@@ -1,5 +1,11 @@
 Changes from Kawa 1.6.66 to 1.6.68.
 ==================================
+The bare beginnings of Common Lisp support, enabled by the --commonlisp
+(or --clisp) command line option.  This is so far little more than a
+hack of the EmacsLisp support, but with lexical scoping and CL-style format.
+
+Changes from Kawa 1.6.66 to 1.6.68.
+==================================
 JEmacs news:
 - Define emacs-version as Kawa version but with leading 0 instead of 1.
 For example, the current value is "0.6.68 JEmacs".

@@ -701,7 +701,7 @@ fi
 
 PACKAGE=kawa
 
-VERSION=1.6.68
+VERSION=1.6.70
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1326,6 +1326,8 @@ trap 'rm -fr `echo "Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefil
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
+  gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
+  gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
@@ -1430,6 +1432,8 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile gnu/Makefile gnu/bytecode/Makefile gnu/ma
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
+  gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
+  gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile

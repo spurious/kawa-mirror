@@ -1,3 +1,11 @@
+Changes from Kawa 1.6.92 to 1.6.94.
+==================================
+The JEmacs code now depends on CommonLisp, rather than vice versa, which
+means Commonlisp no longer depends on Swing, and can be built with GCJ.
+CommonLisp and JEmacs symbols are now implemented using Binding, not String.
+
+Changes from Kawa 1.6.90 to 1.6.92.
+==================================
 Kawa now installs as a .jar file (kawa.jar symlinked to kawa-VERSION.jar),
 rather than a collection of .class files.
 
@@ -14,12 +22,12 @@ A new formatting framework uses the Consumer interface from gnu.lists.
 You can associate a format with an output port.  Common Lisp and JEmacs
 finally print using their respective syntaxes.
 
-All output port (OutPort instances) are now automatically flushed on
+All output ports (OutPort instances) are now automatically flushed on
 program exit, using a new WriterManager helper class.
 
 The new commmand-line option --debug-print-expr causes the Expression
 for each expression to be printed.  The option --debug-print-final-expr
-is similar, but prints Expressions after optimization just before
+is similar, but prints Expressions after optimization and just before
 compilation.  They are printed using the new pretty-printer.
 
 Changed calling convention for --full-tailcalls to write results

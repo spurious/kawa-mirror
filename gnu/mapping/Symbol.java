@@ -23,7 +23,7 @@ public class Symbol
   static int counter;
   public int id = ++counter;
 
-  String name;
+  protected String name;
   Namespace namespace;
 
   public final Symbol getKeySymbol () { return this; }

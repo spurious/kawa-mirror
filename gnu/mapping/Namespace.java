@@ -19,7 +19,7 @@ import java.io.*;
 public class Namespace
   implements Externalizable
 {
-  /** Map namepsace anmes (and nick-names) to Namespaces. */
+  /** Map namepsace names (and nick-names) to Namespaces. */
   static final Hashtable nsTable = new Hashtable(50);
 
   /** The Namespace with the empty name. */
@@ -118,10 +118,9 @@ public class Namespace
     return null;
   }
 
-  protected Symbol createInternal(String key, int hash)
+  public Symbol add(Symbol sym, int hash)
   {
     int index = hash & mask;
-    Symbol sym = new Symbol(key);
     SymbolRef ref = new SymbolRef(sym, this);
     sym.namespace = this;
     ref.next = table[index];
@@ -151,7 +150,7 @@ public class Namespace
 	  }
 	*/
 	if (create)
-	  return createInternal(key, hash);
+	  return add(new Symbol(key), hash);
 	else
 	  return null;
       }

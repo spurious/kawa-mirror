@@ -1,3 +1,10 @@
+2004-12-20  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (name): Make field protected, for the sake of Keyword.
+	* Namespace.java (createInternal): Remove, moving most of body to ...
+	(add): New public method.
+	(lookup): Use add instead of createInternal.
+
 2004-12-19  Per Bothner  <per@bothner.com>
 
 	* InheritingEnvironment.java (hasMoreElements): Fix logic bug

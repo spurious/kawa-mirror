@@ -1,3 +1,9 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* AddOp.java (classify):  Fix logic for non-float non-integer reals.
+	(compile):  Use LangPrimType.doubleType instead	Type.double_type.
+	Fix bug reported 10-17 Sven.Hartrumpf@fernuni-hagen.de.
+
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* IsEqv.java (IsEqv):  Implement CanInline instead of Inlineable.

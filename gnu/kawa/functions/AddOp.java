@@ -279,7 +279,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
       }
     else if (type.isSubtype(typeDFloNum))
       {
-	PrimType dtype = Type.double_type;
+	PrimType dtype = LangPrimType.doubleType;
 	Target dtarget = new StackTarget(dtype);
 	CodeAttr code = comp.getCode();
 	args[0].compile(comp, dtarget);
@@ -298,7 +298,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
     
   }
 
-  /** Claassify an expression according to its numeric type.
+  /** Classify an expression according to its numeric type.
    * kind==0:  not a number.
    * kind==1:  a non-real number
    * kind==2:  real number
@@ -350,14 +350,9 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
 	if (kind0 == 4 && kind == 4)
 	  type = typeIntNum;
-	else if (kind0 >= 3 && kind >= 3)
-	  {
-	    type = typeDFloNum;
-	    kind0 = 3;
-	  }
 	else if (kind0 >= 2 && kind >= 2)
 	  {
-	    if (kind0 >= 3 || kind >= 3)
+	    if (kind0 == 3 || kind == 3)
 	      {
 		type = typeDFloNum;
 		kind0 = 3;

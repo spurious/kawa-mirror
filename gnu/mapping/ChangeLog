@@ -1,3 +1,8 @@
+2005-02-11  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java: New class, extends Location.
+	* Makefile.am: Update accordingly.
+
 2005-02-07  Thomas Krk  <tk@research.att.com>
 
 	* Environment.java (make(String, Environment)): Set baseTimestamp.

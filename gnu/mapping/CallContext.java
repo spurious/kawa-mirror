@@ -1,5 +1,4 @@
-// -*-Java-*-
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (C) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -12,12 +11,12 @@ import java.util.Hashtable;
 public class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
-@if WITH REFERENCES@
+  /* BEGIN JAVA2 */
   static ThreadLocal currentContext = new ThreadLocal();
-@endif WITH REFERENCES@
-@if WITHOUT REFERENCES@
-  static Hashtable threadMap = new Hashtable(50);
-@endif WITHOUT REFERENCES@
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
+  // static Hashtable threadMap = new Hashtable(50);
+  /* END JAVA1 */
   Thread currentThread;
 
   public final Environment getEnvironment()
@@ -31,29 +30,29 @@ public class CallContext implements Runnable
   {
     Thread thread = Thread.currentThread();
     ctx.currentThread = thread; 
-@if WITH REFERENCES@
+    /* BEGIN JAVA2 */
     currentContext.set(ctx);
-@endif WITH REFERENCES@
-@if WITHOUT REFERENCES@
-    if (thread instanceof Future)
-      ((Future) thread).context = ctx;
-    else
-      threadMap.put(thread, ctx);
-@endif WITHOUT REFERENCES@
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
+    // if (thread instanceof Future)
+    //   ((Future) thread).context = ctx;
+    // else
+    //   threadMap.put(thread, ctx);
+    /* END JAVA1 */
   }
 
   /** Get but don't create a CallContext for the current thread. */
   public static CallContext getOnlyInstance()
   {
-@if WITH REFERENCES@
+    /* BEGIN JAVA2 */
     return (CallContext) currentContext.get();
-@endif WITH REFERENCES@
-@if WITHOUT REFERENCES@
-    Thread thread = Thread.currentThread();
-    if (thread instanceof Future)
-      return ((Future) thread).getCallContext();
-    return (CallContext) threadMap.get(thread);
-@endif WITHOUT REFERENCES@
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
+    // Thread thread = Thread.currentThread();
+    // if (thread instanceof Future)
+    //   return ((Future) thread).getCallContext();
+    // return (CallContext) threadMap.get(thread);
+    /* END JAVA1 */
   }
 
   /** Get or create a CallContext for the current thread. */

@@ -5,6 +5,7 @@ include $(top_srcdir)/Make-rules
 java_sources=\
   AliasConstraint.java \
   ApplyMethodContainer.java ApplyMethodProc.java \
+  CallContext.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \
   IndirectConstraint.java \
@@ -48,15 +49,7 @@ java_sources=\
   WrongArguments.java \
   WrongType.java
 
-java_BUILT = \
-  CallContext.java
-
-CallContext.java: $(srcdir)/CallContext.java.in
-	sed $(DONT_EDIT_SUBS) $(SED_REFERENCES_SUBS) \
-	  <$(srcdir)/CallContext.java.in >CallContext.java
-
-BUILT_SOURCES = $(java_BUILT)
-EXTRA_DIST = package.html CallContext.java.in
+EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-mapping
 GCJ_INPUTS =  $(java_Java)

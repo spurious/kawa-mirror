@@ -2,3 +2,4 @@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = bytecode math
+EXTRA_DIST = PACKAGES

@@ -402,11 +402,16 @@ public class OutPort extends PrintConsumer implements Printable
     writeBreak(PrettyWriter.NEWLINE_LINEAR);
   }
 
+  /** Write a new-line iff the containing section cannot be printed
+   * on one line.  Either all linear-style newlines in a logical
+   * block becomes spaces (if it all fits in a line), or none
+   * of them do. */
   public void writeBreakLinear()
   {
     writeBreak(PrettyWriter.NEWLINE_LINEAR);
   }
 
+  /** Write a new-line if needed, space otherwise. */
   public void writeSpaceFill()
   {
     write(' ');

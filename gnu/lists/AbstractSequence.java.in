@@ -662,16 +662,7 @@ public abstract class AbstractSequence
     
     java.util.Enumeration e = elements();
     for (int i = 0;  e.hasMoreElements(); i++)
-      try
-	{
-	  arr[i] = e.nextElement();
-	}
-      catch (java.lang.ArrayIndexOutOfBoundsException ex)
-	{
-	  System.err.println("arry except at i:"+i+" len:"+len);
-	  ((TreeList) this).dump();
-	  throw ex;
-	}
+      arr[i] = e.nextElement();
     return arr;
   } 
 

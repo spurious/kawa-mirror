@@ -40,11 +40,11 @@ public class TtyInPort extends InPort
 
   private boolean promptEmitted;
 
-  public int fill (char[] buffer, int off, int len) throws java.io.IOException
+  public int fill (int len) throws java.io.IOException
   {
-    int count = in.read(buffer, off, len);
+    int count = in.read(buffer, pos, len);
     if (tie != null && count > 0)
-      tie.echo(buffer, off, len);
+      tie.echo(buffer, pos, count);
     return count;
   }
 

@@ -1,3 +1,8 @@
+2000-02-19  Per Bothner  <per@bothner.com>
+
+	* SysInPort.java (fill):  Change parameters.
+	* TtyInPort.java (fill):  Change parameters.
+
 2000-02-11  Per Bothner  <per@bothner.com>
 
 	* ApplyMethodContainer.java:  New interface.

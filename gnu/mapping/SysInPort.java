@@ -13,8 +13,9 @@ public class SysInPort extends TtyInPort
     this.inStream = inStream;
   }
 
-  public int fill (char[] buffer, int off, int len) throws java.io.IOException
+  public int fill (int len) throws java.io.IOException
   {
+    int off = pos;
     /* This explanation and work-around comes from jacl 1.0's Shell.java:
      *
      * On Unix platforms, System.in.read() will block the delivery of

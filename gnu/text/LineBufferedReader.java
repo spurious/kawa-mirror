@@ -86,16 +86,16 @@ public class LineBufferedReader extends FilterReader
   String name;
 
   /** The current line number (at position of lineStartPos). */
-  int lineNumber;
+  protected int lineNumber;
 
   /** If mark has been called, and not invalidated, the read ahead limit.
     * Zero if mark has not been called, or had been invalidated
     * (due to either calling reset or excessive reading ahead). */
-  private int readAheadLimit = 0;
+  protected int readAheadLimit = 0;
 
   /** The position of the mark (assuming readAheadLinit > 0).
     * (Garbage if readAheadLimit <= 0). */
-  private int markPos;
+  protected int markPos;
 
   public LineBufferedReader (InputStream in)
   {
@@ -121,9 +121,9 @@ public class LineBufferedReader extends FilterReader
     * Can assume that len > 0.  Only called if pos>=limit.
     * Return -1 if EOF, otherwise number of read chars.
     * This can be usefully overridden by sub-classes. */
-  public int fill (char[] buffer, int off, int len) throws java.io.IOException
+  public int fill (int len) throws java.io.IOException
   {
-    return in.read(buffer, off, len);
+    return in.read(buffer, pos, len);
   }
 
   private void clearMark ()
@@ -258,8 +258,7 @@ public class LineBufferedReader extends FilterReader
 	    else
 	      flags &= ~PREV_WAS_CR;
 	  }
-	int readCount = buffer.length - pos;
-	readCount = fill(buffer, pos, readCount);
+	int readCount = fill(buffer.length - pos);
 	if (readCount <= 0)
 	  return -1;
 	limit += readCount;

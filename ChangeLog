@@ -1,3 +1,12 @@
+2002-02-16  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.98.
+	* build.xml:  Likewise.
+
+	* build.xml:  Handle filtering of CallContext.java.in.  Build gnu/brl.
+
+	* Makefile.am (+kawa-doc.tar.gz):  New rule.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* Make-rules (scm-classes.stamp):  Use SCM_COMPILE_FLAGS.

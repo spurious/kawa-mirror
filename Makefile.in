@@ -427,6 +427,11 @@ kawa-@VERSION@.jar: $(JAR_DEPS)
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
 	    `find . -name '*.class' -print`
 
+kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
+
+kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/internals.xml doc/kawa-tour.texi
+	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
+
 dist-kawa-@VERSION@.jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \

@@ -1,3 +1,15 @@
+Function argument in error message are now numbered starting at one.
+
+A new function calling convention, used for --full-tailcalls.
+A function call is split up in two parts:  A match0/.../matchN
+method checks that the actual arguments match the expected
+formal arguments, and leaves them in the per-thread CallContext.
+Then after the calling function returns, a zero-argument apply()
+methods evaluates the function body.  This new convention has
+long-term advantages (performance, full continuations), but the
+most immediate benefit is better handling of generic (otherloaded)
+functions.  There are also improved error messages.
+
 Real numbers, characters, Lisp/Scheme strings (FString) and symbols
 all now implement the Comparable interface.
 

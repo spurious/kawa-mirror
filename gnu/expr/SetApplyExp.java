@@ -60,6 +60,8 @@ public class SetApplyExp extends ApplyExp
     comp.compileConstant(gnu.mapping.Values.empty, target);
   }
 
+  Object walk (ExpWalker walker) { return walker.walkSetApplyExp(this); }
+
   static synchronized Method getSetMethod (int arg_count)
   {
     ClassType proc = Compilation.scmProcedureType;

@@ -1,3 +1,10 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* MultiplyOp.java:  Renamed from kawa.standard.multiply_oper.
+	* DivideOp.java:  Renamed from kawa.standard.divide_oper.
+	* NumberCompare.java:  Moved from kawa.standard.NumberCompare.
+	* Makefile.am (java_sources):  Add new classes.
+
 2001-08-24  Per Bothner  <per@bothner.com>
 
 	* AddOp.java (compile):  Optimize additions of doubles and DFloNum.

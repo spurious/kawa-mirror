@@ -9,9 +9,12 @@ java_sources=\
   Apply.java \
   Assoc.java \
   DisplayFormat.java \
+  DivideOp.java \
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
   MakeProcedure.java \
+  MultiplyOp.java \
+  NumberCompare.java \
   Member.java \
   Setter.java \
   ValuesMap.java \

@@ -69,7 +69,7 @@ public class Literal
     this.value = value;
     comp.literalTable.put (value, this);
     this.field = field;
-    this.type = field.type;
+    this.type = field.getType();
     flags = ALLOCATED|INITIALIZED|ASSIGNED;
   }
 
@@ -78,17 +78,6 @@ public class Literal
     this.value = value;
     comp.literalTable.put (value, this);
     this.type = type;
-  }
-
-  void compile (Compilation comp)
-  {
-    comp.method.compile_getstatic (field);
-    if (field == comp.literalsField)
-      {
-	comp.method.compile_push_int (index);
-	comp.method.compile_array_load (comp.scmObjectType);
-	comp.method.maybe_compile_checkcast (type);
-      }
   }
 
   /** Emit code to re-create this Literal's value, an Object array. */
@@ -112,7 +101,13 @@ public class Literal
 
   void emit (Compilation comp, boolean ignore)
   {
-    if ((flags & ALLOCATED) != 0 && ! (value instanceof String))
+    if (value instanceof String)
+      {
+	if (! ignore)
+	  comp.method.compile_push_string (value.toString ());
+	return;
+      }
+    if ((flags & ALLOCATED) != 0)
       {
 	if ((flags & ASSIGNED) == 0 || field == null)
 	  throw new Error ("internal error in Literal.emit");
@@ -128,10 +123,6 @@ public class Literal
 	comp.method.compile_dup (comp.javaIntegerType);
 	comp.method.compile_push_int (((Integer)value).intValue ());
 	comp.method.compile_invoke_special (comp.initIntegerMethod);
-      }
-    else if (value instanceof String)
-      {
-	comp.method.compile_push_string (value.toString ());
       }
     else if (value instanceof String[])
       emitArray (comp, comp.javaStringType);

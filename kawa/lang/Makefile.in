@@ -50,10 +50,7 @@ NORMAL_UNINSTALL = true
 PRE_UNINSTALL = true
 POST_UNINSTALL = true
 EXEEXT = @EXEEXT@
-EXTRA_MISC = @EXTRA_MISC@
-EXTRA_OBJ = @EXTRA_OBJ@
 JAVA = @JAVA@
-JAVA_VERSION = @JAVA_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
@@ -67,6 +64,7 @@ SUFFIXES = .java .class
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 CLASSPATH_ENV = CLASSPATH=../..:$(srcdir)/../..:$$CLASSPATH
 JAVAC = javac
+JCFLAGS = -g
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -156,14 +154,8 @@ PrimProcedure.class PrimApplyExp.class \
 Values.class \
 Promise.class \
 Future.class \
-@EXTRA_OBJ@ \
+Record.class GetFieldProc.class SetFieldProc.class RecordConstructor.class \
 $(EXCEPTIONS)
-
-OBJ_1_0=
-OBJ_1_1=Record.class \
-  GetFieldProc.class SetFieldProc.class RecordConstructor.class
-
-EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 
 java_DATA=$(OBJ)
 
@@ -285,7 +277,7 @@ maintainer-clean
 
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
 
 all: $(OBJ)
 

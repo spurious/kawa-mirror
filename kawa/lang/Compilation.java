@@ -210,12 +210,20 @@ public class Compilation
   {
     if (value == null)
       method.compile_push_null();
+    else if (value instanceof String && ! immediate)
+      method.compile_push_string ((String) value);
     else
       {
 	Literal literal = findLiteral (value);
 	if (literal.field == null)
 	  literal.assign (this);
-	literal.compile (this);
+	method.compile_getstatic (literal.field);
+	if (literal.field == literalsField)
+	  {
+	    method.compile_push_int (literal.index);
+	    method.compile_array_load (scmObjectType);
+	    method.maybe_compile_checkcast (literal.type);
+	  }
       }
   }
 
@@ -449,6 +457,7 @@ public class Compilation
     // so instead create an artificial Variable for the incoming argument.
     // Below, we assign the value to the slot.
     int i = 0;
+    method.initCode();
     for (Variable var = lexp.firstVar ();  var != null;  var = var.nextVar ())
       {
 	if (! (var instanceof Declaration) || ! var.isParameter ())

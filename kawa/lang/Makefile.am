@@ -7,9 +7,10 @@ SUFFIXES = .java .class
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 CLASSPATH_ENV = CLASSPATH=../..:$(srcdir)/../..:$$CLASSPATH
 JAVAC = javac
+JCFLAGS = -g
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -99,14 +100,8 @@ PrimProcedure.class PrimApplyExp.class \
 Values.class \
 Promise.class \
 Future.class \
-@EXTRA_OBJ@ \
+Record.class GetFieldProc.class SetFieldProc.class RecordConstructor.class \
 $(EXCEPTIONS)
-
-OBJ_1_0=
-OBJ_1_1=Record.class \
-  GetFieldProc.class SetFieldProc.class RecordConstructor.class
-
-EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 
 java_DATA=$(OBJ)
 

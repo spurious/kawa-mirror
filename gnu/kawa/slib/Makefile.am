@@ -22,10 +22,7 @@ java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm srfi1.scm readtable.scm \
 EXTRA_DIST = $(java_SCM) XML.scm HTTP.scm gui.scm
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-../../../kawa/java-classes.stamp:
-	cd ../../../kawa; $(MAKE)
+all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

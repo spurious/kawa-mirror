@@ -1,3 +1,7 @@
+2004-12-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: No longer need to force ../../../kawa to be made first.
+
 2004-10-26  Per Bothner  <per@bothner.com>
 
 	* BRLRead.java (brlReadTable): Set using new makeSchemeReadTable.

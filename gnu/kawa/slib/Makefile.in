@@ -410,10 +410,7 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
-all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-../../../kawa/java-classes.stamp:
-	cd ../../../kawa; $(MAKE)
+all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

@@ -161,8 +161,7 @@ public class XQuery extends Interpreter
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	  System.err.println("caught "+ex);
-	// Ignore - happens while building this directory.
+	// Ignore - gnu.kawa.servlet.HTTP is only built if servlets enabled.
       }
 
     define("define", new kawa.standard.set_b());

@@ -1,3 +1,7 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Add new tests for double elipsis in template.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* classes1.scm: Add test for define-namespace of a class.

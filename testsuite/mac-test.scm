@@ -1,4 +1,4 @@
-(test-init "macros" 80)
+(test-init "macros" 82)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -305,6 +305,9 @@
     ((check-matching 5 a b c ... z) (list a b c ... 'last z))
     ((check-matching 6 a b c ... z . r) (list a b c ... 'last z 'cdr r))
     ((check-matching 7 a 1 ... 1 . r) (list a 'cdr r))
+    ((check-matching 8 (a ...) ... (r ...))
+     (list (+ a ...) ... 'R r ... 'F (+ a ... ...)))
+    ((check-matching 9 (a ...) ...) (list #(A a ... ... Z) '(A a ... ... Z)))
     ((check-matching a . b) "no-match")
     ))
 (test '(3 #(2 1)) 'check-matching-1 (check-matching 1 #(1 2 3)))
@@ -326,3 +329,7 @@
 (test '(10 cdr 100) 'check-matching-7b (check-matching 7 10 1 1 1 . 100))
 (test '(10 cdr 100) 'check-matching-7c (check-matching 7 10 1 . 100))
 (test "no-match" 'check-matching-7d (check-matching 7 10 . 100))
+(test '(3 12 R 8 9 F 15)
+      'check-matching-8 (check-matching 8 (1 2) (3 4 5) (8 9)))
+(test '(#(A 1 2 3 4 5 Z) (A 1 2 3 4 5 Z))
+      'check-matching-9 (check-matching 9 (1 2) (3 4 5)))

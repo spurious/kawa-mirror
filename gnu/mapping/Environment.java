@@ -14,14 +14,8 @@ public class Environment extends NameMap
 
   Environment previous;
 
-  int time_stamp;
-
   protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
   protected UnboundConstraint unboundConstraint = new UnboundConstraint(this);
-
-  /** The value of previous.time_stamp when this was created.
-   * Newer Bindings in previous are ignored. */
-  int previous_time_stamp;
 
   static final float threshold = (float) 0.7;
   static int num_bindings;
@@ -84,7 +78,6 @@ public class Environment extends NameMap
   {
     this ();
     this.previous = previous;
-    this.previous_time_stamp = this.time_stamp = previous.time_stamp;
   }
 
   public Binding getBinding (String name)
@@ -115,7 +108,6 @@ public class Environment extends NameMap
 
   private Binding lookup (String name, int hash)
   {
-    int time_stamp = this.time_stamp;
     for (Environment env = this;  env != null;  env = env.previous)
       {
 	Binding[] env_tab = env.table;
@@ -123,10 +115,9 @@ public class Environment extends NameMap
 	for (Binding binding = env_tab[index];
 	     binding != null;  binding = binding.chain)
 	  {
-	    if (binding.sym_name == name && binding.time_stamp < time_stamp)
+	    if (binding.sym_name == name)
 	      return binding;
 	  }
-	time_stamp = env.previous_time_stamp;
       }
     return null;
   }
@@ -147,11 +138,9 @@ public class Environment extends NameMap
     int hash = System.identityHashCode(name);
     int index = (hash & 0x7FFFFFFF) % table.length;
 
-    Binding binding = new Binding ();
+    Binding binding = new Binding(name);
     binding.constraint = trivialConstraint;
-    binding.setName(name);
     binding.value = value;
-    binding.time_stamp = time_stamp++;
     binding.chain = table[index];
     table[index] = binding;
     return binding;
@@ -188,7 +177,6 @@ public class Environment extends NameMap
 
   public Object remove (String name)
   {
-    int time_stamp = this.time_stamp;
     int hash = System.identityHashCode(name);
     Environment env = this;
     for ( ; ;  env = env.previous)
@@ -200,14 +188,13 @@ public class Environment extends NameMap
 	for (Binding binding = env_tab[index];
 	     binding != null;  binding = binding.chain)
 	  {
-	    if (binding.sym_name == name && binding.time_stamp < time_stamp)
+	    if (binding.sym_name == name)
 	      {
 		Object old = binding.get(); 
 		env.remove(binding);
 		return old;
 	      }
 	  }
-	time_stamp = env.previous_time_stamp;
       }
   }
 
@@ -230,8 +217,6 @@ public class Environment extends NameMap
 	      table[index] = next;
 	    else
 	      prev.chain = next;
-	    if (b.time_stamp + 1 == time_stamp)
-	      time_stamp--;
 	    num_bindings--;
 	    return;
 	  }

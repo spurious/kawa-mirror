@@ -72,16 +72,6 @@ public class CompileFile
 	  }
 	catch (Throwable ex)
 	  {
-	    StringBuffer sbuf = new StringBuffer();
-	    sbuf.append("Internal error while compiling ");
-	    sbuf.append(inname);
-	    int line = comp.getLine();
-	    if (line > 0)
-	      {
-		sbuf.append(':');
-		sbuf.append(line);
-	      }
-	    System.err.println(sbuf);
 	    ex.printStackTrace(System.err);
 	    System.exit(-1);
 	  }

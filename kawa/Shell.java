@@ -237,12 +237,14 @@ public class Shell
 	      }
 	    catch (WrongArguments e)
 	      {
+		messages.printAll(perr, 20);
 		if (e.usage != null)
 		  perr.println("usage: "+e.usage);
 		e.printStackTrace(perr);
 	      }
 	    catch (java.lang.ClassCastException e)
 	      {
+		messages.printAll(perr, 20);
 		perr.println("Invalid parameter, was: "+ e.getMessage());
 		e.printStackTrace(perr);
 	      }
@@ -265,6 +267,7 @@ public class Shell
 	      }
 	    catch (Throwable e)
 	      {
+		messages.printAll(perr, 20);
 		e.printStackTrace(perr);
 		if (! interactive)
 		  return;

@@ -1,3 +1,9 @@
+2005-01-30  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (compile_to_files): Don't generate
+	error message - that's handled in Compilation.compile.
+	* Shell.java (run): Print messages in all catch clauses.
+
 2005-01-29  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (featureMap): Add srfi-37 and args-fold.

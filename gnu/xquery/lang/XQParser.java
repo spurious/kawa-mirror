@@ -1649,7 +1649,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	Declaration decl = parser.lookup(name, -1);
 	exp = null;
-	if (decl == null && Compilation.generateServletDefault)
+	if (decl == null)
 	  {
 	    if (name == "request")
 	      exp = makeFunctionExp("gnu.kawa.servlet.GetRequest",

@@ -4,7 +4,9 @@
 package gnu.xml;
 import gnu.lists.Convert;
 
-/** Parse an xpath expression, yielding an XPath object. */
+/** Parse an xpath expression, yielding an XPath object.
+ * @deprecated  Use the XQuery implementation instead.
+ */
 
 public class XPathParser implements XPathConstants
 {

@@ -1,3 +1,10 @@
+2002-04-07  Per Bothner  <per@bothner.com>
+
+	* XPath.java:  Mark as deprecated.
+	* XPathConstants.java:  Likewise.
+	* XPathContext.java:  Likewise.
+	* XPathParser.java:  Likewise.
+
 2002-03-24  Per Bothner  <per@bothner.com>
 
 	* QName.java.in (hashCode):  Allow localname to be null.

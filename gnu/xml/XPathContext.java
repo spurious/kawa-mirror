@@ -5,6 +5,10 @@ package gnu.xml;
 import gnu.lists.*;
 import java.io.PrintStream;
 
+/**
+ * @deprecated  Use the XQuery implementation instead.
+ */
+
 public class XPathContext
 	implements XPathConstants, PositionConsumer
 {

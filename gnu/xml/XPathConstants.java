@@ -3,6 +3,10 @@
 
 package gnu.xml;
 
+/**
+ * @deprecated  Use the XQuery implementation instead.
+ */
+
 public interface XPathConstants
 {
   /**

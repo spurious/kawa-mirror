@@ -4,6 +4,10 @@
 package gnu.xml;
 import gnu.lists.*;
 
+/**
+ * @deprecated  Use the XQuery implementation instead.
+ */
+
 public class XPath implements XPathConstants
 {
   String srcPath;

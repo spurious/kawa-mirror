@@ -244,7 +244,7 @@ public class FindTailCalls extends ExpWalker
   // calls that call the key.
   // Hashtable applications = new Hashtable();
 
-  protected Expression walkObjectExp (ObjectExp exp)
+  protected Expression walkClassExp (ClassExp exp)
   {
     boolean save = inTailContext;
     LambdaExp parent = currentLambda;

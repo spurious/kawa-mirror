@@ -10,7 +10,7 @@ import gnu.bytecode.*;
  * @author	Per Bothner
  */
 
-public class ModuleExp extends ClassExp
+public class ModuleExp extends LambdaExp
 {
   /** True if the body is too complex to evaluate,and we must compile it.
    * This is because it contains a construct we know how to compile, but not
@@ -218,7 +218,7 @@ public class ModuleExp extends ClassExp
 	    && ! decl.isPrivate())
 	  continue;  // Handled in SetExp.
 	Expression value = decl.getValue();
-	if (value instanceof LambdaExp)
+	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }

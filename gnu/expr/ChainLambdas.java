@@ -2,7 +2,7 @@ package gnu.expr;
 
 /** Sets up the firstChild/nextSibling links of each LambdaExp.
  * Setup 'outer' links of ScopeExp and its sub-classes.
- * Also generates a class name for each ObjectExp and registers each class.
+ * Also generates a class name for each ClassExp and registers each class.
  * Also, if lambda is bound to a unique declaration, make that its name.
  */
 
@@ -38,7 +38,7 @@ public class ChainLambdas extends ExpWalker
   protected Expression walkLambdaExp (LambdaExp exp)
   {    
     LambdaExp parent = currentLambda;
-    if (parent != null && ! (parent instanceof ObjectExp))
+    if (parent != null && ! (parent instanceof ClassExp))
       {
 	exp.nextSibling = parent.firstChild;
 	parent.firstChild = exp;
@@ -62,10 +62,10 @@ public class ChainLambdas extends ExpWalker
     return exp;
   }
 
-  protected Expression walkObjectExp (ObjectExp exp)
+  protected Expression walkClassExp (ClassExp exp)
   {    
     LambdaExp parent = currentLambda;
-    if (parent != null && ! (parent instanceof ObjectExp))
+    if (parent != null && ! (parent instanceof ClassExp))
       {
 	exp.nextSibling = parent.firstChild;
 	parent.firstChild = exp;
@@ -76,6 +76,11 @@ public class ChainLambdas extends ExpWalker
     // Give name to object class.
     exp.getCompiledClassType(comp);
     comp.addClass(exp.type);
+    if (exp.isMakingClassPair())
+      {
+	exp.instanceType.setName(exp.type.getName()+"$class");
+	comp.addClass(exp.instanceType);
+      }
     return exp;
   }
 }

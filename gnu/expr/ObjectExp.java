@@ -2,13 +2,8 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 
-public class ObjectExp extends LambdaExp
+public class ObjectExp extends ClassExp
 {
-  /** List of base classes and implemented interfaces. */
-  public Expression[] supers;
-
-  public LambdaExp initMethod;
-
   public ObjectExp ()
   {
     type = null;
@@ -16,266 +11,34 @@ public class ObjectExp extends LambdaExp
     setCanRead(true);
   }
 
-  public String getJavaName ()
+  protected Expression walk (ExpWalker walker)
   {
-    return name == null ? "object" : Compilation.mangleName (name);
-  }
-
-  public ClassType getCompiledClassType(Compilation comp)
-  {
-    if (getType().getName() == null)
-      {
-	String name = getName();
-	if (name == null)
-	  name = "object";
-	type.setName(comp.generateClassName(name));
-      }
-    return type;
-  }
-
-  public Type getType()
-  {
-    if (type == null)
-      {
-	type = new ClassType();
-	if (supers == null || supers.length == 0)
-	  type.setSuper(Type.pointer_type);
-	else
-	  {
-	    int len = supers.length;
-	    ClassType[] superTypes = new ClassType[len];
-	    int j = 0;
-	    for (int i = 0;  i < len;  i++)
-	      {
-                Type st = kawa.standard.Scheme.exp2Type(supers[i]);
-                if (st == null || ! (st instanceof ClassType))
-                  throw new Error("invalid super type");
-                ClassType t = (ClassType) st;
-		if ((t.getModifiers() & Access.INTERFACE) == 0)
-		  {
-		    if (j < i)
-		      throw new Error("duplicate superclass");
-		    type.setSuper(t);
-		  }
-		else
-		  superTypes[j++] = t;
-	      }
-	    if (j > 0)
-	      {
-		ClassType[] interfaces;
-		if (j == len)
-		  interfaces = superTypes;
-		else
-		  {
-		    interfaces = new ClassType[j];
-		    System.arraycopy(superTypes, 0, interfaces, 0, j);
-		  }
-		type.setInterfaces(interfaces);
-	      }
-            if (j == len)
-              type.setSuper(Type.pointer_type);
-	  }
-      }
-    return type;
+    return walker.walkObjectExp(this);
   }
 
   public void compile (Compilation comp, Target target)
   {
-    super.compile(comp, Target.pushObject);
+    ClassType new_class = compile (comp);
+    CodeAttr code = comp.getCode();
+    code.emitNew(type);
+    code.emitDup(1);
+    Method init = comp.getConstructor(type, this);
+    if (closureEnvField != null)
+      {
+	LambdaExp caller = outerLambda();
+	Variable closureEnv =
+	  ! Compilation.usingTailCalls ? getHeapLambda(caller).heapFrame
+	  : caller.heapFrame != null ? caller.heapFrame	: caller.closureEnv;
+	code.emitLoad(closureEnv);
+      }
+    code.emitInvokeSpecial(init);
+
     if (initMethod != null)
       {
-	CodeAttr code = comp.getCode();
 	code.emitDup(1);
 	code.emitInvokeVirtual(initMethod.getMainMethod());
       }
     target.compileFromStack(comp, getCompiledClassType(comp));
   }
 
-  public ClassType compile (Compilation comp)
-  {
-    ClassType saveClass = comp.curClass;
-    Method saveMethod = comp.method;
-    try
-      {
-	ClassType new_class = getCompiledClassType(comp);
-	comp.curClass = new_class;
-
-	String filename = getFile();
-	if (filename != null)
-	  new_class.setSourceFile (filename);
-
-	LambdaExp saveLambda = comp.curLambda;
-	comp.curLambda = this;
-
-	allocFrame(comp);
-	if (getNeedsStaticLink() && saveLambda.heapFrameLambda != this)
-	  {
-            Variable parentFrame = saveLambda.heapFrame != null
-              ? saveLambda.heapFrame
-              : saveLambda.closureEnv;
-            if (parentFrame != null)
-              closureEnvField = staticLinkField
-                = new_class.addField("closureEnv", parentFrame.getType());
-	  }
-	comp.generateConstructor (this);
-	CodeAttr code;
-
-	for (Declaration decl = firstDecl();
-             decl != null;  decl = decl.nextDecl())
-	  {
-	    // If the declaration derives from a method, don't create field.
-	    if (decl.getCanRead())
-	      {
-		decl.field = new_class.addField(decl.getName(), decl.getType(),
-						Access.PUBLIC);
-		decl.setSimple(false);
-	      }
-	  }
-
-	for (LambdaExp child = firstChild;  child != null; )
-	  {
-	    ClassType method_class;
-	    boolean method_static;
-	    int method_flags;
-	    //method_class = heapFrameLambda.getCompiledClassType(comp);
-	    //method_class = (ClassType) heapFrame.getType();
-	    method_class = type;
-	    child.declareThis(method_class);
-
-	    // generate_unique_name (method_class, child.getName());
-	    String child_name = child.getName();
-	    child.addMethodFor(comp, null);
-	    child = child.nextSibling;
-	  }
-
-	for (LambdaExp child = firstChild;  child != null; )
-	  {
-	    Method save_method = comp.method;
-	    LambdaExp save_lambda = comp.curLambda;
-	    comp.method = child.getMainMethod();
-	    comp.curClass = comp.method.getDeclaringClass();
-	    comp.curLambda = child;
-	    comp.method.initCode();
-            child.allocChildClasses(comp);
-	    child.allocParameters(comp);
-	    child.enterFunction(comp);
-	    child.compileBody(comp);
-	    child.compileEnd(comp);
-	    child.compileChildMethods(comp);
-	    comp.method = save_method;
-	    comp.curClass = new_class;
-	    comp.curLambda = save_lambda;
-	    child = child.nextSibling;
-	  }
-
-	comp.curLambda = saveLambda;
-
-	return new_class;
-      }
-    finally
-      {
-	comp.curClass = saveClass;
-	comp.method = saveMethod;
-      }
-  }
-
-  protected Expression walk (ExpWalker walker)
-  {
-    return walker.walkObjectExp(this);
-  }
-
-  protected void walkChildren(ExpWalker walker)
-  {
-    LambdaExp save = walker.currentLambda;
-    walker.currentLambda = this;
-    try
-      {
-	for (LambdaExp child = firstChild;
-	     child != null && walker.exitValue == null;
-	     child = child.nextSibling)
-	  walker.walkLambdaExp(child);
-      }
-    finally
-      {
-	walker.currentLambda = save;
-      }
-  }
-
-  public void print (OutPort out)
-  {
-    out.startLogicalBlock("(Object/", ")", 2);
-    if (name != null)
-      {
-	out.print(name);
-	out.print('/');
-      }
-    out.print(id);
-    out.print("/ (");
-    Special prevMode = null;
-    int i = 0;
-    int opt_i = 0;
-    int key_args = keywords == null ? 0 : keywords.length;
-    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
-    for (Declaration decl = firstDecl();  decl != null; decl = decl.nextDecl())
-      {
-	Special mode;
-	if (i < min_args)
-	  mode = null;
-	else if (i < min_args + opt_args)
-	  mode = Special.optional;
-	else if (max_args < 0 && i == min_args + opt_args)
-	  mode = Special.rest;
-	else
-	  mode = Special.key;
-	if (i > 0)
-	  out.print(' ');
-	if (mode != prevMode)
-	  {
-	    out.print(mode);
-	    out.print(' ');
-	  }
-	Expression defaultArg = null;
-	if (mode == Special.optional || mode == Special.key)
-	  defaultArg = defaultArgs[opt_i++];
-	if (defaultArg != null)
-	  out.print('(');
-	out.print(decl.getName());
-	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
-	  {
-	    out.print(' ');
-	    defaultArg.print(out);
-	    out.print(')');
-	  }
-	i++;
-	prevMode = mode;
-      }
-    out.print(") ");
-    for (LambdaExp child = firstChild;  child != null;
-	 child = child.nextSibling)
-      {
-        out.println();
-	out.writeSpaceLinear();
-        out.print(" method: ");
-        child.print(out);
-      }
-    out.writeSpaceLinear();
-    if (body == null)
-      out.print("<null body>");
-    else
-      body.print (out);
-    out.endLogicalBlock(")");
-  }
-
-  public String toString()
-  {
-    String str = "ObjectExp/"+name+'/'+id+'/';
-
-	int l = getLine();
-	if (l <= 0 && body != null)
-	  l = body.getLine();
-	if (l > 0)
-	  str = str + "l:" + l;
-
-    return str;
-  }
 }

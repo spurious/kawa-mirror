@@ -256,13 +256,14 @@ public class FindCapturedVars extends ExpWalker
 	if (decl.isSimple())
 	  {	
 	    if (declLambda instanceof ModuleExp
-		|| declLambda instanceof ObjectExp)
+		|| declLambda instanceof ClassExp)
 	      {
 		declLambda.heapFrameLambda = declLambda;
 	      }
 	    else if (declLambda.capturedVars == null)
 	      {
-		if (! Compilation.usingTailCalls)
+		if (! Compilation.usingTailCalls
+		    || heapLambda instanceof ClassExp)
 		  ;
 		else if (heapLambda.isClassGenerated())
 		  declLambda.heapFrameLambda = heapLambda;

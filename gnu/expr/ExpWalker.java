@@ -27,7 +27,8 @@ public class ExpWalker
 
   protected Expression walkLetExp (LetExp exp) { return walkScopeExp(exp); }
   protected Expression walkLambdaExp (LambdaExp exp) { return walkScopeExp(exp); }
-  protected Expression walkObjectExp (ObjectExp exp) { return walkLambdaExp(exp); }
+  protected Expression walkClassExp (ClassExp exp) { return walkLambdaExp(exp); }
+  protected Expression walkObjectExp (ObjectExp exp) { return walkClassExp(exp); }
   protected Expression walkModuleExp (ModuleExp exp) { return walkLambdaExp(exp); }
   protected Expression walkSetExp (SetExp exp) { return walkExpression(exp); }
   //protected Expression walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }

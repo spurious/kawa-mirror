@@ -24,13 +24,7 @@ public class ELispReader extends gnu.text.LispReader
   {
     return (Character.isWhitespace (ch)
 	    || ch == ')' || ch == '(' || ch == '"' || ch == ';'
-	    || ch == '[' || ch == ']');
-  }
-
-  Object readSymbol ()
-       throws java.io.IOException
-  {
-    return readSymbol (read (), getReadCase());
+	    || ch == '[' || ch == ']' || ch == '\'' || ch == '#');
   }
 
   protected Object makeNil ()
@@ -51,41 +45,13 @@ public class ELispReader extends gnu.text.LispReader
     ((Pair) pair).cdr = cdr;
   }
 
-  /** Get specification of how symbols should be case-folded.
-    * @return Either 'P' (means preserve case), 'U' (upcase),
-    * 'D' (downcase, or 'I' (invert case).
-    */
-  public static char getReadCase()
-  {
-    char read_case;
-    try
-      {
-	String read_case_string
-	  = Environment.lookup_global("symbol-read-case").toString();
-	read_case = read_case_string.charAt(0);
-	if (read_case == 'P') ;
-	else if (read_case == 'u')
-	  read_case = 'U';
-	else if (read_case == 'd' || read_case == 'l' || read_case == 'L')
-	  read_case = 'D';
-	else if (read_case == 'i')
-	  read_case = 'I';
-      }
-    catch (Exception ex)
-      {
-	read_case = 'P';
-      }
-    return read_case;
-  }
-
-  Object readSymbol (int c, char read_case)
+  boolean readAtom0 (int c, StringBuffer str)
        throws java.io.IOException
   {
     char firstChar = (char) c;
+    boolean sawBackslash = false;
     if (c < 0 || isDelimiter(firstChar))
       error("no symbol start character");
-    StringBuffer str = new StringBuffer (30);
-    char lastChar = ' ';
     for (;;)
       {
 	char ch = (char)c;
@@ -95,20 +61,11 @@ public class ELispReader extends gnu.text.LispReader
 	    if (c < 0)
 	      {
 		error("EOF after \\ escape");
-		return "??";
+		str.append("??");
+		return true;
 	      }
 	    ch = (char) c;
-	    lastChar = ' ';
-	  }
-	else
-	  {
-	    lastChar = ch;
-	    if (read_case == 'U'
-		|| (read_case == 'I' && Character.isLowerCase(ch)))
-	      ch = Character.toUpperCase(ch);
-	    else if (read_case == 'D'
-		     || (read_case == 'I' && Character.isUpperCase(ch)))
-	      ch = Character.toLowerCase (ch);
+	    sawBackslash = true;
 	  }
 	str.append (ch);
 	c = peek();
@@ -116,7 +73,68 @@ public class ELispReader extends gnu.text.LispReader
 	  break;
 	skip();
       }
+    return sawBackslash;
+  }
+
+  Object readAtom (int c)
+    throws java.io.IOException
+  {
+    StringBuffer str = new StringBuffer (30);
+    boolean sawBackslash = readAtom0(c, str);
+    int len = str.length();
+    if (! sawBackslash)
+      {
+	int i = 0;
+	char ch = str.charAt(0);
+	if (ch == '+' || ch == '-')
+	  i++;
+	if (i != len)
+	  {
+	    boolean sawDigits = false;
+	    while (i != len && Character.isDigit(str.charAt(i)))
+	      {
+		i++;
+		sawDigits = true;
+	      }
+	    if (i > 0 && i < len && str.charAt(i) == '.')
+	      {
+		// Integers can have trailing decimal points.
+		if (++i == len)
+		  str.setLength(len = --i);
+	      }
+	    if (i == len && sawDigits) // It is an integer.
+	      return IntNum.valueOf(str.toString(), 10);
+
+	    while (i != len && Character.isDigit(str.charAt(i)))
+	      {
+		i++;
+		sawDigits = true;
+	      }
+	    if (i + 1 < len && ((ch = str.charAt(i)) == 'e' || ch == 'E'))
+	      {
+		ch = str.charAt(++i);
+		sawDigits = false;
+		if (ch == '+' || ch == '-')
+		  i++;
+		while (i != len && Character.isDigit(str.charAt(i)))
+		  {
+		    i++;
+		    sawDigits = true;
+		  }
+	      }
+	    if (i == len && sawDigits)
+	      return new DFloNum(str.toString ());
+	  }
+      }
     return ELisp.getSymbol(str.toString().intern());
+  }
+
+  Object readInteger (int base)
+    throws java.io.IOException
+  {
+    StringBuffer str = new StringBuffer (30);
+    readAtom0(read(), str);
+    return IntNum.valueOf(str.toString(), base);
   }
 
   boolean charIsInt = true;
@@ -165,356 +183,6 @@ public class ELispReader extends gnu.text.LispReader
 	c = read();
       }
     return str.toString();
-  }
-
-  /** Read a number from this.
-   * Actually reads a quantity, which is a complex number and an optional unit.
-   * @param radix the default radix
-   * This can be overridden by an explicit radix in the number.
-   * @return the number read
-   */
-
-  public Numeric readNumber (int radix)
-       throws java.io.IOException
-  {
-    return readNumber (read (), radix);
-  }
-
-  public Numeric readNumber (int c, int radix)
-       throws java.io.IOException
-  {
-    char exactness = ' ';
-    int explicit_radix = 0;
-    while (c == '#')
-      {
-	c = read ();
-	switch (c)
-	  {
-	  case 'e':
-	  case 'i':
-	    if (exactness != ' ')
-	      error("extra exactness specifier (#" + (char)c + ")");
-	    exactness = (char) c;
-	    break;
-	  case 'x':
-	  case 'd':
-	  case 'o':
-	  case 'b':
-	    if (explicit_radix != 0)
-	      error("extra radix specifier (#" + (char)c + ")");
-	    explicit_radix = c == 'x' ? 16 : c == 'd' ? 10 : c == 'o' ? 8 : 2;
-	    break;
-	  default:
-	    error( "unrecognized #-construct in number");
-	  }
-	c = read ();
-      }
-    if (explicit_radix != 0)
-      radix = explicit_radix;
-
-    Complex cnum = readComplex (c, radix, exactness);
-    
-    Unit unit = null;
-    if (radix == 10)
-      {
-	c = peek ();
-	while (Character.isLowerCase ((char)c)
-	       || Character.isUpperCase ((char)c))
-	  {
-	    skip();
-	    String word = readAlphaWord (c);
-	    Unit u = Unit.lookup (word);
-	    if (u == null)
-	      error("unknown unit: " + word);
-	    int power;
-	    try {
-	      power = readOptionalExponent ();
-	    } catch (ClassCastException e) {
-	      error("unit exponent too large");
-	      power = 1;
-	    }
-	    if (power != 1)
-	      u = Unit.pow (u, power);
-	    if (unit == null)
-	      unit = u;
-	    else
-	      unit = Unit.mul (unit, u);
-	    c = peek ();
-	  }
-      }
-
-    return unit == null ? cnum : Quantity.make (cnum, unit);
-  }
-
-  Complex readComplex (int c, int radix, char exactness)
-       throws java.io.IOException
-  {
-    int next;
-    if (((c == '+') || (c == '-'))
-	&& (((next = peek ()) == 'i') || (next == 'I')))
-      {
-	skip();
-	if (exactness == 'i')
-	  return new DComplex (0, (c == '+') ? 1 : -1);
-	else
-	  return (c == '+') ? Complex.imOne () : Complex.imMinusOne ();
-      }
-    
-    RealNum num = readReal (c, radix, exactness);
-    c = read ();
-    switch (c)
-      {
-      case 'i': case 'I':
-	/* A pure imaginary number.
-	 * But if a unit follows, assume the i is part of its name.
-	 * This makes it possible to use 12in as 12 inches, not 12i
-	 * n's.  To get 12i n's, use 0+12in.
-	 * The output methods do not account for this, so read-write
-	 * invariance is broken.
-	 * We really need a better syntax for quantities, like number*unit.
-	 * (Another problem is 1 hertz, which prints as 1s-1, but that reads 
-	 * as 0.1).
-	 * NOTE:  This requires 2 charactes of look-ahead!
-	 */
-	if (Character.isLowerCase ((char)(next = peek()))
-	    || Character.isUpperCase ((char)next))
-	  {
-	    unread(next);
-	    return num;
-	  }
-	return Complex.make (IntNum.zero (), num);
-
-
-      case '@':
-	/* polar notation */
-	RealNum angle = readReal (read (), radix, exactness);
-
-	/* r4rs requires 0@1.0 to be inexact zero, even if (make-polar
-	 * 0 1.0) is exact zero, so check for this case.  */
-	if (num.isZero () && !angle.isExact ())
-	  return new DFloNum (0.0);
-
-	return Complex.polar (num, angle);
-	
-      case '+': case '-': 
-	/* rectangular notation */
-	RealNum im;
-	if (((next = peek ()) == 'i') || (next == 'I'))
-	  {
-	    im = (c == '+') ? IntNum.one () : IntNum.minusOne ();
-	    read ();
-	  }
-	else
-	  {
-	    im = readReal (c, radix, exactness);
-	    if ((c = read ()) != 'i' && c != 'I')
-	      error("no i in rectangular complex number");
-	  }
-	return Complex.make (num, im);
-      }
-
-    if (c >= 0)
-      unread(c);
-    return num;
-  }
-
-  /* Signal error(message) and skip to the end of this word. */
-  RealNum numError(String message)
-    throws java.io.IOException
-  {
-    error(message);
-    for (;;)
-      {
-	int c = read();
-	if (c < 0) break;
-	if (isDelimiter((char) c))
-	  {
-	    unread(c);
-	    break;
-	  }
-      }
-    return IntNum.zero();
-  }
-
-
-  public RealNum readReal(int c, int radix, char exactness)
-       throws java.io.IOException
-  {
-    boolean negative = false;
-
-    if (c=='+')
-      c = read ();
-    else if (c=='-')
-      {
-	negative = true;
-	c = read ();
-      }
-
-    int i = port.pos;
-    if (c >= 0)
-      i--;   // Reset to position before current char c.
-    port.pos = i;
-    long ival = readDigitsInBuffer(port, radix);
-    boolean digit_seen = port.pos > i;
-    if (digit_seen && port.pos < port.limit)
-      {
-	if (isDelimiter(port.buffer[port.pos]))
-	  {
-	    if (ival >= 0)
-	      return IntNum.make(negative ? -ival : ival);
-	    else
-	      return IntNum.valueOf(port.buffer, i, port.pos - i,
-				    radix, negative);
-	  }
-      }
-    StringBuffer str = new StringBuffer (20);
-    if (negative)
-      str.append('-');
-    if (digit_seen)
-      str.append(port.buffer, i, port.pos - i);
-
-   /* location of decimal point in str.  */
-    int point_loc = -1;
-    int exp = 0;
-    boolean hash_seen = false;
-    boolean exp_seen = false;
-    for (;;)
-      {
-	c = read ();
-	if (Character.digit ((char)c, radix) >= 0)
-	  {
-	    if (hash_seen)
-	      return numError("digit after '#' in number");
-	    digit_seen = true;
-	    str.append ((char) c);
-	    continue;
-	  }
-	switch (c)
-	  {
-	  case '#':
-	    if (!hash_seen)
-	      {
-		if (radix != 10)
-		  return numError("'#' in non-decimal number");
-		if (!digit_seen)
-		  return numError("'#' with no preceeding digits in number");
-		hash_seen = true;
-	      }
-	    str.append ('0');
-	    digit_seen = true;
-	    continue;
-	  case '.':
-	    if (radix != 10)
-	      return numError("'.' in non-decimal number");
-	    if (point_loc >= 0)
-	      return numError("duplicate '.' in number");
-	    point_loc = str.length ();
-	    str.append ('.');
-	    continue;
-	  case 'e': case 's': case 'f': case 'd': case 'l':
-	  case 'E': case 'S': case 'F': case 'D': case 'L':
-	    int next;
-	    if (radix != 10 || !((next = peek ()) == '+' || next == '-'
-				 || Character.digit ((char)next, 10) >= 0))
-	      break;
-	    if (!digit_seen)
-	      return numError("mantissa with no digits");
-	    exp = readOptionalExponent ();
-	    exp_seen = true;
-	    c = read ();
-	    break;
-	  }
-	break;
-      }
-
-    if (c == '/')
-      {
-	if (hash_seen || exp_seen || point_loc != -1)
-	  return numError("exponent, '#', or '.' in numerator");
-	if (!digit_seen)
-	  return numError("numerator with no digits");
-	IntNum numer = IntNum.valueOf (str.toString (), radix);
-	str.setLength (0);
-	c = peek();
-	if (Character.digit ((char)c, radix) < 0)
-	  return numError("denominator with no digits");
-	do
-	  {
-	    str.append((char) c);
-	    skip();
-	    c = peek();
-	  }
-	while (Character.digit ((char)c, radix) >= 0);
-	
-	IntNum denom = IntNum.valueOf (str.toString (), radix);
-
-	// Check for zero denominator values: 0/0, n/0, and -n/0
-	// (i.e. NaN, Infinity, and -Infinity).
-	if (denom.isZero ())
-	  {
-	    if (exactness == 'i')
-	      {
-		return new DFloNum ((numer.isZero () ? Double.NaN
-				     : negative ? Double.NEGATIVE_INFINITY
-				     : Double.POSITIVE_INFINITY));
-	      }
-	    else if (numer.isZero())
-	      return numError("0/0 is undefined");
-	  }
-
-	if (exactness != 'i')
-	  return (RatNum.make (numer, denom));
-
-	// For inexact, we make a RatNum and let it do the division.
-	// This doesn't work for #i-0/1, because it's the same
-	// rational number as #i0/1, so we check for that.
-	return new DFloNum (numer.isZero () ? (negative ? -0.0 : 0.0)
-			    : RatNum.make (numer, denom).doubleValue ());
-
-      }
-    
-    if (c >= 0)
-      unread(c);
-
-    if (!digit_seen)
-      return numError("real number (or component) with no digits");
-
-    if (exactness == 'i'
-	|| exactness == ' ' && (hash_seen || exp_seen || point_loc != -1))
-      {
-	if (radix == 10)
-	  {
-	    if (exp != 0)
-	      {
-		str.append('e');
-		str.append(exp);
-	      }
-	    return new DFloNum(str.toString ());
-	  }
-	IntNum inum = IntNum.valueOf (str.toString (), radix);
-	return new DFloNum (inum.isZero () ? (negative ? -0.0 : 0.0)
-			    : inum.doubleValue ());
-      }
-
-    if (point_loc == -1 && ! exp_seen)
-      return IntNum.valueOf (str.toString (), radix);
-
-    /* Parse an exact with a decimal point or exponent.  */
-    IntNum mant;
-    if (point_loc == -1)
-      mant = IntNum.valueOf (str.toString ());
-    else
-      {
-	String s = str.toString ();
-	mant = IntNum.valueOf (s.substring (0, point_loc)
-                               + s.substring (point_loc + 1, s.length ()));
-	point_loc = s.length () - (point_loc + 1);  // # of decimals
-	if (exp < 0 && Integer.MIN_VALUE + point_loc >= exp)
-	  return numError("exponent overflow");
-	exp -= point_loc;
-      }
-    return (mant.isZero () ? mant
-	    : (RealNum)(mant.mul (IntNum.power(IntNum.make (10), exp))));
   }
 
   /**
@@ -659,27 +327,20 @@ public class ELispReader extends gnu.text.LispReader
 	    else
 	      func = Interpreter.unquote_sym;
 	    return readQuote (func);
-	  case '.':
-	  case '+':
-	  case '-':
-	    next = peek ();
-	    if (Character.isDigit((char) next)
-		 || (c != '.' && (next == '.' || next == 'i' || next == 'I')))
-	      return readNumber(c, 10);
-	    else
-	      return readSymbol(c, getReadCase());
 	  case '[':
 	    return readVector();
 	  case '#':
 	    next = read();
 	    switch (next)
 	      {
-	      case 'x':
-	      case 'd':
-	      case 'o':
-	      case 'b':
-		unread (next);
-		return readNumber ('#', 10);
+	      case ':':
+		StringBuffer sbuf = new StringBuffer(30);
+		readAtom0(read(), sbuf);
+		return new String(sbuf.toString());
+	      case 'x':  return readInteger(16);
+	      case 'd':  return readInteger(10);
+	      case 'o':  return readInteger(8);
+	      case 'b':  return readInteger(2);
 	      case '|':
 		saveReadState = ((InPort) port).readState;
 		((InPort) port).readState = '|';
@@ -699,10 +360,7 @@ public class ELispReader extends gnu.text.LispReader
 	  default:
 	    if (Character.isWhitespace((char)c))
 	      break;
-	    if (Character.isDigit((char)c))
-	      return readNumber (c, 10);
-	    else
-	      return readSymbol(c, getReadCase());
+	    return readAtom(c);
 	  }
 	c = read ();
       }

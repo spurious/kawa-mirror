@@ -851,6 +851,16 @@ public class Compilation
    */
   public void compile (ModuleExp lexp, String classname, String prefix)
   {
+    if (ModuleExp.debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + lexp.getName()
+		      + " to " + classname + ":");
+	lexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
     source_filename = lexp.filename;
     classPrefix = prefix;
     mainLambda = lexp;
@@ -923,16 +933,6 @@ public class Compilation
 	  }
       }
 
-    if (ModuleExp.debugPrintExpr)
-      {
-	OutPort dout = OutPort.outDefault();
-	dout.println("[Compiling module-name:" + mexp.getName()
-		      + " top:" + topname + " prefix=" + prefix + " :");
-	mexp.print(dout);
-	dout.println(']');
-	dout.flush();
-      }
-
     /* DEBUGGING:
     OutPort perr = OutPort.errDefault();
     perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
@@ -980,11 +980,11 @@ public class Compilation
     if (zar_file.exists ())
       zar_file.delete ();
     ZipOutputStream zout;
-    /* Java2:
+    /* BEGIN JAVA2 */
     if (makeJar)
-      zout = new JarOutputStream (new FileOutputStream (zar_file));
+      zout = new java.util.jar.JarOutputStream(new FileOutputStream(zar_file));
     else
-    */
+    /* END JAVA2 */
       {
 	zout = new ZipOutputStream (new FileOutputStream (zar_file));
 	zout.setMethod(ZipOutputStream.STORED); // no compression

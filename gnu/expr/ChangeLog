@@ -1,5 +1,20 @@
 2004-10-23  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (compileToFiles):  Move debugPrintExpr handling ...
+	(compile): ... to here, so it also works when compiling to archive.
+
+	* Compilation.java (compileToArchive):  Enable .jar support.
+
+	* FindTailCalls.java (walkLetExp): Optimize letrec-like forms.
+	(walkSetExp): Supress assignment if optimized above.
+
+	* LetExp.java (compile): If init value is #!undefined, convert
+	to #!null or zero.
+	
+	* QuoteExp.java (getInstance): New static method.
+
+2004-10-23  Per Bothner  <per@bothner.com>
+
 	* CheckedTarget.java (argno): Make field 1-orgin, matching WrongType.
 	(<init>): New constructor, for general non-call casting.
 	(getInstance): New factor method, for non-call casting.

@@ -49,6 +49,7 @@ public class LetExp extends ScopeExp
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
 	Target varTarget;
+	Expression init = inits[i];
         decl.allocateVariable(code);
 	if (! decl.needsInit())
 	  varTarget = Target.Ignore;
@@ -56,8 +57,16 @@ public class LetExp extends ScopeExp
 	  {
 	    Type varType = decl.getType();
 	    varTarget = CheckedTarget.getInstance(varType);
+	    if (init == QuoteExp.undefined_exp)
+	      {
+		// Typically created by letrec.
+		if (varType instanceof PrimType)
+		  init = new QuoteExp(new Byte((byte) 0));
+		else if (varType != null && varType != Type.pointer_type)
+		  init = QuoteExp.nullExp;
+	      }
 	  }
-	inits[i].compile (comp, varTarget);
+	init.compile (comp, varTarget);
       }
 
     code.enterScope (scope);
@@ -81,7 +90,8 @@ public class LetExp extends ScopeExp
 
   protected void walkChildren(ExpWalker walker)
   {
-    inits = walker.walkExps(inits);
+    if (inits != null)
+      inits = walker.walkExps(inits);
     if (walker.exitValue == null)
       body = (Expression) walker.walk(body);
   }

@@ -28,6 +28,19 @@ public class QuoteExp extends Expression
   static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
   static public QuoteExp nullExp = new QuoteExp(null);
 
+  public static QuoteExp getInstance (Object value)
+  {
+    if (value == null)
+      return nullExp;
+    if (value == Undefined.getInstance())
+      return undefined_exp;
+    if (value == Values.empty)
+      return voidExp;
+    if (value instanceof Boolean)
+      return ((Boolean) value).booleanValue() ? trueExp : falseExp;
+    return new QuoteExp(value);
+  }
+
   public QuoteExp (Object val) { value = val; }
   
   public Object eval (Environment env)

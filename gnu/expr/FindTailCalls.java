@@ -130,7 +130,18 @@ public class FindTailCalls extends ExpWalker
 
 	decl = exp.firstDecl();
 	for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
-	  exp.inits[i] = walkSetExp (decl, exp.inits[i]);
+	  {
+	    Expression init = walkSetExp (decl, exp.inits[i]);
+	    // Optimize letrec-like forms.
+	    if (init == QuoteExp.undefined_exp)
+	      {
+		Expression value = decl.getValue();
+		if (value instanceof LambdaExp
+		    || (value != init && value instanceof QuoteExp))
+		  init = value;
+	      }
+	    exp.inits[i] = init;
+	  }
       }
     finally
       {
@@ -327,7 +338,16 @@ public class FindTailCalls extends ExpWalker
 	    decl = Declaration.followAliases(decl);
 
 	  }
-	exp.new_value = walkSetExp(decl, exp.new_value);
+	Expression value = walkSetExp(decl, exp.new_value);
+	if (decl != null && decl.context instanceof LetExp
+	    && value == decl.getValue()
+	    && (value instanceof LambdaExp || value instanceof QuoteExp))
+	  {
+	    // The assignment is redundant, as it has been moved to the
+	    // initialization of the LetExp.
+	    return QuoteExp.voidExp;
+	  }
+	exp.new_value = value;
 	return exp;
       }
     finally

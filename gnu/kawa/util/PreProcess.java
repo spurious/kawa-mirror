@@ -224,6 +224,9 @@ public class PreProcess
   public static void main (String[] args)
   {
     PreProcess pp = new PreProcess();
+ 
+    pp.keywords.put("true", Boolean.TRUE);
+    pp.keywords.put("false", Boolean.FALSE);
 
     for (int i = 0;  i < args.length;  i++)
       {

@@ -10,16 +10,14 @@ import gnu.kawa.util.*;
 
 public class Lambda extends Syntax implements Printable
 {
-  static private Pattern pattern = new VarListPat (1);
-
   public Expression rewrite (Object obj, Translator tr)
   {
-    Object [] match = pattern.match (obj);
-    if (match == null)
+    if (! (obj instanceof Pair))
       return tr.syntaxError ("missing formals in lambda");
     int old_errors = tr.getMessages().getErrorCount();
     LambdaExp lexp = new LambdaExp();
-    rewrite(lexp, match[0], match[1], tr);
+    Pair pair = (Pair) obj;
+    rewrite(lexp, pair.car, pair.cdr, tr);
     if (tr.getMessages().getErrorCount() > old_errors)
       return new ErrorExp("bad lambda expression");
     return lexp;

@@ -290,6 +290,8 @@ public class Translator extends Object
           func = new QuoteExp(pproc);
       }
 
+    if (func instanceof ReferenceExp)
+      ((ReferenceExp) func).setProcedureName(true);
     return new ApplyExp (func, args);
   }
 

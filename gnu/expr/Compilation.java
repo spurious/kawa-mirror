@@ -56,12 +56,19 @@ public class Compilation
   public static final ArrayType objArrayType = new ArrayType (scmObjectType);
   public static final ArrayType symbolArrayType = new ArrayType(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
-  static public ClassType scmProcedureType
+  static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType scmInterpreterType
     = ClassType.make("kawa.lang.Interpreter");
-  static public ClassType scmEnvironmentType
+  static public ClassType typeEnvironment
     = ClassType.make("gnu.mapping.Environment");
+  static public ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
+  static public final Method getBindingMethod
+    = typeBinding.addMethod("get", Type.typeArray0,
+			    Type.pointer_type, Access.PUBLIC);
+  static public final Method getProcedureBindingMethod
+    = typeBinding.addMethod("getProcedure", Type.typeArray0,
+			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
     = scmInterpreterType.addField ("trueObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC); 
@@ -86,6 +93,10 @@ public class Compilation
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
 
+  static public final Method getBindingEnvironmentMethod
+    = typeEnvironment.addMethod("getBinding", string1Arg,
+				typeBinding, Access.PUBLIC);
+
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
     makeListMethod = scmListType.addMethod ("makeList",
@@ -96,19 +107,21 @@ public class Compilation
 						    Access.PUBLIC);
 
     lookupGlobalMethod
-      = scmEnvironmentType.addMethod ("lookup_global", sym1Arg,
-				       scmObjectType,
-				       Access.PUBLIC|Access.STATIC);
+      = typeEnvironment.addMethod ("lookup_global", sym1Arg,
+				   scmObjectType,
+				   Access.PUBLIC|Access.STATIC);
     Type[] symObjArgs = { scmSymbolType, scmObjectType };
     defineGlobalMethod
-      = scmEnvironmentType.addMethod ("define_global", symObjArgs,
-				       Type.void_type,
-				       Access.PUBLIC|Access.STATIC);
+      = typeEnvironment.addMethod ("define_global", symObjArgs,
+				   Type.void_type,Access.PUBLIC|Access.STATIC);
     putGlobalMethod
-      = scmEnvironmentType.addMethod ("put_global", symObjArgs,
-				       Type.void_type,
-				       Access.PUBLIC|Access.STATIC);
+      = typeEnvironment.addMethod ("put_global", symObjArgs,
+				   Type.void_type,Access.PUBLIC|Access.STATIC);
   }
+
+  public static Method getCurrentEnvironmentMethod
+    = typeEnvironment.addMethod("getCurrent", Type.typeArray0,
+				typeEnvironment,Access.PUBLIC|Access.STATIC);
 
   public static Type[] apply0args = Type.typeArray0;
   public static Type[] apply1args = { scmObjectType };
@@ -121,7 +134,7 @@ public class Compilation
   public static Method makePairMethod;
   static Method checkArgCountMethod;
 
-  public static Method apply0method = scmProcedureType.addMethod
+  public static Method apply0method = typeProcedure.addMethod
   ("apply0", apply0args, scmObjectType, Access.PUBLIC|Access.FINAL);
 
   public static Method apply1method;
@@ -132,26 +145,26 @@ public class Compilation
 
   static
   {
-    apply1method = scmProcedureType.addMethod ("apply1", apply1args,
+    apply1method = typeProcedure.addMethod ("apply1", apply1args,
 						scmObjectType, Access.PUBLIC);
-    apply2method = scmProcedureType.addMethod ("apply2", apply2args,
+    apply2method = typeProcedure.addMethod ("apply2", apply2args,
 						scmObjectType, Access.PUBLIC);
     Type[] apply3args = { scmObjectType, scmObjectType, scmObjectType };
-    apply3method = scmProcedureType.addMethod ("apply3", apply3args,
+    apply3method = typeProcedure.addMethod ("apply3", apply3args,
 						scmObjectType, Access.PUBLIC);
     Type[] apply4args = { scmObjectType , scmObjectType, scmObjectType, scmObjectType};
-    apply4method = scmProcedureType.addMethod ("apply4", apply4args,
+    apply4method = typeProcedure.addMethod ("apply4", apply4args,
 						scmObjectType, Access.PUBLIC);
-    applyNmethod = scmProcedureType.addMethod ("applyN", applyNargs,
+    applyNmethod = typeProcedure.addMethod ("applyN", applyNargs,
 						scmObjectType, Access.PUBLIC);
     makePairMethod = scmPairType.addMethod ("makePair", apply2args,
 					     scmPairType,
 					     Access.PUBLIC|Access.STATIC);
     Type[] args = new Type[2];
-    args[0] = scmProcedureType;
+    args[0] = typeProcedure;
     args[1] = Type.int_type;
     checkArgCountMethod
-      = scmProcedureType.addMethod("checkArgCount", args, Type.void_type,
+      = typeProcedure.addMethod("checkArgCount", args, Type.void_type,
 				   Access.PUBLIC|Access.STATIC);
   }
 
@@ -160,17 +173,17 @@ public class Compilation
     apply4method, applyNmethod };
 
   public static ClassType typeProcedure0
-    = ClassType.make("gnu.mapping.Procedure0", scmProcedureType);
+    = ClassType.make("gnu.mapping.Procedure0", typeProcedure);
   public static ClassType typeProcedure1
-    = ClassType.make("gnu.mapping.Procedure1", scmProcedureType);
+    = ClassType.make("gnu.mapping.Procedure1", typeProcedure);
   public static ClassType typeProcedure2
-    = ClassType.make("gnu.mapping.Procedure2", scmProcedureType);
+    = ClassType.make("gnu.mapping.Procedure2", typeProcedure);
   public static ClassType typeProcedure3
-    = ClassType.make("gnu.mapping.Procedure3", scmProcedureType);
+    = ClassType.make("gnu.mapping.Procedure3", typeProcedure);
   public static ClassType typeProcedure4
-    = ClassType.make("gnu.mapping.Procedure4", scmProcedureType);
+    = ClassType.make("gnu.mapping.Procedure4", typeProcedure);
   public static ClassType typeProcedureN
-    = ClassType.make("gnu.mapping.ProcedureN", scmProcedureType);
+    = ClassType.make("gnu.mapping.ProcedureN", typeProcedure);
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
 
@@ -181,7 +194,7 @@ public class Compilation
     = typeCallStack.addMethod("pop", apply0args, Type.void_type,
 			      Access.PUBLIC);
   public static Field noArgsProcedureField
-    = scmProcedureType.addField("noArgs", objArrayType,
+    = typeProcedure.addField("noArgs", objArrayType,
 				Access.PUBLIC|Access.STATIC);
   public static Field valueCallStackField
     = typeCallStack.addField("value", Type.pointer_type, Access.PUBLIC);
@@ -196,14 +209,14 @@ public class Compilation
   public static Field argsCallStackField
     = typeCallStack.addField("args", objArrayType, Access.PROTECTED);
   public static Field procCallStackField
-    = typeCallStack.addField("proc", scmProcedureType, Access.PROTECTED);
+    = typeCallStack.addField("proc", typeProcedure, Access.PROTECTED);
   public static Field callerCallFrameField
     = typeCallFrame.addField("caller", typeCallFrame, Access.PROTECTED);
   public static Field saved_pcCallFrameField
     = typeCallFrame.addField("saved_pc", Type.int_type, Access.PROTECTED);
   private static Type[] applyCpsArgs = { typeCallStack};
   public static Method applyCpsMethod
-    = scmProcedureType.addMethod("apply", applyCpsArgs, Type.void_type,
+    = typeProcedure.addMethod("apply", applyCpsArgs, Type.void_type,
 				 Access.PUBLIC);
 
   public static ClassType[] typeProcedureArray = {
@@ -583,7 +596,7 @@ public class Compilation
   {
     String name;
     ClassType new_class = lexp.type;
-    if (new_class == scmProcedureType)
+    if (new_class == typeProcedure)
       new_class = allocClass(lexp);
     curClass = new_class;
     if (! (fewerClasses && curClass == mainClass))
@@ -622,8 +635,6 @@ public class Compilation
 	for (int i = arg_count;  --i >= 0; )
 	  arg_types[i] = scmObjectType;
       }
-
-    generateConstructor (curClass, lexp);
 
     CodeAttr code;
     if (arg_letter == 'N')
@@ -840,16 +851,38 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (! immediate && curClass == mainClass && literalsChain != null)
+    if (curClass == mainClass
+	&& ((! immediate && literalsChain != null)
+	    || bindingFields.size() > 0))
       {
 	Method save_method = method;
 	method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
 				     Access.PUBLIC|Access.STATIC);
 	method.init_param_slots ();
-	dumpLiterals ();
-	getCode().emitReturn();
+	if (! immediate)
+	  dumpLiterals ();
+	code = getCode();
+	int numGlobals = bindingFields.size();
+	if (numGlobals > 0)
+	  {
+	    code.emitInvokeStatic(getCurrentEnvironmentMethod);
+	    java.util.Enumeration e = bindingFields.keys();
+	    while (e.hasMoreElements())
+	      {
+		String id = (String) e.nextElement();
+		Field fld = (Field) bindingFields.get(id);
+		if (--numGlobals > 0)
+		  code.emitDup(1);
+		code.emitPushString(id);
+		code.emitInvokeVirtual(getBindingEnvironmentMethod);
+		code.emitPutStatic(fld);
+	      }
+	  }
+	code.emitReturn();
 	method = save_method;
       }
+
+    generateConstructor (curClass, lexp);
 
     curLambda = saveLambda;
 
@@ -890,5 +923,19 @@ public class Compilation
   public void freeLocalField (Field field)
   {
     // FIXME
+  }
+
+  Hashtable bindingFields = new Hashtable(100);
+
+  /** Allocate a static Binding field used to access globals bindings. */
+  public Field getBindingField (String name)
+  {
+    Object fld = bindingFields.get(name);
+    if (fld != null)
+      return (Field) fld;
+    String fieldName = "id"+bindingFields.size()+"$"+mangleName(name);
+    Field field = mainClass.addField(fieldName, typeBinding, Access.STATIC);
+    bindingFields.put(name, field);
+    return field;
   }
 }

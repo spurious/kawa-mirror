@@ -1,3 +1,7 @@
+Mon Aug  3 13:21:22 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/FString.java (hashCode):  Fix typo:  32 -> 31.
+
 Fri Jul 24 16:05:10 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/standard/makeProcLocation.java:  New helper class.

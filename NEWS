@@ -2,6 +2,9 @@ Changes from Kawa 1.6.53 to 1.6.54
 ==================================
 Created new packages gnu.mapping and gnu.expr.  Many classes were
 moved from kawa.lang to the new packages.
+(This is part of the long-term process of splitting Kawa into more
+manageable chunks, separating the Scheme-specific code from the
+language-independent code, and moving classes under the gnu hierarchy.)
 
 You can now write keywords with the colon first (e.g. :KEYWORD),
 which has exactly the same effect and meaning as putting the colon

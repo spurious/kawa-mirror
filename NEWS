@@ -1,5 +1,14 @@
 Changes from Kawa 1.6.53 to 1.6.55
 ==================================
+New --debug-dump-zip option writes out a .zip file for compilation.
+(Useful for debugging Kawa.)
+
+You can now declare parameter types.
+
+Lot of work on more efficient procedure representation and calling
+convention:  Inlining, directly callable statics method, plus some
+procedures no longer generate a separate Class.
+
 Local functions that are only called from one locations, except for
 tail-recursion, are now inlined.  This inlines do loops, and most
 "named let" loops.

@@ -1,5 +1,10 @@
 TO BE DONE FOR 2.0:
 
+Literals in inline should use fields (rather than array);
+use java.lang.reflect.Field to pass them in.
+
+Why is start pc==0 in LocalVariableTable?
+
 Let LineBufferedReader pos, limit, buffer be private,
 but provide methods to get/set them.
 

@@ -27,9 +27,9 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
 KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
-  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o
+  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
 LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
-  gnu-brl.lo gnu-kawa-brl.lo
+  gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 endif
 if ENABLE_SERVLET
 KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o

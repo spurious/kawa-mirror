@@ -139,10 +139,10 @@ INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 @ENABLE_XML_TRUE@KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
-@ENABLE_XML_TRUE@  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o
+@ENABLE_XML_TRUE@  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
 
 @ENABLE_XML_TRUE@LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
-@ENABLE_XML_TRUE@  gnu-brl.lo gnu-kawa-brl.lo
+@ENABLE_XML_TRUE@  gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 
 @ENABLE_SERVLET_TRUE@KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
 @ENABLE_SERVLET_TRUE@LIBADD_SERVLET = gnu-kawa-servlet.lo
@@ -214,6 +214,7 @@ libkawa_la_LDFLAGS =
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-xquery-lang.lo \
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-brl.lo \
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-kawa-brl.lo \
+@ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-kawa-xslt.lo \
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-kawa-slib.lo \
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	gnu-commonlisp-lisp.lo \
 @ENABLE_SERVLET_FALSE@@ENABLE_XML_TRUE@	kawa-lib.lo
@@ -254,6 +255,7 @@ libkawa_la_LDFLAGS =
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-xquery-lang.lo \
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-brl.lo \
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-kawa-brl.lo \
+@ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-kawa-xslt.lo \
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-kawa-servlet.lo \
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-kawa-slib.lo \
 @ENABLE_SERVLET_TRUE@@ENABLE_XML_TRUE@	gnu-commonlisp-lisp.lo \

@@ -470,7 +470,7 @@ public class Scheme extends LispInterpreter
                     new kawa.standard.define_class(objectSyntax, false));
       define_syntax("define-simple-class",
                     new kawa.standard.define_class(objectSyntax, true));
-      define_syntax("this", "kawa.lib.syntax");
+      define_syntax("this", "kawa.standard.thisRef");
       define_proc("make", gnu.kawa.reflect.Invoke.make);
       define_field("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
       define_field("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");

@@ -17,9 +17,9 @@ public class ParentAxis extends TreeScanner
 
   public void scan (AbstractSequence seq, int ipos, PositionConsumer out)
   {
-    int parent = seq.parentPos(ipos);
+    ipos = seq.parentPos(ipos);
     int end = seq.endPos();
-    if (parent != end && type.isInstancePos(seq, parent))
+    if (ipos != end && type.isInstancePos(seq, ipos))
       out.writePosition(seq, ipos);
   }
 }

@@ -1,3 +1,9 @@
+2003-09-04  Per Bothner  <per@bothner.com>
+
+	* Focus.java (size, contextSize):  Remove unused fields.
+
+	* ParentAxis.java (scan):  Fix thinko.
+
 2003-08-03  Per Bothner  <per@bothner.com>
 
 	* SortedNodes.java (finishFragment):  Move writePosition call to

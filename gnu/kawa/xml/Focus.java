@@ -34,8 +34,6 @@ public final class Focus extends TreePosition
 
   public long position;
   IntNum contextPosition;
-  int size;
-  IntNum contextSize;
 
   public static void compileGetCurrent(Compilation comp)
   {

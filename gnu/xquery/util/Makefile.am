@@ -9,6 +9,7 @@ java_sources = \
   Children.java \
   Document.java \
   IntegerRange.java \
+  IsEmptySequence.java \
   MakeAttribute.java \
   MakeElement.java \
   NamedChildren.java \

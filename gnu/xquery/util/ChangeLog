@@ -1,3 +1,8 @@
+2001-10-02  Per Bothner  <per@bothner.com>
+
+	* IsEmptySequence.java:  New class; extends Procedure1.
+	* Makefile.am (java_sources):  Add IsEmptySequence.java.
+
 2001-09-24  Per Bothner  <per@bothner.com>
 
 	* IntegerRange.java:  New class; extends CpsProcedure.

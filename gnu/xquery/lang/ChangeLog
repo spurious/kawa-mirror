@@ -1,3 +1,17 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (peekOperand):  Don't unread after EOF.
+
+	* XQParser.java (parseNodeTest):  New method.
+	(parseRelativePathExpr):  Don't check node-tests here.
+	(parseStepQualifiers):  New method.
+	(parseMaybePrimaryExpr):  Now handles node tests.
+
+	* XQParser.java (parseMaybePrimaryExpr):  Fix indexes when checking
+	for "let" or "for".
+
+	* XQuery.java (<init>):  Define "true" and "false".
+
 2001-10-17  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseRelativePathExpr):  Handle PATH/*, PATH/@ATTR,

@@ -420,10 +420,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	    unread();
 	    return curToken = DEFINE_TOKEN;
 	  }
-	//int next = peek();
 	if (next != ':')
 	  {
-	    unread();
+	    if (next >= 0)
+	      unread();
 	    return curToken;
 	  }
 	next = read();
@@ -684,6 +684,57 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseRelativePathExpr();
   }
 
+  Expression parseNodeTest()
+      throws java.io.IOException, SyntaxException
+  {
+     Declaration dotDecl = parser.lookup("dot", -1);
+     return parseNodeTest(new ReferenceExp("dot", dotDecl));
+  }
+
+  Expression parseNodeTest(Expression dot)
+      throws java.io.IOException, SyntaxException
+  {
+    Expression exp;
+    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+      {
+	String name = new String(tokenBuffer, 0, tokenBufferLength);;
+	Expression[] args = { dot, new QuoteExp(""),
+			      new QuoteExp(name.intern()) };
+	exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
+			   args);
+      }
+    else if (curToken == OP_MUL)
+      {
+	Expression[] args = { dot, QuoteExp.nullExp, QuoteExp.nullExp };
+	exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
+			   args);
+      }
+    else if (curToken == '@')
+      {
+	getRawToken();
+	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+	  {
+	    String name = new String(tokenBuffer, 0, tokenBufferLength);;
+	    Expression[] args = { dot, new QuoteExp(""),
+				  new QuoteExp(name.intern()) };
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
+			       args);
+	  }
+	else if (curToken == OP_MUL)
+	  {
+	    Expression[] args = { dot, QuoteExp.nullExp, QuoteExp.nullExp };
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
+			       args);
+	  }
+	else
+	  return syntaxError("missing name or '*' after '@'");
+      }
+    else
+      return null;
+    getRawToken();
+    return exp;
+  }
+
   Expression parseRelativePathExpr()
       throws java.io.IOException, SyntaxException
   {
@@ -692,47 +743,21 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	int op = curToken;
 	getRawToken();
-	// Kludge for special case.
-	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
-	  {
-	    String name = new String(tokenBuffer, 0, tokenBufferLength);;
-	    Expression[] args = { exp, new QuoteExp(""),
-				  new QuoteExp(name.intern()) };
-	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
-			       args);
-	    getRawToken();
-	  }
-	else if (curToken == OP_MUL)
-	  {
-	    Expression[] args = { exp, QuoteExp.nullExp, QuoteExp.nullExp };
-	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
-			       args);
-	    getRawToken();
-	  }
-	else if (curToken == '@')
-	  {
-	    getRawToken();
-	    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
-	      {
-		String name = new String(tokenBuffer, 0, tokenBufferLength);;
-		Expression[] args = { exp, new QuoteExp(""),
-				      new QuoteExp(name.intern()) };
-		exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
-				   args);
-		getRawToken();
-	      }
-	    else if (curToken == OP_MUL)
-	      {
-		Expression[] args = { exp, QuoteExp.nullExp, QuoteExp.nullExp };
-		exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
-				   args);
-		getRawToken();
-	      }
-	    else
-	      return syntaxError("missing name or '*' after '@'");
-	  }
-	else
-	  exp = makeBinary(op, exp, parseStepExpr());
+
+	LambdaExp lexp = new LambdaExp();
+	lexp.min_args = 1;
+	lexp.max_args = 1;
+	Declaration decl = lexp.addDeclaration("dot");
+	decl.noteValue (null);  // Does not have a known value.
+	parser.push(lexp);
+	lexp.body = parseStepExpr();
+	parser.pop(lexp);
+	Expression[] args = { lexp, exp };
+	exp = new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
+					   "valuesMap"),
+			   args);
+
+	// exp = makeBinary(op, exp, parseStepExpr());
       }
     return exp;
   }
@@ -749,23 +774,50 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseOtherStepExpr();
   }
 
+  Expression parseStepQualifiers(Expression exp)
+    throws java.io.IOException, SyntaxException
+  {
+    for (;;)
+      {
+	if (curToken == '[')
+	  {
+	    getRawToken();
+	    LambdaExp lexp = new LambdaExp();
+	    lexp.setFile(getName());
+	    lexp.setLine(getLineNumber(), getColumnNumber());
+	    lexp.min_args = 1;
+	    lexp.max_args = 1;
+	    parser.push(lexp);
+	    Declaration dot = lexp.addDeclaration("dot");
+	    dot.noteValue(null);
+	    Expression cond = parseExpr();
+	    parser.pop(lexp);
+	    lexp.body = cond;
+	    if (curToken != ']')
+	      return syntaxError("missing ']'");
+	    getRawToken();
+	    Expression[] args = { exp, lexp };
+	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.ValuesFilter",
+					       "valuesFilter"),
+			       args);
+	  }
+	/*
+	else if (curToken == ARROW_TOKEN)
+	  ...;
+	*/
+	else
+	  return exp;
+      }
+  }
+
   /* Parse an OtherStepExpr.
    */
   Expression parseOtherStepExpr()
       throws java.io.IOException, SyntaxException
   {
-    Expression exp = parsePrimaryExpr();
-    for (;;)
-      {
-	/*
-	if (curToken == '[')
-	  ...;
-	else if (curToken == ARROW_TOKEN)
-	  ...;
-	else
-	*/
-	  return exp;
-      }
+    Expression e = parsePrimaryExpr();
+    e = parseStepQualifiers(e);
+    return e;
   }
 
   /**
@@ -935,7 +987,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (nesting == 0 && curToken == EOL_TOKEN)
 	  return exp;
 	if (curToken != ',')
-	  error("missing ')'");
+	  throw new Error("missing ')' - saw "+new String(tokenBuffer, 0, tokenBufferLength)+" @:"+getColumnNumber());
 	getRawToken();
       }
     return exp;
@@ -1055,15 +1107,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	      {
 		// FIXME:  use match(String)?
 		c1 = tokenBuffer[0];
-		c2 = tokenBuffer[2];
+		c2 = tokenBuffer[1];
 		c3 = tokenBuffer[2];
 		if ((c1 == 'l' || c1 == 'L')
-		    || (c2 == 'e' || c1 == 'E')
-		    || (c3 == 't' || c1 == 'T'))
+		    || (c2 == 'e' || c2 == 'E')
+		    || (c3 == 't' || c3 == 'T'))
 		  forOrLet = 0;
 		else if ((c1 == 'f' || c1 == 'F')
-		    || (c2 == 'o' || c1 == 'O')
-		    || (c3 == 'r' || c1 == 'R'))
+		    || (c2 == 'o' || c2 == 'O')
+		    || (c3 == 'r' || c3 == 'R'))
 		  forOrLet = 1;
 	      }
 	    if (forOrLet < 0)
@@ -1080,9 +1132,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (next >= 0)
 	      unread();
-	    new Error("NameTest").printStackTrace();
-	    return syntaxError("NameTest not implememented");
+	    return parseNodeTest();
 	  }
+      }
+    else if (token == OP_MUL || token == '@')
+      {
+	return parseNodeTest();
       }
     else
       return null;
@@ -1162,7 +1217,7 @@ public class XQParser extends LispReader // should be extends Lexer
     Declaration decl = sc.addDeclaration(name);
     if (isFor)
       decl.noteValue (null);  // Does not have a known value.
-    parser.push(sc);
+    parser.push(sc); // FIXME where is matching pop?
     Expression body;
     if (curToken == ',')
       {

@@ -13,6 +13,7 @@ import gnu.xquery.util.*;
 import gnu.xml.*;
 import gnu.text.Lexer;
 import java.util.Vector;
+import gnu.kawa.functions.ConstantFunction0;
 
 public class XQuery extends Interpreter
 {
@@ -185,6 +186,8 @@ public class XQuery extends Interpreter
     define("define", new kawa.standard.set_b());
     define("document", gnu.xquery.util.Document.document);
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
+    define("false", new ConstantFunction0("false", Boolean.FALSE));
+    define("true", new ConstantFunction0("true", Boolean.TRUE));
     define("string-value", gnu.xquery.util.StringValue.stringValue);
   }
 

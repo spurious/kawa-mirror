@@ -18,7 +18,9 @@ public class location extends Syntax implements Printable
   /** Assuming obj is in an lvalue context, re-write it. */
   public static Expression rewriteArg (Object obj, Translator tr)
   {
-    // FIXME! Do we need this?  Why not just call tr.rewrite(obj) ?
+    // FIXME!  The reason we need this instead of just calling tr.rewrite(obj)
+    // is because the latter will inline procedures to PrimProcedures.
+    // We should fix Translator so it doesn't do that.
     while (obj instanceof Pair)
       {
 	Pair pair = (Pair) obj;

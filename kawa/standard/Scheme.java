@@ -823,6 +823,7 @@ public class Scheme extends Interpreter
 	types.put ("list", ClassType.make("gnu.kawa.util.LList"));
 	types.put ("pair", ClassType.make("gnu.kawa.util.Pair"));
 	types.put ("string", ClassType.make("gnu.kawa.util.FString"));
+	types.put ("abstract-string", ClassType.make("gnu.kawa.util.AbstractString"));
 	types.put ("character", ClassType.make("gnu.kawa.util.Char"));
 	types.put ("vector", ClassType.make("gnu.kawa.util.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));

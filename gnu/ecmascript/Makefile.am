@@ -8,4 +8,4 @@ javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
   Reserved.java BinaryOp.java Convert.java \
-  Lexer.java Parser.java
+  Lexer.java Parser.java Prompter.java

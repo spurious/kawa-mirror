@@ -1,6 +1,6 @@
 package gnu.ecmascript;
 import kawa.lang.*;
-
+import java.util.Vector;
 
 public class Parser
 {
@@ -18,16 +18,10 @@ public class Parser
     this.lexer = new Lexer(port);
   }
 
-  public Expression parseLogicalORExpression()
-    throws java.io.IOException, kawa.lang.ReadError
-  {
-    return parseBinaryExpression(4);
-  }
-
   public Expression parseConditionalExpression()
     throws java.io.IOException, kawa.lang.ReadError
   {
-    Expression exp1 = parseLogicalORExpression();
+    Expression exp1 = parseBinaryExpression(1);
     Object result = peekToken();
     if (result != Lexer.condToken)
       return exp1;
@@ -99,18 +93,29 @@ public class Parser
       }
   }
 
+  /** Return the next token from the lexer.
+   * A LineTerminator is considered a token.
+   */
+  public Object peekTokenOrLine()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    if (token == null)
+      token = lexer.getToken();
+    return token;
+  }
+
+  /** Return the next non-whitespace token from the lexer.
+   * LineTerminators are skipped until a non-eolToken is found.
+   */
   public Object peekToken()
     throws java.io.IOException, kawa.lang.ReadError
   {
-    while (token == null)
+    if (token == null)
+      token = lexer.getToken();
+    while (token == Lexer.eolToken)
       {
+	skipToken();
 	token = lexer.getToken();
-	OutPort out = OutPort.outDefault();
-	out.print("token:");
-	SFormat.print(token, out);
-	out.println(" [class:"+token.getClass()+"]");
-	if (token == Lexer.eolToken)
-	  skipToken();
       }
     return token;
   }
@@ -167,11 +172,130 @@ public class Parser
     return syntaxError("unexpected token: "+result);
   }
 
+  public Expression makePropertyAccessor (Expression exp, Expression prop)
+  {
+    return null;  // FIXME
+  }
+
+  public final static Expression[] emptyArgs = { };
+
+  public Expression[] parseArguments()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    skipToken();
+    Object token = peekToken();
+    if (token == Lexer.rparenToken)
+      {
+	skipToken();
+	return emptyArgs;
+      }
+    Vector args = new Vector(10);
+    for (;;)
+      {
+	Expression arg = parseAssignmentExpression();
+	args.addElement(arg);
+	token = getToken();
+	if (token == Lexer.rparenToken)
+	  break;
+	if (token != Lexer.commaToken)
+	  syntaxError("invalid token '"+token+"' in argument list");
+      }
+    Expression[] exps = new Expression[args.size()];
+    args.copyInto(exps);
+    return exps;
+  }
+
+  public Expression makeNewExpression(Expression exp, Expression[] args)
+  {
+    if (args == null)
+      args = emptyArgs;
+    exp = null;  // FIXME
+    return new ApplyExp(exp, args);
+  }
+
+  public Expression makeCallExpression(Expression exp, Expression[] args)
+  {
+    return new ApplyExp(exp, args); // FIXME
+  }
+
+  public String getIdentifier()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    Object token = getToken();
+    if (token instanceof String)
+      return (String) token;
+    throw new ReadError(port, "missing identifier");
+  }
+
+  public Expression parseLeftHandSideExpression ()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    int newCount = 0;
+    while (peekToken() == Lexer.newToken)
+      {
+	newCount++;
+	skipToken();
+      }
+    Expression exp = parsePrimaryExpression();
+    for (;;)
+      {
+	Object token = peekToken();
+	if (token == Lexer.dotToken)
+	  {
+	    skipToken();
+	    String name = getIdentifier();
+	    exp = makePropertyAccessor(exp, new QuoteExp(name));
+	  }
+	else if (token == Lexer.lbracketToken)
+	  {
+	    skipToken();
+	    Expression prop = parseExpression();
+	    token = getToken();
+	    if (token != Lexer.rbracketToken)
+	      return syntaxError("expected ']' - got:"+token);
+	    exp = makePropertyAccessor(exp, prop);
+	  }
+	else if (token == Lexer.lparenToken)
+	  {
+	    Expression[] args = parseArguments();
+System.err.println("after parseArgs:"+peekToken());
+	    if (newCount > 0)
+	      {
+		exp = makeNewExpression(exp, args);
+		newCount--;
+	      }
+	    else
+	      exp = makeCallExpression(exp, args);
+	  }
+	else
+	  break;
+      }
+    for (; newCount > 0;  newCount--)
+      {
+	exp = makeNewExpression(exp, null);
+      }
+    return exp;
+  }
+
+  public Expression parsePostfixExpression ()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    Expression exp = parseLeftHandSideExpression();
+    Object op = peekTokenOrLine();
+    if (op != Reserved.opPlusPlus && op != Reserved.opMinusMinus)
+      return exp;
+    skipToken();
+    Expression[] args = { exp };
+    return new ApplyExp(new QuoteExp(((Reserved)op).proc), args);
+  }
+
+
   public Expression parseUnaryExpression ()
     throws java.io.IOException, kawa.lang.ReadError
   {
+    //Object op = peekTokenOrLine();
     // FIXME
-    return parsePrimaryExpression();
+    return parsePostfixExpression();
   }
 
   public int errors;
@@ -201,31 +325,6 @@ public class Parser
     return new ErrorExp (message);
   }
 
-  /*
-  public Expression parseBinaryExpression(int prio)
-    throws java.io.IOException, kawa.lang.ReadError
-  {
-    if (prio > 10)
-      return parseUnaryExpression();
-    Expression exp1 = parseBinaryExpression(prio+2);
-    token = peekToken();
-    for(;;)
-      {
-	if (! (token instanceof Reserved))
-	  break;
-	Reserved op = (Reserved) token;
-	if (op.prio != prio)
-	  break;
-	getToken();
-	Expression exp2 = parseBinaryExpression(prio+2);
-	Expression[] args = { exp1, exp2 };
-	ApplyExp exp = new ApplyExp(new QuoteExp(op.proc), args);
-	exp1 = exp;
-      }
-    return exp1;
-  }
-  */
-
   public Expression parseBinaryExpression(int prio)
     throws java.io.IOException, kawa.lang.ReadError
   {
@@ -239,7 +338,7 @@ public class Parser
 	if (op.prio < prio)
 	  return exp1;
 	getToken();
-	Expression exp2 = parseBinaryExpression(op.prio+2);
+	Expression exp2 = parseBinaryExpression(op.prio+1);
 	Expression[] args = { exp1, exp2 };
 	exp1 = new ApplyExp(new QuoteExp(op.proc), args);
       }
@@ -247,10 +346,111 @@ public class Parser
 
   static Expression emptyStatement = new QuoteExp(Interpreter.voidObject);
 
+  public Expression parseIfStatement()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    skipToken();
+    Object token = getToken();
+    if (token != Lexer.lparenToken)
+      return syntaxError("expected '(' - got:"+token);
+    Expression test_part = parseExpression();
+    token = getToken();
+    if (token != Lexer.rparenToken)
+      return syntaxError("expected ')' - got:"+token);
+    Expression then_part = parseStatement();
+    token = peekToken();
+    Expression else_part;
+    if (token == Lexer.elseToken)
+      {
+	skipToken();
+	else_part = parseStatement();
+      }
+    else
+      else_part = null;
+    return new IfExp(test_part, then_part, else_part);
+  }
+
+  public Expression parseFunctionDefinition()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    skipToken();
+    String name = getIdentifier();
+    Object token = getToken();
+    if (token != Lexer.lparenToken)
+      return syntaxError("expected '(' - got:"+token);
+    Vector args = new Vector(10);
+    if (peekToken() == Lexer.rparenToken)
+      {
+	skipToken();
+      }
+    else
+      {
+	for (;;)
+	  {
+	    String arg = getIdentifier();
+	    args.addElement(arg);
+	    token = getToken();
+	    if (token == Lexer.rparenToken)
+	      break;
+	    if (token != Lexer.commaToken)
+	      syntaxError("invalid token '"+token+"' in argument list");
+	  }
+      }
+    Expression body = parseBlock();
+    LambdaExp lexp = new LambdaExp(body);
+    lexp.name = name;
+    SetExp sexp = new SetExp(name, lexp);
+    sexp.setDefining(true);
+    return sexp;
+  }
+
+  public Expression parseBlock()
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    Expression[] exps = null;
+    if (getToken() != Lexer.lbraceToken)
+      return syntaxError("extened '{'");
+    int nExps = 0;
+    for (;;)
+      {
+	token = peekToken();
+	boolean last;
+	if (token == Lexer.rbraceToken)
+	  {
+	    skipToken();
+	    if (exps == null)
+	      return emptyStatement;
+	    last = true;
+	  }
+	else
+	  last = false;
+	if (exps == null)
+	  exps = new Expression[2];
+	else if (last ? exps.length !=nExps : exps.length <= nExps) 
+	  { // need to resize 
+	    int newsize = last ? nExps : 2 * exps.length; 
+	    Expression[] new_exps = new Expression[newsize]; 
+	    System.arraycopy(exps, 0, new_exps, 0, nExps); 
+	    exps = new_exps; 
+	  } 
+	if (last)
+	  return new BeginExp(exps);
+	exps[nExps++] = parseStatement();
+      }
+  }
+
   public Expression parseStatement()
     throws java.io.IOException, kawa.lang.ReadError
   {
     Object token = peekToken();
+    if (token instanceof Reserved)
+      {
+	switch (((Reserved) token).prio)
+	  {
+	  case Reserved.IF_TOKEN:  return parseIfStatement();
+	  case Reserved.FUNCTION_TOKEN:  return parseFunctionDefinition();
+	  }
+      }
     if (token == Lexer.eofToken)
       return eofExpr;
     if (token == Lexer.semicolonToken)
@@ -259,37 +459,7 @@ public class Parser
 	return emptyStatement;
       }
     if (token == Lexer.lbraceToken)
-      {
-	Expression[] exps = null;
-	skipToken();
-	int nExps = 0;
-	for (;;)
-	  {
-	    token = peekToken();
-	    boolean last;
-	    if (token == Lexer.rbraceToken)
-	      {
-		skipToken();
-		if (exps == null)
-		  return emptyStatement;
-		last = true;
-	      }
-	    else
-	      last = false;
-	    if (exps == null)
-	      exps = new Expression[2];
-	    else if (last ? exps.length !=nExps : exps.length <= nExps) 
-	      { // need to resize 
-		int newsize = last ? nExps : 2 * exps.length; 
-		Expression[] new_exps = new Expression[newsize]; 
-		System.arraycopy(exps, 0, new_exps, 0, nExps); 
-		exps = new_exps; 
-	      } 
-	    if (last)
-	      return new BeginExp(exps);
-	    exps[nExps++] = parseStatement();
-	  }
-      }
+      return parseBlock();
     
     Expression exp = parseExpression();
     getSemicolon();
@@ -301,7 +471,14 @@ public class Parser
     Interpreter interp = new kawa.standard.Scheme();  // FIXME
     Environment.setCurrent(interp.getEnvironment());
 
-    Parser parser = new Parser(InPort.inDefault());
+    InPort inp = InPort.inDefault ();
+    if (inp instanceof TtyInPort)
+      {
+	Object prompter = new Prompter();
+	((TtyInPort)inp).setPrompter((Procedure) prompter);
+      }
+
+    Parser parser = new Parser(inp);
     OutPort out = OutPort.outDefault();
     for (;;)
       {

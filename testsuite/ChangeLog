@@ -1,3 +1,9 @@
+2003-07-14  Joerg Hoehle  <Joerg-Cyril.Hoehle@t-systems.com>
+
+	* misc-test.scm: New test - for bug with makeBuiltinUnary.
+
+	* misc-test.scm: New call-with-values test.
+
 2003-07-12  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* module3.scm: Added functions to test compile time bug of

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 113)
+(test-init "Miscellaneous" 118)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -33,6 +33,10 @@
 
 (test 5 call-with-values (lambda () (values 4 5)) (lambda (a b) b))
 (test -1 call-with-values * -)
+;; Test from: Joerg-Cyril.Hoehle@t-systems.com
+(test '(() #!eof) call-with-values
+      (lambda () (values '() '#!eof))
+      (lambda (x y) (list x y)))
 
 ;;; This caused a spurious warning in earlier releases.
 (test '(1 2 3) 'let (let ((x (lambda l l))) (x 1 2 3)))
@@ -63,6 +67,23 @@
     (list x y)))
 
 (test '(20 30) test-catch)
+
+;; Extracted from bug reported by Joerg-Cyril.Hoehle@t-systems.com
+(define (test-unary-minus)
+  (- (char->integer #\0)))
+(test -48 test-unary-minus)
+(define (test-string->integer str start end)
+  (and (< -1 start end (+ (string-length str) 1))
+       (let loop ((pos start) (accum 0))
+	 (cond
+	  ((>= pos end) accum)
+	  ((char-numeric? (string-ref str pos))
+	   (loop (+ pos 1) (+ (char->integer (string-ref str pos))
+			      (- (char->integer #\0)) (* 10 accum))))
+	  (else #f)))))
+(test 123 test-string->integer "123" 0 3)
+(test 123 test-string->integer "123456" 0 3)
+(test 23 test-string->integer "123456" 1 3)
 
 (section "new-line handling")
 ;;; Test that #\return and #\newline are read robustly.

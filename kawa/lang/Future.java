@@ -66,4 +66,13 @@ public class Future extends Thread
       }
     return result;
   }
+
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append ("#<future ");
+    buf.append(getName());
+    buf.append(">");
+    return buf.toString();
+  }
+
 }

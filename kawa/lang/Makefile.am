@@ -89,6 +89,7 @@ CompileFile.class \
 loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
+PrimProcedure.class PrimApplyExp.class \
 Values.class \
 Promise.class \
 Future.class \
@@ -99,7 +100,7 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ)
+CLEANFILES = *.class
 
 all: $(OBJ)
 

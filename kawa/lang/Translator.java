@@ -1,5 +1,6 @@
 package kawa.lang;
 import kawa.standard.Scheme;
+import codegen.Method;
 
 /** Used to translate from source for to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -182,6 +183,19 @@ public class Translator extends Object
 	Pair cdr_pair = (Pair) cdr;
 	args[i] = rewrite_car (cdr_pair);
 	cdr = cdr_pair.cdr;
+      }
+    if (func instanceof QuoteExp)
+      {
+	QuoteExp qfunc = (QuoteExp) func;
+	if (qfunc.value instanceof PrimProcedure)
+	  {
+	    PrimProcedure proc = (PrimProcedure) qfunc.value;
+	    Method method = proc.method;
+	    boolean is_static = method.getStaticFlag();
+	    if (args.length != method.getParameterTypes().length + (is_static ? 0 : 1))
+	      return syntaxError ("wrong number of arguments to primitive");
+	    return new PrimApplyExp (qfunc, args);
+	  }
       }
     return new ApplyExp (func, args);
   }

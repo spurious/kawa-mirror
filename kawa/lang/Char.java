@@ -4,6 +4,7 @@ import java.util.Hashtable;
 import codegen.ClassType;
 import codegen.Method;
 import codegen.Access;
+import codegen.Type;
 
 /**
  * A wrapper for characters.
@@ -129,17 +130,28 @@ public class Char implements Printable, Compilable
   }
 
   static public ClassType scmCharType;
-  static Method makeCharMethod;
+  public static Method makeCharMethod;
+  public static Method charValueMethod;
 
-  public Literal makeLiteral (Compilation comp)
+  public static void initMakeMethods()
   {
     if (scmCharType == null)
       {
 	scmCharType = new ClassType ("kawa.lang.Char");
 	makeCharMethod = scmCharType.new_method ("make",
-						 comp.int1Args, scmCharType,
+						 Compilation.int1Args,
+						 scmCharType,
 						 Access.PUBLIC|Access.STATIC);
+	charValueMethod = scmCharType.new_method ("charValue",
+						  Type.typeArray0,
+						  Type.char_type,
+						  Access.PUBLIC);
       }
+  }
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    initMakeMethods();
     return new Literal (this, scmCharType, comp);
   }
 

@@ -1,4 +1,5 @@
 package kawa.lang;
+import codegen.Type;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.
@@ -30,6 +31,20 @@ public abstract class Expression implements Printable
     if (line > 0)
       comp.method.compile_linenumber (line);
     compile (comp, flags);
+  }
+
+  public final void compile (Compilation comp, int flags, Type type)
+  {
+    compile (comp, flags);
+    if (type == Type.char_type)
+      { // We handle char specially, because Kawa does not use standard
+	// java.lang.Character type.
+	Char.initMakeMethods();
+	comp.method.compile_checkcast (Char.scmCharType);
+	comp.method.compile_invoke_virtual (Char.charValueMethod);
+      }
+    else
+      type.compileCoerceFromObject(comp.method);
   }
 
   String filename;

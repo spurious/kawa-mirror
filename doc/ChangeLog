@@ -1,3 +1,7 @@
+2003-06-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Scheme types in Java): Update ancient class names.
+
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Update URL for Ant.

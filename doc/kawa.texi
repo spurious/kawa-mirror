@@ -4415,7 +4415,7 @@ All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 Scheme symbols are implemented using @code{java.lang.String}.
 (Don't be confused by the fact the Scheme sybols are represented
 using Java Strings, while Scheme strings are represented by
-@code{kawa.lang.Scheme}.  It is just that the semantics of Java strings
+@code{gnu.lists.FString}.  It is just that the semantics of Java strings
 match Scheme symbols, but do not match mutable Scheme strings.)
 Interned symbols are presented as interned Strings.
 (Note that with JDK 1.1 string literals are automatically interned.)
@@ -4427,17 +4427,15 @@ an IntNum.
 
 A Scheme "flonum" is implemented by @code{gnu.math.DFloNum}.
 
-A Scheme pair is implemented by @code{kawa.lang.Pair}.
+A Scheme pair is implemented by @code{gnu.lists.Pair}.
 
-A Scheme vector is implemented by @code{kawa.lang.Vector}.
+A Scheme vector is implemented by @code{gnu.lists.FVectror}.
 
-Scheme characters are implemented using @code{kawa.lang.Char}.
+Scheme characters are implemented using @code{gnu.text.Char}.
 
-Scheme strings are implemented using @code{kawa.lang.FString}.
+Scheme strings are implemented using @code{gnu.lists.FString}.
 
-Scheme procedures are all sub-classes of @code{kawa.lang.Procedure}.
-Normally each function (lambda expression) in the source code is
-compiled to a separate sub-class of @samp{Procedure}.
+Scheme procedures are all sub-classes of @code{gnu.mapping.Procedure}.
 The "action" of a @samp{Procedure} is invoked by using one of
 the @samp{apply*} methods:  @samp{apply0}, @samp{apply1},
 @samp{apply2}, @samp{apply3}, @samp{apply4}, or @samp{applyN}.

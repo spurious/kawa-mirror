@@ -54,10 +54,6 @@ public final class Binding extends Location
    * in that case, the newest comes first. */
   Binding chain;
 
-  /** The "time" the binding was created.
-   * If the binding is newer than the current thread, it does not count. */
-  int time_stamp;
-
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<binding ");

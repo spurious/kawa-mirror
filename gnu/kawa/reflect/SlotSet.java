@@ -210,31 +210,46 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     Expression value = args[2];
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
-    String name = ClassMethods.checkName(arg1);
-    if (type instanceof ClassType && name != null)
+    Object part = null;
+    if (type instanceof ClassType)
       {
         ClassType ctype = (ClassType) type;
-        Object part = getField(ctype, name);
-        if (part != null)
-          {
-            boolean isStaticField = 
-              (part instanceof gnu.bytecode.Field)
-              ? ((gnu.bytecode.Field) part).getStaticFlag()
-              : ((gnu.bytecode.Method) part).getStaticFlag();
-            args[0].compile(comp,
-                            isStaticField ? Target.Ignore
-                            : Target.pushValue(ctype));
+	String name = ClassMethods.checkName(arg1);
+	if (name != null)
+	  {
+	    part = getField(ctype, name);
+	    if (part == null && type != Type.pointer_type)
+	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+	  }
+	else if (arg1 instanceof QuoteExp)
+	  {
+	    part = ((QuoteExp) arg1).getValue();
+	    // Inlining (make <type> field: value) creates calls to
+	    // setFieldReturnObject whose 2nd arg is a Field or Method.
+	    if (! (part instanceof Field || part instanceof Method))
+	      {
+		part = null;
+	      }
+	  }
+
+	if (part != null)
+	  {
+	    boolean isStaticField = 
+	      (part instanceof gnu.bytecode.Field)
+	      ? ((gnu.bytecode.Field) part).getStaticFlag()
+	      : ((gnu.bytecode.Method) part).getStaticFlag();
+	    args[0].compile(comp,
+			    isStaticField ? Target.Ignore
+			    : Target.pushValue(ctype));
 	    if (returnSelf)
 	      comp.getCode().emitDup(ctype);
-            compileSet(this, ctype, args[2], part, comp);
+	    compileSet(this, ctype, args[2], part, comp);
 	    if (returnSelf)
 	      target.compileFromStack(comp, ctype);
 	    else
 	      comp.compileConstant(Values.empty, target);
-            return;
-          }
-        if (type != Type.pointer_type)
-          comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+	    return;
+	  }
       }
     ApplyExp.compile(exp, comp, target);
   }

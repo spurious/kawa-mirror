@@ -1015,6 +1015,7 @@ Optional Packages:
   --without-java-references  Don't use java.lang.ref
   --with-swing            Assume Swing (Java Foundation Classes) is available
   --with-awt              Assume AWT is available (default on)
+  --with-sax2             Assume AWT is available
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
@@ -2019,6 +2020,13 @@ fi;
 # Check whether --with-awt or --without-awt was given.
 if test "${with_awt+set}" = set; then
   withval="$with_awt"
+
+fi;
+
+
+# Check whether --with-sax2 or --without-sax2 was given.
+if test "${with_sax2+set}" = set; then
+  withval="$with_sax2"
 
 fi;
 
@@ -3876,7 +3884,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3879 "configure"' > conftest.$ac_ext
+  echo '#line 3887 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7555,7 +7563,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7558 "configure"
+#line 7566 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7653,7 +7661,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7656 "configure"
+#line 7664 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10760,7 +10768,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10763 "configure"
+#line 10771 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10858,7 +10866,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10861 "configure"
+#line 10869 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13488,7 +13496,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13491 "configure"
+#line 13499 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13586,7 +13594,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13589 "configure"
+#line 13597 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14762,6 +14770,16 @@ fi
 
 
 
+if test "$with_sax2" = "yes"; then
+  WITH_SAX2_TRUE=
+  WITH_SAX2_FALSE='#'
+else
+  WITH_SAX2_TRUE='#'
+  WITH_SAX2_FALSE=
+fi
+
+
+
 if test "$enable_kawa_frontend" = "yes"; then
   ENABLE_KAWA_FRONTEND_TRUE=
   ENABLE_KAWA_FRONTEND_FALSE='#'
@@ -14911,7 +14929,7 @@ done
 ac_config_links="$ac_config_links $ac_config_links_8"
 
 
-ac_config_files="$ac_config_files Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -15072,6 +15090,13 @@ if test -z "${WITH_AWT_TRUE}" && test -z "${WITH_AWT_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"WITH_AWT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"WITH_AWT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WITH_SAX2_TRUE}" && test -z "${WITH_SAX2_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WITH_SAX2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WITH_SAX2\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -15500,6 +15525,8 @@ do
   "gnu/kawa/servlet/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/servlet/Makefile" ;;
   "gnu/xml/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/xml/Makefile" ;;
   "gnu/kawa/xml/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/xml/Makefile" ;;
+  "gnu/kawa/xslt/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/xslt/Makefile" ;;
+  "gnu/kawa/sax/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/sax/Makefile" ;;
   "gnu/brl/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/brl/Makefile" ;;
   "gnu/kawa/brl/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/brl/Makefile" ;;
   "gnu/kawa/lispexpr/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/kawa/lispexpr/Makefile" ;;
@@ -15692,6 +15719,8 @@ s,@WITH_SWING_TRUE@,$WITH_SWING_TRUE,;t t
 s,@WITH_SWING_FALSE@,$WITH_SWING_FALSE,;t t
 s,@WITH_AWT_TRUE@,$WITH_AWT_TRUE,;t t
 s,@WITH_AWT_FALSE@,$WITH_AWT_FALSE,;t t
+s,@WITH_SAX2_TRUE@,$WITH_SAX2_TRUE,;t t
+s,@WITH_SAX2_FALSE@,$WITH_SAX2_FALSE,;t t
 s,@ENABLE_KAWA_FRONTEND_TRUE@,$ENABLE_KAWA_FRONTEND_TRUE,;t t
 s,@ENABLE_KAWA_FRONTEND_FALSE@,$ENABLE_KAWA_FRONTEND_FALSE,;t t
 s,@pathsep@,$pathsep,;t t

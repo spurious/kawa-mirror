@@ -144,6 +144,13 @@
     <property name="with-awt" value="false"/>
     
     <!-- 
+       If org.xml.sax.ContentHandler is in the classpath, then we'll compile
+       in SAX2 support, unless you override the setting of with-sax2.
+    -->
+    <available property="with-sax2" classname="org.xml.sax.ContentHandler"/>
+    <property name="with-sax2" value="false"/>
+    
+    <!-- 
        If java.awt.Component is in the classpath, then we'll compile the
        JEmacs Swing UI, unless you override the setting of with-swing.
     -->
@@ -172,6 +179,7 @@
         with-references=${with-references}
         with-awt=${with-awt}
         with-swing=${with-swing}
+        with-sax2=${with-sax2}
         enable-jemacs=${enable-jemacs}
         enable-xml=${enable-xml}
         enable-servlet=${enable-servlet}
@@ -383,6 +391,13 @@
     </xcopy>
   </target>
   
+  <patternset id="with-sax2-false">
+  </patternset>
+
+  <patternset id="with-sax2-true">
+    <include name="gnu/kawa/sax/"/>
+  </patternset>
+
   <patternset id="with-awt-true"/>
   
   <patternset id="with-awt-false">
@@ -540,10 +555,12 @@
            optimize="${optimize}" >
       <include name="gnu/xml/"/>
       <include name="gnu/kawa/xml/"/>
+      <include name="gnu/kawa/xslt/"/>
       <include name="gnu/xquery/lang/"/>
       <include name="gnu/xquery/util/"/>
       <include name="gnu/brl/"/>
       <include name="gnu/kawa/brl/"/>
+      <patternset refid="with-sax2-${with-sax2}"/>
     </javac>
   </target>
 

@@ -41,6 +41,9 @@ AC_ARG_WITH(swing,
 AC_ARG_WITH(awt,
   [  --with-awt              Assume AWT is available (default on)])
 
+AC_ARG_WITH(sax2,
+  [  --with-sax2             Assume AWT is available])
+
 AC_PROG_CC
 AC_PROG_CXX
 dnl AC_PROG_INSTALL
@@ -99,6 +102,7 @@ AM_CONDITIONAL(ENABLE_SERVLET, test "$enable_servlet" = "yes")
 AM_CONDITIONAL(WITH_JAVA_REFERENCES, test "$with_java_references" = "yes")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
+AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 
 if test $enable_kawa_frontend = yes ; then
@@ -182,6 +186,7 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
   gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile
   gnu/xml/Makefile gnu/kawa/xml/Makefile
+  gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile
   gnu/brl/Makefile gnu/kawa/brl/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile

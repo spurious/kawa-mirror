@@ -1,5 +1,11 @@
 2002-06-11  Per Bothner  <per@bothner.com>
 
+	* configure.in (--with-sax2):  New flag.
+	(AC_OUTPUT):  Craete gnu/kawa/xslt/Makefile and gnu/kawa/sax/Makefile.
+	* build.xml:  Support with-xax2 option.
+	* build.properties:  Document with-ax2 flag.
+	Build gnu/kawa/xslt/ and gnu/kawa/sax/ if appropriate.
+
 	* kawa/repl.java (commandLineArgArray):  New variable.
 	(setArgs):  Set commandLineArgArray.
 

@@ -10,7 +10,7 @@ public abstract class Procedure implements Named, Printable
   /** If non-null, a sequence of (key, value)-pairs. */
   private Object[] properties;
 
-  private static String nameKey = new String("$name$");
+  private static final String nameKey = "name";
 
   public String getName()
   {
@@ -149,7 +149,19 @@ public abstract class Procedure implements Named, Printable
     return defaultValue;
   }
 
-  public synchronized Object setProperty(Object key, Object value)
+  public synchronized void setProperty(Object key, Object value)
+  {
+    properties = setProperty(properties, key, value);
+  }
+
+  /** Given a property list, update it.
+   * @param properties the input property list
+   * @param key
+   * @param value associate this with key in result
+   * @return updated property list (maybe the same as the input)
+   */
+  public static Object[] setProperty(Object[] properties,
+				     Object key, Object value)
   {
     int avail;
     Object[] props = properties;
@@ -168,7 +180,7 @@ public abstract class Procedure implements Named, Printable
 	      {
 		Object old = props[i + 1];
 		props[i + 1] = value;
-		return old;
+		return properties;
 	      }
 	    else if (k == null)
 	      avail = i;
@@ -183,6 +195,6 @@ public abstract class Procedure implements Named, Printable
       }
     props[avail] = key;
     props[avail+1] = value;
-    return null;
+    return properties;
   }
 }

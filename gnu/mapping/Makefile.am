@@ -23,6 +23,7 @@ java_JAVA=\
   InPort.java \
   Location.java \
   LogWriter.java \
+  MethodProc.java \
   NameMap.java \
   Named.java \
   OutPort.java \

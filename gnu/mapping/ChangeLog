@@ -1,3 +1,14 @@
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java:  Moved from gnu.expr.
+	* CpsProcedure.java:  Now extends MethodProc.
+	(getVarBuffer, match, applyV):  New methods.
+	* Makefile.am:  Update accordingly.
+
+	* Procedure.java (setProperty):  Return void, not old value.
+	(setProperty(Object[].Object,Object):  New static method.
+	(nameKey):  Change to plain "name".
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* Environment.java (defineValue):  Replace constraint.

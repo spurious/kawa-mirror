@@ -1,3 +1,7 @@
+2003-07-22  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* misc-test.scm: Test for Savannah bug #4423.
+
 2003-07-21  Per Bothner  <per@bothner.com>
 
 	* gui-test.scm:  Use a button model twice, to test new

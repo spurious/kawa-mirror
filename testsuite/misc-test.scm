@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 118)
+(test-init "Miscellaneous" 119)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -538,3 +538,5 @@
 
 (test '(thread thread main) test-fluid-let-levels)
 
+(define (not-a) ((lambda (x) (not x)) 'a))
+(test #f not-a)

@@ -4,6 +4,7 @@ import java.io.*;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.SourceMessages;
 
 /** A class to read Scheme forms (S-expressions). */
 
@@ -12,6 +13,11 @@ public class ScmRead extends gnu.text.LispReader
   public ScmRead(InPort port)
   {
     super(port);
+  }
+  
+  public ScmRead(InPort port, SourceMessages messages)
+  {
+    super(port, messages);
   }
   
   Object readSymbol ()
@@ -105,7 +111,10 @@ public class ScmRead extends gnu.text.LispReader
       }
     if (lastChar == ':')
       {
-	str.setLength(str.length()-1);
+	int len = str.length();
+	if (len == 2 && str.charAt(0) == ':')
+	  return "::";
+	str.setLength(len-1);
 	return Keyword.make(str.toString());
       }
     if (firstChar == ':')
@@ -760,7 +769,9 @@ public class ScmRead extends gnu.text.LispReader
 	  case ')':
 	    error("An unexpected close paren was read.");
 	  case '(':
-	    return readList();
+	    return readList(')');
+	  case '[':
+	    return readList(']');
 	  case '"':
 	    saveReadState = ((InPort) port).readState;
 	    ((InPort) port).readState = '\"';

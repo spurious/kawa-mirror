@@ -7,6 +7,7 @@ import gnu.expr.*;
 import java.lang.reflect.Modifier;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.text.SourceMessages;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -60,10 +61,18 @@ public class Translator extends Object
   // Global environment used to look for syntax/macros.
   private Environment env;
 
+  public Translator (Environment env, SourceMessages messages)
+  {
+    this.env = env;
+    current_decls = new Environment();
+    this.messages = messages;
+  }
+
   public Translator (Environment env)
   {
     this.env = env;
     current_decls = new Environment();
+    messages = new SourceMessages();
   }
 
   public Translator ()
@@ -105,9 +114,12 @@ public class Translator extends Object
     return exp;
   }
 
-  /** Count of errors seen (at compile time). */
-  public int errors;
+  SourceMessages messages;
 
+  public SourceMessages getMessages() { return messages; }
+  public void setMessages (SourceMessages messages)
+  { this.messages = messages; }
+ 
   /**
    * Handle syntax errors (at rewrite time).
    * @param message an error message to print out
@@ -115,22 +127,8 @@ public class Translator extends Object
    */
   public Expression syntaxError (String message)
   {
-    errors++;
-    OutPort err = OutPort.errDefault();
-    if (current_line > 0)
-      {
-	if (current_filename != null)
-	  err.print (current_filename);
-	err.print (':');
-	err.print (current_line);
-	if (current_column > 1)
-	  {
-	    err.print (':');
-	    err.print (current_column);
-	  }
-	err.print (": ");
-      }
-    err.println (message);
+    messages.error('e', current_filename, current_line, current_column,
+		   message);
     return new ErrorExp (message);
   }
 
@@ -277,7 +275,7 @@ public class Translator extends Object
 		Class[] ptypes = meth.getParameterTypes();
 		if (ptypes.length != cdr_length)
 		  continue;
-		// In the future, we ma try to find the "best" match.
+		// In the future, we may try to find the "best" match.
 		if (best != null)
 		  return syntaxError("ambiguous inline for call to "+name
 				     + " (in class "+procClass.getName()+")");

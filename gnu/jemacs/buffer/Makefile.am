@@ -10,6 +10,7 @@ java_WITH_SWING = \
   Buffer.java \
   BufferContent.java \
   BufferKeymap.java \
+  BufferLocalConstraint.java \
   BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
@@ -24,7 +25,6 @@ java_WITH_SWING = \
   Menu.java \
   Mode.java \
   Modeline.java \
-  PrefixAction.java \
   ProcessMode.java \
   ReplBuffer.java \
   TelnetMode.java \

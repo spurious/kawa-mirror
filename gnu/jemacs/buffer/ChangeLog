@@ -1,3 +1,52 @@
+2000-06-18  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (markMarker):  New field.
+	(checkMark, getMarkMarker):  New methods.
+	* Window.java:  Now also implements ChangeListener.
+	(activateRegion):  New method.
+	(select(Caret)):  New method.
+
+	* Buffer.java (charHeight, charWidth):  Moved to Window.
+	* Window.java (charHeight, charWidth):  New fields, moved from Buffer.
+	(getCharSize):  New method.
+	(getHeightInLines, getWidthInColumns):  Update accordingly.
+
+	* BufferKeymap.java (lookupKey):  Changes to handle escape and meta.
+	(defineKey):  Likewise.
+	(metaKey, metaKeymap):  New static fields.
+	(CTRL_MASK, SHIFT_MASK, ALT_MASK, META_MASK):  New constants.
+	(asNonAction, asAction):  Update accordingly.
+	(ignorable, asKeyStroke, definePrefix, stripMeta):  New methods.
+	(getDefaultAction):  Always return null.
+	* InsertAction.java (actionPerformed):  Don't clear
+	buffer.keymap.pendingLength unless we actually insert something.
+
+	* Marker.java (isBeginningOfLine, isEndOfLine):  New predicates.
+	(set):  Oops.  Need to set buffer.
+	
+	* BufferLocalConstraint.java:  New class, extends Constraint.
+	* Command.java (key):  New field (needed for prefix keys).
+	(resolveSymbol):  New method.
+	(perform):  Check for "intercative" methods.
+	(processInteractionString, toString):  New methods.
+	(getCommand):  Call resolveSymbol.
+	* PrefixAction.java:  Removed - now subsumed by Coommand.
+	* Makefile.am:  Update accordingly.
+
+	* ReplBuffer.java (scheme):  Removed method.
+	(make):  New static methods that specify Interpreter or language name.
+
+	* emacs.scm (set-keymap-name):  Takes optional name.
+	(set-keymap-name):  New method - for now does nothing.
+	(global-map): Change to new Keymap - not DEFAULT_KEYMAP.
+	Also comment out calls to define-key - use keydefs.el instead.
+	(esc-map):  New variable.
+	(forward-char, backward-char, next-line, previous-line):  Comment out.
+	Instead use persions in simple.el.
+	(move-line):  Rename to line-move.
+	(copy-merker):  More correct implementation.
+	(decode-buffer):  New procedure.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* Buffer.java:  Now extends DefaultStyledDocument.

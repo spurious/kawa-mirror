@@ -100,7 +100,9 @@ public final class Marker implements Position
             if (newPosition > newLength)
               newPosition = newLength;
           }
-	position = buffer.content.createPosition(newPosition, EMACS_MARK_KIND);
+	buffer = newBuffer;
+	position = newBuffer.content.createPosition(newPosition,
+						    EMACS_MARK_KIND);
       }
   }
 
@@ -321,6 +323,19 @@ public final class Marker implements Position
     return count;
   }
   */
+
+  public boolean isBeginningOfLine()
+  {
+    int offset = getOffset();
+    return offset == 0 || buffer.content.charAt(offset - 1) == '\n';
+  }
+
+  public boolean isEndOfLine()
+  {
+    int offset = getOffset();
+    BufferContent content = buffer.content;
+    return offset == content.length() || content.charAt(offset) == '\n';
+  }
 
   public int hashCode()
   {

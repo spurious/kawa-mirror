@@ -1,3 +1,56 @@
+2004-10-03  Christian Surlykke <christian@surlykke.dk>
+
+	Implementation of SwtWindow.split(buffer, lines, horizontal)
+	Corrected a number of accesses to SWT to go through SwtHelper for
+	proper thread handling.
+	* SwtFrame.java (SwtFrame): Added firstVisibleLine parameter to call
+	to swtWindow.getReadyToShow.
+	* SwtHelper.java (newStyledText): Added parameter firstVisibleLine to
+	determine the line at the top of the visible area.
+	(getTopIndex): New method. Returns index of first visible line in a 
+	StyledText.
+	(getCaretOffset): New method. Returns offset of caret in a StyledText.
+	(getParent): New method. Returns parent of a Control.
+	(getArea): New method. Returns area (in pixels x pixels) of the inside
+	of a StyledText widget (i.e. excluding borders, menus, scrollbars).
+	(getLineHeight): New method. Returns the height (in pixels) of the 
+	currently used font for a StyledText.
+	(setCaretOffset): New method. Sets the offset of the caret for a 
+	StyledText.
+	(setContent): New method. Sets the content of a StyledText.
+	(showSelection): New method. Scrolls the selection of a StyledText
+	into view.
+	(redraw): New method. Marks the area belonging to a Control as needing
+	to be redrawn.
+	(newSashForm): New method. Creates a new SashForm instance.
+	(setParent): New method. Sets the parent of a Control.
+	(injectSashFormAsParent): New method. Given a contol makes a new 
+	SashForm as new parent of control and control's old parent as its 
+	parent.
+	(setWeights): New method. Sets the weights of a SashForm to determine 
+	the relative heights/widths of it's children.
+	(layout): New method. Calls layout on a Composite.
+	* SwtWindow.java (getReadyToShow): Added firstVisibleLine to call to 
+	SwtHelper.newStyledText.
+	(setBuffer): Changed call to StyledText.setContent to call to 
+	SwtHelper.setContent.
+	(handleCommand): Changed call to StyledText.redraw to call to 
+	SwtHelper.redraw.
+	(getPoint): Changed call to StyledText.getCaretOffset to call to 
+	SwtHelper.getCaretOffset.
+	(setDot): Changed call to StyledText.setCaretOffset to call to 
+	SwtHelper.setCaretOffset.
+	(split): Added implementation.
+	(getWidth): Changed call to StyledText.getSize() to call to 
+	SwtHelper.getArea.
+	(getHeight): Changed call to StyledText.getSize() to call to 
+	SwtHelper.getArea.
+	(verifyKey): Changed call to StyledText.setCaretOffset to call to
+	SwtHelper.setCaretOffset.
+	(mouseDown): Changed call to StyledText.getCaretOffset to call to
+	SwtHelper.getCaretOffset and call to StyledText.showSelection to call
+	to SwtHelper.showSelection. 
+	  
 2004-08-28  Christian Surlykke <christian@surlykke.dk>
 
 	Added menus to the SwtFrontend.

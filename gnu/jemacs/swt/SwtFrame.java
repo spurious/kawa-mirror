@@ -44,7 +44,7 @@ public class SwtFrame extends EFrame
     super(window);
     this.swtWindow = window;
     shell = SwtHelper.newShell(SwtHelper.getDisplay(), new FillLayout());
-    swtWindow.getReadyToShow(shell);
+    swtWindow.getReadyToShow(shell, 0);
   }
 
   /**

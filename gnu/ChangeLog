@@ -1,3 +1,8 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Only select commonlisp if Swing is used.
+	(This is needed because of broken dependency on jemacs.)
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* kawa/functions:  New package.

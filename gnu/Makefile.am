@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS_WITH_SWING = jemacs
-SUBDIRS = bytecode math text mapping expr kawa ecmascript \
-	commonlisp $(SUBDIRS_@SWING_SELECTED@)
+SUBDIRS_WITH_SWING = commonlisp jemacs
+SUBDIRS = bytecode math lists text mapping expr kawa ecmascript \
+	$(SUBDIRS_@SWING_SELECTED@)
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html

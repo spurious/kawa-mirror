@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -100,6 +101,8 @@ OFILES_DIR = $(TO_TOPDIR)
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o dump$(exext)
 TO_TOPDIR = $(top_builddir)
 GCJ_DEPS = $(java_JAVA)
+
+CLEANFILES = *.class *.o *.stamp dump$(exext)
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
@@ -146,8 +149,6 @@ dump.java
 
 
 PACKAGE_FNAME = gnu-bytecode
-
-CLEANFILES = *.class *.o *.stamp dump$(exext)
 
 EXTRA_DIST = package.html
 subdir = gnu/bytecode

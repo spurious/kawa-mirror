@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -87,9 +88,9 @@ kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS_WITH_SWING = jemacs
-SUBDIRS = bytecode math text mapping expr kawa ecmascript \
-	commonlisp $(SUBDIRS_@SWING_SELECTED@)
+SUBDIRS_WITH_SWING = commonlisp jemacs
+SUBDIRS = bytecode math lists text mapping expr kawa ecmascript \
+	$(SUBDIRS_@SWING_SELECTED@)
 
 EXTRA_DIST = PACKAGES
 

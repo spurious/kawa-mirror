@@ -1,7 +1,6 @@
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java:  Update for new gnu.lists.
-	
 	(asNumber):  Don't allow Position.
 	(getName):  Return "CommonLisp" (not "Emacs-Lisp"!).
 	

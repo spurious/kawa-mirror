@@ -8,3 +8,17 @@ Should U64Vector (etc) extend S64Vector (etc)?  Would share some code,
 but I don't think a U64Vector "is-a" S64Vector.
 
 PositionSet class (subsumes DOM NodeSet).
+
+Old CharBuffer had replace(int where, char[] chars, int start, int count),
+and replace(int where, String string).
+
+Old AbstractString had InPort open(), and replace(int where, char[]
+chars, int start, int count), and replace(int where, String string),
+and replace (int where, AbstractString string) and FString copy(), and
+insert(int where, int count, boolean beforeMarkers) and
+insert(int where, AbstractString str, boolean beforeMarkers) and
+insert(int where, char[] chars, int start, int count, boolean beforeMarkers)
+and insert(int where, char ch, int count, boolean beforeMarkers).
+
+class SubString extends SubSequence implements CharSequence.
+public SubString(CharSequence base, ...) { ... }

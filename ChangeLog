@@ -1,3 +1,18 @@
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/AutoloadProcedure.java (load):  If getFunction
+	raises an UnboundSumbol, catch that silently.
+
+	* kawa/standard/define.java (scanForDefinition):  For define-private,
+	set PRIVATE_SPECIFIED explicitly in addition to default PRIVATE flag.
+	* kawa/lang/Translator.java (finishModule):  Only complain about
+	export and private mismatch if PRIVATE_SPECIFIED.
+
+	* kawa/standard/require.java (scanForDefinition):  Look for instance
+	declaration in current Environment.
+	Make the instance declaration readable, so it won't becomes 'ignored'.
+	Use getDefineto define imported fields..
+
 2001-09-20  Per Bothner  <per@bothner.com>
 
 	Add support for --help, based on a patch from

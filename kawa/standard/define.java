@@ -53,7 +53,10 @@ public class define extends Syntax implements Printable
 	Declaration decl = defs.getDefine(sym, 'w', tr);
 	tr.pushBinding(sym, decl);
 	if (makePrivate)
-	  decl.setPrivate(true);
+	  {
+	    decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+	    decl.setPrivate(true);
+	  }
 	if (makeConstant)
 	  decl.setFlag(Declaration.IS_CONSTANT);
 	Object declForm = (! function) ? (Object) decl

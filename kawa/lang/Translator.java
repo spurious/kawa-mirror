@@ -634,8 +634,9 @@ public class Translator extends Parser
 	      {
 		if (decl.isPrivate())
 		  {
-		    error('e', decl,
-			  "'", "' is declared both private and exported");
+		    if (decl.getFlag(Declaration.PRIVATE_SPECIFIED))
+		      error('e', decl,
+			    "'", "' is declared both private and exported");
 		    decl.setPrivate(false);
 		  }
 	      }

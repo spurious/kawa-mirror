@@ -142,13 +142,14 @@ public class require extends Syntax
 	    boolean isStatic = (flags & Access.STATIC) != 0;
             if (! isStatic && instance == null)
               {
-                instance = find((ClassType) type, tr.environ);
+                instance = find((ClassType) type, Environment.getCurrent());
 		if (! immediate)
 		  {
 		    String fname = tname.replace('.', '$') + "$instance";
 		    decl = new Declaration(fname, type);
 		    decl.setPrivate(true);
 		    defs.addDeclaration(decl);
+		    decl.setCanRead(true);
 		  }
               }
             String fname = fld.getName();
@@ -175,7 +176,8 @@ public class require extends Syntax
 			 : Compilation.demangleName(fname, true).intern());
                     Type ftype = fld.getType();
 		    Type dtype = interp.getTypeFor(ftype.getReflectClass());
-		    Declaration fdecl = new Declaration(fdname, dtype);
+		    Declaration fdecl = defs.getDefine(fdname, 'w', tr);
+		    fdecl.setType(dtype);
                     if (ftype.isSubtype(Compilation.typeBinding))
                       fdecl.setIndirectBinding(true);
 		    if (! isStatic)
@@ -187,7 +189,6 @@ public class require extends Syntax
 		      fdecl.noteValue(new QuoteExp(fvalue));
 		    fdecl.setPrivate(true);
 		    fdecl.setSimple(false);
-		    defs.addDeclaration(fdecl);
 		    tr.pushBinding(fdname, fdecl);  // Add to translation env.
 		  }
 		catch (Exception ex)

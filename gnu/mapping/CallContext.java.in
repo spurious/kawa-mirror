@@ -355,6 +355,26 @@ public class CallContext implements Runnable
   }
 
   protected String baseUri;
+  protected static String baseUriDefault;
+
+  public static String getBaseUriDefault ()
+  {
+    String uri = baseUriDefault;
+    if (uri == null)
+      {
+	uri = System.getProperty("user.dir");	
+	if (uri == null)
+	  return null;
+	char sep = java.io.File.separatorChar;
+	// Should also encode illegal characters using '%'.  FIXME.
+	if (sep != '/')
+	  uri = uri.replace(sep, '/');
+	uri = ((uri.charAt(0) == '/' ? "file://" : "file:///")
+		   + uri + '/');
+	baseUriDefault = uri;
+      }
+    return uri;
+  }
 
   public String getBaseUriRaw ()
   {
@@ -365,19 +385,10 @@ public class CallContext implements Runnable
    * However, it may get reset to the "current document". */
   public String getBaseUri ()
   {
-    if (baseUri == null)
-      {
-	String uri = System.getProperty("user.dir");	
-	if (uri == null)
-	  return null;
-	char sep = java.io.File.separatorChar;
-	// Should also encode illegal characters using '%'.  FIXME.
-	if (sep != '/')
-	  uri = uri.replace(sep, '/');
-	baseUri = ((uri.charAt(0) == '/' ? "file://" : "file:///")
-		   + uri + '/');
-      }
-    return baseUri;
+    String uri = baseUri;
+    if (uri == null)
+      baseUri = uri = getBaseUriDefault();
+    return uri;
   }
 
   /** Set the current "base URI". */

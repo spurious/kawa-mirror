@@ -1,3 +1,8 @@
+2003-03-03  Per Bothner  <per@bothner.com>
+
+	* CallContext.java.in (baseUriDefault):  new static field.
+	(getBaseUriDefault):  New static method.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* CallContext.java.in (baseUri):  New protected field.

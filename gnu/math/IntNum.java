@@ -1100,10 +1100,10 @@ public class IntNum extends RatNum implements Compilable
   }
 
   static ClassType thisType;
-  static Method makeIntMethod;
-  static Method makeLongMethod;
+  public static Method makeIntMethod;
+  public static Method makeLongMethod;
 
-  public Literal makeLiteral (Compilation comp)
+  public static void initMakeMethods ()
   {
     if (thisType == null)
       {
@@ -1117,6 +1117,11 @@ public class IntNum extends RatNum implements Compilable
 	makeLongMethod = thisType.new_method ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }
+  }
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    initMakeMethods ();
     return new Literal (this, thisType, comp);
   }
 

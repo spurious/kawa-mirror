@@ -29,6 +29,6 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ)
+CLEANFILES = *.class
 
 all: $(OBJ)

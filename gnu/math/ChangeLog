@@ -1,3 +1,10 @@
+Mon Feb  3 17:09:07 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* DFloNum.java (makeMethod):  Make public.
+	* IntNum.java (makeIntMethod, makeLongMethod):  Make public.
+	* {DFloNum,IntNum}.java (initMakeMethods):  New methods,
+	* Makefile.{am,in} (CLEANFILES):  Delete *.class, not just $(OBJ).
+
 Tue Jan 21 18:25:50 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Complex.java (doubleRealValue):  Synonym for doubleValue();

@@ -183,9 +183,9 @@ public class DFloNum extends RealNum implements Compilable
   }
 
   static ClassType thisType;
-  static Method makeMethod;
+  public static Method makeMethod;
 
-  public Literal makeLiteral (Compilation comp)
+  public static void initMakeMethods ()
   {
     if (thisType == null)
       {
@@ -195,6 +195,11 @@ public class DFloNum extends RealNum implements Compilable
 	makeMethod = thisType.new_method ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }
+  }
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    initMakeMethods ();
     return new Literal (this, thisType, comp);
   }
 

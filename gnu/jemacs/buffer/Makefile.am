@@ -13,6 +13,7 @@ java_WITH_SWING = \
   BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
+  Command.java \
   FinalAction.java \
   Frame.java \
   InsertAction.java \
@@ -21,7 +22,6 @@ java_WITH_SWING = \
   Menu.java \
   Modeline.java \
   PrefixAction.java \
-  ProcAction.java \
   ReplBuffer.java \
   TooLongAction.java \
   Window.java

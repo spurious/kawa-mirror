@@ -102,8 +102,8 @@ public class BufferKeymap implements javax.swing.text.Keymap
     Action action = lookupKey(keymap, prefixKeys, nKeys, null, acceptDefaults);
     if (action instanceof PrefixAction)
       return ((PrefixAction) action).getKeymap();
-    if (action instanceof ProcAction)
-      return ((ProcAction) action).getProcedure();
+    if (action instanceof Command)
+      return ((Command) action).getCommand();
     if (action instanceof FinalAction)
       return ((FinalAction) action).action;
     if (action instanceof TooLongAction)
@@ -262,7 +262,9 @@ public class BufferKeymap implements javax.swing.text.Keymap
 			       Object keySpec, Object binding)
   {
     if (binding instanceof Procedure)
-      binding = new ProcAction((Procedure) binding);
+      binding = new Command((Procedure) binding);
+    else if (binding instanceof String)
+      binding = new Command(binding, (String) binding);
     else if (binding instanceof Keymap)
       binding = new PrefixAction(null, (Keymap) binding);
     KeyStroke key;

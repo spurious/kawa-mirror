@@ -10,9 +10,9 @@ import gnu.kawa.reflect.StaticFieldLocation;
 import kawa.lang.Translator; // FIXME
 import gnu.mapping.Values;
 
-/** Interpreter sub-class for Lisp-like languages (including Scheme). */
+/** Language sub-class for Lisp-like languages (including Scheme). */
 
-public abstract class LispInterpreter extends Interpreter
+public abstract class LispInterpreter extends Language
 {
   static public final String quote_sym = "quote";
   static public final String unquote_sym = "unquote";

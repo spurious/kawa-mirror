@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>JEmacs and the gnu.emacs Package</title>
+  </head>
+
+  <body>
+    <h1>JEmacs and the gnu.emacs Package</h1>
+<p>
+The <code>gnu.expr</code> provides various building blocks
+for building an Emacs-like text editor.  It also provides a
+number of Scheme procedures that have the same name and similar
+functionality as the Emacs Lisp functions.
+<p>
+It uses the Swing tool-kit.
+
+<h2>Plan</h2>
+
+The plan is to use
+this together with the (unfinished) <code>gnu.elisp</code>
+package to provide a fully-functional re-implementation of
+Emacs Lisp which compiles to Java bytecodes.
+I'm hoping volunteers will help me make "JEmacs" into something
+useful.  I have fairly clear ideas about much of what need to be
+done.  Contact me if you are interested.
+
+<h2>Status</h2>
+Very unfinished proof of concerpt.
+
+<h2>Usage</h2>
+Load <code>emacs.scm</code> into a running Kawa.
+Then evaluate:
+<pre>
+(emacs)
+</pre>
+That brings up a Emacs window.
+<p>
+You can do <code>(split-window)</code> to create new (sub-)windows
+in an existing frame; type <code>(make-frame)</code> to create
+a new frame (to-level window), or do <code>(get-buffer-create NAME)</code>
+to create a new buffer.
+Note also how <code>ctrl/B</code> and <code>ctrl/F</code> have been
+bound to the correct functions.
+
+<h2>License</h2>
+Same as the package <code>gnu.expr</code>:  Modified Gnu Public License.
+See the file <a href="http:../expr/COPYING">../expr/COPYING</a>.
+For now, the copyright holder is Per Bothner;  in the future it may
+make more sense to make the FSF the copyright owner, since the plan
+is to use a lot of the existing ELisp packages once ELisp support
+is complete.
+
+<h2>Author</h2>
+
+Per Bothner,
+<tt>&lt;<a href="mailto:bothner@gnu.org">bothner@gnu.org</a>&gt;</tt>
+<p>
+<!-- hhmts start -->
+Last modified: Sun Jun 20 21:44:39 PDT 1999
+<!-- hhmts end -->
+  </body>
+</html>

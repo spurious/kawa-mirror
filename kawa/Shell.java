@@ -54,12 +54,11 @@ public class Shell
 	      return;
 
             // Skip whitespace, in case somebody calls (read-char) or similar.
+	    int ch;
             for (;;)
               {
-                int ch = inp.read();
-                if (ch < 0)
-		  return;
-                if (ch == '\r' || ch == '\n')
+                ch = inp.read();
+                if (ch < 0 || ch == '\r' || ch == '\n')
                   break;
                 if (ch != ' ' && ch != '\t')
                   {
@@ -87,6 +86,8 @@ public class Shell
 	    Object result = mod.evalModule (env);
 	    if (pout != null)
 	      interp.print(result, pout);
+	    if (ch < 0)
+	      break;
 	  }
 	catch (WrongArguments e)
 	  {

@@ -95,29 +95,27 @@ SUFFIXES = .java .class .scm .el .lisp
 #CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 
 javadir = $(datadir)/java/$(subdir)
-
+JAVACFLAGS = 
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
-GCJFLAGS = -gdwarf-2
-OFILES_DIR = $(TO_TOPDIR)
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+#GCJFLAGS = -gdwarf-2
+GCJFLAGS = -g
+OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 GCJ_DEPS = $(java_JAVA)
 
-CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
-ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
+ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 SUBDIRS = lang standard lib
-
-bin_PROGRAMS = @kawa_bin@
-EXTRA_PROGRAMS = kawa
-noinst_SCRIPTS = kawa.sh
-kawa_SOURCES = kawa.c
 
 java_WITH_AWT = \
   GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
@@ -129,41 +127,16 @@ java_JAVA = Shell.java repl.java Version.java \
 
 
 EXTRA_JAVA = $(java_WITH_AWT)
-SOURCES = $(java_JAVA) Version.java.in kawa.c
+
+SOURCES = $(java_JAVA) Version.java.in
 
 PACKAGE_FNAME = kawa-repl
-
-READLINE_INCLUDE_PATH = 
-READLINE_LIB_PATH = 
-kawa_EXTRA_LIBS = -lncurses  # For Linux
-#kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-DEFS = -DKAWALIB='"$(datadir)/java"' $(READLINE_INCLUDE_PATH)
-kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 EXTRA_DIST = Version.java.in Version.java
 subdir = kawa
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-EXTRA_PROGRAMS =  kawa$(EXEEXT)
-bin_PROGRAMS =  @kawa_bin@
-PROGRAMS =  $(bin_PROGRAMS)
-
-CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@
-am_kawa_OBJECTS =  kawa.o
-kawa_OBJECTS =  $(am_kawa_OBJECTS)
-kawa_DEPENDENCIES = 
-kawa_LDFLAGS = 
-SCRIPTS =  $(noinst_SCRIPTS)
-
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES =  $(kawa_SOURCES)
-JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
-JAVAROOT = $(top_builddir)
+DIST_SOURCES = 
 depcomp = 
 DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
 
@@ -172,12 +145,9 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
 DIST_SUBDIRS =  $(SUBDIRS)
-SOURCES = $(kawa_SOURCES)
-OBJECTS = $(am_kawa_OBJECTS)
-
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .java .class .scm .el .lisp .c .o
+.SUFFIXES: .java .class .scm .el .lisp
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/Make-rules
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/Makefile
 
@@ -185,49 +155,6 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
 
-
-mostlyclean-binPROGRAMS:
-
-
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-
-distclean-binPROGRAMS:
-
-
-maintainer-clean-binPROGRAMS:
-
-
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(bindir)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
-	    echo "  $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f"; \
-	     $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f; \
-	  else :; fi; \
-	done
-
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
-	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
-	  rm -f $(DESTDIR)$(bindir)/$$f; \
-	done
-
-mostlyclean-compile:
-	-rm -f *.o core *.core
-
-distclean-compile:
-	-rm -f *.tab.c
-
-kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES)
-	@rm -f kawa$(EXEEXT)
-	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
-.c.o:
-	$(COMPILE) -c $<
 
 mostlyclean-javaJAVA:
 
@@ -389,7 +316,7 @@ installcheck-am:
 installcheck: installcheck-recursive
 install-info-am: 
 install-info: install-info-recursive
-install-exec-am: install-binPROGRAMS install-exec-local
+install-exec-am:
 install-exec: install-exec-recursive
 
 install-data-am: install-javaJAVA
@@ -398,15 +325,15 @@ install-data: install-data-recursive
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
-uninstall-am: uninstall-binPROGRAMS uninstall-javaJAVA
+uninstall-am: uninstall-javaJAVA
 uninstall: uninstall-recursive
-all-am: Makefile $(PROGRAMS) $(SCRIPTS) classjava.stamp
+all-am: Makefile classjava.stamp
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
 installdirs: installdirs-recursive
 installdirs-am:
-	$(mkinstalldirs)  $(DESTDIR)$(bindir) $(DESTDIR)$(javadir)
+	$(mkinstalldirs)  $(DESTDIR)$(javadir)
 
 
 mostlyclean-generic:
@@ -425,57 +352,54 @@ maintainer-clean-generic:
 	-rm -f Makefile.in
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-javaJAVA mostlyclean-am
+clean-am: clean-generic clean-javaJAVA mostlyclean-am
 
 distclean: distclean-recursive
 
-distclean-am: clean-am distclean-binPROGRAMS distclean-compile \
-	distclean-generic distclean-javaJAVA distclean-tags
+distclean-am: clean-am distclean-generic distclean-javaJAVA \
+	distclean-tags
 
 maintainer-clean: maintainer-clean-recursive
 
-maintainer-clean-am: distclean-am maintainer-clean-binPROGRAMS \
-	maintainer-clean-generic maintainer-clean-javaJAVA
+maintainer-clean-am: distclean-am maintainer-clean-generic \
+	maintainer-clean-javaJAVA
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-binPROGRAMS mostlyclean-compile \
-	mostlyclean-generic mostlyclean-javaJAVA
+mostlyclean-am: mostlyclean-generic mostlyclean-javaJAVA
 
 .PHONY: all all-am all-recursive all-redirect check check-am \
-	check-recursive clean clean-binPROGRAMS clean-generic \
-	clean-javaJAVA clean-recursive distclean distclean-binPROGRAMS \
-	distclean-compile distclean-generic distclean-javaJAVA \
+	check-recursive clean clean-generic clean-javaJAVA \
+	clean-recursive distclean distclean-generic distclean-javaJAVA \
 	distclean-recursive distclean-tags distdir dvi dvi-am \
 	dvi-recursive info info-am info-recursive install install-am \
-	install-binPROGRAMS install-data install-data-am \
-	install-data-recursive install-exec install-exec-am \
-	install-exec-local install-exec-recursive install-info \
-	install-info-am install-info-recursive install-javaJAVA \
-	install-recursive install-strip installcheck installcheck-am \
-	installcheck-recursive installdirs installdirs-am \
-	installdirs-recursive maintainer-clean \
-	maintainer-clean-binPROGRAMS maintainer-clean-generic \
-	maintainer-clean-javaJAVA maintainer-clean-recursive \
-	mostlyclean mostlyclean-binPROGRAMS mostlyclean-compile \
-	mostlyclean-generic mostlyclean-javaJAVA mostlyclean-recursive \
-	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-javaJAVA uninstall-recursive
+	install-data install-data-am install-data-recursive \
+	install-exec install-exec-am install-exec-recursive \
+	install-info install-info-am install-info-recursive \
+	install-javaJAVA install-recursive install-strip installcheck \
+	installcheck-am installcheck-recursive installdirs \
+	installdirs-am installdirs-recursive maintainer-clean \
+	maintainer-clean-generic maintainer-clean-javaJAVA \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-javaJAVA mostlyclean-recursive tags tags-recursive \
+	uninstall uninstall-am uninstall-javaJAVA uninstall-recursive
 
 
 # Make sure $(KAWA1) is available, if --enable-gcj-compiled.
 $(TO_TOPDIR)/kawa1$(exeext):
-	cd $(TO_TOPDIR) && $(MAKE) kawa1$(exeext)
+	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
 
 $(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
 	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 $(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
-	$(JAR) cf classes.jar *.class
 	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
-	  classes.jar -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
-	rm classes.jar
+	  *.class -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+
+java-classes.stamp: $(java_Java)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > java-classes.stamp
 
 scm-classes.stamp: $(java_SCM)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
@@ -489,27 +413,19 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
-kawa.sh:
-	echo '#!/bin/sh' >tmp
-	echo 'KAWALIB=$${KAWALIB-$(datadir)/java}' >>tmp
-	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
-	echo 'export CLASSPATH' >>tmp
-	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
-	chmod +x tmp
-	mv tmp kawa.sh
+# Almost the same as automake's install-javaJAVA, but the standard
+# automake support for Java doesn't handle built Java classes.
+install-java-classes: java-classes.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
+	done
 
 # Force repl.class to be built before sub-dirs.
 # Specifically, lib needs repl to compile scm files.
 all-recursive:  classjava.stamp $(@GCJ_COMPILED_SELECTED@)
-
-install-exec-local: install-exec-bindir
-
-install-exec-bindir: $(noninst_SCRIPTS)
-	$(mkinstalldirs) $(bindir)
-	if test "@kawa_bin@" = "" ; then \
-	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
-	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -24,9 +24,9 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<list-repeat-pattern ");
-    SFormat.print (element_pattern, ps);
-    ps.print ('>');
+    ps.print("#<list-repeat-pattern ");
+    ps.print(element_pattern);
+    ps.print('>');
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars)
@@ -35,7 +35,7 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
       System.err.print ("(match ");
       print (System.err);
       System.err.print (" on ");
-      SFormat.print (obj, System.err);
+      System.err.print(obj);
       System.err.print (")\n");
       */
     int length = LList.listLength(obj, false);
@@ -51,9 +51,9 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
 	Pair pair = (Pair) obj;
 	/* DEBUGGING
 	   System.err.print ("(sub-match ["+j+"] ");
-	   SFormat.print (element_pattern, System.err);
+	   System.err.print(element_pattern);
 	   System.err.print (" on ");
-	   SFormat.print (pair.car, System.err);
+	   System.err.print(pair.car);
 	   */
 
 	if (! element_pattern.match (pair.car, element_vars, 0))

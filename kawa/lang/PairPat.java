@@ -41,9 +41,9 @@ public class PairPat extends Pattern implements Printable, Externalizable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<pair-pattern car: ");
-    SFormat.print (car, ps);
+    ps.print(car);
     ps.print (" cdr: ");
-    SFormat.print (cdr, ps);
+    ps.print(cdr);
     ps.print ('>');
   }
 

@@ -26,9 +26,9 @@ public class EqualPat extends Pattern implements Printable, Externalizable
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<equals: ");
-    SFormat.print (value, ps);
-    ps.print ('>');
+    ps.print("#<equals: ");
+    ps.print(value);
+    ps.print('>');
   }
 
   /**

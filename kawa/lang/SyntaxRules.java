@@ -240,7 +240,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      {
 		if (j > 0)  err.print ("; ");
 		err.print (j + ": ");
-		SFormat.print (vars[j], err);
+		err.print(vars[j]);
 	      }
 	    err.println ('}');
 	    */
@@ -261,7 +261,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    err.print("{Expansion of ");
 	    err.print(literal_identifiers[0]);
 	    err.print(": ");
-	    SFormat.print(expansion, err);
+	    err.print(expansion);
 	    err.println('}');
 	    err.flush();
 	    */

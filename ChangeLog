@@ -1,3 +1,32 @@
+Sun Dec 14 22:42:44 1997  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in:  Set version to 1.5.92.
+	* kawa/repl.java:  Define new variable symbol-read-case.
+	* kawa/lang/InPort.java (getReadCase):  New function.
+	(readSymbol):  Check value of getReadCase.
+	* kawa/langEnvironment.java (user):  Now just returns value of current.
+	
+Sun Dec 14 16:12:19 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/*.java:  More updates for gnu.bytecode changes.
+	* kawa/lang/Compilation.java (addClass):  Fix type of "this".
+	* kawa/lang/Environment.java (current):  Renamed to getCurrent.
+	(setCurrent):  New method.
+	Various fixes to support per-thread environments.
+	* kawa/lang/ModuleExp.java (eval_module):  Set and restore
+	current Environment if we must compile.
+
+	* kawa/lang/Expression.java (getType):  New method.
+	* kawa/lang/TryExp.java:  New class, for try-finally expressions.
+	* kawa/lang/Makefile.am:  Add TryExp.
+
+	* kawa/standard/Scheme.java (setEnvironment):  New method.
+	(Scheme):  Define dynamic-wind and fluid-let.
+	* kawa/standard/try_finally.java:  New class which extends Syntax.
+	* kawa/standard/Makefile.am:  Added try_finally.
+
+	* kawa/standard/load.java (loadCompiled):  Update ZipLoaded constuctor.
+
 Thu Nov 27 21:42:08 1997  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/*.java:  Update for gnu.bytecode changes.

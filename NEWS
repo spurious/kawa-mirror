@@ -1,5 +1,20 @@
 Changes since Kawa 1.5
 ======================
+The reader by default no longer down-cases letters in symbols.
+A new variable symbol-read-case control how case is handled:
+'P (the default) preserves case;  'U upper-cases letters;
+'D or -" down-cases letters; and 'I inverts case.
+
+The gnu.bytecode package now supports exception handlers,
+and Kawa has preiminary exception handler support:  The new
+synantic form try-finally supports a cleanup hook that is run
+after some other code finishes (normally or abnormally).
+Try-finally is used to implement dynamic-wind and fluid-let.
+
+The environment handling has been improved to support thread-specific
+environments, a thread-safe fluid-let, and multiple top-levels.
+(The latter still needs a bit of work.)
+
 The gnu.bytecode package has been extensively changed.
 There are new classes representing the various standard Attributes,
 and data associated with an attribute is now stored there.

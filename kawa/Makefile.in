@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.0 from Makefile.am
+# Makefile.in generated automatically by automake 1.1g from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -37,50 +37,76 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang math standard lib
+SUBDIRS = math lang standard lib
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
+bin_SCRIPTS = kawa
+
+# Sufix for batch files.
+BAT=
+
+JAVA = java
+JAVAC = javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 
 javadir=$(prefix)/java/$(subdir)
 
-OBJ = Shell.class
+OBJ = Shell.class repl.class
 
 java_DATA=$(OBJ)
 
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ)
-mkinstalldirs = $(top_srcdir)/mkinstalldirs
-DATA = $(java_DATA)
+CLEANFILES=$(OBJ) kawa$(BAT) tmp
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+SCRIPTS =  $(bin_SCRIPTS)
 
-DIST_COMMON = Makefile.am Makefile.in
+DATA =  $(java_DATA)
+
+DIST_COMMON =  Makefile.am Makefile.in
 
 
-PACKAGE = @PACKAGE@
-VERSION = @VERSION@
-
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST)
-DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \
+	$(TEXINFOS) $(MANS) $(EXTRA_DIST)
 
 TAR = tar
 default: all
 
 
 $(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake $(subdir)/Makefile
+	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
 
-Makefile: $(top_builddir)/config.status Makefile.in
-	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= ./config.status
+Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+install-binSCRIPTS: $(bin_SCRIPTS)
+	$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(bindir)
+	list="$(bin_SCRIPTS)"; for p in $$list; do \
+	  if test -f $$p; then \
+	    $(INSTALL_SCRIPT) $$p $(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else if test -f $(srcdir)/$$p; then \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p \
+	      $(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	list="$(bin_SCRIPTS)"; for p in $$list; do \
+	  rm -f $(bindir)/`echo $$p|sed '$(transform)'`; \
+	done
 
 install-javaDATA: $(java_DATA)
+	$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
 	list="$(java_DATA)"; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
@@ -105,13 +131,12 @@ uninstall-javaDATA:
 @SET_MAKE@
 
 all-recursive install-data-recursive install-exec-recursive \
-installdirs-recursive install-recursive uninstall-recursive \
+installdirs-recursive install-recursive uninstall-recursive install-info-recursive \
 check-recursive installcheck-recursive info-recursive dvi-recursive \
 mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
 	for subdir in $(SUBDIRS); do		\
 	  target=`echo $@ | sed s/-recursive//`; \
-	  echo making $$target in $$subdir;	\
 	  (cd $$subdir && $(MAKE) $$target)	\
 	   || case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
 	done && test -z "$$fail"
@@ -128,9 +153,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES) $(CONFIG_HEADER) \
 	tags=; \
 	here=`pwd`; \
 	for subdir in $(SUBDIRS); do \
-	  test -f $$subdir/TAGS && { \
-	    tags="$$tags -i $$here/$$subdir/TAGS"; \
-	  } \
+	  test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
 	done; \
 	test -z "$(ETAGS_ARGS)$(CONFIG_HEADER)$(SOURCES)$(HEADERS)$$tags" \
 	  || etags $(ETAGS_ARGS) $$tags $(CONFIG_HEADER) $(SOURCES) $(HEADERS)
@@ -144,54 +167,45 @@ distclean-tags:
 
 maintainer-clean-tags:
 
-subdir = kawa
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-distdir: $(DEP_DISTFILES)
-	if test "$(srcdir)" = "." && ln -s . linkdir ; then true; \
-	else \
-	  mkdir linkdir; \
-	  for dir in $(srcdir) . ; do \
-	    for file in `cd $$dir && echo *` ; do \
-	      test -f linkdir/$$file \
-	      || test -d $$dir/$$file \
-	      || ln $$dir/$$file linkdir/$$file 2> /dev/null \
-	      || cp -p $$dir/$$file linkdir/$$file; \
-	    done; \
-	  done; \
-	fi
-	for file in `cd linkdir && echo $(DISTFILES)`; do \
+
+subdir = kawa
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  test -f $(distdir)/$$file \
-	  || ln linkdir/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p linkdir/$$file $(distdir)/$$file; \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-	rm -rf linkdir
 	for subdir in $(SUBDIRS); do		\
 	  test -d $(distdir)/$$subdir		\
 	  || mkdir $(distdir)/$$subdir		\
 	  || exit 1;				\
-	  chmod 777 $(distdir)/$$subdir;	\
+	  chmod 755 $(distdir)/$$subdir;	\
 	  (cd $$subdir && $(MAKE) distdir=../$(distdir)/$$subdir distdir) \
 	    || exit 1; \
 	done
 info: info-recursive
-
 dvi: dvi-recursive
-
-check: all check-recursive
-
+check: all-am
+	$(MAKE) check-recursive
 installcheck: installcheck-recursive
+install-info: install-info-recursive
+all-am: $(SCRIPTS) $(DATA) Makefile
 
-all-am: $(DATA) Makefile
+install-exec-am: install-binSCRIPTS
 
 install-data-am: install-javaDATA
 
-uninstall-am: uninstall-javaDATA
+uninstall-am: uninstall-binSCRIPTS uninstall-javaDATA
 
-install-exec: install-exec-recursive
+install-exec: install-exec-recursive install-exec-am
+	$(NORMAL_INSTALL)
 
 install-data: install-data-recursive install-data-am
+	$(NORMAL_INSTALL)
 
-install: install-recursive install-data-am
+install: install-recursive install-exec-am install-data-am
 	@:
 
 uninstall: uninstall-recursive uninstall-am
@@ -201,7 +215,7 @@ all: all-recursive all-am
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
 installdirs: installdirs-recursive
-	$(mkinstalldirs)  $(javadir)
+	$(mkinstalldirs)  $(bindir) $(javadir)
 
 
 mostlyclean-generic:
@@ -212,7 +226,8 @@ clean-generic:
 
 distclean-generic:
 	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log $(CONFIG_HEADER) stamp-h
+	rm -f config.cache config.log stamp-h
+	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
 	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
@@ -237,25 +252,36 @@ maintainer-clean:  maintainer-clean-am maintainer-clean-recursive
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-.PHONY: default uninstall-javaDATA install-javaDATA \
-install-data-recursive uninstall-data-recursive install-exec-recursive \
+.PHONY: default uninstall-binSCRIPTS install-binSCRIPTS \
+uninstall-javaDATA install-javaDATA install-data-recursive \
+uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info dvi check \
-installcheck all-am install-data-am uninstall-am install-exec \
-install-data install uninstall all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+installcheck install-info all-am install-exec-am install-data-am \
+uninstall-am install-exec install-data install uninstall all \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
 	$(JAVAC) -d .. $<
 
-all: $(OBJ)
+kawa$(BAT):
+	echo '#!/bin/sh' >tmp
+	echo 'KAWALIB=$${KAWALIB-$(prefix)/java}' >>tmp
+	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+	echo 'export CLASSPATH' >>tmp
+	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+	chmod +x tmp
+	mv tmp kawa$(BAT)
+
+all: $(OBJ) kawa
 .SUFFIXES:
-.SUFFIXES: $(SUFFIXES)
+.SUFFIXES: .java .class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

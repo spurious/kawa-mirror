@@ -2,27 +2,43 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang math standard lib
+SUBDIRS = math lang standard lib
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
+bin_SCRIPTS = kawa
+
+# Sufix for batch files.
+BAT=
+
+JAVA = java
+JAVAC = javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 
 .java.class:
 	$(JAVAC) -d .. $<
 
 javadir=$(prefix)/java/$(subdir)
 
-OBJ = Shell.class
+OBJ = Shell.class repl.class
 
 java_DATA=$(OBJ)
 
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ)
+CLEANFILES=$(OBJ) kawa$(BAT) tmp
 
-all: $(OBJ)
+kawa$(BAT):
+	echo '#!/bin/sh' >tmp
+	echo 'KAWALIB=$${KAWALIB-$(prefix)/java}' >>tmp
+	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+	echo 'export CLASSPATH' >>tmp
+	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+	chmod +x tmp
+	mv tmp kawa$(BAT)
+
+all: $(OBJ) kawa
 
 
 

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.2g from Makefile.am
+# Makefile.in generated automatically by automake 1.3 from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -11,7 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -31,6 +31,8 @@ infodir = @infodir@
 mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
+
+DISTDIR =
 
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -80,7 +82,7 @@ all: all-recursive all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus ./gnu/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
@@ -154,7 +156,7 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = ./gnu
+subdir = gnu
 
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \

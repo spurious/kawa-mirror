@@ -168,7 +168,11 @@ public class TestMisc
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");
+    printSummary();
+  }
 
+  public static boolean printSummary ()
+  {
     System.out.println("# of expected passes      " + expectedPasses);
     if (expectedFailures > 0)
       System.out.println("# of expected failures    " + expectedFailures);
@@ -176,6 +180,52 @@ public class TestMisc
       System.out.println("# of unexpected passes    " + unexpectedPasses);
     if (unexpectedFailures > 0)
       System.out.println("# of unexpected failures  " + unexpectedFailures);
+    return unexpectedFailures != 0;
+  }
+
+  /** True if the two string match, ignoring unquoted white-space. */
+  public static boolean matches(String str1, String str2)
+  {
+    int i = 0;
+    int j = 0;
+    char quote = 0;
+    for (;;)
+      {
+	char x, y;
+	for (;;)
+	  {
+	    if (i >= str1.length())
+	      {
+		x = 0;
+		break;
+	      }
+	    x = str1.charAt(i++);
+	    if (quote != 0 || ! Character.isWhitespace(x))
+	      break;
+	  }
+	for (;;)
+	  {
+	    if (j >= str2.length())
+	      {
+		y = 0;
+		break;
+	      }
+	    y = str2.charAt(j++);
+	    if (quote != 0 || ! Character.isWhitespace(y))
+	      break;
+	  }
+	if (x != y)
+	  return false;
+	if (x == 0)
+	  return true;
+	if (x == '\'' || x == '\"')
+	  {
+	    if (quote == 0)
+	      quote = x;
+	    else if (x == quote)
+	      quote = 0;
+	  }
+      }
   }
 
   public static void evalTest(String expr, String expected)
@@ -198,7 +248,7 @@ public class TestMisc
 	  result = "*** caught " + ex.getClass().getName() + " ***";
       }
     boolean failureExpected = failureExpectedNext != null;
-    if (expected.equals(result))
+    if (matches(expected, result))
       {
 	if (failureExpected)
 	  unexpectedPasses++;

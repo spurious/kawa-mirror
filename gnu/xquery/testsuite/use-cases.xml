@@ -1,0 +1,130 @@
+<testsuite>
+
+<test>
+<query>4+5</query>
+<expect>9</expect>
+</test>
+
+<test>
+<query><![CDATA[<a>{4+5}</a>]]></query>
+<expect><a>9</a></expect>
+</test>
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q1</ident>
+
+<description>List books published by Addison-Wesley after 1991,
+  including their year and title.</description>
+<query><![CDATA[
+<bib>
+{
+  for $b in document("bib.xml")/bib/book
+  where $b/publisher = "Addison-Wesley" and $b/@year > 1991
+  return
+    <book year={ $b/@year }>
+{ $b/title }
+    </book>
+}
+</bib>
+]]>
+</query>
+<expect>
+  <bib>
+    <book year="1994">
+      <title>TCP/IP Illustrated</title>
+    </book>
+    <book year="1992">
+      <title>Advanced Programming in the Unix environment</title>
+    </book>
+  </bib>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q2</ident>
+<description>Create a flat list of all the title-author pairs, with
+  each pair enclosed in a "result" element.</description>
+<query>
+  <results>
+  {
+    for $b in document("bib.xml")/bib/book,
+        $t in $b/title,
+        $a in $b/author
+    return
+        <result>
+            { $t }    
+            { $a }
+        </result>
+  }
+  </results>
+</query>
+<expect>
+  <results>
+    <result>
+      <title>TCP/IP Illustrated</title>
+       <author><last>Stevens</last><first>W.</first></author>
+    </result>
+    <result>
+       <title>Advanced Programming in the Unix environment</title>
+        <author><last>Stevens</last><first>W.</first></author>
+    </result>
+    <result>
+       <title>Data on the Web</title>
+       <author><last>Abiteboul</last><first>Serge</first></author>
+    </result>
+    <result>
+        <title>Data on the Web</title>
+        <author><last>Buneman</last><first>Peter</first></author>
+    </result>
+    <result>
+        <title>Data on the Web</title>
+        <author><last>Suciu</last><first>Dan</first></author>
+    </result>
+  </results>
+</expect>
+</test>
+
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q3</ident>
+<description>For each book in the bibliography, list the title and
+  authors, grouped inside a "result" element.</description>
+<query>
+<results>
+  {
+    for $b in document("bib.xml")/bib/book
+    return
+        <result>
+            { $b/title }
+            {
+                for $a in $b/author
+                return $a
+            }
+        </result>
+  }
+</results>
+</query>
+<expect>
+  <results>
+    <result>
+      <title>TCP/IP Illustrated</title>
+      <author><last>Stevens</last><first>W.</first></author>
+    </result>
+    <result>
+      <title>Advanced Programming in the Unix environment</title>
+      <author><last>Stevens</last><first>W.</first></author>
+    </result>
+    <result>
+      <title>Data on the Web</title>
+      <author><last>Abiteboul</last><first>Serge</first></author>
+      <author><last>Buneman</last><first>Peter</first></author>
+      <author><last>Suciu</last><first>Dan</first></author>
+    </result>
+    <result>
+      <title>The Economics of Technology and Content for Digital TV</title>
+    </result>
+  </results>
+</expect>
+</test>
+
+</testsuite>

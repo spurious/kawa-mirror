@@ -1,5 +1,7 @@
 2002-01-29  Per Bothner  <per@bothner.com>
 
+	* configure.in:  Also make link to gnu/xquery/testsuite/bib.xml.in.
+
 	* gnu/brl:  New package - code imported from BRL.
 	* configure.in (AC_OUTPUT):  Also generate gnu/brl/Makefile.
 

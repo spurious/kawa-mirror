@@ -2458,6 +2458,7 @@ Make_rules="$srcdir/Make-rules"
 
 
 
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -2795,8 +2796,8 @@ rm -f conftest.s*
 EOF
 
 cat >> $CONFIG_STATUS <<EOF
-ac_sources="gnu/xquery/testsuite/tab.xml.in"
-ac_dests="gnu/xquery/testsuite/tab.xml"
+ac_sources="gnu/xquery/testsuite/tab.xml.in gnu/xquery/testsuite/bib.xml.in"
+ac_dests="gnu/xquery/testsuite/tab.xml gnu/xquery/testsuite/bib.xml"
 EOF
 
 cat >> $CONFIG_STATUS <<\EOF

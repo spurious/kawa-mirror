@@ -1,3 +1,15 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (printSummary):  New method.
+	(main):  Call printSummary.
+
+	* TestMisc.java (matches):  New method.
+	(evalTest):  Use matches rather than equals.
+	* TestSuite.java:  New class, inherits from TestMisc.
+	* bib.xml.in:  New data file, referenced from uses-cases.xml.
+	* use-cases.xml:  New collection of tests, from W3C use-cases.
+	* Makefile.am:  Upadte for new test.
+
 2002-01-21  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main): Add test for 'for'-'where'.

@@ -41,6 +41,15 @@ public class ReaderDispatchMisc extends ReadTableEntry
       ch = code;
     switch (ch)
       {
+      case ':':
+	// Handle Guile-style keyword syntax: '#:KEYWORD'
+	// Note this conflicts with Common Lisp uninterned symbols.  FIXME
+	int startPos = reader.tokenBufferLength;
+	reader.readToken(reader.read(), false, 'P');
+	int length = reader.tokenBufferLength - startPos;
+	String name = new String(reader.tokenBuffer, startPos, length);
+	reader.tokenBufferLength = startPos;
+	return gnu.expr.Keyword.make(name.intern());
       case '\\':
 	return LispReader.readCharacter(reader);
       case '!':

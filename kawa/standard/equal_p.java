@@ -1,46 +1,39 @@
 package kawa.standard;
+import kawa.lang.*;
 
 import kawa.lang.Procedure2;
 
-public class equal_p extends kawa.lang.Procedure2 {
-   public kawa.standard.equal_p() {
-      super("equal?");
-   }
+public class equal_p extends kawa.lang.Procedure2
+{
+  public kawa.standard.equal_p()
+  {
+    super("equal?");
+  }
 
-   public Object apply2 (Object arg1, Object arg2) 
-   {
-      if (arg1==arg2) {
-         return kawa.lang.Interpreter.trueObject;
-      } else if (arg1 instanceof java.lang.Boolean &&
-                 arg2 instanceof java.lang.Boolean) {
-         if (((java.lang.Boolean)arg1).equals((java.lang.Boolean)arg2)) {
-            return kawa.lang.Interpreter.trueObject;
-         } 
-      } else if (arg1 instanceof kawa.lang.symbol &&
-                 arg2 instanceof kawa.lang.symbol) {
-         if (((kawa.lang.symbol)arg1).name.equals(((kawa.lang.symbol)arg2).name)) {
-            return kawa.lang.Interpreter.trueObject;
-         } 
-      } else if (arg1 instanceof java.lang.Double &&
-                 arg2 instanceof java.lang.Double) {
-         if (((java.lang.Double)arg1).equals((java.lang.Double)arg2)) {
-            return kawa.lang.Interpreter.trueObject;
-         } 
-      } else if (arg1 instanceof java.lang.Integer &&
-                 arg2 instanceof java.lang.Integer) {
-         if (((java.lang.Integer)arg1).equals((java.lang.Integer)arg2)) {
-            return kawa.lang.Interpreter.trueObject;
-         } 
-      } else if (arg1 instanceof java.lang.Character &&
-                 arg2 instanceof java.lang.Character) {
-         if (((java.lang.Character)arg1).equals((java.lang.Character)arg2)) {
-            return kawa.lang.Interpreter.trueObject;
-         } 
-      } else if (arg1 instanceof kawa.lang.snull &&
-                 arg2 instanceof kawa.lang.snull) {
-         return kawa.lang.Interpreter.trueObject;
-      } 
-      return kawa.lang.Interpreter.falseObject;
+  // This does not handle list or vector equality!!  FIXME
+  public final static boolean equal_p (Object arg1, Object arg2)
+  {
+    if (arg1==arg2)
+      return true;
+    else if (arg1 instanceof Boolean && arg2 instanceof Boolean)
+      return ((Boolean)arg1).booleanValue () == ((Boolean)arg2).booleanValue();
+    else if (arg1 instanceof Double && arg2 instanceof Double)
+      return (((Double)arg1).equals((Double)arg2));
+    else if (arg1 instanceof Integer && arg2 instanceof Integer)
+      return ((Integer)arg1).intValue () == ((Integer)arg2).intValue ();
+    else if (arg1 instanceof Character && arg2 instanceof Character)
+      return ((Character)arg1).charValue() == ((Character)arg2).charValue ();
+    else if (arg1 instanceof snull && arg2 instanceof snull)
+      return true;
+    return false;
+  }
+
+  public Object apply2 (Object arg1, Object arg2)
+  {
+    if (equal_p (arg1, arg2))
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
    }
 
 }

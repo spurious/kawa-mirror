@@ -2,22 +2,28 @@ package kawa.standard;
 
 import kawa.lang.Procedure1;
 
-public class length extends kawa.lang.Procedure1 {
-   public kawa.standard.length() {
-      super("length");
-   }
+public class length extends kawa.lang.Procedure1
+{
+  public kawa.standard.length()
+  {
+    super("length");
+  }
 
-   public Object apply1 (Object arg1)
-   {
-      int count = 0;
-      if (arg1 instanceof kawa.lang.pair) {
-         kawa.lang.pair p = (kawa.lang.pair)arg1;
-         while (p.cdr instanceof kawa.lang.pair) {
-            p = (kawa.lang.pair)p.cdr;
-            count++;
-         }
-      } 
-      return new java.lang.Integer(count);
-   }
+  /** Count the length of a list.
+   * Note: does not catch circular lists!
+   * @param arg the list to count
+   * @return the length
+   */
+  static public final int length (Object arg)
+  {
+    int count = 0;
+    for ( ; arg instanceof kawa.lang.pair; arg = ((kawa.lang.pair)arg).cdr)
+      count++;
+    return count;
+  }
 
+  public Object apply1 (Object arg1)
+  {
+    return new java.lang.Integer (length (arg1));
+  }
 }

@@ -1,7 +1,9 @@
 package kawa.lang;
 
-public class print {
-  public static void print (Object obj, java.io.PrintStream ps) {
+public class print
+{
+  public static void print (Object obj, java.io.PrintStream ps)
+  {
     if (obj instanceof kawa.lang.Printable)
       ((kawa.lang.Printable)obj).print(ps);
     else if (obj instanceof java.lang.StringBuffer)
@@ -17,6 +19,8 @@ public class print {
 	ps.print("#f");
     else if (obj instanceof java.lang.Character)
       ps.print(((java.lang.Character)obj).charValue());
+    else if (obj == null)
+      ps.print("#<null>");
     else
       ps.print("#<"+obj.getClass().getName()+">");
   }

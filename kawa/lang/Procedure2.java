@@ -1,47 +1,51 @@
 package kawa.lang;
 
-import java.io.PrintStream;
-import java.util.Vector;
+/**
+ * Abstract class for 2-argument Scheme procedures.
+ * Extensions must provide apply2.
+ * @author	Per Bothner
+ */
 
-public abstract class Procedure2 extends Named implements Executable {
+public abstract class Procedure2 extends Procedure
+{
 
-   public Procedure2(java.lang.String n) {
-      super(n);
-   }
+  public Procedure2(java.lang.String n)
+  {
+    super(n);
+  }
 
-  /*   public abstract Object execute2(kawa.lang.Interpreter i,java.util.Vector frames,Object arg1,Object arg2)
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol;
-	     */
+  public Object apply0 ()
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    throw new WrongArguments(this.name,2,"(?)");
+  }
 
-   public abstract Object apply2 (Object arg1,Object arg2)
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol;
+  public Object apply1 (Object arg1)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    throw new WrongArguments(this.name,2,"(?)");
+  }
 
+  public abstract Object apply2 (Object arg1,Object arg2)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol;
 
-   public Object execute(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object list
-   ) 
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol
-   {
-      if (list instanceof kawa.lang.pair) {
-         kawa.lang.pair p1 = (kawa.lang.pair)list;
-         if (p1.cdr instanceof kawa.lang.pair) {
-            kawa.lang.pair p2 = (kawa.lang.pair)p1.cdr;
-            if (p2.cdr instanceof kawa.lang.snull) {
-               return apply2 (p1.car,p2.car);
-            }
-         }
-      } 
-      throw new kawa.lang.WrongArguments(this.name,2,"(?)");
-   }
+  public Object apply3 (Object arg1, Object arg2, Object arg3)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    throw new WrongArguments(this.name,2,"(?)");
+  }
+
+  public Object apply4 (Object arg1, Object arg2, Object arg3, Object arg4)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    throw new WrongArguments(this.name,2,"(?)");
+  }
+
+  public Object applyN (Object[] args)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    if (args.length != 2)
+      throw new WrongArguments(this.name,2,"(?)");
+    return apply2 (args[0], args[1]);
+  }
 }

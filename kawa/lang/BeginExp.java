@@ -1,0 +1,37 @@
+package kawa.lang;
+
+/**
+ * This class rerpesents a sequence of Expressions.
+ * The expressions are evaluated for their side-effects,
+ * and the value of the last Expression is the result.
+ * @author	Per Bothner
+ */
+
+public class BeginExp extends Expression
+{
+  Expression[] exps;
+
+  public BeginExp (Expression[] ex) { exps = ex; }
+
+  public Object eval (Environment env)
+       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  {
+    int n = exps.length;
+    int i;
+    for (i = 0; i < i - 1; i++)
+      exps[i].eval (env);
+    return exps[i].eval (env);
+  }
+
+  public void print (java.io.PrintStream ps)
+  {
+    ps.print("(#%begin");
+    int n = exps.length;
+    for (int i = 0; i < n; i++)
+      { 
+	ps.print(" ");
+	exps[i].print (ps);
+      }
+    ps.print(")");
+  }
+}

@@ -1,29 +1,21 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Syntaxable;
+/**
+ * Implement the re-writer for the "begin" primitive.
+ * @author	Per Bothner
+ */
 
-public class begin extends kawa.lang.Named implements Syntaxable {
-   public kawa.standard.begin() {
-      super("begin");
-   }
+public class begin extends Syntax implements Printable
+{
+  public Expression rewrite (Object obj, Interpreter interp)
+       throws kawa.lang.WrongArguments
+  {
+    return interp.rewrite_body (obj);
+  }
 
-   public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object formo)
-      throws kawa.lang.WrongType,
-             kawa.lang.WrongArguments,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol
-   {
-      Object result = kawa.lang.Interpreter.undefinedObject;
-      if (formo instanceof kawa.lang.pair) {
-         while (formo instanceof kawa.lang.pair) {
-            kawa.lang.pair pair = (kawa.lang.pair)formo;
-            result = i.eval(pair.car,frames);
-            formo = pair.cdr;
-         }
-      }
-
-      return result;
-
-   }
-
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print("#<builtin begin>");
+  }
 }

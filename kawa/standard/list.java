@@ -1,19 +1,24 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Executable;
+/**
+ * Implement the Scheme standard function "list".
+ * @author Per Bothner
+ */
 
-public class list extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.list() {
-      super("list");
-   }
+public class list extends ProcedureN
+{
+  public list()
+  {
+    super("list");
+  }
 
-   public Object execute(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arglist
-   ) 
-   {
-      return arglist;
-   }
-
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    Object result = Interpreter.nullObject;
+    for (int i = args.length;  --i >= 0; )
+      result = new pair (args[i], result);
+    return result;
+  }
 }

@@ -1,52 +1,50 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
+/**
+ * Implement the Scheme standard function "+".
+ * @author Per Bothner
+ */
 
-import kawa.lang.Named;
-import kawa.lang.Executable;
+public class plus_oper extends ProcedureN
+{
+  public kawa.standard.plus_oper()
+  {
+    super("+");
+  }
 
-public class plus_oper extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.plus_oper() {
-      super("+");
-   }
-
-   public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object arglist) 
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError
-   {
-      int ival = 0;
-      double dval = 0.0;
-      boolean isInteger = true;
-      int count = 1;
-      while (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)arglist;
-         if (pair.car instanceof java.lang.Double) {
-            if (isInteger) {
-               isInteger = false;
-               dval = ival;
-            }
-            dval += ((java.lang.Double)pair.car).doubleValue();
-         } else if (pair.car instanceof java.lang.Integer) {
-            if (isInteger) {
-               ival += ((java.lang.Integer)pair.car).intValue();
-            } else {
-               dval += ((java.lang.Integer)pair.car).intValue();
-            }
-         } else {
-            throw new kawa.lang.WrongType(this.name,count,"number");
-         }
-         arglist = pair.cdr;
-         count++;
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    int ival = 0;
+    double dval = 0.0;
+    boolean isInteger = true;
+    for (int i = 0; i < args.length; i++)
+      {
+	Object arg = args[i];
+	if (arg instanceof Double)
+	  {
+            if (isInteger)
+	      {
+		isInteger = false;
+		dval = ival;
+	      }
+            dval += ((Double)arg).doubleValue();
+	  }
+	else if (arg instanceof Integer)
+	  {
+            if (isInteger)
+	      ival += ((Integer)arg).intValue();
+	    else
+	      dval += ((Integer)arg).intValue();
+	  }
+	else
+	  throw new WrongType(this.name,i + 1,"number");
       }
 
-      if (isInteger) {
-         return new java.lang.Integer(ival);
-      } else {
-         return new java.lang.Double(dval);
-      }
-
+      if (isInteger)
+	return new Integer(ival);
+      else
+	return new Double(dval);
    }
-
 }

@@ -1,13 +1,8 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Interpreter;
-import kawa.lang.Named;
-import kawa.lang.Executable;
-import kawa.lang.Syntaxable;
-
-//-- Exceptions
-
-public class StandardInterpreter extends kawa.lang.Interpreter {
+public class StandardInterpreter extends Interpreter
+{
    public kawa.standard.StandardInterpreter(
       kawa.lang.iport i,
       kawa.lang.oport o,
@@ -23,10 +18,8 @@ public class StandardInterpreter extends kawa.lang.Interpreter {
       kawa.lang.Procedure2 equal;
 
       //-- Section 4.1
-      syn = new kawa.standard.ifp();
-      define(syn.name,syn);
-      syn = new kawa.standard.set_b();
-      define(syn.name,syn);
+      define("if", new kawa.standard.ifp());
+      define("set!", new kawa.standard.set_b());
 
       //-- Section 6.1
       proc = new kawa.standard.not();
@@ -232,20 +225,17 @@ public class StandardInterpreter extends kawa.lang.Interpreter {
 
 
       //-- (let ((n obj)...) e1 ... )
+      define("let", new kawa.standard.let());
       //-- (let* ((n obj)...) e1 ... )
-      syn = new kawa.standard.let();
-      define(syn.name,syn);
-      define("let*",syn);
+      define("let*", new kawa.standard.letstar());
       //-- (letrec ((n obj)...) e1 ... )
       syn = new kawa.standard.letrec();
       define(syn.name,syn);
       //-- (define sym obj)
-      syn = new kawa.standard.define();
-      define(syn.name,syn);
+      define("define", new kawa.standard.define());
       //-- (apply sym obj)
       //-- (begin obj ...)
-      syn = new kawa.standard.begin();
-      define(syn.name,syn);
+      define("begin", new kawa.standard.begin());
       //-- (if cond then-exp else-exp)
       //-- (when cond exp ...)
       syn = new kawa.standard.when();

@@ -1,49 +1,32 @@
 package kawa.standard;
 import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
+/**
+ * The Syntax transformer that re-writes the Scheme "set!" primitive.
+ * @author	Per Bothner
+ */
 
-import kawa.lang.Syntax2;
-import java.io.PrintStream;
+public class set_b extends Syntax implements Printable
+{
 
-public class set_b extends kawa.lang.Syntax2 {
-   public kawa.standard.set_b() {
-      super("set!");
-   }
+  static private Pattern pattern = new ListPat (2, 2);
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongArguments,
-            kawa.lang.WrongType,
-            kawa.lang.GenericError,
-            kawa.lang.UnboundSymbol
-   {
-      if (arg1 instanceof kawa.lang.symbol) {
-         kawa.lang.symbol s = (kawa.lang.symbol)arg1;
-         Object o = i.eval(arg2,frames);
-         if (frames!=null) {
-            int length = frames.size();
-            for (int f=length-1; f>=0; f--) {
-               java.util.Hashtable frame = (java.util.Hashtable)frames.elementAt(f);
-               Object p = frame.get(s.name);
-               if (p!=null) {
-                  frame.put(s.name,o);
-                  return kawa.lang.Interpreter.undefinedObject;
-               }
-            } 
-         }
-         if (i.lookup(s.name)!=null) {
-            i.define(s.name,o);
-            return kawa.lang.Interpreter.undefinedObject;
-         } else {
-            throw new kawa.lang.UnboundSymbol(s.name);
-         }
-      } else {
-         throw new kawa.lang.WrongArguments(this.name,2,"(set! symbol obj)");
-      }
-   }
+  public Expression rewrite (Object obj, Interpreter interp)
+       throws WrongArguments
+  {
+    Object [] match = pattern.match (obj);
+    if (match == null || ! (match[0] instanceof symbol))
+      throw new WrongArguments("set!",2,"(set! variable expression)");
+    symbol sym = (symbol) match[0];
+    SetExp sexp = new SetExp (sym, interp.rewrite (match[1]));
+    Declaration decl = (Declaration) interp.current_decls.get (sym);
+    if (decl != null)
+      sexp.binding = decl;
+    return sexp;
+  }
+
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print("#<builtin set!>");
+  }
 }

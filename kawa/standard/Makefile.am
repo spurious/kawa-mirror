@@ -104,6 +104,7 @@ exit.class \
 define.class \
 let.class \
 letrec.class \
+letstar.class \
 begin.class \
 ifp.class \
 when.class \

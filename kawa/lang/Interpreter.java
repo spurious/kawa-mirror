@@ -30,36 +30,43 @@ import kawa.lang.WrongType;
 // To be fixed things
 import kawa.lang.NotImplemented;
 
-public class Interpreter extends Object {
+public class Interpreter extends Object
+{
+  static public Boolean  trueObject = new Boolean(true);
+  static public Boolean  falseObject = new Boolean(false);
 
-   static public Boolean  trueObject = new Boolean(true);
-   static public Boolean  falseObject = new Boolean(false);
+  static public snull  nullObject = new kawa.lang.snull();
+  static public Undefined undefinedObject = new kawa.lang.Undefined();
 
-   static public snull  nullObject = new kawa.lang.snull();
-   static public Undefined undefinedObject = new kawa.lang.Undefined();
+  private final int EOFChar = -1;
+  private char buffer[];
+  private char ibuffer[];
+  private int bufferLength;
+  private int bindex;
+  private boolean initialized;
 
-   private final int EOFChar = -1;
-   private char buffer[];
-   private char ibuffer[];
-   private int bufferLength;
-   private int bindex;
-   private boolean initialized;
+  // Global environment.
+  // Currently maps String -> Object;  should probably be symbol -> Object.
+  protected java.util.Hashtable globals;
+  
+  static protected symbol lambda_sym = symbol.intern ("lambda");
+  static protected Lambda lambda = new Lambda ();
+  static protected symbol quote_sym = symbol.intern ("quote");
+  static protected Quote quote = new Quote();
 
-   protected java.util.Hashtable symbolTable;
-   protected java.util.Vector executionFrames;
-   //-- Environment variables
-   protected java.util.Hashtable globals;
-   protected Lambda lambda;
-   protected Quote           quote;
-   protected QuasiQuote      quasiquote;
-   protected Unquote         unquote;
-   protected UnquoteSplicing unquotesplicing;
+  // Map name to Declaration.
+  public java.util.Hashtable current_decls;
+  kawa.lang.ScopeExp current_scope;
 
-   public kawa.lang.iport in;
-   public kawa.lang.oport out;
-   public kawa.lang.oport err;
+  protected QuasiQuote      quasiquote;
+  protected Unquote         unquote;
+  protected UnquoteSplicing unquotesplicing;
 
-   public Interpreter(
+  public kawa.lang.iport in;
+  public kawa.lang.oport out;
+  public kawa.lang.oport err;
+
+  public Interpreter(
       kawa.lang.iport i,
       kawa.lang.oport o,
       kawa.lang.oport e
@@ -72,30 +79,39 @@ public class Interpreter extends Object {
       bufferLength    = 1024;
       buffer          = new char[bufferLength];
       ibuffer         = new char[bufferLength];
-      symbolTable     = new java.util.Hashtable();
-      executionFrames = new java.util.Vector();
       globals         = new java.util.Hashtable();
-      lambda          = new kawa.lang.Lambda();
-      quote           = new kawa.lang.Quote();
+      current_decls   = new java.util.Hashtable();
       quasiquote      = new kawa.lang.QuasiQuote();
       unquote         = new kawa.lang.Unquote();
       unquotesplicing = new kawa.lang.UnquoteSplicing();
 
-      define(lambda.name,lambda);
-      define(quote.name,quote);
+      define(lambda_sym, lambda);
+      define(quote_sym, quote);
       define(quasiquote.name,quasiquote);
       define(unquote.name,unquote);
       define(unquotesplicing.name,unquotesplicing);
 
    }
 
-   public void define(java.lang.String name,Object p) {
-      globals.put(name,p);
-   }
+  public void define(java.lang.String name,Object p)
+  {
+    globals.put(name,p);
+  }
 
-   public Object lookup(java.lang.String name) {
-      return globals.get(name);
-   }
+  public void define(symbol sym, Object p)
+  {
+    globals.put(sym.toString (),p);
+  }
+
+  public Object lookup(java.lang.String name)
+  {
+    return globals.get(name);
+  }
+
+  public Object lookup(symbol name)
+  {
+    return globals.get(name.toString ());
+  }
 
    public kawa.lang.pair copy(kawa.lang.pair list) {
       kawa.lang.pair newlist = new kawa.lang.pair(list.car,list.cdr);
@@ -117,68 +133,6 @@ public class Interpreter extends Object {
       return list;
    }
 
-   public Object evalSymbol(kawa.lang.symbol symbol,java.util.Vector frames) {
-      if (frames!=null) {
-         int length = frames.size();
-         for (int i=length-1; i>=0; i--) {
-            java.util.Hashtable frame = (java.util.Hashtable)frames.elementAt(i);
-            Object p = frame.get(symbol.name);
-            if (p!=null) {
-               return p;
-            }
-         } 
-      }
-      return globals.get(symbol.name);
-   }
-
-   public Object evalpair(kawa.lang.pair pair,java.util.Vector frames) 
-      throws kawa.lang.UnboundSymbol,
-             kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError
-   {
-      Object rator = eval(pair.car,frames);
-
-      //((Printable)rator).print(System.out);
-      //System.out.println("");
-
-      //-- TODO: must handle macro
-
-      if (rator instanceof kawa.lang.Executable) {
-         //System.out.println("executing procedure...");
-         Object randsarg = nullObject;
-         pair current = null;
-         Object rands = pair.cdr;
-         while (rands instanceof kawa.lang.pair) {
-            kawa.lang.pair randspair = (kawa.lang.pair)rands;
-            //if (randspair.car instanceof Printable) {
-            //   System.out.println("Before eval: ");
-            //   ((kawa.lang.Printable)randspair.car).print(System.out);
-            //   System.out.println("");
-            //}
-            if (current==null) {
-               current = new kawa.lang.pair(eval(randspair.car,frames),nullObject);
-               randsarg = current;
-            } else {
-               current.cdr = new kawa.lang.pair(eval(randspair.car,frames),nullObject);
-               current = (kawa.lang.pair)current.cdr;
-            }
-            //if (randspair.car instanceof Printable) {
-            //   System.out.println("After eval: ");
-            //   ((kawa.lang.Printable)randspair.car).print(System.out);
-            //   System.out.println("");
-            //}
-            rands = randspair.cdr;
-         }
-         return apply(rator,randsarg,frames);
-      } else if (rator instanceof kawa.lang.Syntaxable) {
-         //System.out.println("executing syntax...");
-         return apply(rator,pair.cdr,frames);
-      } else {
-         throw new kawa.lang.WrongType("eval pair",0,"syntax or procedure");
-      }
-   }
-                                                          
    public Object apply(Object rator,Object rands,java.util.Vector frames)
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType,
@@ -203,7 +157,7 @@ public class Interpreter extends Object {
              kawa.lang.WrongType,
              kawa.lang.GenericError
    {
-      return eval(obj,executionFrames);
+     throw new GenericError ("interp.eval called!");
    }
 
    public Object eval(Object obj,java.util.Vector frames) 
@@ -212,19 +166,7 @@ public class Interpreter extends Object {
              kawa.lang.WrongType,
              kawa.lang.GenericError
    {
-      if (obj instanceof kawa.lang.symbol) {
-         //System.out.println("Looking up symbol '"+((kawa.lang.symbol)obj).name+"'...");
-         Object eobj = evalSymbol((kawa.lang.symbol)obj,frames);
-         if (eobj==null) {
-            throw new kawa.lang.UnboundSymbol(((kawa.lang.symbol)obj).name);
-         }
-         return eobj;
-      } else if (obj instanceof kawa.lang.pair) {
-         //System.out.println("Evaling pair...");
-         return evalpair((kawa.lang.pair)obj,frames);
-      } else {
-         return obj;
-      }
+     throw new GenericError ("interp.eval called!");
    }
  
    public Object read()
@@ -481,7 +423,7 @@ public class Interpreter extends Object {
              NotImplemented
    {
       return new kawa.lang.pair(
-         quote,
+         quote_sym,
          new kawa.lang.pair(
             read(ip),
             nullObject
@@ -598,11 +540,8 @@ public class Interpreter extends Object {
       }
       if (bindex!=0) {
          java.lang.String symname = java.lang.String.copyValueOf(buffer,0,bindex);
-         kawa.lang.symbol symbol = (kawa.lang.symbol)symbolTable.get(symname);
-         if (symbol==null) {
-            symbol = new kawa.lang.symbol(symname);
-         }
-         return symbol;
+	 symname = symname.toLowerCase();  // if we're case-folding
+	 return kawa.lang.symbol.intern (symname);
       } else {
          return nullObject;
       }
@@ -768,5 +707,80 @@ public class Interpreter extends Object {
    protected Object readBinaryNumber(iport ip) throws NotImplemented {
       throw new NotImplemented();
    }
+
+  /**
+   * Re-write a Scheme <body> in S-expression format into internal form.
+   * Does not yet handle internal defines.
+   */
+
+  public Expression rewrite_body (Object exp)
+       throws kawa.lang.WrongArguments
+  {
+    int count = kawa.standard.length.length (exp);
+    if (count == 1)
+      return rewrite (((pair)exp).car);
+    else if (count == 0)
+      throw new WrongArguments ("<body>", 1, "body with no expressions");
+    else
+      {
+	Expression[] exps = new Expression [count];
+	for (int i = 0; i < count; i++)
+	  {
+	    pair exp_pair = (kawa.lang.pair) exp;
+	    exps[i] = rewrite (exp_pair.car);
+	    exp = exp_pair.cdr;
+	  }
+	return new BeginExp (exps);
+      }
+  }
+
+  /**
+   * Re-write a Scheme expression in S-expression format into internal form.
+   */
+
+  public Expression rewrite (Object exp)
+       throws WrongArguments
+  {
+    if (exp instanceof kawa.lang.pair)
+      {
+	pair p = (pair)exp;
+	Object car = p.car;
+	Object cdr = p.cdr;
+	if (car instanceof Syntax)
+	  return ((Syntax)car).rewrite (cdr, this);
+
+	if (car instanceof symbol)
+	  {
+	    Object binding = lookup ((symbol) car);
+	    if (binding instanceof Syntax)
+	      return ((Syntax)binding).rewrite (cdr, this);
+	  }
+
+	int cdr_length = kawa.standard.length.length (cdr);
+
+	Expression[] args = new Expression[cdr_length];
+	for (int i = 0; i < cdr_length; i++)
+	  {
+	    pair cdr_pair = (pair) cdr;
+	    args[i] = rewrite (cdr_pair.car);
+	    cdr = cdr_pair.cdr;
+	  }
+	return new ApplyExp (rewrite (car), args);
+      }
+    else if (exp instanceof symbol)
+      {
+	ReferenceExp rexp = new ReferenceExp ((kawa.lang.symbol)exp);
+	Declaration decl = (Declaration) current_decls.get (rexp.symbol);
+	if (decl != null)
+	  rexp.binding = decl;
+	return rexp;
+      }
+    else if (exp instanceof Expression)
+      return (Expression) exp;
+    else if (exp == null)
+      return null;
+    else
+      return new QuoteExp (exp);
+  }
 
 }

@@ -1,23 +1,25 @@
 package kawa.lang;
 
-import java.io.PrintStream;
+/**
+ * The Syntax transformer that re-writes the "quote" Scheme primitive.
+ * @author	Per Bothner
+ */
 
-public class Quote extends Named implements Syntaxable {
-   public kawa.lang.Quote() {
-      super("quote");
-   }
+public class Quote extends Syntax implements Printable
+{
+  static private Pattern pattern = new ListPat (1);
 
-   public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object arglist) 
-      throws kawa.lang.WrongArguments
-   {
-      if (arglist instanceof kawa.lang.pair) {
-         return ((kawa.lang.pair)arglist).car;
-      } else {
-         throw new kawa.lang.WrongArguments(this.name,1,"(quote obj)");
-      }
-   }
+  public Expression rewrite (Object obj, Interpreter interp)
+       throws kawa.lang.WrongArguments
+  {
+    Object [] match = pattern.match (obj);
+    if (match == null)
+      throw new kawa.lang.WrongArguments("quote",1,"(quote value)");
+    return new QuoteExp (match[0]);
+  }
 
-   public void print(java.io.PrintStream ps) {
-      ps.print("#<kawa.lang.Quote>");
-   }
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print("#<builtin quote>");
+  }
 }

@@ -494,17 +494,17 @@ public abstract class AbstractSequence
     return nextIndex(ipos, xpos) != size();
   }
 
-  protected int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos, Object xpos)
   {
     return hasNext(ipos, xpos) ? Sequence.OBJECT_VALUE : Sequence.EOF_VALUE;
   }
 
-  protected String getNextTypeName(int ipos, Object xpos)
+  public String getNextTypeName(int ipos, Object xpos)
   {
     return null;
   }
 
-  protected Object getNextTypeObject(int ipos, Object xpos)
+  public Object getNextTypeObject(int ipos, Object xpos)
   {
     return null;
   }
@@ -518,7 +518,7 @@ public abstract class AbstractSequence
   /** Move forward one element position.
    * @return true unless at end of sequence.
    */
-  protected boolean gotoNext(PositionContainer posSet, int posNumber)
+  public boolean gotoNext(PositionContainer posSet, int posNumber)
   {
     int ipos = posSet.getPositionInt(posNumber);
     Object xpos = posSet.getPositionPtr(posNumber);
@@ -536,7 +536,7 @@ public abstract class AbstractSequence
   }
 
   /** Potential optimization. */
-  protected boolean gotoNext(SeqPosition pos)
+  public boolean gotoNext(SeqPosition pos)
   {
     return gotoNext(pos, 0);
   }
@@ -566,7 +566,7 @@ public abstract class AbstractSequence
    *   false if current position is end of sequence or following element
    *   is atomic (cannot have children).
    */
-  protected boolean gotoChildrenStart(TreePosition pos)
+  public boolean gotoChildrenStart(TreePosition pos)
   {
     return false;
   }

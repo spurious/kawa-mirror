@@ -1,4 +1,4 @@
-; polytype.scm
+;;; POLYTYPE -- A polymorphic type inferencer for Scheme.
 (test-init "polytype")
 
 ;------------------------------------------------------------------------------
@@ -169,6 +169,20 @@
     '(list ?a) ; patch because #f = ()
     (constant-type x)))
 
+(define (map-left-right f lst)
+  (let loop ((lst lst))
+    (if (pair? lst)
+      (let ((x (f (car lst))))
+        (cons x (loop (cdr lst))))
+      '())))
+
+(define (map-left-right2 f lst1 lst2)
+  (let loop ((lst1 lst1) (lst2 lst2))
+    (if (pair? lst1)
+      (let ((x (f (car lst1) (car lst2))))
+        (cons x (loop (cdr lst1) (cdr lst2))))
+      '())))
+
 (define (type f) ; return the type of expression 'f'
   (define e (env-empty))
   (define (j p f) ; algorithm 'j' from Robin Milner's paper
@@ -184,28 +198,32 @@
           ((eq? (car f) 'quote)
            (instance (quoted-constant-type (cadr f)) (env-empty)))
           ((eq? (car f) 'if)
-           (let ((pre (j p (cadr f)))
-                 (con (j p (caddr f)))
-                 (alt (j p (cadddr f))))
+           (let* ((pre (j p (cadr f)))
+                  (con (j p (caddr f)))
+                  (alt (j p (cadddr f))))
              (set! e (unify con alt (unify pre 'bool e)))
              con))
           ((eq? (car f) 'lambda)
-           (let ((parms (map (lambda (x) (new-variable)) (cadr f))))
-             (let ((body (j (env-join (map (lambda (x y) (list x 'lambda y))
-                                           (cadr f)
-                                           parms)
-                                      p)
-                            (caddr f))))
+           (let ((parms (map-left-right (lambda (x) (new-variable)) (cadr f))))
+             (let ((body
+                    (j (env-join (map-left-right2
+                                  (lambda (x y) (list x 'lambda y))
+                                  (cadr f)
+                                  parms)
+                                 p)
+                       (caddr f))))
                (cons '-> (append parms (list body))))))
           ((eq? (car f) 'let)
-           (j (env-join (map (lambda (x) (list (car x) 'let (j p (cadr x))))
-                             (cadr f))
+           (j (env-join (map-left-right
+                         (lambda (x) (list (car x) 'let (j p (cadr x))))
+                         (cadr f))
                         p)
               (caddr f)))
           ((eq? (car f) 'letrec)
-           (let ((p* (env-join (map (lambda (x)
-                                      (list (car x) 'letrec (new-variable)))
-                                    (cadr f))
+           (let ((p* (env-join (map-left-right
+                                (lambda (x)
+                                  (list (car x) 'letrec (new-variable)))
+                                (cadr f))
                                p)))
              (for-each
                (lambda (x)
@@ -214,11 +232,13 @@
                (cadr f))
              (j p* (caddr f))))
           ((and (pair? (car f)) (eq? (caar f) 'lambda))
-           (j p (list 'let (map list (cadar f) (cdr f)) (caddar f))))
+           (j p (list 'let
+                      (map-left-right2 list (cadar f) (cdr f))
+                      (caddar f))))
           (else
-           (let ((result (new-variable))
-                 (oper (j p (car f)))
-                 (args (map (lambda (x) (j p x)) (cdr f))))
+           (let* ((result (new-variable))
+                  (oper (j p (car f)))
+                  (args (map-left-right (lambda (x) (j p x)) (cdr f))))
              (set! e (unify oper (cons '-> (append args (list result))) e))
              result))))
   (let ((t (j (env-empty) f)))
@@ -255,39 +275,33 @@
      (+ 4 (call/cc (lambda (exit)
                      (if (null? x) (exit 0) (length x)))))))
 
-;(define (test expect fun result)
-;  (write result)
-;  (newline)
-;  (if (not (equal? expect result))
-;      (begin
-;        (display "EXPECTED ")
-;        (write expect)
-;        (newline))))
-
 (define (run)
 
   (set! variable-count 0)
 
-  (test '(list num)
-        'example1 (type example1))
+  (let* ((e1 (type example1))
+         (e2 (type example2))
+         (e3 (type example3))
+         (e4 (type example4))
+         (e5 (type example5))
+         (e6 (type example6))
+         (e7 (type example7)))
+    (list e1 e2 e3 e4 e5 e6 e7)))
 
-  (test '(-> (list bool) (list num) num)
-        'example2 (type example2))
+(define expected
+  '((list num)
+    (-> (list bool) (list num) num)
+    (-> num num)
+    (-> ?20 ?20)
+    (-> (list ?24) num)
+    (-> (-> ?33 ?34) (list ?33) (list ?34))
+    (-> (list ?51) num)))
 
-  (test '(-> num num)
-        'example3 (type example3))
+;(define (main . args)
+;  (run-benchmark
+;    "polytype"
+;    polytype-iters
+;    (lambda () (run))
+;    (lambda (result) (equal? result expected))))
 
-  (test '(-> ?20 ?20)
-        'example4 (type example4))
-
-  (test '(-> (list ?24) num)
-        'example5 (type example5))
-
-  (test '(-> (-> ?33 ?34) (list ?33) (list ?34))
-        'example6 (type example6))
-
-  (test '(-> (list ?51) num)
-        'example7 (type example7)))
-
-;(time (run))
-(run)
+(test expected run)

@@ -1,3 +1,11 @@
+Fri Jul 10 18:46:27 1998  Per Bothner  <bothner@cygnus.com>
+
+	* polytype.scm:  From Marc Feeley <feeley@IRO.UMontreal.CA>:
+	I've just found a problem with "polytype.scm".  The numbering of the
+	type variables returned depends on the argument evaluation order (and
+	also the order that "map" calls the function).  Here is the new
+	version of the program which fixes these problems.
+
 Fri Jul 10 18:11:41 1998  Per Bothner  <bothner@cygnus.com>
 
 	* polytype.scm:  Merge with updated version from Feeley.

@@ -200,19 +200,6 @@ public abstract class Interpreter
     environ.define(name, ClassMethods.apply(cname, mname));
   }
 
-  // to be removed.
-  protected void define_field (String name, String cname, String fname)
-  {
-    StaticFieldConstraint.define(environ, name, cname, fname);
-  }
-
-  // to be removed.
-  protected void define_field (String name, String cname)
-  {
-    StaticFieldConstraint.define(environ, name, cname,
-				 Compilation.mangleNameIfNeeded(name));
-  }
-
   /** Declare in the current Environment a procedure bound to a static field.
    * @param name the procedure's source-level name.
    * @param cname the name of the class containing the field.

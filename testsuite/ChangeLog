@@ -1,3 +1,7 @@
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* Makefile.am, Makefile.in (SOURCES):  Add formatst.scm.
+
 1999-07-15  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Added 3 new (originally failing) test-cases reported

@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import java.net.URL;
+import gnu.text.*;
 
 /** Implement the XQuery function 'document'. */
 
@@ -36,30 +37,36 @@ public class Document extends Procedure1
     return new URL(fileName);
   }
 
-  public static TreeList document (Object url) throws Throwable
+  public static void parse (Object name, Consumer out) throws Throwable
   {
-    TreeList doc = new TreeList();
-    ParsedXMLToConsumer.parse((url instanceof URL ? (URL) url
-			       : makeURL(url.toString())),
-			      doc);
-    return doc;
+    URL url = name instanceof URL ? (URL) name : makeURL(name.toString());
+    SourceMessages messages = new SourceMessages();
+    XMLParser parser
+      = new XMLParser(url,
+		      new NamespaceResolver(out),
+		      messages);
+    out.beginDocument();
+    parser.parse();
+    if (messages.seenErrors())
+      throw new SyntaxException(messages);
+    out.endDocument();
   }
 
-  public static TreeList document (String fileName) throws Throwable
+  public static TreeList parse (Object url) throws Throwable
   {
     TreeList doc = new TreeList();
-    ParsedXMLToConsumer.parse(makeURL(fileName), doc);
+    parse(url, doc);
     return doc;
   }
 
   public Object apply1 (Object arg1) throws Throwable
   {
-    return document(arg1.toString());
+    return parse(arg1.toString());
   }
 
   public void apply (CallContext ctx) throws Throwable
   {
     String fileName = ctx.getNextArg().toString();
-    ParsedXMLToConsumer.parse(makeURL(fileName), ctx.consumer);
+    parse(makeURL(fileName), ctx.consumer);
   }
 }

@@ -1,3 +1,11 @@
+2002-06-24  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java:  New class, extends gnu.xml.XMLParserChar.
+	* Makefile.am (java_sources);  Add new file.
+	* Document.java (document):  Rename static helper methods to 'parse'.
+	Inline ParsedXMLToConsumer.parse, which is now gone.
+	Allocate new XMLParser instance.
+
 2002-06-10  Per Bothner  <per@bothner.com>
 
 	* NamedDescendants.java:  Support descdendant-or-self.

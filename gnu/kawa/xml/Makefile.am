@@ -18,7 +18,8 @@ java_sources = \
   NamespaceEnv.java \
   NodeType.java \
   OutputAsXML.java \
-  WriteTo.java
+  WriteTo.java \
+  XMLParser.java
 
 java_BUILT = \
   Focus.java

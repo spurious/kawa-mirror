@@ -1,3 +1,7 @@
+1999-05-13  Per Bothner  <bothner@magnus.cygnus.com>
+
+	* kawa.texi:  Fix syntax errors in @deffn specs.
+
 1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa.texi (Getting Kawa):  Mention both stable version and snapshots.

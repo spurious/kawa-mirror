@@ -1,3 +1,14 @@
+2004-08-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/cxr.java:  Use new WrongType constructors.
+	* kawa/standard/make.java:  Likewise.
+	* kawa/standard/read.java:  Likewise.
+	* kawa/standard/readchar.java:  Likewise.
+	* kawa/standard/vector_append.java:  Likewise.
+	* kawa/standard/append.java:  Likewise.
+	(append):  New static field.
+	* kawa/standard/Scheme.java:  Redefined 'append' to use new field.
+
 2004-08-06  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java:  New longer implements Procedure2.

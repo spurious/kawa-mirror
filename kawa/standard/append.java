@@ -9,6 +9,9 @@ import gnu.lists.*;
 
 public class append extends ProcedureN
 {
+  public static final append append = new append();
+  static { append.setName("append"); }
+
   public Object applyN (Object[] args)
   {
     return append$V(args);
@@ -37,7 +40,7 @@ public class append extends ProcedureN
 	    list = list_pair.cdr;
 	  }
 	if (list != LList.Empty)
-	  throw new WrongType("append", 2, "list");
+	  throw new WrongType(append, i+1, args[i], "list");
 	if (last != null)
 	  {
 	    last.cdr = result;

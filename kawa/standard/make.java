@@ -21,7 +21,7 @@ public class make extends ProcedureN
     else
       clas = null;
     if (clas == null)
-      throw new WrongType("make", 1, "class");
+      throw new WrongType(this, 1, arg_0, "class");
     Object result;
     try
       {

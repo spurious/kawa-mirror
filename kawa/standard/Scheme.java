@@ -181,7 +181,7 @@ public class Scheme extends LispInterpreter
       define_field("list?", "kawa.lib.lists");
       define_field("list", "gnu.kawa.functions.MakeList");
       define_proc ("length", "kawa.lib.lists");
-      define_proc ("append", "kawa.standard.append");
+      define_field("append", "kawa.standard.append", "append");
       define_proc ("reverse", "kawa.lib.lists");
       define_proc ("reverse!", "kawa.lib.lists");  // Not R5RS.
       define_field("list-tail", "kawa.lib.lists");

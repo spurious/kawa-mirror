@@ -35,7 +35,7 @@ public class vector_append extends ProcedureN
 	  {
 	    int n = LList.listLength(arg, false);
 	    if (n < 0)
-	      throw new WrongType ("vector-append", i, "list or vector");
+	      throw new WrongType (vectorAppend, i, arg, "list or vector");
 	    length += n;
 	  }
       }

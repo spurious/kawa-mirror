@@ -47,7 +47,7 @@ public class cxr extends Procedure1 implements HasSetter
     for (int i = (m >> 16);  --i >= 0;  m >>= 1)
       {
 	if (! (arg1 instanceof Pair) )
-	    throw new WrongType(this.getName(), 1, "list");
+	  throw new WrongType(this, 1, arg1, "list");
 	Pair pair = (Pair) arg1;
 	arg1 = (m & 1) != 0 ? pair.cdr : pair.car;
       }
@@ -63,7 +63,7 @@ public class cxr extends Procedure1 implements HasSetter
     for (int i = (m >> 16);  --i > 0;  m >>= 1)
       {
 	if (! (list instanceof Pair) )
-	    throw new WrongType(this.getName(), 1, "list");
+	  throw new WrongType(this, 1, list, "list");
 	pair = (Pair) list;
 	list = (m & 1) != 0 ? pair.cdr : pair.car;
       }

@@ -90,6 +90,6 @@ public class readchar extends Procedure0or1
       return readChar ((Reader) arg1);
     if (arg1 instanceof InputStream)
       return readChar ((InputStream) arg1);
-    throw new WrongType (getName(), 1, "input port");
+    throw new WrongType (this, 1, arg1, "<input-port>");
   }
 }

@@ -1,5 +1,8 @@
 2004-03-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/load.java (loadSource):  Don't call beginDocument
+	or endDocument.
+
 	* build.xml (build.selectjava):  Add gnu/mapping/Symbol.java
 	and gnu/text/Char.java.
 

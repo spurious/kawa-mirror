@@ -152,7 +152,6 @@ public class load extends Procedure1 {
     Interpreter interp = Interpreter.getInterpreter();
     Consumer out = (print ? kawa.Shell.getOutputConsumer(OutPort.outDefault())
 		    : new VoidConsumer());
-    out.beginDocument();
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more efficient.
     // Unfortunately, it is difficult to get macros to work properly.
@@ -182,7 +181,6 @@ public class load extends Procedure1 {
 	    ctx.consumer = save;
 	  }
       }
-    out.endDocument();
   }
 
   public final Object apply1 (Object arg1)

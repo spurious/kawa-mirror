@@ -22,11 +22,21 @@ public class Symbol extends Location implements Externalizable
     return getName();
   }
 
-  public static Symbol make (String namespace, String name)
+  /** Find or create a symbol in a specificed environment.
+   * @param eviron can be an Environment, or a namespace/environment name
+   *   (resolved using Environment.getInstance), or null (in which case
+   *   an uninterned symbol is created.
+   * @param name The "local name" or "print name" of the desired symbol.
+   */
+  public static Symbol make (Object environ, String name)
   {
-    Environment env = Environment.getInstance(namespace);
     if (name != null)
       name = name.intern();
+    if (environ == null)
+      return new Symbol(name);
+    Environment env = environ instanceof String
+      ? Environment.getInstance((String) environ)
+      : (Environment) environ;
     return env.getSymbol(name);
   }
 
@@ -122,21 +132,12 @@ public class Symbol extends Location implements Externalizable
   }
 
   // The compiler emits calls to this method.
-  public static Symbol make (Object init, String name)
+  public static Symbol makeUninterned (Object init, String name)
   {
     Symbol binding = new Symbol(name);
     binding.value = init;
     binding.constraint = TrivialConstraint.getInstance((Environment) null);
     return binding;
-  }
-
-  // gnu.expr.LitTable uses this.
-  public static Symbol make (String name, Environment env)
-  {
-    if (env == null)
-      return new Symbol(name);
-    else
-      return env.getSymbol(name);
   }
 
   public void print(java.io.PrintWriter ps)
@@ -357,19 +358,19 @@ public class Symbol extends Location implements Externalizable
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    out.writeObject(getName());
     out.writeObject(getEnvironment());
+    out.writeObject(getName());
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    String name = (String) in.readObject();
     Environment env = (Environment) in.readObject();
     if (env == null)
       constraint = UnboundConstraint.getInstance((Environment) null);
     else
       constraint = env.unboundConstraint;
+    String name = (String) in.readObject();
     if (name != null)
       setName(name.intern());
   }

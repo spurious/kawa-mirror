@@ -403,7 +403,7 @@ public class Declaration
 	args[0] = Type.pointer_type;
 	args[1] = Type.string_type;
 	makeSymbolMethod
-	  = Compilation.typeSymbol.addMethod("make", args,
+	  = Compilation.typeSymbol.addMethod("makeUninterned", args,
 					      Compilation.typeSymbol,
 					      Access.PUBLIC|Access.STATIC);
       }

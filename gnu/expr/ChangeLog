@@ -1,3 +1,8 @@
+2003-03-15  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (pushIndirectBinding):  Update to use named
+	Symbol.make -> makeUninterned method.
+
 2003-03-06  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (print):  Add a writeSpaceFill call.

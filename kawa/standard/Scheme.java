@@ -183,11 +183,11 @@ public class Scheme extends Interpreter
       define_proc ("string->symbol", "kawa.standard.string2symbol");
 
       //-- Section 6.5
-      define_proc ("number?", "kawa.standard.number_p");
-      define_proc ("quantity?", "kawa.standard.number_p");
-      define_proc ("complex?", "kawa.standard.complex_p");
-      define_proc ("real?", "kawa.standard.real_p");
-      define_proc ("rational?", "kawa.standard.rational_p");
+      define_proc ("number?", "kawa.lib.numbers");
+      define_proc ("quantity?", "kawa.lib.number");
+      define_proc ("complex?", "kawa.lib.numbers");
+      define_proc ("real?", "kawa.lib.numbers");
+      define_proc ("rational?", "kawa.lib.numbers");
       define_proc ("integer?", "kawa.standard.integer_p");
       define_proc ("exact?", "kawa.standard.exact_p");
       define_proc ("inexact?", "kawa.standard.inexact_p");
@@ -196,7 +196,7 @@ public class Scheme extends Interpreter
       define_proc (">", "kawa.standard.greater_oper");
       define_proc ("<=", "kawa.standard.lessequal_oper");
       define_proc (">=", "kawa.standard.greaterequal_oper");
-      define_proc ("zero?", "kawa.standard.zero_p");
+      define_proc ("zero?", "kawa.lib.numbers");
       define_proc ("positive?", "kawa.standard.positive_p");
       define_proc ("negative?", "kawa.standard.negative_p");
       define_proc ("odd?", "kawa.standard.odd_p");
@@ -207,21 +207,21 @@ public class Scheme extends Interpreter
       define_proc ("-", "kawa.standard.minus_oper");
       define_proc ("*", "kawa.standard.multiply_oper");
       define_proc ("/", "kawa.standard.divide_oper");
-      define_proc ("abs", "kawa.standard.abs");
-      define_proc ("quotient", "kawa.standard.quotient");
-      define_proc ("remainder", "kawa.standard.remainder");
+      define_proc ("abs", "kawa.lib.numbers");
+      define_proc ("quotient", "kawa.lib.numbers");
+      define_proc ("remainder", "kawa.lib.numbers");
       define_proc ("modulo", "kawa.standard.modulo");
       define_proc ("gcd", "kawa.standard.gcd");
       define_proc ("lcm", "kawa.standard.lcm");
-      define_proc ("numerator", "kawa.standard.numerator");
-      define_proc ("denominator", "kawa.standard.denominator");
+      define_proc ("numerator", "kawa.lib.numbers");
+      define_proc ("denominator", "kawa.lib.numbers");
       define_proc ("floor", "kawa.standard.floor");
       define_proc ("ceiling", "kawa.standard.ceiling");
       define_proc ("truncate", "kawa.standard.truncate");
       define_proc ("round", "kawa.standard.round");
       define_proc ("rationalize", "kawa.standard.rationalize");
-      define_proc ("exp", "kawa.standard.exp");
-      define_proc ("log", "kawa.standard.log");
+      define_proc ("exp", "kawa.lib.numbers");
+      define_proc ("log", "kawa.lib.numbers");
       define_proc ("sin", "kawa.standard.sin");
       define_proc ("cos", "kawa.standard.cos");
       define_proc ("tan", "kawa.standard.tan");
@@ -230,9 +230,9 @@ public class Scheme extends Interpreter
       define_proc ("atan", "kawa.standard.atan");
       define_proc ("sqrt", "kawa.standard.sqrt");
       define_proc ("expt", "kawa.standard.expt");
-      define_proc ("make-rectangular", "kawa.standard.make_rectangular");
-      define_proc ("make-polar", "kawa.standard.make_polar");
-      define_proc ("real-part", "kawa.standard.real_part");
+      define_proc ("make-rectangular", "kawa.lib.numbers");
+      define_proc ("make-polar", "kawa.lib.numbers");
+      define_proc ("real-part", "kawa.lib.numbers");
       define_proc ("imag-part", "kawa.standard.imag_part");
       define_proc ("magnitude", "kawa.standard.abs");
       define_proc ("angle", "kawa.standard.angle");

@@ -44,11 +44,9 @@ ass.class \
 symbol_p.class \
 symbol2string.class \
 string2symbol.class \
-number_p.class quantity_p.class complex_p.class \
-real_p.class rational_p.class integer_p.class \
+integer_p.class \
 exact_p.class \
 inexact_p.class \
-zero_p.class \
 positive_p.class \
 negative_p.class \
 odd_p.class \
@@ -64,21 +62,14 @@ plus_oper.class \
 minus_oper.class \
 multiply_oper.class \
 divide_oper.class \
-abs.class \
-quotient.class \
-remainder.class \
 modulo.class \
 gcd.class \
 lcm.class \
-numerator.class \
-denominator.class \
 floor.class \
 ceiling.class \
 truncate.class \
 round.class \
 rationalize.class \
-exp.class \
-log.class \
 sin.class \
 cos.class \
 tan.class \
@@ -87,8 +78,7 @@ acos.class \
 atan.class \
 sqrt.class \
 expt.class \
-make_rectangular.class make_polar.class \
-real_part.class imag_part.class angle.class \
+imag_part.class angle.class \
 exact2inexact.class \
 inexact2exact.class \
 number2string.class \

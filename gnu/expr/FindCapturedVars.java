@@ -334,6 +334,13 @@ public class FindCapturedVars extends ExpWalker
 	decl = allocUnboundDecl(exp.getSymbol());
 	exp.setBinding(decl);
       }
+    if (decl.getFlag(Declaration.IS_UNKNOWN)
+	&& comp.getBooleanOption("warn-undefined-variable", false))
+      {
+	Object resolved = comp.resolve(exp.getSymbol(), exp.isProcedureName());
+	if (resolved == null)
+	  comp.error('w', "no declaration seen for "+exp.getName());
+      }
     capture(Declaration.followAliases(decl));
     return exp;
   }

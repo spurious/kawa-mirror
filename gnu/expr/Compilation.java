@@ -857,6 +857,13 @@ public class Compilation
     lexical = new NameLookup(getInterpreter());
   }
 
+  public Compilation (Interpreter interp, SourceMessages messages)
+  {
+    this.interp = interp;
+    this.messages = messages;
+    lexical = new NameLookup(interp);
+  }
+
   /** Create a new Compilation environment.
    * @param lexp top-level function
    * @param classname name of top-level class to generate
@@ -1784,7 +1791,8 @@ public class Compilation
     throw new Error("unimeplemented parse");
   }
 
-  public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
+  protected Interpreter interp;
+  public Interpreter getInterpreter() { return interp; }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
@@ -2028,6 +2036,22 @@ public class Compilation
   {
     Expression[] args = { exp };
     return loopRepeat(args);
+  }
+
+  public Object resolve(Object name, boolean function)
+  {
+    Symbol symbol;
+    if (name instanceof String)
+      symbol = interp.getEnvironment().lookup((String) name);
+    else
+      symbol = (Symbol) name;
+    if (symbol == null)
+      return null;
+    if (function && getInterpreter().hasSeparateFunctionNamespace())
+      return symbol.getFunctionValue(null);
+    if (symbol.isBound())
+      return symbol.getValue();
+    return null;
   }
 
   /** Current lexical scope - map name to Declaration. */

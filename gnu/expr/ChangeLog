@@ -1,5 +1,13 @@
 2003-10-19  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (<init>)  Add Interpreter argument.
+	(interp):  New Interpreter field.
+	(getInterpreter):  Change to return interp.
+	(resolve):  Moved here from kawa/lang/Translator.
+
+	* FindCapturedVars.java (walkReferenceExp):  Warn if the flag
+	'warn-undefined-variable' is and decl is unknown.
+
 	* BeginExp.java (compileOptions):  New field.
 	(setCompileOptions, pushOptions, popOptions):  New methods.
 	(compile, walkChildren):  Use pushOptions and popOptons.

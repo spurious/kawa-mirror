@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.OutPort;
 
 /**
  * Class used to implement "fluid-let" for Scheme and "let" for Emacs.
@@ -67,6 +68,11 @@ public class FluidLetExp extends LetExp
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkFluidLetExp(this);
+  }
+
+  public void print (OutPort out)
+  {
+    print(out, "(FluidLet", ")");
   }
 
   static ClassType typeCallContext = ClassType.make("gnu.mapping.CallContext");

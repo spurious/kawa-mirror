@@ -91,7 +91,12 @@ public class LetExp extends ScopeExp
 
   public void print (OutPort out)
   {
-    out.startLogicalBlock("(Let", ")", 2);
+    print(out, "(Let", ")");
+  }
+
+  public void print (OutPort out, String startTag, String endTag)
+  {
+    out.startLogicalBlock(startTag, endTag, 2);
     out.writeSpaceFill();
     printLineColumn(out);
     out.startLogicalBlock("(", false, ")");
@@ -120,6 +125,6 @@ public class LetExp extends ScopeExp
     out.endLogicalBlock(")");
     out.writeSpaceLinear();
     body.print (out);
-    out.endLogicalBlock(")");
+    out.endLogicalBlock(endTag);
   }
 }

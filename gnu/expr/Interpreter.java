@@ -189,7 +189,7 @@ public abstract class Interpreter
   }
 
   /** Import all the public fields of an object. */
-  public static void defineAll(Object object, Environment env)
+  public void defineAll(Object object)
   {
     Class clas = object.getClass();
     java.lang.reflect.Field[] fields = clas.getFields();
@@ -201,17 +201,9 @@ public abstract class Interpreter
 	  {
 	    try
 	      {
-		Object part = field.get(object);
-		if (part instanceof Named)
-		  name = ((Named) part).getName();
-		else
-		  name = name.intern();
-		if (part instanceof Binding)
-		  env.addBinding((Binding) part);
-		else
-		  env.define(name, part);
+		defineFromFieldValue(name, field.get(object));
 	      }
-	    catch (Exception ex)
+	    catch (Throwable ex)
 	      {
 		throw new WrappedException("error accessing field "+field, ex);
 	      }
@@ -224,6 +216,19 @@ public abstract class Interpreter
       }
   }
 
+  public void defineFromFieldValue(String name, Object part)
+    throws Throwable
+  {
+    if (part instanceof Named)
+      name = ((Named) part).getName();
+    else
+      name = name.intern();
+    if (part instanceof Binding)
+      environ.addBinding((Binding) part);
+    else
+      environ.define(name, part);
+  }
+
   public void loadClass(String name)
     throws java.lang.ClassNotFoundException
   {
@@ -231,7 +236,7 @@ public abstract class Interpreter
       {
 	Class clas = Class.forName(name);
 	Object inst = clas.newInstance ();
-	defineAll(inst, environ);
+	defineAll(inst);
 	if (inst instanceof ModuleBody)
 	  ((ModuleBody)inst).run();
       }

@@ -1,3 +1,9 @@
+2002-01-31  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (defineFromFieldValue):  New method.
+	(defineAll):  Make non-static, and use defineFromFieldValue.
+	(loadClass):  Change to use non-static defineAll.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add "krl".

@@ -1,6 +1,5 @@
 package kawa;
-import kawa.lang.*;
-import kawa.standard.*;
+import kawa.lang.CompileFile;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
@@ -26,13 +25,13 @@ public class repl extends Procedure0or1
   public Object apply0 ()
   {
     Shell.run(interp, Environment.getCurrent());
-    return Scheme.voidObject;
+    return Values.empty;
   }
 
   public Object apply1(Object env)
   {
     Shell.run(interp, (Environment) env);
-    return Scheme.voidObject;
+    return Values.empty;
   }
 
   static void bad_option (String str)
@@ -144,7 +143,7 @@ public class repl extends Procedure0or1
 	    initFile = new File(homeDirectory, kawarc_name);
 	  }
 	else
-	  scmHomeDirectory = Scheme.falseObject;
+	  scmHomeDirectory = Interpreter.falseObject;
 	Environment.define_global("home-directory", scmHomeDirectory);
 	if (initFile != null && initFile.exists())
 	  Shell.runFile(initFile.getPath());
@@ -484,7 +483,7 @@ public class repl extends Procedure0or1
 		    System.err.println("got connection from "
 				       +client.getInetAddress()
 				       +" port:"+client.getPort());
-		    serveTelnet(Interpreter.defaultInterpreter, client);
+		    TelnetRepl.serve(Interpreter.defaultInterpreter, client);
 		  }
 	      }
 	    catch (java.io.IOException ex)
@@ -620,63 +619,4 @@ public class repl extends Procedure0or1
 	exitDecrement();
       }
    }
-
-  /** Run a Kawa repl as a telnet server.
-      @param client A client that has connected to us,
-      and that wants to use the telnet protocol to talk to a
-      Scheme read-eval-print-loop. */
-  static void serveTelnet (Interpreter interp, java.net.Socket client)
-    throws java.io.IOException
-  {
-    Telnet conn = new Telnet(client, true);
-    java.io.OutputStream sout = conn.getOutputStream();
-    java.io.InputStream sin = conn.getInputStream();
-    OutPort out = new OutPort(sout);
-    TtyInPort in = new TtyInPort(sin, "<stdin>", out);
-    /*
-    conn.request(Telnet.DO, Telnet.EOF);
-    conn.request(Telnet.DO, Telnet.NAWS);
-    conn.request(Telnet.DO, Telnet.TTYPE);
-    conn.request(Telnet.DO, Telnet.LINEMODE);
-    */
-
-    Thread thread = new Future(new SocketRepl(interp, client),
-			       interp.getEnvironment(),
-			       in, out, out);
-    thread.start();
-  }
 }
-
-class SocketRepl extends Procedure0
-{
-  // close when finished.
-  java.net.Socket socket;
-
-  Interpreter interp;
-
-  public SocketRepl(Interpreter interp, java.net.Socket socket)
-  {
-    this.interp = interp;
-    this.socket = socket;
-  }
-
-  public Object apply0 ()
-  {
-    try
-      {
-	Shell.run(interp, Environment.getCurrent());
-	return Scheme.voidObject;
-      }
-    finally
-      {
-	try
-	  {
-	    socket.close();
-	  }
-	catch (java.io.IOException ex)
-	  {
-	  }
-      }
-  }
-}
-

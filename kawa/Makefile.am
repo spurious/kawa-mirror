@@ -11,7 +11,7 @@ java_WITH_AWT = \
   GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
 
 java_sources = Shell.java repl.java Version.java \
-  TelnetInputStream.java TelnetOutputStream.java Telnet.java\
+  TelnetInputStream.java TelnetOutputStream.java Telnet.java TelnetRepl.java \
   $(java_@AWT_SELECTED@)
 
 EXTRA_DIST = Version.java.in $(java_WITH_AWT)

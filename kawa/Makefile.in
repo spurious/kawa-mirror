@@ -219,7 +219,7 @@ java_WITH_AWT = \
 
 
 java_sources = Shell.java repl.java Version.java \
-  TelnetInputStream.java TelnetOutputStream.java Telnet.java\
+  TelnetInputStream.java TelnetOutputStream.java Telnet.java TelnetRepl.java \
   $(java_@AWT_SELECTED@)
 
 

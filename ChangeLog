@@ -1,3 +1,15 @@
+2003-04-12  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (apply0, apply1, checkInitFile):  Don't use
+	static fields from kawa.standard.Scheme.
+
+	* kawa/repl.java (SocketRepl class):  Make public and rename to ...
+	* kawa/TelnetRepl.java:  ... new class based on old SocketRepl.
+	(serve):  New static method based on old kawa.serveTelnet method.
+	* kawa/repl.java (serveTelnet):  Removed method.
+	(processArgs)  Update to call TelnetRepl.serve.
+	* kawa/Makefile.am (java_sources):  Add TelnetRepl.java.
+
 2003-04-06  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/EqualPat.java (print):  Don't use SFormat.

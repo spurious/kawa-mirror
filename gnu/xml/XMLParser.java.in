@@ -482,8 +482,8 @@ public class @XMLParser@
 		pos = this.pos;
 		buffer = this.buffer;
 		limit = pos + count;
+		start = saved >= 0 ? pos - saved : limit;
 		ch = buffer[pos++];
-		start = saved >= 0 ? 0 : limit;
 	      }
 	    else
 	      {

@@ -26,6 +26,14 @@ done.  Contact me if you are interested.
 
 <h2>Status</h2>
 Very unfinished proof of concerpt.
+It is a functional but very minimal editor.
+Many of the core Emacs concepts (keymaps, windows, frames,
+buffers, markers) are implemented, and generally in such a way as
+to provide the standard Emacs semantics.  There are Scheme functions
+with the same name and similar behavior as the standard Emacs Lisp
+functions.  However, there is only a very limited set of core "editing"
+commands, and no searching commands.  And it is <em>not</em>
+robust or reliable.
 
 <h2>To-do</h2>
 A couple of things volunteers might start with
@@ -34,10 +42,6 @@ A couple of things volunteers might start with
 <li>Implement more of the editing commands:  Insert/delete/forward/backward
 char/word/line.  (By default, BS should delete backwards,
 and Delete should delete forwards, but this will be customizable.) 
-<li>Implement commands to read and save files.  Associate a filename
-with a buffer, and display it in the mode line.
-(Until we decide how to handle mini-buffers, just prompt for filename
-with System.out and read from System.in.)
 <li>Display the modeline in inverse video, but extend it to the full
 window width.
 <li>Come up with a design for narrowing a buffer.  One possibility
@@ -46,17 +50,8 @@ But I think a more flexible design would use an "IndirectDocument" class
 that refers to a sub-range of a buffer.  This would help with "Indirect
 Buffers", and might be flexible and elegant in general.
 <li>Perhaps Buffer should inherit from Document (or rather
-DefaultStyledDocument).  Hwever, that might lose some flexibility.
-<li>Split windows correctly, so that the windows that are not split
-keep their sizes, the windows being split gets split as specified,
-and the frame does not change size.  Also handle horizonal splits.
-<li>Work on buffer-local keymaps and keymap search order.
-(Swing provides a single parent keymap;  Emacs may use many.
-For now, just implement a single parent, I think.)
-Handle multi-key key-sequences: 
-When a prefix key is seen, temporarily install a new keymap
-to handle the rest of the sequence, but only in the selected window.
-(This may not quite match Emacs behavior, but I think it is better.)
+DefaultStyledDocument).  However, that might lose some flexibility.
+<li>Needs methods to control Window scrolling.
 <li>Think about how to map extents and faces to Swing attributes
 and styles.
 <li>Decide how to implement Emacs strings.
@@ -77,7 +72,11 @@ in an existing frame; type <code>(make-frame)</code> to create
 a new frame (to-level window), or do <code>(get-buffer-create NAME)</code>
 to create a new buffer.
 Note also how <code>ctrl/B</code> and <code>ctrl/F</code> have been
-bound to the correct functions.
+bound to the correct functions.  For other working key-bindings,
+look for the calls to <code>define-key</code> in <code>emacs.scm</code>.
+<p>
+The call <code>(scheme-swing-window)</code> creates a new Scheme
+interaction window.
 
 <h2>License</h2>
 Same as the package <code>gnu.expr</code>:  Modified Gnu Public License.
@@ -93,7 +92,7 @@ Per Bothner,
 <tt>&lt;<a href="mailto:bothner@gnu.org">bothner@gnu.org</a>&gt;</tt>
 <p>
 <!-- hhmts start -->
-Last modified: Sat Aug  7 20:46:03 PDT 1999
+Last modified: Tue Sep 14 09:07:05 PDT 1999
 <!-- hhmts end -->
   </body>
 </html>

@@ -1,3 +1,90 @@
+1999-09-13  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (current):  New static field.
+	(getCurrent, setCurrent):  New static methods.
+
+	* Buffer.java (redStyle, blueStyle):  New styles.
+	(redrawModeline):  Make it a little fancier.
+	* Modeline.java (<init>):  Take explicit Buffer argument.
+	Set background to light gray.
+	
+	* Buffer.java (insertFile):  Don't set point at end; leave it as was.
+	
+	* BufferKeymap.java (defaultKeymap):  New static field.
+	(globalKeymap):  Make this a new Keymap.
+
+	* Window.java (next, previous):  Remove fields.  Instead use
+	awt Component hierarchy.
+	(getNextWindow, getOtherWindow, getContainedWindow, getFirstWindow,
+ 	getLastWindow, getNextWindowInFrame):  New methods.
+	(deleteNoValidate, deleteOtherWindows):  New methods.
+	(split):  Moved in code from Frame.addWindow.
+	* Frame.java (getFirstWindow, getLastWindow, getSelectedFrame,
+	getSelectedWindow, otherWindow):  New methods.
+	(first):  Remove field.
+	(addWindow):  Remove.
+	(delete, isLive):  New methods.
+	
+	* Window.java (selected):  Remove static field.
+	(getSelected):  New method - gets window selected in selected Frame.
+	(setSelected):  Also make buffer current.
+	(warp):  Remove one overloaded method.
+
+	* emacs.scm (read-dialog):  New, creates popup window.
+	(read-from-minibuffer):  Redefine as read-dialog.
+	(*current-buffer*):  Removed variable.
+	(new-window, other-window, delete-frame, frame-selected-window,
+	frame-live?, selected-frame):  New procedures.
+
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	Following item from the To-do section of overview.html are now done:
+	* Implemented commands to read and save files.
+	* We ask for file and buffer names using a dialog pop-up window.
+	* Split windows correctly, so that the windows that are not split
+	keep their sizes, the windows being split gets split as specified,
+	and the frame does not change size.  Now also handles horizonal splits.
+	* Fairly good support for  buffer-local keymaps and Emacs-style keymap
+	search order.  A new class BufferKeymap manages the active keymaps of
+	a buffer.  Multi-key key-sequences are handled.  Pending prefix keys
+	are remembered on a per-buffer basis (whereas Emacs does it globally).
+
+	* Frame.java (addWindow):  Support horizontal splitting.
+	(ask, toString):  New methods.
+	* Window.java:  Now inherits from JTextPane.
+	(wrap, getPanel, getWindow, delete, deleteOtherWindows):  New methods.
+	* Modeline.java (redraw):  Removed method.  (Not much left ...)
+
+	* Buffer.java (getFileName, setFileName, fileFile, redrawModeline,
+	makePointMarkerm getPointMarker, save, insertFile):  New methods.
+	* BufferContent.java:  New class; extends GapContent.
+	* Marker.java:  Partially re-write to use BufferContent features.
+	(hashCode, equals, toString):  New methods.
+	(insert):  New methods, moved from Buffer.java.
+
+	* BufferKeymap.java:  New class; implements javax.swing.text.Keymap.
+	* Keymap.java:  Removed;  defineKey methods moved to BufferKeymap.
+	* InsertAction.java:  New class; extends javax.swing.text.TextAction.
+	* FinalAction.java:  New class; extends javax.swing.text.TextAction.
+	* PrefixAction.java:  New class; extends javax.swing.text.TextAction.
+	* ProcAction.java:  New class;  replaced ProcCommand.
+	* ProcCommand.java:  Renamed to ProcAction.java.
+	* TooLongAction.java:  New class; extends javax.swing.AbstractAction.
+	* CancelledException.java:  New class; extends RuntimeException.
+
+	* BufferWriter.java:  New class; extends java.io.Writer.
+	* ReplBuffer.java:  New class; extends Buffer.
+	* Signal.java (message):  New static method.
+	* Makefile.am, Makefile.in (java_JAVA):  Update for new classes.
+	* emacs.scm (open-output-buffer, open-output-marker, make-keymap,
+ 	keymap-name, current-local-map, use-local-map, lookup-key, find-file,
+ 	find-file-noselect, save-buffer, write-file, insert-file, make-marker,
+ 	point-marker, copy-marker, marker-position, marker-buffer, set-marker,
+ 	buffer-file-name, set-visited-file-name, read-from-minibuffer,
+	delete-window, delete-other-windows, switch-to-buffer):
+ 	New (more-or-less-standard Emacs) procedures.
+	(term-send-input, scheme-swing-window):  New non-standard procedures.
+
 1999-08-07  Per Bothner  <per@bothner.com>
 
 	Move from gnu.emacs to gnu.jemacs.buffer.

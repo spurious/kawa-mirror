@@ -29,12 +29,14 @@ EXTRA_JAVA = $(java_WITH_SWING)
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lang. -C
 
-SCMSOURCES = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \
-  ListOps.scm MiscOps.scm
+SCM_WITH_SWING = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \
+  MiscOps.scm
+SCMSOURCES = ListOps.scm $(SCM_@SWING_SELECTED@)
+ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
 CLEANFILES = *.class *.stamp
 
-EXTRA_DIST = $(SCMSOURCES) package.html
+EXTRA_DIST = $(ALL_SCMSOURCES) package.html
 
 scmclasses.stamp: $(SCMSOURCES)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
@@ -44,4 +46,4 @@ all: Makefile classjava.stamp scmclasses.stamp
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:
-	echo $(SCMSOURCES)
+	echo $(ALL_SCMSOURCES)

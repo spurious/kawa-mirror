@@ -1,5 +1,7 @@
 2000-05-28  Per Bothner  <per@bothner.com>
 
+	* Makefile.am:  Only compile MiscOps.scm unless Swing is enabled.
+
 	* ELispReader.java:  LispReader and ScmRead moved to gnu.kawa.lispexpr.
 
 2000-05-22  Per Bothner  <per@bothner.com>

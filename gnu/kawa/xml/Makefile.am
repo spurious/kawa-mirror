@@ -9,6 +9,7 @@ java_sources = \
   Attributes.java \
   AttributeConstructor.java \
   AttributeType.java \
+  CDataConstructor.java \
   ChildAxis.java \
   CoerceNodes.java \
   CommentConstructor.java \
@@ -26,9 +27,13 @@ java_sources = \
   IntersectNodes.java \
   IteratorItems.java \
   KAttr.java \
+  KCDATASection.java \
+  KCharacterData.java \
+  KComment.java \
   KDocument.java \
   KElement.java \
   KNode.java \
+  KProcessingInstruction.java \
   KText.java \
   ListItems.java \
   MakeResponseHeader.java \

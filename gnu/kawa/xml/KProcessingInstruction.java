@@ -6,10 +6,10 @@ import gnu.lists.*;
 import gnu.xml.*;
 import org.w3c.dom.*;
 
-public class KText extends KCharacterData
-  implements org.w3c.dom.Text
+public class KProcessingInstruction extends KNode
+  implements org.w3c.dom.ProcessingInstruction
 {
-  public KText (NodeTree seq, int ipos)
+  public KProcessingInstruction (NodeTree seq, int ipos)
   {
     super(seq, ipos);
   }
@@ -21,15 +21,19 @@ public class KText extends KCharacterData
     return "#text";
   }
 
-  public Text splitText(int offset)
-    throws DOMException
+  public String getData ()
   {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   "splitText not supported");
+    return getNodeValue();
   }
 
-  public boolean hasAttributes ()
+  public void setData(String data)  throws DOMException
   {
-    return false;
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "setData not supported");
+  }
+
+  public String getTarget ()
+  {
+    return ((NodeTree) sequence).posTarget(ipos);
   }
 }

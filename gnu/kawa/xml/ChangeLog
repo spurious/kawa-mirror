@@ -1,3 +1,24 @@
+2004-05-20  Per Bothner  <per@bothner.com>
+
+	* CDataConstructor.java:  New class, extends CpsProcedure.
+	* KCharacterData.java:  New class, extends KNode.
+	* KComment.java:  new class, extends KCharacterData.
+	* KText.java:  Change to inherit KCharacterData.
+	Move most methods to KCharacterData.
+	* KCDATASection.java:  New class, extends KText.
+	* KProcessingInstruction.java:  New class, extends KNode.
+	* Makefile.am:  Update accordingly.
+
+	* KText.java (getNodeType):  Fix to return TEXT_NODE.
+
+	* KNode.java (make):  Handle CDATA_VALUE, COMMENT_VALUE
+	and PROCESSING_INSTRUCTION_VALUE.
+	An empty NodeTree is treated as an empty text node.
+
+	* KNode.java (toString):  New method.
+
+	* NodeConstructor.java (popNodeContext):  Wrap NodeTree as KNode.
+
 2004-05-05  Per Bothner  <per@bothner.com>
 
 	* CommentConstructor.java:  New class.

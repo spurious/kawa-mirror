@@ -44,9 +44,11 @@ implements Inlineable
 
   public static void popNodeContext (Consumer saved, CallContext ctx)
   {
-    Consumer current = ctx.consumer;
+    Object current = ctx.consumer;
     if (saved != current)
       {
+	if (current instanceof NodeTree)
+	  current = KNode.make((NodeTree) current);
 	saved.writeObject(current);
 	ctx.consumer = saved;
       }

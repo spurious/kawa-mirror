@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.xml.*;
 import org.w3c.dom.*;
 import org.w3c.dom.Document;
+import gnu.mapping.*;
 
 public abstract class KNode extends SeqPosition
   implements org.w3c.dom.Node
@@ -27,8 +28,16 @@ public abstract class KNode extends SeqPosition
 	return new KAttr(seq, ipos);
       case Sequence.DOCUMENT_VALUE:
 	return new KDocument(seq, ipos);
+      case Sequence.CDATA_VALUE:
+	return new KCDATASection(seq, ipos);
+      case Sequence.COMMENT_VALUE:
+	return new KComment(seq, ipos);
+      case Sequence.PROCESSING_INSTRUCTION_VALUE:
+	return new KProcessingInstruction(seq, ipos);
       case Sequence.EOF_VALUE:
-	return null;
+	if (! seq.isEmpty())
+	  return null;
+	// .. else fall through to create an empty text node.
       default:
 	return new KText(seq, ipos);
       }
@@ -239,5 +248,13 @@ public abstract class KNode extends SeqPosition
   public NamedNodeMap getAttributes ()
   {
     throw new UnsupportedOperationException("getAttributes not implemented yet");
+  }
+
+  public String toString ()
+  {
+    CharArrayOutPort wr = new CharArrayOutPort();
+    XMLPrinter xp = new XMLPrinter(wr);
+    ((NodeTree) sequence).consumeNext(ipos, xp);
+    return wr.toString();
   }
 }

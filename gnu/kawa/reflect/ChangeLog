@@ -1,8 +1,11 @@
 2003-05-17  Per Bothner  <per@bothner.com>
 
+	* Invoke.java (applyN, applyN):  Use Symbol's getName method.
+
 	* Invoke.java (inlineClassName):  Take InlineCalls parameter instead
 	of Interpreter.  Get latter from former.
 	If type is a Classtype and isExisting, emit error is not found.
+
 	* InstanceOf.java (inline):  Upadte call to inlineClassName.
 	* SlotGet.java (inline):  Likewise.
 	* SlotSet.java (inline):  Likewise.

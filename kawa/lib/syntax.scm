@@ -44,13 +44,10 @@
    (thunk)
    (after)))
 
-(define (catch key thunk handler)
+(define (catch key (thunk :: <procedure>) (handler :: <procedure>))
   (try-catch (thunk)
 	     (ex <kawa.lang.NamedException>
-		 ((primitive-virtual-method
-		   <kawa.lang.NamedException> "applyHandler"
-		   <object> (<object> <function>))
-		  ex key handler))))
+		 (invoke ex 'applyHandler key handler))))
 
 ;; SRFI-11  Copyright (C) Lars T Hansen (1999). All Rights Reserved.
 

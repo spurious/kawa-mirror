@@ -1,3 +1,7 @@
+2004-07-31  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (catch):  Add type declarations.  Simplify using invoke.
+
 2004-07-19  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (rationalize, sqrt, exact->inexact, inexact->exact):

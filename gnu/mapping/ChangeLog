@@ -1,5 +1,10 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
+	* IndirectableLocation.java (setAlias): New method.
+	* Location.java (print):  Restore printing of location name.
+	* LocationProc.java: Minor optimiation.
+	* ProcLocation.java (setWithSave, setRestore): New methods.
+
 	* LocationProc.java: New file, but class was extracted from
 	kawa/standard/location.java.
 	Add some extra "features" to support srfi-39 "parameter objects".

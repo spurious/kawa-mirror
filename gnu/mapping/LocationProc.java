@@ -9,6 +9,11 @@ package gnu.mapping;
  */
 public class LocationProc extends Procedure0or1 implements HasSetter
 {
+  // FIXME Having the converter as part of the LocationProc is ugly.
+  // For one thing, it messes up ProcLocation.
+  // Instead, the 'loc' should be a "constrained Location".
+  // In that case kawa.standard.location.makeProcLocation$V could be
+  // optimized to return a ProcLocation of the argument is a LocationProc.
   Procedure converter;
   Location loc;
 
@@ -46,9 +51,19 @@ public class LocationProc extends Procedure0or1 implements HasSetter
     return new Setter0(this);
   }
 
-  public Location getLocation ()
+  public final Location getLocation ()
   {
     return loc;
+  }
+
+  public Object setWithSave (Object newValue)
+  {
+    return loc.setWithSave(newValue);
+  }
+
+  public void setRestore (Object oldValue)
+  {
+    loc.setRestore(oldValue);
   }
 
   public String toString () { return "#<location-proc "+loc+">"; }

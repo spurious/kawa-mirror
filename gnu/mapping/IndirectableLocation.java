@@ -55,6 +55,13 @@ public abstract class IndirectableLocation extends Location
     this.value = null;
   }
 
+  /** Define this Location as an alias for some other Location. */
+  public void setAlias (Location base)
+  { 
+    this.base = base;
+    this.value = INDIRECT_FLUIDS;
+  }
+
   public void undefine ()
   {
     base = null;

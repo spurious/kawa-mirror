@@ -64,4 +64,34 @@ public class ProcLocation extends Location
   {
     return true;
   }
+
+  public Object setWithSave (Object newValue)
+  {
+    if (proc instanceof LocationProc && args.length == 0)
+      {
+	LocationProc lproc = (LocationProc) proc;
+	if (lproc.converter != null)
+	  {
+	    try
+	      {
+		newValue = lproc.converter.apply1(newValue);
+	      }
+	    catch (Throwable ex)
+	      {
+		throw WrappedException.wrapIfNeeded(ex);
+	      }
+	  }
+	return lproc.loc.setWithSave(newValue);
+      }
+    return super.setWithSave(newValue);
+  }
+
+  public void setRestore (Object oldValue)
+  {
+    if (proc instanceof LocationProc && args.length == 0)
+      ((LocationProc) proc).loc.setRestore(oldValue);
+    else
+      super.setRestore(oldValue);
+  }
 }
+

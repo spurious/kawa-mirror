@@ -125,11 +125,9 @@ public abstract class Location
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<location ");
-    /*
-    String name = getName();
+    Symbol name = getKeySymbol();
     if (name != null)
       ps.print(name);
-    */
     Object unb = Location.UNBOUND;
     Object value = get(unb);
     if (value != unb)

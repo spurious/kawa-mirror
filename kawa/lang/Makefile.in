@@ -224,8 +224,11 @@ AutoloadProcedure.java \
 Continuation.java \
 CalledContinuation.java \
 Syntax.java Macro.java \
+SyntaxPattern.java \
 SyntaxRule.java \
 SyntaxRules.java \
+PatternScope.java \
+SyntaxTemplate.java \
 AutoloadSyntax.java \
 CompileFile.java \
 loadcompiled.java \

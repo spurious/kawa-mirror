@@ -1,5 +1,21 @@
 2004-11-06  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Syntax.java (rewriteForm, scanForm): New methods.
+	* kawa/lang/SyntaxForm.java (form, scope): Make fields public.
+	(tr): Remove field.
+	(make, toString, fromDatum, fromDatumIfNeeded, rewrite, rewriteBody,
+	isIdentifier, freeIdentifierEquals): New methods.
+	* kawa/lang/SyntaxPattern.java: New class extends Pattern. It encodes
+	a pattern from syntax-case/syntax-rules in a "program".
+	* kawa/lang/SyntaxTemplate.java: New class.
+	* kawa/lang/SyntaxRule.java: Now a skeleton that inherits from
+	SyntaxTemplate.
+	* kawa/lang/SyntaxRules.java: Major re-write.
+	* kawa/lang/PatternScope.java: New class.
+	* kawa/lang/Makefile.am: Add new classes.
+
+2004-11-06  Per Bothner  <per@bothner.com>
+
 	* Make-rules: New automake doesn't seem to set DIST_SOURCES from
 	SOURCES, so undefine SOURCES and define DISTFILES explicitly.
 

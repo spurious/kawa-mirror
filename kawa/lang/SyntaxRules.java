@@ -16,33 +16,24 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   /* The largest (num_variables+template_identifier.length) for any rule. */
   int maxVars = 0;
 
-  private void calculate_maxVars (int template_identifiers_length)
-  {
-    for (int i = rules.length;  --i >= 0; )
-      {
-	int size = rules[i].num_variables + template_identifiers_length;
-	if (size > maxVars)
-	  maxVars = size;
-      }
-  }
-
   public SyntaxRules ()
   {
   }
 
+  /** The compiler generates calls to this constructor. */
   public SyntaxRules (Object[] literal_identifiers, SyntaxRule[] rules,
-		      int template_identifiers_length)
+		      int maxVars)
   {
     this.literal_identifiers = literal_identifiers;
     this.rules = rules;
-    calculate_maxVars(template_identifiers_length);    
+    this.maxVars = maxVars;
   }
 
-  public SyntaxRules (Object[] literal_identifiers, Object rules,
+  public SyntaxRules (Object[] literal_identifiers, Object srules,
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
-    int rules_count = LList.listLength(rules, false);
+    int rules_count = LList.listLength(srules, false);
     if (rules_count <= 0)
       {
 	rules_count = 0;
@@ -51,10 +42,10 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
     Macro macro = tr.currentMacroDefinition;
-    java.util.Vector capturedIdentifiers = macro.capturedIdentifiers;
-    for (int i = 0;  i < rules_count;  i++, rules = rules_pair.cdr)
+    //    java.util.Vector capturedIdentifiers = macro.capturedIdentifiers;
+    for (int i = 0;  i < rules_count;  i++, srules = rules_pair.cdr)
       {
-	rules_pair = (Pair) rules;
+	rules_pair = (Pair) srules;
 
 	Object syntax_rule = rules_pair.car;
 	if (! (syntax_rule instanceof Pair))
@@ -85,188 +76,149 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      }
 	    Object template = syntax_rule_pair.car;
 
-	    // For the i'th pattern variable, pattern_names.elementAt(i)
-	    // is the name of the variable, and
-	    // (int) pattern_nesting.charAt (i) is the nesting (in terms
-	    // of number of ellipsis that indicate the variable is repeated).
-	    StringBuffer pattern_nesting_buffer = new StringBuffer ();
-	    java.util.Vector pattern_names = new java.util.Vector ();
+	    PatternScope patternScope = PatternScope.push(tr);
+	    tr.push(patternScope);
+
 	    if (! (pattern instanceof Pair)
 		|| ! (((Pair)pattern).car instanceof String))
 	      {
 		tr.syntaxError ("pattern does not start with name");
 		return;
 	      }
+	    // ?? FIXME
             literal_identifiers[0] = ((Pair)pattern).car;
-	    pattern = ((Pair) pattern).cdr;
 
-	    Pattern translated_pattern
-	      = translate_pattern (pattern, literal_identifiers,
-				   pattern_names, pattern_nesting_buffer,
-				   0, tr);
-	    String pattern_nesting = pattern_nesting_buffer.toString ();
+	    StringBuffer programbuf = new StringBuffer();
+	    SyntaxForm syntax = null;
+	    while (pattern instanceof SyntaxForm)
+	      {
+		syntax = (SyntaxForm) pattern;
+		pattern = syntax.form;
+	      }
 
-	    this.rules[i]
-	      = new SyntaxRule (translated_pattern, pattern_nesting,
-				pattern_names, template,
-				capturedIdentifiers, tr);
-	    /* DEBUGGING:
-	    OutPort err = OutPort.errDefault();
-	    err.print("{translated template for macro ");
-	    err.print(literal_identifiers[0]);
-	    err.println(':');
-	    this.rules[i].print_template_program (capturedIdentifiers, err);
-	    err.println ('}');
-	    */
+	    // In R5RS syntax-rules, the initial name is neither a
+	    // pattern variable or a literal identifier, so ingore it.
+	    if (pattern instanceof Pair)
+	      {
+		Pair p = (Pair) pattern;
+		programbuf.append((char) ((1 << 3) | SyntaxPattern.MATCH_PAIR));
+		programbuf.append((char) SyntaxPattern.MATCH_IGNORE);
+		pattern = p.cdr;
+	      }
+	    SyntaxPattern spattern = new SyntaxPattern(programbuf, pattern,
+					     syntax, literal_identifiers, tr);
+
+	    this.rules[i] = new SyntaxRule(spattern, template, tr);
+
+	    PatternScope.pop(tr);
+	    tr.pop();
 	  }
 	finally
 	  {
 	    tr.setLine(save_filename, save_line, save_column);
 	  }
       }
-    int num_identifiers = capturedIdentifiers.size();
-    calculate_maxVars (num_identifiers);
-    macro.templateIdentifiers = new String[num_identifiers];
-    capturedIdentifiers.copyInto(macro.templateIdentifiers);
-    macro.capturedDeclarations = new Declaration[num_identifiers];
-    for (int j = num_identifiers;  --j >= 0; )
+
+    // Calculate maxVars:
+    for (int i = this.rules.length;  --i >= 0; )
       {
-	String name = macro.templateIdentifiers[j];
-	Declaration decl =  (Declaration) tr.lexical.lookup(name, -1);
-	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
-	  {
-	    decl.setCanRead(true);
-	    decl.setFlag(Declaration.EXTERNAL_ACCESS);
-	  }
-	macro.capturedDeclarations[j] = decl;
+	int size = this.rules[i].pattern_nesting.length();
+	if (size > maxVars)
+	  maxVars = size;
       }
   }
 
-  /** Recursively translate a pattern in a syntax-rule to a Pattern object.
+  /* --- Recursively translate a pattern in a syntax-rule to a Pattern object.
    * @param pattern the the pattern to translate
    * @param literal_identifiers the literals of the syntax-rule
-   * @param pattern_name (output) the pattern variables in the pattern
-   * @param pattern_nesting (output) the nesting of each pattern variable
    * @param nesting the depth of ... we are inside
    * @param tr  the current Translator
    * @return the translated Pattern
    */
-  public static Pattern translate_pattern (Object pattern,
-					   Object[] literal_identifiers,
-					   java.util.Vector pattern_names,
-					   StringBuffer pattern_nesting,
-					   int nesting, Translator tr )
-  {
-    if (pattern instanceof Pair)
-      {
-	Pair pair = (Pair) pattern;
-	if (pair.cdr instanceof Pair)
-	  {
-	    Pair cdr_pair = (Pair) pair.cdr;
-	    if (cdr_pair.car == SyntaxRule.dots3)
-	      {
-		if (cdr_pair.cdr != LList.Empty)
-		  tr.syntaxError ("junk follows ... in syntax-rule pattern");
-		Pattern car_pat
-		  = translate_pattern (pair.car, literal_identifiers,
-				       pattern_names, pattern_nesting,
-				       nesting + 1, tr);
-		return new ListRepeatPat (car_pat);
-	      }
-	  }
-	Pattern car_pat = translate_pattern (pair.car, literal_identifiers,
-					     pattern_names, pattern_nesting,
-					     nesting, tr);
-	return new PairPat (car_pat,
-			    translate_pattern (pair.cdr, literal_identifiers,
-					       pattern_names, pattern_nesting,
-					       nesting, tr));
-      }
-    else if (pattern instanceof String || pattern instanceof Symbol)
-      {
-	for (int i = literal_identifiers.length;  --i >= 0; )
-	  {
-	    // NOTE - should also generate check that the binding of the
-	    // pattern at macro definition time matches that at macro
-	    // application type.  However, we currently only support
-	    // define-syntax (and not let[rec]-syntax) so it is not necessary.
-	    if (literal_identifiers[i] == pattern)
-	      return new EqualPat (pattern);
-	  }
-	if (pattern_names.contains (pattern))
-	  tr.syntaxError ("duplicated pattern variable " + pattern);
-	pattern_names.addElement (pattern);
-	pattern_nesting.append ((char) nesting);
-	return new AnyPat ();
-      }
-    else
-      return new EqualPat (pattern);
-  }
 
   public Object apply1 (Object arg)
   {
-    SyntaxForm sform;
-    Pair form;
-    try
+    if (arg instanceof SyntaxForm)
       {
-        sform = (SyntaxForm) arg;
-        form = (Pair) sform.form;
+	SyntaxForm sf = (SyntaxForm) arg;
+	Translator tr = (Translator) Compilation.getCurrent();
+	ScopeExp save_scope = tr.currentScope();
+	tr.setCurrentScope(sf.scope);
+	try
+	  {
+	    return expand(sf, tr);
+	  }
+	finally
+	  {
+	    tr.setCurrentScope(save_scope);
+	  }
       }
-   catch (ClassCastException ex)
-      {
-        throw WrongType.make(ex, this, 0);
-      }  
-    return expand(form, sform.tr);
+    else
+      return expand(arg, (Translator) Compilation.getCurrent());
   }
 
-  public Object expand (Pair form, Translator tr)
+  /* DEBUGGING:
+  private void printElement (Object el, StringBuffer sb)
   {
-    Object obj = form.cdr;
+    if (el instanceof Object[])
+      {
+	Object[] arr = (Object[]) el;
+	sb.append('{');
+	for (int i = 0;  i < arr.length;  i++)
+	  {
+	    if (i != 0)
+	      sb.append(", ");
+	    printElement(arr[i], sb);
+	  }
+	sb.append('}');
+      }
+    else
+      sb.append(el);
+  }
+  END DEBUGGING */
+
+  public Object expand (Object obj, Translator tr)
+  {
     Object[] vars = new Object[maxVars];
     Macro macro = (Macro) tr.getCurrentSyntax();
-    int num_identifiers = macro.templateIdentifiers.length;
+    /* DEBUGGING:
+    System.err.println("match "+macro+" args:"+obj+" maxVars:"+maxVars);
+    System.err.flush();
+    */
     for (int i = 0;  i < rules.length;  i++)
       {
 	SyntaxRule rule = rules[i];
 	// check that literals have correct binding - FIXME!!
-	if (rule.pattern.match (obj, vars, 0))
+	Pattern pattern = rule.pattern;
+	boolean matched = pattern.match (obj, vars, 0);
+	if (matched)
 	  {
 	    /* DEBUGGING:
 	    OutPort err = OutPort.errDefault();
-	    err.print ("{Matched variables: ");
-	    for (int j = 0;  j < rule.num_variables;  j++)
+	    StringBuffer sb = new StringBuffer();
+	    sb.append("{Expand "+macro + " rule#" + i
+		      +" - matched variables: ");
+	    for (int j = 0;  j < rule.pattern.varCount;  j++)
 	      {
-		if (j > 0)  err.print ("; ");
-		err.print (j + ": ");
-		err.print(vars[j]);
+		if (j > 0)  sb.append("; ");
+		sb.append(j);  sb.append(": ");
+		printElement(vars[j], sb);
 	      }
-	    err.println ('}');
-	    */
+	    sb.append('}');
+	    err.println(sb);
+	    err.flush();
+	    END DEBUGGING */
 
-	    int[] indexes = new int[rule.max_nesting];
-	    for (int j = 0;  j < num_identifiers;  j++)
-	      {
-		String name = macro.templateIdentifiers[j];
-		Symbol renamed_symbol = new Symbol(name);
-		vars[rule.num_variables + j] = renamed_symbol;
-		Declaration captured
-		  = macro.capturedDeclarations == null ? null
-		  : macro.capturedDeclarations[j];
-		Declaration alias = new Declaration(renamed_symbol);
-		ReferenceExp ref;
-		if (captured != null)
-		  ref = new ReferenceExp(captured);
-		else
-		  ref = new ReferenceExp(name);
-		alias.noteValue(ref);
-		alias.setAlias(true);
-		tr.push(alias);
-	      }
-	    Object expansion = rule.execute_template (0, vars, 0, indexes, tr, form);
+	    /* DEBUGGING:
+	    err.print("Expanding ");  err.println(literal_identifiers[0]);
+	    rule.print_template_program(null, err);
+	    err.flush();
+	    */
+	    Object expansion = rule.execute(vars, tr);
 
 	    /* DEBUGGING:
 	    err.print("{Expansion of ");
-	    err.print(literal_identifiers[0]);
+	    err.print(macro);
 	    err.print(": ");
 	    err.print(expansion);
 	    err.println('}');
@@ -275,6 +227,11 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    return expansion;
 	  }
       }
+    /* DEBUGGING:
+    System.err.println("no matching syntax-rule for "
+		       + literal_identifiers[0]);
+    System.err.flush();
+    */
     return tr.syntaxError ("no matching syntax-rule for "
 			   + literal_identifiers[0]);
   }

@@ -1,5 +1,16 @@
 2002-04-18  Per Bothner  <per@bothner.com>
 
+	* kawa.repl (exitCounter):  New static field.
+	(exitIncrement, exitDecrement):  New static methods.
+	(main):  Call exitDecrement.
+	* kawa/GuiConsole.java (numConsoles):  Removed static field.
+	(<init>):  Call repl's exitIncrement instead of upping numConsoles.
+	(close):  Instead of incrementing/testing numConsoles,
+	call repl's exitDecrement.
+	* kawa.repl (windowStarted):  Removed field.
+	(processArgs):  Don't set windowStarted.
+	(main):  Don't test windowStarted - I don't think it makes sense.
+	
 	* kawa/lang/Record.java (makeRecordType):  No longer need to
 	catch java.io.IOException, since writeToArray now takes care of it.
 

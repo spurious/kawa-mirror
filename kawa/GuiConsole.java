@@ -22,8 +22,6 @@ public class GuiConsole extends Frame implements ActionListener {
 
   static int window_number = 0;
 
-  public static int numConsoles = 0;
-
   Interpreter interp;
   Environment environment;
   Future thread;
@@ -51,7 +49,7 @@ public class GuiConsole extends Frame implements ActionListener {
     in_r = new gnu.text.QueueReader ();
     message = new MessageArea(false, in_r);
     window_number++;
-    numConsoles++;
+    kawa.repl.exitIncrement();
 
     out_p = new OutPort(message.getStdout(), true, "<msg_stdout>");
     err_p = new OutPort(message.getStderr(), true, "<msg_stderr>");
@@ -74,19 +72,17 @@ public class GuiConsole extends Frame implements ActionListener {
 
   void close () {
     in_r.appendEOF();
-    numConsoles--;
     dispose();
     // Give thread chance to finish and clean up
     try {
       Thread.sleep(100);
     } catch (InterruptedException ex) {
     }
-    if (numConsoles <= 0)
-      System.exit(0);
     // Thread.stop is deprecated in JDK 1.2, but I see no good
     // alternative.  (Thread.destroy is not implemented!)
-    thread.stop();
-  }
+    thread.stop(); 
+    kawa.repl.exitDecrement();
+ }
 
   private void setupMenus() {
     MenuBar menubar;

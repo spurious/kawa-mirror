@@ -1,3 +1,7 @@
+Sat Aug 29 20:48:19 1998  Per Bothner  <bothner@cygnus.com>
+
+	* DFloNum.java,IntNum.java: Do ClassType.make instead of new ClassType.
+
 Thu Jul 23 07:54:54 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Dimensions.java (<init>):  Fix missing variable re-initialization.

@@ -255,7 +255,7 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("gnu.math.DFloNum");
+	thisType = ClassType.make("gnu.math.DFloNum");
 	Type[] args = new Type[1];
 	args[0] = Type.double_type;
 	makeMethod = thisType.addMethod ("make", args, thisType,

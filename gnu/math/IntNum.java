@@ -1196,7 +1196,7 @@ public class IntNum extends RatNum implements Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("gnu.math.IntNum");
+	thisType = ClassType.make("gnu.math.IntNum");
 	Type[] args = new Type[1];
 	args[0] = Type.int_type;
 	makeIntMethod = thisType.addMethod ("make", args, thisType,

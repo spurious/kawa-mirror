@@ -3579,7 +3579,7 @@ send a blank message request to @code{kawa-subscribe@@sources.redhat.com}.
 To unsubscribe, send a blank message to
 @code{kawa-unsubscribe@@sources.redhat.com}.  (If your mail is forwarded,
 send mail to the address following @code{mailto:} in the
-@code{List-Unsubscribe} line in the messages you get form the list.)
+@code{List-Unsubscribe} line in the messages you get from the list.)
 
 Messages to the mailing list are now
 @uref{http://sources.redhat.com/ml/kawa/, archived}.

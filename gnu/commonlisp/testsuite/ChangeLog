@@ -1,3 +1,7 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* lang-test.lisp:  Rename a duplicate test name.
+
 2003-01-01  Per Bothner  <per@bothner.com>
 
 	* lang-test.lisp:  Add a defmacro test.

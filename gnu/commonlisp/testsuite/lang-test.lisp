@@ -14,7 +14,7 @@
 ;(test t 'eq-test-1 (eq t 't))
 
 (test t 'equal-test-1 (equal "tt" "tt"))
-(test nil 'equal-test-1 (equal "tt" "tt "))
+(test nil 'equal-test-2 (equal "tt" "tt "))
 
 (test "The octal value of 18 is 22,
    and the hex value is 12."

@@ -1,4 +1,5 @@
 package kawa.lang;
+import java.io.CharArrayWriter;
 
 /** A Format to print structured objects on streams.
  * After JDK 1.1 comes out, this should be made compatible with
@@ -9,47 +10,26 @@ public class SFormat // extends java.text.Format  [in JDK 1.1.]
 {
   public String format (Object obj)
   {
-    StringBuffer sb = new StringBuffer();
-    format (obj, sb);
-    return sb.toString ();
+    CharArrayWriter wr = new CharArrayWriter();
+    format(obj, new OutPort(wr));
+    return wr.toString();
   }
 
   public StringBuffer format (Object obj, StringBuffer buffer)
   {
-    // FIXME:  Replace to use CharOutputSream in JDK 1.1
-    java.io.ByteArrayOutputStream bout
-      = new java.io.ByteArrayOutputStream ();
-    OutPort port = new OutPort(bout, "<string>");
-    format (obj, port);
-    port.close ();
-    byte[] bresult = bout.toByteArray ();
-
-    java.io.ByteArrayInputStream bis =
-      new java.io.ByteArrayInputStream (bresult);
-    InPort is = new InPort (bis, "<string>");
-    for (;;)
-      {
-	try
-	  {
-	    int c = is.readChar ();
-	    if (c < 0)
-	      break;
-	    buffer.append ((char)c);
-	  }
-	catch (java.io.IOException ex)
-	  {
-	    throw new InternalError ("unexpected IOException: "+ex.toString());
-	  }
-      }
+    /* FIXME - more efficient to use a "StringBufferWriter". */
+    CharArrayWriter wr = new CharArrayWriter();
+    format(obj, new OutPort(wr));
+    buffer.append(wr.toCharArray());
     return buffer;
   }
 
-  public void format (Object obj, java.io.PrintStream ps)
+  public void format (Object obj, java.io.PrintWriter ps)
   {
     print (obj, ps);
   }
 
-  public static void print (Object obj, java.io.PrintStream ps)
+  public static void print (Object obj, java.io.PrintWriter ps)
   {
     if (obj instanceof kawa.lang.Printable)
       ((kawa.lang.Printable)obj).print(ps);

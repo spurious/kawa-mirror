@@ -12,7 +12,7 @@ public abstract class Expression implements Printable
   abstract public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError;
 
-  abstract public void print (java.io.PrintStream ps);
+  abstract public void print (java.io.PrintWriter ps);
 
   /** If IGNORED is set in the flags passed to compile, the result is ignored.
    * Hence, do not leave any result on the stack. */

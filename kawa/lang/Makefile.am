@@ -23,8 +23,10 @@ EofReadError.class
 
 OBJ=\
 Char.class \
+LineBufferedReader.class \
 InPort.class \
 OutPort.class \
+TtyInPort.class LogWriter.class \
 Expression.class \
 ApplyExp.class \
 BeginExp.class \

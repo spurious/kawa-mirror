@@ -85,7 +85,7 @@ public class ReferenceExp extends Expression
       }
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%ref ");
     SFormat.print (symbol, ps);

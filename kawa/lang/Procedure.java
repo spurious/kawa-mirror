@@ -41,7 +41,7 @@ public abstract class Procedure extends Named implements Printable
 				 Object arg3,Object arg4)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol;
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
     Symbol n = name ();

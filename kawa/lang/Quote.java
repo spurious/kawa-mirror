@@ -17,7 +17,7 @@ public class Quote extends Syntax implements Printable
     return new QuoteExp (match[0]);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print("#<builtin quote>");
   }

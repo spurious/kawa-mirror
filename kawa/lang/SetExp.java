@@ -107,7 +107,7 @@ public class SetExp extends Expression
       comp.compileConstant (Interpreter.voidObject);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print(isDefining () ? "(#%define " : "(#%set! ");
     SFormat.print (name, ps);

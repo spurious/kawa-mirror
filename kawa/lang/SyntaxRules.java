@@ -220,7 +220,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
     return tr.rewrite (rewrite1 (obj, tr));
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<macro " + literal_identifiers[0] + ">");
   }

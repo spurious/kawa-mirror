@@ -25,7 +25,7 @@ public class AutoloadProcedure extends Procedure
     this.className = className;
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
     if (name () != null)
@@ -60,6 +60,8 @@ public class AutoloadProcedure extends Procedure
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
+	if (loaded == this)
+	  throw new GenericError("circularity in autoload of "+name);
 	if (loaded instanceof ModuleBody)
 	  {
 	    Environment env = Environment.current ();
@@ -133,6 +135,8 @@ public class AutoloadProcedure extends Procedure
   {
     if (loaded == null)
       load ();
+    if (loaded instanceof AutoloadProcedure)
+	  throw new InternalError("circularity in autoload of "+name());
     return loaded.applyN (args);
   }
 }

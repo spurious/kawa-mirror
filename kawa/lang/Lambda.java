@@ -21,7 +21,7 @@ public class Lambda extends Syntax implements Printable
     return result;
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print("#<builtin lambda>");
   }

@@ -212,11 +212,15 @@ public class Compilation
    */
   public void compileConstant (Object value)
   {
-    Literal literal = findLiteral (value);
-    if (literal.field == null)
-      literal.assign (this);
-    literal.compile (this);
-    return;
+    if (value == null)
+      method.compile_push_null();
+    else
+      {
+	Literal literal = findLiteral (value);
+	if (literal.field == null)
+	  literal.assign (this);
+	literal.compile (this);
+      }
   }
 
   public void dumpLiterals ()

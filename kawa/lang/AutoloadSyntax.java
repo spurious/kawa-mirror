@@ -25,7 +25,7 @@ public class AutoloadSyntax extends Syntax
     this.className = className;
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<syntax ");
     if (name () != null)

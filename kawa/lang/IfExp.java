@@ -55,7 +55,7 @@ public class IfExp extends Expression
     comp.method.compile_fi ();
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%if ");
     test.print (ps);

@@ -1,6 +1,6 @@
 package kawa.lang;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 public class Symbol extends Object implements Printable, Compilable
 {
@@ -66,7 +66,7 @@ public class Symbol extends Object implements Printable, Compilable
     return make (name);
   }
 
-  public static void print(String name, java.io.PrintStream ps)
+  public static void print(String name, java.io.PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)
       && ((OutPort)ps).printReadable;
@@ -92,7 +92,7 @@ public class Symbol extends Object implements Printable, Compilable
       ps.print(name);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     print(name, ps);
   }

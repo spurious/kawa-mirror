@@ -18,7 +18,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
     return new ListRepeatPat (element_pattern);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<list-repeat-pattern ");
     SFormat.print (element_pattern, ps);

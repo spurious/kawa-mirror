@@ -143,7 +143,7 @@ public class FString extends Sequence implements Printable, Compilable
     comp.method.compile_invoke_special (initFStringMethod);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)
       && ((OutPort)ps).printReadable;

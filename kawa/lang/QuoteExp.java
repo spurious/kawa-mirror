@@ -27,7 +27,7 @@ public class QuoteExp extends Expression
       comp.compileConstant (value);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%quote ");
     SFormat.print (value, ps);

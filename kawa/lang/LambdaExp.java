@@ -368,7 +368,7 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%lambda (");
     Special prevMode = null;

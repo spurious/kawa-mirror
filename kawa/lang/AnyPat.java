@@ -13,7 +13,7 @@ public class AnyPat extends Pattern implements Printable, Compilable
 
   public static AnyPat make () { return new AnyPat (); }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<match any>");
   }

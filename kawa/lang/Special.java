@@ -1,6 +1,6 @@
 package kawa.lang;
 import gnu.bytecode.*;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /** A class of special one-of-a-kind builtin values. */
 
@@ -29,7 +29,7 @@ public class Special extends Object implements Printable, Compilable
     return name;
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     Symbol.print(name, ps);
   }

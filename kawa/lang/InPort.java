@@ -2,28 +2,8 @@ package kawa.lang;
 import gnu.math.*;
 import java.io.*;
 
-/**
- * An InputStream that handles characters (rather than just bytes).
- */
-
-public class InPort extends FilterInputStream implements Printable
+public class InPort extends LineBufferedReader implements Printable
 {
-  protected byte[] buffer;
-
-  int pos;
-
-  int limit;
-
-  // The current line number (at pos).
-  int linenumber;
-
-  // The position that marks the start of the current line, or -1 if unknown.
-  int linestart;
-
-  protected int markpos = -1;
-
-  protected int marklimit;
-
   String name;
 
   public String getName ()
@@ -39,7 +19,11 @@ public class InPort extends FilterInputStream implements Printable
   public InPort (InputStream in)
   {
     super (in);
-    linenumber = 1;
+  }
+
+  public InPort (Reader in)
+  {
+    super (in);
   }
 
   public InPort (InputStream in, String name)
@@ -48,8 +32,15 @@ public class InPort extends FilterInputStream implements Printable
     this.name = name;
   }
 
+  public InPort (Reader in, String name)
+  {
+    this (in);
+    this.name = name;
+  }
+
   // For now, this is static.  It should probably be thread-local.
-  private static InPort inp = new InPort (System.in, "<stdin>");
+  private static InPort inp = new TtyInPort (System.in, "<stdin>",
+					     OutPort.outDefault());
 
   static public InPort inDefault ()
   {
@@ -61,234 +52,17 @@ public class InPort extends FilterInputStream implements Printable
     inp = in;
   }
 
-  public int getLineNumber ()
-  {
-    return linenumber;
-  }
-
-  public int getColumnNumber ()
-  {
-    return pos - getLineStart ();
-  }
-
-  public void setLineNumber (int linenumber)
-  {
-    this.linenumber = linenumber;
-  }
-
-  public boolean markSupported ()
-  {
-    return true;
-  }
-
-  private final int getLineStart ()
-  {
-    if (linestart < 0)
-      {
-	linestart = pos;
-	while (linestart > 0 && buffer[linestart - 1] != '\n')
-	  linestart--;
-      }
-    return linestart;
-  }
-
-  public synchronized void mark(int read_limit)
-  {
-    marklimit = read_limit;
-    markpos = pos;
-  }
-
-  public void reset ()  throws IOException
-  {
-    if (markpos < 0)
-      throw new IOException("Resetting to invalid mark");
-    if (markpos < getLineStart ())
-      {
-	for (pos = linestart; pos > markpos; )
-	  {
-	    --pos;
-	    if (buffer[pos] == '\n')
-	      linenumber--;
-	  }
-	linestart = -1;
-      }
-    pos = markpos;
-  }
-
-  public int available () throws java.io.IOException
-  {
-    int avail;
-    try
-      {
-	avail = in.available ();
-      }
-    catch (java.io.IOException ex)
-      {
-	avail = 0;
-      }
-    return (limit - pos) + avail;
-  }
-
-  /** Read a byte. */
-
-  public int read ()
-       throws java.io.IOException
-  {
-    if (pos >= limit)
-      {
-	// Calculate how much to save from the existing buffer.
-	// This should be the last line starting before both markpos and pos.
-	int save_start = pos;
-	if (markpos >= 0 && markpos < pos)
-	  {
-	    if (pos - markpos > marklimit)
-	      markpos = -1;
-	    else
-	      save_start = markpos;
-	  }
-	if (getLineStart () > save_start)
-	  {
-	    while (save_start > 0 && buffer[save_start - 1] != '\n')
-	      save_start--;
-	  }
-	else
-	  save_start = linestart;
-
-	int avail;
-	try
-	  {
-	    avail = in.available ();
-	  }
-	catch (java.io.IOException ex)
-	  {
-	    avail = 0;
-	  }
-	if (buffer == null)
-	  buffer = new byte[avail >= 1024 ? 1024 : 256];
-	else
-	  {
-	    byte[] new_buffer;
-	    int copy_size = limit - save_start;
-	    if (copy_size >= buffer.length)
-	      new_buffer = new byte [2 * buffer.length];
-	    else
-	      {
-		new_buffer = buffer;
-		if (save_start == 0)
-		  copy_size = 0;
-	      }
-	    System.arraycopy (buffer, save_start, new_buffer, 0, copy_size);
-	    buffer = new_buffer;
-	  }
-
-	pos -= save_start;
-	if (markpos >= 0)
-	  markpos -= save_start;
-	linestart -= save_start;
-
-	int to_read = buffer.length - pos;
-	if (to_read > avail)
-	  to_read = avail > 0 ? avail : 1;
-	to_read = in.read (buffer, pos, to_read);
-	if (to_read <= 0)
-	  {
-	    limit = pos;
-	    return -1;
-	  }
-	limit = pos + to_read;
-      }
-    int ch = buffer[pos++];
-    if (ch == '\n')
-      {
-	linestart = pos;
-	linenumber++;
-      }
-    return ch;
-  }
-
-  /** Read a (possibly multi-byte) character.
-   * Currently, we assume the external representation is UTF-8. */
-
+  /* Compatibility. */
   public int readChar ()
        throws java.io.IOException
   {
-    int byte0 = read ();
-    if (byte0 < 128) // handles EOF
-      return byte0;
-    int byte1 = read ();
-    if ((byte1 & 0xC80) == 0x80)
-      {
-	if ((byte0 & 0xE0) == 0xC0)
-	  return ((byte0 & 0x3F) << 6) | (byte1 & 0x3F);
-	int byte2 = read ();
-	if ((byte2 & 0xC0) == 0x80)
-	  {
-	    if ((byte0 & 0xF0) == 0xE0)
-	      return ((byte0 & 0x1F) << 12)
-		| ((byte1 & 0x3F) << 6) | (byte2 & 0x3F);
-	    int byte3 = read ();
-	    if ((byte3 & 0xC0) == 0x80)
-	      {
-		if ((byte0 & 0xF8) == 0xF0)
-		  return ((byte0 & 0x0F) << 18) | ((byte1 & 0x3F) << 12)
-		    | ((byte2 & 0x3F) << 6) | (byte3 & 0x3F);
-		int byte4 = read ();
-		if ((byte4 & 0xC0) == 0x80)
-		  {
-		    if ((byte4 & 0xFC) == 0xF8)
-		      return ((byte0 & 0x03) << 24) | ((byte1 & 0x3F) << 18)
-			| ((byte2 & 0x3F) << 12) | ((byte3 & 0x3F) << 6)
-			| (byte4 & 0x3F);
-		    int byte5 = read ();
-		    if ((byte5 & 0xC0) == 0x80)
-		      {
-			if ((byte5 & 0xFE) == 0xFC)
-			  return ((byte0 & 0x1) << 30) | ((byte1 & 0x3F) << 24)
-			    | ((byte2 & 0x3F) << 18) | ((byte3 & 0x3F) << 12)
-			    | ((byte4 & 0x3F) << 6) | (byte5 & 0x3F);
-		      }
-		  }
-	      }
-	  }
-      }
-    // Should probably raise exception (malformed UTF multi-byte).  FIXME.
-    return -1;
-  }
-
-  public void unreadChar ()
-  {
-    for (;;)
-      {
-	byte ch = buffer[--pos];
-	if (ch == '\n')
-	  {
-	    linestart = -1;
-	    linenumber--;
-	  }
-	if ((ch & 0xC0) != 0x80)
-	  return;
-      }
-  }
-
-  public int peekChar ()
-       throws java.io.IOException
-  {
-    int ch = readChar ();
-    if (ch >= 0)
-      unreadChar ();
-    return ch;
-  }
-
-  public void skipChar ()
-       throws java.io.IOException
-  {
-    readChar ();
+    return read ();
   }
 
   Object readSymbol ()
        throws java.io.IOException, ReadError
   {
-    return readSymbol (readChar ());
+    return readSymbol (read ());
   }
 
   Object readSymbol (int c)
@@ -301,15 +75,15 @@ public class InPort extends FilterInputStream implements Printable
 	if (c < 0)
 	  break;
 	char ch = (char)c;
-	if (Character.isSpace (ch)
+	if (Character.isWhitespace (ch)
 	    || ch == ')' || ch == '(' || ch == '"' || ch == ';')
 	  {
-	    unreadChar ();
+	    unread ();
 	    break;
 	  }
 	if (ch == '\\')
 	  {
-	    c = readChar ();
+	    c = read ();
 	    if (c < 0)
 	      break;  // Error
 	    ch = (char) c;
@@ -322,7 +96,7 @@ public class InPort extends FilterInputStream implements Printable
 	    ch = Character.toLowerCase (ch);
 	  }
 	str.append (ch);
-	c = readChar ();
+	c = read ();
       }
     if (lastChar == ':')
       {
@@ -339,7 +113,7 @@ public class InPort extends FilterInputStream implements Printable
   protected Object readCharacter()
        throws java.io.IOException, ReadError  
   {
-    int c = readChar ();
+    int c = read ();
     if (c < 0)
       throw new EofReadError (this, "unexpected EOF in character literal");
     int origc = c;
@@ -371,7 +145,7 @@ public class InPort extends FilterInputStream implements Printable
   protected Object readSpecial()
        throws java.io.IOException, ReadError  
   {
-    int c = readChar ();
+    int c = read ();
     if (c < 0)
       throw new EofReadError (this, "unexpected EOF after #!");
     String name = readSymbol(c).toString();
@@ -407,10 +181,10 @@ public class InPort extends FilterInputStream implements Printable
 	  str.append ((char) c);
 	else
 	  {
-	    unreadChar();
+	    unread();
 	    break;
 	  }
-	c = readChar();
+	c = read();
       }
     return str.toString();
   }
@@ -422,11 +196,11 @@ public class InPort extends FilterInputStream implements Printable
   int readOptionalExponent()
        throws java.io.IOException, ReadError
   {
-    int sign = readChar();
+    int sign = read();
     boolean neg = false;
     int c;
     if (sign == '+' || sign == '-')
-      c = readChar();
+      c = read();
     else
       {
 	c = sign;
@@ -443,7 +217,7 @@ public class InPort extends FilterInputStream implements Printable
       {
 	for (;;)
 	  {
-	    c = readChar();
+	    c = read();
 	    int d = Character.digit ((char)c, 10);
 	    if (d < 0)
 	      break;
@@ -451,7 +225,7 @@ public class InPort extends FilterInputStream implements Printable
 	  }
       }
     if (c >= 0)
-      unreadChar();
+      unread();
     if (sign == '-')
       value = -value;
     return value;
@@ -467,7 +241,7 @@ public class InPort extends FilterInputStream implements Printable
   public Numeric readSchemeNumber(int radix, char exactness)
        throws java.io.IOException, ReadError
   {
-    return readSchemeNumber (readChar(), radix, exactness);
+    return readSchemeNumber (read(), radix, exactness);
   }
 
   public Numeric readSchemeNumber(int c, int radix, char exactness)
@@ -475,7 +249,7 @@ public class InPort extends FilterInputStream implements Printable
   {
     while (c == '#')
       {
-	c = readChar();
+	c = read();
 	switch (c)
 	  {
 	  case 'e':
@@ -496,25 +270,25 @@ public class InPort extends FilterInputStream implements Printable
 	  default:
 	    throw new ReadError (this,  "unrecognized #-construct in number");
 	  }
-	c = readChar ();
+	c = read ();
       }
     if (radix == 0)
       radix = 10;
     Quantity num = readSchemeReal (c, radix, exactness);
-    c = readChar();
+    c = read();
     if (c == '@')
       {
-	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	Quantity im = readSchemeReal (read(), radix, exactness);
 	return Quantity.add (num, Quantity.mul (im, Complex.imOne()), 1);
       }
     else if (c == '+')
       {
-	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	Quantity im = readSchemeReal (read(), radix, exactness);
 	return Quantity.add (num, im, 1);
       }
     else if (c == '-')
       {
-	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	Quantity im = readSchemeReal (read(), radix, exactness);
 	return Quantity.add (num, im, -1);
       }
     else if (Character.isLowerCase ((char)c)
@@ -524,7 +298,7 @@ public class InPort extends FilterInputStream implements Printable
 			     "unexpected latter '"+((char)c)+"'after number");
       }
     else if (c >= 0)
-      unreadChar();
+      unread();
     return num;
   }
 
@@ -536,12 +310,12 @@ public class InPort extends FilterInputStream implements Printable
     StringBuffer str = new StringBuffer(20);
     if (c=='+')
       {
-	c = readChar();
+	c = read();
       }
     else if (c=='-')
       {
 	str.append ((char) c);
-	c = readChar ();
+	c = read ();
       }
 
     int digits = 0;
@@ -561,28 +335,28 @@ public class InPort extends FilterInputStream implements Printable
 	else if (radix == 10 && isFloat < 2
 		 && (c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l'||
 		     c == 'E' || c == 'S' || c == 'F' || c == 'D' || c == 'L')
-		 && ((next = peekChar()) == '+' || next == '-'
+		 && ((next = peek()) == '+' || next == '-'
 		     || Character.digit((char)next, 10) >= 0))
 	  {
 	    isFloat = 2;
 	    str.append('e');
 	    str.append(readOptionalExponent());
-	    c = readChar();
+	    c = read();
 	    break;
 	  }
 	else // catches EOF
 	  break;
 	str.append((char) c);
-	c = readChar();
+	c = read();
       }
     if (digits == 0)
       throw new ReadError (this, "number constant with no digits");
     if (c == '/')
       {
-	c = peekChar ();
+	c = peek ();
 	if (Character.digit ((char)c, radix) < 0)
 	  throw new ReadError (this,"\"/\" in rational not followed by digit");
-	Numeric denominator = readSchemeReal(readChar(), radix, 'e');
+	Numeric denominator = readSchemeReal(read(), radix, 'e');
 	if (isFloat > 0 || ! (denominator instanceof IntNum))
 	  throw new ReadError (this, "invalid fraction");
 	return RatNum.make (IntNum.valueOf(str.toString (), radix),
@@ -597,7 +371,7 @@ public class InPort extends FilterInputStream implements Printable
 	if (word.length() == 1 && (c == 'i' || c == 'I'))
 	  {
 	    imaginary = true;
-	    c = readChar();
+	    c = read();
 	    break;
 	  }
 	else
@@ -612,13 +386,13 @@ public class InPort extends FilterInputStream implements Printable
 	      unit = u;
 	    else
 	      unit = Unit.mul(unit, u);
-	    c = readChar();
+	    c = read();
 	    if (exactness != 'e')
 	      isFloat = 1;
 	  }
       }
     if (c >= 0)
-      unreadChar();
+      unread();
 
     RealNum rnum;
     if (isFloat == 0 && exactness != 'i')
@@ -647,14 +421,14 @@ public class InPort extends FilterInputStream implements Printable
     do
       {
 	int next, v;
-	c = readChar();
+	c = read();
 	switch (c)
 	  {
 	  case '"':
 	    inString = false;
             break;
 	  case '\\':
-	    switch (c = readChar())
+	    switch (c = read())
 	      {
 	      case 'a':  c = '\007';  break;
 	      case 'b':  c = '\b';    break;
@@ -668,7 +442,7 @@ public class InPort extends FilterInputStream implements Printable
 		c = 0;
 		for (int i = 4;  --i >= 0; )
 		  {
-		    v = readChar ();
+		    v = read ();
 		    if (v < 0)
 		      throw new EofReadError (this,
 					      "premature EOF in \\u escape");
@@ -682,19 +456,19 @@ public class InPort extends FilterInputStream implements Printable
 	      case '0':  case '1':  case '2':  case '3':
 	      case '4':  case '5':  case '6':  case '7':
 		c = Character.digit ((char) c, 8);
-		if ((next = readChar ()) >= 0)
+		if ((next = read ()) >= 0)
 		  {
 		    if ((v = Character.digit ((char) next, 8)) < 0)
-		      unreadChar ();
+		      unread ();
 		    else
 		      {
 			c = c * 8 + v;
-			if ((next = readChar ()) >= 0)
+			if ((next = read ()) >= 0)
 			  {
 			    if ((v = Character.digit ((char) next, 8)) >= 0)
 			      c = c * 8 + v;
 			    else
-			      unreadChar ();
+			      unread ();
 			  }
 		      }
 		  }
@@ -735,22 +509,22 @@ public class InPort extends FilterInputStream implements Printable
     int c;
     do
       {
-	c = readChar ();
+	c = read ();
 	if (c < 0)
 	  return;
 	if (c == ';')
 	  {
 	    for (;;)
 	      {
-		c = readChar ();
+		c = read ();
 		if (c < 0)
 		  return;
 		if (c == '\n')
 		  break;
 	      }
 	  }
-      } while (Character.isSpace ((char) c));
-    unreadChar ();
+      } while (Character.isWhitespace ((char) c));
+    unread ();
   }
 
   /** Read a list (possibly improper) of zero or more Scheme forms.
@@ -765,23 +539,23 @@ public class InPort extends FilterInputStream implements Printable
     for (;;)
       {
 	skipWhitespaceAndComments();
-	int c = peekChar ();
+	int c = peek ();
 	if (c == ')' || c < 0)
 	  break;
-	skipChar ();
+	skip ();
 	if (c == '.')
 	  {
-	    int next = peekChar ();
+	    int next = peek ();
 	    if (next < 0)
 	      throw new EofReadError (this, ". followed by EOF");
-	    if (Character.isSpace((char)next))
+	    if (Character.isWhitespace((char)next))
 	      {
 		if (last == null)
 		  throw new ReadError (this, ". at start of list");
 		//-- Read the cdr for the Pair
 		Object cdr = readSchemeObject ();
 		skipWhitespaceAndComments();
-		if (peekChar () != ')')
+		if (peek () != ')')
 		  throw new ReadError (this, ". OBJECT not followed by )");
 		last.cdr = cdr;
 		return list;
@@ -808,7 +582,7 @@ public class InPort extends FilterInputStream implements Printable
        throws java.io.IOException, ReadError
   {
     List list = readListBody ();
-    int c = readChar ();
+    int c = read ();
     if (c < 0)
 	throw new EofReadError (this, "unexpected EOF in list");
     return list;
@@ -817,7 +591,7 @@ public class InPort extends FilterInputStream implements Printable
   public Object readSchemeObject ()
       throws java.io.IOException, ReadError
   {
-    return readSchemeObject (readChar ());
+    return readSchemeObject (read ());
   }
   public Object readSchemeObject (int c)
       throws java.io.IOException, ReadError
@@ -825,8 +599,8 @@ public class InPort extends FilterInputStream implements Printable
     for (;;)
       {
 	int next;
-	while (Character.isSpace((char)c))
-	  c = readChar ();
+	while (Character.isWhitespace((char)c))
+	  c = read ();
 	switch (c)
 	  {
 	  case -1:
@@ -834,7 +608,7 @@ public class InPort extends FilterInputStream implements Printable
 	  case ';':
 	    do
 	      {
-		c = readChar();
+		c = read();
 		if (c < 0) // EOF
 		  return List.Empty;
 	      } while (c!='\n');
@@ -851,9 +625,9 @@ public class InPort extends FilterInputStream implements Printable
 	    return readQuote(Interpreter.quasiquote_sym);
 	  case ',':
 	    Symbol func;
-	    if (peekChar()=='@')
+	    if (peek()=='@')
 	      {
-		skipChar ();
+		skip ();
 		func = Interpreter.unquotesplicing_sym;
 	      }
 	    else
@@ -862,14 +636,14 @@ public class InPort extends FilterInputStream implements Printable
 	  case '.':
 	  case '+':
 	  case '-':
-	    next = peekChar ();
+	    next = peek ();
 	    if (Character.isDigit((char) next)
 		 || (c != '.' && next == '.'))
 	      return readSchemeNumber(c, 0, ' ');
 	    else
 	      return readSymbol(c);
 	  case '#':
-	    next = readChar();
+	    next = read();
 	    switch (next)
 	      {
 	      case '(':
@@ -892,16 +666,25 @@ public class InPort extends FilterInputStream implements Printable
 	      case 'e':
 		return readSchemeNumber (0, (char) next);
 	      case '|':
-		boolean notAtEnd = true;
+		int commentNesting = 1;
 		do {
-		  c = readChar();
+		  c = read();
+		  if (c == '|')
+		    {
+		      c = read();
+		      if (c == '#')
+			commentNesting--;
+		    }
+		  else if (c == '#')
+		    {
+		      c = read();
+		      if (c == '|')
+			commentNesting++;
+		    }
 		  if (c < 0)
 		    throw new EofReadError (this,
 					    "unexpected eof in #| comment.");
-
-		  if (c=='|' && readChar()=='#')
-		    notAtEnd = false;
-		} while (notAtEnd);
+		} while (commentNesting > 0);
 		break;
 	      default:
 		throw new ReadError (this, "An invalid #-construct was read.");
@@ -913,11 +696,11 @@ public class InPort extends FilterInputStream implements Printable
 	    else
 	      return readSymbol(c);
 	  }
-	c = readChar ();
+	c = read ();
       }
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<input-port");
     if (name != null)

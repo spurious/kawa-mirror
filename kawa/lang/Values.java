@@ -41,7 +41,7 @@ public class Values implements Printable
     return proc.applyN (vals);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     if (this == empty)
       {

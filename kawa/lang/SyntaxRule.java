@@ -87,7 +87,7 @@ public class SyntaxRule implements Compilable
   final static int FIRST_LITERALS = 6;
 
   /* DEBUGGING
-  void print_template_program (java.io.PrintStream ps)
+  void print_template_program (java.io.PrintWriter ps)
   {
     for (int i = 0;  i < template_program.length (); i++)
       {

@@ -33,7 +33,7 @@ public class PairPat extends Pattern implements Printable, Compilable
     return cdr.match (pair.cdr, vars, start_vars + car_count);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<pair-pattern car: ");
     SFormat.print (car, ps);

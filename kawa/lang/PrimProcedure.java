@@ -61,7 +61,7 @@ public class PrimProcedure extends ProcedureN
 
   static Hashtable types;
 
-  public static Type string2Type (String name)
+  public static Type getNamedType (String name)
   {
     if (types == null)
       {
@@ -80,8 +80,25 @@ public class PrimProcedure extends ProcedureN
 	types.put ("java.lang.Object", Type.pointer_type);
 	types.put ("String", Type.string_type);
 	types.put ("java.lang.String", Type.string_type);
+
+	types.put ("<void>", Type.void_type);
+	types.put ("<int>", Type.int_type);
+	types.put ("<char>", Type.char_type);
+	types.put ("<object>", Type.pointer_type);
+	types.put ("<integer>", new ClassType("gnu.math.IntNum"));
+	types.put ("<symbol>", new ClassType("kawa.lang.Symbol"));
+	types.put ("<keyword>", new ClassType("kawa.lang.Keyword"));
+	types.put ("<list>", new ClassType("kawa.lang.List"));
+	types.put ("<pair>", new ClassType("kawa.lang.Pair"));
+	types.put ("<string>", new ClassType("kawa.lang.FString"));
+	types.put ("<vector>", new ClassType("kawa.lang.Vector"));
       }
-    Type t = (Type) types.get(name);
+    return (Type) types.get(name);
+  }
+
+  public static Type string2Type (String name)
+  {
+    Type t = getNamedType (name);
     if (t != null)
       return t;
     if (name.endsWith("[]"))

@@ -228,6 +228,14 @@ public class Translator extends Object
 	// to the original Symbol.  Here, use the original Symbol.
 	if (binding != null && binding instanceof Symbol)
 	  return new ReferenceExp ((Symbol) binding);
+	String name = sym.toString();
+	int len = name.length();
+	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
+	  {
+	    gnu.bytecode.Type type = PrimProcedure.getNamedType(name);
+	    if (type != null)
+	      return new QuoteExp(type);
+	  }
 	return new ReferenceExp (sym, resolve (sym, (Declaration) binding));
       }
     else if (exp instanceof Expression)

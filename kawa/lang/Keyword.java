@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 public class Keyword extends Object implements Printable, Compilable
 {
@@ -48,7 +48,7 @@ public class Keyword extends Object implements Printable, Compilable
     return name+':';
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     Symbol.print(name, ps);
     ps.print(':');

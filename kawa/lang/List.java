@@ -1,5 +1,5 @@
 package kawa.lang;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * Semi-abstract class for Scheme lists.
@@ -13,7 +13,7 @@ public class List extends Sequence implements Printable
 
   static public final List Empty = new List ();
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     // Gets overridden for Pair.
     ps.print("()");

@@ -99,7 +99,7 @@ public class Vector extends Sequence implements Printable, Compilable
     comp.method.compile_pop (1);
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     int size = value.length;
     ps.print("#(");

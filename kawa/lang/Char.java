@@ -108,7 +108,7 @@ public class Char implements Printable, Compilable
 				"backspace",
 				"rubout" };
 
-  public void print(PrintStream ps)
+  public void print(PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)
       && ((OutPort)ps).printReadable;

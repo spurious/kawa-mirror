@@ -31,7 +31,7 @@ public class BeginExp extends Expression
     exps[i].compile_with_linenumber (comp, flags);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%begin");
     int n = exps.length;

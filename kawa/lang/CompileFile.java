@@ -17,10 +17,10 @@ public class CompileFile extends Procedure2
   public static final ModuleExp read (String name, Translator tr)
        throws GenericError
   {
-    FileInputStream fstream;
+    FileReader fstream;
     try
       {
-	fstream = new FileInputStream (name);
+	fstream = new FileReader (name);
       }
     catch (java.io.FileNotFoundException e)
       {

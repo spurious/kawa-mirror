@@ -46,7 +46,7 @@ public class LetExp extends ScopeExp
     comp.method.popScope ();
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%let (");
     Variable var = firstVar ();

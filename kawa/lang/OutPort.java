@@ -2,29 +2,52 @@ package kawa.lang;
 import java.io.*;
 
 /**
- * An OutputStream that handles characters (rather than just bytes).
+ * An extended Writer.
  */
 
-public class OutPort extends PrintStream implements Printable
+public class OutPort extends PrintWriter implements Printable
 {
   String name;
+  private Writer base;
 
   public OutPort (OutputStream out)
   {
-    super (out);
+    this (out, null);
   }
 
   public OutPort (OutputStream out, String name)
   {
+    this(new BufferedWriter(new OutputStreamWriter(out)), true, name);
+  }
+
+  public OutPort (Writer out)
+  {
+    super (out);
+    base = base;
+  }
+
+  public OutPort (Writer out, String name)
+  {
     super (out);
     this.name = name;
+    base = out;
+  }
+
+  public OutPort (Writer out, boolean autoflush, String name)
+  {
+    super (out, autoflush);
+    this.name = name;
+    base = out;
   }
 
   public boolean printReadable;
 
   // For now, these are static.  They should probably be thread-local.
-  private static OutPort out = new OutPort (System.out, "<stdout>");
-  private static OutPort err = new OutPort (System.err, "<stderr>");
+  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.err))), true, "<stdout>");
+  private static OutPort out = outInitial;
+
+  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), "<stderr>");
+  private static OutPort err = errInitial;
 
   static public OutPort outDefault ()
   {
@@ -46,6 +69,24 @@ public class OutPort extends PrintStream implements Printable
     err = e;
   }
 
+  public void echo (char[] buf, int off, int len)  throws java.io.IOException
+  {
+    if (base instanceof LogWriter)
+      ((LogWriter)base).echo(buf, off, len);
+  }
+
+  public void closeLogFile ()  throws java.io.IOException
+  {
+    if (base instanceof LogWriter)
+      ((LogWriter)base).closeLogFile();
+  }
+
+  public void setLogFile (String name)  throws java.io.IOException
+  {
+    if (base instanceof LogWriter)
+      ((LogWriter)base).setLogFile(name);
+  }
+
   /**
    * Write a character value to a byte-stream.
    * The default transation generates UTF-8 multi-bytes.
@@ -53,62 +94,7 @@ public class OutPort extends PrintStream implements Printable
    */
   public void writeChar (int i)
   {
-    if (i < 0x7F)
-      write (i);
-    else if (i <= 0x7FF)  // 11 bits
-      {
-	write (0xC0 | ((i >>  6) & 0x1F));
-	write (0x80 | ((i >>  0) & 0x3F));
-      }
-    else if (i <= 0xFFFF) // 16 bits
-      {
-	write (0xE0 | ((i >> 12) & 0x0F));
-	write (0x80 | ((i >>  6) & 0x3F));
-	write (0x80 | ((i >>  0) & 0x3F));
-      }
-    else if (i <= 0x1FFFFF) // 21 bits
-      {
-	write (0xF0 | ((i >> 18) & 0x07));
-	write (0x80 | ((i >> 12) & 0x3F));
-	write (0x80 | ((i >>  6) & 0x3F));
-	write (0x80 | ((i >>  0) & 0x3F));
-      }
-    else if (i <= 0x3FFFFFF) // 26 bits
-      {
-	write (0xF8 | ((i >> 24) & 0x03));
-	write (0x80 | ((i >> 18) & 0x3F));
-	write (0x80 | ((i >> 12) & 0x3F));
-	write (0x80 | ((i >>  6) & 0x3F));
-	write (0x80 | ((i >>  0) & 0x3F));
-      }
-    else // 31 bits
-      {
-	write (0xFC | ((i >> 30) & 0x01));
-	write (0x80 | ((i >> 24) & 0x3F));
-	write (0x80 | ((i >> 18) & 0x3F));
-	write (0x80 | ((i >> 12) & 0x3F));
-	write (0x80 | ((i >>  6) & 0x3F));
-	write (0x80 | ((i >>  0) & 0x3F));
-      }
-  }
-
-  public void print (char c)
-  {
-    writeChar ((int)c);
-  }
-
-  public void print (char[] s)
-  {
-    int n = s.length;
-    for (int i = 0; i < n; i++)
-      writeChar ((int) s[i]);
-  }
-
-  public void print (String s)
-  {
-    int n = s.length();
-    for (int i = 0 ; i < n ; i++)
-      writeChar ((int) s.charAt(i));
+    write (i);
   }
 
   public void writeSchemeObject (Object obj, boolean readable)
@@ -125,7 +111,7 @@ public class OutPort extends PrintStream implements Printable
       }
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<output-port");
     if (name != null)

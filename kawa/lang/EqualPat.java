@@ -23,7 +23,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
 
   public int varCount () { return 0; }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<match equal");
     SFormat.print (value, ps);

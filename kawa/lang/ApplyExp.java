@@ -107,7 +107,7 @@ public class ApplyExp extends Expression
       comp.method.compile_pop (1);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%apply ");
     func.print (ps);

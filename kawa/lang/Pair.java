@@ -1,6 +1,6 @@
 package kawa.lang;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 public class Pair extends List implements Printable, Compilable
 {
@@ -13,7 +13,7 @@ public class Pair extends List implements Printable, Compilable
     cdr = cdrval;
   }
 
-  public void print(java.io.PrintStream ps)
+  public void print(java.io.PrintWriter ps)
   {
     ps.print("(");
     printNoParen(this, ps);
@@ -101,7 +101,7 @@ public class Pair extends List implements Printable, Compilable
       return false;
   }
 
-  static public final void printNoParen (Pair p, java.io.PrintStream ps)
+  static public final void printNoParen (Pair p, java.io.PrintWriter ps)
   {
     for (;;)
       {

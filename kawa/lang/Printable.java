@@ -1,7 +1,7 @@
 package kawa.lang;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 public interface Printable {
-   void print(java.io.PrintStream ps);
+   void print(java.io.PrintWriter ps);
 }

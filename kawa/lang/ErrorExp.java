@@ -20,7 +20,7 @@ public class ErrorExp extends Expression
     throw new GenericError ("evaluated erroreous expression: " + message);
   }
 
-  public void print (java.io.PrintStream ps)
+  public void print (java.io.PrintWriter ps)
   {
     ps.print ("(%error ");
     ps.print (message);

@@ -1,3 +1,29 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* .../*/Makefile.am, Makefile.in:  Updated to autmake-1.5d.
+	Since SOURCES now gets over-written, move source list to EXTRA_DIST.
+	Use automake include instead of autoconf substitution.
+	Remove AUTOMAKE_OPTIONS, except in doc.
+	Various related tweaks.
+	* AUTHORS, INSTALL, depcomp:  New files, required by automake now
+	that AUTOMAKE_OPTIONS is no longer foreign.
+	* Make-rules:  Various updates, now that we use autoamke inclusion.
+	(SED_REFERENCES_SUBS):  Moved from 3 three other Makefile.am's.
+	* configure.in:  Various fixes/tweaks.
+
+	* libtool.m4, ltmain.sh:  Updated to cvs libtool.
+	* libtool.m4:  Don't add -DPIC compile flag if tag is GCJ.
+	(ac_compile. ac_link):  Add definitions.
+	* ltcf-c.sh, ltcf-cxx.sh, ltcf-gcj.sh, ltconfig:  Removed.
+
+	* kawa/lang/CompileFile.java (read):  Add throws specifications since
+	Interpreter's parseFile.has them.
+	(compile_to_files):  Add catches.
+
+	* kawa/standard/Scheme.java (eval):  Removed - now in Intrepreter.
+
+	* kawa/standard/require.java (<clinit>):  HTTP is now in slib package.
+
 2002-02-20  Per Bothner  <per@bothner.com>
 
 	* config.sub, config.guess:  Updated from master versions.

@@ -1,3 +1,12 @@
+The class gnu.expr.Interpreter has various new 'eval' methods that
+are useful for evaluating Scheme/BRL/XQuery/... expressions from Java.
+
+Kawa now uses current versions of autoconf, autoamke, and libtool,
+alowing the use of automake file inclusion.
+
+The comparisons <, <=, -, >, and => now compile to optimized Java
+arithmetic if both operands are <int> or a literal that fits in <int>.
+
 Changes from Kawa 1.6.97 to 1.6.98.
 ==================================
 Generated HTML and Postscrpt documents are no longer included in the
@@ -16,7 +25,7 @@ There are a number of new functions for accessing HTTP requests and
 generating HTTP responses.
 
 Kawa now supports a new experimental programming KRL (the "Kawa Report
-Language").  You select this language using --krl on teh Kawa command
+Language").  You select this language using --krl on the Kawa command
 link.  It allows Scheme code to be inside template files, like HTML
 pages, using a syntax based on BRL (brl.sourceforge.net).  However,
 KRL has soem experimental changes to both BRL and standard Scheme.

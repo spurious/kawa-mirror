@@ -1,3 +1,12 @@
+Guile-style keyword syntax '#:KEYWORD' is recognized.
+(Note this conflicts with Common Lisp syntax for uninterned symbols.)
+
+New syntax forms define-class and define-simple-class allow you to
+define classes more easily.  define-class supports true multiple
+inheritance and first class class values, where each Scheme class
+is compiled to a pair of an inteface and a class.  define-simple-class
+generates more efficient and Java-compatible classes.
+
 Changes from Kawa 1.6.94 to 1.6.95.
 ==================================
 A new language "xquery" implements a (so far small subset of) XQuery,

@@ -1,3 +1,22 @@
+2001-08-17  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main):  Don't getInterpreter on --connect.
+	Wait until processing other arguments.
+	
+	* kawa/standard/Scheme.java (demangleName):  Moved two methods
+	to gnu/expr/Compilation.java.
+
+	* kawa/standard/Scheme.java (initScheme):  Define define-class,
+	define-simple-class. map-values, and children.
+	* kawa/standard/define_class.java:  New working implementation.
+	* kawa/standard/load.java (loadSource):  If getMainPrintValues(),
+	then expression values are printed to standard output.
+	* kawa/Shell.java (run):  Clear list of errors after SyntaxException.
+	(runString):  If ModuleBody.getMainPrintValues(), print to outDefault.
+	
+	* kawa/standard/object.java (rewriteClassDef):  Take ClassExp.
+	Allow super type to be non-constant.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.95.

@@ -14,9 +14,6 @@ dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], cl
 AC_ARG_ENABLE(kawa-frontend,
   [  --enable-kawa-frontend   Build "kawa" front-end program using readline],
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
-if test $enable_kawa_frontend = yes ; then
-  kawa_bin=kawa
-fi
 
 AC_ARG_WITH(gcj,
   [  --gjc    Compile Kawa using GCJ (GNU Compiler for Java)])

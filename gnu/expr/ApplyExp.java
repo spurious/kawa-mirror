@@ -129,6 +129,22 @@ public class ApplyExp extends Expression
 	    func_name = func_decl.string_name ();
 	  }
       }
+    else if (exp.func instanceof QuoteExp)
+      {
+        Object proc = ((QuoteExp) exp.func).getValue();
+        // If it wasn't inlineable, we already checked for this in Translator.
+        if (proc instanceof Inlineable)
+          {
+            PrimProcedure pproc
+              = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
+            if (pproc != null)
+              {
+                exp = new ApplyExp(pproc, exp.args);
+                ((Inlineable) pproc).compile(exp, comp, target);
+                return;
+              }
+          }
+      }
     if (func_lambda != null)
       {
 	// These error message should really be done earlier,

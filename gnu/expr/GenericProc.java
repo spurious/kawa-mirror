@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.Type;
 
 /** A collection of MethodProcs;  one is chosen at apply time. */
 
@@ -57,17 +58,17 @@ public class GenericProc extends MethodProc
     return new Object[2];
   }
 
-  public int isApplicable(Expression[] args)
+  public int isApplicable(Type[] args)
   {
-    int best = 0;
+    int best = -1;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
         int result = method.isApplicable(args);
-        if (result == 2)
-          return 2;
         if (result == 1)
-          best = 1;
+          return 1;
+        if (result == 0)
+          best = 0;
       }
     return best;
   }

@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.Type;
 
 /** Similar to a CLOS method.
  * Can check if arguments "match" before committing to calling method. */
@@ -16,10 +17,42 @@ public abstract class MethodProc extends ProcedureN
   }
 
   /** Test if method is applicable to an invocation with given arguments.
-   * Returns 0 if no; 2 if yes; 1 if need to check at run-time. */
-  public int isApplicable(Expression[] args)
+   * Returns -1 if no; 1 if yes; 0 if need to check at run-time. */
+  public int isApplicable(Type[] argTypes)
   {
-    return 1;
+    int argCount = argTypes.length;
+    int num = numArgs();
+    if (argCount < (num & 0xFFF)
+	|| (num >= 0 && argCount > (num >> 12)))
+      return -3;
+    int result = 1;
+    for (int i = argCount;  --i >= 0; )
+      {
+        Type ptype = getParameterType(i);
+        int code = ptype.compare(argTypes[i]);
+        if (code == -3)
+          return -1;
+        if (code < 0)
+          result = 0;
+      }
+    return result;
+  }
+
+  /** Return number of paramaters, including optional and rest arguments. */
+  public int numParameters()
+  {
+    int num = numArgs();
+    int max = num >> 12;
+    if (max >= 0)
+      return max;
+    // This isn't really right, but it works for PrimProcedure.  FIXME.
+    int min = num & 0xFFF;
+    return min + 1;
+  }
+
+  public Type getParameterType(int index)
+  {
+    return Type.pointer_type;
   }
 
   /** Match the incoming arguments.
@@ -45,5 +78,51 @@ public abstract class MethodProc extends ProcedureN
     if (err != null)
       throw err;
     return applyV(vars);
+  }
+
+  /** Return the more specific of the arguments.
+   * @return null if neither is more specific. */
+  public static MethodProc mostSpecific(MethodProc proc1, MethodProc proc2)
+  {
+    // True if we've determined proc1 cannot be the more specific.
+    boolean not1 = false;
+    // True if we've determined proc2 cannot be the more specific.
+    boolean not2 = false;
+    int min1 = proc1.minArgs();
+    int min2 = proc2.minArgs();
+    int max1 = proc1.maxArgs();
+    int max2 = proc2.maxArgs();
+    int num1 = proc1.numParameters();
+    int num2 = proc2.numParameters();
+    int limit = num1 > num2 ? num1 : num2;
+    if (max1 != max2)
+      {
+        if (max1 < 0)
+          not2 = true;
+        if (max2 < 0)
+          not1 = true;
+      }
+    if (min1 < min2)
+      not2 = true;
+    else if (min1 > min2)
+      not1 = true;
+    for (int i = 0; i < limit; i++)
+      {
+        Type t1 = proc1.getParameterType(i);
+        Type t2 = proc2.getParameterType(i);
+        if (! t2.isSubtype(t1))
+          {
+            not2 = true;
+            if (not1)
+              return null;
+          }
+        if (! t1.isSubtype(t2))
+          {
+            not1 = true;
+            if (not2)
+              return null;
+          }
+      }
+    return not2 ? proc1 : not1 ? proc2 : null;
   }
 }

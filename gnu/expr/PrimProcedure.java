@@ -25,6 +25,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public final int opcode() { return op_code; }
 
   public Type getReturnType () { return retType; }
+  public void setReturnType (Type retType) { this.retType = retType; }
 
   public Type getReturnType (Expression[] args) { return retType; }
 
@@ -257,6 +258,85 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       comp.compileConstant(Values.empty, target);
     else
       target.compileFromStack(comp, retType);
+  }
+
+  public Type getParameterType(int index)
+  {
+    int lenTypes = argTypes.length;
+    if (index < lenTypes - 1)
+      return argTypes[index];
+    boolean varArgs = takesVarArgs();
+    if (index < lenTypes && ! varArgs)
+      return argTypes[index];
+    // if (! varArgs) ERROR;
+    return ((ArrayType) argTypes[lenTypes - 1]).getComponentType();
+  }
+
+  // This is null in JDK 1.1 and something else in JDK 1.2.
+  private static ClassLoader systemClassLoader
+  = PrimProcedure.class.getClassLoader();
+
+  /** Search for a matching static method in a procedure's class.
+   * @return a PrimProcedure that is suitable, or null. */
+  public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
+  {
+    Class procClass = pproc.getClass();
+    if (procClass.getClassLoader() != systemClassLoader)
+      return null;
+    try
+      {
+        java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
+        java.lang.reflect.Method best = null;
+        Class[] bestTypes = null;
+        String name = pproc.getName();
+        if (name == null)
+          return null;
+        String mangledName = Compilation.mangleName(name);
+        String mangledNameV = mangledName + "$V";
+        for (int i = meths.length;  --i >= 0; )
+          {
+            java.lang.reflect.Method meth = meths[i];
+            int mods = meth.getModifiers();
+            if ((mods & (Access.STATIC|Access.PUBLIC))
+                != (Access.STATIC|Access.PUBLIC))
+              continue;
+            String mname = meth.getName();
+            boolean variable;
+            if (mname.equals("apply") || mname.equals(mangledName))
+              variable = false;
+            else if (mname.equals("apply$V") || mname.equals(mangledNameV))
+              variable = true;
+            else
+              continue;
+            Class[] ptypes = meth.getParameterTypes();
+            if (variable ? ptypes.length - 1 > args.length
+                : ptypes.length != args.length)
+              continue;
+            // In the future, we may try to find the "best" match.
+            if (best != null)
+              return null;
+            best = meth;
+            bestTypes = ptypes;
+          }
+        if (best != null)
+          {
+            ClassType procType = ClassType.make(procClass.getName());
+            Type[] argTypes = new Type[bestTypes.length];
+            for (int i = argTypes.length;  --i >= 0; )
+              argTypes[i] = Type.make(bestTypes[i]);
+            gnu.bytecode.Method method
+              = procType.addMethod(best.getName(), best.getModifiers(),
+                                   argTypes,
+                                   Type.make(best.getReturnType()));
+            PrimProcedure prproc = new PrimProcedure(method);
+            prproc.setName(name);
+            return prproc;
+          }
+      }
+    catch (SecurityException ex)
+      {
+      }
+    return null;
   }
 
   public String getName()

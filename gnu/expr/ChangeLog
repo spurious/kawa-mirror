@@ -1,3 +1,14 @@
+1999-11-03  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  If function is Inlineable but we didn't
+	line it, try PrimProcedure.getMethodFor.
+	* MethodProc.java (isApplicable):  Change arg types and return codes.
+	Implementation now uses Type.compare.
+	(numParameters, getParameterType, mostSpecific):  New methods.
+	* GenericProc.java (isApplicable):  Change arg types and return codes.
+	* PrimProcedure.java (setReturnType, getParameterType): New methods.
+	(getMethodFor):  New static method.  (Code moved from Translator.)
+
 1999-10-25  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (popParams):  Take extra argument.

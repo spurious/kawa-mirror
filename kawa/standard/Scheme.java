@@ -10,12 +10,12 @@ import gnu.text.SourceMessages;
 
 public class Scheme extends Interpreter
 {
-  final void define_proc (Named proc)
+  protected void define_proc (Named proc)
   {
     define (proc.name (), proc);
   }
 
-  final void define_proc (String name, Named proc)
+  protected void define_proc (String name, Named proc)
   {
     if (proc.getName() == null)
       proc.setName(name);
@@ -23,12 +23,12 @@ public class Scheme extends Interpreter
   }
 
   /* Define a procedure to be autoloaded. */
-  final void define_proc (String name, String className)
+  protected void define_proc (String name, String className)
   {
     define (name, new AutoloadProcedure (name, className));
   }
 
-  final void define_syntax (String name, Syntax proc)
+  protected void define_syntax (String name, Syntax proc)
   {
     if (proc.getName() == null)
       proc.setName(name);
@@ -36,7 +36,7 @@ public class Scheme extends Interpreter
   }
 
   /* Define a Syntax to be autoloaded. */
-  final void define_syntax (String name, String className)
+  protected void define_syntax (String name, String className)
   {
     define (name, new AutoloadSyntax (name, className));
   }
@@ -373,6 +373,8 @@ public class Scheme extends Interpreter
       define_proc ("transcript-on", "kawa.lib.ports");
       define_proc ("call-with-input-string", "kawa.lib.ports");  // Extension
       define_proc ("open-input-string", "kawa.lib.ports");  // SRFI-6
+      define_proc ("open-output-string", "kawa.lib.ports");  // SRFI-6
+      define_proc ("get-output-string", "kawa.lib.ports");  // SRFI-6
       define_proc ("call-with-output-string",  // Extension
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
@@ -466,7 +468,7 @@ public class Scheme extends Interpreter
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
       define_proc("static-field", "kawa.standard.static_field");
       define_proc("invoke", "gnu.kawa.reflect.Invoke");
-      define_proc("invoke-static", "gnu.kawa.reflect.InvokeStatic");
+      define_proc("invoke-static", gnu.kawa.reflect.InvokeStatic.invokeStatic);
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -723,6 +725,8 @@ public class Scheme extends Interpreter
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
 	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
+	types.put ("string-output-port",
+                   ClassType.make("gnu.mapping.CharArrayOutPort"));
 	types.put ("record", ClassType.make("kawa.lang.Record"));
 	types.put ("type", ClassType.make("gnu.bytecode.Type"));
 	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));

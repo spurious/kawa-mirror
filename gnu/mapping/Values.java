@@ -1,15 +1,21 @@
 package gnu.mapping;
+import java.io.*;
 
 /** Encapsulate multiple values in a single object.
  * In Scheme and Lisp mainly used to return multiple values from a function.
  */
 
-public class Values implements Printable
+public class Values implements Printable, Externalizable
 {
   public static final Object[] noArgs = new Object[0];
   private Object[] vals;
 
   public static final Values empty = new Values(noArgs);
+
+  public Values ()
+  {
+    vals = noArgs;
+  }
 
   /** Constructor.
    * @param values the values to encapulate
@@ -62,4 +68,32 @@ public class Values implements Printable
       }
     ps.print (">");
   }
+
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the values in order (written using writeObject).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = vals.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeObject(vals[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    Object[] data = len == 0 ? noArgs : new Object[len];
+    for (int i = 0;  i < len;  i++)
+      data[i] = in.readObject();
+    this.vals = data;
+  }
+
+  public Values readResolve() throws ObjectStreamException
+  {
+    return vals.length == 0 ? empty : this;
+  }
+
 }

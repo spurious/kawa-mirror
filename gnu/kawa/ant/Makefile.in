@@ -107,9 +107,11 @@ XML_SELECTED = @XML_SELECTED@
 am__include = @am__include@
 am__quote = @am__quote@
 extra_java = @extra_java@
+filesep = @filesep@
 install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
+pathsep = @pathsep@
 
 # These Java sources are not built or used when using configure+make, only
 # when using Ant - but they still should go into the distribution tar file.

@@ -97,14 +97,18 @@ extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 
+AUTOMAKE_OPTIONS = foreign
+
 KAWALIB = ../../..
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 CLEANFILES = tmp* *.log testing.zip *.class
 
-SOURCES = tab.xml.in maketab1.xql tab.html \
-  multab.xql expectedmul.xml descend.xql
+java_sources = TestMisc.java
+
+EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
+  multab.xql expectedmul.xml descend.xql expdescend.xml
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

@@ -1,13 +1,17 @@
+AUTOMAKE_OPTIONS = foreign
+
+@Make_rules@
+
 KAWALIB = ../../..
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 CLEANFILES = tmp* *.log testing.zip *.class
 
-SOURCES = tab.xml.in maketab1.xql tab.html \
-  multab.xql expectedmul.xml descend.xql
+java_sources = TestMisc.java
 
-@Make_rules@
+EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
+  multab.xql expectedmul.xml descend.xql expdescend.xml
 
 all:
 

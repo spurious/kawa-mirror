@@ -22,7 +22,7 @@ public abstract class Procedure2 extends Procedure
 
   public Object apply0 ()
   {
-    throw new WrongArguments(this.name(), 2, "(?)");
+    throw new WrongArguments(this.getName(), 2, "(?)");
   }
 
   public Object apply1 (Object arg1)

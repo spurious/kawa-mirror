@@ -1,3 +1,12 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
+	* Named.java:  Changed from class to interface.
+	* Procedure.java:  Now implements rather than extends Named.
+	* Procedure2.java:  Use getName() rather than name().
+
 2000-02-19  Per Bothner  <per@bothner.com>
 
 	* SysInPort.java (fill):  Change parameters.

@@ -5,18 +5,35 @@ package gnu.mapping;
  * @author  Per Bothner
  */
 
-public abstract class Procedure extends Named implements Printable
+public abstract class Procedure implements Named, Printable
 {
   protected static Object[] noArgs = Values.noArgs;
 
+  protected String sym_name;
+
+  public String getName()
+  {
+    return sym_name;
+  }
+
+  /** @deprecated */
+  public final String name()
+  {
+    return getName();
+  }
+
+  public final void setName (String name)
+  {
+    sym_name = name;
+  }
+
   public Procedure()
   {
-    super ();
   }
 
   public Procedure(String n)
   {
-    super(n);
+    sym_name = n;
   }
 
   public abstract Object applyN (Object[] args);
@@ -82,7 +99,7 @@ public abstract class Procedure extends Named implements Printable
   public Procedure getSetter()
   {
     if (! (this instanceof HasSetter))
-      throw new RuntimeException("procedure "+name()+ "has no setter");
+      throw new RuntimeException("procedure "+getName()+ "has no setter");
     int num_args = numArgs();
     if (num_args == 0x0000)
       return new Setter0(this);

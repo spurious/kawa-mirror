@@ -18,6 +18,7 @@
 ;each case.
 
 ;(require 'string-case)
+(require 'generic-write)
 
 ;; Parse the output of NUMBER->STRING.
 ;; Returns a list: (sign-character digit-string exponent-integer)
@@ -459,7 +460,6 @@
 
 	      ;; SLIB extension
 	      ((#\a #\A)		;#\a #\A are pretty-print
-	       (require 'generic-write)
 	       (let ((os "") (pr precision))
 		 (generic-write
 		  (car args) (not alternate-form) #f

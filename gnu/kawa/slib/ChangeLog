@@ -1,3 +1,10 @@
+2001-02-28  Per Bothner  <per@bothner.com>
+
+	* SLib.java:  Removed; functionality moved to kawa.standard.require.
+
+	* printf.scm: (require 'generic-write) moved to top-level.  This is
+	a work-around for some bugs in require.
+
 2001-02-16  Per Bothner  <per@bothner.com>
 
 	* XML.scm:  New module.

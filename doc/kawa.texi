@@ -3257,7 +3257,8 @@ Here are the currently supported features.
 The Kawa module system is based on the features of the Java class system.
 
 @menu
-* Records::
+* Record types::          Defining Record Types
+* Dynamic records::       Creating New Record Types On-the-fly
 * Mangling::              Mapping Scheme names to Java names
 * Allocating objects::
 * Field operations::      Accessing fields of Java objects
@@ -3276,13 +3277,102 @@ it using parentheses: @samp{(this)}.  A planned extension will
 allow an optional class specifier (needed for nested clases).
 @end deffn
 
+@node Record types, Dynamic records, Objects Classes and Modules, Objects Classes and Modules
 
-@node Records, Mangling, Objects Classes and Modules, Objects Classes and Modules
-@section Records
+The @code{define-record-type} form can be used for creating new data
+types, called record types. A predicate, constructor, and field
+accessors and modifiers are defined for each record type.
+The @code{define-record-type} feature is specified
+by @uref{http://srfi.schemers.org/srfi-9/srfi-9.html,SRFI-9},
+which is implemented by many modern Scheme implementations.
 
-The Record package provides a facility for users to define their own
-record data types.  Records are extensions of the class @code{Record}.
-These procedures use the Java 1.1 reflection facility.
+@deffn Syntax define-record-type @var{type-name} (@var{constructor-name} @var{field-tag} ...) @var{predicate-name} (@var{field-tag} @var{accessor-name} [@var{modifier-name}]) ...
+
+The form @code{define-record-type} is generative: each use creates a new
+record type that is distinct from all existing types, including other
+record types and Scheme's predefined types. Record-type definitions may
+only occur at top-level (there are two possible semantics for `internal'
+record-type definitions, generative and nongenerative, and no consensus
+as to which is better).
+
+An instance of @code{define-record-type} is equivalent to the following definitions:
+@itemize @bullet
+@item
+The @var{type-name} is bound to a representation of the record type
+itself.
+@item
+The @var{constructor-name} is bound to a procedure that takes
+as many arguments as there are @var{field-tag}s in the
+@code{(@var{constructor-name} ...)} subform and returns
+a new @var{type-name} record. Fields whose tags are listed with
+@var{constructor-name} have the corresponding argument as their initial
+value. The initial values of all other fields are unspecified.
+@item
+The @var{predicate-name} is a predicate that returns @code{#t}
+when given a value returned by @var{constructor-name}
+and @code{#f} for everything else.
+@item
+Each @var{accessor-name} is a procedure that takes a record of
+type @var{type-name} and returns the current value of the corresponding field.
+It is an error to pass an accessor a value which is not a record of the
+appropriate type.
+@item
+Each @var{modifier-name} is a procedure that takes a record of
+type @var{type-name} and a value which becomes the new value of
+the corresponding field.
+The result (in Kawa) is the empty value @code{#!void}.
+It is an error to pass a
+modifier a first argument which is not a record of the appropriate type.
+@end itemize
+
+Set!ing the value of any of these identifiers has no effect on the
+behavior of any of their original values.
+@end deffn
+
+Here is an example of how you can define a record type named @code{pare}
+with two fields @code{x} and @code{y}:
+@example
+(define-record-type pare
+  (kons x y)
+  pare?
+  (x kar set-kar!)
+  (y kdr))
+@end example
+
+The above defines @code{kons} to be a constructor,
+@code{kar} and @code{kdr} to be accessors,
+@code{set-kar!} to be a modifier,
+and @code{pare?} to be a predicate for @code{pare}s.
+@example
+(pare? (kons 1 2))        --> #t
+(pare? (cons 1 2))        --> #f
+(kar (kons 1 2))          --> 1
+(kdr (kons 1 2))          --> 2
+(let ((k (kons 1 2)))
+  (set-kar! k 3)
+  (kar k))                --> 3
+@end example
+
+The Kawa compiler creates a new Java class with a name derived from
+the @var{type-name}.  If the @var{type-name} is valid Java class name,
+that becomes the name of the Java class.  If the @var{type-name} has
+the form @code{<@var{name}>} (for example @code{<pare>}), then @var{name}
+is used, if possible, for the Java class name.  Otherwise, the name
+of the Java class is derived by "mangling" the @var{type-name}.
+In any case, the package is the same as that of the surrounding module.
+
+Kawa generates efficient code for the @var{predicate-name},
+@var{accessor-name}, and @var{modifier-name} functions.
+The @var{constructor-name} currently compiles into code using run-time
+reflection, but hopefully that will get fixed.
+
+@node Dynamic records, Mangling, Record types, Objects Classes and Modules
+@section Creating New Record Types On-the-fly
+
+Calling the @code{make-record-type} procedure creates a new record data
+type at run-time, without any compile-time support.
+It is primarily provided for compatibility; in most cases it is better
+to use the @code{define-record-type} form (@pxref{Record types}).
 
 @defun make-record-type type-name field-names
 Returns a @dfn{record-type descriptor}, a value representing a new data
@@ -3389,7 +3479,10 @@ field-names argument given in the call to @code{make-record-type} that
 created the type represented by @var{rtd}.@refill
 @end defun
 
-@node Mangling, Allocating objects, Records, Objects Classes and Modules
+Records are extensions of the class @code{Record}.
+These procedures use the Java 1.1 reflection facility.
+
+@node Mangling, Allocating objects, Dynamic records, Objects Classes and Modules
 @section Mapping Scheme names to Java names
 
 Programs use "names" to refer to various values and procedures.
@@ -4990,14 +5083,18 @@ which is Copyright (C) William D Clinger (1999). All Rights Reserved.
 This manual has quoted from SRFI-8 (receive: Binding to multiple values),
 which is Copyright (C) John David Stone (1999). All Rights Reserved.
 
+This manual has quoted from SRFI-9 (Defining Record Types)
+which is Copyright (C) Richard Kelsey (1999).  All Rights Reserved.
+
 This manual has quoted from SRFI-11 (Syntax for receiving multiple values),
 which is Copyright (C) Lars T. Hansen (1999). All Rights Reserved.
 
 This manual has quoted from SRFI-25 (Multi-dimensional Array Primitives),
 which is Copyright (C) Jussi Piitulainen (2001). All Rights Reserved.
 
-The following notice applies to SRFI-6, SRFI-8, SRFI-11, and SRFI-25,
-which is quoted in this manual, but it does not apply to the manual as a whole:
+The following notice applies to SRFI-6, SRFI-8, SRFI-9, SRFI-11, and
+SRFI-25, which are quoted in this manual, but it does not apply to the
+manual as a whole:
 
 @quotation
 This document and translations of it may be copied and furnished to

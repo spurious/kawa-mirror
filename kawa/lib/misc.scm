@@ -5,8 +5,11 @@
              env sym)
        #!null)))
 
-;;; Here %V is a macro defined in the Makefile.
-(define (scheme-implementation-version) (%V))
+(define (scheme-implementation-version)
+  (constant-fold
+   (primitive-constructor <string> (<java.lang.String>))
+   (constant-fold (primitive-static-method <kawa.Version> "getVersion"
+					   <java.lang.String> ()))))
 
 (define (scheme-window #!optional share)
   ((primitive-constructor <kawa.GuiConsole> (<kawa.lang.Interpreter>))

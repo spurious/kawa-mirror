@@ -66,6 +66,15 @@
 					  (or (eqv? key 'datum)
 					      (%case-match key more ...)))))
 
+;;; AND
+
+(define-syntax and
+  (syntax-rules ()
+		((and) #t)
+		((and test) test)
+		((and test1 test2 ...)
+		 (if test1 (and test2 ...) #f))))
+
 ;;; LET (including named let)
 
 (define-syntax let (syntax-rules ()

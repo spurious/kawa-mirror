@@ -28,25 +28,28 @@
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
-;; NOTE:  Guile has port-line.  RScheme has input-port-line-number.
+(define (port-line #!optional (port (current-input-port)))
+  ((primitive-virtual-method <kawa.lang.LineBufferedReader> "getLineNumber"
+			     <int> ())
+   port))
 (define (input-port-line-number port)
-  (+ 1
-     ((primitive-virtual-method <kawa.lang.LineBufferedReader> "getLineNumber"
-				<int> ())
-      port)))
+  (+ 1 (port-line port)))
 
-;; NOTE: Guile has set-port-line! (and also set-port-column!)  Change?
-(define (set-input-port-line-number! port num)
+(define (set-port-line! port line)
   ((primitive-virtual-method <kawa.lang.LineBufferedReader> "setLineNumber"
 			     <void> (<int>))
-   port (- num 1)))
+   port line))
 
-;; NOTE:  Guile has port-column.  Should we change?
+(define (set-input-port-line-number! port num)
+  (set-port-line port (- num 1)))
+
+(define (port-column #!optional (port (current-input-port)))
+  ((primitive-virtual-method <kawa.lang.LineBufferedReader>
+			     "getColumnNumber" <int> ())
+   port))
+
 (define (input-port-column-number port)
-  (+ 1
-     ((primitive-virtual-method <kawa.lang.LineBufferedReader>
-				"getColumnNumber" <int> ())
-      port)))
+  (+ 1 (port-column port)))
 
 (define (default-prompter port)
   (let ((state (input-port-read-state port)))

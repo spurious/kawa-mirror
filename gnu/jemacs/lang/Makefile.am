@@ -15,9 +15,19 @@ java_JAVA=\
   Symbol.java \
   SymbolConstraint.java \
   UnboundSymbolConstraint.java \
-  ValueSymbolConstraint.java
+  ValueSymbolConstraint.java \
+  lambda.java \
+  setq.java
 
 KAWA = $(JAVA) kawa.repl
+KAWAFLAGS = -P gnu.jemacs.lang. -C
 
-all: Makefile classjava.stamp
+SCMSOURCES = SymbolOps.scm
 
+CLEANFILES = *.class *.stamp
+
+scmclasses.stamp: $(SCMSOURCES)
+	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
+	echo timestamp > scmclasses.stamp
+
+all: Makefile classjava.stamp scmclasses.stamp

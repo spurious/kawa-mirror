@@ -77,10 +77,15 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_JAVA =    ELisp.java   ELispReader.java   FunctionSymbolConstraint.java   GeneralSymbolConstraint.java   ObArray.java   Symbol.java   SymbolConstraint.java   UnboundSymbolConstraint.java   ValueSymbolConstraint.java
+java_JAVA =    ELisp.java   ELispReader.java   FunctionSymbolConstraint.java   GeneralSymbolConstraint.java   ObArray.java   Symbol.java   SymbolConstraint.java   UnboundSymbolConstraint.java   ValueSymbolConstraint.java   lambda.java   setq.java
 
 
 KAWA = $(JAVA) kawa.repl
+KAWAFLAGS = -P gnu.jemacs.lang. -C
+
+SCMSOURCES = SymbolOps.scm
+
+CLEANFILES = *.class *.stamp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 JAVACFLAGS = 
@@ -180,6 +185,7 @@ installdirs:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -215,7 +221,11 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-all: Makefile classjava.stamp
+scmclasses.stamp: $(SCMSOURCES)
+	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
+	echo timestamp > scmclasses.stamp
+
+all: Makefile classjava.stamp scmclasses.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

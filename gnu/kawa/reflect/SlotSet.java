@@ -10,7 +10,7 @@ public class SlotSet extends Procedure3 implements Inlineable
 
   public static void apply (Object obj, String name, Object value)
   {
-    kawa.lang.Interpreter interpreter = kawa.standard.Scheme.getInstance();
+    Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
     boolean illegalAccess = false;
     name = gnu.expr.Compilation.mangleName(name);
     Class clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();

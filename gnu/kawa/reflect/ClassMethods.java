@@ -47,7 +47,7 @@ public class ClassMethods extends ProcedureN
    */
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
                                            int modifiers, int modmask,
-                                           kawa.lang.Interpreter interpreter)
+                                           Interpreter interpreter)
   {
     Class dclass = dtype.getReflectClass();
     if (dclass == null)
@@ -147,7 +147,7 @@ public class ClassMethods extends ProcedureN
                                  Type rtype, Type[] atypes,
                                  int modifiers, int modmask)
   {
-    kawa.lang.Interpreter interpreter = kawa.standard.Scheme.getInstance();
+    Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
     PrimProcedure[] methods = getMethods(dtype, mname,
                                          modifiers, modmask, interpreter);
     GenericProc gproc = null;

@@ -226,7 +226,7 @@ public class Scheme extends Interpreter
       //-- Section 6.7  -- complete
       define_proc ("string?", "kawa.standard.string_p");
       define_proc ("make-string", "kawa.standard.make_string");
-      define_proc ("string", "kawa.standard.string");
+      define_proc ("string", "kawa.standard.string_v");
       define_proc ("string-length", "kawa.standard.string_length");
       define_proc ("string-ref", "kawa.standard.string_ref");
       define_proc ("string-set!", "kawa.standard.string_set_b");

@@ -1,3 +1,12 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* Children.java:  New class, extends CpsProcedure.
+	* NamedChildren.java:  New class, extends CpsProcedure.
+	* StringValue.java:  New class, extends Procedure1.
+	* Makefile.am (java_sources):  Add new classes.
+
+	* Document.java (document):  Call TreeList's beginDocument method.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	New package gnu.xquery.util.

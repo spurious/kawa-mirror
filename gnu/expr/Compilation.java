@@ -429,7 +429,7 @@ public class Compilation
 		  }
 		if (sig1 == 'Z')
 		  {
-		    boolean val = ((PrimType) type).booleanValue(value);
+		    boolean val = PrimType.booleanValue(value);
 		    code.emitPushInt(val ? 1 : 0);
 		    return;
 		  }
@@ -944,7 +944,7 @@ public class Compilation
 	  }
       }
 
-    if (mexp.debugPrintExpr)
+    if (ModuleExp.debugPrintExpr)
       {
 	OutPort dout = OutPort.outDefault();
 	dout.println("[Compiling module-name:" + mexp.getName()
@@ -1008,7 +1008,7 @@ public class Compilation
     */
       {
 	zout = new ZipOutputStream (new FileOutputStream (zar_file));
-	zout.setMethod(zout.STORED); // no compression
+	zout.setMethod(ZipOutputStream.STORED); // no compression
       }
 
     byte[][] classBytes = new byte[numClasses][];

@@ -28,7 +28,8 @@ public class ConsumerTarget extends Target
   {
     CodeAttr code = comp.getCode();
     comp.loadCallContext();
-    code.emitGetField(comp.typeCallContext.getDeclaredField("consumer"));
+    code.emitGetField(Compilation.typeCallContext
+		      .getDeclaredField("consumer"));
     Scope scope = code.getCurrentScope();
     Variable result
       = scope.addVariable(code, Compilation.typeConsumer, "$result");
@@ -46,7 +47,7 @@ public class ConsumerTarget extends Target
       exp.compile(comp, target);
     else
       {
-	ClassType typeValues = comp.typeValues;
+	ClassType typeValues = Compilation.typeValues;
 	compileUsingConsumer(exp, comp, target,
 			     typeValues.getDeclaredMethod("make", 0),
 			     typeValues.getDeclaredMethod("canonicalize", 0));
@@ -114,7 +115,8 @@ public class ConsumerTarget extends Target
 	  methodName = "writeObject";
 	else
 	  {
-	    method = comp.typeValues.getDeclaredMethod("writeValues", 2);
+	    method = (Compilation.typeValues
+		      .getDeclaredMethod("writeValues", 2));
 	    code.emitLoad(consumer);
 	    code.emitInvokeStatic(method);
 	    return;

@@ -3,7 +3,6 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import java.util.Hashtable;
 import gnu.mapping.*;
 
 /** A primitive Procedure implemented by a plain Java method. */

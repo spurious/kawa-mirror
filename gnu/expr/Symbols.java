@@ -1,8 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
 
-import java.io.PrintWriter;
-
 /** Utility class containing various routines to manipulate Scheme symbols.
   * Note Scheme symbols are represented using java.lang.String objects,
   * and there are no Symbol objects. */

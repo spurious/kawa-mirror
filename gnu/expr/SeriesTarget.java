@@ -3,7 +3,6 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.*;
 
 /** The value in the result (as a sequence of values) is passed to a function.
  */

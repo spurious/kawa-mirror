@@ -67,8 +67,8 @@ public class ProcInitializer extends Initializer
                   ((Expression) val).compile(comp, target);
                 else
                   comp.compileConstant(val, target);
-		Method m = comp.typeProcedure.getDeclaredMethod("setProperty",
-								2);
+		Method m = (Compilation.typeProcedure
+			    .getDeclaredMethod("setProperty", 2));
 		code.emitInvokeVirtual(m);
 	      }
 	  }

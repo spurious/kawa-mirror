@@ -3,7 +3,6 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.Values;
 
 /** Same as StackTarget, but catch ClassCastException.
  * Generate code so that if coercion fails, catch ClassCastException,

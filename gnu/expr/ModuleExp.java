@@ -1,5 +1,4 @@
 package gnu.expr;
-import java.io.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.text.*;

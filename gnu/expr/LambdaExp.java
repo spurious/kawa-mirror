@@ -639,7 +639,7 @@ public class LambdaExp extends ScopeExp
       }
     else
       { LambdaExp outer = outerLambda();
-	rtype = comp.typeModuleMethod;
+	rtype = Compilation.typeModuleMethod;
 	if ((flags & NO_FIELD) != 0
 	    || (comp.immediate && outer instanceof ModuleExp))
 	  {
@@ -932,7 +932,7 @@ public class LambdaExp extends ScopeExp
 		    : decl == firstArgsArrayArg.nextDecl()))
 	      {
 		Variable var =
-		  scope.addVariable(null, comp.typeCallContext, "$ctx");
+		  scope.addVariable(null, Compilation.typeCallContext, "$ctx");
 		var.setParameter(true);
 		var.setArtificial(true);
 	      } 
@@ -1105,7 +1105,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    if (decl.field != null)
 	      continue;
-     	    String dname = comp.mangleName(decl.getName());
+     	    String dname = Compilation.mangleName(decl.getName());
 	    String mname = dname;
 	    // Check for existing field with same name.
 	    for (int i = 0; ; )
@@ -1129,7 +1129,7 @@ public class LambdaExp extends ScopeExp
           {
 	    code.emitNew(frameType);
 	    code.emitDup(frameType);
-	    Method constructor = comp.getConstructor(frameType, this);
+	    Method constructor = Compilation.getConstructor(frameType, this);
 	    code.emitInvokeSpecial(constructor);
 
             if (staticLinkField != null)
@@ -1143,7 +1143,7 @@ public class LambdaExp extends ScopeExp
       }
 
     Variable argsArray = this.argsArray;
-    if (min_args == max_args && ! comp.fewerClasses
+    if (min_args == max_args && ! Compilation.fewerClasses
 	&& primMethods == null
 	&& getCallConvention () < Compilation.CALL_WITH_CONSUMER)
       argsArray = null;
@@ -1225,7 +1225,7 @@ public class LambdaExp extends ScopeExp
 		code.emitLoad(argsArray);
 		code.emitPushInt(i - plainArgs);
 		code.emitInvokeStatic(Compilation.makeListMethod);
-		stackType = comp.scmListType;
+		stackType = Compilation.scmListType;
               }
 	    else
 	      { // Keyword argument.

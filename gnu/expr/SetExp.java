@@ -206,7 +206,7 @@ public class SetExp extends Expression
 		valuePushed = true;
 	      }
 	    String setterName = isFuncDef() ? "setFunctionValue" : "set";
-	    code.emitInvokeVirtual(comp.typeSymbol
+	    code.emitInvokeVirtual(Compilation.typeSymbol
 				   .getDeclaredMethod(setterName, 1));
 	    if (isSetIfUnbound())
 	      {

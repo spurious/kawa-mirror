@@ -40,7 +40,7 @@ public class BindingInitializer extends Initializer
       {
 	// FIXME - this should be cached in a local Variable:
 	if (! createNewSymbol)
-	  code.emitInvokeStatic(comp.getCurrentEnvironmentMethod);
+	  code.emitInvokeStatic(Compilation.getCurrentEnvironmentMethod);
 
 	String name = decl.getName();
 	if (name == null)
@@ -50,7 +50,7 @@ public class BindingInitializer extends Initializer
 	if (createNewSymbol)
 	  code.emitInvokeStatic(makeSymbolMethod);
 	else
-	  code.emitInvokeVirtual(comp.getSymbolEnvironmentMethod);
+	  code.emitInvokeVirtual(Compilation.getSymbolEnvironmentMethod);
       }
     else
       {

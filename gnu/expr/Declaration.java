@@ -541,7 +541,7 @@ public class Declaration
     out.print("/fl:");
     out.print(Integer.toHexString(flags));
     Type t = getType();
-    if (t != null && t != type.pointer_type)
+    if (t != null && t != Type.pointer_type)
       {
 	out.print("::");
 	out.print(t.getName());

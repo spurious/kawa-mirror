@@ -1,7 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
 import java.io.*;
-import gnu.lists.*;
 
 public class Keyword implements Printable, Externalizable
 {

@@ -1,5 +1,25 @@
 2004-07-20  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java:  Use static syntax to access static fields/methods.
+	* BindingInitializer.java:  Likewise.
+	* ClassExp.java:  Likewise.
+	* Compilation.java:  Likewise.
+	* ConsumerTarget.java:  Likewise.
+	* Declaration.java:  Likewise.
+	* LambdaExp.java:  Likewise.
+	* ObjectExp.java:  Likewise.
+	* ProcInitializer.java:  Likewise.
+	* SetExp.java:  Likewise.
+	* CheckedTarget.java:  Remove unused import statements.
+	* InlineCalls.java:  Likewise.
+	* Keyword.java:  Likewise.
+	* ModuleExp.java:  Likewise.
+	* ObjectExp.java:  Likewise.
+	* PrimProcedure.java:  Likewise.
+	* SeriesTarget.java:  Likewise.
+	* Symbols.java:  Likewise.
+	* Undefined.java:  Likewise.
+
 	* FindTailCalls.java (findTailCalls):  Take Compilation parameter.
 	* Compilation.java (compile):  Pass this to findTailCalls.
 	* Compilation.java (usingCPSStyle):  Make non-static. 

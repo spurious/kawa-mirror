@@ -1,6 +1,5 @@
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.*;
 
 public class ObjectExp extends ClassExp
 {
@@ -22,7 +21,7 @@ public class ObjectExp extends ClassExp
     CodeAttr code = comp.getCode();
     code.emitNew(type);
     code.emitDup(1);
-    Method init = comp.getConstructor(type, this);
+    Method init = Compilation.getConstructor(type, this);
     if (closureEnvField != null)
       {
 	LambdaExp caller = outerLambda();

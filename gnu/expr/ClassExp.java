@@ -139,8 +139,8 @@ public class ClassExp extends LambdaExp
 		int dot = name.indexOf('.', start);
 		if (dot < 0)
 		  break;
-		nbuf.append(comp.mangleNameIfNeeded(name.substring(start,
-								  dot)));
+		nbuf.append(Compilation
+			    .mangleNameIfNeeded(name.substring(start, dot)));
 		nbuf.append('.');
 		start = dot + 1;
 	      }
@@ -155,7 +155,8 @@ public class ClassExp extends LambdaExp
 		  nbuf.append(comp.classPrefix);
 	      }
 	    if (start < name.length())
-	      nbuf.append(comp.mangleNameIfNeeded(name.substring(start)));
+	      nbuf.append(Compilation
+			  .mangleNameIfNeeded(name.substring(start)));
 	    name = nbuf.toString();
 	  }
 	type.setName(name);

@@ -104,7 +104,7 @@ public class ApplyExp extends Expression
 	  }
 	else
 	  {
-	    code.emitDup(comp.objArrayType);
+	    code.emitDup(Compilation.objArrayType);
 	    code.emitPushInt(i);
 	    arg.compile (comp, Target.pushObject);
 	  }
@@ -217,14 +217,14 @@ public class ApplyExp extends Expression
 	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	    int pc = fswitch.getMaxValue() + 1;
 	    fswitch.addCase(pc, l, code);
-            exp_func.compile (comp, new StackTarget(comp.typeProcedure));
+            exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
 	    comp.loadCallContext();
 
 	    // Emit: context->pc = pc.
 	    comp.loadCallContext();
 	    code.emitPushInt(pc);
 	    code.emitPutField(Compilation.pcCallContextField);
-	    code.emitInvokeVirtual(comp.applyCpsMethod);
+	    code.emitInvokeVirtual(Compilation.applyCpsMethod);
 
 	    // emit[save java stack, if needed]
 	    Type[] stackTypes = code.saveStackTypeState(false);
@@ -298,8 +298,8 @@ public class ApplyExp extends Expression
 	&& (exp.isTailCall() || target instanceof ConsumerTarget)
 	&& ! comp.curLambda.getInlineOnly())
       {
-	ClassType typeContext = comp.typeCallContext;
-	exp_func.compile(comp, new StackTarget(comp.typeProcedure));
+	ClassType typeContext = Compilation.typeCallContext;
+	exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
 	comp.loadCallContext();
 	code.emitDupX();
 	// Stack:  context, proc, context
@@ -318,7 +318,7 @@ public class ApplyExp extends Expression
 	    compileToArray (exp.args, comp);
 	    code.emitInvoke(typeContext.getDeclaredMethod("setArgsN", 1));
 	  }
-	code.emitPutField(comp.procCallContextField);
+	code.emitPutField(Compilation.procCallContextField);
 	if (exp.isTailCall())
 	  {
 	    code.emitReturn();
@@ -336,7 +336,7 @@ public class ApplyExp extends Expression
       }
 
     if (!tail_recurse)
-      exp_func.compile (comp, new StackTarget(comp.typeProcedure));
+      exp_func.compile (comp, new StackTarget(Compilation.typeProcedure));
 
     boolean toArray
       = (tail_recurse ? func_lambda.min_args != func_lambda.max_args
@@ -344,7 +344,7 @@ public class ApplyExp extends Expression
     if (toArray)
       {
 	compileToArray(exp.args, comp);
-	method = comp.applyNmethod;
+	method = Compilation.applyNmethod;
       }
     else if (tail_recurse)
       {
@@ -360,7 +360,7 @@ public class ApplyExp extends Expression
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
-        method = comp.applymethods[args_length];
+        method = Compilation.applymethods[args_length];
       }
     if (tail_recurse)
       {

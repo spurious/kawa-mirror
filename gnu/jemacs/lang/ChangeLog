@@ -1,3 +1,25 @@
+2000-03-17  Per Bothner  <per@bothner.com>
+
+	* ELisp.java:  Inherit from Interpreter directly, not via Scheme.
+	(charIsInt):  Moved here from ELispReader.
+	(getCharacter):  New /moved ???
+	(defun):  If value is Named, set its name, if it doesn't have one.
+	(elispCounter):  New static int field.
+	(<init>):  Set name using elispCounter.
+	Copy over bindings from Scheme.getInstance().
+	Add definitions fro ArrayOps.
+	Add if, while, let, let*.
+	(getNewEnvironment, read, print, getTypeFor):  Copied over from Scheme.
+	* ELispReader.java (charIsInt):  Moved to ELisp.
+	(readCharacter):  Call ELisp.getCharacter.
+	Check for `#\ ' case before calling (new variant of) readEscape.
+
+	* ArrayOps.scm:  New file; defines arrayp, aref, aset, fillarray.
+	* While.java:  new class;  extends Syntax.
+	* Makefile.am, Makefile.in:  Update for new files.
+
+	* setq.java (rewriteForm):  Set PREFER_BINDING2 flag on SetExp.
+
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	Various tweaks for better javadoc processing.

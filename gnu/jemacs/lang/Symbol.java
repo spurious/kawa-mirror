@@ -79,7 +79,6 @@ public class Symbol extends Binding2
 					 Object symbol, Object value)
   {
     Binding2 binding = getBinding(environ, symbol);
-    System.err.println("setFun "+symbol+" bind:"+binding+" val:"+value);
     binding.functionValue = value;
   }
 }

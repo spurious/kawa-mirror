@@ -79,13 +79,13 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_JAVA =    ELisp.java   ELispReader.java   ObArray.java   Symbol.java   NumberCompare.java   defun.java   lambda.java   setq.java
+java_JAVA =    ELisp.java   ELispReader.java   ObArray.java   Symbol.java   NumberCompare.java   While.java   defun.java   lambda.java   setq.java
 
 
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lang. -C
 
-SCMSOURCES = SymbolOps.scm NumberOps.scm
+SCMSOURCES = SymbolOps.scm NumberOps.scm ArrayOps.scm
 
 CLEANFILES = *.class *.stamp
 

@@ -12,6 +12,7 @@ java_JAVA=\
   ObArray.java \
   Symbol.java \
   NumberCompare.java \
+  While.java \
   defun.java \
   lambda.java \
   setq.java
@@ -19,7 +20,7 @@ java_JAVA=\
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lang. -C
 
-SCMSOURCES = SymbolOps.scm NumberOps.scm
+SCMSOURCES = SymbolOps.scm NumberOps.scm ArrayOps.scm
 
 CLEANFILES = *.class *.stamp
 

@@ -18,16 +18,14 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class Interpreter
 {
   // FIXME should be a fluid variable!
-  public static Interpreter defaultInterpreter = null;
-
-  public static Interpreter getInterpreter() { return defaultInterpreter; }
+  static Language defaultLanguage = null;
 
   public static Language getDefaultLanguage()
-  { return (Language) defaultInterpreter; }
+  { return (Language) defaultLanguage; }
 
-  public static void setDefaultLanguage(Interpreter lang)
+  public static void setDefaultLanguage(Language language)
   {
-    defaultInterpreter = lang;
+    defaultLanguage = language;
   }
 
   /**
@@ -575,113 +573,6 @@ public abstract class Interpreter
   public Object coerceToObject(int val)
   {
     return gnu.math.IntNum.make(val);
-  }
-
-  public Procedure getPrompter()
-  {
-    Object property = null;
-    if (hasSeparateFunctionNamespace())
-      property = EnvironmentKey.FUNCTION;
-    return (Procedure) Environment.getCurrent()
-      .get(getSymbol("default-prompter"), property, null);
-  }
-
-  /** Return the result of evaluating a string as a source expression. */
-  public final Object eval (String string) throws Throwable
-  {
-    return eval(new CharArrayInPort(string));
-  }
-
-  /** Evaluate expression(s) read from a Reader.
-   * This just calls eval(InPort).
-   */
-  public final Object eval (Reader in) throws Throwable
-  {
-    return eval(in instanceof InPort ? (InPort) in : new InPort(in));
-  }
-
-  /** Evaluate expression(s) read from an InPort. */
-  public final Object eval (InPort port) throws Throwable
-  {
-    CallContext ctx = CallContext.getInstance();
-    int oldIndex = ctx.startFromContext();
-    try
-      {
-	eval(port, ctx);
-	return ctx.getFromContext(oldIndex);
-      }
-    catch (Throwable ex)
-      { 
-	ctx.cleanupFromContext(oldIndex);
-	throw ex;
-      }
-  }
-
-  /** Evaluate a string and write the result value(s) on a Writer. */
-  public final void eval (String string, Writer out) throws Throwable
-  {
-    eval(new CharArrayInPort(string), out);
-  }
-
-  /** Evaluate a string and write the result value(s) to a PrintConsumer.
-   * This is to disambiguate calls using OutPort or XMLPrinter,
-   * which are both Writer and Consumer. */
-  public final void eval (String string, PrintConsumer out) throws Throwable
-  {
-    eval(string, getOutputConsumer(out));
-  }
-
-  /** Evaluate a string and write the result value(s) to a Consumer. */
-  public final void eval (String string, Consumer out) throws Throwable
-  {
-    eval(new CharArrayInPort(string), out);
-  }
-
-  /** Read expressions from a Reader and write the result to a Writer. */
-  public final void eval (Reader in, Writer out) throws Throwable
-  {
-    eval(in, getOutputConsumer(out));
-  }
-
-  /** Read expressions from a Reader and write the result to a Consumer. */
-  public void eval (Reader in, Consumer out) throws Throwable
-  {
-    InPort port = in instanceof InPort ? (InPort) in : new InPort(in);
-    CallContext ctx = CallContext.getInstance();
-    Consumer save = ctx.consumer;
-    try
-      {
-	ctx.consumer = out;
-	eval(port, ctx);
-      }
-    finally
-      {
-	ctx.consumer = save;
-      }
-  }
-
-  public void eval (InPort port, CallContext ctx) throws Throwable
-  {
-    SourceMessages messages = new SourceMessages();
-    Environment saveEnviron = Environment.getCurrent();
-    if (saveEnviron != environ)
-      Environment.setCurrent(environ);
-    Language saveLang = getDefaultLanguage();
-    setDefaultLanguage(this);
-    try
-      {
-	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
-	ModuleExp.evalModule(environ, ctx, comp);
-      }
-    finally
-      {
-	if (saveEnviron != environ && saveEnviron != null)
-	  Environment.setCurrent(saveEnviron);
-	setDefaultLanguage(saveLang);
-      }
-    if (messages.seenErrors())
-      throw new RuntimeException("invalid syntax in eval form:\n"
-				 + messages.toString(20));
   }
 
   // The compiler finds registerEnvironment by using reflection.

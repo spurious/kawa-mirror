@@ -1,5 +1,12 @@
 2005-03-04  Per Bothner  <per@bothner.com>
 
+	* Interpreter.java (getPromter): Remove unused method.
+	(eval - various overloaded versions): Move to Language.
+	(defaultInterpreter): Rename to defaultLanguage and made non-public.
+	* Language.java (eval - various): Moved from Interpreter.
+	* ModuleBody.java: Update Interpreter->Language various places.
+	* SetExp.java: Likewise.
+
 	* Compilation.java (getInterpreter): Remove deprecated method.
 	* BindingInitializer.java: Update Interpreter->Lanuguage various places.
 	* InlineCalls.java: Likewise.

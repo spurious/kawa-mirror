@@ -70,9 +70,8 @@ public class SetExp extends AccessExp
     Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
       : env.getSymbol(symbol.toString());
     Object property = null;
-    Interpreter interp = Interpreter.getInterpreter();
-    if (isFuncDef()
-	&& interp.hasSeparateFunctionNamespace())
+    Language language = Language.getDefaultLanguage();
+    if (isFuncDef() && language.hasSeparateFunctionNamespace())
       property = EnvironmentKey.FUNCTION;
     if (binding != null
         && ! (binding.context instanceof ModuleExp))
@@ -86,7 +85,7 @@ public class SetExp extends AccessExp
 	if (getHasValue())
 	  return loc;
 	else
-	  return Interpreter.getInterpreter().noValue();
+	  return language.noValue();
       }
 
     Object new_val = new_value.eval (env);
@@ -103,7 +102,7 @@ public class SetExp extends AccessExp
       {
 	env.put(sym, property, new_val);
       }
-    return getHasValue() ? new_val : interp.noValue();
+    return getHasValue() ? new_val : language.noValue();
   }
 
   public void compile (Compilation comp, Target target)

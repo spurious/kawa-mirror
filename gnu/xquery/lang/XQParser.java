@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
+import gnu.xquery.util.*;
 import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
@@ -11,6 +12,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import gnu.kawa.xml.*;
 import gnu.xml.QName;
+import gnu.bytecode.Type;
 
 /** A class to read xquery forms. */
 
@@ -25,7 +27,7 @@ public class XQParser extends LispReader // should be extends Lexer
   int nesting;
   boolean interactive;
 
-  /** Skip whitspace.
+  /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
    * and returns that.  If there are no more non-space characters,
    * returns ' '.  */
@@ -39,6 +41,26 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return ch;
       }
   }
+
+  final void skipComment()
+    throws java.io.IOException, SyntaxException
+  {
+    int seenDashes = 0;
+    int startLine = getLineNumber() + 1;
+    for (;;)
+      {
+	int ch = read();
+	if (ch == '-')
+	  seenDashes++;
+	else if (ch == '}' && seenDashes >= 2)
+	  return;
+	else if (ch < 0)
+	  eofError("non-terminated comment starting at line "+startLine);
+	else
+	  seenDashes = 0;
+      }
+  }
+
 
   final int skipHSpace()
     throws java.io.IOException
@@ -116,6 +138,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int AXIS_SELF = 12;
   // Token types for binary operators.
   // When used as a token code, get the priority by shifting 2 right.
+  static final int OP_WHERE     = 196;
   static final int OP_OR        = 200;          // 'or'
   static final int OP_AND       = 200 + 4;      // 'and'
   static final int OP_EQU       = 200 + 8;      // '='
@@ -133,7 +156,8 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int OP_MOD       = 200 + 20 + 2; // 'mod'
   static final int OP_INTERSECT = 200 + 24;     // 'intersect'
   static final int OP_EXCEPT    = 200 + 24 + 1; // 'except'
-  static final int OP_UNION     = 200 + 24 + 2; // 'except'
+  static final int OP_UNION     = 200 + 24 + 2; // 'union'
+
   
   /**
    * An encoding of the token type:
@@ -171,18 +195,35 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return curToken = EOF_TOKEN;
 	if (next == '\n' || next == '\r')
 	  {
-	    if (nesting > 0)
-	      continue;
-	    return curToken = EOL_TOKEN;
+	    if (nesting <= 0)
+	      return curToken = EOL_TOKEN;
 	  }
-	if (next != ' ' && next != '\t')
+	else if (next == '{')
+	  {
+	    next = read();
+	    if (next != '-')
+	      {
+		unread(next);
+		return curToken = '{';
+	      }
+	    next = read();
+	    if (next != '-')
+	      {
+		// FIXME backup 2 chars. Can fix using special token for '{-'.
+		unread();
+		unread();
+		return curToken = '{';
+	      }
+	    skipComment();
+	  }
+	else if (next != ' ' && next != '\t')
 	  break;
       }
     tokenBufferLength = 0;
     char ch = (char) next;
     switch (ch)
       {
-      case '(':  case ')':  case '[':  case ']':  case '{':  case '}':
+      case '(':  case ')':  case '[':  case ']':  case '}':
       case '$':  case '@':  case ',':  case ':':
 	break;
       case '|':
@@ -352,6 +393,25 @@ public class XQParser extends LispReader // should be extends Lexer
     return ch;
   }
 
+  public void appendNamedEntity(String name, StringBuffer sbuf)
+  {
+    name = name.intern();
+    char ch = '?';
+    if (name == "lt")
+      ch = '<';
+    else if (name == "gt")
+      ch = '>';
+    else if (name == "amp")
+      ch = '&';
+    else if (name == "quot")
+      ch = '"';
+    else if (name == "apos")
+      ch = '\'';
+    else
+      error("unknown enity reference: '"+name+"'");
+    sbuf.append(ch);
+  }
+
   /** Return the current token, assuming it is in operator context.
    * Resolve NCNAME_TOKEN (identifier) to 'and', 'or', 'div', etc.
    */
@@ -394,6 +454,11 @@ public class XQParser extends LispReader // should be extends Lexer
 		}
 	      }
 	  }
+	else if (len == 5)
+	  {
+	    if (match("where"))
+	      curToken = OP_WHERE;
+	  }
 	else if (len == 10)
 	  {
 	    for (int i = 0; ;   i++)
@@ -425,10 +490,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	curValue = name;
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
 	if (next == '('
-	    && ! name.equalsIgnoreCase("if"))
+	    && ! name.equals("if"))
 	  // FunctionCall or KindTest
 	  return curToken = FNAME_TOKEN;
-	if ((next == 'f' || next == 'F') && "define".equalsIgnoreCase(name))
+	if ((next == 'f' || next == 'F') && "define".equals(name))
 	  {
 	    unread();
 	    return curToken = DEFINE_TOKEN;
@@ -571,14 +636,26 @@ public class XQParser extends LispReader // should be extends Lexer
     return exp;
   }
 
+  public Expression parseElementType()
+      throws java.io.IOException, SyntaxException
+  {
+    QName qname = parseNameTest(defaultNamespace);
+    getRawToken();
+    return new QuoteExp(new ElementType(qname));
+  }
+
   public Expression parseDataType()
       throws java.io.IOException, SyntaxException
   {
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
-	gnu.bytecode.Type type = kawa.standard.Scheme.getNamedType(tname);
 	getRawToken();
+	if ("element".equalsIgnoreCase(tname))
+	  {
+	    return parseElementType();
+	  }
+	Type type = kawa.standard.Scheme.getNamedType(tname);
 	return new QuoteExp(type);
       }
     else
@@ -782,9 +859,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	int op = curToken;
 	getRawToken();
 
-	LambdaExp lexp = new LambdaExp();
-	lexp.min_args = 1;
-	lexp.max_args = 1;
+	LambdaExp lexp = new LambdaExp(1);
 	Declaration decl = lexp.addDeclaration("dot");
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	decl.noteValue (null);  // Does not have a known value.
@@ -843,11 +918,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	    int startLine = getLineNumber() + 1;
 	    int startColumn = getColumnNumber() + 1;
 	    getRawToken();
-	    LambdaExp lexp = new LambdaExp();
+	    LambdaExp lexp = new LambdaExp(1);
 	    lexp.setFile(getName());
 	    lexp.setLine(startLine, startColumn);
-	    lexp.min_args = 1;
-	    lexp.max_args = 1;
 	    parser.push(lexp);
 	    Declaration dot = lexp.addDeclaration("dot");
 	    dot.noteValue(null);
@@ -933,7 +1006,49 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else if (next == delimiter)
 	  break;
-	// FIXME handle char references etc.
+	else if (next == '&')
+	  {
+	    StringBuffer cbuf = new StringBuffer(30);
+	    int base = 0;
+	    next = read();
+	    if (next == '#')
+	      {
+		next = read();
+		if (next == 'x')
+		  {
+		    base = 16;
+		    next = read();
+		  }
+		base = 10;
+	      }
+	    while (next >= 0)
+	      {
+		char ch = (char) next;
+		if (! isNamePart(ch))
+		  break;
+		cbuf.append(ch);
+		next = read();
+	      }
+	    if (next != ';')
+	      error("invalid entity/character reference");
+	    else
+	      {
+		String ref = cbuf.toString();
+		if (base == 0)
+		  appendNamedEntity(ref, sbuf);
+		else
+		  {
+		    try
+		      {
+			sbuf.append((char) Integer.parseInt(ref, base));
+		      }
+		    catch (NumberFormatException ex)
+		      {
+			error("invalid character references");
+		      }
+		  }
+	      }
+	  }
 	else
 	  sbuf.append((char) next);
       }
@@ -1004,7 +1119,7 @@ public class XQParser extends LispReader // should be extends Lexer
     for (;;)
       {
 	ch = skipSpace();
-	if (ch < 0 || ch == '>')
+	if (ch < 0 || ch == '>' || ch == '/')
 	  break;
 	unread(ch);
 	getRawToken();
@@ -1030,29 +1145,41 @@ public class XQParser extends LispReader // should be extends Lexer
 	vec.setSize(vecSize);
 	vec.addElement(new ApplyExp(makeAttr, args));
       }
-    if (ch != '>')
-      return syntaxError("missing '>' after start element");
-    parseContent('<', vec);
-    ch = skipSpace();
-    if (ch >= 0 && ch != '>')
+    boolean empty = false;
+    if (ch == '/')
       {
-	unread(ch);
-	getRawToken();
-	if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
-	  return syntaxError("invalid tag syntax after '</'");
-	if (! (element instanceof QuoteExp))
-	  return syntaxError("'<{'expression'}>' must be closed by '</>'");
-	String tag = new String(tokenBuffer, 0, tokenBufferLength);
-	Object start = ((QuoteExp) element).getValue();
-	String startTag = start instanceof ElementConstructor
-	  ? ((ElementConstructor) start).getXmlName()
-	  : start.toString();
-	if (! (tag.equals(startTag)))
-	  return syntaxError("'<"+startTag+">' closed by '</"+tag+">'");
-	ch = skipSpace();
+	ch = read();
+	if (ch == '>')
+	  empty = true;
+	else
+	  unread(ch);
       }
-    if (ch != '>')
-      return syntaxError("missing '>' after end element");
+    if (! empty)
+      {
+	if (ch != '>')
+	  return syntaxError("missing '>' after start element");
+	parseContent('<', vec);
+	ch = skipSpace();
+	if (ch >= 0 && ch != '>')
+	  {
+	    unread(ch);
+	    getRawToken();
+	    if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
+	      return syntaxError("invalid tag syntax after '</'");
+	    if (! (element instanceof QuoteExp))
+	      return syntaxError("'<{'expression'}>' must be closed by '</>'");
+	    String tag = new String(tokenBuffer, 0, tokenBufferLength);
+	    Object start = ((QuoteExp) element).getValue();
+	    String startTag = start instanceof ElementConstructor
+	      ? ((ElementConstructor) start).getXmlName()
+	      : start.toString();
+	    if (! (tag.equals(startTag)))
+	      return syntaxError("'<"+startTag+">' closed by '</"+tag+">'");
+	    ch = skipSpace();
+	  }
+	if (ch != '>')
+	  return syntaxError("missing '>' after end element");
+      }
     args = new Expression[vec.size()];
     vec.copyInto(args);
     nesting--;
@@ -1079,6 +1206,77 @@ public class XQParser extends LispReader // should be extends Lexer
 	getRawToken();
       }
     return exp;
+  }
+
+  Expression parseTypeSwitch()
+    throws java.io.IOException, SyntaxException
+  {
+    getRawToken();
+    Expression selector = parseExpr();
+    if (curToken != ')')
+      return syntaxError("missing ')' after 'typeswitch' selector");
+    getRawToken();
+    Object varName = null;
+    Vector vec = new Vector();
+    vec.addElement(selector);
+    if (match("as"))
+      {
+	getRawToken();
+	if (curToken == '$')
+	  {
+	    getRawToken();
+	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+	      varName
+		= new String(tokenBuffer, 0, tokenBufferLength).intern();
+	  }
+	if (varName == null)
+	  return syntaxError("missing Variable after 'as' clause");
+	getRawToken();
+      }
+    String argName = varName == null ? "$arg$" : varName.toString();
+    while (match("case"))
+      {
+	getRawToken();
+	Expression caseType = parseDataType();
+	LambdaExp lexp = new LambdaExp(1);
+	Declaration decl = lexp.addDeclaration(argName,  // FIXME cast
+					       (Type) ((QuoteExp) caseType).getValue());
+
+	//getRawToken();
+	if (match("return"))
+	  getRawToken();
+	else
+	  error("missing 'return' after 'case'");
+	parser.push(lexp);
+	Expression caseExpr = parseExpr();
+	lexp.body = caseExpr;
+	parser.pop(lexp);
+	vec.addElement(lexp);
+      }
+    LambdaExp lexp = new LambdaExp(0);
+    if (match("default"))
+      {
+	getRawToken();
+	if (match("return"))
+	  getRawToken();
+	else
+	  error("missing 'return' after 'default'");
+	parser.push(lexp);
+	Expression defaultExpr = parseExpr();
+	lexp.body = defaultExpr;
+	parser.pop(lexp);
+      }
+    else
+      {
+	lexp.body = QuoteExp.voidExp;
+	error('w', "no 'default' clause in 'typeswitch'");
+      }
+    vec.addElement(lexp);
+    Expression[] args = new Expression[vec.size()];
+    vec.copyInto(args);
+    return new ApplyExp(makeFunctionExp("gnu.kawa.reflect.TypeSwitch",
+					"typeSwitch"),
+			args);
   }
 
   /**
@@ -1177,6 +1375,8 @@ public class XQParser extends LispReader // should be extends Lexer
     else if (token == FNAME_TOKEN)
       {
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
+	if (name.equals("typeswitch"))
+	  return parseTypeSwitch();;
 	startColumn -= tokenBufferLength;
 	name = name.intern();
 	nesting++;
@@ -1217,25 +1417,21 @@ public class XQParser extends LispReader // should be extends Lexer
 		c1 = tokenBuffer[0];
 		c2 = tokenBuffer[1];
 		c3 = tokenBuffer[2];
-		if ((c1 == 'l' || c1 == 'L')
-		    || (c2 == 'e' || c2 == 'E')
-		    || (c3 == 't' || c3 == 'T'))
+		if (c1 == 'l' && c2 == 'e' && c3 == 't')
 		  forOrLet = 0;
-		else if ((c1 == 'f' || c1 == 'F')
-		    || (c2 == 'o' || c2 == 'O')
-		    || (c3 == 'r' || c3 == 'R'))
+		else if (c1 == 'f' && c2 == 'o' && c3 == 'r')
 		  forOrLet = 1;
 	      }
 	    if (forOrLet < 0)
-	      return syntaxError("invalid syntax - variable following name");
+	      throw new Error/*return syntaxError*/("invalid syntax - variable following name");
 	    exp = parseFLWRExpression(forOrLet > 0);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn - 3);
 	    return exp;
 	  }
 	else if (next == '(' && tokenBufferLength == 2
-		 && ((c1 = tokenBuffer[0]) == 'i' || c1 == 'I')
-		 && ((c2 = tokenBuffer[1]) == 'f' || c2 == 'F'))
+		 && tokenBuffer[0] == 'i'
+		 && tokenBuffer[1] == 'f')
 	  {
 	    return parseIfExpr();
 	  }
@@ -1301,7 +1497,7 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	char cs = word.charAt(i);
 	char cb = tokenBuffer[i];
-	if (cs != cb && cs != Character.toLowerCase(cb))
+	if (cs != cb)
 	  return false;
       }
     return true;
@@ -1315,9 +1511,7 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression[] inits = { init };
     if (isFor)
       {
-	LambdaExp lexp = new LambdaExp();
-	lexp.min_args = 1;
-	lexp.max_args = 1;
+	LambdaExp lexp = new LambdaExp(1);
 	sc = lexp;
       }
     else
@@ -1343,9 +1537,14 @@ public class XQParser extends LispReader // should be extends Lexer
     else
       {
 	Expression cond;
-	if (match("where"))
+	if (curToken == OP_WHERE)
 	  {
-	    cond = parsePrimaryExpr();   // FIXME
+	    getRawToken();
+	    cond = parseBinaryExpr(priority(OP_OR));
+	  }
+	else if (match("where"))
+	  {
+	    cond = parseBinaryExpr(priority(OP_OR));
 	  }
 	else
 	  cond = null;
@@ -1407,7 +1606,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("missing ':=' in 'let' clause - "+curToken);
       }
     getRawToken();
-    Expression value = parseExpr();
+    Expression value = parseBinaryExpr(priority(OP_OR));
     return parseFLWRExpression(isFor, name, value);
   }
 
@@ -1508,7 +1707,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	return exp;
       }
     if (curToken == NCNAME_TOKEN
-	&& "namespace".equalsIgnoreCase((String) curValue))
+	&& "namespace".equals((String) curValue))
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
 	if (next >= 0)
@@ -1533,7 +1732,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
       }
     if (curToken == NCNAME_TOKEN
-	&& "default".equalsIgnoreCase((String) curValue))
+	&& "default".equals((String) curValue))
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
 	if (next >= 0)
@@ -1554,7 +1753,6 @@ public class XQParser extends LispReader // should be extends Lexer
 		  return syntaxError("missing uri namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
 		defaultNamespace = uri.toString();
-		System.err.println("saw default namespace = "+uri);
 		return QuoteExp.voidExp;
 	      }
 	  }

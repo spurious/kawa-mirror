@@ -1,3 +1,30 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>):  Add new pre-defined functions.
+
+	* XQParser.java: Add support for XQuery comments.
+	(skipComment):  New method.
+	(getRawToken):  Check for and skip comments.
+
+	* XQParser.java (parseDataType):  Parse 'element' type.
+	(parseElementType):  New method.
+
+	* XQParser.java (parseTypeSwitch):  New method handle 'typeswitch'.
+	(parseMaybePrimaryExpr):  Call it.
+
+	* XQParser.java:  Fix parsing for 'where' in FLWR-expression.
+	(OP_WHERE):  New constant.
+	(peekOperator):  Recognize 'where'.
+	(parseFLWRExpression):  Fix handling of 'where'.
+
+	* XQParser.java (parseContent):  Handle char references.
+	(appendNamedEntity):  New method to resolve char references.
+
+	& XQParser.java (parseElementConstructor):  Handle abbreviated element.
+
+	* XQParser.java:  Use case-sentive matching for keywords etc.
+	* XQParser.java:  Use LambdaExp constructor taking a parameter count.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* XQParser.java:  Set line number information various places.

@@ -187,11 +187,16 @@ public class XQuery extends Interpreter
 
     define("define", new kawa.standard.set_b());
     define("document", gnu.xquery.util.Document.document);
+    define("item-at", gnu.xquery.util.ItemAt.itemAt);
+    define("count", gnu.kawa.functions.CountValues.countValues);
+    define("sublist", gnu.xquery.util.SubList.subList);
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
     define("false", new ConstantFunction0("false", Boolean.FALSE));
     define("true", new ConstantFunction0("true", Boolean.TRUE));
     define("string-value", gnu.xquery.util.StringValue.stringValue);
     define("string", gnu.xquery.util.StringValue.string);
+
+    define("write-to", gnu.kawa.functions.WriteTo.writeTo);
   }
 
   public static XQuery getInstance()

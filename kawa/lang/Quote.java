@@ -10,11 +10,10 @@ public class Quote extends Syntax implements Printable
   static private Pattern pattern = new ListPat (1);
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     Object [] match = pattern.match (obj);
     if (match == null)
-      throw new kawa.lang.WrongArguments("quote",1,"(quote value)");
+      return interp.syntaxError ("quote requires a single argument");
     return new QuoteExp (match[0]);
   }
 

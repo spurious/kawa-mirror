@@ -12,7 +12,6 @@ public class letrec extends Syntax implements Printable
   static private Pattern pattern2 = new ListPat (2);
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (! (obj instanceof Pair))
       return interp.syntaxError ("missing letrec arguments");

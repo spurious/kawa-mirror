@@ -16,7 +16,6 @@ public class and_or extends Syntax implements Printable
   }
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (obj == List.Empty)
       return new QuoteExp (is_and ? Interpreter.trueObject

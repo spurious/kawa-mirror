@@ -12,7 +12,6 @@ import kawa.lang.*;
 public class define_syntax extends Syntax
 {
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     int obj_length = List.list_length (obj);
     if (obj_length != 2)

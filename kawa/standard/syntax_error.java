@@ -9,7 +9,6 @@ import kawa.lang.*;
 public class syntax_error extends Syntax
 {
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     StringBuffer buffer = new StringBuffer ();
     int words = 0;

@@ -9,7 +9,6 @@ import kawa.lang.*;
 public class begin extends Syntax implements Printable
 {
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     return interp.rewrite_body (obj);
   }

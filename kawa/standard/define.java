@@ -10,7 +10,6 @@ import kawa.lang.*;
 public class define extends Syntax implements Printable
 {
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (obj instanceof Pair)
       {

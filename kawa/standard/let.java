@@ -13,7 +13,6 @@ public class let extends Syntax implements Printable
   static private Pattern pattern2 = new ListPat (2);
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (! (obj instanceof Pair))
       return interp.syntaxError ("missing let arguments");
@@ -28,9 +27,9 @@ public class let extends Syntax implements Printable
 	Pair bind_pair = (Pair) bindings;
 	Object[] bind_match = pattern2.match (bind_pair.car);
 	if (bind_match == null)
-	throw new WrongArguments("let", 2, "(let ((var init)...) body)");
+	  return interp.syntaxError ("let binding is not a pair");
 	if (! (bind_match[0] instanceof Symbol))
-	  throw new WrongArguments("let", 2, "(let ((var init)...) body) [var is not an identifier]");
+	  return interp.syntaxError("variable in let binding is not a symbol");
 	Declaration decl = let.add_decl ((Symbol) bind_match[0]);
 	inits[i] = interp.rewrite (bind_match[1]);
 	decl.noteValue (inits[i]);

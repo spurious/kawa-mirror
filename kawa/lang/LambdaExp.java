@@ -16,6 +16,9 @@ public class LambdaExp extends ScopeExp
   int max_args;
   private boolean is_module_body;
 
+  // True if this contains a nested ScopeExp.
+  boolean hasNestedScopes;
+
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
 
@@ -55,8 +58,10 @@ public class LambdaExp extends ScopeExp
    * @param interp the (Scheme) interpreter
    */
   public LambdaExp (Object formals, Object body, Interpreter interp)
-    throws WrongArguments
   {
+    if (formals == ModuleBody.formals)
+      setModuleBody (true);
+
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
     for (; bindings instanceof Pair; min_args++)
@@ -66,8 +71,10 @@ public class LambdaExp extends ScopeExp
     else if (bindings instanceof Symbol)
       max_args = -1;
     else
-      throw new WrongArguments ("lambda", 2,
-				"(lambda formals body) [invalid formals]");
+      {
+	interp.syntaxError ("misformed formals in lambda");
+	return;
+      }
 
     Variable var;
     var = add_decl (Symbol.make ("this"));
@@ -88,6 +95,8 @@ public class LambdaExp extends ScopeExp
       {
 	Pair bind_pair = (Pair) bindings;
 	Declaration decl = add_decl ((Symbol) bind_pair.car);
+	if (isModuleBody ())
+	  decl.type = Compilation.scmEnvironmentType;
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
 	bindings = bind_pair.cdr;
@@ -165,7 +174,7 @@ public class LambdaExp extends ScopeExp
     comp.method.compile_invoke_nonvirtual (new_class.constructor);
   }
 
-  void compile_setLiterals (Compilation comp, Object[] values)
+  void compile_setLiterals (Compilation comp)
   {
     ClassType[] interfaces = { new ClassType ("kawa.lang.CompiledProc") };
     comp.mainClass.setInterfaces (interfaces);
@@ -176,21 +185,6 @@ public class LambdaExp extends ScopeExp
     setLiterals_method.init_param_slots ();
     setLiterals_method.compile_push_value (setLiterals_method.find_arg (1));
     setLiterals_method.compile_putstatic (comp.literalsField);
-
-    if (staticLinkField != null && outerLambda () == null)
-      {
-	Method saveMethod = comp.method;
-	comp.method = setLiterals_method;
-	// The outer-most lambda needs a staticLink,
-	// because it is surrounded by some other ScopeExp.
-	// This code sets the staticLink from the environment.
-	setLiterals_method.compile_push_this ();
-	comp.compileConstant (values);
-	setLiterals_method.compile_checkcast (Compilation.objArrayType);
-	setLiterals_method.compile_putfield (staticLinkField);
-	comp.method = saveMethod;
-      }
-
     setLiterals_method.compile_return ();
   }
 
@@ -202,7 +196,7 @@ public class LambdaExp extends ScopeExp
 	String class_name = name == null ? "lambda"
 	  : Compilation.mangleClassName (name.toString ());
 	Compilation comp = new Compilation (this, class_name, true);
-	compile_setLiterals (comp, env.values);
+	compile_setLiterals (comp);
 
 	byte[][] classes = new byte[comp.numClasses][];
 	String[] classNames = new String[comp.numClasses];
@@ -261,6 +255,14 @@ public class LambdaExp extends ScopeExp
       {
 	throw new GenericError ("class illegal access: in lambda eval");
       }
+  }
+
+  public final Object eval_module (Environment env)
+       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  {
+    if (!hasNestedScopes) // optimization - don't generate unneeded Class.
+      return body.eval (env);
+    return ((ModuleBody) eval (env)).run (env);
   }
 
   public void print (java.io.PrintStream ps)

@@ -11,7 +11,6 @@ public class ifp extends Syntax implements Printable
   static private Pattern pattern = new ListPat (2, 3);
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     Object [] match = pattern.match (obj);
     if (match == null)

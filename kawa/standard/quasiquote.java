@@ -14,7 +14,6 @@ public class quasiquote extends Syntax implements Printable
   }
 
   Object expand_pair (Pair pair, int depth, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (pair.car == Interpreter.quasiquote_sym)
       depth++;
@@ -73,7 +72,6 @@ public class quasiquote extends Syntax implements Printable
    *   in which case it is implicitly in a QuoteExp).
    */
   Object expand (Object template, int depth, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     if (template instanceof Pair)
       return expand_pair ((Pair) template, depth, interp);
@@ -141,13 +139,13 @@ public class quasiquote extends Syntax implements Printable
 	      {
 		Expression[] arg1 = new Expression[1];
 		arg1[0] = (Expression) buffer[i];
-		Procedure func = kawa.standard.vector.vectorProcedure;
+		Procedure func = kawa.standard.vector_v.vectorProcedure;
 		args[i] = new ApplyExp (new QuoteExp (func), arg1);
 	      }
 	  }
 	Procedure func;
 	if (max_state < 3)
-	  func = kawa.standard.vector.vectorProcedure;
+	  func = kawa.standard.vector_v.vectorProcedure;
 	else
 	  func = kawa.standard.vector_append.vappendProcedure;
 	return new ApplyExp (new QuoteExp (func), args);
@@ -157,7 +155,6 @@ public class quasiquote extends Syntax implements Printable
   }
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     Pair pair;
     if (! (obj instanceof Pair)

@@ -12,7 +12,6 @@ public class set_b extends Syntax implements Printable
   static private Pattern pattern = new ListPat (2, 2);
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws WrongArguments
   {
     Object [] match = pattern.match (obj);
     if (match == null)

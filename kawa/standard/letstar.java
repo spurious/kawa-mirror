@@ -8,7 +8,6 @@ import kawa.lang.*;
 
 public class letstar extends Syntax implements Printable
 {
-  static private Pattern pattern = new VarListPat (1);
   static private Pattern pattern2 = new ListPat (2);
 
   /**
@@ -19,19 +18,18 @@ public class letstar extends Syntax implements Printable
    * @return the re-written expression
    */
   static Expression rewrite (Object bindings, Object body, Interpreter interp)
-    throws WrongArguments
   {
     if (bindings == List.Empty)
       return interp.rewrite_body (body);
     if (! (bindings instanceof Pair))
-      throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
+      return interp.syntaxError ("missing bindings in let*");
     Pair bind_pair = (Pair) bindings;
     Expression[] inits = new Expression[1];
     Object[] bind_match = pattern2.match (bind_pair.car);
     if (bind_match == null)
-      throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
+      return interp.syntaxError ("let* binding is not a pair");
     if (! (bind_match[0] instanceof Symbol))
-      throw new WrongArguments("let*", 2, "(let* ((var init)...) body) [var is not an identifier]");
+      return interp.syntaxError("variable in let* binding is not a symbol");
     LetExp let = new LetExp (inits);
     Declaration decl = let.add_decl ((Symbol) bind_match[0]);
     inits[0] = interp.rewrite (bind_match[1]);
@@ -43,11 +41,10 @@ public class letstar extends Syntax implements Printable
   }
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
-    Object [] match = pattern.match (obj);
-    if (match == null)
-      throw new kawa.lang.WrongArguments("let*",2,"(let* bindings body)");
-    return rewrite (match[0], match[1], interp);
+    if (! (obj instanceof Pair))
+      return interp.syntaxError ("missing let* arguments");
+    Pair pair = (Pair) obj;
+    return rewrite (pair.car, pair.cdr, interp);
   }
 }

@@ -470,7 +470,7 @@ public class Lexer extends gnu.text.Lexer
 	    Object token = reader.getToken();
 	    OutPort out = OutPort.outDefault();
 	    out.print("token:");
-	    SFormat.print(token, out);
+	    out.print(token);
 	    out.println(" [class:"+token.getClass()+"]");
 	    if (token == Sequence.eofValue)
 	      break;

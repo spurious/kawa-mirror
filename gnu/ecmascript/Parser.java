@@ -536,7 +536,7 @@ System.err.println("after parseArgs:"+peekToken());
 	    out.println("]");
 	    Object result = expr.eval(Environment.user());
 	    out.print("result: ");
-	    SFormat.print(result, out);
+	    out.print(result);
 	    out.println();
 	  }
 	catch (Throwable ex)

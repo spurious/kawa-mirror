@@ -1,3 +1,8 @@
+2003-04-06  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (main):  Don't use SFormat.
+	* Parser.java (main):  Likewise.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* Parser.java (main):   Catch Throwable as eval may now throw it.

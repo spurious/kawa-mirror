@@ -11,7 +11,6 @@ import java.util.*;
  * out and err PrintWriter so that you can redirect stdout/stderr to
  * these streams, using the System.setOut/setErr methods.
  *
- * @version 	$Revision$
  * @author 	Albert Ting
  */
 public class MessageArea extends TextArea

@@ -91,7 +91,7 @@ public class Values implements Printable, Externalizable
     this.vals = data;
   }
 
-  public Values readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return vals.length == 0 ? empty : this;
   }

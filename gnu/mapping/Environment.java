@@ -145,7 +145,8 @@ public class Environment extends NameMap
   public Binding defineValue (String name, Object value)
   {
     Binding binding = getBinding(name);
-    binding.set(value);
+    binding.constraint = trivialConstraint;
+    binding.value = value;
     return binding;
   }
 

@@ -7,11 +7,14 @@ package gnu.mapping;
 
 public abstract class Procedure implements Named, Printable
 {
-  private String sym_name;
+  /** If non-null, a sequence of (key, value)-pairs. */
+  private Object[] properties;
+
+  private static String nameKey = new String("$name$");
 
   public String getName()
   {
-    return sym_name;
+    return (String) getProperty(nameKey, null);
   }
 
   /** @deprecated */
@@ -22,7 +25,7 @@ public abstract class Procedure implements Named, Printable
 
   public final void setName (String name)
   {
-    sym_name = name;
+    setProperty(nameKey, name);
   }
 
   public Procedure()
@@ -31,7 +34,7 @@ public abstract class Procedure implements Named, Printable
 
   public Procedure(String n)
   {
-    sym_name = n;
+    setName(n);
   }
 
   public abstract Object applyN (Object[] args);
@@ -131,5 +134,55 @@ public abstract class Procedure implements Named, Printable
     else
       ps.print (n);
     ps.print ('>');
+  }
+
+  public Object getProperty(Object key, Object defaultValue)
+  {
+    if (properties != null)
+      {
+	for (int i = properties.length;  (i -= 2) >= 0; )
+	  {
+	    if (properties[i] == key)
+	      return properties[i + 1];
+	  }
+      }
+    return defaultValue;
+  }
+
+  public synchronized Object setProperty(Object key, Object value)
+  {
+    int avail;
+    Object[] props = properties;
+    if (props == null)
+      {
+	properties = props = new Object[10];
+	avail = 0;
+      }
+    else
+      {
+	avail = -1;
+	for (int i = props.length;  (i -= 2) >= 0; )
+	  {
+	    Object k = props[i];
+	    if (k == key)
+	      {
+		Object old = props[i + 1];
+		props[i + 1] = value;
+		return old;
+	      }
+	    else if (k == null)
+	      avail = i;
+	  }
+	if (avail < 0)
+	  {
+	    avail = props.length;
+	    properties = new Object[2 * avail];
+	    System.arraycopy(props, 0, properties, 0, avail);
+	    props = properties;
+	  }
+      }
+    props[avail] = key;
+    props[avail+1] = value;
+    return null;
   }
 }

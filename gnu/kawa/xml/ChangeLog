@@ -1,5 +1,7 @@
 2004-02-15  Per Bothner  <per@bothner.com>
 
+	* DefineNamespace.java (rewrite):  Move handling to scanForDefinitions.
+
 	* DefineNamespace.java (rewriteForm):  Use Translator's exp2Type.
 
 2004-01-04  Per Bothner  <per@bothner.com>

@@ -1,3 +1,7 @@
+2003-07-16  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* PrimType.java (compare):  Guard againt null otherName.
+
 2003-06-18  Jim White  <jim@pagesmiths.com>
 
 	* Type.java (mapNameToType):  Initialize statically.

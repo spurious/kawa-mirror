@@ -172,6 +172,8 @@ public class PrimType extends Type {
       return -3;
     char sig1 = signature.charAt(0);
     String otherName = other.getName();
+    if (otherName == null)
+       return -1;
     // This is very incomplete!  FIXME.
     switch (sig1)
       {

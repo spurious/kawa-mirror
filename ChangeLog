@@ -1,3 +1,45 @@
+2004-12-08  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java: Update for new Environment handling.
+	* kawa/lang/AutoloadProcedure.java (load): No longer handle autoload
+	of ModuleBody.
+	* kawa/lang/AutoloadSyntax.java: Likewise.
+	* kawa/standard/load.java: Small updates.
+	* kawa/standard/location.java: Update for changed ProcLocation.
+	* kawa/standard/require.java: Rewrite for new Environment handling.
+	* kawa/standard/fluid_let.java: Don't set type, since it's no
+	longer a typeFluidBinding, but an indirect binding.
+	Clear noted value, since it may be changed unpredictably.
+
+	* kawa/standard/Scheme.java (defSntxStFld): Removed - now redundant.
+	(initScheme): Update.  Use defSntStFld many places.
+	* kawa/standard/ScmEnv.java: No longer search "extra" Environments.
+	(extra, numExtras): Removed fields.
+	(addExtra, get): Removed method.
+	(lookupExtend): New method.
+	(ScmEnvConstraint): Remove local class.
+	* kawa/standard/TracedProcedure.java: Use new Location handling.
+	* kawa/standard/define.java (scanForm): Use new Translator.define.
+	* kawa/standard/define_alias.java: Set line number.
+	* kawa/standard/define_autoload.java: Remove the unused ability to
+	specify an autoload type.
+
+	* kawa/lang/Macro.java: Handle hygiene even without (require).
+	(getCapturedScope, setCapturedScope, makeNonHygienic): New methods.
+	* kawa/lang/SyntaxForm.java: New implements Externalizable.
+	* kawa/lang/TemplateScope.java: New class.
+	* kawa/lang/Makefile.am: Update accordingly.
+	* kawa/lang/SyntaxTemplate.java (execute): Create TemplateScope.
+	* kawa/lang/Translator.java: Numerous updates.
+	* kawa/standard/define_class.java: Handle hygiene.
+	* kawa/standard/define_syntax.java: Support new macro handling.
+	* kawa/standard/define_variable.java: Set decl's IS_DYNAMNIC flag.
+
+	* kawa/standard/object.java: Use rewrite_car to set line numbers.
+
+	* kawa/standard/define_syntax.java: Don't special-case for rule
+	being a QuoteExp.  Pass 'instance' value when create Macro.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Don't include old makekawa.bat.

@@ -67,7 +67,7 @@ public class object extends Syntax
 	    superlist = ((SyntaxForm) superlist).form;
 	  }
 	Pair superpair = (Pair) superlist;
-	supers[i] = tr.rewrite(superpair.car);
+	supers[i] = tr.rewrite_car(superpair, false);
 	superlist = superpair.cdr;
       }
     oexp.supers = supers;

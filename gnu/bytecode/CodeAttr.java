@@ -1682,6 +1682,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     put1 (195);  // monitorexit
   }
 
+  /** Call pending finalizer functions.
+   * @param limit Only call finalizers more recent than this.
+   */
+  public void doPendingFinalizers (TryState limit)
+  {
+    TryState stack = try_stack;
+    while (stack != limit)
+      {
+	if (stack.finally_subr != null         // there is a finally block
+	    && stack.finally_ret_addr == null) // 'return' is not inside it
+	  emitJsr(stack.finally_subr);
+	stack = stack.previous;
+      }
+  }
+
   /**
    * Compile a method return.
    * If inside a 'catch' clause, first call 'finally' clauses.
@@ -1690,15 +1705,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitReturn ()
   {
-    TryState stack = try_stack;
-    while (stack != null)
-      {
-	if (stack.finally_subr != null         // there is a finally block
-	    && stack.finally_ret_addr == null) // 'return' is not inside it
-	  emitJsr(stack.finally_subr);
-	stack = stack.previous;
-      }
-
+    doPendingFinalizers(null);
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
@@ -1879,6 +1886,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (try_stack.saved_result != null || vars != null)
 	popScope();
     try_stack = try_stack.previous;
+  }
+
+  public final TryState getCurrentTry ()
+  {
+    return try_stack;
   }
 
   public final boolean isInTry()

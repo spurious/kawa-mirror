@@ -1,3 +1,9 @@
+2002-05-19  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (doPendingFinalizers):  New public method.
+	(emitReturn):  Call doPendingFinalizers.
+	(getCurrentTry):  New method.
+
 2002-05-06  Per Bothner  <per@bothner.com>
 
 	* Method.java (toString):  Use '.' before method name.

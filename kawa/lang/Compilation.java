@@ -387,7 +387,18 @@ public class Compilation
 	  literalsField = new_class.addField ("literals",
 					       objArrayType, Access.STATIC);
       }
+    /* CPS:
+    if (usingCPSstyle())
+      {
+	code = ...;
+	push "pc" argument;
+	fswitch = new SwitchState(code);
+      }
+    */
     addClass (new_class);
+    String filename = lexp.getFile();
+    if (filename != null)
+      new_class.setSourceFile (filename);
 
     int arg_count;
     char arg_letter;
@@ -652,7 +663,8 @@ public class Compilation
 		    compileConstant(lexp.keywords[key_i++]);
 		    code.emitInvokeStatic(searchForKeywordMethod);
 		    code.emitDup(1);
-		    code.emitIfCompare1(199); // ifnonnull
+		    compileConstant(Special.dfault);
+		    code.emitIfEq();
 		    code.emitPop(1);
 		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
 		    code.emitFi();
@@ -667,9 +679,6 @@ public class Compilation
 	    i++;
 	  }
       }
-
-    lexp.start_label = new Label (method);
-    lexp.start_label.define(code);
 
     lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())
@@ -710,4 +719,9 @@ public class Compilation
 
     return new_class;
   }
+
+  public boolean usingCPSstyle() { return false; }
+
+  /* When usingCPSstyle(), the switch statement selecting the correct func. */
+  // CPS: public SwitchState fswitch;
 }

@@ -223,6 +223,8 @@ public class LambdaExp extends ScopeExp
 	decl.noteValue (null);  // Does not have a known value.
 	decl.push(tr);
       }
+    if (body instanceof PairWithPosition)
+      setFile(((PairWithPosition) body).getFile());
     this.body = tr.rewrite_body (body);
     pop (tr);
   }
@@ -238,9 +240,6 @@ public class LambdaExp extends ScopeExp
 
   /** Declaration used if varargs or too many args. */
   Declaration argsArray;
-
-  /** Start of actual body (after copying args etc into home locations). */
-  Label start_label;
 
   /** Get the i'the formal parameter. */
   Declaration getArg (int i)

@@ -73,6 +73,31 @@ public class ApplyExp extends Expression
 	  }
       }
 
+    /* CPS:
+    if (comp.usingCPSstyle())
+      {
+	//  evaluate args to frame-locals vars;  // may recurse! 
+	if (isTailCall())
+	  {
+	    emit[proc.apply(args, context, THIS_frame.caller, THIS_frame.saved_pc)];
+	     code.emitReturn();
+	  }
+	else
+	  {
+	    Label l = new Label(code);
+	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
+	    int pc = fswitch.getMaxValue() + 1;
+	    fswitch.addCase(pc, l, comp);
+	    emit[proc.apply(args, context, THIS_frame, pc)];
+	    emit[save java stack, if needed];
+	    code.emitReturn();
+	    l.define(code);
+	    emit[restore java stack, if needed];
+	  }
+	return;
+      }
+    */
+
     // Check for tail-recursion.
     boolean tail_recurse
       = (target instanceof TailTarget)
@@ -81,22 +106,13 @@ public class ApplyExp extends Expression
     if (!tail_recurse)
       {
 	exp.func.compile (comp, Target.pushObject);
-	comp.method.compile_checkcast (comp.scmProcedureType);
+	code.emitCheckcast(comp.scmProcedureType);
       }
 
     int args_length = exp.args.length;
-    if (tail_recurse
-	&& func_lambda.min_args == func_lambda.max_args)
-      {
-	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, Target.pushObject);
-	for (int i = args_length;  --i >= 0; )
-	  SetExp.compile_store (func_lambda.getArg (i), comp);
-	code.emitGoto(func_lambda.start_label);
-	return;
-      }
-
-    if (args_length <= 4)
+    if (args_length <= 4
+	|| (tail_recurse
+	    && func_lambda.min_args == func_lambda.max_args))
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
@@ -117,7 +133,7 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	comp.method.compile_tailcall (true);
+	code.emitTailCall(true);
 	return;
       }
     code.emitInvokeVirtual(applymethod);

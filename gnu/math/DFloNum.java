@@ -30,6 +30,11 @@ public class DFloNum extends RealNum implements Compilable
     return value;
   }
 
+  public long longValue ()
+  {
+    return (long) value;
+  }
+
   public int hashCode ()
   {
     return (int)value;

@@ -1,5 +1,9 @@
 Mon Jan 20 15:58:50 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
+	* Numeric.java:  Inherit from java.lang.Number.
+	(intValue, longValue): New methods.
+	* Complex.java, DFloNum.java, IntFraction.java:  New longValue method.
+
 	* DQuantity.java (add):  Adjust for different units.
 	* IntNum.java (longValue):  Support non-normalized value.
 	(appendWord, increment_unsigned, increment): Remove useless code.

@@ -14,6 +14,7 @@ public abstract class Complex extends Quantity
 
   public double doubleValue () { return re().doubleValue (); }
   public double doubleImagValue () { return im().doubleValue (); }
+  public long longValue () { return re().longValue(); }
 
   public static Complex make (RealNum re, RealNum im)
   {

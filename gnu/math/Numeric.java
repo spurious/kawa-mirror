@@ -1,7 +1,11 @@
 package kawa.math;
 
-public abstract class Numeric
+public abstract class Numeric extends java.lang.Number
 {
+  public float floatValue () { return (float) doubleValue(); }
+  public int intValue() { return (int) longValue(); }
+  public long longValue() { return (long) doubleValue(); }
+
   /** Return this + k * obj. */
   public abstract Numeric add (Object obj, int k);
 

@@ -98,6 +98,11 @@ public class IntFraction extends RatNum
     return IntFraction.neg (this);
   }
 
+  public long longValue ()
+  {
+    return toExactInt (ROUND).longValue ();
+  }
+
   public double doubleValue ()
   {
     // FIXME.  Can cause unnecessary overflow or loss of precison.

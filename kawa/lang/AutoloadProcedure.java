@@ -92,8 +92,15 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 	  }
 	else if (name != null)
 	  {
-	    if (env.getFunction(name) == this)
-	      env.putFunction(name, loaded);
+	    try
+	      {
+		// Should use something like isFunctionBound FIXME
+		if (env.getFunction(name) == this)
+		  env.putFunction(name, loaded);
+	      }
+	    catch (UnboundSymbol ex)
+	      {
+	      }
 	    if (loaded.name () == null)
 	      loaded.setName (name);
 	  }

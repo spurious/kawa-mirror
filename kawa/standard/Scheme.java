@@ -691,8 +691,6 @@ public class Scheme extends LispLanguage
 
   public Scheme ()
   {
-    if (Language.getDefaultLanguage() == null)
-      Language.setDefaultLanguage(this);
     environ = getNewEnvironment();
     if (instance == null)
       {
@@ -953,6 +951,14 @@ public class Scheme extends LispLanguage
   public static Type exp2Type (Expression exp)
   {
     return getInstance().getTypeFor(exp);
+  }
+
+  public ReadTable createReadTable ()
+  {
+    ReadTable tab = ReadTable.getInitial();
+    ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
+    dispatchTable.set('\'', new ReaderQuote("syntax"));
+    return tab;
   }
 
   /** The compiler insert calls to this method for applications and applets. */

@@ -1,5 +1,14 @@
 2005-03-16  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java (previousLanguage): New static field.
+	(getLanguageFromFilenameExtension, getLanguage, processArgs): Use
+	previousLanguage to avoiding calling Language.getDefaultLanguage
+	before that is working.
+	* kawa/standard/Scheme.java (createReadTable): New method.
+	* kawa/standard/Scheme.java <init>): Don't setDefaultLanguage here.
+
+2005-03-16  Per Bothner  <per@bothner.com>
+
 	* kawa/repl.java (processArgs): Handle new --module-static-run flag.
 	* kawa/standard/require.java (importDefinitions): Skip fields whose
 	name ends in "$instance" - except to optimize 'dofind'.

@@ -16,6 +16,7 @@ public class repl extends Procedure0or1
   public static String compilationPrefix = null;
 
   Language language;
+  static Language previousLanguage;
 
   public repl(Language language)
   {
@@ -191,29 +192,27 @@ public class repl extends Procedure0or1
 				 commandLineArguments);
   }
 
-  public static Language getLanguageFromFilenameExtension(String name)
+  public static void getLanguageFromFilenameExtension(String name)
   {
-    if (Language.getDefaultLanguage() == null)
+    if (previousLanguage == null)
       {
-	Language lang = Language.getInstanceFromFilenameExtension(name);
-	if (lang != null)
+	previousLanguage = Language.getInstanceFromFilenameExtension(name);
+	if (previousLanguage != null)
 	  {
-	    Language.setDefaults(lang);
-	    return lang;
+	    Language.setDefaults(previousLanguage);
+	    return;
 	  }
       }
-    return getLanguage();
+    getLanguage();
   }
 
-  public static Language getLanguage()
+  public static void getLanguage()
   {
-    Language lang = Language.getDefaultLanguage();
-    if (lang == null)
+    if (previousLanguage == null)
       {
-	lang = Language.getInstance(null);
-	Language.setDefaults(lang);
+	previousLanguage = Language.getInstance(null);
+	Language.setDefaults(previousLanguage);
       }
-    return lang;
   }
 
   static boolean shutdownRegistered
@@ -591,7 +590,6 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
 	  { // Check if arg is a known language name.
-	    Language previous = Language.getDefaultLanguage();
 	    String name = arg;
 	    if (name.length() > 2 && name.charAt(0) == '-')
 	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
@@ -599,8 +597,9 @@ public class repl extends Procedure0or1
 	    if (lang != null)
 	      {
 		Language.setDefaultLanguage(lang);
-		if (previous == null)
+		if (previousLanguage == null)
 		  Language.setDefaults(lang);
+		previousLanguage = lang;
 	      }
 	    else
 	      {

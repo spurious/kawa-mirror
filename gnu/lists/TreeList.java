@@ -1898,7 +1898,7 @@ implements Consumer, PositionConsumer, Consumable
 
   public void dump (java.io.PrintWriter out)
   {
-    out.println("TreeList @"+System.identityHashCode(this)
+    out.println(getClass().getName()+" @"+System.identityHashCode(this)
 		       + " gapStart:"+gapStart+" gapEnd:"+gapEnd+" length:"+data.length);
     int toskip = 0;
     for (int i = 0;  i < data.length;  i++)

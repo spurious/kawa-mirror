@@ -716,9 +716,10 @@ public abstract class AbstractSequence
    * @return if hasNext(ipos). */
   public boolean consumeNext (int ipos, Consumer out)
   {
-    if (! hasNext(ipos))
+    int next = nextPos(ipos);
+    if (next == 0)
       return false;
-    out.writeObject(getPosNext(ipos));
+    consumePosRange(ipos, next, out);
     return true;
   }
 

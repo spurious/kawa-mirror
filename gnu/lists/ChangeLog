@@ -1,9 +1,15 @@
+2003-07-10  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (consumeNext):  Hopefully more efficient.
+
+	* TreeList.java (dump):  Write out class name.
+
 2003-05-09  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in, Convert.java.in, SeqPosition.java.in,
 	Sequence.java.in, SimpleVector.java.in:  Renamed to ...
 	* AbstractSequence.java, Convert.java, SeqPosition.java, Sequence.java,
-	SimpleVector.java:  new files, using new JAVA1/JAVA2 framework.
+	SimpleVector.java:  New files, using new JAVA1/JAVA2 framework.
 	* Makefile.am:  Updated accordingly.
 	Various cleanups followed.
 

@@ -1,3 +1,10 @@
+2000-02-26  Per Bothner  <per@bothner.com>
+
+	* Literal.java (nullIteral):  New final static field.
+	(emit):  Handle null value.
+	* Compilation.java (findLiteral):  Handle null value.
+	(emitLiteral):  Likewise.
+
 2000-02-25  Per Bothner  <per@bothner.com>
 
 	* ExpFullWalker.java (walkDefaultArgs):  New method.

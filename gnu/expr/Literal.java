@@ -32,6 +32,9 @@ public class Literal extends Initializer
    * value of the literal to the Field. */
   public static final int ASSIGNED = 8;
 
+  public static final Literal nullLiteral
+    = new Literal(null, Type.pointer_type);
+
   public final Object getValue() { return value; }
 
   void assign (Compilation comp)
@@ -89,6 +92,12 @@ public class Literal extends Initializer
     this.type = type;
   }
 
+  private Literal (Object value, Type type)
+  {
+    this.value = value;
+    this.type = type;
+  }
+
   /** Emit code to re-create this Literal's value, an Object array. */
   void emitArray (Compilation comp, Type element_type)
   {
@@ -121,6 +130,12 @@ public class Literal extends Initializer
   void emit (Compilation comp, boolean ignore)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
+    if (value == null)
+      {
+	if (! ignore)
+	  code.emitPushNull();
+	return;
+      }
     if (value instanceof String)
       {
 	if (! ignore)

@@ -290,6 +290,8 @@ public class Compilation
 
   public Literal findLiteral (Object value)
   {
+    if (value == null)
+      return Literal.nullLiteral;
     Literal literal = (Literal) literalTable.get (value);
     if (literal != null)
       {
@@ -347,10 +349,16 @@ public class Compilation
    */
   public void emitLiteral (Object value)
   {
-    Literal literal = (Literal) literalTable.get (value);
-    if (literal == null)
-      throw new Error ("emitLiteral called without previous findLiteral");
-    literal.emit (this, false);
+    gnu.bytecode.CodeAttr code = getCode();
+    if (value == null)
+      code.emitPushNull();
+    else
+      {
+	Literal literal = (Literal) literalTable.get (value);
+	if (literal == null)
+	  throw new Error ("emitLiteral called without previous findLiteral");
+	literal.emit (this, false);
+      }
   }
 
   /** Emit code to "evaluate" a compile-time constant.

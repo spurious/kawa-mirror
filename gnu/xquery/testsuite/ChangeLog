@@ -1,3 +1,8 @@
+2004-04-18  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main):  Include comment in expected output.
+	* tab.html:  Likewise.
+
 2004-03-08  Per Bothner  <per@bothner.com>
 
 	* exp-format-users.html:  Don't expect XML declaration.

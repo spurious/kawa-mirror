@@ -1,3 +1,7 @@
+Fix Type.string_type.
+
+Make all apply, eval, etc method do 'throws Exception'.
+
 Perhaps CallFrame should extend ModuleBody.
 
 BEFORE KAWA 1.7:

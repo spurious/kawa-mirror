@@ -30,6 +30,68 @@ public abstract class Interpreter
   static public final String unquotesplicing_sym = "unquote-splicing";
   static public final String quasiquote_sym = "quasiquote";
 
+  /**
+   * List of known languages and their Interpreter classes.
+   * Each element is one or more language names, followed by the
+   * name of the Interpreter sub-class.
+   * The table is searched from the beginning.
+   */
+
+  static String[][] languages =
+  {
+    { "scheme", "kawa.standard.Scheme" },
+    { "emacs", "elisp", "gnu.jemacs.lang.ELisp" }
+  };
+
+  /** Look for an interpreter for a language with the given name.
+   * If name is null, look for the first language available. */
+  public static Interpreter getInstance (String name)
+  {
+    int langCount = languages.length;
+    for (int i = 0;  i < langCount;  i++)
+      {
+	String[] names = languages[i];
+	int nameCount = names.length - 1;
+	for (int j = nameCount;  --j >= 0;  )
+	  {
+	    if (name == null || names[j].equalsIgnoreCase(name))
+	      {
+		Class langClass;
+		try
+		  {
+		    langClass = Class.forName(names[nameCount]);
+		  }
+		catch (ClassNotFoundException ex)
+		  {
+		    // In the future, we may support langauges names that
+		    // can be implemented by more than one Interpreter,
+		    // so don't give up yet.
+		    break;
+		  }
+		return getInstance(name, langClass);
+	      }
+	  }
+      }
+    return null;
+  }
+
+  public static Interpreter getInstance (String langName, Class langClass)
+  {
+    try
+      {
+	java.lang.reflect.Method method
+	  = langClass.getDeclaredMethod("getInstance", new Class[0]);
+	return (Interpreter) method.invoke(null, Values.noArgs);
+      }
+    catch (Exception ex)
+      {
+	if (langName == null)
+	  langName = langClass.getName();
+	throw new WrappedException("getInstance for '" + langName + "' failed",
+				   ex);
+      }
+  }
+
   /** Test if a value is considered "true" in this language. */
   public boolean isTrue(Object value)
   {

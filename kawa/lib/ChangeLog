@@ -1,3 +1,7 @@
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (this):  New macro.
+
 2000-02-01  Per Bothner  <per@bothner.com>
 
 	* misc.scm (null-environment):  Update field name used.

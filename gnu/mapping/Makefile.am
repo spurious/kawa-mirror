@@ -17,6 +17,7 @@ java_JAVA=\
   Named.java \
   OutPort.java \
   Printable.java \
+  ProcLocation.java \
   Procedure.java \
   Procedure0.java \
   Procedure0or1.java \

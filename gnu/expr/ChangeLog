@@ -1,3 +1,8 @@
+2002-11-23  Per Bothner  <per@bothner.com>
+
+	*  Interpreter.java (define_field):  Move 2 methods from
+	kawa.standard.Scheme.
+
 2002-11-20  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getSymbolValue, getSymbolProcedure,

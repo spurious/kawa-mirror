@@ -9,7 +9,7 @@ import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
-import gnu.kawa.reflect.ClassMethods;
+import gnu.kawa.reflect.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 
@@ -198,6 +198,16 @@ public abstract class Interpreter
   public void define(String sym, Object p)
   {
     environ.define (sym, p);
+  }
+
+  protected void define_field (String name, String cname, String fname)
+  {
+    StaticFieldConstraint.define(environ, name, cname, fname);
+  }
+
+  protected void define_field (String name, String cname)
+  {
+    StaticFieldConstraint.define(environ, name, cname, Compilation.mangleName(name));
   }
 
   /** Enter a named function into the current environment. */

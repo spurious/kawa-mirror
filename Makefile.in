@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -111,7 +112,7 @@ JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 MAINTAINERCLEANFILES = makekawa.bat
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 
-TKAWA_OFILES = \
+KAWA1_OFILES = \
   gnu-bytecode.o \
   gnu-expr.o \
   gnu-kawa-functions.o \
@@ -480,8 +481,8 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
 
-kawa1$(exeext): $(TKAWA_OFILES)
-	 gcj -o kawa1$(exeext) $(TKAWA_OFILES) --main=kawa.repl
+kawa1$(exeext): $(KAWA1_OFILES)
+	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl
 
 distall:  distcheck kawa.jar jemacs.jar
 

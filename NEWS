@@ -1,3 +1,15 @@
+The new gnu.lists package has new implementations of sequence-related
+classes.  It replaces most of gnu.kawa.util.  See the package.html file.
+
+If the expected type of a non-unary + or - is <int> or <long> and
+the operands are integeral types, then the operands will converted to
+the primitive integer type and the addition or subtraction done
+using primitive arithmetic.  Similarly if the expected type is <float>
+or <long> and the operands have appropriate type.  This optimization
+an make a big performance difference.  (We still need to also optimize
+compare operations like (< x y) to really benefit from <int> declarations
+of loop variables.)
+
 The implementation of procedure closures has been changed to basically
 be the same as top-level procedures (except when --full-tailcalls is
 specified):  Each procedure is now an instance of a ModuleMethod,

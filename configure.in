@@ -17,16 +17,19 @@ if test $enable_kawa_frontend = yes ; then
 fi
 
 AC_ARG_ENABLE(gcj-compiled,
-  [  --enable-gjc-compiled    Compile Kawa using GCJ (CNU Compiler fir Java)])
+  [  --enable-gjc-compiled    Compile Kawa using GCJ (GNU Compiler for Java)])
 
 AC_ARG_ENABLE(xml,
   [  --enable-xml             Build support for XML processing])
 
+AC_ARG_WITH(java-collection,
+  [  --with-java-collections  Assume Java collections (java.util.List) is available])
+
 AC_ARG_WITH(swing,
-  [  --with-swing  Assume Swing (Java Foundation Classes) is available])
+  [  --with-swing             Assume Swing (Java Foundation Classes) is available])
 
 AC_ARG_WITH(awt,
-  [  --with-awt  Assume AWT is available (default on)])
+  [  --with-awt               Assume AWT is available (default on)])
 
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
@@ -48,6 +51,15 @@ case ${enable_gcj_compiled} in
     ;;
 esac
 
+case ${with_java_collections} in
+  yes)
+    JAVA_COLLECTIONS_SELECTED=WITH_JAVA_COLLECTIONS
+    ;;
+  *)
+    JAVA_COLLECTIONS_SELECTED=WITHOUT_JAVA_COLLECTIONS
+    ;;
+esac
+  
 case ${with_swing} in
   yes)
     extra_java='$(java_SWING)'
@@ -72,6 +84,7 @@ esac
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 
 AC_SUBST(XML_SELECTED)
+AC_SUBST(JAVA_COLLECTIONS_SELECTED)
 AC_SUBST(AWT_SELECTED)
 AC_SUBST(SWING_SELECTED)
 AC_SUBST(GCJ_COMPILED_SELECTED)
@@ -85,7 +98,7 @@ AC_SUBST(JEMACS_VERSION)
 AC_SUBST(SHELL)
 
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
-  gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
+  gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
   gnu/kawa/functions/Makefile gnu/kawa/xml/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile

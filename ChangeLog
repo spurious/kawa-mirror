@@ -1,3 +1,40 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	Many changes to handlenew gnu.lists package.
+	* Make-rules (CLEANFILES):  New definition.
+	* configure.in:  Handle --with-java-collection flag.
+
+	* kawa/Shell.java, kawa/repl.java:
+  	Import gnu.lists instead of gnu.kawa.util.
+	* kawa/lang/{AutoloadSyntax.java,CompileFile.java,Eval.java,
+	Lambda.java,ListPat.java,ListRepeatPat.java,Macro.java,PairPat.java,
+	Quote.java,Record.java,RecordConstructor.java,Syntax.java,
+	SyntaxRule.java,SyntaxRules.java,Translator.java,VarListPat.java}:
+	Likewise.  Also, use LList.listLength instead of LList.length.
+	* kawa/standard/{and_or.java,append.java,begin.java,
+	call_with_output_string.java,cxr.java,define.java,define_alias.java,
+	define_autoload.java,define_class.java,define_member_alias.java,
+	define_syntax.java,define_unit.java,define_variable.java,export.java,
+	fluid_let.java,let.java,let_syntax.java,letrec.java,load.java,
+	location.java,map.java,module_extends.java,module_implements.java,
+	module_name.java,module_static.java,object.java,prim_method.java,
+	quasiquote.java,read_line.java,readchar.java,require.java,set_b.java,
+	string2number.java,string_append.java,string_v.java,synchronizd.java,
+	syntax_case.java,syntax_error.java,syntax_rules.java,try_catch.java,
+	try_finally.java,vector_append.java}:
+	Import gnu.lists instead of gnu.kawa.util.
+	Update LList.length->listLength, elementAt->get, length->size.
+	* kawa/standard/{exact_p.java,inexact_p.java,list_p.java,list_ref.java,
+	.list_tail.java,list2string.java,number2string.java,string2list.java,
+	vector2list.java}:  Removed - re-written in Scheme.
+	* Makefile.am (java_JAVA):  Remove removed files.
+	* Scheme.java (initScheme):  Update accordingly.
+	(getNamedType):  Update paths for classes now in gnu.lists.
+
+	* Scheme.java (define_field):  Mangle the procedure name.
+
+	* missing:  Update to newer version.
+
 2001-02-28  Per Bothner  <per@bothner.com>
 
 	Support for compiling Kawa using Gcj.

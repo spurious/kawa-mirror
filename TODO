@@ -6,6 +6,7 @@ BEFORE KAWA 1.7:
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
 * Printer for ELisp and CLisp.
+* document define-procedure
 * Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
 

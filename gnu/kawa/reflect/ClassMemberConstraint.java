@@ -116,30 +116,40 @@ public class ClassMemberConstraint extends Constraint
       {
 	try
 	  {
-	    object = field.get(object);
+	    Object value = field.get(object);
+	    if (value instanceof Binding)
+	      {
+		env.addBinding((Binding) value);
+		return;
+	      }
+	    if (value instanceof Named)
+	      name = ((Named) value).getName();
+
+	    // The problem with the following is that we can't catch
+	    // set! to a constant (defined using define-contsant).  (Note we
+	    // do want to allow a new define, at leastwhen interactive.)
+	    // However, if we always use a ClassMemberConstraint then
+	    // some hitherto-valid Scheme programs will break:  Since it
+	    // will also prohibit re-assigning to a procedure defined
+	    // using (define (foo ...) ...) since that gets compiled to a
+	    // final Procedure field.  FIXME.
+	    if (true)
+	      {
+		name = name.intern();
+		env.define(name, value);
+		return;
+	      }
 	  }
 	catch (Exception ex)
 	  {
 	    throw new WrappedException("error accessing field "+field, ex);
 	  }
-	if (object instanceof Binding)
-	  env.addBinding((Binding) object);
-	else
-	  {
-	    if (object instanceof Named)
-	      name = ((Named) object).getName();
-	    else
-	      name = name.intern();
-	    env.define(name, object);
-	  }
       }
-    else
-      {
-	Binding binding = new Binding(name);
-	setValue(binding, object);
-	setConstraint(binding, new ClassMemberConstraint(field));
-	env.addBinding(binding);
-      }
+    name = name.intern();
+    Binding binding = new Binding(name);
+    setValue(binding, object);
+    setConstraint(binding, new ClassMemberConstraint(field));
+    env.addBinding(binding);
   }
 
   /** Import all the public fields of an object. */

@@ -59,7 +59,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	if (pos.sequence instanceof TreeList)
 	  {
 	    TreeList tlist = (TreeList) pos.sequence;
-	    namedChildren(type, atlist,
+	    namedChildren(type, tlist,
 			  tlist.posToDataIndex(pos.ipos), consumer);
 	  }
       }

@@ -759,7 +759,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if ((next < 0 || next == '{' || next == delimiter)
 	    && sbuf.length() > 0)
 	  {
-	    result.add(new QuoteExp(new FString(sbuf)));
+	    result.addElement(new QuoteExp(new FString(sbuf)));
 	    sbuf.setLength(0);
 	  }
 	if (next < 0)

@@ -152,14 +152,6 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     return exp;
   }
 
-  /*
-  public void compareIntegers(Expression arg0, Expression arg1,
-			      Compilation comp, Target target)
-  {
-    compile [[ new ApplyExp(this, { new ApplyExp(<IntNum.compare>, { arg0, arg1 }), QuoteExp.zeroExp }) ]];
-  }
-  */
-
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
@@ -170,7 +162,9 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	int kind0 = classify(arg0);
 	int kind1 = classify(arg1);
 	CodeAttr code = comp.getCode();
-	if (kind0 >= int_KIND && kind1 >= int_KIND)
+	if (kind0 >= RealNum_KIND && kind1 >= RealNum_KIND
+	    // Don't optimize if both operands are fractions.
+	    && (kind0 != RealNum_KIND || kind1 != RealNum_KIND))
 	  {
 	    if (! (target instanceof ConditionalTarget))
 	      {
@@ -178,13 +172,52 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 			      comp, target);
 		return;
 	      }
-	    StackTarget intTarget = new StackTarget(Type.int_type);
-	    ConditionalTarget ctarget = (ConditionalTarget) target;
-	    
-	    int opcode;
 	    int mask = flags;
 	    if (mask == TRUE_IF_NEQ)
 	      mask = TRUE_IF_GRT|TRUE_IF_LSS;
+	    if (kind0 >= IntNum_KIND && kind1 >= IntNum_KIND
+		&& (kind0 < long_KIND || kind1 < long_KIND))
+	      {
+		Type[] ctypes = new Type[2];
+		ctypes[0] = AddOp.typeIntNum;
+		if (kind1 >= long_KIND)
+		  {
+		    ctypes[1] = Type.long_type;
+		  }
+		else if (kind0 >= long_KIND
+			 // Simple check to avoid re-ordering side-effects.
+			 && (arg0 instanceof QuoteExp
+			     || arg1 instanceof QuoteExp
+			     || arg0 instanceof ReferenceExp
+			     || arg1 instanceof ReferenceExp))
+		  {
+		    ctypes[1] = Type.long_type;
+		    args = new Expression[2];
+		    args[0] = arg1;
+		    args[1] = arg0;
+		    mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
+		  }
+		else
+		  ctypes[1] = AddOp.typeIntNum;
+		Method cmeth
+		  = AddOp.typeIntNum.getDeclaredMethod("compare", ctypes);
+		PrimProcedure compare = new PrimProcedure(cmeth);
+		System.err.println("do compare "+compare);
+		arg0 = new ApplyExp(compare, args);
+		arg1 = new QuoteExp(IntNum.zero());
+		kind0 = kind1 = int_KIND;
+	      }
+	    Type commonType;
+	    if (kind0 >= int_KIND && kind1 >= int_KIND)
+	      commonType = Type.int_type;
+	    else if (kind0 >= long_KIND && kind1 >= long_KIND)
+	      commonType = Type.long_type;
+	    else
+	      commonType = Type.double_type;
+	    StackTarget subTarget = new StackTarget(commonType);
+	    ConditionalTarget ctarget = (ConditionalTarget) target;
+	    
+	    int opcode;
 	    if (arg0 instanceof QuoteExp && ! (arg1 instanceof QuoteExp))
 	      {
 		Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
@@ -204,9 +237,10 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	      default:
 		opcode = 0;
 	      }
-	    arg0.compile(comp, intTarget);
+	    arg0.compile(comp, subTarget);
 	    Object value;
-	    if (arg1 instanceof QuoteExp
+	    if (kind0 >= int_KIND && kind1 >= int_KIND
+		&& arg1 instanceof QuoteExp
 		&& (value = ((QuoteExp) arg1).getValue()) instanceof IntNum
 		&& ((IntNum) value).isZero())
 	      {
@@ -214,37 +248,26 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	      }
 	    else
 	      {
-		arg1.compile(comp, intTarget);
+		arg1.compile(comp, subTarget);
 		code.emitGotoIfCompare2(label1, opcode);
 	      }
 	    ctarget.emitGotoFirstBranch(code);
 	    return;
 	  }
-	if (kind0 >= IntNum_KIND && kind1 >= IntNum_KIND)
-	  {
-	    /*
-	    compareIntegers(arg0, arg1, comp, target);
-	    return;
-	    */
-	  }
       }
     ApplyExp.compile(exp, comp, target);
   }
 
-  private static final int IntNum_KIND = 5;
-  private static final int long_KIND = 6;
-  private static final int int_KIND = 7;
+  // Return a code indicate type of number:
+  private static final int Unknown_KIND = 0; // unknown or invalid type
+  private static final int Number_KIND = 1; // java.lang.Number - not used
+  private static final int Numeric_KIND = 2;  // gnu.math.Numeric
+  private static final int RealNum_KIND = 3; // exact or unknown real
+  private static final int double_KIND = 4; // inexact real (double or DFloNum)
+  private static final int IntNum_KIND = 5; // gnu.math.IntNum
+  private static final int long_KIND = 6; // long
+  private static final int int_KIND = 7; // int
 
-  /** Return a code indicate type of number:
-   * 0: unknown or invalid type
-   * 1: java.lang.Number - ignored for now
-   * 2: gnu.math.Numeric
-   * 3: gnu.math.RealNum
-   * 4  floating primitive type
-   * 5: gnu.math.IntNum
-   * 6: long (including literal in long range??)
-   * 7: int
-   */
   static int classify (Expression exp)
   {
     Type type = exp.getType();
@@ -268,9 +291,9 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
       {
 	char sig = type.getSignature().charAt(0);
 	if (sig == 'V' || sig == 'Z' || sig == 'C')
-	  return 0;
+	  return Unknown_KIND;
 	if (sig == 'D' || sig == 'F')
-	  return 4;
+	  return double_KIND;
 	if (sig == 'J')
 	  return long_KIND;
 	return int_KIND;
@@ -278,12 +301,12 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
      if (type.isSubtype(AddOp.typeIntNum))
        return IntNum_KIND;
      if (type.isSubtype(AddOp.typeDFloNum))
-       return 4;
+       return double_KIND;
      if (type.isSubtype(AddOp.typeRealNum))
-       return 3;
+       return RealNum_KIND;
      if (type.isSubtype(AddOp.typeNumeric))
-       return 2;
-    return 0;
+       return Numeric_KIND;
+    return Unknown_KIND;
   }
 
   public Type getReturnType (Expression[] args)

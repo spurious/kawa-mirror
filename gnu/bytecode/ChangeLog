@@ -1,3 +1,8 @@
+2005-03-22  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitTryStart): Create new TryState *after* we
+	save any stack values, so saves come before exception range start.
+
 2005-03-02  Per Bothner  <per@bothner.com>
 
 	* Field.java (setConstantValue): Handle boolean and char fields.

@@ -430,7 +430,7 @@ System.err.println("after parseArgs:"+peekToken());
       }
     Expression body = parseBlock();
     LambdaExp lexp = new LambdaExp(body);
-    lexp.name = name;
+    lexp.setName(name);
     SetExp sexp = new SetExp(name, lexp);
     sexp.setDefining(true);
     return sexp;

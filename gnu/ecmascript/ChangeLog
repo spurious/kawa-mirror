@@ -1,3 +1,8 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* Parser.java (parseFunctionDefinition): Use setName method, since
+	LambdaExp's name field was removed.
+
 2004-01-09  Per Bothner  <per@bothner.com>
 
 	* Parser.java (main):  Update Environment.setCurrent to setGlobal.

@@ -43,6 +43,14 @@ public class Symbol
     return ns == null ? null : ns.getName();
   }
 
+  public final boolean hasEmptyNamespace ()
+  {
+    Namespace ns = getNamespace();
+    String nsname;
+    return (ns == null
+	    || (nsname = ns.getName()) == null || nsname.length() == 0);
+  }
+
   /** Synonym for getName - the "print name" of the symbol without Namespace.
    * Useful when thinking of a Symbol as an XML QName. */
   public final String getLocalName()

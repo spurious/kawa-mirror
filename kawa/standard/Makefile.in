@@ -166,9 +166,16 @@ vector_set_b.class \
 vector2list.class \
 list2vector.class \
 vector_fill_b.class \
+call_with_input_file.class \
+call_with_output_file.class \
+current_input_port.class \
+current_output_port.class \
+with_input_from_file.class \
+with_output_to_file.class \
 read.class \
 readchar.class \
 eof_object_p.class \
+char_ready_p.class \
 write.class \
 newline.class \
 writechar.class \

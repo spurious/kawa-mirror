@@ -198,8 +198,18 @@ public class StandardInterpreter extends Interpreter
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
 
       //-- Section 6.10
+      define_proc ("call-with-input-file",
+		   "kawa.standard.call_with_input_file");
+      define_proc ("call-with-output-file",
+		   "kawa.standard.call_with_output_file");
       define_proc ("input-port?", "kawa.standard.input_port_p.java");
       define_proc ("output-port?", "kawa.standard.output_port_p.java");
+      define_proc ("current-input-port", "kawa.standard.current_input_port");
+      define_proc ("current-output-port", "kawa.standard.current_output_port");
+      define_proc ("with-input-from-file",
+		   "kawa.standard.with_input_from_file");
+      define_proc ("with-output-to-file",
+		   "kawa.standard.with_output_to_file");
       define_proc ("open-input-file", "kawa.standard.open_input_file");
       define_proc ("open-output-file", "kawa.standard.open_output_file");
       define_proc ("close-input-port", "kawa.standard.close_input_port");

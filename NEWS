@@ -7,7 +7,7 @@ An example is the check-format-users test in gnu/xquesry/testsuite/Makefile.
 There are now converts between SAX2 and Consumer events, and a basic
 implementation of XMLReader based on XMLParser.
 
-as-xml ?
+The function as-xml prints a value in XML format.
 
 Srfi-0 (cond-expand), srfi-8 (receive), and srfi-25 (multi-dimensional
 array)  are now implemented.  So is srfi-1 (list library), though that

@@ -1,3 +1,7 @@
+Sun Mar 21 16:55:47 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* misc-test.scm:  Add tests for location and define-alias.
+
 Thu Mar 11 11:09:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* misc-test.scm:  Add another test.

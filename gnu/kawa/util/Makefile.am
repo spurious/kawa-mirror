@@ -8,7 +8,6 @@ javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
   AbstractString.java \
-  Char.java \
   CharBuffer.java \
   F32Vector.java \
   F64Vector.java \

@@ -1,4 +1,5 @@
 package gnu.kawa.util;
+import gnu.text.Char;
 
 public abstract class AbstractString extends UniformVector
 {

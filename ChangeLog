@@ -1,3 +1,9 @@
+2005-02-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (namespaceResolve): Only coerce String,
+	FString, and Symbol with empty emptyspace to namespace uri.
+	Specifically, don't coerce a <ClassType> at this point.
+
 2005-02-20  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewrite(LambdaExp,Object,Translator): Rename

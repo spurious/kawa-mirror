@@ -517,8 +517,10 @@ public class Translator extends Compilation
 	if (dval instanceof QuoteExp)
 	  {
 	    Object val = ((QuoteExp) dval).getValue();
-	    String uri = val.toString();
-	    return Symbol.make(uri, local);
+	    if (val instanceof String || val instanceof FString
+		|| (val instanceof Symbol
+		    && ((Symbol) val).hasEmptyNamespace()))
+	      return Symbol.make(val.toString(), local);
 	  }
       }
     return str;

@@ -1,3 +1,12 @@
+2002-01-07  Per Bothner  <per@bothner.com>
+
+	* NamedChildrenFilter.java:  New class, extends FilterConsumer.
+	* Makefile.am (java_sources):  Add NamedChildrenFilter.java.
+
+	* NamespaceResolver.java (endAttributes):  Fix range bug.
+
+	* XMLPrinter.java (beginDocument, endDocument):  New methods.
+
 2002-01-02  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java.in:  No longer read entire file into buffer.

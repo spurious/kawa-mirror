@@ -17,6 +17,7 @@ java_FUTURE = \
   XMLConsumer.java
 
 java_sources = \
+  NamedChildrenFilter.java \
   NamespaceResolver.java \
   QName.java \
   XPath.java \

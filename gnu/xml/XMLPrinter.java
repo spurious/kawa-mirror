@@ -104,6 +104,10 @@ public class XMLPrinter implements Consumer, PositionConsumer
     out.writeLong(v);
   }
 
+  public void beginDocument() { }
+
+  public void endDocument() { }
+
   public void beginGroup(String typeName, Object type)
   {
     closeTag();

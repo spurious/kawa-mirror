@@ -18,21 +18,19 @@ public class ELispReader extends CLispReader
     super(port, messages);
   }
   
-  protected ReadTable getReadTable () { return elispReadTable; }
-
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
   {
     return (new ELispReader(port)).readObject();
   }
 
-  public static ReadTable elispReadTable;
-  static
+  public static ReadTable createReadTable ()
   {
-    elispReadTable = ReadTable.getInitial();
-    elispReadTable.set('[', new ReaderVector(']'));
-    elispReadTable.remove(']');
-    elispReadTable.set('?', new ELispReadTableEntry('?'));
+    ReadTable rt = ReadTable.getInitial();
+    rt.set('[', new ReaderVector(']'));
+    rt.remove(']');
+    rt.set('?', new ELispReadTableEntry('?'));
+    return rt;
   }
 }
 

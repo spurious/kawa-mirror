@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2004  Per M.A. Bothner.
+// Copyright (c) 2001, 2004, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.commonlisp.lang;
@@ -10,6 +10,7 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.lispexpr.ReadTable;
 
 public class CommonLisp extends Lisp2
 {
@@ -182,6 +183,9 @@ public class CommonLisp extends Lisp2
       }
     return Type.make(clas);
   }
+
+  public ReadTable createReadTable ()
+  {
+    return ReadTable.getInitial();
+  }
 }
-
-

@@ -4,6 +4,7 @@ import kawa.standard.Scheme;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
+import gnu.kawa.lispexpr.ReadTable;
 
 public class BRL extends Scheme
 {
@@ -78,6 +79,16 @@ public class BRL extends Scheme
     if (isBrlCompatible())
       return super.makeBody(exps);
     return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
+  }
+
+  static BRLReaderString brlReader =  new BRLReaderString();
+
+  public ReadTable createReadTable ()
+  {
+    ReadTable rt = super.createReadTable();
+    rt.setBracketMode(1);
+    rt.set(']', brlReader);
+    return rt;
   }
 
   public Procedure getPrompter()

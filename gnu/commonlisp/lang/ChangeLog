@@ -1,3 +1,9 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	*  CLispReader.java (getReadTable): Remove method.
+	(clispReadTable): Remove field.
+	* CommonLisp.java (createReadTable): New method.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* defvar.java (scanForDefinitions): Mark new declaration IS_DYNAMIC.

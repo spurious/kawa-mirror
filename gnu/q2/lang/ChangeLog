@@ -1,3 +1,9 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	* Q2.java (createReadTable): New method.
+	* Q2Read.java (getReadTable): Remove method.
+	(q2ReadTable): Remove field.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* Q2.java (registerEnvironment): Use new setDefaults method.

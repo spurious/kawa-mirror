@@ -4,6 +4,7 @@ import kawa.standard.Scheme;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
+import gnu.kawa.lispexpr.ReadTable;
 
 public class Q2 extends Scheme
 {
@@ -63,6 +64,13 @@ public class Q2 extends Scheme
   public Procedure getPrompter()
   {
     return new Prompter();
+  }
+
+  public ReadTable createReadTable ()
+  {
+    ReadTable rt = ReadTable.getInitial();
+    rt.set('(', new Q2ReaderParens());
+    return rt;
   }
 }
 

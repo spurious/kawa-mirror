@@ -5,7 +5,7 @@ import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
-import gnu.kawa.lispexpr.LangPrimType;
+import gnu.kawa.lispexpr.*;
 import gnu.commonlisp.lang.*;
 import gnu.kawa.functions.DisplayFormat;
 
@@ -238,6 +238,11 @@ public class ELisp extends Lisp2
 	return Scheme.getNamedType(name);
       }
     return Type.make(clas);
+  }
+
+  public ReadTable createReadTable ()
+  {
+    return ELispReader.createReadTable();
   }
 
   public static void readableChar(char ch, StringBuffer buf, boolean quote)

@@ -1,3 +1,12 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	* BRL.java (createReadTable): New method.
+	* BRLRead.java (getReadTable): Remove method.
+	(brlReadTable): Remove field.
+	(set_string_start): Removed method - inlined in creatReadTable.
+	(brlReader): Move to ..
+	* BRL.java: ... and make static.
+
 2005-03-07  Per Bothner  <per@bothner.com>
 
 	* BRL.java: Update Interpreter -> Language.

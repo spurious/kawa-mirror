@@ -29,8 +29,6 @@ public class Q2Read extends LispReader
     init();
   }
   
-  protected ReadTable getReadTable () { return q2ReadTable; }
-
   int skipIndentation ()
       throws java.io.IOException, SyntaxException
   {
@@ -182,13 +180,6 @@ public class Q2Read extends LispReader
     expressionStartFile = port.getName();
     expressionStartLine = port.getLineNumber();
     expressionStartColumn = port.getColumnNumber();
-  }
-
-  public static ReadTable q2ReadTable;
-  static
-  {
-    q2ReadTable = ReadTable.getInitial();
-    q2ReadTable.set('(', new Q2ReaderParens());
   }
 }
 

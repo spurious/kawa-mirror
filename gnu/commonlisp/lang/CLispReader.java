@@ -17,8 +17,6 @@ public class CLispReader extends LispReader
     super(port, messages);
   }
   
-  protected ReadTable getReadTable () { return clispReadTable; }
-
   protected Object makeSymbol (String name)
   {
     return CommonLisp.asSymbol(name.intern());
@@ -28,11 +26,5 @@ public class CLispReader extends LispReader
       throws java.io.IOException, SyntaxException
   {
     return (new CLispReader(port)).readObject();
-  }
-
-  public static ReadTable clispReadTable;
-  static
-  {
-    clispReadTable = ReadTable.getInitial();
   }
 }

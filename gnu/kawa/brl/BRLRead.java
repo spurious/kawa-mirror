@@ -20,7 +20,6 @@ public class BRLRead extends LispReader
   void init()
   {
     initialColonIsKeyword = false;
-    set_string_start(']');
     ((InPort) port).readState = ']';
   }
 
@@ -36,8 +35,6 @@ public class BRLRead extends LispReader
     init();
   }
   
-  protected ReadTable getReadTable () { return brlReadTable; }
-
   public Object readObject ()
       throws java.io.IOException, SyntaxException
   {
@@ -60,7 +57,7 @@ public class BRLRead extends LispReader
 	    if (port.readState == ']')
 	      {
 		port.unread();
-		Object value = brlReader.read(this, ']', 1);
+		Object value = BRL.brlReader.read(this, ']', 1);
 		if (ch == '[' && value == BRL.emptyForm)
 		  continue;
 		return value;
@@ -98,15 +95,6 @@ public class BRLRead extends LispReader
     return (new BRLRead(port)).readObject();
   }
 
-  public BRLReaderString brlReader =  new BRLReaderString();
-
-  public void set_string_start(char c)
-  {
-    brlReadTable = ReadTable.getInitial();
-    brlReadTable.setBracketMode(1);
-    brlReadTable.set(c, brlReader);
-  }
-
   boolean brlCompatible = false;
 
   public boolean isBrlCompatible() { return brlCompatible; }
@@ -126,11 +114,5 @@ public class BRLRead extends LispReader
     expressionStartFile = port.getName();
     expressionStartLine = port.getLineNumber();
     expressionStartColumn = port.getColumnNumber();
-  }
-
-  public static ReadTable brlReadTable;
-  static
-  {
-    brlReadTable = ScmRead.makeSchemeReadTable();
   }
 }

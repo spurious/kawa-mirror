@@ -1924,7 +1924,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=kawa
- VERSION=1.7.90
+ VERSION=1.7.91
 
 
 cat >>confdefs.h <<_ACEOF

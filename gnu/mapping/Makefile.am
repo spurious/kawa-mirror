@@ -14,6 +14,7 @@ java_JAVA=\
   InPort.java \
   Location.java \
   LogWriter.java \
+  NameMap.java \
   Named.java \
   OutPort.java \
   Printable.java \

@@ -1,3 +1,7 @@
+2003-07-14  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (makeBuiltinUnary):  New factory method.
+
 2003-06-13  Per Bothner  <per@bothner.com>
 
 	* Keyword.java (apply):  Use CallContext's getNextArg

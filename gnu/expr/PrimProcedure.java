@@ -253,6 +253,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this.argTypes= argTypes;
   }
 
+  public static PrimProcedure makeBuiltinUnary(int opcode, Type type)
+  {
+    // FIXME - should cache!
+    Type[] args = new Type[1];
+    args[0] = type;
+    return new PrimProcedure(opcode, type, args);
+  }
+
   public static PrimProcedure makeBuiltinBinary(int opcode, Type type)
   {
     // FIXME - should cache!

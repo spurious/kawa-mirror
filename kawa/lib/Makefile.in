@@ -126,6 +126,7 @@ SECONDARY_OBJS=\
   strings$$string__length.class \
   syntax$$_Cdefmacro.class \
   syntax$$gentemp.class \
+  syntax$$dynamic__wind.class \
   thread$$exit.class \
   vectors$$list_2_vector.class \
   vectors$$vector__length.class \

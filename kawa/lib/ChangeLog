@@ -1,3 +1,8 @@
+Sun Dec 14 16:53:58 1997  Per Bothner  <bothner@cygnus.com>
+
+	* syntax.scm (dynamic-wind):  New procedure.
+	(fluid-let):  New syntax.
+
 Sat Nov  1 23:26:45 1997  Per Bothner  <bothner@cygnus.com>
 
 	* misc.scm (scheme-implementation-version):  New procedure.

@@ -1,3 +1,110 @@
+Wed Sep  4 13:43:32 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/CompileFile.java (compile_to_files):  New function,
+	to compile to one or more source files.
+
+	* kawa/lang/SchemeLoader.java:  Zip archive support moved
+	to codegen/ZipArchive.java.
+	* kawa/lang/compilefunc.java:  Maybe compile to ModuleBody.
+
+	* kawa/lang/{SyntaxRuleSyntaxRules}.java:  New classes, to support
+	define-syntax/syntax-rules (R5RS hygienic top-level macros).
+
+	* kawa/lang/AutoloadProcedure.java (name):  Replace by super.name().
+	(load) Support autoloading an entire module.
+	* kawa/lang/AutoloadSyntax.java:  New class, to autoload macros.
+
+	* kawa/lang/{Nameable,Named}.java:  Store a symbol, not a String.
+	(name):  Change from String field to Symbol-returning method.
+	* kawa/lang/{Procedure,Procedure0,Procedure1,Procedure2,Procedure3,
+	Procedure4,Procedure0or1,Procedure1or2,Interpreter,LambdaProcedure,
+	Syntax,compilefunc}.java:  Update to use Named.name().
+	* kawa/lang/Compilation.java (nameField):  Update name and Type.
+	* kawa/lang/ProcedureN.java:  Add Symbol-taking constructor.
+	* kawa/lang/LambdaExp.java (name):  Change from String to Symbol.
+	* kawa/lang/LambdaProcedure.java (constructor):  Name is now Symbol.
+	* kawa/lang/compilefunc.java (compile):  Name is now a Symbol.
+
+	* kawa/lang/Syntax.java (print):  New method to implement Printable.
+	* kawa/lang/UnboundSymbol.java:  Store a Symbol rather than a String.
+	* kawa/lang/ReferenceExp.java (eval):  Update for UnboundSymbol fix.
+	* kawa/lang/LambdaExp.java (is_module_body):  New field,
+	(isModuleBody,setModuleBody):  New methods.
+
+	* kawa/lang/Procedure.java:  No longer implement Executable.
+	(execute):  Remove obsolete interface.
+
+	* kawa/lang/Interpreter.java (quasiquote,unquote, unquotesplicing):
+	Remove unused fields.
+	* kawa/lang/Interpreter.java (resolve):  Add extra argument
+	so caller can do current_decls.get and test for renamed global.
+
+	* kawa/lang/ReadError.java:  Include line number info in error message.
+	* kawa/lang/Interpreter.java (rewrite_car, rewrite_pair_with_position,
+	rewrite_pair):  New functions to rewrite with line numbers.
+	(syntaxError):  Report filename and line/column position.
+	* kawa/lang/Expression.java (filename, position):  New fields.
+	(setFile, setLine, getFile, setFule, getColumn):  New methods.
+
+	* kawa/lang/Pattern.java (match):  New abstract calling interface.
+	(varCount):  New abstract method.
+	* kawa/lang/{EqualPat,ListPat,VarListPat}.java (match):
+	Change to match new interface.  Implement varCount.
+	* kawa/lang/EqualPat.java (makeLiteral, emit):  Implement Compilable.
+	* kawa/lang/{AnyPat,ListRepeatPat,PairPat).java:  New Pattern classes.
+
+	* kawa/lang/ModuleBody.java:  New sub-class of Procedure0.
+	* kawa/lang/ErrorExp.java (compile):  Fix reversed test.
+
+	* kawa/lang/InPort.java:  Keep track of line and column position.
+	Supports marks and reset.
+	(readQuote):  Generalize with extra argument.
+	(readQuasiQuote):  Superseded by generalized readQuote.
+
+	* kawa/lang/Literal.java (emitArray):  New method.
+	(emit):  Support (Object[]), (Symbol[]), (String) type literals.
+	(check_cycle):  New method.
+	* kawa/lang/{WrongArguments,WrongType}.java:  Add Symbol-taking init.
+	* kawa/lang/IfExp.java (eval,compile): Missing else returns voidObject.
+	* kawa/lang/print.java (print):  Handle (int[]).
+
+	* kawa/lang/Compilation (emitLiteral):  New method.
+	(scmPatternType,symbolArrayType,scmNamedType,nameField):  New statics.
+	(findLiteral):  Handle Object[] values.
+	(findNamedClass, generateClassName, constructor):  New methods.
+	* kawa/lang/LambdaExp.java (compile):  Use new generateClassName.
+	(eval):  Use more natural class names.
+	* kawa/lang/Vector.java (findLiteral):
+	Simplify by using new support for emitting Object[] values.
+	* kawa/lang/{Pair,Vector}.java (emit):  Use new emitLiteral method.
+	* kawa/lang/PairWithPosition.java:  New class extends Pair.
+	
+	* kawa/lang/{Executable,Syntaxable,QuasiQuote,Unquote,
+	UnquoteSplicing}.java:  Remove obsolete classes.
+	* kawa/lang/Makefile.{am,in}:  Update for new and removed classes.
+
+	* kawa/standard/{begin,cond,define,ifp,let,letrec,letstar,set_b}.java:
+	Remove print method.  No longer needed.
+	* kawa/standard/{apply,boolean_p,procedure_p}.java:
+	Remove non-default constructor.  Name binding handled by autoload.
+	* kawa/standard/{ass,mem,readchar,write}.java: Use new Named.name().
+	* kawa/standard/define.java (rewrite):  Call setName with Symbol.
+	* kawa/standard/define_syntax.java:  New class - hygienic macros.
+
+	* kawa/standard/StandardInterpreter.java (define_syntax): New function.
+	(constructor):  Add new macros.  Some cleanup here and there.
+	* kawa/standard/load.java (loadClassFile):  New function.
+	(apply1):  Also support loading from a .class file.
+	* kawa/standard/{unless,when}.java:  Replaced by lib.when_unless.
+	* kawa/standard/Makefile.{am,in}:  Update.  Fix SUFFIXES.
+
+	* kawa/lib:  New directory.
+	* kawa/Makefile.{am,in}:  Add lib to SUBDIRS.
+
+	* configure{.in,} (AC_OUTPUT):  Add kawa/lib/Makefile.
+	* kawac.java:  New application class.
+	* Makefile.{am,in}:  Build kawac.class.  Fix SUFFIXES.
+
 Tue Aug 20 13:59:36 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Values.java:  New class.

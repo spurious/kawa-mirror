@@ -1,3 +1,11 @@
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (flags):  New variable.
+	(ADD_FIELDS_DONE, ADD_METHODS_DONE, EXISTING_CLASS):  New constants.
+	* ClassType.java (addFields):  New method.
+	(getDeclaredField):  New method.  May call addFields. 
+	(getDeclaredMethod, getMethod):  New methods.  May call addMethods.
+
 1999-11-03  Per Bothner  <per@bothner.com>
 
 	* Type.java (isSubtype):  Use new isSubclass method from ClassType.

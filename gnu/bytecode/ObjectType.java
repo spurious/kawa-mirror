@@ -12,6 +12,12 @@ public abstract class ObjectType extends Type
     size = 4;
   }
 
+  // Miscellaneous bits:
+  final static int ADD_FIELDS_DONE  = 1;
+  final static int ADD_METHODS_DONE = 2;
+  // A ClassType that we can expect to have a corresponding reflectClass.
+  final static int EXISTING_CLASS = 4;
+  int flags;
 
   public abstract String getNameOrSignature();
 
@@ -22,6 +28,7 @@ public abstract class ObjectType extends Type
       {
 	if (reflectClass == null)
 	  reflectClass = Class.forName(getNameOrSignature().replace('/', '.'));
+        flags |= EXISTING_CLASS;
       }
     catch (java.lang.ClassNotFoundException ex)
       {

@@ -24,6 +24,7 @@ public class ClassType extends ObjectType implements AttrContainer {
       {
 	cl = new ClassType(name);
 	classTable.put(name, cl);
+        cl.flags |= EXISTING_CLASS;
       }
     return cl;
   }
@@ -164,9 +165,13 @@ public class ClassType extends ObjectType implements AttrContainer {
     return fields_count;
   }
 
-  /** Find a field with the given name,or null. */
-  public Field getField(String name)
+  /** Find a field with the given name declared in this class.
+   * @return the matching field, or null if there is no such field.
+   */
+  public Field getDeclaredField(String name)
   {
+    if ((flags & (ADD_FIELDS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
+      addFields();
     Field field;
     for (field = fields;   field != null;  field = field.next)
       {
@@ -174,6 +179,23 @@ public class ClassType extends ObjectType implements AttrContainer {
 	  return field;
       }
     return null;
+  }
+
+  /** Find a field with the given name declared in this class or its ancestors.
+   * @return the matching field, or null if there is no such field.
+   */
+  public Field getField(String name)
+  {
+    ClassType cl = this;
+    for (;;)
+      {
+        Field field = cl.getDeclaredField(name);
+        if (field != null)
+          return field;
+        cl = cl.getSuperclass();
+        if (cl == null)
+          return null;
+      }
   }
 
   /**
@@ -204,6 +226,35 @@ public class ClassType extends ObjectType implements AttrContainer {
     field.type = type;
     field.flags = flags;
     return field;
+  }
+
+  /** Use reflection to add all the declared fields of this class.
+   * Does not add private or package-private fields.
+   * Does not check for duplicate (already-known) fields. */
+  public void addFields()
+  {
+    Class clas = getReflectClass();
+    java.lang.reflect.Field[] fields;
+    try
+      {
+        fields = clas.getDeclaredFields();
+      }
+    catch (SecurityException ex)
+      {
+        fields = clas.getFields();
+      }
+    int count = fields.length;
+    for (int i = 0;  i < count;  i++)
+      {
+        java.lang.reflect.Field field = fields[i];
+        if (! field.getDeclaringClass().equals(clas))
+          continue;
+        int modifiers = field.getModifiers();
+        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
+          continue;
+        addField(field.getName(), Type.make(field.getType()), modifiers);
+      }
+    flags |= ADD_FIELDS_DONE;
   }
 
   Method methods;
@@ -251,12 +302,34 @@ public class ClassType extends ObjectType implements AttrContainer {
   public Method addMethod (String name, int flags,
 			   Type[] arg_types, Type return_type)
   {
+    Method method = getDeclaredMethod(name, arg_types);
+    if (method != null
+        && return_type.equals(method.getReturnType())
+        && flags == method.access_flags)
+      return method;
+
+    method = new Method (this, flags);
+    method.setName(name);
+    method.arg_types = arg_types;
+    method.return_type = return_type;
+    return method;
+  }
+
+  public Method addMethod (String name,  String signature, int flags)
+  {
+    Method meth = addMethod(name, flags);
+    meth.setSignature(signature);
+    return meth;
+  }
+
+  public Method getDeclaredMethod(String name, Type[] arg_types)
+  {
+    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
+      addMethods(getReflectClass());
     Method method;
     for (method = methods;  method != null;  method = method.next)
       {
-	if (! name.equals(method.getName())
-	    || ! return_type.equals(method.getReturnType())
-	    || flags != method.access_flags)
+	if (! name.equals(method.getName()))
 	  continue;
 	Type[] method_args = method.getParameterTypes();
 	if (arg_types == method_args)
@@ -272,19 +345,21 @@ public class ClassType extends ObjectType implements AttrContainer {
 	if (i < 0)
 	  return method;
       }
-
-    method = new Method (this, flags);
-    method.setName(name);
-    method.arg_types = arg_types;
-    method.return_type = return_type;
-    return method;
+    return null;
   }
 
-  public Method addMethod (String name,  String signature, int flags)
+  public Method getMethod(String name, Type[] arg_types)
   {
-    Method meth = addMethod(name, flags);
-    meth.setSignature(signature);
-    return meth;
+    ClassType cl = this;
+    for (;;)
+      {
+        Method method = cl.getDeclaredMethod(name, arg_types);
+        if (method != null)
+          return method;
+        cl = cl.getSuperclass();
+        if (cl == null)
+          return null;
+      }
   }
 
   /** Use reflection to add all the declared methods of this class.
@@ -303,7 +378,6 @@ public class ClassType extends ObjectType implements AttrContainer {
         methods = clas.getMethods();
       }
     int count = methods.length;
-    System.err.println("addMethods("+clas+") #"+ count);
     for (int i = 0;  i < count;  i++)
       {
         java.lang.reflect.Method method = methods[i];
@@ -317,14 +391,16 @@ public class ClassType extends ObjectType implements AttrContainer {
         Type[] args = new Type[j];
         while (--j >= 0)
           args[j] = Type.make(paramTypes[j]);
-        addMethod(method.getName(), modifiers,
-                  args, Type.make(method.getReturnType()));
+        Method meth = new Method (this, modifiers);
+        meth.setName(method.getName());
+        meth.arg_types = args;
+        meth.return_type = Type.make(method.getReturnType());
       }
+    flags |= ADD_METHODS_DONE;
   }
 
   public Method[] getMatchingMethods(String name, Type[] paramTypes, int flags)
   {
-    System.err.println(""+this+".getMatchingMethods("+name);
     int i = getMethodCount();
     int nMatches = 0;
     java.util.Vector matches = new java.util.Vector(10);

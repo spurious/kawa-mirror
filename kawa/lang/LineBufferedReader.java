@@ -59,6 +59,9 @@ public class LineBufferedReader extends FilterReader
   /* If true in flags, may not re-allocate buffer. */
   private static final int USER_BUFFER = 2;
 
+  /* If true in flags, char before start of buffer was '\r'. */
+  private static final int PREV_WAS_CR = 4;
+
   /** True if CR and CRLF should be converted to LF. */
   public final boolean getConvertCR () { return (flags & CONVERT_CR) != 0; }
 
@@ -81,7 +84,7 @@ public class LineBufferedReader extends FilterReader
   int lineStartPos;
 
   /** The current line number (at position of lineStartPos). */
-  int lineNumber = -1;
+  int lineNumber;
 
   /** If mark has been called, and not invalidated, the read ahead limit.
     * Zero if mark has not been called, or had been invalidated
@@ -214,31 +217,45 @@ public class LineBufferedReader extends FilterReader
 
   public int read () throws java.io.IOException
   {
-    char prev = '\0';
-    if (pos == 0 ? lineStartPos >= 0
-	: ((prev = buffer[pos-1]) == '\n' || prev == '\r'))
+    char prev;
+    if (pos > 0)
+      prev = buffer[pos-1];
+    else if ((flags & PREV_WAS_CR) != 0)
+      prev = '\r';
+    else if (lineStartPos >= 0)
+      prev = '\n';
+    else
+      prev = '\0';
+    if (prev == '\r' || prev == '\n')
       {
-	boolean revisited = pos < highestPos;
-	if (prev != '\n' || !getConvertCR()
-	    || pos <= 1 || buffer[pos-2] != '\r')
+	if (lineStartPos < pos && (readAheadLimit == 0 || pos <= markPos))
 	  {
+	    lineStartPos = pos;
 	    lineNumber++;
+	  }
+	boolean revisited = pos < highestPos;
+	if (prev != '\n'
+	    || (pos <= 1 ? (flags & PREV_WAS_CR) == 0 : buffer[pos-2] != '\r'))
+	  {
 	    lineStart(revisited);
 	  }
 	if (! revisited)
 	  highestPos = pos + 1;  // Add one for this read().
-	if (readAheadLimit == 0 || pos < markPos)
-	  lineStartPos = pos;
       }
 
     if (pos >= limit)
       {
-	boolean prevWasCR = false;
 	if (buffer == null)
 	  buffer = new char[BUFFER_SIZE];
 	else if (limit == buffer.length)
 	  reserve(buffer, 1);
-
+	if (pos == 0)
+	  {
+	    if (prev == '\r')
+	      flags |= PREV_WAS_CR;
+	    else
+	      flags &= ~PREV_WAS_CR;
+	  }
 	int readCount = buffer.length - pos;
 	readCount = fill(buffer, pos, readCount);
 	if (readCount <= 0)
@@ -249,8 +266,20 @@ public class LineBufferedReader extends FilterReader
     int ch = buffer[pos++];
     if (ch == '\n')
       {
-	if (prev == '\r' && getConvertCR())
-	  return read();
+	if (prev == '\r')
+	  {
+	    // lineNumber is the number of lines before lineStartPos.
+	    // If lineStartPos is between '\r and '\n', we will count
+	    // an extra line for the '\n', which gets the count off.
+	    // Hence compensate.
+	    if (lineStartPos == pos - 1)
+	      {
+		lineNumber--;
+		lineStartPos--;
+	      }
+	    if (getConvertCR())
+	      return read();
+	  }
       }
     else if (ch == '\r')
       {
@@ -292,7 +321,7 @@ public class LineBufferedReader extends FilterReader
     int lineno = lineNumber;
     if (readAheadLimit == 0) // Normal, fast case:
       {
-	if (pos > 0 && lineStartPos != pos)
+	if (pos > 0 && pos > lineStartPos)
 	  {
 	    char prev = buffer[pos-1];
 	    if (prev == '\n' || prev == '\r')
@@ -503,11 +532,16 @@ public class LineBufferedReader extends FilterReader
       {
 	char ch = buffer[pos - 1];
 	if (ch != '\n' && ch != '\r')
-	  return buffer[pos];
+	  {
+	    ch = buffer[pos];
+	    if (ch == '\r' && getConvertCR())
+	      ch = '\n';
+	    return ch;
+	  }
       }
     int c = read ();
     if (c >= 0)
-      unread();
+      unread_quick();
     return c;
   }
 

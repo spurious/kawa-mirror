@@ -6,5 +6,5 @@
 ;; FUTURE
 
 (define-syntax future (syntax-rules ()
-				   ((delay expression)
+				   ((future expression)
 				    (%make-future (lambda () expression)))))

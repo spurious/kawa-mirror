@@ -10,6 +10,11 @@
 (define (current-output-port)
   ((primitive-static-method <output-port> "outDefault" <output-port> ())))
 
+;; SRFI-6
+(define (open-input-string string)
+  ((primitive-virtual-method <string> "open" <input-port> ())
+   string))
+
 (define (call-with-input-string str proc)
   (let* ((port
 	  ((primitive-virtual-method <string> "open" <input-port> ())

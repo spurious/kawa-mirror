@@ -1,3 +1,8 @@
+1999-10-25  Per Bothner  <per@bothner.com>
+
+	* kawa/lib/ports.scm (open-input-string):  New procedure. 
+	* kawa/lib/thread.scm (future):  Fix typo:  delay -> future.
+
 1999-09-10  Per Bothner  <per@bothner.com>
 
 	* files.scm (*temp-file-number*):  Revert to non-private, until we

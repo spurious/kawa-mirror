@@ -5,6 +5,7 @@ import kawa.standard.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
+import gnu.text.SourceMessages;
 
 public class Shell extends Procedure0
 {
@@ -81,8 +82,9 @@ public class Shell extends Procedure0
 			  InPort inp, OutPort pout, OutPort perr)
   {
     Environment env = interp.getEnvironment();
-    Translator tr = new Translator (env);
-    ScmRead lexer = new ScmRead(inp);
+    SourceMessages messages = new SourceMessages();
+    Translator tr = new Translator(env, messages);
+    ScmRead lexer = new ScmRead(inp, messages);
     for (;;)
       {
 	try
@@ -96,11 +98,10 @@ public class Shell extends Procedure0
 	    body.car = sexp;
 	    /* If the errors were minor, we could perhaps try to
 	       do Translation (to check for more errors)  .  ??? */
-	    if (lexer.checkErrors(perr, 20))
-	      continue;
-	    tr.errors = 0;
 	    ModuleExp mod = Scheme.makeModuleExp(body, tr);
 	    mod.setName("atInteractiveLevel");  // FIXME
+	    if (lexer.checkErrors(perr, 20))
+	      continue;
 
 	    /* DEBUGGING:
 	    perr.print ("[Re-written expression: ");
@@ -110,12 +111,9 @@ public class Shell extends Procedure0
 	    perr.flush();
 	    */
 
-	    if (tr.errors == 0)
-	      {
-		Object result = mod.evalModule (env);
-		if (pout != null)
-		  interp.print(result, pout);
-	      }
+	    Object result = mod.evalModule (env);
+	    if (pout != null)
+	      interp.print(result, pout);
 	  }
 	catch (WrongArguments e)
 	  {

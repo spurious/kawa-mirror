@@ -133,7 +133,7 @@ public class Compilation
   public static ClassType typeType = ClassType.make("gnu.bytecode.Type");
   public static ClassType typeObjectType
     = ClassType.make("gnu.bytecode.ObjectType", typeType);
-  public static ClassType typeClass = ClassType.make("java.lang.Class");
+  public static ClassType typeClass = Type.java_lang_Class_type;
   static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
@@ -2370,8 +2370,10 @@ public class Compilation
   public void loadClassRef (String className)
   {
     CodeAttr code = getCode();
-    /* #ifdef JAVA5 */
-    // code.emitPushConstant(code.getConstants().addClass(className));
+    // The following conditional should be for JAVA5, but that cause
+    // a verification error I haven't managed to figure out.  FIXME.
+    /* #ifdef false */
+    // code.emitPushClass(className);
     /* #else */
     code.emitPushString(className);
     code.emitInvokeStatic(getForNameHelper());

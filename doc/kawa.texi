@@ -723,6 +723,15 @@ Use a calling convention that does not support proper tail recursion.
 Self-tail-recursion (i.e. a recursive call to the current function)
 is still implemented correctly, assuming that the called function
 is known at compile time.
+@item --no-inline
+Disable inlining of known functions and methods.
+The generated code runs slower, but you can more reliably trace procedures.
+Normally Kawa will assume that a procedure @code{fn}
+declared using a @code{(define (fn args) body)} form is constant,
+assuming it isn't modified in the current module.  However, it is
+possible some other module might modify the binding of @code{fn}.
+You can use the @code{--no-inline} to disable the assumption that @code{fn}
+is constant.
 @end table
 
 The default is currently @code{--no-full-tailcalls} because I believe it is
@@ -3880,6 +3889,9 @@ For example, the following are all equivalent:
 
 You can call a Java method as if it were a Scheme procedure
 using various mechanisms.
+
+@subsection Invoking a method with a prefixed name
+
 The most convenient way to do it is to
 use @code{define-namespace} to define an alias for a Java class:
 @example
@@ -3926,11 +3938,13 @@ namespace alias:
 (java.lang.Object:toString some-value)
 @end example
 If Kawa sees a qualified name with a prefix that is not defined @emph{and}
-that matches the name of an existing class, then Kawa will automaticaly
+that matches the name of a known class, then Kawa will automatically
 treat the prefix
 as a nickname for namespace uri like @code{class:java.lang.Integer}.
 Both conditions should be true at both compile-time and run-time.
 However, using an explicit @code{define-namespace} is recommended.
+
+@subsection Invoking a method with the @code{invoke} function
 
 If you prefer, you can instead use the following functions.
 (There is also an older deprecated lower-level interface
@@ -3941,21 +3955,16 @@ The @var{class} can be a @code{<java.lang.Class>}, a
 @code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
 that names a Java class.  The @var{name} can be @code{<symbol>} or
 @code{<string>} that names one or more methods in the Java class.
-The name is "mangled" (@pxref{Mangling}) into a valid Java name.
 
-Any public methods (static or instance) in the specified @var{class} (or its
-super-classes) that match "@var{name}" or "@var{name}$V" collectively form a
-generic procedure.  When the procedure is applied to the argument list,
+Any accessible methods (static or instance) in the specified @var{class}
+(or its super-classes) that match "@var{name}" or "@var{name}$V" collectively
+form a generic procedure.  When the procedure is applied to the argument list,
 the most specific applicable method is chosen depending on the
 argument list;  that method is then
 called with the given arguments.  Iff the method is an instance method,
 the first actual argument is used as the @code{this} argument.  If there are
 no applicable methods (or no methods at all!), or there is no "best"
 method, @code{WrongType} is thrown.
-
-("@var{name}$V" is used for procedures with @code{#!rest} or keyword args;
-the last argument must be an array type;  all the "extra" arguments
-must be compatible with the type of the array elements.)
 
 An example (derived from the Skij FAQ):
 @example
@@ -3973,11 +3982,10 @@ if it can pick a single "best" matching method.
 @defun invoke object name args ...
 The @var{name} can be @code{<symbol>} or
 @code{<string>} that names one or more methods in the Java class.
-The name is "mangled" (@pxref{Mangling}) into a valid Java name.
 
-Any public methods (static or instance) in the specified @var{class} (or its
-super-classes) that match "@var{name}" or "@var{name}$V" collectively form a
-generic procedure.  When the procedure is applied to the argument list,
+Any accessible methods (static or instance) in the specified @var{class}
+(or its super-classes) that match "@var{name}" or "@var{name}$V" collectively
+form a generic procedure.  When the procedure is applied to the argument list,
 the most specific applicable method is chosen depending on the
 argument list;  that method is then
 called with the given arguments.  Iff the method is an instance method,
@@ -3985,10 +3993,6 @@ the @var{object} is used as the @code{this} argument;
 otherwise @var{object} is prepended to the @var{args} list.  If there are
 no applicable methods (or no methods at all!), or there is no "best"
 method, @code{WrongType} is thrown.
-
-("@var{name}$V" is used for procedures with @code{#!rest} or keyword args;
-the last argument must be an array type;  all the "extra" arguments
-must be compatible with the type of the array elements.)
 
 The behavior of interpreted code and compiled code is not
 indentical, though you should get the same result either way
@@ -4019,7 +4023,6 @@ The @var{class} can be a @code{<java.lang.Class>}, a
 that names a Java class.  
 The @var{name} can be @code{<symbol>} or
 @code{<string>} that names one or more methods in the Java class.
-The name is "mangled" (@pxref{Mangling}) into a valid Java name.
 
 This procedure is very similar to @code{invoke} and @code{invoke-static}
 and invokes the specified method, ignoring any methods in subclasses
@@ -4058,6 +4061,27 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
+@subsection Method names
+
+All of the above select a method to invoke base on specified
+method name and argments.  If specified name is not a Java name,
+it is "mangled" (@pxref{Mangling}) into a valid Java name.
+All accessible methods whose names match are considered.
+Methods that match after appending @code{$V} or @code{$X} or @code{$V$X}
+are also considered.  A @code{$V} suffix matches a variable
+number of arguments:  any excess arguments are collect into an
+@code{gnu.lists.LList} or a Java array (depending on the final parameter type).
+A @code{$X} specifies that the method expects an extra implicit
+@code{CallContext} parameter.  In that case the method's result is written
+to the @code{CallContext}, so the method result type must be @code{void}.
+
+(Kawa compiles a procedure with a @code{#!rest} or keyword args
+whose name is @code{@var{fn}} to a method named @code{@var{fn}$V}.
+It adds an implicit parameter for the extra arguments.
+By default this extra extra parameter is a Scheme list,
+but you can specify a Java array type instead.  In tha case the
+array element type must be compatible with all the extra arguments.)
+
 @node Field operations, Defining new classes, Method operations, Objects Classes and Modules
 @section Accessing fields of Java objects
 
@@ -4066,11 +4090,10 @@ the fields of Java objects and static fields.
 The lower-level interfaces are macros that return functions.
 These functions can be inlined, producing efficient code.
 The higher-level functions are less verbose and more convenient.
-However, they can only access public fields.
 
 @defun field object fieldname
 Get the instance field with the given @var{fieldname} from the given
-@var{Object}.  Returns the value of the field, which must be public.
+@var{Object}.  Returns the value of the field, which must be accessible.
 This procedure has a @code{setter}, and so can be used as the first
 operand to @code{set!}.
 
@@ -4084,7 +4107,7 @@ be @code{'length}, and the result is the number of elements of the array.
 
 @defun static-field class fieldname
 Get the static field with the given @var{fieldname} from the given
-@var{class}.  Returns the value of the field, which must be public.
+@var{class}.  Returns the value of the field, which must be accessible.
 This procedure has a @code{setter}, and so can be used as the first
 operand to @code{set!}.
 @end defun
@@ -4148,8 +4171,11 @@ If @code{define-class} is used, @emph{all} of the classes listed
 in @var{supers} should be interfaces or classes defined using
 @code{define-class}.
 
-Each @var{field-decl} declares a public instance "slot" (field)
-with the given @var{fname}.  If @var{ftype} is specified it is the
+Each @var{field-decl} declares a instance "slot" (field)
+with the given @var{fname}. 
+By default it is publicly visible, but you can specify
+a different visiblity with the @code{access:} specifier.
+ If @var{ftype} is specified it is the
 type of the slot.  The following @var{option-keyword}s are implemented:
 @table @asis
 @item @code{type:} @var{ftype}
@@ -4220,7 +4246,7 @@ Currently, the @var{formal-arguments} cannot contain optional, rest,
 or keyword parameters.  (The plan is to allow optional parameters,
 implemented using multiple overloaded methods.)
 
-A @var{method-decl} in @code{define-static-field}
+A @var{method-decl} in @code{define-simple-class}
 can have the following @var{option-keyword}s:
 @table @asis
 @item @code{access:} @var{kind}

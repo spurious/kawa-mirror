@@ -1,3 +1,10 @@
+2004-02-16  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Options):  Document --no-inline.
+
+	* kawa.texi (Method operations, Field operations):  Update since
+	we can access non-public fields and methods.
+
 2004-02-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes):  Document access: options

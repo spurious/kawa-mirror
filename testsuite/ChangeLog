@@ -1,3 +1,7 @@
+2000-04-14  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm: Added 4 tests for record with names that need mangling.
+
 2000-02-29  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm (test-nesting-3):  New test, triggers bug reported

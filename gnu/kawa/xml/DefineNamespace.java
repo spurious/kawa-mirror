@@ -61,7 +61,7 @@ public class DefineNamespace extends Syntax
 	    if ("::" == p2.car && p2.cdr instanceof Pair
 		&& (p3 = (Pair) p2.cdr).cdr instanceof Pair)
 	      {
-		decl.setType(kawa.standard.prim_method.exp2Type(p3.car, tr));
+		decl.setType(tr.exp2Type(p3));
 		decl.setFlag(Declaration.TYPE_SPECIFIED);
 		p2 = (Pair) p3.cdr;
 	      }

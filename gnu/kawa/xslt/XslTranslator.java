@@ -39,8 +39,7 @@ public class XslTranslator extends Lexer implements Consumer
     super(inp, messages);
     this.interpreter = interpreter;
     /* FIXME
-    parser = new XMLParser(inp,
-			   new ParsedXMLToConsumer(new NamespaceResolver(this)));
+    parser = new XMLParser(inp, new NamespaceResolver(this));
     */
   }
 

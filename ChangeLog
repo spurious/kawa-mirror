@@ -1,5 +1,46 @@
 Tue Jun 25 20:40:57 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* kawa/lang/Char.java:  New class, for representing Scheme characters,
+	* kawa/lang/{SyntaxError,ReadError,EofReadError}.java:  New Exceptions.
+	* kawa/lang/{EOFInComment,EOFInString,InvalidCharacterName,
+	InvalidPoundConstruct,MalformedList,NotImplemented,NumberTooLong,
+	UnexpectedCloseParen}.java:  Replaced by SyntaxError sub-classes.
+
+	* kawa/lang/{InPort,OutPort}.java:  New classes, replace iport & oport.
+	* kawa/lang/{iport,oport}.java:  Removed.
+	
+	* kawa/lang/Procedure0or1.java:  New Procedure sub-class.
+
+	* kawa/lang/{Procedure,Expression}.java: Implement Printable interface.
+	* kawa/lang/LambdaExp.java:  Add optional name field, setName method.
+	* kawa/lang/LambdaProcedure.java:  Use and print LamdaExp.name.
+
+	* kawa/lang/ErrorExp.java:  New Expression sub-class.
+	* kawa/lang/Interpreter.java:  Move read-related functions to InPort.
+	* kawa/lang/Interpreter.java:  Update iport->InPort, oport->OutPort.
+	* kawa/lang/SetExp.java (eval):  Return voidObject.
+	* kawa/lang/Symbol.java:  New makeUninterned, generate methods.
+	Add make as a (preferred) synonym for intern.
+	* kawa/lang/print.java:  Print obj.toString() as the default.
+	Print Scheme strings with quoting if OutPort.printReadable.
+	
+	* kawa/{lang,standard}/Makefile.{am,in}:  Updated accordingly.
+
+	* kawa.java, kawa/Shell.java:  Update iport->InPort, oport->OutPort.
+	* kawa/Shell.java: Use eofObject.  No longer catch removed Exceptions.
+	
+	* kawa/standard/StandardInterpreter.java (define_proc):  new method.
+	Use it to add new primitives.
+	* kawa/standard/{char_equal_p,char_greater_equal_p,char_greater_p,
+	char_less_equal_p,char_less_p,char_p,make_string,string,string_ref,
+	string_set_b}.java:  Stylistic changes.  
+	Update java.lang.Character->Char.
+	* kawa/standard/{eof_object_p,load,read,readchar,write,writechar}.java:
+	New classes to implement I/O primitives.
+	* kawa/standard/eqv_p.java:  Chars are now equal? iff eq?.
+	* kawa/standard/ifp,set_b}.java:  Use new Interpreter.syntaxError.
+	* kawa/standard/define.java:  Likewise.  Also do LambdaExp.setname.
+
 	* license.term:  New license Based on Tcl copyright.
 	* COPYING:  Removed.
 

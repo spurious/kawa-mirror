@@ -22,9 +22,9 @@ class kawa {
       }
       kawa.standard.StandardInterpreter interpreter =
          new kawa.standard.StandardInterpreter(
-            new kawa.lang.iport(stream),
-            new kawa.lang.oport(System.out),
-            new kawa.lang.oport(System.err)
+            InPort.inDefault (),
+	    OutPort.outDefault (),
+	    OutPort.errDefault ()
          );
 
       kawa.Shell shell = new kawa.Shell(

@@ -6,8 +6,9 @@ import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class FVector extends Sequence implements Printable, Compilable
+public class FVector extends UniformVector implements Printable, Compilable
 {
+  public String getTag() { return ""; }
 
   Object[] value;
 
@@ -53,13 +54,6 @@ public class FVector extends Sequence implements Printable, Compilable
   public final void setElementAt (Object new_value, int index)
   {
     value[index] = new_value;
-  }
-
-  public final Object set (int index, Object new_value)
-  {
-    Object old = value[index];
-    value[index] = new_value;
-    return old;
   }
 
   public final void setAll (Object new_value)

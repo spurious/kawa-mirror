@@ -22,6 +22,13 @@ public abstract class UniformVector extends Sequence implements Printable
     return old;
   }
 
+  /** Replace all the elements with a new value. */ 
+  public void setAll (Object value)
+  {
+     for (int index = length(); --index >= 0; )
+       setElementAt(value, index);
+  }
+
   public void copy(Sequence src)
   {
     java.util.Enumeration e = src.elements();

@@ -12,10 +12,12 @@ import gnu.expr.*;
  * @author Per Bothner
  */
 
-public class FString extends Sequence implements Printable, Compilable
+public class FString extends UniformVector implements Printable, Compilable
 {
 
   char[] value;
+
+  public String getTag() { return "ch"; }
 
   public FString (int num)
   {
@@ -105,11 +107,21 @@ public class FString extends Sequence implements Printable, Compilable
     value[index] = ch;
   }
 
+  public void setElementAt (Object new_value, int index)
+  {
+    value[index] = ((Char) new_value).charValue();
+  }
+
   /** Set all the elements to a given character. */
   public final void fill (char ch)
   {
     for (int i = value.length;  --i >= 0; )
       value[i] = ch;
+  }
+
+  public final void setAll(Object value)
+  {
+    fill(((Char) value).charValue());
   }
 
   public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)

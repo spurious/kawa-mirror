@@ -1,7 +1,7 @@
 package gnu.kawa.util;
 import gnu.expr.Special;
 
-public abstract class Sequence
+public abstract class Sequence // FUTURE: implements java.util.List
 {
   /**
    * A safe function to count the length of a sequence.

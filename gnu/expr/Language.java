@@ -208,8 +208,9 @@ public abstract class Language
     Object property = (hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION
 		       : null);
     Symbol sym = getSymbol(name);
-    StaticFieldLocation.define(environ, sym, property,
-			       cname, fname);
+    StaticFieldLocation loc
+      = StaticFieldLocation.define(environ, sym, property, cname, fname);
+    loc.setProcedure();
   }
 
   /** Declare in the current Environment a procedure bound to a static field.

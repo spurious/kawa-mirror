@@ -33,4 +33,4 @@ check-obj: testing.zip
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   obj-test.scm misc-test.scm
-CLEANFILES = tmp?
+CLEANFILES = tmp? *.log testing.zip

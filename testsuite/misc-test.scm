@@ -20,3 +20,6 @@
 
 (define-unit ft 12in)
 (test 18in + 6in 1ft)
+
+;;; This caused a spurious warning in earlier releases.
+(test '(1 2 3) 'let (let ((x (lambda l l))) (x 1 2 3)))

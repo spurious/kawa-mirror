@@ -157,7 +157,8 @@ public abstract class RatNum extends RealNum
   /** Calcaulte the simplest rational between two reals. */
   public static RealNum rationalize (RealNum x, RealNum y)
   {
-    // This algorithm is copied from C-Gambit, copyright Marc Feeley.
+    // This algorithm is by Alan Bawden.  It has been transcribed
+    // with permission from C-Gambit, copyright Marc Feeley.
     if (x.grt (y))
       return simplest_rational2 (y, x);
     else if (! (y.grt(x)))

@@ -1,3 +1,29 @@
+Tue Mar  3 11:51:08 1998  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in (AC_OUTPUT):  Generate kawa/Version.java.
+	* kawa/{Makefile.am,kawa/Makefile.in}: Update to generate Version.java.
+	* kawa/repl.java (main):  Handle --version and --main.
+	Moving definition of symbol-read-case to Scheme.java.
+	* kawa/Version.java.in:  New template used to generate Version.java.
+	* kawa/lang/Compilation.java (generateMain, generateMainDefault):  New.
+	(addClass):  Generate main method if generateMain is true.
+	* kawa/lang/ModuleBody.java (runAsMain):  New method.
+
+	* kawa/lang/{ApplyExp.java,Compilation.java,Literal.java,
+	ReferenceExp.java,SetApplyExp.java,SetExp.java,SyntaxRules.java,
+	Vector.java}:  Update for moved gnu.bytecode methods.
+
+	* kawa/lang/{GetFieldProc.java,SetFieldProc.java}:  Rewrite to
+	work with ClassType (not just Class) and implement Inlineable.
+	* kawa/lang/{PrimGetStatic.java,PrimSetStatic.java}:  New Procedures.
+	* kawa/lang/{PrimArrayGet.java,PrimArrayLength.java,
+	PrimArrayNew.java,PrimArraySet.java}:  New Inlineable Procedures.
+	* kawa/lang/{Makefile.am,Makefile.in}:  Update for new classes.
+	* kawa/standard/Scheme.java:  Add new methods from kawa.lib.reflection.
+
+	* kawa/lang/LineBufferedReader.java (fill):  Fix minor think-o.
+	* kawa/lang/TtyInPort.java (fill):  Likewise.
+
 Tue Feb 24 18:32:21 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/Keyword.java (getName):  New method.

@@ -147,11 +147,17 @@ JAVADOC_DIR = $$HOME/Kawa/api
 JAVADOC_PACKAGES = \
   gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists\
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
-  kawa kawa.lang kawa.standard \
-  gnu.jemacs.lang gnu.jemacs.buffer
+  gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard \
+  gnu.kawa.xml gnu.xquery.lang gnu.xquery.util \
+  gnu.jemacs.lang gnu.jemacs.buffer gnu.commonlisp.lang
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
+# NOTE:  To update javadoc do 'make install-javadoc-html'.
+# cd $JAVADOC_DIR
+# cvs import -m "Javadoc generated." software/kawa/api javadoc kawa_$(VERSION)
+# cvs checkout -jjavadoc:yesterday -jjavadoc software/kawa/api
+# cvs ci -m 'Updated.' .
 
 MAINTAINERCLEANFILES = makekawa.bat
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
@@ -426,7 +432,7 @@ dist-kawa-@VERSION@.jar:
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && $$srcdir/configure \
+	  && $$srcdir/configure --enable-servlet --with-swing --with-awt --with-java-collectiosn --with-java-references \
 	  && $(MAKE) \
 	  && $(JAR) cmf $$srcdir/jar-manifest \
 	    ../kawa-@VERSION@.jar \
@@ -445,8 +451,16 @@ jemacs-@JEMACS_VERSION@.jar:
 	      `find . -name '*.class' -print` \
 	  && cd .. && rm -rf tmpdir
 
+kawa-@VERSION@-src.zip: kawa-@VERSION@.tar.gz
+	mkdir zip-temp
+	cd zip-temp ;\
+	  tar xzf ../kawa-@VERSION@.tar.gz; \
+	  zip -q -r ../kawa-@VERSION@-src.zip kawa-@VERSION@
+	rm -rf zip-temp
+
 kawa-compiled.zip: kawa-@VERSION@-compiled.zip
 kawa.jar: kawa-@VERSION@.jar
+kawa-src.zip: kawa-@VERSION@-src.zip
 jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 install-javadoc-html:

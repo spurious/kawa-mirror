@@ -629,7 +629,8 @@ to started.  This option allows you to connect using any
 Telnet client program to a remote "Kawa server".
 @item --scheme
 Set the default language to Scheme.
-(This is the default unless you select another language.)
+(This is the default unless you select another language,
+or you name a file with a known extension on the command-line.)
 @item --elisp
 @itemx --emacs
 @itemx --emacs-lisp

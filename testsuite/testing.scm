@@ -116,14 +116,12 @@
 ;; want to use '+ in the test function below.  The clean (future) solution
 ;; would be to put this file inside a module.  FIXME.
 
-(define save-+ +)
-
 (define (test expect fun . args)
   ((lambda (res)
      (cond ((equal? expect res)
 	    (if fail-expected
 		(set! xpass-count (+ xpass-count 1))
-		(set! pass-count (save-+ pass-count 1)))
+		(set! pass-count (+ pass-count 1)))
 	    (if *log-file*
 		(report-pass *log-file* fun args res))
 	    (cond ((or verbose fail-expected)

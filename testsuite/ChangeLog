@@ -1,3 +1,8 @@
+1999-11-18  Per Bothner  <per@bothner.com>
+
+	* testing.scm:  Remove save-+ kludge.  No longer needed, now that +
+	is "inlined" (actually just resolved by the compiler).
+
 1999-11-16  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Added test for "too many args?" bug

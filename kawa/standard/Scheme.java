@@ -390,6 +390,14 @@ public class Scheme extends Interpreter
       define_proc ("bit-extract", "kawa.standard.bit_extract");
       define_proc ("integer-length", "kawa.standard.int_length");
 
+      // These are from SLIB.
+      define_proc("string-upcase!", "kawa.lib.strings");
+      define_proc("string-downcase!", "kawa.lib.strings");
+      define_proc("string-capitalize!", "kawa.lib.strings");
+      define_proc("string-upcase", "kawa.lib.strings");
+      define_proc("string-downcase", "kawa.lib.strings");
+      define_proc("string-capitalize", "kawa.lib.strings");
+
       define_proc("primitive-virtual-method",
 		  new kawa.standard.prim_method(182));
       define_proc("primitive-static-method",
@@ -474,6 +482,10 @@ public class Scheme extends Interpreter
       define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
 
+      define_proc ("format", "kawa.standard.format");
+      define_proc ("parse-format", parseFormat);
+      //define_proc("emacs:parse-format", new kawa.standard.ParseFormat(true));
+
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
       define_proc ("string->keyword", "kawa.lib.keywords");
@@ -529,7 +541,7 @@ public class Scheme extends Interpreter
   }
 
   public Object read (InPort in)
-    throws java.io.IOException, kawa.lang.SyntaxException
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     return ScmRead.readObject(in);
   }
@@ -555,6 +567,7 @@ public class Scheme extends Interpreter
     out.flush();
   }
 
+  public static Procedure1 parseFormat = new ParseFormat(false);
 
   /** If exp is a "constant" Type, return that type, otherwise return null. */
   public static Type getTypeValue (Expression exp)

@@ -28,11 +28,6 @@ public abstract class Interpreter
 
   public static Interpreter getInterpreter() { return defaultInterpreter; }
 
-  static public final String quote_sym = "quote";
-  static public final String unquote_sym = "unquote";
-  static public final String unquotesplicing_sym = "unquote-splicing";
-  static public final String quasiquote_sym = "quasiquote";
-
   /**
    * List of known languages and their Interpreter classes.
    * Each element is one or more language names, or filename extensions,

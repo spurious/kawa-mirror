@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.kawa.lispexpr.LispInterpreter;
 
 public class SyntaxRule implements Externalizable 
 {
@@ -165,13 +166,13 @@ public class SyntaxRule implements Externalizable
 	  {
 	    code = RCONS;
 	    int cdr_quote_nesting = quote_nesting;
-	    if (pair.car == Interpreter.quote_sym)
+	    if (pair.car == LispInterpreter.quote_sym)
 	      cdr_quote_nesting = -1;
-	    else if (pair.car == Interpreter.quasiquote_sym
+	    else if (pair.car == LispInterpreter.quasiquote_sym
 		     && cdr_quote_nesting >= 0)
 	      cdr_quote_nesting++;
-	    else if ((pair.car == Interpreter.unquote_sym
-		      || pair.car == Interpreter.unquotesplicing_sym)
+	    else if ((pair.car == LispInterpreter.unquote_sym
+		      || pair.car == LispInterpreter.unquotesplicing_sym)
 		     && cdr_quote_nesting > 0)
 	      cdr_quote_nesting--;
 	    translate_template (pair.cdr, template_program,
@@ -200,10 +201,10 @@ public class SyntaxRule implements Externalizable
 	    return;
 	  }
 	else if (quote_nesting == 0
-		 && template != Interpreter.quote_sym
-		 && template != Interpreter.quasiquote_sym
-		 && template != Interpreter.unquote_sym
-		 && template != Interpreter.unquotesplicing_sym)
+		 && template != LispInterpreter.quote_sym
+		 && template != LispInterpreter.quasiquote_sym
+		 && template != LispInterpreter.unquote_sym
+		 && template != LispInterpreter.unquotesplicing_sym)
 	  {
 	    int identifier_num = indexOf(template_identifiers, template);
 	    if (identifier_num < 0)

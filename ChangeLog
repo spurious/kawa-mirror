@@ -1,3 +1,9 @@
+2003-12-20  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRule.java (translate_template):  Some constants
+	have moved from Interpreter to LispInterpreter.  Update for that.
+	* kawa/standard/Scheme.java (initScheme):  Likewise.
+
 2003-11-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.in (install-javadoc-html):  Only delete html files.

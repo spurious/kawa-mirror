@@ -1,3 +1,9 @@
+2003-12-20  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (quote_sym, unquote_sym, unquotesplicing_sym,
+	quasiquote_sym):  Move constants here from gnu.expr.Interpreter.
+	* ReadTable.java (getInitial):  Update accordingly.
+
 2003-11-08  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (parse):  Update to take a Lexer rather than

@@ -91,7 +91,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("lambda", lambda);
 
       //-- Section 4.1  -- complete
-      define (Interpreter.quote_sym, new Quote ());
+      define (LispInterpreter.quote_sym, new Quote ());
       define_syntax("define", new kawa.standard.define(lambda, false));
       define_syntax("define-private",
                     new kawa.standard.define(lambda, true));

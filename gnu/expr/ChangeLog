@@ -1,3 +1,8 @@
+2003-12-20  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (quote_sym, unquote_sym, unquotesplicing_sym,
+	quasiquote_sym):  Move constants to gnu.kawa.lispexpr.LispInterpreter.
+
 2003-11-22  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getDefaultSymbolValue):  Allow ':local'

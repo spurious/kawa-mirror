@@ -12,6 +12,11 @@ import kawa.lang.Translator; // FIXME
 
 public abstract class LispInterpreter extends Interpreter
 {
+  static public final String quote_sym = "quote";
+  static public final String unquote_sym = "unquote";
+  static public final String unquotesplicing_sym = "unquote-splicing";
+  static public final String quasiquote_sym = "quasiquote";
+
   public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {

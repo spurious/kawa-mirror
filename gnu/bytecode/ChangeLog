@@ -1,3 +1,9 @@
+1999-03-13  Geoff Berry  <gcb@duke.edu>
+
+	* SwitchState.java (addDefault(Label,CodeAttr)): New method.
+	(addCase(int,Label,CodeAttr)): 	Fix binary search.
+	(finish):  Move pushType call.
+
 Tue Mar 16 20:49:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* PrimType.java (emitCoerceFromObject):  Handle coercing to void.

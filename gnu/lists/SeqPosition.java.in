@@ -8,12 +8,6 @@ import java.util.NoSuchElementException;
 /**
  * A position in a sequence (list).
  *
- * A position points *between* two elements in its "containing" sequence, or
- * it points before the first element (if any), or after the last.
- * Sometimes, we loosely say that the position refers to or points to
- * an element of the sequence; in that case we mean the position is
- * immediately before the element.
- *
  * Conceptually similar to Java2's ListIterator, but we use the name "Position"
  * to indicate that it can be used to both indicate a position in a sequence
  * and to iterate through a sequence.  If you use a SeqPosition as a
@@ -23,42 +17,8 @@ import java.util.NoSuchElementException;
  * initialize it to some beginnning position, and then modify the current
  * position of the SeqPosition so it refers to successive elements.
  *
- * What needs to be emphasized is that *all* Sequence classes use the
- * *same* SeqPosition class for positions and iteration.  You would
- * never extend this class to handle a new Sequence type; instead
- * add the needed methods to the new AbstractSequence sub-clsss.
- * If you have an unused SeqPosition object, it can be used to iterate
- * over *any* Sequence you choose.  This potentially saves memory allocation.
- * We do this by requiring that any position be representable using a pair
- * of an int and an Object.  In other words, the state of an iterator is
- * restricted to be an (int, Object) pair.  Of course that is all you need,
- * since if you need more state you can always create a helper object,
- * and store the extra state there.  The assumption, though is that for
- * most Sequence object, an (int, Object) would be enough, without creating
- * any new objects (beyond, sometimes, the SeqPosition itself).
- *
- * The int part of the position-state is stored in the ipos field, and
- * the Object part of the position-state is stored in the xpos field.
- * Neither of those fields have any meaning in themselves, they only have
- * meaning as interpreted by the specific Sequence.  For example, ipos
- * might be the offset of the position in the sequence, but it might also
- * some "magic cookie".  If a Sequence supports insertions and deletions,
- * and you want positions to be automatically adjusted, then a position
- * has to be a magic cookie, instead of an offset.  (A typical implementation
- * is for such a position to be an index into a table of positions managed
- * by the Sequence itself.)  So a complete position is actually an
- * (int, Object, AbstractSequence) triple, where the AbstractSequence
- * component is the object that interprets the (int, Object) pair.
- * Normally, the AbstractSequence part of a position triple is the
- * Sequence "containing" the position, but it can be any Abstract Sequence
- * that implements the various methods that provide the semantics
- * for the (int, Object) pair.
- *
- * The PositionContainer interface is a more abstract version of
- * SeqPosition, in that it can represents more than one position.
- * For example, instead of an array of separately allocated SeqPosition
- * obejcts, you might use some data structure that implements PositionContainer
- * (which is abstractly a list of (int, Object, Sequence)-triples).
+ * See the <a href="package-summary.html#iteration">package overview</a>
+ * for more information.
  */
 
 public class SeqPosition

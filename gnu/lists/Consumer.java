@@ -8,6 +8,9 @@ package gnu.lists;
  * A consumer is like a SAX DocumentHandler or a PrintWriter,
  * but more abstract.  If a Sequence class impleemnts Consumer,
  * then data "written" to the sequence will be inserted in the sequence.
+ * <p>
+ * <em>Note:</em> This interface is not quite final.  For example it is
+ * possible we should need to add endAttribute after each attribute.
  */
 
 public interface Consumer

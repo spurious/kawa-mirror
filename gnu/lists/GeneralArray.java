@@ -3,7 +3,8 @@
 
 package gnu.lists;
 
-/** An UNFINISHED class to handle general multi-dimensional arrays.
+/** A class to handle general multi-dimensional arrays.
+ * This class is <strong>unfinished</strong>.
  * If the number of dimensions (the "rank") is one, should use
  * a class that implements Sequence.
  * GeneralArray uses a SimpleVector 'base' to store the actual data, and

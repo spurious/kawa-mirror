@@ -5,9 +5,7 @@
   </head>
 
   <body>
-    <h1>The gnu.lists package</h1>
-
-<p>Contains utilty classes and interfaces for sequences (lists), arrays, and trees.</p>
+<p>Contains utility classes and interfaces for sequences (lists), arrays, and trees.</p>
 <p>Features:
 <ul>
 <li>
@@ -38,21 +36,101 @@ lists; arrays with various element types; adjustable arrays that use a
 "buffer-gap" to make insertions and deletions more efficient; and
 adjustable arrays that automatically update positions on insertions
 and deletions.</li>
-<li> The <code>TreeList</code> class can compactly represent
+<li> The <a href="TreeList.html"><code>TreeList</code></a> class can compactly represent
 a nested hetrogenous tree.  One intended usage is as a very efficient
 representation for XML data.</li>
 <li>
-The <code>Consumer</code> interface is an abstraction of "data sinks" -
+The <a href="Consumer.html"><code>Consumer</code></a> interface is an abstraction of "data sinks" -
 objects that can receive data and do something with them.  It is
 similar to SAX's DocumentHandler but at a more abstract (and sometimes
 more efficient) level.
 </ul>
 
+<a id="iteration"><h2>The iteration and position framework</h1>
+<p>
+A <i>position</i> points <em>between</em> two elements in its "containing"
+sequence, or it points before the first element (if any), or after the last.
+Sometimes, we loosely say that the position refers to or points to
+an element of the sequence; in that case we mean the position is
+immediately before the element.
+<p>
+An <i>iterator</i> is an object that has a current position,
+but that can be moved so it gets a new position.
+ What needs to be emphasized is that <em>all</em>
+<a href="Sequence.html"><ode>Sequence</code></a> implementations.
+use the <em>same</em> <a href="SeqPosition.html"><code>SeqPosition</code></a>
+class to implement positions and iteration.
+In other "collections frameworks" each sequence class has its corresponding
+iterator class, but in this framework you instead add the methods
+that handle iteration to the sequence class itself, extending
+the <a href="AbstractSequence.html"><code>AbstractSequence</code></a> class.
+A consequence of this is that if you have an unused
+<a href="SeqPosition.html"><code>SeqPosition</code></a> object, you can
+use it to iterate over <em>any</em> <code>Sequence</code> you choose.
+This potentially saves memory allocation, which gains you the most
+when iterating over a nested sequence structure, like a tree of XML data.
+<p>
+We do this by requiring that any position be representable using a pair
+of an <code>int</code> and an <code>Object</code>.
+In other words, the state of an iterator is
+restricted to be an (<code>int</code>, <code>Object</code>) pair.
+Of course that is all you <em>could</em> need, since if you need more
+state you can always create a helper object,
+and store the extra state there.  The assumption we make though is that for
+most <code>Sequence</code>s, an (<code>int</code>, <code>Object</code>)
+would be enough, without creating any new objects (beyond,
+sometimes, the <code>SeqPosition</code> itself).
+<p>
+The <code>int</code> part of a position-state is normally
+named <code>ipos</code>, and the <code>Object</code> part of a
+position-state is named <code>xpos</code>.
+Neither of these values have any meaning in themselves, they only have
+meaning as interpreted by the specific <code>Sequence</code>.
+For example, <code>ipos</code> might be the offset of the position in
+the sequence, but it might also some "magic cookie".
+If a <code>Sequence</code> supports insertions and deletions,
+and you want positions to be automatically adjusted, then a position
+<em>has</em> to be a magic cookie rather than an offset.
+(A typical implementation is for such a position to be an index
+into a table of positions managed by the <code>Sequence</code> itself.) 
+So a complete position is actually a (<code>int</code>, <code>Object</code>,
+<code>AbstractSequence</code>) triple, where the <code>AbstractSequence</code>
+component is the object that interprets the (<code>int</code>,
+<code>Object</code>) pair.
+Normally, the <code>AbstractSequence</code> part of a position triple is the
+<code>Sequence</code> "containing" the position, but it can be any
+<code>AbstractSequence</code>
+that implements the various methods that provide the semantics
+for the (<code>int</code>, <code>Object</code>) pair.
+<p>
+The  <a href="PositionContainer.html"><code>PositionContainer</code></a>
+interface is a more abstract version of <code>SeqPosition</code>, in
+that it can represents more than one position.
+For example, instead of an array of separately allocated
+<code>SeqPosition</code> objects, you might use some data structure
+that implements <code>PositionContainer</code>,
+which is abstractly a list of (<code>int</code>, <code>Object</code>,
+<code>Sequence</code>)-triples.
+
+<h1>The consumer protocol</h1>
+<p>
+You typically use an iteration framework it process the elements
+of a sequence in such a way that the data consumer is active
+and in control, while the sequence itself (the data producer) is a
+passive object. The <a href="Consumer.html"><code>Consumer</code></a>
+works the other way round:  The data producer is active and in control,
+while the data consumer is passive, consuming elements when requested
+by the data producer.  The <code>Consumer</code> is a more abstract
+variant of <a href="http://www.megginson.com/SAX/index.html">SAX</a>'s
+<code>ContentHandler</code> interface for processing "events";
+however <code>Consumer</code> is intended for general value sequences,
+and is less tied to XML.
+
     <hr>
     <address><a href="mailto:per@bothner.com">Per Bothner</a></address>
 <!-- Created: Thu Mar  8 12:32:37 PST 2001 -->
 <!-- hhmts start -->
-Last modified: Thu Mar  8 13:07:14 PST 2001
+Last modified: Sun Jun 17 10:32:21 CST 2001
 <!-- hhmts end -->
   </body>
 </html>

@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * A Sequence is an ordered list of elements.
- * It is similar to and compatible with the Java2 java,util.List interface,
+ * It is similar to and compatible with the Java2 java.util.List interface,
  * but does not require it.
  *
  * All standard classes that implement Sequence also extend AbstractSequence.
@@ -30,6 +30,7 @@ extends
   /** Special magic end-of-file marker. */
   public static final Object eofValue = new String[] { "(EOF)" };
 
+  /** True is this sequence contains no elements. */
   public boolean isEmpty();
 
   /** See java.util.List. */
@@ -42,6 +43,7 @@ extends
 
   public java.util.Enumeration elements();
 
+  /** Return code used to indicate a position is at end of the sequence. */
   public static final int EOF_VALUE = 0;
   public static final int PRIM_VALUE = 16;
   public static final int INT_U8_VALUE = PRIM_VALUE + 1;
@@ -53,7 +55,10 @@ extends
   public static final int INT_U64_VALUE = PRIM_VALUE + 7;
   public static final int INT_S64_VALUE = PRIM_VALUE + 8;
 
+  /** Return code used to indicate next element is 32-bit float. */
   public static final int FLOAT_VALUE = PRIM_VALUE + 9;
+
+  /** Return code used to indicate next element is 64-bit double. */
   public static final int DOUBLE_VALUE = PRIM_VALUE + 10;
   public static final int BOOLEAN_VALUE = PRIM_VALUE + 11;
   /** A byte in an encoded string.

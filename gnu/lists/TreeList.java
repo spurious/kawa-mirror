@@ -3,7 +3,7 @@
 
 package gnu.lists;
 
-/** A compact representation of a nested list (i.e. tree) structure.
+/** A compact representation of a tree, that is a nested list structure.
  * The data structure can store anything that can be emitted to a Consumer.
  * This data structure is optimized for efficient forwards traversal
  * through the data structure, not random access.

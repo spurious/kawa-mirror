@@ -4,7 +4,7 @@
 package gnu.lists;
 
 /**
- * An object that casn be "fed" a TreePosition, and will do something with it.
+ * An object that can be "fed" a TreePosition, and will do something with it.
  * That "something" can be printing it, copy it, filter it - or ignore it.
  */
 

@@ -4,6 +4,8 @@
 package gnu.lists;
 import java.io.*;
 
+/** Simple adjustable-length vector of boolean values. */
+
 public class BitVector extends SimpleVector implements Externalizable
 {
   boolean[] data;

@@ -3,6 +3,8 @@
 
 package gnu.lists;
 
+/** A Consumer that wraps some other Consumer. */
+
 public class FilterConsumer implements Consumer
 {
   protected Consumer base;

@@ -1,9 +1,15 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* CLispReader.java:  New class, extends LispReader.
+	* CommonLisp.java:  Change ELispReader/ELisp to CLispReader/CommonLisp.
+	* Makefile.am (java_JAVA):  Add CommonLisp.java.
+	Inlcude Make-rules and support gcj-compilation.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java:  Update for new gnu.lists.
 	(asNumber):  Don't allow Position.
 	(getName):  Return "CommonLisp" (not "Emacs-Lisp"!).
-	
 
 2000-10-14  Per Bothner  <per@bothner.com>
 

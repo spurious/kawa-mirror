@@ -87,30 +87,50 @@ install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 
 
+
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+SUFFIXES = .java .class .scm .el .lisp
 
 javadir = $(datadir)/java/$(subdir)
+JAVACFLAGS = 
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
+GCJ = gcj
+JAR = fastjar
+#GCJFLAGS = -gdwarf-2
+GCJFLAGS = -g
+OFILES_DIR = $(TO_TOPDIR)/bin
+TO_TOPDIR = $(top_builddir)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+GCJ_DEPS = $(java_JAVA)
+
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o
+
+DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
+ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
+# Compiler to use for compiling builtin .scm/.el/.cl files.
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_JAVA = \
+  CLispReader.java \
   CommonLisp.java
 
+
+PACKAGE_FNAME = gnu-commonlisp-lang
 OBJEXT = o
 subdir = gnu/commonlisp/lang
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 DIST_SOURCES =
-JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
-JAVAROOT = $(top_builddir)
 depcomp = 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .java .class
+.SUFFIXES: .java .class .scm .el .lisp
 
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/Make-rules $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --cygnus  gnu/commonlisp/lang/Makefile
 
@@ -165,6 +185,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -218,6 +239,46 @@ uninstall-am: uninstall-javaJAVA
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic uninstall uninstall-am uninstall-javaJAVA
 
+
+# Make sure $(KAWA1) is available, if --enable-gcj-compiled.
+$(TO_TOPDIR)/kawa1$(exeext):
+	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
+
+$(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
+	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
+
+$(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	  *.class -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+
+java-classes.stamp: $(java_Java)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > java-classes.stamp
+
+scm-classes.stamp: $(java_SCM)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --module-static -C $?
+	echo timestamp > scm-classes.stamp
+
+elisp-classes.stamp: $(java_ELISP)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
+	echo timestamp > elisp-classes.stamp
+
+# Almost the same as automake's install-javaJAVA, but the standard
+# automake support for Java doesn't handle built Java classes.
+install-java-classes: java-classes.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
+	done
+
+all: $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -99,7 +99,7 @@ public class CommonLisp extends Interpreter
 
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
-    return new ELispReader(inp, messages);
+    return new CLispReader(inp, messages);
   }
 
   public String getName()
@@ -240,7 +240,7 @@ public class CommonLisp extends Interpreter
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    ELisp interp = new ELisp();
+    CommonLisp interp = new CommonLisp();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
   }
@@ -253,7 +253,7 @@ public class CommonLisp extends Interpreter
   public Object read (InPort in)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    return ELispReader.readObject(in);
+    return CLispReader.readObject(in);
   }
 
   public void print (Object value, OutPort out)
@@ -343,7 +343,7 @@ public class CommonLisp extends Interpreter
 	  }
 	else
 	  {
-	    System.err.println("INTERNAL ERROR in ELisp.defineAll for "+name
+	    System.err.println("INTERNAL ERROR in CommonLisp.defineAll for "+name
 +" in "+clas);
 	    /*
 	    Binding2 binding = new Binding2(name);

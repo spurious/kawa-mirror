@@ -20,6 +20,8 @@ public class MessageArea extends TextArea implements KeyListener {
   private PrintWriter err;
   kawa.lang.QueueReader in;
 
+  public int outputMark = 0;
+
   /**
    * simple TextArea that always scrolls to the bottom.  Also creates an
    * out and err PrintWriter so that you can redirect stdout/stderr to
@@ -47,16 +49,6 @@ public class MessageArea extends TextArea implements KeyListener {
     return(doFocus && super.isFocusTraversable());
   }
 
-  public void append(String txt) {
-    super.append(txt);
-
-    // Need to catch in case peer class hasn't been created yet
-    try {
-      setCaretPosition(getText().length());
-    } catch (Exception e) {
-    }
-  }
-
   void enter (KeyEvent e) {
 	int pos = getCaretPosition();
 	String str = getText();
@@ -65,10 +57,16 @@ public class MessageArea extends TextArea implements KeyListener {
 	if (lineAfter < 0)
 	  lineAfter = len;
 	int lineBefore = pos == 0 ? 0 : 1 + str.lastIndexOf('\n', pos-1);
+	if (lineBefore < outputMark && lineAfter >= outputMark)
+	  lineBefore = outputMark;
 	str = str.substring(lineBefore, lineAfter);
-	if (pos < len)
+	if (lineAfter < len) {
 	  append(str);
+	  len += lineAfter - lineBefore;
+	}
 	append("\n");
+	outputMark = len+1;
+	setCaretPosition(outputMark);
 	e.consume();
 	if (in != null) {
 	  in.append(str);

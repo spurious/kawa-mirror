@@ -21,17 +21,29 @@ public class TextAreaWriter extends java.io. Writer
       flush();
   }
 
+  public void write (String str)
+  {
+    if (area instanceof MessageArea)
+      {
+	MessageArea msg = (MessageArea) area;
+	area.insert(str, msg.outputMark);
+	msg.outputMark += str.length();
+      }
+    else
+      area.append(str);
+  }
+
   public synchronized void write (char[] data, int off, int len)
   {
     flush();
-    area.append(new String(data, off, len));
+    write(new String(data, off, len));
   }
 
   public synchronized void flush()
   {
     if (! str.equals(""))
       {
-	area.append(str);
+	write(str);
 	str = "";
       }
   }

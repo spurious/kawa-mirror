@@ -34,7 +34,7 @@ OBJ = Shell.class repl.class \
 # but they also need to be installed.
 
 SECONDARY_OBJS=\
-	GuiConsole$$1.class GuiConsole$$_MenuAction.class
+	GuiConsole$$1.class
 
 java_DATA=$(OBJ) $(SECONDARY_OBJS)
 

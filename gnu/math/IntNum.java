@@ -1242,13 +1242,14 @@ public class IntNum extends RatNum implements Compilable
 	for (int i = len;  --i >= 0; )
 	  words[i] = this.words[i];
       }
+    if (words[len-1] < 0)
+      negate (words, words, len);
     for (int i = words.length;  --i > len; )
       words[i] = 0;
-    if (words[len-1] < 0)
-      negate (words, words, words.length);
   }
 
-  /** Set dest[0:len-1] to the negation of src[0:len-1]. */
+  /** Set dest[0:len-1] to the negation of src[0:len-1].
+   * Ok for src==dest. */
   public static int negate (int[] dest, int[] src, int len)
   {
     long carry = 1;

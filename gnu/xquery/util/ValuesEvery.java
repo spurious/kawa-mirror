@@ -5,7 +5,7 @@ package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.mapping.*;
 
-/** Used to implement 'some .. satsifies' and 'every ... satisfies'.
+/** Used to implement 'some - satisfies' and 'every - satisfies'.
  * A 2-argument Procedure (similar to ValuesMap), where the first
  * argument is a Procedure that maps a value to a boolean, and
  * the second argument is a sequence of values to pass to the former.

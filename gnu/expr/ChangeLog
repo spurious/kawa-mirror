@@ -1,3 +1,7 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add entry for "q2".
+
 2004-02-12  Per Bothner  <per@bothner.com>
 
 	* LangExp.java:  New class, extends Expression.

@@ -1,11 +1,10 @@
-// Copyright (c) 2002, 2003  Per M.A. Bothner.
+// Copyright (c) 2002, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
-//import gnu.bytecode.Method;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
@@ -42,6 +41,7 @@ public abstract class Interpreter
     { "brl", ".brl", "gnu.kawa.brl.BRL" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
     { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
+    { "q2", ".q2", "gnu.q2.lang.Q2" },
     { "xslt", "xsl", ".xsl", "gnu.kawa.xslt.XSLT" },
     { "commonlisp", "common-lisp", "clisp", "lisp",
       ".lisp", ".lsp", ".cl",

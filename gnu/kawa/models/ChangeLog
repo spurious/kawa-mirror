@@ -1,0 +1,8 @@
+2003-07-21  Per Bothner  <per@bothner.com>
+
+	New package.
+	* Button.java:  New class, implements Vewable.
+	* MenuItem.java:  New class.
+	* ViewContainer.java:  New interface.
+	* Viewable.java:  New interface.
+	* Makefile.am:  New file.

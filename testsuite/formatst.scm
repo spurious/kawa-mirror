@@ -52,7 +52,6 @@
 	    (call-with-output-string (lambda (p) (display iobj p))))
 	   (call-with-output-string (lambda (p) (display iobj p)))))
       (call-with-output-string (lambda (p) (display iobj p)))))
-
 (define standard-test test)
 
 (define (test format-args out-str)
@@ -292,7 +291,8 @@ def")
 (test '("~a" "abc \" abc") "abc \" abc")
 (test '("~s" #\space) "#\\space")
 (test '("~s" #\newline) "#\\newline")
-(test '("~s" #\tab) "#\\ht")
+;; SLIB has: (test '("~s" #\tab) "#\\ht")
+(test '("~s" #\tab) "#\\tab")
 (test '("~s" #\a) "#\\a")
 (test '("~a" (a "b" c)) "(a b c)")
 
@@ -300,10 +300,12 @@ def")
 
 (define format:old-scc format:symbol-case-conv)
 (set! format:symbol-case-conv string-upcase)
+(set! fail-expected "format:symbol-case-conv not implemented")
 (test '("~a" abc) "ABC")
 (set! format:symbol-case-conv string-downcase)
 (test '("~s" abc) "abc")
 (set! format:symbol-case-conv string-capitalize)
+(set! fail-expected "format:symbol-case-conv not implemented")
 (test '("~s" abc) "Abc")
 (set! format:symbol-case-conv format:old-scc)
 
@@ -318,10 +320,12 @@ def")
 ; internal object case type force test
 
 (set! format:iobj-case-conv string-upcase)
+(set! fail-expected "format:iobj-case-conv not implemented")
 (test `("~a" ,display) (string-upcase (format:iobj->str display)))
 (set! format:iobj-case-conv string-downcase)
 (test `("~s" ,display) (string-downcase (format:iobj->str display)))
 (set! format:iobj-case-conv string-capitalize)
+(set! fail-expected "format:iobj-case-conv not implemented")
 (test `("~s" ,display) (string-capitalize (format:iobj->str display)))
 (set! format:iobj-case-conv #f)
 
@@ -419,7 +423,8 @@ def")
 ; up and out
 
 (test '("abc ~^ xyz") "abc ")
-(test '("~@(abc ~^ xyz~) ~a" 10) "ABC  xyz 10")
+;; SLIB has: (test '("~@(abc ~^ xyz~) ~a" 10) "ABC  xyz 10")
+(test '("~@(abc ~^ xyz~) ~a" 10) "Abc  xyz 10")
 (test '("done. ~^ ~d warning~:p. ~^ ~d error~:p.") "done. ")
 (test '("done. ~^ ~d warning~:p. ~^ ~d error~:p." 10) "done.  10 warnings. ")
 (test '("done. ~^ ~d warning~:p. ~^ ~d error~:p." 10 1)

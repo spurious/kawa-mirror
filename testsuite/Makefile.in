@@ -186,7 +186,7 @@ check:
 	$(MAKE) check2 OPTIONS=--full-tailcalls
 	$(MAKE) check1
 
-check1:  check-num
+check1:  check-num check-format
 check2:  check-scm check-misc check-mac check-misc check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm

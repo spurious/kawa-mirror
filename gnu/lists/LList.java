@@ -4,7 +4,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-import java.io.PrintWriter;
 import java.io.*;
 
 /**

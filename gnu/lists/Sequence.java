@@ -3,10 +3,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-/* BEGIN JAVA2 */
-import java.util.*;
-/* END JAVA2 */
-import java.io.*;
 
 /**
  * A Sequence is an ordered list of elements.

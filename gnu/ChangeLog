@@ -1,3 +1,8 @@
+Sun Mar 21 11:03:23 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* elisp:  New package gnu.elisp.
+	* Makefile.am, makefile.in (SUBDIRS):  Add elisp.
+
 Thu Jul 23 08:45:29 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am (SUBDIRS):  Added mapping and expr.

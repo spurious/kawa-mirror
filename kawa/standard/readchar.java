@@ -9,6 +9,9 @@ import gnu.mapping.InPort;
 
 public class readchar extends Procedure0or1
 {
+  public static final readchar readChar = new readchar(false);
+  public static final readchar peekChar = new readchar(true);
+
   boolean peeking;
   public readchar(boolean peeking)
   {

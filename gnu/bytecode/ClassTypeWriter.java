@@ -121,7 +121,7 @@ public class ClassTypeWriter extends PrintWriter
 	print(" Signature: ");
 	if (field.signature_index != 0)
 	  printOptionalIndex(field.signature_index);
-	printSignature(field.type.getSignature());
+	printSignature(field.type);
 	println();
 	printAttributes(field);
       }
@@ -141,7 +141,9 @@ public class ClassTypeWriter extends PrintWriter
 	print("Method name:");
 	if (method.name_index != 0)
 	  printOptionalIndex(method.name_index);
+	print('\"');
 	print(method.getName());
+	print('\"');
 	print(Access.toString(method.access_flags));
 	print(" Signature: ");
 	if (method.signature_index != 0)
@@ -151,10 +153,10 @@ public class ClassTypeWriter extends PrintWriter
 	  {
 	    if (i > 0)
 	      print(',');
-	    printSignature(method.arg_types[i].getSignature());
+	    printSignature(method.arg_types[i]);
 	  }
 	print(')');
-	printSignature(method.return_type.getSignature());
+	printSignature(method.return_type);
 	println();
 	printAttributes(method);
       }
@@ -336,6 +338,14 @@ public class ClassTypeWriter extends PrintWriter
 	print(sig.substring(pos));
 	print('>');
       }
+  }
+
+  public final void printSignature(Type type)
+  {
+    if (type == null)
+      print("<unknown type>");
+    else
+      printSignature(type.getSignature());
   }
 
   // THE REMAINING CODE IS THE SKELTON OF AN UNFINISHED DIS-ASSEMBLER.

@@ -53,7 +53,7 @@ public class Scope
 
   public void addVariable (Method method, Variable var)
   {
-    var.start_pc = method.PC;
+    var.start_pc = method.code == null ? 0 : method.code.PC;
     addVariable (var);
     if (var.isSimple ())
       method.allocate_local (var);

@@ -4,11 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Field implements AttrContainer {
-  private String name;
-  public Type type;
-  int name_index; /* Index in constant table, or 0 if un-assigned */
-  int signature_index; /* Index in constant table, or 0 if un-assigned */
+public class Field extends Location implements AttrContainer {
   int constant_value_index; /* If non-0, cpool index of constant value. */
   int flags;
   Field next;
@@ -17,10 +13,6 @@ public class Field implements AttrContainer {
   public final Attribute getAttributes () { return attributes; }
   public final void setAttributes (Attribute attributes)
     { this.attributes = attributes; }
-
-  public final String getSignature () { return type.getSignature (); }
-
-  public final Type getType () { return type; }
 
   /** The class that contains this field. */
   ClassType owner;
@@ -64,14 +56,5 @@ public class Field implements AttrContainer {
 	= constants.addUtf8("ConstantValue").index;
   }
 
-  public final String getName ()
-  {
-    return name;
-  }
-
-  public final void setName (String name)
-  {
-    this.name = name;
-  }
 
 }

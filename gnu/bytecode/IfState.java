@@ -25,11 +25,11 @@ public class IfState {
   /** The types that were pushed by the then-clause. */
   Type[] then_stacked_types;
 
-  public IfState (Method method)
+  public IfState (CodeAttr code)
   {
-    previous = method.if_stack;
-    method.if_stack = this;
-    end_label = new Label (method);
+    previous = code.if_stack;
+    code.if_stack = this;
+    end_label = new Label(code);
   }
 }
 

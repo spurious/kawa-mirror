@@ -1,3 +1,25 @@
+Sun Nov  2 13:39:48 1997  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java, LineNumbersAttr.java, LocalVarsAttr.java:
+	New classes to represent more standard attributes.
+	* Location.java:  New class - shared stuff from Field and Variable.
+	* Field.java, Variable.java:  Inherit from Location; move stuff there.
+	* Attribute.java (isSkipped, setSkipped, getlengthAll):  New methods.
+	* ClassFileInput.java (readAttributes):  Make more robust.
+	Read Code, lineNumberTable, and LocalVariableTable attributes.
+	* ClassType.java (addMethod):  Use new Method.setSignature.
+	* ClassTypeWriter.java (printSignature):  New method.  Use it.
+	* Label.java (relocate_fixups, relocate_wide, emit_spring,
+	add_fixup, emit, emit_wide):  Charge arg from Method to CodeAttr.
+	* Makefile.am:  Add new classes.  Add JCFLAGS.
+	* Method.java:  Many variables and methods moved to CodeAttr,
+	LineNumbersAtrr or LocalsVarsAttr.  Update accordingly.
+	(setSignature, setName, assign_constants):  New methods.
+	* ClassType.java, IfState.java:  Update for stuff moved around.
+
+	* VarEnumerator.java (reset):  Tolerate null scope.
+	* Type.java (signatureToType):  Add overloading with offset and length.
+
 Fri Sep 26 21:12:29 1997  Per Bothner  <bothner@cygnus.com>
 
 	* Attribute.java, AttrContainer.java, MiscAttr.java,

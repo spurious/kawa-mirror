@@ -147,7 +147,7 @@ public class ClassType extends Type implements AttrContainer {
   public final Field addField (String name, Type type) {
     Field field = new Field (this);
     field.setName(name);
-    field.type = type;
+    field.setType(type);
     return field;
   }
   public final Field addField (String name, Type type, int flags)
@@ -192,30 +192,9 @@ public class ClassType extends Type implements AttrContainer {
 
   public Method addMethod (String name,  String signature, int flags)
   {
-    int len = signature.length();
-    if (len < 3 || signature.charAt(0) != '(')
-      throw new ClassFormatError("bad method signature");
-    int pos = 1;
-    java.util.Stack types = new java.util.Stack();
-    for (;;)
-      {
-	int arg_sig_len = Type.signatureLength(signature, pos);
-	if (arg_sig_len < 0)
-	  {
-	    if (pos < len && signature.charAt(pos) == ')')
-	      break;
-	    throw new ClassFormatError("bad method signature");
-	  }
-	String arg_sig = signature.substring(pos, pos+arg_sig_len);
-	Type arg_type = Type.signatureToType(arg_sig);
-	types.push(arg_type);
-	pos += arg_sig_len;
-      }
-    Type[] arg_types = new Type[types.size()];
-    for (int i = types.size();  --i >= 0; )
-      arg_types[i] = (Type) types.pop();
-    Type rtype = Type.signatureToType(signature.substring(pos+1));
-    return addMethod(name, arg_types, rtype, flags);
+    Method meth = addMethod(name, flags);
+    meth.setSignature(signature);
+    return meth;
   }
 
   /** Do various fixups after generating code but before we can write it out.
@@ -244,7 +223,7 @@ public class ClassType extends Type implements AttrContainer {
     }
     for (Method method = methods; method != null; method = method.next) {
       method.assign_constants ();
-      method.finalize_labels ();
+      method.code.finalize_labels ();
     }
     Attribute.assignConstants(this, this);
   }

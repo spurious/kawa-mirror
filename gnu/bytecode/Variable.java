@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Variable implements java.util.Enumeration {
+public class Variable extends Location implements java.util.Enumeration {
 
   /* Variables in a Scope are linked together in a linked list. */
   Variable next;
@@ -16,9 +16,6 @@ public class Variable implements java.util.Enumeration {
       throw new java.util.NoSuchElementException("Variable enumeration");
     return next;
   }
-
-  int name_index; /* Index in constant table, or 0 if un-assigned */
-  int signature_index; /* Index in constant table, or 0 if un-assigned */
 
   private int flags = SIMPLE_FLAG;
   /* The SIMPLE_FLAG records the isSimple (q.v.) state. */
@@ -40,8 +37,6 @@ public class Variable implements java.util.Enumeration {
   int start_pc;
   int end_pc;
 
-  private Type type;
-  public String name;
   final boolean dead () { return end_pc > 0; }
 
   /** Returns true for a "simple" variable.
@@ -89,22 +84,4 @@ public class Variable implements java.util.Enumeration {
       flags &= ~ARTIFICIAL_FLAG;
   }
 
-  public final String getName ()
-  {
-    return name;
-  }
-
-  public final void setName (String name)
-  {
-    this.name = name;
-  }
-
-  public final Type getType()
-  {
-    return type;
-  }
-  public final void setType(Type type)
-  {
-    this.type = type;
-  }
 }

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.FileInputStream;
 
 /** Class to read a ClassType from a DataInputStream (.class file).
- * This currently skips all atributes, including the Code attribute.
  * @author Per Bothner
  */
 
@@ -119,7 +118,14 @@ public class ClassFileInput extends DataInputStream
 	    if (last == null)
 	      container.setAttributes(attr);
 	    else
-	      last.setNext(attr);
+	      {
+		if (container.getAttributes()==attr)
+		  { /* Move to end. */
+		    container.setAttributes(attr.getNext());
+		    attr.setNext(null);
+		  }
+		last.setNext(attr);
+	      }
 	    last = attr;
 	  }
       }
@@ -151,6 +157,59 @@ public class ClassFileInput extends DataInputStream
       {
 	return new SourceFileAttr(readUnsignedShort(), (ClassType) container);
       }
+    else if (name == "Code" && container instanceof Method)
+      {
+        CodeAttr code = new CodeAttr((Method) container);
+	code.setMaxStack(readUnsignedShort());
+	code.setMaxLocals(readUnsignedShort());
+	int code_len = readInt();
+	byte[] insns = new byte[code_len];
+	readFully(insns);
+	code.setCode(insns);
+	int exception_table_length = readUnsignedShort();
+	for (int i = 0;  i < exception_table_length;  i++)
+	  {
+	    int start_pc = readUnsignedShort();
+	    int end_pc = readUnsignedShort();
+	    int handle_pc = readUnsignedShort();
+	    int catch_type = readUnsignedShort();
+	    /* FIXME */
+	  }
+	readAttributes(code);
+	return code;
+      }
+    else if (name == "LineNumberTable" && container instanceof CodeAttr)
+      {
+        int count = readUnsignedShort();
+	short[] numbers = new short[2 * count];
+	for (int i = 0;  i < count;  i++)
+	  {
+	    numbers[2 * i] = readShort();
+	    numbers[2 * i + 1] = readShort();
+	  }
+	return new LineNumbersAttr(numbers, (CodeAttr) container);
+      }
+    else if (name == "LocalVariableTable" && container instanceof CodeAttr)
+      {
+	LocalVarsAttr attr = new LocalVarsAttr((CodeAttr) container);
+	Method method = attr.getMethod();
+	if (attr.parameter_scope == null)
+	  attr.parameter_scope = method.pushScope();
+	Scope scope = attr.parameter_scope;
+	ConstantPool constants = method.getConstants();
+        int count = readUnsignedShort();
+	for (int i = 0;  i < count;  i++)
+	  {
+	    Variable var = new Variable();
+	    scope.addVariable(var);
+	    var.start_pc = readUnsignedShort();
+	    var.end_pc = var.start_pc + readUnsignedShort();
+	    var.setName(readUnsignedShort(), constants);
+	    var.setSignature(readUnsignedShort(), constants);
+	    method.assign_local(var, readUnsignedShort());
+	  }
+	return attr;
+      }
     else
       {
 	byte[] data = new byte[length];
@@ -168,13 +227,10 @@ public class ClassFileInput extends DataInputStream
 	int flags = readUnsignedShort();
 	int nameIndex = readUnsignedShort();
 	int descriptorIndex = readUnsignedShort();
-	CpoolUtf8 nameConstant = (CpoolUtf8)
-	  constants.getForced(nameIndex, ConstantPool.UTF8);
-	CpoolUtf8 sigConstant = (CpoolUtf8)
-	  constants.getForced(descriptorIndex, ConstantPool.UTF8);
-	Type type = Type.signatureToType(sigConstant.string);
-	Field fld = ctype.addField(nameConstant.string, type, flags);
-		       
+	Field fld = ctype.addField();
+	fld.setName(nameIndex, constants);
+	fld.setSignature(descriptorIndex, constants);
+	fld.flags = flags;
 	readAttributes(fld);
       }
   }
@@ -188,12 +244,9 @@ public class ClassFileInput extends DataInputStream
 	int flags = readUnsignedShort();
 	int nameIndex = readUnsignedShort();
 	int descriptorIndex = readUnsignedShort();
-	CpoolUtf8 nameConstant = (CpoolUtf8)
-	  constants.getForced(nameIndex, ConstantPool.UTF8);
-	CpoolUtf8 sigConstant = (CpoolUtf8)
-	  constants.getForced(descriptorIndex, ConstantPool.UTF8);
-	Method meth = ctype.addMethod(nameConstant.string,
-				      sigConstant.string, flags);
+	Method meth = ctype.addMethod(null, flags);
+	meth.setName(nameIndex);
+	meth.setSignature(descriptorIndex);
 	readAttributes(meth);
       }
   }

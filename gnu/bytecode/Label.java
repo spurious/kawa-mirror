@@ -83,19 +83,24 @@ public class Label {
 
   public Label (Method method)
   {
+    this(method.code);
+  }
+
+  public Label (CodeAttr code)
+  {
     position = -1;
-    if (method.labels != null)
+    if (code.labels != null)
       {
-	next = method.labels.next;
-	method.labels.next = this;
+	next = code.labels.next;
+	code.labels.next = this;
       }
     else
-      method.labels = this;
+      code.labels = this;
   }
 
   /* Make all narrow fixups for this label point (relatively) to target. */
-  final private void relocate_fixups (Method method, int target)
-  {
+  final private void relocate_fixups (CodeAttr code, int target)
+ {
     if (fixups == null)
       return;
     for (int i = fixups.length; --i >= 0; )
@@ -104,32 +109,32 @@ public class Label {
 	/* Adjust the 2-byte offset at pos in method by (target-pos). */
 	if (pos >= 0)
 	  {
-	    byte[] code = method.code;
-	    int code_val = ((code[pos] & 0xFF) << 8) | (code[pos+1] & 0xFF);
+	    byte[] insns = code.getCode();
+	    int code_val = ((insns[pos] & 0xFF) << 8) | (insns[pos+1] & 0xFF);
 	    code_val += target - pos;
 	    if (code_val < -32768 || code_val >= 32768)
 	      throw new Error ("overflow in label fixup");
-	    code[pos] = (byte) (code_val >> 8);
-	    code[pos+1] = (byte) (code_val);
+	    insns[pos] = (byte) (code_val >> 8);
+	    insns[pos+1] = (byte) (code_val);
 	  }
       }
-    if (this != method.labels)
-      method.reorder_fixups ();
+    if (this != code.labels)
+      code.reorder_fixups ();
     fixups = null;
   }
 
   /* Adjust the 4-byte offset at pos in method by (target-pos). */
-  static final void relocate_wide (Method method, int pos, int target) {
+  static final void relocate_wide (CodeAttr code, int pos, int target) {
     if (pos >= 0) {
-      byte[] code = method.code;
+      byte[] insns = code.getCode();
       int code_val
-	= ((code[pos] & 0xFF) << 24) | ((code[pos+1] & 0xFF) << 16)
-	| ((code[pos+2] & 0xFF) << 8) | (code[pos+3] & 0xFF);
+	= ((insns[pos] & 0xFF) << 24) | ((insns[pos+1] & 0xFF) << 16)
+	| ((insns[pos+2] & 0xFF) << 8) | (insns[pos+3] & 0xFF);
       code_val += target-pos;
-      code[pos] = (byte) (code_val >> 24);
-      code[pos+1] = (byte) (code_val >> 16);
-      code[pos+2] = (byte) (code_val >> 8);
-      code[pos+3] = (byte) code_val;
+      insns[pos] = (byte) (code_val >> 24);
+      insns[pos+1] = (byte) (code_val >> 16);
+      insns[pos+2] = (byte) (code_val >> 8);
+      insns[pos+3] = (byte) code_val;
     }
   }
 
@@ -138,18 +143,24 @@ public class Label {
    * Define the value of a label as having the current location.
    * @param method the current method
    */
-  public void define (Method method)
+  public void define (Method method) { define (method.code); }
+
+  /**
+   * Define the value of a label as having the current location.
+   * @param code the "Code" attribute of the current method
+   */
+  public void define (CodeAttr code)
   {
-    method.unreachable_here = false;
+    code.unreachable_here = false;
     if (position >= 0)
       throw new Error ("label definition more than once");
-    position = method.PC;
+    position = code.PC;
 
-    relocate_fixups (method, position);
+    relocate_fixups (code, position);
 
     if (wide_fixups != null) {
       for (int i = wide_fixups.length; --i >= 0; )
-	relocate_wide (method, wide_fixups[i], position);
+	relocate_wide (code, wide_fixups[i], position);
       wide_fixups = null;
     }
   }
@@ -163,24 +174,25 @@ public class Label {
    * We also have to jump past this goto.
    */
    
-  void emit_spring (Method method)
+  void emit_spring (CodeAttr code)
   {
-    if (!method.unreachable_here)
+    code.reserve(8);
+    if (!code.unreachable_here)
       {
-	method.put1 (167);  // goto PC+6
-	method.put2 (6);
+	code.put1 (167);  // goto PC+6
+	code.put2 (6);
       }
-    spring_position = method.PC;
-    relocate_fixups (method, spring_position);
-    method.put1 (200);  // goto_w
-    add_wide_fixup (method);
-    method.put4 (1);
+    spring_position = code.PC;
+    relocate_fixups (code, spring_position);
+    code.put1 (200);  // goto_w
+    add_wide_fixup (code.PC);
+    code.put4 (1);
   }
 
   /* Save a fixup so we can later backpatch code[method.PC..method.PC+1]. */
-  private void add_fixup (Method method)
+  private void add_fixup (CodeAttr code)
   {
-    int PC = method.PC;
+    int PC = code.PC;
     int i;
     if (fixups == null)
       {
@@ -207,15 +219,14 @@ public class Label {
 	else
 	  fixups[i] = PC;
       }
-    if (this != method.labels
-	&& (method.labels.fixups == null
-	    || PC < method.labels.fixups[0]))
-      method.reorder_fixups ();
+    if (this != code.labels
+	&& (code.labels.fixups == null
+	    || PC < code.labels.fixups[0]))
+      code.reorder_fixups ();
   }
   
-  private void add_wide_fixup (Method method)
+  private void add_wide_fixup (int PC)
   {
-    int PC = method.PC;
     int i;
     if (wide_fixups == null) {
       wide_fixups = new int[2];
@@ -243,8 +254,8 @@ public class Label {
    * Emit the reference as a 2-byte difference relative to PC-1.
    */
    
-  public void emit (Method method) {
-    int PC_rel = 1 - method.PC;
+  public void emit (CodeAttr code) {
+    int PC_rel = 1 - code.PC;
     int delta = PC_rel;
     if (defined ()) {
       delta += position;
@@ -252,13 +263,13 @@ public class Label {
 	if (spring_position >= 0 && spring_position + PC_rel >= -32768)
 	  delta = spring_position + PC_rel;
 	else {
-	  add_fixup (method);
+	  add_fixup (code);
 	  delta = PC_rel;
 	}
       }
     } else
-      add_fixup (method);
-    method.put2 (1);
+      add_fixup (code);
+    code.put2 (1);
   }
 
   /**
@@ -266,13 +277,13 @@ public class Label {
    * @param method the current method
    * Emit the reference as a 4-byte difference relative to PC-offset.
    */
-  public void emit_wide (Method method, int start_offset)
+  public void emit_wide (CodeAttr code, int start_offset)
   {
-    int delta = 1 - method.PC;
+    int delta = 1 - code.PC;
     if (defined ())
       delta += position;
     else
-      add_wide_fixup (method);
-    method.put4 (start_offset);
+      add_wide_fixup (code.PC);
+    code.put4 (start_offset);
   }
 }

@@ -1,3 +1,7 @@
+1999-12-17  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (emitCheckedCoerce): Use "lambda" as default name.
+
 1999-12-11  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (walkLetExp)  Don't optimize if FluidLetExp.

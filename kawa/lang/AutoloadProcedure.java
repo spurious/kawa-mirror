@@ -125,33 +125,33 @@ public class AutoloadProcedure extends Procedure implements Externalizable
     return getLoaded().numArgs();
   }
 
-  public Object apply0 ()
+  public Object apply0 () throws Throwable
   {
     return getLoaded().apply0 ();
   }
 
-  public Object apply1 (Object arg1)
+  public Object apply1 (Object arg1) throws Throwable
   {
     return getLoaded().apply1 (arg1);
   }
 
-   public Object apply2 (Object arg1,Object arg2)
+   public Object apply2 (Object arg1,Object arg2) throws Throwable
   {
     return getLoaded().apply2 (arg1, arg2);
   }
 
-  public Object apply3 (Object arg1, Object arg2, Object arg3)
+  public Object apply3 (Object arg1, Object arg2, Object arg3) throws Throwable
   {
     return getLoaded().apply3 (arg1, arg2, arg3);
   }
 
   public Object apply4 (Object arg1, Object arg2,
-			Object arg3, Object arg4) 
+			Object arg3, Object arg4)  throws Throwable
   {
     return getLoaded().apply4 (arg1, arg2, arg3, arg4);
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     if (loaded == null)
       load ();

@@ -38,7 +38,7 @@ public class Record extends NameMap
     return hash;
   }
 
-  public Object getChecked (String fname)
+  public Object get (String fname, Object defaultValue)
   {
     Class clas = getClass();
     java.lang.reflect.Field fld;
@@ -49,7 +49,7 @@ public class Record extends NameMap
       }
     catch (NoSuchFieldException ex)
       {
-	//throw new UnboundSymbol(fname);
+	//return defaultValue;
 	throw new GenericError("no such field "+fname+" in "+clas.getName());
       }
     catch (IllegalAccessException ex)

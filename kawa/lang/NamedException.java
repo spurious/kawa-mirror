@@ -24,7 +24,7 @@ public class NamedException extends RuntimeException
       throw this;
   }
 
-  public Object applyHandler (Object key, Procedure handler)
+  public Object applyHandler (Object key, Procedure handler) throws Throwable
   {
     checkMatch(key);
     return handler.applyN(args);

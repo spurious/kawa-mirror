@@ -82,7 +82,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 	Object expansion = pr.apply1(sform);
         return expansion;
       }
-    catch (Exception ex)
+    catch (Throwable ex)
       {
         return tr.syntaxError("evaluating syntax transformer `"
                               + getName() + "' threw " + ex);

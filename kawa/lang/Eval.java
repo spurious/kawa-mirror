@@ -11,6 +11,7 @@ public class Eval extends Procedure1or2
   final static String evalFunctionName = "atEvalLevel";
 
   public static void eval (Object sexpr, Environment env, CallContext ctx)
+    throws Throwable
   {
     PairWithPosition body;
     if (sexpr instanceof PairWithPosition)
@@ -26,6 +27,7 @@ public class Eval extends Procedure1or2
 
   public static Object evalBody (Object body, Environment env,
 				 SourceMessages messages)
+    throws Throwable
   {
     CallContext ctx = new CallContext();
     ctx.values = Values.noArgs;
@@ -34,6 +36,7 @@ public class Eval extends Procedure1or2
   }
 
   public static Object eval (Object sexpr, Environment env)
+        throws Throwable
   {
     CallContext ctx = new CallContext();
     ctx.values = Values.noArgs;
@@ -43,6 +46,7 @@ public class Eval extends Procedure1or2
 
   public static void evalBody (Object body, Environment env,
 			       SourceMessages messages, CallContext ctx)
+    throws Throwable
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -67,16 +71,19 @@ public class Eval extends Procedure1or2
   }
 
   public Object apply1 (Object arg1)
+    throws Throwable
   {
     return eval (arg1, Environment.user ());
   }
 
   public Object apply2 (Object arg1, Object arg2)
+    throws Throwable
   {
     return eval (arg1, (Environment) arg2);
   }
 
   public void apply (CallContext ctx)
+    throws Throwable
   {
     Procedure.checkArgCount(this, ctx.count);
     Object exp = ctx.getArgAsObject(0);

@@ -18,7 +18,7 @@ public class Promise implements Printable
     this.thunk = thunk;
   }
 
-  public Object force ()
+  public Object force () throws Throwable
   {
     if (result == null)
       {

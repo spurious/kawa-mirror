@@ -22,7 +22,7 @@ AC_ARG_ENABLE(gcj-compiled,
 AC_ARG_ENABLE(xml,
   [  --enable-xml             Build support for XML processing])
 
-AC_ARG_WITH(java-collection,
+AC_ARG_WITH(java-collections,
   [  --with-java-collections  Assume Java collections (java.util.List) is available])
 
 AC_ARG_WITH(swing,

@@ -1398,9 +1398,9 @@ if test "${enable_xml+set}" = set; then
 fi
 
 
-# Check whether --with-java-collection or --without-java-collection was given.
-if test "${with_java_collection+set}" = set; then
-  withval="$with_java_collection"
+# Check whether --with-java-collections or --without-java-collections was given.
+if test "${with_java_collections+set}" = set; then
+  withval="$with_java_collections"
   :
 fi
 

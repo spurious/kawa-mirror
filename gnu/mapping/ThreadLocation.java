@@ -47,7 +47,12 @@ public class ThreadLocation extends Location
   /** Set the default/global value. */
   public void setGlobal (Object value)
   {
-    global.set(value);
+    synchronized (this)
+      {
+	if (global == null)
+	  global = new SharedLocation(this.name, null, 0);
+	global.set(value);
+      }
   }
 
   /** Get the thread-specific Location for this Location. */

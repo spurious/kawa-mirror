@@ -1,3 +1,8 @@
+A new (unfinished) framework supports multiple languages.  The
+command-line option --elisp selects Emacs Lisp, while --scheme
+(the default) selects Scheme.  (The only difference so far is the
+reader syntax;  that will change.)
+
 The `format' function now  provides fairly complete functionality
 for CommonLisp-style formatting.  (See the Comon Lisp hyperspec at
 http://www.harlequin.com/education/books/HyperSpec/Body/sec_22-3.html.)

@@ -1,3 +1,36 @@
+1999-07-16  Per Bothner  <per@bothner.com>
+
+	* kawa/GuiConsole.java (<init>):  Create a kawa.repl, not a kawa.Shell.
+	* kawa/Shell.java:  No longer inherits from Procedure0.
+	All methods are static;  most now take an explicit Environment
+	(for top-level bindings) as well as Interpreter (current language).
+	* kawa/repl.java:  Now extends Procedure0or1.
+	(apply0, apply1):  New methods.
+	(interp):  New instance field.
+	(<init>):  New constructor.
+	(defaultInterpreter):  New static field.
+	(getInterpreter, setInterpreter):  New static methods.
+	(main):  Options to select interpreter (language).
+	(serveTelnet):  Take Interpreter argument.
+	Create a new SocketRepl, instead of a new Shell.
+	(SocketRepl):  New Procedure0 class.
+
+	* kawa/lang/Sequence.java (toArray):  Implement two new methods.
+	* kawa/lang/Pair.java (toArray):  Implement optimized versions.
+	* kawa/lang/FString.java (toCharArray):  New method.
+
+	* kawa/lang/Interpreter.java (getLexer):  New abstract method.
+	* kawa/standard/Scheme.java (getInstance, getLexer):  New methods.
+	(initScheme):  Declare "repl".  Change "emacs.read".
+	* kawa/standard/load.java (loadSource):  Use Scheme.getInstance.
+
+	* kawa/standard/convert.java (compile):  Use Target.pushValue.
+
+
+1999-07-11  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Char.java (charNameValues, charNames):  Add "bel" for ^G.
+
 1999-06-30  Per Bothner  <per@bothner.com>
 
 	* **/Makefile.in:  Re-generated.

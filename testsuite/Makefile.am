@@ -166,7 +166,7 @@ check-scribble: scribble.class
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  MyFunc.java MyModule.java \
+  MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm \
   module1.scm module1a.scm module2.scm module3.scm \
   HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \

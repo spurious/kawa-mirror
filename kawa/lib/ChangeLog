@@ -1,5 +1,15 @@
 2004-08-24  Per Bothner  <per@bothner.com>
 
+	* ports.scm (open-input-file, open-ouput-file,
+	call-with-output-string):  New functions, translated from Java.
+	(call-with-input-file, call-with-output-file, call-with-input-string,
+	input-port?, output-port?, current-input-port, current-output-port,
+	current-error-port, open-output-string):  Add type specifiers.
+	* Makefile.am (java_SCM_ALWAYS):  Re-arrange to avoid forward
+	references, enabling better inlining.
+
+2004-08-24  Per Bothner  <per@bothner.com>
+
 	* ports.scm (call-with-input-file, call-with-output-file):  Fix thinko
 	- neither of these functions are void.
 

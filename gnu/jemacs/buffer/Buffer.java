@@ -4,6 +4,7 @@ import java.io.*;
 import java.awt.Color;
 import gnu.mapping.InPort;
 import gnu.kawa.util.AbstractString;
+import gnu.text.Char;
 
 public class Buffer extends DefaultStyledDocument
 {
@@ -17,7 +18,7 @@ public class Buffer extends DefaultStyledDocument
   static javax.swing.text.StyleContext styles
   = new javax.swing.text.StyleContext();
   static Style defaultStyle = styles.addStyle("default",null);
-  Style inputStyle = styles.addStyle("input", null);
+  Style inputStyle = defaultStyle;
   static Style redStyle = styles.addStyle("red", null);
   static Style blueStyle = styles.addStyle("blue", null);
   static
@@ -253,8 +254,8 @@ public class Buffer extends DefaultStyledDocument
     for (int i = 0;  i < len;  i++)
       {
 	Object value = values[i];
-	if (value instanceof gnu.kawa.util.Char)
-	  insert(((gnu.kawa.util.Char) value).charValue(), 1, style);
+	if (value instanceof Char)
+	  insert(((Char) value).charValue(), 1, style);
 	else
 	  pointMarker.insert(value.toString(), style);
       }
@@ -262,8 +263,8 @@ public class Buffer extends DefaultStyledDocument
 
   public void insert (Object value, Style style)
   {
-    if (value instanceof gnu.kawa.util.Char)
-      insert(((gnu.kawa.util.Char) value).charValue(), 1, style);
+    if (value instanceof Char)
+      insert(((Char) value).charValue(), 1, style);
     else
       pointMarker.insert(value.toString(), style);
   }

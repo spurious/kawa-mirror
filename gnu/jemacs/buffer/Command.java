@@ -182,6 +182,7 @@ public class Command extends javax.swing.text.TextAction
                 args[argIndex++] = IntNum.make(mark);
               }
             break;
+          case 'F':  // FIXME
           case 's':
           case 'S':
             String answer =

@@ -1,3 +1,12 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* BufferKeymap.java (ignorable):  Don't ignore '\n' or '\t'.
+
+	* Command.java (processInteractionString):  Accept 'F'.
+
+	* ReplBuffer.java (<init>):  Use redStyle for inputStyle.
+	* Buffer.java (<init>):  Default inputStyle to defaultStyle.
+
 2000-06-18  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (markMarker):  New field.

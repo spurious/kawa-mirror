@@ -21,7 +21,7 @@ public class ReplBuffer extends Buffer
   {
     super(interp.getName() + " interaction");
 
-    StyleConstants.setBold(inputStyle, true);
+    inputStyle = redStyle;
 
     processMark = new Marker(pointMarker);
     processWriter = new BufferWriter(processMark, true);

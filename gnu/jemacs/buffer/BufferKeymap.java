@@ -4,6 +4,7 @@ import gnu.math.IntNum;
 import javax.swing.*;
 import javax.swing.text.*;
 import gnu.kawa.util.*;
+import gnu.text.Char;
 import java.awt.event.KeyEvent;
 
 /** This manages the keymaps active for a given buffer.
@@ -181,7 +182,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
     if (code == 0)
       { // It's a KEY_TYPED (keyChar) event.
         char ch = key.getKeyChar();
-        return ch < ' ' || ch > 127;
+        return (ch < ' ' && ch != '\n' && ch != '\t') || ch > 127;
       }
     else
       { // It's a KEY_PRESSED (keyCODE) event.

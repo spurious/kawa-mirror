@@ -631,6 +631,16 @@ public class Translator extends Compilation
       return QuoteExp.getInstance(exp);
   }
 
+  public static void setLine(Expression exp, Object pair)
+  {
+    if (pair instanceof PairWithPosition)
+      {
+	PairWithPosition expPos = (PairWithPosition) pair;
+	exp.setFile(expPos.getFile());
+	exp.setLine(expPos.getLine(), expPos.getColumn());
+      }
+  }
+
   public static void setLine(Declaration decl, Object pair)
   {
     if (pair instanceof PairWithPosition)

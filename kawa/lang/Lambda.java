@@ -304,12 +304,7 @@ public class Lambda extends Syntax implements Printable
 	    = Keyword.make(name instanceof Symbol ? ((Symbol) name).getName()
 			   : name.toString());
 	Declaration decl = new Declaration(name);
-        if (bindings instanceof PairWithPosition)
-          {
-            PairWithPosition declPos = (PairWithPosition) bindings;
-            decl.setFile(declPos.getFile());
-            decl.setLine(declPos.getLine(), declPos.getColumn());
-          }
+	Translator.setLine(decl, bindings);
 	if (typeSpecPair != null)
 	  {
 	    decl.setType(tr.exp2Type(typeSpecPair));

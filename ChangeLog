@@ -14,6 +14,16 @@
 	(disassemble, match): Handle MATCH_ANY_CAR.
 	* kawa/lang/SyntaxRules.java: Updated for renamed pattern_nesting.
 
+	* kawa/lang/Lambda.java (rewrite): Use Translator.setLine method.
+
+	* kawa/lang/Macro.java (expand): If result is not PairWithPosition,
+	copy position from input form.
+
+	* kawa/lang/Translator.java (setLine): New static convenience method.
+	* kawa/standard/define.java (scanForm): Use it.
+
+	* kawa/standard/syntax_case.java: Remove unused local.
+
 2004-11-14  Per Bothner  <per@bothner.com>
 	
 	* kawa/standard/char_ready_p.java: No longer extend Procedure0or1.

@@ -115,6 +115,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 	    pr = (Procedure)
 	      ((Expression) exp).eval(tr.getGlobalEnvironment());
 	  }
+	Object result;
 	if (! hygienic)
 	  {
 	    int nargs = Translator.listLength(form);
@@ -130,9 +131,18 @@ public class Macro extends Syntax implements Printable, Externalizable
 		  args[i-1] = pair.car;
 		form = pair.cdr;
 	      }
-	    return pr.applyN(args);
+	    result = pr.applyN(args);
 	  }
-	return pr.apply1(form);
+	else
+	  result = pr.apply1(form);
+	if (form instanceof PairWithPosition && result instanceof Pair
+	    && ! (result instanceof PairWithPosition))
+	  {
+	    Pair p = (Pair) result;
+	    result = new PairWithPosition((PairWithPosition) form,
+					  p.car, p.cdr);
+	  }
+	return result;
       }
     catch (Throwable ex)
       {

@@ -94,6 +94,7 @@ public class define extends Syntax implements Printable
 	lexp.nameDecl = decl;
 	Object formals = p4.car;
 	Object body = p4.cdr;
+	Translator.setLine(lexp, p1);
 	lambda.rewrite(lexp, formals, tr);
 	Object realBody = lambda.rewriteAttrs(lexp, body, tr);
 	if (realBody != body)

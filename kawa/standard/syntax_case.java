@@ -55,7 +55,6 @@ public class syntax_case extends Syntax
 	int varCount = pattern.varCount();
 	if (varCount > work.maxVars)
 	  work.maxVars = varCount;
-	String pattern_nesting = clauseScope.pattern_nesting.toString();
 
 	BlockExp block = new BlockExp();
 	Expression[] args = new Expression[4];

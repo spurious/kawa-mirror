@@ -223,7 +223,7 @@ public class Translator extends Parser
 	      if (getInterpreter().hasSeparateFunctionNamespace())
 		proc = binding.getFunctionValue(null);
 	      else
-		proc = binding.getValue();
+		proc = binding.get(null);
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)

@@ -1,5 +1,8 @@
 2002-03-07  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite_pair):  Use get, with a default,
+	in case there is an existing Binding, but it is unbound.
+
 	* configure.in (pathset, filesep):  New substitutions.
 	* Make-rules (CLASSPATH_ENV): Use pathsep and filesep.
 

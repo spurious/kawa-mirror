@@ -4,9 +4,10 @@
 package gnu.bytecode;
 import java.io.*;
 
-/* Represents the contents of a standard "LineNumberTable" attribute.
- * @author      Per Bothner
- */
+/**
+  * Represents the contents of a standard "LineNumberTable" attribute.
+  * @author      Per Bothner
+  */
 
 public class LineNumbersAttr extends Attribute
 {
@@ -35,7 +36,7 @@ public class LineNumbersAttr extends Attribute
   /** Add a new line number entry.
     * @param linenumber the number in the source file for this entry
     * @param PC the byte code location for the code for this line number. */
-  void put (int linenumber, int PC)
+  public void put (int linenumber, int PC)
   {
     if (linenumber_table == null)
       linenumber_table = new short[32];
@@ -51,6 +52,7 @@ public class LineNumbersAttr extends Attribute
     linenumber_count++;
   }
 
+  /** Get the number of line number entries. */
   public final int getLength() { return 2 + 4 * linenumber_count; }
 
   public void write (DataOutputStream dstr) throws java.io.IOException

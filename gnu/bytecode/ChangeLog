@@ -1,3 +1,21 @@
+Sat Mar  7 08:27:38 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Add and fix various comments for javadoc.
+	* overview.html:  New file (derived from README).
+	* README:  Now mainly just a link to overview.html.
+	* LineNumbersAttr.java (put):  Make public.
+	* Location.java:  Make class public.
+	* Makefile.am (HTML_HOME, install-html):  New for installing html.
+	* CodeAttr.java (adjustTypedOp):  New private method.
+	(emitLoad, emitStore):  Used new adjustTypedOp.
+	(emitBinop, emitAdd, emitSub, emitMul, emitDiv, emitRem):  New here.
+	* Method.java (compile_binop, compile_primop, compile_add,
+	compile_sub, compile_mul, compile_div, compile_rem):  Removed here.
+
+	* Type.java (coerceFromObject):  Made abstract.
+	* ObjectType.java (coerceFromObject):  Moved here from Type.
+	Add special handling for Type.string_type.
+
 Mon Mar  2 22:56:44 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Type.java (make):  New static method.

@@ -6,7 +6,7 @@ import java.io.*;
 
 /** An abstracted "variable", inherited by Field and Variable. */
 
-class Location {
+public class Location {
   protected String name;
   protected Type type;
   int name_index; /* Index in constant table, or 0 if un-assigned */

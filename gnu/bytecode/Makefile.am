@@ -56,3 +56,10 @@ SOURCES = $(OBJ:.class=.java)
 CLEANFILES=$(OBJ)
 
 all: $(OBJ)
+
+HTML_HOME = $$HOME/public_html
+
+install-html:
+	-mkdir $(HTML_HOME)/gnu.bytecode
+	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.bytecode/index.html
+	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.bytecode/COPYING

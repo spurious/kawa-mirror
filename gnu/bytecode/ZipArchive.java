@@ -275,24 +275,22 @@ public class ZipArchive
 
   /**
    * Manipulate a .zip archive using a tar-like interface.
-   * Usage:  ZipArchive command archive [file ...]
-   *
-   * ZipArchive t archive file ...
-   *   List information about the named members of the archive
-   *
-   * ZipArchibe x archive file ...
+   * <p>
+   * Usage:  <code>ZipArchive</code> <var>command archive</var> [<var>file</var> ...]
+   * <dl>
+   * <dt><code>ZipArchive t</code> <var>archive file</var> ...<dd>
+   *   List information about the named members of the archive.
+   * <dt><code>ZipArchive x</code> <var>archive file</var> ...<dd>
    *   Extract the named members from the archive.
-   *
-   * ZipArchive p archive file ...
+   * <dt><code>ZipArchive p</code> <var>archive file</var> ...<dd>
    *   Print the named members from the archive on standard output.
    *   Prints just the raw contents, with no headers or conversion.
-   *
-   * ZipArchive [ptx] archive
+   * <dt><code>ZipArchive</code> [<code>ptx</code>] <var>archive</var><dd>
    *   With no arguments, does each command for every member in the archive.
-   *
-   * ZipArchive q archive file ...
+   * <dt><code>ZipArchive q</code> <var>archive file</var> ...<dd>
    *   Add the named files to the end of archive.
    *   Does not check for duplicates.
+   * </dl>
    */
 
   public static void main (String args[]) throws IOException

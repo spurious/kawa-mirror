@@ -13,7 +13,7 @@ package gnu.mapping;
 
 public class ApplyMethodProc extends ProcedureN
 {
-  ApplyMethodContainer module;
+  public ApplyMethodContainer module;
   public final int selector;
   private int numArgs;
 

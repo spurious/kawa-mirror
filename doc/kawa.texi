@@ -175,7 +175,8 @@ Alternatively, you can install the pre-compiled binary distribution.
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) version 1.1.x from JavaSoft (Sun).
-(Kawa has also been reported to work with Kaffe, Symantec Cafe, and J++.)
+(Kawa has also been reported to work with Kaffe, Symantec Cafe, J++,
+and JDK 1.2beta.)
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com/products/jdk/1.1/index.html">

@@ -2,7 +2,8 @@ package gnu.mapping;
 
 /** A procedure activation frame (when compiled with explicit stacks). */
 
-public abstract class CallFrame extends CpsProcedure implements Cloneable
+public abstract class CallFrame extends CpsProcedure
+implements Cloneable, CpsMethodContainer
 {
   public Object[] args;
   public Procedure proc;
@@ -12,6 +13,12 @@ public abstract class CallFrame extends CpsProcedure implements Cloneable
   protected int numArgs;
 
   public int numArgs() { return numArgs; }
+
+  public void apply(CpsMethodProc proc, CallContext context)
+  {
+    context.pc = proc.selector;
+    step(context);
+  }
 
   public void apply (CallContext stack)
   {

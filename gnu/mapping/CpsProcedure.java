@@ -45,21 +45,6 @@ public abstract class CpsProcedure extends MethodProc
 
   public Object applyV(CallContext ctx) throws Throwable
   {
-    Consumer consumerSave = ctx.consumer;
-    ValueStack vstack = ctx.vstack;
-    ctx.consumer = vstack;
-    int dindexSave = vstack.gapStart;
-    int oindexSave = vstack.oindex;
-    try
-      {
-	ctx.runUntilDone();
-	return Values.make(vstack, dindexSave, vstack.gapStart);
-      }
-    finally
-      {
-	ctx.consumer = consumerSave;
-	vstack.gapStart = dindexSave;
-	vstack.oindex = oindexSave;
-      }
+    return ctx.runUntilValue();
   }
 }

@@ -73,11 +73,12 @@ public class Values extends TreeList implements Printable, Externalizable
 
   public static Object make (TreeList list, int startPosition, int endPosition)
   {
-    int size = list.size();
-    if (size == 0)
+    int next;
+    if (startPosition == endPosition
+	|| (next = list.nextDataIndex(startPosition)) <= 0)
       return empty;
-    if (size == 1)
-      return list.getNext(startPosition, null);
+    if (next == endPosition || list.nextDataIndex(next) < 0)
+      return list.getNext(startPosition, null); // Singleton value
     Values vals = new Values();
     list.consumeRange(startPosition, endPosition, vals);
     return vals;

@@ -184,6 +184,42 @@ public class CallContext implements Runnable
       }
   }
 
+  /** Run until no more continuations, returning final result. */
+  public final Object runUntilValue() throws Throwable
+  {
+    Consumer consumerSave = consumer;
+    ValueStack vst = vstack;
+    consumer = vst;
+    int dindexSave = vst.gapStart;
+    int oindexSave = vst.oindex;
+    try
+      {
+	runUntilDone();
+	return Values.make(vst, dindexSave, vst.gapStart);
+      }
+    finally
+      {
+	consumer = consumerSave;
+	vst.gapStart = dindexSave;
+	vst.oindex = oindexSave;
+      }
+  }
+
+  /** Run until no more continuations, sending result to a COnsumer. */
+  public final void runUntilValue(Consumer out) throws Throwable
+  {
+    Consumer consumerSave = consumer;
+    consumer = out;
+    try
+      {
+	runUntilDone();
+      }
+    finally
+      {
+	consumer = consumerSave;
+      }
+  }
+
   public void run()
   {
     try

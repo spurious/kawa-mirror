@@ -98,7 +98,7 @@ public abstract class Procedure implements Named, Printable
   {
     Object result;
     int count = ctx.count;
-    if (ctx.where == 0)
+    if (ctx.where == 0 && count != 0)
       result = applyN(ctx.values);
     else
       {

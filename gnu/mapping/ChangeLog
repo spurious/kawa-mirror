@@ -1,3 +1,16 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (runUntilValue):  Two new methods.
+	* CpsProcedure.java (applyV):  Use runUntilValue.
+
+	* CallFrame.java:  Now also implements CpsMethodContainer;
+	(apply):  New method.
+	
+	* Procedure.java (apply):  Check count!=0 if where==0;.
+
+	* Values.java (make(TreeList,int,int)):  Fix logic - check size of
+	specified range, not entire TreeList.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* Future.java (getFluids):  New method.

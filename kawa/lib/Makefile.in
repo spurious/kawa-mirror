@@ -45,7 +45,7 @@ SUFFIXES = .java .scm .class
 JAVA=java -classpath ../..:$$CLASSPATH
 JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
-javadir=$(prefix)/java/kawa/lib
+javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
   case.class \
@@ -57,7 +57,8 @@ OBJ=\
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.scm)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.scm)
 
 CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
@@ -70,9 +71,9 @@ PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST)
 DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST)
 
 TAR = tar
 default: all
@@ -169,7 +170,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	$(JAVA) kawac -d ../.. $< kawa.lib.
+	$(JAVA) kawac -d ../.. $< $(subdir).
 
 all: $(OBJ)
 .SUFFIXES:

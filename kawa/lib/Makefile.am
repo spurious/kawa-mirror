@@ -11,9 +11,9 @@ JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	$(JAVA) kawac -d ../.. $< kawa.lib.
+	$(JAVA) kawac -d ../.. $< $(subdir).
 
-javadir=$(prefix)/java/kawa/lib
+javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
   case.class \
@@ -25,7 +25,8 @@ OBJ=\
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.scm)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.scm)
 
 CLEANFILES=$(OBJ)
 

@@ -1,3 +1,18 @@
+Wed Jun 19 10:16:59 1996  Per Bothner  <bothner@deneb.cygnus.com>
+	
+	* kawa/lang/symbol.java -> Symbol.java:  Renamed class.
+	* kawa/lang/List.java:  New class.
+	* kawa/lang/pair.java -> Pair.java:  Renamed;  made sub-class of List.
+	* kawa/lang/snull.java:  Removed.  Use static List.Empty instead.
+	* kawa/lang/Procedure1or2.java:  New sub-class of Procedure.
+	* kawa/lang/{*.java,Makefile.am,Makefile.in}:  Update accordingly.
+
+	* kawa/standard{*.java,Makefile.am,Makefile.in}:  Update accordingly.
+	* kawa/standard/{append,apply.make_vector,string,vector}.java:
+	Re-write as Procedure sub-class.
+	* kawa/standard/{ass,mem}.java:  Minor cleanups and optimizations.
+	* kawa/standard/list_p.java:  Use List.list_length.
+
 Tue Jun 18 12:19:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Expression.java:  New abstract class.
@@ -31,10 +46,6 @@ Tue Jun 18 12:19:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
 	* kawa/standard/{list,plus_oper}.java: Re-written to extend ProcedureN.
 	* kawa/standard/string2symbol.java:  Should not fold case.
 	* kawa/standard/StandardInterpreter.java:  Update accordingly.
-	
-M kawa/lang/Makefile
-	M kawa/standard/Makefile
-
 
 Wed Jun 12 22:06:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
 

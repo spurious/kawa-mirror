@@ -1,6 +1,6 @@
 package kawa.lang;
 import kawa.standard.Scheme;
-import codegen.Method;
+import gnu.bytecode.Method;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -121,8 +121,8 @@ public class Translator extends Object
 	      {
 		if (lambda.staticLink == null)
 		  lambda.staticLink
-		    = lambda.add_decl (Symbol.make ("staticLink"),
-				       Compilation.objArrayType);
+		    = lambda.addDeclaration(Symbol.make ("staticLink"),
+					    Compilation.objArrayType);
 		if (lambda != curLambda)
 		  lambda.staticLink.setSimple (false);
 	      }
@@ -310,12 +310,12 @@ public class Translator extends Object
 		  if (defs == null)
 		    defs = new LetExp (null);
 		  if (name instanceof Symbol)
-		    defs.add_decl ((Symbol) name);
+		    defs.addDeclaration((Symbol) name);
 		  else if (name instanceof Pair)
 		    {
 		      Pair name_pair = (Pair) name;
 		      if (name_pair.car instanceof Symbol)
-			defs.add_decl ((Symbol) name_pair.car);
+			defs.addDeclaration((Symbol) name_pair.car);
 		    }
 		  forms.addElement (st);
 		}

@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import java.util.Hashtable;
 import java.io.*;
 
@@ -41,25 +41,25 @@ public class Compilation
   static public ClassType scmEnvironmentType
     = new ClassType ("kawa.lang.Environment");
   static final Field carField
-    = scmPairType.new_field ("car", scmObjectType, Access.PUBLIC);
+    = scmPairType.addField ("car", scmObjectType, Access.PUBLIC);
   static final Field cdrField
-    = scmPairType.new_field ("cdr", scmObjectType, Access.PUBLIC);
+    = scmPairType.addField ("cdr", scmObjectType, Access.PUBLIC);
   static final Field trueConstant
-    = scmInterpreterType.new_field ("trueObject", scmBooleanType,
+    = scmInterpreterType.addField ("trueObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC); 
   static final Field falseConstant
-    = scmInterpreterType.new_field ("falseObject", scmBooleanType,
+    = scmInterpreterType.addField ("falseObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nullConstant
-  = scmListType.new_field ("Empty", scmListType, Access.PUBLIC|Access.STATIC);
+  = scmListType.addField ("Empty", scmListType, Access.PUBLIC|Access.STATIC);
   static final Field voidConstant
-  = scmInterpreterType.new_field ("voidObject", scmObjectType,
+  = scmInterpreterType.addField ("voidObject", scmObjectType,
 				  Access.PUBLIC|Access.STATIC);
   static final Field undefinedConstant
-  = scmInterpreterType.new_field ("undefinedObject", scmUndefinedType,
+  = scmInterpreterType.addField ("undefinedObject", scmUndefinedType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nameField
-  = scmNamedType.new_field ("sym_name", scmSymbolType, Access.PUBLIC);
+  = scmNamedType.addField ("sym_name", scmSymbolType, Access.PUBLIC);
   static Method makeSymbolMethod;
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
@@ -72,24 +72,24 @@ public class Compilation
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
-    makeListMethod = scmListType.new_method ("makeList",
+    makeListMethod = scmListType.addMethod ("makeList",
 					     makeListArgs, scmListType,
 					     Access.PUBLIC|Access.STATIC);
-    initIntegerMethod = javaIntegerType.new_method ("<init>",
+    initIntegerMethod = javaIntegerType.addMethod ("<init>",
 						    int1Args, Type.void_type,
 						    Access.PUBLIC);
 
-    makeSymbolMethod = scmSymbolType.new_method ("make", string1Arg,
+    makeSymbolMethod = scmSymbolType.addMethod ("make", string1Arg,
 						 scmSymbolType,
 						 Access.PUBLIC|Access.STATIC);
     Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
-      = scmEnvironmentType.new_method ("lookup_global", sym1Arg,
+      = scmEnvironmentType.addMethod ("lookup_global", sym1Arg,
 				       scmObjectType,
 				       Access.PUBLIC|Access.STATIC);
     Type[] symObjArgs = { scmSymbolType, scmObjectType };
     defineGlobalMethod
-      = scmEnvironmentType.new_method ("define_global", symObjArgs,
+      = scmEnvironmentType.addMethod ("define_global", symObjArgs,
 				       Type.void_type,
 				       Access.PUBLIC|Access.STATIC);
   }
@@ -98,11 +98,11 @@ public class Compilation
   static Type[] applyNargs = { objArrayType };
 
   static final Method makeNullPairMethod
-  = scmPairType.new_method ("makePair", apply0args, scmPairType,
+  = scmPairType.addMethod ("makePair", apply0args, scmPairType,
 			     Access.PUBLIC|Access.STATIC);
   static Method makePairMethod;
 
-  public static Method apply0method = scmProcedureType.new_method
+  public static Method apply0method = scmProcedureType.addMethod
   ("apply0", apply0args, scmObjectType, Access.PUBLIC|Access.FINAL);
 
   public static Method apply1method;
@@ -114,25 +114,25 @@ public class Compilation
 
   static
   {
-    apply1method = scmProcedureType.new_method ("apply1", apply1args,
+    apply1method = scmProcedureType.addMethod ("apply1", apply1args,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
     Type[] apply2args = { scmObjectType, scmObjectType };
-    apply2method = scmProcedureType.new_method ("apply2", apply2args,
+    apply2method = scmProcedureType.addMethod ("apply2", apply2args,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
     Type[] apply3args = { scmObjectType, scmObjectType, scmObjectType };
-    apply3method = scmProcedureType.new_method ("apply3", apply3args,
+    apply3method = scmProcedureType.addMethod ("apply3", apply3args,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
     Type[] apply4args = { scmObjectType , scmObjectType, scmObjectType, scmObjectType};
-    apply4method = scmProcedureType.new_method ("apply4", apply4args,
+    apply4method = scmProcedureType.addMethod ("apply4", apply4args,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
-    applyNmethod = scmProcedureType.new_method ("applyN", applyNargs,
+    applyNmethod = scmProcedureType.addMethod ("applyN", applyNargs,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
-    makePairMethod = scmPairType.new_method ("makePair", apply2args,
+    makePairMethod = scmPairType.addMethod ("makePair", apply2args,
 					     scmPairType,
 					     Access.PUBLIC|Access.STATIC);
   }
@@ -331,7 +331,7 @@ public class Compilation
 	mainClass = curClass;
 	literalTable = new Hashtable (100);
 	if (immediate)
-	  literalsField = new_class.new_field ("literals",
+	  literalsField = new_class.addField ("literals",
 					       objArrayType, Access.STATIC);
       }
     addClass (new_class);
@@ -373,7 +373,7 @@ public class Compilation
     boolean constructor_takes_staticLink = false;
     if (lexp.staticLink != null)
       {
-	lexp.staticLinkField = curClass.new_field ("staticLink", objArrayType);
+	lexp.staticLinkField = curClass.addField ("staticLink", objArrayType);
 	if (lexp.outerLambda () != null)
 	  {
 	    constructor_args = applyNargs;
@@ -381,12 +381,12 @@ public class Compilation
 	  }
       }
 
-    Method constructor_method = curClass.new_method ("<init>",
+    Method constructor_method = curClass.addMethod ("<init>",
 						     constructor_args,
 						     Type.void_type,
 						     Access.PUBLIC);
     curClass.constructor = constructor_method;
-    Method superConstructor = superType.new_method ("<init>",
+    Method superConstructor = superType.addMethod ("<init>",
 						    apply0args, Type.void_type,
 						    Access.PUBLIC);
 
@@ -414,7 +414,7 @@ public class Compilation
 
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
     Method apply_method
-      = curClass.new_method (apply_name, arg_types, scmObjectType,
+      = curClass.addMethod (apply_name, arg_types, scmObjectType,
 			     Access.PUBLIC|Access.FINAL);
     method = apply_method;
 
@@ -459,8 +459,8 @@ public class Compilation
 	    // Later, we copy it from it's incoming register
 	    // to its home location heapFrame.  Here we just create and
 	    // assign a Variable for the incoming (register) value.
-	    Symbol incoming_name = Symbol.make (var.strName ()+"Incoming");
-	    Declaration incoming = lexp.add_decl (incoming_name);
+	    Symbol incoming_name = Symbol.make (var.getName ()+"Incoming");
+	    Declaration incoming = lexp.addDeclaration (incoming_name);
 	    incoming.setArtificial (true);
 	    incoming.setParameter (true);
 	    if (! method.assign_local (incoming, i))
@@ -556,7 +556,7 @@ public class Compilation
 			argts[1] = Type.int_type;
 			argts[2] = scmObjectType;
 			searchForKeywordMethod
-			  = scmKeywordType.new_method("searchForKeyword",
+			  = scmKeywordType.addMethod("searchForKeyword",
 						      argts, scmObjectType,
 						      Access.PUBLIC|Access.STATIC);
 		      }
@@ -597,7 +597,7 @@ public class Compilation
       }
     constructor_method.compile_return ();
 
-    method.pop_scope ();
+    method.popScope();
     curLambda = saveLambda;
 
     return new_class;

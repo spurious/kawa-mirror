@@ -1,9 +1,9 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
-import codegen.ArrayType;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
+import gnu.bytecode.ArrayType;
 
 public class SyntaxRule implements Compilable
 {
@@ -387,7 +387,7 @@ public class SyntaxRule implements Compilable
 	argTypes[4] = comp.objArrayType;
 	argTypes[5] = Type.int_type;
 	initSyntaxRuleMethod
-	  = thisType.new_method ("<init>", argTypes,
+	  = thisType.addMethod ("<init>", argTypes,
 				 Type.void_type, Access.PUBLIC);
       } 
     Literal literal = new Literal (this, thisType, comp);

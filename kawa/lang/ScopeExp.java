@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 /**
  * Abstract class for expressions that add local variable bindings.
@@ -59,8 +59,8 @@ public abstract class ScopeExp extends Expression
 		if (alloc_scope.heapFrame == null)
 		  {
 		    alloc_scope.heapFrame
-		      = alloc_scope.add_decl (Symbol.make ("heapFrame"),
-					      Compilation.objArrayType);
+		      = alloc_scope.addDeclaration (Symbol.make ("heapFrame"),
+						    Compilation.objArrayType);
 		    alloc_scope.heapFrame.setArtificial (true);
 		  }
 		decl.baseVariable = alloc_scope.heapFrame;
@@ -140,10 +140,10 @@ public abstract class ScopeExp extends Expression
    * Create a new declaration in the current Scope.
    * @param name name to give to the new Declaration.
    */
-  public final Declaration add_decl (Symbol name)
+  public final Declaration addDeclaration (Symbol name)
   {
     Declaration decl = new Declaration (name);
-    add_decl (decl);
+    addDeclaration(decl);
     return decl;
   }
 
@@ -152,20 +152,20 @@ public abstract class ScopeExp extends Expression
    * @param name name to give to the new Declaration.
    * @param type type of the new Declaration.
    */
-  public final Declaration add_decl (Symbol name, Type type)
+  public final Declaration addDeclaration (Symbol name, Type type)
   {
     Declaration decl = new Declaration (name);
-    add_decl (decl);
-    decl.type = type;
+    addDeclaration(decl);
+    decl.setType(type);
     return decl;
   }
 
   /**
    * Add a Declaration to the current Scope.
    */
-  public final void add_decl (Declaration decl)
+  public final void addDeclaration (Declaration decl)
   {
-    scope.add_var (decl);
+    scope.addVariable (decl);
     decl.context = this;
   }
 

@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 /**
  * The static information associated with a local variable binding.
@@ -97,8 +97,8 @@ public class Declaration extends Variable
   public Declaration (Symbol s)
   {
     sym = s;
-    name = ClassType.to_utf8 (s.toString ());
-    type = Type.pointer_type;
+    name = s.toString ();
+    setType(Type.pointer_type);
   }
 
   public String string_name () { return sym.toString (); }

@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.ClassType;
+import gnu.bytecode.ClassType;
 
 /**
  * A Pattern is used to match against objects.

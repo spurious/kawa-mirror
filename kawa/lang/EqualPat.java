@@ -1,8 +1,8 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 /**
  * A pattern that requires an exact match (using equal?).
@@ -39,7 +39,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
       {
 	EqualPatType = new ClassType ("kawa.lang.EqualPat");
 	makeEqualPatMethod =
-	  EqualPatType.new_method ("make", comp.apply1args,
+	  EqualPatType.addMethod ("make", comp.apply1args,
 				   EqualPatType, Access.PUBLIC|Access.STATIC);
       }
     Literal literal = new Literal (this, EqualPatType, comp);

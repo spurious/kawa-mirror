@@ -1,8 +1,8 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 public class PairPat extends Pattern implements Printable, Compilable
 {
@@ -56,7 +56,7 @@ public class PairPat extends Pattern implements Printable, Compilable
 	apply2args[0] = comp.scmPatternType;
 	apply2args[1] = comp.scmPatternType;
 	makePairPatMethod =
-	  classPairPat.new_method ("make", apply2args,
+	  classPairPat.addMethod ("make", apply2args,
 				   classPairPat, Access.PUBLIC|Access.STATIC);
       }
     Literal literal = new Literal (this, classPairPat, comp);

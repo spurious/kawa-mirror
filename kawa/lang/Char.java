@@ -1,10 +1,10 @@
 package kawa.lang;
 import java.io.*;
 import java.util.Hashtable;
-import codegen.ClassType;
-import codegen.Method;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Method;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 /**
  * A wrapper for characters.
@@ -138,11 +138,11 @@ public class Char implements Printable, Compilable
     if (scmCharType == null)
       {
 	scmCharType = new ClassType ("kawa.lang.Char");
-	makeCharMethod = scmCharType.new_method ("make",
+	makeCharMethod = scmCharType.addMethod ("make",
 						 Compilation.int1Args,
 						 scmCharType,
 						 Access.PUBLIC|Access.STATIC);
-	charValueMethod = scmCharType.new_method ("charValue",
+	charValueMethod = scmCharType.addMethod ("charValue",
 						  Type.typeArray0,
 						  Type.char_type,
 						  Access.PUBLIC);

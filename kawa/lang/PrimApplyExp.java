@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import kawa.math.IntNum;
 import kawa.math.DFloNum;
 

@@ -21,7 +21,7 @@ public class ModuleExp extends LambdaExp
   public ModuleExp (List body, Translator tr, String filename)
   {
     super (formals, body, tr);
-    lookup (env_formal).type = Compilation.scmEnvironmentType;
+    lookup(env_formal).setType(Compilation.scmEnvironmentType);
     setFile (filename);
   }
 

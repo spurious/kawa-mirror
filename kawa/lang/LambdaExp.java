@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import java.util.Hashtable;
 
 /**
@@ -145,15 +145,15 @@ public class LambdaExp extends ScopeExp
       keywords = new Keyword[key_args];
 
     Variable var;
-    var = add_decl (Symbol.make ("this"));
+    var = addDeclaration (Symbol.make ("this"));
     var.setParameter (true);  var.setArtificial (true);
     
     if (min_args != max_args || min_args > 4)
       {
 	// Compilation.compile depends on the "argsArray" variable
 	// being the second one created for this scope.
-	argsArray = add_decl (Symbol.make ("argsArray"),
-			       Compilation.objArrayType);
+	argsArray = addDeclaration (Symbol.make ("argsArray"),
+				    Compilation.objArrayType);
 	argsArray.setParameter (true);
 	argsArray.setArtificial (true);
       }
@@ -205,14 +205,14 @@ public class LambdaExp extends ScopeExp
 	  }
 	if (mode == Special.key)
 	  keywords[key_args++] = Keyword.make(name.toString());
-	Declaration decl = add_decl (name);
+	Declaration decl = addDeclaration (name);
 	decl.setParameter(true);
 	decl.noteValue(null);  // Does not have a known value.
 	decl.push(tr);
       }
     if (bindings instanceof Symbol)
       {
-	Declaration decl = add_decl ((Symbol) bindings);
+	Declaration decl = addDeclaration ((Symbol) bindings);
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
 	decl.push(tr);
@@ -286,7 +286,7 @@ public class LambdaExp extends ScopeExp
     comp.mainClass.setInterfaces (interfaces);
 
     Method setLiterals_method
-      = comp.mainClass.new_method ("setLiterals", comp.applyNargs,
+      = comp.mainClass.addMethod ("setLiterals", comp.applyNargs,
 				   Type.void_type, Access.PUBLIC);
     setLiterals_method.init_param_slots ();
     setLiterals_method.compile_push_value (setLiterals_method.find_arg (1));
@@ -311,7 +311,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    ClassType clas = comp.classes[iClass];
 	    classNames[iClass] = clas.getName ();
-	    classes[iClass] = clas.emit_to_array ();
+	    classes[iClass] = clas.writeToArray ();
 	  }
 
 	/* DEBUGGING:

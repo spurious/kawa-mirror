@@ -1,8 +1,8 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 /** Representation of fixed-length mutable character strings.
  * Used for the Scheme string type.
@@ -127,7 +127,7 @@ public class FString extends Sequence implements Printable, Compilable
       {
 	scmStringType = new ClassType ("kawa.lang.FString");
 	initFStringMethod
-	  = scmStringType.new_method ("<init>", comp.string1Arg,
+	  = scmStringType.addMethod ("<init>", comp.string1Arg,
 				      Type.void_type, Access.PUBLIC);
       }
     Literal literal = new Literal (this, scmStringType, comp);

@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import java.io.PrintStream;
 
 /** A class of special one-of-a-kind builtin values. */
@@ -45,23 +45,23 @@ public class Special extends Object implements Printable, Compilable
 	Type[] apply1args = new Type[1];
 	apply1args[0] = comp.javaStringType;
 	makeMethod =
-	  thisType.new_method ("make", apply1args,
+	  thisType.addMethod ("make", apply1args,
 			       thisType, Access.PUBLIC|Access.STATIC);
       }
     if (this == optional)
-      return new Literal(this, thisType.new_field("optional", thisType,
+      return new Literal(this, thisType.addField("optional", thisType,
 						  Access.PUBLIC|Access.STATIC),
 			 comp);
     if (this == rest)
-      return new Literal(this, thisType.new_field("rest", thisType,
+      return new Literal(this, thisType.addField("rest", thisType,
 						  Access.PUBLIC|Access.STATIC),
 			 comp);
     if (this == key)
-      return new Literal(this, thisType.new_field("key", thisType,
+      return new Literal(this, thisType.addField("key", thisType,
 						  Access.PUBLIC|Access.STATIC),
 			 comp);
     if (this == eof)
-      return new Literal(this, thisType.new_field("eof", thisType,
+      return new Literal(this, thisType.addField("eof", thisType,
 						  Access.PUBLIC|Access.STATIC),
 			 comp);
     return new Literal (this, thisType, comp);

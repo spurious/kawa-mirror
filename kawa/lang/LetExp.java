@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 /**
  * Class used to implement "let" syntax (and variants) for Scheme.
@@ -43,7 +43,7 @@ public class LetExp extends ScopeExp
     store_rest (comp, firstVar ());
 
     body.compile_with_linenumber (comp, flags);
-    comp.method.pop_scope ();
+    comp.method.popScope ();
   }
 
   public void print (java.io.PrintStream ps)

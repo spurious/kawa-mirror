@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 /** This class is used to represent "combination" or "application".
  * A function and arguments are evaluated, and then the function applied.

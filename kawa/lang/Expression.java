@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.Type;
+import gnu.bytecode.Type;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.

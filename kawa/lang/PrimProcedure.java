@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import java.util.Hashtable;
 
 /** A primitive Procedure implemented by a plain Java method. */
@@ -39,7 +39,7 @@ public class PrimProcedure extends ProcedureN
     this.op_code = op_code;
     if (op_code == 185) // invokeinterface
       classtype.access_flags |= Access.INTERFACE;
-    method = classtype.new_method (name, argTypes, retType,
+    method = classtype.addMethod (name, argTypes, retType,
 				   op_code == 184 ? Access.STATIC : 0);
     this.retType = retType;
     this.argTypes= argTypes;

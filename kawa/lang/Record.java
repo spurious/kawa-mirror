@@ -1,9 +1,9 @@
 package kawa.lang;
 import java.lang.reflect.Field;
-import codegen.ClassType;
-import codegen.Type;
-import codegen.Access;
-import codegen.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Type;
+import gnu.bytecode.Access;
+import gnu.bytecode.Method;
 
 public class Record
 {
@@ -97,10 +97,10 @@ public class Record
     clas.access_flags = Access.PUBLIC;
 
     // Generate the (default) constructor.
-    Method constructor = clas.new_method ("<init>", Type.typeArray0,
+    Method constructor = clas.addMethod ("<init>", Type.typeArray0,
 					  Type.void_type, Access.PUBLIC);
     Method superConstructor
-      = superClass.new_method ("<init>", Type.typeArray0,
+      = superClass.addMethod ("<init>", Type.typeArray0,
 			       Type.void_type, Access.PUBLIC);
     constructor.init_param_slots ();
     constructor.compile_push_this ();
@@ -110,7 +110,7 @@ public class Record
     while (fnames != List.Empty)
       {
 	Pair pair = (Pair) fnames;
-	clas.new_field(pair.car.toString(), Type.pointer_type, Access.PUBLIC);
+	clas.addField(pair.car.toString(), Type.pointer_type, Access.PUBLIC);
 	fnames = (List) pair.cdr;
       }
     byte[][] arrays = new byte[1][];
@@ -118,8 +118,8 @@ public class Record
     names[0] = name;
     try
       {
-	arrays[0] = clas.emit_to_array();
-	clas.emit_to_file("tmp.class");
+	arrays[0] = clas.writeToArray();
+	clas.writeToFile("tmp.class");
       }
     catch (java.io.IOException ex)
       {

@@ -1,8 +1,8 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 public class ListRepeatPat extends Pattern implements Printable, Compilable
 {
@@ -74,7 +74,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
 	Type[] apply1args = new Type[1];
 	apply1args[0] = comp.scmPatternType;
 	makeListRepeatMethod =
-	  thisType.new_method ("make", apply1args,
+	  thisType.addMethod ("make", apply1args,
 			       thisType, Access.PUBLIC|Access.STATIC);
       }
     Literal literal = new Literal (this, thisType, comp);

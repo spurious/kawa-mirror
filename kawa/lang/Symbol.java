@@ -28,6 +28,15 @@ public class Symbol extends Object implements Printable, Compilable
     return new Symbol ("GS." + Integer.toString(++gensym_counter));
   }
 
+  /**
+   * Generate a new (interned) Symbol with a unique name.
+   * @return the new Symbol
+   */
+  public static final Symbol gentemp ()
+  {
+    return Symbol.make("GS." + Integer.toString(++gensym_counter));
+  }
+
   private static java.util.Hashtable symbolTable = new java.util.Hashtable ();
 
   public int hashCode () { return name.hashCode (); }

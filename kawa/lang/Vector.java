@@ -1,8 +1,8 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 public class Vector extends Sequence implements Printable, Compilable
 {
@@ -62,7 +62,7 @@ public class Vector extends Sequence implements Printable, Compilable
       {
 	scmVectorType = new ClassType ("kawa.lang.Vector");
 	initVectorMethod
-	  = scmVectorType.new_method ("<init>", comp.applyNargs,
+	  = scmVectorType.addMethod ("<init>", comp.applyNargs,
 				      Type.void_type, Access.PUBLIC);
       }
     Literal literal = new Literal (this, scmVectorType, comp);

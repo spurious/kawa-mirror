@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 import java.io.PrintStream;
 
@@ -75,7 +75,7 @@ public class Keyword extends Object implements Printable, Compilable
 	Type[] applyargs = new Type[1];
 	applyargs[0] = comp.javaStringType;
 	makeKeywordMethod =
-	  comp.scmKeywordType.new_method ("make", applyargs,
+	  comp.scmKeywordType.addMethod ("make", applyargs,
 					  comp.scmKeywordType,
 					  Access.PUBLIC|Access.STATIC);
       }

@@ -1,7 +1,7 @@
 package kawa.lang;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
 
 /**
  * A pattern that matches anything.
@@ -35,7 +35,7 @@ public class AnyPat extends Pattern implements Printable, Compilable
       {
 	thisType = new ClassType ("kawa.lang.AnyPat");
 	makeAnyPatMethod =
-	  thisType.new_method ("make", comp.apply0args,
+	  thisType.addMethod ("make", comp.apply0args,
 			       thisType, Access.PUBLIC|Access.STATIC);
       }
     return new Literal (this, thisType, comp);

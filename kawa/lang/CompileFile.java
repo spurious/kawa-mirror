@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 import java.io.*;
 
 /** Procedure to read and compile and entire file.
@@ -75,7 +75,7 @@ public class CompileFile extends Procedure2
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType clas = comp.classes[iClass];
-	    classes[iClass] = clas.emit_to_array ();
+	    classes[iClass] = clas.writeToArray ();
 
 	    zar.append (clas.getName ().replace ('.', '/') + ".class",
 			classes[iClass]);
@@ -130,7 +130,7 @@ public class CompileFile extends Procedure2
             ClassType clas = comp.classes[iClass];
 	    String out_name
 	      = directory + clas.getName ().replace ('.', '/') + ".class";
-	    clas.emit_to_file (out_name);
+	    clas.writeToFile (out_name);
           }
       }
     catch (IOException ex)

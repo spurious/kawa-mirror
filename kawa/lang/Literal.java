@@ -1,5 +1,5 @@
 package kawa.lang;
-import codegen.*;
+import gnu.bytecode.*;
 
 /** A Literal contains compile-time information about a constant. */
 
@@ -46,7 +46,7 @@ public class Literal
     next = comp.literalsChain;
     comp.literalsChain = this;
     if (! comp.immediate)
-      field = comp.mainClass.new_field ("Lit"+index, type,
+      field = comp.mainClass.addField ("Lit"+index, type,
 					Access.STATIC|Access.FINAL);
     else
       // Not actually used, except some places test that field==null.

@@ -1,3 +1,12 @@
+2005-03-29  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java: Initalize various static fields,
+	including 'instance', in a static block, so they can be final.
+	Set/restore current environment, since needed for loadClass.
+	(initLisp): New method.
+	(lispCounter): Remove - use Language.env_counter.
+	(getNewEnvironment): New method.
+
 2005-03-23  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (importLocation): Remove kludge for GCJ/classpath.

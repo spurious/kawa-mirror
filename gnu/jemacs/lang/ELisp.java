@@ -57,23 +57,40 @@ public class ELisp extends Lisp2
     return "Emacs-Lisp";
   }
 
-  static ELisp instance;
+  static final ELisp instance;
 
-  static int elispCounter = 0;
+  public static final Environment elispEnvironment
+    = Environment.make("elisp-environment");
 
-  public ELisp()
+  static
   {
-    Environment scmEnv = Scheme.builtin();
-    environ = new SimpleEnvironment("interaction-environment."+(++elispCounter));
-    Environment.setCurrent(environ);
+    instance = new ELisp();
+    instance.environ = elispEnvironment;
 
-    TRUE = environ.getSymbol("t");
-    define("t", TRUE);
-    define("nil", FALSE);
+    instance.define("t", TRUE);
+    instance.define("nil", FALSE);
+    CallContext ctx = CallContext.getInstance();
+    Environment saveEnv = ctx.getEnvironmentRaw();
+    try
+      {
+        ctx.setEnvironmentRaw(elispEnvironment);
+        instance.initELisp();
+      }
+    finally
+      {
+        ctx.setEnvironmentRaw(saveEnv);
+      }
+    instance.environ = instance.getNewEnvironment();
+  }
 
-    if (instance == null)
-      instance = this;
+  ELisp ()
+  {
+    // Kludge - should be static - but in which Namespace/Environment?
+    TRUE = elispEnvironment.getSymbol("t");
+  }
 
+  private void initELisp ()
+  {
     try
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
@@ -159,17 +176,21 @@ public class ELisp extends Lisp2
       }
   }
 
+  public Environment getNewEnvironment ()
+  {
+    return Environment.make("interaction-environment."+(++env_counter),
+                            elispEnvironment);
+  }
+
   public static ELisp getInstance()
   {
-    if (instance == null)
-      instance = new ELisp();
     return instance;
   }
 
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Language.setDefaults(new ELisp());
+    Language.setDefaults(instance);
   }
 
   public Object read (InPort in)

@@ -56,29 +56,49 @@ public class CommonLisp extends Lisp2
     return "CommonLisp";
   }
 
-  static CommonLisp instance;
+  static final CommonLisp instance;
 
-  static int lispCounter = 0;
+  public static final Environment clispEnvironment
+    = Environment.make("clisp-environment");
+
+  static
+  {
+    instance = new CommonLisp();
+    instance.environ = clispEnvironment;
+
+    instance.define("t", TRUE);
+    instance.define("nil", FALSE);
+    CallContext ctx = CallContext.getInstance();
+    Environment saveEnv = ctx.getEnvironmentRaw();
+    try
+      {
+        ctx.setEnvironmentRaw(clispEnvironment);
+        instance.initLisp();
+      }
+    finally
+      {
+        ctx.setEnvironmentRaw(saveEnv);
+      }
+    instance.environ = instance.getNewEnvironment();
+  }
+
+  public Environment getNewEnvironment ()
+  {
+    return Environment.make("interaction-environment."+(++env_counter),
+                            clispEnvironment);
+  }
 
   public CommonLisp()
   {
-    Environment scmEnv = Scheme.builtin();
-    environ = new SimpleEnvironment("interaction-environment."+(++lispCounter));
-    Environment.setCurrent(environ);
+  }
 
-    TRUE = environ.getSymbol("t");
-    // TRUE.set(TRUE); FIXME
-    define("t", TRUE);
-    define("nil", FALSE);
-
-    LocationEnumeration e = scmEnv.enumerateAllLocations();
+  void initLisp()
+  {
+    LocationEnumeration e = Scheme.builtin().enumerateAllLocations();
     while (e.hasMoreElements())
       {
         importLocation(e.nextLocation());
       }
-
-    if (instance == null)
-      instance = this;
 
     try
       {
@@ -125,8 +145,6 @@ public class CommonLisp extends Lisp2
 
   public static CommonLisp getInstance()
   {
-    if (instance == null)
-      instance = new CommonLisp();
     return instance;
   }
 

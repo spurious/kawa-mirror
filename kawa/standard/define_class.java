@@ -5,6 +5,13 @@ import gnu.expr.*;
 
 public class define_class extends Syntax
 {
+  object objectSyntax;
+
+  define_class (object objectSyntax)
+  {
+    this.objectSyntax = objectSyntax;
+  }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
@@ -58,7 +65,7 @@ public class define_class extends Syntax
     //    tr.push(lexp);
     ClassExp oexp = new ClassExp();
     oexp.setName(name);
-    Expression oe = object.rewriteClassDef((Pair) form.cdr, oexp, tr);
+    Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
     /*
     lexp.body = oe;
     tr.pop(lexp);

@@ -88,11 +88,17 @@ public class Scheme extends Interpreter
       nullEnvironment.setName ("null-environment");
       environ = nullEnvironment;
 
+      Lambda lambda = new kawa.lang.Lambda();
+      lambda.setKeywords(Special.optional, Special.rest, Special.key);
+      define_syntax ("lambda", lambda);
+
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new Quote ());
-      define_syntax("define", new kawa.standard.define(false));
-      define_syntax("define-private", new kawa.standard.define(true));
-      define_syntax("define-constant", new kawa.standard.define(false, true));
+      define_syntax("define", new kawa.standard.define(lambda, false));
+      define_syntax("define-private",
+                    new kawa.standard.define(lambda, true));
+      define_syntax("define-constant",
+                    new kawa.standard.define(lambda, false, true));
       define_syntax("define-autoload", new define_autoload(false));
       define_syntax("define-autoloads-from-file", new define_autoload(true));
       define_syntax ("if", "kawa.standard.ifp");
@@ -117,7 +123,6 @@ public class Scheme extends Interpreter
       define_syntax ("quasiquote", "kawa.standard.quasiquote");
 
       //-- Section 5  -- complete [except for internal definitions]
-      define_syntax ("lambda", "kawa.lang.Lambda");
 
       // Appendix (and R5RS)
       define ("define-syntax", new kawa.standard.define_syntax ());
@@ -453,8 +458,10 @@ public class Scheme extends Interpreter
       define_proc("as", kawa.standard.convert.getInstance());
       define_proc("instance?", new gnu.kawa.reflect.InstanceOf(this));
       define_syntax("synchronized", "kawa.standard.synchronizd");
-      define_syntax("object", "kawa.standard.object");
-      define_syntax("define-class", "kawa.standard.define_class");
+      object objectSyntax = new kawa.standard.object(lambda);
+      define_syntax("object", objectSyntax);
+      define_syntax("define-class",
+                    new kawa.standard.define_class(objectSyntax));
       define_syntax("this", "kawa.lib.syntax");
       define_proc("make", gnu.kawa.reflect.Invoke.make);
       define_proc("slot-ref", gnu.kawa.reflect.SlotGet.field);

@@ -11,14 +11,18 @@ import gnu.kawa.util.*;
 
 public class define extends Syntax implements Printable
 {
+  Lambda lambda;
+
   boolean makePrivate;
   boolean makeConstant;
-  public define(boolean makePrivate)
+  public define(Lambda lambda, boolean makePrivate)
   {
+    this.lambda = lambda;
     this.makePrivate = makePrivate;
   }
-  public define(boolean makePrivate, boolean makeConstant)
+  public define(Lambda lambda, boolean makePrivate, boolean makeConstant)
   {
+    this.lambda = lambda;
     this.makePrivate = makePrivate;
     this.makeConstant = makeConstant;
   }
@@ -125,7 +129,7 @@ public class define extends Syntax implements Printable
             if (name != null)
               {
 		LambdaExp lexp = new LambdaExp();
-		Lambda.rewrite(lexp, p2.cdr, p1.cdr, tr);
+		lambda.rewrite(lexp, p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
 		  {

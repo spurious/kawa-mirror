@@ -7,6 +7,13 @@ import java.util.Vector;
 
 public class object extends Syntax
 {
+  Lambda lambda;
+
+  public object(Lambda lambda)
+  {
+    this.lambda = lambda;
+  }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     if (! (form.cdr instanceof Pair))
@@ -25,8 +32,8 @@ public class object extends Syntax
     return rewriteClassDef(pair, oexp, tr);
   }
 
-  public static Expression rewriteClassDef (Pair pair, ObjectExp oexp,
-					    Translator tr)
+  public Expression rewriteClassDef (Pair pair, ObjectExp oexp,
+                                     Translator tr)
   {
     tr.mustCompileHere();
     int num_supers = LList.list_length (pair.car);
@@ -139,7 +146,7 @@ public class object extends Syntax
 	    Pair mpair = (Pair) pair.car;
 	    LambdaExp lexp = meth;
 	    meth = meth.nextSibling;
- 	    Lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+ 	    lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
 	  }
 	else
 	  return tr.syntaxError("invalid field/method definition");

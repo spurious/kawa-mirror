@@ -10,6 +10,19 @@ import gnu.kawa.util.*;
 
 public class Lambda extends Syntax implements Printable
 {
+  public Object optionalKeyword;
+  public Object restKeyword;
+  public Object keyKeyword;
+
+  public Expression defaultDefault = QuoteExp.falseExp;
+
+  public void setKeywords(Object optional, Object rest, Object key)
+  {
+    optionalKeyword = optional;
+    restKeyword = rest;
+    keyKeyword = key;
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))
@@ -30,7 +43,7 @@ public class Lambda extends Syntax implements Printable
    * @param tr the (Scheme) Translator
    */
   // FIXME make method of Translator
-  public static void rewrite(LambdaExp lexp, Object formals, Object body, Translator tr)
+  public void rewrite(LambdaExp lexp, Object formals, Object body, Translator tr)
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
@@ -42,39 +55,42 @@ public class Lambda extends Syntax implements Printable
       {
 	pair = (Pair) bindings;
         // An initial pass to count the parameters.
-	if (pair.car == Special.optional)
+	if (pair.car == optionalKeyword)
 	  {
 	    if (opt_args >= 0)
 	      {
-		tr.syntaxError ("multiple #!optional in parameter list");
+		tr.syntaxError ("multiple "+optionalKeyword+" in parameter list");
 		return;
 	      }
 	    else if (rest_args >= 0 || key_args >= 0)
 	      {
-		tr.syntaxError ("#!optional after #!rest or #!key");
+		tr.syntaxError (optionalKeyword.toString()+" after " + restKeyword + " or " + keyKeyword);
 		return;
 	      }
 	    opt_args = 0;
 	  }
-	else if (pair.car == Special.rest)
+	else if (pair.car == restKeyword)
 	  {
 	    if (rest_args >= 0)
 	      {
-		tr.syntaxError ("multiple #!rest in parameter list");
+		tr.syntaxError ("multiple " + restKeyword
+                                + " in parameter list");
 		return;
 	      }
 	    else if (key_args >= 0)
 	      {
-		tr.syntaxError ("#!rest after #!key");
+		tr.syntaxError (restKeyword.toString()
+                                + " after " + keyKeyword);
 		return;
 	      }
 	    rest_args = 0;
 	  }
-	else if (pair.car == Special.key)
+	else if (pair.car == keyKeyword)
 	  {
 	    if (key_args >= 0)
 	      {
-		tr.syntaxError ("multiple #!key in parameter list");
+		tr.syntaxError ("multiple " + keyKeyword
+                                + " in parameter list");
 		return;
 	      }
 	    key_args = 0;
@@ -96,7 +112,8 @@ public class Lambda extends Syntax implements Printable
       {
 	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
 	  {
-	    tr.syntaxError ("dotted rest-arg after #!optional, #!rest, or #!key");
+	    tr.syntaxError ("dotted rest-arg after " + optionalKeyword
+                            +", " + restKeyword + ", or " + keyKeyword);
 	    return;
 	  }
 	rest_args = 1;
@@ -108,7 +125,7 @@ public class Lambda extends Syntax implements Printable
       }
     if (rest_args > 1)
       {
-	tr.syntaxError ("multiple #!rest parameters");
+	tr.syntaxError ("multiple " + restKeyword + " parameters");
         return;
       }
     if (opt_args < 0)
@@ -135,14 +152,14 @@ public class Lambda extends Syntax implements Printable
     for (; bindings instanceof Pair;  bindings = pair.cdr)
       {
 	pair = (Pair) bindings;
-	if (pair.car == Special.optional
-	    || pair.car == Special.rest || pair.car == Special.key)
+	if (pair.car == optionalKeyword
+	    || pair.car == restKeyword || pair.car == keyKeyword)
 	  {
 	    mode = pair.car;
 	    continue;
 	  }
 	String name;
-	Object defaultValue = QuoteExp.falseExp;
+	Object defaultValue = defaultDefault;
 	Object typeSpec = null;
         Pair p;
 	if (pair.car instanceof String)
@@ -225,9 +242,9 @@ public class Lambda extends Syntax implements Printable
 	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)");
 	    return;
 	  }
-	if (mode == Special.optional || mode == Special.key)
+	if (mode == optionalKeyword || mode == keyKeyword)
 	  lexp.defaultArgs[opt_args++] = tr.rewrite(defaultValue);
-	if (mode == Special.key)
+	if (mode == keyKeyword)
 	  lexp.keywords[key_args++] = Keyword.make(name.toString());
 	Declaration decl = lexp.addDeclaration (name);
         if (bindings instanceof PairWithPosition)
@@ -241,7 +258,7 @@ public class Lambda extends Syntax implements Printable
 	    decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
-	else if (mode == Special.rest)
+	else if (mode == restKeyword)
 	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.
 	tr.push(decl);
@@ -255,6 +272,11 @@ public class Lambda extends Syntax implements Printable
       }
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
+    rewriteBody(lexp, body, tr);
+  }
+
+  public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
+  {
     // Syntatic sugar:  <TYPE> BODY --> (as <TYPE> BODY)
     lexp.body = tr.rewrite_body (body);
     if (lexp.body instanceof BeginExp)
@@ -265,8 +287,7 @@ public class Lambda extends Syntax implements Printable
 	if (len > 1)
 	  {
 	    Expression rexp = exps[0];
-	    gnu.bytecode.Type rtype
-	      = kawa.standard.Scheme.getTypeValue(rexp);
+	    gnu.bytecode.Type rtype = tr.getInterpreter().getTypeFor(rexp);
 	    if (rtype != null)
 	      {
 		if (len > 2)

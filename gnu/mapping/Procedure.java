@@ -7,6 +7,8 @@ package gnu.mapping;
 
 public abstract class Procedure extends Named implements Printable
 {
+  public static Object[] noArgs = new Object[0];
+
   public Procedure()
   {
     super ();
@@ -53,11 +55,11 @@ public abstract class Procedure extends Named implements Printable
   /* We use a single virtual function to reduce the number of methods
    * in the system, as well as the number of virtual method table entries.
    * We shift by 12 so the number can normally be represented using a
-   * sipush instruction, with requiring a constant pool entry.
+   * sipush instruction, without requiring a constant pool entry.
    */
   public int numArgs() { return 0xfffff000; }
 
-  /* CPS:
+  /* CPS: ??
   public void apply1(Object arg, CallStack stack, CallFrame rlink, int rpc)
   {
     context.value = apply1(arg);
@@ -65,6 +67,14 @@ public abstract class Procedure extends Named implements Printable
     context.pc = rpc;
   }
   */
+  /** Call this Procedure using the explicit-CallStack-convention.
+   * The input arguments are (by default) in stack.args;
+   * the result is (by default) left in stack.value. */
+
+  public void apply (CallStack stack)
+  {
+    stack.value = applyN(stack.args);
+  }
 
   public Procedure getSetter()
   {

@@ -112,7 +112,7 @@ public class Literal
 
   void emit (Compilation comp, boolean ignore)
   {
-    if ((flags & ALLOCATED) != 0)
+    if ((flags & ALLOCATED) != 0 && ! (value instanceof String))
       {
 	if ((flags & ASSIGNED) == 0 || field == null)
 	  throw new Error ("internal error in Literal.emit");

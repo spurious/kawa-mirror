@@ -37,6 +37,8 @@ public class Compilation
     = new ClassType ("kawa.lang.Procedure");
   static public ClassType scmInterpreterType
     = new ClassType ("kawa.lang.Interpreter");
+  static public ClassType scmEnvironmentType
+    = new ClassType ("kawa.lang.Environment");
   static final Field carField
     = scmPairType.new_field ("car", scmObjectType, Access.PUBLIC);
   static final Field cdrField
@@ -173,9 +175,10 @@ public class Compilation
     Literal literal = (Literal) literalTable.get (value);
     if (literal != null)
       {
-	// This value is used multiple types (perhaps recursively),
+	// This value is used multiple times (perhaps recursively),
 	// so do allocate a LitN Field for it.
-	if (literal.field == null)
+	// However, String literals are shared in the constant pool instead.
+	if (literal.field == null && ! (literal.value instanceof String))
 	  literal.assign (this);
       }
     else

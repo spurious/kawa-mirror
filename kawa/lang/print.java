@@ -52,6 +52,7 @@ public class print
 	    if (i > 0)
 	      ps.print (' ');
 	    ps.print (arr[i]);
+	    //ps.print ("#x"+Long.toString((long)arr[i] & 0xffffffffL, 16));
 	  }
 	ps.print (']');
       }

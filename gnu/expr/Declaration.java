@@ -63,30 +63,7 @@ public class Declaration extends Variable
   /** If this is a field in some object, load a reference to that object. */
   public void loadOwningObject (Compilation comp)
   {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    LambdaExp curLambda = comp.curLambda;
-    LambdaExp lambda = getContext().currentLambda ();
-    while (curLambda != lambda && curLambda.getInlineOnly())
-      curLambda = curLambda.outerLambda();
-    if (lambda == curLambda)
-      code.emitLoad(lambda.heapFrame);
-    else
-      {
-	code.emitPushThis();
-	LambdaExp parent = curLambda.outerLambda();
-	if (parent.heapFrameLambda != curLambda)
-	  {
-	    code.emitGetField(curLambda.staticLinkField);
-	  }
-	while (parent != lambda)
-	  {
-	    if (parent.heapFrameLambda != null)
-	      curLambda = parent.heapFrameLambda;
-	    code.emitGetField(curLambda.staticLinkField);
-	    curLambda = parent;
-	    parent = parent.outerLambda();
-	  }
-      }
+    getContext().currentLambda().loadHeapFrame(comp);
   }
 
   public void load (Compilation comp)
@@ -123,12 +100,52 @@ public class Declaration extends Variable
    * If the variable can be set more than once, then value is null. */
   Expression value = QuoteExp.undefined_exp;
 
-  private boolean indirectBinding;
+  static final int INDIRECT_BINDING = 1;
+  static final int CAN_READ = 2;
+  static final int CAN_CALL = 4;
+  static final int CAN_WRITE = 8;
+  int flags;
 
   /** True if the value of the variable is the contents of a Binding. */
-  public final boolean isIndirectBinding() { return this.indirectBinding; }
+  public final boolean isIndirectBinding()
+  { return (flags & INDIRECT_BINDING) != 0; }
   public final void setIndirectBinding(boolean indirectBinding)
-  { this.indirectBinding = indirectBinding; }
+  {
+    if (indirectBinding) flags |= INDIRECT_BINDING;
+    else flags &= ~INDIRECT_BINDING;
+  }
+
+  /* Note:  You probably want to use !ignorable(). */
+  public final boolean getCanRead()
+  { return (flags & CAN_READ) != 0; }
+  public final void setCanRead(boolean read)
+  {
+    if (read) flags |= CAN_READ;
+    else flags &= ~CAN_READ;
+  }
+
+  public final boolean getCanCall()
+  { return (flags & CAN_CALL) != 0; }
+  public final void setCanCall(boolean called)
+  {
+    if (called) flags |= CAN_CALL;
+    else flags &= ~CAN_CALL;
+  }
+
+  public final boolean getCanWrite()
+  { return (flags & CAN_WRITE) != 0; }
+  public final void setCanWrite(boolean written)
+  {
+    if (written) flags |= CAN_WRITE;
+    else flags &= ~CAN_WRITE;
+  }
+
+  /** True if we never need to access this declaration. */
+  public boolean ignorable()
+  {
+    return ! getCanRead()
+      && (! getCanCall() || (value != null && value instanceof LambdaExp));
+  }
 
   public void noteValue (Expression value)
   {
@@ -139,13 +156,18 @@ public class Declaration extends Variable
       this.value = null;
   }
 
-  public Declaration (String s)
+  public Declaration (String name)
+  {
+    this(name, Type.pointer_type);
+  }
+
+  public Declaration (String s, Type type)
   {
     sym = s;
     name = Compilation.mangleName(s);
     if (s.equals(name))
       name = s;
-    setType(Type.pointer_type);
+    setType(type);
   }
 
   public String string_name () { return sym; }
@@ -156,7 +178,7 @@ public class Declaration extends Variable
       Assume the initial value is already pushed on the stack. */
   public void initBinding (Compilation comp)
   {
-    if (indirectBinding)
+    if (isIndirectBinding())
       {
 	CodeAttr code = comp.getCode();
 	code.emitPushString(symbol());

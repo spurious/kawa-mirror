@@ -22,6 +22,8 @@ public class Compilation
 
   public final CodeAttr getCode() { return method.getCode(); }
 
+  int method_counter;
+
   // Various standard classes
   static public ClassType scmObjectType = Type.pointer_type;
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
@@ -140,6 +142,25 @@ public class Compilation
     apply0method, apply1method, apply2method, apply3method,
     apply4method, applyNmethod };
 
+  public static ClassType typeProcedure0
+    = ClassType.make("gnu.mapping.Procedure0", scmProcedureType);
+  public static ClassType typeProcedure1
+    = ClassType.make("gnu.mapping.Procedure1", scmProcedureType);
+  public static ClassType typeProcedure2
+    = ClassType.make("gnu.mapping.Procedure2", scmProcedureType);
+  public static ClassType typeProcedure3
+    = ClassType.make("gnu.mapping.Procedure3", scmProcedureType);
+  public static ClassType typeProcedure4
+    = ClassType.make("gnu.mapping.Procedure4", scmProcedureType);
+  public static ClassType typeProcedureN
+    = ClassType.make("gnu.mapping.ProcedureN", scmProcedureType);
+  public static ClassType typeModuleBody
+    = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
+
+  public static ClassType[] typeProcedureArray = {
+    typeProcedure0, typeProcedure1, typeProcedure2, typeProcedure3,
+    typeProcedure4 };
+
   Hashtable literalTable;
   int literalsCount;
   Literal literalsChain;
@@ -244,6 +265,54 @@ public class Compilation
 			   : ctarg.ifFalse);
 	return;
       }
+    if (target instanceof StackTarget)
+      {
+	Type type = ((StackTarget) target).getType();
+	if (type instanceof PrimType)
+	  {
+	    try
+	      {
+		String signature = type.getSignature();
+		CodeAttr code = getCode();
+		char sig1 = (signature == null || signature.length() != 1) ? ' '
+		  : signature.charAt(0);
+		if (value instanceof Number)
+		  {
+		    Number num = (Number) value;
+		    switch (sig1)
+		      {
+		      case 'B':  case 'S':  case 'I':
+			code.emitPushInt(num.intValue());
+			return;
+		      case 'J':
+			code.emitPushLong(num.longValue());
+			return;
+		      case 'F':
+			code.emitPushFloat(num.floatValue());
+			return;
+		      case 'D':
+			code.emitPushDouble(num.doubleValue());
+			return;
+		      }
+		  }
+		if (sig1 == 'C')
+		  {
+		    code.emitPushInt((int) ((PrimType) type).charValue(value));
+		    return;
+		  }
+		if (sig1 == 'Z')
+		  {
+		    boolean val = ((PrimType) type).booleanValue(value);
+		    code.emitPushInt(val ? 1 : 0);
+		    return;
+		  }
+	      }
+	    catch (ClassCastException ex)
+	      {
+		// should print an ERROR.
+	      }
+	  }
+      }
     compileConstant(value);
     target.compileFromStack(this, Type.pointer_type);
   }
@@ -346,11 +415,16 @@ public class Compilation
     source_filename = lexp.filename;
     classPrefix = prefix;
     this.immediate = immediate;
-
     FindTailCalls.findTailCalls(lexp);
+    lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp);
 
-    addClass (lexp, classname);
+    mainClass = allocClass (lexp, classname);
+    literalTable = new Hashtable (100);
+    if (immediate)
+      literalsField = mainClass.addField ("literals",
+					  objArrayType, Access.STATIC);
+    addClass (lexp);
   }
 
   public void addClass (ClassType new_class)
@@ -369,19 +443,69 @@ public class Compilation
     new_class.access_flags = Access.PUBLIC;
   }
 
-  /** Compiles a function to a class. */
-  public final ClassType addClass (LambdaExp lexp, String name)
+  ClassType allocClass (LambdaExp lexp)
   {
-    ClassType new_class = new ClassType (name);
-    curClass = new_class;
-    if (mainClass == null)
+    String name = lexp.name == null? "lambda" : lexp.name;
+    name = generateClassName(name);
+    return allocClass(lexp, name);
+  }
+
+  ClassType allocClass (LambdaExp lexp, String name)
+  {
+    ClassType type = new ClassType(name);
+    ClassType superType
+      = lexp.isModuleBody () ? typeModuleBody
+      : lexp.min_args != lexp.max_args || lexp.min_args > 4 ? typeProcedureN
+      : typeProcedureArray[lexp.min_args];
+    type.setSuper (superType);
+
+    lexp.type = type;
+    addClass(type);
+    return type;
+  }
+
+  public final Method generateConstructor (ClassType clas, LambdaExp lexp)
+  {
+    Method save_method = method;
+    ClassType save_class = curClass;
+    curClass = clas;
+    Method constructor_method = clas.addMethod("<init>", Access.PUBLIC,
+					       apply0args, Type.void_type);
+    clas.constructor = constructor_method;
+    Method superConstructor
+      = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
+				       apply0args, Type.void_type);
+    method = constructor_method;
+    constructor_method.init_param_slots ();
+    CodeAttr code = getCode();
+    code.emitPushThis();
+    code.emitInvokeSpecial(superConstructor);
+
+    // If immediate, we cannot set the function name in the constructor,
+    // since setLiterals has not been called yet (ecept for nested functions).
+    if (lexp != null && lexp.name != null && !immediate)
       {
-	mainClass = curClass;
-	literalTable = new Hashtable (100);
-	if (immediate)
-	  literalsField = new_class.addField ("literals",
-					       objArrayType, Access.STATIC);
+	constructor_method.compile_push_this ();
+	compileConstant (lexp.name);
+	code.emitPutField(nameField);
       }
+    code.emitReturn();
+    method = save_method;
+    curClass = save_class;
+    return constructor_method;
+  }
+
+  /** Compiles a function to a class. */
+  public final ClassType addClass (LambdaExp lexp)
+  {
+    String name;
+    boolean main = mainClass == null;
+    ClassType new_class = lexp.type;
+    if (new_class == scmProcedureType)
+      new_class = allocClass(lexp);
+    curClass = new_class;
+    lexp.allocChildClasses(this);
+
     /* CPS:
     if (usingCPSstyle())
       {
@@ -390,8 +514,8 @@ public class Compilation
 	fswitch = new SwitchState(code);
       }
     */
-    addClass (new_class);
     String filename = lexp.getFile();
+    lexp.type = new_class;
     if (filename != null)
       new_class.setSourceFile (filename);
 
@@ -400,16 +524,12 @@ public class Compilation
     LambdaExp saveLambda = curLambda;
     curLambda = lexp;
     Type[] arg_types;
-    Variable argsArray;
     if (lexp.min_args != lexp.max_args || lexp.min_args > 4)
       {
 	arg_count = 1;
 	arg_letter = 'N';
 	arg_types = new Type[1];
 	arg_types[0] = new ArrayType (scmObjectType);
-
-	// The "argsArray" is the second variable allocated (after "this").
-	argsArray = lexp.firstVar().nextVar();
       }
     else
       {
@@ -420,74 +540,11 @@ public class Compilation
 	  arg_types[i] = scmObjectType;
 	if (lexp.isModuleBody ())
 	  arg_types[0] = Compilation.scmEnvironmentType;
-	argsArray = null;
       }
 
-    ClassType superType
-      = ClassType.make(lexp.isModuleBody () ? "gnu.expr.ModuleBody"
-		       : "gnu.mapping.Procedure" + arg_letter);
-    curClass.setSuper (superType);
+    generateConstructor (curClass, lexp);
 
-    if (lexp.getImportsLexVars())
-      {
-	LambdaExp parent = lexp.outerLambda();
-	LambdaExp heapFrameLambda = parent.heapFrameLambda;
-	if (heapFrameLambda != lexp && heapFrameLambda != null)
-	  {
-	    ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
-	    lexp.staticLinkField
-	      = curClass.addField ("closureEnv", heapFrameType);
-	  }
-	// otherwise: closureEnv==this.
-	else if (parent.getImportsLexVars())
-	  {
-	    Type slinkType = parent.outerLambda()
-	      .heapFrameLambda.getCompiledClassType();
-	    lexp.staticLinkField = curClass.addField ("staticLink", slinkType);
-	  }
-      }
-
-    for (Declaration decl = lexp.capturedVars; decl != null;
-	 decl = decl.nextCapturedVar)
-      {
-	String dname = mangleName(decl.getName());
-	String mname = dname;
-	// Check for existing field with name name.  Probably overkill.
-	for (int i = 0; ; i++)
-	  {
-	    Field fld = curClass.getField(mname);
-	    if (fld == null)
-	      break;
-	    mname = dname + 1;
-	  }
-	decl.field = curClass.addField (mname, decl.getType());
-      }
-
-    Method constructor_method = curClass.addMethod ("<init>",
-						     apply0args,
-						     Type.void_type,
-						     Access.PUBLIC);
-    curClass.constructor = constructor_method;
-    Method superConstructor = superType.addMethod ("<init>",
-						    apply0args, Type.void_type,
-						    Access.PUBLIC);
-
-    method = constructor_method;
-    constructor_method.init_param_slots ();
-    CodeAttr code = getCode();
-    code.emitPushThis();
-    code.emitInvokeSpecial(superConstructor);
-
-    // If immediate, we cannot set the function name in the constructor,
-    // since setLiterals has not been called yet (ecept for nested functions).
-    if (lexp.name != null && !immediate)
-      {
-	constructor_method.compile_push_this ();
-	compileConstant (lexp.name);
-	code.emitPutField(nameField);
-      }
-    code.emitReturn();
-
+    CodeAttr code;
     if (arg_letter == 'N')
       {
 	method = curClass.addMethod("numArgs", apply0args, Type.int_type,
@@ -496,6 +553,86 @@ public class Compilation
 	code = getCode();
 	code.emitPushInt(lexp.min_args | (lexp.max_args << 12));
 	code.emitReturn();
+      }
+
+    for (LambdaExp child = lexp.firstChild;  child != null; )
+      {
+	if (! child.getCanRead() && ! child.getInlineOnly())
+	  {
+	    ClassType method_class;
+	    boolean method_static;
+	    int method_flags;
+	    if (! child.getImportsLexVars())
+	      //if (lexp.heapFrame == null)
+	      {
+		method_class = new_class;
+		method_flags = Access.PUBLIC|Access.STATIC;
+	      }
+	    else
+	      {
+		//method_class = lexp.heapFrameLambda.getCompiledClassType();
+		method_class = (ClassType) lexp.heapFrame.getType();
+		method_flags = Access.PUBLIC;
+		child.declareThis(method_class);
+	      }
+	    // generate_unique_name (method_class, child.getName());
+	    String child_name = child.getName();
+	    String method_name = "lambda"+(++method_counter);
+	    if (child.min_args != child.max_args)
+	      child.declareArgsArray();
+	    if (child_name != null)
+	      method_name = method_name + mangleName(child_name);
+	    child.primMethod
+	      = child.addMethodFor (method_class, method_name, method_flags);
+	  }
+	child = child.nextSibling;
+      }
+
+    Expression body = lexp.body;
+    Declaration heapFrame = lexp.heapFrame;
+
+    if (lexp.min_args == lexp.max_args && ! lexp.isModuleBody ()
+	&& ! lexp.getImportsLexVars())
+      {
+	Expression[] args = new Expression[lexp.max_args];
+
+	Method method = lexp.addMethodFor (curClass, "apply",
+					   Access.PUBLIC|Access.STATIC);
+	this.method = method;
+	method.initCode();
+	code = getCode();
+	lexp.allocParameters(this, null);
+	lexp.enterFunction(this, null);
+	Type rtype = method.getReturnType();
+	Target target = rtype == Type.pointer_type ? Target.returnObject
+	  : rtype == Type.void_type ? Target.Ignore
+	  : new TailTarget(rtype);
+	body.compileWithPosition(this, target);
+	if (method.reachableHere ())
+	  code.emitReturn();
+	method.popScope();
+
+	// Set up for compiling regular virtual applyX method.
+	// It just calls the static method we just finished with.
+	Variable var = lexp.firstVar ();
+	lexp.scope = new Scope();
+	int itype = 0;
+	for ( ;  var != null; var = var.nextVar ())
+	  {
+	    if (! var.isParameter() || var.isArtificial())
+	      continue;
+	    String vname = var.getName();
+	    Declaration decl = lexp.addDeclaration(vname);
+	    decl.setParameter(true);
+	    if (var.isArtificial())
+	      decl.setArtificial(true);
+	    else
+	      args[itype++] = new ReferenceExp(vname, decl);
+	    if (! var.isSimple())
+	      var = var.nextVar();  // Skip xxIncoming fake fields.
+	  }
+	body = new ApplyExp(new QuoteExp(new PrimProcedure(method)), args);
+	lexp.heapFrame = null;
       }
 
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
@@ -510,11 +647,13 @@ public class Compilation
     // Below, we assign the value to the slot.
     method.initCode();
     code = getCode();
-    Variable var = lexp.firstVar();
-    if (var.getName() == "this")
-      var.setType(new_class);
+
+    Variable var = lexp.declareThis(new_class);
+    Variable argsArray;
+    if (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+      argsArray = lexp.declareArgsArray();
     else
-       throw new Error("internal error - 'this' is not first arg");
+    	argsArray = null;
 
     int line = lexp.getLine();
     if (line > 0)
@@ -536,10 +675,42 @@ public class Compilation
     lexp.allocParameters(this, argsArray);
     lexp.enterFunction(this, argsArray);
 
-
-    lexp.body.compileWithPosition(this, Target.returnObject);
+    body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())
       code.emitReturn();
+    method.popScope();
+
+    lexp.heapFrame = heapFrame;  // Restore heapFrame.
+    for (LambdaExp child = lexp.firstChild;  child != null; )
+      {
+	if (! child.getCanRead() && ! child.getInlineOnly())
+	  {
+	    Method save_method = method;
+	    LambdaExp save_lambda = curLambda;
+	    method = child.primMethod;
+	    curClass = method.getDeclaringClass();
+	    curLambda = child;
+	    method.initCode();
+            child.allocChildClasses(this);
+	    argsArray = null;
+	    if (child.min_args != child.max_args)
+	      argsArray = child.declareArgsArray();
+	    child.allocParameters(this, argsArray);
+	    child.enterFunction(this, argsArray);
+	    Type rtype = method.getReturnType();
+	    Target target = rtype == Type.pointer_type ? Target.returnObject
+	      : rtype == Type.void_type ? Target.Ignore
+	      : new TailTarget(rtype);
+	    child.body.compileWithPosition(this, target);
+	    if (method.reachableHere ())
+	      getCode().emitReturn();
+	    method.popScope();
+	    method = save_method;
+	    curClass = new_class;
+	    curLambda = save_lambda;
+	  }
+	child = child.nextSibling;
+      }
 
     if (! immediate && curClass == mainClass && literalsChain != null)
       {
@@ -552,7 +723,6 @@ public class Compilation
 	method = save_method;
       }
 
-    method.popScope();
     curLambda = saveLambda;
 
     if (generateMain && lexp.isModuleBody () && curClass == mainClass)
@@ -565,11 +735,11 @@ public class Compilation
 	code = getCode();
 	code.emitNew(curClass);
 	code.emitDup(curClass);
-	code.emitInvokeSpecial(constructor_method);
+	code.emitInvokeSpecial(curClass.constructor);
 	code.emitLoad(code.getArg(0));
 	Method moduleMain
-	  = superType.addMethod("runAsMain", Access.PUBLIC,
-				args, Type.void_type);
+	  = typeModuleBody.addMethod("runAsMain", Access.PUBLIC,
+				     args, Type.void_type);
 	code.emitInvokeVirtual(moduleMain);
 	code.emitReturn();
       }

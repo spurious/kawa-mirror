@@ -21,18 +21,26 @@ public class LetExp extends ScopeExp
   {
     if (vars != null)
       {
+	Declaration decl = (Declaration) vars;
 	store_rest (comp, vars.nextVar ());
-	((Declaration) vars).initBinding(comp);
+	if (! decl.ignorable())
+	  decl.initBinding(comp);
       }
   }
 
   public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
+
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
-    for (int i = 0; i < inits.length; i++)
-      inits[i].compile (comp, Target.pushObject);
+    Variable var = firstVar();
+    for (int i = 0; i < inits.length; i++, var = var.nextVar())
+      {
+	inits[i].compile (comp,
+			  ((Declaration) var).ignorable() ? Target.Ignore
+			  : Target.pushObject);
+      }
 
     code.enterScope (scope);
 

@@ -22,7 +22,7 @@ public class LambdaExp extends ScopeExp
   int id = ++counter;
 
   /** A list of Declarations, chained using Declaration's nextCapturedVar.
-    * All the Declarations are allocated in the current closure. */
+    * All the Declarations are allocated in the current heapFrame. */
   Declaration capturedVars;
   /* If any variables local to this LambdaExp are captured by some inner
      non-lined Lambda, then all such variables are allocated in a heapFrame.
@@ -30,8 +30,13 @@ public class LambdaExp extends ScopeExp
      of our child lambdas.  heapFrameLambda points to the child.  */
   LambdaExp heapFrameLambda;
 
+  LambdaExp firstChild;
+  LambdaExp nextSibling;
+
   static final int INLINE_ONLY = 1;
-  static final int IMPORTS_LEX_VARS = 2;
+  static final int CAN_READ = 2;
+  static final int CAN_CALL = 4;
+  static final int IMPORTS_LEX_VARS = 8;
   int flags;
 
   /** True iff this lambda is only "called" inline. */
@@ -51,6 +56,22 @@ public class LambdaExp extends ScopeExp
     if (importsLexVars) flags |= IMPORTS_LEX_VARS;
     else flags &= ~IMPORTS_LEX_VARS;
   }
+
+  public final boolean getCanRead()
+  { return (flags & CAN_READ) != 0; }
+  public final void setCanRead(boolean read)
+  {
+    if (read) flags |= CAN_READ; 
+    else flags &= ~CAN_READ;
+  }
+
+  public final boolean getCanCall()
+  { return (flags & CAN_CALL) != 0; }
+  public final void setCanCall(boolean called)
+  {
+    if (called) flags |= CAN_CALL;
+    else flags &= ~CAN_CALL;
+  }
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
 
@@ -59,14 +80,19 @@ public class LambdaExp extends ScopeExp
 
   public final boolean variable_args () { return max_args < 0; }
 
+  ClassType type = Compilation.scmProcedureType;
 
   /** Return the ClassType of the Procedure this is being compiled into. */
   public ClassType getCompiledClassType()
   {
-    Variable var = firstVar();
-    if (var == null || var.getName() != "this")
+    if (type == Compilation.scmProcedureType)
       throw new Error("internal error: getCompileClassType");
-    return (ClassType) var.getType();
+    return type;
+  }
+
+  public Type getType()
+  {
+    return type;
   }
 
   /** Number of argument variable actually passed by the caller.
@@ -79,21 +105,51 @@ public class LambdaExp extends ScopeExp
     return min_args == max_args && max_args <= 4 && max_args > 0 ? max_args : 1;
   }
 
+  /** Method used to implement this function. */
+  Method primMethod;
+
   public void setName (String name)
   {
     this.name = name;
   }
+
+  public String getName () { return name; }
 
   public LambdaExp outerLambda ()
   {
     return outer == null ? null : outer.currentLambda ();
   }
 
-  public void declareThis()
+  public Declaration declareThis(ClassType clas)
   {
-    Variable var;
-    var = addDeclaration ("this");
+    Declaration var  = new Declaration("this", clas);
+    scope.addVariableAfter(null, var);
     var.setParameter (true);  var.setArtificial (true);
+    return var;
+  }
+
+  public Declaration declareArgsArray()
+  {
+    Variable prev = scope.firstVar();
+    if (prev != null)
+      {
+	if (prev.getName() == "argsArray")
+	  return (Declaration) prev;
+	if (prev.getName() == "this")
+	  {
+	    Variable next = prev.nextVar();
+	    if (next != null && next.getName() == "argsArray")
+	      return (Declaration) next;
+	  }
+	else
+	  prev = null;
+      }
+    Declaration decl = new Declaration ("argsArray", Compilation.objArrayType);
+    // The "argsArray" is the second variable allocated (after "this").
+    scope.addVariableAfter(prev, decl);
+    decl.setParameter(true);
+    decl.setArtificial(true);
+    return decl;
   }
 
   public LambdaExp ()
@@ -102,7 +158,7 @@ public class LambdaExp extends ScopeExp
 
   public LambdaExp (Expression body)
   {
-    declareThis();
+    //declareThis();
     this.body = body;
   }
 
@@ -113,13 +169,40 @@ public class LambdaExp extends ScopeExp
    * If getName() is "staticLink", it is used to chain together heap frames. */
   public Field staticLinkField;
 
-  /** Declaration used if varargs or too many args. */
-  public Declaration argsArray;
-
   /** A variable that points to the heap-allocated part of the frame.
    * This is an instance of heapFrameLambda (which is one of our children);
    * each captured variable is a field in the heapFrame. */
   Declaration heapFrame;
+
+  /** Generate code to load heapFrame on the JVM stack. */
+  public void loadHeapFrame (Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    LambdaExp curLambda = comp.curLambda;
+    while (curLambda != this && curLambda.getInlineOnly())
+      curLambda = curLambda.outerLambda();
+    if (this == curLambda)
+      code.emitLoad(this.heapFrame);
+    else
+      {
+	code.emitPushThis();
+	LambdaExp parent = curLambda.outerLambda();
+	if (parent.heapFrameLambda != curLambda
+	    && parent.heapFrameLambda != null
+	    && curLambda.getCanRead())
+	  {
+	    code.emitGetField(curLambda.staticLinkField);
+	  }
+	while (parent != this)
+	  {
+	    if (parent.heapFrameLambda != null)
+	      curLambda = parent.heapFrameLambda;
+	    code.emitGetField(curLambda.staticLinkField);
+	    curLambda = parent;
+	    parent = parent.outerLambda();
+	  }
+      }
+  }
 
   /** Get the i'the formal parameter. */
   Declaration getArg (int i)
@@ -143,9 +226,7 @@ public class LambdaExp extends ScopeExp
     Method saveMethod = comp.method;
     try
       {
-	String new_name = name == null ? "lambda" : name;
-	new_name = comp.generateClassName(new_name);
-	return comp.addClass (this, new_name);
+	return comp.addClass (this);
       }
     finally
       {
@@ -178,7 +259,7 @@ public class LambdaExp extends ScopeExp
 	  }
 	code.emitPutField(staticLinkField);
       }
-    
+
     if (name != null)
       {
 	// Call setName(name) on the result.
@@ -194,6 +275,7 @@ public class LambdaExp extends ScopeExp
 	code.emitPushString(name);
 	code.emitInvokeVirtual(setNameMethod);
       }
+
     return new_class;
   }
 
@@ -218,6 +300,78 @@ public class LambdaExp extends ScopeExp
 	rtype = compileAlloc (comp);
       }
     target.compileFromStack(comp, rtype);
+  }
+
+  Method addMethodFor (ClassType ctype, String name, int flags)
+  {
+    Type rtype = body.getType();
+    Type[] atypes;
+    if (min_args != max_args)
+      atypes = Compilation.applyNargs;
+    else
+      {
+	atypes = new Type[max_args];
+	Variable var = firstVar ();
+
+	for (int itype = 0;  itype < atypes.length; var = var.nextVar ())
+	  {
+	    if (! var.isParameter() || var.isArtificial())
+	      continue;
+	    atypes[itype++] = var.getType();
+	  }
+      }
+    return ctype.addMethod(name, atypes, rtype, flags);
+  }
+
+  // Can we merge this with allocParameters?
+  public void allocChildClasses (Compilation comp)
+  {
+    for (LambdaExp child = firstChild;  child != null; ) 
+      { 
+        if (child.getCanRead() )
+	  //            || heapFrameLambda == child 
+	  //            || child.min_args != child.max_args) 
+          { 
+            comp.allocClass(child); 
+          } 
+        child = child.nextSibling; 
+      } 
+
+    if (heapFrame != null)
+      {
+	ClassType frameType;
+	if (heapFrameLambda != null)
+	  {
+	    frameType = heapFrameLambda.getCompiledClassType();
+	    //frameType = comp.curClass;
+	  }
+	else
+	  {
+	    frameType = new ClassType(comp.generateClassName("frame"));
+	    frameType.setSuper(Type.pointer_type);
+	    comp.addClass(frameType);
+	  }
+	heapFrame.setType(frameType);
+      }
+
+    if (getImportsLexVars())
+      {
+	LambdaExp parent = outerLambda();
+	LambdaExp heapFrameLambda = parent.heapFrameLambda;
+	if (heapFrameLambda != this && heapFrameLambda != null
+	    && getCanRead())
+	  {
+	    ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
+	    staticLinkField = comp.curClass.addField ("closureEnv", heapFrameType);
+	  }
+	// otherwise: closureEnv==this.
+	else if (parent.getImportsLexVars())
+	  {
+	    Type slinkType = parent.outerLambda().heapFrame.getType();
+	    staticLinkField = comp.curClass.addField ("staticLink", slinkType);
+	  }
+      }
+
   }
 
   void allocParameters (Compilation comp, Variable argsArray)
@@ -288,10 +442,36 @@ public class LambdaExp extends ScopeExp
     CodeAttr code = comp.getCode();
     // Tail-calls loop back to here! 
     code.enterScope (scope);
-
-    if (heapFrameLambda != null)
+    if (heapFrame != null)
       {
-	heapFrameLambda.compileAlloc(comp);
+	ClassType frameType = (ClassType) heapFrame.getType();
+	for (Declaration decl = capturedVars; decl != null;
+	     decl = decl.nextCapturedVar)
+	  {
+	    String dname = comp.mangleName(decl.getName());
+	    String mname = dname;
+	    // Check for existing field with name name.  Probably overkill.
+	    for (int i = 0; ; i++)
+	      {
+		Field fld =frameType.getField(mname);
+		if (fld == null)
+		  break;
+		mname = dname + 1;
+	      }
+	    Type dtype = decl.getType();
+	    decl.field = frameType.addField (mname, decl.getType());
+	  }
+	if (heapFrameLambda != null)
+	  {
+	    heapFrameLambda.compileAlloc(comp);
+	  }
+	else
+	  {
+	    code.emitNew(frameType);
+	    code.emitDup(frameType);
+	    Method constructor = comp.generateConstructor(frameType, null);
+	    code.emitInvokeSpecial(constructor);
+	  }
 	code.emitStore(heapFrame);
       }
 
@@ -407,6 +587,10 @@ public class LambdaExp extends ScopeExp
     code.emitReturn();
   }
 
+  /** Used to control with .zip files dumps are generated. */
+  public static String dumpZipPrefix;
+  public static int dumpZipCounter;
+
   public Object eval (Environment env)
   {
     try
@@ -426,23 +610,33 @@ public class LambdaExp extends ScopeExp
 	    classes[iClass] = clas.writeToArray ();
 	  }
 
-	/* DEBUGGING:
-	java.io.FileOutputStream zfout = new java.io.FileOutputStream("Foo.zip");
-	java.util.zip.ZipOutputStream zout = new java.util.zip.ZipOutputStream(zfout);
-	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	if (dumpZipPrefix != null)
 	  {
-	    String clname = classNames[iClass].replace ('.', '/') + ".class";
-	    java.util.zip.ZipEntry zent = new java.util.zip.ZipEntry (clname);
-	    zent.setSize(classes[iClass].length);
-	    java.util.zip.CRC32 crc = new java.util.zip.CRC32();
-	    crc.update(classes[iClass]);
-	    zent.setCrc(crc.getValue());
-	    zent.setMethod(java.util.zip.ZipEntry.STORED);
-	    zout.putNextEntry(zent);
-	    zout.write(classes[iClass]);
+	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
+	    if (dumpZipCounter >= 0)
+	      zipname.append(++dumpZipCounter);
+	    zipname.append(".zip");
+	    java.io.FileOutputStream zfout
+	      = new java.io.FileOutputStream(zipname.toString());
+	    java.util.zip.ZipOutputStream zout
+	      = new java.util.zip.ZipOutputStream(zfout);
+	    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	      {
+		String clname
+		  = classNames[iClass].replace ('.', '/') + ".class";
+		java.util.zip.ZipEntry zent
+		  = new java.util.zip.ZipEntry (clname);
+		zent.setSize(classes[iClass].length);
+		java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+		crc.update(classes[iClass]);
+		zent.setCrc(crc.getValue());
+		zent.setMethod(java.util.zip.ZipEntry.STORED);
+		zout.putNextEntry(zent);
+		zout.write(classes[iClass]);
+	      }
+	    zout.close ();
 	  }
-	zout.close ();
-	*/
+
 	/* DEBUGGING:
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
@@ -459,9 +653,10 @@ public class LambdaExp extends ScopeExp
 	     literal = literal.next)
 	  {
 	    /* DEBUGGING:
-	    System.err.print ("literal["+literal.index+"]=");
-	    SFormat.print (literal.value, System.err);
-	    System.err.println();
+	    OutPort out = OutPort.errDefault();
+	    out.print("literal["+literal.index+"]=");
+	    SFormat.print(literal.value, out);
+	    out.println();
 	    */
 	    literals[literal.index] = literal.value;
 	  }
@@ -474,7 +669,7 @@ public class LambdaExp extends ScopeExp
       }
     catch (java.io.IOException ex)
       {
-    ex.printStackTrace(OutPort.errDefault());
+	ex.printStackTrace(OutPort.errDefault());
 	throw new RuntimeException ("I/O error in lambda eval: "+ex);
       }
     catch (ClassNotFoundException ex)
@@ -548,5 +743,16 @@ public class LambdaExp extends ScopeExp
     ps.print(")");
   }
 
-  public String toString() { return "LambdaExp/"+name+'/'+id+'/'; }
+  public String toString()
+  {
+    String str = "LambdaExp/"+name+'/'+id+'/';
+
+	int l = getLine();
+	if (l <= 0)
+	  l = body.getLine();
+	if (l > 0)
+	  str = str + "l:" + l;
+
+    return str;
+  }
 }

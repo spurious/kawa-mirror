@@ -1,3 +1,37 @@
+Fri Sep 11 20:20:12 1998  Per Bothner  <bothner@cygnus.com>
+
+	More efficient procedure representation:  Inlining, directly
+	callable statics, procedures that don't require own Classes.
+	* ApplyExp.java (compileToArray):  New method.
+	(compile):  Handle different kinds of apply methods.
+	* Compilation.java (generateConstructor, allocClass):  New methods.
+	(addClass):  Handle specialized more efficient procedure schemes.
+	* Declaration.java:  Add various flags, getters, and setters.
+	* FindCapturedVars.java (capture):  More general (and complex).
+	* FindTailCalls.java:  Also setCanRead, setCancall etc of
+	of Declarations and LambdaExps, and chain LambdaExp children together.
+	* LambdaExp.java:  Add various flags.
+	(declareArgsArray, loadHeapFrame, addMethodFor,
+	allocChildClasses):  New methods.
+	(eval):  Dumping .zip files is now controlled by static dumpZipPrefix.
+	* LetExp.java (store_rest):  Don't initBinding if decl is ignorable.
+	(compile):  Ignore init expression if target is ignorable.
+	
+	* PrimProcedure.java:  Moved from kawa.lang package.
+	* Makefile.am, Makefile.in:  Update accordingly.
+
+	* QuoteExp.java (nullExp):  New static.
+
+	* QuoteExp.java (getType):  New method.
+	* BeginExp.java (getType):  New method.
+	* ReferenceExp.java (getType):  New method.
+
+	* SetExp.java (compile):  If lhs is ignorable, target is Ignore.
+	* StackTarget.java (compileFromStack):  If stack type inherits
+	from target type, we can avoid coercion.
+
+	* TryExp.java (print):  Handle null finally_clause.
+
 Sat Aug 29 20:32:46 1998  Per Bothner  <bothner@cygnus.com>
 
 	* FindCapturedVars.java (capture):  Handle inline functions better.

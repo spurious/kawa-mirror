@@ -13,7 +13,7 @@ public class FindCapturedVars extends ExpFullWalker
     LambdaExp declLambda = decl.getContext().currentLambda ();
     while (curLambda != declLambda && curLambda.getInlineOnly())
       curLambda = curLambda.outerLambda();
-    if (curLambda != declLambda)
+    if (curLambda != declLambda && ! decl.ignorable())
       {
 	LambdaExp heapLambda = curLambda;
 	for (;;)
@@ -26,25 +26,31 @@ public class FindCapturedVars extends ExpFullWalker
 	  }
 	if (decl.isSimple())
 	  {
-	    if (declLambda.heapFrameLambda == null)
+	    if (declLambda.capturedVars == null)
 	      {
-		if (heapLambda.getInlineOnly())
+		if (! heapLambda.getInlineOnly() && heapLambda.getCanRead())
+		  declLambda.heapFrameLambda = heapLambda;
+		else
 		  {
-		    // First look for other non-line siblings of heapLambda,
-		    // It that fails, create a dummy LambdaExp.  FIXME
-		    throw new Error("not implemented - capture thru inline");
+		    for (LambdaExp child = declLambda.firstChild; ;
+			 child = child.nextSibling)
+		      {
+			if (child == null)
+			  break;
+			if (! child.getInlineOnly() && child.getCanRead())
+			  {
+			    declLambda.heapFrameLambda = child;
+			    break;
+			  }
+		      }
 		  }
-		declLambda.heapFrameLambda = heapLambda;
 		declLambda.heapFrame
-		  = declLambda.addDeclaration("heapFrame",
-					      Compilation.objArrayType);
+		  = declLambda.addDeclaration("heapFrame");
 		declLambda.heapFrame.setArtificial(true);
 	      }
-	    else
-	      heapLambda = declLambda.heapFrameLambda;
 	    decl.setSimple(false);
-	    decl.nextCapturedVar = heapLambda.capturedVars;
-	    heapLambda.capturedVars = decl;
+	    decl.nextCapturedVar = declLambda.capturedVars;
+	    declLambda.capturedVars = decl;
 	  }
       }
   }

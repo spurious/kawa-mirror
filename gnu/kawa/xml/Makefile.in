@@ -218,6 +218,8 @@ java_sources = \
   NodeName.java \
   NodeType.java \
   OutputAsXML.java \
+  SortNodes.java \
+  SortedNodes.java \
   TextConstructor.java \
   WriteTo.java \
   XMLParser.java

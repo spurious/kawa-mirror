@@ -1,5 +1,9 @@
 2003-07-26  Per Bothner  <per@bothner.com>
 
+	* SortedNodes.java:  New class, extends Values.
+	* SortNodes.java:  New class, extends Procedure1.
+	* Makefile.am (java_sources):  Update accordingly.
+
 	* ElementConstructor.java (compileUsingNodeTree):  Use new
 	ConsumerTarget.compileUsingConsumer helper method.
 

@@ -1,3 +1,8 @@
+2004-01-04  Per Bothner  <per@bothner.com>
+
+	* StringValue.java (stringValue):  Require KNode, not SeqPosition.
+	* ValuesFilter.java (matches):  Check KNode, not SeqPosition.
+
 2003-11-21  Per Bothner  <per@bothner.com>
 
 	* IntegerRange.java (integerRange):  If M > N then M to N is now empty.

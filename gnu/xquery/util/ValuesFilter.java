@@ -42,7 +42,7 @@ public class ValuesFilter extends CpsProcedure implements CanInline
       return ((Boolean) result).booleanValue();
     if (result instanceof Number)
       return count == ((Number) result).longValue();
-    if (result instanceof SeqPosition)
+    if (result instanceof KNode)
       return true;
     if (result instanceof Values)
       {

@@ -5,6 +5,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.*;
+import gnu.kawa.xml.KNode;
 import gnu.math.*;
 
 public class StringValue extends Procedure1
@@ -27,20 +28,12 @@ public class StringValue extends Procedure1
 
   public static void stringValue (Object node, StringBuffer sbuf)
   {
-    if (node instanceof TreeList)
+    if (node instanceof KNode)
       {
-	((TreeList) node).stringValue(0, sbuf);
+	KNode pos = (KNode) node;
+	NodeTree tlist = (NodeTree) pos.sequence;
+	tlist.stringValue(tlist.posToDataIndex(pos.ipos), sbuf);
 	return;
-      }
-    else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
-      {
-	SeqPosition pos = (SeqPosition) node;
-	if (pos.sequence instanceof TreeList)
-	  {
-	    TreeList tlist = (TreeList) pos.sequence;
-	    tlist.stringValue(tlist.posToDataIndex(pos.ipos), sbuf);
-	    return;
-	  }
       }
     sbuf.append(node);
   }

@@ -1,3 +1,8 @@
+Mon Jan  6 23:43:50 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* std_syntax.scm (cond):  Fix typo .... -> ... .
+	Reported by Harold Carr <carr@Eng.Sun.COM>.
+
 Fri Dec 13 17:02:37 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Makefile.{am.in} (JAVA):  Separate out new JAVAFLAGS macro.

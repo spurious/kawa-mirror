@@ -24,7 +24,7 @@
 		((cond (test))
 		 test)
 
-		((cond (test) clause1 clause2 ....)
+		((cond (test) clause1 clause2 ...)
 		 (or test (cond clause1 clause2 ...)))
 
 		((cond (test result1 result2 ...))

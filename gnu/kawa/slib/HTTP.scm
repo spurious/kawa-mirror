@@ -23,6 +23,9 @@
 (define (request-path-translated) :: <String>
   (invoke (get-request) 'getPathTranslated))
 
+(define (request-servlet-path) :: <String>
+  (invoke (get-request) 'getServletPath))
+
 (define (request-query-string)
   (let ((query (invoke (get-request) 'getQueryString)))
     (if (eq? query #!null) #f query)))

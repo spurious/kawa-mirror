@@ -1,3 +1,7 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (request-servlet-path):  New function.
+
 2002-03-21  Per Bothner  <per@bothner.com>
 
 	* srfi1.scm:  New file.  SRFI-1 list-library reference implementation

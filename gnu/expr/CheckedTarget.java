@@ -102,7 +102,7 @@ public class CheckedTarget extends StackTarget
     boolean isInTry = code.isInTry();
     initWrongType();
     int startPC = code.getPC();
-    type.emitCoerceFromObject(code);
+    emitCoerceFromObject(type, comp);
 
     int endPC = code.getPC();
     // If no cast was needed, no code has been generated.

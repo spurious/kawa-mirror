@@ -60,12 +60,29 @@ public class StackTarget extends Target
   public static void convert(Compilation comp, Type stackType, Type targetType)
   {
     if (! compileFromStack0(comp, stackType, targetType))
-      targetType.emitCoerceFromObject(comp.getCode());
+      emitCoerceFromObject(targetType, comp);
+  }
+
+  protected static void emitCoerceFromObject(Type type, Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    if (type instanceof gnu.kawa.reflect.OccurrenceType)
+      {
+	// Kludge (OccurrenceType doesn't implement emitCoerceFromObject):
+	comp.compileConstant(type, Target.pushObject);
+	code.emitSwap();
+	code.emitInvokeVirtual(ClassType.make("gnu.bytecode.Type")
+			       .getDeclaredMethod("coerceFromObject", 1));
+      }
+    else
+      {
+	type.emitCoerceFromObject(code);
+      }
   }
 
   public void compileFromStack(Compilation comp, Type stackType)
   {
     if (! compileFromStack0(comp, stackType))
-      type.emitCoerceFromObject(comp.getCode());
+      emitCoerceFromObject(type, comp);
   }
 }

@@ -1,3 +1,9 @@
+2003-10-30  Per Bothner  <per@bothner.com>
+
+	* StackTarget.java (emitCoerceFromObject):  New static helper method.
+	(convert, compileFromStack):  Use it.
+	* CheckedTarget.java (emitCheckedCoerce):  Likewise.
+
 2003-10-19  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (<init>)  Add Interpreter argument.

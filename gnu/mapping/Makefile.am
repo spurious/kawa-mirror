@@ -35,7 +35,6 @@ java_sources=\
   Procedure3.java \
   Procedure4.java \
   ProcedureN.java \
-  SFormat.java \
   Setter.java \
   Setter0.java \
   Setter1.java \

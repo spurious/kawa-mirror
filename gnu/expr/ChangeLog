@@ -1,5 +1,8 @@
 2002-11-10  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (match): Catch ClassCastException if coercing
+	'this' fails.
+
 	* FindTailCalls.java (walkFluidLetExp): Set inTailContext to false for
 	body, since we need to restore bindings at end.
 	Fixes bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.

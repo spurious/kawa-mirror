@@ -1,3 +1,7 @@
+Thu May 29 15:04:35 1997  Per Bothner  <bothner@cygnus.com>
+
+	* DFloNum.java (isNegative):  Fix bad think-o.
+
 Fri May 23 17:29:47 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* IntNum.java (gcd):  Check that either arg is zero.

@@ -107,7 +107,7 @@ public class DFloNum extends RealNum implements Compilable
 
   public boolean isNegative ()
   {
-    return value >= 0;
+    return value < 0;
   }
 
   public Numeric neg ()

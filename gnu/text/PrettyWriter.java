@@ -383,14 +383,14 @@ public class PrettyWriter extends java.io.Writer
       column = minimum;
     if (column > prefixLen)
       {
-	char[] newPrefix = new char[enoughSpace(prefixLen, column - prefixLen)];
-	System.arraycopy(prefix, 0, newPrefix, 0, current);
-	prefix = newPrefix;
+	prefix = new char[enoughSpace(prefixLen, column - prefixLen)];
+	System.arraycopy(this.prefix, 0, prefix, 0, current);
+	this.prefix = prefix;
       }
     if (column > current)
       {
 	for (int i = current;  i < column;  i++)
-	  this.prefix[i] = ' ';
+	  prefix[i] = ' ';
       }
     blocks[blockDepth + BLOCK_PREFIX_LENGTH] = column;
   }

@@ -1,3 +1,7 @@
+2005-02-25  Per Bothner  <per@bothner.com>
+
+	* defvar.java (scanForDefinitions): Mark new declaration IS_DYNAMIC.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (registerEnvironment): Use new setDefaults method.

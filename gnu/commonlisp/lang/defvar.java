@@ -27,6 +27,7 @@ public class defvar extends Syntax
 	if (decl == null)
 	  {
 	    decl = new Declaration(name);
+	    decl.setFlag(Declaration.IS_DYNAMIC);
 	    defs.addDeclaration(decl);
 	  }
 	else

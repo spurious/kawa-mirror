@@ -445,7 +445,7 @@ mapping needed for Scheme strings.</para>
 </sect2>
 
 </sect1>
-<sect1 is="Numbers"><title>Numbers</title>
+<sect1 id="Numbers"><title>Numbers</title>
 <para>
 Scheme defines a <quote>numerical tower</quote> of numerical types:
 number, complex, real, rational, and integer.
@@ -2585,7 +2585,7 @@ for Java packages.  Other people just prefer to use Scheme,
 but have to co-exist with Java.</para>
 </sect1>
   
-<bibliography>
+<bibliography id="Bibliography">
 <title>Bibliography</title>
 
 <biblioentry>

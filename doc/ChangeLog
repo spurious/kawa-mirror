@@ -1,3 +1,10 @@
+2003-11-22  Per Bothner  <per@bothner.com>
+
+	* internals.xml (Numbers):  Fix typo 'is' -> 'id' in attribute name.
+	(bibliography):  Add 'id' attribute.
+
+	* Makefile.am (internals/index.html):  New rule.
+
 2003-11-19  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (KRL):  Note unescaped-data.

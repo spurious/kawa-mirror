@@ -9,6 +9,11 @@ package kawa.lang;
 public abstract class Procedure0or1 extends Procedure
 {
 
+  public Procedure0or1 ()
+  {
+    super();
+  }
+
   public Procedure0or1 (String n)
   {
     super(n);

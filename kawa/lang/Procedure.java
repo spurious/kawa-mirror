@@ -9,7 +9,7 @@ public abstract class Procedure extends Named implements Executable, Printable
 {
   public Procedure()
   {
-    super("<unknown>");
+    super(null);
   }
 
   public Procedure(java.lang.String n)
@@ -79,7 +79,7 @@ public abstract class Procedure extends Named implements Executable, Printable
   {
     ps.print ("#<procedure ");
     String n = name ();
-    ps.print (n == null ? "<null>" : n);
+    ps.print (n == null ? "<unknown>" : n);
     ps.print ('>');
   }
 }

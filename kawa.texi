@@ -36,9 +36,19 @@ and that compiles Scheme code into Java byte-codes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
 
+@ifhtml
+R. Alexander Milowski
+<tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>
+wrote the first Kawa releases.
+<a href="http://www.cygnus.com/~bothner">Per Bothner</a>
+<tt>&lt;<a href="mailto:bothner@cygnus.com">bothner@cygnus.com</a>&gt;</tt>
+extensively re-wrote Kawa, and released version 0.3 and up.
+@end ifhtml
+@ifclear html
 R. Alexander Milowski @w{<alex@@copsol.com>} wrote the first Kawa releases.
 Per Bothner @w{<bothner@@cygnus.com>} extensively re-wrote Kawa,
 and released version 0.3 and up.
+@end ifclear
 
 @ifhtml
 <a href="http://www.cygnus.com/~bothner/kawa.html">This</a>
@@ -82,7 +92,7 @@ an online copy of R4RS
 * Restrictions::         Features of R4RS not implemented
 * Extensions::
 * Compiling::            Compiling Scheme code to byte-codes
-* Primitive functions::  Writing new "primitive" Scheme functions in Java
+* Primitive functions::  The Scheme-Java interface
 * Reporting Bugs::
 * License::              
 @end menu
@@ -333,10 +343,8 @@ which is a vector of strings.
 The file Compliance.html specifies which functions and syntax
 have been implemented so far.
 
-Of the "numeric tower", only integers and double-precision
-floats are implemented.  There is partial bignum support,
-but many operations are only available for 32-bit
-(or sometimes 64-bit) fixnums.
+Of the "numeric tower", exact rationals (integers and fractions),
+and double-precision floats are implemented.
 Integral function do not necessarily work on
 inexact (floating-point) integers.
 (The whole idea of "inexact integer" in R4RS seems rather pointless ...)
@@ -367,6 +375,74 @@ Delivers all of its arguments to its continuation.
 Call its @var{thunk} argument with a continuation that,
 when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
+@end defun
+
+@subsection Logical Number Operations
+
+These functions operate on the 2's complement binary representation
+of an exact integer.
+
+@defun logand i ...
+Returns the bit-wise logical "and" of the arguments.
+If no argument is given, the result is -1.
+@end defun
+
+@defun logior i ...
+Returns the bit-wise logical "(inclusive) or" of the arguments.
+If no argument is given, the result is 0.
+@end defun
+
+@defun logxor i ...
+Returns the bit-wise logical "exclusive or" of the arguments.
+If no argument is given, the result is 0.
+@end defun
+
+@defun lognot i
+Returns the bit-wise logical inverse of the argument.
+@end defun
+
+@defun logop op x y
+Perfoam one of the 16 bitwise operations of @var{x} and @var{y},
+depending on @var{op}.
+@end defun
+
+@defun bittest i j
+Returns true if the arguments have any bits in common.
+Same as @code{(not (zero? (logand @var{i} @var{j})))},
+but is more efficient.
+@end defun
+
+@defun logbit? i pos
+Returns @code{#t} iff @var{i} has a one in the bit numbered @var{pos}.
+@end defun
+
+@defun arithmetic-shift i j
+Shifts @var{i} by @var{j}.
+It is a "left" shift if @code{@var{j}>0}, and
+a "right" shift if @code{@var{j}<0}.
+
+The result is equal to @code{(floor (* @var{i} (expt 2 @var{j})))}.
+@end defun
+
+@defun ash i j
+Alias for @code{arithmetic-shift}.
+@end defun
+
+@defun logcount i
+Count the number of 1-bits in @var{i}, if it is non-negative.
+If @var{i} is negative, count number of 0-bits.
+@end defun
+
+@defun integer-length i
+Return number of bits needed to represent @var{i} if @var{i} is unsigned.
+Regardless of the sign of @var{i}, return one less than the number of bits
+needed for a field that can represent @var{i} as a two's complement integer.
+@end defun
+
+@defun bit-extract n start end
+Return the integer formed from the (unsigned) bit-field
+starting at @var{start} and ending just before @var{end}.
+Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
 @subsection Ports
@@ -437,14 +513,6 @@ If @var{condition} is false, evaluate each @var{form} in order,
 returning the value of the last one.
 @end defmac
 
-@defun arithmetic-shift i j
-Shifts @var{i} by @var{j}.
-It is a "left" shift if @code{@var{j}>0}, and
-a "right" shift if @code{@var{j}<0}.
-
-The result is equal to @code{(floor (* @var{i} (expt 2 @var{j})))}.
-@end defun
-
 @defun vector-append @var{arg}...
 Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
@@ -469,7 +537,7 @@ There are two ways to do this.
 
 You can compile a Scheme source file to a single archive file.
 You do this using the @code{compile-file} function.
-The result is a single file that you can move around @code{load}
+The result is a single file that you can move around and @code{load}
 just like the @code{.scm} source file.  You just specify the name
 of the archive file to the @code{load} procedure.
 Currently, the archive is a "zip" archive and has extension ".zip";
@@ -516,12 +584,12 @@ loading @samp{foo.scm}, except you will get the byte-compiled versions.
 @node Files compilation,  , Archive compilation, Compiling
 @subsection Compiling Scheme to a set of .class files
 
-The @samp{kawac} will compile a @samp{.scm} source file into one or
+The @samp{kawac} application will compile a @samp{.scm} source file into one or
 more @samp{.class} files.
 
 You run it as follows:
 @example
-java kawac infile [-d outdirectory] [prefix [topname]]
+java kawac @var{infile} [-d @var{outdirectory}] [@var{prefix} [@var{topname}`<]]
 @end example
 
 Here:
@@ -559,7 +627,7 @@ or:
 @end example
 
 @node Primitive functions, Reporting Bugs, Compiling, Top
-@section Writing new "primitive" Scheme functions in Java
+@section The Scheme-Java interface
 
 @subsection Scheme types in Java
 
@@ -567,6 +635,8 @@ All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 
 Scheme symbols are implemented by @code{kawa.lang.Symbol}.
 Use the @samp{make} static method to create a new (interned) symbol.
+(It is likely that Scheme Symbols will be represented by java.lang.String
+values after JDK 1.1 is released.)
 
 Scheme integers are implemented by @code{kawa.math.IntNum}.
 Use the make static function to create a new IntNum from an int or a long.
@@ -598,25 +668,69 @@ The @samp{Procedure2} class provides implementations of all
 the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
-A function that does some initialization and makes definitions
-should probably be written as a @code{ModuleBody}.
-A @code{ModuleBody} is a sub-class of @code{Procedure0}.
-It must therefore define an @samp{apply0} method;  that is where
-you can put definitions.  A @code{ModuleBody} can be loaded
-using the Scheme @samp{load} procedure.
+@subsection Loading a ModuleBody
 
-You can define new bindings in the top-level environment
-using the @code{define_global} method in @code{kawa.lang.Interpreter}.
-For example:
+The "top" class created by @code{kawac} (@pxref{Files compilation})
+extends the @code{ModuleBody} class.  It is actually fairly
+easy to write a @code{ModuleBody} by hand in Java, and you can
+then use the Scheme @code{load} procedure to cause arbitrary
+actions.  Here is an example.
+@emph{(Note that the details are subject to change!)}
+
 @example
-   Interpreter.define_global (Symbol.make ("pi"),
-                              new DFloNum (java.lang.Math.PI));
+package MyDev;
+import kawa.lang.*;
+class MyDevFunc extends Procedure2
+@{
+  public Object apply2 (Object arg1, Object arg2)
+  @{
+    ... stuff to control my device ...;
+  @}
+@}
+
+public class MyDevice extends ModuleBody
+@{
+  public Object run (Environment env)
+    throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  @{
+    ... initialize my device here ...;
+
+    // Declare (handle-my-device x y) to call MyDevFunc.apply2 (x, y):
+    env.define ("handle-my-device", new MyDevFunc ());
+
+    // Return the void value (i.e. no value).
+    return Interpreter.voidObject;
+  @}
+@}
 @end example
 
-The various Kawa classes may be shuffled around some in the future.
-It is quite likely they will not remain in the package @samp{kawa.lang},
-so you should probably use @code{import} statements rather than
-fully-qualified class names to refer to Kawa classes.
+If this text is in the file @code{MyDev/MyDevice.java}, and you compile
+it with @code{javac}, you will get @code{MyDev/MyDevice.class}
+and @code{MyDev/MyDevFunc.class}.  Assuming the current directory
+is in your @code{CLASSPATH}, you can now do the following in Kawa:
+@example
+(load "MyDev/MyDevice.class")
+@end example
+or:
+@example
+(load "MyDev.MyDevice")
+@end example
+
+This will cause the actions in @code{MyDevice.run} to be executed.
+The current environment is passed in as the parameter @code{env}.
+One of those actions is to define the procedure @code{handle-my-device}.
+
+@subsection Evaluating Scheme expressions from Java
+
+The following methods are recommended if you need to evaluate a
+Scheme expression from a Java method.
+
+@deftypefn {Static method} Object Scheme.eval (Object @var{sexpr}, Environment @var{env})
+@end deftypefn
+@deftypefn {Static method} Object Scheme.eval (InPort @var{port}, Environment @var{env})
+@end deftypefn
+@deftypefn {Static method} Object Scheme.eval (String @var{string}, Environment @var{env})
+@end deftypefn
 
 @node Reporting Bugs, License, Primitive functions, Top
 @section Reporting Bugs

@@ -1,5 +1,13 @@
 Changes since 1.0:
 ==================
+Logical operations on exact integers have been implemented.
+These include all the logical functions from Guile.
+
+Exact rational arithetic is now fully implemented.
+All integer functions now believed to correctly handle bignums.
+
+A testsuite (and testing framework) was added.
+
 Eval is available, as specified for R5RS.
 Also implemented are scheme-report-environment, null-environment, and
 interaction-environment.

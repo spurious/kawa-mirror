@@ -45,19 +45,10 @@ public class TryExp extends Expression
   {
     CodeAttr code = comp.getCode();
     boolean has_finally = finally_clause != null;
-    // Non-null if we need a temporary to save the result.
-    Variable saved_result;
-    if (has_finally && ! (target instanceof IgnoreTarget))
-      {
-	code.pushScope();
-	saved_result = code.addLocal(getType());
-      }
-    else
-      saved_result = null;
-    code.emitTryStart(has_finally);
+    Type result_type = target instanceof IgnoreTarget ? null
+	: getType();
+    code.emitTryStart(has_finally, result_type);
     try_clause.compileWithPosition(comp, target);
-    if (saved_result != null)
-      code.emitStore(saved_result);
     code.emitTryEnd();
 
     CatchClause catch_clause = catch_clauses;
@@ -73,11 +64,6 @@ public class TryExp extends Expression
 	code.emitFinallyEnd();
       }
     code.emitTryCatchEnd();
-    if (saved_result != null)
-      {
-	code.emitLoad(saved_result);
-	code.popScope();
-      }
   }
 
   public void print (java.io.PrintWriter ps)

@@ -1,3 +1,7 @@
+2003-10-12  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (Scheme):  Update isEq initialization.
+
 2003-10-09  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/read.java (apply1):  Use Procedure's getName

@@ -7,13 +7,15 @@ import gnu.expr.*;
 
 /** Implement that standard Scheme function "eqv?". */
 
-public class IsEqv extends Procedure2 implements Inlineable
+public class IsEqv extends Procedure2 implements CanInline
 {
   Interpreter interpreter;
+  IsEq isEq;
 
-  public IsEqv(Interpreter interpreter, String name)
+  public IsEqv(Interpreter interpreter, String name, IsEq isEq)
   {
     this.interpreter = interpreter;
+    this.isEq = isEq;
     setName(name);
   }
 
@@ -41,18 +43,11 @@ public class IsEqv extends Procedure2 implements Inlineable
     return false;
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
     if (nonNumeric(args[0]) || nonNumeric(args[1]))
-      IsEq.compile(args, comp, target, interpreter);
-    else
-      ApplyExp.compile(exp, comp, target);
+      return new ApplyExp(isEq, args);
+    return exp;
   }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return interpreter.getTypeFor(Boolean.TYPE);
-  }
-
 }

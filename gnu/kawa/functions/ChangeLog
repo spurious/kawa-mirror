@@ -1,3 +1,10 @@
+2003-10-12  Per Bothner  <per@bothner.com>
+
+	* IsEqv.java (IsEqv):  Implement CanInline instead of Inlineable.
+	(isEq):  New field.
+	(inline):  New method.
+	(compile, getReturnType):  Removed.
+
 2003-09-09  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (startCounter):  New field.

@@ -686,7 +686,7 @@ public class Scheme extends LispInterpreter
         map = new map(true);
 	forEach = new map(false);
         isEq = new gnu.kawa.functions.IsEq(this, "eq?");
-        isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?");
+        isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?", isEq);
         isEqual = new gnu.kawa.functions.IsEqual(this, "equal?");
       }
   }

@@ -27,4 +27,10 @@ public class ValueStack extends TreeList implements Sequence
     oindex = i2;
     return i;
   }
+
+  public void clear()
+  {
+    oindex = 0;
+    super.clear();
+  }
 }

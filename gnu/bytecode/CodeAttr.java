@@ -946,7 +946,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (to_sig.length() == 1 || from_sig.length() == 1)
       {
 	char to_sig0 = to_sig.charAt(0);
-	char from_sig0 = to_sig.charAt(0);
+	char from_sig0 = from_sig.charAt(0);
 	if (from.size < 4)
 	  from_sig0 = 'I';
 	if (to.size < 4)

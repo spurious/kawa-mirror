@@ -1,3 +1,7 @@
+Mon Feb 23 22:50:46 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitConvert):  Fix thinko - s/to_sig/from_sig/.
+
 Sun Feb  8 23:29:37 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (emitGotoIfEq):  Use signature to select opcode.

@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_sources = \
+  LangPrimType.java \
   LispReader.java \
   ReaderDispatch.java \
   ReaderDispatchMacro.java \

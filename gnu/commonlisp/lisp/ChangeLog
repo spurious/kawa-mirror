@@ -1,0 +1,5 @@
+2001-06-18  Per Bothner  <per@bothner.com>
+
+	New package.
+	* PrimOps.scm:  New file, based on code moved from gnu.jemacs.lang.
+	* Makefile.am:  New file.

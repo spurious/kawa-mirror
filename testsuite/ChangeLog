@@ -1,3 +1,8 @@
+Mon May 26 22:00:05 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* num-test.scm:  Add inexact->exact test that detected gcd of 0 bug.
+	* Makefile.{am,in}:  Remove unused junk.
+
 Tue May 20 22:16:36 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* num-test.scm:  Add two tests for recently-fixed bugs.

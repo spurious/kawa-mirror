@@ -28,6 +28,7 @@
 
 (SECTION "convert")
 (test 10000000000 inexact->exact (exact->inexact 10000000000))
+(test 0 inexact->exact 0.0)
 
 (SECTION "shift")
 (test 12676506002282294014967032053760 arithmetic-shift 10 100)

@@ -1,11 +1,8 @@
 ## Process this with automake to create Makefile.in
 
 JAVA=java
-JAVAFLAGS=-classpath ..:$$CLASSPATH
-#KAWA = $(JAVA) $(JAVAFLAGS) kawa.repl
 KAWALIB = ..
 KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa
-KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
 KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
 
 MISC_1_1 = check-obj

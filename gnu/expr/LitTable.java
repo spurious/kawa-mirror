@@ -29,19 +29,17 @@ public class LitTable implements ObjectOutput
     // initialize using a single call, which generates better code.
 
     // Here is the first pass.
-    for (Initializer init = comp.clinitChain;  init != null;
+    for (Literal init = comp.literalsChain;  init != null;
 	 init = init.next)
       {
-	if (init instanceof Literal)
-	  writeObject(((Literal) init).value);
+	writeObject(init.value);
       }
 
     // Here is the second pass.
-    for (Initializer init = comp.clinitChain;  init != null;
+    for (Literal init = comp.literalsChain;  init != null;
 	 init = init.next)
       {
-	if (init instanceof Literal)
-	  emit((Literal) init, true);
+	emit(init, true);
       }
 
     // For speedier garbage collection.
@@ -463,7 +461,12 @@ public class LitTable implements ObjectOutput
   void emit(Literal literal, boolean ignore)
   {
     CodeAttr code = comp.getCode();
-    if (literal.value instanceof String)
+    if (literal.value == null)
+      {
+	if (! ignore)
+	  code.emitPushNull();
+      }
+    else if (literal.value instanceof String)
       {
 	if (! ignore)
 	  code.emitPushString(literal.value.toString ());
@@ -556,7 +559,10 @@ public class LitTable implements ObjectOutput
 	Method resolveMethod
 	  = makeStatic ? null : type.getDeclaredMethod("readResolve", 0);
 	if (resolveMethod != null)
-	  code.emitInvokeVirtual(resolveMethod);
+	  {
+	    code.emitInvokeVirtual(resolveMethod);
+	    type.emitCoerceFromObject(code);
+	  }
 	if (literal.field != null)
 	  {
 	    if (! ignore || (useDefaultInit && method != null))

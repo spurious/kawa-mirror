@@ -63,7 +63,7 @@ public class Special extends Object implements Printable, Externalizable
     name = in.readUTF();
   }
 
-  public Special readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return make(name);
   }

@@ -11,9 +11,9 @@ public class Keyword extends Object implements Printable, Externalizable
   {
   }
 
-  private Keyword (String n)
+  private Keyword (String name)
   {
-    name = new String(n);
+    this.name = name;
   }
 
   private static java.util.Hashtable keywordTable = new java.util.Hashtable ();
@@ -119,7 +119,7 @@ public class Keyword extends Object implements Printable, Externalizable
     name = in.readUTF();
   }
 
-  public Keyword readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return make(name);
   }

@@ -33,27 +33,35 @@ public class StandardInterpreter extends Interpreter
       kawa.lang.Procedure2 eq;
       kawa.lang.Procedure2 equal;
 
-      //-- Section 4.1
+      //-- Section 4.1  -- complete
+      define (Interpreter.quote_sym, new kawa.lang.Quote ());
+      define_syntax ("define", "kawa.standard.define");
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
-      // Section 4.2
+      // Section 4.2  -- complete
       define_syntax ("cond", "kawa.lib.cond");
       define_syntax ("case", "kawa.lib.case");
-      define ("or", new kawa.standard.and_or (false));
       define ("and", new kawa.standard.and_or (true));
+      define ("or", new kawa.standard.and_or (false));
+      define_syntax ("%let", "kawa.standard.let");
+      define_syntax ("let", "kawa.lib.let");
+      define_syntax ("let*", "kawa.standard.letstar");
+      define_syntax ("letrec", "kawa.standard.letrec");
       define_syntax ("begin", "kawa.standard.begin");
       define_syntax ("do", "kawa.lib.do");
-      define_syntax ("quasiquote", "kawa.standard.quasiquote");
-      define_proc ("%make-promise", "kawa.standard.make_promise");
       define_syntax ("delay", "kawa.lib.delay");
-      define_syntax ("%syntax-error", "kawa.standard.syntax_error");
+      define_proc ("%make-promise", "kawa.standard.make_promise");
+      define_syntax ("quasiquote", "kawa.standard.quasiquote");
 
-      //-- Section 6.1
+      //-- Section 5  -- complete [except for internal definitions]
+      define_syntax ("lambda", "kawa.lang.Lambda");
+
+      //-- Section 6.1  -- complete
       define_proc ("not", "kawa.standard.not");
       define_proc ("boolean?", "kawa.standard.boolean_p");
 
-      //-- Section 6.2
+      //-- Section 6.2  -- complete
       eqv = new kawa.standard.eqv_p();
       define(eqv.name (), eqv);
       eq = new kawa.standard.eq_p();
@@ -127,24 +135,40 @@ public class StandardInterpreter extends Interpreter
 
       //-- Section 6.5
       define_proc ("number?", "kawa.standard.number_p");
+      define_proc ("complex?", "kawa.standard.real_p");  // For now
       define_proc ("real?", "kawa.standard.real_p");
-      define("inexact?",proc);
-      proc = new kawa.standard.integer_p();
-      define(proc.name (), proc);
-      define("exact?",proc);
+      define_proc ("rational?", "kawa.standard.rational_p");
+      define_proc ("integer?", "kawa.standard.integer_p");
+      define_proc ("exact?", "kawa.standard.exact_p");
+      define_proc ("inexact?", "kawa.standard.inexact_p");
+      define_proc ("=", "kawa.standard.equal_oper");
+      define_proc ("<", "kawa.standard.less_oper");
+      define_proc (">", "kawa.standard.greater_oper");
+      define_proc ("<=", "kawa.standard.lessequal_oper");
+      define_proc (">=", "kawa.standard.greaterequal_oper");
       define_proc ("zero?", "kawa.standard.zero_p");
       define_proc ("positive?", "kawa.standard.positive_p");
       define_proc ("negative?", "kawa.standard.negative_p");
-      define_proc ("=", "kawa.standard.equal_oper");
-      define_proc ("<", "kawa.standard.less_oper");
-      define_proc ("<=", "kawa.standard.lessequal_oper");
-      define_proc (">", "kawa.standard.greater_oper");
-      define_proc (">=", "kawa.standard.greaterequal_oper");
+      define_proc ("odd?", "kawa.standard.odd_p");
+      define_proc ("even?", "kawa.standard.even_p");
       define_proc ("+", "kawa.standard.plus_oper");
       define_proc ("-", "kawa.standard.minus_oper");
       define_proc ("*", "kawa.standard.multiply_oper");
       define_proc ("/", "kawa.standard.divide_oper");
       define_proc ("abs", "kawa.standard.abs");
+      define_proc ("numerator", "kawa.standard.numerator");
+      define_proc ("denominator", "kawa.standard.denominator");
+      define_proc ("exp", "kawa.standard.exp");
+      define_proc ("log", "kawa.standard.log");
+      define_proc ("sin", "kawa.standard.sin");
+      define_proc ("cos", "kawa.standard.cos");
+      define_proc ("tan", "kawa.standard.tan");
+      define_proc ("asin", "kawa.standard.asin");
+      define_proc ("acos", "kawa.standard.acos");
+      define_proc ("atan", "kawa.standard.atan");
+      define_proc ("sqrt", "kawa.standard.sqrt");
+      define_proc ("expt", "kawa.standard.expt");
+      define_proc ("number->string", "kawa.standard.number2string");
 
       //-- Section 6.6  -- complete
       define_proc ("char?", "kawa.standard.char_p");
@@ -216,7 +240,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
 
-      //-- Section 6.10
+      //-- Section 6.10 [complete except for char-ready? and transcript-on/off]
       define_proc ("call-with-input-file",
 		   "kawa.standard.call_with_input_file");
       define_proc ("call-with-output-file",
@@ -243,15 +267,8 @@ public class StandardInterpreter extends Interpreter
       define_proc ("newline", "kawa.standard.newline");
       define_proc ("load", "kawa.standard.load");
 
-      define_syntax ("%let", "kawa.standard.let");
-      define_syntax ("let", "kawa.lib.let");
-      //-- (let* ((n obj)...) e1 ... )
-      define_syntax ("let*", "kawa.standard.letstar");
-      //-- (letrec ((n obj)...) e1 ... )
-      define_syntax ("letrec", "kawa.standard.letrec");
-      //-- (define sym obj)
-      define_syntax ("define", "kawa.standard.define");
-      
+      define_syntax ("%syntax-error", "kawa.standard.syntax_error");
+
       define_proc ("exit", "kawa.standard.exit");
       define_proc ("values", "kawa.standard.values");
       define_proc ("call-with-values", "kawa.standard.call_with_values");

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
 public class vector_length extends Procedure1
 {
@@ -12,7 +13,7 @@ public class vector_length extends Procedure1
        throws kawa.lang.WrongType
   {
     if (arg1 instanceof Vector)
-      return new java.lang.Integer(((Vector)arg1).length ());
+      return IntNum.make (((Vector)arg1).length ());
     else
       throw new kawa.lang.WrongType(this.name(),1,"vector");
   }

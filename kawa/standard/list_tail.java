@@ -1,15 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
 public class list_tail extends Procedure2
 {
-   public list_tail()
-  {
-    super("list-tail");
-  }
-
   static public Object listTail (Object list, int count)
-       throws WrongArguments, WrongType, GenericError
+       throws GenericError
   {
     while (--count >= 0)
       {
@@ -22,14 +18,10 @@ public class list_tail extends Procedure2
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError
+       throws GenericError
   {
-    if (! (arg1 instanceof Pair))
-      throw new WrongType(this.name (), 1, "list");
-    if (! (arg2 instanceof java.lang.Integer))
-      throw new WrongType(this.name (), 2, "integer");
     Pair list = (Pair)arg1;
-    int count = ((java.lang.Integer)arg2).intValue();
+    int count = IntNum.intValue (arg2);
     return listTail (list, count);
   }
 }

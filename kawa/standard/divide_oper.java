@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.*;
 
 /**
  * Implement the Scheme standard function "/".
@@ -11,14 +12,14 @@ public class divide_oper extends ProcedureN
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    double dval = ((Number)args[0]).doubleValue ();
+    Numeric result;
+    int i = 0;
     if (args.length == 1)
-      return new Double (1.0 / dval);
-    for (int i = 0; i < args.length; i++)
-      {
-	Number arg = (Number) args[i];
-	dval = dval / arg.doubleValue ();
-      }
-    return new Double(dval);
+      result = IntNum.one ();
+    else
+      result = (Numeric) (args[i++]);
+    for (; i < args.length;  i++)
+      result = result.div (args[i]);
+    return result;
    }
 }

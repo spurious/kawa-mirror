@@ -1,19 +1,13 @@
 package kawa.standard;
+import kawa.lang.*;
+import kawa.math.*;
 
-import kawa.lang.Procedure1;
+/** Implement the standard Scheme procedure "real?". */
 
-public class real_p extends kawa.lang.Procedure1 {
-   public kawa.standard.real_p() {
-      super("real?");
-   }
-
-   public Object apply1 (Object arg1)
+public class real_p extends Procedure1
+{
+  public Object apply1 (Object arg1)
    {
-      if (arg1 instanceof java.lang.Double) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
+     return Interpreter.boolObject (arg1 instanceof RealNum);
    }
-
 }

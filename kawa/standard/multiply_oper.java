@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
+import kawa.math.Numeric;
 
 /**
  * Implement the Scheme standard function "*".
@@ -11,35 +13,12 @@ public class multiply_oper extends ProcedureN
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    int ival = 1;
-    double dval = 1.0;
-    boolean isInteger = true;
-    for (int i = 0; i < args.length; i++)
-      {
-	Object arg = args[i];
-	if (arg instanceof Double)
-	  {
-            if (isInteger)
-	      {
-		isInteger = false;
-		dval = ival;
-	      }
-            dval *= ((Double)arg).doubleValue();
-	  }
-	else if (arg instanceof Integer)
-	  {
-            if (isInteger)
-	      ival *= ((Integer)arg).intValue();
-	    else
-	      dval *= ((Integer)arg).intValue();
-	  }
-	else
-	  throw new WrongType(this.name(),i + 1,"number");
-      }
-
-      if (isInteger)
-	return new Integer(ival);
-      else
-	return new Double(dval);
+    int len = args.length;
+    if (len == 0)
+      return IntNum.one ();
+    Numeric result = (Numeric) args[0];
+    for (int i = 1; i < len; i++)
+      result = result.mul (args[i]);
+    return result;
    }
 }

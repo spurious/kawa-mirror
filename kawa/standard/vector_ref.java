@@ -1,19 +1,15 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
 public class vector_ref extends Procedure2
 {
-  public vector_ref()
-  {
-    super("vector-ref");
-  }
-
   public Object apply2 (Object arg1, Object arg2)
        throws WrongArguments, WrongType, GenericError
   {
     try
       {
-	return ((Vector)arg1).elementAt (((Integer)arg2).intValue ());
+	return ((Vector)arg1).elementAt (IntNum.intValue (arg2));
       }
     catch (ArrayIndexOutOfBoundsException e)
       {

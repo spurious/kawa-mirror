@@ -1,13 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
 public class length extends Procedure1
 {
-  public length()
-  {
-    super("length");
-  }
-
   /** Count the length of a list.
    * Note: does not catch circular lists!
    * @param arg the list to count
@@ -23,6 +19,6 @@ public class length extends Procedure1
 
   public Object apply1 (Object arg1)
   {
-    return new java.lang.Integer (length (arg1));
+    return IntNum.make (length (arg1));
   }
 }

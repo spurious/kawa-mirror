@@ -1,12 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class writechar extends Procedure1or2 {
-  public writechar()
-  {
-    super("write-char");
-  }
-
+public class writechar extends Procedure1or2
+{
   public final Object apply1 (Object arg1)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {

@@ -1,12 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
-public class make_string extends Procedure1or2 {
-  public make_string()
-  {
-    super("make-string");
-  }
-
+public class make_string extends Procedure1or2
+{
   public final Object apply1 (Object arg1)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
@@ -16,9 +13,7 @@ public class make_string extends Procedure1or2 {
   public final Object apply2 (Object arg1,Object arg2)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    if (! (arg1 instanceof java.lang.Integer))
-      throw new WrongType(this.name(),1,"integer");
-    int count = ((java.lang.Integer)arg1).intValue();
+    int count = IntNum.intValue (arg1);
     char ch;
     if (arg2 instanceof Char)
       ch = ((Char)arg2).charValue();

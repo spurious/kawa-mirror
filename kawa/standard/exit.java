@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.IntNum;
 
 public class exit extends Procedure0or1
 {
@@ -11,7 +12,7 @@ public class exit extends Procedure0or1
 
   public Object apply1 (Object arg1)
   {
-    int status = ((Number)arg1).intValue ();
+    int status = IntNum.intValue (arg1);
     System.exit (status);
     return Interpreter.undefinedObject;  // Never reached
   }

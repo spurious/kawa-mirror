@@ -1,22 +1,18 @@
 package kawa.standard;
 import kawa.lang.*;
+import kawa.math.*;
 
 public class substring extends Procedure3
 {
-  public substring()
+  public static StringBuffer substring (StringBuffer str, int start, int end)
   {
-    super("substring");
+    return new StringBuffer (str.toString().substring (start, end));
   }
-  
+
   public Object apply3 (Object arg1, Object arg2, Object arg3)
        throws WrongType, GenericError
   {
-    return new StringBuffer (
-         ((StringBuffer)arg1).toString().substring(
-            ((Integer)arg2).intValue(),
-            ((Integer)arg3).intValue()
-         )
-      );
-   }
-
+    return substring ((StringBuffer)arg1,
+		      IntNum.intValue (arg2), IntNum.intValue (arg3));
+  }
 }

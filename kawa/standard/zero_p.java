@@ -1,33 +1,16 @@
 package kawa.standard;
+import kawa.lang.*;
+import kawa.math.*;
 
-//-- Exceptions
-import kawa.lang.WrongType;
+/** Implement the standard Scheme procedure "zero?". */
 
-import kawa.lang.Procedure1;
-
-public class zero_p extends kawa.lang.Procedure1 {
-   public kawa.standard.zero_p() {
-      super("zero?");
-   }
-
-   public Object apply1 (Object arg1)
-     throws kawa.lang.WrongType
+public class zero_p extends Procedure1
+{
+  public Object apply1 (Object arg1)
    {
-      if (arg1 instanceof java.lang.Double) {
-         if (((java.lang.Double)arg1).doubleValue()==0.0) {
-            return kawa.lang.Interpreter.trueObject;
-         } else {
-            return kawa.lang.Interpreter.falseObject;
-         }
-      } else if (arg1 instanceof java.lang.Integer) {
-         if (((java.lang.Integer)arg1).intValue()==0) {
-            return kawa.lang.Interpreter.trueObject;
-         } else {
-            return kawa.lang.Interpreter.falseObject;
-         }
-      } else {
-         throw new kawa.lang.WrongType(this.name(),1,"number");
-      }
+     if (((Numeric)arg1).isZero ())
+       return Interpreter.trueObject;
+     else
+       return Interpreter.falseObject;
    }
-
 }

@@ -155,7 +155,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final void apply (String name, Environment env)
+  public static final void apply (String name, Environment env)
     throws SyntaxException
   {
     if (name.endsWith (".zip") || name.endsWith(".jar"))

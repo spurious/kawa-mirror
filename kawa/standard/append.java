@@ -1,10 +1,4 @@
 package kawa.standard;
-import gnu.mapping.WrongType;
-import gnu.mapping.ProcedureN;
-import gnu.bytecode.Field;
-import gnu.bytecode.Access;
-import gnu.bytecode.ClassType;
-import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.kawa.util.*;
 
@@ -13,16 +7,14 @@ import gnu.kawa.util.*;
  * @author Per Bothner
  */
 
-public class append extends ProcedureN implements Compilable
+public class append extends ProcedureN
 {
-  public static append appendProcedure = new append ();
-
-  public append()
+  public Object applyN (Object[] args)
   {
-    super("append");
+    return append$V(args);
   }
 
-  public Object applyN (Object[] args)
+  public static Object append$V (Object[] args)
   {
     int count = args.length;
     if (count == 0)
@@ -45,7 +37,7 @@ public class append extends ProcedureN implements Compilable
 	    list = list_pair.cdr;
 	  }
 	if (list != LList.Empty)
-	  throw new WrongType(this.name (), 2, "list");
+	  throw new WrongType("append", 2, "list");
 	if (last != null)
 	  {
 	    last.cdr = result;
@@ -53,23 +45,5 @@ public class append extends ProcedureN implements Compilable
 	  }
       }
     return result;
-  }
-
-  static Field appendConstant;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (appendConstant == null)
-      {
-	ClassType thisType = new ClassType ("kawa.standard.append");
-	appendConstant = thisType.addField("appendProcedure", thisType,
-					   Access.PUBLIC|Access.STATIC);
-      }
-    return new Literal (this, appendConstant, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    throw new Error ("internal error - append.emit called");
   }
 }

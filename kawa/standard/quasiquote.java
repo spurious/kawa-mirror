@@ -3,6 +3,8 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import gnu.kawa.reflect.Invoke;
+import gnu.bytecode.ClassType;
 
 /**
  * The Syntax transformer that re-writes the "quasiquote" Scheme primitive.
@@ -45,11 +47,10 @@ public class quasiquote extends Syntax implements Printable
 	    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != LList.Empty)
 	  return tr.syntaxError ("invalid used of " + pair_car.car +
 				     " in quasiquote template");
-	Procedure append = kawa.standard.append.appendProcedure;
 	Expression[] args = new Expression[2];
 	args[0] = tr.rewrite (pair_car_cdr.car);
 	args[1] = coerceExpression (expanded_cdr);
-	return new ApplyExp (new QuoteExp (append), args);
+	return Invoke.makeInvokeStatic(appendType, "append", args);
       }
     Object expanded_car = expand (pair.car, depth, tr);
     if (expanded_car == pair.car && expanded_cdr == pair.cdr)
@@ -59,11 +60,10 @@ public class quasiquote extends Syntax implements Printable
       return new Pair (expanded_car, expanded_cdr);
     else
       {
-	Expression cons = new QuoteExp (kawa.standard.cons.consProcedure);
 	Expression[] args = new Expression[2];
 	args[0] = coerceExpression (expanded_car);
 	args[1] = coerceExpression (expanded_cdr);
-	return new ApplyExp (cons, args);
+	return Invoke.makeInvokeStatic(consType, "cons", args);
       }
   }
 
@@ -142,16 +142,13 @@ public class quasiquote extends Syntax implements Printable
 	      {
 		Expression[] arg1 = new Expression[1];
 		arg1[0] = (Expression) buffer[i];
-		Procedure func = kawa.standard.vector_v.vectorProcedure;
-		args[i] = new ApplyExp (new QuoteExp (func), arg1);
+		args[i] = Invoke.makeInvokeStatic(vectorType, "vector", arg1);
 	      }
 	  }
-	Procedure func;
 	if (max_state < 3)
-	  func = kawa.standard.vector_v.vectorProcedure;
+	  return Invoke.makeInvokeStatic(vectorType, "vector", args);
 	else
-	  func = kawa.standard.vector_append.vappendProcedure;
-	return new ApplyExp (new QuoteExp (func), args);
+	  return Invoke.makeInvokeStatic(vectorAppendType, "apply", args);
       }
     else
       return template;
@@ -165,4 +162,10 @@ public class quasiquote extends Syntax implements Printable
       return tr.syntaxError ("wrong number of arguments to quasiquote");
     return coerceExpression (expand (pair.car, 1, tr));
   }
+
+  static final ClassType consType = ClassType.make("kawa.lib.lists");
+  static final ClassType appendType = ClassType.make("kawa.standard.append");
+  static final ClassType vectorType = ClassType.make("kawa.lib.vectors");
+  static final ClassType vectorAppendType
+    = ClassType.make("kawa.standard.vector_append");
 }

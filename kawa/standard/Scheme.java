@@ -151,7 +151,7 @@ public class Scheme extends Interpreter
 
       //-- Section 6.3  -- complete
       define_proc("pair?", "kawa.lib.lists");
-      define_proc("cons", kawa.standard.cons.consProcedure);
+      define_proc("cons", "kawa.lib.lists");
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
       define_proc ("set-car!", "kawa.lib.lists");
@@ -189,7 +189,7 @@ public class Scheme extends Interpreter
       define_proc ("list?", "kawa.standard.list_p");
       define_proc ("list", "kawa.standard.list_v");
       define_proc ("length", "kawa.lib.lists");
-      define ("append", kawa.standard.append.appendProcedure);
+      define_proc ("append", "kawa.standard.append");
       define_proc ("reverse", "kawa.standard.reverse");
       define_proc ("list-tail", "kawa.standard.list_tail");
       define_proc ("list-ref", "kawa.standard.list_ref");
@@ -256,8 +256,8 @@ public class Scheme extends Interpreter
       define_proc ("sin", "kawa.lib.numbers");
       define_proc ("cos", "kawa.lib.numbers");
       define_proc ("tan", "kawa.lib.numbers");
-      define_proc ("asin", "kawa.standard.asin");
-      define_proc ("acos", "kawa.standard.acos");
+      define_proc ("asin", "kawa.lib.numbers");
+      define_proc ("acos", "kawa.lib.numbers");
       define_proc ("atan", "kawa.standard.atan");
       define_proc ("sqrt", "kawa.standard.sqrt");
       define_proc ("expt", "kawa.standard.expt");
@@ -323,16 +323,16 @@ public class Scheme extends Interpreter
 
       //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.lib.vectors");
-      define_proc ("make-vector", "kawa.standard.make_vector");
-      define ("vector", kawa.standard.vector_v.vectorProcedure);
+      define_proc ("make-vector", "kawa.lib.vectors");
+      define_proc ("vector", "kawa.lib.vectors");
       define_proc ("vector-length", "kawa.lib.vectors");
       define_proc ("vector-ref", "kawa.lib.vectors");
       define_proc ("vector-set!", "kawa.lib.vectors");
       define_proc ("list->vector", "kawa.lib.vectors");
       define_proc ("vector->list", "kawa.standard.vector2list");
-      define_proc ("vector-fill!", "kawa.standard.vector_fill_b");
+      define_proc ("vector-fill!", "kawa.lib.vectors");
       // Extension:
-      define ("vector-append", kawa.standard.vector_append.vappendProcedure);
+      define_proc ("vector-append", "kawa.standard.vector_append");
 
       //-- Section 6.9  -- complete [except restricted call/cc]
       define_proc ("procedure?", "kawa.lib.misc");
@@ -358,7 +358,7 @@ public class Scheme extends Interpreter
 		   "kawa.standard.with_output_to_file");
       define_proc ("open-input-file", "kawa.standard.open_input_file");
       define_proc ("open-output-file", "kawa.standard.open_output_file");
-      define_proc ("close-input-port", "kawa.standard.close_input_port");
+      define_proc ("close-input-port", "kawa.lib.ports");
       define_proc ("close-output-port", "kawa.lib.ports");
       define_proc ("read", "kawa.standard.read");
       define_proc ("read-line", "kawa.standard.read_line");
@@ -402,8 +402,8 @@ public class Scheme extends Interpreter
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
-      define_proc ("null-environment", "kawa.standard.null_env");
-      define_proc ("interaction-environment", "kawa.standard.user_env");
+      define_proc ("null-environment", "kawa.lib.misc");
+      define_proc ("interaction-environment", "kawa.lib.misc");
       define_proc ("dynamic-wind", "kawa.lib.syntax");
 
       kawa_environment = new Environment (r5_environment);
@@ -418,13 +418,13 @@ public class Scheme extends Interpreter
       define_proc ("logand", "kawa.standard.logand");
       define_proc ("logior", "kawa.standard.logior");
       define_proc ("logxor", "kawa.standard.logxor");
-      define_proc ("lognot", "kawa.standard.lognot");
-      define_proc ("logop", "kawa.standard.logop");
-      define_proc ("logbit?", "kawa.standard.logbit_p");
-      define_proc ("logtest", "kawa.standard.logtest");
-      define_proc ("logcount", "kawa.standard.logcount");
-      define_proc ("bit-extract", "kawa.standard.bit_extract");
-      define_proc ("integer-length", "kawa.standard.int_length");
+      define_proc ("lognot", "kawa.lib.numbers");
+      define_proc ("logop", "kawa.lib.numbers");
+      define_proc ("logbit?", "kawa.lib.numbers");
+      define_proc ("logtest", "kawa.lib.numbers");
+      define_proc ("logcount", "kawa.lib.numbers");
+      define_proc ("bit-extract", "kawa.lib.numbers");
+      define_proc ("integer-length", "kawa.lib.numbers");
 
       // These are from SLIB.
       define_proc("string-upcase!", "kawa.lib.strings");

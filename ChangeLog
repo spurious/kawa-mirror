@@ -3,7 +3,8 @@ Mon Feb 22 22:19:00 1999  Per Bothner  <bothner@cygnus.com>
 	* configure.in:  Set version to 1.6.57.
 	Update AM_EXEEXT -> AC_EXEEXT.  Move AC_PROG_CC before AC_EXEEXT.
 	* Makefile.am (kawa-compiled.zip):  New rule.
-	* **/Makefile.in:  Re-generate using atomake 1.4.
+	* **/Makefile.in:  Re-generate using automake 1.4.
+	* aclocal.m4:  Re-generate using aclocal 1.4.
 	* configure:  Re-generate using autoconf 2.13.
 
 Fri Jan  1 22:13:41 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>

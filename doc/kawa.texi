@@ -505,7 +505,7 @@ Set the default language to Emacs Lisp.
 @itemx --commonlisp
 @itemx --common-lisp
 Set the default language to CommonLisp.
-(The implementation is @em{very} incomplete.)
+(The implementation is @emph{very} incomplete.)
 @end table
 
 The following options control which calling conventions are used:

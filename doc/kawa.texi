@@ -4102,7 +4102,7 @@ operand to @code{set!}.
 The field name is "mangled" (@pxref{Mangling}) into a valid Java name.
 If there is no accessible field whose name is @code{"@var{fieldname}"},
 we look for a no-argument method whose name is
-@code{"get@var{Fieldname}"} (or @code{"is@var{Fieldname}"}" for a
+@code{"get@var{Fieldname}"} (or @code{"is@var{Fieldname}"} for a
 boolean property).
 
 If @var{object} is a primitive Java array, then @var{fieldname} can only

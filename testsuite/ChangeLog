@@ -1,3 +1,11 @@
+2004-12-26  Per Bothner  <per@bothner.com>
+
+	* included-1.scm: New file, to test include-relative.
+	* Makefile.am (EXTRA_DIST): Update accordingly.
+	* module1.scm (list0length-): Use include-relative
+
+	* mac-test.scm: New test based on code by Andre van Tonder
+
 2004-12-24  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: New test, from Chez Scheme User's Guide.

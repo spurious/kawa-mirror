@@ -1,4 +1,4 @@
-(test-init "macros" 83)
+(test-init "macros" 84)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -311,6 +311,23 @@
 	 (if (= n 0) (break ls))
 	 (set! ls (cons 'a ls))
 	 (set! n (- n 1)))))
+
+;; Based on SRFI-57 reference implementation by Andre van Tonder.
+(define-syntax top:if-free=
+  (syntax-rules ()
+    ((top:if-free= x y kt kf)
+     (begin
+       (define-syntax if-free=:test
+         (syntax-rules (x)
+           ((if-free=:test x kt* kf*) kt*)
+           ((if-free=:test z kt* kf*) kf*)))
+       (if-free=:test y kt kf)))))
+(define-syntax free=
+  (syntax-rules ()
+    ((free= x y)
+     (let () (top:if-free= x y #t #f)))))
+(test '(#t #f #t #f) 'test-free=
+      (list (free= x x) (free= y x) (free= abba abba) (free= y x)))
 
 (define-syntax check-matching
   (syntax-rules ()

@@ -1,3 +1,7 @@
+2003-02-23  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkIfExp):  New method - fold if constant test.
+
 2003-02-20  Tom Reilly <treilly@macromedia.com>
 
 	* Compilation.java (outputClass):  Made separate method,

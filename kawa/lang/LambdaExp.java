@@ -14,7 +14,16 @@ public class LambdaExp extends ScopeExp
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
   int max_args;
+  private boolean is_module_body;
+
+  /** True iff this is the dummy top-level function of a module body. */
+  public final boolean isModuleBody () { return is_module_body; }
+  /** Set the state of isModuleBody (). */
+  public final void setModuleBody (boolean is_module_body)
+  { this.is_module_body = is_module_body; }
+
   public final boolean variable_args () { return max_args < 0; }
+
 
   /** Number of argument variable actually passed by the caller.
    * For functions that accept more than 4 argument, or take a variable number,
@@ -133,7 +142,8 @@ public class LambdaExp extends ScopeExp
     ClassType new_class;
     try
       {
-	String new_name = "lambda" + comp.numClasses;
+	String new_name
+	  = comp.generateClassName (name == null ? "lambda" : name);
 	new_class = new ClassType (new_name);
 	comp.curClass = new_class;
 	comp.addClass (new_class);
@@ -190,22 +200,28 @@ public class LambdaExp extends ScopeExp
       return new LambdaProcedure (this, env);
     try
       {
-	Compilation comp = new Compilation (this, "lambda0", true);
+	Compilation comp = new Compilation (this, "Top", true);
 	compile_setLiterals (comp, env.values);
 
 	byte[][] classes = new byte[comp.numClasses][];
+	String[] classNames = new String[comp.numClasses];
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  classes[iClass] = comp.classes[iClass].emit_to_array ();
+	  {
+	    ClassType clas = comp.classes[iClass];
+	    classNames[iClass] = clas.getClassName ();
+	    classes[iClass] = clas.emit_to_array ();
+	  }
 
-	/* DEBUGGING
+	/* DEBUGGING:
 	ZipArchive zar = new ZipArchive ("Foo.zip", "rw");
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  zar.append ("lambda" + iClass + ".class", classes[iClass]);
+	  zar.append (classNames[iClass].replace ('.', '/') + ".class",
+	              classes[iClass]);
 	zar.close ();
 	*/
 
-	SchemeLoader loader = new SchemeLoader (classes);
-	Class clas = loader.loadClass ("lambda0", true);
+	SchemeLoader loader = new SchemeLoader (classNames, classes);
+	Class clas = loader.loadClass ("Top", true);
 	Object inst = clas.newInstance ();
 
 	/* Pass literal values to the compiled code. */
@@ -214,7 +230,7 @@ public class LambdaExp extends ScopeExp
 	for (Literal literal = comp.literalsChain;  literal != null;
 	     literal = literal.next)
 	  {
-	    /* DEBUGGING
+	    /* DEBUGGING:
 	    System.err.print ("literal["+literal.index+"]=");
 	    print.print (literal.value, System.err);
 	    System.err.println();

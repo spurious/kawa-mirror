@@ -32,8 +32,7 @@ public class ReferenceExp extends Expression
       {
 	val = env.interp.lookup (symbol);
 	if (val == null)
-	  throw 
-	    new UnboundSymbol(symbol.toString ());
+	  throw new UnboundSymbol (symbol);
       }
     return val;
   }

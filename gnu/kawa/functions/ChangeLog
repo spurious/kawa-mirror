@@ -1,3 +1,8 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* AppendValues.java:  Implement CanInline.
+	(inline):  New method.
+
 2002-03-21  Per Bothner  <per@bothner.com>
 
 	* Assoc.java:  Remove class - subsumed by kawa.lib.lists.

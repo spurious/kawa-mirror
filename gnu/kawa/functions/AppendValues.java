@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
-public class AppendValues extends CpsProcedure implements Inlineable
+public class AppendValues extends CpsProcedure implements CanInline, Inlineable
 {
   public static final AppendValues appendValues = new AppendValues();
 
@@ -24,6 +24,19 @@ public class AppendValues extends CpsProcedure implements Inlineable
 	else
 	  ctx.writeValue(arg);
       }
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 1)
+      return args[0];
+    if (args.length == 0)
+      return QuoteExp.voidExp;
+    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    if (folded != exp)
+      return folded;
+    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -8,6 +8,15 @@ import gnu.expr.*;
 
 public class convert extends Procedure2 implements Inlineable
 {
+  static convert instance = null;
+
+  public static convert getInstance ()
+  {
+    if (instance == null)
+      instance = new convert();
+    return instance;
+  }
+
   public Object apply2 (Object arg1, Object arg2)
   {
     Type type = (Type) arg1;
@@ -46,5 +55,16 @@ public class convert extends Procedure2 implements Inlineable
 	code.emitInvokeVirtual(coerceMethod);
 	target.compileFromStack(comp, Type.pointer_type);
       }
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    if (args != null && args.length == 2)
+      {
+	Type type = Scheme.getTypeValue(args[0]);
+	if (type != null)
+	  return type;
+      }
+    return Type.pointer_type;
   }
 }

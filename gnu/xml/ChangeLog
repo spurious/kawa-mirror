@@ -1,3 +1,9 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (<init>):  Add 5 new constructors.
+	(setStyle):  New method.
+	(make):  Use setStyle.
+
 2003-01-05  Per Bothner  <per@bothner.com>
 
 	* XPath.java:  Removed - superceded more-or-less by XQuery.

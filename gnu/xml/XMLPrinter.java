@@ -27,9 +27,20 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     super(out, autoFlush);
   }
 
-  public XMLPrinter (Writer out)
+  public XMLPrinter (Consumer out, boolean autoFlush)
   {
-    super(out);
+    super(out, autoFlush);
+  }
+
+  /** To disambiguate between Writer and Consumer versions. */
+  public XMLPrinter (PrintConsumer out, boolean autoFlush)
+  {
+    super((Writer) out, autoFlush);
+  }
+
+  public XMLPrinter (OutputStream out, boolean autoFlush)
+  {
+    super(out, autoFlush);
   }
 
   public XMLPrinter (Consumer out)
@@ -37,20 +48,40 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     super(out, false);
   }
 
+  public XMLPrinter (Writer out)
+  {
+    super(out);
+  }
+
+  public XMLPrinter (PrintConsumer out)
+  {
+    super((Writer) out, false);
+  }
+
+  public XMLPrinter (OutputStream out)
+  {
+    super(out, false);
+  }
+
   public static XMLPrinter make(Consumer out, Object style)
   {
     XMLPrinter xout = new XMLPrinter(out);
-    xout.style = style;
+    xout.setStyle(style);
+    return xout;
+  }
+
+  public void setStyle (Object style)
+  {
+    this.style = style;
     if ("html".equals(style))
       {
-	xout.isHtml = true;
-	xout.htmlCompat = true;
+	isHtml = true;
+	htmlCompat = true;
       }
     if ("xhtml".equals(style))
-      xout.htmlCompat = true;
+      htmlCompat = true;
     if ("plain".equals(style))
-      xout.escapeText = false;
-    return xout;
+      escapeText = false;
   }
 
   protected static final boolean isWordChar(char ch)

@@ -519,7 +519,7 @@
 	 (vector "New Frame" make-frame)
 	 (vector "Delete Frame" delete-frame)
 	 "------"
-	 (vector "Save" save-buffer :active (buffer-modified-p) ))
+	 #("Save" save-buffer active: (buffer-modified-p)))
    (list "Tools"
 	 (vector "Scheme interaction" scheme-swing-window))
    #!null

@@ -8,11 +8,6 @@ import kawa.lang.*;
 
 public class multiply_oper extends ProcedureN
 {
-  public multiply_oper()
-  {
-    super("*");
-  }
-
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {

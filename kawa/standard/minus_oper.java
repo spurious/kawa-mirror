@@ -8,11 +8,6 @@ import kawa.lang.*;
 
 public class minus_oper extends ProcedureN
 {
-  public minus_oper()
-  {
-    super("-");
-  }
-
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {

@@ -1,3 +1,7 @@
+Wed Dec 23 16:01:01 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa.texi (Anonymous classes):  Updated, more information.
+
 Thu Nov 26 11:51:37 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi (Formals):  Describe parameter and return type specs.

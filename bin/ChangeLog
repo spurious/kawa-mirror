@@ -1,3 +1,9 @@
+2003-05-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Various fixes.  bin_SCRIPTS is set to gckawa
+	whenever WITH_GCJ is set, regardless of ENABLE_KAWA_FRONTEND.
+	Likewise KAWAPROGS includes kawa-bin whenever WITH_GCJ is set.
+
 2003-02-01  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA2_XML_OFILES):  Add gnu-kawa-xslt.o.

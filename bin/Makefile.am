@@ -1,11 +1,16 @@
-if ENABLE_KAWA_FRONTEND
 if WITH_GCJ
-KAWAPROGS =  kawa-bin kawa
 bin_SCRIPTS = gckawa
+if ENABLE_KAWA_FRONTEND
+KAWAPROGS = kawa-bin kawa
 else
+KAWAPROGS = kawa-bin
+endif
+else
+if ENABLE_KAWA_FRONTEND
 KAWAPROGS = kawa
 endif
 endif
+
 bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
 EXTRA_PROGRAMS = kawa

@@ -48,25 +48,15 @@ public class Scheme extends Interpreter
   static Environment r5Environment;
   protected static Environment kawaEnvironment;
 
-  public static SpecialType byteType
-    = new SpecialType ("byte", "B", 1, java.lang.Byte.TYPE);
-  public static SpecialType shortType
-    = new SpecialType ("short", "S", 2, java.lang.Short.TYPE);
-  public static SpecialType intType
-    = new SpecialType ("int", "I", 4, java.lang.Integer.TYPE);
-  public static SpecialType longType
-    = new SpecialType ("long", "J", 8, java.lang.Long.TYPE);
-
-  public static SpecialType floatType
-    = new SpecialType ("float", "F", 4, java.lang.Float.TYPE);
-  public static SpecialType doubleType
-    = new SpecialType ("double", "D", 8, java.lang.Double.TYPE);
-  public static SpecialType booleanType
-    = new SpecialType("boolean", "Z", 1, java.lang.Boolean.TYPE);
-  public static SpecialType charType
-    = new SpecialType("char", "C", 2, java.lang.Character.TYPE);
-  public static SpecialType voidType
-    = new SpecialType("void", "V", 0, java.lang.Void.TYPE);
+  public static SpecialType byteType = new SpecialType(Type.byte_type);
+  public static SpecialType shortType = new SpecialType(Type.short_type);
+  public static SpecialType intType = new SpecialType(Type.int_type);
+  public static SpecialType longType = new SpecialType(Type.long_type);
+  public static SpecialType floatType = new SpecialType(Type.float_type);
+  public static SpecialType doubleType = new SpecialType(Type.double_type);
+  public static SpecialType booleanType;
+  public static SpecialType charType = new SpecialType(Type.char_type);
+  public static SpecialType voidType = new SpecialType(Type.void_type);
 
   static Scheme instance;
 
@@ -142,11 +132,11 @@ public class Scheme extends Interpreter
       define_proc ("boolean?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
-      eqv = new kawa.standard.eqv_p();
+      eqv = new kawa.standard.eqv_p(this);
       define_proc("eqv?", eqv);
-      eq = new kawa.standard.eq_p();
+      eq = new kawa.standard.eq_p(this);
       define_proc("eq?", eq);
-      equal = new kawa.standard.equal_p();
+      equal = new kawa.standard.equal_p(this);
       define_proc("equal?", equal);
 
       //-- Section 6.3  -- complete
@@ -458,7 +448,7 @@ public class Scheme extends Interpreter
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.syntax");
       define_proc("as", kawa.standard.convert.getInstance());
-      define_proc("instance?", new kawa.standard.instance());
+      define_proc("instance?", new kawa.standard.instance(this));
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
       define_syntax("define-class", "kawa.standard.define_class");
@@ -796,6 +786,8 @@ public class Scheme extends Interpreter
   {
     if (types == null)
       {
+	booleanType = new SpecialType(Type.boolean_type,
+				      Scheme.getInstance());
 	types = new Hashtable ();
 	types.put ("void", Scheme.voidType);
 	types.put ("int", Scheme.intType);
@@ -846,7 +838,14 @@ public class Scheme extends Interpreter
         types.put ("f32vector", ClassType.make("gnu.kawa.util.F32Vector"));
         types.put ("f64vector", ClassType.make("gnu.kawa.util.F64Vector"));
       }
-    return (Type) types.get(name);
+    Type type = (Type) types.get(name);
+    if (type == null && name.equals("elisp:boolean"))
+      {
+	type = new SpecialType(Type.boolean_type,
+			       gnu.jemacs.lang.ELisp.getInstance());
+	types.put("elisp:boolean", type);
+      }
+    return type;
   }
 
   public Type getTypeFor (Class clas)

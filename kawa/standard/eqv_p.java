@@ -9,6 +9,13 @@ import gnu.kawa.util.*;
 
 public class eqv_p extends Procedure2 implements Inlineable
 {
+  Interpreter interpreter;
+
+  public eqv_p(Interpreter interpreter)
+  {
+    this.interpreter = interpreter;
+  }
+
   public static boolean apply (Object arg1, Object arg2) 
   {
     if (arg1==arg2)
@@ -20,7 +27,7 @@ public class eqv_p extends Procedure2 implements Inlineable
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    return apply(arg1, arg2) ? Boolean.TRUE : Boolean.FALSE;
+    return interpreter.booleanObject(apply(arg1, arg2));
    }
 
   private static boolean nonNumeric(Expression exp)
@@ -37,14 +44,14 @@ public class eqv_p extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     if (nonNumeric(args[0]) || nonNumeric(args[1]))
-      eq_p.compile(args, comp, target);
+      eq_p.compile(args, comp, target, interpreter);
     else
       ApplyExp.compile(exp, comp, target);
   }
 
   public Type getReturnType (Expression[] args)
   {
-    return Scheme.booleanType;
+    return interpreter.getTypeFor(Boolean.TYPE);
   }
 
 }

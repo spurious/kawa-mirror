@@ -6,10 +6,23 @@ import gnu.expr.*;
 
 public class instance extends Procedure2 implements Inlineable
 {
+  Interpreter interpreter;
+
+  public instance(Interpreter interpreter)
+  {
+    this.interpreter = interpreter;
+  }
+
+  public static boolean apply (Object arg1, Object arg2)
+  {
+    Type type = (Type) arg2;
+    return type.isInstance(arg1);
+  }
+
   public Object apply2 (Object arg1, Object arg2)
   {
     Type type = (Type) arg2;
-    return type.isInstance(arg1) ? Boolean.TRUE : Boolean.FALSE;
+    return interpreter.booleanObject(type.isInstance(arg1));
   }
 
   static gnu.bytecode.ClassType typeType;
@@ -32,18 +45,18 @@ public class instance extends Procedure2 implements Inlineable
 	    typeType = ClassType.make("gnu.bytecode.Type");
 	    instanceMethod = typeType.addMethod("isInstance",
 						Compilation.apply1args,
-						Scheme.booleanType,
+						Type.boolean_type,
 						gnu.bytecode.Access.PUBLIC);
 	  }
 	args[1].compile(comp, typeType);
 	args[0].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(instanceMethod);
       }
-    target.compileFromStack(comp, Scheme.booleanType);
+    target.compileFromStack(comp, interpreter.getTypeFor(Boolean.TYPE));
   }
 
   public Type getReturnType (Expression[] args)
   {
-    return Scheme.booleanType;
+    return interpreter.getTypeFor(Boolean.TYPE);
   }
 }

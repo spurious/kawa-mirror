@@ -1,3 +1,20 @@
+2000-04-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SpecialType.java (interpreter):  New optional field.
+	Call interpreter to handle conversion to/from boolean.
+	* kawa/standard/eq_p.java (interpreter):  New field.  Used to
+	do language-appropriate boolean result.
+	* kawa/standard/equal_p.java:  Likewise.
+	* kawa/standard/eqv_p.java:  Likewise.
+	* kawa/standard/instance.java:  Likewise.
+	* kawa/standard/not.java (getReturnType):  Get from interpreter.
+	* kawa/standard/Scheme.java
+	(booleanType):  Don't initialize in static constructor.
+	(intType, floatType, etc):  Use new SpecialType constructor.
+	(initSchee):  Pass this to eq_p, eqv_p, equal_p, instance constructors.
+	(getNamedType):  Init boolean here, passing in Scheme.getInstance.
+	Also, handle <elisp:boolean>.
+
 2000-04-21  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java:  No extends from gnu.expr.Parser.

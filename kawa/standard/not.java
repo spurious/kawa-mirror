@@ -48,6 +48,6 @@ public class not extends Procedure1 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return Scheme.booleanType;
+    return interpreter.getTypeFor(Boolean.TYPE);
   }
 }

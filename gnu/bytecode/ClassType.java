@@ -103,7 +103,7 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public ClassType getSuperclass ()
   {
-    if (superClass == null && reflectClass != null)
+    if (superClass == null && getReflectClass() != null)
       {
         Class superReflectClass = reflectClass.getSuperclass();
         // Neither Object nor interfaces have a superclass.
@@ -672,6 +672,26 @@ public class ClassType extends ObjectType implements AttrContainer {
     return buffer;
   }
 
+  /** True if this class/interface implements the interface iface. */
+  public final boolean implementsInterface(ClassType iface)
+  {
+    if (this == iface)
+      return true;
+    ClassType baseClass = this.getSuperclass();
+    if (baseClass != null && baseClass.implementsInterface(iface))
+      return true;
+    ClassType[] interfaces = getInterfaces();
+    if (interfaces != null)
+      {
+	for (int i = interfaces.length;  --i >= 0; )
+	  {
+	    if (interfaces[i].implementsInterface(iface))
+	      return true;
+	  }
+      }
+    return false;
+  }
+
   public final boolean isSubclass(ClassType other)
   {
     ClassType baseClass = this;
@@ -698,8 +718,18 @@ public class ClassType extends ObjectType implements AttrContainer {
     if (name != null && name.equals(other.getName()))
       return 0;
     ClassType cother = (ClassType) other;
-    if (this.isInterface() || cother.isInterface())
-      return -2;
+    if (this.isInterface())
+      {
+	if (cother.implementsInterface(this))
+	  return 1;
+	return -2;
+      }
+    if (cother.isInterface())
+      {
+	if (this.implementsInterface(cother))
+	  return -1;
+	return -2;
+      }
     if (isSubclass(cother))
       return -1;
     if (cother.isSubclass(this))

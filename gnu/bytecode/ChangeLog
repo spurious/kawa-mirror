@@ -1,8 +1,15 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getSuperclass):  Call getReflectClass if needed.
+
+	* ClassType.java (implementsInterface):  New method.
+	(compare):  Use implementsInterface to compare interfaces.
+
 2001-02-26  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (doFixups):  Move method fixups to Method, CodeAttr.
 	* CodeAttr.java (assignConstants):  Handle CodeFragments, labels here.
-	* Method.java (assign_constants):  Rename to assignConstants.
+	* Method.java (assign_constants):  REname to assignConstants.
 
 2000-11-21  Brain R. Lewis <brlewis@users.sourceforge.net>
 

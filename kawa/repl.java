@@ -318,7 +318,7 @@ public class repl extends Procedure0or1
 	    System.out.print("Kawa ");
 	    System.out.print(Version.getVersion());
 	    System.out.println();
-            System.out.println("Copyright (C) 1999 Per Bothner");
+            System.out.println("Copyright (C) 2000 Per Bothner");
 	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')

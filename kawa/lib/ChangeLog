@@ -1,5 +1,8 @@
 2000-01-24  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (lognot, logop, logbit?, bit-extract, logtest, logcount,
+	integer-length):  New functions;  replace classes in kawa.standard.
+	* misc.scm (null-environment, interaction-environment):  Likewise.
 	* lists.scm (cons):  New procedure, replaces kawa/standard/cons.java.
 	* vectors.scm (vector):  New procedure, replaces
  	kawa/standard/vector_v.java.

@@ -81,3 +81,23 @@
  ())
    ((primitive-virtual-method <quantity> "number" <complex> ()) x)))
 
+(define (lognot (i :: <integer>))
+  (invoke-static <gnu.math.BitOps> 'not i))
+
+(define (logop (op :: <int>) (i :: <integer>) (j :: <integer>))
+  (invoke-static <gnu.math.BitOps> 'bitOp op i j))
+
+(define (logbit? (i :: <integer>) (bitno :: <int>))
+  (invoke-static <gnu.math.BitOps> 'bitValue i bitno))
+
+(define (bit-extract (i :: <integer>) (start :: <int>) (end :: <int>))
+  (invoke-static <gnu.math.BitOps> 'extract i start end))
+
+(define (logtest (i :: <integer>) (j :: <integer>))
+  (invoke-static <gnu.math.BitOps> 'test))
+
+(define (logcount (i :: <integer>))
+  (invoke-static <gnu.math.BitOps> 'bitCount i))
+
+(define (integer-length (i :: <integer>))
+  (invoke i 'intLength))

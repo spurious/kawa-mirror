@@ -33,6 +33,12 @@
              env sym)
        #!null)))
 
+(define (null-environment)
+  (static-field <kawa.standard.Scheme> 'null_environment))
+
+(define (interaction-environment)
+  (invoke-static <gnu.mapping.Environment> 'user))
+
 (define (scheme-implementation-version)
   (constant-fold
    (primitive-constructor <string> (<java.lang.String>))

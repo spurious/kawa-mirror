@@ -36,7 +36,7 @@ public class TrivialConstraint extends Constraint
   {
     Constraint constraint = binding.constraint;
     if (constraint instanceof TrivialConstraint)
-      return (TrivialConstraint) binding.constraint;
+      return (TrivialConstraint) constraint;
     return getInstance(constraint.getEnvironment(binding));
   }
 

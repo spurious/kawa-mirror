@@ -1,5 +1,9 @@
 2004-01-09  Per Bothner  <per@bothner.com>
 
+	* FluidConstraint.java (find):  Inline Future.getFluids.
+
+	* TrivialConstraint.java (getInstance):  Minor fix,
+	
 	* CallContext.java (curEnvironment):  New field.
 	(getEnvironment):  Rewrite to use curEnvironment.
 	* Environment.java (getCurrent):  Use CallContext's getEnvironment.

@@ -22,7 +22,7 @@ public class FluidConstraint extends Constraint
 
   FluidBinding find (Symbol symbol)
   {
-    FluidBinding fl = Future.getFluids();
+    FluidBinding fl = CallContext.getInstance().fluidBindings;
     for (; fl != null;  fl = fl.previous)
       {
 	if (fl.symbol == symbol)

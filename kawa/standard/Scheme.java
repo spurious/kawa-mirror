@@ -415,7 +415,7 @@ public class Scheme extends Interpreter
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Translator tr = new Translator (env);
-    return Eval.eval (CompileFile.read (port, tr), tr);
+    return Eval.eval (CompileFile.read (port, tr), tr, env);
   }
 
   /** Evalutate Scheme expressions from an "S expression."

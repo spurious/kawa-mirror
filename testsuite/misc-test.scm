@@ -448,7 +448,6 @@
   (lambda ((x :: <number>) (y :: <number>)) (+ x y))
   (lambda ((x :: <string>) (y :: <string>)) (string-append x y)))
 (test 12 Plus 5 7)
-(set! fail-expected "overload resolution on lambda parameter types not implemented")
 (test "57" Plus "5" "7")
 
 (define (return-null) #!null)
@@ -570,4 +569,3 @@
 (require 'list-lib)
 
 (test '(1 3) 'filter!-test (filter! odd? (iota 5)))
-

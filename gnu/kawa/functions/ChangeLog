@@ -1,3 +1,7 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* ValuesMap.java (apply):  Use nextPos; don't use nextDataIndex.
+
 2003-08-01  Per Bothner  <per@bothner.com>
 
 	* Convert.java (setCoercedReturnValue):  New static helper method.

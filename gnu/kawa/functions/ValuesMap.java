@@ -27,20 +27,12 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
       {
 	int ipos = 0;
 	Values values = (Values) val;
-	for (;;)
+	while ((ipos = values.nextPos(ipos)) != 0)
 	  {
-	    Object v = values.getPosNext(ipos);
-	    if (v == Sequence.eofValue)
-	      break;
+	    Object v = values.getPosPrevious(ipos);
 	    ctx.setArgs(v);
 	    ctx.proc = proc;
 	    ctx.runUntilDone();
-	    ipos = values.nextDataIndex(values.posToDataIndex(ipos));
-	    /*
-	    if (ipos < 0)
-	      break;
-	    */
-	    ipos = ipos << 1;
 	  }
       }
     else

@@ -60,6 +60,7 @@ public class load extends Procedure1 {
 	if (!zfile.canRead ())
 	  throw new RuntimeException ("load: "+name+" - not readable");
 	ZipLoader loader = new ZipLoader (name);
+	loader.loadAllClasses();
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	Object proc = clas.newInstance ();
 	if (proc instanceof ModuleBody)

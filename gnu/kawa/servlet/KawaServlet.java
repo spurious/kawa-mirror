@@ -9,7 +9,7 @@ import gnu.xml.*;
 import java.io.IOException;
 
 public abstract class KawaServlet
-extends HttpServlet implements CpsMethodContainer
+extends HttpServlet
 {
    public void doPost (HttpServletRequest request,
 		       HttpServletResponse response)
@@ -61,8 +61,9 @@ extends HttpServlet implements CpsMethodContainer
     ctx.consumer.beginDocument();
     try
       {
+	// FIXME - untested!
 	apply(ctx);
-	ctx.run();
+	//ctx.run();
       }
     catch (Throwable throwable)
       {
@@ -77,10 +78,6 @@ extends HttpServlet implements CpsMethodContainer
 	throw new ServletException(throwable);
       }
     ctx.consumer.endDocument();
-  }
-
-  public void apply(CpsMethodProc proc, CallContext context)
-  {
   }
 
   public abstract void apply(CallContext context)  throws Throwable;

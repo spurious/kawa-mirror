@@ -1,3 +1,7 @@
+2004-08-08  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java (doGet): Change for new Procedure API.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* GetRequest.java:  Extend MethodProc instead of CpsProcedure.

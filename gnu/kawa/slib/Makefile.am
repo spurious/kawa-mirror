@@ -5,7 +5,8 @@ AUTOMAKE_OPTIONS = foreign
 include $(top_srcdir)/Make-rules
 
 PACKAGE_CFNAME = gnu-kawa-slib
-ENABLE_GCJ_COMPILED = ../../kawa1$(exeext) scm-classes.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext) \
+  $(OFILES_DIR)/$(PACKAGE_CFNAME).o
 
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm \
   $(SCMSOURCES_@XML_SELECTED@)

@@ -58,7 +58,6 @@ Symbol.class \
 Vector.class \
 Undefined.class \
 Lambda.class \
-LambdaProcedure.class \
 Quote.class \
 Interpreter.class \
 Procedure.class \

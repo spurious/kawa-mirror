@@ -115,8 +115,6 @@ public class LambdaExp extends ScopeExp
   /** Start of actual body (after copying args etc into home locations). */
   Label start_label;
 
-  public static boolean doCompile = true;
-
   /** Get the i'the formal parameter. */
   Declaration getArg (int i)
   {
@@ -196,11 +194,10 @@ public class LambdaExp extends ScopeExp
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    if (!doCompile)
-      return new LambdaProcedure (this, env);
     try
       {
-	Compilation comp = new Compilation (this, "Top", true);
+	String class_name = name == null ? "lambda" : name.toString ();
+	Compilation comp = new Compilation (this, class_name, true);
 	compile_setLiterals (comp, env.values);
 
 	byte[][] classes = new byte[comp.numClasses][];
@@ -221,7 +218,7 @@ public class LambdaExp extends ScopeExp
 	*/
 
 	SchemeLoader loader = new SchemeLoader (classNames, classes);
-	Class clas = loader.loadClass ("Top", true);
+	Class clas = loader.loadClass (class_name, true);
 	Object inst = clas.newInstance ();
 
 	/* Pass literal values to the compiled code. */
@@ -238,6 +235,9 @@ public class LambdaExp extends ScopeExp
 	    literals[literal.index] = literal.value;
 	  }
 	cproc.setLiterals (literals);
+	Named named = (Named) inst;
+	if (named.name () == null)
+	  named.setName (this.name);
 
 	return inst;
       }

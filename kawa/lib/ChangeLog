@@ -1,3 +1,8 @@
+2005-03-23  Per Bothner  <per@bothner.com>
+
+	* ports.scm (with-output-to-file, with-output-to-file): New functions.
+	* thread.scm (sleep): New function.
+
 2005-03-18  Per Bothner  <per@bothner.com>
 
 	* system.scm (convert-list-to-string-array): Optimize by adding type

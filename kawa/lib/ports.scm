@@ -16,6 +16,32 @@
      (proc port)
      (close-output-port port))))
 
+(define (with-input-from-file fname (proc :: <procedure>))
+  (let ((port :: <input-port> (gnu.mapping.InPort:openFile
+			       (invoke fname 'toString)))
+	(save :: <input-port> (gnu.mapping.InPort:inDefault)))
+    (try-finally
+     (begin
+       (gnu.mapping.InPort:setInDefault port)
+       (proc))
+     (begin
+       (gnu.mapping.InPort:setInDefault save)
+       (invoke port 'close)))))       
+
+(define (with-output-to-file filename (proc :: <procedure>))
+  (let* ((fname (invoke filename 'toString))
+	 (port :: <output-port> (gnu.mapping.OutPort:new
+				 (java.io.FileWriter:new fname)
+				 fname))
+	 (save :: <output-port> (gnu.mapping.OutPort:outDefault)))
+    (try-finally
+     (begin
+       (gnu.mapping.OutPort:setOutDefault port)
+       (proc))
+     (begin
+       (gnu.mapping.OutPort:setOutDefault save)
+       (invoke port 'close)))))
+
 (define (input-port? x) :: <boolean>
   (instance? x <input-port>))
 

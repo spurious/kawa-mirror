@@ -2,6 +2,9 @@
   (invoke-static <output-port> 'runCleanups)
   (invoke-static <java.lang.System> 'exit status))
 
+(define (sleep (time :: <quantity>)) :: <void>
+  (kawa.standard.sleep:sleep time))
+
 ;; FUTURE
 
 (define-syntax future (syntax-rules ()

@@ -36,6 +36,9 @@ and that compiles Scheme code into Java byte-codes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
 
+See the summary
+of @uref{http://www.cygnus.com/~bothner/kawa/News.txt,recent changes}.
+
 The author of Kawa is
 @ifhtml
 <a href="http://www.cygnus.com/~bothner">Per Bothner</a>
@@ -53,36 +56,33 @@ R. Alexander Milowski @w{<alex@@copsol.com>}.
 <a href="http://www.cygnus.com/~bothner/kawa.html">This</a>
 is the Kawa home-page.
 <a href="http://www.copsol.com/kawa/index.html">
-Copsol's Kawa home-page</a>
-is not maintained by Cygnus and so may not be as current.
 @end ifhtml
 @ifclear html
 The Kawa home page (which is currently just an on-line
 version of this document) is
 @url{http://www.cygnus.com/~bothner/kawa.html}.
-Copsol's Kawa home-page (@url{http://www.copsol.com/kawa/index.html})
-is not maintained by Cygnus and so may not be as current.
 @end ifclear
+@uref{http://www.copsol.com/sgmlimpl/tools/kawa/index.html,Copsol's Kawa home-page}
+is not maintained by me and so may not be as current.
 
-The name Kawa may change in the future, to avoid confusion
-with a proprietary product of the same name.
-
-@ifhtml
-The <a href="http://www.cs.indiana.edu/scheme-repository/home.html">
-Scheme repository</a> has various useful information on Scheme,
-including a pointer to an online copy of
-<a href="http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html">R4RS</a>.
-@end ifhtml
-@ifclear html
-The Scheme repository
-(@url{http://www.cs.indiana.edu/scheme-repository/home.html})
+The
+@uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
 has various useful information on Scheme, including a pointer to
-an online copy of R4RS
-(@url{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html}).
-@end ifclear
+an online copy of
+@uref{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html,R4RS}.
+
+Javadoc generated
+@uref{http://www.cygnus.com/~bothner/kawa/api/packages.html,documentation of the Kawa classes} is now available online.
 
 For copyright information on the software and documentation,
 see @ref{License}.
+
+This package has nothing to do with the
+@uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
+
+The two packages @uref{http:../gnu.bytecode/,@code{gnu.bytecode}}
+and @uref{http:../gnu.math/,@code{gnu.math}} are used by Kawa,
+and distributed with it, but may be independently useful.
 
 @menu
 * Features::
@@ -93,7 +93,7 @@ see @ref{License}.
 * Extensions::           Kawa features not in standard Scheme
 * Compiling::            Compiling Scheme code to byte-codes
 * Low-level functions::  The Scheme-Java interface
-* Reporting Bugs::
+* Reporting Bugs::       The Kawa Mailing List
 * License::              
 @end menu
 
@@ -398,14 +398,12 @@ use @samp{-w} to get a new window.
 Creates a new top-level window, and runs an interactive read-eval-print
 in the new window.  See @ref{New-Window}.
 Same as @code{-e (scheme-window #t)}.
-You can specify multiple @samp{-w} options, but if you mix @samp{-w}
-with @samp{s}, the new windows will not repaint until
-the read-eval-print-loop in the original "console" is done.
+You can specify multiple @samp{-w} options, and also use @samp{-s}.
 @item --version
 Prints out the Kawa version number, and then exits.
 @end table
 
-The options @samp{-C}, @samp{-d}, @samp{-T} and @samp{-P}
+The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, and @samp{--main}
 are used to compile a Scheme file; see @ref{Files compilation}.
 
 If there are further command-line arguments after the options
@@ -486,6 +484,7 @@ nor @code{letrec-syntax} are implemented.
 * Quantities::
 * Threads::
 * Standard Types::
+* Processes::
 * Miscellaneous::
 @end menu
 
@@ -961,6 +960,14 @@ For all text files (that is if @code{port-char-encoding} is not @code{#f}),
 on input a @code{#\Return} character or
 a @code{#\Return} followed by @code{#\Newline}
 are converted into plain @code{#\Newline}.
+
+This variable is checked when the file is opened;  not when actually
+reading or writing.  Here is an example of how you can safely
+change the encoding temporarily:
+@example
+(define (open-binary-input-file name)
+  (fluid-let ((port-char-encoding #f)) (open-input-file name)))
+@end example
 @end defvar
 
 @node Exceptions, Eval and Environments, Ports, Extensions
@@ -1178,7 +1185,7 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
-@node Standard Types, Miscellaneous, Threads, Extensions
+@node Standard Types, Processes, Threads, Extensions
 @section Standard Types
 
 Kawa has first-class types, that you can use in various ways.
@@ -1192,8 +1199,16 @@ These types are bound to identifiers having the form @code{<TYPENAME>}.
 To find which Java classes these types map into, look in
 @code{kawa/lang/PrimProcedure.java}.
 
+Note that the value of these variables are instances
+of @code{gnu.bytecode.Type},
+not (as you might at first expect) @code{java.lang.Class}.
+
 @defvar <object>
 An arbitrary Scheme value - and hence an arbitrary Java object.
+@end defvar
+
+@defvar <number>
+The type of Scheme numbers.
 @end defvar
 
 @defvar <integer>
@@ -1230,13 +1245,61 @@ The type of Scheme vectors.
 The type of Scheme procedures.
 @end defvar
 
+@defvar <input-port>
+The type of Scheme input ports.
+@end defvar
+
+@defvar <output-port>
+The type of Scheme output ports.
+@end defvar
+
 More will be added later.
 
 In addition, any Java type can be named using this syntax.
 For example @code{<java.lang.StringBuffer[]>} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
-@node Miscellaneous,  , Standard Types, Extensions
+@node Processes, Miscellaneous, Standard Types, Extensions
+@section Processes
+
+@defun make-process command envp
+Creates a @code{<java.lang.Process>} object, using the specified
+@var{command} and @var{envp}.
+The @var{command} is converted to an array of Java strings
+(that is an object that has type @code{<java.lang.String[]>}.
+It can be a Scheme vector or list (whose elements should be
+Java strings or Scheme strings);  a Java array of Java strings;
+or a Scheme string.  In the latter case, the command is converted
+using @code{command-parse}.
+The @var{envp} is process environment;  it should be either
+a Java array of Java strings, or the special @code{#!null} value.
+@end defun
+
+@defun system command
+Runs the specified @var{command}, and waits for it to finish.
+Returns the return code from the command.  The return code is an integer,
+where 0 conventionally means successful completion.
+The @var{command} can be any of the types handled by @code{make-process}.
+@end defun
+
+@defvar command-parse
+The value of this variable should be a one-argument procedure.
+It is used to convert a command from a Scheme string to a Java
+array of the constituent "words".
+The default binding, on Unix-like systems, returns a new command to
+invoke @code{"/bin/sh" "-c"} concatenated with the command string;
+on non-Unix-systems, it is bound to @code{tokenize-string-to-string-array}.
+@end defvar
+
+@defun tokenize-string-to-string-array command
+Uses a @code{java.util.StringTokenizer} to parse the @var{command} string
+into an array of words.  This splits the @var{command} using spaces
+to delimit words; there is no special processing for quotes or other
+special characters.
+(This is the same as what @code{java.lang.Runtime.exec(String)} does.)
+@end defun
+
+@node Miscellaneous,  , Processes, Extensions
 @section Miscellaneous
 
 @defun scheme-implementation-version
@@ -1287,9 +1350,7 @@ current @code{(interaction-environment)};  if not (the default),
 a new top-level environment is created.
 
 You can create multiple top-level window that can co-exist.
-These run in separate threads.  However, because of some unknown
-thread dependency, these windows will not work if you started an
-non-window command-loop.
+They run in separate threads.
 @end defun
 
 @defun apply proc [arg1 ...] args
@@ -1300,6 +1361,22 @@ primitive Java array.
 Calls the @var{proc} (which must be a procedure), using as arguments
 the @var{arg1}... values plus all the elements of @var{args}.
 @end defun
+
+@deffn Syntax constant-fold proc arg1 ...
+Same as @code{(@var{proc} @var{arg1} ...)}, unless @var{proc} and
+all the following arguments are compile-time constants.
+(That is:  They are either constant, or symbols that have a global
+binding and no lexical binding.)  In that case, @var{proc}
+is applied to the arguments at compile-time, and the result replaces
+the @code{constant-fold} form.  If the application raises an exception,
+a compile-time error is reported.
+For example:
+@example
+(constant-fold vector 'a 'b 'c)
+@end example
+is equivalent to @code{(quote #(a b c))}, assuming @code{vector}
+has not been re-bound.
+@end deffn
 
 @deffn Syntax when condition form...
 If @var{condition} is true, evaluate each @var{form} in order,
@@ -1324,6 +1401,7 @@ Returns @code{#t} iff @var{value} is an instance of type @var{type}.
 @defun as type value
 Converts or coerces @var{value} to a value of type @var{type}.
 Throws an exception if that cannot be done.
+Not supported for @var{type} to be a primitive type such as @code{<int>}.
 @end defun
 
 @node Compiling, Low-level functions, Extensions, Top
@@ -1742,7 +1820,7 @@ For the @code{Environment} in most cases you could use
 @samp{Environment.current()}.
 
 @node Reporting Bugs, License, Low-level functions, Top
-@chapter Reporting Bugs
+@chapter Reporting Bugs and the Kawa Mailing List
 
 If you have a problem installing or using Kawa,
 send mail to @code{kawa@@cygnus.com}
@@ -1751,16 +1829,18 @@ This mailing list is used for reporting bugs, patches, discussing
 changes to Kawa, and announcing snapshots.  If you wish to subscribe
 (or later unsubscribe), send a request to @code{kawa-request@@cygnus.com}.
 
-Messages to the mailing list are archived
-at @url{http://www.cygnus.com/ml/kawa/}.
+Messages to the mailing list are now
+@uref{http://www.cygnus.com/ml/kawa/, archived}.
 
 @node License,  , Reporting Bugs, Top
 @chapter License
 
 This is the license for the Kawa software:
 
-Note that the Kawa distribution includes two packages @code{gnu.bytecode}
-and @code{gnu.math} which have different terms than Kawa itself
+Note that the Kawa distribution includes two
+packages @uref{http:../gnu.bytecode/,gnu.bytecode}
+and @uref{http:../gnu.math/,gnu.math}
+which have different terms than Kawa itself
 (but which impose no restrictions as long as you do not modify
 those two packages).
 

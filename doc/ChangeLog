@@ -1,3 +1,9 @@
+Tue Mar 10 22:25:38 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (install-html):  New rule to install html.
+	* kawa.texi:  Docuemnt system and related process stuff in new section.
+	Add various urls.  Various other tweaks.
+
 Tue Mar  3 19:23:23 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Document --main and --version flags.

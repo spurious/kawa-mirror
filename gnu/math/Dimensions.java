@@ -1,5 +1,5 @@
 // Copyright (c) 1997  Per M.A. Bothner.
-// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
 

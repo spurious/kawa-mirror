@@ -7,6 +7,11 @@
 	(id, counter):  Remove debugging fields.
 	(apply1, applyN):  Remove methods.
 	(apply):  New method.
+	* kawa/standard/call_with_values.java (apply):  Use checkN.
+	* kawa/standard/callcc.java:  Extend MethodProc, not Procedure1.
+	(apply(Procedure), apply1):  Remove methods.
+	(numArgs, match1, apply):  New methods.
+	* kawa/standard/load.java (loadCompiled):  Always assume ModuleBody.
 
 2004-08-08  Per Bothner  <per@bothner.com>
 

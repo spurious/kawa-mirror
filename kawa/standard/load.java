@@ -76,13 +76,8 @@ public class load extends Procedure1 {
 	loader.loadAllClasses();
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	Object proc = clas.newInstance ();
-	if (proc instanceof ModuleBody)
-	  {
-	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(proc, env);
-	    ((ModuleBody) proc).run();
-	  }
-	else
-	  ((CallFrame) proc).apply0();
+	gnu.kawa.reflect.ClassMemberConstraint.defineAll(proc, env);
+	((ModuleBody) proc).run();
       }
     catch (java.io.IOException ex)
       {

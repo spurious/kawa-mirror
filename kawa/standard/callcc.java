@@ -8,40 +8,42 @@ import gnu.mapping.*;
  * @author Per Bothner
  */
 
-public class callcc extends Procedure1
+public class callcc extends MethodProc
 {
-  /** Call a precedure with the current continuation. */
-  public static Object apply (Procedure proc) throws Throwable
+  public int numArgs() { return 0x1001; }
+
+  public int match1 (Object proc, CallContext ctx)
   {
-    kawa.lang.Continuation cont = new kawa.lang.Continuation ();
+    if (! (proc instanceof Procedure))
+      return NO_MATCH_BAD_TYPE;
+    return super.match1(proc, ctx);
+  }
+
+  public void apply (CallContext ctx)  throws Throwable
+  {
+    Procedure proc = (Procedure) ctx.value1;
+    Continuation cont = new Continuation(ctx);
+    proc.check1(cont, ctx);
+    proc = ctx.proc;
+    ctx.proc = null;
     try
       {
-	return proc.apply1 (cont);
+	proc.apply(ctx);
+	ctx.runUntilDone();
       }
     catch (CalledContinuation ex)
       {
 	if (ex.continuation != cont)
 	  throw ex;
-	return ex.value;
+	Object[] values = ex.values;
+	int nvalues = values.length;
+	for (int i = 0;  i < nvalues;  i++)
+	  ctx.consumer.writeObject(ex.values[i]);
       }
     finally
       {
 	cont.invoked = true;
       }
-  }
-
-  public Object apply1 (Object arg1) throws Throwable
-  {
-    Procedure proc;
-    try
-      {
-	proc = (Procedure) arg1;
-      }
-    catch (ClassCastException ex)
-      {
-	throw new GenericError ("argument to call/cc is not procedure");
-      }
-    return apply (proc);
   }
 
   /*

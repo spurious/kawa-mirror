@@ -18,22 +18,21 @@ public class call_with_values extends Procedure2
     return callWithValues((Procedure) producer, (Procedure) consumer);
   }
 
-  public void apply (CallContext stack) throws Throwable
+  public void apply (CallContext ctx) throws Throwable
   {
     Procedure.checkArgCount(this, 2);
-    Object[] args = stack.getArgs();
+    Object[] args = ctx.getArgs();
     Object values = ((Procedure) args[0]).apply0 ();
     Procedure consumer = (Procedure) args[1];
     if (values instanceof Values)
       {
 	args = ((Values) values).getValues();
-	stack.setArgsN(args);
+	consumer.checkN(args, ctx);
       }
     else
       {
-	stack.setArgs(values);
+	consumer.check1(values, ctx);
       }
-    consumer.apply(stack);
   }
 }
 

@@ -1,3 +1,15 @@
+Changes from Kawa 1.6.52 to 1.6.53
+==================================
+Added string-upcase!, string-downcase!, string-capitalize!, string-upcase,
+string-downcase, and string-capitalize;  compatible with Slib.
+
+Character constants can now use octal notation (as in Guile).
+
+A format function, similar to that in Common Lisp (and Slib) has been
+added.
+
+The default parameter of a #!optional or #!key parameter can now be #!null.
+
 Changes since Kawa 1.6.51
 =========================
 The "record" feature has been changed to that a "record-type descriptor"

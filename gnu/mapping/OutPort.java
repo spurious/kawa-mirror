@@ -290,6 +290,13 @@ class BufferedPort extends FilterWriter
   void flushLocal()
     throws IOException
   {
+    if (out == null)
+      {
+        char[] newBuffer = new char[2 * buffer.length];
+        System.arraycopy(buffer, 0, newBuffer, 0, bufWritePos);
+        buffer = newBuffer;
+        return;
+      }
     int i = bufWritePos;
     for (;;)
       {
@@ -313,6 +320,8 @@ class BufferedPort extends FilterWriter
   public void flush()
     throws IOException
   {
+    if (out == null)
+      return;
     flushLocal();
     out.flush();
   }
@@ -333,7 +342,12 @@ class BufferedPort extends FilterWriter
   public void close()
     throws IOException
   {
-    flushLocal();
-    out.close();
+    if (out != null)
+      {
+        flushLocal();
+        out.close();
+        out = null;
+      }
+    buffer = null;
   }
 }

@@ -22,6 +22,7 @@ java_JAVA=\
   NameMap.java \
   Named.java \
   OutPort.java \
+  CharArrayOutPort.java \
   Printable.java \
   ProcLocation.java \
   Procedure.java \

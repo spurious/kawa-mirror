@@ -1,3 +1,10 @@
+1999-11-03  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (flushLocal):  If out is null, expand buffer.
+	(flush, close):  Don't flush if out == null.
+	* CharArrayOutPort.java:  New class.
+	* Makefile.am, Makefile.in (java_JAVA):  Add CharArrayOutPort.java.
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	* Values.java (values):  Renamed to getValues.

@@ -1,5 +1,10 @@
 TO BE DONE FOR 2.0:
 
+Let LineBufferedReader pos, limit, buffer be private,
+but provide methods to get/set them.
+
+Fix scheme-window so #!eof closes window.
+
 Implement source-filename source-line source-column macros.
 Macro-expansions lose line number information.
 Fix when switching to syntatic closures.
@@ -10,7 +15,7 @@ becomes: (prim-virtual-method <TYPE> 'NAME <RTYPE> <ARG1> ...)
 
 Combine primitive field with record facility and define-class.
 
-Support presistence and serialization of Scheme values.
+Support persistence and serialization of Scheme values.
 
 Allow the type of an Expression to be other than Object.
 Use type declarations and (local) type inference.

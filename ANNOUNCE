@@ -1,77 +1,51 @@
 To: java@relog.ch
-Subject: code/misc/Kawa - Scheme compiler and runtime v. 1.2
+To: linux-announce@news.ornl.gov
+Subject: Kawa 1.6.1 Scheme compiler and runtime in Java
 --------
-SUBJECT 
-  code/misc/Kawa - Scheme compiler and runtime v. 1.2
-
 URL
   http://www.cygnus.com/~bothner/kawa.html  (Information)
-  ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz  (Code)
-  ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip  (Application)
+  ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz  (Code)
+  ftp://ftp.cygnus.com/pub/bothner/kawa-current-compiled.zip  (Application)
+  ftp://ftp.cygnus.com/pub/bothner/kawa_1.6.1_all.deb (Debian package)
 
 DESCRIPTION
-  Kawa (pronounced kava) is a Scheme interpreter written completely in Java.
+  Kawa (pronounced kava) is a Scheme evaluator written completely in Java.
   Scheme procedures are compiled into Java bytecodes for efficiency.
+
+  This is a fairly complete implementation of Scheme, with many useful
+  extensions, but general tail-call-elimination and continuations
+  are not supported yet.
 
   The release includes a number of useful classes, including
   a package that makes it easy to create .class files, and
   powerful Number classes.
 
   The full sources and documentation is available by anonymous ftp
-  from ftp.cygnus.com, in pub/bothner/kawa-1.2.tar.gz.
+  from ftp.cygnus.com, in pub/bothner/kawa-current.tar.gz.
 
   The pre-compiled .class files (only) are in the same directory
-  in kawa-1.2-compiled.tar.gz.
+  in kawa-current-compiled.tar.gz.
 
 VERSION
-  Kawa 1.2.
+  Kawa 1.6.1.
 
 CHANGES
 
-  Added primitives to make it easy to call arbitrary Java methods
-  from Scheme.
+  There have been many changes since the last public release.
+  Major ones include access to Java fields and arrays;  exception
+  handling (low-level try-catch as well as Guile's catch/throw);
+  internationalized ports with a programmable promt and transcript;
+  ability to compile a stand-alone Scheme application;  various
+  optimizations;  numerous new procedures;  and a better home page,
+  including javadoc internals documentation and a mail archive.
+  See http://www.cygnus.com/~bothner/kawa/News.txt.
 
-  Exact rational arithetic is now fully implemented.
-  All integer functions now believed to correctly handle bignums.
-  Logical operations on exact integers have been implemented.
-  These include all the logical functions from Guile.
+  There is now a .deb package file for easy installation on Debian
+  GNU/Linux systems.
 
-  Complex numbers are implemented (except {,a}{sin,cos,tan}).
-  Quantities (with units) are implemented (as in DSSSL).
-
-  Eval is available, as specified for R5RS.
-  Also implemented are scheme-report-environment, null-environment, and
-  interaction-environment.
-
-  Internal define is implemented.
-
-  Rough support for multiple threads is implemented.
-
-  Moved kawa class to kawa/repl.  Merged in kawac (compiler)
-  functionality.  A 'kawa' shell-script is now created.
-  This is now the preferred interface to both the interactive
-  evaluator and the compiler (on Unix-like systems).
-
-  Now builds "without a snag" using Cafe 1.51 under Win95.
-  (Symantec JIT (ver 2.00b19) requires disabling JIT - JAVA_COMPCMD=disable.)
-  Compiles under JDK 1.1 beta (with some warnings).
-
-  A testsuite (and testing framework) was added.
-
-  Documentation moved to doc directory.
-  There is now an internals overview, in doc/kawa-tour.ps.
 
 PRICE
   Free for commercial and non-commercial use.
-
-SOURCE
-  Included
-
-AUTHOR
-  Per Bothner <bothner@cygnus.com>
-
-CONTACT
-  Per Bothner <bothner@cygnus.com>.
 
 	--Per Bothner
 Cygnus Solutions     bothner@cygnus.com     http://www.cygnus.com/~bothner

@@ -137,37 +137,10 @@ public class ApplyExp extends Expression
 	    if (value != null && value instanceof QuoteExp) 
 	      {
 		Object quotedValue = ((QuoteExp) value).getValue();
-		Procedure proc;
-		String msg = null;
-		if (! (quotedValue instanceof Procedure))
-		  {
-		    proc = null;
-		    msg = "calling " + func_name + " which is not a procedure";
-		  }
-                else if (checkInlineable && quotedValue instanceof Inlineable)
+		if (checkInlineable && quotedValue instanceof Inlineable)
                   {
                     ((Inlineable) quotedValue).compile(exp, comp, target);
                     return;
-                  }
-		else
-		  {
-		    proc = (Procedure) quotedValue;
-		    msg = WrongArguments.checkArgCount(proc, args_length);
-		  }
-		if (msg != null)
-		  comp.error('w', msg);
-		else
-		  {
-		    PrimProcedure pproc
-		      = PrimProcedure.getMethodFor(proc, func_decl, exp.args,
-						   comp.getInterpreter());
-		    if (pproc != null)
-		      {
-			if (! pproc.getStaticFlag())
-			  func_decl.base.load(comp);
-			pproc.compile(null, exp.args, comp, target);
-			return;
-		      }
 		  }
 	      }
 	  }
@@ -180,16 +153,6 @@ public class ApplyExp extends Expression
             if (checkInlineable)
               {
                 ((Inlineable) proc).compile(exp, comp, target);
-                return;
-              }
-
-            // If it wasn't inlineable, we already checked for this in Translator.
-            PrimProcedure pproc
-              = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
-            if (pproc != null)
-              {
-                exp = new ApplyExp(pproc, exp.args);
-                ((Inlineable) pproc).compile(exp, comp, target);
                 return;
               }
           }
@@ -412,9 +375,9 @@ public class ApplyExp extends Expression
 
   protected void walkChildren(ExpWalker walker)
   {
-    func = func.walk(walker);
+    func = walker.walk(func);
     if (walker.exitValue == null)
-      args = walker.walkExps(args);
+      args = walker.walkExps(args, args.length);
   }
 
   public void print (OutPort out)

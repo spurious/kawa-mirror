@@ -729,7 +729,7 @@ public class Compilation
 
     // Do various code re-writes and optimization.
     PushApply.pushApply(lexp);
-    InlineCalls.inlineCalls(lexp);
+    InlineCalls.inlineCalls(lexp, this);
     ChainLambdas.chainLambdas(lexp, this);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
@@ -1529,17 +1529,6 @@ public class Compilation
   public void freeLocalField (Field field)
   {
     // FIXME
-  }
-
-  public void error(char severity, String filename, int line, int column, String message)
-  {
-    error(new gnu.text.SourceError(severity, filename, line, column, message));
-  }
-
-  public void error(gnu.text.SourceError err)
-  {
-    // FIXME - use SourceMessages framework!
-    System.err.println(err);
   }
 
   /** This may not make sense, except for Lisp-like languages.

@@ -1,3 +1,15 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compile):  Pass this to InlineCalls.
+	* InlineCalls.java (inlineCalls):  Save Compilation and messages.
+	(walkApplyExp):  Check for correct argument count.
+	Resolve known procedures to PrimProcedure.  This used to be done
+	in ApplyExp, but it is better to do it earlier.
+	* ApplyExp.java (walkChildren):  Inline 1-argument walkExps.
+	(compile):  Don't check argument count or look for PrimProcedure here.
+
+	* Compilation.java (error):  Remove no-longer used methods.
+
 2002-07-24  Per Bothner  <per@bothner.com>
 
 	* Compilation.java:  Merge in functionality of Parser.java.

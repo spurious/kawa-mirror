@@ -1,61 +1,73 @@
 package gnu.expr;
-import gnu.mapping.Procedure;
+import gnu.mapping.*;
+import gnu.text.*;
 
 public class InlineCalls extends ExpWalker
 {
-  public static void inlineCalls (Expression exp)
+  Compilation comp;
+
+  public static void inlineCalls (Expression exp, Compilation comp)
   {
     InlineCalls walker = new InlineCalls();
-    exp.walk(walker);
-    //or:  walter.walkExpression(exp);
+    walker.comp = comp;
+    walker.messages = comp.getMessages();
+    walker.walk(exp);
   }
 
   protected Expression walkApplyExp(ApplyExp exp)
   {
     super.walkApplyExp(exp);
     LambdaExp lambda = null;
+    int nargs = exp.getArgCount();
     if (exp.func instanceof LambdaExp)
       lambda = (LambdaExp) exp.func;
-    if (exp.func instanceof QuoteExp)
-      {
-	Object proc = ((QuoteExp) exp.func).getValue();
-	if (proc instanceof CanInline)
-	  {
-	    return ((CanInline) proc).inline(exp, this);
-	  }
-      }
+    Expression func = exp.func;
+    Declaration decl = null;
     if (exp.func instanceof ReferenceExp)
       {
-        Declaration decl = ((ReferenceExp) exp.func).binding;
+        decl = ((ReferenceExp) exp.func).binding;
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
-            Object proc = decl.getValue();
-	    if (proc instanceof LambdaExp) 
-	      lambda = (LambdaExp) proc;
-            if (proc instanceof QuoteExp)
-              proc = ((QuoteExp) proc).getValue();
-            if (proc instanceof CanInline)
-              return ((CanInline) proc).inline(exp, this);
-            // if (proc instanceof Procedure)
-	    // {
-	    //   PrimProcedure mproc
-	    //    = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
-	    //   if (mproc != null)
-	    //     return new QuoteExp(mproc);
-	    // }
+            func = decl.getValue();
+	    if (func instanceof LambdaExp) 
+	      lambda = (LambdaExp) func;
+	  }
+      }
+    if (func instanceof QuoteExp)
+      {
+	Object fval = ((QuoteExp) func).getValue();
+	if (! (fval instanceof Procedure))
+	  return noteError(decl == null ? "called value is not a procedure"
+			   : ("calling " + decl.getName()
+			      + " which is not a procedure"));
+	Procedure proc = (Procedure) fval;
+	String msg = WrongArguments.checkArgCount(proc, nargs);
+	if (msg != null)
+	  return noteError(msg);
+	if (proc instanceof CanInline)
+	  return ((CanInline) proc).inline(exp, this);
+	PrimProcedure mproc
+	  = PrimProcedure.getMethodFor(proc, decl, exp.args,
+				       comp.getInterpreter());
+	if (mproc != null)
+	  {
+	    if (mproc.getStaticFlag())
+	      return new ApplyExp(mproc, exp.args);
+	    Expression[] margs = new Expression[1 + nargs];
+	    System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+	    margs[0] = new ReferenceExp(decl.base);
+	    return new ApplyExp(mproc, margs);
 	  }
       }
     if (lambda != null)
       {
 	int args_length = exp.args.length;
-        String msg = null;
-	if (args_length < lambda.min_args)
-          msg = "too few args for ";
-	else if (lambda.max_args >= 0 && args_length > lambda.max_args)
-          msg = "too many args "+args_length+" for ";
-	// FIXME make error message
+	String msg = WrongArguments.checkArgCount(lambda.getName(),
+						  lambda.min_args,
+						  lambda.max_args,
+						  args_length);
 	if (msg != null)
-	  System.err.println("bad call: "+msg+lambda.getName());
+	  return noteError(msg);
       }
     return exp;
   }

@@ -12,15 +12,6 @@ public class Symbols
   {
   }
 
-  public static final String makeUninterned (String str)
-  {
-    str = new String(str);
-    /* DEBUGGING:
-    gensyms.addElement(str);
-    */
-    return str;
-  }
-
   private static int gensym_counter;
 
   /* DEBUGGING:

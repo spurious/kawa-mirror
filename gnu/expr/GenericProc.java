@@ -9,7 +9,7 @@ import gnu.bytecode.Type;
 
 public class GenericProc extends MethodProc
 {
-  MethodProc[] methods;
+  protected MethodProc[] methods;
   int count;
   int minArgs;
   int maxArgs;
@@ -28,7 +28,16 @@ public class GenericProc extends MethodProc
     return minArgs | (maxArgs << 12);
   }
 
-  public void add(MethodProc method)
+  protected synchronized void add (MethodProc[] procs)
+  {
+    int n = procs.length;
+    if (methods == null)
+      methods = new MethodProc[n];
+    for (int i = 0;  i < n;  i++)
+      add(procs[i]);
+  }
+
+  public synchronized void add(MethodProc method)
   {
     if (methods == null)
       methods = new MethodProc[8];
@@ -49,14 +58,14 @@ public class GenericProc extends MethodProc
     if (i < count)
       System.arraycopy(methods, i, methods, i + 1, count - i);
     methods[i] = method;
-    count++;
 
     int n = method.minArgs();
-    if (n < minArgs)
+    if (n < minArgs || count==0)
       minArgs = n;
     n = method.maxArgs();
     if (n == -1 || n > maxArgs)
       maxArgs = n;
+    count++;
   }
 
   /* Possibly optimization.  Likewise for apply0, apply2, apply3, apply4.

@@ -1,3 +1,13 @@
+2004-12-05  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java (methods): Make protected, for new ClassMethodProc.
+	(add): New method overloading.  Make synchronized.
+	Fix bug where minArgs didn't get changed from 0.
+	* PrimProcedure.java (getMethodFor): Add method overloadings.
+	Check for GenericProc.
+	
+	* Symbols.java (makeUninterned): Remove unused method.
+
 2004-12-02  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (tailCall): Turn field into flag.

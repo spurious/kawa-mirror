@@ -531,19 +531,44 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 					    Expression[] args,
 					    Interpreter interpreter)
   {
+    int nargs = args.length;
+    Type[] atypes = new Type[nargs];
+    for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
+    return getMethodFor(pproc, decl, atypes, interpreter);
+  }
+
+  public static PrimProcedure getMethodFor (Procedure pproc, Declaration decl,
+					    Type[] atypes,
+					    Interpreter interpreter)
+  {
+    if (pproc instanceof GenericProc)
+      {
+	GenericProc gproc = (GenericProc) pproc;
+	MethodProc[] methods = gproc.methods;
+	pproc = null;
+	for (int i = gproc.count;  --i >= 0; )
+	  {
+	    int applic = methods[i].isApplicable(atypes);
+	    if (applic < 0)
+	      continue;
+	    if (pproc != null)
+	      return null; // Ambiguous.
+	    pproc = methods[i];
+	  }
+	if (pproc == null)
+	  return null;
+      }
     if (pproc instanceof PrimProcedure)
       {
 	PrimProcedure prproc = (PrimProcedure) pproc;
-	int nargs = args.length;
-	Type[] atypes = new Type[nargs];
-	for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
 	if (prproc.isApplicable(atypes) >= 0)
 	  return prproc;
       }
     Class pclass = getProcedureClass(pproc);
     if (pclass == null)
       return null;
-    return getMethodFor(pclass, pproc.getName(), decl, args, interpreter);
+    return getMethodFor((ClassType) Type.make(pclass), pproc.getName(),
+			decl, atypes, interpreter);
   }
 
   public static Class getProcedureClass (Object pproc)
@@ -577,12 +602,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   getMethodFor (ClassType procClass, String name, Declaration decl,
                 Expression[] args, Interpreter interpreter)
   {
-    PrimProcedure best = null;
-    int bestCode = -1;
     int nargs = args.length;
-    boolean bestIsApply = false;
     Type[] atypes = new Type[nargs];
     for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
+    return getMethodFor(procClass, name, decl, atypes, interpreter);
+  }
+
+  public static PrimProcedure
+  getMethodFor (ClassType procClass, String name, Declaration decl,
+		Type[] atypes, Interpreter interpreter)
+  {
+    PrimProcedure best = null;
+    int bestCode = -1;
+    boolean bestIsApply = false;
     try
       {
         if (name == null)

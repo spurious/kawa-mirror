@@ -242,8 +242,8 @@ public class ModuleExp extends LambdaExp
   {
     if (directory == null || directory.length() == 0)
       directory = "";
-    else if (directory.charAt(directory.length() - 1) != '/')
-      directory = directory + '/';
+    else if (directory.charAt(directory.length() - 1) != File.separatorChar)
+      directory = directory + File.separatorChar;
     String name = getName();
     if (name != null)
       {

@@ -188,6 +188,20 @@ public class LitTable implements ObjectOutput
 	  {
 	    // nothing to do
 	  }
+	else if (obj instanceof Integer)
+	  push(obj, Type.int_type);
+	else if (obj instanceof Short)
+	  push(obj, Type.short_type);
+	else if (obj instanceof Byte)
+	  push(obj, Type.byte_type);
+	else if (obj instanceof Long)
+	  push(obj, Type.long_type);
+	else if (obj instanceof Double)
+	  push(obj, Type.double_type);
+	else if (obj instanceof Float)
+	  push(obj, Type.float_type);
+	else if (obj instanceof Character)
+	  push(obj, Type.char_type);
 	else
 	  error(obj.getClass().getName()+" does not implement Externalizable");
 	int nargs = stackPointer - oldStack;

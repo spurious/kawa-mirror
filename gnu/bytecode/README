@@ -1,71 +1,8 @@
 The gnu.bytecode package contains classes to generate, read, write,
 and print Java bytecode (.class) files.
 
-It is used by Kawa to compile Scheme into bytecodes;  it should be useful
-for other languages that need to be compiled into Java bytecodes.
-(An interesting exercise would be an interactive Java expression evaluator.)
+The file overview.html gives some information about this class.
+It is the basis for the home page for this package:
+    http://www.cygnus.com/~bothner/gnu.bytecode/
 
-The most important class is ClassType.  This contains information
-about a single class.  Note that the difference between ClassType
-and java.lang.Class is that the latter only represents existing
-classes that have been loaded into the Java VM;  in contrast,
-ClassType can be used to build new classes incrementally and on the fly.
-
-A ClassType has a list of Field objects;  new ones can be added using
-the various addField methods.  A ClassType manages a ConstantPool.
-It also has a list of Method objects;  new ones can be created
-by the various addMethod objects.
-
-A Method contains many methods you can use to generate bytecode.
-See Kawa for examples.
-
-Once you have finished generating a ClassType, you can write it to
-a .class file with the writeToFile method.  You can also make a
-byte array suitable for ClassLoader.defineClass using the writeToArray
-method.  This is used by Kawa to compile and immediately load a class.
-
-You can also print out the contains of a ClassType in human-readable
-form using the class ClassTypeWriter.  This prints a fair bit of
-information of the generated class, but it does not print the actual
-code (i.e. there is no dis-assembler yet),
-
-You can also build a ClassType by reading it from an existing .class
-file by using a ClassFileInput class.  This reads the constant
-pool, the fields, methods, superclass, and interfaces;  however
-it currently skips many of the attributes (including the code attribute).
-The gnu.bytecode.dump class has a main method that prints out
-the information in a named class file.
-
-Zip archive manager
--------------------
-To build, extract, list, or print a zip file, you can use ZipArchive
-as an application:
-	java gnu.bytecode.ZipArchive [txpq] acrhive [file ...]
-See the comments for ZipArchive.main.
-ZipArchive does not do compression or uncompressions, and it is reported
-that that some programs do not like the archives it creates.
-It is probably best suited for listing and extracting from classes.zip-like
-archives.  (It should probably be re-written using JDK 1.1.)
-
-Class file dumper
------------------
-To print out the contents of a class file foo.class, you can use
-ClassTypeWriter as an application:
-	java gnu.bytecode.ClassTypeWriter foo.class
-This will print out the constant pool, fields, methods, superclass,
-and implemented interfaces of class foo.
-It currently skips all attributes, including the Code atribute.
-It is useful for printing out detailed information about the constant
-pool, which javap does not do.
-
-License
--------
-See the file COPYING.
-
-Author
-------
-Per Bothner, Cygnus Solutions, bothner@cygnus.com.
-
-Bugs and patches
-----------------
-Send them to bothner@cygnus.com.
+	--Per Bothner, Cygnus Solutions, bothner@cygnus.com.

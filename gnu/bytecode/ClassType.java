@@ -70,6 +70,11 @@ public class ClassType extends Type {
     return set_class_name (to_utf8 (name.replace ('.', '/')));
   }
 
+  public final String getClassName ()
+  {
+    return this_name;
+  }
+
   CpoolClass set_class_name (byte[] name)
   {
     CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
@@ -127,10 +132,17 @@ public class ClassType extends Type {
   Field fields;
   int fields_count;
   Field last_field;
-  int ConstantValue_name_index;  // Constant pool index of "ConstantValue"
-  int Code_name_index;  // Constant pool index of "Code"
+  /**  Constant pool index of "ConstantValue". */
+  int ConstantValue_name_index;
+
+  /** Constant pool index of "Code". */
+  int Code_name_index;
+
   /** Constant pool index of "LocalVariableTable". */
   int LocalVariableTable_name_index;
+
+  /** Constant pool index of "LineNumberTable". */
+  int LineNumberTable_name_index;
 
   /**
    * Add a new field to this class.
@@ -260,7 +272,7 @@ public class ClassType extends Type {
   public void emit_to_file ()
     throws java.io.IOException
   {
-    emit_to_file ((new String (name, 0)) + ".class");
+    emit_to_file (this_name.replace ('.', '/') + ".class");
   }
 
   public byte[] emit_to_array ()

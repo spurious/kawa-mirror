@@ -514,8 +514,8 @@ public class Method {
   }
 
   /** Compile code to duplicate with offset.
-   * @param size the size of the stack item to duplicate (0, 1 or 2)
-   * @param offset where to insert the result (must be 1 or 2)
+   * @param size the size of the stack item to duplicate (1 or 2)
+   * @param offset where to insert the result (must be 0, 1, or 2)
    * The new words get inserted at stack[SP-size-offset]
    */
   public void compile_dup (int size, int offset)
@@ -531,14 +531,14 @@ public class Method {
 	if (copied1.size > 4)
 	  throw new Error ("using dup for 2-word type");
       }
-    else if (size == 2 && copied1.size <= 4)
+    else if (size != 2)
+      throw new Error ("invalid size to compile_dup");
+    else if (copied1.size <= 4)
       {
 	copied2 = pop_stack_type ();
 	if (copied2.size > 4)
 	  throw new Error ("dup will cause invalid types on stack");
       }
-    else
-      throw new Error ("invalid size to compile_dup");
 
     int code;
     // These are the types of the words (in any) that are "skipped":
@@ -831,16 +831,19 @@ public class Method {
       throw new Error ("bad type in binary operation");
     push_stack_type (type1_raw);
   }
-
-  public void compile_invoke_method (Method method, boolean virtual)
+  public void compile_invoke_method (Method method, int opcode)
   {
     instruction_start_hook (3);
-    for (int i = method.arg_types.length + 1;  --i >= 0; )
+    int arg_count = method.arg_types.length;
+    boolean is_invokestatic = opcode == 184;
+    if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
+      throw new Error
+	("compile_invoke_xxx static flag mis-match method.flags="+method.access_flags);
+    if (!is_invokestatic)
+      arg_count++;
+    while (--arg_count >= 0)
       pop_stack_type ();
-    if (virtual)
-      put1 (182);  // invokevirtual
-    else
-      put1 (183);  // invokenonvirtual
+    put1 (opcode);  // invokevirtual, invokenonvirtual, or invokestatic
     put2 (CpoolRef.get_const (classfile, method).index);
     if (method.return_type != Type.void_type)
       push_stack_type (method.return_type);
@@ -852,12 +855,12 @@ public class Method {
    */
   public void compile_invoke_virtual (Method method)
   {
-    compile_invoke_method (method, true);
+    compile_invoke_method (method, 182);  // invokevirtual
   }
 
   public void compile_invoke_nonvirtual (Method method)
   {
-    compile_invoke_method (method, false);
+    compile_invoke_method (method, 183);  // invokenonvirtual
   }
 
   /** Compile a static method call.
@@ -866,15 +869,7 @@ public class Method {
    */
   public void compile_invoke_static (Method method)
   {
-    if ((method.access_flags & Access.STATIC) == 0)
-      throw new Error ("compile_invoke_static invoked on non-static method");
-    instruction_start_hook (3);
-    for (int i = method.arg_types.length;  --i >= 0; )
-      pop_stack_type (); 
-    put1 (184);  // invokestatic
-    put2 (CpoolRef.get_const (classfile, method).index);
-    if (method.return_type != Type.void_type)
-      push_stack_type (method.return_type);
+    compile_invoke_method (method, 184);  // invokestatic
   }
 
   /** Compile a tail-call to position 0 of the current procewure.
@@ -952,6 +947,28 @@ public class Method {
     compile_fieldop (field, 181);  // putfield
   }
 
+  // The line number table.  Each even entry (starting with index 0) is a PC,
+  // and the following odd entry is the linenumber.
+  short[] linenumber_table;
+  // The number of linenumber (pairs) in linenumber_table.
+  int linenumber_count;
+
+  public void compile_linenumber (int linenumber)
+  {
+    if (linenumber_table == null)
+      linenumber_table = new short[32];
+    else if (2 * linenumber_count >= linenumber_table.length)
+      {
+	short[] new_linenumbers = new short [2 * linenumber_table.length];
+	System.arraycopy (linenumber_table, 0, new_linenumbers, 0,
+			  2 * linenumber_count);
+	linenumber_table = new_linenumbers;
+      }
+    linenumber_table[2 * linenumber_count] = (short) PC;
+    linenumber_table[2 * linenumber_count + 1] = (short) linenumber;
+    linenumber_count++;
+  }
+
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {
@@ -966,6 +983,7 @@ public class Method {
     if (have_code)
       {
 	int local_variable_count = 0;
+	int linenumber_count = this.linenumber_count;
 	VarEnumerator vars = null;
 	if (classfile.emitDebugInfo)
 	  {
@@ -976,12 +994,17 @@ public class Method {
 		  local_variable_count++;
 	      }
 	  }
+	else
+	  linenumber_count = 0;
 	
-	short code_attributes_count
-	  = local_variable_count > 0 ? (short) 1 : (short) 0;
+	int code_attributes_count
+	  = (local_variable_count > 0 ? 1 : 0)
+	  + (linenumber_count > 0 ? 1 : 0);
 	int code_attribute_size = 12 + PC + 8 * exception_table_length;
 	if (local_variable_count > 0)
 	  code_attribute_size += 8 + 10 * local_variable_count;
+	if (linenumber_count > 0)
+	  code_attribute_size += 8 + 4 * linenumber_count;
 	dstr.writeShort (classfile.Code_name_index);
 	dstr.writeInt (code_attribute_size);
 	dstr.writeShort (max_stack);
@@ -1007,6 +1030,18 @@ public class Method {
 		    dstr.writeShort (var.signature_index);
 		    dstr.writeShort (var.offset);
 		  }
+	      }
+	  }
+
+	if (linenumber_count > 0)
+	  {
+	    dstr.writeShort (classfile.LineNumberTable_name_index);
+	    dstr.writeInt (2 + 4 * linenumber_count);
+	    dstr.writeShort (linenumber_count);
+	    for (int i = 0;  i < linenumber_count;  i++)
+	      {
+		dstr.writeShort (linenumber_table[2 * i]);  // start_pc
+		dstr.writeShort (linenumber_table[2 * i + 1]);  // line_number
 	      }
 	  }
       }
@@ -1047,6 +1082,11 @@ public class Method {
 
     if (classfile.emitDebugInfo)
       {
+	if (classfile.LineNumberTable_name_index == 0
+	     && linenumber_count > 0)
+	  classfile.LineNumberTable_name_index
+	    = classfile.get_utf8_const ("LineNumberTable");
+
 	if (classfile.LocalVariableTable_name_index == 0)
 	  classfile.LocalVariableTable_name_index
 	    = classfile.get_utf8_const ("LocalVariableTable");

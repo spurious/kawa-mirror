@@ -1,3 +1,14 @@
+Tue Sep  3 19:44:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* ClassType.java (getClassName):  New method.
+	* Method.java (compile_linenumber):  New method.
+	(LineNumberTable_name_index):  New field.
+	(linenumber_count, linenumber_table):  New fields.
+	(write):  Emit line numbers.
+	(compile_invoke_method):  Generalize to support invokestatic.
+	(compile_invoke_virtual, compile_invoke_nonvirtual,
+	compile_invoke_static):  Update accordingly.
+	
 Sat Jul 20 17:32:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Makefile.am, Makefile.in (OBJ): Add ZipArchive.class.

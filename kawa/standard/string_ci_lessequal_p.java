@@ -6,15 +6,15 @@ import gnu.mapping.Procedure2;
 
 public class string_ci_lessequal_p extends Procedure2
 {
-   public Object apply2 (Object arg1, Object arg2)
-   {
-      if (arg1.toString().toLowerCase().compareTo(
-             arg2.toString().toLowerCase()
-          )<=0) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
+  public static boolean apply (Object arg1, Object arg2)
+  {
+    String s1 = arg1.toString().toLowerCase();
+    String s2 = arg2.toString().toLowerCase();
+    return s1.compareTo(s2) <= 0;
    }
 
+  public Object apply2 (Object arg1, Object arg2)
+  {
+    return apply(arg1, arg2) ? Boolean.TRUE : Boolean.FALSE;
+  }
 }

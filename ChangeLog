@@ -1,3 +1,61 @@
+2000-05-27  Per Bothner  <per@bothner.com>
+
+	* M ChangeLog
+M NEWS
+M TODO
+cvs server: Updating debian
+cvs server: Updating doc
+M doc/Makefile.am
+M doc/Makefile.in
+M doc/kawa.texi
+cvs server: Updating gnu
+M gnu/expr/BindingInitializer.java
+M gnu/expr/ChainLambdas.java
+M gnu/expr/Compilation.java
+M gnu/expr/Declaration.java
+M gnu/expr/ExpWalker.java
+M gnu/expr/FindCapturedVars.java
+M gnu/expr/FindTailCalls.java
+M gnu/expr/LambdaExp.java
+M gnu/expr/LetExp.java
+M gnu/expr/ModuleBody.java
+M gnu/expr/ModuleExp.java
+M gnu/expr/ObjectExp.java
+M gnu/expr/ReferenceExp.java
+M gnu/expr/ScopeExp.java
+M gnu/expr/SetExp.java
+M gnu/kawa/reflect/ClassMemberConstraint.java
+cvs server: Updating gnu/kawa/slib
+M gnu/kawa/slib/ppfile.scm
+M kawa/lang/Lambda.java
+M kawa/lang/Macro.java
+M kawa/lang/Syntax.java
+M kawa/lang/Translator.java
+cvs server: Updating kawa/lib
+M kawa/lib/files.scm
+M kawa/lib/lists.scm
+M kawa/lib/strings.scm
+M kawa/lib/trace.scm
+M kawa/lib/uniform.scm
+M kawa/lib/vectors.scm
+cvs server: Updating kawa/standard
+M kawa/standard/Makefile.am
+M kawa/standard/Makefile.in
+M kawa/standard/Scheme.java
+M kawa/standard/define.java
+M kawa/standard/define_alias.java
+M kawa/standard/define_syntax.java
+M kawa/standard/let.java
+M kawa/standard/letrec.java
+M kawa/standard/require.java
+M kawa/standard/set_b.java
+cvs server: Updating testsuite
+M testsuite/misc-test.scm
+M testsuite/num-test.scm
+M testsuite/obj-test.scm
+M testsuite/test.scm
+
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* confgure.in (AC_OUTPUT):  Add gnu/jemacs/lisp/Makefile.
@@ -54,6 +112,23 @@
 	* kawa/standard/Scheme.java (getNamedType):  Don't hard-wire
 	"elisp:boolean".  Instead, handle "elisp:*".  Also, get an Elisp
 	instance using reflection - in case it isn't available when compiling.
+
+2000-04-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SpecialType.java (interpreter):  New optional field.
+	Call interpreter to handle conversion to/from boolean.
+	* kawa/standard/eq_p.java (interpreter):  New field.  Used to
+	do language-appropriate boolean result.
+	* kawa/standard/equal_p.java:  Likewise.
+	* kawa/standard/eqv_p.java:  Likewise.
+	* kawa/standard/instance.java:  Likewise.
+	* kawa/standard/not.java (getReturnType):  Get from interpreter.
+	* kawa/standard/Scheme.java
+	(booleanType):  Don't initialize in static constructor.
+	(intType, floatType, etc):  Use new SpecialType constructor.
+	(initSchee):  Pass this to eq_p, eqv_p, equal_p, instance constructors.
+	(getNamedType):  Init boolean here, passing in Scheme.getInstance.
+	Also, handle <elisp:boolean>.
 
 2000-04-22  Per Bothner  <per@bothner.com>
 

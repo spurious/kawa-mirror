@@ -122,14 +122,16 @@ public class ClassMemberConstraint extends Constraint
 	  {
 	    throw new WrappedException("error accessing field "+field, ex);
 	  }
-	if (object instanceof Named)
-	  name = ((Named) object).getName();
-	else
-	  name = name.intern();
 	if (object instanceof Binding)
 	  env.addBinding((Binding) object);
 	else
-	  env.define(name, object);
+	  {
+	    if (object instanceof Named)
+	      name = ((Named) object).getName();
+	    else
+	      name = name.intern();
+	    env.define(name, object);
+	  }
       }
     else
       {

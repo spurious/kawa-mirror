@@ -20,6 +20,8 @@ public class ELispReader extends LispReader
     super(port, messages);
   }
   
+  protected ReadTable getReadTable () { return elispReadTable; }
+
   protected boolean isDelimiter (char ch)
   {
     return (Character.isWhitespace (ch)
@@ -137,238 +139,52 @@ public class ELispReader extends LispReader
     return IntNum.valueOf(str.toString(), base);
   }
 
-  /**
-   * Read a ELisp character literal.
-   * Assumes the initial '?' and has already been read.
-   */
-  protected Object readCharacter()
-    throws java.io.IOException, SyntaxException
-  {
-    int c = read();
-    if (c == '\\')
-      {
-	c = read();
-	if (c != ' ' && c >= 0)
-	  c = readEscape(c);
-      }
-    if (c < 0)
-      {
-	error("unexpected EOF in character literal");
-	c = '?';
-      }
-    return ELisp.getCharacter(c);
-  }
-
-  /** Read a word of alphabetic characters.
-   * @param c the first letter of the word (previously read)
-   * @return the word that was read.
-   */
-
-  public String readAlphaWord (int c)
-       throws java.io.IOException
-  {
-    StringBuffer str = new StringBuffer(20);
-    for (;;)
-      {
-	if (c < 0)
-	  break;
-	if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
-	  str.append ((char) c);
-	else
-	  {
-	    unread(c);
-	    break;
-	  }
-	c = read();
-      }
-    return str.toString();
-  }
-
-  /**
-   * Read a Scheme string literal.
-   * Assume we have already skipped the initial '"'.
-   */
-  protected Object readString()
-      throws java.io.IOException, SyntaxException
-  {
-    StringBuffer obj = new StringBuffer ();
-    boolean inString = true;
-    int c = '\"';
-    int prev;
-    do
-      {
-	int next, v;
-
-	prev = c;
-
-	// Read next char - inline the common case.
-	if (prev == '\r')
-	  {
-	    c = read();
-	    if (c == '\n')
-	      continue;
-	  }
-	else if (port.pos < port.limit && prev != '\n')
-	  c = port.buffer[port.pos++];
-	else
-	  c = read();
-
-	switch (c)
-	  {
-	  case '"':
-	    inString = false;
-            break;
-	  case '\r':
-	    obj.append('\n');
-	    continue;
-	  case '\\':
-	    c = readEscape();
-            if (c == -2)
-	      {
-		c = '\n'; // So prev gets set ...
-		continue;
-	      }
-	    /* ... fall through ... */
-	  default:
-	    if (c < 0)
-	      eofError("unexpected EOF in string literal");
-	    obj.append ((char) c);
-	    break;
-	  }
-      } while (inString);
-    return new FString (obj);
-  }
-
-  protected Object readQuote (String func_symbol)
-      throws java.io.IOException, SyntaxException
-  {
-    return new Pair (func_symbol,
-		     new Pair (readObject (), LList.Empty));
-  }
-
-
-  protected FVector readVector ()
-    throws java.io.IOException, SyntaxException
-  {
-    char saveReadState = ((InPort) port).readState;
-    ((InPort) port).readState = '[';
-     try
-       {
-	 java.util.Vector vec = new java.util.Vector();
-	 for (;;)
-	   {
-	     int c = skipWhitespaceAndComments();
-	     if (c < 0)
-	       eofError("unexpected EOF in vector");
-	     if (c == ']')
-	       break;
-	     vec.addElement(readObject(c));
-	   }
-	 Object[] objs = new Object[vec.size()];
-	 vec.copyInto(objs);
-	 return new FVector(objs);
-       }
-     finally
-       {
-	((InPort) port).readState = saveReadState;
-       }
-  }
- 
-
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
   {
     return (new ScmRead(port)).readObject();
   }
 
-  public Object readObject (int c)
-      throws java.io.IOException, SyntaxException
+  public static ReadTable elispReadTable;
+  static
   {
-    char saveReadState;
-    for (;;)
+    elispReadTable = ReadTable.getInitial();
+    elispReadTable.set('[', new ReaderVector(']'));
+    elispReadTable.set('?', new ELispReadTableEntry('?'));
+  }
+}
+
+class ELispReadTableEntry extends ReaderDispatchMisc
+{
+  public ELispReadTableEntry(int code)
+  {
+    super(code);
+  }
+
+  public Object read (Lexer in, int ch, int count)
+    throws java.io.IOException, SyntaxException
+  {
+    LispReader reader = (LispReader) in;
+    if (code >= 0)
+      ch = code;
+    switch (ch)
       {
-	int next;
-	switch (c)
+      case '?':
+	ch = reader.read();
+	if (ch == '\\')
 	  {
-	  case -1:
-	    return Sequence.eofValue;
-	  case ';':
-	    do
-	      {
-		c = read();
-		if (c < 0) // EOF
-		  return LList.Empty;
-	      } while (c != '\n' && c!= '\r');
-            break;
-	  case ')':
-	    error("An unexpected close paren was read.");
-	  case '(':
-	    return readList();
-	  case '"':
-	    saveReadState = ((InPort) port).readState;
-	    ((InPort) port).readState = '\"';
-	    try
-	      {
-		return readString();
-	      }
-	    finally
-	      {
-		((InPort) port).readState = saveReadState;
-	      }
-	  case '?':
-	    return readCharacter();
-	  case '\'':
-	    return readQuote(Interpreter.quote_sym);
-	  case '`':
-	    return readQuote(Interpreter.quasiquote_sym);
-	  case ',':
-	    String func;
-	    if (peek()=='@')
-	      {
-		skip();
-		func = Interpreter.unquotesplicing_sym;
-	      }
-	    else
-	      func = Interpreter.unquote_sym;
-	    return readQuote (func);
-	  case '[':
-	    return readVector();
-	  case '#':
-	    next = read();
-	    switch (next)
-	      {
-	      case ':':
-		StringBuffer sbuf = new StringBuffer(30);
-		readAtom0(read(), sbuf);
-		return new String(sbuf.toString());
-	      case 'x':  return readInteger(16);
-	      case 'd':  return readInteger(10);
-	      case 'o':  return readInteger(8);
-	      case 'b':  return readInteger(2);
-	      case '\'':
-		return readQuote("function");
-	      case '|':
-		saveReadState = ((InPort) port).readState;
-		((InPort) port).readState = '|';
-		try
-		  {
-		    readNestedComment();
-		  }
-		finally
-		  {
-		    ((InPort) port).readState = saveReadState;
-		  }
-		break;
-	      default:
-		error("An invalid #-construct was read.");
-	      }
-            break;
-	  default:
-	    if (Character.isWhitespace((char)c))
-	      break;
-	    return readAtom(c);
+	    ch = reader.read();
+	    if (ch != ' ' && ch >= 0)
+	      ch = reader.readEscape(ch);
 	  }
-	c = read ();
+	if (ch < 0)
+	  {
+	    reader.error("unexpected EOF in character literal");
+	    ch = '?';
+	  }
+	return ELisp.getCharacter(ch);
       }
+    reader.error("unexpected dispatch character");
+    return null;
   }
 }

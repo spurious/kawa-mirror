@@ -1,18 +1,7 @@
 package kawa.lang;
 
 //-- Java dependancies
-
 import java.util.Hashtable;
-import java.util.Vector;
-
-//-- kawa Primitives
-import kawa.lang.Printable; 
-import kawa.lang.Symbol;
-
-// Exceptions
-import kawa.lang.UnboundSymbol;
-import kawa.lang.WrongArguments;
-import kawa.lang.WrongType;
 
 public class Interpreter extends Object
 {
@@ -24,10 +13,6 @@ public class Interpreter extends Object
   static public Undefined voidObject = new kawa.lang.Undefined();
   static public Symbol eofObject = Symbol.makeUninterned ("#<eof>");
 
-  // Global environment.
-  // Currently maps String -> Object;  should probably be Symbol -> Object.
-  protected java.util.Hashtable globals;
-  
   static public Symbol quote_sym = Symbol.make ("quote");
   static public Symbol unquote_sym = Symbol.make ("unquote");
   static public Symbol unquotesplicing_sym = Symbol.make ("unquote-splicing");
@@ -55,6 +40,13 @@ public class Interpreter extends Object
     return curInterpreter;
   }
 
+  // transitional hack FIXME
+  protected Environment env;
+  public static Environment curEnvironment ()
+  {
+    return curInterpreter.env;
+  }
+
   public Interpreter(InPort i, OutPort o, OutPort e)
   {
       in = i;
@@ -62,19 +54,17 @@ public class Interpreter extends Object
       err = e;
 
       curInterpreter = this;
-
-      globals         = new java.util.Hashtable();
       current_decls   = new java.util.Hashtable();
    }
 
   public void define(String name, Object p)
   {
-    globals.put(name,p);
+    env.put (Symbol.make (name), p);
   }
 
   public void define(Symbol sym, Object p)
   {
-    globals.put(sym.toString (),p);
+    env.define (sym, p);
   }
 
   public static Object lookup_global (Symbol name)
@@ -93,12 +83,12 @@ public class Interpreter extends Object
 
   public Object lookup(java.lang.String name)
   {
-    return globals.get(name);
+    return env.get (Symbol.make (name));
   }
 
   public Object lookup(Symbol name)
   {
-    return globals.get(name.toString ());
+    return env.get (name);
   }
 
    public Pair copy(Pair list) {
@@ -127,7 +117,6 @@ public class Interpreter extends Object
    */
 
   public Expression rewrite_body (Object exp)
-       throws kawa.lang.WrongArguments
   {
     int count = kawa.standard.length.length (exp);
     if (count == 1)
@@ -155,7 +144,6 @@ public class Interpreter extends Object
   int current_column;
 
   final Expression rewrite_car (Pair pair)
-       throws WrongArguments
   {
     if (pair instanceof PairWithPosition)
       return rewrite_with_position (pair.car, (PairWithPosition) pair);
@@ -170,7 +158,6 @@ public class Interpreter extends Object
    * @return the re-written form as an Expression object
    */
   Expression apply_rewrite (Syntax syntax, Object args)
-       throws WrongArguments
   {
     Syntax save_syntax = syntax;
     Object save_args = args;
@@ -247,7 +234,6 @@ public class Interpreter extends Object
   }
 
   public Expression rewrite_pair (Pair p)
-       throws WrongArguments
   {
     Object car = p.car;
     Object cdr = p.cdr;
@@ -256,7 +242,17 @@ public class Interpreter extends Object
 
     if (car instanceof Symbol)
       {
-	Object binding = lookup ((Symbol) car);
+	Symbol sym = (Symbol) car;
+	Object binding = current_decls.get (sym);
+        if (binding != null)
+	  {
+	    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
+	    // to the original Symbol.  Here, use the original Symbol.
+	    if (binding instanceof Symbol)
+	      binding = lookup ((Symbol) binding);
+	  }
+	else
+	  binding = lookup ((Symbol) car);
 	if (binding instanceof Syntax)
 	  return apply_rewrite ((Syntax) binding, cdr);
       }
@@ -278,7 +274,6 @@ public class Interpreter extends Object
    * Re-write a Scheme expression in S-expression format into internal form.
    */
   public Expression rewrite (Object exp)
-       throws WrongArguments
   {
     if (exp instanceof PairWithPosition)
       return rewrite_with_position (exp, (PairWithPosition) exp);
@@ -303,7 +298,6 @@ public class Interpreter extends Object
   }
 
   public Expression rewrite_with_position (Object exp, PairWithPosition pair)
-       throws WrongArguments
   {
     String save_filename = current_filename;
     int save_line = current_line;

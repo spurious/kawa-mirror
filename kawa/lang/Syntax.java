@@ -19,8 +19,7 @@ abstract public class Syntax extends Named implements Printable
    * @param interp the interpreter thatprovides context
    * @return the re-written expression
    */
-  abstract public Expression rewrite (Object obj, Interpreter interp)
-    throws kawa.lang.WrongArguments;
+  abstract public Expression rewrite (Object obj, Interpreter interp);
 
   public void print(java.io.PrintStream ps)
   {

@@ -4,14 +4,14 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .scm .class
 
-JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
-JAVA=java -classpath @TOP_BUILDDIR@:$$CLASSPATH
+JAVA=java -classpath ../..:$$CLASSPATH
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
-java.class:
-	cd $(srcdir); $(JAVAC) $*.java
+.java.class:
+	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	cd ../..; $(JAVA) kawac $< kawa.lib.
+	$(JAVA) kawac -d ../.. $< kawa.lib.
 
 javadir=$(prefix)/java/kawa/lib
 

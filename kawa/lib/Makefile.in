@@ -42,8 +42,8 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .scm .class
 
-JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
-JAVA=java -classpath @TOP_BUILDDIR@:$$CLASSPATH
+JAVA=java -classpath ../..:$$CLASSPATH
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 javadir=$(prefix)/java/kawa/lib
 
@@ -56,6 +56,8 @@ OBJ=\
   when_unless.class
 
 java_DATA=$(OBJ)
+
+EXTRA_DIST = $(OBJ:.class=.scm)
 
 CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
@@ -163,11 +165,11 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-java.class:
-	cd $(srcdir); $(JAVAC) $(<F)
+.java.class:
+	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	cd ../..; $(JAVA) kawac $< kawa.lib.
+	$(JAVA) kawac -d ../.. $< kawa.lib.
 
 all: $(OBJ)
 .SUFFIXES:

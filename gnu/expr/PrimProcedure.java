@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -413,9 +413,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       procClass = ((ModuleMethod) pproc).module.getClass();
     else
       procClass = pproc.getClass();
-    if (procClass.getClassLoader() != systemClassLoader)
-      return null;
-    return procClass;
+    try
+      {
+	if (procClass.getClassLoader() == systemClassLoader)
+	  return procClass;
+      }
+    catch (SecurityException ex)
+      {
+      }
+    return null;
   }
 
   /** Get PrimProcedure for matching method in given class. */

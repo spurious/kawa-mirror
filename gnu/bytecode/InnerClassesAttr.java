@@ -33,10 +33,10 @@ public class InnerClassesAttr  extends Attribute
     dstr.writeShort(count);
     for (int i = 0;  i < count;  i++)
       {
-	dstr.writeShort(data[2 * i]);     // inner_class_info_index
-	dstr.writeShort(data[2 * i + 1]); // outer_class_info_index
-	dstr.writeShort(data[2 * i + 2]); // inner_name_index
-	dstr.writeShort(data[2 * i + 3]); // inner_class_access_flags
+	dstr.writeShort(data[4 * i]);     // inner_class_info_index
+	dstr.writeShort(data[4 * i + 1]); // outer_class_info_index
+	dstr.writeShort(data[4 * i + 2]); // inner_name_index
+	dstr.writeShort(data[4 * i + 3]); // inner_class_access_flags
       }
   }
 

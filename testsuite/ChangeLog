@@ -1,3 +1,14 @@
+Sat Aug 29 11:27:43 1998  Per Bothner  <bothner@cygnus.com>
+
+	* testing.scm (total-expected-count):  New variable.
+	(test-init):  Take optional argument for setting total-expected-count.
+	(report-display, report-newline):  New functions.
+	(test-report):  Check that total matches total-expected-count.
+	* mac-test.scm, num-test.scm, obj-test.scm, polytype.scm, test.scm
+	(test-init):  Add total count of tests.
+
+	* misc-test.scm:  Add new tests for closures.
+
 Fri Jul 10 18:46:27 1998  Per Bothner  <bothner@cygnus.com>
 
 	* polytype.scm:  From Marc Feeley <feeley@IRO.UMontreal.CA>:

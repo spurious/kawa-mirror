@@ -114,7 +114,8 @@ KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_JAVA = \
-  ConsumeProc.java
+  ConsumeProc.java \
+  RangeTable.java
 
 
 PACKAGE_FNAME = gnu-kawa-util

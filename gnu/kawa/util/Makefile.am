@@ -5,7 +5,8 @@ AUTOMAKE_OPTIONS = foreign
 include $(top_srcdir)/Make-rules
 
 java_JAVA=\
-  ConsumeProc.java
+  ConsumeProc.java \
+  RangeTable.java
 
 PACKAGE_FNAME = gnu-kawa-util
 

@@ -1,3 +1,8 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* RangeTable.java:  New class.
+	* Makefile.am:  Update accordingly.
+
 2001-03-29  Per Bothner  <per@bothner.com>
 
 	* Position.java:  Removed - subsumed by gnu.lists.SeqPosition.

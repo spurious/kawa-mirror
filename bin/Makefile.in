@@ -465,8 +465,8 @@ install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
 	if test "@kawa_bin@" = "" ; then \
 	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
-	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa; \
 	fi
+@WITH_GCJ_TRUE@	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -104,5 +104,7 @@ install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
 	if test "@kawa_bin@" = "" ; then \
 	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
-	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa; \
 	fi
+if WITH_GCJ
+	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
+endif

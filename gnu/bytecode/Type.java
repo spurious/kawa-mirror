@@ -13,7 +13,7 @@ public abstract class Type {
    */
   int size;
 
-  Type () { }
+  protected Type () { }
 
   /** The type used to implement types not natively understood by the JVM.
 

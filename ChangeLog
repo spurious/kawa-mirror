@@ -1,4 +1,20 @@
+Fri Jul 19 14:55:52 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/{call_with_input_file,call_with_output_file,
+	char_ready_p,current_input_port,current_output_port,
+	with_input_from_file}.java:  New functions.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}:  Update.
+
 Thu Jul 18 15:04:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Literal.java (emit):  Fix StringBuffer init invocation.
+	* kawa/lang/Vector.java:  Add makeLiteral, print; implement Compilable.
+
+	* kawa/standard/string{,_ci}_{greater,less}thanequal_p.java:
+	Rename to avoid the redundant "than".
+	* kawa/standard/{string_fill_b,vector_fill_b,vector_set_b}.java:
+	Return Interpreter.voidObject.
+	* kawa/standard/string_append.java:  Allow 0 arguments.
 
 	* kawa/standard/{setcar_b,setcar_b).java:  Return voidObject.
 	* kawa/standard/{car,car).java:  Fix exception message.

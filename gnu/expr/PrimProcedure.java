@@ -31,7 +31,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   /** Return true iff the last parameter is a "rest" argument. */
   public boolean takesVarArgs()
   {
-    return method != null && method.getName().endsWith("$V");
+    if (method != null)
+      {
+	String name = method.getName();
+	return name.endsWith("$V") || name.endsWith("$V$X");
+      }
+    return false;
+  }
+
+  public boolean takesContext()
+  {
+    return method != null && method.getName().endsWith("$X");
   }
 
   public int numArgs()
@@ -316,16 +326,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    *   pass a link to a closure environment, which was pushed by our caller.)
    *   If this_type==null, no special handling of args[0] or argTypes[0].
    */
-  public static void compileArgs(Expression[] args,
-				 Type thisType, Type[] argTypes,
-				 boolean variable,
-				 String name, LambdaExp source,
-				 Compilation comp)
+  void compileArgs(Expression[] args, Type thisType, Compilation comp)
  {
+    boolean variable = takesVarArgs();
+    String name = getName();
     Type arg_type = null;
     gnu.bytecode.CodeAttr code = comp.getCode();
     int skipArg = thisType == Type.void_type ? 1 : 0;
     int arg_count = argTypes.length - skipArg;
+    if (takesContext())
+      arg_count--;
     boolean is_static = thisType == null || skipArg != 0;
     int fix_arg_count = variable ? arg_count - 1 : args.length;
     Declaration argDecl = source == null ? null : source.firstDecl();
@@ -405,14 +415,47 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (Type thisType, Expression[] args, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    compileArgs(args, thisType, argTypes,
-		takesVarArgs(), getName(), source, comp);
-    
+    Type stackType = retType;
+    compileArgs(args, thisType, comp);
+
     if (method == null)
       code.emitPrimop (opcode(), args.length, retType);
-    else
+    else if (! takesContext())
       code.emitInvokeMethod(method, opcode());
-    target.compileFromStack(comp, retType);
+    else
+      {
+	comp.loadCallContext();
+	if (target instanceof ConsumerTarget
+	    && ((ConsumerTarget) target).isContextTarget())
+	  {
+	    code.emitInvokeMethod(method, opcode());
+	    return;
+	  }
+	else
+	  {
+	    stackType = Type.pointer_type;
+	    code.pushScope();
+	    Variable saveIndex = code.addLocal(Type.int_type);
+	    comp.loadCallContext();
+	    code.emitInvokeVirtual(Compilation.typeCallContext.
+				   getDeclaredMethod("startFromContext", 0));
+	    code.emitStore(saveIndex);
+	    code.emitWithCleanupStart();
+	    code.emitInvokeMethod(method, opcode());
+	    code.emitWithCleanupCatch(null);
+	    comp.loadCallContext();
+	    code.emitLoad(saveIndex);
+	    code.emitInvokeVirtual(Compilation.typeCallContext.
+				   getDeclaredMethod("cleanupFromContext", 1));
+	    code.emitWithCleanupDone();
+	    comp.loadCallContext();
+	    code.emitLoad(saveIndex);
+	    code.emitInvokeVirtual(Compilation.typeCallContext.
+				   getDeclaredMethod("getFromContext", 1));
+	    code.popScope();
+	  }
+      }
+    target.compileFromStack(comp, stackType);
   }
 
   public Type getParameterType(int index)
@@ -452,6 +495,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 					    Expression[] args,
 					    Interpreter interpreter)
   {
+    if (pproc instanceof PrimProcedure)
+      {
+	PrimProcedure prproc = (PrimProcedure) pproc;
+	int nargs = args.length;
+	Type[] atypes = new Type[nargs];
+	for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
+	if (prproc.isApplicable(atypes) >= 0)
+	  return prproc;
+      }
     Class pclass = getProcedureClass(pproc);
     if (pclass == null)
       return null;

@@ -174,9 +174,12 @@ public class ApplyExp extends Expression
 	  // This is supposed to get caught by InlineCalls.
 	  throw new Error ("internal error - wrong number of parameters for "
 			   + func_lambda);
-	if (func_lambda.getCallConvention() < Compilation.CALL_WITH_CONSUMER
-		 && comp.inlineOk(func_lambda)
-		 && (method = func_lambda.getMethod(args_length)) != null)
+	int conv = func_lambda.getCallConvention();
+	if (comp.inlineOk(func_lambda)
+	    && (conv <= Compilation.CALL_WITH_CONSUMER
+		|| (conv == Compilation.CALL_WITH_TAILCALLS
+		    && ! exp.isTailCall()))
+	    && (method = func_lambda.getMethod(args_length)) != null)
 	  {
 	    PrimProcedure pproc = new PrimProcedure(method, func_lambda);
 	    boolean is_static = method.getStaticFlag();
@@ -195,29 +198,6 @@ public class ApplyExp extends Expression
 		  func_lambda.getOwningLambda().loadHeapFrame(comp);
 	      }
 
-	    /*
-	    Type[] argTypes = method.getParameterTypes();
-	    boolean varArgs = func_lambda.restArgType() != null;
-	    if (func_lambda.isHandlingTailCalls())
-	      {
-		Type[] tmp = new Type[argTypes.length-1];
-		System.arraycopy(argTypes, 0, tmp, 0, tmp.length);
-		argTypes = tmp;
-		PrimProcedure.compileArgs(args,
-					  extraArg > 0 ? Type.void_type : null,
-					  argTypes, varArgs,
-					  func_name, func_lambda, comp);
-		comp.loadCallContext();
-		// FIXME: compile save consumer; consumer = vtstack
-		// i.e. runUntilDone() needs to be partially inlined.
-		code.emitInvoke(method);
-		comp.loadCallContext();
-		// FIXME:  Also restore consumer.
-		code.emitInvoke(comp.typeCallContext.getDeclaredMethod("runUntilValue", 0));
-		target.compileFromStack(comp, func_lambda.getReturnType());
-		return;
-	      }
-	    */
 	    pproc.compile(extraArg ? Type.void_type : null,
 			  args, comp, target);
 	    return;

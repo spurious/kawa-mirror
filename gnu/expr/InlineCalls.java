@@ -75,10 +75,14 @@ public class InlineCalls extends ExpWalker
 	  }
 	else if (rexp.getSymbol() instanceof Symbol)
 	  {
-	    Expression inv
-	      = rewriteToInvocation((Symbol) rexp.getSymbol(), exp);
+	    Symbol symbol = (Symbol) rexp.getSymbol();
+	    Expression inv = rewriteToInvocation(symbol, exp);
 	    if (inv != null)
 	      return inv;
+	    Object fval = symbol.getFunctionValue(null);
+	    if (fval instanceof Procedure)
+	      func = new QuoteExp(fval);
+	    decl = null;
 	  }
 		 
       }
@@ -103,7 +107,7 @@ public class InlineCalls extends ExpWalker
 	    if (mproc != null)
 	      {
 		ApplyExp nexp;
-		if (mproc.getStaticFlag())
+		if (mproc.getStaticFlag() || decl == null)
 		  nexp = new ApplyExp(mproc, exp.args);
 		else
 		  {

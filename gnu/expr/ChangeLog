@@ -16,6 +16,16 @@
 	* Compilation.java (addClass):  Make static modules simpler and more
 	consistent with non-static by using apply method.
 
+	* InlineCalls.java (walkApplyExp):  If function is a Symbol with
+	bound function, use the latter.
+	* PrimProcedure.java (takesContext):  New method.
+	(takesVarArgs):  Check for method name ending with $V$X as well as $V.
+	(compileArgs):  Make non-static and simplify.  Adjust for context arg.
+	(compile):  Handle methods that take context arg.
+	(getMethodFor):  Handle case of incoming PrimProcedure.
+	* ApplyExp.java (compile):  Allow direct invocation of known method if
+	CALL_WITH_CONSUMER or if CALL_WITH_TAILCALLS and not in tail position.
+
 	* FindTailCalls.java (walkApplyExp):  If function is append-values,
 	then last operand may be a tail-call.
 

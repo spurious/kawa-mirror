@@ -42,10 +42,10 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
     Object type = ctx.getNextArg();
     Consumer out = ctx.consumer;
     beginAttribute(type, out);
-    Object arg = ctx.getNextArg();
     Object endMarker = Special.dfault;
     for (;;)
       {
+	Object arg = ctx.getNextArg(endMarker);
 	if (arg == endMarker)
 	  break;
 	if (arg instanceof Consumable)

@@ -27,7 +27,7 @@ public abstract class LispInterpreter extends Interpreter
     throws java.io.IOException, gnu.text.SyntaxException
   {
     gnu.text.SourceMessages messages = lexer.getMessages();
-    kawa.lang.Translator tr = new kawa.lang.Translator(env, messages);
+    kawa.lang.Translator tr = new Translator(this, messages);
     tr.immediate = true;
     lexer.clearErrors();
     PairWithPosition body
@@ -50,7 +50,7 @@ public abstract class LispInterpreter extends Interpreter
 				SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    kawa.lang.Translator tr = new kawa.lang.Translator (environ, messages);
+    kawa.lang.Translator tr = new Translator (this, messages);
         tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     if (Compilation.generateAppletDefault)

@@ -1,3 +1,7 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* BRL.java (parseFile):  Pass this to Translator constructor.
+
 2003-09-04  Per Bothner  <per@bothner.com>
 
 	* BRL.java (getLexer, parseFile):  Change defaultCallConvention

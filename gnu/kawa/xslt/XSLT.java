@@ -41,7 +41,7 @@ public class XSLT extends XQuery
   {
     try
       {
-	Compilation tr = new Compilation(messages);
+	Compilation tr = new Compilation(this, messages);
 	XQParser lexer
 	  = (XQParser) super.getLexer(new CharArrayInPort(string), messages);
 	//lexer.nesting = 1;
@@ -86,7 +86,7 @@ public class XSLT extends XQuery
     lexer.clearErrors();
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     gnu.text.SourceMessages messages = lexer.getMessages();
-    Compilation tr = new Compilation(messages);
+    Compilation tr = new Compilation(this, messages);
     tr.immediate = true;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(lexer.getName());
@@ -108,7 +108,7 @@ public class XSLT extends XQuery
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(messages);
+    Compilation tr = new Compilation(this, messages);
     tr.immediate = immediate;
     tr.mustCompileHere();
     ModuleExp mexp = new ModuleExp();

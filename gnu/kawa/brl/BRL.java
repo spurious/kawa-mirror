@@ -1,6 +1,7 @@
 package gnu.kawa.brl;
 import gnu.mapping.*;
 import kawa.standard.Scheme;
+import kawa.lang.Translator;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.*;
 import gnu.xml.*;
@@ -73,8 +74,7 @@ public class BRL extends Scheme
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    kawa.lang.Translator tr
-      = new  kawa.lang.Translator (Environment.user(), messages);
+    Translator tr = new Translator (this, messages);
     tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());

@@ -39,19 +39,19 @@
   :group 'environment)
 
 
-;; created by C code
-(defvar global-map (current-global-map) "\
-Default global keymap mapping XEmacs keyboard input into commands.
-The value is a keymap which is usually (but not necessarily) XEmacs's
-global map.")
+;;;; created by C code
+;;(defvar global-map (current-global-map) "\
+;;Default global keymap mapping XEmacs keyboard input into commands.
+;;The value is a keymap which is usually (but not necessarily) XEmacs's
+;;global map.")
 
-;; created by C code
-(defvar esc-map (symbol-function 'ESC-prefix) "\
-Default keymap for ESC (meta) commands.
-The normal global definition of the character ESC indirects to this keymap.")
+;;;; created by C code
+;;(defvar esc-map (symbol-function 'ESC-prefix) "\
+;;Default keymap for ESC (meta) commands.
+;;The normal global definition of the character ESC indirects to this keymap.")
 
-(set-keymap-name global-map 'global-map)
-(set-keymap-name esc-map 'ESC-prefix)
+;;(set-keymap-name global-map 'global-map)
+;;(set-keymap-name esc-map 'ESC-prefix)
 
 (define-prefix-command 'Control-X-prefix t)
 (defvar ctl-x-map (symbol-function 'Control-X-prefix) "\
@@ -68,7 +68,7 @@ Keymap for subcommands of C-x 4")
 (defvar ctl-x-5-map (symbol-function 'ctl-x-5-prefix) "\
 Keymap for subcommands of C-x 5")
 (define-key global-map "\C-x5" 'ctl-x-5-prefix)
-
+#|
 (define-prefix-command 'mode-specific-command-prefix t)
 (defvar mode-specific-map (symbol-function 'mode-specific-command-prefix) "\
 Keymap for characters following C-c.")
@@ -92,15 +92,18 @@ Keymap for characters following C-c.")
 (define-key global-map "\M-u" 'upcase-region-or-word)
 (define-key global-map "\M-l" 'downcase-region-or-word)
 (define-key global-map "\M-c" 'capitalize-region-or-word)
+|#
 
 ;; FSFmacs cmds.c
 
+#|
 (let ((n 33))
   (while (<= n 255)
     (if (not (= n 127))
         (define-key global-map n 'self-insert-command))
     (setq n (1+ n))))
 (define-key global-map " " 'self-insert-command)
+|#
 
 (define-key global-map "\C-a" 'beginning-of-line)
 (define-key global-map "\C-b" 'backward-char-command)
@@ -182,9 +185,7 @@ Keymap for characters following C-c.")
 ;; FSFmacs loaddefs.el
 
 ;; New FSF19 bindings: C-x n as a prefix for narrowing commands.
-(define-key global-map "\C-xn" (let ((map (make-sparse-keymap)))
-                                 (set-keymap-name map 'narrowing-prefix)
-                                 map))
+(define-key global-map "\C-xn" (make-sparse-keymap 'narrowing-prefix))
 (put 'narrow-to-region 'disabled t)
 (define-key global-map "\C-xnn" 'narrow-to-region)
 (define-key global-map "\C-xnw" 'widen)
@@ -193,8 +194,8 @@ Keymap for characters following C-c.")
 ;(define-key global-map "\C-xn" 'narrow-to-region)
 ;(define-key global-map "\C-xw" 'widen)
 
-(define-key global-map "\C-j" 'newline-and-indent)
-(define-key global-map "\C-m" 'newline)
+;;;(define-key global-map "\C-j" 'newline-and-indent)
+;;(define-key global-map "\C-m" 'newline)
 (define-key global-map "\C-o" 'open-line)
 (define-key global-map "\M-\C-o" 'split-line)
 (define-key global-map "\C-q" 'quoted-insert)
@@ -253,7 +254,7 @@ Keymap for characters following C-c.")
 (define-key global-map '(control ? ) 'set-mark-command)
 (define-key global-map "\C-x\C-x" 'exchange-point-and-mark)
 (define-key global-map "\C-x\C-@" 'pop-global-mark)
-(define-key global-map [(control x) (control ? )] 'pop-global-mark)
+;(define-key global-map [(control x) (control ? )] 'pop-global-mark)
 
 (define-key global-map "\C-n" 'next-line)
 (define-key global-map "\C-p" 'previous-line)
@@ -264,8 +265,8 @@ Keymap for characters following C-c.")
 ;;; Done.  -hniksic
 ;(put 'set-goal-column 'disabled t)
 
-(define-key global-map [menu] 'execute-extended-command)
-(define-key global-map [find] 'search-forward)
+;;(define-key global-map [menu] 'execute-extended-command)
+;;(define-key global-map [find] 'search-forward)
 
 (define-key global-map "\C-t" 'transpose-chars)
 (define-key global-map "\M-t" 'transpose-words)
@@ -313,9 +314,7 @@ Keymap for characters following C-c.")
 ;(define-key global-map "\C-xr" 'copy-rectangle-to-register)
 
 ;; New FSF19 bindings: C-x r as a prefix for register commands
-(define-key global-map "\C-xr" (let ((map (make-sparse-keymap)))
-                                 (set-keymap-name map 'rectangle-prefix)
-                                 map))
+(define-key global-map "\C-xr" (make-sparse-keymap 'rectangle-prefix))
 (define-key global-map "\C-xr\C-@" 'point-to-register)
 (define-key global-map "\C-xr " 'point-to-register)
 (define-key global-map "\C-xrj" 'jump-to-register)
@@ -439,7 +438,7 @@ Keymap for characters following C-c.")
 (define-key global-map "\C-x+" 'balance-windows)
 (define-key ctl-x-4-map "0" 'kill-buffer-and-window)
 
-;;(define-key global-map "\C-g" 'keyboard-quit)
+(define-key global-map "\C-g" 'keyboard-quit)
 (let ((ch (quit-char)))
   (if (or (characterp ch) (integerp ch))
       (setq ch (char-to-string ch)))
@@ -509,6 +508,7 @@ Keymap for characters following C-c.")
 (define-key global-map 'right		'forward-char-command)
 (define-key global-map 'up		'previous-line)
 (define-key global-map 'down		'next-line)
+#|
 (define-key global-map 'kp-left		'backward-char-command)
 (define-key global-map 'kp-right	'forward-char-command)
 (define-key global-map 'kp-up		'previous-line)
@@ -643,5 +643,6 @@ Keymap for characters following C-c.")
 (define-key global-map 'deleteline	'kill-line)
 (define-key global-map 'insertchar	'function-key-error)
 (define-key global-map 'deletechar	'delete-char)
+|#
 
 ;;; keydefs.el ends here

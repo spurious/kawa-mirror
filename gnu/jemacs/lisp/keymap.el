@@ -43,14 +43,14 @@
   (interactive)
   (ding))
 
-(defmacro kbd (keys)
-  "Convert KEYS to the internal Emacs key representation.
-KEYS should be a string in the format used for saving keyboard macros
-\(see `insert-kbd-macro')."
-  (if (or (stringp keys)
-	  (vectorp keys))
-      (read-kbd-macro keys)
-    `(read-kbd-macro ,keys)))
+;;(defmacro kbd (keys)
+;;  "Convert KEYS to the internal Emacs key representation.
+;;KEYS should be a string in the format used for saving keyboard macros
+;;\(see `insert-kbd-macro')."
+;;  (if (or (stringp keys)
+;;	  (vectorp keys))
+;;      (read-kbd-macro keys)
+;;    `(read-kbd-macro ,keys)))
 
 (defun suppress-keymap (map &optional nodigits)
   "Make MAP override all normally self-inserting keys to be undefined.
@@ -119,6 +119,7 @@ KEYMAP are redefined.  See also `accessible-keymaps'."
           (setq defn (key-binding defn))) ;; a keyboard macro
       (insert (format "%s" defn)))))
 
+#|
 ;; From Bill Dubuque <wgd@martigny.ai.mit.edu>
 (defun read-command-or-command-sexp (prompt)
   "Read a command symbol or command sexp.
@@ -135,6 +136,7 @@ Prompts with PROMPT."
 	   (interactive)
 	   ,result)
       result)))
+|#
 
 (defun local-key-binding (keys)
   "Return the binding for command KEYS in current local keymap only.
@@ -421,6 +423,7 @@ Argument KEYS can be in any form accepted by `define-key' function."
 (defun event-apply-meta-modifier (ignore-prompt)
   (event-apply-modifier 'meta))
 
+#|
 ;;; #### `key-translate-map' is ignored for now.
 (defun event-apply-modifier (symbol)
   "Return the next key event, with a modifier flag applied.
@@ -450,6 +453,7 @@ SYMBOL is the name of this modifier, as a symbol.
      (append (list symbol)
 	     (delq symbol
 		   (aref (key-sequence-list-description (car events)) 0))))))
+|#
 
 (defun synthesize-keysym (ignore-prompt)
   "Read a sequence of keys, and returned the corresponding key symbol.
@@ -476,6 +480,7 @@ The characters must be from the [-_a-zA-Z0-9].  Reading is terminated
 	     (error "Event has no character equivalent: %s" event))))
     (vector (intern (concat "" (nreverse list))))))
 
+#|
 ;; This looks dirty.  The following code should maybe go to another
 ;; file, and `create-console-hook' should maybe default to nil.
 (add-hook
@@ -489,5 +494,5 @@ The characters must be from the [-_a-zA-Z0-9].  Reading is terminated
      (define-key function-key-map [?\C-x ?@ ?c] 'event-apply-control-modifier)
      (define-key function-key-map [?\C-x ?@ ?a] 'event-apply-alt-modifier)
      (define-key function-key-map [?\C-x ?@ ?k] 'synthesize-keysym))))
-
+|#
 ;;; keymap.el ends here

@@ -114,6 +114,7 @@ since they have special meaning in a regexp."
 		       string))
     ))
 
+#|
 (defmacro with-search-caps-disable-folding (string regexp-flag &rest body) "\
 Eval BODY with `case-fold-search' let to nil if `search-caps-disable-folding' 
 is non-nil, and if STRING (either a string or a regular expression according
@@ -140,6 +141,7 @@ function called interactively."
 (put 'with-interactive-search-caps-disable-folding 'lisp-indent-function 2)
 (put 'with-interactive-search-caps-disable-folding 'edebug-form-spec 
      '(sexp sexp &rest form))
+|#
 
 (defun newline (&optional arg)
   "Insert a newline, and move to left margin of the new line if it's blank.
@@ -1764,6 +1766,7 @@ Does not set point.  Does nothing if mark ring is empty."
   "Put the mark where point is now, and point where the mark is now.
 The mark is activated unless DONT-ACTIVATE-REGION is non-nil."
   (interactive nil)
+(message "exchange-dot-and-mark called dont-act:%s" dont-activate-region)
   (let ((omark (mark t)))
     (if (null omark)
 	(error "No mark set in this buffer"))
@@ -2061,8 +2064,8 @@ When the `track-eol' feature is doing its job, the value is 9999.")
 (make-variable-buffer-local 'temporary-goal-column)
 
 ;XEmacs: not yet ported, so avoid compiler warnings
-(eval-when-compile
-  (defvar inhibit-point-motion-hooks))
+;;(eval-when-compile
+;;  (defvar inhibit-point-motion-hooks))
 
 (defcustom line-move-ignore-invisible nil
   "*Non-nil means \\[next-line] and \\[previous-line] ignore invisible lines.
@@ -2072,6 +2075,7 @@ Use with care, as it slows down movement significantly.  Outline mode sets this.
 
 ;; This is the guts of next-line and previous-line.
 ;; Arg says how many lines to move.
+#|
 (defun line-move (arg)
   ;; Don't run any point-motion hooks, and disregard intangibility,
   ;; for intermediate positions.
@@ -2148,6 +2152,7 @@ Use with care, as it slows down movement significantly.  Outline mode sets this.
       (setq inhibit-point-motion-hooks nil)
       (goto-char new)))
   nil)
+|#
 
 ;;; Many people have said they rarely use this feature, and often type
 ;;; it by accident.  Maybe it shouldn't even be on a key.
@@ -2278,12 +2283,12 @@ With argument 0, interchanges line point is in with line mark is in."
 		       (forward-line arg)))
 		  arg))
 
-(eval-when-compile
-  ;; avoid byte-compiler warnings...
-  (defvar start1)
-  (defvar start2)
-  (defvar end1)
-  (defvar end2))
+;;(eval-when-compile
+;;  ;; avoid byte-compiler warnings...
+;;  (defvar start1)
+;;  (defvar start2)
+;;  (defvar end1)
+;;  (defvar end2))
 
 ; start[12] and end[12] used in transpose-subr-1 below
 (defun transpose-subr (mover arg)
@@ -3070,7 +3075,7 @@ state before disabling selective display."
 	     ))))
   (setq selective-display nil))
 
-(add-hook 'change-major-mode-hook 'nuke-selective-display)
+;;(add-hook 'change-major-mode-hook 'nuke-selective-display)
 
 (defconst overwrite-mode-textual (purecopy " Ovwrt")
   "The string displayed in the mode line when in overwrite mode.")
@@ -3258,7 +3263,7 @@ when it is off screen."
 ;Turned off because it makes dbx bomb out.
 (setq blink-paren-function 'blink-matching-open)
 
-(eval-when-compile (defvar myhelp))	; suppress compiler warning
+;;(eval-when-compile (defvar myhelp))	; suppress compiler warning
 
 ;; XEmacs: Some functions moved to cmdloop.el:
 ;; keyboard-quit
@@ -3421,6 +3426,7 @@ Each action has the form (FUNCTION . ARGS)."
 		'switch-to-buffer-other-frame yank-action send-actions))
 
 
+#|
 (defun set-variable (var val)
   "Set VARIABLE to VALUE.  VALUE is a Lisp object.
 When using this interactively, supply a Lisp expression for VALUE.
@@ -3463,6 +3469,7 @@ it were the arg to `interactive' (which see) to interactively read the value."
   (if (and (boundp var) (specifierp (symbol-value var)))
       (set-specifier (symbol-value var) val)
     (set var val)))
+|#
 
 ;; XEmacs
 (defun activate-region ()
@@ -3532,9 +3539,9 @@ Otherwise, this function always returns false."
 (defvar uncapitalized-title-words
   '("the" "a" "an" "in" "of" "for" "to" "and" "but" "at" "on" "as" "by"))
 
-(defvar uncapitalized-title-word-regexp
-  (concat "[ \t]*\\(" (mapconcat #'identity uncapitalized-title-words "\\|")
-	  "\\)\\>"))
+;;(defvar uncapitalized-title-word-regexp
+;;  (concat "[ \t]*\\(" (mapconcat #'identity uncapitalized-title-words "\\|")
+;;	  "\\)\\>"))
 
 (defun capitalize-string-as-title (string)
   "Capitalize the words in the string, except for small words (as in titles).
@@ -3668,14 +3675,17 @@ should ever do this.  Calling this function will call the hook
 Calling this function ensures that the region stays active after the
 current command terminates, even if `zmacs-region-stays' is not set.
 Returns t if the region was activated (i.e. if `zmacs-regions' if t)."
+(message "zmacs-activate-region called !z-r:%s" (not zmacs-regions));
   (if (not zmacs-regions)
       nil
     (setq zmacs-region-active-p t
-	  zmacs-region-stays t
-	  zmacs-region-rectangular-p (and (boundp 'mouse-track-rectangle-p)
-					  mouse-track-rectangle-p))
+	  zmacs-region-stays t)
+    ;;zmacs-region-rectangular-p (and (boundp 'mouse-track-rectangle-p)
+    ;; mouse-track-rectangle-p))
+(message "zmacs-activate-region 2")
     (if (marker-buffer (mark-marker t))
-	(zmacs-make-extent-for-region (cons (point-marker t) (mark-marker t))))
+	(invoke (selected-window) 'activateRegion))
+;;	(zmacs-make-extent-for-region (cons (point-marker t) (mark-marker t))))
     (run-hooks 'zmacs-activate-region-hook)
     t))
 
@@ -3738,10 +3748,10 @@ when appropriate.  Calling this function will call the hook
 
 ;; need this to terminate the currently-displayed message
 ;; ("Loading simple ...")
-(when (and
-       (not (fboundp 'display-message))
-       (not (featurep 'debug)))
-  (send-string-to-terminal "\n"))
+;;(when (and
+;;       (not (fboundp 'display-message))
+;;       (not (featurep 'debug)))
+;;  (send-string-to-terminal "\n"))
 
 (defvar message-stack nil
   "An alist of label/string pairs representing active echo-area messages.
@@ -3759,7 +3769,7 @@ as the second argument.")
   "Maximum size of the \" *Message-Log*\" buffer.  See `log-message'."
   :type 'integer
   :group 'log-message)
-(make-compatible-variable 'message-log-max 'log-message-max-size)
+;;(make-compatible-variable 'message-log-max 'log-message-max-size)
 
 ;; We used to reject quite a lot of stuff here, but it was a bad idea,
 ;; for two reasons:
@@ -3901,9 +3911,11 @@ If LABEL is nil, the entire message-stack is cleared.
 
 Unless you need the return value or you need to specify a label,
 you should just use (message nil)."
+#|
   (or frame (setq frame (selected-frame)))
   (let ((clear-stream (and message-stack (eq 'stream (frame-type frame)))))
     (remove-message label frame)
+(error "hello")
     (let ((inhibit-read-only t)
 	  (zmacs-region-stays zmacs-region-stays)) ; preserve from change
       (erase-buffer " *Echo Area*"))
@@ -3917,7 +3929,9 @@ you should just use (message nil)."
 	    oldmsg)
 	;; #### Should we (redisplay-echo-area) here?  Messes some
 	;; things up.
-	nil))))
+	nil)))
+|#
+nil)
 
 (defun remove-message (&optional label frame)
   ;; If label is nil, we want to remove all matching messages.
@@ -3994,7 +4008,9 @@ by default--see the `log-message-ignore-labels' variable):
   * command       helper command messages like \"Mark set\"
   * no-log        messages that should never be logged"
   (clear-message label frame stdout-p t)
-  (append-message label message frame stdout-p))
+  (display label) (display ": ") (display message) (display ?\n)
+  (force-output))
+;;  (append-message label message frame stdout-p))
 
 (defun current-message (&optional frame)
   "Return the current message in the echo area, or nil.

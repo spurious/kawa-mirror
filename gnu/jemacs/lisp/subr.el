@@ -41,6 +41,7 @@
 
 ;;;; Lisp language features.
 
+#|
 (defmacro lambda (&rest cdr)
   "Return a lambda expression.
 A call of the form (lambda ARGS DOCSTRING INTERACTIVE BODY) is
@@ -71,6 +72,7 @@ Used for compatibility among different emacs variants."
   `(if (fboundp ,(car args))
        nil
      (define-function ,@args)))
+|#
 
 
 ;;;; Keymap support.
@@ -437,6 +439,7 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 ;					      path-separator))))
 ;  (split-string-by-char path (aref separator 0)))
 
+#|
 (defmacro with-output-to-string (&rest forms)
   "Collect output to `standard-output' while evaluating FORMS and return
 it as a string."
@@ -500,6 +503,7 @@ The original current buffer is restored afterwards."
      (insert ,str)
      ,@body
      (buffer-string)))
+|#
 
 (defun insert-face (string face)
   "Insert STRING and highlight with FACE.  Return the extent created."
@@ -585,6 +589,7 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 
 ;; getf, remf in cl*.el.
 
+#|
 (defmacro putf (plist prop val)
   "Add property PROP to plist PLIST with value VAL.
 Analogous to (setq PLIST (plist-put PLIST PROP VAL))."
@@ -599,6 +604,7 @@ Analogous to (setq LAX-PLIST (lax-plist-put LAX-PLIST PROP VAL))."
   "Remove property PROP from lax plist LAX-PLIST.
 Analogous to (setq LAX-PLIST (lax-plist-remprop LAX-PLIST PROP))."
   `(setq ,lax-plist (lax-plist-remprop ,lax-plist ,prop)))
+|#
 
 ;;; Error functions
 
@@ -613,6 +619,7 @@ error using the debugger `r' command.  See also `cerror'."
   "Like `error' but signals a continuable error."
   (signal 'error (list (apply 'format args))))
 
+#|
 (defmacro check-argument-type (predicate argument)
   "Check that ARGUMENT satisfies PREDICATE.
 If not, signal a continuable `wrong-type-argument' error until the
@@ -621,6 +628,7 @@ to ARGUMENT."
   `(if (not (,(eval predicate) ,argument))
        (setq ,argument
 	     (wrong-type-argument ,predicate ,argument))))
+|#
 
 (defun signal-error (error-symbol data)
   "Signal a non-continuable error.  Args are ERROR-SYMBOL, and associated DATA.

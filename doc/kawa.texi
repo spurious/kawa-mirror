@@ -480,8 +480,8 @@ but is useful when interfacing to low-level Java code.
 @node Keywords, Optional and keyword lambda parameters, Special named constants, Extensions
 @subsection Keywords
 
-Keywords are similar to symbols.  The mian difference is that keywords are
-self-evaluating and therefore do no need to be quoted in expressions.
+Keywords are similar to symbols.  The main difference is that keywords are
+self-evaluating and therefore do not need to be quoted in expressions.
 They are used mainly for specifying keyword arguments.
 
 @display
@@ -493,7 +493,7 @@ the @var{identifier} and the colon (which is not considered part
 of the name of the keyword).
 
 @defun keyword? obj
-Return @code{#t} is @var{obj} is a keyword, and otherwise returns @code{#f}.
+Return @code{#t} if @var{obj} is a keyword, and otherwise returns @code{#f}.
 @end defun
 
 @defun keyword->string keyword
@@ -521,15 +521,16 @@ You can of course also use the extended format in a @code{define}:
 
 @display
 @var{formal-arguments} =
-@var{required-optional-arguments} . @var{rest-variable} @var{or:}
-@var{required-optional-arguments} @var{rest-keyword-arguments}
+@var{req-opt-args} . @var{rest-arg} @var{or:}
+@var{req-opt-args} @var{rest-key-args}
 @end display
 @display
-@var{required-optional-arguments} = @var{required-argument}* (#!optional @var{optional-argument}*)?
-@var{optional-argument} = @var{variable} | (@var{variable} @var{initializer})
-@var{required-argument} = @var{variable}
-@var{rest-keyword-arguments} = (#!rest @var{rest-variable})? (#!key @var{keyword-argument}*)?
-@var{keyword-argument} = @var{variable} | (@var{variable} @var{initializer})
+@var{req-opt-args} = @var{req-arg}* (#!optional @var{opt-arg}*)?
+@var{rest-key-args} = (#!rest @var{rest-arg})? (#!key @var{key-arg}*)?
+@var{opt-arg} = @var{variable} | (@var{variable} @var{initializer})
+@var{req-arg} = @var{variable}
+@var{key-arg} = @var{variable} | (@var{variable} @var{initializer})
+@var{rest-arg} = @var{variable}
 @end display
 
 When the procedure is applied to a list of actual arguments, the formal and
@@ -537,32 +538,32 @@ actual arguments are processed from left to right as follows:
 
 @itemize @bullet
 @item
-The @var{required-argument}s are bound to actual arguments starting with the
+The @var{req-arg}s are bound to actual arguments starting with the
 first actual argument.  It shall be an error if there are fewer actual
-arguments then there are @var{required-argument}s.
+arguments then there are @var{req-arg}s.
 @item
-Next the @var{optional-argument}s are bound to remaining actual arguemnts.
-Ig the are fewer remaining actual arguments than there are
-@var{optional-argument}s, then the remaining @var{variable}s are bound
+Next the @var{opt-arg}s are bound to remaining actual arguemnts.
+If there are fewer remaining actual arguments than there are
+@var{opt-arg}s, then the remaining @var{variable}s are bound
 to the corresponding @var{initializer}, if one was specified, and
 otherwise to @code{#f}.  The @var{initializer} is evaluated in an
 environment in which all the previous formal parameters have been bound.
 @item
-If there is a @var{rest-variable}, it is bound to a list of all the
-remaining actual arguemnts.  These remaining actual arguemnts are also
-eligible to be bound to keyword arguemnts.   If there is no
-@var{rest-variable} and there are no @var{keyword-argument}s, then it shall
+If there is a @var{rest-arg}, it is bound to a list of all the
+remaining actual arguments.  These remaining actual arguments are also
+eligible to be bound to keyword arguments.   If there is no
+@var{rest-arg} and there are no @var{key-arg}s, then it shall
 be an error if there are any remaining actual arguments.
 @item
 If @code{#!key} was specified, then there shall be an even number of
-remianing actual arguments.  These are interpreted as a series of pairs,
-where the first memer of each pair is a keyword specifying the argument name,
+remaining actual arguments.  These are interpreted as a series of pairs,
+where the first member of each pair is a keyword specifying the argument name,
 and the second is the corresponding value.  It shall be an error if the first
-member of a pair is not a keyword.  If shall be an error if the argument name
-is not the same as a variable in a @var{keyword-argument}s, unless there
-is a @var{rest-variable}.  If the same argument name occurrs more than once
-in a the list of actual arguments, then the first value is used.
-If there is no actual argument for a particular @var{keyword-argument},
+member of a pair is not a keyword.  It shall be an error if the argument name
+is not the same as a variable in a @var{key-arg}s, unless there
+is a @var{rest-arg}.  If the same argument name occurrs more than once
+in the list of actual arguments, then the first value is used.
+If there is no actual argument for a particular @var{key-arg},
 then the variable is bound
 to the corresponding @var{initializer}, if one was specified, and
 otherwise to @code{#f}.  The @var{initializer} is evaluated in an
@@ -686,7 +687,7 @@ if the @var{field-names} argument is provided, it is an error if it
 contains any duplicates or any symbols not in the default list.
 
 In Kawa, @var{rtd} may be any @code{Class} that has a public default
-constructor, as long as the @var{field-nameds} are public instance
+constructor, as long as the @var{field-names} are public instance
 fields.  (The fields should have type @code{Object} -- unless you
 know what you are doing!)
 @end defun
@@ -748,7 +749,7 @@ Returns a record-type descriptor representing the type of the given
 record.  That is, for example, if the returned descriptor were passed to
 @code{record-predicate}, the resulting predicate would return a true
 value when passed the given record.  In Kawa, @var{record} may be any object,
-and value returned is the class of the object.
+and the value returned is the class of the object.
 @end defun
 
 @defun record-type-name rtd
@@ -1112,7 +1113,7 @@ The return type @code{"void"} indicates that no value is returned.
 @defmac primitive-constructor class (argtype ...)
 Returns a new anonymous procedure, which when called will create
 a new object of the specified class, and will then call the
-constructor matching the specidfied argument types.
+constructor matching the specified argument types.
 @end defmac
 
 @defmac primitive-virtual-method class method rtype (argtype ...)

@@ -258,10 +258,8 @@ public class ApplyExp extends Expression
     if (func instanceof QuoteExp)
       {
 	Object proc = ((QuoteExp) func).getValue();
-	if (proc instanceof PrimProcedure)
-	  return ((PrimProcedure) proc).getReturnType();
-	if (proc instanceof kawa.lang.SetFieldProc)
-	  return Type.void_type;
+	if (proc instanceof Inlineable)
+	  return ((Inlineable) proc).getReturnType(args);
       }
     return super.getType();
   }

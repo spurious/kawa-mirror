@@ -74,7 +74,7 @@ public class XSLT extends XQuery
     // return null;
   /*
     XslTranslator xtr = new XslTranslator(mexp, messages, this);
-    XMLParser parser = new XMLParser(inp, new NamespaceResolver(xtr));
+    XMLParser parser = new XMLParser(inp, xtr);
     return xtr;
     return null; // FIXME
   */

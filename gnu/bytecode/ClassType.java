@@ -28,14 +28,20 @@ public class ClassType extends ObjectType implements AttrContainer {
     return cl;
   }
 
+  public static ClassType make (String name, ClassType superClass)
+  {
+    ClassType type = make(name);
+    if (type.superClass == null)
+      type.setSuper(superClass);
+    return type;
+  }
+
   int thisClassIndex;
 
   /** The super (base) class of the current class.
-   * X.superClass == X means the superClass has not been specified,
-   * and defaults to java.lang.Object.
-   * X.superClass == null means X has no super class, which implies
-   * that X == java.lang.Object. */
-  ClassType superClass = this;
+   * X.superClass == null means the superClass has not been specified,
+   * and defaults to java.lang.Object. */
+  ClassType superClass;
   /** The constant pool index of the superClass, or -1 if unassigned. */
   int superClassIndex = -1;
 
@@ -73,7 +79,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   /** Sets the name of the class being defined in this classfile.
    * @param name the name to give to the class
    */
-  void setName (String name)
+  public void setName (String name)
   {
     this_name = name;
     name = name.replace ('.', '/');
@@ -92,13 +98,18 @@ public class ClassType extends ObjectType implements AttrContainer {
    */
   public void setSuper (String name)
   {
-    setSuper(name == null ? null : ClassType.make(name));
+    setSuper(name == null ? Type.pointer_type : ClassType.make(name));
   }
 
   public void setSuper (ClassType superClass)
   {
     this.superClass = superClass;
   }
+
+  public ClassType getSuperclass ()
+  {
+    return superClass;
+ }
 
   public ClassType[] getInterfaces() { return interfaces; }
 

@@ -30,6 +30,20 @@ public class PrimType extends Type {
 				 + getName());
   }
 
+  /** Coerce value to a char.
+   * Only defined if getSignature() is "C". */
+  public char charValue (Object value)
+  {
+    return ((Character) value).charValue();
+  }
+
+  /** Coerce value to a boolean.
+   * Only defined if getSignature() is "Z". */
+  public boolean booleanValue (Object value)
+  {
+    return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     char sig1 = (signature == null || signature.length() != 1) ? ' '

@@ -1,3 +1,10 @@
+Fri Sep 11 20:05:59 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ClassType.java (make):  New static overload.
+	(setname):  Make public.
+	(getSuperclass):  New method.
+	* PrimType.java (charValue, booleanValue):  New coercions.
+
 Sat Aug 29 20:24:39 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Method.java (getModifiers):  New method.

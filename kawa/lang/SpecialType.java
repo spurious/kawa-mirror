@@ -9,9 +9,29 @@ import gnu.kawa.util.Char;
 
 public class SpecialType extends gnu.bytecode.PrimType
 {
+  Interpreter interpreter;
+
+  public SpecialType (PrimType type)
+  {
+    super(type);
+  }
+
+  public SpecialType (PrimType type, Interpreter interpreter)
+  {
+    super(type);
+    this.interpreter = interpreter;
+  }
+
   public SpecialType (String nam, String sig, int siz, Class reflectClass)
   {
     super (nam, sig, siz, reflectClass);
+  }
+
+  public SpecialType (String nam, String sig, int siz, Class reflectClass,
+		      Interpreter interpreter)
+  {
+    super (nam, sig, siz, reflectClass);
+    this.interpreter = interpreter;
   }
 
   public Object coerceFromObject (Object obj)
@@ -22,7 +42,7 @@ public class SpecialType extends gnu.bytecode.PrimType
     switch (sig1)
       {
       case 'Z':
-	return obj == Boolean.FALSE ? obj : Boolean.TRUE;
+	return interpreter.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
       case 'C':
 	return new Character(((Char) obj).charValue());
       }
@@ -42,12 +62,7 @@ public class SpecialType extends gnu.bytecode.PrimType
     switch (sig1)
       {
       case 'Z':
-	code.emitGetStatic(Compilation.falseConstant);
-	code.emitIfNEq();
-	code.emitPushInt(1);
-	code.emitElse();
-	code.emitPushInt(0);
-	code.emitFi();
+	interpreter.emitCoerceToBoolean(code);
 	break;
       case 'C':
 	// We handle char specially, because Kawa does not use standard
@@ -67,7 +82,7 @@ public class SpecialType extends gnu.bytecode.PrimType
     switch (sig1)
       {
       case 'Z':
-	return ((Boolean) obj).booleanValue() ? Boolean.TRUE : Boolean.FALSE;
+	return interpreter.booleanObject(((Boolean) obj).booleanValue());
       case 'C':
 	if (obj instanceof Char)
 	  return obj;
@@ -91,9 +106,9 @@ public class SpecialType extends gnu.bytecode.PrimType
       {
       case 'Z':
 	code.emitIfIntNotZero();
-	code.emitGetStatic(Compilation.trueConstant);
+	interpreter.emitPushBoolean(true, code);
 	code.emitElse();
-	code.emitGetStatic(Compilation.falseConstant);
+	interpreter.emitPushBoolean(false, code);
 	code.emitFi();
 	break;
       case 'C':

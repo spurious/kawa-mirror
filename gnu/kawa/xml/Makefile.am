@@ -10,11 +10,15 @@ java_sources = \
   DefineNamespace.java \
   Document.java \
   ElementConstructor.java \
+  ElementType.java \
   HttpPrinter.java \
   MakeResponseHeader.java \
   MakeUnescapedData.java \
   NamedAttributes.java \
+  NamedChildren.java \
+  NamedDescendants.java \
   NamespaceEnv.java \
+  NodeType.java \
   OutputAsXML.java \
   WriteTo.java
 

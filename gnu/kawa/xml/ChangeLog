@@ -1,3 +1,20 @@
+2002-02-05  Per Bothner  <per@bothner.com>
+
+	* NamedChildren.java:  Moved from gnu.xquery.util.
+	* NodeType.java  Moved from gnu.xquery.util.
+	* ElementType.java  Moved from gnu.xquery.util.
+	* NamedDescendants.java:  New class, extends CpsProcedure.
+	* Makefile.am:  Update accordingly.
+
+	* NamedChildren.java:  Implement Externalizable.
+	(writeExternal, readExternal):  New methods.
+
+	* NamedChildren.java:  Implement GroupPredicate.
+	(isInstance):  New methods, needed for GroupPredicate.
+	(<init>):  New constructor.
+
+	* package.html:  New file, for javadoc.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* WriteTo.java (writeTo):  Disambiguate XMLPrinter constructor.

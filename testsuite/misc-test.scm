@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 109)
+(test-init "Miscellaneous" 112)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -467,3 +467,36 @@
 (test #t instance? "x" <string>)
 (test #f instance? "x" <number>)
 (test #f instance? #!null <string>)
+
+;; Based on a bug reported 05-26 Sven.Hartrumpf@FernUni-Hagen.de
+(define (list-cond compare a b)
+  (cons (compare a (list b)) b))
+(define (make-mf forms results)
+  (let ((r
+  (map
+   (lambda (result)
+     (map
+      (lambda (form)
+	(list-cond
+	 (lambda (a b)
+	   (string<? (cadr a) (car b)))
+	 forms
+	 (list form)))
+      forms))
+   results)))
+  (call-with-output-string
+   (lambda (output-stream)
+     (for-each
+      (lambda (form)
+	(format output-stream "[f:~a]" form))
+      r)))))
+(test "[f:((#f a1) (#f a2))][f:((#f a1) (#f a2))]"
+      make-mf '("a1" "a2") '("b1" "b2"))
+
+(require 'printf)
+(define (test-printf format value)
+  (call-with-output-string
+   (lambda (out)
+     (fprintf out format value))))
+(test "[ 23]" test-printf "[%3d]" 23)
+(test "[3.50 ]" test-printf "[%-5.2f]" 3.5)

@@ -1,3 +1,8 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* emacs.scm:  Use invoke instead of primitive-virtual-method.
+	Add parameter type declarations.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* BufferLocalConstraint.java (get):  Now takes defaultValue argument.

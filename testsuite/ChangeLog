@@ -1,3 +1,9 @@
+1999-11-28  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Various tests for variable lookup, inlining,
+	recursion and similar nasty stuff. Based on bug
+	reports from Walter C. Pelissero <wcp@lpds.sublink.org>.
+
 1999-11-18  Per Bothner  <per@bothner.com>
 
 	* testing.scm:  Remove save-+ kludge.  No longer needed, now that +

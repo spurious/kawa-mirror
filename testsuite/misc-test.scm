@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 72)
+(test-init "Miscellaneous" 79)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -268,12 +268,75 @@
     (lambda () (lambda () bar2))))
 (test 34 ((test-nesting-2)))
 
+;;; Testcase from  "Walter C. Pelissero" <wcp@lpds.sublink.org>:
+(test #t procedure?
+      (let* ((is-equal eqv?)
+             (false
+              (lambda ()
+                (is-equal 'bar 'foo)))
+             (foo (lambda () 'foo)))
+        (lambda ()
+          (foo))))
+
+(test #t pair?
+      (let* ((is-equal eqv?)
+             (false
+              (lambda ()
+                (is-equal 'bar 'foo)))
+             (foo (lambda () (false))))
+        (list
+         false
+         (lambda () (foo)))))
+
+(test #t pair?
+      (let* ((is-equal eqv?)
+             (false
+              (lambda ()
+                (is-equal 'bar 'foo)))
+             (foo (lambda () (false))))
+        (list
+         false
+         (lambda ()
+           (define (bar) (foo))
+           (list bar (bar))))))
+
+(test #t procedure?
+      (let () 
+        (define aa 20)
+        (define (foo) aa)
+        (define (bar)
+          (let loop ((arg 'bar))
+            (foo)
+            (not (loop (foo)))))
+        bar))
+
+(test #t not
+      (let* ((foo (lambda ()
+                    'foo))
+             (bar (lambda ()
+                    (let loop ((arg 'bar))
+                      (foo)
+                      (not (loop (foo)))))))
+        #f))
+
 (define (test-duplicate-names)
   (let ((bar #t)) (lambda () (lambda () bar)))
   (let ((bar #t)) (lambda () (lambda () bar)))
   (let ((bar #t)) (lambda () (lambda () bar)))
   97)
 (test 97 test-duplicate-names)
+
+(test #f 'mutual-recursion-1
+      (letrec ((a (lambda () (b)))
+               (b (lambda () (a))))
+        #f))
+(test #f 'mutual-recursion-2
+      (letrec ((a (lambda () 10))
+               (b (lambda () (a)))
+               (c (lambda () (e) (b)))
+               (d (lambda () (c)))
+               (e (lambda () (d))))
+        #f))
 
 ;; Used to cause a verification error.
 (define (sql-rsmd-all op rsmd . iter)

@@ -27,6 +27,8 @@ public class PairWithPosition extends Pair
     return filename;
   }
 
+  /** Get the line number of (the start of) this pair.
+    * The "first" line is line 1. */
   public final int getLine ()
   {
     return position >> 12;

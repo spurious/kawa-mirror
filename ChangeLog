@@ -1,3 +1,18 @@
+Fri Jan  1 22:13:41 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/TelnetConnection.java:  New class - for telnet connection.
+	* kawa/TelnetInputStream.java:  New class.
+	* kawa/TelnetOutputStream.java:  New class..
+	* kawa/Telnet.java:  New class - a mini-client for telnet.
+	* kawa/kawa.c:  New front-end driver for Kawa.
+	* kawa/Makefile.am:  Support building and installing kawa front-end.
+	* kawa/Shell.java (socket):  New field.
+	(apply0):  If socket field is non-NULL, close it on exit.
+	* kawa/repl.java (serveTelnet):  New method.
+	(main):  Support new flags --connect and --server.
+	* configure.in:  Support new --enable-kawa-frontend flag.
+	* */Makefile.in:  Re-generated.
+
 Wed Dec 23 15:10:03 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/standard/object.java (rewrite):  Handle field initialization.

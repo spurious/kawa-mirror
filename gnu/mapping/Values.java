@@ -181,7 +181,12 @@ public class Values extends TreeList implements Printable, Externalizable
   public static Object nextValue(Object values, int curIndex)
   {
     if (values instanceof Values)
-      return ((Values) values).getPosNext(curIndex << 1);
+      {
+	Values v = (Values) values;
+	if (curIndex >= v.gapEnd)
+	  curIndex -= v.gapEnd - v.gapStart;
+	return ((Values) values).getPosNext(curIndex << 1);
+      }
     else
       return values;
   }

@@ -1,5 +1,8 @@
 2003-10-12  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite_pair):  Check if decl's
+	constant value is a Syntax rather than using IS_SYNTAX flag.
+
 	* kawa/standard/Scheme.java (Scheme):  Update isEq initialization.
 
 2003-10-09  Per Bothner  <per@bothner.com>

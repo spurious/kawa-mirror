@@ -314,8 +314,9 @@ public class Translator extends Compilation
         else
 	  {
 	    decl = Declaration.followAliases(decl);
-	    if (decl.getFlag(Declaration.IS_SYNTAX))
-	      return apply_rewrite ((Syntax) decl.getConstantValue(), p);
+	    proc = decl.getConstantValue();
+	    if (proc instanceof Syntax)
+	      return apply_rewrite ((Syntax) proc, p);
 	  }
 
 	ref.setProcedureName(true);

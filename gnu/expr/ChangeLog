@@ -1,3 +1,8 @@
+2004-07-27  Chris Dean  <ctdean@sokitomi.com>
+
+	* Compilation.java:  Add --warn-as-error.
+	* ExpWalker.java (ExpWalker):  Check --warn-as-error.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java:  Use static syntax to access static fields/methods.

@@ -41,6 +41,8 @@ public class Compilation
 		"warn if no compiler-visible binding for a variable");
     options.add("warn-invoke-unknown-method", Options.BOOLEAN_OPTION,
 		"warn if invoke calls an unknown method");
+    options.add("warn-as-error", Options.BOOLEAN_OPTION,
+		"Make all warnings into errors");
   }
 
   /** Get a named boolean option. */
@@ -1886,12 +1888,18 @@ public class Compilation
  
   public void error(char severity, String message)
   {
+    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+      severity = 'e';
+    
     messages.error(severity, getFile(), getLine(), getColumn(),
 		   message);
   }
 
   public void error(char severity, Declaration decl, String msg1, String msg2)
   {
+    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+      severity = 'e';
+    
     String filename = getFile();
     int line = getLine();
     int column = getColumn();

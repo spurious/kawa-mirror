@@ -146,6 +146,8 @@ public class ExpWalker
 
   public void error(char kind, String message)
   {
+    if (kind == 'w' && comp.getBooleanOption("warn-as-error", false))
+      kind = 'e';
     if (messages != null)
       messages.error(kind, message);
     else

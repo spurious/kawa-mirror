@@ -82,7 +82,7 @@ CONFIG_CLEAN_FILES =
 JAVACFLAGS = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
 JAVAROOT = $(top_builddir)
-DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
+DIST_COMMON =  $(java_JAVA) COPYING ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

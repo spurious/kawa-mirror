@@ -19,7 +19,8 @@ java_JAVA=\
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lisp. -C
 
-ELISPSOURCES = alist.el hanoi.el rect.el autoloads.el
+ELISPSOURCES = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
+  rect.el editfns.el subr.el autoloads.el
 
 CLEANFILES = *.class *.stamp
 

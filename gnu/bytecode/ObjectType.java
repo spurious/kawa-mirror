@@ -26,7 +26,12 @@ public class ObjectType extends Type
   final static int ADD_METHODS_DONE = 2;
   // A ClassType that we can expect to have a corresponding reflectClass.
   final static int EXISTING_CLASS = 4;
-  int flags;
+  /* */ public int flags;
+
+  public final boolean isExisting()
+  {
+    return (flags & EXISTING_CLASS) != 0;
+  }
 
   public final void setExisting(boolean existing)
   {

@@ -193,8 +193,10 @@ public class XQuery extends Interpreter
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
     define("false", new ConstantFunction0("false", Boolean.FALSE));
     define("true", new ConstantFunction0("true", Boolean.TRUE));
+    define("number", gnu.xquery.util.NumberValue.numberValue);
     define("string-value", gnu.xquery.util.StringValue.stringValue);
     define("string", gnu.xquery.util.StringValue.string);
+    define("concat", new kawa.standard.string_append());
 
     define("write-to", gnu.kawa.functions.WriteTo.writeTo);
   }

@@ -1,10 +1,11 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.57)
+AM_INIT_AUTOMAKE(kawa, 1.6.58)
 
 AM_MAINTAINER_MODE
-AM_EXEEXT
+AC_PROG_CC
+AC_EXEEXT
 
 AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
@@ -25,7 +26,6 @@ AC_SUBST(JAVAC)
 AC_SUBST(kawa_bin)
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
-AC_PROG_CC
 
 AC_SUBST(TOP_BUILDDIR)
 AC_SUBST(CC)

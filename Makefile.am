@@ -9,6 +9,8 @@ javadir=$(datadir)/java
 kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
+kawa-compiled.zip: kawa-@VERSION@-compiled.zip
+
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs
 

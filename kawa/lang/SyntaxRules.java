@@ -38,14 +38,14 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
   }
 
   public SyntaxRules (Symbol[] literal_identifiers, Object rules,
-		      Interpreter interp)
+		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
     int rules_count = List.list_length (rules);
     if (rules_count <= 0)
       {
 	rules_count = 0;
-	interp.syntaxError ("missing or invalid syntax-rules");
+	tr.syntaxError ("missing or invalid syntax-rules");
       }
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
@@ -56,34 +56,34 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	Object syntax_rule = rules_pair.car;
 	if (! (syntax_rule instanceof Pair))
 	  {
-	    interp.syntaxError ("missing pattern in " + i + "'th syntax rule");
+	    tr.syntaxError ("missing pattern in " + i + "'th syntax rule");
 	    return;
 	  }
 	Pair syntax_rule_pair = (Pair) syntax_rule;
 	Object pattern = syntax_rule_pair.car;
 
-	String save_filename = interp.current_filename;
-	int save_line = interp.current_line;
-	int save_column = interp.current_column;
+	String save_filename = tr.current_filename;
+	int save_line = tr.current_line;
+	int save_column = tr.current_column;
 
 	try
 	  {
 	    if (syntax_rule_pair instanceof PairWithPosition)
 	      {
 		PairWithPosition pp = (PairWithPosition) syntax_rule_pair;
-		interp.current_filename = pp.getFile ();
-		interp.current_line = pp.getLine ();
-		interp.current_column = pp.getColumn ();
+		tr.current_filename = pp.getFile ();
+		tr.current_line = pp.getLine ();
+		tr.current_column = pp.getColumn ();
 	      }
 	    if (! (syntax_rule_pair.cdr instanceof Pair))
 	      {
-		interp.syntaxError ("missing template in " + i + "'th syntax rule");
+		tr.syntaxError ("missing template in " + i + "'th syntax rule");
 		return;
 	      }
 	    syntax_rule_pair = (Pair) syntax_rule_pair.cdr;
 	    if (syntax_rule_pair.cdr != List.Empty)
 	      {
-		interp.syntaxError ("junk after "+i+"'th syntax rule");
+		tr.syntaxError ("junk after "+i+"'th syntax rule");
 		return;
 	      }
 	    Object template = syntax_rule_pair.car;
@@ -97,7 +97,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	    if (! (pattern instanceof Pair)
 		|| ! (((Pair)pattern).car instanceof Symbol))
 	      {
-		interp.syntaxError ("pattern does not start with name");
+		tr.syntaxError ("pattern does not start with name");
 		return;
 	      }
 	    pattern = ((Pair) pattern).cdr;
@@ -106,12 +106,12 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	    Pattern translated_pattern
 	      = translate_pattern (pattern, literal_identifiers,
 				   pattern_names, pattern_nesting_buffer,
-				   0, interp);
+				   0, tr);
 	    String pattern_nesting = pattern_nesting_buffer.toString ();
 
 	    this.rules[i]
 	      = new SyntaxRule (translated_pattern, pattern_nesting,
-				pattern_names, template, interp);
+				pattern_names, template, tr);
 	    /* DEBUGGING:
 	    System.err.println ("{translated template:");
 	    this.rules[i].print_template_program (System.err);
@@ -120,9 +120,9 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	  }
 	finally
 	  {
-	    interp.current_filename = save_filename;
-	    interp.current_line = save_line;
-	    interp.current_column = save_column;
+	    tr.current_filename = save_filename;
+	    tr.current_line = save_line;
+	    tr.current_column = save_column;
 	  }
       }
     calculate_maxVars ();    
@@ -134,14 +134,14 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
    * @param pattern_name (output) the pattern variables in the pattern
    * @param pattern_nesting (output) the nesting of each pattern variable
    * @param nesting the depth of ... we are inside
-   * @param interp  the current interpreter
+   * @param tr  the current Translator
    * @return the translated Pattern
    */
   public static Pattern translate_pattern (Object pattern,
 					   Symbol[] literal_identifiers,
 					   java.util.Vector pattern_names,
 					   StringBuffer pattern_nesting,
-					   int nesting, Interpreter interp)
+					   int nesting, Translator tr )
   {
     if (pattern instanceof Pair)
       {
@@ -152,21 +152,21 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	    if (cdr_pair.car == SyntaxRule.dots3)
 	      {
 		if (cdr_pair.cdr != List.Empty)
-		  interp.syntaxError ("junk follows ... in syntax-rule pattern");
+		  tr.syntaxError ("junk follows ... in syntax-rule pattern");
 		Pattern car_pat
 		  = translate_pattern (pair.car, literal_identifiers,
 				       pattern_names, pattern_nesting,
-				       nesting + 1, interp);
+				       nesting + 1, tr);
 		return new ListRepeatPat (car_pat);
 	      }
 	  }
 	Pattern car_pat = translate_pattern (pair.car, literal_identifiers,
 					     pattern_names, pattern_nesting,
-					     nesting, interp);
+					     nesting, tr);
 	return new PairPat (car_pat,
 			    translate_pattern (pair.cdr, literal_identifiers,
 					       pattern_names, pattern_nesting,
-					       nesting, interp));
+					       nesting, tr));
       }
     else if (pattern instanceof Symbol)
       {
@@ -180,7 +180,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	      return new EqualPat (pattern);
 	  }
 	if (pattern_names.contains (pattern))
-	  interp.syntaxError ("duplicated pattern variable " + pattern);
+	  tr.syntaxError ("duplicated pattern variable " + pattern);
 	pattern_names.addElement (pattern);
 	pattern_nesting.append ((char) nesting);
 	return new AnyPat ();
@@ -189,7 +189,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       return new EqualPat (pattern);
   }
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     Object[] vars = new Object[maxVars];
     for (int i = 0;  i < rules.length;  i++)
@@ -208,10 +208,10 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	      }
 	    System.err.println ('}');
 	    */
-	    return rule.execute_template (vars, interp);
+	    return rule.execute_template (vars, tr);
 	  }
       }
-    return interp.syntaxError ("no matching syntax-rule for "
+    return tr.syntaxError ("no matching syntax-rule for "
 				+ literal_identifiers[0]);
   }
 

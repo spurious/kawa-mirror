@@ -42,16 +42,11 @@ class kawac
     if (infile == null)
       usage ();
 
-    kawa.standard.Scheme interpreter =
-      new kawa.standard.Scheme(InPort.inDefault (),
-					    OutPort.outDefault (),
-					    OutPort.errDefault ()
-         );
+    Environment env = Scheme.makeEnvironment();
     
     try
       {
-	CompileFile.compile_to_files (infile, directory, prefix, topname);
-	if (interpreter.errors > 0)
+	if (CompileFile.compile_to_files (infile, directory, prefix, topname))
 	  System.exit (-1);
       }
     catch (GenericError ex)

@@ -16,10 +16,10 @@ abstract public class Syntax extends Named implements Printable
    * Re-write an expression that is an "application" of this Syntax object.
    * @param obj the arguments to this "application" (i.e. the cdr of
    * the macro/builtin invokation)
-   * @param interp the interpreter thatprovides context
+   * @param tr the Translator that provides context
    * @return the re-written expression
    */
-  abstract public Expression rewrite (Object obj, Interpreter interp);
+  abstract public Expression rewrite (Object obj, Translator tr);
 
   public void print(java.io.PrintStream ps)
   {

@@ -104,25 +104,25 @@ public class Declaration extends Variable
   public String string_name () { return sym.toString (); }
 
   /**
-   * Insert this into Interpreter.current_decls.
+   * Insert this into Translator.current_decls.
    * (Used at rewrite time, not eval time.)
    */
-  void push (Interpreter interp)
+  void push (Translator tr)
   {
-    Object old_decl = interp.current_decls.get (sym);
+    Object old_decl = tr.current_decls.get (sym);
     if (old_decl != null)
       shadowed = old_decl;
-    interp.current_decls.put (sym, this);
+    tr.current_decls.put (sym, this);
   }
 
-  /** Remove this from Interpreter.current_decls.
+  /** Remove this from Translator.current_decls.
    * (Used at rewrite time, not eval time.)
    */
-  void pop (Interpreter interp)
+  void pop (Translator tr)
   {
     if (shadowed == null)
-      interp.current_decls.remove (sym);
+      tr.current_decls.remove (sym);
     else
-      interp.current_decls.put (sym, shadowed);
+      tr.current_decls.put (sym, shadowed);
   }
 }

@@ -19,18 +19,13 @@ class kawa
     for (int i = arg_start;  i < args.length;  i++)
       array[i - arg_start] = new StringBuffer (args[i]);
     commandLineArguments = new Vector (array);
-    Interpreter.define_global (Symbol.make ("command-line-arguments"),
+    Environment.define_global (Symbol.make ("command-line-arguments"),
 			       commandLineArguments);
   }
 
   public static void main(String args[])
   {
-    kawa.standard.Scheme interpreter =
-      new kawa.standard.Scheme(
-	    InPort.inDefault (),
-	    OutPort.outDefault (),
-	    OutPort.errDefault ()
-         );
+    Environment env = Scheme.makeEnvironment ();
 
     int iArg = 0;
     boolean something_done = false;
@@ -43,7 +38,7 @@ class kawa
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    setArgs (args, iArg+1);
-	    Shell.runString (args[iArg], interpreter, false);
+	    Shell.runString (args[iArg], env, false);
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -59,7 +54,7 @@ class kawa
 	  {
 	    iArg++;
 	    setArgs (args, iArg);
-	    Shell.run (InPort.inDefault (), interpreter, true, true);
+	    Shell.run (InPort.inDefault (), env, true, true);
 	    return;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
@@ -78,7 +73,7 @@ class kawa
     else
       {
 	setArgs (args, iArg);
-	Shell.run (InPort.inDefault (), interpreter, true, true);
+	Shell.run (InPort.inDefault (), env, true, true);
       }
    }
 }

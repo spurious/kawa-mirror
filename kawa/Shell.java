@@ -7,16 +7,15 @@ import java.io.*;
 
 public class Shell
 {
-  public static void run (InPort inp, Interpreter interp,
+  public static void run (InPort inp, Environment env,
 			  boolean pflag, boolean dflag)
   {
-    java.io.PrintStream pout = interp.out;
-    java.io.PrintStream perr = interp.err;
-    kawa.lang.Interpreter interpreter = interp;
+    Translator tr = new Translator (env);
+    java.io.PrintStream pout = OutPort.outDefault();
+    java.io.PrintStream perr = OutPort.errDefault();
     boolean prompt = pflag;
     boolean display = dflag;
 
-    Environment env = Environment.user ();
     for (;;)
       {
 	try
@@ -35,15 +34,14 @@ public class Shell
 		return;
 	      }
 
-	    interpreter.errors = 0;
+	    tr.errors = 0;
 
-	    LambdaExp lexp = new ModuleExp (new Pair (sexp, List.Empty),
-					    env);
-	    lexp.setName (Symbol.make ("atInteractiveLevel"));  // FIXME
 	    String filename = inp.getName ();
 	    if (filename == null)
 	      filename = "<unknown>";
-	    lexp.setFile (filename);
+	    ModuleExp mod = new ModuleExp (new Pair (sexp, List.Empty),
+					   tr, filename);
+	    mod.setName (Symbol.make ("atInteractiveLevel"));  // FIXME
 
 	    /* DEBUGGING:
 	    perr.print ("[Re-written expression: ");
@@ -53,12 +51,12 @@ public class Shell
 	    perr.flush();
 	    */
 
-	    if (interpreter.errors == 0)
+	    if (tr.errors == 0)
 	      {
-		Object result = lexp.eval_module (env);
+		Object result = mod.eval_module (env);
 		if (result == null)
 		  pout.println ("[null returned]\n");
-		else if (display && result != Interpreter.voidObject)
+		else if (display && result != Scheme.voidObject)
 		  {
 		    SFormat.print (result, pout);
 		    pout.println();
@@ -95,10 +93,10 @@ public class Shell
       }
   }
 
-  public static void runString (String str, Interpreter interp, boolean dflag)
+  public static void runString (String str, Environment env, boolean dflag)
   {
     InPort str_port = call_with_input_string.open_input_string (str);
-    run (str_port, interp, false, dflag);
+    run (str_port, env, false, dflag);
   }
 
   public static void runFile (String fname)

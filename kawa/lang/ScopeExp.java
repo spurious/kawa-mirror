@@ -70,21 +70,21 @@ public abstract class ScopeExp extends Expression
       }
   }
 
-  public final void push_decls (Interpreter interp)
+  public final void push_decls (Translator tr)
   {
     for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
       {
 	if (! var.isArtificial ())
-	  ((Declaration)var).push (interp);
+	  ((Declaration)var).push (tr);
       }
   }
 
-  public final void pop_decls (Interpreter interp)
+  public final void pop_decls (Translator tr)
   {
     for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
       {
 	if (! var.isArtificial ())
-	  ((Declaration)var).pop (interp);
+	  ((Declaration)var).pop (tr);
       }
   }
 
@@ -100,9 +100,9 @@ public abstract class ScopeExp extends Expression
       }
   }
 
-  public void push (Interpreter interp)
+  public void push (Translator tr)
   {
-    outer = interp.current_scope;
+    outer = tr.current_scope;
     if (outer != null && // FIXME
 	! (this instanceof LambdaExp))
       {
@@ -111,15 +111,15 @@ public abstract class ScopeExp extends Expression
 	if (lambda != null)
 	  lambda.hasNestedScopes = true;
       }
-    interp.current_scope = this;
-    push_decls (interp);
+    tr.current_scope = this;
+    push_decls (tr);
   }
 
-  public void pop (Interpreter interp)
+  public void pop (Translator tr)
   {
     assign_space ();
-    pop_decls (interp);
-    interp.current_scope = outer;
+    pop_decls (tr);
+    tr.current_scope = outer;
   }
 
   /**

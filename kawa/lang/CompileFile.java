@@ -14,7 +14,7 @@ public class CompileFile extends Procedure2
     super ("compile-file");
   }
 
-  public static final LambdaExp read (String name, Environment env)
+  public static final ModuleExp read (String name, Translator tr)
        throws GenericError
   {
     FileInputStream fstream;
@@ -27,10 +27,10 @@ public class CompileFile extends Procedure2
 	throw new GenericError ("compile-file: file not found: " + name);
       }
 
-    return read (new InPort (fstream, name), env);
+    return read (new InPort (fstream, name), tr);
   }
 
-  public static final LambdaExp read (InPort port, Environment env)
+  public static final ModuleExp read (InPort port, Translator tr)
        throws GenericError
   {
     List body;
@@ -48,9 +48,7 @@ public class CompileFile extends Procedure2
       {
 	throw new GenericError ("I/O exception reading file: " + e.toString ());
       }
-    LambdaExp lexp = new ModuleExp (body, env);
-    lexp.filename = port.getName ();
-    return lexp;
+    return new ModuleExp (body, tr, port.getName ());
   }
 
   public final Object apply2 (Object arg1, Object arg2)
@@ -58,8 +56,8 @@ public class CompileFile extends Procedure2
   {
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
-    Interpreter interpreter = Interpreter.current ();
-    LambdaExp lexp = read (arg1.toString (), Environment.user ());
+    Translator tr = new Translator ();
+    ModuleExp lexp = read (arg1.toString (), tr);
     Compilation comp = new Compilation (lexp,
 					LambdaExp.fileFunctionName, false);
 
@@ -98,9 +96,10 @@ public class CompileFile extends Procedure2
    * @param topname name for the class of the .class for the top-level code.
    *  If null, topname is derived from prefix and inname.
    * @param prefix to prepend classnames for functions
+   * @return true iff there were syntax errors
    */
-  public static void compile_to_files (String inname, String directory,
-				String prefix, String topname)
+  public static boolean compile_to_files (String inname, String directory,
+					  String prefix, String topname)
        throws GenericError
   {
     if (topname == null)
@@ -114,11 +113,10 @@ public class CompileFile extends Procedure2
 	if (prefix != null)
 	  topname = prefix + short_name;
       }
-    Interpreter interpreter = Interpreter.current ();
-    int save_errors = interpreter.errors;
-    LambdaExp lexp = read (inname, Environment.user ());
-    if (interpreter.errors > save_errors)
-      return;
+    Translator tr = new Translator (Environment.user());
+    LambdaExp lexp = read (inname, tr);
+    if (tr.errors > 0)
+      return true;
     Compilation comp = new Compilation (lexp, topname, prefix);
     if (directory == null || directory.length () == 0)
       directory = "";
@@ -140,5 +138,6 @@ public class CompileFile extends Procedure2
       {
         throw new GenericError (ex.toString ());
       }
+    return false;
   }
 }

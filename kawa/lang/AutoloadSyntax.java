@@ -73,8 +73,8 @@ public class AutoloadSyntax extends Syntax
 	    loaded = (Syntax) value;
 	    if (name != null)
 	      {
-		if (Interpreter.current ().lookup (name) == this)
-		  Interpreter.define_global (name, loaded);
+		if (Environment.lookup_global (name) == this)
+		  Environment.define_global (name, loaded);
 		if (loaded.name () == null)
 		  loaded.setName (name);
 	      }
@@ -94,7 +94,7 @@ public class AutoloadSyntax extends Syntax
       { throw_error ("type error"); }
   }
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     if (loaded == null)
       {
@@ -104,13 +104,13 @@ public class AutoloadSyntax extends Syntax
 	  }
 	catch (GenericError e)
 	  {
-	    return interp.syntaxError (e.getMessage ());
+	    return tr.syntaxError (e.getMessage ());
 	  }
 	catch (WrongType e)
 	  {
-	    return interp.syntaxError (e.getMessage ());
+	    return tr.syntaxError (e.getMessage ());
 	  }
       }
-    return loaded.rewrite (obj, interp);
+    return loaded.rewrite (obj, tr);
   }
 }

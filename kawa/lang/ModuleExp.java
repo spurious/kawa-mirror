@@ -12,10 +12,18 @@ public class ModuleExp extends LambdaExp
   /** The formal parameter list of a ModuleBody. */
   static public Object formals = new Pair (env_formal, List.Empty);
 
-  public ModuleExp (List body, Environment env)
+  public ModuleExp (List body, Translator tr, String filename)
   {
-    super (formals, body, env.interpreter());
+    super (formals, body, tr);
     lookup (env_formal).type = Compilation.scmEnvironmentType;
+    setFile (filename);
   }
 
+  public final Object eval_module (Environment env)
+       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  {
+    if (!hasNestedScopes) // optimization - don't generate unneeded Class.
+      return body.eval (env);
+    return ((ModuleBody) eval (env)).run (env);
+  }
 }

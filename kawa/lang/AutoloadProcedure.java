@@ -73,8 +73,8 @@ public class AutoloadProcedure extends Procedure
 	  }
 	else if (name != null)
 	  {
-	    if (Interpreter.lookup_global (name) == this)
-	      Interpreter.define_global (name, loaded);
+	    if (Environment.lookup_global (name) == this)
+	      Environment.define_global (name, loaded);
 	    if (loaded.name () == null)
 	      loaded.setName (name);
 	  }

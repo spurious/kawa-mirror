@@ -6,22 +6,21 @@ public class Eval extends Procedure1or2
 {
   final static Symbol evalFunctionName = Symbol.make ("atEvalLevel");
 
-  public static Object eval (LambdaExp lexp, Environment env)
+  public static Object eval (ModuleExp mod, Translator tr)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    Interpreter interpreter = env.interpreter ();
-    int save_errors = interpreter.errors;
-    lexp.setName (evalFunctionName);
-    lexp.filename = "<eval>";
-    if (interpreter.errors > save_errors)
+    mod.setName (evalFunctionName);
+    if (tr.errors > 0)
       throw new GenericError ("syntax errors during eval");
-    return lexp.eval_module (env);
+    return mod.eval_module (tr.env);
   }
 
   public static Object eval (Object sexpr, Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    return eval (new ModuleExp (new Pair (sexpr, List.Empty), env), env);
+    Translator tr = new Translator (env);
+    ModuleExp mod = new ModuleExp (new Pair (sexpr, List.Empty), tr, "<eval>");
+    return eval (mod, tr);
   }
 
   public Object apply1 (Object arg1)

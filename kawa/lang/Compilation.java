@@ -85,12 +85,12 @@ public class Compilation
 						 Access.PUBLIC|Access.STATIC);
     Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
-      = scmInterpreterType.new_method ("lookup_global", sym1Arg,
+      = scmEnvironmentType.new_method ("lookup_global", sym1Arg,
 				       scmObjectType,
 				       Access.PUBLIC|Access.STATIC);
     Type[] symObjArgs = { scmSymbolType, scmObjectType };
     defineGlobalMethod
-      = scmInterpreterType.new_method ("define_global", symObjArgs,
+      = scmEnvironmentType.new_method ("define_global", symObjArgs,
 				       Type.void_type,
 				       Access.PUBLIC|Access.STATIC);
   }

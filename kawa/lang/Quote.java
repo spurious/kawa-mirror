@@ -9,11 +9,11 @@ public class Quote extends Syntax implements Printable
 {
   static private Pattern pattern = new ListPat (1);
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     Object [] match = pattern.match (obj);
     if (match == null)
-      return interp.syntaxError ("quote requires a single argument");
+      return tr.syntaxError ("quote requires a single argument");
     return new QuoteExp (match[0]);
   }
 

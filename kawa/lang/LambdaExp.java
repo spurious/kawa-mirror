@@ -51,9 +51,9 @@ public class LambdaExp extends ScopeExp
    * Higher-level constructor, that does the re-writing.
    * @param formals the formal parameter list (or symbol)
    * @param body the body of the procedure
-   * @param interp the (Scheme) interpreter
+   * @param tr the (Scheme) Translator
    */
-  public LambdaExp (Object formals, Object body, Interpreter interp)
+  public LambdaExp (Object formals, Object body, Translator tr)
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
@@ -65,7 +65,7 @@ public class LambdaExp extends ScopeExp
       max_args = -1;
     else
       {
-	interp.syntaxError ("misformed formals in lambda");
+	tr.syntaxError ("misformed formals in lambda");
 	return;
       }
 
@@ -98,9 +98,9 @@ public class LambdaExp extends ScopeExp
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
       }
-    push (interp);
-    this.body = interp.rewrite_body (body);
-    pop (interp);
+    push (tr);
+    this.body = tr.rewrite_body (body);
+    pop (tr);
   }
 
   /** If non-null, this is the Field that contains the static link. */
@@ -246,14 +246,6 @@ public class LambdaExp extends ScopeExp
       {
 	throw new GenericError ("class illegal access: in lambda eval");
       }
-  }
-
-  public final Object eval_module (Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
-  {
-    if (!hasNestedScopes) // optimization - don't generate unneeded Class.
-      return body.eval (env);
-    return ((ModuleBody) eval (env)).run (env);
   }
 
   public void print (java.io.PrintStream ps)

@@ -7,8 +7,6 @@ package kawa.lang;
 
 public class Environment // extends [somewhat] java.util.Dictionary
 {
-  Interpreter interp;
-
   private Binding[] table;
 
   Environment previous;
@@ -37,8 +35,23 @@ public class Environment // extends [somewhat] java.util.Dictionary
   public static Environment user ()
   {
     // transitional hack FIXME
-    return Interpreter.curEnvironment ();
+    return kawa.standard.Scheme.curEnvironment ();
   }
+
+  public static Object lookup_global (Symbol name)
+       throws UnboundSymbol
+  {
+    Object result = user().get (name);
+    if (result == null)
+      throw new UnboundSymbol(name);
+    return result;
+  }
+
+  public static void define_global (Symbol name, Object new_value)
+  {
+    user().define (name, new_value);
+  }
+
 
   static Environment cur;
 
@@ -47,15 +60,10 @@ public class Environment // extends [somewhat] java.util.Dictionary
     // FIXME - this should look at the current thread - somethink like:
     /*
       Thread thread = Thread.currentThread ();
-      if (thread instanceof KawaThread)
-      return ((KawaThread)thread).environment;
+      if (thread instanceof Future)
+      return ((Future)thread).environment;
      */
     return cur == null ? user () : cur;
-  }
-
-  public Interpreter interpreter ()
-  {
-    return interp;
   }
 
   public Environment ()
@@ -73,19 +81,6 @@ public class Environment // extends [somewhat] java.util.Dictionary
     this ();
     this.previous = previous;
     this.previous_time_stamp = this.time_stamp = previous.time_stamp;
-    this.interp = previous.interp;
-  }
-
-  // Obsolete (soon)
-  public Environment (kawa.lang.Interpreter i)
-  {
-    this ();
-    interp = i;
-  }
-
-  public Interpreter getInterpreter ()
-  {
-    return interp;
   }
 
   /**

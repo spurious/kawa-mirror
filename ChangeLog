@@ -1,3 +1,28 @@
+Sun Jan  5 19:18:27 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Create new Translator class from the rewrite-related methods and data
+	in Interpreter, and create new Translator for each top-level ModuleExp.
+	* kawa/lang/CompileFile.java (compile_to_files):  Return true
+	if syntax errors seen.
+	* kawa/lang/Translator.java:  New class, comtaining non-static data
+	and rewrite-related methods from Interpreter.
+	* kawa/lang/Environment.java (lookup_global,define_global):
+	Moved here from Interpreter.
+	* kawa/lang/Compilation.java (lookupGlobalMethod, defineGlobalMethod):
+	Update accordingly.
+	* kawa/lang/Interpreter.java: Only static fields and boolObject remain.
+	* kawa/lang/LambdaExp (eval_module):  Moved to ModuleExp.
+	* kawa/lang/ModuleExp.java (constructor):  Take extra filename arg.
+	* kawa/lang/{AutoloadProcedure,AutoloadSyntax,CompileFile,Declaration,
+	Eval,Expression,LambdaExp,Quote,ScopeExp,Syntax,SyntaxRule,SyntaxRules}
+	.java, kawa/standard/{and_or,begin,define,define_syntax,ifp,let,letrec,
+	load,quasiquote,set_b,syntax_error}.java, kawa/Shell.java:
+	Update Interpreter -> Translator.
+	Update statics in Interpreter to Scheme.
+	* kawa.java, kawac.java:  Update.
+	* kawa/standard/Scheme.java (makeEnvironment):  New function.
+	(define,lookup,env):  Moved from Interpreter.
+
 Fri Jan  3 17:35:43 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/ModuleExp.java:  New class.

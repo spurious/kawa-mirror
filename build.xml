@@ -4,22 +4,43 @@
   <!-- Give the user a chance to override the defaults. -->
   <property file="build.properties"/>
   
-  <property name="version" value="1.6.97"/>
+  <property name="version.release" value="1.6.97"/>
+  <property name="version.local" value=""/>
+  <property name="version" value="${version.release}${version.local}"/>
 
   <property name="debug"        value="true" />
   <property name="deprecation"  value="false" />
   <property name="optimize"     value="true" />
   
+  <!--
+    There was some discussion of using user.dir as a default here.
+    The most promising use being for dist.dir (and maybe build.dir).
+    But I decided against that for several reasons:
+      1) Consistency (don't make a special case).
+      2) The user.dir property isn't reliable (some bad JVMs out there).
+      3) Ant is not able to handle both absolute and relative paths
+         for commandline arguments based on user.dir.  Ant automatically
+         handles relative paths relative to basedir, not user.dir.
+         As a result, if dist.dir defaulted to user.dir,
+         "ant -buildfile ../kawa/build.xml" and
+         "ant -buildfile ../kawa/build.xml -Ddist.dir=." 
+         would produce different results.
+    So, the only way to use Ant where the current directory (user.dir)
+    is not the directory containing the buildfile, you *must* supply
+    absolute paths as arguments.  That is:
+    "ant -buildfile ../kawa/build.xml -Ddist.dir=`pwd`/."
+    The exception is Ant's arguments themselves, which are processed
+    as plain Java files and so are relative to the current directory.
+  -->
   <property name="src.dir"      value="${basedir}"/>
-  <!--<property name="build.dir"    value="${basedir}"/>-->
   <property name="build.dir"    value="${user.dir}"/>
-  <property name="dist.dir"     value="${basedir}"/>
+  <property name="dist.dir"     value="${build.dir}"/>
   
-  <property name="build.tools" value="${build.dir}/tools"/>
+  <property name="build.tools"        value="${build.dir}/tools"/>
   <property name="build.preprocessed" value="${build.dir}"/>
-  <property name="build.classes" value="${build.dir}"/>
+  <property name="build.classes"      value="${build.dir}"/>
   
-  <property name="dist.kawa.jar" value="${dist.dir}/kawa-${version}.jar"/>
+  <property name="dist.kawa.jar"    value="${dist.dir}/kawa-${version}.jar"/>
   
   <!-- 
      Set preprocess.overwrite true to force preprocessing.
@@ -30,6 +51,11 @@
 
   <target name="all" depends="classes, jar"/>
 
+  <target name="classes" 
+          depends="java-classes, lib-scm-classes
+          , slib-scm-classes, commonlisp-scm-classes
+          , servlet-classes, jemacs-classes" />
+  
   <!-- 
      These are the files that are Kawa.    
      They go in the classpath, jar, and are deleted by clean.
@@ -61,92 +87,86 @@
      <include name="kawa/Version.java"/>
   </fileset>
   
-  <patternset id="with-awt-true">
-  </patternset>
-  
-  <patternset id="with-awt-false">
-    <exclude name="kawa/GuiConsole.java"/>
-    <exclude name="kawa/MessageArea.java"/>
-    <exclude name="kawa/TextAreaWriter.java"/>
-    <exclude name="kawa/GuiInPort.java"/>
-  </patternset>
-  
-  <patternset id="with-swing-true">
-    <include name="gnu/jemacs/buffer/*"/>
-    <include name="gnu/jemacs/lang/*"/>
-  </patternset>
-  
-  <patternset id="with-swing-false">
-  </patternset>
-  
-  <!-- The following is part of an "if" trick.  Don't change it. -->
-  <property name="with-swing-true" value="do not change me"/>
-
-  <target name="classes" 
-          depends="java-classes, lib-scm-classes, slib-scm-classes
-          , slib-scm-classes, commonlisp-scm-classes
-          , jemacs-el-classes" />
-  
   <target name="run" depends="classes">
-     <java classname="kawa.repl" classpath="${build.classes}" />
+     <java taskname="kawa" classname="kawa.repl" classpath="${build.classes}" />
   </target>
   
-  <target name="build-tools">
-    <mkdir dir="${build.tools}"/>
-    <!-- 
-      This didn't work in NetBeans for some reason. 
-      (Even the includejavaruntime/includeantruntime attributes do no good.
-      The really weird thing is that NetBeans has access to the classes
-      for autocomplete and the scripting window.  Oh well.)
-      The workaround is to link to ant.jar.
-    -->
-    <javac srcdir="${src.dir}"
-           destdir="${build.tools}"
-           classpath="lib/ext/ant.jar"
-           debug="${debug}"
-           deprecation="${deprecation}"
-           optimize="${optimize}">
-      <include name="gnu/kawa/ant/*"/>
-    </javac>
-
-    <taskdef name="xcopy"
-             classname="gnu.kawa.ant.XCopy"
-             classpath="${build.tools}"/>
-
-    <!-- 
-       This doesn't really help us because user data 
-       definitions don't seem to be possible.
-    <typedef name="linestripperset" 
-             classname="gnu.kawa.ant.LineStripperSet"
-             classpath="${build.tools}"/>
-    -->
-
+  <target name="runw" depends="classes">
+     <java taskname="kawa" fork="true"
+           classname="kawa.repl" classpath="${build.classes}">
+       <arg value="-w"/>
+     </java>
   </target>
   
+  <!--
+    This is part of an "if" trick.  Do not change me.
+    The "if" attribute for tasks is not true if the property is not
+    set at all, not whether the value is "true" or "false".
+    So here we use the value of the with- or enable- properties
+    and rely on true being "true" with this property defined,
+    and false being "false" with that property not defined.
+  -->
+  <property name="true" value="true"/>
+
   <target name="build-settings" depends="build-tools">
+    <!--
+       In the following you'll see that each conditional property is set
+       twice.  That is because available will not set the property at
+       all if the condition is false.  We need the explicit "false" value
+       so that we can work consistently with "-D" and build.properties.
+       Ant only sets a property once (within a given task chain) and so
+       the second setting is ignored if "available" set it to "true".
+    -->
     <!-- 
        If java.util.List is in the classpath, then we'll compile with
        Java Collections, unless you override the setting of with-collections.
     -->
     <available property="with-collections" classname="java.util.List"/>
+    <property name="with-collections" value="false"/>
     
     <!-- 
        If java.lang.ref.WeakReference is in the classpath, then we'll compile with
        Java References, unless you override the setting of with-references.
     -->
     <available property="with-references" classname="java.lang.ref.WeakReference"/>
+    <property name="with-references" value="false"/>
     
     <!-- 
        If java.awt.Component is in the classpath, then we'll compile the
        AWT UI, unless you override the setting of with-awt.
     -->
     <available property="with-awt" classname="java.awt.Component"/>
+    <property name="with-awt" value="false"/>
     
     <!-- 
        If java.awt.Component is in the classpath, then we'll compile the
        JEmacs Swing UI, unless you override the setting of with-swing.
     -->
     <available property="with-swing" classname="javax.swing.JComponent"/>
+    <property name="with-swing" value="false"/>
+
+    <!--
+       JEmacs stuff is compiled if Swing is used, unless enable-jemacs is false.
+    -->
+    <property name="enable-jemacs" value="${with-swing}"/>
+
+    <!--
+       If javax.servlet.http.HttpServlet is in the classpath, then we'll
+       compile Kawa' servlet interface, unless you override enable-servlet.
+    -->
+    <available property="enable-servlet" classname="javax.servlet.http.HttpServlet"/>
+    <property name="enable-servlet" value="false"/>
+  
+    <echo>
+	build.dir=${build.dir}
+        version=${version}
+        with-collections=${with-collections}
+        with-references=${with-references}
+        with-awt=${with-awt}
+        with-swing=${with-swing}
+        enable-jemacs=${enable-jemacs}
+        enable-servlet=${enable-servlet}
+    </echo>
 
     <!-- 
        This dummy copy is just so we can reference the sets by id.
@@ -184,12 +204,44 @@
     </xcopy>
   </target>
   
+  <target name="build-tools">
+    <mkdir dir="${build.tools}"/>
+    <!-- 
+      This didn't work in NetBeans for some reason. 
+      (Even the includejavaruntime/includeantruntime attributes do no good.
+      The really weird thing is that NetBeans has access to the classes
+      for autocomplete and the scripting window.  Oh well.)
+      The workaround is to link to ant.jar.
+    -->
+    <javac srcdir="${src.dir}"
+           destdir="${build.tools}"
+           classpath="lib/ext/ant.jar"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+      <include name="gnu/kawa/ant/*"/>
+    </javac>
+
+    <taskdef name="xcopy"
+             classname="gnu.kawa.ant.XCopy"
+             classpath="${build.tools}"/>
+
+    <!-- 
+       This doesn't really help us because user data 
+       definitions don't seem to be possible.
+    <typedef name="linestripperset" 
+             classname="gnu.kawa.ant.LineStripperSet"
+             classpath="${build.tools}"/>
+    -->
+
+  </target>
+  
   <!-- 
      This preprocessing jazz is rather involved and verbose,
      but it is entirely compatible with the makefile code 
      and actually _isn't_ as complicated as I could have made 
      it (as there are still unrolled patterns here that could 
-     have been wrapped up but demurred in consideration of 
+     have been wrapped up but I demurred in consideration of 
      those who may try and grok it).
   -->
 
@@ -304,6 +356,15 @@
     </xcopy>
   </target>
   
+  <patternset id="with-awt-true"/>
+  
+  <patternset id="with-awt-false">
+    <exclude name="kawa/GuiConsole.java"/>
+    <exclude name="kawa/MessageArea.java"/>
+    <exclude name="kawa/TextAreaWriter.java"/>
+    <exclude name="kawa/GuiInPort.java"/>
+  </patternset>
+  
   <target name="java-classes" depends="preprocess">
     <mkdir dir="${build.classes}"/>
     <!-- 
@@ -327,14 +388,12 @@
       <include name="gnu/math/"/>
       <include name="gnu/text/"/>
       <include name="gnu/xml/"/>
-      <include name="gnu/kawa/xml/"/>
-      <include name="gnu/xquery/lang"/>
-      <include name="gnu/xquery/util"/>
+      <include name="gnu/xquery/lang/"/>
+      <include name="gnu/xquery/util/"/>
       <include name="kawa/lang/"/>
       <include name="kawa/standard/"/>
       <include name="kawa/"/>
       <patternset refid="with-awt-${with-awt}"/>
-      <patternset refid="with-swing-${with-swing}"/>
     </javac>
   </target>
    
@@ -382,7 +441,7 @@
   </target>
 
   <target name="lib-scm-classes" 
-          depends="check-lib-scm-classes" 
+          depends="java-classes, check-lib-scm-classes" 
           unless="lib-scm-classes-uptodate">
     <apply taskname="kawa" executable="java" 
            failonerror="true" parallel="true">
@@ -407,7 +466,7 @@
   </target>
 
   <target name="commonlisp-scm-classes"
-          depends="check-commonlisp-scm-classes" 
+          depends="java-classes, check-commonlisp-scm-classes" 
           unless="commonlisp-scm-classes-uptodate">
     <apply taskname="kawa" executable="java" 
            failonerror="true" parallel="true">
@@ -435,19 +494,35 @@
   </target>
 
   <target name="slib-scm-classes"
-          depends="check-slib-scm-classes" 
+          depends="java-classes, check-slib-scm-classes" 
           unless="slib-scm-classes-uptodate">
     <apply taskname="kawa" executable="java" 
            failonerror="true" parallel="true">
-      <arg line="-classpath"/> <arg path="${build.classes}"/>
-      <arg line="kawa.repl"/>
-      <arg line="-d"/> <arg path="${build.classes}"/>
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.slib. --module-static -C"/>
       <fileset refid="slib-scm"/>
     </apply>
   </target>
   
-      <fileset id="jemacs-scm" dir="${src.dir}/gnu/jemacs/buffer"> 
+  <target name="servlet-classes" 
+          depends="build-settings, java-classes" 
+          if="${enable-servlet}">
+    <javac srcdir="${src.dir}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}" >
+      <include name="gnu/kawa/servlet/"/>
+    </javac>
+  </target>
+   
+      <fileset id="jemacs-lang-scm" dir="${src.dir}/gnu/jemacs/lang"> 
+        <include name="MiscOps.scm"/>
+        <include name="NumberOps.scm"/>
+      </fileset>
+      <fileset id="jemacs-buffer-scm" dir="${src.dir}/gnu/jemacs/buffer"> 
         <include name="emacs.scm"/>
       </fileset>
       <fileset id="jemacs-el" dir="${src.dir}/gnu/jemacs/lisp"> 
@@ -464,12 +539,16 @@
         <include name="autoloads.el"/>
       </fileset>
 
-  <target name="check-jemacs-el-classes">
-    <condition property="jemacs-el-classes-uptodate"> 
+  <target name="check-jemacs-lisp-classes">
+    <condition property="jemacs-lisp-classes-uptodate"> 
       <and>
         <uptodate>
           <mapper type="glob" from="*.scm" to="*.class"/>
-          <srcfiles refid="jemacs-scm"/>
+          <srcfiles refid="jemacs-lang-scm"/>
+        </uptodate>
+        <uptodate>
+          <mapper type="glob" from="*.scm" to="*.class"/>
+          <srcfiles refid="jemacs-buffer-scm"/>
         </uptodate>
         <uptodate>
           <mapper type="glob" from="*.el" to="*.class"/>
@@ -479,27 +558,51 @@
     </condition>
   </target>
 
-  <target name="jemacs-el-classes" 
-          depends="build-settings, check-jemacs-el-classes" 
-          if="with-swing-${with-swing}" 
-          unless="jemacs-el-classes-uptodate">
+  <target name="jemacs-java-classes" 
+          depends="build-settings, java-classes" 
+          if="${enable-jemacs}">
+    <javac srcdir="${src.dir}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}" >
+      <include name="gnu/jemacs/buffer/"/>
+      <include name="gnu/jemacs/lang/"/>
+    </javac>
+  </target>
+   
+  <target name="jemacs-classes" 
+          depends="build-settings, java-classes
+            , jemacs-java-classes
+            , check-jemacs-lisp-classes" 
+          if="${enable-jemacs}" 
+          unless="jemacs-lisp-classes-uptodate">
     <apply taskname="kawa" executable="java" 
            failonerror="true" parallel="true">
-      <arg line="-classpath"/> <arg path="${build.classes}"/>
-      <arg line="kawa.repl"/>
-      <arg line="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
-      <fileset refid="jemacs-scm"/>
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.jemacs.lang. --module-static -C"/>
+      <fileset refid="jemacs-lang-scm"/>
     </apply>
 
-    <!-- Don't know why, but "elisp" can't "getInstance" if this is present: -->
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
+      <fileset refid="jemacs-buffer-scm"/>
+    </apply>
+
+    <!-- !JPW: Don't know why, but "elisp" can't "getInstance" if this is present: -->
     <delete file="${build.classes}/gnu/jemacs/lisp/primitives.class"/>
 
     <apply taskname="elisp" executable="java" 
            failonerror="true" parallel="true">
-      <arg line="-classpath"/> <arg path="${build.classes}"/>
-      <arg line="kawa.repl"/>
-      <arg line="-d"/> <arg path="${build.classes}"/>
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.jemacs.lisp. --elisp -C"/>
       <fileset refid="jemacs-el"/>
     </apply>
@@ -513,8 +616,9 @@
   </target>
 
   <!--
-    These clean targets are split up because I can't (yet)
-    get build-tools to work in NetBeans.
+    These clean targets are split up for when
+    get build-tools doesn't work in NetBeans.
+    (There is a workaround now, see build-tools.)
     For this to work, build.tools must be a different
     directory than build.classes uses.
   -->

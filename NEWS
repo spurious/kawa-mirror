@@ -1,8 +1,29 @@
+Changed lots of error messages to use pairs of single quotes rather
+than starting with a backquote (accent grave):  'name' instead of `name'.
+Many newer fonts make the latter look bad, so it is now discouraged.
+
+The types <String> and <java.lang.String> new behave differently.
+finally matching the documentation.  The type <java.lang.String> now
+works just like (say) <java.util.Hashtable>: Converting an object to a
+<java.lang.String> is done by a single coercion, so the incoming value
+must be a java.lang.String reference or null.  The special type
+<String> converts any object to a java.string.String by calling toString;
+it also handles null by specially testing for it.
+
+For convenience (and backwards compatibility) Kawa uses the type
+<Scheme> (rather than <java.lang.String>) when it sees the Java
+type java.lang.String, for example in the argument to an invoke.
+
+The default behaviour of '[' and '] was changed back to be token
+(word) constituents, matching R5RS and Common Lisp.  However, you
+can easily change this behaviour using the new setBrackMode method
+or the defaultBracketMode static field in ReadTable.
+
 You can now build Kawa from source using the Ant build system (from
 Apache's Jakarta project), as an alternative to using the traditional
 configure+make system.  An advantage of Ant is that it works on
 most Java systems, without requiring a Unix shell and commands.
-Specifically, this makes it easy to build kawa under MS-Windows.
+Specifically, this makes it easy to build Kawa under MS-Windows.
 Thanks to James White for contributing this support.
 
 The syntax ':NAME' no longer by default reads as a keyword,

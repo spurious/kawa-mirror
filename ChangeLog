@@ -1,5 +1,7 @@
 2001-11-24  Per Bothner  <per@bothner.com>
 
+	* build.xml, build.properties:  Update from Jim White.
+
 	* Makefile.am:  Add more directories (conditionally) to JAR_DEPS.
 
 	* kawa/standard/convert.java:  Moved to gnu.kawa.functions.Convert.

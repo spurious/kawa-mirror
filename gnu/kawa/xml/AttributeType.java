@@ -71,7 +71,13 @@ implements TypeValue, Externalizable, AttributePredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
-    if (attrType instanceof Symbol)
+    if (attrType instanceof XName)
+      {
+	XName qtype = (XName) attrType;
+	curNamespaceURI = qtype.getNamespaceURI();
+	curLocalName = qtype.getLocalName();
+      }
+    else if (attrType instanceof Symbol)
       {
 	Symbol qname = (Symbol) attrType;
 	curNamespaceURI = qname.getNamespaceURI();
@@ -101,7 +107,13 @@ implements TypeValue, Externalizable, AttributePredicate
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
-    if (curName instanceof Symbol)
+    if (curName instanceof XName)
+      {
+	XName qtype = (XName) curName;
+	curNamespaceURI = qtype.getNamespaceURI();
+	curLocalName = qtype.getLocalName();
+      }
+    else if (curName instanceof Symbol)
       {
 	Symbol qname = (Symbol) curName;
 	curNamespaceURI = qname.getNamespaceURI();

@@ -67,7 +67,13 @@ implements TypeValue, Externalizable, GroupPredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
-    if (groupType instanceof Symbol)
+    if (groupType instanceof XName)
+      {
+	XName qtype = (XName) groupType;
+	curNamespaceURI = qtype.getNamespaceURI();
+	curLocalName = qtype.getLocalName();
+      }
+    else if (groupType instanceof Symbol)
       {
 	Symbol qname = (Symbol) groupType;
 	curNamespaceURI = qname.getNamespaceURI();
@@ -97,7 +103,13 @@ implements TypeValue, Externalizable, GroupPredicate
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
-    if (curName instanceof Symbol)
+    if (curName instanceof XName)
+      {
+	XName qtype = (XName) curName;
+	curNamespaceURI = qtype.getNamespaceURI();
+	curLocalName = qtype.getLocalName();
+      }
+    else if (curName instanceof Symbol)
       {
 	Symbol qname = (Symbol) curName;
 	curNamespaceURI = qname.getNamespaceURI();

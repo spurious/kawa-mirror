@@ -1,3 +1,8 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* BRL.java:  Remove unused import statements.
+	* BRLReaderString.java:  Likewise.
+
 2004-01-09  Per Bothner  <per@bothner.com>
 
 	* BRL.java (registerEnvironment):  Update setCurrent to setGlobal.

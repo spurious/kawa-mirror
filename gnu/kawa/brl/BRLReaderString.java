@@ -4,7 +4,6 @@ package gnu.kawa.brl;
 // Copyright (C) 2001  Bruce R. Lewis and Eaton Vance Management
 // See the file COPYING for license terms.
 
-import gnu.kawa.lispexpr.*;
 import gnu.text.*;
 import gnu.mapping.InPort;
 import gnu.lists.*;

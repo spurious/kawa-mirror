@@ -56,7 +56,7 @@ public class LocalVarsAttr extends Attribute
 	      used[var.offset] = var;
 	    else if (used[var.offset] != var)
 	      throw new Error ("inconsistent local variable assignments for "
-+var.getName()+" at "+var.offset+" != "+used[var.offset]);
++var+" != "+used[var.offset]);
 	  }
       }
   }

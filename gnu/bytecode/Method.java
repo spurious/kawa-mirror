@@ -316,7 +316,18 @@ public class Method implements AttrContainer {
     sbuf.append(' ');
     sbuf.append(name);
     if (arg_types != null)
-      sbuf.append(getSignature());
+      {
+	int args_count = arg_types.length; 
+	sbuf.append('(');
+	for (int i = 0; i < args_count; i++)
+	  {
+	    if (i > 0)
+	      sbuf.append(',');
+	    sbuf.append (arg_types[i].getName());
+	  }
+	sbuf.append(')');
+	sbuf.append(return_type.getName());
+      }
     return sbuf.toString();
   }
 };

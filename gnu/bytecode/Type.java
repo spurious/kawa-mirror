@@ -299,27 +299,24 @@ public abstract class Type {
     throw new Error ("unimplemented emitCoerceFromObject for "+this);
   }
 
-  static public Type byte_type = new PrimType ("byte", "B", 1,
-					       java.lang.Byte.TYPE);
-  static public Type short_type = new PrimType ("short", "S", 2,
-						java.lang.Short.TYPE);
-  static public Type int_type = new PrimType ("int", "I", 4,
-					      java.lang.Integer.TYPE);
-  static public Type long_type = new PrimType ("long", "J", 8,
-					       java.lang.Long.TYPE);
-
-  static public Type float_type = new PrimType ("float", "F", 4,
-						java.lang.Float.TYPE);
-  static public Type double_type = new PrimType ("double", "D", 8,
-						 java.lang.Double.TYPE);
-
-  static public Type boolean_type = new PrimType ("boolean", "Z", 1,
-						  java.lang.Boolean.TYPE);
-  static public Type char_type = new PrimType ("char", "C", 2,
-					       java.lang.Character.TYPE);
-
-  static public Type void_type = new PrimType ("void", "V", 0,
-					       java.lang.Void.TYPE);
+  public static final PrimType byte_type
+    = new PrimType ("byte", "B", 1, java.lang.Byte.TYPE);
+  public static final PrimType short_type
+    = new PrimType ("short", "S", 2, java.lang.Short.TYPE);
+  public static final PrimType int_type
+    = new PrimType ("int", "I", 4, java.lang.Integer.TYPE);
+  public static final PrimType long_type
+    = new PrimType ("long", "J", 8, java.lang.Long.TYPE);
+  public static final PrimType float_type
+    = new PrimType ("float", "F", 4, java.lang.Float.TYPE);
+  public static final PrimType double_type
+    = new PrimType ("double", "D", 8, java.lang.Double.TYPE);
+  public static final PrimType boolean_type
+    = new PrimType ("boolean", "Z", 1, java.lang.Boolean.TYPE);
+  public static final PrimType char_type
+    = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
+  public static final PrimType void_type
+    = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
   static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType string_type = ClassType.make("java.lang.String");

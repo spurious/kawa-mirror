@@ -1,4 +1,4 @@
-(test-init "objects" 15)
+(test-init "objects" 16)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -46,6 +46,9 @@
 	       ((val2 (field obj 'fld))
 		(str2 (as <String> obj)))
 	     (list val1 str1 val2 str2)))))
+
+(test 1 'object-locals
+      (let ((x (object (<java.lang.Object>) (z (lambda (x) (display x)))))) 1))
 
 (test 2 'object-with-closure-1
       (length (let*

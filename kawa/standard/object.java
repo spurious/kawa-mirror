@@ -124,7 +124,7 @@ public class object extends Syntax
 		Expression initValue = tr.rewrite(init);
 		SetExp sexp = new SetExp (decl.getName(), initValue);
 		sexp.binding = decl;
-		decl.noteValue(initValue);
+		decl.noteValue(null);
 		inits.setElementAt(sexp, init_index++);
 	      }
 	  }

@@ -164,6 +164,11 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     startWord();
   }
 
+  public void beginDocument()
+  {
+    super.write("<?xml version=\"1.0\"?>\n");
+  }
+
   public void beginGroup(String typeName, Object type)
   {
     closeTag();

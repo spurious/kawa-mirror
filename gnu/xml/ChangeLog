@@ -1,3 +1,7 @@
+2004-01-12  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (beginDocument):  New method - print XML declaration.
+
 2004-01-04  Per Bothner  <per@bothner.com>
 
 	* NodeTree (getIteratorAtPos):  New method.

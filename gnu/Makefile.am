@@ -11,7 +11,6 @@ endif
 if WITH_SWING
 SWING_SUBDIRS = jemacs
 endif
-EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html
 

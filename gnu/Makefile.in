@@ -121,7 +121,6 @@ SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
 @ENABLE_XML_TRUE@BRL_SUBDIR = brl
 @ENABLE_XML_TRUE@XQUERY_SUBDIR = xquery
 @WITH_SWING_TRUE@SWING_SUBDIRS = jemacs
-EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html
 subdir = gnu

@@ -1,3 +1,7 @@
+2005-01-01  Per Bothner  <per@bothner.com>
+
+	* LiteralFormat.java (content): New method.
+
 2004-08-05  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (endLogicalBlock):  Fix "dangling pointer" bug.

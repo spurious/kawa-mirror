@@ -35,6 +35,12 @@ public class LiteralFormat extends ReportFormat
     throw new Error("LiteralFormat.parseObject - not implemented");
   }
 
+  /** Return the text that would be printed by the format. */
+  public String content ()
+  {
+    return new String(text);
+  }
+
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer("LiteralFormat[\"");

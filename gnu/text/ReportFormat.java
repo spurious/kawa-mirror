@@ -30,7 +30,7 @@ public abstract class ReportFormat extends Format
    * @param start the index (in args) of the argument to start with
    * @return an integer result(resultCode, nextArg), where
    * nextArg is the index following the last argument processed, and
-   * code is a result code (normally 0, or negative if early termintation
+   * code is a result code (normally 0, or negative if early termintation)
    */
   public abstract int format(Object[] args, int start,
 			     Writer dst, FieldPosition fpos)

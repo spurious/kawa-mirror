@@ -26,7 +26,6 @@ public class CompoundFormat extends ReportFormat
     for (int i = 0;  i < length;  i++)
       {
 	Format fmt = formats[i];
-	//System.err.println("format("+fmt+")");
 	if (fmt instanceof ReportFormat)
 	  {
 	    start = ((ReportFormat) fmt).format(args, start, dst, fpos);

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -481,7 +481,8 @@ public class LambdaExp extends ScopeExp
     if (nameDecl != null && nameDecl.field != null)
       return nameDecl.field;
     String name = getName();
-    String fname = name == null ? "lambda" : Compilation.mangleName(name);
+    String fname
+      = name == null ? "lambda" : Compilation.mangleNameIfNeeded(name);
     int fflags = Access.FINAL;
     if (nameDecl != null && nameDecl.context instanceof ModuleExp)
       {

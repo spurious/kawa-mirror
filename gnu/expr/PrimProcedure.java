@@ -460,9 +460,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       {
         if (name == null)
           return null;
-        String mangledName
-	  = decl == null || decl.field == null ? Compilation.mangleName(name)
-	  : decl.field.getName();
+        String mangledName = Compilation.mangleName(name);
         String mangledNameV = mangledName + "$V";
 	boolean applyOk = true; // Also look for "apply" and "apply$V".
 	for (Method meth = procClass.getDeclaredMethods();

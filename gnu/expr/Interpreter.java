@@ -207,7 +207,8 @@ public abstract class Interpreter
 
   protected void define_field (String name, String cname)
   {
-    StaticFieldConstraint.define(environ, name, cname, Compilation.mangleName(name));
+    StaticFieldConstraint.define(environ, name, cname,
+				 Compilation.mangleNameIfNeeded(name));
   }
 
   /** Enter a named function into the current environment. */

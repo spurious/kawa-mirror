@@ -1,3 +1,6 @@
+// Copyright (c) 2003  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Named;
@@ -414,7 +417,7 @@ public class Declaration
       {
         String vname = null;
         if (symbol != null)
-          vname = Compilation.mangleName(getName());
+          vname = Compilation.mangleNameIfNeeded(getName());
 	if (isAlias() && getValue() instanceof ReferenceExp)
 	  {
 	    Declaration base = followAliases(this);
@@ -510,7 +513,7 @@ public class Declaration
     String fname = getName();
     boolean external_access = (flags & EXTERNAL_ACCESS+PRIVATE)
       == EXTERNAL_ACCESS+PRIVATE;
-    fname = Compilation.mangleName(fname);
+    fname = Compilation.mangleNameIfNeeded(fname);
     if (getFlag(IS_UNKNOWN))
       fname = UNKNOWN_PREFIX + fname;
     if (external_access)
@@ -586,7 +589,7 @@ public class Declaration
         if (procClass != null)
           {
             ClassType procType = (ClassType) Type.make(procClass);
-            String fname = Compilation.mangleName(name);
+            String fname = Compilation.mangleNameIfNeeded(name);
             gnu.bytecode.Field procField = procType.getDeclaredField(fname);
             if (procField != null)
               {

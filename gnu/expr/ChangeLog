@@ -1,3 +1,13 @@
+2003-01-01  Per Bothner  <per@bothner.com>
+
+	Field names now use the reversible mangleNameIfNeeded - though
+	method names don't.
+	* Interpreter.java (define_field):  Use mangleNameIfNeeded.
+	* LambdaExp.java (allocFieldFor):  Use mangleNameIfNeeded.
+	* Declaration.java (allocateVariable, makeField):  Likewise.
+	* PrimProcedure.java (getMethodFor):  Don't use field name for
+	mangledName, as they may be mangled differently.
+
 2002-12-16  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileTarget):  Better handling of Values.

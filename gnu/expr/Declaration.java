@@ -202,6 +202,17 @@ public class Declaration
    * If the variable can be set more than once, then value is null. */
   protected Expression value = QuoteExp.undefined_exp;
 
+  /** The value of this <code>Declaration</code>, if known.
+   * Usually the expression used to initialize the <code>Declaration</code>,
+   * or null if the <code>Declaration</code> can be assigned a different
+   * value after initialization.  Note that this is the semantic value: If the
+   * <code>INDIRECT_LOCATION</code> is set, then <code>getValue</code> is the
+   * value <em>after</em> de-referencing the resulting <code>Location</code>.
+   * An exception is if <code>isAlias()</code>; in that case
+   * <code>getValue()</code> is an expression yielding a <code>Location</code>
+   * which needs to be de-referenced to get this <code>Declaration</code>'s
+   * actual value.
+   */
   public final Expression getValue() { return value; }
 
   /** If getValue() is a constant, return the constant value, otherwise null. */
@@ -242,8 +253,10 @@ public class Declaration
   static final int PROCEDURE = 0x80;
 
   public static final int IS_ALIAS = 0x100;
+
   /** Set if this is just a declaration, not a definition. */
   public static final int NOT_DEFINING = 0x200;
+
   public static final int EXPORT_SPECIFIED = 0x400;
   public static final int STATIC_SPECIFIED = 0x800;
   public static final int NONSTATIC_SPECIFIED = 0x1000;

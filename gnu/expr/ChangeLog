@@ -1,3 +1,8 @@
+2004-09-05  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (findLiteral): Also search superclasses for
+	static fields.
+
 2004-08-11  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (addClass): Don't implement Runnable for Servlets.

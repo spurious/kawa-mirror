@@ -251,27 +251,28 @@ public class LitTable implements ObjectOutput
     synchronized (staticTable)
       {
 	literal = (Literal) staticTable.get(value);
-	if (literal == null || literal.value != value)
+	if ((literal == null || literal.value != value)
+	    && valueType instanceof ClassType)
 	  {
-	    if (valueType instanceof ClassType
-		&& staticTable.get(valueClass) == null)
+	    // Add all the static final public fields to staticTable.
+	    int needed_mod = Access.STATIC | Access.FINAL | Access.PUBLIC;
+	    Class fldClass = valueClass;
+	    ClassType fldType = (ClassType) valueType;
+	    while (staticTable.get(fldClass) == null)
 	      {
 		// This is a convention to note that we've scanned valueType.
-		staticTable.put(valueClass, valueClass);
-		// Add all the static final public fields to staticTable.
-		int needed_mod = Access.STATIC | Access.FINAL | Access.PUBLIC;
-		for (Field fld = ((ClassType) valueType).getFields();
+		staticTable.put(fldClass, fldClass);
+		for (Field fld = fldType.getFields();
 		     fld != null;  fld = fld.getNext())
 		  {
-		    int mods = fld.getModifiers();
-		    if ((mods & needed_mod) == needed_mod)
+		    if ((fld.getModifiers() & needed_mod) == needed_mod)
 		      {
 			try
 			  {
 			    java.lang.reflect.Field rfld = fld.getReflectField();
 			    Object litValue = rfld.get(null);
 			    if (litValue == null
-				|| ! valueClass.isInstance(litValue))
+				|| ! fldClass.isInstance(litValue))
 			      continue;
 			    Literal lit = new Literal (litValue, fld, this);
 			    staticTable.put(litValue, lit);
@@ -285,6 +286,10 @@ public class LitTable implements ObjectOutput
 			  }
 		      }
 		  }
+		fldClass = fldClass.getSuperclass();
+		if (fldClass == null)
+		  break;
+		fldType = (ClassType) Type.make(fldClass);
 	      }
 	  }
       }

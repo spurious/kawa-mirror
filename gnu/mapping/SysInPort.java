@@ -64,7 +64,7 @@ public class SysInPort extends TtyInPort
 	  break;
       }
     if (tie != null)
-      tie.echo(buffer, off, len);
+      tie.echo(buffer, off-count, count);
     return count;
   }
 }

@@ -1,3 +1,7 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* SysInPort.java (fill):  Fix logic error, whihc broke transcripts.
+
 1999-08-27  Per Bothner  <per@bothner.com>
 
 	* Environment.java (num_binding):  Make non-static.

@@ -1,3 +1,6 @@
+// Copyright (c) 2003  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import java.util.Hashtable;
 
@@ -277,7 +280,7 @@ public class FindCapturedVars extends ExpWalker
 	      }
 	  }
 	if (decl.isSimple())
-	  {	
+	  {
 	    if (declLambda.capturedVars == null
 		&& ! decl.isStatic()
 		&& ! (declLambda instanceof ModuleExp

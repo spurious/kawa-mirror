@@ -2,6 +2,8 @@ Mon Sep 16 11:04:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.0.  (Yeah!)
 	* Makefile.{am,in}:  Add rule to make kawa.html and include it in dist.
+	* Makefile.{am,in} (EXTRA_DIST):  Add license.terms and scm2java.html.
+	* scm2java.html:  Warn that it is not current, and fix some typos.
 
 	* kawa/standard/{floor,ceiling,truncate,round}.java:  Handle IntNum.
 	* kawa/standard/{lcm,max,min,modulo,quotient,remainder}.java:  New.

@@ -9,6 +9,10 @@
 </address>
 May 1996
 <p>
+<em>(This design document discusses the issues of implementing
+Java in Scheme.  It predates the implementation, and does not
+necessarily match the current Kawa implementation.)</em>
+<p>
 Our biggest outstanding deliverable for Guile is a byte-compiler
 and -interpreter.  Using Java has been suggested, and there is
 wide-spread interest in using Java byte codes for other languages.
@@ -147,7 +151,7 @@ In some cases, a number of functions can use the same <code>Procedure</code>
 sub-class. For example, the <code>c[ad]*r</code> functions could be
 implemented with a single <code>Procedure</code> sub-class, with
 a field containing an encoding of the <code>[ad]*</code>.
-The <code>apply</code> method used that field to do the right thing.
+The <code>apply</code> method uses that field to do the right thing.
 <p>
 A <a name="closures">closure</a> requires a <code>Procedure</code>
 sub-class with a field that contains the static context.
@@ -331,7 +335,7 @@ candidate for a combined Scheme/Java system.
 Finally, it does not take much code to write a simple Scheme interpreter,
 This can be byte compiled, and linked in
 with the rest of the system.  This makes most sense in
-a Scheme system that emphasiseslarge applications, and uses
+a Scheme system that emphasises large applications, and uses
 a compiler that does global optimization,
 such as <a href="#Stalin">Stalin</a>.
 

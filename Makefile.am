@@ -34,7 +34,7 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-EXTRA_DIST = kawa.txt kawa.html
+EXTRA_DIST = kawa.txt kawa.html license.terms scm2java.html
 info_TEXINFOS = kawa.texi
 CLEANFILES=$(OBJ)
 

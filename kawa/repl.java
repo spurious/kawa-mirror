@@ -573,13 +573,52 @@ public class repl extends Procedure0or1
 	    if (name.length() > 2 && name.charAt(0) == '-')
 	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
 	    Interpreter interpreter = Interpreter.getInstance(name);
-	    if (interpreter == null)
-	      bad_option(arg);
-	    else
+	    if (interpreter != null)
 	      {
 		Interpreter.defaultInterpreter = interpreter;
 		if (previous == null)
 		  Environment.setCurrent(interpreter.getEnvironment());
+	      }
+	    else
+	      {
+		// See it arg is a valid Compation option, and it so set it.
+		int eq = name.indexOf("=");
+		String opt_value;
+		if (eq < 0)
+		  opt_value = null;
+		else
+		  {
+		    opt_value = name.substring(eq+1);
+		    name = name.substring(0, eq);
+		  }
+
+		// Convert "--no-xxx" to "--xxx=no":
+		boolean startsWithNo
+		  = name.startsWith("no-") && name.length() > 3;
+		if (opt_value == null && startsWithNo)
+		  {
+		    opt_value = "no";
+		    name = name.substring(3);
+		  }
+
+		String msg = Compilation.options.set(name, opt_value);
+		if (msg != null)
+		  {
+		    // It wasn't a valid Complation option.
+		    if (startsWithNo && msg == gnu.text.Options.UNKNOWN)
+		      msg = "both '--no-' prefix and '="+
+			opt_value+"' specified";
+		    if (msg == gnu.text.Options.UNKNOWN)
+		      {
+			bad_option(arg);
+		      }
+		    else
+		      {
+			System.err.println ("kawa: bad option '"
+					    + arg + "': " + msg);
+			System.exit (-1);
+		      }
+		  }
 	      }
 	  }
 	else

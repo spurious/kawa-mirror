@@ -1,3 +1,10 @@
+Tue Mar  3 17:49:13 1998  Per Bothner  <bothner@cygnus.com>
+
+	* reflection.scm (primitive-array-get, primitive-array-set,
+	primitive-array-new, primitive-array-length,
+	primitive-get-field, primitive-set-field, primitive-get-static,
+	primitive-set-static):  New procedures.
+
 Wed Feb 18 22:14:57 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ports.scm (input-port-column-number):  Fix parenthesis error.

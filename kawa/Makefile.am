@@ -48,7 +48,7 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 # Specifically, lib needs repl to compile scm files.
 all-recursive:  classjava.stamp
 
-EXTRA_DIST = Version.java
+EXTRA_DIST = Version.java.in Version.java
 
 install-exec-local: install-exec-bindir
 

@@ -36,6 +36,6 @@ public class prim_throw extends Procedure1 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return Type.void_type;
+    return Type.neverReturnsType;
   }
 }

@@ -1,0 +1,7 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	New package for a new experimental "q2" language.
+	* Q2.java:  New class, extends Scheme.
+	* Q2Apply.java:  New class, extends CpsProcedure.
+	* Q2Read.java:  New class, extends LispReader.
+	* Makefile.am:  New file.

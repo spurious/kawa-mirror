@@ -63,6 +63,15 @@ public abstract class Procedure extends Named implements Printable
    */
   public int numArgs() { return 0xfffff000; }
 
+  /* CPS:
+  public void apply1(Object arg, CpsContext context, CpsFrame rlink, int rpc)
+  {
+    context.value = apply1(arg);
+    context.frame = rlink;
+    context.pc = rpc;
+  }
+  */
+
   public Procedure getSetter()
   {
     if (! (this instanceof HasSetter))

@@ -1,9 +1,10 @@
 package gnu.expr;
 
-/** Does setTailCall on AppluyExp's that are tail-calls.
+/** Does setTailCall on ApplyExp's that are tail-calls.
     Also sets up the LambdaExp firstChild/nextSibling links.
     Also setCanRead, setCanCall, setCanWrite on Declarations
-    and setCanRead, setCancall on LambdaExp when appropriate. */
+    and setCanRead, setCancall on LambdaExp when appropriate.
+    Also do APPLY-LET and APPLY-BEGIN optimizations (described in the code). */
 
 public class FindTailCalls extends ExpFullWalker
 {
@@ -18,10 +19,32 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkApplyExp(ApplyExp exp)
   {
+    if (exp.func instanceof LetExp) // [APPLY-LET]
+      {
+	// Optimize ((let (...) body) . args) to (let (...) (body . args)).
+	// This helps optimize Scheme "named let".
+	LetExp let = (LetExp) exp.func;
+	Expression body = let.body;
+	let.body = exp;
+	exp.func = body;
+	return let.walk(this);
+      }
+    if (exp.func instanceof BeginExp)  // [APPLY-BEGIN]
+      {
+	// Optimize ((begin ... last) . args) to (begin ... (last . args)).
+	// This helps optimize Scheme "named let".
+	BeginExp begin = (BeginExp) exp.func;
+	Expression[] stmts = begin.exps;
+	int last_index = begin.exps.length - 1;
+	exp.func = stmts[last_index];
+	stmts[last_index] = exp;
+	return begin.walk(this);
+      }
     if (inTailContext)
       exp.setTailCall(true);
     exp.context = currentLambda;
     boolean save = inTailContext;
+    LambdaExp lexp = null;
     try
       {
 	inTailContext = false;
@@ -34,18 +57,30 @@ public class FindTailCalls extends ExpFullWalker
 		exp.nextCall = binding.firstCall;
 		binding.firstCall = exp;
 		binding.setCanCall(true);
+		if (binding.value instanceof LambdaExp)
+		  lexp = (LambdaExp) binding.value;
 	      }
 	  }
 	else if (exp.func instanceof LambdaExp)
 	  {
-	    LambdaExp func = (LambdaExp) exp.func;
-	    walkLambdaExp(func, false);
-	    func.setCanCall(true);
+	    lexp = (LambdaExp) exp.func;
+	    walkLambdaExp(lexp, false);
+	    lexp.setCanCall(true);
 	  }
 	else
-	  exp.func.walk(this);
-	walkExps(exp.args);
-	return null;
+	  exp.func = (Expression) exp.func.walk(this);
+	if (lexp != null)
+	  {
+	    if (lexp.returnContinuation == exp) ; // OK
+	    else if (lexp == currentLambda && save)
+	      ; // (Self-)tail-recursion is OK.
+	    else if (lexp.returnContinuation == null)
+	      lexp.returnContinuation = exp;
+	    else
+	      lexp.returnContinuation = LambdaExp.unknownContinuation;
+	  }
+	exp.args = walkExps(exp.args);
+	return exp;
       }
     finally
       {
@@ -62,9 +97,9 @@ public class FindTailCalls extends ExpFullWalker
 	for (int i = 0;  i <= n;  i++)
 	  {
 	    inTailContext = (i == n);
-	    exp.exps[i].walk(this);
+	    exp.exps[i] = (Expression) exp.exps[i].walk(this);
 	  }
-	return null;
+	return exp;
       }
     finally
       {
@@ -82,10 +117,10 @@ public class FindTailCalls extends ExpFullWalker
 
 	gnu.bytecode.Variable var = exp.firstVar();
 	for (int i = 0;  i < n;  i++)
-	  walkSetExp ((Declaration) var, exp.inits[i]);
+	  exp.inits[i] = walkSetExp ((Declaration) var, exp.inits[i]);
 
 	inTailContext = true;
-	exp.body.walk(this);
+	exp.body = (Expression) exp.body.walk(this);
 
 	var = exp.firstVar();
 	for (int i = 0;  i < n;  i++, var = var.nextVar())
@@ -101,7 +136,7 @@ public class FindTailCalls extends ExpFullWalker
 	      }
 	  }
 
-	return null;
+	return exp;
       }
     finally
       {
@@ -115,13 +150,13 @@ public class FindTailCalls extends ExpFullWalker
     try
       {
 	inTailContext = false;
-	exp.test.walk(this);
+	exp.test = (Expression) exp.test.walk(this);
 	inTailContext = true;
-	exp.then_clause.walk(this);
+	exp.then_clause = (Expression) exp.then_clause.walk(this);
 	Expression else_clause = exp.else_clause;
 	if (else_clause != null)
-	  else_clause.walk(this);
-	return null;
+	  exp.else_clause = (Expression) else_clause.walk(this);
+	return exp;
       }
     finally
       {
@@ -131,10 +166,11 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkLambdaExp (LambdaExp exp)
   {
-    return walkLambdaExp (exp, true);
+    walkLambdaExp (exp, true);
+    return exp;
   }
 
-  final Object walkLambdaExp (LambdaExp exp, boolean canRead)
+  final void walkLambdaExp (LambdaExp exp, boolean canRead)
   {
     boolean save = inTailContext;
     LambdaExp parent = currentLambda;
@@ -147,14 +183,13 @@ public class FindTailCalls extends ExpFullWalker
 	  {
 	    currentLambda.nextSibling = parent.firstChild;
 	    parent.firstChild = currentLambda;
-	    //System.err.println("link "+exp+" to parent "+parent);
 	  }
 	inTailContext = false;
-	Object result
-	  = exp.defaultArgs == null ? null : walkExps(exp.defaultArgs); 
+	if (exp.defaultArgs != null)
+	  exp.defaultArgs = walkExps(exp.defaultArgs);
 	inTailContext = true;
-	if (result == null)
-	  result = exp.body.walk(this);
+	if (exitValue == null)
+	  exp.body = (Expression) exp.body.walk(this);
 
 	// Put list of children in proper order.
 	LambdaExp prev = null, child = exp.firstChild;
@@ -166,8 +201,6 @@ public class FindTailCalls extends ExpFullWalker
 	    child = next;
 	  }
 	exp.firstChild = prev;
-
-	return null;
       }
     finally
       {
@@ -180,10 +213,10 @@ public class FindTailCalls extends ExpFullWalker
   {
     if (exp.binding != null)
       exp.binding.setCanRead(true);
-    return null;
+    return exp;
   }
 
-  final void walkSetExp (Declaration decl, Expression value)
+  final Expression walkSetExp (Declaration decl, Expression value)
   {
     if (decl != null)
       decl.setCanWrite(true);
@@ -191,9 +224,10 @@ public class FindTailCalls extends ExpFullWalker
       {
 	LambdaExp lexp = (LambdaExp) value; 
 	walkLambdaExp(lexp, false);
+	return lexp;
       }
     else
-      value.walk(this);
+      return (Expression) value.walk(this);
   }
 
   public Object walkSetExp (SetExp exp)
@@ -202,8 +236,8 @@ public class FindTailCalls extends ExpFullWalker
     try
       {
 	inTailContext = false;
-	walkSetExp(exp.binding, exp.new_value);
-	return null;
+	exp.new_value = walkSetExp(exp.binding, exp.new_value);
+	return exp;
       }
     finally
       {
@@ -217,13 +251,11 @@ public class FindTailCalls extends ExpFullWalker
     try
       {
 	inTailContext = false;
-	super.walkTryExp(exp);
-	return null;
+	return super.walkTryExp(exp);
       }
     finally
       {
 	inTailContext = save;
       }
   }
-
 }

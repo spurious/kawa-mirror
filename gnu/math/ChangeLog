@@ -1,3 +1,7 @@
+Wed Jun 24 18:59:48 1998  Per Bothner  <bothner@cygnus.com>
+
+	* RealNum.java (toExactInt):  New methods.
+
 Tue Jun  2 18:54:18 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (divide):  Finish implementation of remainder.

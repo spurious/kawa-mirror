@@ -99,10 +99,46 @@ public abstract class RealNum extends Complex
 
   /** Converts a real to an integer, according to a specified rounding mode.
    * Note an inexact argument gives an inexact result, following Scheme.
-   * See also RatNum.toExactInt. */
+   * See also toExactInt. */
   public RealNum toInt (int rounding_mode)
   {
     return new DFloNum(toInt(doubleValue(), rounding_mode));
+  }
+
+  /** Converts to an exact integer, with specified rounding mode. */
+  public IntNum toExactInt (int rounding_mode)
+  {
+    return toExactInt(doubleValue(), rounding_mode);
+  }
+
+  /** Converts real to an exact integer, with specified rounding mode. */
+  public static IntNum toExactInt (double value, int rounding_mode)
+  {
+    return toExactInt(toInt(value, rounding_mode));
+  }
+
+  /** Converts an integral double (e.g. toInt result) to an IntNum. */
+  public static IntNum toExactInt (double value)
+  {
+    if (Double.isInfinite (value) || Double.isNaN (value))
+      throw new ArithmeticException ("cannot convert "+value+" to exact integer");
+    long bits = Double.doubleToLongBits (value);
+    boolean neg = bits < 0;
+    int exp = (int) (bits >> 52) & 0x7FF;
+    bits &= 0xfffffffffffffL;
+    if (exp == 0)
+      bits <<= 1;
+    else
+      bits |= 0x10000000000000L;
+    if (exp <= 1075)
+      {
+	int rshift = 1075 - exp;
+	if (rshift > 53)
+	  return IntNum.zero();
+	bits >>= rshift;
+	return IntNum.make (neg ? -bits : bits);
+      }
+    return IntNum.shift (IntNum.make (neg ? -bits : bits), exp - 1075);
   }
 
   public Complex exp ()

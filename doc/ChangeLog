@@ -1,3 +1,7 @@
+2003-06-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Update build instructions.  Mention select-java1.
+
 2003-05-31  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Index): Name renamed to 'Overall Index', to avoid

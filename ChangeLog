@@ -1,3 +1,27 @@
+Fri Mar 13 22:11:59 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Target.java:  New abstract class - represents the
+ 	destination for the value of an Expression.
+	* kawa/lang/{StackTarget.java,TailTarget.java,IgnoreTarget.java}:
+	New classes that extend Target.
+	* kawa/lang/Makefile.am:  Update for new target classes.
+	* kawa/lang/Expression.java (compile):  Take Target instead of flags.
+	(IGNORED, LAST):  Removed flags.
+	(compile_with_linenumber): Renamed to compileWithPosition; take Target.
+	* kawa/lang/Compilation.java (compileConstant):  New overload.
+	* kawa/lang/{ApplyExp.java,BeginExp.java,CatchClause.java,
+	Compilation.java,ErrorExp.java,GetFieldProc.java,IfExp.java,
+	Inlineable.java,LambdaExp.java,LetExp.java,PrimArrayGet.java,
+	PrimArrayLength.java,PrimArrayNew.java,PrimArraySet.java,
+	PrimGetStatic.java,PrimProcedure.java,PrimSetStatic.java,QuoteExp.java,
+	ReferenceExp.java,SetApplyExp.java,SetExp.java,SetFieldProc.java,
+	TryExp.java} (compile):  Update to take a Target.
+	* kawa/standard/{convert.java,instance.java,prim_throw.java}: Likewise.
+
+Wed Mar 11 17:00:00 1998  Per Bothner  <bothner@cygnus.com>
+
+	Kawa version 1.6 released.
+
 Tue Mar 10 20:01:37 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/ApplyExp.java (getFunction):  New method.

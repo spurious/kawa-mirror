@@ -19,7 +19,7 @@ java_JAVA=\
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lisp. -C
 
-ELISPSOURCES = hanoi.el rect.el
+ELISPSOURCES = alist.el hanoi.el rect.el autoloads.el
 
 CLEANFILES = *.class *.stamp
 
@@ -30,6 +30,6 @@ WITHOUT_SWING:
 all: Makefile @SWING_SELECTED@
 
 elclasses.stamp: $(ELISPSOURCES)
-	cd ../../../kawa; $(MAKE) 
+	cd ../../../kawa; $(MAKE)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) --elisp $(KAWAFLAGS) $?
 	echo timestamp > elclasses.stamp

@@ -1,3 +1,9 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* alist.el:  Imported from xemacs-21.2.32.  (Not working yet.)
+	* autoloads.el:  New file.
+	* Makefile.am (ELISPSOURCES):  Add accordingly.
+
 2000-04-23  Per Bothner  <per@bothner.com>
 
 	New package.

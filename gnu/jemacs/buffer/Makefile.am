@@ -4,9 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_WITH_SWING = \
   Buffer.java \
-  BufferContent.java \
   BufferLocalConstraint.java \
-  BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
   Command.java \
@@ -18,12 +16,11 @@ java_WITH_SWING = \
   InfProcessMode.java \
   InputStreamHandler.java \
   Marker.java \
-  MarkerReader.java \
   Menu.java \
   Mode.java \
   Modeline.java \
   ProcessMode.java \
-  ReplBuffer.java \
+  ReplMode.java \
   SelfInsertCommand.java \
   TelnetMode.java \
   TooLongAction.java

@@ -271,10 +271,10 @@
   (invoke window 'getWidthInColumns))
 
 (define (window-pixel-height #!optional (window :: <window> (selected-window)))
-  (invoke (invoke window 'getPanel) 'getHeight))
+  (invoke window 'getHeight))
 
 (define (window-pixel-width #!optional (window :: <window> (selected-window)))
-  (invoke (invoke window 'getPanel) 'getWidth))
+  (invoke window 'getWidth))
 
 (define (window-text-area-pixel-height
 	 #!optional (window :: <window> (selected-window)))
@@ -556,18 +556,6 @@
   (set-buffer (get-buffer-create "*scratch*"))
   (make-frame))
 
-;;; REPL
-
-(define (term-send-input #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.ReplBuffer> "enter"
-                             <void> ())
-   buffer))
-
-(define repl-map (make-keymap 'repl-map))
-(define-key repl-map "\r" term-send-input)
-(define-key repl-map "\n" term-send-input)
-(define-key repl-map 'return term-send-input)
-
 ;;; TELNET
 
 (define (telnet #!optional (host (read-from-minibuffer "Open telnet connecttion to host:"))
@@ -586,12 +574,11 @@
     buffer))    
 
 (define (scheme-swing-window)
-  (let ((buffer
-         (invoke-static <gnu.jemacs.buffer.ReplBuffer> 'make 'scheme)))
-    (use-local-map repl-map buffer)
-    ; (make-frame buffer)
+  (let ((buffer (get-buffer-create "Scheme interaction")))
+    (invoke-static <gnu.jemacs.buffer.ReplMode> 'make buffer 'scheme)
+    (use-local-map (static-field <process> 'modeMap) buffer)
     (switch-to-buffer buffer)
-    buffer))
+    buffer))    
 
 (define (decode-buffer buffer)
   (if (eq? '() buffer) (current-buffer)

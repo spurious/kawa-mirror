@@ -1,11 +1,12 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
 @if WITH COLLECTIONS@
 import java.util.*;
 @endif WITH COLLECTIONS@
+import java.io.*;
 
 /**
  * A Sequence is an ordered list of elements.
@@ -28,7 +29,7 @@ extends
     Consumable
 {
   /** Special magic end-of-file marker. */
-  public static final Object eofValue = new String[] { "(EOF)" };
+  public static final Object eofValue = new EofClass();
 
   /** True is this sequence contains no elements. */
   public boolean isEmpty();
@@ -75,4 +76,26 @@ extends
   public static final int PROCESSING_INSTRUCTION_VALUE = 16;
   public static final int ENTITY_REFERENCE_VALUE = 16;
   */
+}
+
+class EofClass implements Externalizable
+{
+  public final String toString()
+  {
+    return "#!eof";
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+  }
+
+  public Object readResolve() throws ObjectStreamException
+  {
+    return Sequence.eofValue;
+  }
 }

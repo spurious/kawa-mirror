@@ -1,3 +1,8 @@
+2003-04-08  Per Bothner  <per@bothner.com>
+
+	* Sequence.java.in (EofClass): New non-public class.
+	(eofValue):  Use EofClass instance.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* GeneralArray.java (toString):  Two new methods.

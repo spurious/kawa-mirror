@@ -113,22 +113,6 @@ java_JAVA = \
   ConsumeProc.java
 
 
-OLD = \
-  AbstractString.java \
-  CharBuffer.java \
-  ConstantString.java \
-  Position.java \
-  S16Vector.java \
-  S32Vector.java \
-  S64Vector.java \
-  SubString.java \
-  U8Vector.java \
-  U16Vector.java \
-  U32Vector.java \
-  U64Vector.java \
-  UniformVector.java
-
-
 PACKAGE_FNAME = gnu-kawa-util
 subdir = gnu/kawa/util
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

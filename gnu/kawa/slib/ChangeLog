@@ -1,3 +1,7 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* XML.java (print-as-xml):  Update Consumable package to gnu.lists
+
 2001-02-28  Per Bothner  <per@bothner.com>
 
 	* SLib.java:  Removed; functionality moved to kawa.standard.require.

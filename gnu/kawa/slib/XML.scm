@@ -5,6 +5,6 @@
   (invoke-static <gnu.kawa.xml.ParsedXMLToConsumer> 'parse url))
 
 ;;; Print a Consumable (such as a <document>) to a port, in XML syntax.
-(define (print-as-xml (data :: <gnu.kawa.util.Consumable>)
+(define (print-as-xml (data :: <gnu.lists.Consumable>)
 		      #!optional (out (current-output-port)))
   (invoke data 'consume (make <gnu.kawa.xml.XMLPrinter> out)))

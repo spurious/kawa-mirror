@@ -9,6 +9,7 @@ javadir=$(datadir)/java/$(subdir)
 java_JAVA=\
   ApplyExp.java \
   BeginExp.java \
+  BlockExp.java \
   CatchClause.java \
   ChainLambdas.java \
   Compilable.java \
@@ -16,11 +17,13 @@ java_JAVA=\
   ConditionalTarget.java \
   Declaration.java \
   ErrorExp.java \
+  ExitExp.java \
   Expression.java \
   ExpFullWalker.java \
   ExpWalker.java \
   FindCapturedVars.java \
   FindTailCalls.java \
+  FluidLetExp.java \
   IfExp.java \
   IgnoreTarget.java \
   Inlineable.java \

@@ -462,6 +462,7 @@ public class Scheme extends Interpreter
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
       define_syntax("define-class", "kawa.standard.define_class");
+      define_syntax("this", "kawa.lib.syntax");
       define_proc("make", gnu.kawa.reflect.Invoke.make);
       define_proc("slot-ref", gnu.kawa.reflect.SlotGet.field);
       define_proc("slot-set!", "gnu.kawa.reflect.SlotSet");
@@ -900,7 +901,9 @@ public class Scheme extends Interpreter
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Environment.setCurrent(new Scheme().getEnvironment());
+    Scheme interp = new Scheme();
+    Interpreter.defaultInterpreter = interp;
+    Environment.setCurrent(interp.getEnvironment());
   }
 
 }

@@ -7,6 +7,6 @@ public class user_env extends Procedure0
 {
   public Object apply0 ()
   {
-    return Scheme.user_environment;
+    return Environment.user();
   }
 }

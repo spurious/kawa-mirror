@@ -3,28 +3,6 @@ import kawa.lang.*;
 
 public class Scheme extends Interpreter
 {
-  // transitional hack FIXME
-  private static Environment env;
-  public static Environment curEnvironment ()
-  {
-    return env;
-  }
-
-  public static void setEnvironment (Environment environ)
-  {
-    env = environ;
-  }
-
-  public void define(String sym, Object p)
-  {
-    env.define (sym, p);
-  }
-
-  public Object lookup(String name)
-  {
-    return env.get (name);
-  }
-
   final void define_proc (Named proc)
   {
     define (proc.name (), proc);
@@ -46,17 +24,15 @@ public class Scheme extends Interpreter
   static Environment r4_environment;
   static Environment r5_environment;
   static Environment kawa_environment;
-  static Environment user_environment;
 
   public static Syntax beginSyntax;
   public static Syntax defineSyntax;
 
-  // FIX transitinal hack - should create new user env each time
-  public static Environment makeEnvironment ()
+  public static synchronized Environment builtin ()
   {
-    if (user_environment == null)
+    if (kawa_environment == null)
       new Scheme ();
-    return user_environment;
+    return kawa_environment;
   }
 
   public void initScheme ()
@@ -71,7 +47,7 @@ public class Scheme extends Interpreter
       // (null-environment)
       null_environment = new Environment ();
       null_environment.setName ("null-environment");
-      env = null_environment;
+      environ = null_environment;
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new kawa.lang.Quote ());
@@ -103,7 +79,7 @@ public class Scheme extends Interpreter
 
       r4_environment = new Environment (null_environment);
       r4_environment.setName ("r4rs-environment");
-      env = r4_environment;
+      environ = r4_environment;
 
       //-- Section 6.1  -- complete
       define_proc ("not", "kawa.standard.not");
@@ -357,7 +333,7 @@ public class Scheme extends Interpreter
 
       r5_environment = new Environment (r4_environment);
       r5_environment.setName ("r5rs-environment");
-      env = r5_environment;
+      environ = r5_environment;
       define_proc ("values", "kawa.standard.values_v");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_proc ("eval", "kawa.lang.Eval");
@@ -367,7 +343,7 @@ public class Scheme extends Interpreter
       define_proc ("dynamic-wind", "kawa.lib.syntax");
 
       kawa_environment = new Environment (r5_environment);
-      env = kawa_environment;
+      environ = kawa_environment;
 
       define_proc ("exit", "kawa.lib.thread");
 
@@ -441,13 +417,14 @@ public class Scheme extends Interpreter
       define_proc ("string->keyword", "kawa.lib.keywords");
   }
 
+  static int scheme_counter = 0;
+
   public Scheme ()
   {
     if (kawa_environment == null)
       initScheme();
-    user_environment = new Environment (kawa_environment);
-    user_environment.setName ("interaction-environment");
-    env = environ = user_environment;
+    environ = new Environment (kawa_environment);
+    environ.setName ("interaction-environment."+(++scheme_counter));
   }
 
   public Scheme (Environment environ)

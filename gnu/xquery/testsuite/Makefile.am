@@ -12,7 +12,7 @@ java_sources = TestMisc.java TestSuite.java
 
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
-  bib.xml.in use-cases.xml
+  bib.xml.in use-cases.xml book1.xml.in reviews.xml.in
 
 all:
 

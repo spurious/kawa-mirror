@@ -41,7 +41,7 @@ public class try_catch extends Syntax implements Printable
 	    if (try_obj instanceof Pair)
 	      {
 		try_pair = (Pair) try_obj;
-		Type type = prim_method.exp2Type (try_pair.car, tr);
+		Type type = tr.exp2Type (try_pair);
 		if (! (type instanceof ClassType))
 		  return tr.syntaxError("catch clause type not a class type");
 		CatchClause clause = new CatchClause (name, (ClassType) type);

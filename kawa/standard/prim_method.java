@@ -32,22 +32,6 @@ public class prim_method extends Syntax
   {
   }
 
-  public static Type exp2Type (Object obj, Translator tr)
-  {
-    String str = obj.toString();
-    if (obj instanceof FString)
-      return Scheme.string2Type(str);
-    else if (obj instanceof String || obj instanceof Symbol)
-      {
-        Type type = tr.getInterpreter().getTypeFor(tr.rewrite(obj));
-	if (type != null)
-	  return type;
-      }
-    tr.syntaxError("invalid type spec (must be \"type\" or 'type or <type>): "
-                   + str);
-    return Type.pointer_type;
-  }
-
   public Expression rewrite (Object obj, Translator tr)
   {
     Object[] match = new Object [4];
@@ -66,10 +50,10 @@ public class prim_method extends Syntax
     for (int i = 0;  i < narg;  i++)
       {
 	Pair p = (Pair)argp;
-	args[i] = exp2Type(p.car, tr);
+	args[i] = tr.exp2Type(p);
 	argp = (LList)p.cdr;
       }
-    Type rtype = exp2Type(match[2], tr);
+    Type rtype = tr.exp2Type(new Pair(match[2], null));
     PrimProcedure proc;
     if (op_code == 0)
       {
@@ -89,7 +73,7 @@ public class prim_method extends Syntax
         else
           {
             carg = 0;
-            ctype = exp2Type(match[0], tr);
+            ctype = tr.exp2Type((Pair) obj);
           }
         try
           {

@@ -4,6 +4,15 @@
 	(rewrite_pair):  Use LispInterpreter's makeApply (overridden by q2).
 	(rewrite):  Rewrrite value of LangExp.
 
+	* kawa/standard/prim_method.java (exp2Type):  Remove method.
+	(rewrite): Use Translator's exp2Type.
+	* kawa/standard/define.java (rewrite):  Use Translator's exp2Type.
+	* kawa/standard/let.java (rewrite):  Likewise.
+	* kawa/standard/letrec.java (rewrite):  Likewise.
+	* kawa/standard/module_extends.java (rewriteForm):  Likewise.
+	* kawa/standard/module_implements.java (rewriteForm):  Likewise.
+	* kawa/standard/try_catch.java (rewrite):  Likewise.
+
 	* kawa/lang/Translator.java (exp2Type):  If unknown type return
 	pointer_type rather than null.
 

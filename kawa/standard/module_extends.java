@@ -9,7 +9,7 @@ public class module_extends extends Syntax
 {
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Type base = prim_method.exp2Type(((Pair) form.cdr).car, tr);
+    Type base = tr.exp2Type((Pair) form.cdr);
     ModuleExp module = tr.getModule();
     module.setSuperType((ClassType) base);
     module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);

@@ -17,7 +17,7 @@ public class module_implements extends Syntax
     for (int i = 0;  i < len;  i++)
       {
 	Pair pair = (Pair) args;
-	interfaces[i] = (ClassType) prim_method.exp2Type(pair.car, tr);
+	interfaces[i] = (ClassType) tr.exp2Type(pair);
 	args = pair.cdr;
       }
     ModuleExp module = tr.getModule();

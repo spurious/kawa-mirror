@@ -56,7 +56,11 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     Expression[] args = exp.getArgs();
     if (args.length == 2
 	&& args[0] instanceof LambdaExp)
-      ((LambdaExp) args[0]).setInlineOnly(true);
+      {
+	LambdaExp lexp = (LambdaExp) args[0];
+	lexp.setInlineOnly(true);
+	lexp.returnContinuation = exp;
+      }
     return exp;
   }
 

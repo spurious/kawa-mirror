@@ -1,3 +1,7 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* ValuesMap.java (inline):  Also set returnContinuation of lambda.
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (apply2):  Make public, so it can be used

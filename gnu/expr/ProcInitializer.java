@@ -10,7 +10,7 @@ public class ProcInitializer extends Initializer
     field = lexp.allocFieldFor(comp);
     proc = lexp;
     LambdaExp heapLambda = lexp.getOwningLambda();
-    if (heapLambda instanceof ModuleExp && comp.mainLambda.isStatic())
+    if (heapLambda instanceof ModuleExp && comp.isStatic())
       {
 	next = comp.clinitChain;
 	comp.clinitChain = this;
@@ -46,7 +46,7 @@ public class ProcInitializer extends Initializer
 	    code.emitDup(comp.moduleClass);
 	    code.emitInvokeSpecial(comp.moduleClass.constructor);
 	    if (comp.moduleClass != comp.mainClass
-		&& ! comp.mainLambda.isStatic())
+		&& ! comp.isStatic())
 	      {
 		comp.moduleInstanceMainField = 
 		  comp.moduleClass.addField("$main", comp.mainClass, 0);

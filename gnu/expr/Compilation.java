@@ -2094,6 +2094,8 @@ public class Compilation
   public final ModuleExp getModule() { return mainLambda; }
   public void setModule(ModuleExp mexp) { mainLambda = mexp; }
 
+  public boolean isStatic() { return mainLambda.isStatic(); }
+
   /** The same as getModule, until we allow nested modules. */
   public ModuleExp currentModule() { return current_scope.currentModule(); }
 

@@ -1,5 +1,7 @@
 2003-06-14  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (JAVADOC_PACKAGES):  Add gnu.kawa.sax, gnu.jemacs.swing.
+
 	* kawa/lang/Eval.java (apply):  Use CallContext's getNextArg
 	method rather than getArgAsObject, which will be deprecated. 
 

@@ -397,7 +397,7 @@ public class Scheme extends Interpreter
       r5_environment = new Environment (r4_environment);
       r5_environment.setName ("r5rs-environment");
       environ = r5_environment;
-      define_proc ("values", "kawa.standard.values_v");
+      define_proc ("values", "kawa.lib.misc");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));

@@ -145,9 +145,14 @@ public class Variable extends Location implements java.util.Enumeration
 
   boolean shouldEmit ()
   {
-    return (isSimple () && name != null && scope != null
-	    && scope.start.position >= 0
-	    && scope.end.position > scope.start.position);
+    Scope sc = scope;  // Cache
+    Label start, end;
+    int pos;
+    return (isSimple () && name != null && sc != null
+	    && (start = sc.start) != null
+	    && (pos = start.position) >= 0
+	    && (end = scope.end) != null
+	    && end.position > pos);
   }
 
   public String toString()

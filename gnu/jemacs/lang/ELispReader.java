@@ -1,5 +1,5 @@
 package gnu.jemacs.lang;
-import kawa.lang.ScmRead;
+import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
 import gnu.text.*;
 import gnu.math.*;
@@ -8,7 +8,7 @@ import gnu.kawa.util.*;
 
 /** A class to read Emacs Lisp forms (S-expressions). */
 
-public class ELispReader extends gnu.text.LispReader
+public class ELispReader extends LispReader
 {
   public ELispReader (InPort port)
   {

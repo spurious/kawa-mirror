@@ -1,3 +1,7 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java:  LispReader and ScmRead moved to gnu.kawa.lispexpr.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* SaveExcursion.java (savePointMark, restoreBufferPointMark):  Use

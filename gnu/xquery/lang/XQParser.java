@@ -209,6 +209,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int FNAME_TOKEN = 'F';
 
   static final int IMPORT_MODULE_TOKEN = 'I'; // <"import" "module">
+  static final int IMPORT_SCHEMA_TOKEN = 'T'; // <"import" "schema">
   static final int MODULE_NAMESPACE_TOKEN = 'M'; // <"module" "namespace">
   static final int DECLARE_NAMESPACE_TOKEN = 'N'; // <"declare" "namespace">
   static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
@@ -2883,6 +2884,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
       }
+
+    if (curToken == IMPORT_SCHEMA_TOKEN)
+      return syntaxError("'import schema' not implemented");
+
     if (curToken == IMPORT_MODULE_TOKEN)
       {
 	getRawToken();

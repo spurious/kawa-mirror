@@ -565,6 +565,10 @@ public class Scheme extends LispInterpreter
       define_syntax ("module-implements", "kawa.standard.module_implements");
       define_syntax ("module-static", "kawa.standard.module_static");
       define_syntax ("module-export", "kawa.standard.export");
+      define_syntax ("module-compile-options",
+		     "kawa.standard.module_compile_options");
+      define_syntax ("with-compile-options",
+		     "kawa.standard.with_compile_options");
 
       define_field("array?", "kawa.lib.arrays");
       define_field("array-rank", "kawa.lib.arrays");

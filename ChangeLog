@@ -1,3 +1,11 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/module_compile_options.java:  New class extends Syntax.
+	* kawa/standard/with_compile_options.java:  New class extends Syntax.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/Scheme.java:  Define '"module-compile-options'
+	and 'with-compile-options'.
+
 2003-10-18  Jim White  <jim@pagesmiths.com>
 
 	* build.xml:  Handle gnu/kawa/models and gnu/kawa/swingviews.

@@ -4,6 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
+import gnu.text.Char;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -227,6 +228,8 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 	SeqPosition pos = (SeqPosition) v;
 	pos.sequence.consumeNext(pos.ipos, pos.xpos, this);
       }
+    else if (v instanceof Char)
+      writeChar(((Char) v).intValue());
     else if (v instanceof String || v instanceof CharSeq)
       {
 	writeChars(v.toString());

@@ -1,3 +1,7 @@
+2002-02-14  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeObject):  Check for gnu.text.Char.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java (emitEntityReference):  New method.

@@ -5,6 +5,7 @@ package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
 import gnu.text.Char;
+import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
 
 /** Print an event stream in XML format on a PrintWriter. */
@@ -12,7 +13,12 @@ import gnu.mapping.OutPort;
 public class XMLPrinter extends PrintConsumer
   implements PositionConsumer, XConsumer
 {
-  boolean printPretty = false;
+  /** Controls whether to add extra indentation.
+   * -1: don't add indentation; 0: pretty-print (avoid needless newlines);
+   * 1: indent (force). */
+  int printIndent = -1;
+
+  boolean printXMLdecl = false;
   boolean inAttribute = false;
   boolean inStartTag = false;
   boolean needXMLdecl = false;
@@ -34,6 +40,8 @@ public class XMLPrinter extends PrintConsumer
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
+  private static final int ELEMENT_START = -3;
+  private static final int ELEMENT_END = -4;
   int prev = ' ';
 
   public XMLPrinter (Writer out, boolean autoFlush)
@@ -116,23 +124,20 @@ public class XMLPrinter extends PrintConsumer
   public void writeChar(int v)
   {
     closeTag();
-    if (printPretty && (v == ' ' || v == '\t'))
+    if (printIndent >= 0 && (v == ' ' || v == '\t'))
       {
 	if (prev != ' ')
 	  {
-	    ((OutPort) out).writeSpaceFill();
+	    //((OutPort) out).writeSpaceFill();
 	    prev = ' ';
 	  }
 	return;
       }
-    if (prev == WORD)
+    if (printIndent >= 0 && (v == '\r' || v == '\n'))
       {
-	if (isWordChar((char) v))
-	  {
-	    super.write(' ');
-	    if (printPretty)
-	      ((OutPort) out).writeBreakFill();
-	  }
+	if (v != '\n' || prev != '\r')
+	  ((OutPort) out).writeBreak(PrettyWriter.NEWLINE_MANDATORY);
+	return;
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
     if (! escapeText)
@@ -164,7 +169,7 @@ public class XMLPrinter extends PrintConsumer
   private void startWord()
   {
     closeTag();
-    if (prev == WORD || isWordChar((char) prev))
+    if (prev == WORD)
       super.write(' ');
     prev = WORD;
   }
@@ -179,18 +184,22 @@ public class XMLPrinter extends PrintConsumer
   {
     if (inStartTag && ! inAttribute)
       {
-	if (printPretty)
+	if (printIndent >= 0)
 	  {
 	    ((OutPort) out).endLogicalBlock("");
 	  }
 	super.write('>');
 	inStartTag = false;
-	prev = '>';
+	prev = ELEMENT_START;
       }
     else if (needXMLdecl)
       {
 	// should also include encoding declaration FIXME.
 	super.write("<?xml version=\"1.0\"?>\n");
+	if (printIndent >= 0)
+	  {
+	    ((OutPort) out).startLogicalBlock("", "", 2);
+	  }
 	needXMLdecl = false;
       }
   }
@@ -202,19 +211,31 @@ public class XMLPrinter extends PrintConsumer
 
   public void beginDocument()
   {
-    // We should emit an XML declaration, but don't emit it set, in case
-    // we get it later as a processing instruction.
-    needXMLdecl = true;
+    if (printXMLdecl)
+      {
+	// We should emit an XML declaration, but don't emit it set, in case
+	// we get it later as a processing instruction.
+	needXMLdecl = true;
+      }
+    if (printIndent >= 0 && ! needXMLdecl)
+      ((OutPort) out).startLogicalBlock("", "", 2);
+  }
+
+  public void endDocument()
+  {
+    if (printIndent >= 0)
+      ((OutPort) out).endLogicalBlock("");
   }
 
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
-    if (printPretty)
+    if (printIndent >= 0)
       {
 	OutPort pout = (OutPort) out;
-	if (prev == '>')
-	  pout.writeBreakLinear();
+	if (prev == ELEMENT_START || prev == ELEMENT_END)
+	  pout.writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
+			  : PrettyWriter.NEWLINE_LINEAR);
 	pout.startLogicalBlock("", "", 2);
       }
     super.write('<');
@@ -285,7 +306,7 @@ public class XMLPrinter extends PrintConsumer
     if (isHtml
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = false;
-    if (printPretty)
+    if (printIndent >= 0)
       ((OutPort) out).startLogicalBlock("", "", 1);
   }
 
@@ -303,19 +324,9 @@ public class XMLPrinter extends PrintConsumer
   {
     if (canonicalize && ! htmlCompat)
       closeTag();
-    if (printPretty)
-      {
-	OutPort pout = (OutPort) out;
-	if (! inStartTag && prev == '>')
-	  {
-	    pout.setIndentation(0, false);
-	    pout.writeBreakLinear();
-	  }
-	pout.endLogicalBlock("");
-      }
     if (inStartTag)
       {
-	if (printPretty)
+	if (printIndent >= 0)
 	  {
 	    ((OutPort) out).endLogicalBlock("");
 	  }
@@ -326,11 +337,24 @@ public class XMLPrinter extends PrintConsumer
       }
     else
       {
+	if (printIndent >= 0)
+	  {
+	    OutPort pout = (OutPort) out;
+	    pout.setIndentation(0, false);
+	    if (prev == ELEMENT_END)
+	      pout.writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
+			      : PrettyWriter.NEWLINE_LINEAR);
+	  }
 	super.write("</");
 	super.write(typeName);
 	super.write(">");
       }
-    prev = '>';
+    if (printIndent >= 0)
+      {
+	OutPort pout = (OutPort) out;
+	pout.endLogicalBlock("");
+      }
+    prev = ELEMENT_END;
     if (isHtml && ! escapeText
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = true;
@@ -347,7 +371,7 @@ public class XMLPrinter extends PrintConsumer
       super.write('"');
     inAttribute = true;
     super.write(' ');
-    if (printPretty)
+    if (printIndent >= 0)
       ((OutPort) out).writeBreakFill();
     super.write(attrName);
     super.write("=\"");
@@ -381,10 +405,6 @@ public class XMLPrinter extends PrintConsumer
       }
     else if (v instanceof Char)
       writeChar(((Char) v).intValue());
-    else if (v instanceof String || v instanceof CharSeq)
-      {
-	writeChars(v.toString());
-      }
     else
       {
 	startWord();
@@ -411,6 +431,7 @@ public class XMLPrinter extends PrintConsumer
     int len = str.length();
     for (int i = 0;  i < len;  i++)
       writeChar(str.charAt(i));
+    prev = '-';
   }
 
   public void write(char[] buf, int off, int len)
@@ -418,23 +439,13 @@ public class XMLPrinter extends PrintConsumer
     closeTag();
     if (len <= 0)
       return;
-    int ch = prev;
-    char c;
-    if (prev == WORD)
-      {
-	c = buf[off++];
-	writeChar(c);
-	ch = c;
-	len--;
-      }
     int limit = off + len;
     int count = 0;
     while (off < limit)
       {
-	c = buf[off++];
-	ch = c;
-	if (ch >= 127 || ch == '<' || ch == '>'
-	    || ch == '&' || (ch == '"' && inAttribute))
+	char c = buf[off++];
+	if (c >= 127 || c == '\n' || c == '\r' || c == '<' || c == '>'
+	    || c == '&' || (c == '"' && inAttribute))
 	  {
 	    if (count > 0)
 	      super.write(buf, off - 1 - count, count);
@@ -446,6 +457,7 @@ public class XMLPrinter extends PrintConsumer
       }
     if (count > 0)
       super.write(buf, limit - count, count);
+    prev = '-';
   }
 
   public boolean writePosition(AbstractSequence seq, int ipos)

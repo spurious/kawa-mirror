@@ -1,3 +1,8 @@
+2005-01-03  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Get the pretty-printer support more-or-less working.
+	(printIndent): Convert boolean to tri-state int.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* SName.java: New class.

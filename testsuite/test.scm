@@ -208,6 +208,7 @@
 (test 1 'define (first '(1 2)))
 (define old-+ +)
 (define + (lambda (x y) (list y x)))
+(set! fail-expected "+ is resolved at compile-time, not run-time")
 (test '(3 6) add3 6)
 (set! + old-+)
 (test 9 add3 6)

@@ -7,49 +7,41 @@ import java.io.*;
 
 /** Information about one member of a ZipArchive. */
 
-public class ZipMember
+public class ZipMember extends java.util.zip.ZipEntry
 {
   ZipMember next; 
-  int compressed_size;
-  int uncompressed_size;
+  long compressed_size;
   //  short filename_length;
-  int relative_offset_local_header;  // start of local directory
+  long relative_offset_local_header;  // start of local directory
 
-  byte[] name;
-  private String str_name;
+  public ZipMember (String zname)
+  {
+    super(zname);
+  }
 
   /* Where the actual data bytes start, withing the achive. */
-  int fileStart ()
+  long fileStart ()
   {
-    return relative_offset_local_header + ZipArchive.LREC_SIZE + 4 + name.length;
+    return relative_offset_local_header + ZipArchive.LREC_SIZE + 4
+      + getName().length();
   }
 
   public void print (PrintStream ps)
   {
-    ps.write (name, 0, name.length);
+    ps.print (getName());
     ps.println (" size: "+compressed_size+" position: "+fileStart ());
-  }
-
-  public String strName ()
-  {
-    if (str_name == null)
-      str_name = new String (name, 0);
-    return str_name;
   }
 
   boolean matches (String match_name)
   {
-    if (name.length != match_name.length ())
-      return false;
-    return match_name.equals (strName ());
+    return match_name.equals (getName ());
   }
 
   public byte[] getData (ZipArchive archive) throws IOException
   {
     archive.file.seek (fileStart());
-    byte[] result = new byte[compressed_size];
+    byte[] result = new byte[(int) compressed_size];
     archive.file.readFully (result);
     return result;
   }
-
 };

@@ -145,12 +145,9 @@ public class CompileFile extends Procedure2
       {
 	File infile = new File (inname);
 	String short_name = infile.getName ();
-	if (short_name.endsWith (".scm"))
-	  short_name
-	    = short_name.substring (0, short_name.length () - 4);
-	else if (short_name.endsWith (".el"))
-	  short_name
-	    = short_name.substring (0, short_name.length () - 3);
+        int dotIndex = short_name.lastIndexOf('.');
+        if (dotIndex > 0)
+          short_name = short_name.substring (0, dotIndex);
 	topname = short_name;
 	if (prefix != null)
 	  topname = prefix + short_name;

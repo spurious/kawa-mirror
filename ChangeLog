@@ -1,3 +1,8 @@
+2000-10-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (compile_to_files):  Strip off any file
+	extension, not just ".scm" or ".el".
+
 2000-08-31  Emmanuel Castro <castro@lirmm.fr>
 
 	* kawa/standard/require (finf):  Fix typo in error message.

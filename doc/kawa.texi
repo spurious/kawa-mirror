@@ -4422,7 +4422,7 @@ of the type @code{<string>}.
 In KRL @code{"mystring"} is a normal Scheme string of type @code{<string>},
 but @code{]mystring[} is special type that suppresses output escaping.
 @item
-When BRL writes out a string, it does not do any processing of
+When BRL writes out a string, it does not do any processing
 to escape special characters like @code{<}.  However, KRL in its default
 mode does normally ecsape characters and strings.  Thus @code{"<a>"}
 is written as @code{&lt;a&gr;}.
@@ -4431,7 +4431,7 @@ by specifying @code{--output-format scheme} on the Kawa command line.
 @item
 Various Scheme syntax forms, including @code{lambda},
 take a @code{<body>}, which is a list of one or more declarations and
-expressions.  In normal Scheme and in BRL the value of a @code{<body>})
+expressions.  In normal Scheme and in BRL the value of a @code{<body>}
 is the value of the last expression.  In KRL the value of a @code{<body>})
 is the concatenation of all the values of the expressions,
 as if using @code{values-append}
@@ -4441,7 +4441,7 @@ In KRL a word starting with a colon is an identifier, which by
 default is bound to the @code{make-element} function specialized
 to take the rest of the word as the tag name (first argument).
 @item
-BRL has an extensive utility library.  This has not yet been ported
+BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 

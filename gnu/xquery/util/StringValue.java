@@ -30,7 +30,6 @@ public class StringValue extends Procedure1
     if (node instanceof Values)
       {
 	TreeList tlist = (TreeList) node;
-	//System.err.println("children:"+node.getClass()); tlist.dump();
 	int index = 0;
 	for (;;)
 	  {

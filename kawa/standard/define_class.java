@@ -34,7 +34,6 @@ public class define_class extends Syntax
         tr.mustCompileHere();
         tr.mustCompileHere();
         tr.push(decl);
-        System.err.println("def_class rewrite push "+decl);
       }
     Pair declForm = tr.makePair(p, decl, p.cdr);
     if (declForm instanceof PairWithPosition)
@@ -43,7 +42,6 @@ public class define_class extends Syntax
         decl.setFile(declPos.getFile());
         decl.setLine(declPos.getLine(), declPos.getColumn());
       }
-    System.err.println("cl add decl:"+decl+ " defs:"+defs);
     defs.addDeclaration(decl);
     st = tr.makePair(st, this, declForm);
     forms.addElement (st);
@@ -58,7 +56,6 @@ public class define_class extends Syntax
     if (form.cdr instanceof Pair)
       {
         form = (Pair) form.cdr;
-        System.err.println("def clas rewr "+form.car);
         if (form.car instanceof String)
           name = (String) form.car;
         else if (form.car instanceof Declaration)
@@ -80,7 +77,6 @@ public class define_class extends Syntax
 	 ? name.substring(1, nlen-1)
 	 : name);
     oexp.setName(cname);
-    System.err.println("d-c name:"+cname);
     Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
     // lexp.body = oe;
     // tr.pop(lexp);

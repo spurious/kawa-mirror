@@ -25,11 +25,9 @@ public class ValuesMap extends CpsProcedure
       {
 	int ipos = 0;
 	Values values = (Values) val;
-	System.err.print("values-map:");values.dump();
 	for (;;)
 	  {
 	    Object v = values.getNext(ipos, null);
-	    System.err.println("map val: ipos:"+ipos+"->"+v);
 	    if (v == Sequence.eofValue)
 	      break;
 	    ctx.setArgs(v);

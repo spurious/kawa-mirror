@@ -4,7 +4,7 @@
 package gnu.expr;
 
 /** This resolves references to lexical Declarations.
- * So far it is only use for XQuery, which overrides it. */
+ * So far it is only used for XQuery, which overrides it. */
 
 public class ResolveNames extends ExpWalker
 {

@@ -1,3 +1,8 @@
+2000-10-09  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java (applyN):  If a method matches, don't re-use the
+	matching CallContext for future match attempts, but use a new one.
+
 2000-10-02  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (allocFields):  If decl.field is already set (e.g.

@@ -44,23 +44,30 @@ public class GenericProc extends MethodProc
     checkArgCount(this, args.length);
     MethodProc best = null;
     CallContext bestVars = null;
-    CallContext vars = new CallContext();
+    CallContext vars = null;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
+        if (vars == null)
+          vars = new CallContext();
         if (method.match(vars, args) == 0)
           {
             if (best == null)
               {
                 best = method;
                 bestVars = vars;
+                vars = null;
               }
             else
               {
                 best = MethodProc.mostSpecific(best, method);
                 if (best == method)
-                  bestVars = vars;
+                  {
+                    bestVars = vars;
+                    vars = null;
+                  }
               }
+            
           }
       }
     if (best == null)

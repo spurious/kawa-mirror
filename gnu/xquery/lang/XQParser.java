@@ -210,6 +210,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int DEFAULT_ELEMENT_TOKEN = 'N'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
   static final int DEFINE_FUNCTION_TOKEN = 'P'; // <"define" "function">
+  static final int DEFINE_VARIABLE_TOKEN = 'V'; // <"define" "variable">
 
   /* 'Q': QName (intern'ed name is curValue)
    * 'R': NCName ':' '*'
@@ -689,6 +690,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  case 'n':
 	    if (lookingAt("declare", /*"n"+*/ "amespace"))
 	      return curToken = DECLARE_NAMESPACE_TOKEN;
+	    break;
+	  case 'v':
+	    if (lookingAt("define", /*"v"+*/ "ariable"))
+	      return curToken = DEFINE_VARIABLE_TOKEN;
 	    break;
 	  }
 	if (next >= 0)
@@ -2379,6 +2384,48 @@ public class XQParser extends LispReader // should be extends Lexer
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	return exp;
+      }
+    if (curToken == DEFINE_VARIABLE_TOKEN)
+      {
+	String name;
+	getRawToken();
+	if (curToken == '$')
+	  getRawToken();
+	else
+	  syntaxError("missing '$'");
+	if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+	  name = new String(tokenBuffer, 0, tokenBufferLength).intern();
+	else
+	  return syntaxError("missing Variable");
+	getRawToken();
+	Expression type = parseOptionalTypeDeclaration();
+	Declaration decl = parser.currentScope().addDeclaration(name);
+	parser.push(decl);
+	Expression init = null;
+	if (curToken == '{')
+	  {
+	    init = parseEnclosedExpr();
+	  }
+	else if (match("external"))
+	  {
+	    error("external variables not implemented yet");
+	  }
+	else
+	  {
+	    error('e', "expected {expression} or external");
+	    if (curToken == OP_EQU || curToken == COLON_EQUAL_TOKEN)
+	      getRawToken();
+	    // This leave curToken pointing at the token *following* the
+	    // expression, but parse is not supposed to read ahead like that.
+	    // Luckily, this is only a problem in the error recovery case,
+	    // when it is usually harmless.  We could fix it by supressing
+	    // the getRawToken in parseMaybePrimaryExpr, which is non-trivial.
+	    init = parseMaybePrimaryExpr();
+	  }
+	SetExp sexp = new SetExp(decl, init);
+	sexp.setDefining(true);
+	decl.noteValue(init);
+	return sexp;
       }
     if (curToken == NCNAME_TOKEN
 	&& "namespace".equals((String) curValue))

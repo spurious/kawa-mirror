@@ -1,3 +1,9 @@
+2003-05-30  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (DEFINE_VARIABLE_TOKEN): New token constant.
+	(peekOperand):  Recognize 'define variable'.
+	(parse):  Handle DEFINE_VARIABLE_TOKEN.
+
 2003-05-13  Per Bothner  <per@bothner.com>
 
 	* XQParser.java:  Handle new KindType syntax of May '03 draft.

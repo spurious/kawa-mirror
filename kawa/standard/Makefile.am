@@ -116,7 +116,7 @@ try_catch.java try_finally.java synchronizd.java \
 convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java location.java \
-define_alias.java \
+define_alias.java define_variable.java \
 define_member_alias.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java \

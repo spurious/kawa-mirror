@@ -542,6 +542,7 @@ public class Scheme extends Interpreter
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
+      define ("define-variable", new kawa.standard.define_variable());
       define ("define-member-alias", new kawa.standard.define_member_alias());
       define ("require", new kawa.standard.require());
 
@@ -894,6 +895,12 @@ public class Scheme extends Interpreter
           return Scheme.string2Type(name.substring(1, len-1));
       }
     return null;
+  }
+
+  /** The compiler insert calls to this method for applications and applets. */
+  public static void registerEnvironment()
+  {
+    Environment.setCurrent(new Scheme().getEnvironment());
   }
 
 }

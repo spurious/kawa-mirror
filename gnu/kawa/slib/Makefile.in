@@ -213,7 +213,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 @Make_rules@
 
-all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) $(@GCJ_COMPILED_SELECTED@)
+all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 ../../../kawa/java-classes.stamp:
 	cd ../../../kawa; $(MAKE)

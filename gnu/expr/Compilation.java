@@ -647,31 +647,6 @@ public class Compilation
 	code.emitReturn();
       }
 
-    for (LambdaExp child = lexp.firstChild;  child != null; )
-      {
-	if (! child.getCanRead() && ! child.getInlineOnly()
-	    && ! child.isHandlingTailCalls())
-	  {
-	    boolean method_static;
-	    ObjectType closureEnvType;
-	    if (lexp.heapFrame == null
-		|| ! (child.getImportsLexVars() || child.getNeedsStaticLink()))
-	      closureEnvType = null;
-	    else
-	      closureEnvType = (ClassType) lexp.heapFrame.getType();
-	    // generate_unique_name (new_class, child.getName());
-	    String child_name = child.getName();
-	    String method_name = "lambda"+(++method_counter);
-	    if (child.min_args != child.max_args)
-	      child.declareArgsArray();
-	    if (child_name != null)
-	      method_name = method_name + mangleName(child_name);
-	    child.primMethod
-	      = child.addMethodFor (new_class, method_name, closureEnvType);
-	  }
-	child = child.nextSibling;
-      }
-
     Expression body = lexp.body;
     Declaration heapFrame = lexp.heapFrame;
 
@@ -816,35 +791,7 @@ public class Compilation
       method.popScope(); // Undoes pushScope in method.initCode.
 
     lexp.heapFrame = heapFrame;  // Restore heapFrame.
-    for (LambdaExp child = lexp.firstChild;  child != null; )
-      {
-	if (! child.getCanRead() && ! child.getInlineOnly()
-	    && ! child.isHandlingTailCalls())
-	  {
-	    Method save_method = method;
-	    LambdaExp save_lambda = curLambda;
-	    method = child.primMethod;
-	    curClass = method.getDeclaringClass();
-	    curLambda = child;
-	    method.initCode();
-            child.allocChildClasses(this);
-	    argsArray = null;
-	    if (child.min_args != child.max_args)
-	      argsArray = child.declareArgsArray();
-	    child.allocParameters(this, argsArray);
-	    child.enterFunction(this, argsArray);
-	    Type rtype = method.getReturnType();
-	    Target target = rtype == Type.pointer_type ? Target.returnObject
-	      : rtype == Type.void_type ? Target.Ignore
-	      : new TailTarget(rtype);
-	    child.body.compileWithPosition(this, target);
-	    child.compileEnd(this);
-	    method = save_method;
-	    curClass = new_class;
-	    curLambda = save_lambda;
-	  }
-	child = child.nextSibling;
-      }
+    lexp.compileChildMethods(this);
     if (usingCPStyle() || (fewerClasses && curClass == mainClass))
       {
 	code = getCode();

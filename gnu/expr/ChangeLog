@@ -1,3 +1,13 @@
+1999-04-15  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Compilation.java (addClass):  Don't create primitive methods here.
+	* LambdaExp.java (allocChildClasses):  Do it here instead,
+	* Compilation.java (addClass):  Don't compiled child methods here.
+	* LambdaExp.java (compileChildMethods):  Do it here instead (new).
+	(compileAsMethod):  New - logic taken from Compilation.addClass.
+	* ApplyExp.java (compile):  Call compileChildMethods if inline call.
+	* ObjectExp.java (compile):  Likewise for child methods.
+
 1999-04-11  Per Bothner  <bothner@cygnus.com>
 
 	* LambdaExp.java (declareClosureEnv):  Fix for object methods.

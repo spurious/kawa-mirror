@@ -574,17 +574,44 @@ public class LambdaExp extends ScopeExp
   // Can we merge this with allocParameters?
   public void allocChildClasses (Compilation comp)
   {
-    for (LambdaExp child = firstChild;  child != null; ) 
+    for (LambdaExp child = firstChild;  child != null;
+	 child = child.nextSibling)
       { 
+	if (child.getInlineOnly())
+	  continue;
         if (child.isClassGenerated())
-	  //            || heapFrameLambda == child 
-	  //            || child.min_args != child.max_args) 
-          { 
-            comp.allocClass(child); 
-          } 
-        child = child.nextSibling; 
+	  //            || heapFrameLambda == child
+	  //            || child.min_args != child.max_args)
+          {
+            comp.allocClass(child);
+          }
       }
+
     allocFrame(comp);
+
+    for (LambdaExp child = firstChild;  child != null;
+	 child = child.nextSibling)
+      { 
+	if (! child.getInlineOnly() && ! child.isClassGenerated())
+	  {
+	    boolean method_static;
+	    ObjectType closureEnvType;
+	    if (heapFrame == null
+		|| ! (child.getImportsLexVars() || child.getNeedsStaticLink()))
+	      closureEnvType = null;
+	    else
+	      closureEnvType = (ClassType) heapFrame.getType();
+	    // generate_unique_name (new_class, child.getName());
+	    String child_name = child.getName();
+	    String method_name = "lambda"+(++comp.method_counter);
+	    if (child.min_args != child.max_args)
+	      child.declareArgsArray();
+	    if (child_name != null)
+	      method_name = method_name + comp.mangleName(child_name);
+	    child.primMethod
+	      = child.addMethodFor(comp.curClass, method_name, closureEnvType);
+	  }
+      }
   }
 
   public void allocFrame (Compilation comp)
@@ -856,6 +883,43 @@ public class LambdaExp extends ScopeExp
 	    i++;
 	  }
       }
+  }
+
+  void compileChildMethods (Compilation comp)
+  {
+    for (LambdaExp child = firstChild;  child != null; )
+      {
+	if (! child.getCanRead() && ! child.getInlineOnly()
+	    && ! child.isHandlingTailCalls())
+	  {
+	    child.compileAsMethod(comp);
+	  }
+	child = child.nextSibling;
+      }
+  }
+
+  void compileAsMethod (Compilation comp)
+  {
+    Method save_method = comp.method;
+    LambdaExp save_lambda = comp.curLambda;
+    comp.method = primMethod;
+    comp.curLambda = this;
+    comp.method.initCode();
+    allocChildClasses(comp);
+    Variable argsArray = null;
+    if (min_args != max_args)
+      argsArray = declareArgsArray();
+    allocParameters(comp, argsArray);
+    enterFunction(comp, argsArray);
+    Type rtype = comp.method.getReturnType();
+    Target target = rtype == Type.pointer_type ? Target.returnObject
+      : rtype == Type.void_type ? Target.Ignore
+      : new TailTarget(rtype);
+    body.compileWithPosition(comp, target);
+    compileEnd(comp);
+    compileChildMethods(comp);
+    comp.method = save_method;
+    comp.curLambda = save_lambda;
   }
 
   /** Used to control with .zip files dumps are generated. */

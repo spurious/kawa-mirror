@@ -146,6 +146,7 @@ public class ObjectExp extends LambdaExp
 	      : new TailTarget(rtype);
 	    child.body.compileWithPosition(comp, target);
 	    child.compileEnd(comp);
+	    child.compileChildMethods(comp);
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;

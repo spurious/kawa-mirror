@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  Average.java \
   BooleanValue.java \
   Children.java \
   Compare.java \
@@ -16,6 +17,7 @@ java_sources = \
   MinMax.java \
   NumberValue.java \
   Position.java \
+  Reduce.java \
   StringValue.java \
   SubList.java \
   ValuesFilter.java \

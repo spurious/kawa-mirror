@@ -1,3 +1,10 @@
+2002-04-19  Per Bothner  <per@bothner.com>
+
+	* Average.java:  New class, extends Procedure1.
+	* Reduce.java:  New class, extends Procedure1.
+	* Makefile.am (java_sources):  Update accordingly.
+	* MinMax.java:  Change to inherit from Reduce.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* BooleanValue.java:  New class, extends Procedure1.

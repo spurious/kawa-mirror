@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector whose elements are 32-bit floats. */
 
-public class F32Vector extends SimpleVector  implements Externalizable
+public class F32Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   float[] data;
   protected static float[] empty = new float[0];
@@ -141,6 +145,24 @@ public class F32Vector extends SimpleVector  implements Externalizable
     int end = iposEnd >>> 1;
     for (;  i < end;  i++)
       out.writeFloat(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    F32Vector vec2 = (F32Vector) obj;
+    float[] arr1 = data;
+    float[] arr2 = vec2.data;
+    int n1 = size;
+    int n2 = vec2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	float v1 = arr1[i];
+	float v2 = arr2[i];
+	if (v1 != v2)
+	  return v1 > v2 ? 1 : -1;
+      }
+    return n1 - n2;
   }
 
   /**

@@ -7,7 +7,10 @@ import java.io.*;
 /** Simple adjustable-length vector whose elements are Object references. */
 
 public class FVector extends SimpleVector
-implements Externalizable, Consumable
+  implements Externalizable, Consumable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   public Object[] data;
 
@@ -124,6 +127,27 @@ implements Externalizable, Consumable
       }
     return true;
   }
+
+  /* BEGIN JAVA2 */
+  public int compareTo(Object obj)
+  {
+    FVector vec2 = (FVector) obj;
+    Object[] d1 = data;
+    Object[] d2 = vec2.data;
+    int n1 = size;
+    int n2 = vec2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	Comparable v1 = (Comparable) d1[i];
+	Comparable v2 = (Comparable) d2[i];
+	int d = v1.compareTo(v2);
+	if (d != 0)
+	  return d;
+      }
+    return n1 - n2;
+  }
+  /* END JAVA2 */
 
   /*
   public final void setElementAt (Object new_value, int index)

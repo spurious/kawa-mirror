@@ -1,5 +1,19 @@
 2004-05-04  Per Bothner  <per@bothner.com>
 
+	* SimpleVector.java (compareToInt, compareToLong):  New helper methods.
+	* F32Vector.java:  Implement Comparable, if JAVA2..
+	(compareTo):  New method.
+	* F64Vector.java:  Likewise.
+	* FVector.java:  Likewise.
+	* U64Vector.java:  Likewise.
+	* S8Vector.java:  Likewise - using compareToInt.
+	* S16Vector.java:  Likewise.
+	* S32Vector.java:  Likewise.
+	* U8Vector.java:  Likewise.
+	* U16Vector.java:  Likewise.
+	* S64Vector.java:  Likewise - using compareToLong.
+	* U32Vector.java:  Likewise.
+	
 	* LList.java:  Implement Comparable, if JAVA2.
 	(compareTo):  New method.
 	* Pair.java (compareTo):  Two new methods.

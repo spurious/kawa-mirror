@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 32-bit integers (ints). */
 
-public class S32Vector extends SimpleVector implements Externalizable
+public class S32Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   int[] data;
   protected static int[] empty = new int[0];
@@ -138,6 +142,11 @@ public class S32Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeInt(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    return compareToInt(this, (S32Vector) obj);
   }
 
   /**

@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector whose elements are 64-bit floats. */
 
-public class F64Vector extends SimpleVector  implements Externalizable
+public class F64Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   double[] data;
   protected static double[] empty = new double[0];
@@ -156,6 +160,24 @@ public class F64Vector extends SimpleVector  implements Externalizable
     ps.print(getDouble(index));
   }
   */
+
+  public int compareTo(Object obj)
+  {
+    F64Vector vec2 = (F64Vector) obj;
+    double[] arr1 = data;
+    double[] arr2 = vec2.data;
+    int n1 = size;
+    int n2 = vec2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	double v1 = arr1[i];
+	double v2 = arr2[i];
+	if (v1 != v2)
+	  return v1 > v2 ? 1 : -1;
+      }
+    return n1 - n2;
+  }
 
   /**
    * @serialData Write 'size' (using writeInt),

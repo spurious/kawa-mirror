@@ -354,6 +354,36 @@ public abstract class SimpleVector extends AbstractSequence
    * It may go away without notice! */
   public String getTag() { return null; }
 
+  protected static int compareToInt(SimpleVector v1, SimpleVector v2)
+  {
+    int n1 = v1.size;
+    int n2 = v2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	int i1 = v1.intAtBuffer(i);
+	int i2 = v2.intAtBuffer(i);
+	if (11 != i2)
+	  return i1 > i2 ? 1 : -1;
+      }
+    return n1 - n2;
+  }
+
+  protected static int compareToLong(SimpleVector v1, SimpleVector v2)
+  {
+    int n1 = v1.size;
+    int n2 = v2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	long i1 = v1.longAtBuffer(i);
+	long i2 = v2.longAtBuffer(i);
+	if (i1 != i2)
+	  return i1 > i2 ? 1 : -1;
+      }
+    return n1 - n2;
+  }
+
   public void consume(int start, int length, Consumer out)
   {
     consumePosRange(start << 1, (start + length) << 1, out);

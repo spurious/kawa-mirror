@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 64-bit integers (longs). */
 
-public class S64Vector extends SimpleVector implements Externalizable
+public class S64Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   long[] data;
   protected static long[] empty = new long[0];
@@ -143,6 +147,11 @@ public class S64Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeLong(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    return compareToLong(this, (S64Vector) obj);
   }
 
   /**

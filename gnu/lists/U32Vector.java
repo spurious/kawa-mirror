@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of unsigned 32-bit integers (ints). */
 
-public class U32Vector extends SimpleVector implements Externalizable
+public class U32Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   int[] data;
 
@@ -142,6 +146,11 @@ public class U32Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeInt(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    return compareToLong(this, (U32Vector) obj);
   }
 
   /**

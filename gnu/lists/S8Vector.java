@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 8-bit integers (bytes). */
 
-public class S8Vector extends SimpleVector implements Externalizable
+public class S8Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   byte[] data;
   protected static byte[] empty = new byte[0];
@@ -143,6 +147,11 @@ public class S8Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeInt(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    return compareToInt(this, (S8Vector) obj);
   }
 
   /**

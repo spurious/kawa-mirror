@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of signed 16-bit integers (shorts). */
 
-public class S16Vector extends SimpleVector implements Externalizable
+public class S16Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   short[] data;
   protected static short[] empty = new short[0];
@@ -143,6 +147,11 @@ public class S16Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeInt(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    return compareToInt(this, (S16Vector) obj);
   }
 
   /**

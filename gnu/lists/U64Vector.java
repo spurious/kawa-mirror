@@ -6,7 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of unsigned 64-bit integers (longs). */
 
-public class U64Vector extends SimpleVector implements Externalizable
+public class U64Vector extends SimpleVector
+  implements Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   long[] data;
 
@@ -142,6 +146,24 @@ public class U64Vector extends SimpleVector implements Externalizable
       end = size;
     for (;  i < end;  i++)
       out.writeLong(data[i]);
+  }
+
+  public int compareTo(Object obj)
+  {
+    U64Vector vec2 = (U64Vector) obj;
+    long[] arr1 = data;
+    long[] arr2 = vec2.data;
+    int n1 = size;
+    int n2 = vec2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	long v1 = arr1[i];
+	long v2 = arr2[i];
+	if (v1 != v2)
+	  return (v1^0x8000000000000000L) > (v2^0x8000000000000000L) ? 1 : -1;
+      }
+    return n1 - n2;
   }
 
   /**

@@ -6,8 +6,8 @@ import gnu.bytecode.*;
 import gnu.mapping.Values;
 
 /** Same as StackTarget, but catch ClassCastException.
- * Generate code so that if coercion fails, catch it re-throw a WrongType.
- * This gives better error messages. */
+ * Generate code so that if coercion fails, catch ClassCastException,
+ * and re-throw a WrongType.  This gives better error messages. */
 
 public class CheckedTarget extends StackTarget
 {

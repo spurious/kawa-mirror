@@ -30,6 +30,7 @@ java_JAVA=\
   Literal.java \
   ModuleBody.java \
   ModuleExp.java \
+  ObjectExp.java \
   QuoteExp.java \
   PrimProcedure.java \
   ReferenceExp.java \

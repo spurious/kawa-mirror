@@ -1,3 +1,65 @@
+Tue Jul 16 23:23:16 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Lots of fixes and improvements, mostly compiler-related.
+	* kawa/lang/Compilable.java:  New interface.
+	* kawa/lang/Pair.java:  Implement emit method; Compilable interface.
+	* kawa/lang/Symbol.java:  Likewise.
+	* LetExp.java (eval):  Update for space_needed->frameSize; heapFrame.
+	(compile):  Don't do redundant add_var's.
+	* SchemeLoader.java:  Support loading classes form a ZipArchive.
+	* kawa/lang/Interpreter.java (lookup_global, define_global):
+	Now take Symbol rather than String.
+	(resolve):  Do decl.setSimple(false) also for top-level lexical defs.
+	* kawa/lang/LambdaExp.java:  Move heapFrame and heapSize to ...
+	* kawa/lang/ScopeExp.java:  ... here.  Rename heapSize -> frameSize.
+	(assign_space):  Fix for non-function lexical scope.
+	(space_needed):  Removed, subsumed by frameSize.
+	* kawa/lang/LambdaExp.java (compile_setLiterals):  New method.
+	* kawa/lang Compilation.java:  New constructor interface.
+	Many new pre-defined ClassTypes, Methods, Fields.
+	(findLiteral):  New recursive function.
+	* CompileFile.java:  New class - read and compile an entire file.
+	* kawa/lang/Declaration.java (getValue, getFrame):  Handle heapFrame.
+	* kawa/lang/Literal.java:  Now generates code to initialize literals
+	when compiling to a file.  Handles circular data.
+	* kawa/lang/ReferenceExp.java (compile, compile_load):  Various fixes.
+	* kawa/lang/SetExp.java (compile):  Push symbol rather than string.
+	* kawa/lang/compilefunc.java:  Lots of re-arranging and fixes
+	for file compilation, lexical outer-function scopes, etc.
+	Move setLiterals-related code to LambdaExp.compile_setLiterals.
+	* kawa/standard/load.java:  Can now load from compiled .zip file
+	as well as from a .scm source file.
+	* kawa/lang/{Makefile.am,Makefile.in}:  Add new classes.
+
+Tue Jul 16 19:09:36 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/AutoloadProcedure.java:  New class, for autoloading.
+	* kawa/standard/StandardInterpreter.java (define_proc):  New method.
+	(<init>):  Use new autoloading define_proc extensively.
+	* Makefile.{am,in}:  Add {newline,map,callcc}.class.
+
+	* kawa/lang/{Continuation,CalledContinuation}>java:  New classes.
+	* kawa/standard/callcc.java: Implement limited call/cc.
+
+	* kawa/lang/List.java (toVector):  New method.
+	* kawa/lang/InPort.java (readSchemeObject):  Handle vector syntax.
+	* kawa/standard/list2vector.java (apply1):  Use List.toVector.
+	* kawa/standard/list_tail.java (listTail):  New method.
+	* kawa/standard/{list_tail,list_ref}:  Use list_tail.listTail.
+	
+	* kawa/standard/{minus_oper,multiply_oper,divide_oper,equal_oper,
+	greater_oper,greaterequal_oper,less_oper,lessequal_oper}.java:
+	Re-write to extend ProcedureN, rather than Named.
+	* kawa/standard/map.java:  New class, implements map and for-each.
+	* kawa/standard/newline.java:  New class, implements newline function.
+	* kawa/lang/print.java (print):  Handle Object[].
+	* kawa/lang/Expression.java (compile):  Make abstract.
+	* kawa/lang/ErrorExp.java (compile):  Added.
+
+Tue Jul 16 19:05:50 1996  R. Alexander Milowski <sgml@winternet.com>
+
+	* kawa/lang/InPort.java (readCharacter):  Recognize letters, e.g. #\A.
+	
 Thu Jul 11 15:10:14 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Major re-write.  All functions are now byte-compiled,

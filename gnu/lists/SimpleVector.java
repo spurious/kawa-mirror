@@ -222,16 +222,16 @@ public abstract class SimpleVector extends AbstractSequence
   /* #ifndef JAVA2 */
   // public boolean addAll(int index, Sequence c)
   // {
-    // boolean changed = false;
-    // int count = c.size();
-    // setSize(size + count);
-    // shift(index, index + count, size - count - index);
-    // for (java.util.Enumeration it = c.elements();  it.hasMoreElements(); )
-      // {
-	// set(index++, it.nextElement());
-	// changed = true;
-      // }
-    // return changed;
+  //   boolean changed = false;
+  //   int count = c.size();
+  //   setSize(size + count);
+  //   shift(index, index + count, size - count - index);
+  //   for (java.util.Enumeration it = c.elements();  it.hasMoreElements(); )
+  //     {
+  //       set(index++, it.nextElement());
+  //       changed = true;
+  //     }
+  //   return changed;
   // }
   /* #endif */
 

@@ -39,7 +39,7 @@ extends AbstractSequence implements Sequence
 
   public Object get (int index)
   {
-    if (index < 0)
+    if (index < 0 || index >=size())
       throw new IndexOutOfBoundsException();
     int start = base.nextIndex(ipos0);
     return base.get(start + index);

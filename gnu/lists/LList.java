@@ -236,19 +236,19 @@ public class LList extends ExtSequence
   /* #ifndef JAVA2 */
   // public static LList makeList (Sequence vals)
   // {
-    // java.util.Enumeration e = ((AbstractSequence) vals).elements();
-    // LList result = LList.Empty;
-    // Pair last = null;
-    // while (e.hasMoreElements())
-      // {
-        // Pair pair = new Pair(e.nextElement(), LList.Empty);
-        // if (last == null)
-          // result = pair;
-        // else
-          // last.cdr = pair;
-        // last = pair;
-      // }
-    // return result;
+  //   java.util.Enumeration e = ((AbstractSequence) vals).elements();
+  //   LList result = LList.Empty;
+  //   Pair last = null;
+  //   while (e.hasMoreElements())
+  //     {
+  //       Pair pair = new Pair(e.nextElement(), LList.Empty);
+  //       if (last == null)
+  //         result = pair;
+  //       else
+  //         last.cdr = pair;
+  //       last = pair;
+  //     }
+  //   return result;
   // }
   /* #endif */
 

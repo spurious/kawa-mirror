@@ -1,3 +1,8 @@
+1999-06-30  Per Bothner  <per@bothner.com>
+
+	* formatst.scm:  New testsuite, derived from one in Slib.
+	* Makefile.am, Makefile.in (check-format):  New rule.
+	
 1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* obj-test.scm:  Yet another object regression test.

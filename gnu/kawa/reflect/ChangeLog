@@ -1,3 +1,9 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java (define): Minor non-functional tweaks.
+
+	* StaticFieldLocation.java: New constructor - currently unused.
+
 2004-12-27  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (defineAll): Ignore fields whose names

@@ -90,8 +90,6 @@ public class ClassMemberLocation extends Location
 	  }
 	catch (Exception ex)
 	  {
-	    if (id==971)
-	      new Error("issing member :"+ex+" type:"+type+" clas:"+clas+" mname:"+mname).printStackTrace();
 	    return null;
 	  }
       }
@@ -101,12 +99,12 @@ public class ClassMemberLocation extends Location
   public Object get (Object defaultValue)
   {
     java.lang.reflect.Field rfld = getRField();
-    if (rfield == null)
+    if (rfld == null)
       return defaultValue;
 
     try
       {
-        return rfield.get(instance);
+        return rfld.get(instance);
       }
     catch (IllegalAccessException ex)
       {
@@ -143,13 +141,13 @@ public class ClassMemberLocation extends Location
     //setValue(loc, value);
   }
 
-  public static void define (Object instance,java.lang.reflect.Field rfield,
+  public static void define (Object instance, java.lang.reflect.Field rfield,
 			     String uri, Interpreter interp, Environment env)
     throws IllegalAccessException
   {
     Object fvalue = rfield.get(instance);
     Type ftype = Type.make(rfield.getType());
-    boolean isAlias = ftype == Compilation.typeLocation;
+    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
     boolean isProcedure = ftype.isSubtype(Compilation.typeProcedure);
     Object fdname = ((fvalue instanceof Named && ! isAlias)
 		     ? ((Named) fvalue).getSymbol()
@@ -159,22 +157,23 @@ public class ClassMemberLocation extends Location
       sym = (Symbol) fdname;
     else
       {
-	sym = Symbol.make(uri == null ? "" : uri, fdname.toString().
-			  intern());
+	sym = Symbol.make(uri == null ? "" : uri,
+			  fdname.toString().intern());
       }
     boolean isFinal = (rfield.getModifiers() & Access.FINAL) != 0;
+    Location loc;
+    Object property = null;
     if (isAlias && isFinal)
       {
-      env.addLocation(sym, null, (Location) fvalue);
+	loc = (Location) fvalue;
       }
     else
       {
-	Object property = null;
 	if (isFinal)
 	  property = interp.getEnvPropertyFor(rfield, fvalue);
-	env.addLocation(sym, property,
-			new ClassMemberLocation(instance, rfield));
+	loc = new ClassMemberLocation(instance, rfield);
       }
+    env.addLocation(sym, property, loc);
   }
 
   public static void defineAll(Object instance, Environment env)

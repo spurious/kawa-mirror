@@ -14,6 +14,11 @@ public class StaticFieldLocation extends ClassMemberLocation
     super(null, ClassType.make(cname), fname);
   }
 
+  public StaticFieldLocation(ClassType type, String mname)
+  {
+    super(null, type, mname);
+  }
+
   public boolean isConstant ()
   {
     return true;

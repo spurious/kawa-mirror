@@ -9,7 +9,7 @@ import gnu.mapping.*;
 
 public class string_append extends ProcedureN
 {
-  public Object applyN (Object[] args)
+  public static FString stringAppend$V (Object[] args)
   {
     int count = args.length;
     java.lang.StringBuffer result = new java.lang.StringBuffer();
@@ -18,5 +18,10 @@ public class string_append extends ProcedureN
        result.append(args[t].toString());
     }
     return new FString (result);
+  }
+
+  public Object applyN (Object[] args)
+  {
+    return stringAppend$V(args);
   }
 }

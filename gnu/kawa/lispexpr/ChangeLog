@@ -1,3 +1,22 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (current): Change to fluid.
+	(getCurrent): Rewrite to use current and default to using Language's.
+	(setCurent): New method.
+
+	* LispLanguage.java (defaultReadTable): New field.
+	(createReadTable): New abstract method.
+	* LispReader.java (getReadTable): Remove method.
+	(readValues, readToken):  Use current ReadTable.
+	* ReaderParens.java (readList): Likewise.
+	* ReaderTypespec.java (read): Likewise.
+	* ReaderDispatch.java (getInitial): Rename to create.
+	(read): Fix call to error so we get correct column number.
+	* ReadTable (getInitial): Update ReaderDispatch.getInitial->create.
+	* ScmRead.java (getReadTable): Remove method.
+	(readtable, makeSchemeReadTable): Remove members - handle by
+	new createReadTable method in Scheme.
+
 2005-03-11  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (defSntxStFld): Call FieldLocation's setSyntax.

@@ -67,6 +67,7 @@ public class ReaderParens extends ReadTableEntry
 	Object list = lexer.makeNil();
 	boolean sawDot = false;
 	boolean sawDotCdr = false;
+	ReadTable readTable = ReadTable.getCurrent();
 	for (;;)
 	  {
 	    int line = port.getLineNumber();
@@ -81,7 +82,7 @@ public class ReaderParens extends ReadTableEntry
 	    if (ch == '.')
 	      {
 		ch = port.peek();
-		entry = lexer.getReadTable().lookup(ch);
+		entry = readTable.lookup(ch);
 		int kind = entry == null ? ReadTable.ILLEGAL : entry.getKind();
 		if (kind == ReadTable.WHITESPACE
 		    || kind == ReadTable.TERMINATING_MACRO
@@ -115,7 +116,7 @@ public class ReaderParens extends ReadTableEntry
 		  }
 	      }
 	    else
-	      entry = lexer.getReadTable().lookup(ch);
+	      entry = readTable.lookup(ch);
 	    Object value = lexer.readValues(ch, entry);
 	    if (value == Values.empty)
 	      continue;

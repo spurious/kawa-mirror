@@ -37,7 +37,9 @@ public class ReaderDispatch extends ReadTableEntry
       : ReadTable.TERMINATING_MACRO;
   }
 
-  public static ReaderDispatch getInitial()
+  /** Create a fresh instance and initialize it appropriately for Common Lisp.
+   */
+  public static ReaderDispatch create()
   {
     ReaderDispatch tab = new ReaderDispatch();
     ReaderDispatchMisc entry = ReaderDispatchMisc.getInstance();
@@ -83,7 +85,10 @@ public class ReaderDispatch extends ReadTableEntry
     ReadTableEntry entry = (ReadTableEntry) table.lookup(ch, null);
     if (entry == null)
       {
-	in.error("invalid dispatch character '"+((char) ch)+'\'');
+	// Effectively subtracting 1 from the column number.
+	in.error('e', in.getName(),
+                 in.getLineNumber() + 1, in.getColumnNumber(),
+                 "invalid dispatch character '"+((char) ch)+'\'');
 	return Values.empty;
       }
     return entry.read(in, ch, count);

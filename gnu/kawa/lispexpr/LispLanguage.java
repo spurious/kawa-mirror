@@ -19,6 +19,12 @@ public abstract class LispLanguage extends Language
   static public final String unquotesplicing_sym = "unquote-splicing";
   static public final String quasiquote_sym = "quasiquote";
 
+  /** The default <code>ReadTable</code> for this language. */
+  public ReadTable defaultReadTable = createReadTable();
+
+  /** Create a fresh <code>ReadTable</code> appropriate for this language. */
+  public abstract ReadTable createReadTable ();
+
   public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {

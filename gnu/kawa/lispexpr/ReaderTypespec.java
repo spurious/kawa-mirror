@@ -22,10 +22,7 @@ public class ReaderTypespec extends ReadTableEntry
   {
     int startPos = in.tokenBufferLength;
     LineBufferedReader port = in.getPort();
-    ReadTable rtable =
-	(in instanceof LispReader) ?
-	((LispReader) in).getReadTable()
-	: ReadTable.getCurrent();
+    ReadTable rtable = ReadTable.getCurrent();
     ReadTableEntry entry;
     char saveReadState = '\0';
     in.tokenBufferAppend(ch);

@@ -3,6 +3,8 @@
 
 package gnu.kawa.lispexpr;
 import gnu.kawa.util.RangeTable;
+import gnu.mapping.*;
+import gnu.expr.Language;
 
 public class ReadTable extends RangeTable
 {
@@ -18,12 +20,15 @@ public class ReadTable extends RangeTable
   /** Default value to pass to setBracketMode() unless overridden. */
   public static int defaultBracketMode = -1;
 
-  static ReadTable current = getInitial();
+  public static final ThreadLocation current
+    = new ThreadLocation(new Symbol("read-table"));
 
   public ReadTable()
   {
   }
 
+  /** Create a new ReadTable and initialize it appropriately for Common Lisp.
+   * Should be renamed to createInitial or makeInitial. FIXME. */
   public static ReadTable getInitial()
   {
     ReadTable tab = new ReadTable();
@@ -63,7 +68,7 @@ public class ReadTable extends RangeTable
     tab.set('\177',entry);
     tab.set('\b', entry);
     tab.set('\"', new ReaderString());
-    tab.set('#',  ReaderDispatch.getInitial());
+    tab.set('#',  ReaderDispatch.create());
     tab.set(';',  ReaderIgnoreRestOfLine.getInstance());
     tab.set('(',  ReaderParens.getInstance('(', ')'));
 
@@ -112,8 +117,25 @@ public class ReadTable extends RangeTable
     setBracketMode(defaultBracketMode);
   }
   
+  public static ReadTable getCurrent()
+  {
+    ReadTable table = (ReadTable) current.get(null);
+    if (table == null)
+      {
+	Language language = Language.getDefaultLanguage();
+	if (language instanceof LispLanguage)
+	  table = ((LispLanguage) language).defaultReadTable;
+	else
+	  table = ReadTable.getInitial();
+	current.set(table);
+      }
+    return table;
+  }
 
-  public static ReadTable getCurrent() { return current; }
+  public static void setCurrent(ReadTable rt)
+  {
+    current.set(rt);
+  }
 
   public ReadTableEntry lookup (int ch)
   {

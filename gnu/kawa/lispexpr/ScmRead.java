@@ -19,23 +19,6 @@ public class ScmRead extends LispReader
     //initialColonIsKeyword = false;
   }
   
-  protected ReadTable getReadTable () { return schemeReadTable; }
-
-  public static ReadTable makeSchemeReadTable()
-  {
-    ReadTable tab = ReadTable.getInitial();
-    ReaderDispatch dispatchTable = ReaderDispatch.getInitial();
-    dispatchTable.set('\'', new ReaderQuote("syntax"));
-    tab.set('#',  dispatchTable);
-    return tab;
-  }
-
-  public static ReadTable schemeReadTable;
-  static
-  {
-    schemeReadTable = makeSchemeReadTable();
-  }
-
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
   {

@@ -91,12 +91,10 @@ public class LispReader extends Lexer
     return read_case;
   }
 
-  protected ReadTable getReadTable () { return ReadTable.getCurrent(); }
-
   public Object readValues (int ch)
       throws java.io.IOException, SyntaxException
   {
-    return readValues(ch, getReadTable().lookup(ch));
+    return readValues(ch, ReadTable.getCurrent().lookup(ch));
   }
 
   /** May return zero or multiple values. */
@@ -180,7 +178,7 @@ public class LispReader extends Lexer
 	    else
 	      break;
 	  }
-	ReadTableEntry entry = getReadTable().lookup(ch);
+	ReadTableEntry entry = ReadTable.getCurrent().lookup(ch);
 	if (entry == null)
 	  {
 	    if (inEscapes)

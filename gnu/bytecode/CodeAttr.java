@@ -499,12 +499,11 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public Scope pushScope () {
     Scope scope = new Scope ();
-    scope.start = getLabel();
     if (locals == null)
       locals = new LocalVarsAttr(getMethod());
     locals.enterScope(scope);
     if (locals.parameter_scope == null) 
-      locals.parameter_scope= scope;
+      locals.parameter_scope = scope;
     return scope;
   }
 

@@ -1,3 +1,7 @@
+2000-06-26  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add ".cl" extension for Common Lisp.
+
 2000-06-24  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add Common Lisp.

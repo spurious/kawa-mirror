@@ -40,7 +40,8 @@ public abstract class Interpreter
   {
     { "scheme", ".scm", "kawa.standard.Scheme" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
-    { "commonlisp", "common-lisp", "clisp", "lisp", ".lisp", ".lsp",
+    { "commonlisp", "common-lisp", "clisp", "lisp",
+      ".lisp", ".lsp", ".cl",
       "gnu.commonlisp.lang.CommonLisp" }
   };
 

@@ -1,3 +1,8 @@
+2002-07-24  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (makeModuleExp):  Moved from Scheme.java.
+	(parse, parseFile):  Update to new Interpreter API.
+
 2002-06-05  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (emitCoerceToObject):  Combine similar code.

@@ -6,12 +6,24 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;
+import kawa.lang.Translator; // FIXME
 
 /** Interpreter sub-class for Lisp-like languages (including Scheme). */
 
 public abstract class LispInterpreter extends Interpreter
 {
-  public ModuleExp parse(Environment env, Lexer lexer)
+  public static ModuleExp makeModuleExp(Object body, Translator tr)
+  {
+    ModuleExp mexp = new ModuleExp();
+    java.util.Vector forms = new java.util.Vector(20);
+    SourceMessages messages = tr.getMessages();
+    tr.push(mexp);
+    tr.scan_body(body, forms, mexp);
+    tr.finishModule(mexp, forms);
+    return mexp;
+  }
+
+  public Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     gnu.text.SourceMessages messages = lexer.getMessages();
@@ -30,10 +42,11 @@ public abstract class LispInterpreter extends Interpreter
     body.car = sexp;
     /* If the errors were minor, we could perhaps try to
        do Translation (to check for more errors)  .  ??? */
-    return kawa.standard.Scheme.makeModuleExp(body, tr);
+    makeModuleExp(body, tr);
+    return tr;
   }
 
-  public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     kawa.lang.Translator tr = new  kawa.lang.Translator (environ, messages);
@@ -55,7 +68,7 @@ public abstract class LispInterpreter extends Interpreter
     if (port.peek() == ')')
       lexer.fatal("An unexpected close paren was read.");
     tr.finishModule(mexp, forms);
-    return mexp;
+    return tr;
   }
 
   /** Combine a <body> consisting of a list of expression. */

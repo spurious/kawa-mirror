@@ -1,0 +1,6 @@
+Sun Mar 21 11:04:19 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	New directory.
+	* ELispReader.java:  New LispReader sub-class.
+	* Makefile.am, Makefile.in  New.
+	* streams.scm:  New file.

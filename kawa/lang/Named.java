@@ -1,6 +1,6 @@
 package kawa.lang;
 
-public class Named extends Object implements Nameable {
+public class Named extends Object {
   public Symbol sym_name;
 
   public Named ()

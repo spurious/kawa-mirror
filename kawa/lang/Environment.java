@@ -21,6 +21,11 @@ public class Environment
     interp = i;
   }
 
+  public Interpreter getInterpreter ()
+  {
+    return interp;
+  }
+
   /**
    * Create a new extended Environment.
    * @param vals the fame of the new values

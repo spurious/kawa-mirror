@@ -14,7 +14,7 @@ public class CompileFile extends Procedure2
     super ("compile-file");
   }
 
-  public static final LambdaExp read (String name, Interpreter interpreter)
+  public static final LambdaExp read (String name, Environment env)
        throws GenericError
   {
     FileInputStream fstream;
@@ -27,8 +27,13 @@ public class CompileFile extends Procedure2
 	throw new GenericError ("compile-file: file not found: " + name);
       }
 
-    InPort port = new InPort (fstream, name);
-    Environment env = new Environment (interpreter);
+    return read (new InPort (fstream, name), env);
+  }
+
+  public static final LambdaExp read (InPort port, Environment env)
+       throws GenericError
+  {
+    Interpreter interpreter = env.getInterpreter ();
 
     List body = List.Empty;
     Pair last = null;
@@ -49,15 +54,11 @@ public class CompileFile extends Procedure2
 	  {
 	    // The '\n' is because a ReadError includes a line number,
 	    // and it is better if that starts the line.
-	    throw new GenericError ("read error in compile-file:\n" + e.toString ());
-	  }
-	catch (SyntaxError e)
-	  {
-	    throw new GenericError ("syntax error in compile-file: " + e.toString ());
+	    throw new GenericError ("read error reading file:\n" + e.toString ());
 	  }
 	catch (java.io.IOException e)
 	  {
-	    throw new GenericError ("I/O exception in compile-file: " + e.toString ());
+	    throw new GenericError ("I/O exception reading file: " + e.toString ());
 	  }
 	Pair cur = new Pair (obj, List.Empty);
 	if (last == null)
@@ -72,7 +73,7 @@ public class CompileFile extends Procedure2
       {
 	LambdaExp lexp = new LambdaExp (List.Empty, body, interpreter);
 	lexp.setModuleBody (true);
-	lexp.filename = name;
+	lexp.filename = port.getName ();
 	return lexp;
       }
     catch (WrongArguments ex)
@@ -87,8 +88,9 @@ public class CompileFile extends Procedure2
     if (! (arg1 instanceof StringBuffer))
       throw new WrongType (this.name (), 1, "file name");
     Interpreter interpreter = Interpreter.current ();
-    LambdaExp lexp = read (arg1.toString (), interpreter);
-    Compilation comp = new Compilation (lexp, "Top", false);
+    LambdaExp lexp = read (arg1.toString (), new Environment (interpreter));
+    Compilation comp = new Compilation (lexp,
+					LambdaExp.fileFunctionName, false);
 
     try
       {
@@ -143,7 +145,7 @@ public class CompileFile extends Procedure2
       }
     Interpreter interpreter = Interpreter.current ();
     int save_errors = interpreter.errors;
-    LambdaExp lexp = read (inname, interpreter);
+    LambdaExp lexp = read (inname, new Environment (interpreter));
     if (interpreter.errors > save_errors)
       return;
     Compilation comp = new Compilation (lexp, topname, prefix);

@@ -16,6 +16,9 @@ public class LambdaExp extends ScopeExp
   int max_args;
   private boolean is_module_body;
 
+  /** The name to give to a dummy implicit function that surrounds a file. */
+  public static String fileFunctionName = "atFileLevel";
+
   /** True iff this is the dummy top-level function of a module body. */
   public final boolean isModuleBody () { return is_module_body; }
   /** Set the state of isModuleBody (). */

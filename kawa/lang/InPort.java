@@ -269,7 +269,7 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   Symbol readSymbol ()
-       throws java.io.IOException, SyntaxError
+       throws java.io.IOException, ReadError
   {
     StringBuffer str = new StringBuffer (30);
     for (;;)
@@ -303,7 +303,7 @@ public class InPort extends FilterInputStream implements Printable
    * Assumes the initial '#' and '\\' have already been read.
    */
   protected Object readCharacter()
-       throws java.io.IOException, SyntaxError  
+       throws java.io.IOException, ReadError  
   {
     int c = readChar ();
     if (c < 0)
@@ -337,11 +337,45 @@ public class InPort extends FilterInputStream implements Printable
     return Char.make((char)c);
   }
 
-  protected Object readNumber(int radix)
-       throws java.io.IOException, SyntaxError
+  /** Read a number (with a <prefix> in Scheme syntax from this.
+   * @param radix the radix/base specified, or zoer if it specified.
+   * @param exactness 'i' if #i was seen;  'e' if #i was seen;  else ' '
+   *  (currently ignored)
+   * @return the number read
+   */
+
+  public Numeric readSchemeNumber(int radix, char exactness)
+       throws java.io.IOException, ReadError
   {
     int c = readChar();
 
+    while (c == '#')
+      {
+	c = readChar();
+	switch (c)
+	  {
+	  case 'e':
+	  case 'i':
+	    if (exactness != ' ')
+	      throw new ReadError (this,  "extra exactness specifier (#"+
+				   (char)c+")");
+	    exactness = (char) c;
+	    break;
+	  case 'x':
+	  case 'o':
+	  case 'b':
+	    if (radix != 0)
+	      throw new ReadError (this,  "extra radix specifier (#"+
+				   (char)c+")");
+	    radix = c == 'x' ? 16 : c == 'o' ? 8 : 2;
+	    break;
+	  default:
+	    throw new ReadError (this,  "unrecognized #-construct in number");
+	  }
+	c = readChar ();
+      }
+    if (radix == 0)
+      radix = 10;
     boolean isFloat = false;
     StringBuffer str = new StringBuffer(20);
     if (c=='+')
@@ -375,7 +409,7 @@ public class InPort extends FilterInputStream implements Printable
    * Assume we have already skipped the initial '"'.
    */
   protected Object readString()
-      throws SyntaxError,
+      throws ReadError,
              java.io.IOException
   {
     StringBuffer obj = new StringBuffer ();
@@ -417,7 +451,7 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   protected Object readQuote (Symbol func_symbol)
-      throws java.io.IOException, SyntaxError
+      throws java.io.IOException, ReadError
   {
     return new Pair (func_symbol,
 		     new Pair (readSchemeObject (),
@@ -449,7 +483,7 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   protected List readList ()
-       throws java.io.IOException, SyntaxError
+       throws java.io.IOException, ReadError
   {
     skipWhitespaceAndComments();
     //-- null Primitive
@@ -502,9 +536,9 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   public Object readSchemeObject ()
-      throws java.io.IOException, SyntaxError
+      throws java.io.IOException, ReadError
   {
-    int c;
+    int c, next;
     while (true)
       {
 	c = readChar ();
@@ -544,14 +578,15 @@ public class InPort extends FilterInputStream implements Printable
 	    return readQuote (func);
 	  case '+':
 	  case '-':
-	    int next = peekChar ();
+	    next = peekChar ();
 	    unreadChar ();
 	    if (Character.isDigit((char) next))
-	      return readNumber(10);
+	      return readSchemeNumber(0, ' ');
 	    else
 	      return readSymbol();
 	  case '#':
-	    switch (readChar()) 
+	    next = readChar();
+	    switch (next)
 	      {
 	      case '(':
 		return readList ().toVector ();
@@ -562,11 +597,14 @@ public class InPort extends FilterInputStream implements Printable
 	      case 'f':
 		return Interpreter.falseObject;
 	      case 'x':
-		return readNumber(16);
+		return readSchemeNumber(16, ' ');
 	      case 'b':
-		return readNumber (2);
+		return readSchemeNumber (2, ' ');
 	      case 'o':
-		return readNumber (8);
+		return readSchemeNumber (8, ' ');
+	      case 'i':
+	      case 'e':
+		return readSchemeNumber (8, (char) next);
 	      case '|':
 		boolean notAtEnd = true;
 		do {
@@ -586,7 +624,7 @@ public class InPort extends FilterInputStream implements Printable
 	  default:
 	    unreadChar ();
 	    if (Character.isDigit((char)c))
-	      return readNumber(10);
+	      return readSchemeNumber(0, ' ');
 	    else
 	      return readSymbol();
 	  }

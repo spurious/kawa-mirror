@@ -9,14 +9,13 @@ JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 .java.class:
 	$(JAVAC) -d ../.. $<
 
-javadir=$(prefix)/java/kawa/lang
+javadir=$(prefix)/java/$(subdir)
 
 EXCEPTIONS=\
 UnboundSymbol.class \
 WrongArguments.class \
 WrongType.class \
 GenericError.class\
-SyntaxError.class \
 ReadError.class \
 EofReadError.class
 
@@ -89,11 +88,12 @@ Values.class \
 Promise.class \
 $(EXCEPTIONS)
 
-java_DATA=$(OBJ) $(EXCEPTIONS)
+java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ) $(EXCEPTIONS)
+CLEANFILES=$(OBJ)
 
 all: $(OBJ)
 

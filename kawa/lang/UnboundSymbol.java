@@ -7,6 +7,7 @@ public class UnboundSymbol extends Exception
 
   public UnboundSymbol(Symbol symbol)
   {
+    super ("Unbound symbol " + symbol);
     this.symbol = symbol;
   }
 }

@@ -96,6 +96,7 @@ public class SetExp extends Expression
     else
       {
 	comp.compileConstant (name);
+	comp.method.maybe_compile_checkcast (comp.scmSymbolType);
 	new_value.compile (comp, 0);
 	comp.method.compile_invoke_static (comp.defineGlobalMethod);
       }

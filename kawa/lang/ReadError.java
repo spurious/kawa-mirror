@@ -4,13 +4,13 @@ package kawa.lang;
  * A syntax error during read.
  */
 
-public class ReadError extends SyntaxError
+public class ReadError extends Exception
 {
   InPort inport;
 
   public ReadError (InPort inport, String message)
   {
-    super (construct_message (inport, message));
+    super (message);
     this.inport = inport;
   }
 
@@ -37,5 +37,10 @@ public class ReadError extends SyntaxError
     buffer.append (": ");
     buffer.append (message);
     return buffer.toString ();
+  }
+
+  public String toString() 
+  {
+    return construct_message (getPort (), getMessage ());
   }
 }

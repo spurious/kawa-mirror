@@ -1,6 +1,4 @@
 package gnu.jemacs.buffer;
-import javax.swing.*;
-import javax.swing.text.*;
 import gnu.jemacs.swing.SwingWindow;
 
 /** A pseudo-action to wrap an integer. */

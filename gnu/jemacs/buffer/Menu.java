@@ -1,10 +1,6 @@
 package gnu.jemacs.buffer;
-import java.awt.event.*;
 import javax.swing.*;
 import gnu.lists.*;
-import gnu.mapping.Procedure;
-import gnu.jemacs.lang.*;
-import java.util.*;
 
 /**
  * This manages a menu (for menubars or popup menus).

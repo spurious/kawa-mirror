@@ -41,7 +41,7 @@ public class Signal extends RuntimeException
 
   public static void checkQuit()
   {
-    if (Thread.currentThread().interrupted())
+    if (Thread.interrupted())
       throw new gnu.mapping.WrappedException(new InterruptedException());
   }
 }

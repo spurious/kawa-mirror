@@ -1,6 +1,4 @@
 package gnu.jemacs.buffer;
-import java.awt.event.FocusEvent;
-import javax.swing.*;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 

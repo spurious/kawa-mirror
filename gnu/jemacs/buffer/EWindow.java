@@ -3,7 +3,6 @@
 
 package gnu.jemacs.buffer;
 import gnu.lists.*;
-import java.awt.*;
 import gnu.mapping.*;
 
 public abstract class EWindow

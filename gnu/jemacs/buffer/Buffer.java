@@ -3,12 +3,10 @@
 
 package gnu.jemacs.buffer;
 import java.io.*;
-import java.awt.Color;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.Char;
 import gnu.commonlisp.lang.Symbols; // FIXME
-import javax.swing.text.*; // FIXME
 
 public abstract class Buffer extends AbstractSequence implements CharSeq
 {

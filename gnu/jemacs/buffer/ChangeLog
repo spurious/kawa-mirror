@@ -1,3 +1,12 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* Buffer.java:  Remove unused import statements.
+	* EWindow.java:  Likewise.
+	* Menu.java:  Likewise.
+	* Modeline.java:  Likewise.
+	* TooLongAction.java:  Likewise.
+	* Signal.java (checkQuit):  Use static syntax to invoke static method.
+
 2003-05-17  Per Bothner  <per@bothner.com>
 
 	* EWindow.java (setFrame):  New method.

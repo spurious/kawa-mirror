@@ -8,7 +8,7 @@ import kawa.lang.*;
 
 public class plus_oper extends ProcedureN
 {
-  public kawa.standard.plus_oper()
+  public plus_oper()
   {
     super("+");
   }

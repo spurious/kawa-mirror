@@ -15,13 +15,14 @@ BAT=
 CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 JAVAC = javac
 JAVA = java
+JCFLAGS = -g
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
 
 # This redundant rule is needed for some versions of make, but not GNU make.
 repl.class:  $(srcdir)/repl.java
-	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
 
 javadir=$(prefix)/java/$(subdir)
 

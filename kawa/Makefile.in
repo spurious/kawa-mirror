@@ -50,9 +50,6 @@ NORMAL_UNINSTALL = true
 PRE_UNINSTALL = true
 POST_UNINSTALL = true
 EXEEXT = @EXEEXT@
-EXTRA_MISC = @EXTRA_MISC@
-EXTRA_OBJ = @EXTRA_OBJ@
-JAVA_VERSION = @JAVA_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
@@ -74,6 +71,7 @@ BAT=
 CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 JAVAC = javac
 JAVA = java
+JCFLAGS = -g
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -307,11 +305,11 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
 
 # This redundant rule is needed for some versions of make, but not GNU make.
 repl.class:  $(srcdir)/repl.java
-	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
 
 kawa$(BAT):
 	echo '#!/bin/sh' >tmp

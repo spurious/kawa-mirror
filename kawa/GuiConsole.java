@@ -31,7 +31,7 @@ public class GuiConsole extends Frame implements ActionListener {
   MessageArea message = null;
 
   public static void main(String[] args) {
-    Language language = new Scheme();
+    Language language = Scheme.getInstance();
     new GuiConsole(language, language.getNewEnvironment());
   }
 

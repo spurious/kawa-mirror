@@ -32,47 +32,53 @@ public class Scheme extends LispLanguage
     define (name, new AutoloadProcedure (name, className, this));
   }
 
-  public static Environment nullEnvironment;
+  public static final Environment nullEnvironment;
   public static Environment r4Environment;
   public static Environment r5Environment;
   protected static SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
-  static Scheme instance;
+  static final Scheme instance;
 
-  public static gnu.kawa.reflect.InstanceOf instanceOf;
-  public static not not;
-  public static kawa.standard.map map;
-  public static kawa.standard.map forEach;
-  public static gnu.kawa.functions.IsEq isEq;
-  public static gnu.kawa.functions.IsEqv isEqv;
-  public static gnu.kawa.functions.IsEqual isEqual;
+  public static final gnu.kawa.reflect.InstanceOf instanceOf;
+  public static final not not;
+  public static final kawa.standard.map map;
+  public static final kawa.standard.map forEach;
+  public static final gnu.kawa.functions.IsEq isEq;
+  public static final gnu.kawa.functions.IsEqv isEqv;
+  public static final gnu.kawa.functions.IsEqual isEqual;
+
+  static {
+    // (null-environment)
+    nullEnvironment = Environment.make("null-environment");
+
+    instance = new Scheme();
+    instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
+    not = new not(instance, "not");
+    map = new map(true);
+    forEach = new map(false);
+    isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
+    isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
+    isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
+    instance.initScheme();
+    instance.environ = instance.getNewEnvironment();
+  }
 
   public static Scheme getInstance()
   {
-    if (kawaEnvironment == null)
-      new Scheme ();
     return instance;
   }
 
   public static synchronized Environment builtin ()
   {
-    if (kawaEnvironment == null)
-      new Scheme ();
     return kawaEnvironment;
   }
 
-  public static Lambda lambda = new kawa.lang.Lambda();
+  public static final Lambda lambda = new kawa.lang.Lambda();
   static { lambda.setKeywords(Special.optional, Special.rest, Special.key); }
 
-  public void initScheme ()
+  private void initScheme ()
   {
-      Named proc;
-      Named syn;
-
-      // (null-environment)
-      nullEnvironment = Environment.make("null-environment");
-
       environ = nullEnvironment;
 
       defSntxStFld("lambda", "kawa.standard.Scheme", "lambda");
@@ -696,23 +702,6 @@ public class Scheme extends LispLanguage
 
   public Scheme ()
   {
-    environ = getNewEnvironment();
-    if (instance == null)
-      {
-        instance = this;
-        instanceOf = new gnu.kawa.reflect.InstanceOf(this, "instance?");
-        not = new not(this, "not");
-        map = new map(true);
-	forEach = new map(false);
-        isEq = new gnu.kawa.functions.IsEq(this, "eq?");
-        isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?", isEq);
-        isEqual = new gnu.kawa.functions.IsEqual(this, "equal?");
-      }
-  }
-
-  public Scheme (Environment environ)
-  {
-    this.environ = environ;
   }
 
   public String getName()
@@ -722,8 +711,6 @@ public class Scheme extends LispLanguage
 
   public Environment getNewEnvironment ()
   {
-    if (kawaEnvironment == null)
-      initScheme();
     return new ScmEnv ("interaction-environment."+(++env_counter),
 		       kawaEnvironment);
   }
@@ -971,6 +958,6 @@ public class Scheme extends LispLanguage
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Language.setDefaults(new Scheme());
+    Language.setDefaults(getInstance());
   }
 }

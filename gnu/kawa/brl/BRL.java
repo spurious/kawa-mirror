@@ -12,17 +12,21 @@ public class BRL extends Scheme
   static BRL brl_instance;
   static final Object emptyForm = new FString();
 
+  protected static final SimpleEnvironment brlEnvironment
+    = Environment.make("brl-environment", Scheme.kawaEnvironment);
+
   public BRL ()
   {
     ModuleBody.setMainPrintValues(true);
-    Environment.setCurrent(getEnvironment());
+    environ = brlEnvironment;
+    Environment.setCurrent(environ);
     try
       {
 	loadClass("gnu.brl.stringfun");
 	loadClass("gnu.kawa.brl.progfun");
 	loadClass("gnu.kawa.slib.HTTP");
       }
-    catch (java.lang.ClassNotFoundException ex)
+    catch (Throwable ex)
       {
 	System.err.println("caught "+ex);
       }

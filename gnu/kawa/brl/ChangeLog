@@ -1,3 +1,8 @@
+2005-03-28  Per Bothner  <per@bothner.com>
+
+	* BRL.java: Update for recent changes to Scheme class.
+	(brlEnvironment): New static final field.
+
 2005-03-24  Per Bothner  <per@bothner.com>
 
 	* BRL.java (instance): Replace static field by ...

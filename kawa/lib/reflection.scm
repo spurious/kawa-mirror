@@ -127,3 +127,15 @@
 (define (subtype? (t1 <type>) (t2 <type>)) <boolean>
   ((primitive-virtual-method <type> "isSubtype" <boolean> (<type>))
    t1 t2))
+
+#|
+(define (field-location object (name <symbol>))
+  ((primitive-static-method <kawa.lang.FieldLocation> "make"
+                            <kawa.lang.FieldLocation> (<object> <symbol>))
+   object name))
+
+(define (method object (name <symbol>))
+  ((primitive-static-method <kawa.lang.method> "make"
+                            <kawa.lang.method> (<object> <symbol>))
+   object name))
+|#

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -99,7 +99,13 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_sources =    Char.java PrettyWriter.java   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java   QueueReader.java SourceMessages.java NullReader.java   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java   IntegerFormat.java RomanIntegerFormat.java EnglishIntegerFormat.java   CaseConvertFormat.java FlushFormat.java WriterManager.java
+java_sources = \
+  Char.java PrettyWriter.java \
+  LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
+  QueueReader.java SourceMessages.java NullReader.java \
+  ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
+  IntegerFormat.java RomanIntegerFormat.java EnglishIntegerFormat.java \
+  CaseConvertFormat.java FlushFormat.java WriterManager.java
 
 
 EXTRA_DIST = package.html

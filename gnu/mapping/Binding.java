@@ -2,10 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
+import java.io.*;
 
 /** A Binding is a Location in an Environment object. */
 
-public class Binding extends Location
+public class Binding extends Location implements Externalizable
     // implements java.util.Map.Entry
 {
   /** The current value of the binding. */
@@ -13,8 +14,11 @@ public class Binding extends Location
 
   Constraint constraint;
 
-  /** Magic value used to indicate there is no (function) binding. */
-  static final String UNBOUND = new String("#unbound#");
+  /** Magic value used to indicate there is no property binding. */
+  public static final String UNBOUND = new String("(unbound)");
+
+  /** Magic value used as a key for function bindings. */
+  static final String FUNCTION = new String("(function).");
 
   public final Object get ()
   {
@@ -23,11 +27,46 @@ public class Binding extends Location
 
   public Procedure getProcedure ()
   {
-    return constraint.getProcedure(this);
+    try
+      {
+	return constraint.getProcedure(this);
+      }
+    catch (UnboundSymbol ex)
+      {
+	// FIXME!!!
+	Object f = getFunctionValue(UNBOUND);
+	if (f != UNBOUND)
+	  return (Procedure) f;
+	throw ex;
+      }
+  }
+
+  public final void defineValue(Object value)
+  {
+    Environment env = constraint.getEnvironment(this);
+    if (env.locked)
+      set(value);
+    else
+      {
+	this.constraint = TrivialConstraint.getInstance(this);
+	this.value = value;
+      }
+  }
+
+  public final void defineConstant(Object value)
+  {
+    Environment env = constraint.getEnvironment(this);
+    if (env.locked)
+      set(value);
+    else
+      {
+	this.constraint = ConstantConstraint.getInstance(env);
+	this.value = value;
+      }
   }
 
   public final void set (Object value)
-  {
+  { 
     constraint.set(this, value);
   }
 
@@ -43,7 +82,17 @@ public class Binding extends Location
 
   public boolean isBound ()
   {
+    try{
     return constraint.isBound(this);
+    } catch (RuntimeException ex)
+      {
+	System.err.println("isBound failed for "+getName());
+	throw ex;
+      }
+  }
+
+  public Binding ()
+  {
   }
 
   public Binding (String name)
@@ -51,16 +100,22 @@ public class Binding extends Location
     setName(name); 
   }
 
-  static final TrivialConstraint trivialConstraint
-    = new TrivialConstraint(null);
-
   // The compiler emits calls to this method.
   public static Binding make (Object init, String name)
   {
     Binding binding = new Binding(name);
     binding.value = init;
-    binding.constraint = trivialConstraint;
+    binding.constraint = TrivialConstraint.getInstance((Environment) null);
     return binding;
+  }
+
+  // gnu.expr.LitTable uses this.
+  public static Binding make (String name, Environment env)
+  {
+    if (env == null)
+      return new Binding(null);
+    else
+      return env.getBinding(name);
   }
 
   public void print(java.io.PrintWriter ps)
@@ -98,20 +153,11 @@ public class Binding extends Location
     return old;
   }
 
+  /** Just tests for identity.
+   * Otherwise hashTables that have Bindings as keys will break. */
   public boolean equals (Object o)
   {
-    if (! (o instanceof Binding))
-      return false;
-    Binding e2 = (Binding) o;
-    String e1Key = getName();
-    String e2Key = e2.getName();
-    // This is not quite following the Collections spec, but we assume keys
-    // are interned, or if they are not, that they are seen as unequal.
-    if (e1Key != e2Key)
-      return false;
-    Object e1Value = constraint.get(this);
-    Object e2Value = e2.constraint.get(e2);
-    return e1Value == null ? e2Value == null : e1Value.equals(e2Value);
+    return this == o;
   }
 
   public int hashCode ()
@@ -234,9 +280,81 @@ public class Binding extends Location
     return countInserted;
   }
 
+  /** Get value of "function binding" of a Binding.
+   * Some languages (including Common Lisp and Emacs Lisp) associate both
+   * a value binding and a function binding with a symbol.
+   * @exception UnboundSymbol if no function binding.
+   */
   public final Object getFunctionValue()
   {
     Object value = constraint.getFunctionValue(this);
-    return value == UNBOUND ? null : value;  // FIXME
+    if (value == UNBOUND)
+      throw new UnboundSymbol(getName());
+    return value;
   }
+
+  /** Get value of "function binding" of a Binding.
+   * Some languages (including Common Lisp and Emacs Lisp) associate both
+   * a value binding and a function binding with a symbol.
+   * @param defaultValue value to return if there is no function binding
+   * @return the function value, or defaultValue if no function binding.
+   */
+  public final Object getFunctionValue(Object defaultValue)
+  {
+    Object value = constraint.getFunctionValue(this);
+    return value == UNBOUND ? defaultValue : value;
+  }
+
+  public boolean hasFunctionValue()
+  {
+    Object value = constraint.getFunctionValue(this);
+    return value != UNBOUND;
+  }
+
+  public void setFunctionValue(Object value)
+  {
+    constraint.setFunctionValue(this, value);
+  }
+
+  public void removeFunctionValue()
+  {
+    constraint.setFunctionValue(this, UNBOUND);
+  }
+
+  public final Environment getEnvironment()
+  {
+    return constraint.getEnvironment(this);
+  }
+
+  public String toString()
+  {
+    return getName();
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+    out.writeObject(getEnvironment());
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    String name = (String) in.readObject();
+    Environment env = (Environment) in.readObject();
+    if (env != null)
+      constraint = env.unboundConstraint;
+    setName(name);
+  }
+
+  public Object readResolve() throws ObjectStreamException
+  {
+    if (constraint == null)
+      return this;
+    Environment env = constraint.getEnvironment(this);
+    if (env == null)
+      return this;
+    return make(env, getName());
+  }
+
 }

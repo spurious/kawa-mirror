@@ -1,3 +1,31 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Binding.java:  Implement Externalizeable.
+	(readExternal, writeExternal, readResolve):  New methods.
+	(getProcedure):  New kludge to Lisp2 bindings.
+	(defineValue, defineConstant. getFunctionValue, hasFunctionValue,
+	setFunctionValue, removeFunctionValue, getEnvironment):  New methods.
+	(toString):  Return name - needed since Lisp symbol is a Binding.
+	(make):  New method.
+	(trivialConstraint):  Removed field.
+	* Constraint.java (setFunctionValue):  New method.
+	* Binding2.java:  Removed class.
+	* Makefile.am (java_JAVA):  Updated.
+
+	* Binding.java (equals):  Replace by identity.
+	* ConstantConstraint.java:  New class; extends Constraint.
+	* Environment.java  (constantConstraint):  New field.
+
+	* Environment.java (locked):  New field
+	(isLocked, setLocked):  New methods.
+	(getBinding):  Don't add new binding if locked (but try parent).
+	(remove):  Throw exception if locked.
+	* TrivialConstraint.java (getInstance):  New static methods.
+	* UnboundConstraint.java (getInstance):  New static methods.
+        (set):  Throw exception if environment is locked.
+
+	* Procedure.java (removeProperty):  New method.
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* CpsProcedure.java (applyN):  Use checkArgCount method.

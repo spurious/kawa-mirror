@@ -63,11 +63,14 @@ public abstract class Constraint
    */
   public Object getFunctionValue(Binding binding)
   {
-    if (binding instanceof Binding2)
-      return ((Binding2) binding).functionValue;
-    else if (binding.isBound())
-      return binding.get();
+    return binding.getProperty(Binding.FUNCTION, Binding.UNBOUND);
+  }
+
+  public void setFunctionValue(Binding binding, Object value)
+  {
+    if (value == Binding.UNBOUND)
+      binding.removeProperty(Binding.FUNCTION);
     else
-      return Binding.UNBOUND;
+      binding.setProperty(Binding.FUNCTION, value);
   }
 }

@@ -8,9 +8,9 @@ java_sources=\
   AliasConstraint.java \
   ApplyMethodContainer.java ApplyMethodProc.java \
   Binding.java \
-  Binding2.java \
   BindingEnumeration.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
+  ConstantConstraint.java \
   IndirectConstraint.java \
   CallFrame.java CallContext.java CpsProcedure.java \
   CpsMethodContainer.java CpsMethodProc.java \

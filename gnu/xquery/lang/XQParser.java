@@ -698,7 +698,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	    String name = new String(tokenBuffer, 0, tokenBufferLength);;
 	    Expression[] args = { exp, new QuoteExp(""),
 				  new QuoteExp(name.intern()) };
-	    System.err.println("path name:"+name);
 	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
 			       args);
 	    getRawToken();

@@ -169,7 +169,7 @@ public class LangPrimType extends gnu.bytecode.PrimType
     char sig1 = getSignature().charAt(0);
     if (other instanceof PrimType)
       {
-	char sig2 = getSignature().charAt(0);
+	char sig2 = other.getSignature().charAt(0);
 	if (sig1 == sig2)
 	  return 0;
 	if (sig1 == 'V')

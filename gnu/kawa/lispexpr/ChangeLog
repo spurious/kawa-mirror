@@ -1,5 +1,8 @@
 2003-04-05  Per Bothner  <per@bothner.com>
 
+	* LangPrimType.java (compare):  Fix thinko.
+	Fixes bug reported by Vladimir Tsichevski <wowa1@online.ru>.
+
 	* LispReader.java (readToken):  Allow "illegal" character if escaped.
 
 2003-02-23  Per Bothner  <per@bothner.com>

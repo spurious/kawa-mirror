@@ -63,7 +63,7 @@ public class quasiquote extends Syntax implements Printable
 	Expression[] args = new Expression[2];
 	args[0] = coerceExpression (expanded_car);
 	args[1] = coerceExpression (expanded_cdr);
-	return Invoke.makeInvokeStatic(consType, "cons", args);
+	return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
       }
   }
 
@@ -163,7 +163,6 @@ public class quasiquote extends Syntax implements Printable
     return coerceExpression (expand (pair.car, 1, tr));
   }
 
-  static final ClassType consType = ClassType.make("kawa.lib.lists");
   static final ClassType appendType = ClassType.make("kawa.standard.append");
   static final ClassType vectorType = ClassType.make("kawa.lib.vectors");
   static final ClassType vectorAppendType

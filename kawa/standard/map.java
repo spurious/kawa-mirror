@@ -3,6 +3,7 @@ import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.functions.IsEq;
+import gnu.kawa.reflect.Invoke;
 
 /** Implement the Scheme standard functions "map" and "for-each".
  * @author Per Bothner
@@ -104,8 +105,6 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     if (nargs < 2)
       return exp;  // ERROR
 
-    if (collect)
-      return exp;  // INLINE NOT IMPLEMENTED;
     nargs--;
 
     // First an outer (let ((%proc PROC)) L2), where PROCS is args[0].
@@ -120,7 +119,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Expression[] inits2 = new Expression[1];
     LetExp let2 = new LetExp(inits2);
     let1.setBody(let2);
-    LambdaExp lexp = new LambdaExp(nargs);
+    LambdaExp lexp = new LambdaExp(collect ? nargs + 1 : nargs);
     inits2[0] = lexp;
     Declaration loopDecl = let2.addDeclaration("%loop");
     loopDecl.noteValue(lexp);
@@ -129,7 +128,6 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Expression[] inits3 = new Expression[nargs];
     LetExp let3 = new LetExp(inits3);
 
-    QuoteExp empty = new QuoteExp(LList.Empty);
     Declaration[] largs = new Declaration[nargs];
     Declaration[] pargs = new Declaration[nargs];
     IsEq isEq = new IsEq(null, "eq?");
@@ -141,36 +139,58 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	inits3[i] = new ReferenceExp(largs[i]);
 	pargs[i].noteValue(inits3[i]);
       }
+    Declaration resultDecl = collect ? lexp.addDeclaration("result") : null;
+    
     Expression[] doArgs = new Expression[nargs];
-    Expression[] recurseArgs = new Expression[nargs];
+    Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	Expression[] carArgs = new Expression[2];
-	Expression[] cdrArgs = new Expression[2];
-	carArgs[0] = new ReferenceExp(pargs[i]);
-	cdrArgs[0] = new ReferenceExp(pargs[i]);
-	carArgs[1] = new QuoteExp("car");
-	cdrArgs[1] = new QuoteExp("cdr");
-	doArgs[i] = new ApplyExp(gnu.kawa.reflect.SlotGet.field, carArgs);
-	recurseArgs[i] = new ApplyExp(gnu.kawa.reflect.SlotGet.field, cdrArgs);
+	doArgs[i] = Expression.makeGetField(new ReferenceExp(pargs[i]), "car");
+	recArgs[i] = Expression.makeGetField(new ReferenceExp(pargs[i]), "cdr");
       }
-    ApplyExp doit = new ApplyExp(new ReferenceExp(procDecl), doArgs);
-    Expression recurse = new ApplyExp(new ReferenceExp(loopDecl), recurseArgs);
-    lexp.body = new BeginExp(doit, recurse);
+    ApplyExp doit = new ApplyExp(new ReferenceExp(procDecl), doArgs); 
+    Expression rec = new ApplyExp(new ReferenceExp(loopDecl), recArgs);
+    if (collect)
+      {
+	Expression[] consArgs = new Expression[2];
+	consArgs[0] = doit;
+	consArgs[1] = new ReferenceExp(resultDecl);
+	recArgs[nargs] = Invoke.makeInvokeStatic(Compilation.typePair,
+						 "make", consArgs);
+	lexp.body = rec;
+      }
+    else
+      {
+	lexp.body = new BeginExp(doit, rec);
+      }
     let3.setBody(lexp.body);
     lexp.body = let3;
-    Expression[] initArgs = new Expression[nargs];
+    Expression[] initArgs = new Expression[collect ? nargs + 1 : nargs];
+    QuoteExp empty = new QuoteExp(LList.Empty);
     for (int i = nargs;  --i >= 0; )
       {
 	Expression[] compArgs = new Expression[2];
 	compArgs[0] = new ReferenceExp(largs[i]);
 	compArgs[1] = empty;
+	Expression result
+	  = collect ? (Expression) new ReferenceExp(resultDecl)
+	  : (Expression) QuoteExp.voidExp;
 	lexp.body = new IfExp(new ApplyExp(isEq, compArgs),
-			      QuoteExp.voidExp, lexp.body);
+			      result, lexp.body);
 	initArgs[i] = args[i+1];
       }
+    if (collect)
+      initArgs[nargs] = empty;
 
-    let2.setBody(new ApplyExp(new ReferenceExp(loopDecl), initArgs));
+    Expression body = new ApplyExp(new ReferenceExp(loopDecl), initArgs);
+    if (collect)
+      {
+	Expression[] reverseArgs = new Expression[1];
+	reverseArgs[0] = body;
+	body = Invoke.makeInvokeStatic(Compilation.scmListType,
+				       "reverseInPlace", reverseArgs);
+      }
+    let2.setBody(body);
 
     return let1;
   }

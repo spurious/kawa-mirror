@@ -9,6 +9,9 @@ import gnu.mapping.*;
 
 public class ObjectFormat extends ReportFormat
 {
+  /** Maxiumum number of characters to show.
+   * Truncate any following characters.
+   * The value -1 means "no limit". */
   int maxChars;
   boolean readable;
 
@@ -67,18 +70,25 @@ public class ObjectFormat extends ReportFormat
 	    oport.printReadable = saveReadable;
 	  }
       }
-    // FIXME do better if maxChars < 0 && dst instanceof CharArrayWriter
+    else if (maxChars < 0 && dst instanceof CharArrayWriter)
+      {
+	OutPort oport = new OutPort(dst);
+	oport.printReadable = readable;
+	SFormat.print(args[start], oport);
+	oport.flush();
+      }
     else
       {
 	CharArrayWriter wr = new CharArrayWriter();
 	OutPort oport = new OutPort(wr);
 	oport.printReadable = readable;
 	SFormat.print(args[start], oport);
-	char[] chars = wr.toCharArray(); 
-	int len = chars.length;
-	if (maxChars >= 0 && len > maxChars)
-	  len = maxChars;
-	dst.write(chars, 0, len);
+	oport.flush();
+	int len = wr.size();
+	if (maxChars < 0 || len <= maxChars)
+	  wr.writeTo(dst);
+	else
+	  dst.write(wr.toCharArray(), 0, maxChars);
       }
     return start + 1;
   }

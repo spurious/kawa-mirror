@@ -30,7 +30,7 @@ public class ErrorExp extends Expression
   public void compile (Compilation comp, int flags)
   {
     // Should never happen!
-    if ((flags & IGNORED) != 0)
+    if ((flags & IGNORED) == 0)
       comp.method.compile_push_null ();
   }
 }

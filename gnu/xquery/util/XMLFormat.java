@@ -80,7 +80,11 @@ public class XMLFormat extends AbstractFormat
     else if (obj == null)
       ;
     else
-      write (obj.toString(), out);
+      {
+	String str = obj.toString();
+	if (str != null)
+	  write (str, out);
+      }
   }
 
   public void format (Object value, Consumer out)

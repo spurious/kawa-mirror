@@ -1,3 +1,7 @@
+2003-03-15  Per Bothner  <per@bothner.com>
+
+	* XMLFormat.java (writeObject):  Check if toString returns null.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java:  Moved gnu.kawa.functions.

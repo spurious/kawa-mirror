@@ -31,7 +31,7 @@ public class not extends Procedure1 implements Inlineable
     if (target instanceof StackTarget && type.getSignature().charAt(0) == 'Z')
       {
 	arg.compile(comp, target);
-	code.emitNot();
+	code.emitNot(target.getType());
       }
     else
       {

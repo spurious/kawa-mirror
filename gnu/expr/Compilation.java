@@ -841,7 +841,6 @@ public class Compilation
    * @param lexp top-level function
    * @param classname name of top-level class to generate
    * @param prefix prefix to pre-pend to the names of other (non-top) classes
-   * @param immediate true if the classes will be immediately loaded
    */
   public void compile (ModuleExp lexp, String classname, String prefix)
   {

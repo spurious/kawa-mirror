@@ -1,4 +1,4 @@
-(test-init "Objects" 66)
+(test-init "Objects" 71)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -214,3 +214,16 @@
 (require <MyModule>)
 (test '(#t 5 6) my-func-t 5 6)
 
+(define-record-type pare
+  (kons x y)
+  pare?
+  (x kar set-kar!)
+  (y kdr))
+(test #t pare? (kons 1 2))
+(test #f pare? (cons 1 2))
+(test 1 kar (kons 1 2))
+(test 2 kdr (kons 1 2))
+(test 3 'set-kdr!
+      (let ((k (kons 1 2)))
+	(set-kar! k 3)
+	(kar k)))

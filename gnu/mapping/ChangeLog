@@ -1,3 +1,19 @@
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* ApplyMethodContainer.java:  New interface.
+	* ApplyMethodProc.java:  New class;  extends ProcedureN.
+
+	* Binding.java (getFunctionValue):  Use AliasConstraint and Binding2.
+	* Binding2.java:  New class; extends Binding.
+	* AliasConstraint.java:  New class; extends Constraint.
+	* Environment.java (defineFunction):  Two new static methods.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new classes.
+
+	* Values.java (noArgs):  New static field.
+	(empty):  Use noArgs.
+	* Procedure.java (nArgs):  Make protected, instead of public.  (Thus
+	it is not found by gnu.kawa.reflect.ClassMemberConstraint.defineAll.)
+
 2000-02-01  Per Bothner  <per@bothner.com>
 
 	* Binding.java (getConstraint, getFunctionValue):  New methods.

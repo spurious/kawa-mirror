@@ -7,7 +7,7 @@ package gnu.mapping;
 
 public abstract class Procedure extends Named implements Printable
 {
-  public static Object[] noArgs = new Object[0];
+  protected static Object[] noArgs = Values.noArgs;
 
   public Procedure()
   {

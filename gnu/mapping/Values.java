@@ -6,9 +6,10 @@ package gnu.mapping;
 
 public class Values implements Printable
 {
+  public static Object[] noArgs = new Object[0];
   private Object[] vals;
 
-  public static final Values empty = new Values(Procedure.noArgs);
+  public static final Values empty = new Values(noArgs);
 
   /** Constructor.
    * @param values the values to encapulate

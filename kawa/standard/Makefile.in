@@ -147,7 +147,6 @@ exact2inexact.class \
 inexact2exact.class \
 number2string.class \
 string2number.class \
-char_p.class \
 char_equal_p.class \
 char_less_p.class \
 char_less_equal_p.class \
@@ -176,7 +175,6 @@ string_ci_lessequal_p.class \
 string_ci_greaterthan_p.class \
 string_ci_greaterequal_p.class \
 string_append.class \
-vector_p.class \
 make_vector.class \
 vector_v.class \
 vector2list.class \
@@ -223,6 +221,7 @@ call_with_values.class \
 make_quantity.class quantity2number.class quantity2unit.class \
 make_future.class sleep.class \
 try_catch.class try_finally.class \
+convert.class instance.class \
 Scheme.class \
 null_env.class \
 user_env.class \

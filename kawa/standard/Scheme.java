@@ -35,6 +35,24 @@ public class Scheme extends Interpreter
   public static Syntax beginSyntax;
   public static Syntax defineSyntax;
 
+  public static SpecialType byteType
+    = new SpecialType ("byte", "B", 1, java.lang.Byte.TYPE);
+  public static SpecialType shortType
+    = new SpecialType ("short", "S", 2, java.lang.Short.TYPE);
+  public static SpecialType intType
+    = new SpecialType ("int", "I", 4, java.lang.Integer.TYPE);
+  public static SpecialType longType
+    = new SpecialType ("long", "J", 8, java.lang.Long.TYPE);
+
+  public static SpecialType floatType
+    = new SpecialType ("float", "F", 4, java.lang.Float.TYPE);
+  public static SpecialType doubleType
+    = new SpecialType ("double", "D", 8, java.lang.Double.TYPE);
+  public static SpecialType booleanType
+    = new SpecialType("boolean", "Z", 1, java.lang.Boolean.TYPE);
+  public static SpecialType charType
+    = new SpecialType("char", "C", 2, java.lang.Character.TYPE);
+
   public static synchronized Environment builtin ()
   {
     if (kawa_environment == null)
@@ -94,15 +112,15 @@ public class Scheme extends Interpreter
 
       //-- Section 6.2  -- complete
       eqv = new kawa.standard.eqv_p();
-      define("eqv?", eqv);
+      define_proc("eqv?", eqv);
       eq = new kawa.standard.eq_p();
-      define("eq?", eq);
+      define_proc("eq?", eq);
       equal = new kawa.standard.equal_p();
-      define("equal?", equal);
+      define_proc("equal?", equal);
 
       //-- Section 6.3  -- complete
-      define_proc ("pair?", "kawa.standard.pair_p");
-      define ("cons", kawa.standard.cons.consProcedure);
+      define_proc("pair?", "kawa.standard.pair_p");
+      define_proc("cons", kawa.standard.cons.consProcedure);
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
       define_proc ("set-car!", "kawa.standard.setcar_b");
@@ -224,7 +242,7 @@ public class Scheme extends Interpreter
       define_proc ("string->number", "kawa.standard.string2number");
 
       //-- Section 6.6  -- complete
-      define_proc ("char?", "kawa.standard.char_p");
+      define_proc ("char?", "kawa.lib.characters");
       define_proc ("char=?", "kawa.standard.char_equal_p");
       define_proc ("char<?", "kawa.standard.char_less_p");
       define_proc ("char>?", "kawa.standard.char_greater_p");
@@ -273,7 +291,7 @@ public class Scheme extends Interpreter
       define_proc ("string-fill!", "kawa.lib.strings");
 
       //-- Section 6.8  -- complete
-      define_proc ("vector?", "kawa.standard.vector_p");
+      define_proc ("vector?", "kawa.lib.vectors");
       define_proc ("make-vector", "kawa.standard.make_vector");
       define ("vector", kawa.standard.vector_v.vectorProcedure);
       define_proc ("vector-length", "kawa.lib.vectors");
@@ -379,12 +397,14 @@ public class Scheme extends Interpreter
 		  new kawa.standard.prim_method(183));
       define_proc("primitive-op1",
 		  new kawa.standard.prim_method());
-      define_proc("primitive-throw", "kawa.standard.prim_throw");
+      define_proc("primitive-throw", new kawa.standard.prim_throw());
       define_syntax("try-finally", "kawa.standard.try_finally");
       define_syntax("try-catch", "kawa.standard.try_catch");
       define_proc("throw", "kawa.standard.throw_name");
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.syntax");
+      define_proc("as", new kawa.standard.convert());
+      define_proc("instance?", new kawa.standard.instance());
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");

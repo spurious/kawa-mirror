@@ -12,6 +12,15 @@
 (define (symbol? x)
   (instance? x <java.lang.String>))
 
+(define (symbol->string (s <symbol>))
+  ((primitive-constructor <kawa.lang.FString> (<symbol>))
+   s))
+
+(define (string->symbol (str <string>))
+  ((primitive-virtual-method <String> "intern" <symbol> ())
+   ((primitive-virtual-method <object> "toString" <String> ())
+    str)))
+
 (define (procedure? x)
   (instance? x <function>))
 

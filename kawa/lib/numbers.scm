@@ -39,6 +39,23 @@
 (define (log x)
   ((primitive-virtual-method <complex> "log" <complex> ())  x))
 
+;;; These are only implemented for <real> arguments.
+(define (sin (x <real>))
+  ((primitive-constructor <gnu.math.DFloNum> (<double>))
+   ((primitive-static-method <java.lang.Math> "sin" <double> (<double>))
+    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+     x))))
+(define (cos (x <real>))
+  ((primitive-constructor <gnu.math.DFloNum> (<double>))
+   ((primitive-static-method <java.lang.Math> "cos" <double> (<double>))
+    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+     x))))
+(define (tan (x <real>))
+  ((primitive-constructor <gnu.math.DFloNum> (<double>))
+   ((primitive-static-method <java.lang.Math> "tan" <double> (<double>))
+    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+     x))))
+
 (define (make-rectangular x y)
   ((primitive-static-method <complex> "make" <complex> (<real> <real>))  x y))
 (define (make-polar x y)

@@ -56,6 +56,7 @@ SECONDARY_OBJS=\
   files$$file__exists_P.class \
   files$$file__readable_P.class \
   files$$create__directory.class \
+  files$$copy__file.class \
   files$$delete__file.class \
   files$$file__directory_P.class \
   files$$file__writable_P.class \
@@ -66,7 +67,6 @@ SECONDARY_OBJS=\
   keywords$$string_2_keyword.class \
   misc$$environment__bound_P.class \
   misc$$scheme__implementation__version.class \
-  ports$$copy__file.class \
   ports$$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \

@@ -352,7 +352,6 @@ public class Scheme extends Interpreter
       define_proc ("set-input-port-prompter!", "kawa.lib.ports");
       define_proc ("transcript-off", "kawa.lib.ports");
       define_proc ("transcript-on", "kawa.lib.ports");
-      define_proc ("copy-file", "kawa.lib.ports");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
@@ -400,6 +399,7 @@ public class Scheme extends Interpreter
       define_proc("file-writable?", "kawa.lib.files");
       define_proc("delete-file", "kawa.lib.files");
       define_proc("rename-file", "kawa.lib.files");
+      define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
       

@@ -57,13 +57,3 @@
 
 (define (transcript-off)
   ((primitive-static-method "kawa.lang.OutPort" "closeLogFile" <void> ())))
-
-(define (copy-file from to)
-  (let ((in (open-input-file from))
-	(out (open-output-file to)))
-    (do ((ch (read-char in) (read-char in)))
-	((eof-object? ch)
-	 (close-output-port out)
-	 (close-input-port in)
-	 #!void)
-      (write-char ch out))))

@@ -73,11 +73,7 @@ ParsedXMLHandler.java:  $(srcdir)/ParsedXMLHandler.java.in
 	sed $(CHAR_SUBS) $(FROM_ParsedXMLHandler) \
 	  <$(srcdir)/ParsedXMLHandler.java.in >ParsedXMLHandler.java 
 
-# CLEANFILES = $(java_BUILT) *.class *.stamp
-
 PACKAGE_FNAME = gnu-xml
 GCJ_INPUTS =  $(java_Java)
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-install-data-am: install-java-classes

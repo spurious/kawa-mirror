@@ -1,3 +1,8 @@
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (PACKAGE_CFNAME):  Replace by plain PACKAGE_FNAME.
+	(java-classes.stamp):  Remove no-longer-appropriate rule.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES):  Remove redundant macro.

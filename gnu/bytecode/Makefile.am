@@ -42,15 +42,15 @@ ExceptionsAttr.java \
 dump.java
 
 PACKAGE_FNAME = gnu-bytecode
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o dump$(exext)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).lo dump$(exext)
 GCJ_INPUTS =  $(java_Java)
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
-dump$(exext):  $(OFILES_DIR)/gnu-bytecode.o
-	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.o
+dump$(exext):  $(OFILES_DIR)/gnu-bytecode.lo
+	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.lo
 
-EXTRA_CLEAN = *.o dump$(exext)
+EXTRA_CLEAN = dump$(exext)
 
 EXTRA_DIST = package.html
 

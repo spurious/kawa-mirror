@@ -1,3 +1,7 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUFFIXES):  Removed redundant macro.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* AddOp.java:  Implement Inlineable (in addition to CanInline).

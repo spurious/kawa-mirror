@@ -57,25 +57,45 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+GCJ_SELECTED = @GCJ_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
+LIBGCJ_CFLAGS = @LIBGCJ_CFLAGS@
+LIBGCJ_CXXFLAGS = @LIBGCJ_CXXFLAGS@
+LIBGCJ_JAVAFLAGS = @LIBGCJ_JAVAFLAGS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
 SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
+libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -83,10 +103,10 @@ java_sources =  Access.java Attribute.java AttrContainer.java ObjectType.java Ar
 
 
 PACKAGE_FNAME = gnu-bytecode
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o dump$(exext)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).lo dump$(exext)
 GCJ_INPUTS = $(java_Java)
 
-EXTRA_CLEAN = *.o dump$(exext)
+EXTRA_CLEAN = dump$(exext)
 
 EXTRA_DIST = package.html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -172,6 +192,7 @@ clean-am:  clean-generic mostlyclean-am
 clean: clean-am
 
 distclean-am:  distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 
@@ -193,8 +214,8 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
-dump$(exext):  $(OFILES_DIR)/gnu-bytecode.o
-	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.o
+dump$(exext):  $(OFILES_DIR)/gnu-bytecode.lo
+	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.lo
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

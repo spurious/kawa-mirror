@@ -49,3 +49,14 @@
 (define (check-fluid-let sym)
   (fluid-let ((*VAR* sym))
     (get-var)))
+
+;; Based on Savannah bug#11822, contributed by Dean Ferreyra.
+;; (Other parts of this testcase are in module1.scm and obj-test.scm.)
+(define-namespace simpleAux <simpleAux>)
+(define-syntax mB
+  (syntax-rules ()
+    ((_ type name)
+     (mA type 
+       ((fn o)
+        (simpleAux:init o)
+        (list (slot-ref o 'x) name))))))

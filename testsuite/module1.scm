@@ -37,3 +37,14 @@
      ((primitive-array-new <java.lang.Object>) len))))
 (define (make-array-fun n)
   (make-array n))
+
+;; From Savannah bug#11822, contributed by Dean Ferreyra.
+;; (Other parts of this testcase are in module3.scm and obj-test.scm.)
+(define-simple-class <simpleAux> ()
+  (x 5)
+  ((init) (set! x 100)))
+(define-syntax mA
+  (syntax-rules ()
+    ((_ type forms ...)
+     (define-simple-class type ()
+       forms ...))))

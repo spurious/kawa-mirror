@@ -1,3 +1,9 @@
+2005-03-25  Per Bothner  <per@bothner.com>
+	    Dean Ferreyra <dferreyra@igc.org>
+
+	* module1.scm, module3.scm, obj-test.scm: Add multi-module test
+	based on Dean's test macros2.diff in Savannah bug #11822.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* MyModule.java: Update Interpreter->Lanuguage various places.

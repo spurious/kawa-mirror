@@ -1,4 +1,4 @@
-(test-init "Objects" 100)
+(test-init "Objects" 101)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -188,6 +188,14 @@
 (define ts1 (make <MyTimestamp> 10 1))
 (define ts2 (make <MyTimestamp> 10 2))
 (test #t < (my-compare ts1 ts2) 0)
+
+;; Based on Savannah bug#11822, contributed by Dean Ferreyra.
+;; (Other parts of this testcase are in module1.scm and module3.scm.)
+(mB <NewClass> 'simple-sym)
+(test '(100 simple-sym) 'bug-11822
+      (let ((s :: <simpleAux> (make <simpleAux>))
+	    (nc :: <NewClass> (make <NewClass>)))
+	(invoke nc 'fn s)))
 
 (test 24 'factorial-4 factorial-4)
 

@@ -361,7 +361,8 @@ public class Scheme extends LispInterpreter
       define_field("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       define_proc ("write-char", "kawa.lib.ports");
       define_proc ("newline", "kawa.lib.ports");
-      define_proc ("load", "kawa.standard.load");
+      define_field("load", "kawa.standard.load", "load");
+      define_field("load-relative", "kawa.standard.load", "loadRelative");
       define_proc ("transcript-off", "kawa.lib.ports");
       define_proc ("transcript-on", "kawa.lib.ports");
       define_proc ("call-with-input-string", "kawa.lib.ports");  // Extension
@@ -383,6 +384,7 @@ public class Scheme extends LispInterpreter
       define_proc ("default-prompter", "kawa.lib.ports");
       define_proc ("input-port-prompter", "kawa.lib.ports");
       define_proc ("set-input-port-prompter!", "kawa.lib.ports");
+      define_field("base-uri", "kawa.lib.misc");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 

@@ -7,8 +7,21 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
+import gnu.kawa.functions.BaseUri;
+import java.net.URL;
 
 public class load extends Procedure1 {
+  boolean relative;
+
+  public load (String name, boolean relative)
+  {
+    super(name);
+    this.relative = relative;
+  }
+
+  public static final load load = new load("load", false);
+  public static final load loadRlative = new load("load-relative", true);
+
   /** Load using the name of a compile .class file. */
   /* This should probably be re-written to use a ClassLoader, unless '.'
    * is in the CLASSPATH, since it a bit ugly that load of a source file
@@ -94,12 +107,25 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static void loadSource (String name, Environment env)
+  public final static void loadSource (String name, Environment env,
+				       boolean relative)
     throws SyntaxException
   {
     try
       {
-	InPort fstream = InPort.openFile(name);
+	InPort fstream;
+	if (BaseUri.hasScheme(name) || relative)
+	  {
+	    if (relative)
+	      name = BaseUri.resolve(name, CallContext.getInstance().getBaseUri());
+	    else
+	      name = BaseUri.resolve(name, CallContext.getBaseUriDefault());
+	    URL url = new URL(name);
+	    InputStream in = url.openConnection().getInputStream();
+	    fstream = InPort.openFile(new BufferedInputStream(in), name);
+	  }
+	else
+	  fstream = InPort.openFile(name);
 	loadSource (fstream, env);
 	fstream.close();
       }
@@ -160,7 +186,7 @@ public class load extends Procedure1 {
   public final Object apply1 (Object arg1)
     throws Throwable
   {
-    return apply2 (arg1, Environment.current ());
+    return apply2 (arg1, Environment.getCurrent ());
   }
 
   public final Object apply2 (Object arg1, Object arg2)
@@ -170,7 +196,7 @@ public class load extends Procedure1 {
     try
       {
 	Environment env = (Environment) arg2;
-	apply (name, env);
+	apply (name, env, relative);
 	return Scheme.voidObject;
       }
     catch (java.io.FileNotFoundException e)
@@ -184,96 +210,109 @@ public class load extends Procedure1 {
       }
   }
 
-  public static final void apply (String name, Environment env)
+  public static final void apply (String name, Environment env,
+				  boolean relative)
     throws Throwable
   {
-    if (name.endsWith (".zip") || name.endsWith(".jar"))
+    CallContext ctx = CallContext.getInstance();
+    String savedBaseUri = ctx.getBaseUri();
+    try
       {
-	loadCompiled (name, env);
-	return;
-      }
-    if (name.endsWith (".scm"))
-      {
-	loadSource (name, env);
-	return;
-      }
-    char file_separator = System.getProperty ("file.separator").charAt(0);
-
-    if (name.endsWith (".class"))
-      {
-	name = name.substring (0, name.length () - 6);
-	name = name.replace ('/', '.');
-	if (file_separator != '/')
-	  name = name.replace (file_separator, '.');
-	loadClassFile (name, env);
-	return;
-      }
-    File file = new File (name);
-    if (file.exists ())
-      {
-	InputStream fs = new BufferedInputStream (new FileInputStream (name));
-	fs.mark(5);
-	int char0 = fs.read ();
-	if (char0 == -1)
-	  return; // Sequence.eofValue;
-	if (char0 == 'P')
+	String base = BaseUri.hasScheme(name) ? name
+	  : BaseUri.resolve(name, savedBaseUri);
+	ctx.setBaseUri(base);
+	if (name.endsWith (".zip") || name.endsWith(".jar"))
 	  {
-	    int char1 = fs.read ();
-	    if (char1 == 'K')
-	      {
-		int char2 = fs.read ();
-		if (char2 == '\003')
-		  {
-		    int char3 = fs.read ();
-		    if (char3 == '\004')
-		      {
-			fs.close ();
-			loadCompiled (name, env);
-			return;
-		      }
-		  }
-	      }
-	  }
-	fs.reset();
-	InPort src = InPort.openFile(fs, name);
-	loadSource (src, env);
-	src.close();
-	return;
-      }
-    else
-      {
-	String fname = name.replace ('.', file_separator);
-	String xname = fname + ".zip";
-	file = new File (xname);
-	if (file.exists ())
-	  {
-	    loadCompiled (xname, env);
+	    loadCompiled (name, env);
 	    return;
 	  }
-	xname = fname + ".jar";
-	file = new File (xname);
-	if (file.exists ())
+	if (name.endsWith (".scm"))
 	  {
-	    loadCompiled (xname, env);
+	    loadSource (name, env, relative);
 	    return;
 	  }
+	char file_separator = System.getProperty ("file.separator").charAt(0);
 
-	xname = fname + ".class";
-	file = new File (xname);
-	if (file.exists ())
+	if (name.endsWith (".class"))
 	  {
+	    name = name.substring (0, name.length () - 6);
+	    name = name.replace ('/', '.');
+	    if (file_separator != '/')
+	      name = name.replace (file_separator, '.');
 	    loadClassFile (name, env);
 	    return;
 	  }
-
-	xname = fname + ".scm";
-	file = new File (xname);
+	File file = new File (name);
 	if (file.exists ())
 	  {
-	    loadSource (xname, env);
+	    InputStream fs = new BufferedInputStream (new FileInputStream (name));
+	    fs.mark(5);
+	    int char0 = fs.read ();
+	    if (char0 == -1)
+	      return; // Sequence.eofValue;
+	    if (char0 == 'P')
+	      {
+		int char1 = fs.read ();
+		if (char1 == 'K')
+		  {
+		    int char2 = fs.read ();
+		    if (char2 == '\003')
+		      {
+			int char3 = fs.read ();
+			if (char3 == '\004')
+			  {
+			    fs.close ();
+			    loadCompiled (name, env);
+			    return;
+			  }
+		      }
+		  }
+	      }
+	    fs.reset();
+	    InPort src = InPort.openFile(fs, name);
+	    loadSource (src, env);
+	    src.close();
 	    return;
 	  }
+	else
+	  {
+	    String fname = name.replace ('.', file_separator);
+	    String xname = fname + ".zip";
+	    file = new File (xname);
+	    if (file.exists ())
+	      {
+		loadCompiled (xname, env);
+		return;
+	      }
+	    xname = fname + ".jar";
+	    file = new File (xname);
+	    if (file.exists ())
+	      {
+		loadCompiled (xname, env);
+		return;
+	      }
+
+	    xname = fname + ".class";
+	    file = new File (xname);
+	    if (file.exists ())
+	      {
+		loadClassFile (name, env);
+		return;
+	      }
+
+	    xname = fname + ".scm";
+	    file = new File (xname);
+	    if (file.exists ())
+	      {
+		loadSource (xname, env, relative);
+		return;
+	      }
+	  }
+	throw new java.io.FileNotFoundException(name);
       }
-    throw new java.io.FileNotFoundException(name);
+    finally
+      {
+	ctx.setBaseUri(savedBaseUri);
+      }
   }
 }

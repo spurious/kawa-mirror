@@ -1,3 +1,15 @@
+2003-03-03  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (relative):  New boolean field.
+	(<init>):  Add constructor.
+	(load, loadRelative):  New static fields.
+	(loadSource, apply):  Take boolean parameter.
+	(loadSource):  Handle URLs.  Resolve usng baseUri or baseUriDefault.
+	(apply1, apply2):  Pass relative flag.
+	(apply):  Set/restore base URI.
+	* kawa/standard/Scheme.java:  Add load-relative and base-uri.
+	* kawa/Shell.java (runFile):  Update for extra load.apply parameter.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (runFile):  Use Environment.getCurrent instead of

@@ -292,7 +292,7 @@ public class Shell
 	if (fname.equals ("-"))
 	  kawa.standard.load.loadSource(InPort.inDefault(), env);
 	else
-	  kawa.standard.load.apply(fname, env);
+	  kawa.standard.load.apply(fname, env, false);
       }
     catch (gnu.text.SyntaxException e)
       {

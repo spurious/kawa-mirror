@@ -291,7 +291,7 @@ public class ApplyExp extends Expression
 	    && (rfunc = (ReferenceExp) func).binding == null)
 	  {
 	    code.emitGetStatic(comp.getBindingField(rfunc.symbol));
-	    code.emitInvokeSpecial(Compilation.getProcedureBindingMethod);
+	    code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
 	  }
 	else
 	  func.compile (comp, new StackTarget(comp.typeProcedure));

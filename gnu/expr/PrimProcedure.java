@@ -74,6 +74,8 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	Throwable th = ex.getTargetException();
 	if (th instanceof RuntimeException)
 	  throw (RuntimeException) th;
+	if (th instanceof Error)
+	  throw (Error) th;
 	throw new RuntimeException(th.toString());
       }
     catch (Exception ex)

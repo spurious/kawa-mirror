@@ -73,7 +73,7 @@ public class ReferenceExp extends Expression
     else
       {
 	code.emitGetStatic(comp.getBindingField(symbol));
-	code.emitInvokeSpecial(Compilation.getBindingMethod);
+	code.emitInvokeVirtual(Compilation.getBindingMethod);
       }
     target.compileFromStack(comp, getType());
   }

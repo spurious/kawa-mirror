@@ -23,8 +23,6 @@ public class load extends Procedure1 {
 	  Environment.setCurrent(env);
 	Class clas = Class.forName (name);
 	Object inst = clas.newInstance ();
-	if (! (inst instanceof Procedure0))
-	  throw new RuntimeException ("load - class is not an Procedure0");
 	gnu.kawa.reflect.ClassMemberConstraint.defineAll(inst, env);
 	((ModuleBody)inst).run();
       }

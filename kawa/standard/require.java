@@ -71,8 +71,6 @@ public class require extends Syntax
       }
     if (value instanceof Runnable)
       ((Runnable) value).run();
-    else if (value instanceof ModuleBody)
-      ((ModuleBody) value).run();
     return value;
   }
 

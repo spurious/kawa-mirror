@@ -1,5 +1,19 @@
 2002-02-13  Per Bothner  <per@bothner.com>
 
+	* CallContext.java:  Removed to CallContext.java.in.
+	* CallContext.java.in:  Conditionalize on --with{,out}-java-references.
+	If with references, using ThreadLocal (Java2 only).  This allows
+	various simplifications at the (acceptable) cost when *not* using
+	ThreadLocal we use a threadMap that might prevent some non-Future
+	threads from being gc'd.
+	(getInstance(Thread), setInstance, mustRemoveMarker, <init>s,
+	defaultContext, getDefaultContext):  Remove.
+	* Makefile.am:  Add sed stuff to build CallContext.java.
+	* CpsProcedure.java (applyN):  Simplify using CallContext.getInstance.
+	* Future.java (setCallContext):  Remove - no longer needed.
+	(run):  No longer call setCallContext.
+	(getFluids):  Update to use correct CallContext.getInstance.
+
 	* SFormat.java (print):  Must handle Char explicitly, since Char
 	no longer implements Printable.
 

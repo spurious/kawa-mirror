@@ -19,26 +19,10 @@ public abstract class CpsProcedure extends MethodProc
     int count = args.length;
     checkArgCount(this, count);
     Thread thread = Thread.currentThread();
-    CallContext old = CallContext.getInstance(thread);
-    CallContext stack;
-    if (old == null)
-      {
-	stack = new CallContext();
-	CallContext.setInstance(thread, stack);
-      }
-    else
-      stack = old;
-    try
-      {
-	stack.setArgsN(args);
-	stack.proc = this;
-	return applyV(stack);
-      }
-    finally
-      {
-	if (old == null)
-	  CallContext.setInstance(thread, old);
-      }
+    CallContext ctx = CallContext.getInstance();
+    ctx.setArgsN(args);
+    ctx.proc = this;
+    return applyV(ctx);
   }
 
   // FIXME - only checks argument length.

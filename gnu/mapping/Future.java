@@ -54,17 +54,8 @@ public class Future extends Thread
   /** Get the CallContext we use for this Thread. */
   public final CallContext getCallContext() { return context; }
 
-  /** Set the CallContext we use for this Thread. */
-  public final void setCallContext(CallContext context)
-  {
-    this.context = context;
-    if (context != null)
-      context.currentThread = this;
-  }
-
   public void run ()
   {
-    setCallContext(new CallContext());
     try
       {
 	result = action.apply0 ();
@@ -123,7 +114,7 @@ public class Future extends Thread
 
   public static FluidBinding getFluids()
   {
-    return CallContext.getInstance(Thread.currentThread()).fluidBindings;
+    return CallContext.getInstance().fluidBindings;
   }
 }
 

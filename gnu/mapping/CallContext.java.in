@@ -1,4 +1,8 @@
- package gnu.mapping;
+// -*-Java-*-
+// Copyright (c) 2002  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.mapping;
 import gnu.math.*;
 import gnu.lists.*;
 import java.util.Hashtable;
@@ -8,27 +12,13 @@ import java.util.Hashtable;
 public class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
-  // static ThreadLocal currentContext = new ThreadLocal();
+@if WITH REFERENCES@
+  static ThreadLocal currentContext = new ThreadLocal();
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
   static Hashtable threadMap = new Hashtable(50);
+@endif WITHOUT REFERENCES@
   Thread currentThread;
-
-  /** A marker used to indicate a temporary CallContext.
-   * This is so we can create and bind a a CallContext on a fluid-let,
-   * and then unbind it from teh current then when the fluid-let finishes.
-   * Otherwise, the threadMap might prevent GC of the thread.
-   * We could use ThreadLocal variables, though that would require JDK 1.2.
-   */
-  private static FluidBinding mustRemoveMarker
-  = new FluidBinding(null, null, null);
-
-  public CallContext ()
-  {
-  }
-
-  public CallContext (Thread thread)
-  {
-    setInstance(thread, this);
-  }
 
   public final Environment getEnvironment()
   {
@@ -37,71 +27,36 @@ public class CallContext implements Runnable
     return Environment.global;
   }
 
-  public static CallContext setMainContext()
-  {
-    Thread thread = Thread.currentThread();
-    CallContext ctx = new CallContext(thread);
-    defaultContext = ctx;
-    return ctx;
-  }
-
-  static CallContext defaultContext = null;
-
-  static synchronized void getDefaultContext ()
-  {
-    if (defaultContext == null)
-      defaultContext = new CallContext();
-  }
-
   /** Get or create a CallContext for the current thread. */
   public static CallContext getInstance()
   {
-    /*
-    CallContext ctx = currentContext.get();
-    if (ctx != null)
+    CallContext ctx;
+@if WITH REFERENCES@
+    Object thloc = currentContext.get();
+    if (thloc == null)
       {
-	ctx = new CallContext(Thread.currentThread());
+	ctx = new CallContext();
+	ctx.currentThread = Thread.currentThread();
 	currentContext.set(ctx);
       }
-    return ctx;
-    */
-
+    else
+      ctx = (CallContext) thloc;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
     Thread thread = Thread.currentThread();
-    CallContext ctx = getInstance(thread);
-    if (ctx == null)
-      {
-	ctx = new CallContext(thread);
-	ctx.fluidBindings = mustRemoveMarker;
-      }
-    return ctx;
-  }
-
-  /** Get the CallContext associated with the current thread.
-      Return null if no CallContext has been associated with this thread. */
-  public static final CallContext getInstance(Thread thread)
-  {
     if (thread instanceof Future)
       return ((Future) thread).getCallContext();
-    Object ctx = threadMap.get(thread);
-    if (ctx != null)
-      return (CallContext) ctx;
-    if (defaultContext == null)
-      getDefaultContext();
-    return defaultContext;
-  }
-
-  /** Set the CallContext associated with the current thread. */
-  public static final void setInstance(Thread thread, CallContext ctx)
-  {
-    if (thread instanceof Future)
-      ((Future) thread).setCallContext(ctx);
-    else if (ctx == null)
-      threadMap.remove(thread);
-    else
+    Object thloc = threadMap.get(thread);
+    if (thloc == null)
       {
-	threadMap.put(thread, ctx);
+	ctx = new CallContext();
 	ctx.currentThread = thread;
+	threadMap.put(thread, ctx);
       }
+    else
+      ctx = (CallContext) thloc;
+@endif WITHOUT REFERENCES@
+    return ctx;
   }
 
   public Procedure proc;
@@ -388,11 +343,5 @@ public class CallContext implements Runnable
 	  binding.constraint = constraint.savedConstraint;
       }
     fluidBindings = old_fluids;
-
-    if (old_fluids == mustRemoveMarker)
-      {
-	setInstance(currentThread, null);
-	currentThread = null;
-      }
   }
 }

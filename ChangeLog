@@ -1,3 +1,35 @@
+Tue Feb 24 18:32:21 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Keyword.java (getName):  New method.
+
+	* kawa/lang/HasSetter.java:  New interface.
+	* kawa/lang/Procedure.java (getSetter, set0, set1, setN):  New methods.
+	* kawa/lang/Compilation.java:  Make various static values public. 
+	* kawa/lang/SetApplyExp.java:  New Expression class.
+	* kawa/lang/Setter.java:  New class, extends ProcedureN.
+	* kawa/lang/Setter0.java:  New. A 0-argument (not counting RHS) Setter.
+	* kawa/lang/Setter1.java:  New. A 1-argument (not counting RHS) Setter.
+	* kawa/lang/Makefile.am:  Update for new classes.
+	* kawa/lang/AutoloadProcedure.java (getSetter):  New method.
+	* kawa/standard/set_b.java (rewrite):  Handle (set! (f . args) v).
+
+	* kawa/lang/Record.java (apply):  Added, since we extend Procedure1.
+	(set1):  Method added, as implementation of interface HasSetter.
+	(print):  Method added, overrides Procedure.print.
+	* kawa/lang/Named.java (sym_name):  Change from public to protected.
+
+	* kawa/lang/Translator.java (rewrite):  Don't check for <TYPE> here.
+	* kawa/lang/ReferenceExp.java (lookup):  New method, checks for
+ 	<TYPE>, but only if otherwise not defined.
+	(eval, compile):  Use lookup to handle "<NAME>".
+
+	* kawa/standard/car.java (set1):  New, to implement HasSetter.
+	* kawa/standard/cdr.java (set1):  New, to implement HasSetter.
+	* kawa/standard/cxr.java (set1):  New, to implement HasSetter.
+	* kawa/standard/setter.java:  New Procedure1 class.
+	* kawa/standard/make.java:  New ProcedureN class.
+	* kawa/standard/Makefile.am, kawa/standard/Scheme.java:  Update.
+
 Thu Feb 19 18:36:18 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am, Makefile.in (kawa-@VERSION@-compiled.zip):  Build

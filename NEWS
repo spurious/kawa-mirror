@@ -1,5 +1,14 @@
 Changes since Kawa 1.5.93
 =========================
+Adding make procedure to create new objects/records.
+
+Extended (set! (f . args) value) to be equivalent to ((setter f) value . args).
+Implemented setter, as well as (setter car) and (setter cdr).
+
+Can now get and set a record field value using an application:
+(rec 'fname) gets the value of the field named fname in record rec.
+(set! (rec 'fname) value) sets the value of the field named fname in rec.
+
 A partial re-write of the implementation of input ports and the Scheme
 reader, to fix some problems, add some features, and improve performance.
 
@@ -94,7 +103,7 @@ takes one argument (the input port), and returns a prompt string.
 There are also user functions for inquiring about the current line
 and column number of an input port.
 
-The R4RS prcedures transcript-on and transcript-off are implemented.
+The R4RS procedures transcript-on and transcript-off are implemented.
 
 Standard types can be referred to using syntax similar to RScheme.
 For example Scheme strings now have the type <string> which is

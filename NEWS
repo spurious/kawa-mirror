@@ -1,3 +1,6 @@
+Real numbers, characters, Lisp/Scheme strings (FString) and symbols
+all now implement the Comparable interface.
+
 XQuery:
 * Implement namespace declaration attributes such as <a xmlns:a="URL">. 
 

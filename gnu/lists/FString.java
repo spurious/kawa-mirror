@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2004  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -11,6 +11,9 @@ import java.io.*;
 
 public class FString extends SimpleVector
 implements CharSeq, Externalizable, Consumable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   public char[] data;
   protected static char[] empty = new char[0];
@@ -313,7 +316,26 @@ implements CharSeq, Externalizable, Consumable
     return true;
   }
 
-  public int getElementKind()
+   public int compareTo(Object obj)
+  {
+    FString str2 = (FString) obj;
+    char[] cs1 = data;
+    char[] cs2 = str2.data;
+    int n1 = size;
+    int n2 = str2.size;
+    int n = n1 > n2 ? n2 : n1;
+    for (int i = 0;  i < n;  i++)
+      {
+	char c1 = cs1[i];
+	char c2 = cs2[i];
+	int d = c1 - c2;
+	if (d != 0)
+	  return d;
+      }
+    return n1 - n2;
+  }
+
+ public int getElementKind()
   {
     return CHAR_VALUE;
   }

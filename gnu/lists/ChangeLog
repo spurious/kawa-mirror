@@ -1,3 +1,8 @@
+2004-04-22  Per Bothner  <per@bothner.com>
+
+	* FString.java:  Implement Comparable, if JAVA2.
+	(compareTo):  New method.
+
 2004-04-18  Per Bothner  <per@bothner.com>
 
 	* XConsumer.java (XConsumer):  New interface, extends Consumer.

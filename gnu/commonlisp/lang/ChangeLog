@@ -1,3 +1,7 @@
+2000-10-14  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (getInstance): Restore current Environment when done.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (<init>):  Update classes used for eq and equal.

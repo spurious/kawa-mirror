@@ -227,7 +227,17 @@ public class CommonLisp extends Interpreter
   public static CommonLisp getInstance()
   {
     if (instance == null)
-      instance = new CommonLisp();
+      {
+        Environment saveEnv = Environment.getCurrent();
+        try
+          {
+            instance = new CommonLisp();
+          }
+        finally
+          {
+            Environment.setCurrent(saveEnv);
+          }
+      }
     return instance;
   }
 

@@ -43,7 +43,6 @@ java_sources=\
   Setter.java \
   Setter0.java \
   Setter1.java \
-  SysInPort.java \
   TtyInPort.java \
   UnboundSymbol.java \
   Values.java \

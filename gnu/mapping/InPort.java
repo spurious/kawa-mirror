@@ -61,7 +61,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
       setConvertCR(true);
   }
 
-  private static InPort systemInPort = new SysInPort (System.in, "<stdin>",
+  private static InPort systemInPort = new TtyInPort (System.in, "<stdin>",
 						      OutPort.outDefault());
   private static InPort defaultInPort = systemInPort;
 

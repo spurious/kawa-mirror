@@ -1,5 +1,10 @@
 2001-09-21  Per Bothner  <per@bothner.com>
 
+	* SysInPort.java:  Removed.  Seems to do more harm than good.
+	Specifically, interferes with echoing on Windows platform.
+	* Makefile.am (java_sources):  Removed.
+	* InPort.java (systemInPort):  Use a TtyInPort instead of a SysInPort.
+
 	* Procedure.java (toString):  If no name, use class name instead.
 
 2001-09-13  Per Bothner  <per@bothner.com>

@@ -20,6 +20,7 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (String name, SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     try
       {
@@ -39,6 +40,7 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (InPort port, SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     return Interpreter.getInterpreter().parseFile(port, messages);
   }
@@ -80,17 +82,24 @@ public class CompileFile extends Procedure2
 	if (prefix != null)
 	  topname = prefix + short_name;
       }
-    ModuleExp mexp = read (inname, messages);
-    if (messages.seenErrors())
-      return;
-
     try
       {
+	ModuleExp mexp = read (inname, messages);
+	if (messages.seenErrors())
+	  return;
+
 	mexp.compileToFiles (topname, directory, prefix);
+      }
+    catch (gnu.text.SyntaxException ex)
+      {
+        // Got a fatal error.
+        if (ex.getMessages() != messages)
+          throw new RuntimeException ("confussing syntax error: "+ex);
+        // otherwise ignore it - it's already been recorded in messages.
       }
     catch (IOException ex)
       {
-        throw new GenericError (ex.toString ());
+        throw new RuntimeException (ex.toString ());
       }
   }
 }

@@ -21,7 +21,7 @@ public class write extends Procedure1or2
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg2 instanceof OutPort))
-      throw new WrongType (this.name, 1, "output port");
+      throw new WrongType (this.name (), 1, "output port");
     ((OutPort)arg2).writeSchemeObject (arg1, readable);
     return Interpreter.voidObject;
   }

@@ -35,6 +35,6 @@ public class ass extends Procedure2
     if (arg2 == List.Empty)
       return Interpreter.falseObject;
     else
-      throw new WrongType(this.name,2,"list");
+      throw new WrongType(this.name (), 2, "list");
   }
 }

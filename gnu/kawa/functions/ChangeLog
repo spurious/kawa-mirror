@@ -1,3 +1,12 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* AddOp.java:  New class, replaces kawa.standard.plus_oper
+	and kawa.standard.minus_oper.
+	* Makefile.am:  Update accordingly.
+
+	* Apply.java (apply):  Temporarily remove use of CallCOntext's getArgs.
+	* Setter.java:  Temporarily comment out CanInline and inline method.
+
 2000-10-11  Per Bothner  <per@bothner.com>
 
 	New package, for Procedures for Scheme/Lisp.

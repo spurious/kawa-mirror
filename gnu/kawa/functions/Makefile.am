@@ -7,6 +7,7 @@ SUFFIXES = .java .class
 javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
+  AddOp.java \
   Apply.java \
   Assoc.java \
   IsEq.java IsEqual.java IsEqv.java \

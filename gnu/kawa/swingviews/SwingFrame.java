@@ -27,18 +27,16 @@ implements ViewContainer
       fr.setJMenuBar(menubar);
     Container pane = getContentPane();
     pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-    add(contents);
-    pack();
-    show();
+    addComponent(contents);
   }
 
-  private void add (Object contents)
+  public void addComponent (Object contents)
   {
     if (contents instanceof AbstractSequence)
       {
 	AbstractSequence seq = (AbstractSequence) contents;
 	for (int iter = seq.startPos();  (iter = seq.nextPos(iter)) != 0; )
-	  add(seq.getPosPrevious(iter));
+	  addComponent(seq.getPosPrevious(iter));
       }
     else if (contents instanceof Viewable)
       ((Viewable) contents).makeView(this);

@@ -3,6 +3,12 @@ Changes from Kawa 1.6.53 to 1.6.54
 Created new packages gnu.mapping and gnu.expr.  Many classes were
 moved from kawa.lang to the new packages.
 
+You can now write keywords with the colon first (e.g. :KEYWORD),
+which has exactly the same effect and meaning as putting the colon
+last (e.g. KEYWORD:).  The latter is preferred is being more consistent
+with normal English use of punctuation, but the former is allowed
+for compatibility with soem other Scheme implementations and Common Lisp.
+
 Changes from Kawa 1.6.52 to 1.6.53
 ==================================
 The new package gnu.text contains facilities for reading, formatting,

@@ -178,15 +178,11 @@ public class LangPrimType extends gnu.bytecode.PrimType
 	  return 0;
 	if (sig1 == 'V')
 	  return 1;
-	if (sig2 == 'V')
+	if (sig2 == 'V' || sig2 == 'Z')
 	  return -1;
-	if (sig2 == 'Z')
-	  return 0;
       }
-    if (sig1 == 'V')
+    if (sig1 == 'V' || sig1 == 'Z')
       return 1;
-    if (sig1 == 'Z')
-      return 0;
     return super.compare(other);
   }
 }

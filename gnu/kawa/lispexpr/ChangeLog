@@ -1,3 +1,8 @@
+2001-11-14  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (compare):  Boolean is less specific than
+	other types.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatchMacro.java (read):  Since apply3 now throws Throwable,

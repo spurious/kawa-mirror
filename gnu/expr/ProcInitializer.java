@@ -17,7 +17,8 @@ public class ProcInitializer extends Initializer
   public static void emitLoadModuleMethod(LambdaExp proc, Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    code.emitNew(comp.typeModuleMethod);
+    ClassType procClass = comp.getMethodProcType();
+    code.emitNew(procClass);
     code.emitDup(1);
 
     code.emitPushThis();
@@ -28,6 +29,7 @@ public class ProcInitializer extends Initializer
     else
       code.emitPushString(name);
     code.emitPushInt(proc.min_args | (proc.max_args << 12));
+    Method initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
     code.emitInvokeSpecial(initModuleMethod);
   }
 
@@ -44,11 +46,4 @@ public class ProcInitializer extends Initializer
     else
       code.emitPutField(field);
   }
-
-  private static final Type[] constructor_args
-    = { Compilation.typeModuleBody, Type.int_type,
-	Compilation.javaStringType, Type.int_type};
-  private static final Method initModuleMethod
-    = Compilation.typeModuleMethod.addMethod("<init>", constructor_args,
-					     Type.void_type, Access.PUBLIC);
 }

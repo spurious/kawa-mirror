@@ -1,3 +1,9 @@
+Mon Jan 19 16:05:29 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm (input-port-read-state, copy-file):  New procedures.
+	(default-prompter):  Use input-port-read-state.
+	* Makefile.am, Makefile.in:  Update for new procedures.
+
 Sun Dec 14 16:53:58 1997  Per Bothner  <bothner@cygnus.com>
 
 	* syntax.scm (dynamic-wind):  New procedure.

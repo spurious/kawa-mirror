@@ -118,6 +118,7 @@ SECONDARY_OBJS=\
   ports$$input__port__column__number.class \
   ports$$input__port__line__number.class \
   ports$$input__port__prompter.class \
+  ports$$input__port__read__state.class \
   ports$$newline.class \
   ports$$set__input__port__line__number_B.class \
   ports$$set__input__port__prompter_B.class \

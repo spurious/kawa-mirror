@@ -130,6 +130,8 @@ public class HttpPrinter extends FilterConsumer
 	    throw new RuntimeException(ex.toString());
 	  }
       }
+    writeChars(sbuf.toString());
+    sbuf.setLength(0);
   }
 
   public void beginGroup(String typeName, Object type)
@@ -151,8 +153,13 @@ public class HttpPrinter extends FilterConsumer
 
   public void writeObject(Object v)
   {
-    beginData();
-    super.writeObject(v);
+    if (v instanceof Consumable && ! (v instanceof UnescapedData))
+      ((Consumable) v).consume(this);
+    else
+      {
+	beginData();
+	super.writeObject(v);
+      }
   }
 
   public void writeChars(String str)
@@ -161,6 +168,14 @@ public class HttpPrinter extends FilterConsumer
       sbuf.append(str);
     else
       base.writeChars(str);
+  }
+
+  public void write(char[] buf, int off, int len)
+  {
+    if (base == null)
+      sbuf.append(buf, off, len);
+    else
+      base.write(buf, off, len);
   }
 
   public void beginDocument()

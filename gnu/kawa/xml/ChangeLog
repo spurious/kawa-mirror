@@ -1,3 +1,10 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (beginData):  Write out and clear sbuf buffer.
+	(writeObject):  If value is Consumable but not UnescapedData (e.g. a
+	TreeList containing response-header attributes), consume it.
+	(write):  New method.
+
 2002-02-14  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (sawContentType):  Make protected, for used

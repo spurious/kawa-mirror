@@ -1,3 +1,7 @@
+2004-01-09  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (registerEnvironment):  Update setCurrent->setGlobal.
+
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* prog1.java:  New class, extends Syntax.

@@ -168,7 +168,7 @@ public class CommonLisp extends Lisp2
   {
     CommonLisp interp = new CommonLisp();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 
   public Object read (InPort in)

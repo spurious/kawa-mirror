@@ -1,3 +1,8 @@
+2000-06-25  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SOURCES):  New variable.
+	(elclasses.WITH_SWING, elclasses.WITHOUT_SWING):  Set proper timestamp.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Fix so works both --with-swing and --without-swing.

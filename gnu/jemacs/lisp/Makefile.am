@@ -16,6 +16,8 @@ KAWAFLAGS = -P gnu.jemacs.lisp. -C
 ELISPSOURCES = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
 
+SOURCES = $(ELISPSOURCES)
+
 CLEANFILES = *.class *.stamp
 
 all: Makefile elclasses.stamp
@@ -23,9 +25,9 @@ all: Makefile elclasses.stamp
 elclasses.WITH_SWING: $(ELISPSOURCES)
 	cd ../../../kawa; $(MAKE)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) --elisp $(KAWAFLAGS) $?
-	echo timestamp > elclasses.stamp
+	echo timestamp > elclasses.WITH_SWING
 
 elclasses.WITHOUT_SWING:
-	echo timestamp > elclasses.stamp
+	echo timestamp > elclasses.WITHOUT_SWING
 
 elclasses.stamp: elclasses.@SWING_SELECTED@

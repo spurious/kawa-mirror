@@ -1,3 +1,11 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxTemplate.java: Fix comment syntax so it doesn't
+	break under 'make select-java1' -> 'make select-java2'.
+	* kawa/lang/Translator.java (syntaxError): Moved to Compilation.
+	* kawa/standard/Scheme.java: Update classes for 'make-element' and
+	'make-attribute'.
+
 2004-12-20  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite): "Filter" through Quote.quote.

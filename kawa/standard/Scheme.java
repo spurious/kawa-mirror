@@ -551,8 +551,8 @@ public class Scheme extends LispInterpreter
       defProcStFld("format", "gnu.kawa.functions.Format");
       defProcStFld("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
 
-      defProcStFld("make-element", "gnu.xquery.util.MakeElement", "makeElement");
-      defProcStFld("make-attribute", "gnu.xquery.util.MakeAttribute", "makeAttribute");
+      defProcStFld("make-element", "gnu.kawa.xml.MakeElement", "makeElement");
+      defProcStFld("make-attribute", "gnu.kawa.xml.MakeAttribute", "makeAttribute");
       defProcStFld("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
       defProcStFld("children", "gnu.xquery.util.Children", "children");
       defProcStFld("attributes", "gnu.kawa.xml.Attributes");

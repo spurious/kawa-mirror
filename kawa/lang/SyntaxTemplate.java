@@ -222,7 +222,7 @@ public class SyntaxTemplate implements Externalizable
 	IdentityHashMap seen_map = (IdentityHashMap) seen;
 	if (seen_map.containsKey(form))
 	  {
-	    // FIXME cycles are OK if data are literal.
+	    /* FIXME cycles are OK if data are literal. */
 	    tr.syntaxError("self-referential (cyclic) syntax tenplate");
 	    return -2;
 	  }

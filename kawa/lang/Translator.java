@@ -123,17 +123,6 @@ public class Translator extends Compilation
     return exp;
   }
 
-  /**
-   * Handle syntax errors (at rewrite time).
-   * @param message an error message to print out
-   * @return an ErrorExp
-   */
-  public Expression syntaxError (String message)
-  {
-    error('e', message);
-    return new ErrorExp (message);
-  }
-
   /** Check if declaraton is an alias for some other name.
    * This is needed to chase identifiers renamed for hygienic macro
    * expansion - see SyntaxRules.expand. */

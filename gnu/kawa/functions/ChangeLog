@@ -1,3 +1,11 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java:  Moved from gnu.kawa.xml - not XML-specific.
+	* Makefile.am:  Update accordingly.
+	* Baseuri.java:  Inherit from Procedure0or1 instead of Procedure1.
+	(apply0):  New methods.
+	(baseUri, hasScheme, resolve, uriSchemeLength): New static methods.
+
 2003-01-09  Per Bothner  <per@bothner.com>
 
 	* Arrays.java (effectiveIndex):  Optimization - use SeqPosition's next,

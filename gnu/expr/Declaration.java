@@ -93,14 +93,6 @@ public class Declaration
       getContext().currentLambda().loadHeapFrame(comp);
   }
 
-  static int fieldNum;
-  public void assignField (Compilation comp)
-  {
-    setSimple(false);
-    String name = comp.mangleName(getName())+'_'+(++fieldNum);
-    field = comp.curClass.addField(name, getType(), 0);
-  }
-
   public void load (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -146,17 +138,35 @@ public class Declaration
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
   static final int CAN_WRITE = 8;
-  static final int IS_FLUID = 16;
-  static final int PRIVATE = 32;
-  static final int IS_SIMPLE = 64;
-  static final int PROCEDURE = 128;
-  static final int IS_ALIAS = 256;
+  static final int IS_FLUID = 0x10;
+  static final int PRIVATE = 0x20;
+  static final int IS_SIMPLE = 0x40;
+  static final int PROCEDURE = 0x80;
+  static final int IS_ALIAS = 0x100;
+  /** Set if this is just a declaration, not a definition. */
+  public static final int NOT_DEFINING = 0x200;
+  public static final int EXPORT_SPECIFIED = 0x400;
+  public static final int STATIC_SPECIFIED = 0x800;
+  public static final int NONSTATIC_SPECIFIED = 0x1000;
+  public static final int TYPE_SPECIFIED = 0x2000;
+  public static final int IS_CONSTANT = 0x4000;
+
   protected int flags = IS_SIMPLE;
+
+  public final boolean getFlag (int flag)
+  {
+    return (flags & flag) != 0;
+  }
 
   public final void setFlag (boolean setting, int flag)
   {
     if (setting) flags |= flag;
     else flags &= ~flag;
+  }
+
+  public final void setFlag (int flag)
+  {
+    flags |= flag;
   }
 
   public final boolean isPublic()
@@ -191,10 +201,25 @@ public class Declaration
 
   /* Note:  You probably want to use !ignorable(). */
   public final boolean getCanRead() { return (flags & CAN_READ) != 0; }
-  public final void setCanRead(boolean read) { setFlag(read, CAN_READ); }
+  public final void setCanRead(boolean read)
+  {
+    setFlag(read, CAN_READ);
+  }
+  public final void setCanRead()
+  {
+    setFlag(true, CAN_READ);
+    if (base != null)
+      base.setCanRead();
+  }
 
   public final boolean getCanCall() { return (flags & CAN_CALL) != 0; }
   public final void setCanCall(boolean called) { setFlag(called, CAN_CALL); }
+  public final void setCanCall()
+  {
+    setFlag(true, CAN_CALL);
+    if (base != null)
+      base.setCanRead();
+  }
 
   public final boolean getCanWrite()
   { return (flags & CAN_WRITE) != 0; }
@@ -213,7 +238,7 @@ public class Declaration
   // rename to isAccessed?
   public boolean ignorable()
   {
-    if (getCanRead())
+    if (getCanRead() || isPublic())
       return false;
     if (! getCanCall())
       return true;
@@ -222,6 +247,16 @@ public class Declaration
       return false;
     LambdaExp lexp = (LambdaExp) value;
     return ! lexp.isHandlingTailCalls() || lexp.getInlineOnly();
+  }
+
+  /** Does this variable need to be initialized or is default ok
+   */
+  public boolean needsInit()
+  {
+    // This is a kludge.  Ideally, we should do some data-flow analysis.
+    // But at least it makes sure require'd variables are not initialized.
+    return ! ignorable()
+      && ! (value == QuoteExp.nullExp && base != null);
   }
 
   public boolean isStatic()
@@ -301,7 +336,17 @@ public class Declaration
         String vname = null;
         if (name != null)
           vname = Compilation.mangleName(getName());
-        var = context.scope.addVariable(code, getType(), vname);
+	if (isAlias() && getValue() instanceof ReferenceExp)
+	  {
+	    Declaration base = followAliases(this);
+	    var = base == null ? null : base.var;
+	  }
+	else
+	  {
+	    Type type = isIndirectBinding() ? Compilation.typeLocation
+	      : getType();
+	    var = context.scope.addVariable(code, type, vname);
+	  }
       }
     return var;
   }
@@ -361,4 +406,16 @@ public class Declaration
     return "Declaration["+getName()+'/'+id+']';
   }
 
+
+  public static Declaration followAliases (Declaration decl)
+  {
+    while (decl != null && decl.isAlias())
+      {
+	Expression declValue = decl.getValue();
+	if (! (declValue instanceof ReferenceExp))
+	  break;
+	decl = ((ReferenceExp) declValue).binding;
+      }
+    return decl;
+  }
 }

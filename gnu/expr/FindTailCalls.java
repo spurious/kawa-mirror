@@ -28,12 +28,12 @@ public class FindTailCalls extends ExpFullWalker
 	if (exp.func instanceof ReferenceExp)
 	  {
 	    ReferenceExp func = (ReferenceExp) exp.func;
-	    Declaration binding = func.binding;
+	    Declaration binding = Declaration.followAliases(func.binding);
 	    if (binding != null)
 	      {
 		exp.nextCall = binding.firstCall;
 		binding.firstCall = exp;
-		binding.setCanCall(true);
+		binding.setCanCall();
 		Expression value = binding.getValue();
 		if (value instanceof LambdaExp)
 		  lexp = (LambdaExp) value;
@@ -96,6 +96,13 @@ public class FindTailCalls extends ExpFullWalker
     return super.walkFluidLetExp(exp);
   }
 
+  public Object walkModuleExp (ModuleExp exp)
+  {
+    super.walkLambdaExp(exp);
+    walkDecls(exp);
+    return exp;
+  }
+
   public Object walkLetExp (LetExp exp)
   {
     int n = exp.inits.length; 
@@ -114,9 +121,14 @@ public class FindTailCalls extends ExpFullWalker
 	inTailContext = save;
       }
     exp.body = (Expression) exp.body.walk(this);
+    walkDecls(exp);
+    return exp;
+  }
 
-    decl = exp.firstDecl();
-    for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
+  public void walkDecls (ScopeExp exp)
+  {
+    Declaration decl = exp.firstDecl();
+    for (;  decl != null;  decl = decl.nextDecl())
       {
 	Expression value = decl.getValue();
 	if (value != null && value instanceof LambdaExp)
@@ -128,7 +140,6 @@ public class FindTailCalls extends ExpFullWalker
 	      lexp.setCanCall(true);
 	  }
       }
-    return exp;
   }
 
   public Object walkIfExp (IfExp exp)
@@ -257,8 +268,9 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkReferenceExp (ReferenceExp exp)
   {
-    if (exp.binding != null)
-      exp.binding.setCanRead(true);
+    Declaration decl = Declaration.followAliases(exp.binding);
+    if (decl != null)
+      decl.setCanRead(true);
     return exp;
   }
 
@@ -284,7 +296,16 @@ public class FindTailCalls extends ExpFullWalker
     try
       {
 	inTailContext = false;
-	exp.new_value = walkSetExp(exp.binding, exp.new_value);
+	Expression declValue;
+	Declaration decl = exp.binding;
+	if (decl != null && decl.isAlias())
+	  {
+	    if (exp.isDefining())
+	      return exp;
+	    decl = Declaration.followAliases(decl);
+
+	  }
+	exp.new_value = walkSetExp(decl, exp.new_value);
 	return exp;
       }
     finally

@@ -168,22 +168,27 @@ public class SetExp extends Expression
       }
     else if (binding != null)
       {
-	if (binding.ignorable())
+	Declaration decl = binding;
+	if (! isDefining())
+	  decl = Declaration.followAliases(decl);
+	if (decl.ignorable())
 	  new_value.compile (comp, Target.Ignore);
-	// FIXME combine next two case?  In that case,
-	// where should isDefining() && ! binding.isPublic() be handled?
-	else if (binding.isAlias() && isDefining() && binding.isPublic())
+	else if (binding.isAlias() && isDefining())
 	  {
-	    binding.load(comp);
-	    new_value.compile (comp, Target.pushObject);
-	    Method meth = ClassType.make("gnu.mapping.AliasConstraint")
-	      .getDeclaredMethod("define", 2);
-	    code.emitInvokeStatic(meth);
+	    if (binding.isPublic()
+		|| !( binding.getValue() instanceof ReferenceExp))
+	      {
+		binding.load(comp);
+		new_value.compile (comp, Target.pushObject);
+		Method meth = ClassType.make("gnu.mapping.AliasConstraint")
+		  .getDeclaredMethod("define", 2);
+		code.emitInvokeStatic(meth);
+	      }
 	  }
-	else if (binding.isIndirectBinding()
-		 && (! isDefining() || binding.isPublic()))
+	else if (decl.isIndirectBinding()
+		 && (! isDefining() || decl.isPublic()))
 	  {
-	    binding.load(comp);
+	    decl.load(comp);
 	    new_value.compile (comp, Target.pushObject);
 	    if (setMethod == null)
 	      setMethod = comp.typeLocation.addMethod
@@ -191,24 +196,27 @@ public class SetExp extends Expression
 		 Type.void_type, Access.PUBLIC|Access.FINAL);
 	    code.emitInvokeVirtual (setMethod);
 	  }
-	else if (binding.isFluid())
+	else if (decl.isFluid())
 	  {
-	    binding.load(comp);
+	    decl.load(comp);
 	    new_value.compile(comp, Type.pointer_type);
 	    code.emitPutField(FluidLetExp.valueField);
 	  }
-	else if (binding.isSimple ())
+	else if (decl.isSimple ())
 	  {
-	    new_value.compile (comp, binding.getType());
+	    new_value.compile (comp, decl.getType());
 	    if (needValue)
 	      code.emitDup(1, 0);  // dup
-	    code.emitStore(binding.getVariable());
+	    Variable var = decl.getVariable();
+	    if (var == null)
+	      var = decl.allocateVariable(code);
+	    code.emitStore(var);
 	  }
 	else
 	  {
-	    Field field = binding.field;
+	    Field field = decl.field;
             if (! field.getStaticFlag())
-              binding.loadOwningObject(comp);
+              decl.loadOwningObject(comp);
 	    new_value.compile (comp, field.getType());
             if (field.getStaticFlag())
               code.emitPutStatic(field);

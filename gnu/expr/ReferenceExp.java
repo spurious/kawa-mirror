@@ -89,14 +89,15 @@ public class ReferenceExp extends Expression
     if (target instanceof IgnoreTarget)
       return;
     CodeAttr code = comp.getCode();
-    if (binding != null)
+    Declaration decl = Declaration.followAliases(binding);
+    if (decl != null)
       {
-	binding.load(comp);
-	if (binding.isIndirectBinding() && ! getDontDereference())
+	decl.load(comp);
+	if (decl.isIndirectBinding() && ! getDontDereference())
 	  {
 	    code.emitInvokeVirtual (Compilation.getLocationMethod);
 	  }
-	else if (binding.isFluid())
+	else if (decl.isFluid())
 	  code.emitGetField(FluidLetExp.valueField);
       }
     else

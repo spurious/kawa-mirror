@@ -21,7 +21,8 @@ public class FindCapturedVars extends ExpFullWalker
     // care of by calling setCallersNeedStaticLink in LambdaExp.)
     if (exp.func instanceof ReferenceExp)
       {
-	Declaration decl = ((ReferenceExp) exp.func).binding;
+	Declaration decl
+	  = Declaration.followAliases(((ReferenceExp) exp.func).binding);
 	if (decl != null && decl.context instanceof ModuleExp)
 	  {
 	    Expression value = decl.getValue();
@@ -110,7 +111,7 @@ public class FindCapturedVars extends ExpFullWalker
     // is its caller.  We get its caller using returnContinuation.context.
     // A complication is that we can have a chain of functions that
     // recursively call each other, and are hence inlined in each other.
-    // Since function is only inlined if it has a single call site,
+    // Since a function is only inlined if it has a single call site,
     // that means there is actually no way to actually enter the chain;
     // i.e. none of the inlined functions can actually get called.
     // However, we have to watch out for this possibility, or the loop
@@ -159,7 +160,9 @@ public class FindCapturedVars extends ExpFullWalker
         else if (declValue == curLambda && ! decl.getCanRead())
           return;
       }
-    if (decl.getCanRead() || declValue == null)
+    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
+      decl.setSimple(false);
+    else if (decl.getCanRead() || declValue == null)
       {
 	LambdaExp heapLambda = curLambda;
 	heapLambda.setImportsLexVars();
@@ -172,16 +175,15 @@ public class FindCapturedVars extends ExpFullWalker
 	    heapLambda.setNeedsStaticLink();
 	    outer = heapLambda.outerLambda();
 	  }
+	if (decl.base != null)
+	  {
+	    decl.base.setCanRead(true);
+	    capture(decl.base);
+	  }
 	if (decl.isSimple())
 	  {	
-	    if (decl.base != null)
-	      {
-		decl.base.setCanRead(true);
-		capture(decl.base);
-	      }
 	    if (declLambda instanceof ModuleExp)
 	      {
-		declLambda.heapFrame = declLambda.thisVariable;
 		declLambda.heapFrameLambda = declLambda;
 	      }
 	    else if (declLambda.capturedVars == null)
@@ -217,7 +219,7 @@ public class FindCapturedVars extends ExpFullWalker
 
   public Object walkReferenceExp (ReferenceExp exp)
   {
-    Declaration decl = exp.getBinding();
+    Declaration decl = Declaration.followAliases(exp.getBinding());
     if (decl != null)
       capture(decl);
    return exp;
@@ -232,8 +234,9 @@ public class FindCapturedVars extends ExpFullWalker
 
   public Object walkSetExp (SetExp exp)
   {
-    if (exp.binding != null)
-      capture(exp.binding);
+    Declaration decl = Declaration.followAliases(exp.binding);
+    if (decl != null)
+      capture(decl);
     return super.walkSetExp(exp);
   }
 

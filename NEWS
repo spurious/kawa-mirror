@@ -1,5 +1,9 @@
 Changes from Kawa 1.2 to 1.3
 ============================
+Impplement defmacro and gentemp.
+
+The codegen package has been renamed gnu.bytecode.
+
 Implement make-record-type and related functions to create and use
 new record types.  A record type is implemented as a java.lang.Class
 object, and this feature depends on the new reflection features of JDK 1.1.

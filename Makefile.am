@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = codegen kawa doc testsuite
+SUBDIRS = gnu kawa doc testsuite
 javadir=$(prefix)/java
 
 # Build a .zip archive from the compiled classes.

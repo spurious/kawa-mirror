@@ -1,3 +1,13 @@
+Tue Mar 25 15:27:34 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	Move codegen to gnu/bytecode.
+	Update for moved package codegen -> gnu.bytecode and new method names.
+
+	* kawa/lang/Symbol.java (gentemp):  New method.
+	* kawa/lang/DefMacro.java, kawa/lang/Makefile.am:  New Syntax class.
+	* kawa/lang/Lambda.java:  Handle syntax errors better.
+	* kawa/standard/Scheme.java:  Update for lib/syntax.scm additions.
+
 Wed Mar 19 11:08:04 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/Shell.java (run):  Don't special case #!null result.

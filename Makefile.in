@@ -47,7 +47,7 @@ JAVA_VERSION = @JAVA_VERSION@
 EXTRA_MISC = @EXTRA_MISC@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = codegen kawa doc testsuite
+SUBDIRS = gnu kawa doc testsuite
 javadir=$(prefix)/java
 ACLOCAL = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

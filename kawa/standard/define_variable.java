@@ -27,6 +27,7 @@ public class define_variable extends Syntax implements Printable
 	tr.push(decl);
 	decl.setSimple(false);
 	decl.setPrivate(true);
+	decl.setFlag(Declaration.IS_DYNAMIC);
 	if (mod.isStatic())
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);

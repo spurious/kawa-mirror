@@ -1,10 +1,11 @@
 package kawa.lang;
 import gnu.expr.*;
 import gnu.mapping.Symbol;
+import java.io.*;
 
 /** A "syntatic closure" - a syntax form with its compilation environment. */
 
-public class SyntaxForm
+public class SyntaxForm implements Externalizable
 {
   public Object form;
 
@@ -83,5 +84,18 @@ public class SyntaxForm
   {
     Translator tr = (Translator) Compilation.getCurrent();
     return tr.lexical.lookup(id1.form, -1) == tr.lexical.lookup(id2.form, -1);
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(form);
+    out.writeObject(scope);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    form = in.readObject();
+    scope = (ScopeExp) in.readObject();
   }
 }

@@ -25,11 +25,15 @@ public class define_class extends Syntax
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st_cdr;
     Object name = p.car;
+    SyntaxForm nameSyntax = null;
     while (name instanceof SyntaxForm)
-      name = ((SyntaxForm) name).form;
+      {
+	nameSyntax = (SyntaxForm) name;
+	name = nameSyntax.form;
+      }
     if (! (name instanceof String || name instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Declaration decl = defs.getDefine(name, 'w', tr);
+    Declaration decl = tr.define(name, nameSyntax, defs);
     if (p instanceof PairWithPosition)
       {
         PairWithPosition declPos = (PairWithPosition) p;
@@ -43,14 +47,25 @@ public class define_class extends Syntax
       decl.setFlag(Declaration.STATIC_SPECIFIED);
     decl.setFlag(Declaration.IS_CONSTANT);
     decl.setType(Compilation.typeClassType);
-    if (defs instanceof ModuleExp)
+    tr.mustCompileHere();
+    Object members = p.cdr;
+    while (members instanceof SyntaxForm)
       {
-        tr.mustCompileHere();
-        tr.mustCompileHere();
-        tr.push(decl);
+	nameSyntax = (SyntaxForm) members;
+	members = nameSyntax.form;
       }
-    p = (Pair) p.cdr;
+    if (! (members instanceof Pair))
+      {
+	tr.error('e', "missing class members");
+	return false;
+      }
+    p = (Pair) members;
+    ScopeExp save_scope = tr.currentScope();
+    if (nameSyntax != null)
+      tr.setCurrentScope(nameSyntax.scope);
     Object[] saved = objectSyntax.scanClassDef(p, oexp, tr);
+    if (nameSyntax != null)
+      tr.setCurrentScope(save_scope);
     if (saved == null)
 	return false;
     st = Translator.makePair(st, this, Translator.makePair(p, decl, saved));

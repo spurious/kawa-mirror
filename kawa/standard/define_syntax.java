@@ -20,9 +20,9 @@ public class define_syntax extends Syntax
   }
 
   static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
-  static Method makeMethod = typeMacro.getDeclaredMethod("make", 2);
+  static Method makeMethod = typeMacro.getDeclaredMethod("make", 3);
   static Method makeNonHygienicMethod
-    = typeMacro.getDeclaredMethod("makeNonHygienic", 2);
+    = typeMacro.getDeclaredMethod("makeNonHygienic", 3);
   static Method setExpanderMethod
     = typeMacro.getDeclaredMethod("setExpander", 1);
 
@@ -69,28 +69,22 @@ public class define_syntax extends Syntax
     macro.expander = rule;
 
     Object expander;
-    if (rule instanceof QuoteExp
-	&& (expander = ((QuoteExp) rule).getValue()) instanceof Procedure
-	&& expander instanceof java.io.Externalizable)
-      {
-	macro.setExpander((Procedure) expander);
-	rule = new QuoteExp(macro);
-      }
+    if (rule instanceof LambdaExp)
+      ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
+    Expression args[] = new Expression[3];
+    args[0] = new QuoteExp(name);
+    args[1] = rule;
+    if (tr.immediate || tr.getModule().isStatic())
+      args[2] = new QuoteExp(defs);
     else
-      {
-	if (rule instanceof LambdaExp)
-	  ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
-	Expression args[] = new Expression[2];
-	args[0] = new QuoteExp(name);
-	args[1] = rule;
-	rule = new ApplyExp(new PrimProcedure(hygienic ? makeMethod : makeNonHygienicMethod), args);
-      }
+      args[2] = new ThisExp(defs);
+    rule = new ApplyExp(new PrimProcedure(hygienic ? makeMethod : makeNonHygienicMethod), args);
     decl.noteValue(rule);
     decl.setProcedureDecl(true);
-
+  
     if (decl.context instanceof ModuleExp)
       {
-        SetExp result = new SetExp (decl, rule);
+	SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
 	if (tr.getInterpreter().hasSeparateFunctionNamespace())
 	  result.setFuncDef(true);

@@ -4,14 +4,44 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
 import java.util.Hashtable;
+import gnu.bytecode.ClassType;
 
 public class Macro extends Syntax implements Printable, Externalizable
 {
   public Object expander;
 
+  Object instance;
+
   private boolean hygienic = true;
 
-  public ScopeExp capturedScope;
+  private ScopeExp capturedScope;
+
+  public ScopeExp getCapturedScope ()
+  {
+    if (capturedScope == null && instance != null)
+      {
+	if (instance instanceof ModuleExp)
+	  {
+	    ModuleExp mexp = (ModuleExp) instance;
+	    mexp.firstDecl(); // Force makeModule, if needed.
+	    capturedScope = mexp;
+	  }
+	else
+	  {
+	    ModuleExp mexp = new ModuleExp();
+	    ClassType ctype = (ClassType) ClassType.make(instance.getClass());
+	    mexp.setType(ctype);
+	    kawa.standard.require.makeModule(mexp, ctype, instance);
+	    capturedScope = mexp;
+	  }
+      }
+    return capturedScope;
+  }
+
+  public void setCapturedScope (ScopeExp scope)
+  {
+    capturedScope = scope;
+  }
 
   public static Macro make (Declaration decl)
   {
@@ -27,12 +57,27 @@ public class Macro extends Syntax implements Printable, Externalizable
     return mac;
   }
 
+  public static Macro makeNonHygienic (Object name, Procedure expander,
+				       Object instance)
+  {
+    Macro mac = new Macro(name, expander);
+    mac.hygienic = false;
+    mac.instance = instance;
+    return mac;
+  }
+
   public static Macro make (Object name, Procedure expander)
   {
     Macro mac = new Macro(name, expander);
     return mac;
   }
 
+  public static Macro make(Object name, Procedure expander, Object instance)
+  {
+    Macro mac = new Macro(name, expander);
+    mac.instance = instance;
+    return mac;
+  }
 
   public final boolean isHygienic() { return hygienic; }
   public final void setHygienic (boolean hygienic) {this.hygienic = hygienic;}

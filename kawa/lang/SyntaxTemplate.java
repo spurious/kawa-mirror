@@ -411,14 +411,14 @@ public class SyntaxTemplate implements Externalizable
 
   public Object execute (Object[] vars, Translator tr)
   {
-    ScopeExp templateScope = new LetExp(null);
+    TemplateScope templateScope = new TemplateScope();
     if (currentScope != null)
       templateScope.outer = currentScope;
     else
       {
 	Syntax curSyntax = tr.getCurrentSyntax();
 	if (curSyntax instanceof Macro)
-	  templateScope.outer = ((Macro) curSyntax).capturedScope;
+	  templateScope.outer = ((Macro) curSyntax).getCapturedScope();
       }
     return execute(0, vars, 0, new int[max_nesting], tr, templateScope);
   }

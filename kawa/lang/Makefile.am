@@ -26,6 +26,7 @@ SyntaxPattern.java \
 SyntaxRule.java \
 SyntaxRules.java \
 PatternScope.java \
+TemplateScope.java \
 SyntaxTemplate.java \
 AutoloadSyntax.java \
 CompileFile.java \

@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.reflect.StaticFieldConstraint;
+import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
@@ -134,8 +134,6 @@ public class Translator extends Compilation
     return new ErrorExp (message);
   }
 
-  private Object nameToLookup;
-
   /** Check if declaraton is an alias for some other name.
    * This is needed to chase identifiers renamed for hygienic macro
    * expansion - see SyntaxRules.expand. */
@@ -200,6 +198,7 @@ public class Translator extends Compilation
   {
     if (obj instanceof String || obj instanceof Symbol)
       {
+	Object nameToLookup;
 	Declaration decl = lexical.lookup(obj, function);
 	if (decl != null)
 	  {
@@ -230,13 +229,27 @@ public class Translator extends Compilation
 	    obj = resolve(obj, function);
 	  }
         if (obj instanceof Syntax)
-          return obj;
+	  {
+	    if (obj instanceof Macro && decl != null)
+	      decl.setSyntax();
+	    return obj;
+	  }
 	if (obj instanceof Declaration)
 	  {
-	    Expression dval
-	      = Declaration.followAliases((Declaration) obj).getValue();
+	    decl = Declaration.followAliases((Declaration) obj);
+	    Expression dval = decl.getValue();
 	    if (dval instanceof QuoteExp)
 	      return ((QuoteExp) dval).getValue();
+	    if (dval != null && decl.getFlag(Declaration.IS_SYNTAX))
+	      {
+		try
+		  {
+		    return dval.eval(env);
+		  }
+		catch (Throwable ex)
+		  {
+		  }
+	      }
 	  }
         if (obj != null)
 	  {
@@ -247,9 +260,15 @@ public class Translator extends Compilation
 	else
 	  {
 	    Symbol symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
-	      : env.lookup(nameToLookup.toString());
-	    if (symbol != null && symbol.isBound())
-	      return symbol.get();
+	      : env.getSymbol(nameToLookup.toString());
+	    Object prop;
+	    if (function && getInterpreter().hasSeparateFunctionNamespace())
+	      prop = EnvironmentKey.FUNCTION;
+	    else
+	      prop = null;
+	    Object val = env.get(symbol, prop,  null);
+	    if (val != null)
+	      return val;
 	  }
 	return null;
       }
@@ -309,13 +328,13 @@ public class Translator extends Compilation
 	    else
 	      {
 		name = sym.toString();
-		symbol = env.lookup(name);
+		symbol = env.getSymbol(name);
 	      }
-	    if (symbol != null)
-	      if (getInterpreter().hasSeparateFunctionNamespace())
-		proc = symbol.getFunctionValue(null);
-	      else
-		proc = symbol.get(null);
+	    proc = env.get(symbol,
+			   getInterpreter().hasSeparateFunctionNamespace()
+			   ? EnvironmentKey.FUNCTION
+			   : null,
+			   null);
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)
@@ -333,9 +352,24 @@ public class Translator extends Compilation
         else
 	  {
 	    decl = Declaration.followAliases(decl);
-	    proc = decl.getConstantValue();
-	    if (proc instanceof Syntax)
-	      return apply_rewrite ((Syntax) proc, p);
+	    if (decl.getFlag(Declaration.IS_SYNTAX))
+	      {
+		Expression dval = decl.getValue();
+		if (dval != null)
+		  {
+		    try
+		      {
+			proc = dval.eval(env);
+			if (proc instanceof Syntax)
+			  return apply_rewrite ((Syntax) proc, p);
+		      }
+		    catch (Throwable ex)
+		      {
+			ex.printStackTrace();
+			error('e', "unable to evaluate macro for "+p.car);
+		      }
+		  }
+	      }
 	  }
 
 	ref.setProcedureName(true);
@@ -345,8 +379,10 @@ public class Translator extends Compilation
 
     int cdr_length = listLength(cdr);
 
+    if (cdr_length == -1)
+      return syntaxError("circular list is not allowed after "+p.car);
     if (cdr_length < 0)
-      return syntaxError("dotted list is not allowed");
+      return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.car);
 
     Expression[] args = new Expression[cdr_length];
 
@@ -467,6 +503,102 @@ public class Translator extends Compilation
     return rewrite(exp, false);
   }
 
+  public Object namespaceResolve (String str)
+  {
+    int colon = str.indexOf(':');
+    if (colon <= 0 || colon >= str.length() - 1)
+      return str;
+    String prefix = str.substring(0, colon);
+    String local = str.substring(colon + 1);
+    String xprefix = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
+    Object uri_decl = lexical.lookup(xprefix, Interpreter.VALUE_NAMESPACE);
+    if (uri_decl instanceof Declaration)
+      {
+	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
+	Expression dval = decl.getValue();
+	if (dval instanceof QuoteExp)
+	  {
+	    Object val = ((QuoteExp) dval).getValue();
+	    String uri = val.toString();
+	    return Symbol.make(uri, local);
+	  }
+      }
+    try // FIXME - not here
+      {
+	Class cl = Class.forName(prefix);
+	return Symbol.make("class:"+prefix, local);
+      }
+    catch (Exception ex)
+      {
+      }
+    //error('e', "unknown namespace prefix '"+prefix+'\'');
+    return str;
+  }
+
+  public Expression namespaceResolve (String str, boolean function)
+  {
+    int colon = str.indexOf(':');
+    if (colon <= 0 || colon >= str.length() - 1)
+      return null;
+    String prefix = str.substring(0, colon);
+    String local = str.substring(colon + 1);
+    String xprefix = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
+    Object uri_decl = lexical.lookup(xprefix, Interpreter.VALUE_NAMESPACE);
+    Symbol sym;
+    if (uri_decl instanceof Declaration)
+      {
+	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
+	Expression dval = decl.getValue();
+
+	if (dval instanceof ReferenceExp)
+	  {
+	    ReferenceExp ref = (ReferenceExp) dval;
+	    Declaration d = ref.getBinding();
+	    if (d != null)
+	      {
+		dval = d.getValue();
+		if (dval instanceof ClassExp)
+		  {
+		    Expression[] args = { ref, new QuoteExp(local) };
+		    ApplyExp aexp = new ApplyExp(ClassType.make("gnu.kawa.reflect.ClassMethodProc")
+					.getDeclaredMethod("make", 2),
+					args);
+		    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+		    return aexp;
+		  }
+	      }
+	  }
+
+	if (dval instanceof QuoteExp)
+	  {
+	    Object val = ((QuoteExp) dval).getValue();
+	    String uri = val.toString();
+	    sym = Symbol.make(uri, local);
+	  }
+	else
+	  return null;
+      }
+    else
+      {
+	Object v = env.get(xprefix, null);
+	if (v != null)
+	  sym = Symbol.make(v.toString(), local);
+	else
+	  {
+	    try
+	      {
+		Class cl = Class.forName(prefix);
+		sym = Symbol.make("class:"+prefix, local);
+	      }
+	    catch (Exception ex)
+	      {
+		return null;
+	      }
+	  }
+      }
+    return rewrite(sym, function);
+  }
+
   public void setCurrentScope (ScopeExp scope)
   {
     super.setCurrentScope(scope);
@@ -502,6 +634,7 @@ public class Translator extends Compilation
     else if (exp instanceof String || exp instanceof Symbol)
       {
 	Declaration decl = lexical.lookup(exp, function);
+	Object nameToLookup;
 	Symbol symbol = null;
 	if (decl != null)
 	  {
@@ -524,45 +657,11 @@ public class Translator extends Compilation
 	  }
 	if (nameToLookup instanceof String && decl == null)
 	  {
-	    String str = (String) nameToLookup;
-	    int colon = str.indexOf(':');
-	    if (colon > 0 && colon < str.length() - 1)
-	      {
-		String prefix = str.substring(0, colon);
-		String local = str.substring(colon + 1);
-		String xprefix
-		  = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
-		Object uri_decl = lexical.lookup(xprefix, function);
-		if (uri_decl instanceof Declaration)
-		  {
-		    decl = Declaration.followAliases((Declaration) uri_decl);
-		    Expression dval = decl.getValue();
-		    if (dval instanceof QuoteExp)
-		      {
-			String uri = ((QuoteExp) dval).getValue().toString();
-			return rewrite(Symbol.make(uri, local), function);
-		      }
-		    decl = null;
-		  }
-		else
-		  {
-		    Object v = resolve(env.lookup(xprefix), function);
-		    if (v != null)
-		      return rewrite(Symbol.make(v.toString(), local),
-				     function);
-		    try
-		      {
-			Class cl = Class.forName(prefix);
-			return rewrite(Symbol.make("class:"+prefix, local),
-				       function);
-		      }
-		    catch (Exception ex)
-		      {
-		      }
-		  }
-	      }
+	    Expression ss = namespaceResolve((String) nameToLookup, function);
+	    if (ss != null)
+	      return ss;
 	  }
-	symbol = exp instanceof String ? env.lookup((String) exp)
+	symbol = exp instanceof String ? env.getSymbol((String) exp)
 	  : (Symbol) exp;
 	Object value = resolve(symbol, function);
 	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
@@ -585,32 +684,26 @@ public class Translator extends Compilation
                   }
               }
             Named proc = (Named) value;
-            Constraint constraint = symbol.getConstraint();
-            if (constraint instanceof StaticFieldConstraint)
+	    Location loc
+	      = env.lookup(symbol,
+			   function && separate ? EnvironmentKey.FUNCTION
+			   : null);
+	    if (loc != null)
+	      loc = loc.getBase();
+            if (loc instanceof StaticFieldLocation)
               {
-                StaticFieldConstraint fconstraint
-                  = (StaticFieldConstraint) constraint;
-                String fname = fconstraint.getName();
-                ClassType t = fconstraint.getDeclaringClass();
-                gnu.bytecode.Field procField = t.getDeclaredField(fname);
-                if (procField != null && procField.getStaticFlag())
-                  {
-                    int fflags = procField.getModifiers();
-                    decl = new Declaration(proc.getName(), procField);
-                    decl.noteValue(new QuoteExp(proc));
-                    if ((fflags & Access.FINAL) != 0)
-                      decl.setFlag(Declaration.IS_CONSTANT);
-                    if (value instanceof Syntax)
-                      decl.setFlag(Declaration.IS_SYNTAX);
-                  }
+                decl = ((StaticFieldLocation) loc).getDeclaration();
               }
+	    /*
             else if (Compilation.inlineOk && function)
               {
 		// Questionable.  fail with new set_b implementation,
 		// which just call rewrite_car on the lhs,
 		// if we don't require function to be true.  FIXME.
                 decl = Declaration.getDeclaration(proc);
+		System.err.println("getDecl "+proc+"->"+decl);
               }
+	    */
           }
 	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
 	    && decl.isProcedureDecl() && ! function)
@@ -619,7 +712,7 @@ public class Translator extends Compilation
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
 	  
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
-	if (separate)
+	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;
       }
@@ -658,6 +751,8 @@ public class Translator extends Compilation
    */
   public Object pushPositionOf(Object pair)
   {
+    if (pair instanceof SyntaxForm)
+      pair = ((SyntaxForm) pair).form;
     if (! (pair instanceof PairWithPosition))
       return null;
     PairWithPosition ppair = (PairWithPosition) pair;
@@ -1147,5 +1242,33 @@ public class Translator extends Compilation
 	if (old != null)
 	  templateScope.addDeclaration((Declaration) old);
       }
+  }
+
+  public Declaration makeAlias (Object name, SyntaxForm nameSyntax)
+  {
+    ScopeExp templateScope = nameSyntax.scope;
+    Declaration alias = new Declaration(name);
+    alias.setAlias(true);
+    alias.setPrivate(true);
+    alias.context = templateScope;
+    templateScope.addDeclaration(alias);
+    return alias;
+  }
+
+  public Declaration define (Object name, SyntaxForm nameSyntax, ScopeExp defs)
+  {
+    Declaration alias;
+    if (nameSyntax != null && nameSyntax.scope != currentScope())
+      {
+	alias = makeAlias(name, nameSyntax);
+	name = new String(name.toString());
+      }
+    else
+      alias = null;
+    Declaration decl = defs.getDefine(name, 'w', this);
+    if (alias != null)
+      alias.noteValue(new ReferenceExp(decl));
+    push(decl);
+    return decl;
   }
 }

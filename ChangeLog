@@ -1,5 +1,12 @@
 2003-01-03  Per Bothner  <per@bothner.com>
 
+	* libtool.m4, ltmain.sh:  Copied from libtool (pre-1.5 CVS) version.
+	* Make-rules (.o rule):  Remoe --tag=GCJ - not needed by new libtool.
+	* ltmain.sh:  Add definition of SED.
+	* aclocal.m4:  Re-generated using aclocal 1.6.3.
+	* configure:  Re-generate using autoconf 2.53.
+	* **/Makefile.in:  Re-generate using automake 1.6.3.
+	
 	* config.guess, config.sub:  Update from ftp.gnu.org.
 
 2003-01-02  Per Bothner  <per@bothner.com>

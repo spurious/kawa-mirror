@@ -4155,21 +4155,30 @@ type of the slot.  The following @var{option-keyword}s are implemented:
 @item @code{type:} @var{ftype}
 Specifies that @var{ftype} is the type of (the values of) the field.
 Equivalent to @samp{:: @var{ftype}}.
-@item @code{allocation:} @code{class:}
-Specifies that there should be a single slot shared between all
-instances of the class (and its sub-classes).
+@item @code{allocation:} @var{kind}
+If @var{kind} is @code{'class} or @code{'static} a single slot is shared
+between all instances of the class (and its sub-classes).
 Not yet implemented for @code{define-class},
 only for @code{define-simple-class}.
 In Java terms this is a @code{static} field.
-@item @code{allocation:} @code{instance:}
-Specifies that each instance has a separate value "slot", and they
+
+If @var{kind} is @code{'instance} then
+each instance has a separate value "slot", and they
 are not shared. In Java terms, this is a non-@code{static} field.
 This is the default.
+
+You can use a keyword like @code{class:} or a string like @code{"class"}
+if you prefer instead of a quoted symbol like @code{'class};
+the latter is recommended.
+@item @code{init:} @var{expr}
+An expression used to initialize the slot.
+The expression is evaluated in a scope that includes the field and
+method names of the current class.
 @item @code{init-form:} @var{expr}
 An expression used to initialize the slot.
-The lexical environment of the @var{expr} is that of the @code{define-class}
-or @code{define-simple-class}.  (This is not quite true in the current
-implementation, as the names of fields and methods of this class are visible.)
+The lexical environment of the @var{expr} is that of the @code{define-class};
+it does @emph{not} include the field and method names of the current class.
+or @code{define-simple-class}.
 @item @code{init-value:} @var{value}
 A value expression used to initialize the slot.
 For now this is synonymous with @var{init-form:}, but that may change
@@ -4179,8 +4188,20 @@ For now this is synonymous with @var{init-form:}, but that may change
 A keyword that that can be used to initialize instance in @code{make} calls.
 For now, this is ignored, and @var{name} should be the same as the
 field's @var{fname}.
-@code{static} field.
 @end table
+
+The @var{fname} can be left out.  That indicates a "dummy slot",
+which is useful for initialization not tied to a specific field.
+In this example, @code{x} is the only actual field.  It is first
+initialized to 10, but if @code{(some-condition)} is true
+then its value is doubled.
+@example
+(define-simple-class <my-class> ()
+  (allocation: 'class
+   init: (perform-actions-when-the-class-is-initizalized))
+  (x init: 10)
+  (init: (if (some-condition) (set! x (* x 2)))))
+@end example
 
 Each @var{method-decl} declares a public non-static method,
 whose name is @var{method-name}.  (If @var{method-name} is not a valid

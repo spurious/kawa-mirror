@@ -1,3 +1,8 @@
+2003-12-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes):  Document new features for
+	field initialization.
+
 2003-11-22  Per Bothner  <per@bothner.com>
 
 	* internals.xml (Numbers):  Fix typo 'is' -> 'id' in attribute name.

@@ -406,6 +406,17 @@ public class CodeAttr extends Attribute implements AttrContainer
     return locals.current_scope.addVariable (this, type, name);
   }
 
+  /** Call addLocal for parameters (as implied by method type). */
+  public void addParamLocals()
+  {
+    Method method = getMethod();
+    if ((method.access_flags & Access.STATIC) == 0)
+      addLocal(method.classfile).setParameter(true);
+    int arg_count = method.arg_types.length;
+    for (int i = 0;  i < arg_count;  i++)
+      addLocal(method.arg_types[i]).setParameter(true);
+  }
+
   public final void emitPushConstant(int val, Type type)
   {
     switch (type.getSignature().charAt(0))

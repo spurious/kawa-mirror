@@ -98,7 +98,9 @@ public abstract class Type {
       {
 	String name = reflectClass.getName();
 	type = lookupType(name);
-	if (type == null)
+	if (type == null
+            || (type.reflectClass != reflectClass
+                && type.reflectClass != null))
 	  {
 	    ClassType cl = new ClassType(name);
 	    cl.flags |= ClassType.EXISTING_CLASS;

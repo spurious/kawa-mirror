@@ -1,3 +1,11 @@
+2000-08-16  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (addParamLocals):  New method.
+	* Method.java (init_param_slots):  Use CodeAttr's new addParamLocals.
+
+	* Type.java (make):  If an existing type has same name but different
+	reflectClass (i.e. different ClassLoader), treat it as different type.
+
 2000-06-10  Per Bothner  <per@bothner.com>
 
 	* Type.java (nullType):  New static field.

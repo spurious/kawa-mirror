@@ -123,12 +123,7 @@ public class Method implements AttrContainer {
   public void init_param_slots ()
   {
     initCode ();
-    if ((access_flags & Access.STATIC) == 0)
-      code.addLocal(classfile).setParameter(true);
-    int arg_count = arg_types.length;
-    for (int i = 0;  i < arg_count;  i++) {
-      code.addLocal(arg_types[i]).setParameter (true);
-    }
+    code.addParamLocals();
   }
 
   void kill_local (Variable var) { var.freeLocal(code); }

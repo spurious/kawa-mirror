@@ -40,22 +40,31 @@ public abstract class LispLanguage extends Language
     tr.push(mexp);
     int first = tr.formStack.size();
     LispReader reader = (LispReader) lexer;
-    for (;;)
+    Compilation save_comp = Compilation.getCurrent();
+    try
       {
-	Object sexp = reader.readCommand();
-	if (sexp == Sequence.eofValue)
-	  {
-	    if ((options & PARSE_ONE_LINE) != 0)
-	      return null;  // FIXME
-	    break;
-	  }
-	tr.scanForm(sexp, mexp);
-	if ((options & PARSE_ONE_LINE) != 0)
-	  break;
+        Compilation.setCurrent(tr);
+        for (;;)
+          {
+            Object sexp = reader.readCommand();
+            if (sexp == Sequence.eofValue)
+              {
+                if ((options & PARSE_ONE_LINE) != 0)
+                  return null;  // FIXME
+                break;
+              }
+            tr.scanForm(sexp, mexp);
+            if ((options & PARSE_ONE_LINE) != 0)
+              break;
+          }
+        if (lexer.peek() == ')')
+          lexer.fatal("An unexpected close paren was read.");
+        tr.finishModule(mexp, first);
       }
-    if (lexer.peek() == ')')
-      lexer.fatal("An unexpected close paren was read.");
-    tr.finishModule(mexp, first);
+    finally
+      {
+        Compilation.setCurrent(save_comp);
+      }
     return tr;
   }
 

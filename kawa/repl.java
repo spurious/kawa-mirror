@@ -95,44 +95,45 @@ public class repl
 	    Shell.run(interp);
 	    return;
 	  }
-	else if (args[iArg].equals ("-w"))
+	else if (arg.equals ("-w"))
 	  {
 	    setArgs (args, iArg);
 	    checkInitFile();
 	    new kawa.GuiConsole(interp);
 	    something_done = true;
 	  }
-	else if (args[iArg].equals ("-d"))
+	else if (arg.equals ("-d"))
 	  {
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    compilationDirectory = args[iArg];
 	  }
-	else if (args[iArg].equals ("-P"))
+	else if (arg.equals ("-P"))
 	  {
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    compilationPrefix = args[iArg];
 	  }
-	else if (args[iArg].equals ("-T"))
+	else if (arg.equals ("-T"))
 	  {
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    compilationTopname = args[iArg];
 	  }
-	else if (args[iArg].equals ("-C"))
+	else if (arg.equals ("-C"))
 	  {
-	    iArg++;
+	    ++iArg;
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    for ( ; iArg < args.length;  iArg++)
 	      {
+		arg = args[iArg];
 		try
 		  {
-		    if (CompileFile.compile_to_files(args[iArg],
+		    if (CompileFile.compile_to_files(arg,
 						     compilationDirectory,
 						     compilationPrefix,
 						     compilationTopname))
@@ -140,17 +141,18 @@ public class repl
 		  }
 		catch (Throwable ex)
 		  {
+		    System.err.println("Internal error while compiling "+arg);
 		    ex.printStackTrace(System.err);
 		    System.exit(-1);
 		  }
 	      }
 	    return;
 	  }
-	else if (args[iArg].equals("--main"))
+	else if (arg.equals("--main"))
 	  {
 	    Compilation.generateMainDefault = true;
 	  }
-	else if (args[iArg].equals("--version"))
+	else if (arg.equals("--version"))
 	  {
 	    System.out.print("Kawa ");
 	    System.out.print(Version.getVersion());

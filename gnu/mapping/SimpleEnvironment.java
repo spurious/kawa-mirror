@@ -172,7 +172,8 @@ public class SimpleEnvironment extends Environment
 
   protected void redefineError (Symbol name, Object property, Location loc)
   {
-    throw new IllegalStateException("prohibited define/redefine of "+name);
+    throw new IllegalStateException("prohibited define/redefine of "
+                                    +name+" in "+this);
   }
 
   public NamedLocation addLocation (Symbol name, Object property, Location loc)

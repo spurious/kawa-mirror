@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
+import gnu.mapping.Symbol;
 
 public class define_class extends Syntax
 {
@@ -18,10 +19,11 @@ public class define_class extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Pair p;
+    Object name;
     if (! (st.cdr instanceof Pair)
-        || ! ((p = (Pair) st.cdr).car instanceof String))
+	|| ! ((name = (p = (Pair) st.cdr).car) instanceof String
+	      || name instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
-    String name = (String) p.car;
     Declaration decl = new Declaration(name);
     ClassExp oexp = new ClassExp();
     decl.noteValue(oexp);
@@ -51,21 +53,23 @@ public class define_class extends Syntax
   public Expression rewriteForm (Pair form, Translator tr)
   {
     //FIXME needs work
-    String name = null;
+    Object symbol = null;
     Declaration decl = null;
     if (form.cdr instanceof Pair)
       {
         form = (Pair) form.cdr;
-        if (form.car instanceof String)
-          name = (String) form.car;
+	if (form.car instanceof String || form.car instanceof Symbol)
+          symbol = form.car;
         else if (form.car instanceof Declaration)
           {
             decl = (Declaration) form.car;
-            name = decl.getName();
+            symbol = decl.getName();
           }
       }
-    if (name == null)
+    if (symbol == null)
       return tr.syntaxError("missing class name in "+this.getName());
+    String name = symbol instanceof Symbol ? ((Symbol) symbol).getName()
+      : symbol.toString();
     //LambdaExp lexp = new LambdaExp();
     //lexp.setName(name);
     //    tr.push(lexp);
@@ -80,7 +84,7 @@ public class define_class extends Syntax
     Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
     // lexp.body = oe;
     // tr.pop(lexp);
-    SetExp sexp = new SetExp (name, oe);
+    SetExp sexp = new SetExp (symbol, oe);
     sexp.binding = decl;
     sexp.setDefining (true);
     // sexp.binding = decl;

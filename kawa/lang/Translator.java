@@ -206,7 +206,8 @@ public class Translator extends Compilation
           return obj;
 	if (obj instanceof Declaration)
 	  {
-	    Expression dval = ((Declaration) obj).getValue();
+	    Expression dval
+	      = Declaration.followAliases((Declaration) obj).getValue();
 	    if (dval instanceof QuoteExp)
 	      return ((QuoteExp) dval).getValue();
 	  }

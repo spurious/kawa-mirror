@@ -4,6 +4,7 @@ import kawa.lang.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import java.util.Vector;
+import gnu.mapping.Symbol;
 
 public class object extends Syntax
 {
@@ -69,10 +70,10 @@ public class object extends Syntax
 	  return tr.syntaxError("object member not a list");
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
-	if (pair.car instanceof String)
+	if (pair.car instanceof String || pair.car instanceof Symbol)
 	  { // Field declaration.
 	    Pair typePair = null;
-	    String sname = (String) pair.car;
+	    Object sname = pair.car;
 	    Declaration decl = oexp.addDeclaration(sname);
 	    decl.setSimple(false);
 	    int nKeywords = 0;
@@ -112,7 +113,8 @@ public class object extends Syntax
 		      {
 			if (! (value instanceof Keyword))
 			  tr.error('e', "invalid 'init-keyword' - not a keyword");
-			else if (((Keyword) value).getName() != sname)
+			else if (((Keyword) value).getName()
+				 != sname.toString())
 			  tr.error('w', "init-keyword option ignored");
 		      }
 		    else
@@ -157,9 +159,10 @@ public class object extends Syntax
 	else if (pair.car instanceof Pair)
 	  { // Method declaration.
 	    Pair mpair = (Pair) pair.car;
-	    if (! (mpair.car instanceof String))
+	    Object mname = mpair.car;
+	    if (! (mname instanceof String)
+		&& ! (mname instanceof Symbol))
 	      return tr.syntaxError("missing method name");
-	    String mname = (String) mpair.car;
 	    Declaration decl = oexp.addDeclaration(mname);
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.setClassMethod(true);
@@ -189,7 +192,7 @@ public class object extends Syntax
 	  {
 	    obj = pair.cdr; // Next member.
 	    pair = (Pair) pair.car;
-	    if (pair.car instanceof String)
+	    if (pair.car instanceof String || pair.car instanceof Symbol)
 	      { // Field declaration.
 		Object type = null;
 		int nKeywords = 0;

@@ -257,21 +257,6 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int OP_NODE = 231; // 'node' followed by '('
   static final int OP_TEXT = 232; // 'text' followed by '('
   
-  /**
-   * An encoding of the token type:
-   * '\uffff': end of string.
-   * '(', ')', '[', ']', '.', '@', ',', '$': ` That character token.
-   */
-
-  boolean checkNext(char ch)
-      throws java.io.IOException
-  {
-    if (peek() != ch)
-      return false;
-    skip();
-    return true;
-  }
-
   public static boolean isNameStart(char ch)
   {
     return Character.isLetter(ch) || ch == '_';

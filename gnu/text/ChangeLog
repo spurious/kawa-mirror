@@ -1,3 +1,7 @@
+2003-05-10  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (checkNext):  Moved from XQParser.java.  Re-written.
+
 2003-05-02  Per Bothner  <per@bothner.com>
 
 	* SyntaxException.java (SyntaxException):  New constructor.

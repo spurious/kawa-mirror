@@ -69,6 +69,23 @@ public class Lexer extends Reader
     port.unread_quick();
   }
 
+  /**
+   * Check if the next character matches a given character.
+   * @param ch The character to match against.
+   * @return if the character read matches
+   * On a match, the position is advanced following that character.
+   */
+  public boolean checkNext(char ch)
+      throws java.io.IOException
+  {
+    int r = port.read();
+    if (r == ch)
+	return true;
+    if (r >= 0)
+      port.unread_quick();
+    return false;
+  }
+
   protected void skip_quick() throws java.io.IOException
   {
     port.skip_quick();

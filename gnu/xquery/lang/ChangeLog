@@ -1,5 +1,7 @@
 2003-05-10  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (checkNext):  Moved to Lexer, and made public.
+
 	* XQParser.java (getrawToken):  In string literals, handle
 	character and entity references, and doubled delimters.
 	(appendNamedEntity):  Removed StringBuffer parameter; write to

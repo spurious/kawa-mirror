@@ -166,7 +166,7 @@ public class repl
 		  }
 		catch (NumberFormatException ex)
 		  {
-		    bad_option ("--server port#");
+		    bad_option ("--connect port#");
 		    port = -1; // never seen.
 		  }
 	      }
@@ -235,6 +235,23 @@ public class repl
 	else if (arg.equals("--debug-dump-zip"))
 	  {
 	    gnu.expr.LambdaExp.dumpZipPrefix = "kawa-zip-dump-";
+	  }
+	else if (arg.equals("--fewer-classes"))
+	  {
+	    gnu.expr.Compilation.fewerClasses = true;
+	  }
+	else if (arg.equals("--cps"))
+	  {
+	    gnu.expr.Compilation.fewerClasses = true;
+	    gnu.expr.Compilation.usingCPStyle = true;
+	  }
+	else if (arg.equals("--full-tailcalls"))
+	  {
+	    gnu.expr.Compilation.usingTailCalls = true;
+	  }
+	else if (arg.equals("--no-full-tailcalls"))
+	  {
+	    gnu.expr.Compilation.usingTailCalls = false;
 	  }
 	else if (arg.equals("--version"))
 	  {

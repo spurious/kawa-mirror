@@ -37,7 +37,7 @@ public class BeginExp extends Expression
     int n = exps.length;
     for (int i = 0; i < n; i++)
       { 
-	ps.print(" ");
+	ps.print('\n');
 	exps[i].print (ps);
       }
     ps.print(")");

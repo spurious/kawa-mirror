@@ -62,6 +62,7 @@ Vector.class \
 Undefined.class \
 Lambda.class \
 Quote.class \
+Translator.class \
 Interpreter.class \
 Eval.class \
 Procedure.class \

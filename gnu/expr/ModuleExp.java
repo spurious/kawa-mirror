@@ -24,7 +24,8 @@ public class ModuleExp extends LambdaExp
 
   public String getJavaName ()
   {
-    return name == null ? "lambda" : Compilation.mangleName (name);
+    String name = getName();
+    return name == null ? "lambda" : Compilation.mangleName(name);
   }
 
   public ModuleExp ()
@@ -186,7 +187,7 @@ public class ModuleExp extends LambdaExp
 		dout.println(']');
 		dout.flush();
 	      }
-	    mexp.body.eval (env, ctx);
+	    mexp.body.eval(ctx);
 	  }
 	else
 	  {
@@ -199,8 +200,8 @@ public class ModuleExp extends LambdaExp
 		Object inst = clas.newInstance ();
 
 		Procedure proc = (Procedure) inst;
-		if (proc.getName() == null)
-		  proc.setName (mexp.name);
+		if (proc.getSymbol() == null)
+		  proc.setSymbol(mexp.getSymbol());
 
 		mod = (ModuleBody) inst;
 
@@ -331,9 +332,10 @@ public class ModuleExp extends LambdaExp
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Module/", ")", 2);
-    if (name != null)
+    Object sym = getSymbol();
+    if (sym != null)
       {
-	out.print(name);
+	out.print(sym);
 	out.print('/');
       }
     out.print(id);

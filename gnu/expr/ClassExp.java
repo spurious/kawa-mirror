@@ -97,6 +97,7 @@ public class ClassExp extends LambdaExp
 
   public String getJavaName ()
   {
+    String name = getName();
     return name == null ? "object" : Compilation.mangleNameIfNeeded (name);
   }
 
@@ -527,6 +528,7 @@ public class ClassExp extends LambdaExp
   public void print (OutPort out)
   {
     out.startLogicalBlock("("+getExpClassName()+"/", ")", 2);
+    Object name = getSymbol();
     if (name != null)
       {
 	out.print(name);

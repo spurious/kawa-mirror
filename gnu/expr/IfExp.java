@@ -37,13 +37,13 @@ public class IfExp extends Expression
       return interpreter.noValue();
   }
 
-  public void eval (Environment env, CallContext ctx) throws Throwable
+  public void apply (CallContext ctx) throws Throwable
   {
     Interpreter interpreter = getInterpreter();
-    if (interpreter.isTrue((test.eval (env))))
-      then_clause.eval (env, ctx);
+    if (interpreter.isTrue((test.eval(ctx))))
+      ctx.proc = then_clause;
     else if (else_clause != null)
-      else_clause.eval(env, ctx);
+      ctx.proc = else_clause;
   }
 
   public void compile (Compilation comp, Target target)

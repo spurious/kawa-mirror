@@ -13,7 +13,6 @@ import java.util.Vector;
 
 public class LambdaExp extends ScopeExp
 {
-  public String name;
   public Expression body;
   public int min_args;
   // Maximum number of actual arguments;  -1 if variable.
@@ -319,19 +318,6 @@ public class LambdaExp extends ScopeExp
       ilast--;
     return types[ilast];
   }
-
-  public void setName (String name)
-  {
-    this.name = name;
-  }
-
-  public void setName (Object name)
-  {
-    this.name
-      = name instanceof Symbol ? ((Symbol) name).getName() : name.toString();
-  }
-
-  public String getName () { return name; }
 
   public LambdaExp outerLambda ()
   {
@@ -778,7 +764,7 @@ public class LambdaExp extends ScopeExp
       }
     if (isInitMethod == 'C')
       nameBuf.append("<clinit>");
-    else if (name != null)
+    else if (getSymbol() != null)
       nameBuf.append(Compilation.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
@@ -1487,9 +1473,10 @@ public class LambdaExp extends ScopeExp
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Lambda/", ")", 2);
-    if (name != null)
+    Object sym = getSymbol();
+    if (sym != null)
       {
-	out.print(name);
+	out.print(sym);
 	out.print('/');
       }
     out.print(id);
@@ -1558,7 +1545,7 @@ public class LambdaExp extends ScopeExp
 
   public String toString()
   {
-    String str = getExpClassName()+':'+name+'/'+id+'/';
+    String str = getExpClassName()+':'+getSymbol()+'/'+id+'/';
 
 	int l = getLine();
 	if (l <= 0 && body != null)

@@ -81,7 +81,8 @@ public class ProcInitializer extends Initializer
 	for (int i = 0;  i < len;  i += 2)
 	  {
 	    Object key = proc.properties[i];
-	    if (key != null)
+	    // Skip "name" property since we've taken care of that specially.
+	    if (key != null && key != "name")
 	      {
 		Object val = proc.properties[i+1];
 		code.emitDup(1);

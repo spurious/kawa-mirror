@@ -1,5 +1,26 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
+	* Expression.java: Change to extens Procedure0.
+	(apply0): New final method.
+	(eval(Environment,CallContext)): Remove method, in favor of ...
+	(apply(CallContext)): ... this new method.
+	(eval(CallContext)): New final helper method.
+	* ApplyExp.java (apply(CallContext)): New tail-call-safe method.
+	(eval(Environment,CallContext)): Above replaces this method.
+	* IfExp.java (apply(CallContext)): New method, replaces ...
+	(eval(Environment,CallContext)): ... this replaced method.
+	* BeginExp.java (apply(CallContext)): New tail-call-safe method.
+
+	* LambdaExp.java (setName(String), setName(Object), getName):
+	Remove methods that conflict with Named, which is now an ancestor.
+	(name): Remove field used by setName/getName.
+	(toString, addMethodFor, print): Use methods instead of 'name' field.
+	* ClassExp.java: Use getName/getSymbol methods instead of name field.
+	* ModuleExp.java: Likewise.
+	* ProcInitializer.java (emit): Don't emit "name" property.
+
+2005-02-12  Per Bothner  <per@bothner.com>
+
 	* SetExp.java (compile): Call new setAlias method for aliases.
 
 	* AccessExp.java: New class, extends Expression.

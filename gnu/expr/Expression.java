@@ -8,7 +8,7 @@ import gnu.mapping.*;
  * @author	Per Bothner
  */
 
-public abstract class Expression implements Printable
+public abstract class Expression extends Procedure0 implements Printable
 {
   public Object eval (Environment env) throws Throwable
   {
@@ -16,10 +16,32 @@ public abstract class Expression implements Printable
 			        + getClass() + ".eval called");
   }
 
-  public void eval (Environment env, CallContext ctx) throws Throwable
+  public final Object apply0 () throws Throwable
   {
-    Object val = eval(env);
+    CallContext ctx = CallContext.getInstance();
+    check0(ctx);
+    return ctx.runUntilValue();
+  }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    Object val = eval(ctx.getEnvironment());
     ctx.writeValue(val);
+  }
+
+  public final Object eval (CallContext ctx) throws Throwable
+  {
+    int start = ctx.startFromContext();
+    try
+      {
+	apply(ctx);
+	return ctx.getFromContext(start);
+      }
+    catch (Throwable ex)
+      {
+	ctx.cleanupFromContext(start);
+	throw ex;
+      }
   }
 
   public final void print (java.io.PrintWriter ps)

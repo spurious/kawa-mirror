@@ -60,13 +60,13 @@ public class ApplyExp extends Expression
     return proc.applyN (vals);
   }
 
-  public void eval (Environment env, CallContext ctx) throws Throwable
+  public void apply (CallContext ctx) throws Throwable
   {
-    Procedure proc = (Procedure) func.eval(env);
+    Procedure proc = (Procedure) func.eval(ctx);
     int n = args.length;
     Object[] vals = new Object[n];
     for (int i = 0; i < n; i++)
-      vals[i] = args[i].eval (env);
+      vals[i] = args[i].eval(ctx);
     if (proc == null)
       throw new NullPointerException();
     proc.checkN(vals, ctx);

@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import java.util.Vector;
+import gnu.lists.*;
 
 /**
  * This class represents a sequence of Expressions.
@@ -105,6 +106,24 @@ public class BeginExp extends Expression
     for (i = 0; i < n - 1; i++)
       exps[i].eval (env);
     return exps[i].eval (env);
+  }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    int n = length;
+    int i;
+    Consumer consumerSave = ctx.consumer;
+    ctx.consumer = VoidConsumer.instance;
+    try
+      {
+	for (i = 0; i < n - 1; i++)
+	  exps[i].eval(ctx);
+      }
+    finally
+      {
+	ctx.consumer = consumerSave;
+      }
+    ctx.proc = exps[i];
   }
 
   public void pushOptions (Compilation comp)

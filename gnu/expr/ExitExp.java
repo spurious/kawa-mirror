@@ -51,4 +51,8 @@ public class ExitExp extends Expression
     ps.print(')');
   }
 
+  public Type getType()
+  {
+    return Type.neverReturnsType;
+  }
 }

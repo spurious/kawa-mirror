@@ -1,3 +1,7 @@
+2000-03-02  Per Bothner  <per@bothner.com>
+
+	* ExitExp.java (getType):  New method - return Type.neverReturnsType.
+
 2000-02-29  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocChildClasses):  Set firstArgsArrayArg for

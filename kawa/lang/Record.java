@@ -1,9 +1,7 @@
 package kawa.lang;
 import java.lang.reflect.Field;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Type;
-import gnu.bytecode.Access;
-import gnu.bytecode.Method;
+import gnu.bytecode.*;
+import gnu.mapping.*;
 
 public class Record extends Procedure1 implements HasSetter
 {
@@ -175,7 +173,7 @@ public class Record extends Procedure1 implements HasSetter
       {
 	throw new InternalError (ex.toString());
       }
-    SchemeLoader loader = new SchemeLoader(names, arrays);
+    ArrayClassLoader loader = new ArrayClassLoader(names, arrays);
     try
       {
 	Class reflectClass = loader.loadClass (name, true);
@@ -193,7 +191,7 @@ public class Record extends Procedure1 implements HasSetter
     List list = List.Empty;
     Field[] fields = clas.getFields();
     for (int i = fields.length;  --i >= 0; )
-      list = new Pair (Symbol.make(fields[i].getName()), list);
+      list = new Pair (fields[i].getName().intern(), list);
     return list;
   }
 

@@ -1,6 +1,7 @@
 package kawa.lang;
 import java.lang.reflect.Field;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
 
 public class RecordConstructor extends ProcedureN
 {
@@ -19,7 +20,7 @@ public class RecordConstructor extends ProcedureN
     this.fields = clas.getDeclaredFields();
   }
 
-  public RecordConstructor (Class clas, String[] fnames) throws GenericError
+  public RecordConstructor (Class clas, String[] fnames)
   {
     this.clas = clas;
     this.fields = new Field[fnames.length];

@@ -1,4 +1,6 @@
 package kawa.lang;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Abstract class for "syntax" objects.

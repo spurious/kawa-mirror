@@ -1,6 +1,9 @@
 package kawa.lang;
 import kawa.standard.Scheme;
 import gnu.bytecode.Method;
+import gnu.bytecode.Variable;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -114,7 +117,7 @@ public class Translator extends Object
     if (decl != null)
       {
 	LambdaExp curLambda = currentLambda ();
-	LambdaExp declLambda = decl.context.currentLambda ();
+	LambdaExp declLambda = decl.getContext().currentLambda ();
 	if (curLambda != declLambda || declLambda == null)
 	  {
 	    decl.setSimple (false);
@@ -193,9 +196,9 @@ public class Translator extends Object
     if (func instanceof ReferenceExp)
       {
 	ReferenceExp ref = (ReferenceExp) func;
-	if (ref.binding == null)
+	if (ref.getBinding() == null)
 	  {
-	    Object first = getBinding(ref.symbol);
+	    Object first = getBinding(ref.getName());
 	    if (first instanceof Syntax)
 	      return apply_rewrite ((Syntax) first, cdr);
 	    if (first instanceof Inlineable)
@@ -368,7 +371,7 @@ public class Translator extends Object
 	for (int i = ndecls;  --i >= 0; )
 	  inits[i] = QuoteExp.undefined_exp;
 	defs.inits = inits;
-	defs.push (this);
+	push(defs);
       }
     Expression body;
     if (nforms == 1)
@@ -383,7 +386,71 @@ public class Translator extends Object
     if (defs == null)
       return body;
     defs.body = body;
-    defs.pop(this);
+    pop(defs);
     return defs;
   }
+
+  /**
+   * Insert decl into current_decls.
+   * (Used at rewrite time, not eval time.)
+   */
+  void push (Declaration decl)
+  {
+    String sym = decl.symbol();
+    Object old_decl = current_decls.get (sym);
+    if (old_decl != null)
+      decl.shadowed = old_decl;
+    current_decls.put (sym, decl);
+  }
+
+  /** Remove this from Translator.current_decls.
+   * (Used at rewrite time, not eval time.)
+   */
+  void pop (Declaration decl)
+  {
+    String sym = decl.symbol();
+    if (decl.shadowed == null)
+      current_decls.remove (sym);
+    else
+      current_decls.put (sym, decl.shadowed);
+  }
+
+  public final void pushDecls (ScopeExp scope)
+  {
+    for (Variable var = scope.firstVar();  var != null;  var = var.nextVar())
+      {
+	// Don't make artificial variables visible.
+	if (! var.isArtificial())
+	  push((Declaration)var);
+      }
+  }
+
+  public final void popDecls (ScopeExp scope)
+  {
+    for (Variable var = scope.firstVar();  var != null;  var = var.nextVar())
+      {
+	if (! var.isArtificial ())
+	  pop((Declaration)var);
+      }
+  }
+
+  public void push (ScopeExp scope)
+  {
+    scope.outer = current_scope;
+    if (! (scope instanceof LambdaExp)) // which implies: outer != null
+      {
+	scope.shared = true;
+	mustCompileHere();
+      }
+    current_scope = scope;
+    pushDecls(scope);
+  }
+
+  public void pop (ScopeExp scope)
+  {
+    scope.assign_space();
+    popDecls(scope);
+    current_scope = scope.outer;
+  }
+
 }

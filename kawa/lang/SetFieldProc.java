@@ -1,6 +1,8 @@
 package kawa.lang;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 // Should be called PrimSetField for consistency.
 
@@ -68,8 +70,9 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
-    exp.args[0].compile(comp, ctype);
-    exp.args[1].compile(comp, field.getType());
+    Expression[] args = exp.getArgs();
+    args[0].compile(comp, ctype);
+    args[1].compile(comp, field.getType());
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPutField(field);
     comp.compileConstant(Interpreter.voidObject, target);

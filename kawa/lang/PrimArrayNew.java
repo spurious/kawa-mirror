@@ -1,5 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class PrimArrayNew extends Procedure1 implements Inlineable
 {
@@ -18,7 +20,7 @@ public class PrimArrayNew extends Procedure1 implements Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.args[0].compile(comp, Type.int_type);
+    exp.getArgs()[0].compile(comp, Type.int_type);
     CodeAttr code = comp.getCode();
     code.emitNewArray(element_type);
     target.compileFromStack(comp, new ArrayType(element_type));

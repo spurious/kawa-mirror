@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.mapping.*;
 
 /** Implement Scheme "promises".
  * @author Per Bothner
@@ -18,7 +19,6 @@ public class Promise implements Printable
   }
 
   public Object force ()
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (result == null)
       {

@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.mapping.*;
 
 /**
  * A Continuation "rerpesents an entire (default) future for the computation.
@@ -19,7 +20,6 @@ public class Continuation extends ProcedureN
   }
 
   public Object apply1 (Object arg1)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (invoked)
       throw new GenericError
@@ -28,14 +28,12 @@ public class Continuation extends ProcedureN
   }
 
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return apply1 (Values.make (args));
   }
 
   /** Call a precedure with the current continuation. */
   public static Object callcc (Procedure proc)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Continuation cont = new Continuation ();
     try

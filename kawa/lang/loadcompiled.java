@@ -1,5 +1,6 @@
 package kawa.lang;
 import gnu.bytecode.*;
+import gnu.mapping.*;
 
 public class loadcompiled extends Procedure1
 {
@@ -9,7 +10,6 @@ public class loadcompiled extends Procedure1
   }
 
   public final Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {

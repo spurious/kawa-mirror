@@ -2,6 +2,8 @@ package kawa.lang;
 import gnu.math.*;
 import java.io.*;
 import gnu.text.SyntaxException;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** A class to read Scheme forms (S-expressions). */
 

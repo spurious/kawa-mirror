@@ -1,4 +1,6 @@
 package kawa.lang;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Implement autoloading of Procedures.
@@ -45,7 +47,7 @@ public class AutoloadProcedure extends Procedure
     ps.print ('>');
   }
 
-  private void throw_error (String prefix) throws GenericError
+  private void throw_error (String prefix)
   {
     throw new GenericError (prefix + className
 				+ " while autoloading "
@@ -54,7 +56,6 @@ public class AutoloadProcedure extends Procedure
 
   /** Load the class named in className. */
   void load ()
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     String name = this.name();
     try
@@ -64,7 +65,7 @@ public class AutoloadProcedure extends Procedure
 	  throw new GenericError("circularity in autoload of "+name);
 	if (loaded instanceof ModuleBody)
 	  {
-	    Environment env = Environment.current ();
+	    Environment env = Environment.getCurrent();
 	    ((ModuleBody)loaded).run (env);
 	    Object value = env.get (name);
 	    if (value == null
@@ -90,7 +91,6 @@ public class AutoloadProcedure extends Procedure
   }
 
   public Object apply0 ()
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();
@@ -98,7 +98,6 @@ public class AutoloadProcedure extends Procedure
   }
 
   public Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();
@@ -106,7 +105,6 @@ public class AutoloadProcedure extends Procedure
   }
 
    public Object apply2 (Object arg1,Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();
@@ -114,7 +112,6 @@ public class AutoloadProcedure extends Procedure
   }
 
   public Object apply3 (Object arg1, Object arg2, Object arg3)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();
@@ -123,7 +120,6 @@ public class AutoloadProcedure extends Procedure
 
   public Object apply4 (Object arg1, Object arg2,
 			Object arg3, Object arg4) 
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();
@@ -131,7 +127,6 @@ public class AutoloadProcedure extends Procedure
   }
 
   public Object applyN (Object[] args)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (loaded == null)
       load ();

@@ -1,4 +1,6 @@
 package kawa.lang;
+import gnu.expr.*;
+import gnu.mapping.*;
 
 /** This class is temporary - I plan to move things to Scheme instead. */
 
@@ -7,7 +9,7 @@ public abstract class Interpreter
   static public final Boolean  trueObject = Boolean.TRUE;
   static public final Boolean  falseObject = Boolean.FALSE;
 
-  static public final Undefined undefinedObject = new kawa.lang.Undefined();
+  static public final Undefined undefinedObject = new Undefined().getInstance();
   static public final Object voidObject = Values.empty;
 
   static public final String quote_sym = "quote";

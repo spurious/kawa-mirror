@@ -2,6 +2,8 @@ package kawa.lang;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * A pattern that matches anything.

@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.mapping.*;
 
 /** Used to implement catch/throw named handlers as in Guile:
   * (catch 'key (lambda () ... (throw 'key ARGS ...) ...)

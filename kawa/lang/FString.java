@@ -3,6 +3,8 @@ import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Representation of fixed-length mutable character strings.
  * Used for the Scheme string type.

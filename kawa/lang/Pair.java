@@ -1,4 +1,7 @@
 package kawa.lang;
+import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 import java.io.PrintWriter;
 
@@ -123,6 +126,9 @@ public class Pair extends List implements Printable, Compilable
       }
   }
 
+  static Field carField = null;
+  static Field cdrField = null;
+
   public Literal makeLiteral (Compilation comp)
   {
     Literal literal = new Literal (this, comp.scmPairType, comp);
@@ -145,6 +151,13 @@ public class Pair extends List implements Printable, Compilable
       }
     else
       {
+	if (carField == null)
+	  {
+	    carField = Compilation.scmPairType.addField
+	      ("car", Compilation.scmObjectType, Access.PUBLIC);
+	    cdrField = Compilation.scmPairType.addField
+	      ("cdr", Compilation.scmObjectType, Access.PUBLIC);
+	  }
 	literal.flags |= Literal.ALLOCATING;
 	comp.emitLiteral (car);
 	comp.emitLiteral (cdr);
@@ -157,10 +170,10 @@ public class Pair extends List implements Printable, Compilable
 	    code.emitGetStatic(literal.field);
 	    code.emitDup(1, 1);  // emit dup_x1
 	    code.emitSwap();
-	    code.emitPutField(Compilation.cdrField);
+	    code.emitPutField(cdrField);
 	    code.emitDup(1, 1);  // emit dup_x1
 	    code.emitSwap();
-	    code.emitPutField(Compilation.carField);
+	    code.emitPutField(carField);
 	  }
 	else
 	  {

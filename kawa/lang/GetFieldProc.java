@@ -1,6 +1,8 @@
 package kawa.lang;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 // Should be called PrimGetField for consistency.
 
@@ -58,7 +60,7 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.args[0].compile(comp, ctype);
+    exp.getArgs()[0].compile(comp, ctype);
     if (field == null)
       {
 	field = ctype.getField(fname);

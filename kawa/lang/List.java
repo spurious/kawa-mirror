@@ -1,5 +1,8 @@
 package kawa.lang;
 import java.io.PrintWriter;
+import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Semi-abstract class for Scheme lists.
@@ -7,7 +10,7 @@ import java.io.PrintWriter;
  * @author	Per Bothner
  */
 
-public class List extends Sequence implements Printable
+public class List extends Sequence implements Printable, Compilable
 {
   protected List () { }
 
@@ -102,5 +105,20 @@ public class List extends Sequence implements Printable
 	list = pair.cdr;
       }
     return new kawa.lang.Vector (values);
+  }
+
+  static private Field nullConstant = null;
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    if (nullConstant == null)
+      nullConstant =
+	Compilation.scmListType.addField ("Empty", Compilation.scmListType,
+					  Access.PUBLIC|Access.STATIC);
+    return new Literal (this, nullConstant, comp);
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
   }
 }

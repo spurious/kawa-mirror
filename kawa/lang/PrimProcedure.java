@@ -4,10 +4,12 @@ import java.util.Hashtable;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import kawa.standard.Scheme;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
-public class PrimProcedure extends ProcedureN implements Inlineable
+public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 {
   Type retType;
   Type[] argTypes;
@@ -141,14 +143,14 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	types.put ("rational", new ClassType("gnu.math.RatNum"));
 	types.put ("integer", new ClassType("gnu.math.IntNum"));
 	types.put ("symbol", new ClassType("java.lang.String"));
-	types.put ("keyword", new ClassType("kawa.lang.Keyword"));
+	types.put ("keyword", new ClassType("gnu.expr.Keyword"));
 	types.put ("list", new ClassType("kawa.lang.List"));
 	types.put ("pair", new ClassType("kawa.lang.Pair"));
 	types.put ("string", new ClassType("kawa.lang.FString"));
 	types.put ("vector", new ClassType("kawa.lang.Vector"));
-	types.put ("function", new ClassType("kawa.lang.Procedure"));
-	types.put ("input-port", new ClassType("kawa.lang.InPort"));
-	types.put ("output-port", new ClassType("kawa.lang.OutPort"));
+	types.put ("function", new ClassType("gnu.mapping.Procedure"));
+	types.put ("input-port", new ClassType("gnu.mapping.InPort"));
+	types.put ("output-port", new ClassType("gnu.mapping.OutPort"));
 	types.put ("record", new ClassType("kawa.lang.Record"));
 	types.put ("type", new ClassType("gnu.bytecode.Type"));
 	types.put ("class-type", new ClassType("gnu.bytecode.ClassType"));
@@ -181,23 +183,24 @@ public class PrimProcedure extends ProcedureN implements Inlineable
     gnu.bytecode.CodeAttr code = comp.getCode();
     int arg_count = argTypes.length;
     boolean is_static = getStaticFlag();
-    Procedure.checkArgCount(this, exp.args.length);
+    Expression[] args = exp.getArgs();
+    Procedure.checkArgCount(this, args.length);
     if (opcode() == 183) // invokespecial == primitive-constructor
       {
 	ClassType type = method.getDeclaringClass();
 	code.emitNew(type);
 	code.emitDup(type);
       }
-    for (int i = 0; i < exp.args.length; ++i)
+    for (int i = 0; i < args.length; ++i)
       {
 	Type arg_type = is_static ? argTypes[i]
 	  : i==0 ? method.getDeclaringClass()
 	  : argTypes[i-1];
-	exp.args[i].compile(comp, arg_type);
+	args[i].compile(comp, arg_type);
       }
     
     if (method == null)
-      code.emitPrimop (opcode(), exp.args.length, retType);
+      code.emitPrimop (opcode(), args.length, retType);
     else
       code.emitInvokeMethod(method, opcode());
 

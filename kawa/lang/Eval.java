@@ -1,4 +1,6 @@
 package kawa.lang;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /* This implements the R5RS "eval" procedure. */
 
@@ -21,7 +23,7 @@ public class Eval extends Procedure1or2
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 	Translator tr = new Translator (env);
-	ModuleExp mod = new ModuleExp (body, tr);
+	ModuleExp mod = kawa.standard.Scheme.makeModuleExp(body, tr);
 	mod.setName (evalFunctionName);
 	if (tr.errors > 0)
 	    throw new GenericError ("syntax errors during eval");
@@ -35,13 +37,11 @@ public class Eval extends Procedure1or2
   }
 
   public Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return eval (arg1, Environment.user ());
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return eval (arg1, (Environment) arg2);
   }

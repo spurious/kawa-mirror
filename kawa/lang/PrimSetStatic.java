@@ -1,6 +1,8 @@
 package kawa.lang;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class PrimSetStatic extends Procedure1 implements Inlineable
 {
@@ -9,7 +11,7 @@ public class PrimSetStatic extends Procedure1 implements Inlineable
   gnu.bytecode.Field field;
   java.lang.reflect.Field reflectField;
 
-  PrimSetStatic (Class clas, String fname) throws GenericError
+  PrimSetStatic (Class clas, String fname)
   {
     ctype = (ClassType) gnu.bytecode.Type.make(clas);
     this.fname = fname;
@@ -58,7 +60,7 @@ public class PrimSetStatic extends Procedure1 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
-    exp.args[0].compile(comp, field.getType());
+    exp.getArgs()[0].compile(comp, field.getType());
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPutStatic(field);
     comp.compileConstant(Interpreter.voidObject, target);

@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.expr.Special;
 
 public abstract class Sequence
 {

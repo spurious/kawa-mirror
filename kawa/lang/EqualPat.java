@@ -3,6 +3,8 @@ import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * A pattern that requires an exact match (using equal?).

@@ -6,6 +6,8 @@ import gnu.bytecode.Method;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
 import kawa.standard.Scheme;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * A wrapper for characters.
@@ -194,7 +196,7 @@ public class Char implements Printable, Compilable
   public void emit (Literal literal, Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPushInt(((Char) literal.value).intValue ());
+    code.emitPushInt(((Char) literal.getValue()).intValue ());
     code.emitInvokeStatic(makeCharMethod);
   }
 }

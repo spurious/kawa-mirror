@@ -1,6 +1,8 @@
 package kawa.lang;
-import gnu.bytecode.*;
 import java.io.*;
+import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Procedure to read and compile and entire file.
  * Creates a .zip archive containing the resulting classes.
@@ -15,7 +17,6 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (String name, Translator tr)
-       throws GenericError
   {
     try
       {
@@ -66,45 +67,23 @@ public class CompileFile extends Procedure2
 
   public static final ModuleExp read (InPort port, Translator tr)
   {
-    return new ModuleExp (readBody(port), tr);
+    return kawa.standard.Scheme.makeModuleExp(readBody(port), tr);
   }
 
   public final Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
     Translator tr = new Translator ();
     ModuleExp lexp = read (arg1.toString (), tr);
-    Compilation comp = new Compilation (lexp,
-					LambdaExp.fileFunctionName, false);
-
     try
       {
-	String fname = arg2.toString ();
-	if (! fname.endsWith (".zip"))
-	  fname = fname + ".zip";
-	File zar_file = new File (fname);
-	if (zar_file.exists ())
-	  zar_file.delete ();
-	ZipArchive zar = new ZipArchive (zar_file, "rw");
-
-	byte[][] classes = new byte[comp.numClasses][];
-	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  {
-	    ClassType clas = comp.classes[iClass];
-	    classes[iClass] = clas.writeToArray ();
-
-	    zar.append (clas.getName ().replace ('.', '/') + ".class",
-			classes[iClass]);
-	  }
-	zar.close ();
+	lexp.compileToArchive(arg2.toString());
       }
     catch (IOException ex)
       {
 	throw new GenericError (ex.toString ());
       }
-
     return Interpreter.voidObject;
   }
 
@@ -118,7 +97,6 @@ public class CompileFile extends Procedure2
    */
   public static boolean compile_to_files (String inname, String directory,
 					  String prefix, String topname)
-       throws GenericError
   {
     if (topname == null)
       {
@@ -135,21 +113,10 @@ public class CompileFile extends Procedure2
     ModuleExp mexp = read (inname, tr);
     if (tr.errors > 0)
       return true;
-    Compilation comp = new Compilation (mexp, topname, prefix);
-    if (directory == null || directory.length () == 0)
-      directory = "";
-    else if (directory.charAt (directory.length () - 1) != '/')
-      directory = directory + '/';
 
     try
       {
-        for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-          {
-            ClassType clas = comp.classes[iClass];
-	    String out_name
-	      = directory + clas.getName ().replace ('.', '/') + ".class";
-	    clas.writeToFile (out_name);
-          }
+	mexp.compileToFiles (topname, directory, prefix);
       }
     catch (IOException ex)
       {

@@ -4,6 +4,8 @@ import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
 import gnu.bytecode.ArrayType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class SyntaxRules extends Syntax implements Printable, Compilable
 {

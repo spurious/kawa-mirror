@@ -1,4 +1,6 @@
 package kawa.lang;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Implement autoloading of Syntax (including macros).
@@ -43,7 +45,7 @@ public class AutoloadSyntax extends Syntax
       }
   }
 
-  private void throw_error (String prefix) throws GenericError
+  private void throw_error (String prefix)
   {
     throw new GenericError (prefix + className
 				+ " while autoloading "
@@ -52,7 +54,6 @@ public class AutoloadSyntax extends Syntax
 
   /** Load the class named in className. */
   void load ()
-       throws WrongType, GenericError
   {
     String name = this.name ();
     try

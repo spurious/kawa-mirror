@@ -4,7 +4,7 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
 
-public class Invoke extends ProcedureN implements CanInline, Inlineable
+public class Invoke extends ProcedureN implements CanInline
 {
   /** 'N' - make (new);  'S' - invoke-static;  'V'  - non-static invoke. */
   char kind;
@@ -207,11 +207,6 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
     return fields;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
-  {
-    return kind == 'V' ? exp : inlineClassName(exp, 0, interpreter);
-  }
-
   /** Resolve class specifier to ClassType at inline time.
    * This is an optimization to avoid having a module-level binding
    * created for the class name. */
@@ -238,8 +233,9 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
     return exp;
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
+    //if (kind == 'N') return inlineClassName(exp, 0, interpreter);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     ClassType type = getClassType(args);
@@ -256,7 +252,7 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
               }
             catch (Exception ex)
               {
-                comp.error('w', "unknown class: " + type.getName());
+                walker.error('w', "unknown class: " + type.getName());
                 methods = null;
               }
             okCount = cacheDefinitelyApplicableMethodCount;
@@ -266,7 +262,7 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
           {
             int index = -1;
             if (methods.length == 0)
-              comp.error('w', "no method `"+name+"' in "+type.getName());
+              walker.error('w', "no method `"+name+"' in "+type.getName());
             else if (okCount + maybeCount == 0)
               {
                 Object[] slots;
@@ -297,27 +293,24 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
                       {
                         errbuf.append(" in class ");
                         errbuf.append(type.getName());
-                        comp.error('w', errbuf.toString());
+                        walker.error('w', errbuf.toString());
                       }
                     else
                       {
                         PrimProcedure method = methods[0];
-                        CodeAttr code = comp.getCode();
-                        method.compile(new ApplyExp(method, new Expression[0]),
-                                       comp, Target.pushObject);
+			exp = new ApplyExp(method, new Expression[0]);
                         for (int i = 0;  i < slots.length;  i++)
                           {
-                            code.emitDup(type);
-                            SlotSet.compileSet(this, type,
-                                               args[2 * i + 2],
-                                               slots[i], comp);
+			    Expression[] sargs
+			      = { exp, new QuoteExp(slots[i]), args[2 * i + 2] };
+			    exp = new ApplyExp(SlotSet.setFieldReturnObject,
+					       sargs);
                          }
-                        target.compileFromStack(comp, type);
-                        return;
+			return exp;
                       }
                   }
                 else
-                  comp.error('w', "no possibly applicable method `"
+                  walker.error('w', "no possibly applicable method `"
                              +name+"' in "+type.getName());
               }
             else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
@@ -327,26 +320,26 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
 		  {
-		    comp.error('w',
+		    walker.error('w',
 			       "more than one definitely applicable method `"
 			       +name+"' in "+type.getName());
 		    for (int i = 0;  i < okCount;  i++)
-		      comp.error('w', "candidate: " + methods[i]);
+		      walker.error('w', "candidate: " + methods[i]);
 		  }
               }
 	    else if (okCount == 0)
 	      {
-		comp.error('w',
+		walker.error('w',
 			   "no definitely applicable method `"
 			   +name+"' in "+type.getName());
 	      }
             else
 	      {
-		comp.error('w',
+		walker.error('w',
 			   "more than one possibly applicable method `"
 			   +name+"' in "+type.getName());
 		for (int i = 0;  i < okCount; )
-		  comp.error('w', "candidate: " + methods[i]);
+		  walker.error('w', "candidate: " + methods[i]);
 	      }
             if (index >= 0)
               {
@@ -354,17 +347,17 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
                   = new Expression[nargs-(kind == 'S' ? 2 : 1)];
                 int i = 0;
                 if (kind == 'V')
-                  margs[i++] = args[0];
+		  margs[i++] = args[0];
                 System.arraycopy(args, kind == 'N' ? 1 : 2,
                                  margs, i,
                                  nargs - (kind == 'N' ? 1 : 2));
                 PrimProcedure method = methods[index];
-                method.compile(new ApplyExp(method, margs), comp, target);
-                return;
+                return new ApplyExp(method, margs);
               }
           }
       }
-    ApplyExp.compile(exp, comp, target);
+    //System.err.println("inline invoke type:"+type+" name:"+name);
+    return exp;
   }
 
   private ClassType getClassType(Expression[] args)
@@ -389,37 +382,6 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
     if (args.length >= 2)
       return ClassMethods.checkName(args[1]);
     return null;
-  }
-
-  public synchronized Type getReturnType (Expression[] args)
-  {
-    int nargs = args.length;
-    if (nargs > 0)
-      {
-        Expression arg0 = args[0];
-        Type type = (kind == 'V' ? arg0.getType()
-                     : interpreter.getTypeFor(arg0));
-        if (kind == 'N')
-          return type == null ? Type.pointer_type : type;
-        Object name = null;
-        if (nargs >= 2
-                 && args[1] instanceof QuoteExp)
-          name = ((QuoteExp) args[1]).getValue();
-        if (type instanceof ClassType
-            && (name instanceof FString || name instanceof String
-		|| name instanceof Binding))
-          {
-            PrimProcedure[] methods = getMethods((ClassType) type,
-                                                 name.toString(), args,
-                                                 kind == 'S' ? 2 : 1);
-            if (methods != null
-                && (cacheDefinitelyApplicableMethodCount == 1
-                    || (cacheDefinitelyApplicableMethodCount == 0
-                        && cachePossiblyApplicableMethodCount == 1)))
-              return methods[0].getReturnType(args);
-          }
-      }
-    return Type.pointer_type;
   }
 
   /** Return an ApplyExp that will call a method with given arguments.

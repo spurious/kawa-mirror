@@ -8,9 +8,16 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   /** True if this is a "static-field" operation. */
   boolean isStatic;
 
+  /** Return value is the first argument, rather than void.
+   * Only if non-static. */
+  boolean returnSelf;
+
   public static final SlotSet setField$Ex = new SlotSet("set-field!", false);
   public static final SlotSet setStaticField$Ex
   = new SlotSet("set-static-field!", true);
+  public static final SlotSet setFieldReturnObject
+    = new SlotSet("set-field-return-object!", false);
+  static { setFieldReturnObject.returnSelf = true; }
 
   public SlotSet(String name, boolean isStatic)
   {
@@ -97,7 +104,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   public Object apply3 (Object obj, Object fname, Object value)
   {
     apply(isStatic, obj, (String) fname, value);
-    return Values.empty;
+    return returnSelf ? obj : Values.empty;
   }
 
   static Object getField(Type type, String name)
@@ -217,8 +224,13 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
             args[0].compile(comp,
                             isStaticField ? Target.Ignore
                             : Target.pushValue(ctype));
+	    if (returnSelf)
+	      comp.getCode().emitDup(ctype);
             compileSet(this, ctype, args[2], part, comp);
-            comp.compileConstant(Values.empty, target);
+	    if (returnSelf)
+	      target.compileFromStack(comp, ctype);
+	    else
+	      comp.compileConstant(Values.empty, target);
             return;
           }
         if (type != Type.pointer_type)
@@ -229,6 +241,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
   public Type getReturnType (Expression[] args)
   {
+    if (returnSelf && args.length == 3)
+      return args[0].getType();
     return Type.void_type;
   }
 }

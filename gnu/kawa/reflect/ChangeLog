@@ -1,3 +1,13 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (returnSelf):  New field.
+	(setFieldReturnObject):  New static final field.
+	(apply3, compile, getReturnType):  Handle returnSelf.
+	* Invoke.java:  No longer implement Inlineable.
+	(compile, getReturnType):  Remove methods.
+	(inline):  Enhance, using most of the old logic from compile.
+	We can do better type propagation easier this way.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* InstanceOf.java, Invoke.java, SlotGet.java, SlotSet.java,

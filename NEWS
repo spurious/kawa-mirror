@@ -2,9 +2,9 @@ define-alias of types can now be exported from a module.
 
 New --no-inline --inline=none option.
 
-You can use define-namespace to dedine "namespace aliases".
+You can use define-namespace to define "namespace aliases".
 This is used for the new short-hard syntax for method invocation:
-(define-namespace Int32 "class:'java.lang.Integer)
+(define-namespace Int32 "class:java.lang.Integer")
 (Int32:toHexString 255) => "ff"
 (Int32:toString (Int32:new "00255")) => "255"
 Alternatively, you can write:

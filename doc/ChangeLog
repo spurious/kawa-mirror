@@ -1,3 +1,8 @@
+Mon Jan 19 16:49:46 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Document cop-file, input-port-read-state, and
+	port-char-encoding.  Update default-prompter.
+	
 Sun Dec 14 22:55:44 1997  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Macros are now "Syntax".

@@ -1,5 +1,8 @@
 2003-04-18  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (compile):  Do nothing if target is IgnoreTarget,
+	and if function isn't read.
+
 	* NameLookup.java:  New class.
 	* Makefile.am (java_sources0:  Update.
 

@@ -537,12 +537,9 @@ public class LambdaExp extends ScopeExp
 
   public void compile (Compilation comp, Target target)
   {
-    if (target instanceof IgnoreTarget)
-      {
-	if (getInlineOnly())
-	  return;
-	// else Causes failures.  Better to remove unneeded LambdaExp earlier. FIXME
-      }
+    if (target instanceof IgnoreTarget
+	&& (getInlineOnly() || ! getCanRead()))
+      return;
     Type rtype;
     CodeAttr code = comp.getCode();
 

@@ -62,6 +62,16 @@ public class ObjectType extends Type
     return reflectClass;
   }
 
+  public Type getImplementationType()
+  {
+    return this == nullType ? pointer_type : this;
+  }
+
+  public Type promote ()
+  {
+    return this == nullType ? pointer_type : this;
+  }
+
   public int compare(Type other)
   {
     // Assume this == nullType.

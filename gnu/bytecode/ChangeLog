@@ -1,3 +1,8 @@
+2001-09-14  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (promote):  Convert nullType to pointer_type;
+	(getImplementationType):  Likewise.
+
 2001-09-12  Per Bothner  <per@bothner.com>
 
 	* Type.java (neverReturnsType):  Use different constructor, to

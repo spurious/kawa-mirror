@@ -14,7 +14,15 @@
   ((primitive-virtual-method <string> "length" <int> ())
    str))
 
-(define (substring str start end)
+(define (string-ref string (k <int>))
+  ((primitive-virtual-method <string> "charAt" <char> (<int>))
+   string k))
+
+(define (string-set! string (k <int>) (char <char>))
+  ((primitive-virtual-method <string> "setCharAt" <void> (<int> <char>))
+   string k char))
+
+(define (substring str (start <int>) (end <int>))
   ((primitive-virtual-method <string> "copy" <string> (<int> <int>))
    str start end))
 
@@ -22,7 +30,7 @@
   ((primitive-virtual-method <string> "copy" <string> ())
    str))
 
-(define (string-fill! str ch)
+(define (string-fill! str (ch <char>))
   ((primitive-virtual-method <string> "fill" <void> (<char>))
    str ch))
 

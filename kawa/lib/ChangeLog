@@ -1,3 +1,10 @@
+Fri Sep 11 22:30:25 1998  Per Bothner  <bothner@cygnus.com>
+
+	* strings.scm (string-ref, string-set!):  Added.
+	(substring, string-fill!):  Declare some parameter and result types.
+	* vectors.scm (vector-ref, vector-set!):  Declare parameter types.
+	* lists.scm (set-car!, set-cdr!):  Added.
+
 1998-08-28  Per Bothner  <bothner@cygnus.com>
 
 	* std_syntax.scm (do):  Use "magic" identifier.

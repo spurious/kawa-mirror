@@ -1,3 +1,15 @@
+A new package gnu.emacs provides various building blocks
+for building an Emacs-like text editor.  These classes
+are only compiled when Kawa is configured with the
+new --with-swing configuration option.  This is a large
+initial step towards "JEmacs" - an Emacs re-implemented
+to use Kawa, Java, and Swing, but with full support (using
+gnu.elisp) for traditional Emacs Lisp.  For more imformation
+see gnu/emacs/overview.html.
+
+A new configuration option --with-swing can be used if Swing is available.
+It is currently only used in gnu.emacs, but that may change.
+
 Changes from Kawa 1.6.56 to 1.6.58
 ==================================
 Kawa is now "properly tail-recursive" if you invoke it with the

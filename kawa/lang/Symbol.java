@@ -92,6 +92,5 @@ public class Symbol extends Object implements Printable, Compilable
   {
     comp.method.compile_push_string (((Symbol)literal.value).toString ());
     comp.method.compile_invoke_static (comp.makeSymbolMethod);
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

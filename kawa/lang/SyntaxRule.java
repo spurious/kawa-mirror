@@ -412,6 +412,5 @@ public class SyntaxRule implements Compilable
     comp.emitLiteral (literal_values);
     comp.method.compile_push_int (max_nesting);
     comp.method.compile_invoke_nonvirtual (initSyntaxRuleMethod);
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

@@ -275,7 +275,5 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 
     // Stack contents:  ..., this, this, literals, array
     comp.method.compile_invoke_nonvirtual (initSyntaxRulesMethod);
-
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

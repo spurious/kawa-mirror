@@ -22,18 +22,18 @@ public class Literal
    * The ALLOCATING flag is true if someone has committed to allocate
    * the value, but has not necessarily finished doing so.
    * The flag is used to detect circularities. */
-  static final int ALLOCATING = 1;
+  public static final int ALLOCATING = 1;
 
   /** Bit in flags used to indicate the value has been allocated.
    * I.e. it has been allocated, but it is not necessarily initialized. */
-  static final int ALLOCATED = 2;
+  public static final int ALLOCATED = 2;
 
   /** Bit in flags indicates that the value has been fully initialized. */
-  static final int INITIALIZED = 4;
+  public static final int INITIALIZED = 4;
 
   /* The ASSIGNED flag is set iff code has been emitted to assign the
    * value of the literal to the Field. */
-  static final int ASSIGNED = 8;
+  public static final int ASSIGNED = 8;
 
   /** The static final field that contains the value of the literal. */
   Field field;
@@ -108,7 +108,6 @@ public class Literal
 	comp.method.compile_array_store (comp.scmObjectType);
 	// Stack contents:  ..., array
       }
-    flags |= Literal.INITIALIZED;
   }
 
   void emit (Compilation comp, boolean ignore)
@@ -129,7 +128,6 @@ public class Literal
 	comp.method.compile_dup (comp.javaIntegerType);
 	comp.method.compile_push_int (((Integer)value).intValue ());
 	comp.method.compile_invoke_nonvirtual (comp.initIntegerMethod);
-	flags |= ALLOCATED|INITIALIZED;
       }
     else if (value instanceof StringBuffer)
       {
@@ -138,12 +136,10 @@ public class Literal
 	StringBuffer string = (StringBuffer) value;
 	comp.method.compile_push_string (value.toString ());
 	comp.method.compile_invoke_nonvirtual (comp.initStringBufferMethod);
-	flags |= Literal.ALLOCATED|Literal.INITIALIZED;
       }
     else if (value instanceof String)
       {
 	comp.method.compile_push_string (value.toString ());
-	flags |= Literal.ALLOCATED|Literal.INITIALIZED;
       }
     else if (value instanceof Symbol[])
       emitArray (comp, comp.scmSymbolType);
@@ -155,6 +151,7 @@ public class Literal
 	System.err.println (value.getClass ());
 	comp.method.compile_getstatic (Compilation.undefinedConstant);
       }
+    flags |= ALLOCATED|INITIALIZED;
     if (field != null && (flags & ASSIGNED) == 0)
       {
 	if (! ignore)
@@ -167,7 +164,7 @@ public class Literal
   }
 
   /** Utility function to check for circular literals dependencies.
-   * Use this in a Compilable.emit method circularities are not allowed
+   * Use this in a Compilable.emit method if circularities are not allowed
    * (perhaps because it it not worth the trouble to handle them). */
   void check_cycle ()
   {

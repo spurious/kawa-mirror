@@ -97,7 +97,6 @@ public class Vector extends Sequence implements Printable, Compilable
       }
     // Remove no-longer-needed array from stack:
     comp.method.compile_pop (1);
-    literal.flags |= Literal.INITIALIZED;
   }
 
   public void print(java.io.PrintStream ps)

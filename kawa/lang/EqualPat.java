@@ -55,6 +55,5 @@ public class EqualPat extends Pattern implements Printable, Compilable
     literal.check_cycle ();
     comp.emitLiteral (value);
     comp.method.compile_invoke_static (makeEqualPatMethod);
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

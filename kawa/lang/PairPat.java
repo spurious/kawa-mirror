@@ -70,7 +70,5 @@ public class PairPat extends Pattern implements Printable, Compilable
     comp.emitLiteral (car);
     comp.emitLiteral (cdr);
     comp.method.compile_invoke_static (makePairPatMethod);
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
-
 }

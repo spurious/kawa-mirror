@@ -147,6 +147,5 @@ public class Char implements Printable, Compilable
   {
     comp.method.compile_push_int (((Char)literal.value).intValue ());
     comp.method.compile_invoke_static (makeCharMethod);
-    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

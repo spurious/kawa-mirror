@@ -168,7 +168,6 @@ public class Pair extends List implements Printable, Compilable
 	    // emit:  push new Pair (pop(), pop())
 	    comp.method.compile_invoke_static  (Compilation.makePairMethod);
 	  }
-	literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
       }
   }
 

@@ -39,7 +39,9 @@ public abstract class Interpreter
   static String[][] languages =
   {
     { "scheme", ".scm", "kawa.standard.Scheme" },
-    { "emacs", "elisp", ".el", "gnu.jemacs.lang.ELisp" }
+    { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
+    { "commonlisp", "common-lisp", "clisp", "lisp", ".lisp", ".lsp",
+      "gnu.commonlisp.lang.CommonLisp" }
   };
 
   /** Look for an interpreter for a language with the given name or extension.

@@ -239,7 +239,9 @@ public class SetExp extends Expression
 	code.emitInvokeStatic(method);
       }
 
-    if (! needValue)
+    if (needValue)
+      target.compileFromStack(comp, getType());
+    else
       comp.compileConstant(Values.empty, target);
   }
 

@@ -45,6 +45,7 @@ public class Special extends Object implements Printable, Externalizable
 
   public void print(java.io.PrintWriter ps)
   {
+    ps.print("#!");
     ps.print(name);
   }
 

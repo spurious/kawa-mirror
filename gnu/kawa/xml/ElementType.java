@@ -82,12 +82,10 @@ implements TypeValue, Externalizable, GroupPredicate
   public static SeqPosition coerceOrNull (Object obj,
 				    String namespaceURI, String localName)
   {
-    SeqPosition pos = NodeType.coerce(obj);
+    SeqPosition pos = NodeType.coerceOrNull(obj, GROUP_OK);
     if (pos.sequence == null)
       return null;
     Object curName = pos.getNextTypeObject();
-    if (pos.sequence.getNextKind(pos.ipos, pos.xpos) != Sequence.GROUP_VALUE)
-      return null;
     String curNamespaceURI;
     String curLocalName;
     if (curName instanceof QName)

@@ -15,7 +15,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   
   public int numArgs() { return 0x2002; }
 
-  public static void namedChildren (GroupPredicate type,
+  public static void namedChildren (NodePredicate type,
 				    TreeList tlist, int index,
 				    Consumer consumer)
     throws Throwable
@@ -28,23 +28,22 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       {
 	if (! getNamedChild(pos, type))
 	  break;
+	int ichild = pos.ipos >>> 1;
+	int next = tlist.nextNodeIndex(ichild, -1 >>> 1);
+	if (ichild == next)
+	  next = tlist.nextDataIndex(ichild);
 	if (consumer instanceof PositionConsumer)
 	  ((PositionConsumer) consumer).writePosition(tlist,
 						      pos.ipos, pos.xpos);
 	else
-	  {
-	    int ichild = pos.ipos >>> 1;
-	    int next = tlist.nextDataIndex(ichild);
-	    tlist.consumeRange(ichild, next, consumer);
-	    pos.ipos = next << 1;
-	  }
-	tlist.gotoNext(pos, 0);
+	  tlist.consumeRange(ichild, next, consumer);
+	pos.ipos = next << 1;
       }
   }
 
   static final Class[] noClasses = {};
 
-  public static void namedChildren (GroupPredicate type, Object node, Consumer consumer)
+  public static void namedChildren (NodePredicate type, Object node, Consumer consumer)
     throws Throwable
   {
     if (node instanceof TreeList)
@@ -112,7 +111,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    GroupPredicate predicate = (GroupPredicate) ctx.getNextArg();
+    NodePredicate predicate = (NodePredicate) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {
@@ -134,7 +133,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       namedChildren(predicate, node, consumer);
   }
 
-  public static boolean getNamedChild(SeqPosition position, GroupPredicate type)
+  public static boolean getNamedChild(SeqPosition position, NodePredicate type)
     throws Throwable
   {
     AbstractSequence seq = position.sequence;
@@ -157,26 +156,43 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       {
 	int ipos = position.ipos;
 	Object xpos = position.xpos;
-	int kind = seq.getNextKind(ipos, xpos);
-	if (kind == Sequence.EOF_VALUE)
+	boolean hasNext = seq.hasNext(ipos, xpos);
+	if (! hasNext)
 	  return false;
-	if (kind == Sequence.GROUP_VALUE)
-	  {
-	    Object curName = seq.getNextTypeObject(ipos, xpos);
-	    if (type.isInstance(seq, ipos, xpos, curName))
-	      return true;
-	  }
-	seq.gotoNext(position, 0);
+	if (type.isInstance(seq, ipos, xpos))
+	  return true;
+	int next;
+	int index = ipos >> 1;
+	if (seq instanceof TreeList)
+	  next = ((TreeList) seq).nextNodeIndex(index, -1 >>> 1);
+	else
+	  next = index;
+	if (next != index)
+	  position.ipos = next << 1;
+	else
+	  seq.gotoNext(position, 0);
       }
   }
 
 
   public static void gotoNext(SeqPosition pos)
   {
-    if (pos.sequence == null)
+    AbstractSequence seq = pos.sequence;
+    if (seq == null)
       pos.ipos++;
     else
-      pos.sequence.gotoNext(pos, 0);
+      {
+	int index = pos.ipos >> 1;
+	int next;
+	if (seq instanceof TreeList)
+	  next = ((TreeList) seq).nextNodeIndex(index, -1 >>> 1);
+	else
+	  next = index;
+	if (next != index)
+	  pos.ipos = next << 1;
+	else
+	  seq.gotoNext(pos, 0);
+      }
   }
 
   static final SeqPosition nullPosition
@@ -239,8 +255,8 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	  predicateVar = null;
 	else
 	  {
-	    predicateVar = code.addLocal(typeGroupPredicate);
-	    args[1].compile(comp, typeGroupPredicate);
+	    predicateVar = code.addLocal(typeNodePredicate);
+	    args[1].compile(comp, typeNodePredicate);
 	    code.emitStore(predicateVar);
 	  }
 
@@ -267,7 +283,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	    code.emitLoad(child);
 	  }
 	if (predicateVar == null)
-	  args[1].compile(comp, typeGroupPredicate);
+	  args[1].compile(comp, typeNodePredicate);
 	else
 	  code.emitLoad(predicateVar);
 	if (target instanceof ConsumerTarget)
@@ -309,8 +325,8 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   = typeNamedChildrenFilter.getDeclaredMethod("make", 3);
   static final ClassType typeNamedChildren
     = ClassType.make("gnu.kawa.xml.NamedChildren");
-  static final ClassType typeGroupPredicate
-    = ClassType.make("gnu.lists.GroupPredicate");
+  static final ClassType typeNodePredicate
+    = ClassType.make("gnu.lists.NodePredicate");
   static final ClassType typeSeqPosition = NodeType.nodeType;
   static final Method getNamedChildMethod
     = typeNamedChildren.getDeclaredMethod("getNamedChild", 2);

@@ -12,12 +12,14 @@ public class NamedAttributes extends CpsProcedure
 {
   public static final NamedAttributes namedAttributes = new NamedAttributes();
   
-  public int numArgs() { return 0x3003; }
+  public int numArgs() { return 0x2002; }
 
-  public static void namedAttributes (String namespaceURI, String localName,
-				    TreeList tlist, int index,
-				    Consumer consumer)
+  public static void namedAttributes (QName qname,
+				      TreeList tlist, int index,
+				      Consumer consumer)
   {
+    String namespaceURI = qname.getNamespaceURI();
+    String localName = qname.getLocalName();
     int child = tlist.gotoAttributesStart(index);
     while (child >= 0)
       {
@@ -32,9 +34,9 @@ public class NamedAttributes extends CpsProcedure
 	String curLocalName;
 	if (curName instanceof QName)
 	  {
-	    QName qname = (QName) curName;
-	    curNamespaceURI = qname.getNamespaceURI();
-	    curLocalName = qname.getLocalName();
+	    QName cname = (QName) curName;
+	    curNamespaceURI = cname.getNamespaceURI();
+	    curLocalName = cname.getLocalName();
 	  }
 	else
 	  {
@@ -53,17 +55,17 @@ public class NamedAttributes extends CpsProcedure
       }
   }
 
-  public static void namedAttributes (String namespaceURI, String localName, Object node, Consumer consumer)
+  public static void namedAttributes (QName qname, Object node, Consumer consumer)
   {
     if (node instanceof TreeList)
       {
-	namedAttributes(namespaceURI, localName, (TreeList) node, 0, consumer);
+	namedAttributes(qname, (TreeList) node, 0, consumer);
       }
     else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedAttributes(namespaceURI, localName, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  namedAttributes(qname, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
       }
   }
 
@@ -71,8 +73,7 @@ public class NamedAttributes extends CpsProcedure
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    String namespaceURI = (String) ctx.getNextArg();
-    String localName = (String) ctx.getNextArg();
+    QName qname = (QName) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {
@@ -84,13 +85,13 @@ public class NamedAttributes extends CpsProcedure
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedAttributes(namespaceURI, localName, tlist.getNext(index << 1, null), consumer);
+	      namedAttributes(qname, tlist.getNext(index << 1, null), consumer);
 	    else
-	      namedAttributes(namespaceURI, localName, tlist, index, consumer);
+	      namedAttributes(qname, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);
 	  }
       }
     else
-      namedAttributes(namespaceURI, localName, node, consumer);
+      namedAttributes(qname, node, consumer);
   }
 }

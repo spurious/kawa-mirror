@@ -1,3 +1,24 @@
+2002-04-07  Per Bothner  <per@bothner.com>
+
+	* NamedAttributes.java:  Take single QName argument.
+
+	* ElementType.java (coerceOrNull):  Use NodeType's coerceOrNull.
+	* NamedDescendants.java:  Accept general NodePredicate rather than
+	just a GroupRedpcate.  Should rename class!
+	* NamedChildren.java:  Likewise.
+	(namedChildren):  Use nextNodeIndex.
+
+	* NodeType.java:  Implement NodePredicate and Externalizable.
+	(writeExternal, readExternal):  New methods.
+	(TEXT_OK, GROUP_OK):  New constants.
+	(kinds):  New field.
+	(<init>):  Set kinds field.
+	(emitCoerceFromObject):  Also push value of kinds.
+	(coerceFromObject):  Cal ceorceForce instead of coerce.
+	(isInstance):  New methods.
+	(coerceOrNull, ceorceForce):  New methods.
+	(coerce):  Remove method.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* ElementType.java:  New constructor.

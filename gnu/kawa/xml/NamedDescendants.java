@@ -10,7 +10,7 @@ public class NamedDescendants extends CpsProcedure
  public static final NamedDescendants namedDescendants
    = new NamedDescendants();
 
-  public static void namedDescendants(GroupPredicate predicate,
+  public static void namedDescendants(NodePredicate predicate,
 				      TreeList list, int pos,
 				      Consumer consumer)
   {
@@ -24,13 +24,16 @@ public class NamedDescendants extends CpsProcedure
 	  ((PositionConsumer) consumer).writePosition(list, pos << 1, null);
 	else
 	  {
-	    int next = list.nextDataIndex(pos);
+	    int next = list.nextNodeIndex(pos, -1 >>> 1);
+	    if (pos == next)
+	      next = list.nextDataIndex(pos);
 	    list.consumeRange(pos, next, consumer);
+	    pos = next;
 	  }
       }
   }
 
-  public static void namedDescendants (GroupPredicate predicate,
+  public static void namedDescendants (NodePredicate predicate,
 				       Object node, Consumer consumer)
     throws Throwable
   {
@@ -50,7 +53,7 @@ public class NamedDescendants extends CpsProcedure
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    GroupPredicate predicate = (GroupPredicate) ctx.getNextArg();
+    NodePredicate predicate = (NodePredicate) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {

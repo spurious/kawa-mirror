@@ -1312,7 +1312,7 @@ implements Consumer, PositionConsumer, Consumable
     return index < 0 ? null : objects[index+1];
   }
 
-  protected Object getPosPrevious(int ipos)
+  public Object getPosPrevious(int ipos)
   {
     if ((ipos & 1) != 0 && ipos != -1)
       return getPosNext(ipos - 3);

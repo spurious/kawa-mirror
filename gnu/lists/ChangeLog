@@ -1,3 +1,9 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java.in (getPosPrevious):  Make public.
+	* SubSequence.java (getPosPrevious):  Likewise.
+	* TreeList.java (getPosPrevious):  Likewise.
+
 2003-02-19  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (oindex):  Field moved here from ValuesStack.

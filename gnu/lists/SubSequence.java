@@ -103,7 +103,7 @@ extends AbstractSequence implements Sequence
     return base.getNextKind(ipos);
   }
 
-  protected Object getPosPrevious(int ipos)
+  public Object getPosPrevious(int ipos)
   {
     if (base.compare(ipos, ipos0) <= 0)
       return eofValue;

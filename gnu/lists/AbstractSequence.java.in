@@ -547,7 +547,7 @@ public abstract class AbstractSequence
   /** Get the element before the specified position.
    * @param ipos the specified position.
    * @return the following element, or eofValue if there is none. */
-  protected Object getPosPrevious(int ipos)
+  public Object getPosPrevious(int ipos)
   {
     int index = nextIndex(ipos);
     if (index <= 0)

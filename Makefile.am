@@ -129,13 +129,14 @@ JAVADOC_DIR = $$HOME/Kawa/api
 JAVADOC_PACKAGES = \
   gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists\
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
-  gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard \
+  gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard kawa.lib \
   gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
-  gnu.kawa.xslt gnu.kawa.sax \
-  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.commonlisp.lang
+  gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang \
+  gnu.kawa.models gnu.kawa.swingviews gnu.q2.lang \
+  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
 
 JAVADOC = javadoc
-JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
+JAVADOC_FLAGS = -J-Xmx60m
 # NOTE:  To update javadoc do:
 # make install-javadoc-html
 # cd ~/Kawa/api
@@ -149,10 +150,16 @@ MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 CLEANFILES = *.jar
 
+ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
+JAVADOC_ANT_JARS = /opt/ant/lib/ant.jar
+JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0/jface.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk_3.1.0/ws/gtk/swt.jar
+JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
+
 install-javadoc-html:
 	-mkdir $(JAVADOC_DIR)
 	-#rm `find $(JAVADOC_DIR)/ -name CVS -prune -o '(' '!' -type d ')' -print`
 	-rm `find $(JAVADOC_DIR)/ -name '*.html'`
+	CLASSPATH=$(JAVADOC_EXTRA_PATH):@conf_classpath@$$CLASSPATH \
 	$(JAVADOC) $(JAVADOC_FLAGS) -sourcepath .:$(top_srcdir) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 

@@ -1,5 +1,14 @@
 2005-04-03  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (JAVADOC_PACKAGES): Add a number of new packages.
+	(JAVADOC_FLAGS): Update - we use more memory, at least on jdk 1.4.
+	(install-javadoc-html): Add extra jars to CLASSPATH, for newpackages -
+	Eclipse, ant, and servlets.
+
+	* kawa/package.html: New file, for javadoc.
+	* kawa/lang/package.html: Likewise.
+	* kawa/standard/package.html: Likewise.
+
 	* kawa/lang/SyntaxForm.java: Fix javadoc errors.
 	* kawa/lang/SyntaxTemplate.java: Likewise.
 

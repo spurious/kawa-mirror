@@ -26,7 +26,7 @@ Installing the binary release
 =============================
 The binary release includes only the binary compiled (.class)
 versions of the same .java source files in the source release.
-It does no include any documentation, so you probably want the
+It does not include any documentation, so you probably want the
 source release in addition to the binary release.  The prupose
 of the binary release is just to save you time and trouble
 compiling the sources.
@@ -39,7 +39,7 @@ Assuming it is /usr/local/java, you can do:
 
 	gunzip -c <kawa-0.3-compiled.tar.gz|(cd /usr/local/java; tar xf -)
 
-hen, before you can actually run Kawa, you need to set CLASSPATH so it
+Then, before you can actually run Kawa, you need to set CLASSPATH so it
 includes the Kawa files.  For example:
 
 	export CLASSPATH=.:/usr/local/java:$JDK/lib/classes.zip
@@ -71,7 +71,6 @@ specify that when you run configure:
 	./configure -- prefix $PREFIX
 
 Thus you need to compile all the .java source files.
-(You will need GNU make, due to some unresolved problems.)
 Just run make:
 
 	make
@@ -106,7 +105,7 @@ You start it by typing:
 and the kawa.class file must be in your CLASSPATH.)
 
 You will then get the "kawa>" prompt, which means you are
-in the Java read-evel-print-loop.  If you type a Scheme
+in the Java read-eval-print-loop.  If you type a Scheme
 expression, Kawa will evaluate it.  Kawa will then print the
 result (if there is a non-"void" result).
 
@@ -120,7 +119,7 @@ have been implemented so far.
 
 Missing syntax forms are do, case, quasi-quote, and promise.
 
-There is no macro system,
+There is no macro system.
 
 The only numeric datatypes are fix-width (32-bit) integers, and
 double-precision floats.  Many of the numeric and math functions
@@ -148,7 +147,7 @@ To byte-compile a file foo.scm do:
 	(compile-file "foo.scm" "foo")
 
 This will create "foo.zip", which contains bytecompiled "j-code"
-that implemented "foo.scm".
+that implements "foo.scm".
 
 You can later do:
 
@@ -159,7 +158,7 @@ loading foo.scm, except you will get the byte-compiled versions.
 
 Actually, note that if you type a lambda expression to the
 read-eval-print loop, or there is one in a .scm file you load,
-those procedure will actually be compiled into bytecodes too.
+those procedures will actually be compiled into bytecodes too.
 The evaluator (in the traditional sense) is only used for top-level
 expressions *outside* a lambda.  (It would have been more elegant
 to also byte-compile top-level expressions by surrounding them

@@ -81,7 +81,7 @@ an online copy of R4RS
 (@url{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html}).
 @end ifclear
 
-For copyright information on the software and docuemntation,
+For copyright information on the software and documentation,
 see @ref{License}.
 
 @menu
@@ -349,8 +349,12 @@ java kawa.repl -e '(display (+ 12 4))(newline)'
 @end example
 Either causes Kawa to print @samp{16}, and then exit.
 
-If there is a file in the user's home directory named @code{.kawarc.scm},
-it is executed on startup.  This is done before the read-eval-print loop
+At startup, Kawa executes an init file from the user's home
+directory.
+The init file is named @code{.kawarc.scm} on Unix-like systems
+(those for which the file separator is @code{'/'}),
+and @code{kawarc.scm} on other systems.
+This is done before the read-eval-print loop
 or before the first @code{-f} or @code{-c} argument.  (It is not run
 for a @code{-e} command, to allow you to set options to override
 the defaults.)

@@ -25,9 +25,15 @@ public class PrimApplyExp extends ApplyExp
   {
     Type[] arg_types = proc.argTypes;
     int arg_count = arg_types.length;
-    boolean is_static = proc.method == null || proc.method.getStaticFlag();
+    boolean is_static = proc.getStaticFlag();
     if (args.length != arg_count + (is_static ? 0 : 1))
       throw new Error ("internal error - wrong number of arguments to primitive");
+    if (proc.opcode() == 183) // invokespecial == primitive-constructor
+      {
+	ClassType type = proc.method.getDeclaringClass();
+	comp.method.compile_new (type);
+	comp.method.compile_dup (type);
+      }
     for (int i = 0; i < args.length; ++i)
       {
 	Type arg_type = is_static ? arg_types[i]
@@ -38,11 +44,9 @@ public class PrimApplyExp extends ApplyExp
     
     Type retType = proc.retType;
     if (proc.method == null)
-      comp.method.compile_primop (proc.opcode, args.length, retType);
-    else if (is_static)
-      comp.method.compile_invoke_static (proc.method);
+      comp.method.compile_primop (proc.opcode(), args.length, retType);
     else
-      comp.method.compile_invoke_virtual (proc.method);
+      comp.method.compile_invoke_method (proc.method, proc.opcode());
 
     if (retType == Type.void_type)
       {

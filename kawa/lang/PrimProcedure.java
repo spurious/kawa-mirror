@@ -9,7 +9,9 @@ public class PrimProcedure extends ProcedureN
   Type retType;
   Type[] argTypes;
   Method method;
-  int opcode;
+  int op_code;
+
+  public final int opcode() { return op_code; }
 
   public Object applyN (Object[] args)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
@@ -26,22 +28,31 @@ public class PrimProcedure extends ProcedureN
 
   public PrimProcedure(int opcode, Type retType, Type[] argTypes)
   {
-    this.opcode = opcode;
+    this.op_code = opcode;
     this.retType = retType;
     this.argTypes= argTypes;
   }
 
-  public PrimProcedure(ClassType classtype, String name,
-			 Type retType, Type[] argTypes, int flags)
+  public PrimProcedure(int op_code, ClassType classtype, String name,
+		       Type retType, Type[] argTypes)
   {
-    method = classtype.new_method (name, argTypes, retType, flags);
+    this.op_code = op_code;
+    method = classtype.new_method (name, argTypes, retType,
+				   op_code == 184 ? Access.STATIC : 0);
     this.retType = retType;
     this.argTypes= argTypes;
+  }
+
+  /** Use to compile new followed by constructor. */
+  public PrimProcedure(ClassType classtype, Type[] argTypes)
+  {
+    this(183, classtype, "<init>", Type.void_type, argTypes);
+    this.retType = classtype;
   }
 
   public final boolean getStaticFlag()
   {
-    return method == null || method.getStaticFlag();
+    return method == null || method.getStaticFlag() || op_code == 183;
   }
 
   public final Type[] getParameterTypes() { return argTypes; }
@@ -83,7 +94,7 @@ public class PrimProcedure extends ProcedureN
     if (method == null)
       {
 	buf.append("<op ");
-	buf.append(opcode);
+	buf.append(op_code);
 	buf.append('>');
       }
     else

@@ -1,3 +1,24 @@
+Changes since Kawa 1.5.92
+=========================
+The syntactic form try-catch provides low-level exception
+handler support.  It is basically the same as Java's try/catch
+form, but in Scheme syntax.  The new procedure primitive-throw
+throws an exception object.
+
+The higher-level catch and throw procedures implement
+exception handling where the handler is specified with a "key"
+(a symbol).  These functions were taken from Guile.
+
+The error function has ben generalized to take multiple arguments
+(as in Guile).  It is now a wrapper around (throw 'misc-error ...).
+
+There is now a new Kawa command-line interface.  If you run
+the kawa.GuiConsole application, a new interaction window
+is craeted.  This is uses the AWT TextArea class.  You can
+create multiple "consoles".  They can either share top-level
+enevironments, or have separate environments.  The GuiConsole
+interface has some nice features, including editing.
+
 Changes since Kawa 1.5
 ======================
 The default prompt now shows continuations lines differently.
@@ -14,7 +35,7 @@ A new variable symbol-read-case control how case is handled:
 'D or -" down-cases letters; and 'I inverts case.
 
 The gnu.bytecode package now supports exception handlers,
-and Kawa has preiminary exception handler support:  The new
+and Kawa has preliminary exception handler support:  The new
 synantic form try-finally supports a cleanup hook that is run
 after some other code finishes (normally or abnormally).
 Try-finally is used to implement dynamic-wind and fluid-let.

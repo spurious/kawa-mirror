@@ -1,3 +1,31 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* NamedUnit.java:  New class, extends Unit.
+	* Makefile.am (java_JAVA):  Add NamedUnit.java.
+	* MulUnit.java:  Implement Externalizable.
+	(lookup, make): New static method.
+	(toString):  Emit '^' and '*' for cleaner output syntax.
+	* BaseUnit.java:  Inherit from NamedUnit. Implement Externalizable.
+	(getDimension):  New method.
+	(<init>):  Added default constructor.  Removed BaseUnit(String).
+	(init, lookup):  New helper methods.
+	(make, compare, getDimension):  New methods.
+	(hashCode):  Change to hashCode of name.
+	* Dimensions.java (endDummy):  Replace by Unit.Empty.
+	* Unit.java:  Make abstract.  No longer implement Externalizable.
+	(<init>)  Remove constructores except default constructor.
+	(define):  Removed some overloaded static methods.
+	(unitTable):  Removed field - replaced by table.
+	(table):  New field.
+	(name):  Removed field - now in NamedUnit.
+	(make, getName):  New methods.
+	(mul):  Use new MulUnit.make method.
+	(<unit>(String,Quantity)):  New constructor.
+
+	* IntNum.java (readResolve):  Fix return type to Object.
+
+	* Quantity.java:  Fix doc comments.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (make(int[]):  New method.

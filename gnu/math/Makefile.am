@@ -10,7 +10,7 @@ java_JAVA=\
   Numeric.java \
   Quantity.java DQuantity.java CQuantity.java \
   Complex.java CComplex.java DComplex.java \
-  BaseUnit.java Unit.java MulUnit.java Dimensions.java \
+  NamedUnit.java BaseUnit.java Unit.java MulUnit.java Dimensions.java \
   RealNum.java DFloNum.java \
   RatNum.java \
   IntFraction.java \

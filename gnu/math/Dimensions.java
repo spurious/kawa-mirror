@@ -13,11 +13,11 @@ public class Dimensions
 {
   /** The BaseUnits that this dimension is defined in terms of.
    * The BaseUnits are in order of their index, and the last
-   * element is BaseUnit.endDummy. */
+   * element is Unit.Empty. */
   BaseUnit[] bases;
   
   /** For each baseunit in bases[i], powers[i] is the corresponding exponent.
-   * It is never zero (as long as i is less than the index of endDummy). */    
+   * It is never zero (as long as i is less than the index of Unit.Empty). */    
   short[] powers;
 
   int hash_code;
@@ -26,10 +26,6 @@ public class Dimensions
   private Dimensions chain;
 
   private static Dimensions[] hashTable = new Dimensions[100];
-
-  // This is a marker used to indicate the end of a list of BaseUnits.
-  // Its index is higher than any other BaseUnit.index.
-  static BaseUnit endDummy = new BaseUnit(0x7fffffff);
 
   public final int hashCode () { return hash_code; }
 
@@ -48,7 +44,7 @@ public class Dimensions
   private Dimensions ()
   {
     bases = new BaseUnit[1];
-    bases[0] = endDummy;
+    bases[0] = Unit.Empty;
     enterHash (0);
   }
 
@@ -58,7 +54,7 @@ public class Dimensions
     bases = new BaseUnit[2];
     powers = new short[1];
     bases[0] = unit;
-    bases[1] = endDummy;
+    bases[1] = Unit.Empty;
     powers[0] = 1;
     enterHash (unit.index);
   }
@@ -69,8 +65,8 @@ public class Dimensions
   {
     int a_i = 0, b_i = 0;
     this.hash_code = hash_code;
-    for (a_i = 0;  a.bases[a_i] != endDummy;  a_i++) ;
-    for (b_i = 0;  b.bases[b_i] != endDummy;  b_i++) ;
+    for (a_i = 0;  a.bases[a_i] != Unit.Empty;  a_i++) ;
+    for (b_i = 0;  b.bases[b_i] != Unit.Empty;  b_i++) ;
     int t_i = a_i + b_i + 1;
     bases = new BaseUnit[t_i];
     powers = new short[t_i];
@@ -91,7 +87,7 @@ public class Dimensions
 	    pow = b.powers[b_i] * mul_b;
 	    b_i++;
 	  }
-	else if (b_base == endDummy)
+	else if (b_base == Unit.Empty)
 	  break;
 	else
 	  {
@@ -105,7 +101,7 @@ public class Dimensions
 	bases[t_i] = a_base;
 	powers[t_i++] = (short) pow;
       }
-    bases[t_i] = endDummy;
+    bases[t_i] = Unit.Empty;
     enterHash (hash_code);
   }
 
@@ -130,7 +126,7 @@ public class Dimensions
 	    pow = b.powers[b_i] * mul_b;
 	    b_i++;
 	  }
-	else if (b_base == endDummy)
+	else if (b_base == Unit.Empty)
 	  return bases[t_i] == b_base;
 	else
 	  {
@@ -159,7 +155,7 @@ public class Dimensions
     return new Dimensions (a, mul_a, b, mul_b, hash);
   }
 
-  /** Get the exponent for a BaseUnit in this Dimesnions object. */
+  /** Get the exponent for a BaseUnit in this Dimensions object. */
   public int getPower (BaseUnit unit)
   {
     for (int i = 0; bases[i].index <= unit.index; i++)
@@ -173,7 +169,7 @@ public class Dimensions
   public String toString ()
   {
     StringBuffer buf = new StringBuffer ();
-    for (int i = 0;  bases[i] != endDummy;  i++)
+    for (int i = 0;  bases[i] != Unit.Empty;  i++)
       {
 	if (i > 0)
 	  buf.append('*');

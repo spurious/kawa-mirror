@@ -8,10 +8,10 @@ import java.io.*;
  * @author	Per Bothner
  */
 
-public class Unit extends Quantity implements Externalizable
+public abstract class Unit extends Quantity
 {
-  String name;
   Dimensions dims;
+  /** The value of this Unit is factor*dims. */
   double factor;
   MulUnit products;
 
@@ -19,11 +19,16 @@ public class Unit extends Quantity implements Externalizable
       Same as the value of the dimensions() only. */
   Unit base;
 
+  /** A hash table of named Units. */
+  static NamedUnit[] table = new NamedUnit[100];
+
   public final Dimensions dimensions() { return dims; }
 
   public final double doubleValue() { return factor; }
 
   public int hashCode () { return dims.hashCode (); }
+
+  public String getName() { return null; }
 
   static Unit mul (Unit unit1, int power1, Unit unit2, int power2)
   {
@@ -83,15 +88,7 @@ public class Unit extends Quantity implements Externalizable
 		      unit1, power1 + munit2.power2 * power2);
       }
 
-    // Search for an existing matching MulUnit.
-    for (MulUnit u = unit1.products;  u != null;  u = u.next)
-      {
-	if (u.unit1 == unit1 && u.unit2 == unit2
-	    && u.power1 == power1 && u.power2 == power2)
-	  return u;
-      }
-    // Did not find a match - create one.
-    return new MulUnit (unit1, power1, unit2, power2);
+    return MulUnit.make(unit1, power1, unit2, power2);
   }
 
   public static Unit mul (Unit unit1, Unit unit2)
@@ -114,51 +111,19 @@ public class Unit extends Quantity implements Externalizable
     factor = 1.0;
   }
 
-  public Unit (String name, double factor, Dimensions dims)
+  public static NamedUnit make (String name, Quantity value)
   {
-    this.name = name;
-    this.factor = factor;
-    this.dims = dims;
-  }
-
-  public Unit (String name, DQuantity value)
-  {
-    this (name, value.doubleValue(), value.unit().dimensions());
-  }
-
-  public Unit (String name, double factor, Unit base)
-  {
-    this (name, factor * base.doubleValue(), base.dimensions());
-  }
-
-  public static Unit define (String name, Quantity value)
-  {
-    if (value.imValue() != 0.0)
-      throw new ArithmeticException("defining "+name+" using complex value");
-    Unit unit = new Unit (name, value.reValue(), value.unit().dimensions());
-    unitTable.put (name, unit);
-    return unit;
+    return NamedUnit.make(name, value);
   }
 
   public static Unit define (String name, DQuantity value)
   {
-    Unit unit = new Unit (name, value);
-    unitTable.put (name, unit);
-    return unit;
-  }
-
-  public static Unit define (String name, double factor, Dimensions dims)
-  {
-    Unit unit = new Unit (name, factor, dims);
-    unitTable.put (name, unit);
-    return unit;
+    return new NamedUnit (name, value);
   }
 
   public static Unit define (String name, double factor, Unit base)
   {
-    Unit unit = new Unit (name, factor, base);
-    unitTable.put (name, unit);
-    return unit;
+    return new NamedUnit (name, factor, base);
   }
 
   public Complex number() { return DFloNum.one(); }
@@ -179,11 +144,12 @@ public class Unit extends Quantity implements Externalizable
     throw new RuntimeException ("unimplemented Unit.sqrt");
   }
 
-  public static java.util.Hashtable unitTable = new java.util.Hashtable ();
+  public static BaseUnit Empty = new BaseUnit();
+  static { Dimensions.Empty.bases[0] = Empty; }
 
-  public static Unit Empty = new Unit ();
-  static {
-    Empty.dims = Dimensions.Empty;
+  public static NamedUnit lookup (String name)
+  {
+    return NamedUnit.lookup(name);
   }
 
   public String toString (double val)
@@ -214,6 +180,7 @@ public class Unit extends Quantity implements Externalizable
 
   public String toString ()
   {
+    String name = getName();
     if (name != null)
       return name;
     else if (this == Unit.Empty)
@@ -225,32 +192,6 @@ public class Unit extends Quantity implements Externalizable
   public Unit unit ()
   {
     return this;
-  }
-
-  public static Unit lookup (String name)
-  {
-    return (Unit) unitTable.get (name);
-  }
-
-  /**
-   * @serialData Write the unit name (using writeUTF).
-   *   Not sure if this is the right approach.
-   */
-
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    out.writeUTF(name);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    name = in.readUTF();
-  }
-
-  public Unit readResolve() throws ObjectStreamException
-  {
-    return lookup(name);
   }
 
   public static final BaseUnit meter = new BaseUnit ("m", "Length");

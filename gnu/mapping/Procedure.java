@@ -146,6 +146,14 @@ public abstract class Procedure implements Named
     return new Setter(this);
   }
 
+  public void setSetter (Procedure setter)
+  {
+    if (this instanceof HasSetter)
+      throw new RuntimeException("procedure '"+getName()+
+				 "' has builtin setter - cannot be modified");
+    setProperty(Procedure.setterKey, setter);
+  }
+
   /** If HasSetter, the Procedure is called in the LHS of an assignment. */
   public void set0(Object result) throws Throwable
   {

@@ -12,6 +12,8 @@
 	(readExternal):  Set constraint even for uninterned Symbol.
 	Intern name if non-null.
 
+	* Procedure.java (setSetter):  New method.
+
 2002-10-28  Per Bothner  <bothner@bothner.com>
 
 	* Binding.java:  Renamed to Symbol.java.

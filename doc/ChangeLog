@@ -1,3 +1,7 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Change Cygnus -> Red Hat as appropriate.
+
 2001-03-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa.1):  Allow kawa.man in $(srcdir).

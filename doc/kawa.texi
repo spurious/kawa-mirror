@@ -58,8 +58,6 @@ R. Alexander Milowski @w{<alex@@copsol.com>}.
 
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.
-The @uref{http://www.cygnus.com/~bothner/kawa.html, old Kawa home page}
-should also work.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
@@ -165,15 +163,15 @@ Debian package file of Kawa.
 
 You can also check out the very latest version via anonymous cvs.
 @example
-cvs -d :pserver:anoncvs@@anoncvs.cygnus.com:/cvs/kawa login
+cvs -d :pserver:anoncvs@@sources.redhat.com:/cvs/kawa login
      (password is ``anoncvs'')
-cvs -d :pserver:anoncvs@@anoncvs.cygnus.com:/cvs/kawa co kawa
+cvs -d :pserver:anoncvs@@sources.redhat.com:/cvs/kawa co kawa
 @end example
 
 Once you have it checked out, you can update it with @code{cvs update}.
 
 You can also
-@uref{http://anoncvs.cygnus.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
+@uref{http://sources.redhat.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
 the cvs archive} via cvsweb.
 
 @node Installation, Running, Getting Kawa, Top
@@ -3579,7 +3577,7 @@ This mailing list is used for reporting bugs, patches, discussing
 changes to Kawa, and announcing snapshots.  If you wish to subscribe,
 send a blank message request to @code{kawa-subscribe@@sources.redhat.com}.
 To unsubscribe, send a blank message to
-@code{kawa-unsubscribe@@sourcware.cygnus.com}.  (If your mail is forwarded,
+@code{kawa-unsubscribe@@sources.redhat.com}.  (If your mail is forwarded,
 send mail to the address following @code{mailto:} in the
 @code{List-Unsubscribe} line in the messages you get form the list.)
 
@@ -3658,7 +3656,7 @@ GNU General Public License for more details.
 These classes are free software.  You can use and re-distribute a class
 without restriction (in source or binary form) as long as you use a
 version that has not been modified in any way from a version released
-by Per Bothner, Cygnus Solutions, or the Free Software Foundation.
+by Per Bothner, Red Hat inc, or the Free Software Foundation.
 You may make and distribute a modified version, provided you follow
 the terms of the GNU General Public License; either version 2,
 or (at your option) any later version.
@@ -3671,7 +3669,7 @@ People have asked what the Kawa license means in practice.
 Informally, you get to pick between these choices:
 @enumerate
 @item
-Use Kawa as distributed by Per Bothner, Cygnus Solutions, or the
+Use Kawa as distributed by Per Bothner, Red Hat Inc, or the
 Free Software Foundation (or their approved agents),
 with no modifications.  In that case, you can use Kawa for any
 purpose you like, and distribute your application with any license

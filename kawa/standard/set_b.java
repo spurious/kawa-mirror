@@ -20,8 +20,11 @@ public class set_b extends Syntax implements Printable
     if (! (match[0] instanceof Symbol))
       return interp.syntaxError ("first set! argument is not a variable name");
     Symbol sym = (Symbol) match[0];
-    SetExp sexp = new SetExp (sym, interp.rewrite (match[1]));
+    Expression value = interp.rewrite (match[1]);
+    SetExp sexp = new SetExp (sym, value);
     sexp.binding = interp.resolve (sym);
+    if (sexp.binding != null)
+      sexp.binding.noteValue (value);
     return sexp;
   }
 

@@ -24,7 +24,7 @@ public class SetApplyExp extends ApplyExp
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     ((ApplyExp) exp.func).args[0].compile(comp, Target.pushObject);
-    comp.method.compile_checkcast (comp.scmProcedureType);
+    comp.method.compile_checkcast (comp.typeProcedure);
     // Number of arguments, not counting the rhs value.
     int args_length = exp.args.length - 1;
 
@@ -64,7 +64,7 @@ public class SetApplyExp extends ApplyExp
 
   static synchronized Method getSetMethod (int arg_count)
   {
-    ClassType proc = Compilation.scmProcedureType;
+    ClassType proc = Compilation.typeProcedure;
     if (arg_count == 0)
       {
 	if (set0Method == null)

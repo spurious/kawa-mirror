@@ -273,7 +273,7 @@ public class ApplyExp extends Expression
       {
 	code.emitLoad(comp.callStackContext);
 	code.emitDup(comp.callStackContext.getType());
-	exp.func.compile(comp, new StackTarget(comp.scmProcedureType));
+	exp.func.compile(comp, new StackTarget(comp.typeProcedure));
 	code.emitPutField(comp.procCallStackField);
 	code.emitDup(comp.callStackContext.getType());
 	//  evaluate args to frame-locals vars;  // may recurse! 
@@ -284,7 +284,18 @@ public class ApplyExp extends Expression
       }
 
     if (!tail_recurse)
-      exp.func.compile (comp, new StackTarget(comp.scmProcedureType));
+      {
+	Expression func = exp.func;
+	ReferenceExp rfunc;
+	if (func instanceof ReferenceExp	
+	    && (rfunc = (ReferenceExp) func).binding == null)
+	  {
+	    code.emitGetStatic(comp.getBindingField(rfunc.symbol));
+	    code.emitInvokeSpecial(Compilation.getProcedureBindingMethod);
+	  }
+	else
+	  func.compile (comp, new StackTarget(comp.typeProcedure));
+      }
 
     if (args_length <= 4
 	|| (tail_recurse

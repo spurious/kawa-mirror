@@ -163,7 +163,7 @@ public class LambdaExp extends ScopeExp
   public final boolean isClassGenerated ()
   {
     return (! getInlineOnly()
-	    && (getCanRead() || Compilation.usingTailCalls()));
+	    && (getCanRead() || isHandlingTailCalls()));
   }
 
   public final boolean isHandlingTailCalls ()
@@ -173,12 +173,12 @@ public class LambdaExp extends ScopeExp
 
   public final boolean variable_args () { return max_args < 0; }
 
-  ClassType type = Compilation.scmProcedureType;
+  ClassType type = Compilation.typeProcedure;
 
   /** Return the ClassType of the Procedure this is being compiled into. */
   public ClassType getCompiledClassType()
   {
-    if (type == Compilation.scmProcedureType)
+    if (type == Compilation.typeProcedure)
       throw new Error("internal error: getCompileClassType");
     return type;
   }
@@ -621,7 +621,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    // i is the register to use for the current parameter
 	    Declaration decl = (Declaration) var;
-	    if (var.isSimple ())
+	    if (var.isSimple () && ! decl.isIndirectBinding())
 	      {
 		// For a simple parameter not captured by an inferior lambda,
 		// just allocate it in the incoming register.  This case also
@@ -749,14 +749,15 @@ public class LambdaExp extends ScopeExp
       {
 	if (var.isParameter () && ! var.isArtificial ())
 	  {
-	    if (argsArray != null || ! var.isSimple())
+	    Declaration param = (Declaration) var;
+	    if (argsArray != null || ! var.isSimple()
+		|| param.isIndirectBinding())
 	      {
 		// If the parameter is captured by an inferior lambda,
 		// then the incoming parameter needs to be copied into its
 		// slot in the heapFrame.  Thus we emit an aaload instruction.
 		// Unfortunately, it expects the new value *last*,
 		// so first push the heapFrame array and the array index.
-		Declaration param = (Declaration) var;
 		if (!param.isSimple ())
 		  {
 		    param.loadOwningObject(comp);
@@ -821,7 +822,9 @@ public class LambdaExp extends ScopeExp
 		// Now finish copying the incoming argument into its
 		// home location.
 		param.getType().emitCoerceFromObject(code);
-		if (param.isSimple ())
+		if (param.isIndirectBinding())
+		  param.pushIndirectBinding(comp);
+		if (param.isSimple())
 		  code.emitStore(param);
 		else
 		  code.emitPutField(param.field);
@@ -986,7 +989,10 @@ public class LambdaExp extends ScopeExp
 	prevMode = mode;
       }
     ps.print(") ");
-    body.print (ps);
+    if (body == null)
+      ps.print("<null body>");
+    else
+      body.print (ps);
     ps.print(")");
   }
 

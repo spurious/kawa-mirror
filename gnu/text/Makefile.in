@@ -197,7 +197,7 @@ DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' \
 
 
 java_sources = \
-  Char.java PrettyWriter.java \
+  Char.java PrettyWriter.java Options.java \
   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
   QueueReader.java SourceMessages.java NullReader.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \

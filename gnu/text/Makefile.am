@@ -3,7 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
-  Char.java PrettyWriter.java \
+  Char.java PrettyWriter.java Options.java \
   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
   QueueReader.java SourceMessages.java NullReader.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \

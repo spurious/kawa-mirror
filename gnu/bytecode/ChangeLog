@@ -1,3 +1,10 @@
+2003-04-04  Per Bothner  <per@bothner.com>
+
+	* Access.java (toString(int,char)):  New overloaded method.
+	Allows printing 'super' instead of 'synchronized' for a class.
+	* ClassTypeWriter.java printClassInfo, printFields, printMethods):
+	Use new method.
+
 2003-03-13  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (getSP):  New method.

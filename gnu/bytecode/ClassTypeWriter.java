@@ -67,7 +67,7 @@ public class ClassTypeWriter extends PrintWriter
     println();
     print("Access flags:");
     int modifiers = ctype.getModifiers();
-    print(Access.toString(modifiers));
+    print(Access.toString(modifiers, 'C'));
     println();
     print("This class: ");
     printOptionalIndex(ctype.thisClassIndex);
@@ -114,7 +114,7 @@ public class ClassTypeWriter extends PrintWriter
 	if (field.name_index != 0)
 	  printOptionalIndex(field.name_index);
 	print(field.getName());
-	print(Access.toString(field.flags));
+	print(Access.toString(field.flags, 'F'));
 	print(" Signature: ");
 	if (field.signature_index != 0)
 	  printOptionalIndex(field.signature_index);
@@ -141,7 +141,7 @@ public class ClassTypeWriter extends PrintWriter
 	print('\"');
 	print(method.getName());
 	print('\"');
-	print(Access.toString(method.access_flags));
+	print(Access.toString(method.access_flags, 'M'));
 	print(" Signature: ");
 	if (method.signature_index != 0)
 	  printOptionalIndex(method.signature_index);

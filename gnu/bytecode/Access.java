@@ -23,13 +23,22 @@ public class Access {
 
   public static String toString(int flags)
   {
+    return toString(flags, '\0');
+  }
+
+  /** Return a string naming the access bits in flags.
+   * @param kind 'C' for a class, 'M' for a method, 'F' for a field.
+   */
+  public static String toString(int flags, char kind)
+  {
     StringBuffer buf = new StringBuffer();
     if ((flags & PUBLIC) != 0)      buf.append(" public");
     if ((flags & PRIVATE) != 0)     buf.append(" private");
     if ((flags & PROTECTED) != 0)   buf.append(" protected");
     if ((flags & STATIC) != 0)      buf.append(" static");
     if ((flags & FINAL) != 0)       buf.append(" final");
-    if ((flags & SYNCHRONIZED) != 0)buf.append(" synchronized");
+    if ((flags & SYNCHRONIZED) != 0)
+      buf.append(kind == 'C' ? " super" : " synchronized");
     if ((flags & VOLATILE) != 0)    buf.append(" volatile");
     if ((flags & TRANSIENT) != 0)   buf.append(" transient");
     if ((flags & NATIVE) != 0)      buf.append(" native");

@@ -70,7 +70,7 @@ public class TracedProcedure extends ProcedureN
 	out.println(")");
 
         // Now do the actual call, but with the indentation incremented.
-        gnu.mapping.Future context = gnu.mapping.Future.getContext();
+        CallContext context = CallContext.getInstance();
         FluidBinding oldBindings = context.fluidBindings;
         IntNum newIndentation = IntNum.make(curIndent+indentationStep);
         FluidBinding newBindings

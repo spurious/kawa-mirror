@@ -1,3 +1,16 @@
+2002-02-12  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main, getInterpreterFromFilenameExtension,
+	getInterpreter):  Call CallContext.setMainContext.
+	* kawa/Shell.java (run):  Call CallContext.getInstance.
+	* kawa/standard/TracedProcedure.java (applyN):  Likewise.
+	* kawa/standard/load.java (loadSource):  Likewise.
+	* kawa/lang/Eval.java (evalBody, eval):  Call CallContext.getInstance.
+	Set/restore CallContext's consumer.
+	
+	* kawa/standard/load.java (loadClassFile):  Explicitly check
+	for Runable rather than just cast to ModuleBody.
+
 2002-02-11  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Link testsuite/scribble.html.in to scribble.html.

@@ -29,19 +29,39 @@ public class Eval extends Procedure1or2
 				 SourceMessages messages)
     throws Throwable
   {
-    CallContext ctx = new CallContext();
-    ctx.values = Values.noArgs;
-    evalBody(body, env, messages, ctx);
-    return Values.make((gnu.lists.TreeList) ctx.vstack);
+    CallContext ctx = CallContext.getInstance();
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = ctx.vstack;
+	ctx.values = Values.noArgs;
+	evalBody(body, env, messages, ctx);
+	return Values.make((gnu.lists.TreeList) ctx.vstack);
+      }
+    finally
+      {
+	ctx.vstack.clear();
+	ctx.consumer = save;
+      }
   }
 
   public static Object eval (Object sexpr, Environment env)
         throws Throwable
   {
-    CallContext ctx = new CallContext();
-    ctx.values = Values.noArgs;
-    eval(sexpr, env, ctx);
-    return Values.make((gnu.lists.TreeList) ctx.vstack);
+    CallContext ctx = CallContext.getInstance();
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = ctx.vstack;
+	ctx.values = Values.noArgs;
+	eval(sexpr, env, ctx);
+	return Values.make((gnu.lists.TreeList) ctx.vstack);
+      }
+    finally
+      {
+	ctx.vstack.clear();
+	ctx.consumer = save;
+      }
   }
 
   public static void evalBody (Object body, Environment env,

@@ -193,7 +193,7 @@ public class Shell
     Lexer lexer = interp.getLexer(inp, messages);
     if (inp instanceof TtyInPort)  // Wrong for the case of '-f' '-'.
       lexer.setInteractive(true);
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
     if (out != null)
       {

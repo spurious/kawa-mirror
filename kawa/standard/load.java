@@ -24,7 +24,8 @@ public class load extends Procedure1 {
 	Class clas = Class.forName (name);
 	Object inst = clas.newInstance ();
 	gnu.kawa.reflect.ClassMemberConstraint.defineAll(inst, env);
-	((ModuleBody)inst).run();
+	if (inst instanceof Runnable)
+	  ((Runnable)inst).run();
       }
     catch (ClassNotFoundException ex)
       {
@@ -139,10 +140,18 @@ public class load extends Procedure1 {
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (messages.seenErrors())
 	  throw new SyntaxException(messages);
-	CallContext ctx = new CallContext();
-	ctx.consumer = out;
-	ctx.values = Values.noArgs;
-	mexp.evalModule(env, ctx);
+	CallContext ctx = CallContext.getInstance();
+	Consumer save = ctx.consumer;
+	try
+	  {
+	    ctx.consumer = out;
+	    ctx.values = Values.noArgs;
+	    mexp.evalModule(env, ctx);
+	  }
+	finally
+	  {
+	    ctx.consumer = save;
+	  }
       }
     out.endDocument();
   }

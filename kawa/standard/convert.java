@@ -15,7 +15,7 @@ public class convert extends Procedure2 implements Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     if (args.length != 2)
@@ -24,9 +24,9 @@ public class convert extends Procedure2 implements Inlineable
     Type type = Scheme.getTypeValue(args[0]);
     if (type != null)
       {
-	args[1].compile(comp, 0);
+	args[1].compile(comp, Target.pushObject);
 	type.emitCoerceFromObject(comp.getCode());
-	
+	target.compileFromStack(comp, type);
       }
     else
       {
@@ -39,11 +39,10 @@ public class convert extends Procedure2 implements Inlineable
 					      gnu.bytecode.Access.PUBLIC);
 	  }
 
-	args[0].compile(comp, 0, typeType);
-	args[1].compile(comp, 0);
+	args[0].compile(comp, typeType);
+	args[1].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(coerceMethod);
+	target.compileFromStack(comp, Type.pointer_type);
       }
-    if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
   }
 }

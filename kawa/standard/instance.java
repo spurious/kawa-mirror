@@ -13,14 +13,14 @@ public class instance extends Procedure2 implements Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method instanceMethod;
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
     Type type = Scheme.getTypeValue(args[1]);
     if (type != null)
       {
-	args[0].compile(comp, 0);	
+	args[0].compile(comp, Target.pushObject);
 	type.emitIsInstance(code);
       }
     else
@@ -33,13 +33,10 @@ public class instance extends Procedure2 implements Inlineable
 						Scheme.booleanType,
 						gnu.bytecode.Access.PUBLIC);
 	  }
-	args[1].compile(comp, 0, typeType);
-	args[0].compile(comp, 0);
+	args[1].compile(comp, typeType);
+	args[0].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(instanceMethod);
       }
-    if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
-    else
-      Scheme.booleanType.emitCoerceToObject(code);
+    target.compileFromStack(comp, Scheme.booleanType);
   }
 }

@@ -24,11 +24,11 @@ public class prim_throw extends Procedure1 implements Inlineable
 
   private static ClassType javaThrowableType;
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     // Check that exp.args.length == 1.  FIXME!
     gnu.bytecode.CodeAttr code = comp.getCode();
-    exp.getArgs()[0].compile(comp, 0);
+    exp.getArgs()[0].compile(comp, Target.pushObject);
     if (javaThrowableType == null)
       javaThrowableType = new ClassType("java.lang.Throwable");
     code.emitCheckcast(javaThrowableType);

@@ -1,3 +1,7 @@
+2004-12-20  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (selfEvaluatingSymbol): New method.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	Update for new Symbol/Location handling.

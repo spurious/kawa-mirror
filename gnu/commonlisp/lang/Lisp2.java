@@ -45,6 +45,11 @@ public abstract class Lisp2 extends LispInterpreter
     return true;
   }
 
+  public boolean selfEvaluatingSymbol (Object obj)
+  {
+    return obj instanceof Keyword || obj == TRUE | obj == FALSE;
+  }
+
   public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
   {
     if (Compilation.typeProcedure.getReflectClass()

@@ -54,6 +54,9 @@ public class Scheme extends Interpreter
   static Environment r5_environment;
   static Environment user_environment;
 
+  public static Syntax beginSyntax;
+  public static Syntax defineSyntax;
+
   // FIX transitinal hack - should create new user env each time
   public static Environment makeEnvironment ()
   {
@@ -78,7 +81,7 @@ public class Scheme extends Interpreter
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new kawa.lang.Quote ());
-      define_syntax ("define", "kawa.standard.define");
+      define ("define", defineSyntax = new kawa.standard.define());
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
@@ -91,7 +94,8 @@ public class Scheme extends Interpreter
       define_syntax ("let", "kawa.lib.std_syntax");
       define_syntax ("let*", "kawa.lib.std_syntax");
       define_syntax ("letrec", "kawa.standard.letrec");
-      define_syntax ("begin", "kawa.standard.begin");
+
+      define ("begin", beginSyntax = new kawa.standard.begin());
       define_syntax ("do", "kawa.lib.std_syntax");
       define_syntax ("delay", "kawa.lib.std_syntax");
       define_proc ("%make-promise", "kawa.standard.make_promise");

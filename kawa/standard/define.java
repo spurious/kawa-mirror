@@ -11,6 +11,9 @@ public class define extends Syntax implements Printable
 {
   public Expression rewrite (Object obj, Translator tr)
   {
+    Symbol name = null;
+    Expression value = null;
+
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
@@ -19,10 +22,8 @@ public class define extends Syntax implements Printable
 	    Pair p2 = (Pair) p1.cdr;
 	    if (p2.cdr == List.Empty)
 	      {
-		SetExp result = new SetExp ((Symbol)p1.car,
-					    tr.rewrite (p2.car));
-		result.setDefining (true);
-		return result;
+		name = (Symbol)p1.car;
+		value = tr.rewrite (p2.car);
 	      }
 	  }
 	else if (p1.car instanceof Pair)
@@ -30,7 +31,7 @@ public class define extends Syntax implements Printable
 	    Pair p2 = (Pair) p1.car;
 	    if (p2.car instanceof Symbol)
 	      {
-		Symbol name = (Symbol) p2.car;
+		name = (Symbol) p2.car;
 		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
@@ -39,12 +40,29 @@ public class define extends Syntax implements Printable
 		    lexp.setFile (pp.getFile ());
 		    lexp.setLine (pp.getLine (), pp.getColumn ());
 		  }
-		SetExp result = new SetExp (name, lexp);
-		result.setDefining (true);
-		return result;
+		value = lexp;
 	      }
 	  }
       }
-    return tr.syntaxError ("invalid syntax for define");
+    if (name == null)
+      return tr.syntaxError ("invalid syntax for define");
+    if (tr.currentScope() instanceof ModuleExp)
+      {
+	SetExp result = new SetExp (name, value);
+	result.setDefining (true);
+	return result;
+      }
+    else
+      {
+	Object binding = tr.current_decls.get (name);
+	// Hygenic macro expansion may bind a renamed (uninterned) Symbol
+	// to the original Symbol.
+	if (binding == null || binding instanceof Symbol)
+	  return tr.syntaxError ("invalid use of define");
+	SetExp sexp = new SetExp (name, value);
+	sexp.binding = tr.resolve (name, (Declaration) binding);
+	sexp.binding.noteValue (value);
+	return sexp;
+      }
   }
 }

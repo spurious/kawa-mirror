@@ -86,12 +86,24 @@ public class load extends Procedure1 {
   public final static Object loadSource (InPort port, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Translator tr = new Translator (env);
-    ModuleExp mexp = CompileFile.read (port, tr);
-    mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
-    if (tr.errors > 0)
-      throw new GenericError ("syntax errors during load");
-    return ((ModuleBody) mexp.eval (env)).run (env);
+    // Reading the entire file and evaluting it as a unit is more
+    // consistent with compiled code, and more eifficient.
+    // Unfortunately, it is difficult to get macros to work properly.
+    // So instead, we read and evaluate each line individually.
+    if (true)
+      {
+	kawa.Shell.run (port, env, false, false);
+	return Scheme.voidObject;
+      }
+    else
+      {
+	Translator tr = new Translator (env);
+	ModuleExp mexp = CompileFile.read (port, tr);
+	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
+	if (tr.errors > 0)
+	  throw new GenericError ("syntax errors during load");
+	return ((ModuleBody) mexp.eval (env)).run (env);
+      }
   }
 
   public final Object apply1 (Object arg1)

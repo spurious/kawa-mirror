@@ -50,6 +50,9 @@ public class define_syntax extends Syntax
 
     SyntaxRules rules
       = new SyntaxRules (literal_identifiers, pair.cdr, tr);
+    // Add rules to translation environment.
+    tr.addGlobal(keyword, rules);
+    // Add rules to execution environment.
     SetExp result = new SetExp (keyword, new QuoteExp (rules));
     result.setDefining (true);
     return result;

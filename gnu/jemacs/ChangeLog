@@ -1,3 +1,8 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* lisp:  New directory (and package).
+	To be used for Emacs Lisp files.
+
 1999-08-08  Per Bothner  <per@bothner.com>
 
 	New package.

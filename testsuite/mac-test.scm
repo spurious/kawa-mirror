@@ -1,4 +1,4 @@
-(test-init "macros" 39)
+(test-init "macros" 40)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -132,3 +132,11 @@
 	(map (cute + (begin (set! a (+ a 1)) a) <>)
 	     '(1 2))
 	a))
+
+(define-syntax test-set
+ (syntax-rules ()
+   ((test-set)
+    (let ((s 1))
+      (set! s (+ s 1))
+      s))))
+(test 2 'est-set (test-set))

@@ -1,3 +1,7 @@
+2003-04-01  Vladimir Tsichevski <wowa@jet.msk.su>
+
+	* mac-test.scm:  Check set! in macro code.
+
 2003-03-24  Per Bothner  <per@bothner.com>
 
 	New testcase based on bug report from Chris Dean 2003-03-23.

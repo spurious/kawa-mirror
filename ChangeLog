@@ -1,5 +1,8 @@
 2002-01-23  Per Bothner  <per@bothner.com>
 
+	* build.xml:  Add enable-xml flag, to build xml-related classes.
+	* build.properties:  Add/document enable-xml.
+
 	* configure.in (AC_OUTPUT):  Also make gnu/kawa/brl/Makefile.
 
 	* kawa/Shell.java (run):  Call Lexer's setInteractive if TtyInPort.

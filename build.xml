@@ -57,7 +57,7 @@
   <target name="classes" 
           depends="java-classes, lib-scm-classes
           , slib-scm-classes, commonlisp-scm-classes
-          , servlet-classes, jemacs-classes" />
+          , xml-classes, servlet-classes, jemacs-classes" />
   
   <!-- 
      These are the files that are Kawa.    
@@ -153,6 +153,8 @@
     -->
     <property name="enable-jemacs" value="${with-swing}"/>
 
+    <property name="enable-xml" value="true"/>
+
     <!--
        If javax.servlet.http.HttpServlet is in the classpath, then we'll
        compile Kawa' servlet interface, unless you override enable-servlet.
@@ -169,6 +171,7 @@
         with-awt=${with-awt}
         with-swing=${with-swing}
         enable-jemacs=${enable-jemacs}
+        enable-xml=${enable-xml}
         enable-servlet=${enable-servlet}
     </echo>
 
@@ -391,9 +394,6 @@
       <include name="gnu/mapping/"/>
       <include name="gnu/math/"/>
       <include name="gnu/text/"/>
-      <include name="gnu/xml/"/>
-      <include name="gnu/xquery/lang/"/>
-      <include name="gnu/xquery/util/"/>
       <include name="kawa/lang/"/>
       <include name="kawa/standard/"/>
       <include name="kawa/"/>
@@ -510,6 +510,22 @@
     </apply>
   </target>
   
+  <target name="xml-classes" 
+          depends="build-settings, java-classes" 
+          if="${enable-xml}">
+    <javac srcdir="${src.dir}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}" >
+      <include name="gnu/xml/"/>
+      <include name="gnu/kawa/xml/"/>
+      <include name="gnu/xquery/lang/"/>
+      <include name="gnu/xquery/util/"/>
+      <include name="gnu/kawa/brl/"/>
+    </javac>
+  </target>
+
   <target name="servlet-classes" 
           depends="build-settings, java-classes" 
           if="${enable-servlet}">

@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Method {
+public class Method implements AttrContainer {
   private String name;
   Type[] arg_types;
   
@@ -18,6 +18,11 @@ public class Method {
   /* A chain of labels.  Unsorted, except that the Label with
      the lowest element in fixups must be the first one. */
   Label labels;
+
+  Attribute attributes;
+  public final Attribute getAttributes () { return attributes; }
+  public final void setAttributes (Attribute attributes)
+  { this.attributes = attributes; }
 
   /* True if we cannot fall through to bytes[PC] -
      the previous instruction was an uncondition control transfer.  */

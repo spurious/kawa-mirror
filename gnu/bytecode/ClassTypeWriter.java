@@ -54,6 +54,15 @@ public class ClassTypeWriter extends PrintWriter
     printMethods();
   }
 
+  public void printAttributes (AttrContainer container)
+  {
+    for (Attribute attr = container.getAttributes();
+	 attr != null;  attr = attr.next)
+      {
+	attr.print(this);
+      }
+  }
+
   void printClassInfo ()
   {
     println();
@@ -114,6 +123,7 @@ public class ClassTypeWriter extends PrintWriter
 	  printOptionalIndex(field.signature_index);
 	printSignature(field.type.getSignature());
 	println();
+	printAttributes(field);
       }
   }
 
@@ -146,6 +156,7 @@ public class ClassTypeWriter extends PrintWriter
 	print(')');
 	printSignature(method.return_type.getSignature());
 	println();
+	printAttributes(method);
       }
   }
 

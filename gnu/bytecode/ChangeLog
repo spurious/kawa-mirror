@@ -1,3 +1,14 @@
+Fri Sep 26 21:12:29 1997  Per Bothner  <bothner@cygnus.com>
+
+	* Attribute.java, AttrContainer.java, MiscAttr.java,
+	SourceFileAttr.java, dump.java:  New classes.
+	* Makefile.am, Makefile.in:  Update for new classes and new automake.
+	* ClassFileInput.java:  Add support for reading Attributes.
+	(main):  Moved to new dump.java.
+	* ClassTypeWriter.java:  Add support for printing Attributes.
+	* ClassType.java, Field.java, Method.java:  Implement AttrContainer.
+	* ClassType.java:  Move some stuff to SourceFileAttr.java.
+
 Fri Sep 26 21:01:25 1997  Per Bothner  <bothner@cygnus.com>
 
 	* CpoolUtf8.java (intern):  New method.

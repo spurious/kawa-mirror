@@ -32,7 +32,9 @@ code (i.e. there is no dis-assembler yet),
 You can also build a ClassType by reading it from an existing .class
 file by using a ClassFileInput class.  This reads the constant
 pool, the fields, methods, superclass, and interfaces;  however
-it currently skips the attributes (including the code attribute).
+it currently skips many of the attributes (including the code attribute).
+The gnu.bytecode.dump class has a main method that prints out
+the information in a named class file.
 
 Zip archive manager
 -------------------

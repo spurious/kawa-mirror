@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class ClassType extends Type {
+public class ClassType extends Type implements AttrContainer {
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
@@ -43,9 +43,12 @@ public class ClassType extends Type {
   int[] interfaceIndexes;
   public int access_flags;
 
+  Attribute attributes;
+  public final Attribute getAttributes () { return attributes; }
+  public final void setAttributes (Attribute attributes)
+    { this.attributes = attributes; }
+
   String sourcefile;
-  /** The index of the SourceFile attribute (if > 0). */ 
-  int sourcefileIndex;
 
   boolean emitDebugInfo = true;
 
@@ -80,7 +83,7 @@ public class ClassType extends Type {
   /** Set the name of the SourceFile associated with this class. */
   public void setSourceFile (String name)
   {
-    sourcefile = name;
+    SourceFileAttr.setSourceFile(this, name);
   }
 
   /**
@@ -125,9 +128,6 @@ public class ClassType extends Type {
 
   /** Constant pool index of "LineNumberTable". */
   int LineNumberTable_name_index;
-
-  /** Constant pool index of "SourceFile". */
-  int SourceFile_name_index;
 
   /**
    * Add a new field to this class.
@@ -246,11 +246,7 @@ public class ClassType extends Type {
       method.assign_constants ();
       method.finalize_labels ();
     }
-    if (sourcefile != null)
-      sourcefileIndex = constants.addUtf8(sourcefile).index;
-    if (SourceFile_name_index == 0 && sourcefileIndex > 0)
-      SourceFile_name_index = constants.addUtf8("SourceFile").index;
-
+    Attribute.assignConstants(this, this);
   }
 
   public void writeToStream (OutputStream stream)
@@ -292,14 +288,7 @@ public class ClassType extends Type {
     for (Method method = methods;  method != null;  method = method.next)
       method.write (dstr, this);
 
-    int attributes_count = sourcefileIndex > 0 ? 1 : 0;
-    dstr.writeShort (attributes_count);
-    if (sourcefileIndex > 0)
-      {
-	dstr.writeShort (SourceFile_name_index);
-	dstr.writeInt (2);
-	dstr.writeShort (sourcefileIndex);
-      }
+    Attribute.writeAll (this, dstr);
   }
 
   public void writeToFile (String filename)

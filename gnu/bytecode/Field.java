@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Field {
+public class Field implements AttrContainer {
   private String name;
   public Type type;
   int name_index; /* Index in constant table, or 0 if un-assigned */
@@ -12,6 +12,11 @@ public class Field {
   int constant_value_index; /* If non-0, cpool index of constant value. */
   int flags;
   Field next;
+
+  Attribute attributes;
+  public final Attribute getAttributes () { return attributes; }
+  public final void setAttributes (Attribute attributes)
+    { this.attributes = attributes; }
 
   public final String getSignature () { return type.getSignature (); }
 

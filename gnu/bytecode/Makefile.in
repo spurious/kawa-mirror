@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.1g from Makefile.am
+# Makefile.in generated automatically by automake 1.2 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 
@@ -32,18 +32,33 @@ pkgincludedir = $(includedir)/@PACKAGE@
 
 top_builddir = ../..
 
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
-TOP_BUILDDIR = @TOP_BUILDDIR@
-JAVA = @JAVA@
-PACKAGE = @PACKAGE@
-VERSION = @VERSION@
-EXTRA_OBJ = @EXTRA_OBJ@
-JAVA_VERSION = @JAVA_VERSION@
+
+NORMAL_INSTALL = true
+PRE_INSTALL = true
+POST_INSTALL = true
+NORMAL_UNINSTALL = true
+PRE_UNINSTALL = true
+POST_UNINSTALL = true
+EXEEXT = @EXEEXT@
 EXTRA_MISC = @EXTRA_MISC@
+EXTRA_OBJ = @EXTRA_OBJ@
+JAVA = @JAVA@
+JAVA_VERSION = @JAVA_VERSION@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -57,6 +72,8 @@ javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
 Access.class \
+Attribute.class \
+AttrContainer.class \
 ArrayType.class \
 ClassType.class \
 ConstantPool.class \
@@ -72,7 +89,9 @@ Field.class \
 IfState.class \
 Label.class \
 Method.class \
+MiscAttr.class \
 Scope.class \
+SourceFileAttr.class \
 Type.class \
 Variable.class \
 VarEnumerator.class \
@@ -80,7 +99,8 @@ ZipArchive.class \
 ZipMember.class \
 ZipLoader.class \
 ClassFileInput.class \
-ClassTypeWriter.class
+ClassTypeWriter.class \
+dump.class
 
 java_DATA=$(OBJ)
 
@@ -92,35 +112,40 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DATA =  $(java_DATA)
 
-DIST_COMMON =  README COPYING ChangeLog Makefile.am Makefile.in README
+DIST_COMMON =  README COPYING ChangeLog Makefile.am Makefile.in
 
 
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(MANS) $(EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
+GZIP = --best
 default: all
 
+.SUFFIXES:
+.SUFFIXES: .class .java
+$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/bytecode/Makefile
 
-$(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
-
-Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
+
 install-javaDATA: $(java_DATA)
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	list='$(java_DATA)'; for p in $$list; do \
+	@list='$(java_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p"; \
 	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
 	  else if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(javadir)/$$p"; \
 	    $(INSTALL_DATA) $$p $(javadir)/$$p; \
 	  fi; fi; \
 	done
 
 uninstall-javaDATA:
+	$(NORMAL_UNINSTALL)
 	list='$(java_DATA)'; for p in $$list; do \
 	  rm -f $(javadir)/$$p; \
 	done
@@ -131,6 +156,7 @@ TAGS:
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = gnu/bytecode
+
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
@@ -141,23 +167,24 @@ distdir: $(DISTFILES)
 info:
 dvi:
 check: all
+	$(MAKE)
 installcheck:
 install-info:
 install-exec: 
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 
 install-data: install-javaDATA
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
 
 uninstall: uninstall-javaDATA
 
-all: $(DATA) Makefile
+all: Makefile $(DATA)
 
 install-strip:
-	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
+	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
 	$(mkinstalldirs)  $(javadir)
 
@@ -170,7 +197,7 @@ clean-generic:
 
 distclean-generic:
 	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log stamp-h
+	rm -f config.cache config.log stamp-h stamp-h[0-9]*
 	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
@@ -178,17 +205,17 @@ maintainer-clean-generic:
 	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean:  mostlyclean-generic
 
-clean:  clean-generic mostlyclean 
+clean:  clean-generic mostlyclean
 
-distclean:  distclean-generic clean 
+distclean:  distclean-generic clean
 	rm -f config.status
 
-maintainer-clean:  maintainer-clean-generic distclean 
+maintainer-clean:  maintainer-clean-generic distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
 .PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi check installcheck install-info install-exec install-data install \
+dvi installcheck install-info install-exec install-data install \
 uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
@@ -198,8 +225,6 @@ maintainer-clean
 	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
 
 all: $(OBJ)
-.SUFFIXES:
-.SUFFIXES: .java .class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

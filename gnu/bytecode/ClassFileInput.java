@@ -17,6 +17,12 @@ public class ClassFileInput extends DataInputStream
   ClassType ctype;
   InputStream str;
 
+  public ClassFileInput (InputStream str)
+       throws IOException
+  {
+    super(str);
+  }
+
   public ClassFileInput (ClassType ctype, InputStream str)
        throws IOException, ClassFormatError
   {
@@ -28,7 +34,7 @@ public class ClassFileInput extends DataInputStream
     readClassInfo();
     readFields();
     readMethods();
-    readAttributes();
+    readAttributes(ctype);
   }
 
   public boolean readHeader () throws IOException
@@ -83,18 +89,46 @@ public class ClassFileInput extends DataInputStream
       }
   }
 
-  public int readAttributes () throws IOException
+  public int readAttributes (AttrContainer container) throws IOException
   {
     int count = readUnsignedShort();
+    Attribute last = container.getAttributes();
     for (int i = 0;  i < count;  i++)
-      readAttribute();
+      {
+	if (last != null)
+	  {
+	    for (;;)
+	      {
+		Attribute next = last.getNext();
+		if (next == null)
+		  break;
+		last = next;
+	      }
+	  }
+	
+	int index = readUnsignedShort();
+	CpoolUtf8 nameConstant = (CpoolUtf8)
+	  ctype.constants.getForced(index, ConstantPool.UTF8);
+	int length = readInt();
+	nameConstant.intern();
+	Attribute attr = readAttribute(nameConstant.string, length, container);
+	if (attr != null)
+	  {
+	    if (attr.getNameIndex() == 0)
+	      attr.setNameIndex(index);
+	    if (last == null)
+	      container.setAttributes(attr);
+	    else
+	      last.setNext(attr);
+	    last = attr;
+	  }
+      }
     return count;
   }
 
-  public void readAttribute () throws IOException
+  public final void skipAttribute (int length)
+    throws IOException
   {
-    int index = readUnsignedShort();
-    int length = readInt();
     int read = 0;
     while (read < length)
       {
@@ -107,6 +141,21 @@ public class ClassFileInput extends DataInputStream
 	    skipped = 1;
 	  }
 	read += skipped;
+      }
+  }
+
+  public Attribute readAttribute (String name, int length, AttrContainer container)
+    throws IOException
+  {
+    if (name == "SourceFile" && container instanceof ClassType)
+      {
+	return new SourceFileAttr(readUnsignedShort(), (ClassType) container);
+      }
+    else
+      {
+	byte[] data = new byte[length];
+	readFully(data, 0, length);
+	return new MiscAttr(name, data);
       }
   }
 
@@ -124,9 +173,9 @@ public class ClassFileInput extends DataInputStream
 	CpoolUtf8 sigConstant = (CpoolUtf8)
 	  constants.getForced(descriptorIndex, ConstantPool.UTF8);
 	Type type = Type.signatureToType(sigConstant.string);
-	ctype.addField(nameConstant.string, type, flags);
+	Field fld = ctype.addField(nameConstant.string, type, flags);
 		       
-	readAttributes();
+	readAttributes(fld);
       }
   }
 
@@ -143,44 +192,9 @@ public class ClassFileInput extends DataInputStream
 	  constants.getForced(nameIndex, ConstantPool.UTF8);
 	CpoolUtf8 sigConstant = (CpoolUtf8)
 	  constants.getForced(descriptorIndex, ConstantPool.UTF8);
-	ctype.addMethod(nameConstant.string, sigConstant.string, flags);
-		       
-	readAttributes();
-      }
-  }
-
-  public static void usage()
-  {
-    System.err.println("Usage: foo.class");
-    System.exit(-1);
-  }
-
-  /** Reads a .class file, and prints out the contents to System.out.
-   * Very rudimentary - prints out the constant pool, and field and method
-   * names and types, but no attributes (i.e. no dis-assembly yet).
-   * @param args One argument - the name of a .class file.
-   */
-  public static void main (String[] args)
-  {
-    if (args.length == 0)
-      usage();
-    String filename = args[0];
-    try
-      {
-	java.io.InputStream inp = new FileInputStream(filename);
-	ClassType ctype = new ClassType();
-	ClassFileInput in = new ClassFileInput(ctype, inp);
-	ClassTypeWriter.print(ctype, System.out, 0);
-      }
-    catch (java.io.FileNotFoundException e)
-      {
-	System.err.println("File "+filename+" not found");
-	System.exit(-1);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println(e);
-	System.exit(-1);
+	Method meth = ctype.addMethod(nameConstant.string,
+				      sigConstant.string, flags);
+	readAttributes(meth);
       }
   }
 }

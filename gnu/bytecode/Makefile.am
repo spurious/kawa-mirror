@@ -15,6 +15,8 @@ javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
 Access.class \
+Attribute.class \
+AttrContainer.class \
 ArrayType.class \
 ClassType.class \
 ConstantPool.class \
@@ -30,7 +32,9 @@ Field.class \
 IfState.class \
 Label.class \
 Method.class \
+MiscAttr.class \
 Scope.class \
+SourceFileAttr.class \
 Type.class \
 Variable.class \
 VarEnumerator.class \
@@ -38,7 +42,8 @@ ZipArchive.class \
 ZipMember.class \
 ZipLoader.class \
 ClassFileInput.class \
-ClassTypeWriter.class
+ClassTypeWriter.class \
+dump.class
 
 java_DATA=$(OBJ)
 

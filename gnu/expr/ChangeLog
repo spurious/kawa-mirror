@@ -1,3 +1,8 @@
+2003-04-19  Per Bothner  <per@bothner.com>
+
+	* ResolveNames.java:  New class, extends ExpWalker.
+	* Makefile.am (java_sources):  Update.
+
 2003-04-19  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* ModuleMethod.java (match):  Allow null as parameter.
@@ -18,7 +23,7 @@
 	and if function isn't read.
 
 	* NameLookup.java:  New class.
-	* Makefile.am (java_sources0:  Update.
+	* Makefile.am (java_sources):  Update.
 
 2003-04-14  Per Bothner  <per@bothner.com>
 

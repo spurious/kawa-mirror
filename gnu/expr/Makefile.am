@@ -42,6 +42,7 @@ java_sources = \
   ModuleExp.java \
   NameLookup.java \
   PairClassType.java \
+  ResolveNames.java \
   ObjectExp.java \
   QuoteExp.java \
   PrimProcedure.java \

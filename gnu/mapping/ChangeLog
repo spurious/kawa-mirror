@@ -1,3 +1,11 @@
+2005-02-18  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java: Improve garbage-collability.
+	(DYNAMIC): New constant.
+	(<init>):  Use DYNAMIC as property for "anonymous" fluids.
+	(class LocationRef): New helper class, with finalize method.
+	(getLocation): Use LocationRef for "anonymous" fluids.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* IndirectableLocation.java (setAlias): New method.

@@ -11,6 +11,8 @@ public class ThreadLocation extends Location
   final Symbol name;
   final Object property;
   static int counter;
+  /** Used as a "property" key for an anonymous fluid binding. */
+  static final Object DYNAMIC = new Symbol("(dynamic)", null);
   private static synchronized int nextCounter() { return ++counter; }
 
   Location global;
@@ -21,11 +23,18 @@ public class ThreadLocation extends Location
   // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
   /* #endif */
 
+  /** A new anonymous fluid location. */
   public ThreadLocation ()
   {
-    this.name = new Symbol("param#"+nextCounter());
-    this.property = this;
-    this.global = new SharedLocation(this.name, null, 0);
+    this(new Symbol("param#"+nextCounter()));
+  }
+
+  /** A new anonymous fluid location but used a given name for printing.
+   * However, the binding is not bound to the name as a visible binding. */
+  public ThreadLocation (Symbol name)
+  {
+    this.name = name;
+    this.property = DYNAMIC;
   }
 
   public ThreadLocation (Symbol name, Object property, Location global)
@@ -44,16 +53,16 @@ public class ThreadLocation extends Location
   /** Get the thread-specific Location for this Location. */
   public Location getLocation ()
   {
-    Location loc;
+    Object entry;
     /* #ifdef JAVA2 */
-    loc = (Location) thLocal.get();
+    entry = (Location) thLocal.get();
     /* #else */
-    // loc = threadMap.get(Thread.currentThread());
+    // entry = threadMap.get(Thread.currentThread());
     /* #endif */
-    if (loc == null)
+    if (entry == null)
       {
 	Environment env = Environment.getCurrent();
-	loc = env.getLocation(name, property);
+	Location loc = env.getLocation(name, property);
 	if (global != null && loc instanceof IndirectableLocation)
 	  {
 	    IndirectableLocation iloc = (IndirectableLocation) loc;
@@ -63,13 +72,27 @@ public class ThreadLocation extends Location
 		  iloc.setBase(global);
 	      }
 	  }
+	
+	if (property == DYNAMIC)
+	  {
+	    LocationRef lref = new LocationRef();
+	    lref.sym = name;
+	    lref.env = env;
+	    lref.loc = loc;
+	    entry = lref;
+	  }
+	else
+	  entry = loc;
 	/* #ifdef JAVA2 */
-	thLocal.set(loc);
+	thLocal.set(entry);
 	/* #else */
-	// threadMap.put(Thread.currentThread(), loc);
+	// threadMap.put(Thread.currentThread(), entry);
 	/* #endif */
       }
-    return loc;
+    if (entry instanceof LocationRef)
+      return ((LocationRef) entry).loc;
+    else
+      return (Location) entry;
   }
 
   public Object get (Object defaultValue)
@@ -111,5 +134,17 @@ public class ThreadLocation extends Location
     ThreadLocation tloc = new ThreadLocation(name, property, null);
     loc.base = tloc;
     return tloc;
+  }
+}
+
+class LocationRef
+{
+  Environment env;
+  Location loc;
+  Symbol sym;
+
+  public void finalize ()
+  {
+    env.remove(sym, ThreadLocation.DYNAMIC);
   }
 }

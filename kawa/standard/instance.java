@@ -41,4 +41,9 @@ public class instance extends Procedure2 implements Inlineable
       }
     target.compileFromStack(comp, Scheme.booleanType);
   }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Scheme.booleanType;
+  }
 }

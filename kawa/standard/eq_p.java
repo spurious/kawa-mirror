@@ -59,4 +59,8 @@ public class eq_p extends Procedure2 implements Inlineable {
       }
   }
 
+  public Type getReturnType (Expression[] args)
+  {
+    return Scheme.booleanType;
+  }
 }

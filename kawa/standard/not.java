@@ -38,4 +38,9 @@ public class not extends Procedure1 implements Inlineable
 	IfExp.compile(arg, QuoteExp.falseExp, QuoteExp.trueExp, comp, target);
       }
   }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Scheme.booleanType;
+  }
 }

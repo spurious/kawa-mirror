@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.bytecode.ClassType;
+import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
@@ -32,5 +32,10 @@ public class prim_throw extends Procedure1 implements Inlineable
       javaThrowableType = new ClassType("java.lang.Throwable");
     code.emitCheckcast(javaThrowableType);
     code.emitThrow();
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Type.void_type;
   }
 }

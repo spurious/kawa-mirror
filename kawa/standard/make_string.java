@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -19,15 +20,15 @@ public class make_string extends kawa.lang.Named implements kawa.lang.Executable
    ) throws kawa.lang.WrongArguments,
             kawa.lang.WrongType
    {
-      if (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)arglist;
+      if (arglist instanceof Pair) {
+         Pair pair = (Pair)arglist;
 
          if (pair.car instanceof java.lang.Integer) {
             int count = ((java.lang.Integer)pair.car).intValue();
             char c = 0;
-            if (pair.cdr instanceof kawa.lang.pair) {
-               kawa.lang.pair second = (kawa.lang.pair)pair.cdr;
-               if (second.cdr instanceof kawa.lang.snull) {
+            if (pair.cdr instanceof Pair) {
+               Pair second = (Pair)pair.cdr;
+               if (second.cdr == List.Empty) {
                   if (second.car instanceof java.lang.Character) {
                      c = ((java.lang.Character)second.car).charValue();
                   } else {

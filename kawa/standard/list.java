@@ -18,7 +18,7 @@ public class list extends ProcedureN
   {
     Object result = Interpreter.nullObject;
     for (int i = args.length;  --i >= 0; )
-      result = new pair (args[i], result);
+      result = new Pair (args[i], result);
     return result;
   }
 }

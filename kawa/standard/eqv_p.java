@@ -22,8 +22,6 @@ public class eqv_p extends kawa.lang.Procedure2
       return ((Integer)arg1).intValue () == ((Integer)arg2).intValue ();
     else if (arg1 instanceof Character && arg2 instanceof Character)
       return ((Character)arg1).charValue() == ((Character)arg2).charValue ();
-    else if (arg1 instanceof snull && arg2 instanceof snull)
-      return true;
     return false;
    }
 

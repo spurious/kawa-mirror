@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -17,24 +18,24 @@ public class letrec extends kawa.lang.Named implements kawa.lang.Syntaxable {
              kawa.lang.GenericError,
              kawa.lang.UnboundSymbol
    {
-      if (formo instanceof kawa.lang.pair) {
-         kawa.lang.pair form = (kawa.lang.pair)formo;
+      if (formo instanceof Pair) {
+         Pair form = (Pair)formo;
          Object obj1 = form.car;
          Object obj2 = form.cdr;
-         if (obj1 instanceof kawa.lang.pair) {
+         if (obj1 instanceof Pair) {
             java.util.Hashtable frame = new java.util.Hashtable();
 
             //-- Bind dummy values
             Object bobj = obj1;
-            while (bobj instanceof kawa.lang.pair) {
-               kawa.lang.pair blist = (kawa.lang.pair)bobj;
-               if (blist.car instanceof kawa.lang.pair) {
-                  kawa.lang.pair binding = (kawa.lang.pair)blist.car;
-                  if (binding.car instanceof kawa.lang.symbol && 
-                      binding.cdr instanceof kawa.lang.pair) {
-                     kawa.lang.pair vpair = (kawa.lang.pair)binding.cdr;
-                     if (vpair.cdr instanceof kawa.lang.snull) {
-                        frame.put(((kawa.lang.symbol)binding.car).toString(),kawa.lang.Interpreter.falseObject);
+            while (bobj instanceof Pair) {
+               Pair blist = (Pair)bobj;
+               if (blist.car instanceof Pair) {
+                  Pair binding = (Pair)blist.car;
+                  if (binding.car instanceof kawa.lang.Symbol && 
+                      binding.cdr instanceof Pair) {
+                     Pair vpair = (Pair)binding.cdr;
+                     if (vpair.cdr == List.Empty) {
+                        frame.put(((Symbol)binding.car).toString(),kawa.lang.Interpreter.falseObject);
                      } else {
                         throw new kawa.lang.GenericError("Malformed let binding.");
                      }
@@ -49,12 +50,12 @@ public class letrec extends kawa.lang.Named implements kawa.lang.Syntaxable {
 
             //-- Bind values
             bobj = obj1;
-            while (bobj instanceof kawa.lang.pair) {
-               kawa.lang.pair blist = (kawa.lang.pair)bobj;
-               kawa.lang.pair binding = (kawa.lang.pair)blist.car;
-               kawa.lang.pair vpair = (kawa.lang.pair)binding.cdr;
+            while (bobj instanceof Pair) {
+               Pair blist = (Pair)bobj;
+               Pair binding = (Pair)blist.car;
+               Pair vpair = (Pair)binding.cdr;
                Object value = i.eval(vpair.car,frames);
-               frame.put(((kawa.lang.symbol)binding.car).toString(),value);
+               frame.put(((Symbol)binding.car).toString(),value);
                bobj = blist.cdr;
             } 
 
@@ -62,8 +63,8 @@ public class letrec extends kawa.lang.Named implements kawa.lang.Syntaxable {
             frames.addElement(frame);
 
             Object result = kawa.lang.Interpreter.undefinedObject;
-            while (obj2 instanceof kawa.lang.pair) {
-               kawa.lang.pair pair = (kawa.lang.pair)obj2;
+            while (obj2 instanceof Pair) {
+               Pair pair = (Pair)obj2;
                result = i.eval(pair.car,frames);
                obj2 = pair.cdr;
             }

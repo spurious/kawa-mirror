@@ -1,10 +1,5 @@
 package kawa.standard;
-
-//-- Exceptions
-import kawa.lang.WrongArguments;
-
-import kawa.lang.Named;
-import kawa.lang.Executable;
+import kawa.lang.*;
 
 public class minus_oper extends kawa.lang.Named implements kawa.lang.Executable {
    public kawa.standard.minus_oper() {
@@ -16,9 +11,9 @@ public class minus_oper extends kawa.lang.Named implements kawa.lang.Executable 
              kawa.lang.WrongType,
              kawa.lang.GenericError
    {
-      if (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair top = (kawa.lang.pair)arglist;
-         if (top.cdr instanceof kawa.lang.pair) {
+      if (arglist instanceof Pair) {
+         Pair top = (Pair)arglist;
+         if (top.cdr instanceof Pair) {
             if (top.car instanceof java.lang.Number) {
                boolean isInteger;
                int ival = 0;
@@ -32,8 +27,8 @@ public class minus_oper extends kawa.lang.Named implements kawa.lang.Executable 
                }
                int count = 2;
                arglist = top.cdr;
-               while (arglist instanceof kawa.lang.pair) {
-                  top = (kawa.lang.pair)arglist;
+               while (arglist instanceof Pair) {
+                  top = (Pair)arglist;
                   if (top.car instanceof java.lang.Integer) {
                      if (isInteger) {
                         ival += ((java.lang.Integer)top.car).intValue();

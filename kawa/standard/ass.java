@@ -1,55 +1,40 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongType;
+public class ass extends Procedure2
+{
+  protected kawa.lang.Procedure2 compare;
+  protected java.lang.String usage;
+  public ass (String name, Procedure2 comp)
+  {
+    super(name);
+    compare = comp;
+    usage = new String("("+name+" obj list)");
+  }
 
-import kawa.lang.Procedure2;
+  public Object apply2 (Object arg1, Object arg2)
+       throws WrongType, WrongArguments, GenericError, UnboundSymbol
+  {
+    while (arg2 instanceof Pair)
+      {
+	Pair list = (Pair)arg2;
 
-public class ass extends kawa.lang.Procedure2 {
-   protected kawa.lang.Procedure2 compare;
-   protected java.lang.String usage;
-   public kawa.standard.ass(java.lang.String name,kawa.lang.Procedure2 comp) {
-      super(name);
-      compare = comp;
-      usage = new java.lang.String("("+name+" obj list)");
-   }
+	if (! (list.car instanceof Pair))
+            throw new GenericError
+	      ("The association list contains non-pair elements.");
+	Pair pair = (Pair) list.car;
 
-   public Object apply2 (Object arg1, Object arg2)
-       throws kawa.lang.WrongType,
-            kawa.lang.WrongArguments,
-            kawa.lang.GenericError,
-            kawa.lang.UnboundSymbol
-   {
-      if (arg2 instanceof kawa.lang.pair) {
-         kawa.lang.pair list = (kawa.lang.pair)arg2;
+	Boolean check = (Boolean) compare.apply2 (pair.car, arg1);
 
-         if (!(list.car instanceof kawa.lang.pair)) {
-            throw new kawa.lang.GenericError("The association list contains non-pair elements.");
-         }
+	if (check.booleanValue())
+	  return pair;
 
-         do {
-            java.lang.Boolean check = (java.lang.Boolean)compare.apply2(((kawa.lang.pair)list.car).car, arg1);
-
-            if (check.booleanValue()) {
-               return list.car;
-            } 
-
-            if (list.cdr instanceof kawa.lang.pair) {
-               list = (kawa.lang.pair)list.cdr;
-               if (!(list.car instanceof kawa.lang.pair)) {
-                  throw new kawa.lang.GenericError("The association list contains non-pair elements.");
-               }
-            } else {
-               list = null;
-            }
-
-         } while (list!=null);
-
-         return kawa.lang.Interpreter.falseObject;
-      } else if (arg2 instanceof kawa.lang.snull) {
-         return kawa.lang.Interpreter.falseObject;
-      } else {
-         throw new kawa.lang.WrongType(this.name,2,"list");
+	arg2 = list.cdr;
       }
-   }
+
+    if (arg2 == List.Empty)
+      return Interpreter.falseObject;
+    else
+      throw new WrongType(this.name,2,"list");
+  }
 }

@@ -1,39 +1,36 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
-import kawa.lang.WrongType;
+public class apply extends ProcedureN
+{
+  public apply()
+  {
+    super("apply");
+  }
 
-import kawa.lang.Procedure2;
-
-public class apply extends kawa.lang.Named {
-   public kawa.standard.apply() {
-      super("apply");
-   }
-
-   public Object execute(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object list
-   ) 
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol
-   {
-      if (list instanceof kawa.lang.pair) {
-         kawa.lang.pair p1 = (kawa.lang.pair)list;
-         if (p1.cdr instanceof kawa.lang.pair) {
-            kawa.lang.pair p2 = (kawa.lang.pair)p1.cdr;
-            if (p2.cdr instanceof kawa.lang.snull) {
-               return i.apply(p1.car,p2.car, frames);
-            }
-         }
-      } 
-      throw new kawa.lang.WrongArguments(this.name,2,"(?)");
-   }
-
-   public void print(java.io.PrintStream ps) {
-      ps.print("#<kawa.standard.apply>");
-   }
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    int count = args.length;
+    if (count < 2)
+      throw new WrongArguments(this.name,2,"(apply proc [args] args)");
+    if (! (args[0] instanceof Procedure))
+      throw new WrongType(this.name,1,"procedure");
+    Procedure proc = (Procedure) args[0];
+    Object last = args[count-1];
+    int last_count = kawa.standard.length.length (last);
+    Object[] proc_args = new Object[last_count + (count - 2)];
+    int i;
+    for (i = 0; i < count - 2; i++)
+      proc_args[i] = args[i+1];
+    while (last instanceof Pair)
+      {
+	Pair pair = (Pair) last;
+	proc_args[i++] = pair.car;
+	last = pair.cdr;
+      }
+    if (last != List.Empty)
+      throw new WrongType(this.name,count-1,"list");
+    return proc.applyN (proc_args);
+  }
 }

@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.GenericError;
@@ -6,7 +7,8 @@ import kawa.lang.WrongType;
 
 import kawa.lang.Procedure1;
 
-public class cadr extends kawa.lang.Procedure1 {
+public class cadr extends Procedure1
+{
    public kawa.standard.cadr() {
       super("cadr");
    }
@@ -15,10 +17,10 @@ public class cadr extends kawa.lang.Procedure1 {
      throws kawa.lang.WrongType,
             kawa.lang.GenericError
    {
-      if (arg1 instanceof kawa.lang.pair) {
-         arg1 = ((kawa.lang.pair)arg1).cdr;          
-         if (arg1 instanceof kawa.lang.pair) {
-            return ((kawa.lang.pair)arg1).car;
+      if (arg1 instanceof Pair) {
+         arg1 = ((Pair)arg1).cdr;          
+         if (arg1 instanceof Pair) {
+            return ((Pair)arg1).car;
          } else {
             throw new kawa.lang.GenericError("Result of the cdr not a pair.");
          }

@@ -1,10 +1,5 @@
 package kawa.standard;
-
-//-- Exceptions
-import kawa.lang.WrongArguments;
-
-import kawa.lang.Named;
-import kawa.lang.Executable;
+import kawa.lang.*;
 
 public class multiply_oper extends kawa.lang.Named implements kawa.lang.Executable {
    public kawa.standard.multiply_oper() {
@@ -20,8 +15,8 @@ public class multiply_oper extends kawa.lang.Named implements kawa.lang.Executab
       double dval = 0.0;
       boolean isInteger = true;
       int count = 1;
-      while (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)arglist;
+      while (arglist instanceof Pair) {
+         Pair pair = (Pair)arglist;
          if (pair.car instanceof java.lang.Integer) {
             if (isInteger) {
                ival = ival * ((java.lang.Integer)pair.car).intValue();

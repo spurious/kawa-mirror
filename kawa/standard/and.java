@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -16,11 +17,11 @@ public class and extends kawa.lang.Named implements kawa.lang.Executable {
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType
    {
-      if (arglist instanceof kawa.lang.pair) {
+      if (arglist instanceof Pair) {
          boolean b = true;
          int index = 1;
-         while (b && arglist instanceof kawa.lang.pair) {
-            kawa.lang.pair pair = (kawa.lang.pair)arglist;
+         while (b && arglist instanceof Pair) {
+            Pair pair = (Pair)arglist;
             if (!((java.lang.Boolean)pair.car).booleanValue()) {
                b = false;
             }

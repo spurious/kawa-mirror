@@ -1,51 +1,29 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
-import kawa.lang.WrongType;
+public class string extends ProcedureN
+{
+  public kawa.standard.string()
+  {
+    super("string");
+  }
 
-import kawa.lang.Named;
-import kawa.lang.Executable;
-
-public class string extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.string() {
-      super("string");
-   }
-
-   public Object execute(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arglist
-   ) throws kawa.lang.WrongArguments,
-            kawa.lang.WrongType
-   {
-      int count = 0;
-      Object o = arglist;
-      while (o instanceof kawa.lang.pair) {
-         count++;
-         if (((kawa.lang.pair)o).car instanceof java.lang.Character) {
-            o = ((kawa.lang.pair)o).cdr;
-         } else {
-            throw new kawa.lang.WrongType(this.name,count,"character");
-         }
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    int count = args.length;
+    //-- TODO: Hack... allocated two times.
+    char value[] = new char[count];
+    for (int i = 0; i < count; i++)
+      {
+	Object arg = args[i];
+	if (arg instanceof java.lang.Character)
+	  value[i] = ((java.lang.Character)arg).charValue();
+	else
+	  throw new WrongType (this.name,count,"character");
       }
-
-      //-- TODO: Hack... allocated two times.
-      char value[] = new char[count];
-      int index = 0;
-
-      o = arglist;
-      while (o instanceof kawa.lang.pair) {
-         count++;
-         value[index] = ((java.lang.Character)((kawa.lang.pair)o).car).charValue();
-         index++;
-         o = ((kawa.lang.pair)o).cdr;
-      }
-
-      StringBuffer foo = new java.lang.StringBuffer();
-      foo.append(value);
-      return foo;
-
-   }
-
+    StringBuffer foo = new java.lang.StringBuffer();
+    foo.append(value);
+    return foo;
+  }
 }

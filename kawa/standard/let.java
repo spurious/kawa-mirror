@@ -24,13 +24,13 @@ public class let extends Syntax implements Printable
     Declaration[] decls = new Declaration [decl_count];
     for (int i = 0; i < decl_count; i++)
       {
-	pair bind_pair = (pair) bindings;
+	Pair bind_pair = (Pair) bindings;
 	Object[] bind_match = pattern2.match (bind_pair.car);
 	if (bind_match == null)
 	throw new WrongArguments("let", 2, "(let ((var init)...) body)");
-	if (! (bind_match[0] instanceof symbol))
+	if (! (bind_match[0] instanceof Symbol))
 	  throw new WrongArguments("let", 2, "(let ((var init)...) body) [var is not an identifier]");
-	decls[i] = new Declaration ((kawa.lang.symbol) bind_match[0]);
+	decls[i] = new Declaration ((Symbol) bind_match[0]);
 	decls[i].index = i;
 	inits[i] = interp.rewrite (bind_match[1]);
 	bindings = bind_pair.cdr;

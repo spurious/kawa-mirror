@@ -1,11 +1,5 @@
 package kawa.standard;
-
-//-- Exceptions
-import kawa.lang.WrongArguments;
-
-import kawa.lang.Executable;
-import kawa.lang.Named;
-import java.io.PrintStream;
+import kawa.lang.*;
 
 public class less_oper extends kawa.lang.Named implements kawa.lang.Executable {
    public kawa.standard.less_oper() {
@@ -16,15 +10,15 @@ public class less_oper extends kawa.lang.Named implements kawa.lang.Executable {
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType
    {
-      if (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)arglist;
+      if (arglist instanceof Pair) {
+         Pair pair = (Pair)arglist;
 
-         if (pair.cdr instanceof kawa.lang.pair) {
+         if (pair.cdr instanceof Pair) {
             boolean retval = true;
-            pair = (kawa.lang.pair)pair.car;
+            pair = (Pair)pair.car;
             java.lang.Number last = null;
             int count = 1;
-            while (retval && pair.cdr instanceof kawa.lang.pair) {
+            while (retval && pair.cdr instanceof Pair) {
                if (last==null) {
                   if (pair.car instanceof java.lang.Number) {
                      last = (java.lang.Number)pair.car;
@@ -39,7 +33,7 @@ public class less_oper extends kawa.lang.Named implements kawa.lang.Executable {
                } else {
                   throw new kawa.lang.WrongType(this.name,count,"number");
                }
-               pair = (kawa.lang.pair)pair.cdr;
+               pair = (Pair)pair.cdr;
                count++;
             }
             if (retval) {

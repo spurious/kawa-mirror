@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -18,17 +19,17 @@ public class equal_oper extends kawa.lang.Named implements kawa.lang.Executable 
    ) throws kawa.lang.WrongArguments,
             kawa.lang.WrongType
    {
-      if (arglist instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)arglist;
+      if (arglist instanceof Pair) {
+         Pair pair = (Pair)arglist;
 
-         if (pair.cdr instanceof kawa.lang.pair) {
+         if (pair.cdr instanceof Pair) {
             boolean isequal = true;
             java.lang.Number first = null;
             double dval = 0.0;
             int count = 1;
             Object o = pair;
-            while (isequal && o instanceof kawa.lang.pair) {
-               pair = (kawa.lang.pair)o;
+            while (isequal && o instanceof Pair) {
+               pair = (Pair)o;
                if (first==null) {
                   if (pair.car instanceof java.lang.Number) {
                      first = (java.lang.Number)pair.car;

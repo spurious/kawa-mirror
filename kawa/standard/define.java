@@ -12,20 +12,20 @@ public class define extends Syntax implements Printable
   public Expression rewrite (Object obj, Interpreter interp)
        throws kawa.lang.WrongArguments
   {
-    if (obj instanceof pair)
+    if (obj instanceof Pair)
       {
-	pair p1 = (pair) obj;
-	if (p1.car instanceof symbol && p1.cdr instanceof pair)
+	Pair p1 = (Pair) obj;
+	if (p1.car instanceof Symbol && p1.cdr instanceof Pair)
 	  {
-	    pair p2 = (pair) p1.cdr;
-	    if (p2.cdr instanceof snull)
-	      return new SetExp ((symbol)p1.car, interp.rewrite (p2.car));
+	    Pair p2 = (Pair) p1.cdr;
+	    if (p2.cdr == List.Empty)
+	      return new SetExp ((Symbol)p1.car, interp.rewrite (p2.car));
 	  }
-	else if (p1.car instanceof pair)
+	else if (p1.car instanceof Pair)
 	  {
-	    pair p2 = (pair) p1.car;
-	    if (p2.car instanceof symbol)
-	      return new SetExp ((symbol) p2.car,
+	    Pair p2 = (Pair) p1.car;
+	    if (p2.car instanceof Symbol)
+	      return new SetExp ((Symbol) p2.car,
 				 new LambdaExp (p2.cdr, p1.cdr, interp));
 	  }
       }

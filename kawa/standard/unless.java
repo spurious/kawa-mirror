@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 import kawa.lang.Syntaxable;
 
@@ -13,14 +14,14 @@ public class unless extends kawa.lang.Named implements kawa.lang.Syntaxable {
              kawa.lang.GenericError,
              kawa.lang.UnboundSymbol
    {
-      if (formo instanceof kawa.lang.pair) {
-         kawa.lang.pair pair = (kawa.lang.pair)formo;
+      if (formo instanceof Pair) {
+         Pair pair = (Pair)formo;
          java.lang.Boolean cond = (java.lang.Boolean)i.eval(pair.car,frames);
 
          Object result = kawa.lang.Interpreter.undefinedObject;
          if (!cond.booleanValue()) {
-            while (pair.cdr instanceof kawa.lang.pair) {
-               pair = (kawa.lang.pair)pair.cdr;
+            while (pair.cdr instanceof Pair) {
+               pair = (Pair)pair.cdr;
                result = i.eval(pair.car,frames);
             }
          } 

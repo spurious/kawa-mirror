@@ -1,10 +1,9 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure1;
-
-public class length extends kawa.lang.Procedure1
+public class length extends Procedure1
 {
-  public kawa.standard.length()
+  public length()
   {
     super("length");
   }
@@ -17,7 +16,7 @@ public class length extends kawa.lang.Procedure1
   static public final int length (Object arg)
   {
     int count = 0;
-    for ( ; arg instanceof kawa.lang.pair; arg = ((kawa.lang.pair)arg).cdr)
+    for ( ; arg instanceof Pair; arg = ((Pair)arg).cdr)
       count++;
     return count;
   }

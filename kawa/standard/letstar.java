@@ -21,19 +21,19 @@ public class letstar extends Syntax implements Printable
   static Expression rewrite (Object bindings, Object body, Interpreter interp)
     throws WrongArguments
   {
-    if (bindings instanceof snull)
+    if (bindings == List.Empty)
       return interp.rewrite_body (body);
-    if (! (bindings instanceof pair))
+    if (! (bindings instanceof Pair))
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
-    pair bind_pair = (pair) bindings;
+    Pair bind_pair = (Pair) bindings;
     Expression[] inits = new Expression[1];
     Declaration[] decls = new Declaration [1];
     Object[] bind_match = pattern2.match (bind_pair.car);
     if (bind_match == null)
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
-    if (! (bind_match[0] instanceof symbol))
+    if (! (bind_match[0] instanceof Symbol))
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body) [var is not an identifier]");
-    decls[0] = new Declaration ((kawa.lang.symbol) bind_match[0]);
+    decls[0] = new Declaration ((Symbol) bind_match[0]);
     decls[0].index = 0;
     inits[0] = interp.rewrite (bind_match[1]);
     LetExp let = new LetExp (decls, inits);

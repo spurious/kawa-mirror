@@ -15,9 +15,9 @@ public class set_b extends Syntax implements Printable
        throws WrongArguments
   {
     Object [] match = pattern.match (obj);
-    if (match == null || ! (match[0] instanceof symbol))
+    if (match == null || ! (match[0] instanceof Symbol))
       throw new WrongArguments("set!",2,"(set! variable expression)");
-    symbol sym = (symbol) match[0];
+    Symbol sym = (Symbol) match[0];
     SetExp sexp = new SetExp (sym, interp.rewrite (match[1]));
     Declaration decl = (Declaration) interp.current_decls.get (sym);
     if (decl != null)

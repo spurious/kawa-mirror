@@ -17,7 +17,7 @@ public class string2symbol extends Procedure1
   {
     // Note string->symbol does *not* fold case, according to R4RS.
     if (arg1 instanceof StringBuffer)
-      return symbol.intern(((StringBuffer)arg1).toString());
+      return Symbol.intern(((StringBuffer)arg1).toString());
     else
       throw new WrongType(this.name,1,"string");
   }

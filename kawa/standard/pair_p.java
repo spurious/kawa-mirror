@@ -1,19 +1,18 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure1;
+public class pair_p extends Procedure1
+{
+  public pair_p()
+  {
+    super("pair?");
+  }
 
-public class pair_p extends kawa.lang.Procedure1 {
-   public kawa.standard.pair_p() {
-      super("pair?");
-   }
-
-   public Object apply1 (Object arg1)
-   {
-      if (arg1 instanceof kawa.lang.pair) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
-   }
-
+  public Object apply1 (Object arg1)
+  {
+    if (arg1 instanceof Pair)
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
+  }
 }

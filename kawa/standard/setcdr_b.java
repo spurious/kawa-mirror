@@ -1,23 +1,21 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongType;
+public class setcdr_b extends Procedure2
+{
+  public setcdr_b()
+  {
+    super("set-cdr!");
+  }
 
-import kawa.lang.Procedure2;
-
-public class setcdr_b extends kawa.lang.Procedure2 {
-   public kawa.standard.setcdr_b() {
-      super("set-cdr!");
-   }
-
-   public Object apply2 (Object arg1, Object arg2) throws kawa.lang.WrongType 
-   {
-      if (arg1 instanceof kawa.lang.pair) {
-         ((kawa.lang.pair)arg1).cdr = arg2;
-         return kawa.lang.Interpreter.undefinedObject;
-      } else {
-         throw new kawa.lang.WrongType(this.name,1,"pair");
+  public Object apply2 (Object arg1, Object arg2) throws WrongType
+  {
+    if (arg1 instanceof Pair)
+      {
+	((Pair)arg1).cdr = arg2;
+	return Interpreter.undefinedObject;
       }
-   }
-
+    else
+      throw new kawa.lang.WrongType(this.name,1,"pair");
+  }
 }

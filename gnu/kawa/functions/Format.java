@@ -133,7 +133,7 @@ public class Format extends ProcedureN
     if (port_arg == Boolean.TRUE)
       {
 	format(OutPort.outDefault(), args, 1);
-	return Boolean.TRUE;
+	return Values.empty;
       }
     else if (port_arg == Boolean.FALSE)
       {
@@ -148,21 +148,21 @@ public class Format extends ProcedureN
     else if (port_arg instanceof OutPort)
       {
 	format((OutPort) port_arg, args, 1);
-	return Boolean.TRUE;
+	return Values.empty;
       }
     else if (port_arg instanceof java.io.Writer)
       { 
 	OutPort port = new OutPort((java.io.Writer) port_arg);
         format(port, args, 1);
 	port.flush();
-        return Boolean.TRUE; 
+	return Values.empty;
       } 
     else if (port_arg instanceof java.io.OutputStream)
       { 
 	OutPort port = new OutPort((java.io.OutputStream) port_arg);
         format(port, args, 1);
 	port.flush();
-        return Boolean.TRUE; 
+	return Values.empty;
       }
     else
       throw new RuntimeException("bad first argument to format");

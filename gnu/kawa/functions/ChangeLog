@@ -1,3 +1,7 @@
+2002-02-16  Per Bothner  <per@bothner.com>
+
+	* Format.java (format$V):  Return #!void instead of #t.
+
 2002-01-31  Per Bothner  <per@bothner.com>
 
 	* Convert.java:  Implement CanInline.

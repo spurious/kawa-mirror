@@ -82,7 +82,7 @@ public class defun extends Syntax implements Printable
 	    sexp.setFuncDef(true);
 	    if (decl != null)
 	      {
-		sexp.binding = decl;
+		sexp.setBinding(decl);
 		if (decl.context instanceof ModuleExp && decl.getCanWrite())
 		  value = null;
 		decl.noteValue(value);

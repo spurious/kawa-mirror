@@ -85,7 +85,7 @@ public class defvar extends Syntax
     sexp.setDefining (true);
     if (decl != null)
       {
-	sexp.binding = decl;
+	sexp.setBinding(decl);
 	if (decl.context instanceof ModuleExp
 	    && decl.getCanWrite())
 	  value = null;

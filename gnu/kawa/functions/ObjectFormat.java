@@ -119,7 +119,17 @@ public class ObjectFormat extends ReportFormat
 			   int maxChars, boolean readable)
     throws java.io.IOException
   {
-    format(args[start], dst, maxChars, readable);
+    Object arg;
+    if (start >= args.length)
+      {
+	arg = "#<missing format argument>";
+	start--;
+	readable = false;
+	maxChars = -1;
+      }
+    else
+      arg = args[start];
+    format(arg, dst, maxChars, readable);
     return start + 1;
   }
 

@@ -1,3 +1,36 @@
+2000-10-13  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Syntax.java:  No longer extend Declaration.
+	(getName, setName):  New methods.
+	(<init>):  Do nothing - since not a Declaration.
+	* kawa/lang/Macro.java (bind):  New method.
+
+	* kawa/lang/Record.java (put): Swap arguments in call to set1,
+	due to change in setter conventions.
+	* kawa/standard/cxr.java (set1):  Swap arguments for new convention.
+	* kawa/standard/make.java (applyN):  Likewise.
+	* kawa/standard/set_b.java (rewrite):  Likewise.
+
+	* kawa/lang/Translator.java:  Significant changes to support that
+	Syntax no longer extends Declaration, and that the introduction
+	of StaticFieldConstraint (which could replace autoloading).
+
+	* kawa/standard/call_with_values.java (apply):  Update for changes
+	in CallContext.
+
+	* kawa/standard/let_syntax.java (rewrite):  Update for Macro no
+	longer inheriting from Declaration.
+	* kawa/standard/define_syntax.java:  Likewise.
+
+	* kawa/standard/let.java (let):  New static final field.
+
+	* kawa/standard/car.java:  Replaced by car from kawa/lib/lists.scm.
+	* kawa/standard/cdr.java:  Replaced by cdr from kawa/lib/lists.scm.
+	* kawa/standard/plus_oper.java: Replaced by gnu.kawa.functions.AddOp.
+	* kawa/standard/minus_oper.java: Replaced by gnu.kawa.functions.AddOp.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/Scheme.java:  Likewise.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/{ceiling.java,floor.java,round.java,truncate.java,
@@ -35,6 +68,16 @@
 	(initScheme):  Numerous updates.
 	(parseFormat):  Removed static field.  (Use field in ParseFormat.)
 	* kawa/standard/Makefile.am:  Numerous updates.
+
+2000-8-17  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/apply.java (apply):  Update CallStack -> CallContext.
+	* kawa/standard/call_with_values.java (apply):  Likewise.
+	* kawa/standard/callcc.java (apply):  Likewise.
+
+	* kawa/lang/Lambda.java (rewriteBody):  Handle ':: <TYPE> EXP ...'.
+	Use new makeCoersion method in Expression.
+	Support <sequence> result to use Consumer target.
 
 2000-10-09  Per Bothner  <per@bothner.com>
 

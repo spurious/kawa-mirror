@@ -3,10 +3,13 @@ BEFORE KAWA 1.7:
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
+* Printer for ELisp and CLisp.
 
 Move kawa.standard.convert to gnu.kawa.reflect.Convert.
 Move kawa.lang.Lambda to gnu.kawa.lispexpr.Lambda.  Merge with Elisp version.
 Remove Scheme.getTypeValue.
+
+(define plus +) ... (plus ...) should not inline call to +.
 
 (define-alias <alias> <class>) doesn't work interactively.
 
@@ -225,6 +228,10 @@ class ObjectExp
     walker.postObjectExp(this);
   }
 }
+
+SYMBOLS
+If we have pre-process environments, (define exit ...) should only re-define
+exit in the current environment, not all.
 
 JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 

@@ -1,4 +1,27 @@
-Changes from Kawa 1.6.66 to 1.6.68.
+Added a hook for constant-folding and other optimization/inlining at
+traversal (ExpWalker) time.  Optimization of + and - procedures to
+use primitive Java operations when the operands are primitive types.
+
+Implementation of SRFI-17.  Change the definitions of
+(set! (f x ...) val) to ((setter f) x ... val), rather then
+the old ((setter f) val x ...).  You can now associate a setter
+with a procedure, either using make-procedure or set-procedure-property!.
+Also, (setter f) is now inlined, when possible.
+
+Internally, Syntax (and hence Macro) no longer extend Declaration.
+
+Accessing a final static field (using static-field) is inlined by
+the compiler, but only for int (or shorter) types.
+
+Various Java-level changes, which may be reflected in Scheme later:
+* gnu.kawa.util.Consumer interface is similar to ObjectOutput
+and SAX's ContentHandler interfaces.
+* A gnu.expr.ConsumerTarget is used when evaluating to an implicit Consumer.
+* These interfaces will make it easy to write functional-style but efficient
+code for transforming data streams, including XML.
+* gnu.kawa.util.FString is now variable-size.
+
+Changes from Kawa 1.6.68 to 1.6.70.
 ==================================
 The bare beginnings of Common Lisp support, enabled by the --commonlisp
 (or --clisp) command line option.  This is so far little more than a

@@ -1,15 +1,63 @@
 	README for kawa-0.3 release
 
 This documents how to install and use Kawa, a Scheme system
-implemented in Java, and that compiles into Java bytecodes.
+implemented in Java, and which compiles into Java bytecodes.
 
-Unpacking and Installation -- quick overview
-==========================
+Setting up to use Java
+======================
+
+You will need a working Java system.
+The program 'java' is the Java interpreter.
+The program 'javac' is the Java compiler,
+and is needed if you want to compile the source release yourself.
+Both programs must both be in your PATH.
+
+You also need to set CLASSPATH so it includes both the
+current directory, and the standard Java library.
+
+If you have the Java Developer's Kit in directory $JDK,
+and your are using a Bourne-shell compatible shell
+(/bin/sh, ksh, bash, or other) you can set both variables thus:
+
+	export PATH=$JDK/bin:$PATH
+	export CLASSPATH=.:$JDK/lib/classes.zip
+
+Installing the binary release
+=============================
+The binary release includes only the binary compiled (.class)
+versions of the same .java source files in the source release.
+It does no include any documentation, so you probably want the
+source release in addition to the binary release.  The prupose
+of the binary release is just to save you time and trouble
+compiling the sources.
+
+The binary release comes as a gzip-compress tar file:
+kawa-0.3-compiled.tar.gz.
+
+You need to decide where you want to put the kawa .class files.
+Assuming it is /usr/local/java, you can do:
+
+	gunzip -c <kawa-0.3-compiled.tar.gz|(cd /usr/local/java; tar xf -)
+
+hen, before you can actually run Kawa, you need to set CLASSPATH so it
+includes the Kawa files.  For example:
+
+	export CLASSPATH=.:/usr/local/java:$JDK/lib/classes.zip
+
+Then to run Kawa do:
+
+	java kawa
+
+Unpacking and Installation the source release
+=============================================
 The Kawa release normally comes as a gzip-compressed tar file.
-We assume you have managed to retrieve and extract the files
-and are reading this file ...
 
-First, you must configure the sources.  This you can do
+In your build directory do:
+
+	tar xzf kawa-0.3.tar.gz
+	cd kawa-0.3
+
+Then you must configure the sources.  This you can do
 the same way you configure most other GNU software.  Normally
 you can just run the configure script with no arguments:
 
@@ -22,22 +70,9 @@ specify that when you run configure:
 
 	./configure -- prefix $PREFIX
 
-You will need a working Java system.
-The program 'java' is the Java interpreter.
-The program 'javac' is the Java compiler.
-They must both be in your PATH.
-
-You also need to set CLASSPATH so it includes both the
-current directory, and the standard Java library.
-
-If you have the Java Developer's Kit in directory $JDK,
-and your are using a Bourne-shell compatible shell
-(/bin/sh, ksh, bash, or other) you can set both variables thus:
-
-	export PATH=$JDK/bin:$PATH
-	export CLASSPATH=.:$JDK/lib/classes.zip
-
-Thus you need to compile all the .java source files.  Just run make:
+Thus you need to compile all the .java source files.
+(You will need GNU make, due to some unresolved problems.)
+Just run make:
 
 	make
 
@@ -75,22 +110,36 @@ in the Java read-evel-print-loop.  If you type a Scheme
 expression, Kawa will evaluate it.  Kawa will then print the
 result (if there is a non-"void" result).
 
-To exit Kawa, type the end-of-file character (normally ctrl/D).
+To exit Kawa, type the end-of-file character (normally ctrl/D),
+or call the exit procedure (with 0 or 1 integer argument).
 
 Scheme restrictions
 ===================
 The file Compliance.html specifies which functions and syntax
 have been implemented so far.
 
-Beyond that, note that there is no tail-call-elimination.
-A future release will do at least tail-recursion-elimination
-(when the system can determine that the function being called
-is the current function).
+Missing syntax forms are do, case, quasi-quote, and promise.
+
+There is no macro system,
+
+The only numeric datatypes are fix-width (32-bit) integers, and
+double-precision floats.  Many of the numeric and math functions
+have not been implemented yet.
 
 Also, call-with-current-continuation is only "upwards" (?).
 I.e. once a continuation has been exited, it cannot be invoked.
 These restricted continuations can be used to implement catch/throw
 (such as the examples in R4RS), but not co-routines or backtracking.
+
+Tail-call elimination
+=====================
+Kawa does not do general tail-call elimination.  However, if the
+compiler can prove that the procedure being called is the current
+function, then the tail call will be replaced by a jump.
+This means the procedure must be defined using a letrec, not a
+define (because the compiler does not know if someone might
+re-define a global definition), and there must be no assignments
+(using set!) to the procedure binding.
 
 Compilation
 ===========
@@ -128,5 +177,6 @@ Per Bothner <bothner@cygnus.com> re-wrote the evaluator to
 use byte compilation, made many other changes, and released 0.3.
 
 If you have a problem or bug, for now send a report to the authors.
+(However, one or both will be on vacation until August 12.)
 If there is demand, we will set up a mailing list.
 Future announcements will be announced at least to comp.lang.scheme.

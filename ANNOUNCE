@@ -1,12 +1,15 @@
-ANNOUNCE:  Kawa Scheme Interpreter, version 0.2
+ANNOUNCE:  Kawa Scheme Interpreter, version 0.3
 =============================================================================
 
 A new version of the Kawa interpreter is availiable.
 
-Kawa (pronounced kava) is a scheme interpreter written completely in Java. 
+Kawa (pronounced kava) is a scheme interpreter written completely in Java.
+
+Changes since 0.2:
+==================
 
 Changes since 0.1:
-=============================================================================
+==================
 
 Kawa 0.2 (6-10-96)
 

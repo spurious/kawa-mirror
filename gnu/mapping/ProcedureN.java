@@ -17,9 +17,11 @@ public abstract class ProcedureN extends Procedure
       super(n);
   }
 
+  public static final Object[] noArgs = new Object[0];
+
   public Object apply0 () throws Throwable
   {
-    return applyN(Values.noArgs);
+    return applyN(noArgs);
   }
 
   public Object apply1 (Object arg1) throws Throwable

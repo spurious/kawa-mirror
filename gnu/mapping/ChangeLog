@@ -1,3 +1,8 @@
+2003-08-08  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
+
+	* ProecdureN.java (noArgs):  New static field.
+	(apply0):  Use it (so we don't depend on Values).
+
 2003-07-12  Per Bothner  <per@bothner.com>
 
 	* Future.java (parent):  Remove unused field.
@@ -54,7 +59,7 @@
 	Previous situation would cause problems when compiling XQuery QNames.
 	(make(String, String)):  Generalize to make(Object, String) - allows
 	first argument to be null, an Environment, or a namespace name.
-	(make(String, Environment)):  Subsumed by above metod, hence removed.
+	(make(String, Environment)):  Subsumed by above method, hence removed.
 	(make(Object, String)):  Rename variant that creates an initialized
 	uninterned symbol to makeUninterned to avoid confusion.
 	(writeExternal, readExternal):  Match new 'make' argument order.

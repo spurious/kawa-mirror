@@ -297,7 +297,7 @@ public class LambdaExp extends ScopeExp
     try
       {
 	String class_name = name == null ? "lambda"
-	  : Compilation.mangleClassName (name.toString ());
+	  : Compilation.mangleName (name.toString ());
 
 	Compilation comp = new Compilation (this, class_name, true);
 	compile_setLiterals (comp);

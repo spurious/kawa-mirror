@@ -1,3 +1,7 @@
+2005-03-02  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java (emitIsInstance): Update getInterpreter->getLanguage.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java: Update Interpreter->Language.

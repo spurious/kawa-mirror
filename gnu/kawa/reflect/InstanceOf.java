@@ -106,6 +106,6 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
     code.emitFi();
     if (cond == null)
       target.compileFromStack(comp,
-			      comp.getInterpreter().getTypeFor(Boolean.TYPE));
+			      comp.getLanguage().getTypeFor(Boolean.TYPE));
   }
 }

@@ -1,3 +1,8 @@
+2003-06-22  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (emitCoerceToObject):  Fix handling of boolean case.
+	Fixes bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.
+
 2003-05-17  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getModifiers, getInterfaces):  Only call

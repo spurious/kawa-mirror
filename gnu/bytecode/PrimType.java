@@ -56,7 +56,7 @@ public class PrimType extends Type {
     char sig1 = getSignature().charAt(0);
     ClassType clas;
     Method method;
-    String cname = null;
+    String cname;
     Type[] args;
     switch (sig1)
       {
@@ -67,7 +67,7 @@ public class PrimType extends Type {
 	code.emitElse();
 	code.emitGetStatic(clas.getDeclaredField("FALSE"));
 	code.emitFi();
-	break;
+	return;
       case 'C':  cname = "java.lang.Character"; break;
       case 'B':  cname = "java.lang.Byte";      break;
       case 'S':  cname = "java.lang.Short";     break;
@@ -75,7 +75,7 @@ public class PrimType extends Type {
       case 'J':  cname = "java.lang.Long";      break;
       case 'F':  cname = "java.lang.Float";     break;
       case 'D':  cname = "java.lang.Double";    break;
-      default:   cname = null;
+      default:   cname = null; // Should never happen.
       }
     clas = ClassType.make(cname);
     args = new Type[1];

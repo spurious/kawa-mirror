@@ -413,42 +413,52 @@
   -->
 
   <!--
-    These files are in two filesets so that the first
+    These files are in multiple filesets so that the first
     set is listed before the second in the command 
-    line (otherwise they just go in directory order
+    line etc (otherwise they just go in directory order
     and the compile fails).
   -->
-      <fileset id="lib-scm-1st" dir="${src.dir}/kawa/lib"> 
+      <fileset id="lib-scm-1" dir="${src.dir}/kawa/lib"> 
+        <include name="prim_syntax.scm"/>
+      </fileset>
+      <fileset id="lib-scm-2" dir="${src.dir}/kawa/lib"> 
         <include name="std_syntax.scm"/>
         <include name="syntax.scm"/>
         <include name="reflection.scm"/>
       </fileset>
-      <fileset id="lib-scm-2nd" dir="${src.dir}/kawa/lib">
+      <fileset id="lib-scm-3" dir="${src.dir}/kawa/lib">
         <include name="lists.scm"/>
-        <include name="thread.scm"/>
         <include name="characters.scm"/>
-        <include name="files.scm"/>
+      </fileset>
+      <fileset id="lib-scm-4" dir="${src.dir}/kawa/lib">
+        <include name="strings.scm"/> <!--Depends on lists-->
+      </fileset>
+      <fileset id="lib-scm-5" dir="${src.dir}/kawa/lib">
+        <include name="thread.scm"/>
         <include name="keywords.scm"/>
-        <include name="ports.scm"/>
-        <include name="misc.scm"/>
         <include name="numbers.scm"/>
-        <include name="strings.scm"/>
         <include name="vectors.scm"/>
+        <include name="ports.scm"/> <!--Depends on strings-->
+      </fileset>
+      <fileset id="lib-scm-6" dir="${src.dir}/kawa/lib">
+        <include name="misc.scm"/> <!--Depends on ports-->
+        <include name="files.scm"/> <!--Depends on lists, ports-->
         <include name="uniform.scm"/>
         <include name="arrays.scm"/>
         <include name="trace.scm"/>
         <include name="windows.scm"/>
-      </fileset>
-      <fileset id="lib-scm-3rd" dir="${src.dir}/kawa/lib">
-        <include name="system.scm"/>
+        <include name="system.scm"/> <!--Depends on vectors-->
       </fileset>
 
   <target name="check-lib-scm-classes">
     <uptodate property="lib-scm-classes-uptodate">
       <mapper type="glob" from="*.scm" to="*.class"/>
-      <srcfiles refid="lib-scm-1st"/> 
-      <srcfiles refid="lib-scm-2nd"/>
-      <srcfiles refid="lib-scm-3rd"/>
+      <srcfiles refid="lib-scm-1"/> 
+      <srcfiles refid="lib-scm-2"/> 
+      <srcfiles refid="lib-scm-3"/>
+      <srcfiles refid="lib-scm-4"/>
+      <srcfiles refid="lib-scm-5"/>
+      <srcfiles refid="lib-scm-6"/>
     </uptodate>
   </target>
 
@@ -460,10 +470,14 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P kawa.lib. --module-static -C"/>
-      <fileset refid="lib-scm-1st"/>
-      <fileset refid="lib-scm-2nd"/>
-      <fileset refid="lib-scm-3rd"/>
+      <arg line="-P kawa.lib. --module-static-run --warn-undefined-variable"/>
+      <arg value="-C"/>
+      <fileset refid="lib-scm-1"/>
+      <fileset refid="lib-scm-2"/>
+      <fileset refid="lib-scm-3"/>
+      <fileset refid="lib-scm-4"/>
+      <fileset refid="lib-scm-5"/>
+      <fileset refid="lib-scm-6"/>
     </apply>
   </target>
   
@@ -486,7 +500,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.commonlisp.lisp. --module-static -C"/>
+      <arg line="-P gnu.commonlisp.lisp. --module-static-run -C"/>
       <fileset refid="commonlisp-scm"/>
     </apply>
   </target>
@@ -518,7 +532,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
       <fileset refid="slib-scm"/>
     </apply>
   </target>
@@ -545,7 +559,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.brl. --module-static -C"/>
+      <arg line="-P gnu.brl. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/brl"> 
         <include name="stringfun.scm"/>
       </fileset>
@@ -555,7 +569,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.brl. --module-static -C"/>
+      <arg line="-P gnu.kawa.brl. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/brl"> 
         <include name="progfun.scm"/>
       </fileset>
@@ -565,7 +579,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/slib"> 
         <include name="XML.scm"/>
         <include name="XStrings.scm"/>
@@ -589,7 +603,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}:${java.class.path}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/slib"> 
         <include name="HTTP.scm"/>
       </fileset>
@@ -676,7 +690,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.lang. --module-static -C"/>
+      <arg line="-P gnu.jemacs.lang. --module-static-run -C"/>
       <fileset refid="jemacs-lang-scm"/>
     </apply>
 
@@ -685,7 +699,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
+      <arg line="-P gnu.jemacs.buffer. --module-static-run -C"/>
       <fileset refid="jemacs-buffer-scm"/>
     </apply>
 
@@ -694,7 +708,7 @@
       <arg value="-classpath"/> <arg path="${build.classes}"/>
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
       <fileset refid="jemacs-slib-scm"/>
     </apply>
 

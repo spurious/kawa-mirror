@@ -1,5 +1,9 @@
 2005-03-18  Per Bothner  <per@bothner.com>
 
+	* build.xml: Pass --module-static-run instead of --module-static.
+	Compile kawa/lib/*.scm in proper order, adding prim_syntax.scm,
+	and --warn-undefined-variable.
+
 	* kawa/standard/Scheme.java (lambda): New static field.
 	* kawa/standard/try_catch.java (rewrite): Rewritw catch-clause first
 	to LambdaExp, rather than LetExp, before converting to CatchClause.

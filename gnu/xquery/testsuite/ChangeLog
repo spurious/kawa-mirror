@@ -1,3 +1,7 @@
+2004-03-08  Per Bothner  <per@bothner.com>
+
+	* exp-format-users.html:  Don't expect XML declaration.
+
 2004-01-12  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main): New testcase for navigating from attribute

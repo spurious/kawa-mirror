@@ -4,6 +4,9 @@ import gnu.bytecode.Method;
 import gnu.bytecode.Variable;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.lang.reflect.Modifier;
+import gnu.bytecode.Type;
+import gnu.bytecode.ClassType;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -163,17 +166,19 @@ public class Translator extends Object
     Object cdr = p.cdr;
 
     Expression func = rewrite_car (p);
+    Object proc = null;
+    ReferenceExp ref = null;
 
     if (func instanceof ReferenceExp)
       {
-	ReferenceExp ref = (ReferenceExp) func;
+	ref = (ReferenceExp) func;
 	if (ref.getBinding() == null)
 	  {
-	    Object first = getBinding(ref.getName());
-	    if (first instanceof Syntax)
-	      return apply_rewrite ((Syntax) first, cdr);
-	    if (first instanceof Inlineable)
-	      func = new QuoteExp(first);
+	    proc = getBinding(ref.getName());
+	    if (proc instanceof Syntax)
+	      return apply_rewrite ((Syntax) proc, cdr);
+	    if (proc instanceof Inlineable)
+	      func = new QuoteExp(proc);
 	  }
       }
 
@@ -181,11 +186,11 @@ public class Translator extends Object
 
     if (func instanceof QuoteExp)
       {
-	Object fval = ((QuoteExp) func).getValue();
-	if (fval instanceof Inlineable)
+	proc = ((QuoteExp) func).getValue();
+	if (proc instanceof Procedure)
 	  {
-	    Procedure proc = (Procedure) fval;
-	    String msg = WrongArguments.checkArgCount(proc, cdr_length);
+	    String msg = WrongArguments.checkArgCount((Procedure) proc,
+						      cdr_length);
 	    if (msg != null)
 	      return syntaxError(msg);
 	  }
@@ -199,6 +204,64 @@ public class Translator extends Object
 	args[i] = rewrite_car (cdr_pair);
 	cdr = cdr_pair.cdr;
       }
+
+  tryDirectCall:
+    if (proc != null && proc instanceof Procedure)
+      {
+	if (proc instanceof AutoloadProcedure)
+	  {
+	    proc = ((AutoloadProcedure) proc).getLoaded();
+	    if (proc == null || ! (proc instanceof Procedure))
+	      break tryDirectCall;
+	  }
+	Class procClass = proc.getClass();
+	try
+	  {
+	    java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
+	    java.lang.reflect.Method best = null;
+	    Class[] bestTypes = null;
+	    String name = ((Procedure) proc).getName();
+	    if (name == null)
+	      break tryDirectCall;
+	    String mangledName = Compilation.mangleName(name);
+	    for (int i = meths.length;  --i >= 0; )
+	      {
+		java.lang.reflect.Method meth = meths[i];
+		int mods = meth.getModifiers();
+		if ((mods & (Modifier.STATIC|Modifier.PUBLIC))
+		    != (Modifier.STATIC|Modifier.PUBLIC))
+		  continue;
+		String mname = meth.getName();
+		if (! mname.equals("apply") && ! mname.equals(mangledName))
+		  continue;
+		Class[] ptypes = meth.getParameterTypes();
+		if (ptypes.length != cdr_length)
+		  continue;
+		// In the future, we ma try to find the "best" match.
+		if (best != null)
+		  return syntaxError("ambiguous inline for call to "+name
+				     + " (in class "+procClass.getName()+")");
+		best = meth;
+		bestTypes = ptypes;
+	      }
+	    if (best != null)
+	      {
+		ClassType procType = ClassType.make(procClass.getName());
+		Type[] argTypes = new Type[bestTypes.length];
+		for (int i = argTypes.length;  --i >= 0; )
+		  argTypes[i] = Type.make(bestTypes[i]);
+		gnu.bytecode.Method method
+		  = procType.addMethod(best.getName(), best.getModifiers(),
+				       argTypes,
+				       Type.make(best.getReturnType()));
+		func = new QuoteExp(new PrimProcedure(method));
+	      }
+	  }
+	catch (SecurityException ex)
+	  {
+	  }
+      }
+
     return new ApplyExp (func, args);
   }
 

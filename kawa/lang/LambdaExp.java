@@ -103,7 +103,7 @@ public class LambdaExp extends ScopeExp
   /** Declaration used if varargs or too many args. */
   Declaration argsArray;
 
-  /** Start of actual body (after copying args etc into home locationss). */
+  /** Start of actual body (after copying args etc into home locations). */
   Label start_label;
 
   public static boolean doCompile = true;

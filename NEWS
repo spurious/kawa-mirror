@@ -2,15 +2,15 @@ Changes from Kawa 1.6.98 to 1.6.99.
 ==================================
 
 A new language front-end handles a tiny subset of XSLT.
-An example is the check-format-users test in gnu/xquesry/testsuite/Makefile.
+An example is the check-format-users test in gnu/xquery/testsuite/Makefile.
 
-There are now converts between SAX2 and Consumer events, and a basic
+There are now converters between SAX2 and Consumer events, and a basic
 implementation of XMLReader based on XMLParser.
 
 The function as-xml prints a value in XML format.
 
 Srfi-0 (cond-expand), srfi-8 (receive), and srfi-25 (multi-dimensional
-array)  are now implemented.  So is srfi-1 (list library), though that
+arrays) are now implemented.  So is srfi-1 (list library), though that
 requires doing (require 'list-lib).
 
 The JEmacs code is being re-organized, splitting out the Swing-dependent
@@ -21,7 +21,7 @@ The class gnu.expr.Interpreter has various new 'eval' methods that
 are useful for evaluating Scheme/BRL/XQuery/... expressions from Java.
 
 Kawa now uses current versions of autoconf, autoamke, and libtool,
-alowing the use of automake file inclusion.
+allowing the use of automake file inclusion.
 
 The comparisons <, <=, -, >, and => now compile to optimized Java
 arithmetic if both operands are <int> or a literal that fits in <int>.

@@ -142,7 +142,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		    info.tag = name;
 		    info.tagHash = hash;
 		    info.prefix = prefix;
-		    info.local = info.local;
+		    info.local = local;
 		    info.nextInBucket = mappingTable[bucket];
 		    mappingTable[bucket] = info;
 		  }

@@ -1,3 +1,9 @@
+2003-10-30  Per Bothner  <per@bothner.com>
+
+	* NamespaceBinding.java (toString):  New method.
+
+	* ParsedXMLToConsumer.java (closeStartTag):  Fix thinko.
+
 2003-10-29  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java:  Re-implement namespaces to preserve

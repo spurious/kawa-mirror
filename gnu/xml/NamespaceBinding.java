@@ -96,4 +96,9 @@ public final class NamespaceBinding
       }
     return prev;
   }
+
+  public String toString()
+  {
+    return "Namespace{"+prefix+"="+uri+", depth:"+depth+"}";
+  }
 }

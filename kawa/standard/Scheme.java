@@ -259,7 +259,7 @@ public class Scheme extends LispInterpreter
       define_proc ("acos", "kawa.lib.numbers");
       define_proc ("atan", "kawa.standard.atan");
       define_proc ("sqrt", "kawa.standard.sqrt");
-      define_proc ("expt", "kawa.standard.expt");
+      define_field ("expt", "kawa.standard.expt");
       define_proc ("make-rectangular", "kawa.lib.numbers");
       define_proc ("make-polar", "kawa.lib.numbers");
       define_proc ("real-part", "kawa.lib.numbers");

@@ -456,7 +456,7 @@ public abstract class Interpreter
 
   /** Used when defining a namespace alias (prefix), in the XML sense.
    * Define in a namespace prefix NS is equivalent to defining a constant
-   * named NAMESPACE_PREFIX+"NS" whose value is teh namespace URI. */
+   * named NAMESPACE_PREFIX+"NS" whose value is the namespace URI. */
   public static final String NAMESPACE_PREFIX = "$Namespace$";
 
   public static final int VALUE_NAMESPACE = 1<<0;
@@ -618,6 +618,20 @@ public abstract class Interpreter
       {
 	if (uri != null && uri.startsWith("class:"))
 	  return ClassMethods.apply(uri.substring(6), name);
+      }
+    // Last restort - check for unresolved namespace prefix.
+    int colon = name.indexOf(':');
+    Environment env = sym.getEnvironment();
+    if (colon > 1 & env != null)
+      {
+	String prefix = (NAMESPACE_PREFIX+name.substring(0, colon)).intern();
+	Object uri_val = env.get(prefix, null);
+	if (uri_val != null)
+	  {
+	    sym = Symbol.make(uri_val, name.substring(colon+1));
+	    return function ? getSymbolProcedure(sym)
+	      : getSymbolValue(sym);
+	  }
       }
     throw new UnboundSymbol(name);
   }

@@ -1,3 +1,11 @@
+2003-04-30  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (rewriteToInvocation):  Make non-static.
+	Call inline method on resulting Invoke procedure.
+
+	* Interpreter.java (getDefaultSymbolValue):  Check for unresolved
+	namespace prefix.
+
 2003-04-28  Per Bothner  <per@bothner.com>
 
 	* ChainLambda.java (walkClassExp):  Don't set ClassExp types here

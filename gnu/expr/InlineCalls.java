@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.text.*;
 import gnu.bytecode.*;
+import gnu.kawa.reflect.Invoke;
 
 public class InlineCalls extends ExpWalker
 {
@@ -16,7 +17,7 @@ public class InlineCalls extends ExpWalker
   }
 
   /** Possibly convert a Symbol method call to invokeStatic or make. */
-  public static Expression rewriteToInvocation(Symbol sym, Expression[] args)
+  Expression rewriteToInvocation(Symbol sym, Expression[] args)
   {
     String uri = sym.getNamespaceURI();
     if (uri == null || ! uri.startsWith("class:"))
@@ -25,7 +26,7 @@ public class InlineCalls extends ExpWalker
     String methodName = sym.getName();
     ClassType typeInvoke = ClassType.make("gnu.kawa.reflect.Invoke");
     String invFieldName;
-    Procedure invProc;
+    Invoke invProc;
     boolean isNew = methodName.equals("new");
     if (isNew)
       {
@@ -47,7 +48,7 @@ public class InlineCalls extends ExpWalker
     if (! isNew)
       xargs[1] = new QuoteExp(methodName);
     args = xargs;
-    return new ApplyExp(new ReferenceExp(invDecl), args);
+    return invProc.inline(new ApplyExp(new ReferenceExp(invDecl), args), this);
   }
 
   protected Expression walkApplyExp(ApplyExp exp)

@@ -1,3 +1,9 @@
+2002-07-30  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (get-response, response-status, error-response,
+	current-servlet, current-servlet-context, current-servlet-config,
+	servlet-context-realpath):  New procedures.
+
 2002-07-25  Per Bothner  <per@bothner.com>
 
 	* readtable.scm ((get-dispatch-macro-table):  Fix obvious bug.

@@ -1,3 +1,8 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* Focus.java, IteratorItems.java, ListItems.java:
+	Change "select" (preprocessor) syntax.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* AttributeConstructor.java: Removed - we now use MakeAttribute.

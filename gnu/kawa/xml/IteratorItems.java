@@ -4,9 +4,9 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
-/* BEGIN JAVA2 */
+/* #ifdef JAVA2 */
 import java.util.Iterator;
-/* END JAVA2 */
+/* #endif */
 
 /* A function that maps an Iterator into the sequence of ite elements. */
 
@@ -20,12 +20,12 @@ public class IteratorItems extends MethodProc
     Object arg = ctx.getNextArg();
     ctx.lastArg();
 
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     Iterator iter = (Iterator) arg;
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // SeqPosition iter = (SeqPosition) arg;
-    /* END JAVA1 */
+    /* #endif */
     while (iter.hasNext())
       {
 	Object val = iter.next();

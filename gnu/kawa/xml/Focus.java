@@ -7,18 +7,20 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.math.IntNum;
 
+/** This is only used for XSLT, which should be fixed. */
+
 public final class Focus extends TreePosition
 {
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   static ThreadLocal current = new ThreadLocal();
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // static Focus current = new Focus();
-  /* END JAVA1 */
+  /* #endif */
 
   public static Focus getCurrent()
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     Object obj = current.get();
     if (obj == null)
       {
@@ -26,10 +28,10 @@ public final class Focus extends TreePosition
 	current.set(obj);
       }
     return (Focus) obj;
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // return current;
-    /* END JAVA1 */
+    /* #endif */
   }
 
   public long position;

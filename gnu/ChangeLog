@@ -1,3 +1,10 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* kawa/lispexpr:  New package gnu.kawa.lispexpr.
+	* kawa/Makefile.am (SUBDIRS):  Added new directory lispexpr.
+	* Makefile.am (SUBDIRS):  Do text before mapping, now that text
+	no longer depends on mapping (but mapping still depends on text).
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	* kawa, kawa.reflect:  New packages.

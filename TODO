@@ -44,6 +44,8 @@ Implement pretty-printer, ideally in a way that works with AWT containers.
 Complete R4RS procedures.
   trig functions for complex numbers
 
+Complete R5RS number syntax;  clean up quantity syntax.
+
 Implement let-syntax and letrec-syntax.
 Implement syntax-case.
 Possibly re-write macro syntax to use syntactic closures.
@@ -55,6 +57,10 @@ Add a way to specify a load-path (or maybe just use CLASSPATH?).
 First seach for loaded files in directory where current file was found.
 
 OTHER:
+
+Provide a way to compile a Scheme program into an Applet class (with
+init/start/stor/pain/etc methods).  Also provide a stripped down
+"kawa-run.zip", without eval, load, or compiler.
 
 Implement modules.
 

@@ -70,7 +70,8 @@ AUTOMAKE_OPTIONS = cygnus
 SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
 
-EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
+  config.guess config.sub install-sh ./mkinstalldirs
 
 HTML_HOME = $$HOME/public_html
 HTML_DOC_DIR = $(HTML_HOME)/kawa/api
@@ -291,6 +292,16 @@ maintainer-clean
 
 kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
+
+# Work-around for automake problem:
+config.guess: $(srcdir)/../config.guess
+	ln -s $< .
+config.sub: $(srcdir)/../config.sub
+	ln -s $< .
+install-sh: $(srcdir)/../install-sh
+	ln -s $< .
+./mkinstalldirs: $(srcdir)/../mkinstalldirs
+	ln -s $< .
 
 install-javadoc-html:
 	-mkdir $(HTML_HOME)/kawa

@@ -1,3 +1,11 @@
+Sun Nov 15 19:18:20 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/standard/ScmEnv.java:  New Environment class.
+	* kawa/standard/Makefile.{am,in} (java_JAVA):  Add ScmEnv.java.
+	* kawa/standard/Scheme.java (builtin):  Create new ScmEnv.
+	* kawa/lang/Record.java:  Inherit from NameMap, not Procedure1.
+	* Makefile.am, Makefile.in:  Work-around for automake (dist) problem.
+
 Sat Oct 17 14:16:05 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/standard/synchronizd.java:  New Syntax.

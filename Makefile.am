@@ -14,13 +14,13 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 
 # Work-around for automake problem:
 config.guess: $(srcdir)/../config.guess
-	ln $< .
+	ln -s $< .
 config.sub: $(srcdir)/../config.sub
-	ln $< .
+	ln -s $< .
 install-sh: $(srcdir)/../install-sh
-	ln $< .
+	ln -s $< .
 ./mkinstalldirs: $(srcdir)/../mkinstalldirs
-	ln $< .
+	ln -s $< .
 
 HTML_HOME = $$HOME/public_html
 HTML_DOC_DIR = $(HTML_HOME)/kawa/api

@@ -117,7 +117,7 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 PACKAGE_CFNAME = gnu-kawa-slib
 
-java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm \
+java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm readtable.scm \
   $(SCMSOURCES_@XML_SELECTED@)
 
 SOURCES = $(java_SCM)

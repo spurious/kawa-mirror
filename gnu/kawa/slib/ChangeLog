@@ -1,3 +1,8 @@
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* readtable.scm:  New module.
+	* Makefile.am (java_SCM):  Add readtble.scm.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* XML.scm:  Update gnu.kawa.xml -> gnu.xml.

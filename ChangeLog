@@ -1,3 +1,23 @@
+Wed Jul 17 20:34:37 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/Shell.java:  Don't exit if eval returns #<eof>.
+
+	* kawa/lang/{InPort,OutPort}:  Add name field.
+	Add print methods and implement Printable.
+
+	* kawa/lang/Compilable.java (makeLiteral):  New method.
+	* kawa/lang/{Pair,Symbol}.java:  Implement makeLiteral.
+	* kawa/lang/Compilation.java:  Use makeLiteral if value is Compilable.
+	* kawa/lang/Interpreter.java (eofObject):  Change print-name.
+
+Wed Jul 17 19:34:00 1996  R. Alexander Milowski <sgml@winternet.com>
+
+	* kawa/standard/{char_ci_equal_p,char_ci_less_p,char_ci_less_equal_p,
+	char_ci_greater_p,char_ci_greater_equal_p,
+	input_port_p,output_port_p,open_input_file,open_output_file,
+	close_input_file,close_output_file}.java:  New Scheme procedures.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}:  Update.
+
 Tue Jul 16 23:23:16 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Lots of fixes and improvements, mostly compiler-related.

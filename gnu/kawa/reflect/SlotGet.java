@@ -302,4 +302,18 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
   {
     return setter == null ? super.getSetter() : setter;
   }
+
+  /**
+   * Convenience method to make an Expression that gets the value of a field.
+   * @param value evaluates to object that has the named field
+   * @param fieldName name of field in value
+   * @return expression that get the name field from value
+   */
+  public static Expression makeGetField(Expression value, String fieldName)
+  {
+    Expression[] args = new Expression[2];
+    args[0] = value;
+    args[1] = new QuoteExp(fieldName);
+    return new ApplyExp(gnu.kawa.reflect.SlotGet.field, args);
+  }
 }

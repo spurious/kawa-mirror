@@ -1,3 +1,7 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (makeGetField):  New method, moved from Expression.
+
 2001-11-21  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods):  Match change in ClassType's

@@ -3,11 +3,12 @@
 
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
+
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.Hashtable;
 
 /** An Emacs window (EWindow) implemented using the Swing toolkits. */
@@ -24,6 +25,8 @@ implements java.awt.event.FocusListener,
   /** The panel that contains this window and the modeline. */
   JPanel panel;
   JScrollPane scrollPane;
+
+  public Modeline modeline;
 
   public SwingWindow(Buffer buffer)
   {
@@ -101,7 +104,7 @@ implements java.awt.event.FocusListener,
       }
   }
 
-  void unselect()
+  public void unselect()
   {
     Caret caret = ((SwingBuffer) buffer).curPosition;
     if (caret == null)
@@ -116,15 +119,7 @@ implements java.awt.event.FocusListener,
 
   public void setSelected()
   {
-    EWindow selected = getSelected();
-    if (selected != null && selected.buffer != buffer)
-      ((SwingWindow) selected).unselect();
-
-    if (frame != null)
-      frame.selectedWindow = this;
-    EFrame.selectedFrame = frame;
-    Buffer.setCurrent(buffer);
-
+    super.setSelected();
     select(jtextpane.getCaret());
   }
 
@@ -376,5 +371,21 @@ implements java.awt.event.FocusListener,
       code |= (e.getModifiers() | kind) << 16;
     return code;
   }
+
+/**
+ * 
+ */
+void flushPending() 
+{
+  pendingLength = 0;
+}
+
+/**
+ * @see gnu.jemacs.buffer.EWindow#tooLong(int)
+ */
+public Object tooLong(int pendingLength)
+{
+  return new TooLongAction(pendingLength);
+}
 
 }

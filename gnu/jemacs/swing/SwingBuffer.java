@@ -3,6 +3,8 @@
 
 package gnu.jemacs.swing;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
 import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import javax.swing.text.*;
@@ -323,6 +325,21 @@ public class SwingBuffer extends Buffer
   public InPort openReader (int start, int count)
   {
     return new BufferReader(this, start, count);
+  }
+
+  /**
+   * @see gnu.jemacs.buffer.Buffer#invoke(java.lang.Runnable)
+   */
+  public void invoke(Runnable doRun)
+  {
+    try
+    {
+      javax.swing.SwingUtilities.invokeAndWait(doRun);
+    }
+    catch (Exception e)
+    {
+      throw new WrappedException(e);
+    }
   }
 
 

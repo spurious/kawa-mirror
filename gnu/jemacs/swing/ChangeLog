@@ -1,3 +1,20 @@
+2004-08-04  Christian Surlykke <christian@surlykke.dk>
+        
+	* IgnoreAction.java: Moved here from gnu.jemacs.buffer
+	* Modeline.java: Moved here from gnu.jemacs.buffer
+	* SwingBuffer.java (invoke): New method, implements Buffer.invoke
+	* SwingFrame.java (setMenuBar): Take an EMenu rather than a Menu.
+	(setMenu): New method, implements EFrame.setMenu
+	* SwingMenu.java: Renamed/moved from gnu/jemacs/buffer/Menu.java.
+	* SwingToolkit.java (getMenu): New method, implements EToolkit.getMenu.
+	(getIgnoreAction): New method, implements EToolkit.getIgnoreaction.
+	* SwingWindow.java (modeline):  Moved field here from EWindow.java.
+	(setSelected): some not-swing-specific code moved to
+	EWindow.setSelected.
+	(flushPending):  New method.
+	(tooLong): New method, implements EWindow.tooLong
+	* TooLongAction.java: Moved here from gnu.jemacs.buffer 
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java:  Remove unused import statements.

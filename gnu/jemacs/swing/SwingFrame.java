@@ -3,6 +3,10 @@
 
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
+import gnu.lists.FString;
+import gnu.lists.FVector;
+import gnu.lists.LList;
+
 import javax.swing.*;
 
 /** An Emacs frame (EFrame) implemented using the Swing toolkits. */
@@ -61,15 +65,23 @@ public class SwingFrame extends EFrame
     return result;
   }
 
-  public void setMenuBar (Menu menu)
+  public void setMenuBar (EMenu menu)
   {
+    SwingMenu swingMenu = (SwingMenu) menu;
     menuBar.removeAll();
     // a menubar contain a list of menus, stored inside a single menu
-    while (menu.getMenuComponentCount() > 0)
-      menuBar.add(menu.getMenuComponent(0));
+    while (swingMenu.getMenuComponentCount() > 0)
+      menuBar.add(swingMenu.getMenuComponent(0));
     menuBar.updateUI();
   }
 
+  public void setMenu(LList menu)
+  {
+    SwingMenu sMenu = new SwingMenu(menu);
+    setMenuBar(sMenu);
+  }
+
+  
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);

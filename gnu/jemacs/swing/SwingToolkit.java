@@ -3,6 +3,8 @@
 
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
+import gnu.lists.LList;
+
 import java.awt.Color;
 import javax.swing.text.*;
 
@@ -46,4 +48,21 @@ public class SwingToolkit extends EToolkit
   {
     StyleConstants.setBackground((Style) face, background);
   }
+
+  /**
+   * @see gnu.jemacs.buffer.EToolkit#getMenu(java.lang.Object)
+   */
+  public EMenu getMenu(LList menubar)
+  {
+    return new SwingMenu(menubar);
+  }
+
+  /**
+   * @see gnu.jemacs.buffer.EToolkit#getIgnoreAction()
+   */
+  public Object getIgnoreAction()
+  {
+    return IgnoreAction.getInstance();
+  }
+  
 }

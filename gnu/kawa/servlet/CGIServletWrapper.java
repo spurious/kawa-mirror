@@ -16,13 +16,14 @@ import java.io.*;
  */
 
 public class CGIServletWrapper extends ServletOutputStream
-implements HttpServletRequest, HttpServletResponse
+implements HttpServletRequest, HttpServletResponse, ServletConfig
 {
   byte buffer[] = null;
   int bufpos = 0;
   PrintStream out = System.out;
   Vector headers = new Vector();
   String sawContentType;
+  String servletName;
 
   public static void main(String[] args)
   {
@@ -30,7 +31,9 @@ implements HttpServletRequest, HttpServletResponse
       {
 	CGIServletWrapper wrapper = new CGIServletWrapper();
 	Class servClass = Class.forName(args[0]);
+	wrapper.servletName = args[0];
 	HttpServlet servlet = (HttpServlet) servClass.newInstance();
+	servlet.init(wrapper);
 	servlet.service(wrapper, wrapper);
 	wrapper.flushBuffer();
       }
@@ -577,6 +580,28 @@ implements HttpServletRequest, HttpServletResponse
   public javax.servlet.http.Cookie[] getCookies()
   {
     return null; // FIXME
+  }
+
+  // ServletConfig methods
+
+  public String getInitParameter(String name)
+  {
+    return null;  // FIXME
+  }
+
+  public Enumeration getInitParameterNames()
+  {
+    return null;  // FIXME
+  }
+
+  public ServletContext getServletContext()
+  {
+    return null;  // FIXME
+  }
+
+  public String getServletName()
+  {
+    return servletName;
   }
 
 }

@@ -134,7 +134,6 @@ public class repl extends Procedure0or1
   {
     if (Interpreter.defaultInterpreter == null)
       {
-	CallContext.setMainContext();
 	Interpreter interp
 	  = Interpreter.getInstanceFromFilenameExtension(name);
 	if (interp != null)
@@ -151,7 +150,6 @@ public class repl extends Procedure0or1
   {
     if (Interpreter.defaultInterpreter == null)
       {
-	CallContext.setMainContext();
 	Interpreter.defaultInterpreter = Interpreter.getInstance(null);
 	Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
       }
@@ -524,7 +522,6 @@ public class repl extends Procedure0or1
 	    String name = arg;
 	    if (name.length() > 2 && name.charAt(0) == '-')
 	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
-	    CallContext.setMainContext();
 	    Interpreter interpreter = Interpreter.getInstance(name);
 	    if (interpreter == null)
 	      bad_option(arg);

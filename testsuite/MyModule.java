@@ -4,9 +4,9 @@ public class MyModule implements Runnable
 {
   public void run ()
   {
-    Interpreter interp = Interpreter.getInterpreter();
+    Language language = Language.getDefaultLanguage();
     Object arg = Boolean.TRUE;
-    interp.defineFunction (new MyFunc ("my-func-t", arg));
+    language.defineFunction (new MyFunc ("my-func-t", arg));
   }
 }
 

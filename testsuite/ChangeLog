@@ -1,3 +1,7 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* MyModule.java: Update Interpreter->Lanuguage various places.
+
 2005-02-20  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Various tests for parameters and fluids. 

@@ -1,3 +1,5 @@
+Changes from Kawa 1.6.55 to 1.6.57
+==================================
 A new command-line flag --server PORT specifies that Kawa should run
 as a telnet server on the specified PORT, creating a new read-eval-print
 loop for each connection.  This allows you to connect using any

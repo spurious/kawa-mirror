@@ -9,7 +9,7 @@ import java.io.*;
  * a literal '<' as a plain "<", instead of being escaped as "&lt;".
  */
 
-public class UnescapedData implements Externalizable
+public class UnescapedData implements Externalizable, Consumable
 {
   String data;
 
@@ -25,6 +25,11 @@ public class UnescapedData implements Externalizable
   public final String getData() { return data; }
 
   public final String toString() { return data; }
+
+  public void consume(Consumer out)
+  {
+    out.writeChars(data);
+  }
 
   public final boolean equals(Object other)
   {

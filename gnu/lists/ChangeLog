@@ -1,3 +1,8 @@
+2002-02-16  Per Bothner  <per@bothner.com>
+
+	* UnescapedData.java:  Implement Consumable..
+	(consume):  New method.
+
 2002-02-05  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (getNextTypeIndex):  Fix bad BEGIN_GROUP_LONG handling.

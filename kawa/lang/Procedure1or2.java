@@ -17,7 +17,7 @@ public abstract class Procedure1or2 extends Procedure
   public Object apply0 ()
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name,1,"(? arg1 [arg2])");
+    throw new WrongArguments(this.name(), 1,"(? arg1 [arg2])");
   }
 
   public abstract Object apply1 (Object arg1)
@@ -29,13 +29,13 @@ public abstract class Procedure1or2 extends Procedure
   public Object apply3 (Object arg1, Object arg2, Object arg3)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name,1,"(? arg1 [arg2])");
+    throw new WrongArguments(this.name(), 1,"(? arg1 [arg2])");
   }
 
   public Object apply4 (Object arg1, Object arg2, Object arg3, Object arg4)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name,1,"(? arg1 [arg2])");
+    throw new WrongArguments(this.name(), 1,"(? arg1 [arg2])");
   }
 
   public Object applyN (Object[] args)
@@ -46,6 +46,6 @@ public abstract class Procedure1or2 extends Procedure
     else if (args.length == 2)
       return apply2 (args[0], args[1]);
     else
-      throw new WrongArguments(this.name,1,"(? arg1 [arg2])");
+      throw new WrongArguments(this.name(), 1,"(? arg1 [arg2])");
   }
 }

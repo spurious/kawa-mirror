@@ -1,15 +1,29 @@
 package kawa.lang;
 
 public class Named extends Object implements Nameable {
-  public String name;
+  public Symbol sym_name;
+
+  public Named ()
+  {
+  }
 
   public Named (String name)
   {
-     this.name = name;
+     sym_name = Symbol.make (name);
   }
 
-  public String name()
+  public Named (Symbol name)
   {
-    return name;
+     sym_name = name;
+  }
+
+  public final Symbol name()
+  {
+    return sym_name;
+  }
+
+  public final void setName (Symbol name)
+  {
+    sym_name = name;
   }
 }

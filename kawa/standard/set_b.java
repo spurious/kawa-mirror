@@ -21,6 +21,8 @@ public class set_b extends Syntax implements Printable
     Symbol sym = (Symbol) match[0];
     Expression value = tr.rewrite (match[1]);
     Object binding = tr.current_decls.get (sym);
+    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
+    // to the original Symbol.  Here, use the original Symbol.
     if (binding != null && binding instanceof Symbol)
       return new SetExp ((Symbol) binding, value);
     SetExp sexp = new SetExp (sym, value);

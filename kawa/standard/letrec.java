@@ -31,7 +31,7 @@ public class letrec extends Syntax implements Printable
 	if (bind_match == null)
 	  return tr.syntaxError ("letrec binding is not 2-element list");
 	if (! (bind_match[0] instanceof Symbol))
-	  return tr.syntaxError ("letrec variable is not an indetifier");
+	  return tr.syntaxError ("letrec variable is not an identifier");
 	let.add_decl ((Symbol) bind_match[0]);
 	inits[i] = QuoteExp.undefined_exp;
 	orig_inits[i] = bind_match[1];
@@ -39,7 +39,7 @@ public class letrec extends Syntax implements Printable
       }
     let.push (tr);
     i = 0;
-    for (Variable var = let.firstVar ();  var != null;  var = var.nextVar (), i++)
+    for (Variable var = let.firstVar(); var != null; var = var.nextVar(), i++)
       {
 	Expression exp = tr.rewrite(orig_inits[i]);
 	Declaration decl = (Declaration) var;

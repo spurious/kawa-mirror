@@ -1,3 +1,7 @@
+2001-06-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Use automake conditionals for xml.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* kawa/xml:  Sub-directory moved/renamed to ...

@@ -100,9 +100,9 @@ libgcj_basedir = @libgcj_basedir@
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS_WITH_SWING = commonlisp jemacs
-XML_ENABLED = xml
-SUBDIRS = bytecode math lists text mapping expr $(@XML_SELECTED@) 	kawa ecmascript $(SUBDIRS_@SWING_SELECTED@)
+SUBDIRS = bytecode math lists text mapping expr $(XML_SUBDIRS) 	kawa ecmascript $(SUBDIRS_@SWING_SELECTED@)
 
+@ENABLE_XML_TRUE@XML_SUBDIRS = xml
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html
@@ -115,6 +115,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
+DIST_SUBDIRS =  bytecode math lists text mapping expr xml kawa \
+ecmascript
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
@@ -229,7 +231,7 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-	for subdir in $(SUBDIRS); do \
+	for subdir in $(DIST_SUBDIRS); do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \

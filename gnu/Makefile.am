@@ -3,9 +3,11 @@
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS_WITH_SWING = commonlisp jemacs
-XML_ENABLED = xml
-SUBDIRS = bytecode math lists text mapping expr $(@XML_SELECTED@) \
+SUBDIRS = bytecode math lists text mapping expr $(XML_SUBDIRS) \
 	kawa ecmascript $(SUBDIRS_@SWING_SELECTED@)
+if ENABLE_XML
+XML_SUBDIRS = xml
+endif
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html

@@ -1,4 +1,5 @@
 package kawa.lang;
+import kawa.math.*;
 import java.io.*;
 
 /**
@@ -354,7 +355,7 @@ public class InPort extends FilterInputStream implements Printable
       }
     do
       {
-	if (c=='.' || c=='e' || c=='E')
+	if ((c=='.' || c=='e' || c=='E') && radix == 10)
 	  isFloat = true;
 	str.append ((char) c);
 	c = readChar ();
@@ -364,9 +365,9 @@ public class InPort extends FilterInputStream implements Printable
     unreadChar();
 
     if (isFloat)
-      return Double.valueOf(str.toString ());
+      return new DFloNum (str.toString ());
     else
-      return Integer.valueOf(str.toString (), radix);
+      return IntNum.valueOf(str.toString (), radix);
   }
 
   /**

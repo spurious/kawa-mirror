@@ -28,13 +28,10 @@ public class Interpreter extends Object
   // Currently maps String -> Object;  should probably be Symbol -> Object.
   protected java.util.Hashtable globals;
   
-  static protected Symbol lambda_sym = Symbol.intern ("lambda");
-  static protected Lambda lambda = new Lambda ();
   static public Symbol quote_sym = Symbol.make ("quote");
   static public Symbol unquote_sym = Symbol.make ("unquote");
   static public Symbol unquotesplicing_sym = Symbol.make ("unquote-splicing");
   static public Symbol quasiquote_sym = Symbol.intern ("quasiquote");
-  static protected Quote quote = new Quote();
 
   // Map name to Declaration.
   public java.util.Hashtable current_decls;
@@ -47,6 +44,11 @@ public class Interpreter extends Object
   public OutPort err;
 
   static Interpreter curInterpreter;
+
+  public static final Boolean boolObject (boolean b)
+  {
+    return b ? trueObject : falseObject;
+  }
 
   static public Interpreter current ()
   {
@@ -63,9 +65,6 @@ public class Interpreter extends Object
 
       globals         = new java.util.Hashtable();
       current_decls   = new java.util.Hashtable();
-
-      define(lambda_sym, lambda);
-      define(quote_sym, quote);
    }
 
   public void define(String name, Object p)
@@ -122,24 +121,6 @@ public class Interpreter extends Object
       return list;
    }
 
-   public Object eval(Object obj) 
-      throws kawa.lang.UnboundSymbol,
-             kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError
-   {
-     throw new GenericError ("interp.eval called!");
-   }
-
-   public Object eval(Object obj,java.util.Vector frames) 
-      throws kawa.lang.UnboundSymbol,
-             kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError
-   {
-     throw new GenericError ("interp.eval called!");
-   }
- 
   public Object read()
       throws java.io.IOException, SyntaxError
   {

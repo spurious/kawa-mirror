@@ -8,7 +8,6 @@ package kawa.lang;
 public class Environment
 {
   kawa.lang.Interpreter interp;
-  java.util.Vector frames; // Obsolete (soon)
   /** The ScopeExp that create this Environment. */
   ScopeExp scope;
   /** The actual frame with the values. */
@@ -20,7 +19,6 @@ public class Environment
   public Environment (kawa.lang.Interpreter i)
   {
     interp = i;
-    frames = null;
   }
 
   /**
@@ -43,6 +41,7 @@ public class Environment
    * @param sym the name of the binding to search for
    * @return the value of the binding, or null if not found
    */
+  /*
   Object lookup (Symbol sym)
   {
     Environment env = this;
@@ -53,7 +52,7 @@ public class Environment
 	  return env.values[decl.offset];
       }
     return interp.globals.get (sym.toString ());
-  }
+  */
 
   /**
    * Evaluate an expression in this Environment.

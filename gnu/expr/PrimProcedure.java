@@ -3,7 +3,6 @@ import gnu.bytecode.*;
 import java.util.Hashtable;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
-//import kawa.standard.Scheme;
 import gnu.mapping.*;
 
 /** A primitive Procedure implemented by a plain Java method. */

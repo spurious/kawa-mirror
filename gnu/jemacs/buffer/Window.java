@@ -89,7 +89,8 @@ public class Window extends javax.swing.JTextPane
     if (selected != null && selected.buffer != buffer)
       selected.unselect();
 
-    frame.selectedWindow = this;
+    if (frame != null)
+      frame.selectedWindow = this;
     Frame.selectedFrame = frame;
     Buffer.setCurrent(buffer);
 

@@ -6,7 +6,7 @@ public class with_output_to_file extends Procedure2
 {
   public with_output_to_file ()
   {
-    super("with_output-to-file");
+    super("with-output-to-file");
   }
 
   public Object apply2 (Object string, Object proc)

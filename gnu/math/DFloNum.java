@@ -206,7 +206,8 @@ public class DFloNum extends RealNum implements Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
-    comp.method.compile_push_double (value);
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    code.emitPushDouble(value);
     comp.method.compile_invoke_static (makeMethod);
   }
 }

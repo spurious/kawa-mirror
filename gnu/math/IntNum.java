@@ -1141,14 +1141,15 @@ public class IntNum extends RatNum implements Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (words == null)
       {
-	comp.method.compile_push_int (ival);
+	code.emitPushInt(ival);
 	comp.method.compile_invoke_static (makeIntMethod);
       }
     else if (ival <= 2)
       {
-	comp.method.compile_push_long (longValue ());
+	code.emitPushLong(longValue ());
 	comp.method.compile_invoke_static (makeLongMethod);
       }
     else

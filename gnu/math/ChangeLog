@@ -1,3 +1,7 @@
+Thu Nov 27 21:37:03 1997  Per Bothner  <bothner@cygnus.com>
+
+	* DFloNum.java, IntNum.java (emit):  Update for gnu.bytecode changes.
+
 Sat Nov  1 20:53:37 1997  Per Bothner  <bothner@cygnus.com>
 
 	* DFloNum.java (toExact):  Make simpler and more efficient.

@@ -1,12 +1,10 @@
-AUTOMAKE_OPTIONS = foreign
-
-@Make_rules@
+include $(top_srcdir)/Make-rules
 
 KAWALIB = ../../..
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
-CLEANFILES = tmp* *.log testing.zip *.class
+EXTRA_CLEAN = tmp* *.log testing.zip *.class
 
 java_sources = TestMisc.java TestSuite.java
 

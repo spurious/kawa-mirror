@@ -1,5 +1,8 @@
 2002-03-02  Per Bothner  <per@bothner.com>
 
+	* Interpreter.java (parseFile):  Now throws IOException and
+	SyntaxException.
+
 	* Interpreter.java (eval):  Eight new utility methods.
 
 2002-02-15  Per Bothner  <per@bothner.com>

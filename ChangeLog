@@ -1,3 +1,49 @@
+Tue Jan 27 12:02:33 1998  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in (VERSION):  Set to 1.5.94.
+
+Mon Jan 26 16:38:14 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/CatchClause.java:  Fixes to get things working.
+	(getNext, setNext, getBody, setBody): New methods.
+	* kawa/lang/TryExp.java:  More fixes.
+	(getCatchClauses, setCatchClauses):  New.
+	* kawa/standard/prim_throw.java:  New class implements primitive-throw.
+	* kawa/standard/throw_name.java:  New Procedure implements throw.
+	* kawa/standard/try_catch.java: new syntax, implements try-catch.
+	* kawa/standard/error.java:  Removed class.
+
+	* kawa/lang/Named.java (getName):  New method.
+
+	* kawa/standard/Scheme.java (define_proc):  New method overload.
+	(initScheme):  Add new methods.  Give name() to old ones.
+	* kawa/{lang,standard}/Makefile.am:  Update for new/removed classes.
+	
+	* kawa/lang/Inlineable.java:  New interface.
+	* kawa/lang/PrimApplyExp.java:  Removed - subsumed by PrimProcedure.
+	* kawa/lang/PrimProcedure.java:  Implement Inlineable.
+ 	(compile):  New method, taken from PrimApplyExp.compile.
+	* kawa/lang/ApplyExp.java (getArgs):  New method.
+	(compile): If a quoted Inlineable function, call its compile method.
+	* kawa/lang/Translator.java (rewrite_pair):  Check if func name is
+	bound to an Inlineable proc;  if so, wrap it in a QuoteExp.
+	But we no longer need to handle PrimProcedure specially.
+	* kawa/standard/prim_method.java (exp2Type):  New method.
+	(rewrite):  Use exp2Type.
+	* kawa/lang/NamedException.java:  New class.
+
+	* kawa/lang/PrimProcedure.java (getnamedType):  Don't put
+	predefined <TYPENAME>s in types;  let rewrite handle it.
+	* kawa/lang/Translator.java (rewrite):  Handle generate <TYPENAME>.
+
+	* kawa/lang/InPort.java (readListBody):  Allow "(. x)", so change
+	return type to Object instead of List.
+	* kawa/lang/ModuleExp.java (constructor):  Update for readListBody.
+	* kawa/lang/CompileFile.java (read):  Likewise.
+	
+	* kawa/lang/{WrongArguments.java,WrongType.java,UnboundSymbol.java,
+	GenericError.java}:  Inherit from RuntimeException.
+
 Sat Jan 24 14:31:52 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/MessageArea.java (endMakr, length, out_stream):  New fields.

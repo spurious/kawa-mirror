@@ -1,7 +1,6 @@
 package kawa.standard;
 import gnu.mapping.*;
 import gnu.math.Unit;
-import gnu.kawa.xml.ElementConstructor;
 
 /** An Environment that does special handling for names of the form "<TYPE>".
  * I.e. if an identifier of the form is unbound, then get a matching Type.

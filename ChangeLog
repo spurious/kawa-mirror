@@ -1,3 +1,7 @@
+2002-07-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/ScmEnv.java:  Remove unneeded (and harmful) import.
+
 2002-06-26  Per Bothner  <per@bothner.com>
 
 	* build.xml:  Update XMLParser.java -> XMLParserChar.java.

@@ -58,66 +58,29 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
   }
 
-  private final void writeRaw(String str)
-    // Can probably just use write(str).  FIXME
-  {
-    try
-      {
-	out.write(str);
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new RuntimeException(ex.toString());
-      }
-  }
-
-  private final void writeRaw(int c)
-  {
-    try
-      {
-	out.write(c);
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new RuntimeException(ex.toString());
-      }
-  }
-
-  private final void writeRaw(char[] buf, int off, int len)
-  {
-    try
-      {
-	out.write(buf, off, len);
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new RuntimeException(ex.toString());
-      }
-  }
-
   public void writeChar(int v)
   {
     closeTag();
     if (prev == WORD)
       {
 	if (isWordChar((char) v))
-	  writeRaw(' ');
+	  super.write(' ');
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
     if (! escapeText)
-      writeRaw((char) v);
+      super.write((char) v);
     else if (v == '<' && ! (isHtml && inAttribute))
-      writeRaw("&lt;");
+      super.write("&lt;");
     else if (v == '>')
-      writeRaw("&gt;");
+      super.write("&gt;");
     else if (v == '&')
-      writeRaw("&amp;");
+      super.write("&amp;");
     else if (v == '\"' && inAttribute)
-      writeRaw("&quot;");
+      super.write("&quot;");
     else if (v >= 127)
-      writeRaw("&#"+v+";");
+      super.write("&#"+v+";");
     else
-      writeRaw((char) v);
+      super.write((char) v);
     prev = v;
   }
 
@@ -125,7 +88,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   {
     closeTag();
     if (prev == WORD || isWordChar((char) prev))
-      writeRaw(' ');
+      super.write(' ');
     prev = WORD;
   }
 
@@ -139,7 +102,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   {
     if (inStartTag && ! inAttribute)
       {
-	writeRaw('>');
+	super.write('>');
 	inStartTag = false;
 	prev = '>';
       }
@@ -153,8 +116,8 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
-    writeRaw('<');
-    writeRaw(typeName);
+    super.write('<');
+    super.write(typeName);
     inStartTag = true;
     if (isHtml
 	&& ("script".equals(typeName) || "style".equals(typeName)))
@@ -177,16 +140,16 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
       closeTag();
     if (inStartTag)
       {
-	writeRaw(isHtml
+	super.write(isHtml
 		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
 		 : (htmlCompat ? " />" : "/>"));
 	inStartTag = false;
       }
     else
       {
-	writeRaw("</");
-	writeRaw(typeName);
-	writeRaw(">");
+	super.write("</");
+	super.write(typeName);
+	super.write(">");
       }
     prev = '>';
     if (isHtml && ! escapeText
@@ -199,17 +162,17 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   public void beginAttribute(String attrName, Object attrType)
   {
     if (inAttribute)
-      writeRaw('"');
+      super.write('"');
     inAttribute = true;
-    writeRaw(' ');
-    writeRaw(attrName);
-    writeRaw("=\"");
+    super.write(' ');
+    super.write(attrName);
+    super.write("=\"");
     prev = ' ';
   }
 
   public void endAttribute()
   {
-    writeRaw('"');
+    super.write('"');
     inAttribute = false;
     prev = ' ';
   }
@@ -219,7 +182,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     closeTag();
     if (v instanceof UnescapedData)
       {
-	writeRaw(((UnescapedData) v).getData());
+	super.write(((UnescapedData) v).getData());
       }
     else if (v instanceof Consumable)
       ((Consumable) v).consume(this);
@@ -262,8 +225,6 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
       writeChar(str.charAt(i));
   }
 
-  //public void writeChars(AbstractString str);
-
   public void write(char[] buf, int off, int len)
   {
     closeTag();
@@ -288,7 +249,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 	    || ch == '&' || (ch == '"' && inAttribute))
 	  {
 	    if (count > 0)
-	      writeRaw(buf, off - 1 - count, count);
+	      super.write(buf, off - 1 - count, count);
 	    writeChar(c);
 	    count = 0;
 	  }
@@ -296,7 +257,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 	  count++;
       }
     if (count > 0)
-      writeRaw(buf, limit - count, count);
+      super.write(buf, limit - count, count);
   }
 
   public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)

@@ -1,5 +1,7 @@
 2000-06-19  Per Bothner  <per@bothner.com>
 
+	* package.html:  Point to www.JEmacs.net.
+
 	* BufferKeymap.java (ignorable):  Don't ignore '\n' or '\t'.
 
 	* Command.java (processInteractionString):  Accept 'F'.

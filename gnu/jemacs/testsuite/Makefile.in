@@ -180,8 +180,13 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 all:
 
-check:
+check_WITH_SWING:
 	$(DOTEST) -f "$(srcdir)/lang-test.el" -e '(test-report)'
+
+check_WITHOUT_SWING:
+	@echo "(no checks, since configued without --with-swing)"
+
+check: check_@SWING_SELECTED@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

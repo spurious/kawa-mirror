@@ -1,3 +1,8 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* Q2.java:  Remove unused import statements.
+	* Q2Read.java:  Likewise.
+
 2004-06-22  Per Bothner  <per@bothner.com>
 
 	* Q2Read.java:  Remove BRL/KRL model of starting out quoted.

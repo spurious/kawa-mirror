@@ -1,12 +1,9 @@
 package gnu.q2.lang;
 import gnu.mapping.*;
 import kawa.standard.Scheme;
-import kawa.lang.Translator;
-import gnu.kawa.lispexpr.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
-import gnu.text.Lexer;
 
 public class Q2 extends Scheme
 {

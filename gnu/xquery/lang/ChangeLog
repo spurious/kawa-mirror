@@ -1,3 +1,7 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Remove unused import statements.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (nesting, pushNesting, popNesting):  Moved to Lexer.

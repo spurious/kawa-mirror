@@ -2,14 +2,12 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
-import gnu.xquery.util.*;
 import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.*;
 import gnu.expr.*;
 import java.util.Vector;
-import java.util.Hashtable;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
 import gnu.bytecode.Type;

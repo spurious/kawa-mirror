@@ -4,7 +4,6 @@ import gnu.expr.QuoteExp;
 import gnu.text.*;
 import gnu.mapping.*;
 import gnu.lists.*;
-import java.util.Stack;
 import gnu.expr.Keyword;
 import gnu.xquery.util.MakeAttribute;
 

@@ -24,7 +24,6 @@ VarListPat.java \
 Lambda.java \
 Quote.java \
 Translator.java \
-Interpreter.java \
 Eval.java \
 AutoloadProcedure.java \
 Continuation.java \

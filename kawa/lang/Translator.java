@@ -161,11 +161,15 @@ public class Translator extends Object
     if (obj instanceof String)
       {
 	String sym = (String) obj;
-	obj = environ.get (sym);
+	Binding binding = environ.lookup (sym);
+	if (binding == null)
+	  obj = null;
+	else
+	  obj = binding.getFunctionValue();
 
         if (obj instanceof Syntax)
           return obj;
-	Binding binding = null;
+	binding = null;
         if (obj != null)
 	  {
 	    // Hygenic macro expansion may bind a renamed (uninterned) symbol
@@ -215,8 +219,8 @@ public class Translator extends Object
 	  {
             String name = ref.getName();
             Binding binding = env.lookup((String) name);
-	    if (binding != null && binding.isBound())
-              proc = binding.get();
+	    if (binding != null)
+	      proc = binding.getFunctionValue();
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)

@@ -23,13 +23,20 @@ public class export extends Syntax
       }
     while (list != LList.Empty)
       {
+        Object symbol;
 	if (! (st instanceof Pair)
-	    || ! ((st = (Pair) list).car instanceof String))
+	    || ! ((symbol = (st = (Pair) list).car) instanceof String
+                  || (symbol instanceof gnu.mapping.Symbol)))
 	  {
 	    tr.error('e', "invalid syntax in '" + getName() + '\'');
 	    return false;
 	  }
-	String symbol = (String) st.car;
+        if (symbol instanceof String)
+          {
+            String str = (String) symbol;
+            if (str.startsWith("namespace:"))
+              symbol = (Language.NAMESPACE_PREFIX + str.substring(10)).intern();
+          }
 	Declaration decl = defs.getNoDefine(symbol);
 	if (decl.getFlag(Declaration.NOT_DEFINING))
 	  Translator.setLine(decl, st);

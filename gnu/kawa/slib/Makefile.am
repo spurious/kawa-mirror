@@ -8,12 +8,12 @@ EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
 
 if ENABLE_XML
 XML_SCM = XML.scm XStrings.scm
+if WITH_SWING
+SWING_SCM = gui.scm
+endif
 endif
 if ENABLE_SERVLET
 SERVLET_SCM = HTTP.scm
-endif
-if WITH_SWING
-SWING_SCM = gui.scm
 endif
 
 # NOTE if this list is changed, also update build,xml.

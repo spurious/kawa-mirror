@@ -1,3 +1,7 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: The NEWS web page is now news.html.
+
 2005-02-06  Per Bothner  <per@bothner.com>
 
 	* internals.xml: Moved to Kawa web site, and assocated cvs repository,

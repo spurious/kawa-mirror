@@ -41,7 +41,7 @@ and that compiles Scheme code into Java byte-codes.
 This documents version @value{VERSION}, updated @value{UPDATED}.
 
 See the summary
-of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
+of @uref{http://www.gnu.org/software/kawa/news.html,recent changes}.
 
 The author of Kawa is
 @uref{http://www.bothner.com/per/,Per Bothner}

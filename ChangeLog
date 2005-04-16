@@ -1,3 +1,9 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* NEWS: Remove file; replaced by html web-page
+	http://www.gnu.org/software/kawa/news.html.
+	* Makefile.am (instanll-html), README: Update accordingly.
+
 2005-04-08  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/export.java (scanForDefinitions): Translate

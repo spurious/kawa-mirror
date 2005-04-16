@@ -789,7 +789,6 @@ install-javadoc-html:
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 
 install-html: install-javadoc-html
-	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
 
 install-data-am:  install-jar

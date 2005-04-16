@@ -15,5 +15,6 @@ java_sources = \
   SwtWindow.java
 
 PACKAGE_FNAME = gnu-jemacs-swt
+GCJ_INPUTS =  $(java_Java)
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

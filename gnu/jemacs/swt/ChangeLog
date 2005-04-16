@@ -1,3 +1,7 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (GCJ_INPUTS, all): Some GCJ-specific fixes.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java: Remove useful or incorrect javadoc comments.

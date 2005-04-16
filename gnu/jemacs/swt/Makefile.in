@@ -221,6 +221,7 @@ java_sources = \
   SwtWindow.java
 
 PACKAGE_FNAME = gnu-jemacs-swt
+GCJ_INPUTS = $(java_Java)
 all: all-am
 
 .SUFFIXES:
@@ -414,7 +415,7 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

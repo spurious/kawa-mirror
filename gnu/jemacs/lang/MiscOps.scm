@@ -15,9 +15,6 @@
 
 (define (purecopy obj) obj)
 
-(define (call-interactively command)
-  (invoke-static <gnu.jemacs.buffer.Command> 'perform command))
-
 (define (minibuffer-depth) 0)  ;; FIXME
 
 ;; The 'if' primitive in version takes an arbitary number of 'else'
@@ -61,13 +58,6 @@
   (invoke-static 'gnu.kawa.functions.Format 'formatToString #\% fmt args))
 
 (define (quit-char) #\bel)
-
-(define (make-local-variable symbol)
-  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #f)
-  symbol)
-(define (make-variable-buffer-local symbol)
-  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #t)
-  symbol)
 
 (define (emacs:read #!optional (port (current-input-port)))
   (let ((lexer

@@ -1,3 +1,9 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* MiscOps.scm (call-interactively, make-variable-buffer-local,
+	make-local-variable): Move buffer-dependent functions to emacs.scm.
+	This removes one dependency of gnu.jemacs.lang on gnu.jemacs.buffer.
+
 2005-03-29  Per Bothner  <per@bothner.com>
 
 	* ELisp.java: Initalize various static fields,

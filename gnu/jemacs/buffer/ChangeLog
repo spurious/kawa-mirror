@@ -1,3 +1,9 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (call-interactively, make-variable-buffer-local,
+	make-local-variable): Move buffer-dependent functions from MiscOps.scm.
+	This removes one dependency of gnu.jemacs.lang on gnu.jemacs.buffer.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* ReplMode.java: Update Interpreter->Lanuguage various places.

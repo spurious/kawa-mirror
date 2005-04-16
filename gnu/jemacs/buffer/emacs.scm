@@ -583,3 +583,13 @@
 (define (decode-buffer buffer)
   (if (eq? '() buffer) (current-buffer)
       (get-buffer buffer)))
+
+(define (call-interactively command)
+  (invoke-static <gnu.jemacs.buffer.Command> 'perform command))
+
+(define (make-local-variable symbol)
+  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #f)
+  symbol)
+(define (make-variable-buffer-local symbol)
+  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #t)
+  symbol)

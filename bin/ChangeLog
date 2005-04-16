@@ -1,3 +1,7 @@
+2005-04-16  Per Bothner  <per@bothner.com>
+
+	* cgi-servlet.c: Do #include <string.h>, since strlen is used.
+
 2005-03-06  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Need new definition of LIBTOOL.

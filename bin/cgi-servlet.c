@@ -1,7 +1,8 @@
 /* A front-end to allow a servlet to be run as a CGI script.
  */
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern char **environ;
 extern char* get_classpath();

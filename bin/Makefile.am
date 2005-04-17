@@ -32,12 +32,25 @@ INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
-KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
-  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
-LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
-  gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
-EXTRA_LIB_XML = -l-org-w3c-dom -l-org-xml-sax
+KAWA1_XML_OFILES = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo \
+  gnu-xquery-lang.lo
+KAWA2_XML_OFILES = gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
+LIBADD_XML = gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 endif
+if WITH_SWING
+KAWA2_JEMACS_SWING = gnu-jemacs-swing.o
+LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
+KAWA2_SWINGVIEWS_OFILES = gnu-kawa-swingviews.o
+LIBADD_SWINGVIEWS = gnu-kawa-swingviews.lo
+endif
+if WITH_SWT
+KAWA2_JEMACS_SWT = gnu-jemacs-swt.o
+LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
+endif
+KAWA2_JEMACS_OFILES = gnu-jemacs-lang.o gnu-jemacs-buffer.o gnu-jemacs-lisp.o \
+  $(KAWA2_JEMACS_SWING) $(KAWA2_JEMACS_SWT)
+LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
+  $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
 if ENABLE_SERVLET
 KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
 LIBADD_SERVLET = gnu-kawa-servlet.lo
@@ -76,10 +89,12 @@ KAWA1_OFILES = \
   gnu-kawa-lispexpr.lo \
   gnu-kawa-reflect.lo \
   gnu-kawa-util.lo \
+  gnu-kawa-models.lo \
   gnu-mapping.lo \
   gnu-math.lo \
   gnu-text.lo \
   gnu-commonlisp-lang.lo \
+  $(KAWA1_XML_OFILES) \
   kawa-lang.lo \
   kawa-repl.lo \
   kawa-standard.lo
@@ -92,9 +107,14 @@ kawa-standard.lo:
 	cd ../kawa/standard && $(MAKE)
 kawa-repl.lo:
 	cd ../kawa && $(MAKE) ../bin/kawa-repl.lo
+gnu-xquery-lang.lo:
+	cd ../gnu/xquery/lang && $(MAKE)
+gnu-xquery-util.lo:
+	cd ../gnu/xquery/util && $(MAKE)
 
 KAWA2_OFILES = $(KAWA1_OFILES) \
-  $(KAWA2_XML_OFILES) $(KAWA2_SERVLET_OFILES) \
+  $(KAWA2_XML_OFILES) $(KAWA2_JEMACS_OFILES) $(KAWA2_SWINGVIEWS_OFILES) \
+  $(KAWA2_SERVLET_OFILES) \
   kawa-lib.o \
   gnu-commonlisp-lisp.o \
   gnu-kawa-slib.o
@@ -110,9 +130,11 @@ endif
 libkawa_la_SOURCES = 
 libkawa_la_LIBADD = \
   $(KAWA1_OFILES) \
-  gnu-ecmascript.lo \
   $(LIBADD_XML) \
   $(LIBADD_SERVLET) \
+  $(LIBADD_SWINGVIEWS) \
+  $(LIBADD_JEMACS) \
+  gnu-ecmascript.lo \
   gnu-kawa-slib.lo \
   gnu-commonlisp-lisp.lo \
   kawa-lib.lo

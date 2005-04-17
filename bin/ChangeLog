@@ -1,6 +1,6 @@
 2005-04-17  Per Bothner  <per@bothner.com>
 
-	* Makefile.ma: Fix/improve various GCJ-related issues.
+	* Makefile.am: Fix/improve various GCJ-related issues.
 
 2005-04-16  Per Bothner  <per@bothner.com>
 

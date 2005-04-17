@@ -71,7 +71,14 @@ public class ObjectType extends Type
     catch (java.lang.ClassNotFoundException ex)
       {
         if ((flags & EXISTING_CLASS) != 0)
-          throw new RuntimeException("no such class: "+getName());
+          {
+	    RuntimeException rex
+              = new RuntimeException("no such class: "+getName());
+            /* #ifdef JAVA4 */
+            rex.initCause(ex);
+            /* #endif */
+            throw rex;
+          }
       }
     return reflectClass;
   }

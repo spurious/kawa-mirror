@@ -51,11 +51,11 @@ public class WrappedException extends RuntimeException
    */
   public WrappedException (String message, Throwable e)
   {
-    /* #ifdef JAVA5 */
-    // super(message, e);
+    /* #ifdef JAVA4 */
+    super(message, e);
     /* #else */
-    super(message);
-    initCause(e);
+    // super(message);
+    // initCause(e);
     /* #endif */
   }
 
@@ -80,19 +80,19 @@ public class WrappedException extends RuntimeException
   }
 
   // The initCause/getCause functionality was added in JDK 1.4.
-  /* #ifndef JAVA5 */
-  public Throwable initCause(Throwable cause)
-  {
-    exception = cause;
-    return this;
-  }
+  /* #ifndef JAVA4 */
+  // public Throwable initCause(Throwable cause)
+  // {
+  //   exception = cause;
+  //   return this;
+  // }
 
-  public Throwable getCause()
-  {
-    return exception;
-  }
+  // public Throwable getCause()
+  // {
+  //   return exception;
+  // }
 
-  private Throwable exception;
+  // private Throwable exception;
   /* #endif */
 
   /** Coerce argument to a RuntimeException. */

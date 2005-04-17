@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KCDATASection extends KText
-  implements org.w3c.dom.CDATASection
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.CDATASection
+  /* #endif */
 {
   public KCDATASection (NodeTree seq, int ipos)
   {

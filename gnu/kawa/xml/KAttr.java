@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KAttr extends KNode
-  implements org.w3c.dom.Attr
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.Attr
+  /* #endif */
 {
   public KAttr (NodeTree seq, int ipos)
   {
@@ -31,22 +33,24 @@ public class KAttr extends KNode
     return sequence.getPosNext(ipos+10);
   }
 
-  public void setValue (String value)
-    throws DOMException
-  {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   "setValue not supported");
-  }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public void setValue (String value)
+  //   throws DOMException
+  // {
+  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   // "setValue not supported");
+  // }
 
-  public Node getParentNode()
-  {
-    return null;
-  }
+  // public Node getParentNode()
+  // {
+  //   return null;
+  // }
 
-  public Element  getOwnerElement ()
-  {
-    return (Element) super.getParentNode();
-  }
+  // public Element  getOwnerElement ()
+  // {
+  //   return (Element) super.getParentNode();
+  // }
+  /* #endif */
 
   public boolean getSpecified ()
   {

@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KDocument extends KNode
-  implements org.w3c.dom.Document
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.Document
+  /* #endif */
 {
   public KDocument (NodeTree seq, int ipos)
   {
@@ -33,10 +35,12 @@ public class KDocument extends KNode
     return null;
   }
 
-  public Element getDocumentElement ()
-  {
-    return (Element) getFirstChild();
-  }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public Element getDocumentElement ()
+  // {
+  //   return (Element) getFirstChild();
+  // }
+  /* #endif */
 
   public short getNodeType () { return Node.DOCUMENT_NODE; }
 

@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KComment extends KCharacterData
-  implements org.w3c.dom.Comment
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.Comment
+  /* #endif */
 {
   public KComment (NodeTree seq, int ipos)
   {

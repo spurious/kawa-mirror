@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public abstract class KCharacterData extends KNode
-  implements org.w3c.dom.CharacterData
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.CharacterData
+  /* #endif */
 {
   public KCharacterData (NodeTree seq, int ipos)
   {

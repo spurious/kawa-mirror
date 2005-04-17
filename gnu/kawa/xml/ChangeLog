@@ -1,3 +1,18 @@
+2005-04-17  Per Bothner  <per@bothner.com>
+
+	* KAttr.java: Make org.w3c.dom.*-dependencies conditional on
+	new 'use:org.w3c.dom.Node' pre-processor condition.
+	The default is now 'off'.
+	* KCDATASection.java: Likewise.
+	* KCharacterData.java: Likewise.
+	* KComment.java: Likewise.
+	* KDocument.java: Likewise.
+	* KElement.java: Likewise.
+	* KNode.java: Likewise.
+	* KProcessingInstruction.java: Likewise.
+	* KText.java: Likewise.
+	* Nodes.java: Likewise.
+
 2005-03-06  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Moved to gnu.kawa.lispexpr.

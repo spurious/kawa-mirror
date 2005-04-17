@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KElement extends KNode
-  implements org.w3c.dom.Element
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.Element
+  /* #endif */
 {
   public KElement (NodeTree seq, int ipos)
   {

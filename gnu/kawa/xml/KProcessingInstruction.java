@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KProcessingInstruction extends KNode
-  implements org.w3c.dom.ProcessingInstruction
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.ProcessingInstruction
+  /* #endif */
 {
   public KProcessingInstruction (NodeTree seq, int ipos)
   {

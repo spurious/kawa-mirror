@@ -10,7 +10,9 @@ import org.w3c.dom.*;
 /** Manages a sequence of node references. */
 
 public class Nodes extends Values
-implements org.w3c.dom.NodeList
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.NodeList
+  /* #endif */
 {
   /** Number of data elements for a POSITION_PAIR_FOLLOWS node reference. */
   static final int POS_SIZE = 5;

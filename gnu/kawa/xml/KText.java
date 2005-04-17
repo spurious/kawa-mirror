@@ -6,7 +6,9 @@ import gnu.xml.*;
 import org.w3c.dom.*;
 
 public class KText extends KCharacterData
-  implements org.w3c.dom.Text
+  /* #ifdef use:org.w3c.dom.Node */
+  // implements org.w3c.dom.Text
+  /* #endif */
 {
   public KText (NodeTree seq, int ipos)
   {

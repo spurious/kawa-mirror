@@ -30,7 +30,8 @@ AC_ARG_WITH(swt,
   AS_HELP_STRING(--with-swt,Assume SWT is available))
 
 AC_ARG_WITH(awt,
-  AS_HELP_STRING(--with-awt,Assume AWT is available (default on)))
+  AS_HELP_STRING(--with-awt,Assume AWT is available (default on)),
+  enable_awt=$enableval, enable_awt=yes)
 
 AC_ARG_WITH(sax2,
   AS_HELP_STRING(--with-sax2,Assume SAX2 is available))
@@ -38,15 +39,20 @@ AC_ARG_WITH(sax2,
 AC_ARG_WITH(java-source,
   AS_HELP_STRING(--with-java-source=NUM,Assume functionality of given Java/JDK version))
 
+with_java_source=`echo ${with_java_source} | tr A-Z a-z`
 case "/${with_java_source}/" in
   /1/) JAVA_SOURCE=1 ;;
   /2/) JAVA_SOURCE=2 ;;
+  /4/) JAVA_SOURCE=4 ;;
+  /4x/) JAVA_SOURCE=4x ;;
   /5/) JAVA_SOURCE=5 ;;
   /1.1*/) JAVA_SOURCE=1 ;;
   /1.2*/) JAVA_SOURCE=2 ;;
   /1.3*/) JAVA_SOURCE=2 ;;
-  /1.4*/) JAVA_SOURCE=2 ;;
-  //) JAVA_SOURCE=2 ;;
+  /1.4*+jaxp1.3/) JAVA_SOURCE=4x ;;
+  /1.4*/) JAVA_SOURCE=4 ;;
+  /gcj4/) JAVA_SOURCE=4x ;;
+  //) JAVA_SOURCE=4 ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
   (Must be 1, 2, 5, or a JDK version such as 1.4.)]) ;;
 esac
@@ -84,15 +90,12 @@ case ${with_gcj} in
 
    _AM_DEPENDENCIES(GCJ)
     AC_SUBST(LIBTOOL_DEPS)
-
-    test "${with_awt}" = "" && with_awt=no
     ;;
   *)
     GCJ_COMPILED_SELECTED=DISABLE_GCJ_COMPILED
     GCJ_SELECTED=WITHOUT_GCJ
     JAVA=${JAVA-java}
     JAVAC=${JAVAC-javac}
-    test "${with_awt}" = "" && with_awt=yes
     dnl needed to match _AM_DEPENDENCIES
     am__fastdepGCJ_TRUE='#'
     ;;
@@ -196,7 +199,7 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
-  gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
+  gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile

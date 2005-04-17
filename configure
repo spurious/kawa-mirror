@@ -2347,7 +2347,9 @@ fi;
 # Check whether --with-awt or --without-awt was given.
 if test "${with_awt+set}" = set; then
   withval="$with_awt"
-
+  enable_awt=$enableval
+else
+  enable_awt=yes
 fi;
 
 
@@ -2364,15 +2366,20 @@ if test "${with_java_source+set}" = set; then
 
 fi;
 
+with_java_source=`echo ${with_java_source} | tr A-Z a-z`
 case "/${with_java_source}/" in
   /1/) JAVA_SOURCE=1 ;;
   /2/) JAVA_SOURCE=2 ;;
+  /4/) JAVA_SOURCE=4 ;;
+  /4x/) JAVA_SOURCE=4x ;;
   /5/) JAVA_SOURCE=5 ;;
   /1.1*/) JAVA_SOURCE=1 ;;
   /1.2*/) JAVA_SOURCE=2 ;;
   /1.3*/) JAVA_SOURCE=2 ;;
-  /1.4*/) JAVA_SOURCE=2 ;;
-  //) JAVA_SOURCE=2 ;;
+  /1.4*+jaxp1.3/) JAVA_SOURCE=4x ;;
+  /1.4*/) JAVA_SOURCE=4 ;;
+  /gcj4/) JAVA_SOURCE=4x ;;
+  //) JAVA_SOURCE=4 ;;
   /*/) { { echo "$as_me:$LINENO: error: Invalid version for --with-java-version.
   (Must be 1, 2, 5, or a JDK version such as 1.4.)" >&5
 echo "$as_me: error: Invalid version for --with-java-version.
@@ -6974,7 +6981,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 6977 "configure"
+#line 6984 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7072,7 +7079,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 7075 "configure"
+#line 7082 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7221,7 +7228,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  $ECHO '#line 7224 "configure"' > conftest.$ac_ext
+  $ECHO '#line 7231 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8689,11 +8696,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8692: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8699: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8696: \$? = $ac_status" >&5
+   echo "$as_me:8703: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -8976,11 +8983,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8979: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8986: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8983: \$? = $ac_status" >&5
+   echo "$as_me:8990: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -9073,11 +9080,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9076: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9083: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9080: \$? = $ac_status" >&5
+   echo "$as_me:9087: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9127,11 +9134,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9130: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9137: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9134: \$? = $ac_status" >&5
+   echo "$as_me:9141: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12730,11 +12737,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12733: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12740: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12737: \$? = $ac_status" >&5
+   echo "$as_me:12744: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12821,11 +12828,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12824: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12831: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12828: \$? = $ac_status" >&5
+   echo "$as_me:12835: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12872,11 +12879,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12875: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12882: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12879: \$? = $ac_status" >&5
+   echo "$as_me:12886: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13973,11 +13980,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13976: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13983: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13980: \$? = $ac_status" >&5
+   echo "$as_me:13987: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14254,11 +14261,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14257: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14264: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14261: \$? = $ac_status" >&5
+   echo "$as_me:14268: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14345,11 +14352,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14348: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14355: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14352: \$? = $ac_status" >&5
+   echo "$as_me:14359: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14396,11 +14403,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14399: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14406: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14403: \$? = $ac_status" >&5
+   echo "$as_me:14410: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16320,15 +16327,12 @@ fi
 
 
 
-
-    test "${with_awt}" = "" && with_awt=no
     ;;
   *)
     GCJ_COMPILED_SELECTED=DISABLE_GCJ_COMPILED
     GCJ_SELECTED=WITHOUT_GCJ
     JAVA=${JAVA-java}
     JAVAC=${JAVAC-javac}
-    test "${with_awt}" = "" && with_awt=yes
         am__fastdepGCJ_TRUE='#'
     ;;
 esac
@@ -16482,7 +16486,7 @@ Make_rules="$srcdir/Make-rules"
                                                                                                               ac_config_links="$ac_config_links gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in testsuite/scribble.html:testsuite/scribble.html.in"
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17402,7 +17406,6 @@ do
   "gnu/commonlisp/lang/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/lang/Makefile" ;;
   "gnu/commonlisp/lisp/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/lisp/Makefile" ;;
   "gnu/commonlisp/testsuite/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/commonlisp/testsuite/Makefile" ;;
-  "gnu/jemacs/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/jemacs/Makefile" ;;
   "gnu/jemacs/lang/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/jemacs/lang/Makefile" ;;
   "gnu/jemacs/buffer/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/jemacs/buffer/Makefile" ;;
   "gnu/jemacs/lisp/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnu/jemacs/lisp/Makefile" ;;

@@ -1,3 +1,15 @@
+2005-04-17  Per Bothner  <per@bothner.com>
+
+	* configure.in (configure.in):  Support --with-java-source=4 and 4x.
+	The default is now --with-java-source=4.
+	Make -with-awt the default, even if --with-gcj.
+	* Makefile.am (select-java4, select-java4x): New rules.
+	(select-java-source): Handle '4' and '4x'.
+
+	* Makefile.am (JEMACS_SUBDIRS): List gnu/jemacs subdirs rather than
+	gnu/jemacs.  Move stuff from gnu/jemacs/Makefile.am.
+	* configure.in (AC_CONFIF_FILES): Remove gnu/jemacs/Makefile.
+
 2005-04-16  Per Bothner  <per@bothner.com>
 
 	* NEWS: Remove file; replaced by html web-page

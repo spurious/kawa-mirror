@@ -64,8 +64,10 @@ DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 	gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions \
 	gnu/kawa/lispexpr gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant \
 	gnu/kawa/models gnu/kawa/swingviews kawa gnu/kawa/slib \
-	gnu/commonlisp gnu/q2 gnu/ecmascript gnu/jemacs gnu/xquery \
-	gnu/brl gnu/kawa/brl bin
+	gnu/commonlisp gnu/q2 gnu/ecmascript gnu/jemacs/lang \
+	gnu/jemacs/buffer gnu/jemacs/lisp gnu/jemacs/testsuite \
+	gnu/jemacs/swing gnu/jemacs/swt gnu/xquery gnu/brl \
+	gnu/kawa/brl bin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -234,7 +236,11 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
 @ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = gnu/kawa/servlet
 @WITH_SWING_TRUE@SWINGVIEWS_SUBDIRS = gnu/kawa/swingviews
-@WITH_SWING_TRUE@JEMACS_SUBDIRS = gnu/jemacs
+@WITH_SWING_TRUE@JEMACS_SWING = gnu/jemacs/swing
+@WITH_SWT_TRUE@JEMACS_SWT = gnu/jemacs/swt
+JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+  gnu/jemacs/testsuite $(JEMACS_SWING) $(JEMACS_SWT)
+
 javadir = $(datadir)/java
 JAR = jar
 @WITH_SWING_TRUE@JAR_DEPS_SWING = \
@@ -272,6 +278,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   ltmain.sh patch-source-list selected-java-source \
   build.xml build.properties \
+  gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules
 
 MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
@@ -466,7 +473,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/debian $(distdir)/gnu/xquery/testsuite $(distdir)/kawa $(distdir)/testsuite
+	$(mkdir_p) $(distdir)/debian $(distdir)/gnu/jemacs $(distdir)/gnu/xquery/testsuite $(distdir)/kawa $(distdir)/testsuite
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -831,6 +838,10 @@ selected-java-source: Makefile
 	then $(MAKE) select-java1; \
 	elif test "@JAVA_SOURCE@" = 2; \
 	then $(MAKE) select-java2; \
+	elif test "@JAVA_SOURCE@" = 4; \
+	then $(MAKE) select-java4; \
+	elif test "@JAVA_SOURCE@" = 4x; \
+	then $(MAKE) select-java4x; \
 	elif test "@JAVA_SOURCE@" = 5; \
 	then $(MAKE) select-java5; \
 	else echo Unrecognized JAVA_SOURCE: @JAVA_SOURCE@; exit 1; \
@@ -844,18 +855,33 @@ $(srcdir)/patch-source-list:
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
+# JDK 1.1
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA5 -JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA4 -JAVA5 -use:org.w3c.dom.Node -JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 1 >$(srcdir)/selected-java-source
 
+# JDK 1.2+, GCJ-3.x
 select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 -JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA4 -JAVA5 -use:org.w3c.dom.Node -JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 2 >$(srcdir)/selected-java-source
 
+# JDK 1.4, GCJ-4.x, without JAXP (default - matches CVS)
+select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA4 -JAVA5 -use:org.w3c.dom.Node -JAXP-1.3 \
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
+	echo 4 >$(srcdir)/selected-java-source
+
+# JDK 1.4, GCJ-4.x with JAXP 1.3
+select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA4 -JAVA5 +use:org.w3c.dom.Node +JAXP-1.3 \
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
+	echo 4x >$(srcdir)/selected-java-source
+
+#JDK 1.5
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA5 +JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA4 +JAVA5 +use:org.w3c.dom.Node +JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 5 >$(srcdir)/selected-java-source
 

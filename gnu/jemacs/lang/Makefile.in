@@ -208,7 +208,9 @@ DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
-java_WITH_SWING = \
+java_sources = \
+  CatchableException.java \
+  While.java \
   ELisp.java \
   ELispReader.java \
   AddOp.java \
@@ -219,14 +221,10 @@ java_WITH_SWING = \
   defcustom.java defgroup.java \
   lambda.java
 
-java_sources = \
-  CatchableException.java \
-  While.java \
-  $(java_@SWING_SELECTED@)
-
 java_SCM = MiscOps.scm NumberOps.scm
 PACKAGE_FNAME = gnu-jemacs-lang
-EXTRA_DIST = $(java_WITH_SWING) $(java_SCM) package.html
+EXTRA_GCJ_INPUTS = MiscOps*.class NumberOps*.class
+EXTRA_DIST = $(java_SCM) package.html
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 all: all-am
 
@@ -421,7 +419,7 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
-all: Makefile java-classes.stamp scm-classes.stamp
+all: Makefile java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

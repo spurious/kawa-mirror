@@ -2,7 +2,9 @@
 
 include $(top_srcdir)/Make-rules
 
-java_WITH_SWING =\
+java_sources=\
+  CatchableException.java \
+  While.java \
   ELisp.java \
   ELispReader.java \
   AddOp.java \
@@ -13,18 +15,14 @@ java_WITH_SWING =\
   defcustom.java defgroup.java \
   lambda.java
 
-java_sources=\
-  CatchableException.java \
-  While.java \
-  $(java_@SWING_SELECTED@)
-
 java_SCM = MiscOps.scm NumberOps.scm
 PACKAGE_FNAME = gnu-jemacs-lang
+EXTRA_GCJ_INPUTS = MiscOps*.class NumberOps*.class
 
-EXTRA_DIST = $(java_WITH_SWING) $(java_SCM) package.html
+EXTRA_DIST = $(java_SCM) package.html
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-all: Makefile java-classes.stamp scm-classes.stamp
+all: Makefile java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

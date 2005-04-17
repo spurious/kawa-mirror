@@ -211,11 +211,11 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
 
-EXTRA_GCJ_DEPS = elisp-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-lisp
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+EXTRA_GCJ_COMPILED = ../../../bin/kawa1$(exeext) elisp-classes.stamp
+EXTRA_GCJ_INPUTS = *.class
 EXTRA_DIST = $(java_ELISP)
-WITH_SWING = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 all: all-am
 
 .SUFFIXES:
@@ -409,7 +409,7 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
-all: Makefile $(@SWING_SELECTED@)
+all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -2,7 +2,7 @@
 
 include $(top_srcdir)/Make-rules
 
-java_WITH_SWING = \
+java_sources = \
   Buffer.java \
   BufferLocal.java \
   BufferWriter.java \
@@ -20,25 +20,18 @@ java_WITH_SWING = \
   ProcessMode.java \
   ReplMode.java \
   SelfInsertCommand.java \
-  TelnetMode.java
-
-java_sources = \
-  $(java_@SWING_SELECTED@) \
+  TelnetMode.java \
   Signal.java
 
 java_SCM = emacs.scm
 
-EXTRA_DIST = emacs.scm $(java_WITH_SWING) package.html
-GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
+EXTRA_DIST = emacs.scm package.html
+GCJ_INPUTS = *emacs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-WITH_SWING: java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-WITHOUT_SWING:
-
-all: Makefile @SWING_SELECTED@
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

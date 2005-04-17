@@ -1,3 +1,7 @@
+2005-04-17  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Always compile all files, regardless of --with-swing.
+
 2005-04-16  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (call-interactively, make-variable-buffer-local,

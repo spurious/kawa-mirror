@@ -74,7 +74,7 @@ public class ObjectType extends Type
           {
 	    RuntimeException rex
               = new RuntimeException("no such class: "+getName());
-            /* #ifdef JAVA4 */
+            /* #ifdef use:java.lang.Throwable.getCause */
             rex.initCause(ex);
             /* #endif */
             throw rex;

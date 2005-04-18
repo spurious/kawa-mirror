@@ -8,8 +8,8 @@ package gnu.lists;
 
 public interface CharSeq
   extends
-  /* #ifdef JAVA5 */
-  // CharSequence, 
+  /* #ifdef use:java.lang.CharSequence */
+  CharSequence, 
   /* #endif */
   Sequence
 {
@@ -30,6 +30,10 @@ public interface CharSeq
 
   public void fill(int fromIndex, int toIndex, char value);
 
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end);
+  /* #endif */
+
   /* #ifdef JAVA5 */
   // /** Append a specified subsequence to an <code>Appendable</code>.
   //  * An allowable implementation is:
@@ -42,8 +46,6 @@ public interface CharSeq
 
   // public void writeTo(Appendable dest)
   //   throws java.io.IOException;
-
-  // public CharSeq subSequence(int start, int end);
   /* #else */
   /**
    * Write out (part of) this string.

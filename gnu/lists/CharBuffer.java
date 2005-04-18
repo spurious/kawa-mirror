@@ -67,16 +67,16 @@ public class CharBuffer extends StableVector implements CharSeq
     string.setCharAt(index, value);
   }
 
-  /* #ifdef JAVA5 */
-  // public SubCharSeq subSequence(int start, int end)
-  // {
-  //   int sz = size();
-  //   if (start < 0 || end < start || end > sz)
-  //     throw new IndexOutOfBoundsException();
-  //   return new SubCharSeq(this,
-  //                         base.createPos(start, false),
-  //                         base.createPos(end, true));
-  // }
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
+  {
+    int sz = size();
+    if (start < 0 || end < start || end > sz)
+      throw new IndexOutOfBoundsException();
+    return new SubCharSeq(this,
+                          base.createPos(start, false),
+                          base.createPos(end, true));
+  }
   /* #endif */
 
   public void fill(int fromIndex, int toIndex, char value)

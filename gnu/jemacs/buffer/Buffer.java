@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.buffer;
@@ -105,6 +105,12 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     getStringContent().getChars(srcBegin, srcEnd, dst, dstBegin);
   }
 
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
+  {
+    return getStringContent().subSequence(start, end);
+  }
+  /* #endif */
   /* #ifdef JAVA5 */
   // /**
   //  * @see gnu.lists.CharSeq#writeTo(int, int, Appendable)
@@ -120,13 +126,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   // {
   //   writeTo(0, length(), dest);
   // }
-
-  // public CharSeq subSequence(int start, int end)
-  // {
-  //   return getStringContent().subSequence(start, end);
-  // }
-  /* #endif */
-  /* #ifndef JAVA5 */
+  /* #else */
   /**
    * @see gnu.lists.CharSeq#writeTo(int, int, java.io.Writer)
    */

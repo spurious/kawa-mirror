@@ -1,3 +1,8 @@
+2005-04-18  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java: Use use:java.lang.CharSequence PreProcess name.
+	* SwtCharBuffer.java: Likewise.
+
 2005-04-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (GCJ_INPUTS, all): Some GCJ-specific fixes.

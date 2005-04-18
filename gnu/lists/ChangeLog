@@ -1,3 +1,12 @@
+2005-04-18  Per Bothner  <per@bothner.com>
+
+	* CharSeq.java:	Use use:java.lang.CharSequence conditional instead
+	of JAVA5, where appropriate.  Make it the default.
+	* FString.java: Likewise.
+	* CharBuffer.java: Likewise.
+	* SubCharSeq.java: Likewise.
+	(subCharSeq): New provate helper method - not needed if JAVA 5.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java: Fix two javadoc typos.

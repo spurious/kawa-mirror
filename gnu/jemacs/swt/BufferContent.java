@@ -280,12 +280,14 @@ public class BufferContent extends SwtCharBuffer
       setCharAt(i, value);
   }
 
-  /* #ifdef JAVA5 */
-  // public CharSeq subSequence(int start, int end)
-  // {
-  //   throw new UnsupportedOperationException("subSequence not implemented");
-  // }
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
+  {
+    throw new UnsupportedOperationException("subSequence not implemented");
+  }
+  /* #endif */
 
+  /* #ifdef JAVA5 */
   // public void writeTo(int start, int count, Appendable dest)
   //   throws java.io.IOException
   // {
@@ -297,8 +299,7 @@ public class BufferContent extends SwtCharBuffer
   // {
   //   dest.append(this, 0, size());
   // }
-  /* #endif */
-  /* #ifndef JAVA5 */
+  /* #else */
   public void writeTo(int start, int count, java.io.Writer dest)
     throws java.io.IOException
   {

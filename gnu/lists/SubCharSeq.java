@@ -73,8 +73,7 @@ implements CharSeq
   //   int index0 = base.nextIndex(ipos0);
   //   ((CharSeq) base).writeTo(index0, size(), dest);
   // }
-  /* #endif */
-  /* #ifndef JAVA5 */
+  /* #else */
   /**
    * Write out (part of) this string.
    * @param start index of initial character to write
@@ -116,14 +115,7 @@ implements CharSeq
     return sbuf.toString();
   }
 
-  /* #ifdef JAVA2 */
-  public java.util.List subList(int fromIx, int toIx)
-  {
-    return (java.util.List) subSequence(fromIx, toIx);
-  }
-  /* #endif */
-
-  public SubCharSeq subSequence(int start, int end)
+  private SubCharSeq subCharSeq(int start, int end)
   {
     int sz = size();
     if (start < 0 || end < start || end > sz)
@@ -132,4 +124,18 @@ implements CharSeq
 			  base.createRelativePos(ipos0, start, false),
 			  base.createRelativePos(ipos0, end, true));
   }
+
+  /* #ifdef JAVA2 */
+  public java.util.List subList(int fromIx, int toIx)
+  {
+    return (java.util.List) subCharSeq(fromIx, toIx);
+  }
+  /* #endif */
+
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
+  {
+    return subCharSeq(start, end);
+  }
+  /* #endif */
 }

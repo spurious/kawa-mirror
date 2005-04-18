@@ -246,10 +246,12 @@ implements CharSeq, Externalizable, Consumable
     return new String (data, start, end - start);
   }
 
-  public CharSeq subSequence(int start, int end)
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
   {
     return new FString(data, start, end-start);
   }
+  /* #endif */
 
   public void setCharAt (int index, char ch)
   {
@@ -431,8 +433,7 @@ implements CharSeq, Externalizable, Consumable
   // {
   //   writeTo(0, size, dest);
   // }
-  /* #endif */
-  /* #ifndef JAVA5 */
+  /* #else */
   public void writeTo(int start, int count, java.io.Writer dest)
     throws java.io.IOException
   {

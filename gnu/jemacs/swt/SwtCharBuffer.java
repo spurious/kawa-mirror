@@ -22,9 +22,7 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     this.lineOffsets = new LineOffsets(initialSize/50);
   }
     
-  /**
-   * @see java.lang.CharSequence#subSequence(int, int)
-   */
+  /* #ifdef use:java.lang.CharSequence */
   public CharSequence subSequence(int start, int end)
   {
     return new SubSequence(start, end);
@@ -64,8 +62,8 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     {
       return SwtCharBuffer.this.subSequence(this.start + start, this.start + end);
     }
-    
   }
+  /* #endif */
 
   public int pos2offset(int pos)
   {

@@ -1,3 +1,7 @@
+2005-04-18  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getReflectClass): Update PreProcess names.
+
 2005-04-17  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getReflectClass): Do initCause on wrapper

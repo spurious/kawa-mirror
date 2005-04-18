@@ -1,5 +1,8 @@
 2005-04-18  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Split JAVA4 PreProcess name into two features:
+	use:java.lang.CharSequence and use:java.lang.Throwable.getCause.
+
 	* Make-rules ($(OFILES_DIR)/$(PACKAGE_FNAME).lo:  Instead of -I flags,
 	use $(CLASSPATH_ENV).	
 	

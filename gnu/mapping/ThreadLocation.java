@@ -19,7 +19,7 @@ public class ThreadLocation extends Location
   /* #ifdef JAVA2 */
   ThreadLocal thLocal = new ThreadLocal();
   /* #else */
-  // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
+  // java.util.Hashtable threadMap = new java.util.Hashtable(50);
   /* #endif */
 
   /** A new anonymous fluid location. */

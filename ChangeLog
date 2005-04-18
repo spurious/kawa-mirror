@@ -1,5 +1,8 @@
 2005-04-18  Per Bothner  <per@bothner.com>
 
+	* Make-rules ($(OFILES_DIR)/$(PACKAGE_FNAME).lo:  Instead of -I flags,
+	use $(CLASSPATH_ENV).	
+	
 	* kawa/standard/syntax.java (convert): Syntax fix for not-JAVA2.
 
 2005-04-17  Per Bothner  <per@bothner.com>

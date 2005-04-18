@@ -433,8 +433,7 @@ $(TO_TOPDIR)/kawa1$(exeext):
 	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
 
 $(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
-	$(LIBTOOL) --mode=compile $(GCJ) $(GCJFLAGS) \
-	  -I$(JAVAROOT) -I$(srcdir)/$(JAVAROOT) -c \
+	$(CLASSPATH_ENV) $(LIBTOOL) --mode=compile $(GCJ) $(GCJFLAGS) -c \
 	  $^ $(EXTRA_GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 
 java-classes.stamp: $(java_Java)

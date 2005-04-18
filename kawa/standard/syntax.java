@@ -46,14 +46,15 @@ public class syntax extends Syntax
     /* #ifndef JAVA2 */
     // Object map = m;
     /* #endif */
+    Object x;
     /* #ifdef JAVA2 */
     IdentityHashMap map = (IdentityHashMap) m;
-    Object x = map.get(form);
+    x = map.get(form);
     if (x != null)
       return x;
     map.put(form, form);
-    x = form;
     /* #endif */
+    x = form;
     if (form instanceof Pair)
       {
 	Pair p = (Pair) form;

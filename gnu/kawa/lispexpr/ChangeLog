@@ -1,3 +1,7 @@
+2005-04-18  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (current): Make non-public.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* package.html: New file, for javadoc.

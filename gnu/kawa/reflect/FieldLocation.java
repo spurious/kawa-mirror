@@ -219,6 +219,7 @@ public class FieldLocation extends ClassMemberLocation
 
   private Object getFieldValue ()
   {
+    super.setup(); // Set rfield, if needed.
     try
       {
 	return rfield.get(instance);

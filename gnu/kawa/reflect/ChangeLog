@@ -1,5 +1,7 @@
 2005-04-20  Per Bothner  <per@bothner.com>
 
+	* FieldLocation.java (setup): Call super.setup() to set rfield.
+
 	* ClassMemberLocation.java (setup): Use initCause to set cause, if
 	use:java.lang.Throwable.getCause PreProcess keyword is set (default).
 

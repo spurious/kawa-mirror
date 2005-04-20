@@ -62,8 +62,13 @@ public class ClassMemberLocation extends Location
 	  }
 	catch (RuntimeException ex)
 	  {
-	    throw new UnboundLocationException(null, "Unbound location - "
-					       + ex.toString());
+            RuntimeException uex
+              = new UnboundLocationException(null, "Unbound location - "
+                                             + ex.toString());
+            /* #ifdef use:java.lang.Throwable.getCause */
+            uex.initCause(ex);
+            /* #endif */
+            throw uex;
 	  }
         try
           {
@@ -71,9 +76,14 @@ public class ClassMemberLocation extends Location
           }
         catch (java.lang.NoSuchFieldException ex)
           {
-	    throw new UnboundLocationException(null, "Unbound location "
-					       + " - no field " + mname
-					       + " in " + type.getName());
+            RuntimeException uex
+              = new UnboundLocationException(null, "Unbound location "
+                                             + " - no field " + mname
+                                             + " in " + type.getName());
+            /* #ifdef use:java.lang.Throwable.getCause */
+            uex.initCause(ex);
+            /* #endif */
+	    throw uex;
           }
       }
   }

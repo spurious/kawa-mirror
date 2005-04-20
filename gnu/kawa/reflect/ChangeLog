@@ -1,3 +1,8 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java (setup): Use initCause to set cause, if
+	use:java.lang.Throwable.getCause PreProcess keyword is set (default).
+
 2005-03-29  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (isIndirectLocation): Make public - for require.

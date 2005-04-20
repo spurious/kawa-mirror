@@ -1,3 +1,8 @@
+2005-04-19  Per Bothner  <per@bothner.com>
+
+	* gnu/commonlisp/lang/CommonLisp.java (registerEnvironment): Use
+	'instance' field rather than creating a new instance.
+
 2005-03-29  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java: Initalize various static fields,

@@ -151,7 +151,7 @@ public class CommonLisp extends Lisp2
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Language.setDefaults(new CommonLisp());
+    Language.setDefaults(instance);
   }
 
   public Object read (InPort in)

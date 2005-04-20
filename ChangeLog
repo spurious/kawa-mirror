@@ -1,3 +1,8 @@
+2005-04-19  Per Bothner  <per@bothner.com>
+
+	* NEWS: Resurrect, since required by GNU/automake standards,
+	but (at least for now) only a reference to the news.html web-page.
+
 2005-04-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Split JAVA4 PreProcess name into two features:

@@ -1,3 +1,8 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	* BRL.java: Initialize krl_instance and brlEnvironment in the
+	static initializer.
+
 2005-03-28  Per Bothner  <per@bothner.com>
 
 	* BRL.java: Update for recent changes to Scheme class.

@@ -2,6 +2,21 @@
 
 (require <module1>)
 
+(module-export dvar-test-1 factorial-4 check-fluid-let *VAR*
+	       namespace-syntax-call list-length-4 my-compare
+	       test3-import1 get3-mod0-v2 set3-mod0-v2
+	       pa-new pa-getter pa-setter pa-length iarr-set mB test1-import0)
+
+(define (get3-mod0-v1) :: <object> mod0-v1)
+(define (set3-mod0-v1 x) (set! mod0-v1 x))
+(define (get3-mod0-v2) :: <object> mod0-v2)
+(define (set3-mod0-v2 x) (set! mod0-v2 x))
+
+(define (test3-import1)
+  (let ((gv1 (get3-mod0-v1)))
+    (set3-mod0-v1 (- gv1 9))
+    (list gv1 mod0-v1 mod0-v2 (mod0-f1))))
+
 (define factorial-4 (my-factorial 4))
 
 (define (list-length-4 arg)
@@ -29,7 +44,7 @@
   (let ((setter (primitive-array-set <int>)))
     (setter array index value)))
 
-(define-variable dvar1 11)
+(define-variable dvar1 (+ (get-mod0-v1) 1)) ;; 11
 (define-variable dvar2)
 (define-variable dvar3 13)
 (define dvar-test-1

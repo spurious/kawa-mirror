@@ -1,11 +1,24 @@
 (module-static #f)
+(module-export my-factorial list-length-2 deldup call-to-first
+	       namespace:date
+	       test1-import0 mod0-v1 mod0-v2 mod0-v3 mod0-f1 mod0-m1
+	       namespace-syntax-test make-array make-array-fun mA)
+(require <module0>)
+
+(define (get1-mod0-v1) mod0-v1)
+(define (set1-mod0-v1 x) (set! mod0-v1 x))
+
+(define (test1-import0)
+  (let ((gv1 (get1-mod0-v1)))
+    (set1-mod0-v1 (+ 14 gv1))
+    (list gv1 mod0-v1 mod0-v2 (mod0-f1))))
 
 (define (my-factorial n)
   (if (<= n 1)
       1
       (* n (my-factorial (- n 1)))))
 
-(define-private (list-length-1 (x :: <list>)) :: <double>
+(define (list-length-1 (x :: <list>)) :: <double>
    (length x))
 (define (list-length-2 x) :: <int>
   (include-relative "included-1.scm")

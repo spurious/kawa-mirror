@@ -1,4 +1,4 @@
-(test-init "Objects" 101)
+(test-init "Objects" 104)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -179,11 +179,18 @@
 (define-variable dvar1 2)
 (define-variable dvar2 3)
 (require <module3>)
+
 (define-variable dvar3 4)
 (test '(2 3 13) 'dvar-test-1 dvar-test-1)
 (set! dvar1 1)
 (test '(1 3 13) list dvar1 dvar2 dvar3)
 (test 0 list-length-4 '())
+(test '(10 24 11 190) test1-import0)
+(test '(24 15 11 181) test3-import1)
+(test '(11 111) 'test-mod0-v2
+      (let ((v2 (get3-mod0-v2)))
+	(set3-mod0-v2 (+ 100 v2))
+	(list v2 (get3-mod0-v2))))
 
 (define ts1 (make <MyTimestamp> 10 1))
 (define ts2 (make <MyTimestamp> 10 2))

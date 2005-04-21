@@ -1,3 +1,15 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	Add various tests for re-export of imported declarations.
+	* module0.scm: New file.
+	* Makefile.am: Update accordingly.
+	* module1.scm: Add explicit module-export so we can re-export some
+	imported definitions.
+	* module3.scm: Likewise.
+	* module1.scm: Import module0 and add some new accessors.
+	* module3.scm: Likewise.
+	* obj-test.scm: Add 3 more tests.
+
 2005-03-25  Per Bothner  <per@bothner.com>
 	    Dean Ferreyra <dferreyra@igc.org>
 

@@ -171,7 +171,7 @@ public class SetExp extends AccessExp
                   break;
                 if (owner != null && orig.needsContext())
                   break;
-                owner = rexp.context;
+                owner = rexp.contextDecl();
                 decl = orig;
               }
           }

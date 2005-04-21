@@ -18,7 +18,11 @@ public class ReferenceExp extends AccessExp
 
   /** If binding has a non-static field and no base, use this instead of base.
    *  This is used for aliases of imported module declarations. */
-  public Declaration context;
+  private Declaration context;
+  public final Declaration contextDecl ()
+  { return context; }
+  public final void setContextDecl(Declaration decl)
+  { context = decl; }
 
   public static final int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
   public static final int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
@@ -115,7 +119,7 @@ public class ReferenceExp extends AccessExp
 
   public void compile (Compilation comp, Target target)
   {
-    binding.load(context, flags, comp, target);
+    binding.load(contextDecl(), flags, comp, target);
   }
 
   protected Expression walk (ExpWalker walker)

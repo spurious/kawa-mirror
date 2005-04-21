@@ -139,7 +139,7 @@ public class Declaration
         if (orig != null
             && (owner == null || ! orig.needsContext()))
           {
-            orig.load(rexp.context, flags, comp, target);
+            orig.load(rexp.contextDecl(), flags, comp, target);
             return;
           }
       }

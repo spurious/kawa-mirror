@@ -294,7 +294,7 @@ public class require extends Syntax
 		else
 		  {
 		    fref = new ReferenceExp(fdecl);
-		    fref.context = decl;
+		    fref.setContextDecl(decl);
                     if (! isImportedInstance)
                       {
                         fref.setDontDereference(true);
@@ -390,14 +390,14 @@ public class require extends Syntax
             ReferenceExp fref = (ReferenceExp) fval;
             ReferenceExp aref = (ReferenceExp) adecl.getValue();
             aref.setBinding(fref.getBinding());
-            Declaration fcontext = fref.context;
+            Declaration fcontext = fref.contextDecl();
             if (fcontext != null && fcontext.needsContext())
               {
                 Declaration cdecl = defs.lookup(fcontext.getSymbol());
                 cdecl.setFlag(Declaration.EXPORT_SPECIFIED);
                 fcontext = cdecl;
               }
-            aref.context = fcontext;
+            aref.setContextDecl(fcontext);
           }
       }
 
@@ -558,7 +558,7 @@ public class require extends Syntax
                 if (vname.equals(xdecl.getType().getName())
                     && xdecl.getFlag(Declaration.MODULE_REFERENCE))
                   {
-                    fref.context = xdecl;
+                    fref.setContextDecl(xdecl);
                     break;
                   }
               }

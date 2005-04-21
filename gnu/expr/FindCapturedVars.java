@@ -362,7 +362,8 @@ public class FindCapturedVars extends ExpWalker
 	      comp.error('w', "no declaration seen for "+exp.getName());
 	  }
       }
-    capture(exp.context, decl);
+
+    capture(exp.contextDecl(), decl);
     return exp;
   }
 
@@ -375,7 +376,7 @@ public class FindCapturedVars extends ExpWalker
 	if (orig != null
 	    && (containing == null || ! orig.needsContext()))
 	  {
-	    capture(rexp.context, orig);
+	    capture(rexp.contextDecl(), orig);
 	    return;
 	  }
       }

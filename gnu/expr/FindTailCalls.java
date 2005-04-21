@@ -170,8 +170,9 @@ public class FindTailCalls extends ExpWalker
             && value instanceof ReferenceExp)
           {
             ReferenceExp rexp = (ReferenceExp) value;
-            if (rexp.context != null && rexp.context.isPrivate())
-              rexp.context.setFlag(Declaration.EXTERNAL_ACCESS);
+            Declaration context = rexp.contextDecl();
+            if (context != null && context.isPrivate())
+              context.setFlag(Declaration.EXTERNAL_ACCESS);
           }
       }
   }

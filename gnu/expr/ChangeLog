@@ -1,10 +1,13 @@
 2005-04-21  Per Bothner  <per@bothner.com>
 
+	* SetExp.java: Give consistent visibility and finality to constants.
+
 	* ReferenceExp.java (context): Make private.
 	(contextDecl, setContextDecl): New accessor methods.
 	(compile): Use new methods.
 	* Declaration.java (load): Likewise.
 	* SetExp.java (compile): Likewise.
+
 	* FindCapturedVars.java (walkReferenceExp, capture): Likewise.
 	* FindTailCalls.java (walkDecl): Likewise.
 

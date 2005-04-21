@@ -21,12 +21,12 @@ public class SetExp extends AccessExp
   /** Get the Expression for calculating the new ("right-hand") value. */
   public final Expression getNewValue() { return new_value; }
 
-  static private int DEFINING_FLAG = NEXT_AVAIL_FLAG;
-  static private int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
-  public static  int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
-  static private int PROCEDURE = NEXT_AVAIL_FLAG << 3;
-  static private int SET_IF_UNBOUND = NEXT_AVAIL_FLAG << 4;
-  static private int HAS_VALUE = NEXT_AVAIL_FLAG << 5;
+  public static final int DEFINING_FLAG = NEXT_AVAIL_FLAG;
+  public static final int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
+  public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
+  public static final int PROCEDURE = NEXT_AVAIL_FLAG << 3;
+  public static final int SET_IF_UNBOUND = NEXT_AVAIL_FLAG << 4;
+  public static final int HAS_VALUE = NEXT_AVAIL_FLAG << 5;
 
   public final boolean isDefining ()
   {

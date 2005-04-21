@@ -1,4 +1,3 @@
-import gnu.mapping.*;
 import gnu.expr.*;
 public class MyModule implements Runnable
 {

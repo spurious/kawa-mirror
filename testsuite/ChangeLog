@@ -1,3 +1,7 @@
+2005-04-21  Per Bothner  <per@bothner.com>
+
+	* MyModule.java: Remove redundant import.
+
 2005-04-20  Per Bothner  <per@bothner.com>
 
 	Add various tests for re-export of imported declarations.

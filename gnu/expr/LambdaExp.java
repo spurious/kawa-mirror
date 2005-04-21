@@ -1194,7 +1194,7 @@ public class LambdaExp extends ScopeExp
 	    // Unfortunately, it expects the new value *last*,
 	    // so first push the heapFrame array and the array index.
 	    if (!param.isSimple ())
-	      param.loadOwningObject(comp);
+	      param.loadOwningObject(null, comp);
 	    // This part of the code pushes the incoming argument.
 	    if (plainArgs < 0)
 	      {

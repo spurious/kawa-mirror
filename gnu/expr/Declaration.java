@@ -116,10 +116,12 @@ public class Declaration
   public Field field;
 
   /** If this is a field in some object, load a reference to that object. */
-  public void loadOwningObject (Compilation comp)
+  void loadOwningObject (Declaration owner, Compilation comp)
   {
-    if (base != null)
-      base.load(null, 0, comp, Target.pushObject);
+    if (owner == null)
+      owner = base;
+    if (owner != null)
+      owner.load(null, 0, comp, Target.pushObject);
     else
       getContext().currentLambda().loadHeapFrame(comp);
   }
@@ -159,10 +161,7 @@ public class Declaration
             ltype = ClassType.make("gnu.kawa.reflect.FieldLocation");
             meth = ltype.getDeclaredMethod("make", 3);
 
-            if (owner != null)
-              owner.load(null, 0, comp, Target.pushObject);
-            else
-              loadOwningObject(comp);
+            loadOwningObject(owner, comp);
           }
         comp.compileConstant(field.getDeclaringClass().getName());
         comp.compileConstant(field.getName());
@@ -176,10 +175,7 @@ public class Declaration
           {
             if (! field.getStaticFlag())
               {
-                if (owner != null)
-                  owner.load(null, 0, comp, Target.pushObject);
-                else
-                  loadOwningObject(comp);
+                loadOwningObject(owner, comp);
                 code.emitGetField(field);
               }
             else
@@ -248,7 +244,7 @@ public class Declaration
       {
         if (! field.getStaticFlag())
           {
-            loadOwningObject(comp);
+            loadOwningObject(null, comp);
             code.emitSwap();
 	    code.emitPutField(field);
           }

@@ -250,7 +250,7 @@ public class SetExp extends AccessExp
 	  {
 	    Field field = decl.field;
             if (! field.getStaticFlag())
-              decl.loadOwningObject(comp);
+              decl.loadOwningObject(null, comp);
             type = field.getType();
 	    new_value.compile (comp, type);
             if (field.getStaticFlag())

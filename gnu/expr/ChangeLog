@@ -1,3 +1,12 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (loadOwningObject): Make non-public.
+	Add 'owner' parameter.
+	(load): Simplify by passing owner to loadOwningObject.
+	(compileStore): Update to pass null 'owner' to loadOwningObject.
+	* LambdaExp.java (enterFunction): Likewise.
+	* SetExp.java (compile): Likewise.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* TypedValue.java: Fix javadoc.

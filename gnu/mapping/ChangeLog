@@ -1,3 +1,8 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (outInitial): Make non-private.
+	* InPort.java (systemInPort): Use outInitial directly.
+
 2005-04-18  Per Bothner  <per@bothner.com>
 
 	* WrappedException.java (getReflectClass): Update PreProcess names.

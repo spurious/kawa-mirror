@@ -70,7 +70,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   public boolean printReadable;
 
-  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
+  static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
 
   private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
 

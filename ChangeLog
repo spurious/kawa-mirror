@@ -1,3 +1,16 @@
+2005-04-20  Per Bothner  <per@bothner.com>
+
+	Solidify support for re-exporting imported declarations.
+	* kawa/lang/Translator.java (processAccesses): If decl is refernced
+	by an exported macro, than it must be non-simple.
+	* kawa/standard/require.java (importDefinitions): Recognize and
+	create declarations for MODULE_REFERENCEs.
+	(makeDeclInModule): Split into ...
+	(makeDeclInModule1, makeDeclInModule2): ... two new methods.
+
+	* kawa/standard/require.java (scanForDefinitions): Use matches
+	method of Translator to check for 'NAME.
+
 2005-04-19  Per Bothner  <per@bothner.com>
 
 	* NEWS: Resurrect, since required by GNU/automake standards,

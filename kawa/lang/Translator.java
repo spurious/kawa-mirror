@@ -1155,6 +1155,7 @@ public class Translator extends Compilation
 	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
 	    decl.setCanRead(true);
+            decl.setSimple(false);
 	    decl.setFlag(Declaration.EXTERNAL_ACCESS);
 	  }
       }

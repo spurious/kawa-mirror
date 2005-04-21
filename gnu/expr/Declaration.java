@@ -145,7 +145,7 @@ public class Declaration
       }
     CodeAttr code = comp.getCode();
     Type rtype = getType();
-    if (! isIndirectBinding() && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
+    if ((flags & ReferenceExp.CREATE_FIELD_REFERENCE) != 0)
       {
         if (field == null)
           throw new Error("internal error: cannot take location of "+this);
@@ -270,6 +270,10 @@ public class Declaration
    */
   public final Expression getValue() { return value; }
 
+  /** Set the value assoociated with this Declaration.
+   * Most code should use noteValue instead. */
+  public final void setValue(Expression value) { this.value = value; }
+
   /** If getValue() is a constant, return the constant value, otherwise null. */
   public final Object getConstantValue()
   {
@@ -357,6 +361,8 @@ public class Declaration
   /** Initialize in <code>&lt;init&gt;</code>/<code>&lt;clinit&gt;</code>
    * rather than in <code>run</code>/<code>$run$</code>. */
   public static final int EARLY_INIT = 0x20000000;
+  /** A reference to a module instance. */
+  public static final int MODULE_REFERENCE = 0x40000000;
 
   protected int flags = IS_SIMPLE;
 
@@ -732,7 +738,7 @@ public class Declaration
     fname = Compilation.mangleNameIfNeeded(fname);
     if (getFlag(IS_UNKNOWN))
       fname = UNKNOWN_PREFIX + fname;
-    if (external_access)
+    if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
       fname = PRIVATE_PREFIX + fname;
     int nlength = fname.length();
     int counter = 0;

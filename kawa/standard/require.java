@@ -96,7 +96,8 @@ public class require extends Syntax
     // Type type = Scheme.expType(tr.rewrite(name));
     Type type = null;
     Pair p;
-    if (name instanceof Pair && (p = (Pair) name).car == "quote")
+    if (name instanceof Pair
+        && tr.matches((p = (Pair) name).car, Scheme.quote_sym))
       {
 	name = p.cdr;
 	if (! (name instanceof Pair)
@@ -156,6 +157,9 @@ public class require extends Syntax
     Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
     Field instanceField = null;
     dofind.setLine(tr);
+    int formsStart = forms.size();
+    Vector declPairs = new Vector();
+    // Should be info.getModuleExp() ?? FIXME
     ModuleExp mod = new ModuleExp();
     // Should skip if immediate.  FIXME
     ClassType typeFieldLocation
@@ -176,8 +180,9 @@ public class require extends Syntax
 		String iname = tname.replace('.', '$') + "$instance";
 		decl = new Declaration(iname, type);
 		decl.setPrivate(true);
+                decl.setFlag(Declaration.IS_CONSTANT
+                             |Declaration.MODULE_REFERENCE);
 		defs.addDeclaration(decl);
-		decl.setCanRead(true);
 		if (immediate)
 		  {
 		    decl.noteValue(new QuoteExp(instance));
@@ -189,12 +194,14 @@ public class require extends Syntax
 		    sexp.setLine(tr);
 		    sexp.setDefining(true);
 		    forms.addElement(sexp);
+                    formsStart = forms.size();
                     decl.setFlag(Declaration.EARLY_INIT);
                     // If Runnable, we need to set decl value in initializer,
                     // and later 'run' it, so it needs to be stored in a field.
                     if (isRunnable)
                       decl.setSimple(false);
 		  }
+                decl.setFlag(Declaration.TYPE_SPECIFIED);
               }
 	    java.lang.reflect.Field rfield;
 	    Object fvalue;
@@ -214,42 +221,19 @@ public class require extends Syntax
 	      }
 	    Type ftype = fld.getType();
 	    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-	    Declaration fdecl = makeDeclInModule(mod, fvalue, fld, language);
+	    Declaration fdecl = makeDeclInModule1(mod, fvalue, fld, language);
 	    Object fdname = fdecl.getSymbol();
             if (fname.startsWith(Declaration.PRIVATE_PREFIX))
-              continue;
-            if (fname.endsWith("$instance"))
               {
-                if (isStatic && fname.equals("$instance"))
-                  instanceField = fld;
+                declPairs.add(null);
+                declPairs.add(fdecl);
                 continue;
               }
-	    /*
-            if (tr.immediate && defs instanceof ModuleExp)
+            if (fname.equals("$instance"))
               {
-                // FIXME use ClassMemberLocation.define
-                Symbol sym;
-                if (fdname instanceof Symbol)
-                  sym = (Symbol) fdname;
-                else
-                  sym = Symbol.make(uri == null ? "" : uri, fdname.toString());
-                Environment env = Environment.getCurrent();
-
-                if (isAlias && isFinal)
-		  env.addLocation(sym, null, (Location) fvalue);
-                else
-                  {
-                    Object property = null;
-                    if (isFinal
-                        && (fdecl.isProcedureDecl() || fvalue instanceof Macro)
-                        && (tr.getLanguage()
-                            .hasSeparateFunctionNamespace()))
-                      property = EnvironmentKey.FUNCTION;
-                    env.addLocation(sym, property,
-                                    new ClassMemberLocation(instance, rfield));
-                  }
+                instanceField = fld;
+                continue;
               }
-	    */
 
 	    // We create an alias in the current context that points
 	    // a dummy declaration in the exported module.  Normally,
@@ -269,16 +253,32 @@ public class require extends Syntax
                 else
                   aname = Symbol.make(uri, sname);
               }
+            boolean isImportedInstance = fname.endsWith("$instance");
 	    try
 	      {
-		Declaration adecl = defs.getDefine(aname, 'w', tr);
-		adecl.setAlias(true);
-		adecl.setIndirectBinding(true);
+		Declaration adecl;
+                if (isImportedInstance)
+                  {
+                    if (defs.lookup(aname) != null)
+                      continue;
+                    adecl = defs.addDeclaration(aname);
+                    adecl.setFlag(Declaration.IS_CONSTANT
+                                  |Declaration.MODULE_REFERENCE);
+                    adecl.setType(fdecl.getType());
+                    adecl.setFlag(Declaration.TYPE_SPECIFIED);
+                 }
+                else
+                  {
+                    adecl = defs.getDefine(aname, 'w', tr);
+                    adecl.setAlias(true);
+                    adecl.setIndirectBinding(true);
+                  }
 		Expression fexp;
                 ReferenceExp fref;
 		if (immediate)
 		  {
-                    if (isFinal && isStatic)
+                    if (isFinal
+                        && (isStatic || isImportedInstance))
                       {
                         // An optimization.
                         adecl.setType(fdecl.getType());
@@ -295,9 +295,13 @@ public class require extends Syntax
 		  {
 		    fref = new ReferenceExp(fdecl);
 		    fref.context = decl;
-		    fref.setDontDereference(true);
+                    if (! isImportedInstance)
+                      {
+                        fref.setDontDereference(true);
+                        fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
+                        adecl.setPrivate(true);
+                      }
 		    fexp = fref;
-		    adecl.setPrivate(true);
 		  }
 		if ((rfield.getModifiers() & Access.FINAL) != 0 && ! isAlias)
 		  {
@@ -342,12 +346,24 @@ public class require extends Syntax
 		    SetExp sexp = new SetExp(adecl, fexp);
                     adecl.setFlag(Declaration.EARLY_INIT);
 		    sexp.setDefining(true);
-		    forms.addElement(sexp);
+                    if (isImportedInstance)
+                      {
+                        // Make sure the "MODULE$instance" declarations are
+                        // initialized first, since we may need then for
+                        // imported declarations that are re-exported.  (The
+                        // instance may be needed for FieldLocation values.)
+                        forms.insertElementAt(sexp, formsStart);
+                        formsStart++;
+                      }
+                    else
+                      forms.addElement(sexp);
 		  }
 		adecl.noteValue(fexp);
 		adecl.setFlag(Declaration.IS_IMPORTED);
 		adecl.setSimple(false);
 		tr.push(adecl);  // Add to translation env.
+                declPairs.add(adecl);
+                declPairs.add(fdecl);
 	      }
 	    catch (Exception ex)
 	      {
@@ -357,6 +373,32 @@ public class require extends Syntax
         t = t.getSuperclass();
         if (t == null)
           break;
+      }
+
+    int ndecls = declPairs.size();
+    for (int i = 0;  i < ndecls;  i += 2)
+      {
+        Declaration adecl = (Declaration) declPairs.elementAt(i);
+        Declaration fdecl = (Declaration) declPairs.elementAt(i+1);
+
+        makeDeclInModule2(mod, fdecl);
+
+        Expression fval = fdecl.getValue();
+        if (adecl != null && fdecl.isIndirectBinding() && ! immediate
+            && fval instanceof ReferenceExp)
+          {
+            ReferenceExp fref = (ReferenceExp) fval;
+            ReferenceExp aref = (ReferenceExp) adecl.getValue();
+            aref.setBinding(fref.getBinding());
+            Declaration fcontext = fref.context;
+            if (fcontext != null && fcontext.needsContext())
+              {
+                Declaration cdecl = defs.lookup(fcontext.getSymbol());
+                cdecl.setFlag(Declaration.EXPORT_SPECIFIED);
+                fcontext = cdecl;
+              }
+            aref.context = fcontext;
+          }
       }
 
     if (isRunnable)
@@ -410,28 +452,35 @@ public class require extends Syntax
 	  continue;
 	try
 	  {
-	    makeDeclInModule(mod,
-			     rclass.getField(fld.getName()).get(instance),
-			     fld, language);
+            Object fvalue = rclass.getField(fld.getName()).get(instance);
+            Declaration fdecl = makeDeclInModule1(mod, fvalue, fld, language);
 	  }
 	catch (Exception ex)
 	  {
 	    throw new WrappedException(ex);
 	  }
       }
+    mod.setFlag(false, ModuleExp.LAZY_DECLARATIONS);
+    for (Declaration fdecl = mod.firstDecl();
+         fdecl != null;  fdecl = fdecl.nextDecl())
+      {
+        makeDeclInModule2(mod, fdecl);
+      }
   }
 
-  private static Declaration makeDeclInModule (ModuleExp mod, Object fvalue,
+  private static Declaration makeDeclInModule1 (ModuleExp mod, Object fvalue,
 					       Field fld, Language language)
   {
     String fname = fld.getName();
     Type ftype = fld.getType();
     boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     Object fdname;
     // FIXME if fvalue is FieldLocation, and field is final,
     // get name from value of field.
-    if (fvalue instanceof Named) // && ! isAlias
+    boolean isImportedInstance;
+    if ((isImportedInstance = fname.endsWith("$instance")))
+      fdname = fname;
+    else if (fvalue instanceof Named) // && ! isAlias
       fdname = ((Named) fvalue).getSymbol();
     else
       {
@@ -443,6 +492,7 @@ public class require extends Syntax
     Type dtype = isAlias ? Type.pointer_type
       : language.getTypeFor(ftype.getReflectClass());
     Declaration fdecl = new Declaration(fdname, dtype);
+    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if (isAlias)
       fdecl.setIndirectBinding(true);
@@ -450,28 +500,13 @@ public class require extends Syntax
       fdecl.setProcedureDecl(true);
     if (isStatic)
       fdecl.setFlag(Declaration.STATIC_SPECIFIED);
-    if (isFinal && ! (fvalue instanceof gnu.mapping.Location))
-      fdecl.noteValue(new QuoteExp(fvalue));
-    else if (isFinal && fvalue instanceof FieldLocation)
-      {
-	FieldLocation floc = (FieldLocation) fvalue;
-        Declaration vdecl = floc.getDeclaration();
-        ReferenceExp fref = new ReferenceExp(vdecl);
-        if (floc.isIndirectLocation())
-          fref.setDontDereference(true);
-        fdecl.noteValue(fref);
-        if (vdecl.isProcedureDecl())
-          fdecl.setProcedureDecl(true);
-        if (vdecl.getFlag(Declaration.IS_SYNTAX))
-          fdecl.setSyntax();
-      }
-    else
-      fdecl.noteValue(null);
-    fdecl.setSimple(false);
-    fdecl.field = fld;
-    if (isFinal)
+    fdecl.field = fld; 
+    if (isFinal && ! isAlias) // FIXME? ok for location?
       fdecl.setFlag(Declaration.IS_CONSTANT);
+    if (isImportedInstance)
+      fdecl.setFlag(Declaration.MODULE_REFERENCE);
     mod.addDeclaration(fdecl);
+    fdecl.setSimple(false);
     if (isFinal && fvalue instanceof Syntax) // FIXME - should check type? not value?
       {
 	fdecl.setSyntax();
@@ -481,6 +516,53 @@ public class require extends Syntax
             mac.setCapturedScope(mod);
           }
       }
+    if (isFinal
+        && (! (fvalue instanceof gnu.mapping.Location)
+            || fvalue instanceof FieldLocation))
+      fdecl.noteValue(new QuoteExp(fvalue));
+    else
+      fdecl.noteValue(null);
     return fdecl;
+  }
+
+  private static void makeDeclInModule2 (ModuleExp mod, Declaration fdecl)
+  {
+    Object fvalue = fdecl.getConstantValue();
+    if (fvalue instanceof FieldLocation)
+      {
+	FieldLocation floc = (FieldLocation) fvalue;
+        Declaration vdecl = floc.getDeclaration();
+        ReferenceExp fref = new ReferenceExp(vdecl);
+        if (floc.isIndirectLocation())
+          fref.setDontDereference(true);
+        fdecl.setValue(fref);
+        if (vdecl.isProcedureDecl())
+          fdecl.setProcedureDecl(true);
+        if (vdecl.getFlag(Declaration.IS_SYNTAX))
+          {
+            fdecl.setSyntax();
+            fvalue = floc.get(null);
+            if (fvalue instanceof Macro)
+              {
+                Macro mac = (Macro) fvalue;
+                mac.setCapturedScope(mod);
+              }
+          }
+        if (! fdecl.getFlag(Declaration.STATIC_SPECIFIED))
+          {
+            ClassType vtype = floc.getDeclaringClass();
+            String vname = vtype.getName();
+            for (Declaration xdecl = mod.firstDecl();
+                 xdecl != null;  xdecl = xdecl.nextDecl())
+              {
+                if (vname.equals(xdecl.getType().getName())
+                    && xdecl.getFlag(Declaration.MODULE_REFERENCE))
+                  {
+                    fref.context = xdecl;
+                    break;
+                  }
+              }
+          }
+      }
   }
 }

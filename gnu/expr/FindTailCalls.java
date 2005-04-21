@@ -158,7 +158,7 @@ public class FindTailCalls extends ExpWalker
     for (;  decl != null;  decl = decl.nextDecl())
       {
 	Expression value = decl.getValue();
-	if (value != null && value instanceof LambdaExp)
+	if (value instanceof LambdaExp)
 	  {
 	    LambdaExp lexp = (LambdaExp) value;
 	    if (decl.getCanRead())
@@ -166,6 +166,13 @@ public class FindTailCalls extends ExpWalker
 	    if (decl.getCanCall())
 	      lexp.setCanCall(true);
 	  }
+        if (decl.getFlag(Declaration.EXPORT_SPECIFIED)
+            && value instanceof ReferenceExp)
+          {
+            ReferenceExp rexp = (ReferenceExp) value;
+            if (rexp.context != null && rexp.context.isPrivate())
+              rexp.context.setFlag(Declaration.EXTERNAL_ACCESS);
+          }
       }
   }
 

@@ -1,5 +1,19 @@
 2005-04-20  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (load): Use new CREATE_FIELD_REFERENCE flag.
+	(setValue): New method.
+	(MODULE_REFERENCE): New constant.
+	(makeField): Don't prepend PRIVATE_PERFIX if MODULE_REFERENCE.
+	* FindTailCalls.java (walkDecl): May need to set EXTERNAL_ACCESS
+	of context variable.
+	* ReferenceExp.java (CREATE_FIELD_REFERENCE): New constant.
+	* SetExp.java (compile): "Inline" call to followAliases, so we
+	can extract 'context' field.  Use that context.
+
+	* FindTailCalls.java (walkDecl): Trivial optimization.
+
+2005-04-20  Per Bothner  <per@bothner.com>
+
 	* Declaration.java (loadOwningObject): Make non-public.
 	Add 'owner' parameter.
 	(load): Simplify by passing owner to loadOwningObject.
@@ -103,7 +117,7 @@
 	* ProcInitializer.java (<init>): No longer place on clinitChain.
 
 	* ModuleBody.java (runDone): New field.
-	(run): Return immiately if run done earlier.
+	(run): Return immediately if run done earlier.
 	* ModuleInfo.java (register): New static method.
 	(getInstance): If there is a static $instance field, use that.
 	(needsRun): Remove field - run checks runDone instead.

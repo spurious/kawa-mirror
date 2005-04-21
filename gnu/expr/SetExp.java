@@ -157,8 +157,24 @@ public class SetExp extends AccessExp
       }
     else
       {
+        Declaration owner = null;
 	if (! isDefining())
-	  decl = Declaration.followAliases(decl);
+          {
+            while (decl != null && decl.isAlias())
+              {
+                declValue = decl.getValue();
+                if (! (declValue instanceof ReferenceExp))
+                  break;
+                ReferenceExp rexp = (ReferenceExp) declValue;
+                Declaration orig = rexp.binding;
+                if (orig == null)
+                  break;
+                if (owner != null && orig.needsContext())
+                  break;
+                owner = rexp.context;
+                decl = orig;
+              }
+          }
 	if (decl.ignorable())
 	  new_value.compile (comp, Target.Ignore);
 	else if (decl.isAlias() && isDefining())
@@ -175,7 +191,8 @@ public class SetExp extends AccessExp
 	else if (decl.isIndirectBinding()
 		 && (isSetIfUnbound() || ! isDefining() || decl.isPublic()))
 	  {
-            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+
+            decl.load(owner, ReferenceExp.DONT_DEREFERENCE,
                       comp, Target.pushObject);
 	    if (isSetIfUnbound())
 	      {
@@ -250,7 +267,7 @@ public class SetExp extends AccessExp
 	  {
 	    Field field = decl.field;
             if (! field.getStaticFlag())
-              decl.loadOwningObject(null, comp);
+              decl.loadOwningObject(owner, comp);
             type = field.getType();
 	    new_value.compile (comp, type);
             if (field.getStaticFlag())

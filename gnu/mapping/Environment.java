@@ -342,7 +342,7 @@ public abstract class Environment
 
   public static SimpleEnvironment make (String name, Environment parent)
   {
-    return new InheritingEnvironment(name, (SimpleEnvironment) parent);
+    return new InheritingEnvironment(name, parent);
   }
 
   public String toString ()

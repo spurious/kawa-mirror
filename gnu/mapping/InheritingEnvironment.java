@@ -11,13 +11,16 @@ public class InheritingEnvironment extends SimpleEnvironment
   Object[] propertyMap;
   int baseTimestamp;
 
-  public InheritingEnvironment (String name, SimpleEnvironment parent)
+  public InheritingEnvironment (String name, Environment parent)
   {
     super(name);
     addParent(parent);
-    int timestamp = ++parent.currentTimestamp;
-    baseTimestamp = timestamp;
-    currentTimestamp = timestamp;
+    if (parent instanceof SimpleEnvironment)
+      {
+        int timestamp =  ++((SimpleEnvironment) parent).currentTimestamp;
+        baseTimestamp = timestamp;
+        currentTimestamp = timestamp;
+      }
   }
 
   public void addParent (Environment env)

@@ -1,3 +1,9 @@
+2005-05-06  Per Bothner  <per@bothner.com>
+
+	* InheritingEnvironment.java (<init>): Handle the case that parent
+	is a plain Environment.
+	* Environment.java (make): Don't need to cast parent any more.
+
 2005-04-20  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (outInitial): Make non-private.

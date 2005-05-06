@@ -75,10 +75,10 @@ public class OutPort extends PrintConsumer implements Printable
   private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
 
   public static final ThreadLocation outLocation
-    = new ThreadLocation(new Symbol("out-default"));
+    = new ThreadLocation("out-default");
   static { outLocation.setGlobal(outInitial); }
   public static final ThreadLocation errLocation
-    = new ThreadLocation(new Symbol("err-default"));
+    = new ThreadLocation("err-default");
   static { errLocation.setGlobal(errInitial); }
   static public OutPort outDefault ()
   {

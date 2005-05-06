@@ -1,3 +1,9 @@
+2005-05-06  Per Bothner  <per@bothner.com>
+
+	* Language.java (current): Update ThreadLocation construction.
+	* BindingInitializer.java (emit): Argument to makePrivate method of
+	ThreadLocation now takes a String.
+
 2005-04-21  Per Bothner  <per@bothner.com>
 
 	* SetExp.java: Give consistent visibility and finality to constants.

@@ -1,5 +1,11 @@
 2005-05-06  Per Bothner  <per@bothner.com>
 
+	* ThreadLocation.java (ANONYMOUS): New constant.
+	(<init>): Take String rather than Symbol.
+	(makePrivate): Likewise.
+	* InPort.java (inLocation): Update ThreadLocation constructor call.
+	* OutPort.java (outLocation, errLocation): Likewise.
+
 	* InheritingEnvironment.java (<init>): Handle the case that parent
 	is a plain Environment.
 	* Environment.java (make): Don't need to cast parent any more.

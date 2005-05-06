@@ -20,8 +20,7 @@ public class ReadTable extends RangeTable
   /** Default value to pass to setBracketMode() unless overridden. */
   public static int defaultBracketMode = -1;
 
-  static final ThreadLocation current
-    = new ThreadLocation(new Symbol("read-table"));
+  static final ThreadLocation current = new ThreadLocation("read-table");
 
   public ReadTable()
   {

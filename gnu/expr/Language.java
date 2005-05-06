@@ -23,8 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public abstract class Language
 {
-  protected static final ThreadLocation current
-    = new ThreadLocation(new Symbol("language"));
+   protected static final ThreadLocation current
+     = new ThreadLocation("language");
 
   public static Language getDefaultLanguage()
   { return (Language) current.get(null); }

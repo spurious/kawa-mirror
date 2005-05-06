@@ -63,7 +63,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
   private static InPort systemInPort
     = new TtyInPort (System.in, "<stdin>", OutPort.outInitial);
   public static final ThreadLocation inLocation
-    = new ThreadLocation(new Symbol("in-default"));
+    = new ThreadLocation("in-default");
   static { inLocation.setGlobal(systemInPort); }
 
   static public InPort inDefault ()

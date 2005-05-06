@@ -14,6 +14,11 @@ public class ThreadLocation extends Location
   boolean unlink;
   private static synchronized int nextCounter() { return ++counter; }
 
+  /** Magic property value used for the "anonymous" ThreadLocations.
+   * These are thread-specific dynamic "parameters" (in the SRFI-39 sense)
+   * that are not tied to a specfic name. */
+  public static final String ANONYMOUS = new String("(dynamic)");
+
   Location global;
 
   /* #ifdef JAVA2 */
@@ -25,15 +30,15 @@ public class ThreadLocation extends Location
   /** A new anonymous fluid location. */
   public ThreadLocation ()
   {
-    this(new Symbol("param#"+nextCounter()));
+    this("param#"+nextCounter());
   }
 
   /** A new anonymous fluid location but used a given name for printing.
    * However, the binding is not bound to the name as a visible binding. */
-  public ThreadLocation (Symbol name)
+  public ThreadLocation (String name)
   {
-    this.name = name;
-    this.property = new String("(dynamic)");
+    this.name = new Symbol(name);
+    this.property = ANONYMOUS;
     unlink = true;
   }
 
@@ -48,7 +53,7 @@ public class ThreadLocation extends Location
    * Creates new unique EnvironmentKey, using a unique property key.
    * @param name used for printing, but not identification.
    */
-  public static ThreadLocation makePrivate (Symbol name)
+  public static ThreadLocation makePrivate (String name)
   {
     return new ThreadLocation(name);
   }

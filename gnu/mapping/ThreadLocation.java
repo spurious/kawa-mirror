@@ -40,6 +40,7 @@ public class ThreadLocation extends Location
     this.name = new Symbol(name);
     this.property = ANONYMOUS;
     unlink = true;
+    global = new SharedLocation(this.name, null, 0);
   }
 
   public ThreadLocation (Symbol name, Object property, Location global)

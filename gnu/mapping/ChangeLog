@@ -1,3 +1,8 @@
+2005-05-08  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java (<init>(String)): Create global local.  This
+	provides a default shared local.
+
 2005-05-06  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java (ANONYMOUS): New constant.

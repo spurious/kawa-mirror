@@ -117,8 +117,7 @@ public abstract class ModuleBody extends Procedure0
 	  }
 	else
 	  {
-	    ctx.consumer = new VoidConsumer();
-	    run(ctx);
+	    run();
 	    ctx.runUntilDone();
 	  }
 	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).

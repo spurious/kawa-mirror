@@ -1,3 +1,8 @@
+2005-05-08  Per Bothner  <per@bothner.com>
+
+	* ModuleBody.java (runAsMain): Call zero-argument run(), which checks
+	runDone, though only if results should not be printed.
+
 2005-05-06  Per Bothner  <per@bothner.com>
 
 	* Language.java (current): Update ThreadLocation construction.

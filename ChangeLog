@@ -1,5 +1,17 @@
 2005-05-06  Per Bothner  <per@bothner.com>
 
+	* kawa/GuiConsole.java: Some updates for changed environment handling.
+	* kawa/Shell.java (run): Remove one overloaded method.
+	* kawa/repl.java (processArgs): Update accordingly.
+	* kawa/lang/Eval.java(evalBody): Don't change current Environment.
+	* kawa/lang/Translator.java (<init>): Use current Environment for env.
+	* kawa/standard/Scheme.java (getNewEnvironment): Remove method.
+	(<clinit>): Don't getNewEnvironment.
+	(lookupBuiltin): New method, based on code from ScmEnv.
+	* kawa/standard/ScmEnv.java: No longer needed - functionality
+	merged into Scheme's lookupBuiltin.
+	* kawa/standard/Makefile.am: Update accordingly.
+
 	* kawa/MessageArea.java (write): Do setCaretPosition.
 
 2005-04-21  Per Bothner  <per@bothner.com>

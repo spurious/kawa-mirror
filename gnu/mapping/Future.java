@@ -4,7 +4,7 @@ public class Future extends Thread
 {
   Object result;
   CallContext context;
-  Environment environment;
+  public Environment environment;
 
   // These are only used to when we need to override the parents' in/out/err
   // in the child.  This is not needed for normal Future objects, but (say)

@@ -32,7 +32,7 @@ public class GuiConsole extends Frame implements ActionListener {
 
   public static void main(String[] args) {
     Language language = Scheme.getInstance();
-    new GuiConsole(language, language.getNewEnvironment());
+    new GuiConsole();
   }
 
   public GuiConsole()
@@ -40,10 +40,9 @@ public class GuiConsole extends Frame implements ActionListener {
     this(Language.getDefaultLanguage(), Environment.getCurrent());
   }
 
-  public GuiConsole(Language language, Environment environment) {
+  public GuiConsole(Language language, Environment penvironment) {
     super("Kawa");
     this.language = language;
-    this.environment = environment;
 
     in_r = new gnu.text.QueueReader ();
     message = new MessageArea(in_r);
@@ -65,7 +64,8 @@ public class GuiConsole extends Frame implements ActionListener {
     setVisible(true);
 
     thread = new Future (new kawa.repl(language),
-			 environment, in_p, out_p, err_p);
+			 penvironment, in_p, out_p, err_p);
+    this.environment = thread.environment;
     thread.start();
   }
 
@@ -132,7 +132,7 @@ public class GuiConsole extends Frame implements ActionListener {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))
-      new GuiConsole(language, language.getNewEnvironment());
+      new GuiConsole(language, Environment.getGlobal());
     else if (cmd.equals(NEW_SHARED))
       new GuiConsole(language, environment);
     else if (cmd.equals(EXIT))

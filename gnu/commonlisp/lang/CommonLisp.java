@@ -79,13 +79,6 @@ public class CommonLisp extends Lisp2
       {
         ctx.setEnvironmentRaw(saveEnv);
       }
-    instance.environ = instance.getNewEnvironment();
-  }
-
-  public Environment getNewEnvironment ()
-  {
-    return Environment.make("interaction-environment."+(++env_counter),
-                            clispEnvironment);
   }
 
   public CommonLisp()

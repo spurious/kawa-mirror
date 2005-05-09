@@ -29,6 +29,8 @@ public abstract class Language
   public static Language getDefaultLanguage()
   { return (Language) current.get(null); }
 
+  static { Environment.setGlobal(BuiltinEnvironment.getInstance()); }
+
   public static void setDefaultLanguage(Language language)
   {
     current.set(language);
@@ -188,7 +190,11 @@ public abstract class Language
   protected Environment environ;
 
   public Environment getEnvironment() { return environ; }
-  public void setEnvironment(Environment environ) { this.environ = environ; }
+
+  public NamedLocation lookupBuiltin (Symbol name, Object property, int hash)
+  {
+    return environ == null ? null : environ.lookup(name, property, hash);
+  }
 
   /** Enter a value into the current environment. */
   public void define(String sym, Object p)
@@ -393,11 +399,6 @@ public abstract class Language
     return oport;
   }
 
-  public Environment getNewEnvironment ()
-  {
-    return Environment.make(null, environ);
-  }
-
   public String getName()
   {
     String name = getClass().getName();
@@ -587,9 +588,6 @@ public abstract class Language
 
   public static void setDefaults (Language lang)
   {
-    Environment env = lang.getEnvironment();
-    Environment.setCurrent(env);
-    Environment.setGlobal(env);
     Language.setDefaultLanguage(lang);
     current.setGlobal(lang);
   }
@@ -684,9 +682,6 @@ public abstract class Language
   public void eval (InPort port, CallContext ctx) throws Throwable
   {
     SourceMessages messages = new SourceMessages();
-    Environment saveEnviron = Environment.getCurrent();
-    if (saveEnviron != environ)
-      Environment.setCurrent(environ);
     Language saveLang = getDefaultLanguage();
     setDefaultLanguage(this);
     try
@@ -696,8 +691,6 @@ public abstract class Language
       }
     finally
       {
-	if (saveEnviron != environ && saveEnviron != null)
-	  Environment.setCurrent(saveEnviron);
 	setDefaultLanguage(saveLang);
       }
     if (messages.seenErrors())
@@ -709,10 +702,7 @@ public abstract class Language
 
   public void runAsApplication (String[] args)
   {
-    setDefaultLanguage(this);
-    if (environ == null)
-      environ = Environment.make("interaction-environment."+(++env_counter));
-    Environment.setCurrent(environ);
+    setDefaults(this);
     kawa.repl.main(args);
   }
 }

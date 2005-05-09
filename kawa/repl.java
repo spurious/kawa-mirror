@@ -234,7 +234,7 @@ public class repl extends Procedure0or1
 	    if (arg.equals ("-c"))
 	      checkInitFile();
 	    Language language = Language.getDefaultLanguage();
-	    Shell.runString(args[iArg], language, language.getEnvironment());
+	    Shell.runString(args[iArg], language, Environment.getCurrent());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -670,7 +670,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(Language.getDefaultLanguage());
+	    Shell.run(Language.getDefaultLanguage(), Environment.getCurrent());
 	  }
       }
     finally

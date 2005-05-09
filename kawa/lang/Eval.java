@@ -72,14 +72,11 @@ public class Eval extends Procedure1or2
     throws Throwable
   {
     Language language = Language.getDefaultLanguage();
-    Environment saveLangEnv = language.getEnvironment();
     Environment saveGlobalEnv = Environment.getCurrent();
     try
       {
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
-	if (env != saveLangEnv)
-	  language.setEnvironment(env);
 	Translator tr = new Translator(language, messages);
 	ModuleExp mod = new ModuleExp();
 	Values forms = new Values();
@@ -109,8 +106,6 @@ public class Eval extends Procedure1or2
       {
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(saveGlobalEnv);
-	if (env != saveLangEnv)
-	  language.setEnvironment(saveLangEnv);
       }
   }
 

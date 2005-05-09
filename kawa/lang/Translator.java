@@ -65,7 +65,7 @@ public class Translator extends Compilation
   public Translator (Language language, SourceMessages messages)
   {
     super(language, messages);
-    this.env = language.getEnvironment();
+    this.env = Environment.getCurrent();
   }
 
   public final Environment getGlobalEnvironment() { return env; }

@@ -1,5 +1,20 @@
 2005-05-08  Per Bothner  <per@bothner.com>
 
+	* BuiltinEnvironment.java: New class, extends Environment.
+	* Makefile.am: Update accordingly.
+	* Compilation.java (getEnvironment): Remove now-inappropriate method.
+	(resolve): Use Environment.getCurrent() instead of getEnvironment.
+	* Declaration.java (load): Likewise.
+	* InlineCalls.java (walkApplyExp): Likewise.
+	* Language.java: Set global Environment to a BuiltinEnvironment.
+	(setEnvironment, getNewEnvironment): Remove methods.
+	(lookupBuiltin): New method.
+	(setDefaults): Language enviroment should *not* be current environement.
+	(eval): Don't change current Environment.
+	(runAsApplication): Don't need to explicitly create Environment.
+
+2005-05-08  Per Bothner  <per@bothner.com>
+
 	* ModuleBody.java (runAsMain): Call zero-argument run(), which checks
 	runDone, though only if results should not be printed.
 

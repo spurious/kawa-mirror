@@ -38,11 +38,6 @@ public class InheritingEnvironment extends SimpleEnvironment
     numInherited++;
   }
 
-  public NamedLocation lookupExtend (Symbol name, Object property, int hash)
-  {
-    return null;
-  }
-
   public NamedLocation lookupInherited (Symbol name, Object property, int hash)
   { 
     for (int i = 0;  i < numInherited;  i++)
@@ -87,10 +82,7 @@ public class InheritingEnvironment extends SimpleEnvironment
     NamedLocation loc = super.lookup(name, property, hash);
     if (loc != null)
       return loc;
-    loc = lookupInherited(name, property, hash);
-    if (loc != null)
-      return loc;
-    return lookupExtend(name, property, hash);
+    return lookupInherited(name, property, hash);
   }
 
   public synchronized NamedLocation
@@ -121,10 +113,7 @@ public class InheritingEnvironment extends SimpleEnvironment
 	else
 	  return loc;
       }
-    loc = lookupExtend(name, property, hash);
-    if (loc != null || ! create)
-      return loc;
-    return addUnboundLocation(name, property, hash);
+    return create ? addUnboundLocation(name, property, hash) : null;
   }
 
   public LocationEnumeration enumerateAllLocations()

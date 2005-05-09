@@ -80,7 +80,6 @@ public class ELisp extends Lisp2
       {
         ctx.setEnvironmentRaw(saveEnv);
       }
-    instance.environ = instance.getNewEnvironment();
   }
 
   ELisp ()
@@ -174,12 +173,6 @@ public class ELisp extends Lisp2
       {
 	// Ignore - happens while building this directory.
       }
-  }
-
-  public Environment getNewEnvironment ()
-  {
-    return Environment.make("interaction-environment."+(++env_counter),
-                            elispEnvironment);
   }
 
   public static ELisp getInstance()

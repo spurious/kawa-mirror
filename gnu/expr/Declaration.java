@@ -184,7 +184,7 @@ public class Declaration
         else if (isIndirectBinding() && comp.immediate && getVariable() == null)
           {
             // This is a bit of a kludge.  See comment in ModuleExp.evalModule.
-            Environment env = comp.getEnvironment();
+            Environment env = Environment.getCurrent();
             Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
               : env.getSymbol(symbol.toString());
             Object property = null;

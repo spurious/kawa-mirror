@@ -146,11 +146,6 @@ public class Shell
       }
   }
 
-  public static void run (Language language)
-  {
-    run(language, language.getEnvironment());
-  }
-
   public static void run (Language language, Environment env)
   {
     InPort inp = InPort.inDefault ();

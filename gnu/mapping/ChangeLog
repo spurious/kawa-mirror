@@ -1,5 +1,9 @@
 2005-05-08  Per Bothner  <per@bothner.com>
 
+	* InheritingEnvironment.java (lookupExtend): Remove method.
+	(lookup, getLocation): Remove lookupExtend calls.
+	* Future.java (environment): Make public, for GuiConsole.
+
 	* ThreadLocation.java (<init>(String)): Create global local.  This
 	provides a default shared local.
 

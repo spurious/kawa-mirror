@@ -2072,7 +2072,6 @@ public class Compilation
 
   protected Language language;
   public Language getLanguage() { return language; }
-  public Environment getEnvironment() { return language.getEnvironment(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
@@ -2427,7 +2426,7 @@ public class Compilation
 
   public Object resolve(Object name, boolean function)
   {
-    Environment env = getEnvironment();
+    Environment env = Environment.getCurrent();
     Symbol symbol;
     if (name instanceof String)
       symbol = env.defaultNamespace().lookup((String) name);

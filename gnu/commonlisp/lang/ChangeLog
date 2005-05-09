@@ -1,7 +1,12 @@
+2005-05-08  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java: Keep environ field set to clispEnvironment.
+	(getNewEnvironment): Remove method.
+
 2005-04-19  Per Bothner  <per@bothner.com>
 
-	* gnu/commonlisp/lang/CommonLisp.java (registerEnvironment): Use
-	'instance' field rather than creating a new instance.
+	* CommonLisp.java (registerEnvironment): Use 'instance' field rather
+	than creating a new instance.
 
 2005-03-29  Per Bothner  <per@bothner.com>
 

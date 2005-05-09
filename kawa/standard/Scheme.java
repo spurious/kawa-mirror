@@ -10,6 +10,8 @@ import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.FormatToConsumer;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.reflect.ClassMethods;
+import gnu.math.Unit;
 
 public class Scheme extends LispLanguage
 {
@@ -63,7 +65,6 @@ public class Scheme extends LispLanguage
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
     repl = new kawa.repl(instance);
     instance.initScheme();
-    instance.environ = instance.getNewEnvironment();
   }
 
   public static Scheme getInstance()
@@ -711,10 +712,42 @@ public class Scheme extends LispLanguage
     return "Scheme";
   }
 
-  public Environment getNewEnvironment ()
+  public NamedLocation lookupBuiltin (Symbol name, Object property, int hash)
   {
-    return new ScmEnv ("interaction-environment."+(++env_counter),
-		       kawaEnvironment);
+    NamedLocation loc = super.lookupBuiltin(name, property, hash);
+    if (loc == null && property == null)
+      {
+        // Special handling for names of the form "<TYPE>".  I.e. if an
+        // identifier of the form is unbound, then get a matching Type.
+        // Also, handles U$unit by doing Unit.lookup("U").  (The Scheme reader
+        // translates a quantity like 2in to (* 2 in$unit).  The advantage is
+        // is that we can have clean scoping rules for unit names;  the downside
+        // is that 2in is no longer a literal.)
+        String nam = name.getName();
+	Object val = null;
+	String uri = name.getNamespaceURI();
+        int len = nam.length();
+	if (uri != null && uri.startsWith("class:"))
+	  {
+	    String mname = nam.equals("new") ? "<init>"
+	      : Compilation.mangleName(nam);
+	    ClassType methodClass = ClassType.make(uri.substring(6));
+	    val = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
+	  }
+	else if (nam.endsWith("$unit"))
+	  val = Unit.lookup(nam.substring(0, nam.length()-5));
+	else if (len > 2 && nam.charAt(0) == '<' && nam.charAt(len-1) == '>')
+          {
+            String tname = nam.substring(1, len-1);
+            val = Scheme.string2Type(tname);
+          }
+	if (val != null)
+          {
+            loc = new PlainLocation(name, null);
+            loc.set(val);
+          }
+      }
+    return loc;
   }
 
   /** Evalutate Scheme expressions from string.

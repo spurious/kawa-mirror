@@ -31,8 +31,7 @@ END-INFO-DIR-ENTRY
 
 @ifnottex
 @node Top, Features, (dir), (dir)
-@top
-@unnumbered The Kawa Scheme system, by Per Bothner
+@top The Kawa Scheme system
 @end ifnottex
 
 Kawa is a Scheme environment, written in Java,
@@ -79,7 +78,7 @@ and
 are used by Kawa, and distributed with it, but may be independently useful.
 
 For a technical overview of Kawa, see these
-@uref{http://www.gnu.org/software/kawa/internals.html}.
+@uref{http://www.gnu.org/software/kawa/internals/index.html}.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -1958,7 +1957,7 @@ sequence @var{j0} ... @var{jk} ... of @var{n} exact integers where
 each @var{jk} satisfies @code{(<= @var{bk} @var{jk})}
 and @code{(< @var{jk} @var{ek})}.
 
-The shape of a @var{d}-dimensional array is a @var{d} × 2 array
+The shape of a @var{d}-dimensional array is a @var{d} * 2 array
 where the element at @var{k 0} contains the lower bound for an index along
 dimension @var{k} and the element at @var{k 1} contains the
 corresponding upper bound, where @var{k} satisfies @code{(<=  0 @var{k})}
@@ -2704,6 +2703,7 @@ A powerful pretty-printer.
 @end menu
 
 @node Named output formats, Files, , Input-Output
+@section Named output formats
 
 The @code{--output-format} (or @code{--format}) command-line switch
 can be used to override the default format for how values are
@@ -3582,6 +3582,7 @@ allow an optional class specifier (needed for nested clases).
 @end deffn
 
 @node Record types, Dynamic records, Objects Classes and Modules, Objects Classes and Modules
+@section Record types
 
 The @code{define-record-type} form can be used for creating new data
 types, called record types. A predicate, constructor, and field

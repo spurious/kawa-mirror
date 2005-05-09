@@ -1,3 +1,13 @@
+2005-05-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: We don't need both @top and @unnumbered at the start.
+
+	* kawa.texi (@top): Update URL for internals manual.
+
+	* kawa.texi (Arrays): Avoid non-Ascii character.
+
+	* kawa.texi: Add two missing @section commands.
+
 2005-04-16  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: The NEWS web page is now news.html.

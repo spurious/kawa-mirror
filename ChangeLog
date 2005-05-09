@@ -1,3 +1,7 @@
+2005-05-06  Per Bothner  <per@bothner.com>
+
+	* kawa/MessageArea.java (write): Do setCaretPosition.
+
 2005-04-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java: Use new contextDecl/setContextDecl

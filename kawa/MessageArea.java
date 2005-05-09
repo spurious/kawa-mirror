@@ -92,9 +92,12 @@ public class MessageArea extends TextArea
   }
 
   public synchronized void write (String str) {
+    boolean moveCaret = getCaretPosition() == outputMark;
     insert(str, outputMark);
     int len = str.length();
     outputMark += len;
+    if (moveCaret)
+      setCaretPosition(outputMark);
     if (endMark >= 0)
       endMark += len;
   }

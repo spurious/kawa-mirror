@@ -8,7 +8,7 @@ public abstract class IndirectableLocation extends Location
   /** If <code>value==DIRECT_ON_SET</code>, break indirection on a <code>set</code>. */
   protected static final Object DIRECT_ON_SET = new String("(direct-on-set)");
 
-  /** If <code>value</code> has this value, forc indirection even
+  /** If <code>value</code> has this value, force indirection even
    * for the <code>setWithSave</code> operation.
    * Ignoring the restore aspect of a <code>fluid-let</code>, it is normally
    * treated as closer to a <code>define</code> than to a <code>set</code>,

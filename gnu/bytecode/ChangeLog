@@ -1,3 +1,7 @@
+2005-05-10  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getMethod): New method.
+
 2005-04-18  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getReflectClass): Update PreProcess names.

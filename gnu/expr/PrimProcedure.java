@@ -201,37 +201,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
   }
 
-  public PrimProcedure(java.lang.reflect.Method method,
-		       Class thisClass, Class[] parameterClasses,
-		       Language language)
-  {
-    Type[] parameterTypes = new Type[parameterClasses.length];
-    Type[] implParameterTypes = new Type[parameterClasses.length];
-    for (int i = parameterClasses.length;  --i >= 0; )
-      {
-	Type ptype = language.getTypeFor(parameterClasses[i]);
-	parameterTypes[i] = ptype;
-	implParameterTypes[i] = ptype.getImplementationType();
-      }
-    Type returnType = language.getTypeFor(method.getReturnType());
-    Type implReturnType = returnType.getImplementationType();
-    ClassType thisType = (ClassType) language.getTypeFor(thisClass);
-    Method meth = thisType.addMethod(method.getName(), method.getModifiers(),
-				     implParameterTypes, implReturnType);
-    init(meth);
-    argTypes = parameterTypes;
-    retType = op_code == 183 ? meth.getDeclaringClass() : returnType;
-  }
-
   public PrimProcedure(java.lang.reflect.Method method, Language language)
   {
-    this(method, method.getDeclaringClass(),
-	 method.getParameterTypes(), language);
+    this(((ClassType) language.getTypeFor(method.getDeclaringClass()))
+         .getMethod(method), language);
   }
 
   public PrimProcedure(Method method)
   {
     init(method);
+    this.retType = method.getName().endsWith("$X") ? Type.pointer_type
+      : method.getReturnType();
   }
 
   public PrimProcedure(Method method, Language language)
@@ -259,8 +239,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     if (argTypes == null)
       argTypes = pTypes;
-    retType = op_code == 183 ? method.getDeclaringClass() :
-      language.getTypeFor(method.getReturnType().getReflectClass());
+    retType = op_code == 183 ? method.getDeclaringClass()
+      : method.getName().endsWith("$X") ? Type.pointer_type
+      : language.getTypeFor(method.getReturnType().getReflectClass());
   }
 
   public PrimProcedure(Method method, boolean is_special, Language language)
@@ -276,7 +257,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     this.method = method;
     this.argTypes = method.getParameterTypes();
-    this.retType = method.getReturnType();
     int flags = method.getModifiers();
     if ((flags & Access.STATIC) != 0)
       this.op_code = 184;  // invokestatic

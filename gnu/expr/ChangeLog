@@ -1,3 +1,12 @@
+2005-05-10  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (<init>): Remove unused constructor.
+	Simplify another constructor by using new ClassType.getMethod.
+
+	* PrimProcedure.java (<init>, init): If talesContext(), method
+	return type is void, so we set retType to Object.
+	Fixes bug reported 2005-05-08 by dominique.boucher@nuecho.com.
+
 2005-05-08  Per Bothner  <per@bothner.com>
 
 	* BuiltinEnvironment.java: New class, extends Environment.

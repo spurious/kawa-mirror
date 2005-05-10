@@ -707,7 +707,7 @@ public class Translator extends Compilation
 			   : null);
 	    if (loc != null)
 	      loc = loc.getBase();
-            if (loc instanceof FieldLocation)
+            if (loc instanceof FieldLocation && inlineOk(null))
               {
                 decl = ((FieldLocation) loc).getDeclaration();
               }

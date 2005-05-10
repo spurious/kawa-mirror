@@ -1,3 +1,8 @@
+2005-05-10  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite): Don't follow FieldLocation
+	if not inlineOk as that may fail compiling a lambda context.
+
 2005-05-06  Per Bothner  <per@bothner.com>
 
 	* kawa/GuiConsole.java: Some updates for changed environment handling.

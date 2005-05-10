@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 135)
+(test-init "Miscellaneous" 136)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -617,3 +617,10 @@
 		 (set! param1v 17)
 		 (append r1 (list (param1) param1v))))))
 	(append r0 (list (param1) param1v))))
+
+;; Bug reported 2005-05-08 by dominique.boucher@nuecho.com.
+(require <moduleFT>)
+(define (test-neg-abs)
+  (let ((x (neg-abs 4)))
+    (format #f "x = ~S." x)))
+(test "x = -4." test-neg-abs)

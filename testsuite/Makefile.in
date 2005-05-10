@@ -404,7 +404,7 @@ check-num: testing.zip
 check-arr: testing.zip
 	$(KAWATEST) -f "$(srcdir)/arr-test.scm" -e '(test-report)'
 
-check-misc: testing.zip
+check-misc: testing.zip moduleFT.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
 check-mac: testing.zip
@@ -432,6 +432,9 @@ check-ppfile:
 
 scribble.class: $(srcdir)/scribble.scm
 	$(KAWA) --applet -C $(srcdir)/scribble.scm
+
+moduleFT.class: $(srcdir)/moduleFT.scm
+	$(KAWA) --full-tailcalls -C $(srcdir)/moduleFT.scm
 
 module0.class: $(srcdir)/module0.scm
 	$(KAWA) -C $(srcdir)/module0.scm

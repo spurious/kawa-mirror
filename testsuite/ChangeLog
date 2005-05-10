@@ -1,3 +1,10 @@
+2005-05-10  Per Bothner  <per@bothner.com>
+	    Dominique Boucher  <dominique.boucher@nuecho.com>
+
+	* moduleFT.scm: New module.
+	* Makefile.am: Build new file and have check-misc depend on it.
+	* misc-test.scm: New test invoking neg-abs from moduleFT.
+
 2005-04-21  Per Bothner  <per@bothner.com>
 
 	* MyModule.java: Remove redundant import.

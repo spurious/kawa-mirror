@@ -1,3 +1,8 @@
+2005-05-13  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Quote.java (expand_pair): Rewrite to avoid deep recursion
+	(and possible StackOverflow) on long lists.
+
 2005-05-10  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite): Don't follow FieldLocation

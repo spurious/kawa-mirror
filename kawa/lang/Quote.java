@@ -66,58 +66,129 @@ public class Quote extends Syntax implements Printable
     return val instanceof Expression ? (Expression) val : new QuoteExp (val);
   }
 
-  static Object expand_pair (Pair pair, int depth, SyntaxForm syntax,
+  static Object expand_pair (Pair list, int depth, SyntaxForm syntax,
 			     Object seen, Translator tr)
   {
-    if (depth <= QUOTE_DEPTH)
-      ;
-    else if (tr.matches(pair.car, LispLanguage.quasiquote_sym))
-      depth++;
-    else if (tr.matches(pair.car, LispLanguage.unquote_sym))
+    Pair pair = list;
+    Object cdr;
+    Object rest;
+    for (;;)
       {
-	depth--;
-	Pair pair_cdr;
-	if (! (pair.cdr instanceof Pair)
-	    || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
-	  return tr.syntaxError ("invalid used of " + pair.car +
+        // This would be simpler as palin recusion, but we try to iterate
+        // over the given list, partly for speed, but more importantly
+        // to avoid stack overflow in the case of long lists.
+        rest = pair;
+        // We're currently examining pair, which is the n'th cdr of list.
+        // All previous elements (cars) are returned identically by expand.
+        // What makes things complicated is that to the extent that no changes
+        // are needed, we want to return the input list as-is.
+        if (depth < 0)
+          {
+          }
+        else if (tr.matches(pair.car, LispLanguage.quasiquote_sym))
+          depth++;
+        else if (tr.matches(pair.car, LispLanguage.unquote_sym))
+          {
+            depth--;
+            Pair pair_cdr;
+            if (! (pair.cdr instanceof Pair)
+                || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
+              return tr.syntaxError ("invalid used of " + pair.car +
 				     " in quasiquote template");
-	if (depth == 0)
-	  return tr.rewrite_car(pair_cdr, syntax);
-      }
-    else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym))
-      return tr.syntaxError ("invalid used of " + pair.car +
+            if (depth == 0)
+              {
+                cdr = tr.rewrite_car(pair_cdr, syntax);
+                break;
+              }
+          }
+        else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym))
+          return tr.syntaxError ("invalid used of " + pair.car +
 				 " in quasiquote template");
-    Object expanded_cdr = expand (pair.cdr, depth, syntax, seen, tr);
-    if (pair.car instanceof Pair && depth > QUOTE_DEPTH)
-      {
-	Pair pair_car = (Pair)pair.car;
-	if (tr.matches(pair_car.car, LispLanguage.unquotesplicing_sym)
-	    && --depth == 0)
-	  {
-	    Pair pair_car_cdr;
-	    if (! (pair_car.cdr instanceof Pair)
-		|| (pair_car_cdr = (Pair) pair_car.cdr).cdr != LList.Empty)
-	      return tr.syntaxError ("invalid used of " + pair_car.car +
-				     " in quasiquote template");
-	    Expression[] args = new Expression[2];
-	    args[0] = tr.rewrite_car(pair_car_cdr, syntax);
-	    args[1] = coerceExpression (expanded_cdr);
-	    return Invoke.makeInvokeStatic(appendType, "append", args);
-	  }
+        if (pair.car instanceof Pair && depth > QUOTE_DEPTH)
+          {
+            Pair pair_car = (Pair)pair.car;
+            if (tr.matches(pair_car.car, LispLanguage.unquotesplicing_sym)
+                && depth == 1)
+              {
+                Pair pair_car_cdr;
+                if (! (pair_car.cdr instanceof Pair)
+                    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != LList.Empty)
+                  return tr.syntaxError ("invalid used of " + pair_car.car +
+                                         " in quasiquote template");
+                Expression[] args = new Expression[2];
+                args[0] = tr.rewrite_car(pair_car_cdr, syntax);
+                Object expanded_cdr = expand (pair.cdr, depth, syntax, seen, tr);
+                args[1] = coerceExpression (expanded_cdr);
+                rest = pair;
+                cdr = Invoke.makeInvokeStatic(appendType, "append", args);
+                break;
+              }
+          }
+        Object car = expand (pair.car, depth, syntax, seen, tr);
+        if (car == pair.car)
+          {
+            rest = pair.cdr;
+            if (rest instanceof Pair)
+              {
+                pair = (Pair) rest;
+                continue;
+              }
+            cdr = expand(rest, depth, syntax, seen, tr);
+            break;
+          }
+        cdr = expand (pair.cdr, depth, syntax, seen, tr);
+        if (car instanceof Expression || cdr instanceof Expression)
+          {
+            Expression[] args = new Expression[2];
+            args[0] = coerceExpression(car);
+            args[1] = coerceExpression(cdr);
+            cdr = Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
+          }
+        else
+          cdr = Translator.makePair(pair, car, cdr);
+        break;
       }
-    Object expanded_car = expand (pair.car, depth, syntax, seen, tr);
-    if (expanded_car == pair.car && expanded_cdr == pair.cdr)
-      return pair;
-    else if (!(expanded_car instanceof Expression)
-	     && !(expanded_cdr instanceof Expression))
-      return Translator.makePair(pair, expanded_car, expanded_cdr);
+    // rest is the n'th cdr of list.  cdr is the expansion of rest.
+    // The first n cars of list are returned identically by expand.
+    // These do need to be copied because cdr!=rest.
+    if (list == rest)
+      return cdr;
+    Pair p = list;
+    Pair prev = null;
+    for (;;)
+      {
+        Pair q = Translator.makePair(p, p.car, null);
+        if (prev == null)
+          list = q;
+        else
+          prev.cdr = q;
+        prev = q;
+        if (p.cdr == rest)
+          break;
+        p = (Pair) p.cdr;
+      }
+    if (cdr instanceof Expression)
+      {
+        Expression[] args = new Expression[2];
+        args[1] = (Expression) cdr;
+        if (prev == list)
+          {
+            // The n==1 case: Only a single pair before rest.
+            args[0] = new QuoteExp(list.car);
+	    return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
+          }
+        else
+          {
+            prev.cdr = LList.Empty;
+            args[0] = new QuoteExp(list);
+	    return Invoke.makeInvokeStatic(appendType, "append", args);
+          }
+      }
     else
       {
-	Expression[] args = new Expression[2];
-	args[0] = coerceExpression (expanded_car);
-	args[1] = coerceExpression (expanded_cdr);
-	return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
+        prev.cdr = cdr;
       }
+    return list;
   }
 
   private static final Object WORKING = new String("(working)");
@@ -125,7 +196,9 @@ public class Quote extends Syntax implements Printable
 
   /** Backquote-expand a template.
    * @param template the quasiquoted template to expand
-   * @param depth the (net) number of quasiquotes we are inside
+   * @param depth the (net) number of quasiquotes we are inside.
+   *   The values QUOTE_DEPTH and DATUM_DEPTH are special cases
+   *   when we're inside a quote rather than a quasiquote.
    * @param tr the rewrite context
    * @return the expanded Expression (the result can be a non-expression,
    *   in which case it is implicitly a QuoteExp).

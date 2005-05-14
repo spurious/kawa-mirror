@@ -228,7 +228,7 @@ public abstract class ScopeExp extends Expression
   public final Declaration addDeclaration (Object name)
   {
     Declaration decl = new Declaration (name);
-    addDeclaration(decl);
+    add(decl);
     return decl;
   }
 
@@ -239,9 +239,8 @@ public abstract class ScopeExp extends Expression
    */
   public final Declaration addDeclaration (Object name, Type type)
   {
-    Declaration decl = new Declaration (name);
-    addDeclaration(decl);
-    decl.setType(type);
+    Declaration decl = new Declaration (name, type);
+    add(decl);
     return decl;
   }
 

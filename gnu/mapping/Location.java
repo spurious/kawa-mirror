@@ -143,8 +143,9 @@ public abstract class Location
   // The compiler emits calls to this method.
   public static Location make (Object init, String name)
   {
-    Symbol sym = Namespace.EmptyNamespace.getSymbol(name.intern());
-    return new PlainLocation(sym, null, init);
+    ThreadLocation loc = new ThreadLocation(name);
+    loc.setGlobal(init);
+    return loc;
   }
 
   // The compiler emits calls to this method.

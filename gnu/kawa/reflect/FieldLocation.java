@@ -8,8 +8,8 @@ public class FieldLocation extends ClassMemberLocation
 {
   Declaration decl;
   /** The cached location of the field, if final.
-   * This is the value of this Location, exception if isIndirectLocation(),
-   * we need to do an extra indirection. */
+   * This is the value of this Location.  Howeve, if INDIRECT_LOCATION is
+   * set and CONSTANT is cleared, then we need to do an extra indirection. */
   Object value;
   static final int SETUP_DONE = 1; // FIXME - do we still need this?
 

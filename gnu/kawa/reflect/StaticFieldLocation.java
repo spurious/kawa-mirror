@@ -23,11 +23,10 @@ public class StaticFieldLocation extends FieldLocation
 
   public Object get (Object defaultValue)
   {
-    if (value == null)
-      value = super.get(defaultValue);
-    if (value instanceof kawa.lang.Macro)
+    Object val = super.get(defaultValue);
+    if (val instanceof kawa.lang.Macro)
       getDeclaration();
-    return value;
+    return val;
   }
 
   public static StaticFieldLocation

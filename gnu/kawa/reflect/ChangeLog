@@ -1,3 +1,8 @@
+2005-05-14  Per Bothner  <per@bothner.com>
+
+	* StaticFieldLocation.java (get): Setting value field from result
+	of super.get violates latter's invariant.
+
 2005-04-20  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (setup): Call super.setup() to set rfield.

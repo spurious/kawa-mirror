@@ -24,7 +24,8 @@ public class SourceError
   public int column;
 
   /** The actual error message.
-   * This is post-localization and -formatting. */
+   * This is post-localization and -formatting.
+   * It can contain multiple lines, separated by '\n'.*/
   public String message;
 
   public SourceError(char severity, String filename, int line, int column, 
@@ -72,5 +73,33 @@ public class SourceError
   public void print(java.io.PrintWriter out)
   {
     out.print(this);
+  }
+
+  public void println(java.io.PrintWriter out)
+  {
+    String line = toString();
+    for (;;)
+      {
+        int nl = line.indexOf('\n');
+        if (nl < 0)
+          break;
+        out.println(line.substring(0, nl));
+        line = line.substring(nl+1);
+      }
+    out.println(line);
+  }
+
+  public void println(java.io.PrintStream out)
+  {
+    String line = toString();
+    for (;;)
+      {
+        int nl = line.indexOf('\n');
+        if (nl < 0)
+          break;
+        out.println(line.substring(0, nl));
+        line = line.substring(nl+1);
+      }
+    out.println(line);
   }
 }

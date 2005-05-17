@@ -132,7 +132,7 @@ public class SourceMessages
     for (SourceError err = firstError;
 	 err != null && --max >= 0;  err = err.next)
       {
-	out.println(err);
+	err.println(out);
       }
   }
 
@@ -142,7 +142,7 @@ public class SourceMessages
     for (SourceError err = firstError;
 	 err != null && --max >= 0;  err = err.next)
       {
-	out.println(err);
+	err.println(out);
       }
   }
 

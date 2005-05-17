@@ -1,3 +1,9 @@
+2005-05-17  Per Bothner  <per@bothner.com>
+
+	* SourceError.java (message): Can contain muliple lines.
+	(println(PrintStream), println(PrintWriter)): New methods.
+	* SourceMessages.java (printAll): Use new println methods.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* Lexer.java: Fix a javadoc typo.

@@ -1107,18 +1107,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    if (decl.field != null)
 	      continue;
-     	    String dname = Compilation.mangleName(decl.getName());
-	    String mname = dname;
-	    // Check for existing field with same name.
-	    for (int i = 0; ; )
-	      {
-		Field fld = frameType.getField(mname);
-		if (fld == null)
-		  break;
-		mname = dname + '_' + ++i;
-	      }
-	    Type ftype = decl.getType().getImplementationType();
-	    decl.field = frameType.addField (mname, ftype, fflags);
+            decl.makeField(frameType, comp, null);
 	  }
       }
     if (heapFrame != null && ! comp.usingCPStyle())

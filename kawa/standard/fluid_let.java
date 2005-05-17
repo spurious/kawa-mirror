@@ -73,6 +73,13 @@ public class fluid_let extends Syntax implements Printable
 	else
 	  return tr.syntaxError("invalid " + getName() + " syntax");
 	Declaration decl = let.addDeclaration(name);
+        Declaration found = tr.lexical.lookup(name, false);
+        if (found != null)
+          {
+            if (found.isLexical())
+              found.setIndirectBinding(true);
+            decl.base = found;
+          }
 	decl.setFluid(true);
 	decl.setIndirectBinding(true);
 	if (value == null)

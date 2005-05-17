@@ -713,6 +713,11 @@ public class Declaration
   public void makeField(Compilation comp, Expression value)
   {
     setSimple(false);
+    makeField(comp.mainClass, comp, value);
+  }
+
+  public void makeField(ClassType frameType, Compilation comp, Expression value)
+  {
     boolean external_access = needsExternalAccess();
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
@@ -742,10 +747,10 @@ public class Declaration
       fname = PRIVATE_PREFIX + fname;
     int nlength = fname.length();
     int counter = 0;
-    while (comp.mainClass.getDeclaredField(fname) != null)
+    while (frameType.getDeclaredField(fname) != null)
       fname = fname.substring(0, nlength) + '$' + (++ counter);
 
-    field = comp.mainClass.addField (fname, ftype, fflags);
+    field = frameType.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {
 	Object val = ((QuoteExp) value).getValue();
@@ -760,7 +765,7 @@ public class Declaration
 	  {
 	    if (val instanceof gnu.text.Char)
 	      val = gnu.math.IntNum.make(((gnu.text.Char) val).intValue());
-	    field.setConstantValue(val, comp.mainClass);
+	    field.setConstantValue(val, frameType);
 	    return;
 	  }
       }

@@ -188,10 +188,8 @@ public class SetExp extends AccessExp
 	    Method meth = locType.getDeclaredMethod("setAlias", 1);
 	    code.emitInvokeVirtual(meth);
 	  }
-	else if (decl.isIndirectBinding()
-		 && (isSetIfUnbound() || ! isDefining() || decl.isPublic()))
+	else if (decl.isIndirectBinding())
 	  {
-
             decl.load(owner, ReferenceExp.DONT_DEREFERENCE,
                       comp, Target.pushObject);
 	    if (isSetIfUnbound())
@@ -224,14 +222,6 @@ public class SetExp extends AccessExp
 		code.emitFi();
 		code.popScope();
 	      }
-	  }
-	else if (decl.isFluid())
-	  {
-            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
-                      comp, Target.pushObject);
-	    new_value.compile(comp, Type.pointer_type);
-	    code.emitInvokeVirtual(Compilation.typeLocation
-				   .getDeclaredMethod("set", 1));
 	  }
 	else if (decl.isSimple ())
 	  {

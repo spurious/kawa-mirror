@@ -1,5 +1,16 @@
 2005-05-14  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (makeField): New overload, takes frame class.
+	* LambdaExp.java (enterFunction): Use new makeField.  This is needed to
+	handle indirect bindings, as might be forced by location or fluid-let.
+	* FindCapturedVars.java (walkFluidLetExp): Only allocate an unbound
+	decl if base is null - i.e. if there is no lexical binding.
+	* LetExp.java (store_rest): Replace emitStore call by more general
+	compileStore in the indirectBinding case.
+	* SetExp.java (compile): Simplify for correct indirectBinding case.
+	* FindTailsCalls.java (walkFluidLetExp): If there is a base declaration
+	note that it too can be read/written.
+
 	* ScopeExp.java (addDeclaration): Trivial optimizations.
 
 2005-05-10  Per Bothner  <per@bothner.com>

@@ -39,10 +39,8 @@ public class LetExp extends ScopeExp
 		  {
 		    decl.pushIndirectBinding(comp);
 		  }
-		code.emitStore(decl.getVariable());
 	      }
-	    else
-	      decl.compileStore(comp);
+            decl.compileStore(comp);
 	  }
       }
   }

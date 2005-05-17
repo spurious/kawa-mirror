@@ -107,9 +107,12 @@ public class FindCapturedVars extends ExpWalker
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
-	Declaration bind = allocUnboundDecl(decl.getSymbol(), false);
-	capture(bind);
-	decl.base = bind;
+        if (decl.base == null)
+          {
+            Declaration bind = allocUnboundDecl(decl.getSymbol(), false);
+            capture(bind);
+            decl.base = bind;
+          }
       }
     return super.walkLetExp(exp);
   }

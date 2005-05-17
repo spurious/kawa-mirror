@@ -106,6 +106,11 @@ public class FindTailCalls extends ExpWalker
       {
         decl.setCanRead(true);
         decl.setCanWrite(true);
+        if (decl.base != null)
+          {
+            decl.base.setCanRead(true);
+            decl.base.setCanWrite(true);
+          }
       }
     boolean save = inTailContext;
     inTailContext = false;

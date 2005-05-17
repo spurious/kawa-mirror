@@ -1,3 +1,7 @@
+2005-05-17  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Change fluid-let test result to match new semantics.
+
 2005-05-10  Per Bothner  <per@bothner.com>
 	    Dominique Boucher  <dominique.boucher@nuecho.com>
 

@@ -501,7 +501,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     Scope scope = new Scope ();
     if (locals == null)
       locals = new LocalVarsAttr(getMethod());
-    locals.enterScope(scope);
+    enterScope(scope);
     if (locals.parameter_scope == null) 
       locals.parameter_scope = scope;
     return scope;

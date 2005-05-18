@@ -353,7 +353,7 @@ public class Invoke extends ProcedureN implements CanInline
             if (methods.length == 0)
 	      {
 		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
-		  walker.error('w', "no accessible method `"+name+"' in "+type.getName());
+		  walker.error('w', "no accessible method '"+name+"' in "+type.getName());
 	      }
             else if (okCount + maybeCount == 0)
               {
@@ -402,7 +402,7 @@ public class Invoke extends ProcedureN implements CanInline
                       }
                   }
                 else
-                  walker.error('w', "no possibly applicable method `"
+                  walker.error('w', "no possibly applicable method '"
                              +name+"' in "+type.getName());
               }
             else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
@@ -436,28 +436,24 @@ public class Invoke extends ProcedureN implements CanInline
 		    && comp.getBooleanOption("warn-invoke-unknown-method",
 					     true))
 		  {
-		    walker.error('w',
-			       "more than one definitely applicable method `"
-			       +name+"' in "+type.getName());
-		    for (int i = 0;  i < okCount;  i++)
-		      walker.error('w', "candidate: " + methods[i]);
+                    StringBuffer sbuf = new StringBuffer();
+                    sbuf.append("more than one definitely applicable method `");
+                    sbuf.append(name);
+                    sbuf.append("' in ");
+                    sbuf.append(type.getName());
+                    append(methods, okCount, sbuf);
+		    walker.error('w', sbuf.toString());
 		  }
               }
-	    else if (okCount == 0)
-	      {
-		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
-		  walker.error('w',
-			       "no definitely applicable method `"
-			       +name+"' in "+type.getName());
-	      }
-            else
-	      {
-		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
-		  walker.error('w',
-			       "more than one possibly applicable method `"
-			       +name+"' in "+type.getName());
-		for (int i = 0;  i < okCount; )
-		  walker.error('w', "candidate: " + methods[i]);
+	    else if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+              {
+                StringBuffer sbuf = new StringBuffer();
+                sbuf.append("more than one possibly applicable method '");
+                sbuf.append(name);
+                sbuf.append("' in ");
+                sbuf.append(type.getName());
+                append(methods, maybeCount, sbuf);
+                walker.error('w', sbuf.toString());
 	      }
             if (index >= 0)
               {
@@ -475,6 +471,15 @@ public class Invoke extends ProcedureN implements CanInline
           }
       }
     return exp;
+  }
+
+  private void append (PrimProcedure[] methods, int mcount, StringBuffer sbuf)
+  {
+    for (int i = 0;  i < mcount;  i++)
+      {
+        sbuf.append("\n  candidate: ");
+        sbuf.append(methods[i]);
+      }
   }
 
   private ClassType getClassType(Expression[] args)

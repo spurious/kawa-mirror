@@ -15,7 +15,7 @@ public class BuiltinEnvironment extends Environment
   public Environment getLangEnvironment ()
   {
     Language lang = Language.getDefaultLanguage();
-    return lang == null ? null : lang.getEnvironment();
+    return lang == null ? null : lang.getLangEnvironment();
   }
 
   public NamedLocation lookup (Symbol name, Object property, int hash)

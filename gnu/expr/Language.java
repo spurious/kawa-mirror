@@ -189,7 +189,10 @@ public abstract class Language
 
   protected Environment environ;
 
-  public Environment getEnvironment() { return environ; }
+  /** Synonym for <code>Environment.getCurrent()</code>. */
+  public final Environment getEnvironment() { return Environment.getCurrent(); }
+
+  public Environment getLangEnvironment() { return environ; }
 
   public NamedLocation lookupBuiltin (Symbol name, Object property, int hash)
   {

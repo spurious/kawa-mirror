@@ -1,3 +1,8 @@
+2005-05-19  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (pushScope):  New helper method - needed for Lambda.
+	(push, letStart): Use it.
+
 2005-05-18  Per Bothner  <per@bothner.com>
 
 	* LitTable.java: Use use:java.util.IdentityHashMap, instead of

@@ -519,7 +519,14 @@ public class Lambda extends Syntax implements Printable
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
     int numRenamedAlias = 0;
+    tr.mustCompileHere();
+    tr.pushScope(lexp);
     Declaration prev = null;
+    int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
+    int opt_args = lexp.defaultArgs == null ? 0
+      : lexp.defaultArgs.length - key_args;
+    int arg_i = 0;
+    int opt_i = 0;
     for (Declaration cur = lexp.firstDecl(); cur != null; cur = cur.nextDecl())
       {
 	if (cur.isAlias())
@@ -532,12 +539,19 @@ public class Lambda extends Syntax implements Printable
 	    cur = param;
 	  }
 	prev = cur;
-      }
 
-    tr.push(lexp);
-    if (lexp.defaultArgs != null)
-      for (int i = 0, n = lexp.defaultArgs.length;  i < n;  i++)
-	lexp.defaultArgs[i] = tr.rewrite(lexp.defaultArgs[i]);
+        if (arg_i >= lexp.min_args
+            && (arg_i < lexp.min_args + opt_args
+                || lexp.max_args >= 0
+                || arg_i != lexp.min_args + opt_args))
+          {
+            lexp.defaultArgs[opt_i] = tr.rewrite(lexp.defaultArgs[opt_i]);
+            opt_i++;
+          }
+        arg_i++;
+
+        tr.lexical.push(cur);
+      }
 
     lexp.body = tr.rewrite_body (body);
     Type rtype;

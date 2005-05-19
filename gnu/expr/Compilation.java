@@ -2143,9 +2143,14 @@ public class Compilation
       }
     else
       mustCompileHere();
+    pushScope(scope);
+    lexical.push(scope);
+  }
+
+  public final void pushScope (ScopeExp scope)
+  {
     scope.outer = current_scope;
     current_scope = scope;
-    lexical.push(scope);
   }
 
   public void pop (ScopeExp scope)
@@ -2249,9 +2254,7 @@ public class Compilation
 
   public void letStart ()
   {
-    LetExp let = new LetExp(null);
-    let.outer = current_scope;
-    current_scope = let;
+    pushScope(new LetExp(null));
   }
 
   public Declaration letVariable (Object name, Type type, Expression init)

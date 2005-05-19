@@ -1,3 +1,10 @@
+2005-05-19  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody): Split up call to Compilation's
+	push method into pieces and interleave them with default argument
+	rewrite, so the latter are done using the correct scope.
+	Fixes Savannah bug #10613.
+
 2005-05-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (select-java1, select-java2, select-java4, select-java4x,

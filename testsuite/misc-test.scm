@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 136)
+(test-init "Miscellaneous" 137)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -7,6 +7,33 @@
       (lambda ( x y #!optional z #!rest r #!key i (j 1))
 	(list x y z i: i j: j))
       3 4 5 i: 6 i: 7)
+
+;; Test for optional argument handling.
+;; (Savannah bug #10613 was a bug in name scoping of default arguments.)
+(define (test-opt-args a b c d)
+  (define n 0)
+  ;; We add a side-effect to check that default arguments are evaluated
+  ;; at the correct time.
+  (define (next-n) (set! n (+ 1 n)) n)
+  (define (inner a
+		 #!optional (b (list a b c d (next-n)))
+		 (c (list a b c d (next-n)))
+		 #!key (d (list a b c d (next-n))))
+    (vector arg-a: a arg-b: b arg-c: c argd: d))
+  (list inner1: (inner 'a2) n: (next-n)
+	inner2: (inner 'a3 'b3 'c3 d: 'd3) n: (next-n)))
+(test
+ '(inner1:
+   #(
+     arg-a: a2
+     arg-b: (a2 b1 c1 d1 1)
+     arg-c: (a2 (a2 b1 c1 d1 1) c1 d1 2)
+     argd:  (a2 (a2 b1 c1 d1 1) (a2 (a2 b1 c1 d1 1) c1 d1 2) d1 3))
+   n: 4
+   inner2:
+   #(arg-a: a3 arg-b: b3 arg-c: c3 argd: d3)
+   n: 5) 
+ test-opt-args 'a1 'b1 'c1 'd1)
 
 (test '(200 . 100)
       (lambda (x #!optional (y (* 2 x)) (p (lambda () (cons y x))))

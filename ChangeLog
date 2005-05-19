@@ -1,5 +1,14 @@
 2005-05-18  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (select-java1, select-java2, select-java4, select-java4x,
+	select-java5): Define new PreProcess key use:java.lang.CharSequence.
+	* kawa/lang/Quote.java: Use use:java.util.IdentityHashMap, instead of
+	JAVA2 - which was wrong since IdentityHashMap is new in JDK 1.4.
+	* kawa/lang/SyntaxTemplate.java: Likewise.
+	* kawa/standard/syntax.java: Likewise.
+
+2005-05-18  Per Bothner  <per@bothner.com>
+
 	* kawa/TelnetRepl.java (serve): Get current Environment directly.
 	* kawa/lang/AutoloadProcedure.java (load): Use new getLangEnvironment.
 

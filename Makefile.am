@@ -243,31 +243,31 @@ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 
 # JDK 1.1
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA5 -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA5 -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 1 >$(srcdir)/selected-java-source
 
 # JDK 1.2+, GCJ-3.x
 select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 2 >$(srcdir)/selected-java-source
 
 # JDK 1.4, GCJ-4.x, without JAXP (default - matches CVS)
 select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 +use:java.lang.CharSequence +use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause -use:org.w3c.dom.Node -JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 4 >$(srcdir)/selected-java-source
 
 # JDK 1.4, GCJ-4.x with JAXP 1.3
 select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:org.w3c.dom.Node +JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:org.w3c.dom.Node +JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 4x >$(srcdir)/selected-java-source
 
-#JDK 1.5
+# JDK 1.5
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA5 +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:org.w3c.dom.Node +JAXP-1.3 \
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA5 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:org.w3c.dom.Node +JAXP-1.3 \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 5 >$(srcdir)/selected-java-source
 

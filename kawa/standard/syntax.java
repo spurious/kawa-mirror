@@ -13,7 +13,7 @@ public class syntax extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap table = new IdentityHashMap();
     /* #endif */
 
@@ -43,11 +43,11 @@ public class syntax extends Syntax
 
   Object convert (Object form, Object m, Translator tr)
   {
-    /* #ifndef JAVA2 */
+    /* #ifndef use:java.util.IdentityHashMap */ 
     // Object map = m;
     /* #endif */
     Object x;
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap map = (IdentityHashMap) m;
     x = map.get(form);
     if (x != null)
@@ -96,7 +96,7 @@ public class syntax extends Syntax
 	if (d != null)
 	  x = new ReferenceExp(d);
       }
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     map.put(form, x);
     /* #endif */
     return x;

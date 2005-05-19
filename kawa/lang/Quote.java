@@ -38,11 +38,10 @@ public class Quote extends Syntax implements Printable
 
   static Object expand (Object template, int depth, Translator tr)
   {
-    /* #ifndef JAVA2 */
-    // Object seen = null;
-    /* #endif */
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap seen = new IdentityHashMap();
+    /* #else */
+    // Object seen = null;
     /* #endif */
     return expand(template, depth, null, seen, tr);
   }
@@ -207,7 +206,7 @@ public class Quote extends Syntax implements Printable
 			SyntaxForm syntax, Object seen, Translator tr)
   {
     boolean resolveNamespaces = depth > DATUM_DEPTH;
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap map = (IdentityHashMap) seen;
     Object old = map.get(template);
     if (old == WORKING)
@@ -309,7 +308,7 @@ public class Quote extends Syntax implements Printable
       result = tr.namespaceResolve((String) template);
     else
       result = template;
-    /* #ifdef JAVA2 */
+    /* #ifdef use:java.util.IdentityHashMap */ 
     if (template != result && map.get(template) == CYCLE)
       tr.error('e', "cycle in non-literal data");
     map.put(template, result);

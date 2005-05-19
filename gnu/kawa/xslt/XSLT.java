@@ -24,7 +24,6 @@ public class XSLT extends XQuery
   {
     instance = this;
     ModuleBody.setMainPrintValues(true);
-    Environment.setCurrent(getEnvironment());
   }
 
   public static XSLT getXsltInstance()

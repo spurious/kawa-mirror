@@ -76,7 +76,6 @@ public class KawaPageServlet extends KawaServlet
 	    Language language
 	      = Language.getInstanceFromFilenameExtension(path);
 	    Language.setDefaultLanguage(language);
-	    Environment.setCurrent(language.getEnvironment());
 	    SourceMessages messages = new SourceMessages();
 	    Compilation comp;
 	    try

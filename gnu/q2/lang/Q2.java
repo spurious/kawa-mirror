@@ -20,7 +20,6 @@ public class Q2 extends Scheme
   {
     instance = this;
     ModuleBody.setMainPrintValues(true);
-    Environment.setCurrent(getEnvironment());
   }
 
   public static Q2 getQ2Instance()

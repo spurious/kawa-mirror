@@ -1,3 +1,7 @@
+2005-05-18  Per Bothner  <per@bothner.com>
+
+	* Q2.java (<init>): Don't set current Environment from this.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* package.html: New file, for javadoc.

@@ -1,3 +1,8 @@
+2005-05-18  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Don't set current Environment
+	using current Language.
+
 2005-03-14  Christian Surlykke <christian@surlykke.dk>
 
 	* KawaPageServlet.java:  Missed Interpreter -> Language fix.

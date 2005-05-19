@@ -1,3 +1,9 @@
+2005-05-18  Christian Surlykke <christian@surlykke.dk>
+
+	* EKeymap.java: (CTRL_MASK, SHIFT_MASK, META_MASK, ALT_MASK) now 
+	public. (show) New method for debugging. Prints integer as binary 
+	string leftpadded with zeros.
+	
 2005-04-18  Per Bothner  <per@bothner.com>
 
 	* Buffer.java: Use use:java.lang.CharSequence PreProcess name.

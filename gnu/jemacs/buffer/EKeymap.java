@@ -36,11 +36,11 @@ implements gnu.mapping.Named
     globalKeymap.setAction(metaKey, metaKeymap);
   }
 
-  static final int CTRL_MASK = java.awt.event.InputEvent.CTRL_MASK;
-  static final int SHIFT_MASK = java.awt.event.InputEvent.SHIFT_MASK;
+  public static final int CTRL_MASK = java.awt.event.InputEvent.CTRL_MASK;
+  public static final int SHIFT_MASK = java.awt.event.InputEvent.SHIFT_MASK;
   // Note ALT_MASK and META_MASK are shifted!
-  static final int META_MASK = java.awt.event.InputEvent.ALT_MASK;
-  static final int ALT_MASK = java.awt.event.InputEvent.META_MASK;
+  public static final int META_MASK = java.awt.event.InputEvent.ALT_MASK;
+  public static final int ALT_MASK = java.awt.event.InputEvent.META_MASK;
 
   public EKeymap (String name)
   {
@@ -555,6 +555,17 @@ implements gnu.mapping.Named
 	else
 	  return null;
       }
+  }
+
+  /*
+   * For debugging 
+   */
+  public static String show(int binary) 
+  {
+    StringBuffer sb = new StringBuffer(Integer.toBinaryString(binary));
+    for (int i = 32 - sb.length() - 1; i >= 0; i--)
+      sb.insert(0, '0');
+    return sb.toString();
   }
 }
 

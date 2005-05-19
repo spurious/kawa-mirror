@@ -434,9 +434,9 @@ public class SwtHelper
                 SwtHelper.display.sleep ();
               }
             }
-            catch (Exception e) 
+            catch (Throwable t) 
             {
-              e.printStackTrace();
+              t.printStackTrace();
             }
           }
           SwtHelper.display.dispose ();

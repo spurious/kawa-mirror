@@ -1,3 +1,12 @@
+2005-05-18  Christian Surlykke <christian@surlykke.dk>
+
+	* SwtHelper.java: Gui-loop in getDisplay now catches Throwable
+	rather than Exception so that java.lang.Error won't terminate it.
+	* SwtKeyMapper.java: New utility class for converting swt key events
+	to awt key events.
+	* SwtWindow: (verifyKey): Doesn't do anything more. (keyPressed): 
+	Sends keyEvent to handleKey. (show): Now uses EKeymap.show.
+	
 2005-04-18  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java: Use use:java.lang.CharSequence PreProcess name.

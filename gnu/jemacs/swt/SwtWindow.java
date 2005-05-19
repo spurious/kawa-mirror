@@ -213,12 +213,6 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   // --- VerifyKeyListener
   public void verifyKey(VerifyEvent event)
   {
-    handleKey(transFormKeyKode(event.keyCode, event.stateMask, EKeymap.PRESSED));
-    if (event.character != 0)
-    {
-      handleKey(event.character);
-    }
-    SwtHelper.setCaretOffset(styledText, buffer.getDot());
     event.doit = false;
   }
 
@@ -236,11 +230,12 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   // --- KeyListener ---
   public void keyPressed(KeyEvent e)
   {
+    handleKey(SwtKeyMapper.swtKey2EKey(e));
+    SwtHelper.setCaretOffset(styledText, buffer.getDot());
   }
   
   public void keyReleased(KeyEvent e)
   {
-    handleKey(transFormKeyKode(e.keyCode, e.stateMask, EKeymap.RELEASED));
   }
   
   // --- MouseListener ---
@@ -260,18 +255,15 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   public void mouseUp(MouseEvent e)
   {
   }
-
-
-  
   
   /**
    * @param e
    */
-  private void show(KeyEvent e)
+  public static void show(KeyEvent e)
   {
-    System.out.println("keyCode:   " + Integer.toBinaryString(e.keyCode));
-    System.out.println("character: " + Integer.toBinaryString(e.character));
-    System.out.println("stateMask: " + Integer.toBinaryString(e.stateMask));
+    System.out.println("keyCode:   " + EKeymap.show(e.keyCode));
+    System.out.println("character: " + EKeymap.show(e.character));
+    System.out.println("stateMask: " + EKeymap.show(e.stateMask));
   }
 
 }

@@ -1,3 +1,7 @@
+2005-05-18  Christian Surlykke <christian@surlykke.dk> 
+
+	* EKeymap.java: (getKeyForName): Map "return" to '\r' rather than '\n'.
+
 2005-05-18  Christian Surlykke <christian@surlykke.dk>
 
 	* EKeymap.java: (CTRL_MASK, SHIFT_MASK, META_MASK, ALT_MASK) now 

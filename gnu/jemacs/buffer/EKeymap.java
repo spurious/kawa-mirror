@@ -318,7 +318,7 @@ implements gnu.mapping.Named
 	break;
       case 'r':
 	if (name == "enter")           return KeyEvent.VK_ENTER;
-	if (name == "return")          return KeyEvent.VK_ENTER;
+	if (name == "return")          return '\r';
 	if (name == "right")           return KeyEvent.VK_RIGHT;
 	break;
       case 't':

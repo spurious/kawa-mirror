@@ -1,3 +1,8 @@
+2005-05-18 Christian Surlykke <christian@surlykke.dk>
+
+	* SwtKeymapper.java: (swtKey2EKey): No PRESSED flag on characters in
+	range 0x1A..0x20
+	
 2005-05-18  Christian Surlykke <christian@surlykke.dk>
 
 	* SwtHelper.java: Gui-loop in getDisplay now catches Throwable

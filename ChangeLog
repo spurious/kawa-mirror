@@ -1,6 +1,11 @@
+2005-05-18  Per Bothner  <per@bothner.com>
+
+	* kawa/TelnetRepl.java (serve): Get current Environment directly.
+	* kawa/lang/AutoloadProcedure.java (load): Use new getLangEnvironment.
+
 2005-05-17  Per Bothner  <per@bothner.com>
 
-	* kawa/standard/fluid_let.java (rewrite): Look for liexlca binding.
+	* kawa/standard/fluid_let.java (rewrite): Look for lexical binding.
 
 2005-05-13  Per Bothner  <per@bothner.com>
 

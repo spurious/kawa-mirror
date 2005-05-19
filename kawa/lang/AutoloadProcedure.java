@@ -88,7 +88,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 				   ? EnvironmentKey.FUNCTION
 				   : null);
 		// Should use something like isFunctionBound FIXME
-		Environment env = language.getEnvironment();
+		Environment env = language.getLangEnvironment();
 		Symbol sym = (name instanceof Symbol ? (Symbol) name
 			      : env.getSymbol(name.toString()));
 		env.put(sym, property, loaded);

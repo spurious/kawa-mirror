@@ -172,7 +172,7 @@ public class XQResolveNames extends ResolveNames
 	String name = (String) symbol;
 	if (function && name.indexOf(':') < 0)
 	  {
-	    Environment builtins = XQuery.getInstance().getEnvironment();
+	    Environment builtins = XQuery.getInstance().getLangEnvironment();
 	    for (int i = 0;  i < functionNamespacePath.length;  i++)
 	      {
 		Symbol sym = functionNamespacePath[i].lookup(name);
@@ -205,7 +205,7 @@ public class XQResolveNames extends ResolveNames
 		    return procToDecl(sym,
 				      ClassMethodProc.make(ctype, sym.getName()));
 		  }
-		Environment builtins = XQuery.getInstance().getEnvironment();
+		Environment builtins = XQuery.getInstance().getLangEnvironment();
 		decl = flookup(sym, builtins);
 		if (decl != null)
 		  return decl;

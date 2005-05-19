@@ -219,6 +219,10 @@ public class ClassMethods extends Procedure2
     return pproc;
   }
 
+  /** Convert an expression to a name.
+   * @return a String if the expression has the form of a symbol or
+   *   string literal, mangled as needed; otherwise null
+   */
   static String checkName(Expression exp, boolean reversible)
   {
     if (exp instanceof QuoteExp)
@@ -234,6 +238,25 @@ public class ClassMethods extends Procedure2
 	if (Compilation.isValidJavaName(nam))
 	  return nam;
 	return Compilation.mangleName(nam, reversible);
+      }
+    return null;
+  }
+
+  /** Convert an expression to a name.
+   * @return a String if the expression has the form of a symbol or
+   *   string literal, with no mangling; otherwise null
+   */
+  static String checkName(Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        Object name = ((QuoteExp) exp).getValue();
+        if (name instanceof FString || name instanceof String)
+	  return name.toString();
+	else if (name instanceof Symbol)
+	  return ((Symbol) name).getName();
+	else
+	  return null;
       }
     return null;
   }

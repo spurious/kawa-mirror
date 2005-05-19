@@ -1,5 +1,10 @@
 2005-05-19  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (slotToMethodName): If we need to mangle, use the
+	non-reversible mangling used for method names.
+
+2005-05-19  Per Bothner  <per@bothner.com>
+
 	* Compilation.java (pushScope):  New helper method - needed for Lambda.
 	(push, letStart): Use it.
 

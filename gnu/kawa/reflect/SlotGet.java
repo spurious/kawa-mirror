@@ -150,12 +150,17 @@ public class SlotGet extends Procedure2
     SlotSet.apply(isStatic, obj, (String) name, value);
   }
 
+  /** Get a named property - field or 'get' accessor method.
+   * @param type the class type declaring the property.
+   * @param name the source (unmangled) name of the property.
+   */
   static Object getField(Type type, String name)
   {
     if (type instanceof ClassType && name != null)
       {
         ClassType clas = (ClassType) type;
-        gnu.bytecode.Field field = clas.getField(name);
+        gnu.bytecode.Field field
+          = clas.getField(Compilation.mangleNameIfNeeded(name));
         if (field != null)
           return field;
 
@@ -190,7 +195,7 @@ public class SlotGet extends Procedure2
     Expression arg1 = args[1];
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
-    String name = ClassMethods.checkName(arg1, true);
+    String name = ClassMethods.checkName(arg1);
     CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {

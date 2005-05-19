@@ -13,10 +13,9 @@ public class LitTable implements ObjectOutput
   Compilation comp;
   ClassType mainClass;
 
-  /* #ifdef JAVA2 */ 
+  /* #ifdef use:java.util.IdentityHashMap */ 
   IdentityHashMap literalTable = new IdentityHashMap(100);
-  /* #endif */
-  /* #ifndef JAVA2 */ 
+  /* #else */
   // Hashtable literalTable = new Hashtable(100);
   /* #endif */
 
@@ -175,7 +174,7 @@ public class LitTable implements ObjectOutput
     // than an IdentityHashMap) then we might find a literal whose
     // value is equals to obj, but not identical.  This can lead to trouble,
     // e.g. if one is a Pair and the other is a PairWithPosition.
-    /* #ifndef JAVA2 */
+    /* #ifndef use:java.util.IdentityHashMap */
     // obj = lit.value;
     /* #endif */
 

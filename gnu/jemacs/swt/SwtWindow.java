@@ -8,7 +8,6 @@ import gnu.jemacs.buffer.EWindow;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -25,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListener, KeyListener, MouseListener
 {
-  private StyledText styledText;
+  private SwtWindowWidget swtWindowWidget;
   private SwtBuffer swtBuffer; 
   
   public SwtWindow(Buffer buffer) {
@@ -35,18 +34,27 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   public SwtWindow(Buffer buffer, boolean wantModeLine) {
     super(buffer);
     this.swtBuffer = (SwtBuffer) buffer;
+    updateModeline();
   }
   
   /**
    * 
    */
-  public void getReadyToShow(Composite parent, int firstVisibleLine)
+  public void getReadyToShow(final Composite parent, final int firstVisibleLine)
   {
-    styledText = SwtHelper.newStyledText(parent, 
-                                         SWT.V_SCROLL | SWT.H_SCROLL,
-                                         swtBuffer.getBufferContent(), 
-                                         this, 
-                                         firstVisibleLine);
+    SwtHelper.getDisplay().syncExec(
+      new Runnable() { 
+        public void run() {
+          swtWindowWidget = new SwtWindowWidget(parent, swtBuffer.getBufferContent(), firstVisibleLine);
+          swtWindowWidget.getStyledText().addVerifyKeyListener(SwtWindow.this);
+          swtWindowWidget.getStyledText().addKeyListener(SwtWindow.this);
+          swtWindowWidget.getStyledText().addFocusListener(SwtWindow.this);
+          swtWindowWidget.getStyledText().addMouseListener(SwtWindow.this);
+          swtWindowWidget.getStyledText().forceFocus();
+        }
+      }
+    );
+    updateModeline();
   }
 
   
@@ -56,7 +64,11 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   public void setBuffer(Buffer buffer)
   {
     super.setBuffer(buffer);
-    SwtHelper.setContent(styledText, ((SwtBuffer) buffer).getBufferContent());
+    this.swtBuffer = (SwtBuffer) buffer;
+    if (swtWindowWidget != null) {
+      SwtHelper.setContent(swtWindowWidget.getStyledText(), swtBuffer.getBufferContent());
+      updateModeline();
+    }
   }
 
   
@@ -105,10 +117,11 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   {
     int oldDot = getBuffer().getDot();
     super.handleCommand(command);
-    SwtHelper.redraw(styledText);
+    SwtHelper.redraw(swtWindowWidget.getStyledText());
+    updateModeline();
     if (oldDot != getBuffer().getDot())
     {
-      styledText.showSelection();
+      swtWindowWidget.getStyledText().showSelection();
     }
   }
   
@@ -133,7 +146,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    */
   public int getPoint()
   {
-    return SwtHelper.getCaretOffset(styledText);
+    return SwtHelper.getCaretOffset(swtWindowWidget.getStyledText());
   }
 
   /**
@@ -141,7 +154,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    */
   public void setDot(int offset)
   {
-    SwtHelper.setCaretOffset(styledText, offset);
+    SwtHelper.setCaretOffset(swtWindowWidget.getStyledText(), offset);
   }
   
   public EWindow split(Buffer buffer, int lines, boolean horizontal)
@@ -150,8 +163,10 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
     newWindow.frame = this.frame;
     linkSibling(newWindow, horizontal);
     
-    int firstVisibleLine = buffer == this.buffer ? SwtHelper.getTopIndex(styledText) : 0;
-    int visibleLines = SwtHelper.getArea(styledText).height / SwtHelper.getLineHeight(styledText);
+    int firstVisibleLine = buffer == this.buffer ? 
+        SwtHelper.getTopIndex(swtWindowWidget.getStyledText()) : 0;
+    int visibleLines = SwtHelper.getArea(swtWindowWidget.getStyledText()).height / 
+                       SwtHelper.getLineHeight(swtWindowWidget.getStyledText());
     
     int[] weights = null;
     if (!horizontal && lines > 0 && visibleLines > 1)
@@ -160,16 +175,13 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
       lines = Math.min(lines, visibleLines - 1);
       weights[0] = lines;
       weights[1] = visibleLines - lines;
-      System.out.println("lines = " + lines);
-      System.out.println("visible lines = " + visibleLines);
-      System.out.println("weights = {" + weights[0] + ", " + weights[1] + "}");
     }
     
-    SwtHelper.injectSashFormAsParent(styledText, horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
-    newWindow.getReadyToShow(SwtHelper.getParent(styledText), firstVisibleLine);
+    SwtHelper.injectSashFormAsParent(swtWindowWidget, horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
+    newWindow.getReadyToShow(SwtHelper.getParent(swtWindowWidget), firstVisibleLine);
     if (weights != null)
-      SwtHelper.setWeights(((SashForm) SwtHelper.getParent(styledText)), weights);
-    SwtHelper.layout(SwtHelper.getParent(SwtHelper.getParent(styledText)));
+      SwtHelper.setWeights(((SashForm) SwtHelper.getParent(swtWindowWidget)), weights);
+    SwtHelper.layout(SwtHelper.getParent(SwtHelper.getParent(swtWindowWidget)));
     
     
     return newWindow;
@@ -188,7 +200,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    */
   public int getWidth()
   {
-    return SwtHelper.getArea(styledText).width;
+    return SwtHelper.getArea(swtWindowWidget.getStyledText()).width;
   }
 
   /**
@@ -196,7 +208,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    */
   public int getHeight()
   {
-    return SwtHelper.getArea(styledText).height;
+    return SwtHelper.getArea(swtWindowWidget.getStyledText()).height;
   }
 
   /**
@@ -231,7 +243,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   public void keyPressed(KeyEvent e)
   {
     handleKey(SwtKeyMapper.swtKey2EKey(e));
-    SwtHelper.setCaretOffset(styledText, buffer.getDot());
+    SwtHelper.setCaretOffset(swtWindowWidget.getStyledText(), buffer.getDot());
   }
   
   public void keyReleased(KeyEvent e)
@@ -247,8 +259,8 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   {
     if (EWindow.getSelected() == this)  // Is this nessecary - aren't we always selected when this event arrives?
     {
-      buffer.setDot(SwtHelper.getCaretOffset(styledText));
-      SwtHelper.showSelection(styledText);
+      buffer.setDot(SwtHelper.getCaretOffset(swtWindowWidget.getStyledText()));
+      SwtHelper.showSelection(swtWindowWidget.getStyledText());
     }
   }
 
@@ -264,6 +276,20 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
     System.out.println("keyCode:   " + EKeymap.show(e.keyCode));
     System.out.println("character: " + EKeymap.show(e.character));
     System.out.println("stateMask: " + EKeymap.show(e.stateMask));
+  }
+
+  public void updateModeline()
+  {
+    if (swtWindowWidget != null) 
+    {
+      SwtHelper.getDisplay().asyncExec(
+        new Runnable() {
+          public void run() {
+            swtWindowWidget.getModeline().setText(swtBuffer.getModelineFormat().toString());
+          }
+        }
+      );
+    }
   }
 
 }

@@ -1,3 +1,21 @@
+2005-05-21 Christian Surlykke <christian@surlykke.dk>
+
+	* SwtWindowWidget.java: New class, a composite widget combining two
+	styledtext widgets, one for editing and one for the modeline.
+	* SwtBuffer.java: (modeline): New field. (getModeline): new method.
+	(redrawModeline): Sets the value of modeline. 
+	(SwtBuffer(String, BufferContent)): Calls redrawModeline.
+	* SwtWindow.java: (swtWindowWidget): New field replacing styledText. 
+	References to styledText replaced with swtWindowWidget.getStyledText()
+	throughout. (updateModeline): New method sets buffers modeline as text
+	in modeline field of swtWindowWidget. (SwtWindow(Buffer, boolean)): 
+	Call updateModeline. (setBuffer): Call updateModeline. 
+	(getReadyToShow): Set this SwtWindow as listener for various events on 
+	styledText field of swtWindowWidget. Call updateModeline. Call 
+	forceFocus on swtWindowWidgets styledText. Some old debug statements 
+	removed.  
+	(handleCommand): Call updateModeline.
+	 
 2005-05-18 Christian Surlykke <christian@surlykke.dk>
 
 	* SwtKeymapper.java: (swtKey2EKey): No PRESSED flag on characters in

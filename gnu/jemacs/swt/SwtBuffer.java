@@ -2,16 +2,19 @@
 
 package gnu.jemacs.swt;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import org.eclipse.swt.custom.StyledTextContent;
-
 import gnu.jemacs.buffer.Buffer;
 import gnu.jemacs.buffer.Marker;
-import gnu.lists.Consumer;
 import gnu.lists.CharSeq;
+import gnu.lists.FString;
 import gnu.mapping.InPort;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.eclipse.swt.custom.StyledTextContent;
 
 /**
  * @author Christian Surlykke
@@ -33,6 +36,7 @@ public class SwtBuffer extends Buffer
 
     pointMarker = new Marker(this, 0, true);
     markMarker = new Marker();
+    redrawModeline();
   }
   
   /** 
@@ -40,10 +44,16 @@ public class SwtBuffer extends Buffer
    */
   public void redrawModeline()
   {
-    // TODO Auto-generated method stub
+    modeline = new FString("-----JEmacs: " + getName() + " ---");
   }
-
-  /**
+  
+  private FString modeline = new FString("");
+  
+  public FString getModelineFormat() {
+    return modeline;
+  }
+  
+   /**
    * @see gnu.jemacs.buffer.Buffer#getLength()
    */
   public int getLength()

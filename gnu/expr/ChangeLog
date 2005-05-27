@@ -1,3 +1,9 @@
+2005-05-27  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass): Don't call run method from <clinit>
+	if immediate, even if --module-static-run was specified, since it
+	needs to be done after declarations are made public in evalModule.
+
 2005-05-19  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (slotToMethodName): If we need to mangle, use the

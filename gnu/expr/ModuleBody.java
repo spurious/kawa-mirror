@@ -17,40 +17,23 @@ public abstract class ModuleBody extends Procedure0
 
   protected boolean runDone;
 
-  public void run (CallContext ctx, boolean force)  throws Throwable
-  {
-    if (! force)
-      {
-        synchronized (this)
-          {
-            if (runDone)
-              return;
-            runDone = true;
-          }
-      }
-    run(ctx);
-  }
-
   public void run (CallContext ctx)  throws Throwable
   {
   }
 
   public void run ()
   {
-    run (VoidConsumer.instance, false);
+    synchronized (this)
+      {
+        if (runDone)
+          return;
+        runDone = true;
+      }
+    run (VoidConsumer.instance);
   }
 
-  public void run (Consumer out, boolean force)
+  public void run (Consumer out)
   {
-    if (! force)
-      {
-        synchronized (this)
-          {
-            if (runDone)
-              return;
-            runDone = true;
-          }
-      }
     // This should match the "run" method generated in Compilation.
     CallContext ctx = CallContext.getInstance();
     Consumer save = ctx.consumer;

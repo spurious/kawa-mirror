@@ -226,7 +226,7 @@ public class ModuleExp extends LambdaExp
 		      }
 		  }
                 if (inst instanceof ModuleBody)
-                  ((ModuleBody) inst).run(ctx, false);
+                  ((ModuleBody) inst).run(ctx);
 	      }
 	    catch (IllegalAccessException ex)
 	      {

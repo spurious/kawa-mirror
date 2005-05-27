@@ -1906,7 +1906,7 @@ public class Compilation
 	  }
 	dumpInitializers(clinitChain);
 
-	if (module.staticInitRun())
+	if (! immediate && module.staticInitRun())
 	  {
 	    code.emitGetStatic(moduleInstanceMainField);
 	    code.emitInvokeInterface(typeRunnable.getDeclaredMethod("run", 0));

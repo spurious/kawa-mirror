@@ -187,7 +187,11 @@ public class FieldLocation extends ClassMemberLocation
     setup();
     Object v;
     if ((flags & VALUE_SET) != 0)
-      v = value;
+      {
+        v = value;
+        if ((flags & CONSTANT) != 0)
+          return v;
+      }
     else
       {
 	v = getFieldValue();
@@ -195,13 +199,11 @@ public class FieldLocation extends ClassMemberLocation
 	  {
 	    flags |= VALUE_SET;
 	    if ((flags & INDIRECT_LOCATION) == 0)
-	      {
-		flags |= CONSTANT;
-	      }
+              flags |= CONSTANT;
 	    value = v;
 	  }
       }
-    if ((flags & (INDIRECT_LOCATION|CONSTANT)) == INDIRECT_LOCATION)
+    if ((flags & INDIRECT_LOCATION) != 0)
       {
 	Object unb = Location.UNBOUND;
 	Location loc = (Location) v;

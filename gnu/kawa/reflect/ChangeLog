@@ -1,3 +1,7 @@
+2005-05-27  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (get): Fix handling of INDIRECT_LOCATION.
+
 2005-05-19  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (checkMethod): New method overloading.

@@ -577,15 +577,18 @@ public class ClassExp extends LambdaExp
     sbuf.append(sname.substring(1));
     return sbuf.toString();
   }
-}
 
-class AbstractMethodFilter implements gnu.bytecode.Filter
-{
-  public static AbstractMethodFilter instance = new AbstractMethodFilter();
-
-  public boolean select(Object value)
+  /** Helper class uses by ClassExp.compile.
+   */
+  private static class AbstractMethodFilter implements gnu.bytecode.Filter
   {
-    gnu.bytecode.Method method = (gnu.bytecode.Method) value;
-    return method.isAbstract();
+    public static final AbstractMethodFilter instance
+      = new AbstractMethodFilter();
+
+    public boolean select(Object value)
+    {
+      gnu.bytecode.Method method = (gnu.bytecode.Method) value;
+      return method.isAbstract();
+    }
   }
 }

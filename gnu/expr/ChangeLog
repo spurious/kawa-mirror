@@ -1,5 +1,7 @@
 2005-05-27  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (AbstractMethodFilter): Change to inner class.
+
 	* Compilation.java (addClass): Don't call run method from <clinit>
 	if immediate, even if --module-static-run was specified, since it
 	needs to be done after declarations are made public in evalModule.

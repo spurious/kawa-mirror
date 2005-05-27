@@ -1,3 +1,7 @@
+2005-05-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Features): Add listing of srf-37, args-fold.
+
 2005-05-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: We don't need both @top and @unnumbered at the start.

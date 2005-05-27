@@ -188,7 +188,7 @@ SRFI 28: Basic Format Strings - @pxref{Format}.
 @item
 SRFI 30: Nested Multi-line Comments.
 @item
-SRFI 37: args-fold
+SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
 @end itemize
 
 @node Getting Kawa, Installation, Features, Top

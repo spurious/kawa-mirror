@@ -58,7 +58,10 @@ public class ThisExp extends ReferenceExp
     if (target instanceof IgnoreTarget)
       return;
     CodeAttr code = comp.getCode();
-    code.emitPushThis();
+    if (comp.method.getStaticFlag())
+      code.emitGetStatic(comp.moduleInstanceMainField);
+    else
+      code.emitPushThis();
     target.compileFromStack(comp, getType());
   }
 

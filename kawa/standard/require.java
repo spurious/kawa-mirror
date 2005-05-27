@@ -273,36 +273,15 @@ public class require extends Syntax
                     adecl.setAlias(true);
                     adecl.setIndirectBinding(true);
                   }
-		Expression fexp;
-                ReferenceExp fref;
-		if (immediate)
-		  {
-                    if (isFinal
-                        && (isStatic || isImportedInstance))
-                      {
-                        // An optimization.
-                        adecl.setType(fdecl.getType());
-                        adecl.setAlias(false);
-                        adecl.setIndirectBinding(isAlias);
-                      }
-                    else
-                      fvalue = new FieldLocation(instance, t, fname);
-                    fexp = new QuoteExp(fvalue);
-                    adecl.setCanRead(true);
-                    fref = null;
-		  }
-		else
-		  {
-		    fref = new ReferenceExp(fdecl);
-		    fref.setContextDecl(decl);
-                    if (! isImportedInstance)
-                      {
-                        fref.setDontDereference(true);
-                        fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
-                        adecl.setPrivate(true);
-                      }
-		    fexp = fref;
-		  }
+                ReferenceExp fref = new ReferenceExp(fdecl);
+                fref.setContextDecl(decl);
+                if (! isImportedInstance)
+                  {
+                    fref.setDontDereference(true);
+                    fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
+                    if (! immediate)
+                      adecl.setPrivate(true);
+                  }
 		if ((rfield.getModifiers() & Access.FINAL) != 0 && ! isAlias)
 		  {
 		    adecl.setFlag(Declaration.IS_CONSTANT);
@@ -311,39 +290,9 @@ public class require extends Syntax
 		  adecl.setProcedureDecl(true);
 		if (isStatic)
 		  adecl.setFlag(Declaration.STATIC_SPECIFIED);
-		/*
-		if (fvalue instanceof gnu.mapping.Location)
-		  {
-		    Declaration fdecl = new Declaration(aname, ftype);
-		    fdecl.base = decl;
-		    fdecl.field = fld;
-		    ReferenceExp ref = new ReferenceExp(fdecl);
-		    ref.setDontDereference(true);
-		    fexp = ref;
-		  }
-		else
-		  {
-		    int j = 0;
-		    Method m;
-		    if (isStatic)
-		      {
-			m = makeClassMemberLocation2;
-			args = new Expression[2];
-		      }
-		    else
-		      {
-			m = makeClassMemberLocation3;
-			args = new Expression[3];
-			args[j++] = new ReferenceExp(decl);
-		      }
-		    args[j++] = new QuoteExp(t.getName());
-		    args[j++] = new QuoteExp(fname);
-		    fexp = new ApplyExp(m, args);
-		  }
-		*/
 		if (! immediate)
 		  {
-		    SetExp sexp = new SetExp(adecl, fexp);
+		    SetExp sexp = new SetExp(adecl, fref);
                     adecl.setFlag(Declaration.EARLY_INIT);
 		    sexp.setDefining(true);
                     if (isImportedInstance)
@@ -358,7 +307,7 @@ public class require extends Syntax
                     else
                       forms.addElement(sexp);
 		  }
-		adecl.noteValue(fexp);
+		adecl.noteValue(fref);
 		adecl.setFlag(Declaration.IS_IMPORTED);
 		adecl.setSimple(false);
 		tr.push(adecl);  // Add to translation env.
@@ -541,15 +490,7 @@ public class require extends Syntax
         if (vdecl.isProcedureDecl())
           fdecl.setProcedureDecl(true);
         if (vdecl.getFlag(Declaration.IS_SYNTAX))
-          {
-            fdecl.setSyntax();
-            fvalue = floc.get(null);
-            if (fvalue instanceof Macro)
-              {
-                Macro mac = (Macro) fvalue;
-                mac.setCapturedScope(mod);
-              }
-          }
+          fdecl.setSyntax();
         if (! fdecl.getFlag(Declaration.STATIC_SPECIFIED))
           {
             ClassType vtype = floc.getDeclaringClass();

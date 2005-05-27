@@ -78,6 +78,7 @@ public class Eval extends Procedure1or2
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
 	Translator tr = new Translator(language, messages);
+        tr.immediate = true;
 	ModuleExp mod = new ModuleExp();
 	Values forms = new Values();
 	tr.push(mod);

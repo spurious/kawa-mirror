@@ -88,12 +88,4 @@ public class ModuleInfo
       }
     return inst;
   }
-
-  public Object getRunInstance ()
-  {
-    Object inst = getInstance();
-    if (inst instanceof Runnable)
-      ((Runnable) inst).run();
-    return inst;
-  }
 }

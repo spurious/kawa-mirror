@@ -72,7 +72,6 @@ public class ModuleExp extends LambdaExp
     try
       {
 	String class_name = mexp.getJavaName ();
-	comp.immediate = true;
 	ArrayClassLoader loader = new ArrayClassLoader ();
 	comp.loader = loader;
 
@@ -173,6 +172,7 @@ public class ModuleExp extends LambdaExp
 	  {
 	    try
 	      {
+                comp.immediate = true;
 		Class clas = evalToClass(comp);
 		if (clas == null)
 		  return;
@@ -226,7 +226,7 @@ public class ModuleExp extends LambdaExp
 		      }
 		  }
                 if (inst instanceof ModuleBody)
-                  ((ModuleBody) inst).run(ctx);
+                  ((ModuleBody) inst).run(ctx, false);
 	      }
 	    catch (IllegalAccessException ex)
 	      {

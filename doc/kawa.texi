@@ -187,6 +187,8 @@ SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedur
 SRFI 28: Basic Format Strings - @pxref{Format}.
 @item
 SRFI 30: Nested Multi-line Comments.
+@item
+SRFI 37: args-fold
 @end itemize
 
 @node Getting Kawa, Installation, Features, Top

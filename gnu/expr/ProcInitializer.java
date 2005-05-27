@@ -42,18 +42,20 @@ public class ProcInitializer extends Initializer
 	      = code.locals.current_scope.addVariable(code,
 						      comp.moduleClass,
 						      "$instance");
-	    code.emitNew(comp.moduleClass);
-	    code.emitDup(comp.moduleClass);
-	    code.emitInvokeSpecial(comp.moduleClass.constructor);
 	    if (comp.moduleClass != comp.mainClass
 		&& ! comp.isStatic())
 	      {
+                code.emitNew(comp.moduleClass);
+                code.emitDup(comp.moduleClass);
+                code.emitInvokeSpecial(comp.moduleClass.constructor);
 		comp.moduleInstanceMainField = 
 		  comp.moduleClass.addField("$main", comp.mainClass, 0);
 		code.emitDup(comp.moduleClass);
 		code.emitPushThis();
 		code.emitPutField(comp.moduleInstanceMainField);
 	      }
+            else
+              code.emitGetStatic(comp.moduleInstanceMainField);
 	    code.emitStore(comp.moduleInstanceVar);
 	  }
 	code.emitLoad(comp.moduleInstanceVar);

@@ -91,10 +91,7 @@ public class define_syntax extends Syntax
     Expression args[] = new Expression[3];
     args[0] = new QuoteExp(name);
     args[1] = rule;
-    if (tr.immediate || tr.isStatic())
-      args[2] = new QuoteExp(defs);
-    else
-      args[2] = ThisExp.makeGivingContext(defs);
+    args[2] = ThisExp.makeGivingContext(defs);
     rule = new ApplyExp(hygienic ? makeHygienic : makeNonHygienic,
 			args);
     decl.noteValue(rule);

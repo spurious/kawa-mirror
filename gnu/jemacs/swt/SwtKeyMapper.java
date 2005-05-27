@@ -22,9 +22,9 @@ public class SwtKeyMapper
     else if ((swtEvent.keyCode & SWT.KEYCODE_BIT) == 0) // It's a unicode
     {
       char ch = swtEvent.character;
-      if (mods == EKeymap.SHIFT_MASK && Character.isLetter(ch))
+      if (mods == EKeymap.SHIFT_MASK && ch != swtEvent.keyCode)
       {
-        ch = Character.toUpperCase(ch);
+        // ch already 'contains' shift so no need to flag it.
         mods = 0;
       }
       if (0 < ch  && ch < 0x1A)

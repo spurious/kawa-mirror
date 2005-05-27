@@ -41,15 +41,6 @@ public class ClassExp extends LambdaExp
     setCanRead(true);
   }
 
-  /*
-  public Object eval (Environment env)
-  {
-    System.err.println("eval ClassExp");
-    Class clas = evalToClass();
-    return Type.make(clas);
-    }
-  */
-
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)

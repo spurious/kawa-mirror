@@ -1,3 +1,11 @@
+2005-05-25 Christian Surlykke <christian@surlykke.dk>
+
+	* SwtBuffer.java: (makeTextChangingEvent): Set start field of 
+	TextChangingEvent.
+	* SwtWindow.java: (handleCommand): Don't redraw StyledText widget.
+	(getReadyToShow): Set StyledText widget caret offset to dot of 
+	buffer.
+	
 2005-05-21 Christian Surlykke <christian@surlykke.dk>
 
 	* SwtWindowWidget.java: New class, a composite widget combining two

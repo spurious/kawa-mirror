@@ -169,6 +169,7 @@ public class BufferContent extends SwtCharBuffer
   private TextChangingEvent makeTextChangingEvent(int start, int length, String newText)
   {
     TextChangingEvent result = new TextChangingEvent(this);
+    result.start =  start;
     result.newCharCount = newText.length();
     result.newLineCount = lineOffsets.countLines(newText);
     result.newText = newText;

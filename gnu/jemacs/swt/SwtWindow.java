@@ -51,6 +51,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
           swtWindowWidget.getStyledText().addFocusListener(SwtWindow.this);
           swtWindowWidget.getStyledText().addMouseListener(SwtWindow.this);
           swtWindowWidget.getStyledText().forceFocus();
+          swtWindowWidget.getStyledText().setCaretOffset(swtBuffer.getDot());
         }
       }
     );
@@ -117,7 +118,6 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   {
     int oldDot = getBuffer().getDot();
     super.handleCommand(command);
-    SwtHelper.redraw(swtWindowWidget.getStyledText());
     updateModeline();
     if (oldDot != getBuffer().getDot())
     {

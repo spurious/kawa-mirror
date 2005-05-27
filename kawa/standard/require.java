@@ -405,10 +405,12 @@ public class require extends Syntax
       {
 	if (immediate)
 	  {
-	    forms.addElement(new ApplyExp(ClassType.make("gnu.expr.ModuleInfo")
-					  .getDeclaredMethod("getRunInstance", 0),
-					  new Expression[] {
-					    new QuoteExp(info)}));
+            dofind = new ApplyExp(ClassType.make("gnu.expr.ModuleInfo")
+                                  .getDeclaredMethod("getRunInstance", 0),
+                                  new Expression[] { new QuoteExp(info)});
+	    forms.addElement(gnu.kawa.functions.Convert
+                             .makeCoercion(dofind,
+                                           new QuoteExp(Type.void_type)));
 	  }
 	else
           {

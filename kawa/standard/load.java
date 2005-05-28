@@ -158,7 +158,8 @@ public class load extends Procedure1 {
     else
       {
 	SourceMessages messages = new SourceMessages();
-	Compilation comp = CompileFile.read(port, messages);
+	Compilation comp
+          = language.parse(port, messages, Language.PARSE_IMMEDIATE);
 	ModuleExp mexp = comp.getModule();
 	mexp.setName(Symbols.make(LambdaExp.fileFunctionName));
 	CallContext ctx = CallContext.getInstance();

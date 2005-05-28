@@ -1,5 +1,8 @@
 2005-05-27  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): Don't set immediate flag here -
+	it's supposed to be set earlier.
+
 	* ThisExp.java (compile): Add an extension for static methods,
 	which is used by define_syntax.
 	* ProcInitializer.java (emitLoadModuleMethod): If module is static,

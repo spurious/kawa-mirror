@@ -172,7 +172,6 @@ public class ModuleExp extends LambdaExp
 	  {
 	    try
 	      {
-                comp.immediate = true;
 		Class clas = evalToClass(comp);
 		if (clas == null)
 		  return;

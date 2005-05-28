@@ -373,7 +373,7 @@ public class XQuery extends Language
     throws Throwable
   {
     InPort port = in instanceof InPort ? (InPort) in : new InPort(in);
-    Compilation comp = parse(port, messages, PARSE_WITH_FOCUS);
+    Compilation comp = parse(port, messages, PARSE_WITH_FOCUS|PARSE_IMMEDIATE);
     CallContext ctx = CallContext.getInstance();
     int oldIndex = ctx.startFromContext();
     try

@@ -1,3 +1,7 @@
+2005-05-27  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (evalToFocusProc): Also set PARSE_IMMEDIATE flag.
+
 2005-05-18  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (lookup): Use new getLangEnvironment method.

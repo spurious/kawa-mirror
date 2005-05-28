@@ -38,6 +38,20 @@ public class Compilation
 
   /** Contains "$instance" if the module is static; otherwise null. */
   Variable moduleInstanceVar;
+
+  /** Used to access the "main" instance.
+   * This is used for two different purposes, which may be confusing:
+   * <ul>
+   * <li>
+   * If we're compiling a static module, then {@code moduleInstanceMainField}
+   * is a field in {@code mainClass} named {@code "$instance"} that
+   * points to the single instance of the module.</li>
+   * <li>
+   * If {@code moduleClass!=mainClass} (typically because we've specified
+   * {@code module-extends}) <em>and</em> the module is non-static then
+   * {@code moduleInstanceMainField} is a field in {@code moduleClass}
+   * named {@code "$main"} that points back to {@code mainClass}.</li></ul>
+   */
   Field moduleInstanceMainField;
 
   /** If true, minimize the number of classes generated.

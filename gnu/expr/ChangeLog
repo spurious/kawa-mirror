@@ -1,5 +1,10 @@
 2005-05-27  Per Bothner  <per@bothner.com>
 
+	* ThisExp.java (compile): Add an extension for static methods,
+	which is used by define_syntax.
+	* ProcInitializer.java (emitLoadModuleMethod): If module is static,
+	use moduleInstanceMainField to access current $instance.
+
 	* ClassExp.java (AbstractMethodFilter): Change to inner class.
 
 	* Compilation.java (addClass): Don't call run method from <clinit>

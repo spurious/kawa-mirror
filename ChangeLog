@@ -1,5 +1,8 @@
 2005-05-27  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_syntax.java (scanForm): We can now simplify
+	the immediate and static cases to match the normal case.
+
 	* kawa/standard/require.java (importDefinitions): Cast getRunInstance
 	result to void, to avoid it being in the expression result.
 

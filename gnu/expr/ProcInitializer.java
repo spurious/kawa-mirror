@@ -42,8 +42,7 @@ public class ProcInitializer extends Initializer
 	      = code.locals.current_scope.addVariable(code,
 						      comp.moduleClass,
 						      "$instance");
-	    if (comp.moduleClass != comp.mainClass
-		&& ! comp.isStatic())
+	    if (comp.moduleClass != comp.mainClass && ! comp.isStatic())
 	      {
                 code.emitNew(comp.moduleClass);
                 code.emitDup(comp.moduleClass);

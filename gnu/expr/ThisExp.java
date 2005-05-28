@@ -59,6 +59,7 @@ public class ThisExp extends ReferenceExp
       return;
     CodeAttr code = comp.getCode();
     if (comp.method.getStaticFlag())
+      // This is an extension used by define_syntax.
       code.emitGetStatic(comp.moduleInstanceMainField);
     else
       code.emitPushThis();

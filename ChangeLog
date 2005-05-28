@@ -1,3 +1,7 @@
+2005-05-27  Dean Ferreyra <dferreyra@igc.org>
+
+	* kawa/lang/Eval.java (evalBody): Need to set immediate flag.
+
 2005-05-27  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions): Simplify immediate

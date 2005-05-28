@@ -1,3 +1,6 @@
+// Copyright (C) 2005 Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ../../COPYING.
+
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;

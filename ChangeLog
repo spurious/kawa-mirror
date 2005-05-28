@@ -1,5 +1,12 @@
 2005-05-27  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (importDefinitions): Simplify immediate
+	mode to share more logic with non-immediate mode.
+
+	* kawa/standard/require.java (makeDeclInModule2): Don't
+	setCapturedScope; it's wrong and may trash correct scope
+	set in makeDeclInModule1.
+
 	* kawa/standard/define_syntax.java (scanForm): We can now simplify
 	the immediate and static cases to match the normal case.
 

@@ -4,6 +4,8 @@ import kawa.lang.*;
 import gnu.lists.*;
 import java.util.Vector;
 import gnu.mapping.Symbol;
+import gnu.bytecode.Type;
+import gnu.kawa.functions.Convert;
 
 public class object extends Syntax
 {
@@ -323,17 +325,16 @@ public class object extends Syntax
     Object components = saved[1];
     Vector inits = (Vector) saved[2];
     LambdaExp method_list = (LambdaExp) saved[3];
-    Vector clinits = new Vector(20);
     oexp.firstChild = method_list;
 
     // First a pass over init-form: specifiers, since these are evaluated
     // in a scope outside the current class.
     int len = inits.size();
-    for (int i = 1;  i < len;  i += 2)
+    for (int i = 0;  i < len;  i += 2)
       {
-	Object init = inits.elementAt(i);
+	Object init = inits.elementAt(i+1);
 	if (init != null)
-	  inits.setElementAt(tr.rewrite_car((Pair) init, false), i);
+          rewriteInit(inits.elementAt(i), oexp, (Pair) init, tr, null);
       }
     
     tr.push(oexp);
@@ -341,7 +342,6 @@ public class object extends Syntax
     // Pass to rewrite method/initializer bodies.
     LambdaExp meth = method_list;
     int init_index = 0;  // Input index in inits Vector.
-    int finit_index = 0;   // Output index in inits vector.
     SyntaxForm componentsSyntax = null;
     for (Object obj = components;  obj != LList.Empty;  )
       {
@@ -427,29 +427,12 @@ public class object extends Syntax
 		  }
 		if (initPair != null)
 		  {
-		    boolean isStatic;
 		    Object d = inits.elementAt(init_index++);
-		    Expression initValue
-		      = (Expression) inits.elementAt(init_index++);
-		    if (initValue == null)
-		      initValue = tr.rewrite_car(initPair, memberSyntax);
-		    if (d instanceof Declaration)
-		      {
-			Declaration decl = (Declaration) d;
-			isStatic = decl.getFlag(Declaration.STATIC_SPECIFIED);
-			SetExp sexp = new SetExp(decl, initValue);
-			tr.setLineOf(sexp);
-			decl.noteValue(null);
-			initValue = sexp;
-		      }
-		    else
-		      {
-			isStatic = d == Boolean.TRUE;
-		      }
-		    if (isStatic)
-		      clinits.addElement(initValue);
-		    else
-		      inits.setElementAt(initValue, finit_index++);
+		    boolean isStatic = d instanceof Declaration
+                      ? ((Declaration) d).getFlag(Declaration.STATIC_SPECIFIED)
+                      : d == Boolean.TRUE;
+		    if (inits.elementAt(init_index++) == null)
+                      rewriteInit(d, oexp, initPair, tr, memberSyntax);
 		  }
 	      }
 	    else if (pair_car instanceof Pair)
@@ -480,39 +463,57 @@ public class object extends Syntax
 	  }
 	
       }
-    inits.setSize(finit_index);
-    makeInitMethod(inits, false, oexp, tr);
-    makeInitMethod(clinits, true, oexp, tr);
+    // If initMethod/clinitMethod were created by the "outer" (first) call
+    // to rewriteInit, then we may need to fix up their outer chain.
+    if (oexp.initMethod != null)
+      oexp.initMethod.outer = oexp;
+    if (oexp.clinitMethod != null)
+      oexp.clinitMethod.outer = oexp;
     tr.pop(oexp);
   }
 
-  private static void makeInitMethod (Vector inits, boolean isStatic,
-				      ClassExp oexp, Translator tr)
+  private static void rewriteInit (Object d, ClassExp oexp, Pair initPair,
+                                   Translator tr, SyntaxForm memberSyntax)
   {
-    int len = inits.size();
-    if (len == 0)
-      return;
-    Expression[] assignments = new Expression[len+1];
-    inits.copyInto((Object[]) assignments);
-    assignments[len] = QuoteExp.voidExp;
-    BeginExp bexp = new BeginExp(assignments);
-    LambdaExp initMethod = new LambdaExp(bexp);
-    initMethod.setClassMethod(true);
-    tr.push(initMethod);
-    if (isStatic)
+    boolean isStatic = d instanceof Declaration
+      ? ((Declaration) d).getFlag(Declaration.STATIC_SPECIFIED)
+      : d == Boolean.TRUE;
+    LambdaExp initMethod = isStatic ? oexp.clinitMethod : oexp.initMethod;
+    if (initMethod == null)
       {
-	initMethod.setName("$clinit$");
-	oexp.clinitMethod = initMethod;
+        initMethod = new LambdaExp(new BeginExp());        
+        initMethod.setClassMethod(true);
+        if (isStatic)
+          {
+            initMethod.setName("$clinit$");
+            oexp.clinitMethod = initMethod;
+          }
+        else
+          {
+            initMethod.setName("$finit$");
+            oexp.initMethod = initMethod;
+            // pseudo-this??  $finit$ is a static method - but (this) is valid.
+            // Is type getting set?  FIXME
+            initMethod.add(null, new Declaration(ThisExp.THIS_NAME));
+          }
+        initMethod.nextSibling = oexp.firstChild;
+        oexp.firstChild = initMethod;
+      }
+    tr.push(initMethod);
+    Expression initValue = tr.rewrite_car(initPair, memberSyntax);
+    if (d instanceof Declaration)
+      {
+        Declaration decl = (Declaration) d;
+        SetExp sexp = new SetExp(decl, initValue);
+        tr.setLineOf(sexp);
+        decl.noteValue(null);
+        initValue = sexp;
       }
     else
-      {
-	initMethod.setName("$finit$");
-	oexp.initMethod = initMethod;
-      }
-    initMethod.nextSibling = oexp.firstChild;
-    oexp.firstChild = initMethod;
+      initValue = Convert.makeCoercion(initValue, new QuoteExp(Type.void_type));
+    ((BeginExp) initMethod.body).add(initValue);
     tr.pop(initMethod);
-  }
+}
 
   /** True if <code>exp</code> matches <code>tag:</code>, <code>"tag"</code>,
    * or <code>'tag</code>.  The latter is recommended as a matter of style.

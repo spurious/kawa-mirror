@@ -553,6 +553,13 @@ public class Lambda extends Syntax implements Printable
         tr.lexical.push(cur);
       }
 
+    if (lexp.isClassMethod()
+        && ! lexp.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+      {
+        // We set the type of this in ClassExp.walkChildren.
+        lexp.add(null, new Declaration(ThisExp.THIS_NAME));
+      }
+
     lexp.body = tr.rewrite_body (body);
     Type rtype;
     if (lexp.body instanceof BeginExp)

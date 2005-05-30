@@ -1,3 +1,16 @@
+2005-05-29  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody): If not STATIC_SPECIFIC for class
+	method then add the implicit this parameter.
+	* kawa/standard/thisRef.java (rewriteForm): Look for implicit this
+	parameter.
+	* kawa/standard/object.java: Rewrite handling of init forms, since
+	we want them to be in the scope of the init methods.  One reason is
+	so we can bindg (this) to the implicit thuis parameter,
+	(rewriteInit): New private method.
+	(makeInitMethod): Remove method.
+	This fixes Savannah bug #10806.
+
 2005-05-27  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (loadSource): "Inline" call to CompileFile's

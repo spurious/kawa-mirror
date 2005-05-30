@@ -13,11 +13,24 @@ public class thisRef extends Syntax
     if (form.cdr == LList.Empty)
       {
 	ScopeExp sc = tr.currentScope();
-	while (sc != null && ! (sc instanceof ClassExp))
-	  sc = sc.outer;
-	if (sc == null)
-	  tr.error('w', "use of 'this' not inside a class");
-	return new ThisExp(sc);
+        for (;;)
+          {
+            if (sc == null)
+              {
+                tr.error('w', "use of 'this' not inside a class");
+                break;
+              }
+            if (sc instanceof LambdaExp && ((LambdaExp) sc).isClassMethod())
+              {
+                Declaration firstParam = sc.firstDecl();
+                if (firstParam != null && firstParam.isThisParameter())
+                  return new ThisExp(firstParam);
+                tr.error('w', "use of 'this' inside static method");
+                break;
+              }
+            sc = sc.outer;
+          }
+	return new ThisExp();
       }
     else
       return tr.syntaxError("this with paramater not implemented");

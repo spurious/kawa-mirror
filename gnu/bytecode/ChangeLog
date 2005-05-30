@@ -1,3 +1,8 @@
+2005-05-30  Per Bothner  <per@bothner.com>
+
+	* Variable.java (isArtificial, setArtificial): Remove unused methods.
+	(ARTIFICIAL_FLAG): Remove unused constant.
+
 2005-05-16  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (pushScope): All our own enterScope, so setStartPC is

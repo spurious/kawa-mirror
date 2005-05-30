@@ -1,5 +1,9 @@
 2005-05-30  Per Bothner  <per@bothner.com>
 
+	* Compilation.java: Remove pointless calls to setArtificial.
+	* FindCapturedVars.java: Likewise.
+	* LambdaExp.java: Likewise.
+
 	* ThisExp.java (THIS_NAME): New static field.
 	(<init>): Use THIS_NAME.
 	(isForContext): New method.
@@ -20,7 +24,6 @@
 	(capture): Simplify "non-static referenced by static" message.
 
 	* ClassExp.java (print): Simplify output.
-
 
 2005-05-27  Per Bothner  <per@bothner.com>
 

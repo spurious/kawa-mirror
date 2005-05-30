@@ -380,7 +380,7 @@ public class LambdaExp extends ScopeExp
       {
         thisVariable = new Variable("this");
 	getVarScope().addVariableAfter(null, thisVariable);
-	thisVariable.setParameter (true);  thisVariable.setArtificial (true);
+	thisVariable.setParameter (true);
       }
     if (thisVariable.getType() == null)
       thisVariable.setType(clas);
@@ -413,7 +413,6 @@ public class LambdaExp extends ScopeExp
 		Type envType = primMethod.getParameterTypes()[0];
 		closureEnv = new Variable("closureEnv", envType);
 		getVarScope().addVariableAfter(null, closureEnv);
-		closureEnv.setArtificial(true);
 		closureEnv.setParameter(true);
 	      }
 	  }
@@ -423,7 +422,6 @@ public class LambdaExp extends ScopeExp
 	  {
 	    closureEnv = new Variable("closureEnv", parentFrame.getType());
 	    getVarScope().addVariable(closureEnv);
-	    closureEnv.setArtificial(true);
 	  }
       }
     return closureEnv;
@@ -838,7 +836,6 @@ public class LambdaExp extends ScopeExp
 		argsArray = new Variable("argsArray",
 					 Compilation.objArrayType);
 		argsArray.setParameter(true);
-		argsArray.setArtificial(true);
 	      }
 	    firstArgsArrayArg = var;
 	    atypes[atypes.length-(withContext ? 2 : 1)] = lastType;
@@ -946,7 +943,6 @@ public class LambdaExp extends ScopeExp
 					    Compilation.typeCallContext,
 					    "$ctx");
 		var.setParameter(true);
-		var.setArtificial(true);
 	      } 
 	    if (decl == null)
 	      break;
@@ -971,7 +967,6 @@ public class LambdaExp extends ScopeExp
 		Type vtype = decl.getType().getImplementationType();
                 var = decl.var = getVarScope().addVariable(null, vtype, vname);
 		//getVarScope().addVariableAfter(var, decl);
-		var.setArtificial (true);
 		var.setParameter (true);
 		//var.allocateLocal(code);
 	      }

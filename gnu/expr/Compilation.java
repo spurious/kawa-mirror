@@ -1870,7 +1870,6 @@ public class Compilation
 	Variable callStackContext = new Variable ("$ctx", typeCallContext);
 	module.getVarScope().addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
-	callStackContext.setArtificial(true);
       }
 
     int line = module.getLine();

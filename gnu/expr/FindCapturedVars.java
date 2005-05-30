@@ -288,7 +288,6 @@ public class FindCapturedVars extends ExpWalker
 		      || declLambda instanceof ClassExp))
 	      {
 		declLambda.heapFrame = new gnu.bytecode.Variable("heapFrame");
-		declLambda.heapFrame.setArtificial(true);
 	      }
 	    decl.setSimple(false);
 	    if (! decl.isPublic())

@@ -472,6 +472,12 @@ public class Declaration
       base.setCanRead();
   }
 
+  /** Is this an implicit 'this' parameter? */
+  public final boolean isThisParameter ()
+  {
+    return symbol == ThisExp.THIS_NAME;
+  }
+
   /** True if we never need to access this declaration. */
   // rename to isAccessed?
   public boolean ignorable()

@@ -1,3 +1,27 @@
+2005-05-30  Per Bothner  <per@bothner.com>
+
+	* ThisExp.java (THIS_NAME): New static field.
+	(<init>): Use THIS_NAME.
+	(isForContext): New method.
+	(eval, compile): Use it.  We default to the super behavior otherwise.
+	* FindCapturedVars.java (walkThisExp): Likewise.
+	* Declaration.java (isThisParameter): New method.
+	* ClassExp.java (walkChildren): If the first parameter of a method
+	isThisParameter, then set its type, if known.
+	* LambdaExp.java (declareThis): If first param isThisParameter(),
+	then note its Variable. 
+	(addMethodFor): Skip first parameter if isThisParameter().
+	(print): Don't get confused by isThisParameter().
+	This fixes Savannah bug #10806.
+
+	* FindCapturedVars.java (walkApplyExp): Force walk of function
+	if NONSTATIC_SPECIFIED, to catch "non-static referenced by static"
+	error in this case.
+	(capture): Simplify "non-static referenced by static" message.
+
+	* ClassExp.java (print): Simplify output.
+
+
 2005-05-27  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): Don't set immediate flag here -

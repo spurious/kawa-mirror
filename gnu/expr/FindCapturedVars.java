@@ -33,7 +33,8 @@ public class FindCapturedVars extends ExpWalker
       {
 	Declaration decl
 	  = Declaration.followAliases(((ReferenceExp) exp.func).binding);
-	if (decl != null && decl.context instanceof ModuleExp)
+	if (decl != null && decl.context instanceof ModuleExp
+            && ! decl.getFlag(Declaration.NONSTATIC_SPECIFIED))
 	  {
 	    Expression value = decl.getValue();
 	    if (value instanceof LambdaExp)
@@ -272,13 +273,8 @@ public class FindCapturedVars extends ExpWalker
 		if (heapDecl != null
 		    && heapDecl.getFlag(Declaration.STATIC_SPECIFIED))
 		  {
-		    // Unfortunately, SourceMessages sorts the output by line,
-		    // so these might show up in wrong order.
-		    // Hence the slight redundancy.
-		    comp.error('e', decl, "non-static ",
-			       " is referenced by static");
 		    comp.error('e', "static " + heapLambda.getName()
-			       + " references non-static");
+			       + " references non-static " + decl.getName());
 		  }
 		heapLambda.setNeedsStaticLink();
 		outer = heapLambda.outerLambda();
@@ -391,9 +387,15 @@ public class FindCapturedVars extends ExpWalker
 
   protected Expression walkThisExp (ThisExp exp)
   {
-    // FIXME - not really right, but works in simple cases.
-    getCurrentLambda ().setImportsLexVars();
-    return exp;
+    if (exp.isForContext())
+      {
+        // This is an extension used by define_syntax.
+        // FIXME - not really right, but works in simple cases.
+        getCurrentLambda ().setImportsLexVars();
+        return exp;
+      }
+    else
+      return walkReferenceExp (exp);
   }
 
   protected Expression walkSetExp (SetExp exp)

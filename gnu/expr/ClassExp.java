@@ -511,7 +511,15 @@ public class ClassExp extends LambdaExp
 	for (LambdaExp child = firstChild;
 	     child != null && walker.exitValue == null;
 	     child = child.nextSibling)
-	  walker.walkLambdaExp(child);
+          {
+            if (instanceType != null)
+              {
+                Declaration firstParam = child.firstDecl();
+                if (firstParam != null && firstParam.isThisParameter())
+                  firstParam.setType(type);
+              }
+            walker.walkLambdaExp(child);
+          }
       }
     finally
       {
@@ -546,15 +554,14 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
-	out.writeSpaceLinear();
-        out.print(" method: ");
+	out.writeBreakLinear();
         child.print(out);
       }
-    out.writeSpaceLinear();
-    if (body == null)
-      out.print("<null body>");
-    else
-      body.print (out);
+    if (body != null)
+      {
+        out.writeBreakLinear();
+        body.print (out);
+      }
     out.endLogicalBlock(")");
   }
 

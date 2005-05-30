@@ -8,6 +8,9 @@ import gnu.mapping.*;
 
 public class ThisExp extends ReferenceExp
 {
+  /** Non-interned name for implicit 'this' variable. */
+  public static final String THIS_NAME = new String("$this$");
+
   /** When evaluating, return the context.
    * This is used for the "context" of a Macro.
    */
@@ -16,9 +19,15 @@ public class ThisExp extends ReferenceExp
   /** The class which this refers to. */
   ScopeExp context;
 
+  /** If this is being used to pass the context instance to a Macro. */
+  public final boolean isForContext ()
+  {
+    return (flags & EVAL_TO_CONTEXT) != 0;
+  }
+
   public Object eval (Environment env)
   {
-    if ((flags & EVAL_TO_CONTEXT) != 0)
+    if (isForContext())
       return context;
   return super.eval(env);
   }
@@ -27,23 +36,23 @@ public class ThisExp extends ReferenceExp
 
   public ThisExp ()
   {
-    super("$this$");
+    super(THIS_NAME);
   }
 
   public ThisExp(ScopeExp context)
   {
-    super("$this$");
+    super(THIS_NAME);
     this.context = context;
   }
 
   public ThisExp (Declaration binding)
   {
-    super("$this", binding);
+    super(THIS_NAME, binding);
   }
 
   public ThisExp (ClassType type)
   {
-    this(new Declaration("this", type));
+    this(new Declaration(THIS_NAME, type));
   }
 
   public static ThisExp makeGivingContext (ScopeExp context)
@@ -57,13 +66,20 @@ public class ThisExp extends ReferenceExp
   {
     if (target instanceof IgnoreTarget)
       return;
-    CodeAttr code = comp.getCode();
-    if (comp.method.getStaticFlag())
-      // This is an extension used by define_syntax.
-      code.emitGetStatic(comp.moduleInstanceMainField);
+    if (isForContext())
+      {
+        // This is an extension used by define_syntax.
+        CodeAttr code = comp.getCode();
+        if (comp.method.getStaticFlag())
+          code.emitGetStatic(comp.moduleInstanceMainField);
+        else
+          code.emitPushThis();
+        target.compileFromStack(comp, getType());
+      }
     else
-      code.emitPushThis();
-    target.compileFromStack(comp, getType());
+      {
+        super.compile(comp, target);
+      }
   }
 
   protected Expression walk (ExpWalker walker)

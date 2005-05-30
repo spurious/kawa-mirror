@@ -14,8 +14,10 @@ import java.util.Vector;
 public class LambdaExp extends ScopeExp
 {
   public Expression body;
+  /** Minumnum number of parameters.
+   * Does not count implicit isThisParameter(). */
   public int min_args;
-  // Maximum number of actual arguments;  -1 if variable.
+  /** Maximum number of actual arguments;  -1 if variable. */
   public int max_args;
 
   /** Set of visible top-level LambdaExps that need apply methods. */
@@ -255,7 +257,7 @@ public class LambdaExp extends ScopeExp
    * this is 1, since in that all arguments are passed in a single array. */
   public int incomingArgs ()
   {
-    // The max_args > 0 is a hack to handle LambdaProecdure, which
+    // The max_args > 0 is a hack to handle LambdaProcedure, which
     // currently always uses a single array argument.
     return min_args == max_args && max_args <= 4 && max_args > 0 ? max_args : 1;
   }
@@ -382,6 +384,8 @@ public class LambdaExp extends ScopeExp
       }
     if (thisVariable.getType() == null)
       thisVariable.setType(clas);
+    if (decls != null && decls.isThisParameter())
+      decls.var = thisVariable;
     return thisVariable;
   }
 
@@ -814,6 +818,8 @@ public class LambdaExp extends ScopeExp
 	if (extraArg > 0)
 	  atypes[0] = closureEnvType;
 	Declaration var = firstDecl();
+        if (var != null && var.isThisParameter())
+          var = var.nextDecl();
 	for (int itype = 0; itype < plainArgs; var = var.nextDecl())
 	  atypes[extraArg + itype++] = var.getType().getImplementationType();
 	if (ctxArg != 0)
@@ -1478,9 +1484,10 @@ public class LambdaExp extends ScopeExp
     int opt_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
-
-    for (Declaration decl = firstDecl();
-         decl != null;  decl = decl.nextDecl())
+    Declaration decl = firstDecl();
+    if (decl != null && decl.isThisParameter())
+      i = -1;
+    for (; decl != null;  decl = decl.nextDecl())
       {
 	Special mode;
 	if (i < min_args)
@@ -1491,7 +1498,7 @@ public class LambdaExp extends ScopeExp
 	  mode = Special.rest;
 	else
 	  mode = Special.key;
-	if (i > 0)
+	if (decl != firstDecl())
 	   out.writeSpaceFill();
 	if (mode != prevMode)
 	  {

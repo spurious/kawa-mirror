@@ -1,4 +1,4 @@
-(module-static counter get-new-count)
+(module-static counter get-new-count call-lambda)
 
 (define-constant xx :: <int> 20)
 
@@ -19,12 +19,17 @@
    (lambda (x) (make-vector 1 x))) ; This lambda doesn't "capture" anything.
   ((lambda-method2 n)
    (lambda (x) (make-vector (+ a n) x))) ; This lambda does.
+  ((lambda-method3)
+   (call-lambda (lambda () (slot-ref (this) 'two))))
   ((x1900) :: <int> access: 'package allocation: 'static
    1900)
   ((g) :: <int> access: 'protected
    (+ xx a))
   ((f (y :: <int>)) :: <int>
    (if (equal? hyphenated-field? "yes") (+ (g) b y) 999)))
+
+(define (call-lambda fn)
+  (fn))
 
 (define-class <ClsB> ()
   (b :: <int> 14)) ;; deprecated syntax

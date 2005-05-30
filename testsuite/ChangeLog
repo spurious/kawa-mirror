@@ -1,3 +1,9 @@
+2004-10-26  Chris Dean  <ctdean@sokitomi.com>
+
+	* obj-test.scm:  Add test of (this) closure
+	* classes1.scm:  ibid.
+	This tests Savannah bug #10806.
+
 2005-05-19  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm (test-opt-args): New function.

@@ -350,6 +350,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     boolean is_static = thisType == null || skipArg != 0;
     int fix_arg_count = variable ? arg_count - 1 : args.length;
     Declaration argDecl = source == null ? null : source.firstDecl();
+    if (argDecl != null && argDecl.isThisParameter())
+      argDecl = argDecl.nextDecl();
     for (int i = 0; ; ++i)
       {
         if (variable && i == fix_arg_count)

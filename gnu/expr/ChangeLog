@@ -1,3 +1,7 @@
+2005-05-31  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compileArgs): Skip implicit isThisParameter().
+
 2005-05-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java: Remove pointless calls to setArtificial.

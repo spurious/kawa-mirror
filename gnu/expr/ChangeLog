@@ -1,5 +1,9 @@
 2005-05-31  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkReferenceExp): New method - expand constants.
+	* FindCapturedVars.java (capture): Don't short-circuit constants.
+	Fixes bug reported 5/11 by Dominique Boucher.
+
 	* PrimProcedure.java (compileArgs): Skip implicit isThisParameter().
 
 2005-05-30  Per Bothner  <per@bothner.com>

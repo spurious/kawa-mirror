@@ -170,9 +170,6 @@ public class FindCapturedVars extends ExpWalker
       return;
     if (decl.field != null && decl.field.getStaticFlag())
       return;
-    if (decl.getFlag(Declaration.IS_CONSTANT)
-	&& decl.getValue() instanceof QuoteExp)
-      return;
 
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();

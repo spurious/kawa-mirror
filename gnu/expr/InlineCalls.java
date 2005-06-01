@@ -141,6 +141,19 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
+  protected Expression walkReferenceExp (ReferenceExp exp)
+  {
+    Declaration decl = exp.getBinding();
+    if (decl != null && decl.getFlag(Declaration.IS_CONSTANT)
+        && decl.field == null)
+      {
+	Expression dval = decl.getValue();
+        if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
+          return walkQuoteExp((QuoteExp) dval);
+      }
+    return super.walkReferenceExp(exp);
+  }
+
   protected Expression walkIfExp (IfExp exp)
   {
     exp.walkChildren(this);

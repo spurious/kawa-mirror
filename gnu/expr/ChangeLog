@@ -1,5 +1,8 @@
 2005-06-01  Per Bothner  <per@bothner.com>
 
+	* ReferenceExp.java (<init>(Declaration)): Un-inline other constructor,
+	to simplify debugging.
+
 	* LambdaExp.java (allocChildClasses): Remove unused variable
 	method_static.
 

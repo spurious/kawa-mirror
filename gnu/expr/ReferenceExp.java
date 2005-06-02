@@ -66,8 +66,7 @@ public class ReferenceExp extends AccessExp
 
   public ReferenceExp (Declaration binding) 
   {
-    this.binding = binding;
-    this.symbol = binding.getSymbol();
+    this(binding.getSymbol(), binding);
   }
 
   public Object eval (Environment env)

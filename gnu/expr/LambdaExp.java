@@ -986,7 +986,6 @@ public class LambdaExp extends ScopeExp
       {
 	if (! child.isClassGenerated() && ! child.getInlineOnly())
 	  {
-	    boolean method_static;
 	    ObjectType closureEnvType;
 	    if (! child.getNeedsClosureEnv())
 	      closureEnvType = null;

@@ -159,12 +159,9 @@ public class FieldLocation extends ClassMemberLocation
             if (d.field != null && d.field.getName().equals(fname))
               break;
           }
-        if (d != null)
-          {
-            decl = d;
-            return d;
-          }
-        throw new RuntimeException("no field found for "+this);
+        if (d == null)
+          throw new RuntimeException("no field found for "+this);
+        decl = d;
       }
     return d;
   }

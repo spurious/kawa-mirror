@@ -411,7 +411,10 @@ public class SyntaxTemplate implements Externalizable
       {
 	Syntax curSyntax = tr.getCurrentSyntax();
 	if (curSyntax instanceof Macro)
-	  templateScope.outer = ((Macro) curSyntax).getCapturedScope();
+	  {
+	    templateScope.outer = ((Macro) curSyntax).getCapturedScope();
+	    templateScope.macroContext = tr.macroContext;
+	  }
       }
     return execute(0, vars, 0, new int[max_nesting], tr, templateScope);
   }

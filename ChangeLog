@@ -1,5 +1,28 @@
 2005-06-02  Per Bothner  <per@bothner.com>
 
+	Handle re-exporting declarations imported from a module.
+	* kawa/lang/Macro.java (getCapturedScope): Use new findFromInstance
+	method from ModuleInfo.
+	* kawa/lang/TemplateScope.java (macroContext): New field.
+	* kawa/lang/SyntaxTemplate.java (execute): Set TemplateScope's
+	macroContext field from Translator's macroContext field.
+	* kawa/lang/Translator.java (macroContext): New field.
+	(getBinding): Inline into check_if_Syntax and remove.
+	(check_if_Syntax): Simplify and change to only lookup lexical
+	declaration.  However, also set macroContext.
+	(rewrite_pair, scanForm): Use new check_if_Syntax.
+	(rewrite): If scope is TemplateScope, set context of ReferenceExp
+	from macroContext, if needed.
+	* kawa/standard/require.java (importDefinitions): Change parameter.
+	Don't search up super chain.  Use new ModuleInfo.setupModuleExp,
+	and then iterate over resulting decls, rather than over fields.
+	Silently skip if we duplicate existing decl with same alias base.
+	Don't do makeDeclInModule2 in second pass since already done
+	by setupModuleExp.  However, search for suitable xxx$instance
+	declaration.
+	(makeModule): Remove unused method.
+	(makeDeclInModule1, makeDeclInModule1): Move to ModuleInfo.
+
 	* kawa/standard/define.java (scanForm): Push/pop source location
 	around define call for better error messages.
 

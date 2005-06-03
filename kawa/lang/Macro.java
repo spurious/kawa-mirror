@@ -17,22 +17,12 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public ScopeExp getCapturedScope ()
   {
-    if (capturedScope == null && instance != null)
+    if (capturedScope == null)
       {
-	if (instance instanceof ModuleExp)
-	  {
-	    ModuleExp mexp = (ModuleExp) instance;
-	    mexp.firstDecl(); // Force makeModule, if needed.
-	    capturedScope = mexp;
-	  }
-	else
-	  {
-	    ModuleExp mexp = new ModuleExp();
-	    ClassType ctype = (ClassType) ClassType.make(instance.getClass());
-	    mexp.setType(ctype);
-	    kawa.standard.require.makeModule(mexp, ctype, instance);
-	    capturedScope = mexp;
-	  }
+        if (instance instanceof ModuleExp) // possibly if immediate.
+          capturedScope = (ModuleExp) instance;
+        else if (instance != null)
+          capturedScope = ModuleInfo.findFromInstance(instance).getModuleExp();
       }
     return capturedScope;
   }

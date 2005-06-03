@@ -7,6 +7,15 @@ import java.io.*;
 
 public class TemplateScope extends LetExp implements Externalizable
 {
+  /** The module instance containing the defining macro.
+   * If we're expanding a macro imported from some external module,
+   * the macro's template(s) may expand to references to declarations in
+   * that external module. If the module is non-static, we may need a
+   * context instance to access those declarations; we inherit the context
+   * instance from the declaration bound to the imported macro.
+   * This is used to setContextDecl() of such references. */
+  Declaration macroContext;
+
   public TemplateScope ()
   {
     super(null);

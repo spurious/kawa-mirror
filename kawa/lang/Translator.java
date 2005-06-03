@@ -104,6 +104,12 @@ public class Translator extends Compilation
   Syntax currentSyntax;
   public Syntax getCurrentSyntax() { return currentSyntax; }
 
+  /**  The module instance containing the current macro.
+   * This is only used temporarily, set when resolving a Declaration
+   * bound to a macro, and used to set the macroContext field of the
+   * TemplateScope created when expanding the macro's template(s). */
+  Declaration macroContext;
+
   /**
    * Apply a Syntax object.
    * @param syntax the Syntax object whose rewrite method we call
@@ -188,115 +194,36 @@ public class Translator extends Compilation
     return decl;
   }
 
-  /**
-   * @param function true if obj is in function-call position (i.e. first).
+  /** Check if a Declaration is bound to a Syntax.
+   * @param decl the Declaration to check
+   * @return the Syntax bound to decl, or null.
+   * In the former case, macroContext may be set as a side effect.
    */
-  Object getBinding (Object obj, boolean function)
+  Syntax check_if_Syntax (Declaration decl)
   {
-    if (obj instanceof String
-	|| (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))
-      {
-	Object nameToLookup;
-	Declaration decl = lexical.lookup(obj, function);
-	if (decl != null)
-	  {
-	    ReferenceExp rexp = getOriginalRef(decl);
-	    if (rexp != null)
-	      {
-		decl = rexp.getBinding();
-		obj = rexp.getSymbol();
-		nameToLookup = obj;
-		if (decl == null)
-		  {
-		    obj = resolve(obj, function);
-		  }
-		else
-		  {
-		    obj = decl;
-		  }
-	      }
-	    else
-	      {
-		nameToLookup = decl.getSymbol();
-		obj = decl;
-	      }
-	  }
-	else
-	  {
-	    nameToLookup = obj;
-	    obj = resolve(obj, function);
-	  }
-        if (obj instanceof Syntax)
-	  {
-	    if (obj instanceof Macro && decl != null)
-	      decl.setSyntax();
-	    return obj;
-	  }
-	if (obj instanceof Declaration)
-	  {
-	    decl = Declaration.followAliases((Declaration) obj);
-	    Expression dval = decl.getValue();
-	    if (dval instanceof QuoteExp)
-	      return ((QuoteExp) dval).getValue();
-	    if (dval != null && decl.getFlag(Declaration.IS_SYNTAX))
-	      {
-		try
-		  {
-		    return dval.eval(env);
-		  }
-		catch (Throwable ex)
-		  {
-		  }
-	      }
-	  }
-        if (obj != null)
-	  {
-            if (obj instanceof Declaration
-		     && ! isLexical((Declaration) obj))
-	      obj = null;
-	  }
-	else
-	  {
-	    Symbol symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
-	      : env.getSymbol(nameToLookup.toString());
-	    Object prop;
-	    if (function && getLanguage().hasSeparateFunctionNamespace())
-	      prop = EnvironmentKey.FUNCTION;
-	    else
-	      prop = null;
-	    Object val = env.get(symbol, prop,  null);
-	    if (val != null)
-	      return val;
-	  }
-	return null;
-      }
-     return obj;
-  }
+    Declaration d = Declaration.followAliases(decl);
 
-  /** Check if Object is Syntax, or bound to Syntax.
-   * @param obj the value to check
-   * @return the Syntax bound to obj, or null.
-   */
-  Syntax check_if_Syntax (Object obj)
-  {
-    if (obj instanceof SyntaxForm)
+    Expression dval = d.getValue();
+    if (dval != null && d.getFlag(Declaration.IS_SYNTAX))
       {
-	SyntaxForm sf = (SyntaxForm) obj;
-	ScopeExp save_scope = current_scope;
-	try
-	  {
-	    setCurrentScope(sf.scope);
-	    obj = getBinding(sf.form, true);
-	  }
-	finally
-	  {
-	    setCurrentScope(save_scope);
-	  }
+        try
+          {
+            if (decl.getValue() instanceof ReferenceExp)
+              {
+                Declaration context
+                  = ((ReferenceExp) decl.getValue()).contextDecl();
+                if (context != null)
+                  macroContext = context;
+              }
+            Object obj = dval.eval(env);
+            return obj instanceof Syntax ? (Syntax) obj : null;
+          }
+        catch (Throwable ex)
+          {
+            ex.printStackTrace();
+            error('e', "unable to evaluate macro for "+decl.getSymbol());
+          }
       }
-    else
-      obj = getBinding(obj, true);
-    if (obj instanceof Syntax)
-      return (Syntax) obj;
     return null;
   }
 
@@ -349,25 +276,14 @@ public class Translator extends Compilation
 	  }
         else
 	  {
-	    decl = Declaration.followAliases(decl);
-	    if (decl.getFlag(Declaration.IS_SYNTAX))
-	      {
-		Expression dval = decl.getValue();
-		if (dval != null)
-		  {
-		    try
-		      {
-			proc = dval.eval(env);
-			if (proc instanceof Syntax)
-			  return apply_rewrite ((Syntax) proc, p);
-		      }
-		    catch (Throwable ex)
-		      {
-			ex.printStackTrace();
-			error('e', "unable to evaluate macro for "+p.car);
-		      }
-		  }
-	      }
+            Declaration saveContext = macroContext;
+            Syntax syntax = check_if_Syntax (decl);
+            if (syntax != null)
+              {
+                Expression e = apply_rewrite (syntax, p);
+                macroContext = saveContext;
+                return e;
+              }
 	  }
 
 	ref.setProcedureName(true);
@@ -729,6 +645,9 @@ public class Translator extends Compilation
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
 
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
+	if (current_scope instanceof TemplateScope
+            && decl != null && decl.needsContext())
+	  rexp.setContextDecl(((TemplateScope) current_scope).macroContext);
 	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;
@@ -933,7 +852,37 @@ public class Translator extends Compilation
     if (st instanceof Pair)
       {
         Pair st_pair = (Pair) st;
-        Syntax syntax = check_if_Syntax(st_pair.car);
+        Declaration saveContext = macroContext;
+        Syntax syntax = null;
+        ScopeExp save_scope = current_scope;
+        try
+          {
+            Object obj = st_pair.car;
+            if (obj instanceof SyntaxForm)
+              {
+                SyntaxForm sf = (SyntaxForm) st_pair.car;
+                setCurrentScope(sf.scope);
+                obj = sf.form;
+              }
+            if (obj instanceof String
+                || (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))
+              {
+                Declaration decl = lexical.lookup(obj, true);
+                if (decl != null)
+                  syntax = check_if_Syntax(decl);
+                else
+                  {
+                    obj = resolve(obj, true);
+                    if (obj instanceof Syntax)
+                      syntax = (Syntax) obj;
+                  }
+              }
+          }
+        finally
+          {
+            if (save_scope != current_scope)
+              setCurrentScope(save_scope);
+          }
 	if (syntax != null)
 	  {
 	    String save_filename = getFile();
@@ -947,6 +896,7 @@ public class Translator extends Compilation
 	      }
 	    finally
 	      {
+                macroContext = saveContext;
 		setLine(save_filename, save_line, save_column);
 	      }
 	  }

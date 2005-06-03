@@ -1,3 +1,8 @@
+2005-06-02  Per Bothner  <per@bothner.com>
+
+	* ScopeExp.java (getDefine): Simplify by emitting two diagnostic
+	messages on redefinition, since errors are no longer sorted.
+
 2005-06-01  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (<init>(Declaration)): Un-inline other constructor,

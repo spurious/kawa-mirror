@@ -189,33 +189,8 @@ public abstract class ScopeExp extends Expression
       decl.flags &= ~ (Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
     else
       {
-	StringBuffer sbuf = new StringBuffer(200);
-	sbuf.append("duplicate definition for '");
-	sbuf.append(name);
-	int oldLine = decl.getLine();
-	if (oldLine <= 0)
-	  sbuf.append('\'');
-	else
-	  {
-	    sbuf.append("\' (overrides ");
-	    String oldFile = decl.getFile();
-	    if (oldFile == null || oldFile.equals(parser.getFile()))
-	      sbuf.append("line ");
-	    else
-	      {
-		sbuf.append(oldFile);
-		sbuf.append(':');
-	      }
-	    sbuf.append(oldLine);
-	    int oldColumn = decl.getColumn();
-	    if (oldColumn > 0)
-	      {
-		sbuf.append(':');
-		sbuf.append(oldColumn);
-	      }
-	    sbuf.append(')');
-	  }
-	parser.error(severity, sbuf.toString());
+        parser.error(severity, "duplicate definition of '"+name+"' here");
+        parser.error(severity, decl, "previous definition of '", "' here");
 	decl = addDeclaration(name);
       }
     return decl;

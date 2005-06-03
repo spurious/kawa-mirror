@@ -66,7 +66,9 @@ public class define extends Syntax implements Printable
     if (name instanceof String)
       name = tr.namespaceResolve((String) name);
 
+    Object savePos = tr.pushPositionOf(p1);
     Declaration decl = tr.define(name, nameSyntax, defs);
+    tr.popPositionOf(savePos);
     name = decl.getSymbol();
     if (makePrivate)
       {

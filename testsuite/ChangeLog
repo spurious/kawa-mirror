@@ -1,3 +1,10 @@
+2005-06-02  Per Bothner  <per@bothner.com>
+
+	Add test for re-exported imported macro.
+	* module0.scm (mod0-m1): Return result as vector rather than sum.
+	* module3.scm (test3-import1): Also test mod0-m1 invocation.
+	* obj-test.scm: Update expected result.
+
 2004-10-26  Chris Dean  <ctdean@sokitomi.com>
 
 	* obj-test.scm:  Add test of (this) closure

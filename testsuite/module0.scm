@@ -19,4 +19,4 @@
 (define-syntax mod0-m1
   (syntax-rules ()
     ((mod-m1)
-     (+ mod-v1 (mod0-pm1) (mod0-pf1)))))
+     (vector mod0-v1 (mod0-pm1) (mod0-pf1)))))

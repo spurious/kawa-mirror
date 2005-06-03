@@ -15,7 +15,7 @@
 (define (test3-import1)
   (let ((gv1 (get3-mod0-v1)))
     (set3-mod0-v1 (- gv1 9))
-    (list gv1 mod0-v1 mod0-v2 (mod0-f1))))
+    (list gv1 mod0-v1 mod0-v2 (mod0-f1) (mod0-m1))))
 
 (define factorial-4 (my-factorial 4))
 

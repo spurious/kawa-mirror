@@ -186,7 +186,7 @@
 (test '(1 3 13) list dvar1 dvar2 dvar3)
 (test 0 list-length-4 '())
 (test '(10 24 11 190) test1-import0)
-(test '(24 15 11 181) test3-import1)
+(test '(24 15 11 181 #(15 338 169)) test3-import1)
 (test '(11 111) 'test-mod0-v2
       (let ((v2 (get3-mod0-v2)))
 	(set3-mod0-v2 (+ 100 v2))

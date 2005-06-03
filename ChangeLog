@@ -1,3 +1,9 @@
+2005-05-27  Christian Surlykke <christian@surlykke.dk>
+
+	* build.xml: Make mappers insider uptodate elements take build.dir
+	property into account.
+	* build.properties: Use basedir in template for build.dir property.
+
 2005-06-02  Per Bothner  <per@bothner.com>
 
 	Handle re-exporting declarations imported from a module.

@@ -452,7 +452,7 @@
 
   <target name="check-lib-scm-classes">
     <uptodate property="lib-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="*.class"/>
+      <mapper type="glob" from="*.scm" to="${build.dir}/kawa/lib/*.class"/>
       <srcfiles refid="lib-scm-1"/> 
       <srcfiles refid="lib-scm-2"/> 
       <srcfiles refid="lib-scm-3"/>
@@ -487,7 +487,7 @@
 
   <target name="check-commonlisp-scm-classes">
     <uptodate property="commonlisp-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="*.class"/>
+      <mapper type="glob" from="*.scm" to="${build.dir}/gnu/commonlisp/lisp/*.class"/>
       <srcfiles refid="commonlisp-scm"/>
     </uptodate>
   </target>
@@ -519,7 +519,7 @@
 
   <target name="check-slib-scm-classes">
     <uptodate property="slib-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="*.class"/>
+      <mapper type="glob" from="*.scm" to="${build.dir}/gnu/kawa/slib/*.class"/>
       <srcfiles refid="slib-scm"/>
     </uptodate>
   </target>
@@ -638,19 +638,27 @@
     <condition property="jemacs-lisp-classes-uptodate"> 
       <and>
         <uptodate>
-          <mapper type="glob" from="*.scm" to="*.class"/>
+          <mapper type="glob" 
+          	  from="*.scm" 
+          	  to="${build.dir}/gnu/jemacs/lang/*.class"/>
           <srcfiles refid="jemacs-lang-scm"/>
         </uptodate>
-        <uptodate>
-          <mapper type="glob" from="*.scm" to="*.class"/>
+      	<uptodate>
+          <mapper type="glob" 
+          	  from="*.scm" 
+          	  to="${build.dir}/gnu/jemacs/buffer/*.class"/>
           <srcfiles refid="jemacs-buffer-scm"/>
         </uptodate>
         <uptodate>
-          <mapper type="glob" from="*.scm" to="*.class"/>
+          <mapper type="glob" 
+          	  from="*.scm" 
+          	  to="${build.dir}/gnu/kawa/slib/*.class"/>
           <srcfiles refid="jemacs-slib-scm"/>
         </uptodate>
         <uptodate>
-          <mapper type="glob" from="*.el" to="*.class"/>
+          <mapper type="glob" 
+          	  from="*.el" 
+          	  to="${build.dir}/gnu/jemacs/lisp/*.class"/>
           <srcfiles refid="jemacs-el"/>
         </uptodate>
       </and>

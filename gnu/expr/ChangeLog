@@ -1,5 +1,16 @@
 2005-06-02  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (cpature): If we have a context, we don't
+	need to capture it - just mark it non-Simple.
+	* ModuleInfo.java *getModuleExp): Inline from ModuleExp.make.
+	(setupModuleExp, findFromInstance): New methods.
+	(makeDeclInModule1, makeDeclInModule1): New methods, moved over from
+	kawa.standard.require.
+	(makeDeclInModule1): Don't need to setCapturedScope of Macro.
+	* ModuleExp.java (info): New field.
+	(make(String), make(ClassType)): Remove no-longer-needed methods.
+	(firstDecl): Simplify - just use setupModuleExp.
+
 	* ScopeExp.java (getDefine): Simplify by emitting two diagnostic
 	messages on redefinition, since errors are no longer sorted.
 

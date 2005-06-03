@@ -33,23 +33,6 @@ public class ModuleExp extends LambdaExp
   {
   }
 
-  public static ModuleExp make (String name)
-  {
-    ModuleExp mexp = new ModuleExp();
-    mexp.setName(name);
-    mexp.flags |= LAZY_DECLARATIONS;
-    return mexp;
-  }
-
-  public static ModuleExp make (ClassType type)
-  {
-    ModuleExp mexp = new ModuleExp();
-    mexp.type = type;
-    mexp.setName(type.getName());
-    mexp.flags |= LAZY_DECLARATIONS;
-    return mexp;
-  }
-
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
 
@@ -283,6 +266,8 @@ public class ModuleExp extends LambdaExp
   ClassType superType;
   ClassType[] interfaces;
 
+  ModuleInfo info;
+
   public final ClassType getSuperType() { return superType; }
   public final void setSuperType(ClassType s) { superType = s; }
   public final ClassType[] getInterfaces() { return interfaces; }
@@ -387,13 +372,7 @@ public class ModuleExp extends LambdaExp
     synchronized (this)
       {
 	if (getFlag(LAZY_DECLARATIONS))
-	  {
-	    if (type == null)
-	      type = ClassType.make(getName());
-            ModuleInfo info = ModuleInfo.find(type.getName());
-	    kawa.standard.require.makeModule(this, type, info.instance);
-	    flags &= ~LAZY_DECLARATIONS;
-	  }
+          info.setupModuleExp();
       }
     return decls;
   }

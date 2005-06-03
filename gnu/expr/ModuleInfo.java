@@ -1,6 +1,9 @@
 package gnu.expr;
 import gnu.mapping.*;
-import gnu.bytecode.ClassType;
+import gnu.bytecode.*;
+import kawa.lang.Syntax; // FIXME
+import gnu.mapping.Location;
+import gnu.kawa.reflect.FieldLocation;
 
 public class ModuleInfo
 {
@@ -20,14 +23,70 @@ public class ModuleInfo
         ClassType ctype
           = (instance == null ? ClassType.make(className)
              : (ClassType) ClassType.make(instance.getClass()));
-        m = ModuleExp.make(ctype);
+        m = new ModuleExp();
+        m.type = ctype;
+        m.setName(ctype.getName());
+        m.flags |= ModuleExp.LAZY_DECLARATIONS;
+        m.info = this;
         exp = m;
       }
     return m;
   }
 
+  /** If module has LAZY_DECLARATIONS, fix that. */
+  public synchronized ModuleExp setupModuleExp ()
+  {
+    ModuleExp mod = getModuleExp();
+    if ((mod.flags & ModuleExp.LAZY_DECLARATIONS) == 0)
+      return mod;
+    mod.setFlag(false, ModuleExp.LAZY_DECLARATIONS);
+    ClassType type = ClassType.make(className);
+    Object instance = null;
+
+    Language language = Language.getDefaultLanguage();
+    Class rclass = type.getReflectClass();
+    for (Field fld = type.getFields();  fld != null;  fld = fld.getNext())
+      {
+	int flags = fld.getFlags();
+	if ((flags & Access.PUBLIC) == 0)
+	  continue;
+	try
+	  {
+            if ((flags & Access.STATIC) == 0 && instance == null)
+              instance = getInstance();
+            Object fvalue = rclass.getField(fld.getName()).get(instance);
+            Declaration fdecl = makeDeclInModule1(mod, fvalue, fld, language);
+	  }
+	catch (Exception ex)
+	  {
+	    throw new WrappedException(ex);
+	  }
+      }
+
+    for (Declaration fdecl = mod.firstDecl();
+         fdecl != null;  fdecl = fdecl.nextDecl())
+      {
+        makeDeclInModule2(mod, fdecl);
+      }
+    return mod;
+  }
+
+  public static ModuleInfo findFromInstance (Object instance)
+  {
+    ModuleInfo info = find(instance.getClass().getName());
+    info.instance = instance;
+    return info;
+  }
+
   public static ModuleInfo find (String className)
   {
+    // A possibly better interface:  FIXME
+    // Use a ModuleManager.  The current MonduleManager is accessed
+    // via a parameter object (fluid binding).  The ModuleManager is
+    // basically just a hashtable - though it could optionally support
+    // inheritance.  Which behaviour is right depends on how we want
+    // threads to inherit modules.
+
     Environment env = Environment.getCurrent();
     Symbol sym = Namespace.EmptyNamespace.getSymbol(className);
     synchronized (env)
@@ -95,5 +154,89 @@ public class ModuleInfo
     if (inst instanceof Runnable)
       ((Runnable) inst).run();
     return inst;
+  }
+
+
+  static Declaration makeDeclInModule1 (ModuleExp mod, Object fvalue,
+					       Field fld, Language language)
+  {
+    String fname = fld.getName();
+    Type ftype = fld.getType();
+    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
+    Object fdname;
+    // FIXME if fvalue is FieldLocation, and field is final,
+    // get name from value of field.
+    boolean isImportedInstance;
+    if ((isImportedInstance = fname.endsWith("$instance")))
+      fdname = fname;
+    else if (fvalue instanceof Named) // && ! isAlias
+      fdname = ((Named) fvalue).getSymbol();
+    else
+      {
+	// FIXME move this to demangleName
+	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+	fdname = Compilation.demangleName(fname, true).intern();
+      }
+    Type dtype = isAlias ? Type.pointer_type
+      : language.getTypeFor(ftype.getReflectClass());
+    Declaration fdecl = mod.addDeclaration(fdname, dtype);
+    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
+    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
+    if (isAlias)
+      fdecl.setIndirectBinding(true);
+    else if (isFinal && ftype.isSubtype(Compilation.typeProcedure))
+      fdecl.setProcedureDecl(true);
+    if (isStatic)
+      fdecl.setFlag(Declaration.STATIC_SPECIFIED);
+    fdecl.field = fld; 
+    if (isFinal && ! isAlias) // FIXME? ok for location?
+      fdecl.setFlag(Declaration.IS_CONSTANT);
+    if (isImportedInstance)
+      fdecl.setFlag(Declaration.MODULE_REFERENCE);
+    fdecl.setSimple(false);
+    if (isFinal && fvalue instanceof Syntax) // FIXME - should check type? not value?
+      fdecl.setSyntax();
+    if (isFinal
+        && (! (fvalue instanceof gnu.mapping.Location)
+            || fvalue instanceof FieldLocation))
+      fdecl.noteValue(new QuoteExp(fvalue));
+    else
+      fdecl.noteValue(null);
+    return fdecl;
+  }
+
+  static void makeDeclInModule2 (ModuleExp mod, Declaration fdecl)
+  {
+    Object fvalue = fdecl.getConstantValue();
+    if (fvalue instanceof FieldLocation)
+      {
+	FieldLocation floc = (FieldLocation) fvalue;
+        Declaration vdecl = floc.getDeclaration();
+        ReferenceExp fref = new ReferenceExp(vdecl);
+        fdecl.setAlias(true);
+        if (floc.isIndirectLocation())
+          fref.setDontDereference(true);
+        fdecl.setValue(fref);
+        if (vdecl.isProcedureDecl())
+          fdecl.setProcedureDecl(true);
+        if (vdecl.getFlag(Declaration.IS_SYNTAX))
+          fdecl.setSyntax();
+        if (! fdecl.getFlag(Declaration.STATIC_SPECIFIED))
+          {
+            ClassType vtype = floc.getDeclaringClass();
+            String vname = vtype.getName();
+            for (Declaration xdecl = mod.firstDecl();
+                 xdecl != null;  xdecl = xdecl.nextDecl())
+              {
+                if (vname.equals(xdecl.getType().getName())
+                    && xdecl.getFlag(Declaration.MODULE_REFERENCE))
+                  {
+                    fref.setContextDecl(xdecl);
+                    break;
+                  }
+              }
+          }
+      }
   }
 }

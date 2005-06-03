@@ -376,7 +376,7 @@ public class FindCapturedVars extends ExpWalker
 	  }
       }
     if (containing != null && decl.needsContext())
-      capture(containing);
+      containing.setSimple(false);
     else
       capture(decl);
   }

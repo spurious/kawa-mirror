@@ -5,6 +5,8 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Field;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
@@ -536,6 +538,46 @@ public abstract class Language
 	return ((ClassExp) exp).getType();
       }
     return null;
+  }
+
+  public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)
+  {
+    String fname = fld.getName();
+    Type ftype = fld.getType();
+    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
+    Object fdname;
+    // FIXME if fvalue is FieldLocation, and field is final,
+    // get name from value of field.
+    boolean isImportedInstance;
+    if ((isImportedInstance = fname.endsWith("$instance")))
+      fdname = fname;
+    else if (fvalue instanceof Named) // && ! isAlias
+      fdname = ((Named) fvalue).getSymbol();
+    else
+      {
+	// FIXME move this to demangleName
+	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+	fdname = Compilation.demangleName(fname, true).intern();
+      }
+    Type dtype = isAlias ? Type.pointer_type
+      : getTypeFor(ftype.getReflectClass());
+    Declaration fdecl = mod.addDeclaration(fdname, dtype);
+    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
+    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
+    if (isAlias)
+      fdecl.setIndirectBinding(true);
+    else if (isFinal && ftype.isSubtype(Compilation.typeProcedure))
+      fdecl.setProcedureDecl(true);
+    if (isStatic)
+      fdecl.setFlag(Declaration.STATIC_SPECIFIED);
+    fdecl.field = fld; 
+    if (isFinal && ! isAlias) // FIXME? ok for location?
+      fdecl.setFlag(Declaration.IS_CONSTANT);
+    if (isImportedInstance)
+      fdecl.setFlag(Declaration.MODULE_REFERENCE);
+    fdecl.setSimple(false);
+    return fdecl;
   }
 
   /** Used when defining a namespace alias (prefix), in the XML sense.

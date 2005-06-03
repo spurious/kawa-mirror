@@ -1,7 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import kawa.lang.Syntax; // FIXME
 import gnu.mapping.Location;
 import gnu.kawa.reflect.FieldLocation;
 
@@ -55,7 +54,14 @@ public class ModuleInfo
             if ((flags & Access.STATIC) == 0 && instance == null)
               instance = getInstance();
             Object fvalue = rclass.getField(fld.getName()).get(instance);
-            Declaration fdecl = makeDeclInModule1(mod, fvalue, fld, language);
+
+            Declaration fdecl = language.declFromField(mod, fvalue, fld);
+            if ((flags & Access.FINAL) != 0
+                && (! (fvalue instanceof gnu.mapping.Location)
+                    || fvalue instanceof FieldLocation))
+              fdecl.noteValue(new QuoteExp(fvalue));
+            else
+              fdecl.noteValue(null);
 	  }
 	catch (Exception ex)
 	  {
@@ -154,56 +160,6 @@ public class ModuleInfo
     if (inst instanceof Runnable)
       ((Runnable) inst).run();
     return inst;
-  }
-
-
-  static Declaration makeDeclInModule1 (ModuleExp mod, Object fvalue,
-					       Field fld, Language language)
-  {
-    String fname = fld.getName();
-    Type ftype = fld.getType();
-    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-    Object fdname;
-    // FIXME if fvalue is FieldLocation, and field is final,
-    // get name from value of field.
-    boolean isImportedInstance;
-    if ((isImportedInstance = fname.endsWith("$instance")))
-      fdname = fname;
-    else if (fvalue instanceof Named) // && ! isAlias
-      fdname = ((Named) fvalue).getSymbol();
-    else
-      {
-	// FIXME move this to demangleName
-	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
-	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
-	fdname = Compilation.demangleName(fname, true).intern();
-      }
-    Type dtype = isAlias ? Type.pointer_type
-      : language.getTypeFor(ftype.getReflectClass());
-    Declaration fdecl = mod.addDeclaration(fdname, dtype);
-    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
-    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
-    if (isAlias)
-      fdecl.setIndirectBinding(true);
-    else if (isFinal && ftype.isSubtype(Compilation.typeProcedure))
-      fdecl.setProcedureDecl(true);
-    if (isStatic)
-      fdecl.setFlag(Declaration.STATIC_SPECIFIED);
-    fdecl.field = fld; 
-    if (isFinal && ! isAlias) // FIXME? ok for location?
-      fdecl.setFlag(Declaration.IS_CONSTANT);
-    if (isImportedInstance)
-      fdecl.setFlag(Declaration.MODULE_REFERENCE);
-    fdecl.setSimple(false);
-    if (isFinal && fvalue instanceof Syntax) // FIXME - should check type? not value?
-      fdecl.setSyntax();
-    if (isFinal
-        && (! (fvalue instanceof gnu.mapping.Location)
-            || fvalue instanceof FieldLocation))
-      fdecl.noteValue(new QuoteExp(fvalue));
-    else
-      fdecl.noteValue(null);
-    return fdecl;
   }
 
   static void makeDeclInModule2 (ModuleExp mod, Declaration fdecl)

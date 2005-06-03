@@ -6,9 +6,12 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.text.*;
 import gnu.lists.*;
+import gnu.bytecode.Access;
+import gnu.bytecode.Field;
 import gnu.mapping.EnvironmentKey;
 import gnu.kawa.reflect.StaticFieldLocation;
 import kawa.lang.Translator; // FIXME
+import kawa.lang.Syntax; // FIXME
 
 /** Language sub-class for Lisp-like languages (including Scheme). */
 
@@ -66,6 +69,15 @@ public abstract class LispLanguage extends Language
         Compilation.setCurrent(save_comp);
       }
     return tr;
+  }
+
+  public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)
+  {
+    Declaration fdecl = super.declFromField(mod, fvalue, fld);
+    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
+    if (isFinal && fvalue instanceof Syntax) // FIXME - should check type? not value?
+      fdecl.setSyntax();
+    return fdecl;
   }
 
   /** Declare in the current Environment a Syntax bound to a static field.

@@ -20,6 +20,7 @@ public class ProcessMode extends Mode
   {
     modeMap.defineKey("\n", enterAction);
     modeMap.defineKey("\r", enterAction);
+    modeMap.defineKey("enter", enterAction);
     modeMap.defineKey("return", enterAction);
     Object insert = new ProcessInsertCommand();
     //    modeMap.setDefaultBinding(insert);

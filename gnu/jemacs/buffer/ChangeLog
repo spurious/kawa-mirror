@@ -1,3 +1,7 @@
+2005-06-04  Per Bothner  <per@bothner.com>
+
+	* ProcessMode.java (<clinit>):  Also map 'enter key to enterAction.
+
 2005-05-18  Christian Surlykke <christian@surlykke.dk> 
 
 	* EKeymap.java: (getKeyForName): Map "return" to '\r' rather than '\n'.

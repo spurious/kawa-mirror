@@ -14,9 +14,6 @@ implements CharSeq, Externalizable, Consumable
   /* #ifdef JAVA2 */
   , Comparable
   /* #endif */
-  /* #ifdef JAVA5 */
-  // , Appendable
-  /* #endif */
 {
   public char[] data;
   protected static char[] empty = new char[0];

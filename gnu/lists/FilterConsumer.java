@@ -5,7 +5,8 @@ package gnu.lists;
 
 /** A Consumer that wraps some other Consumer. */
 
-public class FilterConsumer implements Consumer
+public class FilterConsumer
+  implements Consumer
 {
   protected Consumer base;
   protected boolean skipping;
@@ -109,4 +110,27 @@ public class FilterConsumer implements Consumer
     if (! skipping)
       base.write(buf, off, len);
   }
+
+  /* #ifdef JAVA5 */
+  // public Consumer append (char c)
+  // {
+  //   if (! skipping)
+  //     base.append(c);
+  //   return this;
+  // }
+
+  // public Consumer append (CharSequence csq)
+  // {
+  //   if (! skipping)
+  //     base.append(csq);
+  //   return this;
+  // }
+
+  // public Consumer append (CharSequence csq, int start, int end)
+  // {
+  //   if (! skipping)
+  //     base.append(csq, start, end);
+  //   return this;
+  // }
+  /* #endif */
 }

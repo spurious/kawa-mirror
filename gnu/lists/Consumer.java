@@ -14,6 +14,9 @@ package gnu.lists;
  */
 
 public interface Consumer
+  /* #ifdef JAVA5 */
+  // extends Appendable
+  /* #endif */
 {
 	public void writeChar(int v);
 	public void writeBoolean(boolean v);
@@ -44,6 +47,12 @@ public interface Consumer
 	public void writeChars(String str);
 	// public void writeChars(AbstractString str);
 	public void write(char[] buf, int off, int len);
+
+	/* #ifdef JAVA5 */
+	// public Consumer append (char c);
+	// public Consumer append (CharSequence csq);
+	// public Consumer append (CharSequence csq, int start, int end);
+	/* #endif */
 }
 
 // This is for people using the Emacs editor:

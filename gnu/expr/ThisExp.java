@@ -29,7 +29,7 @@ public class ThisExp extends ReferenceExp
   {
     if (isForContext())
       return context;
-  return super.eval(env);
+    return super.eval(env);
   }
 
   public ScopeExp getContextScope () { return context; }

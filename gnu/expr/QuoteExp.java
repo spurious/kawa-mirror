@@ -60,6 +60,11 @@ public class QuoteExp extends Expression
     return walker.walkQuoteExp(this);
   }
 
+  public String toString ()
+  {
+    return "QuoteExp["+value+"]";
+  }
+
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Quote", ")", 2);

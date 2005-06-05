@@ -7,7 +7,7 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.*;
 import gnu.commonlisp.lang.*;
-import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.util.AbstractFormat;
 
 public class ELisp extends Lisp2
 {
@@ -192,10 +192,10 @@ public class ELisp extends Lisp2
     return ELispReader.readObject(in);
   }
 
-  static final DisplayFormat writeFormat = new Print(true);
-  static final DisplayFormat displayFormat = new Print(false);
+  static final AbstractFormat writeFormat = new Print(true);
+  static final AbstractFormat displayFormat = new Print(false);
 
-  public FormatToConsumer getFormat(boolean readable)
+  public AbstractFormat getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;
   }

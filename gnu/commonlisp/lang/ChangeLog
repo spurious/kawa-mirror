@@ -1,3 +1,7 @@
+2005-06-04  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (writeFormat, displayFormat): Change type.
+
 2005-05-08  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java: Keep environ field set to clispEnvironment.

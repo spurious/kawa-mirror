@@ -10,6 +10,7 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.util.AbstractFormat;
 import gnu.kawa.lispexpr.ReadTable;
 
 public class CommonLisp extends Lisp2
@@ -153,10 +154,10 @@ public class CommonLisp extends Lisp2
     return CLispReader.readObject(in);
   }
 
-  static final DisplayFormat writeFormat = new DisplayFormat(true, 'C');
-  static final DisplayFormat displayFormat = new DisplayFormat(false, 'C');
+  static final AbstractFormat writeFormat = new DisplayFormat(true, 'C');
+  static final AbstractFormat displayFormat = new DisplayFormat(false, 'C');
 
-  public FormatToConsumer getFormat(boolean readable)
+  public AbstractFormat getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;
   }

@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
 import gnu.math.IntNum;
+import gnu.kawa.util.AbstractFormat;
 
 /** The XQuery language. */
 
@@ -622,7 +623,7 @@ public class XQuery extends Language
 
   public static final XMLFormat writeFormat = new XMLFormat();
 
-  public FormatToConsumer getFormat(boolean readable)
+  public AbstractFormat getFormat(boolean readable)
   {
     return writeFormat;
   }

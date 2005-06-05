@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.mapping.*;
 import kawa.standard.Scheme;
-import gnu.lists.FormatToConsumer;
+import gnu.kawa.util.AbstractFormat;
 
 public class ObjectFormat extends ReportFormat
 {
@@ -58,11 +58,11 @@ public class ObjectFormat extends ReportFormat
 			     boolean readable)
   {
     boolean saveReadable = out.printReadable;
-    FormatToConsumer saveFormat = out.objectFormat;
+    AbstractFormat saveFormat = out.objectFormat;
     try
       {
 	out.printReadable = readable;
-	DisplayFormat format
+	AbstractFormat format
 	  = readable ? Scheme.writeFormat : Scheme.displayFormat;
 	out.objectFormat = format;
 	format.writeObject(obj, (gnu.lists.Consumer) out);

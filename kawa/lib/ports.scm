@@ -125,6 +125,14 @@
 (define (char-ready? #!optional (port (current-input-port)))
   (invoke-static <kawa.standard.char_ready_p> 'ready port))
 
+(define (write value #!optional (out (current-output-port))) :: <void>
+  (invoke (static-field <kawa.standard.Scheme> 'writeFormat)
+	  'format value out))
+
+(define (display value #!optional (out (current-output-port))) :: <void>
+  (invoke (static-field <kawa.standard.Scheme> 'displayFormat)
+	  'format value out))
+
 (define (input-port-read-state port)
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))

@@ -343,8 +343,8 @@ public class Scheme extends LispLanguage
       defProcStFld("peek-char", "kawa.standard.readchar", "peekChar");
       defProcStFld("eof-object?", "kawa.lib.ports");
       defProcStFld("char-ready?", "kawa.lib.ports");
-      defProcStFld("write", "kawa.standard.Scheme", "writeFormat");
-      defProcStFld("display", "kawa.standard.Scheme", "displayFormat");
+      defProcStFld("write", "kawa.lib.ports");
+      defProcStFld("display", "kawa.lib.ports");
       defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       defProcStFld("write-char", "kawa.lib.ports");
       defProcStFld("newline", "kawa.lib.ports");
@@ -838,9 +838,6 @@ public class Scheme extends LispLanguage
 
   public static final DisplayFormat writeFormat = new DisplayFormat(true, 'S');
   public static final DisplayFormat displayFormat = new DisplayFormat(false, 'S');
-  static { writeFormat.setName("write"); }
-  static { displayFormat.setName("display"); }
-
   public FormatToConsumer getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;

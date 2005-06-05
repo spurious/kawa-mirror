@@ -1,8 +1,10 @@
 package gnu.kawa.util;
 import gnu.mapping.*;
 import gnu.lists.*;
+import java.text.FieldPosition;
 
-public abstract class AbstractFormat extends Procedure1or2 implements FormatToConsumer
+public abstract class AbstractFormat extends java.text.Format
+  implements FormatToConsumer
 {
   protected void write(String str, Consumer out)
   {
@@ -15,6 +17,21 @@ public abstract class AbstractFormat extends Procedure1or2 implements FormatToCo
   public void writeChar(int v, Consumer out)
   {
     out.writeChar(v);
+  }
+
+  /** Write a long.
+   * The default is to call writeLong on teh Consumer. */
+  public void writeLong(long v, Consumer out)
+  {
+    out.writeLong(v);
+  }
+
+  /** Write an int.
+   * The default is to call writeLong, so sub-classes only need to
+   * override the latter. */
+  public void writeInt(int i, Consumer out)
+  {
+    writeLong(i, out);
   }
 
   public void writeBoolean(boolean v, Consumer out)
@@ -31,18 +48,6 @@ public abstract class AbstractFormat extends Procedure1or2 implements FormatToCo
   public void endGroup(String typeName, Consumer out)
   {
     write(")", out);
-  }
-
-  public Object apply1 (Object arg1)
-  {
-    format (arg1, OutPort.outDefault());
-    return Values.empty;
-  }
-
-  public Object apply2 (Object arg1,Object arg2)
-  {
-    format (arg1, (Consumer) arg2); 
-    return Values.empty;
   }
 
   public void format (Object value, Consumer out)
@@ -80,5 +85,19 @@ public abstract class AbstractFormat extends Procedure1or2 implements FormatToCo
 	writeObject(obj, (Consumer) out);
 	port.close();
       }
+  }
+
+  public StringBuffer format(Object val, StringBuffer sbuf, FieldPosition fpos)
+  {
+    CharArrayOutPort out = new CharArrayOutPort();
+    writeObject(val, out);
+    sbuf.append(out.toCharArray());
+    return sbuf;
+  }
+
+  public Object parseObject(String text, java.text.ParsePosition status)
+  {
+    throw new Error(this.getClass().getName()
+                    + ".parseObject - not implemented");
   }
 }

@@ -1,3 +1,13 @@
+2005-06-04  Per Bothner  <per@bothner.com>
+
+	* AbstractFormat.java: Change to extend java.text.Format
+	rather than Procedure1or2.
+	(apply1, apply2): Remove methods.
+	(format(Object,StringBuffer,FieldPosition)): New method, for Format.
+	(parseObject): New stub method.
+
+	* AbstractFormat.java (writeLong, writeInt): New methods.
+
 2005-01-29  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java (main): Predefine "true" and "false" keywords.

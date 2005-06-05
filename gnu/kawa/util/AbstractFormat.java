@@ -4,7 +4,6 @@ import gnu.lists.*;
 import java.text.FieldPosition;
 
 public abstract class AbstractFormat extends java.text.Format
-  implements FormatToConsumer
 {
   protected void write(String str, Consumer out)
   {
@@ -50,12 +49,14 @@ public abstract class AbstractFormat extends java.text.Format
     write(")", out);
   }
 
+  public abstract void writeObject(Object v, Consumer out);
+
   public void format (Object value, Consumer out)
   {
     if (out instanceof OutPort)
       {
 	OutPort pout = (OutPort) out;
-	FormatToConsumer saveFormat = pout.objectFormat;
+	AbstractFormat saveFormat = pout.objectFormat;
 	try
 	  {
 	    pout.objectFormat = this;

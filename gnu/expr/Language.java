@@ -13,6 +13,7 @@ import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.reflect.*;
 import java.io.*;
+import gnu.kawa.util.AbstractFormat;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -372,7 +373,7 @@ public abstract class Language
   {
     if (value == Values.empty)
       return;
-    FormatToConsumer saveFormat = out.objectFormat;
+    AbstractFormat saveFormat = out.objectFormat;
     try
       {
 	out.objectFormat = getFormat(readable);
@@ -391,7 +392,7 @@ public abstract class Language
       }
   }
 
-  public FormatToConsumer getFormat(boolean readable)
+  public AbstractFormat getFormat(boolean readable)
   {
     return null;
   }

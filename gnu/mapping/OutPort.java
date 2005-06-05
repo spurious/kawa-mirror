@@ -2,6 +2,7 @@ package gnu.mapping;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
+import gnu.kawa.util.AbstractFormat;
 
 /**
  * An extended PrintWriter.
@@ -226,7 +227,7 @@ public class OutPort extends PrintConsumer implements Printable
   /** If non-null, use this to print numbers. */
   java.text.NumberFormat numberFormat;
 
-  public FormatToConsumer objectFormat;
+  public AbstractFormat objectFormat;
 
   public void print(char v)
   {

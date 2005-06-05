@@ -1,3 +1,7 @@
+2005-06-04  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (objectFormat): Change type to AbstractFormat.
+
 2005-05-17  Per Bothner  <per@bothner.com>
 
 	* Location.java (make): Return a ThreadLocation.

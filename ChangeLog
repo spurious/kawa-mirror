@@ -1,5 +1,11 @@
 2005-06-04  Per Bothner  <per@bothner.com>
 
+	* kawa/Shell.java (getOutputConsumer): Check for AbstractFormat
+	instead of removed FormatToConsumer.
+	(run): Likewise update types.
+	* kawa/standard/Scheme.java (writeFormat, displayFormat): Change type.
+	(getFormat): Change return type to AbstractFormat.
+
 	* kawa/standard/Scheme.java: Redefine write and display as functions
 	in kawa.lib.ports, since DisplayForm no longer extends Procedure.
 	For same reason, don't call setname on writeFormat and displayFormat.

@@ -5,6 +5,7 @@ import gnu.expr.*;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
+import gnu.kawa.util.AbstractFormat;
 
 /** Utility functions (static methods) for kawa.repl.
  * Should probably be merged with kawa.repl.  FIXME. */
@@ -131,9 +132,9 @@ public class Shell
 	  if (args[i] == portArg)
 	    args[i] = out;
 	Object format = defaultFormatMethod.invoke(null, args);
-	if (format instanceof FormatToConsumer)
+	if (format instanceof AbstractFormat)
 	  {
-	    out.objectFormat = (FormatToConsumer) format;
+	    out.objectFormat = (AbstractFormat) format;
 	    return out;
 	  }
 	else
@@ -163,7 +164,7 @@ public class Shell
 			  InPort inp, OutPort pout, OutPort perr)
   {
     Consumer out;
-    FormatToConsumer saveFormat = null;
+    AbstractFormat saveFormat = null;
     if (pout != null)
       saveFormat = pout.objectFormat;
     out = getOutputConsumer(pout);

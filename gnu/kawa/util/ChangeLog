@@ -1,5 +1,9 @@
 2005-06-04  Per Bothner  <per@bothner.com>
 
+	* AbstractFormat.java: No longer implement FormatToConsumer.
+	(writeObject): New abstract method.
+	(format): Update variable saveFormat to match OutPort's objectFormat.
+
 	* AbstractFormat.java: Change to extend java.text.Format
 	rather than Procedure1or2.
 	(apply1, apply2): Remove methods.

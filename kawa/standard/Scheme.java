@@ -8,7 +8,7 @@ import gnu.expr.*;
 import java.util.Hashtable;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
-import gnu.lists.FormatToConsumer;
+import gnu.kawa.util.AbstractFormat;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.math.Unit;
@@ -836,9 +836,9 @@ public class Scheme extends LispLanguage
     return new ScmRead(inp, messages);
   }
 
-  public static final DisplayFormat writeFormat = new DisplayFormat(true, 'S');
-  public static final DisplayFormat displayFormat = new DisplayFormat(false, 'S');
-  public FormatToConsumer getFormat(boolean readable)
+  public static final AbstractFormat writeFormat = new DisplayFormat(true, 'S');
+  public static final AbstractFormat displayFormat = new DisplayFormat(false, 'S');
+  public AbstractFormat getFormat(boolean readable)
   {
     return readable ? writeFormat : displayFormat;
   }

@@ -8,7 +8,7 @@ import gnu.expr.*;
 import java.util.Hashtable;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
-import gnu.kawa.util.AbstractFormat;
+import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.math.Unit;

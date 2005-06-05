@@ -7,7 +7,6 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.*;
 import gnu.commonlisp.lang.*;
-import gnu.kawa.util.AbstractFormat;
 
 public class ELisp extends Lisp2
 {

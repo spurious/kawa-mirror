@@ -10,7 +10,6 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
-import gnu.kawa.util.AbstractFormat;
 import gnu.kawa.lispexpr.ReadTable;
 
 public class CommonLisp extends Lisp2

@@ -13,7 +13,6 @@ import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.reflect.*;
 import java.io.*;
-import gnu.kawa.util.AbstractFormat;
 import java.lang.reflect.InvocationTargetException;
 
 /**

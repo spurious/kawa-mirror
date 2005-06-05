@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.mapping.*;
 import kawa.standard.Scheme;
-import gnu.kawa.util.AbstractFormat;
+import gnu.lists.AbstractFormat;
 
 public class ObjectFormat extends ReportFormat
 {

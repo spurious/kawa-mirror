@@ -1,6 +1,5 @@
-package gnu.kawa.util;
+package gnu.lists;
 import gnu.mapping.*;
-import gnu.lists.*;
 import java.text.FieldPosition;
 
 public abstract class AbstractFormat extends java.text.Format

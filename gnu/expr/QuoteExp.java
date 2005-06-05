@@ -71,7 +71,7 @@ public class QuoteExp extends Expression
     out.writeSpaceLinear();
     if (value instanceof Expression)
       value = value.toString(); // To avoid cycles.
-    gnu.kawa.util.AbstractFormat saveFormat = out.objectFormat;
+    gnu.lists.AbstractFormat saveFormat = out.objectFormat;
     try
       {
 	out.objectFormat = Language.getDefaultLanguage().getFormat(true);

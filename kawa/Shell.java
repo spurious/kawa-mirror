@@ -5,7 +5,6 @@ import gnu.expr.*;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
-import gnu.kawa.util.AbstractFormat;
 
 /** Utility functions (static methods) for kawa.repl.
  * Should probably be merged with kawa.repl.  FIXME. */

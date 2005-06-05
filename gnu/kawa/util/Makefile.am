@@ -4,7 +4,6 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   ConsumeProc.java \
-  AbstractFormat.java \
   RangeTable.java
 
 PACKAGE_FNAME = gnu-kawa-util

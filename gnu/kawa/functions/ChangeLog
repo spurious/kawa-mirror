@@ -1,5 +1,8 @@
 2005-06-04  Per Bothner  <per@bothner.com>
 
+	* DisplayFormat.java: Update for AbstractFormat move to gnu.lists.
+	* ObjectFormat.java: Likewise.
+
 	* ObjectFormat.java (print): Update to match OutPort's objectFormat.: 
 
 2005-04-03  Per Bothner  <per@bothner.com>

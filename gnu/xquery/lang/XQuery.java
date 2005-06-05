@@ -18,7 +18,6 @@ import java.io.Reader;
 import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
 import gnu.math.IntNum;
-import gnu.kawa.util.AbstractFormat;
 
 /** The XQuery language. */
 

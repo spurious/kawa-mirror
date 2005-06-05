@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  AbstractFormat.java \
   AbstractSequence.java \
   Array.java \
   AttributePredicate.java \

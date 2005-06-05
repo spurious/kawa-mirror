@@ -1,7 +1,6 @@
 package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.text.Char;
-import gnu.kawa.util.AbstractFormat;
 
 /** A format that prints in XML syntax.
  * This may be a bad idea - maybe we should just use XMLConsumer.

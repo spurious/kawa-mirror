@@ -2,7 +2,6 @@ package gnu.mapping;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
-import gnu.kawa.util.AbstractFormat;
 
 /**
  * An extended PrintWriter.

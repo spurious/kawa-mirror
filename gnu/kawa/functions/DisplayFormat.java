@@ -6,7 +6,6 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.PrintWriter;
 import gnu.text.Char;
-import gnu.kawa.util.AbstractFormat;
 
 /** Handle formatted output for Lisp-like languages. */
 

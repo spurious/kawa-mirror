@@ -20,7 +20,6 @@ java_sources = \
   F32Vector.java \
   F64Vector.java \
   FilterConsumer.java \
-  FormatToConsumer.java \
   FString.java \
   FVector.java \
   GapVector.java \

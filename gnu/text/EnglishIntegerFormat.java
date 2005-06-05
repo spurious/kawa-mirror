@@ -3,7 +3,7 @@ import java.text.FieldPosition;
 import gnu.lists.*;
 
 public class EnglishIntegerFormat extends java.text.NumberFormat
-// implements FormatToConsumer
+// or extends AbstractFormat?
 {
   private static EnglishIntegerFormat cardinalEnglish;
   private static EnglishIntegerFormat ordinalEnglish;

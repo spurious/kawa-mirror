@@ -84,7 +84,7 @@
   (gnu.kawa.models.WithTransform:new pic transform))
 
 (define-constant color-red :: <java.awt.Color>
-  (static-field <java.awt.Color> 'RED))
+  (static-field <java.awt.Color> 'red))
 
 (define-private (frame-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
 			       (name :: <java.lang.String>)

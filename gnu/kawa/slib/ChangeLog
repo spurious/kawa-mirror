@@ -1,3 +1,8 @@
+2005-06-06   Robert D. Skeels <athene@earthlink.net>
+
+	* gui.scm (color-red): Use 'red rather than 'RED, since former is
+	portable to older JDK versions.
+
 2005-04-11  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: gui.scm needs both --with-swing and --enable-xml.

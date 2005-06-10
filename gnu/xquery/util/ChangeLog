@@ -1,3 +1,21 @@
+2005-06-09  Per Bothner  <per@bothner.com>
+
+	* StringValue.java (stringValue): null or #!void append nothing.
+	(lowerCase, upperCase, substring, stringLength, substringBefore,
+	substringAfter, translate, stringPad, contains, startsWith, endWith,
+	stringJoin): Don't return empty on empty input string; instead return
+	the empty string, usually taken care of by stringValue.
+	(substring, stringLength, substringBefore, substringAfter, translate,
+	startsWith, stringJoin): Convert to String using stringvalue, not
+	toString.
+	(contains, startsWith, endsWith, substringAfter): Remove redundant
+	comparisons.
+	(substringBefore): Fix off-by-one error.
+	(translate): Re-do StringBuffer construction to append each character,
+	rather than modify/delete characters.
+	(stringPad): Throw exception on error instead of printing.
+	Also, improve StringBuffer allocation.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* XMLFormat.java: Update for AbstractFormat move to gnu.lists.

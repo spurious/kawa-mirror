@@ -393,15 +393,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    ClassType mclass;
-    if (method == null)
-      mclass = null;
-    else
-      {
-	mclass = method.getDeclaringClass();
-	comp.usedClass(mclass);
-	comp.usedClass(method.getReturnType());
-      }
+    ClassType mclass = method == null ? null :  method.getDeclaringClass();
 
     // invokespecial == primitive-constructor
     if (opcode() == 183 && ! is_special) 
@@ -429,15 +421,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
     if (method == null)
       code.emitPrimop (opcode(), args.length, retType);
-    else if (! takesContext())
-      code.emitInvokeMethod(method, opcode());
     else
       {
-	comp.loadCallContext();
-	if (target instanceof IgnoreTarget
+	comp.usedClass(method.getDeclaringClass());
+	comp.usedClass(method.getReturnType());
+        if (! takesContext())
+          code.emitInvokeMethod(method, opcode());
+	else if (target instanceof IgnoreTarget
 	    || (target instanceof ConsumerTarget
 		&& ((ConsumerTarget) target).isContextTarget()))
 	  {
+            comp.loadCallContext();
 	    code.emitInvokeMethod(method, opcode());
 	    if (! exp.isTailCall())
 	      {
@@ -449,6 +443,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  }
 	else
 	  {
+            comp.loadCallContext();
 	    stackType = Type.pointer_type;
 	    code.pushScope();
 	    Variable saveIndex = code.addLocal(Type.int_type);

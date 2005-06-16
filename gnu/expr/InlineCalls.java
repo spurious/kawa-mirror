@@ -137,6 +137,46 @@ public class InlineCalls extends ExpWalker
 						  args_length);
 	if (msg != null)
 	  return noteError(msg);
+
+        int conv = lambda.getCallConvention();
+        Method method;
+	if (comp.inlineOk(lambda)  && lambda.isClassMethod()
+	    && (conv <= Compilation.CALL_WITH_CONSUMER
+		|| (conv == Compilation.CALL_WITH_TAILCALLS))
+	    && (method = lambda.getMethod(args_length)) != null)
+	  {
+            // This is an optimization to expand a call to a method in the
+            // same ClassExp.  The result is a call to a PrimProcedure instead.
+            // This isn't just an optimization, since the re-write is
+            // needed to ensure that if we're in an inner lambda that the
+            // $this$ declaration is captured in a closure.
+	    PrimProcedure mproc = new PrimProcedure(method, lambda);
+            Expression[] margs;
+            if (mproc.getStaticFlag())
+              margs = exp.args;
+            else
+              {
+                LambdaExp curLambda = getCurrentLambda();
+                for (;;)
+                  {
+                    if (curLambda == null)
+                      return noteError("internal error: missing "+lambda);
+                    if (curLambda.outer == lambda.outer) // I.e. same class.
+                      break;
+                    curLambda = curLambda.outerLambda();
+                  }
+                Declaration d = curLambda.firstDecl();
+                if (d==null || ! d.isThisParameter())
+                  return noteError("calling non-static method "
+                                   +lambda.getName()+" from static method "
+                                   +curLambda.getName());
+                margs = new Expression[1 + nargs];
+                System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+                margs[0] = new ThisExp(d);
+              }
+            ApplyExp nexp = new ApplyExp(mproc, margs);
+            return nexp.setLine(exp);
+          }
       }
     return exp;
   }

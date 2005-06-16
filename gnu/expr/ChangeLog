@@ -1,3 +1,9 @@
+2005-06-15  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkApplyExp): Optimize call to method in same
+	ClassExp.  This fix a bug when $this$ isn't captured.
+	Fixes bug reported by Dean Ferreyra 06-09.
+
 2005-06-11  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java: Use calls to usedType from one compile method,

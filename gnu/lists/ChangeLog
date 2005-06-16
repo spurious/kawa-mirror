@@ -1,3 +1,7 @@
+2005-06-15  Per Bothner  <per@bothner.com>
+
+	* SeqPosition.java (nextElement): Remove redundant throws specifier.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java: Moved from gnu.kawa.util.

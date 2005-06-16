@@ -191,7 +191,6 @@ implements
 
   /** See java.util.Enumeration. */
   public final Object nextElement()
-    throws NoSuchElementException
   {
     return next();
   }

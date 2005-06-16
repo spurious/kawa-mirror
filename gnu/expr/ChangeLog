@@ -1,5 +1,11 @@
 2005-06-15  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (addMethodFor): If nested in a ClassExp, add method
+	to that class.  Fixes a verification error if it references a private.
+	* Compilation.java (generateApplyMethodsWithContext): Tweak argument
+	count calculation and pushing this for above case.
+	(generateApplyMethodsWithoutContext): Likewise.
+
 	* InlineCalls.java (walkApplyExp): Optimize call to method in same
 	ClassExp.  This fix a bug when $this$ isn't captured.
 	Fixes bug reported by Dean Ferreyra 06-09.

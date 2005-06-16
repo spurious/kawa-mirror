@@ -693,8 +693,16 @@ public class LambdaExp extends ScopeExp
 
   void addMethodFor (Compilation comp, ObjectType closureEnvType)
   {
-    LambdaExp heapLambda = getOwningLambda();
-    ClassType ctype = heapLambda.getHeapFrameType();
+    ScopeExp sc = this;
+    while (sc != null && ! (sc instanceof ClassExp))
+      sc = sc.outer;
+    ClassType ctype;
+    // If this is nested inside a Class, then create the method in that
+    // class - in case it references a private field/method.
+    if (sc != null)
+      ctype = ((ClassExp) sc).instanceType;
+    else
+      ctype = getOwningLambda().getHeapFrameType();
     addMethodFor(ctype, comp, closureEnvType);
   }
 

@@ -1421,9 +1421,7 @@ public class Compilation
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
-	    int nargs = primArgTypes.length;
-	    int singleArgs = varArgs ? (nargs - 1) : nargs;
-	    singleArgs--;  // Don't count CallContext argument.
+	    int singleArgs = source.min_args+methodIndex;
 	    Variable counter = null;
 	    int pendingIfEnds = 0;
 
@@ -1441,7 +1439,9 @@ public class Compilation
 	      }
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
-	    if (needsThis > 0)
+	    if (needsThis > 0
+                // The following is true if there is frame parameter.
+                || singleArgs + 1 < primArgTypes.length)
 	      {
 		code.emitPushThis();
 		if (curClass == moduleClass && mainClass != moduleClass)
@@ -1620,8 +1620,7 @@ public class Compilation
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
-	    int nargs = primArgTypes.length;
-	    int singleArgs = varArgs ? (nargs - 1) : nargs;
+	    int singleArgs = source.min_args+methodIndex;
 	    Variable counter = null;
 	    int pendingIfEnds = 0;
 
@@ -1639,7 +1638,9 @@ public class Compilation
 	      }
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
-	    if (needsThis > 0)
+	    if (needsThis > 0
+                // The following is true if there is frame parameter.
+                || singleArgs < primArgTypes.length)
 	      {
 		code.emitPushThis();
 		if (curClass == moduleClass && mainClass != moduleClass)

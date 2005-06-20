@@ -1439,9 +1439,9 @@ public class Compilation
 	      }
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
-	    if (needsThis > 0
-                // The following is true if there is frame parameter.
-                || singleArgs + 1 < primArgTypes.length)
+            int explicitFrameArg
+              = singleArgs + (varArgs ? 2 : 1) < primArgTypes.length ? 1 : 0;
+	    if (needsThis + explicitFrameArg > 0)
 	      {
 		code.emitPushThis();
 		if (curClass == moduleClass && mainClass != moduleClass)
@@ -1482,7 +1482,7 @@ public class Compilation
 
 	    if (varArgs)
 	      {
-		Type lastArgType = primArgTypes[singleArgs];
+		Type lastArgType = primArgTypes[explicitFrameArg+singleArgs];
 		if (lastArgType instanceof ArrayType)
 		  {
 		    Type elType
@@ -1638,9 +1638,9 @@ public class Compilation
 	      }
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
-	    if (needsThis > 0
-                // The following is true if there is frame parameter.
-                || singleArgs < primArgTypes.length)
+            int explicitFrameArg
+              = singleArgs + (varArgs ? 1 : 0) < primArgTypes.length ? 1 : 0;
+	    if (needsThis + explicitFrameArg > 0)
 	      {
 		code.emitPushThis();
 		if (curClass == moduleClass && mainClass != moduleClass)
@@ -1682,7 +1682,7 @@ public class Compilation
 
 	    if (varArgs)
 	      {
-		Type lastArgType = primArgTypes[singleArgs];
+		Type lastArgType = primArgTypes[explicitFrameArg+singleArgs];
 		if (lastArgType instanceof ArrayType)
 		  {
 		    Type elType

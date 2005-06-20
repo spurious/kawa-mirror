@@ -1,3 +1,9 @@
+2005-06-19  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateApplyMethodsWithContext): More carefully
+	calculate method arguments to fix reported problems.
+	(generateApplyMethodsWithoutContext): Likewise.
+
 2005-06-15  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor): If nested in a ClassExp, add method

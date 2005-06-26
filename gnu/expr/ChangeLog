@@ -1,3 +1,8 @@
+2005-06-26  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Make static fields for "dynamic"
+	variables implemented using ThreadLocation.
+
 2005-06-19  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateApplyMethodsWithContext): More carefully

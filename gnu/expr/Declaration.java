@@ -734,6 +734,11 @@ public class Declaration
       fflags |= Access.PUBLIC;
     if (isStatic()
 	|| (isConstant && value instanceof QuoteExp)
+        // "Dynamic" variables use ThreadLocation, based on the current
+        // Environment, so we don't need more than one static field.
+        || (getFlag(Declaration.IS_UNKNOWN
+                    |Declaration.IS_DYNAMIC|Declaration.IS_FLUID)
+            && isIndirectBinding() && ! isAlias())
 	|| (value instanceof ClassExp
 	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;

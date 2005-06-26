@@ -235,12 +235,29 @@ public class SyntaxTemplate implements Externalizable
       }
     /* #endif */
 
+  check_form:
     if (form instanceof Pair)
       {
 	Pair pair = (Pair) form;
 	int ret_cdr = -2;;
 	int save_pc = template_program.length();
 	Object car = pair.car;
+
+        // Look for (... ...) and translate that to ...
+        if (tr.matches(car, dots3))
+          {
+            Object cdr = tr.stripSyntax(pair.cdr);
+            if (cdr instanceof Pair)
+              {
+                Pair cdr_pair = (Pair) cdr;
+                if (cdr_pair.car == dots3 && cdr_pair.cdr == LList.Empty)
+                  {
+                    form = dots3;
+                    break check_form;
+                  }
+              }
+          }
+
 	int save_literals = literals_vector.size();
   
 	// This may get patched to a BUILD_CONS.
@@ -251,7 +268,7 @@ public class SyntaxTemplate implements Externalizable
 	while (rest instanceof Pair)
 	  {
 	    Pair p = (Pair) rest;
-	    if (p.car != dots3)
+	    if (! tr.matches(p.car, dots3))
 	      break;
 	    num_dots3++;
 	    rest = p.cdr;
@@ -336,10 +353,10 @@ public class SyntaxTemplate implements Externalizable
       }
     if (form instanceof String || form instanceof Symbol)
       tr.noteAccess(form, tr.currentScope());
-    if (! (form instanceof SyntaxForm))
+    if (! (form instanceof SyntaxForm) && form != dots3)
       template_program.append((char) (BUILD_SYNTAX));
     template_program.append((char) (BUILD_LITERAL + 8 * literals_index));
-    return -2;
+    return  form == dots3 ? -1 : -2;
   }
 
   /** Similar to vec.indexOf(elem), but uses == (not equals) to compare. */

@@ -35,6 +35,25 @@ public class LambdaExp extends ScopeExp
     * All the Declarations are allocated in the current heapFrame. */
   Declaration capturedVars;
 
+  public void capture (Declaration decl)
+  {
+    if (decl.isSimple())
+      {
+        if (capturedVars == null
+            && ! decl.isStatic()
+            && ! (this instanceof ModuleExp || this instanceof ClassExp))
+          {
+            heapFrame = new gnu.bytecode.Variable("heapFrame");
+          }
+        decl.setSimple(false);
+        if (! decl.isPublic())
+          {
+            decl.nextCapturedVar = capturedVars;
+            capturedVars = decl;
+          }
+      }
+  }
+
   /** A local variable that points to the heap-allocated part of the frame.
    * Each captured variable is a field in the heapFrame.  A procedure has
    * a heapFrame iff if has a parameter or local variable that is

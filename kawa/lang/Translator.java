@@ -1104,6 +1104,7 @@ public class Translator extends Compilation
 	Declaration decl =  (Declaration) lexical.lookup(name, -1);
 	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
+            decl.getContext().currentLambda().capture(decl);
 	    decl.setCanRead(true);
             decl.setSimple(false);
 	    decl.setFlag(Declaration.EXTERNAL_ACCESS);

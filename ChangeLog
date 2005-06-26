@@ -1,5 +1,10 @@
 2005-06-26  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (processAccesses): Call new capture method
+	in LambdaExp to force field to get allocated.
+	* kawa/standard/syntax_case.java (rewriteClauses): Handle SyntaxForm
+	in input form.
+
 	* kawa/lang/SyntaxTemplate.java (convert_template): Convert '(... ...)'
 	to '...' as in other syntax-case implementations.
 

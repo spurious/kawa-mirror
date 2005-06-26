@@ -73,16 +73,24 @@ public class syntax_case extends Syntax
 	clauseScope.inits = inits;
 
 	Expression output;
-	pair = (Pair) pair.cdr;
+        SyntaxForm syntax = null;
+        Object tail = pair.cdr;
+        while (tail instanceof SyntaxForm)
+          {
+            syntax = (SyntaxForm) tail;
+            tail = syntax.form;
+          }
+	pair = (Pair) tail;
 	if (pair.cdr == LList.Empty)
-	  output = tr.rewrite(pair.car);
+	  output = tr.rewrite_car(pair, syntax);
 	else
 	  {
-	    Expression fender = tr.rewrite(pair.car);
+	    Expression fender = tr.rewrite_car(pair, syntax);
 	    if (! (pair.cdr instanceof Pair
 		   && (pair = (Pair) pair.cdr).cdr == LList.Empty))
 	      return tr.syntaxError("syntax-case:  bad clause");
-	    output = new IfExp(fender, tr.rewrite(pair.car), new ExitExp(block));
+	    output = new IfExp(fender, tr.rewrite_car(pair, syntax),
+                               new ExitExp(block));
 	  }
 	clauseScope.setBody(output);
 

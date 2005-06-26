@@ -1,5 +1,8 @@
 2005-06-26  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (capture): New method.
+	* FindCapturedVars.java (capture): Use new method.
+
 	* Declaration.java (makeField): Make static fields for "dynamic"
 	variables implemented using ThreadLocation.
 

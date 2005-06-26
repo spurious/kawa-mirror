@@ -277,22 +277,8 @@ public class FindCapturedVars extends ExpWalker
 		outer = heapLambda.outerLambda();
 	      }
 	  }
-	if (decl.isSimple())
-	  {
-	    if (declLambda.capturedVars == null
-		&& ! decl.isStatic()
-		&& ! (declLambda instanceof ModuleExp
-		      || declLambda instanceof ClassExp))
-	      {
-		declLambda.heapFrame = new gnu.bytecode.Variable("heapFrame");
-	      }
-	    decl.setSimple(false);
-	    if (! decl.isPublic())
-	      {
-		decl.nextCapturedVar = declLambda.capturedVars;
-		declLambda.capturedVars = decl;
-	      }
-	  }
+
+        declLambda.capture(decl);
       }
   }
 

@@ -11,7 +11,14 @@ import gnu.bytecode.*;
 
 public class DivideOp extends ProcedureN implements CanInline
 {
+  /** True if result shoudl be cast to integer.
+   * Basically a hack (that should be generalized) for XQuery's
+   * idiv operator. */
+  boolean asInteger;
+
   public static final DivideOp $Sl = new DivideOp("/");
+  public static final DivideOp idiv = new DivideOp("idiv");
+  static { idiv.asInteger = true; }
 
   public DivideOp(String name)
   {
@@ -28,6 +35,8 @@ public class DivideOp extends ProcedureN implements CanInline
       result = (Numeric) (args[i++]);
     for (; i < args.length;  i++)
       result = result.div (args[i]);
+    if (asInteger)
+      result = ((RealNum) result).toExactInt(Numeric.TRUNCATE);
     return result;
    }
 
@@ -36,6 +45,8 @@ public class DivideOp extends ProcedureN implements CanInline
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
+    if (asInteger)
+      return exp;
     Expression[] args = exp.getArgs();
     if (args.length > 2)
       return AddOp.pairwise(this, exp.getFunction(), args, walker);

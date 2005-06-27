@@ -1,3 +1,9 @@
+2005-06-26  Per Bothner  <per@bothner.com>
+
+	* DivideOp.java (asInteger): New field.
+	(idiv): New static field.
+	(applyN, inline): Check asInteger.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java: Update for AbstractFormat move to gnu.lists.

@@ -257,28 +257,35 @@ public class XQParser extends Lexer
   // When used as a token code, get the priority by shifting 2 right.
   static final int OP_WHERE     = 196;
   static final int OP_BASE      = 400;
-  static final int OP_OR        = OP_BASE;          // 'or'
-  static final int OP_AND       = OP_BASE + 4;      // 'and'
-  static final int OP_EQU       = OP_BASE + 8;      // '='
-  static final int OP_NEQ       = OP_BASE + 8 + 1;  // '!='
-  static final int OP_INSTANCEOF= OP_BASE + 8 + 2;  // 'instance' 'of'
-  static final int OP_RANGE_TO  = OP_BASE + 8 + 3;  // 'to'
-  static final int OP_LSS       = OP_BASE + 12;     // '<'
-  static final int OP_GRT       = OP_BASE + 12 + 1; // '>'
-  static final int OP_LEQ       = OP_BASE + 12 + 2; // '<='
-  static final int OP_GEQ       = OP_BASE + 12 + 3; // '>='
-  static final int OP_IS        = OP_BASE + 16;     // 'is'
-  static final int OP_ISNOT     = OP_BASE + 16 + 1; // 'isnot'
-  static final int OP_GRTGRT    = OP_BASE + 16 + 2; // '>>'
-  static final int OP_LSSLSS    = OP_BASE + 16 + 3; // '<<'
-  static final int OP_ADD       = OP_BASE + 20;     // '+'
-  static final int OP_SUB       = OP_BASE + 20 + 1; // '-'
-  static final int OP_MUL       = OP_BASE + 24;     // '*'
-  static final int OP_DIV       = OP_BASE + 24 + 1; // 'div'
-  static final int OP_MOD       = OP_BASE + 24 + 2; // 'mod'
-  static final int OP_INTERSECT = OP_BASE + 28;     // 'intersect'
-  static final int OP_EXCEPT    = OP_BASE + 28 + 1; // 'except'
-  static final int OP_UNION     = OP_BASE + 28 + 2; // 'union'
+  static final int OP_OR        = OP_BASE;      // 'or'
+  static final int OP_AND       = OP_BASE + 1;  // 'and'
+  static final int OP_EQU       = OP_BASE + 2;  // '='
+  static final int OP_NEQ       = OP_BASE + 3;  // '!='
+  static final int OP_LSS       = OP_BASE + 4;  // '<'
+  static final int OP_GRT       = OP_BASE + 5;  // '>'
+  static final int OP_LEQ       = OP_BASE + 6;  // '<='
+  static final int OP_GEQ       = OP_BASE + 7;  // '>='
+  static final int OP_IS        = OP_BASE + 8;  // 'is'
+  static final int OP_ISNOT     = OP_BASE + 9;  // 'isnot'
+  static final int OP_GRTGRT    = OP_BASE + 10; // '>>'
+  static final int OP_LSSLSS    = OP_BASE + 11; // '<<'
+
+  static final int OP_RANGE_TO  = OP_BASE + 12;  // 'to'
+
+  static final int OP_ADD       = OP_BASE + 13;  // '+'
+  static final int OP_SUB       = OP_BASE + 14;  // '-'
+
+  static final int OP_MUL       = OP_BASE + 15;  // '*'
+  static final int OP_DIV       = OP_BASE + 16;  // 'div'
+  static final int OP_IDIV      = OP_BASE + 17;  // 'idiv'
+  static final int OP_MOD       = OP_BASE + 18;  // 'mod'
+
+  static final int OP_UNION     = OP_BASE + 19;  // 'union'
+
+  static final int OP_INTERSECT = OP_BASE + 20;  // 'intersect'
+  static final int OP_EXCEPT    = OP_BASE + 21;  // 'except'
+
+  static final int OP_INSTANCEOF= OP_BASE + 22;  // 'instance' 'of'
 
   static final int OP_NODE = 231; // 'node' followed by '('
   static final int OP_TEXT = 232; // 'text' followed by '('
@@ -635,87 +642,89 @@ public class XQParser extends Lexer
     if (curToken == NCNAME_TOKEN)
       {
 	int len = tokenBufferLength;
-	if (len == 2 || len == 3)
-	  {
-	    char c1 = tokenBuffer[0];
-	    if (len == 2)
-	      {
-		char c2 = tokenBuffer[1];
-		if (c1 == 'o' && c2 == 'r')
-		  curToken = OP_OR;
-		else if (c1 == 't' && c2 == 'o')
-		  curToken = OP_RANGE_TO;
-		else if (c1 == 'i' && c2 == 's')
-		  curToken = OP_IS;
+        char c1, c2, c3;
+        switch (len)
+          {
+          case 2:
+            c1 = tokenBuffer[0];
+            c2 = tokenBuffer[1];
+            if (c1 == 'o' && c2 == 'r')
+              curToken = OP_OR;
+            else if (c1 == 't' && c2 == 'o')
+              curToken = OP_RANGE_TO;
+            else if (c1 == 'i' && c2 == 's')
+              curToken = OP_IS;
 
-		// The ValueComp operators 'eq' ... are mapped to the
-		// corresponding GeneralComp operators '=' ...
-		// So we fail to catch certain errors.  FIXME.
-		else if (c1 == 'e' && c2 == 'q')
-		  curToken = OP_EQU;
-		else if (c1 == 'n' && c2 == 'e')
-		  curToken = OP_NEQ;
-		else if (c1 == 'g')
-		  {
-		    if (c2 == 'e')  curToken = OP_GEQ;
-		    else if (c2 == 't')  curToken = OP_GRT;
-		  }
-		else if (c1 == 'l')
-		  {
-		    if (c2 == 'e')  curToken = OP_LEQ;
-		    else if (c2 == 't')  curToken = OP_LSS;
-		  }
-	      }
-	    else
-	      {
-		char c2 = tokenBuffer[1];
-		char c3 = tokenBuffer[2];
-		if (c1 == 'a')
-		  {
-		    if (c2 == 'n' && c3 == 'd')
-		      curToken = OP_AND;
-		  }
-		else if (c1 == 'm') {
-		  if (c2 == 'u' && c3 == 'l')
-		    curToken = OP_MUL;
-		  if (c2 == 'o' && c3 == 'd')
-		    curToken = OP_MOD;
-		}
-		else if (c1 == 'd') {
-		  if (c2 == 'i' && c3 == 'v')
-		    curToken = OP_DIV;
-		}
-	      }
-	  }
-	else if (len == 5)
-	  {
-	    if (match("where"))
-	      curToken = OP_WHERE;
-	    else if (match("isnot"))
-	      curToken = OP_ISNOT;
-	    else if (match("union"))
-	      curToken = OP_UNION;
-	  }
-	else if (len == 6)
-	  {
-	    if (match("except"))
-	      curToken = OP_EXCEPT;
-	  }
-	else if (len == 8)
-	  {
-	    if (match("instance"))
-	      curToken = OP_INSTANCEOF;
-	  }
-	else if (len == 9)
-	  {
-	    if (match("intersect"))
-	      curToken = OP_INTERSECT;
-	  }
-	else if (len == 10)
-	  {
-	    if (match("instanceof")) // obsolete
-	      curToken = OP_INSTANCEOF;
-	  }
+            // The ValueComp operators 'eq' ... are mapped to the
+            // corresponding GeneralComp operators '=' ...
+            // So we fail to catch certain errors.  FIXME.
+            else if (c1 == 'e' && c2 == 'q')
+              curToken = OP_EQU;
+            else if (c1 == 'n' && c2 == 'e')
+              curToken = OP_NEQ;
+            else if (c1 == 'g')
+              {
+                if (c2 == 'e')  curToken = OP_GEQ;
+                else if (c2 == 't')  curToken = OP_GRT;
+              }
+            else if (c1 == 'l')
+              {
+                if (c2 == 'e')  curToken = OP_LEQ;
+                else if (c2 == 't')  curToken = OP_LSS;
+              }
+            break;
+
+          case 3:
+            c1 = tokenBuffer[0];
+            c2 = tokenBuffer[1];
+            c3 = tokenBuffer[2];
+            if (c1 == 'a')
+              {
+                if (c2 == 'n' && c3 == 'd')
+                  curToken = OP_AND;
+              }
+            else if (c1 == 'm') {
+              if (c2 == 'u' && c3 == 'l')
+                curToken = OP_MUL;
+              if (c2 == 'o' && c3 == 'd')
+                curToken = OP_MOD;
+            }
+            else if (c1 == 'd') {
+              if (c2 == 'i' && c3 == 'v')
+                curToken = OP_DIV;
+            }
+            break;
+          case 4:
+            if (match("idiv"))
+              curToken = OP_IDIV;
+            break;
+          case 5:
+            if (match("where"))
+              curToken = OP_WHERE;
+            else if (match("isnot"))
+              curToken = OP_ISNOT;
+            else if (match("union"))
+              curToken = OP_UNION;
+            break;
+          case 6:
+            if (match("except"))
+              curToken = OP_EXCEPT;
+            break;
+          case 8:
+            if (match("instance"))
+              curToken = OP_INSTANCEOF;
+            break;
+          case 9:
+            if (match("intersect"))
+              curToken = OP_INTERSECT;
+            break;
+          case 10:
+            if (match("instanceof")) // obsolete
+              curToken = OP_INSTANCEOF;
+            break;
+          default:
+            break;
+          }
       }
     return curToken;
   }
@@ -956,36 +965,32 @@ public class XQParser extends Lexer
   
   private static final int priority(int opcode)
   {
-    /* FIXME:  Future!
     switch (opcode)
       {
-      case ',':
-      case ')':
-      case -1:
       case OP_OR:
-	return OP_BASE >> 2;
+	return 1;
       case OP_AND:
-	return (OP_BASE + 4) >> 2;
+        return 2;
       case OP_EQU:  case OP_NEQ:
-      case OP_INSTANCEOF:  case OP_RANGE_TO:
-	return (OP_BASE + 8) >> 2;
       case OP_LSS:  case OP_GRT:  case OP_LEQ:  case OP_GEQ:
-	return (OP_BASE + 12) >> 2;
       case OP_IS:  case OP_ISNOT:
       case OP_GRTGRT:  case OP_LSSLSS:
-	return (OP_BASE + 16) >> 2;
+        return 3;
+      case OP_RANGE_TO:
+        return 4;
       case OP_ADD:  case OP_SUB:
-	return (OP_BASE + 20) >> 2;
-      case OP_MUL: case OP_DIV:  case OP_MOD:
-	return (OP_BASE + 24) >> 2;
-      case OP_INTERSECT:  case OP_EXCEPT:  case OP_UNION:
-	return (OP_BASE + 28) >> 2;
+	return 5;
+      case OP_MUL: case OP_DIV:  case OP_IDIV: case OP_MOD:
+        return 6;
+      case OP_UNION:
+        return 7;
+      case OP_INTERSECT:  case OP_EXCEPT:
+        return 8;
+      case OP_INSTANCEOF:
+	return 9;
       default:
-	//System.err.println("unknown priorty for "+opcode);
 	return 0;
       }
-    */
-    return opcode >> 2;
   }
 
   int count = 0;
@@ -1023,6 +1028,9 @@ public class XQParser extends Lexer
 	break;
       case OP_DIV:
 	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "$Sl", "div");
+	break;
+      case OP_IDIV:
+	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "idiv", "idiv");
 	break;
       case OP_MOD:
 	func = new QuoteExp(new PrimProcedure(ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
@@ -1286,7 +1294,7 @@ public class XQParser extends Lexer
 	    || (token == OP_LSS && peek() == '/'))
 	  return exp;  
 	int tokPriority = priority(token);
-	if (tokPriority < prio || tokPriority > (OP_MOD >> 2))
+	if (tokPriority < prio)
 	  return exp;
 	char saveReadState = pushNesting('%');
 	boolean sawInstanceof = false;

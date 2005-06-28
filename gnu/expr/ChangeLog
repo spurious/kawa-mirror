@@ -1,3 +1,17 @@
+2005-06-27  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (context, contextDecl): Mome field and methods
+	to super-class ...
+	* AccessExp.java (context, contextDecl): ... here.
+	* FindTailCalls.java (walkReferenceExp, walkSetExp): If there is a
+	contextDecl(), mark it as readable.
+	* FindCapturedVars.java (walkSetExp): Pass context to capture.
+	(capture): If containing Declaration is needed, capture it.
+	* SetExp.java (compile): Pass context to Declaration's load.
+	Fixes Savannah bug #4881.
+
+	* SetExp.java (toString): New method.
+
 2005-06-26  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (capture): New method.

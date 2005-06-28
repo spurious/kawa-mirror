@@ -67,6 +67,7 @@ public class set_b extends Syntax implements Printable
     ReferenceExp ref = (ReferenceExp) name;
     Declaration decl = ref.getBinding();
     SetExp sexp = new SetExp (ref.getSymbol(), value);
+    sexp.setContextDecl(ref.contextDecl());
     if (decl != null)
       {
 	sexp.setBinding(decl);

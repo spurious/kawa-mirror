@@ -362,7 +362,7 @@ public class FindCapturedVars extends ExpWalker
 	  }
       }
     if (containing != null && decl.needsContext())
-      containing.setSimple(false);
+      capture(containing);
     else
       capture(decl);
   }
@@ -392,7 +392,7 @@ public class FindCapturedVars extends ExpWalker
       {
 	if (! exp.isDefining())
 	  decl = Declaration.followAliases(decl);
-	capture(decl);
+	capture(exp.contextDecl(), decl);
       }
     return super.walkSetExp(exp);
   }

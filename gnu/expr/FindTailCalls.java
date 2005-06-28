@@ -314,6 +314,9 @@ public class FindTailCalls extends ExpWalker
     Declaration decl = Declaration.followAliases(exp.binding);
     if (decl != null)
       decl.setCanRead(true);
+    Declaration ctx = exp.contextDecl();
+    if (ctx != null)
+      ctx.setCanRead(true);
     return exp;
   }
 
@@ -350,6 +353,9 @@ public class FindTailCalls extends ExpWalker
 	  }
 	if (decl != null)
 	  decl.setCanWrite();
+        Declaration ctx = exp.contextDecl();
+        if (ctx != null)
+          ctx.setCanRead(true);
 	Expression value = walkSetExp(decl, exp.new_value);
 	if (decl != null && decl.context instanceof LetExp
 	    && value == decl.getValue()

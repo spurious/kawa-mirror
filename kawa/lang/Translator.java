@@ -648,6 +648,8 @@ public class Translator extends Compilation
 	if (current_scope instanceof TemplateScope
             && decl != null && decl.needsContext())
 	  rexp.setContextDecl(((TemplateScope) current_scope).macroContext);
+        else
+          checkMemberContext(rexp, decl);
 	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;
@@ -658,6 +660,23 @@ public class Translator extends Compilation
       return (Expression) exp;
     else
       return QuoteExp.getInstance(Quote.quote(exp, this));
+  }
+
+  public void checkMemberContext (AccessExp exp, Declaration decl)
+  {
+    if (decl == null || ! decl.getFlag(Declaration.FIELD_OR_METHOD)
+        || decl.isStatic())
+      return;
+    ScopeExp scope = currentScope();
+    for (;;)
+      {
+        if (scope == null)
+          throw new Error("internal error: missing "+decl);
+        if (scope.outer == decl.context) // I.e. same class.
+          break;
+        scope = scope.outer;
+      }
+    exp.setContextDecl(scope.firstDecl());
   }
 
   public static void setLine(Expression exp, Object pair)

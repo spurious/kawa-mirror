@@ -4,6 +4,9 @@
 package gnu.expr;
 import gnu.mapping.*;
 
+/** A common super-type for ReferenceExpa and SetExp.
+ * Contains shared information about the variable that is accessed. */
+
 public abstract class AccessExp extends Expression
 {
   /** The name of the variable to set - either a String or a Symbol. */
@@ -22,4 +25,12 @@ public abstract class AccessExp extends Expression
   public final Declaration getBinding() { return binding; }
 
   public final void setBinding(Declaration decl) { binding = decl; }
+
+  /** If binding has a non-static field and no base, use this instead of base.
+   *  This is mainly used for aliases of imported module declarations. */
+  private Declaration context;
+  public final Declaration contextDecl ()
+  { return context; }
+  public final void setContextDecl(Declaration decl)
+  { context = decl; }
 }

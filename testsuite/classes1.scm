@@ -21,12 +21,30 @@
    (lambda (x) (make-vector (+ a n) x))) ; This lambda does.
   ((lambda-method3)
    (call-lambda (lambda () (slot-ref (this) 'two))))
+  ((lambda-method4)
+   (call-lambda (lambda () two)))
+  ((lambda-method5 x)
+   (lambda () (set! two x)))
+  ((lambda-method6)
+   (lambda (x) (set! two x)))
+  ((lambda-method7)
+   (lambda (x) (slot-set! (this) 'two x)))
+  ((lambda-method-rest1 name)
+   (lambda (arg1 . rest) (list name arg1 rest)))
   ((x1900) :: <int> access: 'package allocation: 'static
    1900)
   ((g) :: <int> access: 'protected
    (+ xx a))
   ((f (y :: <int>)) :: <int>
-   (if (equal? hyphenated-field? "yes") (+ (g) b y) 999)))
+   (if (equal? hyphenated-field? "yes") (+ (g) b y) 999))
+
+  ;; Bug reported by Dean Ferreyra <dferreyra@igc.org> 2005-06-09
+  ((trouble)
+   (let ((fn (lambda (o)
+               (get-identity-property-name o))))
+     fn))
+  ((get-identity-property-name property-name)
+   (string-append property-name "Identity")))
 
 (define (call-lambda fn)
   (fn))

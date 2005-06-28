@@ -1,3 +1,10 @@
+2005-06-27  Per Bothner  <per@bothner.com>
+
+	* classes1.scm (<SimapleA>): A bunch of new methods to test various
+	accesses nested in lambda's inside methods.
+	One test is a bug reported by Dean Ferreyra 2005-06-09.
+	* obj-test.scm: Test them.
+
 2005-06-02  Per Bothner  <per@bothner.com>
 
 	Add test for re-exported imported macro.

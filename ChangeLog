@@ -1,3 +1,9 @@
+2005-06-29  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (numEqu, numGrt, numGEq, numLss, numLEq):
+	New static fields for the numeric compare functions.
+	(initScheme): Re-define numeric comparisions using new fields.
+
 2005-06-27  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (checkMemberContext): New method.

@@ -1,3 +1,12 @@
+2005-06-29  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (language): New field.
+	(make): Factor method now takes a Language.
+	(apply2, applyN): Convert result to language's boolean objects.
+	(TRUE_IF_XXX constants): Make public, since used externally.
+	($Eq, $Gr, $Gr$Eq, $Ls, $Ls$Eq): Remove static fields, since
+	NumberCompare objects are now Language-spacific.
+
 2005-06-26  Per Bothner  <per@bothner.com>
 
 	* DivideOp.java (asInteger): New field.

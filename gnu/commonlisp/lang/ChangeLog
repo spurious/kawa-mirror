@@ -1,9 +1,14 @@
 2005-06-29  Per Bothner  <per@bothner.com>
 
-	* Lisp2.java (TRUE): Make final, and initialzie statically.
+	* CommonLisp.java (numEqu, numGrt, numGEq, numLss, numLEq): New static
+	fields for the numeric compare functions.
+	(initLisp): Define functions for them.
+	Fixes Savannah bug #13573.
+
+	* Lisp2.java (TRUE): Make final, and initialize statically.
 
 	* Lisp2.java (selfEvaluatingSymbol):  Fix typo.
-
+	
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java:  Update for AbstractFormat move to gnu.lists.

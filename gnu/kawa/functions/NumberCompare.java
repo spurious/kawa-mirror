@@ -8,6 +8,8 @@ import gnu.expr.*;
 
 public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 {
+  Language language;
+
   // Return codes from Numeric.compare:
   static final int RESULT_GRT = 1;
   static final int RESULT_EQU = 0;
@@ -16,24 +18,14 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
   static final int RESULT_NEQ = -3;
 
   // One flag bit for each of the above RESULT_XXX codes:
-  static final int TRUE_IF_GRT = 1 << (RESULT_GRT + 3);
-  static final int TRUE_IF_EQU = 1 << (RESULT_EQU + 3);
-  static final int TRUE_IF_LSS = 1 << (RESULT_LSS + 3);
-  static final int TRUE_IF_NAN = 1 << (RESULT_NAN + 3);
-  static final int TRUE_IF_NEQ = 1 << (RESULT_NEQ + 3);
+  public static final int TRUE_IF_GRT = 1 << (RESULT_GRT + 3);
+  public static final int TRUE_IF_EQU = 1 << (RESULT_EQU + 3);
+  public static final int TRUE_IF_LSS = 1 << (RESULT_LSS + 3);
+  public static final int TRUE_IF_NAN = 1 << (RESULT_NAN + 3);
+  public static final int TRUE_IF_NEQ = 1 << (RESULT_NEQ + 3);
   int flags;
 
   public int numArgs() { return (-1 << 12) | 2; }
-
-  // The funny name of the static fields and methods correspond to
-  // the name mangling scheme defined in Compilation.mangleName.
-  // They can therefor be statically resolved by the compiler.
-
-  public static final NumberCompare $Eq   = make("=",TRUE_IF_EQU);
-  public static final NumberCompare $Gr   = make(">",TRUE_IF_GRT);
-  public static final NumberCompare $Gr$Eq= make(">=",TRUE_IF_GRT|TRUE_IF_EQU);
-  public static final NumberCompare $Ls   = make("<",TRUE_IF_LSS);
-  public static final NumberCompare $Ls$Eq= make("<=",TRUE_IF_LSS|TRUE_IF_EQU);
 
   public static boolean $Eq(Object arg1, Object arg2)
   {
@@ -102,20 +94,23 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		    && applyN(TRUE_IF_LSS|TRUE_IF_EQU, rest))));
   }
 
-  public static NumberCompare make(String name, int flags)
+  public static NumberCompare make(Language language, String name, int flags)
   {
     NumberCompare proc = new NumberCompare();
+    proc.language = language;
     proc.setName(name);
     proc.flags = flags;
     return proc;
   }
 
+  protected final Language getLanguage ()
+  {
+    return language;
+  }
+
   public Object apply2 (Object arg1, Object arg2)
   {
-    if (apply2(flags, arg1, arg2))
-      return Boolean.TRUE;
-    else
-      return Boolean.FALSE;
+    return getLanguage().booleanObject(apply2(flags, arg1, arg2));
   }
 
   static public boolean apply2 (int flags, Object arg1, Object arg2)
@@ -141,7 +136,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
   {
     //  if (args.length < 2)
     //  throw new WrongArguments(this.name(),2,"(< x1 x2 ...)");
-    return applyN(flags, args) ? Boolean.TRUE : Boolean.FALSE;
+    return getLanguage().booleanObject(applyN(flags, args));
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)

@@ -10,6 +10,7 @@ import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.math.Unit;
 
@@ -51,6 +52,12 @@ public class Scheme extends LispLanguage
   public static final gnu.kawa.functions.IsEqual isEqual;
   public static final kawa.repl repl;
 
+  public static final NumberCompare numEqu;
+  public static final NumberCompare numGrt;
+  public static final NumberCompare numGEq;
+  public static final NumberCompare numLss;
+  public static final NumberCompare numLEq;
+
   static {
     // (null-environment)
     nullEnvironment = Environment.make("null-environment");
@@ -63,6 +70,16 @@ public class Scheme extends LispLanguage
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
+    numEqu = NumberCompare.make(instance, "=",
+                                NumberCompare.TRUE_IF_EQU);
+    numGrt = NumberCompare.make(instance, ">",
+                                NumberCompare.TRUE_IF_GRT);
+    numGEq = NumberCompare.make(instance, ">=",
+                                NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_EQU);
+    numLss = NumberCompare.make(instance, "<",
+                                NumberCompare.TRUE_IF_LSS);
+    numLEq = NumberCompare.make(instance, "<=",
+                                NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
     repl = new kawa.repl(instance);
     instance.initScheme();
   }
@@ -200,11 +217,11 @@ public class Scheme extends LispLanguage
       define_proc ("integer?", "kawa.standard.integer_p");
       defProcStFld("exact?", "kawa.lib.numbers");
       defProcStFld("inexact?", "kawa.lib.numbers");
-      defProcStFld("=", "gnu.kawa.functions.NumberCompare", "$Eq");
-      defProcStFld("<", "gnu.kawa.functions.NumberCompare", "$Ls");
-      defProcStFld(">", "gnu.kawa.functions.NumberCompare", "$Gr");
-      defProcStFld("<=", "gnu.kawa.functions.NumberCompare", "$Ls$Eq");
-      defProcStFld(">=", "gnu.kawa.functions.NumberCompare", "$Gr$Eq");
+      defProcStFld("=", "kawa.standard.Scheme", "numEqu");
+      defProcStFld("<", "kawa.standard.Scheme", "numLss");
+      defProcStFld(">", "kawa.standard.Scheme", "numGrt");
+      defProcStFld("<=", "kawa.standard.Scheme", "numLEq");
+      defProcStFld(">=", "kawa.standard.Scheme", "numGEq");
       defProcStFld("zero?", "kawa.lib.numbers");
       defProcStFld("positive?", "kawa.lib.numbers");
       defProcStFld("negative?", "kawa.lib.numbers");

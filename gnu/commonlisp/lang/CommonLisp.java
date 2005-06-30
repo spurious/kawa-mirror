@@ -10,6 +10,7 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
+import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.lispexpr.ReadTable;
 
 public class CommonLisp extends Lisp2
@@ -61,6 +62,12 @@ public class CommonLisp extends Lisp2
   public static final Environment clispEnvironment
     = Environment.make("clisp-environment");
 
+  public static final NumberCompare numEqu;
+  public static final NumberCompare numGrt;
+  public static final NumberCompare numGEq;
+  public static final NumberCompare numLss;
+  public static final NumberCompare numLEq;
+
   static
   {
     instance = new CommonLisp();
@@ -68,6 +75,16 @@ public class CommonLisp extends Lisp2
 
     instance.define("t", TRUE);
     instance.define("nil", FALSE);
+    numEqu = NumberCompare.make(instance, "=",
+                                NumberCompare.TRUE_IF_EQU);
+    numGrt = NumberCompare.make(instance, ">",
+                                NumberCompare.TRUE_IF_GRT);
+    numGEq = NumberCompare.make(instance, ">=",
+                                NumberCompare.TRUE_IF_GRT|NumberCompare.TRUE_IF_EQU);
+    numLss = NumberCompare.make(instance, "<",
+                                NumberCompare.TRUE_IF_LSS);
+    numLEq = NumberCompare.make(instance, "<=",
+                                NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
     CallContext ctx = CallContext.getInstance();
     Environment saveEnv = ctx.getEnvironmentRaw();
     try
@@ -132,6 +149,12 @@ public class CommonLisp extends Lisp2
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     defun("princ", displayFormat);
     defun("prin1", writeFormat);
+
+    defProcStFld("=", "gnu.commonlisp.lang.CommonLisp", "numEqu");
+    defProcStFld("<", "gnu.commonlisp.lang.CommonLisp", "numLss");
+    defProcStFld(">", "gnu.commonlisp.lang.CommonLisp", "numGrt");
+    defProcStFld("<=", "gnu.commonlisp.lang.CommonLisp", "numLEq");
+    defProcStFld(">=", "gnu.commonlisp.lang.CommonLisp", "numGEq");
 
     defProcStFld("functionp", "gnu.commonlisp.lisp.PrimOps");
   }

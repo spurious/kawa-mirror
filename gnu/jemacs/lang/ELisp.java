@@ -83,8 +83,6 @@ public class ELisp extends Lisp2
 
   ELisp ()
   {
-    // Kludge - should be static - but in which Namespace/Environment?
-    TRUE = elispEnvironment.getSymbol("t");
   }
 
   private void initELisp ()

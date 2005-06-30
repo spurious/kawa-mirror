@@ -15,7 +15,8 @@ import gnu.kawa.reflect.FieldLocation;
 public abstract class Lisp2 extends LispLanguage
 {
   public static final LList FALSE = LList.Empty;
-  public static Symbol TRUE;
+  // FIXME - which namespace?
+  public static final Symbol TRUE = Namespace.getDefault().getSymbol("t");
   public static final Expression nilExpr = new QuoteExp(FALSE);
 
   public boolean isTrue(Object value)
@@ -48,7 +49,7 @@ public abstract class Lisp2 extends LispLanguage
 
   public boolean selfEvaluatingSymbol (Object obj)
   {
-    return obj instanceof Keyword || obj == TRUE | obj == FALSE;
+    return obj instanceof Keyword || obj == TRUE || obj == FALSE;
   }
 
   public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)

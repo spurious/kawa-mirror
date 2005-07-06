@@ -335,7 +335,9 @@ public class Declaration
 
   public final boolean needsExternalAccess ()
   {
-    return (flags & EXTERNAL_ACCESS+PRIVATE) == EXTERNAL_ACCESS+PRIVATE;
+    return (flags & EXTERNAL_ACCESS+PRIVATE) == EXTERNAL_ACCESS+PRIVATE
+      // Kludge - needed for macros - see Savannah bug #13601.
+      || (flags & IS_NAMESPACE_PREFIX+PRIVATE) == IS_NAMESPACE_PREFIX+PRIVATE;
   }
 
   /** If we need a 'context' supplied from a ReferenceExp or 'this. */

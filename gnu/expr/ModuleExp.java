@@ -291,7 +291,7 @@ public class ModuleExp extends LambdaExp
 
   void allocFields (Compilation comp)
   {
-    // We want the create the id$XXX Symbol fields for unknowns first,
+    // We want the create the loc$XXX Symbol fields for unknowns first,
     // because it is possible some later Declaration's initializer may depend
     // on it.  Normally this is not an issue, as initializer are usually
     // run as part of the "body" of the module, which is executed later.
@@ -312,6 +312,8 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	Expression value = decl.getValue();
 	if (((decl.isSimple() && ! decl.isPublic()) || decl.ignorable())
+            // Kludge - needed for macros - see Savannah bug #13601.
+            && ! decl.isNamespaceDecl()
 	    && ! (value instanceof ClassExp))
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))

@@ -1,3 +1,10 @@
+2005-07-05  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (needsExternalAccess): Returns true if a
+	namespace declaration.
+	* ModuleExp.java (allocFields): Alloc field if a namespace declaration.
+	Fix (work-around) for Savannah bug #13601.
+
 2005-06-27  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (context, contextDecl): Mome field and methods

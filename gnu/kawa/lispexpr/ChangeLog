@@ -1,3 +1,8 @@
+2005-07-05  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java (scanForDefinitions): Set IS_NAMESPACE_PREFIX
+	flag on namespace declaration.
+
 2005-06-03  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (declFromField): New method, refines method

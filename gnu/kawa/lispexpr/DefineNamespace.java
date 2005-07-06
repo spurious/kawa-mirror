@@ -24,7 +24,7 @@ public class DefineNamespace extends Syntax
     String name = (Language.NAMESPACE_PREFIX + p1.car).intern();
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
-    decl.setFlag(Declaration.IS_CONSTANT);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
     if (defs instanceof ModuleExp)
       decl.setCanRead(true);
     Translator.setLine(decl, p1);

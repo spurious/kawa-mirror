@@ -1,3 +1,8 @@
+2005-07-13  Per Bothner  <per@bothner.com>
+
+	* IntFraction.java (toString(int)): Pass radix to toString for
+	denominator as well as numerator.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* IntNum.java: Fix two javadoc problems.

@@ -139,7 +139,7 @@ public class IntFraction extends RatNum implements Externalizable
 
   public String toString (int radix)
   {
-    return num.toString (radix) + '/' + den.toString ();
+    return num.toString(radix) + '/' + den.toString(radix);
   }
 
   /**

@@ -70,7 +70,9 @@ public abstract class Procedure implements Named
   /** Minimum number of arguments required. */
   public final int minArgs() { return numArgs() & 0xFFF; }
 
-  /** Maximum number of arguments allowed, or -1 for unlimited. */
+  /** Maximum number of arguments allowed, or -1 for unlimited.
+   * (May also return -1 if there are keyword arguments, for implementation
+   * reasons.) */
   public final int maxArgs() { return numArgs() >> 12; }
 
   /** Check that the number of arguments in a call is valid.

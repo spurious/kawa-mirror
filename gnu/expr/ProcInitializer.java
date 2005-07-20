@@ -63,7 +63,10 @@ public class ProcInitializer extends Initializer
     comp.compileConstant(proc.nameDecl != null ? proc.nameDecl.getSymbol()
 			 : proc.getName(),
 			 Target.pushObject);
-    code.emitPushInt(proc.min_args | (proc.max_args << 12));
+    // If there are keyword arguments, we treat that as "unlimited" maxArgs,
+    // so that ModuleBody.matchX methods call matchN.  A kludge, I guess.
+    code.emitPushInt(proc.min_args
+                     | ((proc.keywords == null ? proc.max_args : -1) << 12));
     Method initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
     code.emitInvokeSpecial(initModuleMethod);
   }

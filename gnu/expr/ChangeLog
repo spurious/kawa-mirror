@@ -1,3 +1,9 @@
+2005-07-20  Per Bothner  <per@bothner.com>
+
+	* ProcInitializer.java (emitLoadModuleMethod): If there are keyword
+	arguments, set resulting maxArgs() to -1.
+	Fixes Savannah bug #13854.
+
 2005-07-05  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (needsExternalAccess): Returns true if a

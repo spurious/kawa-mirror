@@ -3,6 +3,8 @@
 
 package gnu.text;
 import java.io.*;
+import gnu.mapping.ThreadLocation;
+import gnu.lists.LList;
 
 /** A pretty printer.
  *
@@ -35,6 +37,14 @@ public class PrettyWriter extends java.io.Writer
 
   /** Line length we should format to. */
   int lineLength = 80;
+  int miserWidth = 40;
+
+  public static ThreadLocation lineLengthLoc
+    = new ThreadLocation("line-length");
+  public static ThreadLocation miserWidthLoc
+    = new ThreadLocation("miser-width");
+  public static ThreadLocation indentLoc
+    = new ThreadLocation("indent");
 
   public boolean isPrettyPrinting;
 
@@ -553,6 +563,27 @@ public class PrettyWriter extends java.io.Writer
 
   public void startLogicalBlock (String prefix, boolean perLine, String suffix)
   {
+    // If the queue is empty, it is a good time to check if line-length etc
+    // have been changed.
+    if (queueSize == 0 && bufferFillPointer == 0)
+      {
+        Object llen = lineLengthLoc.get(null);
+        if (llen == null)
+          lineLength = 80;
+        else
+          lineLength = Integer.parseInt(llen.toString());
+
+        Object mwidth = miserWidthLoc.get(null);
+        if (mwidth == null || mwidth == Boolean.FALSE
+            // For Common Lisp nil.  Should we use Language.isTrue() FIXME.
+            || mwidth == LList.Empty)
+          miserWidth = -1;
+        else
+          miserWidth = Integer.parseInt(mwidth.toString());
+
+        Object indent = indentLoc.get(null);
+        // if (indent == null || indent ...
+      }
     if (prefix != null)
       write(prefix);
     if (! isPrettyPrinting)
@@ -926,11 +957,10 @@ public class PrettyWriter extends java.io.Writer
     return outputAnything;
   }
 
-  int miserWidth;
   protected int getMiserWidth () // DONE
   {
     // CommonLisp:  Use *print-miser-width*.
-    return 40;
+    return miserWidth;
   }
 
   boolean isMisering() // DONE

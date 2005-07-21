@@ -1118,8 +1118,6 @@ public class Compilation
                               .getDeclaredMethod("register", 1));
       }
 
-    Initializer init;
-    lexp.initChain = Initializer.reverse(lexp.initChain);
     if (lexp.initChain != null)
       {
 	// Create dummy lambda, for its closureEnv.  This may be needed
@@ -1128,10 +1126,11 @@ public class Compilation
 	curLambda = new LambdaExp();
 	curLambda.closureEnv = code.getArg(0);
 	curLambda.outer = save;
+        Initializer init;
 	while ((init = lexp.initChain) != null)
 	  {
-	    lexp.initChain = init.next;
-	    init.emit(this);
+	    lexp.initChain = null;
+	    dumpInitializers(init);
 	  }
 	curLambda = save;
       }
@@ -1918,7 +1917,12 @@ public class Compilation
 				     Access.STATIC|Access.PUBLIC|Access.FINAL);
 	    code.emitPutStatic(moduleInstanceMainField);
 	  }
-	dumpInitializers(clinitChain);
+        Initializer init;
+        while ((init = clinitChain) != null)
+          {
+            clinitChain = null;
+            dumpInitializers(init);
+          }
 
 	if (! immediate && module.staticInitRun())
 	  {

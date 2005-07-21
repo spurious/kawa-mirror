@@ -1,5 +1,11 @@
 2005-07-20  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (addClass): Call dumpInitializers inside a loop, in
+	case emiting an initialier creates more - just like we do in
+	generateConstructor.  Fixes Savannah bug #13821.
+	(generateConstructor): Use dumpInitializers.
+	This removes need for invoking Initializer.reverse.
+
 	* ProcInitializer.java (emitLoadModuleMethod): If there are keyword
 	arguments, set resulting maxArgs() to -1.
 	Fixes Savannah bug #13854.

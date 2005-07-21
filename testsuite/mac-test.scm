@@ -1,4 +1,4 @@
-(test-init "macros" 84)
+(test-init "macros" 85)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -366,3 +366,9 @@
       'check-matching-8 (check-matching 8 (1 2) (3 4 5) (8 9)))
 (test '(#(A 1 2 3 4 5 Z) (A 1 2 3 4 5 Z))
       'check-matching-9 (check-matching 9 (1 2) (3 4 5)))
+
+;; Savannah bug #13821
+(define-macro (test-13821 #!key (args ()))
+  (letrec ((double (lambda (x) (* x 2))))
+    `(+ ,@(map double args))))
+(test 12 'test-13821 (test-13821 args: (1 2 3)))

@@ -1,3 +1,7 @@
+2005-07-20  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: New test based on Savanah bug report #13821.
+
 2005-06-27  Per Bothner  <per@bothner.com>
 
 	* classes1.scm (<SimapleA>): A bunch of new methods to test various

@@ -1,3 +1,10 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* BRL.java (brl_instance): Make final.
+	(<init>): Take Environment parameter.
+	(<clinit>): Initialize brl_instance.
+	(getBrlInstance): brl_instance is now guaranteed pre-allocated.
+
 2005-04-20  Per Bothner  <per@bothner.com>
 
 	* BRL.java: Initialize krl_instance and brlEnvironment in the

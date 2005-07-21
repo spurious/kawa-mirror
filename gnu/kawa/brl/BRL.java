@@ -9,7 +9,7 @@ import gnu.kawa.lispexpr.ReadTable;
 public class BRL extends Scheme
 {
   static final BRL krl_instance;
-  static BRL brl_instance;
+  static final BRL brl_instance;
   static final Object emptyForm = new FString();
 
   protected static final SimpleEnvironment brlEnvironment
@@ -19,8 +19,9 @@ public class BRL extends Scheme
 
   static
   {
-    krl_instance = new BRL();
-    krl_instance.environ = brlEnvironment;
+    krl_instance = new BRL(brlEnvironment);
+    brl_instance = new BRL(brlEnvironment);
+    brl_instance.setBrlCompatible(true);
     CallContext ctx = CallContext.getInstance();
     Environment saveEnv = ctx.getEnvironmentRaw();
     try
@@ -34,8 +35,9 @@ public class BRL extends Scheme
       }
   }
 
-  public BRL ()
+  protected BRL (Environment env)
   {
+    super(env);
   }
 
   void initBRL ()
@@ -65,12 +67,6 @@ public class BRL extends Scheme
 
   public static BRL getBrlInstance()
   {
-    if (brl_instance == null)
-      {
-        brl_instance = new BRL ();
-        brl_instance.environ = brlEnvironment;
-        brl_instance.setBrlCompatible(true);
-      }
     return brl_instance;
   }
 

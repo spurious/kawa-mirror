@@ -7,6 +7,7 @@ import java.io.*;
 import gnu.text.Char;
 import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
+import gnu.mapping.ThreadLocation;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -28,6 +29,17 @@ public class XMLPrinter extends PrintConsumer
   boolean isHtml = false;
   boolean undeclareNamespaces = false;
   Object style;
+  /** Fluid parameter to control whether a DOCTYPE declaration is emitted.
+   * If non-null, this is the the public identifier. */
+  public static final ThreadLocation doctypeSystem
+    = new ThreadLocation("doctype-system");
+  /** The system identifier emitted in a DOCTYPE declaration. 
+   * Has no effect if doctypeSystem returns null.
+   * If non-null, this is the the system identifier. */
+  public static final ThreadLocation doctypePublic
+    = new ThreadLocation("doctype-public");
+  public static final ThreadLocation indentLoc
+    = new ThreadLocation("xml-indent");
 
   /** Chain of currently active namespace nodes. */
   NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
@@ -230,6 +242,52 @@ public class XMLPrinter extends PrintConsumer
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
+    if (groupNesting == 0)
+      {
+        if (out instanceof OutPort)
+          {
+            Object xmlIndent = indentLoc.get(null);
+            String indent = xmlIndent == null ? null : xmlIndent.toString();
+            if (indent == null)
+              printIndent = -1;
+            else if (indent.equals("pretty"))
+              printIndent = 0;
+            else if (indent.equals("always") || indent.equals("yes"))
+              printIndent = 1;
+            else // if (ident.equals("no")) or default:
+              printIndent = -1;
+          }
+        else
+          printIndent = -1;
+
+        Object systemIdentifier = doctypeSystem.get(null);
+        if (systemIdentifier != null)
+          {
+            String systemId = systemIdentifier.toString();
+            if (systemId.length() > 0)
+              {
+                Object publicIdentifier = doctypePublic.get(null);
+                super.write("<!DOCTYPE ");
+                super.write(typeName);
+                String publicId = publicIdentifier == null ? null
+                  : publicIdentifier.toString();
+                if (publicId != null && publicId.length() > 0)
+                  {
+                    super.write(" PUBLIC \"");
+                    super.write(publicId);
+                    super.write("\" \"");
+                  }
+                else
+                  {
+                    super.write(" SYSTEM \"");
+                  }
+                super.write(systemId);
+                super.write("\">");
+                if (out instanceof OutPort)
+                  ((OutPort) out).println();
+              }
+          }
+      }
     if (printIndent >= 0)
       {
 	OutPort pout = (OutPort) out;

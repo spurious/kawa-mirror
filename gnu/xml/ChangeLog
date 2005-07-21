@@ -1,3 +1,8 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (doctypeSystem, doctypePublic, indentLoc): New fields.
+	(beginGroup): Use new fields to control output.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* NamespaceBinding.java: Fix typo in javadoc.

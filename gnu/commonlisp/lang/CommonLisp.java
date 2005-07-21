@@ -71,7 +71,6 @@ public class CommonLisp extends Lisp2
   static
   {
     instance = new CommonLisp();
-    instance.environ = clispEnvironment;
 
     instance.define("t", TRUE);
     instance.define("nil", FALSE);
@@ -100,6 +99,7 @@ public class CommonLisp extends Lisp2
 
   public CommonLisp()
   {
+    environ = clispEnvironment;
   }
 
   void initLisp()

@@ -64,7 +64,6 @@ public class ELisp extends Lisp2
   static
   {
     instance = new ELisp();
-    instance.environ = elispEnvironment;
 
     instance.define("t", TRUE);
     instance.define("nil", FALSE);
@@ -83,6 +82,7 @@ public class ELisp extends Lisp2
 
   ELisp ()
   {
+    environ = elispEnvironment;
   }
 
   private void initELisp ()

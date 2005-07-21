@@ -1,3 +1,8 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (environ): Since it is again possible to have multiple
+	instances, set the environ field in the constructor, not statically.
+
 2005-06-29  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (numEqu, numGrt, numGEq, numLss, numLEq): New static

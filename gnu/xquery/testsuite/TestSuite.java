@@ -11,6 +11,7 @@ public class TestSuite extends FilterConsumer
 {
   public static void main(String[] args)
   {
+    gnu.xquery.lang.XQuery.registerEnvironment();
     for (int i = 0;  i < args.length;  i++)
       {
 	try

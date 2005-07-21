@@ -9,8 +9,5 @@
             $prod:=$x*$y
           return <td align="right" bgcolor="{$bg}">{
             if ($x > 1 and $y > 1) then $prod else <b>{$prod}</b>}</td>
-    }</tr>,
-    "
-")
-}</table>,"
-"
+    }</tr>)
+}</table>

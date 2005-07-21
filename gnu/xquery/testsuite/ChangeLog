@@ -1,3 +1,11 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* TestSuite.java (main): Do XQuery.registerEnvironment first.
+
+	* Makefile.am (check-multab): Specify pretty-printing.
+	* multab.xql>: Remove strings with explicit enwlines.
+	* expectedmul.xml: New expected pretty output.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* use-cases.xml: Update syntax for enclosed expression in atrtribute.

@@ -1,5 +1,11 @@
 2005-07-21  Per Bothner  <per@bothner.com>
 
+	* Language.java (userEnv, encOunter): New fields.
+	(getEnvironment): New method.
+	(getNewEnvironment): Restore previously-removed method, but now
+	using the userEnv field.
+	(getTypeFor, getPrompter, eval): Use new getEnvironment method.
+
 	* ModuleBody.java (runAsMain): Call kawa.repl.processArgs.
 
 2005-07-20  Per Bothner  <per@bothner.com>

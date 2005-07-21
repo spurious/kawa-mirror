@@ -189,10 +189,28 @@ public abstract class Language
     return false;
   }
 
+  /** The environment for language built-ins and predefined bindings. */
   protected Environment environ;
 
-  /** Synonym for <code>Environment.getCurrent()</code>. */
-  public final Environment getEnvironment() { return Environment.getCurrent(); }
+  /** If non-null, the user environment.
+   * This allows "bunding" an Environment with a Language. This is partly to
+   * match existing documentation, and partly for convenience from Java code.
+   * Normally, userEnv is null, in which case the user environment is
+   * extracted from the current thread. */
+  protected Environment userEnv;
+
+  /** Get current user environment. */
+  public final Environment getEnvironment()
+  {
+    return userEnv != null ? userEnv : Environment.getCurrent();
+  }
+
+  static int envCounter;
+
+  public final Environment getNewEnvironment ()
+  {
+    return Environment.make("environment-"+(++envCounter), environ);
+  }
 
   public Environment getLangEnvironment() { return environ; }
 
@@ -263,7 +281,7 @@ public abstract class Language
   }
 
   /** Import all the public fields of an object. */
-  public void defineAll(Object object)
+  private void defineAll(Object object)
   {
     Class clas = object.getClass();
     java.lang.reflect.Field[] fields = clas.getFields();
@@ -293,7 +311,7 @@ public abstract class Language
       }
   }
 
-  public void defineFromFieldValue(java.lang.reflect.Field fld, Object value)
+  private void defineFromFieldValue(java.lang.reflect.Field fld, Object value)
     throws Throwable
   {
     if (value instanceof Location)
@@ -532,7 +550,7 @@ public abstract class Language
 	    else if (! decl.getFlag(Declaration.IS_UNKNOWN))
 	      return getTypeFor(exp);
 	  }
-	Object val = Environment.getCurrent().get(name);
+	Object val = getEnvironment().get(name);
 	if (val instanceof Type)
 	  return (Type) val;
         int len = name.length();
@@ -649,7 +667,7 @@ public abstract class Language
     Object property = null;
     if (hasSeparateFunctionNamespace())
       property = EnvironmentKey.FUNCTION;
-    Procedure prompter = (Procedure) Environment.getCurrent()
+    Procedure prompter = (Procedure) getEnvironment()
       .get(getSymbol("default-prompter"), property, null);
     if (prompter != null)
       return prompter;
@@ -739,7 +757,7 @@ public abstract class Language
     try
       {
 	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
-	ModuleExp.evalModule(Environment.getCurrent(), ctx, comp);
+	ModuleExp.evalModule(getEnvironment(), ctx, comp);
       }
     finally
       {

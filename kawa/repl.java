@@ -645,10 +645,76 @@ public class repl extends Procedure0or1
 	      }
 	  }
 	else
-	  return iArg;
+          {
+            int eq = arg.indexOf('=');
+            if (eq <= 0)
+              return iArg;
+            String key = arg.substring(0, eq);
+            String value = arg.substring(eq+1);
+            String uri, local;
+            for (int i = 0; ; i++)
+              {
+                String[] propertyField = propertyFields[i];
+                if (propertyField == null)
+                  break;
+                if (key.equals(propertyField[0]))
+                  {
+                    String cname = propertyField[1];
+                    String fname = propertyField[2];
+                    try
+                      {
+                        Class clas = Class.forName(cname);
+                        ThreadLocation loc = (ThreadLocation)
+                          clas.getDeclaredField(fname).get(null);
+                        loc.setGlobal(value);
+                        continue;
+                      }
+                    catch (Throwable ex)
+                      {
+                        System.err.println("error setting property " + key
+                                           +" field "+cname+'.'+fname+": "+ex);
+                        System.exit(-1);
+                      }
+                  }
+              }
+            if (key.charAt(0) == '{')
+              {
+                int rbrace = key.lastIndexOf('}');
+                if (rbrace <= 0)
+                  {
+                    System.err.println("missing '}' in property name '"+key+"'");
+                    System.exit (-1);
+                  }
+                uri = key.substring(1, rbrace);
+                local = key.substring(rbrace+1);
+              }
+            else
+              {
+                uri = "";
+                local = key;
+              }
+            Symbol symbol = Symbol.make(uri, local);
+            // Run Language's static initializer.
+            Language.getDefaultLanguage();
+            Environment current = Environment.getCurrent();
+            current.put(symbol, null, value);
+          }
       }
     return something_done ? -1 : iArg;
   }
+
+  static String[][] propertyFields =
+    {
+      { "out:doctype-system", "gnu.xml.XMLPrinter", "doctypeSystem" },
+      { "out:doctype-public", "gnu.xml.XMLPrinter", "doctypePublic" },
+      { "out:base", "gnu.kawa.functions.DisplayFormat", "outBase" },
+      { "out:radix", "gnu.kawa.functions.DisplayFormat", "outRadix" },
+      { "out:line-length", "gnu.text.PrettyWriter", "lineLengthLoc" },
+      { "out:right-margin", "gnu.text.PrettyWriter", "lineLengthLoc" },
+      { "out:miser-width", "gnu.text.PrettyWriter", "miserWidthLoc" },
+      { "out:xml-indent", "gnu.xml.XMLPrinter", "indentLoc" },
+      null
+    };
 
   public static void main(String args[])
   {

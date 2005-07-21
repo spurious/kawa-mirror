@@ -1,3 +1,8 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (propertyFields): New static table.
+	(processArgs): Process arguments of the form 'NAME=VALUE'.
+
 2005-07-20  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run): Set and restore default Language.

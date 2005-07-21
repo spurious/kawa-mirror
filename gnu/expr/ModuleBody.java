@@ -99,7 +99,8 @@ public abstract class ModuleBody extends Procedure0
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain (String[] args)
   {
-    kawa.repl.setArgs(args, 0);
+    int iArg = kawa.repl.processArgs(args, 0, args.length);
+    kawa.repl.setArgs(args, iArg);
     gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {

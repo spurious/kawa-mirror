@@ -1,3 +1,7 @@
+2005-07-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Add PreProcess.java.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java: Moved to gnu.lists.

@@ -6,6 +6,7 @@ java_sources = \
   ConsumeProc.java \
   RangeTable.java
 
+EXTRA_DIST = PreProcess.java
 PACKAGE_FNAME = gnu-kawa-util
 GCJ_INPUTS =  $(java_Java)
 

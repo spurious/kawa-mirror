@@ -173,6 +173,7 @@ public class Declaration
         Object val;
         if (field != null)
           {
+            comp.usedClass(field.getDeclaringClass());
             if (! field.getStaticFlag())
               {
                 loadOwningObject(owner, comp);

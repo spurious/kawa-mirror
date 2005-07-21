@@ -1,5 +1,7 @@
 2005-07-20  Per Bothner  <per@bothner.com>
 
+	* Language.java (defAliasStFld): New method.
+
 	* Compilation.java (addClass): Call dumpInitializers inside a loop, in
 	case emiting an initialier creates more - just like we do in
 	generateConstructor.  Fixes Savannah bug #13821.

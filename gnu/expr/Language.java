@@ -208,6 +208,13 @@ public abstract class Language
     environ.define(s, null, p);
   }
 
+  /** Declare in the current Environment a variable aliased to a static field.
+   */
+  protected void defAliasStFld(String name, String cname, String fname)
+  {
+    StaticFieldLocation.define(environ, getSymbol(name), null, cname, fname);
+  }
+
   /** Declare in the current Environment a procedure bound to a static field.
    * @param name the procedure's source-level name.
    * @param cname the name of the class containing the field.

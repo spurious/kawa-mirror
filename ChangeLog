@@ -1,3 +1,8 @@
+2005-07-20  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (r4Environment, r5Environment,
+	kawaEnvironment): Make final, and allocate in static block.
+
 2005-06-29  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (numEqu, numGrt, numGEq, numLss, numLEq):

@@ -36,9 +36,9 @@ public class Scheme extends LispLanguage
   }
 
   public static final Environment nullEnvironment;
-  public static Environment r4Environment;
-  public static Environment r5Environment;
-  protected static SimpleEnvironment kawaEnvironment;
+  public static final Environment r4Environment;
+  public static final Environment r5Environment;
+  protected static final SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
   static final Scheme instance;
@@ -61,6 +61,9 @@ public class Scheme extends LispLanguage
   static {
     // (null-environment)
     nullEnvironment = Environment.make("null-environment");
+    r4Environment = Environment.make("r4rs-environment", nullEnvironment);
+    r5Environment = Environment.make("r5rs-environment", r4Environment);
+    kawaEnvironment = Environment.make("kawa-environment", r5Environment);
 
     instance = new Scheme();
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
@@ -137,7 +140,6 @@ public class Scheme extends LispLanguage
                    "letrec_syntax");
 
       nullEnvironment.setLocked();
-      r4Environment = Environment.make("r4rs-environment", nullEnvironment);
       environ = r4Environment;
 
       //-- Section 6.1  -- complete
@@ -393,7 +395,6 @@ public class Scheme extends LispLanguage
                    "syntax_error");
 
       r4Environment.setLocked();
-      r5Environment = Environment.make("r5rs-environment", r4Environment);
       environ = r5Environment;
 
       defProcStFld("values", "kawa.lib.misc");
@@ -411,7 +412,6 @@ public class Scheme extends LispLanguage
       defProcStFld("dynamic-wind", "kawa.lib.misc");
 
       r5Environment.setLocked();
-      kawaEnvironment = Environment.make("kawa-environment", r5Environment);
       environ = kawaEnvironment;
  
       defSntxStFld("define-private", "kawa.lib.prim_syntax");

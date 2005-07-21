@@ -1,5 +1,7 @@
 2005-07-20  Per Bothner  <per@bothner.com>
 
+	* kawa/Shell.java (run): Set and restore default Language.
+
 	* kawa/standard/Scheme.java (r4Environment, r5Environment,
 	kawaEnvironment): Make final, and allocate in static block.
 

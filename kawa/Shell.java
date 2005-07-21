@@ -182,6 +182,7 @@ public class Shell
 			  InPort inp, Consumer out, OutPort perr)
   {
     SourceMessages messages = new SourceMessages();
+    Language saveLanguage = Language.getDefaultLanguage();
     Lexer lexer = language.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
     boolean interactive = inp instanceof TtyInPort;
@@ -193,6 +194,8 @@ public class Shell
 	saveConsumer = ctx.consumer;
 	ctx.consumer = out;
       }
+    if (language != saveLanguage)
+      Language.setDefaultLanguage(language);
     try
       {
 	for (;;)
@@ -273,6 +276,8 @@ public class Shell
       {
 	if (out != null)
 	  ctx.consumer = saveConsumer;
+        if (language != saveLanguage)
+          Language.setDefaultLanguage(saveLanguage);
       }
   }
 

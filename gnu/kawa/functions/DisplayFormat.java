@@ -4,6 +4,8 @@
 package gnu.kawa.functions;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.math.RatNum;
+import gnu.math.IntNum;
 import java.io.PrintWriter;
 import gnu.text.Char;
 
@@ -11,6 +13,15 @@ import gnu.text.Char;
 
 public class DisplayFormat extends AbstractFormat
 {
+  /** Fluid parameter to specify default output base for printing rationals. */
+  public static final ThreadLocation outBase
+    = new ThreadLocation("out-base");
+  static { outBase.setGlobal(IntNum.ten()); }
+  /** True if we should print a radix indicator when printing rationals.
+   * The default is no; otherwise we follow Common Lisp conventions. */
+  public static final ThreadLocation outRadix
+    = new ThreadLocation("out-radix");
+
   /** Create a new instance.
    * @param readable if output should be formatted so it could be read
    *   back in again, for example strings shoudl be quoted.
@@ -155,6 +166,36 @@ public class DisplayFormat extends AbstractFormat
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable && out instanceof PrintWriter)
       ((Printable) obj).print((PrintWriter) out);
+    else if (obj instanceof RatNum)
+      {
+        int b = 10;
+        boolean showRadix = false;
+        Object base = outBase.get(null);
+        Object printRadix = outRadix.get(null);
+        if (printRadix != null
+            && (printRadix == Boolean.TRUE
+                || "yes".equals(printRadix.toString())))
+          showRadix = true;
+        if (base instanceof Number)
+          b = ((IntNum) base).intValue();
+        else if (base != null)
+          b = Integer.parseInt(base.toString());
+        String asString = ((RatNum) obj).toString(b);
+        if (showRadix)
+          {
+            if (b == 16)
+              write("#x", out);
+            else if (b == 8)
+              write("#o", out);
+            else if (b == 2)
+              write("#b", out);
+            else if (b != 10 || ! (obj instanceof IntNum))
+              write("#"+base+"r", out);
+          }
+        write(asString, out);
+        if (showRadix && b == 10 && obj instanceof IntNum)
+          write(".", out);
+      }
     else
       {
 	String asString = obj != null ? obj.toString() : null;

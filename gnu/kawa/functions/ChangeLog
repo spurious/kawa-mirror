@@ -1,3 +1,9 @@
+2005-07-20  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (outBase, outRadix): New ThreadLocation fields.
+	(writeObject): If obj is rational, use outBase and outRadix to format
+	number as specified for Common Lisp.	
+
 2005-06-29  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (language): New field.

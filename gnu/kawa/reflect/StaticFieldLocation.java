@@ -16,11 +16,6 @@ public class StaticFieldLocation extends FieldLocation
     super(null, type, mname);
   }
 
-  public boolean isConstant ()
-  {
-    return true;
-  }
-
   public Object get (Object defaultValue)
   {
     Object val = super.get(defaultValue);

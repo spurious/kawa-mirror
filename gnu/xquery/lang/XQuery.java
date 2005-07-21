@@ -766,6 +766,17 @@ public class XQuery extends Language
     mangle(name, 0, name.length(), sbuf, 'U');
     return sbuf.toString();
   }
+
+  public static Object getExternal (SName name, Object type)
+  {
+    Environment env = Environment.getCurrent();
+    Symbol symbol = name.getSymbol();
+    Object value = env.get(symbol, null, null);
+    if (value == null)
+      throw new RuntimeException("unbound external "+name);
+    // FIXME - cast to type.
+    return value;
+  }
 }
 
 class Prompter extends Procedure1

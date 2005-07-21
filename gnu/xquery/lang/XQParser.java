@@ -1469,7 +1469,7 @@ public class XQParser extends Lexer
 
   /** This is deprecated because it only sees namespace prefix in the
    * module prefix.  It doesn't see prefixes in namespace attributes.
-   * The correct solution is to defer anmespace resolution to "resolve" time,
+   * The correct solution is to defer namespace resolution to "resolve" time,
    * as parseNameTest does. */
   Symbol parseQName (String defaultNamespaceUri)
       throws java.io.IOException, SyntaxException
@@ -3078,7 +3078,16 @@ public class XQParser extends Lexer
 	  }
 	else if (match("external"))
 	  {
-	    error("external variables not implemented yet");
+            Expression[] args =
+              {
+                new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
+                             new Expression[] {new QuoteExp(decl.getName())}),
+                QuoteExp.nullExp // FIXME
+              };
+            init = new ApplyExp(ClassType.make("gnu.xquery.lang.XQuery")
+                                .getDeclaredMethod("getExternal", 2),
+                                args);
+            getRawToken();
 	  }
 	else
 	  {

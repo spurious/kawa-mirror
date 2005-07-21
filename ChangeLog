@@ -1,5 +1,10 @@
 2005-07-21  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (<init>): Default constructor now calls
+	geNewEnvironment, to match old documentation/advice.
+	Also sets the environ field.
+	New non-default constructor called from clinit.
+
 	* kawa/repl.java (propertyFields): New static table.
 	(processArgs): Process arguments of the form 'NAME=VALUE'.
 

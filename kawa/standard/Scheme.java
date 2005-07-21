@@ -65,7 +65,7 @@ public class Scheme extends LispLanguage
     r5Environment = Environment.make("r5rs-environment", r4Environment);
     kawaEnvironment = Environment.make("kawa-environment", r5Environment);
 
-    instance = new Scheme();
+    instance = new Scheme(kawaEnvironment);
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
     not = new not(instance, "not");
     map = new map(true);
@@ -722,6 +722,13 @@ public class Scheme extends LispLanguage
 
   public Scheme ()
   {
+    environ = kawaEnvironment;
+    userEnv = getNewEnvironment();
+  }
+
+  protected Scheme (Environment env)
+  {
+    environ = env;
   }
 
   public String getName()

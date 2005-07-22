@@ -34,7 +34,7 @@ public abstract class AbstractFormat extends java.text.Format
 
   public void writeBoolean(boolean v, Consumer out)
   {
-    write(v ? "true" : "false", out);
+    out.writeBoolean(v);
   }
 
   public void beginGroup(String typeName, Object type, Consumer out)

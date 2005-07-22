@@ -1,3 +1,7 @@
+2005-07-21  Per Bothner  <per@bothner.com>
+
+	* AbstractFormat.java (writeBoolean): Use target's writeBoolean.
+
 2005-06-15  Per Bothner  <per@bothner.com>
 
 	* SeqPosition.java (nextElement): Remove redundant throws specifier.

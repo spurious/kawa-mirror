@@ -105,9 +105,7 @@ public abstract class ModuleBody extends Procedure0
     try
       {
 	CallContext ctx = CallContext.getInstance();
-	ClassMemberLocation.defineAll(this,  null,
-				      Language.getDefaultLanguage(),
-				      ctx.getEnvironment());
+	ClassMemberLocation.defineAll(this, ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();

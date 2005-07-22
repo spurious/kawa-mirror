@@ -1,5 +1,7 @@
 2005-07-21  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java (runAsMain): Use other defineAll overload.
+
 	* Declaration.java (load): Note that field's declaraing class is used.
 
 	* Language.java (userEnv, encOunter): New fields.

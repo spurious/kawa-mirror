@@ -1,6 +1,9 @@
 2005-07-21  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (<init>): Comment out unused variable.
+
 	* XQuery.java (getExternal): New method.
+
 	* XQParser.java (parse): Implement external variables.
 
 2005-06-26  Per Bothner  <per@bothner.com>

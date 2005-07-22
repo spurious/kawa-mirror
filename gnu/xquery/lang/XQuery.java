@@ -475,8 +475,6 @@ public class XQuery extends Language
 
   public XQuery()
   {
-    Environment scmEnv = Scheme.builtin();
-
     environ = Environment.make(XQUERY_FUNCTION_NAMESPACE);
     defaultNamespace = xqueryFunctionNamespace;
     //environ.setPrevious(extensionsEnvEnv);
@@ -487,6 +485,8 @@ public class XQuery extends Language
       instance = this;
 
     /*
+    Environment scmEnv = Scheme.builtin();
+
     Environment saveEnv = Environment.getCurrent();
     try
       {

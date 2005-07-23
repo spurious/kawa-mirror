@@ -61,16 +61,6 @@ public class LocationProc extends Procedure0or1 implements HasSetter
     return loc;
   }
 
-  public Object setWithSave (Object newValue)
-  {
-    return loc.setWithSave(newValue);
-  }
-
-  public void setRestore (Object oldValue)
-  {
-    loc.setRestore(oldValue);
-  }
-
   public String toString ()
   {
     Object n = getSymbol();

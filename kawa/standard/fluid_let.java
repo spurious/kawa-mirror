@@ -48,51 +48,56 @@ public class fluid_let extends Syntax implements Printable
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
-	Expression value;
-	Pair binding;
-	Object name = bind_pair.car;
-	if (name instanceof String || name instanceof Symbol)
-	  {
-	    value = defaultInit;
-	  }
-	else if (name instanceof Pair
-		 && ((binding = (Pair) name).car instanceof String
-		     || binding.car instanceof Symbol 
-                     || binding.car instanceof SyntaxForm))
-		 
-	  {
-	      name = binding.car;
-             if (name instanceof SyntaxForm)
-             {
-               name = ((SyntaxForm)name).form;
-             }
-
-	    if (binding.cdr == LList.Empty)
-	      value = defaultInit;
-	    else if (! (binding.cdr instanceof Pair)
-		     || (binding = (Pair) binding.cdr).cdr != LList.Empty)
-	      return tr.syntaxError("bad syntax for value of " + name
-				    + " in " + getName());
-	    else
-	      value = tr.rewrite (binding.car);
-	  }
-	else
-	  return tr.syntaxError("invalid " + getName() + " syntax");
-	Declaration decl = let.addDeclaration(name);
-        Declaration found = tr.lexical.lookup(name, false);
-        if (found != null)
+        Object savePos = tr.pushPositionOf(bind_pair);
+        try
           {
-            if (found.isLexical())
-              found.setIndirectBinding(true);
-            decl.base = found;
+            Expression value;
+            Pair binding;
+            Object name = bind_pair.car;
+            if (name instanceof String || name instanceof Symbol)
+              {
+                value = defaultInit;
+              }
+            else if (name instanceof Pair
+                     && ((binding = (Pair) name).car instanceof String
+                         || binding.car instanceof Symbol 
+                         || binding.car instanceof SyntaxForm))
+              {
+                name = binding.car;
+                if (name instanceof SyntaxForm)
+                  name = ((SyntaxForm)name).form;
+
+                if (binding.cdr == LList.Empty)
+                  value = defaultInit;
+                else if (! (binding.cdr instanceof Pair)
+                         || (binding = (Pair) binding.cdr).cdr != LList.Empty)
+                  return tr.syntaxError("bad syntax for value of " + name
+                                        + " in " + getName());
+                else
+                  value = tr.rewrite(name);
+              }
+            else
+              return tr.syntaxError("invalid " + getName() + " syntax");
+            Declaration decl = let.addDeclaration(name);
+            Declaration found = tr.lexical.lookup(name, false);
+            if (found != null)
+              {
+                if (found.isLexical())
+                  found.setIndirectBinding(true);
+                decl.base = found;
+              }
+            decl.setFluid(true);
+            decl.setIndirectBinding(true);
+            if (value == null)
+              value = new ReferenceExp(name);
+            inits[i] = value;
+            decl.noteValue(null);
+            bindings = bind_pair.cdr;
           }
-	decl.setFluid(true);
-	decl.setIndirectBinding(true);
-	if (value == null)
-	  value = new ReferenceExp(name);
-	inits[i] = value;
-	decl.noteValue(null);
-	bindings = bind_pair.cdr;
+        finally
+          {
+            tr.popPositionOf(savePos);
+          }
       }
     tr.push(let);
     if (star && bindings != LList.Empty)

@@ -1,6 +1,11 @@
+2005-07-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/fluid-let.java (rewrite):  Push/pop position
+	for better error messages.
+
 2005-07-23  Alex Milowski  <alex@milowski.org>
 
-	* kawa/standard/fluid-let.java (reqrite): Handle SyntaxForm.
+	* kawa/standard/fluid-let.java (rewrite): Handle SyntaxForm.
 
 2005-07-23  Per Bothner  <per@bothner.com>
 

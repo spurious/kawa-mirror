@@ -37,10 +37,11 @@ public class GuiConsole extends Frame implements ActionListener {
 
   public GuiConsole()
   {
-    this(Language.getDefaultLanguage(), Environment.getCurrent());
+    this(Language.getDefaultLanguage(), Environment.getCurrent(), false);
   }
 
-  public GuiConsole(Language language, Environment penvironment) {
+  public GuiConsole(Language language, Environment penvironment, boolean shared)
+  {
     super("Kawa");
     this.language = language;
 
@@ -65,6 +66,8 @@ public class GuiConsole extends Frame implements ActionListener {
 
     thread = new Future (new kawa.repl(language),
 			 penvironment, in_p, out_p, err_p);
+    if (shared)
+      thread.environment.setIndirectDefines();
     this.environment = thread.environment;
     thread.start();
   }
@@ -132,9 +135,9 @@ public class GuiConsole extends Frame implements ActionListener {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))
-      new GuiConsole(language, Environment.getGlobal());
+      new GuiConsole(language, Environment.getGlobal(), false);
     else if (cmd.equals(NEW_SHARED))
-      new GuiConsole(language, environment);
+      new GuiConsole(language, environment, true);
     else if (cmd.equals(EXIT))
       System.exit(0);
     else if (cmd.equals(CLOSE))

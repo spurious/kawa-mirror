@@ -1,5 +1,8 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* windows.scm (scheme-window): Specifically use Scheme rather than
+	current language.  Update for new GuiConsole constructor.  Return void.
+
 	* parameters.scm (parameterize%): setWithSave and setRestore now
 	require an extra CallContext parameter.
 

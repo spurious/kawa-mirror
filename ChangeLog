@@ -1,5 +1,9 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* kawa/GuiConsole.java (<init>): New shared parameter.
+	Use to call InheritingEnvironment's setIndirectDefines.
+	(actionPerformed): Update for modified Environment inheritance.
+
 	* kawa/standard/TracedProcedure.java (applyN): setWithSave and
 	setRestore now require an extra CallContext parameter.
 

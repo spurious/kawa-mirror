@@ -1,9 +1,7 @@
-(define (scheme-window #!optional share)
+(define (scheme-window #!optional share) :: <void>
   (let* ((language :: <gnu.expr.Language>
-		 (invoke-static <gnu.expr.Language> 'getDefaultLanguage))
+		 (kawa.standard.Scheme:getInstance))
 	 (env :: <gnu.mapping.Environment>
 	      (if share (interaction-environment)
 		  (invoke language 'getNewEnvironment))))
-    ((primitive-constructor <kawa.GuiConsole> (<gnu.expr.Language>
-					       <gnu.mapping.Environment>))
-     language env)))
+    (make <kawa.GuiConsole> language env share)))

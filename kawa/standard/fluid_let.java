@@ -57,10 +57,16 @@ public class fluid_let extends Syntax implements Printable
 	  }
 	else if (name instanceof Pair
 		 && ((binding = (Pair) name).car instanceof String
-		     || binding.car instanceof Symbol))
+		     || binding.car instanceof Symbol 
+                     || binding.car instanceof SyntaxForm))
 		 
 	  {
-	    name = binding.car;
+	      name = binding.car;
+             if (name instanceof SyntaxForm)
+             {
+               name = ((SyntaxForm)name).form;
+             }
+
 	    if (binding.cdr == LList.Empty)
 	      value = defaultInit;
 	    else if (! (binding.cdr instanceof Pair)

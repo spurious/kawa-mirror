@@ -1,3 +1,7 @@
+2005-07-23  Alex Milowski  <alex@milowski.org>
+
+	* kawa/standard/fluid-let.java (reqrite): Handle SyntaxForm.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (*print-base*, *print-radix*,

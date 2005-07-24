@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 139)
+(test-init "Miscellaneous" 142)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -658,3 +658,23 @@
   (let ((x (neg-abs 4)))
     (format #f "x = ~S." x)))
 (test "x = -4." test-neg-abs)
+
+;; Common Lisp hyperspec
+(test "[#24rn]" 'print-base-1 ;; Common Lisp returns upper-case #24rN
+      (fluid-let ((*print-base* 24) (*print-radix* #t))
+	(format #f "[~s]" 23)))
+(test '("101000" "1111" "220" "130" "104" "55" "50" "44" "40" "37" "34"
+	"31" "2c" "2a" "28" "26" "24" "22" "20" "1j" "1i" "1h" "1g" "1f"
+	"1e" "1d" "1c" "1b" "1a" "19" "18" "17" "16" "15" "14") 'print-base-2
+	;print the decimal number 40 in each base from 2 to 36
+      (let loop ((i 36) (r '()))
+	(if (= i 1) r
+	    (loop (- i 1)
+		  (cons (fluid-let ((*print-base* i)) (format #f "~s" 40))
+			r)))))
+(test '("#b1010 #b1/1010" "#3r101 #3r1/101" "#o12 #o1/12" "10. #10r1/10" "#xa #x1/a") 'print-base-3
+      ;;print the integer 10 and the ratio 1/10 in bases 2, 3, 8, 10, 16 
+      (map (lambda (pb)
+	     (fluid-let ((*print-radix* #t) (*print-base* pb))
+	       (format #f "~S ~S" 10 1/10)))
+	   '(2 3 8 10 16)))

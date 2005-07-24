@@ -1,5 +1,8 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* misc-test.scm: New tests, from Common Lisp hyperspec, for testing
+	*print-radix* and *print-base*.
+
 	* misc-test.scm: New test for future inside fluid-let.
 
 2005-07-20  Per Bothner  <per@bothner.com>

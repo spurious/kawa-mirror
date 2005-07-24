@@ -1,5 +1,8 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (*print-base*, *print-radix*,
+	*print-right-margin*, *print-miser-width*): New fluid variables.
+
 	* kawa/GuiConsole.java (<init>): New shared parameter.
 	Use to call InheritingEnvironment's setIndirectDefines.
 	(actionPerformed): Update for modified Environment inheritance.

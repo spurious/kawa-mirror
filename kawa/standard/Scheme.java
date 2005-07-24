@@ -716,6 +716,15 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("cond-expand", "kawa.lib.syntax");
       defSntxStFld("%cond-expand", "kawa.lib.syntax");
+
+      defAliasStFld("*print-base*", "gnu.kawa.functions.DisplayFormat",
+                    "outBase");
+      defAliasStFld("*print-radix*", "gnu.kawa.functions.DisplayFormat",
+                    "outRadix");
+      defAliasStFld("*print-right-margin*",
+                    "gnu.text.PrettyWriter", "lineLengthLoc");
+      defAliasStFld("*print-miser-width*",
+                    "gnu.text.PrettyWriter", "miserWidthLoc");
  
       kawaEnvironment.setLocked();
   }

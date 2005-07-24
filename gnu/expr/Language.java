@@ -656,10 +656,15 @@ public abstract class Language
     return gnu.math.IntNum.make(val);
   }
 
-  public static void setDefaults (Language lang)
+  public static synchronized void setDefaults (Language lang)
   {
     Language.setDefaultLanguage(lang);
     current.setGlobal(lang);
+    // Assuming this is the initial (main) thread, make it's Environment
+    // the default (global) one, so child threads can inherit from it.
+    // Thus command-line definitions etc get inherited.
+    if (Environment.getGlobal() == BuiltinEnvironment.getInstance())
+      Environment.setGlobal(Environment.getCurrent());
   }
 
   public Procedure getPrompter()

@@ -1,5 +1,8 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* Language.java (setDefaults):  Set global/default environment to
+	that of the initial (main) thread.
+
 	* BuiltinEnvironment.java (getLocation): Update parameter list.
 
 	* FluidLetExp.java (compile):  setWithSave andf setRestore now take

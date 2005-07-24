@@ -38,9 +38,7 @@ public class ReplMode extends ProcessMode
   public static void make (Buffer buffer, Language language)
     throws java.io.IOException
   {
-    
-    buffer.modes = new ReplMode (buffer,
-				 language, Environment.getCurrent());
+    buffer.modes = new ReplMode (buffer, language, Environment.getGlobal());
   }
 
 

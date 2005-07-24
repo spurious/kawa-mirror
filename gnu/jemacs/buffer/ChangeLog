@@ -1,5 +1,7 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* ReplMode.java (make): Inherit from global, not current, environment.
+
 	* emacs.scm (interaction-window): New function.
 	(scheme-window): Rename to scheme-interaction-window.
 	(elisp-interaction-window): New function.

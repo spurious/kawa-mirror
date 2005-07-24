@@ -81,9 +81,8 @@ public class SimpleEnvironment extends Environment
   }
 
   public synchronized NamedLocation
-  getLocation (Symbol name, Object property, boolean create)
+  getLocation (Symbol name, Object property, int hash, boolean create)
   {
-    int hash = name.hashCode() ^ System.identityHashCode(property);
     NamedLocation loc = lookup(name, property, hash);
     if (loc != null)
       return loc;
@@ -206,7 +205,10 @@ public class SimpleEnvironment extends Environment
 	    : ((flags & CAN_DEFINE) == 0) && loc.isBound());
 	  redefineError(name, property, nloc);
       }
-    nloc.base = loc;
+    if ((flags & Environment.INDIRECT_DEFINES) != 0)
+      nloc.base = ((SimpleEnvironment) ((InheritingEnvironment) this).getParent(0)).addLocation(name, property, hash, loc);
+    else
+      nloc.base = loc;
     nloc.value = IndirectableLocation.INDIRECT_FLUIDS;
     return nloc;
   }

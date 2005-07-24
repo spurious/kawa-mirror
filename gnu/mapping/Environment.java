@@ -37,6 +37,9 @@ public abstract class Environment
   /** If this flag is on, set DIRECT_ON_SET for inherited locations. */
   static final int DIRECT_INHERITED_ON_SET = 16;
 
+  /** Newly defined locations are created in inherited parent environment. */
+  public static final int INDIRECT_DEFINES = 32;
+
   int flags = (CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE
 	       |DIRECT_INHERITED_ON_SET);
 
@@ -69,6 +72,12 @@ public abstract class Environment
     flags &= ~(CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE);
   }
 
+  public final void setIndirectDefines ()
+  {
+    flags |= Environment.INDIRECT_DEFINES;
+    ((InheritingEnvironment) this).baseTimestamp = 0x7fffffff;
+  }
+
   /** Return a location bound to (key, property).
    * Create new unbound Location if no such Location exists. */
   public final Location getLocation (Symbol key, Object property)
@@ -99,7 +108,14 @@ public abstract class Environment
   }
 
   public abstract NamedLocation getLocation (Symbol key, Object property,
-					       boolean create);
+                                             int hash, boolean create);
+
+  public final NamedLocation
+  getLocation (Symbol name, Object property, boolean create)
+  {
+    int hash = name.hashCode() ^ System.identityHashCode(property);
+    return getLocation(name, property, hash, create);
+  }
 
   public final Location getLocation (Object key, boolean create)
   {
@@ -340,7 +356,7 @@ public abstract class Environment
     return new SimpleEnvironment(name);
   }
 
-  public static SimpleEnvironment make (String name, Environment parent)
+  public static InheritingEnvironment make (String name, Environment parent)
   {
     return new InheritingEnvironment(name, parent);
   }
@@ -356,5 +372,3 @@ public abstract class Environment
     return toString();
   }
 }
-
-

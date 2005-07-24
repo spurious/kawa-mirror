@@ -23,6 +23,9 @@ public class InheritingEnvironment extends SimpleEnvironment
       }
   }
 
+  public final int getNumParents () { return numInherited; }
+  public final Environment getParent (int index) { return inherited[index]; }
+
   public void addParent (Environment env)
   {
     if (numInherited == 0)
@@ -86,13 +89,15 @@ public class InheritingEnvironment extends SimpleEnvironment
   }
 
   public synchronized NamedLocation
-  getLocation (Symbol name, Object property, boolean create)
+  getLocation (Symbol name, Object property, int hash, boolean create)
   {
-    int hash = name.hashCode() ^ System.identityHashCode(property);
     NamedLocation loc = lookupDirect(name, property, hash);
     if (loc != null)
       return loc;
-    loc = lookupInherited(name, property, hash);
+    if ((flags & INDIRECT_DEFINES) != 0 && create)
+      loc = inherited[0].getLocation(name, property, hash, true);
+    else
+      loc = lookupInherited(name, property, hash);
 
     if (loc != null)
       {
@@ -102,7 +107,9 @@ public class InheritingEnvironment extends SimpleEnvironment
 	    if ((flags & CAN_DEFINE) == 0 && loc.isBound())
 	      redefineError(name, property, xloc);
 	    xloc.base = loc;
-	    if ((flags & DIRECT_INHERITED_ON_SET) != 0)
+            if (loc.value == IndirectableLocation.INDIRECT_FLUIDS)
+              xloc.value = loc.value;
+	    else if ((flags & DIRECT_INHERITED_ON_SET) != 0)
 	      xloc.value = IndirectableLocation.DIRECT_ON_SET;
 	    else
 	      xloc.value = null;

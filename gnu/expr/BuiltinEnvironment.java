@@ -26,7 +26,8 @@ public class BuiltinEnvironment extends Environment
     return lang == null ? null : lang.lookupBuiltin(name, property, hash);
   }
 
-  public NamedLocation getLocation (Symbol key, Object property, boolean create)
+  public NamedLocation getLocation (Symbol key, Object property,
+                                    int hash, boolean create)
   {
     throw new RuntimeException();
   }

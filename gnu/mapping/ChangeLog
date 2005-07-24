@@ -1,5 +1,16 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* Environment.java (INDIRECT_DEFINES): New flag.
+	(setIndirectDefines): New method.
+	(getGlobal): Add new overload, with abstract method taking hash code.\
+	(make(String,Environment)): More precise return type.
+	* SimpleEnvironment.java (getLocation):  Update accordingly.
+	(addLocation): If INDIRECT_DEFINES, add to parent instead.
+	* InheritingEnvironment.java (getLocation): Update accordingly.
+	If INDIRECT_DEFINES, create in parent.
+	If existing loc has INDIRECT_FLUIDS, copy that attribute.
+	* InheritingEnvironment.java (getNumParents, getParent): New methods.
+
 	* CallContext.java (pushedFluids, pushedFluidsCount): New fields.
 	(pushFluid, popFluid): New methods.
 	(getEnvironment): Set THREAD_SAFE flag on new environment.

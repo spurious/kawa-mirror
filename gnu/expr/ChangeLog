@@ -1,5 +1,7 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* BuiltinEnvironment.java (getLocation): Update parameter list.
+
 	* FluidLetExp.java (compile):  setWithSave andf setRestore now take
 	an extra CallContext parameter.
 

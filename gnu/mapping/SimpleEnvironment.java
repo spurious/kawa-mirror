@@ -185,7 +185,8 @@ public class SimpleEnvironment extends Environment
   // FIXME rename to define
   NamedLocation addLocation (Symbol name, Object property, int hash, Location loc)
   {
-    if (loc instanceof ThreadLocation)
+    if (loc instanceof ThreadLocation
+        && ((ThreadLocation) loc).property == property)
       loc = ((ThreadLocation) loc).getLocation();
     NamedLocation nloc = lookupDirect(name, property, hash);
     if (loc == nloc)
@@ -348,39 +349,6 @@ public class SimpleEnvironment extends Environment
     envTable.put(name, this);
     return this;
    
-  }
-
-  public synchronized void makeShared ()
-  {
-    if ((flags & THREAD_SAFE) != 0)
-      return;
-    flags |= THREAD_SAFE;
-    for (int index = table.length;  --index >= 0; )
-      {
-	NamedLocation prev = null;
-	int timestamp = currentTimestamp;
-	for (NamedLocation loc = table[index];  loc != null; )
-	  {
-	    NamedLocation next = loc.next;
-	    if (! (loc instanceof SharedLocation) && loc != sharedTail)
-	      {
-		SharedLocation sloc;
-		sloc = new SharedLocation(loc.name, loc.property, timestamp);
-		sloc.base = loc.base;
-		sloc.value = loc.value;
-		loc.next = null;
-		loc.base = sloc;
-		loc.value = IndirectableLocation.INDIRECT_FLUIDS;
-		loc = sloc;
-	      }
-	    if (prev == null)
-	      table[index] = loc;
-	    else
-	      prev.next = loc;
-	    prev = loc;
-	    loc = next;
-	  }
-      }
   }
 
   /* #ifdef JAVA2 */

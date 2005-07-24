@@ -25,8 +25,12 @@ public class CallContext // implements Runnable
   public final Environment getEnvironment()
   {
     if (curEnvironment == null)
-      curEnvironment
-	= Environment.make(currentThread.getName(), Environment.global);
+      {
+	Environment env
+          = Environment.make(currentThread.getName(), Environment.global);
+        env.flags |= Environment.THREAD_SAFE;
+        curEnvironment = env;
+      }
     return curEnvironment;
   }
 
@@ -381,6 +385,35 @@ public class CallContext // implements Runnable
   public void setBaseUri (String baseUri)
   {
     this.baseUri = baseUri;
+  }
+
+  /** A stack of currently re-bound fluids variables.
+   * There is one for each active fluids-let or parmaterize variable. */
+  Location[] pushedFluids;
+  /** The number of active elements of the pushedFluids array. */
+  int pushedFluidsCount;
+
+  public final void pushFluid (Location loc)
+  {
+    Location[] fluids = pushedFluids;
+    int count = pushedFluidsCount;
+    if (fluids == null)
+      {
+        pushedFluids = fluids = new Location[10];
+      }
+    else if (count == fluids.length)
+      {
+        Location[] newFluids = new Location[2 * count];
+        System.arraycopy(fluids, 0, newFluids, 0, count);
+        pushedFluids = fluids = newFluids;
+      }
+    fluids[count] = loc;
+    pushedFluidsCount = count + 1;
+  }
+
+  public final void popFluid ()
+  {
+    pushedFluids[--pushedFluidsCount] = null;
   }
 }
 

@@ -1,3 +1,8 @@
+2005-07-23  Per Bothner  <per@bothner.com>
+
+	* parameters.scm (parameterize%): setWithSave and setRestore now
+	require an extra CallContext parameter.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* ports.scm (write, display): New functions.

@@ -4,8 +4,7 @@
 package gnu.mapping;
 
 /** A Location suitable when Environment or Location can be access by
- * multiple threads.  Accesses are synchronized.
- * Also, setWithSave setRestore are different than PlainLocation. */
+ * multiple threads.  Accesses are synchronized. */
 
 public class SharedLocation extends NamedLocation
 {
@@ -41,37 +40,6 @@ public class SharedLocation extends NamedLocation
       getEnvironment().put(getKeySymbol(), getKeyProperty(), newValue);
     else
       base.set(newValue);
-  }
-
-  public synchronized Object setWithSave (Object newValue)
-  {
-    Object old;
-    if (base != null)
-      {	
-	if (value == INDIRECT_FLUIDS)
-	  return base.setWithSave(newValue);
-	old = base;
-	base = null;
-      }
-    else
-      {
-	old = value;
-      }
-    value = newValue;
-    return old;
-  }
-
-  public synchronized void setRestore (Object oldValue)
-  {
-    if (base != null)
-      base.setRestore(oldValue);
-    else if (oldValue instanceof Location)
-      {
-	value = null;
-	base = (Location) oldValue;
-      }
-    else
-      value = oldValue;
   }
 
 }

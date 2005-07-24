@@ -26,11 +26,15 @@ public class FluidLetExp extends LetExp
       ttarg = Target.pushObject;
     else
       ttarg = new StackTarget(result_type);
-    code.enterScope(getVarScope());
+    Scope scope = getVarScope();
+    code.enterScope(scope);
+    Variable ctx = scope.addVariable(code, Compilation.typeCallContext, null);
+    comp.loadCallContext();
+    code.emitStore(ctx);
     Variable[] save = new Variable[inits.length];
     
     Declaration decl = firstDecl();
-    doInits(decl, 0, save, comp);
+    doInits(decl, 0, save, comp, ctx);
     code.emitTryStart(true, result_type);
     body.compileWithPosition(comp, ttarg);
     code.emitTryEnd();
@@ -42,8 +46,9 @@ public class FluidLetExp extends LetExp
 	decl.load(null, ReferenceExp.DONT_DEREFERENCE,
 		  comp, Target.pushObject);
 	code.emitLoad(save[i]);
+        code.emitLoad(ctx);
 	code.emitInvokeVirtual(Compilation.typeLocation
-			       .getDeclaredMethod("setRestore", 1));
+			       .getDeclaredMethod("setRestore", 2));
 	
       }
     code.emitTryCatchEnd();
@@ -53,7 +58,7 @@ public class FluidLetExp extends LetExp
   }
 
   private void doInits (Declaration decl, int i, Variable[] save,
-			Compilation comp)
+			Compilation comp, Variable ctx)
   {
     if (i >= inits.length)
       return;
@@ -65,9 +70,10 @@ public class FluidLetExp extends LetExp
     code.emitDup();
     code.emitStore(decl.getVariable());
     inits[i].compile(comp, Target.pushObject);
-    doInits(decl.nextDecl(), i+1, save, comp);
+    doInits(decl.nextDecl(), i+1, save, comp, ctx);
+    code.emitLoad(ctx);
     code.emitInvokeVirtual(Compilation.typeLocation
-			   .getDeclaredMethod("setWithSave", 1));
+			   .getDeclaredMethod("setWithSave", 2));
     code.emitStore(save[i]);
   }
 

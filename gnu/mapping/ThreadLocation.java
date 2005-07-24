@@ -123,14 +123,14 @@ public class ThreadLocation extends Location
     getLocation().set(value);
   }
 
-  public Object setWithSave (Object newValue)
+  public Object setWithSave (Object newValue, CallContext ctx)
   {
-    return getLocation().setWithSave(newValue);
+    return getLocation().setWithSave(newValue, ctx);
   }
 
-  public void setRestore (Object oldValue)
+  public void setRestore (Object oldValue, CallContext ctx)
   {
-    getLocation().setRestore(oldValue);
+    getLocation().setRestore(oldValue, ctx);
   }
 
   public Symbol getKeySymbol () { return name; }

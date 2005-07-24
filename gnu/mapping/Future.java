@@ -17,21 +17,52 @@ public class Future extends Thread
 
   Procedure action;
 
-  public Future (Procedure action, Environment penvironment)
+  public Future (Procedure action, CallContext parentContext)
+  {
+    this(action, parentContext, parentContext.getEnvironment());
+
+  }
+
+  public Future (Procedure action,
+                 CallContext parentContext, Environment penvironment)
   {
     this.action = action;
-    if (penvironment instanceof SimpleEnvironment)
-      ((SimpleEnvironment) penvironment).makeShared();
     SimpleEnvironment env = Environment.make(getName(), penvironment); 
-    env.makeShared();
+    env.flags |= Environment.THREAD_SAFE;
     env.flags &= ~Environment.DIRECT_INHERITED_ON_SET;
     this.environment = env;
+    int n = parentContext.pushedFluidsCount;
+    for (int i = 0;  i < n; i++)
+      {
+        // If we're inside a fluid-let, then the child thread should inherit
+        // the fluid-let binding, even if it isn't accessed in the child until
+        // after the parent exits the fluid-let.  Set things up so only the
+        // binding in the parent is restored, but they share utnil then.
+        Location loc = parentContext.pushedFluids[i];
+        Symbol name = loc.getKeySymbol();
+        Object property = loc.getKeyProperty();
+        if (name != null && loc instanceof NamedLocation)
+          {
+            NamedLocation nloc = (NamedLocation) loc;
+            if (nloc.base == null)
+              {
+                SharedLocation sloc = new SharedLocation(name, property, 0);
+                sloc.value = nloc.value;
+                nloc.base = sloc;
+                nloc.value = null;
+                nloc = sloc;
+              }
+            int hash = name.hashCode() ^ System.identityHashCode(property);
+            NamedLocation xloc = env.addUnboundLocation(name, property, hash);
+            xloc.base = nloc;
+          }
+      }
   }
 
   public Future (Procedure action, Environment penvironment,
 		 InPort in, OutPort out, OutPort err)
   {
-    this(action, penvironment);
+    this(action, CallContext.getInstance(), penvironment);
     this.in = in;
     this.out = out;
     this.err = err;
@@ -39,7 +70,7 @@ public class Future extends Thread
 
   public Future (Procedure action)
   {
-    this(action, Environment.getCurrent());
+    this(action, CallContext.getInstance());
   }
 
   /** Get the CallContext we use for this Thread. */
@@ -49,7 +80,10 @@ public class Future extends Thread
   {
     try
       {
-	context = CallContext.getInstance();
+        if (context == null)
+          context = CallContext.getInstance();
+        else
+          CallContext.setInstance(context);
 	context.curEnvironment = environment;
 	if (in != null)
 	  InPort.setInDefault(in);

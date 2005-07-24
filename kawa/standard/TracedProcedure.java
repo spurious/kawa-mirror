@@ -82,7 +82,7 @@ public class TracedProcedure extends ProcedureN
         CallContext context = CallContext.getInstance();
         IntNum newIndentation = IntNum.make(curIndent+indentationStep);
 	Object result;
-	Object save = curIndentLoc.setWithSave(newIndentation);
+	Object save = curIndentLoc.setWithSave(newIndentation, context);
         try
           {
             result = proc.applyN(args);
@@ -95,7 +95,7 @@ public class TracedProcedure extends ProcedureN
           }
         finally
           {
-	    curIndentLoc.setRestore(save);
+	    curIndentLoc.setRestore(save, context);
           }
 
         // Print the result (indented).

@@ -23,11 +23,12 @@
       (begin . body)
       (begin . restore)))
     ((parameterize% ((param1 value1) . rest) restore . body)
-     (let* ((p :: <gnu.mapping.Location> (as-location% param1))
+     (let* ((ctx (gnu.mapping.CallContext:getInstance))
+	    (p :: <gnu.mapping.Location> (as-location% param1))
 	    (v value1)
-	    (save (gnu.mapping.Location:setWithSave p v)))
+	    (save (gnu.mapping.Location:setWithSave p v ctx)))
        (parameterize% rest
-		      ((gnu.mapping.Location:setRestore p save) . restore)
+		      ((gnu.mapping.Location:setRestore p save ctx) . restore)
 		      . body)))))
 
 (define-syntax parameterize

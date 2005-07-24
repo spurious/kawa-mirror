@@ -1,3 +1,8 @@
+2005-07-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/TracedProcedure.java (applyN): setWithSave and
+	setRestore now require an extra CallContext parameter.
+
 2005-07-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (<init>): Default constructor now calls

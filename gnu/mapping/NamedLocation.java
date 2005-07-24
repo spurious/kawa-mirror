@@ -103,4 +103,40 @@ public abstract class NamedLocation extends IndirectableLocation
       h ^= val.hashCode();
     return h;
   }
+
+  public synchronized Object setWithSave (Object newValue, CallContext ctx)
+  {
+    Object old;
+    if (base != null)
+      {	
+	if (value == INDIRECT_FLUIDS)
+          return base.setWithSave(newValue, ctx);
+	old = base;
+	base = null;
+      }
+    else
+      {
+	old = value;
+      }
+    value = newValue;
+    ctx.pushFluid(this);
+    return old;
+  }
+
+  public synchronized void setRestore (Object oldValue, CallContext ctx)
+  {
+    if (value == INDIRECT_FLUIDS)
+      base.setRestore(oldValue, ctx);
+    else
+      {
+        if (oldValue instanceof Location)
+          {
+            value = null;
+            base = (Location) oldValue;
+          }
+        else
+          value = oldValue;
+        ctx.popFluid();
+      }
+  }
 }

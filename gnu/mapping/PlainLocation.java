@@ -41,35 +41,4 @@ public class PlainLocation extends NamedLocation
     else
       base.set(newValue);
   }
-
-  public Object setWithSave (Object newValue)
-  {
-    Object old;
-    if (base != null)
-      {
-	if (value == INDIRECT_FLUIDS)
-	  return base.setWithSave(newValue);
-	old = base;
-	base = null;
-      }
-    else
-      {
-	old = value;
-      }
-    value = newValue;
-    return old;
-  }
-
-  public void setRestore (Object oldValue)
-  {
-    if (base != null)
-      base.setRestore(oldValue);
-    else if (oldValue instanceof Location)
-      {
-	value = null;
-	base = (Location) oldValue;
-      }
-    else
-      value = oldValue;
-  }
 }

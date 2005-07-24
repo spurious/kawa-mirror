@@ -1,5 +1,23 @@
 2005-07-23  Per Bothner  <per@bothner.com>
 
+	* CallContext.java (pushedFluids, pushedFluidsCount): New fields.
+	(pushFluid, popFluid): New methods.
+	(getEnvironment): Set THREAD_SAFE flag on new environment.
+	* Location.java (setWithSave, setRestore): Take extra CallContext
+	parameter, so we can call pushFluid/popFluid.
+	* SharedLocation.java (setWithSave, setRestore): Move to NamedLocation.
+	* NamedLocation.java (setWithSave, setRestore): Update to pass
+	or use CallContext parameter.
+	* ThreadLocation.java (setWithSave, setRestore): Update accordingly.
+	* ConstrainedLocation.java (setWithSave, setRestore): Likewise update.
+	* PlainLocation.java (setWithSave, setRestore): Use inherited methods.
+	* Future.java (<init>): Pass parent CallContext.  Use it import into
+	child any pushed fluid bindings.
+	Don't call makeShared, but force/assume that THREAD_SAFE is set.
+	* SimpleEnvironment.java (addLocation): Only rereference ThreadLocation
+	if it's the same property and thus a cycle is a risk.
+	(makeShared): Remove no-longer-used method.
+
 	* LocationProc.java (setWithSave, setRestore): Remove unused methods.
 
 2005-06-04  Per Bothner  <per@bothner.com>

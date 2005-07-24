@@ -547,7 +547,8 @@
 	 "------"
 	 #("Save" save-buffer active: (buffer-modified-p)))
    (list "Tools"
-	 (vector "Scheme interaction" scheme-window))
+	 (vector "ELisp interaction" elisp-interaction-window)
+	 (vector "Scheme interaction" scheme-interaction-window))
    #!null
    (list "Help"
 	 #( "About JEmacs..." about-jemacs ) )))
@@ -573,12 +574,18 @@
     (switch-to-buffer buffer)
     buffer))    
 
-(define (scheme-window)
-  (let ((buffer (get-buffer-create "Scheme interaction")))
-    (invoke-static <gnu.jemacs.buffer.ReplMode> 'make buffer 'scheme)
+(define (scheme-interaction-window)
+  (interaction-window 'scheme "Scheme interaction"))
+
+(define (elisp-interaction-window)
+  (interaction-window 'elisp "Lisp interaction"))
+
+(define (interaction-window lang-name buffer-name)
+  (let ((buffer (get-buffer-create buffer-name)))
+    (invoke-static <gnu.jemacs.buffer.ReplMode> 'make buffer lang-name)
     (use-local-map (static-field <process> 'modeMap) buffer)
     (switch-to-buffer buffer)
-    buffer))    
+    buffer))
 
 (define (decode-buffer buffer)
   (if (eq? '() buffer) (current-buffer)

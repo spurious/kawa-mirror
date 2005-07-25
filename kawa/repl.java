@@ -703,6 +703,11 @@ public class repl extends Procedure0or1
     return something_done ? -1 : iArg;
   }
 
+  /** A list of standard command-line fluid names to map to static fields.
+   * For each entry:
+   * element 0 is a property name (before the '=' in the comamnd-line);
+   * element 1 is the name of a class;
+   * element 2 is the name of a static ThreadLocation field. */
   static String[][] propertyFields =
     {
       { "out:doctype-system", "gnu.xml.XMLPrinter", "doctypeSystem" },

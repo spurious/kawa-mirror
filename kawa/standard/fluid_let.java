@@ -74,7 +74,7 @@ public class fluid_let extends Syntax implements Printable
                   return tr.syntaxError("bad syntax for value of " + name
                                         + " in " + getName());
                 else
-                  value = tr.rewrite(name);
+                  value = tr.rewrite(binding.car);
               }
             else
               return tr.syntaxError("invalid " + getName() + " syntax");

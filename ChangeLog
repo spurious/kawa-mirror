@@ -1,3 +1,8 @@
+2005-07-25  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/fluid-let.java (rewrite): Revert thinko in previous
+	change.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/fluid-let.java (rewrite):  Push/pop position

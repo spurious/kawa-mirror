@@ -1,3 +1,7 @@
+2005-07-27  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeChar): Fix bug that suppressed soem spaces.
+
 2005-07-21  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (doctypeSystem, doctypePublic, indentLoc): New fields.

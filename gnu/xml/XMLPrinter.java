@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2005  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -138,11 +138,8 @@ public class XMLPrinter extends PrintConsumer
     closeTag();
     if (printIndent >= 0 && (v == ' ' || v == '\t'))
       {
-	if (prev != ' ')
-	  {
-	    //((OutPort) out).writeSpaceFill();
-	    prev = ' ';
-	  }
+        ((OutPort) out).writeSpaceFill();
+        prev = ' ';
 	return;
       }
     if (printIndent >= 0 && (v == '\r' || v == '\n'))

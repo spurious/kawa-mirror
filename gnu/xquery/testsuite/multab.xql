@@ -1,7 +1,10 @@
-<table>{
-  for $y in 1 to 10 return (
+declare variable $max as xs:integer external;
+declare variable $caption external;
+<table><caption>{$caption}{$max}x{$max}</caption>
+{
+  for $y in 1 to $max return (
     <tr>{
-      for $x in 1 to 10 return
+      for $x in 1 to $max return
         let $bg:=(if($x mod 2 + $y mod 2 <= 0) then "lightgreen"
                   else if ($y mod 2 <= 0) then "yellow"
                   else if ($x mod 2 <= 0) then "lightblue"

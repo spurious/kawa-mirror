@@ -47,7 +47,8 @@ multab.class:  multab.xql
 	$(KAWA) --main --xquery -C $<
 
 check-multab:  multab.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) multab out:xml-indent=pretty >tmpmul
+	CLASSPATH=.:$(KAWALIB) $(JAVA) multab \
+	  max=10 caption="Multiplication table " out:xml-indent=pretty >tmpmul
 	@if diff -b $(srcdir)/expectedmul.xml tmpmul; then echo '# multab test passes'; else echo FAIL multab test; fi
 
 descend.class:  descend.xql

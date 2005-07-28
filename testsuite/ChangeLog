@@ -1,3 +1,7 @@
+2005-07-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Add moduleFT.scm.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: New tests, from Common Lisp hyperspec, for testing

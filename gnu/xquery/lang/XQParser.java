@@ -3082,7 +3082,7 @@ public class XQParser extends Lexer
               {
                 new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
                              new Expression[] {new QuoteExp(decl.getName())}),
-                QuoteExp.nullExp // FIXME
+                type==null ? QuoteExp.nullExp : type
               };
             init = new ApplyExp(ClassType.make("gnu.xquery.lang.XQuery")
                                 .getDeclaredMethod("getExternal", 2),

@@ -774,7 +774,18 @@ public class XQuery extends Language
     Object value = env.get(symbol, null, null);
     if (value == null)
       throw new RuntimeException("unbound external "+name);
-    // FIXME - cast to type.
+    if (type instanceof ClassType)
+      {
+        String cname = ((ClassType) type).getName();
+        // KLUDGE - FIXME
+        if ("gnu.math.IntNum".equals(cname))
+          value = IntNum.valueOf(value.toString());
+        else if ("gnu.math.RealNum".equals(cname))
+          value = gnu.math.DFloNum.make(Double.parseDouble(value.toString()));
+        else
+          throw new Error("cast to "+cname+" for external "
+                          +name+" not implemented");
+      }
     return value;
   }
 }

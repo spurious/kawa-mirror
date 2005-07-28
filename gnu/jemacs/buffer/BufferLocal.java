@@ -5,19 +5,26 @@ import gnu.mapping.*;
  * A buffer-local variable (Location).
  */
 
-public class BufferLocal extends NamedLocation
+public class BufferLocal extends IndirectableLocation
 {
   boolean all;
 
   Buffer cachedBuffer;
+
+  final Symbol name;
 
   /** Index in <code>cachedBuffer</code>'s <code>LocalBindings</code> array. */
   int cachedIndex;
 
   BufferLocal (Symbol name, boolean all)
   {
-    super(name, null);
+    this.name = name;
     this.all = all;
+  }
+
+  public final Symbol getKeySymbol ()
+  {
+    return name;
   }
 
   public static void make(Symbol symbol, boolean all)
@@ -32,7 +39,7 @@ public class BufferLocal extends NamedLocation
       }
     BufferLocal bloc = new BufferLocal(symbol, all);
     bloc.base = base;
-    env.addLocation(bloc);
+    env.addLocation(symbol, null, bloc);
   }
 
   public Object get (Object defaultValue)

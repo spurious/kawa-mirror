@@ -1,3 +1,11 @@
+2005-07-28  Per Bothner  <per@bothner.com>
+
+	* BufferLocal.java: Extend IndirectableLocation, not NamedLocation.
+	(<init.): Modify appropriately.
+	(name): New field.
+	(getKeySymbol): New method.
+	(make): Need to explicitly pass name to addLocation.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* ReplMode.java (make): Inherit from global, not current, environment.

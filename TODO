@@ -1,4 +1,4 @@
-BEFORE 1.8
+HIGH PRIORITY:
 * properties of symbols
 * Document fluid-let in manual.
 * implement fn:reverse, fn:distinct-values
@@ -10,7 +10,6 @@ BEFORE 1.8
 * Name mangling, document library modules.
 * Finish namespace handling: namespaces in constructed nodes,
   fn:namespace-for-uri-prefix, get-in-scope-prefixes
-* XML pretty-printing?
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))
 
 Remove pretty-print implementation in slib.
@@ -27,7 +26,6 @@ It should be the same as the ctx.consumer.
 BEFORE KAWA 1.8?
 * SRFI-9 (define-record-type) constructurs should not use reflection.
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
-* Interpreter.getInterpreter should get current thread's.
 * CL reader interface
 * More define-class functionality?
 * Finish modules: define-module?  constructor arguments?
@@ -127,8 +125,6 @@ Remove Scheme.getTypeValue.
 
 (define plus +) ... (plus ...) should not inline call to +.
 
-(define-alias <alias> <class>) doesn't work interactively.
-
 Implement IntRange class.
 Use it to replace Char's hashtable.
 Replace Char by Character.
@@ -151,8 +147,6 @@ Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).
 
 BindingInitializer.emit: global Environment should be cached
-
-Add --inline and --no-inline flags.
 
 TO BE DONE FOR 2.0:
 
@@ -180,16 +174,12 @@ binding, if any, as at the defining site.
 
 Complain if syntax or macro is used in other than function-call position.
 
-Why is start pc==0 in LocalVariableTable?
-
 Let LineBufferedReader pos, limit, buffer be private,
 but provide methods to get/set them.
 
 exact->inexact only implemented for RealNums, not other Complex.
 
 Fix scheme-window so #!eof closes window.
-
-Option(s) to control/disable inlining.
 
 Implement source-filename source-line source-column macros.
 
@@ -251,14 +241,6 @@ Optionally issue a warning if a symbol is rebound.
 
 Make kawa.repl -f FILE (or something) work for compiled FILEs.
 
-Use primitive types for expressions when declared/inferred.  Inline arithmetic
-when possible.  Integrate native numeric types into numeric tower.
-Native ints would have "modular" semantics.  32-bit int would be
-converted to an Object as a java.lang.Int, and would overflow by
-wrapping around, while gnu.math.IntNum would not wrap around.
-Need specification and implementation of mixed modular and
-infinite-precision integers.
-
 Inline calls to simple methods, especially builtins.
 Ties in with module specifications (to determine which bindings are builtin).
 
@@ -304,8 +286,6 @@ exit in the current environment, not all.
 JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 
 Rewrite (make-temporary-file) to use File.createTempFile.
-
-gnu.mapping.Symbol should implement java.util.Map.Entry.
 
 Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).
 

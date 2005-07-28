@@ -1,3 +1,10 @@
+2005-07-27  Per Bothner  <per@bothner.com>
+
+	* ModuleBody.java (runAsMain(String[])): Sprit into two methods,
+	one static and one non-static.  Deprecate old method.
+	(processArgs, runAsMain()): New methods.
+	* Compilation.java (generateConstructor):  Call new methods.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* Language.java (setDefaults):  Set global/default environment to

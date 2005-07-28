@@ -95,12 +95,24 @@ public abstract class ModuleBody extends Procedure0
     mainPrintValues = value;
   }
 
+  /** This is invoked by main when ModuleBody is compiled with --main.
+   * @deprecated. */
+  public final void runAsMain (String[] args)
+  {
+    processArgs(args);
+    runAsMain();
+  }
 
   /** This is invoked by main when ModuleBody is compiled with --main. */
-  public final void runAsMain (String[] args)
+  public static void processArgs (String[] args)
   {
     int iArg = kawa.repl.processArgs(args, 0, args.length);
     kawa.repl.setArgs(args, iArg);
+  }
+
+  /** This is invoked by main when ModuleBody is compiled with --main. */
+  public final void runAsMain ()
+  {
     gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {

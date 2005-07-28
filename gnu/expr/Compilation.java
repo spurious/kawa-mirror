@@ -2032,6 +2032,8 @@ public class Compilation
 	    code.emitInvokeStatic(ClassType.make("kawa.Shell")
 				  .getDeclaredMethod("setDefaultFormat", 1));
 	  }
+	code.emitLoad(code.getArg(0));
+	code.emitInvokeStatic(typeModuleBody.getDeclaredMethod("processArgs", 1));
 	if (moduleInstanceMainField != null)
 	  code.emitGetStatic(moduleInstanceMainField);
 	else
@@ -2040,11 +2042,7 @@ public class Compilation
 	    code.emitDup(curClass);
 	    code.emitInvokeSpecial(curClass.constructor);
 	  }
-	code.emitLoad(code.getArg(0));
-	Method moduleMain
-	  = typeModuleBody.addMethod("runAsMain", Access.PUBLIC,
-				     args, Type.void_type);
-	code.emitInvokeVirtual(moduleMain);
+	code.emitInvokeVirtual(typeModuleBody.getDeclaredMethod("runAsMain", 0));
 	code.emitReturn();
       }
 

@@ -1,3 +1,10 @@
+2005-07-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (dist-hook): Default is now select-java4.
+
+	* configure.in (AC_INIT): Set version to 1.8beta.
+	* build.xml (version.release): Likewise.
+
 2005-07-25  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/fluid-let.java (rewrite): Revert thinko in previous

@@ -1,5 +1,10 @@
 2005-07-27  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (set-selected-java-source): New rule - set
+	selected-java-source but only if changed.
+	(select-java1, select-java2, select-java4, select-java4x, select-java5):
+	Use new set-selected-java-source rule, which works with read-only files.
+
 	* Makefile.am (dist-hook): Default is now select-java4.
 
 	* configure.in (AC_INIT): Set version to 1.8beta.

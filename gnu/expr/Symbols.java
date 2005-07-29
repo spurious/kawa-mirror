@@ -14,6 +14,11 @@ public class Symbols
 
   private static int gensym_counter;
 
+  static synchronized int generateInt()
+  {
+    return ++gensym_counter;
+  }
+
   /* DEBUGGING:
   static java.util.Vector gensyms = new java.util.Vector();
 
@@ -50,7 +55,7 @@ public class Symbols
    */
   public static final String generate ()
   {
-    String str = new String ("GS." + Integer.toString(++gensym_counter));
+    String str = new String("GS." + Integer.toString(generateInt()));
     /* DEBUGGING:
     gensyms.addElement(str);
     */
@@ -63,7 +68,7 @@ public class Symbols
    */
   public static final String gentemp ()
   {
-    return Symbols.make("GS." + Integer.toString(++gensym_counter));
+    return Symbols.make("GS." + Integer.toString(generateInt()));
   }
 
   /**

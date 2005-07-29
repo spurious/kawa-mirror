@@ -509,8 +509,11 @@ public class Translator extends Compilation
     else
       {
 	Object v = env.get(xprefix, null);
-	if (v != null)
-	  sym = Symbol.make(v.toString(), local);
+        if (v != null)
+	  sym = Symbol.make(v instanceof ClassType
+                            ? "class:"+((ClassType) v).getName()
+                            : v.toString(),
+                            local);
 	else
 	  {
 	    try

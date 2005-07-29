@@ -1,3 +1,8 @@
+2005-07-29  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (namespaceResolve): If prefix is bound in
+	the current environment to a ClassType, add "class:" prefix to name.
+
 2005-07-27  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (set-selected-java-source): New rule - set

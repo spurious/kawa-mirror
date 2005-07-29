@@ -1,3 +1,7 @@
+2005-07-28  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (id, counter): Remove unused fields.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* Environment.java (INDIRECT_DEFINES): New flag.

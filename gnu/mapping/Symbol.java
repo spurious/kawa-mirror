@@ -20,9 +20,6 @@ public class Symbol
   /* #endif */
   Externalizable
 {
-  static int counter;
-  public int id = ++counter;
-
   protected String name;
   Namespace namespace;
 

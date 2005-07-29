@@ -179,7 +179,7 @@ public class ClassType extends ObjectType
    * @return the interfaces this class is declared to implement
    * (not those inherited from its superclass/superinterfaces).
    */
-  public ClassType[] getInterfaces()
+  public synchronized ClassType[] getInterfaces()
   {
     if (interfaces == null
 	&& (flags & EXISTING_CLASS) != 0 && getReflectClass() != null)

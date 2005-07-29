@@ -1,3 +1,7 @@
+2005-07-28  Dean Ferreyra <dean@octw.com>
+
+	* ClassType.java (getInterfaces): Add missing needed synchornized.
+
 2005-05-30  Per Bothner  <per@bothner.com>
 
 	* Variable.java (isArtificial, setArtificial): Remove unused methods.

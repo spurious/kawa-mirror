@@ -83,7 +83,9 @@ For a technical overview of Kawa, see these
 For copyright information on the software and documentation,
 see @ref{License}.
 
-Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
+Thanks to @uref{http://www.brainfood.com/,Brainfood}
+and @uref{http://www.mercedsystems.com/,Merced Systems} for support in
+developing Kawa.
 
 This package has nothing to do with the
 @uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
@@ -1696,13 +1698,17 @@ procedure is also of variable arity, and the body calls the first
 @var{slot-or-expr} with remaining arguments provided to the actual call of the
 specialized procedure.
 
-Here are some examples:@*
-@code{(cut cons (+ a 1) <>)} is the same as @w{@code{(lambda (x2) (cons (+ a 1) x2))}}@*
-@code{(cut list 1 <> 3 <> 5)} is the same as @w{@code{(lambda (x2 x4) (list 1 x2 3 x4 5))}}@*
-@code{(cut list)} is the same as @w{@code{(lambda () (list))}}@*
+Here are some examples:
+
+@code{(cut cons (+ a 1) <>)} is the same as @w{@code{(lambda (x2) (cons (+ a 1) x2))}}
+
+@code{(cut list 1 <> 3 <> 5)} is the same as @w{@code{(lambda (x2 x4) (list 1 x2 3 x4 5))}}
+
+@code{(cut list)} is the same as @w{@code{(lambda () (list))}}
+
 @code{(cut list 1 <> 3 <...>)} is the same as @w{@code{(lambda (x2 . xs) (apply list 1 x2 3 xs))}}
 
-The first argument can also be a slot, as one should expect in Scheme:@*
+The first argument can also be a slot, as one should expect in Scheme:
 @code{(cut <> a b)} is the same as @w{@code{(lambda (f) (f a b))}}
 @end deffn
 
@@ -1712,7 +1718,7 @@ similar to @code{cut}, but it evaluates the non-slot expressions at the
 time the procedure is specialized, not at the time the specialized
 procedure is called.
 
-For example:@*
+For example
 @code{(cute cons (+ a 1) <>)} is the same as
 @w{@code{(let ((a1 (+ a 1))) (lambda (x2) (cons a1 x2)))}}
 
@@ -3006,6 +3012,31 @@ change the encoding temporarily:
 (define (open-binary-input-file name)
   (fluid-let ((port-char-encoding #f)) (open-input-file name)))
 @end example
+@end defvar
+
+@defvar *print-base*
+The number base (radix) to use by default when printing rational numbers.
+Must be an integer between 2 and 36, and the default is of course 10.
+For example setting @code{*print-base*} to 16 produces hexadecimal output.
+@end defvar
+
+@defvar *print-radix*
+If true, prints an indicator of the radix used when printing rational numbers.
+If @code{*print-base*} is respectively 2, 8, or 16, then
+@code{#b}, @code{#o} or @code{#x} is written before the number;
+otherwise @code{#@var{N}r} is written, where @code{@var{N}} is the base.
+An exception is when  @code{*print-base*} is 10, in which case a period
+is written @emph{after} the number, to match Common Lisp; this may
+be inappropriate for Scheme, so is likely to change.
+@end defvar
+
+@defvar *print-right-margin*
+The right margin (or line width) to use when pretty-printing.
+@end defvar
+
+@defvar *print-miser-width*
+If this an integer, and the available width is less or equal to this value,
+then the pretty printer switch to the more @dfn{miser} compact style.
 @end defvar
 
 @node Format, , Ports, Input-Output
@@ -5492,6 +5523,12 @@ Daniel Bonniot @email{bonniot@@users.sf.net}).
 @node License, Overall Index, Projects, Top
 @chapter License
 
+@menu
+* Software-License::      License for the Kawa software
+* Manual-License::        License for the Kawa manual
+@end menu
+
+@node Software-License, Manual-License, , License
 @section License for the Kawa software
 
 The license for Kawa and the packages it depends on
@@ -5577,14 +5614,17 @@ arising out of or in connection with the use or performance of
 this software.
 @end quotation
 
-@section Copyright for this manual
+@node Manual-License, , Software-License, License
+@section License for the Kawa manual
 
-Here is the license for this manual:
+Here is the copyright license for this manual:
 
-Copyright @copyright{} 1996, 1997, 1998, 1999 Per Bothner
-@*Parts of this manual were derived from the SLIB manual,
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2005 Per Bothner
+
+Parts of this manual were derived from the SLIB manual,
 copyright @copyright{} 1993-1998 Todd R. Eigenschink and Aubrey Jaffer.
-@*Parts of this manual were derived from ISO/EIC 10179:1996(E)
+
+Parts of this manual were derived from ISO/EIC 10179:1996(E)
 (Document Style and Specifical Language) - unknown copyright.
 
 Permission is granted to make and distribute verbatim copies of

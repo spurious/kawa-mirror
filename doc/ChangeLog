@@ -1,3 +1,17 @@
+2005-07-30  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Top): Thank Merced in addition to Brainfood.
+
+	* kawa.texi (Procedures): Replace $* (line-break) commands by new 
+	paragraphs, since DocBook doesn't handle internals line-breaks.
+
+	* kawa.texi (Ports): Document *print-base*, *print-radix*,
+	*print-right-margin*, *print-miser-width*.
+
+	* kawa.texi (License): Add sub-node structure.
+
+	* kawa.texi: Update copyrights.
+
 2005-05-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Features): Add listing of srf-37, args-fold.

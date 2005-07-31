@@ -1,3 +1,10 @@
+2005-07-31  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Restrictions): Merged node into Features chapter.
+	(Features): Rename and move to where Restrictions used to be.
+
+	* kawa.texi: Remove references to JavaSoft.
+
 2005-07-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Top): Thank Merced in addition to Brainfood.

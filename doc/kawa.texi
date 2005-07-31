@@ -30,7 +30,7 @@ END-INFO-DIR-ENTRY
 @end ifinfo
 
 @ifnottex
-@node Top, Features, (dir), (dir)
+@node Top, Getting Kawa, (dir), (dir)
 @top The Kawa Scheme system
 @end ifnottex
 
@@ -91,11 +91,10 @@ This package has nothing to do with the
 @uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
 
 @menu
-* Features::
 * Getting Kawa::
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
-* Restrictions::         Features of R5RS not implemented
+* Features::             Feature of Kawa Scheme
 * Compiling::            Compiling Scheme code to byte-code or an executable
 * Extensions::           Various Kawa features not in standard Scheme
 * Input-Output::         Input, output, and file handling
@@ -111,89 +110,7 @@ This package has nothing to do with the
 * Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
 
-@node Features, Getting Kawa, Top, Top
-@chapter Features
-
-Kawa is a full Scheme implementation.  It implements almost
-all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
-By default, symbols are case sensitive.
-
-It is completely written in Java.  Scheme functions and files
-are automatically compiled into Java byte-codes.  Kawa does some
-optimizations, and the compiled code runs at reasonable speed.
-
-Kawa uses Unicode internally, and uses the Java facilities to convert
-files using other character encodings.
-
-Kawa provides the usual read-eval-print loop, as well as batch modes.
-
-Kawa provides a framework for implementing other progressing languages,
-and comes with incomplete support for CommonLisp, Emacs Lisp, and
-EcmaScript, and the
-draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
-
-Kawa is written in an object-oriented style.
-
-Kawa has builtin pretty-printer support, and fancy formatting.
-
-Kawa supports class-definition facilities, and separately-compiled modules.
-
-Kawa implements the full numeric tower, including infinite-precision
-rational numbers and complex numbers.  It also supports "quantities"
-with units, such as @code{3cm}.
-
-You can optionally declare the types of variables.
-
-You can conveniently access Java objects, methods, fields, and classes.
-
-Kawa implements most of the features of the expression language of DSSSL,
-the Scheme-derived ISO-standard Document Style Semantics and Specification
-Language for SGML.  Of the core expression language, the only features
-missing are character properties, @code{external-procedure},
-the time-relationed procedures, and character name escapes in
-string literals.  Also, Kawa is not generally tail-recursive.
-From the full expression language, Kawa additionally is missing
-@code{format-number}, @code{format-number-list}, and language objects.
-Quantities, keyword values, and the expanded @code{lambda} form
-(with optional and keyword parameters) are supported.
-
-Kawa implements the following semi-standard SRFIs
-(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
-@itemize
-@item
-SRFI 0: Feature-based conditional expansion construct,
-using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
-@item
-SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
-@item
-SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}..
-@item
-SRFI 6: Basic String Ports - @pxref{Ports}.
-@item
-SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
-@item
-SRFI 9: Defining Record Types, using @code{define-record-type}
-- @pxref{Record types}.
-@item
-SRFI 11: Syntax for receiving multiple values,
-using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
-@item
-SRFI 17: Generalized @code{set!} - @pxref{Locations}.
-@item
-SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
-@item
-SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
-@item
-SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
-@item
-SRFI 28: Basic Format Strings - @pxref{Format}.
-@item
-SRFI 30: Nested Multi-line Comments.
-@item
-SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
-@end itemize
-
-@node Getting Kawa, Installation, Features, Top
+@node Getting Kawa, Installation, Top, Top
 @chapter Getting Kawa
 
 You can get Kawa sources and binaries from the Kawa ftp site
@@ -243,7 +160,7 @@ You will need a working Java system.  Kawa has been reported to
 work with JDK from 1.1 through 1.4.x, Kaffe, Symantec Cafe, J++, and GCJ.
 
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) from JavaSoft (Sun).  You can download free copies of
+(JDK) from Sun.  You can download free copies of
 @uref{http://java.sun.com/j2se/1.4/, JDK 1.4} for various platforms.
 
 If you want to run Kawa on a Macintosh, see
@@ -583,7 +500,7 @@ However, there are some problems with filenames that make this
 more complicated than it should be.  It should be possible
 to build Kawa under Cygwin using @code{gcj} as descibed above.
 
-@node Running, Restrictions, Installation, Top
+@node Running, Features, Installation, Top
 @chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa} program.
@@ -599,8 +516,8 @@ On some platforms, @samp{kawa} is a program that uses the GNU
 
 To run Kawa manually, you must start a Java interpreter.
 How you do this depends on the Java interpreter.
-For JavaSoft's JDK, you must have the Java interpreter
-in your @code{PATH}.
+For Sun's JDK s and some other implementations, you must have the
+Java interpret (usually named @code{java}) in your @code{PATH}.
 You must also make sure that the @code{kawa/repl.class} file,
 the rest of the Kawa packages, and the standard Java
 packages can be found by searching CLASSPATH.
@@ -737,8 +654,8 @@ You can use the @code{--no-inline} to disable the assumption that @code{fn}
 is constant.
 @end table
 
-The default is currently @code{--no-full-tailcalls} because I believe it is
-faster (though I have not done any measurements yet).
+The default is currently @code{--no-full-tailcalls} because
+it is usually faster.
 It is also closer to the Java call model, so may be better for people
 primarily interested in using Kawa for scripting Java systems.
 
@@ -851,8 +768,98 @@ is in a new window, you can select @samp{Close} from the @samp{File} menu.
 To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
 
-@node Restrictions, Compiling, Running, Top
-@chapter Features of R5RS not implemented
+@node Features, Compiling, Running, Top
+@chapter Features of Kawa Scheme
+
+Kawa is a full Scheme implementation.  It implements almost
+all of R5RS (for exceptions see below), plus some extensions.
+By default, symbols are case sensitive.
+
+It is completely written in Java.  Scheme functions and files
+are automatically compiled into Java byte-codes.  Kawa does some
+optimizations, and the compiled code runs at reasonable speed.
+
+Kawa uses Unicode internally, and uses the Java facilities to convert
+files using other character encodings.
+
+Kawa provides the usual read-eval-print loop, as well as batch modes.
+
+Kawa provides a framework for implementing other progressing languages,
+and comes with incomplete support for CommonLisp, Emacs Lisp, and
+EcmaScript, and the
+draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
+
+Kawa is written in an object-oriented style.
+
+Kawa has builtin pretty-printer support, and fancy formatting.
+
+Kawa supports class-definition facilities, and separately-compiled modules.
+
+Kawa implements the full numeric tower, including infinite-precision
+rational numbers and complex numbers.  It also supports "quantities"
+with units, such as @code{3cm}.
+
+You can optionally declare the types of variables.
+
+You can conveniently access Java objects, methods, fields, and classes.
+
+Kawa implements most of the features of the expression language of DSSSL,
+the Scheme-derived ISO-standard Document Style Semantics and Specification
+Language for SGML.  Of the core expression language, the only features
+missing are character properties, @code{external-procedure},
+the time-relationed procedures, and character name escapes in
+string literals.  Also, Kawa is not generally tail-recursive.
+From the full expression language, Kawa additionally is missing
+@code{format-number}, @code{format-number-list}, and language objects.
+Quantities, keyword values, and the expanded @code{lambda} form
+(with optional and keyword parameters) are supported.
+
+@menu
+* Implemented SRFIs::
+* Restrictions::
+@end menu
+
+@node Implemented SRFIs, Restrictions, , Features
+@section Implemented SRFIs
+
+Kawa implements the following semi-standard SRFIs
+(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
+@itemize
+@item
+SRFI 0: Feature-based conditional expansion construct,
+using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
+@item
+SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
+@item
+SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
+@item
+SRFI 6: Basic String Ports - @pxref{Ports}.
+@item
+SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
+@item
+SRFI 9: Defining Record Types, using @code{define-record-type}
+- @pxref{Record types}.
+@item
+SRFI 11: Syntax for receiving multiple values,
+using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
+@item
+SRFI 17: Generalized @code{set!} - @pxref{Locations}.
+@item
+SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
+@item
+SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
+@item
+SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
+@item
+SRFI 28: Basic Format Strings - @pxref{Format}.
+@item
+SRFI 30: Nested Multi-line Comments.
+@item
+SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@end itemize
+
+@node Restrictions, , Implemented SRFIs, Features
+@section Features of R5RS not implemented
 
 Kawa implements all the required and optional features of R5RS,
 with the following exceptions.
@@ -886,7 +893,7 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
-@node Compiling, Extensions, Restrictions, Top
+@node Compiling, Extensions, Features, Top
 @chapter Compiling Scheme code to byte-code or an executable
 
 All Scheme functions and source files are invisibly compiled

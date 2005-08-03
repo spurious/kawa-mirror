@@ -5,9 +5,17 @@ import gnu.lists.*;
 
 public class DefineNamespace extends Syntax
 {
+  private boolean makePrivate = false;
+  
   public static final DefineNamespace define_namespace
     = new DefineNamespace();
-  static { define_namespace.setName("define-namespace"); }
+  public static final DefineNamespace define_private_namespace
+    = new DefineNamespace();
+  static {
+    define_namespace.setName("define-namespace");
+    define_private_namespace.setName("define-private-namespace");
+    define_private_namespace.makePrivate = true;
+  }
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
@@ -25,7 +33,12 @@ public class DefineNamespace extends Syntax
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
-    if (defs instanceof ModuleExp)
+    if (makePrivate)
+      {
+        decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+        decl.setPrivate(true);
+      }
+    else if (defs instanceof ModuleExp)
       decl.setCanRead(true);
     Translator.setLine(decl, p1);
     Expression value = tr.rewrite_car (p2, false);

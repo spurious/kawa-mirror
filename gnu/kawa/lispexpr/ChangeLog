@@ -1,3 +1,11 @@
+2005-08-03  Chris Dean  <ctdean@sokitomi.com>
+	    Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java: Implement define-private-namespace.
+	(makePrivate): New field.
+	(define_private_namespace): New static field.
+	(scanForDefinitions): Check makePrivate field.
+
 2005-07-05  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions): Set IS_NAMESPACE_PREFIX

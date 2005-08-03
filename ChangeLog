@@ -1,3 +1,8 @@
+2005-08-03  Chris Dean  <ctdean@sokitomi.com>
+
+	* kawa/standard/Scheme.java (initScheme): Define new
+	define-private-namespace function.
+
 2005-07-29  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (namespaceResolve): If prefix is bound in

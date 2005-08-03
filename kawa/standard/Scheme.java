@@ -564,6 +564,8 @@ public class Scheme extends LispLanguage
       define_proc ("make-quantity", "kawa.standard.make_quantity");
       defSntxStFld("define-namespace", "gnu.kawa.lispexpr.DefineNamespace",
                    "define_namespace");
+      defSntxStFld("define-private-namespace", "gnu.kawa.lispexpr.DefineNamespace",
+                   "define_private_namespace");
       defSntxStFld("define-unit", "kawa.standard.define_unit", "define_unit");
       defSntxStFld("define-base-unit", "kawa.standard.define_unit",
                    "define_base_unit");

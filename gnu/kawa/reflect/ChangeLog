@@ -1,3 +1,7 @@
+2005-08-03  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (get): Return defaultValue on setup exception.
+
 2005-07-21  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (defineAll): Inline one overload in other,

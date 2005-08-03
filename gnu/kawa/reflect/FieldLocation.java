@@ -181,7 +181,14 @@ public class FieldLocation extends ClassMemberLocation
 
   public Object get (Object defaultValue)
   {
-    setup();
+    try
+      {
+        setup();
+      }
+    catch (Throwable ex)
+      {
+        return defaultValue;
+      }
     Object v;
     if ((flags & VALUE_SET) != 0)
       {

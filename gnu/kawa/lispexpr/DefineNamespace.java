@@ -26,7 +26,7 @@ public class DefineNamespace extends Syntax
 	|| ! (p1.cdr instanceof Pair)
 	|| (p2 = (Pair) p1.cdr).cdr != LList.Empty)
       {
-	tr.error('e', "invalid syntax for define-alias");
+	tr.error('e', "invalid syntax for define-namespace");
 	return false;
       }
     String name = (Language.NAMESPACE_PREFIX + p1.car).intern();

@@ -52,7 +52,7 @@ public class Q2 extends Scheme
     return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
   }
 
-  public Expression makeApply (Expression func, Expression[] args)
+  public ApplyExp makeApply (Expression func, Expression[] args)
   {
     /*
     if (func instanceof QuoteExp

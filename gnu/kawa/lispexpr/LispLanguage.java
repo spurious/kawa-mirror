@@ -107,7 +107,7 @@ public abstract class LispLanguage extends Language
     return new BeginExp (exps);
   }
 
-  public Expression makeApply (Expression func, Expression[] args)
+  public ApplyExp makeApply (Expression func, Expression[] args)
   {
     return new ApplyExp(func, args);
   }

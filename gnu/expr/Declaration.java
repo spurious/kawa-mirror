@@ -792,6 +792,20 @@ public class Declaration
       }
   }
 
+  /** Create a declaration corresponding to a static field.
+   * @param cname name of class containing field
+   * @param fname name of static field
+   */
+  public static Declaration
+  getDeclarationFromStatic (String cname, String fname)
+  {
+    ClassType clas = ClassType.make(cname);
+    Field fld = clas.getDeclaredField(fname);
+    Declaration decl = new Declaration(fname, fld);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
+    return decl;
+  }
+
   public static Declaration getDeclaration(Named proc)
   {
     return getDeclaration(proc, proc.getName());

@@ -1,3 +1,7 @@
+2005-08-03  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (getDeclarationFromStatic): New static method.
+
 2005-07-28  Per Bothner  <per@bothner.com>
 
 	* Symbols.java (generateInt): New static synchronized method.

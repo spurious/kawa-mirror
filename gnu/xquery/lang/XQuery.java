@@ -197,8 +197,6 @@ public class XQuery extends Language
     return "XQuery";
   }
 
-  static XQuery instance;
-
   static int envCounter = 0;
 
   /** Environment of pre-defined non-standard Qexo/Kawa functions. */
@@ -473,16 +471,21 @@ public class XQuery extends Language
     proc.check3(item, IntNum.make(position), IntNum.make(size), ctx);
   }
 
+  public static final Environment xqEnvironment
+    = Environment.make(XQUERY_FUNCTION_NAMESPACE);
+
+  static final XQuery instance = new XQuery();
+  static { instance.initXQuery(); }
+
   public XQuery()
   {
-    environ = Environment.make(XQUERY_FUNCTION_NAMESPACE);
+    environ = xqEnvironment;
     defaultNamespace = xqueryFunctionNamespace;
-    //environ.setPrevious(extensionsEnvEnv);
+  }
 
+  private void initXQuery ()
+  {
     ModuleBody.setMainPrintValues(true);
-
-    if (instance == null)
-      instance = this;
 
     /*
     Environment scmEnv = Scheme.builtin();
@@ -604,8 +607,6 @@ public class XQuery extends Language
 
   public static XQuery getInstance()
   {
-    if (instance == null)
-      instance = new XQuery();
     return instance;
   }
 

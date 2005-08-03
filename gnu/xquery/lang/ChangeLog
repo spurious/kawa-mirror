@@ -1,3 +1,10 @@
+2005-08-03  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (instance): Make final.
+	(xqEnvironment): New final field.
+	(initXQuery): New private method, called from static constructor.
+	(<init>): Just set two fields.
+
 2005-07-27  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse): Pass external variable's type to getExternal.

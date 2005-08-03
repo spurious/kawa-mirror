@@ -1,5 +1,10 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* SlotSet.java (setField$Ex): Rename to set$Mnfield$Ex to match current
+	mangling scheme for field names.
+	(setStaticField$Ex): Likewise rename to set$Mnstatic$Mnfield$Ex.
+	* SlotGet.java (field, staticField): Update setter references.
+
 	* FieldLocation.java (get): Return defaultValue on setup exception.
 
 2005-07-21  Per Bothner  <per@bothner.com>

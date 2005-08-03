@@ -12,8 +12,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
    * Only if non-static. */
   boolean returnSelf;
 
-  public static final SlotSet setField$Ex = new SlotSet("set-field!", false);
-  public static final SlotSet setStaticField$Ex
+  public static final SlotSet set$Mnfield$Ex = new SlotSet("set-field!", false);
+  public static final SlotSet set$Mnstatic$Mnfield$Ex
   = new SlotSet("set-static-field!", true);
   public static final SlotSet setFieldReturnObject
     = new SlotSet("set-field-return-object!", false);

@@ -481,7 +481,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("this", "kawa.standard.thisRef", "thisSyntax");
       defProcStFld("make", "gnu.kawa.reflect.Invoke", "make");
       defProcStFld("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
-      defProcStFld("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
+      defProcStFld("slot-set!", "gnu.kawa.reflect.SlotSet", "set$Mnfield$Ex");
       defProcStFld("field", "gnu.kawa.reflect.SlotGet");
       defProcStFld("class-methods", "gnu.kawa.reflect.ClassMethods",
 		   "classMethods");

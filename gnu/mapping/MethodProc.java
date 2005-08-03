@@ -92,10 +92,8 @@ public abstract class MethodProc extends ProcedureN
   {
     int arg = (short) code;
     code &= 0xffff0000;
-    if (code == NO_MATCH_TOO_FEW_ARGS || code == NO_MATCH_TOO_MANY_ARGS)
-      return new WrongArguments(proc, args.length);
     if (code != NO_MATCH_BAD_TYPE)
-      arg = WrongType.ARG_UNKNOWN;
+      return new WrongArguments(proc, args.length);
     return new WrongType(proc, arg, args[arg-1]);
   }
 

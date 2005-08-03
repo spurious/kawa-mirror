@@ -1,3 +1,7 @@
+2005-08-03  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (matchFailAsException): Fix thinko.
+
 2005-07-28  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (id, counter): Remove unused fields.

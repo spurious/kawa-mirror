@@ -1,5 +1,8 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (namespaceResolve): Add a followAliases
+	to handle imported classes.
+
 	* kawa/lang/Translator.java (namespaceResolve): Return expressions that
 	creates a ClassMethodProc, when appropriate.
 	* kawa/standard/Scheme.java (lookupBuiltin): No point at this time

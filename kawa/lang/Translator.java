@@ -462,7 +462,7 @@ public class Translator extends Compilation
 	if (dval instanceof ReferenceExp)
 	  {
 	    ReferenceExp ref = (ReferenceExp) dval;
-	    Declaration d = ref.getBinding();
+	    Declaration d = Declaration.followAliases(ref.getBinding());
 	    if (d != null)
 	      {
 		dval = d.getValue();

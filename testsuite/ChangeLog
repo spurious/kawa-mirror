@@ -1,3 +1,9 @@
+2005-08-03  Dean Ferreyra <dean@octw.com>
+
+	* classes1.scm (datetest-ns, make-date-test): Move from here ...
+	* classes2.scm: .. to here. This tests reference to class in
+	imported module.
+
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm: Test new (*:METHOD ...) syntax.

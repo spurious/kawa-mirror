@@ -89,8 +89,3 @@
 (define-simple-class <IdClass2> (<IdClass1>)
   (allocation: 'class init: (get-new-count))
   (var2 init-form: (get-new-count)))
-
-(define-namespace date-test-ns <SimpleDateTest>)
-(define (make-date-test)
-  (let ((d :: <SimpleDateTest> (date-test-ns:new)))
-    (date-test-ns:get-year d)))

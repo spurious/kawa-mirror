@@ -15,3 +15,8 @@
 (define yy :: <int> 56)
 
 (define date-test-instance (make <DateTest>))
+
+(define-namespace date-test-ns <SimpleDateTest>)
+(define (make-date-test)
+  (let ((d :: <SimpleDateTest> (date-test-ns:new)))
+    (date-test-ns:get-year d)))

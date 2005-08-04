@@ -1,5 +1,8 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (getValue): Load (lazily) from final static field.
+	(getConstantValue): Use getValue.
+
 	* Declaration.java (getDeclarationFromStatic): New static method.
 
 2005-07-28  Per Bothner  <per@bothner.com>

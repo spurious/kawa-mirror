@@ -269,7 +269,24 @@ public class Declaration
    * which needs to be de-referenced to get this <code>Declaration</code>'s
    * actual value.
    */
-  public final Expression getValue() { return value; }
+  public final Expression getValue()
+  {
+    if (value == QuoteExp.undefined_exp
+        && field != null
+        && ((field.getModifiers() & Access.STATIC+Access.FINAL)
+            == Access.STATIC+Access.FINAL)
+        && ! isIndirectBinding())
+      {
+        try
+          {
+            value = new QuoteExp(field.getReflectField().get(null));
+          }
+        catch (Throwable ex)
+          {
+          }
+      }
+    return value;
+  }
 
   /** Set the value assoociated with this Declaration.
    * Most code should use noteValue instead. */
@@ -278,9 +295,10 @@ public class Declaration
   /** If getValue() is a constant, return the constant value, otherwise null. */
   public final Object getConstantValue()
   {
-    if (! (value instanceof QuoteExp) || value == QuoteExp.undefined_exp)
+    Object v = getValue();
+    if (! (v instanceof QuoteExp) || v == QuoteExp.undefined_exp)
       return null;
-    return ((QuoteExp) value).getValue();
+    return ((QuoteExp) v).getValue();
   }
 
   /** This prefix is prepended to field names for unknown names. */

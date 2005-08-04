@@ -1,3 +1,8 @@
+2005-08-03  Per Bothner  <per@bothner.com>
+
+	* lists.scm: Use new namespace-prefix-based syntax more places.
+	* ports.scm: Likewise.
+
 2005-07-23  Per Bothner  <per@bothner.com>
 
 	* windows.scm (scheme-window): Specifically use Scheme rather than

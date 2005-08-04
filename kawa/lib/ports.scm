@@ -18,7 +18,7 @@
 
 (define (with-input-from-file fname (proc :: <procedure>))
   (let ((port :: <input-port> (gnu.mapping.InPort:openFile
-			       (invoke fname 'toString)))
+			       (*:toString fname)))
 	(save :: <input-port> (gnu.mapping.InPort:inDefault)))
     (try-finally
      (begin
@@ -26,7 +26,7 @@
        (proc))
      (begin
        (gnu.mapping.InPort:setInDefault save)
-       (invoke port 'close)))))       
+       (*:close port)))))       
 
 (define (with-output-to-file filename (proc :: <procedure>))
   (let* ((fname (invoke filename 'toString))
@@ -53,9 +53,9 @@
     ((define-alias-parameter name type location)
      (begin
        (define-constant name :: <gnu.mapping.LocationProc>
-	 (invoke-static <gnu.mapping.LocationProc> 'makeNamed
-			(gnu.mapping.Symbol:make '|| 'name)
-			location))
+	 (gnu.mapping.LocationProc:makeNamed
+	  (gnu.mapping.Symbol:make '|| 'name)
+	  location))
        (gnu.mapping.LocationProc:pushConverter
 	name
 	(lambda (arg)
@@ -126,12 +126,10 @@
   (invoke-static <kawa.standard.char_ready_p> 'ready port))
 
 (define (write value #!optional (out (current-output-port))) :: <void>
-  (invoke (static-field <kawa.standard.Scheme> 'writeFormat)
-	  'format value out))
+  (*:format (kawa.standard.Scheme:.writeFormat) value out))
 
 (define (display value #!optional (out (current-output-port))) :: <void>
-  (invoke (static-field <kawa.standard.Scheme> 'displayFormat)
-	  'format value out))
+  (*:format (kawa.standard.Scheme:.displayFormat) value out))
 
 (define (input-port-read-state port)
   ((primitive-virtual-method <input-port> "getReadState" <char> ())

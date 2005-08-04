@@ -1,17 +1,16 @@
 (module-static #t)
 
 (define (pair? x) :: <boolean>
-  (instance? x <pair>))
+  (<pair>:instance? x))
 
 (define (cons car cdr) :: <pair>
-  (make <pair> car cdr))
+  (<pair>:new car cdr))
 
 (define (null? x) :: <boolean>
   (eq? x '()))
 
 (define (set-car! (p <pair>) x)
-  ((primitive-set-field <pair> 'car <object>)
-   p x))
+  (set! (*:.car p) x))
 
 (define (set-cdr! (p <pair>) x)
   ((primitive-set-field <pair> 'cdr <object>)
@@ -23,7 +22,7 @@
     ;; Using just a lambda would not give it a name,
     ;; so it would use use "lambda" for a WrongType exception.
     (define (car (x :: <pair>))
-      (field x 'car))
+      (*:.car x))
     car))
 
 (define-procedure cdr
@@ -43,7 +42,7 @@
 	  (loop (cdr pair) (cons (car pair) result))))))
 
 (define (list-tail list (count :: <int>))
-  (invoke-static <list> 'listTail list count))
+  (<list>:listTail list count))
 
 (define (list-ref list (index :: <int>))
   (car (list-tail list index)))

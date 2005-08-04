@@ -442,13 +442,15 @@ public class Translator extends Compilation
     return str;
   }
 
-  public Expression namespaceResolve (String str, boolean function)
+  private Expression namespaceResolve (String str, boolean function)
   {
     int colon = str.indexOf(':');
     if (colon <= 0 || colon >= str.length() - 1)
       return null;
     String prefix = str.substring(0, colon);
     String local = str.substring(colon + 1);
+    if ("*".equals(prefix))
+      return ClassMethodProc.makeExp(QuoteExp.nullExp, new QuoteExp(local));
     String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
     Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
     Symbol sym;
@@ -465,14 +467,7 @@ public class Translator extends Compilation
 	      {
 		dval = d.getValue();
 		if (dval instanceof ClassExp)
-		  {
-		    Expression[] args = { ref, new QuoteExp(local) };
-		    ApplyExp aexp = new ApplyExp(ClassType.make("gnu.kawa.reflect.ClassMethodProc")
-					.getDeclaredMethod("make", 2),
-					args);
-		    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-		    return aexp;
-		  }
+                  return ClassMethodProc.makeExp(ref, new QuoteExp(local));
 	      }
 	    else
 	      {
@@ -480,7 +475,7 @@ public class Translator extends Compilation
 		int nlen = name.length();
 		if (nlen > 2 && name.charAt(0) == '<'
 		    && name.charAt(nlen-1) == '>')
-		  dval = new QuoteExp("class:" + name.substring(1, nlen-1));
+                  return ClassMethodProc.makeExp(ref, new QuoteExp(local));
 	      }
 	  }
 
@@ -489,18 +484,12 @@ public class Translator extends Compilation
 	    Object val = ((QuoteExp) dval).getValue();
 	    String uri;
 	    if (val instanceof ClassType)
-	      {
-		// Perhaps this should be if (true)? I.e. map class:method
-		// to a method value even if not in function position?
-		// Or would we rather use that syntax to access fields?  FIXME
-		if (function)
-		  return new QuoteExp(ClassMethodProc.make((ClassType) val,
-							   local));
-		else
-		  uri = "class:"+((ClassType) val).getName();
-	      }
+              return ClassMethodProc.makeExp(dval, new QuoteExp(local));
 	    else
 	      uri = val.toString();
+            if (uri.startsWith("class:"))
+              return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
+                                             new QuoteExp(local));
 	    sym = Symbol.make(uri, local);
 	  }
 	else
@@ -509,26 +498,39 @@ public class Translator extends Compilation
     else
       {
 	Object v = env.get(xprefix, null);
+        if (v instanceof ClassType)
+          return ClassMethodProc.makeExp(new QuoteExp(v),
+                                         new QuoteExp(local));
         if (v != null)
-	  sym = Symbol.make(v instanceof ClassType
-                            ? "class:"+((ClassType) v).getName()
-                            : v.toString(),
-                            local);
+          {
+            String uri = v.toString();
+            if (uri.startsWith("class:"))
+              return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
+                                             new QuoteExp(local));
+            sym = Symbol.make(uri, local);
+          }
+        else if (prefix.length() > 2 && prefix.charAt(0) == '<'
+                 && prefix.charAt(prefix.length()-1) == '>')
+          {
+            return ClassMethodProc.makeExp(rewrite(prefix), new QuoteExp(local));
+          }
 	else
 	  {
-	    try
-	      {
-		/* #ifdef JAVA2 */
-		Class cl = Class.forName(prefix, false, getClass().getClassLoader());
-		/* #else */
-		// Class cl = Class.forName(prefix);
-		/* #endif */
-		sym = Symbol.make("class:"+prefix, local);
-	      }
-	    catch (Throwable ex)
-	      {
-		return null;
-	      }
+            try
+              {
+                /* #ifdef JAVA2 */
+                Class cl = Class.forName(prefix, false,
+                                         getClass().getClassLoader());
+                /* #else */
+                // Class cl = Class.forName(prefix);
+                /* #endif */
+                return ClassMethodProc.makeExp(new QuoteExp(Type.make(cl)),
+                                               new QuoteExp(local));
+              }
+            catch (Throwable ex)
+              {
+                return null;
+              }
 	  }
       }
     return rewrite(sym, function);

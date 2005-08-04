@@ -144,8 +144,9 @@ public class XQResolveNames extends ResolveNames
       }
   }
 
-  Declaration flookup (Symbol sym, Environment env)
+  Declaration flookup (Symbol sym)
   {
+    Environment env = XQuery.xqEnvironment;
     gnu.mapping.Location loc = env.lookup(sym, EnvironmentKey.FUNCTION);
     if (loc == null)
       return null;
@@ -162,96 +163,79 @@ public class XQResolveNames extends ResolveNames
     return null;
   }
 
-  public Declaration lookup (Expression exp, Object symbol, boolean function)
-  {
-    Declaration decl = lookup.lookup(symbol, function);
-    if (decl != null)
-      return decl;
-    if (symbol instanceof String)
-      {
-	String name = (String) symbol;
-	if (function && name.indexOf(':') < 0)
-	  {
-	    Environment builtins = XQuery.getInstance().getLangEnvironment();
-	    for (int i = 0;  i < functionNamespacePath.length;  i++)
-	      {
-		Symbol sym = functionNamespacePath[i].lookup(name);
-		if (sym != null)
-		  {
-		    decl = lookup.lookup(sym, function);
-		    if (decl != null)
-		      return decl;
-		    if (! function)
-		      continue;
-		    decl = flookup(sym, builtins);
-		    if (decl != null)
-		      return decl;
-		  }
-	      }
-	  }
-	else
-	  {
-	    Symbol sym = namespaceResolve(name, function);
-	    if (sym == null)
-	      return null;
-	    decl = lookup.lookup(sym, function);
-	    if (function && decl == null)
-	      {
-		String uri = sym.getNamespaceURI();
-		if (uri != null && uri.length() > 6 &&
-		    uri.startsWith("class:"))
-		  {
-		    ClassType ctype = ClassType.make(uri.substring(6));
-		    return procToDecl(sym,
-				      ClassMethodProc.make(ctype, sym.getName()));
-		  }
-		Environment builtins = XQuery.getInstance().getLangEnvironment();
-		decl = flookup(sym, builtins);
-		if (decl != null)
-		  return decl;
-	      }
-	  }
-      }
-    if (decl == null)
-      {
-	if (function)
-	  {
-	  }
-	error('e',
-	      (function ? "unknown function " : "unknown variable $")+symbol);
-      }
-    return decl;
-  }
-
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
     if (exp.getBinding() == null)
       {
 	Object symbol = exp.getSymbol();
-	Declaration decl = lookup.lookup(symbol, exp.isProcedureName());
-	if (decl != null)
-	  exp.setBinding(decl);
-	else
-	  {
-	    Symbol sym;
-	    if (symbol instanceof Symbol
-		&& "".equals((sym = (Symbol) symbol).getNamespaceURI()))
-	      {
-		String name = sym.getLocalName();
-		Expression f;
-		if ("request".equals(name))
-		  f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetRequest", 
-					       "getRequest");
-		else if ("response".equals(name))
-		  f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetResponse",
-					       "getResponse");
-		else
-		  f = null;
-		if (f != null)
-		  return new ApplyExp(f, Expression.noExpressions);
-	      }
-	    super.walkReferenceExp(exp);
-	  }
+        boolean function = exp.isProcedureName();
+	Declaration decl = lookup.lookup(symbol, function);
+        Symbol sym;
+        if (decl != null)
+          ;
+	else if (symbol instanceof Symbol
+            && "".equals((sym = (Symbol) symbol).getNamespaceURI()))
+          {
+            String name = sym.getLocalName();
+            Expression f;
+            if ("request".equals(name))
+              f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetRequest", 
+                                           "getRequest");
+            else if ("response".equals(name))
+              f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetResponse",
+                                           "getResponse");
+            else
+              f = null;
+            if (f != null)
+              return new ApplyExp(f, Expression.noExpressions);
+          }
+        else // if (symbol instanceof String)
+          {
+            String name = (String) symbol;
+            if (function && name.indexOf(':') < 0)
+              {
+                for (int i = 0;  i < functionNamespacePath.length;  i++)
+                  {
+                    sym = functionNamespacePath[i].lookup(name);
+                    if (sym != null)
+                      {
+                        decl = lookup.lookup(sym, function);
+                        if (decl != null)
+                          break;
+                        if (! function)
+                          continue;
+                        decl = flookup(sym);
+                        if (decl != null)
+                          break;
+                      }
+                  }
+              }
+            else
+              {
+                sym = namespaceResolve(name, function);
+                if (sym != null)
+                  {
+                    decl = lookup.lookup(sym, function);
+                    if (decl == null && function)
+                      {
+                        String uri = sym.getNamespaceURI();
+                        if (uri != null && uri.length() > 6 &&
+                            uri.startsWith("class:"))
+                          {
+                            ClassType ctype = ClassType.make(uri.substring(6));
+                            return ClassMethodProc.makeExp(new QuoteExp(ctype),
+                                                           new QuoteExp(sym.getName()));
+                          }
+                        decl = flookup(sym);
+                      }
+                  }
+              }
+          }
+        if (decl != null)
+          exp.setBinding(decl);
+        else
+          error('e',
+                (function ? "unknown function " : "unknown variable $")+symbol);
       }
     return exp;
   }

@@ -1,5 +1,9 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (flookup): Change to take single argument.
+	(lookup): Merge/inline into walkReferenceExp.
+	(walkReferenceExp): Call ClassMethodProc's makeExp rather than make.
+
 	* XQuery.java (instance): Make final.
 	(xqEnvironment): New final field.
 	(initXQuery): New private method, called from static constructor.

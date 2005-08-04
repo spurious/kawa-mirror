@@ -5,6 +5,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.kawa.functions.Setter;
+import gnu.kawa.reflect.ClassMethodProc;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.
@@ -53,6 +54,9 @@ public class set_b extends Syntax implements Printable
 	// rewrite (set! (proc . args) rhs) => ((setter proc) args ... rhs)
 
 	ApplyExp aexp = (ApplyExp) name;
+        if (tr.inlineOk(aexp.getFunction()))
+          // Optimize (TYPE:MEMBER ...) forms so they can be inlined.
+          aexp = ClassMethodProc.rewrite((ApplyExp) name);
 	int nargs = aexp.getArgCount();
 	Expression[] xargs = new Expression[nargs+1];
 	System.arraycopy(aexp.getArgs(), 0, xargs, 0, nargs);

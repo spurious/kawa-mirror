@@ -762,14 +762,7 @@ public class Scheme extends LispLanguage
 	Object val = null;
 	String uri = name.getNamespaceURI();
         int len = nam.length();
-	if (uri != null && uri.startsWith("class:"))
-	  {
-	    String mname = nam.equals("new") ? "<init>"
-	      : Compilation.mangleName(nam);
-	    ClassType methodClass = ClassType.make(uri.substring(6));
-	    val = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
-	  }
-	else if (nam.endsWith("$unit"))
+	if (nam.endsWith("$unit"))
 	  val = Unit.lookup(nam.substring(0, nam.length()-5));
 	else if (len > 2 && nam.charAt(0) == '<' && nam.charAt(len-1) == '>')
           {

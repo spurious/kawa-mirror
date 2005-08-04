@@ -1,5 +1,12 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (namespaceResolve): Return expressions that
+	creates a ClassMethodProc, when appropriate.
+	* kawa/standard/Scheme.java (lookupBuiltin): No point at this time
+	in handling Symbols with uri starting "class:".
+	* kawa/standard/set_b.java (rewriteForm): Optimize (TYPE:MEMBER ...)
+	forms using ClassMethodProc rewrite form.
+
 	* kawa/standard/Scheme.java (initScheme): Update field name used
 	slot-set!.
 

@@ -1,5 +1,13 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* ClassMethodProc.java: Major rewrite. Now extends ProcedureN
+	rather than GenericProc.
+	(getMethods, inline, isApplicable, mtch0, match1, match2, match,
+	match4, numArgs): Remove no-longer-appropriate methods.
+	(makeExp, applyN, setN, rewrite): New methods.
+	(makeMethod, makeMethodExp, fieldDecl, staticFieldDecl, makeDecl,
+	invokeDecl, invokeStaticDecl): New static fields.
+
 	* SlotSet.java (setField$Ex): Rename to set$Mnfield$Ex to match current
 	mangling scheme for field names.
 	(setStaticField$Ex): Likewise rename to set$Mnstatic$Mnfield$Ex.

@@ -1,5 +1,9 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkApplyExp): No longer call rewriteToInvocation.
+	Instead call CallMethpdProc's rewrite method.
+	(rewriteToInvocation): Remove no-longer used method.
+
 	* Declaration.java (getValue): Load (lazily) from final static field.
 	(getConstantValue): Use getValue.
 

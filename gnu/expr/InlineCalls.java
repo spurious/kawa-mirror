@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.reflect.ClassMethodProc;
 
 public class InlineCalls extends ExpWalker
 {
@@ -12,46 +13,10 @@ public class InlineCalls extends ExpWalker
     walker.walk(exp);
   }
 
-  /** Possibly convert a Symbol method call to invokeStatic or make. */
-  Expression rewriteToInvocation(Symbol sym, ApplyExp aexp)
-  {
-    Expression[] args = aexp.args;
-    String uri = sym.getNamespaceURI();
-    if (uri == null || ! uri.startsWith("class:"))
-      return null;
-    String className = uri.substring(6);
-    String methodName = sym.getName();
-    ClassType typeInvoke = ClassType.make("gnu.kawa.reflect.Invoke");
-    String invFieldName;
-    Invoke invProc;
-    boolean isNew = methodName.equals("new");
-    if (isNew)
-      {
-	invFieldName = "make";
-	invProc = gnu.kawa.reflect.Invoke.make;
-      }
-    else
-      {
-	invFieldName = "invokeStatic";
-	invProc = gnu.kawa.reflect.Invoke.invokeStatic;
-      }
-    Field invField = typeInvoke.getDeclaredField(invFieldName);
-    Declaration invDecl = new Declaration("invoke", invField);
-    invDecl.noteValue(new QuoteExp(invProc));
-    invDecl.setFlag(Declaration.IS_CONSTANT);
-    Expression[] xargs = new Expression[args.length + (isNew ? 1 : 2)];
-    System.arraycopy(args, 0, xargs, (isNew ? 1 : 2), args.length);
-    xargs[0] = new QuoteExp(className);
-    if (! isNew)
-      xargs[1] = new QuoteExp(methodName);
-    args = xargs;
-    ApplyExp nexp = new ApplyExp(new ReferenceExp(invDecl), args);
-    nexp.setLine(aexp);
-    return invProc.inline(nexp, this);
-  }
-
   protected Expression walkApplyExp(ApplyExp exp)
   {
+    if (comp.inlineOk(exp.func))
+      exp = ClassMethodProc.rewrite(exp);
     super.walkApplyExp(exp);
     LambdaExp lambda = null;
     int nargs = exp.getArgCount();
@@ -75,9 +40,6 @@ public class InlineCalls extends ExpWalker
 	else if (rexp.getSymbol() instanceof Symbol)
 	  {
 	    Symbol symbol = (Symbol) rexp.getSymbol();
-	    Expression inv = rewriteToInvocation(symbol, exp);
-	    if (inv != null)
-	      return inv;
 	    Object fval = Environment.getCurrent().getFunction(symbol, null);
 	    if (fval instanceof Procedure)
 	      func = new QuoteExp(fval);

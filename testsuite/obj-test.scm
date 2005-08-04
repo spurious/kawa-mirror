@@ -313,7 +313,7 @@
 (test (+ 1900 (date:get-year (date:new)))
       invoke simple-date 'get-year)
 (define non-simple-date (make <DateTest>))
-(test (+ 1900 (date:get-year (date:new)))
+(test (+ 1900 (*:get-year (date:new)))
       invoke non-simple-date 'get-year)
 (test #t 'date-1 (>= (invoke date-test-instance 'get-year) 2004))
 (test #f 'date-2 (invoke non-simple-date 'before date-test-instance))

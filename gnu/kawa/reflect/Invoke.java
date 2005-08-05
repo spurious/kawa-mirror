@@ -261,9 +261,26 @@ public class Invoke extends ProcedureN implements CanInline
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
+    return inline(exp, walker.getCompilation());
+  }
+
+  private Expression inline (ApplyExp exp, Compilation comp)
+  {
     Expression[] args = exp.getArgs();
     int nargs = args.length;
-    ClassType type = getClassType(args);
+    if (nargs == 0 || (kind == 'V' && nargs == 1))
+      // This should never happen, as InlineCalls.walkApplyExp
+      // checks the number of arguments before inline is called.
+      return exp;
+    ClassType type;
+    Expression arg0 = args[0];
+    Type type0 = (kind == 'V' ? arg0.getType() : language.getTypeFor(arg0));
+    if (type0 instanceof PairClassType)
+      type = ((PairClassType) type0).instanceType;
+      else if (type0 instanceof ClassType)
+      type = (ClassType) type0;
+    else
+      type = null;
     String name = getMethodName(args);
 
     int margsLength, argsStartIndex, objIndex;
@@ -292,22 +309,15 @@ public class Invoke extends ProcedureN implements CanInline
         objIndex = 1;
       }
     else
-      return walker.noteError("unknown invoke kind: " + kind);
-    return inline(exp, name, margsLength, argsStartIndex, objIndex,
-		  type, walker);
-  }
-                
-  public Expression inline (ApplyExp exp, String name,
-			    int margsLength, int argsStartIndex, int objIndex,
-			    ClassType type, ExpWalker walker)
-  {
-    Expression[] args = exp.getArgs();
+      return exp;
 
     // Add implicit staticLink for classes that need it.
     // Doesn't yet handle: (define-namespace p <C>) (p:new)
+    // FIXME  Does this work?  getStaticLink doesn't get set
+    // until FindCapturedVars.
     if (kind == 'N' && argsStartIndex == 1
-	&& type instanceof PairClassType
-	&& ((PairClassType) type).getStaticLink() != null)
+	&& type0 instanceof PairClassType
+	&& ((PairClassType) type0).getStaticLink() != null)
       {
 	Expression[] cargs = { args[0] };
 	Expression[] xargs = new Expression[margsLength+1];
@@ -320,15 +330,22 @@ public class Invoke extends ProcedureN implements CanInline
 	args = xargs;
       }
 
+    Declaration decl;
     if (type != null && name != null
-	// We can't generate <init> until we know whether it needs
-	// a lexical link, which we don't know until FindCapturedVars is run.
-	// Unfortunately, this means make doesn't get property inlined.  FIXME
-	&& (kind != 'N' || type.isExisting()))
+        && (kind != 'N'
+            || type.isExisting()
+            // The problem is we don't know until FindCapturedVars is run
+            // whether <init> takes a static link.  However, if it's a
+            // static class (including define-simple-class) then we're safe
+            // and that covers the most important case.
+            // A better solution would be to call a "placeholder" PrimProcedure
+            // and dhave it do the right thing at code generation time.
+            || (arg0 instanceof ReferenceExp
+                && (decl = ((ReferenceExp) arg0).getBinding()) != null
+                && decl.getFlag(Declaration.STATIC_SPECIFIED))))
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;
-	Compilation comp = walker.getCompilation();
         synchronized (this)
           {
             try
@@ -341,7 +358,7 @@ public class Invoke extends ProcedureN implements CanInline
               }
             catch (Exception ex)
               {
-                walker.error('w', "unknown class: " + type.getName());
+                comp.error('w', "unknown class: " + type.getName());
                 methods = null;
               }
             okCount = cacheDefinitelyApplicableMethodCount;
@@ -353,7 +370,7 @@ public class Invoke extends ProcedureN implements CanInline
             if (methods.length == 0)
 	      {
 		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
-		  walker.error('w', "no accessible method '"+name+"' in "+type.getName());
+		  comp.error('w', "no accessible method '"+name+"' in "+type.getName());
 	      }
             else if (okCount + maybeCount == 0)
               {
@@ -385,7 +402,7 @@ public class Invoke extends ProcedureN implements CanInline
                       {
                         errbuf.append(" in class ");
                         errbuf.append(type.getName());
-                        walker.error('w', errbuf.toString());
+                        comp.error('w', errbuf.toString());
                       }
                     else
                       {
@@ -402,7 +419,7 @@ public class Invoke extends ProcedureN implements CanInline
                       }
                   }
                 else
-                  walker.error('w', "no possibly applicable method '"
+                  comp.error('w', "no possibly applicable method '"
                              +name+"' in "+type.getName());
               }
             else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
@@ -442,7 +459,7 @@ public class Invoke extends ProcedureN implements CanInline
                     sbuf.append("' in ");
                     sbuf.append(type.getName());
                     append(methods, okCount, sbuf);
-		    walker.error('w', sbuf.toString());
+		    comp.error('w', sbuf.toString());
 		  }
               }
 	    else if (comp.getBooleanOption("warn-invoke-unknown-method", true))
@@ -453,7 +470,7 @@ public class Invoke extends ProcedureN implements CanInline
                 sbuf.append("' in ");
                 sbuf.append(type.getName());
                 append(methods, maybeCount, sbuf);
-                walker.error('w', sbuf.toString());
+                comp.error('w', sbuf.toString());
 	      }
             if (index >= 0)
               {
@@ -480,20 +497,6 @@ public class Invoke extends ProcedureN implements CanInline
         sbuf.append("\n  candidate: ");
         sbuf.append(methods[i]);
       }
-  }
-
-  private ClassType getClassType(Expression[] args)
-  {
-    if (args.length > 0)
-      {
-        Expression arg0 = args[0];
-        Type type = (kind == 'V' ? arg0.getType() : language.getTypeFor(arg0));
-	if (type instanceof PairClassType)
-	  return ((PairClassType) type).instanceType;
-        if (type instanceof ClassType)
-	  return (ClassType) type;
-      }
-    return null;
   }
 
   private String getMethodName(Expression[] args)

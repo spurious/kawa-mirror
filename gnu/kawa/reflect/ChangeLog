@@ -1,3 +1,10 @@
+2005-08-04  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (getClassType, inline): Inline in 2-argument inline
+	(inline): Overload to take a Compilation.
+	* Invoke.java (inline): Allow inlining of constructor even if it
+	doesn't yet exist as long as the class is static.
+
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java: Major rewrite. Now extends ProcedureN

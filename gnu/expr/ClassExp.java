@@ -284,8 +284,13 @@ public class ClassExp extends LambdaExp
 	    || ! isMakingClassPair())
 	  child.addMethodFor(type, comp, null);
 	if (isMakingClassPair())
+          // FIXME this is wrong if the method is static
 	  child.addMethodFor(instanceType, comp, type);
       }
+    // It is desirable to declare the constructor now, so it's available
+    // to InlineCalls.  But we can't if we might need a static link.
+    if (nameDecl != null && nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+      comp.getConstructor(instanceType, this);
   }
 
   /** Return implementation method matching name and param types.
@@ -418,7 +423,7 @@ public class ClassExp extends LambdaExp
 		&& mname.charAt(2) == 't'
 		&& mname.charAt(1) == 'e'
 		&& ((ch = mname.charAt(0)) == 'g' || ch == 's'))
-	      {
+	      { // a "set" or "get" method is treated as a slot accessor.
 		Type ftype;
 		if (ch == 's' && rtype.isVoid() && ptypes.length == 1)
 		  ftype = ptypes[0];

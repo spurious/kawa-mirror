@@ -1,3 +1,9 @@
+2005-08-05  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Instead of isPrivate() method use
+	isPublic() method which also requires that the context be a ModulExp.
+	Fixes Savannah bug #14037 (leaking lexical bindings).
+
 2005-08-04  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (declareParts): Declare constructor, if class static.

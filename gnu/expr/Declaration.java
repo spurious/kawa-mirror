@@ -751,7 +751,7 @@ public class Declaration
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
     if (isPublic() && ! isConstant && ! typeSpecified)
       setIndirectBinding(true);
-    if (! isPrivate() || external_access)
+    if (isPublic() || external_access)
       fflags |= Access.PUBLIC;
     if (isStatic()
 	|| (isConstant && value instanceof QuoteExp)

@@ -1,3 +1,8 @@
+2005-08-07  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (pushChain): Partly inline call to push(ScopeExp),
+	but avoid needless calls to mustCompileHere() because of TemplateScope.
+
 2005-08-05  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): Instead of isPrivate() method use

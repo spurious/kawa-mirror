@@ -2141,7 +2141,8 @@ public class Compilation
     if (scope != limit)
       {
 	pushChain(scope.outer, limit);
-	push(scope);
+        pushScope(scope);
+        lexical.push(scope);
       }
   }
 

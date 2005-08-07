@@ -54,6 +54,8 @@ public class SlotGet extends Procedure2
 	int length = java.lang.reflect.Array.getLength(obj);
 	return language.coerceToObject(length);
       }
+    if ("class".equals(fname))
+      return clas;
     boolean illegalAccess = false;
     java.lang.reflect.Field field;
     try
@@ -196,6 +198,14 @@ public class SlotGet extends Procedure2
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
     String name = ClassMethods.checkName(arg1);
+    if ("class".equals(name)
+        // Ideally we should also handle array types ...  FIXME
+        && type instanceof ClassType)
+      {
+        comp.loadClassRef(type.getName());
+        target.compileFromStack(comp, Type.java_lang_Class_type);
+        return;
+      }
     CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {

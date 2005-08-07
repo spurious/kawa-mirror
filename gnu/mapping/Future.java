@@ -37,7 +37,7 @@ public class Future extends Thread
         // If we're inside a fluid-let, then the child thread should inherit
         // the fluid-let binding, even if it isn't accessed in the child until
         // after the parent exits the fluid-let.  Set things up so only the
-        // binding in the parent is restored, but they share utnil then.
+        // binding in the parent is restored, but they share until then.
         Location loc = parentContext.pushedFluids[i];
         Symbol name = loc.getKeySymbol();
         Object property = loc.getKeyProperty();

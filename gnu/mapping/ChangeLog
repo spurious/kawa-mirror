@@ -1,3 +1,8 @@
+2005-08-07  Per Bothner  <per@bothner.com>
+
+	* NamedLocation.java (setRestore): If restored value is not a Location,
+	then clear base.  This fixes a bug caused by sharing done in Future.
+
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java (matchFailAsException): Fix thinko.

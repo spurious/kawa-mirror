@@ -135,7 +135,10 @@ public abstract class NamedLocation extends IndirectableLocation
             base = (Location) oldValue;
           }
         else
-          value = oldValue;
+          {
+            value = oldValue;
+            base = null;
+          }
         ctx.popFluid();
       }
   }

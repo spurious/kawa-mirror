@@ -1,3 +1,9 @@
+2005-08-08  Per Bothner  <per@bothner.com>
+
+	* ClassMethodProc.java (castDecl): New static field.
+	(CAST_METHOD_NAME, INSTANCEOF_METHOD_NAME): New constants.
+	(applyN, rewrite): Support class cast operation.
+
 2005-08-07  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (apply2, compile): Implement "class" pseudo-field.

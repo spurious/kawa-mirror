@@ -19,6 +19,12 @@ public class ClassMethodProc extends ProcedureN
   ClassType ctype;
   String methodName;
 
+  /** Pseudo-method-name for the cast operation. */
+  public static final String CAST_METHOD_NAME = "@";
+
+  /** Pseudo-method-name for class-membership-test (instanceof) operation. */
+  public static final String INSTANCEOF_METHOD_NAME = "instance?";
+
   public static final Method makeMethod
     = (ClassType.make("gnu.kawa.reflect.ClassMethodProc")
        .getDeclaredMethod("make", 2));
@@ -43,6 +49,9 @@ public class ClassMethodProc extends ProcedureN
   static final Declaration instanceOfDecl
   = Declaration.getDeclarationFromStatic("kawa.standard.Scheme", "instanceOf");
 
+  static final Declaration castDecl
+  = Declaration.getDeclarationFromStatic("gnu.kawa.functions.Convert", "as");
+
   public static ClassMethodProc make (ClassType ctype, String methodName)
   {
     ClassMethodProc p = new ClassMethodProc();
@@ -64,9 +73,10 @@ public class ClassMethodProc extends ProcedureN
     boolean isInstance = ctype == null;
     boolean isField = methodName.length() > 1 && methodName.charAt(0) == '.';
     boolean isNew = methodName.equals("new");
-    boolean isInstanceOf = methodName.equals("nstance?");
+    boolean isInstanceOf = methodName.equals(INSTANCEOF_METHOD_NAME);
+    boolean isCast = methodName.equals(CAST_METHOD_NAME);
     Object[] xargs
-      = new Object[args.length+(isInstance||isNew||isInstanceOf?1:2)];
+      = new Object[args.length+(isInstance||isNew||isInstanceOf||isCast?1:2)];
     Procedure proc;
     String name = isField ? methodName.substring(1) : methodName;
     if (isField && ! isInstance && args.length == 1)
@@ -93,6 +103,13 @@ public class ClassMethodProc extends ProcedureN
         System.arraycopy(args, 1, xargs, 2, args.length-1);
         xargs[0] = args[0];
         xargs[1] = ctype;
+      }
+    else if (isCast)
+      {
+        proc = gnu.kawa.functions.Convert.as;
+        System.arraycopy(args, 1, xargs, 2, args.length-1);
+        xargs[0] = ctype;
+        xargs[1] = args[0];
       }
     else
       {
@@ -148,8 +165,9 @@ public class ClassMethodProc extends ProcedureN
     boolean isInstance = clExp == QuoteExp.nullExp;
     Expression[] args = exp.getArgs();
     String mname = ((QuoteExp) fargs[1]).getValue().toString();
-    boolean isInstanceOf = mname.equals("instance?");
-    if (args.length == 0 && (isInstance || isInstanceOf))
+    boolean isInstanceOf = mname.equals(INSTANCEOF_METHOD_NAME);
+    boolean isCast = mname.equals(CAST_METHOD_NAME);
+    if (args.length == 0 && (isInstance || isInstanceOf || isCast))
       return exp;
     boolean isField = mname.length() > 1 && mname.charAt(0) == '.';
     boolean isNew = mname.equals("new");
@@ -159,7 +177,7 @@ public class ClassMethodProc extends ProcedureN
         isInstance = true;
       }
     Expression[] xargs
-      = new Expression[args.length+(isInstance||isNew||isInstanceOf?1:2)];
+      = new Expression[args.length+(isInstance||isNew||isInstanceOf||isCast?1:2)];
     Declaration decl;
     if (isInstance)
       {
@@ -180,13 +198,20 @@ public class ClassMethodProc extends ProcedureN
         xargs[0] = args[0];
         xargs[1] = fargs[0];
       }
+    else if (isCast)
+      {
+        decl = castDecl;
+        System.arraycopy(args, 1, xargs, 2, args.length-1);
+        xargs[0] = fargs[0];
+        xargs[1] = args[0];
+      }
     else
       {
         decl = isField ? staticFieldDecl : invokeStaticDecl;
         System.arraycopy(args, 0, xargs, 2, args.length);
         xargs[0] = fargs[0];
       }
-    if (! isNew && ! isInstanceOf)
+    if (! isNew && ! isInstanceOf && ! isCast)
       xargs[1] = isField ? new QuoteExp(mname.substring(1)) : fargs[1];
     return new ApplyExp(new ReferenceExp(decl), xargs);
   }

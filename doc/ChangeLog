@@ -1,3 +1,13 @@
+2005-08-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (node): Subdivide into subsections.
+	New material on setting variables.
+	Document out:base, out:radix, out:doctype-systemm, out:doctype-public,
+	out:xml-indent, out:line-length, out:right-margin options.
+	(Record types): define-record-type constructors are now optimized.
+	(Method operations): Document namespace-colon syntax extensions.
+	(Field operations): Likewise.
+
 2005-07-31  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Restrictions): Merged node into Features chapter.

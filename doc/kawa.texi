@@ -565,7 +565,16 @@ or before the first @code{-f} or @code{-c} argument.  (It is not run
 for a @code{-e} command, to allow you to set options to override
 the defaults.)
 
-@table @samp
+If there are further command-line arguments after the options
+have been processed, then the first remaining argument names a
+file that is read and evaluated.  If there is no such argument,
+then Kawa enters an interactive read-eval-print loop,
+but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
+@samp{-C}, or @samp{--} options were specified.
+
+@subsection General options
+
+@table @code
 @item -e @var{expr}
 Kawa evaluates @var{expr}, which contains one or more Scheme expressions.
 Does not cause the @code{~/.kawarc.scm} init file to be run.
@@ -599,6 +608,11 @@ Start a server listening from connections on the specified @var{portnum}.
 Each connection using the Telnet protocol causes a new read-eval-print-loop
 to started.  This option allows you to connect using any
 Telnet client program to a remote "Kawa server".
+@end table
+
+@subsection Options for language selection
+
+@table @code
 @item --scheme
 Set the default language to Scheme.
 (This is the default unless you select another language,
@@ -628,14 +642,67 @@ Set the default language to XSLT (XML Stylesheet Language Transformations).
 (The implementation is @emph{very} incomplete.)
 See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
 for more information.
+@end table
+
+@subsection Options for setting variable
+
+@table @code
+@item @var{name}=@var{value}
+Set the global variable with the specified @var{name} to the given @var{value}.
+The type of the @var{value} is currently unspecified; the plan is for it
+to be like XQuery's @dfn{untyped atomic} which can be coerced as needed.
+@item @{@var{namespace-uri}@}@var{local-name}=@var{value}
+Set the global variable with the specified namespace uri and
+namespace-local name to the given value.
+@end table
+
+@subsection Options for controlling output formatting
+
+@table @code
 @item --output-format @var{format}
 @itemx --format @var{format}
 Change the default output format to that specified by @var{format}.
 See @ref{Named output formats} for more information and a list.
 @end table
 
+@table @code
+@item out:base=@var{integer}
+The number base (radix) to use by default when printing rational numbers.
+Must be an integer between 2 and 36, and the default is of course 10.
+For example the option @code{out:base=16} produces hexadecimal output.
+Equivalent to setting the @code{*print-base*} variable.
+@item out:radix=no|yes
+If true, prints an indicator of the radix used when printing rational numbers.
+The default is @code{no}.
+Equivalent to setting the @code{*print-radix*} variable.
+@item out:doctype-system=@var{system-identifier}
+If @code{out:doctype-system} is specified then a @code{DOCTYPE} declaration
+is written before writing a top-level XML element, using
+the specified @var{system-identifier}.
+@item out:doctype-public=@var{public-identifier}
+Ignored unless  @code{out:doctype-system} is also specified,
+in which case the @var{public-identifier} is written
+as the public identifiers of the @code{DOCTYPE} declaration.
+@item out:xml-indent=@var{kind}
+Controls whether extra line breaks and indentation are added
+when printing XML.
+If @var{kind} is @code{always} or @code{yes} then newlines and
+appropriate indentation are added before and after each element.
+If @var{kind} is @code{pretty} then the pretty-printer is used
+to only add new lines when an element otherwise won't fit on a single line.
+If @var{kind} is @code{no} (the default) then no extra line breaks
+or indentation are added.
+@item out:line-length=@var{columns}
+@itemx out:right-margin=@var{columns}
+Specifies the maximum number of number of columns in a line
+when the pretty-printer decides where to break a line.
+(The two options are equivalent.)
+@end table
+
+@subsection Options for compiling and optimizing
+
 The following options control which calling conventions are used:
-@table @samp
+@table @code
 @item --full-tailcalls
 Use a calling convention that supports proper tail recursion.
 @item --no-full-tailcalls
@@ -669,9 +736,11 @@ see @ref{Files compilation}.
 The option @samp{--connect @var{portnum}} is only used by
 the @samp{kawa} front-end program.
 
+@subsection Options for debugging
+
 The following options are useful if you want to debug or understand
 how Kawa works.
-@table @samp
+@table @code
 @item --debug-dump-zip
 Normally, when Kawa loads a soyrce file, or evaluates a non-trivial expression,
 it generates new internal Java classes but does not write them out.  This
@@ -686,13 +755,6 @@ Similar to the previous option, but prints out the @code{Expression} after
 various transformations and optimizations have been done, and just before
 code generation.
 @end table
-
-If there are further command-line arguments after the options
-have been processed, then the first remaining argument names a
-file that is read and evaluated.  If there is no such argument,
-then Kawa enters an interactive read-eval-print loop,
-but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
-@samp{-C}, or @samp{--} options were specified.
 
 @node Scripts, New-Window, Options, Running
 @section Running Command Scripts
@@ -980,7 +1042,7 @@ Note the @samp{-C} must come last, because @samp{Kawa} processes the
 arguments and options in order,
 
 Here:
-@table @samp
+@table @code
 @item -C @var{infile} ...
 The Scheme source files we want to compile.
 @item -d @var{outdirectory}
@@ -1035,7 +1097,7 @@ kawa -f macs.scm -C foosrc.scm
 
 Various named option control how Kawa compiles certain forms.
 
-@table @samp
+@table @code
 @item --module-static
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static #t)} were specified). @xref{Module classes}.
@@ -2735,7 +2797,7 @@ For Scheme, the default is @code{--scheme} for read-eval-print
 interaction, and @code{--ignore} for files that are loaded.
 
 The formats currently supported include the following:
-@table @samp
+@table @code
 @item scheme
 Values are printed in a format matching the Scheme programming language,
 as if using @code{display}.  "Groups" or "elements" are written as lists.
@@ -3605,8 +3667,8 @@ The Kawa module system is based on the features of the Java class system.
 * Dynamic records::       Creating New Record Types On-the-fly
 * Mangling::              Mapping Scheme names to Java names
 * Allocating objects::
-* Field operations::      Accessing fields of Java objects
 * Method operations::     Calling Java methods from Scheme
+* Field operations::      Accessing fields of Java objects
 * Defining new classes::
 * Anonymous classes::
 * Module classes::        Modules and how they are compiled to classes
@@ -3706,10 +3768,8 @@ is used, if possible, for the Java class name.  Otherwise, the name
 of the Java class is derived by "mangling" the @var{type-name}.
 In any case, the package is the same as that of the surrounding module.
 
-Kawa generates efficient code for the @var{predicate-name},
-@var{accessor-name}, and @var{modifier-name} functions.
-The @var{constructor-name} currently compiles into code using run-time
-reflection, but hopefully that will get fixed.
+Kawa generates efficient code for the resulting functions,
+without needing to use run-time reflection.
 
 @node Dynamic records, Mangling, Record types, Objects Classes and Modules
 @section Creating New Record Types On-the-fly
@@ -3944,6 +4004,13 @@ In this example the name @code{Int32} is a @dfn{namespace alias}
 for the namespace whose full name is @code{"class:java.lang.Integer"}.
 The full name should be the 6 characters @code{"class:"} followed
 by the fully-qualified name of a Java class.
+Equivalently, you can use a name for a class, such as:
+@example
+(define-namespace Int32 <java.lang.Integer>)
+@end example
+The latter syntax also works for classes defined in the module,
+or aliases, since the name is first searched in the lexical scope.
+
 You can name a method using a @dfn{qualified name} containing a colon.
 The part of the name before the colon is a namespace alias (in
 this case @code{Int32}), and the part of the name after the colon is the
@@ -3956,6 +4023,13 @@ Java class @code{java.lang.Integer}, passing it the argument @code{255},
 and returning the Java String @code{"ff"}.  (Note this is not the
 same as a Scheme string!)
 
+The general syntax is
+@example
+(@var{prefix}:@var{method-name} @var{arg} ...)
+@end example
+This invokes the method named @var{method-name} in the class corresponding
+to @var{prefix}, and the @var{arg}s are the method arguments.
+
 You can use the method name @code{new} to construct new objects:
 @example
 (Int32:new '|255|)
@@ -3967,12 +4041,33 @@ You can also write:
 @end example
 Kawa is smart enough to convert the Kawa string to a Java String.
 
-You can invoke non-static methods the same way.  In that case the first
-argument is the receiver or @code{this} argument.
+To invoke a non-static method you can use a special prefix @code{*}:
 @example
-(Int32:toString (Int32:new "00255"))
+(*:toString (list 9 8 7))
 @end example
-This evaluates to the Java String @code{"255"}.
+The general syntax is
+@example
+(*:@var{method-name} @var{instance} @var{arg} ...)
+@end example
+This invokes the method named @var{method-name}
+with @var{instance} as the target object, and the @var{arg}s are
+the method arguments.
+
+Alternatively, you can invoke a non-static method using an explicit
+@var{prefix}:
+@example
+(@var{prefix}:@var{method-name} @var{instance} @var{arg} ...)
+@end example
+Assuming that @var{prefix} is bound to @var{class} then the
+above is equivalent to:
+@example
+(*:@var{method-name} (as @var{class} @var{instance}) @var{arg} ...)
+@end example
+For example:
+@example
+(Int32:doubleValue (Int32:new "00255"))
+@end example
+This returns the @code{double} value @code{255.0}.
 
 As a shorthand, you can use the name of a Java class instead of a
 namespace alias:
@@ -3986,6 +4081,19 @@ treat the prefix
 as a nickname for namespace uri like @code{class:java.lang.Integer}.
 Both conditions should be true at both compile-time and run-time.
 However, using an explicit @code{define-namespace} is recommended.
+
+As a final shorthand you can use an identifier in handle brackets,
+such as an existing type alias like @code{<list>}.
+The following are all equivalent:
+@example
+(<list>:list3 'a 'b 'c)
+@end example
+This is equivalent to:
+@example
+(define-namespace @var{prefix} <list>
+(@var{prefix}:list3 'a 'b 'c)
+@end example
+for some otherwise-unused @var{prefix}.
 
 @subsection Invoking a method with the @code{invoke} function
 
@@ -4127,6 +4235,61 @@ array element type must be compatible with all the extra arguments.)
 
 @node Field operations, Defining new classes, Method operations, Objects Classes and Modules
 @section Accessing fields of Java objects
+
+The recommmended way to access fields 
+uses the namespace-colon syntax described in @pxref{Method operations}.
+The difference is that instead of a method name following the colon
+there is field name a following the colon @emph{and} a period.
+
+To access an static field named @var{field-name} use this syntax
+@example
+(@var{prefix}:.@var{field-name} @var{instance})
+@end example
+The @var{prefix} can be as discussed in @xref{Method operations}.
+Here are 5 equivalent ways:
+@example
+(java.lang.Integer:.MAX_VALUE)
+(<java.lang.Integer>:.MAX_VALUE)
+(define-namespace Int32 <java.lang.Integer>)
+(Int32:.MAX_VALUE)
+(define-namespace Integer "class:java.lang.Integer")
+(Integer:.MAX_VALUE)
+(define-alias <j.l.Integer> <java.lang.Integer>)
+(<j.l.Integer>:.MAX_VALUE)
+@end example
+You can set a static field using this syntax:
+@example
+(set! (@var{prefix}:.@var{field-name}) @var{new-value})
+@end example
+
+To access a instance field named @var{field-name} use the following syntax.
+Note the period before the @var{field-name}.
+@example
+(*:.@var{field-name} @var{instance})
+@end example
+This syntax works with @code{set!} - to set the field use this syntax:
+@example
+(set! (*:.@var{field-name} @var{instance}) @var{new-value})
+@end example
+Here is an example:
+@example
+(define p (list 3 4 5))
+(*:.cdr p) => (4 5)
+(set! (*:.cdr p) (list 6 7))
+p => (3 6 7)
+@end example
+
+You can specify an explicit class:
+@example
+(@var{prefix}:.@var{field-name} @var{instance})
+@end example
+If @var{prefix} is bound to @code{<@var{class}>}, then the above
+is equivalent to:
+@example
+(*:.@var{field-name} (as <@var{class}> @var{instance}))
+@end example
+
+@subsection Using field and static-field methods
 
 Kawa has both a high-level interface and a low-level interface for accessing
 the fields of Java objects and static fields.
@@ -4495,6 +4658,12 @@ where the part before the colon matches the @var{name} will be
 treated as being in the package/namespace whose global unique name
 is the @var{namespace-uri}.
 
+(A namespace is similar to a Common Lisp package,
+and the @var{namespace-uri} is like the name of the package.
+However, a namespace alias belongs to the lexical scope,
+while a Common Lisp package nickname is global
+and belongs to the package itself.)
+
 The features is currently used for XML (to be documented).
 In XML terminology, a name containing a colon is a @dfn{qualified name}.
 The part of the name before the colon is a @dfn{namespace prefix},
@@ -4507,7 +4676,28 @@ The part of a name following the colon is the @var{local part} of the name.
 
 If the namespace starts with the strings @code{"class:"}, then the
 @var{name} can be used for invoking Java methods
-- @pxref{Method operations}.
+(@pxref{Method operations}) and accessing fields (@pxref{Field operations}).
+
+Instead of a @var{vamespace-uri} you can use a variable that names
+a class, usually of the form @code{<@var{classname}>}.
+The following are equivalent:
+@example
+(define-namespace sb "class:java.lang.StringBuffer")
+(define-namespace sb <java.lang.StringBuffer>)
+@end example
+However, there is one important difference: The @code{<@var{classname}>}
+is first searched in the lexical scope.
+It may resolve to a class defined in the current compilation unit
+(perhaps defined using @code{define-simple-class}),
+or imported from another module,
+or an alias (such as from @code{define-alias}).
+Only if @code{<@var{classname}>} is @emph{not} found in the current
+scope is it tried as the class name @var{classname}.
+@end deffn
+
+@deffn Syntax define-private-namespace name namespace-uri
+Same as @code{define-namespace}, but the prefix @var{name}
+is local to the current module.
 
 @end deffn
 
@@ -4824,11 +5014,8 @@ The compiler can inline each to a single bytecode instruction
 These macros are deprecated.
 The @code{fields} and @code{static-field} functions
 (@pxref{Field operations}) are easier to use, more powerful, and
-just as efficient.  (One exception is for @code{primitive-set-static};
-while its functionality can be expressed using
-@code{(set! (static-field ...) ...)}, that idiom is currently
-less efficient.)  Also, the high-level functions currently do
-not provide access to private fields.
+just as efficient.  However, the high-level functions currently do
+not provide access to non-public fields.
 
 @deffn Syntax primitive-get-field class fname ftype
 Use this to access a field named @var{fname} having type @var{type} in

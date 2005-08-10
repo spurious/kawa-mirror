@@ -1,3 +1,7 @@
+2005-08-09  Per Bothner  <per@bothner.com>
+
+	* SimpleEnvironment (define): Remove unused local variable prev.
+
 2005-08-07  Per Bothner  <per@bothner.com>
 
 	* NamedLocation.java (setRestore): If restored value is not a Location,

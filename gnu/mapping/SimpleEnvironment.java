@@ -138,7 +138,6 @@ public class SimpleEnvironment extends Environment
 			       Object newValue)
   {
     int index = hash & mask;
-    NamedLocation prev = null;
     NamedLocation first = table[index];
     NamedLocation loc = first;
     for (;;)
@@ -158,7 +157,6 @@ public class SimpleEnvironment extends Environment
 	    loc.value = newValue;
 	    return loc;
 	  }
-	prev = loc;
 	loc = loc.next;
       }
   }

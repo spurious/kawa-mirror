@@ -1,3 +1,9 @@
+2005-08-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (JAVADOC_FLAGS): Remove (comment out) macro.
+
+	* Makefile.am (set-selected-java-source): Fix thinko.
+
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (namespaceResolve): Add a followAliases

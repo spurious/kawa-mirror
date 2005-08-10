@@ -146,7 +146,7 @@ JAVADOC_PACKAGES = \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
 
 JAVADOC = javadoc
-JAVADOC_FLAGS = -J-Xmx60m
+#JAVADOC_FLAGS = -J-Xmx60m
 
 # NOTE:  To update javadoc:
 #   make install-javadoc-html
@@ -272,8 +272,8 @@ select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(MAKE) set-selected-java-source JAVA_SOURCE=5
 
 set-selected-java-source:
-	test "$JAVA_SOURCE" = `cat $(srcdir)/selected-java-source` \
-	  || echo "$JAVA_SOURCE" >$(srcdir)/selected-java-source
+	test "@JAVA_SOURCE@" = `cat $(srcdir)/selected-java-source` \
+	  || echo "@JAVA_SOURCE@" >$(srcdir)/selected-java-source
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
   kawa-@VERSION@-src.zip jemacs-@JEMACS_VERSION@.jar bytecode-@BYTECODE_VERSION@.jar

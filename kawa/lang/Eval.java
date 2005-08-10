@@ -36,18 +36,16 @@ public class Eval extends Procedure1or2
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    Consumer save = ctx.consumer;
+    int oldIndex = ctx.startFromContext();
     try
       {
-	ctx.consumer = ctx.vstack;
-	ctx.values = Values.noArgs;
 	evalBody(body, env, messages, ctx);
-	return Values.make((gnu.lists.TreeList) ctx.vstack);
+	return ctx.getFromContext(oldIndex);
       }
-    finally
-      {
-	ctx.vstack.clear();
-	ctx.consumer = save;
+    catch (Throwable ex)
+      { 
+	ctx.cleanupFromContext(oldIndex);
+	throw ex;
       }
   }
 
@@ -55,18 +53,16 @@ public class Eval extends Procedure1or2
         throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    Consumer save = ctx.consumer;
+    int oldIndex = ctx.startFromContext();
     try
       {
-	ctx.consumer = ctx.vstack;
-	ctx.values = Values.noArgs;
 	eval(sexpr, env, ctx);
-	return Values.make((gnu.lists.TreeList) ctx.vstack);
+	return ctx.getFromContext(oldIndex);
       }
-    finally
-      {
-	ctx.vstack.clear();
-	ctx.consumer = save;
+    catch (Throwable ex)
+      { 
+	ctx.cleanupFromContext(oldIndex);
+	throw ex;
       }
   }
 

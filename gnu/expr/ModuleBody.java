@@ -96,7 +96,8 @@ public abstract class ModuleBody extends Procedure0
   }
 
   /** This is invoked by main when ModuleBody is compiled with --main.
-   * @deprecated. */
+   * @deprecated
+   */
   public final void runAsMain (String[] args)
   {
     processArgs(args);

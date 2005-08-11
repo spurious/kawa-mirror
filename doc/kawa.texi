@@ -34,37 +34,45 @@ END-INFO-DIR-ENTRY
 @top The Kawa Scheme system
 @end ifnottex
 
-Kawa is a Scheme environment, written in Java,
-and that compiles Scheme code into Java byte-codes.
+Kawa is:
+@itemize @bullet
+@item
+A framework written in Java for implementing
+high-level and dynamic languages, compling them into Java bytecodes.
+@item
+An implementation of @uref{http://www.schemers.org/,Scheme}, which
+is in the Lisp family of programming languages.
+Kawa is a featureful dialect in its own right,
+and additionally provides very useful integration with Java.
+It can be used as a ``scripting language'', but includes a compiler
+and all the benefits of a ``real'' programming language, including
+optional static typing.
+@item
+Implementations of other programming languages,
+including @uref{../qexo/index.html, XQuery (Qexo)}
+and @uref{http://JEmacs.sourceforge.net/,Emacs Lisp (JEmacs)}.
+@end itemize
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
-
 See the summary
 of @uref{http://www.gnu.org/software/kawa/news.html,recent changes}.
 
-The author of Kawa is
-@uref{http://www.bothner.com/per/,Per Bothner}
-@email{per@@bothner.com}.
-Kawa is a re-write of Kawa 0.2, which was written by
-R. Alexander Milowski @email{alex@@milowski.com}.
-
+@ifnotdocbook
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.
+@end ifnotdocbook
 
-The
-@uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
-has various useful information on Scheme.
-but it is not very actively updated.
-A new repository has been started at
-@uref{http://www.schemers.org/,www.schemers.org}.
-It includes pointer to an online copy of
-@uref{http://www.schemers.org/Documents/Standards/,R5RS}.
-
+For lots of Scheme resources, see
+@uref{http://www.schemers.org/,www.schemers.org},
+including an online copy of the
+@uref{http://www.schemers.org/Documents/Standards/,R5RS standard}.
 A nice quick introduction to Scheme can be found in
 @uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
 discusses Scheme implementation is
-@uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
+@uref{ftp://ftp.cs.utexas.edu/pub/garbage/cs345/schintro-v14/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
+For a technical overview of Kawa, see these
+@uref{http://www.gnu.org/software/kawa/internals/index.html}.
 Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
 The packages
 @uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
@@ -77,17 +85,19 @@ and
 @uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
 are used by Kawa, and distributed with it, but may be independently useful.
 
-For a technical overview of Kawa, see these
-@uref{http://www.gnu.org/software/kawa/internals/index.html}.
-
 For copyright information on the software and documentation,
 see @ref{License}.
 
+The author of Kawa is
+@uref{http://www.bothner.com/per/,Per Bothner}
+@email{per@@bothner.com}.
 Thanks to @uref{http://www.brainfood.com/,Brainfood}
 and @uref{http://www.mercedsystems.com/,Merced Systems} for support in
 developing Kawa.
+Kawa is a re-write of Kawa 0.2, which was written by
+R. Alexander Milowski @email{alex@@milowski.com}.
 
-This package has nothing to do with the
+This package has nothing to do with the defunct
 @uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
 
 @menu
@@ -102,7 +112,6 @@ This package has nothing to do with the
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
 * XML tools::            Tools for working with XML and HTML
-* KRL::                  The Kawa Report Language for generating XML/HTML
 * Mailing lists::        Where to report bugs, discuss changes, etc
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
@@ -956,7 +965,7 @@ re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
 @node Compiling, Extensions, Features, Top
-@chapter Compiling Scheme code to byte-code or an executable
+@chapter Compiling to byte-code or an executable
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
@@ -994,16 +1003,16 @@ in the @code{CLASSPATH}.
 You can also compile your Scheme program to native code using GCJ.
 
 @menu
-* Archive compilation::         Compiling Scheme to an archive file
-* Files compilation::           Compiling Scheme to a set of .class files
+* Archive compilation::         Compiling to an archive file
+* Files compilation::           Compiling to a set of .class files
 * Compilation options::
-* Application compilation::     Compiling Scheme to a standalone application
-* Applet compilation::          Compiling Scheme to an applet
-* Compiling to executable::     Compiling Scheme to a native executable
+* Application compilation::     Compiling to a standalone application
+* Applet compilation::          Compiling to an applet
+* Compiling to executable::     Compiling to a native executable
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
-@section Compiling Scheme to an archive file
+@section Compiling to an archive file
 
 @defun compile-file source-file compiled-archive
 Compile the @var{source-file}, producing a @code{.zip} archive
@@ -1024,7 +1033,7 @@ loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
 @end defun
 
 @node Files compilation
-@section Compiling Scheme to a set of .class files
+@section Compiling to a set of .class files
 
 Invoking @samp{kawa} (or @samp{java kawa.repl}) with
 the @samp{-C} flag will compile
@@ -1160,7 +1169,7 @@ is only active within @var{body}.
 @end deffn
 
 @node Application compilation
-@section Compiling Scheme to a standalone application
+@section Compiling to a standalone application
 
 A Java application is a Java class with a special method
 (whose name is @code{main}).  The application can be invoked directly
@@ -1183,7 +1192,7 @@ Your Scheme program can access the command-line arguments @var{args}
 by using the global variable @samp{command-line-arguments}.
 
 @node Applet compilation, Compiling to executable, Application compilation, Compiling
-@section Compiling Scheme to an applet
+@section Compiling to an applet
 An applet is a Java class that inherits from @code{java.applet.Applet}.
 The applet can be downloaded and run in a Java-capable web-browser.
 To generate an applet from a Scheme program, write the Scheme
@@ -1248,7 +1257,7 @@ Sorry, Java is needed.</applet>
 @end example
 
 @node Compiling to executable, , Applet compilation, Compiling
-@section Compiling Scheme to a native executable
+@section Compiling to a native executable
 
 You can compile your Scheme program to native code using GCJ,
 as long as you have built Kawa using GCJ.
@@ -1289,7 +1298,7 @@ find that library.
 * Strings::
 * Arrays::  Multi-dimensional Arrays
 * Uniform vectors::
-* Exceptions:: Signalling and recovering from exceptions
+* Exceptions:: Exception handling
 * Locations::
 * Eval and Environments::
 * Debugging::
@@ -2369,7 +2378,7 @@ It @code{vec} is re-sized so it needs a larger underlying array,
 then it will no longer use @code{arr}.
 
 @node Exceptions, Locations, Uniform vectors, Extensions
-@section Signalling and recovering from exceptions
+@section Exception handling
 
 @defun catch key thunk handler
 Invoke @var{thunk} in the dynamic context of @var{handler} for
@@ -3253,7 +3262,7 @@ as @code{~@@P but jumps 1 argument backward.}
 @var{commawidth} is the number of characters between two comma characters.
 
 
-@subsection Formatting floating-point (real) numbers
+@subsection Formatting real numbers
 
 @table @asis
 @item @code{~F}
@@ -3414,7 +3423,7 @@ aborts if @var{n} <= @var{m} <= @var{k}
 @end table
 @end table
 
-@subsection Not Implemented CL Format Control Directives
+@subsection Unimplemented CL Format Control Directives
 
 @table @asis
 @item @code{~:A}
@@ -3666,8 +3675,8 @@ The Kawa module system is based on the features of the Java class system.
 * Record types::          Defining Record Types
 * Dynamic records::       Creating New Record Types On-the-fly
 * Mangling::              Mapping Scheme names to Java names
-* Allocating objects::
 * Method operations::     Calling Java methods from Scheme
+* Allocating objects::
 * Field operations::      Accessing fields of Java objects
 * Defining new classes::
 * Anonymous classes::
@@ -3887,7 +3896,7 @@ created the type represented by @var{rtd}.@refill
 Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
 
-@node Mangling, Allocating objects, Dynamic records, Objects Classes and Modules
+@node Mangling, Method operations, Dynamic records, Objects Classes and Modules
 @section Mapping Scheme names to Java names
 
 Programs use "names" to refer to various values and procedures.
@@ -3958,36 +3967,7 @@ is mapped to the method name @samp{file$Mnexists$Qu}.
 Because @samp{$} is used to encode special characters, you
 should avoid using it in names in your source file.
 
-@node Allocating objects, Method operations, Mangling, Objects Classes and Modules
-@section  Allocating objects
-
-@defun make type args ...
-Constructs a new object instance of the specified @var{type},
-which must be either a @code{java.lang.Class} or a
-@code{<gnu.bytecode.ClassType>}.
-
-The @var{args ...} are passed to the constructor of the class type.
-If there is no applicable constructor, and the @var{args ...}
-consist of a set of (@var{keyword},@var{value})-pairs,
-then the default constructor is called, and each
-(@var{keyword},@var{value})-pair is used to set the correspdong slot
-of the result, as if by:
-@code{(slot-set! @var{result} @var{keyword} @var{value})}.
-
-For example, the following are all equivalent:
-@example
-(set! p (make <java.awt.Point> 3 4))
-
-(set! p (make <java.awt.Point> y: 4 x: 3))
-
-(set! p (make <java.awt.Point>))
-(slot-set! p 'x 3)
-(set! (slot-ref p 'y) 4)
-@end example
-
-@end defun
-
-@node Method operations, Field operations, Allocating objects, Objects Classes and Modules
+@node Method operations, Allocating objects, Mangling, Objects Classes and Modules
 @section Calling Java methods from Scheme
 
 You can call a Java method as if it were a Scheme procedure
@@ -4233,7 +4213,43 @@ By default this extra extra parameter is a Scheme list,
 but you can specify a Java array type instead.  In tha case the
 array element type must be compatible with all the extra arguments.)
 
-@node Field operations, Defining new classes, Method operations, Objects Classes and Modules
+@node Allocating objects, Field operations, Method operations, Objects Classes and Modules
+@section  Allocating objects
+
+Often the most convenient way to allocate a new object
+is to use the namespace-colon syntax discussed in the pervious section.
+For example:
+@example
+(java.util.Vector:new 20)
+@end example 
+
+@defun make type args ...
+Constructs a new object instance of the specified @var{type},
+which must be either a @code{java.lang.Class} or a
+@code{<gnu.bytecode.ClassType>}.
+
+The @var{args ...} are passed to the constructor of the class type.
+If there is no applicable constructor, and the @var{args ...}
+consist of a set of (@var{keyword},@var{value})-pairs,
+then the default constructor is called, and each
+(@var{keyword},@var{value})-pair is used to set the correspdong slot
+of the result, as if by:
+@code{(slot-set! @var{result} @var{keyword} @var{value})}.
+
+For example, the following are all equivalent:
+@example
+(set! p (make <java.awt.Point> 3 4))
+
+(set! p (make <java.awt.Point> y: 4 x: 3))
+
+(set! p (make <java.awt.Point>))
+(slot-set! p 'x 3)
+(set! (slot-ref p 'y) 4)
+@end example
+
+@end defun
+
+@node Field operations, Defining new classes, Allocating objects, Objects Classes and Modules
 @section Accessing fields of Java objects
 
 The recommmended way to access fields 
@@ -4260,6 +4276,12 @@ Here are 5 equivalent ways:
 You can set a static field using this syntax:
 @example
 (set! (@var{prefix}:.@var{field-name}) @var{new-value})
+@end example
+
+The special field name @code{class} can be used to extract the
+@code{java.lang.Class} object for a class-type.  For example:
+@example
+(java.util.Vector:.class) => class java.util.Vector
 @end example
 
 To access a instance field named @var{field-name} use the following syntax.
@@ -4318,6 +4340,10 @@ Get the static field with the given @var{fieldname} from the given
 @var{class}.  Returns the value of the field, which must be accessible.
 This procedure has a @code{setter}, and so can be used as the first
 operand to @code{set!}.
+
+If the @var{fieldname} is the special name @code{class},
+then it returns the @code{java.lang.Class} object corresponding to
+@var{class} (which is usually a @code{gnu.bytecode.ClassType} object).
 @end defun
 
 Examples:
@@ -5004,7 +5030,7 @@ checks that there really is a method that matches the specification.)
 Otherwise, the Java reflection facility is used.
 
 @node Low-level Field operations, Loading Java functions into Scheme, Low-level Method invocation, Low-level functions
-@section Low-level Operations on Object Fields
+@section Low-level field operations
 
 The following macros evaluate to procedures that can be used to
 access or change the fields of objects or static fields.
@@ -5231,8 +5257,8 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node XML tools, KRL, Low-level functions, Top
-@chapter Tools for working with XML and HTML
+@node XML tools, Mailing lists, Low-level functions, Top
+@chapter Working with XML and HTML
 
 Kawa has a number of experimental features for working with XML.
 These are built on the concepts of the @code{gnu.lists} package.
@@ -5243,6 +5269,7 @@ These are built on the concepts of the @code{gnu.lists} package.
 * CGI scripts::          Installing Kawa programs as CGI scripts
 * HTTP requests::        Functions for accessing HTTP requests
 * HTTP response::        Functions for generating HTTP response
+* KRL::                  The Kawa Report Language for generating XML/HTML
 @end menu
 
 @subsection Scheme functions
@@ -5507,8 +5534,8 @@ Returns false if there was no query string.
 Corresponds to the CGI variable @code{QUERY_STRING}.
 @end defun
 
-@node HTTP response, , HTTP requests, XML tools
-@section Functions for generating HTTP responses
+@node HTTP response, KRL, HTTP requests, XML tools
+@section Generating HTTP responses
 
 @defun unescaped-data data
 Creates a special value which causes @code{data} to be printed,
@@ -5551,8 +5578,8 @@ response message of @var{message}.
 (For now this is the same as @code{error-response}.)
 @end defun
 
-@node KRL, Mailing lists,  XML tools, Top
-@chapter KRL - The Kawa Report Language for generating XML/HTML
+@node KRL, , HTTP response, XML tools
+@section KRL - The Kawa Report Language for generating XML/HTML
 
 KRL (the "Kawa Report Language") is powerful Kawa dialect for embedding
 Scheme code in text files such as HTML or XML templates.  You select
@@ -5564,7 +5591,7 @@ uses some of BRL's code, but there are some experimental differences,
 and the implementation core is different.  You can run KRL in
 BRL-compatility-mode by specifying @code{--brl} instead of @code{--krl}.
 
-@section Differences between KRL and BRL
+@subsection Differences between KRL and BRL
 
 This section summarizes the known differences between KRL and BRL.
 Unless otherwise specified, KRL in BRL-compatibility mode will
@@ -5603,7 +5630,7 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Mailing lists, Support, KRL, Top
+@node Mailing lists, Support, XML tools, Top
 @chapter Where to report bugs, discuss changes, etc
 
 @section Reporting bugs

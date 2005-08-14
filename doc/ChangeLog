@@ -1,3 +1,8 @@
+2005-08-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Change top-level titles.
+	Merge a bunch up top-level chapters together.
+
 2005-08-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Various terser chapter/section titles.

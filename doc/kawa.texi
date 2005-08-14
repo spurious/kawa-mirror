@@ -1,7 +1,7 @@
 \input texinfo.tex      @c -*-texinfo-*-
 @c %**start of header
 @setfilename kawa.info
-@settitle Kawa, the Java-based Scheme system
+@settitle The Kawa language framework
 @setchapternewpage off
 @syncodeindex fn cp
 @syncodeindex vr cp
@@ -14,7 +14,7 @@
 @finalout
 @end iftex
 @titlepage
-@title Kawa, the Java-based Scheme system
+@title The Kawa language framework
 @subtitle @value{UPDATED}
 @sp 1
 @author Per Bothner
@@ -24,14 +24,14 @@
 @ifinfo
 @format
 START-INFO-DIR-ENTRY
-* kawa: (kawa).         Kawa, the Java-based Scheme system
+* kawa: (kawa).         The Kawa language framework
 END-INFO-DIR-ENTRY
 @end format
 @end ifinfo
 
 @ifnottex
-@node Top, Getting Kawa, (dir), (dir)
-@top The Kawa Scheme system
+@node Top, Installation, (dir), (dir)
+@top The Kawa language framework
 @end ifnottex
 
 Kawa is:
@@ -101,26 +101,26 @@ This package has nothing to do with the defunct
 @uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
 
 @menu
-* Getting Kawa::
 * Installation::         Building and installing Kawa
-* Running::              How to start up and run Kawa
-* Features::             Feature of Kawa Scheme
-* Compiling::            Compiling Scheme code to byte-code or an executable
-* Extensions::           Various Kawa features not in standard Scheme
-* Input-Output::         Input, output, and file handling
-* Types::
-* Objects Classes and Modules::
-* Low-level functions::  The Scheme-Java interface
-* XML tools::            Tools for working with XML and HTML
-* Mailing lists::        Where to report bugs, discuss changes, etc
-* Support::              Technical support for Kawa
-* Projects::             Projects using Kawa
+* Running::              Invoking, Running, and Using Kawa
+* Extensions::           Features and Extensions of Kawa Scheme
+* Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
 
-@node Getting Kawa, Installation, Top, Top
-@chapter Getting Kawa
+@node Installation, Running, Top, Top
+@chapter Getting and installing Kawa
+
+@menu
+* Getting Kawa::
+* Running Java::                Getting and running Java
+* Binary distribution::         Installing and using the binary distribution
+* Source distribution::         Installing and using the source distribution
+@end menu
+
+@node Getting Kawa, Running Java, , Installation
+@section Getting Kawa
 
 You can get Kawa sources and binaries from the Kawa ftp site
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/},
@@ -147,22 +147,13 @@ You can also
 @uref{http://sources.redhat.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
 the cvs archive} via cvsweb.
 
-@node Installation, Running, Getting Kawa, Top
-@chapter Building and installing Kawa
-
 Before installing Kawa, you must have Java working on your
 system.
 
 You can compile Kawa from the source distribution.
 Alternatively, you can install the pre-compiled binary distribution.
 
-@menu
-* Running Java::                Getting and running Java
-* Binary distribution::         Installing and using the binary distribution
-* Source distribution::         Installing and using the source distribution
-@end menu
-
-@node Running Java, Binary distribution, , Installation
+@node Running Java, Binary distribution, Getting Kawa, Installation
 @section Getting and running Java
 
 You will need a working Java system.  Kawa has been reported to
@@ -509,7 +500,7 @@ However, there are some problems with filenames that make this
 more complicated than it should be.  It should be possible
 to build Kawa under Cygwin using @code{gcj} as descibed above.
 
-@node Running, Features, Installation, Top
+@node Running, Extensions, Installation, Top
 @chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa} program.
@@ -548,6 +539,7 @@ result (if there is a non-"void" result).
 * Scripts::      Running Command Scripts
 * New-Window::   Running a Command Interpreter in a new Window
 * Exiting::      Exiting Kawa
+* Compiling::    Compiling to byte-code or an executable
 @end menu
 
 @node Options, Scripts, Running, Running
@@ -839,133 +831,8 @@ is in a new window, you can select @samp{Close} from the @samp{File} menu.
 To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
 
-@node Features, Compiling, Running, Top
-@chapter Features of Kawa Scheme
-
-Kawa is a full Scheme implementation.  It implements almost
-all of R5RS (for exceptions see below), plus some extensions.
-By default, symbols are case sensitive.
-
-It is completely written in Java.  Scheme functions and files
-are automatically compiled into Java byte-codes.  Kawa does some
-optimizations, and the compiled code runs at reasonable speed.
-
-Kawa uses Unicode internally, and uses the Java facilities to convert
-files using other character encodings.
-
-Kawa provides the usual read-eval-print loop, as well as batch modes.
-
-Kawa provides a framework for implementing other progressing languages,
-and comes with incomplete support for CommonLisp, Emacs Lisp, and
-EcmaScript, and the
-draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
-
-Kawa is written in an object-oriented style.
-
-Kawa has builtin pretty-printer support, and fancy formatting.
-
-Kawa supports class-definition facilities, and separately-compiled modules.
-
-Kawa implements the full numeric tower, including infinite-precision
-rational numbers and complex numbers.  It also supports "quantities"
-with units, such as @code{3cm}.
-
-You can optionally declare the types of variables.
-
-You can conveniently access Java objects, methods, fields, and classes.
-
-Kawa implements most of the features of the expression language of DSSSL,
-the Scheme-derived ISO-standard Document Style Semantics and Specification
-Language for SGML.  Of the core expression language, the only features
-missing are character properties, @code{external-procedure},
-the time-relationed procedures, and character name escapes in
-string literals.  Also, Kawa is not generally tail-recursive.
-From the full expression language, Kawa additionally is missing
-@code{format-number}, @code{format-number-list}, and language objects.
-Quantities, keyword values, and the expanded @code{lambda} form
-(with optional and keyword parameters) are supported.
-
-@menu
-* Implemented SRFIs::
-* Restrictions::
-@end menu
-
-@node Implemented SRFIs, Restrictions, , Features
-@section Implemented SRFIs
-
-Kawa implements the following semi-standard SRFIs
-(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
-@itemize
-@item
-SRFI 0: Feature-based conditional expansion construct,
-using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
-@item
-SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
-@item
-SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
-@item
-SRFI 6: Basic String Ports - @pxref{Ports}.
-@item
-SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
-@item
-SRFI 9: Defining Record Types, using @code{define-record-type}
-- @pxref{Record types}.
-@item
-SRFI 11: Syntax for receiving multiple values,
-using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
-@item
-SRFI 17: Generalized @code{set!} - @pxref{Locations}.
-@item
-SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
-@item
-SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
-@item
-SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
-@item
-SRFI 28: Basic Format Strings - @pxref{Format}.
-@item
-SRFI 30: Nested Multi-line Comments.
-@item
-SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
-@end itemize
-
-@node Restrictions, , Implemented SRFIs, Features
-@section Features of R5RS not implemented
-
-Kawa implements all the required and optional features of R5RS,
-with the following exceptions.
-
-The entire "numeric tower" is implemented.
-However, some transcendental function only work on reals.
-Integral function do not necessarily work on
-inexact (floating-point) integers.
-(The whole idea of "inexact integer" in R5RS seems rather pointless ...)
-
-Also, @code{call-with-current-continuation} is only "upwards" (?).
-I.e. once a continuation has been exited, it cannot be invoked.
-These restricted continuations can be used to implement catch/throw
-(such as the examples in R4RS), but not co-routines or backtracking.
-
-Kawa now does general tail-call elimination, but only if
-you use the flag @code{--full-tail-calls}.  (Currently, the
-@code{eval} function itself is not fully tail-recursive, in violation
-of R5RS.)   The @code{--full-tail-calls} flag is not on by default,
-partly because it is noticably slower (though I have not measured how
-much), and partly I think it is more useful for Kawa to be compilatible
-with standard Java calling conventions and tools.
-Code compiled with @code{--full-tail-calls} can call code
- compiled without it and vice versa.
-
-Even without @code{--full-tail-calls}, if the
-compiler can prove that the procedure being called is the current
-function, then the tail call will be replaced by a jump.
-This means the procedure must be defined using a letrec, not a
-define (because the compiler does not know if someone might
-re-define a global definition), and there must be no assignments
-(using @code{set!}) to the procedure binding.
-
-@node Compiling, Extensions, Features, Top
-@chapter Compiling to byte-code or an executable
+@node Compiling, , , Running
+@section Compiling to byte-code or an executable
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
@@ -1012,7 +879,7 @@ You can also compile your Scheme program to native code using GCJ.
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
-@section Compiling to an archive file
+@subsection Compiling to an archive file
 
 @defun compile-file source-file compiled-archive
 Compile the @var{source-file}, producing a @code{.zip} archive
@@ -1033,7 +900,7 @@ loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
 @end defun
 
 @node Files compilation
-@section Compiling to a set of .class files
+@subsection Compiling to a set of .class files
 
 Invoking @samp{kawa} (or @samp{java kawa.repl}) with
 the @samp{-C} flag will compile
@@ -1102,7 +969,7 @@ kawa -f macs.scm -C foosrc.scm
 @end example
 
 @node Compilation options
-@section Compilation options
+@subsection Compilation options
 
 Various named option control how Kawa compiles certain forms.
 
@@ -1169,7 +1036,7 @@ is only active within @var{body}.
 @end deffn
 
 @node Application compilation
-@section Compiling to a standalone application
+@subsection Compiling to a standalone application
 
 A Java application is a Java class with a special method
 (whose name is @code{main}).  The application can be invoked directly
@@ -1192,7 +1059,7 @@ Your Scheme program can access the command-line arguments @var{args}
 by using the global variable @samp{command-line-arguments}.
 
 @node Applet compilation, Compiling to executable, Application compilation, Compiling
-@section Compiling to an applet
+@subsection Compiling to an applet
 An applet is a Java class that inherits from @code{java.applet.Applet}.
 The applet can be downloaded and run in a Java-capable web-browser.
 To generate an applet from a Scheme program, write the Scheme
@@ -1257,7 +1124,7 @@ Sorry, Java is needed.</applet>
 @end example
 
 @node Compiling to executable, , Applet compilation, Compiling
-@section Compiling to a native executable
+@subsection Compiling to a native executable
 
 You can compile your Scheme program to native code using GCJ,
 as long as you have built Kawa using GCJ.
@@ -1283,32 +1150,161 @@ the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
 
-@node Extensions, Input-Output, Compiling, Top
-@chapter Extensions
+@node Extensions, Community, Running, Top
+@chapter Scheme Extensions and Language Reference
 
 @menu
+* Features::             Summary of Kawa Scheme Features
 * Syntax and conditional compilation::
 * Multiple values::
 * Special named constants::
 * Keywords::
 * Procedures::
-* Quantities::  Quantities and Numbers
-* Logical Number Operations::
-* Lists::
-* Strings::
-* Arrays::  Multi-dimensional Arrays
-* Uniform vectors::
-* Exceptions:: Exception handling
+* Numbers::              Quantities and Numbers
+* Data structures::
+* Exceptions::           Exception handling
 * Locations::
 * Eval and Environments::
 * Debugging::
 * Threads::
 * Processes::
 * Miscellaneous::
+* Input-Output::         Input, output, and file handling
+* Types::
+* Objects Classes and Modules::
+* Low-level functions::  The Scheme-Java interface
+* XML tools::            Tools for working with XML and HTML
 @end menu
 
-@node Syntax and conditional compilation, Multiple values, Extensions, Extensions
+@node Features, Syntax and conditional compilation, , Extensions
+@section Summary of Kawa Scheme Features
+
+Kawa is a full Scheme implementation.  It implements almost
+all of R5RS (for exceptions see below), plus some extensions.
+By default, symbols are case sensitive.
+
+It is completely written in Java.  Scheme functions and files
+are automatically compiled into Java byte-codes.  Kawa does some
+optimizations, and the compiled code runs at reasonable speed.
+
+Kawa uses Unicode internally, and uses the Java facilities to convert
+files using other character encodings.
+
+Kawa provides the usual read-eval-print loop, as well as batch modes.
+
+Kawa provides a framework for implementing other progressing languages,
+and comes with incomplete support for CommonLisp, Emacs Lisp, and
+EcmaScript, and the
+draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
+
+Kawa is written in an object-oriented style.
+
+Kawa has builtin pretty-printer support, and fancy formatting.
+
+Kawa supports class-definition facilities, and separately-compiled modules.
+
+Kawa implements the full numeric tower, including infinite-precision
+rational numbers and complex numbers.  It also supports "quantities"
+with units, such as @code{3cm}.
+
+You can optionally declare the types of variables.
+
+You can conveniently access Java objects, methods, fields, and classes.
+
+Kawa implements most of the features of the expression language of DSSSL,
+the Scheme-derived ISO-standard Document Style Semantics and Specification
+Language for SGML.  Of the core expression language, the only features
+missing are character properties, @code{external-procedure},
+the time-relationed procedures, and character name escapes in
+string literals.  Also, Kawa is not generally tail-recursive.
+From the full expression language, Kawa additionally is missing
+@code{format-number}, @code{format-number-list}, and language objects.
+Quantities, keyword values, and the expanded @code{lambda} form
+(with optional and keyword parameters) are supported.
+
+@menu
+* Implemented SRFIs::
+* Restrictions::
+@end menu
+
+@node Implemented SRFIs, Restrictions, , Features
+@subsection Implemented SRFIs
+
+Kawa implements the following semi-standard SRFIs
+(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
+@itemize
+@item
+SRFI 0: Feature-based conditional expansion construct,
+using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
+@item
+SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
+@item
+SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
+@item
+SRFI 6: Basic String Ports - @pxref{Ports}.
+@item
+SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
+@item
+SRFI 9: Defining Record Types, using @code{define-record-type}
+- @pxref{Record types}.
+@item
+SRFI 11: Syntax for receiving multiple values,
+using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
+@item
+SRFI 17: Generalized @code{set!} - @pxref{Locations}.
+@item
+SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
+@item
+SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
+@item
+SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
+@item
+SRFI 28: Basic Format Strings - @pxref{Format}.
+@item
+SRFI 30: Nested Multi-line Comments.
+@item
+SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@end itemize
+
+@node Restrictions, , Implemented SRFIs, Features
+@subsection Features of R5RS not implemented
+
+Kawa implements all the required and optional features of R5RS,
+with the following exceptions.
+
+The entire "numeric tower" is implemented.
+However, some transcendental function only work on reals.
+Integral function do not necessarily work on
+inexact (floating-point) integers.
+(The whole idea of "inexact integer" in R5RS seems rather pointless ...)
+
+Also, @code{call-with-current-continuation} is only "upwards" (?).
+I.e. once a continuation has been exited, it cannot be invoked.
+These restricted continuations can be used to implement catch/throw
+(such as the examples in R4RS), but not co-routines or backtracking.
+
+Kawa now does general tail-call elimination, but only if
+you use the flag @code{--full-tail-calls}.  (Currently, the
+@code{eval} function itself is not fully tail-recursive, in violation
+of R5RS.)   The @code{--full-tail-calls} flag is not on by default,
+partly because it is noticably slower (though I have not measured how
+much), and partly I think it is more useful for Kawa to be compilatible
+with standard Java calling conventions and tools.
+Code compiled with @code{--full-tail-calls} can call code
+ compiled without it and vice versa.
+
+Even without @code{--full-tail-calls}, if the
+compiler can prove that the procedure being called is the current
+function, then the tail call will be replaced by a jump.
+This means the procedure must be defined using a letrec, not a
+define (because the compiler does not know if someone might
+re-define a global definition), and there must be no assignments
+(using @code{set!}) to the procedure binding.
+
+@node Syntax and conditional compilation, Multiple values, Features, Extensions
 @section Syntax and conditional compilation
+
+Kawa supports most of the @code{syntax-case} feature.
 
 @deffn Syntax define-syntax ..
 Pattern ...
@@ -1554,7 +1550,7 @@ Returns the keyword whose name is @var{string}.
 (The @var{string} does not include a final @code{#\:}.)
 @end defun
 
-@node Procedures, Quantities, Keywords, Extensions
+@node Procedures, Numbers, Keywords, Extensions
 @section Procedures
 
 @defun apply proc [arg1 ...] args
@@ -1807,8 +1803,19 @@ evaluate it during every invocation of the resulting procedure.
 
 @end deffn
 
-@node Quantities, Logical Number Operations, Procedures, Extensions
+@node Numbers, Data structures, Procedures, Extensions
 @section Quantities and Numbers
+
+Kawa supports the full Scheme set of number operations with soem extensions.
+
+@menu
+* Quantities::
+* Extended Number Operations::
+* Logical Number Operations::
+@end menu
+
+@node Quantities, Extended Number Operations, , Numbers
+@subsection Quantities and Units
 
 As a super-class of numbers, Kawa also provides quantities.
 A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
@@ -1865,6 +1872,9 @@ equal to the quantity @var{expression}.
 @end example
 @end deffn
 
+@node Extended Number Operations, Logical Number Operations, Quantities, Numbers
+@subsection Extended Number Operations
+
 @defun quotient x y
 Generalized to arbitrary real numbers, using the definition:
 @code{(truncate (/ x y))}.
@@ -1887,8 +1897,8 @@ The result is inexact if either argument is inexact,
 even if @code{x} is exact and @code{y} is 0.
 @end defun
 
-@node Logical Number Operations, Lists, Quantities, Extensions
-@section Logical Number Operations
+@node Logical Number Operations, , Extended Number Operations, Numbers
+@subsection Logical Number Operations
 
 These functions operate on the 2's complement binary representation
 of an exact integer.
@@ -1956,8 +1966,19 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
-@node Lists, Strings, Logical Number Operations, Extensions
-@section Lists
+@node Data structures, Exceptions, Numbers, Extensions
+@section Data structures
+
+@menu
+* Lists::
+* Strings::
+* Arrays::  Multi-dimensional Arrays
+* Strings::
+* Uniform vectors::
+@end menu
+
+@node Lists, Strings, , Data structures
+@subsection Lists
 
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
 is available, though not enabled by default.  To use its functions you
@@ -1974,8 +1995,8 @@ with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
 was pair, it becomes the last pair of the reversed result.
 @end defun
 
-@node Strings, Arrays, Lists, Extensions
-@section Strings
+@node Strings, Arrays, Lists, Data structures
+@subsection Strings
 
 @defun string-upcase str
 Return a new string where the letters in @var{str} are replaced
@@ -2009,8 +2030,8 @@ are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
 @end defun
 
-@node Arrays, Uniform vectors, Strings, Extensions
-@section Multi-dimensional Arrays
+@node Arrays, Uniform vectors, Strings, Data structures,
+@subsection Multi-dimensional Arrays
 
 Arrays are heterogeneous data structures whose elements are indexed by
 integer sequences of fixed length.  The length of a valid index sequence
@@ -2173,8 +2194,8 @@ evaluates to a two-dimensionsal array of @code{<double>}:
 #2a((1.0 2.0 3.0) (3.0 4.0 5.0))
 @end example
 
-@node Uniform vectors, Exceptions, Arrays, Extensions
-@section Uniform vectors
+@node Uniform vectors, , Arrays, Data structures
+@subsection Uniform vectors
 
 Uniform vectors are vectors whose elements are of the same numeric type.
 The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
@@ -2346,7 +2367,7 @@ with the elements of the list @var{l}.  The elements of @var{l}
 must be numbers coercible the new vector's element type.
 @end defun
 
-@subsection Relationship with Java arrays
+@subsubsection Relationship with Java arrays
 
 Each uniform array type is implemented as an @dfn{underlying Java array},
 and a length field.
@@ -2377,7 +2398,7 @@ so changes to one affect the other.
 It @code{vec} is re-sized so it needs a larger underlying array,
 then it will no longer use @code{arr}.
 
-@node Exceptions, Locations, Uniform vectors, Extensions
+@node Exceptions, Locations, Data structures, Extensions
 @section Exception handling
 
 @defun catch key thunk handler
@@ -2700,7 +2721,7 @@ special characters.
 (This is the same as what @code{java.lang.Runtime.exec(String)} does.)
 @end defun
 
-@node Miscellaneous,  , Processes, Extensions
+@node Miscellaneous, Input-Output, Processes, Extensions
 @section Miscellaneous
 
 @defun scheme-implementation-version
@@ -2772,8 +2793,8 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@node Input-Output, Types, Extensions, Top
-@chapter Input, output, and file handling
+@node Input-Output, Types, Miscellaneous, Extensions
+@section Input, output, and file handling
 
 Kawa has a number of useful tools for controlling input and output:
 
@@ -2789,7 +2810,7 @@ A powerful pretty-printer.
 @end menu
 
 @node Named output formats, Files, , Input-Output
-@section Named output formats
+@subsection Named output formats
 
 The @code{--output-format} (or @code{--format}) command-line switch
 can be used to override the default format for how values are
@@ -2860,7 +2881,7 @@ Top-level values are ignored, instead of printed.
 @end table
 
 @node Files, Ports, Named output formats, Input-Output
-@section File System Interface
+@subsection File System Interface
 
 @defun file-exists? filename
 Returns true iff the file named @var{filename} actually exists.
@@ -2916,7 +2937,7 @@ this will be fixed in a future release (using Java2 features).
 @end defun
 
 @node Ports, Format, Files, Input-Output
-@section Ports
+@subsection Ports
 
 @defun current-error-port
 Return the port to which errors and warnings should be sent
@@ -3118,7 +3139,7 @@ then the pretty printer switch to the more @dfn{miser} compact style.
 @end defvar
 
 @node Format, , Ports, Input-Output
-@section Formatted Output (Common-Lisp-style)
+@subsection Formatted Output (Common-Lisp-style)
 
 @defun format destination fmt . arguments
 An almost complete implementation of Common LISP format description
@@ -3156,7 +3177,7 @@ Neither justification, nor pretty-printing are supported yet.
 
 Plus of course, we need documentation for @code{format}!
 
-@subsection Implemented CL Format Control Directives
+@subsubsection Implemented CL Format Control Directives
 
 Documentation syntax: Uppercase characters represent the corresponding
 control directive characters. Lowercase characters represent control
@@ -3190,7 +3211,7 @@ prints a character as emacs does (eg. @code{^C} for ASCII 03).
 @end table
 @end table
 
-@subsection Formatting Integers
+@subsubsection Formatting Integers
 
 @table @asis
 @item @code{~D}
@@ -3262,7 +3283,7 @@ as @code{~@@P but jumps 1 argument backward.}
 @var{commawidth} is the number of characters between two comma characters.
 
 
-@subsection Formatting real numbers
+@subsubsection Formatting real numbers
 
 @table @asis
 @item @code{~F}
@@ -3312,7 +3333,7 @@ The sign appears before the padding.
 @end table
 @end table
 
-@subsection Miscellaneous formatting operators
+@subsubsection Miscellaneous formatting operators
 
 @table @asis
 @item @code{~%}
@@ -3423,7 +3444,7 @@ aborts if @var{n} <= @var{m} <= @var{k}
 @end table
 @end table
 
-@subsection Unimplemented CL Format Control Directives
+@subsubsection Unimplemented CL Format Control Directives
 
 @table @asis
 @item @code{~:A}
@@ -3475,8 +3496,8 @@ may also print number strings, i.e. passing a number as a string and
 format it accordingly.
 @end table
 
-@node Types, Objects Classes and Modules, Input-Output, Top
-@chapter Types
+@node Types, Objects Classes and Modules, Input-Output, Extensions
+@section Types
 
 A @dfn{type} is a set of values, plus an associated set of operations
 valid on those values.
@@ -3519,8 +3540,8 @@ that map to primitive Java types or java classes.
 * Declaring Types of Variables::
 @end menu
 
-@node Standard Types, Declaring Types of Variables, Types, Types
-@section Standard Types
+@node Standard Types, Declaring Types of Variables, , Types
+@subsection Standard Types
 
 These types are bound to identifiers having the form @code{<TYPENAME>}.
 (This syntax and most of the names are as in RScheme.)
@@ -3642,7 +3663,7 @@ Also, @code{<java.lang.StringBuffer[]>} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
 @node Declaring Types of Variables,  , Standard Types, Types
-@section Declaring Types of Variables
+@subsection Declaring Types of Variables
 
 @deffn Syntax let ((name [:: type] init) ...) body
 Declare new locals variables with the given @var{name}, initial value
@@ -3663,8 +3684,8 @@ If @var{type} is not specified, it defaults to @code{<object>}.
 
 See also @code{define-private}, and @code{define-constant}.
 
-@node Objects Classes and Modules, Low-level functions, Types, Top
-@chapter Object, Classes and Modules
+@node Objects Classes and Modules, XML tools, Types, Extensions
+@section Object, Classes and Modules
 
 Kawa provides various ways to define, create, and access Java objects.
 Here are the currently supported features.
@@ -3693,7 +3714,7 @@ allow an optional class specifier (needed for nested clases).
 @end deffn
 
 @node Record types, Dynamic records, Objects Classes and Modules, Objects Classes and Modules
-@section Record types
+@subsection Record types
 
 The @code{define-record-type} form can be used for creating new data
 types, called record types. A predicate, constructor, and field
@@ -3781,7 +3802,7 @@ Kawa generates efficient code for the resulting functions,
 without needing to use run-time reflection.
 
 @node Dynamic records, Mangling, Record types, Objects Classes and Modules
-@section Creating New Record Types On-the-fly
+@subsection Creating New Record Types On-the-fly
 
 Calling the @code{make-record-type} procedure creates a new record data
 type at run-time, without any compile-time support.
@@ -3897,7 +3918,7 @@ Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
 
 @node Mangling, Method operations, Dynamic records, Objects Classes and Modules
-@section Mapping Scheme names to Java names
+@subsection Mapping Scheme names to Java names
 
 Programs use "names" to refer to various values and procedures.
 The definition of what is a "name" is different in different
@@ -3968,12 +3989,12 @@ Because @samp{$} is used to encode special characters, you
 should avoid using it in names in your source file.
 
 @node Method operations, Allocating objects, Mangling, Objects Classes and Modules
-@section Calling Java methods from Scheme
+@subsection Calling Java methods from Scheme
 
 You can call a Java method as if it were a Scheme procedure
 using various mechanisms.
 
-@subsection Invoking a method with a prefixed name
+@subsubsection Invoking a method with a prefixed name
 
 The most convenient way to do it is to
 use @code{define-namespace} to define an alias for a Java class:
@@ -4075,7 +4096,7 @@ This is equivalent to:
 @end example
 for some otherwise-unused @var{prefix}.
 
-@subsection Invoking a method with the @code{invoke} function
+@subsubsection Invoking a method with the @code{invoke} function
 
 If you prefer, you can instead use the following functions.
 (There is also an older deprecated lower-level interface
@@ -4192,7 +4213,7 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@subsection Method names
+@subsubsection Method names
 
 All of the above select a method to invoke base on specified
 method name and argments.  If specified name is not a Java name,
@@ -4214,7 +4235,7 @@ but you can specify a Java array type instead.  In tha case the
 array element type must be compatible with all the extra arguments.)
 
 @node Allocating objects, Field operations, Method operations, Objects Classes and Modules
-@section  Allocating objects
+@subsection  Allocating objects
 
 Often the most convenient way to allocate a new object
 is to use the namespace-colon syntax discussed in the pervious section.
@@ -4250,7 +4271,7 @@ For example, the following are all equivalent:
 @end defun
 
 @node Field operations, Defining new classes, Allocating objects, Objects Classes and Modules
-@section Accessing fields of Java objects
+@subsection Accessing fields of Java objects
 
 The recommmended way to access fields 
 uses the namespace-colon syntax described in @pxref{Method operations}.
@@ -4311,7 +4332,7 @@ is equivalent to:
 (*:.@var{field-name} (as <@var{class}> @var{instance}))
 @end example
 
-@subsection Using field and static-field methods
+@subsubsection Using field and static-field methods
 
 Kawa has both a high-level interface and a low-level interface for accessing
 the fields of Java objects and static fields.
@@ -4362,7 +4383,7 @@ A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
 @end defun
 
 @node Defining new classes, Anonymous classes, Field operations, Objects Classes and Modules
-@section Defining new classes
+@subsection Defining new classes
 
 Kawa provides various mechanisms for defining new classes.
 The @code{define-class} and @code{define-simple-class} forms
@@ -4534,7 +4555,7 @@ A simple example:
 @end example
 
 @node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
-@section Anonymous classes
+@subsection Anonymous classes
 
 @deffn Syntax object (supers ...) field-or-method-decl ...
 Returns a new instance of an anonymous (inner) class.
@@ -4572,7 +4593,7 @@ A @var{method-decl} is as for @code{define-class}.
 @end deffn
 
 @node Module classes, , Anonymous classes, Objects Classes and Modules
-@section Modules and how they are compiled to classes
+@subsection Modules and how they are compiled to classes
 
 A @dfn{module} is a set of definitions that the module @dfn{exports},
 as well as some @dfn{actions} (expressions evaluated for their side effect).
@@ -4602,7 +4623,7 @@ an instance module or a static module, is a module, and can be
 loaded or imported as such;  the class need not have written
 using Scheme.
 
-@subsection Name visibility
+@subsubsection Name visibility
 
 The definitions that a module exports are accessible to other modules.
 These are the "public" definitions, to use Java terminology.
@@ -4640,7 +4661,7 @@ Alternatively, you can write:
 (define (fact x) ...)
 @end example
 
-@subsection Definitions
+@subsubsection Definitions
 
 In addition to @code{define} (which can take an optional type specifier),
 Kawa has some extra definition forms.
@@ -4727,7 +4748,7 @@ is local to the current module.
 
 @end deffn
 
-@subsection How a module becomes a class
+@subsubsection How a module becomes a class
 
 If you want to just use a Scheme module as a module (i.e. @code{load}
 or @code{require} it), you don't care how it gets translated
@@ -4862,7 +4883,7 @@ module class will also automatically implement @code{java.lang.Runnable}.
 case the @code{run} method return an @code{Object} rather than @code{void}.
 This will likely change.)
 
-@subsection Requiring (importing) a module
+@subsubsection Requiring (importing) a module
 
 You can import a module into the current namespace with @code{require}.
 
@@ -4900,8 +4921,8 @@ which yields the implementing @code{<@var{classname}>}.
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
-@node Low-level functions, XML tools, Objects Classes and Modules, Top
-@chapter The Scheme-Java interface
+@node Low-level functions, , , Extensions
+@subsection The Scheme-Java interface
 
 Kawa has extensive features so you can work with Java objects
 and call Java methods.
@@ -4916,7 +4937,7 @@ and call Java methods.
 @end menu
 
 @node Scheme types in Java, Array operations, Low-level functions, Low-level functions
-@section Scheme types in Java
+@subsection Scheme types in Java
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 
@@ -4955,7 +4976,7 @@ the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
 @node Array operations, Low-level Method invocation, Scheme types in Java, Low-level functions
-@section Low-level Operations on Java Arrays
+@subsection Low-level Operations on Java Arrays
 
 The following macros evaluate to procedures that can be used to
 manipulate primitive Java array objects.
@@ -4992,7 +5013,7 @@ Applying the procedure returns the length of the array.
 @end deffn
 
 @node Low-level Method invocation, Low-level Field operations, Array operations, Low-level functions
-@section Low-level Method invocation
+@subsection Low-level Method invocation
 
 The following lower-level primitives require you to specify
 the parameter and return types explicitly.
@@ -5030,7 +5051,7 @@ checks that there really is a method that matches the specification.)
 Otherwise, the Java reflection facility is used.
 
 @node Low-level Field operations, Loading Java functions into Scheme, Low-level Method invocation, Low-level functions
-@section Low-level field operations
+@subsection Low-level field operations
 
 The following macros evaluate to procedures that can be used to
 access or change the fields of objects or static fields.
@@ -5073,7 +5094,7 @@ value of the static field to the argument.
 @end deffn
 
 @node Loading Java functions into Scheme, Evaluating Scheme expressions from Java, Low-level Field operations, Low-level functions
-@section Loading Java functions into Scheme
+@subsection Loading Java functions into Scheme
 
 When @code{kawa -C} compiles (@pxref{Files compilation}) a Scheme module
 it creates a class that implements the @code{java.lang.Runnable} interface.
@@ -5211,7 +5232,7 @@ public class MyFunc2 extends Procedure2
 @end example
 
 @node Evaluating Scheme expressions from Java,  , Loading Java functions into Scheme, Low-level functions
-@section Evaluating Scheme expressions from Java
+@subsection Evaluating Scheme expressions from Java
 
 The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
@@ -5257,8 +5278,8 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node XML tools, Mailing lists, Low-level functions, Top
-@chapter Working with XML and HTML
+@node XML tools, , Objects Classes and Modules, Extensions
+@section Working with XML and HTML
 
 Kawa has a number of experimental features for working with XML.
 These are built on the concepts of the @code{gnu.lists} package.
@@ -5272,7 +5293,7 @@ These are built on the concepts of the @code{gnu.lists} package.
 * KRL::                  The Kawa Report Language for generating XML/HTML
 @end menu
 
-@subsection Scheme functions
+@subsubsection Scheme functions
 
 @defun make-element tag [attribute ...] child ...
 Create a representation of a XML element, corresponding to
@@ -5311,7 +5332,7 @@ print @var{value} in XML syntax.
 prints @code{<p>Some <em>text</em>.</p>}.
 @end defun
 
-@subsection xquery language
+@subsubsection xquery language
 
 W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
 and a draft has been released.
@@ -5320,7 +5341,7 @@ source language; this also prints output using XML syntax.
 See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
 for examples and more information.
 
-@subsection XSL transformations
+@subsubsection XSL transformations
 
 There is an experimental implementation of the XSLT (XML Stylesheet
 Language Transformations) language.  Selecting @code{--xslt} at the
@@ -5330,7 +5351,7 @@ See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
 for more information.
 
 @node Server-side scripts, Servlets, , XML tools
-@section Writing web-server-side Kawa scripts
+@subsection Writing web-server-side Kawa scripts
 
 You can compile a Kawa program (written in any supported
 Kawa language, including Scheme, BRL, KRL, or XQuery),
@@ -5400,7 +5421,7 @@ The next two sections will explain how you can install this script
 as either a servlet or a CGI script.
 
 @node Servlets, CGI scripts, Server-side scripts, XML tools
-@section Installing Kawa programs as Servlets
+@subsection Installing Kawa programs as Servlets
 
 You can compile a Kawa program to a @code{Servlet}, and run it
 in a servlet engine (a Servlet-aware web server).
@@ -5433,7 +5454,7 @@ Returns the file path of the current servlet's "Web application".
 @end defun
 
 @node CGI scripts, HTTP requests, Servlets, XML tools
-@section Installing Kawa programs as CGI scripts
+@subsection Installing Kawa programs as CGI scripts
 
 The recommended way to have a web-server run a Kawa program
 as a CGI script is to compile the Kawa program to a servlet
@@ -5488,7 +5509,7 @@ which should have much reduced start-up time, making
 Kawa servlets more practical.
 
 @node HTTP requests, HTTP response, CGI scripts, XML tools
-@section Functions for accessing HTTP requests
+@subsection Functions for accessing HTTP requests
 
 The following functions are useful for accessing
 properties of a HTTP request, in a Kawa program that is
@@ -5535,7 +5556,7 @@ Corresponds to the CGI variable @code{QUERY_STRING}.
 @end defun
 
 @node HTTP response, KRL, HTTP requests, XML tools
-@section Generating HTTP responses
+@subsection Generating HTTP responses
 
 @defun unescaped-data data
 Creates a special value which causes @code{data} to be printed,
@@ -5579,7 +5600,7 @@ response message of @var{message}.
 @end defun
 
 @node KRL, , HTTP response, XML tools
-@section KRL - The Kawa Report Language for generating XML/HTML
+@subsection KRL - The Kawa Report Language for generating XML/HTML
 
 KRL (the "Kawa Report Language") is powerful Kawa dialect for embedding
 Scheme code in text files such as HTML or XML templates.  You select
@@ -5591,7 +5612,7 @@ uses some of BRL's code, but there are some experimental differences,
 and the implementation core is different.  You can run KRL in
 BRL-compatility-mode by specifying @code{--brl} instead of @code{--krl}.
 
-@subsection Differences between KRL and BRL
+@subsubsection Differences between KRL and BRL
 
 This section summarizes the known differences between KRL and BRL.
 Unless otherwise specified, KRL in BRL-compatibility mode will
@@ -5630,9 +5651,17 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Mailing lists, Support, XML tools, Top
-@chapter Where to report bugs, discuss changes, etc
+@node Community, License, Extensions, Top
+@chapter The Kawa Community
 
+@menu
+* Reporting bugs::       Where to report bugs
+* Mailing lists::        Where to discuss changes, etc
+* Support::              Technical support for Kawa
+* Projects::             Projects using Kawa
+@end menu
+
+@node Reporting bugs, Mailing lists, , Community
 @section Reporting bugs
 
 To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
@@ -5647,6 +5676,7 @@ the archives through the
 @uref{http://mail.gnu.org/mailman/listinfo/bug-kawa,
 @code{bug-kawa} web interface}.
 
+@node Mailing lists, Support, Reporting bugs, Community
 @section General Kawa email and discussion
 
 The general Kawa email list is @email{kawa@@sources.redhat.com}.
@@ -5668,8 +5698,8 @@ There are separate mailing lists for
 and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
 
 
-@node Support, Projects, Mailing lists, Top
-@chapter Technical Support for Kawa
+@node Support, Projects, Mailing lists, Community
+@section Technical Support for Kawa
 
 If you have a project that depends on Kawa or one of its component
 packages, you might do well get get paid priority support from
@@ -5692,8 +5722,8 @@ time will be prorated and refunded.
 
 Per is also available for development projects.
 
-@node Projects, License, Support, Top
-@chapter Projects using Kawa
+@node Projects, , Support, Community
+@section Projects using Kawa
 
 JEmacs is included in the Kawa distribution.  It is a project to
 re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
@@ -5741,7 +5771,7 @@ You can find more about Nice at @uref{http://nice.sourceforge.net}.
 For more information feel free to contact
 Daniel Bonniot @email{bonniot@@users.sf.net}).
 
-@node License, Overall Index, Projects, Top
+@node License, Overall Index, Community, Top
 @chapter License
 
 @menu

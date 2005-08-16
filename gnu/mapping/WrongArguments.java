@@ -10,7 +10,7 @@ public class WrongArguments extends IllegalArgumentException {
 
   Procedure proc;
 
-  /** Returns an error message if the number of arguments in a call is valid.
+  /** Returns an error message if the number of arguments in a call is invalid.
     * @param proc the Procedure being called
     * @param argCount the number of arguments in the call
     * @return null, if the number of arguments is ok;

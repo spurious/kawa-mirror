@@ -210,6 +210,8 @@ ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
   ConsumeProc.java \
+  GeneralHashTable.java \
+  HashNode.java \
   RangeTable.java
 
 EXTRA_DIST = PreProcess.java

@@ -1,3 +1,9 @@
+2005-08-16  Per Bothner  <per@bothner.com>
+
+	* GeneralHashTable.java: New class.
+	* HashNode.java: New class.
+	* Makefile.am (java_sources): Add new classes.
+
 2005-07-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Add PreProcess.java.

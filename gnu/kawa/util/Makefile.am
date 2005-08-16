@@ -4,6 +4,8 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   ConsumeProc.java \
+  GeneralHashTable.java \
+  HashNode.java \
   RangeTable.java
 
 EXTRA_DIST = PreProcess.java

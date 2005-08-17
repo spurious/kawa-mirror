@@ -569,6 +569,8 @@ public class XQuery extends Language
     define_method("concat", "gnu.xquery.util.StringValue", "concat");
 
     define_method("QName", "gnu.xquery.util.QNameUtils", "makeQName");
+    define_method("prefix-from-QName", "gnu.xquery.util.QNameUtils",
+		  "prefixFromQName");
     define_method("local-name-from-QName", "gnu.xquery.util.QNameUtils",
 		  "localNameFromQName");
     define_method("namespace-uri-from-QName", "gnu.xquery.util.QNameUtils",

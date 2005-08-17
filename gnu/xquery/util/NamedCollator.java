@@ -14,7 +14,7 @@ implements Externalizable
   String name;
 
   public static final String UNICODE_CODEPOINT_COLLATION
-    = "http://www.w3.org/2004/10/xpath-functions/collation/codepoint";
+    = "http://www.w3.org/2005/04/xpath-functions/collation/codepoint";
 
   public static NamedCollator make (String name)
   {
@@ -24,7 +24,13 @@ implements Externalizable
     return coll;
   }
 
+  public static NamedCollator find (String name)
+  {
+    return make(name);
+  }
+
   public static final NamedCollator codepointCollation = new NamedCollator();
+  static { codepointCollation.name = UNICODE_CODEPOINT_COLLATION; }
 
   public void resolve ()
   {

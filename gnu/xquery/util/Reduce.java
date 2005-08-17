@@ -33,14 +33,14 @@ public class Reduce extends Procedure1
     if (arg instanceof Values)
       {
 	TreeList tlist = (TreeList) arg;
-	int index = 0;
+	int pos = 0;
 	for (;;)
 	  {
-	    Object next = tlist.getPosNext(index << 1);
+	    Object next = tlist.getPosNext(pos);
 	    if (next == Sequence.eofValue)
 	      return result;
 	    result = combine(result, next);
-	    index = tlist.nextDataIndex(index);
+            pos = tlist.nextPos(pos);
 	  }
       }
     else

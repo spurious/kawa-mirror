@@ -96,6 +96,15 @@ public class QNameUtils
     throw WrongType.make(null, "local-name-from-QName", 1, name);
   }
 
+  public static Object prefixFromQName (Object name)
+  {
+    if (name == Values.empty || name == null)
+      return name;
+    if (name instanceof SName)
+      return ((SName) name).getPrefix();
+    throw WrongType.make(null, "prefix-from-QName", 1, name);
+  }
+
   public static Object namespaceURIFromQName (Object name)
   {
     if (name == Values.empty || name == null)

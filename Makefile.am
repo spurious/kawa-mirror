@@ -41,6 +41,7 @@ JAR_DEPS_SWING = \
 endif
 if ENABLE_XML
 JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
+  ./gnu/kawa/xml/java-classes.stamp \
   ./gnu/xquery/lang/java-classes.stamp \
   ./gnu/xquery/util/java-classes.stamp
 endif

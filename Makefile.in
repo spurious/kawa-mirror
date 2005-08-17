@@ -251,6 +251,7 @@ JAR = jar
 @WITH_SWING_TRUE@  ./gnu/jemacs/lisp/elisp-classes.stamp
 
 @ENABLE_XML_TRUE@JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
+@ENABLE_XML_TRUE@  ./gnu/kawa/xml/java-classes.stamp \
 @ENABLE_XML_TRUE@  ./gnu/xquery/lang/java-classes.stamp \
 @ENABLE_XML_TRUE@  ./gnu/xquery/util/java-classes.stamp
 

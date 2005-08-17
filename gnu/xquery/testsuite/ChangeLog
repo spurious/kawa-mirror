@@ -1,3 +1,7 @@
+2005-08-16  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main): Add test for prefix-from-QName.
+
 2005-07-27  Per Bothner  <per@bothner.com>
 
 	* multab.xql ($max, $caption): New external variables in prologue.

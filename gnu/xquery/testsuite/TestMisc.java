@@ -285,6 +285,10 @@ public class TestMisc
     evalTest("for $n in doc('tab.xml')/result/row/* "
 	     + "return local-name-from-QName(node-name($n))",
 	     "fld1 fld2 fld1 fld2");
+    evalTest("declare namespace h='H';\n"
+             +" for $n in doc('tab.xml')/result/*:row/* "
+	     + "return (prefix-from-QName(node-name($n)),';')",
+	     " ;  ;  ;  ; j ; h ; j ; k ;");
     evalTest("for $n in doc('tab.xml')/result/*:row/*:fld1 "
 	     + "return <n>{namespace-uri-from-QName(node-name($n))}</n>",
 	     "<n></n><n></n><n>J</n><n>J</n>");

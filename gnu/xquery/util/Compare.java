@@ -51,7 +51,8 @@ public class Compare extends Procedure2 implements CanInline
   }
   */
 
-  public static boolean apply(int flags, Object arg1, Object arg2)
+  public static boolean apply(int flags, Object arg1, Object arg2,
+                              NamedCollator collator)
   {
     if (arg1 instanceof Values)
       {
@@ -62,7 +63,7 @@ public class Compare extends Procedure2 implements CanInline
 	    int next = values1.nextDataIndex(index);
 	    if (next < 0)
 	      return false;
-	    if (apply(flags, values1.getPosNext(index << 1), arg2))
+	    if (apply(flags, values1.getPosNext(index << 1), arg2, collator))
 	      return true;
 	    index = next;
 	  }
@@ -76,22 +77,30 @@ public class Compare extends Procedure2 implements CanInline
 	    int next = values2.nextDataIndex(index);
 	    if (next < 0)
 	      return false;
-	    if (apply(flags, arg1, values2.getPosNext(index << 1)))
+	    if (apply(flags, arg1, values2.getPosNext(index << 1), collator))
 	      return true;
 	    index = next;
 	  }
       }
+    arg1 = NodeUtils.atomicValue(arg1);
+    arg2 = NodeUtils.atomicValue(arg2);
     if (arg1 instanceof Number || arg2 instanceof Number)
       {
 	if (! (arg1 instanceof Numeric))
-	  arg1 = new DFloNum(StringValue.stringValue(arg1));
+	  arg1 = new DFloNum(arg1.toString());
 	if (! (arg2 instanceof Numeric))
-	  arg2 = new DFloNum(StringValue.stringValue(arg2));
+	  arg2 = new DFloNum(arg2.toString());
 	return NumberCompare.apply2(flags, arg1, arg2);
       }
-    String str1 = StringValue.stringValue(arg1);
-    String str2 = StringValue.stringValue(arg2);
-    int comp = str1.compareTo(str2);
+    String str1 = arg1.toString();
+    String str2 = arg2.toString();
+    int comp;
+    /* #ifdef JAVA2 */
+    if (collator != null)
+      comp = collator.compare(str1, str2);
+    else
+    /* #endif */
+      comp = str1.compareTo(str2);
     if (comp < 0)
       return (flags & TRUE_IF_LSS+TRUE_IF_NEQ) != 0;
     else if (comp > 0)
@@ -102,7 +111,7 @@ public class Compare extends Procedure2 implements CanInline
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    return apply(flags, arg1, arg2) ? Boolean.TRUE : Boolean.FALSE;
+    return apply(flags, arg1, arg2, null) ? Boolean.TRUE : Boolean.FALSE;
   }
 
   public static final Compare $Eq   = make("=",TRUE_IF_EQU);

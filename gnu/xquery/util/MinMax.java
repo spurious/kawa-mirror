@@ -3,6 +3,7 @@
 
 package gnu.xquery.util;
 import gnu.mapping.*;
+import gnu.kawa.xml.KNode;
 
 public class MinMax extends Reduce
 {
@@ -22,6 +23,10 @@ public class MinMax extends Reduce
     if (arg1 == Values.empty)
       return arg2; // FIXME - verify that arg2 is comparable.
     int flags = returnMax ? Compare.TRUE_IF_GRT :  Compare.TRUE_IF_LSS;
-    return Compare.apply(flags, arg1, arg2) ? arg1 : arg2;
+    if (arg1 instanceof KNode)
+      arg1 = NumberValue.numberValue(arg1);
+    if (arg2 instanceof KNode)
+      arg2 = NumberValue.numberValue(arg2);
+    return Compare.apply(flags, arg1, arg2, null) ? arg1 : arg2;
   }
 }

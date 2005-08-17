@@ -220,4 +220,15 @@ public class StringValue extends Procedure1
     return result.toString();
   }
 
+  /** This implements the XQuery <code>fn:compare</code> function. */
+  public static Object compare (Object val1, Object val2, NamedCollator coll)
+  {
+    if (val1 == Values.empty || val1 == null
+        || val2 == Values.empty || val2 == null)
+      return Values.empty;
+    if (coll == null)
+      coll = NamedCollator.codepointCollation;
+    int ret = coll.compare(val1.toString(), val2.toString());
+    return ret < 0 ? IntNum.minusOne() : ret > 0 ? IntNum.one() : IntNum.zero();
+  }
 }

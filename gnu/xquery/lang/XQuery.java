@@ -550,7 +550,6 @@ public class XQuery extends Language
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
     defProcStFld("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
     define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
-    define_method("root", "gnu.kawa.xml.Nodes", "root");
     define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");
     define_method("substring", "gnu.xquery.util.StringValue", "substring");

@@ -6,29 +6,41 @@ import gnu.expr.*;
 import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.mapping.*;
-import gnu.bytecode.ClassType;
+import gnu.bytecode.*;
 import gnu.kawa.reflect.*;
+import gnu.xquery.util.NamedCollator;
 
 public class XQResolveNames extends ResolveNames
 {
   XQParser parser;
 
-  /** Value of <code>getCode()</code> for <code>lastDecl</code>. */
+  /** Code number for the special <code>last</code> function. */
   public static final int LAST_BUILTIN = -1;
 
-  /** Value of <code>getCode()</code> for <code>positionDecl</code>. */
+  /** Code number for the special <code>position</code> function. */
   public static final int POSITION_BUILTIN = -2;
 
   /** Value of <code>xs:QName()</code> constructor. */
   public static final int XS_QNAME_BUILTIN = -3;
 
+  /** Code number for the special <code>compare</code> function. */
+  public static final int COMPARE_BUILTIN = -4;
+
+  /** Code number for the special <code>distinct-values</code> function. */
+  public static final int DISTINCT_VALUES_BUILTIN = -5;
+
+  /** Code number for the special <code>local-name</code> function. */
+  public static final int LOCAL_NAME_BUILTIN = -6;
+
+  /** Code number for the special <code>namespace-uri</code> function. */
+  public static final int NAMESPACE_URI_BUILTIN = -7;
+
+  /** Code number for the special <code>root</code> function. */
+  public static final int ROOT_BUILTIN = -8;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
-
-  /** Declaration for the <code>fn:position()</code> function. */
-  public static final Declaration positionDecl
-    = makeBuiltin("position", POSITION_BUILTIN);
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
@@ -54,12 +66,22 @@ public class XQResolveNames extends ResolveNames
     this(null);
   }
 
+  void pushBuiltin (String name, int code)
+  {
+    lookup.push(makeBuiltin(name, code));
+  }
+
   public XQResolveNames (Compilation comp)
   {
     super(comp);
     lookup.push(lastDecl);
-    lookup.push(positionDecl);
     lookup.push(xsQNameDecl);
+    pushBuiltin("position", POSITION_BUILTIN);
+    pushBuiltin("compare", COMPARE_BUILTIN);
+    pushBuiltin("distinct-values", DISTINCT_VALUES_BUILTIN);
+    pushBuiltin("local-name", LOCAL_NAME_BUILTIN);
+    pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
+    pushBuiltin("root", ROOT_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -257,6 +279,62 @@ public class XQResolveNames extends ResolveNames
 
   NamespaceBinding constructorNamespaces;
 
+  /**
+   * Coerce argument to NamedCallator, or return default collator.
+   * @param args argument list
+   * @param argno index in args of collator argument
+   */
+  Expression getCollator (Expression[] args, int argno)
+  {
+    if (args != null && args.length > argno)
+      return new ApplyExp(ClassType.make("gnu.xquery.util.NamedCollator")
+                            .getDeclaredMethod("find", 1),
+                            new Expression[] { args[argno] });
+    NamedCollator coll = parser.defaultCollator;
+    return coll == null ? QuoteExp.nullExp : new QuoteExp(coll);
+  }
+
+  Expression withCollator (Method method, Expression[] args,
+                           String name, int minArgs)
+  {
+    return withCollator(new QuoteExp(new PrimProcedure(method)),
+                        args, name, minArgs);
+  }
+
+  /** Adjust call to add default collator if collator argument is missing. */
+  Expression withCollator (Expression function, Expression[] args,
+                           String name, int minArgs)
+  {
+    String err = WrongArguments.checkArgCount(name, minArgs, minArgs+1, args.length);
+    if (err != null)
+      return getCompilation().syntaxError(err);
+    Expression[] xargs = new Expression[minArgs+1];
+    System.arraycopy(args, 0, xargs, 0, minArgs);
+    xargs[minArgs] = getCollator(args, minArgs);
+    return new ApplyExp(function, xargs);
+  }
+
+  /** Adjust call to add default contex itemt if that argument is missing. */
+  Expression withContext (Method method, Expression[] args,
+                          String name, int minArgs)
+  {
+    String err = WrongArguments.checkArgCount(name, minArgs, minArgs+1,
+                                              args.length);
+    if (err != null)
+      return getCompilation().syntaxError(err);
+    if (args.length == minArgs)
+      {
+        Expression[] xargs = new Expression[minArgs+1];
+        System.arraycopy(args, 0, xargs, 0, minArgs);
+        Declaration dot = lookup.lookup(XQParser.DOT_VARNAME, -1);
+        if (dot == null)
+          return getCompilation().syntaxError("undefined context for " + name);
+        xargs[minArgs] = new ReferenceExp(dot);
+        args = xargs;
+      }
+    return new ApplyExp(method, args);
+  }
+
   protected Expression walkApplyExp (ApplyExp exp)
   {
     Expression func = exp.getFunction();
@@ -306,13 +384,45 @@ public class XQResolveNames extends ResolveNames
 		    args[0],
 		    new QuoteExp(constructorNamespaces),
 		    new QuoteExp(parser.prologNamespaces) };
-		  gnu.bytecode.Method meth
+		  Method meth
 		    = (ClassType.make("gnu.xquery.util.QNameUtils")
 		       .getDeclaredMethod("resolveQName", 3));
 		  ApplyExp app = new ApplyExp(meth, xargs);
 		  app.setFlag(ApplyExp.INLINE_IF_CONSTANT);
 		  return app;
 		}
+              case LOCAL_NAME_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("localName", 1);
+                  return withContext(meth, exp.getArgs(), "fn:local-name", 0);
+                }
+              case ROOT_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.kawa.xml.Nodes")
+                    .getDeclaredMethod("root", 1);
+                  return withContext(meth, exp.getArgs(), "fn:root", 0);
+                }
+              case NAMESPACE_URI_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("namespaceURI", 1);
+                  return withContext(meth, exp.getArgs(),
+                                     "fn:namespace-uri", 0);
+                }
+              case COMPARE_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.StringValue")
+                    .getDeclaredMethod("compare", 3);
+                  return withCollator(meth, exp.getArgs(), "fn:compare", 2);
+                }
+              case DISTINCT_VALUES_BUILTIN:
+                {
+                  Method meth = ClassType.make("gnu.xquery.util.DistinctValues")
+                    .getDeclaredMethod("distinctValues$X", 3);
+                  return withCollator(meth, exp.getArgs(),
+                                      "fn:distinct-values", 1);
+                }
 	      }
 	  }
       }

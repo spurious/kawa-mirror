@@ -7,12 +7,14 @@ java_sources = \
   BooleanValue.java \
   Compare.java \
   Debug.java \
+  DistinctValues.java \
   IndexOf.java \
   IntegerRange.java \
   ItemAt.java \
   LastIndexOf.java \
   MinMax.java \
   NamedCollator.java \
+  NodeUtils.java \
   NumberValue.java \
   QNameUtils.java \
   Reduce.java \

@@ -25,7 +25,9 @@ implements Inlineable
   public static void popNodeConsumer (Consumer saved, Consumer current)
   {
     if (saved != current)
-      saved.writeObject(current);
+      saved.writeObject(current instanceof NodeTree
+                        ? (Object) KNode.make((NodeTree) current)
+                        : (Object) current);
   }
 
   public static XConsumer pushNodeContext (CallContext ctx)

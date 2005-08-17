@@ -1,3 +1,9 @@
+2005-08-16  Per Bothner  <per@bothner.com>
+
+	* PositionConsumer.java (consume) Change return type to void.
+	(writePosition): Likewise.
+	* TreeList.java (consume, writePosition): Update accordingly.
+
 2005-07-21  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java (writeBoolean): Use target's writeBoolean.

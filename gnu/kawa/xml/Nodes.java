@@ -22,10 +22,10 @@ public class Nodes extends Values
   int nesting = 0;
   NodeTree curFragment;
 
-  public boolean writePosition(AbstractSequence seq, int ipos)
+  public void writePosition (AbstractSequence seq, int ipos)
   {
     count++;
-    return super.writePosition(seq, ipos);
+    super.writePosition(seq, ipos);
   }
 
   public int find (Object seq)

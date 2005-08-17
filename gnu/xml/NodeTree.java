@@ -13,10 +13,9 @@ import gnu.xml.XName;
 
 public class NodeTree extends TreeList
 {
-  public boolean writePosition(AbstractSequence seq, int ipos)
+  public void writePosition(AbstractSequence seq, int ipos)
   {
     seq.consumeNext(ipos, this);
-    return true;
   }
 
   /** If v is a node, make a copy of it. */

@@ -1,5 +1,8 @@
 2005-08-16  Per Bothner  <per@bothner.com>
 
+	* Nodes.java (writePosition) Change return type to void.
+	* SortedNodes.java (writePosition): Likewise.
+
 	* NodeConstructor.java (popNodeConsumer): Wrap NodeTree in KNode,
 	as in 2004-05-20 change to popNodeContext.
 

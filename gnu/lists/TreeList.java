@@ -390,7 +390,7 @@ public class TreeList extends AbstractSequence
     data[index+1] = (char) i;
   }
 
-  public boolean consume(SeqPosition position)
+  public void consume (SeqPosition position)
   {
     ensureSpace(3);
     // FIXME - no need for find to search in this case!
@@ -398,10 +398,9 @@ public class TreeList extends AbstractSequence
     data[gapStart++] = POSITION_REF_FOLLOWS;
     setIntN(gapStart, index);
     gapStart += 2;
-    return true;
   }
 
-  public boolean writePosition(AbstractSequence seq, int ipos)
+  public void writePosition(AbstractSequence seq, int ipos)
   {
     ensureSpace(5);
     data[gapStart] = POSITION_PAIR_FOLLOWS;
@@ -409,7 +408,6 @@ public class TreeList extends AbstractSequence
     setIntN(gapStart+1, seq_index);
     setIntN(gapStart+3, ipos);
     gapStart += 5;
-    return true;
   }
 
   public void writeObject(Object v)

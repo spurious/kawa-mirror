@@ -515,10 +515,9 @@ public class XMLPrinter extends PrintConsumer
     prev = '-';
   }
 
-  public boolean writePosition(AbstractSequence seq, int ipos)
+  public void writePosition(AbstractSequence seq, int ipos)
   {
     seq.consumeNext(ipos, this);
-    return true;
   }
 
   public void writeBaseUri (Object uri)
@@ -572,7 +571,7 @@ public class XMLPrinter extends PrintConsumer
     prev = '>';
   }
 
-  public boolean consume (SeqPosition position)
+  public void consume (SeqPosition position)
   {
     throw new Error("not implemented consume(TreePosition)");
   }

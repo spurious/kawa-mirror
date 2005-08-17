@@ -16,17 +16,15 @@ public interface PositionConsumer
    *
    * The caller may invalidate or change the position after consume returns,
    * so if the consumer wants to save it, it needs to copy it.
-   * 
-   * @return true if we are interested in more nodes.
    */
   // FIXME rename to add or writePosition?
-  public boolean consume(SeqPosition position);
+  public void consume(SeqPosition position);
 
   /** Consume a single position pair.
    * This PositionConsumer may assume the sequence does no reference
    * management; i.e. that copyPos is trivial and releasePos is
    * a no-op.  If that is not the case, use consume(TreePosition) instead.
    */
-  public boolean writePosition(AbstractSequence seq, int ipos);
+  public void writePosition(AbstractSequence seq, int ipos);
 
 }

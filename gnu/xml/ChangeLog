@@ -1,3 +1,8 @@
+2005-08-16  Per Bothner  <per@bothner.com>
+
+	* NodeTree.java (writePosition): Update to return void.
+	* XMLPrinter.java (consume, writePosition): Likewise.
+
 2005-07-27  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (writeChar): Fix bug that suppressed soem spaces.

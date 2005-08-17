@@ -53,7 +53,7 @@ public class SortedNodes extends Nodes
     return start + POS_SIZE * lo;
   }
 
-  public boolean writePosition(AbstractSequence seq, int ipos)
+  public void writePosition(AbstractSequence seq, int ipos)
   {
     if (count >  0)
       {
@@ -68,7 +68,7 @@ public class SortedNodes extends Nodes
 	    // case in path expressions), then find will immediately return i.
 	    i = find (i, (end - i) / POS_SIZE, seq, ipos);
 	    if (i < 0)
-	      return true;
+	      return;
 	    int delta = i - gapEnd;
 	    if (delta > 0)
 	      {
@@ -78,12 +78,12 @@ public class SortedNodes extends Nodes
 	      }
 	  }
 	else if (cmp == 0)
-	  return true;
+	  return;
 	else
 	  {
 	    int i = find (0, lastIndex / POS_SIZE, seq, ipos);
 	    if (i < 0)
-	      return true;
+	      return;
 	    int delta = gapStart - i;
 	    if (delta > 0)
 	      {
@@ -93,7 +93,7 @@ public class SortedNodes extends Nodes
 	      }
 	  }
       }
-    return super.writePosition(seq, ipos);
+    super.writePosition(seq, ipos);
   }
 
 }

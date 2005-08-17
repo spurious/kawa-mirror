@@ -183,6 +183,15 @@ public class NodeTree extends TreeList
     return index >= 0 && data[index] == BEGIN_ATTRIBUTE_LONG;
   }
 
+  /** Return the type-value of the node at the specified position. */
+  public Object typedValue (int ipos)
+  {
+    // FIXME when we support validation.
+    StringBuffer sbuf = new StringBuffer();
+    stringValue(posToDataIndex(ipos), sbuf);
+    return sbuf.toString();  // FIXME as untypedAtomic.
+  }
+
   /** Get the target of a process-instruction. */
   public String posTarget (int ipos)
   {

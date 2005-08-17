@@ -1,5 +1,7 @@
 2005-08-16  Per Bothner  <per@bothner.com>
 
+	* NodeTree.java (typedValue): New method.
+
 	* NodeTree.java (writePosition): Update to return void.
 	* XMLPrinter.java (consume, writePosition): Likewise.
 

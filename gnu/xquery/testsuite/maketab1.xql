@@ -1,7 +1,7 @@
 declare xmlspace preserve;
 let $newline := "
 ",
-$result := (document("tab.xml")/result)
+$result := (doc("tab.xml")/result)
   return
     (<table>
 {for $x in ($result/row)

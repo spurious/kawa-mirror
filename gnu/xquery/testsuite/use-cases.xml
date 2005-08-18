@@ -8,7 +8,7 @@
 <query><![CDATA[
 <bib>
 {
-  for $b in document("bib.xml")/bib/book
+  for $b in doc("bib.xml")/bib/book
   where $b/publisher = "Addison-Wesley" and $b/@year > 1991
   return
     <book year="{ $b/@year }">
@@ -37,7 +37,7 @@
 <query>
   <results>
   {
-    for $b in document("bib.xml")/bib/book,
+    for $b in doc("bib.xml")/bib/book,
         $t in $b/title,
         $a in $b/author
     return
@@ -81,7 +81,7 @@
 <query>
 <results>
   {
-    for $b in document("bib.xml")/bib/book
+    for $b in doc("bib.xml")/bib/book
     return
         <result>
             { $b/title }
@@ -123,8 +123,8 @@ the title of the book and its price from each source.</description>
 <query><![CDATA[
 <books-with-prices>
 {
-    for $b in document("bib.xml")//book,
-        $a in document("reviews.xml")//entry
+    for $b in doc("bib.xml")//book,
+        $a in doc("reviews.xml")//entry
     where $b/title = $a/title
     return
         <book-with-prices>
@@ -413,7 +413,7 @@ figures and their titles. Preserve the original attributes of each
 let $res :=
 <figlist>
 {
-    for $f in document("book1.xml")//figure
+    for $f in doc("book1.xml")//figure
     return
         <figure>
             { $f/@* }
@@ -443,8 +443,8 @@ return $res
 <description>How many sections are in Book1,
 and how many figures?</description>
 <query>
-<section_count>{ count(document("book1.xml")//section) }</section_count>, 
-<figure_count>{ count(document("book1.xml")//figure) }</figure_count>
+<section_count>{ count(doc("book1.xml")//section) }</section_count>, 
+<figure_count>{ count(doc("book1.xml")//figure) }</figure_count>
 </query>
 <expect>
 <section_count>7</section_count>
@@ -458,7 +458,7 @@ and how many figures?</description>
 <query>
 <top_section_count>
 { 
-   count(document("book1.xml")/book/section) 
+   count(doc("book1.xml")/book/section) 
  }
 </top_section_count>
 </query>
@@ -771,9 +771,9 @@ price of more than 1000.</ident>
 <query><![CDATA[
 <result>
 {
-    for $u in document("users.xml")//user_tuple
+    for $u in doc("users.xml")//user_tuple
 return
-    for $i in document("items.xml")//item_tuple
+    for $i in doc("items.xml")//item_tuple
     where $u/rating > "C" 
        and $i/reserve_price > 1000 
        and $i/offered_by = $u/userid
@@ -884,12 +884,12 @@ item(s) that received the highest bid ever recorded, and the amount of
 that bid.</ident>
 <NOTE>explicitly cast using number before calling max</NOTE>
 <query><![CDATA[
-let $highbid := <bid>{max(for $b in document("bids.xml")//bid_tuple/bid return number($b))}</bid>
+let $highbid := <bid>{max(for $b in doc("bids.xml")//bid_tuple/bid return number($b))}</bid>
 return
     <result>
       {
-        for $item in document("items.xml")//item_tuple,
-            $b in document("bids.xml")//bid_tuple[itemno = $item/itemno]
+        for $item in doc("items.xml")//item_tuple,
+            $b in doc("bids.xml")//bid_tuple[itemno = $item/itemno]
         where $b/bid = $highbid
         return
             <expensive_item>

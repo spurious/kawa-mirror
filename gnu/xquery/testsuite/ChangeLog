@@ -1,3 +1,8 @@
+2005-08-18  Per Bothner  <per@bothner.com>
+
+	* use-cases.xql: Update staadard function document -> doc.
+	* maketab1.xql: Likewise.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main): Add test for prefix-from-QName.

@@ -193,24 +193,10 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
+  /*
   protected Expression walkSetExp (SetExp exp)
   {
-    Declaration decl = exp.binding;
-    boolean updateNeeded = false;
-    if (decl != null)
-      {
-        Expression declValue = decl.getValue();
-        if (declValue == exp.new_value)
-          updateNeeded = true;
-      }
-    exp.walkChildren(this);
-    if (updateNeeded)
-      {
-        decl.value = exp.new_value;
-        if (exp.new_value instanceof LambdaExp)
-          ((LambdaExp) exp.new_value).nameDecl = decl;
-      }
-    /*
+    super.walkExp(exp);
     if (decl != null && ! decl.getFlag(Declaration.TYPE_SPECIFIED))
       {
 	// This is a kludge to handle the a #!rest parameter that
@@ -222,9 +208,9 @@ public class InlineCalls extends ExpWalker
 	if (declType != null && ! exp.new_value.getType().isSubtype(declType))
 	  decl.setType(Type.pointer_type);
       }
-    */
     return exp;
   }
+  */
 
   protected Expression walkClassExp (ClassExp exp)
   {

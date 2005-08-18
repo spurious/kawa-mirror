@@ -1,3 +1,10 @@
+2005-08-18  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkReferenceExp): Don't replace by value
+	if getDontDereference().
+	* ExpWalker.java (walkSetExp):  Update declaration's value.
+	* InlineCalls.java *walkSetExp): Remove - use inherited method.
+
 2005-08-07  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (pushChain): Partly inline call to push(ScopeExp),

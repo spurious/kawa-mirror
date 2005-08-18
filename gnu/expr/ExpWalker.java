@@ -64,7 +64,23 @@ public class ExpWalker
   protected Expression walkClassExp (ClassExp exp) { return walkLambdaExp(exp); }
   protected Expression walkObjectExp (ObjectExp exp) { return walkClassExp(exp); }
   protected Expression walkModuleExp (ModuleExp exp) { return walkLambdaExp(exp); }
-  protected Expression walkSetExp (SetExp exp) { return walkExpression(exp); }
+
+  protected Expression walkSetExp (SetExp exp)
+  {
+    Declaration decl = exp.binding;
+    boolean updateNeeded = decl != null && decl.value == exp.new_value;
+    Expression ret = walkExpression(exp);
+    // If the Declarations's value was that of our new_value,
+    // and we modified/simplified the latter, update the former as well.
+    if (updateNeeded && exp.isDefining())
+      {
+        decl.value = exp.new_value;
+        if (exp.new_value instanceof LambdaExp)
+          ((LambdaExp) exp.new_value).nameDecl = decl;
+      }
+    return ret;
+  }
+
   //protected Expression walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }
   protected Expression walkTryExp (TryExp exp) { return walkExpression(exp); }
   protected Expression walkBeginExp (BeginExp exp) { return walkExpression(exp); }

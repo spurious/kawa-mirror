@@ -256,17 +256,48 @@ return
 </expect>
 </test>
 
-<!--
 <test>
 <ident>Use Case "XMP" (Experiences and Exemplars) Q10</ident>
 <description>In the document "prices.xml", find the minimum price for
 each book, in the form of a "minprice" element with the book title as
 its title attribute.</description>
-<NOTE>needs distinct-values</NOTE>
+<NOTE>Instead of an external prices.xml file, use a local table.</NOTE>
 <query>
 <results>
   {
-    let $doc := doc("docs/prices.xml")
+    let $doc :=
+    <prices>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <source>bstore2.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <source>bstore1.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <source>bstore2.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <source>bstore1.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <source>bstore2.example.com</source>
+        <price>34.95</price>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <source>bstore1.example.com</source>
+        <price>39.95</price>
+    </book>
+    </prices>
     for $t in distinct-values($doc//book/title)
     let $p := $doc//book[title = $t]/price
     return
@@ -290,7 +321,6 @@ its title attribute.</description>
 </results>
 </expect>
 </test>
--->
 
 <test>
 <ident>Use Case "XMP" (Experiences and Exemplars) Q11</ident>
@@ -554,7 +584,7 @@ declare function local:section_summary($s)
 }
 </toc> ]]>
 </query>
-<NOTE>the use-cases document is missing the attributes</NOTE>
+<NOTE>the use-cases doc is missing the attributes</NOTE>
 <expect>
   <toc>
     <section id="intro" difficulty="easy">
@@ -640,12 +670,9 @@ return ($s//instrument)[position()<=2]
 <ident>Use case "SEQ" (Queries based on Sequence) Q3</ident>
 <description>In Report1, what Instruments were used in the first
 two Actions after the second Incision?</description>
-<NOTE>two calls to doc pulled out to use same variable.
-Need to fix doc to cache previous NodeTree instances.</NOTE>
 <query><![CDATA[
-let $report1 := doc("report1.xml")
-let $i2 := ($report1//incision)[2]
-for $a in ($report1//action)[. >> $i2][position()<=2]
+let $i2 := (doc("report1.xml")//incision)[2]
+for $a in (doc("report1.xml")//action)[. >> $i2][position()<=2]
 return $a//instrument
 ]]></query>
 <expect>
@@ -878,13 +905,60 @@ and highest bid.</description>
 </test>
 -->
 
+<!--
+Needs order by
+<test>
+<ident>Use Case "R" Q9 - List the number of items auctioned each month in 1999 for which data is available, ordered by month.</item>
+<query>
+<result>
+  {
+    let $end_dates := doc("items.xml")//item_tuple/end_date
+    for $m in distinct-values(for $e in $end_dates 
+                              return month-from-date($e))
+    let $item := doc("items.xml")
+        //item_tuple[year-from-date(end_date) = 1999 
+                     and month-from-date(end_date) = $m]
+    order by $m
+    return
+        <monthly_result>
+            <month>{ $m }</month>
+            <item_count>{ count($item) }</item_count>
+        </monthly_result>
+  }
+</result>
+</query>
+<expect>
+<result>
+    <monthly_result>
+        <month>1</month>
+        <item_count>1</item_count>
+    </monthly_result>
+    <monthly_result>
+        <month>2</month>
+        <item_count>2</item_count>
+    </monthly_result>
+    <monthly_result>
+        <month>3</month>
+        <item_count>3</item_count>
+    </monthly_result>
+    <monthly_result>
+        <month>4</month>
+        <item_count>1</item_count>
+    </monthly_result>
+    <monthly_result>
+        <month>5</month>
+        <item_count>1</item_count>
+    </monthly_result>
+</result> </expect>
+</test>
+-->
+
 <test>
 <ident>Use Case "R" Q11 - List the item number and description of the
 item(s) that received the highest bid ever recorded, and the amount of
 that bid.</ident>
-<NOTE>explicitly cast using number before calling max</NOTE>
 <query><![CDATA[
-let $highbid := <bid>{max(for $b in doc("bids.xml")//bid_tuple/bid return number($b))}</bid>
+let $highbid := max(doc("bids.xml")//bid_tuple/bid)
 return
     <result>
       {
@@ -906,13 +980,90 @@ return
     <expensive_item>
       <itemno>1002</itemno>
       <description>Motorcycle</description>
-      <high_bid>
-        <bid>1200</bid>
-      </high_bid>
+      <high_bid>1200</high_bid>
     </expensive_item>
   </result>
 </expect>
 </test>
+
+<test>
+<ident>Use Case Q12 - List the item number and description of the item(s)
+that received the largest number of bids, and the number of bids it (or they)
+received.</ident>
+<query>
+declare function local:bid_summary()
+  as element()*
+{
+    for $i in distinct-values(doc("bids.xml")//itemno)
+    let $b := doc("bids.xml")//bid_tuple[itemno = $i]
+    return
+        <bid_count>
+            <itemno>{ $i }</itemno>
+            <nbids>{ count($b) }</nbids>
+        </bid_count>
+};
+
+<result>
+ {
+    let $bid_counts := local:bid_summary(),
+        $maxbids := max($bid_counts/nbids),
+        $maxitemnos := $bid_counts[nbids = $maxbids]
+    for $item in doc("items.xml")//item_tuple,
+        $bc in $bid_counts
+    where $bc/nbids =  $maxbids and $item/itemno = $bc/itemno
+    return
+        <popular_item>
+            { $item/itemno }
+            { $item/description }
+            <bid_count>{ $bc/nbids/text() }</bid_count>
+        </popular_item>
+ }
+</result> 
+</query>
+<expect>
+<result>
+    <popular_item>
+        <itemno>1001</itemno>
+        <description>Red Bicycle</description>
+        <bid_count>5</bid_count>
+    </popular_item>
+    <popular_item>
+        <itemno>1002</itemno>
+        <description>Motorcycle</description>
+        <bid_count>5</bid_count>
+    </popular_item>
+</result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "NS" - Queries Using Namespaces:  Q1</ident>
+<description>List all unique namespaces used in the sample data.</description>
+<query>
+<Q1>
+  {
+    for $n in distinct-values(
+                  for $i in (doc("auction.xml")//* | doc("auction.xml")//@*)
+                  return namespace-uri($i)
+               )
+    return  <ns>{$n}</ns>
+  }
+</Q1>
+</query>
+<expect>
+<Q1>
+  <ns>http://www.example.com/AuctionWatch</ns>
+  <ns>http://www.example.com/auctioneers#anyzone</ns>
+  <ns>http://www.w3.org/1999/xlink</ns>
+  <ns>http://www.w3.org/2001/XMLSchema</ns>
+  <ns>http://www.example.com/auctioneers#eachbay</ns>
+  <ns>http://www.example.org/music/records</ns>
+  <ns>http://www.example.com/auctioneers#yabadoo</ns>
+  <ns>http://www.w3.org/XML/1998/namespace</ns>
+</Q1>
+</expect>
+</test>
+
 
 <test>
 <ident>Use Case "NS" - Queries Using Namespaces:  Q2</ident>
@@ -926,16 +1077,7 @@ declare namespace music = "http://www.example.org/music/records";
   }
 </Q2>
 </query>
-<NOTE>
-The use-case document shows: <![CDATA[
-<Q2>
-  <music
-    xmlns="http://www.example.org/music/records">In a Silent Way</music>
-  <music
-     xmlns="http://www.example.org/music/records">Think of One ...</music>
-</Q2>
-]]> but I don't think that is correct.
-</NOTE>
+<NOTE>The order of emitted namespace declaration was changed.</NOTE>
 <expect><![CDATA[
 <Q2>
   <title

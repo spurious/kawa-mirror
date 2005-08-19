@@ -1,6 +1,11 @@
 2005-08-18  Per Bothner  <per@bothner.com>
 
-	* use-cases.xql: Update staadard function document -> doc.
+	* use-cases.xql: Can remove some kludges since fn:doc now properly
+	caches the document.
+	Also add new new use-cases that depended on distinct-values.
+	(R/Q11): Since fn:max now atomizes can remove kludge.
+
+	* use-cases.xql: Update standard function document -> doc.
 	* maketab1.xql: Likewise.
 
 2005-08-16  Per Bothner  <per@bothner.com>

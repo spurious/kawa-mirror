@@ -521,8 +521,6 @@ public class XQuery extends Language
       }
     */
 
-    defProcStFld("document", "gnu.kawa.xml.Document","document");
-    defProcStFld("doc", "gnu.kawa.xml.Document", "document");  // kludge
     defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
     defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
     defProcStFld("count", "gnu.kawa.functions.CountValues", "countValues");

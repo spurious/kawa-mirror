@@ -55,6 +55,8 @@ public class XQParser extends Lexer
 
   NamedCollator defaultCollator = null;
 
+  String baseURI = null;
+
   boolean preserveBoundarySpace;
 
   public Namespace[] functionNamespacePath
@@ -229,6 +231,7 @@ public class XQParser extends Lexer
   static final int DEFAULT_COLLATION_TOKEN = 'G';
   static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
   static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
+  static final int DECLARE_BASE_URI_TOKEN = 'B'; // <"declare" "base-uri">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
 
   /* 'Q': QName (intern'ed name is curValue)
@@ -826,6 +829,10 @@ public class XQParser extends Lexer
 	curValue = name;
 	switch (next)
 	  {
+          case 'b':
+	    if (lookingAt("declare", /*"b"+*/ "ase-uri"))
+              return curToken = DECLARE_BASE_URI_TOKEN;
+            break;
 	  case 'd':
 	    if (lookingAt("declare", /*"d"+*/ "efault"))
 	      {
@@ -1268,6 +1275,24 @@ public class XQParser extends Lexer
       }
     else
       return null;
+  }
+
+  /** Parse a <code>URILiteral</code>..
+   * @return either a String (on success),
+   * or an ErrorExp (after emitting an error).
+   */
+  Object parseURILiteral ()
+      throws java.io.IOException, SyntaxException
+  {
+    getRawToken();
+    if (curToken != STRING_TOKEN)
+      return declError("expected a URILiteral");
+    String str = new String(tokenBuffer, 0, tokenBufferLength);
+    // FUTURE: An implementation MAY raise a static error if the value
+    // of a URILiteral is of nonzero length and is not in the lexical
+    // space of xs:anyURI, or if it is a string that represents a
+    // relative URI as defined in [RFC2396].  err:XQST0046
+    return str;
   }
 
   Expression parseExpr()
@@ -3192,12 +3217,12 @@ public class XQParser extends Lexer
       }
     if (curToken == DEFAULT_COLLATION_TOKEN)
       {
-	getRawToken();
-	if (curToken != STRING_TOKEN)
-	  return declError("missing collation name");
+        Object val = parseURILiteral();
+        if (val instanceof Expression) // an ErrorExp
+          return (Expression) val;
 	if (defaultCollator != null && ! interactive) // err:XQ0038
 	    return declError("duplicate default collation declaration");
-	String collation = new String(tokenBuffer, 0, tokenBufferLength);
+	String collation = (String) val;
 	try
 	  {
 	    defaultCollator = NamedCollator.make(collation);

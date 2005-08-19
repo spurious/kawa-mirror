@@ -38,6 +38,12 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>root</code> function. */
   public static final int ROOT_BUILTIN = -8;
 
+  /** Code number for the special <code>doc</code> function. */
+  public static final int DOC_BUILTIN = -9;
+
+  /** Code number for the special <code>doc-available</code> function. */
+  public static final int DOC_AVAILABLE_BUILTIN = -10;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -82,6 +88,9 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("local-name", LOCAL_NAME_BUILTIN);
     pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
     pushBuiltin("root", ROOT_BUILTIN);
+    pushBuiltin("doc", DOC_BUILTIN);
+    pushBuiltin("document", DOC_BUILTIN); // Obsolete
+    pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -415,6 +424,31 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.xquery.util.StringValue")
                     .getDeclaredMethod("compare", 3);
                   return withCollator(meth, exp.getArgs(), "fn:compare", 2);
+                }
+              case DOC_BUILTIN:
+              case DOC_AVAILABLE_BUILTIN:
+                {
+                  Expression[] args = exp.getArgs();
+                  ClassType cl = ClassType.make("gnu.kawa.xml.Document");
+                  String mname;
+                  if (code == DOC_BUILTIN)
+                    {
+                      mname = "parseCached";
+                      if (parser.warnOldVersion
+                          && "document".equals(decl.getName()))
+                        getCompilation()
+                          .error('w', "replace 'document' by 'doc'");
+                    }
+                  else
+                    mname = "availableCached";
+                  Method meth = cl.getDeclaredMethod(mname, 2);
+                  String err
+                    = WrongArguments.checkArgCount("fn:"+decl.getName(),
+                                                   1, 1, args.length);
+                  if (err != null)
+                    return getCompilation().syntaxError(err);
+                  Expression base = QuoteExp.getInstance(parser.baseURI);
+                  return new ApplyExp(meth, new Expression[]{ args[0], base });
                 }
               case DISTINCT_VALUES_BUILTIN:
                 {

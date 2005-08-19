@@ -1,3 +1,7 @@
+2005-08-18  Per Bothner  <per@bothner.com>
+
+	* Document.java (parseCached, availableCached): New static functions.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* Nodes.java (writePosition) Change return type to void.

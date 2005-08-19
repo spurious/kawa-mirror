@@ -67,6 +67,67 @@ public class Document extends Procedure1
     return new KDocument(doc, 0);
   }
 
+  /** Internal namespace used to mange cached documents. */
+  static String docNamespace = "http://gnu.org/kawa/cached-documents";
+
+  public static Object parseCached (URL url)
+    throws Throwable
+  {
+    Symbol sym = Symbol.make(docNamespace, url.toString());
+    Environment env = Environment.getCurrent();
+    synchronized (sym)
+      {
+        NamedLocation loc = env.getLocation(sym, null, true);
+        Object val = loc.get(null);
+        if (val != null)
+          return val;
+
+        NodeTree tree = new NodeTree();
+        SourceMessages messages = new SourceMessages();
+        XMLParser parser = new XMLParser(url, messages, tree);
+        tree.beginDocument();
+        tree.writeBaseUri(url);
+        parser.parse();
+        if (messages.seenErrors())
+          throw new SyntaxException("document function read invalid XML",
+                                    messages);
+        tree.endDocument();
+        val = new KDocument(tree, 0);
+        loc.set(val);
+        return val;
+      }
+  }
+
+  /** Parse an XML document, caching the result.
+   * Only positive results are cached; failures are not.)
+   * This implements the standard XQuery <code>fn:doc</code> function.
+   */
+  public static Object parseCached (Object url, String base)
+    throws Throwable
+  {
+    return parseCached(makeURL(url, base));
+  }
+
+  /** Check if an XML document is available, caching the result.
+   * Only positive results are cached; failures are not.  Thus it is possible
+   * for a false result to be followed by a true result, but not vice versa.
+   * This implements the standard XQuery <code>fn:doc-available</code> function.
+   */
+  public static boolean availableCached (Object url, String base)
+    throws java.net.MalformedURLException
+  {
+    URL resolved = makeURL(url, base);
+    try
+      {
+        parseCached(resolved);
+        return true;
+      }
+    catch (Throwable ex)
+      {
+        return false;
+      }
+  }
+
   public Object apply1 (Object arg1) throws Throwable
   {
     return parse(arg1.toString());

@@ -1,3 +1,15 @@
+2005-08-18  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Implement 'declare base-uri' statement.
+	(vaseURI): New field.
+	(parseURILiteral): New method.
+	(parse): Use new method for both 'declare base-uri' and for
+	'declare default collation' statements.
+	* XQResolveNames.java (DOC_BUILTIN, DOC_AVAILABLE_BUILTIN): New values.
+	(walkApplyExp): Handle new macros.
+	* XQuery.java (initXQuery): Remove declarations for fn:doc and
+	deprecated fn:document since now handled by XQResolveNames constructor.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (COMPARE_BUILTIN, DISTINCT_VALUES_BUILTIN,

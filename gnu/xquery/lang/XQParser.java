@@ -1517,12 +1517,14 @@ public class XQParser extends Lexer
     return Symbol.make(uri, local);
   }
 
+  private final String undefTestErr = "node test when focus is undefined";
+
   Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
     Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
     if (dotDecl == null)
-      error("node test when focus is undefined");
+      error(undefTestErr);
     int token = peekOperand();
 
     if (curToken == '@' && axis < 0)
@@ -1588,6 +1590,8 @@ public class XQParser extends Lexer
     Expression[] dotArg = { new ReferenceExp(DOT_VARNAME, dotDecl) };
     exp = new ApplyExp(mkAxis, dotArg);
     getRawToken();
+    if (dotDecl == null)
+      return new ErrorExp(undefTestErr);
     return exp;
   }
 
@@ -1712,7 +1716,7 @@ public class XQParser extends Lexer
 	    lexp.addDeclaration(LAST_VARNAME, Type.int_type);
 	    comp.push(lexp);
 	    dot.noteValue(null);
-	    Expression cond = parseExpr();
+	    Expression cond = parseExprSequence(']');
 	    char kind;
 	    Expression valuesFilter;
 	    if (axis < 0)
@@ -1740,8 +1744,6 @@ public class XQParser extends Lexer
 	    cond.setLine(startLine, startColumn);
 	    comp.pop(lexp);
 	    lexp.body = cond;
-	    if (curToken != ']')
-	      return syntaxError("missing ']'");
 	    getRawToken();
 	    Expression[] args = { exp, lexp };
 	    exp = new ApplyExp(valuesFilter, args);
@@ -2252,6 +2254,18 @@ public class XQParser extends Lexer
     return result;
   }
 
+  Expression parseParenExpr ()
+      throws java.io.IOException, SyntaxException
+  {
+    getRawToken();
+    char saveReadState = pushNesting('(');
+    Expression exp = parseExprSequence(')');
+    popNesting(saveReadState);
+    if (curToken == EOF_TOKEN)
+      eofError("missing ')' - unexpected end-of-file");
+    return exp;
+  }
+
   Expression parseExprSequence(int rightToken)
       throws java.io.IOException, SyntaxException
   {
@@ -2278,10 +2292,7 @@ public class XQParser extends Lexer
     throws java.io.IOException, SyntaxException
   {
     char save = pushNesting('t');
-    getRawToken();
-    Expression selector = parseExpr();
-    if (curToken != ')')
-      return syntaxError("missing ')' after 'typeswitch' selector");
+    Expression selector = parseParenExpr();
     getRawToken();
     Object varName = null;
     Declaration decl;
@@ -2412,12 +2423,7 @@ public class XQParser extends Lexer
     char kind;
     if (token == '(')
       {
-	getRawToken();
-	char saveReadState = pushNesting('(');
-	exp = parseExprSequence(')');
-	popNesting(saveReadState);
-	if (curToken == EOF_TOKEN)
-	  eofError("missing ')' - unexpected end-of-file");
+        exp = parseParenExpr();
       }
     else if (token == '{')
       {
@@ -2653,11 +2659,8 @@ public class XQParser extends Lexer
   public Expression parseIfExpr()
       throws java.io.IOException, SyntaxException
   {
-    getRawToken();
     char save = pushNesting('i');
-    Expression cond = parseExpr();
-    if (curToken != ')')
-      return syntaxError("missing ')' after 'if (EXPR'");
+    Expression cond = parseParenExpr();
     getRawToken();
     if (! match("then"))
       syntaxError("missing 'then'");
@@ -3296,7 +3299,15 @@ public class XQParser extends Lexer
 	parseSeparator();
 	return QuoteExp.voidExp;
       }
-
+    if (curToken == DECLARE_BASE_URI_TOKEN)
+      {
+        Object val = parseURILiteral();
+        if (val instanceof Expression) // an ErrorExp
+          return (Expression) val;
+	parseSeparator();
+        baseURI = (String) val;
+	return QuoteExp.voidExp;
+      }
     Expression exp = parseExprSequence(EOF_TOKEN);
     if (curToken == EOL_TOKEN)
       unread('\n');

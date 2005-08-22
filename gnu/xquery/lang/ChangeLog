@@ -1,3 +1,16 @@
+2005-08-22  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNodeTest): Return ErrorExp if focus is
+	undefined, to prevent confusion later, in XQResolveNames.
+
+	* XQParser.java: Fix various places where we only accepted an ExprSingle
+	rather than a (comma-separated) Expr.
+	(parseStepQualifiers): Use parseExprSequence to rather than parseExpr.
+	(parseParenExpr): New method.
+	(parseTypeSwitch, parseMaybePrimaryExpr, parseIfExpr):
+	Use parseParenExpr.
+	(parse): Handle DECLARE_BASE_URI_TOKEN - i.e 'declare base-uri'.
+
 2005-08-18  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Implement 'declare base-uri' statement.

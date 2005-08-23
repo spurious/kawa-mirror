@@ -35,7 +35,7 @@ END-INFO-DIR-ENTRY
 @end ifnottex
 
 Kawa is:
-@itemize @bullet
+@itemize
 @item
 A framework written in Java for implementing
 high-level and dynamic languages, compling them into Java bytecodes.
@@ -1321,7 +1321,7 @@ source form that is futher processed (it may be repeatedly macro-expanded).
 
 If you define a macro with @code{defmacro}, you (currently) cannot use
 the macro in the same compilation as the definition.
-This restriction does not apply to macros defined by @code{define-syntax}.
+This restriction does not apply to macros defined using @code{syntax-rules}.
 @end deffn
 
 @defun gentemp
@@ -1702,7 +1702,7 @@ You can of course also use the extended format in a @code{define}:
 When the procedure is applied to a list of actual arguments, the formal and
 actual arguments are processed from left to right as follows:
 
-@itemize @bullet
+@itemize
 @item
 The @var{req-arg}s are bound to actual arguments starting with the
 first actual argument.  It shall be an error if there are fewer actual
@@ -3733,7 +3733,7 @@ record-type definitions, generative and nongenerative, and no consensus
 as to which is better).
 
 An instance of @code{define-record-type} is equivalent to the following definitions:
-@itemize @bullet
+@itemize
 @item
 The @var{type-name} is bound to a representation of the record type
 itself.
@@ -5618,7 +5618,7 @@ This section summarizes the known differences between KRL and BRL.
 Unless otherwise specified, KRL in BRL-compatibility mode will
 act as BRL.
 
-@itemize @bullet
+@itemize
 @item
 In BRL a normal Scheme string @code{"mystring"} is the same
 as the inverted quote string @code{]mystring[}, and both are instances
@@ -5733,6 +5733,24 @@ BRL ("the Beautiful Report Language") is a database-oriented language
 to embed in HTML and other markup.
 @uref{http://brl.sourceforge.net/, BRL} allows you to embed Scheme in
 a an HTML file on a web server.
+
+The @uref{http://schemeway.sourceforge.net,SchemeWay Project} is a set of
+@uref{http://www.eclipse.org,Eclipse} plug-ins for professional Scheme
+programming. The first plugin released, SchemeScript, is a fully-featured
+Scheme
+editor customizable in Scheme. It embeds the Kawa Scheme system and has
+many features that ease Kawa Scheme programming (like code completion on
+variable names, 
+class and method names, namespaces, etc).
+
+@uref{http://www.nuecho.com,Nü Echo} develops high-performance speech
+enabled applications. Nü Echo uses Kawa for the development of innovative
+speech application development tools, like a complete 
+@uref{http://www.nuecho.com/en/services/grammar.shtml,grammar IDE} and a 
+S-expression based language and development environment for the
+specification of 
+highly reusable @uref{http://www.nuecho.com/en/services/dcl.shtml,dialog
+components}. 
 
 The Health Media Research Laboratory, part of the Comprehensive Cancer
 Center at the University of Michigan, is using Kawa as an integral part of

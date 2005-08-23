@@ -54,11 +54,6 @@ public abstract class RealNum extends Complex
   public abstract Numeric mul (Object obj);
   public abstract Numeric div (Object obj);
 
-  public RealNum angle()
-  {
-    return IntNum.zero();
-  }
-
   public Numeric abs ()
   {
     return isNegative () ? neg () : this;

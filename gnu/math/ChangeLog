@@ -1,3 +1,8 @@
+2005-08-22  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (angle): Remove bogus method - angle of a negative
+	real is pi, and hence result is inexact. Use inherited method instead.
+
 2005-07-13  Per Bothner  <per@bothner.com>
 
 	* IntFraction.java (toString(int)): Pass radix to toString for

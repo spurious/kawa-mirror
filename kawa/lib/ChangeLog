@@ -1,3 +1,7 @@
+2005-08-23  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (angle): Remove redundant number() call.
+
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* lists.scm: Use new namespace-prefix-based syntax more places.

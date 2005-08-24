@@ -119,7 +119,7 @@
   (invoke x 'abs))
 
 (define (angle (x :: <complex>)) :: <real>
-  (invoke (invoke x 'number) 'angle))
+  (invoke x 'angle))
 
 (define (exact->inexact (num :: <number>)) :: <number>
   (if (invoke num 'isExact)

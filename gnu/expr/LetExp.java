@@ -149,8 +149,15 @@ public class LetExp extends ScopeExp
 
   protected void walkChildren(ExpWalker walker)
   {
-    if (inits != null)
-      inits = walker.walkExps(inits);
+    Declaration decl = firstDecl();
+    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
+      {
+	Expression init0 = inits[i];
+	Expression init = walker.walk(init0);
+	inits[i] = init;
+	if (decl.value == init0)
+          decl.value = init;
+      }
     if (walker.exitValue == null)
       body = (Expression) walker.walk(body);
   }

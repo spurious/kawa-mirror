@@ -1,3 +1,7 @@
+2005-08-23  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (walkChildren): Update declaration's value.
+
 2005-08-18  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (walkReferenceExp): Don't replace by value

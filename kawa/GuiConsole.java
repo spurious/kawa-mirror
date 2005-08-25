@@ -66,9 +66,10 @@ public class GuiConsole extends Frame implements ActionListener {
 
     thread = new Future (new kawa.repl(language),
 			 penvironment, in_p, out_p, err_p);
+    Environment env = thread.getEnvironment();
     if (shared)
-      thread.environment.setIndirectDefines();
-    this.environment = thread.environment;
+      env.setIndirectDefines();
+    this.environment = env;
     thread.start();
   }
 

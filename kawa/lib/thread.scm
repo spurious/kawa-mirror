@@ -15,3 +15,6 @@
   (let ((f :: <gnu.mapping.Future> (make <gnu.mapping.Future> p)))
     (invoke f 'start)
     f))
+
+(define (runnable (p :: <procedure>)) :: <gnu.mapping.RunnableClosure>
+  (make <gnu.mapping.RunnableClosure> p))

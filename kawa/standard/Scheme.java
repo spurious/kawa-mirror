@@ -576,6 +576,7 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("future", "kawa.lib.thread");
       defProcStFld("sleep", "kawa.lib.thread");
+      defProcStFld("runnable", "kawa.lib.thread");
 
       defSntxStFld("trace", "kawa.lib.trace");
       defSntxStFld("untrace", "kawa.lib.trace");

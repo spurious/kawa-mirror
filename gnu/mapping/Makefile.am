@@ -39,6 +39,7 @@ java_sources=\
   ProcLocation.java \
   PropertyLocation.java \
   ReadOnlyLocation.java \
+  RunnableClosure.java \
   Setter.java \
   Setter0.java \
   Setter1.java \

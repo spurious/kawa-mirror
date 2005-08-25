@@ -1,3 +1,7 @@
+2005-08-15  thomas kirk  <tk@research.att.com>
+
+	* thread.scm (runnable): New function.
+
 2005-08-23  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (angle): Remove redundant number() call.

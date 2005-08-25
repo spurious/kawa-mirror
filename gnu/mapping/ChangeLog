@@ -1,3 +1,12 @@
+2005-08-15  thomas kirk  <tk@research.att.com>
+
+	* RunnableClosure.java: New class implementing Runnable.
+	Extracted from Future
+	* Future.java: Most functionality moved to RunnableClosure.
+	Future now just implements a Thread that encapsulates and
+	executes a RunnableClosure.
+	* Makefile.am: Add RunnableClosure.java.
+
 2005-08-09  Per Bothner  <per@bothner.com>
 
 	* SimpleEnvironment (define): Remove unused local variable prev.

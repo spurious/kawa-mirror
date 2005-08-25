@@ -2,101 +2,42 @@ package gnu.mapping;
 
 public class Future extends Thread
 {
-  Object result;
-  CallContext context;
-  public Environment environment;
-
-  // These are only used to when we need to override the parents' in/out/err
-  // in the child.  This is not needed for normal Future objects, but (say)
-  // when starting a repl in a new window.  In that case we could do te
-  // in/out/err override in the 'action'.  FIXME.
-  private InPort in;
-  private OutPort out;
-  private OutPort err;
-  Throwable exception;
-
-  Procedure action;
+  public RunnableClosure closure;
 
   public Future (Procedure action, CallContext parentContext)
   {
-    this(action, parentContext, parentContext.getEnvironment());
-
+    closure = new RunnableClosure(action, parentContext);
   }
 
   public Future (Procedure action,
                  CallContext parentContext, Environment penvironment)
   {
-    this.action = action;
-    SimpleEnvironment env = Environment.make(getName(), penvironment); 
-    env.flags |= Environment.THREAD_SAFE;
-    env.flags &= ~Environment.DIRECT_INHERITED_ON_SET;
-    this.environment = env;
-    int n = parentContext.pushedFluidsCount;
-    for (int i = 0;  i < n; i++)
-      {
-        // If we're inside a fluid-let, then the child thread should inherit
-        // the fluid-let binding, even if it isn't accessed in the child until
-        // after the parent exits the fluid-let.  Set things up so only the
-        // binding in the parent is restored, but they share until then.
-        Location loc = parentContext.pushedFluids[i];
-        Symbol name = loc.getKeySymbol();
-        Object property = loc.getKeyProperty();
-        if (name != null && loc instanceof NamedLocation)
-          {
-            NamedLocation nloc = (NamedLocation) loc;
-            if (nloc.base == null)
-              {
-                SharedLocation sloc = new SharedLocation(name, property, 0);
-                sloc.value = nloc.value;
-                nloc.base = sloc;
-                nloc.value = null;
-                nloc = sloc;
-              }
-            int hash = name.hashCode() ^ System.identityHashCode(property);
-            NamedLocation xloc = env.addUnboundLocation(name, property, hash);
-            xloc.base = nloc;
-          }
-      }
+    closure = new RunnableClosure (action, parentContext, penvironment);
+    closure.environment.setName(getName());
   }
 
   public Future (Procedure action, Environment penvironment,
 		 InPort in, OutPort out, OutPort err)
   {
-    this(action, CallContext.getInstance(), penvironment);
-    this.in = in;
-    this.out = out;
-    this.err = err;
+    closure = new RunnableClosure (action, penvironment, in, out, err);
   }
 
   public Future (Procedure action)
   {
-    this(action, CallContext.getInstance());
+    closure = new RunnableClosure(action);
   }
 
   /** Get the CallContext we use for this Thread. */
-  public final CallContext getCallContext() { return context; }
+  public final CallContext getCallContext() {
+    return closure.getCallContext();
+  }
 
-  public void run ()
-  {
-    try
-      {
-        if (context == null)
-          context = CallContext.getInstance();
-        else
-          CallContext.setInstance(context);
-	context.curEnvironment = environment;
-	if (in != null)
-	  InPort.setInDefault(in);
-	if (out != null)
-	  OutPort.setOutDefault(out);
-	if (err != null)
-	  OutPort.setErrDefault(err);
-	result = action.apply0 ();
-      }
-    catch (Throwable ex)
-      {
-	exception = ex;
-      }
+  public Environment getEnvironment() {
+    return closure.environment;
+  }
+
+  public void run() {
+    closure.run();
   }
 
   public Object waitForResult ()
@@ -109,13 +50,10 @@ public class Future extends Thread
       {
 	throw new RuntimeException ("thread join [force] was interrupted");
       }
-    if (exception != null)
-      {
-	if (exception instanceof RuntimeException)
-	  throw (RuntimeException) exception;
-	throw new RuntimeException (exception.toString());
-      }
-    return result;
+    Throwable ex = closure.exception;
+    if (ex != null)
+      throw WrappedException.wrapIfNeeded(ex);
+    return closure.result;
   }
 
   public String toString() {

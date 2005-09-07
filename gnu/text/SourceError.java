@@ -56,12 +56,15 @@ public class SourceError
   {
     StringBuffer buffer = new StringBuffer ();
     buffer.append (filename == null ? "<unknown>" : filename);
-    buffer.append (':');
-    buffer.append (line);
-    if (column > 0)
+    if (line != 0 || column != 0)
       {
 	buffer.append (':');
-	buffer.append (column);
+	buffer.append (line);
+	if (column > 0)
+	  {
+	    buffer.append (':');
+	    buffer.append (column);
+	  }
       }
     buffer.append (": ");
     if (severity == 'w')

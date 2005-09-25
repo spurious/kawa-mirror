@@ -207,6 +207,7 @@ public class XQResolveNames extends ResolveNames
 	else if (symbol instanceof Symbol
             && "".equals((sym = (Symbol) symbol).getNamespaceURI()))
           {
+            // kludge - use xxx_BUILTIN mechanism?  FIXME
             String name = sym.getLocalName();
             Expression f;
             if ("request".equals(name))

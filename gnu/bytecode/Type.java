@@ -100,7 +100,6 @@ public abstract class Type {
 	    mapNameToType.put(name, type);
 	  }
       }
-    type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
     return type;
   }

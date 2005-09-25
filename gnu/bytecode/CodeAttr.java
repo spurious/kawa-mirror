@@ -103,7 +103,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   int fixup_count;
 
   /** This causes a later processFixup to rearrange the code.
-   * The codet a target comes here, nstead of the following instructions. */
+   * The code at target comes here, instead of the following instructions.
+   * Fuctionally equivalent to: <code>goto target; here:</code>,
+   * but implemented by code re-arranging.  Therefore there should be
+   * at some later point a <code>goto here; target:</code>.
+   */
   public final void fixupChain (Label here, Label target)
   {
     fixupAdd(CodeAttr.FIXUP_MOVE, 0, target);

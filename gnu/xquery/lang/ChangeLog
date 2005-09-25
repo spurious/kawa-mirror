@@ -3,9 +3,9 @@
 	* XQParser.java (parseNodeTest): Return ErrorExp if focus is
 	undefined, to prevent confusion later, in XQResolveNames.
 
-	* XQParser.java: Fix various places where we only accepted an ExprSingle
-	rather than a (comma-separated) Expr.
-	(parseStepQualifiers): Use parseExprSequence to rather than parseExpr.
+	* XQParser.java: Fix various places where we only accepted an
+	ExprSingle rather than a (comma-separated) Expr.
+	(parseStepQualifiers): Use parseExprSequence rather than parseExpr.
 	(parseParenExpr): New method.
 	(parseTypeSwitch, parseMaybePrimaryExpr, parseIfExpr):
 	Use parseParenExpr.
@@ -25,8 +25,8 @@
 
 2005-08-16  Per Bothner  <per@bothner.com>
 
-	* XQResolveNames.java (COMPARE_BUILTIN, DISTINCT_VALUES_BUILTIN,
-	LOCAL_NAME_BUILTIN, NAMESPACE_URI_BUILTIN, ROOT_BUILTIN): New constants.
+	* XQResolveNames.java (NAMESPACE_URI_BUILTIN, DISTINCT_VALUES_BUILTIN,
+	LOCAL_NAME_BUILTIN, ROOT_BUILTIN, COMPARE_BUILTIN): New constants.
 	(positionDecl): Remove unneded static field.
 	(pushBuiltin): New convenience method.
 	(<init>): Push various builtin functions.

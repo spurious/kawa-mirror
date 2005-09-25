@@ -130,8 +130,7 @@ public abstract class Procedure implements Named
 	    result = proc.apply0();
 	    break;
 	  case 1:
-	    Object a = ctx.getNextArg();
-	    result = proc.apply1(a);
+	    result = proc.apply1(ctx.getNextArg());
 	    break;
 	  case 2:
 	    result = proc.apply2(ctx.getNextArg(), ctx.getNextArg());

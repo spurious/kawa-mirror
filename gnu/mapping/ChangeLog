@@ -1,3 +1,7 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (apply): Clean up old debugging left-over.
+
 2005-08-15  thomas kirk  <tk@research.att.com>
 
 	* RunnableClosure.java: New class implementing Runnable.

@@ -1,3 +1,7 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* SequenceUtils.java (reverse$X): New methods, implements fn:revrese.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java: New class.

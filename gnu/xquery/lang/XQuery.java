@@ -535,6 +535,8 @@ public class XQuery extends Language
 		  "isEmptySequence");
     define_method("exists", "gnu.xquery.util.SequenceUtils",
 		  "exists");
+    define_method("reverse", "gnu.xquery.util.SequenceUtils",
+		  "reverse");
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");

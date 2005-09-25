@@ -3119,12 +3119,7 @@ public class XQParser extends Lexer
 	  }
 	else
 	  {
-	    // This leave curToken pointing at the token *following* the
-	    // expression, but parse is not supposed to read ahead like that.
-	    // Luckily, this is only a problem in the error recovery case,
-	    // when it is usually harmless.  We could fix it by supressing
-	    // the getRawToken in parseMaybePrimaryExpr, which is non-trivial.
-	    init = parseMaybePrimaryExpr();
+	    init = parseExpr();
 	    Expression err = null;
 	    if (! sawEq || init == null)
 	      err = syntaxError("expected ':= init' or 'external'");

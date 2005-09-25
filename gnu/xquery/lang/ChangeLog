@@ -1,3 +1,9 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Define 'reverse' function.
+
+	* XQParser.java (parse): Fix 'declare variable' parse bug.
+
 2005-08-22  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseNodeTest): Return ErrorExp if focus is

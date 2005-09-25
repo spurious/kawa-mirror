@@ -112,9 +112,13 @@ public class ModuleExp extends LambdaExp
         CallContext ctx = CallContext.getInstance();
         ctx.value1 = comp;
 
-	Class clas = loader.loadClass (class_name, true);
-	comp.mainClass.setReflectClass(clas);
-        return clas;
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  {
+	    ClassType ctype = comp.classes[iClass];
+            ctype.setReflectClass(loader.loadClass(ctype.getName(), false));
+            ctype.setExisting(true);
+          }
+	return loader.loadClass (class_name, true);
       }
     catch (java.io.IOException ex)
       {

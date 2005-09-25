@@ -1,3 +1,8 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalToClass): Load classes eagerly so we can do
+	setReflectClass for all the generated classes.
+
 2005-08-23  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (walkChildren): Update declaration's value.

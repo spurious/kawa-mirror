@@ -19,6 +19,26 @@ public class ClassMethodProc extends ProcedureN
   ClassType ctype;
   String methodName;
 
+  /*
+   * 'N' - new (make) - if methodName is "new".
+   * 'I' - instance of - if methodName is INSTANCEOF_METHOD_NAME.
+   * 'C' - cast - if methodName is CAST_METHOD_NAME.
+   * 'F' - get field
+   */
+  char kind;
+
+  void fixup ()
+  {
+    if (methodName.equals("new"))
+      kind = 'N';
+    else if (methodName.equals(INSTANCEOF_METHOD_NAME))
+      kind = 'I';
+    else if (methodName.equals(CAST_METHOD_NAME))
+      kind = 'C';
+    else if (methodName.length() > 1 && methodName.charAt(0) == '.')
+      kind = 'F';
+  }
+
   /** Pseudo-method-name for the cast operation. */
   public static final String CAST_METHOD_NAME = "@";
 
@@ -57,6 +77,7 @@ public class ClassMethodProc extends ProcedureN
     ClassMethodProc p = new ClassMethodProc();
     p.ctype = ctype;
     p.methodName = methodName;
+    p.fixup();
     return p;
   }
 
@@ -68,13 +89,43 @@ public class ClassMethodProc extends ProcedureN
     return aexp;
   }
 
+  public void apply (CallContext ctx) throws Throwable
+  {
+    Object[] args = ctx.getArgs();
+    if (kind != 0)
+      {
+        Object result = applyN(args);
+        ctx.writeValue(result);
+      }
+    else
+      {
+        int thisCount = ctype==null ? 1 : 0;
+        Object[] xargs = new Object[args.length+2-thisCount];
+        Invoke proc;
+        String name = methodName;
+        if (ctype == null)
+          {
+            proc = Invoke.invoke;
+            xargs[0] = args[0];
+          }
+        else
+          {
+            proc = Invoke.invokeStatic;
+            xargs[0] = ctype;
+          }
+        xargs[1] = name;
+        System.arraycopy(args, thisCount, xargs, 2, args.length - thisCount);
+        proc.apply(xargs, ctx);
+      }
+  }
+
   public Object applyN (Object[] args)  throws Throwable
   {
     boolean isInstance = ctype == null;
-    boolean isField = methodName.length() > 1 && methodName.charAt(0) == '.';
-    boolean isNew = methodName.equals("new");
-    boolean isInstanceOf = methodName.equals(INSTANCEOF_METHOD_NAME);
-    boolean isCast = methodName.equals(CAST_METHOD_NAME);
+    boolean isField = kind == 'F';
+    boolean isNew = kind == 'N';
+    boolean isInstanceOf = kind == 'I';
+    boolean isCast = kind == 'C';
     Object[] xargs
       = new Object[args.length+(isInstance||isNew||isInstanceOf||isCast?1:2)];
     Procedure proc;
@@ -152,19 +203,38 @@ public class ClassMethodProc extends ProcedureN
   public static ApplyExp rewrite (ApplyExp exp)
   {
     Expression func = exp.getFunction();
-    if (! (func instanceof ApplyExp))
+    if (func instanceof ReferenceExp)
+      {
+        Declaration fdecl = ((ReferenceExp) func).getBinding();
+        if (fdecl != null)
+          func = fdecl.getValue();
+      }
+    Object fvalue;
+    Expression clExp;
+    String mname;
+    if (func instanceof ApplyExp)
+      {
+        ApplyExp fapp = (ApplyExp) func;
+        Expression ffunc = fapp.getFunction();
+        Expression[] fargs;
+        if (ffunc != makeMethodExp
+            || (fargs = fapp.getArgs()).length != 2
+            || ! (fargs[1] instanceof QuoteExp))
+          return exp;
+        clExp = fargs[0];
+        mname = ((QuoteExp) fargs[1]).getValue().toString();
+      }
+    else if (func instanceof QuoteExp
+             && (fvalue = ((QuoteExp) func).getValue()) instanceof ClassMethodProc)
+      {
+        ClassMethodProc cmProc = (ClassMethodProc) fvalue;
+        clExp = QuoteExp.getInstance(cmProc.ctype);
+        mname = cmProc.methodName;
+      }
+    else
       return exp;
-    ApplyExp fapp = (ApplyExp) func;
-    Expression ffunc = fapp.getFunction();
-    Expression[] fargs;
-    if (ffunc != makeMethodExp
-        || (fargs = fapp.getArgs()).length != 2
-        || ! (fargs[1] instanceof QuoteExp))
-      return exp;
-    Expression clExp = fargs[0];
     boolean isInstance = clExp == QuoteExp.nullExp;
     Expression[] args = exp.getArgs();
-    String mname = ((QuoteExp) fargs[1]).getValue().toString();
     boolean isInstanceOf = mname.equals(INSTANCEOF_METHOD_NAME);
     boolean isCast = mname.equals(CAST_METHOD_NAME);
     if (args.length == 0 && (isInstance || isInstanceOf || isCast))
@@ -189,30 +259,30 @@ public class ClassMethodProc extends ProcedureN
       {
         decl = makeDecl;
         System.arraycopy(args, 0, xargs, 1, args.length);
-        xargs[0] = fargs[0];
+        xargs[0] = clExp;
       }
     else if (isInstanceOf)
       {
         decl = instanceOfDecl;
         System.arraycopy(args, 1, xargs, 2, args.length-1);
         xargs[0] = args[0];
-        xargs[1] = fargs[0];
+        xargs[1] = clExp;
       }
     else if (isCast)
       {
         decl = castDecl;
         System.arraycopy(args, 1, xargs, 2, args.length-1);
-        xargs[0] = fargs[0];
+        xargs[0] = clExp;
         xargs[1] = args[0];
       }
     else
       {
         decl = isField ? staticFieldDecl : invokeStaticDecl;
         System.arraycopy(args, 0, xargs, 2, args.length);
-        xargs[0] = fargs[0];
+        xargs[0] = clExp;
       }
     if (! isNew && ! isInstanceOf && ! isCast)
-      xargs[1] = isField ? new QuoteExp(mname.substring(1)) : fargs[1];
+      xargs[1] = new QuoteExp(isField ? mname.substring(1) : mname);
     return new ApplyExp(new ReferenceExp(decl), xargs);
   }
 
@@ -227,5 +297,9 @@ public class ClassMethodProc extends ProcedureN
   {
     ctype = (ClassType) in.readObject();
     methodName = in.readUTF();
+    fixup();
   }
+
+  public String toString()
+  { return "#<class-method "+ctype.getName()+" "+methodName+'>'; }
 }

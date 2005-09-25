@@ -1,3 +1,16 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (typeFrom): New private helper method.
+	(apply(CallContext), apply(Object[],CallContext)): New methods.
+	(applyN): Use typeFrom.
+	* ClassMethodProc.java (kind): New field.
+	(fixup): New method to initialize 'kind' field.
+	(make, readExternal): Use fixup.
+	(apply(CallContext)): New method - optimimization.
+	(applyN, rewrite): Slight optimization by using kind field.
+	(rewrite): Generalize func to handle QuoteExp and ReferenceExp.
+	(toString): New method.
+
 2005-08-08  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java (castDecl): New static field.

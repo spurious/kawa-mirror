@@ -46,6 +46,60 @@ public class Invoke extends ProcedureN implements CanInline
     return applyN(make, args);
   }
 
+  private static ClassType typeFrom (Object arg, Invoke thisProc)
+  {
+    if (arg instanceof Class)
+      arg = Type.make((Class) arg);
+    if (arg instanceof ClassType)
+      return (ClassType) arg;
+    if (arg instanceof String || arg instanceof FString)
+      return ClassType.make(arg.toString());
+    if (arg instanceof Symbol)
+      return ClassType.make(((Symbol) arg).getName());
+    throw new WrongType(thisProc, 0, null);
+  }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    apply(ctx.getArgs(), ctx);
+  }
+
+  public void apply (Object[] args, CallContext ctx) throws Throwable
+  {
+    if (kind=='S' || kind=='V')
+      {
+        // The following is an optimization, so that output from the
+        // method is sent directly to ctx.consumer, rather than reified.
+        int nargs = args.length;
+        Procedure.checkArgCount(this, nargs);
+        Object arg0 = args[0];
+        String mname;
+        ClassType dtype = (kind != 'V' ? typeFrom(arg0, this)
+                           : (ClassType) Type.make(arg0.getClass()));
+        Object arg1 = args[1];
+        if (arg1 instanceof String || arg1 instanceof FString)
+          mname = arg1.toString();
+	else if (arg1 instanceof Symbol)
+	  mname = ((Symbol) arg1).getName();
+        else
+          throw new WrongType(this, 1, null);
+        mname = Compilation.mangleName(mname);
+        Procedure proc = ClassMethods.apply(dtype, mname, null, null,
+                                            0, kind=='S' ? 0 : Access.STATIC);
+        if (proc == null)
+          throw new RuntimeException(getName() + ": no method named `"
+                                     + mname + "' in class " + dtype.getName());
+        Object[] margs = new Object[nargs-(kind == 'S' ? 2 : 1)];
+        int i = 0;
+        if (kind == 'V')
+          margs[i++] = args[0];
+        System.arraycopy(args, 2, margs, i, nargs - 2);
+        proc.checkN(margs, ctx);
+      }
+    else
+      ctx.writeValue(this.applyN(args));
+  }
+
   public Object applyN (Object[] args) throws Throwable
   {
     return applyN(this, args);
@@ -62,23 +116,9 @@ public class Invoke extends ProcedureN implements CanInline
     int nargs = args.length;
     Procedure.checkArgCount(thisProc, nargs);
     Object arg0 = args[0];
-    ClassType dtype;
+    ClassType dtype = (kind != 'V' ? typeFrom(arg0, thisProc)
+                       : (ClassType) Type.make(arg0.getClass()));
     String mname;
-    if (kind == 'V')
-      dtype = (ClassType) Type.make(arg0.getClass());
-    else
-      {
-        if (arg0 instanceof Class)
-          arg0 = Type.make((Class) arg0);
-        if (arg0 instanceof ClassType)
-          dtype = (ClassType) arg0;
-        else if (arg0 instanceof String || arg0 instanceof FString)
-          dtype = ClassType.make(arg0.toString());
-	else if (arg0 instanceof Symbol)
-          dtype = ClassType.make(((Symbol) arg0).getName());
-        else
-          throw new WrongType(thisProc, 0, null);
-      }
     Object staticLink = null;
     if (kind == 'N')
       {

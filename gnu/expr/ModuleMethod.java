@@ -144,6 +144,14 @@ public class ModuleMethod extends MethodProc
   public void apply (CallContext ctx)
     throws Throwable
   {
+    // This method does not get called for methods compiled with
+    // --full-tailcalls, since their match methods set ctx.proc to the
+    // ModuleWithContext, rather than this ModuleMethod.
+    // We get here for methods compiled with the --no-full-tailcalls option.
+    // In that case the compiler-generated matchX methods set ctx.pc
+    // to 0...5 to indicate where the arguments were saved.
+    // It would be more consistent to set ctx.where and ctx.count, though
+    // a simple switch of ctx.pc is faster.  But how robust is this?
     Object result;
     switch (ctx.pc)
       {

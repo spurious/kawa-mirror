@@ -1,7 +1,7 @@
 (require 'gui)
 
 (define test-image
-  (read-image "file:///Users/bothner/pics/NelsonCove/NC-USGS-topo.jpg"))
+  (image-read "http://nelsoncove.us/NC-USGS-topo.jpg"))
 
 (define Yes-button
   (button label: "Yes"

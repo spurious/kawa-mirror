@@ -1,3 +1,8 @@
+2005-09-26  Per Bothner  <per@bothner.com>
+
+	* gui.scm (image-width, image-height): New procedures.
+	(read-image): Renamed to image-read for naming consistency.
+
 2005-06-06   Robert D. Skeels <athene@earthlink.net>
 
 	* gui.scm (color-red): Use 'red rather than 'RED, since former is

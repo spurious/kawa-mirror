@@ -73,8 +73,14 @@
    (static-field <java.awt.AlphaComposite> 'SRC)
    alpha))
 
-(define (read-image url) :: <java.awt.image.BufferedImage>
+(define (image-read url) :: <java.awt.image.BufferedImage>
   (javax.imageio.ImageIO:read (gnu.kawa.xml.Document:makeURL url)))
+
+(define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
+  (*.getWidth image))
+
+(define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
+  (*.getHeight image))
 
 (define (rotation (theta :: <double>)) :: <java.awt.geom.AffineTransform>
   (java.awt.geom.AffineTransform:getRotateInstance theta))

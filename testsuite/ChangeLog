@@ -1,3 +1,8 @@
+2005-09-26  Per Bothner  <per@bothner.com>
+
+	* gui-test.scm (testimage): Update read-image -> image-read.
+	Use a publicly available image URL.
+
 2005-08-03  Dean Ferreyra <dean@octw.com>
 
 	* classes1.scm (datetest-ns, make-date-test): Move from here ...

@@ -1,5 +1,8 @@
 2005-09-25  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (compile): New static method.
+	(compile): Use new method.
+
 	* ModuleExp.java (evalToClass): Load classes eagerly so we can do
 	setReflectClass for all the generated classes.
 

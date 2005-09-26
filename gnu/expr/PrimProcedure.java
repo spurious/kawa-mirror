@@ -40,7 +40,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public boolean takesContext()
   {
-    return method != null && method.getName().endsWith("$X");
+    return method != null && takesContext(method);
+  }
+
+  public static boolean takesContext(Method method)
+  {
+    return method.getName().endsWith("$X");
   }
 
   public int numArgs()
@@ -420,51 +425,63 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     compileArgs(args, thisType, comp);
 
     if (method == null)
-      code.emitPrimop (opcode(), args.length, retType);
+      {
+        code.emitPrimop (opcode(), args.length, retType);
+        target.compileFromStack(comp, stackType);
+      }
     else
       {
-	comp.usedClass(method.getDeclaringClass());
-	comp.usedClass(method.getReturnType());
-        if (! takesContext())
-          code.emitInvokeMethod(method, opcode());
-	else if (target instanceof IgnoreTarget
-	    || (target instanceof ConsumerTarget
-		&& ((ConsumerTarget) target).isContextTarget()))
-	  {
+        compile(comp, method, target, exp.isTailCall(), op_code, stackType);
+      }
+  }
+
+  public static void compile (Compilation comp, Method method, Target target,
+                              boolean isTailCall, int op_code, Type stackType)
+  {
+    CodeAttr code = comp.getCode();
+    comp.usedClass(method.getDeclaringClass());
+    comp.usedClass(method.getReturnType());
+    if (! takesContext(method))
+      {
+        code.emitInvokeMethod(method, op_code);
+      }
+    else if (target instanceof IgnoreTarget
+             || (target instanceof ConsumerTarget
+                 && ((ConsumerTarget) target).isContextTarget()))
+      {
+        comp.loadCallContext();
+        code.emitInvokeMethod(method, op_code);
+        if (isTailCall)
+          {
             comp.loadCallContext();
-	    code.emitInvokeMethod(method, opcode());
-	    if (! exp.isTailCall())
-	      {
-		comp.loadCallContext();
-		code.emitInvoke(Compilation.typeCallContext
-				.getDeclaredMethod("runUntilDone", 0));
-	      }
-	    return;
-	  }
-	else
-	  {
-            comp.loadCallContext();
-	    stackType = Type.pointer_type;
-	    code.pushScope();
-	    Variable saveIndex = code.addLocal(Type.int_type);
-	    comp.loadCallContext();
-	    code.emitInvokeVirtual(Compilation.typeCallContext.
-				   getDeclaredMethod("startFromContext", 0));
-	    code.emitStore(saveIndex);
-	    code.emitWithCleanupStart();
-	    code.emitInvokeMethod(method, opcode());
-	    code.emitWithCleanupCatch(null);
-	    comp.loadCallContext();
-	    code.emitLoad(saveIndex);
-	    code.emitInvokeVirtual(Compilation.typeCallContext.
-				   getDeclaredMethod("cleanupFromContext", 1));
-	    code.emitWithCleanupDone();
-	    comp.loadCallContext();
-	    code.emitLoad(saveIndex);
-	    code.emitInvokeVirtual(Compilation.typeCallContext.
-				   getDeclaredMethod("getFromContext", 1));
-	    code.popScope();
-	  }
+            code.emitInvoke(Compilation.typeCallContext
+                            .getDeclaredMethod("runUntilDone", 0));
+          }
+        return;
+      }
+    else
+      {
+        comp.loadCallContext();
+        stackType = Type.pointer_type;
+        code.pushScope();
+        Variable saveIndex = code.addLocal(Type.int_type);
+        comp.loadCallContext();
+        code.emitInvokeVirtual(Compilation.typeCallContext.
+                               getDeclaredMethod("startFromContext", 0));
+        code.emitStore(saveIndex);
+        code.emitWithCleanupStart();
+        code.emitInvokeMethod(method, op_code);
+        code.emitWithCleanupCatch(null);
+        comp.loadCallContext();
+        code.emitLoad(saveIndex);
+        code.emitInvokeVirtual(Compilation.typeCallContext.
+                               getDeclaredMethod("cleanupFromContext", 1));
+        code.emitWithCleanupDone();
+        comp.loadCallContext();
+        code.emitLoad(saveIndex);
+        code.emitInvokeVirtual(Compilation.typeCallContext.
+                               getDeclaredMethod("getFromContext", 1));
+        code.popScope();
       }
     target.compileFromStack(comp, stackType);
   }

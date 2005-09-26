@@ -2,7 +2,6 @@
 
 <test>
 <ident>Use Case "XMP" (Experiences and Exemplars) Q1</ident>
-
 <description>List books published by Addison-Wesley after 1991,
   including their year and title.</description>
 <query><![CDATA[
@@ -210,6 +209,36 @@ additional authors.</description>
             <first>Peter</first>
         </author>
         <et-al/>
+    </book>
+</bib>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q7</ident>
+<description>List the titles and years of all books published by Addison-Wesley
+after 1991, in alphabetic order.</description>
+<query>
+<bib>
+  {
+    for $b in doc("bib.xml")//book
+    where $b/publisher = "Addison-Wesley" and $b/@year > 1991
+    order by $b/title
+    return
+        <book>
+            { $b/@year }
+            { $b/title }
+        </book>
+  }
+</bib> 
+</query>
+<expect>
+<bib>
+    <book year="1992">
+        <title>Advanced Programming in the Unix environment</title>
+    </book>
+    <book year="1994">
+        <title>TCP/IP Illustrated</title>
     </book>
 </bib>
 </expect>
@@ -436,7 +465,7 @@ declare function local:toc($book-or-section as element()) as element()*
 
 <test>
 <ident>Use Case "TREE": Queries that preserve hierarchy: Q2</ident>
-<description><!CDATA[[Prepare a (flat) figure list for Book1, listing all the
+<description><![CDATA[Prepare a (flat) figure list for Book1, listing all the
 figures and their titles. Preserve the original attributes of each
 <figure>; element, if any.]]></description>
 <query>
@@ -788,6 +817,53 @@ declare function local:between($seq as node()*, $start as node(), $end as node()
       <action>#2 0 Maxon stay sutures were placed on each side of the midline.
       </action>
 </critical_sequence>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" Q2 </ident>
+<description>
+For all bicycles, list the item number, description, and highest bid (if any),
+ordered by item number.</description>
+<query>
+<result>
+  {
+    for $i in doc("items.xml")//item_tuple
+    let $b := doc("bids.xml")//bid_tuple[itemno = $i/itemno]
+    where contains($i/description, "Bicycle")
+    order by $i/itemno
+    return
+        <item_tuple>
+            { $i/itemno }
+            { $i/description }
+            <high_bid>{ max($b/bid) }</high_bid>
+        </item_tuple>
+  }
+</result> 
+</query>
+<expect>
+<result>
+  <item_tuple>
+    <itemno>1001</itemno>
+    <description>Red Bicycle</description>
+    <high_bid>55</high_bid>
+  </item_tuple>
+  <item_tuple>
+    <itemno>1003</itemno>
+    <description>Old Bicycle</description>
+    <high_bid>20</high_bid>
+  </item_tuple>
+  <item_tuple>
+    <itemno>1007</itemno>
+    <description>Racing Bicycle</description>
+    <high_bid>225</high_bid>
+  </item_tuple>
+  <item_tuple>
+    <itemno>1008</itemno>
+    <description>Broken Bicycle</description>
+    <high_bid></high_bid>
+  </item_tuple>
+</result> 
 </expect>
 </test>
 

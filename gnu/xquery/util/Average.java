@@ -18,9 +18,10 @@ public class Average extends Procedure1
 
   Object combine (Object arg1, Object arg2)
   {
+    arg2 = NumberValue.numberValue(arg2);
     if (arg1 == Values.empty)
-      return arg2; // FIXME - verify that arg2 is numeric.
-    return AddOp.$Pl(arg1, arg2);
+      return arg2;
+    return AddOp.$Pl(NumberValue.numberValue(arg1), arg2);
   }
 
   public Object apply1(Object arg)

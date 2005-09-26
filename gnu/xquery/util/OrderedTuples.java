@@ -2,11 +2,11 @@ package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.mapping.*;
 
-/** Helper class used in conjunction with {@link OrderedTuples}.
+/** Helper class used in conjunction with {@link OrderedMap}.
  * It has the tuples from the {@code for} and {@code let}-clauses,
  * as filtered by the {@code where}-clause.
  *
- * The tuples are sorted using a linked-lined version of merge sort.
+ * The tuples are sorted using a linked-list version of merge sort.
  *
  * The sequence of n tuples for m variables is represented using
  * an array of length n where each element is an array of length m.
@@ -170,7 +170,7 @@ int cmp(int a, int b)  throws Throwable
      * Silly special case: if `list' was passed in as NULL, return
      * NULL immediately.
      */
-    if (list < 0)
+    if (n == 0)
 	return -1;
 
     next = new int[n];

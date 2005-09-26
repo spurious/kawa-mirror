@@ -1,3 +1,12 @@
+2005-09-26  Per Bothner  <per@bothner.com>
+
+	* Environment.java (remove, unlink): New methods.
+	* Location.java (undefine): New method.
+	* SimpleEnvironment.java (remove): Rename to unlink, which takes hash.
+	Don't undefine location - do that in remove.
+	* ThreadLocation.java (LocationRef.finalize): Just unlink - don't
+	undefine the location.
+
 2005-09-25  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (apply): Clean up old debugging left-over.

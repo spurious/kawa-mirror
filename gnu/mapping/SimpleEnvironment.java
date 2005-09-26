@@ -241,10 +241,9 @@ public class SimpleEnvironment extends Environment
     mask = newMask;
   }
 
-  public void remove (Symbol symbol, Object property)
+  public Location unlink (Symbol symbol, Object property, int hash)
   {
-    int index = ((symbol.hashCode() ^ System.identityHashCode(property))
-		 & this.mask);
+    int index = hash & this.mask;
     NamedLocation prev = null;
     NamedLocation loc = table[index];
     while (loc != null)
@@ -252,18 +251,19 @@ public class SimpleEnvironment extends Environment
 	NamedLocation next = loc.next;
 	if (loc.matches(symbol, property))
 	  {
+            if (! getCanRedefine())
+              redefineError(symbol, property, loc);
 	    if (prev == null)
 	      table[index] = next;
 	    else
 	      prev.next = loc;
 	    num_bindings--;
-	    if (loc instanceof IndirectableLocation)
-	      ((IndirectableLocation) loc).undefine();
-	    return;
+	    return loc;
 	  }
 	prev = loc;
 	loc = next;
       }
+    return null;
   }
 
   public Object remove (EnvironmentKey key)

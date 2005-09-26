@@ -162,6 +162,9 @@ class LocationRef
 
   public void finalize ()
   {
-    env.remove(loc.getKeySymbol(), loc.getKeyProperty());
+    Symbol symbol = loc.getKeySymbol();
+    Object property = loc.getKeyProperty();
+    int hash = symbol.hashCode() ^ System.identityHashCode(property);
+    env.unlink(symbol, property, hash);
   }
 }

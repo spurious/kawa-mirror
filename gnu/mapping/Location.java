@@ -70,6 +70,11 @@ public abstract class Location
 
   public abstract void set (Object value);
 
+  public void undefine ()
+  {
+    set(UNBOUND);
+  }
+
   /** Set a value, but return cookie so old value can be restored.
    * This is intended for fluid-let where (in the case of multiple threads)
    * a simple save-restore isn't always the right thing. */

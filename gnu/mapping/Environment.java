@@ -249,16 +249,43 @@ public abstract class Environment
     return put((Object) key, value);
   }
 
+  /** Remove Location from this Environment.
+   * Does not explicitly undefine the location itself.
+   */
+  public Location unlink (Symbol key, Object property, int hash)
+  {
+    throw new RuntimeException("unsupported operation: unlink (aka undefine)");
+  }
+
+  /** Remove Location from this Environment and undefined it. */
+  public void remove (Symbol key, Object property, int hash)
+  {
+    Location loc = unlink(key, property, hash);
+    if (loc != null)
+      loc.undefine();
+  }
+
+  /** Remove and undefine binding.
+   * (A more type-specific version of gnu.util.mape.remove.)
+   * @return Old value
+   */
   public Object remove (EnvironmentKey key)
   {
-    Object value = get(key, null);
-    remove(key.getKeySymbol(), key.getKeyProperty());
+    Symbol symbol = key.getKeySymbol();
+    Object property = key.getKeyProperty();
+    int hash = symbol.hashCode() ^ System.identityHashCode(property);
+    Location loc = getLocation(symbol, property, hash, false);
+    if (loc == null)
+      return null;
+    Object value = loc.get(null);
+    remove(symbol, property, hash);
     return value;
   }
 
-  public void remove (Symbol sym, Object property)
+  public void remove (Symbol symbol, Object property)
   {
-    remove(getLocation(sym, property, false));
+    int hash = symbol.hashCode() ^ System.identityHashCode(property);
+    remove(symbol, property, hash);
   }
 
   public final void remove (Symbol sym)

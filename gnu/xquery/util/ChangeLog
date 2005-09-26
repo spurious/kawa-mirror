@@ -1,5 +1,9 @@
 2005-09-25  Per Bothner  <per@bothner.com>
 
+	* OrderedMap.java: New class, extends MethodProc.
+	* OrderedTuples.java: New class, extends FilterConsumer.
+	* Makefile.am: Update accordingly.
+
 	* SequenceUtils.java (reverse$X): New methods, implements fn:revrese.
 
 2005-08-16  Per Bothner  <per@bothner.com>

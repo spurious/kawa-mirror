@@ -16,6 +16,8 @@ java_sources = \
   NamedCollator.java \
   NodeUtils.java \
   NumberValue.java \
+  OrderedMap.java \
+  OrderedTuples.java \
   QNameUtils.java \
   Reduce.java \
   RelativeStep.java \

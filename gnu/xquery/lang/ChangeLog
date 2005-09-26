@@ -1,5 +1,14 @@
 2005-09-25  Per Bothner  <per@bothner.com>
 
+	* XQParser.java: Re-do FLWOR parsing to handle 'order by'.
+	(parseFLWRInner): New method.
+	(parseFLWRExpression): Use parseFLWRInner.
+
+	* XQParser.java (parseSortExpr): Remove obsolete method.
+	(parseExp): Call parseExprSingle instead of parseSortExpr.
+
+	* XQParser.java (parse): Move error for duplicate declare collation.
+
 	* XQuery.java (initXQuery): Define 'reverse' function.
 
 	* XQParser.java (parse): Fix 'declare variable' parse bug.

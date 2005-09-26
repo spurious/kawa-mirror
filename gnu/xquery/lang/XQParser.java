@@ -8,6 +8,7 @@ import gnu.lists.*;
 import gnu.text.*;
 import gnu.expr.*;
 import java.util.Vector;
+import java.util.Stack;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
 import gnu.bytecode.*;
@@ -55,12 +56,24 @@ public class XQParser extends Lexer
 
   NamedCollator defaultCollator = null;
 
+  /** The default order for empty sequences.
+   * Either <code>'L'</code> (for "least") or <code>'G'</code> (for "greatest").
+   */
+  char defaultEmptyOrder = 'L';
+
   String baseURI = null;
 
   boolean preserveBoundarySpace;
 
   public Namespace[] functionNamespacePath
     = XQuery.defaultFunctionNamespacePath;
+
+  /** Stack of currently active for/let Declarations. */
+  Declaration[] flworDecls;
+  /* Index in flworDecls of first Declaration in current FLWOR. */
+  int flworDeclsFirst;
+  /* Total number of currently active for/let Declarations. */
+  int flworDeclsCount;
 
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
@@ -1091,14 +1104,6 @@ public class XQParser extends Lexer
     return makeBinary(func, exp1, exp2);
   }
 
-  Expression parseSortExpr()
-      throws java.io.IOException, SyntaxException
-  {
-    Expression exp = parseBinaryExpr(priority(OP_OR));
-    // FIXME check for "sortby".
-    return exp;
-  }
-
   private void  parseSimpleKindType ()
     throws java.io.IOException, SyntaxException
   {
@@ -1298,7 +1303,7 @@ public class XQParser extends Lexer
   Expression parseExpr()
       throws java.io.IOException, SyntaxException
   {
-    return parseSortExpr();
+    return parseExprSingle();
   }
 
   final Expression parseExprSingle ()
@@ -2725,9 +2730,116 @@ public class XQParser extends Lexer
     return decl;
   }
 
-  /** Parse a let- or a for-expression.
-   * Assume the 'let'/'for'-token has been seen, and we've read '$'. */
   public Expression parseFLWRExpression (boolean isFor)
+      throws java.io.IOException, SyntaxException
+  {
+    int flworDeclsSave = flworDeclsFirst;
+    flworDeclsFirst = flworDeclsCount;
+    Expression exp = parseFLWRInner(isFor);
+
+    if (match ("order"))
+      {
+        getRawToken();
+        if (match ("by"))
+          getRawToken();
+        else
+          error("missing 'by' following 'order'");
+        Stack specs = new Stack();
+        for (;;)
+          {
+            boolean descending = false;
+            char emptyOrder = defaultEmptyOrder;
+
+            LambdaExp lexp = new LambdaExp(flworDeclsCount-flworDeclsFirst);
+            for (int i = flworDeclsFirst;  i < flworDeclsCount;  i++)
+              lexp.addDeclaration(flworDecls[i].getSymbol());
+            comp.push(lexp);
+            lexp.body = parseExprSingle();
+            comp.pop(lexp);
+            specs.push(lexp);
+
+            if (match("ascending"))
+              getRawToken();
+            else if (match("descending"))
+              {
+                getRawToken();
+                descending = true;
+              }
+            if (match("empty"))
+              {
+                getRawToken();
+                if (match("greatest"))
+                  {
+                    getRawToken();
+                    emptyOrder = 'G';
+                  }
+                else if (match("least"))
+                  {
+                    getRawToken();
+                    emptyOrder = 'L';
+                  }
+                else
+                  error
+                    ("'empty' sequence order must be 'greatest' or 'least'");
+              }
+            specs.push(new QuoteExp((descending ? "D" : "A") + emptyOrder));
+            Object collation = defaultCollator;
+            if (match("collation"))
+              {
+                Object uri = parseURILiteral();
+                if (uri instanceof String)
+                  {
+                    try
+                      {
+                        collation = NamedCollator.make((String) uri);
+                      }
+                    catch (Exception name)
+                      { // err:XQ0076
+                        error("unknown collation '"+uri+"'");
+                      }
+                  }
+                getRawToken();
+              }
+            specs.push(new QuoteExp(collation));
+            if (curToken != ',')
+              break;
+          }
+        if (! match("return"))
+          return syntaxError("expected 'return' clause");
+        getRawToken();
+
+        LambdaExp lexp = new LambdaExp(flworDeclsCount-flworDeclsFirst);
+        //lexp.setFile(getName());
+        //lexp.setLine(declLine, declColumn);
+        for (int i = flworDeclsFirst;  i < flworDeclsCount;  i++)
+          lexp.addDeclaration(flworDecls[i].getSymbol());
+        comp.push(lexp);
+	lexp.body = parseExprSingle();
+        comp.pop(lexp);
+        int nspecs = specs.size();
+        Expression[] args = new Expression[2 + nspecs];
+        args[0] = exp;
+        args[1] = lexp;
+        for (int i = 0;  i < nspecs;  i++)
+          args[2+i] = (Expression) specs.elementAt(i);
+	return new ApplyExp(makeFunctionExp("gnu.xquery.util.OrderedMap",
+					    "orderedMap"),
+			    args);
+
+      }
+    flworDeclsFirst = flworDeclsSave;
+    return exp;
+  }
+
+  /** Parse a let- or a for-expression.
+   * Assume the 'let'/'for'-token has been seen, and we've read '$'.
+   *
+   * If we see the 'order' keyword of an 'order by' clause then we top
+   * parsing, and return a result as if we instead saw a
+   * 'return make-tuple($x, ...)'.  The 'order by' clause will get
+   * parser by the outer-mot 'for' or 'let'.
+   */
+  public Expression parseFLWRInner (boolean isFor)
       throws java.io.IOException, SyntaxException
   {
     char saveNesting = pushNesting(isFor ? 'f' : 'l');
@@ -2735,6 +2847,15 @@ public class XQParser extends Lexer
     Declaration decl = parseVariableDeclaration();
     if (decl == null)
       return syntaxError("missing Variable - saw "+tokenString());
+    if (flworDecls == null)
+      flworDecls = new Declaration[8];
+    else if (flworDeclsCount >= flworDecls.length)
+      {
+        Declaration[] tmp = new Declaration[flworDeclsCount];
+        System.arraycopy(flworDecls, 0, tmp, 0, flworDeclsCount);
+        flworDecls = tmp;
+      }
+    flworDecls[flworDeclsCount++] = decl;
     getRawToken();
 
     Expression type = parseOptionalTypeDeclaration();
@@ -2802,21 +2923,21 @@ public class XQParser extends Lexer
 	getRawToken();
 	if (curToken != '$')
 	  return syntaxError("missing $NAME after ','");
-	body = parseFLWRExpression(isFor);
+	body = parseFLWRInner(isFor);
       }
     else if (match("for"))
       {
 	getRawToken();
 	if (curToken != '$')
 	  return syntaxError("missing $NAME after 'for'");
-	body = parseFLWRExpression(true);
+	body = parseFLWRInner(true);
       }
     else if (match("let"))
       {
 	getRawToken();
 	if (curToken != '$')
 	  return syntaxError("missing $NAME after 'let'");
-	body = parseFLWRExpression(false);
+	body = parseFLWRInner(false);
       }
     else
       {
@@ -2837,21 +2958,30 @@ public class XQParser extends Lexer
 	boolean sawStable = match("stable");
 	if (sawStable)
 	  getRawToken();
-	if (match ("order"))
-	  return syntaxError("'order by' clause not implemented yet");
 	boolean sawReturn = match("return");
-	if (! sawReturn && ! match("let") && ! match("for"))
+	boolean sawOrder = match("order");
+	if (! sawReturn && ! sawOrder && ! match("let") && ! match("for"))
 	  return syntaxError("missing 'return' clause");
-	peekNonSpace("unexpected eof-of-file after 'return'");
+        if (! sawOrder)
+          peekNonSpace("unexpected eof-of-file after 'return'");
 	int bodyLine = getLineNumber() + 1;
 	int bodyColumn = getColumnNumber() + 1;
 	if (sawReturn)
 	  getRawToken();
-	body = parseExprSingle();
+        if (sawOrder)
+          {
+            int ndecls = flworDeclsCount - flworDeclsFirst;
+            Expression[] args = new Expression[ndecls];
+            for (int i = 0;  i < ndecls;  i++)
+              args[i] = new ReferenceExp(flworDecls[flworDeclsFirst+i]);
+            body = new ApplyExp(ClassType.make("gnu.xquery.util.OrderedMap")
+                                .getDeclaredMethod("makeTuple$V", 1),
+                                args);
+          }
+        else
+          body = parseExprSingle();
 	if (cond != null)
-	  {
-	    body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
-	  }
+          body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
 	body.setFile(getName());
 	body.setLine(bodyLine, bodyColumn);
       }
@@ -3218,8 +3348,6 @@ public class XQParser extends Lexer
         Object val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;
-	if (defaultCollator != null && ! interactive) // err:XQ0038
-	    return declError("duplicate default collation declaration");
 	String collation = (String) val;
 	try
 	  {
@@ -3230,6 +3358,8 @@ public class XQParser extends Lexer
 	    defaultCollator = NamedCollator.codepointCollation;
 	    return declError("unknown collation '"+collation+"'");
 	  }
+	if (defaultCollator != null && ! interactive) // err:XQ0038
+          return declError("duplicate default collation declaration");
 	parseSeparator();
 	return QuoteExp.voidExp;
       }

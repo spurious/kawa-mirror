@@ -2803,6 +2803,7 @@ public class XQParser extends Lexer
             specs.push(new QuoteExp(collation));
             if (curToken != ',')
               break;
+            getRawToken();
           }
         if (! match("return"))
           return syntaxError("expected 'return' clause");

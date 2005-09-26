@@ -116,6 +116,69 @@
 </test>
 
 <test>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q4</ident>
+<description>For each author in the bibliography, list the author's name and
+the titles of all books by that author, grouped inside a "result" element.
+</description>
+<query>
+<results>
+  {
+    let $a := doc("bib.xml")//author
+    for $last in distinct-values($a/last),
+        $first in distinct-values($a[last=$last]/first)
+    order by $last, $first
+    return
+        <result>
+            <author>
+               <last>{ $last }</last>
+               <first>{ $first }</first>
+            </author>
+            {
+                for $b in doc("bib.xml")/bib/book
+                where some $ba in $b/author 
+                      satisfies ($ba/last = $last and $ba/first=$first)
+                return $b/title
+            }
+        </result>
+  }
+</results> 
+</query>
+<expect>
+<results>
+    <result>
+        <author>
+            <last>Abiteboul</last>
+            <first>Serge</first>
+        </author>
+        <title>Data on the Web</title>
+    </result>
+    <result>
+        <author>
+            <last>Buneman</last>
+            <first>Peter</first>
+        </author>
+        <title>Data on the Web</title>
+    </result>
+    <result>
+        <author>
+            <last>Stevens</last>
+            <first>W.</first>
+        </author>
+        <title>TCP/IP Illustrated</title>
+        <title>Advanced Programming in the Unix environment</title>
+    </result>
+    <result>
+        <author>
+            <last>Suciu</last>
+            <first>Dan</first>
+        </author>
+        <title>Data on the Web</title>
+    </result>
+</results>
+</expect>
+</test>
+
+<test>
 <ident>Use Case "XMP" (Experiences and Exemplars) Q5</ident>
 <description>For each book found at both bn.com and amazon.com, list
 the title of the book and its price from each source.</description>
@@ -820,6 +883,42 @@ declare function local:between($seq as node()*, $start as node(), $end as node()
 </expect>
 </test>
 
+<!-- Despends of current-date().
+<test>
+<ident>Use Case "R" Q1 </ident>
+<description>List the item number and description of all bicycles that
+currently have an auction in progress, ordered by item number.</description>
+<query>
+<result>
+  {
+    for $i in doc("items.xml")//item_tuple
+    where $i/start_date <= current-date()
+      and $i/end_date >= current-date() 
+      and contains($i/description, "Bicycle")
+    order by $i/itemno
+    return
+        <item_tuple>
+            { $i/itemno }
+            { $i/description }
+        </item_tuple>
+  }
+</result>
+</query>
+<result>
+<result>
+    <item_tuple>
+        <itemno>1003</itemno>
+        <description>Old Bicycle</description>
+    </item_tuple>
+    <item_tuple>
+        <itemno>1007</itemno>
+        <description>Racing Bicycle</description>
+    </item_tuple>
+</result>
+</result>
+</test>
+-->
+
 <test>
 <ident>Use Case "R" Q2 </ident>
 <description>
@@ -935,6 +1034,54 @@ have no bids.</description>
         <description>Broken Bicycle</description>
     </no_bid_item>
   </result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q5</ident>
+<description>For bicycle(s) offered by Tom Jones that have received a bid,
+list the item number, description, highest bid, and name of the highest bidder,
+ordered by item number.</description>
+<query>
+<result>
+  {
+    for $seller in doc("users.xml")//user_tuple,
+        $buyer in  doc("users.xml")//user_tuple,
+        $item in  doc("items.xml")//item_tuple,
+        $highbid in  doc("bids.xml")//bid_tuple
+    where $seller/name = "Tom Jones"
+      and $seller/userid  = $item/offered_by
+      and contains($item/description , "Bicycle")
+      and $item/itemno  = $highbid/itemno
+      and $highbid/userid  = $buyer/userid
+      and $highbid/bid = max(
+                              doc("bids.xml")//bid_tuple
+                                [itemno = $item/itemno]/bid
+                         )
+    order by ($item/itemno)
+    return
+        <jones_bike>
+            { $item/itemno }
+            { $item/description }
+            <high_bid>{ $highbid/bid }</high_bid>
+            <high_bidder>{ $buyer/name }</high_bidder>
+        </jones_bike>
+  }
+</result> 
+</query>
+<expect>
+<result>
+    <jones_bike>
+        <itemno>1001</itemno>
+        <description>Red Bicycle</description>
+        <high_bid>
+            <bid>55</bid>
+        </high_bid>
+        <high_bidder>
+            <name>Mary Doe</name>
+        </high_bidder>
+    </jones_bike>
+</result>
 </expect>
 </test>
 
@@ -1108,6 +1255,238 @@ declare function local:bid_summary()
         <description>Motorcycle</description>
         <bid_count>5</bid_count>
     </popular_item>
+</result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q13</ident>
+<description>For each user who has placed a bid, give the userid, name,
+number of bids, and average bid, in order by userid.</description>
+<NOTE>Added ".0" to the expected avgbid results.</NOTE>
+<query>
+<result>
+ {
+    for $uid in distinct-values(doc("bids.xml")//userid),
+        $u in doc("users.xml")//user_tuple[userid = $uid]
+    let $b := doc("bids.xml")//bid_tuple[userid = $uid]
+    order by $u/userid
+    return
+        <bidder>
+            { $u/userid }
+            { $u/name }
+            <bidcount>{ count($b) }</bidcount>
+            <avgbid>{ avg($b/bid) }</avgbid>
+        </bidder>
+  }
+</result> 
+</query>
+<expect>
+<result>
+    <bidder>
+        <userid>U01</userid>
+        <name>Tom Jones</name>
+        <bidcount>2</bidcount>
+        <avgbid>220.0</avgbid>
+    </bidder>
+    <bidder>
+        <userid>U02</userid>
+        <name>Mary Doe</name>
+        <bidcount>5</bidcount>
+        <avgbid>387.0</avgbid>
+    </bidder>
+    <bidder>
+        <userid>U03</userid>
+        <name>Dee Linquent</name>
+        <bidcount>2</bidcount>
+        <avgbid>487.5</avgbid>
+    </bidder>
+    <bidder>
+        <userid>U04</userid>
+        <name>Roger Smith</name>
+        <bidcount>5</bidcount>
+        <avgbid>266.0</avgbid>
+    </bidder>
+    <bidder>
+        <userid>U05</userid>
+        <name>Jack Sprat</name>
+        <bidcount>2</bidcount>
+        <avgbid>110.0</avgbid>
+    </bidder>
+</result> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q14</ident>
+<description>
+List item numbers and average bids for items that have received three or
+more bids, in descending order by average bid.</description>
+<NOTE>Added ".0" to the expected avgbid results.</NOTE>
+<NOTE>re-ordered expected output.</NOTE>
+<query>
+<result>
+ {
+    for $i in distinct-values(doc("bids.xml")//itemno)
+    let $b := doc("bids.xml")//bid_tuple[itemno = $i]
+    let $avgbid := avg($b/bid)
+    where count($b) >= 3
+    order by $avgbid descending
+    return
+        <popular_item>
+            <itemno>{ $i }</itemno>
+            <avgbid>{ $avgbid }</avgbid>
+        </popular_item>
+  }
+</result> 
+</query>
+<expect>
+<result>
+    <popular_item>
+        <itemno>1002</itemno>
+        <avgbid>800.0</avgbid>
+    </popular_item>
+    <popular_item>
+        <itemno>1001</itemno>
+        <avgbid>45.0</avgbid>
+    </popular_item>
+    <popular_item>
+        <itemno>1007</itemno>
+        <avgbid>200.0</avgbid>
+    </popular_item>
+</result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q15</ident>
+<description>List names of users who have placed multiple bids of at
+least $100 each.</description>
+<query>
+<result>
+  {
+    for $u in doc("users.xml")//user_tuple
+    let $b := doc("bids.xml")//bid_tuple[userid=$u/userid and bid>=100]
+    where count($b) &gt; 1
+    return
+        <big_spender>{ $u/name/text() }</big_spender>
+  }
+</result>
+</query>
+<expect>
+<result>
+    <big_spender>Mary Doe</big_spender>
+    <big_spender>Dee Linquent</big_spender>
+    <big_spender>Roger Smith</big_spender>
+</result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q16</ident>
+<description>List all registered users in order by userid; for each user,
+include the userid, name, and an indication of whether the user is active (has
+at least one bid on record) or inactive (has no bid on record).</description>
+<query>
+<result>
+  {
+    for $u in doc("users.xml")//user_tuple
+    let $b := doc("bids.xml")//bid_tuple[userid=$u/userid and bid>=100]
+    where count($b) > 1
+    return
+        <big_spender>{ $u/name/text() }</big_spender>
+  }
+</result>
+</query>
+<expect>
+<result>
+    <big_spender>Mary Doe</big_spender>
+    <big_spender>Dee Linquent</big_spender>
+    <big_spender>Roger Smith</big_spender>
+</result>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q17</ident>
+<description>List the names of users, if any, who have bid on every item.
+</description>
+<query>
+<frequent_bidder>
+  {
+    for $u in doc("users.xml")//user_tuple
+    where 
+      every $item in doc("items.xml")//item_tuple satisfies 
+        some $b in doc("bids.xml")//bid_tuple satisfies 
+          ($item/itemno = $b/itemno and $u/userid = $b/userid)
+    return
+        $u/name
+  }
+</frequent_bidder>
+</query>
+<expect>
+<frequent_bidder /> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q18</ident>
+<description>List all users in alphabetic order by name. For each user,
+include descriptions of all the items (if any) that were bid on by that user,
+in alphabetic order.</description>
+<query>
+<result>
+  {
+    for $u in doc("users.xml")//user_tuple
+    order by $u/name
+    return
+        <user>
+            { $u/name }
+            {
+                for $b in distinct-values(doc("bids.xml")//bid_tuple
+                                             [userid = $u/userid]/itemno)
+                for $i in doc("items.xml")//item_tuple[itemno = $b]
+                let $descr := $i/description/text()
+                order by $descr
+                return
+                    <bid_on_item>{ $descr }</bid_on_item>
+            }
+        </user>
+  }
+</result>
+</query>
+<expect>
+<result>
+    <user>
+        <name>Dee Linquent</name>
+        <bid_on_item>Motorcycle</bid_on_item>
+        <bid_on_item>Racing Bicycle</bid_on_item>
+    </user>
+    <user>
+        <name>Jack Sprat</name>
+        <bid_on_item>Old Bicycle</bid_on_item>
+        <bid_on_item>Racing Bicycle</bid_on_item>
+    </user>
+    <user>
+        <name>Mary Doe</name>
+        <bid_on_item>Motorcycle</bid_on_item>
+        <bid_on_item>Red Bicycle</bid_on_item>
+    </user>
+    <user>
+        <name>Rip Van Winkle</name>
+    </user>
+    <user>
+        <name>Roger Smith</name>
+        <bid_on_item>Motorcycle</bid_on_item>
+        <bid_on_item>Old Bicycle</bid_on_item>
+        <bid_on_item>Racing Bicycle</bid_on_item>
+        <bid_on_item>Red Bicycle</bid_on_item>
+    </user>
+    <user>
+        <name>Tom Jones</name>
+        <bid_on_item>Motorcycle</bid_on_item>
+        <bid_on_item>Tricycle</bid_on_item>
+    </user>
 </result>
 </expect>
 </test>

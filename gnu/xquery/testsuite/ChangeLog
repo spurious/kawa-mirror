@@ -1,3 +1,7 @@
+2005-09-26  Per Bothner  <per@bothner.com>
+
+	* use-cases.xql: Add 9 more use-cases.
+
 2005-09-25  Per Bothner  <per@bothner.com>
 
 	* use-cases.xql: Add two use-cases for 'order by'.

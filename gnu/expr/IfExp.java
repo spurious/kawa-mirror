@@ -108,16 +108,20 @@ public class IfExp extends Expression
     if (! trueInherited /* && trueLabel.hasFixups()*/)
       {
 	trueLabel.define(code);
+        Variable callContextSave = comp.callContextVar;
 	then_clause.compileWithPosition(comp, target);
+        comp.callContextVar = callContextSave;
       }
     if (! falseInherited /* && falseLabel.hasFixups()*/)
       {
 	code.emitElse();
 	falseLabel.define(code);
+        Variable callContextSave = comp.callContextVar;
 	if (else_clause == null)
 	  comp.compileConstant(Values.empty, target);
 	else
 	  else_clause.compileWithPosition(comp, target);
+        comp.callContextVar = callContextSave;
       }
     else
       code.setUnreachable();

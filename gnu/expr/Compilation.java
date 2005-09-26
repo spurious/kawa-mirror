@@ -1092,6 +1092,8 @@ public class Compilation
   public final void generateConstructor (ClassType clas, LambdaExp lexp)
   {
     Method save_method = method;
+    Variable callContextSave = callContextVar;
+    callContextVar = null;
     ClassType save_class = curClass;
     curClass = clas;
     Method constructor_method = getConstructor(clas, lexp);
@@ -1144,6 +1146,7 @@ public class Compilation
     code.emitReturn();
     method = save_method;
     curClass = save_class;
+    callContextVar = callContextSave;
   }
 
   /** In an <init> for a generated ClassExp, emit $finit$ calls.
@@ -2058,20 +2061,23 @@ public class Compilation
     return field;
   }
 
+  /** If non-null, contains the value of the current CallContext. */
+  Variable callContextVar;
+
   /** Generate code to push the current CallContext on the JVM stack. */
   public final void loadCallContext()
   {
     CodeAttr code = getCode();
-    if (curLambda.getCallConvention() >= CALL_WITH_CONSUMER)
+    if (callContextVar == null)
       {
-	Variable var = curLambda.getVarScope().lookup("$ctx");
-	if (var != null && var.getType() == typeCallContext)
-	  {
-	    code.emitLoad(var);
-	    return;
-	  }
+        code.emitInvokeStatic(getCallContextInstanceMethod);
+        code.emitDup();
+        callContextVar = new Variable("$ctx", typeCallContext);
+        curLambda.getVarScope().addVariable(code, callContextVar);
+        code.emitStore(callContextVar);
       }
-    code.emitInvokeStatic(getCallContextInstanceMethod);
+    else
+      code.emitLoad(callContextVar);
   }
 
   public void freeLocalField (Field field)

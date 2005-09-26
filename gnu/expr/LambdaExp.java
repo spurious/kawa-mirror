@@ -1181,9 +1181,13 @@ public class LambdaExp extends ScopeExp
     int plainArgs = -1;
     int defaultStart = 0;
     Method mainMethod = getMainMethod();
+    Variable callContextSave = comp.callContextVar;
 
     for (Declaration param = firstDecl();  param != null; param = param.nextDecl())
       {
+        comp.callContextVar
+          = (getCallConvention() < Compilation.CALL_WITH_CONSUMER ? null
+             : getVarScope().lookup("$ctx"));
 	if (param == firstArgsArrayArg && argsArray != null)
 	  {
 	    if (primMethods != null)
@@ -1306,6 +1310,7 @@ public class LambdaExp extends ScopeExp
 	  }
 	i++;
       }
+    comp.callContextVar = callContextSave;
   }
 
   void compileChildMethods (Compilation comp)
@@ -1359,6 +1364,7 @@ public class LambdaExp extends ScopeExp
 	    int thisArg = isStatic ? 0 : 1;
 	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    Declaration decl;
+            Variable callContextSave = comp.callContextVar;
 	    Variable var = code.getArg(0);
 	    if (! isStatic)
 	      {
@@ -1375,6 +1381,7 @@ public class LambdaExp extends ScopeExp
 		code.emitLoad(var);
 		var = var.nextVar();
 	      }
+	    comp.callContextVar = ctxArg ? var : null;
 	    for (int j = i; j < toCall;  j++, decl = decl.nextDecl())
 	      {
 		Target paramTarget = StackTarget.getInstance(decl.getType());
@@ -1400,6 +1407,7 @@ public class LambdaExp extends ScopeExp
 	      code.emitInvokeVirtual(primMethods[toCall]);
 	    code.emitReturn();
 	    closureEnv = null;
+            comp.callContextVar = callContextSave;
 	  }
 	else
 	  {
@@ -1431,12 +1439,20 @@ public class LambdaExp extends ScopeExp
   public void compileBody (Compilation comp)
   {
     Target target;
+    Variable callContextSave = comp.callContextVar;
+    comp.callContextVar = null;
     if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
-      target = ConsumerTarget.makeContextTarget(comp);
+      {
+	Variable var = getVarScope().lookup("$ctx");
+	if (var != null && var.getType() == Compilation.typeCallContext)
+          comp.callContextVar = var;
+        target = ConsumerTarget.makeContextTarget(comp);
+      }
     else
       target = Target.pushValue(getReturnType());
     body.compileWithPosition(comp, target,
 			     body.getLine() > 0 ? body : this);
+    comp.callContextVar = callContextSave;
   }
 
   /** A cache if this has already been evaluated. */

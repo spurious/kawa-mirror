@@ -1,3 +1,8 @@
+2005-09-25  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (interaction-window): Add parameter type declaration
+	to avoid ambiguity warning.
+
 2005-07-28  Per Bothner  <per@bothner.com>
 
 	* BufferLocal.java: Extend IndirectableLocation, not NamedLocation.

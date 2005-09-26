@@ -580,7 +580,7 @@
 (define (elisp-interaction-window)
   (interaction-window 'elisp "Lisp interaction"))
 
-(define (interaction-window lang-name buffer-name)
+(define (interaction-window (lang-name :: <java.lang.String>) buffer-name)
   (let ((buffer (get-buffer-create buffer-name)))
     (invoke-static <gnu.jemacs.buffer.ReplMode> 'make buffer lang-name)
     (use-local-map (static-field <process> 'modeMap) buffer)

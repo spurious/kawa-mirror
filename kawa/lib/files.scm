@@ -77,7 +77,7 @@
 	  fname))))
 
 ;;; The definition of include is based on that in the portable implementation
-;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.
+;;; of syntax-case psyntax.ss, which is again based on Chez Scheme.
 ;;; Copyright (c) 1992-2002 Cadence Research Systems
 ;;; Permission to copy this software, in whole or in part, to use this
 ;;; software for any lawful purpose, and to redistribute this software

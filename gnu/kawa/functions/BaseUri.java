@@ -84,7 +84,7 @@ public class BaseUri extends Procedure0or1
 	    || (fileSep != '/'
 		&& (uri.charAt(0) == fileSep || uri.charAt(1) == ':'))))
       {
-	// Uri is an abolste file name, but doesn't have a uri scheme.
+	// Uri is an absolute file name, but doesn't have a uri scheme.
 	int baseLen = base.length();
 	int pathStart = BaseUri.uriSchemeLength(base);
 	if (pathStart <= 1)

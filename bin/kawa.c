@@ -69,7 +69,7 @@
 #endif
 #endif
 
-extern char * get_classpath();
+extern char * get_classpath(const char *);
 
 #ifndef JAVA
 #define JAVA "java"
@@ -428,6 +428,11 @@ static int buf_count = 0;
 
 int num_keys = 0;
 
+/* True if readine input should be boldface.
+   Default off because it isn't quite robust - sometimes
+   the prompt becomes bold when it shouldn't. */   
+int bold_input = 0;
+
 static void
 null_prep_terminal (int meta)
 {
@@ -436,6 +441,22 @@ null_prep_terminal (int meta)
 static void
 null_deprep_terminal ()
 {
+  if (bold_input)
+    {
+      fprintf (rl_outstream, "\033[0m");
+      fflush (rl_outstream);
+    }
+}
+
+static int
+pre_input_change_mode ()
+{
+  if (bold_input)
+    {
+      fprintf (rl_outstream, "\033[1m");
+      fflush (rl_outstream);
+    }
+  return 0;
 }
 
 static void
@@ -495,7 +516,7 @@ main(int argc, char** argv)
 #endif
 
 #ifndef GCJ_COMPILED
-  putenv (get_classpath());
+  putenv (get_classpath(argv[0]));
 #endif
 
   if (! use_telnet)
@@ -630,10 +651,10 @@ main(int argc, char** argv)
 	    malloc (sizeof(command_args) + (5 + argc) * sizeof(char*));
 	  int out_argc = 0;
 	  char port_buf[12];
-	  int namelen;
+	  socklen_t namelen;
 	  int conn;
 #ifdef GCJ_COMPILED
-	  char* rp = rindex(argv[0], '/');
+	  char* rp = strrchr(argv[0], '/');
 	  if (rp != NULL)
 	    {
 	      int dirlen = rp - argv[0];
@@ -745,6 +766,7 @@ main(int argc, char** argv)
     {
       rl_prep_term_function = null_prep_terminal;
       rl_deprep_term_function = null_deprep_terminal;
+      rl_pre_input_hook = pre_input_change_mode;
     }
 
   in_from_tty_fd = STDIN_FILENO;

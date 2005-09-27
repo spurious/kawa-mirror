@@ -1,18 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifndef GCJ_COMPILED
-char *kawalib = KAWALIB;
+const char *kawalib = KAWALIB;
+const char *kawajar = KAWAJAR;
 
 char *
-get_classpath()
+get_classpath(const char *progname)
 {
-  char *path, *classpath;
+  char *classpath;
   int i;
-  path = getenv("KAWALIB");
+  const char *path = getenv("KAWALIB");
   if (path == NULL)
-    path = kawalib;
+    {
+      path = kawalib;
+      const char *rp = progname == NULL ? NULL : strrchr(progname, '/');
+      if (rp != NULL)
+	{
+	  /* If kawa is executed "in place" as $builddir/bin/kawa
+	     (i.e. not the installed $bindir/kawa), then the kawajar
+	     is $buildir/kawa-$version.jar.  Since it's nice to be able to
+	     execute in place, look for it there first.  If we're executing
+	     an installed kawa then the jar won't be there. */
+	  char *buf = malloc (strlen(progname) + strlen(kawajar) + 5);
+	  if (buf != NULL)
+	    {
+	      sprintf(buf, "%.*s/../%s", rp - progname, progname, kawajar);
+	      if (access (buf, R_OK) == 0)
+		path = buf;
+	    }
+	}
+    }
   i = strlen (path);
   if (i > 4
       && (strcmp (path+i-4, ".zip") == 0

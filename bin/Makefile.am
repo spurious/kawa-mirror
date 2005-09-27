@@ -26,7 +26,7 @@ READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 WITH_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
-WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
+WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"' -DKAWAJAR='"kawa-$(VERSION).jar"'
 DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)

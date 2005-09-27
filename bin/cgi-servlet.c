@@ -5,7 +5,7 @@
 #include <string.h>
 
 extern char **environ;
-extern char* get_classpath();
+extern char* get_classpath(const char *);
 char *progname;
 
 #ifndef JAVA
@@ -50,7 +50,7 @@ main(int argc, char** argv)
 	  putenv(p);
 	}
     }
-  putenv (get_classpath());
+  putenv (get_classpath(argv[0]));
 #endif
 
   for (envp = environ; *envp != NULL; envp++)

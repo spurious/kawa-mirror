@@ -1,3 +1,16 @@
+2005-09-26  Per Bothner  <per@bothner.com>
+
+	* kawapath.c (kawajar): New global, initialized from KAWAJAR macro.
+	(get_classpath): Take progname argument.  Use that to search for
+	../kawa-$version.jar when executing in-place.
+	* Makefile.am (WITHOUT_GCJ_DEFS): Define KAWAJAR cpp macro.
+	* cgi-servlet.c (main): Pass argv[0] to get_classpath.
+	* kawa.c (main): Likewise.
+
+	* kawa.c (main): Update rindex -> strrchr.
+
+	* kawa.c: Add a currently-unused hook to bold-face readline input.
+
 2005-04-17  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Fix/improve various GCJ-related issues.

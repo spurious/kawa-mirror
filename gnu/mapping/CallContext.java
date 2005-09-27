@@ -352,15 +352,19 @@ public class CallContext // implements Runnable
     String uri = baseUriDefault;
     if (uri == null)
       {
-	uri = System.getProperty("user.dir");	
-	if (uri == null)
-	  return null;
-	char sep = java.io.File.separatorChar;
-	// Should also encode illegal characters using '%'.  FIXME.
-	if (sep != '/')
-	  uri = uri.replace(sep, '/');
-	uri = ((uri.charAt(0) == '/' ? "file://" : "file:///")
-		   + uri + '/');
+        /* #ifdef use:java.net.URI */
+        uri = new java.io.File("").toURI().toString();
+        /* #else */
+	// uri = System.getProperty("user.dir");	
+	// if (uri == null)
+        //   return null;
+	// char sep = java.io.File.separatorChar;
+        // /* Note this does not encode illegal characters using '%'. */
+	// if (sep != '/')
+	//   uri = uri.replace(sep, '/');
+	// uri = ((uri.charAt(0) == '/' ? "file:" : "file:/")
+	// 	   + uri + '/');
+        /* #endif */
 	baseUriDefault = uri;
       }
     return uri;

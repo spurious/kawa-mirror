@@ -1,5 +1,8 @@
 2005-09-27  Per Bothner  <per@bothner.com>
 
+	* CallContext.java (getBaseUriDefault): Use File.toURI().toString(),
+	if use:java.net.URI is set - i.e. for JDK 1.4 or higher.
+
 	* Future.java (waitForResult): Specify throws Throwable
 	so we don't have to wrap an exception.
 

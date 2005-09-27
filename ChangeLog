@@ -1,5 +1,8 @@
 2005-09-27  Per Bothner  <per@bothner.com>
 
+	* Makefile.am:  Define new PreProcess flag: use:java.net.URI.
+	* build.xml: Likewise.
+
 	* kawa/standard/load.java (apply): If relative, resolve against
 	base uri here only, and not in loadSource.
 	(loadSource): Make private.  Remove 'relative' parameter.

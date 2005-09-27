@@ -102,21 +102,14 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static void loadSource (String name, Environment env,
-				       boolean relative)
+  private static void loadSource (String name, Environment env)
     throws SyntaxException
   {
     try
       {
 	InPort fstream;
-	boolean nameAbsolute = BaseUri.hasScheme(name);
-	if (nameAbsolute || relative)
+	if (BaseUri.hasScheme(name))
 	  {
-	    if (! nameAbsolute)
-	      {
-		String base = CallContext.getInstance().getBaseUri();
-		name = BaseUri.resolve(name, base);
-	      }
 	    URL url = new URL(name);
 	    InputStream in = url.openConnection().getInputStream();
 	    fstream = InPort.openFile(new BufferedInputStream(in), name);
@@ -214,9 +207,14 @@ public class load extends Procedure1 {
     String savedBaseUri = ctx.getBaseUri();
     try
       {
-	String base = BaseUri.hasScheme(name) ? name
-	  : BaseUri.resolve(name, savedBaseUri);
-	ctx.setBaseUri(base);
+        // Resolve a relative URI.  However, if the base uri matches the
+        // default base uri (i.e. the current directory) just leave it as
+        // a filename, rather than coercing it to a URI.
+        if (! BaseUri.hasScheme(name)
+            && relative
+            && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
+          name = BaseUri.resolve(name, savedBaseUri);
+	ctx.setBaseUri(name);
 	if (name.endsWith (".zip") || name.endsWith(".jar"))
 	  {
 	    loadCompiled (name, env);
@@ -224,7 +222,7 @@ public class load extends Procedure1 {
 	  }
 	if (name.endsWith (".scm"))
 	  {
-	    loadSource (name, env, relative);
+	    loadSource (name, env);
 	    return;
 	  }
 	char file_separator = System.getProperty ("file.separator").charAt(0);
@@ -300,7 +298,7 @@ public class load extends Procedure1 {
 	    file = new File (xname);
 	    if (file.exists ())
 	      {
-		loadSource (xname, env, relative);
+		loadSource (xname, env);
 		return;
 	      }
 	  }

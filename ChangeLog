@@ -1,3 +1,12 @@
+2005-09-27  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (apply): If relative, resolve against
+	base uri here only, and not in loadSource.
+	(loadSource): Make private.  Remove 'relative' parameter.
+	Don't do any uri-resolving - assume caller has done that.
+	If the result is still relative, assume it's a elative file name.
+	Fixes Savannah bug #14397: load-relative doesn't work.
+
 2005-09-26  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.8.

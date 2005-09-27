@@ -188,15 +188,13 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you time and trouble of
 compiling the sources.
 
-The binary release depends on certain "Java 2" features, such as
-collections.  If you have an older Java implementation (including
+The binary release depends on certain "Java 2" features
+correspondiong to JDK 1.4. If you have an older Java implementation (including
 JDK 1.1.x) you will need to get the source distribution.
 
 The binary release comes as a @code{.jar} archive
 @samp{kawa-@value{VERSION}.jar}.
-
-You can unzip the archive, or you can use it as is.
-Assuming the latter, copy the archive to some suitable location,
+Copy this archive to some suitable location,
 such as @code{/usr/local/lib/kawa.jar}.
 
 Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
@@ -2662,9 +2660,6 @@ The interface is similar to the standard @code{delay}/@code{force},
 where a thread is basically the same as a promise, except that
 evaluation may be in parallel.
 
-So far, only modest effort has been made into making Kawa
-thread-safe.
-
 @deffn Syntax future expression
 Creates a new thread that evaluates @var{expression}.
 @end deffn
@@ -2673,6 +2668,13 @@ Creates a new thread that evaluates @var{expression}.
 The standard @code{force} function has generalized to also work
 on threads.  If waits for the thread's @var{expression} to finish
 executing, and returns the result.
+@end defun
+
+@defun runnable function
+Creates a new @code{Runnable} instance from a function.
+Useful for passing the Java code that expects a @code{Runnable}.
+You can get the result (a value or a thrown exception) using the
+@code{getResult} method.
 @end defun
 
 @defun sleep time

@@ -1,11 +1,12 @@
 if WITH_GCJ
-bin_SCRIPTS = gckawa
+bin_SCRIPTS = gckawa qexo
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS = kawa-bin kawa
 else
 KAWAPROGS = kawa-bin
 endif
 else
+bin_SCRIPTS = qexo
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS = kawa
 endif
@@ -18,7 +19,7 @@ noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
-CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+CLEANFILES = kawa.sh qexo kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 LIBTOOL = $(top_builddir)/libtool
 
 READLINE_INCLUDE_PATH =
@@ -80,6 +81,28 @@ gckawa:
 	echo 'exec gcj "$$@" -L$(libdir) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
+
+qexo:
+	echo '#!/bin/sh' >tmp
+	echo 'case $$0 in' >>tmp
+	echo '  */qexo)' >>tmp
+	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
+	echo '    if test -x $$kawa; then true' >>tmp
+if ENABLE_KAWA_FRONTEND
+else
+	echo '    elif test -x $$kawa.sh; then' >>tmp
+	echo '      kawa=$$kawa.sh' >>tmp
+endif
+	echo '    else' >>tmp
+	echo '      kawa="kawa"' >>tmp
+	echo '    fi' >>tmp
+	echo '  ;;' >>tmp
+	echo '  *)' >>tmp
+	echo '    kawa="kawa";' >>tmp
+	echo 'esac' >>tmp
+	echo 'exec $$kawa --xquery "$$@"' >>tmp
+	chmod +x tmp
+	mv tmp qexo
 
 KAWA1_OFILES = \
   gnu-bytecode.lo \
@@ -154,6 +177,7 @@ if ENABLE_KAWA_FRONTEND
 else
 	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
 endif
+	$(INSTALL_SCRIPT) qexo $(DESTDIR)$(bindir)/qexo
 if WITH_GCJ
 	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
 endif
@@ -161,4 +185,4 @@ endif
 uninstall-local: uninstall-exec-bindir
 
 uninstall-exec-bindir:
-	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa
+	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa $(DESTDIR)$(bindir)/qexo

@@ -1,5 +1,7 @@
 2005-09-26  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (qexo): New rule, creates qexo wrapper script.
+
 	* kawapath.c (kawajar): New global, initialized from KAWAJAR macro.
 	(get_classpath): Take progname argument.  Use that to search for
 	../kawa-$version.jar when executing in-place.

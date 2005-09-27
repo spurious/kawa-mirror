@@ -265,7 +265,8 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa
+@WITH_GCJ_FALSE@bin_SCRIPTS = qexo
+@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa qexo
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin
 @ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@KAWAPROGS = kawa
 @ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin kawa
@@ -273,7 +274,7 @@ noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES = 
-CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+CLEANFILES = kawa.sh qexo kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 READLINE_INCLUDE_PATH = 
 READLINE_LIB_PATH = 
 kawa_EXTRA_LIBS = -lncurses  # For Linux
@@ -701,6 +702,25 @@ gckawa:
 	chmod +x tmp
 	mv tmp gckawa
 
+qexo:
+	echo '#!/bin/sh' >tmp
+	echo 'case $$0 in' >>tmp
+	echo '  */qexo)' >>tmp
+	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
+	echo '    if test -x $$kawa; then true' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	echo '    elif test -x $$kawa.sh; then' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	echo '      kawa=$$kawa.sh' >>tmp
+	echo '    else' >>tmp
+	echo '      kawa="kawa"' >>tmp
+	echo '    fi' >>tmp
+	echo '  ;;' >>tmp
+	echo '  *)' >>tmp
+	echo '    kawa="kawa";' >>tmp
+	echo 'esac' >>tmp
+	echo 'exec $$kawa --xquery "$$@"' >>tmp
+	chmod +x tmp
+	mv tmp qexo
+
 gnu-commonlisp-lang.lo:
 	cd ../gnu/commonlisp/lang && $(MAKE)
 kawa-lang.lo:
@@ -726,12 +746,13 @@ install-exec-local: install-exec-bindir
 install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
 @ENABLE_KAWA_FRONTEND_FALSE@	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
+	$(INSTALL_SCRIPT) qexo $(DESTDIR)$(bindir)/qexo
 @WITH_GCJ_TRUE@	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
 
 uninstall-local: uninstall-exec-bindir
 
 uninstall-exec-bindir:
-	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa
+	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa $(DESTDIR)$(bindir)/qexo
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -1,3 +1,10 @@
+2005-09-27  Per Bothner  <per@bothner.com>
+
+	* Future.java (waitForResult): Specify throws Throwable
+	so we don't have to wrap an exception.
+
+	* RunnableClosure.java (getResult): New method.
+
 2005-09-26  Per Bothner  <per@bothner.com>
 
 	* Environment.java (remove, unlink): New methods.

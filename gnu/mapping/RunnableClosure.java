@@ -110,6 +110,17 @@ public class RunnableClosure implements Runnable
       }
   }
 
+  /** Get the result of running this {@code Runnable}.
+   * The result is a value or a thrown exception.
+   * Should be called after {#code run} finishes. */
+  Object getResult () throws Throwable
+  {
+    Throwable ex = exception;
+    if (ex != null)
+      throw ex;
+    return result;
+  }
+
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append ("#<runnable ");

@@ -40,7 +40,7 @@ public class Future extends Thread
     closure.run();
   }
 
-  public Object waitForResult ()
+  public Object waitForResult ()  throws Throwable
   {
     try
       {
@@ -52,7 +52,7 @@ public class Future extends Thread
       }
     Throwable ex = closure.exception;
     if (ex != null)
-      throw WrappedException.wrapIfNeeded(ex);
+      throw ex;
     return closure.result;
   }
 

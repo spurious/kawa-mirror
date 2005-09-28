@@ -211,12 +211,12 @@ SUFFIXES = .pdf
 KAWA_HTMLS = kawa/index.html
 GENERATED_HTML = $(KAWA_HTMLS)
 TEXI2PDF = texi2pdf
-man_MANS = kawa.1
-EXTRA_DIST = kawa.txt scm2java.html kawa.man \
+man_MANS = kawa.1 qexo.1
+EXTRA_DIST = kawa.txt scm2java.html kawa.man qexo.man \
   kawa-tour.tex mdate-sh
 
 info_TEXINFOS = kawa.texi kawa-tour.texi
-CLEANFILES = kawa.txt *.info kawa/*.html kawa1.tmp kawa.1
+CLEANFILES = kawa.txt *.info kawa/*.html kawa1.tmp kawa.1 qexo.1
 HTML_HOME = $$HOME/public_html
 all: all-am
 
@@ -639,6 +639,10 @@ $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
 kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1
+
+qexo.1: $(srcdir)/qexo.man
+	nroff -man $(srcdir)/qexo.man | col -b > qexo1.tmp
+	mv qexo1.tmp qexo.1
 
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf kawa-tour.ps
 	tar cf - kawa/*.html kawa.pdf kawa-tour.ps|gzip -c --best >$@

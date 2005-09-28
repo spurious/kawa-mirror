@@ -1,3 +1,9 @@
+2005-09-28  Per Bothner  <per@bothner.com>
+
+	* qexo.man: New man page.
+	* Makefile.am: Update accordingly.
+	* kawa.man: Lots of little changes.
+
 2005-09-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Minor updates.

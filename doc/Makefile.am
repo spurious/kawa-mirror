@@ -18,18 +18,22 @@ TEXI2PDF = texi2pdf
 	TEXINPUTS=$(top_srcdir)/../texinfo/texinfo.tex:$$TEXINPUTS \
 	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) $<
 
-man_MANS = kawa.1
+man_MANS = kawa.1 qexo.1
 kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1
 
+qexo.1: $(srcdir)/qexo.man
+	nroff -man $(srcdir)/qexo.man | col -b > qexo1.tmp
+	mv qexo1.tmp qexo.1
+
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf kawa-tour.ps
 	tar cf - kawa/*.html kawa.pdf kawa-tour.ps|gzip -c --best >$@
 
-EXTRA_DIST = kawa.txt scm2java.html kawa.man \
+EXTRA_DIST = kawa.txt scm2java.html kawa.man qexo.man \
   kawa-tour.tex mdate-sh
 info_TEXINFOS = kawa.texi kawa-tour.texi
-CLEANFILES = kawa.txt *.info kawa/*.html kawa1.tmp kawa.1
+CLEANFILES = kawa.txt *.info kawa/*.html kawa1.tmp kawa.1 qexo.1
 
 # Redundant if configured with  --enable-maintainer-mode.
 # Work around a questionable autoconf feature.

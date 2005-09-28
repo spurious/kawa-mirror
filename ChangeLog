@@ -1,3 +1,7 @@
+2005-09-28  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Fold +JAVA2 into JAVA4_FEATURES macro.
+
 2005-09-27  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/location.java (rewrite): Do setCanRead and setCanWrite

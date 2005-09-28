@@ -1,3 +1,11 @@
+2005-09-27  Per Bothner  <per@bothner.com>
+
+	Add test for Savannah bug #14640 (internal compile error when
+	using "location").
+	* module1.scm (mod1-v5): Declare and export new variable.
+	* module2.scm (mod2-v5); Access mod1-v5 using a location, only.
+	* obj-test.scm: Check that mod2-v5 is correct.
+
 2005-09-26  Per Bothner  <per@bothner.com>
 
 	* gui-test.scm (testimage): Update read-image -> image-read.

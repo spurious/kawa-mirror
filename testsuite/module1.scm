@@ -1,12 +1,14 @@
 (module-static #f)
 (module-export my-factorial list-length-2 deldup call-to-first
-	       namespace:date
+	       namespace:date mod1-v5
 	       test1-import0 mod0-v1 mod0-v2 mod0-v3 mod0-f1 mod0-m1
 	       namespace-syntax-test make-array make-array-fun mA)
 (require <module0>)
 
 (define (get1-mod0-v1) mod0-v1)
 (define (set1-mod0-v1 x) (set! mod0-v1 x))
+
+(define mod1-v5 15)
 
 (define (test1-import0)
   (let ((gv1 (get1-mod0-v1)))

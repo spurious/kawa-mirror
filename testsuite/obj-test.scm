@@ -1,4 +1,4 @@
-(test-init "Objects" 110)
+(test-init "Objects" 111)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -191,6 +191,7 @@
       (let ((v2 (get3-mod0-v2)))
 	(set3-mod0-v2 (+ 100 v2))
 	(list v2 (get3-mod0-v2))))
+(test 25 'test-mod2-v5  mod2-v5)
 
 (define ts1 (make <MyTimestamp> 10 1))
 (define ts2 (make <MyTimestamp> 10 2))

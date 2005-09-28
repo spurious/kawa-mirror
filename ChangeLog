@@ -1,5 +1,9 @@
 2005-09-27  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/location.java (rewrite): Do setCanRead and setCanWrite
+	on variable captured by a location.
+	Fixes Savannah bug #14640: internal compile error when using "location".
+
 	* Makefile.am:  Define new PreProcess flag: use:java.net.URI.
 	* build.xml: Likewise.
 

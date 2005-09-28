@@ -39,9 +39,14 @@ public class location extends Syntax implements Printable
       {
 	ReferenceExp rexp = (ReferenceExp) arg;
 	rexp.setDontDereference(true);
-	Declaration binding = rexp.getBinding();
-	if (binding != null && binding.isLexical())
-	  binding.setIndirectBinding(true);
+	Declaration decl = rexp.getBinding();
+	if (decl != null)
+          {
+            if (decl.isLexical())
+              decl.setIndirectBinding(true);
+            decl.setCanRead(true);
+            decl.setCanWrite(true);
+          }
 	return rexp;
       }
     if (arg instanceof ApplyExp)

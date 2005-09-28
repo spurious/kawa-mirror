@@ -2,7 +2,7 @@
 (module-extends <pair>)
 (module-export list-length-1 list-length-3 classify list1234 <a8711>
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair
-	       my-array-7)
+	       my-array-7 mod2-v5)
 (require <module1>)
 (require <module1a>)
 (define (list-length-1 x) :: <integer>
@@ -64,3 +64,11 @@
     objects)))
 
 (define my-array-7 (make-array-fun 7))
+
+;; Derived from Savannah bug# 14640.
+;; (The key is that mod0-v5 is imported and otherwise unreferenced in this
+;; module.  Thus CAN_READ didn't get set for mod0-v5, which confused things.)
+(define mod2-v5
+  (let ((loc (location mod1-v5)))
+    (+ 10 (loc))))
+

@@ -21,6 +21,35 @@
 ;; SOFTWARE.
 
 (cond-expand
+ (chicken
+  (require-extension syntax-case))
+ (guile
+  (use-modules (ice-9 syncase) (srfi srfi-9) (srfi srfi-34) (srfi srfi-35) (srfi srfi-39)))
+ (sisc
+  (require-extension (srfi 9 34 35 39)))
+ (else
+  ))
+
+(cond-expand
+ (chicken
+  (define-syntax test-source-location-cons%
+    (syntax-rules ()
+      ((test-source-location-cons% form-to-use cdr)
+       (or (and-let* ((line (get-line-number 'form-to-use)))
+             (cons (cons 'source-line line) cdr))
+           cdr)))))
+ (gauche
+  (define-syntax test-source-location-cons%
+    (syntax-rules ()
+      ((test-source-location-cons% form-to-use cdr)
+       (let ((f 'form-to-use))
+         (or (and-let* (((pair? f))
+                        (info (pair-attribute-get f 'source-info #f))
+                        ((pair? info))
+                        ((pair? (cdr info))))
+               (cons (cons 'source-file (car info))
+                     (cons (cons 'source-line (cadr info)) cdr)))
+             cdr))))))
  (kawa
   (define-syntax source-file
     (lambda (x)
@@ -307,22 +336,32 @@
     ((test-runner-on-test r) r alist)))
 
 (cond-expand
+ (guile
+  (define-syntax test-evaluate-with-catch%
+    (syntax-rules ()
+      ((test-evaluate-with-catch% test-expression)
+       (catch #t (lambda () test-expression) (lambda (key . args) #f))))))
  (kawa
   (define-syntax test-evaluate-with-catch%
     (syntax-rules ()
-      ((test-evaluate-with-catch test-expression)
+      ((test-evaluate-with-catch% test-expression)
        (try-catch test-expression
 		  (ex <java.lang.Throwable>
 		      #f))))))
  (srfi-34
   (define-syntax test-evaluate-with-catch%
     (syntax-rules ()
-      ((test-evaluate-with-catch test-expression)
-       (guard (cond (else #f)) test-expression)))))
+      ((test-evaluate-with-catch% test-expression)
+       (guard (err (else #f)) test-expression)))))
+ (chicken
+  (define-syntax test-evaluate-with-catch%
+    (syntax-rules ()
+      ((test-evaluate-with-catch% test-expression)
+       (condition-case test-expression (ex () #f))))))
  (else
   (define-syntax test-evaluate-with-catch%
     (syntax-rules ()
-      ((test-evaluate-with-catch test-expression)
+      ((test-evaluate-with-catch% test-expression)
        test-expression)))))
 
 (define-syntax test-raw-assert
@@ -381,21 +420,32 @@
 		    (and (>= v (- x r)) (<= v (+ x r))))))))
 
 (cond-expand
+ (guile
+  (define-syntax test-error%
+    (syntax-rules ()
+      ((test-error% etype expr)
+       (catch #t (lambda () expr #f) (lambda (key . args) #t))))))
  (srfi-35
   (define-syntax test-error%
     (syntax-rules ()
       ((test-error% #t expr)
-       (guard (else #t))
-	      (begin expr #f))
+       (guard (ex (else #t))
+	      (begin expr #f)))
       ((test-error% etype expr)
-       (guard (cond ((condition-has-type? cond etype) #t) (else #f))
+       (guard (ex ((condition-has-type? ex etype) #t) (else #f))
 	      (begin expr #f))))))
  (srfi-34
   (define-syntax test-error%
     (syntax-rules ()
       ((test-error% etype expr)
-       (guard (else #t))
-	      (begin expr #f)))))
+       (guard (ex (else #t))
+	      (begin expr #f))))))
+ (chicken
+  (define-syntax test-error%
+    (syntax-rules ()
+      ((test-error% etype expr)
+       (condition-case (begin expr #f)
+                       (ex () #t))))))
  (kawa
   (define-syntax test-error%
     (syntax-rules ()
@@ -406,7 +456,7 @@
   (define-syntax test-error%
     (syntax-rules ()
       ((test-error% etype expr)
-       #t)))))
+       (begin expr #f))))))
 
 (define-syntax test-error
   (syntax-rules ()

@@ -1,3 +1,7 @@
+2005-10-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Features): Add link to Restrictions node.
+
 2005-09-28  Per Bothner  <per@bothner.com>
 
 	* qexo.man: New man page.

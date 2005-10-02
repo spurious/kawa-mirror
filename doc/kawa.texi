@@ -1178,7 +1178,7 @@ find that library.
 @section Summary of Kawa Scheme Features
 
 Kawa is a full Scheme implementation.  It implements almost
-all of R5RS (for exceptions see below), plus some extensions.
+all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
 By default, symbols are case sensitive.
 
 It is completely written in Java.  Scheme functions and files

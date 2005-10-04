@@ -61,7 +61,7 @@ public class GeneralHashTable
   }
 
   /** Compare two keys for equivalence.
-   * Override this and the {@link hash(Object)} method if you want
+   * Override this and the {@link #hash(Object)} method if you want
    * a different equivalence relation.
    */
   public boolean matches (Object value1, Object value2)

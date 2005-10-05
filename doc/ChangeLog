@@ -1,3 +1,8 @@
+2005-10-05  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Comment out @ifnotdocbook/@end ifnotdocbook since only
+	recent makeinfo has it.  Instead, the web-site-builder filters it out.
+
 2005-10-01  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Features): Add link to Restrictions node.

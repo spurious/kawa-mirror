@@ -4,7 +4,7 @@ KAWALIB = ../kawa-$(VERSION).jar
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
-KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
+KAWATEST = CLASSPATH=. $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 if ENABLE_SERVLET
 SERVLET_TESTS = check-HelloCgiS check-HelloCgiK check-HelloCgiX
@@ -75,42 +75,42 @@ scribble.class: $(srcdir)/scribble.scm
 	$(KAWA) --applet -C $(srcdir)/scribble.scm
 
 moduleFT.class: $(srcdir)/moduleFT.scm
-	$(KAWA) --full-tailcalls -C $(srcdir)/moduleFT.scm
+	CLASSPATH=. $(KAWA) --full-tailcalls -C $(srcdir)/moduleFT.scm
 
 module0.class: $(srcdir)/module0.scm
-	$(KAWA) -C $(srcdir)/module0.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/module0.scm
 
 module1.class: $(srcdir)/module1.scm module0.class
-	$(KAWA) -C $(srcdir)/module1.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/module1.scm
 
 module1a.class: $(srcdir)/module1a.scm
-	$(KAWA) -C $(srcdir)/module1a.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/module1a.scm
 
 module2.class: $(srcdir)/module2.scm module1.class module1a.class
-	$(KAWA) -C $(srcdir)/module2.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/module2.scm
 
 module3.class: $(srcdir)/module3.scm module1.class MyTimestamp.class
-	$(KAWA) -C $(srcdir)/module3.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/module3.scm
 
 classes1.class: $(srcdir)/classes1.scm
-	$(KAWA) -C $(srcdir)/classes1.scm
+	CLASSPATH=. $(KAWA) -C $(srcdir)/classes1.scm
 
 SimpleB.class: $(srcdir)/SimpleB.java classes1.class
 	CLASSPATH=..:. $(JAVAC) -g $(srcdir)/SimpleB.java -d .
 
 classes2.class: $(srcdir)/classes2.scm SimpleB.class
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	$(KAWA) -C $(srcdir)/classes2.scm
 
 HelloCgiK.class: $(srcdir)/HelloCgiK.krl
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	$(KAWA) --servlet --krl -C $(srcdir)/HelloCgiK.krl
 
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
 check-HelloCgiK: HelloCgiK.class HelloCgiK
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiK SERVER_NAME=localhost \
 	  KAWALIB=$(KAWALIB) ./HelloCgiK >tmp.out
 	@if diff -b $(srcdir)/HelloCgiK.expected tmp.out; \
@@ -118,7 +118,7 @@ check-HelloCgiK: HelloCgiK.class HelloCgiK
 	  else echo FAIL HelloCgiK test; fi
 
 HelloCgiS.class: $(srcdir)/HelloCgiS.scm
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	$(KAWA) --servlet --output-format xml -C $(srcdir)/HelloCgiS.scm
 
 HelloCgiS:
@@ -133,14 +133,14 @@ check-HelloCgiS: HelloCgiS.class HelloCgiS
 	  else echo FAIL HelloCgiS test; fi
 
 HelloCgiX.class: $(srcdir)/HelloCgiX.xql
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	$(KAWA) --servlet -C $(srcdir)/HelloCgiX.xql
 
 HelloCgiX:
 	$(LN_S) ../bin/cgi-servlet HelloCgiX
 
 check-HelloCgiX: HelloCgiX.class HelloCgiX
-	CLASSPATH=@conf_classpath@$$CLASSPATH \
+	CLASSPATH=@conf_classpath@. \
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiX SERVER_NAME=localhost \
 	  PATH_TRANSLATED=./HelloCgiX KAWALIB=$(KAWALIB) ./HelloCgiX >tmp.out
 	@if diff -b $(srcdir)/HelloCgiX.expected tmp.out; \
@@ -164,7 +164,7 @@ MyDate.class MyTimestamp.class: $(srcdir)/MyDate.java $(srcdir)/MyTimestamp.java
 	CLASSPATH=..:. $(JAVAC) -g -d . $?
 
 check-pitfalls:
-	$(KAWA) -f $(srcdir)/r5rs_pitfall.scm
+	CLASSPATH=. $(KAWA) -f $(srcdir)/r5rs_pitfall.scm
 
 APPLETVIEWER = appletviewer
 

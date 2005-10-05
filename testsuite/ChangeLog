@@ -1,5 +1,7 @@
 2005-10-05  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Add "." to CLASSPATH various places.
+
 	* num-test.scm: Rewrite to use SRFI-64 "testing".
 	* Makefile.am: Update accordingly.
 

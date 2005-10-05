@@ -435,6 +435,7 @@
       </fileset>
       <fileset id="lib-scm-4" dir="${src.dir}/kawa/lib">
         <include name="strings.scm"/> <!--Depends on lists-->
+	<include name="parameters.scm"/>
       </fileset>
       <fileset id="lib-scm-5" dir="${src.dir}/kawa/lib">
         <include name="thread.scm"/>

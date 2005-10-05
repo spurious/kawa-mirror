@@ -1,3 +1,7 @@
+2005-10-05  Jim White  <jim@pagesmiths.com>
+
+	* build.xml (lib-scm-4): Add parameters.scm.
+
 2005-09-28  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): Update copyright printed by --version.

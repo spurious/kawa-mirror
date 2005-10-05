@@ -1,3 +1,8 @@
+2005-10-05  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: Rewrite to use SRFI-64 "testing".
+	* Makefile.am: Update accordingly.
+
 2005-09-27  Per Bothner  <per@bothner.com>
 
 	Add test for Savannah bug #14640 (internal compile error when

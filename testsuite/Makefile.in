@@ -399,7 +399,7 @@ check-scm: testing.zip
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
 check-num: testing.zip
-	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
+	$(KAWA) -e "(require 'testing)" $(OPTIONS) -f "$(srcdir)/num-test.scm"
 
 check-arr: testing.zip
 	$(KAWATEST) -f "$(srcdir)/arr-test.scm" -e '(test-report)'

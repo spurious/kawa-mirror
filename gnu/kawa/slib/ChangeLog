@@ -1,3 +1,9 @@
+2005-10-05  Per Bothner  <per@bothner.com>
+
+	* testing.scm: More and better-specified callbacks,
+	A full-featured test-runner-simple.
+	New functions for test-results.
+
 2005-08-15  Alex Shinn <alexshinn@gmail.com>
 
 	* testing.scm: Add "full" support for Chicken, Gauche, Guile and SISC.

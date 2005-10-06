@@ -161,8 +161,9 @@ public class XQResolveNames extends ResolveNames
 	      }
 	    else
 	      name = namespaceResolve((String) name, function);
-	    if (name != null)
-	      decl.setName(name);
+	    if (name == null)
+              continue;
+            decl.setName(name);
 	  }
 
 	Declaration old = lookup.lookup(name, function);

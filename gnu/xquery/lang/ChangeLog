@@ -1,5 +1,7 @@
 2005-10-06  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parse): Set line number for 'external' variable.
+
 	* XQParser.java (parseFLWRInner): Fix thinko in growing array.
 
 	* XQParser.java (parseTypeSwitch): Number of parameters to LambdaExp

@@ -3246,6 +3246,8 @@ public class XQParser extends Lexer
             init = new ApplyExp(ClassType.make("gnu.xquery.lang.XQuery")
                                 .getDeclaredMethod("getExternal", 2),
                                 args);
+            init.setFile(getName());
+            init.setLine(curLine, curColumn);
             getRawToken();
 	  }
 	else

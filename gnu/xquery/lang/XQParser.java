@@ -2345,7 +2345,7 @@ public class XQParser extends Lexer
       }
     else
       decl = new Declaration("(arg)");
-    LambdaExp lexp = new LambdaExp(0);
+    LambdaExp lexp = new LambdaExp(1);
     lexp.addDeclaration(decl);
     if (match("default"))
       {

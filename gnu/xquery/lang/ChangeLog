@@ -1,5 +1,8 @@
 2005-10-06  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseTypeSwitch): Number of parameters to LambdaExp
+	for a case is 1, not 0.
+
 	* XQResolveNames.java (push): If namespaceResolve returned null,
 	skip this Declaration.
 

@@ -1,5 +1,7 @@
 2005-10-06  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseFLWRInner): Fix thinko in growing array.
+
 	* XQParser.java (parseTypeSwitch): Number of parameters to LambdaExp
 	for a case is 1, not 0.
 

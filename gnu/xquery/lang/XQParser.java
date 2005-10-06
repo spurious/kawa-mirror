@@ -2852,7 +2852,7 @@ public class XQParser extends Lexer
       flworDecls = new Declaration[8];
     else if (flworDeclsCount >= flworDecls.length)
       {
-        Declaration[] tmp = new Declaration[flworDeclsCount];
+        Declaration[] tmp = new Declaration[2 * flworDeclsCount];
         System.arraycopy(flworDecls, 0, tmp, 0, flworDeclsCount);
         flworDecls = tmp;
       }

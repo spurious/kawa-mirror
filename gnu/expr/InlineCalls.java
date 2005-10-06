@@ -68,7 +68,7 @@ public class InlineCalls extends ExpWalker
 	if (comp.inlineOk(proc))
 	  {
 	    if (proc instanceof Inlineable)
-	      return new ApplyExp(proc, exp.getArgs());
+	      return new ApplyExp(proc, exp.getArgs()).setLine(exp);
 	    PrimProcedure mproc
 	      = PrimProcedure.getMethodFor(proc, decl, exp.args,
 					   comp.getLanguage());

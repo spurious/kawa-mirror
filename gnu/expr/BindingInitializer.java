@@ -92,7 +92,8 @@ public class BindingInitializer extends Initializer
       }
     else
       {
-	value.compile (comp, field == null ? decl.getType() : field.getType());
+        Type type = field == null ? decl.getType() : field.getType();
+	value.compileWithPosition(comp, StackTarget.getInstance(type));
       }
 
     // Optimization of Declaration.compileStore, to avoid swap.

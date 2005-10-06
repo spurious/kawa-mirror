@@ -5728,6 +5728,13 @@ Per is also available for development projects.
 @node Projects, , Support, Community
 @section Projects using Kawa
 
+@uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
+extensively in their contact center performance management product
+Merced Peformance Suite.  Kawa Scheme is used for all development
+and has allowed Merced to realize the large productivity gains
+that come with using Scheme while still maintaining tight
+integration with a large number of Java libraries.
+
 JEmacs is included in the Kawa distribution.  It is a project to
 re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
 It has its own @uref{http://www.jemacs.net/,home-page}.

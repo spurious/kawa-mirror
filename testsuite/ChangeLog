@@ -1,3 +1,7 @@
+2005-10-06  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Also search inherited $CLASSPATH - though last.
+
 2005-10-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Add "." to CLASSPATH various places.

@@ -15,6 +15,13 @@ public class KText extends KCharacterData
     super(seq, ipos);
   }
 
+  public static KText make (String text)
+  {
+    NodeTree tree = new NodeTree();
+    tree.writeChars(text);
+    return new KText(tree, 0);
+  }
+
   public short getNodeType () { return Node.TEXT_NODE; }
 
   public String getNodeName()

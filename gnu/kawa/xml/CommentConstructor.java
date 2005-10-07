@@ -11,6 +11,8 @@ public class CommentConstructor extends MethodProc // NodeConstructor
   public static final CommentConstructor commentConstructor
     = new CommentConstructor();
 
+  public int numArgs() { return 0x1001; }
+
   public void apply (CallContext ctx)
   {
     Consumer saved = ctx.consumer;

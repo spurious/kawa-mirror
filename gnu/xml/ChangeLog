@@ -1,5 +1,8 @@
 2005-10-06  Per Bothner  <per@bothner.com>
 
+	* NodeTree.java (writeObject): Atomize plain values with
+	MakeText.text$C.
+
 	* XMLPrinter.java (writeObject): Disable intra-sequence space
 	for SeqPosition - i.e. nodes - and UnescapedData.
 

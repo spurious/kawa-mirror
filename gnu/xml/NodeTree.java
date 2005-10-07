@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XName;
+import gnu.kawa.xml.MakeText;  // FIXME
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -28,8 +29,8 @@ public class NodeTree extends TreeList
       }
     else if (v instanceof TreeList)
       ((TreeList) v).consume(this);
-    else
-      super.writeObject(v);
+    else // Atomize.
+      MakeText.text$C(v, this);
   }
 
   public int nextPos (int position)

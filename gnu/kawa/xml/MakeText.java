@@ -4,29 +4,61 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.expr.*;
+import gnu.bytecode.*;
 import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
-public class MakeText extends MethodProc // NodeConstructor
+public class MakeText extends NodeConstructor
 {
   public static final MakeText makeText = new MakeText();
 
-  public void apply (CallContext ctx)
+  public int numArgs() { return 0x1001; }
+
+  public Object apply1 (Object arg)
   {
+    if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
+      return arg;
+    StringBuffer sbuf = new StringBuffer();
+    StringValue.stringValue(arg, sbuf);
+    return KText.make(sbuf.toString());
+  }
+
+  public static void text$C (Object arg, Consumer out)
+  {
+    if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
+      return;
+    String str;
+    if (arg instanceof String)
+      str = (String) arg;
+    else
+      {
+        StringBuffer sbuf = new StringBuffer();
+        if (arg instanceof Values)
+          {
+            Object[] vals = ((Values) arg).getValues();
+            for (int i = 0;  i < vals.length; i++)
+              {
+                if (i > 0)
+                  sbuf.append(' ');
+                StringValue.stringValue(vals[i], sbuf);
+              }
+          }
+        else
+          StringValue.stringValue(arg, sbuf);
+        str = sbuf.toString();
+      }
+    out.writeChars(str);
+  }
+
+  public static void text$X (Object arg, CallContext ctx)
+  {
+    if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
+      return;
     Consumer saved = ctx.consumer;
     Consumer out = NodeConstructor.pushNodeContext(ctx);
     try
       {
-	StringBuffer sbuf = new StringBuffer();
-	Object endMarker = Location.UNBOUND;
-	for (;;)
-	  {
-	    Object arg = ctx.getNextArg(endMarker);
-	    if (arg == endMarker)
-	      break;
-	    StringValue.stringValue(arg, sbuf);
-	    out.writeChars(sbuf.toString());
-	    sbuf.setLength(0);
-	  }
+        text$C(arg, out);
       }
     finally
       {
@@ -34,17 +66,19 @@ public class MakeText extends MethodProc // NodeConstructor
       }
   }
 
-  /*
+  public void apply (CallContext ctx)
+  {
+    text$X(ctx.getNextArg(null), ctx);
+  }
+
   public void compileToNode (ApplyExp exp, Compilation comp,
 				      ConsumerTarget target)
   {
-    Variable consumer = target.getConsumerVariable();
-    Expression[] args = exp.getArgs();
-    int nargs = args.length;
     CodeAttr code = comp.getCode();
-    for (int i = 0;  i < nargs;  i++)
-      // FIXME needs to coerce to string value.
-      compileChild(args[i], comp, target);
+    Expression[] args = exp.getArgs();
+    args[0].compile(comp, Target.pushObject);
+    code.emitLoad(target.getConsumerVariable());
+    code.emitInvokeStatic(ClassType.make("gnu.kawa.xml.MakeText")
+                          .getDeclaredMethod("text$C", 2));
   }
-  */
 }

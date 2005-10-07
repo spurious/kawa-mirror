@@ -1,3 +1,14 @@
+2005-10-06  Per Bothner  <per@bothner.com>
+
+	* CommentConstructor.java (numArgs): New method.
+
+	* KText.java (make(String)): New static method.
+	* MakeText.java: Extend NodeConstructor.
+	(compileToNode): New method.
+	(numArgs, apply1): New methods.
+	(text$X, text$C): New static methods.
+	(apply): Just call text$X.
+
 2005-08-18  Per Bothner  <per@bothner.com>
 
 	* Document.java (parseCached, availableCached): New static functions.

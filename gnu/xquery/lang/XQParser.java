@@ -1861,10 +1861,12 @@ public class XQParser extends Lexer
       throws java.io.IOException, SyntaxException
   {
     tokenBufferLength = 0;
-    int prevEnclosed = result.size() - 1;
+    int startSize = result.size();
+    int prevEnclosed = startSize - 1;
     boolean skipBoundarySpace = ! preserveBoundarySpace && delimiter == '<';
     boolean skippable = skipBoundarySpace;
-    Expression makeText = null;
+    Expression makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
+                                          "makeText");
     for (;;)
       {
 	int next = read();
@@ -1875,21 +1877,27 @@ public class XQParser extends Lexer
 	  }
 	if (next == delimiter || next < 0 || next == '{')
 	  {
-	    if (tokenBufferLength > 0 && ! skippable)
-	      {
-		Expression str
-		  = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength));
-		result.addElement(str);
-	      }
-	    else if (next == '{' && prevEnclosed == result.size())
-	      {
-		
-		Expression[] args = { new QuoteExp("") };
-		if (makeText == null)
-		  makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
-					     "makeText");
-		result.addElement(new ApplyExp(makeText, args));
-	      }
+          addText:
+            {
+              String text;
+              if (tokenBufferLength > 0 && ! skippable)
+                {
+                  text = new String(tokenBuffer, 0, tokenBufferLength);
+                  if (next == delimiter && startSize == result.size())
+                    {
+                      // This is partly an optimization, but it also to
+                      // avoid an error for namespace declaration attributes.
+                      result.addElement(new QuoteExp(text));
+                      break addText;
+                    }
+                }
+              else if (next == '{' && prevEnclosed == result.size())
+                text = "";
+              else
+                break addText; // Don't need to add anything.
+              Expression[] args = { new QuoteExp(text) };
+              result.addElement(new ApplyExp(makeText, args));
+            }
 	    tokenBufferLength = 0;
 	  }
 	if (next < 0)
@@ -2608,7 +2616,9 @@ public class XQParser extends Lexer
 	    if (curToken != '{')
 	      return syntaxError("missing '{'");
 	    getRawToken();
-	    if (curToken != '}')
+            if (kind == 't' || kind == 'c')
+              vec.addElement(parseExprSequence('}'));
+	    else if (curToken != '}')
 	      {
 		vec.addElement(parseExpr());
 		while (curToken == ',')

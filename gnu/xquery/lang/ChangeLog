@@ -1,5 +1,10 @@
 2005-10-06  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseMaybePrimaryExpr): For text and comment
+	parse an ExprSequence, yielding a single argument.
+	* XQParser.java (parseContent): Various tweaks to fix/improve
+	handing of text content, including fixing whitespace insertion.
+
 	* XQParser.java (parse): Set line number for 'external' variable.
 
 	* XQParser.java (parseFLWRInner): Fix thinko in growing array.

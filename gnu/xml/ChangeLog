@@ -1,3 +1,8 @@
+2005-10-06  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeObject): Disable intra-sequence space
+	for SeqPosition - i.e. nodes - and UnescapedData.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (typedValue): New method.

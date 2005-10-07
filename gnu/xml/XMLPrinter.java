@@ -451,12 +451,15 @@ public class XMLPrinter extends PrintConsumer
       {
 	SeqPosition pos = (SeqPosition) v;
 	pos.sequence.consumeNext(pos.ipos, this);
+        if (pos.sequence instanceof NodeTree)
+          prev = '-';
 	return;
       }
     closeTag();
     if (v instanceof UnescapedData)
       {
 	super.write(((UnescapedData) v).getData());
+        prev = '-';
       }
     else if (v instanceof Char)
       writeChar(((Char) v).intValue());

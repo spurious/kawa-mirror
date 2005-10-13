@@ -1892,6 +1892,7 @@ public class Compilation
       }
 
     module.compileBody(this);
+    module.compileChildMethods(this);
 
     Label startLiterals = null;
     Label afterLiterals = null;
@@ -1991,7 +1992,6 @@ public class Compilation
       method.popScope(); // Undoes pushScope in method.initCode.
 
     module.heapFrame = heapFrame;  // Restore heapFrame.
-    module.compileChildMethods(this);
     if (usingCPStyle() || (fewerClasses && curClass == mainClass))
       {
 	code = getCode();

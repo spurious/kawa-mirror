@@ -444,7 +444,13 @@ public class ClassExp extends LambdaExp
                       calledInit = pproc.method.getDeclaringClass();
                   }
                 ClassType superClass = instanceType.getSuperclass();
-                if (calledInit != superClass)
+                if (calledInit != null)
+                  {
+                    bodyFirst.compileWithPosition(comp, Target.Ignore);
+                    if (calledInit != instanceType && calledInit != superClass)
+                      comp.error('e', "call to <init> for not this or super class");
+                  }
+                else if (calledInit != superClass)
                   {
                     // Call default super constructor if there isn't an explicit
                     // call to a super constructor.
@@ -457,12 +463,6 @@ public class ClassExp extends LambdaExp
                         code.emitPushThis();
                         code.emitInvokeSpecial(superConstructor);
                       }
-                  }
-                if (calledInit != null)
-                  {
-                    bodyFirst.compileWithPosition(comp, Target.Ignore);
-                    if (calledInit != instanceType && calledInit != superClass)
-                      comp.error('e', "call to <init> for not this or super class");
                   }
                 if (calledInit != instanceType)
                   comp.callInitMethods(getCompiledClassType(comp),

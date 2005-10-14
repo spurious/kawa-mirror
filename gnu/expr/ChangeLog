@@ -1,5 +1,8 @@
 2005-10-14  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (compile): Fix thinko - don't call default super
+	constructor if we call super *or* this constructor.
+
 	* ClassExp.java (explicitInit): New field.
 	(declareParts): Set explicitInit if method name is "*init*.
 	Don't declare default constructor if explicitInit.

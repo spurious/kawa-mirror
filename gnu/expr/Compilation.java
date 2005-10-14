@@ -2266,6 +2266,8 @@ public class Compilation
   public void setFile(String filename) { messages.setFile(filename); }
   public void setLine(int line) { messages.setLine(line); }
   public void setColumn(int column) { messages.setColumn(column); }
+  public final void setLine(Expression position)
+  { setLine(position.filename, position.getLine(), position.getColumn()); }
 
   public void setLine(String filename, int line, int column)
   {

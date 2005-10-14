@@ -1,3 +1,10 @@
+2005-10-14  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (setLine(Expression)): New method.
+	* Expression.java (compileNotePosition): Use new method.
+	* ClassExp.java (compile): Set/restore current line number from method.
+	* LambdaExp.java (allocParameters): Do putLineNumber.
+
 2005-10-13  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (<init>): Rearrange constructor code so we can

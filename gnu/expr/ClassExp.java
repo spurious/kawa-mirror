@@ -31,7 +31,13 @@ public class ClassExp extends LambdaExp
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
 
+  /** An artificial method named {@code "$finit$"} for evaluating
+   * non-static initializations.
+   * All constructors need to call this. */
   public LambdaExp initMethod;
+
+  /** An artificial method named {@code "$clinit$"} for evaluating 
+   * static initializations. */
   public LambdaExp clinitMethod;
 
   public ClassExp ()
@@ -385,6 +391,10 @@ public class ClassExp extends LambdaExp
 	  {
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;
+            String saveFilename = comp.getFile();
+            int saveLine = comp.getLine();
+            int saveColumn = comp.getColumn();
+            comp.setLine(child);
 	    comp.method = child.getMainMethod();
 	    //comp.curClass = comp.method.getDeclaringClass();
             Declaration childDecl = child.nameDecl;
@@ -403,6 +413,7 @@ public class ClassExp extends LambdaExp
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;
+            comp.setLine(saveFilename, saveLine, saveColumn);
 	    child = child.nextSibling;
 	  }
 

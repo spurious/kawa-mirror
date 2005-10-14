@@ -1057,6 +1057,9 @@ public class LambdaExp extends ScopeExp
     int j = 0;
 
     code.locals.enterScope(getVarScope());
+    int line = getLine();
+    if (line != 0)
+      code.putLineNumber(getFile(), line);
 
     for (Declaration decl = firstDecl();  decl != null;  )
       {

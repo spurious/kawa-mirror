@@ -123,7 +123,7 @@ public abstract class Expression extends Procedure0 implements Printable
     String saveFilename = comp.getFile();
     int saveLine = comp.getLine();
     int saveColumn = comp.getColumn();
-    comp.setLine(position.filename, position.getLine(), position.getColumn());
+    comp.setLine(position);
     compile(comp, target);
     // This might logically belong in a `finally' clause.
     // It is intentionally not so, so if there is an internal error causing

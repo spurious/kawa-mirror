@@ -562,28 +562,29 @@ public class Lambda extends Syntax implements Printable
 
     lexp.body = tr.rewrite_body (body);
     Type rtype;
-    if (lexp.body instanceof BeginExp)
+    BeginExp bexp;
+    Expression[] exps;
+    int len;
+    if (lexp.body instanceof BeginExp
+        && (len = (exps = (bexp = (BeginExp) lexp.body).getExpressions()).length) > 1
+        && exps[0] instanceof ReferenceExp)
       {
-	BeginExp bexp = (BeginExp) lexp.body;
-	Expression[] exps = bexp.getExpressions();
-	int len = exps.length;
 	// Handle '<TYPENAME> BODY':
-	if (len > 1 && exps[0] instanceof ReferenceExp)
-	  {
-	    Expression rexp = exps[0];
-	    len--;
-	    if (len == 1)
-	      lexp.body = exps[1];
-	    else
-	      {
-		Expression[] new_body = new Expression[len];
-		System.arraycopy(exps, 1, new_body, 0, len);
-		lexp.body = new BeginExp(new_body);
-	      }
-	    Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
-	  }
+        Expression rexp = exps[0];
+        len--;
+        if (len == 1)
+          lexp.body = exps[1];
+        else
+          {
+            Expression[] new_body = new Expression[len];
+            System.arraycopy(exps, 1, new_body, 0, len);
+            lexp.body = new BeginExp(new_body);
+          }
+        Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
       }
-    else if (lexp.returnType != null && lexp.returnType != Type.pointer_type)
+    else if (lexp.returnType != null
+             && lexp.returnType != Type.pointer_type
+             && lexp.returnType != Type.void_type)
       {
 	Expression value = lexp.body;
 	lexp.body = Convert.makeCoercion(value, lexp.returnType);

@@ -9,6 +9,9 @@ public class ClassExp extends LambdaExp
   public boolean isSimple() { return simple; }
   public void setSimple(boolean value) { simple = value; }
 
+  /** True if there is at least one explicit "<init>" ("*init*"} method. */
+  boolean explicitInit;
+
   /** The class of instances of this class.
    * Same as super.type unless isMakingClassPair(), in which case super.type
    * is an interface, and instanceType is a class implementing the interface.
@@ -286,6 +289,8 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
+        if ("*init*".equals(child.getName()))
+          explicitInit = true;
 	if ((child != initMethod && child != clinitMethod)
 	    || ! isMakingClassPair())
 	  child.addMethodFor(type, comp, null);
@@ -293,10 +298,13 @@ public class ClassExp extends LambdaExp
           // FIXME this is wrong if the method is static
 	  child.addMethodFor(instanceType, comp, type);
       }
-    // It is desirable to declare the constructor now, so it's available
-    // to InlineCalls.  But we can't if we might need a static link.
-    if (nameDecl != null && nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
-      comp.getConstructor(instanceType, this);
+    if (! explicitInit)
+      {
+        // It is desirable to declare the constructor now, so it's available
+        // to InlineCalls.  But we can't if we might need a static link.
+        if (nameDecl != null && nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+          comp.getConstructor(instanceType, this);
+      }
   }
 
   /** Return implementation method matching name and param types.
@@ -384,7 +392,8 @@ public class ClassExp extends LambdaExp
               closureEnvField = staticLinkField
                 = instanceType.addField("this$0", parentFrame.getType());
 	  }
-	comp.generateConstructor(instanceType, this);
+        if (! explicitInit)
+          comp.generateConstructor(instanceType, this);
 	CodeAttr code;
 
 	for (LambdaExp child = firstChild;  child != null; )
@@ -407,7 +416,65 @@ public class ClassExp extends LambdaExp
             child.allocChildClasses(comp);
 	    child.allocParameters(comp);
 	    child.enterFunction(comp);
-	    child.compileBody(comp);
+            if ("*init*".equals(child.getName()))
+              {
+                code = comp.getCode();
+
+                // Extract "first" expression to see if it is special.
+                Expression bodyFirst = child.body;
+                while (bodyFirst instanceof BeginExp)
+                  {
+                    BeginExp bbody = (BeginExp) bodyFirst;
+                    if (bbody.length == 0)
+                      bodyFirst = null;
+                    else
+                      bodyFirst = bbody.exps[0];
+                  }
+
+                // See if bodyFirst is a this(...) or super(...) call.
+                ClassType calledInit = null;
+                Object value;  Expression exp;
+                if (bodyFirst instanceof ApplyExp
+                    && (exp = ((ApplyExp) bodyFirst).func) instanceof QuoteExp
+                    && (value = ((QuoteExp) exp).getValue()) instanceof PrimProcedure)
+                  {
+                    PrimProcedure pproc = (PrimProcedure) value;
+                    if (pproc.isSpecial()
+                        && ("<init>".equals(pproc.method.getName())))
+                      calledInit = pproc.method.getDeclaringClass();
+                  }
+                ClassType superClass = instanceType.getSuperclass();
+                if (calledInit != superClass)
+                  {
+                    // Call default super constructor if there isn't an explicit
+                    // call to a super constructor.
+                    Method superConstructor
+                      = superClass.getDeclaredMethod("<init>", 0);
+                    if (superConstructor == null)
+                      comp.error('e', "super class does not have a default constructor");
+                    else
+                      {
+                        code.emitPushThis();
+                        code.emitInvokeSpecial(superConstructor);
+                      }
+                  }
+                if (calledInit != null)
+                  {
+                    bodyFirst.compileWithPosition(comp, Target.Ignore);
+                    if (calledInit != instanceType && calledInit != superClass)
+                      comp.error('e', "call to <init> for not this or super class");
+                  }
+                if (calledInit != instanceType)
+                  comp.callInitMethods(getCompiledClassType(comp),
+                                       new Vector(10));
+                if (calledInit != null)
+                  // Skip bodyFirst since we already compiled it.
+                  Expression.compileButFirst(child.body, comp);
+                else
+                  child.compileBody(comp);
+              }
+            else
+              child.compileBody(comp);
 	    child.compileEnd(comp);
 	    child.compileChildMethods(comp);
 	    comp.method = save_method;

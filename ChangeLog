@@ -1,5 +1,12 @@
 2005-10-13  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/object.java (rewriteClassDef): If method name is
+	"*init*" (i.e. a constructor) set the return type to void.
+	Also complain if a non-simple class.
+	Also set line number of method.
+	* kawa/lang/Lambda.java (rewriteAttrs): Complain if explicit
+	return type seen for "*init* method.
+
 	* kawa/lang/Lambda.java (rewrite): Remove redundant method.
 	(rewrite(Object,Translator)): Update accordingly,
 	* kawa/lang/Lambda.java (rewrite(Object,Translator)):

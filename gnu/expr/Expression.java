@@ -137,6 +137,24 @@ public abstract class Expression extends Procedure0 implements Printable
     compile (comp, StackTarget.getInstance(type));
   }
 
+  /** Compile all but the first sub-"statement".
+   * A kludge used for constructor methods, since if the first "statement"
+   * is a super-constructor we need to inject initializer expressions. */
+  public static void compileButFirst (Expression exp, Compilation comp)
+  {
+    if (exp instanceof BeginExp)
+      {
+        BeginExp bexp = (BeginExp) exp;
+ 	int n = bexp.length;
+        if (n == 0)
+          return;
+        Expression[] exps = bexp.exps;
+        compileButFirst(exps[0], comp);
+	for (int i = 1; i < n; i++)
+	  exps[i].compileWithPosition(comp, Target.Ignore);       
+      }
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkExpression(this);

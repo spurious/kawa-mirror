@@ -1,5 +1,16 @@
 2005-10-14  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (explicitInit): New field.
+	(declareParts): Set explicitInit if method name is "*init*.
+	Don't declare default constructor if explicitInit.
+	(compile): Don't emit default constructor if explicitInit.
+	(compile): Special handling for explicit ("*init*") constructors.
+	* Compilation.java (mangleName): Mangle '*init*" to "<init>".
+	(callInitMethods): Make non-private since needed by ClassExp.
+	* Expression.java (compileButFirst): New static method.
+	* FindCapturedVars.java (walkClassExp): Don't getConstructor for
+	default constructor if ClassExp has explicitInit.
+
 	* Compilation.java (setLine(Expression)): New method.
 	* Expression.java (compileNotePosition): Use new method.
 	* ClassExp.java (compile): Set/restore current line number from method.

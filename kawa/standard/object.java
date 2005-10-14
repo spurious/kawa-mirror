@@ -444,6 +444,13 @@ public class object extends Syntax
 		// *and* the body we handle using setCurrentScope.
 		if (memberSyntax != null)
 		  tr.setCurrentScope(memberSyntax.scope);
+                if ("*init*".equals(meth.getName()))
+                  {
+                    meth.setReturnType(Type.void_type);
+                    if (! oexp.isSimple())
+                      tr.error('e', "'*init*' methods only supported for simple classes");
+                  }
+                Translator.setLine(meth, pair);
 		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr,
 			       memberCarSyntax != null
 			       && (memberSyntax == null

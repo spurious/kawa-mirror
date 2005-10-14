@@ -597,6 +597,8 @@ public class Compilation
   public static String mangleName (String name, boolean reversible)
   {
     int len = name.length ();
+    if (len == 6 && name.equals("*init*")) // Constructor methods.
+      return "<init>";
     StringBuffer mangled = new StringBuffer (len);
     boolean upcaseNext = false;
     for (int i = 0;  i < len;  i++)
@@ -1154,7 +1156,7 @@ public class Compilation
    * @param clas Class to search for $finit$, and to search supertypes.
    * @param seen array of seen classes, to avoid duplicate $finit$ calls.
    */
-  private void callInitMethods (ClassType clas, Vector seen)
+  void callInitMethods (ClassType clas, Vector seen)
   {
     if (clas == null)
       return;

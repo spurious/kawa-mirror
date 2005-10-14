@@ -82,7 +82,7 @@ public class FindCapturedVars extends ExpWalker
     Expression ret = super.walkClassExp(exp);
     // Make sure <init> has been declared, in case we need to invoke it.
     // However, this is only safe to do if ! getNeedsClosureEnv().  FIXME.
-    if (! exp.getNeedsClosureEnv())
+    if (! exp.explicitInit && ! exp.getNeedsClosureEnv())
       Compilation.getConstructor(exp.instanceType, exp);
     return ret;
   }

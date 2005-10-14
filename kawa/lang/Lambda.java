@@ -378,10 +378,15 @@ public class Lambda extends Syntax implements Printable
 	  break;
 	if (attrName == null)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
-	    gnu.bytecode.Type rtype = tr.getLanguage().getTypeFor(attrExpr);
-	    if (rtype != null)
-	      lexp.setReturnType(rtype);
+            Expression attrExpr = tr.rewrite_car(pair2, syntax);
+            if (lexp.isClassMethod() && "*init*".equals(lexp.getName()))
+              tr.error('e', "explicit return type for '*init*' method");
+            else
+              {
+                gnu.bytecode.Type rtype = tr.getLanguage().getTypeFor(attrExpr);
+                if (rtype != null)
+                  lexp.setReturnType(rtype);
+              }
 	  }
 	else if (attrName == kawa.standard.object.accessKeyword)
 	  {

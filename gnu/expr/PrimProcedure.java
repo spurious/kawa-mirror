@@ -25,6 +25,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public Type getReturnType () { return retType; }
   public void setReturnType (Type retType) { this.retType = retType; }
 
+  public boolean isSpecial() { return is_special; }
+
   public Type getReturnType (Expression[] args) { return retType; }
 
   /** Return true iff the last parameter is a "rest" argument. */
@@ -221,6 +223,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public PrimProcedure(Method method, Language language)
   {
+    this(method, false, language);
+  }
+
+  public PrimProcedure(Method method, boolean is_special, Language language)
+  {
     init(method);
 
     // This stuff deals with that a language may have its own mapping
@@ -244,14 +251,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     if (argTypes == null)
       argTypes = pTypes;
-    retType = op_code == 183 ? method.getDeclaringClass()
+    retType = op_code == 183 && ! is_special ? method.getDeclaringClass()
       : method.getName().endsWith("$X") ? Type.pointer_type
       : language.getTypeFor(method.getReturnType().getReflectClass());
-  }
-
-  public PrimProcedure(Method method, boolean is_special, Language language)
-  {
-    this(method, language);
     if (is_special) {
       this.is_special = true;
       op_code = 183;

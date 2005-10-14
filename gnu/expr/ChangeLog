@@ -1,5 +1,9 @@
 2005-10-13  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (<init>): Rearrange constructor code so we can
+	set the return type to void if is_special.
+	(isSpecial): New method.
+
 	* Compilation.java (addClass): Move module.compileChildMethods
 	invocation before we dump initializers, since compiling methods
 	may require more initialization.

@@ -1,5 +1,10 @@
 2005-10-13  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Lambda.java (rewrite): Remove redundant method.
+	(rewrite(Object,Translator)): Update accordingly,
+	* kawa/lang/Lambda.java (rewrite(Object,Translator)):
+	Set line of LambdaExpr from pair.
+
 	* kawa/lang/Lambda.java (rewriteBody): If returnType specified, wrap
 	body in coercion even if it is a BeginExp.
 	However, don't do so it returnType is void_type.

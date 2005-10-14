@@ -68,7 +68,7 @@ public class defun extends Syntax implements Printable
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    LambdaExp lexp = new LambdaExp();
-	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr);
+	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr, null);
 	    lexp.setSymbol(name);
 	    if (p2 instanceof PairWithPosition)
 	      {

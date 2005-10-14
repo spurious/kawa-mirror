@@ -32,7 +32,8 @@ public class Lambda extends Syntax implements Printable
     int old_errors = tr.getMessages().getErrorCount();
     LambdaExp lexp = new LambdaExp();
     Pair pair = (Pair) obj;
-    rewrite(lexp, pair.car, pair.cdr, tr);
+    Translator.setLine(lexp, pair);
+    rewrite(lexp, pair.car, pair.cdr, tr, null);
     if (tr.getMessages().getErrorCount() > old_errors)
       return new ErrorExp("bad lambda expression");
     return lexp;
@@ -48,15 +49,6 @@ public class Lambda extends Syntax implements Printable
 		      Translator tr, TemplateScope templateScopeRest)
   {
     rewriteFormals(lexp, formals, tr, templateScopeRest);
-    if (body instanceof PairWithPosition)
-      lexp.setFile(((PairWithPosition) body).getFile());
-    body = rewriteAttrs(lexp, body, tr);
-    rewriteBody(lexp, body, tr);
-  }
-  public void rewrite(LambdaExp lexp, Object formals, Object body,
-		      Translator tr)
-  {
-    rewriteFormals(lexp, formals, tr, null);
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
     body = rewriteAttrs(lexp, body, tr);

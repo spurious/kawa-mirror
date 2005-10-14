@@ -94,7 +94,7 @@ public class lambda extends Lambda
             else
               {
                 LambdaExp ilexp = new LambdaExp();
-                rewrite(ilexp, LList.Empty, interactive, tr);
+                rewrite(ilexp, LList.Empty, interactive, tr, null);
                 ilexp.setCanRead(true);
                 interactive = ilexp;
               }

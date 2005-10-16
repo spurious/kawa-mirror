@@ -1,3 +1,8 @@
+2005-10-16  Alex Shinn <alexshinn@gmail.com>
+
+	* testing.scm (%test-record-define%): Add predicate and allocator as
+	macro parameters so they're added to teh correct namespace.
+
 2005-10-05  Per Bothner  <per@bothner.com>
 
 	* testing.scm: More and better-specified callbacks,

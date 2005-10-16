@@ -87,25 +87,25 @@
  (srfi-9
   (define-syntax %test-record-define%
     (syntax-rules ()
-      ((%test-record-define% (name index setter getter) ...)
+      ((%test-record-define% alloc runner? (name index setter getter) ...)
        (define-record-type test-runner
-	 (test-runner-alloc)
-	 test-runner?
+	 (alloc)
+	 runner?
 	 (name setter getter) ...)))))
  (else
   (define test-runner-cookie% (list "test-runner"))
-  (define (test-runner? obj)
-    (and (vector? obj)
-	 (> (vector-length obj) 1)
-	 (eq (vector-ref obj 0) test-runner-cookie%)))
-  (define (test-runner-alloc)
-    (let ((runner (make-vector 23)))
-      (vector-set! runner 0 test-runner-cookie%)
-      runner))
   (define-syntax %test-record-define%
     (syntax-rules ()
-      ((%test-record-define% (name index getter setter) ...)
+      ((%test-record-define% alloc runner? (name index getter setter) ...)
        (begin
+	 (define (runner? obj)
+	   (and (vector? obj)
+		(> (vector-length obj) 1)
+		(eq (vector-ref obj 0) test-runner-cookie%)))
+	 (define (alloc)
+	   (let ((runner (make-vector 23)))
+	     (vector-set! runner 0 test-runner-cookie%)
+	     runner))
 	 (begin
 	   (define (getter runner)
 	     (vector-ref runner index)) ...)
@@ -114,6 +114,7 @@
 	     (vector-set! runner index value)) ...)))))))
 
 (%test-record-define%
+ test-runner-alloc test-runner?
  ;; Cumulate count of all tests that have passed and were expected to.
  (pass-count 1 test-runner-pass-count test-runner-pass-count!)
  (fail-count 2 test-runner-fail-count test-runner-fail-count!)

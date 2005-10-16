@@ -1,3 +1,8 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Kludge to search Type.string_type
+	rather than type.tostring_type for methods.
+
 2005-09-25  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (typeFrom): New private helper method.

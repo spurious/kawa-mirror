@@ -111,6 +111,9 @@ public class ClassMethods extends Procedure2
                                            Language language)
   {
     MethodFilter filter = new MethodFilter(mname, modifiers, modmask, caller);
+    // FIXME kludge until we handle "language types".
+    if (dtype == Type.tostring_type)
+      dtype = Type.string_type;
     boolean named_class_only = is_special || "<init>".equals(mname);
     Vector methods = new Vector();
     dtype.getMethods(filter, named_class_only ? 0 : 2,

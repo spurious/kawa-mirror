@@ -1,3 +1,14 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (<init>): Don't try to getReflectClass for a
+	non-existing ClassType - i.e. one defined in this compilation.
+
+	* PrimProcedure.java (<init>): Kludge - never set tostring_type
+	for return type.
+
+	* StackTarget.java (compileFromStack0): Use CodeAttr's new castNeeded
+	method to suppress redundant casts also for ArrayTypes.
+
 2005-10-14  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compile): Fix thinko - don't call default super

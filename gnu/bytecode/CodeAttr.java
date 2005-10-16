@@ -1775,17 +1775,32 @@ public class CodeAttr extends Attribute implements AttrContainer
 		       + " in emitCheckcast/emitInstanceof");
   } 
 
+  public static boolean castNeeded (Type top, Type required)
+  {
+    for (;;)
+      {
+        if (required instanceof ClassType
+            && top instanceof ClassType
+            && ((ClassType) top).isSubclass((ClassType) required))
+          return false;
+        else if (required instanceof ArrayType
+                 && top instanceof ArrayType)
+          {
+            required = ((ArrayType) required).getComponentType();
+            top = ((ArrayType) top).getComponentType();
+            continue;
+          }
+        return true;
+      }
+  }
+
   public void emitCheckcast (Type type)
   {
-    if (type instanceof ClassType)
+    if (castNeeded(topType(), type))
       {
-	Type top = topType();
-	if (top instanceof ClassType
-	    && ((ClassType) top).isSubclass((ClassType) type))
-	  return;
+        emitCheckcast(type, 192);
+        pushType(type);
       }
-    emitCheckcast(type, 192);
-    pushType(type);
   }
 
   public void emitInstanceof (Type type)

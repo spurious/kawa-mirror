@@ -99,7 +99,7 @@ public class ClassType extends ObjectType
     if (callerPackage.equals(classPackage))
       return true;
     if ((modifiers & Access.PROTECTED) != 0
-	&& declaring.isSubclass(this))
+        && this.isSubclass(declaring))
       return true;
     return false;
   }

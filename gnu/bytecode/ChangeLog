@@ -1,3 +1,11 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isAccessible): Fix thinko.
+
+	* CodeAttr.java (castNeeded): New static hekp method that handles
+	ArrayTypes as well as ClassTypes.
+	(emitCheckcast): Make use of castNeeded.
+
 2005-09-25  Per Bothner  <per@bothner.com>
 
 	* Type.java (make): Remove redundant statement.

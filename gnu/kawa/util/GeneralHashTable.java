@@ -2,18 +2,18 @@
 // This is free software;  for terms and warranty disclaimer see COPYING.
 
 package gnu.kawa.util;
-import gnu.mapping.*;
 
 /** A generic hash table.
  * Supports deletions, and re-allocates the table when too big.
  * The equivalence relation can be customized. */
 
 public class GeneralHashTable
+// FUTURE: implements java.util.Map
 {
-  HashNode[] table;
+  protected HashNode[] table;
   int log2Size;
   private int mask;
-  int num_bindings;
+  protected int num_bindings;
 
   public GeneralHashTable ()
   {
@@ -83,12 +83,25 @@ public class GeneralHashTable
     return defaultValue;
   }
 
-  public void put (Object key, Object value)
+  public HashNode getNode (Object key)
   {
-    put(key, hash(key), value);
+    int hash = hash(key);
+    int index = hash & this.mask;
+    for (HashNode node = table[index];
+	 node != null;  node = node.next)
+      {
+	if (matches(key, hash, node))
+          return node;
+      }
+    return null;
   }
 
-  public void put (Object key, int hash, Object value)
+  public Object put (Object key, Object value)
+  {
+    return put(key, hash(key), value);
+  }
+
+  public Object put (Object key, int hash, Object value)
   {
     int index = hash & mask;
     HashNode first = table[index];
@@ -102,18 +115,17 @@ public class GeneralHashTable
             node = makeEntry(key, hash, value);
             node.next = first;
             table[index] = node;
-	    return;
+	    return null;
 	  }
 	else if (matches(key, hash, node))
 	  {
-	    node.setValue(value);
-	    return;
+	    return node.setValue(value);
 	  }
 	node = node.next;
       }
   }
 
-  public void remove (Object key)
+  public Object remove (Object key)
   {
     int hash = hash(key);
     int index = hash & this.mask;
@@ -129,11 +141,12 @@ public class GeneralHashTable
 	    else
 	      prev.next = node;
 	    num_bindings--;
-	    return;
+	    return node.getValue();
 	  }
 	prev = node;
 	node = next;
       }
+    return null;
   }
 
   void rehash ()
@@ -159,5 +172,23 @@ public class GeneralHashTable
     table = newTable;
     log2Size++;
     mask = newMask;
+  }
+
+  public void clear ()
+  {
+    HashNode[] t = this.table;
+    for (int i = t.length;  --i >= 0; )
+      t[i] = null;
+    num_bindings = 0;
+  }
+
+  public int size ()
+  {
+    return num_bindings;
+  }
+
+  protected static HashNode next (HashNode node)
+  {
+    return node.next;
   }
 }

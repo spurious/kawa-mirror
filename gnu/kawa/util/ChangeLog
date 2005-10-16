@@ -1,3 +1,15 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* GeneralHashTable.java: Improve compatibility with java.util.Map.
+	(clear, size): New methods.
+	* HashNode.java: Implement java.util.Map.Entry, in the JAVA2 case.
+	(setValue): Method returns old value.
+	(equals, hashCode): New methods.
+
+	* GeneralHashTable.java (getNode): New helper method, for srfi69.scm.
+	(table, num_bindings): Make proctected, for access from srfi69.scm.
+	(next): New protected static method, also for srfi69.scm.
+
 2005-08-16  Per Bothner  <per@bothner.com>
 
 	* GeneralHashTable.java: New class.

@@ -1,3 +1,8 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* srfi69.scm: Major re-write for Kawa.
+	* Makefile.am (java_SCM): Add srfi69.scm.
+
 2005-10-16  Panu Kalliokoski  <atehwa@sange.fi>
 
 	* srfi69.scm: The SRFI-69 (Basic bash tables) reference implementation.

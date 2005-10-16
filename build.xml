@@ -517,6 +517,8 @@
         <include name="DefineRecordType.scm"/>
         <include name="srfi1.scm"/>
         <include name="srfi37.scm"/>
+        <include name="srfi69.scm"/>
+        <include name="testing.scm"/>
         <include name="readtable.scm"/>
         <include name="cut.scm"/>
       </fileset>

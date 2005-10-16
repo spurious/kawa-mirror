@@ -79,6 +79,8 @@ public class require extends Syntax
     map("args-fold", SLIB_PREFIX + "srfi37");
     map("srfi-64", SLIB_PREFIX + "testing");
     map("testing", SLIB_PREFIX + "testing");
+    map("srfi-69", SLIB_PREFIX + "srfi69");
+    map("hash-table", SLIB_PREFIX + "srfi69");
     map("gui", SLIB_PREFIX + "gui");
   }
 

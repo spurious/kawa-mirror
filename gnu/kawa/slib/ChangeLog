@@ -1,3 +1,8 @@
+2005-10-16  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Add module-compile-options if Kawa, to catch bugs.
+	This did catch some bugs; fixed those.
+	
 2005-10-16  Alex Shinn <alexshinn@gmail.com>
 
 	* testing.scm (%test-record-define%): Add predicate and allocator as

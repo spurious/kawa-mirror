@@ -53,6 +53,8 @@
                      (cons (cons 'source-line (cadr info)) cdr)))
              cdr))))))
  (kawa
+  (module-compile-options warn-undefined-variable: #t
+			  warn-invoke-unknown-method: #t)
   (define-syntax source-file
     (lambda (x)
       (syntax-case x ()
@@ -465,7 +467,6 @@
 
 (define (test-result-remove runner pname)
   (let* ((alist (test-runner-result-alist runner))
-	 (pname (car rest))
 	 (p (assq pname alist)))
     (if p
 	(test-runner-result-alist! runner
@@ -768,7 +769,7 @@
     ((test-match-nth n count)
      (test-match-nth% n count))))
 
-(define (test-match-all% predlist)
+(define (test-match-all% pred-list)
   (lambda (runner)
     (let loop ((l pred-list))
       (if (null? l) #t
@@ -782,11 +783,11 @@
     ((test-match-all pred ...)
      (test-match-all% (list (test-make-predicate% pred) ...)))))
 
-(define (test-match-any% predlist)
+(define (test-match-any% pred-list)
   (lambda (runner)
     (let loop ((l pred-list))
       (if (null? l) #f
-	  (any ((car l) runner)
+	  (or ((car l) runner)
 	      (loop (cdr l)))))))
   
 (define-syntax test-match-any
@@ -812,4 +813,4 @@
 
 (define (test-match-named name)
   (lambda (runner)
-    (equal? name (test-runnner-test-name runner))))
+    (equal? name (test-runner-test-name runner))))

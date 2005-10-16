@@ -1,3 +1,7 @@
+2005-10-16  Panu Kalliokoski  <atehwa@sange.fi>
+
+	* srfi69.scm: The SRFI-69 (Basic bash tables) reference implementation.
+
 2005-10-16  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Add module-compile-options if Kawa, to catch bugs.

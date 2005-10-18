@@ -8,6 +8,8 @@ java_sources=\
   GetResponse.java \
   KawaPageServlet.java \
   KawaServlet.java \
+  ReplServlet.java \
+  ReplSession.java \
   ServletCallContext.java \
   ServletPrinter.java
 

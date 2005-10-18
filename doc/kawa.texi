@@ -1269,6 +1269,8 @@ SRFI 28: Basic Format Strings - @pxref{Format}.
 SRFI 30: Nested Multi-line Comments.
 @item
 SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@item
+SRFI 69: Basic hash tables - @pxref{Hash tables}.
 @end itemize
 
 @node Restrictions, , Implemented SRFIs, Features
@@ -1646,7 +1648,7 @@ match" among the component method procedures:  I.e. the most specific
 method procedure that is applicable given the actual arguments.
 
 @quotation
-@strong{Note:} The current implementation of selecting the "best" method
+@strong{Warning:} The current implementation of selecting the "best" method
 is not reliable if there is more than one method.
 It can select depending on argument count, and it can select between
 primitive Java methods.  However, it cannot yet do what you probably
@@ -1978,8 +1980,8 @@ Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (-
 * Lists::
 * Strings::
 * Arrays::  Multi-dimensional Arrays
-* Strings::
 * Uniform vectors::
+* Hash tables::
 @end menu
 
 @node Lists, Strings, , Data structures
@@ -2035,7 +2037,7 @@ are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
 @end defun
 
-@node Arrays, Uniform vectors, Strings, Data structures,
+@node Arrays, Uniform vectors, Strings, Data structures
 @subsection Multi-dimensional Arrays
 
 Arrays are heterogeneous data structures whose elements are indexed by
@@ -2199,7 +2201,7 @@ evaluates to a two-dimensionsal array of @code{<double>}:
 #2a((1.0 2.0 3.0) (3.0 4.0 5.0))
 @end example
 
-@node Uniform vectors, , Arrays, Data structures
+@node Uniform vectors, Hash tables, Arrays, Data structures
 @subsection Uniform vectors
 
 Uniform vectors are vectors whose elements are of the same numeric type.
@@ -2402,6 +2404,270 @@ At this point @code{vec} uses @code{arr} for its underlying storage,
 so changes to one affect the other.
 It @code{vec} is re-sized so it needs a larger underlying array,
 then it will no longer use @code{arr}.
+
+@node Hash tables, , Uniform vectors, Data structures
+@subsection Hash tables
+
+A hash table is a data structure that:
+@itemize
+@item
+provides a mapping from some set of keys to some set of values associated 
+to those keys; 
+@item
+has no intrinsic order for the (key, value) associations it contains;
+@item
+supports in-place modification as the primary means of setting the contents
+of a hash table; and
+@item
+provides key lookup and destructive update in amortised constant time,
+provided that a good hash function is used. 
+@end itemize
+
+The Kawa hash table functions follow the
+@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI-69} specifiation.
+The Kawa implementation has been optimized for performance and better
+Java integration.  Specifically, the default hash function uses
+the standard Java @code{hashCode} method.
+
+To use the hash table functions in your Kawa program you must first:
+@example
+(require 'srfi-69)
+@end example
+or
+@example
+(require 'hash-table)
+@end example
+
+@subsubsection Type constructors and predicate
+@defun make-hash-table [ equal? [ hash [ size-hint]]] → hash-table
+
+Create a new hash table with no associations.
+The @var{equal?} parameter is a predicate
+that should accept two keys and return a boolean telling whether they
+denote the same key value; it defaults to the @code{equal?} function.
+
+The @var{hash} parameter is a hash function, and defaults to an 
+appropriate hash function
+for the given @var{equal?} predicate (see the Hashing section).
+However, an
+acceptable default is not guaranteed to be given for any equivalence
+predicate coarser than @code{equal?}, except for @code{string-ci=?}.
+(The function @code{hash} is acceptable for @code{equal?}, so if you
+use coarser equivalence than @code{equal?} other than @code{string-ci=?},
+you must always provide the function hash yourself.)
+(An equivalence predicate @var{c1} is coarser than a equivalence
+predicate @var{c2} iff there exist values @var{x} and @var{y} such
+that @code{(and (@var{c1} @var{x} @var{y}) (not (@var{c2} @var{x} @var{y})))}.)
+
+The @var{size-hint} parameter can be used to suggested an approriate
+initial size.  This option is not part of the SRFI-69 specification
+(though it is handled by the reference implementation), so specifying
+that option might be unportable.
+@end defun
+
+@defun hash-table? obj → boolean
+A predicate to test whether a given object @var{obj} is a hash table.
+@end defun
+
+@defun alist->hash-table alist [ equal? [ hash [ size-hint]]] → hash-table
+
+Takes an association list @var{alist} and creates a hash table
+@var{hash-table} which maps the @code{car} of every element in
+@var{alist} to the @code{cdr} of corresponding elements in
+@var{alist}. The @var{equal?}, @var{hash}, and @var{size-hint}
+parameters are interpreted as in @code{make-hash-table}. If some key
+occurs multiple times in @var{alist}, the value in the first
+association will take precedence over later ones. (Note: the choice of
+using @code{cdr} (instead of @code{cadr}) for values tries to strike
+balance between the two approaches: using @var{cadr} would render this
+procedure unusable for @code{cdr} alists, but not vice versa.)
+@end defun
+
+@subsubsection Reflective queries
+@defun hash-table-equivalence-function hash-table
+Returns the equivalence predicate used for keys of @var{hash-table}.
+@end defun
+
+@defun hash-table-hash-function hash-table
+Returns the hash function used for keys of @var{hash-table}.
+@end defun
+
+@subsubsection Dealing with single elements
+@defun hash-table-ref hash-table key [ thunk ] → value
+This procedure returns the value associated to @var{key} in
+@var{hash-table}. If no value is associated to @var{key} and
+@var{thunk} is given, it is called with no arguments and its value is
+returned; if @var{thunk} is not given, an error is signalled. Given a
+good hash function, this operation should have an (amortised) complexity
+of O(1) with respect to the number of associations in @var{hash-table}.
+@end defun
+
+@defun hash-table-ref/default hash-table key default → value
+Evaluates to the same value as @code{(hash-table-ref @var{hash-table}
+@var{key} (lambda () @var{default}))}. Given a good hash function, this
+operation should have an (amortised) complexity of O(1) with respect
+to the number of associations in hash-table.
+@end defun
+
+@defun hash-table-set! hash-table key value → void
+This procedure sets the value associated to @var{key} in
+@var{hash-table}. The previous association (if any) is removed. Given
+a good hash function, this operation should have an (amortised)
+complexity of O(1) with respect to the number of associations in
+hash-table.
+@end defun
+
+@defun hash-table-delete! hash-table key → void
+This procedure removes any association to @var{key} in
+@var{hash-table}. It is not an error if no association for the
+@var{key} exists; in this case, nothing is done. Given a good hash
+function, this operation should have an (amortised) complexity of O(1)
+with respect to the number of associations in hash-table.
+@end defun
+
+@defun hash-table-exists? hash-table key → boolean
+This predicate tells whether there is any association to @var{key} in
+@var{hash-table}. Given a good hash function, this operation should
+have an (amortised) complexity of O(1) with respect to the number of
+associations in hash-table.
+@end defun
+
+@defun hash-table-update! hash-table key function [ thunk ] → void
+Semantically equivalent to, but may be implemented more efficiently than,
+the following code:
+@example
+(hash-table-set! @var{hash-table key}
+                 (function (hash-table-ref @var{hash-table} @var{key} @var{thunk})))
+@end example
+@end defun
+
+@defun hash-table-update!/default hash-table key function default → void
+Behaves as if it evaluates to
+@code{(hash-table-update! @var{hash-table} @var{key} @var{function} (lambda () @var{default}))}.
+@end defun
+
+@subsubsection Dealing with the whole contents
+
+@defun hash-table-size hash-table → integer
+Returns the number of associations in @var{hash-table}. This operation takes
+constant time.
+@end defun
+
+@defun hash-table-keys hash-table → list
+Returns a list of keys in @var{hash-table}.
+The order of the keys is unspecified.
+@end defun
+
+@defun hash-table-values hash-table → list
+Returns a list of values in @var{hash-table}. The order of the values is
+unspecified, and is not guaranteed to match the order of keys in the
+result of @code{hash-table-keys}.
+@end defun
+
+@defun hash-table-walk hash-table proc → void
+@var{proc} should be a function taking two arguments, a key and a
+value. This procedure calls @var{proc} for each association in
+@var{hash-table}, giving the key of the association as key and the
+value of the association as value. The results of @var{proc} are
+discarded. The order in which @var{proc} is called for the different
+associations is unspecified.
+@end defun
+
+@defun hash-table-fold hash-table f init-value → final-value
+This procedure calls @var{f} for every association in @var{hash-table}
+with three arguments: the key of the association key, the value of the
+association value, and an accumulated value, @var{val}. The @var{val}
+is @var{init-value} for the first invocation of @var{f}, and for
+subsequent invocations of @var{f}, the return value of the previous
+invocation of @var{f}. The value @var{final-value} returned by
+@code{hash-table-fold} is the return value of the last invocation of
+@var{f}. The order in which @var{f} is called for different
+associations is unspecified.
+@end defun
+
+@defun hash-table->alist hash-table → alist
+Returns an association list such that the @code{car} of each element
+in @var{alist} is a key in @var{hash-table} and the corresponding
+@code{cdr} of each element in @var{alist} is the value associated to
+the key in @var{hash-table}. The order of the elements is unspecified.
+
+The following should always produce a hash table with the same mappings
+as a hash table @var{h}:
+@example
+(alist->hash-table (hash-table->alist @var{h})
+                        (hash-table-equivalence-function @var{h})
+                        (hash-table-hash-function @var{h}))
+@end example
+@end defun
+
+@defun hash-table-copy hash-table → hash-table
+Returns a new hash table with the same equivalence predicate, hash
+function and mappings as in @var{hash-table}.
+@end defun
+
+@defun hash-table-merge! hash-table1 hash-table2 → hash-table
+Adds all mappings in @var{hash-table2} into @var{hash-table1} and
+returns the resulting hash table. This function may modify
+@var{hash-table1} destructively.
+@end defun
+
+@subsubsection Hashing
+Hashing means the act of taking some value and producing a number from
+the value. A hash function is a function that does this. Every
+equivalence predicate e has a set of acceptable hash functions for
+that predicate; a hash funtion hash is acceptable iff
+@code{(e @var{obj1} @var{obj2})} implies
+@code{(= (hash @var{obj1}) (hash @var{obj2}))}.
+
+A hash function @var{h} is good for a equivalence predicate @var{e} if
+it distributes the result numbers (hash values) for non-equal objects
+(by @var{e}) as uniformly as possible over the numeric range of hash
+values, especially in the case when some (non-equal) objects resemble
+each other by e.g. having common subsequences. This definition is
+vague but should be enough to assert that e.g. a constant function is
+not a good hash function.
+
+When the definition of @code{make-hash-table} above talks about an
+appropriate hashing function for @var{e}, it means a hashing function
+that gives decent performance (for the hashing operation) while being
+both acceptable and good for @var{e}. This definition, too, is
+intentionally vague.
+
+The Kawa implementation always calls the hash functions with a single
+parameter, and expects the result to be within the entire
+(32-bit signed) @code{<int>} range, for compatibility with
+standard @code{hashCode} methods.
+
+@defun hash object [ bound ] → integer
+Produces a hash value for object in the range from 0 (inclusive) tp to
+@var{bound} (exclusive).
+
+If @var{bound} is not given, the Kawa implementation returns a value within
+the range @w{@code{(- (expt 2 32))}} (inclusive)
+to @w{@code{(- (expt 2 32) 1)}} (inclusive).
+It does this by calling the standard @code{hashCode} method,
+and returning the result as is.
+(If the @var{object} is the Java @code{null} value, 0 is returned.)
+This hash function is acceptable for @code{equal?}.
+@end defun
+
+@defun string-hash string [ bound ] → integer
+The same as @code{hash}, except that the argument string must be a string.
+(The Kawa implementation returns the same as the @code{hash} function.)
+@end defun
+
+@defun string-ci-hash string [ bound ] → integer
+The same as @code{string-hash}, except that the case of characters in
+string does not affect the hash value produced.
+(The Kawa implementation returns the same the @code{hash} function
+applied to teh lower-cased @var{string}.)
+@end defun
+
+@defun hash-by-identity object [ bound ] → integer
+The same as @code{hash}, except that this function is only guaranteed
+to be acceptable for @code{eq?}.
+Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
+@end defun 
 
 @node Exceptions, Locations, Data structures, Extensions
 @section Exception handling
@@ -5962,6 +6228,33 @@ editors, except as needed for the purpose of developing SRFIs in which
 case the procedures for copyrights defined in the SRFI process must be
 followed, or as required to translate it into languages other than
 English.
+@end quotation
+
+This manual has quoted from SRFI-69 (Basic hash tables),
+which is Copyright (C) Panu Kalliokoski (2005). All Rights Reserved.
+
+The following notice applies to SRFI-69,
+which are quoted in this manual, but it does not apply to the manual as a whole:
+
+@quotation
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+Software), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 @end quotation
 
 @c I'd prefer to call this node plain "Index", but that causes a clash

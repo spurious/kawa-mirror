@@ -2481,8 +2481,15 @@ public class XQParser extends Lexer
       }
     else if (token == FLOAT_TOKEN)
       {
-	Object val = new gnu.math.DFloNum(new String(tokenBuffer, 0, tokenBufferLength));
-	exp = new QuoteExp(val);
+        String str = new String(tokenBuffer, 0, tokenBufferLength);
+        try
+          {
+            exp = new QuoteExp(new gnu.math.DFloNum(str));
+          }
+        catch (Throwable ex)
+          {
+            exp = syntaxError("invalid decimal literal: '"+str+"'");
+          }
       }
     /*
     else if (token == '<')

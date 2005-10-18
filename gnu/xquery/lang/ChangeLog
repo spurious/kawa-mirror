@@ -1,3 +1,8 @@
+2005-10-18  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseMaybePrimaryExpr): Catch DFloNum
+	parsing exception.
+
 2005-10-06  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseMaybePrimaryExpr): For text and comment

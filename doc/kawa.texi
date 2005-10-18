@@ -5,6 +5,7 @@
 @setchapternewpage off
 @syncodeindex fn cp
 @syncodeindex vr cp
+@syncodeindex pg cp
 @c version: %W% %G%
 @c %**end of header
 
@@ -976,17 +977,22 @@ Various named option control how Kawa compiles certain forms.
 @item --module-static
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static #t)} were specified). @xref{Module classes}.
+@cindex --warn-@var{whatever}
+@cindex --no-warn-@var{whatever}
+@pindex warn-invoke-unknown-method
 @item --warn-invoke-unknown-method
 Emit a warning if the @code{invoke} function calls a named method
 for which there is no matching method in the compile-time type of the receiver.
 This (currently) defaults to on;
 to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
+@pindex warn-undefined-variable
 @item --warn-undefined-variable
 Emit a warning if the code references a variable which is neither in
 lexical scope nor in the compile-time dynamic (global) environment.
 This is useful for catching typos.
 (A @code{define-variable} form can be used to silence warnings.
 It declares to the compiler that a variable is to be resolved dynamically.)
+@pindex warn-as-error
 @item --warn-as-error
 Treat a compilation warning as if it were an error and halt compilation.
 @end table

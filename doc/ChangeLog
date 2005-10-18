@@ -1,3 +1,7 @@
+2005-10-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Compilation options): Add some index entries.
+
 2005-10-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES): Move kawa.txt *.info to ...

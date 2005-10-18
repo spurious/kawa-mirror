@@ -8,7 +8,7 @@ public class TtyInPort extends InPort
 {
   protected OutPort tie;
 
-  private Procedure prompter;
+  protected Procedure prompter;
 
   /** Get the current prompter function. */
 
@@ -38,7 +38,7 @@ public class TtyInPort extends InPort
     this.tie = tie;
   }
 
-  private boolean promptEmitted;
+  protected boolean promptEmitted;
 
   public int fill (int len) throws java.io.IOException
   {

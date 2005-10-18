@@ -1168,7 +1168,6 @@ find that library.
 * Numbers::              Quantities and Numbers
 * Data structures::
 * Exceptions::           Exception handling
-* Locations::
 * Eval and Environments::
 * Debugging::
 * Threads::
@@ -1239,38 +1238,45 @@ Kawa implements the following semi-standard SRFIs
 (@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
 @itemize
 @item
-SRFI 0: Feature-based conditional expansion construct,
+@uref{http://srfi.schemers.org/srfi-0/srfi-0.html, SRFI 0}: Feature-based conditional expansion construct,
 using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
 @item
-SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
+@uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)}.
 @item
-SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
+@uref{http://srfi.schemers.org/srfi-4/srfi-4.html, SRFI 4}: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
 @item
-SRFI 6: Basic String Ports - @pxref{Ports}.
+@uref{http://srfi.schemers.org/srfi-6/srfi-6.html, SRFI 6}: Basic String Ports - @pxref{Ports}.
 @item
-SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
+@uref{http://srfi.schemers.org/srfi-8/srfi-8.html, SRFI 8}: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
 @item
-SRFI 9: Defining Record Types, using @code{define-record-type}
+@uref{http://srfi.schemers.org/srfi-9/srfi-9.html, SRFI 9}: Defining Record Types, using @code{define-record-type}
 - @pxref{Record types}.
 @item
-SRFI 11: Syntax for receiving multiple values,
+@uref{http://srfi.schemers.org/srfi-11/srfi-11.html, SRFI 11}: Syntax for receiving multiple values,
 using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
 @item
-SRFI 17: Generalized @code{set!} - @pxref{Locations}.
+@uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
+using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
+(The implementation has not been optimied for Kawa yet.)
 @item
-SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
+@uref{http://srfi.schemers.org/srfi-17/srfi-17.html, SRFI 17}: Generalized @code{set!} - @pxref{Locations}.
 @item
-SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
+@uref{http://srfi.schemers.org/srfi-23/srfi-23.html, SRFI 23}: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
 @item
-SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
+@uref{http://srfi.schemers.org/srfi-25/srfi-25.html, SRFI 25}: Multi-dimensional Array Primitives - @pxref{Arrays}.
 @item
-SRFI 28: Basic Format Strings - @pxref{Format}.
+@uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26}: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
 @item
-SRFI 30: Nested Multi-line Comments.
+@uref{http://srfi.schemers.org/srfi-28/srfi-28.html, SRFI 28}: Basic Format Strings - @pxref{Format}.
 @item
-SRFI 37: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@uref{http://srfi.schemers.org/srfi-30/srfi-30.html, SRFI 30}: Nested Multi-line Comments.
 @item
-SRFI 69: Basic hash tables - @pxref{Hash tables}.
+@uref{http://srfi.schemers.org/srfi-37/srfi-37.html, SRFI 37}: @uref{http://srfi.schemers.org/srfi-37/srfi-37.html,@code{args-fold} - a program argument processor}, if @code{(require 'args-fold)}.
+@item
+@uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
+@xref{Parameter objects}.
+@item
+@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
 @end itemize
 
 @node Restrictions, , Implemented SRFIs, Features
@@ -2669,7 +2675,7 @@ to be acceptable for @code{eq?}.
 Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
 @end defun 
 
-@node Exceptions, Locations, Data structures, Extensions
+@node Exceptions, Eval and Environments, Data structures, Extensions
 @section Exception handling
 
 @defun catch key thunk handler
@@ -2761,8 +2767,85 @@ is not yet possible in Kawa), the @var{in-guard} is called again.
 This function was added in R5RS.
 @end defun
 
-@node Locations, Eval and Environments, Exceptions, Extensions
-@section Locations
+@node Eval and Environments, Debugging, Exceptions, Extensions
+@section Eval and Environments
+
+@defun eval expression [environment]
+@code{eval} evaluates @var{expression} in the environment indicated
+by @var{environment}.
+
+The default for @var{environment} is the result
+of @code{(interaction-environment)}.
+@end defun
+
+@defun null-environment version
+This procedure returns an environment that contains no variable bindings,
+but contains (syntactic) bindings for all the syntactic keywords.
+
+The effect of assigning to a variable in this environment (such
+as @code{let}) is undefined.
+@end defun
+
+@defun scheme-report-environment version
+The @var{version} must be an exact non-negative inetger corresponding to
+a version of one of the Revised@var{version} Reports on Scheme.
+The procedure returns an environment that contains exactly the set of
+bindings specified in the corresponding report.
+
+This implementation supports @var{version} that is 4 or 5.
+
+The effect of assigning to a variable in this environment (such
+as @code{car}) is undefined.
+@end defun
+
+@defun interaction-environment
+This procedure return an environment that contains implementation-defined
+bindings, as well as top-level user bindings.
+@end defun
+
+@defun environment-bound? environment symbol
+Return true @code{#t} if there is a binding for @var{symbol}
+in @var{environment};  otherwise returns @code{#f}.
+@end defun
+
+@deffn Syntax fluid-let ((variable init) ...) body ...
+Evaluate the @var{init} expressions.
+Then modify the dynamic bindings for the @var{variables} to the
+values of the @var{init} expressions, and evaluate the @var{body} expressions.
+Return the result of the last expression in @var{body}.
+Before returning, restore the original bindings.
+The temporary bindings are only visible in the current thread, and its
+descendent threads.
+@end deffn
+
+@defun base-uri [node]
+If @var{node} is specified, returns the base-URI property
+of the @var{node}.  If the @var{node} does not have the base-URI
+property, returns @code{#f}.
+(The XQuery version returns the empty sequence in that case.)
+
+In the zero-argument case, returns the "base URI" of the current context.
+By default the base URI is the current working directory (as a URL).
+While a source file is @code{load}ed, the base URI is temporarily
+set to the URL of the document.
+@end defun
+
+@defun load path
+The @var{path} can be an (absolute) URL or a filename.
+@end defun
+
+@defun load-relative path
+Same as @code{load}, except that @var{path} is a
+URI that is relative to the context's current base URI.
+@end defun
+
+@menu
+* Locations::
+* Parameter objects::
+@end menu
+
+@node Locations, Parameter objects, , Eval and Environments
+@subsection Locations
 
 A @dfn{location} is a place where a value can be stored.
 An @dfn{lvalue} is an expression that refers to a location.
@@ -2840,77 +2923,127 @@ as a settable @dfn{thunk}.  Others may find it useful to
 think of the @code{location} syntax as similar to the C @samp{&} operator;
 for the @samp{*} indirection operator, Kawa uses procedure application.
 
-@node Eval and Environments, Debugging, Locations, Extensions
-@section Eval and Environments
+@node Parameter objects, , Locations, Eval and Environments
+@subsection Parameter objects
 
-@defun eval expression [environment]
-@code{eval} evaluates @var{expression} in the environment indicated
-by @var{environment}.
+A parameter object is a procedure that is bound to a location,
+and may optionally have a conversion procedure.
+The procedure accepts zero or one argument.
+When the procedure is called with zero arguments,
+the content of the location is returned.
+On a call with one argument the content of the location
+is updated with the result of applying the parameter object's conversion
+procedure to the argument.
 
-The default for @var{environment} is the result
-of @code{(interaction-environment)}.
+Parameter objects are created with the @code{make-parameter} procedure
+which takes one or two arguments. The second argument is a one
+argument conversion procedure. If only one argument is passed to
+make-parameter the identity function is used as a conversion
+procedure.
+A new location is created and asociated with the 
+parameter object. The initial content of the location is the
+result of applying the conversion procedure to the first argument of
+make-parameter.
+
+Note that the conversion procedure can be used for guaranteeing the
+type of the parameter object's binding and/or to perform some
+conversion of the value.
+
+The @code{parameterize} special form, when given a parameter object
+and a value, binds the parameter
+object to a new location for the dynamic extent of its body.
+The initial content of the location is the result of
+applying the parameter object's conversion procedure to the value. The
+@code{parameterize} special form behaves analogously to @code{let}
+when binding more than one parameter object (that is the order of
+evaluation is unspecified and the new bindings are only visible in the
+body of the parameterize special form).
+
+When a new thread is created using @code{future} or @code{runnable}
+then the child thread shares locations with its parents.
+This sharing is broken by a @code{parameterize} that changes
+the location, and restored when the @code{parameterize} exits.
+
+Note that @code{parameterize} and @code{fluid-let} have similar
+binding and sharing behavior.
+The difference is that @code{fluid-let} modifies locations
+accessed by name, while @code{make-parameter} and @code{parameterize}
+create anonymous locations accessed by calling a parameter procedure.
+
+The R5RS procedures @code{current-input-port} and @code{current-output-port}
+are parameter objects.
+
+@defun make-parameter init [converter])
+
+Returns a new parameter object which is bound in the global dynamic
+environment to a location containing the value returned by the call
+@code{(@var{converter} @var{init})}. If the conversion procedure
+converter is not specified the identity function is used instead.
+
+The parameter object is a procedure which accepts zero or one
+argument. When it is called with no argument, the content of the
+location bound to this parameter object in the current dynamic
+environment is returned. When it is called with one argument, the
+content of the location is set to the result of the call
+@code{(@var{converter} @var{arg})}, where @var{arg} is the argument
+passed to the parameter object, and an unspecified value is returned.
+
+@example
+(define radix
+  (make-parameter 10))
+
+(define write-shared
+  (make-parameter
+    #f
+    (lambda (x)
+      (if (boolean? x)
+          x
+          (error "only booleans are accepted by write-shared")))))
+
+(radix)           ==>  10
+(radix 2)
+(radix)           ==>  2
+(write-shared 0)  gives an error
+
+(define prompt
+  (make-parameter
+    123
+    (lambda (x)
+      (if (string? x)
+          x
+          (with-output-to-string (lambda () (write x)))))))
+
+(prompt)       ==>  "123"
+(prompt ">")
+(prompt)       ==>  ">"
+@end example
 @end defun
 
-@defun null-environment version
-This procedure returns an environment that contains no variable bindings,
-but contains (syntactic) bindings for all the syntactic keywords.
+@deffn Syntax parameterize ((expr1 expr2) ...) <body>
+The expressions @var{expr1} and @var{expr2} are evaluated in an
+unspecified order. The value of the @var{expr1} expressions must be
+parameter objects. For each @var{expr1} expression and in an
+unspecified order, the local dynamic environment is extended with a
+binding of the parameter object @var{expr1} to a new location whose
+content is the result of the call @code{(@var{converter} @var{val})},
+where @var{val} is the value of @var{expr2} and @var{converter} is the
+conversion procedure of the parameter object. The resulting dynamic
+environment is then used for the evaluation of @var{<body>} (which
+refers to the R5RS grammar nonterminal of that name). The result(s) of
+the parameterize form are the result(s) of the @var{<body>}.
 
-The effect of assigning to a variable in this environment (such
-as @code{let}) is undefined.
-@end defun
+@example
+(radix)                                              ==>  2
+(parameterize ((radix 16)) (radix))                  ==>  16
+(radix)                                              ==>  2
 
-@defun scheme-report-environment version
-The @var{version} must be an exact non-negative inetger corresponding to
-a version of one of the Revised@var{version} Reports on Scheme.
-The procedure returns an environment that contains exactly the set of
-bindings specified in the corresponding report.
+(define (f n) (number->string n (radix)))
 
-This implementation supports @var{version} that is 4 or 5.
-
-The effect of assigning to a variable in this environment (such
-as @code{car}) is undefined.
-@end defun
-
-@defun interaction-environment
-This procedure return an environment that contains implementation-defined
-bindings, as well as top-level user bindings.
-@end defun
-
-@defun environment-bound? environment symbol
-Return true @code{#t} if there is a binding for @var{symbol}
-in @var{environment};  otherwise returns @code{#f}.
-@end defun
-
-@deffn Syntax fluid-let ((variable init) ...) body ...
-Evaluate the @var{init} expressions.
-Then modify the dynamic bindings for the @var{variables} to the
-values of the @var{init} expressions, and evaluate the @var{body} expressions.
-Return the result of the last expression in @var{body}.
-Before returning, restore the original bindings.
-The temporary bindings are only visible in the current thread, and its
-descendent threads.
+(f 10)                                               ==>  "1010"
+(parameterize ((radix 8)) (f 10))                    ==>  "12"
+(parameterize ((radix 8) (prompt (f 10))) (prompt))  ==>  "1010"
+@end example
 @end deffn
-
-@defun base-uri [node]
-If @var{node} is specified, returns the base-URI property
-of the @var{node}.  If the @var{node} does not have the base-URI
-property, returns @code{#f}.
-(The XQuery version returns the empty sequence in that case.)
-
-In the zero-argument case, returns the "base URI" of the current context.
-By default the base URI is the current working directory (as a URL).
-While a source file is @code{load}ed, the base URI is temporarily
-set to the URL of the document.
-@end defun
-
-@defun load path
-The @var{path} can be an (absolute) URL or a filename.
-@end defun
-
-@defun load-relative path
-Same as @code{load}, except that @var{path} is a
-URI that is relative to the context's current base URI.
-@end defun
 
 @node Debugging, Threads, Eval and Environments, Extensions
 @section Debugging
@@ -6211,9 +6344,12 @@ This manual has quoted from SRFI-26 (Notation for Specializing
 Parameters without Currying),
 which is Copyright (C) Sebastian Egner (2002). All Rights Reserved.
 
+This manual has quoted from SRFI-39 (Parameter objects),
+which is Copyright (C) Marc Feeley (2002). All Rights Reserved.
+
 The following notice applies to SRFI-6, SRFI-8, SRFI-9, SRFI-11, SRFI-25,
-and SRFI-26, which are quoted in this manual, but it does not apply to the
-manual as a whole:
+SRFI-26, and SRFI-39,
+which are quoted in this manual, but it does not apply to the manual as a whole:
 
 @quotation
 This document and translations of it may be copied and furnished to
@@ -6228,6 +6364,16 @@ editors, except as needed for the purpose of developing SRFIs in which
 case the procedures for copyrights defined in the SRFI process must be
 followed, or as required to translate it into languages other than
 English.
+
+The limited permissions granted above are perpetual and will not be
+revoked by the authors or their successors or assigns.
+
+This document and the information contained herein is provided on an
+"AS IS" basis and THE AUTHOR AND THE SRFI EDITORS DISCLAIM ALL
+WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY
+RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+PARTICULAR PURPOSE.
 @end quotation
 
 This manual has quoted from SRFI-69 (Basic hash tables),

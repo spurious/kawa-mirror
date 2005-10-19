@@ -104,50 +104,22 @@
      (let-values (?binding0)
         (let*-values (?binding1 ...) ?body0 ?body1 ...)))))
 
-;; CASE-LAMBDA implementation from SRFI-16, by Lars T Hansen.
-;; http://srfi.schemers.org/srfi-16/srfi-16.html
-
-;; This code is in the public domain.
-
-(define-syntax case-lambda
-  (syntax-rules ()
-    ((case-lambda 
-      (?a1 ?e1 ...) 
-      ?clause1 ...)
-     (lambda args
-       (let ((l (length args)))
-         (case-lambda "CLAUSE" args l 
-           (?a1 ?e1 ...)
-           ?clause1 ...))))
-    ((case-lambda "CLAUSE" ?args ?l 
-      ((?a1 ...) ?e1 ...) 
-      ?clause1 ...)
-     (if (= ?l (length '(?a1 ...)))
-         (apply (lambda (?a1 ...) ?e1 ...) ?args)
-         (case-lambda "CLAUSE" ?args ?l 
-           ?clause1 ...)))
-    ((case-lambda "CLAUSE" ?args ?l
-      ((?a1 . ?ar) ?e1 ...) 
-      ?clause1 ...)
-     (case-lambda "IMPROPER" ?args ?l 1 (?a1 . ?ar) (?ar ?e1 ...) 
-       ?clause1 ...))
-    ((case-lambda "CLAUSE" ?args ?l 
-      (?a1 ?e1 ...)
-      ?clause1 ...)
-     (let ((?a1 ?args))
-       ?e1 ...))
-    ((case-lambda "CLAUSE" ?args ?l)
-     (error "Wrong number of arguments to CASE-LAMBDA."))
-    ((case-lambda "IMPROPER" ?args ?l ?k ?al ((?a1 . ?ar) ?e1 ...)
-      ?clause1 ...)
-     (case-lambda "IMPROPER" ?args ?l (+ ?k 1) ?al (?ar ?e1 ...) 
-      ?clause1 ...))
-    ((case-lambda "IMPROPER" ?args ?l ?k ?al (?ar ?e1 ...) 
-      ?clause1 ...)
-     (if (>= ?l ?k)
-         (apply (lambda ?al ?e1 ...) ?args)
-         (case-lambda "CLAUSE" ?args ?l 
-           ?clause1 ...)))))
+(define-syntax (case-lambda form)
+  (syntax-case form ()
+    ((_ . cl)
+     (make <pair> ; The cons function isn't visible yet.
+       (syntax make-procedure)
+       (let loop ((clauses (syntax cl)))
+	 (syntax-case clauses ()
+	   (((formals . body) . rest)
+	    (make <pair>
+	      (syntax (lambda formals . body))
+	      (loop (syntax rest))))
+	   (()
+	    '())
+	   (rest
+	    (list (syntax-error (syntax rest)
+				"invalid case-lambda clause")))))))))
 
 ;; COND-EXPAND implementation from http://srfi.schemers.org/srfi-0/srfi-0.html
 ;; Copyright (C) Marc Feeley (1999). All Rights Reserved.

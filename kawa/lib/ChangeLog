@@ -1,3 +1,8 @@
+2005-10-19  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (case-lambda): Reimplement to translate to make-procedure.
+	Use syntax-case in implementation.
+
 2005-08-15  thomas kirk  <tk@research.att.com>
 
 	* thread.scm (runnable): New function.

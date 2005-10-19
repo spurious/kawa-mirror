@@ -393,6 +393,7 @@ public class Scheme extends LispLanguage
 
       defProcStFld("%syntax-error", "kawa.standard.syntax_error",
                    "syntax_error");
+      defProcStFld("syntax-error", "kawa.lib.prim_syntax");
 
       r4Environment.setLocked();
       environ = r5Environment;

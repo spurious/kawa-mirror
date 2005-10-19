@@ -1,3 +1,7 @@
+2005-10-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard.Scheme.java: Define syntax-error macro.
+
 2005-10-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am JAVADOC_ANT_JARS, JAVADOC_ECLIPSE_JARS): Update/fix.

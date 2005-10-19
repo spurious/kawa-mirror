@@ -772,12 +772,21 @@ public class Declaration
       else
         ftype = Compilation.typeLocation;
     String fname = getName();
-    fname = Compilation.mangleNameIfNeeded(fname);
-    if (getFlag(IS_UNKNOWN))
-      fname = UNKNOWN_PREFIX + fname;
-    if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
-      fname = PRIVATE_PREFIX + fname;
-    int nlength = fname.length();
+    int nlength;
+    if (fname==null)
+      {
+        fname = "$unnamed$0";
+        nlength = fname.length() - 2; // Without the "$0".
+      }
+    else
+      {
+        fname = Compilation.mangleNameIfNeeded(fname);
+        if (getFlag(IS_UNKNOWN))
+          fname = UNKNOWN_PREFIX + fname;
+        if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
+          fname = PRIVATE_PREFIX + fname;
+        nlength = fname.length();
+      }
     int counter = 0;
     while (frameType.getDeclaredField(fname) != null)
       fname = fname.substring(0, nlength) + '$' + (++ counter);

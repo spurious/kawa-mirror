@@ -1,3 +1,9 @@
+2005-10-19  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Handle an unnamed declaration.
+	This fixes a bug where an inner syntax-case needed to initialize
+	its matchArray using a matchArray from an outer lambda.
+
 2005-10-16  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (<init>): Don't try to getReflectClass for a

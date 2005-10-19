@@ -1,5 +1,5 @@
 HIGH PRIORITY:
-* srfi-69 - hash tables
+* re-implement case-lambda in terms of make-procedure
 * properties of symbols
 * Document fluid-let in manual.
 * rename sublist to subsequence.  deprecate sublist, item-at
@@ -24,7 +24,6 @@ The default output-pourt shold be re-directed.
 It should be the same as the ctx.consumer.
 
 BEFORE KAWA 1.8?
-* SRFI-9 (define-record-type) constructurs should not use reflection.
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * CL reader interface
 * More define-class functionality?

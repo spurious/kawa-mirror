@@ -2973,7 +2973,7 @@ create anonymous locations accessed by calling a parameter procedure.
 The R5RS procedures @code{current-input-port} and @code{current-output-port}
 are parameter objects.
 
-@defun make-parameter init [converter])
+@defun make-parameter init [converter]
 
 Returns a new parameter object which is bound in the global dynamic
 environment to a location containing the value returned by the call

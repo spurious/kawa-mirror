@@ -37,10 +37,16 @@ public class WrongArguments extends IllegalArgumentException {
     else
       return null;
     StringBuffer buf = new StringBuffer(100);
-    buf.append("call to '");
-    buf.append(pname);
-    buf.append("' has too ");
-    buf.append(tooMany ? "many" : "few");
+    buf.append("call to ");
+    if (pname == null)
+      buf.append("unnamed procedure");
+    else
+      {
+        buf.append('\'');
+        buf.append(pname);
+        buf.append('\'');
+      }
+    buf.append(tooMany ? " has too many" : " has too few");
     buf.append(" arguments (");
     buf.append(argCount);
     if (min == max)

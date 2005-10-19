@@ -1,3 +1,8 @@
+2005-10-18  Per Bothner  <per@bothner.com>
+
+	* Makefile.am JAVADOC_ANT_JARS, JAVADOC_ECLIPSE_JARS): Update/fix.
+	(javadoc-cvs.log): Make script more robust wrt empty file lists.
+
 2005-10-16  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (featureMap): Add 'srfi-69,'hash-table.

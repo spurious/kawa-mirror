@@ -160,15 +160,17 @@ javadoc-cvs.log:
 	  && find . -name CVS -prune -o -type f -exec echo rm '{}' ';'
 	$(MAKE) install-javadoc-html >&LOG.JAVADOC
 	(cd $(JAVADOC_DIR) && cvs -n update -d .>&/tmp/cvs-changes \
-	  && cvs add `grep '^[?] ' /tmp/cvs-changes |sed -e 's|[?] ||'` \
-	  && cvs remove `grep '^[U] ' /tmp/cvs-changes |sed -e 's|[U] ||'` \
+	  && (grep '^[?] ' /tmp/cvs-changes |sed -e 's|[?] ||') >/tmp/cvs-adds \
+	  && (test '!' -s /tmp/cvs-adds || cvs add `cat /tmp/cvs-adds`) \
+	  && (grep '^[U] ' /tmp/cvs-changes |sed -e 's|[U] ||') >/tmp/cvs-rems\
+	  && (test '!' -s /tmp/cvs-rems || cvs remove `cat /tmp/cvs-rems`) \
 	  && cvs update -d .) >cvs-update.log
 	echo ExamineCheck ./cvs-update.log
 	echo then: "(cd $(JAVADOC_DIR) && cvs ci -m 'Re-run javadoc.')".
 
 ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
-JAVADOC_ANT_JARS = /opt/ant/lib/ant.jar
-JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0/jface.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk_3.1.0/ws/gtk/swt.jar
+JAVADOC_ANT_JARS = $(ECLIPSE_PLUGINS_PATH)/org.apache.ant_1.6.5/lib/ant.jar
+JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk.linux.x86_3.1.0.jar
 JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
 
 install-javadoc-html:

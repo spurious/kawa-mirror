@@ -4898,8 +4898,9 @@ then its value is doubled.
   (init: (if (some-condition) (set! x (* x 2)))))
 @end example
 
-Each @var{method-decl} declares a public non-static method,
-whose name is @var{method-name}.  (If @var{method-name} is not a valid
+Each @var{method-decl} declares method,
+which is by default public and non-static, and whose name is @var{method-name}.
+(If @var{method-name} is not a valid
 Java method name, it is mapped to something reasonable.
 For example @code{foo-bar?} is mapped to @code{isFooBar}.)
 The types of the method arguments can be specified in the
@@ -4930,27 +4931,57 @@ For example:
 @end example
 @end table
 
+The special @var{method-name} @samp{*init*} can be used to name
+a non-default constructor (in a @code{define-simple-class} only).
+It can be used to initialize a freshly-allocated instance
+using passed-in parameters.
+You can call a superclass or a sibling constructor using
+the @code{invoke-special} special function.
+(This is general but a admittedly a bit verbose; a more compact
+form will be added in the future.)
+See the example below.
+
 The scope of the @var{body} of a method includes the @var{field-decl}s
 of the object.  It does include the surrounding lexical scope.
 It sort-of also includes the declared methods, but this is not working yet.
 @end deffn
 
-A simple example:
+In the following example we define a simple class @code{<2d-vector>}
+and a class @code{<3d-vector>} that extends it.  (This is for illustration
+only - defining 3-dimensional points as an extension
+of 2-dimensional points does not really make sense.)
+
 @example
 (define-simple-class <2d-vector> ()
-  (x type: <double> init-value: 0.0 init-keyword: x:)
-  (y type: <double> init-value: 0.0 init-keyword: y:)
+  (x type: <double> init-keyword: x:)
+  (y type: <double> init-keyword: y:)
+  (zero-2d :: <2d-vector> allocation: 'static
+   init-value: (make <2d-vector> 0))
+  ;; An object initializer (constructor) method.
+  ((*init* (x0 :: <double>) (y0 :: <double>))
+   (set! x x0)
+   (set! y y0))
+  ((*init* (xy0 :: <double>))
+   ;; Call above 2-argument constructor.
+   (invoke-special <2d-vector> (this) '*init* xy0 xy0))
+  ;; Need a default constructor as well, for the  (make ..) below.
+  ((*init*) #!void)
   ((add (other :: <2d-vector>)) :: <2d-vector>
    ;; Kawa compiles this using primitive Java types!
    (make <2d-vector>
      x: (+ x (slot-ref other 'x))
      y: (+ y (slot-ref other 'y))))
   ((scale (factor :: <double>)) :: <2d-vector>
-   ;; Unfortunately, multiply is not yet optimized as addition is.
    (make <2d-vector> x: (* factor x) y: (* factor y))))
 
 (define-simple-class <3d-vector> (<2d-vector>)
   (z type: <double> init-value: 0.0 init-keyword: z:)
+  ;; A constructor which calls the superclass constructor.
+  ((*init* (x0 :: <double>) (y0 :: <double>) (z0 :: <double>))
+   (invoke-special <2d-vector> (this) '*init* x0 y0)
+   (set! z z0))
+  ;; Need a default constructor for the  (make ..) below.
+  ((*init*) #!void)
   ((scale (factor :: <double>)) :: <2d-vector>
    ;; Note we cannot override the return type to <3d-vector>
    ;; because Java does not allow that.  Should hide that. .
@@ -4958,9 +4989,16 @@ A simple example:
      ;; Unfortunately, slot names of inherited classes are not visible.
      ;; Until this is fixed, use slot-ref.
      x: (* factor (slot-ref (this) 'x))
-     y: (* factor (slot-ref (this) 'y))
+     y: (* factor (*:.y (this))) ;; Alternative syntax.
      z: (* factor z))))
 @end example
+
+Note we define both explicit non-default constructor methods,
+and we associate fields with keywords, so they can be named
+in a @code{make} call.  The latter requires a default constructor,
+and since having non-default constructors suppresses
+the implicit default constructor we have to explicitly define it.
+Using both styles of constructors is rather redundant, though.
 
 @node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
 @subsection Anonymous classes

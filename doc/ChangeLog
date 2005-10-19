@@ -1,5 +1,7 @@
 2005-10-18  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Defining new classes): Discuss *init* methods.
+
 	* kawa.texi (Parameter objects): New node.
 	(Location): Move under the Eval and Environments section.
 	* kawa.texi (Implemented-SRFIs): Update for SRFI-16 and SRFI-39.

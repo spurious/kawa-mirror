@@ -39,7 +39,7 @@ Kawa is:
 @itemize
 @item
 A framework written in Java for implementing
-high-level and dynamic languages, compling them into Java bytecodes.
+high-level and dynamic languages, compiling them into Java bytecodes.
 @item
 An implementation of @uref{http://www.schemers.org/,Scheme}, which
 is in the Lisp family of programming languages.

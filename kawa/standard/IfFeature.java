@@ -35,6 +35,8 @@ public class IfFeature
       return true;
     if (name == "srfi-11") // let-values, let*-values
       return true;
+    if (name == "srfi-16") // case-lambda
+      return true;
     if (name == "srfi-17") // Generalized set!
       return true;
     if (name == "srfi-23") // Error reporting mechanism
@@ -46,6 +48,8 @@ public class IfFeature
     if (name == "srfi-28") // Basic Format Strings
       return true;
     if (name == "srfi-30") // Nested Multi-line Comments.
+      return true;
+    if (name == "srfi-39") // Parameter objects
       return true;
     return false;
   }

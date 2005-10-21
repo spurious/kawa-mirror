@@ -1,3 +1,11 @@
+2005-10-20  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/IfFeature.java (hasFeature): We also have features
+	srfi-16 and srfi-39.
+
+	* kawa/standard/require.java (featureMap): Add srfi-35, srfi-35,
+	and aliases.
+
 2005-10-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard.Scheme.java: Define syntax-error macro.

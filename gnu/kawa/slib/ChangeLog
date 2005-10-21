@@ -1,3 +1,10 @@
+2005-10-20  Per Bothner  <per@bothner.com>
+
+	* srfi34.scm: New implementation of SRFI-34 (Exception Handling for
+	Programs).
+	* conditions.scm: New implementation of SRFI-35 (Conditions).
+	* Makefile.am: Update accordingly.
+
 2005-10-16  Per Bothner  <per@bothner.com>
 
 	* srfi69.scm: Major re-write for Kawa.

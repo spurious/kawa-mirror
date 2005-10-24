@@ -367,13 +367,13 @@ dist-info: $(INFO_DEPS)
 
 mostlyclean-aminfo:
 	-rm -rf kawa.aux kawa.cp kawa.cps kawa.fn kawa.ky kawa.kys kawa.log kawa.pg \
-	  kawa.pgs kawa.tmp kawa.toc kawa.tp kawa.tps kawa.vr kawa.dvi \
-	  kawa.pdf kawa.ps kawa.html kawa-tour.aux kawa-tour.cp \
-	  kawa-tour.cps kawa-tour.fn kawa-tour.fns kawa-tour.ky \
-	  kawa-tour.kys kawa-tour.log kawa-tour.pg kawa-tour.pgs \
-	  kawa-tour.tmp kawa-tour.toc kawa-tour.tp kawa-tour.tps \
-	  kawa-tour.vr kawa-tour.vrs kawa-tour.dvi kawa-tour.pdf \
-	  kawa-tour.ps kawa-tour.html
+	  kawa.tmp kawa.toc kawa.tp kawa.tps kawa.vr kawa.dvi kawa.pdf \
+	  kawa.ps kawa.html kawa-tour.aux kawa-tour.cp kawa-tour.cps \
+	  kawa-tour.fn kawa-tour.fns kawa-tour.ky kawa-tour.kys \
+	  kawa-tour.log kawa-tour.pg kawa-tour.pgs kawa-tour.tmp \
+	  kawa-tour.toc kawa-tour.tp kawa-tour.tps kawa-tour.vr \
+	  kawa-tour.vrs kawa-tour.dvi kawa-tour.pdf kawa-tour.ps \
+	  kawa-tour.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \

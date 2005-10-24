@@ -1,3 +1,10 @@
+2005-10-24  Per Bothner  <per@bothner.com>
+
+	* conditions.scm: Add appropriate (provide 'FEATURE) macros.
+	* srfi1.scm: Likewise.
+	* srfi34.scm: Likewise.
+	* srfi69.scm: Likewise.
+
 2005-10-20  Per Bothner  <per@bothner.com>
 
 	* srfi34.scm: New implementation of SRFI-34 (Exception Handling for

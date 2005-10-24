@@ -33,6 +33,9 @@
 	       make-compound-condition extract-condition
 	       define-condition-type condition
 	       &condition &message &serious &error)
+(provide 'srfi-35)
+(provide 'condition)
+(provide 'conditions)
 
 (define-simple-class <condition-type> ()
   (name)

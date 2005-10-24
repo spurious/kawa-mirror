@@ -24,6 +24,8 @@
 
 (module-compile-options warn-undefined-variable: #t
 			warn-invoke-unknown-method: #t)
+(provide 'srfi-69)
+(provide 'hash-table)
 
 (define *default-bound* #x100000000)
 

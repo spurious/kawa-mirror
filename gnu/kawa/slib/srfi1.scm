@@ -9,6 +9,9 @@
 ;;; hold me liable for its use. Please send bug reports to shivers@ai.mit.edu.
 ;;;     -Olin
 
+(provide 'srfi-1)
+(provide 'list-lib)
+
 ;;; This is a library of list- and pair-processing functions. I wrote it after
 ;;; carefully considering the functions provided by the libraries found in
 ;;; R4RS/R5RS Scheme, MIT Scheme, Gambit, RScheme, MzScheme, slib, Common

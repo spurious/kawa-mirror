@@ -1,6 +1,7 @@
 (module-compile-options warn-undefined-variable: #t
 			warn-invoke-unknown-method: #t)
 (module-export with-exception-handler guard raise)
+(provide 'srfi-34)
 
 (define-simple-class <raise-object-exception> (<java.lang.Throwable>)
   (value)

@@ -16,6 +16,16 @@
     ((define name value)
      (%define name 0 #!null value))))
 
+;; For now the same as plain define.
+(%define-syntax define-for-syntax
+  (syntax-rules (::)
+    ((define-for-syntax (name . formals) . body)
+     (%define name 2 #t formals . body))
+    ((define-for-syntax name :: type value)
+     (%define name 1 type value))
+    ((define-for-syntax name value)
+     (%define name 0 #!null value))))
+
 (%define-syntax define-private
   (syntax-rules (::)
     ((define-private (name . formals) . body)

@@ -64,6 +64,32 @@
 (define (free-identifier=? id1 id2) :: <boolean>
   (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
 
+(define (syntax-source form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (let ((str (*:getFile (as  <gnu.lists.PairWithPosition> form))))
+	   (if (eq? str #!null) #f  (make <string> str))))
+	(else
+	 #f)))
+
+(define (syntax-line form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (*:getLine (as <gnu.lists.PairWithPosition> form)))
+	(else
+	 #f)))
+
+;; zero-origin for compatility with MzScheme.
+(define (syntax-column form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (- (*:getColumn (as <gnu.lists.PairWithPosition> form)) 0))
+	(else
+	 #f)))
+
 ;; LET-VALUES implementation from SRFI-11, by Lars T Hansen.
 ;; http://srfi.schemers.org/srfi-11/srfi-11.html
 

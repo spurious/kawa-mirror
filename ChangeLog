@@ -1,5 +1,8 @@
 2005-10-24  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: Declare define-for-syntax, syntax-source,
+	syntax-line, syntax-column macros.
+
 	* kawa/standard/IfFeature.java (hasFeature): Look for a magic
 	"%provide%"+NAME variable, as defined by the new provide macro.
 	* kawa/standard/Scheme.java: Declare (provide ...) macro.

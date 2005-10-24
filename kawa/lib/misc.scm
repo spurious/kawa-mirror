@@ -25,6 +25,21 @@
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))
 
+(define-syntax (provide form)
+  (syntax-case form ()
+    ((provide 'feature)
+     (cons (syntax define-constant)
+	   (cons (datum->syntax-object
+		  form
+		  (string->symbol
+		   (string-append "%provide%"
+				  (symbol->string
+				   (syntax-object->datum (syntax feature))))))
+		 (syntax (:: <int> 123)))))
+    ((_ . rest)
+     (syntax-error form "provide requires a quoted feature-name"))))
+	   
+
 (define (environment-bound? (env :: <gnu.mapping.Environment>) sym)
   :: <boolean>
   (invoke env 'isBound

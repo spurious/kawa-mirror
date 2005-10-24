@@ -51,6 +51,15 @@ public class IfFeature
       return true;
     if (name == "srfi-39") // Parameter objects
       return true;
+
+    String provide_name = ("%provide%"+name).intern();
+    Compilation comp = Compilation.getCurrent();
+    Declaration decl = comp.lookup(provide_name, -1);
+    if (decl!=null && ! decl.getFlag(Declaration.IS_UNKNOWN))
+      return true;
+    Object obj = comp.resolve(provide_name, false);
+    if (obj instanceof Number && ((Number) obj).intValue()==123)
+      return true;
     return false;
   }
 }

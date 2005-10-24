@@ -1,5 +1,21 @@
 2005-10-24  Per Bothner  <per@bothner.com>
 
+	* testing.scm: Add more Kawa tweaks.
+	Add non-basic support for mzscheme.
+	(test-source-location-cons%): Now deprecated - not used for Kawa.
+	(test-runner-get): New function.
+	Use it where appropriate.
+	(test-begin): For Kawa, actual definition is now pre-loaded.
+	(test-result-ref): Move earlier, as needed for mzscheme.
+	(test-source-line2): Now works for mzscheme as well as Kawa.
+	(test-assert%): Inline macro into test-assert.
+	(test-comp2%): mzscheme needs to define-for-syntax.
+	(test-error%): More test-comp1body% call, so we can skip
+	the test if we don't support catching errors.
+	(test-as-specifier%): New function to "coerce" test specifiers.
+	(test-skip, test-expect-fail): Use it.
+	(test-read-eval-string string): New function.
+
 	* conditions.scm: Add appropriate (provide 'FEATURE) macros.
 	* srfi1.scm: Likewise.
 	* srfi34.scm: Likewise.

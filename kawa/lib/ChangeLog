@@ -1,5 +1,7 @@
 2005-10-24  Per Bothner  <per@bothner.com>
 
+	* misc.scm (test-begin): New macro.
+
 	* prim_syntax.scm (define-for-syntax): New macro - as in mzscheme.
 	* syntax.scm (syntax-source, syntax-ilne, syntax-column): New
 	macros, matching ones in mzscheme.

@@ -564,6 +564,7 @@ public class Scheme extends LispLanguage
       defProcStFld("procedure-property", "kawa.lib.misc");
       defProcStFld("set-procedure-property!", "kawa.lib.misc");
       defSntxStFld("provide", "kawa.lib.misc");
+      defSntxStFld("test-begin", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");

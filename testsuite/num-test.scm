@@ -1,6 +1,10 @@
-(test-begin "numbers" 1662)
+(test-begin "numbers" 1664)
 
 (test-approximate 1.4 (sqrt 2) 0.02)
+(test-error
+   #t (test-read-eval-string "0.0.0"))
+(test-assert
+ (eq? 3 3))
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.

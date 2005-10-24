@@ -398,8 +398,8 @@ check-scm: testing.zip
 	  -e "(set! symbol-read-case 'D)" \
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
-check-num: testing.zip
-	$(KAWA) -e "(require 'testing)" $(OPTIONS) -f "$(srcdir)/num-test.scm"
+check-num:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/num-test.scm"
 
 check-arr: testing.zip
 	$(KAWATEST) -f "$(srcdir)/arr-test.scm" -e '(test-report)'

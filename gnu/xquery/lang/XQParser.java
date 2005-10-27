@@ -3532,6 +3532,18 @@ public class XQParser extends Lexer
   {
     switch (curToken)
       {
+      case STRING_TOKEN:
+	StringBuffer sbuf = new StringBuffer();
+	sbuf.append('"');
+	for (int i = 0;  i < tokenBufferLength;  i++)
+	  {
+	    char ch = tokenBuffer[i];
+	    if (ch == '"')
+	      sbuf.append('"');
+	    sbuf.append(ch);
+	  }
+	sbuf.append('"');
+	return sbuf.toString();
       case NCNAME_TOKEN:
       case QNAME_TOKEN:
 	return new String(tokenBuffer, 0, tokenBufferLength);

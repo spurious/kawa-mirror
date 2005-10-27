@@ -1,3 +1,7 @@
+2005-10-27  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (tokenString): Handle STRING_TOKEN.
+
 2005-10-18  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseMaybePrimaryExpr): Catch DFloNum

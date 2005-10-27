@@ -161,7 +161,7 @@ public class ClassType extends ObjectType
     if (superClass == null
 	&& ! isInterface()
 	&& ! ("java.lang.Object".equals(getName()))
- 	&& getReflectClass() != null)
+	&& (flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
       {
 	superClass = (ClassType) make(reflectClass.getSuperclass());
       }

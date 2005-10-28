@@ -81,6 +81,85 @@ public abstract class Language
     languages = newLangs;
   }
 
+  /** Detect the programming language of a file based on its first line.
+   * @return a suitable Language or null if we didn't recognize one.
+   */
+  public static Language detect (InputStream in)
+    throws IOException
+  {
+    if (! in.markSupported())
+      return null;
+    StringBuffer sbuf = new StringBuffer();
+    in.mark(200);
+    for (;;)
+      {
+        if (sbuf.length() >= 200)
+          break;
+        int c = in.read();
+        if (c < 0 || c == '\n' || c == '\r')
+          break;
+        sbuf.append((char) c);
+      }
+    in.reset();
+    return detect(sbuf.toString());
+  }
+
+  /** Detect the programming language of a file based on its first line.
+   * @return a suitable Language or null if we didn't recognize one.
+   */
+  public static Language detect (InPort port)
+    throws IOException
+  {
+    StringBuffer sbuf = new StringBuffer();
+    port.mark(300);
+    port.readLine(sbuf, 'P');
+    port.reset();
+    return detect(sbuf.toString());
+  }
+
+  /** Detect the programming language of a file based on its first line.
+   * @param line the first input line
+   * @return a suitable Language or null if we didn't recognize one.
+   */
+  public static Language detect (String line)
+  {
+    String str = line.trim();
+    // Does the line contain the string "kawa:LANGAUGE" for a valid LANGUAGE?
+    int k = str.indexOf("kawa:");
+    if (k >= 0)
+      {
+        int i = k+5;
+        int j = i;
+        while (j < str.length()
+               && Character.isJavaIdentifierPart(str.charAt(j)))
+          j++;
+        if (j > i)
+          {
+            String w = str.substring(i, j);
+            Language lang = getInstance(w);
+            if (lang != null)
+              return lang;
+          }
+      }
+    // Check for various Emacs language/mode patterns.
+    if (str.indexOf("-*- scheme -*-") >= 0)
+      return getInstance("scheme");
+    if (str.indexOf("-*- xquery -*-") >= 0)
+      return getInstance("xquery");
+    if (str.indexOf("-*- emacs-lisp -*-") >= 0)
+      return getInstance("elisp");
+    if (str.indexOf("-*- common-lisp -*-") >= 0
+        || str.indexOf("-*- lisp -*-") >= 0)
+      return getInstance("common-lisp");
+    // Does it start with an XQuery comment or XQuery version statement?
+    if ((str.charAt(0) == '(' && str.charAt(1) == ':')
+        || (str.length() >= 7 && str.substring(0, 7).equals("xquery ")))
+      return getInstance("xquery");
+    if (str.charAt(0) == ';' && str.charAt(1) == ';')
+      return getInstance("scheme");
+    return null;
+  }
+
   public static Language getInstanceFromFilenameExtension(String filename)
   {
     int dot = filename.lastIndexOf('.');

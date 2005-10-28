@@ -1,3 +1,7 @@
+2005-10-27  Per Bothner  <per@bothner.com>
+
+	* build.xml: Kludgy update for gnu/kawa/srfi for new files.
+
 2005-10-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java: Declare test-begin.

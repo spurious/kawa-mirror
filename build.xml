@@ -509,13 +509,21 @@
     </apply>
   </target>
 
-      <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib"> 
+      <filelist id="slib-scm-list" dir="${src.dir}/gnu/kawa/slib"
+	       files="genwrite.scm pp.scm ppfile.scm printf.scm
+		DefineRecordType.scm srfi1.scm srfi34.scm conditions.scm
+		srfi37.scm srfi69.scm testing.scm readtable.scm cut.scm"/>
+      <!-- Ant doesn't seem to have a way to map a filelist to a fileset.
+	   There may be a way using pathconvet or a mapper, but for now .. -->
+      <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib">
         <include name="genwrite.scm"/>
         <include name="pp.scm"/>
         <include name="ppfile.scm"/>
         <include name="printf.scm"/>
         <include name="DefineRecordType.scm"/>
         <include name="srfi1.scm"/>
+        <include name="srfi34.scm"/>
+        <include name="conditions.scm"/>
         <include name="srfi37.scm"/>
         <include name="srfi69.scm"/>
         <include name="testing.scm"/>
@@ -539,7 +547,7 @@
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
-      <fileset refid="slib-scm"/>
+      <filelist refid="slib-scm-list"/>
     </apply>
   </target>
   

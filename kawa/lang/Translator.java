@@ -38,6 +38,7 @@ public class Translator extends Compilation
   Stack renamedAliasStack;
 
   public Stack formStack = new Stack();
+  public int firstForm;
 
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
@@ -1138,7 +1139,7 @@ public class Translator extends Compilation
       setCurrentScope(saveScope);
   }
 
-  public void finishModule(ModuleExp mexp, int first)
+  public void finishModule(ModuleExp mexp)
   {
     boolean moduleStatic = mexp.isStatic();
     for (Declaration decl = mexp.firstDecl();
@@ -1181,7 +1182,10 @@ public class Translator extends Compilation
       }
     if (! moduleStatic)
       mexp.declareThis(null);
+  }
 
+  public void resolveModule(ModuleExp mexp)
+  {
     processAccesses();
 
     setModule(mexp);
@@ -1189,7 +1193,7 @@ public class Translator extends Compilation
     try
       {
 	Compilation.setCurrent(this);
-	mexp.body = makeBody(first, mexp);
+	mexp.body = makeBody(firstForm, mexp);
 	lexical.pop(mexp);
       }
     finally

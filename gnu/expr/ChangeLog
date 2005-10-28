@@ -1,5 +1,8 @@
 2005-10-27  Per Bothner  <per@bothner.com>
 
+	* Language.java (resolve): New method.
+	* ModuleExp.java (evalModule): Call resolve.
+
 	* ModuleManager.java: New class.
 	* Makefile.am: Update accordingly.
 	* ModuleInfo.java (next): New field, for chaining by ModuleManager.

@@ -1,5 +1,13 @@
 2005-10-27  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/CompileFile.java (compile_to_files): Call resolve.
+	* kawa/lang/Translator.java (finishModule): Move final actions to ...
+	(resolveModule): ... new method.
+	(firstForm): New field, instead of finishModule parameter.
+	* kawa/lang/Eval.java (evalBody): Update for modified firstModule.
+
+2005-10-27  Per Bothner  <per@bothner.com>
+
 	* build.xml: Kludgy update for gnu/kawa/srfi for new files.
 
 2005-10-24  Per Bothner  <per@bothner.com>

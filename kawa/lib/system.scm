@@ -85,6 +85,7 @@
 		   (make <gnu.text.SourceMessages>))
 	 (comp :: <gnu.expr.Compilation>
 	       (invoke-static <kawa.lang.CompileFile> 'read source messages)))
+    (*:resolve (*:getLanguage comp) comp)
     (if (invoke messages 'seenErrors)
 	(primitive-throw (make <gnu.text.SyntaxException> messages)))
     (invoke comp 'compileToArchive

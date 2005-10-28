@@ -87,7 +87,8 @@ public class Eval extends Procedure1or2
             Compilation.setCurrent(tr);
             int first = tr.formStack.size();
             tr.scanBody(body, mod, false);
-            tr.finishModule(mod, first);
+            tr.firstForm = first;
+            tr.finishModule(mod);
           }
         finally
           {

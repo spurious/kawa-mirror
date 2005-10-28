@@ -161,8 +161,12 @@ public class XQuery extends Language
 	dout.flush();
       }
 
-    resolver.resolveModule(mexp);
+    resolver.resolveModule(mexp); // FIXME should move to resolve(Compilation)
     return tr;
+  }
+
+  public void resolve (Compilation comp)
+  {
   }
 
   public int getNamespaceOf(Declaration decl)

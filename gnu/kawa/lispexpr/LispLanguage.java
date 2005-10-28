@@ -62,13 +62,21 @@ public abstract class LispLanguage extends Language
           }
         if (lexer.peek() == ')')
           lexer.fatal("An unexpected close paren was read.");
-        tr.finishModule(mexp, first);
+        tr.firstForm = first;
+        tr.finishModule(mexp);
       }
     finally
       {
         Compilation.setCurrent(save_comp);
       }
     return tr;
+  }
+
+  /** Resolve names and other post-parsing processing. */
+  public void resolve (Compilation comp)
+  {
+    Translator tr = (Translator) comp;
+    tr.resolveModule(tr.getModule());
   }
 
   public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)

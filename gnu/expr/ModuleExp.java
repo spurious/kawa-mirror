@@ -136,6 +136,7 @@ public class ModuleExp extends LambdaExp
 
   public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
   {
+    comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
     Environment orig_env = Environment.getCurrent();
     try

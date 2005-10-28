@@ -63,6 +63,7 @@ public class CompileFile
     try
       {
 	Compilation comp = read (inname, messages);
+        comp.getLanguage().resolve(comp);
 	if (messages.seenErrors())
 	  return;
 	try

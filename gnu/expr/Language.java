@@ -546,6 +546,13 @@ public abstract class Language
   public abstract Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException;
 
+  /** Perform any need post-processing after we've read all the modules
+   * to be compiled.
+   * Using a separate pass allows compiling mutually recursive modules. */
+  public void resolve (Compilation comp)
+  {
+  }
+
   public Type getTypeFor(Class clas)
   {
     return Type.make(clas);

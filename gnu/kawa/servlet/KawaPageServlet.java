@@ -84,6 +84,7 @@ public class KawaPageServlet extends KawaServlet
 		String name = path.substring(path.lastIndexOf('/')+1,
 					     path.indexOf('.'));
 		comp.getModule().setName(name);
+                language.resolve(comp);
 	      }
 	    catch (SyntaxException ex)
 	      {

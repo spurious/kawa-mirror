@@ -1,5 +1,10 @@
 2005-10-27  Per Bothner  <per@bothner.com>
 
+	* ModuleManager.java: New class.
+	* Makefile.am: Update accordingly.
+	* ModuleInfo.java (next): New field, for chaining by ModuleManager.
+	(find): Just call ModuleManager's findWithClassName.
+
 	* Language.java (detect): New methods.
 
 2005-10-19  Per Bothner  <per@bothner.com>

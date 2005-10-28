@@ -6,7 +6,7 @@ import gnu.kawa.reflect.FieldLocation;
 
 public class ModuleInfo
 {
-  static final String INFO_KEY = new String("(module-info)");
+  ModuleInfo next;
 
   String className;
 
@@ -86,27 +86,7 @@ public class ModuleInfo
 
   public static ModuleInfo find (String className)
   {
-    // A possibly better interface:  FIXME
-    // Use a ModuleManager.  The current MonduleManager is accessed
-    // via a parameter object (fluid binding).  The ModuleManager is
-    // basically just a hashtable - though it could optionally support
-    // inheritance.  Which behaviour is right depends on how we want
-    // threads to inherit modules.
-
-    Environment env = Environment.getCurrent();
-    Symbol sym = Namespace.EmptyNamespace.getSymbol(className);
-    synchronized (env)
-      {
-	Location loc = env.getLocation(sym, INFO_KEY, true);
-	ModuleInfo info = (ModuleInfo) loc.get(null);
-	if (info == null)
-	  {
-	    info = new ModuleInfo();
-	    info.className = className;
-	    loc.set(info);
-	  }
-	return info;
-      }
+    return ModuleManager.getInstance().findWithClassName(className);
   }
 
   public static void register (Object instance)

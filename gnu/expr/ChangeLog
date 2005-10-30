@@ -1,3 +1,13 @@
+2005-10-29  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java: New class.
+	* Makefile.am: Update accordingly.
+	* ModuleInfo.java (moduleClass): Nwe field.
+	(getModuleClass): New method.
+	(instance): Remove field - now managed by ModuleContext.
+	(getModuleExp): Simplify.
+	(findFromInstance, register, getInstance): use ModuleContext methods.
+
 2005-10-27  Per Bothner  <per@bothner.com>
 
 	* Language.java (resolve): New method.

@@ -10,18 +10,16 @@ public class ModuleInfo
 
   String className;
 
-  Object instance;
-
   ModuleExp exp;
+
+  Class moduleClass;
 
   public synchronized ModuleExp getModuleExp ()
   {
     ModuleExp m = exp;
     if (m == null)
       {
-        ClassType ctype
-          = (instance == null ? ClassType.make(className)
-             : (ClassType) ClassType.make(instance.getClass()));
+        ClassType ctype = ClassType.make(className);
         m = new ModuleExp();
         m.type = ctype;
         m.setName(ctype.getName());
@@ -77,11 +75,20 @@ public class ModuleInfo
     return mod;
   }
 
+  public Class getModuleClass ()
+    throws ClassNotFoundException
+  {
+    Class mclass = moduleClass;
+    if (mclass != null)
+      return mclass;
+    mclass = Class.forName(className);
+    moduleClass = mclass;
+    return mclass;
+  }
+
   public static ModuleInfo findFromInstance (Object instance)
   {
-    ModuleInfo info = find(instance.getClass().getName());
-    info.instance = instance;
-    return info;
+    return ModuleContext.getContext().findFromInstance(instance);
   }
 
   public static ModuleInfo find (String className)
@@ -91,47 +98,13 @@ public class ModuleInfo
 
   public static void register (Object instance)
   {
-    String cname = instance.getClass().getName();
-    ModuleInfo info = find(cname);
-    info.instance = instance;
+    ModuleInfo info = find(instance.getClass().getName());
+    ModuleContext.getContext().setInstance(info, instance);
   }
 
-  public synchronized Object getInstance ()
+  public Object getInstance ()
   {
-    Object inst = instance;
-    if (inst == null)
-      {
-	Class clas;
-	String cname = className;
-	try
-	  {
-	    clas = Class.forName(cname);
-	  }
-	catch (java.lang.ClassNotFoundException ex)
-	  {
-	    throw new WrappedException("cannot find module " + cname, ex);
-	  }
-
-	try
-	  {
-	    try
-	      {
-		inst = clas.getDeclaredField("$instance").get(null);
-	      }
-	    catch (NoSuchFieldException ex)
-	      {
-		// Not a static module - create a new instance.
-		inst = clas.newInstance();
-	      }
-	  }
-	catch (Throwable ex)
-	  {
-	    throw new WrappedException
-	      ("exception while initializing module " + cname, ex);
-	  }
-	instance = inst;
-      }
-    return inst;
+    return ModuleContext.getContext().findInstance(this);
   }
 
   public Object getRunInstance ()

@@ -1,3 +1,12 @@
+2005-10-31  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java: Partial re-write replace the procedureCach
+	and instead use gnu.expr.ModuleContext.
+	(class CacheEntry): Remove class.
+	* KawaPageServlet.java: Use gnu.expr.Language to detect the source
+	language, rather than depending on file extension.
+	Also, support a default handler module.
+
 2005-10-27  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Call Language's resolve method.

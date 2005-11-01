@@ -26,6 +26,11 @@ public class ModuleContext
     return global;
   }
 
+  public ModuleManager getManager ()
+  {
+    return manager;
+  }
+
   Hashtable table = new Hashtable();
 
   public Object checkInstance (ModuleInfo info)

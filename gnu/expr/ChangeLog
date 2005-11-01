@@ -1,3 +1,11 @@
+2005-10-31  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java (getManager): New method.
+	* ModuleInfo.java (classname, moduleClass): Make fields public.
+	(sourceURL, lastCheckedTime, lastModifiedTime): New fields.
+	* ModuleManager.java (searchWithSourcePath, findWithSourcePath,
+	findWithURL): New methods.
+
 2005-10-29  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java: New class.

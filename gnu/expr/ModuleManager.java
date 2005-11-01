@@ -1,4 +1,5 @@
 package gnu.expr;
+import java.net.*;
 
 public class ModuleManager
 {
@@ -30,5 +31,31 @@ public class ModuleManager
         modules = info;
       }
     return info;
+  }
+
+  public ModuleInfo searchWithSourcePath (String sourcePath)
+  {
+    for (ModuleInfo info = modules;  info != null;  info = info.next)
+      if (sourcePath.equals(info.sourceURL))
+        return info;
+    return null;
+  }
+
+  public synchronized ModuleInfo findWithSourcePath (String sourcePath)
+  {
+    ModuleInfo info = searchWithSourcePath(sourcePath);
+    if (info == null)
+      {
+        info = new ModuleInfo();
+        info.sourceURL = sourcePath;
+        info.next = modules;
+        modules = info;
+      }
+    return info;
+  }
+
+  public ModuleInfo findWithURL (URL url)
+  {
+    return findWithSourcePath(url.toExternalForm());
   }
 }

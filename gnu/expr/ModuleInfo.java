@@ -8,11 +8,16 @@ public class ModuleInfo
 {
   ModuleInfo next;
 
-  String className;
+  public String className;
 
   ModuleExp exp;
 
-  Class moduleClass;
+  public Class moduleClass;
+
+  /** Maybe just use a a URL?. */
+  public String sourceURL;
+  public long lastCheckedTime;
+  public long lastModifiedTime;
 
   public synchronized ModuleExp getModuleExp ()
   {

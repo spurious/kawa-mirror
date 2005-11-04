@@ -1,3 +1,14 @@
+2005-11-03  Per Bothner  <per@bothner.com>
+
+	* ReplSession.java: Major changes, mainly to support emitting
+	html/xml into output.  Don't encode to XML character entities here.
+	(class OutBufferWriter): Extend OutPort.
+	Interject XMLPrinter between this and PrettyWriter.
+	(write methods): Write to PrettyWriter's buffer.
+	(beginGroup, endGroup, beginAttribute, endAttribute): New methods
+	to allows us to emit element tags without extra encoding.
+	(flush, flushhToSessionBuffer): 
+
 2005-10-31  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java: Partial re-write replace the procedureCach

@@ -2,88 +2,73 @@ package gnu.kawa.servlet;
 import gnu.text.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-
+import gnu.lists.PrintConsumer;
 import java.io.*;
+import gnu.xml.*;
 
 /** The server state for a browser-base "read-eval-print-loop" session. */
 
-public class ReplSession
+public class ReplSession extends Writer
 {
   Language language;
   Environment penvironment;
   QueueReader qreader;
   InPort in_p;
-  OutPort err_p;
-  OutPort out_p;
+  OutBufferWriter err_p;
+  OutBufferWriter out_p;
   OutBufferWriter prompt_p;
   Future thread;
 
   StringBuffer outBuffer = new StringBuffer();
-  // 'O' if there is an enclosed <span std="output" ....
-  // 'E' if there is an enclosed <span std="error" ....
-  // 'P' if there is an enclosed <span std="prompt" ....
-  // 'R' outputing raw unquoted html
-  char outBufferState;
   boolean outAvailable;
 
-  void appendOutput (char c, char kind)
+  void append1 (char c)
+  {
+    if (c == '\r' || c == '\n')
+      outBuffer.append("<br/>");
+    else
+      outBuffer.append(c);
+  }
+
+  public void write (int c)
   {
     synchronized (this)
       {
-        appendOutputRaw(c, kind);
+        append1((char) c);
       }
   }
 
-  void appendOutputRaw (char c, char kind)
+  public void write (char[] cbuf, int off, int len)
   {
-    if (outBufferState != '\0' && outBufferState != 'R'
-        && outBufferState != kind)
-      //|| c == '\n' || c == '\r'))
+    synchronized (this)
       {
-        outBuffer.append("</span>");
-        outBufferState = '\0';
-      }
-    if (kind == 'R')
-      {
-        outBuffer.append(c);
-        outBufferState = kind;
-      }
-    else if (c == '\n' || c == '\r')
-      {
-        outBuffer.append("<br />");
-      }
-    else
-      {
-        if (outBufferState != kind)
-          {
-            if (kind == 'O')
-              outBuffer.append("<span std=\"output\">");
-            else if (kind == 'E')
-              outBuffer.append("<span std=\"error\">");
-            else if (kind == 'P')
-              outBuffer.append("<span std=\"prompt\">");
-            outBufferState = kind;
-          }
-        if (c == '&')
-          outBuffer.append("&amp;");
-        else if (c == '<')
-          outBuffer.append("&lt;");
-        else if (c == '>')
-          outBuffer.append("&gt;");
-        else
-          outBuffer.append((char) c);
+        for (int i = 0;  i < len; i++)
+          append1(cbuf[off+i]);
       }
   }
 
-  public void appendOutputRaw (String str, int off, int len, char kind)
+  public void write (String str, int off, int len)
   {
-    for (int i = 0;  i < len; i++)
-      appendOutputRaw(str.charAt(off+i), kind);
+    synchronized (this)
+      {
+        for (int i = 0;  i < len; i++)
+          append1(str.charAt(off+i));
+      }
   }
 
-  public void appendOutputRaw (String str, char kind)
+  public void flush ()
   {
-    appendOutputRaw(str, 0, str.length(), kind);
+    synchronized (this)
+      {
+        if (outBuffer.length() > 0)
+          outAvailable = true;
+        notify();
+      }
+  }
+
+  public void close ()
+  {
+    flush();
   }
 
   String grabOutput ()
@@ -116,20 +101,17 @@ public class ReplSession
 
   String grabOutputRaw ()
   {
-    if (outBufferState != '\0' && outBufferState != 'R')
-      {
-        outBuffer.append("</span>");
-        outBufferState = '\0';
-      }
     String result = outBuffer.toString();
     outBuffer.setLength(0);
     outAvailable = false;
+    //System.err.println("grabOutRaw ["+result+"]");
     return result;
   }
 
   public ReplSession ()
   {
     this(kawa.standard.Scheme.getInstance());
+    //this(gnu.xquery.lang.XQuery.getInstance());
   }
 
   public ReplSession (Language language)
@@ -139,10 +121,11 @@ public class ReplSession
     penvironment = Environment.getCurrent();
     qreader = new QueueReader();
 
-    out_p = new OutPort(new OutBufferWriter(this, 'O'), true, true, "<stdout>");
-    err_p = new OutPort(new OutBufferWriter(this, 'E'), true, true, "<stderr>");
-    prompt_p = new OutBufferWriter(this, 'P');
+    out_p = new OutBufferWriter(this, 'O', "<stdout>");
+    err_p = new OutBufferWriter(this, 'E', "<stderr>");
+    prompt_p = new OutBufferWriter(this, 'P', "<prompt>");
     in_p = new MyTtyInPort(qreader, "<stdin>", out_p, this);
+
     thread = new Future (new kawa.repl(language),
                          penvironment, in_p, out_p, err_p);
     thread.start();
@@ -184,9 +167,12 @@ class MyTtyInPort extends TtyInPort
 		  {
                     synchronized (session)
                       {
+                        session.out_p.flushToSessionBuffer();
+                        session.outBuffer.append("<div class=\"interaction\"><span std=\"prompt\">");
                         prompt_p.write(string);
-                        session.appendOutputRaw("<input std='input' value='' onchange='enterLine(this);'/>", 'R');
-                        tie.flush();
+                        prompt_p.flushToSessionBuffer();
+                        session.outBuffer.append("</span><input std='input' value='' onchange='enterLine(this);'/></div>");
+                        session.flush();
                       }
 		    tie.clearBuffer();
 		    promptEmitted = true;
@@ -200,50 +186,97 @@ class MyTtyInPort extends TtyInPort
   }
 }
 
-class OutBufferWriter extends Writer
+class OutBufferWriter extends OutPort
 {
   ReplSession session;
+  /** Which port this is:
+   * 'O': output
+   * 'E': error
+   * 'p': prompt
+   */
   char kind;
+  int nesting = 0;
+  XMLPrinter xout;
 
-  public OutBufferWriter (ReplSession session, char kind)
+  public OutBufferWriter (ReplSession session, char kind, String name)
   {
+    super(session, false, true, name);
     this.session = session;
     this.kind = kind;
+    xout = new XMLPrinter(bout, true);
+    out = xout;
   }
 
   public void write (int c)
   {
-    session.appendOutput((char) c, kind);
-  }
-
-  public void write (char[] cbuf, int off, int len)
-  {
-    for (int i = 0;  i < len; i++)
-      session.appendOutput(cbuf[off+i], kind);
+    xout.writeChar(c);
   }
 
   public void write (String str, int off, int len)
   {
-    synchronized (session)
-      {
-        session.appendOutputRaw(str, off, len, kind);
-      }
+    for (int i = 0;  i < len; i++)
+      xout.writeChar(str.charAt(off+i));
+  }
+
+  public void write (String str)
+  {
+    int len = str.length();
+    for (int i = 0;  i < len; i++)
+      xout.writeChar(str.charAt(i));
+  }
+
+  public void beginGroup(String typeName, Object type)
+  {
+    nesting++;
+    xout.beginGroup(typeName, type);
+  }
+
+  public void endGroup(String typeName)
+  {
+    nesting--;
+    xout.endGroup(typeName);
+  }
+
+  public void beginAttribute(String attrName, Object attrType)
+  {
+    xout.beginAttribute(attrName, attrType);
+  }
+
+  public void endAttribute()
+  {
+    xout.endAttribute();
+  }
+
+  public void println ()
+  {
+    bout.write("<br />");
+    flush();
+  }
+
+  final void flushToSessionBuffer ()  throws java.io.IOException
+  {
+    bout.forcePrettyOutput();
   }
 
   public void flush ()
   {
-    // FIXME?
+    if (nesting > 0)
+      return;
     synchronized (session)
       {
-        if (session.outBuffer.length() > 0)
-          session.outAvailable = true;
-        session.notify();
+        if (kind == 'E')
+          session.outBuffer.append("<span std=\"error\">");
+        try
+          {
+            flushToSessionBuffer();
+          }
+        catch (IOException ex)
+          {
+            throw new RuntimeException(ex.toString());
+          }
+        if (kind == 'E')
+          session.outBuffer.append("</span>");
+        session.flush();
       }
-  }
-
-  public void close ()
-  {
-    flush();
-    // FIXME?
   }
 }

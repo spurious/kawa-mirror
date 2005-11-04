@@ -1,3 +1,10 @@
+2005-11-03  Per Bothner  <per@bothner.com>
+
+	* KNode.java: Implement Consumable.
+	(consume): New method.
+
+	* KNode.java (copy): New method, overrides SeqPosition.
+
 2005-10-06  Per Bothner  <per@bothner.com>
 
 	* CommentConstructor.java (numArgs): New method.

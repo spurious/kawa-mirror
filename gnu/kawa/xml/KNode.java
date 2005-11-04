@@ -1,4 +1,4 @@
-// Copyright (c) 2004  Per M.A. Bothner.
+// Copyright (c) 2004, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -9,9 +9,11 @@ import org.w3c.dom.Document;
 import gnu.mapping.*;
 
 public abstract class KNode extends SeqPosition
+  implements
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.Node
+  // org.w3c.dom.Node,
   /* #endif */
+  Consumable
 {
 
   public KNode (NodeTree seq, int ipos)
@@ -65,6 +67,18 @@ public abstract class KNode extends SeqPosition
       }
   }
 
+  /* #ifdef JAVA5 */
+  // public KNode copy ()
+  // {
+  //   return make((NodeTree) sequence, sequence.copyPos(getPos()));
+  // }
+  /* #else */
+  public SeqPosition copy ()
+  {
+    return make((NodeTree) sequence, sequence.copyPos(getPos()));
+  }
+  /* #endif */
+ 
   public static KNode make(NodeTree seq)
   {
     return make(seq, 0);
@@ -364,6 +378,14 @@ public abstract class KNode extends SeqPosition
   public Object getFeature (String feature, String version)
   {
     return null;
+  }
+
+  public void consume(Consumer out)
+  {
+    if (out instanceof PositionConsumer)
+      ((PositionConsumer) out).consume(this);
+    else
+      ((NodeTree) sequence).consumeNext(ipos, out);
   }
 
   /* #ifdef JAXP-1.3 */

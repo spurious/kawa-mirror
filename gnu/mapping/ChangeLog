@@ -1,5 +1,9 @@
 2005-11-03  Per Bothner  <per@bothner.com>
 
+	* OutPort.java (beginAttribute, endAttribute): Call corresponding
+	method 	of objectFormat if non-null.
+	* OutPort.java (bout): Make protected, for ReplSession.java.
+
 	* OutPort.java (prev): Remove never-read field.
 	(WORD): Remove unused constant.
 	(startWord): Remove needless method.

@@ -16,7 +16,7 @@ public class OutPort extends PrintConsumer implements Printable
   // Otherwise, it is too painful, as there is no documented
   // interface that would allow PrintWriter to be cleanly extended ...
   // The helper class also lets us make transparent use of WriterManager.
-  PrettyWriter bout;
+  protected PrettyWriter bout;
 
   /** An index into the WriterManager's internal table. */
   protected int index;
@@ -270,15 +270,23 @@ public class OutPort extends PrintConsumer implements Printable
    * This is only allowed immediately after a beginGroup. */
   public void beginAttribute(String attrName, Object attrType)
   {
-    print(' ');
-    print(attrName);
-    print(": ");
+    if (objectFormat != null)
+      objectFormat.beginAttribute(attrName, attrType, this);
+    else
+      {
+        print(' ');
+        print(attrName);
+        print(": ");
+      }
   }
 
   /** No more attributes in this group. */
   public void endAttribute()
   {
-    print(' ');  // FIXME
+    if (objectFormat != null)
+      objectFormat.endAttribute(this);
+    else
+      print(' ');
   }
 
   public void freshLine()

@@ -48,6 +48,18 @@ public abstract class AbstractFormat extends java.text.Format
     write(")", out);
   }
 
+  public void beginAttribute(String attrName, Object attrType, Consumer out)
+  {
+    write(" ", out);
+    write(attrName, out);
+    write(": ", out);
+  }
+
+  public void endAttribute(Consumer out)
+  {
+    write(" ", out);  // FIXME
+  }
+
   public abstract void writeObject(Object v, Consumer out);
 
   public void format (Object value, Consumer out)

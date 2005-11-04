@@ -5,7 +5,7 @@ package gnu.text;
 import java.io.*;
 
 /** Manages a collection of Writers, handling automatic closing.
- * This class is useful for making sure that a Writer closed (and its
+ * This class is useful for making sure that a Writer is closed (and its
  * buffers flushed) when a VM exits.
  * A WriterManager can be usefully passed to the JDK 1.3 method
  * addShutdownHook in Runtime.

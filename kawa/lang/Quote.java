@@ -73,7 +73,7 @@ public class Quote extends Syntax implements Printable
     Object rest;
     for (;;)
       {
-        // This would be simpler as palin recusion, but we try to iterate
+        // This would be simpler as plain recursion, but we try to iterate
         // over the given list, partly for speed, but more importantly
         // to avoid stack overflow in the case of long lists.
         rest = pair;

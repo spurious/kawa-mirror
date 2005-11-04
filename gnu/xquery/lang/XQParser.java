@@ -962,6 +962,7 @@ public class XQParser extends Lexer
     pushNamespace("xs", XQuery.SCHEMA_NAMESPACE);
     pushNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
     pushNamespace("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
+    pushNamespace("html", XQuery.XHTML_NAMESPACE);
     pushNamespace("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);
     pushNamespace("qexo", XQuery.QEXO_FUNCTION_NAMESPACE);
     pushNamespace("local", XQuery.LOCAL_NAMESPACE);

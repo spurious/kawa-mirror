@@ -33,6 +33,8 @@ public class XQuery extends Language
     = "http://www.w3.org/2004/10/xquery-local-functions";
   public static final String SCHEMA_NAMESPACE
     = "http://www.w3.org/2001/XMLSchema";
+  public static final String XHTML_NAMESPACE
+    = "http://www.w3.org/1999/xhtml";
   public static final Namespace xqueryFunctionNamespace
     = Namespace.getInstance(XQUERY_FUNCTION_NAMESPACE);
   public static final Namespace kawaFunctionNamespace

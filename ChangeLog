@@ -1,3 +1,8 @@
+2005-11-03  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (namespaceResolve): Also check dynamic
+	environment.  Needed to handle define-namespace in repl.
+
 2005-10-27  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files): Call resolve.

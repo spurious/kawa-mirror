@@ -440,6 +440,12 @@ public class Translator extends Compilation
 	      return Symbol.make(val.toString(), local);
 	  }
       }
+    else
+      {
+	Object v = env.get(xprefix, null);
+        if (v != null)
+          return Symbol.make(v.toString(), local);
+      }
     return str;
   }
 

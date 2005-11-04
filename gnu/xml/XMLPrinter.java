@@ -494,9 +494,9 @@ public class XMLPrinter extends PrintConsumer
 
   public void write(char[] buf, int off, int len)
   {
-    closeTag();
     if (len <= 0)
       return;
+    closeTag();
     int limit = off + len;
     int count = 0;
     while (off < limit)
@@ -576,6 +576,6 @@ public class XMLPrinter extends PrintConsumer
 
   public void consume (SeqPosition position)
   {
-    throw new Error("not implemented consume(TreePosition)");
+    position.sequence.consumeNext(position.ipos, this);
   }
 }

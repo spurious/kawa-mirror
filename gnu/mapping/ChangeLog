@@ -1,3 +1,11 @@
+2005-11-03  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (prev): Remove never-read field.
+	(WORD): Remove unused constant.
+	(startWord): Remove needless method.
+	(write(int), write(char[],int,int), write(String), print)char)):
+	Remove now-pointless method overrides.
+
 2005-10-19  Per Bothner  <per@bothner.com>
 
 	* WrongArguments.java (checkArgCount): Check for a null procedure name.

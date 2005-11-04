@@ -165,50 +165,9 @@ public class OutPort extends PrintConsumer implements Printable
   }
   */
 
-  protected static final int WORD = -2;
-  protected int prev = '\n';
-
   protected static final boolean isWordChar(char ch)
   {
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
-  }
-
-  private void startWord()
-  {
-    /*
-    if (prev == WORD || isWordChar((char) prev))
-      {
-	super.write(' ');
-      }
-    */
-    prev = WORD;
-  }
-
-  public void write (int c)
-  {
-    // if (prev == WORD && isWordChar((char) c))    out.print(' ');
-    super.write(c);
-    prev = c;
-  }
-
-  public void write (char[] buffer, int start, int count)
-  {
-    if (count > 0)
-      {
-	// if (prev == WORD && isWordChar(buffer[start]))  out.print(' ');
-	super.write(buffer, start, count);
-	prev = buffer[start+count-1];
-      }
-  }
-
-  public void write(String v)
-  {
-    int len = v.length();
-    if (len == 0)
-      return;
-    //if (prev == WORD && isWordChar(v.charAt(0)))  out.write(' ');
-    prev = v.charAt(len-1);
-    super.write(v);
   }
 
   /**
@@ -228,21 +187,8 @@ public class OutPort extends PrintConsumer implements Printable
 
   public AbstractFormat objectFormat;
 
-  public void print(char v)
-  {
-    /*
-    if (prev == WORD && isWordChar((char) v))
-      {
-	out.print(' ');
-      }
-    */
-    super.print(v);
-    prev = v;
-  }
-
   public void print(int v)
   {
-    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -251,7 +197,6 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void print(long v)
   {
-    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -260,7 +205,6 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void print(double v)
   {
-    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -269,7 +213,6 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void print(float v)
   {
-    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -283,7 +226,6 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void print(Object v)
   {
-    startWord();
     if (objectFormat != null)
       objectFormat.writeObject(v, this);
     else if (v instanceof Consumable)
@@ -322,7 +264,6 @@ public class OutPort extends PrintConsumer implements Printable
       objectFormat.endGroup(typeName,this);
     else
       print(')');
-    prev = ')';
   }
 
   /** Write a attribute for the current group.
@@ -332,13 +273,11 @@ public class OutPort extends PrintConsumer implements Printable
     print(' ');
     print(attrName);
     print(": ");
-    prev = WORD;
   }
 
   /** No more attributes in this group. */
   public void endAttribute()
   {
-    prev = WORD;
     print(' ');  // FIXME
   }
 

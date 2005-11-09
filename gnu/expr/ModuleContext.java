@@ -41,7 +41,7 @@ public class ModuleContext
   public Object findInstance (ModuleInfo info)
   {
     Object inst = table.get(info.className);
-    if (inst == null)
+    if (inst == null || inst.getClass() != info.moduleClass)
       {
         String cname = info.className;
 	Class clas;

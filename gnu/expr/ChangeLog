@@ -1,3 +1,8 @@
+2005-11-08  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java (findInstance): Only re-use an instance if its
+	class matches that in the ModuleInfo.
+
 2005-10-31  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (getManager): New method.

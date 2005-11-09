@@ -109,7 +109,7 @@
 	* FindCapturedVars.java (walkReferenceExp): Don't replace by value
 	if getDontDereference().
 	* ExpWalker.java (walkSetExp):  Update declaration's value.
-	* InlineCalls.java *walkSetExp): Remove - use inherited method.
+	* InlineCalls.java (walkSetExp): Remove - use inherited method.
 
 2005-08-07  Per Bothner  <per@bothner.com>
 
@@ -129,7 +129,7 @@
 2005-08-03  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkApplyExp): No longer call rewriteToInvocation.
-	Instead call CallMethpdProc's rewrite method.
+	Instead call ClassMethodProc's rewrite method.
 	(rewriteToInvocation): Remove no-longer used method.
 
 	* Declaration.java (getValue): Load (lazily) from final static field.

@@ -1,3 +1,7 @@
+2005-11-08  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Put ModuleInfo in hashtable.  Ooops.
+
 2005-11-03  Per Bothner  <per@bothner.com>
 
 	* ReplSession.java: Major changes, mainly to support emitting

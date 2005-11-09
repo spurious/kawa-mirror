@@ -118,6 +118,7 @@ public class KawaPageServlet extends KawaServlet
     minfo = mmanager.findWithURL(url);
     minfo.lastModifiedTime = lastModified;
     minfo.lastCheckedTime = now;
+    mmap.put(path, minfo);
 
     InputStream resourceStream = connection.getInputStream();
             

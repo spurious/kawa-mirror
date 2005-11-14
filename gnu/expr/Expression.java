@@ -59,7 +59,7 @@ public abstract class Expression extends Procedure0 implements Printable
       {
 	OutPort out = new OutPort(ps);
 	print(out);
-	out.flush();
+	out.close();
       }
   }
 

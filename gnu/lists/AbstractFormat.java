@@ -104,6 +104,7 @@ public abstract class AbstractFormat extends java.text.Format
     CharArrayOutPort out = new CharArrayOutPort();
     writeObject(val, out);
     sbuf.append(out.toCharArray());
+    out.close();
     return sbuf;
   }
 

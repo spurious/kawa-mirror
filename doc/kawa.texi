@@ -6180,7 +6180,7 @@ integration with a large number of Java libraries.
 
 JEmacs is included in the Kawa distribution.  It is a project to
 re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
-It has its own @uref{http://www.jemacs.net/,home-page}.
+It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
 
 BRL ("the Beautiful Report Language") is a database-oriented language
 to embed in HTML and other markup.

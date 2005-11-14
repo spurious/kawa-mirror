@@ -1,3 +1,7 @@
+2005-11-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Projects): Update JEmacs link.
+
 2005-10-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Discuss *init* methods.

@@ -1,3 +1,8 @@
+2005-11-14  Dean Ferreyra <dferreyra@igc.org>
+
+	* kawapath.c (get_classpath): Move declaration so we can compile
+	with old (pre-C99) compilers
+
 2005-09-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (qexo): New rule, creates qexo wrapper script.

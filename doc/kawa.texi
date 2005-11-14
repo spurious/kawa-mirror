@@ -1257,7 +1257,6 @@ using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
 @item
 @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
 using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
-(The implementation has not been optimied for Kawa yet.)
 @item
 @uref{http://srfi.schemers.org/srfi-17/srfi-17.html, SRFI 17}: Generalized @code{set!} - @pxref{Locations}.
 @item

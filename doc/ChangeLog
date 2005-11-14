@@ -1,5 +1,7 @@
 2005-11-14  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Implemented SRFIs): Remove no-longer-needed caveat.
+
 	* kawa.texi (Projects): Update JEmacs link.
 
 2005-10-18  Per Bothner  <per@bothner.com>

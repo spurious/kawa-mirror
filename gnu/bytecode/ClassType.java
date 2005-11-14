@@ -475,7 +475,7 @@ public class ClassType extends ObjectType
    * @param filter to select methods to return
    * @param searchSupers 0 if only current class should be searched,
    *   1 if superclasses should also be searched,
-   *   2 if super-interfaces should also be search
+   *   2 if super-interfaces should also be searched
    * @param result array to place selected methods in
    * @param offset start of where in result to place result
    * @return number of methods placed in result array
@@ -517,7 +517,7 @@ public class ClassType extends ObjectType
    * @param filter to select methods to return
    * @param searchSupers 0 if only current class should be searched,
    *   1 if superclasses should also be searched,
-   *   2 if super-interfaces should also be search
+   *   2 if super-interfaces should also be searched
    * @param result Vector to add selected methods in
    * @param context If non-null, skip if class not visible in named package.
    * @return number of methods placed in result array
@@ -619,8 +619,27 @@ public class ClassType extends ObjectType
           return method;
         cl = cl.getSuperclass();
         if (cl == null)
-          return null;
+          break;
       }
+    cl = this;
+    for (;;)
+      {
+        ClassType[] interfaces = cl.getInterfaces();
+        if (interfaces != null)
+          {
+            for (int i = 0;  i < interfaces.length;  i++)
+              {
+                Method method
+                  = interfaces[i].getDeclaredMethod(name, arg_types);
+                if (method != null)
+                  return method;
+              }
+          }
+        cl = cl.getSuperclass();
+        if (cl == null)
+          break;
+      }
+    return null;
   }
 
   /** Use reflection to add all the declared methods of this class.

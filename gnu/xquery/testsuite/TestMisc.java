@@ -538,6 +538,7 @@ public class TestMisc
     CharArrayOutPort wr = new CharArrayOutPort();
     gnu.xml.XMLPrinter xp = new gnu.xml.XMLPrinter(wr);
     xp.writeObject(value);
+    wr.close();
     return wr.toString();
   }
 
@@ -621,7 +622,9 @@ public class TestMisc
 	ctx.consumer = save;
       }
 
-    return new String(out.toCharArray());
+    String result = new String(out.toCharArray());
+    out.close();
+    return result;
   }
 
 }

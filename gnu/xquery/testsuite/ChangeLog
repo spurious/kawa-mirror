@@ -1,3 +1,7 @@
+2005-11-14  thomas kirk  <tk@research.att.com>
+
+	* TestMisc.java (toString, eval): Close CharArrayOutPort.
+
 2005-10-06  Per Bothner  <per@bothner.com>
 
 	* expectedmul.xml: Remove no-longer-emitted incorrect spaces.

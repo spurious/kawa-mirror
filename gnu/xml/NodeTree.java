@@ -207,6 +207,7 @@ public class NodeTree extends TreeList
     CharArrayOutPort wr = new CharArrayOutPort();
     XMLPrinter xp = new XMLPrinter(wr);
     consume(xp);
+    wr.close();
     return wr.toString();
   }
 }

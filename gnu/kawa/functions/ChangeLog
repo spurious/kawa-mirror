@@ -1,3 +1,8 @@
+2005-11-14  thomas kirk  <tk@research.att.com>
+
+	* Format.java (formatToString, format$V): Close OutPorts.
+	* ObjectFormat.java (format): Close OutPort.
+
 2005-07-20  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (outBase, outRadix): New ThreadLocation fields.

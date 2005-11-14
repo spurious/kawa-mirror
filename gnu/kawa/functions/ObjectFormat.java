@@ -91,7 +91,7 @@ public class ObjectFormat extends ReportFormat
       {
 	OutPort oport = new OutPort(dst);
 	print(arg, oport, readable);
-	oport.flush();
+	oport.close();
 	return true;
       }
     else
@@ -99,7 +99,7 @@ public class ObjectFormat extends ReportFormat
 	CharArrayWriter wr = new CharArrayWriter();
 	OutPort oport = new OutPort(wr);
 	print(arg, oport, readable);
-	oport.flush();
+	oport.close();
 	int len = wr.size();
 	if (maxChars < 0 || len <= maxChars)
 	  {

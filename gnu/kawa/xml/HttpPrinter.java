@@ -192,7 +192,7 @@ public class HttpPrinter extends FilterConsumer
       {
 	// else ???;
 	if (writer != null)
-	  writer.flush();
+	  writer.close();
 	if (ostream != null)
 	  ostream.flush();
       }

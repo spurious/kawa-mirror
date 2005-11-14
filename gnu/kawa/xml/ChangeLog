@@ -1,3 +1,8 @@
+2005-11-14  thomas kirk  <tk@research.att.com>
+
+	* HttpPrinter.java (endDocument): cclose OutPort.
+	* KNode.java (toString): Close OutPort.
+
 2005-11-03  Per Bothner  <per@bothner.com>
 
 	* KNode.java: Implement Consumable.

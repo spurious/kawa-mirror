@@ -1,3 +1,7 @@
+2005-11-14  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (matchN): Fix off-by-one-error.
+
 2005-11-08  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (findInstance): Only re-use an instance if its

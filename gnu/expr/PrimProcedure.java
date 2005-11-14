@@ -146,7 +146,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  }
 	catch (ClassCastException ex)
           {
-            return NO_MATCH_BAD_TYPE;
+            return NO_MATCH_BAD_TYPE|1;
           }
       }
     else
@@ -166,7 +166,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           }
         catch (ClassCastException ex)
           {
-            return NO_MATCH_BAD_TYPE|i;
+            return NO_MATCH_BAD_TYPE|(i+1);
           }
       }
     ctx.value1 = thisValue;

@@ -19,6 +19,15 @@ public class CharArrayOutPort extends OutPort
     return result;
   }
 
+  /** Do nothing.
+   * This allows access to the buffer after the port is closed.
+   * Not clear whether this is a good or bad idea, but it matches
+   * ByteArrayOutputStream, CharArrayWriter, and StringWriter.
+   */
+  public void close ()
+  {
+  }
+
   public String toString()
   {
     return new String(bout.buffer, 0, bout.bufferFillPointer);

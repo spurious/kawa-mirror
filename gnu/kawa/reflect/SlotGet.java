@@ -107,20 +107,15 @@ public class SlotGet extends Procedure2
         result = language.coerceToObject(getmethod.getReturnType(), result);
         return result;
       }
-    catch (java.lang.reflect.InvocationTargetException ex2)
+    catch (java.lang.reflect.InvocationTargetException ex)
       {
-        Throwable th = ex2.getTargetException();
-        if (th instanceof RuntimeException)
-          throw (RuntimeException) th;
-        if (th instanceof Error)
-          throw (Error) th;
-        throw new RuntimeException(th.toString());
+        throw WrappedException.wrapIfNeeded(ex.getTargetException());
       }
     catch (IllegalAccessException ex)
       {
         illegalAccess = true;
       }
-    catch (java.lang.NoSuchMethodException ex3)
+    catch (java.lang.NoSuchMethodException ex)
       {
       }
     if (illegalAccess)

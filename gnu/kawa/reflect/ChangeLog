@@ -1,5 +1,7 @@
 2005-11-16  Per Bothner  <per@bothner.com>
 
+	* SlotGet.java (apply2): Use WrappedException.
+
 	* ClassMethods.java (getMethods): Pass caller's package, if known,
 	as context to ClassType.getMethods.
 

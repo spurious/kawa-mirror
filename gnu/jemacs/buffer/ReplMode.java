@@ -29,17 +29,11 @@ public class ReplMode extends ProcessMode
     thread.start();
   }
 
-  public static void make (Buffer buffer, String language)
+  public static void make (Buffer buffer, Object language)
     throws java.io.IOException
   {
-    make(buffer, Language.getInstance(language));
+    Language lang = language instanceof Language ? (Language) language
+      : Language.getInstance(language.toString());
+    buffer.modes = new ReplMode (buffer, lang, Environment.getGlobal());
   }
-
-  public static void make (Buffer buffer, Language language)
-    throws java.io.IOException
-  {
-    buffer.modes = new ReplMode (buffer, language, Environment.getGlobal());
-  }
-
-
 }

@@ -1,3 +1,8 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* ReplMode.java (make): Combine two methods.
+	This makes it easier to select method at compiletime in editfns.el.
+
 2005-09-25  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (interaction-window): Add parameter type declaration

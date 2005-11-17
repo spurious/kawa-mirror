@@ -1,5 +1,8 @@
 2005-11-16  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/module_name.java (rewriteForm): Replace method by
+	scanForm method, since we want to set class names in the first pass.
+	
 	* kawa/repl.java (compilationPrefix): Remove field.
 	We now use Compilation.classPrefixDefault.
 	(processArgs): Update accordingly.

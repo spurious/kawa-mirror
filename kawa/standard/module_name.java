@@ -8,19 +8,21 @@ public class module_name extends Syntax
   public static final module_name module_name = new module_name();
   static { module_name.setName("module-name"); }
 
-  public Expression rewriteForm (Pair form, Translator tr)
+  public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
     Object arg = ((Pair) form.cdr).car;
-    String name;
+    String name = null;
     Pair p;
+    String err = null;
     if (arg instanceof Pair && (p = (Pair) arg).car == "quote")
       {
 	arg = p.cdr;
 	if (! (arg instanceof Pair)
 	    || (p = (Pair) arg).cdr != LList.Empty
 	    || ! (p.car instanceof String))
-	  return tr.syntaxError("invalid quoted symbol for 'module-name'");
-	name = (String) p.car;
+	  err = "invalid quoted symbol for 'module-name'";
+        else
+          name = (String) p.car;
       }
     else if (arg instanceof FString)
       name = arg.toString();
@@ -35,17 +37,21 @@ public class module_name extends Syntax
 	    name = name.substring(1, len-1);
 	  }
 	else
-	  return tr.syntaxError("not implemented: plain name in module-name");
+	  err = "not implemented: plain name in module-name";
       }
     else
-      return tr.syntaxError("un-implemented expression in module-name");
-    int index = name.lastIndexOf('.');
-    if (index >= 0)
-      tr.classPrefix = name.substring(0, index+1);
+      err = "un-implemented expression in module-name";
+    if (err != null)
+      tr.formStack.add(tr.syntaxError(err));
     else
-      name = tr.classPrefix + name;
-    ModuleExp module = tr.getModule();
-    module.setName(name);
-    return QuoteExp.voidExp;
+      {
+        int index = name.lastIndexOf('.');
+        if (index >= 0)
+          tr.classPrefix = name.substring(0, index+1);
+        else
+          name = tr.classPrefix + name;
+        ModuleExp module = tr.getModule();
+        module.setName(name);
+      }
   }
 }

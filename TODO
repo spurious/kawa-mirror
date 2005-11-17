@@ -1,5 +1,4 @@
 HIGH PRIORITY:
-* re-implement case-lambda in terms of make-procedure
 * properties of symbols
 * Document fluid-let in manual.
 * rename sublist to subsequence.  deprecate sublist, item-at
@@ -8,6 +7,7 @@ HIGH PRIORITY:
 * XQuery distinguish qexo: kawa: fn: default function namespaces.
 * Implement/document external functions, variables.
 * Name mangling, document library modules.
+  Document --module-static-run vs --module-static.
 * Finish namespace handling: namespaces in constructed nodes,
   fn:namespace-for-uri-prefix, get-in-scope-prefixes
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))

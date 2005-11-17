@@ -43,8 +43,8 @@
 
 (defun lisp-interaction ()
   (interactive)
-  (let ((buffer
-         (invoke-static 'gnu.jemacs.buffer.ReplBuffer 'make 'elisp)))
+  (let ((buffer (get-buffer-create "*lisp-interaction*")))
+    (invoke-static 'gnu.jemacs.buffer.ReplMode 'make buffer 'elisp)
     (use-local-map repl-map buffer)
     (switch-to-buffer buffer)
     buffer))

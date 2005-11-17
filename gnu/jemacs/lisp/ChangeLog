@@ -1,3 +1,7 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* editfns.el (lisp-interaction): Update belatedly ReplBuffer->ReplMode.
+
 2005-05-18  Christian Surlykke <christian@surlykke.dk>
 
 	* keydefs.el: Added binding for 'enter.

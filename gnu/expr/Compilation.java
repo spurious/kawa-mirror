@@ -484,8 +484,9 @@ public class Compilation
     return null;
   }
 
+  public static String classPrefixDefault = "";
   /** If non-null: a prefix for generateClassName to prepend to names. */
-  public String classPrefix;
+  public String classPrefix = classPrefixDefault;
 
   /** Recusive helper function to reverse order of words in hostname. */
   private static void putURLWords(String name, StringBuffer sbuf)
@@ -857,9 +858,8 @@ public class Compilation
   /** Create a new Compilation environment.
    * @param lexp top-level function
    * @param classname name of top-level class to generate
-   * @param prefix prefix to pre-pend to the names of other (non-top) classes
    */
-  public void compile (ModuleExp lexp, String classname, String prefix)
+  public void compile (ModuleExp lexp, String classname)
   {
     if (ModuleExp.debugPrintExpr)
       {
@@ -872,7 +872,6 @@ public class Compilation
       }
 
     source_filename = lexp.filename;
-    classPrefix = prefix;
     mainLambda = lexp;
 
     if (messages.seenErrors())
@@ -925,7 +924,7 @@ public class Compilation
       }
   }
 
-  public void compileToFiles (ModuleExp mexp, String topname, String directory, String prefix)
+  public void compileToFiles (ModuleExp mexp, String topname, String directory)
     throws java.io.IOException
   {
     if (directory == null || directory.length() == 0)
@@ -934,25 +933,17 @@ public class Compilation
       directory = directory + File.separatorChar;
     String name = mexp.getName();
     if (name != null)
-      {
-	topname = name;
-	if (prefix == null)
-	  {
-	    int index = name.lastIndexOf('.');
-	    if (index >= 0)
-	      prefix = name.substring(0, index+1);
-	  }
-      }
+      topname = name;
 
     /* DEBUGGING:
     OutPort perr = OutPort.errDefault();
-    perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
+    perr.println ("[Expression to compile topname:"+topname);
     this.print (perr);
     perr.println();
     perr.flush();
     */
 
-    compile(mexp, topname, prefix);
+    compile(mexp, topname);
     if (! messages.seenErrors())
       outputClass(directory);
   }
@@ -986,7 +977,7 @@ public class Compilation
 	fname = fname + ".zip";
 	makeJar = false;
       }
-    compile(mexp, LambdaExp.fileFunctionName, null);
+    compile(mexp, LambdaExp.fileFunctionName);
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();

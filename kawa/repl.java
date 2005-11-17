@@ -13,7 +13,6 @@ public class repl extends Procedure0or1
 {
   public static String compilationDirectory = null;
   public static String compilationTopname = null;
-  public static String compilationPrefix = null;
 
   Language language;
   static Language previousLanguage;
@@ -381,7 +380,7 @@ public class repl extends Procedure0or1
 	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    compilationPrefix = args[iArg];
+	    Compilation.classPrefixDefault = args[iArg];
 	  }
 	else if (arg.equals ("-T"))
 	  {
@@ -406,7 +405,6 @@ public class repl extends Procedure0or1
 
 		    CompileFile.compile_to_files(arg,
 						 compilationDirectory,
-						 compilationPrefix,
 						 compilationTopname,
 						 messages);
 		    boolean sawErrors = messages.seenErrors();

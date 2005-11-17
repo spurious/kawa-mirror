@@ -1,3 +1,12 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (classPrefixDefault): New static field.
+	(classPrefix): Initialize from classPrefixDefault.
+	(compile): Remove prefix parameter.  Don't set classPrefix here.
+	(compileToFiles): Remove prefix parameter.
+	(compileToArchive): Update call to compile method.
+	* ModuleExp.java (evalToClass): Likewise.
+
 2005-11-14  thomas kirk  <tk@research.att.com>
 
 	* Expression.java (print): Close OutPort.

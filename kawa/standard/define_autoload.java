@@ -98,9 +98,7 @@ public class define_autoload extends Syntax
 	      prefix = prefix.substring(0, i+1);
 	  }
 	*/
-	String prefix = kawa.repl.compilationPrefix;
-	if (prefix == null)
-	  prefix = "";
+	String prefix = tr.classPrefix;
 	int extlen = extension.length();
 	int speclen = filespec.length();
 	String cname = filespec.substring(0, speclen - extlen);

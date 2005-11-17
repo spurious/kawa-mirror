@@ -135,9 +135,8 @@ public class require extends Syntax
 		&& str.charAt(len-1) == '>')
 	      {
 		str = str.substring(1, len-1);
-		if (str.indexOf('.') < 0
-		    && kawa.repl.compilationPrefix != null)
-		  str = kawa.repl.compilationPrefix + str;
+		if (str.indexOf('.') < 0)
+		  str = tr.classPrefix + str;
 		type = Scheme.string2Type(str);
 	      }
 	  }

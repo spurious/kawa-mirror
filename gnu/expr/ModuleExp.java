@@ -58,7 +58,7 @@ public class ModuleExp extends LambdaExp
 	ArrayClassLoader loader = new ArrayClassLoader ();
 	comp.loader = loader;
 
-	comp.compile(mexp, class_name, null);
+	comp.compile(mexp, class_name);
 	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
 	  return null;

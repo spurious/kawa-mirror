@@ -1,3 +1,15 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (compilationPrefix): Remove field.
+	We now use Compilation.classPrefixDefault.
+	(processArgs): Update accordingly.
+	* kawa/lang/CompileFile.java (compile_to_files): Remove prefix
+	parameter.  Set classname after we've parsed file, using classPrefix.
+	* kawa/standard/define_autoload.java (scanFile): Use classPrefix.
+	* kawa/standard/module_name.java (rewriteForm): Use classPrefix.
+	If name has a package prefix, set classPrefix.
+	* kawa/standard/require.java (scanForDefinitions): Use classPrefix.
+
 2005-11-08  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.8.1alpha.

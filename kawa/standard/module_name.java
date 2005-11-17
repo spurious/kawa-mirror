@@ -39,9 +39,11 @@ public class module_name extends Syntax
       }
     else
       return tr.syntaxError("un-implemented expression in module-name");
-    if (name.indexOf('.') < 0
-	&& kawa.repl.compilationPrefix != null)
-      name = kawa.repl.compilationPrefix + name;
+    int index = name.lastIndexOf('.');
+    if (index >= 0)
+      tr.classPrefix = name.substring(0, index+1);
+    else
+      name = tr.classPrefix + name;
     ModuleExp module = tr.getModule();
     module.setName(name);
     return QuoteExp.voidExp;

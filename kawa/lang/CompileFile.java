@@ -42,33 +42,30 @@ public class CompileFile
    * @param directory where to place the .class files
    * @param topname name for the class of the .class for the top-level code.
    *  If null, topname is derived from prefix and inname.
-   * @param prefix to prepend classnames for functions
    */
   public static void compile_to_files (String inname, String directory,
-                                       String prefix, String topname,
+                                       String topname,
                                        SourceMessages messages)
   {
-    if (topname == null)
-      {
-	File infile = new File (inname);
-	String short_name = infile.getName ();
-        int dotIndex = short_name.lastIndexOf('.');
-        if (dotIndex > 0)
-          short_name = short_name.substring (0, dotIndex);
-	short_name = Compilation.mangleNameIfNeeded(short_name);
-	topname = short_name;
-	if (prefix != null)
-	  topname = prefix + short_name;
-      }
     try
       {
 	Compilation comp = read (inname, messages);
         comp.getLanguage().resolve(comp);
 	if (messages.seenErrors())
 	  return;
+        if (topname == null)
+          {
+            File infile = new File (inname);
+            String short_name = infile.getName ();
+            int dotIndex = short_name.lastIndexOf('.');
+            if (dotIndex > 0)
+              short_name = short_name.substring (0, dotIndex);
+            short_name = Compilation.mangleNameIfNeeded(short_name);
+            topname = comp.classPrefix + short_name;
+          }
 	try
 	  {
-	    comp.compileToFiles(comp.getModule(), topname, directory, prefix);
+	    comp.compileToFiles(comp.getModule(), topname, directory);
 	  }
 	catch (Throwable ex)
 	  {

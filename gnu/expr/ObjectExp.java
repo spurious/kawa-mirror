@@ -5,9 +5,7 @@ public class ObjectExp extends ClassExp
 {
   public ObjectExp ()
   {
-    type = null;
-    // Make sure we actually generate a class.
-    setCanRead(true);
+    super(true);
   }
 
   protected Expression walk (ExpWalker walker)

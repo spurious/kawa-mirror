@@ -55,14 +55,19 @@ public class define_class extends Syntax
         decl.setFile(declPos.getFile());
         decl.setLine(declPos.getLine(), declPos.getColumn());
       }
-    ClassExp oexp = new ClassExp();
-    oexp.setSimple(isSimple);
+    ClassExp oexp = new ClassExp(isSimple);
     decl.noteValue(oexp);
-    if (isSimple)
-      decl.setFlag(Declaration.STATIC_SPECIFIED);
     decl.setFlag(Declaration.IS_CONSTANT);
     decl.setType(Compilation.typeClassType);
     tr.mustCompileHere();
+
+    String cname = name instanceof Symbol ? ((Symbol) name).getName()
+      : name.toString();
+    int nlen = cname.length();
+    if (nlen > 2 && cname.charAt(0) == '<' && cname.charAt(nlen-1) == '>')
+      cname = cname.substring(1, nlen-1);
+    oexp.setName(cname);
+
     Object members = p.cdr;
     while (members instanceof SyntaxForm)
       {
@@ -99,19 +104,8 @@ public class define_class extends Syntax
 	if (! (form.car instanceof Declaration))
 	  return tr.syntaxError(this.getName() + " can only be used in <body>");
 	decl = (Declaration) form.car;
-	symbol = decl.getSymbol();
       }
-    if (symbol == null)
-      return tr.syntaxError("missing class name in "+this.getName());
-    String name = symbol instanceof Symbol ? ((Symbol) symbol).getName()
-      : symbol.toString();
     ClassExp oexp = (ClassExp) decl.getValue();
-    int nlen = name.length();
-    String cname
-      = (nlen > 2 && name.charAt(0) == '<' && name.charAt(nlen-1) == '>'
-	 ? name.substring(1, nlen-1)
-	 : name);
-    oexp.setName(cname);
     objectSyntax.rewriteClassDef((Object[]) form.cdr, tr);
     SetExp sexp = new SetExp(decl, oexp);
     sexp.setDefining (true);

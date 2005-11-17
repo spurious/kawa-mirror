@@ -18,17 +18,10 @@ public class ClassExp extends LambdaExp
    * Using an interface plus a class gives us true multiple inheritance. */
   ClassType instanceType;
 
-  boolean makeClassPair;
-
-  public void setMakingClassPair(boolean val)
-  {
-    makeClassPair = val;
-  }
-
   /** True if we should make a pair of an interface and a class. */
   public boolean isMakingClassPair()
   {
-    return makeClassPair;
+    return ! simple;
   }
 
   /** List of base classes and implemented interfaces. */
@@ -47,6 +40,22 @@ public class ClassExp extends LambdaExp
   {
     type = null;
     // Make sure we actually generate a class.
+    setCanRead(true);
+  }
+
+  public ClassExp (boolean simple)
+  {
+    this.simple = simple;
+    if (simple)
+      instanceType = type = new ClassType();
+    else
+      {
+        PairClassType ptype = new PairClassType();
+        type = ptype;
+        instanceType = new ClassType();
+        ptype.setInterface(true);
+        ptype.instanceType = instanceType;
+      }
     setCanRead(true);
   }
 
@@ -106,14 +115,8 @@ public class ClassExp extends LambdaExp
     return type;
   }
 
-  void setParts(ExpWalker walker, Compilation comp)
+  public void setClassName (Compilation comp)
   {
-    if (! partsDeclared)
-      {
-	if (type == null)
-	  setTypes(comp);
-	declareParts(comp);
-      }
     if (type.getName() == null)
       {
 	String name = getName();
@@ -131,7 +134,7 @@ public class ClassExp extends LambdaExp
 	else
 	  {
 	    int start = 0;
-	    StringBuffer nbuf = new StringBuffer(100);;
+	    StringBuffer nbuf = new StringBuffer(100);
 	    for (;;)
 	      {
 		int dot = name.indexOf('.', start);
@@ -158,10 +161,16 @@ public class ClassExp extends LambdaExp
 	    name = nbuf.toString();
 	  }
 	type.setName(name);
+        comp.addClass(type);
+        if (isMakingClassPair())
+          {
+            instanceType.setName(type.getName()+"$class");
+            comp.addClass(instanceType);
+          }
       }
   }
 
-  void setTypes(Compilation comp)
+  public void setTypes(Compilation comp)
   {
     int len = supers == null ? 0 : supers.length;
     ClassType[] superTypes = new ClassType[len];
@@ -171,13 +180,7 @@ public class ClassExp extends LambdaExp
       {
 	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
 	if (st == null || ! (st instanceof ClassType))
-	  {
-	    String msg = "invalid super type";
-	    if (comp == null)
-	      throw new Error(msg);
-	    else
-	      comp.error('e', msg);
-	  }
+          comp.error('e', "invalid super type");
 	ClassType t = (ClassType) st;
 	int modifiers;
 	try
@@ -193,43 +196,23 @@ public class ClassExp extends LambdaExp
 	if ((modifiers & Access.INTERFACE) == 0)
 	  {
 	    if (j < i)
-	      {
-		String msg = "duplicate superclass for "+this;
-		if (comp == null)
-		  throw new Error(msg);
-		else
-		  comp.error('e', msg);
-	      }
+              comp.error('e', "duplicate superclass for "+this);
 	    superType = t;
 	  }
 	else
 	  superTypes[j++] = t;
       }
-    if (superType == null)
+    if (! isSimple())
       {
-	if (! isSimple())
-	  {
-	    PairClassType ptype = new PairClassType();
-	    type = ptype;
-	    setMakingClassPair(true);
-	    instanceType = new ClassType();
-	    type.setInterface(true);
-	    ClassType[] interfaces = { type };
-	    // Can we better.  FIXME.
-	    instanceType.setSuper(Type.pointer_type);
-	    instanceType.setInterfaces(interfaces);
-	    ptype.instanceType = instanceType;
-	  }
-	else
-	  instanceType = type = new ClassType();
-	type.setSuper(Type.pointer_type);
+        if (superType != null)
+          comp.error('e', "non-simple class inherts from non-interface "+superType.getName());
+          
+        ClassType[] interfaces = { type };
+        // Can we better.  FIXME.
+        instanceType.setSuper(Type.pointer_type);
+        instanceType.setInterfaces(interfaces);
       }
-    else
-      {
-	instanceType = type = new ClassType();
-	type.setSuper(superType);
-      }
-    instanceType.setModifiers(Access.SUPER);
+    type.setSuper(superType == null ? Type.pointer_type : superType);
 
     ClassType[] interfaces;
     if (j == len)
@@ -244,8 +227,6 @@ public class ClassExp extends LambdaExp
 
   public Type getType()
   {
-    if (type == null)
-      setTypes(null);
     return type;
   }
 
@@ -575,7 +556,6 @@ public class ClassExp extends LambdaExp
     ClassType saveClass = comp.curClass;
     try
       {
-	setParts(walker, comp);
 	comp.curClass = type;
 	return walker.walkClassExp(this);
       }

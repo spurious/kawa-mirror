@@ -1,5 +1,20 @@
 2005-11-16  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (makeClassPair): Remove field.
+	(setMakingClassPair): Remove method.
+	(isMakingClassPair): Is now just the inverse of isSimple().
+	(<init>): New constructor, alocates and sets ClassType objects.
+	(setClassName): New method, extracted from old setParts.
+	Also call Compilation's addClass.
+	(setParts): Remove no-longer-needed method.
+	(setTypes): Simplify - always called with non-null Compilation.
+	Types are now pre-allocated.
+	(getType): Remove - just used inherited method.
+	(walk): No need to call setParts.
+	* ObjectExp.java (<init>): Call new super-constructor.
+	* InlineCalls.java (walkClassExp): Remove, since non-inherited
+	functionality is already done when the ClassExp was created.
+
 	* Compilation.java (classPrefixDefault): New static field.
 	(classPrefix): Initialize from classPrefixDefault.
 	(compile): Remove prefix parameter.  Don't set classPrefix here.

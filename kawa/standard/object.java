@@ -43,7 +43,6 @@ public class object extends Syntax
 	pair = (Pair) pair.cdr;
       }
     ObjectExp oexp = new ObjectExp();
-    oexp.setSimple(true);
     // if (clname != null) oexp.setName(clname);
     Object[] saved = scanClassDef(pair, oexp, tr);
     if (saved != null)
@@ -327,6 +326,8 @@ public class object extends Syntax
     LambdaExp method_list = (LambdaExp) saved[3];
     oexp.firstChild = method_list;
 
+    oexp.setClassName(tr);
+
     // First a pass over init-form: specifiers, since these are evaluated
     // in a scope outside the current class.
     int len = inits.size();
@@ -477,6 +478,8 @@ public class object extends Syntax
     if (oexp.clinitMethod != null)
       oexp.clinitMethod.outer = oexp;
     tr.pop(oexp);
+    oexp.setTypes(tr);
+    oexp.declareParts(tr);
   }
 
   private static void rewriteInit (Object d, ClassExp oexp, Pair initPair,

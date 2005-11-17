@@ -66,7 +66,7 @@
 (define (default-offset)
   *MY-YEAR-OFFSET*)
 
-(define-class <DateTest> (<java.util.Date>)
+(define-simple-class <DateTest> (<java.util.Date>)
   (offset init-form:  (default-offset))
   ((get-year) :: <int>
    (+ (invoke-special <java.util.Date> (this) 'get-year) offset)))

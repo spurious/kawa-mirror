@@ -1,3 +1,14 @@
+2005-11-17  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_class.java (scanForDefinitions): Use new
+	ClassExp constructor.
+	Don't set STATIC_SPECIFIED for simple class since that needlessly
+	prohibits "inner" classes accessing external data.
+	Set name of ClassExp now rather than during rewrite.
+	* kawa/standard/object.java (rewriteForm): Don't need to setSimple.
+	(rewriteClassDef): Call ClassExp's new setClassName method.
+	Call ClassExp's setTypes and declareParts methods here.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/module_name.java (rewriteForm): Replace method by

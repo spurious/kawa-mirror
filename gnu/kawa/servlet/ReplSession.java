@@ -136,6 +136,11 @@ public class ReplSession extends Writer
     qreader.append(line);
     qreader.append('\n');
   }
+
+  void appendInput (String line)
+  {
+    qreader.append(line);
+  }
 }
 
 class MyTtyInPort extends TtyInPort
@@ -249,7 +254,7 @@ class OutBufferWriter extends OutPort
 
   public void println ()
   {
-    bout.write("<br />");
+    bout.write('\n');
     flush();
   }
 

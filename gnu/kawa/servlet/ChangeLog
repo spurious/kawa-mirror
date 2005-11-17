@@ -1,3 +1,9 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* ReplSession.java (println): It suffices to just write a newline.
+	(appendInput): New method - like appendInputLine without newline.
+	* ReplServlet.java (doPost): Handle new action command.
+
 2005-11-08  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Put ModuleInfo in hashtable.  Ooops.

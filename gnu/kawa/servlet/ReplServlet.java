@@ -48,6 +48,8 @@ public class ReplServlet extends HttpServlet
     String inputData  = sbuf.toString();
     if ("line".equals(command))
       rsession.appendInputLine(inputData);
+    else if ("action".equals(command))
+      rsession.appendInput(inputData);
     String result = rsession.waitOutput();
     resultBuffer.append(result);
     resultBuffer.append("</result>");

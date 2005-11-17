@@ -172,7 +172,7 @@ public class ClassType extends ObjectType
   {
     String name = getName();
     int index = name.lastIndexOf('.');
-    return index < 0 ? name : name.substring(0, index);
+    return index < 0 ? "" : name.substring(0, index);
   }
 
   /**

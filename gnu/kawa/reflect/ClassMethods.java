@@ -118,7 +118,7 @@ public class ClassMethods extends Procedure2
     Vector methods = new Vector();
     dtype.getMethods(filter, named_class_only ? 0 : 2,
 		     methods,
-		     "-"); // Should be more specific - FIXME
+                     caller == null ? "-" : caller.getPackageName());
 
     int mlength = (named_class_only ? methods.size()
 		   : removeRedundantMethods(methods));

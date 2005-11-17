@@ -1,3 +1,8 @@
+2005-11-16  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Pass caller's package, if known,
+	as context to ClassType.getMethods.
+
 2005-10-16  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): Kludge to search Type.string_type

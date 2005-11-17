@@ -225,11 +225,6 @@ public class ClassExp extends LambdaExp
     type.setInterfaces(interfaces);
   }
 
-  public Type getType()
-  {
-    return type;
-  }
-
   boolean partsDeclared;
 
   public void declareParts(Compilation comp)

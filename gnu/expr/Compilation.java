@@ -1091,14 +1091,8 @@ public class Compilation
     curClass = clas;
     Method constructor_method = getConstructor(clas, lexp);
     clas.constructor = constructor_method;
-
-    Method superConstructor
-      = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
-				       apply0args, Type.void_type);
     method = constructor_method;
     CodeAttr code = constructor_method.startCode();
-    code.emitPushThis();
-    code.emitInvokeSpecial(superConstructor);
 
     if (lexp instanceof ClassExp && lexp.staticLinkField != null)
       {
@@ -1106,6 +1100,12 @@ public class Compilation
 	code.emitLoad(code.getCurrentScope().getVariable(1));
 	code.emitPutField(lexp.staticLinkField);
       }
+    Method superConstructor
+      = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
+				       apply0args, Type.void_type);
+    code.emitPushThis();
+    code.emitInvokeSpecial(superConstructor);
+
     if (curClass == mainClass && ! immediate)
       {
 	code.emitPushThis();

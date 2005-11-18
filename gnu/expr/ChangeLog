@@ -1,3 +1,9 @@
+2005-11-18  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateConstructor): Setup staticLinkField
+	before calling super constructor, in case latter calls a method
+	that needs static link.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (makeClassPair): Remove field.

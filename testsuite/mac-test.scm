@@ -1,4 +1,4 @@
-(test-init "macros" 85)
+(test-init "macros" 86)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -372,3 +372,20 @@
   (letrec ((double (lambda (x) (* x 2))))
     `(+ ,@(map double args))))
 (test 12 'test-13821 (test-13821 args: (1 2 3)))
+
+;; Savannah bug #14097
+(define-syntax slot
+  (syntax-rules ()
+    ((_ obj slotname)
+     (field obj (quote slotname)))
+    ((_ slotname)
+     (field (this) (quote slotname)))))
+(define-simple-class <xclass> ()
+  (x :init 0)
+  ((incx) <void>
+   (set! (slot x) (+ 1 (slot x))))
+  ((incx2) <void>
+   (set! (slot (this) x) (+ 1 (slot (this) x)))))
+(define xinstance (make <xclass>))
+(invoke xinstance 'incx)
+(test 1 'xclass (slot xinstance x))

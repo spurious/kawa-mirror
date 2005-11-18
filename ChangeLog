@@ -1,3 +1,14 @@
+2005-11-18  Per Bothner  <per@bothner.com>
+
+	Fixes Savannah bug #14097: problem with (this) syntax within
+	define-syntax.
+	* kawa/lang/Translator.java (curMethodLambda): New field.
+	* kawa/standard/object.java (rewriteClassDef, rewriteInit):
+	Save, set and restore curMethodLambda.
+	* kawa/standard/thisRef.java: Don't search static scope chain for
+	a class-method, since that may be weird when expanding macros.
+	Instead, use curMethodLambda.
+
 2005-11-17  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_class.java (scanForDefinitions): Use new

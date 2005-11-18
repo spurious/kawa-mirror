@@ -40,6 +40,8 @@ public class Translator extends Compilation
   public Stack formStack = new Stack();
   public int firstForm;
 
+  public LambdaExp curMethodLambda;
+
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
   {

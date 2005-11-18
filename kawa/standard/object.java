@@ -452,12 +452,15 @@ public class object extends Syntax
                       tr.error('e', "'*init*' methods only supported for simple classes");
                   }
                 Translator.setLine(meth, pair);
+                LambdaExp saveLambda = tr.curMethodLambda;
+                tr.curMethodLambda = meth;
 		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr,
 			       memberCarSyntax != null
 			       && (memberSyntax == null
 				   || memberCarSyntax.scope != memberSyntax.scope)
 			       ? memberCarSyntax.scope
 			       : null);
+                tr.curMethodLambda = saveLambda;
 		if (memberSyntax != null)
 		  tr.setCurrentScope(save_scope);
 		meth = meth.nextSibling;
@@ -510,6 +513,8 @@ public class object extends Syntax
         oexp.firstChild = initMethod;
       }
     tr.push(initMethod);
+    LambdaExp saveLambda = tr.curMethodLambda;
+    tr.curMethodLambda = initMethod;
     Expression initValue = tr.rewrite_car(initPair, memberSyntax);
     if (d instanceof Declaration)
       {
@@ -522,6 +527,7 @@ public class object extends Syntax
     else
       initValue = Convert.makeCoercion(initValue, new QuoteExp(Type.void_type));
     ((BeginExp) initMethod.body).add(initValue);
+    tr.curMethodLambda = saveLambda;
     tr.pop(initMethod);
 }
 

@@ -72,10 +72,14 @@ am__DEPENDENCIES_2 = gnu-bytecode.lo gnu-lists.lo gnu-expr.lo \
 @ENABLE_XML_TRUE@	gnu-kawa-xslt.lo
 @ENABLE_SERVLET_TRUE@am__DEPENDENCIES_4 = gnu-kawa-servlet.lo
 @WITH_SWING_TRUE@am__DEPENDENCIES_5 = gnu-kawa-swingviews.lo
-@WITH_SWING_TRUE@am__DEPENDENCIES_6 = gnu-jemacs-swing.lo
-@WITH_SWT_TRUE@am__DEPENDENCIES_7 = gnu-jemacs-swt.lo
-am__DEPENDENCIES_8 = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo \
-	gnu-jemacs-lisp.lo $(am__DEPENDENCIES_6) $(am__DEPENDENCIES_7)
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@am__DEPENDENCIES_6 =  \
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@	gnu-jemacs-swing.lo
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@am__DEPENDENCIES_7 =  \
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@	gnu-jemacs-swt.lo
+@ENABLE_JEMACS_TRUE@am__DEPENDENCIES_8 = gnu-jemacs-lang.lo \
+@ENABLE_JEMACS_TRUE@	gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
+@ENABLE_JEMACS_TRUE@	$(am__DEPENDENCIES_6) \
+@ENABLE_JEMACS_TRUE@	$(am__DEPENDENCIES_7)
 libkawa_la_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) \
 	$(am__DEPENDENCIES_8) gnu-ecmascript.lo gnu-kawa-slib.lo \
@@ -131,7 +135,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-AWT_SELECTED = @AWT_SELECTED@
 BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -149,6 +152,10 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
+ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
+ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
+ENABLE_JEMACS_TRUE = @ENABLE_JEMACS_TRUE@
 ENABLE_KAWA_FRONTEND_FALSE = @ENABLE_KAWA_FRONTEND_FALSE@
 ENABLE_KAWA_FRONTEND_TRUE = @ENABLE_KAWA_FRONTEND_TRUE@
 ENABLE_SERVLET_FALSE = @ENABLE_SERVLET_FALSE@
@@ -197,7 +204,6 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_AWT_FALSE = @WITH_AWT_FALSE@
@@ -210,7 +216,6 @@ WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
 WITH_SWT_FALSE = @WITH_SWT_FALSE@
 WITH_SWT_TRUE = @WITH_SWT_TRUE@
-XML_SELECTED = @XML_SELECTED@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -237,7 +242,6 @@ build_vendor = @build_vendor@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-extra_java = @extra_java@
 filesep = @filesep@
 host = @host@
 host_alias = @host_alias@
@@ -288,17 +292,17 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 @ENABLE_XML_TRUE@KAWA2_XML_OFILES = gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
 @ENABLE_XML_TRUE@LIBADD_XML = gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
-@WITH_SWING_TRUE@KAWA2_JEMACS_SWING = gnu-jemacs-swing.o
-@WITH_SWING_TRUE@LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@KAWA2_JEMACS_SWING = gnu-jemacs-swing.o
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
 @WITH_SWING_TRUE@KAWA2_SWINGVIEWS_OFILES = gnu-kawa-swingviews.o
 @WITH_SWING_TRUE@LIBADD_SWINGVIEWS = gnu-kawa-swingviews.lo
-@WITH_SWT_TRUE@KAWA2_JEMACS_SWT = gnu-jemacs-swt.o
-@WITH_SWT_TRUE@LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
-KAWA2_JEMACS_OFILES = gnu-jemacs-lang.o gnu-jemacs-buffer.o gnu-jemacs-lisp.o \
-  $(KAWA2_JEMACS_SWING) $(KAWA2_JEMACS_SWT)
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@KAWA2_JEMACS_SWT = gnu-jemacs-swt.o
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
+@ENABLE_JEMACS_TRUE@KAWA2_JEMACS_OFILES = gnu-jemacs-lang.o gnu-jemacs-buffer.o gnu-jemacs-lisp.o \
+@ENABLE_JEMACS_TRUE@  $(KAWA2_JEMACS_SWING) $(KAWA2_JEMACS_SWT)
 
-LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
-  $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
+@ENABLE_JEMACS_TRUE@LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
+@ENABLE_JEMACS_TRUE@  $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
 
 @ENABLE_SERVLET_TRUE@KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
 @ENABLE_SERVLET_TRUE@LIBADD_SERVLET = gnu-kawa-servlet.lo

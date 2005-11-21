@@ -90,7 +90,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-AWT_SELECTED = @AWT_SELECTED@
 BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -108,6 +107,10 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
+ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
+ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
+ENABLE_JEMACS_TRUE = @ENABLE_JEMACS_TRUE@
 ENABLE_KAWA_FRONTEND_FALSE = @ENABLE_KAWA_FRONTEND_FALSE@
 ENABLE_KAWA_FRONTEND_TRUE = @ENABLE_KAWA_FRONTEND_TRUE@
 ENABLE_SERVLET_FALSE = @ENABLE_SERVLET_FALSE@
@@ -156,7 +159,6 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_AWT_FALSE = @WITH_AWT_FALSE@
@@ -169,7 +171,6 @@ WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
 WITH_SWT_FALSE = @WITH_SWT_FALSE@
 WITH_SWT_TRUE = @WITH_SWT_TRUE@
-XML_SELECTED = @XML_SELECTED@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -196,7 +197,6 @@ build_vendor = @build_vendor@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-extra_java = @extra_java@
 filesep = @filesep@
 host = @host@
 host_alias = @host_alias@
@@ -228,55 +228,19 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
   $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
-  gnu/kawa/models $(SWINGVIEWS_SUBDIRS) \
+  gnu/kawa/models gnu/kawa/swingviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
+  $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
 
 @ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
 @ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 @ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
 @ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = gnu/kawa/servlet
-@WITH_SWING_TRUE@SWINGVIEWS_SUBDIRS = gnu/kawa/swingviews
-@WITH_SWING_TRUE@JEMACS_SWING = gnu/jemacs/swing
-@WITH_SWT_TRUE@JEMACS_SWT = gnu/jemacs/swt
-JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-  gnu/jemacs/testsuite $(JEMACS_SWING) $(JEMACS_SWT)
-
 javadir = $(datadir)/java
 JAR = jar
-@WITH_SWING_TRUE@JAR_DEPS_SWING = \
-@WITH_SWING_TRUE@  ./gnu/jemacs/buffer/java-classes.stamp \
-@WITH_SWING_TRUE@  ./gnu/jemacs/buffer/scm-classes.stamp \
-@WITH_SWING_TRUE@  ./gnu/jemacs/lang/java-classes.stamp \
-@WITH_SWING_TRUE@  ./gnu/jemacs/lang/scm-classes.stamp \
-@WITH_SWING_TRUE@  ./gnu/jemacs/lisp/elisp-classes.stamp
-
-@ENABLE_XML_TRUE@JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
-@ENABLE_XML_TRUE@  ./gnu/kawa/xml/java-classes.stamp \
-@ENABLE_XML_TRUE@  ./gnu/xquery/lang/java-classes.stamp \
-@ENABLE_XML_TRUE@  ./gnu/xquery/util/java-classes.stamp
-
-@ENABLE_SERVLET_TRUE@JAR_DEPS_SERVLET = ./gnu/kawa/servlet/java-classes.stamp
-JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) $(JAR_DEPS_SERVLET) \
-  ./gnu/bytecode/java-classes.stamp \
-  ./gnu/math/java-classes.stamp \
-  ./gnu/lists/java-classes.stamp \
-  ./gnu/text/java-classes.stamp \
-  ./gnu/mapping/java-classes.stamp \
-  ./gnu/expr/java-classes.stamp \
-  ./gnu/kawa/util/java-classes.stamp \
-  ./gnu/kawa/reflect/java-classes.stamp \
-  ./gnu/kawa/functions/java-classes.stamp \
-  ./gnu/kawa/lispexpr/java-classes.stamp \
-  ./gnu/kawa/slib/scm-classes.stamp \
-  ./gnu/ecmascript/java-classes.stamp \
-  ./gnu/commonlisp/lang/java-classes.stamp \
-  ./kawa/lang/java-classes.stamp \
-  ./kawa/standard/java-classes.stamp \
-  ./kawa/lib/scm-classes.stamp \
-  ./kawa/java-classes.stamp
-
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   ltmain.sh patch-source-list selected-java-source \
@@ -285,7 +249,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   kawa/Version.java jar-manifest Make-rules
 
 MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
-MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
+MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp
 CLEANFILES = *.jar
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -718,7 +682,7 @@ uninstall-info: uninstall-info-recursive
 	uninstall-local
 
 
-kawa-@VERSION@.jar: $(JAR_DEPS)
+kawa-@VERSION@.jar: ./kawa-jar.stamp
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
 	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
 

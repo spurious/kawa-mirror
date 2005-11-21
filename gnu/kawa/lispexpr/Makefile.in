@@ -56,7 +56,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-AWT_SELECTED = @AWT_SELECTED@
 BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -74,6 +73,10 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
+ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
+ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
+ENABLE_JEMACS_TRUE = @ENABLE_JEMACS_TRUE@
 ENABLE_KAWA_FRONTEND_FALSE = @ENABLE_KAWA_FRONTEND_FALSE@
 ENABLE_KAWA_FRONTEND_TRUE = @ENABLE_KAWA_FRONTEND_TRUE@
 ENABLE_SERVLET_FALSE = @ENABLE_SERVLET_FALSE@
@@ -123,7 +126,6 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_AWT_FALSE = @WITH_AWT_FALSE@
@@ -136,7 +138,6 @@ WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
 WITH_SWT_FALSE = @WITH_SWT_FALSE@
 WITH_SWT_TRUE = @WITH_SWT_TRUE@
-XML_SELECTED = @XML_SELECTED@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -163,7 +164,6 @@ build_vendor = @build_vendor@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-extra_java = @extra_java@
 filesep = @filesep@
 host = @host@
 host_alias = @host_alias@
@@ -407,22 +407,26 @@ $(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
 	echo timestamp > java-classes.stamp
+	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 scm-classes.stamp: $(java_SCM)
 	$(CLASSPATH_ENV) \
 	  $(KAWA1) -d $(top_builddir) --module-static-run $(SCM_COMPILE_FLAGS) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. -C $?
 	echo timestamp > scm-classes.stamp
+	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 clisp-classes.stamp: $(java_CLISP)
 	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --clisp -C $?
 	echo timestamp > clisp-classes.stamp
+	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 elisp-classes.stamp: $(java_ELISP)
 	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
+	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

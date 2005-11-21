@@ -56,7 +56,6 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-AWT_SELECTED = @AWT_SELECTED@
 BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
@@ -74,6 +73,10 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
+ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
+ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
+ENABLE_JEMACS_TRUE = @ENABLE_JEMACS_TRUE@
 ENABLE_KAWA_FRONTEND_FALSE = @ENABLE_KAWA_FRONTEND_FALSE@
 ENABLE_KAWA_FRONTEND_TRUE = @ENABLE_KAWA_FRONTEND_TRUE@
 ENABLE_SERVLET_FALSE = @ENABLE_SERVLET_FALSE@
@@ -122,7 +125,6 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 WITH_AWT_FALSE = @WITH_AWT_FALSE@
@@ -135,7 +137,6 @@ WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
 WITH_SWT_FALSE = @WITH_SWT_FALSE@
 WITH_SWT_TRUE = @WITH_SWT_TRUE@
-XML_SELECTED = @XML_SELECTED@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -162,7 +163,6 @@ build_vendor = @build_vendor@
 conf_classpath = @conf_classpath@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-extra_java = @extra_java@
 filesep = @filesep@
 host = @host@
 host_alias = @host_alias@
@@ -198,6 +198,7 @@ DOTEST = $(KAWA) --elisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
 EXTRA_DIST = lang-test.el
+CLEANFILES = *.log
 all: all-am
 
 .SUFFIXES:
@@ -295,6 +296,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -359,15 +361,9 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
+@ENABLE_JEMACS_TRUE@check:
+@ENABLE_JEMACS_TRUE@	$(DOTEST) -f "$(srcdir)/lang-test.el" -e '(test-report)'
 all:
-
-check_WITH_SWING:
-	$(DOTEST) -f "$(srcdir)/lang-test.el" -e '(test-report)'
-
-check_WITHOUT_SWING:
-	@echo "(no checks, since configued without --with-swing)"
-
-check: check_@SWING_SELECTED@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

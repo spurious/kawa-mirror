@@ -689,7 +689,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar JAVA_SOURCE LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBTOOL SED GREP EGREP FGREP LD NM AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP CXXCPP GCJ ac_ct_GCJ GCJFLAGS GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_SWT_TRUE WITH_SWT_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE conf_classpath pathsep filesep JAVA JAVAC XML_SELECTED AWT_SELECTED SWING_SELECTED GCJ_COMPILED_SELECTED GCJ_SELECTED extra_java TOP_BUILDDIR JEMACS_VERSION BYTECODE_VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar JAVA_SOURCE LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBTOOL SED GREP EGREP FGREP LD NM AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP CXXCPP GCJ ac_ct_GCJ GCJFLAGS GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_ECHO2_TRUE ENABLE_ECHO2_FALSE ENABLE_JEMACS_TRUE ENABLE_JEMACS_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_SWT_TRUE WITH_SWT_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE conf_classpath pathsep filesep JAVA JAVAC GCJ_COMPILED_SELECTED GCJ_SELECTED TOP_BUILDDIR JEMACS_VERSION BYTECODE_VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files='Make_rules'
 
 # Initialize some variables set by options.
@@ -1251,6 +1251,8 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --enable-kawa-frontend  Build "kawa" front-end program using readline
   --disable-xml           Don't build support for XML processing
+  --enable-echo2          Enable support for the Echo2 web toolkit
+  --enable-jemacs         Build JEmacs
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-shared[=PKGS]
@@ -1268,7 +1270,7 @@ Optional Packages:
   --with-gcj              Compile Kawa using GCJ (GNU Compiler for Java)
   --with-servlet[=servlet-api.jar]
                           Build support for generating servlets
-  --with-swing            Assume Swing (Java Foundation Classes) is available
+  --with-swing            Assume Swing is available (default on)
   --with-swt              Assume SWT is available
   --with-awt              Assume AWT is available (default on)
   --with-sax2             Assume SAX2 is available
@@ -2329,11 +2331,29 @@ else
   with_servlet=no
 fi;
 
+# Check whether --enable-echo2 or --disable-echo2 was given.
+if test "${enable_echo2+set}" = set; then
+  enableval="$enable_echo2"
+  enable_echo2=$enableval
+else
+  enable_echo2=yes
+fi;
+
+# Check whether --enable-jemacs or --disable-jemacs was given.
+if test "${enable_jemacs+set}" = set; then
+  enableval="$enable_jemacs"
+  enable_jemacs=$enableval
+else
+  enable_jemacs=yes
+fi;
+
 
 # Check whether --with-swing or --without-swing was given.
 if test "${with_swing+set}" = set; then
   withval="$with_swing"
-
+  enable_awt=$enableval
+else
+  enable_awt=yes
 fi;
 
 
@@ -6981,7 +7001,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 6984 "configure"
+#line 7004 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7079,7 +7099,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 7082 "configure"
+#line 7102 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7228,7 +7248,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  $ECHO '#line 7231 "configure"' > conftest.$ac_ext
+  $ECHO '#line 7251 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8696,11 +8716,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8699: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8719: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8703: \$? = $ac_status" >&5
+   echo "$as_me:8723: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -8983,11 +9003,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8986: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9006: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8990: \$? = $ac_status" >&5
+   echo "$as_me:9010: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -9080,11 +9100,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9083: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9103: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9087: \$? = $ac_status" >&5
+   echo "$as_me:9107: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9134,11 +9154,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9137: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9157: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9141: \$? = $ac_status" >&5
+   echo "$as_me:9161: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12737,11 +12757,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12740: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12760: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12744: \$? = $ac_status" >&5
+   echo "$as_me:12764: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12828,11 +12848,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12831: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12851: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12835: \$? = $ac_status" >&5
+   echo "$as_me:12855: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12879,11 +12899,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12882: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12902: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12886: \$? = $ac_status" >&5
+   echo "$as_me:12906: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13980,11 +14000,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13983: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14003: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13987: \$? = $ac_status" >&5
+   echo "$as_me:14007: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14261,11 +14281,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14264: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14284: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14268: \$? = $ac_status" >&5
+   echo "$as_me:14288: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14352,11 +14372,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14355: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14375: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14359: \$? = $ac_status" >&5
+   echo "$as_me:14379: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14403,11 +14423,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14406: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14426: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14410: \$? = $ac_status" >&5
+   echo "$as_me:14430: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16355,6 +16375,26 @@ fi
 
 
 
+if test "$enable_echo2" = "yes"; then
+  ENABLE_ECHO2_TRUE=
+  ENABLE_ECHO2_FALSE='#'
+else
+  ENABLE_ECHO2_TRUE='#'
+  ENABLE_ECHO2_FALSE=
+fi
+
+
+
+if test "$enable_jemacs" = "yes"; then
+  ENABLE_JEMACS_TRUE=
+  ENABLE_JEMACS_FALSE='#'
+else
+  ENABLE_JEMACS_TRUE='#'
+  ENABLE_JEMACS_FALSE=
+fi
+
+
+
 if test "$enable_xml" = "yes"; then
   ENABLE_XML_TRUE=
   ENABLE_XML_FALSE='#'
@@ -16424,27 +16464,6 @@ else
 fi
 
 
-case ${with_swing} in
-  yes)
-    extra_java='$(java_SWING)'
-    SWING_SELECTED=WITH_SWING
-    ;;
-  *)
-    extra_java=''
-    SWING_SELECTED=WITHOUT_SWING
-    ;;
-esac
-
-case ${with_awt} in
-  no) AWT_SELECTED=WITHOUT_AWT ;;
-  *)  AWT_SELECTED=WITH_AWT ;;
-esac
-
-case ${enable_xml} in
-  yes)  XML_SELECTED=XML_ENABLED ;;
-  *)  XML_SELECTED=XML_DISABLED ;;
-esac
-
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 BYTECODE_VERSION="$VERSION"
 
@@ -16467,10 +16486,6 @@ esac
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
-
-
-
-
 
 
 
@@ -16656,6 +16671,20 @@ if test -z "${WITH_GCJ_TRUE}" && test -z "${WITH_GCJ_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"WITH_GCJ\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"WITH_GCJ\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_ECHO2_TRUE}" && test -z "${ENABLE_ECHO2_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_ECHO2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ENABLE_ECHO2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_JEMACS_TRUE}" && test -z "${ENABLE_JEMACS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_JEMACS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ENABLE_JEMACS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -17610,6 +17639,10 @@ s,@am__fastdepGCJ_FALSE@,$am__fastdepGCJ_FALSE,;t t
 s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@WITH_GCJ_TRUE@,$WITH_GCJ_TRUE,;t t
 s,@WITH_GCJ_FALSE@,$WITH_GCJ_FALSE,;t t
+s,@ENABLE_ECHO2_TRUE@,$ENABLE_ECHO2_TRUE,;t t
+s,@ENABLE_ECHO2_FALSE@,$ENABLE_ECHO2_FALSE,;t t
+s,@ENABLE_JEMACS_TRUE@,$ENABLE_JEMACS_TRUE,;t t
+s,@ENABLE_JEMACS_FALSE@,$ENABLE_JEMACS_FALSE,;t t
 s,@ENABLE_XML_TRUE@,$ENABLE_XML_TRUE,;t t
 s,@ENABLE_XML_FALSE@,$ENABLE_XML_FALSE,;t t
 s,@ENABLE_SERVLET_TRUE@,$ENABLE_SERVLET_TRUE,;t t
@@ -17629,12 +17662,8 @@ s,@pathsep@,$pathsep,;t t
 s,@filesep@,$filesep,;t t
 s,@JAVA@,$JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
-s,@XML_SELECTED@,$XML_SELECTED,;t t
-s,@AWT_SELECTED@,$AWT_SELECTED,;t t
-s,@SWING_SELECTED@,$SWING_SELECTED,;t t
 s,@GCJ_COMPILED_SELECTED@,$GCJ_COMPILED_SELECTED,;t t
 s,@GCJ_SELECTED@,$GCJ_SELECTED,;t t
-s,@extra_java@,$extra_java,;t t
 s,@TOP_BUILDDIR@,$TOP_BUILDDIR,;t t
 s,@JEMACS_VERSION@,$JEMACS_VERSION,;t t
 s,@BYTECODE_VERSION@,$BYTECODE_VERSION,;t t

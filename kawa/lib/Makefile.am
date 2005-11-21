@@ -2,10 +2,6 @@
 
 include $(top_srcdir)/Make-rules
 
-java_SCM=\
-  $(java_SCM_ALWAYS) \
-  $(scm_@AWT_SELECTED@)
-
 # NOTE if you update this list, also update build.xml.
 java_SCM_ALWAYS =\
   prim_syntax.scm \
@@ -29,8 +25,13 @@ java_SCM_ALWAYS =\
   trace.scm
 
 scm_WITH_AWT = windows.scm
-
 EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
+
+if WITH_AWT
+java_SCM= $(java_SCM_ALWAYS) $(scm_WITH_AWT)
+else
+java_SCM= $(java_SCM_ALWAYS)
+endif
 
 # Used to generate makekawa.bat in ../.. .
 list-sources:

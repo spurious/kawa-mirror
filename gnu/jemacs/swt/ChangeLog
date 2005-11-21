@@ -1,3 +1,7 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS and ENABLE_SWT.
+
 2005-05-25 Christian Surlykke <christian@surlykke.dk>
 
 	* SwtKeyMapper.java: (swtKey2EKey): If unicode then remove shift 

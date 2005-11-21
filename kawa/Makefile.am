@@ -7,12 +7,14 @@ SUBDIRS = lang standard lib
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 #CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 
+if WITH_AWT
 java_WITH_AWT = \
   GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
+endif
 
 java_sources = Shell.java repl.java Version.java \
   TelnetInputStream.java TelnetOutputStream.java Telnet.java TelnetRepl.java \
-  $(java_@AWT_SELECTED@)
+  $(java_WITH_AWT)
 
 EXTRA_DIST = Version.java.in $(java_WITH_AWT)
 

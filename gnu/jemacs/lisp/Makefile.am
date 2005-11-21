@@ -12,4 +12,7 @@ EXTRA_GCJ_INPUTS = *.class
 
 EXTRA_DIST = $(java_ELISP)
 
-all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+if ENABLE_JEMACS
+ALL = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+all: Makefile $(ALL)

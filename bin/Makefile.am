@@ -39,11 +39,14 @@ KAWA2_XML_OFILES = gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
 LIBADD_XML = gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 endif
 if WITH_SWING
+if ENABLE_JEMACS
 KAWA2_JEMACS_SWING = gnu-jemacs-swing.o
 LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
+endif
 KAWA2_SWINGVIEWS_OFILES = gnu-kawa-swingviews.o
 LIBADD_SWINGVIEWS = gnu-kawa-swingviews.lo
 endif
+if ENABLE_JEMACS
 if WITH_SWT
 KAWA2_JEMACS_SWT = gnu-jemacs-swt.o
 LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
@@ -52,6 +55,7 @@ KAWA2_JEMACS_OFILES = gnu-jemacs-lang.o gnu-jemacs-buffer.o gnu-jemacs-lisp.o \
   $(KAWA2_JEMACS_SWING) $(KAWA2_JEMACS_SWT)
 LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
   $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
+endif
 if ENABLE_SERVLET
 KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
 LIBADD_SERVLET = gnu-kawa-servlet.lo

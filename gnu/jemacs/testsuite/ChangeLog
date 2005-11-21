@@ -1,3 +1,8 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Put check rule inside ENABLE_JEMACS conditional.
+	(CLEANFILES): Remove *.log file.
+
 2003-11-10  Per Bothner  <per@bothner.com>
 
 	* lang-test.el:  'format' tests are now working.

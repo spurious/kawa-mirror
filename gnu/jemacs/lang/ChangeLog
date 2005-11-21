@@ -1,3 +1,8 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS.
+	(list-sources): Remove no-longer-used rule.
+
 2005-10-13  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody): Update for changed Lambda.rewrite.

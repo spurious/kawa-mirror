@@ -1,3 +1,23 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Make-rules (java-classes.stamp, scm-classes.stamp,
+	clisp-classes.stamp, elisp-classes.stamp):
+	Also touch kawa-jar.stamp in top-dir.
+	* Makefile.am: Remove JAP_DEPS_XXX macros.
+	(kawa-@VERSION@.jar): Depend on kawa-jar.stamp instead of JAR_DEPS.
+	(MOSTLYCLEANFILES): Remome *.stamp - specifically kawa-jar.stamp.
+
+	* Makefile.am (SUBDIRS): Enter jemacs/swing/swt dirs unconditionally.
+	(JEMACS_SUBDIRS, JEMACS_SWING, JEMACS_SWT, SWINGVIEWS_SUBDIRS):
+	Remove no-longer-needed macros.
+	* configure.in: New --enable-jemacs option - default off,
+	to avoid accidental includion of GPL'd code.
+	New --enable-echo2, currently unused.
+	Change --with[out]-swing to default to 'with'.
+	Add ENABLE_JEMACS and ENABLE_ECHO2 automake conditionals.
+	Remove SWING_SELECTED, AWT_SELECTED, XML_SELECTED, extra_java variables.
+	* kawa/Makefile.am: Use WITH_AWT conditional.
+
 2005-11-18  Per Bothner  <per@bothner.com>
 
 	Fixes Savannah bug #14097: problem with (this) syntax within

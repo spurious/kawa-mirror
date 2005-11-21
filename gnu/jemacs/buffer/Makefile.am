@@ -31,8 +31,7 @@ EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-# Used to generate makekawa.bat in ../../.. .
-list-sources:
-	echo $(SCMSOURCES)
+if ENABLE_JEMACS
+ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+all: Makefile $(ALL)

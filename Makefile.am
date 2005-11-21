@@ -4,9 +4,11 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
   $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
-  gnu/kawa/models $(SWINGVIEWS_SUBDIRS) \
+  gnu/kawa/models gnu/kawa/swingviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
+  $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
 if ENABLE_XML
 XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
@@ -18,57 +20,11 @@ endif
 if ENABLE_SERVLET
 SERVLET_SUBDIRS = gnu/kawa/servlet
 endif
-if WITH_SWING
-SWINGVIEWS_SUBDIRS = gnu/kawa/swingviews
-JEMACS_SWING = gnu/jemacs/swing
-endif
-if WITH_SWT
-JEMACS_SWT = gnu/jemacs/swt
-endif
-JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-  gnu/jemacs/testsuite $(JEMACS_SWING) $(JEMACS_SWT)
 javadir=$(datadir)/java
 
 JAR = jar
 
-if WITH_SWING
-JAR_DEPS_SWING = \
-  ./gnu/jemacs/buffer/java-classes.stamp \
-  ./gnu/jemacs/buffer/scm-classes.stamp \
-  ./gnu/jemacs/lang/java-classes.stamp \
-  ./gnu/jemacs/lang/scm-classes.stamp \
-  ./gnu/jemacs/lisp/elisp-classes.stamp
-endif
-if ENABLE_XML
-JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
-  ./gnu/kawa/xml/java-classes.stamp \
-  ./gnu/xquery/lang/java-classes.stamp \
-  ./gnu/xquery/util/java-classes.stamp
-endif
-if ENABLE_SERVLET
-JAR_DEPS_SERVLET = ./gnu/kawa/servlet/java-classes.stamp
-endif
-
-JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) $(JAR_DEPS_SERVLET) \
-  ./gnu/bytecode/java-classes.stamp \
-  ./gnu/math/java-classes.stamp \
-  ./gnu/lists/java-classes.stamp \
-  ./gnu/text/java-classes.stamp \
-  ./gnu/mapping/java-classes.stamp \
-  ./gnu/expr/java-classes.stamp \
-  ./gnu/kawa/util/java-classes.stamp \
-  ./gnu/kawa/reflect/java-classes.stamp \
-  ./gnu/kawa/functions/java-classes.stamp \
-  ./gnu/kawa/lispexpr/java-classes.stamp \
-  ./gnu/kawa/slib/scm-classes.stamp \
-  ./gnu/ecmascript/java-classes.stamp \
-  ./gnu/commonlisp/lang/java-classes.stamp \
-  ./kawa/lang/java-classes.stamp \
-  ./kawa/standard/java-classes.stamp \
-  ./kawa/lib/scm-classes.stamp \
-  ./kawa/java-classes.stamp
-
-kawa-@VERSION@.jar: $(JAR_DEPS)
+kawa-@VERSION@.jar: ./kawa-jar.stamp
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
 	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
 
@@ -132,7 +88,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   kawa/Version.java jar-manifest Make-rules
 
 MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
-MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
+MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp
 CLEANFILES = *.jar
 
 HTML_HOME = $$HOME/public_html

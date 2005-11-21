@@ -6,13 +6,10 @@ DOTEST = $(KAWA) --elisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
 EXTRA_DIST = lang-test.el
+CLEANFILES = *.log
 
-all:
-
-check_WITH_SWING:
+if ENABLE_JEMACS
+check:
 	$(DOTEST) -f "$(srcdir)/lang-test.el" -e '(test-report)'
-
-check_WITHOUT_SWING:
-	@echo "(no checks, since configued without --with-swing)"
-
-check: check_@SWING_SELECTED@
+endif
+all:

@@ -1,3 +1,7 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* editfns.el (lisp-interaction): Update belatedly ReplBuffer->ReplMode.

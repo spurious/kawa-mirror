@@ -21,9 +21,8 @@ EXTRA_GCJ_INPUTS = MiscOps*.class NumberOps*.class
 
 EXTRA_DIST = $(java_SCM) package.html
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+if ENABLE_JEMACS
+ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+all: Makefile $(ALL)
 
-all: Makefile java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-# Used to generate makekawa.bat in ../../.. .
-list-sources:
-	echo $(ALL_SCMSOURCES)

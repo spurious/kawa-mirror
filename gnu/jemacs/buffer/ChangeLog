@@ -1,3 +1,8 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS.
+	(list-sources): Remove no-longer-used rule.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* ReplMode.java (make): Combine two methods.

@@ -17,4 +17,9 @@ java_sources = \
 PACKAGE_FNAME = gnu-jemacs-swt
 GCJ_INPUTS =  $(java_Java)
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+if ENABLE_JEMACS
+if WITH_SWT
+ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+endif
+all: Makefile $(ALL)

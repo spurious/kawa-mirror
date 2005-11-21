@@ -1,3 +1,7 @@
+2005-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Add conditionals for ENABLE_JEMACS as appropriate.
+
 2005-11-14  Dean Ferreyra <dferreyra@igc.org>
 
 	* kawapath.c (get_classpath): Move declaration so we can compile

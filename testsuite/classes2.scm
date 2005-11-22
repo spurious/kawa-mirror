@@ -20,3 +20,15 @@
 (define (make-date-test)
   (let ((d :: <SimpleDateTest> (date-test-ns:new)))
     (date-test-ns:get-year d)))
+
+(define-simple-class <TestCapture1> ()
+  (z :: <integer> init: 11)
+  ((ff farg)
+   (list
+    (lambda (y) (list yy z y)))))
+
+(define-simple-class <TestCapture2> ()
+  (z :: <integer> init: 12)
+  ((ff farg)
+   (list
+    (lambda (y) (list yy y)))))

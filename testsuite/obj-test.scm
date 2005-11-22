@@ -1,4 +1,4 @@
-(test-init "Objects" 111)
+(test-init "Objects" 113)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -8,7 +8,7 @@
 ;; Force call to be compiled with (hopefully) inlining:
 (define-syntax force-compile
   (syntax-rules () ((force-compile proc arg ...)
-                    (let () (proc arg ...)))))
+                    ((lambda () (proc arg ...))))))
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -274,6 +274,11 @@
 (set! (field obj6 'e) (- (field obj6 'e) 10))
 (test 29 'obj6-e (slot-ref obj6 'e))
 (test 156 'obj6-f (invoke obj6 'f 7))
+
+(define test-capture-1 (make <TestCapture1>))
+(test '(56 11 21) 'test-capture-1 ((car (invoke test-capture-1 'ff 99)) 21))
+(define test-capture-2 (make <TestCapture2>))
+(test '(56 22) 'test-capture-2 ((car (invoke test-capture-2 'ff 99)) 22))
 
 (require <MyFunc>)
 (test '(1 2 3) my-func-1 2 3)

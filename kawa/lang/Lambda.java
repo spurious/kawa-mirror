@@ -25,6 +25,13 @@ public class Lambda extends Syntax implements Printable
     keyKeyword = key;
   }
 
+  public Expression rewriteForm (Pair form, Translator tr)
+  {
+    Expression exp = rewrite(form.cdr, tr);
+    Translator.setLine(exp, form);
+    return exp;
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))

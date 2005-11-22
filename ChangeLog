@@ -1,3 +1,8 @@
+2005-11-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteForm): New method, so we can set
+	the line/column number to the actual lambda expression.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Make-rules (java-classes.stamp, scm-classes.stamp,

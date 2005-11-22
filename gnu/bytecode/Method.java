@@ -212,7 +212,7 @@ public class Method implements AttrContainer {
     Attribute.writeAll(this, dstr);
   }
 
-  private String signature;
+  String signature;
 
   public String getSignature ()
   {

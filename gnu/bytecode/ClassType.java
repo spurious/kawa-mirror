@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -74,6 +74,46 @@ public class ClassType extends ObjectType
 
   /** Set the modifiers (access flags) for this class. */
   public final void setModifiers(int flags) { access_flags = flags; }
+
+  public final boolean hasOuterLink ()
+  {
+    getFields();
+    return (flags & HAS_OUTER_LINK) != 0;
+  }
+
+  /** Note that this class needs an other link ("this$0") field.
+   * This is only allowed if !isExisting().
+   * Adjust any existing "<init>" methods to take the extra
+   * implicit parameter.
+   * @param outer the outer class
+   */
+  public final void setOuterLink (ClassType outer)
+  {
+    if ((flags & EXISTING_CLASS) != 0)
+      throw new Error("setOuterLink called for existing class "+getName());
+    Field field = getDeclaredField("this$0");
+    if (field == null)
+      {
+        field = addField("this$0", outer);
+        flags |= HAS_OUTER_LINK;
+        for (Method meth = methods; meth != null;  meth = meth.getNext())
+          {
+            if ("<init>".equals(meth.getName()))
+              {
+                if (meth.code != null)
+                  throw new Error("setOuterLink called when "+meth+" has code");
+                Type[] arg_types = meth.arg_types;
+                Type[] new_types = new Type[arg_types.length+1];
+                System.arraycopy(arg_types, 0, new_types, 1, arg_types.length);
+                new_types[0] = outer;
+                meth.arg_types = new_types;
+                meth.signature = null;
+              }
+          }
+      }
+    else if (! outer.equals(field.getType()))
+      throw new Error("inconsistent setOuterLink call for "+getName());
+  }
 
   /** Check if a component is accessible from this class.
    * @param declaring the class containing the component (a field, method,
@@ -346,6 +386,8 @@ public class ClassType extends ObjectType
         java.lang.reflect.Field field = fields[i];
         if (! field.getDeclaringClass().equals(clas))
           continue;
+        if ("this$0".equals(field.getName()))
+          flags |= HAS_OUTER_LINK;
         int modifiers = field.getModifiers();
         if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
           continue;
@@ -561,20 +603,22 @@ public class ClassType extends ObjectType
 
   public Method getDeclaredMethod(String name, Type[] arg_types)
   {
+    int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
     for (Method method = getDeclaredMethods();
 	 method != null;  method = method.next)
       {
 	if (! name.equals(method.getName()))
 	  continue;
 	Type[] method_args = method.getParameterTypes();
-	if (arg_types == null || arg_types == method_args)
+	if (arg_types == null
+            || (arg_types == method_args && needOuterLinkArg==0))
 	  return method;
 	int i = arg_types.length;
-	if (i != method_args.length)
+	if (i != method_args.length-needOuterLinkArg)
 	  continue;
 	while (-- i >= 0)
 	  {
-	    Type meth_type = method_args[i];
+	    Type meth_type = method_args[i+needOuterLinkArg];
 	    Type need_type = arg_types[i];
 	    if (meth_type == need_type)
 	      continue;
@@ -593,11 +637,12 @@ public class ClassType extends ObjectType
   public Method getDeclaredMethod(String name, int argCount)
   {
     Method result = null;
+    int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
     for (Method method = getDeclaredMethods();
 	 method != null;  method = method.next)
       {
 	if (name.equals(method.getName())
-	    && argCount == method.getParameterTypes().length)
+	    && argCount + needOuterLinkArg == method.getParameterTypes().length)
 	  {
 	    if (result != null)
 	      throw new Error("ambiguous call to getDeclaredMethod(\""

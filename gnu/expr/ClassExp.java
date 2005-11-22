@@ -79,7 +79,10 @@ public class ClassExp extends LambdaExp
     boolean needsLink = getNeedsClosureEnv();
     if (isMakingClassPair() || needsLink)
       {
-	comp.loadClassRef(instanceType.getName());
+        if (new_class == instanceType)
+          code.emitDup(instanceType);
+        else
+          comp.loadClassRef(instanceType.getName());
 	typeType = ClassType.make("gnu.expr.PairClassType");
 	nargs = needsLink ? 3 : 2;
       }
@@ -91,7 +94,7 @@ public class ClassExp extends LambdaExp
     Type[] argsClass = new Type[nargs];
     if (needsLink)
       {
-	comp.curLambda.loadHeapFrame(comp);
+	getOwningLambda().loadHeapFrame(comp);
 	argsClass[--nargs] = Type.pointer_type;
       }
     ClassType typeClass = ClassType.make("java.lang.Class");
@@ -368,8 +371,6 @@ public class ClassExp extends LambdaExp
               closureEnvField = staticLinkField
                 = instanceType.addField("this$0", parentFrame.getType());
 	  }
-        if (! explicitInit)
-          comp.generateConstructor(instanceType, this);
 	CodeAttr code;
 
 	for (LambdaExp child = firstChild;  child != null; )
@@ -459,6 +460,10 @@ public class ClassExp extends LambdaExp
             comp.setLine(saveFilename, saveLine, saveColumn);
 	    child = child.nextSibling;
 	  }
+        if (! explicitInit)
+          comp.generateConstructor(instanceType, this);
+        else if (initChain != null)
+          initChain.reportError("unimplemented: explicit constructor cannot initialize ", comp);
 
 	Method[] methods = type.getMethods(AbstractMethodFilter.instance, 2);
 	for (int i = 0;  i < methods.length;  i++)
@@ -532,6 +537,7 @@ public class ClassExp extends LambdaExp
 	      }
 	  }
 
+        generateApplyMethods(comp);
 	comp.curLambda = saveLambda;
 
 	return new_class;
@@ -595,7 +601,8 @@ public class ClassExp extends LambdaExp
 	out.print('/');
       }
     out.print(id);
-    out.print("/ (");
+    out.print("/fl:");  out.print(Integer.toHexString(flags));
+    out.print(" (");
     Special prevMode = null;
     int i = 0;
     int opt_i = 0;

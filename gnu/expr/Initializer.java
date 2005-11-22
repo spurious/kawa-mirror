@@ -25,4 +25,9 @@ public abstract class Initializer
       }
     return prev;
   }
+
+  public void reportError (String message, Compilation comp)
+  {
+    comp.error('e', message+"field "+field);
+  }
 }

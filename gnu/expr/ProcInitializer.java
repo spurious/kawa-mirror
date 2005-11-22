@@ -29,8 +29,10 @@ public class ProcInitializer extends Initializer
     ClassType procClass = Compilation.typeModuleMethod;
     code.emitNew(procClass);
     code.emitDup(1);
-
-    if (! (proc.getOwningLambda() instanceof ModuleExp)
+    LambdaExp owning = proc.getOwningLambda();
+    if (owning instanceof ClassExp && owning.staticLinkField != null)
+      code.emitLoad(code.getCurrentScope().getVariable(1));
+    else if (! (owning instanceof ModuleExp)
 	|| (comp.moduleClass == comp.mainClass
 	    && ! comp.method.getStaticFlag()))
       code.emitPushThis();
@@ -107,5 +109,24 @@ public class ProcInitializer extends Initializer
       code.emitPutStatic(field);
     else
       code.emitPutField(field);
+  }
+
+  public void reportError (String message, Compilation comp)
+  {
+    String saveFile = comp.getFile();
+    int saveLine = comp.getLine();
+    int saveColumn = comp.getColumn();
+    comp.setLine(proc);
+    String name = proc.getName();
+    StringBuffer sbuf = new StringBuffer(message);
+    if (name == null)
+      sbuf.append("unnamed procedure");
+    else
+      {
+        sbuf.append("procedure ");
+        sbuf.append(name);
+      }
+    comp.error('e', sbuf.toString());
+    comp.setLine(saveFile, saveLine, saveColumn);
   }
 }

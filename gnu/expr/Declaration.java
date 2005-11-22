@@ -94,7 +94,7 @@ public class Declaration
   public final void setSimple(boolean b)
   {
     setFlag(b, IS_SIMPLE);
-    if (var != null) var.setSimple(b);
+    if (var != null && ! var.isParameter()) var.setSimple(b);
   }
 
   public final void setSyntax ()

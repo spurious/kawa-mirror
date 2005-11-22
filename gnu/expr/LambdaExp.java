@@ -471,21 +471,30 @@ public class LambdaExp extends ScopeExp
 
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (curLambda.heapFrame != null && this == curLambda)
-      code.emitLoad(curLambda.heapFrame);
-    else if (curLambda.closureEnv != null)
-      code.emitLoad(curLambda.closureEnv);
-    else
-      code.emitPushThis();
-    if (this != curLambda)
       {
-	LambdaExp parent = curLambda.outerLambda();
-	while (parent != this)
-	  {
-	    if (parent.staticLinkField != null)
-	      code.emitGetField(parent.staticLinkField);
-	    //curLambda = parent;
-	    parent = parent.outerLambda();
-	  }
+        code.emitLoad(curLambda.heapFrame);
+        return;
+      }
+    ClassType curType;
+    if (curLambda.closureEnv != null)
+      {
+        code.emitLoad(curLambda.closureEnv);
+        curType = (ClassType) curLambda.closureEnv.getType();
+      }
+    else
+      {
+        code.emitPushThis();
+        curType = comp.curClass;
+      }
+    while (curLambda != this)
+      {
+        Field link = curLambda.staticLinkField;
+        if (link != null && link.getDeclaringClass() == curType)
+          {
+            code.emitGetField(link);
+            curType = (ClassType) link.getType();
+          }
+        curLambda = curLambda.outerLambda();
       }
   }
 
@@ -518,7 +527,15 @@ public class LambdaExp extends ScopeExp
 
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);
+    
+    generateApplyMethods(comp);
+  }
+
+  public void generateApplyMethods(Compilation comp)
+  {
     comp.generateMatchMethods(this);
+    int numApplyMethods
+      = applyMethods == null ? 0 : applyMethods.size();
     if (Compilation.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
       comp.generateApplyMethodsWithContext(this);
     else
@@ -975,7 +992,9 @@ public class LambdaExp extends ScopeExp
 	      break;
 	    Variable var = decl.var;
 	    // i is the register to use for the current parameter
-	    if (decl.isSimple () && ! decl.isIndirectBinding())
+            if (var != null)
+              ;
+	    else if (decl.isSimple () && ! decl.isIndirectBinding())
 	      {
 		// For a simple parameter not captured by an inferior lambda,
 		// just allocate it in the incoming register.

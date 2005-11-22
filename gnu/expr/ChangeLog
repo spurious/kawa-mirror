@@ -1,3 +1,33 @@
+2005-11-21  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (setSimple): If Variable is a parameter,
+	don't make it simple.
+	* LambdaExp.java (allocChildClasses): If decl has a Variable, use it.
+
+	* LambdaExp.java (compileEnd): Split out tail part into ...
+	(generateApplyMethods): ... new method.
+
+	* LambdaExp.java (loadHeapFrame): Skip unneeded static link fields.
+	Kind-of-kludgy, but fixes new test cases.
+
+	* ClassExp.java (compilePushClass):  Generate better code.
+
+	* ClassExp.java (compilePushClass):  Using getOwningLambda
+	seems more correct/robust - though not sure.
+
+	* ClassExp.java (compile): Call generateApplyMethods after methods
+	have been compiled, in case initializers are emitted.
+	Emit error if explicitInit and initializers are emitted.
+	(generateApplyMethods): Add needed call.
+
+	* Initializer.java (reportError): New method.
+	* ProcInitializer.java	(reportError): New method.
+
+	* ProcInitializer.java	(emitLoadModuleMethod): Handle the case of a
+	ClassExp with a passed-in static link.
+
+	* ClassExp.java (print): Also print flags.
+
 2005-11-18  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateConstructor): Setup staticLinkField

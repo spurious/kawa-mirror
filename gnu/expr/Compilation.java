@@ -171,11 +171,9 @@ public class Compilation
     = typeSymbol.addMethod("getProcedure", Type.typeArray0,
 			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
-    = scmBooleanType.addField ("TRUE", scmBooleanType,
-			       Access.PUBLIC|Access.STATIC); 
+    = scmBooleanType.getDeclaredField("TRUE"); 
   static public final Field falseConstant
-    = scmBooleanType.addField ("FALSE", scmBooleanType,
-			       Access.PUBLIC|Access.STATIC);
+    = scmBooleanType.getDeclaredField("FALSE");
 
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
@@ -277,19 +275,18 @@ public class Compilation
   public static ClassType typeValues
     = ClassType.make("gnu.mapping.Values");
   public static Field noArgsField
-    = typeValues.addField("noArgs", objArrayType,
-				Access.PUBLIC|Access.STATIC);
+    = typeValues.getDeclaredField("noArgs");
   public static Field pcCallContextField
-    = typeCallContext.addField("pc", Type.int_type, Access.PROTECTED);
+    = typeCallContext.getDeclaredField("pc");
   public static ClassType typeMethodProc
   = ClassType.make("gnu.mapping.MethodProc", typeProcedureN);
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod", typeMethodProc);
-  //  public static Field numArgsCallFrameField = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
+  //  public static Field numArgsCallFrameField = typeCallFrame.getDeclaredField("numArgs");
   public static Field argsCallContextField
-    = typeCallContext.addField("values", objArrayType, Access.PROTECTED);
+    = typeCallContext.getDeclaredField("values");
   public static Field procCallContextField
-    = typeCallContext.addField("proc", typeProcedure, Access.PROTECTED);
+    = typeCallContext.getDeclaredField("proc");
   private static Type[] applyCpsArgs = { typeCallContext};
   public static Method applyCpsMethod
     = typeProcedure.addMethod("apply", applyCpsArgs, Type.void_type,

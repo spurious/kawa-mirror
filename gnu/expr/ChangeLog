@@ -1,5 +1,8 @@
 2005-11-22  Per Bothner  <per@bothner.com>
 
+	* Compilation.java: For various static Field fields, initialize using
+	getDeclaredField rather than addField.
+
 	* PrimProcedure.java (compile/6): Rename to compileInvoke.
 	 (compile/4): Make non-public.  Update to call compileInvoke.
 

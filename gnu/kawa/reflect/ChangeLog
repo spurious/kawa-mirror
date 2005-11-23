@@ -1,3 +1,9 @@
+2005-11-22  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (getField): Adjust for updated ClassType.getField,
+	to request all fields, not just public|protected ones.
+	* SlotSet.java (getField): Likewise.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (apply2): Use WrappedException.

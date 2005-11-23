@@ -319,20 +319,32 @@ public class ClassType extends ObjectType
   }
 
   /** Find a field with the given name declared in this class or its ancestors.
+   * @param name the name of the field.
+   * @param mask of match a field whose modifiers has one of these bits set.
+   *   Howeve, if mask is -1, ignore the access flags.
    * @return the matching field, or null if there is no such field.
    */
-  public Field getField(String name)
+  public Field getField(String name, int mask)
   {
     ClassType cl = this;
     for (;;)
       {
         Field field = cl.getDeclaredField(name);
-        if (field != null)
+        if (field != null
+            && (mask == -1 || (field.getModifiers() & mask) != 0))
           return field;
         cl = cl.getSuperclass();
         if (cl == null)
           return null;
       }
+  }
+
+  /** Find a field with the given name declared in this class or its ancestors.
+   * @return the matching field, or null if there is no such field.
+   */
+  public Field getField(String name)
+  {
+    return getField(name, Access.PUBLIC);
   }
 
   /**
@@ -384,14 +396,10 @@ public class ClassType extends ObjectType
     for (int i = 0;  i < count;  i++)
       {
         java.lang.reflect.Field field = fields[i];
-        if (! field.getDeclaringClass().equals(clas))
-          continue;
         if ("this$0".equals(field.getName()))
           flags |= HAS_OUTER_LINK;
-        int modifiers = field.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
-          continue;
-        addField(field.getName(), Type.make(field.getType()), modifiers);
+        addField(field.getName(), Type.make(field.getType()),
+                 field.getModifiers());
       }
     flags |= ADD_FIELDS_DONE;
   }
@@ -416,9 +424,7 @@ public class ClassType extends ObjectType
   }
 
   public Method addMethod (String name) {
-    Method method = new Method (this, 0);
-    method.setName(name);
-    return method;
+    return addMethod(name, 0);
   }
 
   public Method addMethod (String name, int flags) {
@@ -446,8 +452,7 @@ public class ClassType extends ObjectType
         && return_type.equals(method.getReturnType())
         && (flags & method.access_flags) == flags)
       return method;
-    method = new Method (this, flags);
-    method.setName(name);
+    method = addMethod(name, flags);
     method.arg_types = arg_types;
     method.return_type = return_type;
     return method;
@@ -660,7 +665,7 @@ public class ClassType extends ObjectType
     for (;;)
       {
         Method method = cl.getDeclaredMethod(name, arg_types);
-	if (method != null)
+	if (method != null && (method.getModifiers() & Access.PUBLIC) != 0)
           return method;
         cl = cl.getSuperclass();
         if (cl == null)
@@ -715,15 +720,12 @@ public class ClassType extends ObjectType
         if (! method.getDeclaringClass().equals(clas))
           continue;
         int modifiers = method.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
-          continue;
         Class[] paramTypes = method.getParameterTypes();
         int j = paramTypes.length;
         Type[] args = new Type[j];
         while (--j >= 0)
           args[j] = Type.make(paramTypes[j]);
-        Method meth = new Method (this, modifiers);
-        meth.setName(method.getName());
+        Method meth = addMethod(method.getName(), modifiers);
         meth.arg_types = args;
         meth.return_type = Type.make(method.getReturnType());
       }
@@ -751,8 +753,7 @@ public class ClassType extends ObjectType
         Type[] args = new Type[j];
         while (--j >= 0)
           args[j] = Type.make(paramTypes[j]);
-        Method meth = new Method (this, modifiers);
-        meth.setName("<init>");
+        Method meth = addMethod("<init>", modifiers);
         meth.arg_types = args;
         meth.return_type = Type.void_type;
       }

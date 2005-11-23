@@ -157,7 +157,7 @@ public class SlotGet extends Procedure2
       {
         ClassType clas = (ClassType) type;
         gnu.bytecode.Field field
-          = clas.getField(Compilation.mangleNameIfNeeded(name));
+          = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
         if (field != null)
           return field;
 

@@ -1,3 +1,13 @@
+2005-11-22  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getField): New method, takes mask.
+	(getField): Old method now just calls new method.
+	(addFields): Now add all fields, not just public|protected ones.
+	(addmethods): Likewise.
+	(getMethod): Only match public methods.
+
+	* ClassType.java (addMethod): Reimplement using shared code.
+
 2005-11-21  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (HAS_OUTER_LINK): New flag,

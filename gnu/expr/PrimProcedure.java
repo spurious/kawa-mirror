@@ -435,8 +435,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     compile(getStaticFlag() ? null : mclass, exp, comp, target);
   }
 
-  public void compile (Type thisType, ApplyExp exp,
-		       Compilation comp, Target target)
+  void compile (Type thisType, ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -450,12 +449,18 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     else
       {
-        compile(comp, method, target, exp.isTailCall(), op_code, stackType);
+        compileInvoke(comp, method, target,
+                      exp.isTailCall(), op_code, stackType);
       }
   }
 
-  public static void compile (Compilation comp, Method method, Target target,
-                              boolean isTailCall, int op_code, Type stackType)
+  /** Emit the actual invoke operation, after arguments have been pushed.
+   * Does whatever magic is needed to pass the result to target,
+   * including passing CallContext or special handling of ConsumerTarget.
+   */
+  public static void
+  compileInvoke (Compilation comp, Method method, Target target,
+                 boolean isTailCall, int op_code, Type stackType)
   {
     CodeAttr code = comp.getCode();
     comp.usedClass(method.getDeclaringClass());

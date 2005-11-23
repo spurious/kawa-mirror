@@ -1,3 +1,7 @@
+2005-11-22  Per Bothner  <per@bothner.com>
+
+	* OrderedMap.java (compile): Update compile->compileInvoke rename.
+
 2005-09-26  Per Bothner  <per@bothner.com>
 
 	* Average.java (combine): Coerce operands with NumberValue.

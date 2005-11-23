@@ -99,8 +99,8 @@ public class OrderedMap extends MethodProc
     args[0].compile(comp, ctarget);
     Method mm = typeTuples.getDeclaredMethod("run$X", 1);
     code.emitLoad(consumer);
-    PrimProcedure.compile(comp, mm, target, exp.isTailCall(),
-                          182/*invokevirtual*/, Type.pointer_type);
+    PrimProcedure.compileInvoke(comp, mm, target, exp.isTailCall(),
+                                182/*invokevirtual*/, Type.pointer_type);
     code.popScope();
   }
 

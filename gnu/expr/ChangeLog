@@ -1,3 +1,8 @@
+2005-11-22  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compile/6): Rename to compileInvoke.
+	 (compile/4): Make non-public.  Update to call compileInvoke.
+
 2005-11-21  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setSimple): If Variable is a parameter,

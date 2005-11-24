@@ -81,13 +81,19 @@ public class ClassType extends ObjectType
     return (flags & HAS_OUTER_LINK) != 0;
   }
 
+  public ClassType getOuterLinkType ()
+  {
+    return ! hasOuterLink() ? null
+      : (ClassType) getDeclaredField("this$0").getType();
+  }
+
   /** Note that this class needs an other link ("this$0") field.
    * This is only allowed if !isExisting().
    * Adjust any existing "<init>" methods to take the extra
    * implicit parameter.
    * @param outer the outer class
    */
-  public final void setOuterLink (ClassType outer)
+  public final Field setOuterLink (ClassType outer)
   {
     if ((flags & EXISTING_CLASS) != 0)
       throw new Error("setOuterLink called for existing class "+getName());
@@ -113,6 +119,7 @@ public class ClassType extends ObjectType
       }
     else if (! outer.equals(field.getType()))
       throw new Error("inconsistent setOuterLink call for "+getName());
+    return field;
   }
 
   /** Check if a component is accessible from this class.

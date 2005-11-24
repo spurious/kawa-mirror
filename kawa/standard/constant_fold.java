@@ -17,8 +17,11 @@ public class constant_fold extends Syntax
     if (exp instanceof ReferenceExp)
       {
 	ReferenceExp rexp = (ReferenceExp) exp;
-	if (rexp.getBinding() == null)
+        Declaration decl = rexp.getBinding();
+	if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
 	  return Environment.user().get(rexp.getName(), null);
+        else
+          return Declaration.followAliases(decl).getConstantValue();
       }
     return null;
   }

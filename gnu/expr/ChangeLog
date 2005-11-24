@@ -1,5 +1,11 @@
 2005-11-23  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (setTypes): Set line numeber before error output.
+
+	* Declaration.java (allocateVariable): If !isSimple return existing var.
+
+	* Language.java (getTypeFor): Get class of ModuleExp.
+
 	* Compilation.java (compile): Only set mainClass if it hasn't been
 	set yet.  Also call getConstructor, in case needed by InlineCalls.
 	

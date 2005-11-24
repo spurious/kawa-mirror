@@ -25,14 +25,6 @@ import gnu.mapping.*;
  * If a parameter is not captured by an inner lambda, the parameter
  * has the flags isSimple and isParameter true.
  *
- * A parameter named "foo" that is captured by an inner lambda is represented
- * using two Declarations, named "foo" and "fooIncoming".
- * The "fooIncoming" declaration is the actual parameter as passed
- * by the caller using a Java local variable slot.  It has isParameter(),
- * isSimple(), and isArtificial set.  The "foo" Declaration has isParameter()
- * set.  The procedure prologue copies "fooIncoming" to "foo", which acts
- * just like a normal captured local variable.
- *
  * If a function takes more than 4 or a variable number of parameters,
  * the arguments are passed in an array (using the applyN virtual method).
  * This array is referenced by the argsArray declaration, which has
@@ -615,9 +607,7 @@ public class Declaration
 
   public final Variable allocateVariable(CodeAttr code)
   {
-    if (! isSimple())
-      return null;
-    if (var == null)
+    if (! isSimple() || var == null)
       {
         String vname = null;
         if (symbol != null)

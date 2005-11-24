@@ -1,3 +1,10 @@
+2005-11-23  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (applyN): Don't need to check for staticLink here.
+	Instead, assume extra parameter for ClassType.
+	(inline): Can more inline constructors regardless of whether
+	there is or will be a static link.
+
 2005-11-22  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (getField): Adjust for updated ClassType.getField,

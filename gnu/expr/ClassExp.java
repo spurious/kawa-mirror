@@ -278,12 +278,7 @@ public class ClassExp extends LambdaExp
 	  child.addMethodFor(instanceType, comp, type);
       }
     if (! explicitInit)
-      {
-        // It is desirable to declare the constructor now, so it's available
-        // to InlineCalls.  But we can't if we might need a static link.
-        if (nameDecl != null && nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
-          comp.getConstructor(instanceType, this);
-      }
+      comp.getConstructor(instanceType, this);
   }
 
   /** Return implementation method matching name and param types.
@@ -369,7 +364,7 @@ public class ClassExp extends LambdaExp
               : saveLambda.closureEnv;
             if (parentFrame != null)
               closureEnvField = staticLinkField
-                = instanceType.addField("this$0", parentFrame.getType());
+                = instanceType.setOuterLink((ClassType) parentFrame.getType());
 	  }
 	CodeAttr code;
 

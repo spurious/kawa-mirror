@@ -61,4 +61,10 @@ public class PairClassType extends ClassType
   {
     return staticLink;
   }
+
+  /** This method is called from compiled code. */
+  public static Object extractStaticLink(ClassType type)
+  {
+    return ((PairClassType) type).staticLink;
+  }
 }

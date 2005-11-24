@@ -119,7 +119,6 @@ public class Invoke extends ProcedureN implements CanInline
     ClassType dtype = (kind != 'V' ? typeFrom(arg0, thisProc)
                        : (ClassType) Type.make(arg0.getClass()));
     String mname;
-    Object staticLink = null;
     if (kind == 'N')
       {
 	mname = "<init>";
@@ -127,7 +126,6 @@ public class Invoke extends ProcedureN implements CanInline
 	  {
 	    PairClassType ptype = (PairClassType) dtype;
 	    dtype = ptype.instanceType;
-	    staticLink = ptype.getStaticLink();
 	  }
       }
     else
@@ -148,53 +146,42 @@ public class Invoke extends ProcedureN implements CanInline
     if (proc == null)
       throw new RuntimeException(thisProc.getName() + ": no method named `"
                                  + mname + "' in class " + dtype.getName());
-    Object[] margs
-      = new Object[nargs-(kind == 'S' || kind == 's' ? 2 : staticLink != null ? 0 : 1)];
-    int i = 0;
-    if (kind == 'V')
-      margs[i++] = args[0];
-    else if (staticLink != null)
-      margs[i++] = staticLink;
-    System.arraycopy(args, kind == 'N' ? 1 : 2, margs, i,
-                     nargs - (kind == 'N' ? 1 : 2));
-    if (kind == 'N')
+    if (kind != 'N')
+      {
+        Object[] margs = new Object[nargs-(kind == 'S' || kind == 's' ? 2 : 1)];
+        int i = 0;
+        if (kind == 'V')
+          margs[i++] = args[0];
+        System.arraycopy(args, 2, margs, i, nargs - 2);
+        return proc.applyN(margs);
+      }
+    else
       {
         CallContext vars = CallContext.getInstance();
-        int err = proc.matchN(margs, vars);
-        int len = nargs - 1;
+        int err = proc.matchN(args, vars);
         if (err == 0)
           return vars.runUntilValue();
-        else if ((len & 1) == 0)
+        else if ((nargs & 1) == 1)
           {
-            // Check if margs is a set of (keyword,value)-pairs.
-            for (i = 0;  i < len;  i += 2)
+            // Check if args is a set of (keyword,value)-pairs.
+            for (int i = 1;  i < nargs;  i += 2)
               {
-                if (! (margs[i] instanceof Keyword))
+                if (! (args[i] instanceof Keyword))
                   throw MethodProc.matchFailAsException(err, thisProc, args);
               }
 
             Object result;
-	    if (staticLink == null)
-	      {
-		result = proc.apply0();
-		i = 0;
-	      }
-	    else
-	      {
-		result = proc.apply1(staticLink);
-		i = 1;
-	      }
-            for (;  i < len;  i += 2)
+            result = proc.apply1(args[0]);
+            for (int i = 1;  i < nargs;  i += 2)
               {
-                Keyword key = (Keyword) margs[i];
-                Object arg = margs[i+1];
+                Keyword key = (Keyword) args[i];
+                Object arg = args[i+1];
                 SlotSet.apply(false, result, key.getName(), arg);
               }
             return result;
           }
         throw MethodProc.matchFailAsException(err, thisProc, args);
       }
-    return proc.applyN(margs);
   }
 
   public int numArgs()
@@ -332,8 +319,8 @@ public class Invoke extends ProcedureN implements CanInline
       }
     else if (kind == 'N')                // make new
       {
-        margsLength = nargs - 1;
-        argsStartIndex = 1;
+        margsLength = nargs;
+        argsStartIndex = 0;
         objIndex = -1;
       }
     else if (kind == 'S' || kind == 's') // Invoke static
@@ -351,38 +338,8 @@ public class Invoke extends ProcedureN implements CanInline
     else
       return exp;
 
-    // Add implicit staticLink for classes that need it.
-    // Doesn't yet handle: (define-namespace p <C>) (p:new)
-    // FIXME  Does this work?  getStaticLink doesn't get set
-    // until FindCapturedVars.
-    if (kind == 'N' && argsStartIndex == 1
-	&& type0 instanceof PairClassType
-	&& ((PairClassType) type0).getStaticLink() != null)
-      {
-	Expression[] cargs = { args[0] };
-	Expression[] xargs = new Expression[margsLength+1];
-	xargs[0] = new ApplyExp(ClassType.make("gnu.expr.PairClassType")
-				.getDeclaredMethod("getStaticLink", 0),
-				cargs);
-	System.arraycopy(args, argsStartIndex, xargs, 1, margsLength);
-	margsLength++;
-	argsStartIndex = 0;
-	args = xargs;
-      }
-
     Declaration decl;
-    if (type != null && name != null
-        && (kind != 'N'
-            || type.isExisting()
-            // The problem is we don't know until FindCapturedVars is run
-            // whether <init> takes a static link.  However, if it's a
-            // static class (including define-simple-class) then we're safe
-            // and that covers the most important case.
-            // A better solution would be to call a "placeholder" PrimProcedure
-            // and dhave it do the right thing at code generation time.
-            || (arg0 instanceof ReferenceExp
-                && (decl = ((ReferenceExp) arg0).getBinding()) != null
-                && decl.getFlag(Declaration.STATIC_SPECIFIED))))
+    if (type != null && name != null)
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;
@@ -417,7 +374,7 @@ public class Invoke extends ProcedureN implements CanInline
                 Object[] slots;
                 if (kind == 'N'
                     && (ClassMethods.selectApplicable(methods,
-                                                      Type.typeArray0)
+                                                      new Type[] { Compilation.typeClassType })
                         >> 32) == 1
                     && (slots = checkKeywords(type, args, 1)) != null)
                   {
@@ -446,8 +403,8 @@ public class Invoke extends ProcedureN implements CanInline
                       }
                     else
                       {
-                        PrimProcedure method = methods[0];
-			ApplyExp e = new ApplyExp(method, new Expression[0]);
+			ApplyExp e = new ApplyExp(methods[0],
+                                                  new Expression[] { arg0 });
                         for (int i = 0;  i < slots.length;  i++)
                           {
 			    Expression[] sargs
@@ -522,8 +479,7 @@ public class Invoke extends ProcedureN implements CanInline
                      src < args.length && dst < margs.length; 
                      src++, dst++)
                   margs[dst] = args[src];
-                PrimProcedure method = methods[index];
-                return new ApplyExp(method, margs).setLine(exp);
+                return new ApplyExp(methods[index], margs).setLine(exp);
               }
           }
       }

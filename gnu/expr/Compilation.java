@@ -1063,6 +1063,9 @@ public class Compilation
 
   public static final Method getConstructor (ClassType clas, LambdaExp lexp)
   {
+    Method meth = clas.getDeclaredMethod("<init>", 0);
+    if (meth != null)
+      return meth;
     Type[] args;
     if (lexp instanceof ClassExp && lexp.staticLinkField != null)
       {

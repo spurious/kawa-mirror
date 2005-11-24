@@ -1,3 +1,12 @@
+2005-11-24  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (IMMEDIATE): New constant.
+	(isStatic): If IMMEDIATE is set, default to static.  However, an
+	explicit NONSTATIC_SPECIFIED or SUPERTYPE_SPECIFIED overrides.  The
+	latter is used for KawaPageServlets in Echo2 mode.
+	* Compilation.java (push): If immediate, set module's IMMEDIATE flag,
+	rather then force static using STATIC_SPECIFIED.
+
 2005-11-23  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (setTypes): Set line numeber before error output.

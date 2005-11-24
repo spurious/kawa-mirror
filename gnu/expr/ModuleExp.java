@@ -22,6 +22,7 @@ public class ModuleExp extends LambdaExp
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
   public static final int STATIC_RUN_SPECIFIED = SUPERTYPE_SPECIFIED << 1;
   public static final int LAZY_DECLARATIONS = STATIC_RUN_SPECIFIED << 1;
+  public static final int IMMEDIATE = LAZY_DECLARATIONS << 1;
 
   public String getJavaName ()
   {
@@ -280,8 +281,11 @@ public class ModuleExp extends LambdaExp
 
   public final boolean isStatic ()
   {
+    // In immediate mode there is no point in a non-static module:
+    // a static module is simpler and more efficient.
     return (getFlag(STATIC_SPECIFIED)
-	    || (gnu.expr.Compilation.moduleStatic > 0
+	    || ((gnu.expr.Compilation.moduleStatic > 0
+                 || getFlag(IMMEDIATE))
 		&& ! getFlag(SUPERTYPE_SPECIFIED)
 		&& ! getFlag(NONSTATIC_SPECIFIED)));
   }

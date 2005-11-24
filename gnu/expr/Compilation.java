@@ -2153,11 +2153,8 @@ public class Compilation
       {
 	if (mainLambda == null)
 	  mainLambda = (ModuleExp) scope;
-
-        // In immediate mode there is no point in a non-static module:
-        // a static module is simpler and more efficient.
         if (immediate)
-          scope.setFlag(ModuleExp.STATIC_SPECIFIED);
+          scope.setFlag(ModuleExp.IMMEDIATE);
       }
     else
       mustCompileHere();

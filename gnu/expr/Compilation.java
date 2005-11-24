@@ -874,7 +874,9 @@ public class Compilation
     if (messages.seenErrors())
       return;
 
-    mainClass = new ClassType(classname);
+    if (mainClass == null)
+      mainClass = new ClassType(classname);
+    getConstructor(mainClass, lexp);
 
     // Do various code re-writes and optimization.
     PushApply.pushApply(lexp);

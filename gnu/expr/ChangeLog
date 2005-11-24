@@ -1,11 +1,15 @@
 2005-11-23  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (compile): Only set mainClass if it hasn't been
+	set yet.  Also call getConstructor, in case needed by InlineCalls.
+	
 	At the Invoke.make and PrimProcedure level all construstor now
 	take the ClassType as an extra parameter.  This is mostly hidden
 	from user code, and the generate bytecode only passes a static link
 	when needed.  The advantage is that we can generate better code.
 	* Compilation.java (getConstructor): Check first if there is an
 	existing constructor, since that papers over the hasOuterLink issue.
+
 	* PairClassType.java (extractStaticLink): New static method.
 	* PrimProcedure.java (isConstructor): New helper method.
 	(numArgs, matchN, apply, compileArg, compile, getParameterType):

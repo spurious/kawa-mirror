@@ -1,5 +1,10 @@
 2005-11-23  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/module_name (scanForm): Do the SyntaxForm handling
+	in case this is called in a macro.
+	Allocate Compilation's mainClass if not set yet.
+	Create a private Declaration if the name is a symbol.
+
 	* kawa/standard/prim_method.java (constructor): Remove static field.
 	(rewrite): Remove no-longer-used support for invokespecial.
 	* kawa/standard/Scheme.java: New generate-temporaries procedure.

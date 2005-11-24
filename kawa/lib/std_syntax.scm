@@ -1,7 +1,8 @@
 ;;; Definitions for some standard syntax.
 
 (module-export cond case and or let let* letrec do delay %make-promise
-	       syntax-object->datum datum->syntax-object with-syntax)
+	       syntax-object->datum datum->syntax-object with-syntax
+	       generate-temporaries)
 
 ;;; COND
 
@@ -213,18 +214,20 @@
 
 ;;; DELAY
 
-(define (%make-promise x)
-  ((primitive-constructor <kawa.lang.Promise> (<gnu.mapping.Procedure>)) x))
-
 (define-syntax delay (syntax-rules ()
 				   ((delay expression)
-				    (%make-promise (lambda () expression)))))
+				    (make <kawa.lang.Promise> (lambda () expression)))))
 
 (define (syntax-object->datum obj)
   (kawa.lang.Quote:quote obj))
 
 (define (datum->syntax-object template-identifier obj)
   (kawa.lang.SyntaxForm:makeWithTemplate template-identifier obj))
+
+(define (generate-temporaries list)
+  (let loop ((n (kawa.lang.Translator:listLength list)) (lst '()))
+    (if (= n 0) lst
+	(loop (- n 1) (make <pair> (datum->syntax-object list (gnu.expr.Symbols:gentemp)) lst)))))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.

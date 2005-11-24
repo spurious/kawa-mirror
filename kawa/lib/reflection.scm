@@ -1,12 +1,18 @@
+(define-syntax (primitive-constructor form)
+  (syntax-case form ()
+    ((_ class (type ...))
+     (syntax-case (generate-temporaries (syntax (type ...))) ()
+       ((name ...)
+	(syntax (lambda (name ...) :: class
+			(make class (as type name) ...))))))))
+
 ;;; RECORDS
 
 (define (make-record-type (name :: <String>) (fnames :: <list>))
   (invoke-static <record> 'makeRecordType name fnames))
 
-(define (record-constructor cl #!optional (flds #!null))
-  ((primitive-constructor <kawa.lang.RecordConstructor>
-			  (<class-type> <object>))
-   cl flds))
+(define (record-constructor (cl :: <class-type>) #!optional (flds #!null))
+  (make <kawa.lang.RecordConstructor> cl flds))
 
 (define (record-accessor (class :: <class-type>) (fname :: <String>))
   (make <kawa.lang.GetFieldProc> class fname))
@@ -57,67 +63,49 @@
   (syntax-rules ()
 		((primitive-array-new element-type)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.ArrayNew> (<gnu.bytecode.Type>))
-		  element-type))))
+		  make <gnu.kawa.reflect.ArrayNew> element-type))))
+
 (define-syntax primitive-array-set
   (syntax-rules ()
 		((primitive-array-set element-type)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.ArraySet> (<gnu.bytecode.Type>))
-		  element-type))))
+		  make <gnu.kawa.reflect.ArraySet> element-type))))
+
 (define-syntax primitive-array-get
   (syntax-rules ()
 		((primitive-array-get element-type)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.ArrayGet> (<gnu.bytecode.Type>))
-		  element-type))))
+		  make <gnu.kawa.reflect.ArrayGet> element-type))))
+
 (define-syntax primitive-array-length
   (syntax-rules ()
 		((primitive-array-length element-type)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.ArrayLength> (<gnu.bytecode.Type>))
-		  element-type))))
-
+		  make <gnu.kawa.reflect.ArrayLength> element-type))))
 (define-syntax primitive-get-field
   (syntax-rules ()
 		((primitive-get-field ctype fname ftype)
 		 (constant-fold
-		  (primitive-constructor
-		   <kawa.lang.GetFieldProc>
-		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
-					     <int>))
+		  make <kawa.lang.GetFieldProc>
 		  ctype fname ftype 1 #|PUBLIC|#))))
 (define-syntax primitive-set-field
   (syntax-rules ()
 		((primitive-set-field ctype fname ftype)
 		 (constant-fold
-		  (primitive-constructor
-		   <kawa.lang.SetFieldProc>
-		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
-					     <int>))
+		  make <kawa.lang.SetFieldProc>
 		  ctype fname ftype 1 #|PUBLIC|#))))
 
 (define-syntax primitive-get-static
   (syntax-rules ()
 		((primitive-get-static ctype fname ftype)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.StaticGet>
-		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
-					     <int>))
+		  make <gnu.kawa.reflect.StaticGet>
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 (define-syntax primitive-set-static
   (syntax-rules ()
 		((primitive-set-static ctype fname ftype)
 		 (constant-fold
-		  (primitive-constructor
-		   <gnu.kawa.reflect.StaticSet>
-		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
-					     <int>))
+		  make <gnu.kawa.reflect.StaticSet>
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 
 (define (subtype? (t1 <type>) (t2 <type>)) <boolean>

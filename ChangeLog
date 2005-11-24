@@ -1,5 +1,10 @@
 2005-11-23  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/prim_method.java (constructor): Remove static field.
+	(rewrite): Remove no-longer-used support for invokespecial.
+	* kawa/standard/Scheme.java: New generate-temporaries procedure.
+	primitive-constructor was moved to kawa.lib.reflection.
+
 	* kawa/standard/constant_fold.java (checkConstant): Allow for
 	Declaration with UNKNOWN flag or constant value.
 

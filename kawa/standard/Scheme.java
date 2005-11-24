@@ -452,8 +452,7 @@ public class Scheme extends LispLanguage
                    "kawa.standard.prim_method", "static_method");
       defSntxStFld("primitive-interface-method",
                    "kawa.standard.prim_method", "interface_method");
-      defSntxStFld("primitive-constructor",
-                   "kawa.standard.prim_method", "constructor");
+      defSntxStFld("primitive-constructor", "kawa.lib.reflection");
       defSntxStFld("primitive-op1",
                    "kawa.standard.prim_method", "op1");
       defSntxStFld("primitive-get-field", "kawa.lib.reflection");
@@ -505,6 +504,7 @@ public class Scheme extends LispLanguage
       defProcStFld("datum->syntax-object", "kawa.lib.std_syntax");
       defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
       defProcStFld("syntax-body->expression", "kawa.lib.prim_syntax");
+      defProcStFld("generate-temporaries", "kawa.lib.std_syntax");
       defSntxStFld("with-syntax", "kawa.lib.std_syntax");
       defProcStFld("syntax-source", "kawa.lib.syntax");
       defProcStFld("syntax-line", "kawa.lib.syntax");

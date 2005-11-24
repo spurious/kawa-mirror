@@ -16,9 +16,6 @@ public class prim_method extends Syntax
   public static final prim_method interface_method = new prim_method(185);
   static { interface_method.setName("primitive-interface-method"); }
 
-  public static final prim_method constructor = new prim_method(183);
-  static { constructor.setName("primitive-constructor"); }
-
   public static final prim_method op1 = new prim_method();
   static { op1.setName("primitive-op1"); }
 
@@ -43,7 +40,6 @@ public class prim_method extends Syntax
   {
     Object[] match = new Object [4];
     if (! (op_code == 0 ? pattern3.match(obj, match, 1)
-	   : op_code == 183 ? pattern2.match(obj, match, 2) // constructor
 	   : pattern4.match(obj, match, 0))) // virtual or static
       return tr.syntaxError ("wrong number of arguments to "+getName()
 			     +"(opcode:"+op_code+")");
@@ -70,18 +66,7 @@ public class prim_method extends Syntax
     else
       {
         ClassType cl = null;
-        Type ctype;
-        int carg;
-        if (op_code == 183)
-          {
-            carg = 2;
-            ctype = rtype;
-          }
-        else
-          {
-            carg = 0;
-            ctype = tr.exp2Type((Pair) obj);
-          }
+        Type ctype = tr.exp2Type((Pair) obj);
         try
           {
             cl = (ClassType) ctype;
@@ -97,21 +82,14 @@ public class prim_method extends Syntax
                 code = 'w';
                 ((ClassType) cl).setExisting(false);
               }
-            tr.error(code, "unknown class: " + match[carg]);
+            tr.error(code, "unknown class: " + match[0]);
           }
-        if (op_code == 183)  // primitive-constructor
-          {
-            proc = new PrimProcedure(cl, args);
-          }
-        else
-          {
-            Pair p;
-            if (match[1] instanceof Pair
-                && (p = (Pair) match[1]).car == "quote")
-              match[1] = ((Pair) p.cdr).car;
-            proc = new PrimProcedure(op_code, cl,
-                                     match[1].toString(), rtype, args);
-          }
+        Pair p;
+        if (match[1] instanceof Pair
+            && (p = (Pair) match[1]).car == "quote")
+          match[1] = ((Pair) p.cdr).car;
+        proc = new PrimProcedure(op_code, cl,
+                                 match[1].toString(), rtype, args);
       }
     return new QuoteExp(proc);
   }

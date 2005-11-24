@@ -1,3 +1,14 @@
+2005-11-23  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (generate-temporaries): New function.
+	* std_syntax.scm (delay): Inline allocation of Promise.
+	(%make-promise): Remove.
+	* reflection.scm (primitive-constructor): New macro.
+	(record-constructor, primitive-array-new, primitive-array-set,
+	primitive-array-get, primitive-array-length, primitive-get-field,
+	primitive-set-field, primitive-get-static, primitive-set-static): Use
+	make procedure instead of primitive-constructor.
+
 2005-10-27  Per Bothner  <per@bothner.com>
 
 	* system.scm (compile-file): Call Language's resolve method.

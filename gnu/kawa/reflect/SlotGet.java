@@ -151,22 +151,21 @@ public class SlotGet extends Procedure2
    * @param type the class type declaring the property.
    * @param name the source (unmangled) name of the property.
    */
-  static Object getField(Type type, String name)
+  static Object getField(ClassType clas, String name, ClassType caller)
   {
-    if (type instanceof ClassType && name != null)
-      {
-        ClassType clas = (ClassType) type;
-        gnu.bytecode.Field field
-          = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
-        if (field != null)
-          return field;
+    gnu.bytecode.Field field
+      = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
+    if (field != null
+        && caller != null && caller.isAccessible(clas, field.getModifiers()))
+      return field;
 
-        // Try looking for a method "getFname" instead:
-        String getname = ClassExp.slotToMethodName("get", name);
-        gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
-        return method;
-      }
-    return null;
+    // Try looking for a method "getFname" instead:
+    String getname = ClassExp.slotToMethodName("get", name);
+    gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
+    if (method == null)
+      return field;
+    else
+      return method;
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
@@ -207,7 +206,7 @@ public class SlotGet extends Procedure2
 	ClassType ctype = (ClassType) type;
 	ClassType caller = comp.curClass != null ? comp.curClass
 	  : comp.mainClass;
-        Object part = getField(ctype, name);
+        Object part = getField(ctype, name, caller);
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
@@ -315,7 +314,7 @@ public class SlotGet extends Procedure2
         if (type instanceof ClassType && name != null)
           {
             ClassType ctype = (ClassType) type;
-            Object part = getField(ctype, name);
+            Object part = getField(ctype, name, null);
             if (part instanceof gnu.bytecode.Field)
               return ((gnu.bytecode.Field) part).getType();
             if (part instanceof gnu.bytecode.Method)

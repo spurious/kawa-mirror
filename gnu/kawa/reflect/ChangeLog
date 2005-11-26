@@ -1,3 +1,11 @@
+2005-11-25  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (checkKeywords): Take caller parameter.
+	* SlotGet.java (getField): Use new caller parameter so we can look
+	for method if Field isn't applicable.
+	Simplify - type is always ClassType and name is always non-null.
+	* SlotSet.java (getField): Likewise.
+
 2005-11-23  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN): Don't need to check for staticLink here.

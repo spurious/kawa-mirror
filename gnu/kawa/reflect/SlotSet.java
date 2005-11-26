@@ -110,34 +110,34 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     return returnSelf ? obj : Values.empty;
   }
 
-  static Object getField(Type type, String name)
+  static Object getField (ClassType clas, String name, ClassType caller)
   {
-    if (type instanceof ClassType && name != null)
-      {
-        ClassType clas = (ClassType) type;
-        gnu.bytecode.Field field
-	  = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
-        if (field != null)
-          return field;
+    gnu.bytecode.Field field
+      = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
+    if (field != null
+        && caller != null && caller.isAccessible(clas, field.getModifiers()))
+      return field;
 
-        // Try looking for a method "getName" or "isName" instead:
-        String getName = ClassExp.slotToMethodName("get", name);
-        gnu.bytecode.Method method = clas.getMethod(getName, Type.typeArray0);
-        if (method == null)
-          {
-            getName = ClassExp.slotToMethodName("is", name);
-            method = clas.getMethod(getName, Type.typeArray0);
-          }
-        if (method == null)
-          return null;
-        Type ftype = method.getReturnType();
-        String setName = ClassExp.slotToMethodName("set", name);
-        Type[] args = new Type[1];
-        args[0] = ftype;
-        method = clas.getMethod(setName, args);
-        return method;
+    // Try looking for a method "setName" instead:
+    // But only if there is also "getName" or "isName" method:
+    String getName = ClassExp.slotToMethodName("get", name);
+    gnu.bytecode.Method method = clas.getMethod(getName, Type.typeArray0);
+    if (method == null)
+      {
+        getName = ClassExp.slotToMethodName("is", name);
+        method = clas.getMethod(getName, Type.typeArray0);
       }
-    return null;
+    if (method == null)
+      return field;
+    Type ftype = method.getReturnType();
+    String setName = ClassExp.slotToMethodName("set", name);
+    Type[] args = new Type[1];
+    args[0] = ftype;
+    method = clas.getMethod(setName, args);
+    if (method == null)
+      return field;
+    else
+      return method;
   }
 
   static void compileSet(Procedure thisProc, ClassType ctype,
@@ -210,9 +210,11 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       {
         ClassType ctype = (ClassType) type;
 	String name = ClassMethods.checkName(arg1, true);
+        ClassType caller = comp.curClass != null ? comp.curClass
+          : comp.mainClass;
 	if (name != null)
 	  {
-	    part = getField(ctype, name);
+	    part = getField(ctype, name, caller);
 	    if (part == null && type != Type.pointer_type)
 	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
 	  }
@@ -234,8 +236,6 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 	      ? ((gnu.bytecode.Field) part).getModifiers()
 	      : ((gnu.bytecode.Method) part).getModifiers();
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
-	    ClassType caller = comp.curClass != null ? comp.curClass
-	      : comp.mainClass;
 	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
 	      comp.error('e', "slot "+name +" in "+ctype.getName()
 			 +" not accessible here");

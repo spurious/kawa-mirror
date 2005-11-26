@@ -229,7 +229,8 @@ public class Invoke extends ProcedureN implements CanInline
 
   /** Return an array if args (starting with start) is a set of
    * (keyword, value)-value pairs. */
-  static Object[] checkKeywords(Type type, Expression[] args, int start)
+  static Object[] checkKeywords(Type type, Expression[] args,
+                                int start, ClassType caller)
   {
     int len = args.length;
     if (((len - start) & 1) != 0)
@@ -244,7 +245,7 @@ public class Invoke extends ProcedureN implements CanInline
         if (! (value instanceof Keyword))
           return null;
         String name = ((Keyword) value).getName();
-        Object slot = SlotSet.getField(type, name);
+        Object slot = SlotSet.getField((ClassType) type, name, caller);
         fields[i] = slot != null ? slot : name;
       }
     return fields;
@@ -343,15 +344,16 @@ public class Invoke extends ProcedureN implements CanInline
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;
+        ClassType caller = comp == null ? null
+          : comp.curClass != null ? comp.curClass
+          : comp.mainClass;
         synchronized (this)
           {
             try
               {
                 methods = getMethods(type, name, args, 
                                      margsLength, argsStartIndex, objIndex,
-				     comp == null ? null
-				     : comp.curClass != null ? comp.curClass
-				     : comp.mainClass);
+				     caller);
               }
             catch (Exception ex)
               {
@@ -376,7 +378,7 @@ public class Invoke extends ProcedureN implements CanInline
                     && (ClassMethods.selectApplicable(methods,
                                                       new Type[] { Compilation.typeClassType })
                         >> 32) == 1
-                    && (slots = checkKeywords(type, args, 1)) != null)
+                    && (slots = checkKeywords(type, args, 1, caller)) != null)
                   {
                     StringBuffer errbuf = null;
                     for (int i = 0;  i < slots.length;  i++)

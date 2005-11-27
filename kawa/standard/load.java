@@ -81,19 +81,19 @@ public class load extends Procedure1 {
       }
     catch (java.io.IOException ex)
       {
-	throw new RuntimeException ("load: "+name+" - "+ex.toString ());
+	throw new WrappedException ("load: "+name+" - "+ex.toString (), ex);
       }
     catch (ClassNotFoundException ex)
       {
-	throw new RuntimeException ("class not found in load");
+	throw new WrappedException ("class not found in load", ex);
       }
     catch (InstantiationException ex)
       {
-	throw new RuntimeException ("class not instantiable: in load");
+	throw new WrappedException ("class not instantiable: in load", ex);
       }
     catch (IllegalAccessException ex)
       {
-	throw new RuntimeException ("class illegal access: in load");
+	throw new WrappedException ("class illegal access: in load", ex);
       }
     finally
       {

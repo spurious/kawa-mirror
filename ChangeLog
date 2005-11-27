@@ -1,3 +1,7 @@
+2005-11-27  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (loadCompiled): Used WrappedException.
+
 2005-11-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/module_name (scanForm): Do the SyntaxForm handling

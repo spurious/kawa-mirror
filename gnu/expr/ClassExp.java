@@ -123,16 +123,30 @@ public class ClassExp extends LambdaExp
     if (type.getName() == null)
       {
 	String name = getName();
-	if (name == null)
-	  name = "object";
-	else
+	if (name != null)
 	  {
 	    int nlen = name.length();
 	    if (nlen > 2
 		&& name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
 	      name = name.substring(1, nlen-1);
 	  }
-	if (! isSimple() || this instanceof ObjectExp)
+        if (name == null)
+          {
+	    StringBuffer nbuf = new StringBuffer(100);
+            comp.getModule().classFor(comp);
+            nbuf.append(comp.mainClass.getName());
+            nbuf.append('$');
+            int len = nbuf.length();
+            for (int i = 0;  ; i++)
+              {
+                nbuf.append(i);
+                name = nbuf.toString();
+                if (comp.findNamedClass(name) == null)
+                  break;
+                nbuf.setLength(len);
+              }
+          }
+	else if (! isSimple() || this instanceof ObjectExp)
 	  name = comp.generateClassName(name);
 	else
 	  {

@@ -1,3 +1,17 @@
+2005-11-28  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (setClassName): If class is anonymous, then
+	generate a name of the form 'mainClass$N' rather than 'objectN',
+	* Compilation.java (mangleName): Support intermediate mangling
+	scheme - reversible, except that '$' is left as is.
+	(compile): Class name is no longer a parameter but set previously.
+	(compileToFiles, compileToArchive): Likewise.
+	* ModuleExp.java (evalToClass): Likewise.
+	(getJavaName): Fix to use correct mangling.
+	(classFor): New method.
+
+	* ModuleExp.java (evalToClass): Use WrappedException.
+
 2005-11-24  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (IMMEDIATE): New constant.

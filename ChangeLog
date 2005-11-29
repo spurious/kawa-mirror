@@ -1,3 +1,8 @@
+2005-11-28  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (compile_to_files): Set top-level
+	class name only if passed in.
+	
 2005-11-27  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (loadCompiled): Used WrappedException.

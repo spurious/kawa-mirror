@@ -3314,7 +3314,12 @@ public class XQParser extends Lexer
 		comp.mainLambda.addDeclaration(decl);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
-		  comp.getModule().setName(Compilation.mangleURI(uri));
+                  {
+                    ModuleExp module = comp.getModule();
+                    module.setName(Compilation.mangleURI(uri));
+                    comp.mainClass = new ClassType(Compilation.mangleURI(uri));
+                    module.setType(comp.mainClass);
+                  }
 		SetExp sexp = new SetExp(decl, decl.getValue());
 		sexp.setDefining (true);
 		return sexp;

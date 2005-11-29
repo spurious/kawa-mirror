@@ -27,7 +27,7 @@ public class ModuleExp extends LambdaExp
   public String getJavaName ()
   {
     String name = getName();
-    return name == null ? "lambda" : Compilation.mangleName(name);
+    return name == null ? "lambda" : Compilation.mangleName(name, 0);
   }
 
   public ModuleExp ()
@@ -55,11 +55,10 @@ public class ModuleExp extends LambdaExp
     SourceMessages messages = comp.getMessages();
     try
       {
-	String class_name = mexp.getJavaName ();
 	ArrayClassLoader loader = new ArrayClassLoader ();
 	comp.loader = loader;
 
-	comp.compile(mexp, class_name);
+	comp.compile(mexp);
 	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
 	  return null;
@@ -119,16 +118,15 @@ public class ModuleExp extends LambdaExp
             ctype.setReflectClass(loader.loadClass(ctype.getName(), false));
             ctype.setExisting(true);
           }
-	return loader.loadClass (class_name, true);
+	return loader.loadClass (mexp.getJavaName(), true);
       }
     catch (java.io.IOException ex)
       {
-	ex.printStackTrace(OutPort.errDefault());
-	throw new RuntimeException ("I/O error in lambda eval: "+ex);
+	throw new WrappedException("I/O error in lambda eval", ex);
       }
     catch (ClassNotFoundException ex)
       {
-	throw new RuntimeException("class not found in lambda eval");
+	throw new WrappedException("class not found in lambda eval", ex);
       }
   }
 
@@ -386,6 +384,71 @@ public class ModuleExp extends LambdaExp
           info.setupModuleExp();
       }
     return decls;
+  }
+
+  /** Return the class this module.
+   * If not set yet, sets it now, based on the source file name.
+   */
+  public ClassType classFor (Compilation comp)
+  {
+    if (type != null && type != Compilation.typeProcedure)
+      return (ClassType) type;
+    String fileName = getFile();
+    File file = null;
+    String mname = getName();
+    if (mname != null)
+      fileName = mname;
+    else if (fileName == null)
+      {
+        fileName = getName();
+        if (fileName == null)
+          fileName = "$unnamed_input_file$";
+      }
+    else if (filename.equals("-") || filename.equals("<stdin>"))
+      {
+        fileName = getName();
+        if (fileName == null)
+          fileName = "$stdin$";
+      }
+    else
+      {
+        file = new File(fileName);
+        fileName = file.getName();
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0)
+          fileName = fileName.substring (0, dotIndex);
+      }
+    String parent;
+    String className;
+    if (getName() == null)
+      setName(fileName);
+    fileName = Compilation.mangleNameIfNeeded(fileName);
+    if (comp.classPrefix.length() == 0
+        && file != null
+        && ! file.isAbsolute()
+        && (parent = file.getParent()) != null
+        && parent.length() > 0 // Probably redundant.
+        && parent.indexOf("..") < 0)
+      {
+        parent = parent.replaceAll(System.getProperty("file.separator"), "/");
+        if (parent.startsWith("./"))
+          parent = parent.substring(2);
+        className = parent.equals(".") ? fileName
+          : Compilation.mangleURI(parent) + "." + fileName;
+      }
+    else
+      className = comp.classPrefix + fileName;
+    ClassType clas = new ClassType(className);
+    setType(clas);
+    if (comp.mainLambda == this)
+      {
+        if (comp.mainClass == null)
+          comp.mainClass = clas;
+        else if (! className.equals(comp.mainClass.getName()))
+          comp.error('e', "inconsistent main class name: "+className
+                     +" - old name: "+comp.mainClass.getName());
+      }
+    return clas;
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

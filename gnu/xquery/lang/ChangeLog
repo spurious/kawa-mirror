@@ -1,3 +1,7 @@
+2005-11-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parse):  Set class name from module namespace.
+
 2005-11-03  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (XHTML_NAMESPACE): New constant.

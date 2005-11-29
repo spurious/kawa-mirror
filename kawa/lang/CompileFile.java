@@ -1,6 +1,7 @@
 package kawa.lang;
 import java.io.*;
 import gnu.mapping.*;
+import gnu.bytecode.ClassType;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 
@@ -53,19 +54,18 @@ public class CompileFile
         comp.getLanguage().resolve(comp);
 	if (messages.seenErrors())
 	  return;
-        if (topname == null)
+        ModuleExp module = comp.getModule();
+        if (topname != null)
           {
-            File infile = new File (inname);
-            String short_name = infile.getName ();
-            int dotIndex = short_name.lastIndexOf('.');
-            if (dotIndex > 0)
-              short_name = short_name.substring (0, dotIndex);
-            short_name = Compilation.mangleNameIfNeeded(short_name);
-            topname = comp.classPrefix + short_name;
+            ClassType top
+              = new ClassType(Compilation.mangleNameIfNeeded(topname));
+            module.setType(top);
+            module.setName(topname);
+            comp.mainClass = top;
           }
 	try
 	  {
-	    comp.compileToFiles(comp.getModule(), topname, directory);
+	    comp.compileToFiles(comp.getModule(), directory);
 	  }
 	catch (Throwable ex)
 	  {

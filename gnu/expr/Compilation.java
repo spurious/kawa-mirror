@@ -568,7 +568,7 @@ public class Compilation
 
   public static String mangleName (String name)
   {
-    return mangleName(name, false);
+    return mangleName(name, -1);
   }
 
   public static String mangleNameIfNeeded (String name)
@@ -576,7 +576,7 @@ public class Compilation
     if (isValidJavaName(name))
       return name;
     else
-      return mangleName(name, true);
+      return mangleName(name, 0);
   }
 
   public static boolean isValidJavaName(String name)
@@ -590,10 +590,20 @@ public class Compilation
     return true;
   }
 
-  /** Convert a string to a safe Java identifier.
-   * @param reversible if we should use an invertible mapping. */
   public static String mangleName (String name, boolean reversible)
   {
+    return mangleName(name, reversible ? 1 : -1);
+  }
+
+  /** Convert a string to a safe Java identifier.
+   * @param reversible if we should use an invertible mapping.
+   * @param kind -1 - non-reverseible;
+   *  0: noversible, except that '$' is not mapped;
+   *  1: reversible
+   */
+  public static String mangleName (String name, int kind)
+  {
+    boolean reversible = kind >= 0;
     int len = name.length ();
     if (len == 6 && name.equals("*init*")) // Constructor methods.
       return "<init>";
@@ -616,7 +626,7 @@ public class Compilation
 	else if (Character.isLetter(ch) || ch == '_')
 	  mangled.append(ch);
 	else if (ch == '$')
-	  mangled.append(reversible ? "$$" : "$");
+	  mangled.append(kind > 1 ? "$$" : "$");
 	else
 	  {
 	    switch (ch)
@@ -856,26 +866,25 @@ public class Compilation
    * @param lexp top-level function
    * @param classname name of top-level class to generate
    */
-  public void compile (ModuleExp lexp, String classname)
+  public void compile (ModuleExp lexp)
   {
-    if (ModuleExp.debugPrintExpr)
-      {
-	OutPort dout = OutPort.outDefault();
-	dout.println("[Compiling module-name:" + lexp.getName()
-		      + " to " + classname + ":");
-	lexp.print(dout);
-	dout.println(']');
-	dout.flush();
-      }
-
     source_filename = lexp.filename;
     mainLambda = lexp;
 
     if (messages.seenErrors())
       return;
 
-    if (mainClass == null)
-      mainClass = new ClassType(classname);
+    mainClass = lexp.classFor(this);
+    if (ModuleExp.debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + lexp.getName()
+                     + " to " + mainClass.getName() + ":");
+	lexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
     getConstructor(mainClass, lexp);
 
     // Do various code re-writes and optimization.
@@ -892,7 +901,7 @@ public class Compilation
     if (debugPrintFinalExpr)
       {
 	OutPort dout = OutPort.outDefault();
-	dout.println ("[Compiling final "+lexp.getName()+" class="+classname+':');
+	dout.println ("[Compiling final "+lexp.getName()+':');
 	lexp.print(dout);
 	dout.println(']');
 	dout.flush();
@@ -923,16 +932,13 @@ public class Compilation
       }
   }
 
-  public void compileToFiles (ModuleExp mexp, String topname, String directory)
+  public void compileToFiles (ModuleExp mexp, String directory)
     throws java.io.IOException
   {
     if (directory == null || directory.length() == 0)
       directory = "";
     else if (directory.charAt(directory.length() - 1) != File.separatorChar)
       directory = directory + File.separatorChar;
-    String name = mexp.getName();
-    if (name != null)
-      topname = name;
 
     /* DEBUGGING:
     OutPort perr = OutPort.errDefault();
@@ -942,7 +948,7 @@ public class Compilation
     perr.flush();
     */
 
-    compile(mexp, topname);
+    compile(mexp);
     if (! messages.seenErrors())
       outputClass(directory);
   }
@@ -976,7 +982,8 @@ public class Compilation
 	fname = fname + ".zip";
 	makeJar = false;
       }
-    compile(mexp, LambdaExp.fileFunctionName);
+    mexp.setName(LambdaExp.fileFunctionName);
+    compile(mexp);
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();

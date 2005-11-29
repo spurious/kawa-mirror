@@ -3,11 +3,8 @@
 
 package gnu.expr;
 import gnu.mapping.*;
-import gnu.bytecode.CodeAttr;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Field;
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
+import gnu.mapping.Location;
 import gnu.lists.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
@@ -556,6 +553,17 @@ public abstract class Language
   public Type getTypeFor(Class clas)
   {
     return Type.make(clas);
+  }
+
+  public final Type getLangTypeFor (Type type)
+  {
+    if (! (type instanceof ObjectType) || ((ObjectType) type).isExisting())
+      {
+        Class clas = type.getReflectClass();
+        if (clas != null)
+          return getTypeFor(clas);
+      }
+    return type;
   }
 
   public static Type string2Type (String name)

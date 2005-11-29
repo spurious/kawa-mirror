@@ -1,3 +1,10 @@
+2005-11-28  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (compileSet):  Coerce argument to language-specific
+	type, using new getLangTypeFor method. Use CheckedTarget.
+
+	* SlotSet.java (compile): Fix name - for error message.
+
 2005-11-25  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (checkKeywords): Take caller parameter.

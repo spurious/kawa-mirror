@@ -144,17 +144,18 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
                          Expression valArg, Object part, Compilation comp)
   {
     CodeAttr code = comp.getCode();
+    Language language = comp.getLanguage();
     boolean isStatic
       = thisProc instanceof SlotSet && ((SlotSet) thisProc).isStatic;
     if (part instanceof gnu.bytecode.Field)
       {
         gnu.bytecode.Field field = (gnu.bytecode.Field) part;
         boolean isStaticField = field.getStaticFlag();
-	Type ftype = field.getType();
+	Type ftype = language.getLangTypeFor(field.getType());
         if (isStatic && ! isStaticField)
           comp.error('e', ("cannot access non-static field `" + field.getName()
                            + "' using `" + thisProc.getName() + '\''));
-        valArg.compile(comp, Target.pushValue(ftype));
+        valArg.compile(comp, CheckedTarget.getInstance(ftype));
         if (isStaticField)
           code.emitPutStatic(field); 
         else
@@ -170,7 +171,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
                      + method.getName() + "' using `"
                      + thisProc.getName() + '\'');
         Type[] setArgTypes = method.getParameterTypes();
-        valArg.compile(comp, Target.pushValue(setArgTypes[0]));
+        valArg.compile(comp, CheckedTarget.getInstance(language.getLangTypeFor(setArgTypes[0])));
         if (isStaticMethod)
           code.emitInvokeStatic(method);
         else if (ctype.isInterface())
@@ -223,10 +224,12 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 	    part = ((QuoteExp) arg1).getValue();
 	    // Inlining (make <type> field: value) creates calls to
 	    // setFieldReturnObject whose 2nd arg is a Field or Method.
-	    if (! (part instanceof Field || part instanceof Method))
-	      {
-		part = null;
-	      }
+            if (part instanceof Field)
+              name = ((Field) part).getName();
+            else if (part instanceof Method)
+              name = ((Method) part).getName();
+            else
+              part = null;
 	  }
 
 	if (part != null)
@@ -237,7 +240,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 	      : ((gnu.bytecode.Method) part).getModifiers();
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
 	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
-	      comp.error('e', "slot "+name +" in "+ctype.getName()
+	      comp.error('e', "slot '"+name +"' in "+ctype.getName()
 			 +" not accessible here");
 	    args[0].compile(comp,
 			    isStaticField ? Target.Ignore

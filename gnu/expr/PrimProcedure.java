@@ -279,7 +279,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         if (javaType instanceof ClassType
             && ! ((ClassType) javaType).isExisting())
           continue;
-	Type langType = language.getTypeFor(javaType.getReflectClass());
+	Type langType = language.getLangTypeFor(javaType);
 	if (javaType != langType)
 	  {
 	    if (argTypes == null)
@@ -298,10 +298,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       retType = Type.pointer_type;
     else
       {
-        retType = method.getReturnType();
-        if (! (retType instanceof ClassType)
-            || ((ClassType) retType).isExisting())
-          retType = language.getTypeFor(retType.getReflectClass());
+        retType = language.getLangTypeFor(method.getReturnType());
 
         // Kludge - tostring_type doesn't have methods.
         // It shouldn't be used as the "type" of anything -

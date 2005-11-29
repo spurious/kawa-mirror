@@ -1,5 +1,8 @@
 2005-11-28  Per Bothner  <per@bothner.com>
 
+	* Language.java (getLangTypeFor): New convenience method.
+	* PrimProcedure.java (<init>): Use new getLangTypeFor method.
+
 	* ClassExp.java (setClassName): If class is anonymous, then
 	generate a name of the form 'mainClass$N' rather than 'objectN',
 	* Compilation.java (mangleName): Support intermediate mangling

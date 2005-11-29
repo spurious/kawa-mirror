@@ -5363,6 +5363,19 @@ If the @var{modulespec} is @code{'@var{featurename}} then the
 which yields the implementing @code{<@var{classname}>}.
 @end deffn
 
+@deffn Syntax provide 'featurename
+Declare that @code{'@var{featurename}} is available.
+A following @code{cond-expand} in this scope will match @var{featurename}.
+@end deffn
+
+Using @code{require} and @code{provide} with @var{featurename}s is
+similar to the same-named macros in SLib, Emacs, and Common Lisp.
+However, in Kawa these are not functions, but instead they
+are syntax forms that are processed at compile time.  That is
+why only quoted @var{featurename}s are supported.
+This is consistent with Kawa emphasis on compilation and
+static binding.
+
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 

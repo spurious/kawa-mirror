@@ -1,3 +1,8 @@
+2005-11-29  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_alias.java (scanForDefinitions): Handle
+	SyntaxForm unwrapping.
+
 2005-11-28  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files): Set top-level

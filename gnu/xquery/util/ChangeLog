@@ -1,3 +1,7 @@
+2005-11-29  Per Bothner  <per@bothner.com>
+
+	* ValuesFilter.java (matches): Handle a String value.
+
 2005-11-22  Per Bothner  <per@bothner.com>
 
 	* OrderedMap.java (compile): Update compile->compileInvoke rename.

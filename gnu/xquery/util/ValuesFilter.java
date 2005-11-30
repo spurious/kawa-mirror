@@ -42,6 +42,8 @@ public class ValuesFilter extends MethodProc implements CanInline
       return ((Boolean) result).booleanValue();
     if (result instanceof Number)
       return count == ((Number) result).longValue();
+    if (result instanceof String)
+      return result.toString().length() > 0;
     if (result instanceof KNode)
       return true;
     if (result instanceof Values)
@@ -60,7 +62,7 @@ public class ValuesFilter extends MethodProc implements CanInline
       }
     if (result instanceof TreeList)
       return ! ((TreeList) result).isEmpty();
-    throw new Error("unimplemented condition type"); // FIXME
+    throw new Error("unimplemented condition type:"+result.getClass().getName()); // FIXME
   }
 
   public void apply (CallContext ctx) throws Throwable

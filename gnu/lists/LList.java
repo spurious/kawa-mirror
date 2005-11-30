@@ -401,6 +401,26 @@ public class LList extends ExtSequence
     return list;
   }
 
+  /** SRFI-1's cons* and Common Lisp's list* function. */
+  public static Object consX (Object[] args)
+  {
+    // Error if args.length==0.
+    Object first = args[0];
+    int n = args.length - 1;
+    if (n <= 0)
+      return first;
+    Pair result = new Pair(first, null);
+    Pair prev = result;
+    for (int i = 1;  i < n;  i++)
+      {
+        Pair next = new Pair(args[i], null);
+        prev.cdr = next;
+        prev = next;
+      }
+    prev.cdr = args[n];
+    return result;
+  }
+
   public String toString ()
   {
     Object rest = this;

@@ -134,10 +134,11 @@ public class Scheme extends LispLanguage
 
       // Appendix (and R5RS)
       defSntxStFld("define-syntax", "kawa.lib.prim_syntax");
-      defSntxStFld("syntax", "kawa.standard.syntax", "syntax");
       defSntxStFld("let-syntax", "kawa.standard.let_syntax", "let_syntax");
       defSntxStFld("letrec-syntax", "kawa.standard.let_syntax",
                    "letrec_syntax");
+      defSntxStFld("syntax-rules", "kawa.standard.syntax_rules",
+                   "syntax_rules");
 
       nullEnvironment.setLocked();
       environ = r4Environment;
@@ -498,8 +499,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("syntax-case", "kawa.standard.syntax_case", "syntax_case");
       defSntxStFld("%define-syntax", "kawa.standard.define_syntax",
                    "define_syntax");
-      defSntxStFld("syntax-rules", "kawa.standard.syntax_rules",
-                   "syntax_rules");
+      defSntxStFld("syntax", "kawa.standard.syntax", "syntax");
+      defSntxStFld("quasisyntax", "kawa.standard.syntax", "quasiSyntax");
       defProcStFld("syntax-object->datum", "kawa.lib.std_syntax");
       defProcStFld("datum->syntax-object", "kawa.lib.std_syntax");
       defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
@@ -1020,6 +1021,7 @@ public class Scheme extends LispLanguage
     ReadTable tab = ReadTable.getInitial();
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));
+    dispatchTable.set('`', new ReaderQuote("quasisyntax"));
     return tab;
   }
 

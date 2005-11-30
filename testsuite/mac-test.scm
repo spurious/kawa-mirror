@@ -1,4 +1,4 @@
-(test-init "macros" 86)
+(test-init "macros" 88)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -389,3 +389,12 @@
 (define xinstance (make <xclass>))
 (invoke xinstance 'incx)
 (test 1 'xclass (slot xinstance x))
+
+(define x (list "X1" "X2"))
+(define y (list "Y1" "Y2"))
+;; See Bawden: Quasiquotation in Lisp (1999), Appendix B.
+(test '(a ("X1" "X2") ("Y1" "Y2") b) 'unquote-1
+      (quasiquote (a (unquote  x y) b)))
+(test '(a "X1" "X2" "Y1" "Y2" b) 'unquote-2
+      (quasiquote (a (unquote-splicing  x y) b)))
+

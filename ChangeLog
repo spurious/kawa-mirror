@@ -1,5 +1,19 @@
 2005-11-29  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Quote.java: Make various methods non-static, and make
+	some methods/fields protected so derived class can use it.
+	(leaf): New wrapper around QuoteExp construction, for overriding.
+	(expand_pair): Extend unqute and unquote-splicing to allow multiple
+	arguments, to match Alan Bawden's suggestion (1999).
+	(append$V): New method, to handle SyntaxForm wrappers.
+	* kawa/lang/Translator.java (matches): New variant takes SyntaxForm.
+	* kawa/standard/Scheme.java (initScheme): Define quasisyntax.
+	Re-arrange R5RS vs syntax-case macros.
+	(createReadTable): Define #` as quasisyntax.
+	* kawa/standard/syntax.java: Change to extend kawa.lang.Quote.
+	This provides quasisyntax support.
+	(wrap, convert): Remove unused methods.  (Was also unused before.)
+
 	* kawa/standard/define_alias.java (scanForDefinitions): Handle
 	SyntaxForm unwrapping.
 

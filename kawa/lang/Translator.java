@@ -155,8 +155,17 @@ public class Translator extends Compilation
   }
 
   /** True iff a form matches a literal symbol. */
-  public boolean matches(Object form, String literal)
+  public final boolean matches(Object form, String literal)
   {
+    return matches(form, null, literal);
+  }
+
+  public boolean matches(Object form, SyntaxForm syntax, String literal)
+  {
+    if (syntax != null)
+      {
+        // FIXME
+      }
     if (form instanceof SyntaxForm)
       {
 	// FIXME

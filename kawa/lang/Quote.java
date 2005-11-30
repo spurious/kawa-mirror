@@ -27,16 +27,16 @@ public class Quote extends Syntax implements Printable
 
   /** An initial value for 'depth' for plain (non-quasi) quote,
    * with namespace resolution. */
-  static final int QUOTE_DEPTH = -1;
+  protected static final int QUOTE_DEPTH = -1;
 
   /** An initial value for 'depth' for plain (non-quasi) quote,
    * without namespace resolution. */
   static final int DATUM_DEPTH = -2;
 
   /** True for quasiquote; false for plain quote. */
-  boolean isQuasi;
+  protected boolean isQuasi;
 
-  static Object expand (Object template, int depth, Translator tr)
+  protected Object expand (Object template, int depth, Translator tr)
   {
     /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap seen = new IdentityHashMap();
@@ -50,23 +50,28 @@ public class Quote extends Syntax implements Printable
    * Basically just recursively removes SyntaxForm wrappers. */
   public static Object quote (Object obj, Translator tr)
   {
-    return expand(obj, DATUM_DEPTH, tr);
+    return plainQuote.expand(obj, DATUM_DEPTH, tr);
   }
 
   /** Quote an object (without namespace-expansion).
    * Basically just recursively removes SyntaxForm wrappers. */
   public static Object quote (Object obj)
   {
-    return expand(obj, DATUM_DEPTH, (Translator) Compilation.getCurrent());
+    return plainQuote.expand(obj, DATUM_DEPTH, (Translator) Compilation.getCurrent());
   }
 
-  static Expression coerceExpression (Object val)
+  protected Expression coerceExpression (Object val, Translator tr)
   {
-    return val instanceof Expression ? (Expression) val : new QuoteExp (val);
+    return val instanceof Expression ? (Expression) val : leaf(val, tr);
   }
 
-  static Object expand_pair (Pair list, int depth, SyntaxForm syntax,
-			     Object seen, Translator tr)
+  protected Expression leaf (Object val, Translator tr)
+  {
+    return new QuoteExp(val);
+  }
+
+  Object expand_pair (Pair list, int depth, SyntaxForm syntax,
+                      Object seen, Translator tr)
   {
     Pair pair = list;
     Object cdr;
@@ -84,9 +89,9 @@ public class Quote extends Syntax implements Printable
         if (depth < 0)
           {
           }
-        else if (tr.matches(pair.car, LispLanguage.quasiquote_sym))
+        else if (tr.matches(pair.car, syntax, LispLanguage.quasiquote_sym))
           depth++;
-        else if (tr.matches(pair.car, LispLanguage.unquote_sym))
+        else if (tr.matches(pair.car, syntax, LispLanguage.unquote_sym))
           {
             depth--;
             Pair pair_cdr;
@@ -100,26 +105,64 @@ public class Quote extends Syntax implements Printable
                 break;
               }
           }
-        else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym))
+        else if (tr.matches(pair.car, syntax, LispLanguage.unquotesplicing_sym))
           return tr.syntaxError ("invalid used of " + pair.car +
 				 " in quasiquote template");
-        if (pair.car instanceof Pair && depth > QUOTE_DEPTH)
+        if (depth == 1 && pair.car instanceof Pair)
           {
-            Pair pair_car = (Pair)pair.car;
-            if (tr.matches(pair_car.car, LispLanguage.unquotesplicing_sym)
-                && depth == 1)
+            Object form = pair.car;
+            SyntaxForm subsyntax = syntax;
+            while (form instanceof SyntaxForm)
               {
-                Pair pair_car_cdr;
-                if (! (pair_car.cdr instanceof Pair)
-                    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != LList.Empty)
-                  return tr.syntaxError ("invalid used of " + pair_car.car +
-                                         " in quasiquote template");
-                Expression[] args = new Expression[2];
-                args[0] = tr.rewrite_car(pair_car_cdr, syntax);
-                Object expanded_cdr = expand (pair.cdr, depth, syntax, seen, tr);
-                args[1] = coerceExpression (expanded_cdr);
+                subsyntax = (SyntaxForm) form;
+                form = subsyntax.form;
+              }
+            int splicing = -1;
+            if (form instanceof Pair)
+              {
+                Object op = ((Pair) form).car;
+                if (tr.matches(op, subsyntax, LispLanguage.unquote_sym))
+                  splicing = 0;
+                else if (tr.matches(op, subsyntax, LispLanguage.unquotesplicing_sym))
+                  splicing = 1;
+              }
+            if (splicing >= 0)
+              {
+                form = ((Pair) form).cdr; // skip "unquote[splicing]".
+                Vector vec = new Vector();
+                cdr = null;
+                // R5RS allows only a single argument.  But
+                // see Bawden: Quasiquotation in Lisp (1999), Appendix B.
+                for (;;)
+                  {
+                    if (form instanceof SyntaxForm)
+                      {
+                        subsyntax = (SyntaxForm) form;
+                        form = subsyntax.form;
+                      }
+                    if (form == LList.Empty)
+                      break;
+                    if (form instanceof Pair)
+                      {
+                        vec.addElement(tr.rewrite_car((Pair) form, subsyntax));
+                        form = ((Pair) form).cdr;
+                      }
+                    else
+                      return tr.syntaxError("improper list argument to unquote");
+                  }
+                int nargs = vec.size() + 1;
+                cdr = expand(pair.cdr, 1, syntax, seen, tr);
+                if (nargs > 1)
+                  {
+                    Expression[] args = new Expression[nargs];
+                    vec.copyInto(args);
+                    args[nargs-1] = coerceExpression(cdr, tr);
+                    if (splicing == 0)
+                      cdr = Invoke.makeInvokeStatic(consXType, "cons$St", args);
+                    else
+                      cdr = Invoke.makeInvokeStatic(quoteType, "append", args);
+                  }
                 rest = pair;
-                cdr = Invoke.makeInvokeStatic(appendType, "append", args);
                 break;
               }
           }
@@ -139,8 +182,8 @@ public class Quote extends Syntax implements Printable
         if (car instanceof Expression || cdr instanceof Expression)
           {
             Expression[] args = new Expression[2];
-            args[0] = coerceExpression(car);
-            args[1] = coerceExpression(cdr);
+            args[0] = coerceExpression(car, tr);
+            args[1] = coerceExpression(cdr, tr);
             cdr = Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
           }
         else
@@ -173,14 +216,14 @@ public class Quote extends Syntax implements Printable
         if (prev == list)
           {
             // The n==1 case: Only a single pair before rest.
-            args[0] = new QuoteExp(list.car);
+            args[0] = leaf(list.car, tr);
 	    return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
           }
         else
           {
             prev.cdr = LList.Empty;
-            args[0] = new QuoteExp(list);
-	    return Invoke.makeInvokeStatic(appendType, "append", args);
+            args[0] = leaf(list, tr);
+	    return Invoke.makeInvokeStatic(quoteType, "append", args);
           }
       }
     else
@@ -202,7 +245,7 @@ public class Quote extends Syntax implements Printable
    * @return the expanded Expression (the result can be a non-expression,
    *   in which case it is implicitly a QuoteExp).
    */
-  static Object expand (Object template, int depth,
+  Object expand (Object template, int depth,
 			SyntaxForm syntax, Object seen, Translator tr)
   {
     boolean resolveNamespaces = depth > DATUM_DEPTH;
@@ -247,7 +290,7 @@ public class Quote extends Syntax implements Printable
 	    int element_depth = depth;
 	    Pair pair;
 	    if (element instanceof Pair && depth > QUOTE_DEPTH
-		&& tr.matches((pair = (Pair)element).car,
+		&& tr.matches((pair = (Pair)element).car, syntax,
 			      LispLanguage.unquotesplicing_sym)
 		&& --element_depth == 0)
 	      {
@@ -284,12 +327,12 @@ public class Quote extends Syntax implements Printable
 		if (state[i] == 3)
 		  args[i] = (Expression) buffer[i];
 		else if (max_state < 3)
-		  args[i] = coerceExpression (buffer[i]);
+		  args[i] = coerceExpression (buffer[i], tr);
 		else if (state[i] < 2)
 		  {
 		    Object[] arg1 = new Object[1];
 		    arg1[0] = buffer[i];
-		    args[i] = new QuoteExp (new FVector (arg1));
+		    args[i] = leaf(new FVector (arg1), tr);
 		  }
 		else
 		  {
@@ -322,11 +365,55 @@ public class Quote extends Syntax implements Printable
     if (! (obj instanceof Pair)
 	|| (pair = (Pair) obj).cdr != LList.Empty)
       return tr.syntaxError ("wrong number of arguments to quasiquote");
-    return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr));
+    return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr), tr);
   }
 
-  static final ClassType appendType = ClassType.make("kawa.standard.append");
+  /** Same as regular append, but handle SyntaxForm wrappers. */
+  public static Object append$V (Object[] args)
+  {
+    int count = args.length;
+    if (count == 0)
+      return LList.Empty;
+    Object result = args[count - 1];
+    for (int i = count - 1; --i >= 0; )
+      {
+	Object list = args[i];
+	Object copy = null;
+	Pair last = null;
+        SyntaxForm syntax = null;
+        for (;;)
+	  {
+            while (list instanceof SyntaxForm)
+              {
+                syntax = (SyntaxForm) list;
+                list = syntax.form;
+              }
+            if (list == LList.Empty)
+              break;
+	    Pair list_pair = (Pair) list;
+            Object car = list_pair.car;
+            if (syntax != null && ! (car instanceof SyntaxForm))
+              car = SyntaxForm.make(car, syntax.scope);
+	    Pair new_pair = new Pair(car, null);
+	    if (last == null)
+	      copy = new_pair;
+	    else
+	      last.cdr = new_pair;
+	    last = new_pair;
+	    list = list_pair.cdr;
+	  }
+	if (last != null)
+	  {
+	    last.cdr = result;
+	    result = copy;
+	  }
+      }
+    return result;
+  }
+
+  static final ClassType consXType = ClassType.make("gnu.kawa.slib.srfi1");
   static final ClassType vectorType = ClassType.make("kawa.lib.vectors");
   static final ClassType vectorAppendType
     = ClassType.make("kawa.standard.vector_append");
+  static final ClassType quoteType = ClassType.make("kawa.lang.Quote");
 }

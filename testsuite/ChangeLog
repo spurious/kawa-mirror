@@ -1,3 +1,7 @@
+2005-11-30  Per Bothner  <per@bothner.com>
+
+	* scribble.scm: Test type inference/propagation by removing specifier.
+
 2005-11-21  Per Bothner  <per@bothner.com>
 
 	* classes2.scm (<TestCapture1>,  <TestCapture2>): New classes, to

@@ -4,8 +4,8 @@
 (define-private last-x 0)
 (define-private last-y 0)
 
-(define (init) <void>
-  (let ((applet :: <java.applet.Applet> (this)))
+(define (init) :: <void>
+  (let ((applet (this)))
     (invoke (this) 'addMouseListener
 	    (object (<java.awt.event.MouseAdapter>)
 		    ((mousePressed (e :: <java.awt.event.MouseEvent>)) <void>

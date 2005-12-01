@@ -1,3 +1,7 @@
+2005-11-30  Per Bothner  <per@bothner.com>
+
+	* ChainLambdas.java (walkLambdaExp): Clear firstChild field.
+
 2005-11-28  Per Bothner  <per@bothner.com>
 
 	* Language.java (getLangTypeFor): New convenience method.

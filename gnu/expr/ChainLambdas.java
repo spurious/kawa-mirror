@@ -46,6 +46,7 @@ public class ChainLambdas extends ExpWalker
     try
       {
 	exp.outer = currentScope;
+        exp.firstChild = null;
 	currentScope = exp;
 	exp.walkChildrenOnly(this);
       }

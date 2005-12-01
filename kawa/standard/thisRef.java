@@ -2,6 +2,7 @@ package kawa.standard;
 import gnu.expr.*;
 import gnu.lists.*;
 import kawa.lang.*;
+import gnu.bytecode.Type;
 
 public class thisRef extends Syntax
 {
@@ -13,18 +14,24 @@ public class thisRef extends Syntax
     if (form.cdr == LList.Empty)
       {
         LambdaExp method = tr.curMethodLambda;
-        if (method == null)
-          tr.error('w', "use of 'this' not inside a class");
-        else
+        Declaration firstParam = method == null ? null : method.firstDecl();
+        if (firstParam == null || ! firstParam.isThisParameter())
           {
-            Declaration firstParam = method.firstDecl();
-            if (firstParam != null && firstParam.isThisParameter())
-              return new ThisExp(firstParam);
-            tr.error('w', "use of 'this' inside static method");
+            firstParam = null;
+            if (method == null || method.nameDecl == null)
+              tr.error('e', "use of 'this' not in a named method");
+            else if (method.nameDecl.isStatic())
+              tr.error('e', "use of 'this' in a static method");
+            else
+              {
+                firstParam = new Declaration(ThisExp.THIS_NAME, (Type) null);
+                method.add(null, firstParam);
+                method.nameDecl.setFlag(Declaration.NONSTATIC_SPECIFIED);
+              }
           }
-	return new ThisExp();
+        return new ThisExp(firstParam);
       }
     else
-      return tr.syntaxError("this with paramater not implemented");
+      return tr.syntaxError("this with parameter not implemented");
   }
 }

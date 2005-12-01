@@ -523,6 +523,12 @@ public class Lambda extends Syntax implements Printable
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
     int numRenamedAlias = 0;
+    // We view a top-level named function as a method, in the sense that the
+    // form (this) is allowed, if the supertype is explicitly specified.
+    if (tr.curMethodLambda == null
+        && lexp.nameDecl != null
+        && tr.getModule().getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
+      tr.curMethodLambda = lexp;
     tr.mustCompileHere();
     tr.pushScope(lexp);
     Declaration prev = null;
@@ -598,6 +604,8 @@ public class Lambda extends Syntax implements Printable
     lexp.countDecls();
     tr.popRenamedAlias(numRenamedAlias);
     lexp.countDecls();
+    if (tr.curMethodLambda == lexp)
+      tr.curMethodLambda = null;
   }
 
 

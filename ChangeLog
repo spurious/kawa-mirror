@@ -1,3 +1,11 @@
+2005-11-30  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody): Set/reset curMethodLambda
+	if we're in a top-level methods and supertype has been specified.
+	* kawa/standard/thisRef.java (rewriteForm): Allow (this) in a top-level
+	function whose module has the super-type explicitly specified.  In
+	that case create a matching Declaration, if needed.
+
 2005-11-29  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java: Make various methods non-static, and make

@@ -193,6 +193,17 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
+  protected Expression walkLambdaExp (LambdaExp exp)
+  {
+    Declaration firstDecl = exp.firstDecl();
+    if (firstDecl != null && firstDecl.isThisParameter()
+        && ! exp.isClassMethod() && firstDecl.getType() == null)
+      {
+        firstDecl.setType(comp.mainClass);
+      }
+    return walkScopeExp(exp);
+  }
+
   /*
   protected Expression walkSetExp (SetExp exp)
   {

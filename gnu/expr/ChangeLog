@@ -1,5 +1,8 @@
 2005-11-30  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkLambdaExp): New method.  Set type of
+	'this' declaration.
+
 	* Compilation.java (compile): Move addClass earlier, so super-class
 	gets set before InlineCalls.
 

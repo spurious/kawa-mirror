@@ -875,6 +875,8 @@ public class Compilation
       return;
 
     mainClass = lexp.classFor(this);
+    addClass(lexp, mainClass);
+
     if (ModuleExp.debugPrintExpr)
       {
 	OutPort dout = OutPort.outDefault();
@@ -907,7 +909,6 @@ public class Compilation
 	dout.flush();
       }
 
-    mainClass = addClass(lexp, mainClass);
     ClassType neededSuper = getModuleType();
     if (mainClass.getSuperclass().isSubtype(neededSuper))
       moduleClass = mainClass;

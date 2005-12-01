@@ -2,6 +2,10 @@
 
 	* scribble.scm: Test type inference/propagation by removing specifier.
 
+2005-11-29  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Test new quasiquote extension.
+
 2005-11-21  Per Bothner  <per@bothner.com>
 
 	* classes2.scm (<TestCapture1>,  <TestCapture2>): New classes, to

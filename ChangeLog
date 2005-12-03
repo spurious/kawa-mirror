@@ -1,5 +1,8 @@
 2005-12-03  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (namespaceResolve): Combine code paths
+	to reduce code duplication.
+
 	* kawa/lang/Translator.java (namespaceResolve): Use new makeExp method.
 
 2005-11-30  Per Bothner  <per@bothner.com>

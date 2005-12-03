@@ -471,7 +471,7 @@ public class Translator extends Compilation
       return ClassMethodProc.makeExp(QuoteExp.nullExp, local);
     String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
     Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
-    Symbol sym;
+    Object val;
     if (uri_decl instanceof Declaration)
       {
 	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
@@ -498,59 +498,48 @@ public class Translator extends Compilation
 	  }
 
 	if (dval instanceof QuoteExp)
-	  {
-	    Object val = ((QuoteExp) dval).getValue();
-	    String uri;
-	    if (val instanceof ClassType)
-              return ClassMethodProc.makeExp(dval, new QuoteExp(local));
-	    else
-	      uri = val.toString();
-            if (uri.startsWith("class:"))
-              return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
-                                             local);
-	    sym = Symbol.make(uri, local);
-	  }
+          val = ((QuoteExp) dval).getValue();
 	else
 	  return null;
       }
     else
       {
-	Object v = env.get(xprefix, null);
-        if (v instanceof ClassType)
-          return ClassMethodProc.makeExp(new QuoteExp(v), local);
-        if (v != null)
-          {
-            String uri = v.toString();
-            if (uri.startsWith("class:"))
-              return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
-                                             local);
-            sym = Symbol.make(uri, local);
-          }
-        else if (prefix.length() > 2 && prefix.charAt(0) == '<'
-                 && prefix.charAt(prefix.length()-1) == '>')
-          {
-            return ClassMethodProc.makeExp(rewrite(prefix), local);
-          }
-	else
-	  {
-            try
-              {
-                /* #ifdef JAVA2 */
-                Class cl = Class.forName(prefix, false,
-                                         getClass().getClassLoader());
-                /* #else */
-                // Class cl = Class.forName(prefix);
-                /* #endif */
-                return ClassMethodProc.makeExp(new QuoteExp(Type.make(cl)),
-                                               local);
-              }
-            catch (Throwable ex)
-              {
-                return null;
-              }
-	  }
+	val = env.get(xprefix, null);
       }
-    return rewrite(sym, function);
+
+    if (val instanceof ClassType)
+      return ClassMethodProc.makeExp(new QuoteExp(val), local);
+    if (val != null)
+      {
+        String uri = val.toString();
+        if (uri.startsWith("class:"))
+          return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
+                                         local);
+        return rewrite(Symbol.make(uri, local), function);
+      }
+    else if (prefix.length() > 2 && prefix.charAt(0) == '<'
+             && prefix.charAt(prefix.length()-1) == '>')
+      {
+        return ClassMethodProc.makeExp(rewrite(prefix), local);
+      }
+    else
+      {
+        try
+          {
+            /* #ifdef JAVA2 */
+            Class cl = Class.forName(prefix, false,
+                                     getClass().getClassLoader());
+            /* #else */
+            // Class cl = Class.forName(prefix);
+            /* #endif */
+            return ClassMethodProc.makeExp(new QuoteExp(Type.make(cl)),
+                                           local);
+          }
+        catch (Throwable ex)
+          {
+            return null;
+          }
+      }
   }
 
   public void setCurrentScope (ScopeExp scope)

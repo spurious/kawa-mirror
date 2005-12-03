@@ -1,3 +1,7 @@
+2005-12-03  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (namespaceResolve): Use new makeExp method.
+
 2005-11-30  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewriteBody): Set/reset curMethodLambda

@@ -39,6 +39,9 @@ public class ClassMethodProc extends ProcedureN
       kind = 'F';
   }
 
+  /** PREFIX:<> is equivalent to the ClassType bound to PREFIX. */
+  public static final String CLASSTYPE_FOR = "<>";
+
   /** Pseudo-method-name for the cast operation. */
   public static final String CAST_METHOD_NAME = "@";
 
@@ -84,6 +87,16 @@ public class ClassMethodProc extends ProcedureN
   public static ApplyExp makeExp (Expression clas, Expression member)
   {
     Expression[] args = { clas, member };
+    ApplyExp aexp = new ApplyExp(ClassMethodProc.makeMethodExp, args);
+    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+    return aexp;
+  }
+
+  public static Expression makeExp (Expression clas, String member)
+  {
+    if (CLASSTYPE_FOR.equals(member))
+      return clas;
+    Expression[] args = { clas, new QuoteExp(member) };
     ApplyExp aexp = new ApplyExp(ClassMethodProc.makeMethodExp, args);
     aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
     return aexp;

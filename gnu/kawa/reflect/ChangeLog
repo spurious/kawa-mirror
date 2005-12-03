@@ -1,3 +1,8 @@
+2005-12-03  Per Bothner  <per@bothner.com>
+
+	* ClassMethodProc.java (CLASSTYPE_FOR): New constant.
+	(makeExp): New method overloading.
+
 2005-11-28  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (compileSet):  Coerce argument to language-specific

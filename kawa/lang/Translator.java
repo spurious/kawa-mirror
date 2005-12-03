@@ -468,7 +468,7 @@ public class Translator extends Compilation
     String prefix = str.substring(0, colon);
     String local = str.substring(colon + 1);
     if ("*".equals(prefix))
-      return ClassMethodProc.makeExp(QuoteExp.nullExp, new QuoteExp(local));
+      return ClassMethodProc.makeExp(QuoteExp.nullExp, local);
     String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
     Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
     Symbol sym;
@@ -485,7 +485,7 @@ public class Translator extends Compilation
 	      {
 		dval = d.getValue();
 		if (dval instanceof ClassExp)
-                  return ClassMethodProc.makeExp(ref, new QuoteExp(local));
+                  return ClassMethodProc.makeExp(ref, local);
 	      }
 	    else
 	      {
@@ -493,7 +493,7 @@ public class Translator extends Compilation
 		int nlen = name.length();
 		if (nlen > 2 && name.charAt(0) == '<'
 		    && name.charAt(nlen-1) == '>')
-                  return ClassMethodProc.makeExp(ref, new QuoteExp(local));
+                  return ClassMethodProc.makeExp(ref, local);
 	      }
 	  }
 
@@ -507,7 +507,7 @@ public class Translator extends Compilation
 	      uri = val.toString();
             if (uri.startsWith("class:"))
               return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
-                                             new QuoteExp(local));
+                                             local);
 	    sym = Symbol.make(uri, local);
 	  }
 	else
@@ -517,20 +517,19 @@ public class Translator extends Compilation
       {
 	Object v = env.get(xprefix, null);
         if (v instanceof ClassType)
-          return ClassMethodProc.makeExp(new QuoteExp(v),
-                                         new QuoteExp(local));
+          return ClassMethodProc.makeExp(new QuoteExp(v), local);
         if (v != null)
           {
             String uri = v.toString();
             if (uri.startsWith("class:"))
               return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
-                                             new QuoteExp(local));
+                                             local);
             sym = Symbol.make(uri, local);
           }
         else if (prefix.length() > 2 && prefix.charAt(0) == '<'
                  && prefix.charAt(prefix.length()-1) == '>')
           {
-            return ClassMethodProc.makeExp(rewrite(prefix), new QuoteExp(local));
+            return ClassMethodProc.makeExp(rewrite(prefix), local);
           }
 	else
 	  {
@@ -543,7 +542,7 @@ public class Translator extends Compilation
                 // Class cl = Class.forName(prefix);
                 /* #endif */
                 return ClassMethodProc.makeExp(new QuoteExp(Type.make(cl)),
-                                               new QuoteExp(local));
+                                               local);
               }
             catch (Throwable ex)
               {

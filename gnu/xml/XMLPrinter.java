@@ -178,7 +178,9 @@ public class XMLPrinter extends PrintConsumer
   private void startWord()
   {
     closeTag();
-    if (prev == WORD)
+    if (prev == WORD
+        && ! (out instanceof OutPort
+              && ((OutPort) out).getColumnNumber() == 0))
       super.write(' ');
     prev = WORD;
   }

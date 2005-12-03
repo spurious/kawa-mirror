@@ -1,3 +1,8 @@
+2005-12-03  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (startWord): Don't print inter-word space
+	if column is zero.
+
 2005-11-14  thomas kirk  <tk@research.att.com>
 
 	* NodeTree.java (toString): Close CharArrayOutPort.

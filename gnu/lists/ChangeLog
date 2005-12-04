@@ -1,3 +1,12 @@
+2005-12-03  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (consumePosRange): Add missing nextPos call.
+	Ooops.
+	* GeneralArray1.java (createPos, nextPos): Need to define these,
+	since the ones in AbstractSequence are mutually dependent, and it
+	matters since GeneralArray1 but not GeneralArray implements Sequence.
+	(consumePosRange): Optimization.
+
 2005-11-29  Per Bothner  <per@bothner.com>
 
 	* LList.java (consX): New method.

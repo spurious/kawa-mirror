@@ -819,6 +819,7 @@ public abstract class AbstractSequence
 	if (! hasNext(it))
 	  throw new RuntimeException();
 	out.writeObject(getPosNext(it));
+        it = nextPos(it);
       }
     releasePos(it);
   }

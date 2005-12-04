@@ -78,6 +78,7 @@ implements Array //, Consumable
 
   public int rank() { return dimensions.length; }
 
+  /** Calculate corresponding index in base array. */
   public int getEffectiveIndex(int[] indexes)
   {
     int result = offset;

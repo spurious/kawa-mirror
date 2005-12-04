@@ -1,3 +1,10 @@
+2005-12-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme): Define define-xml-namespace.
+	(html): Define as an xml-namespace.
+	* kawa/lang/Translator (asXmlNamespace): New method.
+	(rewrite_pair):  Translate application of xml-names to make-element.
+
 2005-12-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java (rewrite): Fix error message.

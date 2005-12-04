@@ -1,20 +1,26 @@
 package gnu.kawa.lispexpr;
 import kawa.lang.*;
 import gnu.expr.*;
+import gnu.mapping.*;
 import gnu.lists.*;
 
 public class DefineNamespace extends Syntax
 {
-  private boolean makePrivate = false;
+  private boolean makePrivate;
+  private boolean makeXML;
   
   public static final DefineNamespace define_namespace
     = new DefineNamespace();
   public static final DefineNamespace define_private_namespace
     = new DefineNamespace();
+  public static final DefineNamespace define_xml_namespace
+    = new DefineNamespace();
   static {
     define_namespace.setName("define-namespace");
     define_private_namespace.setName("define-private-namespace");
     define_private_namespace.makePrivate = true;
+    define_xml_namespace.setName("define-xml-namespace");
+    define_xml_namespace.makeXML = true;
   }
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
@@ -29,7 +35,8 @@ public class DefineNamespace extends Syntax
 	tr.error('e', "invalid syntax for define-namespace");
 	return false;
       }
-    String name = (Language.NAMESPACE_PREFIX + p1.car).intern();
+    String prefix = (String) p1.car;
+    String name = (Language.NAMESPACE_PREFIX + prefix).intern();
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
@@ -46,6 +53,27 @@ public class DefineNamespace extends Syntax
     sexp.setDefining (true);
     decl.noteValue(value);
     forms.addElement (sexp);
+    if (makeXML)
+      {
+        if (value instanceof QuoteExp)
+          {
+            Object nsval = ((QuoteExp) value).getValue();
+            if (nsval instanceof String || nsval instanceof FString)
+              {
+                Symbol sym = Symbol.make(nsval.toString(), XML_NAMESPACE_MAGIC);
+                value = new QuoteExp(prefix);
+                decl = defs.getDefine(sym, 'w', tr);
+                tr.push(decl);
+                decl.setFlag(Declaration.IS_CONSTANT);
+                sexp = new SetExp(decl, value);
+                sexp.setDefining (true);
+                decl.noteValue(value);
+                forms.addElement(sexp);
+                return true;
+              }
+          }
+        tr.error('e', "define-xml-namespace must be bound to string literal");
+      }
     return true;
   }
 
@@ -53,4 +81,6 @@ public class DefineNamespace extends Syntax
   {
     return tr.syntaxError ("define-namespace is only allowed in a <body>");
   }
+
+  public static final String XML_NAMESPACE_MAGIC = "&xml&";
 }

@@ -6,7 +6,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
-import gnu.kawa.lispexpr.LispLanguage;
+import gnu.kawa.lispexpr.*;
 import java.util.*;
 
 /** Used to translate from source to Expression.
@@ -310,10 +310,27 @@ public class Translator extends Compilation
     if (cdr_length < 0)
       return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.car);
 
-    Expression[] args = new Expression[cdr_length];
+    boolean mapKeywordsToAttributes = false;
+    Stack vec = new Stack();
+
+    if (func instanceof ReferenceExp)
+      {
+        Object sym = ((ReferenceExp) func).getSymbol();
+        if (sym instanceof Symbol
+            && asXmlNamespace(((Symbol) sym).getNamespaceURI()) != null)
+          {
+            String orig = Quote.quote(p.car).toString();
+            int colon = orig.indexOf(':');
+            String prefix = colon < 0 ? "" : orig.substring(0, colon);
+            mapKeywordsToAttributes = true;
+            Object type = new gnu.xml.SName((Symbol) sym, prefix);
+            func = new QuoteExp(gnu.kawa.xml.MakeElement.makeElement);
+            vec.addElement(new QuoteExp(type));
+          }
+      }
 
     ScopeExp save_scope = current_scope;
-    for (int i = 0; i < cdr_length; i++)
+    for (int i = 0; i < cdr_length;)
       {
 	if (cdr instanceof SyntaxForm)
 	  {
@@ -322,9 +339,36 @@ public class Translator extends Compilation
 	    setCurrentScope(sf.scope);
 	  }
 	Pair cdr_pair = (Pair) cdr;
-	args[i] = rewrite_car (cdr_pair, false);
+	Expression arg = rewrite_car (cdr_pair, false);
+        i++;
+
+        if (mapKeywordsToAttributes)
+          {
+            if ((i & 1) == 0) // Previous iteration was a keyword
+              {
+                Expression[] aargs = new Expression[2];
+                aargs[0] = (Expression) vec.pop();
+                aargs[1] = arg;
+                arg = new ApplyExp(gnu.kawa.xml.MakeAttribute.makeAttribute, aargs);
+              }
+            else
+              {
+                Object value;
+                if (arg instanceof QuoteExp
+                    && (value = ((QuoteExp) arg).getValue()) instanceof Keyword
+                    && i < cdr_length)
+                  arg = new QuoteExp(((Keyword) value).asSymbol());
+                else
+                  mapKeywordsToAttributes = false;
+              }
+          }
+
+        vec.addElement(arg);
 	cdr = cdr_pair.cdr;
       }
+    Expression[] args = new Expression[vec.size()];
+    vec.copyInto(args);
+
     if (save_scope != current_scope)
       setCurrentScope(save_scope);
 
@@ -540,6 +584,21 @@ public class Translator extends Compilation
             return null;
           }
       }
+  }
+
+  /** Check if a uri has been registered as an "XML namespace".
+   * @return the corresponding prefix.if so, or null otherwise.
+   */
+  Object asXmlNamespace (String uri)
+  {
+    if (uri == null || uri.length() == 0)
+      return null;
+    Symbol magic = Symbol.make(uri, DefineNamespace.XML_NAMESPACE_MAGIC);
+    Declaration xml_decl = lexical.lookup(magic, false);
+    Object val;
+    if (xml_decl == null)
+      return env.get(magic, null);
+    return Declaration.followAliases((Declaration) xml_decl).getConstantValue();
   }
 
   public void setCurrentScope (ScopeExp scope)

@@ -1,3 +1,9 @@
+2005-12-04  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java (makeXML): New option.
+	(define_xml_namespace): New constant field.
+	(scanForDefinitions): Handle makeXML - i.e. "define-xml-namespace",.
+
 2005-10-27  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (resolve): New methods.

@@ -572,6 +572,8 @@ public class Scheme extends LispLanguage
       define_proc ("make-quantity", "kawa.standard.make_quantity");
       defSntxStFld("define-namespace", "gnu.kawa.lispexpr.DefineNamespace",
                    "define_namespace");
+      defSntxStFld("define-xml-namespace", "gnu.kawa.lispexpr.DefineNamespace",
+                   "define_xml_namespace");
       defSntxStFld("define-private-namespace", "gnu.kawa.lispexpr.DefineNamespace",
                    "define_private_namespace");
       defSntxStFld("define-unit", "kawa.standard.define_unit", "define_unit");
@@ -736,7 +738,12 @@ public class Scheme extends LispLanguage
                     "gnu.text.PrettyWriter", "lineLengthLoc");
       defAliasStFld("*print-miser-width*",
                     "gnu.text.PrettyWriter", "miserWidthLoc");
- 
+
+      define((Language.NAMESPACE_PREFIX+"html").intern(),
+             "http://www.w3.org/1999/xhtml");
+      environ.define(Symbol.make("http://www.w3.org/1999/xhtml",
+                                 DefineNamespace.XML_NAMESPACE_MAGIC),
+                                 null, "html");
       kawaEnvironment.setLocked();
   }
 

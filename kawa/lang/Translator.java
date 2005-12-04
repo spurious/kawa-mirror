@@ -315,17 +315,22 @@ public class Translator extends Compilation
 
     if (func instanceof ReferenceExp)
       {
+        // Check if function symbol is an "xml namespace".
         Object sym = ((ReferenceExp) func).getSymbol();
+        String uri;
         if (sym instanceof Symbol
-            && asXmlNamespace(((Symbol) sym).getNamespaceURI()) != null)
+            && (uri = ((Symbol) sym).getNamespaceURI()) != null)
           {
             String orig = Quote.quote(p.car).toString();
             int colon = orig.indexOf(':');
             String prefix = colon < 0 ? "" : orig.substring(0, colon);
-            mapKeywordsToAttributes = true;
-            Object type = new gnu.xml.SName((Symbol) sym, prefix);
-            func = new QuoteExp(gnu.kawa.xml.MakeElement.makeElement);
-            vec.addElement(new QuoteExp(type));
+            if (prefix.equals(asXmlNamespace(uri)))
+              {
+                mapKeywordsToAttributes = true;
+                Object type = new gnu.xml.SName((Symbol) sym, prefix);
+                func = new QuoteExp(gnu.kawa.xml.MakeElement.makeElement);
+                vec.addElement(new QuoteExp(type));
+              }
           }
       }
 

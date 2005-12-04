@@ -1,5 +1,8 @@
 2005-12-04  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator (rewrite_pair): Be a little more conservative
+	with xml names: Only map to make-element if prefix matches.
+
 	* kawa/standard/Scheme.java (initScheme): Define define-xml-namespace.
 	(html): Define as an xml-namespace.
 	* kawa/lang/Translator (asXmlNamespace): New method.

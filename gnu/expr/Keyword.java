@@ -17,6 +17,14 @@ public class Keyword extends Symbol
     super(name);
   }
 
+  /** Get the corresponding non-keyword symbol.
+   * Informally, the symbol corresponding to dropping the ':'.
+   */
+  public Symbol asSymbol ()
+  {
+    return Namespace.EmptyNamespace.getSymbol(name);
+  }
+
   /**
    * Create or find a Keyword with a given name (without final ':').
    * @param name the print-name of the desired Keyword

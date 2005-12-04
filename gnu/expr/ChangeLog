@@ -1,3 +1,7 @@
+2005-12-04  Per Bothner  <per@bothner.com>
+
+	* Keyword.java (as Symbol): New method.
+
 2005-11-30  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkLambdaExp): New method.  Set type of

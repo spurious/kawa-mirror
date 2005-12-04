@@ -1,5 +1,7 @@
 2005-12-03  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Quote.java (rewrite): Fix error message.
+
 	* kawa/lang/Translator.java (namespaceResolve): Combine code paths
 	to reduce code duplication.
 

@@ -364,7 +364,7 @@ public class Quote extends Syntax implements Printable
     Pair pair;
     if (! (obj instanceof Pair)
 	|| (pair = (Pair) obj).cdr != LList.Empty)
-      return tr.syntaxError ("wrong number of arguments to quasiquote");
+      return tr.syntaxError ("wrong number of arguments to quote");
     return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr), tr);
   }
 

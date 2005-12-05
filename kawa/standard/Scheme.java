@@ -1028,7 +1028,7 @@ public class Scheme extends LispLanguage
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.getInitial();
-    tab.postfixLookupOperator = '`';
+    tab.postfixLookupOperator = '\\';
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));

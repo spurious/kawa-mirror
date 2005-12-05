@@ -1,3 +1,14 @@
+2005-12-05  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readToken): Move ReadTable.getCurrent() out of loop.
+	* LispReader.java (validPostfixLookupStart): New method.
+	Requires following character to be letter, rather than any CONSTITUENT.
+	We may extend it later - but we want to not conflict with existing
+	useful uses of '\\' for SINGLE_ESCAPE.
+	(handlePostfix): Use validPostfixLookupStart
+	(readoken): Check if a character is postfixLookupOperator,
+	and if validPostfixLookupStart then treat it as TERMINATING_MACRO.
+
 2005-12-04  Per Bothner  <per@bothner.com>
 
 	Handle syntax ObjectOpName as sugar for ($lookup$ Object 'Name).

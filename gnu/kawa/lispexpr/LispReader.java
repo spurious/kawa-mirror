@@ -169,6 +169,7 @@ public class LispReader extends Lexer
   public void readToken(int ch, boolean inEscapes, char readCase)
       throws java.io.IOException, SyntaxException
   {
+    ReadTable rtable = ReadTable.getCurrent();
     for (;; ch = read())
       {
 	if (ch < 0)
@@ -178,7 +179,7 @@ public class LispReader extends Lexer
 	    else
 	      break;
 	  }
-	ReadTableEntry entry = ReadTable.getCurrent().lookup(ch);
+	ReadTableEntry entry = rtable.lookup(ch);
 	if (entry == null)
 	  {
 	    if (inEscapes)
@@ -191,6 +192,10 @@ public class LispReader extends Lexer
 	    break;
 	  }
 	int kind = entry.getKind();
+        if (ch == rtable.postfixLookupOperator && ! inEscapes
+            && validPostfixLookupStart())
+          kind = ReadTable.TERMINATING_MACRO;
+                  
 	if (kind == ReadTable.SINGLE_ESCAPE)
 	  {
 	    ch = read();
@@ -273,6 +278,13 @@ public class LispReader extends Lexer
       }
   }
 
+  protected boolean validPostfixLookupStart ()
+      throws java.io.IOException
+  {
+    int ch = port.peek();
+    return ch >= 0 && Character.isLetter((char) ch);
+  }
+
   Object handlePostfix (Object value, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
@@ -285,11 +297,7 @@ public class LispReader extends Lexer
           break;
         // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
         port.read();
-        ch = port.peek();
-        ReadTableEntry entry2;
-        if (ch < 0
-            || (entry2 = rtable.lookup(ch)) == null
-            || entry2.getKind() != ReadTable.CONSTITUENT)
+        if (! validPostfixLookupStart())
           {
             unread();
             break;

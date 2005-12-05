@@ -253,17 +253,17 @@ public class LispReader extends Lexer
     ((InPort) port).readState = ' ';
     try
       {
+        ReadTable rtable = ReadTable.getCurrent();
 	for (;;)
 	  {
 	    int ch = port.read();
 	    if (ch < 0)
 	      return Sequence.eofValue; // FIXME
-	    Object value = readValues(ch);
+            ReadTableEntry entry = rtable.lookup(ch);
+            Object value = readValues(ch, entry);
 	    if (value == Values.empty)
 	      continue;
-	    if (value == QuoteExp.voidExp)
-	      value = Values.empty;
-	    return value;
+	    return handlePostfix(value, rtable);
 	  }
       }
     finally
@@ -271,6 +271,35 @@ public class LispReader extends Lexer
 	tokenBufferLength = startPos;
 	((InPort) port).readState = saveReadState;
       }
+  }
+
+  Object handlePostfix (Object value, ReadTable rtable)
+      throws java.io.IOException, SyntaxException
+  {
+    if (value == QuoteExp.voidExp)
+      value = Values.empty;
+    for (;;)
+      {
+        int ch = port.peek();
+        if (ch < 0 || ch != rtable.postfixLookupOperator)
+          break;
+        // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
+        port.read();
+        ch = port.peek();
+        ReadTableEntry entry2;
+        if (ch < 0
+            || (entry2 = rtable.lookup(ch)) == null
+            || entry2.getKind() != ReadTable.CONSTITUENT)
+          {
+            unread();
+            break;
+          }
+        Object rightOperand = readValues(port.read());
+        value = LList.list3("$lookup$", value,
+                            LList.list2(LispLanguage.quote_sym,
+                                        rightOperand));
+      }
+    return value;
   }
 
   private boolean isPotentialNumber (char[] buffer, int start, int end)

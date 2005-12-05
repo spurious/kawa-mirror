@@ -16,6 +16,7 @@ java_sources=\
   CountValues.java \
   DisplayFormat.java \
   DivideOp.java \
+  GetNamedPart.java \
   IntegerFormat.java \
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \

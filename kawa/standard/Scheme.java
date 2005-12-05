@@ -489,6 +489,8 @@ public class Scheme extends LispLanguage
       defProcStFld("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
       defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
+      defProcStFld("$lookup$", "gnu.kawa.functions.GetNamedPart",
+                     "getNamedPart");
 
       defProcStFld("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
       defProcStFld("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
@@ -1026,6 +1028,7 @@ public class Scheme extends LispLanguage
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.getInitial();
+    tab.postfixLookupOperator = '`';
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));

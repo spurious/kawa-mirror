@@ -1,5 +1,11 @@
 2005-12-04  Per Bothner  <per@bothner.com>
 
+	Handle syntax ObjectOpName as sugar for ($lookup$ Object 'Name).
+	* ReadTable.java (postfixLookupOperator): New field.
+	* LispReader.java (handlePostfix): New function.
+	(readObject): Call handlePostfix after readValues.
+	* ReaderParens.java (readList): Call handlePostfix after each car.
+
 	* DefineNamespace.java (makeXML): New option.
 	(define_xml_namespace): New constant field.
 	(scanForDefinitions): Handle makeXML - i.e. "define-xml-namespace",.

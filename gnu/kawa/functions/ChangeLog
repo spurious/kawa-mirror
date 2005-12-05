@@ -1,3 +1,8 @@
+2005-12-04  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java: New class.
+	* Makefile.am: Update accodingly.
+
 2005-11-14  thomas kirk  <tk@research.att.com>
 
 	* Format.java (formatToString, format$V): Close OutPorts.

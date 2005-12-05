@@ -120,8 +120,7 @@ public class ReaderParens extends ReadTableEntry
 	    Object value = lexer.readValues(ch, entry);
 	    if (value == Values.empty)
 	      continue;
-	    if (value == gnu.expr.QuoteExp.voidExp)
-	      value = Values.empty;
+            value = lexer.handlePostfix(value, readTable);
 
 	    // ( a1 ... an . cdr) creates an n-element list ended by
 	    // cdr.  If n==0, a reasonable (and common) extension is to

@@ -20,6 +20,9 @@ public class ReadTable extends RangeTable
   /** Default value to pass to setBracketMode() unless overridden. */
   public static int defaultBracketMode = -1;
 
+  /** A character such that PreOpWord -> ($lookup$ Pre 'Word), if > 0. */
+  public char postfixLookupOperator = (char) (-1);
+
   static final ThreadLocation current = new ThreadLocation("read-table");
 
   public ReadTable()

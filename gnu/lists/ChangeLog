@@ -1,3 +1,8 @@
+2005-12-05  Per Bothner  <per@bothner.com>
+
+	* AbstractFormat.java (beginGroup): Emit a space after the typename.
+	(beginAttribute): Don't need an initial space.
+
 2005-12-03  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (consumePosRange): Add missing nextPos call.

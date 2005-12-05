@@ -41,6 +41,7 @@ public abstract class AbstractFormat extends java.text.Format
   {
     write("(", out);
     write(typeName, out);
+    write(" ", out);
   }
 
   public void endGroup(String typeName, Consumer out)
@@ -50,7 +51,6 @@ public abstract class AbstractFormat extends java.text.Format
 
   public void beginAttribute(String attrName, Object attrType, Consumer out)
   {
-    write(" ", out);
     write(attrName, out);
     write(": ", out);
   }

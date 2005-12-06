@@ -1,3 +1,9 @@
+2005-12-05  Per Bothner  <per@bothner.com>
+	    Dean Ferreyra <dean@octw.com>
+
+	* classes2.scm: New test for Savannah bug #15151
+	* obj-test.scm: Run the test.
+
 2005-11-30  Per Bothner  <per@bothner.com>
 
 	* scribble.scm: Test type inference/propagation by removing specifier.

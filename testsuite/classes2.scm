@@ -32,3 +32,6 @@
   ((ff farg)
    (list
     (lambda (y) (list yy y)))))
+
+;; Test for Savannah bug #15151
+(define (getClassTest o) (slot-ref o 'class))

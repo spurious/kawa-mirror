@@ -1,4 +1,4 @@
-(test-init "Objects" 113)
+(test-init "Objects" 114)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -340,3 +340,8 @@
       (let ((getter (primitive-array-get <int>)))
 	(list (getter arr-5 0) (getter arr-5 1)
 	      ((primitive-array-get <int>) arr-5 4))))
+
+;; Test for Savannah bug #15151
+(test (*:toString "gnu.math.IntNum") 'getClassTest
+      (*:getName (getClassTest '123)))
+

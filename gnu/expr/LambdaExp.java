@@ -581,11 +581,15 @@ public class LambdaExp extends ScopeExp
     return field;
   }
 
-  final void addApplyMethod(LambdaExp lexp)
+  final void addApplyMethod (Compilation comp)
   {
-    if (applyMethods == null)
-      applyMethods = new Vector();
-    applyMethods.addElement(lexp);
+    LambdaExp owner = getOwningLambda();
+    ClassType frameType = owner.getHeapFrameType();
+    if (! (frameType.getSuperclass().isSubtype(Compilation.typeModuleBody)))
+      owner = comp.getModule();
+    if (owner.applyMethods == null)
+      owner.applyMethods = new Vector();
+    owner.applyMethods.addElement(this);
   }
 
   public Field compileSetField (Compilation comp)
@@ -595,7 +599,7 @@ public class LambdaExp extends ScopeExp
     else
       {
 	compileAsMethod(comp);
-	getOwningLambda().addApplyMethod(this);
+	addApplyMethod(comp);
       }
 
     return (new ProcInitializer(this, comp)).field;
@@ -681,7 +685,7 @@ public class LambdaExp extends ScopeExp
 	    || (comp.immediate && outer instanceof ModuleExp))
 	  {
 	    compileAsMethod(comp);
-	    getOwningLambda().addApplyMethod(this);
+	    addApplyMethod(comp);
 	    ProcInitializer.emitLoadModuleMethod(this, comp);
 	  }
 	else

@@ -1,3 +1,14 @@
+2005-12-05  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (addApplyMethods): "Swap" operands, replacing
+	lexp parameter by this.  Fold getOwningLambda() call from callers.
+	If the frameType doesn't extend ModuleBody, then we need to use
+	the Compilation's moduleClass, so add it to the ModuleExp instead.
+	This matches the logic in generateApplyMethodsWithoutContext.
+	Otherwise, we might get different sets of methods for distinct
+	owning LambdaExp's that end up in the same class's apply method,
+	which will mess things up.
+
 2005-12-04  Per Bothner  <per@bothner.com>
 
 	* Keyword.java (as Symbol): New method.

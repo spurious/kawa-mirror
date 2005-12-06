@@ -1,3 +1,8 @@
+2005-12-05  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (compile): Don't return compile-time-class for "class",
+	unless isStatic.  Fixes Savannah bug #15151.
+
 2005-12-03  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java (CLASSTYPE_FOR): New constant.

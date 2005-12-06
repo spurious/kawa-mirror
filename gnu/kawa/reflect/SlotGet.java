@@ -192,7 +192,7 @@ public class SlotGet extends Procedure2
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
     String name = ClassMethods.checkName(arg1);
-    if ("class".equals(name)
+    if (isStatic && "class".equals(name)
         // Ideally we should also handle array types ...  FIXME
         && type instanceof ClassType)
       {

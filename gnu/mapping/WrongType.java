@@ -19,10 +19,10 @@ public class WrongType extends WrappedException
   public static final int ARG_UNKNOWN = -1;
 
   /** <code>number==ARG_VARNAME</code> means not a call,
-   * <code>procname</code> is a variable name. (deprecated/unused) */
+   * <code>procname</code> is a variable name.*/
   public static final int ARG_VARNAME = -2;
 
-  /** <code>number==ARG_VARNAME</code> means not a call,
+  /** <code>number==ARG_DESCRIPTION</code> means not a call,
    * <code>procname</code> describes the target. (deprecated/unused) */
   public static final int ARG_DESCRIPTION = -3;
 
@@ -55,6 +55,13 @@ public class WrongType extends WrappedException
     this.proc = proc;
     this.procname = proc.getName();
     this.number = n;
+  }
+
+  public WrongType(ClassCastException ex, Procedure proc, int n,
+                   Object argValue)
+  {
+    this(proc, n, ex);
+    this.argValue = argValue;
   }
 
   public WrongType(Procedure proc, int n, Object argValue)
@@ -90,6 +97,14 @@ public class WrongType extends WrappedException
     this.number = n;
   }
  
+  public WrongType (ClassCastException ex, String procname, int n,
+                    Object argValue)
+  {
+    this(procname, n, ex);
+    this.argValue = argValue;
+    System.err.println("create "+this);
+  }
+
   /** @deprecated */
   public static WrongType make(ClassCastException ex, Procedure proc, int n)
   {
@@ -123,17 +138,11 @@ public class WrongType extends WrappedException
   public String getMessage()
   {
     StringBuffer sbuf = new StringBuffer(100);
-    if (number == ARG_VARNAME)
-      {
-        sbuf.append("Value for variable '");
-        sbuf.append(procname);
-        sbuf.append("'");
-      }
-    else if (number == ARG_DESCRIPTION)
+    if (number == ARG_DESCRIPTION)
       {
         sbuf.append(procname);
       }
-    else if (number == ARG_CAST)
+    else if (number == ARG_CAST || number == ARG_VARNAME)
       {
         sbuf.append("Value");
       }
@@ -159,9 +168,9 @@ public class WrongType extends WrappedException
 	  sbuf.append(argString);
 	sbuf.append(")");
       }
-    if (procname != null)
+    if (procname != null && number != ARG_DESCRIPTION)
       {
-        sbuf.append(" to '");
+        sbuf.append(number == ARG_VARNAME ? " for variable '" : " to '");
         sbuf.append(procname);
         sbuf.append("'");
       }

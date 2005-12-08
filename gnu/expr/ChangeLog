@@ -1,3 +1,10 @@
+2005-12-08  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (initWrongType, emitCheckedCoerce):
+	Use (new) WrongType constructors directly instead of calling 'make'
+	static 	methods.  This generates slightly bigger bytecode, but it makes
+	for nicer stack traces which don't include the WrongType.make call.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addApplyMethods): "Swap" operands, replacing

@@ -13,7 +13,8 @@ public class CheckedTarget extends StackTarget
 {
   LambdaExp proc;
   String procname;
-  /** 1-origin argument index, or WrongType.ARG_CAST. */
+  /** 1-origin argument index,
+      or WrongType.ARG_CAST, or WrongType-ARG_VARNAME. */
   int argno;
 
   public CheckedTarget(Type type)
@@ -57,8 +58,8 @@ public class CheckedTarget extends StackTarget
 
   static ClassType typeClassCastException;
   static ClassType typeWrongType;
-  static Method makeWrongTypeStringMethod;
-  static Method makeWrongTypeProcMethod;
+  static Method initWrongTypeStringMethod;
+  static Method initWrongTypeProcMethod;
 
   private static void initWrongType()
   {
@@ -72,19 +73,17 @@ public class CheckedTarget extends StackTarget
         args[1] = Compilation.javaStringType;
         args[2] = Type.int_type;
 	args[3] = Type.pointer_type;
-        makeWrongTypeStringMethod
-          = typeWrongType.addMethod("make", args,
-                                    typeWrongType,
-                                    Access.PUBLIC|Access.STATIC);
+        initWrongTypeStringMethod
+          = typeWrongType.addMethod("<init>", Access.PUBLIC,
+                                    args, Type.void_type);
         args = new Type[4];
         args[0] = typeClassCastException;
         args[1] = Compilation.typeProcedure;
         args[2] = Type.int_type;
 	args[3] = Type.pointer_type;
-        makeWrongTypeProcMethod
-          = typeWrongType.addMethod("make", args,
-                                    typeWrongType,
-                                    Access.PUBLIC|Access.STATIC);
+        initWrongTypeProcMethod
+          = typeWrongType.addMethod("<init>", Access.PUBLIC,
+                                    args, Type.void_type);
       }
   }
 
@@ -174,6 +173,9 @@ public class CheckedTarget extends StackTarget
     int line = comp.getLine();
     if (line > 0)
       code.putLineNumber(line);
+    code.emitNew(typeWrongType);
+    code.emitDupX(); // dup_x1
+    code.emitSwap();
     if (thisIsProc)
       code.emitPushThis();
     else
@@ -182,8 +184,8 @@ public class CheckedTarget extends StackTarget
 			  : procname);
     code.emitPushInt(argno);
     code.emitLoad(argValue);
-    code.emitInvokeStatic(thisIsProc ? makeWrongTypeProcMethod
-                          : makeWrongTypeStringMethod);
+    code.emitInvokeSpecial(thisIsProc ? initWrongTypeProcMethod
+                           : initWrongTypeStringMethod);
     if (tmpScope != null)
       code.popScope();
     code.emitThrow();

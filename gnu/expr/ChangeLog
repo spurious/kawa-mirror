@@ -1,5 +1,8 @@
 2005-12-08  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (print): Use Declaration's printInfo in header listing
+	declarations, like we do for other ScopeExps.
+
 	* CheckedTarget.java (initWrongType, emitCheckedCoerce):
 	Use (new) WrongType constructors directly instead of calling 'make'
 	static 	methods.  This generates slightly bigger bytecode, but it makes

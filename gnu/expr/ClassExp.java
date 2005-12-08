@@ -625,7 +625,7 @@ public class ClassExp extends LambdaExp
       {
 	if (i > 0)
 	  out.print(' ');
-	out.print(decl);
+        decl.printInfo(out);
 	i++;
       }
     out.print(") ");

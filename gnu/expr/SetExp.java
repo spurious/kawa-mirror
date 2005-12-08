@@ -226,7 +226,7 @@ public class SetExp extends AccessExp
 	else if (decl.isSimple ())
 	  {
             type = decl.getType();
-	    new_value.compile (comp, type);
+	    new_value.compile(comp, decl);
 	    if (needValue)
               {
                 code.emitDup(type);  // dup or dup2
@@ -245,7 +245,7 @@ public class SetExp extends AccessExp
 	    ClassExp cl = (ClassExp) decl.context;
 	    Method setter = cl.type.getDeclaredMethod(setName, 1);
 	    cl.loadHeapFrame(comp);
-	    new_value.compile(comp, decl.getType());
+	    new_value.compile(comp, decl);
 	    if (needValue)
 	      {
 		code.emitDupX();
@@ -259,7 +259,7 @@ public class SetExp extends AccessExp
             if (! field.getStaticFlag())
               decl.loadOwningObject(owner, comp);
             type = field.getType();
-	    new_value.compile (comp, type);
+	    new_value.compile(comp, decl);
             if (field.getStaticFlag())
               {
                 if (needValue)

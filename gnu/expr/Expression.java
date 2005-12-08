@@ -137,6 +137,19 @@ public abstract class Expression extends Procedure0 implements Printable
     compile (comp, StackTarget.getInstance(type));
   }
 
+  /** Compile an expression with checking suitable for a known Declaration.
+   * Leaves the result on the stack (i.e. does not assign to the lhs).
+   * It does coerce the value to a suitable type for the lhs, and
+   * throw a hopefully-informative WrongType exception on failure.
+   */
+  public final void compile (Compilation comp, Declaration lhs)
+  {
+    compile (comp,
+             CheckedTarget.getInstance(lhs.getType(),
+                                       lhs.getName(),
+                                       WrongType.ARG_VARNAME));
+  }
+
   /** Compile all but the first sub-"statement".
    * A kludge used for constructor methods, since if the first "statement"
    * is a super-constructor we need to inject initializer expressions. */

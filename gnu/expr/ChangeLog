@@ -1,5 +1,8 @@
 2005-12-08  Per Bothner  <per@bothner.com>
 
+	* Expression.java (compile(Compilation, Declaration)): New method.
+	* SetExp.java (compile): Use new method for more informative eceptions.
+
 	* ClassExp.java (print): Use Declaration's printInfo in header listing
 	declarations, like we do for other ScopeExps.
 

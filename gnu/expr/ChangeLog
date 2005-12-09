@@ -1,5 +1,8 @@
 2005-12-08  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (allocChildClasses): Don't special-case $finit$.
+	(addApplyMethod): Don't select a ClassExp for apply methods.
+
 	* Expression.java (compile(Compilation, Declaration)): New method.
 	* SetExp.java (compile): Use new method for more informative eceptions.
 

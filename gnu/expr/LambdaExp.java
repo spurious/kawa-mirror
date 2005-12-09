@@ -583,7 +583,16 @@ public class LambdaExp extends ScopeExp
 
   final void addApplyMethod (Compilation comp)
   {
-    LambdaExp owner = getOwningLambda();
+    LambdaExp owner = this;
+    // Similar to getOwningLambda(), but we can't add apply methods
+    // to a ClassExp - at least not unless it extends ModuleBody.
+    for (;;)
+      {
+        owner = owner.outerLambda();
+	if (owner instanceof ModuleExp
+	    || owner.heapFrame != null)
+          break;
+      }
     ClassType frameType = owner.getHeapFrameType();
     if (! (frameType.getSuperclass().isSubtype(Compilation.typeModuleBody)))
       owner = comp.getModule();
@@ -1041,8 +1050,6 @@ public class LambdaExp extends ScopeExp
 	      closureEnvType = null;
 	    else if (this instanceof ClassExp)
 	      closureEnvType = getCompiledClassType(comp);
-	    else if ("$finit$".equals(getName()))
-	      closureEnvType = outerLambda().getCompiledClassType(comp);
             else
               {
                 LambdaExp owner = this;

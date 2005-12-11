@@ -16,9 +16,20 @@ public class StableVector extends GapVector
    * headed by the 'free' variable.  */
   protected int[] positions;
 
-  /** The index of the first free element in positions, or -1 if none.
-   * If free == -2, there is is no free element chain, but free elements
-   * have the value FREE_POSITION. */
+  /** The head of the free elements in position, if they are chained.
+   * We need track of available elements in the positions array in two ways:
+   * In unchained mode, there is no free list per se.  Instead an index i
+   * is available if positions[i]==FREE_POSITION.  This modemakes it
+   * easy to loop over all positions, ignores the unused ones.
+   * In chained mode, there is a free list and if index i is available,
+   * then positions[i] is the next available index, with -1 if there is none.
+   * Unchained mode is indicated by free==-2.
+   * In chained mode, free is the first element in te free list,
+   * or -1 if the free list is empty.
+   * The main virtue of this convention is that we don't need a separate
+   * list or array for the free list.  But we should get rid of the
+   * unchained mode, at least.  FIXME.
+   */
   protected int free;
 
   /** An invalid value for an in-use element of positions. */
@@ -28,18 +39,18 @@ public class StableVector extends GapVector
   protected void chainFreelist()
   {
     free = -1;
-    for (int i = positions.length;  --i >= END_POSITION; )
+    for (int i = positions.length;  --i > END_POSITION; )
       {
 	int pos = positions[i];
 	if (pos == FREE_POSITION)
 	  {
-	    positions[i] = pos;
+	    positions[i] = free;
 	    free = i;
 	  }
       }
   }
 
-  /** At all free elements in positions to FREE_POSITION. */
+  /** Set all free elements in positions to FREE_POSITION. */
   protected void unchainFreelist()
   {
     for (int i = free;  i >= 0; )
@@ -268,6 +279,8 @@ public class StableVector extends GapVector
     // adjust positions in gap
     int low = gapStart;
     int high = gapEnd;
+    if (free >= 0)
+      unchainFreelist();
     for (int i = positions.length;  --i >= START_POSITION; )
       {
 	int pos = positions[i];

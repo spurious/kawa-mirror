@@ -141,19 +141,9 @@ public class CharBuffer extends StableVector implements CharSeq
 
   public String toString()
   {
-    char[] array = string.data;
-    int alen = array.length;
-    if (gapStart == 0)
-      return new String(array, gapEnd, alen - gapEnd);
-    else if (gapEnd == alen)
-      return new String(array, 0, gapStart);
-    else
-      {
-	StringBuffer sbuf = new StringBuffer(length());
-	sbuf.append(array, 0, gapStart);
-	sbuf.append(array, gapEnd, alen - gapEnd);
-	return sbuf.toString();
-      }
+    int len = size();
+    int start = getSegment(0, len);
+    return new String(getArray(), start, len);
   }
 
   /* #ifdef JAVA5 */
@@ -198,5 +188,24 @@ public class CharBuffer extends StableVector implements CharSeq
     char[] array = string.data;
     dest.write(array, 0, gapStart);
     dest.write(array, gapEnd, array.length - gapEnd);
+  }
+
+  public void dump()
+  {
+    System.err.println("Buffer Content dump.  size:"+size()+"  buffer:"+getArray().length);
+    System.err.print("before gap: \"");
+    System.err.print(new String(getArray(), 0, gapStart));
+    System.err.println("\" (gapStart:"+gapStart+" gapEnd:"+gapEnd+')');
+    System.err.print("after gap: \"");
+    System.err.print(new String(getArray(), gapEnd, getArray().length-gapEnd));
+    System.err.println("\"");
+    int poslen = positions == null ? 0 : positions.length;
+    System.err.println("Positions (size: "+poslen+" free:"+free+"):");
+    for (int i = 0;  i < poslen;  i++)
+      {
+	int pos = positions[i];
+	if (free == -2 ? pos != FREE_POSITION : pos != 0)
+	  System.err.println("position#"+i+": "+(pos>>1)+" isAfter:"+(pos&1));
+      }
   }
 }

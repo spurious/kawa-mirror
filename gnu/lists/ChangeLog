@@ -1,3 +1,14 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* GapVector.java (getSegment): New method, based on old getChars
+	method in gnu.jemacs.swing.BufferContent.
+	(removePosRange): Fix thinko in calculating where to shiftGap.
+	* StableVector.java (chainFreelist): Fix two thinkos.
+	(removePosRange): We have to unchainFreelist before we can
+	loop over the positions.
+	* CharBuffer.java (toString): Use new getSegment method.
+	(dump): Moved from gnu.jemacs.swing.BufferContent.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java (beginGroup): Emit a space after the typename.

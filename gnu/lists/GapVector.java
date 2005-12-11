@@ -111,6 +111,39 @@ public class GapVector extends AbstractSequence implements Sequence
       shiftGap(where);
   }
 
+  /** If needed, move the gap so the given segment is contiguous.
+   * @return the offset in the base array containing the segment,
+   * or -1 if the parameters are bad.
+   */
+   
+  public int getSegment (int where, int len)
+  {
+    int length = size();
+    if (where < 0 || where > length)
+      return -1;
+    if (len < 0)
+      len = 0;
+    else if (where + len > length)
+      len = length - where;
+    // if (len < 0 || where + len > length)
+    //   return -1;
+    if (where + len <= gapStart)
+      return where;
+    if (where >= gapStart)
+      return where + (gapEnd - gapStart);
+    // Shift the gap depending in which direction needs least copying.
+    if (gapStart - where > (len >> 1))
+      {
+	shiftGap(where + len);
+	return where;
+      }
+    else
+      {
+	shiftGap(where);
+	return where + (gapEnd - gapStart);
+      }
+  }
+
   protected int addPos (int ipos, Object value)
   {
     int index = ipos >>> 1;
@@ -132,7 +165,7 @@ public class GapVector extends AbstractSequence implements Sequence
     ipos0 >>>= 1;
     ipos1 >>>= 1;
     if (ipos0 > gapEnd)
-      shiftGap(ipos0);
+      shiftGap(ipos0-gapEnd+gapStart);
     else if (ipos1 < gapStart)
       shiftGap(ipos1);
     if (ipos0 < gapStart)

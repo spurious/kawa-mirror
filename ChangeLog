@@ -1,5 +1,12 @@
 2005-12-10  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/load.java (apply): Add extra argument.
+	Skip that many lines.
+	(apply2): Update to match.
+	* kawa/Shell.java (runFile): Also add extra skipLines argument.
+	* kawa/repl.java: Update runFile callers.
+	(processArgs): Handle new --script and --scriptN options.
+
 	* kawa/standard/load.java (apply): Remove some hacks to map "class name"
 	to filename, and special .scm handling.
 	In return, we now allow general URLs in addition to filename.

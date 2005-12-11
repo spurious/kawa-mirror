@@ -288,15 +288,20 @@ public class Shell
 	OutPort.errDefault());
   }
 
-  public static void runFile (String fname)
+  public static void runFile (String fname, int skipLines)
   {
     Environment env = Environment.getCurrent();
     try
       {
 	if (fname.equals ("-"))
-	  kawa.standard.load.loadSource(InPort.inDefault(), env);
+          {
+            InPort in = InPort.inDefault();
+            while (--skipLines >= 0)
+              in.skipRestOfLine();
+            kawa.standard.load.loadSource(in, env);
+          }
 	else
-	  kawa.standard.load.apply(fname, env, false);
+	  kawa.standard.load.apply(fname, env, false, skipLines);
       }
     catch (gnu.text.SyntaxException e)
       {

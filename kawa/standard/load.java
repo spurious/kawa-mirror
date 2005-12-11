@@ -154,7 +154,7 @@ public class load extends Procedure1 {
     try
       {
 	Environment env = (Environment) arg2;
-	apply (name, env, relative);
+	apply (name, env, relative, 0);
 	return Values.empty;
       }
     catch (java.io.FileNotFoundException e)
@@ -169,7 +169,7 @@ public class load extends Procedure1 {
   }
 
   public static final void apply (String name, Environment env,
-				  boolean relative)
+				  boolean relative, int skipLines)
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
@@ -230,6 +230,8 @@ public class load extends Procedure1 {
           }
         fs.reset();
         InPort src = InPort.openFile(fs, name);
+        while (--skipLines >= 0)
+          src.skipRestOfLine();
         loadSource (src, env);
         src.close();
         return;

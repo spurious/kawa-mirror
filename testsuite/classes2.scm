@@ -35,3 +35,17 @@
 
 ;; Test for Savannah bug #15151
 (define (getClassTest o) (slot-ref o 'class))
+
+(define (classes2-capture-test-a x)
+  (let ((obj
+	 (object ()
+		 (action (list x (lambda (e) (- yy 10)))))))
+    (slot-ref obj 'action)))
+
+(define (classes2-capture-test-b x)
+  (let ((obj
+	 (object ()
+		 (y)
+		 (action (lambda (e) (+ yy 10))))))
+    (slot-ref obj 'action)))
+

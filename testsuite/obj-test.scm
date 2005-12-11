@@ -1,4 +1,4 @@
-(test-init "Objects" 114)
+(test-init "Objects" 116)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -279,6 +279,11 @@
 (test '(56 11 21) 'test-capture-1 ((car (invoke test-capture-1 'ff 99)) 21))
 (define test-capture-2 (make <TestCapture2>))
 (test '(56 22) 'test-capture-2 ((car (invoke test-capture-2 'ff 99)) 22))
+
+(test 46 'classes2-capture-test-a
+      ((cadr (classes2-capture-test-a 100)) 'a))
+(test 66 'classes2-capture-test-a
+      ((classes2-capture-test-b 100) 'b))
 
 (require <MyFunc>)
 (test '(1 2 3) my-func-1 2 3)

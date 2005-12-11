@@ -189,13 +189,6 @@ public class load extends Procedure1 {
 	    loadCompiled (name, env);
 	    return;
 	  }
-        /*
-	if (name.endsWith (".scm"))
-	  {
-	    loadSource (name, env);
-	    return;
-	  }
-        */
 	char file_separator = System.getProperty ("file.separator").charAt(0);
 
 	if (name.endsWith (".class"))

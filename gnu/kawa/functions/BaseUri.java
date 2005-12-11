@@ -32,39 +32,11 @@ public class BaseUri extends Procedure0or1
     return baseUri == null ? Values.empty : (Object) baseUri;
   }
 
-  /** Tests if a URL has a scheme.
-   * For convenience, we treat a 1-character "scheme" as an
-   * MS-DOS-style "drive letter" - i.e. not a scheme. */
-  public static boolean hasScheme (String name)
-  {
-    return uriSchemeLength(name) > 1;
-  }
-
-  /** Helper routine to get the scheme part of a URI.
-   * The scheme part is "http:" or "file:" or "ftp:" most commonly.
-   * This functions searches for the first ':' that doesn't follow a '/'.
-   * @return The length of the scheme component, not counting the colon,
-   * (or alternatively the index of the colon,), or -1 if the is no scheme.
-   */
-  public static int uriSchemeLength (String uri)
-  {
-    int len = uri.length();
-    for (int i = 0;  i < len;  i++)
-      {
-	char ch = uri.charAt(i);
-	if (ch == ':')
-	  return i;
-	if (ch == '/')
-	  return -1;
-      }
-    return -1;
-  }
-
   /** Resolve a URI against a base URI.
    * This does not collapse redundant '..' and '.'; perhaps it should. */
   public static String resolve (String uri, String base)
   {
-    if (hasScheme(uri) || base == null)
+    if (InPort.uriSchemeSpecified(uri) || base == null)
       return uri;
     char fileSep = System.getProperty ("file.separator").charAt(0);
     int lastSl = base.lastIndexOf('/');
@@ -86,7 +58,7 @@ public class BaseUri extends Procedure0or1
       {
 	// Uri is an absolute file name, but doesn't have a uri scheme.
 	int baseLen = base.length();
-	int pathStart = BaseUri.uriSchemeLength(base);
+	int pathStart = InPort.uriSchemeLength(base);
 	if (pathStart <= 1)
 	  return uri;
 	pathStart++;

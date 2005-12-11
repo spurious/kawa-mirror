@@ -102,37 +102,6 @@ public class load extends Procedure1 {
       }
   }
 
-  private static void loadSource (String name, Environment env)
-    throws SyntaxException
-  {
-    try
-      {
-	InPort fstream;
-	if (BaseUri.hasScheme(name))
-	  {
-	    URL url = new URL(name);
-	    InputStream in = url.openConnection().getInputStream();
-	    fstream = InPort.openFile(new BufferedInputStream(in), name);
-	  }
-	else
-	  fstream = InPort.openFile(name);
-	loadSource (fstream, env);
-	fstream.close();
-      }
-    catch (java.io.FileNotFoundException e)
-      {
-	throw new RuntimeException ("load: file not found: " + name);
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new RuntimeException("failed to close \""+name+"\" after loading");
-      }
-    catch (Throwable ex)
-      {
-	throw new WrappedException(ex);
-      }
-  }
-
   public final static void loadSource (InPort port, Environment env)
     throws SyntaxException, Throwable
   {
@@ -207,11 +176,11 @@ public class load extends Procedure1 {
     String savedBaseUri = ctx.getBaseUri();
     try
       {
+        boolean isUri = InPort.uriSchemeSpecified(name);
         // Resolve a relative URI.  However, if the base uri matches the
         // default base uri (i.e. the current directory) just leave it as
         // a filename, rather than coercing it to a URI.
-        if (! BaseUri.hasScheme(name)
-            && relative
+        if (! isUri && relative
             && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
           name = BaseUri.resolve(name, savedBaseUri);
 	ctx.setBaseUri(name);
@@ -220,11 +189,13 @@ public class load extends Procedure1 {
 	    loadCompiled (name, env);
 	    return;
 	  }
+        /*
 	if (name.endsWith (".scm"))
 	  {
 	    loadSource (name, env);
 	    return;
 	  }
+        */
 	char file_separator = System.getProperty ("file.separator").charAt(0);
 
 	if (name.endsWith (".class"))
@@ -236,73 +207,39 @@ public class load extends Procedure1 {
 	    loadClassFile (name, env);
 	    return;
 	  }
-	File file = new File (name);
-	if (file.exists ())
-	  {
-	    InputStream fs = new BufferedInputStream (new FileInputStream (name));
-	    fs.mark(5);
-	    int char0 = fs.read ();
-	    if (char0 == -1)
-	      return; // Sequence.eofValue;
-	    if (char0 == 'P')
-	      {
-		int char1 = fs.read ();
-		if (char1 == 'K')
-		  {
-		    int char2 = fs.read ();
-		    if (char2 == '\003')
-		      {
-			int char3 = fs.read ();
-			if (char3 == '\004')
-			  {
-			    fs.close ();
-			    loadCompiled (name, env);
-			    return;
-			  }
-		      }
-		  }
-	      }
-	    fs.reset();
-	    InPort src = InPort.openFile(fs, name);
-	    loadSource (src, env);
-	    src.close();
-	    return;
-	  }
-	else
-	  {
-	    String fname = name.replace ('.', file_separator);
-	    String xname = fname + ".zip";
-	    file = new File (xname);
-	    if (file.exists ())
-	      {
-		loadCompiled (xname, env);
-		return;
-	      }
-	    xname = fname + ".jar";
-	    file = new File (xname);
-	    if (file.exists ())
-	      {
-		loadCompiled (xname, env);
-		return;
-	      }
-
-	    xname = fname + ".class";
-	    file = new File (xname);
-	    if (file.exists ())
-	      {
-		loadClassFile (name, env);
-		return;
-	      }
-
-	    xname = fname + ".scm";
-	    file = new File (xname);
-	    if (file.exists ())
-	      {
-		loadSource (xname, env);
-		return;
-	      }
-	  }
-	throw new java.io.FileNotFoundException(name);
+        InputStream fs;
+        if (isUri)
+          fs = new URL(name).openConnection().getInputStream();
+        else
+          fs = new FileInputStream(name);
+        fs = new BufferedInputStream(fs);
+        fs.mark(5);
+        int char0 = fs.read ();
+        if (char0 == -1)
+          return; // Sequence.eofValue;
+        if (char0 == 'P')
+          {
+            int char1 = fs.read ();
+            if (char1 == 'K')
+              {
+                int char2 = fs.read ();
+                if (char2 == '\003')
+                  {
+                    int char3 = fs.read ();
+                    if (char3 == '\004')
+                      {
+                        fs.close ();
+                        loadCompiled (name, env);
+                        return;
+                      }
+                  }
+              }
+          }
+        fs.reset();
+        InPort src = InPort.openFile(fs, name);
+        loadSource (src, env);
+        src.close();
+        return;
       }
     finally
       {

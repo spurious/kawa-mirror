@@ -1,3 +1,10 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (apply): Remove some hacks to map "class name"
+	to filename, and special .scm handling.
+	In return, we now allow general URLs in addition to filename.
+	(loadSource(String,Environment)): Remove static method.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (createReadTable): Use '\\' for

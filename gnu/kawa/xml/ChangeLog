@@ -1,3 +1,8 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* Document.java (makeURL): Update because BaseUri.hasScheme
+	was moved and renamed to InPort.uriSchemeSpecified.
+
 2005-11-14  thomas kirk  <tk@research.att.com>
 
 	* HttpPrinter.java (endDocument): cclose OutPort.

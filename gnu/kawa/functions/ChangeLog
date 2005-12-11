@@ -1,3 +1,9 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java (uriSchemeLength): Moved to InPort.java.
+	(hasScheme): Moved to InPort.java and renamed to uriSchemeSpecified.
+	(resolve): Update accordingly.
+
 2005-12-04  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java: New class.

@@ -22,7 +22,7 @@ public class Document extends Procedure1
     if (url instanceof URL)
       return (URL) url;
     String name = url.toString();
-    if (! BaseUri.hasScheme(name))
+    if (! InPort.uriSchemeSpecified(name))
       {
 	if (base != null)
 	  {
@@ -31,7 +31,7 @@ public class Document extends Procedure1
 			   b == Values.empty ?  base.toString()
 			   : b.toString());
 	  }
-	if (! BaseUri.hasScheme(name))
+	if (! InPort.uriSchemeSpecified(name))
 	  {
 	    name = BaseUri.resolve(name, BaseUri.baseUri().toString());
 	  }

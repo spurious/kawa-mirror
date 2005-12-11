@@ -1,3 +1,9 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* InPort.java (uriSchemeLength): Moved from BaseUri.java.
+	(uriSchemeSpecified): Moved hasScheme from BaseUri.java and renamed.
+	(openFile): Open using URLConnection if uriSchemeSpecified.
+
 2005-12-08  Per Bothner  <per@bothner.com>
 
 	* WrongType.java: New constructors for use by CheckedTarget.

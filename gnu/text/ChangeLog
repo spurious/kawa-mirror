@@ -1,3 +1,7 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (skipRestOfLine): New method.
+
 2005-09-07  Per Bothner  <per@bothner.com>
 
 	* SourceError.java (totring): Check that line is non-zero.

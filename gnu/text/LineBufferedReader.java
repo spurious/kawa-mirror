@@ -605,6 +605,27 @@ public class LineBufferedReader extends FilterReader
     return count;
   }
 
+  /** Skips the rest of the current line, including the line terminator. */
+  public void skipRestOfLine ()
+       throws java.io.IOException
+  {
+    for (;;)
+      {
+        int c = read();
+        if (c < 0)
+          return;
+        if (c == '\r')
+          {
+            c = read();
+            if (c >= 0 && c != '\n')
+              unread();
+            break;
+          }
+        else if (c == '\n')
+          break;
+      }
+  }
+
   /* Move one character backwards. */
   public void unread ()
        throws java.io.IOException

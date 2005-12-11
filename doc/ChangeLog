@@ -1,3 +1,7 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Options, Scipts): Document new --script option.
+
 2005-11-29  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Module classes): Document provide macro.

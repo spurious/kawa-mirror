@@ -595,6 +595,19 @@ The global variable @samp{command-line-arguments} is set to the remaining
 arguments (if any), and an interactive read-eval-print loop is started.
 This uses the same "console" as where you started up Kawa;
 use @samp{-w} to get a new window.
+@item --script @var{filename-or-url}
+@itemx --script@var{N} @var{filename-or-url}
+The global variable @samp{command-line-arguments} is set to the remaining
+arguments (if any).
+Kawa reads and evaluates expressions from the file named
+by @var{filename-or-url}.
+If @code{script} is followed by an integer @var{N},
+then @var{N} lines are skipped first.
+
+Skipping some initial lines is useful if you want to have a non-Kawa
+preamble before the actual Kawa code.
+One use for this is for Kawa shell scripts (@pxref{Scripts}).
+
 @item -w
 Creates a new top-level window, and runs an interactive read-eval-print
 in the new window.  See @ref{New-Window}.
@@ -784,7 +797,7 @@ Here is an example:
 @end example
 
 If this file has the execute permission set and is in your @code{PATH},
-then you can execute it just my naming it on command line.  The
+then you can execute it just by naming it on command line.  The
 system kernel will automatically execute @code{kawa}, passing it the
 filename as an argument.
 
@@ -801,6 +814,29 @@ most modern Unix-like systems:
 #!/usr/bin/env kawa
 (format #t "The time is ~s~%" (make <java.util.Date>))
 @end example
+
+If you need to specify extra arguments to @code{kawa},
+you can use the following trick:
+@example
+#!/bin/sh
+exec kawa --commonlisp out:base=16 --script2 "$0" "$@@"
+(setq xx 20) (display xx) (newline)
+@end example
+This causes the shell to invoke the @code{kawa} program.
+This assumes @code{kawa} is in the command path;
+if not replace @code{kawa} by the appropriate incantation,
+which can be multiple words (for example @code{java kawa.repl}).
+The @code{exec} tells the shell to @emph{replace} itself by @var{kawa};
+this is important so the shell doesn't continue with this file
+when done with @code{kawa}.
+The rest of the line can contain whatever commands and options you
+want when executing Kawa.  The important part is @code{--script2 "$0"}.
+The shell replaces the @code{"$0"} by the name the script, and
+replaces the @code{"$@@"} by the remaining arguments passed to the script.
+So what Kawa sees is the @code{--script2} option followed the script name,
+followed by remaining command-line arguments.
+The @code{--script2} tells Kawa to execute the script, after ignoring
+the initial two lines, which would confuse it terribly.
 
 @node New-Window, Exiting, Scripts, Running
 @section Running a Command Interpreter in a new Window

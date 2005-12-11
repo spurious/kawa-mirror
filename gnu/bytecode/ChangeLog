@@ -1,3 +1,8 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* ArrayClassLoader.java (context): New field.
+	(getResourceContext, setResourceContext, findResource): New methods.
+
 2005-11-23  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getOuterLinkType): New method.

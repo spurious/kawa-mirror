@@ -1,5 +1,7 @@
 package gnu.bytecode;
 import java.util.Hashtable;
+import java.net.URL;
+import java.net.URLConnection;
 
 /** Load classes from a set of byte arrays.
  * @author	Per Bothner
@@ -9,9 +11,18 @@ public class ArrayClassLoader extends ClassLoader
 {
   Hashtable map = new Hashtable(100);
 
+  /** If non-null, context to use for finding resources. */
+  URL context;
+
   public ArrayClassLoader ()
   {
   }
+
+  /** Get base URL to use for finding resources, or null if none is set. */
+  public URL getResourceContext () { return context; }
+
+  /** Set base URL to use for finding resources. */
+  public void setResourceContext (URL context) { this.context = context; }
 
   /** Load classes from the given byte arrays.
     By convention, the classes we manage are named "lambda"+<INTEGER>. */
@@ -44,6 +55,24 @@ public class ArrayClassLoader extends ClassLoader
       addClass(ctype. getReflectClass());
     else
       addClass(ctype.getName(), ctype.writeToArray());
+  }
+
+  protected URL findResource(String name)
+  {
+    if (context != null)
+      {
+        try
+          {
+            URL url = new URL(context, name);
+            url.openConnection().connect();
+            return url;
+          }
+        catch (Throwable ex)
+          {
+            // Fall through ...
+          }
+      }
+    return super.findResource(name);
   }
 
   public Class loadClass (String name, boolean resolve)

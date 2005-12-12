@@ -856,7 +856,7 @@ public abstract class Language
     try
       {
 	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
-	ModuleExp.evalModule(getEnvironment(), ctx, comp);
+	ModuleExp.evalModule(getEnvironment(), ctx, comp, null);
       }
     finally
       {

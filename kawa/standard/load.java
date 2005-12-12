@@ -102,7 +102,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static void loadSource (InPort port, Environment env)
+  public final static void loadSource (InPort port, Environment env, URL url)
     throws SyntaxException, Throwable
   {
     boolean print = ModuleBody.getMainPrintValues();
@@ -115,7 +115,7 @@ public class load extends Procedure1 {
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run(language, env, port, out, OutPort.errDefault());
+	kawa.Shell.run(language, env, port, out, OutPort.errDefault(), url);
       }
     else
       {
@@ -130,7 +130,7 @@ public class load extends Procedure1 {
 	  {
 	    ctx.consumer = out;
 	    ctx.values = Values.noArgs;
-	    ModuleExp.evalModule(env, ctx, comp);
+	    ModuleExp.evalModule(env, ctx, comp, url);
 	    if (messages.seenErrors())
 	      throw new SyntaxException(messages);
 	  }
@@ -180,15 +180,23 @@ public class load extends Procedure1 {
         // Resolve a relative URI.  However, if the base uri matches the
         // default base uri (i.e. the current directory) just leave it as
         // a filename, rather than coercing it to a URI.
-        if (! isUri && relative
-            && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
-          name = BaseUri.resolve(name, savedBaseUri);
+        String resolved = name;
+        if (! isUri)
+          {
+            String base = savedBaseUri;
+            if (! InPort.uriSchemeSpecified(base))
+              base = BaseUri.resolve(base, ctx.getBaseUriDefault());
+            resolved = BaseUri.resolve(name, base);
+            if (relative && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
+              name = resolved;
+          }
 	ctx.setBaseUri(name);
 	if (name.endsWith (".zip") || name.endsWith(".jar"))
 	  {
 	    loadCompiled (name, env);
 	    return;
 	  }
+        URL url = new URL(resolved);
 	char file_separator = System.getProperty ("file.separator").charAt(0);
 
 	if (name.endsWith (".class"))
@@ -202,7 +210,7 @@ public class load extends Procedure1 {
 	  }
         InputStream fs;
         if (isUri)
-          fs = new URL(name).openConnection().getInputStream();
+          fs = url.openConnection().getInputStream();
         else
           fs = new FileInputStream(name);
         fs = new BufferedInputStream(fs);
@@ -232,7 +240,7 @@ public class load extends Procedure1 {
         InPort src = InPort.openFile(fs, name);
         while (--skipLines >= 0)
           src.skipRestOfLine();
-        loadSource (src, env);
+        loadSource (src, env, url);
         src.close();
         return;
       }

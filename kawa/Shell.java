@@ -156,7 +156,7 @@ public class Shell
 	  ((TtyInPort)inp).setPrompter(prompter);
       }
 
-    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault());
+    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault(), null);
   }
 
   public static void run (Language language,  Environment env,
@@ -169,7 +169,7 @@ public class Shell
     out = getOutputConsumer(pout);
     try
       {
-	run(language, env, inp, out, perr);
+	run(language, env, inp, out, perr, null);
       }
     finally
       {
@@ -179,7 +179,8 @@ public class Shell
   }
 
   public static void run (Language language,  Environment env,
-			  InPort inp, Consumer out, OutPort perr)
+			  InPort inp, Consumer out, OutPort perr,
+                          java.net.URL url)
   {
     SourceMessages messages = new SourceMessages();
     Language saveLanguage = Language.getDefaultLanguage();
@@ -226,7 +227,7 @@ public class Shell
 		      }
 		  }
 
-		ModuleExp.evalModule(env, ctx, comp);
+		ModuleExp.evalModule(env, ctx, comp, url);
 		if (messages.checkErrors(perr, 20))
 		  continue;
 		ctx.runUntilDone();
@@ -285,7 +286,7 @@ public class Shell
   {
     run(language, env, new CharArrayInPort(str),
 	ModuleBody.getMainPrintValues() ? OutPort.outDefault() : null,
-	OutPort.errDefault());
+	OutPort.errDefault(), null);
   }
 
   public static void runFile (String fname, int skipLines)
@@ -298,7 +299,7 @@ public class Shell
             InPort in = InPort.inDefault();
             while (--skipLines >= 0)
               in.skipRestOfLine();
-            kawa.standard.load.loadSource(in, env);
+            kawa.standard.load.loadSource(in, env, null);
           }
 	else
 	  kawa.standard.load.apply(fname, env, false, skipLines);

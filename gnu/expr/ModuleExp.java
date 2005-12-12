@@ -5,6 +5,7 @@ import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
 import java.io.*;
 import gnu.kawa.reflect.StaticFieldLocation;
+import java.net.URL;
 
 /**
  * Class used to implement Scheme top-level environments.
@@ -49,13 +50,15 @@ public class ModuleExp extends LambdaExp
   ///** A cache if this has already been evaluated. */
   //Procedure thisValue;
 
-  public static Class evalToClass (Compilation comp)
+  public static Class evalToClass (Compilation comp, URL url)
   {
     ModuleExp mexp = comp.getModule();
     SourceMessages messages = comp.getMessages();
     try
       {
 	ArrayClassLoader loader = new ArrayClassLoader ();
+        if (url != null)
+          loader.setResourceContext(url);
 	comp.loader = loader;
 
 	comp.compile(mexp);
@@ -133,7 +136,9 @@ public class ModuleExp extends LambdaExp
   /** Flag to force compilation, even when not required. */
   public static boolean alwaysCompile = false;
 
-  public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
+  public final static void evalModule (Environment env, CallContext ctx,
+                                       Compilation comp, URL url)
+    throws Throwable
   {
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
@@ -159,7 +164,7 @@ public class ModuleExp extends LambdaExp
 	  {
 	    try
 	      {
-		Class clas = evalToClass(comp);
+		Class clas = evalToClass(comp, url);
 		if (clas == null)
 		  return;
                 Object inst;

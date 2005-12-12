@@ -1,3 +1,7 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (evalToFocusProc): Update evalModule call.
+
 2005-11-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse):  Set class name from module namespace.

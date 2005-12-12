@@ -382,7 +382,7 @@ public class XQuery extends Language
     int oldIndex = ctx.startFromContext();
     try
       {
-	ModuleExp.evalModule(Environment.getCurrent(), ctx, comp);
+	ModuleExp.evalModule(Environment.getCurrent(), ctx, comp, null);
 	return (Procedure) ctx.getFromContext(oldIndex);
       }
     catch (Throwable ex)

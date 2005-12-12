@@ -615,7 +615,7 @@ public class TestMisc
 	ctx.consumer = interp.getOutputConsumer(out);
 	ModuleExp mod = comp.getModule();
 	mod.setName("atInteractiveLevel");  // FIXME
-	ModuleExp.evalModule(env, ctx, comp);
+	ModuleExp.evalModule(env, ctx, comp, null);
       }
     finally
       {

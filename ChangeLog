@@ -1,5 +1,13 @@
 2005-12-11  Per Bothner  <per@bothner.com>
 
+	Remember URL of loaded file, so it can be passed to ArrayClassLoader.
+	* kawa/Shell.java (run): Take extra URL argument.
+	(runFile): Handle skipLines even if read from stdin.
+	* kawa/repl.java (processArgs): Update evalModule call.
+	* kawa/lang/Eval.java (evalBody): Likewise.
+	* kawa/standard/load.java (loadSource): New URL parameter.
+	(apply): Get URL and pass it to loadSource.
+
 	* kawa/lang/Lambda.java (rewriteBody): Temporarily set curLambda.
 	* kawa/standard/object.java (rewriteInit): Set line of initializing
 	SetExp to that of Declaration - rather than current Translator position.

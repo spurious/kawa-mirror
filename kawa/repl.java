@@ -346,7 +346,7 @@ public class repl extends Procedure0or1
 		// FIXME adjust line number
 		setArgs(args, iArg+1);
 		checkInitFile();
-		kawa.standard.load.loadSource(freader, Environment.user());
+		kawa.standard.load.loadSource(freader, Environment.user(), null);
 		return -1;
 	      }
 	    catch (gnu.text.SyntaxException ex)

@@ -1,3 +1,7 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (eval): Update evalModule call.
+
 2005-11-14  thomas kirk  <tk@research.att.com>
 
 	* TestMisc.java (toString, eval): Close CharArrayOutPort.

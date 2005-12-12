@@ -98,7 +98,7 @@ public class Eval extends Procedure1or2
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());
 	mod.setName (evalFunctionName);
-	ModuleExp.evalModule(env, ctx, tr);
+	ModuleExp.evalModule(env, ctx, tr, null);
 	if (messages.seenErrors())
 	  throw new RuntimeException("invalid syntax in eval form:\n"
 				     + messages.toString(20));

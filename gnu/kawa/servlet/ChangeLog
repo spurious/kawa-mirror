@@ -1,3 +1,8 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Better error catching.
+	Update evalToClass call to also pass in URL.
+
 2005-11-16  Per Bothner  <per@bothner.com>
 
 	* ReplSession.java (println): It suffices to just write a newline.

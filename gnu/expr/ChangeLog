@@ -1,5 +1,9 @@
 2005-12-11  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass, evalModule): Extra URL parameter.
+	(evalToClass): If url passed-in, set class-loader's resource context.
+	* Language.java (eval): Update call to evalModule.
+
 	* Declaration.java (makeField): Only make fields final for ModuleExp
 	and ClassExp - not for captured local variables and parameters.
 

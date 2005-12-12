@@ -110,7 +110,7 @@ implements java.awt.event.FocusListener,
     if (caret == null)
       return;
     int point = caret.getDot();
-    int index = ((SwingBuffer) buffer).content.createPos(point, true);
+    int index = ((SwingBuffer) buffer).content.buffer.createPos(point, true);
     buffer.pointMarker.ipos = index;
     ((SwingBuffer) buffer).curPosition = null;
     jtextpane.getCaret().removeChangeListener(this);
@@ -164,7 +164,7 @@ implements java.awt.event.FocusListener,
     // Change buffer's pointMarker so it follows this EWindow's Caret.
     ((SwingBuffer) buffer).curPosition = caret;
     if (! buffer.pointMarker.isPoint())
-      ((SwingBuffer) buffer).content.releasePos(buffer.pointMarker.ipos);
+      ((SwingBuffer) buffer).content.buffer.releasePos(buffer.pointMarker.ipos);
     buffer.pointMarker.sequence = null;
     caret.addChangeListener(this);
   }

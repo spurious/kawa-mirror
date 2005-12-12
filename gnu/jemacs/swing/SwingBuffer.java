@@ -252,32 +252,32 @@ public class SwingBuffer extends Buffer
 
   public CharSeq getStringContent ()
   {
-    return content;
+    return content.buffer;
   }
 
   public int createPos(int index, boolean isAfter)
   {
-    return content.createPos(index, isAfter);
+    return content.buffer.createPos(index, isAfter);
   }
 
   public Object get (int index)
   {
-    return content.get(index);
+    return content.buffer.get(index);
   }
 
   public int size ()
   {
-    return content.size();
+    return content.buffer.size();
   }
 
   public int nextIndex(int ipos)
   {
-    return content.nextIndex(ipos);
+    return content.buffer.nextIndex(ipos);
   }
 
   public long savePointMark ()
   {
-    int pointPosition = content.createPos(getDot(), false);
+    int pointPosition = content.buffer.createPos(getDot(), false);
     int markPosition = 0;  // FIXME
     return ((long) markPosition) << 32 | ((long) pointPosition & 0xffffffffl);
   }
@@ -286,8 +286,8 @@ public class SwingBuffer extends Buffer
   {
     int pointPosition = (int) pointMark;
     int markPosition = (int) (pointMark >> 32);
-    setDot(content.nextIndex(pointPosition));
-    content.releasePos(pointPosition);
+    setDot(content.buffer.nextIndex(pointPosition));
+    content.buffer.releasePos(pointPosition);
     // Restore mark - FIXME
     // content.releasePosition(markPosition);
   }

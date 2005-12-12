@@ -1,3 +1,13 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java: Most of the functionality has now been moved
+	to gnu.kawa.swingviews.SwingContent, which we now extend.
+	* BufferReader.java: Now mostly Swing-independent.
+	* MarkerReader: Likewise.
+	* SwingBuffer.java: Various updates now that BufferContent doesn't
+	extend CharBuffer.
+	* SwingWindow.java: Likewise.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS and ENABLE_SWING.

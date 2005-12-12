@@ -3,19 +3,20 @@ import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import java.io.*;
 import gnu.jemacs.swing.SwingBuffer;  // FIXME
+import gnu.lists.CharBuffer;
 
 public class BufferReader extends InPort
 {
-  BufferContent content;
+  CharBuffer content;
   int rangeStart;
   int rangeLength;
 
   public BufferReader(Buffer buffer, int start, int count)
   {
-    this(((SwingBuffer) buffer).content, buffer.getName(), start, count);
+    this(((SwingBuffer) buffer).content.buffer, buffer.getName(), start, count);
   }
 
-  public BufferReader(BufferContent content, String name, int start, int count)
+  public BufferReader(CharBuffer content, String name, int start, int count)
   {
     super(gnu.text.NullReader.nullReader, name);
     this.content = content;

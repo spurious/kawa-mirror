@@ -2,11 +2,12 @@ package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import java.io.*;
+import gnu.lists.CharBuffer;
 
 public class MarkerReader extends InPort
 {
   Marker marker;
-  BufferContent content;
+  CharBuffer content;
 
   public MarkerReader(Buffer buffer)
   {
@@ -22,7 +23,7 @@ public class MarkerReader extends InPort
   {
     super(gnu.text.NullReader.nullReader, buffer.getName());
     this.marker = marker;
-    content = ((gnu.jemacs.swing.SwingBuffer) buffer).content;
+    content = ((gnu.jemacs.swing.SwingBuffer) buffer).content.buffer;
     this.buffer = content.getArray();
   }
 

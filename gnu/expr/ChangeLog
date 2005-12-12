@@ -1,3 +1,8 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Only make fields final for ModuleExp
+	and ClassExp - not for captured local variables and parameters.
+
 2005-12-08  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocChildClasses): Don't special-case $finit$.

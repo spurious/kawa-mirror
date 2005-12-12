@@ -753,7 +753,8 @@ public class Declaration
 	|| (value instanceof ClassExp
 	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;
-    if (isIndirectBinding() || isConstant)
+    if ((isIndirectBinding() || isConstant)
+        && (context instanceof ClassExp || context instanceof ModuleExp))
       fflags |= Access.FINAL;
     Type ftype = getType().getImplementationType();
     if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))

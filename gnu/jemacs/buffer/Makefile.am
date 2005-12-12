@@ -5,6 +5,7 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   Buffer.java \
   BufferLocal.java \
+  BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
   Command.java \

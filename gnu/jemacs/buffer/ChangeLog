@@ -1,3 +1,9 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* BufferReader.java: Moved from gnu.jemacs.swing.
+	Removed a Swing-specific constructor.
+	* Makefile.am: Update accordingly.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS.

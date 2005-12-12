@@ -1,5 +1,8 @@
 2005-12-11  Per Bothner  <per@bothner.com>
 
+	* BufferReader.java: Moved to gnu.jemacs.buffer.
+	* Makefile.am: Update accordingly.
+
 	* BufferContent.java: Most of the functionality has now been moved
 	to gnu.kawa.swingviews.SwingContent, which we now extend.
 	* BufferReader.java: Now mostly Swing-independent.

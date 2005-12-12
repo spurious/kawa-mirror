@@ -210,7 +210,6 @@ ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
   BufferContent.java \
-  BufferReader.java \
   IgnoreAction.java \
   MarkerReader.java \
   Modeline.java \

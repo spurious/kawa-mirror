@@ -4,7 +4,6 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   BufferContent.java \
-  BufferReader.java \
   IgnoreAction.java \
   MarkerReader.java \
   Modeline.java \

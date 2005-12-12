@@ -1,8 +1,7 @@
-package gnu.jemacs.swing;
+package gnu.jemacs.buffer;
 import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import java.io.*;
-import gnu.jemacs.swing.SwingBuffer;  // FIXME
 import gnu.lists.CharBuffer;
 
 public class BufferReader extends InPort
@@ -10,11 +9,6 @@ public class BufferReader extends InPort
   CharBuffer content;
   int rangeStart;
   int rangeLength;
-
-  public BufferReader(Buffer buffer, int start, int count)
-  {
-    this(((SwingBuffer) buffer).content.buffer, buffer.getName(), start, count);
-  }
 
   public BufferReader(CharBuffer content, String name, int start, int count)
   {

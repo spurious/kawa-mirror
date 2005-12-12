@@ -570,7 +570,10 @@ public class Lambda extends Syntax implements Printable
         lexp.add(null, new Declaration(ThisExp.THIS_NAME));
       }
 
+    LambdaExp saveLambda = tr.curLambda;
+    tr.curLambda = lexp;
     lexp.body = tr.rewrite_body (body);
+    tr.curLambda = saveLambda;
     Type rtype;
     BeginExp bexp;
     Expression[] exps;

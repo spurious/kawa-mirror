@@ -1,3 +1,9 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody): Temporarily set curLambda.
+	* kawa/standard/object.java (rewriteInit): Set line of initializing
+	SetExp to that of Declaration - rather than current Translator position.
+
 2005-12-10  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (apply): Add extra argument.

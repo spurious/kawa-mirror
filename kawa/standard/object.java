@@ -520,7 +520,8 @@ public class object extends Syntax
       {
         Declaration decl = (Declaration) d;
         SetExp sexp = new SetExp(decl, initValue);
-        tr.setLineOf(sexp);
+        sexp.setFile(decl.getFile());
+        sexp.setLine(decl.getLine(), decl.getColumn());
         decl.noteValue(null);
         initValue = sexp;
       }

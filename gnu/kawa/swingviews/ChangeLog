@@ -1,3 +1,9 @@
+2005-12-11  Per Bothner  <per@bothner.com>
+
+	* SwingContent.java: New class (and some non-public classes), containing
+	most of the logic moved from gnu/jemacs/swing/BufferContent.java.
+	* Makefile.am: Update accordingly.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Use WITH_SWING conditional.

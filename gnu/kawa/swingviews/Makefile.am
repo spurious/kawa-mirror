@@ -6,6 +6,7 @@ java_sources = \
   SwingButton.java \
   SwingFrame.java \
   SwingContainer.java \
+  SwingContent.java \
   SwingPaintable.java
 
 PACKAGE_FNAME = gnu-kawa-swingviews

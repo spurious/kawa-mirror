@@ -1,3 +1,9 @@
+2005-12-13  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java: No longer extends Procedure0or1.
+	(baseUri): Remove no-longer used static field.
+	(appl0, apply1): Remove no-longer-needed methods.
+
 2005-12-10  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java (uriSchemeLength): Moved to InPort.java.

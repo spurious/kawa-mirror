@@ -44,6 +44,9 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>doc-available</code> function. */
   public static final int DOC_AVAILABLE_BUILTIN = -10;
 
+  /** Code number for the special <code>doc-available</code> function. */
+  public static final int BASE_URI_BUILTIN = -11;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -88,6 +91,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("local-name", LOCAL_NAME_BUILTIN);
     pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
     pushBuiltin("root", ROOT_BUILTIN);
+    pushBuiltin("base-uri", BASE_URI_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
     pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
@@ -413,6 +417,12 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.kawa.xml.Nodes")
                     .getDeclaredMethod("root", 1);
                   return withContext(meth, exp.getArgs(), "fn:root", 0);
+                }
+              case BASE_URI_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.kawa.functions.BaseUri")
+                    .getDeclaredMethod("baseUri", 1);
+                  return withContext(meth, exp.getArgs(), "fn:base-uri", 0);
                 }
               case NAMESPACE_URI_BUILTIN:
 		{

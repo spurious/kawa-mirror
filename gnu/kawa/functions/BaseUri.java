@@ -1,14 +1,12 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
 import gnu.mapping.*;
 import gnu.lists.*;
 
-public class BaseUri extends Procedure0or1
+public class BaseUri
 {
-  public static final BaseUri baseUri = new BaseUri();
-
   public static Object baseUri (Object node)
   {
     Object baseUri = null;
@@ -81,15 +79,5 @@ public class BaseUri extends Procedure0or1
 	sbuf.append(uri);
       }
     return sbuf.toString();
-  }
-
-  public Object apply0 ()
-  {
-    return baseUri();
-  }
-
-  public Object apply1 (Object node)
-  {
-    return baseUri(node);
   }
 }

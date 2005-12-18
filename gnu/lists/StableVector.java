@@ -24,7 +24,7 @@ public class StableVector extends GapVector
    * In chained mode, there is a free list and if index i is available,
    * then positions[i] is the next available index, with -1 if there is none.
    * Unchained mode is indicated by free==-2.
-   * In chained mode, free is the first element in te free list,
+   * In chained mode, free is the first element in the free list,
    * or -1 if the free list is empty.
    * The main virtue of this convention is that we don't need a separate
    * list or array for the free list.  But we should get rid of the
@@ -85,6 +85,10 @@ public class StableVector extends GapVector
 	positions[i] = free;
 	free = i;
       }
+  }
+
+  protected StableVector ()
+  {
   }
 
   protected int allocPositionIndex()
@@ -281,15 +285,23 @@ public class StableVector extends GapVector
     int high = gapEnd;
     if (free >= 0)
       unchainFreelist();
-    for (int i = positions.length;  --i >= START_POSITION; )
+    for (int i = positions.length;  --i > START_POSITION; )
       {
 	int pos = positions[i];
 	if (pos != FREE_POSITION)
 	  {
 	    int index = pos >> 1;
-	    if (index >= low && index <= high)
-	      positions[i]
-		= (pos & 1) != 1 ? (gapEnd << 1) | 1 : (gapStart << 1);
+            boolean isAfter = (pos & 1) != 0;
+            if (isAfter)
+              {
+                if (index >= low && index < high)
+                  positions[i] = (gapEnd << 1) | 1;
+              }
+            else
+              {
+                if (index > low && index <= high)
+                  positions[i] = (gapStart << 1);
+              }
 	  }
       }
   }

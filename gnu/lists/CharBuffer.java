@@ -9,7 +9,8 @@ package gnu.lists;
  * javax.swing.text.AbstractDocument.Content
  */
 
-public class CharBuffer extends StableVector implements CharSeq
+public class CharBuffer extends StableVector
+  implements CharSeq, java.io.Serializable
 {
   // Same as super.base but pre-cast to FString.
   private FString string;
@@ -23,6 +24,10 @@ public class CharBuffer extends StableVector implements CharSeq
   public CharBuffer(int initialSize)
   {
     this(new FString(initialSize));
+  }
+
+  protected CharBuffer ()
+  {
   }
 
   public int length() { return size(); }
@@ -201,10 +206,17 @@ public class CharBuffer extends StableVector implements CharSeq
     System.err.println("\"");
     int poslen = positions == null ? 0 : positions.length;
     System.err.println("Positions (size: "+poslen+" free:"+free+"):");
+    boolean[] isFree = null;
+    if (free != -2)
+      {
+        isFree = new boolean[positions.length];
+        for (int i = free;  i >= 0;  i = positions[i])
+          isFree[i] = true;
+      }
     for (int i = 0;  i < poslen;  i++)
       {
 	int pos = positions[i];
-	if (free == -2 ? pos != FREE_POSITION : pos != 0)
+	if (free == -2 ? pos != FREE_POSITION : ! isFree[i])
 	  System.err.println("position#"+i+": "+(pos>>1)+" isAfter:"+(pos&1));
       }
   }

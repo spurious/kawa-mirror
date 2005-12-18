@@ -1,3 +1,13 @@
+2005-12-18  Per Bothner  <per@bothner.com>
+
+	* GapVector.java: Add protected no-arg constructor, for serialization.
+	* StableVector.java: Likewise.
+	* CharBuffer.java: Likewise.  Also implement java.io.Serializable.
+
+	* StableVector.java (remove): Fix buggy position adjustment.
+
+	* CharBuffer.java (dump): Suppress printing unused positions.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* GapVector.java (getSegment): New method, based on old getChars

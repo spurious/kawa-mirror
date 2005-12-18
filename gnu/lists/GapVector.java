@@ -22,6 +22,10 @@ public class GapVector extends AbstractSequence implements Sequence
     this.gapEnd = base.size;
   }
 
+  protected GapVector ()
+  {
+  }
+
   public int size()
   {
     return base.size - (gapEnd - gapStart);

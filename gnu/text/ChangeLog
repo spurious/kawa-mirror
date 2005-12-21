@@ -1,3 +1,9 @@
+2005-12-21  Per Bothner  <per@bothner.com>
+
+	* WriterManager.java (register): Add one to return value, so it is
+	always positive, hence we can use zero to mean 'not registered'.
+	(unregister): If index is 0, ignore it.  Otherwise, subtract one.
+
 2005-12-10  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (skipRestOfLine): New method.

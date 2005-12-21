@@ -18,7 +18,8 @@ public class OutPort extends PrintConsumer implements Printable
   // The helper class also lets us make transparent use of WriterManager.
   protected PrettyWriter bout;
 
-  /** An index into the WriterManager's internal table. */
+  /** An index into the WriterManager's internal table.
+   * The value zero means it is unregistered. */
   protected int index;
   
   OutPort(Writer base, PrettyWriter out, boolean autoflush)
@@ -26,7 +27,8 @@ public class OutPort extends PrintConsumer implements Printable
     super(out, autoflush);
     this.bout = out;
     this.base = base;
-    index = WriterManager.instance.register(out);
+    if (closeOnExit())
+      index = WriterManager.instance.register(out);
   }
 
   public OutPort(Writer base, boolean printPretty, boolean autoflush)
@@ -314,7 +316,15 @@ public class OutPort extends PrintConsumer implements Printable
   public void close()
   {
     super.close();
-    WriterManager.instance.unregister(index);
+    if (index > 0)
+      WriterManager.instance.unregister(index);
+  }
+
+  /** True if the port should be automatically closed on exit.
+   * (If so, it will be registered by WriterManager. */
+  protected boolean closeOnExit ()
+  {
+    return true;
   }
 
   public static void runCleanups ()

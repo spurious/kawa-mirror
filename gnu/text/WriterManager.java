@@ -53,11 +53,13 @@ public class WriterManager implements Runnable
     ports[index] = port;
     freeListHead = freeList[index];
     freeList[index] = -2;
-    return index;
+    return index + 1;
   }
 
   public synchronized void unregister (int index)
   {
+    if (--index < 0)
+      return;
     ports[index] = null;
     freeList[index] = freeListHead;
     freeListHead = index;

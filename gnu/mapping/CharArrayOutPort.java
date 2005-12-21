@@ -28,6 +28,12 @@ public class CharArrayOutPort extends OutPort
   {
   }
 
+  /** No point in registering this port with a WriterManager. */
+  protected boolean closeOnExit ()
+  {
+    return false;
+  }
+
   public String toString()
   {
     return new String(bout.buffer, 0, bout.bufferFillPointer);

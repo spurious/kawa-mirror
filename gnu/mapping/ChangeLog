@@ -1,3 +1,10 @@
+2005-12-21  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (closeOnExit): New method.
+	(<init>): Only register with WriterManager if closeOnExit().
+	* CharArrayOutPort.java (closeOnExit): New method - returns false.
+	This fixes a memory leak - CharArrayOutPort were not being collected.
+
 2005-12-10  Per Bothner  <per@bothner.com>
 
 	* InPort.java (uriSchemeLength): Moved from BaseUri.java.

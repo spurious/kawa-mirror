@@ -357,7 +357,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    boolean matchCar = context == 'P';
 	    int n = (nesting << 1) + (matchCar ? 1 : 0);
 	    patternScope.patternNesting.append((char) n);
-	    tr.push(patternScope.addDeclaration(pattern));
+            Declaration decl = patternScope.addDeclaration(pattern);
+            decl.setFile(tr.getFile());
+            decl.setLine(tr.getLine(), tr.getColumn());
+	    tr.push(decl);
 	    addInt(program, (i << 3) | (matchCar ? MATCH_ANY_CAR : MATCH_ANY));
 	    return;
 	  }

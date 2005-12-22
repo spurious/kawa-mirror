@@ -1,3 +1,8 @@
+2005-12-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxPattern.java (translate): Set source position
+	on pattern Declarations.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	Remember URL of loaded file, so it can be passed to ArrayClassLoader.

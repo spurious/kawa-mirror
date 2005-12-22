@@ -22,7 +22,6 @@ public class syntax extends kawa.lang.Quote
 	|| (form = (Pair) (form.cdr)).cdr != LList.Empty)
       return tr.syntaxError("syntax forms requires a single form");
     return coerceExpression(expand(form.car, isQuasi ? 1 : Quote.QUOTE_DEPTH, tr), tr);
-    //    return makeSyntax(form.car, tr);
   }
 
   protected Expression leaf (Object val, Translator tr)

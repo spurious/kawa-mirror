@@ -1057,7 +1057,7 @@ public class LispReader extends Lexer
 
   public Object makePair (Object car, Object cdr)
   {
-    Object pair = makePair(car, 0, 0);
+    Object pair = makePair(car, -1, -1);
     setCdr(pair, cdr);
     return pair;
   }

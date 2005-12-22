@@ -1,3 +1,11 @@
+2005-12-22  Per Bothner  <per@bothner.com>
+
+	* ReaderQuote.java (read): Set line/column numbers on returned list.
+	Especially important for quasiquote and quasisyntax.
+
+	* LispReader.java (makePair): Fix unknown line number to -1,
+	which then gets increment to 1.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readToken): Move ReadTable.getCurrent() out of loop.

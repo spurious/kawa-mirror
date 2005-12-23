@@ -19,10 +19,8 @@ public class SwingContent
   public SwingContent (int initialSize)
   {
     CharBuffer b = new CharBuffer(initialSize);
-    // Swing seems to assume that a Content object is initialized
-    // containing a single '\n'.  This of course is not documented ...
-    // (A cleaner solution might be to initialize this as empty, but have
-    // Buffer insert the initial '\n'.  FIXME.)
+    // Swing assumes that a Content object is initialized to contain
+    // a single '\n'.  This of course is not clearly documented ...
     b.gapEnd = initialSize-1;
     b.getArray()[b.gapEnd] = '\n';
     this.buffer = b;
@@ -101,12 +99,9 @@ public class SwingContent
     throws BadLocationException
   {
     CharBuffer b = buffer;
-    // A weird hack, but this seems to be what Swing does ...
-    boolean isAfter = offset != 0;
-
     if (offset < 0 || offset > b.length())
       throw new BadLocationException("bad offset to createPosition", offset);
-    return new GapPosition(b, offset, isAfter);
+    return new GapPosition(b, offset);
   }
 
 }
@@ -114,9 +109,9 @@ public class SwingContent
 class GapPosition extends SeqPosition
     implements javax.swing.text.Position
 {
-  public GapPosition(CharBuffer content, int offset, boolean isAfter)
+  public GapPosition(CharBuffer content, int offset)
   {
-    super(content, offset, isAfter);
+    super(content, offset, false);
   }
 
   public int getOffset() { return nextIndex(); }

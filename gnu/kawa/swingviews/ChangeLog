@@ -1,3 +1,9 @@
+2005-12-22  Per Bothner  <per@bothner.com>
+
+	* SwingContent.java (createPosition): It turns out Swing is happier
+	if positions are always "before".
+	(GapPosition.<init>): Hardwire 'isAfter' to 'false'.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* SwingContent.java: New class (and some non-public classes), containing

@@ -72,6 +72,7 @@ public class require extends Syntax
     map("printf", SLIB_PREFIX + "printf");
     map("xml", SLIB_PREFIX + "XML");
     map("readtable", SLIB_PREFIX + "readtable");
+    map("srfi-10", SLIB_PREFIX + "readtable");
     map("http", SLIB_PREFIX + "HTTP");
     map("srfi-1", SLIB_PREFIX + "srfi1");
     map("list-lib", SLIB_PREFIX + "srfi1");

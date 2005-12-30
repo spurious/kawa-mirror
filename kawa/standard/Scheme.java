@@ -1032,6 +1032,7 @@ public class Scheme extends LispLanguage
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));
+    dispatchTable.set(',', ReaderDispatchMisc.getInstance());
     return tab;
   }
 

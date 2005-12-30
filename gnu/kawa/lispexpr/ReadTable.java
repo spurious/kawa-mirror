@@ -5,6 +5,7 @@ package gnu.kawa.lispexpr;
 import gnu.kawa.util.RangeTable;
 import gnu.mapping.*;
 import gnu.expr.Language;
+import gnu.kawa.reflect.StaticFieldLocation;
 
 public class ReadTable extends RangeTable
 {
@@ -119,6 +120,38 @@ public class ReadTable extends RangeTable
     setBracketMode(defaultBracketMode);
   }
   
+  /** A table mapping constructor tags to functions, as in SRFI-10. */
+  Environment ctorTable = null;
+
+  void initCtorTable ()
+  {
+    if (ctorTable == null)
+      ctorTable = Environment.make();
+  }
+
+  /** Add a mapping for a SRFI-10 constructor tag. */
+  public synchronized void putReaderCtor (String key, Procedure proc)
+  {
+    initCtorTable();
+    ctorTable.put(key, proc);
+  }
+
+  /** Map a SRFI-10 constructor tag to Procedure-valued lazy field  */
+  public synchronized void putReaderCtorFld (String key,
+                                             String cname, String fname)
+  {
+    initCtorTable();
+    Symbol symbol = ctorTable.getSymbol(key);
+    StaticFieldLocation.define(ctorTable, symbol, null, cname, fname);
+  }
+
+  /** Resolve a SRFI-10 constructor tags to a functions. */
+  public synchronized Procedure getReaderCtor (String key)
+  {
+    initCtorTable();
+    return (Procedure) ctorTable.get(key, null);
+  }
+
   public static ReadTable getCurrent()
   {
     ReadTable table = (ReadTable) current.get(null);

@@ -5,6 +5,8 @@ package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.mapping.InPort;
 import gnu.mapping.Values;
+import gnu.mapping.Procedure;
+import gnu.lists.*;
 
 public class ReaderDispatchMisc extends ReadTableEntry
 {
@@ -34,6 +36,8 @@ public class ReaderDispatchMisc extends ReadTableEntry
     LispReader reader = (LispReader) in;
     char saveReadState = '\0';
     LineBufferedReader port;
+    int length;
+    String name;
     if (code >= 0)
       ch = code;
     switch (ch)
@@ -43,8 +47,8 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	// Note this conflicts with Common Lisp uninterned symbols.  FIXME
 	int startPos = reader.tokenBufferLength;
 	reader.readToken(reader.read(), false, 'P');
-	int length = reader.tokenBufferLength - startPos;
-	String name = new String(reader.tokenBuffer, startPos, length);
+	length = reader.tokenBufferLength - startPos;
+	name = new String(reader.tokenBuffer, startPos, length);
 	reader.tokenBufferLength = startPos;
 	return gnu.expr.Keyword.make(name.intern());
       case '\\':
@@ -98,6 +102,43 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	      ((InPort) port).readState = saveReadState;
 	  }
 	return Values.empty;
+      case ',':
+	port = reader.getPort();
+        Object list;
+        if (port.peek() == '('
+            && ((length
+                 = LList.listLength(list = reader.readObject(), false))
+                > 0)
+            && ((Pair) list).car instanceof String)
+          {
+            name = (String) ((Pair) list).car;
+            Procedure proc = ReadTable.getCurrent().getReaderCtor(name);
+            if (proc == null)
+              in.error("unknown reader constructor "+name);
+            else
+              {
+                length--;  // Subtract 1 for the consrutcor name.
+                Object[] args = new Object[length];
+                Object argList = ((Pair) list).cdr;
+                for (int i = 0;  i < length;  i++)
+                  {
+                    Pair pair = (Pair) argList;
+                    args[i] = pair.car;
+                    argList = pair.cdr;
+                  }
+                try
+                  {
+                    return proc.applyN(args);
+                  }
+                catch (Throwable ex)
+                  {
+                    in.error("caught "+ex+" applying reader constructor "+name);
+                  }
+              }
+          }
+        else
+          in.error("a non-empty list starting with a symbol must follow #,");
+	return Boolean.FALSE;
       default:
 	in.error("An invalid #-construct was read.");
 	return Values.empty;

@@ -1,5 +1,3 @@
-;; Common Lisp has *readtable* variable, which is settable.
-;; FIXME - should be a parameter object.
 (define (current-readtable) :: <readtable>
   (invoke-static <readtable> 'getCurrent))
 
@@ -80,3 +78,7 @@
 		     (invoke readtable 'lookup disp-char))
 	 (sub-entry (invoke disp-entry 'lookup sub-char)))
     (if (eq? sub-entry #!null) #f sub-entry)))
+
+(define (define-reader-ctor (key :: <symbol>) (proc :: <procedure>)
+	 #!optional (readtable :: <readtable> (current-readtable)))
+  (*:putReaderCtor readtable key proc))

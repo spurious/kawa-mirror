@@ -161,12 +161,12 @@ public abstract class KNode extends SeqPosition
   //   int previous = 0;
   //   for (;;)
   //     {
-	// previous = child;
-	// child = sequence.nextPos(child);
-	// if (child == 0)
-	  // break;
-	// if (((NodeTree) sequence).posToDataIndex(child) == index)
-	  // break;
+  //       previous = child;
+  //       child = sequence.nextPos(child);
+  //       if (child == 0)
+  //         break;
+  //       if (((NodeTree) sequence).posToDataIndex(child) == index)
+  //         break;
   //     }
   //   return previous == 0 ? null
   //     : make((NodeTree) sequence, previous);
@@ -193,8 +193,8 @@ public abstract class KNode extends SeqPosition
   //   int child = sequence.firstChildPos(ipos);
   //   while (child != 0)
   //     {
-	// last = child;
-	// child = sequence.nextPos(child);
+  //       last = child;
+  //       child = sequence.nextPos(child);
   //     }
   //   return last == 0 ? null : make((NodeTree) sequence, last);
   // }
@@ -205,8 +205,8 @@ public abstract class KNode extends SeqPosition
   //   int child = sequence.firstChildPos(ipos);
   //   while (child != 0)
   //     {
-	// nodes.writePosition(sequence, child);
-	// child = sequence.nextPos(child);
+  //       nodes.writePosition(sequence, child);
+  //       child = sequence.nextPos(child);
   //     }
   //   return nodes;
   // }
@@ -220,9 +220,9 @@ public abstract class KNode extends SeqPosition
   //   int child = sequence.firstChildPos(ipos);
   //   while (child != 0)
   //     {
-	// if (matches)
-	  // nodes.writePosition(sequence, child);
-	// child = sequence.nextPos(child);
+  //       if (matches)
+  //         nodes.writePosition(sequence, child);
+  //       child = sequence.nextPos(child);
   //     }
   //   return nodes;
   //   */
@@ -234,14 +234,14 @@ public abstract class KNode extends SeqPosition
   // public void setNodeValue (String nodeValue)  throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setNodeValue not supported");
+  //                          "setNodeValue not supported");
   // }
 
   // /** Not implemented. */
   // public void setPrefix (String prefix)  throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setPrefix not supported");
+  //                          "setPrefix not supported");
   // }
 
   // /** Not implemented. */
@@ -249,7 +249,7 @@ public abstract class KNode extends SeqPosition
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "insertBefore not supported");
+  //                          "insertBefore not supported");
   // }
 
   // /** Not implemented. */
@@ -257,7 +257,7 @@ public abstract class KNode extends SeqPosition
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "replaceChild not supported");
+  //                          "replaceChild not supported");
   // }
 
   // /** Not implemented. */
@@ -265,7 +265,7 @@ public abstract class KNode extends SeqPosition
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "removeChild not supported");
+  //                          "removeChild not supported");
   // }
 
   // /** Not implemented. */
@@ -273,7 +273,7 @@ public abstract class KNode extends SeqPosition
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "appendChild not supported");
+  //                          "appendChild not supported");
   // }
 
   // /** Not implemented. */
@@ -281,7 +281,7 @@ public abstract class KNode extends SeqPosition
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setTextContent not supported");
+  //                          "setTextContent not supported");
   // }
 
   // /** Only implemented if deep is true. */
@@ -344,11 +344,11 @@ public abstract class KNode extends SeqPosition
   // {
   //   if (! (other instanceof KNode))
   //     throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-			     // "other Node is a "+other.getClass().getName());
+  //                            "other Node is a "+other.getClass().getName());
   //   KNode n = (KNode) other;
   //   AbstractSequence nseq = n.sequence;
   //   return (short) (sequence == nseq ? nseq.compare(ipos, n.ipos)
-		    // : (int) sequence.stableCompare(nseq));
+  //                   : (int) sequence.stableCompare(nseq));
   // }
   //   
   // public boolean isSameNode (Node node)

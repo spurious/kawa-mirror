@@ -1,6 +1,7 @@
 2005-12-31  Per Bothner  <per@bothner.com>
 
-	* KAttr.java: Remove TAB in conditional text.
+	* KNode.java: Remove TAB in conditional text.
+	* KAttr.java: Likewise.
 	* KDocument.java: Likewise.
 
 2005-12-10  Per Bothner  <per@bothner.com>

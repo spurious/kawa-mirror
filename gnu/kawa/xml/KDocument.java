@@ -211,7 +211,7 @@ public class KDocument extends KNode
   // public DOMConfiguration getDomConfig ()
   // {
   //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-			   // "getDomConfig not implemented");
+  //                          "getDomConfig not implemented");
   // }
   /* #endif JAXP-1.3 */
 }

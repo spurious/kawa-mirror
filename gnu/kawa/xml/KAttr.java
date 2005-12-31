@@ -38,7 +38,7 @@ public class KAttr extends KNode
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setValue not supported");
+  //                          "setValue not supported");
   // }
 
   // public Node getParentNode()

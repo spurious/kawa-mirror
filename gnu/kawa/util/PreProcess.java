@@ -37,6 +37,9 @@ public class PreProcess
     int commentAt = -1;
     int curIndent = 0;
     int nesting = 0;
+    // If currently skipping, the nesting level of the controlling
+    // conditional.  Otherwise, 0.
+    int skipNesting = 0;
     String cmd = null;
     boolean changedLine = false;
     for (;;)
@@ -166,33 +169,50 @@ public class PreProcess
 		      }
 		    if ("#ifdef".equals(cmd) || "#ifndef".equals(cmd))
 		      {
-			if (nesting > 0)
-			  error("nested "+cmd+" not supported");
-			nesting++;
 			if (binding == null)
 			  {
 			    System.err.println(filename+":"+lineno
 					       +": warning - undefined keyword: "+rest);
 			    binding = Boolean.FALSE;
-			  }
-			commentAt
-			  = (((cmd.charAt(3) == 'n')
-			      == (binding == Boolean.FALSE))
-			     ? -1
-			     : curIndent);
+			  } 
+			nesting++;
+                        if (skipNesting > 0)
+                          commentAt = curIndent;
+                        else if ((cmd.charAt(3) == 'n')
+                                 != (binding == Boolean.FALSE))
+                          {
+                            commentAt = curIndent;
+                            skipNesting = nesting;
+                          }
 		      }
 		    else if ("#else".equals(cmd))
 		      {
 			if (nesting == 0)
 			  error("unexpected "+cmd);
-			commentAt = commentAt >= 0 ? -1 : curIndent;
+                        else if (nesting == skipNesting)
+                          {
+                            commentAt = -1;
+                            skipNesting = 0;
+                          }
+                        else
+                          {
+                            commentAt = curIndent;
+                            if (skipNesting == 0)
+                              skipNesting = nesting;
+                          }
 		      }
 		    else if ("#endif".equals(cmd))
 		      {
 			if (nesting == 0)
 			  error("unexpected "+cmd);
+                        if (nesting == skipNesting)
+                          {
+                            skipNesting = 0;
+                            commentAt = -1;
+                          }
+                        else if (skipNesting > 0)
+                          commentAt = curIndent;
 			nesting--;
-			commentAt = -1;
 		      }
 		    else
 		      error("unknown command: "+cmnt);

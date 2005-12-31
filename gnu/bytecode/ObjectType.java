@@ -63,9 +63,8 @@ public class ObjectType extends Type
 	    /* #ifdef JAVA2 */
 	    /* Specifies optional 'initialize' argument. */
 	    reflectClass = Class.forName(getInternalName().replace('/', '.'),
-					 false, getClass().getClassLoader());
-	    /* #endif */
-	    /* #ifndef JAVA2 */
+                                         false, getClass().getClassLoader());
+	    /* #else */
 	    // reflectClass = Class.forName(getInternalName().replace('/', '.'));
 	    /* #endif */
 	  }

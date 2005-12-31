@@ -1,3 +1,7 @@
+2005-12-31  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getReflectClass): Un-tab-ify conditional text.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java (context): New field.

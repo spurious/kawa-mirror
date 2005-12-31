@@ -81,7 +81,14 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
    * MS-DOS-style "drive letter" - i.e. not a scheme. */
   public static boolean uriSchemeSpecified (String name)
   {
-    return uriSchemeLength(name) > 1;
+    int ulen = uriSchemeLength(name);
+    if (ulen == 1 && File.separatorChar == '\\')
+      {
+        char drive = name.charAt(0);
+        return ! ((drive >= 'a' && drive <= 'z')
+                  || (drive >= 'A' && drive <= 'Z'));
+      }
+    return ulen > 1;
   }
 
   /** Helper routine to get the scheme part of a URI.

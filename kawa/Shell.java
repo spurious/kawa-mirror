@@ -156,7 +156,7 @@ public class Shell
 	  ((TtyInPort)inp).setPrompter(prompter);
       }
 
-    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault(), null);
+    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault());
   }
 
   public static void run (Language language,  Environment env,

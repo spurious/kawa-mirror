@@ -40,7 +40,12 @@ public class Strings
       }
   }
 
-  public static void printQuoted (CharSeq str,
+  public static void printQuoted (
+                                  /* #ifdef use:java.lang.CharSequence */
+                                  CharSequence str,
+                                  /* #else */
+                                  // CharSeq str,
+                                  /* #endif */
 				  java.io.PrintWriter ps, int escapes)
   {
     int len = str.length();

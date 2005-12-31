@@ -1,3 +1,8 @@
+2005-12-30  Per Bothner  <per@bothner.com>
+
+	* Strings.java (printQuoted): Allow any CharSequence, not just
+	CharSeq, if java.lang.CharSequence is available - e.g. JDK 1.4 or later.
+
 2005-12-18  Per Bothner  <per@bothner.com>
 
 	* GapVector.java: Add protected no-arg constructor, for serialization.

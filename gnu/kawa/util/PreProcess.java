@@ -41,7 +41,7 @@ public class PreProcess
     // conditional.  Otherwise, 0.
     int skipNesting = 0;
     String cmd = null;
-    boolean changedLine = false;
+    int changedLine = 0; // -1: comment added or moved; +1 comment removed
     for (;;)
       {
 	int c = in.read();
@@ -58,7 +58,7 @@ public class PreProcess
 	    buf[len++] = (byte) c;
 	    continue;
 	  }
-	if (commentAt >= 0 && dataStart < 0 && ! changedLine
+	if (commentAt >= 0 && dataStart < 0 && changedLine <= 0
 	    && c != '\r' && c != '\n'
 	    && (commentAt == curIndent
 		|| (c != ' ' && c != '\t')))
@@ -91,14 +91,15 @@ public class PreProcess
 		buf[len++] = '/';
 		buf[len++] = '/';
 		buf[len++] = ' ';
-		changedLine = true;
+		changedLine = 1;
+                changed = true;
 	      }
 	  }
 	if (c != ' ' && c != '\t' && dataStart < 0)
 	  {
 	    // First non-space character.
 	    dataStart = len;
-	    if (nesting > 0 && commentAt < 0 && c == '/')
+	    if (nesting > 0 && commentAt != curIndent && c == '/')
 	      {
 		c = in.read();
 		if (c < 0)
@@ -110,13 +111,17 @@ public class PreProcess
 		    c = in.read();
 		    if (c < 0)
 		      break;
-		    changedLine = true;
+		    changedLine = -1;
+                    changed = true;
 		    if (c == ' ')
-		      c = in.read();
+                      {
+                        c = in.read();
+                        if (c == ' ' || c == '\t')
+                          dataStart = -1;
+                      }
 		  }
 	      }
 	  }
-	changed = changed || changedLine;
 	buf[len] = (byte) c;
 	len++;
 	if (c == '\r' || c == '\n')
@@ -222,7 +227,7 @@ public class PreProcess
 	    dataStart = -1;
 	    curIndent = 0;
 	    lineno++;
-	    changedLine = false;
+	    changedLine = 0;
 	  }
 	else if (dataStart < 0)
 	  curIndent = c == '\t' ? (curIndent + 8) & ~7 : curIndent + 1;

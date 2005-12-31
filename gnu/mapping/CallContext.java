@@ -42,7 +42,7 @@ public class CallContext // implements Runnable
     currentContext.set(ctx);
     /* #else */
     // if (thread instanceof Future)
-    //   ((Future) thread).context = ctx;
+    //   ((Future) thread).closure.context = ctx;
     // else
     //   threadMap.put(thread, ctx);
     /* #endif */

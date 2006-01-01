@@ -24,6 +24,7 @@ java_sources=\
   MultiplyOp.java \
   NumberCompare.java \
   Setter.java \
+  URI_utils.java \
   ValuesMap.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 

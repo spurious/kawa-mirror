@@ -1,3 +1,14 @@
+2005-12-31  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java: New class, for URI-related helper methods.
+	(toURI): Convert various values to URI - or String if URI is missing.
+	(URLtoURI, toURIString, filenameToURIString, toURIString): Static
+	help methods.
+	* Makefile.am: Update accordingly.
+
+	* DisplayFormat.java (writeObject): Use SRFI-10 notation when readably
+	writing java.net.URI objects.  This is condionally compiled.
+
 2005-12-13  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java: No longer extends Procedure0or1.

@@ -111,6 +111,17 @@ public class DisplayFormat extends AbstractFormat
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Symbol)
       writeObject(obj.toString(), out);
+    /* #ifdef use:java.net.URI */
+    /* #ifdef use:java.lang.CharSequence */
+    else if (obj instanceof java.net.URI && getReadableOutput()
+             && out instanceof PrintWriter)
+      {
+        write("#,(URI ", out);
+        Strings.printQuoted(obj.toString(), (PrintWriter) out, 0);
+        out.writeChar(')');
+      }
+    /* #endif */
+    /* #endif */
     else if (obj instanceof CharSeq)
       {
 	CharSeq str = (CharSeq) obj;

@@ -1,3 +1,7 @@
+2005-12-31  Per Bothner  <per@bothner.com>
+
+	* files.scm (URI): New procedure.
+
 2005-11-23  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (generate-temporaries): New function.

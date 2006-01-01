@@ -62,6 +62,9 @@
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
 
+(define (URI url)
+  (gnu.kawa.functions.URI_utils:toURI url))
+
 (define-private *temp-file-number* 1)
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
 ; This is not safe from race conditions!

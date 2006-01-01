@@ -586,6 +586,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("defmacro", "kawa.lib.syntax");
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
+      defProcStFld("URI", "kawa.lib.files");
+
       defSntxStFld("future", "kawa.lib.thread");
       defProcStFld("sleep", "kawa.lib.thread");
       defProcStFld("runnable", "kawa.lib.thread");
@@ -1033,6 +1035,7 @@ public class Scheme extends LispLanguage
     dispatchTable.set('\'', new ReaderQuote("syntax"));
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));
     dispatchTable.set(',', ReaderDispatchMisc.getInstance());
+    tab.putReaderCtorFld("URI", "kawa.lib.files", "URI");
     return tab;
   }
 

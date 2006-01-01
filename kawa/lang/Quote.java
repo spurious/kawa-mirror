@@ -254,12 +254,12 @@ public class Quote extends Syntax implements Printable
     Object old = map.get(template);
     if (old == WORKING)
       {
-	map.put(template, CYCLE);
-	return old;
+        map.put(template, CYCLE);
+        return old;
       }
     else if (old == CYCLE)
       {
-	return old;
+        return old;
       }
     else if (old != null)
       return old;

@@ -1,3 +1,8 @@
+2005-12-31  Per Bothner  <per@bothner.com>
+
+	* Quote.java: Un-tab-ify conditional code.
+	* SyntaxTemplate.java: Likewise.
+
 2005-12-30  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run): Fix bug which prevented getOutputConsumer

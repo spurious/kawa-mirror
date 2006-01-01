@@ -224,14 +224,14 @@ public class SyntaxTemplate implements Externalizable
     /* #ifdef use:java.util.IdentityHashMap */ 
     if (form instanceof Pair || form instanceof FVector)
       {
-	IdentityHashMap seen_map = (IdentityHashMap) seen;
-	if (seen_map.containsKey(form))
-	  {
-	    /* FIXME cycles are OK if data are literal. */
-	    tr.syntaxError("self-referential (cyclic) syntax tenplate");
-	    return -2;
-	  }
-	seen_map.put(form, form);
+        IdentityHashMap seen_map = (IdentityHashMap) seen;
+        if (seen_map.containsKey(form))
+          {
+            /* FIXME cycles are OK if data are literal. */
+            tr.syntaxError("self-referential (cyclic) syntax tenplate");
+            return -2;
+          }
+        seen_map.put(form, form);
       }
     /* #endif */
 

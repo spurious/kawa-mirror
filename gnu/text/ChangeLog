@@ -1,3 +1,8 @@
+2006-01-02  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java: Moved from gnu.kawa.functions.
+	* Makefile.am: Update accordingly.
+
 2005-12-21  Per Bothner  <per@bothner.com>
 
 	* WriterManager.java (register): Add one to return value, so it is

@@ -1,3 +1,8 @@
+2006-01-02  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java: Moved to gnu.text.
+	* Makefile.am: Update accordingly.
+
 2005-12-31  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java: New class, for URI-related helper methods.

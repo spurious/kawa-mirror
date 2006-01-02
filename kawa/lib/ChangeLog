@@ -1,3 +1,7 @@
+2006-01-02  Per Bothner  <per@bothner.com>
+
+	* files.scm (URI): Update package for moved URI_utils class.
+
 2005-12-31  Per Bothner  <per@bothner.com>
 
 	* files.scm (URI): New procedure.

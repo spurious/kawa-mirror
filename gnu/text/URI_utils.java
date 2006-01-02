@@ -1,4 +1,4 @@
-package gnu.kawa.functions;
+package gnu.text;
 /* #ifdef use:java.net.URI */
 import java.net.URI;
 import java.util.WeakHashMap;

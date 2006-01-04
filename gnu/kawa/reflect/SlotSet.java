@@ -115,7 +115,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
     if (field != null
-        && caller != null && caller.isAccessible(clas, field.getModifiers()))
+        && caller != null
+        && caller.isAccessible(field.getDeclaringClass(), field.getModifiers()))
       return field;
 
     // Try looking for a method "setName" instead:
@@ -234,13 +235,23 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
 	if (part != null)
 	  {
-	    int modifiers =
-	      (part instanceof gnu.bytecode.Field)
-	      ? ((gnu.bytecode.Field) part).getModifiers()
-	      : ((gnu.bytecode.Method) part).getModifiers();
+	    int modifiers;
+            ClassType ptype;
+            if (part instanceof gnu.bytecode.Field)
+              {
+                gnu.bytecode.Field field = (gnu.bytecode.Field) part;
+                modifiers = field.getModifiers();
+                ptype = field.getDeclaringClass();
+              }
+            else
+              {
+                gnu.bytecode.Method method = (gnu.bytecode.Method) part;
+                modifiers = method.getModifiers();
+                ptype = method.getDeclaringClass();
+              }
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
-	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
-	      comp.error('e', "slot '"+name +"' in "+ctype.getName()
+	    if (caller != null && ! caller.isAccessible(ptype, modifiers))
+	      comp.error('e', "slot '"+name +"' in "+ptype.getName()
 			 +" not accessible here");
 	    args[0].compile(comp,
 			    isStaticField ? Target.Ignore

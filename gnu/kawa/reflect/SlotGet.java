@@ -156,7 +156,8 @@ public class SlotGet extends Procedure2
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
     if (field != null
-        && caller != null && caller.isAccessible(clas, field.getModifiers()))
+        && caller != null
+        && caller.isAccessible(field.getDeclaringClass(), field.getModifiers()))
       return field;
 
     // Try looking for a method "getFname" instead:
@@ -210,6 +211,7 @@ public class SlotGet extends Procedure2
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
+            ctype = field.getDeclaringClass();
             int modifiers = field.getModifiers();
             boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
@@ -269,6 +271,7 @@ public class SlotGet extends Procedure2
         if (part instanceof gnu.bytecode.Method)
           {
             gnu.bytecode.Method method = (gnu.bytecode.Method) part;
+            ctype = method.getDeclaringClass();
 	    int modifiers = method.getModifiers();
             boolean isStaticMethod = method.getStaticFlag();
             if (isStatic && ! isStaticMethod)

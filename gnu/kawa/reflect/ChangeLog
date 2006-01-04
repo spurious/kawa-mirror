@@ -1,3 +1,9 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (getField, compile): Pass the declaring-class of the
+	field or method to isAccessible, not the possibly-derived class.
+	* SlotSet.java (getField, compile): Likewise.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (compile): Don't return compile-time-class for "class",

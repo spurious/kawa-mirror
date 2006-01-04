@@ -117,7 +117,7 @@
 		   (datum->syntax-object
 		    (syntax filename)
 		    (make <string>
-		     (gnu.kawa.functions.BaseUri:resolve
+		     (gnu.text.URI_utils:resolve
 		      (field path-pair 'car)
 		      (gnu.lists.PairWithPosition:getFile path-pair)))))))))
 

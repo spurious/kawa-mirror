@@ -1,5 +1,7 @@
 2006-01-04  Per Bothner  <per@bothner.com>
 
+	* files.scm (include-relative): Update to use URI_utils.
+
 	* ports.scm (open-input-file, open-output-file, call-with-input-file,
 	with-input-from-file, with-output-to-file): Generalize to use
 	general path - specifically URIs - and the methods in URI_utils.

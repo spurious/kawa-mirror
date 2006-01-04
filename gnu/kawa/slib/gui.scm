@@ -73,8 +73,8 @@
    (static-field <java.awt.AlphaComposite> 'SRC)
    alpha))
 
-(define (image-read url) :: <java.awt.image.BufferedImage>
-  (javax.imageio.ImageIO:read (gnu.kawa.xml.Document:makeURL url)))
+(define (image-read uri) :: <java.awt.image.BufferedImage>
+  (javax.imageio.ImageIO:read (gnu.text.URI_utils:getInputStream uri)))
 
 (define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
   (*.getWidth image))

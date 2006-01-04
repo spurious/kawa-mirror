@@ -9,7 +9,7 @@ import gnu.lists.*;
 
 public class OutPort extends PrintConsumer implements Printable
 {
-  String name;
+  Object name;
   private Writer base;
 
   // To keep track of column-numbers, we use a helper class.
@@ -37,7 +37,7 @@ public class OutPort extends PrintConsumer implements Printable
   }
 
   public OutPort(Writer base, boolean printPretty,
-		 boolean autoflush, String name)
+		 boolean autoflush, Object name)
   {
     this(base, new PrettyWriter(base, printPretty), autoflush);
     this.name = name;
@@ -48,7 +48,7 @@ public class OutPort extends PrintConsumer implements Printable
     this (out, null);
   }
 
-  public OutPort (OutputStream out, String name)
+  public OutPort (OutputStream out, Object name)
   {
     this(new OutputStreamWriter(out), true, name);
   }
@@ -58,13 +58,13 @@ public class OutPort extends PrintConsumer implements Printable
     this(out, false, false);
   }
 
-  public OutPort (Writer base, String name)
+  public OutPort (Writer base, Object name)
   {
     this(base, false, false);
     this.name = name;
   }
 
-  public OutPort (Writer base, boolean autoflush, String name)
+  public OutPort (Writer base, boolean autoflush, Object name)
   {
     this (base, false, autoflush);
     this.name = name;
@@ -102,12 +102,11 @@ public class OutPort extends PrintConsumer implements Printable
     errLocation.set(e);
   }
 
-  public static OutPort openFile(String fname)
-    throws java.io.UnsupportedEncodingException,
-           java.io.FileNotFoundException
+  public static OutPort openFile(Object fname)
+    throws java.io.IOException
   {
       Object conv = Environment.user().get("port-char-encoding");
-      java.io.OutputStream strm = new java.io.FileOutputStream(fname);
+      java.io.OutputStream strm = URI_utils.getOutputStream(fname);
       strm = new java.io.BufferedOutputStream(strm);
       java.io.Writer wr;
       if (conv == null || conv == Boolean.TRUE)

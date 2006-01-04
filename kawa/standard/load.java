@@ -7,7 +7,7 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
-import gnu.kawa.functions.BaseUri;
+import gnu.text.URI_utils;
 import java.net.URL;
 
 public class load extends Procedure1 {
@@ -183,10 +183,10 @@ public class load extends Procedure1 {
         String resolved = name;
         if (! isUri)
           {
-            String base = savedBaseUri;
-            if (! InPort.uriSchemeSpecified(base))
-              base = BaseUri.resolve(base, ctx.getBaseUriDefault());
-            resolved = BaseUri.resolve(name, base);
+            Object base = savedBaseUri;
+            if (! URI_utils.isAbsolute(base))
+              base = URI_utils.resolve(base, ctx.getBaseUriDefault());
+            resolved = URI_utils.resolve(name, base).toString();
             if (relative && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
               name = resolved;
           }
@@ -208,12 +208,7 @@ public class load extends Procedure1 {
 	    loadClassFile (name, env);
 	    return;
 	  }
-        InputStream fs;
-        if (isUri)
-          fs = url.openConnection().getInputStream();
-        else
-          fs = new FileInputStream(name);
-        fs = new BufferedInputStream(fs);
+        InputStream fs = new BufferedInputStream(URI_utils.getInputStream(url));
         fs.mark(5);
         int char0 = fs.read ();
         if (char0 == -1)

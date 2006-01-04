@@ -1,11 +1,11 @@
-(define (open-input-file (pathname :: <String>)) :: <input-port>
-  (invoke-static <input-port> 'openFile pathname))
+(define (open-input-file path) :: <input-port>
+  (invoke-static <input-port> 'openFile path))
 
-(define (open-output-file (pathname :: <String>)) :: <output-port>
-  (invoke-static <output-port> 'openFile pathname))
+(define (open-output-file path) :: <output-port>
+  (invoke-static <output-port> 'openFile path))
 
-(define (call-with-input-file (pathname :: <String>) (proc :: <procedure>))
- (let ((port :: <input-port> (open-input-file pathname)))
+(define (call-with-input-file path (proc :: <procedure>))
+ (let ((port :: <input-port> (open-input-file path)))
     (try-finally
      (proc port)
      (close-input-port port))))
@@ -16,9 +16,8 @@
      (proc port)
      (close-output-port port))))
 
-(define (with-input-from-file fname (proc :: <procedure>))
-  (let ((port :: <input-port> (gnu.mapping.InPort:openFile
-			       (*:toString fname)))
+(define (with-input-from-file path (proc :: <procedure>))
+  (let ((port :: <input-port> (gnu.mapping.InPort:openFile path))
 	(save :: <input-port> (gnu.mapping.InPort:inDefault)))
     (try-finally
      (begin
@@ -28,11 +27,8 @@
        (gnu.mapping.InPort:setInDefault save)
        (*:close port)))))       
 
-(define (with-output-to-file filename (proc :: <procedure>))
-  (let* ((fname (invoke filename 'toString))
-	 (port :: <output-port> (gnu.mapping.OutPort:new
-				 (java.io.FileWriter:new fname)
-				 fname))
+(define (with-output-to-file path (proc :: <procedure>))
+  (let* ((port :: <output-port> (gnu.mapping.OutPort:openFile path))
 	 (save :: <output-port> (gnu.mapping.OutPort:outDefault)))
     (try-finally
      (begin

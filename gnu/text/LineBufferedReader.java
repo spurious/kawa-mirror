@@ -93,7 +93,7 @@ public class LineBufferedReader extends FilterReader
     * If lineStartPos < 0, it means we went beyond the buffer maximum. */
   int lineStartPos;
 
-  String name;
+  Object name;
 
   /** The current line number (at position of lineStartPos). */
   protected int lineNumber;
@@ -353,12 +353,18 @@ public class LineBufferedReader extends FilterReader
     return len;
   }
 
-  public String getName ()
+  /** Should return a URI or a String. */
+  public Object getURI ()
   {
     return name;
   }
 
-  public void setName (String name)
+  public String getName ()
+  {
+    return name == null ? null : name.toString();
+  }
+
+  public void setName (Object name)
   {
     this.name = name;
   }

@@ -33,7 +33,7 @@ public class XMLParser extends XMLParserChar
     this.messages = messages;
   }
 
-  private XMLParser(URL url, Consumer out, SourceMessages messages,
+  private XMLParser(Object uri, Consumer out, SourceMessages messages,
 		    ParsedXMLToConsumer resolver,
 		    LineBufferedReader lreader)
     throws java.io.IOException
@@ -41,15 +41,15 @@ public class XMLParser extends XMLParserChar
     super(null, 0, 0, resolver);
     in = lreader;
     resolver.setParser(this);
-    lreader.setName(url.toString());
+    lreader.setName(uri);
     this.messages = messages;
   }
 
-  public XMLParser(URL url, SourceMessages messages, Consumer out)
+  public XMLParser(Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    this(url, out, messages, new ParsedXMLToConsumer(out),
-	 new LineBufferedReader(url.openConnection().getInputStream()));
+    this(uri, out, messages, new ParsedXMLToConsumer(out),
+	 new LineBufferedReader(new java.io.BufferedInputStream(URI_utils.getInputStream(uri))));
   }
 
   public int fill(char[] buffer,  int start, int pos)

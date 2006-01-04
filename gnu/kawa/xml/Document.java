@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -11,48 +11,17 @@ import gnu.kawa.functions.BaseUri;
 
 /** Implement the XQuery function 'document'. */
 
-public class Document extends Procedure1
+public class Document
 {
   public static final Document document = new Document();
 
-  /** Resolve relative URI, and return an URL instance. */
-  public static URL makeURL(Object url, Object base)
-    throws java.net.MalformedURLException
-  {
-    if (url instanceof URL)
-      return (URL) url;
-    String name = url.toString();
-    if (! InPort.uriSchemeSpecified(name))
-      {
-	if (base != null)
-	  {
-	    Object b = BaseUri.baseUri(base);
-	    name = BaseUri.resolve(name,
-			   b == Values.empty ?  base.toString()
-			   : b.toString());
-	  }
-	if (! InPort.uriSchemeSpecified(name))
-	  {
-	    name = BaseUri.resolve(name, BaseUri.baseUri().toString());
-	  }
-      }
-    return new URL(name);
-  }
-
-  public static URL makeURL(Object url)
-    throws java.net.MalformedURLException
-  {
-    return makeURL(url, null);
-  }
-
   public static void parse (Object name, Consumer out) throws Throwable
   {
-    URL url = makeURL(name, null);
     SourceMessages messages = new SourceMessages();
-    XMLParser parser = new XMLParser(url, messages, out);
+    XMLParser parser = new XMLParser(name, messages, out);
     out.beginDocument();
     if (out instanceof TreeList)
-      ((TreeList) out).writeBaseUri(url);
+      ((TreeList) out).writeBaseUri(name);
     parser.parse();
     if (messages.seenErrors())
       throw new SyntaxException("document function read invalid XML",
@@ -60,20 +29,20 @@ public class Document extends Procedure1
     out.endDocument();
   }
 
-  public static KDocument parse (Object url) throws Throwable
+  public static KDocument parse (Object uri) throws Throwable
   {
     NodeTree doc = new NodeTree();
-    parse(url, doc);
+    parse(uri, doc);
     return new KDocument(doc, 0);
   }
 
   /** Internal namespace used to mange cached documents. */
   static String docNamespace = "http://gnu.org/kawa/cached-documents";
 
-  public static Object parseCached (URL url)
+  public static Object parseCached (Object uri)
     throws Throwable
   {
-    Symbol sym = Symbol.make(docNamespace, url.toString());
+    Symbol sym = Symbol.make(docNamespace, uri.toString());
     Environment env = Environment.getCurrent();
     synchronized (sym)
       {
@@ -84,9 +53,9 @@ public class Document extends Procedure1
 
         NodeTree tree = new NodeTree();
         SourceMessages messages = new SourceMessages();
-        XMLParser parser = new XMLParser(url, messages, tree);
+        XMLParser parser = new XMLParser(uri, messages, tree);
         tree.beginDocument();
-        tree.writeBaseUri(url);
+        tree.writeBaseUri(uri);
         parser.parse();
         if (messages.seenErrors())
           throw new SyntaxException("document function read invalid XML",
@@ -102,10 +71,20 @@ public class Document extends Procedure1
    * Only positive results are cached; failures are not.)
    * This implements the standard XQuery <code>fn:doc</code> function.
    */
-  public static Object parseCached (Object url, String base)
+  public static Object parseCached (Object uri, Object base)
     throws Throwable
   {
-    return parseCached(makeURL(url, base));
+    if (! (uri instanceof URL))
+      {
+        String name = uri.toString();
+        if (! InPort.uriSchemeSpecified(name))
+          {
+            if (base == null)
+              base = BaseUri.baseUri();
+            uri = URI_utils.resolve(uri, base);
+          }
+      }
+    return parseCached(uri);
   }
 
   /** Check if an XML document is available, caching the result.
@@ -113,46 +92,16 @@ public class Document extends Procedure1
    * for a false result to be followed by a true result, but not vice versa.
    * This implements the standard XQuery <code>fn:doc-available</code> function.
    */
-  public static boolean availableCached (Object url, String base)
-    throws java.net.MalformedURLException
+  public static boolean availableCached (Object url, Object base)
   {
-    URL resolved = makeURL(url, base);
     try
       {
-        parseCached(resolved);
+        parseCached(url, base);
         return true;
       }
     catch (Throwable ex)
       {
         return false;
-      }
-  }
-
-  public Object apply1 (Object arg1) throws Throwable
-  {
-    return parse(arg1.toString());
-  }
-
-  public void apply (CallContext ctx) throws Throwable
-  {
-    Object url = ctx.getNextArg();
-    Object base = ctx.getNextArg(null);
-    if (url instanceof Values)
-      {
-	int iter = 0;
-	Values vals = (Values) url;
-	for (;;)
-	  {
-	    iter = vals.nextPos(iter);
-	    if (iter == 0)
-	      break;
-	    Object val = vals.getPosPrevious(iter);	
-	    parse(makeURL(url, base), ctx.consumer);
-	  }
-      }
-    else
-      {
-	parse(makeURL(url, base), ctx.consumer);
       }
   }
 }

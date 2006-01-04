@@ -1,3 +1,10 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java.in (<init>): New constructor taking InputStream,
+	even when 'CHAR is char'.
+	(<init>): Simplify constructior taking URL.
+	(open): New static method using URI_utils.getInputStream.
+
 2005-12-03  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (startWord): Don't print inter-word space

@@ -1,3 +1,10 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* InPort.java (<<init>): Generalize name to Object - can be a URI.
+	(openFile): Likewise.  Use new URI_utils.getInputStream.
+	* OutPort.java (name): Generalize type - can be a URI.
+	(openFile): Likewise.  Use new URI_utils.getOutputStream.
+
 2005-12-31  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (setInstance): Belatedly update for non-JAVA2 case

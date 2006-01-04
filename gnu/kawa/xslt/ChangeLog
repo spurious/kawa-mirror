@@ -1,3 +1,8 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* XLST.java (runStylesheet): Don't use Document's removed makeURL
+	method.  The parse method now handles resolution.
+
 2005-06-04  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java (append): Add 3 methods, if JAVA5 is defined,

@@ -1,3 +1,9 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-input-file, open-output-file, call-with-input-file,
+	with-input-from-file, with-output-to-file): Generalize to use
+	general path - specifically URIs - and the methods in URI_utils.
+
 2006-01-02  Per Bothner  <per@bothner.com>
 
 	* files.scm (URI): Update package for moved URI_utils class.

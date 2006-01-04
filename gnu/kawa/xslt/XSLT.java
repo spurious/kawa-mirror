@@ -169,12 +169,11 @@ public class XSLT extends XQuery
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    String base = CallContext.getBaseUriDefault();
     String[] args = kawa.repl.commandLineArgArray;
     for (int i = 0;  i < args.length;  i++)
       {
 	String arg = args[i];
-	KDocument doc = Document.parse(Document.makeURL(arg, base));
+	KDocument doc = Document.parse(arg);
 	Focus pos = Focus.getCurrent();
 	pos.push(doc.sequence, doc.ipos);
 	process((TreeList) doc.sequence, pos, ctx);

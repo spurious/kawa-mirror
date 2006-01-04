@@ -1,5 +1,6 @@
 package gnu.mapping;
 import java.io.*;
+import gnu.text.URI_utils;
 
 public class InPort extends gnu.text.LineBufferedReader implements Printable
 {
@@ -8,7 +9,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     super (in);
   }
 
-  public InPort (Reader in, String name)
+  public InPort (Reader in, Object name)
   {
     this (in);
     setName(name);
@@ -19,7 +20,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     super (in);
   }
 
-  public InPort (InputStream in, String name)
+  public InPort (InputStream in, Object name)
   {
     this (in);
     setName(name);
@@ -42,7 +43,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     return new java.io.InputStreamReader(in);
   }
 
-  public InPort (InputStream in, String name, Object conv)
+  public InPort (InputStream in, Object name, Object conv)
     throws java.io.UnsupportedEncodingException
   {
     this (convertToReader(in, conv), name);
@@ -111,19 +112,15 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     return -1;
   }
 
-  public static InPort openFile(String fname)
+  public static InPort openFile(Object fname)
     throws java.io.IOException
   {
-    java.io.InputStream strm;
-    if (uriSchemeSpecified(fname))
-      strm = new java.net.URL(fname).openConnection().getInputStream();
-    else
-      strm = new java.io.FileInputStream(fname);
+    java.io.InputStream strm = URI_utils.getInputStream(fname);
     strm = new java.io.BufferedInputStream(strm);
     return openFile(strm, fname);
   }
 
-  public static InPort openFile(InputStream strm, String fname)
+  public static InPort openFile(InputStream strm, Object fname)
     throws java.io.UnsupportedEncodingException
   {
     return new InPort(strm, fname,
@@ -133,7 +130,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<input-port");
-    String name = getName();
+    Object name = getName();
     if (name != null)
       {
 	ps.print (' ');

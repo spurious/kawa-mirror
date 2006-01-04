@@ -1,3 +1,7 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java (resolve): Remove method - using URI_utils instead.
+
 2006-01-02  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java: Moved to gnu.text.

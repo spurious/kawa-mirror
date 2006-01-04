@@ -1,10 +1,11 @@
 // -*-Java-*-
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
 import java.io.*;
 import java.net.*;
+import gnu.text.URI_utils;
 
 /** Reads XML from a @CHAR@ array.
  * Assumes a state-less character encoding containing ascii as a sub-set,
@@ -572,6 +573,17 @@ public class @XMLParser@
     this.out = out;
   }
 @endif CHAR is byte@
+@if CHAR is char@
+  public @XMLParser@(InputStream in, @ParsedXMLHandler@ out)
+  {
+    this.in = new InputStreamReader(in); 
+    buffer = new char[1024];
+    pos = 0;
+    limit = 0;
+
+    this.out = out;
+  }
+@endif CHAR is char@
 
 @if CHAR is char@
   public @XMLParser@(Reader in, @ParsedXMLHandler@ out)
@@ -596,20 +608,13 @@ public class @XMLParser@
 
   public @XMLParser@(URL url, @ParsedXMLHandler@ out)  throws IOException
   {
-    URLConnection conn = url.openConnection();
-    InputStream in = conn.getInputStream();
-@if CHAR is byte@
-    this.in = in; 
-    buffer = new byte[1024];
-@endif CHAR is byte@
-@if CHAR is char@
-    this.in = new InputStreamReader(in);
-    buffer = new char[1024];
-@endif CHAR is char@
-    pos = 0;
-    limit = 0;
+    this(url.openConnection().getInputStream(), out);
+  }
 
-    this.out = out;
+  public static @XMLParser@ open (Object uri, @ParsedXMLHandler@ out)
+    throws IOException
+  {
+    return new @XMLParser@(URI_utils.getInputStream(uri), out);
   }
 
   public void error(char severity, String message)

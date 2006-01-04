@@ -1,3 +1,7 @@
+2006-01-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (apply): Use new URI_utils methods.
+
 2005-12-31  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (unitScheme): Declare URI function.

@@ -650,6 +650,11 @@ public class XQuery extends Language
       "nonPositiveInteger", "gnu.math.IntNum",
       "negativeInteger", "gnu.math.IntNum",
       "nonNegativeInteger", "gnu.math.IntNum",
+      /* #ifdef use:java.net.URI */
+      "anyURI", "java.net.URI",
+      /* #else */
+      // "anyURI", Type.string_type,
+      /* #endif */
       "decimal", "gnu.math.RealNum"
     };
 

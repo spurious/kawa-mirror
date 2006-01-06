@@ -543,7 +543,7 @@ public class LitTable implements ObjectOutput
 	// We need to special case ClassTypes that are (currently)
 	// non-existing, because the corresponding reflective Class
 	// needs to be loaded using the correct ClassLoader.
-	comp.loadClassRef(((ClassType) literal.value).getName());
+	comp.loadClassRef(((ClassType) literal.value));
 	code.emitInvokeStatic(Compilation.typeType.getDeclaredMethod("make", 1));
 	code.emitCheckcast(Compilation.typeClassType);
 	store(literal, ignore, code);

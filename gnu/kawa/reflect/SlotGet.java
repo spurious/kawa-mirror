@@ -197,7 +197,7 @@ public class SlotGet extends Procedure2
         // Ideally we should also handle array types ...  FIXME
         && type instanceof ClassType)
       {
-        comp.loadClassRef(type.getName());
+        comp.loadClassRef((ClassType) type);
         target.compileFromStack(comp, Type.java_lang_Class_type);
         return;
       }

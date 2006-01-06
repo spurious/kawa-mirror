@@ -1,3 +1,7 @@
+2006-01-05  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java: Use new Compilation.loadClasRef variant.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (getField, compile): Pass the declaring-class of the

@@ -1,3 +1,10 @@
+2006-01-05  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (loadClassRef): New overload takes ClassType.
+	Partly for convenience, plus an optimization.
+	* ClassExp.java: New new loadClasRef variant.
+	* LitTable.java: Likewise.
+
 2005-12-22  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (allocField): Alloc fields even if decl.ignorable().

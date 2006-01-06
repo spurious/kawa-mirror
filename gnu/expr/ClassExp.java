@@ -73,7 +73,7 @@ public class ClassExp extends LambdaExp
     // Type.make(Class.forname)
 
     gnu.bytecode.CodeAttr code = comp.getCode();
-    comp.loadClassRef(new_class.getName());
+    comp.loadClassRef(new_class);
     ClassType typeType;
     int nargs;
     boolean needsLink = getNeedsClosureEnv();
@@ -82,7 +82,7 @@ public class ClassExp extends LambdaExp
         if (new_class == instanceType)
           code.emitDup(instanceType);
         else
-          comp.loadClassRef(instanceType.getName());
+          comp.loadClassRef(instanceType);
 	typeType = ClassType.make("gnu.expr.PairClassType");
 	nargs = needsLink ? 3 : 2;
       }

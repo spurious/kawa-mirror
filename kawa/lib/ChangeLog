@@ -1,3 +1,9 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* files.scm (URI): Give specific <URI> return type.
+	(resolve-uri): New procedure.
+	(module-uri): New macro.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* files.scm (include-relative): Update to use URI_utils.

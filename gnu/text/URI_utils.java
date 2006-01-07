@@ -27,44 +27,19 @@ public class URI_utils
     return InPort.uriSchemeSpecified(uri.toString());
   }
 
-  /** Handle name that starts with "class-resource://". */
+  /** Handle name that starts with "class-resource:/". */
   static URL resourceURL (Object uri, String str)
     throws java.io.IOException
   {
-    // Either: class-resource://CLASS//LOADER-REL-PATH
-    // or: class-resource://CLASS/CLASS-REL-PATH
-    // or: class-resource:///LOADER-REL-PATH
+    // Either: class-resource:/PACKAGE/CLASS
+    // or: class-resource:/CLASS
+    // or: class-resource:/PACKAGE/RESOURCE
+    // or: class-resource:/RESOURCE
     ClassLoader loader = getClassLoaderForURI(uri);
-    int sl1 = CLASS_RESOURCE_URI_SCHEME_LENGTH + 2;
-    int sl2 = str.indexOf('/', sl1);
     if (loader == null)
-      {
-        if (sl2 > sl1)
-          {
-            try
-              {
-                String clname = str.substring(sl1, sl2);
-                Class clas = Class.forName(clname);
-                loader = clas.getClassLoader();
-              }
-            catch (Throwable ex)
-              {
-                // loader is null, so handled below.
-              }
-          }
-        if (loader == null)
-          throw new IOException("unknown class-loader for URI '"+str+'\'');
-      }
-    int pstart;
-    if (sl2 <= 0) // actually invalid
-      pstart = sl1;
-    else if (sl2 == sl1) // case 3 above
-      pstart = sl1+1;
-    else if (sl2+1 <= str.length() && str.charAt(sl2+1)=='/') // case 1
-      pstart = sl2+2;
-    else // case 1
-      pstart = sl1;
-    URL url = loader.getResource(str.substring(pstart));
+      throw new IOException("unknown class-loader for URI '"+str+'\'');
+    URL url
+      = loader.getResource(str.substring(CLASS_RESOURCE_URI_PREFIX_LENGTH));
     if (url == null)
       throw new FileNotFoundException(str);
     return url;
@@ -76,7 +51,7 @@ public class URI_utils
     if (uri instanceof URL || uri instanceof File)
       return uri;
     String str = uri.toString();
-    if (str.startsWith(CLASS_RESOURCE_URI_SCHEME + "//"))
+    if (str.startsWith(CLASS_RESOURCE_URI_PREFIX))
       return resourceURL(uri, str);
     if (! InPort.uriSchemeSpecified(str))
       {
@@ -309,12 +284,55 @@ public class URI_utils
   /** A special URI-scheme for accessing resources relative to a ClassLoader.
    * The resource is found using ClassLoader's getResource method.
    * The actual ClassLoader is found using getClassLoaderForURI. */
-  public static final String CLASS_RESOURCE_URI_SCHEME = "class-resource:";
+  public static final String CLASS_RESOURCE_URI_PREFIX = "class-resource:/";
 
-  /** The length of CLASS_RESOURCE_URI_SCHEME, including colon. */
-  public static final int CLASS_RESOURCE_URI_SCHEME_LENGTH = 15;
+  /** The length of CLASS_RESOURCE_URI_PREFIX, including ":/". */
+  public static final int CLASS_RESOURCE_URI_PREFIX_LENGTH = 16;
 
-  public static Object resolve (Object relative, Object base)
+  public static
+  /* #ifdef use:java.net.URI */
+  URI
+  /* #else */
+  // String
+  /* #endif */
+  makeClassResourceURI (Class clas)
+  {
+    String cname = clas.getName();
+    int dot = cname.lastIndexOf('.');
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append(CLASS_RESOURCE_URI_PREFIX);
+    if (dot >= 0)
+      {
+        sbuf.append(cname.substring(0, dot));
+        sbuf.append('/');
+        cname = cname.substring(dot+1);
+      }
+    sbuf.append(cname);
+    String str = sbuf.toString();
+    /* #ifdef use:java.net.URI */
+    URI uri;
+    try
+      {
+        uri = new URI(str);
+      }
+    catch (Throwable ex)
+      {
+        throw gnu.mapping.WrappedException.wrapIfNeeded(ex);
+      }
+    /* #else */
+    // String uri = str;
+    /* #endif */
+    setClassLoaderForURI(uri, clas.getClassLoader());
+    return uri;
+  }
+
+  public static
+  /* #ifdef use:java.net.URI */
+  URI
+  /* #else */
+  // String
+  /* #endif */
+  resolve (Object relative, Object base)
     throws java.net.URISyntaxException
   {
     String rstr;
@@ -362,9 +380,8 @@ public class URI_utils
           }
         rstr = rstr.replace(fileSep, '/');
       }
-    Object resolved;
     /* #ifdef use:java.net.URI */
-    resolved =  toURI(base).resolve(rstr);
+    URI resolved =  toURI(base).resolve(rstr);
     /* #else */
     // /* The following is an appximation of URI's rsolve method. */
     // /* For example, it doesn't simplify "../" to "". */
@@ -396,9 +413,9 @@ public class URI_utils
     //     sbuf.setLength(pathStart);
     //   }
     // sbuf.append(rstr);
-    // resolved = sbuf.toString();
+    // String resolved = sbuf.toString();
     /* #endif */
-     if (resolved.toString().startsWith(CLASS_RESOURCE_URI_SCHEME))
+     if (resolved.toString().startsWith(CLASS_RESOURCE_URI_PREFIX))
       setClassLoaderForURI(resolved, getClassLoaderForURI(base));
     return resolved;
   }

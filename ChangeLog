@@ -1,10 +1,15 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (getNamedType): Declare <URI> type.
+	(initScheme): Declare resolve-uri function, and module-uri syntax,
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (apply): Use new URI_utils methods.
 
 2005-12-31  Per Bothner  <per@bothner.com>
 
-	* kawa/standard/Scheme.java (unitScheme): Declare URI function.
+	* kawa/standard/Scheme.java (initScheme): Declare URI function.
 	(createReadTable): Declare URI as a reader constructor.
 
 	* kawa/lang/Quote.java: Un-tab-ify conditional code.

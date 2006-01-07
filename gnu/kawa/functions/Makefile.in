@@ -222,6 +222,7 @@ java_sources = \
   CountValues.java \
   DisplayFormat.java \
   DivideOp.java \
+  GetModuleClass.java \
   GetNamedPart.java \
   IntegerFormat.java \
   IsEq.java IsEqual.java IsEqv.java \

@@ -1,3 +1,8 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalToClass): If url isn't specified,
+	use default from CallContext's baseUri.
+
 2006-01-05  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (loadClassRef): New overload takes ClassType.

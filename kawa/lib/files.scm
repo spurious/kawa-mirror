@@ -62,8 +62,18 @@
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
 
-(define (URI url)
+(define (URI url) :: <URI>
   (gnu.text.URI_utils:toURI url))
+
+(define (resolve-uri uri base) :: <URI>
+  (gnu.text.URI_utils:resolve uri base))
+
+(define-syntax module-uri
+  (lambda (form)
+    (syntax-case form ()
+      ((_)
+       (gnu.kawa.functions.GetModuleClass::getModuleClassURI
+	(gnu.expr.Compilation:getCurrent))))))
 
 (define-private *temp-file-number* 1)
 ; From MzLib.  Scsh has (create-temp-file [prefix]).

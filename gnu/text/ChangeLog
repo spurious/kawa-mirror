@@ -1,3 +1,14 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (makeClassResourceURI): New method.
+	(resourceURL): Largely rewrite for modified "class-resource:/"
+	uri-scheme handling.
+	(CLASS_RESOURCE_URI_SCHEME): Rename to CLASS_RESOURCE_URI_PREFIX
+	and add '/'.
+	(CLASS_RESOURCE_URI_SCHEME_LENGTH): Likewise increment and
+	rename to CLASS_RESOURCE_URI_PREFIX_LENGTH.
+	(resolve): Give more precise return type.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (isAbsolute, resourceURL, toFileOrURL,

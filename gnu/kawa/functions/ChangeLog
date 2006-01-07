@@ -1,3 +1,9 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* GetModuleClass.java: New class, extends Procedure0.
+	(getModuleClassURI): New static main public entry point.
+	* Makefile.am (java_sources): Add new file.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java (resolve): Remove method - using URI_utils instead.

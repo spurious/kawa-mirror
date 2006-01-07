@@ -587,6 +587,8 @@ public class Scheme extends LispLanguage
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
       defProcStFld("URI", "kawa.lib.files");
+      defProcStFld("resolve-uri", "kawa.lib.files");
+      defSntxStFld("module-uri", "kawa.lib.files");
 
       defSntxStFld("future", "kawa.lib.thread");
       defProcStFld("sleep", "kawa.lib.thread");
@@ -965,6 +967,11 @@ public class Scheme extends LispLanguage
         types.put ("f64vector", ClassType.make("gnu.lists.F64Vector"));
         types.put ("document", ClassType.make("gnu.lists.TreeList"));
         types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
+        /* #ifdef use:java.net.URI */
+        types.put ("URI", ClassType.make("java.net.URI"));
+        /* #else */
+        // types.put ("URI", ClassType.make("java.lang.String"));
+        /* #endif */
       }
     Type type = (Type) types.get(name);
     if (type == null

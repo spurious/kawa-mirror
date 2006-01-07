@@ -57,8 +57,16 @@ public class ModuleExp extends LambdaExp
     try
       {
 	ArrayClassLoader loader = new ArrayClassLoader ();
-        if (url != null)
-          loader.setResourceContext(url);
+        if (url == null)
+          {
+            CallContext ctx = CallContext.getInstance();
+            String base = ctx.getBaseUri();
+            if (InPort.uriSchemeSpecified(base))
+              url = new URL(base);
+            else
+              url = new URL(new URL(ctx.getBaseUriDefault()), base);
+          }
+        loader.setResourceContext(url);
 	comp.loader = loader;
 
 	comp.compile(mexp);

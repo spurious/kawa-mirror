@@ -1,5 +1,11 @@
 2006-01-07  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Quote.java (consX$V): New static helper method.
+	(expand_pair): Use new consX$V method rather than compiled
+	method in gnu.kawa.slib.srfi1.  The latter caused an awkward
+	dependency which broke quasi-quotation under Common Lisp.
+	(consXType): Remove no-longer-needed field.
+
 	* kawa/standard/Scheme.java (getNamedType): Declare <URI> type.
 	(initScheme): Declare resolve-uri function, and module-uri syntax,
 

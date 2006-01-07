@@ -157,10 +157,8 @@ public class Quote extends Syntax implements Printable
                     Expression[] args = new Expression[nargs];
                     vec.copyInto(args);
                     args[nargs-1] = coerceExpression(cdr, tr);
-                    if (splicing == 0)
-                      cdr = Invoke.makeInvokeStatic(consXType, "cons$St", args);
-                    else
-                      cdr = Invoke.makeInvokeStatic(quoteType, "append", args);
+                    String method = splicing == 0 ? "consX" : "append";
+                    cdr = Invoke.makeInvokeStatic(quoteType, method, args);
                   }
                 rest = pair;
                 break;
@@ -368,6 +366,12 @@ public class Quote extends Syntax implements Printable
     return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr), tr);
   }
 
+  /** A wrapper around LList.consX to make it a "variable-arg method". */
+  public static Object consX$V (Object[] args)
+  {
+    return LList.consX(args);
+  }
+
   /** Same as regular append, but handle SyntaxForm wrappers. */
   public static Object append$V (Object[] args)
   {
@@ -411,7 +415,6 @@ public class Quote extends Syntax implements Printable
     return result;
   }
 
-  static final ClassType consXType = ClassType.make("gnu.kawa.slib.srfi1");
   static final ClassType vectorType = ClassType.make("kawa.lib.vectors");
   static final ClassType vectorAppendType
     = ClassType.make("kawa.standard.vector_append");

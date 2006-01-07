@@ -1,3 +1,10 @@
+2006-01-07  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (RESOLVE_URI_BUILTIN): New constant.
+	(<init>): Declare "resolve-uri" function.
+	(walkApplyExp): Handle RESOLVE_URI_BUILTIN.
+	(getBaseUriExpr): New helper method.
+
 2006-01-05  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (typeMap): Add binding for anyURI.

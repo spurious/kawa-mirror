@@ -47,6 +47,9 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>doc-available</code> function. */
   public static final int BASE_URI_BUILTIN = -11;
 
+  /** Code number for the special <code>ressolve-uri</code> function. */
+  public static final int RESOLVE_URI_BUILTIN = -12;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -92,6 +95,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
     pushBuiltin("root", ROOT_BUILTIN);
     pushBuiltin("base-uri", BASE_URI_BUILTIN);
+    pushBuiltin("resolve-uri", RESOLVE_URI_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
     pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
@@ -459,8 +463,26 @@ public class XQResolveNames extends ResolveNames
                                                    1, 1, args.length);
                   if (err != null)
                     return getCompilation().syntaxError(err);
-                  Expression base = QuoteExp.getInstance(parser.baseURI);
+                  Expression base = getBaseUriExpr();
                   return new ApplyExp(meth, new Expression[]{ args[0], base });
+                }
+              case RESOLVE_URI_BUILTIN:
+                {
+                  Expression[] args = exp.getArgs();
+                  String err
+                    = WrongArguments.checkArgCount("fn:"+decl.getName(),
+                                                   1, 2, args.length);
+                  if (err != null)
+                    return getCompilation().syntaxError(err);
+                  Expression[] margs = new Expression[2];
+                  margs[0] = args[0];
+                  if (args.length == 1)
+                    margs[1] = getBaseUriExpr();
+                  else
+                    margs[1] = args[1];
+                  Method meth = ClassType.make("gnu.text.URI_utils")
+                    .getDeclaredMethod("resolve", 2);
+                  return new ApplyExp(meth, margs);
                 }
               case DISTINCT_VALUES_BUILTIN:
                 {
@@ -497,6 +519,15 @@ public class XQResolveNames extends ResolveNames
 	  make.setNamespaceNodes(nsBindings);
       }
     return exp;
+  }
+
+  Expression getBaseUriExpr ()
+  {
+    Compilation comp = getCompilation();
+    if (parser.baseURI != null)
+      return QuoteExp.getInstance(parser.baseURI);
+    else
+      return gnu.kawa.functions.GetModuleClass.getModuleClassURI(comp);
   }
 
   static NamespaceBinding maybeAddNamespace(SName qname,

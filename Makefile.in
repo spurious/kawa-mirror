@@ -64,9 +64,9 @@ CTAGS = ctags
 DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 	gnu/mapping gnu/xml gnu/kawa/xml gnu/kawa/xslt gnu/expr \
 	gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions \
-	gnu/kawa/lispexpr gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant \
-	gnu/kawa/models gnu/kawa/swingviews kawa gnu/kawa/slib \
-	gnu/commonlisp gnu/q2 gnu/ecmascript gnu/jemacs/lang \
+	gnu/kawa/lispexpr gnu/kawa/models gnu/kawa/swingviews kawa \
+	gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+	gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant gnu/jemacs/lang \
 	gnu/jemacs/buffer gnu/jemacs/lisp gnu/jemacs/testsuite \
 	gnu/jemacs/swing gnu/jemacs/swt gnu/xquery gnu/brl \
 	gnu/kawa/brl bin
@@ -227,9 +227,9 @@ target_vendor = @target_vendor@
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
   gnu/kawa/models gnu/kawa/swingviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+  gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
   gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
   $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
@@ -238,7 +238,6 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 @ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 @ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
-@ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = gnu/kawa/servlet
 javadir = $(datadir)/java
 JAR = jar
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \

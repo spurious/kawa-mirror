@@ -13,6 +13,14 @@ java_sources=\
   ServletCallContext.java \
   ServletPrinter.java
 
-PACKAGE_FNAME = gnu-kawa-servlet
+java_SCM = HTTP.scm
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+PACKAGE_FNAME = gnu-kawa-servlet
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+EXTRA_GCJ_INPUTS =  *.class
+EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
+
+if ENABLE_SERVLET
+ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+endif
+all: Makefile $(ALL)

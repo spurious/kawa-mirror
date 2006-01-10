@@ -517,8 +517,8 @@ public class XQuery extends Language
       }
     catch (Throwable ex)
       {
-	// Ignore.  We get a ClassNotFoundException if gnu.kawa.slib.HTTP
-	// was not built.  We get a NoClassDefFoundError if gnu.kawa.slib.HTTP
+	// Ignore.  We get a ClassNotFoundException if gnu.kawa.servlet.HTTP
+	// was not built.  We get a NoClassDefFoundError if gnu.kawa.servlet.HTTP
 	// can't find servlets in the classpath.
       }
     finally
@@ -589,25 +589,25 @@ public class XQuery extends Language
     defProcStFld("not", "kawa.standard.Scheme");
 
     defaultNamespace = qexoFunctionNamespace;
-    defProcStFld("response-header", "gnu.kawa.slib.HTTP");
-    defProcStFld("response-content-type", "gnu.kawa.slib.HTTP");
-    defProcStFld("response-status", "gnu.kawa.slib.HTTP");
-    defProcStFld("error-response", "gnu.kawa.slib.HTTP");
-    defProcStFld("current-servlet", "gnu.kawa.slib.HTTP");
-    defProcStFld("current-servlet-context", "gnu.kawa.slib.HTTP");
-    defProcStFld("current-servlet-config", "gnu.kawa.slib.HTTP");
-    defProcStFld("servlet-context-realpath", "gnu.kawa.slib.HTTP");
-    defProcStFld("get-response", "gnu.kawa.slib.HTTP");
-    defProcStFld("get-request", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-method", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-uri", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-url", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-path-info", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-path-translated", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-servlet-path", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-query-string", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-parameter", "gnu.kawa.slib.HTTP");
-    defProcStFld("request-parameters", "gnu.kawa.slib.HTTP");
+    defProcStFld("response-header", "gnu.kawa.servlet.HTTP");
+    defProcStFld("response-content-type", "gnu.kawa.servlet.HTTP");
+    defProcStFld("response-status", "gnu.kawa.servlet.HTTP");
+    defProcStFld("error-response", "gnu.kawa.servlet.HTTP");
+    defProcStFld("current-servlet", "gnu.kawa.servlet.HTTP");
+    defProcStFld("current-servlet-context", "gnu.kawa.servlet.HTTP");
+    defProcStFld("current-servlet-config", "gnu.kawa.servlet.HTTP");
+    defProcStFld("servlet-context-realpath", "gnu.kawa.servlet.HTTP");
+    defProcStFld("get-response", "gnu.kawa.servlet.HTTP");
+    defProcStFld("get-request", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-method", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-uri", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-url", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-path-info", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-path-translated", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-servlet-path", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-query-string", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-parameter", "gnu.kawa.servlet.HTTP");
+    defProcStFld("request-parameters", "gnu.kawa.servlet.HTTP");
     defaultNamespace = xqueryFunctionNamespace;
   }
 

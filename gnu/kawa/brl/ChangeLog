@@ -1,3 +1,7 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* BRL.java (initBRL): HTTP module was moved to gnu.kawa.servlet.
+
 2005-07-21  Per Bothner  <per@bothner.com>
 
 	* BRL.java (brl_instance): Make final.

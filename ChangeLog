@@ -1,3 +1,10 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.scm (featureMap): HTTP was moved.
+	* Makefile.am (SUBDIRS): No longer conditionalize on ENABLE_SERVLET.
+	Instead, always do gnu/kawa/servlet.  However, rearrange so it done
+	later, since it now includes HTTP.scm.
+
 2006-01-07  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java (consX$V): New static helper method.

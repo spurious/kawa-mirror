@@ -47,7 +47,7 @@ public class BRL extends Scheme
       {
 	loadClass("gnu.brl.stringfun");
 	loadClass("gnu.kawa.brl.progfun");
-	loadClass("gnu.kawa.slib.HTTP");
+	loadClass("gnu.kawa.servlet.HTTP");
       }
     catch (Throwable ex)
       {

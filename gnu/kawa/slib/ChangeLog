@@ -1,3 +1,9 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm: Moved to gnu/kawa/servlet.
+	* Makefile.am: Update accordingly.  Also, do conditionalizing on
+	ENABLE_SERVLET consitioning here rather than at top-level.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* gui.scm (image-read): Generalize to use URI_utils.

@@ -1,3 +1,8 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm: Moved to gnu/kawa/slib.
+	* Makefile.am: Update accordingly. 
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Better error catching.

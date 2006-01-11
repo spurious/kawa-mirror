@@ -45,6 +45,32 @@ public class URI_utils
     return url;
   }
 
+  public static URL FiletoURL (File file)
+  {
+    try
+      {
+        /* #ifdef JAVA2 */
+        return file.toURL();
+        /* #else */
+        // char fileSep = File.separatorChar;
+        // return new URL("file:" + file.getAbsolutePath().replace(fileSep, '/'));
+        /* #endif */
+      }
+    catch (Throwable ex)
+      {
+        throw gnu.mapping.WrappedException.wrapIfNeeded(ex);
+      }
+  }
+
+  public static URL toURL (Object uri)
+    throws java.io.IOException
+  {
+    uri = toFileOrURL(uri);
+    if (uri instanceof File)
+      return FiletoURL((File) uri);
+    return (URL) uri;
+  }
+
   public static Object toFileOrURL (Object uri)
     throws java.io.IOException
   {
@@ -236,25 +262,9 @@ public class URI_utils
   // public static String FiletoURI (File file)
   // {
   //   if (file.isAbsolute())
-  //     {
-  //       /* #ifdef JAVA2 */
-  //       try
-  //         // {
-  //           // return file.toURL().toString();
-  //         // }
-  //       catch (Throwable ex)
-  //         // {
-  //           // throw gnu.mapping.WrappedException.wrapIfNeeded(ex);
-  //         // }
-  //       /* #else */
-  //       char fileSep = File.separatorChar;
-  //       return "file:" + file.getAbsolutePath().replace(fileSep, '/');
-  //       /* #endif */
-  //     }
+  //     return FiletoURL(file).toString();
   //   else
-  //     {
-  //       return file.toString().replace(File.separatorChar, '/');
-  //     }
+  //     return file.toString().replace(File.separatorChar, '/');
   // }
   /* #endif */
 

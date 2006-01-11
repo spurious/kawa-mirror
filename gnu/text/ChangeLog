@@ -1,3 +1,8 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (FiletoURL, toURL): New methods.
+	(FiletoURI): Use fileToURL.
+
 2006-01-07  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (makeClassResourceURI): New method.

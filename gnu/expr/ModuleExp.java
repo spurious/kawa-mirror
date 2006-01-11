@@ -15,8 +15,6 @@ import java.net.URL;
 public class ModuleExp extends LambdaExp
 		       implements Externalizable
 {
-  public static boolean debugPrintExpr = false;
-
   public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
@@ -158,9 +156,9 @@ public class ModuleExp extends LambdaExp
 
 	if (! alwaysCompile && ! comp.mustCompile)
 	  { // optimization - don't generate unneeded Class.
-	    if (debugPrintExpr)
+	    if (Compilation.debugPrintExpr)
 	      {
-		OutPort dout = OutPort.outDefault();
+		OutPort dout = OutPort.errDefault();
 		dout.println ("[Evaluating module \""+mexp.getName()+"\":");
 		mexp.print(dout);
 		dout.println(']');

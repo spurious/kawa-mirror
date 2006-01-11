@@ -550,7 +550,7 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--debug-print-expr"))
 	  {
-	    gnu.expr.ModuleExp.debugPrintExpr = true;
+            Compilation.debugPrintExpr = true;
 	  }
 	else if (arg.equals("--debug-print-final-expr"))
 	  {

@@ -58,6 +58,9 @@ public class Compilation
    * Do this even if it makes things a little slower. */
   public static boolean fewerClasses;
 
+  /** If true, print out expressions after parsing and before optimizations. */
+  public static boolean debugPrintExpr = false;
+
   /** If true, print out final expressions after optimizations etc. */
   public static boolean debugPrintFinalExpr;
 
@@ -877,9 +880,9 @@ public class Compilation
     mainClass = lexp.classFor(this);
     addClass(lexp, mainClass);
 
-    if (ModuleExp.debugPrintExpr)
+    if (debugPrintExpr)
       {
-	OutPort dout = OutPort.outDefault();
+	OutPort dout = OutPort.errDefault();
 	dout.println("[Compiling module-name:" + lexp.getName()
                      + " to " + mainClass.getName() + ":");
 	lexp.print(dout);
@@ -902,7 +905,7 @@ public class Compilation
 
     if (debugPrintFinalExpr)
       {
-	OutPort dout = OutPort.outDefault();
+	OutPort dout = OutPort.errDefault();
 	dout.println ("[Compiling final "+lexp.getName()+':');
 	lexp.print(dout);
 	dout.println(']');

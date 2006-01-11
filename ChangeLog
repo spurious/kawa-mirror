@@ -1,5 +1,8 @@
 2006-01-10  Per Bothner  <per@bothner.com>
 
+	* kawa.repl (processArgs): The debugPrintExpr flag was moved from
+	ModuleExp to Compilation.
+
 	* kawa/standard/require.scm (featureMap): HTTP was moved.
 	* Makefile.am (SUBDIRS): No longer conditionalize on ENABLE_SERVLET.
 	Instead, always do gnu/kawa/servlet.  However, rearrange so it done

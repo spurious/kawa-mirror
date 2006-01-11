@@ -1,3 +1,11 @@
+2006-01-10  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (debugPrintExpr): Move static field from here ...
+	* Compilation.java: ... to here.
+	* Compilation.java (compile): When debugging print expressions to
+	standard error, rather than standard output.
+	* ModuleExp.java (evalModule): Likewise.
+
 2006-01-07  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): If url isn't specified,

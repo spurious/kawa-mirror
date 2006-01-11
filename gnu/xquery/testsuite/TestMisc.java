@@ -21,7 +21,7 @@ public class TestMisc
   public static void main(String[] args)
   {
     // gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
-    // gnu.expr.ModuleExp.debugPrintExpr = true;
+    // Compilation.debugPrintExpr = true;
     // Compilation.debugPrintFinalExpr = true;
 
     evalTest("3.5+1", "4.5");

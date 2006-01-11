@@ -1,3 +1,7 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Belatedly remove HTTP.scm.
+
 2006-01-10  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm: Moved to gnu/kawa/servlet.

@@ -1,5 +1,10 @@
 2006-01-10  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalModule): Set ContextClassLoader for thread.
+
+	* ModuleExp.java (allocFields): Don't make field for declaration
+	whose value is a ModuleExp - as created by a module-name form.
+
 	* Compilation.java (loadClassRef): moduleInstanceMainField
 	may not have been set yet.
 

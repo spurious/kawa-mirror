@@ -149,6 +149,8 @@ public class ModuleExp extends LambdaExp
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
     Environment orig_env = Environment.getCurrent();
+    ClassLoader savedLoader = null;
+    Thread thread = null; // Non-null if we need to restore context ClassLoader.
     try
       {
 	if (env != orig_env)
@@ -173,6 +175,16 @@ public class ModuleExp extends LambdaExp
 		Class clas = evalToClass(comp, url);
 		if (clas == null)
 		  return;
+                try
+                  {
+                    thread = Thread.currentThread();
+                    savedLoader = thread.getContextClassLoader();
+                    thread.setContextClassLoader(clas.getClassLoader());
+                  }
+                catch (Throwable ex)
+                  {
+                    thread = null;
+                  }
                 Object inst;
                 try
                   {
@@ -236,6 +248,8 @@ public class ModuleExp extends LambdaExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(orig_env);
+        if (thread != null)
+          thread.setContextClassLoader(savedLoader);
       }
   }
 
@@ -336,6 +350,8 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
+        if (value instanceof ModuleExp) // if decl set by a module-name command.
+          continue;
 	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);

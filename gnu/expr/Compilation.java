@@ -2407,7 +2407,10 @@ public class Compilation
 
   public void loadClassRef (ClassType clas)
   {
-    if (clas == mainClass && mainLambda.isStatic())
+    // Try an optimization
+    if (clas == mainClass && mainLambda.isStatic()
+        // moduleInstanceMainField may not have been set yet.
+        && moduleInstanceMainField != null)
       {
         CodeAttr code = getCode();
         code.emitGetStatic(moduleInstanceMainField);

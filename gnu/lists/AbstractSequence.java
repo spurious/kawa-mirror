@@ -373,10 +373,10 @@ public abstract class AbstractSequence
     boolean changed = false;
     for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-	Object value = getPosPrevious(iter);
-	if (c.contains(value))
+        Object value = getPosPrevious(iter);
+        if (c.contains(value))
           {
-	    removePos(iter, -1);
+            removePos(iter, -1);
             changed = true;
           }
       }
@@ -388,10 +388,10 @@ public abstract class AbstractSequence
     boolean changed = false;
     for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-	Object value = getPosPrevious(iter);
+        Object value = getPosPrevious(iter);
         if (! c.contains(value))
           {
-	    removePos(iter, -1);
+            removePos(iter, -1);
             changed = true;
           }
       }
@@ -736,7 +736,7 @@ public abstract class AbstractSequence
     // FIXME should also depend on class?
     /* #ifdef JAVA2 */
     if (! (this instanceof java.util.List)
-	|| ! (o instanceof java.util.List))
+        || ! (o instanceof java.util.List))
       return this == o;
     Iterator it1 = iterator();
     Iterator it2 = ((java.util.List) o).iterator();
@@ -793,8 +793,8 @@ public abstract class AbstractSequence
   public List subList(int fromIx, int toIx)
   {
     return new SubSequence(this,
-			   createPos(fromIx, false),
-			   createPos(toIx, true));
+                           createPos(fromIx, false),
+                	   createPos(toIx, true));
   }
   /* #endif */
 

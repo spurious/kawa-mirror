@@ -213,8 +213,8 @@ public abstract class SimpleVector extends AbstractSequence
     shift(index, index + count, size - count - index);
     for (Iterator it = c.iterator();  it.hasNext(); )
       {
-	set(index++, it.next());
-	changed = true;
+        set(index++, it.next());
+        changed = true;
       }
     return changed;
   }
@@ -310,12 +310,12 @@ public abstract class SimpleVector extends AbstractSequence
           {
             changed = true;
           }
-	else
-	{
-	  if (changed)
-	    set(j, value);
-	  j++;
-	}
+        else
+        {
+          if (changed)
+            set(j, value);
+          j++;
+        }
       }
     setSize(j);
     return changed;
@@ -332,12 +332,12 @@ public abstract class SimpleVector extends AbstractSequence
           {
             changed = true;
           }
-	else
-	  {
-	    if (changed)
-	      set(j, value);
-	    j++;
-	  }
+        else
+          {
+            if (changed)
+              set(j, value);
+            j++;
+          }
       }
     setSize(j);
     return changed;

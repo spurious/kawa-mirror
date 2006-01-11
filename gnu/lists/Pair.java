@@ -195,23 +195,23 @@ public class Pair extends LList implements Externalizable
       return 1;
     for (;;)
       {
-	Object x1 = pair1.car;
-	Object x2 = pair2.car;
-	int d = ((Comparable) x1).compareTo((Comparable) x2);
-	if (d != 0)
-	  return d;
-	x1 = pair1.cdr;
-	x2 = pair2.cdr;
-	if (x1 == x2)
-	  return 0;
-	if (x1 == null)
-	  return -1;
-	if (x2 == null)
-	  return 1;
-	if (! (x1 instanceof Pair) || !(x2 instanceof Pair))
-	  return ((Comparable) x1).compareTo((Comparable) x2);
-	pair1 = (Pair) x1;
-	pair2 = (Pair) x2;
+        Object x1 = pair1.car;
+        Object x2 = pair2.car;
+        int d = ((Comparable) x1).compareTo((Comparable) x2);
+        if (d != 0)
+          return d;
+        x1 = pair1.cdr;
+        x2 = pair2.cdr;
+        if (x1 == x2)
+          return 0;
+        if (x1 == null)
+          return -1;
+        if (x2 == null)
+          return 1;
+        if (! (x1 instanceof Pair) || !(x2 instanceof Pair))
+          return ((Comparable) x1).compareTo((Comparable) x2);
+        pair1 = (Pair) x1;
+        pair2 = (Pair) x2;
       }
   }
 

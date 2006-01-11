@@ -1,6 +1,8 @@
 2006-01-10  Per Bothner  <per@bothner.com>
 
-	* kawa.repl (processArgs): The debugPrintExpr flag was moved from
+	* kawa/standard/Scheme.java (initScheme): Declare resource-uri.
+
+	* kawa/repl.java (processArgs): The debugPrintExpr flag was moved from
 	ModuleExp to Compilation.
 
 	* kawa/standard/require.scm (featureMap): HTTP was moved.

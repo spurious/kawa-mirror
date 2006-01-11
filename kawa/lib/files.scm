@@ -72,8 +72,13 @@
   (lambda (form)
     (syntax-case form ()
       ((_)
-       (gnu.kawa.functions.GetModuleClass::getModuleClassURI
+       (gnu.kawa.functions.GetModuleClass:getModuleClassURI
 	(gnu.expr.Compilation:getCurrent))))))
+
+(define-syntax resource-uri
+  (syntax-rules ()
+    ((resource-uri uri)
+     (gnu.text.URI_utils:resolve uri (module-uri)))))
 
 (define-private *temp-file-number* 1)
 ; From MzLib.  Scsh has (create-temp-file [prefix]).

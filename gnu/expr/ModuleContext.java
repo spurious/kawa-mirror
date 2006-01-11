@@ -38,41 +38,48 @@ public class ModuleContext
     return table.get(info.className);
   }
 
+  /** Allocate a new instance of the class corresponding to the argument. */
+  public Object makeInstance (ModuleInfo info)
+  {
+    String cname = info.className;
+    Class clas;
+    try
+      {
+        clas = info.getModuleClass();
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+        throw new WrappedException("cannot find module " + cname, ex);
+      }
+
+    Object inst;
+    try
+      {
+        try
+          {
+            inst = clas.getDeclaredField("$instance").get(null);
+          }
+        catch (NoSuchFieldException ex)
+          {
+            // Not a static module - create a new instance.
+            inst = clas.newInstance();
+          }
+      }
+    catch (Throwable ex)
+      {
+        throw new WrappedException
+          ("exception while initializing module " + cname, ex);
+      }
+    setInstance(info, inst);
+    return inst;
+  }
+
+  /** If there is no instance of the argument's class, allocated one. */
   public Object findInstance (ModuleInfo info)
   {
     Object inst = table.get(info.className);
-    if (inst == null || inst.getClass() != info.moduleClass)
-      {
-        String cname = info.className;
-	Class clas;
-	try
-	  {
-            clas = info.getModuleClass();
-	  }
-	catch (java.lang.ClassNotFoundException ex)
-	  {
-	    throw new WrappedException("cannot find module " + cname, ex);
-	  }
-
-	try
-	  {
-	    try
-	      {
-		inst = clas.getDeclaredField("$instance").get(null);
-	      }
-	    catch (NoSuchFieldException ex)
-	      {
-		// Not a static module - create a new instance.
-		inst = clas.newInstance();
-	      }
-	  }
-	catch (Throwable ex)
-	  {
-	    throw new WrappedException
-	      ("exception while initializing module " + cname, ex);
-	  }
-	setInstance(info, inst);
-      }
+    if (inst == null)
+      inst = makeInstance(info);
     return inst;
   }
 

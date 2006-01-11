@@ -1,5 +1,10 @@
 2006-01-10  Per Bothner  <per@bothner.com>
 
+	* ModuleContext.java (findInstance): Split out allocation into ...
+	(makeInstance): New method.
+	(findInstance): Don't require class of instance of match that of
+	ModuleInstance.  This allow replacing of "proxy" instances.
+
 	* ModuleExp.java (evalModule): Set ContextClassLoader for thread.
 
 	* ModuleExp.java (allocFields): Don't make field for declaration

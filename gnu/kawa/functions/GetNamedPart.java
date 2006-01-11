@@ -95,21 +95,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
           }
       }
 
-    try
-      {
-        gnu.kawa.reflect.SlotSet.setField(container, part.toString(), value);
-        return;
-      }
-    catch (Throwable ex)
-      {
-        // FIXME!
-      }
-
-    StringBuffer sbuf = new StringBuffer();
-    sbuf.append("setN called:");
-    for (int i = 0;  i < args.length;  i++)
-      sbuf.append(" "+args[i]);
-    throw new Error(sbuf.toString());
+    gnu.kawa.reflect.SlotSet.setField(container, part.toString(), value);
   }
 }
 

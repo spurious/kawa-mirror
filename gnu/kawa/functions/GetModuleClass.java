@@ -21,18 +21,13 @@ public class GetModuleClass extends Procedure0
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    // Usually equivalent to the following, though that is sensitive to class
-    // loader mismatches.
-    // comp.compileConstant("class-resources://" + comp.mainClass.getName() + '/', target);
-    // This could/should be optimized.  FIXME.
     comp.loadClassRef(comp.mainClass);
     target.compileFromStack(comp, ClassType.make("java.lang.Class"));
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    //return ClassType.make("java.lang.Class");
-    return Type.pointer_type;
+    return ClassType.make("java.lang.Class");
   }
 
   private static String CLASS_RESOURCE_NAME = "$class_resource_URI$";

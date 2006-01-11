@@ -1,3 +1,7 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* GetModuleClass.java: Some cleaning up.
+
 2006-01-07  Per Bothner  <per@bothner.com>
 
 	* GetModuleClass.java: New class, extends Procedure0.

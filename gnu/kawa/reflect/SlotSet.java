@@ -119,22 +119,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         && caller.isAccessible(field.getDeclaringClass(), field.getModifiers()))
       return field;
 
-    // Try looking for a method "setName" instead:
-    // But only if there is also "getName" or "isName" method:
-    String getName = ClassExp.slotToMethodName("get", name);
-    gnu.bytecode.Method method = clas.getMethod(getName, Type.typeArray0);
-    if (method == null)
-      {
-        getName = ClassExp.slotToMethodName("is", name);
-        method = clas.getMethod(getName, Type.typeArray0);
-      }
-    if (method == null)
-      return field;
-    Type ftype = method.getReturnType();
     String setName = ClassExp.slotToMethodName("set", name);
-    Type[] args = new Type[1];
-    args[0] = ftype;
-    method = clas.getMethod(setName, args);
+    gnu.bytecode.Method method = clas.getDeclaredMethod(setName, 1);
     if (method == null)
       return field;
     else

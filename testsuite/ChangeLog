@@ -1,3 +1,9 @@
+2005-12-10  Per Bothner  <per@bothner.com>
+
+	* classes2.scm: Added 2 functions for capturing module-level non-static
+	variable "through" a ClassExp.
+	(obj-test): Call those new functions.
+
 2005-12-05  Per Bothner  <per@bothner.com>
 	    Dean Ferreyra <dean@octw.com>
 

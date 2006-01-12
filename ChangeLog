@@ -1,3 +1,7 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.scm (featureMap): Define swing-gui feature.
+
 2006-01-10  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initScheme): Declare resource-uri.

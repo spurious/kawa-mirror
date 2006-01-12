@@ -87,6 +87,7 @@ public class require extends Syntax
     map("srfi-69", SLIB_PREFIX + "srfi69");
     map("hash-table", SLIB_PREFIX + "srfi69");
     map("gui", SLIB_PREFIX + "gui");
+    map("swing-gui", SLIB_PREFIX + "swing");
   }
 
   public static String mapFeature(String featureName)

@@ -1,3 +1,7 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* gui-test.scm: Update for gui changes.
+
 2005-12-10  Per Bothner  <per@bothner.com>
 
 	* classes2.scm: Added 2 functions for capturing module-level non-static

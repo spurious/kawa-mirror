@@ -212,7 +212,7 @@ PACKAGE_FNAME = gnu-kawa-slib
 EXTRA_GCJ_INPUTS = *.class
 EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
 @ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm
-@ENABLE_XML_TRUE@@WITH_SWING_TRUE@SWING_SCM = gui.scm
+@ENABLE_XML_TRUE@@WITH_SWING_TRUE@SWING_SCM = swing.scm
 
 # NOTE if this list is changed, also update build,xml.
 java_SCM = DefineRecordType.scm readtable.scm \
@@ -220,9 +220,9 @@ java_SCM = DefineRecordType.scm readtable.scm \
   conditions.scm srfi34.scm \
   srfi37.scm srfi69.scm \
   genwrite.scm pp.scm ppfile.scm printf.scm \
-  cut.scm testing.scm $(XML_SCM) $(SWING_SCM)
+  cut.scm testing.scm $(XML_SCM) gui.scm $(SWING_SCM)
 
-EXTRA_DIST = $(java_SCM) XML.scm.scm gui.scm
+EXTRA_DIST = $(java_SCM) XML.scm gui.scm
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 all: all-am
 
@@ -420,11 +420,7 @@ elisp-classes.stamp: $(java_ELISP)
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
-all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-# Used to generate makekawa.bat in ../../.. .
-list-sources:
-	echo $(SCMSOURCES)
+all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

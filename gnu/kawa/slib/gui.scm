@@ -1,8 +1,3 @@
-(define (make-action-listener proc)
-  :: <java.awt.event.ActionListener>
-  (invoke-static <gnu.kawa.swingviews.SwingContainer>
-		 'makeActionListener proc))
-
 (define-syntax process-keywords
   (syntax-rules ()
 		((process-keywords obj args handle-keyword handle-non-keyword)
@@ -25,17 +20,32 @@
 				  (handle-non-keyword obj arg)
 				  (loop (+ i 1)))))))))))
 
+(define (as-color value) :: <java.awt.Color>
+  (cond ((instance? value <java.awt.Color>)
+	 value)
+	((instance? value <java.lang.Integer>)
+	 (make <java.awt.Color> (java.lang.Integer:intValue value)))
+	((instance? value <gnu.math.IntNum>)
+	 (make <java.awt.Color> (gnu.math.IntNum:intValue value)))
+	(else
+	 (static-field <java.awt.Color> (*:toString value)))))
+
 (define-private (button-keyword (button :: <gnu.kawa.models.Button>)
 				(name :: <java.lang.String>)
 				value)
-  (cond ((eq? name 'label)
-	 (invoke button 'setLabel value))
-	((eq? name 'image)
-	 #t) ;; not implemented
+  (cond ((eq? name 'foreground)
+	  (*:setForeground button (as-color value)))
+	((eq? name 'background)
+	 (*:setBackground button (as-color value)))
+	;((eq? name 'width) (*:setWidth button (extent value)))
+	((eq? name 'action)
+	 (*:setAction button value))
+	;((eq? name 'image)
+	;#t) ;; not implemented
+	((eq? name 'text)
+	 (*:setText button value))
 	((eq? name 'disabled)
-	 (invoke button 'setDisabled value))	 
-	((eq? name 'oncommand)
-	 (invoke button 'setAction value))
+	 (*:setDisabled button value))	 
 	(else (error (format "unknown button attribute ~s" name)))))
 
 (define-private (button-non-keyword (button :: <gnu.kawa.models.Button>)
@@ -43,35 +53,19 @@
   #t)
 
 (define (button #!rest args  :: <object[]>)
-  (let ((button :: <gnu.kawa.models.Button>
-		(make  <gnu.kawa.models.Button>)))
+  (let ((button (make  <gnu.kawa.models.Button>)))
     (process-keywords button args button-keyword button-non-keyword)
     button))
 
-(define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
-  (make <gnu.kawa.models.FillShape> shape))
+(define (Button #!rest args  :: <object[]>)
+  (let ((button (make  <gnu.kawa.models.Button>)))
+    (process-keywords button args button-keyword button-non-keyword)
+    button))
 
-(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
-  (make <gnu.kawa.models.DrawShape> shape))
-
-(define (with-paint  (paint  :: <java.awt.Color>)
-		     (pic ::  <gnu.kawa.models.Paintable>))
-  (make  <gnu.kawa.models.WithPaint> pic paint))
-
-(define (with-composite  #!rest (arguments :: <Object[]>))
-  (gnu.kawa.models.WithComposite:make arguments))
-
-(define (composite-src-over #!optional (alpha :: <float> 1.0))
-  :: <java.awt.Composite>
-  (java.awt.AlphaComposite:getInstance
-   (static-field <java.awt.AlphaComposite> 'SRC_OVER)
-   alpha))
-
-(define (composite-src #!optional (alpha :: <float> 1.0))
-  :: <java.awt.Composite>
-  (java.awt.AlphaComposite:getInstance
-   (static-field <java.awt.AlphaComposite> 'SRC)
-   alpha))
+(define-syntax Image
+  (syntax-rules ()
+    ((text-field . args)
+     (make <gnu.kawa.models.DrawImage> . args))))
 
 (define (image-read uri) :: <java.awt.image.BufferedImage>
   (javax.imageio.ImageIO:read (gnu.text.URI_utils:getInputStream uri)))
@@ -82,119 +76,108 @@
 (define (image-height (image  :: <java.awt.image.BufferedImage>)) :: <int>
   (*.getHeight image))
 
-(define (rotation (theta :: <double>)) :: <java.awt.geom.AffineTransform>
-  (java.awt.geom.AffineTransform:getRotateInstance theta))
+(define-private (label-keyword (instance :: <gnu.kawa.models.Label>)
+				(name :: <java.lang.String>)
+				value)
+  (cond ((eq? name 'text)
+	  (*:setText instance value))
+;	((eq? name 'icon)
+;	 (if (or (instance? value <string>)
+;		 (instance? value <java.lang.String>))
+;	     (set! value
+;		   (make <nextapp.echo2.app.ResourceImageReference> value)))
+;	 (*:setIcon instance value))
+	(else (error (format "unknown label attribute ~s" name)))))
 
-(define (with-transform  (transform  :: <java.awt.geom.AffineTransform>)
-		     (pic ::  <gnu.kawa.models.Paintable>))
-  (gnu.kawa.models.WithTransform:new pic transform))
+(define-private (label-non-keyword (instance :: <gnu.kawa.models.Label>)
+				    arg)
+  :: <void>
+  (cond ;((instance? arg <gnu.kawa.models.DrawImage>))
+	; (*:setIcon instance arg))
+	(else
+	 (*:setText instance arg))))
 
-(define-constant color-red :: <java.awt.Color>
-  (static-field <java.awt.Color> 'red))
+(define (Label #!rest args  :: <object[]>)
+  (let ((instance (make <gnu.kawa.models.Label>)))
+    (process-keywords instance args label-keyword label-non-keyword)
+    instance))
 
-(define-private (frame-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
-			       (name :: <java.lang.String>)
-			       value)
+(define-private (text-keyword (instance :: <gnu.kawa.models.Text>)
+				(name :: <java.lang.String>)
+				value)
+  (cond ((eq? name 'text)
+	  (*:setText instance value))
+	;((eq? name 'foreground)
+	;  (*:setForeground button value))
+	;((eq? name 'background)
+	;  (*:setBackground button value))
+	;((eq? name 'layout-data)
+	;  (*:setLayoutData button value))
+	(else (error (format "unknown text attribute ~s" name)))))
+
+(define-private (text-non-keyword (instance :: <gnu.kawa.models.Text>)
+				    arg)
+  :: <void>
+  (*:setText instance arg))
+
+(define (Text #!rest args  :: <object[]>) :: <gnu.kawa.models.Text>
+  (let ((instance (make <gnu.kawa.models.Text>)))
+    (process-keywords instance args text-keyword text-non-keyword)
+    instance))
+
+(define-private (box-keyword (instance :: <gnu.kawa.models.Box>)
+				(name :: <java.lang.String>)
+				value)
+  (cond ;((eq? name 'insets)
+;	  (*:setInsets instance value))
+	((eq? name 'cell-spacing)
+	 (*:setCellSpacing instance value))
+	(else (error (format "unknown box attribute ~s" name)))))
+
+(define-private (as-model arg) :: <gnu.kawa.models.Model>
+  (invoke (<gnu.kawa.models.Display>:getInstance) 'coerceToModel arg))
+
+(define-private (box-non-keyword (box :: <gnu.kawa.models.Box>)
+				    arg) :: <void>
+  (*:add box (as-model arg)))
+;  (*:add box (as-component arg)))
+
+(define (Row #!rest args  :: <object[]>)
+  (let ((instance (make <gnu.kawa.models.Row>)))
+    (process-keywords instance args box-keyword box-non-keyword)
+    instance))
+
+(define (Column #!rest args  :: <object[]>)
+  (let ((instance (make <gnu.kawa.models.Column>)))
+    (process-keywords instance args box-keyword box-non-keyword)
+    instance))
+
+(define (set-content (window :: <gnu.kawa.models.Window>) pane) :: <void>
+  (*:setContent window pane))
+
+(define-private (window-keyword (instance :: <gnu.kawa.models.Window>)
+				(name :: <java.lang.String>)
+				value)
   (cond ((eq? name 'title)
-	 (invoke frame 'setTitle value))
+	  (*:setTitle instance value))
+	((eq? name 'content)
+	 (*:setContent instance value))
 	((eq? name 'menubar)
-	 (invoke frame 'setJMenuBar value))
-	(else (error (format "unknown frame attribute ~s" name)))))
+	 (*:setMenuBar instance value))
+	(else (error (format "unknown window attribute ~s" name)))))
 
-(define (frame #!rest args  :: <object[]>)
-  :: <gnu.kawa.swingviews.SwingFrame>
-    (let ((frame :: <gnu.kawa.swingviews.SwingFrame>
-		 (make  <gnu.kawa.swingviews.SwingFrame> #!null #!null #!void))
-	  (num-args :: <int> (field args 'length)))
-      (let loop ((i :: <int> 0))
-	(if (< i num-args)
-	    (let ((arg ((primitive-array-get <object>) args i)))
-	      (cond ((instance? arg <gnu.expr.Keyword>)
-		     (frame-keyword frame (gnu.expr.Keyword:getName arg)
-				    ((primitive-array-get <object>) args (+ i 1)))
-		     (loop (+ i 2)))
-		    ((instance? arg <gnu.kawa.xml.KAttr>)
-		     (let* ((attr :: <gnu.kawa.xml.KAttr> arg)
-			    (name :: <java.lang.String> (invoke attr 'getName))
-			    (value (invoke attr 'getValue))) ;; FIXME
-		       (frame-keyword frame name value))
-		     (loop (+ i 1)))
-		    (else
-		     (invoke frame 'addComponent arg)
-		     (loop (+ i 1))))))
-	(invoke frame 'pack)
-	(invoke frame 'show)
-	frame)))
+(define-private (window-non-keyword (instance :: <gnu.kawa.models.Window>)
+				    arg)
+  :: <void>
+  (*:setContent instance arg))
 
+(define (Window #!rest args  :: <object[]>) :: <gnu.kawa.models.Window>
+  (let ((instance
+	 (invoke (<gnu.kawa.models.Display>:getInstance) 'makeWindow)))
+    (process-keywords instance args window-keyword window-non-keyword)
+    instance))
 
-
-(define (menubar #!rest args  :: <object[]>)
-    :: <javax.swing.JMenuBar>
-    (let ((menubar :: <javax.swing.JMenuBar>
-		    (make  <javax.swing.JMenuBar>))
-	  (num-args :: <int> (field args 'length)))
-      (let loop ((i :: <int> 0))
-	(if (< i num-args)
-	    (let ((arg ((primitive-array-get <object>) args i)))
-	      
-	      (invoke menubar 'add (as <javax.swing.JMenu> arg))
-	      (loop (+ i 1)))))
-      menubar))
-
-(define (menu #!rest args :: <object[]>)
-    :: <javax.swing.JMenu>
-    (let ((menu :: <javax.swing.JMenu>
-		    (make  <javax.swing.JMenu>))
-	  (num-args :: <int> (field args 'length)))
-      (let loop ((i :: <int> 0))
-	(if (< i num-args)
-	    (let ((arg ((primitive-array-get <object>) args i)))
-	      (cond ((and (eq? arg label:) (< (+ i 1) num-args))
-		     (invoke menu 'setText
-			     (as <String>
-				 ((primitive-array-get <object>) args (+ i 1))))
-		     (loop (+ i 2)))
-		    (else
-		     (invoke menu 'add (as <javax.swing.JMenuItem> arg))
-		     (loop (+ i 1)))))))
-      menu))
-
-(define (menuitem #!key
-		(label :: <String> #!null)
-		(image #!null)
-		(default #!null)
-		(oncommand #!null)
-		(disabled #f)
-		(accesskey #!null))
-  :: <javax.swing.JMenuItem>
-  (let ((menuitem :: <javax.swing.JMenuItem>
-		(make  <javax.swing.JMenuItem>)))
-    (if disabled
-	(invoke menuitem 'setEnabled #f))
-    (if (not (eq? label #!null))
-	(invoke menuitem 'setText label))
-    (if (not (eq? oncommand #!null))
-	(invoke menuitem 'addActionListener (make-action-listener oncommand)))
-    menuitem))
-
-(define (polygon initial #!rest (more-points :: <object[]>))
-  (let ((path :: <java.awt.geom.GeneralPath>
-	      (make <java.awt.geom.GeneralPath>))
-	(n-points :: <int>
-		  ((primitive-array-length <object>) more-points)))
-    (invoke path 'moveTo
-	    (real-part initial) (imag-part initial))
-    (do ((i :: <int> 0 (+ i 1)))
-	((>= i n-points)
-	 (invoke path 'closePath)
-	 path)
-      (let ((pt ((primitive-array-get <object>) more-points i)))
-	(invoke path 'lineTo (real-part pt) (imag-part pt))))))
-
-(define (scroll contents #!key w h)
-  (if (instance? contents <gnu.kawa.models.Paintable>)
-      (set! contents (gnu.kawa.swingviews.SwingPaintable:new contents)))
-  (let ((scr :: <javax.swing.JScrollPane>
-	     (javax.swing.JScrollPane:new contents)))
-    (invoke scr 'setPreferredSize (make <java.awt.Dimension> w h))
-    scr))
+(define-syntax run-application
+  (syntax-rules ()
+    ((run-application window)
+     (gnu.kawa.models.Window:open window))))

@@ -1,5 +1,9 @@
 2006-01-11  Per Bothner  <per@bothner.com>
 
+	* gui.scm: Move Swing-specific functions to ...
+	* swing.scm: ... new file.
+	* Makefile.am: Update accordingly.
+
 	* Makefile.am (EXTRA_DIST): Belatedly remove HTTP.scm.
 
 2006-01-10  Per Bothner  <per@bothner.com>

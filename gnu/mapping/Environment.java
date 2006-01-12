@@ -257,40 +257,37 @@ public abstract class Environment
     throw new RuntimeException("unsupported operation: unlink (aka undefine)");
   }
 
-  /** Remove Location from this Environment and undefined it. */
-  public void remove (Symbol key, Object property, int hash)
+  /** Remove Location from this Environment and undefine it. */
+  public Object remove (Symbol key, Object property, int hash)
   {
     Location loc = unlink(key, property, hash);
-    if (loc != null)
-      loc.undefine();
-  }
+    if (loc == null)
+      return null;
+    Object value = loc.get(null);
+    loc.undefine();
+    return value;
+ }
 
   /** Remove and undefine binding.
-   * (A more type-specific version of gnu.util.mape.remove.)
    * @return Old value
    */
-  public Object remove (EnvironmentKey key)
+  public final Object remove (EnvironmentKey key)
   {
     Symbol symbol = key.getKeySymbol();
     Object property = key.getKeyProperty();
     int hash = symbol.hashCode() ^ System.identityHashCode(property);
-    Location loc = getLocation(symbol, property, hash, false);
-    if (loc == null)
-      return null;
-    Object value = loc.get(null);
-    remove(symbol, property, hash);
-    return value;
+    return remove(symbol, property, hash);
   }
 
-  public void remove (Symbol symbol, Object property)
+  public final Object remove (Symbol symbol, Object property)
   {
     int hash = symbol.hashCode() ^ System.identityHashCode(property);
-    remove(symbol, property, hash);
+    return remove(symbol, property, hash);
   }
 
   public final void remove (Symbol sym)
   {
-    remove(sym, null);
+    remove(sym, null, sym.hashCode());
   }
 
   public final void removeFunction (Symbol sym)
@@ -300,12 +297,16 @@ public abstract class Environment
 
   public final Object remove (Object key)
   {
-    Location loc = getLocation(key, false);
-    if (loc == null)
-      return null;
-    Object oldValue = loc.get(null);
-    remove(loc);
-    return oldValue;
+    Object property = null;
+    if (key instanceof EnvironmentKey)
+      {
+	EnvironmentKey k = (EnvironmentKey) key;
+	return remove(k.getKeySymbol(), k.getKeyProperty());
+      }
+    Symbol symbol = key instanceof Symbol ? (Symbol) key
+      : getSymbol((String) key);
+    int hash = symbol.hashCode() ^ System.identityHashCode(property);
+    return remove(symbol, property, hash);
   }
 
   public Namespace defaultNamespace()

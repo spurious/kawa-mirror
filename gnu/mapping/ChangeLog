@@ -1,3 +1,12 @@
+2006-01-12  Per Bothner  <per@bothner.com>
+
+	* Environment.java (remove): Fix a StackOverflowException.
+	Make most variants final and implemented in terms on one core method.
+	Have that method be implemented using unlink.
+	Have most of the remove methods return the old value.
+	* SimpleEnvironment.java (remove): Remove method.  Redundant now
+	that we use unlink and undefine.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* InPort.java (<<init>): Generalize name to Object - can be a URI.

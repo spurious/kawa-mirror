@@ -266,35 +266,6 @@ public class SimpleEnvironment extends Environment
     return null;
   }
 
-  public Object remove (EnvironmentKey key)
-  {
-    Symbol symbol = key.getKeySymbol();
-    Object property = key.getKeyProperty();
-    int index = ((symbol.hashCode() ^ System.identityHashCode(property))
-		 & this.mask);
-    NamedLocation prev = null;
-    NamedLocation loc = table[index];
-    while (loc != null)
-      {
-	NamedLocation next = loc.next;
-	if (loc.matches(symbol, property))
-	  {
-	    Object value = loc.get(null);
-	    if (prev == null)
-	      table[index] = next;
-	    else
-	      prev.next = loc;
-	    num_bindings--;
-	    if (loc instanceof IndirectableLocation)
-	      ((IndirectableLocation) loc).undefine();
-	    return value;
-	  }
-	prev = loc;
-	loc = next;
-      }
-    return null;
-  }
-
   /** Does not enumerate inherited Locations. */
   public LocationEnumeration enumerateLocations()
   {

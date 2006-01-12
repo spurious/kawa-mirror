@@ -3,7 +3,7 @@
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  gnu/kawa/models gnu/kawa/swingviews \
+  gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
   gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
   gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
@@ -96,7 +96,7 @@ JAVADOC_PACKAGES = \
   gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard kawa.lib \
   gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
   gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang \
-  gnu.kawa.models gnu.kawa.swingviews gnu.q2.lang \
+  gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.q2.lang \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
 
 JAVADOC = javadoc

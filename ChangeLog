@@ -1,5 +1,9 @@
 2006-01-11  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (SUBDIRS): Add new directory gnu/kawa/swtviews.
+	(JAVADOC_PACKAGES): Add new package gnu.kawa.swtviews.
+	* configure.in (AC_CONFIG_FILES): Add gnu/kawa/swtviews/Makefile.
+
 	* kawa/repl.java (propertyFields): Add "display:toolkit".
 
 	* kawa/standard/require.scm (featureMap): Define swing-gui feature.

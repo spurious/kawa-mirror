@@ -194,5 +194,6 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
   gnu/kawa/ant/Makefile
   gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile
+  gnu/kawa/swtviews/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile])
 AC_OUTPUT

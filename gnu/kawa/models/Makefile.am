@@ -19,6 +19,7 @@ java_sources = \
   Spacer.java \
   Text.java \
   Viewable.java \
+  WeakListener.java \
   Window.java \
   WithComposite.java \
   WithPaint.java \

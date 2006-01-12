@@ -1,5 +1,9 @@
 2006-01-11  Per Bothner  <per@bothner.com>
 
+	* Model.java (class WeakListener):  Move to ..
+	* WeakListener.java: New public class,
+	since it is needed by SwtDisplay.LabelListener.
+
 	* Model.java: New abstract class, implements Viewable.
 	(WeakListener): New helper class, extends WeakReference.
 	* Box.java: New abstract class, extends Model.

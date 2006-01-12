@@ -4,9 +4,9 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   SwingButton.java \
-  SwingFrame.java \
-  SwingContainer.java \
   SwingContent.java \
+  SwingDisplay.java \
+  SwingFrame.java \
   SwingPaintable.java
 
 PACKAGE_FNAME = gnu-kawa-swingviews

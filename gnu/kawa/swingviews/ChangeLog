@@ -1,3 +1,20 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* SwingDisplay.java: New class, extends gnu.models.Display.
+	(ProcActionListener): New non-public class, extends ActionListener.
+	(SwingBox): New non-public class, extends javax.swing.Box.
+	(SwingLabel): New non-public class, extends JLabel.
+	(ComponentModule): New non-public helper class, extends Model.
+	* SwingButton.java: Nwe implement ModelListener.
+	Remove various "ButtonModel" fields and methods - just sue SwModel.
+	Add some hooks for keeping track for foreground, background, and text.
+	* SwingContainer.java: Removed interface.  Functionality is
+	now in SwingDisplay class.
+	* SwingFrame.java: Now implements gnu.kawa.models.Window.
+	(getDisplay, setContent, setMenuBar, open): New methods.
+	(addComponent): Various updates.
+	* Makefile.am: Update for new and removed java files.
+
 2005-12-22  Per Bothner  <per@bothner.com>
 
 	* SwingContent.java (createPosition): It turns out Swing is happier

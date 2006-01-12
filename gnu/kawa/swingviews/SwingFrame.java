@@ -6,15 +6,11 @@ import javax.swing.*;
 import gnu.lists.*;
 
 public class SwingFrame extends JFrame
-implements ViewContainer
+implements gnu.kawa.models.Window
 {
-  public Object addButton (Button model)
-  {
-    System.err.flush();
-    SwingButton button = new SwingButton(model);
-    getContentPane().add(button);
-    return button;
-  }
+  SwingDisplay display;
+
+  public Display getDisplay () { return display; }
 
   public SwingFrame (String title,
 		     javax.swing.JMenuBar menubar,
@@ -30,19 +26,39 @@ implements ViewContainer
     addComponent(contents);
   }
 
+  public void setContent (Object content)
+  {
+    setContentPane(new JPanel());
+    addComponent(content);
+    pack();
+  }
+
+  public void setMenuBar (Object menubar)
+  {
+    setJMenuBar((javax.swing.JMenuBar) menubar);
+  }
+
   public void addComponent (Object contents)
   {
-    if (contents instanceof AbstractSequence)
+    if (contents instanceof gnu.lists.FString || contents instanceof String)
+      getContentPane().add(new JLabel(contents.toString()));
+    else if (contents instanceof AbstractSequence)
       {
 	AbstractSequence seq = (AbstractSequence) contents;
 	for (int iter = seq.startPos();  (iter = seq.nextPos(iter)) != 0; )
 	  addComponent(seq.getPosPrevious(iter));
       }
     else if (contents instanceof Viewable)
-      ((Viewable) contents).makeView(this);
+      ((Viewable) contents).makeView(getDisplay(), getContentPane());
     else if (contents instanceof Paintable)
       getContentPane().add(new SwingPaintable((Paintable) contents));
-    else
+    else if (contents != null)
       getContentPane().add((Component) contents);
+  }
+
+  public void open ()
+  {
+    pack();
+    setVisible(true);
   }
 }

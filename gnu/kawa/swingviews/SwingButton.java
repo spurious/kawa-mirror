@@ -1,27 +1,63 @@
 package gnu.kawa.swingviews;
 import gnu.kawa.models.*;
 import javax.swing.*;
+import java.awt.Color;
 
 public class SwingButton
 extends JButton
-			      /*  implements ButtonModel*/
+implements ModelListener
 {
-  /*
   Button model;
-
-  // State needed by Swing's ButtonModel but may not be really "model".
-  boolean armed;
-  boolean pressed;
-  boolean rollover;
-  */
 
   public SwingButton (Button model)
   {
+    super(model.getText());
     setModel(new SwModel(model));
+    this.model = model;
     Object action = model.getAction();
     if (action != null)
-      addActionListener(SwingContainer.makeActionListener(action));
-    setText(model.getLabel());
+      addActionListener(SwingDisplay.makeActionListener(action));
+    model.addListener(this);
+    Color fg = model.getForeground();
+    if (fg != null)
+      super.setBackground(fg);
+    Color bg = model.getBackground();
+    if (bg != null)
+      super.setBackground(bg);
+  }
+
+  public void setText(String text)
+  {
+    if (model == null)
+      super.setText(text);
+    else
+      model.setText(text);
+  }
+
+  public void setForeground (Color fg)
+  {
+    if (model == null)
+      super.setForeground(fg);
+    else
+      model.setForeground(fg);
+  }
+
+  public void setBackground (Color bg)
+  {
+    if (model == null)
+      super.setBackground(bg);
+    else
+      model.setBackground(bg);
+  }
+
+  public void modelUpdated (Model model, Object key)
+  {
+    if (key == "text" && model == this.model)
+      super.setText(this.model.getText());
+    else if (key == "foreground" && model == this.model)
+      super.setForeground(this.model.getForeground());
+    else if (key == "background" && model == this.model)
+      super.setBackground(this.model.getBackground());
   }
 }
 
@@ -32,26 +68,6 @@ class SwModel extends DefaultButtonModel
   public SwModel (Button model)
   {
     this.model = model;
-    setActionCommand(model.getLabel());
+    setActionCommand(model.getText());
   }
-
-  /*
-  // ButtonModel methods
-  public boolean isEnabled () { System.err.println("SwB.sisEnabled called");return ! model.isDisabled(); }
-  public void setEnabled (boolean b) { System.err.println("SwB.setEnabled called");model.setDisabled(!b); }
-  */
-  /*
-  public boolean isArmed () { System.err.println("SwB.isArmed called");return armed; }
-  public void setArmed (boolean armed) { System.err.println("SwB.setArmed called");this.armed = armed; }
-  public void setPressed (boolean pressed) { System.err.println("SwB.setPressed called");this.pressed = pressed; }
-  public void setRollover (boolean rollover) { System.err.println("SwB.setRollover called");this.rollover = rollover; }
-  public boolean isPressed () { System.err.println("SwB.uisPressed called");return pressed; }
-  public boolean isRollover () { System.err.println("SwB.isRollover called");return rollover; }
-  public void setGroup (ButtonGroup group)
-  { 
-    System.err.println("SwB.setGroup called");
-throw new UnsupportedOperationException();
-  }
-  */
-
 }

@@ -1,0 +1,14 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	New package.
+	* Echo2Display.java: New class extends Display.
+	(class Echo2Document): New class.
+	(class Echo2Column): New class.
+	(class Echo2Row): New class.
+	(class ResourceImageReference): New class.
+	(class Echo2Label): New class.
+	(class Echo2Button): New class.
+	* Echo2AppInstance.java: New class, extends ApplicationInstance.
+	* Echo2Servlet.java: New class, extends WebContainerServlet.
+	* Echo2Window.java: New class.
+	* Makefile.am: New file.

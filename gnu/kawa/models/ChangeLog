@@ -1,3 +1,26 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* Model.java: New abstract class, implements Viewable.
+	(WeakListener): New helper class, extends WeakReference.
+	* Box.java: New abstract class, extends Model.
+	* Column.java: New class, extends Box.
+	* Row.java: New class, extends Box.
+	* Label.java: New class, extends Model.
+	* Spacer.java: New class, extends Model.
+	* Text.java: New class, expends Model.
+	* Button.java: Change to extend Model.
+	(label): Rename feld and property name from "label" to :text".
+	(foregrund, background, width): Nwe fields and accessor methods.
+	* DrawImage.java: Change to extend Model.
+	Set type of src field to URI, if that is available.
+	(loadImage, getImage, getSrc, setSrc): New methods.
+	* Display.java: New abstract class.
+	* ModelListener.java: New interface.
+	* ViewContainer.java: Removed interface.
+	* Viewable.java (amkeView): Change argument to not use ViewContainer.
+	* Window.java: New interface.
+	* Makefile.am: Update for new and removed java files.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* package.html: New file, for javadoc.

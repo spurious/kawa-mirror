@@ -2,5 +2,5 @@ package gnu.kawa.models;
 
 public interface Viewable
 {
-  public Object makeView(ViewContainer context);
+  public void makeView (Display display, Object where);
 }

@@ -3,14 +3,23 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  Box.java \
   Button.java \
+  Column.java \
+  Display.java \
   DrawImage.java \
   DrawShape.java \
   FillShape.java \
+  Label.java \
+  Model.java \
+  ModelListener.java \
   MenuItem.java \
   Paintable.java \
-  ViewContainer.java \
+  Row.java \
+  Spacer.java \
+  Text.java \
   Viewable.java \
+  Window.java \
   WithComposite.java \
   WithPaint.java \
   WithTransform.java

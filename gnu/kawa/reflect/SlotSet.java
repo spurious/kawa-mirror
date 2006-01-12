@@ -80,20 +80,15 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         setmethod.invoke(obj, args);
         return;
       }
-    catch (java.lang.reflect.InvocationTargetException ex2)
+    catch (java.lang.reflect.InvocationTargetException ex)
       {
-        Throwable th = ex2.getTargetException();
-        if (th instanceof RuntimeException)
-          throw (RuntimeException) th;
-        if (th instanceof Error)
-          throw (Error) th;
-        throw new RuntimeException(th.toString());
+        throw WrappedException.wrapIfNeeded(ex.getTargetException());
       }
     catch (IllegalAccessException ex)
       {
         illegalAccess = true;
       }
-    catch (java.lang.NoSuchMethodException ex3)
+    catch (java.lang.NoSuchMethodException ex)
       {
       }
 

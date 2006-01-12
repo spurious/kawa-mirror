@@ -1,5 +1,7 @@
 2006-01-11  Per Bothner  <per@bothner.com>
 
+	* SlotSet.java (apply2): Use WrappedException.wrapIfNeeded.
+
 	* SlotSet.java (getField): Simplify seraching for a setter method.
 	Specifically, look for any 1-argument method.
 

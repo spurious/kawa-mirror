@@ -618,7 +618,7 @@
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
-      <fileset dir="${src.dir}/gnu/kawa/slib"> 
+      <fileset dir="${src.dir}/gnu/kawa/servlet"> 
         <include name="HTTP.scm"/>
       </fileset>
     </apply>

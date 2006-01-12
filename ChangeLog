@@ -1,5 +1,7 @@
 2006-01-11  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java (propertyFields): Add "display:toolkit".
+
 	* kawa/standard/require.scm (featureMap): Define swing-gui feature.
 
 2006-01-10  Per Bothner  <per@bothner.com>

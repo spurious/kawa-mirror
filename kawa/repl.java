@@ -741,6 +741,7 @@ public class repl extends Procedure0or1
       { "out:right-margin", "gnu.text.PrettyWriter", "lineLengthLoc" },
       { "out:miser-width", "gnu.text.PrettyWriter", "miserWidthLoc" },
       { "out:xml-indent", "gnu.xml.XMLPrinter", "indentLoc" },
+      { "display:toolkit", "gnu.kawa.models.Display", "myDisplay" },
       null
     };
 

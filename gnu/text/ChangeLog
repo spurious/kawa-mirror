@@ -1,3 +1,7 @@
+2006-01-12  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (toFileOrURL): Fix some problems with File handling.
+
 2006-01-10  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (FiletoURL, toURL): New methods.

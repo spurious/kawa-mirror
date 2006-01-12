@@ -83,21 +83,14 @@ public class URI_utils
       {
         CallContext ctx = CallContext.getInstance();
         String base = ctx.getBaseUriRaw();
-        char fileSep = File.separatorChar;
-        if (base == null)
+        if (base == null || ! InPort.uriSchemeSpecified(base))
           {
-            if (fileSep != '/')
-              str = str.replace('/', fileSep);
-            return new File(str);
-          }
-        else if (! InPort.uriSchemeSpecified(base))
-          {
-            if (fileSep != '/')
-              {
-                str = str.replace('/', fileSep);
-                base = base.replace('/', fileSep);
-              }
-            File dir = new File(base);
+            char fileSep = File.separatorChar;
+            str = str.replace('/', fileSep);
+            File file = new File(str);
+            if (base == null || file.isAbsolute())
+              return file;
+            File dir = new File(base.replace('/', fileSep));
             if (! dir.isDirectory())
               {
                 /* #ifdef JAVA2 */

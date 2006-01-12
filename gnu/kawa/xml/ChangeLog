@@ -1,3 +1,10 @@
+2006-01-11  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java: If we see data (including beginGroup) before a
+	beginDocumnet, pretend we saw a beginDocument anyway. This makes
+	creating servlet output more flexible and easier, since we don't
+	have to wrap everything in beginDocument/endDocument.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* Document.java: No longer extend Procedure1.

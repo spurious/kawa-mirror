@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2002. 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -18,9 +18,15 @@ public class HttpPrinter extends FilterConsumer
   StringBuffer sbuf = new StringBuffer(100);
   String currentHeader;
 
+  /** 1 - implicit; 2: explicit. */
+  private int seenBeginDocument;
+
   protected String sawContentType;
 
-  OutputStream ostream;
+  /** Difference between number of beginGroup and endGroup calls so far. */
+  private int groupNesting;
+
+  protected OutputStream ostream;
   OutPort writer;
 
   public HttpPrinter(OutputStream out)
@@ -121,6 +127,11 @@ public class HttpPrinter extends FilterConsumer
 	else if ("text/plain".equalsIgnoreCase(sawContentType))
 	  style = "plain";
 	base = XMLPrinter.make(writer, style);
+        if (seenBeginDocument == 0)
+          {
+            base.beginDocument();
+            seenBeginDocument = 1;
+          }
 	try
 	  {
 	    printHeaders();
@@ -149,6 +160,15 @@ public class HttpPrinter extends FilterConsumer
       }
     beginData();
     base.beginGroup(typeName, type);
+    groupNesting++;
+  }
+
+  public void endGroup(String typeName)
+  {
+    super.endGroup(typeName);
+    groupNesting--;
+    if (groupNesting == 0 && seenBeginDocument == 1)
+      endDocument();
   }
 
   public void writeObject(Object v)
@@ -182,6 +202,7 @@ public class HttpPrinter extends FilterConsumer
   {
     if (base != null)
       base.beginDocument();
+    seenBeginDocument = 2;
   }
 
   public void endDocument()

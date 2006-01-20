@@ -94,7 +94,7 @@ public abstract class MethodProc extends ProcedureN
     code &= 0xffff0000;
     if (code != NO_MATCH_BAD_TYPE)
       return new WrongArguments(proc, args.length);
-    return new WrongType(proc, arg, args[arg-1]);
+    return new WrongType(proc, arg, arg > 0 ? args[arg-1] : null);
   }
 
   public Object applyN(Object[] args) throws Throwable

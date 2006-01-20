@@ -1,3 +1,9 @@
+2006-01-20  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (matchN): Do't cast the extraArg for a constructor.
+	It might be a Class or String rather than a ClassType.
+	We check in Invoke.typeFrom anyway.
+
 2006-01-10  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (findInstance): Split out allocation into ...

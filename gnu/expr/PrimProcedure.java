@@ -154,16 +154,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    rargs[paramCount-1] = restArray;
 	  }
       }
-    if (extraCount != 0)
+    if (isConstructor())
+      extraArg = args[0];
+    else if (extraCount != 0)
       {
 	try
 	  {
-            ClassType extraType;
-            if(isConstructor())
-              extraType = Compilation.typeClassType;
-            else
-              extraType = method.getDeclaringClass();
-	    extraArg = extraType.coerceFromObject(args[0]);
+            extraArg = method.getDeclaringClass().coerceFromObject(args[0]);
 	  }
 	catch (ClassCastException ex)
           {

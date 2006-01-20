@@ -1,3 +1,8 @@
+2006-01-20  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (typeFrom): Fix arguments to WrongType constructor.
+	We used to get a NullPointerException is WrappedException.<init>.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (apply2): Use WrappedException.wrapIfNeeded.

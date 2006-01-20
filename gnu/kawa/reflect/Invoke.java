@@ -56,7 +56,7 @@ public class Invoke extends ProcedureN implements CanInline
       return ClassType.make(arg.toString());
     if (arg instanceof Symbol)
       return ClassType.make(((Symbol) arg).getName());
-    throw new WrongType(thisProc, 0, null);
+    throw new WrongType(thisProc, 0, arg, "class-specifier");
   }
 
   public void apply (CallContext ctx) throws Throwable

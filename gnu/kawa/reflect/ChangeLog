@@ -1,5 +1,10 @@
 2006-01-20  Per Bothner  <per@bothner.com>
 
+	* Invoke.java: Extend 'make' procedure for primitive-array allocation.
+	(typeFrom): Allow to return an ArrayType if this is 'make'.
+	(apply, applyN): Update call-sites accordingly.
+	(applyN, inline): Handle allocation of arrays.
+
 	* Invoke.java (typeFrom): Fix arguments to WrongType constructor.
 	We used to get a NullPointerException is WrappedException.<init>.
 

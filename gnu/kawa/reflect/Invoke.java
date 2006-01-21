@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
+import java.lang.reflect.Array;
 
 public class Invoke extends ProcedureN implements CanInline
 {
@@ -46,12 +47,13 @@ public class Invoke extends ProcedureN implements CanInline
     return applyN(make, args);
   }
 
-  private static ClassType typeFrom (Object arg, Invoke thisProc)
+  private static ObjectType typeFrom (Object arg, Invoke thisProc)
   {
     if (arg instanceof Class)
       arg = Type.make((Class) arg);
-    if (arg instanceof ClassType)
-      return (ClassType) arg;
+    if (arg instanceof ClassType
+        || (thisProc.kind == 'N' && arg instanceof ArrayType))
+      return (ObjectType) arg;
     if (arg instanceof String || arg instanceof FString)
       return ClassType.make(arg.toString());
     if (arg instanceof Symbol)
@@ -74,8 +76,8 @@ public class Invoke extends ProcedureN implements CanInline
         Procedure.checkArgCount(this, nargs);
         Object arg0 = args[0];
         String mname;
-        ClassType dtype = (kind != 'V' ? typeFrom(arg0, this)
-                           : (ClassType) Type.make(arg0.getClass()));
+        ClassType dtype = (ClassType)
+          (kind != 'V' ? typeFrom(arg0, this) : Type.make(arg0.getClass()));
         Object arg1 = args[1];
         if (arg1 instanceof String || arg1 instanceof FString)
           mname = arg1.toString();
@@ -116,8 +118,8 @@ public class Invoke extends ProcedureN implements CanInline
     int nargs = args.length;
     Procedure.checkArgCount(thisProc, nargs);
     Object arg0 = args[0];
-    ClassType dtype = (kind != 'V' ? typeFrom(arg0, thisProc)
-                       : (ClassType) Type.make(arg0.getClass()));
+    ObjectType dtype = (kind != 'V' ? typeFrom(arg0, thisProc)
+                       : (ObjectType) Type.make(arg0.getClass()));
     String mname;
     if (kind == 'N')
       {
@@ -127,6 +129,53 @@ public class Invoke extends ProcedureN implements CanInline
 	    PairClassType ptype = (PairClassType) dtype;
 	    dtype = ptype.instanceType;
 	  }
+        if (dtype instanceof ArrayType)
+          {
+            Type elementType = ((ArrayType) dtype).getComponentType();
+            int len;
+            len = args.length-1;
+            String name;
+            int length;
+            int i;
+            boolean lengthSpecified;
+            if (len >= 2 && args[1] instanceof Keyword
+                && ("length".equals(name = ((Keyword) args[1]).getName())
+                    || "size".equals(name)))
+              {
+                length = ((Number) args[2]).intValue();
+                i = 3;
+                lengthSpecified = true;
+              }
+            else
+              {
+                length = len;
+                i = 1;
+                lengthSpecified = false;
+              }
+            Object arr = Array.newInstance(elementType.getReflectClass(),
+                                           length);
+            int index = 0;
+            for (; i <= len;  i++)
+              {
+                Object arg = args[i];
+                if (lengthSpecified && arg instanceof Keyword && i < len)
+                  {
+                    String kname = ((Keyword) arg).getName();
+                    try
+                      {
+                        index =  Integer.parseInt(kname);
+                      }
+                    catch (Throwable ex)
+                      {
+                        throw new RuntimeException("non-integer keyword '"+kname+"' in array constructor");
+                      }
+                    arg = args[++i];
+                  }
+                Array.set(arr, index, elementType.coerceFromObject(arg));
+                index++;
+              }
+            return arr;
+          }
       }
     else
       {
@@ -140,7 +189,7 @@ public class Invoke extends ProcedureN implements CanInline
         mname = Compilation.mangleName(mname);
       }
     MethodProc proc
-      = ClassMethods.apply(dtype, mname, null, null,
+      = ClassMethods.apply((ClassType) dtype, mname, null, null,
                            thisProc.kind=='s' ? Access.STATIC : 0,
                            thisProc.kind=='S' ? 0 : Access.STATIC);
     if (proc == null)
@@ -167,7 +216,7 @@ public class Invoke extends ProcedureN implements CanInline
             for (int i = 1;  i < nargs;  i += 2)
               {
                 if (! (args[i] instanceof Keyword))
-                  throw MethodProc.matchFailAsException(err, thisProc, args);
+                  throw MethodProc.matchFailAsException(err, proc, args);
               }
 
             Object result;
@@ -180,7 +229,7 @@ public class Invoke extends ProcedureN implements CanInline
               }
             return result;
           }
-        throw MethodProc.matchFailAsException(err, thisProc, args);
+        throw MethodProc.matchFailAsException(err, proc, args);
       }
   }
 
@@ -300,13 +349,14 @@ public class Invoke extends ProcedureN implements CanInline
       // This should never happen, as InlineCalls.walkApplyExp
       // checks the number of arguments before inline is called.
       return exp;
-    ClassType type;
+    ObjectType type;
     Expression arg0 = args[0];
     Type type0 = (kind == 'V' ? arg0.getType() : language.getTypeFor(arg0));
     if (type0 instanceof PairClassType)
       type = ((PairClassType) type0).instanceType;
-    else if (type0 instanceof ClassType)
-      type = (ClassType) type0;
+    else if (type0 instanceof ClassType
+             || (kind == 'N' && type0 instanceof ArrayType))
+      type = (ObjectType) type0;
     else
       type = null;
     String name = getMethodName(args);
@@ -340,7 +390,66 @@ public class Invoke extends ProcedureN implements CanInline
       return exp;
 
     Declaration decl;
-    if (type != null && name != null)
+    if (kind == 'N' && type instanceof ArrayType)
+      {
+        ArrayType atype = (ArrayType) type;
+        Type elementType = atype.getComponentType();
+        Expression sizeArg = null;
+        boolean lengthSpecified = false;
+        if (args.length >= 3 && args[1] instanceof QuoteExp)
+          {
+            Object arg1 = ((QuoteExp) args[1]).getValue();
+            if (arg1 instanceof Keyword
+                 && ("length".equals(name = ((Keyword) arg1).getName())
+                     || "size".equals(name)))
+              {
+                System.err.println("key0: "+name);
+                sizeArg = args[2];
+                lengthSpecified = true;
+              }
+          }
+        if (sizeArg == null)
+          sizeArg = QuoteExp.getInstance(new Integer(args.length-1));
+        Expression alloc = new ApplyExp(new ArrayNew(elementType),
+                                        new Expression[] { sizeArg } );
+        LetExp let = new LetExp(new Expression[] { alloc });
+        Declaration adecl = let.addDeclaration((String) null, atype);
+        adecl.noteValue(alloc);
+        BeginExp begin = new BeginExp();
+        int index = 0;
+        for (int i = lengthSpecified ? 3 : 1; i < args.length;  i++)
+          {
+            Expression arg = args[i];
+            if (lengthSpecified && i+1 < args.length && arg instanceof QuoteExp)
+              {
+                Object key = ((QuoteExp) arg).getValue();
+                if (key instanceof Keyword)
+                  {
+                    String kname = ((Keyword) key).getName();
+                    try
+                      {
+                        index = Integer.parseInt(kname);
+                        arg = args[++i];
+                      }
+                    catch (Throwable ex)
+                      {
+                        comp.error('e', "non-integer keyword '"+kname+"' in array constructor");
+                        return exp;
+                      }
+                  }
+              }
+            begin.add(new ApplyExp(new ArraySet(elementType),
+                                   new Expression[] {
+                                     new ReferenceExp(adecl),
+                                     QuoteExp.getInstance(new Integer(index)),
+                                     arg}));
+            index++;
+          }
+        begin.add(new ReferenceExp(adecl));
+        let.body = begin;
+        return let;
+      }
+    else if (type != null && name != null)
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;
@@ -351,7 +460,7 @@ public class Invoke extends ProcedureN implements CanInline
           {
             try
               {
-                methods = getMethods(type, name, args, 
+                methods = getMethods((ClassType) type, name, args, 
                                      margsLength, argsStartIndex, objIndex,
 				     caller);
               }

@@ -1,3 +1,9 @@
+2006-01-24  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObject): Print contents of Java arrays.
+	(write(Array,int,int,Consumer)): Make sure space is written between
+	elements even if Consumer is not an OutPort.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java: Some cleaning up.

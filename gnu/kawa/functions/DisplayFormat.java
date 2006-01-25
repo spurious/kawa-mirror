@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner.
+// Copyright (c) 2001, 2002, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -209,7 +209,37 @@ public class DisplayFormat extends AbstractFormat
       }
     else
       {
-	String asString = obj != null ? obj.toString() : null;
+        String asString;
+        if (obj == null)
+          asString = null;
+        else
+          {
+            Class cl = obj.getClass();
+            if (cl.isArray())
+              {
+                int len = java.lang.reflect.Array.getLength(obj);
+                if (out instanceof OutPort)
+                  ((OutPort) out).startLogicalBlock("[", false, "]");
+                else
+                  write("[", out);
+                for (int i = 0;  i < len;  i++)
+                  {
+                    if (i > 0)
+                      {
+                        write(" ", out);
+                        if (out instanceof OutPort)
+                          ((OutPort) out).writeBreakFill();
+                      }
+                    writeObject(java.lang.reflect.Array.get(obj, i), out);
+                  }
+                if (out instanceof OutPort)
+                  ((OutPort) out).endLogicalBlock("]");
+                else
+                  write("]", out);
+                return;
+              }
+            asString = obj.toString();
+          }
 	if (asString == null)
 	  write("#!null", out);
 	else
@@ -240,8 +270,12 @@ public class DisplayFormat extends AbstractFormat
 	level++;
 	for (int i = 0;  i < size;  i++)
 	  {
-	    if (i > 0 && out instanceof OutPort)
-	      ((OutPort) out).writeSpaceFill();
+	    if (i > 0)
+              {
+                write(" ", out);
+                if (out instanceof OutPort)
+                  ((OutPort) out).writeBreakFill();
+              }
 	    int step;
 	    if (level == rank)
 	      {

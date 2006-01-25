@@ -12,6 +12,8 @@
   (d :: <int> init-form: 23 init-keyword: d:)
   (e :: <int> init-form: 24))
 
+(define (make-simpleC ival) (make <SimpleC> i: ival))
+
 (define yy :: <int> 56)
 
 (define date-test-instance (make <DateTest>))

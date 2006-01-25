@@ -1,4 +1,4 @@
-(test-init "Objects" 116)
+(test-init "Objects" 117)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -261,6 +261,7 @@
 (test 10 'obj3-c (slot-ref obj3 'c))
 (test 25 slot-ref obj3 'd)
 (test 24 slot-ref obj3 'e)
+(test 3 slot-ref (make-simpleC 3) 'i)
 
 (define obj4 (make <ClsC>))
 (test 14 'obj4-b (slot-ref obj4 'b))

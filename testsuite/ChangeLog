@@ -1,3 +1,12 @@
+2006-01-24  Per Bothner  <per@bothner.com>
+	    Dean Ferreyra <dean@octw.com>
+
+	* SimpleB.java (i): New private field.
+	(getI, setI): New public accessors.
+	* classes2.scm (make-simpleC): New function to allocate <SimpleC>
+	which needs to expand to a call of inherited setI.
+	* obj-test.scm: Add call to make-simpleC.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* gui-test.scm: Update for gui changes.

@@ -1,3 +1,9 @@
+2006-01-24  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (getField): Look for method using getMethod rather than
+	getDeclaredMethod, so we can check inherited methods.
+	Fixes bug introduced 2006-01-11.
+
 2006-01-20  Per Bothner  <per@bothner.com>
 
 	* Invoke.java: Extend 'make' procedure for primitive-array allocation.

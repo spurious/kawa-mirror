@@ -1,3 +1,10 @@
+2006-01-24  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getDeclaredMethod): If arg_types[i] is null,
+	match any parameter type.
+	(getMethod): Don't check that method is public; let caller
+	check that method is accessible.
+
 2005-12-31  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getReflectClass): Un-tab-ify conditional text.

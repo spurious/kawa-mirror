@@ -613,6 +613,13 @@ public class ClassType extends ObjectType
     return count;
   }
 
+  /** Look for a matching method.
+   * @param name method name
+   * @param arg_types parameter types that must match.
+   *  Can also be null, to match any parameter type list.
+   *  Otherwise, an element of arg_types must be the same type (equals),
+   *  though a null element of arg_types is a wildcard that matches any type.
+   */
   public Method getDeclaredMethod(String name, Type[] arg_types)
   {
     int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
@@ -632,7 +639,7 @@ public class ClassType extends ObjectType
 	  {
 	    Type meth_type = method_args[i+needOuterLinkArg];
 	    Type need_type = arg_types[i];
-	    if (meth_type == need_type)
+	    if (meth_type == need_type || need_type == null)
 	      continue;
 	    String meth_sig = meth_type.getSignature();
 	    String need_sig = need_type.getSignature();
@@ -672,7 +679,7 @@ public class ClassType extends ObjectType
     for (;;)
       {
         Method method = cl.getDeclaredMethod(name, arg_types);
-	if (method != null && (method.getModifiers() & Access.PUBLIC) != 0)
+	if (method != null)
           return method;
         cl = cl.getSuperclass();
         if (cl == null)

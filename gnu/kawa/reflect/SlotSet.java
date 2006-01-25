@@ -115,7 +115,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       return field;
 
     String setName = ClassExp.slotToMethodName("set", name);
-    gnu.bytecode.Method method = clas.getDeclaredMethod(setName, 1);
+    gnu.bytecode.Method method = clas.getMethod(setName, new Type[1]);
     if (method == null)
       return field;
     else

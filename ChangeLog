@@ -1,5 +1,8 @@
 2006-02-02  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java (processArgs): Update copyright year printed
+	when giving the --version flag.
+
 	* kawa/standard/Scheme.java (initScheme): Declare 'namespace' function.
 	(createReadTable): Declare 'namespace' reader constructor.
 

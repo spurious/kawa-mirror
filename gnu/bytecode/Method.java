@@ -314,6 +314,19 @@ public class Method implements AttrContainer {
     return next;
   }
 
+  public void listParameters (StringBuffer sbuf)
+  {
+    int args_count = arg_types.length; 
+    sbuf.append('(');
+    for (int i = 0; i < args_count; i++)
+      {
+        if (i > 0)
+          sbuf.append(',');
+        sbuf.append (arg_types[i].getName());
+      }
+    sbuf.append(')');
+  }
+
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);
@@ -322,15 +335,7 @@ public class Method implements AttrContainer {
     sbuf.append(name);
     if (arg_types != null)
       {
-	int args_count = arg_types.length; 
-	sbuf.append('(');
-	for (int i = 0; i < args_count; i++)
-	  {
-	    if (i > 0)
-	      sbuf.append(',');
-	    sbuf.append (arg_types[i].getName());
-	  }
-	sbuf.append(')');
+        listParameters(sbuf);
 	sbuf.append(return_type.getName());
       }
     return sbuf.toString();

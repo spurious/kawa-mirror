@@ -1,5 +1,10 @@
 2006-02-01  Per Bothner  <per@bothner.com>
 
+	* ListCodeSize.java: New utility application class.
+	* Makefile.am: Update accordingly.
+	* Method.java (listParameters): New method.
+	(toString): Use listParameters.
+
 	* ArrayClassLoader.java: Remove unneeded import.
 
 2006-01-24  Per Bothner  <per@bothner.com>

@@ -35,7 +35,8 @@ ArrayClassLoader.java \
 ClassFileInput.java \
 ClassTypeWriter.java \
 ExceptionsAttr.java \
-dump.java
+dump.java \
+ListCodeSize.java
 
 PACKAGE_FNAME = gnu-bytecode
 GCJ_INPUTS =  $(java_Java)

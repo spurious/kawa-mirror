@@ -1,7 +1,6 @@
 package gnu.bytecode;
 import java.util.Hashtable;
 import java.net.URL;
-import java.net.URLConnection;
 
 /** Load classes from a set of byte arrays.
  * @author	Per Bothner

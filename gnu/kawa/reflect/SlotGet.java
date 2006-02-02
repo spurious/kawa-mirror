@@ -82,6 +82,7 @@ public class SlotGet extends Procedure2
           }
         catch (Exception ex)
           {
+            ex.printStackTrace();
           }
       }
 
@@ -151,7 +152,7 @@ public class SlotGet extends Procedure2
    * @param type the class type declaring the property.
    * @param name the source (unmangled) name of the property.
    */
-  static Object getField(ClassType clas, String name, ClassType caller)
+  public static Object getField(ClassType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);

@@ -20,7 +20,7 @@ public class ArrayGet extends Procedure2 implements Inlineable, Externalizable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
-    args[0].compile(comp, new ArrayType(element_type));
+    args[0].compile(comp, ArrayType.make(element_type));
     args[1].compile(comp, Type.int_type);
     CodeAttr code = comp.getCode();
     code.emitArrayLoad(element_type);

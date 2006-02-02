@@ -294,7 +294,8 @@ public class Invoke extends ProcedureN implements CanInline
         if (! (value instanceof Keyword))
           return null;
         String name = ((Keyword) value).getName();
-        Object slot = SlotSet.getField((ClassType) type, name, caller);
+        Object slot
+          = SlotSet.lookupFieldOrMethod((ClassType) type, name, caller);
         fields[i] = slot != null ? slot : name;
       }
     return fields;
@@ -403,7 +404,6 @@ public class Invoke extends ProcedureN implements CanInline
                  && ("length".equals(name = ((Keyword) arg1).getName())
                      || "size".equals(name)))
               {
-                System.err.println("key0: "+name);
                 sizeArg = args[2];
                 lengthSpecified = true;
               }
@@ -412,6 +412,8 @@ public class Invoke extends ProcedureN implements CanInline
           sizeArg = QuoteExp.getInstance(new Integer(args.length-1));
         Expression alloc = new ApplyExp(new ArrayNew(elementType),
                                         new Expression[] { sizeArg } );
+        if (lengthSpecified && args.length == 3)
+          return alloc;
         LetExp let = new LetExp(new Expression[] { alloc });
         Declaration adecl = let.addDeclaration((String) null, atype);
         adecl.noteValue(alloc);

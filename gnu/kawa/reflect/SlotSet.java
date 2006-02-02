@@ -105,7 +105,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     return returnSelf ? obj : Values.empty;
   }
 
-  static Object getField (ClassType clas, String name, ClassType caller)
+  public static Object
+  lookupFieldOrMethod (ClassType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
@@ -197,7 +198,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
           : comp.mainClass;
 	if (name != null)
 	  {
-	    part = getField(ctype, name, caller);
+	    part = lookupFieldOrMethod(ctype, name, caller);
 	    if (part == null && type != Type.pointer_type)
 	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
 	  }

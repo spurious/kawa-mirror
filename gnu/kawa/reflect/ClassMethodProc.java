@@ -48,11 +48,12 @@ public class ClassMethodProc extends ProcedureN
   /** Pseudo-method-name for class-membership-test (instanceof) operation. */
   public static final String INSTANCEOF_METHOD_NAME = "instance?";
 
-  public static final Method makeMethod
+  private static final Method makeMethod
     = (ClassType.make("gnu.kawa.reflect.ClassMethodProc")
        .getDeclaredMethod("make", 2));
+  private static PrimProcedure makeProc = new PrimProcedure(makeMethod);
   public static final QuoteExp makeMethodExp
-    = new QuoteExp(new PrimProcedure(makeMethod));
+    = new QuoteExp(makeProc);
 
   static final Declaration fieldDecl
   = Declaration.getDeclarationFromStatic("gnu.kawa.reflect.SlotGet", "field");
@@ -78,6 +79,8 @@ public class ClassMethodProc extends ProcedureN
   public static ClassMethodProc make (ClassType ctype, String methodName)
   {
     ClassMethodProc p = new ClassMethodProc();
+    if (ctype == null)
+      new Error("ClassMethodProc.make ctype:"+ctype+" mname:"+methodName);
     p.ctype = ctype;
     p.methodName = methodName;
     p.fixup();
@@ -86,9 +89,11 @@ public class ClassMethodProc extends ProcedureN
 
   public static ApplyExp makeExp (Expression clas, Expression member)
   {
+    //return gnu.kawa.functions.GetNamedPart.makeExp(clas, member);
     Expression[] args = { clas, member };
-    ApplyExp aexp = new ApplyExp(ClassMethodProc.makeMethodExp, args);
-    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+    //return new ApplyExp(gnu.kawa.functions.GetNamedPart.getNamedPart, args);
+    ApplyExp aexp = new ClassMethodExp(args);
+    //    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
     return aexp;
   }
 
@@ -96,10 +101,14 @@ public class ClassMethodProc extends ProcedureN
   {
     if (CLASSTYPE_FOR.equals(member))
       return clas;
+    //return gnu.kawa.functions.GetNamedPart.makeExp(clas, new QuoteExp(member));
+    return makeExp(clas, new QuoteExp(member));
+    /*
     Expression[] args = { clas, new QuoteExp(member) };
-    ApplyExp aexp = new ApplyExp(ClassMethodProc.makeMethodExp, args);
-    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+    ApplyExp aexp = new ClassMethodExp(args);
+    //aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
     return aexp;
+    */
   }
 
   public void apply (CallContext ctx) throws Throwable
@@ -314,5 +323,27 @@ public class ClassMethodProc extends ProcedureN
   }
 
   public String toString()
-  { return "#<class-method "+ctype.getName()+" "+methodName+'>'; }
+  {
+    StringBuffer sbuf = new StringBuffer("#<class-method ");
+    if (ctype != null)
+      sbuf.append(ctype.getName());
+    sbuf.append(' ');
+    sbuf.append(methodName);
+    sbuf.append('>');
+    return sbuf.toString();
+  }
+}
+
+class ClassMethodExp extends ApplyExp
+{
+  public ClassMethodExp (Expression[] args)
+  {
+    super(ClassMethodProc.makeMethodExp, args);
+  }
+
+  public Expression inline (ApplyExp exp, ExpWalker walker, Declaration decl)
+  {
+    System.err.println("inline ClassMethodExp");
+    return exp;
+  }
 }

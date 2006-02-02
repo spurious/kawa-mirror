@@ -1,3 +1,11 @@
+2006-02-01  Per Bothner  <per@bothner.com>
+
+	* ArrayGet.java (compile): Use ArrayType.make rather than creating
+	a new ArrayType - which may not compare correctly.
+	* ArrayLength.java (compile): Likewise.
+	* ArrayNew.java (compile, getReturnType): Likewise.
+	* ArraySet.java (compile): Likewise.
+
 2006-01-24  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (getField): Look for method using getMethod rather than

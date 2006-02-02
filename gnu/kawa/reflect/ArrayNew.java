@@ -24,12 +24,12 @@ public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
     exp.getArgs()[0].compile(comp, Type.int_type);
     CodeAttr code = comp.getCode();
     code.emitNewArray(element_type);
-    target.compileFromStack(comp, new ArrayType(element_type));
+    target.compileFromStack(comp, ArrayType.make(element_type));
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return new ArrayType(element_type);
+    return ArrayType.make(element_type);
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

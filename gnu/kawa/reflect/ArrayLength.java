@@ -22,7 +22,7 @@ public class ArrayLength
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.getArgs()[0].compile(comp, new ArrayType(element_type));
+    exp.getArgs()[0].compile(comp, ArrayType.make(element_type));
     CodeAttr code = comp.getCode();
     code.emitArrayLength();
     target.compileFromStack(comp, gnu.kawa.lispexpr.LangPrimType.intType);

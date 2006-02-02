@@ -568,6 +568,7 @@ public class Scheme extends LispLanguage
       defProcStFld("set-procedure-property!", "kawa.lib.misc");
       defSntxStFld("provide", "kawa.lib.misc");
       defSntxStFld("test-begin", "kawa.lib.misc");
+      defProcStFld("namespace", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
@@ -1044,6 +1045,7 @@ public class Scheme extends LispLanguage
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));
     dispatchTable.set(',', ReaderDispatchMisc.getInstance());
     tab.putReaderCtorFld("URI", "kawa.lib.files", "URI");
+    tab.putReaderCtorFld("namespace", "kawa.lib.misc", "namespace");
     return tab;
   }
 

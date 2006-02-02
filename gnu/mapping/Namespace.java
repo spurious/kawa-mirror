@@ -63,6 +63,11 @@ public class Namespace
     return EmptyNamespace.getSymbol(name);
   }
 
+  public static Namespace make(String name) // Needed for Literals.
+  {
+    return getInstance(name);
+  }
+
   public static Namespace getInstance(String name)
   {
     if (name == null)
@@ -257,7 +262,8 @@ public class Namespace
    
   }
 
-  public String toString() { return "ns["+name+"@"+Integer.toHexString(System.identityHashCode(this))+"]"; }
+  public String toString()
+  { return "#,(namespace \""+name+"\")"; }
 }
 
 /** A week reference to a <code>Symbol</code>.

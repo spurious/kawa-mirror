@@ -1,3 +1,7 @@
+2006-02-02  Per Bothner  <per@bothner.com>
+
+	* misc.scm (namespace): New function.
+
 2006-01-10  Per Bothner  <per@bothner.com>
 
 	* files.scm (resource-uri): New syntax.

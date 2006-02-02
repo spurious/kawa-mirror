@@ -123,3 +123,6 @@
      (begin
        (cond-expand (srfi-64 #!void) (else (require 'srfi-64)))
        (test-%begin suite-name count)))))
+
+(define (namespace name) :: <gnu.mapping.Namespace>
+  (invoke-static <gnu.mapping.Namespace> 'getInstance name))

@@ -1,3 +1,8 @@
+2006-02-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme): Declare 'namespace' function.
+	(createReadTable): Declare 'namespace' reader constructor.
+
 2006-01-12  Per Bothner  <per@bothner.com>
 
 	* build.xml: Update directory containing HTTP.scm.

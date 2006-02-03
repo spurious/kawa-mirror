@@ -1,3 +1,12 @@
+2006-02-03  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/cxr.java (caar, cadr, etc): New static fields.
+	(cxr): New constructor.
+	(program): Make private.
+	(apply1, set1): No longer need to call program, since done by <init>.
+	* kawa/standard/Scheme.java (initScheme): Modify definitions of
+	caar, cadr, etc to use nwe static fields.
+
 2006-02-02  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): Update copyright year printed

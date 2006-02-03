@@ -6,7 +6,7 @@ package gnu.mapping;
 /** A Location that forwards to a thread-specific Location.
  */
 
-public class ThreadLocation extends Location
+public class ThreadLocation extends Location implements Named
 {
   final Symbol name;
   final Object property;
@@ -43,6 +43,15 @@ public class ThreadLocation extends Location
     global = new SharedLocation(this.name, null, 0);
   }
 
+  private ThreadLocation (Symbol name)
+  {
+    this.name = name;
+    String str = name == null ? null : name.toString();
+    this.property = ANONYMOUS;
+    unlink = true;
+    global = new SharedLocation(new Symbol(str), null, 0);
+  }
+
   public ThreadLocation (Symbol name, Object property, Location global)
   {
     this.name = name;
@@ -55,6 +64,11 @@ public class ThreadLocation extends Location
    * @param name used for printing, but not identification.
    */
   public static ThreadLocation makePrivate (String name)
+  {
+    return new ThreadLocation(name);
+  }
+
+  public static ThreadLocation makePrivate (Symbol name)
   {
     return new ThreadLocation(name);
   }
@@ -135,6 +149,20 @@ public class ThreadLocation extends Location
 
   public Symbol getKeySymbol () { return name; }
   public Object getKeyProperty () { return property; }
+  public String getName () { return name == null ? null : name.toString(); }
+  public Object getSymbol () // Implements Named
+  {
+    // If this was allocated using makePrivate(String) it is better
+    // to return the original String, rather than a generated Symbol.
+    // One motivation is when a module is imported with a specified namespace
+    // URI (only in XQuery at this point); we want to use the latter namespace.
+    if (name != null && property == ANONYMOUS
+        && (((SharedLocation) global).getKeySymbol() == name))
+      return name.toString();
+    return name;
+  }
+  public void setName (String name)
+  { throw new RuntimeException("setName not allowed"); }
 
   static SimpleEnvironment env;
 

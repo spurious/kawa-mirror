@@ -83,10 +83,14 @@ public class BindingInitializer extends Initializer
 	      }
 	    else
 	      {
-                if (name != null)
-                  name = name.toString();
+                Type[] atypes = new Type[1];
+                if (name instanceof Symbol)
+                  atypes[0] = Compilation.typeSymbol;
+                else
+                  atypes[0] = Type.tostring_type;
                 comp.compileConstant(name, Target.pushObject);
-		code.emitInvokeStatic(t.getDeclaredMethod("makePrivate", 1));
+		code.emitInvokeStatic(t.getDeclaredMethod("makePrivate",
+                                                          atypes));
 	      }
 	  }
       }

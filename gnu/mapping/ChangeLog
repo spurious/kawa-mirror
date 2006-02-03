@@ -1,5 +1,11 @@
 2006-02-02  Per Bothner  <per@bothner.com>
 
+	* ThreadLocation.java: Implement Named.
+	(getName, getSymbol): New methods.
+	(setName): New stub method - throws an exception.
+	(<init>): New private constructor that takes a Symbol.
+	(makePrivate): New overload that takes Symbol rather than String.
+
 	* Namespace.java (make): New static method.
 	(toString): Changed to display Scheme literal syntax.
 

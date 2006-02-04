@@ -1,3 +1,15 @@
+ 2006-02-04  Per Bothner  <per@bothner.com>
+
+	* Expression.java (inline): New method.
+	* LambdaExp.java (inline): New method, containing the part of
+	InlineCall's walkApplyExp that handled LambdaExp functions.
+	* ReferenceExp.java (inline): New method, likewise containing the
+	ReferenceExp-handling parts of InlineCall's walkApplyExp.
+	* QuoteExp.java (inline): New method, likewise containing the
+	QuoteExp-handling parts of InlineCall's walkApplyExp.
+	* InlineCalls.java (walkApplyExp): Replace most of the old code by
+	a call of the new virtual 'inline' method.
+
 2006-02-03  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (emit): If name is a Symbol then emit a

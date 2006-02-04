@@ -60,6 +60,56 @@ public class QuoteExp extends Expression
     return walker.walkQuoteExp(this);
   }
 
+  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  {
+    if (this == QuoteExp.undefined_exp)
+      return exp;
+    Object fval = getValue();
+    if (! (fval instanceof Procedure))
+      return walker.noteError(decl == null || fval == null ? "called value is not a procedure"
+			      : ("calling " + decl.getName()
+				 + " which is a "+fval.getClass().getName()));
+    Procedure proc = (Procedure) fval;
+    int nargs = exp.getArgCount();
+    String msg = WrongArguments.checkArgCount(proc, nargs);
+    if (msg != null)
+      return walker.noteError(msg);
+    if (proc instanceof CanInline)
+      return ((CanInline) proc).inline(exp, walker);
+    if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
+      {
+	Expression e = exp.inlineIfConstant(proc, walker);
+	if (e != exp)
+	  return walker.walk(e);
+      }
+    Compilation comp = walker.getCompilation();
+    if (comp.inlineOk(proc))
+      {
+	if (proc instanceof Inlineable)
+	  return new ApplyExp(this, exp.getArgs()).setLine(exp);
+	PrimProcedure mproc
+	  = PrimProcedure.getMethodFor(proc, decl, exp.args,
+				       comp.getLanguage());
+	if (mproc != null)
+	  {
+	    ApplyExp nexp;
+	    if (mproc.getStaticFlag() || decl == null)
+	      nexp = new ApplyExp(mproc, exp.args);
+	    else if (decl.base == null)
+	      return exp;
+	    else
+	      {
+		Expression[] margs = new Expression[1 + nargs];
+		System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+		margs[0] = new ReferenceExp(decl.base);
+		nexp = new ApplyExp(mproc, margs);
+	      }
+	    return nexp.setLine(exp);
+	  }
+      }
+    return exp;
+  }
+
   public String toString ()
   {
     return "QuoteExp["+value+"]";

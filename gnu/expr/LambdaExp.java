@@ -1534,6 +1534,57 @@ public class LambdaExp extends ScopeExp
       }
   }
 
+  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  {
+    int args_length = exp.args.length;
+    String msg = WrongArguments.checkArgCount(getName(),
+                                              min_args, max_args, args_length);
+    if (msg != null)
+      return walker.noteError(msg);
+    int conv = getCallConvention();
+    Compilation comp = walker.getCompilation();
+    Method method;
+    if (comp.inlineOk(this) && isClassMethod()
+        && (conv <= Compilation.CALL_WITH_CONSUMER
+            || (conv == Compilation.CALL_WITH_TAILCALLS))
+        && (method = getMethod(args_length)) != null)
+      {
+        // This is an optimization to expand a call to a method in the
+        // same ClassExp.  The result is a call to a PrimProcedure instead.
+        // This isn't just an optimization, since the re-write is
+        // needed to ensure that if we're in an inner lambda that the
+        // $this$ declaration is captured in a closure.
+        PrimProcedure mproc = new PrimProcedure(method, this);
+        Expression[] margs;
+        if (mproc.getStaticFlag())
+          margs = exp.args;
+        else
+          {
+            LambdaExp curLambda = walker.getCurrentLambda();
+            for (;;)
+              {
+                if (curLambda == null)
+                  return walker.noteError("internal error: missing "+this);
+                if (curLambda.outer == outer) // I.e. same class.
+                  break;
+                curLambda = curLambda.outerLambda();
+              }
+            Declaration d = curLambda.firstDecl();
+            if (d==null || ! d.isThisParameter())
+              return walker.noteError("calling non-static method "
+                                      +getName()+" from static method "
+                                      +curLambda.getName());
+            int nargs = exp.getArgCount();
+            margs = new Expression[1 + nargs];
+            System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+            margs[0] = new ThisExp(d);
+          }
+        ApplyExp nexp = new ApplyExp(mproc, margs);
+        return nexp.setLine(exp);
+      }
+    return exp;
+  }
+
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Lambda/", ")", 2);

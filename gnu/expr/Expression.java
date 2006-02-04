@@ -175,6 +175,20 @@ public abstract class Expression extends Procedure0 implements Printable
 
   protected void walkChildren (ExpWalker walker) { }
 
+  /** Apply inlining transformations on a given ApplyExp.
+   * Assumes the ApplyExp's function is the this expression,
+   * or can be optimized to this expression.
+   * @param exp an application whose function expression can be simplified
+   *  to this expression.
+   * @param walker the context for the current inlining pass
+   * @param decl if non-null, a Declaration bound to this expression
+   * @return an Expression equivalent to te passed-in exp.
+   */
+  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  {
+    return exp;
+  }
+
   String filename;
   int position;
 

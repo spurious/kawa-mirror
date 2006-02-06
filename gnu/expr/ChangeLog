@@ -1,3 +1,7 @@
+2006-02-05  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (getType): Get type from a bound Declaration.
+
  2006-02-04  Per Bothner  <per@bothner.com>
 
 	* Expression.java (inline): New method.

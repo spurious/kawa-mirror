@@ -159,9 +159,27 @@ public class ReferenceExp extends AccessExp
 
   public gnu.bytecode.Type getType()
   {
-    return (binding == null || binding.isFluid()) ? Type.pointer_type
-      : getDontDereference() ? Compilation.typeLocation
-      : Declaration.followAliases(binding).getType();
+    Declaration decl = binding;
+    if (decl == null || decl.isFluid())
+      return Type.pointer_type;
+    if (getDontDereference())
+      return Compilation.typeLocation;
+    decl = Declaration.followAliases(decl);
+    Type type = decl.getType();
+    if (type == null || type == Type.pointer_type)
+      {
+        Expression value = decl.getValue();
+        if (value != null)
+          {
+            // Kludge to guard against cycles.
+            // Not verified if it is really needed, but just in case ...
+            Expression save = decl.value;
+            decl.value = null;
+            type = value.getType();
+            decl.value = save;
+          }
+      }
+    return type;
   }
 
   public String toString()

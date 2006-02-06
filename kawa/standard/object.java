@@ -290,7 +290,8 @@ public class object extends Syntax
 		tr.error('e', "missing method name");
 		return null;
 	      }
-	    Declaration decl = oexp.addDeclaration(mname);
+	    Declaration decl
+              = oexp.addDeclaration(mname, Compilation.typeProcedure);
 	    Translator.setLine(decl, mpair);
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.outer = oexp;

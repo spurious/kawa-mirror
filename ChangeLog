@@ -1,3 +1,8 @@
+2006-02-06  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/object.java (scanClassDef): Specify that method
+	Declarations have Procedure type.
+
 2006-02-03  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/cxr.java (caar, cadr, etc): New static fields.

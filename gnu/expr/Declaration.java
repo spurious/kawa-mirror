@@ -531,7 +531,12 @@ public class Declaration
 
   public final boolean isLexical()
   {
-    return ! isFluid() && ! getFlag(IS_UNKNOWN);
+    return (flags & (IS_FLUID|IS_DYNAMIC|IS_UNKNOWN)) == 0;
+  }
+
+  public static final boolean isUnknown (Declaration decl)
+  {
+    return decl == null || decl.getFlag(IS_UNKNOWN);
   }
 
   /** List of ApplyExp where this declaration is the function called.
@@ -831,26 +836,53 @@ public class Declaration
 
   public static Declaration getDeclaration(Object proc, String name)
   {
+    gnu.bytecode.Field procField = null;
     if (name != null)
       {
-        Class procClass = PrimProcedure.getProcedureClass(proc);
-        if (procClass != null)
+        /*
+        // This is a way to map from the Procedure's name to a Field,
+        // by assuming the name as the form "classname:fieldname".
+        // It may be better to use names of the form "{classname}fieldname".
+        // For now we don't need this feature.
+        int colon = name.indexOf(':');
+        if (colon > 0)
           {
-            ClassType procType = (ClassType) Type.make(procClass);
-            String fname = Compilation.mangleNameIfNeeded(name);
-            gnu.bytecode.Field procField = procType.getDeclaredField(fname);
-            if (procField != null)
+            try
               {
-                int fflags = procField.getModifiers();
-                if ((fflags & Access.STATIC) != 0)
-                  {
-                    Declaration decl = new Declaration(name, procField);
-                    decl.noteValue(new QuoteExp(proc));
-                    if ((fflags & Access.FINAL) != 0)
-                      decl.setFlag(Declaration.IS_CONSTANT);
-                    return decl;
-                  }
+                ClassType procType
+                  = (ClassType) ClassType.make(name.substring(0, colon));
+                name = name.substring(colon+1);
+                String fname = Compilation.mangleNameIfNeeded(name);
+                procField = procType.getDeclaredField(fname);
               }
+            catch (Throwable ex)
+              {
+                System.err.println("CAUGHT "+ex+" in getDeclaration for "+proc);
+                return null;
+              }
+          }
+        else
+        */
+          {
+            Class procClass = PrimProcedure.getProcedureClass(proc);
+            if (procClass != null)
+              {
+                ClassType procType = (ClassType) Type.make(procClass);
+                String fname = Compilation.mangleNameIfNeeded(name);
+                procField = procType.getDeclaredField(fname);
+              }
+          }
+      }
+    if (procField != null)
+      {
+        int fflags = procField.getModifiers();
+        if ((fflags & Access.STATIC) != 0)
+          {
+            Declaration decl = new Declaration(name, procField);
+            decl.noteValue(new QuoteExp(proc));
+            if ((fflags & Access.FINAL) != 0)
+              decl.setFlag(Declaration.IS_CONSTANT);
+            return decl;
           }
       }
     return null;

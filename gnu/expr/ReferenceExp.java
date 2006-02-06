@@ -31,6 +31,11 @@ public class ReferenceExp extends AccessExp
   public final void setDontDereference(boolean setting)
   { setFlag(setting, DONT_DEREFERENCE); }
 
+  public final boolean isUnknown ()
+  {
+    return Declaration.isUnknown(binding);
+  }
+
   /** True if this identifier appears in "function call position".
    * If so, it should be interpreted as a function name, which makes a
    * difference for languages (like Common Lisp) that have two name spaces. */

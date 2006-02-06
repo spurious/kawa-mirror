@@ -44,7 +44,7 @@ public abstract class Location
 	    sbuf.append(property);
 	  }
       }
-    /* DEBGUGGING:
+    /* DEBUGGING:
     sbuf.append(" #:");
     sbuf.append(id);
     */

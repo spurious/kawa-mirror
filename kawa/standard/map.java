@@ -113,7 +113,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 
     nargs--;
 
-    // First an outer (let ((%proc PROC)) L2), where PROCS is args[0].
+    // First an outer (let ((%proc PROC)) L2), where PROC is args[0].
     Expression[] inits1 = new Expression[1];
     inits1[0] = args[0];
     LetExp let1 = new LetExp(inits1);

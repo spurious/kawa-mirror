@@ -1,3 +1,9 @@
+2006-02-05  Per Bothner  <per@bothner.com>
+
+	* WriteTo.java (writeToIfChange): New static method and field.
+	(ifChanged): New flag.
+	(apply2): Use it.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java: If we see data (including beginGroup) before a

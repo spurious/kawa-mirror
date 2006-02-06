@@ -536,7 +536,8 @@ public class XQuery extends Language
     defProcStFld("avg", "gnu.xquery.util.Average", "avg");
     defProcStFld("index-of", "gnu.xquery.util.IndexOf", "indexOf");
     defProcStFld("last-index-of", "gnu.xquery.util.LastIndexOf", "lastIndexOf");
-    defProcStFld("sublist", "gnu.xquery.util.SubList", "subList");
+    defProcStFld("sublist", "gnu.xquery.util.SubList", "subList"); // deprecated
+    defProcStFld("subsequence", "gnu.xquery.util.SubList", "subList");
     define_method("empty", "gnu.xquery.util.SequenceUtils",
 		  "isEmptySequence");
     define_method("exists", "gnu.xquery.util.SequenceUtils",
@@ -551,6 +552,8 @@ public class XQuery extends Language
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     defProcStFld("write-to", "gnu.kawa.xml.WriteTo", "writeTo");
+    defProcStFld("write-to-if-changed", "gnu.kawa.xml.WriteTo",
+                 "writeToIfChanged");
     defProcStFld("iterator-items",
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");

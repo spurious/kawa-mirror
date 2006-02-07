@@ -583,40 +583,44 @@ public abstract class Language
     return t;
   }
 
-  public Type getTypeFor(String name)
+  public Type getTypeFor (String name)
   {
-    return  string2Type(name);
+    return string2Type(name);
+  }
+
+  public final Type getTypeFor (Object spec)
+  {
+    if (spec instanceof Type)
+      return (Type) spec;
+    if (spec instanceof Class)
+      return getTypeFor((Class) spec);
+    if (spec instanceof String || spec instanceof FString)
+      return getTypeFor(spec.toString());
+    if (spec instanceof Symbol)
+      return getTypeFor(((Symbol) spec).getName());
+    if (spec instanceof CharSeq)
+      return ClassType.make(spec.toString());
+    if (spec instanceof Namespace)
+      {
+        String uri = ((Namespace) spec).getName();
+        if (uri != null && uri.startsWith("class:"))
+          return getLangTypeFor(string2Type(uri.substring(6)));
+      }
+    return null;
   }
 
   /** "Coerce" a language-specific "type specifier" object to a Type. */
-  public Type asType(Object spec)
+  public final Type asType(Object spec)
   {
-    if (! (spec instanceof Type))
-      {
-        if (spec instanceof Class)
-          return getTypeFor((Class) spec);
-        if (spec instanceof String || spec instanceof FString)
-          return getTypeFor(spec.toString());
-        if (spec instanceof Symbol)
-          return getTypeFor(((Symbol) spec).getName());
-        if (spec instanceof CharSeq)
-          return ClassType.make(spec.toString());
-      }
-    return (Type) spec;
+    Type type = getTypeFor(spec);
+    return type == null ? (Type) spec : type;
   }
 
   public Type getTypeFor(Expression exp)
   {
     if (exp instanceof QuoteExp)
       {
-        try
-          {
-            return asType(((QuoteExp) exp).getValue());
-          }
-        catch (Exception ex)
-          {
-            return null;
-          }
+        return getTypeFor(((QuoteExp) exp).getValue());
       }
     else if (exp instanceof ReferenceExp)
       {

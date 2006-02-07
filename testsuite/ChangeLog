@@ -1,5 +1,7 @@
 2006-02-07  Per Bothner  <per@bothner.com>
 
+	* obj-test.scm: Ad soem new tests of colon syntax.
+
 	* module1.scm: Update export list namespace:data -> plains date.
 	* module3.scm (timestamp): Fix no-longer-supported syntax.
 

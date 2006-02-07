@@ -1,4 +1,4 @@
-(test-init "Objects" 117)
+(test-init "Objects" 123)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -330,6 +330,14 @@
 (test #t 'date-1 (>= (invoke date-test-instance 'get-year) 2004))
 (test #f 'date-2 (invoke non-simple-date 'before date-test-instance))
 (test #t 'date-3 (>= (make-date-test) 2004))
+
+(test 13 'colon-test-1 (list 11 12 13 14):cdr:cdr:car)
+(test '(12 13 14) 'colon-test-2 (list 11 12 13 14):cdr)
+(define colon-test-list-1 (list 11 12 13 14))
+(test 13 'colon-test-3 colon-test-list-1:cdr:cdr:car)
+(test '(12 13 14) 'colon-test-4 colon-test-list-1:cdr)
+(test '|(11 12 13 14)| 'colon-test-5 (colon-test-list-1:toString))
+(test '|(12 13 14)| 'colon-test-6 (colon-test-list-1:cdr:toString))
 
 ;; Test for Savannah bug #4289
 (define pa-data (pa-new 10))

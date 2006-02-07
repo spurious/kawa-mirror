@@ -7,7 +7,8 @@ import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.kawa.reflect.*;
+import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.functions.GetNamedPart;
 import gnu.xquery.util.NamedCollator;
 
 public class XQResolveNames extends ResolveNames
@@ -264,8 +265,7 @@ public class XQResolveNames extends ResolveNames
                             uri.startsWith("class:"))
                           {
                             ClassType ctype = ClassType.make(uri.substring(6));
-                            return ClassMethodProc.makeExp(new QuoteExp(ctype),
-                                                           new QuoteExp(sym.getName()));
+                            return GetNamedPart.makeExp(ctype, sym.getName());
                           }
                         decl = flookup(sym);
                       }

@@ -11,12 +11,12 @@ import gnu.bytecode.*;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.xquery.util.*;
 import gnu.xml.*;
-import gnu.kawa.reflect.ClassMethodProc;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import java.io.Reader;
 import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
+import gnu.kawa.reflect.ClassMethods;
 import gnu.math.IntNum;
 
 /** The XQuery language. */
@@ -193,7 +193,10 @@ public class XQuery extends Language
   protected void define_method(String name, String cname, String mname)
   {
     Symbol sym = Symbol.make(defaultNamespace, name);
-    Procedure proc = ClassMethodProc.make(ClassType.make(cname), mname);
+    // This does require eager loading of the class, which takes
+    // extra time on startup.  FIXME.
+    ClassType ctype = ClassType.make(cname);
+    Procedure proc = ClassMethods.apply(ctype, mname, null, null, 0, 0, this);
     proc.setSymbol(sym);
     environ.define(sym, EnvironmentKey.FUNCTION, proc);
   }
@@ -543,7 +546,7 @@ public class XQuery extends Language
     define_method("exists", "gnu.xquery.util.SequenceUtils",
 		  "exists");
     define_method("reverse", "gnu.xquery.util.SequenceUtils",
-		  "reverse");
+		  "reverse$X");
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
@@ -573,7 +576,7 @@ public class XQuery extends Language
     define_method("starts-with", "gnu.xquery.util.StringValue", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringValue", "endsWith");
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
-    define_method("concat", "gnu.xquery.util.StringValue", "concat");
+    define_method("concat", "gnu.xquery.util.StringValue", "concat$V");
 
     define_method("QName", "gnu.xquery.util.QNameUtils", "makeQName");
     define_method("prefix-from-QName", "gnu.xquery.util.QNameUtils",

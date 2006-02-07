@@ -8,7 +8,6 @@ java_sources = \
   ArrayNew.java \
   ArraySet.java \
   ClassMemberLocation.java \
-  ClassMethodProc.java \
   ClassMethods.java \
   FieldLocation.java \
   InstanceOf.java \

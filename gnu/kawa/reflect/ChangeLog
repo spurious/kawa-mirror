@@ -1,3 +1,10 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* ClassMethodProc.java: Remove no-longer needed file.
+	* Makefile: Update accordingly.
+	* ClassMethods.java (apply): Extra Language parameter.
+	* Invoke.java: Update callers.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java: Remove a bunch of no-longer needed crub.

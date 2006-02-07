@@ -1,5 +1,9 @@
 2006-02-07  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkReferenceExp): Create GetNamedPart
+	application rather than removed ClassMethodProc.
+	* XQuery.java (define_method): Don't use removed ClassMethodProc.
+
 	* XQParser.java (parseNameTest): NAMESPACE_PREFIX is now gone.
 	(makeNamespaceDecl): Likewise.
 	* XQResolvenames.java (namespaceResolve): Likewise.

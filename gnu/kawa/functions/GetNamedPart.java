@@ -31,6 +31,11 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     return makeExp(clas, new QuoteExp(member));
   }
 
+  public static ApplyExp makeExp (Type type, String member)
+  {
+    return makeExp(new QuoteExp(type), new QuoteExp(member));
+  }
+
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
@@ -210,11 +215,11 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
       {
         // FIXME!
       }
-    Language language = Language.getDefaultLanguage();
     MethodProc methods = ClassMethods.apply((ClassType) ClassType.make(container.getClass()),
                                             name,
                                             (Type) null, (Type[]) null,
-                                            0, Access.STATIC);
+                                            0, Access.STATIC,
+                                            Language.getDefaultLanguage());
     if (methods != null)
       return new NamedPart(container, name, 'M', methods);
     throw new RuntimeException("no part '"+part+"' in "+container+" m:"+methods);

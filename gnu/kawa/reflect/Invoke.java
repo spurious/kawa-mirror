@@ -87,7 +87,8 @@ public class Invoke extends ProcedureN implements CanInline
           throw new WrongType(this, 1, null);
         mname = Compilation.mangleName(mname);
         Procedure proc = ClassMethods.apply(dtype, mname, null, null,
-                                            0, kind=='S' ? 0 : Access.STATIC);
+                                            0, kind=='S' ? 0 : Access.STATIC,
+                                            language);
         if (proc == null)
           throw new RuntimeException(getName() + ": no method named `"
                                      + mname + "' in class " + dtype.getName());
@@ -191,7 +192,8 @@ public class Invoke extends ProcedureN implements CanInline
     MethodProc proc
       = ClassMethods.apply((ClassType) dtype, mname, null, null,
                            thisProc.kind=='s' ? Access.STATIC : 0,
-                           thisProc.kind=='S' ? 0 : Access.STATIC);
+                           thisProc.kind=='S' ? 0 : Access.STATIC,
+                           thisProc.language);
     if (proc == null)
       throw new RuntimeException(thisProc.getName() + ": no method named `"
                                  + mname + "' in class " + dtype.getName());

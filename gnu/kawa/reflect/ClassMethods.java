@@ -46,7 +46,8 @@ public class ClassMethods extends Procedure2
       throw new WrongType(thisProc, 1, null);
     if (! ("<init>".equals(mname)))
       mname = Compilation.mangleName(mname);
-    MethodProc result = apply(dtype, mname, rtype, atypes, modifiers, modmask);
+    MethodProc result = apply(dtype, mname, rtype, atypes, modifiers, modmask,
+                              Language.getDefaultLanguage());
     if (result == null)
       throw new RuntimeException("no applicable method named `"+mname+"' in "
                                  +dtype.getName());
@@ -179,9 +180,9 @@ public class ClassMethods extends Procedure2
 
   public static MethodProc apply(ClassType dtype, String mname,
                                  Type rtype, Type[] atypes,
-                                 int modifiers, int modmask)
+                                 int modifiers, int modmask,
+                                 Language language)
   {
-    Language language = Language.getDefaultLanguage();
     PrimProcedure[] methods = getMethods(dtype, mname, modifiers, modmask,
 					 null, language);
     GenericProc gproc = null;

@@ -34,6 +34,7 @@ public class ReaderVector extends ReadTableEntry
      try
        {
 	 java.util.Vector vec = new java.util.Vector();
+         ReadTable rtable = ReadTable.getCurrent();
 	 for (;;)
 	   {
 	     int ch = lexer.read();
@@ -41,7 +42,7 @@ public class ReaderVector extends ReadTableEntry
 	       lexer.eofError("unexpected EOF in vector");
 	     if (ch == close)
 	       break;
-	     Object value = lexer.readValues(ch);
+	     Object value = lexer.readValues(ch, rtable);
 	     if (value instanceof Values)
 	       {
 		 Object[] values = ((Values) value).getValues();

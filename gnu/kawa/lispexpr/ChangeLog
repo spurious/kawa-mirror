@@ -1,3 +1,17 @@
+2006-02-06  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (lookup_sym): New static final.
+	* LispReader.java (readValues): Take some extra parameters.
+	If seeing SINGLE_ESCAPE or MULTIPLE_ESCAPE, just defer handling
+	to readToken (which it used to do anyway), instead of duplicating work.
+	(readToken): Take an extra postfixMode parameter.
+	(handlePostfix): Set line+column on resulting $lookup$ form.
+	(readObject): Pass line and column to handlePostfix.
+	(validPostfixLookupStart): Readtable is passed in to look up
+	class of following character - not just a letter.
+	* ReaderParens.java: Pass extra argumenta to modified methods.
+	* ReaderVector.java: Likewise.
+
 2005-12-30  Per Bothner  <per@bothner.com>
 
 	* ReadTable.java (ctorTable): New field.

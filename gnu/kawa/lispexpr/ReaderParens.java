@@ -117,10 +117,10 @@ public class ReaderParens extends ReadTableEntry
 	      }
 	    else
 	      entry = readTable.lookup(ch);
-	    Object value = lexer.readValues(ch, entry);
+	    Object value = lexer.readValues(ch, false, entry, readTable);
 	    if (value == Values.empty)
 	      continue;
-            value = lexer.handlePostfix(value, readTable);
+            value = lexer.handlePostfix(value, readTable, line, column);
 
 	    // ( a1 ... an . cdr) creates an n-element list ended by
 	    // cdr.  If n==0, a reasonable (and common) extension is to

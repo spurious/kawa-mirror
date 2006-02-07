@@ -91,14 +91,15 @@ public class LispReader extends Lexer
     return read_case;
   }
 
-  public Object readValues (int ch)
+  public Object readValues (int ch,  ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
-    return readValues(ch, ReadTable.getCurrent().lookup(ch));
+    return readValues(ch, false, rtable.lookup(ch), rtable);
   }
 
   /** May return zero or multiple values. */
-  public Object readValues (int ch, ReadTableEntry entry)
+  public Object readValues (int ch, boolean postfixMode,
+                            ReadTableEntry entry, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
     // Step numbers refer to steps in section 2.2 of the HyperSpec.
@@ -114,7 +115,6 @@ public class LispReader extends Lexer
 	return Values.empty;
       }
     int kind = entry.getKind();
-    boolean inEscapes = false;
     seenEscapes = false;
     switch (kind)
       {
@@ -125,27 +125,14 @@ public class LispReader extends Lexer
       case ReadTable.NON_TERMINATING_MACRO:
 	Object value = entry.read(this, ch, -1);
 	return value;
-      case ReadTable.SINGLE_ESCAPE:
-	// Step 5:
-	ch = read();
-	if (ch < 0)
-	  eofError("unexpected EOF after single escape");
-	tokenBufferAppend(TOKEN_ESCAPE_CHAR);
-	tokenBufferAppend(ch);
-	seenEscapes = true;
-	ch = read();
-	break;
-      case ReadTable.MULTIPLE_ESCAPE:
-	// Step 6:
-	inEscapes = true;
-	seenEscapes = true;
-	ch = read();
-	break;
-      default:  // case ReadTable.CONSTITUENT:
+      case ReadTable.CONSTITUENT:
+      case ReadTable.SINGLE_ESCAPE: // Step 5:
+      case ReadTable.MULTIPLE_ESCAPE: // Step 6:
+      default:  // 
 	break;
       }
 
-    readToken(ch, inEscapes, getReadCase());
+    readToken(ch, postfixMode, getReadCase());
     int endPos = tokenBufferLength;
     if (seenEscapes)
       return returnSymbol(startPos, endPos);
@@ -166,9 +153,10 @@ public class LispReader extends Lexer
   /** True if "IDENTIFIER:" should be treated as a keyword. */
   protected boolean finalColonIsKeyword = true;
 
-  public void readToken(int ch, boolean inEscapes, char readCase)
+  public void readToken(int ch, boolean postfixMode, char readCase)
       throws java.io.IOException, SyntaxException
   {
+    boolean inEscapes = false;
     ReadTable rtable = ReadTable.getCurrent();
     for (;; ch = read())
       {
@@ -192,8 +180,8 @@ public class LispReader extends Lexer
 	    break;
 	  }
 	int kind = entry.getKind();
-        if (ch == rtable.postfixLookupOperator && ! inEscapes
-            && validPostfixLookupStart())
+        if (postfixMode && ch == rtable.postfixLookupOperator && ! inEscapes
+            && validPostfixLookupStart(rtable))
           kind = ReadTable.TERMINATING_MACRO;
                   
 	if (kind == ReadTable.SINGLE_ESCAPE)
@@ -261,14 +249,15 @@ public class LispReader extends Lexer
         ReadTable rtable = ReadTable.getCurrent();
 	for (;;)
 	  {
+	    int line = port.getLineNumber();
+	    int column = port.getColumnNumber();
 	    int ch = port.read();
 	    if (ch < 0)
 	      return Sequence.eofValue; // FIXME
-            ReadTableEntry entry = rtable.lookup(ch);
-            Object value = readValues(ch, entry);
+            Object value = readValues(ch, rtable);
 	    if (value == Values.empty)
 	      continue;
-	    return handlePostfix(value, rtable);
+	    return handlePostfix(value, rtable, line, column);
 	  }
       }
     finally
@@ -278,14 +267,22 @@ public class LispReader extends Lexer
       }
   }
 
-  protected boolean validPostfixLookupStart ()
+  protected boolean validPostfixLookupStart (ReadTable rtable)
       throws java.io.IOException
   {
     int ch = port.peek();
-    return ch >= 0 && Character.isLetter((char) ch);
+    ReadTableEntry entry;
+    if (ch < 0 || ch == ':' || (entry = rtable.lookup(ch)) == null
+        || ch == rtable.postfixLookupOperator)
+      return false;
+    int kind = entry.getKind();
+    return kind == ReadTable.CONSTITUENT
+      || kind == ReadTable.NON_TERMINATING_MACRO
+      || kind == ReadTable.MULTIPLE_ESCAPE
+      || kind == ReadTable.SINGLE_ESCAPE;
   }
 
-  Object handlePostfix (Object value, ReadTable rtable)
+  Object handlePostfix (Object value, ReadTable rtable, int line, int column)
       throws java.io.IOException, SyntaxException
   {
     if (value == QuoteExp.voidExp)
@@ -297,15 +294,17 @@ public class LispReader extends Lexer
           break;
         // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
         port.read();
-        if (! validPostfixLookupStart())
+        if (! validPostfixLookupStart(rtable))
           {
             unread();
             break;
           }
-        Object rightOperand = readValues(port.read());
-        value = LList.list3("$lookup$", value,
-                            LList.list2(LispLanguage.quote_sym,
-                                        rightOperand));
+        ch = port.read();
+        Object rightOperand = readValues(ch, true, rtable.lookup(ch), rtable);
+        value = LList.list2(value,
+                            LList.list2(LispLanguage.quote_sym, rightOperand));
+        value = PairWithPosition.make(LispLanguage.lookup_sym, value,
+                                      port.getName(), line+1, column+1);
       }
     return value;
   }

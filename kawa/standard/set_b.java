@@ -14,11 +14,6 @@ import gnu.kawa.reflect.ClassMethodProc;
 
 public class set_b extends Syntax implements Printable
 {
-  static final ClassType setterType = ClassType.make("gnu.kawa.functions.Setter");
-  static final Field setterField = setterType.getDeclaredField("setter");
-  static final Declaration setterDecl = new Declaration("setter", setterField);
-  static { setterDecl.noteValue(new QuoteExp(Setter.setter)); }
-
   static private Pattern pattern = new ListPat (2, 2);
 
   public static final set_b set = new set_b();
@@ -54,15 +49,22 @@ public class set_b extends Syntax implements Printable
 	// rewrite (set! (proc . args) rhs) => ((setter proc) args ... rhs)
 
 	ApplyExp aexp = (ApplyExp) name;
-        if (tr.inlineOk(aexp.getFunction()))
-          // Optimize (TYPE:MEMBER ...) forms so they can be inlined.
-          aexp = ClassMethodProc.rewrite((ApplyExp) name);
-	int nargs = aexp.getArgCount();
+        Expression[] args = aexp.getArgs();
+	int nargs = args.length;
+        int skip = 0;
+        Expression func = aexp.getFunction();
+        if (args.length > 0 && func instanceof ReferenceExp
+            && ((ReferenceExp) func).getBinding() == Scheme.applyFieldDecl)
+          {
+            skip = 1;
+            nargs--;
+            func = args[0];
+          }
+        Expression[] setterArgs = { func };
 	Expression[] xargs = new Expression[nargs+1];
-	System.arraycopy(aexp.getArgs(), 0, xargs, 0, nargs);
+	System.arraycopy(args, skip, xargs, 0, nargs);
 	xargs[nargs] = value;
-        Expression[] setterArgs = { aexp.getFunction() };
-	return new ApplyExp(new ApplyExp(new ReferenceExp(setterDecl),
+	return new ApplyExp(new ApplyExp(new ReferenceExp(Setter.setterDecl),
                                          setterArgs), xargs);
       }
     else if (! (name instanceof ReferenceExp))

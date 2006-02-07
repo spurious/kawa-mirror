@@ -1,3 +1,22 @@
+2006-02-06  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java: New class, extends ProcedureN.
+	* GetNamedInstancePart.java: New class, extends ProcedureN.
+	(SetNamedInstancePart): New non-public class, extends Procedure2.
+	* GetNamedPart.java: Major re-write, partly to handle inlining,
+	and partly to handle namespaces.
+	(GetNamedExp): New non-public class, extends ApplyExp.
+	(NamedPart: New non-public class, extends procedureN.
+	(CurriedInvoke): Remove no-longer used non-public class.
+	(NamedPartSetter): New non-public class, extends gnu.mapping.Setter.
+	* SetNamedPart.java: New class, extends Procedure3.
+	* Makefile.am: Update with new files.
+	* Setter.java (apply1): Allow argument to be an array as well.
+	(inline): Check if operand is of an array type.
+	Check if operand is a QuoteExp, as well as a ReferenceExp.
+	(SetArray): New non-public class, extends Procedure2.
+	(SetArrayExp): New non-public class, extends ApplyExp.
+
 2006-01-24  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObject): Print contents of Java arrays.

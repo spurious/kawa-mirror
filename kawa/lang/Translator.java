@@ -8,6 +8,8 @@ import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
+import gnu.kawa.functions.GetNamedPart;
+import gnu.kawa.functions.GetNamedInstancePart;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -239,7 +241,7 @@ public class Translator extends Compilation
     return null;
   }
 
-  public Expression rewrite_pair (Pair p)
+  public Expression rewrite_pair (Pair p, boolean function)
   {
     if (p.car instanceof Syntax)
       return apply_rewrite((Syntax) p.car, p);
@@ -318,12 +320,14 @@ public class Translator extends Compilation
         // Check if function symbol is an "xml namespace".
         Object sym = ((ReferenceExp) func).getSymbol();
         String uri;
+        Object q;
         if (sym instanceof Symbol
-            && (uri = ((Symbol) sym).getNamespaceURI()) != null)
+            && (uri = ((Symbol) sym).getNamespaceURI()) != null
+            && (q = p.car) instanceof Pair
+            && (q = ((Pair) p.car).cdr) instanceof Pair
+            && (q = ((Pair) q).car) instanceof String)
           {
-            String orig = Quote.quote(p.car).toString();
-            int colon = orig.indexOf(':');
-            String prefix = colon < 0 ? "" : orig.substring(0, colon);
+            String prefix = (String) q;
             if (prefix.equals(asXmlNamespace(uri)))
               {
                 mapKeywordsToAttributes = true;
@@ -378,6 +382,46 @@ public class Translator extends Compilation
       setCurrentScope(save_scope);
 
     return ((LispLanguage) getLanguage()).makeApply(func, args);
+  }
+
+  private Symbol namespaceResolve (Expression context, Expression member)
+  {
+    if (context instanceof ReferenceExp && member instanceof QuoteExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) context;
+        Declaration decl = rexp.getBinding();
+        Object val;
+        if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
+          {
+            Object rsym = rexp.getSymbol();
+            Symbol sym = rsym instanceof Symbol ? (Symbol) rsym
+              : env.getSymbol(rsym.toString());
+            val = env.get(sym, null);
+          }
+        else if (decl.isNamespaceDecl())
+          {
+            val = decl.getConstantValue();
+          }
+        else
+          val = null;
+        if (val instanceof Namespace)
+          {
+            Namespace ns = (Namespace) val;
+            String uri = ns.getName();
+            if (uri != null && uri.startsWith("class:"))
+              return null; 
+            String mem = ((QuoteExp) member).getValue().toString().intern();
+            return ns.getSymbol(mem);
+          }
+      }
+    return null;
+  }
+
+  public Symbol namespaceRewriteResolve (Object object, Object part)
+  {
+    Expression car = rewrite(object);
+    Expression cdr = rewrite(part);
+    return namespaceResolve(car, cdr);
   }
 
   public static Object stripSyntax (Object obj)
@@ -478,117 +522,82 @@ public class Translator extends Compilation
     return rewrite(exp, false);
   }
 
-  public Object namespaceResolve (String str)
+  public Object namespaceResolve (Object name)
   {
+    if (! (name instanceof String))
+      {
+        Pair p;
+        if (name instanceof Pair
+            && safeCar(p = (Pair) name) == LispLanguage.lookup_sym
+            && p.cdr instanceof Pair
+            && (p = (Pair) p.cdr).cdr instanceof Pair)
+          {
+            Symbol sym = namespaceRewriteResolve(p.car, ((Pair) p.cdr).car);
+            if (sym != null)
+              return sym;
+          }
+        return name;
+      }
+    String str = (String) name;
     int colon = str.indexOf(':');
     if (colon <= 0 || colon >= str.length() - 1)
       return str;
-    String prefix = str.substring(0, colon);
-    String local = str.substring(colon + 1);
-    String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
-    Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
-    if (uri_decl instanceof Declaration)
-      {
-	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
-	Expression dval = decl.getValue();
-	if (dval instanceof QuoteExp)
-	  {
-	    Object val = ((QuoteExp) dval).getValue();
-	    if (val instanceof String || val instanceof FString
-		|| (val instanceof Symbol
-		    && ((Symbol) val).hasEmptyNamespace()))
-	      return Symbol.make(val.toString(), local);
-	  }
-      }
-    else
-      {
-	Object v = env.get(xprefix, null);
-        if (v != null)
-          return Symbol.make(v.toString(), local);
-      }
+    String prefix = str.substring(0, colon).intern();
+    Declaration decl = lexical.lookup(prefix, Language.VALUE_NAMESPACE);
+    Object val;
+    if (Declaration.isUnknown(decl))
+      val = env.get(prefix, null);
+    else if (decl.isNamespaceDecl())
+      val = decl.getConstantValue();
+    else // Actually an error.  FIXME
+      val = null;
+    if (val instanceof Namespace)
+      return ((Namespace) val).getSymbol(str.substring(colon + 1).intern());
     return str;
   }
 
-  private Expression namespaceResolve (String str, boolean function)
+  private Expression namespaceResolve (String str, int colon, boolean function)
   {
-    int colon = str.indexOf(':');
-    if (colon <= 0 || colon >= str.length() - 1)
-      return null;
-    String prefix = str.substring(0, colon);
-    String local = str.substring(colon + 1);
-    if ("*".equals(prefix))
-      return ClassMethodProc.makeExp(QuoteExp.nullExp, local);
-    String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
-    Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
-    Object val;
-    if (uri_decl instanceof Declaration)
+    if (colon == 1 && str.charAt(0) == '*')
+      return GetNamedInstancePart.makeExp(new QuoteExp(str.substring(colon+1).intern()));
+    String str1 = str.substring(0, colon).intern();
+    int prev_colon = str1.lastIndexOf(':');
+    Expression exp1;
+    int len1;
+    Declaration pdecl;
+    Object val1;
+    if (prev_colon >= 0)
       {
-	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
-	Expression dval = decl.getValue();
-
-	if (dval instanceof ReferenceExp)
-	  {
-	    ReferenceExp ref = (ReferenceExp) dval;
-	    Declaration d = Declaration.followAliases(ref.getBinding());
-	    if (d != null)
-	      {
-		dval = d.getValue();
-		if (dval instanceof ClassExp)
-                  return ClassMethodProc.makeExp(ref, local);
-	      }
-	    else
-	      {
-		String name = ref.getName();
-		int nlen = name.length();
-		if (nlen > 2 && name.charAt(0) == '<'
-		    && name.charAt(nlen-1) == '>')
-                  return ClassMethodProc.makeExp(ref, local);
-	      }
-	  }
-
-	if (dval instanceof QuoteExp)
-          val = ((QuoteExp) dval).getValue();
-	else
-	  return null;
+        exp1 = namespaceResolve(str1, prev_colon, false);
+        if (exp1 == null)
+          return null;
       }
-    else
-      {
-	val = env.get(xprefix, null);
-      }
-
-    if (val instanceof ClassType)
-      return ClassMethodProc.makeExp(new QuoteExp(val), local);
-    if (val != null)
-      {
-        String uri = val.toString();
-        if (uri.startsWith("class:"))
-          return ClassMethodProc.makeExp(rewrite("<"+uri.substring(6)+">"),
-                                         local);
-        return rewrite(Symbol.make(uri, local), function);
-      }
-    else if (prefix.length() > 2 && prefix.charAt(0) == '<'
-             && prefix.charAt(prefix.length()-1) == '>')
-      {
-        return ClassMethodProc.makeExp(rewrite(prefix), local);
-      }
+    else if ((pdecl = lexical.lookup(str1, Language.VALUE_NAMESPACE)) != null
+             && pdecl.isLexical() && ! pdecl.isProcedureDecl())
+      // FIXME maybe set PREFER_BINDING2
+      exp1 = rewrite(str1);
+    else if (((val1 = env.get(str1, null)) != null
+              && ! (val1 instanceof Procedure))
+             || ((len1 = str1.length()) >= 3
+                 && str1.charAt(0) == '<' && str1.charAt(len1-1) == '>'))
+      exp1 = new ReferenceExp(str1);
     else
       {
         try
           {
             /* #ifdef JAVA2 */
-            Class cl = Class.forName(prefix, false,
-                                     getClass().getClassLoader());
+            Class cl = Class.forName(str1, false, getClass().getClassLoader());
             /* #else */
-            // Class cl = Class.forName(prefix);
+            // Class cl = Class.forName(str);
             /* #endif */
-            return ClassMethodProc.makeExp(new QuoteExp(Type.make(cl)),
-                                           local);
+            exp1 = QuoteExp.getInstance(Type.make(cl));
           }
         catch (Throwable ex)
           {
             return null;
           }
       }
+    return GetNamedPart.makeExp(exp1, str.substring(colon+1).intern());
   }
 
   /** Check if a uri has been registered as an "XML namespace".
@@ -637,7 +646,7 @@ public class Translator extends Compilation
     if (exp instanceof PairWithPosition)
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
-      return rewrite_pair ((Pair) exp);
+      return rewrite_pair((Pair) exp, function);
     else if (exp instanceof String
 	     || (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)))
       {
@@ -663,23 +672,26 @@ public class Translator extends Compilation
 	  {
 	    nameToLookup = exp;
 	  }
-	if (nameToLookup instanceof String && decl == null)
+        int colon;
+	if (nameToLookup instanceof String
+            && (decl == null || ! decl.isLexical())
+            && (colon = ((String) nameToLookup).lastIndexOf(':')) >= 0)
 	  {
-	    Expression ss = namespaceResolve((String) nameToLookup, function);
+	    Expression ss = namespaceResolve((String) nameToLookup, colon, function);
 	    if (ss != null)
 	      return ss;
 	  }
 	symbol = exp instanceof String ? env.getSymbol((String) exp)
 	  : (Symbol) exp;
-	Object value = resolve(symbol, function);
 	boolean separate = getLanguage().hasSeparateFunctionNamespace();
+        Object value;
         if (decl != null)
           {
             if (! isLexical(decl)
                 || (separate && decl.isProcedureDecl()))
               decl = null;
           }
-        else if (value instanceof Named)
+        else if ((value = resolve(symbol, function)) instanceof Named)
           {
             if (value instanceof AutoloadProcedure)
               {
@@ -709,9 +721,8 @@ public class Translator extends Compilation
 		// which just call rewrite_car on the lhs,
 		// if we don't require function to be true.  FIXME.
                 decl = Declaration.getDeclaration(proc);
-		System.err.println("getDecl "+proc+"->"+decl);
               }
-	    */
+            */
           }
 	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
 	    && decl.isProcedureDecl() && ! function)
@@ -873,7 +884,7 @@ public class Translator extends Compilation
     try
       {
 	if (exp == pair)
-	  result = rewrite_pair (pair);  // To avoid a cycle
+	  result = rewrite_pair(pair, function);  // To avoid a cycle
 	else
 	  result = rewrite (exp, function);
 	setLineOf(result);
@@ -957,6 +968,14 @@ public class Translator extends Compilation
                 SyntaxForm sf = (SyntaxForm) st_pair.car;
                 setCurrentScope(sf.scope);
                 obj = sf.form;
+              }
+            Pair p;
+            if (obj instanceof Pair
+                && (p = (Pair) obj).car == LispLanguage.lookup_sym
+                && p.cdr instanceof Pair
+                && (p = (Pair) p.cdr).cdr instanceof Pair)
+              {
+                obj = namespaceRewriteResolve(p.car, ((Pair) p.cdr).car);
               }
             if (obj instanceof String
                 || (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))

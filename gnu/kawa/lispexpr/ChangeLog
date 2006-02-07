@@ -1,5 +1,12 @@
 2006-02-06  Per Bothner  <per@bothner.com>
 
+	* DefineNamespace.java (scanForDefinitions): A namespace declaration
+	is now essentially an alias declaration, except that if the bound
+	value is a String literal then lookup the corresponding Namespace.
+	* LispLanguage.java (lookup_syn): Update comment.
+	* LispReader.java (readValues): Hack to force initial ':' to be
+	treated as CONSTITUENT.
+
 	* LispLanguage.java (lookup_sym): New static final.
 	* LispReader.java (readValues): Take some extra parameters.
 	If seeing SINGLE_ESCAPE or MULTIPLE_ESCAPE, just defer handling

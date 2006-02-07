@@ -35,7 +35,10 @@ public class export extends Syntax
           {
             String str = (String) symbol;
             if (str.startsWith("namespace:"))
-              symbol = (Language.NAMESPACE_PREFIX + str.substring(10)).intern();
+              {
+                tr.error('w', "'namespace:' prefix ignored");
+                symbol = str.substring(10).intern();
+              }
           }
 	Declaration decl = defs.getNoDefine(symbol);
 	if (decl.getFlag(Declaration.NOT_DEFINING))

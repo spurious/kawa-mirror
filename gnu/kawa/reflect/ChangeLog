@@ -1,3 +1,8 @@
+2006-02-06  Per Bothner  <per@bothner.com>
+
+	* ClassMethodProc.java: Remove a bunch of no-longer needed crub.
+	The entire file will be removed soon.
+
 2006-02-01  Per Bothner  <per@bothner.com>
 
 	* ArrayGet.java (compile): Use ArrayType.make rather than creating

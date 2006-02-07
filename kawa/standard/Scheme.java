@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
+import gnu.kawa.functions.ApplyToArgs;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.reflect.ClassMethods;
@@ -58,6 +59,9 @@ public class Scheme extends LispLanguage
   public static final NumberCompare numLss;
   public static final NumberCompare numLEq;
 
+  public static final ApplyToArgs applyToArgs;
+  static final Declaration applyFieldDecl;
+
   static {
     // (null-environment)
     nullEnvironment = Environment.make("null-environment");
@@ -70,6 +74,10 @@ public class Scheme extends LispLanguage
     not = new not(instance, "not");
     map = new map(true);
     forEach = new map(false);
+    applyToArgs = new ApplyToArgs("apply-to-args", instance);
+    applyFieldDecl
+      = Declaration.getDeclarationFromStatic("kawa.standard.Scheme",
+                                             "applyToArgs");
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
@@ -490,7 +498,7 @@ public class Scheme extends LispLanguage
 		   "staticField");
       defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
       defProcStFld("$lookup$", "gnu.kawa.functions.GetNamedPart",
-                     "getNamedPart");
+                   "getNamedPart");
 
       defProcStFld("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
       defProcStFld("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
@@ -747,8 +755,7 @@ public class Scheme extends LispLanguage
       defAliasStFld("*print-miser-width*",
                     "gnu.text.PrettyWriter", "miserWidthLoc");
 
-      define((Language.NAMESPACE_PREFIX+"html").intern(),
-             "http://www.w3.org/1999/xhtml");
+      define("html", "http://www.w3.org/1999/xhtml");
       environ.define(Symbol.make("http://www.w3.org/1999/xhtml",
                                  DefineNamespace.XML_NAMESPACE_MAGIC),
                                  null, "html");
@@ -1036,10 +1043,18 @@ public class Scheme extends LispLanguage
     return getInstance().getTypeFor(exp);
   }
 
+  public ApplyExp makeApply (Expression func, Expression[] args)
+  {
+    Expression[] exps = new Expression[args.length+1];
+    exps[0] = func;
+    System.arraycopy(args, 0, exps, 1, args.length);
+    return new ApplyExp(new ReferenceExp(applyFieldDecl), exps);
+  }
+
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.getInitial();
-    tab.postfixLookupOperator = '\\';
+    tab.postfixLookupOperator = ':';
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));
     dispatchTable.set('`', new ReaderQuote("quasisyntax"));

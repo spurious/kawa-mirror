@@ -52,19 +52,21 @@ public class define extends Syntax implements Printable
 	nameSyntax = (SyntaxForm) name;
 	name = nameSyntax.form;
       }
-    if (! (name instanceof String || name instanceof Symbol))
-      {
-	tr.formStack.addElement(st);  // defer error handling until rewrite
-	return;
-      }
-
     int options = ((Number) Translator.stripSyntax(p2.car)).intValue();
     boolean makePrivate = (options & 4) != 0;
     boolean makeConstant = (options & 8) != 0;
 
     ScopeExp scope = tr.currentScope();
+    name = tr.namespaceResolve(name);
     if (name instanceof String)
-      name = tr.namespaceResolve((String) name);
+      {
+        //name = tr.namespaceResolve(name);
+      }
+    else if (! (name instanceof Symbol))
+      {
+        tr.error('e', "'"+name+"' is not a valid identifier");
+        name = null;
+      }
 
     Object savePos = tr.pushPositionOf(p1);
     Declaration decl = tr.define(name, nameSyntax, defs);
@@ -82,6 +84,7 @@ public class define extends Syntax implements Printable
       {
 	LambdaExp lexp = new LambdaExp();
 	decl.setProcedureDecl(true);
+        decl.setType(Compilation.typeProcedure);
 	lexp.setSymbol(name);
 	lexp.nameDecl = decl;
 	Object formals = p4.car;

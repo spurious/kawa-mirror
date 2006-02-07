@@ -6,6 +6,7 @@ java_sources=\
   AddOp.java \
   AppendValues.java \
   Apply.java \
+  ApplyToArgs.java \
   Arithmetic.java \
   Arrays.java \
   ArrayRef.java \
@@ -17,6 +18,7 @@ java_sources=\
   DisplayFormat.java \
   DivideOp.java \
   GetModuleClass.java \
+  GetNamedInstancePart.java \
   GetNamedPart.java \
   IntegerFormat.java \
   IsEq.java IsEqual.java IsEqv.java \
@@ -24,6 +26,7 @@ java_sources=\
   MakeProcedure.java \
   MultiplyOp.java \
   NumberCompare.java \
+  SetNamedPart.java \
   Setter.java \
   ValuesMap.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 

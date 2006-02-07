@@ -1,3 +1,9 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNameTest): NAMESPACE_PREFIX is now gone.
+	(makeNamespaceDecl): Likewise.
+	* XQResolvenames.java (namespaceResolve): Likewise.
+
 2006-02-05  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (initXQuery): Define write-to-if-changed function.

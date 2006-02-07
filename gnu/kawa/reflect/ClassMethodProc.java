@@ -91,10 +91,7 @@ public class ClassMethodProc extends ProcedureN
   {
     //return gnu.kawa.functions.GetNamedPart.makeExp(clas, member);
     Expression[] args = { clas, member };
-    //return new ApplyExp(gnu.kawa.functions.GetNamedPart.getNamedPart, args);
-    ApplyExp aexp = new ClassMethodExp(args);
-    //    aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-    return aexp;
+    return new ApplyExp(ClassMethodProc.makeMethodExp, args);
   }
 
   public static Expression makeExp (Expression clas, String member)
@@ -103,12 +100,6 @@ public class ClassMethodProc extends ProcedureN
       return clas;
     //return gnu.kawa.functions.GetNamedPart.makeExp(clas, new QuoteExp(member));
     return makeExp(clas, new QuoteExp(member));
-    /*
-    Expression[] args = { clas, new QuoteExp(member) };
-    ApplyExp aexp = new ClassMethodExp(args);
-    //aexp.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-    return aexp;
-    */
   }
 
   public void apply (CallContext ctx) throws Throwable
@@ -221,93 +212,6 @@ public class ClassMethodProc extends ProcedureN
       }
   }
 
-  /** Rewrite/optimize ((ClassMethodProc:make CLASS "METHOD") args). */
-  public static ApplyExp rewrite (ApplyExp exp)
-  {
-    Expression func = exp.getFunction();
-    if (func instanceof ReferenceExp)
-      {
-        Declaration fdecl = ((ReferenceExp) func).getBinding();
-        if (fdecl != null)
-          func = fdecl.getValue();
-      }
-    Object fvalue;
-    Expression clExp;
-    String mname;
-    if (func instanceof ApplyExp)
-      {
-        ApplyExp fapp = (ApplyExp) func;
-        Expression ffunc = fapp.getFunction();
-        Expression[] fargs;
-        if (ffunc != makeMethodExp
-            || (fargs = fapp.getArgs()).length != 2
-            || ! (fargs[1] instanceof QuoteExp))
-          return exp;
-        clExp = fargs[0];
-        mname = ((QuoteExp) fargs[1]).getValue().toString();
-      }
-    else if (func instanceof QuoteExp
-             && (fvalue = ((QuoteExp) func).getValue()) instanceof ClassMethodProc)
-      {
-        ClassMethodProc cmProc = (ClassMethodProc) fvalue;
-        clExp = QuoteExp.getInstance(cmProc.ctype);
-        mname = cmProc.methodName;
-      }
-    else
-      return exp;
-    boolean isInstance = clExp == QuoteExp.nullExp;
-    Expression[] args = exp.getArgs();
-    boolean isInstanceOf = mname.equals(INSTANCEOF_METHOD_NAME);
-    boolean isCast = mname.equals(CAST_METHOD_NAME);
-    if (args.length == 0 && (isInstance || isInstanceOf || isCast))
-      return exp;
-    boolean isField = mname.length() > 1 && mname.charAt(0) == '.';
-    boolean isNew = mname.equals("new");
-    if (isField && ! isInstance && args.length == 1)
-      {
-        args = new Expression[] { Convert.makeCoercion(args[0], clExp) };
-        isInstance = true;
-      }
-    Expression[] xargs
-      = new Expression[args.length+(isInstance||isNew||isInstanceOf||isCast?1:2)];
-    Declaration decl;
-    if (isInstance)
-      {
-        decl = isField ? fieldDecl : invokeDecl;
-        System.arraycopy(args, 1, xargs, 2, args.length-1);
-        xargs[0] = args[0];
-      }
-    else if (isNew)
-      {
-        decl = makeDecl;
-        System.arraycopy(args, 0, xargs, 1, args.length);
-        xargs[0] = clExp;
-      }
-    else if (isInstanceOf)
-      {
-        decl = instanceOfDecl;
-        System.arraycopy(args, 1, xargs, 2, args.length-1);
-        xargs[0] = args[0];
-        xargs[1] = clExp;
-      }
-    else if (isCast)
-      {
-        decl = castDecl;
-        System.arraycopy(args, 1, xargs, 2, args.length-1);
-        xargs[0] = clExp;
-        xargs[1] = args[0];
-      }
-    else
-      {
-        decl = isField ? staticFieldDecl : invokeStaticDecl;
-        System.arraycopy(args, 0, xargs, 2, args.length);
-        xargs[0] = clExp;
-      }
-    if (! isNew && ! isInstanceOf && ! isCast)
-      xargs[1] = new QuoteExp(isField ? mname.substring(1) : mname);
-    return new ApplyExp(new ReferenceExp(decl), xargs);
-  }
-
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(ctype);
@@ -331,19 +235,5 @@ public class ClassMethodProc extends ProcedureN
     sbuf.append(methodName);
     sbuf.append('>');
     return sbuf.toString();
-  }
-}
-
-class ClassMethodExp extends ApplyExp
-{
-  public ClassMethodExp (Expression[] args)
-  {
-    super(ClassMethodProc.makeMethodExp, args);
-  }
-
-  public Expression inline (ApplyExp exp, ExpWalker walker, Declaration decl)
-  {
-    System.err.println("inline ClassMethodExp");
-    return exp;
   }
 }

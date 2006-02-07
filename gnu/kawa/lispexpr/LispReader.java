@@ -126,6 +126,11 @@ public class LispReader extends Lexer
 	Object value = entry.read(this, ch, -1);
 	return value;
       case ReadTable.CONSTITUENT:
+        if (ch == rtable.postfixLookupOperator)
+          { // Force an initial ':' to be treated as a CONSTITUENT.
+            tokenBufferAppend(ch);
+            ch = read();
+          }
       case ReadTable.SINGLE_ESCAPE: // Step 5:
       case ReadTable.MULTIPLE_ESCAPE: // Step 6:
       default:  // 
@@ -357,11 +362,6 @@ public class LispReader extends Lexer
   public static Object parseNumber(char[] buffer, int start, int count,
 				   char exactness, int radix, int flags)
   {
-    /*
-    System.err.println("parseNumber '"+new String(buffer,start, count)
-		       +"' exact:"+(exactness=='\0'?"\\0":(""+exactness))
-		       +" radix:"+radix+" fl:"+flags);
-    */
     int end = start + count;
     int pos = start;
     if (pos >= end)

@@ -110,7 +110,7 @@ public class XQResolveNames extends ResolveNames
     String prefix = colon >= 0 ? name.substring(0, colon)
       : function ? XQuery.DEFAULT_FUNCTION_PREFIX
       : XQuery.DEFAULT_ELEMENT_PREFIX; 
-    String nssym = (Language.NAMESPACE_PREFIX + prefix).intern();
+    String nssym = prefix.intern();
     Declaration decl = lookup.lookup(nssym, -1);
     Object uri = null;
     if (decl != null)

@@ -1,5 +1,13 @@
 2006-02-06  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkApplyOnly): New method.
+	(walkApplyExp): Call walkApplyOnly.
+	Don't call ClassMethodProc.rewrite - now handled using the inline
+	method of ApplyExp sub-classes.
+	* Language.java (NAMESPACE_PREFIX): Removed - no longer used.
+
+2006-02-06  Per Bothner  <per@bothner.com>
+
 	* ModuleExp.java (evalModule): Declaration name need not be a String.
 	(allocFields): Apply deMorgan's law, to match form in SetExp.compile.
 

@@ -1,3 +1,8 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* module1.scm: Update export list namespace:data -> plains date.
+	* module3.scm (timestamp): Fix no-longer-supported syntax.
+
 2006-01-24  Per Bothner  <per@bothner.com>
 	    Dean Ferreyra <dean@octw.com>
 

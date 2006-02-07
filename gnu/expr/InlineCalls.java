@@ -2,7 +2,6 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
-import gnu.kawa.reflect.ClassMethodProc;
 
 public class InlineCalls extends ExpWalker
 {
@@ -16,8 +15,12 @@ public class InlineCalls extends ExpWalker
   protected Expression walkApplyExp(ApplyExp exp)
   {
     super.walkApplyExp(exp);
-    if (comp.inlineOk(exp.func))
-      exp = ClassMethodProc.rewrite(exp);
+    return walkApplyOnly(exp);
+  }
+
+  /** Walk an ApplyExp assuming function and arguments have been walked. */
+  public Expression walkApplyOnly(ApplyExp exp)
+  {
     return exp.func.inline(exp, this, null);
   }
 

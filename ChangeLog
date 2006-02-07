@@ -1,5 +1,24 @@
 2006-02-06  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite_pair): Update checking for xml
+	namespaces to match namespace changes.
+	(namespaceResolve, namespaceRewriteResolve): New/rewritten methods.
+	(scanForm): Do namespaceRewriteResolve first.
+	* kawa/standard/Scheme.java (applyToArgs, setApplyToArgs,
+	applyFieldDecl): New static fields.
+	(makeApply): New method, overrides LispLanguage.
+	(createReadTable): Change postfixLookupOperator to ':'.
+	* kawa/standard/define.java (scanForm): Soem changes to handle
+	namespace resolution.  Set type of functions to Procedure.
+	* kawa/standard/export.java (scanForDefinitions): Since namespace
+	prefixes are now in the regular namespace, we no longer need
+	to export 'namespace:PREFIX'.
+	* kawa/standard/location.java (makeProcLocation$V): Remove needless
+	ApplyToArgs application.
+	* kawa/standard/set_b.java (rewriteForm): Check for ApplyToArgs.
+
+2006-02-06  Per Bothner  <per@bothner.com>
+
 	* kawa/standard/object.java (scanClassDef): Specify that method
 	Declarations have Procedure type.
 

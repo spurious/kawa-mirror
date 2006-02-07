@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.bytecode.ClassType;
 
 public class DefineNamespace extends Syntax
 {
@@ -35,8 +36,7 @@ public class DefineNamespace extends Syntax
 	tr.error('e', "invalid syntax for define-namespace");
 	return false;
       }
-    String prefix = (String) p1.car;
-    String name = (Language.NAMESPACE_PREFIX + prefix).intern();
+    String name = (String) p1.car;
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
@@ -48,31 +48,37 @@ public class DefineNamespace extends Syntax
     else if (defs instanceof ModuleExp)
       decl.setCanRead(true);
     Translator.setLine(decl, p1);
-    Expression value = tr.rewrite_car (p2, false);
+    Expression value;
+    String literal = null;
+    if (p2.car instanceof FString)
+      {
+        literal = p2.car.toString();
+        value = new QuoteExp(Namespace.getInstance(literal));
+	decl.setType(ClassType.make("gnu.mapping.Namespace"));
+	decl.setFlag(Declaration.TYPE_SPECIFIED);
+       }
+    else
+      value = tr.rewrite_car (p2, false);
     SetExp sexp = new SetExp(decl, value);
     sexp.setDefining (true);
     decl.noteValue(value);
     forms.addElement (sexp);
     if (makeXML)
       {
-        if (value instanceof QuoteExp)
+        if (literal == null)
+          tr.error('e', "define-xml-namespace must be bound to string literal");
+        else
           {
-            Object nsval = ((QuoteExp) value).getValue();
-            if (nsval instanceof String || nsval instanceof FString)
-              {
-                Symbol sym = Symbol.make(nsval.toString(), XML_NAMESPACE_MAGIC);
-                value = new QuoteExp(prefix);
-                decl = defs.getDefine(sym, 'w', tr);
-                tr.push(decl);
-                decl.setFlag(Declaration.IS_CONSTANT);
-                sexp = new SetExp(decl, value);
-                sexp.setDefining (true);
-                decl.noteValue(value);
-                forms.addElement(sexp);
-                return true;
-              }
+            Symbol sym = Symbol.make(literal, XML_NAMESPACE_MAGIC);
+            value = new QuoteExp(name);
+            decl = defs.getDefine(sym, 'w', tr);
+            tr.push(decl);
+            decl.setFlag(Declaration.IS_CONSTANT);
+            sexp = new SetExp(decl, value);
+            sexp.setDefining (true);
+            decl.noteValue(value);
+            forms.addElement(sexp);
           }
-        tr.error('e', "define-xml-namespace must be bound to string literal");
       }
     return true;
   }

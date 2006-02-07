@@ -63,7 +63,19 @@ public class location extends Syntax implements Printable
   public static Location
   makeProcLocation$V (Procedure proc, Object[] args)
   {
-    if (proc instanceof LocationProc && args.length == 0)
+    int nargs = args.length;
+    if (proc instanceof gnu.kawa.functions.ApplyToArgs
+        && nargs > 0
+        && args[0] instanceof Procedure) // FIXME
+      {
+        proc = (Procedure) args[0];
+        if (proc instanceof LocationProc && nargs == 1)
+          return ((LocationProc) proc).getLocation();
+        Object[] rargs = new Object[nargs-1];
+        System.arraycopy(args, 1, rargs, 0, rargs.length);
+        return new ProcLocation(proc, rargs);
+      }
+    if (proc instanceof LocationProc && nargs == 0)
       return ((LocationProc) proc).getLocation();
     return new ProcLocation(proc, args);
   }

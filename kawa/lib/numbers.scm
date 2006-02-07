@@ -5,7 +5,13 @@
 (define (complex? x) :: <boolean>  (instance? x <complex>))
 (define (real? x) :: <boolean> (instance? x <real>))
 (define (rational? x)  :: <boolean> (instance? x <rational>))
-;;;(define (integer? x) ...)
+(define (integer? x) :: <boolean>
+  (or (instance? x <gnu.math.IntNum>)
+      (and (instance? x <gnu.math.DFloNum>)
+	   (= (java.lang.Math:IEEEremainder
+	       (gnu.math.DFloNum:doubleValue x)
+	       1.0)
+	      0.0))))
 
 (define (exact? x) :: <boolean> 
   (and (instance? x <number>) (invoke (as <number> x) 'isExact)))
@@ -28,6 +34,22 @@
 
 (define (even? (x :: <integer>)) :: <boolean> 
   (not (odd? x)))
+
+(define (max #!rest (args :: <Object[]>))
+  (let ((n :: <int> (field args 'length))
+	(result :: <real> (args 0)))
+    (do ((i :: <int> 1 (+ i 1)))
+	 ((>= i n) result)
+      (set! result
+	    (*:max result (args i))))))
+
+(define (min #!rest (args :: <Object[]>))
+  (let ((n :: <int> (field args 'length))
+	(result :: <real> (args 0)))
+    (do ((i :: <int> 0 (+ i 1)))
+	 ((>= i n) result)
+      (set! result
+	    (*:min result (args i))))))
 
 (define (abs (x :: <number>)) :: <number>
   (invoke x 'abs))
@@ -52,6 +74,24 @@
 	  (if (exact? y) x (exact->inexact x))
 	  (- x (* (invoke (/ x y) 'toInt (static-field <number> 'FLOOR))
 		  y)))))
+
+(define (gcd #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> (field args 'length)))
+    (if (zero? n)
+	0
+	(let ((result :: <integer> (args 0)))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (set! result (<integer>:gcd result (<integer>:@ (args i)))))))))
+
+(define (lcm #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> (field args 'length)))
+    (if (zero? n)
+	1
+	(let ((result :: <integer> (<integer>:abs (<integer>:@ (args 0)))))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (set! result (<integer>:lcm result (<integer>:@ (args i)))))))))
 
 (define (numerator (x :: <rational>)) :: <integer>
   (invoke x 'numerator))
@@ -146,6 +186,34 @@
 (define (bit-extract (i :: <integer>) (start :: <int>) (end :: <int>))
   :: <integer>
   (invoke-static <gnu.math.BitOps> 'extract i start end))
+
+(define (logand #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> (field args 'length)))
+    (if (zero? n)
+	-1
+	(let ((result :: <integer> (args 0)))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (let ((arg-i :: <integer> (args i)))
+	      (set! result (gnu.math.BitOps:and result arg-i))))))))
+
+(define (logior #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> (field args 'length)))
+    (if (zero? n)
+	0
+	(let ((result :: <integer> (args 0)))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (set! result (gnu.math.BitOps:ior result (args i))))))))
+
+(define (logxor #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> (field args 'length)))
+    (if (zero? n)
+	0
+	(let ((result :: <integer> (args 0)))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (set! result (gnu.math.BitOps:xor result (args i))))))))
 
 (define (logtest (i :: <integer>) (j :: <integer>))
   (invoke-static <gnu.math.BitOps> 'test i j))

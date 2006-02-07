@@ -17,19 +17,6 @@ import gnu.math.Unit;
 
 public class Scheme extends LispLanguage
 {
-
-  protected void define_proc (Named proc)
-  {
-    define (proc.getName (), proc);
-  }
-
-  protected void define_proc (String name, Named proc)
-  {
-    if (proc.getName() == null)
-      proc.setName(name);
-    define(name, proc);
-  }
-
   /** Define a procedure to be autoloaded. */
   protected void define_proc (String name, String className)
   {
@@ -225,7 +212,7 @@ public class Scheme extends LispLanguage
       defProcStFld("complex?", "kawa.lib.numbers");
       defProcStFld("real?", "kawa.lib.numbers");
       defProcStFld("rational?", "kawa.lib.numbers");
-      define_proc ("integer?", "kawa.standard.integer_p");
+      defProcStFld("integer?", "kawa.lib.numbers");
       defProcStFld("exact?", "kawa.lib.numbers");
       defProcStFld("inexact?", "kawa.lib.numbers");
       defProcStFld("=", "kawa.standard.Scheme", "numEqu");
@@ -238,8 +225,8 @@ public class Scheme extends LispLanguage
       defProcStFld("negative?", "kawa.lib.numbers");
       defProcStFld("odd?", "kawa.lib.numbers");
       defProcStFld("even?", "kawa.lib.numbers");
-      define_proc ("max", "kawa.standard.max");
-      define_proc ("min", "kawa.standard.min");
+      defProcStFld ("max", "kawa.lib.numbers");
+      defProcStFld ("min", "kawa.lib.numbers");
       defProcStFld("+", "gnu.kawa.functions.AddOp", "$Pl");
       defProcStFld("-", "gnu.kawa.functions.AddOp", "$Mn");
       defProcStFld("*", "gnu.kawa.functions.MultiplyOp", "$St");
@@ -248,8 +235,8 @@ public class Scheme extends LispLanguage
       defProcStFld("quotient", "kawa.lib.numbers");
       defProcStFld("remainder", "kawa.lib.numbers");
       defProcStFld("modulo", "kawa.lib.numbers");
-      define_proc ("gcd", "kawa.standard.gcd");
-      define_proc ("lcm", "kawa.standard.lcm");
+      defProcStFld ("gcd", "kawa.lib.numbers");
+      defProcStFld ("lcm", "kawa.lib.numbers");
       defProcStFld("numerator", "kawa.lib.numbers");
       defProcStFld("denominator", "kawa.lib.numbers");
       defProcStFld("floor", "kawa.lib.numbers");
@@ -437,9 +424,9 @@ public class Scheme extends LispLanguage
 
       defProcStFld("arithmetic-shift", "kawa.lib.numbers");
       defProcStFld("ash", "kawa.lib.numbers", "arithmetic$Mnshift");
-      define_proc ("logand", "kawa.standard.logand");
-      define_proc ("logior", "kawa.standard.logior");
-      define_proc ("logxor", "kawa.standard.logxor");
+      defProcStFld("logand", "kawa.lib.numbers");
+      defProcStFld("logior", "kawa.lib.numbers");
+      defProcStFld("logxor", "kawa.lib.numbers");
       defProcStFld("lognot", "kawa.lib.numbers");
       defProcStFld("logop", "kawa.lib.numbers");
       defProcStFld("logbit?", "kawa.lib.numbers");

@@ -1,3 +1,19 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme): The R5RS functions
+	integer?, max, min, gcd, lcm, logand, logior, logxor are now
+	implemented in Scheme in kawa.lib.numbers.
+	(define_proc): Remove two no-longer-needed methods.
+	* kawa/standard/gcd.java: Remove no-longer-needed file.
+	* kawa/standard/integer_p.java: Likewise.
+	* kawa/standard/lcm.java: Likewise.
+	* kawa/standard/logand.java: Likewise.
+	* kawa/standard/logior.java: Likewise.
+	* kawa/standard/logxor.java: Likewise.
+	* kawa/standard/max.java: Likewise.
+	* kawa/standard/min.java: Likewise.
+	* Makefile.am: Update accordingly.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite_pair): Update checking for xml

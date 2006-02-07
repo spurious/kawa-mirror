@@ -1,5 +1,8 @@
 2006-02-07  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (integer?, max, min, gcd, lcm, logand, logior, logxor):
+	Rewrite from Java to Scheme, now that array operations are less tedious.
+
 	* lists.scm (set-car!): Use new syntax.
 
 2006-02-02  Per Bothner  <per@bothner.com>

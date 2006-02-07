@@ -8,11 +8,6 @@ prim_method.java prim_throw.java throw_name.java \
 not.java \
 cxr.java \
 append.java \
-integer_p.java \
-max.java \
-min.java \
-gcd.java \
-lcm.java \
 fluid_let.java \
 atan.java \
 expt.java \
@@ -27,7 +22,6 @@ load.java \
 constant_fold.java \
 map.java \
 callcc.java \
-logand.java logior.java logxor.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java \
 syntax.java syntax_case.java \

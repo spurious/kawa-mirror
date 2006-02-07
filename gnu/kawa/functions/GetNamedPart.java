@@ -198,7 +198,6 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
               {
                 // FIXME!
               }
-            //return ClassMethodProc.make((ClassType)container, part.toString());
             return ClassMethods.apply(ClassMethods.classMethods, container, part, null, null, 0, 0);
           }
       }

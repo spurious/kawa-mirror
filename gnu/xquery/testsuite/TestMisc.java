@@ -1,6 +1,5 @@
 package gnu.xquery.testsuite;
 import gnu.expr.*;
-import kawa.*;
 import gnu.mapping.*;
 import gnu.xquery.lang.*;
 import gnu.text.*;
@@ -602,7 +601,7 @@ public class TestMisc
     InPort in = new CharArrayInPort(expr);
     SourceMessages messages = new SourceMessages();
 
-    Compilation comp = interp.parse(in, messages, interp.PARSE_IMMEDIATE);
+    Compilation comp = interp.parse(in, messages, Language.PARSE_IMMEDIATE);
     SourceError firstError = messages.getErrors();
     if (firstError != null)
       return "*** syntax error - " + firstError;

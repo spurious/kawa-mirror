@@ -1,3 +1,7 @@
+2006-02-06  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Two minor cleanups to fix warnings from some compilers.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (eval): Update evalModule call.

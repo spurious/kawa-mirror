@@ -4,7 +4,7 @@ package gnu.mapping;
 
 public class Setter extends ProcedureN
 {
-  Procedure getter;
+  protected Procedure getter;
 
   public Setter(Procedure getter)
   {

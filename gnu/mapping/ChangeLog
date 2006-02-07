@@ -1,3 +1,7 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* Setter.java (getter): Make field protected for NamedPartSetter class.
+
 2006-02-02  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java: Implement Named.

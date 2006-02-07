@@ -1,5 +1,10 @@
 2006-02-07  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm: New file of lots of little functions that we
+	expect to be compiled optimally.
+	* inlining.expected: Expected sides of the methods.
+	* Makefile.am: Added appropriate rules.
+
 	* obj-test.scm: Ad soem new tests of colon syntax.
 
 	* module1.scm: Update export list namespace:data -> plains date.

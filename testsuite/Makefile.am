@@ -15,7 +15,7 @@ endif
 all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
-  $(SERVLET_TESTS) $(SAX2_TESTS)
+  $(SERVLET_TESTS) $(SAX2_TESTS) check-inlining
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -173,6 +173,21 @@ APPLETVIEWER = appletviewer
 check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. scribble.html
 
+InliningTest.class: $(srcdir)/inlining-test.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
+
+inlining.log: InliningTest.class Makefile
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
+	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
+	makeIarr lengthIarr getIarr setIarr >inlining.log
+
+check-inlining: inlining.log $(srcdir)/inlining.expected
+	@if diff $(srcdir)/inlining.expected inlining.log; \
+	  then echo '# inlining test passes'; \
+	  else echo FAIL inlining test; fi
+
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
@@ -182,4 +197,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
   ppfile.out scribble.html.in \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
-  HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected
+  HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
+  inlining-test.scm inlining.expected

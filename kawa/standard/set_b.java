@@ -5,7 +5,6 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.kawa.functions.Setter;
-import gnu.kawa.reflect.ClassMethodProc;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.

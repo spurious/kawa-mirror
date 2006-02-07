@@ -1,5 +1,10 @@
 2006-02-06  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalModule): Declaration name need not be a String.
+	(allocFields): Apply deMorgan's law, to match form in SetExp.compile.
+
+2006-02-06  Per Bothner  <per@bothner.com>
+
 	* Language.java (getTypeFor(Object)): New final convenince method.
 	(asType(Object)): Now just a wrapper for getTypeFor.
 	(getTypeFor(Expression)): No longer need to catch exception.

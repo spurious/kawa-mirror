@@ -199,7 +199,7 @@ public class ModuleExp extends LambdaExp
 		for (Declaration decl = mexp.firstDecl();
 		     decl != null;  decl = decl.nextDecl())
 		  {
-		    Object dname = decl.getName();
+		    Object dname = decl.getSymbol();
 		    if (decl.isPrivate() || dname == null)
 		      continue;
 		    Field fld = decl.field;
@@ -358,7 +358,7 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-            if ((! decl.getFlag(Declaration.IS_CONSTANT) && ! decl.isAlias())
+            if (! (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias())
 		|| value == QuoteExp.undefined_exp)
 	      value = null;
 	    decl.makeField(comp, value);

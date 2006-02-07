@@ -15,8 +15,8 @@ public class ClassMethods extends Procedure2
    * @param arg0 a Class, ClassType, or a String, FString or Symbol
    *  that names a class.
    * @param arg1 a method name (a String, FString, or Symbol)
-   * Loosely the same as ClassMethodProc.make(arg0, arg1),
-   * but with some extar conversions and checks.
+   * Loosely the same as GetNamedPart.make(arg0, arg1),
+   * but with some extra conversions and checks.
    */
   public Object apply2 (Object arg0, Object arg1)
   {

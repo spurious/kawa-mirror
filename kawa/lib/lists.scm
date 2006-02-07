@@ -10,7 +10,7 @@
   (eq? x '()))
 
 (define (set-car! (p <pair>) x)
-  (set! (*:.car p) x))
+  (set! p:car x))
 
 (define (set-cdr! (p <pair>) x)
   ((primitive-set-field <pair> 'cdr <object>)

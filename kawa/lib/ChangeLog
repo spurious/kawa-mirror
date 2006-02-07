@@ -1,3 +1,7 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* lists.scm (set-car!): Use new syntax.
+
 2006-02-02  Per Bothner  <per@bothner.com>
 
 	* misc.scm (namespace): New function.

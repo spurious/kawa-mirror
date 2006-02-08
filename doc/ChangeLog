@@ -1,3 +1,8 @@
+2006-02-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Array operations): Document new compact Java array
+	notation.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Options, Scipts): Document new --script option.

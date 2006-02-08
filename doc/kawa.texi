@@ -5423,7 +5423,7 @@ and call Java methods.
 
 @menu
 * Scheme types in Java::
-* Array operations::      Low-level operations on Java arrays
+* Array operations::      Using Java arrays
 * Low-level Method invocation::
 * Low-level Field operations::
 * Loading Java functions into Scheme::
@@ -5470,7 +5470,92 @@ the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
 @node Array operations, Low-level Method invocation, Scheme types in Java, Low-level functions
-@subsection Low-level Operations on Java Arrays
+@subsection Using Java Arrays
+
+[The following description only applies to Kawa in CVS or 1.8.1 or newer.
+If you're using an older Kawa, skip to the last sub-section.]
+
+@subsubsection Creating new Java arrays
+
+To allocate a Java array you can use the @code{make} function.
+For example, you allocate an array with room for 10 elements
+each of each is a primitive @code{int} you can do this:
+@example
+(make <int[]> length: 10)
+@end example
+
+If you use the type ``expression'' @code{<int[]>} as a function,
+you can leave out the @code{make} name, so this is equivalent:
+@example
+(<int[]> length: 10)
+@end example
+
+You can specify the initial elements instead of the length:
+@example
+(<object[]> 31 32 33 34)
+@end example
+This creates a 4-length array, initialized to the given values.
+
+If you specify a length, you can also specify initial values for selected
+elements.
+If you specify an index, in the form of a literal integer-valued keyword,
+then following elements are placed starting at that position.
+@example
+(<int[]> length: 100 10 12 80: 15 16 50: 13 14)
+@end example
+This creates an array with 100 elements.  Most of them are initialized
+to the default value of zero,
+but elements with indexes 0, 1, 50, 51, 80, 81 are initialized
+to the values 10, 12, 13, 14, 15, 16, respectively.
+
+@subsubsection Accessing Java array elements
+
+You can access the elements of a Java array by treating it as
+a one-argument function, where the argument is the index:
+@example
+(define primes (<integer[]> 2 3 5 7 11 13))
+(primes 0) ==> 2
+(primes 5) ==> 13
+@end example
+
+You can set an element by treating the array as a function
+with a @code{setter}:
+@example
+(set! (primes 0) -2)
+(set! (primes 3) -7)
+primes ==> [-2 3 5 -7 11 13]
+@end example
+
+To get the number of elements of an array, you can treat
+it as having a @code{length} field:
+@example
+primes:length ==> 6
+@end example
+
+Here is a longer example.  This is the actual definition of the
+standard @code{gcd} function.  Note the @code{args} variable
+receives all the arguments on the form of an @code{Object} array.
+@example
+(define (gcd #!rest (args :: <Object[]>)) :: <integer>
+  (let ((n :: <int> args:length))
+    (if (zero? n)
+	0
+	(let ((result :: <integer> (args 0)))
+	  (do ((i :: <int> 1 (+ i 1)))
+	      ((>= i n) result)
+	    (set! result (<integer>:gcd result (<integer>:@ (args i)))))))))
+@end example
+
+The above example generates good code,
+thanks to judicious use of casts and type specifications.
+In general, if Kawa knows that
+a ``function'' is an array then it will generate efficient
+bytecode instructions for array operations.
+
+@subsubsection Old low-level array macros
+
+[The following macros are deprecated in CVS, but you still have to
+use them in Kawa 1.8 or older.]
 
 The following macros evaluate to procedures that can be used to
 manipulate primitive Java array objects.

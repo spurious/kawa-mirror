@@ -529,7 +529,6 @@ public class Lambda extends Syntax implements Printable
         && lexp.nameDecl != null
         && tr.getModule().getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
       tr.curMethodLambda = lexp;
-    tr.mustCompileHere();
     tr.pushScope(lexp);
     Declaration prev = null;
     int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;

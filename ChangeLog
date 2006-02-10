@@ -1,5 +1,8 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Lambda.java (rewriteBody): No longer need to
+	mustCompleHere.
+
 	* kawa/lang/Eval.java (evalBody): Use new pushNewModule method.
 
 	* kawa/standard/map.java (inline): Use existing IsEq from Scheme.

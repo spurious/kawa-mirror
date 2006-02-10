@@ -30,8 +30,7 @@ public class IfExp extends Expression
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Language language = getLanguage();
-    if (language.isTrue((test.eval(ctx))))
+    if (getLanguage().isTrue(test.eval(ctx)))
       then_clause.apply(ctx);
     else if (else_clause != null)
       else_clause.apply(ctx);

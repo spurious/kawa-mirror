@@ -1,4 +1,4 @@
-(test-init "macros" 88)
+(test-init "macros" 89)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -398,3 +398,13 @@
 (test '(a "X1" "X2" "Y1" "Y2" b) 'unquote-2
       (quasiquote (a (unquote-splicing  x y) b)))
 
+(begin ;; Test that we can define and use a syntax-case macro in same module.
+  (define-syntax local-defmac-or
+    (lambda (x)
+      (syntax-case x ()
+		   ((_) (syntax #f))
+		   ((_ e) (syntax e))
+		   ((_ e1 e2 e3 ...)
+		    (syntax
+		     (let ((t e1)) (if t t (local-defmac-or e2 e3 ...))))))))
+  (test 4 'local-defmac-or (local-defmac-or #f 4 5)))

@@ -1,3 +1,7 @@
+2006-02-10  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Add test for macro defined and used in same module.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm (force-compile):  Since lambdas no longer autmatically

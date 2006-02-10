@@ -419,6 +419,9 @@ public class CallContext // implements Runnable
   {
     pushedFluids[--pushedFluidsCount] = null;
   }
+
+  /** Current stack of evaluation frames for interpreter. */
+  public Object[][] evalFrames;
 }
 
 /* CPS:

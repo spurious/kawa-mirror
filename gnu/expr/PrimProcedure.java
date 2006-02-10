@@ -132,9 +132,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       && (! method.getStaticFlag() || isConstructor()) ? 1 : 0;
     fixArgs += extraCount;
     boolean takesContext = takesContext();
-    Object[] rargs = new Object[paramCount + (takesContext ? 1 : 0)];
+    Object[] rargs = new Object[paramCount];
     if (takesContext)
-      rargs[paramCount] = ctx;
+      rargs[--paramCount] = ctx;
     Object extraArg;
     if (takesVarArgs)
       {
@@ -143,6 +143,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  { // FIXME
 	    rargs[paramCount-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
+            elementType = Type.pointer_type;
 	  }
 	else
 	  {
@@ -179,7 +180,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
               arg = type.coerceFromObject(arg);
             if (i < fixArgs)
               rargs[i-extraCount] = arg;
-            else
+            else if (restArray != null) // I.e. using array rather than LList.
               restArray[i - fixArgs] = arg;
           }
         catch (ClassCastException ex)
@@ -233,7 +234,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	else
 	  result = retType.coerceToObject(((java.lang.reflect.Method) member)
 					  .invoke(ctx.value1, ctx.values));
-	ctx.consumer.writeObject(result);
+        if (! takesContext())
+          ctx.consumer.writeObject(result);
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {

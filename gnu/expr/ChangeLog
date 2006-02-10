@@ -1,3 +1,9 @@
+2006-02-09  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (matchN): Fix a bug in the takesContext() case.
+	(apply): Likewise.
+	(matcN): Fix bugs in handling of #!rest arg with a LList type.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkApplyOnly): New method.

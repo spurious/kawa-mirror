@@ -1,3 +1,8 @@
+2006-02-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/syntax_case.java (rewriteClauses): Fix to use
+	correct PrimProcedure constructor, taking a Language.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewriteBody): No longer need to

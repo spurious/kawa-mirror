@@ -15,6 +15,7 @@ public class syntax_case extends Syntax
   Expression rewriteClauses (Object clauses, syntax_case_work work,
                              Translator tr)
   {
+    Language language = tr.getLanguage();
     if (clauses == LList.Empty)
       {
         /*
@@ -35,7 +36,7 @@ public class syntax_case extends Syntax
             Method method = clas.addMethod("error", argtypes,
                                            Type.pointer_type,
                                            Access.PUBLIC|Access.STATIC);
-            call_error = new PrimProcedure(method);
+            call_error = new PrimProcedure(method, language);
           }
         return new ApplyExp(call_error, args);
       }
@@ -64,7 +65,7 @@ public class syntax_case extends Syntax
 	args[2] = new ReferenceExp(tr.matchArray);
 	args[3] = new QuoteExp(IntNum.zero());
 	Expression tryMatch
-	  = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod), args);
+	  = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod, language), args);
 
 	int newVarCount = varCount - outerVarCount;
 	Expression[] inits = new Expression[newVarCount];

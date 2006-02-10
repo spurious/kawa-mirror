@@ -14,11 +14,7 @@ public class ErrorExp extends Expression
     this.message = message;
   }
 
-  public Object eval (Environment env)
-  {
-    // Should not happen
-    throw new RuntimeException ("evaluated erroneous expression: " + message);
-  }
+  protected boolean mustCompile () { return false; }
 
   public void print (OutPort out)
   {

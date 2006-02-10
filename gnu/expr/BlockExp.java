@@ -1,9 +1,9 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.OutPort;
+import gnu.mapping.*;
 
 /**
  * Class used to implement a block that can be exited.
@@ -35,6 +35,26 @@ public class BlockExp extends Expression
   Label exitLabel;
   /* Current TryState when we start compiling the.  Temporary. */
   TryState oldTryState;
+
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    Object result;
+    try
+      {
+        result = body.eval(ctx);
+      }
+    catch (BlockExitException ex)
+      {
+        if (ex.exit.block != this)
+          throw ex;
+        result = ex.exit.result;
+        if (exitBody != null)
+          result = exitBody.eval(ctx);
+      }
+    ctx.writeValue(result);
+  }
 
   public void compile (Compilation comp, Target target)
   {
@@ -94,5 +114,16 @@ public class BlockExp extends Expression
         exitBody.print(out);
       }
     out.endLogicalBlock(")");
+  }
+}
+
+class BlockExitException extends RuntimeException
+{
+  ExitExp exit;
+  Object result;
+  public BlockExitException (ExitExp exit, Object result)
+  {
+    this.exit = exit;
+    this.result = result;
   }
 }

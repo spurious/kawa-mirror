@@ -17,31 +17,51 @@ public class LetExp extends ScopeExp
   public Expression getBody() { return body; }
   public void setBody(Expression body) { this.body = body; }
 
-  /* Recursive helper routine, to store the values on the stack
-   * into the variables in vars, in reverse order. */
-  void store_rest (Compilation comp, int i, Declaration decl)
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx) throws Throwable
   {
-    if (decl != null)
+    int level = ScopeExp.nesting(this);
+    int i = frameSize;
+    
+    Object[] evalFrame = new Object[i];
+    Object[][] evalFrames = ctx.evalFrames;
+    if (evalFrames == null)
       {
-	store_rest (comp, i+1, decl.nextDecl());
-	if (decl.needsInit())
-	  {
-	    if (decl.isIndirectBinding())
-	      {
-		CodeAttr code = comp.getCode();
-		if (inits[i] == QuoteExp.undefined_exp)
-		  {
-		    Object name = decl.getSymbol();
-		    comp.compileConstant(name, Target.pushObject);
-		    code.emitInvokeStatic(BindingInitializer.makeLocationMethod(name));
-		  }
-		else
-		  {
-		    decl.pushIndirectBinding(comp);
-		  }
-	      }
-            decl.compileStore(comp);
-	  }
+        evalFrames = new Object[level+10][];
+        ctx.evalFrames = evalFrames;
+      }
+    else if (level >= evalFrames.length)
+      {
+        evalFrames = new Object[level+10][];
+        System.arraycopy(ctx.evalFrames, 0, evalFrames, 0, evalFrames.length);
+        ctx.evalFrames = evalFrames;
+      }
+    evalFrames[level] = evalFrame;
+
+    try
+      {
+        i = 0;
+        for (Declaration decl = firstDecl(); decl != null;
+             decl = decl.nextDecl())
+          {
+            Object value = inits[i].eval(ctx);
+            Type type = decl.type;
+            if (type != null && type != Type.pointer_type)
+              value = type.coerceFromObject(value);
+            if (decl.isIndirectBinding())
+              {
+                gnu.mapping.Location loc = decl.makeIndirectLocationFor();
+                loc.set(value);
+                value = loc;
+              }
+            evalFrame[i++] = value;
+          }
+        body.apply(ctx);
+      }
+    finally
+      {
+        evalFrames[level] = null;
       }
   }
 
@@ -87,6 +107,34 @@ public class LetExp extends ScopeExp
   }
   */
 
+  /* Recursive helper routine, to store the values on the stack
+   * into the variables in vars, in reverse order. */
+  void store_rest (Compilation comp, int i, Declaration decl)
+  {
+    if (decl != null)
+      {
+	store_rest (comp, i+1, decl.nextDecl());
+	if (decl.needsInit())
+	  {
+	    if (decl.isIndirectBinding())
+	      {
+		CodeAttr code = comp.getCode();
+		if (inits[i] == QuoteExp.undefined_exp)
+		  {
+		    Object name = decl.getSymbol();
+		    comp.compileConstant(name, Target.pushObject);
+		    code.emitInvokeStatic(BindingInitializer.makeLocationMethod(name));
+		  }
+		else
+		  {
+		    decl.pushIndirectBinding(comp);
+		  }
+	      }
+            decl.compileStore(comp);
+	  }
+      }
+  }
+
   public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -94,7 +142,7 @@ public class LetExp extends ScopeExp
     /*
     if (comp.usingCPStyle())
       { 
-	for (Declartion decl = firstDecl(); decl != null; decl = decl.nextVar ())
+	for (Declartion decl = firstDecl(); decl != null; decl = decl.nextDecl())
 	  {
 	    decl.assignField(comp);
 	  }

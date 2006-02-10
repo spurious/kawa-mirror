@@ -17,6 +17,8 @@ public class LangExp extends Expression
 
   public LangExp (Object value) { this.hook = value; }
 
+  protected boolean mustCompile () { return false; }
+
   public void print (OutPort out)
   {
     out.print("(LangExp ???)");

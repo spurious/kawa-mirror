@@ -25,6 +25,9 @@ public class ChainLambdas extends ExpWalker
 	exp.outer = currentScope;
 	currentScope = exp;
 	exp.walkChildren(this);
+        exp.setIndexes();
+        if (exp.mustCompile())
+          comp.mustCompileHere();
 	return exp;
       }
     finally
@@ -69,6 +72,9 @@ public class ChainLambdas extends ExpWalker
 
     if (exp.getName() == null && exp.nameDecl != null)
       exp.setName(exp.nameDecl.getName());
+    exp.setIndexes();
+    if (exp.mustCompile())
+      comp.mustCompileHere();
     return exp;
   }
 

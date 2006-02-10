@@ -1,9 +1,9 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.OutPort;
+import gnu.mapping.*;
 
 /**
  * Expression to exit a lexically surrounding block.
@@ -25,6 +25,13 @@ public class ExitExp extends Expression
   {
     this.result = QuoteExp.voidExp;
     this.block = block;
+  }
+
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    throw new BlockExitException(this, result.eval(ctx));
   }
 
   public void compile (Compilation comp, Target target)

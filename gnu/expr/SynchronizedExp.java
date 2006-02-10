@@ -13,13 +13,17 @@ public class SynchronizedExp extends Expression
     this.body = body;
   }
 
-  public Object eval (Environment env) throws Throwable
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx) throws Throwable
   {
-    Object value = object.eval(env);
+    Object value = object.eval(ctx);
+    Object result;
     synchronized (value)
       {
-	return body.eval(env);
+	result = body.eval(ctx);
       }
+    ctx.writeValue(result);
   }
 
   public void compile (Compilation comp, Target target)

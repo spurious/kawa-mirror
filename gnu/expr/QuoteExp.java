@@ -45,9 +45,11 @@ public class QuoteExp extends Expression
 
   public QuoteExp (Object val) { value = val; }
   
-  public Object eval (Environment env)
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx)
   {
-    return value;
+    ctx.writeValue(value);
   }
 
   public void compile (Compilation comp, Target target)

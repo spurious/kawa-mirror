@@ -3,7 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.OutPort;
+import gnu.mapping.*;
 
 /**
  * Class used to implement "fluid-let" for Scheme and "let" for Emacs.
@@ -13,6 +13,8 @@ import gnu.mapping.OutPort;
 public class FluidLetExp extends LetExp
 {
   public FluidLetExp (Expression[] i) { super(i); }
+
+  protected boolean mustCompile () { return true; }
 
   public void compile (Compilation comp, Target target)
   {

@@ -26,24 +26,15 @@ public class IfExp extends Expression
     return Language.getDefaultLanguage(); // FIXME
   }
 
-  public Object eval (Environment env) throws Throwable
-  {
-    Language language = getLanguage();
-    if (language.isTrue((test.eval (env))))
-      return then_clause.eval (env);
-    else if (else_clause != null)
-      return else_clause.eval (env);
-    else
-      return language.noValue();
-  }
+  protected boolean mustCompile () { return false; }
 
   public void apply (CallContext ctx) throws Throwable
   {
     Language language = getLanguage();
     if (language.isTrue((test.eval(ctx))))
-      then_clause.match0(ctx);
+      then_clause.apply(ctx);
     else if (else_clause != null)
-      else_clause.match0(ctx);
+      else_clause.apply(ctx);
   }
 
   public void compile (Compilation comp, Target target)

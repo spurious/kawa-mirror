@@ -66,51 +66,59 @@ public class ReferenceExp extends AccessExp
     this(binding.getSymbol(), binding);
   }
 
-  public Object eval (Environment env)
-  {
-    if (binding != null)
-      {
-        // This isn't just an optimization; it's needed for module imports.
-        if (binding.value instanceof QuoteExp
-            && binding.value != QuoteExp.undefined_exp
-            && (! getDontDereference() || binding.isIndirectBinding()))
-          {
-            Object value = binding.getConstantValue();
-            if (binding.isIndirectBinding())
-              return ((gnu.mapping.Location) value).get();
-            return value;
-          }
+  protected boolean mustCompile () { return false; }
 
-        if (binding.field != null && binding.field.getStaticFlag()
-            && (! getDontDereference() || binding.isIndirectBinding()))
-          {
-            try
-              {
-                Object value = binding.field.getReflectField().get(null);
-                if (binding.isIndirectBinding())
-                  return ((gnu.mapping.Location) value).get();
-                return value;
-              }
-            catch (Exception ex)
-              {
-                throw WrappedException.wrapIfNeeded(ex);
-              }
-          }
-        if ( ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
-          throw new Error("internal error: ReferenceExp.eval on lexical binding");
+  public void apply (CallContext ctx)
+    throws Throwable
+  {
+    Object value;
+    // This isn't just an optimization; it's needed for module imports.
+    if (binding != null && binding.value instanceof QuoteExp
+        && binding.value != QuoteExp.undefined_exp
+        && (! getDontDereference() || binding.isIndirectBinding()))
+      {
+        value = binding.getConstantValue();
       }
-    Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
-      : env.getSymbol(symbol.toString());
-    Object property = getFlag(PREFER_BINDING2) && isProcedureName()
-      ? EnvironmentKey.FUNCTION
-      : null;
-    if (getDontDereference())
-      return env.getLocation(sym, property);
-    Object unb = gnu.mapping.Location.UNBOUND;
-    Object val = env.get(sym, property, unb);
-    if (val == unb)
-      throw new UnboundLocationException(sym);
-    return val;
+    else if (binding != null
+             && binding.field != null && binding.field.getStaticFlag()
+             && (! getDontDereference() || binding.isIndirectBinding()))
+      {
+        try
+          {
+            value = binding.field.getReflectField().get(null);
+          }
+        catch (Exception ex)
+          {
+            throw WrappedException.wrapIfNeeded(ex);
+          }
+      }
+    else if (binding == null
+             || (binding.context instanceof ModuleExp
+                 && ! binding.isPrivate()))
+      {
+        Environment env = ctx.getEnvironment();
+        Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+          : env.getSymbol(symbol.toString());
+        Object property = getFlag(PREFER_BINDING2) && isProcedureName()
+          ? EnvironmentKey.FUNCTION
+          : null;
+        if (getDontDereference())
+          value = env.getLocation(sym, property);
+        else
+          {
+            Object unb = gnu.mapping.Location.UNBOUND;
+            value = env.get(sym, property, unb);
+            if (value == unb)
+              throw new UnboundLocationException(sym);
+          }
+        ctx.writeValue(value);
+        return;
+      }
+    else
+      value = ctx.evalFrames[ScopeExp.nesting(binding.context)][binding.evalIndex];
+    if (! getDontDereference() && binding.isIndirectBinding())
+      value = ((gnu.mapping.Location) value).get();
+    ctx.writeValue(value);
   }
 
   public void compile (Compilation comp, Target target)

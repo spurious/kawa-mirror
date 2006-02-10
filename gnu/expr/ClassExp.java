@@ -59,6 +59,8 @@ public class ClassExp extends LambdaExp
     setCanRead(true);
   }
 
+  protected boolean mustCompile () { return true; }
+
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)

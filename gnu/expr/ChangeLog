@@ -1,5 +1,36 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (evalIndex):  New field.
+	(makeIndirectLocationFor): New method.
+	* ChainLambdas.java (walkScopeExp, walkLambdaExp): Check if
+	expression mustCompile.
+	(walkScopeExp): Do setIndexes of Declaration, for interpretation.
+	* Expression.java (mustCompile): New abstract method.
+	(eval(Expression), eval(CallContext)): Make both final.
+	(apply): This is not the method that needs to be overridden.
+	* ScopeExp.java (frameSize): New field.
+	(setIndexes): New method.
+	(mustCompile): Remove no-longer-needed temporay stub method.
+	* ApplyExp.java (eval): Remove method.
+	* BeginExp.java (eval): Likewise,
+	* ErrorExp.java (eval): Likewise,
+	* ???Exp.java (mustCompile): New methods.
+	* BlockExp.java (appply): New method for interpreter.
+	(BlockExitException): New non-public class.
+	* ExitExp.java (apply): New method.
+	* IfExp.java (apply): Don't use match0 for tail-expressions,
+	since that breaks try-[catch-]finally.
+	* LambdaExp.java (apply): New method,
+	(Closure): New non-public class, extends MethodProc.
+	* LetExp.java (apply): New method.
+	* QuoteExp.java (eval): Replace method with new apply method.
+	* SynchronizedExp.java: Likewise.
+	* ThisExp.java: Likewise.
+	* TryExp.java: Likewise.
+	* ReferenceExp.java (eval):  Replace by new apply method, and
+	rewrite to handle lexical bindings.
+	* SetExp.java: Likewise.
+
 	* Compilation.java (walkModule, addMainClass): New methods.
 	(compile, addClass(ModuleExp)):  Remove and move things around to ...
 	(compileModule, compileWalkedModule): ... create these new methods.

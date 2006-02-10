@@ -27,17 +27,30 @@ public class TryExp extends Expression
     this.finally_clause = finally_clause;
   }
 
-  public Object eval (Environment env) throws Throwable
+  protected boolean mustCompile () { return catch_clauses != null; }
+
+  public void apply (CallContext ctx) throws Throwable
   {
     if (catch_clauses != null)
       throw new RuntimeException("internal error - TryExp.eval called");
     try
       {
-	return try_clause.eval(env);
+	try_clause.apply(ctx);
+        ctx.runUntilDone();
+      }
+    catch (Throwable ex)
+      {
+        for (CatchClause clause = catch_clauses; clause != null;
+             clause = clause.next)
+          {
+            Declaration decl = clause.firstDecl();
+            // FIXME
+          }
+        throw ex;
       }
     finally
       {
-	finally_clause.eval(env);
+	finally_clause.eval(ctx);
       }
   }
 

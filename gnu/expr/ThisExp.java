@@ -25,11 +25,13 @@ public class ThisExp extends ReferenceExp
     return (flags & EVAL_TO_CONTEXT) != 0;
   }
 
-  public Object eval (Environment env)
+  public void apply (CallContext ctx)
+    throws Throwable
   {
     if (isForContext())
-      return context;
-    return super.eval(env);
+      ctx.writeValue(context);
+    else
+      super.apply(ctx);
   }
 
   public ScopeExp getContextScope () { return context; }

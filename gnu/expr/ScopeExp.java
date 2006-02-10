@@ -246,12 +246,24 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
+  /** Size of evalFrame to allocate in interpreter. */
+  protected int frameSize;
+
+  /** Calculate offset and frameSize needed by interpreter. */
+  protected void setIndexes ()
+  {
+    int i = 0;
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
+      {
+        decl.evalIndex = i++;
+      }
+    frameSize = i;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkScopeExp(this);
   }
-
-  public final boolean mustCompile() { return ! (this instanceof ModuleExp); }
 
   public String toString() { return getClass().getName()+"#"+id; }
 

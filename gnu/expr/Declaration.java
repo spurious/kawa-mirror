@@ -77,6 +77,9 @@ public class Declaration
   public final Declaration nextDecl() { return next; }
   public final void setNext(Declaration next) {  this.next = next; }
 
+  /** Index in evalFrame for this scope, if interpreting. */
+  int evalIndex;
+
   Variable var;
   public Variable getVariable() { return var; }
 
@@ -813,6 +816,14 @@ public class Declaration
       {
 	BindingInitializer.create(this, value, comp);
       }
+  }
+
+  /* Used when evaluating for an indirect binding. */
+  gnu.mapping.Location makeIndirectLocationFor ()
+  {
+    Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+      : Namespace.EmptyNamespace.getSymbol(symbol.toString().intern());
+    return gnu.mapping.Location.make(sym);
   }
 
   /** Create a declaration corresponding to a static field.

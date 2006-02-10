@@ -65,31 +65,43 @@ public class SetExp extends AccessExp
     new_value = val;
   }
 
-  public Object eval (Environment env) throws Throwable
+  protected boolean mustCompile () { return false; }
+
+  public void apply (CallContext ctx) throws Throwable
   {
+    Environment env = ctx.getEnvironment();
     Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
       : env.getSymbol(symbol.toString());
     Object property = null;
     Language language = Language.getDefaultLanguage();
     if (isFuncDef() && language.hasSeparateFunctionNamespace())
       property = EnvironmentKey.FUNCTION;
-    if (binding != null
-        && ! (binding.context instanceof ModuleExp))
-      throw new Error ("internal error - SetExp.eval with lexical binding");
-
     if (isSetIfUnbound())
       {
 	Location loc = env.getLocation(sym, property);
 	if (! loc.isBound())
 	  loc.set(new_value.eval (env));
 	if (getHasValue())
-	  return loc;
-	else
-	  return language.noValue();
+	   ctx.writeValue(loc);
+        return;
       }
 
     Object new_val = new_value.eval (env);
-    if (isDefining ())
+    if (binding != null && ! (binding.context instanceof ModuleExp))
+      {
+        Object[] evalFrame = ctx.evalFrames[ScopeExp.nesting(binding.context)];
+        if (binding.isIndirectBinding())
+          {
+            Location loc;
+            if (isDefining())
+              evalFrame[binding.evalIndex] =  Location.make(sym);
+            loc = (Location) evalFrame[binding.evalIndex];
+            loc.set(new_value);
+          }
+        else
+          evalFrame[binding.evalIndex] = new_val;
+      }
+    else if (isDefining ())
       {
 	/*
 	if (binding != null && binding.isAlias())
@@ -102,7 +114,8 @@ public class SetExp extends AccessExp
       {
 	env.put(sym, property, new_val);
       }
-    return getHasValue() ? new_val : language.noValue();
+    if (getHasValue())
+      ctx.writeValue(new_val);
   }
 
   public void compile (Compilation comp, Target target)

@@ -31,6 +31,8 @@ public class CatchClause extends ScopeExp
   public final Expression getBody() { return body; }
   public final void setBody(Expression body) { this.body = body; }
 
+  protected boolean mustCompile () { return true; }
+
   public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();

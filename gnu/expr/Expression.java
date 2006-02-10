@@ -10,11 +10,39 @@ import gnu.mapping.*;
 
 public abstract class Expression extends Procedure0 implements Printable
 {
-  public Object eval (Environment env) throws Throwable
+  public final Object eval (CallContext ctx) throws Throwable
   {
-    throw new RuntimeException ("internal error - "
-			        + getClass() + ".eval called");
+    int start = ctx.startFromContext();
+    try
+      {
+	match0(ctx);
+	return ctx.getFromContext(start);
+      }
+    catch (Throwable ex)
+      {
+	ctx.cleanupFromContext(start);
+	throw ex;
+      }
   }
+
+  public final Object eval (Environment env) throws Throwable
+  {
+    CallContext ctx = CallContext.getInstance();
+    Environment save = ctx.getEnvironmentRaw();
+    if (env != save)
+      ctx.setEnvironmentRaw(env);
+    try
+      {
+        return eval(ctx);
+      }
+    finally
+      {
+        if (env != save)
+          ctx.setEnvironmentRaw(save);
+      }
+  }
+
+  protected abstract boolean mustCompile ();
 
   public final int match0 (CallContext ctx)
   {
@@ -30,25 +58,15 @@ public abstract class Expression extends Procedure0 implements Printable
     return ctx.runUntilValue();
   }
 
+  /** Evaluate the expression.
+   * This is named apply rather than eval so it is compatible with the
+   * full-tail-call calling convention, and we can stash an Expression in
+   * CallContext's proc field.  FIXME - are we making use of this?
+   */
   public void apply (CallContext ctx) throws Throwable
   {
-    Object val = eval(ctx.getEnvironment());
-    ctx.writeValue(val);
-  }
-
-  public final Object eval (CallContext ctx) throws Throwable
-  {
-    int start = ctx.startFromContext();
-    try
-      {
-	match0(ctx);
-	return ctx.getFromContext(start);
-      }
-    catch (Throwable ex)
-      {
-	ctx.cleanupFromContext(start);
-	throw ex;
-      }
+    throw new RuntimeException ("internal error - "
+			        + getClass() + ".eval called");
   }
 
   public final void print (java.io.PrintWriter ps)

@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 2003, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -50,15 +50,7 @@ public class ApplyExp extends Expression
     args = a;
   }
 
-  public Object eval (Environment env) throws Throwable
-  {
-    Procedure proc = (Procedure) func.eval(env);
-    int n = args.length;
-    Object[] vals = new Object[n];
-    for (int i = 0; i < n; i++)
-      vals[i] = args[i].eval (env);
-    return proc.applyN (vals);
-  }
+  protected boolean mustCompile () { return false; }
 
   public void apply (CallContext ctx) throws Throwable
   {

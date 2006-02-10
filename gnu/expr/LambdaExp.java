@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.lists.LList;
 import java.util.Vector;
 
 /**
@@ -1534,6 +1535,28 @@ public class LambdaExp extends ScopeExp
       }
   }
 
+  protected boolean mustCompile ()
+  {
+    if (keywords != null && keywords.length > 0)
+      return true;
+    if (defaultArgs != null)
+      {
+        for (int i = defaultArgs.length;  --i >= 0; )
+          {
+            Expression def = defaultArgs[i];
+            // Non-constant default arguments require care with scoping.
+            if (def != null && ! (def instanceof QuoteExp))
+              return true;
+          }
+      }
+    return false;
+  }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    ctx.writeValue(new Closure(this, ctx));
+  }
+
   public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
   {
     int args_length = exp.args.length;
@@ -1715,5 +1738,176 @@ public class LambdaExp extends ScopeExp
   public final void setReturnType (Type returnType)
   {
     this.returnType = returnType;
+  }
+}
+
+class Closure extends MethodProc
+{
+  Object[][] evalFrames;
+  LambdaExp lambda;
+
+  public int numArgs() { return lambda.min_args | (lambda.max_args << 12); }
+
+  public Closure (LambdaExp lexp, CallContext ctx)
+  {
+    this.lambda = lexp;
+
+    Object[][] oldFrames = ctx.evalFrames;
+    if (oldFrames != null)
+      {
+        int n = oldFrames.length;
+        while (n > 0 && oldFrames[n-1] == null)
+          n--;
+
+        evalFrames = new Object[n][];
+        System.arraycopy(oldFrames, 0, evalFrames, 0, n);
+      }
+    setSymbol(lambda.getSymbol());
+  }
+
+  public int match0 (CallContext ctx)
+  {
+    return matchN(new Object[] { }, ctx);
+  }
+
+  public int match1 (Object arg1, CallContext ctx)
+  {
+    return matchN(new Object[] { arg1 }, ctx);
+  }
+
+  public int match2 (Object arg1, Object arg2, CallContext ctx)
+  {
+    return matchN(new Object[] { arg1, arg2 }, ctx);
+  }
+
+  public int match3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
+  {
+    return matchN(new Object[] { arg1, arg2, arg3 }, ctx);
+  }
+
+  public int match4 (Object arg1, Object arg2, Object arg3, Object arg4,
+                     CallContext ctx)
+  {
+    return matchN(new Object[] { arg1, arg2, arg3, arg4 }, ctx);
+  }
+
+  public int matchN (Object[] args, CallContext ctx)
+  {
+    int num = numArgs();
+    int nargs = args.length;
+    int min = num & 0xFFF;
+    if (nargs < min)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    int max = num >> 12;
+    if (nargs > max && max >= 0)
+      return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+
+    Object[] evalFrame = new Object[lambda.frameSize];
+    int key_args = lambda.keywords == null ? 0 : lambda.keywords.length;
+    int opt_args = lambda.defaultArgs == null ? 0
+      : lambda.defaultArgs.length - key_args;
+    int i = 0;
+    int opt_i = 0;
+    int min_args = lambda.min_args;
+    for (Declaration decl = lambda.firstDecl(); decl != null;
+         decl = decl.nextDecl())
+      {
+        Object value;
+	if (i < min_args)
+	  value = args[i++];
+	else if (i < min_args + opt_args)
+          {
+            if (i < nargs)
+              value = args[i++];
+            else
+              value = ((QuoteExp) lambda.defaultArgs[opt_i++]).getValue();
+          }
+	else if (lambda.max_args < 0 && i == min_args + opt_args)
+          {
+            if (decl.type instanceof ArrayType)
+              {
+                int rem = nargs - i;
+                Type elementType = ((ArrayType) decl.type).getComponentType();
+                if (elementType == Type.pointer_type)
+                  {
+                    Object[] rest = new Object[rem];
+                    System.arraycopy(args, i, rest, 0, rem);
+                    value = rest;
+                  }
+                else
+                  {
+                    Class elementClass = elementType.getReflectClass();
+                    value
+                      = java.lang.reflect.Array.newInstance(elementClass, rem);
+                    for (int j = 0;  j < rem;  j++)
+                      {
+                        Object el;
+                        try
+                          {
+                            el = elementType.coerceFromObject(args[i+j]);
+                          }
+                        catch (ClassCastException ex)
+                          {
+                            return NO_MATCH_BAD_TYPE|(i+j);
+                          }
+                        java.lang.reflect.Array.set(value, j, el);
+                      }
+                  }
+              }
+            else
+              value = LList.makeList(args, i);
+          }
+        else // Should never happen
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+        if (decl.type != null)
+          {
+            try
+              {
+                value = decl.type.coerceFromObject(value);
+              }
+            catch (ClassCastException ex)
+              {
+                return NO_MATCH_BAD_TYPE|i;
+              }
+          }
+        if (decl.isIndirectBinding())
+          {
+            gnu.mapping.Location loc = decl.makeIndirectLocationFor();
+            loc.set(value);
+            value = loc;
+          }
+        evalFrame[decl.evalIndex] = value;
+      }
+    ctx.values = evalFrame;
+    ctx.where = 0;
+    ctx.next = 0;
+    ctx.proc = this;
+    return 0; // FIXME
+  }
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    int level = ScopeExp.nesting(lambda);
+    Object[] evalFrame = ctx.values;
+    Object[][] saveFrames = ctx.evalFrames;
+
+    int numFrames = evalFrames == null ? 0 : evalFrames.length;
+    if (level >= numFrames)
+      numFrames = level;
+    numFrames += 10;
+    Object[][] newFrames = new Object[numFrames][];
+    if (evalFrames != null)
+      System.arraycopy(evalFrames, 0, newFrames, 0, evalFrames.length);
+    newFrames[level] = evalFrame;
+    ctx.evalFrames = newFrames;
+
+    try
+      {
+        lambda.body.apply(ctx);
+      }
+    finally
+      {
+        ctx.evalFrames = saveFrames;
+      }
   }
 }

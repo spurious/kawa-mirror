@@ -99,14 +99,7 @@ public class BeginExp extends Expression
     compileOptions = options;
   }
 
-  public Object eval (Environment env) throws Throwable
-  {
-    int n = length;
-    int i;
-    for (i = 0; i < n - 1; i++)
-      exps[i].eval (env);
-    return exps[i].eval (env);
-  }
+  protected boolean mustCompile () { return false; }
 
   public void apply (CallContext ctx) throws Throwable
   {
@@ -123,7 +116,7 @@ public class BeginExp extends Expression
       {
 	ctx.consumer = consumerSave;
       }
-    exps[i].match0(ctx);
+    exps[i].apply(ctx);
   }
 
   public void pushOptions (Compilation comp)

@@ -1,3 +1,7 @@
+2006-02-09  Per Bothner  <per@bothner.com>
+
+	* ArrayGet.java (apply2): Added missing coercion.
+
 2006-02-07  Per Bothner  <per@bothner.com>
 
 	* ClassMethodProc.java: Remove no-longer needed file.

@@ -3,6 +3,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
+import java.lang.reflect.Array;
 
 public class ArrayGet extends Procedure2 implements Inlineable, Externalizable
 {
@@ -15,7 +16,8 @@ public class ArrayGet extends Procedure2 implements Inlineable, Externalizable
 
   public Object apply2 (Object array, Object index)
   {
-    return java.lang.reflect.Array.get(array, ((Number) index).intValue());
+    Object value = Array.get(array, ((Number) index).intValue());
+    return element_type.coerceToObject(value);
   }
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {

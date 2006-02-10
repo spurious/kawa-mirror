@@ -348,9 +348,10 @@ public class Invoke extends ProcedureN implements CanInline
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length;
-    if (nargs == 0 || (kind == 'V' && nargs == 1))
-      // This should never happen, as InlineCalls.walkApplyExp
-      // checks the number of arguments before inline is called.
+    if (! comp.mustCompile
+        // This should never happen, as InlineCalls.walkApplyExp
+        // checks the number of arguments before inline is called.
+        || nargs == 0 || (kind == 'V' && nargs == 1))
       return exp;
     ObjectType type;
     Expression arg0 = args[0];

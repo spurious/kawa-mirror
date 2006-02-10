@@ -157,6 +157,10 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
+    // Inlining may yield PrimProcedure instructions of bytecode instructions
+    // which we don't know how to interpret (yet).
+    if (! walker.getCompilation().mustCompile)
+      return exp;
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;

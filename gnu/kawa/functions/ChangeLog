@@ -1,5 +1,8 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* AddOp.java (inline): Don't inline, unless mustCompile.
+	* MultiplyOp.java: Likewise.
+
 	* ApplyToArgs.java (match1, match2, match3, match4, matchN,
 	check1, check2, check3, check4, checkN): New methods.
 

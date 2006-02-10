@@ -1,5 +1,9 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* Invoke.java (inline): Don't inline, unless mustCompile.
+	* SlotGet.java (inline): Likewise.
+	* SlotSet.java (inline): Likewise.
+
 	* ArrayGet.java (apply2): Added missing coercion.
 
 2006-02-07  Per Bothner  <per@bothner.com>

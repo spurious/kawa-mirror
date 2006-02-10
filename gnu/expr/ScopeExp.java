@@ -251,6 +251,8 @@ public abstract class ScopeExp extends Expression
     return walker.walkScopeExp(this);
   }
 
+  public final boolean mustCompile() { return ! (this instanceof ModuleExp); }
+
   public String toString() { return getClass().getName()+"#"+id; }
 
   static int counter;

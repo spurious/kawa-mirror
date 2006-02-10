@@ -67,7 +67,8 @@ public class ModuleExp extends LambdaExp
         loader.setResourceContext(url);
 	comp.loader = loader;
 
-	comp.compile(mexp);
+	comp.compileWalkedModule(mexp);
+
 	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
 	  return null;
@@ -137,6 +138,13 @@ public class ModuleExp extends LambdaExp
       {
 	throw new WrappedException("class not found in lambda eval", ex);
       }
+    catch (Throwable ex)
+      {
+	comp.error('f', "internal compile error - caught "+ex);
+	comp.messages.printAll(OutPort.errDefault(), 20);
+	comp.messages.clear();
+	throw WrappedException.wrapIfNeeded(ex);
+      }
   }
 
   /** Flag to force compilation, even when not required. */
@@ -156,12 +164,17 @@ public class ModuleExp extends LambdaExp
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 
+        if (alwaysCompile || comp.mustCompile)
+          comp.addMainClass(mexp);
+
+        comp.walkModule(mexp);
+
 	if (! alwaysCompile && ! comp.mustCompile)
 	  { // optimization - don't generate unneeded Class.
-	    if (Compilation.debugPrintExpr)
+	    if (Compilation.debugPrintFinalExpr)
 	      {
 		OutPort dout = OutPort.errDefault();
-		dout.println ("[Evaluating module \""+mexp.getName()+"\":");
+		dout.println ("[Evaluating final module \""+mexp.getName()+"\":");
 		mexp.print(dout);
 		dout.println(']');
 		dout.flush();
@@ -170,6 +183,9 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
+            if (comp.mainClass == null)
+              comp.addMainClass(mexp);
+
 	    try
 	      {
 		Class clas = evalToClass(comp, url);

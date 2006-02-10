@@ -1,5 +1,16 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (walkModule, addMainClass): New methods.
+	(compile, addClass(ModuleExp)):  Remove and move things around to ...
+	(compileModule, compileWalkedModule): ... create these new methods.
+	(push(ScopeExp)): Possible mustCompileFile() here call moved ..
+	(pushScope): ... this more-commponly-called method instead.
+	* ModuleExp.java (evalToClass):Call compileWalkedModule instead 
+	of remove compile method.  Add general catch of Throwable.
+	(evalModule): Do InliningCalls etc even if we're not sure we need to
+	compile.  Check mustCompile after we have done so.
+	* ScopeExp.java (mustCompile): New temporary stub method.
+
 	* Compilation.java (source_filename) Removed field.
 	(addClass): Adjust accordingly.
 	(pushNewModule): New method.

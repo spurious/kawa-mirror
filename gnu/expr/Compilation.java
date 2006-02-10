@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2005  Per M.A. Bothner.
+// Copyright (c) 1999, 2000-2005, 2006 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -863,66 +863,40 @@ public class Compilation
     this.lexical = lexical;
   }
 
-  /** Create a new Compilation environment.
-   * @param lexp top-level function
-   * @param classname name of top-level class to generate
-   */
-  public void compile (ModuleExp lexp)
+  /** Shared processing for both compiling/eval. */
+  public void walkModule (ModuleExp mexp)
   {
-    mainLambda = lexp;
-
-    if (messages.seenErrors())
-      return;
-
-    mainClass = lexp.classFor(this);
-    addClass(lexp, mainClass);
-
     if (debugPrintExpr)
       {
 	OutPort dout = OutPort.errDefault();
-	dout.println("[Compiling module-name:" + lexp.getName()
-                     + " to " + mainClass.getName() + ":");
-	lexp.print(dout);
+	dout.println("[Module:" + mexp.getName());
+	mexp.print(dout);
 	dout.println(']');
 	dout.flush();
       }
 
-    getConstructor(mainClass, lexp);
+    PushApply.pushApply(mexp);
+    InlineCalls.inlineCalls(mexp, this);
+    ChainLambdas.chainLambdas(mexp, this);
+    FindTailCalls.findTailCalls(mexp, this);
+  }
 
-    // Do various code re-writes and optimization.
-    PushApply.pushApply(lexp);
-    InlineCalls.inlineCalls(lexp, this);
-    ChainLambdas.chainLambdas(lexp, this);
-    FindTailCalls.findTailCalls(lexp, this);
-    lexp.setCanRead(true);
-    FindCapturedVars.findCapturedVars(lexp, this);
-
+  /** Create a new Compilation environment.
+   * @param lexp top-level function
+   */
+  public void compileModule (ModuleExp lexp)
+  {
     if (messages.seenErrors())
       return;
 
-    if (debugPrintFinalExpr)
-      {
-	OutPort dout = OutPort.errDefault();
-	dout.println ("[Compiling final "+lexp.getName()+':');
-	lexp.print(dout);
-	dout.println(']');
-	dout.flush();
-      }
+    addMainClass(lexp);
 
-    ClassType neededSuper = getModuleType();
-    if (mainClass.getSuperclass().isSubtype(neededSuper))
-      moduleClass = mainClass;
-    else
-      {
-	moduleClass = new ClassType(generateClassName("frame"));
-	moduleClass.setSuper(neededSuper);
-	addClass(moduleClass);
-	generateConstructor(moduleClass, lexp);
-      }
-    litTable = new LitTable(this);
+    // Do various code re-writes and optimization.
+    walkModule(lexp);
+
     try
       {
-	addClass (lexp);
+	compileWalkedModule(lexp);
       }
     catch (Throwable ex)
       {
@@ -949,7 +923,7 @@ public class Compilation
     perr.flush();
     */
 
-    compile(mexp);
+    compileModule(mexp);
     if (! messages.seenErrors())
       outputClass(directory);
   }
@@ -984,7 +958,7 @@ public class Compilation
 	makeJar = false;
       }
     mexp.setName(LambdaExp.fileFunctionName);
-    compile(mexp);
+    compileModule(mexp);
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();
@@ -1040,6 +1014,15 @@ public class Compilation
       }
     classes[numClasses++] = new_class;
     new_class.access_flags |= Access.PUBLIC|Access.SUPER;
+  }
+
+  void addMainClass (ModuleExp module)
+  {
+    mustCompile = true;
+
+    mainClass = module.classFor(this);
+    addClass(module, mainClass);
+    getConstructor(mainClass, module);
   }
 
   ClassType addClass (ModuleExp module, ClassType type)
@@ -1806,9 +1789,39 @@ public class Compilation
     return method;
   }
 
-  /** Compiles a module to a class. */
-  public final ClassType addClass (ModuleExp module)
+  /** The guts of compiling a module to one or more classes.
+   * Assumes walkModule has been done.
+   */
+  void compileWalkedModule (ModuleExp module)
   {
+    module.setCanRead(true);
+    FindCapturedVars.findCapturedVars(module, this);
+
+    if (messages.seenErrors())
+      return;
+
+    if (debugPrintFinalExpr)
+      {
+	OutPort dout = OutPort.errDefault();
+	dout.println ("[Compiling final "+module.getName()
+                     + " to " + mainClass.getName() + ":");
+	module.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
+    ClassType neededSuper = getModuleType();
+    if (mainClass.getSuperclass().isSubtype(neededSuper))
+      moduleClass = mainClass;
+    else
+      {
+	moduleClass = new ClassType(generateClassName("frame"));
+	moduleClass.setSuper(neededSuper);
+	addClass(moduleClass);
+	generateConstructor(moduleClass, module);
+      }
+
+    litTable = new LitTable(this);
     String name;
     ClassType new_class = module.type;
     if (new_class == typeProcedure)
@@ -2051,8 +2064,6 @@ public class Compilation
 	code.emitInvokeVirtual(typeModuleBody.getDeclaredMethod("runAsMain", 0));
 	code.emitReturn();
       }
-
-    return new_class;
   }
 
   int localFieldIndex; 
@@ -2171,14 +2182,14 @@ public class Compilation
 
   public void push (ScopeExp scope)
   {
-    if (! (scope instanceof ModuleExp))
-      mustCompileHere();
     pushScope(scope);
     lexical.push(scope);
   }
 
   public final void pushScope (ScopeExp scope)
   {
+    if (scope.mustCompile())
+      mustCompileHere();
     scope.outer = current_scope;
     current_scope = scope;
   }

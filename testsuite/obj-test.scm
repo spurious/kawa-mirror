@@ -8,7 +8,7 @@
 ;; Force call to be compiled with (hopefully) inlining:
 (define-syntax force-compile
   (syntax-rules () ((force-compile proc arg ...)
-                    ((lambda () (proc arg ...))))))
+                    ((lambda (#!key keydummy) (proc arg ...))))))
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))

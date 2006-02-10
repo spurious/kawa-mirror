@@ -1,3 +1,8 @@
+2006-02-09  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm (force-compile):  Since lambdas no longer autmatically
+	force compilation, using a #!key does do it.
+
 2006-02-07  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm: New file of lots of little functions that we

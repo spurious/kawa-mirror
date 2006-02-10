@@ -136,7 +136,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 
     Declaration[] largs = new Declaration[nargs];
     Declaration[] pargs = new Declaration[nargs];
-    IsEq isEq = new IsEq(null, "eq?");
+    IsEq isEq = Scheme.isEq;
     for (int i = 0;  i < nargs;  i++)
       {
 	String argName = "arg"+i;

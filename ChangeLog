@@ -1,3 +1,7 @@
+2006-02-09  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline): Use existing IsEq from Scheme.
+
 2006-02-07  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initScheme): The R5RS functions
@@ -24,7 +28,7 @@
 	applyFieldDecl): New static fields.
 	(makeApply): New method, overrides LispLanguage.
 	(createReadTable): Change postfixLookupOperator to ':'.
-	* kawa/standard/define.java (scanForm): Soem changes to handle
+	* kawa/standard/define.java (scanForm): Some changes to handle
 	namespace resolution.  Set type of functions to Procedure.
 	* kawa/standard/export.java (scanForDefinitions): Since namespace
 	prefixes are now in the regular namespace, we no longer need

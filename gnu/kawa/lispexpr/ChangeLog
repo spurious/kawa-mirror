@@ -1,3 +1,7 @@
+2006-02-09  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): Use new Compilation.pushNewModule method.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions): A namespace declaration

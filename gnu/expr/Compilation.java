@@ -836,8 +836,6 @@ public class Compilation
       }
   }
 
-  String source_filename;
-
   public Compilation (boolean immediate, SourceMessages messages)
   {
     this(messages);
@@ -871,7 +869,6 @@ public class Compilation
    */
   public void compile (ModuleExp lexp)
   {
-    source_filename = lexp.filename;
     mainLambda = lexp;
 
     if (messages.seenErrors())
@@ -1027,11 +1024,11 @@ public class Compilation
 
   public void addClass (ClassType new_class)
   {
-    if (source_filename != null)
+    if (mainLambda.filename != null)
       {
 	if (emitSourceDebugExtAttr)
 	  new_class.setStratum(getLanguage().getName());
-	new_class.setSourceFile(source_filename);
+	new_class.setSourceFile(mainLambda.filename);
       }
     if (classes == null)
       classes = new ClassType[20];
@@ -2158,16 +2155,23 @@ public class Compilation
       }
   }
 
+  public ModuleExp pushNewModule (String filename)
+  {
+    ModuleExp module = new ModuleExp();
+    if (filename != null)
+      module.setFile(filename);
+    if (Compilation.generateAppletDefault)
+      module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
+    if (immediate)
+      module.setFlag(ModuleExp.IMMEDIATE);
+    mainLambda = module;
+    push(module);
+    return module;
+  }
+
   public void push (ScopeExp scope)
   {
-    if (scope instanceof ModuleExp)
-      {
-	if (mainLambda == null)
-	  mainLambda = (ModuleExp) scope;
-        if (immediate)
-          scope.setFlag(ModuleExp.IMMEDIATE);
-      }
-    else
+    if (! (scope instanceof ModuleExp))
       mustCompileHere();
     pushScope(scope);
     lexical.push(scope);

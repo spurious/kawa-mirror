@@ -1,5 +1,10 @@
 2006-02-09  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (source_filename) Removed field.
+	(addClass): Adjust accordingly.
+	(pushNewModule): New method.
+	(push(ScopeExp)): Simplify ModuleExp handling - now in pushNewModule
+
 	* PrimProcedure.java (matchN): Fix a bug in the takesContext() case.
 	(apply): Likewise.
 	(matcN): Fix bugs in handling of #!rest arg with a LList type.

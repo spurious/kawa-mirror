@@ -104,9 +104,7 @@ public class XQuery extends Language
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     XQResolveNames resolver = new XQResolveNames(tr);
     resolver.functionNamespacePath = parser.functionNamespacePath;
-    ModuleExp mexp = new ModuleExp();
-    mexp.setFile(lexer.getName());
-    tr.push(mexp);
+    ModuleExp mexp = tr.pushNewModule(lexer.getName());
     tr.mustCompileHere();
     ((XQParser) lexer).resolver = resolver;
     resolver.parser =  (XQParser) lexer;

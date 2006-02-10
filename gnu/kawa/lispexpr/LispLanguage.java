@@ -36,13 +36,8 @@ public abstract class LispLanguage extends Language
     SourceMessages messages = lexer.getMessages();
     kawa.lang.Translator tr = new Translator (this, messages);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = new ModuleExp();
-    if (Compilation.generateAppletDefault)
-      mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
-    String fname = lexer.getName();
-    mexp.setFile(fname);
+    ModuleExp mexp = tr.pushNewModule(lexer.getName());
     Values forms = new Values();
-    tr.push(mexp);
     int first = tr.formStack.size();
     LispReader reader = (LispReader) lexer;
     Compilation save_comp = Compilation.getCurrent();

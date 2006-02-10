@@ -21,6 +21,7 @@ public class LetExp extends ScopeExp
 
   public void apply (CallContext ctx) throws Throwable
   {
+    setIndexes();
     int level = ScopeExp.nesting(this);
     int i = frameSize;
     

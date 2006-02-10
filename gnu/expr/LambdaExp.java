@@ -1554,6 +1554,11 @@ public class LambdaExp extends ScopeExp
 
   public void apply (CallContext ctx) throws Throwable
   {
+    // It would be better to call setIndexes at compile-time, but that
+    // doesn't work if we're called as a syntax expander at rewrite time.
+    // Better, if this is a top-level eval, to create a "compile-time" module,
+    // but I haven't figured out how to do that.  FIXME.
+    setIndexes();
     ctx.writeValue(new Closure(this, ctx));
   }
 

@@ -3,6 +3,7 @@ import gnu.math.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import java.math.*;
 
 /** This implements the numeric comparison relations: <, <=, etc. */
 
@@ -115,7 +116,65 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 
   static public boolean apply2 (int flags, Object arg1, Object arg2)
   {
-    return ((1 << (3 + ((Numeric)arg1).compare(arg2))) & flags) != 0;
+    int code1 = Arithmetic.classifyValue(arg1);
+    int code2 = Arithmetic.classifyValue(arg2);
+    int code = code1 < code2 ? code2 : code1;
+    int comp; // A Numeric.compare return code: -1, 0, 1, or rarely: -2, or -3.
+    switch (code)
+      {
+      case Arithmetic.INT_CODE:
+	int i1 = Arithmetic.asInt(arg1);
+	int i2 = Arithmetic.asInt(arg2);
+        comp = i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
+	break;
+      case Arithmetic.LONG_CODE:
+	long l1 = Arithmetic.asLong(arg1);
+	long l2 = Arithmetic.asLong(arg2);
+        comp = l1 < l2 ? -1 : l1 > l2 ? 1 : 0;
+        break;
+      case Arithmetic.BIGINTEGER_CODE:
+	BigInteger bi1 = Arithmetic.asBigInteger(arg1);
+	BigInteger bi2 = Arithmetic.asBigInteger(arg2);
+	comp = bi1.compareTo(bi2);
+        break;
+      case Arithmetic.INTNUM_CODE:
+	comp = IntNum.compare(Arithmetic.asIntNum(arg1),
+                              Arithmetic.asIntNum(arg2));
+        break;
+      case Arithmetic.BIGDECIMAL_CODE:
+	BigDecimal bd1 = Arithmetic.asBigDecimal(arg1);
+	BigDecimal bd2 = Arithmetic.asBigDecimal(arg2);
+	comp = bd1.compareTo(bd2);
+        break;
+      case Arithmetic.RATNUM_CODE:
+	comp = RatNum.compare(Arithmetic.asRatNum(arg1),
+                              Arithmetic.asRatNum(arg2));
+        break;
+      case Arithmetic.FLOAT_CODE:
+        if (code1 > Arithmetic.RATNUM_CODE && code2 > Arithmetic.RATNUM_CODE)
+          {
+            float f1 = Arithmetic.asFloat(arg1);
+            float f2 = Arithmetic.asFloat(arg2);
+            comp = f1 > f2 ? 1 : f1 < f2 ? -1 : f1 == f2 ? 0 : -2;
+            break;
+          }
+        // else fall through, to handle exact-inexact comparison
+      case Arithmetic.DOUBLE_CODE:
+      case Arithmetic.FLONUM_CODE:
+        if (code1 > Arithmetic.RATNUM_CODE && code2 > Arithmetic.RATNUM_CODE)
+          {
+            double d1 = Arithmetic.asDouble(arg1);
+            double d2 = Arithmetic.asDouble(arg2);
+            comp = d1 > d2 ? 1 : d1 < d2 ? -1 : d1 == d2 ? 0 : -2;
+            break;
+          }
+        // else fall through, to handle exact-inexact comparison
+      default:
+	Numeric num1 = Arithmetic.asNumeric(arg1);
+	Numeric num2 = Arithmetic.asNumeric(arg2);
+        comp = ((Numeric) num1).compare(num2);
+      }
+    return ((1 << (3 + comp)) & flags) != 0;
   }
 
   static boolean applyN (int flags, Object[] args)

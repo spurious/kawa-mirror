@@ -1,5 +1,8 @@
 2006-02-10  Per Bothner  <per@bothner.com>
 
+	* NumberCompare.java (apply2): Rewrite so we can also handle standard
+	Java Number classes, by making use of Arithmetic.classifyValue.
+
 	* Arithmetic.java (toString): New method.
 
 2006-02-09  Per Bothner  <per@bothner.com>

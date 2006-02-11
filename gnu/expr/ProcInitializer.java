@@ -71,15 +71,7 @@ public class ProcInitializer extends Initializer
                      | ((proc.keywords == null ? proc.max_args : -1) << 12));
     Method initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
     code.emitInvokeSpecial(initModuleMethod);
-  }
 
-  public void emit(Compilation comp)
-  {
-    CodeAttr code = comp.getCode();
-    if (! field.getStaticFlag())
-      code.emitPushThis();
-
-    emitLoadModuleMethod(proc, comp);
 
     if (proc.properties != null)
       {
@@ -104,6 +96,15 @@ public class ProcInitializer extends Initializer
 	      }
 	  }
       }
+  }
+
+  public void emit(Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    if (! field.getStaticFlag())
+      code.emitPushThis();
+
+    emitLoadModuleMethod(proc, comp);
 
     if (field.getStaticFlag())
       code.emitPutStatic(field);

@@ -1,3 +1,11 @@
+2006-02-10  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (Closure:getProperty): New method.
+	* ProcInitializer.java (emit): Move emitting of properties to
+	emitLoadModuleMethod method.
+	* ModuleMethod (<init>): Don't setSymbol if it is null.
+	(getName): Remove method - use from super class.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (evalIndex):  New field.

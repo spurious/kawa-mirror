@@ -1915,4 +1915,12 @@ class Closure extends MethodProc
         ctx.evalFrames = saveFrames;
       }
   }
+
+  public Object getProperty(Object key, Object defaultValue)
+  {
+    Object value = super.getProperty(key, defaultValue);
+    if (value == null)
+      value = lambda.getProperty(key, defaultValue);
+    return value;
+  }
 }

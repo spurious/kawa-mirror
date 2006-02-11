@@ -33,18 +33,9 @@ public class ModuleMethod extends MethodProc
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setSymbol(name);
+    if (name != null)
+      setSymbol(name);
     this.argTypes = argTypes;
-  }
-
-  public String getName ()
-  {
-    String name = super.getName();
-    if (name == null)
-      {
-	name = "{" + module.getClass().getName() + ':' + selector + '}';
-      }
-    return name;
   }
 
   /** Figure out parameter types.

@@ -166,7 +166,7 @@ The discussion below assumes you are using the Java Developer's Kit
 @uref{http://java.sun.com/j2se/1.4/, JDK 1.4} for various platforms.
 
 If you want to run Kawa on a Macintosh, see
-@uref{http://home.earthlink.net/%7Eathene/scheme/mackawa.html}.
+@uref{http://rdsathene.org/scheme/mackawa.html}.
 
 The program @code{java} is the Java interpreter.
 The program @code{javac} is the Java compiler,

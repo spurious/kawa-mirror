@@ -44,8 +44,10 @@ public class LetExp extends ScopeExp
       {
         i = 0;
         for (Declaration decl = firstDecl(); decl != null;
-             decl = decl.nextDecl())
+             decl = decl.nextDecl(), i++)
           {
+            if (! decl.needsInit()) 
+              continue;
             Object value = inits[i].eval(ctx);
             Type type = decl.type;
             if (type != null && type != Type.pointer_type)
@@ -56,7 +58,7 @@ public class LetExp extends ScopeExp
                 loc.set(value);
                 value = loc;
               }
-            evalFrame[i++] = value;
+            evalFrame[i] = value;
           }
         body.apply(ctx);
       }

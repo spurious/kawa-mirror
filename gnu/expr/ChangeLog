@@ -1,5 +1,15 @@
 2006-02-10  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (apply): Skip Declation if !needsInit().
+	* FindTailsCalls.java (walkApplyExp): Da setCanRead on Declaration
+	if we might be interpreting.
+
+	* LambdaExp.java (apply): Call setIndex, in case we're called
+	directly from a macro expanded.
+	* LetExp.java (apply): Likewise.
+
+2006-02-10  Per Bothner  <per@bothner.com>
+
 	* LambdaExp.java (Closure:getProperty): New method.
 	* ProcInitializer.java (emit): Move emitting of properties to
 	emitLoadModuleMethod method.

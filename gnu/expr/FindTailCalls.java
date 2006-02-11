@@ -34,7 +34,11 @@ public class FindTailCalls extends ExpWalker
 	      {
 		exp.nextCall = binding.firstCall;
 		binding.firstCall = exp;
+                Compilation comp = getCompilation();
 		binding.setCanCall();
+                if (! comp.mustCompile)
+                  // Avoid tricky optimization if we're interpreting.
+                  binding.setCanRead();
 		Expression value = binding.getValue();
 		if (value instanceof LambdaExp)
 		  lexp = (LambdaExp) value;

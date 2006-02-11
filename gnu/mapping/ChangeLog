@@ -1,3 +1,9 @@
+2006-02-10  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (sourceLocationKey): New constant.
+	(setSourceLocation, getSourceLocation): New method.
+	(toString): Try getSourceLocation() if getName() is null.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (evalFrames): New field.

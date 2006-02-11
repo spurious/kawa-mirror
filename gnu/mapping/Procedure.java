@@ -14,6 +14,7 @@ public abstract class Procedure implements Named
   private Object[] properties;
 
   private static final String nameKey = "name";
+  private static final String sourceLocationKey = "source-location";
   private static final String setterKey = "setter";
 
   public String getName()
@@ -27,6 +28,17 @@ public abstract class Procedure implements Named
   public Object getSymbol()
   {
     return getProperty(nameKey, null);
+  }
+
+  public void setSourceLocation (String file, int line)
+  {
+    setProperty(sourceLocationKey, file + ":" + line);
+  }
+
+  public String getSourceLocation ()
+  {
+    Object value = getProperty(sourceLocationKey, null);
+    return value == null ? null : value.toString();
   }
 
   /** @deprecated */
@@ -427,6 +439,8 @@ public abstract class Procedure implements Named
     StringBuffer sbuf = new StringBuffer();
     sbuf.append ("#<procedure ");
     String n = getName();
+    if (n == null)
+      n = getSourceLocation();
     if (n == null)
       n = getClass().getName();
     sbuf.append(n);

@@ -65,6 +65,13 @@ public class Lambda extends Syntax implements Printable
   public void rewriteFormals(LambdaExp lexp, Object formals,
 		      Translator tr, TemplateScope templateScopeRest)
   {
+    if (lexp.getSymbol() == null)
+      {
+        String filename = lexp.getFile();
+        int line = lexp.getLine();
+        if (filename != null && line > 0)
+          lexp.setSourceLocation(filename, line);
+      }
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
     int opt_args = -1;

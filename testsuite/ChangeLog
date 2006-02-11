@@ -1,4 +1,10 @@
 2006-02-10  Per Bothner  <per@bothner.com>
+	    Dean Ferreyra <dferreyra@igc.org>
+
+	* num-test.scm: New testcase base on Savannah bug #11427
+	"<java.lang.Integer> in the interpreter gives ClassCastException".
+
+2006-02-10  Per Bothner  <per@bothner.com>
             Gerardo Horvilleur <mago@mundojava.com>
 
 	* misc-test.scm: New testcase based on Savannah

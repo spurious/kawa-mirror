@@ -1,4 +1,4 @@
-(test-begin "numbers" 1664)
+(test-begin "numbers" 1665)
 
 (test-approximate 1.4 (sqrt 2) 0.02)
 (test-error
@@ -183,4 +183,11 @@
 (set! v #((b 3) (a 1) (b 2) (a 2) (b -1) (a)))
 (java.util.Collections:sort v)
 (test-equal "sort-v-8" #((a) (a 1) (a 2) (b -1) (b 2) (b 3)) v)
+
+;; Savannah bug #11427  Dean Ferreyra <dferreyra@igc.org>
+;; <java.lang.Integer> in the interpreter gives ClassCastException.
+(define seven (make <java.lang.Integer> 7))(- (as <int> seven) 3)
+(test-assert (= seven 7))
+
 (test-end)
+

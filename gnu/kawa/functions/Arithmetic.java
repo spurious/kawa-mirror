@@ -168,4 +168,40 @@ public class Arithmetic
       }
     return (Numeric) value;
   }
+
+  /** Convert a number to a String.
+   * Handles classes subclasses of gnu.math.Numeric
+   * as well as standard Java classes.
+   */
+  public static String toString (Object number, int radix)
+  {
+    int code = Arithmetic.classifyValue(number);
+    switch (code)
+      {
+      case Arithmetic.INT_CODE:
+        return Integer.toString(Arithmetic.asInt(number), radix);
+      case Arithmetic.LONG_CODE:
+        return Long.toString(Arithmetic.asLong(number), radix);
+      case Arithmetic.BIGINTEGER_CODE:
+        return Arithmetic.asBigInteger(number).toString(radix);
+      case Arithmetic.INTNUM_CODE:
+        return Arithmetic.asIntNum(number).toString(radix);
+      case Arithmetic.BIGDECIMAL_CODE:
+        if (radix == 10)
+          return Arithmetic.asBigDecimal(number).toString();
+        // else fall through:
+      case Arithmetic.FLOAT_CODE:
+        if (radix == 10)
+          return Float.toString(Arithmetic.asFloat(number));
+        // else fall through:
+      case Arithmetic.DOUBLE_CODE:
+      case Arithmetic.FLONUM_CODE:
+        if (radix == 10)
+          return Double.toString(Arithmetic.asDouble(number));
+        // else fall through:
+      case Arithmetic.RATNUM_CODE:
+      default:
+        return Arithmetic.asNumeric(number).toString(radix);
+      }
+  }
 }

@@ -1,3 +1,8 @@
+2006-02-10  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (number->string): Use new Arithmetic:toString function,
+	which also support java.lang.Long, gnu.math.BigDecimal, etc.
+
 2006-02-07  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (integer?, max, min, gcd, lcm, logand, logior, logxor):

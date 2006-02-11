@@ -224,6 +224,7 @@
 (define (integer-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))
 
-(define (number->string (arg :: <number>) #!optional (radix :: <int> 10))
+(define (number->string (arg :: <java.lang.Number>)
+			#!optional (radix :: <int> 10))
   (make <string>
-    (invoke arg 'toString radix)))
+    (gnu.kawa.functions.Arithmetic:toString arg radix)))

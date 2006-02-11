@@ -1125,7 +1125,6 @@ public class Translator extends Compilation
 	setLineOf(body);
 	if (ndecls == 0)
 	  return body;
-	mustCompileHere();
 	defs.body = body;
 	setLineOf(defs);
 	return defs;

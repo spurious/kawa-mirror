@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 142)
+(test-init "Miscellaneous" 143)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -678,3 +678,14 @@
 	     (fluid-let ((*print-radix* #t) (*print-base* pb))
 	       (format #f "~S ~S" 10 1/10)))
 	   '(2 3 8 10 16)))
+
+;; Savannah bug #14697 Error using :: <int>
+;; Submitted by:  	Gerardo Horvilleur <mago>
+(define bug14697-result "")
+(let ((GS.261 :: <int> 10)
+      (GS.262 :: <int> 1))
+  (do ((i :: <int> 1 (+ i GS.262)))
+      ((> i GS.261))
+    (set! bug14697-result (string-append bug14697-result " "
+					 (number->string i)))))
+(test " 1 2 3 4 5 6 7 8 9 10" 'bug14697 bug14697-result)

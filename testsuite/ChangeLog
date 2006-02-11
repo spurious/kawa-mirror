@@ -1,4 +1,10 @@
 2006-02-10  Per Bothner  <per@bothner.com>
+            Gerardo Horvilleur <mago@mundojava.com>
+
+	* misc-test.scm: New testcase based on Savannah
+	bug #14697 "Error using :: <int>".
+
+2006-02-09  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Add test for macro defined and used in same module.
 

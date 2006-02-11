@@ -1,5 +1,8 @@
 2006-02-10  Per Bothner  <per@bothner.com>
 
+	* number.scm (max, min, gcd, lcm, logand, logior, logxor):
+	Use more convenient array:length syntax.
+
 	* numbers.scm (number->string): Use new Arithmetic:toString function,
 	which also support java.lang.Long, gnu.math.BigDecimal, etc.
 

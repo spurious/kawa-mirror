@@ -36,7 +36,7 @@
   (not (odd? x)))
 
 (define (max #!rest (args :: <Object[]>))
-  (let ((n :: <int> (field args 'length))
+  (let ((n :: <int> args:length)
 	(result :: <real> (args 0)))
     (do ((i :: <int> 1 (+ i 1)))
 	 ((>= i n) result)
@@ -44,7 +44,7 @@
 	    (*:max result (args i))))))
 
 (define (min #!rest (args :: <Object[]>))
-  (let ((n :: <int> (field args 'length))
+  (let ((n :: <int> args:length)
 	(result :: <real> (args 0)))
     (do ((i :: <int> 0 (+ i 1)))
 	 ((>= i n) result)
@@ -76,7 +76,7 @@
 		  y)))))
 
 (define (gcd #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> (field args 'length)))
+  (let ((n :: <int> args:length))
     (if (zero? n)
 	0
 	(let ((result :: <integer> (args 0)))
@@ -85,7 +85,7 @@
 	    (set! result (<integer>:gcd result (<integer>:@ (args i)))))))))
 
 (define (lcm #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> (field args 'length)))
+  (let ((n :: <int> args:length))
     (if (zero? n)
 	1
 	(let ((result :: <integer> (<integer>:abs (<integer>:@ (args 0)))))
@@ -188,7 +188,7 @@
   (invoke-static <gnu.math.BitOps> 'extract i start end))
 
 (define (logand #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> (field args 'length)))
+  (let ((n :: <int> args:length))
     (if (zero? n)
 	-1
 	(let ((result :: <integer> (args 0)))
@@ -198,7 +198,7 @@
 	      (set! result (gnu.math.BitOps:and result arg-i))))))))
 
 (define (logior #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> (field args 'length)))
+  (let ((n :: <int> args:length))
     (if (zero? n)
 	0
 	(let ((result :: <integer> (args 0)))
@@ -207,7 +207,7 @@
 	    (set! result (gnu.math.BitOps:ior result (args i))))))))
 
 (define (logxor #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> (field args 'length)))
+  (let ((n :: <int> args:length))
     (if (zero? n)
 	0
 	(let ((result :: <integer> (args 0)))

@@ -32,15 +32,13 @@ AC_ARG_ENABLE(jemacs,
   enable_jemacs=$enableval, enable_jemacs=yes)
 
 AC_ARG_WITH(swing,
-  AS_HELP_STRING(--with-swing,Assume Swing is available (default on)),
-  enable_awt=$enableval, enable_awt=yes)
+  AS_HELP_STRING(--with-swing,Assume Swing is available (default on)))
 
 AC_ARG_WITH(swt,
   AS_HELP_STRING(--with-swt,Assume SWT is available))
 
 AC_ARG_WITH(awt,
-  AS_HELP_STRING(--with-awt,Assume AWT is available (default on)),
-  enable_awt=$enableval, enable_awt=yes)
+  AS_HELP_STRING(--with-awt,Assume AWT is available (default on)))
 
 AC_ARG_WITH(sax2,
   AS_HELP_STRING(--with-sax2,Assume SAX2 is available))
@@ -120,11 +118,10 @@ AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
-AM_CONDITIONAL(ENABLE_SERVLET,
-  test "$enable_servlet" != "" -a "$enable_servlet" != "no")
-AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
+AM_CONDITIONAL(ENABLE_SERVLET, "$enable_servlet" != "no")
+AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
-AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
+AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 

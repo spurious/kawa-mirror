@@ -1,3 +1,9 @@
+2006-02-14  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define.java (scanForm): Fix wrong test for a function
+	definition - which failed when the name was a Symbol.
+	* kawa/standard/define.java: Fix incorrect comment.
+
 2006-02-13  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java (expand_pair): Translate (%lookup$ PART1 'PART2)

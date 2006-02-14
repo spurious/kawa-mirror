@@ -11,7 +11,7 @@ import gnu.lists.*;
  * The <code>name</code> is an identifier (<code>String</code> or
  * <code>Symbol</code>) or </code>Declaration</code>.
  * The <code>code</code> is an integer mask,
- * where 1 means a function definition, 2 means type specified,
+ * where 1 means type specified, 2 means a function definition,
  * 4 means private, and 8 means constant.
  * The <code>type</code> is the declarated type or <code>null</code>.
  * The <code>value</code> is the initializing value. * 
@@ -101,7 +101,7 @@ public class define extends Syntax implements Printable
 	    // (define (f) ...) defaults f to being read-only,
 	    // unless f is assigned to in this module.
 	    if (! makeConstant
-		&& (name instanceof String
+		&& ((options & 2) != 0
 		    || ! Compilation.inlineOk))
 	      decl.setCanWrite(true);
 	  }

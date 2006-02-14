@@ -16,12 +16,12 @@
 
 ;; SYMBOLS
 
-(define (boundp symbol) :: <clisp:boolean>
+(define (boundp symbol) :: |<clisp:boolean>|
   ((primitive-static-method <gnu.commonlisp.lang.Symbols> "isBound"
                             <boolean> (<object>))
    symbol))
 
-(define (symbolp x) :: <clisp:boolean>
+(define (symbolp x) :: |<clisp:boolean>|
   (invoke-static <gnu.commonlisp.lang.Symbols> 'isSymbol x))
 
 (define (symbol-name symbol)
@@ -154,5 +154,5 @@
 (define (char-to-string ch)
   (make <string> 1 (invoke-static <gnu.commonlisp.lang.CommonLisp> 'asChar ch)))
 
-(define (functionp x) <clisp:boolean>
+(define (functionp x) |<clisp:boolean>|
   (instance? x <function>))

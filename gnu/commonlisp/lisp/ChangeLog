@@ -1,3 +1,7 @@
+2006-02-13  Per Bothner  <per@bothner.com>
+
+	* PrimOps.scm: Quote |<clisp:boolean>| since colon confuses reader.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* PrimOps.scm: Update Symbol handling.

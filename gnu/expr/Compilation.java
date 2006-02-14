@@ -360,7 +360,7 @@ public class Compilation
     return inlineOk;
   }
 
-  public boolean inlineOk (Procedure prcc)
+  public boolean inlineOk (Procedure proc)
   {
     return inlineOk;
   }
@@ -1016,7 +1016,7 @@ public class Compilation
     new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
 
-  void addMainClass (ModuleExp module)
+  public void addMainClass (ModuleExp module)
   {
     mustCompile = true;
 

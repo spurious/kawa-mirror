@@ -20,8 +20,7 @@ AC_ARG_ENABLE(xml,
   enable_xml=$enableval, enable_xml=yes)
 
 AC_ARG_WITH(servlet,
-  AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets),
-  with_servlet=$withval, with_servlet=no)
+  AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 
 AC_ARG_ENABLE(echo2,
   AS_HELP_STRING(--enable-echo2,Enable support for the Echo2 web toolkit),
@@ -109,7 +108,7 @@ case ${with_gcj} in
 esac
 
 # Partly for compatibility (--enable/--disable-servlet was the old option);
-# partly to allow --with-servlet=path-to-jar 0--disable-servlet.
+# partly to allow --with-servlet=path-to-jar --disable-servlet.
 # we essentially default enable-servlet to with-servlet. But we don't
 # want to clutter up configure --help with --enable-servlet.
 enable_servlet=${enable_servlet-${with_servlet}}
@@ -118,7 +117,7 @@ AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
-AM_CONDITIONAL(ENABLE_SERVLET, "$enable_servlet" != "no")
+AM_CONDITIONAL(ENABLE_SERVLET, test "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")

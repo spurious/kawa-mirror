@@ -1,3 +1,8 @@
+2006-02-13  Per Bothner  <per@bothner.com>
+
+	* configure.in: Fix recent breakage in --{with,enable}-servlet.
+	Also make a simplification.
+
 2006-02-12  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Fix/simplify handling with --with-awt and --with-swing.

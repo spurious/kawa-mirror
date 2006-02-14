@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispLanguage;
+import gnu.kawa.functions.GetNamedPart;
 
 /**
  * The Syntax transformer that re-writes the "quote" "quasiquote" primitive.
@@ -97,11 +98,14 @@ public class Quote extends Syntax implements Printable
             Expression part1 = tr.rewrite_car(p1, false);
             Expression part2 = tr.rewrite_car(p2, false);
             Symbol sym = tr.namespaceResolve(part1, part2);
+            String combinedName;
             if (sym != null)
               ;
             else if (part1 instanceof ReferenceExp
                      && part2 instanceof QuoteExp)
               sym = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
+            else if ((combinedName = GetNamedPart.combineName(part1, part2)) != null)
+              sym = tr.getGlobalEnvironment().getSymbol(combinedName);
             else
               {
                 Object save = tr.pushPositionOf(pair);

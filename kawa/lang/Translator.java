@@ -8,6 +8,7 @@ import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
+import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.functions.GetNamedInstancePart;
 
 /** Used to translate from source to Expression.
@@ -530,29 +531,12 @@ public class Translator extends Compilation
             Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
               return sym;
-            Object p1 = stripSyntax(p.car);
-            if (p1 instanceof String
-                && part2 instanceof QuoteExp)
-              return ((String) p1 + ':' + ((QuoteExp) part2).getValue()).intern();
+            String combinedName = GetNamedPart.combineName(part1, part2);
+            if (combinedName != null)
+              return combinedName;
           }
-        return name;
       }
-    String str = (String) name;
-    int colon = str.indexOf(':');
-    if (colon <= 0 || colon >= str.length() - 1)
-      return str;
-    String prefix = str.substring(0, colon).intern();
-    Declaration decl = lexical.lookup(prefix, Language.VALUE_NAMESPACE);
-    Object val;
-    if (Declaration.isUnknown(decl))
-      val = env.get(prefix, null);
-    else if (decl.isNamespaceDecl())
-      val = decl.getConstantValue();
-    else // Actually an error.  FIXME
-      val = null;
-    if (val instanceof Namespace)
-      return ((Namespace) val).getSymbol(str.substring(colon + 1).intern());
-    return str;
+    return name;
   }
 
   /** Check if a uri has been registered as an "XML namespace".

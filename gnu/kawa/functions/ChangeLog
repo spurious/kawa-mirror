@@ -1,3 +1,8 @@
+2006-02-14  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (combineName): New static method.
+	(makeExp): Use combineName.
+
 2006-02-13  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (makeExp): Calculate combined name if first operand

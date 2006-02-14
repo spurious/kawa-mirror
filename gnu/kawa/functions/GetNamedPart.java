@@ -21,32 +21,36 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
   /** Pseudo-method-name for class-membership-test (instanceof) operation. */
   public static final String INSTANCEOF_METHOD_NAME = "instance?";
 
+  public static String combineName (Expression part1, Expression part2)
+  {
+    String name1;
+    Object name2;
+    if (part2 instanceof QuoteExp
+        && (name2 = ((QuoteExp) part2).getValue()) instanceof String
+        && ((part1 instanceof ReferenceExp
+             && (name1 = ((ReferenceExp) part1).getSimpleName()) != null)
+            || (part1 instanceof GetNamedExp
+                && (name1 = ((GetNamedExp) part1).combinedName) != null)))
+      return (name1+':'+name2).intern();
+    return null;
+  }
+
   public static Expression makeExp (Expression clas, Expression member)
   {
     ReferenceExp rexp;
-    String combinedName = null;
-    Object mem;
-    if (member instanceof QuoteExp
-        && (mem = ((QuoteExp) member).getValue()) instanceof String)
+    String combinedName = combineName(clas, member);
+    if (combinedName != null)
       {
-        String name1;
-        if ((clas instanceof ReferenceExp
-             && (name1 = ((ReferenceExp) clas).getSimpleName()) != null)
-            || (clas instanceof GetNamedExp
-                && (name1 = ((GetNamedExp) clas).combinedName) != null))
-          {
-            combinedName = (name1+':'+mem).intern();
-            Translator tr = (Translator) Compilation.getCurrent();
-            Declaration decl = tr.lexical.lookup(combinedName, false/*FIXME*/);
-            if (! Declaration.isUnknown(decl))
-              return new ReferenceExp(decl);
+        Translator tr = (Translator) Compilation.getCurrent();
+        Declaration decl = tr.lexical.lookup(combinedName, false/*FIXME*/);
+        if (! Declaration.isUnknown(decl))
+          return new ReferenceExp(decl);
 
-            Environment env = Environment.getCurrent();
-            Symbol symbol = env.defaultNamespace().lookup(combinedName);
-            Object property = null; // FIXME?
-            if (symbol != null && env.isBound(symbol, property))
-              return new ReferenceExp(combinedName);
-          }
+        Environment env = Environment.getCurrent();
+        Symbol symbol = env.defaultNamespace().lookup(combinedName);
+        Object property = null; // FIXME?
+        if (symbol != null && env.isBound(symbol, property))
+          return new ReferenceExp(combinedName);
       }
     if (clas instanceof ReferenceExp
         && (rexp = (ReferenceExp) clas).isUnknown())

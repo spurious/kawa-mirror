@@ -101,7 +101,7 @@ public class define extends Syntax implements Printable
 	    // (define (f) ...) defaults f to being read-only,
 	    // unless f is assigned to in this module.
 	    if (! makeConstant
-		&& ((options & 2) != 0
+		&& ((options & 2) == 0
 		    || ! Compilation.inlineOk))
 	      decl.setCanWrite(true);
 	  }

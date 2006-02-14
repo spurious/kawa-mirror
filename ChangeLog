@@ -1,5 +1,7 @@
 2006-02-14  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define.java (scanForm): Fix oops in previous check-in.
+
 	* kawa/lang/Quote.java (expand_pair): Use GetNamedPair.combineName
 	to resolve '($lookup$ part1 'part2) to 'part1:part2 - as in source.
 	* kawa/lang/Translator.java (namespaceResolve): Likewise.

@@ -26,7 +26,7 @@
 	* inlining.expected: Expected sides of the methods.
 	* Makefile.am: Added appropriate rules.
 
-	* obj-test.scm: Ad soem new tests of colon syntax.
+	* obj-test.scm: Ad some new tests of colon syntax.
 
 	* module1.scm: Update export list namespace:data -> plains date.
 	* module3.scm (timestamp): Fix no-longer-supported syntax.

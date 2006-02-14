@@ -1,3 +1,10 @@
+2006-02-14  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (define-syntax, define, define-private,
+	define-constant): Recognize "compound names" - ($lookup$ PART1 'PART2),
+	which appeared as PART1:PART2 is the source code.
+	(define_for_syntax): Just define in terms of define, for now.
+
 2006-02-10  Per Bothner  <per@bothner.com>
 
 	* number.scm (max, min, gcd, lcm, logand, logior, logxor):

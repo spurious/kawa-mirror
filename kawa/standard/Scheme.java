@@ -12,7 +12,9 @@ import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.ApplyToArgs;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.functions.NumberCompare;
+import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.reflect.ClassMethods;
+import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.math.Unit;
 
 public class Scheme extends LispLanguage
@@ -48,6 +50,7 @@ public class Scheme extends LispLanguage
 
   public static final ApplyToArgs applyToArgs;
   static final Declaration applyFieldDecl;
+  public static final Declaration getNamedPartDecl;
 
   static {
     // (null-environment)
@@ -78,6 +81,19 @@ public class Scheme extends LispLanguage
                                 NumberCompare.TRUE_IF_LSS);
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
+
+    // Declare the special symbol $lookup$ (from the reader)
+    // and bind it to getNamedPartDecl.
+    String cname = "gnu.kawa.functions.GetNamedPart";
+    String fname = "getNamedPart";
+    getNamedPartDecl = Declaration.getDeclarationFromStatic(cname, fname);
+    Symbol lookup_sym = instance.getSymbol("$lookup$");
+    StaticFieldLocation loc
+      = StaticFieldLocation.define(instance.environ, lookup_sym, null,
+                                   cname, fname);
+    loc.setProcedure();
+    loc.setDeclaration(getNamedPartDecl);
+
     repl = new kawa.repl(instance);
     instance.initScheme();
   }
@@ -484,8 +500,6 @@ public class Scheme extends LispLanguage
       defProcStFld("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
       defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
-      defProcStFld("$lookup$", "gnu.kawa.functions.GetNamedPart",
-                   "getNamedPart");
 
       defProcStFld("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
       defProcStFld("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
@@ -1030,8 +1044,14 @@ public class Scheme extends LispLanguage
     return getInstance().getTypeFor(exp);
   }
 
-  public ApplyExp makeApply (Expression func, Expression[] args)
+  public Expression makeApply (Expression func, Expression[] args)
   {
+    if (func instanceof ReferenceExp
+        && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
+      {
+        // FIXME don't copy the args array in makeExp ...
+        return GetNamedPart.makeExp(args[0], args[1]);
+      }
     Expression[] exps = new Expression[args.length+1];
     exps[0] = func;
     System.arraycopy(args, 0, exps, 1, args.length);

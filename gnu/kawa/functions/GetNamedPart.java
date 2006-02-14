@@ -4,6 +4,7 @@ import gnu.mapping.*;
 import gnu.kawa.reflect.*;
 import gnu.expr.*;
 import java.io.*;
+import kawa.lang.Translator;
 
 /** Procedure to get the value of a named component of an object. */
 
@@ -20,18 +21,63 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
   /** Pseudo-method-name for class-membership-test (instanceof) operation. */
   public static final String INSTANCEOF_METHOD_NAME = "instance?";
 
-  public static ApplyExp makeExp (Expression clas, Expression member)
+  public static Expression makeExp (Expression clas, Expression member)
   {
+    ReferenceExp rexp;
+    String combinedName = null;
+    Object mem;
+    if (member instanceof QuoteExp
+        && (mem = ((QuoteExp) member).getValue()) instanceof String)
+      {
+        String name1;
+        if ((clas instanceof ReferenceExp
+             && (name1 = ((ReferenceExp) clas).getSimpleName()) != null)
+            || (clas instanceof GetNamedExp
+                && (name1 = ((GetNamedExp) clas).combinedName) != null))
+          {
+            combinedName = (name1+':'+mem).intern();
+            Translator tr = (Translator) Compilation.getCurrent();
+            Declaration decl = tr.lexical.lookup(combinedName, false/*FIXME*/);
+            if (! Declaration.isUnknown(decl))
+              return new ReferenceExp(decl);
+
+            Environment env = Environment.getCurrent();
+            Symbol symbol = env.defaultNamespace().lookup(combinedName);
+            Object property = null; // FIXME?
+            if (symbol != null && env.isBound(symbol, property))
+              return new ReferenceExp(combinedName);
+          }
+      }
+    if (clas instanceof ReferenceExp
+        && (rexp = (ReferenceExp) clas).isUnknown())
+      {
+        String name = rexp.getName();
+        try
+          {
+            /* #ifdef JAVA2 */
+            Class cl = Class.forName(name, false,
+                                     clas.getClass().getClassLoader());
+            /* #else */
+            // Class cl = Class.forName(name);
+            /* #endif */
+            clas = QuoteExp.getInstance(Type.make(cl));
+          }
+        catch (Throwable ex)
+          {
+          }
+      }
     Expression[] args = { clas, member };
-    return new GetNamedExp(args);
+    GetNamedExp exp = new GetNamedExp(args);
+    exp.combinedName = combinedName;
+    return exp;
   }
 
-  public static ApplyExp makeExp (Expression clas, String member)
+  public static Expression makeExp (Expression clas, String member)
   {
     return makeExp(clas, new QuoteExp(member));
   }
 
-  public static ApplyExp makeExp (Type type, String member)
+  public static Expression makeExp (Type type, String member)
   {
     return makeExp(new QuoteExp(type), new QuoteExp(member));
   }
@@ -43,6 +89,13 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         || ! (exp instanceof GetNamedExp))
       return exp;
     Expression context = args[0];
+    if (context instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) context;
+        if ("*".equals(rexp.getName()))
+          return GetNamedInstancePart.makeExp(args[1]);
+      }
+
     String mname = ((QuoteExp) args[1]).getValue().toString();
     Type type = context.getType();
     boolean isInstanceOperator = context == QuoteExp.nullExp;
@@ -244,6 +297,26 @@ class GetNamedExp extends ApplyExp
    */
   char kind;
   PrimProcedure[] methods;
+
+  public String combinedName;
+
+  public void apply (CallContext ctx) throws Throwable
+  {
+    if (combinedName != null)
+      {
+        Environment env = ctx.getEnvironment();
+        Symbol sym = env.getSymbol(combinedName);
+        Object unb = gnu.mapping.Location.UNBOUND;
+        Object property = null;  // FIXME?
+        Object value = env.get(sym, property, unb);
+        if (value != unb)
+          {
+            ctx.writeValue(value);
+            return;
+          }
+      }
+    super.apply(ctx);
+  }
 
   public GetNamedExp(Expression[] args)
   {

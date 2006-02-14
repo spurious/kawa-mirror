@@ -82,11 +82,36 @@ public class Quote extends Syntax implements Printable
         // over the given list, partly for speed, but more importantly
         // to avoid stack overflow in the case of long lists.
         rest = pair;
+        Pair p1, p2;
         // We're currently examining pair, which is the n'th cdr of list.
         // All previous elements (cars) are returned identically by expand.
         // What makes things complicated is that to the extent that no changes
         // are needed, we want to return the input list as-is.
-        if (depth < 0)
+        if (depth > DATUM_DEPTH
+            && tr.matches(pair.car, syntax, LispLanguage.lookup_sym)
+            && pair.cdr instanceof Pair
+            && (p1 = (Pair) pair.cdr) instanceof Pair
+            && (p2 = (Pair) p1.cdr) instanceof Pair
+            && p2.cdr == LList.Empty)
+          {
+            Expression part1 = tr.rewrite_car(p1, false);
+            Expression part2 = tr.rewrite_car(p2, false);
+            Symbol sym = tr.namespaceResolve(part1, part2);
+            if (sym != null)
+              ;
+            else if (part1 instanceof ReferenceExp
+                     && part2 instanceof QuoteExp)
+              sym = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
+            else
+              {
+                Object save = tr.pushPositionOf(pair);
+                tr.error('e', "'"+p1.car+"' is not a valid prefix");
+                tr.popPositionOf(save);
+              }
+            cdr = sym;
+            break;
+          }
+        else if (depth < 0)
           {
           }
         else if (tr.matches(pair.car, syntax, LispLanguage.quasiquote_sym))

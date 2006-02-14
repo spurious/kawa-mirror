@@ -65,6 +65,7 @@ public class define_syntax extends Syntax
 	nameSyntax = (SyntaxForm) name;
 	name = nameSyntax.form;
       }
+    name = tr.namespaceResolve(name);
     if (! (name instanceof String || name instanceof Symbol))
       {
         tr.formStack.addElement(tr.syntaxError("missing macro name for "+Translator.safeCar(st)));

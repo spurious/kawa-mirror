@@ -117,7 +117,7 @@ public class ReaderParens extends ReadTableEntry
 	      }
 	    else
 	      entry = readTable.lookup(ch);
-	    Object value = lexer.readValues(ch, false, entry, readTable);
+	    Object value = lexer.readValues(ch, entry, readTable);
 	    if (value == Values.empty)
 	      continue;
             value = lexer.handlePostfix(value, readTable, line, column);

@@ -1,14 +1,24 @@
 ;; Definitins for some primitives before we define anything else.
 
 (%define-syntax define-syntax
-  (syntax-rules ()
+  (syntax-rules ($lookup$)
+    ((define-syntax (($lookup$ part1 'part2) . pattern) . forms)
+     ;; Should deprecate - incompatible with SRFI-72
+     (%define-syntax ($lookup$ part1 'part2) (lambda pattern . forms)))
+    ((define-syntax ($lookup$ part1 'part2) function)
+     (%define-syntax ($lookup$ part1 'part2) function))
     ((define-syntax (name . pattern) . forms)
+     ;; Should deprecate - incompatible with SRFI-72
      (%define-syntax name (lambda pattern . forms)))
     ((define-syntax name function)
      (%define-syntax name function))))
 
 (%define-syntax define
-  (syntax-rules (::)
+  (syntax-rules (:: $lookup$)
+    ((define ($lookup$ part1 'part2) :: type value)
+     (%define ($lookup$ part1 'part2) 1 type value))
+    ((define ($lookup$ part1 'part2)value)
+     (%define ($lookup$ part1 'part2) 0 #!null value))
     ((define (name . formals) . body)
      (%define name 2 #t formals . body))
     ((define name :: type value)
@@ -19,15 +29,15 @@
 ;; For now the same as plain define.
 (%define-syntax define-for-syntax
   (syntax-rules (::)
-    ((define-for-syntax (name . formals) . body)
-     (%define name 2 #t formals . body))
-    ((define-for-syntax name :: type value)
-     (%define name 1 type value))
-    ((define-for-syntax name value)
-     (%define name 0 #!null value))))
+    ((define-for-syntax . rest)
+     (define . rest))))
 
 (%define-syntax define-private
-  (syntax-rules (::)
+  (syntax-rules (:: $lookup$)
+    ((define-private ($lookup$ part1 'part2) :: type value)
+     (%define ($lookup$ part1 'part2) 5 type value))
+    ((define-private ($lookup$ part1 'part2) value)
+     (%define ($lookup$ part1 'part2) 4 #!null value))
     ((define-private (name . formals) . body)
      (%define name 6 #t formals . body))
     ((define-private name :: type value)
@@ -36,7 +46,11 @@
      (%define name 4 #!null value))))
 
 (%define-syntax define-constant
-  (syntax-rules (::)
+  (syntax-rules (:: $lookup$)
+    ((define-constant (($lookup$ part1 'part2) . formals) . body)
+     (%define ($lookup$ part1 'part2) 10 #t formals . body))
+    ((define-constant ($lookup$ part1 'part2) :: type value)
+     (%define ($lookup$ part1 'part2) 9 type value))
     ((define-constant (name . formals) . body)
      (%define name 10 #t formals . body))
     ((define-constant name :: type value)

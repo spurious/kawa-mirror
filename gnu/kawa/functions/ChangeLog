@@ -1,3 +1,12 @@
+2006-02-13  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (makeExp): Calculate combined name if first operand
+	is a ReferenceExp or a nested GetNamedExp and 2nd is a constant string.
+	Change return type to Expression, since if combined name is bound in
+	lexical scope we use that. Check if 1st part matches a classname.
+	(inline): Convert '*:PART' here instead of in Translator.
+	(GetNamedExp.apply): New method - check for combinedName.
+
 2006-02-10  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (apply2): Rewrite so we can also handle standard

@@ -94,12 +94,11 @@ public class LispReader extends Lexer
   public Object readValues (int ch,  ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
-    return readValues(ch, false, rtable.lookup(ch), rtable);
+    return readValues(ch, rtable.lookup(ch), rtable);
   }
 
   /** May return zero or multiple values. */
-  public Object readValues (int ch, boolean postfixMode,
-                            ReadTableEntry entry, ReadTable rtable)
+  public Object readValues (int ch, ReadTableEntry entry, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
     // Step numbers refer to steps in section 2.2 of the HyperSpec.
@@ -137,7 +136,7 @@ public class LispReader extends Lexer
 	break;
       }
 
-    readToken(ch, postfixMode, getReadCase());
+    readToken(ch, getReadCase());
     int endPos = tokenBufferLength;
     if (seenEscapes)
       return returnSymbol(startPos, endPos);
@@ -158,7 +157,7 @@ public class LispReader extends Lexer
   /** True if "IDENTIFIER:" should be treated as a keyword. */
   protected boolean finalColonIsKeyword = true;
 
-  public void readToken(int ch, boolean postfixMode, char readCase)
+  public void readToken(int ch, char readCase)
       throws java.io.IOException, SyntaxException
   {
     boolean inEscapes = false;
@@ -185,7 +184,7 @@ public class LispReader extends Lexer
 	    break;
 	  }
 	int kind = entry.getKind();
-        if (postfixMode && ch == rtable.postfixLookupOperator && ! inEscapes
+        if (ch == rtable.postfixLookupOperator && ! inEscapes
             && validPostfixLookupStart(rtable))
           kind = ReadTable.TERMINATING_MACRO;
                   
@@ -305,7 +304,7 @@ public class LispReader extends Lexer
             break;
           }
         ch = port.read();
-        Object rightOperand = readValues(ch, true, rtable.lookup(ch), rtable);
+        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
         value = LList.list2(value,
                             LList.list2(LispLanguage.quote_sym, rightOperand));
         value = PairWithPosition.make(LispLanguage.lookup_sym, value,
@@ -1075,7 +1074,7 @@ public class LispReader extends Lexer
     throws java.io.IOException, SyntaxException
   {
     int startPos = reader.tokenBufferLength - previous;
-    reader.readToken(reader.read(), false, 'P');
+    reader.readToken(reader.read(), 'P');
     int endPos = reader.tokenBufferLength;
     if (startPos == endPos)
       {
@@ -1106,7 +1105,7 @@ public class LispReader extends Lexer
       reader.eofError("unexpected EOF in character literal");
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), false, 'D');
+    reader.readToken(reader.read(), 'D');
     int length = reader.tokenBufferLength - startPos;
     if (length == 1)
       return Char.make(reader.tokenBuffer[startPos]);
@@ -1150,7 +1149,7 @@ public class LispReader extends Lexer
 
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), false, 'D');
+    reader.readToken(reader.read(), 'D');
     int length = reader.tokenBufferLength - startPos;
     String name = new String(reader.tokenBuffer, startPos, length);
     if (name.equals("optional"))

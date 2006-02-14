@@ -1,5 +1,7 @@
 2006-02-13  Per Bothner  <per@bothner.com>
 
+	* AccessExp.java (getSimpleName): New method.
+
 	* Compilation.java (addMainClass): Make public, since it is used
 	by KawaPageServlet.
 

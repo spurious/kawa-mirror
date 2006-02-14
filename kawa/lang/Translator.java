@@ -8,7 +8,6 @@ import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
-import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.functions.GetNamedInstancePart;
 
 /** Used to translate from source to Expression.
@@ -384,7 +383,7 @@ public class Translator extends Compilation
     return ((LispLanguage) getLanguage()).makeApply(func, args);
   }
 
-  private Symbol namespaceResolve (Expression context, Expression member)
+  public Symbol namespaceResolve (Expression context, Expression member)
   {
     if (context instanceof ReferenceExp && member instanceof QuoteExp)
       {
@@ -415,13 +414,6 @@ public class Translator extends Compilation
           }
       }
     return null;
-  }
-
-  public Symbol namespaceRewriteResolve (Object object, Object part)
-  {
-    Expression car = rewrite(object);
-    Expression cdr = rewrite(part);
-    return namespaceResolve(car, cdr);
   }
 
   public static Object stripSyntax (Object obj)
@@ -532,9 +524,16 @@ public class Translator extends Compilation
             && p.cdr instanceof Pair
             && (p = (Pair) p.cdr).cdr instanceof Pair)
           {
-            Symbol sym = namespaceRewriteResolve(p.car, ((Pair) p.cdr).car);
+            Expression part1 = rewrite(p.car);
+            Expression part2 = rewrite(((Pair) p.cdr).car);
+
+            Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
               return sym;
+            Object p1 = stripSyntax(p.car);
+            if (p1 instanceof String
+                && part2 instanceof QuoteExp)
+              return ((String) p1 + ':' + ((QuoteExp) part2).getValue()).intern();
           }
         return name;
       }
@@ -554,50 +553,6 @@ public class Translator extends Compilation
     if (val instanceof Namespace)
       return ((Namespace) val).getSymbol(str.substring(colon + 1).intern());
     return str;
-  }
-
-  private Expression namespaceResolve (String str, int colon, boolean function)
-  {
-    if (colon == 1 && str.charAt(0) == '*')
-      return GetNamedInstancePart.makeExp(new QuoteExp(str.substring(colon+1).intern()));
-    String str1 = str.substring(0, colon).intern();
-    int prev_colon = str1.lastIndexOf(':');
-    Expression exp1;
-    int len1;
-    Declaration pdecl;
-    Object val1;
-    if (prev_colon >= 0)
-      {
-        exp1 = namespaceResolve(str1, prev_colon, false);
-        if (exp1 == null)
-          return null;
-      }
-    else if ((pdecl = lexical.lookup(str1, Language.VALUE_NAMESPACE)) != null
-             && pdecl.isLexical() && ! pdecl.isProcedureDecl())
-      // FIXME maybe set PREFER_BINDING2
-      exp1 = rewrite(str1);
-    else if (((val1 = env.get(str1, null)) != null
-              && ! (val1 instanceof Procedure))
-             || ((len1 = str1.length()) >= 3
-                 && str1.charAt(0) == '<' && str1.charAt(len1-1) == '>'))
-      exp1 = new ReferenceExp(str1);
-    else
-      {
-        try
-          {
-            /* #ifdef JAVA2 */
-            Class cl = Class.forName(str1, false, getClass().getClassLoader());
-            /* #else */
-            // Class cl = Class.forName(str);
-            /* #endif */
-            exp1 = QuoteExp.getInstance(Type.make(cl));
-          }
-        catch (Throwable ex)
-          {
-            return null;
-          }
-      }
-    return GetNamedPart.makeExp(exp1, str.substring(colon+1).intern());
   }
 
   /** Check if a uri has been registered as an "XML namespace".
@@ -672,15 +627,6 @@ public class Translator extends Compilation
 	  {
 	    nameToLookup = exp;
 	  }
-        int colon;
-	if (nameToLookup instanceof String
-            && (decl == null || ! decl.isLexical())
-            && (colon = ((String) nameToLookup).lastIndexOf(':')) >= 0)
-	  {
-	    Expression ss = namespaceResolve((String) nameToLookup, colon, function);
-	    if (ss != null)
-	      return ss;
-	  }
 	symbol = exp instanceof String ? env.getSymbol((String) exp)
 	  : (Symbol) exp;
 	boolean separate = getLanguage().hasSeparateFunctionNamespace();
@@ -710,9 +656,14 @@ public class Translator extends Compilation
 			   : null);
 	    if (loc != null)
 	      loc = loc.getBase();
-            if (loc instanceof FieldLocation && inlineOk(null))
+            if (loc instanceof FieldLocation)
               {
                 decl = ((FieldLocation) loc).getDeclaration();
+                if (! inlineOk(null)
+                    // A kludge - we get a bunch of testsuite failures
+                    // if we don't inline $lookup$.  FIXME.
+                    && decl != kawa.standard.Scheme.getNamedPartDecl)
+                  decl = null;
               }
 	    /*
             else if (Compilation.inlineOk && function)
@@ -975,7 +926,9 @@ public class Translator extends Compilation
                 && p.cdr instanceof Pair
                 && (p = (Pair) p.cdr).cdr instanceof Pair)
               {
-                obj = namespaceRewriteResolve(p.car, ((Pair) p.cdr).car);
+                Expression part1 = rewrite(p.car);
+                Expression part2 = rewrite(((Pair) p.cdr).car);
+                obj = namespaceResolve(part1, part2);
               }
             if (obj instanceof String
                 || (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))

@@ -1,5 +1,16 @@
 2006-02-13  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Quote.java (expand_pair): Translate (%lookup$ PART1 'PART2)
+	to 'PART1:PART2.
+	 * kawa/lang/Translator.java (namespaceResolve): Remove two overloads.
+	(namespaceRewriteResolve): Remove method.  Just inline it.
+	(rewrite): Remove a namespaceResolve call.
+	Always inline getNamedPart.
+	* kawa/standard/Scheme.java (getNamedPartDecl): New static field.
+	(makeApply): Change return type. Check if function is getNamedPartDecl.
+	* kawa/standard/define.java (scanForn): Always call tr.namespaceResolve.
+	* kawa/standard/define_syntax.java (scanForm): Likewise.
+
 	* configure.in: Fix recent breakage in --{with,enable}-servlet.
 	Also make a simplification.
 

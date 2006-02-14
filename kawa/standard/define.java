@@ -58,11 +58,7 @@ public class define extends Syntax implements Printable
 
     ScopeExp scope = tr.currentScope();
     name = tr.namespaceResolve(name);
-    if (name instanceof String)
-      {
-        //name = tr.namespaceResolve(name);
-      }
-    else if (! (name instanceof Symbol))
+    if (! (name instanceof String || name instanceof Symbol))
       {
         tr.error('e', "'"+name+"' is not a valid identifier");
         name = null;

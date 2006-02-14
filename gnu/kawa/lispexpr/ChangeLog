@@ -1,3 +1,12 @@
+2006-02-13  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (makeApply): Change return type to Expression.
+
+	* LispReader.java (readToken): Don't check postfixMode parameter.
+	(readToken, readValues): Hence remove the postfixMode parameter.
+	* ReaderDispatchMisc.java: Update accordingly.
+	* ReaderParens.java: Likewise.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (parse): Use new Compilation.pushNewModule method.

@@ -20,6 +20,19 @@ public abstract class AccessExp extends Expression
     return symbol instanceof Symbol ? ((Symbol) symbol).getName()
       : symbol.toString();
   }
+
+  /** Return a simple name, or null if the name has a non-empty namespace. */
+  public final String getSimpleName()
+  {
+    if (symbol instanceof String)
+      return (String) symbol;
+    Symbol sym;
+    if (symbol instanceof Symbol
+        && (sym = (Symbol) symbol).hasEmptyNamespace())
+      return sym.getLocalName();
+    return null;
+  }
+
   public final Object getSymbol() { return symbol; }
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }

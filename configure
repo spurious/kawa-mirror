@@ -16399,7 +16399,7 @@ fi
 
 
 
-if test "$enable_servlet" != "no"; then
+if test "$enable_servlet" != "" -a "$enable_servlet" != "no"; then
   ENABLE_SERVLET_TRUE=
   ENABLE_SERVLET_FALSE='#'
 else

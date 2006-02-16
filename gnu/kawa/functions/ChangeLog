@@ -1,5 +1,8 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* GetNamedPart.java (GetNamedExp.inline): Re-organize to use a switch
+	statement based on 'kind' field.  Fix some buglets.
+
 	* GetNamedPart.java (GetNamedExp.side_effects): New method.
 
 	* GetNamedPart.java (inline): Fix switched arguments to getMethods.

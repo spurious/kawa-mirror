@@ -344,60 +344,47 @@ class GetNamedExp extends ApplyExp
   {
     Expression[] pargs = getArgs();
     Expression context = pargs[0];
-    Object name;
-    if (! (pargs[1] instanceof QuoteExp)
-        || ! ((name = ((QuoteExp) pargs[1]).getValue()) instanceof String))
-      return exp;
     Expression[] args = exp.getArgs();
-    String mname = name.toString();
-    // It would be more efficient to check the kind field,
-    // but there may be case where kind hasn't been set.
-    boolean isInstanceOf = mname.equals(GetNamedPart.INSTANCEOF_METHOD_NAME);
-    boolean isCast = mname.equals(GetNamedPart.CAST_METHOD_NAME);
-    boolean isField = mname.length() > 1 && mname.charAt(0) == '.';
-    boolean isInstance = context == QuoteExp.nullExp;
-    boolean isNew = mname.equals("new");
-    if (isField && ! isInstance && args.length == 1)
+    Expression[] xargs;
+    switch (kind)
       {
-        args = new Expression[] { Convert.makeCoercion(args[0], context) };
-        isInstance = true;
-      }
-    Expression[] xargs
-      = new Expression[args.length+(isInstance||isNew||isInstanceOf||isCast?1:2)];
-    if (isInstance)
-      {
-        decl = isField ? fieldDecl : invokeDecl;
-        System.arraycopy(args, 1, xargs, 2, args.length-1);
-        xargs[0] = args[0];
-      }
-    else if (isNew)
-      {
+      case 'M':
+        decl = invokeDecl;
+        xargs = new Expression[args.length+2];
+        xargs[0] = pargs[0];
+        xargs[1] = pargs[1];
+        System.arraycopy(args, 0, xargs, 2, args.length);
+        break;
+      case 'N': // new
         decl = makeDecl;
+        xargs = new Expression[args.length+1];
         System.arraycopy(args, 0, xargs, 1, args.length);
         xargs[0] = context;
-      }
-    else if (isInstanceOf)
-      {
+        break;
+      case 'I': // instance-of
         decl = instanceOfDecl;
+        xargs = new Expression[args.length+1];
         System.arraycopy(args, 1, xargs, 2, args.length-1);
         xargs[0] = args[0];
         xargs[1] = context;
-      }
-    else if (isCast)
-      {
+        break;
+      case 'C': // cast
         decl = castDecl;
+        xargs = new Expression[args.length+1];
         System.arraycopy(args, 1, xargs, 2, args.length-1);
         xargs[0] = context;
         xargs[1] = args[0];
-      }
-    else
-      {
-        decl = isField ? staticFieldDecl : invokeStaticDecl;
-        System.arraycopy(args, 0, xargs, 2, args.length);
+        break;
+      case 'S': // invoke-static
+        decl = invokeStaticDecl;
+        xargs = new Expression[args.length+2];
         xargs[0] = context;
+        xargs[1] = pargs[1];
+        System.arraycopy(args, 0, xargs, 2, args.length);
+        break;
+      default:
+        return exp;
       }
-    if (! isNew && ! isInstanceOf && ! isCast)
-      xargs[1] = new QuoteExp(isField ? mname.substring(1) : mname);
     return walker.walkApplyOnly(new ApplyExp(new ReferenceExp(decl), xargs));
   }
 

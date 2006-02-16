@@ -401,6 +401,17 @@ class GetNamedExp extends ApplyExp
     return walker.walkApplyOnly(new ApplyExp(new ReferenceExp(decl), xargs));
   }
 
+  public boolean side_effects ()
+  {
+    // The actual GetNamedExp that returns a method reference doesn't
+    // have side-effects - though applying tha result does.
+    if (kind == 'S' || kind == 'N' || kind == 'C' || kind == 'I')
+      return false;
+    if (kind == 'M')
+      return getArgs()[0].side_effects();
+    return true;
+  }
+
   static final Declaration fieldDecl
   = Declaration.getDeclarationFromStatic("gnu.kawa.reflect.SlotGet", "field");
 

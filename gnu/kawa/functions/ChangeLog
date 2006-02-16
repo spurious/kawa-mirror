@@ -1,5 +1,7 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* GetNamedPart.java (GetNamedExp.side_effects): New method.
+
 	* GetNamedPart.java (inline): Fix switched arguments to getMethods.
 
 2006-02-14  Per Bothner  <per@bothner.com>

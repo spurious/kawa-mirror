@@ -1,3 +1,7 @@
+2006-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Software-License): Update to reflect new X11/MIT license.
+
 2006-02-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Running Java): Update link to Robert D. Skeels's

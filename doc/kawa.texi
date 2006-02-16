@@ -6386,62 +6386,37 @@ Daniel Bonniot @email{bonniot@@users.sf.net}).
 @node Software-License, Manual-License, , License
 @section License for the Kawa software
 
-The license for Kawa and the packages it depends on
-is a "modified Gnu Public License".  You can find it in
-the file @code{COPYING} in the Kawa sources, and
-also quoted here:.
+The license for Kawa the software is the
+@uref{http://opensource.org/licenses/mit-license.php, X11/MIT license}
+which is quoted below.
+
+The Kawa license used to be a "modified Gnu Public License".
+Note that not all of the file files have been updated yet
+to reflect the new license.
 
 @example
-The Java classes (with related files and documentation) in these packages
-are copyright (C) 1996, 1997, 1998, 1999  Per Bothner.
+The software (with related files and documentation) in these packages
+are copyright (C) 1996-2006  Per Bothner.
 
-These classes are distributed in the hope that they will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-These classes are free software.  You can use and re-distribute a class
-without restriction (in source or binary form) as long as you use a
-version that has not been modified in any way from a version released
-by Per Bothner, Red Hat inc, or the Free Software Foundation.
-You may make and distribute a modified version, provided you follow
-the terms of the GNU General Public License; either version 2,
-or (at your option) any later version.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 @end example
-
-The file @code{COPYING} also contains a copy of the
-GNU General Public License version 2.
-
-People have asked what the Kawa license means in practice.
-Informally, you get to pick between these choices:
-@enumerate
-@item
-Use Kawa as distributed by Per Bothner, Red Hat Inc, or the
-Free Software Foundation (or their approved agents),
-with no modifications.  In that case, you can use Kawa for any
-purpose you like, and distribute your application with any license
-you like.  (This basically gives you the same rights as
-a typical commercial royalty-free re-distribution license.)
-@item
-Obey the terms of the standard Gnu Public License.  (See
-@uref{http://www.gnu.org/copyleft/gpl.html}).  Informally, this means
-that if you distribute any application that is based on Kawa, you must
-also make available to all your recipients (customers) the source code
-for your entire application, giving them the modification and
-re-distribution rights they have under the GPL.  In a Java context, I take
-"entire application" to mean all classes (and native code) that run in
-the same Java virtual machine, except for the Java runtime system itself
-(the virtual machine, low-level run-time system, and any classes in
-a @code{java} or @code{javax} package).
-@item
-If you need to make a change to Kawa, you can submit them to Per Bothner,
-and convince him to include them in future Kawa releases.
-@item
-You can negotiate some other (commercial) license with Per Bothner.
-@end enumerate
-
-In general, if the license of Kawa or associated packages causes
-difficulties, let me know.
 
 Kawa uses some math routines from fdlib's libf77, which bear the
 following copyright:

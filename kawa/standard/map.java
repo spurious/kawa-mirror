@@ -113,9 +113,15 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 
     nargs--;
 
+    Expression proc = args[0];
+    // If evaluating proc doesn't have side-effects, then we want to do
+    // so inside loop, since that turns a "read" info a "call", which
+    // may allow better inlining.
+    boolean procSafeForMultipleEvaluation = ! proc.side_effects();
+
     // First an outer (let ((%proc PROC)) L2), where PROC is args[0].
     Expression[] inits1 = new Expression[1];
-    inits1[0] = args[0];
+    inits1[0] = proc;
     LetExp let1 = new LetExp(inits1);
     Declaration procDecl
       = let1.addDeclaration("%proc", Compilation.typeProcedure);
@@ -154,7 +160,10 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	doArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car");
 	recArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr");
       }
-    ApplyExp doit = new ApplyExp(new ReferenceExp(procDecl), doArgs); 
+    if (! procSafeForMultipleEvaluation)
+      proc = new ReferenceExp(procDecl);
+    Expression doit
+      = ((InlineCalls) walker).walkApplyOnly(new ApplyExp(proc, doArgs));
     Expression rec = new ApplyExp(new ReferenceExp(loopDecl), recArgs);
     if (collect)
       {
@@ -198,6 +207,9 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       }
     let2.setBody(body);
 
-    return let1;
+    if (procSafeForMultipleEvaluation)
+      return let2;
+    else
+      return let1;
   }
 }

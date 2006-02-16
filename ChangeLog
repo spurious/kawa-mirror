@@ -1,3 +1,8 @@
+2006-02-16  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline): If evaluating procedure doesn't
+	have side-effects, do so inside loop, which may allow inlining.
+
 2006-02-15  Per Bothner  <per@bothner.com>
 
 	* COPYING: Change to use X!!/MIT license.

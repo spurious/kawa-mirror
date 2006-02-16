@@ -875,8 +875,8 @@ public class Compilation
 	dout.flush();
       }
 
-    PushApply.pushApply(mexp);
     InlineCalls.inlineCalls(mexp, this);
+    PushApply.pushApply(mexp);
     ChainLambdas.chainLambdas(mexp, this);
     FindTailCalls.findTailCalls(mexp, this);
   }

@@ -660,8 +660,20 @@ public class Translator extends Compilation
             */
           }
 	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
-	    && decl.isProcedureDecl() && ! function)
-	  return syntaxError("not implemented: variable reference to a method");
+	    && decl.isProcedureDecl())
+          {
+             LambdaExp method = curMethodLambda;
+             Declaration firstParam
+               = method == null ? null : method.firstDecl();
+             Expression part1;
+             if (method.nameDecl.isStatic())
+               part1 = new ReferenceExp(method.outerLambda().nameDecl);
+             else
+               part1 = new ThisExp(firstParam);
+             return GetNamedPart.makeExp(part1,
+                                         QuoteExp.getInstance(decl.getName()));
+              
+          }
 	if (decl != null && decl.getContext() instanceof PatternScope)
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
 

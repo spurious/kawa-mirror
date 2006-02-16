@@ -1,5 +1,8 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite): Handle reference to method name
+	by create a GetNamedExp.
+
 	* kawa/standard/map.java (inline): If evaluating procedure doesn't
 	have side-effects, do so inside loop, which may allow inlining.
 

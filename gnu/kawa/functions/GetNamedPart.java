@@ -172,7 +172,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
           = type instanceof ClassType ? (ClassType) type : Type.pointer_type;
         PrimProcedure[] methods
           = ClassMethods.getMethods(ctype, Compilation.mangleName(mname),
-                                    Access.STATIC, 0, false, caller, language);
+                                    0, Access.STATIC, false, caller, language);
         if (methods != null && methods.length > 0)
           {
             nexp.methods = methods;

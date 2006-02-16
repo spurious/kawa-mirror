@@ -1,5 +1,8 @@
 2006-02-15  Per Bothner  <per@bothner.com>
 
+	* COPYING: Change to use X!!/MIT license.
+	* gnu/*/COPYING: Remove redundant files.
+
 	* configure.in: Oops.  Partly go back to original handling
 	of --{with,enable}-servlet.
 

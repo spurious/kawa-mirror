@@ -112,6 +112,8 @@ public class QuoteExp extends Expression
     return exp;
   }
 
+  public boolean side_effects () { return false; }
+
   public String toString ()
   {
     return "QuoteExp["+value+"]";

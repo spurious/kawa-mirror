@@ -1,5 +1,9 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* Expression.java (side_effects): New method.
+	* QuoteExp.java (side_effects): New method.
+	* ReferenceExp.java (side_effects): New method.
+
 	* Compilation.java (walkModule): Better to PushApply after InlineCalls.
 
 2006-02-13  Per Bothner  <per@bothner.com>

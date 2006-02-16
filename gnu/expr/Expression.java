@@ -312,4 +312,7 @@ public abstract class Expression extends Procedure0 implements Printable
   {
     return (flags & flag) != 0;
   }
+
+  /** True if evaluating may have side-effects. */
+  public boolean side_effects () { return true; }
 }

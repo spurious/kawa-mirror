@@ -195,6 +195,11 @@ public class ReferenceExp extends AccessExp
     return type;
   }
 
+  public boolean side_effects ()
+  {
+    return binding == null || ! binding.isLexical();
+  }
+
   public String toString()
   {
     return "RefExp/"+symbol+'/'+id+'/';

@@ -73,19 +73,18 @@ implements TypeValue, Externalizable, AttributePredicate
     String curLocalName;
     /* #ifdef JAXP-1.3 */
     // if (attrType instanceof javax.xml.namespace.QName)
-    // {
-    // javax.xml.namespace.QName qtype
-    // = (javax.xml.namespace.QName) attrType;
-    // curNamespaceURI = qtype.getNamespaceURI();
-    // curLocalName = qtype.getLocalPart();
-    // }
-    /* #endif */
-    /* #ifndef JAXP-1.3 */
+    //   {
+    //     javax.xml.namespace.QName qtype
+    //       = (javax.xml.namespace.QName) attrType;
+    //     curNamespaceURI = qtype.getNamespaceURI();
+    //     curLocalName = qtype.getLocalPart();
+    //   }
+    /* #else */
     if (attrType instanceof SName)
       {
-	SName qtype = (SName) attrType;
-	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalPart();
+        SName qtype = (SName) attrType;
+        curNamespaceURI = qtype.getNamespaceURI();
+        curLocalName = qtype.getLocalPart();
       }
     /* #endif */
     else if (attrType instanceof Symbol)
@@ -120,19 +119,18 @@ implements TypeValue, Externalizable, AttributePredicate
     String curLocalName;
     /* #ifdef JAXP-1.3 */
     // if (curName instanceof javax.xml.namespace.QName)
-    // {
-    // javax.xml.namespace.QName qtype
-    // = (javax.xml.namespace.QName) curName;
-    // curNamespaceURI = qtype.getNamespaceURI();
-    // curLocalName = qtype.getLocalPart();
-    // }
-    /* #endif */
-    /* #ifndef JAXP-1.3 */
+    //   {
+    //     javax.xml.namespace.QName qtype
+    //       = (javax.xml.namespace.QName) curName;
+    //     curNamespaceURI = qtype.getNamespaceURI();
+    //     curLocalName = qtype.getLocalPart();
+    //   }
+    /* #else */
     if (curName instanceof SName)
       {
-	SName qtype = (SName) curName;
-	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalPart();
+        SName qtype = (SName) curName;
+        curNamespaceURI = qtype.getNamespaceURI();
+        curLocalName = qtype.getLocalPart();
       }
     /* #endif */
     else if (curName instanceof Symbol)

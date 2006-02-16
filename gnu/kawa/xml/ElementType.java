@@ -74,19 +74,19 @@ implements TypeValue, Externalizable, GroupPredicate
     /* #ifdef JAXP-1.3 */
     // if (groupType instanceof javax.xml.namespace.QName)
     // {
-    // javax.xml.namespace.QName qtype
-    // = (javax.xml.namespace.QName) groupType;
-    // curNamespaceURI = qtype.getNamespaceURI();
-    // curLocalName = qtype.getLocalPart();
+    //   javax.xml.namespace.QName qtype
+    //     = (javax.xml.namespace.QName) groupType;
+    //   curNamespaceURI = qtype.getNamespaceURI();
+    //   curLocalName = qtype.getLocalPart();
     // }
     /* #endif */
     /* #ifndef JAXP-1.3 */
     if (groupType instanceof SName)
-      {
-	SName qtype = (SName) groupType;
-	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalPart();
-      }
+     {
+       SName qtype = (SName) groupType;
+       curNamespaceURI = qtype.getNamespaceURI();
+       curLocalName = qtype.getLocalPart();
+     }
     /* #endif */
     else if (groupType instanceof Symbol)
       {
@@ -121,18 +121,17 @@ implements TypeValue, Externalizable, GroupPredicate
     /* #ifdef JAXP-1.3 */
     // if (curName instanceof javax.xml.namespace.QName)
     // {
-    // javax.xml.namespace.QName qtype
-    // = (javax.xml.namespace.QName) curName;
-    // curNamespaceURI = qtype.getNamespaceURI();
-    // curLocalName = qtype.getLocalPart();
+    //   javax.xml.namespace.QName qtype
+    //     = (javax.xml.namespace.QName) curName;
+    //   curNamespaceURI = qtype.getNamespaceURI();
+    //   curLocalName = qtype.getLocalPart();
     // }
-    /* #endif */
-    /* #ifndef JAXP-1.3 */
+    /* #else */
     if (curName instanceof SName)
       {
-	SName qtype = (SName) curName;
-	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalPart();
+        SName qtype = (SName) curName;
+        curNamespaceURI = qtype.getNamespaceURI();
+        curLocalName = qtype.getLocalPart();
       }
     /* #endif */
     else if (curName instanceof Symbol)

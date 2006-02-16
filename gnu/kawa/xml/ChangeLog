@@ -1,5 +1,10 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* Nodes.java (item): Fix bad recursion.
+	Only include if use:org.w3c.dom.Node PreProcess-flag is given.
+
+2006-02-16  Per Bothner  <per@bothner.com>
+
 	* AttributeType.java: Fix tabs/spacing to PreProcess works properly,
 	* ElementType.java: Likewise.
 

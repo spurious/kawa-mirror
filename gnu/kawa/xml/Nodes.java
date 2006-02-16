@@ -246,13 +246,15 @@ public class Nodes extends Values
     return KNode.make((NodeTree) objects[getIntN(i+1)], getIntN(i+3));
   }
 
-  public Node item(int index)
-  {
-    if (index >= count)
-      return null;
-    else
-      return (Node) item(index);
-  }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public Node item(int index)
+  // {
+  //   if (index >= count)
+  //     return null;
+  //   else
+  //     return (Node) get(index);
+  // }
+  /* #endif */
 
   public Object getPosNext(int ipos)
   {

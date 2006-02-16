@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 143)
+(test-init "Miscellaneous" 147)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -658,6 +658,16 @@
   (let ((x (neg-abs 4)))
     (format #f "x = ~S." x)))
 (test "x = -4." test-neg-abs)
+
+(test '((prefix-test 11)
+	(prefix-test:var2 12)
+	(prefix-test:var2:var3 13)
+	(prefix-test:filler:var4 14))
+      'prefix-test
+      prefix-test-list)
+(test '(12) 'prefix-test:var2 prefix-test:var2)
+(test '(13) 'prefix-test:var2:var3 prefix-test:var2:var3)
+(test '(14) 'prefix-test:filler:var4 prefix-test:filler:var4)
 
 ;; Common Lisp hyperspec
 (test "[#24rn]" 'print-base-1 ;; Common Lisp returns upper-case #24rN

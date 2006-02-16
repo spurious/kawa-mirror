@@ -1,5 +1,9 @@
 2006-02-16  Per Bothner  <per@bothner.com>
 
+	* moduleFT.scm: A number of definitions and references to variables
+	with colons in their names.
+	* misc-test.scm: Test it.
+
 	* inlining-test.scm (tohex2, tohex2): More inlining tests.
 	* inlining.expected: Update accordingly.
 

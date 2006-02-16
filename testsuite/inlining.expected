@@ -58,6 +58,8 @@ InliningTest.newPair10(java.lang.Object,java.lang.Object)gnu.lists.Pair: 10 byte
 InliningTest.newPair11(java.lang.Object,java.lang.Object)gnu.lists.Pair: 10 bytes
 InliningTest.newPair12(java.lang.Object,java.lang.Object)gnu.lists.Pair: 10 bytes
 InliningTest.tohex1(java.lang.Object)java.lang.Object: 5 bytes
+InliningTest.tohex2(Int)java.lang.Object: 5 bytes
+InliningTest.tohex3(Int)java.lang.Object: 5 bytes
 InliningTest.makeIarr1(int)int[]: 4 bytes
 InliningTest.makeIarr2(int)int[]: 4 bytes
 InliningTest.makeIarr3(int)int[]: 18 bytes

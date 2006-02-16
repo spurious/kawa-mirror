@@ -115,10 +115,19 @@
 (define TWO xx:TWO)
 |#
 (define-simple-class <Int> ()
+  (value :: <int>)
+  ((toHex)
+   (<java.lang.Integer>:toHexString value))
+  ((toHex x) allocation: 'static
+   (<java.lang.Integer>:toHexString x))
   ((toHex x) allocation: 'static
    (<java.lang.Integer>:toHexString x)))
 (define (tohex1 x)
   (<Int>:toHex x))
+(define (tohex2 (x :: <Int>))
+  (invoke x 'toHex))
+(define (tohex3 (x :: <Int>))
+  (x:toHex))
 
 (define-namespace xx "XX")
 (define xx:two 222)

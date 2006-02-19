@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Field extends Location implements AttrContainer {
+public class Field extends Location implements AttrContainer, Member {
   int flags;
   Field next;
 

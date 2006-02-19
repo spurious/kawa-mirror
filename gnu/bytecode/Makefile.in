@@ -209,6 +209,7 @@ CpoolUtf8.java \
 Filter.java \
 Location.java Field.java \
 Label.java IfState.java TryState.java SwitchState.java \
+Member.java \
 Method.java \
 CodeAttr.java ConstantValueAttr.java \
 LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \

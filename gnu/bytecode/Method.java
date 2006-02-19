@@ -16,7 +16,7 @@ import java.io.*;
   * in <code>CodeAttr</code>instead.
   */
 
-public class Method implements AttrContainer {
+public class Method implements AttrContainer, Member {
   private String name;
   Type[] arg_types;
   Type return_type;

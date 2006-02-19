@@ -600,8 +600,8 @@ public class Compilation
 
   /** Convert a string to a safe Java identifier.
    * @param reversible if we should use an invertible mapping.
-   * @param kind -1 - non-reverseible;
-   *  0: noversible, except that '$' is not mapped;
+   * @param kind -1 - non-reversible;
+   *  0: reversible, except that '$' is not mapped;
    *  1: reversible
    */
   public static String mangleName (String name, int kind)

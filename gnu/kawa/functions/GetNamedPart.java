@@ -178,7 +178,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             nexp.methods = methods;
             return nexp.setProcedureKind('M');
           }
-        Object part = SlotGet.getField(ctype, mname, caller);
+        Member part = SlotGet.lookupMember(ctype, mname, caller);
         if (part != null
             || (mname.equals("length") && type instanceof ArrayType))
           {

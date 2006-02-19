@@ -30,7 +30,7 @@ public class SetNamedPart extends Procedure3 implements HasSetter, CanInline
 
     if (type instanceof ClassType)
       {
-        Object part = SlotSet.lookupFieldOrMethod((ClassType) type, mname, caller);
+        Object part = SlotSet.lookupMember((ClassType) type, mname, caller);
         if (part != null)
           {
             // FIXME: future kludge to avoid re-doing SlotGet.getField.

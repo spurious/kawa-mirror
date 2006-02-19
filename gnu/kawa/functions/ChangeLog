@@ -1,3 +1,8 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Update to use SlotGet.lookupMember.
+	* SetNamedPart.java (inline): Update to use SlotSet.lookupMember.
+	
 2006-02-16  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (GetNamedExp.inline): Re-organize to use a switch

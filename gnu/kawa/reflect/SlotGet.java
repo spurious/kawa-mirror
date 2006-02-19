@@ -152,7 +152,8 @@ public class SlotGet extends Procedure2
    * @param type the class type declaring the property.
    * @param name the source (unmangled) name of the property.
    */
-  public static Object getField(ClassType clas, String name, ClassType caller)
+  public static Member
+  lookupMember (ClassType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
@@ -208,7 +209,7 @@ public class SlotGet extends Procedure2
 	ClassType ctype = (ClassType) type;
 	ClassType caller = comp.curClass != null ? comp.curClass
 	  : comp.mainClass;
-        Object part = getField(ctype, name, caller);
+        Member part = lookupMember(ctype, name, caller);
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
@@ -318,7 +319,7 @@ public class SlotGet extends Procedure2
         if (type instanceof ClassType && name != null)
           {
             ClassType ctype = (ClassType) type;
-            Object part = getField(ctype, name, null);
+            Member part = lookupMember(ctype, name, null);
             if (part instanceof gnu.bytecode.Field)
               return ((gnu.bytecode.Field) part).getType();
             if (part instanceof gnu.bytecode.Method)

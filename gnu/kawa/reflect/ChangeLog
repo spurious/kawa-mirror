@@ -1,3 +1,12 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (getField): Return Member, and rename to lookupMember.
+	(compile, getReturnType): Update accordingly.
+	* SlotSet.java (lookupFieldOrMethod): Rename to lookupMember,
+	and change return type to Member.
+	(compile): Update accordingly. Can now simplify a bit.
+	* Invoke.java (checkKeywords): Update appropriately.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inline): Don't inline, unless mustCompile.

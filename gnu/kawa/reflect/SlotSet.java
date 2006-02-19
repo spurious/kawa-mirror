@@ -105,8 +105,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     return returnSelf ? obj : Values.empty;
   }
 
-  public static Object
-  lookupFieldOrMethod (ClassType clas, String name, ClassType caller)
+  public static Member
+  lookupMember (ClassType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
@@ -189,7 +189,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     Expression value = args[2];
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
-    Object part = null;
+    Member part = null;
     if (type instanceof ClassType)
       {
         ClassType ctype = (ClassType) type;
@@ -198,37 +198,34 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
           : comp.mainClass;
 	if (name != null)
 	  {
-	    part = lookupFieldOrMethod(ctype, name, caller);
+	    part = lookupMember(ctype, name, caller);
 	    if (part == null && type != Type.pointer_type)
 	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
 	  }
 	else if (arg1 instanceof QuoteExp)
 	  {
-	    part = ((QuoteExp) arg1).getValue();
+	    Object obj = ((QuoteExp) arg1).getValue();
 	    // Inlining (make <type> field: value) creates calls to
 	    // setFieldReturnObject whose 2nd arg is a Field or Method.
-            if (part instanceof Field)
-              name = ((Field) part).getName();
-            else if (part instanceof Method)
-              name = ((Method) part).getName();
-            else
-              part = null;
+            if (obj instanceof Member)
+              {
+                part = (Member) obj;
+                name = part.getName();
+              }
 	  }
 
 	if (part != null)
 	  {
-	    int modifiers;
+	    int modifiers = part.getModifiers();
             ClassType ptype;
             if (part instanceof gnu.bytecode.Field)
               {
                 gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-                modifiers = field.getModifiers();
                 ptype = field.getDeclaringClass();
               }
             else
               {
                 gnu.bytecode.Method method = (gnu.bytecode.Method) part;
-                modifiers = method.getModifiers();
                 ptype = method.getDeclaringClass();
               }
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;

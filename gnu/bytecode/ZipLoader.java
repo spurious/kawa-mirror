@@ -104,11 +104,14 @@ public class ZipLoader extends ClassLoader
     return clas;
   }
 
-  /** Load all classes immediately from zip archive, close archive. */
-  public void loadAllClasses ()
+  /** Load all classes immediately from zip archive, close archive.
+   * @return main class (1st class in archive).
+   */
+  public Class loadAllClasses ()
     throws java.io.IOException
   {
     java.util.Enumeration e = this.zar.entries();
+    Class mainClass = null;
     while (e.hasMoreElements())
       {
 	java.util.zip.ZipEntry member =
@@ -120,10 +123,13 @@ public class ZipLoader extends ClassLoader
 	byte[] bytes = new byte[member_size];
 	new java.io.DataInputStream(strm).readFully(bytes);
 	Class clas = defineClass (name, bytes, 0, member_size);
+        if (mainClass == null)
+          mainClass = clas;
 	loadedClasses.addElement(name);
 	loadedClasses.addElement(clas);
       }
     close();
+    return mainClass;
   }
 
   /** Close the zip archive - loadClass will reopen if necessary. */

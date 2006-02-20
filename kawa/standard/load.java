@@ -73,19 +73,16 @@ public class load extends Procedure1 {
 	if (!zfile.canRead ())
 	  throw new RuntimeException ("load: "+name+" - not readable");
 	ZipLoader loader = new ZipLoader (name);
-	loader.loadAllClasses();
-	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
-	Object proc = clas.newInstance ();
+        Class clas = loader.loadAllClasses();
+        Object proc = clas == null ? null : clas.newInstance();
+        if (! (proc instanceof ModuleBody))
+          throw new RuntimeException("load: "+name+" - no module in archive");
 	gnu.kawa.reflect.ClassMemberLocation.defineAll(proc, env);
 	((ModuleBody) proc).run();
       }
     catch (java.io.IOException ex)
       {
 	throw new WrappedException ("load: "+name+" - "+ex.toString (), ex);
-      }
-    catch (ClassNotFoundException ex)
-      {
-	throw new WrappedException ("class not found in load", ex);
       }
     catch (InstantiationException ex)
       {
@@ -123,7 +120,6 @@ public class load extends Procedure1 {
 	Compilation comp
           = language.parse(port, messages, Language.PARSE_IMMEDIATE);
 	ModuleExp mexp = comp.getModule();
-	mexp.setName(Symbols.make(LambdaExp.fileFunctionName));
 	CallContext ctx = CallContext.getInstance();
 	Consumer save = ctx.consumer;
 	try

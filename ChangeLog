@@ -1,3 +1,11 @@
+2006-02-19  thomas kirk  <tk@research.att.com>
+	    Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (loadCompiled): Get main class from
+ 	ZipLoader.loadAllClasses rather than using LambdaExp.fileFunctionName.
+	This fixes Savannah bug #15725.
+	(loadSource): Don't set module name to LambdaExp.fileFunctionname.
+
 2006-02-19  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite): Use ClassMethods.getMethods

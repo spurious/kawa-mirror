@@ -214,8 +214,6 @@ public class LambdaExp extends ScopeExp
     if (isMethod) flags |= CLASS_METHOD;
     else flags &= ~CLASS_METHOD;
   }
-  /** The name to give to a dummy implicit function that surrounds a file. */
-  public static String fileFunctionName = "atFileLevel";
 
   /** True iff this is the dummy top-level function of a module body. */
   public final boolean isModuleBody () { return this instanceof ModuleExp; }

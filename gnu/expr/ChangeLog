@@ -1,5 +1,9 @@
 2006-02-19  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (compileToArchive): Do't set module name to
+	LambdaExp.fileFunctionName.  Instead, load picks the first class.
+	* LambdaExp.java (fileFunctionName): Remove no-longer-used field.
+
 	* Compilation.java (addClass): Ensure that mainClass is the "first"
 	class, so it is written first when writing an archive.
 

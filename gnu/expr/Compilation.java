@@ -957,7 +957,6 @@ public class Compilation
 	fname = fname + ".zip";
 	makeJar = false;
       }
-    mexp.setName(LambdaExp.fileFunctionName);
     compileModule(mexp);
     File zar_file = new File (fname);
     if (zar_file.exists ())

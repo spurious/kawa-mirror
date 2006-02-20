@@ -1,5 +1,9 @@
 2006-02-19  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite): Use ClassMethods.getMethods
+	rather than ClassMethods.apply to we can pass in 'caller'.
+	It also does less useless work.
+
 	* kawa/lang/Translator.java (rewrite): When searching lexical scope,
 	also seach fields of methods of this class and super-types.
 	* kawa/standard/object.java (rewriteClassDef): Call setTypes earlier,

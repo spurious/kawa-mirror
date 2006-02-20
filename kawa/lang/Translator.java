@@ -622,11 +622,15 @@ public class Translator extends Compilation
                   = (caller == cexp.clinitMethod
                      || (caller != cexp.initMethod 
                          && caller.nameDecl.isStatic()));
-                char mode = contextStatic ? 'S' : 'V';
                 if (part == null)
-                  part = ClassMethods.apply(ctype, dname, mode, language);
-                if (part == null)
-                  continue;
+                  {
+                    char mode = contextStatic ? 'S' : 'V';
+                    PrimProcedure[] methods
+                      = ClassMethods.getMethods(ctype, dname,
+                                                mode, ctype, language);
+                    if (methods.length == 0)
+                      continue;
+                  }
                 Expression part1;
                 // FIXME We're throwing away 'part', which is wasteful.
                 if (contextStatic)

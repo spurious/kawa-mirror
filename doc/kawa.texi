@@ -4977,8 +4977,8 @@ form will be added in the future.)
 See the example below.
 
 The scope of the @var{body} of a method includes the @var{field-decl}s
-of the object.  It does include the surrounding lexical scope.
-It sort-of also includes the declared methods, but this is not working yet.
+and @var{field-decl}s of the body, including those inherited from
+superclasses and implemented interfaces.
 @end deffn
 
 In the following example we define a simple class @code{<2d-vector>}

@@ -1,3 +1,7 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Methods are now in scope.
+
 2006-02-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Software-License): Update to reflect new X11/MIT license.

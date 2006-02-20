@@ -11,13 +11,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 {
   Type retType;
   /** The types of the method parameters.
-   * If known, the types have been coerced to Langauge-specific parameters.
-   * Does not include the implicit static link argument of some constrcutors.
+   * If known, the types have been coerced to Language-specific parameters.
+   * Does not include the implicit static link argument of some constructors.
    */
   Type[] argTypes;
   Method method;
   int op_code;
-  boolean is_special = false;
+  /** 'P' means use invokespecial;
+   * 'V' means expect a target (this) argument, even if method is static;
+   * '\0' means don't expect a target. */
+  char mode;
 
   /** If non-null, the LambdaExp that this PrimProcedure implements. */
   LambdaExp source;
@@ -29,7 +32,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public Type getReturnType () { return retType; }
   public void setReturnType (Type retType) { this.retType = retType; }
 
-  public boolean isSpecial() { return is_special; }
+  public boolean isSpecial() { return mode == 'P'; }
 
   public Type getReturnType (Expression[] args) { return retType; }
 
@@ -57,7 +60,20 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public final boolean isConstructor()
   {
     // invokespecial == primitive-constructor
-    return opcode() == 183 && ! is_special;
+    return opcode() == 183 && mode != 'P';
+  }
+
+  /** Whether we are passed an argument for the 'target' / 'receiver' / 'this'.
+   * Normally this is false for static methods and true for non-static
+   * methods.  However, we may need to be able to call a static method using
+   * {@code object.name(args...)} (Java syntax) or
+   * {@code (invoke object 'name args...)} (Scheme syntax).
+   * This includes when the {@code object} is implied.
+   * In this case we need to ignore the first argument's value.
+   */
+  public boolean takesTarget ()
+  {
+    return mode != '\0';
   }
 
   /** The (minimum, number) of arguments.
@@ -68,7 +84,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public int numArgs()
   {
     int num = argTypes.length;
-    if (method != null && ! method.getStaticFlag())
+    if (takesTarget())
       num++;
     if (takesContext())
       num--;
@@ -128,8 +144,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int paramCount = argTypes.length;
     Type elementType = null;
     Object[] restArray = null;
-    int extraCount = method != null
-      && (! method.getStaticFlag() || isConstructor()) ? 1 : 0;
+    int extraCount = (takesTarget() || isConstructor()) ? 1 : 0;
     fixArgs += extraCount;
     boolean takesContext = takesContext();
     Object[] rargs = new Object[paramCount];
@@ -258,12 +273,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public PrimProcedure(Method method, Language language)
   {
-    this(method, false, language);
+    this(method, '\0', language);
   }
 
-  public PrimProcedure(Method method, boolean is_special, Language language)
+  public PrimProcedure(Method method, char mode, Language language)
   {
-    this.is_special = is_special;
+    this.mode = mode;
 
     init(method);
 
@@ -316,12 +331,18 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     else
       {
 	ClassType mclass = method.getDeclaringClass();
-	if ((mclass.getModifiers() & Access.INTERFACE) != 0)
-	  this.op_code = 185;  // invokeinterface
-	else if (is_special || "<init>".equals(method.getName()))
+	if (mode == 'P')
 	  this.op_code = 183;  // invokespecial
-	else
-	  this.op_code = 182;  // invokevirtual
+        else
+          {
+            mode = 'V';
+            if ("<init>".equals(method.getName()))
+              this.op_code = 183;  // invokespecial
+            else if ((mclass.getModifiers() & Access.INTERFACE) != 0)
+              this.op_code = 185;  // invokeinterface
+            else
+              this.op_code = 182;  // invokevirtual
+          }
       }
     Type[] mtypes = method.getParameterTypes();
     if (isConstructor() && method.getDeclaringClass().hasOuterLink())
@@ -373,16 +394,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 				  argTypes, retType);
     this.retType = retType;
     this.argTypes= argTypes;
-  }
-
-  /** Use to compile new followed by constructor. */
-  public PrimProcedure(ClassType classtype, Type[] argTypes)
-  {
-    this.op_code = 183;
-    method = classtype.addMethod ("<init>", 0,
-				  argTypes, Type.void_type);
-    this.argTypes = argTypes;
-    this.retType = classtype;
+    mode = op_code == 184 ? '\0' : 'V';
   }
 
   /** True if there is no 'this' parameter. */
@@ -401,7 +413,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    *   then args[0] is the receiver and thisType is its expected class.
    *   If thisType==Type.void_type, ignore argTypes[0].  (It is used to to
    *   pass a link to a closure environment, which was pushed by our caller.)
-   *   If this_type==null, no special handling of args[0] or argTypes[0].
+   *   If thisType==null, no special handling of args[0] or argTypes[0].
    */
   private void compileArgs(Expression[] args, int startArg, Type thisType, Compilation comp)
  {
@@ -494,6 +506,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           thisType = null;
         startArg = 1;
       }
+    else if (takesTarget() && method.getStaticFlag())
+      startArg = 1;
 
     compileArgs(args, startArg, thisType, comp);
 
@@ -567,7 +581,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public Type getParameterType(int index)
   {
-    if (method != null && ! method.getStaticFlag())
+    if (takesTarget())
       {
         if (index == 0)
           return isConstructor() ? Type.pointer_type

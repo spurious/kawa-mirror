@@ -20,13 +20,10 @@ public class ClassMethods extends Procedure2
    */
   public Object apply2 (Object arg0, Object arg1)
   {
-    return apply(this, arg0, arg1, null, null, 0, 0);
+    return apply(this, arg0, arg1);
   }
 
-  public static MethodProc apply(Procedure thisProc,
-                                 Object arg0, Object arg1,
-                                 Type rtype, Type[] atypes,
-                                 int modifiers, int modmask)
+  public static MethodProc apply(Procedure thisProc, Object arg0, Object arg1)
   {
     ClassType dtype;
     String mname;
@@ -46,23 +43,11 @@ public class ClassMethods extends Procedure2
       throw new WrongType(thisProc, 1, null);
     if (! ("<init>".equals(mname)))
       mname = Compilation.mangleName(mname);
-    MethodProc result = apply(dtype, mname, rtype, atypes, modifiers, modmask,
-                              Language.getDefaultLanguage());
+    MethodProc result = apply(dtype, mname, '\0', Language.getDefaultLanguage());
     if (result == null)
       throw new RuntimeException("no applicable method named `"+mname+"' in "
                                  +dtype.getName());
     return result;
-  }
-
-  /** Return the methods of a class with the specified name and flag.
-   * @param caller if non-null, check that methods are accessible in it.
-   * @return an array containing the methods.
-   */
-  public static PrimProcedure[] getMethods(ClassType dtype, String mname,
-                                           int modifiers, int modmask,
-                                           ClassType caller, Language language)
-  {
-    return getMethods(dtype,mname,modifiers,modmask,false, caller, language);
   }
 
   private static int removeRedundantMethods(Vector methods)
@@ -103,19 +88,19 @@ public class ClassMethods extends Procedure2
   }
     
   /** Return the methods of a class with the specified name and flag.
+   * @param caller if non-null, check that methods are accessible in it.
    * @return an array containing the methods.
    */
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
-                                           int modifiers, int modmask,
-                                           boolean is_special,
+                                           char mode,
                                            ClassType caller,
                                            Language language)
   {
-    MethodFilter filter = new MethodFilter(mname, modifiers, modmask, caller);
+    MethodFilter filter = new MethodFilter(mname, 0, 0, caller);
     // FIXME kludge until we handle "language types".
     if (dtype == Type.tostring_type)
       dtype = Type.string_type;
-    boolean named_class_only = is_special || "<init>".equals(mname);
+    boolean named_class_only = mode == 'P' || "<init>".equals(mname);
     Vector methods = new Vector();
     dtype.getMethods(filter, named_class_only ? 0 : 2,
 		     methods,
@@ -129,7 +114,7 @@ public class ClassMethods extends Procedure2
     for (int i = mlength;  --i >= 0; )
     {
       Method method = (Method) methods.elementAt(i);
-      PrimProcedure pproc = new PrimProcedure(method, is_special, language);
+      PrimProcedure pproc = new PrimProcedure(method, mode, language);
       result[count++] = pproc;
     }
     return result;
@@ -179,33 +164,14 @@ public class ClassMethods extends Procedure2
   }
 
   public static MethodProc apply(ClassType dtype, String mname,
-                                 Type rtype, Type[] atypes,
-                                 int modifiers, int modmask,
-                                 Language language)
+                                 char mode, Language language)
   {
-    PrimProcedure[] methods = getMethods(dtype, mname, modifiers, modmask,
-					 null, language);
+    PrimProcedure[] methods = getMethods(dtype, mname, mode, null, language);
     GenericProc gproc = null;
     PrimProcedure pproc = null;
     for (int i = 0;  i < methods.length;  i++)
       {
         PrimProcedure cur = methods[i];
-        if (atypes != null)
-          {
-            int applicable = cur.isApplicable(atypes);
-            if (applicable == -1)
-              continue;
-            if (pproc != null)
-              {
-                MethodProc best = MethodProc.mostSpecific(pproc, cur);
-                if (best != null)
-                  {
-                    if (cur == best)
-                      pproc = cur;
-                    continue;
-                  }
-              }
-          }
         if (pproc != null && gproc == null)
           {
             gproc = new GenericProc();

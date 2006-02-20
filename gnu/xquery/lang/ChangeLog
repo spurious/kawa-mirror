@@ -1,3 +1,7 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (define_method): Update for changed ClassMethods.apply.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parse): Use new Compilation.pushNewModule method.

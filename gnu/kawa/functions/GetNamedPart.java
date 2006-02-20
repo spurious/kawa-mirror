@@ -138,7 +138,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         PrimProcedure[] methods
           = ClassMethods.getMethods((ClassType) typeval,
                                     Compilation.mangleName(mname),
-                                    0, 0, false, caller, language);
+                                    '\0', caller, language);
         if (methods != null && methods.length > 0)
           {
             nexp.methods = methods;
@@ -172,7 +172,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
           = type instanceof ClassType ? (ClassType) type : Type.pointer_type;
         PrimProcedure[] methods
           = ClassMethods.getMethods(ctype, Compilation.mangleName(mname),
-                                    0, Access.STATIC, false, caller, language);
+                                    'V', caller, language);
         if (methods != null && methods.length > 0)
           {
             nexp.methods = methods;
@@ -260,7 +260,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
               {
                 // FIXME!
               }
-            return ClassMethods.apply(ClassMethods.classMethods, container, part, null, null, 0, 0);
+            return ClassMethods.apply(ClassMethods.classMethods, container, part);
           }
       }
 
@@ -273,9 +273,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         // FIXME!
       }
     MethodProc methods = ClassMethods.apply((ClassType) ClassType.make(container.getClass()),
-                                            name,
-                                            (Type) null, (Type[]) null,
-                                            0, Access.STATIC,
+                                            name, '\0',
                                             Language.getDefaultLanguage());
     if (methods != null)
       return new NamedPart(container, name, 'M', methods);

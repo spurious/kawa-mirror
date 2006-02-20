@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
+import gnu.bytecode.Member;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
@@ -590,6 +591,53 @@ public class Translator extends Compilation
 	     || (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)))
       {
 	Declaration decl = lexical.lookup(exp, function);
+
+        // If we're nested inside a class (in a ClassExp) then the field
+        // and methods names of this class and super-classes/interfaces
+        // need to be searched.
+        ScopeExp scope = current_scope;
+        int decl_nesting = decl == null ? -1 : ScopeExp.nesting(decl.context);
+        String dname;
+        if (exp instanceof String
+            || (exp instanceof Symbol && ((Symbol) exp).hasEmptyNamespace()))
+          dname = exp.toString();
+        else
+          {
+            dname = null;
+            scope = null;
+          }
+        for (;scope != null; scope = scope.outer)
+          {
+            if (scope instanceof LambdaExp
+                && scope.outer instanceof ClassExp // redundant? FIXME
+                && ((LambdaExp) scope).isClassMethod())
+              {
+                if (decl_nesting >= ScopeExp.nesting(scope.outer))
+                  break;
+                LambdaExp caller = (LambdaExp) scope;
+                ClassExp cexp = (ClassExp) scope.outer;
+                ClassType ctype = (ClassType) cexp.getType();
+                Object part = SlotGet.lookupMember(ctype, dname, ctype);
+                boolean contextStatic
+                  = (caller == cexp.clinitMethod
+                     || (caller != cexp.initMethod 
+                         && caller.nameDecl.isStatic()));
+                char mode = contextStatic ? 'S' : 'V';
+                if (part == null)
+                  part = ClassMethods.apply(ctype, dname, mode, language);
+                if (part == null)
+                  continue;
+                Expression part1;
+                // FIXME We're throwing away 'part', which is wasteful.
+                if (contextStatic)
+                  part1 = new ReferenceExp(((ClassExp) caller.outer).nameDecl);
+                else
+                  part1 = new ThisExp(caller.firstDecl());
+                return GetNamedPart.makeExp(part1,
+                                            QuoteExp.getInstance(dname));
+              }
+          }
+
 	Object nameToLookup;
 	Symbol symbol = null;
 	if (decl != null)
@@ -658,21 +706,6 @@ public class Translator extends Compilation
                 decl = Declaration.getDeclaration(proc);
               }
             */
-          }
-	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
-	    && decl.isProcedureDecl())
-          {
-             LambdaExp method = curMethodLambda;
-             Declaration firstParam
-               = method == null ? null : method.firstDecl();
-             Expression part1;
-             if (method.nameDecl.isStatic())
-               part1 = new ReferenceExp(method.outerLambda().nameDecl);
-             else
-               part1 = new ThisExp(firstParam);
-             return GetNamedPart.makeExp(part1,
-                                         QuoteExp.getInstance(decl.getName()));
-              
           }
 	if (decl != null && decl.getContext() instanceof PatternScope)
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");

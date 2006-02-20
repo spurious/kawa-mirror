@@ -328,6 +328,7 @@ public class object extends Syntax
     oexp.firstChild = method_list;
 
     oexp.setClassName(tr);
+    oexp.setTypes(tr);
 
     // First a pass over init-form: specifiers, since these are evaluated
     // in a scope outside the current class.
@@ -338,7 +339,7 @@ public class object extends Syntax
 	if (init != null)
           rewriteInit(inits.elementAt(i), oexp, (Pair) init, tr, null);
       }
-    
+
     tr.push(oexp);
 
     // Pass to rewrite method/initializer bodies.
@@ -482,7 +483,6 @@ public class object extends Syntax
     if (oexp.clinitMethod != null)
       oexp.clinitMethod.outer = oexp;
     tr.pop(oexp);
-    oexp.setTypes(tr);
     oexp.declareParts(tr);
   }
 

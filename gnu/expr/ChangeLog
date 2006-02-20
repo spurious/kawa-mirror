@@ -1,3 +1,17 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java: Handle a mode where a 'target' is passed when
+	for static method calls.
+	(mode): New field, subsumes removed is_special field.
+	(isSpecial, isConstructor): Update accordingly.
+	(takesTarget): New method.
+	(numArgs, matchN, getParameterType): Update appropriately.
+	(<init>)(Method,char,Language)): New constructor.
+	(<init>)(Method,boolean,Language)): Removed constructor.
+	(<init>)(ClassType,Type[])): Removed unused constructor.
+	(init): Set mode to 'V' if needed.
+	(compile): If static and takesTarget(), skip first argument.
+
 2006-02-16  Per Bothner  <per@bothner.com>
 
 	* Expression.java (side_effects): New method.

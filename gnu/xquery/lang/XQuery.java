@@ -194,7 +194,7 @@ public class XQuery extends Language
     // This does require eager loading of the class, which takes
     // extra time on startup.  FIXME.
     ClassType ctype = ClassType.make(cname);
-    Procedure proc = ClassMethods.apply(ctype, mname, null, null, 0, 0, this);
+    Procedure proc = ClassMethods.apply(ctype, mname, '\0', this);
     proc.setSymbol(sym);
     environ.define(sym, EnvironmentKey.FUNCTION, proc);
   }

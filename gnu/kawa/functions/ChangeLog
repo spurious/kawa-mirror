@@ -1,5 +1,8 @@
 2006-02-19  Per Bothner  <per@bothner.com>
 
+	* GetNamedPart.java (getNamedPart): Update for
+	simplified Classmethods.{GetMethods,apply} parameter lists.
+
 	* GetNamedPart.java (inline): Update to use SlotGet.lookupMember.
 	* SetNamedPart.java (inline): Update to use SlotSet.lookupMember.
 	

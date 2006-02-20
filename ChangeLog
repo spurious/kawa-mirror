@@ -1,3 +1,11 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite): When searching lexical scope,
+	also seach fields of methods of this class and super-types.
+	* kawa/standard/object.java (rewriteClassDef): Call setTypes earlier,
+	so we can search for inherited fields and methods.
+	Remove old incomplete code for matching fields and methods.
+
 2006-02-16  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite): Handle reference to method name

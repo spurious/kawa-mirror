@@ -7,13 +7,23 @@ import java.lang.reflect.Array;
 
 public class Invoke extends ProcedureN implements CanInline
 {
-  /** 'N' - make (new);  'S' - invoke-static (static or non-static);
-      's' - like 'S' but only allow static method; 'V'  - non-static invoke. */
+  /** The kind on invoke operation.
+   *  'N' - make (new).
+   *  'S' - invoke-static (static or non-static):
+   *        The first operand is a Class or Type, the second is the name,
+   *        and if the is non-sttaic the 3rd is the receiver.
+   *  's' - Like 'S' but only allow static methods. [not used]
+   *  'V' - non-static invoke, only allow non-static methods. [not used]
+   *  '*' - non-static invoke, can match static methods also.
+   *        This is Java's 'Primary.MethodName(args)' - if the selected method
+   *        is static, we only use Primary's type for method select,
+   *        but ignore its value.
+   */
   char kind;
 
   Language language;
 
-  public static final Invoke invoke = new Invoke("invoke", 'V');
+  public static final Invoke invoke = new Invoke("invoke", '*');
   public static final Invoke invokeStatic = new Invoke("invoke-static", 'S');
   public static final Invoke invokeSpecial = new Invoke("invoke-special", 'P');
   public static final Invoke make = new Invoke("make", 'N');
@@ -34,17 +44,17 @@ public class Invoke extends ProcedureN implements CanInline
 
   public static Object invoke$V(Object[] args) throws Throwable
   {
-    return applyN(invoke, args);
+    return invoke.applyN(args);
   }
 
   public static Object invokeStatic$V(Object[] args) throws Throwable
   {
-    return applyN(invokeStatic, args);
+    return invokeStatic.applyN(args);
   }
 
   public static Object make$V(Object[] args) throws Throwable
   {
-    return applyN(make, args);
+    return make.applyN(args);
   }
 
   private static ObjectType typeFrom (Object arg, Invoke thisProc)
@@ -63,12 +73,8 @@ public class Invoke extends ProcedureN implements CanInline
 
   public void apply (CallContext ctx) throws Throwable
   {
-    apply(ctx.getArgs(), ctx);
-  }
-
-  public void apply (Object[] args, CallContext ctx) throws Throwable
-  {
-    if (kind=='S' || kind=='V')
+    Object[] args = ctx.getArgs();
+    if (kind=='S' || kind=='V' || kind=='s' || kind=='*')
       {
         // The following is an optimization, so that output from the
         // method is sent directly to ctx.consumer, rather than reified.
@@ -77,24 +83,12 @@ public class Invoke extends ProcedureN implements CanInline
         Object arg0 = args[0];
         String mname;
         ClassType dtype = (ClassType)
-          (kind != 'V' ? typeFrom(arg0, this) : Type.make(arg0.getClass()));
-        Object arg1 = args[1];
-        if (arg1 instanceof String || arg1 instanceof FString)
-          mname = arg1.toString();
-	else if (arg1 instanceof Symbol)
-	  mname = ((Symbol) arg1).getName();
-        else
-          throw new WrongType(this, 1, null);
-        mname = Compilation.mangleName(mname);
-        Procedure proc = ClassMethods.apply(dtype, mname, null, null,
-                                            0, kind=='S' ? 0 : Access.STATIC,
-                                            language);
-        if (proc == null)
-          throw new RuntimeException(getName() + ": no method named `"
-                                     + mname + "' in class " + dtype.getName());
+          ((kind == 'S' || kind == 's') ? typeFrom(arg0, this)
+           : Type.make(arg0.getClass()));
+        Procedure proc = lookupMethods(dtype, args[1]);
         Object[] margs = new Object[nargs-(kind == 'S' ? 2 : 1)];
         int i = 0;
-        if (kind == 'V')
+        if (kind == 'V' || kind == '*')
           margs[i++] = args[0];
         System.arraycopy(args, 2, margs, i, nargs - 2);
         proc.checkN(margs, ctx);
@@ -105,26 +99,19 @@ public class Invoke extends ProcedureN implements CanInline
 
   public Object applyN (Object[] args) throws Throwable
   {
-    return applyN(this, args);
-  }
-
-  protected static Object applyN (Invoke thisProc, Object[] args)
-    throws Throwable
-  {
-    int kind = thisProc.kind;
     if (kind == 'P')
-      throw new RuntimeException(thisProc.getName() 
+      throw new RuntimeException(getName() 
                                  + ": invoke-special not allowed at run time");
     
     int nargs = args.length;
-    Procedure.checkArgCount(thisProc, nargs);
+    Procedure.checkArgCount(this, nargs);
     Object arg0 = args[0];
-    ObjectType dtype = (kind != 'V' ? typeFrom(arg0, thisProc)
+    ObjectType dtype = (kind != 'V' && kind != '*' ? typeFrom(arg0, this)
                        : (ObjectType) Type.make(arg0.getClass()));
-    String mname;
+    Object mname;
     if (kind == 'N')
       {
-	mname = "<init>";
+	mname = null;
 	if (dtype instanceof PairClassType)
 	  {
 	    PairClassType ptype = (PairClassType) dtype;
@@ -180,28 +167,14 @@ public class Invoke extends ProcedureN implements CanInline
       }
     else
       {
-        Object arg1 = args[1];
-        if (arg1 instanceof String || arg1 instanceof FString)
-          mname = arg1.toString();
-	else if (arg1 instanceof Symbol)
-	  mname = ((Symbol) arg1).getName();
-        else
-          throw new WrongType(thisProc, 1, null);
-        mname = Compilation.mangleName(mname);
+        mname = args[1];
       }
-    MethodProc proc
-      = ClassMethods.apply((ClassType) dtype, mname, null, null,
-                           thisProc.kind=='s' ? Access.STATIC : 0,
-                           thisProc.kind=='S' ? 0 : Access.STATIC,
-                           thisProc.language);
-    if (proc == null)
-      throw new RuntimeException(thisProc.getName() + ": no method named `"
-                                 + mname + "' in class " + dtype.getName());
+    MethodProc proc = lookupMethods((ClassType) dtype, mname);
     if (kind != 'N')
       {
         Object[] margs = new Object[nargs-(kind == 'S' || kind == 's' ? 2 : 1)];
         int i = 0;
-        if (kind == 'V')
+        if (kind == 'V' || kind == '*')
           margs[i++] = args[0];
         System.arraycopy(args, 2, margs, i, nargs - 2);
         return proc.applyN(margs);
@@ -245,6 +218,32 @@ public class Invoke extends ProcedureN implements CanInline
   private int cacheDefinitelyApplicableMethodCount;
   private int cachePossiblyApplicableMethodCount;
 
+  protected MethodProc lookupMethods(ClassType dtype, Object name)
+  {
+    String mname;
+    if (kind == 'N')
+      mname = "<init>";
+    else
+      {
+        if (name instanceof String || name instanceof FString)
+          mname = name.toString();
+	else if (name instanceof Symbol)
+	  mname = ((Symbol) name).getName();
+        else
+          throw new WrongType(this, 1, null);
+        mname = Compilation.mangleName(mname);
+      }
+    MethodProc proc = ClassMethods.apply(dtype, mname,
+                                         kind == 'P' ? 'P'
+                                         : kind == '*' || kind == 'V' ? 'V'
+                                         : '\0',
+                                         language);
+    if (proc == null)
+      throw new RuntimeException(getName() + ": no method named `"
+                                 + mname + "' in class " + dtype.getName());
+    return proc;
+  }
+
   protected PrimProcedure[] getMethods(ClassType ctype, String mname,
                                        Expression[] args, int margsLength, 
                                        int argsStartIndex, int objIndex,
@@ -265,9 +264,9 @@ public class Invoke extends ProcedureN implements CanInline
 
     PrimProcedure[] methods
       = ClassMethods.getMethods(ctype, mname,
-                                kind == 's' ? Access.STATIC : 0,
-                                kind == 'S' ? 0 : Access.STATIC,
-                                kind == 'P',
+                                kind == 'P' ? 'P'
+                                : kind == '*' || kind == 'V' ? 'V'
+                                : '\0',
                                 caller, language);
     
     long num = ClassMethods.selectApplicable(methods, atypes);
@@ -350,11 +349,11 @@ public class Invoke extends ProcedureN implements CanInline
     if (! comp.mustCompile
         // This should never happen, as InlineCalls.walkApplyExp
         // checks the number of arguments before inline is called.
-        || nargs == 0 || (kind == 'V' && nargs == 1))
+        || nargs == 0 || ((kind == 'V' || kind == '*') && nargs == 1))
       return exp;
     ObjectType type;
     Expression arg0 = args[0];
-    Type type0 = (kind == 'V' ? arg0.getType() : language.getTypeFor(arg0));
+    Type type0 = (kind == 'V' || kind == '*' ? arg0.getType() : language.getTypeFor(arg0));
     if (type0 instanceof PairClassType)
       type = ((PairClassType) type0).instanceType;
     else if (type0 instanceof ClassType
@@ -365,7 +364,7 @@ public class Invoke extends ProcedureN implements CanInline
     String name = getMethodName(args);
 
     int margsLength, argsStartIndex, objIndex;
-    if (kind == 'V')                     // Invoke virtual
+    if (kind == 'V' || kind == '*')      // Invoke virtual
       {
         margsLength = nargs - 1;
         argsStartIndex = 2;

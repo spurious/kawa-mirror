@@ -1,5 +1,17 @@
 2006-02-19  Per Bothner  <per@bothner.com>
 
+	* ClassMethods.java (getMethods): Combine two methods into one,
+	and simplify parameter list to take a 'mode'.
+	Pass mode to PrimProcedure constructor.
+	(apply - both variants): Simplify parameter list.
+	* Invoke.java (invoke): New can also match static methods.
+	(apply(Objct[],CallContext)): Merge into caller.
+	Handle more kinds.
+	(applyN(Invoke,Object[])): Merge into caller.  Likewise handle more.
+	(lookupMethods): New method.
+	(apply, applyN): Use it.
+	(getMethods): Handle more kinds.
+
 	* SlotGet.java (getField): Return Member, and rename to lookupMember.
 	(compile, getReturnType): Update accordingly.
 	* SlotSet.java (lookupFieldOrMethod): Rename to lookupMember,

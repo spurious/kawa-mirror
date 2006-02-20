@@ -1012,8 +1012,14 @@ public class Compilation
 	System.arraycopy (classes, 0, new_classes, 0, numClasses);
 	classes = new_classes;
       }
-    classes[numClasses++] = new_class;
     new_class.access_flags |= Access.PUBLIC|Access.SUPER;
+    if (new_class == mainClass && numClasses > 0)
+      {
+        // Ensure mainClass is written first when writing an archive.
+        new_class = classes[0];
+        classes[0] = mainClass;
+      }
+    classes[numClasses++] = new_class;
   }
 
   public void addMainClass (ModuleExp module)

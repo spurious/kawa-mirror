@@ -1,3 +1,7 @@
+2006-02-19  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (coerceToObject): Handle "coercing to void".
+
 2006-02-13  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (makeApply): Change return type to Expression.

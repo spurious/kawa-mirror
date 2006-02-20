@@ -4,6 +4,7 @@ import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
 import gnu.text.Char;
+import gnu.mapping.Values;
 
 /** Use to implement some special types that convert differently. */
 
@@ -71,6 +72,8 @@ public class LangPrimType extends PrimType implements TypeValue
 	return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
       case 'C':
 	return new Character(((Char) obj).charValue());
+      case 'V':
+        return Values.empty;
       }
     return super.coerceFromObject(obj);
   }
@@ -139,6 +142,7 @@ public class LangPrimType extends PrimType implements TypeValue
       case 'D':  case 'F':
 	return DFloNum.make(((Number) obj).doubleValue());
       case 'V':
+        // Perhaps we should return Language.noValue() instead?
 	return gnu.mapping.Values.empty;
       }
     return super.coerceToObject(obj);

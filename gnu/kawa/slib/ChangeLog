@@ -1,3 +1,17 @@
+2006-02-21  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Lots of fixes and improvements.
+	(test-source-location-cons%): Remove syntax.
+	(test-name): Remove test-runner field.
+	(group-path): Renamed field to groups-stack.
+	(test-%should-execute-test): Now also sets preliminary result-kind.
+	(test-runner-group-path): Now implemented using test-runner-group-stack.
+	(test-match-any%, test-match-all%): Take variable number of arguments.
+	(test-make-predicate%): Remove - use test-asspecifier% instead.
+	(test-match-named): Renamed to test-match-name.
+	(test-end, test-end%): Reimplement for better error handling/checking.
+	(test-runner-result-alist): Renamed to test-result-alist.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* gui.scm: Move Swing-specific functions to ...

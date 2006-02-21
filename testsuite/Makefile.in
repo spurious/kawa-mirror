@@ -403,7 +403,7 @@ check-num:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/num-test.scm"
 
 check-arr: testing.zip
-	$(KAWATEST) -f "$(srcdir)/arr-test.scm" -e '(test-report)'
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/arr-test.scm"
 
 check-misc: testing.zip moduleFT.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'

@@ -1,3 +1,8 @@
+2006-02-21  Per Bothner  <per@bothner.com>
+
+	* arr-test.scm: Rewrite to use srfi-64 framework.
+	* Makefile.am: Upadte accordingly.
+
 2006-02-16  Per Bothner  <per@bothner.com>
 
 	* moduleFT.scm: A number of definitions and references to variables

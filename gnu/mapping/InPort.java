@@ -106,7 +106,9 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 	char ch = uri.charAt(i);
 	if (ch == ':')
 	  return i;
-	if (ch == '/')
+        if (i == 0 ? ! Character.isLetter(ch)
+            : (! Character.isLetterOrDigit(ch)
+               && ch != '+' && ch != '-' && ch != '.'))
 	  return -1;
       }
     return -1;

@@ -262,6 +262,7 @@ JAVADOC_PACKAGES = \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
 
 JAVADOC = javadoc
+JAVADOC_FLAGS = -use
 ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
 JAVADOC_ANT_JARS = $(ECLIPSE_PLUGINS_PATH)/org.apache.ant_1.6.5/lib/ant.jar
 JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk.linux.x86_3.1.0.jar

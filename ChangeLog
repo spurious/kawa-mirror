@@ -1,3 +1,7 @@
+2006-02-22  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (JAVADOC_FLAGS): Pass -use to javadoc.
+
 2006-02-19  thomas kirk  <tk@research.att.com>
 	    Per Bothner  <per@bothner.com>
 

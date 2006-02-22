@@ -100,6 +100,7 @@ JAVADOC_PACKAGES = \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
 
 JAVADOC = javadoc
+JAVADOC_FLAGS = -use
 #JAVADOC_FLAGS = -J-Xmx60m
 
 # NOTE:  To update javadoc:

@@ -386,7 +386,8 @@ check2-full-tailcalls:
 check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
-check1:  check-num check-arr check-format check-ppfile scribble.class
+check1:  check-num check-arr check-srfi-64 check-format \
+  check-ppfile scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -402,8 +403,11 @@ check-scm: testing.zip
 check-num:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/num-test.scm"
 
-check-arr: testing.zip
+check-arr:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/arr-test.scm"
+
+check-srfi-64:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-64-test.scm"
 
 check-misc: testing.zip moduleFT.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'

@@ -11,8 +11,11 @@ public class SourceError
    * 'e' (for error), or 'f' (for fatal error). */
   public char severity;
 
-  /* The name or URL of the file containing the error. */
+  /** The name or URL of the file containing the error. */
   public String filename;
+
+  /** If non-null, an error code, as might be specified by a standard. */
+  public String code;
 
   /** The line number of the error, with 1 being the top line.
    * The value 0 means unknown or not applicable (such as the entire file). */
@@ -70,6 +73,12 @@ public class SourceError
     if (severity == 'w')
       buffer.append("warning - ");
     buffer.append (message);
+    if (code != null)
+      {
+        buffer.append(" [");
+        buffer.append(code);
+        buffer.append("]");
+      }
     return buffer.toString ();
   }
 

@@ -126,6 +126,14 @@ public class SourceMessages
 			  current_line, current_column, message));
   }
 
+  public void error(char severity, String message, String code)
+  {
+    SourceError err = new SourceError(severity, current_filename,
+                                      current_line, current_column, message);
+    err.code = code;
+    error(err);
+  }
+
   /** Print all the error messages to a PrintStream. */
   public void printAll(java.io.PrintStream out, int max)
   {

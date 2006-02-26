@@ -1,3 +1,9 @@
+2006-02-26  Per Bothner  <per@bothner.com>
+
+	* SourceError.java (code): New field.
+	(toString): If code field is non-null, display it.
+	* SourceMessages.java (error(char,String,String)): New method.
+
 2006-01-12  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (toFileOrURL): Fix some problems with File handling.

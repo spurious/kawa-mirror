@@ -1,8 +1,10 @@
-// Copyright (c) 1997, 1998, 1999, 2000  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2000, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /** A class for infinite-precision integers.
  * @author Per Bothner
@@ -1252,7 +1254,7 @@ public class IntNum extends RatNum implements Externalizable
 	  {
 	    int digit = Character.digit (ch, radix);
 	    if (digit < 0)
-	      break;
+	      throw new NumberFormatException("For input string: \""+s+'"');
 	    bytes[byte_len++] = (byte) digit;
 	  }
       }
@@ -1572,4 +1574,19 @@ public class IntNum extends RatNum implements Externalizable
     return canonicalize();
   }
 
+  public BigInteger asBigInteger ()
+  {
+    if (words == null || ival <= 2)
+      return BigInteger.valueOf(longValue());
+    return new BigInteger(toString());
+  }
+
+  public BigDecimal asBigDecimal ()
+  {
+    if (words == null)
+      return new BigDecimal(ival);
+    if (ival <= 2)
+      return new BigDecimal(longValue());
+    return new BigDecimal(toString());
+  }
 }

@@ -1,5 +1,11 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
+	* Duration.java: New class, extends Quantity.
+	* Makefile.am: Update accordingly.
+	* Unit.java (NON_COMBINABLE): New constant.
+	(duration, months):: New units.
+	(second): Change to be based on duration.
+
 	* IntNum.java (asBigInteger, asBigDecimal): New methods.
 	* RealNum.java (asBigDecimal): New method.
 

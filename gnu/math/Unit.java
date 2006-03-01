@@ -193,8 +193,17 @@ public abstract class Unit extends Quantity
     return this;
   }
 
+  /** A magic factor to indicate units that have the same "dimension"
+   * but not a fixed multiple.
+   * E.g. "month" and "day", or money of different currencies.
+   * Since they have the same dimension, they can be added to get
+   * an (unimplemented) combined quantity, but they cannot be compared.
+   * No general support yet, but used for time Duration.
+   */
+  public static double NON_COMBINABLE = 0.0;
+
   public static final BaseUnit meter = new BaseUnit ("m", "Length");
-  public static final BaseUnit second = new BaseUnit ("s", "Time");
+  public static final BaseUnit duration = new BaseUnit ("duration", "Time");
   public static final BaseUnit gram = new BaseUnit ("g", "Mass");
   public static final Unit cm = define("cm", 0.01, meter);
   public static final Unit mm = define("mm", 0.1, cm);
@@ -203,6 +212,10 @@ public abstract class Unit extends Quantity
   public static final Unit pica = define("pica", 0.004233333, meter);
   public static final Unit radian = define("rad", 1.0, Unit.Empty);
 
+  public static final NamedUnit second =
+    new NamedUnit("s", NON_COMBINABLE, duration);
+  public static final NamedUnit month =
+    new NamedUnit("month", NON_COMBINABLE, duration);
   public static final Unit minute = define("min", 60.0, second);
   public static final Unit hour = define("hour", 60.0, minute);
 }

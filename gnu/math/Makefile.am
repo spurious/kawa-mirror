@@ -13,6 +13,7 @@ java_sources = \
   MPN.java \
   IntNum.java \
   BitOps.java \
+  Duration.java \
   FixedRealFormat.java \
   ExponentialFormat.java
 

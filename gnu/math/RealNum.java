@@ -1,7 +1,8 @@
-// Copyright (c) 1997, 2004  Per M.A. Bothner.
+// Copyright (c) 1997, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.math.BigDecimal;
 
 public abstract class RealNum extends Complex
   /* #ifdef JAVA2 */
@@ -213,5 +214,10 @@ public abstract class RealNum extends Complex
   public int compareTo(Object o)
   {
     return compare(o);
+  }
+
+  public java.math.BigDecimal asBigDecimal ()
+  {
+    return new BigDecimal(doubleValue());
   }
 }

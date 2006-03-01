@@ -1,6 +1,7 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (asBigInteger, asBigDecimal): New methods.
+	* RealNum.java (asBigDecimal): New method.
 
 	* IntNum.java (valueOf): Throw exception if bad input format.
 

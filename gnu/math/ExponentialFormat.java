@@ -14,7 +14,7 @@ public class ExponentialFormat extends java.text.Format
 {
   /** Number of fractional digits to show.
    *  This is `d' in the CommonLisp spec. */
-  public int fracDigits;
+  public int fracDigits = -1;
 
   /** Number of digits to show in the integer part of the result.
    * If positive, The number of digits before the decimal point.
@@ -28,7 +28,9 @@ public class ExponentialFormat extends java.text.Format
 
   public char overflowChar;
   public char padChar;
-  public char exponentChar;
+  public char exponentChar = 'E';
+  /** Display sign of exponent even when it is non-negative. */
+  public boolean exponentShowSign;
 
   /** True if '+' should be printed for non-negative number. */
   public boolean showPlus;
@@ -188,7 +190,8 @@ public class ExponentialFormat extends java.text.Format
       {
 	// Append the exponent.
 	sbuf.append(exponentChar);
-	sbuf.append(exponent >= 0 ? '+' : '-');
+        if (exponentShowSign || exponent < 0)
+          sbuf.append(exponent >= 0 ? '+' : '-');
 	i = sbuf.length();
 	sbuf.append(exponentAbs);
 	newLen = sbuf.length();

@@ -1268,6 +1268,7 @@ class LispRealFormat extends ReportFormat
     else // if (op == 'E' || op == 'G')
       {
 	ExponentialFormat efmt = new ExponentialFormat();
+        efmt.exponentShowSign = true;
 	efmt.width = getParam(this.arg1, 0, args, start);
 	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
 	efmt.fracDigits = getParam(this.arg2, -1, args, start);

@@ -1,5 +1,8 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
+	* ExponentialFormat.java (exponentShowSign): New flag/option.
+	(fracDigits, exponentChar): Initialize to better defaults.
+
 	* Duration.java: New class, extends Quantity.
 	* Makefile.am: Update accordingly.
 	* Unit.java (NON_COMBINABLE): New constant.

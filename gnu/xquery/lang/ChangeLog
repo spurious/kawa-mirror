@@ -1,5 +1,47 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (FLOAT_TOKEN): Replace by DECIMAL_TOKEN, DOUBLE_TOKEN.
+	(getRawToken): Fix recognition of numbers to distinguish
+	xs:decimal literals from xs:double literals - which have exponent.
+	(parseMaybePrimaryExpr): Handle double/decimal literals correctly.
+
+	* XQParser.java: Pass XQuery error code various places.
+	(error, fatal): New methods take error code.
+
+	* XQParser.java (OP_TREAT_AS, OP_CASTABLE_AS, OP_CAST_AS): New tokens.
+	(priority): Handle new tokens.
+	(match(String,String,boolean)): New method.
+	(peekOperator): Recognize 'cast as', 'treat as', castable as'.
+	(parseBinaryExpr): Handle new operations.
+
+	(DECLARE_XMLSPACE_TOKEN): Rename to DECLARE_BOUNDARY_SPACE_TOKEN.
+	(DECLARE_ORDERING_TOKEN): New token.
+	(orderingModeUnordered): New field.
+	(parseMaybePrimaryExpr): Recognize 'declare orderering'.
+
+	* XQParser.java (OP_ELEMENT, OP_ATTRIBUTE, OP_ITEM, OP_EMPTY_SEQUENCE,
+	OP_SCHEMA_ATTRIBUTE, OP_SCHEMA_ELEMENT, IF_LPAREN_TOKEN,
+	TYPESWITCH_LPAREN_TOKEN, FOR_DOLLAR_TOKEN, LET_DOLLAR_TOKEN,
+	SOME_DOLLAR_TOKEN, EVERY_DOLLAR_TOKEN, CASE_DOLLAR_TOKEN,
+	VALIDATE_LBRACE_TOKEN, ORDERED_LBRACE_TOKEN, UNORDERED_LBRACE_TOKEN,
+	ELEMENT_TOKEN, ATTRIBUTE_TOKEN, TEXT_TOKEN, COMMENT_TOKEN, PI_TOKEN,
+	DOCUMENT_TOKEN): New token representing keyword followed by specific
+	characters, so we can distinguish from a NameTest reliably.
+	(peekOperand): Rewrite to use switch statement.  Recognize tokens
+	such 'element' depending on following characters.
+	(parseSimpleKindType): Don't check for '(' - handled in peekOperand.
+	(parseElementType): Likewise.
+	(parseItemType, parseNodeTest, parseStepExpr): Update accordingly.
+	(parseMaybeKindTest): New method.
+	(parseExprSingle): Now matches specifications' grammar.
+	(parseOtherStepExpr): Inline into caller.
+	(matchConstructorKeyword): Remove no-longer-needed method.
+	(parseMaybePrimaryExpr): Changes to use switch and new tokenization.
+
+	* XQParser.java (makeNamespaceDecl): Handle empty (default) prefix.
+
+2006-03-01  Per Bothner  <per@bothner.com>
+
 	* XQParser.java (parse): Use new SetExp.makeDefinition factory method.
 
 	* XQParser.java (pushStandardNamespaces): Define 'xdt' prefix,

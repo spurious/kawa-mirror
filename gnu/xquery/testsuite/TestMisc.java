@@ -191,14 +191,14 @@ public class TestMisc
 	     + " return ('[', $n, ']')",
 	     "[<a at1=\"val1\"><b /><c /></a>][ at1=\"val1\"][<b />][<c />]");
 
-    // Boundary whitsapce (xmlspace) tests:
-    evalTest("declare xmlspace preserve;\n"
+    // Boundary whitsapce (boundary-space) tests:
+    evalTest("declare boundary-space preserve;\n"
 	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
 	     " ;<b/>;  x  ;");
-    evalTest("declare xmlspace skip;\n"
+    evalTest("declare boundary-space strip;\n"
 	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
 	     "<b/>; x ;");
-    evalTest("declare xmlspace skip;\n"
+    evalTest("declare boundary-space strip;\n"
 	     + "for $n in (<a> x <b/> y<c/>&#x20;</a>)/node() return ($n,';')",
 	     " x ;<b/>; y;<c/>; ;");
     evalTest("for $n in (<a> <b/> </a>)/node() return ($n,';')",
@@ -378,11 +378,11 @@ public class TestMisc
     evalNodeNames(some_elements+"($b, $a, $b, $d) except ()", "a;b;d;");
 
     // Check for catching errors:
-    evalTest("+ +", "*** syntax error - <string>:1:3: missing expression");
+    evalTest("+ +", "*** syntax error - <string>:1:3: missing expression [XPST0003]");
 
     evalTest("declare namespace x1='XXX",
 	     "*** caught SyntaxException - <string>:1:22: "
-	     + "unexpected end-of-file in string starting here");
+	     + "unexpected end-of-file in string starting here [XPST0003]");
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");

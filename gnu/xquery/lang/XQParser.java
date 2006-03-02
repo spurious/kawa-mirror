@@ -15,6 +15,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
+import kawa.standard.require;
 
 /** A class to read xquery forms. */
 
@@ -64,6 +65,8 @@ public class XQParser extends Lexer
   String baseURI = null;
 
   boolean preserveBoundarySpace;
+
+  boolean orderingModeUnordered;
 
   public Namespace[] functionNamespacePath
     = XQuery.defaultFunctionNamespacePath;
@@ -208,10 +211,11 @@ public class XQParser extends Lexer
   static final int EOF_TOKEN = -1;
   static final int EOL_TOKEN = '\n';
   static final char INTEGER_TOKEN = '0';
-  static final char FLOAT_TOKEN = '1';
+  static final char DECIMAL_TOKEN = '1';
+  static final char DOUBLE_TOKEN = '2';
   static final int STRING_TOKEN = '"';
   static final int SLASHSLASH_TOKEN = 'D';
-  static final int DOTDOT_TOKEN = '2';
+  static final int DOTDOT_TOKEN = '3';
   static final int COLON_EQUAL_TOKEN = 'L'; // ":="
   static final int COLON_COLON_TOKEN = 'X';
 
@@ -238,13 +242,14 @@ public class XQParser extends Lexer
   static final int IMPORT_SCHEMA_TOKEN = 'T'; // <"import" "schema">
   static final int MODULE_NAMESPACE_TOKEN = 'M'; // <"module" "namespace">
   static final int DECLARE_NAMESPACE_TOKEN = 'N'; // <"declare" "namespace">
-  static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
+  static final int DECLARE_BOUNDARY_SPACE_TOKEN = 'S'; // <"declare" "boundary-space">
   static final int DEFAULT_ELEMENT_TOKEN = 'E'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
   static final int DEFAULT_COLLATION_TOKEN = 'G';
   static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
   static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
   static final int DECLARE_BASE_URI_TOKEN = 'B'; // <"declare" "base-uri">
+  static final int DECLARE_ORDERING_TOKEN = 'U'; // <"declare" "ordering">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
 
   /* 'Q': QName (intern'ed name is curValue)
@@ -270,44 +275,69 @@ public class XQParser extends Lexer
   static final int AXIS_PRECEDING_SIBLING = 11;
   static final int AXIS_SELF = 12;
   // Token types for binary operators.
-  // When used as a token code, get the priority by shifting 2 right.
-  static final int OP_WHERE     = 196;
-  static final int OP_BASE      = 400;
-  static final int OP_OR        = OP_BASE;      // 'or'
-  static final int OP_AND       = OP_BASE + 1;  // 'and'
-  static final int OP_EQU       = OP_BASE + 2;  // '='
-  static final int OP_NEQ       = OP_BASE + 3;  // '!='
-  static final int OP_LSS       = OP_BASE + 4;  // '<'
-  static final int OP_GRT       = OP_BASE + 5;  // '>'
-  static final int OP_LEQ       = OP_BASE + 6;  // '<='
-  static final int OP_GEQ       = OP_BASE + 7;  // '>='
-  static final int OP_IS        = OP_BASE + 8;  // 'is'
-  static final int OP_ISNOT     = OP_BASE + 9;  // 'isnot'
-  static final int OP_GRTGRT    = OP_BASE + 10; // '>>'
-  static final int OP_LSSLSS    = OP_BASE + 11; // '<<'
+  static final int OP_WHERE      = 196;
+  static final int OP_BASE        = 400;
+  static final int OP_OR         = OP_BASE;      // 'or'
+  static final int OP_AND        = OP_BASE + 1;  // 'and'
+  static final int OP_EQU        = OP_BASE + 2;  // ' ='
+  static final int OP_NEQ        = OP_BASE + 3;  // '! ='
+  static final int OP_LSS        = OP_BASE + 4;  // '<'
+  static final int OP_GRT        = OP_BASE + 5;  // '>'
+  static final int OP_LEQ        = OP_BASE + 6;  // '< ='
+  static final int OP_GEQ        = OP_BASE + 7;  // '> ='
+  static final int OP_IS         = OP_BASE + 8;  // 'is'
+  static final int OP_ISNOT      = OP_BASE + 9;  // 'isnot'
+  static final int OP_GRTGRT     = OP_BASE + 10; // '>>'
+  static final int OP_LSSLSS     = OP_BASE + 11; // '<<'
 
-  static final int OP_RANGE_TO  = OP_BASE + 12;  // 'to'
+  static final int OP_RANGE_TO   = OP_BASE + 12;  // 'to'
 
-  static final int OP_ADD       = OP_BASE + 13;  // '+'
-  static final int OP_SUB       = OP_BASE + 14;  // '-'
+  static final int OP_ADD        = OP_BASE + 13;  // '+'
+  static final int OP_SUB        = OP_BASE + 14;  // '-'
 
-  static final int OP_MUL       = OP_BASE + 15;  // '*'
-  static final int OP_DIV       = OP_BASE + 16;  // 'div'
-  static final int OP_IDIV      = OP_BASE + 17;  // 'idiv'
-  static final int OP_MOD       = OP_BASE + 18;  // 'mod'
+  static final int OP_MUL        = OP_BASE + 15;  // '*'
+  static final int OP_DIV        = OP_BASE + 16;  // 'div'
+  static final int OP_IDIV       = OP_BASE + 17;  // 'idiv'
+  static final int OP_MOD        = OP_BASE + 18;  // 'mod'
 
-  static final int OP_UNION     = OP_BASE + 19;  // 'union'
+  static final int OP_UNION      = OP_BASE + 19;  // 'union'
 
-  static final int OP_INTERSECT = OP_BASE + 20;  // 'intersect'
-  static final int OP_EXCEPT    = OP_BASE + 21;  // 'except'
+  static final int OP_INTERSECT  = OP_BASE + 20;  // 'intersect'
+  static final int OP_EXCEPT     = OP_BASE + 21;  // 'except'
 
-  static final int OP_INSTANCEOF= OP_BASE + 22;  // 'instance' 'of'
+  static final int OP_INSTANCEOF = OP_BASE + 22;  // 'instance' 'of'
+  static final int OP_TREAT_AS   = OP_BASE + 23;  // 'treat' 'as'
+  static final int OP_CASTABLE_AS= OP_BASE + 24;  // 'castable' 'as'
+  static final int OP_CAST_AS    = OP_BASE + 25;  // 'cast' 'as'
 
   static final int OP_NODE = 231; // 'node' followed by '('
   static final int OP_TEXT = 232; // 'text' followed by '('
   static final int OP_COMMENT = 233; // 'comment' followed by '('
   static final int OP_PI = 234;   // 'processing-instruction' '('
   static final int OP_DOCUMENT = 235; // 'document-node' '('
+  static final int OP_ELEMENT = 236; // 'element' '('
+  static final int OP_ATTRIBUTE = 236; // 'element' '('
+  static final int OP_ITEM = 237; // 'item' '('
+  static final int OP_EMPTY_SEQUENCE = 238; // 'empty-sequence' '('
+  static final int OP_SCHEMA_ATTRIBUTE = 239; // 'schema-attribute' '('
+  static final int OP_SCHEMA_ELEMENT = 240; // 'schema-element' '('
+  static final int IF_LPAREN_TOKEN = 241; // 'if' '('
+  static final int TYPESWITCH_LPAREN_TOKEN = 242; // 'typeswitch' '('
+
+  static final int FOR_DOLLAR_TOKEN = 243; // 'for' '$'
+  static final int LET_DOLLAR_TOKEN = 244; // 'let' '$'
+  static final int SOME_DOLLAR_TOKEN = 245; // 'some' '$'
+  static final int EVERY_DOLLAR_TOKEN = 246; // 'every' '$'
+  static final int CASE_DOLLAR_TOKEN = 247; // 'case' '$'
+  static final int VALIDATE_LBRACE_TOKEN = 248; // 'validate' '{'
+  static final int ORDERED_LBRACE_TOKEN = 249; // 'ordered' '{'
+  static final int UNORDERED_LBRACE_TOKEN = 250; // 'unordered' '{'
+  static final int ELEMENT_TOKEN = 251; // 'element' followed by '{' or alpha
+  static final int ATTRIBUTE_TOKEN = 252;// 'attribute' followed by '{' or alpha
+  static final int TEXT_TOKEN = 253; // 'text' followed by '{'
+  static final int COMMENT_TOKEN = 254; // 'text' followed by '{'
+  static final int PI_TOKEN = 255; // 'processing-instruction' followed by '{' or alpha
+  static final int DOCUMENT_TOKEN = 256; // ;document' followed by '{'
   
   public static boolean isNameStart(char ch)
   {
@@ -432,27 +462,6 @@ public class XQParser extends Lexer
 	ch = checkNext('=') ? (char) OP_LEQ
 	  : checkNext('<') ? (char) OP_LSSLSS : (char) OP_LSS;
 	break;
-      case '.':
-	if (checkNext('.'))
-	  {
-	    ch = DOTDOT_TOKEN;
-	    break;
-	  }
-	next = peek();
-	if (Character.isDigit((char) next))
-	  {
-	    tokenBufferAppend('.');
-	    for (;;)
-	      {
-		tokenBufferAppend((char) next);
-		skip();
-		next = peek();
-		if (! Character.isDigit((char) next))
-		  break;
-	      }
-	    ch = FLOAT_TOKEN;
-	  }
-	break;
       case '\'':  case '\"':
 	char saveReadState = pushNesting ((char) next);
 	for (;;)
@@ -480,9 +489,10 @@ public class XQParser extends Lexer
 	ch = STRING_TOKEN;
 	break;
       default:
-	if (Character.isDigit(ch))
+	if (Character.isDigit(ch)
+            || (ch == '.' && Character.isDigit((char) peek())))
 	  {
-	    boolean seenDot = false;
+	    boolean seenDot = ch == '.';
 	    for (;; )
 	      {
 		tokenBufferAppend(ch);
@@ -523,16 +533,22 @@ public class XQParser extends Lexer
 		    expDigits++;
 		  }
 		if (expDigits == 0)
-		  error("no digits following exponent");
-		ch = FLOAT_TOKEN;
+		  error('e', "no digits following exponent", "XPST0003");
+		ch = DOUBLE_TOKEN;
 	      }
 	    else
 	      {
-		ch = seenDot ? FLOAT_TOKEN : INTEGER_TOKEN;
+		ch = seenDot ? DECIMAL_TOKEN : INTEGER_TOKEN;
 		if (next >= 0)
 		  unread(next);
 	      }
 	  }
+        else if (ch == '.')
+          {
+            if (checkNext('.'))
+              ch = DOTDOT_TOKEN;
+	    break;
+          }
 	else if (isNameStart(ch))
 	  {
 	    for (;;)
@@ -643,6 +659,30 @@ public class XQParser extends Lexer
     tokenBufferAppend(ch);
   }
 
+  boolean match (String word1, String word2, boolean force)
+      throws java.io.IOException, SyntaxException
+  {
+    if (match(word1))
+      {
+        mark();
+        getRawToken();
+        if (match(word2))
+          {
+            reset();
+            getRawToken();
+            return true;
+          }
+        reset();
+        if (force)
+          {
+            error('e', "'"+word1+"' must be followed by '"+word2+"'",
+                  "XPST0003");
+            return true;
+          }
+      }
+    return false;
+  }
+
   /** Return the current token, assuming it is in operator context.
    * Resolve NCNAME_TOKEN (identifier) to 'and', 'or', 'div', etc.
    */
@@ -713,6 +753,8 @@ public class XQParser extends Lexer
           case 4:
             if (match("idiv"))
               curToken = OP_IDIV;
+            else if (match("cast", "as", true))
+              curToken = OP_CAST_AS;
             break;
           case 5:
             if (match("where"))
@@ -721,14 +763,18 @@ public class XQParser extends Lexer
               curToken = OP_ISNOT;
             else if (match("union"))
               curToken = OP_UNION;
+            else if (match("treat", "as", true))
+              curToken = OP_TREAT_AS;
             break;
           case 6:
             if (match("except"))
               curToken = OP_EXCEPT;
             break;
           case 8:
-            if (match("instance"))
+            if (match("instance", "of", true))
               curToken = OP_INSTANCEOF;
+            else if (match("castable", "as", true))
+              curToken = OP_CASTABLE_AS;
             break;
           case 9:
             if (match("intersect"))
@@ -736,7 +782,11 @@ public class XQParser extends Lexer
             break;
           case 10:
             if (match("instanceof")) // obsolete
-              curToken = OP_INSTANCEOF;
+              {
+                if (warnOldVersion)
+		  error('w', "use 'instanceof of' (two words) instead of 'instanceof'");
+                curToken = OP_INSTANCEOF;
+              }
             break;
           default:
             break;
@@ -806,35 +856,128 @@ public class XQParser extends Lexer
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	int next = skipSpace(nesting != 0);
+        switch (tokenBuffer[0])
+          {
+          case 'a':
+            if (match("attribute"))
+              {
+                if (next == '(')
+                  return curToken = OP_ATTRIBUTE;
+                if (next == '{' || isNameStart((char) next))
+                  {
+                    unread();
+                    return curToken = ATTRIBUTE_TOKEN;
+                  }
+                break;
+              }
+            break;
+          case 'c':
+            if (match("comment"))
+              {
+                if (next == '(')
+                  return curToken = OP_COMMENT;
+                if (next == '{')
+                  {
+                    unread();
+                    return curToken = COMMENT_TOKEN;
+                  }
+              }
+            break;
+          case 'd':
+            if (next == '{' && match("document"))
+              {
+                unread();
+                return curToken = DOCUMENT_TOKEN;
+              }
+            if (next == '(' && match("document-node"))
+              return curToken = OP_DOCUMENT;
+            break;
+          case 'e':
+            if (match("element"))
+              {
+                if (next == '(')
+                  return curToken = OP_ELEMENT;
+                if (next == '{' || isNameStart((char) next))
+                  {
+                    unread();
+                    return curToken = ELEMENT_TOKEN;
+                  }
+                break;
+              }
+            if (match("empty-sequence"))
+              return curToken = OP_EMPTY_SEQUENCE;
+            if (next == '$' && match("every"))
+              return curToken = EVERY_DOLLAR_TOKEN;
+            break;
+          case 'f':
+            if (next == '$' && match("for"))
+              return curToken = FOR_DOLLAR_TOKEN;
+            break;
+          case 'i':
+            if (next == '(' && match("if"))
+              return curToken = IF_LPAREN_TOKEN;
+            if (next == '(' && match("item"))
+              return curToken = OP_ITEM;
+            break;
+          case 'l':
+            if (next == '$' && match("let"))
+              return curToken = LET_DOLLAR_TOKEN;
+            break;
+          case 'n':
+            if (next == '(' && match("node"))
+              return curToken = OP_NODE;
+            break;
+          case 'o':
+            if (next == '{' && match("ordered"))
+              return curToken = ORDERED_LBRACE_TOKEN;
+            break; 
+          case 'p':
+            if (match("processing-instructio"))
+              {
+                if (next == '(')
+                  return curToken = OP_PI;
+                if (next == '{' || isNameStart((char) next))
+                  {
+                    unread();
+                    return curToken = PI_TOKEN;
+                  }
+                break;
+              }
+            break;
+          case 's':
+            if (next == '$' && match("some"))
+              return curToken = SOME_DOLLAR_TOKEN;
+            if (next == '(' && match("schema-attribute"))
+              return curToken = OP_SCHEMA_ATTRIBUTE;
+            if (next == '(' && match("schema-element"))
+              return curToken = OP_SCHEMA_ELEMENT;
+            break;
+          case 't':
+            if (match("text"))
+              {
+                if (next == '(')
+                  return curToken = OP_TEXT;
+                if (next == '{')
+                  {
+                    unread();
+                    return curToken = TEXT_TOKEN;
+                  }
+              }
+            if (next == '(' && match("typeswitch"))
+              return curToken = TYPESWITCH_LPAREN_TOKEN;
+            break;
+          case 'u':
+            if (next == '{' && match("unordered"))
+              return curToken = UNORDERED_LBRACE_TOKEN;
+            break; 
+          case 'v':
+            if (next == '{' && match("validate"))
+              return curToken = VALIDATE_LBRACE_TOKEN;
+            break;
+          }
 	if (next == '(' && peek() != ':')
 	  {
-	    int token = FNAME_TOKEN;
-	    switch (tokenBuffer[0])
-	      {
-	      case 'c':
-		if (match("comment")) token = OP_COMMENT;
-		break;
-	      case 'd':
-		if (match("document-node")) token = OP_DOCUMENT;
-		break;
-	      case 'i':
-		if (match("if"))
-		  {
-		    unread();
-		    return curToken;
-		  }
-		break;
-	      case 'n':
-		if (match("node")) token = OP_NODE;
-		break;
-	      case 'p':
-		if (match("processing-instruction")) token = OP_PI;
-		break;
-	      case 't':
-		if (match("text")) token = OP_TEXT;
-		break;
-	      }
-	    return curToken = token;
+	    return curToken = FNAME_TOKEN;
 	  }
 	if (next == ':' && peek() == ':')
 	  return curToken = getAxis();
@@ -845,6 +988,8 @@ public class XQParser extends Lexer
           case 'b':
 	    if (lookingAt("declare", /*"b"+*/ "ase-uri"))
               return curToken = DECLARE_BASE_URI_TOKEN;
+	    if (lookingAt("declare", /*"b"+*/ "oundary-space"))
+              return curToken = DECLARE_BOUNDARY_SPACE_TOKEN;
             break;
 	  case 'd':
 	    if (lookingAt("declare", /*"d"+*/ "efault"))
@@ -904,6 +1049,14 @@ public class XQParser extends Lexer
 	    if (lookingAt("module", /*"n"+*/ "amespace"))
 	      return curToken = MODULE_NAMESPACE_TOKEN;
 	    break;
+	  case 'o':
+	    if (lookingAt("declare", /*"o"+*/ "rdering"))
+	      return curToken = DECLARE_ORDERING_TOKEN;
+	    break;
+	  case 's':
+	    if (lookingAt("import", /*"s"+*/ "chema"))
+	      return curToken = IMPORT_SCHEMA_TOKEN;
+	    break;
 	  case 'v':
 	    if (lookingAt("declare", /*"v"+*/ "ariable"))
 	      return curToken = DECLARE_VARIABLE_TOKEN;
@@ -917,7 +1070,12 @@ public class XQParser extends Lexer
 	    break;
 	  case 'x':
 	    if (lookingAt("declare", /*"x"+*/ "mlspace"))
-	      return curToken = DECLARE_XMLSPACE_TOKEN;
+              {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'define xmlspace' by 'declare boundary-space'");
+                return curToken = DECLARE_BOUNDARY_SPACE_TOKEN;
+              }
 	    break;
 	  }
 	if (next >= 0)
@@ -1013,6 +1171,12 @@ public class XQParser extends Lexer
         return 8;
       case OP_INSTANCEOF:
 	return 9;
+      case OP_TREAT_AS:
+        return 10;
+      case OP_CASTABLE_AS:
+        return 11;
+      case OP_CAST_AS:
+        return 12;
       default:
 	return 0;
       }
@@ -1113,57 +1277,37 @@ public class XQParser extends Lexer
     throws java.io.IOException, SyntaxException
   {
     getRawToken();
-    if (curToken == '(')
-      {
-	getRawToken();
-	if (curToken == ')')
-	  getRawToken();
-	else
-	  error("expected ')'");
-      }
+    if (curToken == ')')
+      getRawToken();
     else
-      warnOldStyleKindTest();
+      error("expected ')'");
   }
 
   public Type parseElementType ()
       throws java.io.IOException, SyntaxException
   {
     Symbol qname;
-    if (curToken == '(')
+    getRawToken();
+    if (curToken == ')')
       {
-	getRawToken();
-	if (curToken == ')')
-	  {
-	    qname = new Symbol(null);
-	    getRawToken();
-	  }
-	else
-	  {
-	    qname = parseQName(defaultElementNamespace);
-	    getRawToken();
-	    if (curToken == ',')
-	      {
-		getRawToken();
-		Symbol tname = parseQName(defaultElementNamespace);
-		getRawToken();
-	      }
-	    if (curToken == ')')
-	      getRawToken();
-	    else
-	      error("expected ')' after element");
-	  }
+        qname = new Symbol(null);
+        getRawToken();
       }
     else
       {
-	warnOldStyleKindTest();
-	if (curToken == QNAME_TOKEN || curToken == OP_MUL
-	    || curToken == NCNAME_TOKEN)
-	  {
-	    qname = parseQName(defaultElementNamespace);
-	    getRawToken();
-	  }
-	else
-	  qname = new Symbol(null);
+        qname = parseQName(defaultElementNamespace);
+
+        getRawToken();
+        if (curToken == ',')
+          {
+            getRawToken();
+            Symbol tname = parseQName(defaultElementNamespace);
+            getRawToken();
+          }
+        if (curToken == ')')
+          getRawToken();
+        else
+          error("expected ')' after element");
       }
     return new ElementType(qname);
   }
@@ -1230,55 +1374,62 @@ public class XQParser extends Lexer
     return new QuoteExp(type);
   }
 
+  public Type parseMaybeKindTest ()
+      throws java.io.IOException, SyntaxException
+  {
+    switch (curToken)
+      {
+      case OP_ELEMENT:
+        return parseElementType();
+
+      case OP_TEXT:
+        parseSimpleKindType();
+        return textNodeTest;
+
+      case OP_COMMENT:
+        parseSimpleKindType();
+        return commentNodeTest;
+
+      case OP_DOCUMENT:
+        parseSimpleKindType();
+        return documentNodeTest;
+
+      case OP_NODE:
+        parseSimpleKindType();
+        return anyNodeTest;
+
+      case OP_PI:
+        parseSimpleKindType();
+        // FIXME don't support processing-instruction(target)
+        return piNodeTest;
+
+      default:
+        return null;
+      }
+  }
+
   public Type parseItemType()
       throws java.io.IOException, SyntaxException
   {
+    peekOperand();
+    Type type = parseMaybeKindTest();
+    if (type != null)
+      return type;
+    if (curToken == OP_EMPTY_SEQUENCE)
+      {
+        parseSimpleKindType();
+        return Type.void_type;
+      }
+    if (curToken == OP_ITEM)
+      {
+        parseSimpleKindType();
+        return Type.pointer_type;
+      }
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
-	if (match("element"))
-	  {
-	    getRawToken();
-	    return parseElementType();
-	  }
-	if (match("text"))
-	  {
-	    parseSimpleKindType();
-	    return textNodeTest;
-	  }
-	if (match("comment"))
-	  {
-	    parseSimpleKindType();
-	    return commentNodeTest;
-	  }
-	if (match("document-node"))
-	  {
-	    parseSimpleKindType();
-	    return documentNodeTest;
-	  }
-	if (match("node"))
-	  {
-	    parseSimpleKindType();
-	    return anyNodeTest;
-	  }
-	if (match("empty"))
-	  {
-	    parseSimpleKindType();
-	    return Type.void_type;
-	  }
-	if (match("item"))
-	  {
-	    parseSimpleKindType();
-	    return Type.pointer_type;
-	  }
-	if (match("processing-instruction"))
-	  {
-	    parseSimpleKindType();
-	    // FIXME don't support processing-instruction(target)
-	    return piNodeTest;
-	  }
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
 	getRawToken();
-	Type type = interpreter.getTypeFor(tname); 
+	type = interpreter.getTypeFor(tname); 
 	if (type == null)
 	  type = ClassType.make(tname);
 	return type;
@@ -1314,7 +1465,31 @@ public class XQParser extends Lexer
   final Expression parseExprSingle ()
       throws java.io.IOException, SyntaxException
   {
-    return parseBinaryExpr(priority(OP_OR));
+    int startLine = curLine;
+    int startColumn = curColumn;
+    peekOperand();
+    switch (curToken)
+      {
+        // FIXME old code tweaked line/column
+        // as in:
+        // exp.setFile(getName());
+        // exp.setLine(startLine, startColumn - 3);
+
+      case IF_LPAREN_TOKEN:
+        return parseIfExpr();
+      case TYPESWITCH_LPAREN_TOKEN:
+        return parseTypeSwitch();
+      case FOR_DOLLAR_TOKEN:
+        return parseFLWRExpression(true);
+      case LET_DOLLAR_TOKEN:
+        return parseFLWRExpression(false);
+      case SOME_DOLLAR_TOKEN:
+        return parseQuantifiedExpr(false);
+      case EVERY_DOLLAR_TOKEN:
+        return parseQuantifiedExpr(true);
+      default:
+        return parseBinaryExpr(priority(OP_OR));
+      }
   }
 
   Expression parseBinaryExpr(int prio)
@@ -1332,28 +1507,43 @@ public class XQParser extends Lexer
 	if (tokPriority < prio)
 	  return exp;
 	char saveReadState = pushNesting('%');
-	boolean sawInstanceof = false;
-	if (token == OP_INSTANCEOF)
-	  {
-	    curToken = NCNAME_TOKEN;
-	    sawInstanceof = match("instanceof");
-	  }
 	getRawToken();
 	popNesting(saveReadState);
-	if (token == OP_INSTANCEOF)
+        if (token >= OP_INSTANCEOF && token <= OP_CAST_AS)
+          {
+            Expression type = parseDataType();
+            Expression[] args = new Expression[2];
+            Expression func;
+            switch (token)
+              {
+              case OP_INSTANCEOF:
+                args[0] = exp;
+                args[1] = type;
+                func = makeFunctionExp("gnu.xquery.lang.XQParser",
+                                       "instanceOf");
+                break;
+              case OP_CASTABLE_AS:
+                args[0] = exp;
+                args[1] = type;
+                func = makeFunctionExp("gnu.xquery.lang.XQParser",
+                                       "castableAs");
+                break;
+              case OP_TREAT_AS:
+                args[0] = type;
+                args[1] = exp;
+                func = makeFunctionExp("gnu.xquery.lang.XQParser",
+                                       "treatAs");
+                break;
+              default: // i.e. case OP_CAST_AS:
+                args[0] = type;
+                args[1] = exp;
+                func = makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
+                break;
+              }
+            exp = new ApplyExp(func, args);
+          }
+	else if (token == OP_INSTANCEOF)
 	  {
-	    if (sawInstanceof)
-	      {
-		if (warnOldVersion)
-		  error('w', "use 'instanceof of' (two words) instead of 'instanceof'");
-	      }
-	    else
-	      {
-		if (match("of"))
-		  getRawToken();
-		else
-		  error('e', "expected 'instance' to be followed by 'of'");
-	      }
 	    Expression[] args = { exp, parseDataType() };
 	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.lang.XQParser",
 					       "instanceOf"),
@@ -1427,11 +1617,18 @@ public class XQParser extends Lexer
       {
 	Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
 	if (dotDecl == null)
-	  error("node test when focus is undefined");
+	  error("node test1 when focus is undefined");
 	Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
 	step1 = new ApplyExp(ClassType.make("gnu.kawa.xml.Nodes")
 			     .getDeclaredMethod("root", 1),
 			     new Expression[] { dot } );
+	int next = skipSpace(nesting != 0);
+        unread(next);
+        if (next < 0 || next == ')' || next == '}')
+          {
+	    getRawToken();
+            return step1;
+          }
       }
     else
       step1 = parseStepExpr();
@@ -1531,33 +1728,15 @@ public class XQParser extends Lexer
   Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
-    Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
-    if (dotDecl == null)
-      error(undefTestErr);
     int token = peekOperand();
-
-    if (curToken == '@' && axis < 0)
-      {
-	getRawToken();
-	axis = AXIS_ATTRIBUTE;
-      }
-    
     Expression exp;
     Expression[] args = new Expression[1];
-    if (curToken == OP_NODE || curToken == OP_TEXT)
+
+    Type type = parseMaybeKindTest();
+
+    if (type != null)
       {	
-	NodePredicate predicate;
-	if (curToken == OP_NODE)
-	  {
-	    predicate = anyNodeTest;
-	  }
-	else // if (curToken == OP_TEXT)
-	  {
-	    predicate = textNodeTest;
-	  }
-	if (getRawToken() != ')')
-	  return syntaxError("missing '()' after node test");
-	args[0] = new QuoteExp(predicate);
+	args[0] = new QuoteExp(type);
       }
     else if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
 	     || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
@@ -1570,6 +1749,7 @@ public class XQParser extends Lexer
 				    parseNameTest(axis == AXIS_ATTRIBUTE));
 	elt.setFlag(ApplyExp.INLINE_IF_CONSTANT);
 	args[0] = elt;
+        getRawToken();
       }
     else if (axis >= 0)
       return syntaxError("unsupported axis '"+axisNames[axis]+"::'");
@@ -1596,9 +1776,11 @@ public class XQParser extends Lexer
     ApplyExp mkAxis = new ApplyExp(axisClass.getDeclaredMethod("make", 1),
 				   args);
     mkAxis.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+    Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+    if (dotDecl == null)
+      error(undefTestErr);
     Expression[] dotArg = { new ReferenceExp(DOT_VARNAME, dotDecl) };
     exp = new ApplyExp(mkAxis, dotArg);
-    getRawToken();
     if (dotDecl == null)
       return new ErrorExp(undefTestErr);
     return exp;
@@ -1693,16 +1875,37 @@ public class XQParser extends Lexer
 	    Expression[] args = { exp };
 	    exp = new ApplyExp(ParentAxis.make(anyNodeTest), args);
 	  }
-	return parseStepQualifiers(exp, axis);
+        // Note that '..' is an AbbrevReverseStep,
+        // but '.' is a FilterExpr - and hence not a valid ForwardStep.
+	return parseStepQualifiers(exp, axis == AXIS_SELF ? -1 : axis);
       }
     axis = peekOperand() - OP_AXIS_FIRST;
-    if (axis  >= 0 && axis < COUNT_OP_AXIS)
+    Expression unqualifiedStep;
+    if (axis >= 0 && axis < COUNT_OP_AXIS)
       {
 	getRawToken();
-	return parseStepQualifiers(parseNodeTest(axis), axis);
+	unqualifiedStep = parseNodeTest(axis);
+      }
+    else if (curToken == '@')
+      {
+	getRawToken();
+	axis = AXIS_ATTRIBUTE;
+	unqualifiedStep = parseNodeTest(axis);
       }
     else
-      return parseOtherStepExpr();
+      {
+	unqualifiedStep = parseNodeTest(-1);
+        if (unqualifiedStep != null)
+          {
+            axis = AXIS_CHILD;
+          }
+        else
+          {
+            axis = -1;
+            unqualifiedStep = parsePrimaryExpr();
+          }
+      }
+    return parseStepQualifiers(unqualifiedStep, axis);
   }
 
   Expression parseStepQualifiers(Expression exp, int axis)
@@ -1766,16 +1969,6 @@ public class XQParser extends Lexer
 	    return exp;
 	  }
       }
-  }
-
-  /* Parse an OtherStepExpr.
-   */
-  Expression parseOtherStepExpr()
-      throws java.io.IOException, SyntaxException
-  {
-    Expression e = parsePrimaryExpr();
-    e = parseStepQualifiers(e, -1);
-    return e;
   }
 
   /**
@@ -2041,7 +2234,7 @@ public class XQParser extends Lexer
 
   Declaration makeNamespaceDecl (String prefix, String uri)
   {
-    String sym = prefix.intern();
+    String sym = prefix == null ? XQuery.DEFAULT_ELEMENT_PREFIX : prefix.intern();
     Declaration decl = new Declaration(sym);
     decl.setType(gnu.bytecode.Type.tostring_type);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
@@ -2271,6 +2464,10 @@ public class XQParser extends Lexer
     return result;
   }
 
+  /** Parse ParenthesizedExpr.
+   *.When called, curToken should be pointing at a '(',
+   * or a token which ends if a '(', such as IF_LPAREN_TOKEN.
+   */
   Expression parseParenExpr ()
       throws java.io.IOException, SyntaxException
   {
@@ -2291,7 +2488,8 @@ public class XQParser extends Lexer
     Expression exp = null;
     for (;;)
       {
-	Expression exp1 = parseExpr();
+	Expression exp1 = parseExprSingle();
+
 	exp = exp == null ? exp1 : makeExprSequence(exp, exp1);
 	if (curToken == rightToken || curToken == EOF_TOKEN)
 	  break;
@@ -2385,46 +2583,6 @@ public class XQParser extends Lexer
 			args);
   }
 
-  char matchConstructorKeyword (int next)
-      throws java.io.IOException, SyntaxException
-  {
-    char kind;
-    if (curToken == NCNAME_TOKEN)
-      {
-	if (match("element"))
-	  kind = 'e';
-	else if (match("attribute"))
-	  kind = 'a';
-	else if (match("document") && next == '{')
-	  kind = 'd';
-	else if (match("text") && next == '{')
-	  kind = 't';
-	else if (match("comment") && next == '{')
-	  kind = 'c';
-	/*
-	else if (match("processing-instruction") && next == '{')
-	  kind = 'p';
-	*/
-	else
-	  return '\0';
-	if (next != '{' && (kind == 'e' || kind == 'a'))
-	  {
-	    if (! isNameStart((char) next))
-	      return '\0';
-	    unread(); // unread 'next' in case it is a single character.
-	    mark();
-	    getRawToken(); // Skip 'element' or 'attribute'.
-	    getRawToken(); // Skip NAME.
-	    if (curToken != '{')
-	      kind = '\0';
-	    reset();
-	    read(); // re-read 'next' since caller expects it.
-	  }
-	return kind;
-      }
-    return '\0';
-  }
-
   /**
    * Try to parse a PrimaryExpr.
    * @return an Expression, or null if no PrimaryExpr was seen.
@@ -2437,7 +2595,6 @@ public class XQParser extends Lexer
     int token = peekOperand();
     Expression exp;
     int c1, c2, c3;
-    char kind;
     if (token == '(')
       {
         exp = parseParenExpr();
@@ -2483,12 +2640,17 @@ public class XQParser extends Lexer
 					     10, false);
 	exp = new QuoteExp(val);
       }
-    else if (token == FLOAT_TOKEN)
+    else if (token == DECIMAL_TOKEN || token == DOUBLE_TOKEN)
       {
         String str = new String(tokenBuffer, 0, tokenBufferLength);
         try
           {
-            exp = new QuoteExp(new gnu.math.DFloNum(str));
+            Object val;
+            if (token == DECIMAL_TOKEN)
+              val = new java.math.BigDecimal(str);
+            else
+              val = new java.lang.Double(str);
+            exp = new QuoteExp(val);
           }
         catch (Throwable ex)
           {
@@ -2536,8 +2698,6 @@ public class XQParser extends Lexer
 	else
 	*/
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
-	if (name.equals("typeswitch"))
-	  return parseTypeSwitch();
 	char save = pushNesting('(');
 	getRawToken();
 	Vector vec = new Vector(10);
@@ -2565,107 +2725,69 @@ public class XQParser extends Lexer
 	exp.setLine(startLine, startColumn);
 	popNesting(save);
       }
-    else if (token == NCNAME_TOKEN || token == QNAME_TOKEN)
+    else if (token == ELEMENT_TOKEN || token == ATTRIBUTE_TOKEN
+             || token == COMMENT_TOKEN || token == DOCUMENT_TOKEN
+             || token == TEXT_TOKEN || token == PI_TOKEN)
       {
-	int next = skipSpace(nesting != 0);
-	if (next == '$')
-	  {
-	    // A FLWR-expression isn't technically a PrimaryExpr.
-	    // Does it matter?  FIXME.
-	    if (match("let"))
-	      exp = parseFLWRExpression(false);
-	    else if (match("for"))
-	      exp = parseFLWRExpression(true);
-	    else if (match("some"))
-	      exp = parseQuantifiedExpr(false);
-	    else if (match("every"))
-	      exp = parseQuantifiedExpr(true);
-	    else
-	      return syntaxError("invalid syntax - variable following name");
-	    exp.setFile(getName());
-	    exp.setLine(startLine, startColumn - 3);
-	    return exp;
-	  }
-	else if ((kind = matchConstructorKeyword(next)) != '\0')
-	  {
-	    if (next >= 0)
-	      unread();
-	    getRawToken();  // Skip 'element'.
-	    Vector vec = new Vector();
-	    Expression func;
-	    if (kind == 'e' || kind == 'a')
-	      {
-		// FIXME - rethink this after next spec revision, which
-		// will hopefully clarify namespace management here.
-		Expression element
-		  = parseNameSpec(defaultElementNamespace, kind == 'a');
-		if (element == null)
-		  return syntaxError("missing element/attribute name");
-		vec.addElement(castQName(element));
-		if (kind == 'e')
-		  {
-		    MakeElement mk = new MakeElement();
-		    if (namespaceBindings != NamespaceBinding.predefinedXML)
-		      mk.setNamespaceNodes(namespaceBindings);
-		    func = new QuoteExp(mk);
-		  }
-		else
-		  func = MakeAttribute.makeAttributeExp;
-		getRawToken();
-	      }
-	    else if (kind == 'd')
-	      func = makeFunctionExp("gnu.kawa.xml.DocumentConstructor",
-				     "documentConstructor");
-	    else if (kind == 'c')
-	      func = makeFunctionExp("gnu.kawa.xml.CommentConstructor",
-				     "commentConstructor");
-	    else /* kind == 't' */
-	      func = makeFunctionExp("gnu.kawa.xml.MakeText",
-				     "makeText");
-	    char saveReadState = pushNesting('{');
-	    peekNonSpace("unexpected end-of-file after '{'");
-	    if (curToken != '{')
-	      return syntaxError("missing '{'");
-	    getRawToken();
-            if (kind == 't' || kind == 'c')
-              vec.addElement(parseExprSequence('}'));
-	    else if (curToken != '}')
-	      {
-		vec.addElement(parseExpr());
-		while (curToken == ',')
-		  {
-		    getRawToken();
-		    vec.addElement(parseExpr());
-		  }
-	      }
-	    popNesting(saveReadState);
-	    if (curToken != '}')
-	      return syntaxError("missing '}'");
-	    Expression[] args = new Expression[vec.size()];
-	    vec.copyInto(args);
-	    exp = new ApplyExp(func, args);
-	    exp.setFile(getName());
-	    exp.setLine(startLine, startColumn);
-	    getRawToken();
-	    return exp;
-	  }
-	else if (next == '(' && tokenBufferLength == 2
-		 && tokenBuffer[0] == 'i'
-		 && tokenBuffer[1] == 'f')
-	  {
-	    return parseIfExpr();
-	  }
-	else
-	  {
-	    if (next >= 0)
-	      unread();
-	    return parseNodeTest(-1);
-	  }
-      }
-    else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@'
-	     || token == OP_NODE || token == OP_TEXT)
-      {
-	return parseNodeTest(-1);
+        getRawToken();  // Skip 'element'.
+        Vector vec = new Vector();
+        Expression func;
+
+        if (token == ELEMENT_TOKEN || token == ATTRIBUTE_TOKEN)
+          {
+            // FIXME - rethink this after next spec revision, which
+            // will hopefully clarify namespace management here.
+            Expression element
+              = parseNameSpec(defaultElementNamespace, token != ELEMENT_TOKEN);
+            if (element == null)
+              return syntaxError("missing element/attribute name");
+            vec.addElement(castQName(element));
+            if (token == ELEMENT_TOKEN)
+              {
+                MakeElement mk = new MakeElement();
+                if (namespaceBindings != NamespaceBinding.predefinedXML)
+                  mk.setNamespaceNodes(namespaceBindings);
+                func = new QuoteExp(mk);
+              }
+            else
+              func = MakeAttribute.makeAttributeExp;
+            getRawToken();
+          }
+        else if (token == DOCUMENT_TOKEN)
+          func = makeFunctionExp("gnu.kawa.xml.DocumentConstructor",
+                                 "documentConstructor");
+        else if (token == COMMENT_TOKEN)
+          func = makeFunctionExp("gnu.kawa.xml.CommentConstructor",
+                                 "commentConstructor");
+        else /* token == TEXT_TOKEN */
+          func = makeFunctionExp("gnu.kawa.xml.MakeText",
+                                 "makeText");
+        char saveReadState = pushNesting('{');
+        peekNonSpace("unexpected end-of-file after '{'");
+        if (curToken != '{')
+          return syntaxError("missing '{'");
+        getRawToken();
+        if (token == TEXT_TOKEN || token == COMMENT_TOKEN)
+          vec.addElement(parseExprSequence('}'));
+        else if (curToken != '}')
+          {
+            vec.addElement(parseExpr());
+            while (curToken == ',')
+              {
+                getRawToken();
+                vec.addElement(parseExpr());
+              }
+          }
+        popNesting(saveReadState);
+        if (curToken != '}')
+          return syntaxError("missing '}'");
+        Expression[] args = new Expression[vec.size()];
+        vec.copyInto(args);
+        exp = new ApplyExp(func, args);
+        exp.setFile(getName());
+        exp.setLine(startLine, startColumn);
+        getRawToken();
+        return exp;
       }
     else
       return null;
@@ -3199,11 +3321,25 @@ public class XQParser extends Lexer
     if (getRawToken() == EOF_TOKEN)
       return null;
     peekOperand();
-    if (curToken == DEFINE_QNAME_TOKEN)
+
+    if (curToken == NCNAME_TOKEN
+	&& "namespace".equals((String) curValue))
       {
-	int declLine = getLineNumber() + 1;
-	int declColumn = getColumnNumber() + 1;
-	int next = peekNonSpace("unexpected end-of-file after 'define QName'");
+	if (warnOldVersion)
+	  error('w', "use 'declare namespace' instead of 'namespace'");
+	curToken = DECLARE_NAMESPACE_TOKEN;
+      }
+
+    int declLine, declColumn, next;
+    Declaration decl;
+    String prefix, uri;
+    Object val;
+    switch (curToken)
+      {
+      case DEFINE_QNAME_TOKEN:
+	declLine = getLineNumber() + 1;
+	declColumn = getColumnNumber() + 1;
+	next = peekNonSpace("unexpected end-of-file after 'define QName'");
 	if (next == '(')
 	  {
 	    syntaxError("'missing 'function' after 'define'");
@@ -3212,11 +3348,10 @@ public class XQParser extends Lexer
 	  }
 	else
 	  return syntaxError("missing keyword after 'define'");
-      }
-    if (curToken == DECLARE_FUNCTION_TOKEN)
-      {
-	int declLine = getLineNumber() + 1;
-	int declColumn = getColumnNumber() + 1;
+
+      case DECLARE_FUNCTION_TOKEN:
+	declLine = getLineNumber() + 1;
+	declColumn = getColumnNumber() + 1;
 	getRawToken();
 	peekNonSpace("unexpected end-of-file after 'define function'");
 	char save = pushNesting('d');
@@ -3226,11 +3361,10 @@ public class XQParser extends Lexer
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	return exp;
-      }
-    if (curToken == DECLARE_VARIABLE_TOKEN)
-      {
+
+      case DECLARE_VARIABLE_TOKEN:
 	getRawToken();
-	Declaration decl = parseVariableDeclaration();
+	decl = parseVariableDeclaration();
 	if (decl == null)
 	  return syntaxError("missing Variable");
 	comp.currentScope().addDeclaration(decl);
@@ -3280,23 +3414,13 @@ public class XQParser extends Lexer
 	    if (init == null)
 	      init = err;
 	  }
-	SetExp sexp = new SetExp(decl, init);
-	sexp.setDefining(true);
-	decl.noteValue(init);
-	return sexp;
-      }
-    if (curToken == NCNAME_TOKEN
-	&& "namespace".equals((String) curValue))
-      {
-	if (warnOldVersion)
-	  error('w', "use 'declare namespace' instead of 'namespace'");
-	curToken = DECLARE_NAMESPACE_TOKEN;
-      }
-    if (curToken == DECLARE_NAMESPACE_TOKEN
-	|| curToken == MODULE_NAMESPACE_TOKEN)
-      {
+        decl.noteValue(init);
+	return SetExp.makeDefinition(decl, init);
+
+      case DECLARE_NAMESPACE_TOKEN:
+      case MODULE_NAMESPACE_TOKEN:
 	int command = curToken;
-	int next = skipSpace(nesting != 0);
+	next = skipSpace(nesting != 0);
 	if (next >= 0)
 	  {
 	    unread();
@@ -3305,15 +3429,15 @@ public class XQParser extends Lexer
 		getRawToken();
 		if (curToken != NCNAME_TOKEN)
 		  return syntaxError("missing namespace prefix");
-		String prefix = new String(tokenBuffer, 0, tokenBufferLength);
+		prefix = new String(tokenBuffer, 0, tokenBufferLength);
 		getRawToken();
 		if (curToken != OP_EQU)
 		  return syntaxError("missing '=' in namespace declaration");
 		getRawToken();
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri in namespace declaration");
-		String uri = new String(tokenBuffer, 0, tokenBufferLength);
-		Declaration decl = pushNamespace(prefix, uri);
+		uri = new String(tokenBuffer, 0, tokenBufferLength);
+		decl = pushNamespace(prefix, uri);
 		comp.mainLambda.addDeclaration(decl);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
@@ -3326,15 +3450,13 @@ public class XQParser extends Lexer
                 return SetExp.makeDefinition(decl, decl.getValue());
 	      }
 	  }
-      }
 
-    if (curToken == IMPORT_SCHEMA_TOKEN)
-      return syntaxError("'import schema' not implemented");
+      case IMPORT_SCHEMA_TOKEN:
+        fatal("'import schema' not implemented", "XQST0009");
 
-    if (curToken == IMPORT_MODULE_TOKEN)
-      {
+      case IMPORT_MODULE_TOKEN:
 	getRawToken();
-	String prefix = null;
+	prefix = null;
 	if (match("namespace"))
 	  {
 	    getRawToken();
@@ -3348,7 +3470,7 @@ public class XQParser extends Lexer
 	  }
 	if (curToken != STRING_TOKEN)
 	  return syntaxError("missing uri in namespace declaration");
-	String uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
+	uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (prefix != null)
 	  comp.mainLambda.addDeclaration(pushNamespace(prefix, uri));
 	getRawToken();
@@ -3364,15 +3486,14 @@ public class XQParser extends Lexer
 	  parseSeparator();
  	ModuleExp module = comp.getModule();
 	Vector forms = new Vector();
-	ClassType type = ClassType.make(Compilation.mangleURI(uri));
-	kawa.standard.require.importDefinitions(type, uri, forms, module, comp);
+	require.importDefinitions(ClassType.make(Compilation.mangleURI(uri)),
+                                  uri, forms, module, comp);
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);
 	return BeginExp.canonicalize(inits);
-      }
-    if (curToken == DEFAULT_COLLATION_TOKEN)
-      {
-        Object val = parseURILiteral();
+
+      case DEFAULT_COLLATION_TOKEN:
+        val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;
 	String collation = (String) val;
@@ -3389,10 +3510,9 @@ public class XQParser extends Lexer
           return declError("duplicate default collation declaration");
 	parseSeparator();
 	return QuoteExp.voidExp;
-      }
-    if (curToken == DEFAULT_ELEMENT_TOKEN
-	|| curToken == DEFAULT_FUNCTION_TOKEN)
-      {
+
+      case DEFAULT_ELEMENT_TOKEN:
+      case DEFAULT_FUNCTION_TOKEN:
 	boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
 	getRawToken();
 	if (match("namespace"))
@@ -3413,8 +3533,7 @@ public class XQParser extends Lexer
 	  }
 	if (curToken != STRING_TOKEN)
 	  return declError("missing namespace uri");
-	String uri = new String(tokenBuffer, 0, tokenBufferLength);
-	String prefix;
+	uri = new String(tokenBuffer, 0, tokenBufferLength);
 	if (forFunctions)
 	  {
 	    prefix = XQuery.DEFAULT_FUNCTION_PREFIX;
@@ -3426,34 +3545,47 @@ public class XQParser extends Lexer
 	    prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
 	    defaultElementNamespace = uri;
 	  }
-	Declaration decl = pushNamespace(prefix, uri);
+	decl = pushNamespace(prefix, uri);
 	comp.mainLambda.addDeclaration(decl);
-	SetExp sexp = new SetExp(decl, decl.getValue());
-	sexp.setDefining (true);
 	parseSeparator();
-	return sexp;
-      }
-    if (curToken == DECLARE_XMLSPACE_TOKEN)
-      {
+	return SetExp.makeDefinition(decl, decl.getValue());
+
+      case DECLARE_BOUNDARY_SPACE_TOKEN:
 	getRawToken();
 	if (curToken == OP_EQU)
 	  {
 	    if (warnOldVersion)
-	      error('w', "obsolate '=' in xmlspace declaration");
+	      error('w', "obsolate '=' in boundary-space declaration");
 	    getRawToken();
 	  }
 	if (match("preserve"))
 	  preserveBoundarySpace = true;
-	else if (match("skip"))
+	else if (match("strip"))
 	  preserveBoundarySpace = false;
+	else if (match("skip"))
+          {
+	    if (warnOldVersion)
+	      error('w', "update: declare boundary-space skip -> strip");
+            preserveBoundarySpace = false;
+          }
 	else
-	  return syntaxError("xmlspace declaration must be preserve or strip");
+	  return syntaxError("boundary-space declaration must be preserve or strip");
 	parseSeparator();
 	return QuoteExp.voidExp;
-      }
-    if (curToken == DECLARE_BASE_URI_TOKEN)
-      {
-        Object val = parseURILiteral();
+
+      case DECLARE_ORDERING_TOKEN:
+	getRawToken();
+	if (match("ordered"))
+          orderingModeUnordered = false;
+	else if (match("unordered"))
+          orderingModeUnordered = true;
+	else
+	  return syntaxError("ordering declaration must be ordered or unordered");
+	parseSeparator();
+	return QuoteExp.voidExp;
+
+      case DECLARE_BASE_URI_TOKEN:
+        val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;
 	parseSeparator();
@@ -3507,7 +3639,7 @@ public class XQParser extends Lexer
 	gnu.bytecode.Field procField = type.getDeclaredField(fieldName);
 	Declaration decl = new Declaration(name, procField);
 	decl.noteValue(new QuoteExp(proc));
-	decl.setFlag(Declaration.IS_CONSTANT);
+	decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
 	return new ReferenceExp(name, decl);
       }
     catch (Exception ex)
@@ -3551,19 +3683,34 @@ public class XQParser extends Lexer
 	  }
 	sbuf.append('"');
 	return sbuf.toString();
+      case FNAME_TOKEN:
+	return new String(tokenBuffer, 0, tokenBufferLength) + " + '('";
       case NCNAME_TOKEN:
       case QNAME_TOKEN:
 	return new String(tokenBuffer, 0, tokenBufferLength);
       case EOF_TOKEN:
 	return "<EOF>";
       default:
+        if (curToken >= OP_AXIS_FIRST
+            && curToken - OP_AXIS_FIRST < COUNT_OP_AXIS)
+          return axisNames[curToken - OP_AXIS_FIRST]+"::-axis("+curToken+")";
 	return Integer.toString(curToken);
       }
   }
 
+  public void error(char severity, String message, String code)
+  {
+    SourceMessages messages = getMessages();
+    SourceError err
+      = new SourceError(severity, port.getName(), curLine, curColumn, message);
+    err.code = code;
+    messages.error(err);
+    //error(severity, port.getName(), curLine, curColumn, message);
+  }
+
   public void error(char severity, String message)
   {
-    error(severity, port.getName(), curLine, curColumn, message);
+    error(severity, message, null);
   }
 
   public Expression declError (String message)
@@ -3589,7 +3736,14 @@ public class XQParser extends Lexer
   public Expression syntaxError (String message)
     throws java.io.IOException, SyntaxException
   {
-    error(message);
+    error('e', message, "XPST0003");
+    /*
+    SourceMessages messages = getMessages();
+    SourceError err
+      = new SourceError('e', port.getName(), curLine, curColumn, message);
+    err.code = "XPST0003";
+    messages.error(err);
+    */
     if (interactive)
       {
 	curToken = 0;
@@ -3611,4 +3765,20 @@ public class XQParser extends Lexer
       }
     return new ErrorExp (message);
   }
+
+  public void eofError(String msg) throws SyntaxException
+  {
+    fatal(msg, "XPST0003");
+  }
+
+  public void fatal(String msg, String code) throws SyntaxException
+  {
+    SourceMessages messages = getMessages();
+    SourceError err
+      = new SourceError('f', port.getName(), curLine, curColumn, msg);
+    err.code = code;
+    messages.error(err);
+    throw new SyntaxException(messages);
+  }
+
 }

@@ -1,3 +1,8 @@
+2006-03-01  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Update for various parser fixes.
+	* expected-1.errs: Likewise.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Two minor cleanups to fix warnings from some compilers.

@@ -29,12 +29,21 @@ public class SortNodes extends Procedure1 implements Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
-    if (args.length != 1)
+    if (args.length != 1 || ! comp.mustCompile)
       ApplyExp.compile(exp, comp, target);
     else
-      ConsumerTarget.compileUsingConsumer(args[0], comp, target,
-					  makeSortedNodesMethod,
-					  canonicalizeMethod);
+      {
+        Method resultMethod;
+        if (target instanceof ConsumerTarget
+            || (target instanceof StackTarget
+                && target.getType().isSubtype(Compilation.typeValues)))
+          resultMethod = null;
+        else
+          resultMethod = canonicalizeMethod;
+        ConsumerTarget.compileUsingConsumer(args[0], comp, target,
+                                            makeSortedNodesMethod,
+                                            resultMethod);
+      }
   }
 
   public Type getReturnType (Expression[] args)

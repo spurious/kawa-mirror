@@ -24,7 +24,7 @@ public class XslTranslator extends Lexer implements Consumer
   ModuleExp mexp;
   Compilation comp;
 
-  /** We seen a beginAttribute but the closing endAttribute. */
+  /** We seen a beginAttribute but not the closing endAttribute. */
   boolean inAttribute;
   /** The 'attribute name' from the most recent beginAttribute. */
   String attributeName;

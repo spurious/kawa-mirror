@@ -14,7 +14,7 @@ import gnu.kawa.functions.ValuesMap;
 public class ValuesFilter extends MethodProc implements CanInline
 {
   /** 'F' if following a ForwardStep; 'R' if following a ReverseStep;
-   * 'R' if following a PrimaryExpr. */
+   * 'P' if following a PrimaryExpr. */
   char kind;
 
   public ValuesFilter (char kind)

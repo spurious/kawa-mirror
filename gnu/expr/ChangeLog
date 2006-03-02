@@ -1,3 +1,8 @@
+2006-03-01  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (<init>): Move constructors next to each other.
+	* SetExp.java (makeDefinition): New convenience factory method.
+
 2006-02-19  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileToArchive): Do't set module name to

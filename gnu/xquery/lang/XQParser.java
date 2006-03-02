@@ -3323,9 +3323,7 @@ public class XQParser extends Lexer
                     comp.mainClass = new ClassType(Compilation.mangleURI(uri));
                     module.setType(comp.mainClass);
                   }
-		SetExp sexp = new SetExp(decl, decl.getValue());
-		sexp.setDefining (true);
-		return sexp;
+                return SetExp.makeDefinition(decl, decl.getValue());
 	      }
 	  }
       }

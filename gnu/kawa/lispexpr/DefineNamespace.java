@@ -59,10 +59,8 @@ public class DefineNamespace extends Syntax
        }
     else
       value = tr.rewrite_car (p2, false);
-    SetExp sexp = new SetExp(decl, value);
-    sexp.setDefining (true);
     decl.noteValue(value);
-    forms.addElement (sexp);
+    forms.addElement(SetExp.makeDefinition(decl, value));
     if (makeXML)
       {
         if (literal == null)
@@ -74,10 +72,8 @@ public class DefineNamespace extends Syntax
             decl = defs.getDefine(sym, 'w', tr);
             tr.push(decl);
             decl.setFlag(Declaration.IS_CONSTANT);
-            sexp = new SetExp(decl, value);
-            sexp.setDefining (true);
             decl.noteValue(value);
-            forms.addElement(sexp);
+            forms.addElement(SetExp.makeDefinition(decl, value));
           }
       }
     return true;

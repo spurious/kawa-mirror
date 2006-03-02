@@ -1,5 +1,7 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parse): Use new SetExp.makeDefinition factory method.
+
 	* XQParser.java (pushStandardNamespaces): Define 'xdt' prefix,
 	but as a synonym for 'xs'.
 

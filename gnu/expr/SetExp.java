@@ -18,6 +18,27 @@ public class SetExp extends AccessExp
   public SetExp (Object symbol, Expression val)
   { this.symbol = symbol;  new_value = val; }
 
+  public SetExp (Declaration decl, Expression val)
+  {
+    this.binding = decl;
+    symbol = decl.getSymbol();
+    new_value = val;
+  }
+
+  public static SetExp makeDefinition (Object symbol, Expression val)
+  {
+    SetExp sexp = new SetExp(symbol, val);
+    sexp.setDefining(true);
+    return sexp;
+  }
+
+  public static SetExp makeDefinition (Declaration decl, Expression val)
+  {
+    SetExp sexp = new SetExp(decl, val);
+    sexp.setDefining(true);
+    return sexp;
+  }
+
   /** Get the Expression for calculating the new ("right-hand") value. */
   public final Expression getNewValue() { return new_value; }
 
@@ -57,13 +78,6 @@ public class SetExp extends AccessExp
 
   public final void setSetIfUnbound (boolean value)
   { if (value) flags |= SET_IF_UNBOUND; else flags &= ~SET_IF_UNBOUND; }
-
-  public SetExp (Declaration decl, Expression val)
-  {
-    this.binding = decl;
-    symbol = decl.getSymbol();
-    new_value = val;
-  }
 
   protected boolean mustCompile () { return false; }
 

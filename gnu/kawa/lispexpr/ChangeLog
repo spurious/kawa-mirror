@@ -1,3 +1,7 @@
+2006-03-01  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java: Use new SetExp.makeDefinition factory method.
+
 2006-02-19  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (coerceToObject): Handle "coercing to void".

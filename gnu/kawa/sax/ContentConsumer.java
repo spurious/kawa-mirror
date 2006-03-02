@@ -1,4 +1,4 @@
-// Copyright (c) 2002, 2003  Per M.A. Bothner.
+// Copyright (c) 2002, 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.sax;
@@ -7,19 +7,19 @@ import gnu.xml.*;
 import org.xml.sax.*;
 import gnu.mapping.Symbol;
 import gnu.text.Char;
+import org.xml.sax.helpers.AttributesImpl;
 
 /** Forward Consumer events to a SAX2 ContentHandler.
  */
 
-public class ContentConsumer implements Consumer, Attributes
+public class ContentConsumer implements Consumer
 {
   ContentHandler out;
   /** Current nesting of elements. */
   int nesting = 0;
   String[] names = new String[15];
-  /** Number of attributes if in begin-element content. */
-  int numAttributes;
-  String[] attributes = new String[20];  
+  String attrQName, attrURI, attrLocalName;
+  AttributesImpl attributes = new AttributesImpl();
   char[] chBuffer;
   StringBuffer strBuffer = new StringBuffer(200);
   /** 1 if in start-tag, 2 if in attribute value, 0 otherwise. */
@@ -39,68 +39,6 @@ public class ContentConsumer implements Consumer, Attributes
     throw new RuntimeException("caught "+ex+" in "+method);
   }
 
-  public int getLength() { return numAttributes; }
-
-  public String getQName(int i)
-  { return i >= numAttributes ? null : attributes[4 * i]; }
-
-  public String getURI(int i)
-  { return i >= numAttributes ? null : attributes[4 * i + 1]; }
-
-  public String getLocalName(int i)
-  { return i >= numAttributes ? null : attributes[4 * i + 2]; }
-
-  public String getValue(int i)
-  { return i >= numAttributes ? null : attributes[4 * i + 3]; }
-
-  public String getType(int i)
-  { return i >= numAttributes ? null : "CDATA"; }
-
-  public int getIndex (String uri, String localPart)
-  {
-    for (int i = numAttributes;  --i >= 0; )
-      {
-	if (uri.equals(attributes[4 * i + 1])
-	    && localPart.equals(attributes[4 * i + 2]))
-	  return i;
-      }
-    return -1;
-  }
-
-  public int getIndex (String qName)
-  {
-    for (int i = numAttributes;  --i >= 0; )
-      {
-	if (qName.equals(attributes[4 * i]))
-	  return i;
-      }
-    return -1;
-  }
-
-  public String getType (String uri, String localPart)
-  {
-    int i = getIndex(uri, localPart);
-    return i < 0 ? null : "CDATA";
-  }
-
-  public String getType(String qName)
-  {
-    int i = getIndex(qName);
-    return i < 0 ? null : "CDATA";
-  }
-
-  public String getValue (String uri, String localPart)
-  {
-    int i = getIndex(uri, localPart);
-    return i < 0 ? null : attributes[4 * i + 3];
-  }
-
-  public String getValue(String qName)
-  {
-    int i = getIndex(qName);
-    return i < 0 ? null : attributes[4 * i + 3];
-  }
-
   void endStartTag()
   {
     if (inStartTag != 1)
@@ -108,16 +46,13 @@ public class ContentConsumer implements Consumer, Attributes
     int i = 3 * (nesting - 1);
     try
       {
-	out.startElement(names[i], names[i+1], names[i+2], this);
+	out.startElement(names[i], names[i+1], names[i+2], attributes);
       }
     catch (SAXException ex)
       {
 	error("startElement", ex);
       }
-    // Is this desirable, for the sake of GC?
-    for (i = 4 * numAttributes;  --i >= 0; )
-      attributes[i] = null;
-    numAttributes = 0;
+    attributes.clear();
     inStartTag = 0;
   }
 
@@ -154,32 +89,22 @@ public class ContentConsumer implements Consumer, Attributes
     names[i] = namespaceURI;
     names[i+1] = localName;
     names[i+2] = typeName;
-    numAttributes = 0;
     inStartTag = 1;
     nesting++;
   }
 
   public void beginAttribute(String attrName, Object attrType)
   {
-    int i = 4 * numAttributes;
-    if (i >= attributes.length)
-      {
-	String[] tmp = new String[2 * i];
-	System.arraycopy(attributes, 0, tmp, 0, i);
-	attributes = tmp;
-      }
-    String namespaceURI = ((Symbol) attrType).getNamespaceURI();
-    String localName = ((Symbol) attrType).getLocalName();
-    attributes[i] = attrName;
-    attributes[i+1] = namespaceURI;
-    attributes[i+2] = localName;
-    numAttributes++;
+    attrURI = ((Symbol) attrType).getNamespaceURI();
+    attrLocalName = ((Symbol) attrType).getLocalName();
+    attrQName = attrName;
     inStartTag = 2;
   }
 
   public void endAttribute()
   {
-    attributes[4 * numAttributes - 1] = strBuffer.toString();
+    attributes.addAttribute(attrURI, attrLocalName, attrQName, "CDATA",
+                            strBuffer.toString());
     strBuffer.setLength(0);
     inStartTag = 1;
   }

@@ -1,5 +1,7 @@
 2006-03-01  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): Call cleanupAfterCompilation.
+
 	* SetExp.java (<init>): Move constructors next to each other.
 	* SetExp.java (makeDefinition): New convenience factory method.
 

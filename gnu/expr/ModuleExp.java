@@ -94,6 +94,8 @@ public class ModuleExp extends LambdaExp
 	    String className = clas.getName ();
 	    byte[] classBytes = clas.writeToArray ();
 	    loader.addClass(className, classBytes);
+            // This reduces memory leaks if we do lots of evalToClass.
+            clas.cleanupAfterCompilation();
 
 	    if (zout != null)
 	      {

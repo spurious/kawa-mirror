@@ -1031,4 +1031,14 @@ public class ClassType extends ObjectType
     return this;
   }
 
+  /** Clear various object references, to help garbage collection. */
+  public void cleanupAfterCompilation ()
+  {
+    for (Method meth = methods;  meth != null;  meth = meth.getNext())
+      meth.cleanupAfterCompilation();
+
+    constants = null;
+    attributes = null;
+    sourceDbgExt = null;
+  }
 }

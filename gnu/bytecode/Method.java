@@ -340,4 +340,11 @@ public class Method implements AttrContainer, Member {
       }
     return sbuf.toString();
   }
+
+  public void cleanupAfterCompilation ()
+  {
+    attributes = null;
+    exceptions = null;
+    code = null;
+  }
 };

@@ -1,3 +1,10 @@
+2006-03-03  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java (emit): Ignore whitespace not in an element.
+
+	* ParsedXMLToConsumer.java (emitProcessingInstruction): Ignore
+	XML declaration.
+
 2006-01-04  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java.in (<init>): New constructor taking InputStream,

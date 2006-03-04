@@ -1,4 +1,4 @@
- // Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+ // Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -298,6 +298,17 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 
   public void emitCharacters(char[] data, int start, int length)
   {
+    // Skip whitespace not in an element.
+    if (nesting == 0)
+      {
+        for (int i = 0; ; i++)
+          {
+            if (i == length)
+              return;
+            if (! Character.isWhitespace(data[start+i]))
+              break;
+          }
+      }
     closeStartTag();
     if (stringValue != null)
       {
@@ -485,6 +496,12 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
                                         int tstart, int tlength,
                                         int dstart, int dlength)
   {
+    // Skip XML declaration.
+    if (nesting == 0 && tlength == 3
+        && buffer[tstart] == 'x'
+        && buffer[tstart+1] == 'm'
+        && buffer[tstart+2] == 'l')
+      return;
     closeStartTag();
     if (base instanceof XConsumer)
       {

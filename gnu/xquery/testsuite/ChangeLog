@@ -1,3 +1,7 @@
+2006-03-04  Per Bothner  <per@bothner.com>
+
+	* maketab1.xql: Update 'declare xmlpspace' -> 'boundary-space'.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Update for various parser fixes.

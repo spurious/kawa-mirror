@@ -1,4 +1,4 @@
-declare xmlspace preserve;
+declare boundary-space preserve;
 let $newline := "
 ",
 $result := (doc("tab.xml")/result)

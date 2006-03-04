@@ -1,3 +1,8 @@
+2006-03-03  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readNestedComment): On unexpected eof, print
+	the starting rather than ending position.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Use new SetExp.makeDefinition factory method.

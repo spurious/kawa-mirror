@@ -1749,12 +1749,17 @@ public class XQParser extends Lexer
 				    parseNameTest(axis == AXIS_ATTRIBUTE));
 	elt.setFlag(ApplyExp.INLINE_IF_CONSTANT);
 	args[0] = elt;
-        getRawToken();
       }
     else if (axis >= 0)
       return syntaxError("unsupported axis '"+axisNames[axis]+"::'");
     else
       return null;
+
+    Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+    if (dotDecl == null)
+      error(undefTestErr);
+    if (type == null)
+      getRawToken();
 
     String axisName;
     switch (axis)
@@ -1776,9 +1781,6 @@ public class XQParser extends Lexer
     ApplyExp mkAxis = new ApplyExp(axisClass.getDeclaredMethod("make", 1),
 				   args);
     mkAxis.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-    Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
-    if (dotDecl == null)
-      error(undefTestErr);
     Expression[] dotArg = { new ReferenceExp(DOT_VARNAME, dotDecl) };
     exp = new ApplyExp(mkAxis, dotArg);
     if (dotDecl == null)
@@ -3705,7 +3707,6 @@ public class XQParser extends Lexer
       = new SourceError(severity, port.getName(), curLine, curColumn, message);
     err.code = code;
     messages.error(err);
-    //error(severity, port.getName(), curLine, curColumn, message);
   }
 
   public void error(char severity, String message)
@@ -3737,13 +3738,6 @@ public class XQParser extends Lexer
     throws java.io.IOException, SyntaxException
   {
     error('e', message, "XPST0003");
-    /*
-    SourceMessages messages = getMessages();
-    SourceError err
-      = new SourceError('e', port.getName(), curLine, curColumn, message);
-    err.code = "XPST0003";
-    messages.error(err);
-    */
     if (interactive)
       {
 	curToken = 0;

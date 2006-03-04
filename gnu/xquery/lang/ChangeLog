@@ -1,3 +1,8 @@
+2006-03-04  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNodeTest): Defer getRawToken until after a
+	possible missing context error message.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (FLOAT_TOKEN): Replace by DECIMAL_TOKEN, DOUBLE_TOKEN.

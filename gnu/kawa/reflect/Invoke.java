@@ -11,7 +11,7 @@ public class Invoke extends ProcedureN implements CanInline
    *  'N' - make (new).
    *  'S' - invoke-static (static or non-static):
    *        The first operand is a Class or Type, the second is the name,
-   *        and if the is non-sttaic the 3rd is the receiver.
+   *        and if the is non-static the 3rd is the receiver.
    *  's' - Like 'S' but only allow static methods. [not used]
    *  'V' - non-static invoke, only allow non-static methods. [not used]
    *  '*' - non-static invoke, can match static methods also.
@@ -305,8 +305,8 @@ public class Invoke extends ProcedureN implements CanInline
    * This is an optimization to avoid having a module-level binding
    * created for the class name. */
 
-  public static Expression inlineClassName (ApplyExp exp, int carg,
-					    InlineCalls walker)
+  public static ApplyExp inlineClassName (ApplyExp exp, int carg,
+                                          InlineCalls walker)
   {
     Compilation comp = walker.getCompilation();
     Language language = comp.getLanguage();
@@ -332,7 +332,9 @@ public class Invoke extends ProcedureN implements CanInline
 	Expression[] nargs = new Expression[args.length];
 	System.arraycopy(args, 0, nargs, 0, args.length);
 	nargs[carg] = new QuoteExp(type);
-	return new ApplyExp(exp.getFunction(), nargs).setLine(exp);
+	ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
+        nexp.setLine(exp);
+        return nexp;
       }
     return exp;
   }

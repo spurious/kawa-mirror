@@ -591,6 +591,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("define-unit", "kawa.standard.define_unit", "define_unit");
       defSntxStFld("define-base-unit", "kawa.standard.define_unit",
                    "define_base_unit");
+      defProcStFld("duration", "kawa.lib.numbers");
 
       defProcStFld("gentemp", "kawa.lib.syntax");
       defSntxStFld("defmacro", "kawa.lib.syntax");
@@ -1068,6 +1069,7 @@ public class Scheme extends LispLanguage
     dispatchTable.set(',', ReaderDispatchMisc.getInstance());
     tab.putReaderCtorFld("URI", "kawa.lib.files", "URI");
     tab.putReaderCtorFld("namespace", "kawa.lib.misc", "namespace");
+    tab.putReaderCtorFld("duration", "kawa.lib.numbers", "duration");
     return tab;
   }
 

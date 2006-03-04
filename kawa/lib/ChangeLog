@@ -1,3 +1,7 @@
+2006-03-03  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (duration): New function.
+
 2006-02-14  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (define-syntax, define, define-private,

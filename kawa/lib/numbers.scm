@@ -228,3 +228,6 @@
 			#!optional (radix :: <int> 10))
   (make <string>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
+
+(define (duration duration) :: <gnu.math.Duration>
+  (gnu.math.Duration:parseDuration duration))

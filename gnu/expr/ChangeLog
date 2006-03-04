@@ -1,3 +1,8 @@
+2006-03-03  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkApplyExp): Don't chain calls to
+	static functions.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): Call cleanupAfterCompilation.

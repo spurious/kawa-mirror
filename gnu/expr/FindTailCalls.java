@@ -32,8 +32,14 @@ public class FindTailCalls extends ExpWalker
 	    Declaration binding = Declaration.followAliases(func.binding);
 	    if (binding != null)
 	      {
-		exp.nextCall = binding.firstCall;
-		binding.firstCall = exp;
+                // No point in building chain if STATIC_SPECIFIED, and it can
+                // lead to memory leaks.  At least if interactive calls cam
+                // resolve to previously-compiled Declarations (as in XQuery).
+                if (! binding.getFlag(Declaration.STATIC_SPECIFIED))
+                  {
+                    exp.nextCall = binding.firstCall;
+                    binding.firstCall = exp;
+                  }
                 Compilation comp = getCompilation();
 		binding.setCanCall();
                 if (! comp.mustCompile)

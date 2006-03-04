@@ -543,7 +543,8 @@ public class Declaration
   }
 
   /** List of ApplyExp where this declaration is the function called.
-   * The applications are chained using their nextcall fields. */
+   * The applications are chained using their nextCall fields.
+   * The chain is not built if STATIC_SPECIFIED. */
   public ApplyExp firstCall;
 
   public void noteValue (Expression value)

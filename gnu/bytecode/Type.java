@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 2000, 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 1997, 2000, 2003, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -110,6 +110,14 @@ public abstract class Type {
   Type (String nam, String sig) {
     this_name = nam;
     signature = sig;
+  }
+
+  public Type (Type type)
+  {
+    this_name = type.this_name;
+    signature = type.signature;
+    size = type.size;
+    reflectClass = type.reflectClass;
   }
 
   public Type promote () {

@@ -1,3 +1,7 @@
+2006-03-07  Per Bothner  <per@bothner.com>
+
+	* Type.java (<init>(Type)): New copy constructor.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* Method.java (cleanupAfterCompilation): New method.

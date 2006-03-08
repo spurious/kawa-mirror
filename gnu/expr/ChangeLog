@@ -1,3 +1,10 @@
+2006-03-07  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (emitCheckedCoerce): Get startPC at same position
+	as startTry, so test for empty exception region is correct.
+
+	* ModuleExp.java (evalModuel): Save/set/restore current Compilation.
+
 2006-03-03  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkApplyExp): Don't chain calls to

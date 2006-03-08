@@ -122,7 +122,6 @@ public class CheckedTarget extends StackTarget
     // we can't safely do that
     boolean isInTry = code.isInTry();
     initWrongType();
-    int startPC = code.getPC();
     Label startTry = new Label(code);
     Scope tmpScope;
     if (argValue == null && type != Type.tostring_type)
@@ -134,6 +133,7 @@ public class CheckedTarget extends StackTarget
       }
     else
       tmpScope = null;
+    int startPC = code.getPC();
     startTry.define(code);
     emitCoerceFromObject(type, comp);
 
@@ -145,6 +145,8 @@ public class CheckedTarget extends StackTarget
     if (endPC == startPC
 	|| type == Type.tostring_type)
       {
+        // FIXME should remove generated store to argValue, by truncating
+        // PC to startPC.  But take care with startPC.position.
 	if (tmpScope != null)
 	  code.popScope();
 	return;

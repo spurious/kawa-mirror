@@ -1586,7 +1586,7 @@ public class IntNum extends RatNum implements Externalizable
     if (words == null)
       return new BigDecimal(ival);
     if (ival <= 2)
-      return new BigDecimal(longValue());
+      return BigDecimal.valueOf(longValue());
     return new BigDecimal(toString());
   }
 }

@@ -1,3 +1,17 @@
+2006-03-07  Per Bothner  <per@bothner.com>
+
+	* Duration.java (seconds): Change from int to long.
+	Lots of consequential updates, including casts, added.
+
+	* Duration.java (getTotalMonths, getTotalSeconds): New methods,
+
+	* Duration.java (toString): Fix string for 0 yearMontDuration.
+
+	* Duration.java (div): New static method to divide Durations.
+	(div(Object)): Use new method.
+
+	* IntNum.java (asBigDecimal): Fix use of wrong method.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* ExponentialFormat.java (exponentShowSign): New flag/option.

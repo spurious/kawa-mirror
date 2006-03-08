@@ -13,13 +13,13 @@ public class Duration extends Quantity implements Externalizable
    * where {@code hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60
    * && secconds >= 0 && minutes > 60}.
    */
-  int seconds;
+  long seconds;
 
   /** Number of nanoseconds.
    * We could possibly include leap seconds in here. */
   int nanos;
 
-  public static Duration make (int months, int seconds, int nanos, Unit unit)
+  public static Duration make (int months, long seconds, int nanos, Unit unit)
   {
     Duration d = new Duration();
     d.months = months;
@@ -188,10 +188,33 @@ public class Duration extends Quantity implements Externalizable
     return Duration.times(this, ((RealNum) x).doubleValue());
   }
 
+  public static double div (Duration dur1, Duration dur2)
+  {
+    int months1 = dur1.months;
+    int months2 = dur2.months;
+    double sec1 = (double) dur1.seconds + dur1.nanos * 0.000000001;
+    double sec2 = (double) dur2.seconds + dur1.nanos * 0.000000001;
+    if (months2 == 0 && sec2 == 0)
+      throw new ArithmeticException("divide duration by zero");
+    if (months2 == 0)
+      {
+        if (months1 == 0)
+          return sec1 /sec2;
+      }
+    else if (sec2 == 0)
+      {
+        if (sec1 == 0)
+          return (double) months1 / (double) months2;
+      }
+    throw new ArithmeticException("divide of incompatible durations");
+  }
+
   public Numeric div (Object y)
   {
     if (y instanceof RealNum)
       return Duration.times(this, 1.0 / ((RealNum) y).doubleValue());
+    if (y instanceof Duration)
+      return new DFloNum(div(this, (Duration) y));
     return ((Numeric)y).divReversed (this);
   }
 
@@ -255,7 +278,7 @@ public class Duration extends Quantity implements Externalizable
     StringBuffer sbuf = new StringBuffer();
     /* #endif */
     int m = months;
-    int s = seconds;
+    long s = seconds;
     int n = nanos;
     boolean neg = m < 0 || s < 0 || n < 0;
     if (neg)
@@ -278,7 +301,7 @@ public class Duration extends Quantity implements Externalizable
         sbuf.append(m);
         sbuf.append('M');
       }
-    int d = s / (24 * 60 * 60);
+    long d = s / (24 * 60 * 60);
     if (d != 0)
       {
         sbuf.append(d);
@@ -288,14 +311,14 @@ public class Duration extends Quantity implements Externalizable
     if (s != 0 || n != 0)
       {
         sbuf.append('T');
-        int hr = s / (60 * 60);
+        long hr = s / (60 * 60);
         if (hr != 0)
           {
             sbuf.append(hr);
             sbuf.append('H');
             s -= 60 * 60 * hr;
           }
-        int mn = s / 60;
+        long mn = s / 60;
         if (mn != 0)
           {
             sbuf.append(mn);
@@ -322,7 +345,7 @@ public class Duration extends Quantity implements Externalizable
           }
       }
     else if (sbuf.length() == 1)
-      sbuf.append(unit == Unit.month ? "0Y" : "0S");
+      sbuf.append(unit == Unit.month ? "0M" : "0S");
     return sbuf.toString();
   }
 
@@ -366,29 +389,37 @@ public class Duration extends Quantity implements Externalizable
 
   public int getDays ()
   {
-    return seconds / (24 * 60 * 60);
+    return (int) (seconds / (24 * 60 * 60));
   }
 
   public int getHours ()
   {
-    int hours = seconds / (60 * 60);
-    return hours % 24;
+    return (int) ((seconds / (60 * 60)) % 24);
   }
 
   public int getMinutes ()
   {
-    int minutes = seconds / 60;
-    return minutes % (24 * 60);
+    return (int) ((seconds / 60) % (24 * 60));
   }
 
   public int getSecondsOnly ()
   {
-    return seconds % (24 * 60 * 60);
+    return (int) (seconds % (24 * 60 * 60));
   }
 
   public int getNanoSecondsOnly ()
   {
     return nanos;
+  }
+
+  public int getTotalMonths ()
+  {
+    return months;
+  }
+
+  public long getTotalSeconds ()
+  {
+    return seconds;
   }
 
   public long getNanoSeconds ()
@@ -409,7 +440,7 @@ public class Duration extends Quantity implements Externalizable
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeInt(months);
-    out.writeInt(seconds);
+    out.writeLong(seconds);
     out.writeInt(nanos);
     out.writeObject(unit);
   }
@@ -418,7 +449,7 @@ public class Duration extends Quantity implements Externalizable
     throws IOException, ClassNotFoundException
   {
     months = in.readInt();
-    seconds = in.readInt();
+    seconds = in.readLong();
     nanos = in.readInt();
     unit = (Unit) in.readObject();
   }

@@ -1,3 +1,11 @@
+2006-03-07  Per Bothner  <per@bothner.com>
+
+	* Arithmetic.java (asIntNum): New overloaded static helper methods.
+	(asIntNum(value)): Handle BigDecimal.
+
+	* NumberCompare.java (compare): New method.
+	(apply2): Now just a wrapper from compare.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* LispFormat.java (LispRealFormat.resolve): Set new exponentShowSign

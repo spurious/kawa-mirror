@@ -92,12 +92,24 @@ public class Arithmetic
     return BigInteger.valueOf(((Number) value).longValue());
   }
 
+  public static IntNum asIntNum (BigDecimal value)
+  {
+    return IntNum.valueOf(((BigDecimal) value).toBigInteger().toString(), 10);
+  }
+
+  public static IntNum asIntNum (BigInteger value)
+  {
+    return IntNum.valueOf(value.toString(), 10);
+  }
+
   public static IntNum asIntNum (Object value)
   {
     if (value instanceof IntNum)
       return (IntNum) value;
     if (value instanceof BigInteger)
       return IntNum.valueOf(value.toString(), 10);
+    if (value instanceof BigDecimal)
+      return asIntNum((BigDecimal) value);
     return IntNum.make(((Number) value).longValue());
   }
 

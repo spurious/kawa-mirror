@@ -116,6 +116,11 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 
   static public boolean apply2 (int flags, Object arg1, Object arg2)
   {
+    return ((1 << (3 + compare(arg1, arg2))) & flags) != 0;
+  }
+  
+  static public int compare (Object arg1, Object arg2)
+  {
     int code1 = Arithmetic.classifyValue(arg1);
     int code2 = Arithmetic.classifyValue(arg2);
     int code = code1 < code2 ? code2 : code1;
@@ -174,7 +179,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	Numeric num2 = Arithmetic.asNumeric(arg2);
         comp = ((Numeric) num1).compare(num2);
       }
-    return ((1 << (3 + comp)) & flags) != 0;
+    return comp;
   }
 
   static boolean applyN (int flags, Object[] args)

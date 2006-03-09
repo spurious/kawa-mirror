@@ -159,7 +159,9 @@ Alternatively, you can install the pre-compiled binary distribution.
 @section Getting and running Java
 
 You will need a working Java system.  Kawa has been reported to
-work with JDK from 1.1 through 1.4.x, Kaffe, Symantec Cafe, J++, and GCJ.
+work with JDK from 1.1 through 1.6.0-beta, Kaffe, Symantec Cafe, J++, and GCJ.
+The released Kawa jar file assumes some JDK 1.4 functionality.
+If those features are missing, you may need to build Kawa from source.
 
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) from Sun.  You can download free copies of
@@ -1013,6 +1015,9 @@ Various named option control how Kawa compiles certain forms.
 @item --module-static
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static #t)} were specified). @xref{Module classes}.
+@item --module-static-run
+If no @code{module-static} is specified, generate a static module
+(as if @code{(module-static 'init-run)} were specified). @xref{Module classes}.
 @cindex --warn-@var{whatever}
 @cindex --no-warn-@var{whatever}
 @pindex warn-invoke-unknown-method
@@ -5315,14 +5320,17 @@ that the field is a macro and apply the macro at compile time.
 @deffn Syntax module-static name ...
 @deffnx Syntax module-static @code{#t}
 @deffnx Syntax module-static @code{#f}
+@deffnx Syntax module-static @code{'init-run}
 Control whether the generated fields and methods are static.
-If @code{#t} is specified, then the module will be a static module,
-@emph{all} definitions will be static, and the module body is evaluated
-in the class's static initializer.
+If @code{#t}  or @code{'init-run} is specified, then the module will be a
+static module, @emph{all} definitions will be static.
+If @code{'init-run} is specified, in addition the module body
+is evaluated in the class's static initializer.
+(Otherwise, it is run the first time it is @code{require}'d.)
 Otherwise, the module is an instance module.  However, the @var{name}s
 that are explicitly listed will be compiled to static fields and methods.
-If @code{#f} is specified, then all exported names will be compiled
-to non-static (instance) fields and methods.
+If @code{#f} is specified, then all exported names will
+be compiled to non-static (instance) fields and methods.
 
 By default, if no @code{module-static} is specified, the following rules apply:
 @enumerate

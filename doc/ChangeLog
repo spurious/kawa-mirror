@@ -1,3 +1,10 @@
+2006-03-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Running Java): Extend notes about tested Java versions.
+
+	* kawa.texi (Compilation options): Mention --module-static-run.
+	(Module classes): Update to mention 'init-run.
+
 2006-02-19  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Methods are now in scope.

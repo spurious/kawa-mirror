@@ -26,13 +26,8 @@ public class Quote extends Syntax implements Printable
     this.isQuasi = isQuasi;
   }
 
-  /** An initial value for 'depth' for plain (non-quasi) quote,
-   * with namespace resolution. */
+  /** An initial value for 'depth' for plain (non-quasi) quote. */
   protected static final int QUOTE_DEPTH = -1;
-
-  /** An initial value for 'depth' for plain (non-quasi) quote,
-   * without namespace resolution. */
-  static final int DATUM_DEPTH = -2;
 
   /** True for quasiquote; false for plain quote. */
   protected boolean isQuasi;
@@ -51,14 +46,14 @@ public class Quote extends Syntax implements Printable
    * Basically just recursively removes SyntaxForm wrappers. */
   public static Object quote (Object obj, Translator tr)
   {
-    return plainQuote.expand(obj, DATUM_DEPTH, tr);
+    return plainQuote.expand(obj, QUOTE_DEPTH, tr);
   }
 
   /** Quote an object (without namespace-expansion).
    * Basically just recursively removes SyntaxForm wrappers. */
   public static Object quote (Object obj)
   {
-    return plainQuote.expand(obj, DATUM_DEPTH, (Translator) Compilation.getCurrent());
+    return plainQuote.expand(obj, QUOTE_DEPTH, (Translator) Compilation.getCurrent());
   }
 
   protected Expression coerceExpression (Object val, Translator tr)
@@ -69,6 +64,11 @@ public class Quote extends Syntax implements Printable
   protected Expression leaf (Object val, Translator tr)
   {
     return new QuoteExp(val);
+  }
+
+  protected boolean expandColonForms ()
+  {
+    return true;
   }
 
   Object expand_pair (Pair list, int depth, SyntaxForm syntax,
@@ -88,7 +88,7 @@ public class Quote extends Syntax implements Printable
         // All previous elements (cars) are returned identically by expand.
         // What makes things complicated is that to the extent that no changes
         // are needed, we want to return the input list as-is.
-        if (depth > DATUM_DEPTH
+        if (expandColonForms()
             && tr.matches(pair.car, syntax, LispLanguage.lookup_sym)
             && pair.cdr instanceof Pair
             && (p1 = (Pair) pair.cdr) instanceof Pair
@@ -265,9 +265,9 @@ public class Quote extends Syntax implements Printable
 
   /** Backquote-expand a template.
    * @param template the quasiquoted template to expand
-   * @param depth the (net) number of quasiquotes we are inside.
-   *   The values QUOTE_DEPTH and DATUM_DEPTH are special cases
-   *   when we're inside a quote rather than a quasiquote.
+   * @param depth - the (net) number of quasiquotes we are inside.
+   *   The value QUOTE_DEPTH is a special case when we're inside
+   *   a quote rather than a quasiquote.
    * @param tr the rewrite context
    * @return the expanded Expression (the result can be a non-expression,
    *   in which case it is implicitly a QuoteExp).
@@ -275,7 +275,6 @@ public class Quote extends Syntax implements Printable
   Object expand (Object template, int depth,
 			SyntaxForm syntax, Object seen, Translator tr)
   {
-    boolean resolveNamespaces = depth > DATUM_DEPTH;
     /* #ifdef use:java.util.IdentityHashMap */ 
     IdentityHashMap map = (IdentityHashMap) seen;
     Object old = map.get(template);
@@ -374,8 +373,6 @@ public class Quote extends Syntax implements Printable
 	      result = Invoke.makeInvokeStatic(vectorAppendType, "apply", args);
 	  }
       }
-    else if (resolveNamespaces && template instanceof String)
-      result = tr.namespaceResolve((String) template);
     else
       result = template;
     /* #ifdef use:java.util.IdentityHashMap */ 

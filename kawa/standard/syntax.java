@@ -16,6 +16,11 @@ public class syntax extends kawa.lang.Quote
     super(name, isQuasi);
   }
 
+  protected boolean expandColonForms ()
+  {
+    return false;
+  }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     if (! (form.cdr instanceof Pair)

@@ -1,3 +1,9 @@
+2006-03-13  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java (compare): Instead of a throw return -2.
+
+	* SlotGet.java (apply): Fix WrongType exception value thrown.
+
 2006-03-03  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inlineClassName): Make return type more specific.

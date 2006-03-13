@@ -31,7 +31,7 @@ public class OccurrenceType extends ObjectType
 
   public int compare(Type other)
   {
-    throw new Error("compare not implemented");
+    return -2;
   }
 
   public Object coerceFromObject (Object obj)

@@ -197,6 +197,11 @@ public class ClassExp extends LambdaExp
     int j = 0;
     for (int i = 0;  i < len;  i++)
       {
+        // setTypes may be called at name-resolution time (so we can can
+        // resolve against inherited field and method names).  Therefore do
+        // inlining now.  Needed (for example) for deprecated PREXIX:<> syntax.
+        supers[i] = new InlineCalls(comp).walk(supers[i]);
+
 	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
 	if (! (st instanceof ClassType))
           {

@@ -7,9 +7,13 @@ public class InlineCalls extends ExpWalker
 {
   public static void inlineCalls (Expression exp, Compilation comp)
   {
-    InlineCalls walker = new InlineCalls();
-    walker.setContext(comp);
+    InlineCalls walker = new InlineCalls(comp);
     walker.walk(exp);
+  }
+
+  public InlineCalls (Compilation comp)
+  {
+    setContext(comp);
   }
 
   protected Expression walkApplyExp(ApplyExp exp)

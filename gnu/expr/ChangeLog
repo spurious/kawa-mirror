@@ -1,3 +1,9 @@
+2006-03-12  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (<init>): New constructor.
+	(inlineClass): Use new constructor.
+	* ClassExp.java (setTypes): Do InlineCalls on supertypes.
+
 2006-03-07  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java (emitCheckedCoerce): Get startPC at same position

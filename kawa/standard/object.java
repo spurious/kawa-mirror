@@ -56,26 +56,7 @@ public class object extends Syntax
   public Object[] scanClassDef (Pair pair, ClassExp oexp, Translator tr)
   {
     tr.mustCompileHere();
-    int num_supers = Translator.listLength(pair.car);
-    if (num_supers < 0)
-      {
-	tr.error('e', "object superclass specification not a list");
-	return null;
-      }
-    Expression[] supers = new Expression[num_supers];
     Object superlist = pair.car;
-    for (int i = 0;  i < num_supers;  i++)
-      {
-	while (superlist instanceof SyntaxForm)
-	  {
-	    // FIXME - need to pass syntax.
-	    superlist = ((SyntaxForm) superlist).form;
-	  }
-	Pair superpair = (Pair) superlist;
-	supers[i] = tr.rewrite_car(superpair, false);
-	superlist = superpair.cdr;
-      }
-    oexp.supers = supers;
     Object components = pair.cdr;
     LambdaExp method_list = null;
     LambdaExp last_method = null;
@@ -314,7 +295,8 @@ public class object extends Syntax
       oexp,
       components,
       inits,
-      method_list
+      method_list,
+      superlist
     };
     return result;
   }
@@ -325,7 +307,28 @@ public class object extends Syntax
     Object components = saved[1];
     Vector inits = (Vector) saved[2];
     LambdaExp method_list = (LambdaExp) saved[3];
+    Object superlist = saved[4];
     oexp.firstChild = method_list;
+
+    int num_supers = Translator.listLength(superlist);
+    if (num_supers < 0)
+      {
+        tr.error('e', "object superclass specification not a list");
+        num_supers = 0;
+      }
+    Expression[] supers = new Expression[num_supers];
+    for (int i = 0;  i < num_supers;  i++)
+      {
+	while (superlist instanceof SyntaxForm)
+	  {
+	    // FIXME - need to pass syntax.
+	    superlist = ((SyntaxForm) superlist).form;
+	  }
+	Pair superpair = (Pair) superlist;
+	supers[i] = tr.rewrite_car(superpair, false);
+	superlist = superpair.cdr;
+      }
+    oexp.supers = supers;
 
     oexp.setClassName(tr);
     oexp.setTypes(tr);

@@ -1,3 +1,9 @@
+2006-03-12  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/object.java (scanClassDef): Move rewrite of
+	list of sypertypes to ...
+	(rewriteClassDef): ... here.
+
 2006-03-11  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java (expand): Never call Translator.namespaceResolve

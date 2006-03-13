@@ -104,6 +104,7 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVACFLAGS = @JAVACFLAGS@
 JAVA_SOURCE = @JAVA_SOURCE@
 JEMACS_VERSION = @JEMACS_VERSION@
 LD = @LD@
@@ -199,7 +200,6 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 SUFFIXES = .java .class .scm .el .lisp
 javadir = $(datadir)/java/$(subdir)
-JAVACFLAGS = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@@conf_classpath@$$CLASSPATH
 JAVAROOT = $(top_builddir)
 JAR = fastjar

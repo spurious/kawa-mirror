@@ -106,6 +106,7 @@ case ${with_gcj} in
     am__fastdepGCJ_TRUE='#'
     ;;
 esac
+JAVACFLAGS=${JAVACFLAGS--g}
 
 # Partly for compatibility (--enable/--disable-servlet was the old option);
 # partly to allow --with-servlet=path-to-jar --disable-servlet.
@@ -144,6 +145,7 @@ AC_SUBST(filesep)
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)
+AC_SUBST(JAVACFLAGS)
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)

@@ -143,16 +143,34 @@ public class Duration extends Quantity implements Externalizable
             part = scanPart (str, pos);
             ch = (char) part;
           }
-        if (ch == 'S')
+        if (ch == 'S' || ch == '.')
           {
             seconds += (int) (part >> 32);
             pos = ((int) part) >> 16;
           }
-        if (pos < len && str.charAt(pos) == '.')
+        if (ch == '.' && pos + 1 < len
+            && Character.digit(str.charAt(pos+1), 10) >= 0)
           {
-            // FIXME handle fraction
+            int nfrac = 0;
+            for (; pos < len; nfrac++)
+              {
+                ch = str.charAt(pos++);
+                int dig = Character.digit(ch, 10);
+                if (dig < 0)
+                  break;
+                if (nfrac < 9)
+                  nanos = 10 * nanos + dig;
+                else if (nfrac == 9 && dig >= 5)
+                  nanos++;
+              }
+            while (nfrac++ < 9)
+              nanos = 10 * nanos;
+            if (ch != 'S')
+              return null;
           }
       }
+    if (pos != len)
+      return null;
     Duration d = new Duration();
     if (negative)
       {
@@ -328,25 +346,29 @@ public class Duration extends Quantity implements Externalizable
         if (s != 0 || n != 0)
           {
             sbuf.append(s);
-            if (n != 0)
-              {
-                sbuf.append('.');
-                int pos = sbuf.length();
-                sbuf.append(n);
-                int len = sbuf.length();
-                int pad = pos + 9 - len;
-                while (--pad >= 0)
-                  sbuf.insert(pos, '0');
-                len = pos + 9;
-                do { --len; } while (sbuf.charAt(len) == '0');
-                sbuf.setLength(len+1);
-              }
+            appendNanoSeconds(n, sbuf);
             sbuf.append('S');
           }
       }
     else if (sbuf.length() == 1)
-      sbuf.append(unit == Unit.month ? "0M" : "0S");
+      sbuf.append(unit == Unit.month ? "0M" : "T0S");
     return sbuf.toString();
+  }
+
+  static void appendNanoSeconds (int nanoSeconds, StringBuffer sbuf)
+  {
+    if (nanoSeconds == 0)
+      return;
+    sbuf.append('.');
+    int pos = sbuf.length();
+    sbuf.append(nanoSeconds);
+    int len = sbuf.length();
+    int pad = pos + 9 - len;
+    while (--pad >= 0)
+      sbuf.insert(pos, '0');
+    len = pos + 9;
+    do { --len; } while (sbuf.charAt(len) == '0');
+    sbuf.setLength(len+1);
   }
 
   /** Parse digits following by a terminator char
@@ -420,6 +442,11 @@ public class Duration extends Quantity implements Externalizable
   public long getTotalSeconds ()
   {
     return seconds;
+  }
+
+  public long getTotalMinutes ()
+  {
+    return seconds / 60;
   }
 
   public long getNanoSeconds ()

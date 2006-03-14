@@ -212,6 +212,8 @@ public abstract class Unit extends Quantity
   public static final Unit pica = define("pica", 0.004233333, meter);
   public static final Unit radian = define("rad", 1.0, Unit.Empty);
 
+  public static final NamedUnit date =
+    new NamedUnit("date", NON_COMBINABLE, duration);
   public static final NamedUnit second =
     new NamedUnit("s", NON_COMBINABLE, duration);
   public static final NamedUnit month =

@@ -1,5 +1,15 @@
 2006-03-14  Per Bothner  <per@bothner.com>
 
+	* DateTime.java: New class, extends Quantity.
+	* Makefile.am: Update accordingly.
+	* Unit.java (date): New unit.
+
+	* Duration.java (valueOf): Handle fractional seconds.
+	(appendNanoSeconds): New static helper method.
+	(toString): Use appendNanoSeconds.
+
+	* Duration.java (getTotalMinutes): New method.
+
 	* RealNum.java (toStringScientific, toStringDecimal): New methods.
 	* ExponentialFormat.java (format): Some new helper overloads.
 	(format): Major rewrite to use Double/Float.toString when precision

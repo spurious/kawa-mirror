@@ -8,6 +8,29 @@ import gnu.lists.*;
 
 public class SequenceUtils
 {
+  public static Object zeroOrOne (Object arg)
+  {
+    // Assumes arg is normalized.
+    if (arg instanceof Values && ! ((Values) arg).isEmpty())
+      throw new IllegalArgumentException();
+    return arg;
+  }
+
+  public static Object oneOrMore (Object arg)
+  {
+    if (arg instanceof Values && ((Values) arg).isEmpty())
+      throw new IllegalArgumentException();
+    return arg;
+  }
+
+  public static Object exactlyOne (Object arg)
+  {
+    // Assumes arg is normalized.
+    if (arg instanceof Values)
+      throw new IllegalArgumentException();
+    return arg;
+  }
+
   public static boolean isEmptySequence(Object arg)
   {
     return arg instanceof Values && ((Values) arg).isEmpty();

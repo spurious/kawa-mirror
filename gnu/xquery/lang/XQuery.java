@@ -586,6 +586,10 @@ public class XQuery extends Language
     define_method("namespace-uri-for-prefix", "gnu.xquery.util.QNameUtils",
 		  "namespaceURIForPrefix");
 
+    define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");
+    define_method("one-or-more", "gnu.xquery.util.SequenceUtils", "oneOrMore");
+    define_method("exactly-one", "gnu.xquery.util.SequenceUtils", "exactlyOne");
+
     defProcStFld("distinct-nodes", "gnu.kawa.xml.SortNodes", "sortNodes");
 
     // FIXME - should be imported?

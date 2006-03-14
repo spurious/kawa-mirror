@@ -1,3 +1,8 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Declare fn:zero-or-one, fn:one-or-more,
+	and fn:exactly-one.
+
 2006-03-04  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseNodeTest): Defer getRawToken until after a

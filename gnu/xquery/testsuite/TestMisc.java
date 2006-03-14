@@ -24,7 +24,7 @@ public class TestMisc
     // Compilation.debugPrintFinalExpr = true;
 
     evalTest("3.5+1", "4.5");
-    evalTest("3.5+1 ,4*2.5", "4.5 10.0");
+    evalTest("3.5+1 ,4*2.5", "4.5 10");
     evalTest("3<5", "true");
     evalTest("let $x:=3+4 return $x", "7");
     evalTest("let $x:=3+4 return <a>{$x}</a>", "<a>7</a>");
@@ -554,7 +554,7 @@ public class TestMisc
 	      returned = throwable;
 	  }
 	throwable = (Throwable) returned;
-	// throwable.printStackTrace();
+        // throwable.printStackTrace();
 	if (returned instanceof SyntaxException)
 	  result = "*** caught SyntaxException - "
 	    + ((SyntaxException) returned).getMessages().getErrors();

@@ -1263,7 +1263,6 @@ declare function local:bid_summary()
 <ident>Use Case "R" (Access to Relational Data) Q13</ident>
 <description>For each user who has placed a bid, give the userid, name,
 number of bids, and average bid, in order by userid.</description>
-<NOTE>Added ".0" to the expected avgbid results.</NOTE>
 <query>
 <result>
  {
@@ -1287,13 +1286,13 @@ number of bids, and average bid, in order by userid.</description>
         <userid>U01</userid>
         <name>Tom Jones</name>
         <bidcount>2</bidcount>
-        <avgbid>220.0</avgbid>
+        <avgbid>220</avgbid>
     </bidder>
     <bidder>
         <userid>U02</userid>
         <name>Mary Doe</name>
         <bidcount>5</bidcount>
-        <avgbid>387.0</avgbid>
+        <avgbid>387</avgbid>
     </bidder>
     <bidder>
         <userid>U03</userid>
@@ -1305,13 +1304,13 @@ number of bids, and average bid, in order by userid.</description>
         <userid>U04</userid>
         <name>Roger Smith</name>
         <bidcount>5</bidcount>
-        <avgbid>266.0</avgbid>
+        <avgbid>266</avgbid>
     </bidder>
     <bidder>
         <userid>U05</userid>
         <name>Jack Sprat</name>
         <bidcount>2</bidcount>
-        <avgbid>110.0</avgbid>
+        <avgbid>110</avgbid>
     </bidder>
 </result> 
 </expect>
@@ -1322,8 +1321,6 @@ number of bids, and average bid, in order by userid.</description>
 <description>
 List item numbers and average bids for items that have received three or
 more bids, in descending order by average bid.</description>
-<NOTE>Added ".0" to the expected avgbid results.</NOTE>
-<NOTE>re-ordered expected output.</NOTE>
 <query>
 <result>
  {
@@ -1344,15 +1341,15 @@ more bids, in descending order by average bid.</description>
 <result>
     <popular_item>
         <itemno>1002</itemno>
-        <avgbid>800.0</avgbid>
-    </popular_item>
-    <popular_item>
-        <itemno>1001</itemno>
-        <avgbid>45.0</avgbid>
+        <avgbid>800</avgbid>
     </popular_item>
     <popular_item>
         <itemno>1007</itemno>
-        <avgbid>200.0</avgbid>
+        <avgbid>200</avgbid>
+    </popular_item>
+    <popular_item>
+        <itemno>1001</itemno>
+        <avgbid>45</avgbid>
     </popular_item>
 </result>
 </expect>

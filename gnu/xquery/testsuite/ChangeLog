@@ -1,3 +1,9 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Remove ".0" fractional parts in expected output,
+	to match specification - and current implementation.
+	* use-cases.xml: Likewise - and now fewer divergences from original.
+
 2006-03-04  Per Bothner  <per@bothner.com>
 
 	* maketab1.xql: Update 'declare xmlpspace' -> 'boundary-space'.

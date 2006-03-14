@@ -220,4 +220,147 @@ public abstract class RealNum extends Complex
   {
     return new BigDecimal(doubleValue());
   }
+
+  public static String toStringScientific (float d)
+  {
+    return toStringScientific(Float.toString(d));
+  }
+
+  public static String toStringScientific (double d)
+  {
+    return toStringScientific(Double.toString(d));
+  }
+
+  /** Convert result of Double.toString or Float.toString to
+   * scientific notation.
+   * Does not validate the input.
+   */
+  public static String toStringScientific (String dstr)
+  {
+    int indexE = dstr.indexOf('E');
+    if (indexE >= 0)
+      return dstr;
+    int len = dstr.length();
+    // Check for "Infinity" or "NaN".
+    char ch = dstr.charAt(len-1);
+    if (ch == 'y' || ch == 'N')
+      return dstr;
+    StringBuffer sbuf = new StringBuffer(len+10);
+    int exp = toStringScientific(dstr, sbuf);
+    sbuf.append('E');
+    sbuf.append(exp);
+    return sbuf.toString();
+  }
+
+  public static int toStringScientific (String dstr, StringBuffer sbuf)
+  {
+    boolean neg = dstr.charAt(0) == '-';
+    if (neg)
+      sbuf.append('-');
+    int pos = neg ? 1 : 0;
+    int exp;
+    int len = dstr.length();
+    if (dstr.charAt(pos) == '0')
+      { // Value is < 1.0.
+        int start = pos;
+        for (;;)
+          {
+            if (pos == len)
+              {
+                sbuf.append("0");
+                exp = 0;
+                break;
+              }
+            char ch = dstr.charAt(pos++);
+            if (ch >= '0' && ch <= '9' && (ch != '0' || pos == len))
+              {
+                sbuf.append(ch);
+                sbuf.append('.');
+                exp = ch == '0' ? 0 : start - pos + 2;
+                if (pos == len)
+                  sbuf.append('0');
+                else
+                  {
+                    while (pos < len)
+                      sbuf.append(dstr.charAt(pos++));
+                  }
+                break;
+              }
+          }
+      }
+    else
+      {
+        // Number of significant digits in string.
+        int ndigits = len - (neg ? 2 : 1);
+        int dot = dstr.indexOf('.');
+        // Number of fractional digits is len-dot-1.
+        int nfrac = len - dot - 1;
+        // We want ndigits-1 fractional digits.  Hence we need to move the
+        // decimal point ndigits-1-(len-dot-1) == ndigits-len+dot positions
+        // to the left. This becomes the exponent we need.
+        exp = ndigits - len + dot;
+        sbuf.append(dstr.charAt(pos++)); // Copy initial digit before point.
+        sbuf.append('.');
+        while (pos < len)
+          {
+            char ch = dstr.charAt(pos++);
+            if (ch != '.')
+              sbuf.append(ch);
+          }
+      }
+    // Remove excess zeros.
+    pos = sbuf.length();
+    int slen = -1;
+    for (;;)
+      {
+        char ch = sbuf.charAt(--pos);
+        if (ch == '0')
+          slen = pos;
+        else
+          {
+            if (ch == '.')
+              slen = pos + 2;
+            break;
+          }
+      }
+    if (slen >= 0)
+      sbuf.setLength(slen);
+    return exp;
+  }
+
+  public static String toStringDecimal (String dstr)
+  {
+    int indexE = dstr.indexOf('E');
+    if (indexE < 0)
+      return dstr;
+    int len = dstr.length();
+    // Check for "Infinity" or "NaN".
+    char ch = dstr.charAt(len-1);
+    if (ch == 'y' || ch == 'N')
+      return dstr;
+    StringBuffer sbuf = new StringBuffer(len+10);
+    boolean neg = dstr.charAt(0) == '-';
+    if (dstr.charAt(indexE+1) != '-')
+      {
+        throw new Error("not implemented: toStringDecimal given non-negative exponent: "+dstr);
+      }
+    else
+      {
+        int pos = indexE+2;  // skip "E-".
+        int exp = 0;
+        while (pos < len)
+          exp = 10 * exp + (dstr.charAt(pos++) - '0');
+        if (neg)
+          sbuf.append('-');
+        sbuf.append("0.");
+        while (--exp > 0) sbuf.append('0');
+        for (pos = 0; (ch = dstr.charAt(pos++)) != 'E'; )
+          {
+            if (ch != '-' & ch != '.'
+                && (ch != '0' || pos < indexE))
+              sbuf.append(ch);
+          }
+        return sbuf.toString();
+      }
+  }
 }

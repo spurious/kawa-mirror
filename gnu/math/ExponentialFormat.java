@@ -61,9 +61,22 @@ public class ExponentialFormat extends java.text.Format
       }
   }
 
+  public StringBuffer format(float value,
+			     StringBuffer sbuf, FieldPosition fpos)
+  {
+    return format(value, fracDigits < 0 ? Float.toString(value) : null,
+                  sbuf, fpos);
+  }
 
   public StringBuffer format(double value,
 			     StringBuffer sbuf, FieldPosition fpos)
+  {
+    return format(value, fracDigits < 0 ? Double.toString(value) : null,
+                  sbuf, fpos);
+  }
+
+  StringBuffer format(double value, String dstr,
+                      StringBuffer sbuf, FieldPosition fpos)
   {
     int k = intDigits;
     int d = fracDigits;
@@ -73,76 +86,102 @@ public class ExponentialFormat extends java.text.Format
     int oldLen = sbuf.length();
     int signLen = 1;
     if (negative)
-      sbuf.append('-');
+      {
+        if (d >= 0)
+          sbuf.append('-');
+        // Otherwise emitted by RealNum.toStringScientific.
+      }
     else if (showPlus)
       sbuf.append('+');
     else
       signLen = 0;
-    int log = (int) (Math.log(value) / LOG10);
     // Number of significant digits.
-    int digits = d < 0 ? 17 : d + (k > 0 ? 1 : k);
-    boolean showExponent = true;
-
+    int digits, scale;
     int digStart = sbuf.length();
-    if (log == 0x80000000)
-      log = digits + 1;
-    int scale = digits - log + 1;
-    IntNum ii = RealNum.toScaledInt(value, scale);
-    ii.format(10, sbuf);
-    int exponent = sbuf.length() - digStart - k - scale;
+    int exponent;
+    boolean nonFinite = Double.isNaN(value) || Double.isInfinite(value);
+    if (d < 0 || nonFinite)
+      {
+	if (dstr == null)
+	  dstr = Double.toString(value); // Needed if nonFinite && d >= 0.
+	int indexE = dstr.indexOf('E');
+        if (indexE >= 0)
+          {
+            sbuf.append(dstr);
+            indexE += digStart;
+            boolean negexp = dstr.charAt(indexE+1) == '-';
+            exponent = 0;
+            for (int i = indexE + (negexp ? 2 : 1);  i < sbuf.length();  i++)
+              exponent = 10 * exponent + (sbuf.charAt(i) - '0');
+            if (negexp)
+              exponent = -exponent;
+            sbuf.setLength(indexE);
+          }
+        else
+          exponent = RealNum.toStringScientific(dstr, sbuf);
+        if (negative)
+          digStart++;
+        int dot = digStart + 1;
+        /* #ifdef JAVA2 */
+        sbuf.deleteCharAt(dot);
+        /* #else */
+        // String afterDot = sbuf.toString().substring(dot+1);
+        // sbuf.setLength(dot);
+        // sbuf.append(afterDot);
+        /* #endif */
+        digits = sbuf.length() - digStart;
+        // Remove trailing '0' added by RealNum.toStringScientific.
+        if (digits > 1 && sbuf.charAt(digStart+digits-1) == '0')
+          sbuf.setLength(digStart + --digits);
+        scale = digits - exponent - 1;
+      }
+    else
+      {
+        digits = d + (k > 0 ? 1 : k);
+        int log = (int) (Math.log(value) / LOG10 + 1000.0); // floor
+        if (log == 0x80000000) // value is zero
+          log = 0;
+        else
+          log = log - 1000;
+        scale = digits - log - 1;
+        RealNum.toScaledInt(value, scale).format(10, sbuf);
+        exponent = digits - 1 - scale;
+      }
+
+    exponent -= k - 1;
     int exponentAbs = exponent < 0 ? -exponent : exponent;
     int exponentLen = exponentAbs >= 1000 ? 4 : exponentAbs >= 100 ? 3
       : exponentAbs >= 10 ? 2 : 1;
     if (expDigits > exponentLen)
       exponentLen = expDigits;
+    boolean showExponent = true;
     int ee = !general ? 0 : expDigits > 0 ? expDigits + 2 : 4;
     boolean fracUnspecified = d < 0;
     if (general || fracUnspecified)
       {
-	int n = sbuf.length() - oldLen - scale;
+	int n = digits - scale;
 	if (fracUnspecified)
 	  {
 	    d = n < 7 ? n : 7;
-	    int q = sbuf.length();
-	    char skip = '0';
-	    int max_digits = width <= 0 ? 16
-	      : width - signLen - exponentLen - 3;
-	    if (max_digits > 0 && max_digits < q - digStart)
-	      {
-		if (sbuf.charAt(digStart + max_digits) >= '5')
-		  skip = '9';
-		q = digStart + max_digits;
-	      }
-	    while (q > digStart && sbuf.charAt(--q) == skip) ;
-	    q = q + 1 - digStart;  // Number of digits needed.
-	    if (q > d)
-	      d = q;
+	    if (digits > d)
+	      d = digits;
 	  }
 	int dd = d - n;
-	if (general && (n >= 0 && dd >= 0)) // FIXME || value == 0.0))
+	if (general && (n >= 0 && dd >= 0))
 	  {
 	    // "arg is printed as if by the format directives 
 	    //    ~ww,dd,0,overflowchar,padcharF~ee@T "
-
-	    // The following is not correct according to the letter
-	    // of the CommonLisp spec, but seems to be in the spirit.
-	    // If the fraction is zero, and there is room, add a '0'.
-	    // (This also matches the Slib.)
-	    if (dd == 0 && fracUnspecified
-		&& (width <= 0 || n+signLen+1+ee < width))
-	      d++;
-
 	    digits = d;
 	    k = n;
 	    showExponent = false; 
 	  }
 	else if (fracUnspecified)
 	  {
-	    int avail = width - signLen - exponentLen - 3;
 	    if (width <= 0)
 	      digits = d;
 	    else
 	      {
+                int avail = width - signLen - exponentLen - 3;
 		digits = avail;
 		if (k < 0)
 		  digits -= k;
@@ -151,14 +190,12 @@ public class ExponentialFormat extends java.text.Format
 	      }
 	    if (digits <= 0)
 	      digits = 1;
-	    if (digits == k && (width <= 0 || digits < avail))
-	      digits++;
 	  }
       }
 
     int digEnd = digStart + digits;
     while (sbuf.length() < digEnd)
-      sbuf.insert(digStart, '0');
+      sbuf.append('0');
 
     // Now round to specified digits.
     char nextDigit = digEnd == sbuf.length() ? '0' : sbuf.charAt(digEnd);
@@ -171,6 +208,7 @@ public class ExponentialFormat extends java.text.Format
     scale -= sbuf.length() - digEnd;
     sbuf.setLength(digEnd);
 
+    int dot = digStart;
     if (k < 0)
       {
 	// Insert extra zeros after '.'.
@@ -182,8 +220,12 @@ public class ExponentialFormat extends java.text.Format
 	// Insert extra zeros before '.', if needed.
 	for (;  digStart+k > digEnd;  digEnd++)
 	  sbuf.append('0');
+        dot += k;
       }
-    sbuf.insert(k >= 0 ? digStart+k : digStart, '.');
+    if (nonFinite)
+      showExponent = false;
+    else
+      sbuf.insert(dot, '.');
 
     int newLen, i;
     if (showExponent)
@@ -205,21 +247,21 @@ public class ExponentialFormat extends java.text.Format
       }
     else
       {
-	if (true) // FIXME
-	  { //  Pedantic according to the Common Lisp spec.
-	    while (--ee >= 0 && (width <= 0 || sbuf.length() < oldLen + width))
-	      sbuf.append(' ');
-	  }
-	else
-	  { // This seems more reaonable:  Don't pad if width not specified!
-	    if (width > 0)
-	      while (--ee >= 0 && sbuf.length() < oldLen + width)
-		sbuf.append(' ');
-	  }
-	newLen = sbuf.length();
+        exponentLen = 0;
       }
+    newLen = sbuf.length();
     int used = newLen - oldLen;
     i = width - used;
+
+    // Insert '0' after '.' if needed and there is space.
+    if (fracUnspecified
+        && (dot + 1 == sbuf.length() || sbuf.charAt(dot+1) == exponentChar)
+        && (width <= 0 || i > 0))
+      {
+        i--;
+        sbuf.insert(dot+1, '0');
+      }
+
     if ((i >= 0 || width <= 0)
 	&& ! (showExponent && exponentLen > expDigits
 	      && expDigits > 0 && overflowChar != '\0'))
@@ -230,6 +272,16 @@ public class ExponentialFormat extends java.text.Format
 	    sbuf.insert(digStart, '0');
 	    --i;
 	  }
+        if (! showExponent
+            // The CommonLisp spec requires adding spaces on the right
+            // when a ~g format ends up using fixed-point format, corresponding
+            // to the space otherwise used for the exponent.  However, it seems
+            // wrong to do so when using a variable-width format.
+            && width > 0)
+          {
+            for (; --ee >= 0; --i) //  && sbuf.length() < oldLen + width; --i)
+              sbuf.append(' ');
+          }
 	// Insert padding:
 	while (--i >= 0)
 	  sbuf.insert(oldLen, padChar);

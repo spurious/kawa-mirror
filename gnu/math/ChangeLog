@@ -1,3 +1,11 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (toStringScientific, toStringDecimal): New methods.
+	* ExponentialFormat.java (format): Some new helper overloads.
+	(format): Major rewrite to use Double/Float.toString when precision
+	is unspecified, so we get the right rounding.
+	Also change output to never add right-padding for "~g".
+
 2006-03-07  Per Bothner  <per@bothner.com>
 
 	* Duration.java (seconds): Change from int to long.

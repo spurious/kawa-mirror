@@ -1,3 +1,7 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* formatst.scm: Some changes in expected output.
+
 2006-02-21  Donovan Kolbly <donovan@rscheme.org>
             Per Bothner  <per@bothner.com>
 

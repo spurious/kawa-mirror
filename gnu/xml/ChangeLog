@@ -1,3 +1,13 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (escapeNonAscii): New option.
+	(beginGroup): If type is an SName, get and print prefix from it.
+	(writeDouble, writeFloat): New methods.
+	(formatDouble, formatFloat, formatDecimal): New static helper methods.
+	(print): New method, to print accoring to XQuery specification.
+	(writeObject): Default to calling print rather than writeChars.
+	(writeChars): Do nothing, not even closeTag(), if zero chars.
+
 2006-03-03  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java (emit): Ignore whitespace not in an element.

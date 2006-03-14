@@ -5,9 +5,11 @@ package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
 import gnu.text.Char;
+import gnu.math.RealNum;
 import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
 import gnu.mapping.ThreadLocation;
+import java.math.BigDecimal;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -26,6 +28,7 @@ public class XMLPrinter extends PrintConsumer
   boolean canonicalize = true;
   boolean htmlCompat = true;
   public boolean escapeText = true;
+  public boolean escapeNonAscii = true;
   boolean isHtml = false;
   boolean undeclareNamespaces = false;
   Object style;
@@ -165,7 +168,7 @@ public class XMLPrinter extends PrintConsumer
 	  super.write("&amp;");
 	else if (v == '\"' && inAttribute)
 	  super.write("&quot;");
-	else if (v >= 127)
+	else if (escapeNonAscii && v >= 127)
 	  super.write("&#"+v+";");
 	else
 	  {
@@ -296,7 +299,19 @@ public class XMLPrinter extends PrintConsumer
 	pout.startLogicalBlock("", "", 2);
       }
     super.write('<');
-    super.write(typeName);
+    if (type instanceof SName)
+      {
+        SName sname = (SName) type;
+        String prefix = sname.getPrefix();
+        if (prefix != null && prefix.length() > 0)
+          {
+            super.write(prefix);
+            super.write(':');
+          }
+        super.write(sname.getLocalPart());
+      }
+    else
+      super.write(typeName);
     NamespaceBinding groupBindings = null;
     namespaceSaveStack[groupNesting++] = namespaceBindings;
     if (type instanceof XName)
@@ -442,6 +457,99 @@ public class XMLPrinter extends PrintConsumer
     prev = ' ';
   }
 
+  public void writeDouble (double d)
+  {
+    startWord();
+    super.write(formatDouble(d));
+  }
+
+  public void writeFloat (float f)
+  {
+    startWord();
+    super.write(formatFloat(f));
+  }
+
+  /** Helper to format xs:double according to XPath/XQuery specification. */
+  public static String formatDouble (double d)
+  {
+    if (Double.isNaN(d))
+      return "NaN";
+    boolean neg = d < 0;
+    if (Double.isInfinite(d))
+      return neg ? "-INF" : "INF";
+    double dabs = neg ? -d : d;
+    String dstr = Double.toString(d);
+    // Unfortunately, XQuery's rules for when to use scientific notation
+    // are different from Java's.  So fixup the string, if needed.
+    if ((dabs >= 1000000 || dabs < 0.000001) && dabs != 0.0)
+      return RealNum.toStringScientific(dstr);
+    else
+      return formatDecimal(RealNum.toStringDecimal(dstr));
+  }
+
+  /** Helper to format xs:float according to XPath/XQuery specification. */
+  public static String formatFloat (float f)
+  {
+    if (Float.isNaN(f))
+      return "NaN";
+    boolean neg = f < 0;
+    if (Float.isInfinite(f))
+      return neg ? "-INF" : "INF";
+    float fabs = neg ? -f : f;
+    String fstr = Float.toString(f);
+    // Unfortunately, XQuery's rules for when to use scientific notation
+    // are different from Java's.  So fixup the string, if needed.
+    if ((fabs >= 1000000 || fabs < 0.000001) && fabs != 0.0)
+      return RealNum.toStringScientific(fstr);
+    else
+      return formatDecimal(RealNum.toStringDecimal(fstr));
+  }
+
+  /** Format java.math.BigDecimal as needed for XPath/XQuery's xs:decimal.
+   * Specifically this means removing trailing fractional zeros, and a trailing
+   * decimal point. However, note that the XML Schema canonical representation
+   * does require a decimal point and at least one fractional digit.
+   */
+  public static String formatDecimal (BigDecimal dec)
+  {
+    /* #ifdef JAVA5 */
+    // return formatDecimal(dec.toPlainString());
+    /* #else */
+    return formatDecimal(dec.toString());
+    /* #endif */
+  }
+
+  static String formatDecimal (String str)
+  {
+    int dot = str.indexOf('.');
+    if (dot >= 0)
+      {
+        int len = str.length();
+        for (int pos = len; ; )
+          {
+            char ch = str.charAt(--pos);
+            if (ch != '0')
+              {
+                if (ch != '.')
+                  pos++;
+                return pos == len ? str : str.substring(0, pos);
+              }
+          }
+      }
+    return str;
+  }
+
+  public void print(Object v)
+  {
+    if (v instanceof BigDecimal)
+      v = formatDecimal((BigDecimal) v);
+    else if (v instanceof Double || v instanceof gnu.math.DFloNum)
+      v = formatDouble(((Number) v).doubleValue());
+    else if (v instanceof Float)
+      v = formatFloat(((Float) v).floatValue());
+    writeChars(v == null ? "(null)" : v.toString());
+  }
+
   public void writeObject(Object v)
   {
     if (v instanceof Consumable && ! (v instanceof UnescapedData))
@@ -469,7 +577,7 @@ public class XMLPrinter extends PrintConsumer
       {
 	startWord();
 	prev = ' ';
-	writeChars(v == null ? "(null)" : v.toString());
+	print(v);
 	prev = WORD;
       }
   }
@@ -487,8 +595,10 @@ public class XMLPrinter extends PrintConsumer
 
   public void writeChars(String str)
   {
-    closeTag();
     int len = str.length();
+    if (len == 0)
+      return;
+    closeTag();
     for (int i = 0;  i < len;  i++)
       writeChar(str.charAt(i));
     prev = '-';

@@ -1,3 +1,8 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileModule): Save/set/restore current
+	Compilation.
+
 2006-03-12  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (<init>): New constructor.
@@ -9,7 +14,7 @@
 	* CheckedTarget.java (emitCheckedCoerce): Get startPC at same position
 	as startTry, so test for empty exception region is correct.
 
-	* ModuleExp.java (evalModuel): Save/set/restore current Compilation.
+	* ModuleExp.java (evalModule): Save/set/restore current Compilation.
 
 2006-03-03  Per Bothner  <per@bothner.com>
 

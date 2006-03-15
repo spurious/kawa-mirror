@@ -894,8 +894,10 @@ public class Compilation
     // Do various code re-writes and optimization.
     walkModule(lexp);
 
+    Compilation saveCompilation = Compilation.getCurrent();
     try
       {
+        Compilation.setCurrent(this);
 	compileWalkedModule(lexp);
       }
     catch (Throwable ex)
@@ -904,6 +906,10 @@ public class Compilation
 	messages.printAll(OutPort.errDefault(), 20);
 	messages.clear();
 	throw WrappedException.wrapIfNeeded(ex);
+      }
+    finally
+      {
+        Compilation.setCurrent(saveCompilation);
       }
   }
 

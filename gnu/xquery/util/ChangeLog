@@ -1,5 +1,11 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* Compare.java (apply): Fixes to handle dates/times/durations, and
+	UntypedAtomic. Other fixes to follow specification more closely.
+	* OrderedTuples.java (cmp): Try numeric compare first.
+
+	* MinMax.java (cmobine): Use new NumverValue.numberCast method.
+
 	* IntegerRange.java (apply): DTRT when range end is empty sequence.
 
 	* Average.java: Use XQuery-specific ArithOp.add rather than AddOp.$pl.

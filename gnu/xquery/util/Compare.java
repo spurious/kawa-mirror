@@ -6,6 +6,8 @@ import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.math.*;
 import gnu.expr.*;
+import gnu.kawa.xml.KNode;
+import gnu.kawa.xml.UntypedAtomic;
 
 /** Compares two values (or sequences) according to XPath semantics. */
 
@@ -82,14 +84,30 @@ public class Compare extends Procedure2 implements CanInline
 	    index = next;
 	  }
       }
-    arg1 = NodeUtils.atomicValue(arg1);
-    arg2 = NodeUtils.atomicValue(arg2);
+    arg1 = KNode.atomicValue(arg1);
+    arg2 = KNode.atomicValue(arg2);
     if (arg1 instanceof Number || arg2 instanceof Number)
       {
-	if (! (arg1 instanceof Numeric))
-	  arg1 = new DFloNum(arg1.toString());
-	if (! (arg2 instanceof Numeric))
-	  arg2 = new DFloNum(arg2.toString());
+	if (arg1 instanceof UntypedAtomic)
+          {
+            String str = arg1.toString();
+            if (arg2 instanceof DateTime)
+              arg1 = DateTime.parse(str, ((DateTime) arg2).components());
+            else if (arg2 instanceof Duration)
+              arg1 = Duration.parse(str, ((Duration) arg2).unit());
+            else
+              arg1 = new DFloNum(str);
+          }
+	if (arg2 instanceof UntypedAtomic)
+          {
+            String str = arg2.toString();
+            if (arg1 instanceof DateTime)
+              arg2 = DateTime.parse(str, ((DateTime) arg1).components());
+            else if (arg1 instanceof Duration)
+              arg2 = Duration.parse(str, ((Duration) arg1).unit());
+            else
+              arg2 = new DFloNum(str);
+          }
 	return NumberCompare.apply2(flags, arg1, arg2);
       }
     String str1 = arg1.toString();

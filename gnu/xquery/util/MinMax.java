@@ -21,12 +21,9 @@ public class MinMax extends Reduce
   public Object combine (Object arg1, Object arg2)
   {
     if (arg1 == Values.empty)
-      return arg2; // FIXME - verify that arg2 is comparable.
+      return NumberValue.numberCast(arg2);
     int flags = returnMax ? Compare.TRUE_IF_GRT :  Compare.TRUE_IF_LSS;
-    if (arg1 instanceof KNode)
-      arg1 = NumberValue.numberValue(arg1);
-    if (arg2 instanceof KNode)
-      arg2 = NumberValue.numberValue(arg2);
+    arg2 = NumberValue.numberCast(arg2);
     return Compare.apply(flags, arg1, arg2, null) ? arg1 : arg2;
   }
 }

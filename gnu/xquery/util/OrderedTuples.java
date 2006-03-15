@@ -1,6 +1,8 @@
 package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.kawa.functions.NumberCompare;
+import gnu.kawa.xml.KNode;
 
 /** Helper class used in conjunction with {@link OrderedMap}.
  * It has the tuples from the {@code for} and {@code let}-clauses,
@@ -140,8 +142,13 @@ int cmp(int a, int b)  throws Throwable
         collator = NamedCollator.codepointCollation;
       Object val1 = comparator.applyN((Object[]) tuples[a]);
       Object val2 = comparator.applyN((Object[]) tuples[b]);
-      // FIXME only correct for strings ???
-      int c = collator.compare(val1.toString(), val2.toString());
+      val1 = KNode.atomicValue(val1);
+      val2 = KNode.atomicValue(val2);
+      int c;
+      if (val1 instanceof Number && val2 instanceof Number)
+        c = NumberCompare.compare(val1, val2);
+      else
+        c = collator.compare(val1.toString(), val2.toString());
       if (c == 0)
         continue;
       return flags.charAt(0) == 'A' ? c : -c;

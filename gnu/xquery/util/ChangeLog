@@ -1,3 +1,17 @@
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* IntegerRange.java (apply): DTRT when range end is empty sequence.
+
+	* Average.java: Use XQuery-specific ArithOp.add rather than AddOp.$pl.
+	Fix handling of empty and singleton sequences.
+	Use ArithOp.div for division.
+	(combine): Inline into caller.
+
+	* NumberValue.java (abs, floor, ceiling, roundHalfToEven): New methods.
+	(numberCast): New static helper method.
+	(numberValue): Use new classes/methods to better follow specification.
+	(apply1): Return NaN on failure, as per specification.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* SequenceUtils.java (zeroOrOne, oneOrMore, exactlyOne): New

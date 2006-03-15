@@ -64,6 +64,9 @@ public class IntegerRange extends MethodProc // implements Inlineable
     Object first = ctx.getNextArg();
     Object last = ctx.getNextArg();
     ctx.lastArg();
+    if (first == Values.empty || first == null
+        || last == Values.empty || last == null)
+      return;
     integerRange((IntNum) first, (IntNum) last, ctx.consumer);
   }
 }

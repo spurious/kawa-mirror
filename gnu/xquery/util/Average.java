@@ -16,14 +16,6 @@ public class Average extends Procedure1
     super(name);
   }
 
-  Object combine (Object arg1, Object arg2)
-  {
-    arg2 = NumberValue.numberValue(arg2);
-    if (arg1 == Values.empty)
-      return arg2;
-    return AddOp.$Pl(NumberValue.numberValue(arg1), arg2);
-  }
-
   public Object apply1(Object arg)
     throws Throwable
   {
@@ -39,17 +31,17 @@ public class Average extends Procedure1
 	    if (next == Sequence.eofValue)
 	      break;
 	    count++;
-	    sum = combine(sum, next);
+            sum = sum == Values.empty ? next : ArithOp.add.apply2(sum, next);
 	    index = tlist.nextPos(index);
 	  }
       }
     else
       {
 	count = 1;
-	sum = combine(sum, arg);
+	sum = arg;
       }
-    if (sum != Values.empty)
-      sum = ((Numeric) sum).div(DFloNum.make(count));
-    return sum;
+    if (sum == Values.empty)
+      return sum;
+    return sum = ArithOp.div.apply2(sum, IntNum.make(count));
   }
 }

@@ -576,6 +576,12 @@ public class XQuery extends Language
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringValue", "concat$V");
 
+    define_method("abs", "gnu.xquery.util.NumberValue", "abs");
+    define_method("floor", "gnu.xquery.util.NumberValue", "floor");
+    define_method("ceiling", "gnu.xquery.util.NumberValue", "ceiling");
+    define_method("round-half-to-even", "gnu.xquery.util.NumberValue",
+                  "roundHalfToEven");
+
     define_method("QName", "gnu.xquery.util.QNameUtils", "makeQName");
     define_method("prefix-from-QName", "gnu.xquery.util.QNameUtils",
 		  "prefixFromQName");

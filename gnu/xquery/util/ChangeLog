@@ -1,5 +1,8 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* RelativeStep.java (inline): Don't optimize unless mustCompile.
+	Also rename Compilation local from 'parser' to 'comp'.
+
 	* Compare.java (apply): Fixes to handle dates/times/durations, and
 	UntypedAtomic. Other fixes to follow specification more closely.
 	* OrderedTuples.java (cmp): Try numeric compare first.

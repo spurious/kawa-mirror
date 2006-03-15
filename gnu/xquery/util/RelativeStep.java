@@ -58,11 +58,14 @@ public class RelativeStep extends MethodProc implements CanInline
     Expression exp1 = args[0];
     Expression exp2 = args[1];
     LambdaExp lexp2;
+    Compilation comp = walker.getCompilation();
     if (! (exp2 instanceof LambdaExp)
+        // The following optimization breaks when interpreting, because
+        // then CoerceToNodes may not work.
+        || ! comp.mustCompile
 	|| (lexp2 = (LambdaExp) exp2).min_args != 3
 	|| lexp2.max_args != 3)
       return exp;
-    Compilation parser = walker.getCompilation();
 
     Declaration dotArg = lexp2.firstDecl();
     Declaration posArg = dotArg.nextDecl();
@@ -74,15 +77,15 @@ public class RelativeStep extends MethodProc implements CanInline
     lexp2.min_args = 2;
     lexp2.max_args = 2;
 
-    parser.letStart();
+    comp.letStart();
     // New to "coerce" to Values - or a NodeList.
     ClassType typeNodes = CoerceNodes.typeNodes;
     ClassType typeSortedNodes = SortNodes.typeSortedNodes;
     Declaration sequence
-      = parser.letVariable("sequence", typeNodes,
+      = comp.letVariable("sequence", typeNodes,
 			   new ApplyExp(CoerceNodes.coerceNodes,
 					new Expression [] {args[0]}));
-    parser.letEnter();
+    comp.letEnter();
     Method sizeMethod = typeNodes.getDeclaredMethod("size", 0);
     Expression lastInit
       =  new ApplyExp(sizeMethod,
@@ -96,6 +99,6 @@ public class RelativeStep extends MethodProc implements CanInline
       = valuesMapWithPos.inline(new ApplyExp(valuesMapWithPos, mapArgs),
 				walker);
     return new ApplyExp(SortNodes.sortNodes,
-			new Expression[] { parser.letDone(lastLet) });
+			new Expression[] { comp.letDone(lastLet) });
   }
 }

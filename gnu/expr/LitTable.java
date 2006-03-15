@@ -214,6 +214,20 @@ public class LitTable implements ObjectOutput
 	  {
 	    // nothing to do
 	  }
+        else if (obj instanceof java.math.BigInteger)
+          {
+            writeChars(obj.toString());
+          }
+        else if (obj instanceof java.math.BigDecimal)
+          {
+            java.math.BigDecimal dec = (java.math.BigDecimal) obj;
+            /* #ifdef JAVA2 */
+            writeObject(dec.unscaledValue());
+            writeInt(dec.scale());
+            /* #else */
+            // writeChars(obj.toString());
+            /* #endif */
+          }
 	else if (obj instanceof Integer)
 	  push(obj, Type.int_type);
 	else if (obj instanceof Short)

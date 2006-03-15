@@ -74,9 +74,11 @@ public class Document
   public static Object parseCached (Object uri, Object base)
     throws Throwable
   {
+    if (uri == Values.empty || uri == null)
+      return uri;
     if (! (uri instanceof URL))
       {
-        String name = uri.toString();
+        String name = StringValue.stringValue(uri);
         if (! InPort.uriSchemeSpecified(name))
           {
             if (base == null)
@@ -94,7 +96,9 @@ public class Document
    */
   public static boolean availableCached (Object url, Object base)
   {
-    try
+    if (url == Values.empty || url == null)
+      return false;
+   try
       {
         parseCached(url, base);
         return true;

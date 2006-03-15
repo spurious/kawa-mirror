@@ -4,7 +4,6 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
 public class CommentConstructor extends MethodProc // NodeConstructor
 {

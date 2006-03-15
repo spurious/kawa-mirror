@@ -1,3 +1,23 @@
+2006-03-14  Per Bothner  <per@bothner.com>
+
+	* StringValue.java: New class, some parts moved from gnu.xquery.utils.
+	* CommentConstructor.java: No longer need to import StringValue.
+	* MakeCDATA.java: Likewise.
+	* MakeText.java: Likewise.
+
+	* Document.java (parseCached, availableCached): Fixes needed for
+	XPath/XQuery semantics.
+
+	* KNode.java (atomicValue): Moved here from  gnu.xquery.util.NodeUtils.
+	Kludge to create UntypedAtomic.
+
+	* UntypedAtomic.java: New class.
+	* XDataType.java: New class, extends gnu.bytecode.Type.
+	* XTimeType.java: New class, extends XDataType.
+	* XIntegerType.java: New class, extends XDataType.
+	* XInteger.java: New class, extends gnu.math.IntNum.
+	* Makefile.am (java_sources): Update accordingly.
+
 2006-03-01  Per Bothner  <per@bothner.com>
 
 	* SortNodes.java (compile): Don't canonicalize result, if target

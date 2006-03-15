@@ -21,6 +21,19 @@ public abstract class KNode extends SeqPosition
     super(seq, ipos);
   }
 
+  public static Object atomicValue (Object value)
+  {
+    if (value instanceof KNode)
+      {
+        KNode node = (KNode) value;
+        Object val = ((NodeTree) node.sequence).typedValue(node.ipos);
+        if (val instanceof String) // Kludge.  FIXME.
+          val = new UntypedAtomic((String) val);
+        return val;
+      }
+    return value;
+  }
+
   /** Convert value to a KNode, returning null if it isn't a node. */
   public static KNode coerce (Object value)
   {

@@ -6,7 +6,6 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
 public class MakeText extends NodeConstructor
 {

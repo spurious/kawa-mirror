@@ -12,6 +12,11 @@
 	(numberValue): Use new classes/methods to better follow specification.
 	(apply1): Return NaN on failure, as per specification.
 
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java: New class, extends Procedure1or2.
+	* Makefile.am: Update accordingly.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* SequenceUtils.java (zeroOrOne, oneOrMore, exactlyOne): New

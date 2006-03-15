@@ -1207,22 +1207,22 @@ public class XQParser extends Lexer
     switch (op)
       {
       case OP_ADD: 
-	func = makeFunctionExp("gnu.kawa.functions.AddOp", "+");
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "add", "+");
 	break;
       case OP_SUB:
-	func = makeFunctionExp("gnu.kawa.functions.AddOp", "-");
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "sub", "-");
 	break;
       case OP_MUL:
-	func = makeFunctionExp("gnu.kawa.functions.MultiplyOp", "$St", "mul");
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "mul", "*");
 	break;
       case OP_DIV:
-	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "$Sl", "div");
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "div", "div");
 	break;
       case OP_IDIV:
-	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "idiv", "idiv");
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "idiv", "idiv");
 	break;
       case OP_MOD:
-	func = new QuoteExp(new PrimProcedure(ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
+	func = makeFunctionExp("gnu.xquery.util.ArithOp", "mod", "mod");
 	break;
       case OP_EQU:
 	func = makeFunctionExp("gnu.xquery.util.Compare", "=");
@@ -1566,12 +1566,17 @@ public class XQParser extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression exp;
-    if (curToken == OP_SUB || curToken == OP_ADD) {
-      int op = curToken;
-      getRawToken();
-      exp = parseUnionExpr();
-      exp = makeBinary(op, new QuoteExp(gnu.math.IntNum.zero()), exp);
-    }
+    if (curToken == OP_SUB || curToken == OP_ADD)
+      {
+        int op = curToken;
+        getRawToken();
+        exp = parseUnionExpr();
+        Expression func
+          = makeFunctionExp("gnu.xquery.util.ArithOp",
+                            op == OP_ADD ? "plus" : "minus",
+                            op == OP_ADD ? "+" : "-");
+        exp = new ApplyExp(func, new Expression[] { exp });
+      }
     else
       exp = parseUnionExpr();
     return exp;

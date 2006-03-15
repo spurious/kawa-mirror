@@ -314,9 +314,7 @@ public class Invoke extends ProcedureN implements CanInline
     if (args.length > carg)
       {
 	Type type = language.getTypeFor(args[carg]);
-	if (type instanceof PairClassType)
-	  type = ((PairClassType) type).instanceType;
-	else if (! (type instanceof Type))
+	if (! (type instanceof Type))
 	  return exp;
 	if (type instanceof ClassType && ((ClassType) type).isExisting())
 	  {

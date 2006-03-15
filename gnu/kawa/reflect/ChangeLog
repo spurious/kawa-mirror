@@ -1,3 +1,9 @@
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inlineClassName): Don't lower a PairClassType to its
+	implementationType - that's only correct for 'make' - which does not
+	use this method.
+
 2006-03-13  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java (compare): Instead of a throw return -2.
@@ -451,7 +457,7 @@
 	of Interpreter.  Get latter from former.
 	If type is a Classtype and isExisting, emit error is not found.
 
-	* InstanceOf.java (inline):  Upadte call to inlineClassName.
+	* InstanceOf.java (inline):  Update call to inlineClassName.
 	* SlotGet.java (inline):  Likewise.
 	* SlotSet.java (inline):  Likewise.
 

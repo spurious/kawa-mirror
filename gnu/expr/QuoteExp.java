@@ -130,6 +130,13 @@ public class QuoteExp extends Expression
       {
 	out.objectFormat = Language.getDefaultLanguage().getFormat(true);
 	out.print(value);
+        /*
+        if (value != null)
+          {
+            out.print(" ::");
+            out.print(value.getClass().getName());
+          }
+        */
       }
     finally
       {

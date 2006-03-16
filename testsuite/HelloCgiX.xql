@@ -1,4 +1,4 @@
-declare xmlspace preserve;
+declare boundary-space preserve;
 response-header("X-Count", 6+7),
 unescaped-data("<?xml version='1.0'?>
 "),

@@ -922,13 +922,13 @@
 
 (define (append-map f lis1 . lists)
   (if (pair? lists)
-      (apply append! (apply map (cons f (cons lis1 lists))))
-      (apply append! (map f lis1))))
+      (apply append (apply map f lis1 lists))
+      (apply append (map f lis1))))
 
 (define (append-map! f lis1 . lists)
   (if (pair? lists)
-      (apply append! (apply map! (cons f (cons lis1 lists))))
-      (apply append! (map! f lis1))))
+      (apply append! (apply map f lis1 lists))
+      (apply append! (map f lis1))))
 
 (define (pair-for-each proc :: <procedure> lis1 . lists)
   (if (pair? lists)

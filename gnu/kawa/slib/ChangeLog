@@ -1,3 +1,9 @@
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* srfi1.scm (append-map, append-map!):  Fix errors (in Kawa-specific
+	changes).
+	Fixes Savannah bug #15579 "append-map may destroy arguments".
+
 2006-02-21  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Lots of fixes and improvements.

@@ -1435,36 +1435,46 @@ public class TreeList extends AbstractSequence
 
   }
 
-  protected int getNextTypeIndex(int ipos)
+  /** Return index in objects array for type or typename of a node.
+   * @param ipos the argument node
+   * @param select 0 if we want the type-name or 1 if we want the
+   *   type-object.  This parameter is ignored if the node is a
+   *   PROCESSING_INSTRUCTION, which ionly has a single entry in the
+   *   objects array.
+   * @return index in objects array, or -1 the node has no type.
+   */
+  private int getNextTypeIndex(int ipos, int select)
   {
     int index = posToDataIndex(ipos);
     if (index == data.length)
-      return Sequence.EOF_VALUE;
+      return -1;
     char datum = data[index];
     if (datum >= BEGIN_GROUP_SHORT
 	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return datum-BEGIN_GROUP_SHORT;
+      return datum-BEGIN_GROUP_SHORT + select;
     else if (datum == BEGIN_GROUP_LONG)
       {
 	int j = getIntN(index+1);
 	j += j < 0 ? data.length : index;
-	return getIntN(j + 1);
+	return getIntN(j + 1)+select;
       }
     else if (datum == BEGIN_ATTRIBUTE_LONG)
+      return getIntN(index + 1)+select;
+    else if (datum == PROCESSING_INSTRUCTION)
       return getIntN(index + 1);
     return -1;
   }
 
   public String getNextTypeName(int ipos)
   {
-    int index = getNextTypeIndex(ipos);
+    int index = getNextTypeIndex(ipos, 0);
     return index < 0 ? null : (String) objects[index];
   }
 
   public Object getNextTypeObject(int ipos)
   {
-    int index = getNextTypeIndex(ipos);
-    return index < 0 ? null : objects[index+1];
+    int index = getNextTypeIndex(ipos, 1);
+    return index < 0 ? null : objects[index];
   }
 
   public Object getPosPrevious(int ipos)

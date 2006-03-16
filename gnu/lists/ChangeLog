@@ -1,5 +1,10 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* FilterConsumer.java (beforeContent): New sub-class hook.
+	Call it before the valious witrXxx methods.
+	(inAttribute, attributeName, attributeType): New convience
+	fields for sub-class use.
+
 	* TreeList.java (getNextTypeIndex): Take extra parameter to indicate
 	if we want type-name or type-object.  This is needed to make it work
 	for processing-instructions, whihc only have one objects array entry.	

@@ -25,6 +25,7 @@ java_sources = \
   SequenceUtils.java \
   StringUtils.java \
   SubList.java \
+  TimeUtils.java \
   ValuesEvery.java \
   ValuesFilter.java \
   XMLFormat.java

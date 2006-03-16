@@ -1,5 +1,9 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* TimeUtils.java: New class with static methods implementing
+	date/time/duration-related functions.
+	* Makefile.am: Update accordingly.
+
 	* StringValue.java: Remove file.  Contents partly moved to new file
 	StringUtils.java and partly moved to gnu/kawa/xml/StringValue.java.
 	(stringToCodepoints$X, appendCodepoint, codepointsToString): New.

@@ -1,5 +1,8 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): Add a slew of date/time/duration-related
+	functions.
+
 	* XQParser.java (XQUERY_VERSION_TOKEN): New constant.
 	(peekOperand): Map <"xquery" "version"> to XQUERY_VERSION_TOKEN.
 	(parse): Handle XQUERY_VERSION_TOKEN.

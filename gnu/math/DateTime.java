@@ -485,7 +485,7 @@ public class DateTime extends Quantity implements Cloneable
       {
         nanos = x.nanoSeconds + k * nanos;
         long millis = x.calendar.getTimeInMillis();
-        millis += k * (nanos / 1000000L);
+        millis += nanos / 1000000L;
         r.calendar.setTimeInMillis(millis);
         r.nanoSeconds = (int) (nanos % 1000000L);
       }

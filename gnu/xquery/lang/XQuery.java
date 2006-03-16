@@ -549,8 +549,8 @@ public class XQuery extends Language
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("boolean", "gnu.xquery.util.BooleanValue", "booleanValue");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
-    defProcStFld("string-value", "gnu.xquery.util.StringValue", "stringValue");
-    defProcStFld("string", "gnu.xquery.util.StringValue", "string");
+    defProcStFld("string-value", "gnu.kawa.xml.StringValue", "stringValue");
+    defProcStFld("string", "gnu.kawa.xml.StringValue", "string");
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     defProcStFld("write-to", "gnu.kawa.xml.WriteTo", "writeTo");
@@ -560,22 +560,26 @@ public class XQuery extends Language
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
-    define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
-    define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");
-    define_method("substring", "gnu.xquery.util.StringValue", "substring");
+    define_method("lower-case", "gnu.xquery.util.StringUtils", "lowerCase");
+    define_method("upper-case", "gnu.xquery.util.StringUtils", "upperCase");
+    define_method("substring", "gnu.xquery.util.StringUtils", "substring");
     define_method("string-length",
-		  "gnu.xquery.util.StringValue", "stringLength");
+		  "gnu.xquery.util.StringUtils", "stringLength");
     define_method("substring-before",
-		  "gnu.xquery.util.StringValue", "substringBefore");
+		  "gnu.xquery.util.StringUtils", "substringBefore");
     define_method("substring-after",
-		  "gnu.xquery.util.StringValue", "substringAfter");
-    define_method("translate", "gnu.xquery.util.StringValue", "translate");
-    define_method("string-pad", "gnu.xquery.util.StringValue", "stringPad");
-    define_method("contains", "gnu.xquery.util.StringValue", "contains");
-    define_method("starts-with", "gnu.xquery.util.StringValue", "startsWith");
-    define_method("ends-with","gnu.xquery.util.StringValue", "endsWith");
-    define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
-    define_method("concat", "gnu.xquery.util.StringValue", "concat$V");
+		  "gnu.xquery.util.StringUtils", "substringAfter");
+    define_method("translate", "gnu.xquery.util.StringUtils", "translate");
+    define_method("string-pad", "gnu.xquery.util.StringUtils", "stringPad");
+    define_method("contains", "gnu.xquery.util.StringUtils", "contains");
+    define_method("starts-with", "gnu.xquery.util.StringUtils", "startsWith");
+    define_method("ends-with","gnu.xquery.util.StringUtils", "endsWith");
+    define_method("string-join", "gnu.xquery.util.StringUtils", "stringJoin");
+    define_method("concat", "gnu.xquery.util.StringUtils", "concat$V");
+    define_method("string-to-codepoints", "gnu.xquery.util.StringUtils",
+		  "stringToCodepoints$X");
+    define_method("codepoints-to-string", "gnu.xquery.util.StringUtils",
+		  "codepointsToString");
 
     define_method("abs", "gnu.xquery.util.NumberValue", "abs");
     define_method("floor", "gnu.xquery.util.NumberValue", "floor");

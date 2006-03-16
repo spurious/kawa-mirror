@@ -437,7 +437,7 @@ public class XQResolveNames extends ResolveNames
                 }
               case COMPARE_BUILTIN:
 		{
-                  Method meth = ClassType.make("gnu.xquery.util.StringValue")
+                  Method meth = ClassType.make("gnu.xquery.util.StringUtils")
                     .getDeclaredMethod("compare", 3);
                   return withCollator(meth, exp.getArgs(), "fn:compare", 2);
                 }

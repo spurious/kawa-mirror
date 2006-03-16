@@ -1,5 +1,10 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* StringValue.java: Remove file.  Contents partly moved to new file
+	StringUtils.java and partly moved to gnu/kawa/xml/StringValue.java.
+	(stringToCodepoints$X, appendCodepoint, codepointsToString): New.
+	* Makefile.am: Update accordingly.
+
 	* NodeUtils.java (atomicValue): Moved to gnu.kawa.xml.KNode.
 	(prefixesFromNodetype, inScopePrefixes$X): New methods.
 

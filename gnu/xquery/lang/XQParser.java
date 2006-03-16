@@ -2209,8 +2209,7 @@ public class XQParser extends Lexer
   public static Expression stringValue(Expression exp)
   {
     Expression[] args = { exp };
-    Expression string
-      = makeFunctionExp("gnu.xquery.util.StringValue", "string");
+    Expression string = makeFunctionExp("gnu.kawa.xml.StringValue", "string");
     return new ApplyExp(string, args);
   }
 

@@ -1,5 +1,10 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (stringValue): Update for moved StringValue class.
+	* XQResolveNames.java (walkApplyExp): Likewise.
+	* XQuery.java (intXQuery): Likewise.
+	Also add fn:string-to-codepoints and fn:codepoints-to-string.
+
 	* XQuery.java (inXQuery): Declare fn:boolean and fn:in-scope-prefixes.
 
 	* XQuery.java (initXQuery): Declare fn:abs, fn:floor, fn:ceiling, and

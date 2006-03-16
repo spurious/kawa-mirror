@@ -23,7 +23,7 @@ java_sources = \
   Reduce.java \
   RelativeStep.java \
   SequenceUtils.java \
-  StringValue.java \
+  StringUtils.java \
   SubList.java \
   ValuesEvery.java \
   ValuesFilter.java \

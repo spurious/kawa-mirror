@@ -216,12 +216,8 @@ public class TimeUtils
       return time;
     DateTime dtime = (DateTime) time;
     if (zone == Values.empty || zone == null)
-      {
-        return dtime.withZoneUnspecified();
-        //if (dtime.isZoneUnspecified())      return dtime;
-      }
+      return dtime.withZoneUnspecified();
     else
       return dtime.adjustTimezone((int) ((Duration) zone).getTotalMinutes());
-    //throw new Error("adjustDateTimeToTimezone unfinished");
   }
 }

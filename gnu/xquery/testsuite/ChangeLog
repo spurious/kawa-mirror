@@ -1,3 +1,7 @@
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* expected-1.errs: Update for changed error message.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Remove ".0" fractional parts in expected output,

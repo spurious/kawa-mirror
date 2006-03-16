@@ -251,6 +251,7 @@ public class XQParser extends Lexer
   static final int DECLARE_BASE_URI_TOKEN = 'B'; // <"declare" "base-uri">
   static final int DECLARE_ORDERING_TOKEN = 'U'; // <"declare" "ordering">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
+  static final int XQUERY_VERSION_TOKEN = 'Y'; // <"xquery" "version">
 
   /* 'Q': QName (intern'ed name is curValue)
    * 'R': NCName ':' '*'
@@ -1067,6 +1068,8 @@ public class XQParser extends Lexer
 			"replace 'define variable' by 'declare variable'");
 		return curToken = DECLARE_VARIABLE_TOKEN;
 	      }
+            if (lookingAt("xquery", /*"v"+*/ "ersion"))
+              return curToken = XQUERY_VERSION_TOKEN;
 	    break;
 	  case 'x':
 	    if (lookingAt("declare", /*"x"+*/ "mlspace"))
@@ -1553,9 +1556,9 @@ public class XQParser extends Lexer
 	  {
 	    Expression exp2 = parseBinaryExpr(tokPriority+1);
 	    if (token == OP_AND)
-	      exp = new IfExp(booleanValue(exp), exp2, QuoteExp.falseExp);
+	      exp = new IfExp(booleanValue(exp), booleanValue(exp2), QuoteExp.falseExp);
 	    else if (token == OP_OR)
-	      exp = new IfExp(booleanValue(exp), QuoteExp.trueExp, exp2);
+	      exp = new IfExp(booleanValue(exp), QuoteExp.trueExp, booleanValue(exp2));
 	    else
 	      exp = makeBinary(token, exp, exp2);
 	  }
@@ -1621,9 +1624,11 @@ public class XQParser extends Lexer
     if (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+        Expression dot;
 	if (dotDecl == null)
-	  error("node test1 when focus is undefined");
-	Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
+	  dot = syntaxError("context item is undefined", "XPDY0002");
+        else
+          dot = new ReferenceExp(DOT_VARNAME, dotDecl);
 	step1 = new ApplyExp(ClassType.make("gnu.kawa.xml.Nodes")
 			     .getDeclaredMethod("root", 1),
 			     new Expression[] { dot } );
@@ -1728,13 +1733,10 @@ public class XQParser extends Lexer
     return Symbol.make(uri, local);
   }
 
-  private final String undefTestErr = "node test when focus is undefined";
-
   Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
     int token = peekOperand();
-    Expression exp;
     Expression[] args = new Expression[1];
 
     Type type = parseMaybeKindTest();
@@ -1761,8 +1763,11 @@ public class XQParser extends Lexer
       return null;
 
     Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+    Expression dot;
     if (dotDecl == null)
-      error(undefTestErr);
+      dot = syntaxError("node test when context item is undefined", "XPDY0002");
+    else
+      dot = new ReferenceExp(DOT_VARNAME, dotDecl);
     if (type == null)
       getRawToken();
 
@@ -1786,11 +1791,7 @@ public class XQParser extends Lexer
     ApplyExp mkAxis = new ApplyExp(axisClass.getDeclaredMethod("make", 1),
 				   args);
     mkAxis.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-    Expression[] dotArg = { new ReferenceExp(DOT_VARNAME, dotDecl) };
-    exp = new ApplyExp(mkAxis, dotArg);
-    if (dotDecl == null)
-      return new ErrorExp(undefTestErr);
-    return exp;
+    return new ApplyExp(mkAxis, new Expression[] { dot });
   }
 
   Expression parseRelativePathExpr(Expression exp)
@@ -1874,9 +1875,11 @@ public class XQParser extends Lexer
 	axis = curToken == '.' ? AXIS_SELF : AXIS_PARENT;
 	getRawToken();
 	Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+        Expression exp;
 	if (dotDecl == null)
-	  error("node test3 when focus is undefined");
-	Expression exp = new ReferenceExp(DOT_VARNAME, dotDecl);
+	  exp = syntaxError("context item is undefined", "XPDY0002");
+	else
+          exp = new ReferenceExp(DOT_VARNAME, dotDecl);
 	if (axis == AXIS_PARENT)
 	  {
 	    Expression[] args = { exp };
@@ -2792,8 +2795,11 @@ public class XQParser extends Lexer
         exp = new ApplyExp(func, args);
         exp.setFile(getName());
         exp.setLine(startLine, startColumn);
+      }
+    else if (token == ORDERED_LBRACE_TOKEN || token == UNORDERED_LBRACE_TOKEN)
+      {
         getRawToken();
-        return exp;
+        exp = parseExprSequence('}');
       }
     else
       return null;
@@ -2861,7 +2867,7 @@ public class XQParser extends Lexer
     if (curToken == QNAME_TOKEN)
       return str;
     else if (curToken == NCNAME_TOKEN)
-      return Symbol.make("", str);
+      return Namespace.EmptyNamespace.getSymbol(str.intern());
     else
       return null;
   }
@@ -3401,7 +3407,7 @@ public class XQParser extends Lexer
             Expression[] args =
               {
                 new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
-                             new Expression[] {new QuoteExp(decl.getName())}),
+                             new Expression[] {new QuoteExp(decl.getSymbol())}),
                 type==null ? QuoteExp.nullExp : type
               };
             init = new ApplyExp(ClassType.make("gnu.xquery.lang.XQuery")
@@ -3590,6 +3596,33 @@ public class XQParser extends Lexer
 	parseSeparator();
 	return QuoteExp.voidExp;
 
+      case XQUERY_VERSION_TOKEN:
+        getRawToken();
+        if (curToken == STRING_TOKEN)
+          {
+            String version = new String(tokenBuffer, 0, tokenBufferLength);
+            if (! version.equals("1.0"))
+              error('w', "unrecognized xquery version "+version, "XQST0031");
+            getRawToken();
+          }
+        else
+          return syntaxError("missing version string after 'xquery version'");
+        if (match("encoding"))
+          {
+            getRawToken();
+            if (curToken != STRING_TOKEN)
+              return syntaxError("invalid encoding specification");
+            else
+              {
+                String encoding = new String(tokenBuffer, 0, tokenBufferLength);
+                // ignore encoding specification.
+                getRawToken();
+              }
+          }
+        if (curToken != ';')
+          syntaxError("missing ';'");
+        return QuoteExp.voidExp;
+
       case DECLARE_BASE_URI_TOKEN:
         val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
@@ -3738,10 +3771,10 @@ public class XQParser extends Lexer
    * @param message an error message to print out
    * @return an ErrorExp
    */
-  public Expression syntaxError (String message)
+  public Expression syntaxError (String message, String code)
     throws java.io.IOException, SyntaxException
   {
-    error('e', message, "XPST0003");
+    error('e', message, code);
     if (interactive)
       {
 	curToken = 0;
@@ -3762,6 +3795,12 @@ public class XQParser extends Lexer
 	throw new SyntaxException(getMessages());
       }
     return new ErrorExp (message);
+  }
+
+  public Expression syntaxError (String message)
+    throws java.io.IOException, SyntaxException
+  {
+    return syntaxError(message, "XPST0003");
   }
 
   public void eofError(String msg) throws SyntaxException

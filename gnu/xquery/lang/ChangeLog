@@ -1,5 +1,24 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (XQUERY_VERSION_TOKEN): New constant.
+	(peekOperand): Map <"xquery" "version"> to XQUERY_VERSION_TOKEN.
+	(parse): Handle XQUERY_VERSION_TOKEN.
+
+	* XQParser.java (parseBinaryExpr): Coerce 'and' and 'or' results
+	to boolean values.
+
+	* XQParser.java (parsePathExpr, parseNodeTest, parseStepExpr): Tweaked
+	error messages when context item is undefined.
+
+	* XQParser.java (parseMaybePrimaryExpr): Handle - by ignoring - the
+	'ordered' and 'unordered' expressions.
+
+	* XQParser.java (parseVariable): Inline Symbol.make call.
+
+	* XQParser.java (parse): Pass Symbol, not String, to getExternal.
+
+	* XQParser.java (syntaxError): Another overload.
+
 	* XQParser.java (stringValue): Update for moved StringValue class.
 	* XQResolveNames.java (walkApplyExp): Likewise.
 	* XQuery.java (intXQuery): Likewise.

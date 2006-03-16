@@ -1,3 +1,10 @@
+2006-03-15  Per Bothner  <per@bothner.com>
+
+	* ProcessingInstructionType.java: New class extends NodeType.
+	* Makefile.am: Update accordingly.
+	* MakeProcInst.java: New extends NodeConstructor.  Re-write
+	accordingly.  Add some XQuery-required error checking.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* StringValue.java: New class, some parts moved from gnu.xquery.utils.

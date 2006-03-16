@@ -1,5 +1,11 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (peekOperand): Fix typo.
+	(parseMaybeKindTest): Generalize OP_PI parsing to full syntax.
+	Use new gnu.kawa.xml.ProcessingInstructionType.
+	(parseMaybePrimaryExpr): Handle PI_TOKEN.
+	(piNodeTest): No longer needed.
+
 	* XQuery.java (initXQuery): Add a slew of date/time/duration-related
 	functions.
 

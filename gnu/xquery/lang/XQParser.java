@@ -933,7 +933,7 @@ public class XQParser extends Lexer
               return curToken = ORDERED_LBRACE_TOKEN;
             break; 
           case 'p':
-            if (match("processing-instructio"))
+            if (match("processing-instruction"))
               {
                 if (next == '(')
                   return curToken = OP_PI;
@@ -1402,9 +1402,18 @@ public class XQParser extends Lexer
         return anyNodeTest;
 
       case OP_PI:
-        parseSimpleKindType();
-        // FIXME don't support processing-instruction(target)
-        return piNodeTest;
+        getRawToken();
+        String piTarget = null;
+        if (curToken == NCNAME_TOKEN || curToken == STRING_TOKEN)
+          {
+            piTarget = new String(tokenBuffer, 0, tokenBufferLength);
+            getRawToken();
+          }
+        if (curToken == ')')
+          getRawToken();
+        else
+          error("expected ')'");
+        return ProcessingInstructionType.getInstance(piTarget);
 
       default:
         return null;
@@ -2768,6 +2777,29 @@ public class XQParser extends Lexer
         else if (token == COMMENT_TOKEN)
           func = makeFunctionExp("gnu.kawa.xml.CommentConstructor",
                                  "commentConstructor");
+        else if (token == PI_TOKEN)
+          {
+            Expression target;
+            if (curToken == NCNAME_TOKEN)
+              {
+                String name = new String(tokenBuffer, 0, tokenBufferLength);
+                target = new QuoteExp(name.intern());
+              }
+            else if (curToken == '{')
+              {
+                target = parseEnclosedExpr();
+              }
+            else
+              {
+                target = syntaxError("expected NCName or '{' after 'processing-instruction'");
+                if (curToken != QNAME_TOKEN)
+                  return target;
+              }
+            vec.addElement(target);
+            func = makeFunctionExp("gnu.kawa.xml.MakeProcInst",
+                                 "makeProcInst");
+            getRawToken();
+          }
         else /* token == TEXT_TOKEN */
           func = makeFunctionExp("gnu.kawa.xml.MakeText",
                                  "makeText");
@@ -2776,7 +2808,8 @@ public class XQParser extends Lexer
         if (curToken != '{')
           return syntaxError("missing '{'");
         getRawToken();
-        if (token == TEXT_TOKEN || token == COMMENT_TOKEN)
+        if (token == TEXT_TOKEN || token == COMMENT_TOKEN
+            || token == PI_TOKEN)
           vec.addElement(parseExprSequence('}'));
         else if (curToken != '}')
           {
@@ -3700,8 +3733,6 @@ public class XQParser extends Lexer
     = new NodeType("text", NodeType.TEXT_OK);
   static final NodeType commentNodeTest
     = new NodeType("comment", NodeType.COMMENT_OK);
-  static final NodeType piNodeTest
-    = new NodeType("processing-instruction", NodeType.PI_OK);
   static final NodeType anyNodeTest
     = new NodeType("node");
 

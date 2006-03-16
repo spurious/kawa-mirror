@@ -49,6 +49,7 @@ java_sources = \
   ParentAxis.java \
   PrecedingAxis.java \
   PrecedingSiblingAxis.java \
+  ProcessingInstructionType.java \
   SelfAxis.java \
   SortNodes.java \
   SortedNodes.java \

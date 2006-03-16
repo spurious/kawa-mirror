@@ -1,5 +1,7 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (inXQuery): Declare fn:boolean and fn:in-scope-prefixes.
+
 	* XQuery.java (initXQuery): Declare fn:abs, fn:floor, fn:ceiling, and
 	fn:round-half-to-even.
 

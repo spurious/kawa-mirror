@@ -547,6 +547,7 @@ public class XQuery extends Language
 		  "reverse$X");
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
+    defProcStFld("boolean", "gnu.xquery.util.BooleanValue", "booleanValue");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
     defProcStFld("string-value", "gnu.xquery.util.StringValue", "stringValue");
     defProcStFld("string", "gnu.xquery.util.StringValue", "string");
@@ -591,6 +592,8 @@ public class XQuery extends Language
 		  "namespaceURIFromQName");
     define_method("namespace-uri-for-prefix", "gnu.xquery.util.QNameUtils",
 		  "namespaceURIForPrefix");
+    define_method("in-scope-prefixes", "gnu.xquery.util.NodeUtils",
+                  "inScopePrefixes$X");
 
     define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");
     define_method("one-or-more", "gnu.xquery.util.SequenceUtils", "oneOrMore");

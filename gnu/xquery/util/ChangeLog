@@ -1,5 +1,11 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (atomicValue): Moved to gnu.kawa.xml.KNode.
+	(prefixesFromNodetype, inScopePrefixes$X): New methods.
+
+	* BooleanValue (booleanValue): Fix thinko.
+	Add correct handling for String and UntypedAtomic.
+
 	* RelativeStep.java (inline): Don't optimize unless mustCompile.
 	Also rename Compilation local from 'parser' to 'comp'.
 

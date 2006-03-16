@@ -5,6 +5,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.Numeric;
+import gnu.kawa.xml.UntypedAtomic;
 
 public class BooleanValue extends Procedure1
 {
@@ -15,9 +16,11 @@ public class BooleanValue extends Procedure1
     if (value instanceof Boolean)
       return ((Boolean) value).booleanValue();
     if (value instanceof Numeric)
-      return ((Numeric) value).isZero();
+      return ! ((Numeric) value).isZero();
     if (value instanceof SeqPosition)
       return true;
+    if (value instanceof String || value instanceof UntypedAtomic)
+      return value.toString().length() > 0;
     if (value instanceof Values)
       {
 	Values values = (Values) value;

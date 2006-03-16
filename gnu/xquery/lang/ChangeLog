@@ -5,6 +5,9 @@
 	* XQuery.java (initXQuery): Declare fn:abs, fn:floor, fn:ceiling, and
 	fn:round-half-to-even.
 
+	* XQParser.java (makeBinary): Use XQuery-specific ArithOp operators.
+	(parseUnaryOp): Proper implementation of unary operators.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (initXQuery): Declare fn:zero-or-one, fn:one-or-more,

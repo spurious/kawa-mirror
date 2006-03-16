@@ -1,3 +1,8 @@
+2006-03-16  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (exp2Type): May need to InlineCalls on
+	type-specifier - for example for PREFIX:<>.
+
 2006-03-13  Per Bothner  <per@bothner.com>
 
 	* configure.in: Define JAVACFLAGS, and default it to -g.

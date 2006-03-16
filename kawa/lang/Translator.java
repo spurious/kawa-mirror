@@ -839,6 +839,7 @@ public class Translator extends Compilation
     try
       {
 	Expression texp = rewrite_car(typeSpecPair, false);
+        texp = new InlineCalls(this).walk(texp);
 	if (texp instanceof ErrorExp)
 	  return null;
 	Type type = getLanguage().getTypeFor(texp);

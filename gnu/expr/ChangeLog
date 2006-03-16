@@ -1,5 +1,7 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* ExpWalker.java (messages): Make protected, for XQResolveNames.
+
 	* LitTable.java (writeObject): Add support for BigInteger and
 	BigDecimal - the latter is used by XQuery for the xs:decimal type.
 

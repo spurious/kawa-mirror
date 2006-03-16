@@ -15,6 +15,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
+import gnu.xquery.util.CastableAs;
 import kawa.standard.require;
 
 /** A class to read xquery forms. */
@@ -50,6 +51,7 @@ public class XQParser extends Lexer
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
+  public static final CastableAs castableAs = CastableAs.castableAs;
 
   NameLookup lexical;
   /** Only used in deprecated parseQName. */

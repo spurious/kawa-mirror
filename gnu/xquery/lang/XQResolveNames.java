@@ -21,7 +21,7 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>position</code> function. */
   public static final int POSITION_BUILTIN = -2;
 
-  /** Value of <code>xs:QName()</code> constructor. */
+  /** Value of {@code xs:QName()} constructor. */
   public static final int XS_QNAME_BUILTIN = -3;
 
   /** Code number for the special <code>compare</code> function. */
@@ -130,7 +130,9 @@ public class XQResolveNames extends ResolveNames
 	      }
 	    catch (Exception ex)
 	      {
-		error('e', "unknown namespace prefix '" + prefix + "'");
+		messages.error('e',
+                               "unknown namespace prefix '" + prefix + "'",
+                               "XPST0081");
 		return null;
 	      }
 	  }
@@ -231,6 +233,11 @@ public class XQResolveNames extends ResolveNames
             if (f != null)
               return new ApplyExp(f, Expression.noExpressions);
           }
+        else if (symbol instanceof Symbol)
+          {
+            // Never happens, I believe.
+            decl = flookup((Symbol) symbol);
+          }
         else // if (symbol instanceof String)
           {
             String name = (String) symbol;
@@ -261,6 +268,13 @@ public class XQResolveNames extends ResolveNames
                     if (decl == null && function)
                       {
                         String uri = sym.getNamespaceURI();
+                        if (XQuery.SCHEMA_NAMESPACE.equals(uri))
+                          {
+                            Type type =
+                              XQuery.getStandardType(sym.getName());
+                            if (type != null)
+                              return QuoteExp.getInstance(type);
+                          }
                         if (uri != null && uri.length() > 6 &&
                             uri.startsWith("class:"))
                           {
@@ -274,9 +288,10 @@ public class XQResolveNames extends ResolveNames
           }
         if (decl != null)
           exp.setBinding(decl);
+        else if (function)
+          error('e', "unknown function "+symbol);
         else
-          error('e',
-                (function ? "unknown function " : "unknown variable $")+symbol);
+          messages.error('e',"unknown variable $"+symbol, "XPST0008");
       }
     return exp;
   }
@@ -495,6 +510,17 @@ public class XQResolveNames extends ResolveNames
 	  }
       }
     proc = exp.getFunctionValue();
+    if (proc instanceof Type)
+      {
+        Expression[] args = exp.getArgs();
+        if (args.length != 1)
+          {
+            messages.error('e', "type constructor requires a single argument");
+            return exp;
+          }
+        return new ApplyExp(XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs"),
+                            new Expression[] { exp.getFunction(), args[0] });
+      }
     if (proc instanceof MakeElement)
       {
 	MakeElement make = (MakeElement) proc;

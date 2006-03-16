@@ -5,7 +5,7 @@ import gnu.text.SourceMessages;
 
 public class ExpWalker
 {
-  SourceMessages messages;
+  protected SourceMessages messages;
   Compilation comp;
 
   /** Get the Compilation associated with this walker. */

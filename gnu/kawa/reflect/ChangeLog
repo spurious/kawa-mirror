@@ -1,5 +1,7 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* InstanceOf.java (language): Make protected, for use by new CastableAs.
+
 	* Invoke.java (inlineClassName): Don't lower a PairClassType to its
 	implementationType - that's only correct for 'make' - which does not
 	use this method.

@@ -1,5 +1,13 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (castableAs): New field, used for 'cast as'.
+	* XQResolveNames.java (namespaceResolve): Tweak error message.
+	(walkReferenceExp): Look for cast "functions" as in xs:decimal.
+	(walkApplyExp): If "function" is a Type, do a cast instead.
+	* XQuery.java (typeMap): Rewrite to use XDataType members.
+	(getStandardTYpe): New static function.
+	(getTypeFor): Map various classes to standard XQuery types.
+
 	* XQParser.java (peekOperand): Fix typo.
 	(parseMaybeKindTest): Generalize OP_PI parsing to full syntax.
 	Use new gnu.kawa.xml.ProcessingInstructionType.

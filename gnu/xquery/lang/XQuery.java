@@ -18,6 +18,7 @@ import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.math.IntNum;
+import gnu.kawa.xml.*;
 
 /** The XQuery language. */
 
@@ -712,30 +713,46 @@ public class XQuery extends Language
   LangPrimType booleanType;
 
   static Object[] typeMap =
-    { "string", Type.string_type,
-      "boolean", Type.boolean_type,
-      "QName", "gnu.xml.SName",
-      "integer", "gnu.math.IntNum",
-      "positiveInteger", "gnu.math.IntNum",
-      "nonPositiveInteger", "gnu.math.IntNum",
-      "negativeInteger", "gnu.math.IntNum",
-      "nonNegativeInteger", "gnu.math.IntNum",
-      /* #ifdef use:java.net.URI */
-      "anyURI", "java.net.URI",
-      /* #else */
-      // "anyURI", Type.string_type,
-      /* #endif */
-      "decimal", "gnu.math.RealNum"
+    { "string", XDataType.stringType,
+      "untypedAtomic", XDataType.untypedAtomicType,
+      "boolean", XDataType.booleanType,
+      "integer", XIntegerType.integerType,
+      "long", XIntegerType.longType,
+      "int", XIntegerType.intType,
+      "short", XIntegerType.shortType,
+      "byte", XIntegerType.byteType,
+      "unsignedLong", XIntegerType.unsignedLongType,
+      "unsignedInt", XIntegerType.unsignedIntType,
+      "unsignedShort", XIntegerType.unsignedShortType,
+      "unsignedByte", XIntegerType.unsignedByteType,
+      "positiveInteger", XIntegerType.positiveIntegerType,
+      "nonPositiveInteger", XIntegerType.nonPositiveIntegerType,
+      "negativeInteger", XIntegerType.negativeIntegerType,
+      "nonNegativeInteger", XIntegerType.nonNegativeIntegerType,
+      "date", XTimeType.dateType,
+      "dateTime", XTimeType.dateTimeType,
+      "time", XTimeType.timeType,
+      "duration", XTimeType.durationType,
+      "yearMonthDuration", XTimeType.yearMonthDurationType,
+      "dayTimeDuration", XTimeType.dayTimeDurationType,
+      "gYearMonth", XTimeType.gYearMonthType,
+      "gYear", XTimeType.gYearType,
+      "gMonthDay", XTimeType.gMonthDayType,
+      "gDay", XTimeType.gDayType,
+      "gMonth", XTimeType.gMonthType,
+      "decimal", XDataType.decimalType,
+      "float", XDataType.floatType,
+      "double", XDataType.doubleType,
+      "anyURI", XDataType.anyURIType,
+      "hexBinary", XDataType.hexBinaryType,
+      "QName", "gnu.xml.SName"
     };
 
-  public Type getTypeFor(String name)
+  public static Type getStandardType (String name)
   {
-    if (name == "t")
-      name = "java.lang.Object";
-    String core = name.startsWith("xs:") ? name.substring(3) : name;
     for (int i = typeMap.length;  (i -= 2) >= 0; )
       {
-	if (typeMap[i].equals(core))
+	if (typeMap[i].equals(name))
 	  {
 	    Object t = typeMap[i+1];
 	    if (t instanceof String)
@@ -744,7 +761,16 @@ public class XQuery extends Language
 	      return (Type) t;
 	  }
       }
-    return Scheme.string2Type(name);
+    return null;
+  }
+
+  public Type getTypeFor(String name)
+  {
+    String core = name.startsWith("xs:") ? name.substring(3)
+      : name.startsWith("xdt:") ? name.substring(4)
+      : name;
+    Type t = getStandardType(core);
+    return t != null ? t : Scheme.string2Type(name);
   }
 
   public Type getTypeFor (Class clas)
@@ -759,6 +785,28 @@ public class XQuery extends Language
 	    return booleanType;
 	  }
 	return Scheme.getNamedType(name);
+      }
+    else if (! clas.isArray())
+      {
+        String name = clas.getName();
+        if (name.equals("java.lang.String"))
+          return XDataType.stringType;
+        if (name.equals("gnu.kawa.xml.UntypedAtomic"))
+          return XDataType.untypedAtomicType;
+        if (name.equals("java.lang.Boolean"))
+          return XDataType.booleanType;
+        if (name.equals("java.lang.Float"))
+          return XDataType.floatType;
+        if (name.equals("java.lang.Double"))
+          return XDataType.doubleType;
+        if (name.equals("java.math.BigDecimal"))
+          return XDataType.decimalType;
+        if (name.equals("gnu.math.Duration"))
+          return XDataType.durationType;
+        /* #ifdef use:java.net.URI */
+        if (name.equals("java.net.URI"))
+          return  XDataType.anyURIType;
+        /* #endif */
       }
     return Type.make(clas);
   }
@@ -856,6 +904,8 @@ public class XQuery extends Language
     Object value = env.get(symbol, null, null);
     if (value == null)
       throw new RuntimeException("unbound external "+name);
+    if (type instanceof XDataType)
+      return ((XDataType) type).cast(value);
     if (type instanceof ClassType)
       {
         String cname = ((ClassType) type).getName();

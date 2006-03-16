@@ -5,7 +5,7 @@ import gnu.expr.*;
 
 public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 {
-  Language language;
+  protected Language language;
 
   public InstanceOf(Language language)
   {

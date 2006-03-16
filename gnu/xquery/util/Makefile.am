@@ -6,6 +6,8 @@ java_sources = \
   ArithOp.java \
   Average.java \
   BooleanValue.java \
+  CastableAs.java \
+  CastAs.java \
   Compare.java \
   Debug.java \
   DistinctValues.java \

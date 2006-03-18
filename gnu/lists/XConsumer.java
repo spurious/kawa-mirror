@@ -8,6 +8,7 @@ package gnu.lists;
  */
 
 public interface XConsumer extends Consumer
+                           // Maybe future: extends org.xml.sax.ContentHandler
 {
   /** Write/set the base-uri property of the current element or document.
    * Only allowed immediately following beginDocument, beginGroup,
@@ -20,4 +21,7 @@ public interface XConsumer extends Consumer
 					 int offset, int length);
 
   public void writeCDATA(char[] chars, int offset, int length);
+
+  // Maybe future?
+  // public void setDocumentLocator(org.xml.sax.Locator locator);
 }

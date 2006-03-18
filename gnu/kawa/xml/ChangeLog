@@ -1,5 +1,8 @@
 2006-03-17  Per Bothner  <per@bothner.com>
 
+	* AttributeType.java (make(Symbol)): New facory method.
+	* ElementType.java (make(Symbol)): New facory method.
+
 	* XMLParser.java: Also implement org.xml.sax.Locator.
 	(getName): Remove method.
 	(getPublicId, getSystemId): New methods, impleementing Locator.

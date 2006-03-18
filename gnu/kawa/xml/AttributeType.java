@@ -23,6 +23,11 @@ implements TypeValue, Externalizable, AttributePredicate
     return new AttributeType(Symbol.make(namespaceURI, localName));
   }
 
+  public static AttributeType make (Symbol qname)
+  {
+    return new AttributeType(qname);
+  }
+
   public AttributeType(Symbol qname)
   {
     this(null, qname);

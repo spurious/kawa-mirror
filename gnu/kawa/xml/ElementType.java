@@ -23,6 +23,11 @@ implements TypeValue, Externalizable, GroupPredicate
     return new ElementType(Symbol.make(namespaceURI, localName));
   }
 
+  public static ElementType make (Symbol qname)
+  {
+    return new ElementType(qname);
+  }
+
   public ElementType(Symbol qname)
   {
     this(null, qname);

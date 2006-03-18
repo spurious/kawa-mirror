@@ -6,6 +6,7 @@ import gnu.kawa.reflect.FieldLocation;
 
 public class ModuleInfo
 {
+  /** Next element in list head by ModuleManager.modules. */
   ModuleInfo next;
 
   public String className;

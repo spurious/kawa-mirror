@@ -6,10 +6,11 @@ public class ModuleManager
   static ModuleManager instance = new ModuleManager();
 
   /** For now assumes a single global ModuleManager.
-   * Later, might have multiple managers.
-   * We may also want to have managers that share classes but not instances. */
+   * Later, might have multiple managers. */
   public static ModuleManager getInstance() { return instance; }
 
+  /** Chain of all modules managed by this ModuleManager.
+   * Linked together by ModuleInfo's next field. */
   ModuleInfo modules;
 
   public ModuleInfo searchWithClassName (String className)

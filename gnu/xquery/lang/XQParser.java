@@ -7,6 +7,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.*;
 import gnu.expr.*;
+import gnu.math.IntNum;
 import java.util.Vector;
 import java.util.Stack;
 import gnu.kawa.xml.*;
@@ -2622,17 +2623,20 @@ public class XQParser extends Lexer
     int token = peekOperand();
     Expression exp;
     int c1, c2, c3;
-    if (token == '(')
+    Vector vec;
+    Expression[] args;
+    switch (token)
       {
+      case '(':
         exp = parseParenExpr();
-      }
-    else if (token == '{')
-      {
+        break;
+
+      case '{':
 	exp = syntaxError("saw unexpected '{' - assume you meant '('");
 	parseEnclosedExpr();
-      }
-    else if (token == OP_LSS)
-      {
+        break;
+
+      case OP_LSS:
 	int next = read();
 	if (next == '/')
 	  {
@@ -2656,19 +2660,19 @@ public class XQParser extends Lexer
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn);
 	  }
-      }
-    else if (token == STRING_TOKEN)
-      {
+        break;
+
+      case STRING_TOKEN:
 	exp = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength).intern());
-      }
-    else if (token == INTEGER_TOKEN)
-      {
-	Object val = gnu.math.IntNum.valueOf(tokenBuffer, 0, tokenBufferLength,
-					     10, false);
-	exp = new QuoteExp(val);
-      }
-    else if (token == DECIMAL_TOKEN || token == DOUBLE_TOKEN)
-      {
+        break;
+
+      case INTEGER_TOKEN:
+	exp = new QuoteExp(IntNum.valueOf(tokenBuffer, 0, tokenBufferLength,
+                                          10, false));
+        break;
+
+      case DECIMAL_TOKEN:
+      case DOUBLE_TOKEN:
         String str = new String(tokenBuffer, 0, tokenBufferLength);
         try
           {
@@ -2683,22 +2687,14 @@ public class XQParser extends Lexer
           {
             exp = syntaxError("invalid decimal literal: '"+str+"'");
           }
-      }
-    /*
-    else if (token == '<')
-      {
-	// ElementConstructor
-      }
-    */
-    else if (token == '$')
-      {
+        break;
+      case '$':
 	Object name = parseVariable();
 	if (name == null)
 	  return syntaxError("missing Variable");
 	exp = new ReferenceExp(name);
-      }
-    else if (token == FNAME_TOKEN)
-      {
+        break;
+      case FNAME_TOKEN:
 	/*
 	if (colon >= 0)
 	  {
@@ -2724,10 +2720,10 @@ public class XQParser extends Lexer
 	  }
 	else
 	*/
-	String name = new String(tokenBuffer, 0, tokenBufferLength);
+	name = new String(tokenBuffer, 0, tokenBufferLength);
 	char save = pushNesting('(');
 	getRawToken();
-	Vector vec = new Vector(10);
+        vec = new Vector(10);
 	if (curToken != ')')
 	  {
 	    for (;;)
@@ -2741,7 +2737,7 @@ public class XQParser extends Lexer
 		getRawToken();
 	      }
 	  }
-	Expression[] args = new Expression[vec.size()];
+	args = new Expression[vec.size()];
 
 	vec.copyInto(args);
 	ReferenceExp rexp = new ReferenceExp(name, null);
@@ -2751,13 +2747,16 @@ public class XQParser extends Lexer
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	popNesting(save);
-      }
-    else if (token == ELEMENT_TOKEN || token == ATTRIBUTE_TOKEN
-             || token == COMMENT_TOKEN || token == DOCUMENT_TOKEN
-             || token == TEXT_TOKEN || token == PI_TOKEN)
-      {
+        break;
+
+      case ELEMENT_TOKEN:
+      case ATTRIBUTE_TOKEN:
+      case COMMENT_TOKEN:
+      case DOCUMENT_TOKEN:
+      case TEXT_TOKEN:
+      case PI_TOKEN:
         getRawToken();  // Skip 'element'.
-        Vector vec = new Vector();
+        vec = new Vector();
         Expression func;
 
         if (token == ELEMENT_TOKEN || token == ATTRIBUTE_TOKEN)
@@ -2790,10 +2789,8 @@ public class XQParser extends Lexer
           {
             Expression target;
             if (curToken == NCNAME_TOKEN)
-              {
-                String name = new String(tokenBuffer, 0, tokenBufferLength);
-                target = new QuoteExp(name.intern());
-              }
+              target = new QuoteExp(new String(tokenBuffer, 0,
+                                               tokenBufferLength).intern());
             else if (curToken == '{')
               {
                 target = parseEnclosedExpr();
@@ -2832,19 +2829,22 @@ public class XQParser extends Lexer
         popNesting(saveReadState);
         if (curToken != '}')
           return syntaxError("missing '}'");
-        Expression[] args = new Expression[vec.size()];
+        args = new Expression[vec.size()];
         vec.copyInto(args);
         exp = new ApplyExp(func, args);
         exp.setFile(getName());
         exp.setLine(startLine, startColumn);
-      }
-    else if (token == ORDERED_LBRACE_TOKEN || token == UNORDERED_LBRACE_TOKEN)
-      {
+        break;
+
+      case ORDERED_LBRACE_TOKEN:
+      case UNORDERED_LBRACE_TOKEN:
         getRawToken();
         exp = parseExprSequence('}');
+        break;
+
+      default:
+        return null;
       }
-    else
-      return null;
     /*
     if (nesting == 0)
       {

@@ -1,3 +1,25 @@
+2006-03-17  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseQName): No longer erroneously try to resolve
+	namespace prefixes here.  Instead use logic from parseNameTest.
+	(OP_ATTRIBUTE): Fix bug where it was same as OP_ELEMENT.
+	(parseElementType): Rename to parseNamedNodeType. generalize to also
+	attribute types, and return Expression.
+	(makeNamedNodeType): New helper method.
+	(parseItemType): Change to return Expression rather than Type.
+	(parseMaybeKindTest): Likewise. Also handle OP_ATTRIBUTE.
+	(parseNodeTest): Update accordingly.
+	(parsedataType): Likewise.
+	Create ApplyExp to call OccurrenceType.getInstance();
+	(setType): Remove method.  Replace calls by Declarations's
+	new setTypeExp method.
+	(resolver): Remove no-longer-needed field.
+	* XQResolveNames.java (RESOLVE_PREFIX_BUILTIN): New constant.
+	(resolvePrefixDecl): New field.
+	(walkApplyExp): Implement RESOLVE_PREFIX_BUILTIN.
+	* XQuery.java (parse): Some simplication/cleanup since XQParser
+	no longer needs XQResolveNames.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (castableAs): New field, used for 'cast as'.

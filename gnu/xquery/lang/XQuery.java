@@ -103,12 +103,8 @@ public class XQuery extends Language
     Compilation tr = new Compilation(this, parser.getMessages(),
 				     parser.lexical);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    XQResolveNames resolver = new XQResolveNames(tr);
-    resolver.functionNamespacePath = parser.functionNamespacePath;
     ModuleExp mexp = tr.pushNewModule(lexer.getName());
     tr.mustCompileHere();
-    ((XQParser) lexer).resolver = resolver;
-    resolver.parser =  (XQParser) lexer;
     if ((options & PARSE_ONE_LINE) != 0)
       {
 	Expression sexp = ((XQParser) lexer).parse(tr);
@@ -152,7 +148,7 @@ public class XQuery extends Language
 	  }
       }
     tr.pop(mexp);
-    
+
     if (false)
       {
 	OutPort dout = OutPort.outDefault();
@@ -162,6 +158,9 @@ public class XQuery extends Language
 	dout.flush();
       }
 
+    XQResolveNames resolver = new XQResolveNames(tr);
+    resolver.functionNamespacePath = parser.functionNamespacePath;
+    resolver.parser =  (XQParser) lexer;
     resolver.resolveModule(mexp); // FIXME should move to resolve(Compilation)
     return tr;
   }

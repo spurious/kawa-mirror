@@ -10,6 +10,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.xquery.util.NamedCollator;
+import gnu.xquery.util.QNameUtils;
 
 public class XQResolveNames extends ResolveNames
 {
@@ -51,12 +52,20 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>ressolve-uri</code> function. */
   public static final int RESOLVE_URI_BUILTIN = -12;
 
+  /** Code number for internal function that maps prefix to uri. */
+  public static final int RESOLVE_PREFIX_BUILTIN = -13;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
+
+  public static final Declaration resolvePrefixDecl
+    = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "(resolve-prefix)"),
+                  RESOLVE_PREFIX_BUILTIN);
+
 
   /** Create a <code>Declaration</code> for a builtin function. */
   public static Declaration makeBuiltin (String name, int code)
@@ -404,9 +413,9 @@ public class XQResolveNames extends ResolveNames
 		      try
 			{
 			  Object val = ((QuoteExp) args[0]).getValue();
-			  val = gnu.xquery.util.QNameUtils.resolveQName(val,
-							constructorNamespaces,
-							parser.prologNamespaces);
+			  val = QNameUtils.resolveQName(val,
+                                                        constructorNamespaces,
+                                                        parser.prologNamespaces);
 			  return new QuoteExp(val);
 			}
 		      catch (RuntimeException ex)
@@ -422,6 +431,36 @@ public class XQResolveNames extends ResolveNames
 		    = (ClassType.make("gnu.xquery.util.QNameUtils")
 		       .getDeclaredMethod("resolveQName", 3));
 		  ApplyExp app = new ApplyExp(meth, xargs);
+		  app.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+		  return app;
+		}
+	      case RESOLVE_PREFIX_BUILTIN:
+		{
+		  Expression[] args = exp.getArgs();
+		  // FIXME check that args.length == 1.
+		  if (args[0] instanceof QuoteExp)
+		    {
+		      try
+			{
+			  Object val = ((QuoteExp) args[0]).getValue();
+			  val = QNameUtils.resolvePrefix(val.toString(),
+                                                         constructorNamespaces,
+                                                         parser.prologNamespaces);
+			  return new QuoteExp(val);
+			}
+		      catch (RuntimeException ex)
+			{
+			  return getCompilation().syntaxError(ex.getMessage());
+			}
+		    }
+		  Expression[] xargs = {
+		    args[0],
+		    new QuoteExp(constructorNamespaces),
+		    new QuoteExp(parser.prologNamespaces) };
+		  PrimProcedure pproc
+		    = new PrimProcedure(ClassType.make("gnu.xquery.util.QNameUtils")
+                                        .getDeclaredMethod("resolvePrefix", 3));
+		  ApplyExp app = new ApplyExp(pproc, xargs);
 		  app.setFlag(ApplyExp.INLINE_IF_CONSTANT);
 		  return app;
 		}

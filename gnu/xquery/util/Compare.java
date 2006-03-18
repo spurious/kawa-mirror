@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.math.*;
 import gnu.expr.*;
+import gnu.xml.SName;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 
@@ -110,15 +111,38 @@ public class Compare extends Procedure2 implements CanInline
           }
 	return NumberCompare.apply2(flags, arg1, arg2);
       }
-    String str1 = arg1.toString();
-    String str2 = arg2.toString();
+    if (arg1 instanceof UntypedAtomic)
+      {
+        if (arg2 instanceof String || arg2 instanceof UntypedAtomic)
+          arg1 = arg1.toString();
+        /*
+        else
+          arg1 = XDataType.getTypeOf(arg2).cast(arg1);
+        */
+      }
+    if (arg2 instanceof UntypedAtomic)
+      {
+        if (arg1 instanceof String || arg1 instanceof UntypedAtomic)
+          arg2 = arg2.toString();
+        /*
+        else
+          arg2 = XDataType.getTypeOf(arg1).cast(arg2);
+        */
+      }
     int comp;
-    /* #ifdef JAVA2 */
-    if (collator != null)
-      comp = collator.compare(str1, str2);
+    if (arg1 instanceof SName && arg2 instanceof SName)
+      comp = arg1.equals(arg2) ? 0 : -3;
     else
-    /* #endif */
-      comp = str1.compareTo(str2);
+      {
+        String str1 = arg1.toString();
+        String str2 = arg2.toString();
+        /* #ifdef JAVA2 */
+        if (collator != null)
+          comp = collator.compare(str1, str2);
+        else
+          /* #endif */
+          comp = str1.compareTo(str2);
+      }
     if (comp < 0)
       return (flags & TRUE_IF_LSS+TRUE_IF_NEQ) != 0;
     else if (comp > 0)

@@ -1,3 +1,7 @@
+2006-03-17  Per Bothner  <per@bothner.com>
+
+	* Compare.java (apply): Fix comparison of QNames (SName).
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* CastAs.java: New class, extends gnu.kawa.functions.Convert.

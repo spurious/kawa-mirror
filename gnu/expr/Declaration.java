@@ -55,9 +55,28 @@ public class Declaration
   public ScopeExp context;
 
   protected Type type;
+  protected Expression typeExp;
+  public final Expression getTypeExp() { return typeExp; }
   public final Type getType() { return type; }
   public final void setType(Type type)
-  { this.type = type;  if (var != null) var.setType(type); }
+  {
+    this.type = type;
+    if (var != null) var.setType(type);
+    typeExp = QuoteExp.getInstance(type);
+  }
+
+  public final void setTypeExp (Expression typeExp)
+  {
+    this.typeExp = typeExp;
+    Object typeValue;
+    Type t = (typeExp instanceof QuoteExp
+              && (typeValue = ((QuoteExp) typeExp).getValue()) instanceof Type
+              ? (Type) typeValue
+              : (Type) Type.pointer_type);
+    this.type = t;
+    if (var != null) var.setType(t);
+  }
+
   public final String getName()
   {
     return symbol == null ? null : symbol instanceof Symbol ? ((Symbol) symbol).getName()

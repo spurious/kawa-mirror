@@ -1,3 +1,11 @@
+2006-03-17  Per Bothner  <per@bothner.com>
+
+	* Declaration.java: Add hooks for type expression that are evaluted
+	at run-time.
+	(typeExp): New Expresaion field.
+	(getTypeExp, setTypeExp): New method.
+	(setType): Modify to also set typeExp.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (messages): Make protected, for XQResolveNames.

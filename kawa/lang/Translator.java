@@ -842,6 +842,7 @@ public class Translator extends Compilation
         texp = new InlineCalls(this).walk(texp);
 	if (texp instanceof ErrorExp)
 	  return null;
+        texp = new InlineCalls(this).walk(texp);
 	Type type = getLanguage().getTypeFor(texp);
 	 if (type == null)
 	   {

@@ -1,3 +1,10 @@
+2006-03-17  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java: Also implement org.xml.sax.Locator.
+	(getName): Remove method.
+	(getPublicId, getSystemId): New methods, impleementing Locator.
+	(getLineNumber, getColumnNumber): Change to be consistent with SAX.	
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* ProcessingInstructionType.java: New class extends NodeType.

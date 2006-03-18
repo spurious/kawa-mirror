@@ -8,6 +8,10 @@ import gnu.text.*;
 import java.net.*;
 
 public class XMLParser extends XMLParserChar
+                       implements
+                       /* #ifdef JAXP-1.3 */
+                       org.xml.sax.Locator
+                       /* #endif */
 {
   SourceMessages messages;
 
@@ -107,18 +111,25 @@ public class XMLParser extends XMLParserChar
 		   message);
   }
 
-  public String getName()
+  public String getPublicId ()
+  {
+    return null;
+  }
+
+  public String getSystemId ()
   {
     return ((LineBufferedReader) in).getName();
   }
 
   public int getLineNumber()
   {
-    return ((LineBufferedReader) in).getLineNumber();
+    int line = ((LineBufferedReader) in).getLineNumber();
+    return line < 0 ? -1 : line + 1;
   }
 
   public int getColumnNumber()
   {
-    return ((LineBufferedReader) in).getColumnNumber();
+    int col = ((LineBufferedReader) in).getColumnNumber();
+    return col < 0 ? -1 : col + 1;
   }
 }

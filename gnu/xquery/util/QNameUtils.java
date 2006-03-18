@@ -41,6 +41,14 @@ public class QNameUtils
       {
 	throw new RuntimeException("invalid QName syntax '"+name+"'");
       }
+    String uri = resolvePrefix(prefix, constructorNamespaces, prologNamespaces);
+    return SName.make(uri, localPart, prefix == null ? "" : prefix);
+  }
+
+  public static String resolvePrefix (String prefix,
+                                      NamespaceBinding constructorNamespaces,
+                                      NamespaceBinding prologNamespaces)
+  {
     String uri;
     if (constructorNamespaces == null)
       uri = null;
@@ -53,9 +61,9 @@ public class QNameUtils
 	if (prefix == null)
 	  uri = "";
 	else
-	  throw new RuntimeException("unknown namespace prefix for '"+name+"'");
+	  throw new RuntimeException("unknown namespace prefix '"+prefix+"'");
       }
-    return SName.make(uri, localPart, prefix == null ? "" : prefix);
+    return uri;
   }
 
   public static boolean validNCName (String name)

@@ -24,6 +24,13 @@ public class OccurrenceType extends ObjectType
     this.maxOccurs = maxOccurs;
   }
 
+  public static Type getInstance (Type base, int minOccurs, int maxOccurs)
+  {
+    if (minOccurs == 1 && maxOccurs == 1)
+      return base;
+    return new OccurrenceType(base, minOccurs, maxOccurs);
+  }
+
   public Type getImplementationType()
   {
     return Type.pointer_type;

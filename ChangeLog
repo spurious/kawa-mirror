@@ -1,3 +1,8 @@
+2006-03-17  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_member_alias.java (scanForDefinitions):
+	Minor optimization.
+
 2006-03-16  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (exp2Type): May need to InlineCalls on

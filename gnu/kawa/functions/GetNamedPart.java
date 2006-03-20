@@ -144,7 +144,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             nexp.methods = methods;
             return nexp.setProcedureKind('S');
           }
-        return new ApplyExp(SlotGet.staticField, args);
+        return new ApplyExp(SlotGet.staticField, args).setLine(exp);
                             
       }
     if (typeval != null)
@@ -184,7 +184,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
           {
             // FIXME: future kludge to avoid re-doing SlotGet.getField.
             // args = new Expression[] { context, new QuoteExp(part) });
-            return new ApplyExp(SlotGet.field, args);
+            return new ApplyExp(SlotGet.field, args).setLine(exp);
           }
       }
 
@@ -383,7 +383,9 @@ class GetNamedExp extends ApplyExp
       default:
         return exp;
       }
-    return walker.walkApplyOnly(new ApplyExp(new ReferenceExp(decl), xargs));
+    ApplyExp result = new ApplyExp(new ReferenceExp(decl), xargs);
+    result.setLine(exp);
+    return walker.walkApplyOnly(result);
   }
 
   public boolean side_effects ()
@@ -461,16 +463,18 @@ class NamedPart extends ProcedureN
         String fname = member.toString().substring(1);
         Expression[] xargs = new Expression[2];
         xargs[1] = QuoteExp.getInstance(fname);
+        SlotGet proc;
         if (args.length > 0)
           {
             xargs[0] = Convert.makeCoercion(args[0], new QuoteExp(container));
-            return new ApplyExp(SlotGet.field, xargs);
+            proc = SlotGet.field;
           }
         else
           {
             xargs[0] = QuoteExp.getInstance(container);
-            return new ApplyExp(SlotGet.staticField, xargs);
+            proc = SlotGet.staticField;
           }
+        return new ApplyExp(proc, xargs).setLine(exp);
       }
     return exp;
   }
@@ -605,17 +609,21 @@ class NamedPartSetter extends gnu.mapping.Setter
         Expression[] xargs = new Expression[3];
         xargs[1] = QuoteExp.getInstance(get.member.toString().substring(1));
         xargs[2] = exp.getArgs()[0];
+        SlotSet proc;
         if (exp.getArgCount() == 1)
           {
             xargs[0] = QuoteExp.getInstance(get.container);
-            return new ApplyExp(SlotSet.set$Mnstatic$Mnfield$Ex, xargs);
+            proc = SlotSet.set$Mnstatic$Mnfield$Ex;
           }
         else if (exp.getArgCount() == 2)
           {
             xargs[0]
               = Convert.makeCoercion(exp.getArgs()[0], new QuoteExp(get.container));
-            return new ApplyExp(SlotSet.set$Mnfield$Ex, xargs);
+            proc = SlotSet.set$Mnfield$Ex;
           }
+        else
+          return exp;
+        return new ApplyExp(proc, xargs).setLine(exp);
       }
     return exp;
   }

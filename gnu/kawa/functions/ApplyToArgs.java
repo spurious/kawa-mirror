@@ -139,22 +139,27 @@ public class ApplyToArgs extends ProcedureN
         Expression proc = args[0];
         args[0] = proc;
         Type ptype = proc.getType();
+        ApplyExp result;
         if (ptype.isSubtype(Compilation.typeProcedure))
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            return ((InlineCalls) walker).walkApplyOnly(new ApplyExp(proc, rargs));
+            result = new ApplyExp(proc, rargs);
           }
-        if (ptype.isSubtype(Compilation.typeType)
+        else if (ptype.isSubtype(Compilation.typeType)
             || walker.getCompilation().getLanguage().getTypeFor(proc) != null)
           {
-            return ((InlineCalls) walker).walkApplyOnly(new ApplyExp(Invoke.make, args));
+            result = new ApplyExp(Invoke.make, args);
           }
-        if (ptype instanceof ArrayType)
+        else if (ptype instanceof ArrayType)
           {
             Type elementType = ((ArrayType) ptype).getComponentType();
-            return new ApplyExp(new ArrayGet(elementType), args);
+            result = new ApplyExp(new ArrayGet(elementType), args);
           }
+        else
+          return exp;
+        result.setLine(exp);
+        return ((InlineCalls) walker).walkApplyOnly(result);
       }
     return exp;
   }

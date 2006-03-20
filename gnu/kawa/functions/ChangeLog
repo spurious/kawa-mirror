@@ -1,3 +1,9 @@
+2006-03-20  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java: When creating new ApplyExp, make sure to copy
+	line number from original.
+	* GetNamedPart.java: Likewise.
+
 2006-03-07  Per Bothner  <per@bothner.com>
 
 	* Arithmetic.java (asIntNum): New overloaded static helper methods.

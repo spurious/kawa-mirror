@@ -1,3 +1,11 @@
+2006-03-20  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Fix printing of tag by endGroup so it matches
+	beginGroup, specifically when type is an SName.
+	(groupNameStack): New field.
+	(writeQName): New protected helper method.
+	(beginGroup, endGroup): Use it.
+
 2006-03-14  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (escapeNonAscii): New option.

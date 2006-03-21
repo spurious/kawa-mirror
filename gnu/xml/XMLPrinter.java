@@ -50,6 +50,8 @@ public class XMLPrinter extends PrintConsumer
   /** Stack of namespaceBindings as of active beginGroup calls. */
   NamespaceBinding[] namespaceSaveStack = new NamespaceBinding[20];
 
+  Object[] groupNameStack = new Object[20];
+
   /** Difference between number of beginGroup and endGroup calls so far. */
   int groupNesting;
 
@@ -241,6 +243,23 @@ public class XMLPrinter extends PrintConsumer
       ((OutPort) out).endLogicalBlock("");
   }
 
+  protected void writeQName (Object name)
+  {
+    if (name instanceof SName)
+      {
+        SName sname = (SName) name;
+        String prefix = sname.getPrefix();
+        if (prefix != null && prefix.length() > 0)
+          {
+            super.write(prefix);
+            super.write(':');
+          }
+        super.write(sname.getLocalPart());
+      }
+    else
+      super.write((String) name);
+  }
+
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
@@ -299,19 +318,9 @@ public class XMLPrinter extends PrintConsumer
 	pout.startLogicalBlock("", "", 2);
       }
     super.write('<');
-    if (type instanceof SName)
-      {
-        SName sname = (SName) type;
-        String prefix = sname.getPrefix();
-        if (prefix != null && prefix.length() > 0)
-          {
-            super.write(prefix);
-            super.write(':');
-          }
-        super.write(sname.getLocalPart());
-      }
-    else
-      super.write(typeName);
+    Object name = type instanceof SName ? type : typeName;
+    writeQName(name);
+    groupNameStack[groupNesting] = name;
     NamespaceBinding groupBindings = null;
     namespaceSaveStack[groupNesting++] = namespaceBindings;
     if (type instanceof XName)
@@ -369,9 +378,12 @@ public class XMLPrinter extends PrintConsumer
       }
     if (groupNesting >= namespaceSaveStack.length)
       {
-	NamespaceBinding[] tmp = new NamespaceBinding[2 * groupNesting];
-	System.arraycopy(namespaceSaveStack, 0, tmp, 0, groupNesting);
-	namespaceSaveStack = tmp;
+	NamespaceBinding[] nstmp = new NamespaceBinding[2 * groupNesting];
+	System.arraycopy(namespaceSaveStack, 0, nstmp, 0, groupNesting);
+	namespaceSaveStack = nstmp;
+	Object[] nmtmp = new Object[2 * groupNesting];
+	System.arraycopy(groupNameStack, 0, nmtmp, 0, groupNesting);
+	groupNameStack = nmtmp;
       }
 
     inStartTag = true;
@@ -418,7 +430,7 @@ public class XMLPrinter extends PrintConsumer
 			      : PrettyWriter.NEWLINE_LINEAR);
 	  }
 	super.write("</");
-	super.write(typeName);
+        writeQName(groupNameStack[groupNesting-1]);
 	super.write(">");
       }
     if (printIndent >= 0)
@@ -433,6 +445,7 @@ public class XMLPrinter extends PrintConsumer
 
     namespaceBindings = namespaceSaveStack[--groupNesting];
     namespaceSaveStack[groupNesting] = null;
+    groupNameStack[groupNesting] = null;
   }
 
   /** Write a attribute for the current group.

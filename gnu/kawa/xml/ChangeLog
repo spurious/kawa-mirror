@@ -1,3 +1,8 @@
+2006-03-20  Per Bothner  <per@bothner.com>
+
+	* NodeName.java (nodeName): Map String to SName, so the result will
+	be an instance of xs:QName.
+
 2006-03-17  Per Bothner  <per@bothner.com>
 
 	* AttributeType.java (make(Symbol)): New facory method.

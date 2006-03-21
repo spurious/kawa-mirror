@@ -4,6 +4,7 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.xml.SName;
 
 public class NodeName extends Procedure1
 {
@@ -22,8 +23,12 @@ public class NodeName extends Procedure1
 	SeqPosition pos = (SeqPosition) node;
 	nodeName = pos.sequence.getNextTypeObject(pos.ipos);
       }
-    return nodeName == null ? Values.empty : nodeName;
-    }
+    if (nodeName == null)
+      return Values.empty;
+    if (nodeName instanceof String)
+      return SName.make("", nodeName.toString(), "");
+    return nodeName;
+  }
 
   public Object apply1 (Object node)
   {

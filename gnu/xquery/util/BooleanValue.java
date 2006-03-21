@@ -17,6 +17,11 @@ public class BooleanValue extends Procedure1
       return ((Boolean) value).booleanValue();
     if (value instanceof Numeric)
       return ! ((Numeric) value).isZero();
+    if (value instanceof Number)
+      {
+        double d = ((Number) value).doubleValue();
+        return d != 0 && ! Double.isNaN(d);
+      }
     if (value instanceof SeqPosition)
       return true;
     if (value instanceof String || value instanceof UntypedAtomic)

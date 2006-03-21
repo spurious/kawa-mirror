@@ -125,27 +125,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     int nargs = args.length;
     boolean takesVarArgs = takesVarArgs();
-    int mlength = minArgs() + (takesVarArgs ? 1 : 0);
-    int fixArgs = takesVarArgs ? mlength - 1 : mlength;
-
-    if (takesVarArgs)
-      {
-        if (nargs < fixArgs)
-          return NO_MATCH_TOO_FEW_ARGS|fixArgs;
-      }
-    else
-      {
-        if (nargs != mlength)
-          if (nargs < mlength)
-            return NO_MATCH_TOO_FEW_ARGS|fixArgs;
-          else
-            return NO_MATCH_TOO_MANY_ARGS|fixArgs;
-      }
+    int fixArgs = minArgs();
+    if (nargs < fixArgs)
+      return NO_MATCH_TOO_FEW_ARGS|fixArgs;
+    if (! takesVarArgs && nargs > fixArgs)
+      return NO_MATCH_TOO_MANY_ARGS|fixArgs;
     int paramCount = argTypes.length;
     Type elementType = null;
     Object[] restArray = null;
     int extraCount = (takesTarget() || isConstructor()) ? 1 : 0;
-    fixArgs += extraCount;
     boolean takesContext = takesContext();
     Object[] rargs = new Object[paramCount];
     if (takesContext)

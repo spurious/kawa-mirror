@@ -1,3 +1,7 @@
+2006-03-24  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (makeGetField): Change return type.
+
 2006-03-17  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java (getInstance): New factory method.

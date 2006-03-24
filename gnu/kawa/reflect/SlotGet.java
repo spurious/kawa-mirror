@@ -343,7 +343,7 @@ public class SlotGet extends Procedure2
    * @param fieldName name of field in value
    * @return expression that get the name field from value
    */
-  public static Expression makeGetField(Expression value, String fieldName)
+  public static ApplyExp makeGetField(Expression value, String fieldName)
   {
     Expression[] args = new Expression[2];
     args[0] = value;

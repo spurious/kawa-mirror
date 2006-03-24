@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.text.SourceMessages;
 
 /**
  * Class used to mark an erroneous expression
@@ -11,6 +12,18 @@ public class ErrorExp extends Expression
   String message;
   public ErrorExp (String message)
   {
+    this.message = message;
+  }
+
+  public ErrorExp (String message, SourceMessages messages)
+  {
+    messages.error('e', message);
+    this.message = message;
+  }
+
+  public ErrorExp (String message, Compilation comp)
+  {
+    comp.getMessages().error('e', message);
     this.message = message;
   }
 

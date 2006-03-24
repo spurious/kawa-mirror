@@ -1,3 +1,7 @@
+2006-03-23  Per Bothner  <per@bothner.com>
+
+	* ErrorExp.java (<init>): New convenience constructors.
+
 2006-03-20  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (matchN): Don't add extraCount to fixArgs.

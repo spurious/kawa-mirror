@@ -31,7 +31,7 @@ public class Scheme extends LispLanguage
   protected static final SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
-  static final Scheme instance;
+  public static final Scheme instance;
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf;
   public static final not not;

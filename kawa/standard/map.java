@@ -111,6 +111,8 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     if (nargs < 2)
       return exp;  // ERROR
 
+    InlineCalls inliner = (InlineCalls) walker;
+
     nargs--;
 
     Expression proc = args[0];
@@ -157,14 +159,13 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	doArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car");
-	recArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr");
+	doArgs[i] = inliner.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"));
+	recArgs[i] = inliner.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"));
       }
     if (! procSafeForMultipleEvaluation)
       proc = new ReferenceExp(procDecl);
-    Expression doit
-      = ((InlineCalls) walker).walkApplyOnly(new ApplyExp(proc, doArgs));
-    Expression rec = new ApplyExp(new ReferenceExp(loopDecl), recArgs);
+    Expression doit = inliner.walkApplyOnly(new ApplyExp(proc, doArgs));
+    Expression rec = inliner.walkApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs));
     if (collect)
       {
 	Expression[] consArgs = new Expression[2];
@@ -190,14 +191,14 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	Expression result
 	  = collect ? (Expression) new ReferenceExp(resultDecl)
 	  : (Expression) QuoteExp.voidExp;
-	lexp.body = new IfExp(new ApplyExp(isEq, compArgs),
+	lexp.body = new IfExp(inliner.walkApplyOnly(new ApplyExp(isEq, compArgs)),
 			      result, lexp.body);
 	initArgs[i] = args[i+1];
       }
     if (collect)
       initArgs[nargs] = empty;
 
-    Expression body = new ApplyExp(new ReferenceExp(loopDecl), initArgs);
+    Expression body = inliner.walkApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), initArgs));
     if (collect)
       {
 	Expression[] reverseArgs = new Expression[1];

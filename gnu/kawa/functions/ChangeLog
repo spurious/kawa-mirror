@@ -1,3 +1,9 @@
+2006-03-23  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Do inline new ApplyExp.
+	(NamedPart.inline): Likewise.
+	(NamedPartSetter.inline): Likewise.
+
 2006-03-20  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java: When creating new ApplyExp, make sure to copy

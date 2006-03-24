@@ -1,3 +1,7 @@
+2006-03-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline): Also inline on new ApplyExp.
+
 2006-03-17  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_member_alias.java (scanForDefinitions):

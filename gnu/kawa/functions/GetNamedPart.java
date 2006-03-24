@@ -144,7 +144,9 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             nexp.methods = methods;
             return nexp.setProcedureKind('S');
           }
-        return new ApplyExp(SlotGet.staticField, args).setLine(exp);
+        ApplyExp aexp = new ApplyExp(SlotGet.staticField, args);
+        aexp.setLine(exp);
+        return ((InlineCalls) walker).walkApplyOnly(aexp);
                             
       }
     if (typeval != null)
@@ -184,7 +186,9 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
           {
             // FIXME: future kludge to avoid re-doing SlotGet.getField.
             // args = new Expression[] { context, new QuoteExp(part) });
-            return new ApplyExp(SlotGet.field, args).setLine(exp);
+            ApplyExp aexp = new ApplyExp(SlotGet.field, args);
+            aexp.setLine(exp);
+            return ((InlineCalls) walker).walkApplyOnly(aexp);
           }
       }
 
@@ -474,7 +478,9 @@ class NamedPart extends ProcedureN
             xargs[0] = QuoteExp.getInstance(container);
             proc = SlotGet.staticField;
           }
-        return new ApplyExp(proc, xargs).setLine(exp);
+        ApplyExp aexp = new ApplyExp(proc, xargs);
+        aexp.setLine(exp);
+        return ((InlineCalls) walker).walkApplyOnly(aexp);
       }
     return exp;
   }
@@ -623,7 +629,9 @@ class NamedPartSetter extends gnu.mapping.Setter
           }
         else
           return exp;
-        return new ApplyExp(proc, xargs).setLine(exp);
+        ApplyExp aexp = new ApplyExp(proc, xargs);
+        aexp.setLine(exp);
+        return ((InlineCalls) walker).walkApplyOnly(aexp);
       }
     return exp;
   }

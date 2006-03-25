@@ -174,6 +174,9 @@ public class ModuleExp extends LambdaExp
 
         comp.walkModule(mexp);
 
+	if (comp.getMessages().seenErrors())
+	  return;
+
 	if (! alwaysCompile && ! comp.mustCompile)
 	  { // optimization - don't generate unneeded Class.
 	    if (Compilation.debugPrintFinalExpr)

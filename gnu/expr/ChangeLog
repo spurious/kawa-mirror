@@ -1,3 +1,7 @@
+2006-03-25  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule): Check if seenErrors.
+
 2006-03-23  Per Bothner  <per@bothner.com>
 
 	* ErrorExp.java (<init>): New convenience constructors.

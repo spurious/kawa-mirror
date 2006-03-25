@@ -119,10 +119,16 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     return ((1 << (3 + compare(arg1, arg2))) & flags) != 0;
   }
   
+  /** Compare two numbers.
+   * @return 1 if {@code arg1>arg2}; 0 if {@code arg1==arg2};
+   * -1 if {@codearg1<arg2}; -2 if either is {@code NaN};
+   * -3 if not comparable (either is not a number). */
   static public int compare (Object arg1, Object arg2)
   {
     int code1 = Arithmetic.classifyValue(arg1);
     int code2 = Arithmetic.classifyValue(arg2);
+    if (code1 < 0 || code2 < 0)
+      return -3;
     int code = code1 < code2 ? code2 : code1;
     int comp; // A Numeric.compare return code: -1, 0, 1, or rarely: -2, or -3.
     switch (code)

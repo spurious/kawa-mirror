@@ -1,3 +1,7 @@
+2006-03-25  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (compare): Fix case of either arg a non-number.
+
 2006-03-23  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Do inline new ApplyExp.

@@ -55,6 +55,9 @@ public class XQResolveNames extends ResolveNames
   /** Code number for internal function that maps prefix to uri. */
   public static final int RESOLVE_PREFIX_BUILTIN = -13;
 
+  /** Code number for the special <code>static-base-uri</code> function. */
+  public static final int STATIC_BASE_URI_BUILTIN = -14;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -105,6 +108,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
     pushBuiltin("root", ROOT_BUILTIN);
     pushBuiltin("base-uri", BASE_URI_BUILTIN);
+    pushBuiltin("static-base-uri", STATIC_BASE_URI_BUILTIN);
     pushBuiltin("resolve-uri", RESOLVE_URI_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
@@ -378,6 +382,17 @@ public class XQResolveNames extends ResolveNames
     return new ApplyExp(method, args);
   }
 
+  private Expression checkArgCount (Expression[] args, Declaration decl,
+                                    int min, int max)
+  {
+    String err = WrongArguments.checkArgCount("fn:"+decl.getName(),
+                                              min, max, args.length);
+    if (err == null)
+      return null;
+    else
+      return getCompilation().syntaxError(err);
+  }
+
   protected Expression walkApplyExp (ApplyExp exp)
   {
     Expression func = exp.getFunction();
@@ -392,6 +407,7 @@ public class XQResolveNames extends ResolveNames
       {
 	Declaration decl = ((ReferenceExp) func).getBinding();
 	int code;
+        Expression err;
 	if (decl != null && (code = decl.getCode()) < 0)
 	  {
 	    switch (code)
@@ -407,7 +423,8 @@ public class XQResolveNames extends ResolveNames
 	      case XS_QNAME_BUILTIN:
 		{
 		  Expression[] args = exp.getArgs();
-		  // FIXME check that args.length == 1.
+                  if ((err = checkArgCount(args, decl, 1, 1)) != null)
+                    return err;
 		  if (args[0] instanceof QuoteExp)
 		    {
 		      try
@@ -437,7 +454,8 @@ public class XQResolveNames extends ResolveNames
 	      case RESOLVE_PREFIX_BUILTIN:
 		{
 		  Expression[] args = exp.getArgs();
-		  // FIXME check that args.length == 1.
+                  if ((err = checkArgCount(args, decl, 1, 1)) != null)
+                    return err;
 		  if (args[0] instanceof QuoteExp)
 		    {
 		      try
@@ -482,6 +500,16 @@ public class XQResolveNames extends ResolveNames
                     .getDeclaredMethod("baseUri", 1);
                   return withContext(meth, exp.getArgs(), "fn:base-uri", 0);
                 }
+
+              case STATIC_BASE_URI_BUILTIN:
+                {
+		  Expression[] args = exp.getArgs();
+                  if ((err = checkArgCount(args, decl, 0, 0)) != null)
+                    return err;
+                  String result = parser.baseURI;
+                  return result == null ? QuoteExp.voidExp
+                    : QuoteExp.getInstance(result);
+                }
               case NAMESPACE_URI_BUILTIN:
 		{
                   Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
@@ -512,22 +540,16 @@ public class XQResolveNames extends ResolveNames
                   else
                     mname = "availableCached";
                   Method meth = cl.getDeclaredMethod(mname, 2);
-                  String err
-                    = WrongArguments.checkArgCount("fn:"+decl.getName(),
-                                                   1, 1, args.length);
-                  if (err != null)
-                    return getCompilation().syntaxError(err);
+                  if ((err = checkArgCount(args, decl, 1, 1)) != null)
+                    return err;
                   Expression base = getBaseUriExpr();
                   return new ApplyExp(meth, new Expression[]{ args[0], base });
                 }
               case RESOLVE_URI_BUILTIN:
                 {
                   Expression[] args = exp.getArgs();
-                  String err
-                    = WrongArguments.checkArgCount("fn:"+decl.getName(),
-                                                   1, 2, args.length);
-                  if (err != null)
-                    return getCompilation().syntaxError(err);
+                  if ((err = checkArgCount(args, decl, 1, 2)) != null)
+                    return err;
                   Expression[] margs = new Expression[2];
                   margs[0] = args[0];
                   if (args.length == 1)
@@ -602,7 +624,9 @@ public class XQResolveNames extends ResolveNames
       return bindings;
     String prefix = qname.getPrefix();
     String uri = qname.getNamespaceURI();
-    return NamespaceBinding.maybeAdd(prefix, uri == "" ? null : uri, bindings);
+    return NamespaceBinding.maybeAdd(prefix == "" ? null : prefix,
+                                     uri == "" ? null : uri,
+                                     bindings);
   }
 
   /** Wrap a (known) procedure value as a Declaration. */

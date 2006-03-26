@@ -1,3 +1,14 @@
+2006-03-25  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (STATIC_BASE_URI_BUILTIN): New constant.
+	(<init>): Declare 'fn:static-base-uri'.
+	(walkApplyExp): Handle STATIC_BASE_URI_BUILTIN.
+
+	* XQResolveNames.java (checkArgCount): New private convenience method.
+	(walkApplyExp): Use it various places to check number of arguments.
+
+	* XQResolveNames.java (maybeAddNamespace): Map prefix=="" to null.
+
 2006-03-18  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseMaybePrimaryExpr): Re-write to use a switch

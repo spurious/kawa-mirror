@@ -38,8 +38,11 @@ public final class NamespaceBinding implements Externalizable
     this.depth = next == null ? 0 : next.depth + 1;
   }
 
+  public static final String XML_NAMESPACE
+  = "http://www.w3.org/XML/1998/namespace";
+
   public static final NamespaceBinding predefinedXML
-  = new NamespaceBinding("xml", "http://www.w3.org/XML/1998/namespace", null);
+  = new NamespaceBinding("xml", XML_NAMESPACE, null);
 
   /** Resolve a prefix.
    * @param prefix an interned namespace prefix to search for.

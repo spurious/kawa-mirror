@@ -1,3 +1,8 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* NamespaceBinding.java (XML_NAMESPACE): New constant.
+	(predefinedXML): Use new constant.
+
 2006-03-20  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Fix printing of tag by endGroup so it matches

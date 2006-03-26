@@ -1104,6 +1104,16 @@ public class XQParser extends Lexer
     return curToken;
   }
 
+  void checkAllowedNamespaceDeclaration (String prefix, String uri)
+  {
+    if ("xml".equals(prefix) || "xmlns".equals(prefix))
+      error('e', "namespace prefix cannot be 'xml' or 'xmlns'",
+            "XQST0070");
+    else if (NamespaceBinding.XML_NAMESPACE.equals(uri))
+      error('e', "namespace uri cannot be the same as the prefined xml namespace",
+            "XQST0070");
+  }
+
   Declaration pushNamespace(String prefix, String uri)
   {
     Declaration decl = makeNamespaceDecl (prefix, uri);
@@ -1120,7 +1130,7 @@ public class XQParser extends Lexer
 
   private void pushStandardNamespaces ()
   {
-    pushNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+    pushNamespace("xml", NamespaceBinding.XML_NAMESPACE);
     pushNamespace("xs", XQuery.SCHEMA_NAMESPACE);
     // Recently xdt types have been moved into the xs namespace.
     // However, keep the xdt prefix for the sake of old code,
@@ -2374,19 +2384,19 @@ public class XQParser extends Lexer
 	String attrName = new String(tokenBuffer, 0, tokenBufferLength);
 	int startLine = getLineNumber() + 1;
 	int startColumn = getColumnNumber() + 1 - tokenBufferLength;
-	String defininingNamespace = null;
+	String definingNamespace = null;
 	if (curToken == NCNAME_TOKEN)
 	  {
 	    if (attrName.equals("xmlns"))
-	      defininingNamespace = "";
+	      definingNamespace = "";
 	  }
 	else
 	  {
 	    if (attrName.startsWith("xmlns:"))
-	      defininingNamespace = attrName.substring(6).intern();
+	      definingNamespace = attrName.substring(6).intern();
 	  }
 	Expression makeAttr
-	  = defininingNamespace != null ? null
+	  = definingNamespace != null ? null
 	  : MakeAttribute.makeAttributeExp;
 	vec.addElement(castQName(new QuoteExp(attrName)));
 	ch = skipSpace();
@@ -2402,7 +2412,7 @@ public class XQParser extends Lexer
 	else
 	  parseContent((char) ch, vec);
 	int n = vec.size() - vecSize;
-	if (defininingNamespace != null)
+	if (definingNamespace != null)
 	  {
 	    String ns = "";
 	    if (n == 1)
@@ -2413,10 +2423,11 @@ public class XQParser extends Lexer
 	      ns = ((QuoteExp) vec.elementAt(vecSize+1)).getValue()
 		.toString().intern();
 	    vec.setSize(vecSize);
-	    if (defininingNamespace == "")
-	      defininingNamespace = null;
+            checkAllowedNamespaceDeclaration(definingNamespace, ns);
+	    if (definingNamespace == "")
+	      definingNamespace = null;
 	    namespaceBindings
-	      = new NamespaceBinding(defininingNamespace,
+	      = new NamespaceBinding(definingNamespace,
 				     ns == "" ? null : ns,
 				     namespaceBindings);
 	  }
@@ -3491,6 +3502,7 @@ public class XQParser extends Lexer
 		  return syntaxError("missing uri in namespace declaration");
 		uri = new String(tokenBuffer, 0, tokenBufferLength);
 		decl = pushNamespace(prefix, uri);
+                checkAllowedNamespaceDeclaration(prefix, uri);
 		comp.mainLambda.addDeclaration(decl);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
@@ -3525,7 +3537,10 @@ public class XQParser extends Lexer
 	  return syntaxError("missing uri in namespace declaration");
 	uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (prefix != null)
-	  comp.mainLambda.addDeclaration(pushNamespace(prefix, uri));
+          {
+            checkAllowedNamespaceDeclaration(prefix, uri);
+            comp.mainLambda.addDeclaration(pushNamespace(prefix, uri));
+          }
 	getRawToken();
 	if (match("at"))
 	  {
@@ -3599,6 +3614,7 @@ public class XQParser extends Lexer
 	    defaultElementNamespace = uri;
 	  }
 	decl = pushNamespace(prefix, uri);
+        checkAllowedNamespaceDeclaration(prefix, uri);
 	comp.mainLambda.addDeclaration(decl);
 	parseSeparator();
 	return SetExp.makeDefinition(decl, decl.getValue());

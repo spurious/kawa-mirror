@@ -1,3 +1,14 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (pushStandardNamespaces): Use new XML_NAMESPACE.
+
+	* XQParser.java (checkAllowedNamespaceDeclaration): New method.
+	(parseElementConstructor): Call checkAllowedNamespaceDeclaration.
+	(parse): Likewise.
+
+	* XQParser.java (parseElementConstructor):  Rename local variable typo
+	defininingNamespace to definingNamespace.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (STATIC_BASE_URI_BUILTIN): New constant.

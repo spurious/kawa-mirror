@@ -1,3 +1,10 @@
+2006-03-25  Per Bothner  <per@bothner.com>
+
+	* OrderedTuples.java (cmp): Various fixes to match 'order by'
+	specification: empty sequence and NaN handling; UntypeAtomic support.
+
+	* QNameUtils.java (makeQName): Add expected intern call.
+
 2006-03-20  Per Bothner  <per@bothner.com>
 
 	* BooleanValue.java (booleanValue): Handle Number that are not Numeric

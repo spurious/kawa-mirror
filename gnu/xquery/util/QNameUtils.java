@@ -88,7 +88,7 @@ public class QNameUtils
     else
       {
 	localPart = paramQName.substring(colon+1);
-	prefix = paramQName.substring(0, colon);
+	prefix = paramQName.substring(0, colon).intern();
       }
     return new SName(namespaceURI, localPart, prefix);
   }

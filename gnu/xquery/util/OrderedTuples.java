@@ -3,6 +3,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.xml.KNode;
+import gnu.kawa.xml.UntypedAtomic;
 
 /** Helper class used in conjunction with {@link OrderedMap}.
  * It has the tuples from the {@code for} and {@code let}-clauses,
@@ -144,11 +145,38 @@ int cmp(int a, int b)  throws Throwable
       Object val2 = comparator.applyN((Object[]) tuples[b]);
       val1 = KNode.atomicValue(val1);
       val2 = KNode.atomicValue(val2);
+      if (val1 instanceof UntypedAtomic)
+        val1 = val1.toString();
+      if (val2 instanceof UntypedAtomic)
+        val2 = val2.toString();
+      boolean empty1 = SequenceUtils.isEmptySequence(val1);
+      boolean empty2 = SequenceUtils.isEmptySequence(val2);
+      if (empty1 && empty2)
+        continue;
       int c;
-      if (val1 instanceof Number && val2 instanceof Number)
-        c = NumberCompare.compare(val1, val2);
+      if (empty1 || empty2)
+        {
+          char emptyOrder = flags.charAt(1);
+          c = empty1 == (emptyOrder == 'L') ? -1 : 1;
+        }
       else
-        c = collator.compare(val1.toString(), val2.toString());
+        {
+          boolean isNaN1 = val1 instanceof Number
+            && Double.isNaN(((Number) val1).doubleValue());
+          boolean isNaN2 = val2 instanceof Number
+            && Double.isNaN(((Number) val2).doubleValue());
+          if (isNaN1 && isNaN2)
+            continue;
+          if (isNaN1 || isNaN2)
+            {
+              char emptyOrder = flags.charAt(1);
+              c = isNaN1 == (emptyOrder == 'L') ? -1 : 1;
+            }
+          else if (val1 instanceof Number && val2 instanceof Number)
+            c = NumberCompare.compare(val1, val2);
+          else
+            c = collator.compare(val1.toString(), val2.toString());
+        }
       if (c == 0)
         continue;
       return flags.charAt(0) == 'A' ? c : -c;

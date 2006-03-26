@@ -50,4 +50,3 @@
 		 (y)
 		 (action (lambda (e) (+ yy 10))))))
     (slot-ref obj 'action)))
-

@@ -5,18 +5,9 @@ import gnu.kawa.xml.KNode;
 import gnu.lists.*;
 import java.math.BigDecimal;
 
-public class StringValue extends Procedure1
+public class StringValue
 {
-  public static final StringValue stringValue
-  = new StringValue("string-value");
-  public static final StringValue string = new StringValue("string");
-
-  public StringValue(String name)
-  {
-    super(name);
-  }
-
-  public Object apply1 (Object node)
+  public static String stringValue (Object node)
   {
     StringBuffer sbuf = new StringBuffer(100);
     if (node instanceof Values)
@@ -37,13 +28,6 @@ public class StringValue extends Procedure1
       }
     else
       stringValue(node, sbuf);
-    return sbuf.toString();
-  }
-
-  public static String stringValue (Object node)
-  {
-    StringBuffer sbuf = new StringBuffer();
-    stringValue(node, sbuf);
     return sbuf.toString();
   }
 

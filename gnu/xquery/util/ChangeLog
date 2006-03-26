@@ -1,3 +1,8 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* SequenceUtils.java (indexOf$X): New static method, implements
+	fn:index-of function.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* OrderedTuples.java (cmp): Various fixes to match 'order by'

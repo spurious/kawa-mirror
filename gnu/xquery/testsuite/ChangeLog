@@ -1,3 +1,8 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main): Replace call to removed 'string-value'
+	function by standard 'string'.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* expected-1.errs: Update for changed error message.

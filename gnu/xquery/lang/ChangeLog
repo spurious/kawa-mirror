@@ -1,5 +1,14 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (stringValueMethod): New static final field.
+	(stringValue): Use stringValueMethod, rather than removed field.
+	* XQResolveNames.java (INDEX_OF_BUILTIN,STRING_BUILTIN): New constants.
+	(<init>): Declare 'fn:index-of' and 'fn:string'.
+	(walkApplyExp): Handle INDEX_OF_BUILTIN and STRING_BUILTIN.
+	* XQuery.java (initXQuery): Remove inccorectly implemented
+	index and string functions, now handled in XQResolveNames.
+	Remove bogus last-index-of and string-value functions.
+
 	* XQParser.java (pushStandardNamespaces): Use new XML_NAMESPACE.
 
 	* XQParser.java (checkAllowedNamespaceDeclaration): New method.

@@ -535,8 +535,6 @@ public class XQuery extends Language
     defProcStFld("max", "gnu.xquery.util.MinMax", "max");
     defProcStFld("sum", "gnu.xquery.util.Reduce", "sum");
     defProcStFld("avg", "gnu.xquery.util.Average", "avg");
-    defProcStFld("index-of", "gnu.xquery.util.IndexOf", "indexOf");
-    defProcStFld("last-index-of", "gnu.xquery.util.LastIndexOf", "lastIndexOf");
     defProcStFld("sublist", "gnu.xquery.util.SubList", "subList"); // deprecated
     defProcStFld("subsequence", "gnu.xquery.util.SubList", "subList");
     define_method("empty", "gnu.xquery.util.SequenceUtils",
@@ -549,8 +547,6 @@ public class XQuery extends Language
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("boolean", "gnu.xquery.util.BooleanValue", "booleanValue");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
-    defProcStFld("string-value", "gnu.kawa.xml.StringValue", "stringValue");
-    defProcStFld("string", "gnu.kawa.xml.StringValue", "string");
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     defProcStFld("write-to", "gnu.kawa.xml.WriteTo", "writeTo");

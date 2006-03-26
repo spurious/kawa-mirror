@@ -71,4 +71,23 @@ public class SequenceUtils
     for (int i = n-1;  --i >= 0; )
       vals.consumePosRange(poses[i], poses[i+1], out);
   }
+
+  public static void indexOf$X (Object seqParam, Object srchParam,
+                                NamedCollator collator, CallContext ctx)
+  {
+    Consumer out = ctx.consumer;
+    if (seqParam instanceof Values)
+      {
+        Values vals = (Values) seqParam;
+        int ipos = vals.startPos();
+        int i = 1;
+        for (; (ipos = vals.nextPos(ipos)) != 0; i++)
+          if (Compare.apply(Compare.TRUE_IF_EQU,
+                            vals.getPosPrevious(ipos),
+                            srchParam, collator))
+            out.writeInt(i);
+      }
+    else if (Compare.apply(Compare.TRUE_IF_EQU, seqParam, srchParam, collator))
+      out.writeInt(1);
+  }
 }

@@ -58,6 +58,12 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>static-base-uri</code> function. */
   public static final int STATIC_BASE_URI_BUILTIN = -14;
 
+  /** Code number for the special <code>index-of</code> function. */
+  public static final int INDEX_OF_BUILTIN = -15;
+
+  /** Code number for the special <code>string</code> function. */
+  public static final int STRING_BUILTIN = -16;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -113,6 +119,8 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
     pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
+    pushBuiltin("index-of", INDEX_OF_BUILTIN);
+    pushBuiltin("string", STRING_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -522,6 +530,17 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.xquery.util.StringUtils")
                     .getDeclaredMethod("compare", 3);
                   return withCollator(meth, exp.getArgs(), "fn:compare", 2);
+                }
+
+              case STRING_BUILTIN:
+                return withContext(XQParser.stringValueMethod,
+                                   exp.getArgs(), "fn:string", 0);
+
+              case INDEX_OF_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.SequenceUtils")
+                    .getDeclaredMethod("indexOf$X", 4);
+                  return withCollator(meth, exp.getArgs(), "fn:index-of", 2);
                 }
               case DOC_BUILTIN:
               case DOC_AVAILABLE_BUILTIN:

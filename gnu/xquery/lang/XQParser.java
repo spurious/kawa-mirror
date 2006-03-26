@@ -2237,12 +2237,14 @@ public class XQParser extends Lexer
     return exp;
   }
 
+  public static final Method stringValueMethod
+  = ClassType.make("gnu.kawa.xml.StringValue")
+    .getDeclaredMethod("stringValue", 1);
+
   /** Coerce the value of an expresison to a string value. */
   public static Expression stringValue(Expression exp)
   {
-    Expression[] args = { exp };
-    Expression string = makeFunctionExp("gnu.kawa.xml.StringValue", "string");
-    return new ApplyExp(string, args);
+    return new ApplyExp(stringValueMethod, new Expression[] { exp });
   }
 
   /** Coerce the value of an expresison to a boolean value. */

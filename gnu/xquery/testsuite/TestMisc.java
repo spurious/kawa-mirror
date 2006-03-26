@@ -133,7 +133,7 @@ public class TestMisc
 	     +"<fld1"+tabNsNodes+" align=\"left\">b1</fld1>"
 	     +"<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
 
-    evalTest("string-value(doc('tab.xml'))",
+    evalTest("string(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
     evalTest("string(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");

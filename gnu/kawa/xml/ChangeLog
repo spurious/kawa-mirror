@@ -1,3 +1,10 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* StringValue.java: No longer extend Procedure1.
+	(stringValue, string): Removed fields.
+	(<init>, apply1): Removed methods.
+	(stringValue): Merge in multi-item support from removed apply1.
+
 2006-03-20  Per Bothner  <per@bothner.com>
 
 	* NodeName.java (nodeName): Map String to SName, so the result will

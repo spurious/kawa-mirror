@@ -2,6 +2,9 @@
 
 	* SequenceUtils.java (indexOf$X): New static method, implements
 	fn:index-of function.
+	* IndexOf.java: Remove no-longer-used class
+.	* LastIndexOf.java: Likewise.
+	* Makefile.am: Update accordingly.
 
 2006-03-25  Per Bothner  <per@bothner.com>
 

@@ -11,10 +11,8 @@ java_sources = \
   Compare.java \
   Debug.java \
   DistinctValues.java \
-  IndexOf.java \
   IntegerRange.java \
   ItemAt.java \
-  LastIndexOf.java \
   MinMax.java \
   NamedCollator.java \
   NodeUtils.java \

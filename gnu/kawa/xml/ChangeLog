@@ -1,5 +1,7 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XMLParser.java: Move "implements" into conditionally-compiled section.
+
 	* StringValue.java: No longer extend Procedure1.
 	(stringValue, string): Removed fields.
 	(<init>, apply1): Removed methods.

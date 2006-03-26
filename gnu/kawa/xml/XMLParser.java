@@ -8,9 +8,9 @@ import gnu.text.*;
 import java.net.*;
 
 public class XMLParser extends XMLParserChar
-                       implements
                        /* #ifdef JAXP-1.3 */
-                       org.xml.sax.Locator
+                       // implements
+                       // org.xml.sax.Locator
                        /* #endif */
 {
   SourceMessages messages;

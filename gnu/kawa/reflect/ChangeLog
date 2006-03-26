@@ -1,3 +1,7 @@
+2006-03-25  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (slotRef): New field.
+
 2006-03-24  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (makeGetField): Change return type.

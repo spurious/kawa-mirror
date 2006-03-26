@@ -16,6 +16,8 @@ public class SlotGet extends Procedure2
   Procedure setter;
   public static final SlotGet field
     = new SlotGet("field", false, SlotSet.set$Mnfield$Ex);
+  public static final SlotGet slotRef
+    = new SlotGet("slot-ref", false, SlotSet.set$Mnfield$Ex);
   public static final SlotGet staticField
     = new SlotGet("static-field", true, SlotSet.set$Mnstatic$Mnfield$Ex);
 

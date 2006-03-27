@@ -1,3 +1,8 @@
+2006-03-27  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (typeMap): Added newly-implemented base64Binary.
+	Added anyAtomicType as an alias for Object.
+
 2006-03-26  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (treatAs): New static constant.

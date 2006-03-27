@@ -8,6 +8,8 @@ java_sources = \
   AttributeAxis.java \
   Attributes.java \
   AttributeType.java \
+  Base64Binary.java \
+  BinaryObject.java \
   ChildAxis.java \
   Children.java \
   CoerceNodes.java \
@@ -20,6 +22,7 @@ java_sources = \
   Focus.java \
   FollowingAxis.java \
   FollowingSiblingAxis.java \
+  HexBinary.java \
   HttpPrinter.java \
   IntersectNodes.java \
   IteratorItems.java \

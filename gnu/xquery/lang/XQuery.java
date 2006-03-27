@@ -749,7 +749,9 @@ public class XQuery extends Language
       "double", XDataType.doubleType,
       "anyURI", XDataType.anyURIType,
       "hexBinary", XDataType.hexBinaryType,
-      "QName", "gnu.xml.SName"
+      "base64Binary", XDataType.base64BinaryType,
+      "QName", "gnu.xml.SName",
+      "anyAtomicType", Type.pointer_type
     };
 
   public static Type getStandardType (String name)

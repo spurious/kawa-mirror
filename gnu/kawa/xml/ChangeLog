@@ -1,3 +1,16 @@
+2006-03-27  Per Bothner  <per@bothner.com>
+
+	* BinaryObject.java: New abstract class.
+	* Base64Binary.java: New class, extends BinaryObject.
+	* HexBinary.java: New class, extends BinaryObject.
+	* Makefile.am: Update accordingly.
+	* XDataType.java (base64BinaryType, hexBinaryType): New static fields.
+	(cast, valueOf): Add support for new types.
+	(parseHexBinary): Remove method - now in HexBinary.java.
+
+	* XDataType.java (decimalType): Change implementation type to
+	java.lang.Number.
+
 2006-03-26  Per Bothner  <per@bothner.com>
 
 	* XTimeType.java (typeXTimeType): Remove field, replacing it by ...

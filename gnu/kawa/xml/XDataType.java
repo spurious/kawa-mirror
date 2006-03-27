@@ -84,8 +84,12 @@ public class XDataType extends Type implements TypeValue
     new XDataType("string", ClassType.make("gnu.kawa.xml.UntypedAtomic"),
                   UNTYPED_ATOMIC_TYPE_CODE);
 
+  public static final XDataType base64BinaryType =
+    new XDataType("base64Binary", ClassType.make("gnu.kawa.xml.Base64Binary"),
+                  BASE64_BINARY_TYPE_CODE);
+
   public static final XDataType hexBinaryType =
-    new XDataType("hexBinary", ArrayType.make(Type.byte_type),
+    new XDataType("hexBinary", ClassType.make("gnu.kawa.xml.HexBinary"),
                   HEX_BINARY_TYPE_CODE);
 
   public static final XDataType booleanType =
@@ -102,7 +106,10 @@ public class XDataType extends Type implements TypeValue
                   ANY_URI_TYPE_CODE);
 
   public static final XDataType decimalType =
-    new XDataType("decimal", ClassType.make("java.math.BigDecimal"),
+    // A decimal value is implemented using java.math.BigDecimal.
+    // However, the integer sub-type is implemented using gnu.math.IntNum.
+    // So we use their common supertype as teh implementationType.
+    new XDataType("decimal", ClassType.make("java.lang.Number"),
                   DECIMAL_TYPE_CODE);
 
   public static final XDataType floatType =
@@ -330,6 +337,12 @@ public class XDataType extends Type implements TypeValue
         return castToDuration(value, Unit.month);
       case DAY_TIME_DURATION_TYPE_CODE:
         return castToDuration(value, Unit.second);
+      case BASE64_BINARY_TYPE_CODE:
+        if (value instanceof BinaryObject)
+          return new Base64Binary(((BinaryObject) value).getBytes());
+      case HEX_BINARY_TYPE_CODE:
+        if (value instanceof BinaryObject)
+          return new HexBinary(((BinaryObject) value).getBytes());
       }
     return coerceFromObject(value);
   }
@@ -423,33 +436,13 @@ public class XDataType extends Type implements TypeValue
         return Duration.parseYearMonthDuration(value);
       case DAY_TIME_DURATION_TYPE_CODE:
         return Duration.parseDayTimeDuration(value);
+      case BASE64_BINARY_TYPE_CODE:
+        return Base64Binary.valueOf(value);
       case HEX_BINARY_TYPE_CODE:
-        return parseHexBinary(value);
+        return HexBinary.valueOf(value);
       default:
         throw new RuntimeException("valueOf not implemented for "+name);
       }
-  }
-
-  static byte[] parseHexBinary (String str)
-  {
-    str = str.trim();
-    int len = str.length();
-    if ((len & 1) != 0)
-      throw new IllegalArgumentException("hexBinary string length not a multiple of 2");
-    len = len >> 1;
-    byte[] result = new byte[len];
-    for (int i = 0;  i < len;  i++)
-      {
-        int d1 = Character.digit(str.charAt(2*i), 16);
-        int d2 = Character.digit(str.charAt(2*i+1), 16);
-        int bad = -1;
-        if (d1 < 0)  bad = 2*i;
-        else if (d2 < 0)  bad = 2*i+1;
-        if (bad >= 0)
-          throw new IllegalArgumentException("invalid hexBinary character at position "+bad);
-        result[i] = (byte) (16 * d1 + d2);
-      }
-    return result;
   }
 
   public static Float makeFloat (float value)

@@ -140,7 +140,7 @@ public class Compare extends Procedure2 implements CanInline
         if (collator != null)
           comp = collator.compare(str1, str2);
         else
-          /* #endif */
+        /* #endif */
           comp = str1.compareTo(str2);
       }
     if (comp < 0)

@@ -1,5 +1,7 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* Compare.java (apply): Fix indentation so PreProcess will work.
+
 	* StringUtils.java (asDouble, asDoubleRounded): New static helpers.
 	(substring): Use asDoubleRounded.
 	* StringUtils.java (stringJoin): Remove redundant casts.

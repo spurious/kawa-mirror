@@ -8,7 +8,7 @@ import gnu.math.*;
 
 public class XTimeType extends XDataType
 {
-  static ClassType typeXTimeType = ClassType.make("gnu.kawa.xml.XTimeType");
+  static ClassType typeDateTime = ClassType.make("gnu.math.DateTime");
 
   public static final XTimeType dateTimeType =
     new XTimeType("dateTime", DATE_TIME_TYPE_CODE);
@@ -30,7 +30,7 @@ public class XTimeType extends XDataType
 
   XTimeType(String name, int code)
   {
-    super((Object) name/*FIXME*/, typeXTimeType, code);
+    super((Object) name/*FIXME*/, typeDateTime, code);
   }
 
   static int components (int typeCode)

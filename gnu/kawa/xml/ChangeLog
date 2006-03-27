@@ -1,5 +1,9 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XTimeType.java (typeXTimeType): Remove field, replacing it by ...
+	(typeDateTime): .. new static field.
+	(<init>): Use typeXTimeType by typeDateTime.	
+
 	* XMLParser.java: Move "implements" into conditionally-compiled section.
 
 	* StringValue.java: No longer extend Procedure1.

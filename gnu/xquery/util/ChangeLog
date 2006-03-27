@@ -1,5 +1,13 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (localName, namespaceURI): Fix to match specification.
+
+	* NodeUtils.java (data$X): New static method.
+
+	* NumberValue.java (round): New static method.
+
+	* NumberValue.java (numberValue): Optimization.
+
 	* Compare.java (apply): Fix indentation so PreProcess will work.
 
 	* StringUtils.java (asDouble, asDoubleRounded): New static helpers.

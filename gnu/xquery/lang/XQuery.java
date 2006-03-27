@@ -556,6 +556,7 @@ public class XQuery extends Language
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("data", "gnu.xquery.util.NodeUtils", "data$X");
     define_method("lower-case", "gnu.xquery.util.StringUtils", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringUtils", "upperCase");
     define_method("substring", "gnu.xquery.util.StringUtils", "substring");
@@ -587,6 +588,7 @@ public class XQuery extends Language
     define_method("abs", "gnu.xquery.util.NumberValue", "abs");
     define_method("floor", "gnu.xquery.util.NumberValue", "floor");
     define_method("ceiling", "gnu.xquery.util.NumberValue", "ceiling");
+    define_method("round", "gnu.xquery.util.NumberValue", "round");
     define_method("round-half-to-even", "gnu.xquery.util.NumberValue",
                   "roundHalfToEven");
 

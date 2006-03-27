@@ -56,6 +56,8 @@ public class NumberValue extends Procedure1
   {
     if (value instanceof Double || value == Values.empty || value == null)
       return value;
+    else if (value instanceof Number)
+      return XDataType.makeDouble(((Number) value).doubleValue());
     else
       return XDataType.doubleType.valueOf(StringValue.stringValue(value));
   }
@@ -127,6 +129,39 @@ public class NumberValue extends Procedure1
         return Arithmetic.asIntNum(dec.divide(XDataType.DECIMAL_ONE, 0, BigDecimal.ROUND_CEILING).toBigInteger());
       }
     return ((RealNum) value).toInt(Numeric.CEILING);
+  }
+
+  public static Object round (Object arg)
+  {
+    Number value = numberCast(arg);
+    if (value == null)
+      return arg;
+    if (value instanceof Double)
+      {
+        double val = ((Double) value).doubleValue();
+        if (val >= -0.5 && val <= 0.0
+            && (val < 0.0 || Double.doubleToLongBits(val) < 0))
+          val = -0.0;
+        else
+          val = Math.floor(val+0.5);
+        return XDataType.makeDouble(val);
+      }
+    if (value instanceof Float)
+      {
+        float val = ((Float) value).floatValue();
+        if (val >= -0.5 && val <= 0.0
+            && (val < 0.0 || Float.floatToIntBits(val) < 0))
+          val = (float) (-0.0);
+        else
+          val = (float) Math.floor(val+0.5);
+        return XDataType.makeFloat(val);
+      }
+    if (value instanceof BigDecimal)
+      {
+        BigDecimal dec = (BigDecimal) value;
+        return Arithmetic.asIntNum(dec.divide(XDataType.DECIMAL_ONE, 0, BigDecimal.ROUND_HALF_UP).toBigInteger());
+      }
+    return ((RealNum) value).toInt(Numeric.ROUND);
   }
 
   public static Object roundHalfToEven (Object value, IntNum precision)

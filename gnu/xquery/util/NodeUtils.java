@@ -12,16 +12,20 @@ public class NodeUtils
   public static Object localName (Object node)
   {
     if (node == Values.empty || node == null)
-      return node;
+      return "";
     Object name = NodeName.nodeName(node);
+    if (name == null || name == Values.empty)
+      return "";
     return QNameUtils.localNameFromQName(name);
   }
 
   public static Object namespaceURI (Object node)
   {
     if (node == Values.empty || node == null)
-      return node;
+      return "";
     Object name = NodeName.nodeName(node);
+    if (name == null || name == Values.empty)
+      return "";
     return QNameUtils.namespaceURIFromQName(name);
   }
 
@@ -48,5 +52,19 @@ public class NodeUtils
         else
           ctx.consumer.writeObject("xml");
       }
+  }
+
+  public static void data$X (Object arg, CallContext ctx)
+  {
+    Consumer out = ctx.consumer; 
+    if (arg instanceof Values)
+      {
+        Values vals = (Values) arg;
+        int ipos = vals.startPos();
+        while ((ipos = vals.nextPos(ipos)) != 0)
+          out.writeObject(KNode.atomicValue(vals.getPosPrevious(ipos)));
+      }
+    else
+      out.writeObject(KNode.atomicValue(arg));
   }
 }

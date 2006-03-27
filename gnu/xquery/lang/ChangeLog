@@ -1,5 +1,7 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): Declare fn:data and fn:round.
+
 	* XQResolveNames.java (NORMALIZE_SPACE_BUILTIN, UNORDERED_BUILTIN):
 	New constants.
 	(<init>): Declare fn:normalize-space and fn:unordered.

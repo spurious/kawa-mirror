@@ -53,6 +53,7 @@ public class XQParser extends Lexer
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
   public static final CastableAs castableAs = CastableAs.castableAs;
+  public static final Convert treatAs = Convert.as;
 
   NameLookup lexical;
 
@@ -62,12 +63,23 @@ public class XQParser extends Lexer
    * Either <code>'L'</code> (for "least") or <code>'G'</code> (for "greatest").
    */
   char defaultEmptyOrder = 'L';
+  boolean emptyOrderDeclarationSeen;
 
   String baseURI = null;
 
-  boolean preserveBoundarySpace;
+  boolean boundarySpacePreserve;
+  boolean boundarySpaceDeclarationSeen;
 
   boolean orderingModeUnordered;
+
+  boolean copyNamespacesNoInherit;
+  boolean copyNamespacesNoPreserve;
+  boolean copyNamespacesDeclarationSeen;
+
+  /** The static construction mode. True if "strip"; false if "preserve". */
+  boolean constructionModeStrip;
+  /** True if a construction mode declaration has been seen. */
+  boolean constructionModeDeclarationSeen;
 
   public Namespace[] functionNamespacePath
     = XQuery.defaultFunctionNamespacePath;
@@ -244,13 +256,17 @@ public class XQParser extends Lexer
   static final int MODULE_NAMESPACE_TOKEN = 'M'; // <"module" "namespace">
   static final int DECLARE_NAMESPACE_TOKEN = 'N'; // <"declare" "namespace">
   static final int DECLARE_BOUNDARY_SPACE_TOKEN = 'S'; // <"declare" "boundary-space">
-  static final int DEFAULT_ELEMENT_TOKEN = 'E'; // <"default" "element">
-  static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
+  static final int DEFAULT_ELEMENT_TOKEN = 'E'; // <"declare" "default" "element">
+  static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"declare" "default" "function">
   static final int DEFAULT_COLLATION_TOKEN = 'G';
+  static final int DEFAULT_ORDER_TOKEN = 'H'; // <"declare" "default" "order">
+
   static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
   static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
   static final int DECLARE_BASE_URI_TOKEN = 'B'; // <"declare" "base-uri">
   static final int DECLARE_ORDERING_TOKEN = 'U'; // <"declare" "ordering">
+  static final int DECLARE_CONSTRUCTION_TOKEN = 'K'; // <"declare" "construction">
+  static final int DECLARE_COPY_NAMESPACES_TOKEN = 'L'; // <"declare" "copy-namespaces">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
   static final int XQUERY_VERSION_TOKEN = 'Y'; // <"xquery" "version">
 
@@ -993,6 +1009,12 @@ public class XQParser extends Lexer
 	    if (lookingAt("declare", /*"b"+*/ "oundary-space"))
               return curToken = DECLARE_BOUNDARY_SPACE_TOKEN;
             break;
+          case 'c':
+	    if (lookingAt("declare", /*"c"+*/ "onstruction"))
+              return curToken = DECLARE_CONSTRUCTION_TOKEN;
+	    if (lookingAt("declare", /*"c"+*/ "opy-namespaces"))
+              return curToken = DECLARE_COPY_NAMESPACES_TOKEN;
+            break;
 	  case 'd':
 	    if (lookingAt("declare", /*"d"+*/ "efault"))
 	      {
@@ -1003,6 +1025,8 @@ public class XQParser extends Lexer
 		  return curToken = DEFAULT_ELEMENT_TOKEN;
 		if (match("collation"))
 		  return curToken = DEFAULT_COLLATION_TOKEN;
+		if (match("order"))
+		  return curToken = DEFAULT_ORDER_TOKEN;
 		error("unrecognized/unimplemented 'declare default'");
 		skipToSemicolon();
 		return peekOperand();
@@ -2099,7 +2123,7 @@ public class XQParser extends Lexer
     tokenBufferLength = 0;
     int startSize = result.size();
     int prevEnclosed = startSize - 1;
-    boolean skipBoundarySpace = ! preserveBoundarySpace && delimiter == '<';
+    boolean skipBoundarySpace = ! boundarySpacePreserve && delimiter == '<';
     boolean skippable = skipBoundarySpace;
     Expression makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
                                           "makeText");
@@ -3629,19 +3653,79 @@ public class XQParser extends Lexer
 	      error('w', "obsolate '=' in boundary-space declaration");
 	    getRawToken();
 	  }
+        if (boundarySpaceDeclarationSeen && ! interactive)
+          syntaxError("duplicate 'declare boundary-space' seen", "XQST0068");
+        boundarySpaceDeclarationSeen = true;
 	if (match("preserve"))
-	  preserveBoundarySpace = true;
+	  boundarySpacePreserve = true;
 	else if (match("strip"))
-	  preserveBoundarySpace = false;
+	  boundarySpacePreserve = false;
 	else if (match("skip"))
           {
 	    if (warnOldVersion)
 	      error('w', "update: declare boundary-space skip -> strip");
-            preserveBoundarySpace = false;
+            boundarySpacePreserve = false;
           }
 	else
 	  return syntaxError("boundary-space declaration must be preserve or strip");
 	parseSeparator();
+	return QuoteExp.voidExp;
+
+      case DECLARE_CONSTRUCTION_TOKEN:
+	getRawToken();
+        if (constructionModeDeclarationSeen && ! interactive)
+          syntaxError("duplicate 'declare construction' seen", "XQST0067");
+        constructionModeDeclarationSeen = true;
+	if (match("strip"))
+          constructionModeStrip = true;
+	else if (match("preserve"))
+          constructionModeStrip = false;
+	else
+	  return syntaxError("construction declaration must be strip or preserve");
+	parseSeparator();
+	return QuoteExp.voidExp;
+
+      case DECLARE_COPY_NAMESPACES_TOKEN:
+	getRawToken();
+        if (copyNamespacesDeclarationSeen && ! interactive)
+          syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0067");
+        constructionModeDeclarationSeen = true;
+	if (match("preserve"))
+          copyNamespacesNoPreserve = false;
+	else if (match("no-preserve"))
+          copyNamespacesNoPreserve = true;
+	else
+	  return syntaxError("expected 'preserve' or 'no-preserve' after 'declare copy-namespaces'");
+        getRawToken();
+        if (curToken != ',')
+          return syntaxError("missing ',' in copy-namespaces declaration");
+        getRawToken();
+	if (match("inherit"))
+          copyNamespacesNoInherit = false;
+	else if (match("no-inherit"))
+          copyNamespacesNoInherit = true;
+	else
+	  return syntaxError("expected 'inherit' or 'no-inherit' in copy-namespaces declaration");
+	parseSeparator();
+	return QuoteExp.voidExp;
+
+      case DEFAULT_ORDER_TOKEN:
+        getRawToken();
+        boolean sawEmpty = match("empty");
+        if (emptyOrderDeclarationSeen && ! interactive)
+          syntaxError("duplicate 'declare default empty order' seen", "XQST0069");
+        emptyOrderDeclarationSeen = true;
+        if (sawEmpty)
+          getRawToken();
+        else
+          syntaxError("expected 'empty greates' or 'empty least'");
+        if (match("greatest"))
+          defaultEmptyOrder = 'G';
+        else if (match("least"))
+          defaultEmptyOrder = 'L';
+        else
+          return syntaxError("expected 'empty greatest' or 'empty least'");
+        parseSeparator();
 	return QuoteExp.voidExp;
 
       case DECLARE_ORDERING_TOKEN:

@@ -1,5 +1,18 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (treatAs): New static constant.
+	(emptyOrderDeclarationSeen, boundarySpaceDeclarationSeen,
+	copyNamespacesNoInherit, copyNamespacesNoPreserve,
+	copyNamespacesDeclarationSeen, constructionModeStrip,
+	constructionModeDeclarationSeen): New fields for static context
+	and prolog state.
+	(preserveBoundarySpace): Rename to boundarySpacePreserve.
+	(DEFAULT_ORDER_TOKEN, DECLARE_CONSTRUCTION_TOKEN,
+	DECLARE_COPY_NAMESPACES_TOKEN): New tokens.
+	(peekOperand): Recognize new tokens.
+	(parse):  Handle new tokens.
+	Also improve DECLARE_BOUNDARY_SPACE_TOKEN handling.
+
 	* XQuery.java (initXQuery): Declare fn:data and fn:round.
 
 	* XQResolveNames.java (NORMALIZE_SPACE_BUILTIN, UNORDERED_BUILTIN):

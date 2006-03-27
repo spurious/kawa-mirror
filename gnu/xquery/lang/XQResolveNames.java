@@ -64,6 +64,12 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>string</code> function. */
   public static final int STRING_BUILTIN = -16;
 
+  /** Code number for the special <code>normalize-space</code> function. */
+  public static final int NORMALIZE_SPACE_BUILTIN = -17;
+
+  /** Code number for the special <code>unordered</code> function. */
+  public static final int UNORDERED_BUILTIN = -18;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -121,6 +127,8 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
     pushBuiltin("index-of", INDEX_OF_BUILTIN);
     pushBuiltin("string", STRING_BUILTIN);
+    pushBuiltin("normalize-space", NORMALIZE_SPACE_BUILTIN);
+    pushBuiltin("unordered", UNORDERED_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -525,6 +533,23 @@ public class XQResolveNames extends ResolveNames
                   return withContext(meth, exp.getArgs(),
                                      "fn:namespace-uri", 0);
                 }
+
+              case NORMALIZE_SPACE_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.StringUtils")
+                    .getDeclaredMethod("normalizeSpace", 1);
+                  return withContext(meth, exp.getArgs(),
+                                     "fn:normalize-space", 0);
+                }
+
+              case UNORDERED_BUILTIN:
+                {
+		  Expression[] args = exp.getArgs();
+                  if ((err = checkArgCount(args, decl, 1, 1)) != null)
+                    return err;
+                  return args[0];
+                }
+
               case COMPARE_BUILTIN:
 		{
                   Method meth = ClassType.make("gnu.xquery.util.StringUtils")

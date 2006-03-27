@@ -1,5 +1,12 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* StringUtils.java (asDouble, asDoubleRounded): New static helpers.
+	(substring): Use asDoubleRounded.
+	* StringUtils.java (stringJoin): Remove redundant casts.
+	* StringUtils.java (encodeForUri, iriToUri, escapeHtmlUri,
+	encodeForUri, normalizeSpace): New static methods.
+	* StringUtils.java (makePattern, matches, repalce): New static methods.
+
 	* SequenceUtils.java (indexOf$X): New static method, implements
 	fn:index-of function.
 	* IndexOf.java: Remove no-longer-used class

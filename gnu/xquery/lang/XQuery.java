@@ -566,12 +566,19 @@ public class XQuery extends Language
     define_method("substring-after",
 		  "gnu.xquery.util.StringUtils", "substringAfter");
     define_method("translate", "gnu.xquery.util.StringUtils", "translate");
+    define_method("encode-for-uri", "gnu.xquery.util.StringUtils",
+                  "encodeForUri");
+    define_method("iri-to-uri", "gnu.xquery.util.StringUtils", "iriToUri");
+    define_method("escape-html-uri", "gnu.xquery.util.StringUtils",
+                  "escapeHtmlUri");
     define_method("string-pad", "gnu.xquery.util.StringUtils", "stringPad");
     define_method("contains", "gnu.xquery.util.StringUtils", "contains");
     define_method("starts-with", "gnu.xquery.util.StringUtils", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringUtils", "endsWith");
     define_method("string-join", "gnu.xquery.util.StringUtils", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringUtils", "concat$V");
+    define_method("matches", "gnu.xquery.util.StringUtils", "matches");
+    define_method("replace", "gnu.xquery.util.StringUtils", "replace");
     define_method("string-to-codepoints", "gnu.xquery.util.StringUtils",
 		  "stringToCodepoints$X");
     define_method("codepoints-to-string", "gnu.xquery.util.StringUtils",

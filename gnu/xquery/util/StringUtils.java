@@ -6,6 +6,8 @@ import gnu.lists.*;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.kawa.xml.StringValue;
+import gnu.kawa.xml.UntypedAtomic;
+import java.util.regex.Pattern;
 
 public class StringUtils
 {
@@ -19,17 +21,29 @@ public class StringUtils
     return StringValue.stringValue(node).toUpperCase();
   }
 
+  static double asDouble (Object value)
+  {
+    if (! (value instanceof Number))
+      value = NumberValue.numberValue(value);
+    return ((Number) value).doubleValue();
+  }
+
+  static int asDoubleRounded (Object value)
+  {
+    return (int) (asDouble(value) + 0.5);
+  }
+
   public static Object substring (Object str, Object start)
   {
-    int i = ((Number) NumberValue.numberValue(start)).intValue() - 1;
+    int i = asDoubleRounded(start) - 1;
 
     return StringValue.stringValue(str).substring(i);
   }
 
   public static Object substring (Object str, Object start, Object length)
   {
-    int i = ((Number) NumberValue.numberValue(start)).intValue() - 1;
-    int len = ((Number) NumberValue.numberValue(length)).intValue();
+    int i = asDoubleRounded(start) - 1;
+    int len = asDoubleRounded(length);
 
     return StringValue.stringValue(str).substring(i, i + len);
   }
@@ -142,9 +156,9 @@ public class StringUtils
     int index=0;
     boolean started = false;
 
-    while((index=Values.nextIndex(((Values)strseq),index)) >= 0)
+    while((index=Values.nextIndex(strseq, index)) >= 0)
       {
-	Object obj = Values.nextValue( ((Values)strseq) ,index-1);
+	Object obj = Values.nextValue(strseq, index-1);
 	if (obj == Values.empty) continue;
 
 	if (started && glen > 0)
@@ -214,5 +228,203 @@ public class StringUtils
     else
       appendCodepoint(arg, sbuf);
     return sbuf.toString();
-  } 
+  }
+
+  public static String encodeForUri (Object arg)
+  {
+    return encodeForUri(arg, 'U');
+  }
+
+  public static String iriToUri (Object arg)
+  {
+    return encodeForUri(arg, 'I');
+  }
+
+  public static String escapeHtmlUri (Object arg)
+  {
+    return encodeForUri(arg, 'H');
+  }
+
+  static String encodeForUri (Object arg, char mode)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    String str;
+    if (arg instanceof String || arg instanceof UntypedAtomic)
+      str = arg.toString();
+    else if (arg == null || arg == Values.empty)
+      str = "";
+    else
+      throw new ClassCastException();
+    int len = str.length();
+    for (int i = 0; i <len;  i++)
+      {
+        int ch = str.charAt(i);
+        // FIXME: Check for surrogate.
+        if (mode == 'H' ? ch >= 32 && ch <= 126
+            : ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+               || (ch >= '0' && ch <= '9')
+               || ch == '-' || ch == '_' || ch == '.' || ch == '#' || ch == '!'
+               || ch == '~' || ch == '*' || ch == '\'' || ch == '(' || ch == ')'
+               || (mode == 'I'
+                   && (ch == ';' || ch == '/' || ch == '?' || ch == ':'
+                       || ch == '@' || ch == '&' || ch == '=' || ch == '+'
+                       || ch == '$' || ch == ',' || ch == '[' || ch == ']'
+                       || ch == '%'))))
+          sbuf.append((char) ch);
+        else
+          {
+            int pos = sbuf.length();
+            int nbytes = 0;
+            int needed = ch < (1 << 7) ? 1
+              : ch < (1 << 11) ? 2
+              : ch < (1 << 16) ? 3
+              : 4;
+            do
+              {
+                // We insert encodings for the bytes in right-to-left order.
+                int availbits = nbytes == 0 ? 7 : 6 - nbytes;
+                int b;
+                if (ch < (1 << availbits))
+                  {
+                    // The rest fits: handling first bytes.
+                    b = ch;
+                    if (nbytes > 0)
+                      b |= (0xff80 >> nbytes) & 0xff;
+                    ch = 0;
+                  }
+                else
+                  {
+                    b = 0x80 | (ch & 0x3f);
+                    ch >>= 6;
+                  }
+                nbytes++;
+                for (int j = 0; j <= 1; j++)
+                  {
+                    int hex = b & 15;
+                    sbuf.insert(pos,
+                                (char) (hex <= 9 ? hex + '0' : hex - 10 + 'A'));
+                    b >>= 4;
+                  }
+                sbuf.insert(pos, '%');
+              }
+            while (ch != 0);
+          }
+      }
+    return sbuf.toString();
+  }
+
+  public static String normalizeSpace (Object arg)
+  {
+    if (arg == Values.empty || arg == null)
+      return "";
+    String str = StringValue.stringValue(arg);
+    int len = str.length();
+    StringBuffer sbuf = null;
+    int skipped = 0;
+    for (int i = 0;  i < len;  i++)
+      {
+        char ch = str.charAt(i);
+        if (Character.isWhitespace(ch))
+          {
+            if (sbuf == null && skipped == 0 && i > 0)
+              sbuf = new StringBuffer(str.substring(0, i));
+            skipped++;
+          }
+        else
+          {
+            if (skipped > 0)
+              {
+                if (sbuf != null)
+                  sbuf.append(' ');
+                else if (skipped > 1 || i == 1 || str.charAt(i-1) != ' ')
+                  sbuf = new StringBuffer();
+                skipped = 0;
+              }
+            if (sbuf != null)
+              sbuf.append(ch);
+          }
+      }
+    return sbuf != null ? sbuf.toString() : skipped > 0 ? "" : str;
+  }
+
+  /* #ifdef use:java.util.regex */
+  public static Pattern makePattern (String pattern, String flags)
+  {
+    int fl = 0;
+    for (int i = flags.length();  --i >= 0; )
+      {
+        char ch = flags.charAt(i);
+        switch (ch)
+          {
+          case 'i':
+            fl |= Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE;
+            break;
+          case 's':
+            fl |= Pattern.DOTALL;
+            break;
+          case 'x':
+            StringBuffer sbuf = new StringBuffer();
+            int plen = pattern.length();
+            for (int j = 0; j < plen;  j++)
+              {
+                char pch = pattern.charAt(j);
+                if (! Character.isWhitespace(pch))
+                  sbuf.append(pch);
+              }
+            pattern = sbuf.toString();
+            break;
+          case 'm':
+            fl |= Pattern.MULTILINE;
+            break;
+          default:
+            throw new IllegalArgumentException("unknown 'replace' flag");
+          }
+      }
+    return Pattern.compile(pattern, fl);
+  }
+  /* #endif */
+
+  public static boolean matches (Object input, String pattern)
+  {
+    return matches(input, pattern, "");
+  }
+
+  public static boolean matches (Object arg, String pattern, String flags)
+  {
+    /* #ifdef use:java.util.regex */
+    String str;
+    if (arg instanceof String || arg instanceof UntypedAtomic)
+      str = arg.toString();
+    else if (arg == null || arg == Values.empty)
+      str = "";
+    else
+      throw new ClassCastException();
+    return makePattern(pattern, flags).matcher(str).find();
+    /* #else */
+    // throw new Error("fn:matches requires java.util.regex (JDK 1.4 or equivalent)");
+    /* #endif */
+  }
+
+  public static String replace (Object input, String pattern,
+                                 String replacement)
+  {
+    return replace(input, pattern, replacement, "");
+  }
+
+  public static String replace (Object arg, String pattern,
+                                 String replacement, String flags)
+  {
+    /* #ifdef use:java.util.regex */
+    String str;
+    if (arg instanceof String || arg instanceof UntypedAtomic)
+      str = arg.toString();
+    else if (arg == null || arg == Values.empty)
+      str = "";
+    else
+      throw new ClassCastException();
+    return makePattern(pattern, flags).matcher(str).replaceAll(replacement);
+    /* #else */
+    // throw new Error("fn:replace requires java.util.regex (JDK 1.4 or equivalent)");
+    /* #endif */
+  }
 }

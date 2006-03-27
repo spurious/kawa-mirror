@@ -1,5 +1,13 @@
 2006-03-26  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (NORMALIZE_SPACE_BUILTIN, UNORDERED_BUILTIN):
+	New constants.
+	(<init>): Declare fn:normalize-space and fn:unordered.
+	(walkApplyExp): Handle NORMALIZE_SPACE_BUILTIN and UNORDERED_BUILTIN.
+
+	* XQuery.java (initXQuery): Declare fn:encode-for-uri, fn:iri-to-uri,
+	fn:escape-html-uri, fn:matches, and fn:replace.
+
 	* XQParser.java (stringValueMethod): New static final field.
 	(stringValue): Use stringValueMethod, rather than removed field.
 	* XQResolveNames.java (INDEX_OF_BUILTIN,STRING_BUILTIN): New constants.

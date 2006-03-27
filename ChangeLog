@@ -1,3 +1,8 @@
+2006-03-26  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (JAVA4_FEATURES, NO_JAVA4_FEATURES): New feature flag
+	use:java.util.regex.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initSchema): Bind 'slot-ref'

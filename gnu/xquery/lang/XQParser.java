@@ -3718,7 +3718,7 @@ public class XQParser extends Lexer
         if (sawEmpty)
           getRawToken();
         else
-          syntaxError("expected 'empty greates' or 'empty least'");
+          syntaxError("expected 'empty greatest' or 'empty least'");
         if (match("greatest"))
           defaultEmptyOrder = 'G';
         else if (match("least"))

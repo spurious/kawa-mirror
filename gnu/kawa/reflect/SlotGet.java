@@ -44,47 +44,88 @@ public class SlotGet extends Procedure2
     return staticField.apply2(obj, fname);
   }
 
-  public Object apply2 (Object obj, Object name)
+  public Object apply2 (Object arg1, Object arg2)
   {
-    if (! (name instanceof String) && ! (name instanceof FString))
-      throw new WrongType(this, 2, name, "string");
-    Language language = Language.getDefaultLanguage();
-    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
+    String name, fname;
+    String getName = null, isName = null;
+    if (arg2 instanceof gnu.bytecode.Field)
+      {
+        fname = ((gnu.bytecode.Field) arg2).getName();
+        name = Compilation.demangleName(fname, true);
+      }
+    else if (arg2 instanceof gnu.bytecode.Method)
+      {
+        String mname = ((gnu.bytecode.Method) arg2).getName();
+        name = Compilation.demangleName(mname, false);
+        if (mname.startsWith("get"))
+          getName = mname;
+        else if (mname.startsWith("is"))
+          isName = mname;
+        fname = null;
+      }
+    else if (! (arg2 instanceof String) && ! (arg2 instanceof FString))
+      throw new WrongType(this, 2, arg2, "string");
+    else
+      {
+        name = arg2.toString();
+        fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
+      }
+    // "intern" fname if it is "class" or "length":
+    if ("class".equals(fname))
+      fname = "class";
+    else if ("length".equals(fname))
+      fname = "length";
+    return getSlotValue(isStatic, arg1, name, fname, getName, isName,
+                         Language.getDefaultLanguage());
+  }
+
+  /** The actual gets of finding the field value.
+   * The compiler emits calls to this method if the field name is literals
+   * but the actual field is not known at compile time.
+   * This speeds lookup a bit.
+   */
+  public static Object
+  getSlotValue (boolean isStatic, Object obj, String name, String fname,
+                String getName, String isName, Language language)
+  {
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
-    if (clas.isArray() && "length".equals(fname))
+    if (fname == "length" && clas.isArray())
       {
 	int length = java.lang.reflect.Array.getLength(obj);
 	return language.coerceToObject(length);
       }
-    if ("class".equals(fname))
+    if (fname == "class")
       return clas;
     boolean illegalAccess = false;
-    java.lang.reflect.Field field;
-    try
+    if (fname != null)
       {
-        field = clas.getField(fname);
-      }
-    catch (Exception ex)
-      {
-        field = null;
-      }
-    if (field != null)
-      {
-        if (isStatic
-            && (field.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0)
-          throw new RuntimeException("cannot access non-static field `"
-                                     + fname + "' using `" + getName() + '\'');
+        java.lang.reflect.Field field;
         try
           {
-            return language.coerceToObject(field.getType(), field.get(obj));
-          }
-        catch (IllegalAccessException ex)
-          {
-            illegalAccess = true;
+            field = clas.getField(fname);
           }
         catch (Exception ex)
           {
-            ex.printStackTrace();
+            field = null;
+          }
+        if (field != null)
+          {
+            if (isStatic
+                && (field.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0)
+              throw new RuntimeException("cannot access non-static field '"
+                                         + fname + '\'');
+            try
+              {
+                return language.coerceToObject(field.getType(), field.get(obj));
+              }
+            catch (IllegalAccessException ex)
+              {
+                illegalAccess = true;
+              }
+            catch (Exception ex)
+              {
+                ex.printStackTrace();  // FIXME?
+              }
           }
       }
 
@@ -95,17 +136,19 @@ public class SlotGet extends Procedure2
         java.lang.reflect.Method getmethod = null;
         
         try {
-          mname = ClassExp.slotToMethodName("get", fname);
+          mname = getName != null ? getName
+            : ClassExp.slotToMethodName("get", fname);
           getmethod = clas.getMethod(mname, noClasses);
         } catch (Exception getEx) {
-          mname = ClassExp.slotToMethodName("is", fname);
+          mname = isName != null ? isName
+            : ClassExp.slotToMethodName("is", fname);
           getmethod = clas.getMethod(mname, noClasses);
         }
 
         if (isStatic
             && (getmethod.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0)
-          throw new RuntimeException("cannot call non-static getter method `"
-                                     + mname + "' using `" + getName() + '\'');
+          throw new RuntimeException("cannot call non-static getter method '"
+                                     + mname + '\'');
         Object result = getmethod.invoke(obj, Values.noArgs);
         result = language.coerceToObject(getmethod.getReturnType(), result);
         return result;
@@ -175,37 +218,48 @@ public class SlotGet extends Procedure2
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    if (isStatic && walker.getCompilation().mustCompile)
-      return Invoke.inlineClassName (exp, 0, (InlineCalls) walker);
-    else
-      return exp;
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
+    Compilation comp = walker.getCompilation();
+    Language language = comp.getLanguage();
+    Type type;
     Expression[] args = exp.getArgs();
-    int nargs = args.length;
-    if (nargs != 2)
-      {
-        String msg = nargs < 2 ? "too few" : "too many";
-        comp.error('e', msg + " arguments to `"+getName()+'\'');
-        comp.compileConstant(null, target);
-        return;
-      }
     Expression arg0 = args[0];
     Expression arg1 = args[1];
-    Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
-      : arg0.getType();
-    String name = ClassMethods.checkName(arg1);
-    if (isStatic && "class".equals(name)
-        // Ideally we should also handle array types ...  FIXME
-        && type instanceof ClassType)
+    String name = null;
+    if (arg1 instanceof QuoteExp)
       {
-        comp.loadClassRef((ClassType) type);
-        target.compileFromStack(comp, Type.java_lang_Class_type);
-        return;
+        Object val1 = ((QuoteExp) arg1).getValue();
+        if (val1 instanceof String
+            || val1 instanceof FString
+            || val1 instanceof Symbol)
+          name = val1.toString();
       }
-    CodeAttr code = comp.getCode();
+    if (isStatic)
+      {
+        type = language.getTypeFor(arg0);
+        if (type instanceof ClassType && "class".equals(name))
+          return arg0;
+	if (type instanceof ClassType && ((ClassType) type).isExisting())
+	  {
+	    try
+	      {
+		type.getReflectClass();
+	      }
+	    catch (Exception ex)
+	      {
+		comp.error('e', "unknown class: " + type.getName());
+	      }
+          }
+        if (type != null)
+          {
+            Expression[] nargs
+              = new Expression[] { new QuoteExp(type), arg1 };
+            ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
+            nexp.setLine(exp);
+            exp = nexp;
+          }
+      }
+    else
+      type = arg0.getType();
     if (type instanceof ClassType && name != null)
       {
 	ClassType ctype = (ClassType) type;
@@ -219,11 +273,81 @@ public class SlotGet extends Procedure2
             int modifiers = field.getModifiers();
             boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
-              comp.error('e', ("cannot access non-static field `" + name
-                               + "' using `" + getName() + '\''));
+              return new ErrorExp("cannot access non-static field `" + name
+                                  + "' using `" + getName() + '\'', comp);
 	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
-	      comp.error('e', "field "+ctype.getName()+'.'+name
-			 +" is not accessible here");
+	      return new ErrorExp("field "+ctype.getName()+'.'+name
+                                  +" is not accessible here", comp);
+          }
+
+        else if (part instanceof gnu.bytecode.Method)
+          {
+            gnu.bytecode.Method method = (gnu.bytecode.Method) part;
+            ctype = method.getDeclaringClass();
+	    int modifiers = method.getModifiers();
+            boolean isStaticMethod = method.getStaticFlag();
+            if (isStatic && ! isStaticMethod)
+              return new ErrorExp("cannot call non-static getter method `"
+                                  + name + "' using `" + getName() + '\'', comp);
+	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
+	      return new ErrorExp( "method "+method +" is not accessible here", 
+                                   comp);
+          }
+        if (part != null)
+          {
+            Expression[] nargs
+              = new Expression[] { arg0, new QuoteExp(part) };
+            ApplyExp nexp = new ApplyExp(exp.getFunction(), nargs);
+            nexp.setLine(exp);
+            return nexp;
+          }
+        if (type != Type.pointer_type)
+          comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+      }
+    if (name != null && ! (type instanceof ArrayType))
+      {
+        String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
+        // So we can quickly check for "class" or "length".
+        // The name gets interned anyway when compiled.
+        fname = fname.intern();
+        String getName = ClassExp.slotToMethodName("get", fname);
+        String isName = ClassExp.slotToMethodName("is", fname);
+        ApplyExp nexp
+          = new ApplyExp(Invoke.invokeStatic,
+                         new Expression[] {
+                           QuoteExp.getInstance("gnu.kawa.reflect.SlotGet"),
+                           QuoteExp.getInstance("getSlotValue"),
+                           isStatic ? QuoteExp.trueExp : QuoteExp.falseExp,
+                           args[0],
+                           QuoteExp.getInstance(name),
+                           QuoteExp.getInstance(fname),
+                           QuoteExp.getInstance(getName),
+                           QuoteExp.getInstance(isName),
+                           QuoteExp.getInstance(language)});
+        nexp.setLine(exp);
+        return ((InlineCalls) walker).walkApplyOnly(nexp);
+      }
+    return exp;
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    Expression arg0 = args[0];
+    Expression arg1 = args[1];
+    Language language = comp.getLanguage();
+    Type type = isStatic ? language.getTypeFor(arg0)
+      : arg0.getType();
+    CodeAttr code = comp.getCode();
+    if (type instanceof ClassType && arg1 instanceof QuoteExp)
+      {
+	ClassType ctype = (ClassType) type;
+        Object part = ((QuoteExp) arg1).getValue();
+        if (part instanceof gnu.bytecode.Field)
+          {
+            gnu.bytecode.Field field = (gnu.bytecode.Field) part;
+            int modifiers = field.getModifiers();
+            boolean isStaticField = (modifiers & Access.STATIC) != 0;
             args[0].compile(comp,
                             isStaticField ? Target.Ignore
                             : Target.pushValue(ctype));
@@ -265,24 +389,17 @@ public class SlotGet extends Procedure2
             else
               code.emitGetField(field);
 	    Type ftype = field.getType();
-	    Language language = Language.getDefaultLanguage();
 	    Class fclass = ftype.getReflectClass();
 	    if (fclass != null)
 	      ftype = language.getTypeFor(fclass);
 	    target.compileFromStack(comp, ftype);
             return;
           }
-        if (part instanceof gnu.bytecode.Method)
+        if (part instanceof Method)
           {
             gnu.bytecode.Method method = (gnu.bytecode.Method) part;
-            ctype = method.getDeclaringClass();
 	    int modifiers = method.getModifiers();
             boolean isStaticMethod = method.getStaticFlag();
-            if (isStatic && ! isStaticMethod)
-              comp.error('e', "cannot call non-static getter method `"
-                         + name + "' using `" + getName() + '\'');
-	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
-	      comp.error('e', "method "+method +" is not accessible here");
             args[0].compile(comp,
                             isStaticMethod ? Target.Ignore
                             : Target.pushValue(ctype));
@@ -295,10 +412,9 @@ public class SlotGet extends Procedure2
 	    target.compileFromStack(comp, method.getReturnType());
             return;
           }
-        if (type != Type.pointer_type)
-          comp.error('e', "no slot `"+name+"' in "+ctype.getName());
       }
-    else if (type instanceof ArrayType && "length".equals(name) && ! isStatic)
+    String name = ClassMethods.checkName(arg1);
+    if (type instanceof ArrayType && "length".equals(name) && ! isStatic)
       {
 	args[0].compile(comp, Target.pushValue(type));
 	code.emitArrayLength();
@@ -315,21 +431,17 @@ public class SlotGet extends Procedure2
       {
         Expression arg0 = args[0];
         Expression arg1 = args[1];
-        Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
-          : arg0.getType();
-        String name = ClassMethods.checkName(arg1, true);
-        if (type instanceof ClassType && name != null)
+        if (arg1 instanceof QuoteExp)
           {
-            ClassType ctype = (ClassType) type;
-            Member part = lookupMember(ctype, name, null);
+            Object part = ((QuoteExp) arg1).getValue();
             if (part instanceof gnu.bytecode.Field)
               return ((gnu.bytecode.Field) part).getType();
             if (part instanceof gnu.bytecode.Method)
               return ((gnu.bytecode.Method) part).getReturnType();
+            if (! isStatic && arg0.getType() instanceof ArrayType
+                && "length".equals(ClassMethods.checkName(arg1, true)))
+              return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
           }
-	else if (type instanceof ArrayType && "length".equals(name)
-		 && ! isStatic)
-	  return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
       }
     return Type.pointer_type;
   }

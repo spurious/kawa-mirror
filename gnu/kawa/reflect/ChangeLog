@@ -1,3 +1,15 @@
+2006-03-27  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java: If the slot name is literal but we don't know the
+	object type, then pre-mangle the field name at compile time.
+	Based on an idea and prototype by Dean Ferreyra <dferreyra@igc.org>.
+	(getSlotValue): New static function.
+	(apply2): Call getSlotValue.
+	(inline): Rewrite to do field lookup now rather than at compile time.
+	(getReturnType): Can therefore be simplified.
+	(inline): If field unknown but field name literal, replace by
+	invocation of getSlotValue.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (slotRef): New field.

@@ -1,3 +1,8 @@
+2006-03-27  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (compile): Do emit value even if it is literal,
+	unless the declaration IS_CONSTANT.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): Check if seenErrors.

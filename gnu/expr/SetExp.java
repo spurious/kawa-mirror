@@ -171,8 +171,7 @@ public class SetExp extends AccessExp
 	((LambdaExp) new_value).compileSetField(comp);
       }
     else if (decl.context instanceof ModuleExp
-	     && (new_value instanceof QuoteExp
-                 || (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias()))
+	     && (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias())
              && isDefining()
              && declValue != null)
       { // This is handled in ModuleExp's allocFields method.  But:

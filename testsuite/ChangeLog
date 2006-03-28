@@ -1,3 +1,11 @@
+2006-03-27  Dean Ferreyra <dferreyra@igc.org>
+	    Per Bothner  <per@bothner.com>
+
+	* Base.java: New interface.
+	* ASupport.java: New module.
+	* use-slots.scm: New test-suite.
+	* Makefile.am: Update to build and run new test.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* HelloCgiX.xql: Update declare xmlspace -> boundary-space.

@@ -15,7 +15,7 @@ endif
 all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
-  $(SERVLET_TESTS) $(SAX2_TESTS) check-inlining
+  $(SERVLET_TESTS) $(SAX2_TESTS) check-inlining check-use-slots
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -191,6 +191,15 @@ check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \
 	  then echo '# inlining test passes'; \
 	  else echo FAIL inlining test; fi
+
+Base.class: $(srcdir)/Base.java
+	CLASSPATH=..:.:$$CLASSPATH $(JAVAC) -g $< -d .
+
+ASupport.class: $(srcdir)/ASupport.scm Base.class
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH $(KAWA) -C $<
+
+check-use-slots: ASupport.class
+	$(KAWA) $(OPTIONS) -f $(srcdir)/use-slots.scm
 
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \

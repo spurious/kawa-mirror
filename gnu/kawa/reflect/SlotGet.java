@@ -137,11 +137,11 @@ public class SlotGet extends Procedure2
         
         try {
           mname = getName != null ? getName
-            : ClassExp.slotToMethodName("get", fname);
+            : ClassExp.slotToMethodName("get", name);
           getmethod = clas.getMethod(mname, noClasses);
         } catch (Exception getEx) {
           mname = isName != null ? isName
-            : ClassExp.slotToMethodName("is", fname);
+            : ClassExp.slotToMethodName("is", name);
           getmethod = clas.getMethod(mname, noClasses);
         }
 
@@ -310,8 +310,8 @@ public class SlotGet extends Procedure2
         // So we can quickly check for "class" or "length".
         // The name gets interned anyway when compiled.
         fname = fname.intern();
-        String getName = ClassExp.slotToMethodName("get", fname);
-        String isName = ClassExp.slotToMethodName("is", fname);
+        String getName = ClassExp.slotToMethodName("get", name);
+        String isName = ClassExp.slotToMethodName("is", name);
         ApplyExp nexp
           = new ApplyExp(Invoke.invokeStatic,
                          new Expression[] {

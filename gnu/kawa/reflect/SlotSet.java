@@ -1,6 +1,7 @@
 package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.lists.FString;
 import gnu.expr.*;
 
 public class SlotSet extends Procedure3 implements CanInline, Inlineable
@@ -39,11 +40,11 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   {
     Language language = Language.getDefaultLanguage();
     boolean illegalAccess = false;
-    name = gnu.expr.Compilation.mangleNameIfNeeded(name);
+    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
     Class clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
     try
       {
-        java.lang.reflect.Field field = clas.getField(name);
+        java.lang.reflect.Field field = clas.getField(fname);
 	Class ftype = field.getType();
         field.set(obj, language.coerceFromObject(ftype, value));
         return;
@@ -167,6 +168,10 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
+    // Unlike, for SlotGet, we do the field-lookup at compile time
+    // rather than inline time.  The main reason is that optimizing
+    // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)
+    // afte we've inlined setter, this method doesn't get called.
     if (isStatic && walker.getCompilation().mustCompile)
       return Invoke.inlineClassName (exp, 0, (InlineCalls) walker);
     else
@@ -190,44 +195,36 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
     Member part = null;
-    if (type instanceof ClassType)
+    if (type instanceof ClassType && arg1 instanceof QuoteExp)
       {
+        Object val1 = ((QuoteExp) arg1).getValue();
         ClassType ctype = (ClassType) type;
-	String name = ClassMethods.checkName(arg1, true);
+	String name;
         ClassType caller = comp.curClass != null ? comp.curClass
           : comp.mainClass;
-	if (name != null)
+        if (val1 instanceof String
+            || val1 instanceof FString
+            || val1 instanceof Symbol)
 	  {
+            name = val1.toString();
 	    part = lookupMember(ctype, name, caller);
 	    if (part == null && type != Type.pointer_type)
 	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
 	  }
-	else if (arg1 instanceof QuoteExp)
+	else if (val1 instanceof Member)
 	  {
-	    Object obj = ((QuoteExp) arg1).getValue();
 	    // Inlining (make <type> field: value) creates calls to
 	    // setFieldReturnObject whose 2nd arg is a Field or Method.
-            if (obj instanceof Member)
-              {
-                part = (Member) obj;
-                name = part.getName();
-              }
+            part = (Member) val1;
+            name = part.getName();
 	  }
+        else
+          name = null;
 
 	if (part != null)
 	  {
 	    int modifiers = part.getModifiers();
-            ClassType ptype;
-            if (part instanceof gnu.bytecode.Field)
-              {
-                gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-                ptype = field.getDeclaringClass();
-              }
-            else
-              {
-                gnu.bytecode.Method method = (gnu.bytecode.Method) part;
-                ptype = method.getDeclaringClass();
-              }
+            ClassType ptype = part.getDeclaringClass();
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
 	    if (caller != null && ! caller.isAccessible(ptype, modifiers))
 	      comp.error('e', "slot '"+name +"' in "+ptype.getName()

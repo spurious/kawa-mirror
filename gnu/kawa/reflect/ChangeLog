@@ -1,5 +1,11 @@
 2006-03-27  Per Bothner  <per@bothner.com>
 
+	* SlotGet.java (getSlotValue, inline): Pass unmangled rather than
+	mangled name to ClassExp.slotToMethodName.
+	* SlotSet.java (apply): Likewise.
+	(inline): Don't call ClassMethods.checkName, which mangles.
+	* SlotSet.java (inline): Combine Field/Method handling using Member.
+
 	* SlotGet.java: If the slot name is literal but we don't know the
 	object type, then pre-mangle the field name at compile time.
 	Based on an idea and prototype by Dean Ferreyra <dferreyra@igc.org>.

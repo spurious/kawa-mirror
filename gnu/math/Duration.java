@@ -290,11 +290,7 @@ public class Duration extends Quantity implements Externalizable
 
   public String toString ()
   {
-    /* #ifdef JAVA5 */
-    // StringBuilder sbuf = new StringBuilder();
-    /* #else */
     StringBuffer sbuf = new StringBuffer();
-    /* #endif */
     int m = months;
     long s = seconds;
     int n = nanos;

@@ -1,3 +1,7 @@
+2006-04-05  Per Bothner  <per@bothner.com>
+
+	* Duration.java (toString): Remove incomplete JAVA5 optimization.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* DateTime.java (add): Fix sign error.

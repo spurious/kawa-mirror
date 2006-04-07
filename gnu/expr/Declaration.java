@@ -72,6 +72,8 @@ public class Declaration
     Type t = (typeExp instanceof QuoteExp
               && (typeValue = ((QuoteExp) typeExp).getValue()) instanceof Type
               ? (Type) typeValue
+              : typeExp instanceof TypeValue
+              ? ((TypeValue) typeExp).getImplementationType()
               : (Type) Type.pointer_type);
     this.type = t;
     if (var != null) var.setType(t);

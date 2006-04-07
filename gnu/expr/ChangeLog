@@ -1,3 +1,10 @@
+2006-04-06  Per Bothner  <per@bothner.com>
+
+	* ExpWalker.java (walkScopeExp): Also walk the type expressions
+	of the Declarations, in case they're non-constant.
+
+	* Declaration.java (setTypeExp): Check if typeExp is TypeValue.
+
 2006-03-27  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (compile): Do emit value even if it is literal,

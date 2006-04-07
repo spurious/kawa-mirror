@@ -56,6 +56,16 @@ public class ExpWalker
 
   protected Expression walkScopeExp (ScopeExp exp)
   {
+    for (Declaration decl = exp.firstDecl(); decl != null;
+         decl = decl.nextDecl())
+      {
+        Expression texp1 = decl.getTypeExp();
+        if (texp1 == null)
+          continue;
+        Expression texp2 = texp1.walk(this);
+        if (texp2 != texp1)
+          decl.setTypeExp(texp2);
+      }
     return walkExpression(exp);
   }
 

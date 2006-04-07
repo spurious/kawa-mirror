@@ -1,3 +1,7 @@
+2006-04-06  Dean Ferreyra <dferreyra@igc.org>
+
+	* kawa/lang/SyntaxTemplate.java: Fix typo in error message.
+
 2006-03-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (JAVA4_FEATURES, NO_JAVA4_FEATURES): New feature flag

@@ -228,7 +228,7 @@ public class SyntaxTemplate implements Externalizable
         if (seen_map.containsKey(form))
           {
             /* FIXME cycles are OK if data are literal. */
-            tr.syntaxError("self-referential (cyclic) syntax tenplate");
+            tr.syntaxError("self-referential (cyclic) syntax template");
             return -2;
           }
         seen_map.put(form, form);

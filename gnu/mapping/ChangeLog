@@ -1,6 +1,7 @@
 2006-02-21  Per Bothner  <per@bothner.com>
 
-	* InPort.java (uriSchemeLength): Before restrictive about scheme syntax.
+	* InPort.java (uriSchemeLength): Be more restrictive about syntax
+	of the url scheme.
 
 2006-02-10  Per Bothner  <per@bothner.com>
 

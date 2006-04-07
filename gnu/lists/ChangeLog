@@ -1,7 +1,7 @@
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* FilterConsumer.java (beforeContent): New sub-class hook.
-	Call it before the valious witrXxx methods.
+	Call it before the various writeXxx methods.
 	(inAttribute, attributeName, attributeType): New convience
 	fields for sub-class use.
 

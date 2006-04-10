@@ -340,6 +340,16 @@ public class ClassType extends ObjectType
         if (field != null
             && (mask == -1 || (field.getModifiers() & mask) != 0))
           return field;
+        ClassType[] interfaces = cl.getInterfaces();
+        if (interfaces != null)
+          {
+            for (int i = 0;  i < interfaces.length;  i++)
+              {
+                field = interfaces[i].getField(name, mask);
+                if (field != null)
+                  return field;
+              }
+          }
         cl = cl.getSuperclass();
         if (cl == null)
           return null;

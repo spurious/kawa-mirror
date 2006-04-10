@@ -1,3 +1,7 @@
+2006-04-10  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getField): Also check super-interfaces.
+
 2006-03-07  Per Bothner  <per@bothner.com>
 
 	* Type.java (<init>(Type)): New copy constructor.

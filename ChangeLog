@@ -1,3 +1,10 @@
+2006-04-10  Dean Ferreyra <dferreyra@igc.org>
+            Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (processArgs): Handle new
+	--debug-{error,warning}-prints-stack-trace arguments,
+	(printOptions): List them.
+	
 2006-04-06  Dean Ferreyra <dferreyra@igc.org>
 
 	* kawa/lang/SyntaxTemplate.java: Fix typo in error message.

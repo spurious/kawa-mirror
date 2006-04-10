@@ -72,6 +72,8 @@ public class repl extends Procedure0or1
     printOption(out, "--debug-dump-zip", "Compiled interactive expressions to a zip archive");
     printOption(out, "--debug-print-expr", "Print generated internal expressions");
     printOption(out, "--debug-print-final-expr", "Print expression after any optimizations");
+    printOption(out, "--debug-error-prints-stack-trace", "Print stack trace with errors");
+    printOption(out, "--debug-warning-prints-stack-trace", "Print stack trace with warnings");
     printOption(out,"--[no-]full-tailcalls", "(Don't) use full tail-calls");
     printOption(out, "-C <filename> ...", "Compile named files to Java class files");
     printOption(out, "--output-format <format>", "Use <format> when printing top-level output");
@@ -555,6 +557,14 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--debug-print-final-expr"))
 	  {
 	    Compilation.debugPrintFinalExpr = true;
+	  }
+	else if (arg.equals("--debug-error-prints-stack-trace"))
+	  {
+            SourceMessages.debugStackTraceOnError = true;
+	  }
+	else if (arg.equals("--debug-warning-prints-stack-trace"))
+	  {
+            SourceMessages.debugStackTraceOnWarning = true;
 	  }
 	else if (arg.equals("--module-static"))
 	  {

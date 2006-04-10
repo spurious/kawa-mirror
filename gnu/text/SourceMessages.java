@@ -3,6 +3,8 @@
 
 package gnu.text;
 
+import gnu.expr.Compilation;
+
 /** A collection of (zero or more) SourceErrors.
  * Has a "current line number" which clients can use as the default line
  * number, or clients can explicitly provide a line number.
@@ -24,6 +26,13 @@ public class SourceMessages
   String current_filename;
   int current_line;
   int current_column;
+
+  /** If true, print out stack trace with any warning. */
+  public static boolean debugStackTraceOnWarning = false;
+
+  /** If true, print out stack trace with any error. */
+  public static boolean debugStackTraceOnError = false;
+
 
   /** Return true iff errors (not warnings) have been seen. */
   public boolean seenErrors() { return errorCount > 0; }
@@ -54,6 +63,13 @@ public class SourceMessages
       errorCount = 1000;
     else if (error.severity != 'w')
       errorCount++;
+    Compilation compilation = Compilation.getCurrent();
+    if ((SourceMessages.debugStackTraceOnError
+         && (error.severity == 'e' || error.severity == 'f'))
+        || SourceMessages.debugStackTraceOnWarning && error.severity == 'w')
+      {
+        error.fakeException = new Throwable();
+      }
 
     // Insert the next error so that line numbers are increasing.
     if (lastError != null && lastError.filename != null

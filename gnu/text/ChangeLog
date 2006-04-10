@@ -1,3 +1,12 @@
+2006-04-10  Dean Ferreyra <dferreyra@igc.org>
+            Per Bothner  <per@bothner.com>
+
+	* SourceError.java (fakeException): New field.
+	(toString): If fakeException is non-null include stack trace in result.
+	* SourceMessages.java (debugStackTraceOnWarning,
+	debugStackTraceOnError): New static globals.
+	(error): Make fakeException if requested.
+
 2006-02-26  Per Bothner  <per@bothner.com>
 
 	* SourceError.java (code): New field.

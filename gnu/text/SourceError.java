@@ -1,4 +1,5 @@
 package gnu.text;
+import java.io.*;
 
 /** Represents an error message from processing a "source" file. */
 
@@ -30,6 +31,11 @@ public class SourceError
    * This is post-localization and -formatting.
    * It can contain multiple lines, separated by '\n'.*/
   public String message;
+
+  /** Provides optional stack trace.
+   * Filled when --debug-error-prints-stack-trace or
+   * --debug-warning-prints-stack-trace option is used.*/
+  public Throwable fakeException;
 
   public SourceError(char severity, String filename, int line, int column, 
 		     String message)
@@ -78,6 +84,27 @@ public class SourceError
         buffer.append(" [");
         buffer.append(code);
         buffer.append("]");
+      }
+    if (fakeException != null)
+      {
+        // We assume getStackTrace is evailable if getCause is,
+        // rather than add a new PreProcess parameter.
+        /* #ifdef use:java.lang.Throwable.getCause */
+        StackTraceElement[] stackTrace = fakeException.getStackTrace();
+        for (int i = 0; i < stackTrace.length; i++)
+          {
+            buffer.append("\n");
+            buffer.append("    ");
+            buffer.append(stackTrace[i].toString());
+          }
+        /* #else */
+        // StringWriter writer = new StringWriter();
+        // PrintWriter pwriter = new PrintWriter(writer);
+        // fakeException.printStackTrace(pwriter);
+        // pwriter.close();
+        // buffer.append("\n");
+        // buffer.append(writer.toString());
+        /* #endif */
       }
     return buffer.toString ();
   }

@@ -1,3 +1,8 @@
+2006-04-10  Dean Ferreyra <dferreyra@igc.org>
+
+	* kawa.texi (Options): Document mew
+	--debug-{error,warning}-prints-stack-trace options.
+
 2006-03-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Running Java): Extend notes about tested Java versions.

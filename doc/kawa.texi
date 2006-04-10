@@ -770,6 +770,10 @@ in a readable format to the standard output.
 Similar to the previous option, but prints out the @code{Expression} after
 various transformations and optimizations have been done, and just before
 code generation.
+@item --debug-error-prints-stack-trace
+Prints a stack trace with any error found during compilation.
+@item --debug-warning-prints-stack-trace
+Prints a stack trace with any warning found during compilation.
 @end table
 
 @node Scripts, New-Window, Options, Running

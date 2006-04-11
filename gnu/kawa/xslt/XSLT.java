@@ -13,7 +13,9 @@ import gnu.kawa.xml.*;
 
 public class XSLT extends XQuery
 {
-  static XSLT instance;
+  // This field need to be public so that the findLiteral method in
+  // gnu.expr.LitTable can find it.
+  public static XSLT instance;
 
   public String getName()
   {

@@ -481,7 +481,9 @@ public class XQuery extends Language
   public static final Environment xqEnvironment
     = Environment.make(XQUERY_FUNCTION_NAMESPACE);
 
-  static final XQuery instance = new XQuery();
+  // This field need to be public so that the findLiteral method in
+  // gnu.expr.LitTable can find it.
+  public static final XQuery instance = new XQuery();
   static { instance.initXQuery(); }
 
   public XQuery()

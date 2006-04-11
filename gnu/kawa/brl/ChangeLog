@@ -1,3 +1,7 @@
+2006-04-10  Per Bothner  <per@bothner.com>
+
+	* BRL.java (krl_instance, brl_instance): Make public.
+
 2006-02-06  Per Bothner  <per@bothner.com>
 
 	* BRLRead.java (readObject): Update for modified readValues method.

@@ -57,7 +57,9 @@ public class CommonLisp extends Lisp2
     return "CommonLisp";
   }
 
-  static final CommonLisp instance;
+  // This field need to be public so that the findLiteral method in
+  // gnu.expr.LitTable can find it.
+  public static final CommonLisp instance;
 
   public static final Environment clispEnvironment
     = Environment.make("clisp-environment");

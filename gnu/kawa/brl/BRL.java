@@ -8,8 +8,12 @@ import gnu.kawa.lispexpr.ReadTable;
 
 public class BRL extends Scheme
 {
-  static final BRL krl_instance;
-  static final BRL brl_instance;
+  // The following two fields need to be public so that the findLiteral
+  // method in gnu.expr.LitTable can find them.
+  /** Language instance for KRL dialect. */
+  public static final BRL krl_instance;
+  /** Language instance for BRL dialect. */
+  public static final BRL brl_instance;
   static final Object emptyForm = new FString();
 
   protected static final SimpleEnvironment brlEnvironment

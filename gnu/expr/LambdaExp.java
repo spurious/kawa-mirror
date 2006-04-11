@@ -810,8 +810,12 @@ public class LambdaExp extends ScopeExp
 	if (nameDecl.needsExternalAccess())
 	  mflags |=  Access.PUBLIC;
 	else
-	  mflags |= nameDecl.getAccessFlags(nameDecl.isPrivate() ? 0
-					    : Access.PUBLIC);
+          {
+            short defaultFlag = nameDecl.isPrivate() ? 0 : Access.PUBLIC;
+            if (isClassMethod())
+              defaultFlag = nameDecl.getAccessFlags(defaultFlag);
+            mflags |= defaultFlag;
+          }
       }
     if (! (outer.isModuleBody() || outer instanceof ClassExp)
 	|| name == null)

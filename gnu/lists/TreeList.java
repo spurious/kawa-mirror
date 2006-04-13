@@ -521,6 +521,7 @@ public class TreeList extends AbstractSequence
     int index = getIntN(gapEnd + 1);
     int begin = getIntN(gapEnd + 3);
     int parent = getIntN(gapEnd + 5);
+    currentParent = parent;
     gapEnd += 7;
     int offset = gapStart - begin;
     int parentOffset = begin - parent;
@@ -546,7 +547,6 @@ public class TreeList extends AbstractSequence
 	setIntN(gapStart + 5, parent);
 	gapStart += 7;
       }
-    currentParent = parent;
   }
 
   public void beginAttribute(String attrName, Object attrType)
@@ -2136,8 +2136,13 @@ public class TreeList extends AbstractSequence
   {
     out.println(getClass().getName()+" @"+System.identityHashCode(this)
 		       + " gapStart:"+gapStart+" gapEnd:"+gapEnd+" length:"+data.length);
+    dump(out, 0, data.length);
+  }
+
+  public void dump (java.io.PrintWriter out, int start, int limit)
+  {
     int toskip = 0;
-    for (int i = 0;  i < data.length;  i++)
+    for (int i = start;  i < limit;  i++)
       {
 	
 	if (i < gapStart || i >= gapEnd)

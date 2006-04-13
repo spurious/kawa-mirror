@@ -1,3 +1,9 @@
+2006-04-13  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (beginGroup):  Fix error in "popping" currentParent.
+
+	* TreeList.java (dump): New debug helper method.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* FilterConsumer.java (beforeContent): New sub-class hook.

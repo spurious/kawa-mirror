@@ -1,3 +1,12 @@
+2006-04-14  Per Bothner  <per@bothner.com>
+
+	* lists.scm (define-cxr): New non-exported helper macro.
+	(caar, cadr, cdar, cddr,
+	caaar, caadr, cadar, caddr, cdaar, cdadr, cddar, cdddr
+	caaaar, caaadr, caadar, caaddr, cadaar, cadadr, caddar, cadddr
+	cdaaar, cdaadr, cdadar, cdaddr, cddaar, cddadr, cdddar, cddddr):
+	Use define-cxr to define functions.
+
 2006-03-03  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (duration): New function.

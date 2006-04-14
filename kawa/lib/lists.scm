@@ -1,4 +1,11 @@
 (module-static #t)
+(module-export pair? cons null? set-car! set-cdr! car cdr
+	       caar cadr cdar cddr
+	       caaar caadr cadar caddr cdaar cdadr cddar cdddr
+	       caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr
+	       cdaaar cdaadr cdadar cdaddr cddaar cddadr cdddar cddddr
+	       length reverse list-tail list-ref list? reverse!
+	       memq memv member assq assv assoc)
 
 (define (pair? x) :: <boolean>
   (<pair>:instance? x))
@@ -31,6 +38,61 @@
     (define (cdr (x :: <pair>))
       (field x 'cdr))
     cdr))
+
+(define-syntax define-cxr
+  (lambda (form)
+    (syntax-case form ()
+      ((_ name slots)
+       #`(define-procedure name
+	   setter: (lambda (arg value)
+		     ,(syntax-case #'slots ()
+			((first1 . rest1)
+			 #`((primitive-set-field <pair> 'first1 <object>)
+			    ,(let loop ((f #'rest1))
+			       (syntax-case f ()
+				 (() #'arg)
+				 ((first . rest)
+				  #`(field (as <pair> ,(loop #'rest))
+					   ',(syntax-object->datum #'first)))))
+			    value))))     
+	   (begin
+	     (define (name arg)
+	       ,(let loop ((f #'slots))
+		  (syntax-case f ()
+		    (() #'arg)
+		    ((first . rest)
+		     #`(field (as <pair> ,(loop #'rest))
+			      ',(syntax-object->datum #'first))))))
+	     name))))))
+
+(define-cxr caar (car car))
+(define-cxr cadr (car cdr))
+(define-cxr cdar (cdr car))
+(define-cxr cddr (cdr cdr))
+(define-cxr caaar (car car car))
+(define-cxr caadr (car car cdr))
+(define-cxr cadar (car cdr car))
+(define-cxr caddr (car cdr cdr))
+(define-cxr cdaar (cdr car car))
+(define-cxr cdadr (cdr car cdr))
+(define-cxr cddar (cdr cdr car))
+(define-cxr cdddr (cdr cdr cdr))
+(define-cxr caaaar (car car car car))
+(define-cxr caaadr (car car car cdr))
+(define-cxr caadar (car car cdr car))
+(define-cxr caaddr (car car cdr cdr))
+(define-cxr cadaar (car cdr car car))
+(define-cxr cadadr (car cdr car cdr))
+(define-cxr caddar (car cdr cdr car))
+(define-cxr cadddr (car cdr cdr cdr))
+(define-cxr cdaaar (cdr car car car))
+(define-cxr cdaadr (cdr car car cdr))
+(define-cxr cdadar (cdr car cdr car))
+(define-cxr cdaddr (cdr car cdr cdr))
+(define-cxr cddaar (cdr cdr car car))
+(define-cxr cddadr (cdr cdr car cdr))
+(define-cxr cdddar (cdr cdr cdr car))
+(define-cxr cddddr (cdr cdr cdr cdr))
 
 (define (length list :: <list>) :: <int>
   (invoke-static <list> 'length list))

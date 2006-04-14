@@ -1,5 +1,7 @@
 2006-04-14  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (print): Guard against null body.
+
 	* Compilation.java (current): New ThreadLocation static field.
 	(getCurrent, setCurrent): Change to use new field.
 

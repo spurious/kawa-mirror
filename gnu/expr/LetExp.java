@@ -255,7 +255,10 @@ public class LetExp extends ScopeExp
       }
     out.endLogicalBlock(")");
     out.writeSpaceLinear();
-    body.print (out);
+    if (body == null)
+      out.print("<null body>");
+    else
+      body.print (out);
     out.endLogicalBlock(endTag);
   }
 }

@@ -247,7 +247,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		err.flush();
 		*/
 	      }
-	    Object expansion = rule.execute(vars, tr);
+	    Object expansion = rule.execute(vars, tr, TemplateScope.make(tr));
 
 	    if (false) // DEBUGGING:
 	      {

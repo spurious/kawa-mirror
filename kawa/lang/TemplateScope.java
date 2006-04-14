@@ -27,6 +27,23 @@ public class TemplateScope extends LetExp implements Externalizable
     this.outer = outer;
   }
 
+  public static TemplateScope make ()
+  {
+    return make((Translator) Compilation.getCurrent());
+  }
+
+  public static TemplateScope make (Translator tr)
+  {
+    TemplateScope templateScope = new TemplateScope();
+    Syntax curSyntax = tr.getCurrentSyntax();
+    if (curSyntax instanceof Macro)
+      {
+        templateScope.outer = ((Macro) curSyntax).getCapturedScope();
+        templateScope.macroContext = tr.macroContext;
+      }
+    return templateScope;
+  }
+
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(outer);

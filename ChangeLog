@@ -1,3 +1,22 @@
+2006-04-14  Per Bothner  <per@bothner.com>
+
+	Various macro fixes.  Most important, quasisyntax sub-templates inherit
+	a shared TemplateScope.
+	* kawa/lang/PatternScope.java (push): Set outer scope.
+	* kawa/lang/TemplateScope.java (make): New factory methods.
+	* kawa/lang/SyntaxTemplate.java (execute): Use passed-in TemplateScope
+	rather than allocating it.
+	If DEBUGGING, check if vars is null.
+	* kawa/lang/SyntaxRules.java (expand): Need to allocate TemplateScope
+	here before passing it to SyntaxTemplate.execute.
+	* kawa/lang/Translator.java (templateScopeDecl): New field.
+	* kawa/standard/let_syntax.java (rewrite): Set setCapturedScope
+	on new macros.
+	* kawa/standard/syntax.java (rewriteForm): Genrate code to allocate
+	and use TemplateScope, using templateScopeDecl.
+
+	* kawa/standard/let_syntax.java (rewrite): Set name of macro.
+
 2006-04-10  Dean Ferreyra <dferreyra@igc.org>
             Per Bothner  <per@bothner.com>
 

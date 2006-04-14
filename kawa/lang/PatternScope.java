@@ -46,6 +46,7 @@ public class PatternScope extends LetExp
 	newScope.patternNesting
 	  = new StringBuffer(oldScope.patternNesting.toString());
       }
+    newScope.outer = tr.currentScope();
     return newScope;
   }
 

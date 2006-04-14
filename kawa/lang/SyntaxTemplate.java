@@ -384,24 +384,31 @@ public class SyntaxTemplate implements Externalizable
    * The compiler translates <code>(syntax <var>template</var>)</code>
    * to a call to this method.
    */
-  public Object execute (Object[] vars)
+  public Object execute (Object[] vars, TemplateScope templateScope)
   {
     if (false)  // DEBUGGING
       {
 	OutPort err = OutPort.errDefault();
 	err.print("{Expand template in ");
 	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
-	err.print(" vars: ");
-	for (int i = 0;  i < vars.length;  i++)
-	  {
-	    err.println();
-	    err.print("  " + i +" : ");
-	    kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
-	  }
+        err.print(" tscope: ");
+        err.print(templateScope);
+        if (vars != null)
+          {
+            err.print(" vars: ");
+            for (int i = 0;  i < vars.length;  i++)
+              {
+                err.println();
+                err.print("  " + i +" : ");
+                kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
+              }
+          }
 	err.println('}');
       }
 
-    Object result = execute(vars, (Translator) Compilation.getCurrent());
+    Object result = execute(0, vars, 0, new int[max_nesting],
+                            (Translator) Compilation.getCurrent(),
+                            templateScope);
 
     if (false) // DEBUGGING:
       {
@@ -419,20 +426,9 @@ public class SyntaxTemplate implements Externalizable
     return result;
   }
 
-  public Object execute (Object[] vars, Translator tr)
+  public Object execute (Object[] vars, Translator tr,
+                         TemplateScope templateScope)
   {
-    TemplateScope templateScope = new TemplateScope();
-    if (currentScope != null)
-      templateScope.outer = currentScope;
-    else
-      {
-	Syntax curSyntax = tr.getCurrentSyntax();
-	if (curSyntax instanceof Macro)
-	  {
-	    templateScope.outer = ((Macro) curSyntax).getCapturedScope();
-	    templateScope.macroContext = tr.macroContext;
-	  }
-      }
     return execute(0, vars, 0, new int[max_nesting], tr, templateScope);
   }
 

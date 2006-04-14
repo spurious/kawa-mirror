@@ -81,7 +81,8 @@ public class let_syntax extends Syntax implements Printable
 	if (binding.cdr != LList.Empty)
 	  return tr.syntaxError("let binding for '"+name+"' is improper list");
 	Declaration decl = new Declaration(name);
-        macros[i] = Macro.make(decl);
+        Macro macro = Macro.make(decl);
+        macros[i] = macro;
 	transformers[i] = binding;
 	trSyntax[i] = bindingSyntax;
         let.addDeclaration(decl);
@@ -94,6 +95,8 @@ public class let_syntax extends Syntax implements Printable
 	    renamedAliases.push(alias);
 	    renamedAliasesCount++;
 	  }
+        macro.setCapturedScope(bindingSyntax != null ? bindingSyntax.scope
+                               : recursive ? let : tr.currentScope());
         decls[i] = decl;
 	inits[i] = QuoteExp.nullExp;
 	bindings = bind_pair.cdr;
@@ -103,10 +106,19 @@ public class let_syntax extends Syntax implements Printable
     Macro savedMacro = tr.currentMacroDefinition;
     for (int i = 0; i < decl_count; i++)   
       {
-	tr.currentMacroDefinition = macros[i];
-        inits[i] = tr.rewrite_car(transformers[i], trSyntax[i]);
-	macros[i].expander = inits[i];
-	decls[i].noteValue(new QuoteExp(macros[i]));
+        Macro macro = macros[i];
+	tr.currentMacroDefinition = macro;
+        Expression value = tr.rewrite_car(transformers[i], trSyntax[i]);
+        inits[i] = value;
+        Declaration decl = decls[i];
+        macro.expander = value;
+        decl.noteValue(new QuoteExp(macro));
+        if (value instanceof LambdaExp)
+          {
+            LambdaExp lvalue = (LambdaExp) value;
+            lvalue.nameDecl = decl;
+            lvalue.setSymbol(decl.getSymbol());
+          }
       }
     tr.currentMacroDefinition = savedMacro;
     if (! recursive)

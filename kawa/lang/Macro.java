@@ -141,6 +141,18 @@ public class Macro extends Syntax implements Printable, Externalizable
 		    tr.currentMacroDefinition = savedMacro;
 		  }
 	      }
+            /* DEBUGGING:
+            if (exp instanceof LambdaExp)
+              {
+                System.err.println("expand "+this+" expander:"+exp);
+                System.err.flush();
+                OutPort dout = OutPort.errDefault();
+		dout.flush();
+                ((Expression) exp).print(dout);
+                dout.println(']');
+		dout.flush();
+             }
+            */
 	    pr = (Procedure)
 	      ((Expression) exp).eval(tr.getGlobalEnvironment());
 	  }

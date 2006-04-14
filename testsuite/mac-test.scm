@@ -1,4 +1,4 @@
-(test-init "macros" 89)
+(test-init "macros" 92)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -408,3 +408,32 @@
 		    (syntax
 		     (let ((t e1)) (if t t (local-defmac-or e2 e3 ...))))))))
   (test 4 'local-defmac-or (local-defmac-or #f 4 5)))
+
+(test '(2 1) 'srfi-72-example-1
+      (let-syntax ((main (lambda (form)
+			   (define (make-swap x y)
+			     (quasisyntax 
+			      (let ((t ,x))
+				(set! ,x ,y)
+				(set! ,y t))))
+			   (quasisyntax
+			    (let ((s 1)
+				  (t 2))
+			      ,(make-swap (syntax s) (syntax t))
+			      (list s t))))))
+	(main)))
+
+(test '(1 2) 'srfi-72-example-2
+      (let ((x 1))
+	(let-syntax ((m (lambda (form)
+			  (let ((x 2))
+			    (quasisyntax (list x ,x))))))
+	  (m))))
+
+(set! fail-expected "define-for-syntax for now is just a synonym for define")
+(define x-72-x3 1)
+(define-for-syntax x-72-x3 2)
+(test '(1 2) 'srfi-72-example-3
+       (let-syntax ((m (lambda (form)
+                    (quasisyntax (list x-72-x3 ,x-72-x3)))))
+	 (m)))

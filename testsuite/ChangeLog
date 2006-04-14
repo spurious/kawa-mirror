@@ -1,3 +1,7 @@
+2006-04-14  Per Bothner  <per@bothner.com>
+
+	* mac-test-scm: Some new tests from srfi-72.
+
 2006-03-27  Dean Ferreyra <dferreyra@igc.org>
 	    Per Bothner  <per@bothner.com>
 

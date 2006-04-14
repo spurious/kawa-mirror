@@ -2518,15 +2518,16 @@ public class Compilation
 
   protected SourceMessages messages;
 
+  private static final ThreadLocation current =
+    new ThreadLocation("current-compilation");
+
   public static Compilation getCurrent ()
   {
-    Environment env = Environment.getCurrent();
-    return (Compilation) env.get("*current-compilation*", null);
+    return (Compilation) current.get();
   }
 
   public static void setCurrent (Compilation comp)
   {
-    Environment env = Environment.getCurrent();
-    env.put("*current-compilation*", comp);
+    current.set(comp);
   }
 }

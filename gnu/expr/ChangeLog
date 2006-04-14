@@ -1,7 +1,12 @@
+2006-04-14  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (current): New ThreadLocation static field.
+	(getCurrent, setCurrent): Change to use new field.
+
 2006-04-10  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor): If a top-level function is defined
-	using define-private, that doesn't mean its method shoudl be private,
+	using define-private, that doesn't mean its method should be private,
 	since it may need to be accessed from a generated class.
 
 2006-04-06  Per Bothner  <per@bothner.com>

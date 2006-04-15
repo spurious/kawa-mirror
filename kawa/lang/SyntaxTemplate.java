@@ -184,13 +184,18 @@ public class SyntaxTemplate implements Externalizable
     OutPort err = OutPort.errDefault();
     err.print("{translated template");
     Macro macro = tr.currentMacroDefinition;
+    err.print(" scope: ");
+    err.print(currentScope);
     if (macro != null)
       {
 	err.print(" for ");
 	err.print(macro);
       }
-    err.println(':');
-    print_template_program (tr.patternScope.pattern_names, err);
+    if (tr != null && tr.patternScope != null)
+      {
+        err.println(" - ");
+        print_template_program (tr.patternScope.pattern_names, err);
+      }
     err.println ('}');
     */
   }

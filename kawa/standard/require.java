@@ -179,7 +179,6 @@ public class require extends Syntax
          fdecl != null;  fdecl = fdecl.nextDecl())
       {
         Object fdname = fdecl.getSymbol();
-        String fname = fdecl.field.getName();
         boolean isAlias = fdecl.isIndirectBinding();
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
 
@@ -213,8 +212,10 @@ public class require extends Syntax
             decl.setFlag(Declaration.TYPE_SPECIFIED);
           }
 
-        if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+        if (fdecl.isPrivate())
           continue;
+
+        String fname = fdecl.field.getName();
         if (fname.equals("$instance"))
           {
             instanceField = fdecl.field;
@@ -275,9 +276,9 @@ public class require extends Syntax
             fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
             if (! immediate)
               adecl.setPrivate(true);
-          }
-        if ((fdecl.field.getModifiers() & Access.FINAL) != 0 && ! isAlias)
-          adecl.setFlag(Declaration.IS_CONSTANT);
+          } 
+        if (fdecl.getFlag(Declaration.IS_CONSTANT))
+         adecl.setFlag(Declaration.IS_CONSTANT);
         if (fdecl.isProcedureDecl())
           adecl.setProcedureDecl(true);
         if (isStatic)

@@ -1,3 +1,9 @@
+2006-04-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Check exported
+	decl's isPrivate rather than field name.  More robust in that it works
+	even if imported module hasn't been compiled yet.
+
 2006-04-14  Per Bothner  <per@bothner.com>
 
 	Various macro fixes.  Most important, quasisyntax sub-templates inherit

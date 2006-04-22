@@ -1,3 +1,9 @@
+2006-04-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Don't needlessly
+	clear simple flag for alias declaration.
+	* kawa/standard/location.java (rewrite): Mark declaration as non-simple.
+
 2006-04-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions): Check exported

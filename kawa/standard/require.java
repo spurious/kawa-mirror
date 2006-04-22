@@ -305,7 +305,6 @@ public class require extends Syntax
           }
         adecl.noteValue(fref);
         adecl.setFlag(Declaration.IS_IMPORTED);
-        adecl.setSimple(false);
         tr.push(adecl);  // Add to translation env.
       }
 

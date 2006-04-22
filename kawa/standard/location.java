@@ -46,6 +46,7 @@ public class location extends Syntax implements Printable
               decl.setIndirectBinding(true);
             decl.setCanRead(true);
             decl.setCanWrite(true);
+            decl.setSimple(false);
           }
 	return rexp;
       }

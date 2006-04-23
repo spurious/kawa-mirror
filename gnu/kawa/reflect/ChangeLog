@@ -1,3 +1,7 @@
+2006-04-23  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java (inline): Fold if constant.
+
 2006-03-27  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (getSlotValue, inline): Pass unmangled rather than

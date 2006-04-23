@@ -1,3 +1,9 @@
+2006-04-23  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkIfExp): Fold if test is reference to known
+	value.
+	(walkLetExp): Fold if let result expression matches let variable.
+
 2006-04-14  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (print): Guard against null body.

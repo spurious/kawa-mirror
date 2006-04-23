@@ -43,8 +43,17 @@ public class InlineCalls extends ExpWalker
 
   protected Expression walkIfExp (IfExp exp)
   {
-    exp.walkChildren(this);
-    Expression test = exp.test;
+    Expression test = exp.test.walk(this);
+    if (test instanceof ReferenceExp)
+      {
+        Declaration decl = ((ReferenceExp) test).getBinding();
+        if (decl != null)
+          {
+            Expression value = decl.getValue();
+            if (value instanceof QuoteExp && value != QuoteExp.undefined_exp)
+              test = value;
+          }
+      }
     if (test instanceof QuoteExp)
       {
 	Language language = comp.getLanguage();
@@ -53,13 +62,20 @@ public class InlineCalls extends ExpWalker
 	else
 	  return exp.else_clause == null ? QuoteExp.voidExp : exp.else_clause;
       }
+
+    exp.test = test;
+    if (exitValue == null)
+      exp.then_clause = walk(exp.then_clause);
+    if (exitValue == null && exp.else_clause != null)
+      exp.else_clause = walk(exp.else_clause);
     return exp;
   }
 
   protected Expression walkLetExp (LetExp exp)
   {
     Declaration decl = exp.firstDecl();
-    for (int i = 0; i < exp.inits.length; i++, decl = decl.nextDecl())
+    int n = exp.inits.length;
+    for (int i = 0; i < n; i++, decl = decl.nextDecl())
       {
 	Expression init0 = exp.inits[i];
 	Expression init = walk(init0);
@@ -75,6 +91,18 @@ public class InlineCalls extends ExpWalker
 
     if (exitValue == null)
       exp.body = (Expression) walk(exp.body);
+    if (exp.body instanceof ReferenceExp)
+      {
+        ReferenceExp ref = (ReferenceExp) exp.body;
+        Declaration d = ref.getBinding();
+        if (d.context == exp && ! ref.getDontDereference())
+          {
+            if ( n == 1)
+              return exp.inits[0];
+            // Can also optimize of n > 1, but have to check if any
+            // other inits can cause side-effects.  Probably not worth it.
+          }
+      }
     return exp;
   }
 

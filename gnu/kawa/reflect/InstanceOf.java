@@ -29,7 +29,33 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    return Invoke.inlineClassName(exp, 1, (InlineCalls) walker);
+    exp = Invoke.inlineClassName(exp, 1, (InlineCalls) walker);
+    Expression[] args = exp.getArgs();
+    if (args.length == 2)
+      {
+        Expression value = args[0];
+        Expression texp = args[1];
+        if (texp instanceof QuoteExp)
+          {
+            Object t = ((QuoteExp) texp).getValue();
+            if (t instanceof Type)
+              {
+                Type type = (Type) t;
+                if (value instanceof QuoteExp)
+                  return type.isInstance(((QuoteExp) value).getValue())
+                    ? QuoteExp.trueExp : QuoteExp.falseExp;
+                if (! value.side_effects())
+                  {
+                    int comp = type.compare(value.getType());
+                    if (comp == 1 || comp == 0)
+                      return QuoteExp.trueExp;
+                    if (comp == -3)
+                      return QuoteExp.falseExp;
+                  }
+              }
+          }
+      }
+    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -147,12 +147,13 @@ public class Declaration
   {
     if (target instanceof IgnoreTarget)
       return;
-    if (isAlias() && (flags & ReferenceExp.DONT_DEREFERENCE) == 0
-	&& value instanceof ReferenceExp)
+    if (isAlias() && value instanceof ReferenceExp)
       {
         ReferenceExp rexp = (ReferenceExp) value;
         Declaration orig = rexp.binding;
         if (orig != null
+            && ((flags & ReferenceExp.DONT_DEREFERENCE) == 0
+                || orig.isIndirectBinding())
             && (owner == null || ! orig.needsContext()))
           {
             orig.load(rexp.contextDecl(), flags, comp, target);
@@ -213,7 +214,8 @@ public class Declaration
           }
         else if (comp.immediate && (val = getConstantValue()) != null)
           {
-            comp.compileConstant(val);
+            comp.compileConstant(val, target);
+            return;
           }
         else
           {

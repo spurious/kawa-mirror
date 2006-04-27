@@ -1,3 +1,11 @@
+2006-04-26  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (pushScope): Set mustCompile if we see a function
+	definition.  Fixes Savannah bug #16388 "performance regression".
+	* Declaration.java (load): Do follow alias even if DONT_DEREFERENCE
+	if base is indirect.
+	If compiling constant, use passed-in Target.
+
 2006-04-23  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkIfExp): Fold if test is reference to known

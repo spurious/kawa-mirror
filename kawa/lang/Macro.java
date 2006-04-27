@@ -36,6 +36,7 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     Macro mac = new Macro(decl.getSymbol());
     decl.setSyntax();
+    mac.capturedScope = decl.context;
     return mac;
   }
 

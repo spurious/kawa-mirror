@@ -44,9 +44,9 @@ public class location extends Syntax implements Printable
           {
             if (decl.isLexical())
               decl.setIndirectBinding(true);
+            decl = Declaration.followAliases(decl);
             decl.setCanRead(true);
             decl.setCanWrite(true);
-            decl.setSimple(false);
           }
 	return rexp;
       }

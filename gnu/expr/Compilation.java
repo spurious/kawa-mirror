@@ -2199,7 +2199,11 @@ public class Compilation
 
   public final void pushScope (ScopeExp scope)
   {
-    if (scope.mustCompile())
+    if (! mustCompile
+        // We set mustCompile if we see a LambdaExp - not because we must
+        // but because it is usually desirable.
+        && (scope.mustCompile()
+            || (scope instanceof LambdaExp && ! (scope instanceof ModuleExp))))
       mustCompileHere();
     scope.outer = current_scope;
     current_scope = scope;

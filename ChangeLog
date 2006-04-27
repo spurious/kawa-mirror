@@ -1,3 +1,11 @@
+2006-04-26  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Macro.java (make(Declaration)): Set capturedScope.
+	* kawa/standard/define_syntax.java (scanForm): If immediate, generate
+	a call to set the capturedScope.
+	* kawa/standard/location.java (rewrite): Revert 2006-04-21 change.
+	Instead follow aliases before setting can-read/can-write flags.
+
 2006-04-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions): Don't needlessly

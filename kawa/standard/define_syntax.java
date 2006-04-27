@@ -32,6 +32,8 @@ public class define_syntax extends Syntax
     = new PrimProcedure(typeMacro.getDeclaredMethod("make", 3));
   static PrimProcedure makeNonHygienic
     = new PrimProcedure(typeMacro.getDeclaredMethod("makeNonHygienic", 3));
+  static PrimProcedure setCapturedScope
+    = new PrimProcedure(typeMacro.getDeclaredMethod("setCapturedScope", 1));
 
   boolean hygienic;
 
@@ -109,6 +111,14 @@ public class define_syntax extends Syntax
 	  result.setFuncDef(true);
 
 	tr.formStack.addElement(result);
+
+        if (tr.immediate)
+          {
+            args = new Expression[2];
+            args[0] = new ReferenceExp(decl);
+            args[1] = new QuoteExp(defs);
+            tr.formStack.addElement(new ApplyExp(setCapturedScope, args));
+          }
       }
   }
 }

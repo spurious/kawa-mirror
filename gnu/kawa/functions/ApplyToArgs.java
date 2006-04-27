@@ -184,7 +184,6 @@ public class ApplyToArgs extends ProcedureN
           throw new WrongArguments(this, args.length); // FIXME
         return java.lang.reflect.Array.get(proc, ((Number) rargs[0]).intValue());
       }
-    System.err.println("ApplyToArgs applyN proc:"+proc);
     throw new WrongType(this, 0, proc, "procedure");
   }
 }

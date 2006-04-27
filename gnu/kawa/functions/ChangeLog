@@ -1,3 +1,7 @@
+2006-04-26  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java (applyN): Remove debug message print-out.
+
 2006-03-25  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (compare): Fix case of either arg a non-number.

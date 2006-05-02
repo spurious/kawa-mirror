@@ -1,3 +1,10 @@
+2006-05-01  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-output-string, get-output-string): Use new compact
+	syntax for constructors and method calls.  Also avoids a dependency
+	of reflection.scm.
+	* strings.scm (string-append/shared): Likewise for array accesses.
+
 2006-04-14  Per Bothner  <per@bothner.com>
 
 	* lists.scm (define-cxr): New non-exported helper macro.

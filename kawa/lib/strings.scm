@@ -116,10 +116,8 @@
     str))
 
 (define (string-append/shared #!rest (args :: <Object[]>)) :: <string>
-  (if (= 0 ((primitive-array-length <Object>) args))
+  (if (= 0 args:length)
       (make <string>)
-      (let ((arg1 :: <string> ((primitive-array-get <Object>) args 0)))
+      (let ((arg1 :: <string> (args 0)))
         (invoke arg1 'addAllStrings args 1)
         arg1)))
-
-

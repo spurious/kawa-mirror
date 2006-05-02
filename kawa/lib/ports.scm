@@ -82,13 +82,10 @@
     (field str 'data) (field str 'size)))
 
 (define (open-output-string) :: <string-output-port>
-  ((primitive-constructor  <string-output-port> ())))
+  (<string-output-port>))
 
 (define (get-output-string (output-port  <string-output-port>))
-  ((primitive-constructor <string> (<char[]>))
-   ((primitive-virtual-method <string-output-port> "toCharArray"
-                              <char[]> ())
-    output-port)))
+  (<string> (output-port:toCharArray)))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
   (let* ((port :: <gnu.mapping.CharArrayInPort>

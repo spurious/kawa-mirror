@@ -142,11 +142,12 @@ public class Declaration
       getContext().currentLambda().loadHeapFrame(comp);
   }
 
-  public void load (Declaration owner, int flags,
+  public void load (AccessExp access, int flags,
                     Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
       return;
+    Declaration owner = access == null ? null : access.contextDecl();
     if (isAlias() && value instanceof ReferenceExp)
       {
         ReferenceExp rexp = (ReferenceExp) value;
@@ -156,7 +157,7 @@ public class Declaration
                 || orig.isIndirectBinding())
             && (owner == null || ! orig.needsContext()))
           {
-            orig.load(rexp.contextDecl(), flags, comp, target);
+            orig.load(rexp, flags, comp, target);
             return;
           }
       }
@@ -240,7 +241,50 @@ public class Declaration
         if (isIndirectBinding()
             && (flags & ReferenceExp.DONT_DEREFERENCE) == 0)
           {
-            code.emitInvokeVirtual(Compilation.getLocationMethod);
+
+            String filename;
+            int line;
+            if (access != null
+                && (filename = access.getFile()) != null
+                && (line = access.getLine()) > 0)
+              {
+                // Wrap call to Location.get by a catch handler that
+                // calls setLine on the UnboundLocationException.
+                ClassType typeUnboundLocationException
+                  = ClassType.make("gnu.mapping.UnboundLocationException");
+                // See comment in CheckedTarget.emitCheckedCoerce.
+                boolean isInTry = code.isInTry();
+                int column = access.getColumn();
+                Label startTry = new Label(code);
+                startTry.define(code);
+                code.emitInvokeVirtual(Compilation.getLocationMethod);
+                Label endTry = new Label(code);
+                endTry.define(code);
+                Label endLabel = new Label(code);
+                if (isInTry)
+                  code.emitGoto(endLabel);
+                int fragment_cookie = 0;
+                if (! isInTry)
+                  fragment_cookie
+                    = code.beginFragment(new Label(code), endLabel);
+                code.addHandler(startTry, endTry, typeUnboundLocationException);
+
+                code.pushType(typeUnboundLocationException);
+                code.emitDup(typeUnboundLocationException);
+                code.emitPushString(filename);
+                code.emitPushInt(line);
+                code.emitPushInt(column);
+                code.emitInvokeVirtual(typeUnboundLocationException
+                                       .getDeclaredMethod("setLine", 3));
+                code.emitThrow();
+                if (isInTry)
+                  endLabel.define(code);
+                else
+                  code.endFragment(fragment_cookie);
+              }
+            else
+              code.emitInvokeVirtual(Compilation.getLocationMethod);
+
             rtype = Type.pointer_type;
           }
       }

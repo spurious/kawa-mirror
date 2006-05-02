@@ -1,3 +1,12 @@
+2006-05-02  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Change 1st param to AccessExp, so we can get
+	at ReferenceExp's source location.  Wrap Location.get call by handler
+	that uses those to call UnboundLocationException.setLine.
+	* gnu/expr/SetExp.java (compile): Update accordingly.
+	* gnu/expr/ReferenceExp.java (compile): Likewise.
+	(apply): Pass file/line/column to new UnboundLocationException.
+
 2006-04-26  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (pushScope): Set mustCompile if we see a function

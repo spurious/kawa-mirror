@@ -177,12 +177,13 @@ public class SetExp extends AccessExp
       { // This is handled in ModuleExp's allocFields method.  But:
         if (needValue)
           {
-            decl.load(contextDecl(), 0, comp, Target.pushObject);
+            decl.load(this, 0, comp, Target.pushObject);
 	    valuePushed = true;
 	  }
       }
     else
       {
+        AccessExp access = this;
         Declaration owner = contextDecl();
 	if (! isDefining())
           {
@@ -198,6 +199,7 @@ public class SetExp extends AccessExp
                 if (owner != null && orig.needsContext())
                   break;
                 owner = rexp.contextDecl();
+                access = rexp;
                 decl = orig;
               }
 	  }
@@ -205,7 +207,7 @@ public class SetExp extends AccessExp
 	  new_value.compile (comp, Target.Ignore);
 	else if (decl.isAlias() && isDefining())
 	  {
-            decl.load(contextDecl(), ReferenceExp.DONT_DEREFERENCE,
+            decl.load(this, ReferenceExp.DONT_DEREFERENCE,
                       comp, Target.pushObject);
 	    ClassType locType
 	      = ClassType.make("gnu.mapping.IndirectableLocation");
@@ -216,7 +218,7 @@ public class SetExp extends AccessExp
 	  }
 	else if (decl.isIndirectBinding())
 	  {
-            decl.load(owner, ReferenceExp.DONT_DEREFERENCE,
+            decl.load(access, ReferenceExp.DONT_DEREFERENCE,
                       comp, Target.pushObject);
 	    if (isSetIfUnbound())
 	      {

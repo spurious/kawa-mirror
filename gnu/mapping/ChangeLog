@@ -1,3 +1,11 @@
+2006-05-02  Per Bothner  <per@bothner.com>
+
+	* UnboundLocationException.java (filename, line, column): New fields.
+	(<init>): New constructor.
+	(setLine): Nwe method.
+	(getMessages): Show filename:line:column if available.
+	(toString): New method - just call getMessage().
+
 2006-02-21  Per Bothner  <per@bothner.com>
 
 	* InPort.java (uriSchemeLength): Be more restrictive about syntax

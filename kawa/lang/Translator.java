@@ -722,6 +722,7 @@ public class Translator extends Compilation
 	  rexp.setContextDecl(((TemplateScope) current_scope).macroContext);
         else
           checkMemberContext(rexp, decl);
+        rexp.setLine(this);
 	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;

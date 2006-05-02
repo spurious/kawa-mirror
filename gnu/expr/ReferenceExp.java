@@ -109,7 +109,8 @@ public class ReferenceExp extends AccessExp
             Object unb = gnu.mapping.Location.UNBOUND;
             value = env.get(sym, property, unb);
             if (value == unb)
-              throw new UnboundLocationException(sym);
+              throw new UnboundLocationException(sym, getFile(),
+                                                 getLine(), getColumn());
           }
         ctx.writeValue(value);
         return;
@@ -123,7 +124,7 @@ public class ReferenceExp extends AccessExp
 
   public void compile (Compilation comp, Target target)
   {
-    binding.load(contextDecl(), flags, comp, target);
+    binding.load(this, flags, comp, target);
   }
 
   protected Expression walk (ExpWalker walker)

@@ -6,6 +6,8 @@ public class UnboundLocationException extends RuntimeException
 {
   public Object symbol;
   Location location;
+  String filename;
+  int line, column;
 
   public UnboundLocationException ()
   {
@@ -13,8 +15,16 @@ public class UnboundLocationException extends RuntimeException
 
   public UnboundLocationException (Object symbol)
   {
-    super ("Unbound symbol " + symbol);
     this.symbol = symbol;
+  }
+
+  public UnboundLocationException (Object symbol, String filename,
+                                   int line, int column)
+  {
+    this.symbol = symbol;
+    this.filename = filename;
+    this.line = line;
+    this.column = column;
   }
 
   public UnboundLocationException (Location loc)
@@ -27,6 +37,13 @@ public class UnboundLocationException extends RuntimeException
     super (message);
     this.symbol = symbol;
   }
+
+  public void setLine (String filename, int line, int column)
+  {
+    this.filename = filename;
+    this.line = line;
+    this.column = column;
+  }
   
   public String getMessage()
   {
@@ -34,6 +51,22 @@ public class UnboundLocationException extends RuntimeException
     if (msg != null)
       return msg;
     StringBuffer sbuf = new StringBuffer();
+    if (filename != null || line > 0)
+      {
+        if (filename != null)
+          sbuf.append(filename);
+        if (line >= 0)
+          {
+            sbuf.append(':');
+            sbuf.append(line);
+            if (column > 0)
+              {
+                sbuf.append(':');
+                sbuf.append(column);
+              }
+          }
+        sbuf.append(": ");
+      }
     Symbol name = location == null ? null : location.getKeySymbol();
     if (name != null)
       {
@@ -55,5 +88,10 @@ public class UnboundLocationException extends RuntimeException
     else
       sbuf.append("unbound location");
     return sbuf.toString();
+  }
+
+  public String toString()
+  {
+    return getMessage();
   }
 }

@@ -1,3 +1,9 @@
+2006-05-02  Per Bothner  <per@bothner.com>
+
+Ok gnu/expr/{Declaration.java,ReferenceExp.java,SetExp.java,ChangeLog}
+Ok gnu/mapping/{UnboundLocationException.java,ChangeLog}
+M kawa/lang/Translator.java
+
 2006-05-01  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (read): Remove unused method.

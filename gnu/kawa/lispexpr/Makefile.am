@@ -20,8 +20,7 @@ java_sources = \
   ReaderTypespec.java \
   ReaderVector.java \
   ReadTable.java \
-  ReadTableEntry.java \
-  ScmRead.java
+  ReadTableEntry.java
 
 KAWA = $(JAVA) kawa.repl
 

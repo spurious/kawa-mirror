@@ -1,3 +1,14 @@
+2006-05-01  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (getLexer): Remove method - use super version.
+	(read): Remove unused method.
+	(class ELispReadTableEntry): Moved from ELispReader.java.
+	(createReadTable): Moved from ELispReader.  Use new super method.
+	* ELispReader.java: Remove no-longer-needed file.
+	* Makefile.am: Upadte accordingly.
+	* MiscOps.scm (emacs:read): Use new syntax and update to use
+	LispReader rather than removed ELispReader.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS.

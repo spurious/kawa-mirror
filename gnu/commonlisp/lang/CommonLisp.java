@@ -47,11 +47,6 @@ public class CommonLisp extends Lisp2
     return (char) i;
   }
 
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
-  {
-    return new CLispReader(inp, messages);
-  }
-
   public String getName()
   {
     return "CommonLisp";
@@ -172,12 +167,6 @@ public class CommonLisp extends Lisp2
     Language.setDefaults(instance);
   }
 
-  public Object read (InPort in)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    return CLispReader.readObject(in);
-  }
-
   static final AbstractFormat writeFormat = new DisplayFormat(true, 'C');
   static final AbstractFormat displayFormat = new DisplayFormat(false, 'C');
 
@@ -209,10 +198,5 @@ public class CommonLisp extends Lisp2
 	return Scheme.getNamedType(name);
       }
     return Type.make(clas);
-  }
-
-  public ReadTable createReadTable ()
-  {
-    return ReadTable.getInitial();
   }
 }

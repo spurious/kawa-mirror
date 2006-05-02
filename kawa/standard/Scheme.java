@@ -886,17 +886,6 @@ public class Scheme extends LispLanguage
       }
   }
 
-  public Object read (InPort in)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    return ScmRead.readObject(in);
-  }
-
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
-  {
-    return new ScmRead(inp, messages);
-  }
-
   public static final AbstractFormat writeFormat = new DisplayFormat(true, 'S');
   public static final AbstractFormat displayFormat = new DisplayFormat(false, 'S');
   public AbstractFormat getFormat(boolean readable)
@@ -1061,7 +1050,7 @@ public class Scheme extends LispLanguage
 
   public ReadTable createReadTable ()
   {
-    ReadTable tab = ReadTable.getInitial();
+    ReadTable tab = ReadTable.createInitial();
     tab.postfixLookupOperator = ':';
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
     dispatchTable.set('\'', new ReaderQuote("syntax"));

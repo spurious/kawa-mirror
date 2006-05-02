@@ -2,7 +2,7 @@ package gnu.jemacs.lang;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.*;
-import gnu.text.Char;
+import gnu.text.*;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.*;
@@ -44,11 +44,6 @@ public class ELisp extends Lisp2
     if (i < 0 || i > 0xffff)
       throw new gnu.jemacs.buffer.Signal("error", "not a character value");
     return (char) i;
-  }
-
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
-  {
-    return new ELispReader(inp, messages);
   }
 
   public String getName()
@@ -183,12 +178,6 @@ public class ELisp extends Lisp2
     Language.setDefaults(instance);
   }
 
-  public Object read (InPort in)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    return ELispReader.readObject(in);
-  }
-
   static final AbstractFormat writeFormat = new Print(true);
   static final AbstractFormat displayFormat = new Print(false);
 
@@ -230,7 +219,11 @@ public class ELisp extends Lisp2
 
   public ReadTable createReadTable ()
   {
-    return ELispReader.createReadTable();
+    ReadTable rt = super.createReadTable();
+    rt.set('[', new ReaderVector(']'));
+    rt.remove(']');
+    rt.set('?', new ELispReadTableEntry('?'));
+    return rt;
   }
 
   public static void readableChar(char ch, StringBuffer buf, boolean quote)
@@ -281,3 +274,39 @@ public class ELisp extends Lisp2
     kawa.repl.main(args);
   }
 }
+
+class ELispReadTableEntry extends ReaderDispatchMisc
+{
+  public ELispReadTableEntry(int code)
+  {
+    super(code);
+  }
+
+  public Object read (Lexer in, int ch, int count)
+    throws java.io.IOException, SyntaxException
+  {
+    LispReader reader = (LispReader) in;
+    if (code >= 0)
+      ch = code;
+    switch (ch)
+      {
+      case '?':
+	ch = reader.read();
+	if (ch == '\\')
+	  {
+	    ch = reader.read();
+	    if (ch != ' ' && ch >= 0)
+	      ch = reader.readEscape(ch);
+	  }
+	if (ch < 0)
+	  {
+	    reader.error("unexpected EOF in character literal");
+	    ch = '?';
+	  }
+	return ELisp.getCharacter(ch);
+      }
+    reader.error("unexpected dispatch character");
+    return null;
+  }
+}
+

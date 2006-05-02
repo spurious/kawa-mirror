@@ -3,7 +3,6 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
-  CLispReader.java \
   Lisp2.java \
   defvar.java \
   defun.java \

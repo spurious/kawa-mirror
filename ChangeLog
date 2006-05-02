@@ -1,3 +1,10 @@
+2006-05-01  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (read): Remove unused method.
+	(getLexer): Remove - use super version.
+	(createReadTable): Update called method name.
+	* kawa/standard/read.java (apply1): Update ScmRead -> LispReader.
+
 2006-04-26  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java (make(Declaration)): Set capturedScope.

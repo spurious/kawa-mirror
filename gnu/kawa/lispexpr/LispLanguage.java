@@ -30,6 +30,11 @@ public abstract class LispLanguage extends Language
   /** Create a fresh <code>ReadTable</code> appropriate for this language. */
   public abstract ReadTable createReadTable ();
 
+  public Lexer getLexer(InPort inp, SourceMessages messages)
+  {
+    return new LispReader(inp, messages);
+  }
+
   public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {

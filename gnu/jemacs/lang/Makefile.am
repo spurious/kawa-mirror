@@ -6,7 +6,6 @@ java_sources=\
   CatchableException.java \
   While.java \
   ELisp.java \
-  ELispReader.java \
   AddOp.java \
   DivideOp.java \
   Print.java \

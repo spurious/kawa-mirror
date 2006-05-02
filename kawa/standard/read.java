@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.kawa.lispexpr.ScmRead;
+import gnu.kawa.lispexpr.LispReader;
 import gnu.mapping.*;
 import gnu.text.*;
 
@@ -16,7 +16,7 @@ public class read extends Procedure0or1
   {
     if (! (arg1 instanceof InPort))
       throw new WrongType (this, 0, arg1, "input port");
-    ScmRead lexer = new ScmRead((InPort)arg1);
+    LispReader lexer = new LispReader((InPort)arg1);
     try
       {
 	Object result = lexer.readObject();

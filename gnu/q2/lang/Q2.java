@@ -72,7 +72,7 @@ public class Q2 extends Scheme
 
   public ReadTable createReadTable ()
   {
-    ReadTable rt = ReadTable.getInitial();
+    ReadTable rt = ReadTable.createInitial();
     rt.set('(', new Q2ReaderParens());
     return rt;
   }

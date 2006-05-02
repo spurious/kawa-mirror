@@ -8,6 +8,7 @@ import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispLanguage;
+import gnu.kawa.lispexpr.ReadTable;
 import gnu.kawa.reflect.FieldLocation;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
@@ -150,5 +151,20 @@ public abstract class Lisp2 extends LispLanguage
         else
           define(name.getName(), val);
       }
+  }
+
+  public ReadTable createReadTable ()
+  {
+    ReadTable tab = new Lisp2ReadTable();
+    tab.initialize();
+    return tab;
+  }
+}
+
+class Lisp2ReadTable extends ReadTable
+{
+  protected Object makeSymbol (String name)
+  {
+    return Lisp2.asSymbol(name.intern());
   }
 }

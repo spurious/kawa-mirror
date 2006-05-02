@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner
+// Copyright (c) 2001, 2003, 2006  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
@@ -30,58 +30,62 @@ public class ReadTable extends RangeTable
   {
   }
 
-  /** Create a new ReadTable and initialize it appropriately for Common Lisp.
-   * Should be renamed to createInitial or makeInitial. FIXME. */
-  public static ReadTable getInitial()
+  public void initialize ()
   {
-    ReadTable tab = new ReadTable();
     ReadTableEntry entry;
     entry = ReadTableEntry.getWhitespaceInstance();
-    tab.set(' ',  entry);
-    tab.set('\t', entry);
-    tab.set('\n', entry);
-    tab.set('\r', entry);
-    tab.set('\f', entry);
-    //tab.set('\v', entry);
-    tab.set('|',  ReadTableEntry.getMultipleEscapeInstance());
-    tab.set('\\', ReadTableEntry.getSingleEscapeInstance());
-    tab.set('0',  '9',  ReadTableEntry.getDigitInstance());
+    set(' ',  entry);
+    set('\t', entry);
+    set('\n', entry);
+    set('\r', entry);
+    set('\f', entry);
+    //set('\v', entry);
+    set('|',  ReadTableEntry.getMultipleEscapeInstance());
+    set('\\', ReadTableEntry.getSingleEscapeInstance());
+    set('0',  '9',  ReadTableEntry.getDigitInstance());
     entry = ReadTableEntry.getConstituentInstance();
-    tab.set('a',  'z',  entry);
-    tab.set('A',  'Z',  entry);
-    tab.set('!',  entry);
-    tab.set('$',  entry);
-    tab.set('%',  entry);
-    tab.set('&',  entry);
-    tab.set('*',  entry);
-    tab.set('+',  entry);
-    tab.set('-',  entry);
-    tab.set('.',  entry);
-    tab.set('/',  entry);
-    tab.set(':',  entry);
-    tab.set('=',  entry);
-    tab.set('>',  entry);
-    tab.set('?',  entry);
-    tab.set('@',  entry);
-    tab.set('^',  entry);
-    tab.set('_',  entry);
-    tab.set('{',  entry);
-    tab.set('}',  entry);
-    tab.set('~',  entry);
-    tab.set('\177',entry);
-    tab.set('\b', entry);
-    tab.set('\"', new ReaderString());
-    tab.set('#',  ReaderDispatch.create());
-    tab.set(';',  ReaderIgnoreRestOfLine.getInstance());
-    tab.set('(',  ReaderParens.getInstance('(', ')'));
+    set('a',  'z',  entry);
+    set('A',  'Z',  entry);
+    set('!',  entry);
+    set('$',  entry);
+    set('%',  entry);
+    set('&',  entry);
+    set('*',  entry);
+    set('+',  entry);
+    set('-',  entry);
+    set('.',  entry);
+    set('/',  entry);
+    set(':',  entry);
+    set('=',  entry);
+    set('>',  entry);
+    set('?',  entry);
+    set('@',  entry);
+    set('^',  entry);
+    set('_',  entry);
+    set('{',  entry);
+    set('}',  entry);
+    set('~',  entry);
+    set('\177',entry);
+    set('\b', entry);
+    set('\"', new ReaderString());
+    set('#',  ReaderDispatch.create());
+    set(';',  ReaderIgnoreRestOfLine.getInstance());
+    set('(',  ReaderParens.getInstance('(', ')'));
 
-    tab.set('\'', new ReaderQuote(LispLanguage.quote_sym));
-    tab.set('`',  new ReaderQuote(LispLanguage.quasiquote_sym));
-    tab.set(',',  new ReaderQuote(LispLanguage.unquote_sym,
+    set('\'', new ReaderQuote(LispLanguage.quote_sym));
+    set('`',  new ReaderQuote(LispLanguage.quasiquote_sym));
+    set(',',  new ReaderQuote(LispLanguage.unquote_sym,
 				 '@', LispLanguage.unquotesplicing_sym));
 
-    tab.setBracketMode();  // Sets the entries for '[', ']', and '<'.
+    setBracketMode();  // Sets the entries for '[', ']', and '<'.
 
+  }
+
+  /** Create a new ReadTable and initialize it appropriately for Common Lisp. */
+  public static ReadTable createInitial ()
+  {
+    ReadTable tab = new ReadTable();
+    tab.initialize();
     return tab;
   }
 
@@ -161,7 +165,7 @@ public class ReadTable extends RangeTable
 	if (language instanceof LispLanguage)
 	  table = ((LispLanguage) language).defaultReadTable;
 	else
-	  table = ReadTable.getInitial();
+	  table = ReadTable.createInitial();
 	current.set(table);
       }
     return table;
@@ -190,5 +194,10 @@ public class ReadTable extends RangeTable
 	  entry = ReadTableEntry.getConstituentInstance();
       }
     return entry;
+  }
+
+  protected Object makeSymbol (String name)
+  {
+    return name.intern();
   }
 }

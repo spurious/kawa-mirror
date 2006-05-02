@@ -60,9 +60,6 @@
 (define (quit-char) #\bel)
 
 (define (emacs:read #!optional (port (current-input-port)))
-  (let ((lexer
-	 ((primitive-constructor <gnu.jemacs.lang.ELispReader> (<input-port>))
-	  port)))
-    ((primitive-virtual-method <gnu.jemacs.lang.ELispReader> "readObject"
-			       <object> ())
-     lexer)))
+  ((<gnu.kawa.lispexpr.LispReader> port):readObject))
+
+

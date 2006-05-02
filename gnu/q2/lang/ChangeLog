@@ -1,3 +1,7 @@
+2006-05-01  Per Bothner  <per@bothner.com>
+
+	* Q2.java (createReadTable): Update getInitial -> createInitial.
+
 2006-02-13  Per Bothner  <per@bothner.com>
 
 	* Q2.java (makeApply): Change return type to Expression.

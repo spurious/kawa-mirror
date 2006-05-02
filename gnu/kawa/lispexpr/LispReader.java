@@ -5,7 +5,12 @@ import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
 
-/** A Lexer to reading S-expressions in generic Lisp-like syntax. */
+/** A Lexer to reading S-expressions in generic Lisp-like syntax.
+ * This class may have outlived its usefulness: It's mostly just a
+ * wrapper around a LineBufferedReader plus a helper token-buffer.
+ * The functionality should be moved to ReadTable, though it is
+ * unclear what to do about the tokenBuffer.
+ */
 
 public class LispReader extends Lexer
 {
@@ -72,7 +77,7 @@ public class LispReader extends Lexer
     * @return Either 'P' (means preserve case), 'U' (upcase),
     * 'D' (downcase, or 'I' (invert case).
     */
-  public char getReadCase()
+  static char getReadCase()
   {
     char read_case;
     try
@@ -140,12 +145,12 @@ public class LispReader extends Lexer
 	break;
       }
 
-    readToken(ch, getReadCase());
+    readToken(ch, getReadCase(), rtable);
     int endPos = tokenBufferLength;
     if (seenEscapes)
-      return returnSymbol(startPos, endPos);
+      return returnSymbol(startPos, endPos, rtable);
     else
-      return handleToken(startPos, endPos);
+      return handleToken(startPos, endPos, rtable);
   }
 
   public static final char TOKEN_ESCAPE_CHAR = '\uffff';
@@ -161,11 +166,10 @@ public class LispReader extends Lexer
   /** True if "IDENTIFIER:" should be treated as a keyword. */
   protected boolean finalColonIsKeyword = true;
 
-  public void readToken(int ch, char readCase)
+  void readToken(int ch, char readCase, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
     boolean inEscapes = false;
-    ReadTable rtable = ReadTable.getCurrent();
     for (;; ch = read())
       {
 	if (ch < 0)
@@ -804,7 +808,7 @@ public class LispReader extends Lexer
 			    radix, negative);
   }
 
-  protected Object returnSymbol(int startPos, int endPos)
+  protected Object returnSymbol(int startPos, int endPos, ReadTable rtable)
   {
     char readCase = getReadCase();
     if (readCase == 'I')
@@ -863,11 +867,11 @@ public class LispReader extends Lexer
 	String str = new String(tokenBuffer, startPos, len - 1);
 	return Keyword.make(str.intern());
       }
-    return makeSymbol(new String(tokenBuffer, startPos, len));
+    return rtable.makeSymbol(new String(tokenBuffer, startPos, len));
   }
 
   /** Classify and return a token in tokenBuffer from startPos to endPos. */
-  public Object handleToken(int startPos, int endPos)
+  public Object handleToken(int startPos, int endPos,  ReadTable rtable)
   {
     Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
 			       '\0', 0, SCM_NUMBERS);
@@ -879,7 +883,7 @@ public class LispReader extends Lexer
 	      : "not a valid number: " + value);
 	return IntNum.zero();
       }
-    return returnSymbol(startPos, endPos);
+    return returnSymbol(startPos, endPos, rtable);
   }
 
   /** Reads a C-style String escape sequence.
@@ -1041,11 +1045,6 @@ public class LispReader extends Lexer
     return readObject();
   }
 
-  protected Object makeSymbol (String name)
-  {
-    return name.intern();
-  }
-
   protected Object makeNil ()
   {
     return LList.Empty;
@@ -1078,7 +1077,7 @@ public class LispReader extends Lexer
     throws java.io.IOException, SyntaxException
   {
     int startPos = reader.tokenBufferLength - previous;
-    reader.readToken(reader.read(), 'P');
+    reader.readToken(reader.read(), 'P', ReadTable.getCurrent());
     int endPos = reader.tokenBufferLength;
     if (startPos == endPos)
       {
@@ -1109,7 +1108,7 @@ public class LispReader extends Lexer
       reader.eofError("unexpected EOF in character literal");
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), 'D');
+    reader.readToken(reader.read(), 'D', ReadTable.getCurrent());
     int length = reader.tokenBufferLength - startPos;
     if (length == 1)
       return Char.make(reader.tokenBuffer[startPos]);
@@ -1153,7 +1152,7 @@ public class LispReader extends Lexer
 
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
-    reader.readToken(reader.read(), 'D');
+    reader.readToken(reader.read(), 'D', ReadTable.getCurrent());
     int length = reader.tokenBufferLength - startPos;
     String name = new String(reader.tokenBuffer, startPos, length);
     if (name.equals("optional"))

@@ -1,3 +1,12 @@
+2006-05-01  Per Bothner  <per@bothner.com>
+
+	* CLispReader.java: Removed class.
+	* Makefile.am: Update accordingly.
+	* Lisp2.java (class Lisp2ReadTable): New class, overrides makeSymbol.
+	(createReadTable): New method.
+	(getLexer): Removed - used super version.
+	* CommonLisp.java (createReadTable): Removed - use super version.
+
 2006-04-10  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (instance): Make public.

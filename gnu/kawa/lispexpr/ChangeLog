@@ -5,6 +5,7 @@
 	(makeSymbol): Move method to ReadTable.
 	(handleToken, returnSymbol, readToken): Take and pass a ReadTable
 	parameter.
+	* ReaderDispatchMisc.java: Update readToken call.
 	* ReadTable.java (initialize): New method.
 	(getInitial): Rename to createInitial and use new initialize method.
 	(makeSymbol): New method.

@@ -1,3 +1,9 @@
+2006-05-02  Per Bothner  <per@bothner.com>
+
+	* testing.scm: Rename internal names to consistently start with '%'.
+	(test-error%x): Remove macro.
+	(%test-error): Re-arrange cond-expand branches.
+
 2006-03-15  Per Bothner  <per@bothner.com>
 
 	* srfi1.scm (append-map, append-map!):  Fix errors (in Kawa-specific

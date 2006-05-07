@@ -1,5 +1,9 @@
 2006-05-06  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (quantity->number, quantity->unit, make-quantity):
+	New functions, converted from Java classes in kawa.standard.
+	* strings.scm (string): Likewise.
+
 	* misc.scm (test-begin): Update test-%begin -> %test-begin.
 
 2006-05-01  Per Bothner  <per@bothner.com>

@@ -306,7 +306,7 @@ public class Scheme extends LispLanguage
       //-- Section 6.7  -- complete
       defProcStFld("string?", "kawa.lib.strings");
       defProcStFld("make-string", "kawa.lib.strings");
-      define_proc ("string", "kawa.standard.string_v");
+      defProcStFld("string", "kawa.lib.strings");
       defProcStFld("string-length", "kawa.lib.strings");
       defProcStFld("string-ref", "kawa.lib.strings");
       defProcStFld("string-set!", "kawa.lib.strings");
@@ -579,9 +579,9 @@ public class Scheme extends LispLanguage
       defSntxStFld("test-begin", "kawa.lib.misc");
       defProcStFld("namespace", "kawa.lib.misc");
 
-      define_proc ("quantity->number", "kawa.standard.quantity2number");
-      define_proc ("quantity->unit", "kawa.standard.quantity2unit");
-      define_proc ("make-quantity", "kawa.standard.make_quantity");
+      defProcStFld("quantity->number", "kawa.lib.numbers");
+      defProcStFld("quantity->unit", "kawa.lib.numbers");
+      defProcStFld("make-quantity", "kawa.lib.numbers");
       defSntxStFld("define-namespace", "gnu.kawa.lispexpr.DefineNamespace",
                    "define_namespace");
       defSntxStFld("define-xml-namespace", "gnu.kawa.lispexpr.DefineNamespace",

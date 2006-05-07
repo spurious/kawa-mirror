@@ -11,7 +11,6 @@ fluid_let.java \
 atan.java \
 expt.java \
 string2number.java \
-string_v.java \
 vector_append.java \
 read.java \
 readchar.java \
@@ -31,7 +30,6 @@ syntax_error.java \
 let.java \
 begin.java \
 call_with_values.java \
-make_quantity.java quantity2number.java quantity2unit.java \
 sleep.java \
 try_catch.java \
 make.java location.java \

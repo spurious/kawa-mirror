@@ -229,5 +229,24 @@
   (make <string>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
 
+(define (quantity->number (q :: <quantity>)) :: <complex>
+  (let ((u (q:unit))
+	(factor (q:doubleValue)))
+    (if (= factor 1.0)
+	(q:number)
+	(<complex>:make (q:reValue) (q:imValue)))))
+
+(define (quantity->unit (q :: <quantity>)) :: <gnu.math.Unit>
+  (q:unit))
+
+(define (make-quantity val unit) :: <quantity>
+  (let ((u :: <gnu.math.Unit>
+	   (if (instance? unit <gnu.math.Unit>) unit
+	       (<gnu.math.Unit>:lookup unit))))
+    (if (eq? u #!null)
+	(primitive-throw (<java.lang.IllegalArgumentException>
+			 (format "unknown unit: ~s" unit))))
+    (<quantity>:make val u)))
+
 (define (duration duration) :: <gnu.math.Duration>
   (gnu.math.Duration:parseDuration duration))

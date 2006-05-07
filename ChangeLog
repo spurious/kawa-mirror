@@ -1,8 +1,16 @@
+2006-05-06  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme): Implementations of 'string',
+	'quantity->number', 'quantity->unit', 'make-quantity' now in kawa.lib.
+	* kawa/standard/make_quantity.java: Remove file.
+	* kawa/standard/quantity2number.java: Likewise.
+	* kawa/standard/quantity2unit.java: Likewise.
+	* kawa/standard/string_v.java: Likewise.
+	* Makefile.am: Update accordingly.
+
 2006-05-02  Per Bothner  <per@bothner.com>
 
-Ok gnu/expr/{Declaration.java,ReferenceExp.java,SetExp.java,ChangeLog}
-Ok gnu/mapping/{UnboundLocationException.java,ChangeLog}
-M kawa/lang/Translator.java
+	* kawa/lang/Translator.java (rewrite): Do setLine on new ReferenceExp.
 
 2006-05-01  Per Bothner  <per@bothner.com>
 

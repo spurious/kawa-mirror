@@ -4,6 +4,13 @@
 (define (make-string (n :: <int>) #!optional (ch #\Space)) :: <string>
   (make <string> n ch))
 
+(define (string #!rest (args :: <Object[]>)) :: <string>
+  (let* ((n :: <int> args:length)
+	 (str (<gnu.lists.FString> n)))
+    (do ((i :: <int> 0 (+ i 1)))
+	((>= i n) str)
+	(str:setCharAt i ((as <character> (args i)):charValue)))))
+
 (define (string-length (str :: <abstract-string>)) :: <int>
   (invoke str 'length))
 

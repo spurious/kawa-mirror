@@ -1,3 +1,7 @@
+2006-05-06  Per Bothner  <per@bothner.com>
+
+	* misc.scm (test-begin): Update test-%begin -> %test-begin.
+
 2006-05-01  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-output-string, get-output-string): Use new compact

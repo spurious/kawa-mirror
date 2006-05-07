@@ -1,3 +1,9 @@
+2006-05-06  Per Bothner  <per@bothner.com>
+
+	* FileUtils.java: New class.
+	(createTempFile): New static method.
+	(Makefile.am): Update accordingly.
+
 2006-04-26  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java (applyN): Remove debug message print-out.

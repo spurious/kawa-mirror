@@ -1,5 +1,8 @@
 2006-05-06  Per Bothner  <per@bothner.com>
 
+	* files.scm (make-temporary-file): Reimplement using new method
+	in gnu.kawa.functions.FileUtils.
+
 	* numbers.scm (quantity->number, quantity->unit, make-quantity):
 	New functions, converted from Java classes in kawa.standard.
 	* strings.scm (string): Likewise.

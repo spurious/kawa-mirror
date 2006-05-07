@@ -80,19 +80,9 @@
     ((resource-uri uri)
      (gnu.text.URI_utils:resolve uri (module-uri)))))
 
-(define-private *temp-file-number* 1)
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
-; This is not safe from race conditions!
-; Fix this using new Java2 File.createTempFile.  FIXME.
-; Should not be using /tmp.  FIXME.
-(define (make-temporary-file #!optional (fmt "kawa~d.tmp"))
-  (let loop ()
-    (let ((fname (string-append (system-tmpdir) (%file-separator)
-				(format #f fmt *temp-file-number*))))
-      (set! *temp-file-number* (+ *temp-file-number* 1))
-      (if (file-exists? fname)
-	  (loop)
-	  fname))))
+(define (make-temporary-file #!optional (fmt "kawa~d.tmp")) :: <string>
+  (make <string> (gnu.kawa.functions.FileUtils:createTempFile fmt)))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, which is again based on Chez Scheme.

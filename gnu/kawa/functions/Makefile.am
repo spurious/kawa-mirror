@@ -17,6 +17,7 @@ java_sources=\
   CountValues.java \
   DisplayFormat.java \
   DivideOp.java \
+  FileUtils.java \
   GetModuleClass.java \
   GetNamedInstancePart.java \
   GetNamedPart.java \

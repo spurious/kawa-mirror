@@ -1,3 +1,7 @@
+2006-05-07  Per Bothner  <per@bothner.com>
+
+	* kawapath.c (get_classpath): Include "." in default CLASSPATH.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Add conditionals for ENABLE_JEMACS as appropriate.

@@ -59,7 +59,7 @@ get_classpath(const char *progname)
   if (classpath == NULL)
     {
       char *buf = malloc (strlen (path) + 20);
-      sprintf (buf, "CLASSPATH=%s", path);
+      sprintf (buf, "CLASSPATH=.:%s", path);
       classpath = buf;
     }
   else

@@ -1,3 +1,9 @@
+2006-05-09  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (lookupMember): If null caller - as when evaluating -
+	the use Object instead to check for accessibility.
+	* SlotSet.java (lookupMember): Likewise.
+
 2006-04-23  Per Bothner  <per@bothner.com>
 
 	* InstanceOf.java (inline): Fold if constant.

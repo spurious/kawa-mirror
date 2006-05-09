@@ -202,10 +202,14 @@ public class SlotGet extends Procedure2
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);
-    if (field != null
-        && caller != null
-        && caller.isAccessible(field.getDeclaringClass(), field.getModifiers()))
-      return field;
+    if (field != null)
+      {
+        if (caller == null)
+          caller = Type.pointer_type;
+        if (caller.isAccessible(field.getDeclaringClass(),
+                                field.getModifiers()))
+          return field;
+      }
 
     // Try looking for a method "getFname" instead:
     String getname = ClassExp.slotToMethodName("get", name);

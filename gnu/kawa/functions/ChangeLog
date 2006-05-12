@@ -1,3 +1,8 @@
+2006-05-11  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeReadableSymbol):  New method.
+	(writeObject): Use writeReadableSymbol if appropriate.
+
 2006-05-06  Per Bothner  <per@bothner.com>
 
 	* FileUtils.java: New class.

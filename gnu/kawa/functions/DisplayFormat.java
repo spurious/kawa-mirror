@@ -8,6 +8,9 @@ import gnu.math.RatNum;
 import gnu.math.IntNum;
 import java.io.PrintWriter;
 import gnu.text.Char;
+/* #ifdef use:java.util.regex */
+import java.util.regex.*;
+/* #endif */
 
 /** Handle formatted output for Lisp-like languages. */
 
@@ -242,8 +245,10 @@ public class DisplayFormat extends AbstractFormat
           }
 	if (asString == null)
 	  write("#!null", out);
-	else
-	  write(asString, out);
+	else if (readable && obj instanceof String)
+          writeReadableSymbol(asString, out);
+        else
+          write(asString, out);
       }
   }
 
@@ -293,5 +298,51 @@ public class DisplayFormat extends AbstractFormat
     else
       write(")", out);
     return count;
+  }
+
+  /* #ifdef use:java.util.regex */
+  static Pattern r5rsIdentifierMinusInteriorColons =
+    Pattern.compile("(([a-zA-Z]|[!$%&*/:<=>?^_~])"
+                    + "([a-zA-Z]|[!$%&*/<=>?^_~]|[0-9]|([+-.@]))*[:]?)"
+                    + "|([+-]|[.][.][.])");
+  /* #endif */
+
+  void writeReadableSymbol (String sym, Consumer out)
+  {
+    /* #ifdef use:java.util.regex */
+    // Use |...| if symbol doesn't follow R5RS conventions
+    // for identifiers or has a colon in the interior.
+    if (! r5rsIdentifierMinusInteriorColons.matcher(sym).matches())
+      {
+        int len = sym.length();
+        if (len == 0)
+          {
+            write("||", out);
+          }
+        else
+          {
+            boolean inVerticalBars = false;
+            for (int i = 0;  i < len;  i++)
+              {
+                char ch = sym.charAt(i);
+                if (ch == '|')
+                  {
+                    write(inVerticalBars ? "|\\" : "\\", out);
+                    inVerticalBars = false;
+                  }
+                else if (! inVerticalBars)
+                  {
+                    out.writeChar('|');
+                    inVerticalBars = true;
+                  }
+                out.writeChar(ch);
+              }
+            if (inVerticalBars)
+              out.writeChar('|');
+          }
+        return;
+      }
+    /* #endif */
+    write(sym, out);
   }
 }

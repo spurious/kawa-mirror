@@ -47,35 +47,6 @@
     (cond ((pair? obj)        (wr-expr obj col))
           ((null? obj)        (wr-lst obj col))
           ((vector? obj)      (wr-lst (vector->list obj) (out "#" col)))
-          ((boolean? obj)     (out (if obj "#t" "#f") col))
-          ((number? obj)      (out (number->string obj) col))
-          ((symbol? obj)      (out (symbol->string obj) col))
-          ((procedure? obj)   (out "#[procedure]" col))
-          ((string? obj)      (if display?
-                                (out obj col)
-                                (let loop ((i 0) (j 0) (col (out "\"" col)))
-                                  (if (and col (< j (string-length obj)))
-                                    (let ((c (string-ref obj j)))
-                                      (if (or (char=? c #\\)
-                                              (char=? c #\"))
-                                        (loop j
-                                              (+ j 1)
-                                              (out "\\"
-                                                   (out (substring obj i j)
-                                                        col)))
-                                        (loop i (+ j 1) col)))
-                                    (out "\""
-                                         (out (substring obj i j) col))))))
-          ((char? obj)        (if display?
-                                (out (make-string 1 obj) col)
-                                (out (case obj
-                                       ((#\space)   "space")
-                                       ((#\newline) "newline")
-                                       (else        (make-string 1 obj)))
-                                     (out "#\\" col))))
-          ((input-port? obj)  (out "#[input-port]" col))
-          ((output-port? obj) (out "#[output-port]" col))
-          ((eof-object? obj)  (out "#!eof[eof-object]" col))
           (else               (out (format #f (if display? "~a" "~s") obj) col))))
 
   (define (pp obj col)

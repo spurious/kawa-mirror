@@ -1,3 +1,7 @@
+2006-05-11  Per Bothner  <per@bothner.com>
+
+	* genwrite.scm (generic-write): Remove special handling of atomic types.
+
 2006-05-02  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Rename internal names to consistently start with '%'.

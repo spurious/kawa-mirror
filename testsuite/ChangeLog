@@ -1,3 +1,8 @@
+2006-05-15  Per Bothner  <per@bothner.com>
+
+	* use-slots.scm (run-me): When a slot-ref is used and the field is
+	accessible use that in preference to the getter method.
+
 2006-04-14  Per Bothner  <per@bothner.com>
 
 	* mac-test-scm: Some new tests from srfi-72.

@@ -24,7 +24,7 @@
     (test-begin "A as A")
     (test-equal "invoke getTargetAxisName()"
 		'|field value| (invoke a 'getTargetAxisName))
-    (test-equal "slot-ref with literal" '|field value|
+    (test-equal "slot-ref with literal" "field value"
 		(slot-ref a 'target-axis-name))
     ;; slot-set! with literal
     (slot-set! a 'target-axis-name 'still-from-field)

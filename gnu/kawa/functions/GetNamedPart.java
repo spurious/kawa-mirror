@@ -277,7 +277,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         // FIXME!
       }
     MethodProc methods = ClassMethods.apply((ClassType) ClassType.make(container.getClass()),
-                                            name, '\0',
+                                            Compilation.mangleName(name), '\0',
                                             Language.getDefaultLanguage());
     if (methods != null)
       return new NamedPart(container, name, 'M', methods);

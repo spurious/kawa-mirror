@@ -1,3 +1,8 @@
+2006-05-16  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (getNamedPart): Add missing name mangling.
+	Fixes Savannah bug@16593 Prefix-colon syntax and name manglingc problem.
+
 2006-05-11  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeReadableSymbol):  New method.

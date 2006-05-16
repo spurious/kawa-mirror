@@ -163,6 +163,12 @@ public class ClassMethods extends Procedure2
     return (((long) numDefApplicable) << 32) + (long) numPosApplicable;
   }
 
+  /** Find methods.
+   * @param dtype class to search
+   * @param mname method name (already mangled, if need be).
+   * @param mode one of 'P' (use invokespecial). 'V' (require this argument
+   *  even if method is static), or '\0' (otherwise).
+   */
   public static MethodProc apply(ClassType dtype, String mname,
                                  char mode, Language language)
   {

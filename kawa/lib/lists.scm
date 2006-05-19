@@ -25,25 +25,19 @@
 
 (define-procedure car
   setter: set-car!
-  (begin
-    ;; Using just a lambda would not give it a name,
-    ;; so it would use use "lambda" for a WrongType exception.
-    (define (car (x :: <pair>))
-      (*:.car x))
-    car))
+  (lambda (x :: <pair>) name: 'car
+	  x:car))
 
 (define-procedure cdr
   setter: set-cdr!
-  (begin
-    (define (cdr (x :: <pair>))
-      (field x 'cdr))
-    cdr))
+  (lambda (x :: <pair>) name: 'cdr
+	  x:cdr))
 
 (define-syntax define-cxr
   (lambda (form)
     (syntax-case form ()
-      ((_ name slots)
-       #`(define-procedure name
+       ((_ fname slots)
+       #`(define-procedure fname
 	   setter: (lambda (arg value)
 		     ,(syntax-case #'slots ()
 			((first1 . rest1)
@@ -54,16 +48,14 @@
 				 ((first . rest)
 				  #`(field (as <pair> ,(loop #'rest))
 					   ',(syntax-object->datum #'first)))))
-			    value))))     
-	   (begin
-	     (define (name arg)
-	       ,(let loop ((f #'slots))
-		  (syntax-case f ()
-		    (() #'arg)
-		    ((first . rest)
-		     #`(field (as <pair> ,(loop #'rest))
-			      ',(syntax-object->datum #'first))))))
-	     name))))))
+			    value))))
+	   (lambda (arg) name: 'fname
+		   ,(let loop ((f #'slots))
+		      (syntax-case f ()
+			(() #'arg)
+			((first . rest)
+			 #`(field (as <pair> ,(loop #'rest))
+				  ',(syntax-object->datum #'first)))))))))))
 
 (define-cxr caar (car car))
 (define-cxr cadr (car cdr))

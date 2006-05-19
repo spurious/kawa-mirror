@@ -1,3 +1,8 @@
+2006-05-19  Per Bothner  <per@bothner.com>
+
+	* lists.scm (car, cdr, define-cxr): Use name: lambda keyword to set
+	name, so we don't have to use less-efficient define kludge.
+
 2006-05-06  Per Bothner  <per@bothner.com>
 
 	* files.scm (make-temporary-file): Reimplement using new method

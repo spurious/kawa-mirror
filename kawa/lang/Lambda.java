@@ -16,6 +16,8 @@ public class Lambda extends Syntax implements Printable
   public Object restKeyword;
   public Object keyKeyword;
 
+  public static final Keyword nameKeyword = Keyword.make("name");
+
   public Expression defaultDefault = QuoteExp.falseExp;
 
   public void setKeywords(Object optional, Object rest, Object key)
@@ -494,6 +496,12 @@ public class Lambda extends Syntax implements Printable
 		lexp.setExceptions(exps);
 	      }
 	  }
+        else if (attrName == nameKeyword)
+          {
+            Expression attrExpr = tr.rewrite_car(pair2, syntax);
+            if (attrExpr instanceof QuoteExp)
+              lexp.setName(((QuoteExp) attrExpr).getValue().toString());
+          }
 	else
 	  {
 	    tr.error('w', "unknown procedure property "+attrName);

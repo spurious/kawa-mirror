@@ -40,5 +40,7 @@ public class ErrorExp extends Expression
   public void compile (Compilation comp, Target target)
   {
     // Should never happen!
+    throw new Error(comp.getFile()+":"+comp.getLine()
+                    +": internal error: compiling error expression: "+message);
   }
 }

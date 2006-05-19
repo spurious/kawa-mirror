@@ -1,5 +1,7 @@
 2006-05-19  Per Bothner  <per@bothner.com>
 
+	* ErrorExp.java (compile): Throw Error if called.
+
 	* ModuleExp.java (allocFields): Don't emit field for unreferenced
 	unknown declaration.
 	* ModuleExp.java (allocFields): Do emit field in IS_CONSTANT case.

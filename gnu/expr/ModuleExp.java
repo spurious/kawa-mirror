@@ -360,7 +360,10 @@ public class ModuleExp extends LambdaExp
       {
 	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
 	  continue;
-	if (decl.getFlag(Declaration.IS_UNKNOWN))
+	if (decl.getFlag(Declaration.IS_UNKNOWN)
+            // We might have an unrefered unknown if the reference gets
+            // optimized away. For example references to <CLASSNAME>.
+            && decl.getFlag(Declaration.CAN_READ|Declaration.CAN_CALL))
 	  decl.makeField(comp, null);
       }
     for (Declaration decl = firstDecl();
@@ -372,6 +375,8 @@ public class ModuleExp extends LambdaExp
 	if (((decl.isSimple() && ! decl.isPublic()))
             // Kludge - needed for macros - see Savannah bug #13601.
             && ! decl.isNamespaceDecl()
+            && ! (decl.getFlag(Declaration.IS_CONSTANT)
+                  && decl.getFlag(Declaration.CAN_READ|Declaration.CAN_CALL))
 	    && ! (value instanceof ClassExp))
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))

@@ -1,3 +1,9 @@
+2006-05-19  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (allocFields): Don't emit field for unreferenced
+	unknown declaration.
+	* ModuleExp.java (allocFields): Do emit field in IS_CONSTANT case.
+
 2006-05-02  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): Change 1st param to AccessExp, so we can get

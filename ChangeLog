@@ -41,6 +41,13 @@
 
 2006-04-14  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (initScheme): Get "caar", "cadr" etc from
+	kawa.lib.lists rather than kawa.standard.cxr.
+	* kawa/standard/cxr.java: Remove file.
+	* kawa/standard/Makefile.am: Update accordingly.
+
+2006-04-14  Per Bothner  <per@bothner.com>
+
 	Various macro fixes.  Most important, quasisyntax sub-templates inherit
 	a shared TemplateScope.
 	* kawa/lang/PatternScope.java (push): Set outer scope.
@@ -76,7 +83,7 @@
 
 2006-03-25  Per Bothner  <per@bothner.com>
 
-	* kawa/standard/Scheme.java (initSchema): Bind 'slot-ref'
+	* kawa/standard/Scheme.java (initScheme): Bind 'slot-ref'
 	to new SlotGet.slotRef field.
 
 2006-03-24  Per Bothner  <per@bothner.com>

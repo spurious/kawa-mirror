@@ -1,5 +1,7 @@
 2006-05-19  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_autoload.java (process): Handle Symbols.
+
 	* kawa/lang/Lambda.java (nameKeyword): New constant field.
 	(rewriteAttrs): Handle name: keyword.
 

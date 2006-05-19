@@ -262,9 +262,9 @@ public class define_autoload extends Syntax
       }
     */
 
-    if (names instanceof String)
+    if (names instanceof String || names instanceof Symbol)
       {
-	String name = (String) names;
+	String name = names.toString();
 	Declaration decl = defs.getDefine(name, 'w', tr);
 	if (filename instanceof String
 	    && (len = (fn = (String) filename).length()) > 2

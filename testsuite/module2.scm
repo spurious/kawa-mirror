@@ -1,6 +1,6 @@
 ;; The next line is just to test the case that we don't extend ModuleBody.
 (module-extends <pair>)
-(module-export list-length-1 list-length-3 classify list1234 <a8711>
+(module-export list-length-1 list-length-3 classify list1234 <A8711>
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair
 	       my-array-7 mod2-v5)
 (require <module1>)

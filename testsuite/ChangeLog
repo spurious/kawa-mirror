@@ -1,3 +1,7 @@
+2006-05-20  Per Bothner  <per@bothner.com>
+
+	* module2.scm: Fix typo <a8711> -> <A8711> in module-export.
+
 2006-05-15  Per Bothner  <per@bothner.com>
 
 	* use-slots.scm (run-me): When a slot-ref is used and the field is

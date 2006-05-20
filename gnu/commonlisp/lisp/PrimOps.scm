@@ -78,7 +78,9 @@
 ;(define (make-symbol NAME)  ...)
 
 (define (set symbol value)
-  (invoke (gnu.mapping.Environment:getCurrent) 'put (invoke-static <gnu.commonlisp.lang.Symbols> 'getSymbol sym) value))
+  ((gnu.mapping.Environment:getCurrent):put
+   (<gnu.commonlisp.lang.Symbols>:getSymbol symbol)
+   value))
 
 #|
 (define (add-to-list symbol value)

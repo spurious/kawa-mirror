@@ -1,3 +1,7 @@
+2006-05-20  Per Bothner  <per@bothner.com>
+
+	* Field.java (setConstantValue): Allocate constant pool if needed.
+
 2006-04-10  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getField): Also check super-interfaces.

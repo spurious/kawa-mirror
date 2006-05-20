@@ -125,7 +125,9 @@ public class Field extends Location implements AttrContainer, Member {
    */
   public final void setConstantValue (Object value, ClassType ctype)
   {
-    ConstantPool cpool = ctype.getConstants();
+    ConstantPool cpool = ctype.constants;
+    if (cpool == null)
+      ctype.constants = cpool = new ConstantPool();
     char sig1 = getType().getSignature().charAt(0);
     CpoolEntry entry;
     switch (sig1)

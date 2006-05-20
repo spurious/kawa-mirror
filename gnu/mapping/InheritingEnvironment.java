@@ -83,7 +83,7 @@ public class InheritingEnvironment extends SimpleEnvironment
   public NamedLocation lookup (Symbol name, Object property, int hash)
   {
     NamedLocation loc = super.lookup(name, property, hash);
-    if (loc != null)
+    if (loc != null && loc.isBound())
       return loc;
     return lookupInherited(name, property, hash);
   }
@@ -92,7 +92,7 @@ public class InheritingEnvironment extends SimpleEnvironment
   getLocation (Symbol name, Object property, int hash, boolean create)
   {
     NamedLocation loc = lookupDirect(name, property, hash);
-    if (loc != null)
+    if (loc != null && (create || loc.isBound()))
       return loc;
     if ((flags & INDIRECT_DEFINES) != 0 && create)
       loc = inherited[0].getLocation(name, property, hash, true);

@@ -1,3 +1,8 @@
+2006-05-20  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile): Handle LambdaExp from imported modules,
+	as when compiling multiple modules at once.
+
 2006-05-19  Per Bothner  <per@bothner.com>
 
 	* ErrorExp.java (compile): Throw Error if called.
@@ -73,7 +78,7 @@
 
 	* Declaration.java: Add hooks for type expression that are evaluted
 	at run-time.
-	(typeExp): New Expresaion field.
+	(typeExp): New Expression field.
 	(getTypeExp, setTypeExp): New method.
 	(setType): Modify to also set typeExp.
 

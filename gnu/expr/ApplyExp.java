@@ -121,6 +121,7 @@ public class ApplyExp extends Expression
     Expression exp_func = exp.func;
     LambdaExp func_lambda = null;
     String func_name = null;
+    Declaration owner = null;
     if (exp_func instanceof LambdaExp)
       {
 	func_lambda = (LambdaExp) exp_func;
@@ -130,9 +131,19 @@ public class ApplyExp extends Expression
       }
     else if (exp_func instanceof ReferenceExp) 
       { 
-        Declaration func_decl = ((ReferenceExp) exp_func).binding;
-        if (! func_decl.getFlag(Declaration.IS_UNKNOWN)
-	    && ! func_decl.getFlag(Declaration.INDIRECT_BINDING))
+        ReferenceExp func_ref = (ReferenceExp) exp_func;
+        owner = func_ref.contextDecl();
+        Declaration func_decl = func_ref.binding;
+        while (func_decl != null && func_decl.isAlias()
+               && func_decl.value instanceof ReferenceExp)
+          {
+            func_ref = (ReferenceExp) func_decl.value;
+            if (owner != null || func_decl.needsContext() || func_ref.binding == null)
+              break;
+            func_decl = func_ref.binding;
+            owner = func_ref.contextDecl();
+          }
+        if (! func_decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
 	    Expression value = func_decl.getValue();
 	    func_name = func_decl.getName();
@@ -192,8 +203,10 @@ public class ApplyExp extends Expression
 		  code.emitLoad(func_lambda.closureEnv != null
 				? func_lambda.closureEnv
 				: func_lambda.thisVariable);
-		else
-		  func_lambda.getOwningLambda().loadHeapFrame(comp);
+		else if (owner != null)
+                  owner.load(null, 0, comp, Target.pushObject);
+                else
+                  func_lambda.getOwningLambda().loadHeapFrame(comp);
 	      }
 
 	    pproc.compile(extraArg ? Type.void_type : null,

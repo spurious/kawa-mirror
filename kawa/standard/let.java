@@ -131,7 +131,7 @@ public class let extends Syntax implements Printable
     let.body = tr.rewrite_body(body);
     tr.pop(let);
     tr.popRenamedAlias(renamedAliasesCount);
-      
+
     return let;
   }
 }

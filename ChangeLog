@@ -1,3 +1,10 @@
+2006-05-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/IfFeature.java (hasFeature): Remove old testing junk. 
+
+	* kawa/standard/module_name.java (scanForm): Don't set STATIC_SPECIFIED
+	on module Declaration - confused FindCapturedVars.capture.
+
 2006-05-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_autoload.java (process): Handle Symbols.

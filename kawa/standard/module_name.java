@@ -86,8 +86,7 @@ public class module_name extends Syntax
         if (decl != null)
           {
             decl.noteValue(module);
-            decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED
-                         |Declaration.STATIC_SPECIFIED);
+            decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
             decl.setPrivate(true);
             decl.setType(Compilation.typeClassType);
           }

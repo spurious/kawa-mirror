@@ -57,9 +57,6 @@ public class IfFeature
     Declaration decl = comp.lookup(provide_name, -1);
     if (decl!=null && ! decl.getFlag(Declaration.IS_UNKNOWN))
       return true;
-    Object obj = comp.resolve(provide_name, false);
-    if (obj instanceof Number && ((Number) obj).intValue()==123)
-      return true;
     return false;
   }
 }

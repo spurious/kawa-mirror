@@ -3477,7 +3477,7 @@ public class XQParser extends Lexer
 	if (curToken == '{')
 	  {
 	    if (warnOldVersion)
-	      error('w', "obsolate '{' in variable declaration");
+	      error('w', "obsolete '{' in variable declaration");
 	    init = parseEnclosedExpr();
 	    parseSeparator();
 	  }

@@ -1,3 +1,7 @@
+2006-05-21  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parse): Fix typo in error message.
+
 2006-04-11  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (instance): Make public.

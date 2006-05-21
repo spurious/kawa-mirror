@@ -1,3 +1,7 @@
+2006-05-21  Per Bothner  <per@bothner.com>
+
+	* expected-1.errs: Update for fixed typo in error message.
+
 2006-03-26  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main): Replace call to removed 'string-value'

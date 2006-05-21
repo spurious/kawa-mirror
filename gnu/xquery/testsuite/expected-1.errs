@@ -1,4 +1,4 @@
-bad-1.xql:1:23: warning - obsolate '{' in variable declaration
+bad-1.xql:1:23: warning - obsolete '{' in variable declaration
 bad-1.xql:1:29: warning - missing ';' after declaration
 bad-1.xql:2:1: warning - replace 'define function' by 'declare function'
 bad-1.xql:2:17: warning - defined function must have qualified name

@@ -73,8 +73,6 @@ public class ModuleExp extends LambdaExp
 	if (messages.seenErrors())
 	  return null;
 
-	byte[][] classes = new byte[comp.numClasses][];
-
 	java.util.zip.ZipOutputStream zout = null;
 	if (dumpZipPrefix != null)
 	  {

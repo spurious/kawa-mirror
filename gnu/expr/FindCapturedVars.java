@@ -40,7 +40,6 @@ public class FindCapturedVars extends ExpWalker
 	    if (value instanceof LambdaExp)
 	      {
 		LambdaExp lexp = (LambdaExp) value;
-		LambdaExp cur = getCurrentLambda();
 		if (! lexp.getNeedsClosureEnv())
 		  skipFunc = true;
 	      }

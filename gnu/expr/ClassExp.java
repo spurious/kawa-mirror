@@ -65,7 +65,7 @@ public class ClassExp extends LambdaExp
   {
     if (target instanceof IgnoreTarget)
       return;
-    ClassType new_class = compile (comp);
+    compile (comp);
     compilePushClass(comp, target);
   }
 
@@ -303,7 +303,7 @@ public class ClassExp extends LambdaExp
 	  child.addMethodFor(instanceType, comp, type);
       }
     if (! explicitInit)
-      comp.getConstructor(instanceType, this);
+      Compilation.getConstructor(instanceType, this);
   }
 
   /** Return implementation method matching name and param types.
@@ -625,9 +625,8 @@ public class ClassExp extends LambdaExp
     out.print(" (");
     Special prevMode = null;
     int i = 0;
-    int opt_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
-    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
+    //int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     for (Declaration decl = firstDecl();  decl != null; decl = decl.nextDecl())
       {
 	if (i > 0)

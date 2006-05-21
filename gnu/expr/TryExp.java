@@ -43,7 +43,7 @@ public class TryExp extends Expression
         for (CatchClause clause = catch_clauses; clause != null;
              clause = clause.next)
           {
-            Declaration decl = clause.firstDecl();
+            // Declaration decl = clause.firstDecl();
             // FIXME
           }
         throw ex;

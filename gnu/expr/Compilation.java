@@ -1283,7 +1283,6 @@ public class Compilation
 	    if (line > 0)
 	      code.putLineNumber(source.getFile(), line);
 
-	    Method primMethod = primMethods[methodIndex];
 	    Variable ctxVar = code.getArg(i == 5 ? 3 : i+2);
 
 	    if (i < 5)
@@ -1874,7 +1873,6 @@ public class Compilation
       }
 
     CodeAttr code;
-    Expression body = module.body;
     Variable heapFrame = module.heapFrame;
     boolean staticModule = module.isStatic();
     Method apply_method;
@@ -2410,7 +2408,6 @@ public class Compilation
     LambdaExp loopLambda = (LambdaExp) current_scope;
     ScopeExp let = loopLambda.outer;
     Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
-    Expression[] letInits = { loopLambda };
     Expression cond = (Expression) exprStack.pop();
     Expression recurse = new ApplyExp(new ReferenceExp(fdecl), exps);
     loopLambda.body = new IfExp(cond,

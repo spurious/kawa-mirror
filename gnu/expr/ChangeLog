@@ -1,3 +1,21 @@
+2006-05-21  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java: Remove unused local variables.
+	* ClassExp.java: Likewise.
+	* Compilation.jav: Likewise.
+	* FindCapturedVars.java: Likewise.
+	* FIndTailCalls.java: Likewise.
+	* GenericProc.java: Likewise.
+	* LambdaExp.java: Likewise.
+	* LitTable.java: Likewise.
+	* ModuleExp.java: Likewise.
+	* ObjectExp.java: Likewise.
+	* SetExp.java: Likewise.
+	* TryExp.java: Likewise.
+	* InlineCalls.java: Remove unused import.
+	* ModuleInfo.java: Likewise.
+	* ClassExp.java: Access static method using class-name syntax.
+
 2006-05-20  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile): Handle LambdaExp from imported modules,

@@ -212,7 +212,6 @@ public class GenericProc extends MethodProc
   public final void setProperties (Object[] args)
   {
     int alen = args.length;
-    int mlen = 0;
     for (int i = 0;  i < alen;  i++)
       {
 	Object arg = args[i];

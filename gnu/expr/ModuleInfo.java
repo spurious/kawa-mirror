@@ -1,7 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.mapping.Location;
 import gnu.kawa.reflect.FieldLocation;
 
 public class ModuleInfo

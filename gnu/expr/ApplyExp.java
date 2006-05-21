@@ -70,7 +70,6 @@ public class ApplyExp extends Expression
 	code.emitGetStatic(Compilation.noArgsField);
 	return;
       }
-    LambdaExp caller = comp.curLambda;
     code.emitPushInt(args.length);
     code.emitNewArray(Type.pointer_type);
     for (int i = 0; i < args.length; ++i)
@@ -192,7 +191,6 @@ public class ApplyExp extends Expression
 	  {
 	    PrimProcedure pproc = new PrimProcedure(method, func_lambda);
 	    boolean is_static = method.getStaticFlag();
-	    Expression[] args = exp.getArgs();
 	    boolean extraArg = false;
 	    // ?? Procedure.checkArgCount(this, args.length); // FIXME
 	    if (! is_static || func_lambda.declareClosureEnv() != null)

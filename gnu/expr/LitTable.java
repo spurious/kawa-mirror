@@ -439,7 +439,6 @@ public class LitTable implements ObjectOutput
 	  {
 	    if (iarg == argLength)
 	      break;
-	    Type aType = argTypes[iarg];
 	    Type pType = bParameters[iparam];
 	    if ((bestArrayArgs & (1 << iparam)) == 0)
 	      {

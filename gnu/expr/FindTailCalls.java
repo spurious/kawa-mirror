@@ -350,7 +350,6 @@ public class FindTailCalls extends ExpWalker
     try
       {
 	inTailContext = false;
-	Expression declValue;
 	Declaration decl = exp.binding;
 	if (decl != null && decl.isAlias())
 	  {

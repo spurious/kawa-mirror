@@ -533,8 +533,6 @@ public class LambdaExp extends ScopeExp
   public void generateApplyMethods(Compilation comp)
   {
     comp.generateMatchMethods(this);
-    int numApplyMethods
-      = applyMethods == null ? 0 : applyMethods.size();
     if (Compilation.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
       comp.generateApplyMethodsWithContext(this);
     else
@@ -1096,7 +1094,6 @@ public class LambdaExp extends ScopeExp
 
     for (Declaration decl = firstDecl();  decl != null;  )
       {
-        Variable var = decl.var;
 	// If the only reason we are using an argsArray is because there
 	// are more than 4 arguments, copy the arguments in local register.
 	// Then forget about the args array.  We do this first, before
@@ -1153,18 +1150,9 @@ public class LambdaExp extends ScopeExp
       }
     if (! comp.usingCPStyle())
       {
-	int fflags;
-	ClassType frameType;
-	if (heapFrame == null)
-	  {
-	    fflags = Access.STATIC;
-	    frameType = currentModule().getCompiledClassType(comp);
-	  }
-	else
-	  {
-	    fflags = 0;
-	    frameType = (ClassType) heapFrame.getType();
-	  }
+	ClassType frameType = heapFrame == null
+          ? currentModule().getCompiledClassType(comp)
+          : (ClassType) heapFrame.getType();
 	for (Declaration decl = capturedVars; decl != null;
 	     decl = decl.nextCapturedVar)
 	  {
@@ -1397,7 +1385,6 @@ public class LambdaExp extends ScopeExp
 	    while (toCall < numStubs
 		   && defaultArgs[toCall] instanceof QuoteExp)
 	      toCall++;
-	    int thisArg = isStatic ? 0 : 1;
 	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    Declaration decl;
             Variable callContextSave = comp.callContextVar;

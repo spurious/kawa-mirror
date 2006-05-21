@@ -154,7 +154,6 @@ public class SetExp extends AccessExp
     // to generate fields for module-level definitions;  this is how
     // bindings are exported from modules.
 
-    Object value;
     Declaration decl = binding;
     Expression declValue = decl.getValue();
     if (decl.getFlag(Declaration.EARLY_INIT)

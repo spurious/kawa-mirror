@@ -1,5 +1,4 @@
 package gnu.expr;
-import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
 

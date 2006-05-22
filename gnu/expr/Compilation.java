@@ -2251,6 +2251,23 @@ public class Compilation
   public void setMessages (SourceMessages messages)
   { this.messages = messages; }
  
+  public void error(char severity, String message, Expression location)
+  {
+    String file = location.getFile();
+    int line = location.getLine();
+    int column = location.getColumn();
+    if (file == null || line <= 0)
+      {
+        file = getFile();
+        line = getLine();
+        column = getColumn();
+      }
+
+    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+      severity = 'e';
+    messages.error(severity, file, line, column, message);
+  }
+
   public void error(char severity, String message)
   {
     if (severity == 'w' && getBooleanOption("warn-as-error", false))

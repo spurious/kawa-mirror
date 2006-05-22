@@ -46,7 +46,7 @@ public class LetExp extends ScopeExp
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl(), i++)
           {
-            if (! decl.needsInit()) 
+            if ((decl.flags & Declaration.CAN_READ+Declaration.CAN_CALL) == 0)
               continue;
             Object value = inits[i].eval(ctx);
             Type type = decl.type;

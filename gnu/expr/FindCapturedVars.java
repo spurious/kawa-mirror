@@ -34,6 +34,7 @@ public class FindCapturedVars extends ExpWalker
 	Declaration decl
 	  = Declaration.followAliases(((ReferenceExp) exp.func).binding);
 	if (decl != null && decl.context instanceof ModuleExp
+            && ! decl.isPublic()
             && ! decl.getFlag(Declaration.NONSTATIC_SPECIFIED))
 	  {
 	    Expression value = decl.getValue();
@@ -339,7 +340,7 @@ public class FindCapturedVars extends ExpWalker
 	    Object resolved
 	      = comp.resolve(exp.getSymbol(), exp.isProcedureName());
 	    if (resolved == null)
-	      comp.error('w', "no declaration seen for "+exp.getName());
+	      comp.error('w', "no declaration seen for "+exp.getName(), exp);
 	  }
       }
 

@@ -1,5 +1,14 @@
 2006-05-21  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (error): New convenience overloading.
+	* FindCapturedVars.java (walkReferenceExp): Use it.
+
+	* FindCapturedVars.java (walkApplyExp): If module-level decl is
+	public we don't need to get closure - that's handled anyway.
+
+	* LetExp.java (apply): Always skip if we can neither read or call.
+	Needed to avoid problems when evaluating let-syntax.
+
 	* LambdaExp.java: Remove unused local variables.
 	* ClassExp.java: Likewise.
 	* Compilation.jav: Likewise.

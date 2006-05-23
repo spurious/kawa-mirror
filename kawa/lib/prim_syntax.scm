@@ -1,4 +1,4 @@
-;; Definitins for some primitives before we define anything else.
+;; Definitions for some primitives before we define anything else.
 
 (%define-syntax define-syntax
   (syntax-rules ($lookup$)

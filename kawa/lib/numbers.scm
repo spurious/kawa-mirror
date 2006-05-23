@@ -245,7 +245,7 @@
 	       (<gnu.math.Unit>:lookup unit))))
     (if (eq? u #!null)
 	(primitive-throw (<java.lang.IllegalArgumentException>
-			 (format "unknown unit: ~s" unit))))
+			 ((format "unknown unit: ~s" unit):toString))))
     (<quantity>:make val u)))
 
 (define (duration duration) :: <gnu.math.Duration>

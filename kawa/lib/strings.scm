@@ -73,7 +73,7 @@
     (set! i (- i 1))
     (if (< i 0)
 	result
-	(loop (cons (string-ref str i) result) i))))
+	(loop (make <pair> (string-ref str i) result) i))))
 
 (define (list->string (list :: <list>)) :: <string>
   (let* ((len :: <int> (length list))

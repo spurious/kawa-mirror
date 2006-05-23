@@ -1,6 +1,6 @@
 ;;; Definitions for some standard syntax.
 
-(module-export cond case and or let let* letrec do delay %make-promise
+(module-export cond case and or let let* letrec do delay
 	       syntax-object->datum datum->syntax-object with-syntax
 	       generate-temporaries)
 

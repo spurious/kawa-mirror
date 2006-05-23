@@ -1,3 +1,9 @@
+2006-05-22  Per Bothner  <per@bothner.com>
+
+	* strings.scm (string->list): Inline cons.
+	* numbers.scm (make-quantity): Add explicit toString call.
+	* std_syntax.scm: Remove bogus export.
+
 2006-05-19  Per Bothner  <per@bothner.com>
 
 	* lists.scm (car, cdr, define-cxr): Use name: lambda keyword to set

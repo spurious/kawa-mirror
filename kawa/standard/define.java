@@ -129,7 +129,6 @@ public class define extends Syntax implements Printable
     Object name = Translator.stripSyntax(p1.car);
     int options = ((Number) Translator.stripSyntax(p2.car)).intValue();
     boolean makePrivate = (options & 4) != 0;
-    boolean makeConstant = (options & 8) != 0;
 
     if (! (name instanceof Declaration))
       return tr.syntaxError(getName(options) + " is only allowed in a <body>");

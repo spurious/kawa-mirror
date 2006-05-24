@@ -2,9 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.*;
 import gnu.lists.*;
-import gnu.mapping.*;
 import gnu.expr.*;
-import java.util.*;
 
 public class syntax extends kawa.lang.Quote
 {

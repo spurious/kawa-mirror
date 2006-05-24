@@ -41,7 +41,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
       }
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
-    Macro macro = tr.currentMacroDefinition;
     // SyntaxForm, if any, wrapping rest of rules list.
     SyntaxForm rules_syntax = null;
     for (int i = 0;  i < rules_count;  i++, srules = rules_pair.cdr)

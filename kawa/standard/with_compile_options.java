@@ -98,7 +98,7 @@ public class with_compile_options extends Syntax
       }
     if (! seenKey)
       tr.error('e', "no option keyword in "+command.getName());
-    return tr.wrapSyntax(form, syntax);
+    return Translator.wrapSyntax(form, syntax);
   }
 
   public Expression rewriteForm (Pair form, Translator tr)

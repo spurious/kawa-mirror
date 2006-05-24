@@ -79,7 +79,6 @@ public class Eval extends Procedure1or2
 	Translator tr = new Translator(language, messages);
         tr.immediate = true;
 	ModuleExp mod = tr.pushNewModule(null);
-	Values forms = new Values();
         Compilation save_comp = Compilation.getCurrent();
         try
           {

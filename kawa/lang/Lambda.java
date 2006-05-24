@@ -183,7 +183,6 @@ public class Lambda extends Syntax implements Printable
       lexp.keywords = new Keyword[key_args];
 
     bindings = formals;
-    int i = 0;
     opt_args = 0;
     key_args = 0;
     Object mode = null;
@@ -521,11 +520,9 @@ public class Lambda extends Syntax implements Printable
     while (body instanceof Pair)
       {
 	Pair pair = (Pair) body;
-	Object attr;
 	if (! (pair.cdr instanceof Pair))
 	  break;
 	Object attrName = pair.car;
-	Object attrValue = ((Pair) pair.cdr).car;
 	if (tr.matches(attrName, "::"))
 	  attrName = null;
 	else if (! (attrName instanceof Keyword))
@@ -588,12 +585,10 @@ public class Lambda extends Syntax implements Printable
     tr.curLambda = lexp;
     lexp.body = tr.rewrite_body (body);
     tr.curLambda = saveLambda;
-    Type rtype;
-    BeginExp bexp;
     Expression[] exps;
     int len;
     if (lexp.body instanceof BeginExp
-        && (len = (exps = (bexp = (BeginExp) lexp.body).getExpressions()).length) > 1
+        && (len = (exps = ((BeginExp) lexp.body).getExpressions()).length) > 1
         && exps[0] instanceof ReferenceExp)
       {
 	// Handle '<TYPENAME> BODY':

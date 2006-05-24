@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import java.io.*;
 import gnu.bytecode.ZipLoader;
 import gnu.mapping.*;

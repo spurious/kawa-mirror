@@ -50,7 +50,6 @@ public class Record extends NameMap
 	  continue;
 	if (! fld.getSourceName().equals(fname))
 	  continue;
-	Object value;
 	return fld.getReflectField();
       }
     throw new NoSuchFieldException();

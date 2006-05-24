@@ -3,7 +3,6 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.bytecode.*;
 import gnu.kawa.functions.Setter;
 
 /**
@@ -13,8 +12,6 @@ import gnu.kawa.functions.Setter;
 
 public class set_b extends Syntax implements Printable
 {
-  static private Pattern pattern = new ListPat (2, 2);
-
   public static final set_b set = new set_b();
   static { set.setName("set!"); }
 

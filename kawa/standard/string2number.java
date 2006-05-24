@@ -10,7 +10,6 @@ public class string2number extends Procedure1or2
   {
     try
       {
-	InPort iport;
 	FString fstr = (FString) str;
 	int len = fstr.length();
 	char[] data = fstr.data;

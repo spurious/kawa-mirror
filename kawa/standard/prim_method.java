@@ -19,7 +19,6 @@ public class prim_method extends Syntax
   public static final prim_method op1 = new prim_method();
   static { op1.setName("primitive-op1"); }
 
-  static private Pattern pattern2 = new ListPat (2);
   static private Pattern pattern3 = new ListPat (3);
   static private Pattern pattern4 = new ListPat (4);
 

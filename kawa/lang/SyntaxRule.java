@@ -1,5 +1,4 @@
 package kawa.lang;
-import gnu.lists.*;
 import java.io.*;
 
 /** A rule in an R5RS <code>syntax-template</code>.  A combination of

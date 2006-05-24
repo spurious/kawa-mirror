@@ -1,7 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.*;
-import gnu.mapping.*;
 
 /** Implements the extended procedure "sleep". */
 

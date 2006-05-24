@@ -96,7 +96,6 @@ public class define_class extends Syntax
   public Expression rewriteForm (Pair form, Translator tr)
   {
     //FIXME needs work
-    Object symbol = null;
     Declaration decl = null;
     if (form.cdr instanceof Pair)
       {

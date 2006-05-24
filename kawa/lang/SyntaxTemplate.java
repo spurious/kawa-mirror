@@ -78,9 +78,6 @@ public class SyntaxTemplate implements Externalizable
 
   static final String dots3 = "...";
 
-  /** The lexical context of template definition. */
-  private ScopeExp currentScope;
-
   /* DEBUGGING:
   void print_template_program (java.util.Vector patternNames,
 			       java.io.PrintWriter ps)
@@ -164,7 +161,6 @@ public class SyntaxTemplate implements Externalizable
 
   public SyntaxTemplate (Object template, SyntaxForm syntax, Translator tr)
   {
-    this.currentScope = tr.currentScope();
     this.patternNesting = tr == null || tr.patternScope == null ? ""
       : tr.patternScope.patternNesting.toString();
     StringBuffer program = new StringBuffer ();
@@ -184,8 +180,6 @@ public class SyntaxTemplate implements Externalizable
     OutPort err = OutPort.errDefault();
     err.print("{translated template");
     Macro macro = tr.currentMacroDefinition;
-    err.print(" scope: ");
-    err.print(currentScope);
     if (macro != null)
       {
 	err.print(" for ");
@@ -251,7 +245,7 @@ public class SyntaxTemplate implements Externalizable
         // Look for (... ...) and translate that to ...
         if (tr.matches(car, dots3))
           {
-            Object cdr = tr.stripSyntax(pair.cdr);
+            Object cdr = Translator.stripSyntax(pair.cdr);
             if (cdr instanceof Pair)
               {
                 Pair cdr_pair = (Pair) cdr;
@@ -528,11 +522,9 @@ public class SyntaxTemplate implements Externalizable
       {
 	Pair p = null;
 	Object result = null;
-	int pc0=pc, pc1=pc;
 	for (;;)
 	  {
 	    pc++;
-	    pc1=pc;
 	    Object q
 	      = executeToList(pc, vars, nesting, indexes, tr, templateScope);
 	    if (p == null)

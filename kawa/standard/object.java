@@ -34,16 +34,14 @@ public class object extends Syntax
     if (! (form.cdr instanceof Pair))
       return tr.syntaxError("missing superclass specification in object");
     Pair pair = (Pair) form.cdr;
-    String clname = null;
+    ObjectExp oexp = new ObjectExp();
     if (pair.car instanceof FString)
       {
-	clname = pair.car.toString();
+        // oexp.setName(pair.car.toString());
 	if (! (pair.cdr instanceof Pair))
 	  return tr.syntaxError("missing superclass specification after object class name");
 	pair = (Pair) pair.cdr;
       }
-    ObjectExp oexp = new ObjectExp();
-    // if (clname != null) oexp.setName(clname);
     Object[] saved = scanClassDef(pair, oexp, tr);
     if (saved != null)
       rewriteClassDef(saved, tr);

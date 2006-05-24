@@ -1,3 +1,28 @@
+2006-05-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRule.java: Remove unneeded import.
+	* kawa/standard/IfFeature.java: Likewise.
+	* kawa/standard/load.java: Likewise.
+	* kawa/standard/set_b.java: Likewise.
+	* kawa/standard/sleep.java: Likewise.
+	* kawa/standard/syntax.java: Likewise.
+	* kawa/standard/try_catch.java: Likewise.
+	* kawa/lang/SyntaxTemplate.java (currentScope): Remove unused field.
+	* kawa/standard/location.java: Likewise.
+	* kawa/standard/prim_method.java: Likewise.
+	* kawa/standard/set_b.java: Likewise.
+	* kawa/lang/SyntaxTemplate.java: Use static syntax for static call.
+	* kawa/standard/with_compile_options.java: Likewise.
+	* kawa/lang/Eval.java: Remove unused local variable.
+	* kawa/lang/Lambda.java
+	* kawa/lang/Record.java: Likewise.
+	* kawa/lang/SyntaxRules.java: Likewise.
+	* kawa/lang/SyntaxTemplate.java: Likewise.
+	* kawa/standard/define.java: Likewise.
+	* kawa/standard/define_class.java: Likewise.
+	* kawa/standard/object.java: Likewise.
+	* kawa/standard/string2number.java: Likewise.
+
 2006-05-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/IfFeature.java (hasFeature): Remove old testing junk. 

@@ -1,3 +1,10 @@
+2006-05-23  Per Bothner  <per@bothner.com>
+
+	* ClassFileInput.java: Remove unused local variables.
+	* ClassType.java: Likewise.
+	* ListCodeSize.java: Likewise.
+	* SourceDebugExtAttr.java: Likewise.
+
 2006-05-20  Per Bothner  <per@bothner.com>
 
 	* Field.java (setConstantValue): Allocate constant pool if needed.

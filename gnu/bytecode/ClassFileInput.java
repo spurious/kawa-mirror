@@ -42,7 +42,7 @@ public class ClassFileInput extends DataInputStream
        throws IOException, ClassFormatError
   {
     ClassType ctype = new ClassType();
-    ClassFileInput reader = new ClassFileInput(ctype, str);
+    new ClassFileInput(ctype, str);
     return ctype;
   }
 
@@ -51,8 +51,8 @@ public class ClassFileInput extends DataInputStream
     int magic = readInt();
     if (magic != 0xcafebabe)
       return false;
-    short minor_version = readShort();
-    short major_version = readShort();
+    readShort(); // minor_version
+    readShort(); // major_version
     return true;
   }
 
@@ -303,7 +303,6 @@ public class ClassFileInput extends DataInputStream
   public void readMethods () throws IOException
   {
     int nMethods = readUnsignedShort();
-    ConstantPool constants = ctype.constants;
     for (int i = 0;  i < nMethods;  i++)
       {
 	int flags = readUnsignedShort();

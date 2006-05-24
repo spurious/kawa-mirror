@@ -785,7 +785,6 @@ public class ClassType extends ObjectType
 
   public Method[] getMatchingMethods(String name, Type[] paramTypes, int flags)
   {
-    int i = getMethodCount();
     int nMatches = 0;
     java.util.Vector matches = new java.util.Vector(10);
     for (Method method = methods;  method != null;  method = method.getNext())

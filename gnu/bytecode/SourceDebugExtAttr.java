@@ -293,7 +293,6 @@ public class SourceDebugExtAttr  extends Attribute
   public void print (ClassTypeWriter dst) 
   {
     ClassType ctype = (ClassType) container;
-    ConstantPool constants = ctype.getConstants();
     dst.print("Attribute \"");
     dst.print(getName());
     dst.print("\", length:");

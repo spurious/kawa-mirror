@@ -38,7 +38,7 @@ public class ListCodeSize
 	java.io.InputStream inp = new FileInputStream(filename);
 
         ClassType ctype = new ClassType();
-        ClassFileInput in = new ClassFileInput(ctype, inp);
+        new ClassFileInput(ctype, inp);
 
         if (args.length == 1)
           {

@@ -1,3 +1,7 @@
+2006-05-23  Per Bothner  <per@bothner.com>
+
+	* Duration.java (add): Remove unused local variable add.
+
 2006-04-05  Per Bothner  <per@bothner.com>
 
 	* Duration.java (toString): Remove incomplete JAVA5 optimization.

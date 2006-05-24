@@ -1,3 +1,7 @@
+2006-05-23  Per Bothner  <per@bothner.com>
+
+	* LineCommenterSet.java: Remove unused local variable.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* Kawa.java: Remove empty javadoc @version tag.

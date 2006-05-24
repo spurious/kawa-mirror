@@ -109,8 +109,6 @@ public class LineCommenterSet extends FilterSet
 				
 			final Hashtable tokens = getCommenterHash();
         
-            final StringBuffer b = new StringBuffer();
-            
             final int endIndex = line.indexOf(endToken, index + beginToken.length() + 1 );
 
 			if (endIndex < 1) {

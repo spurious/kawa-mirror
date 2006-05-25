@@ -362,8 +362,17 @@ public class ApplyExp extends Expression
     else
       {
 	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, Target.pushObject);
+          {
+            exp.args[i].compile (comp, Target.pushObject);
+            if (! code.reachableHere())
+              break;
+          }
         method = Compilation.applymethods[args_length];
+      }
+    if (! code.reachableHere())
+      {
+        comp.error('e', "unreachable code");
+        return;
       }
     if (tail_recurse)
       {

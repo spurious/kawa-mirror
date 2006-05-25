@@ -13,6 +13,12 @@ public class ModuleManager
    * Linked together by ModuleInfo's next field. */
   ModuleInfo modules;
 
+  public void add (ModuleInfo info)
+  {
+    info.next = modules;
+    modules = info;
+  }
+
   public ModuleInfo searchWithClassName (String className)
   {
     for (ModuleInfo info = modules;  info != null;  info = info.next)
@@ -28,8 +34,7 @@ public class ModuleManager
       {
         info = new ModuleInfo();
         info.className = className;
-        info.next = modules;
-        modules = info;
+        add(info);
       }
     return info;
   }
@@ -49,8 +54,7 @@ public class ModuleManager
       {
         info = new ModuleInfo();
         info.sourceURL = sourcePath;
-        info.next = modules;
-        modules = info;
+        add(info);
       }
     return info;
   }

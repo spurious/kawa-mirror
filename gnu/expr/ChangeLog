@@ -1,3 +1,10 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* ModuleManager.java (add): New method.
+	(findWithClassName, findWithSourcePath): Use it.
+
+	* ApplyExp.java (compile): Exit early if code is not reachable.
+
 2006-05-21  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (error): New convenience overloading.

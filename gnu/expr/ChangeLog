@@ -1,5 +1,7 @@
 2006-05-25  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (toString): New method
+
 	* Language.java (declFromField): Set EXTERNAL_ACCESS if appropriate.
 
 	* ModuleManager.java (add): New method.

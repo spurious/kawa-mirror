@@ -2548,4 +2548,9 @@ public class Compilation
   {
     current.set(comp);
   }
+
+  public String toString ()
+  {
+    return "<compilation "+mainLambda+">";
+  }
 }

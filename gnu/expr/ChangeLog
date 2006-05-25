@@ -1,5 +1,7 @@
 2006-05-25  Per Bothner  <per@bothner.com>
 
+	* Language.java (declFromField): Set EXTERNAL_ACCESS if appropriate.
+
 	* ModuleManager.java (add): New method.
 	(findWithClassName, findWithSourcePath): Use it.
 

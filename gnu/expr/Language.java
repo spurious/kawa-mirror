@@ -672,6 +672,7 @@ public abstract class Language
     // FIXME if fvalue is FieldLocation, and field is final,
     // get name from value of field.
     boolean isImportedInstance;
+    boolean externalAccess = false;
     if ((isImportedInstance = fname.endsWith("$instance")))
       fdname = fname;
     else if (fvalue instanceof Named) // && ! isAlias
@@ -680,7 +681,10 @@ public abstract class Language
       {
 	// FIXME move this to demangleName
 	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
-	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+          {
+            externalAccess = true;
+            fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+          }
 	fdname = Compilation.demangleName(fname, true).intern();
       }
     Type dtype = isAlias ? Type.pointer_type
@@ -700,6 +704,8 @@ public abstract class Language
     if (isImportedInstance)
       fdecl.setFlag(Declaration.MODULE_REFERENCE);
     fdecl.setSimple(false);
+    if (externalAccess)
+      fdecl.setFlag(Declaration.EXTERNAL_ACCESS|Declaration.PRIVATE);
     return fdecl;
   }
 

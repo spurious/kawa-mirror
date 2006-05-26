@@ -303,8 +303,8 @@ public class DisplayFormat extends AbstractFormat
   /* #ifdef use:java.util.regex */
   static Pattern r5rsIdentifierMinusInteriorColons =
     Pattern.compile("(([a-zA-Z]|[!$%&*/:<=>?^_~])"
-                    + "([a-zA-Z]|[!$%&*/<=>?^_~]|[0-9]|([+-.@]))*[:]?)"
-                    + "|([+-]|[.][.][.])");
+                    + "([a-zA-Z]|[!$%&*/<=>?^_~]|[0-9]|([-+.@]))*[:]?)"
+                    + "|([-+]|[.][.][.])");
   /* #endif */
 
   void writeReadableSymbol (String sym, Consumer out)

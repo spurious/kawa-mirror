@@ -1,3 +1,8 @@
+2006-05-25  Dean Ferreyra <dferreyra@igc.org>
+
+	* DisplayFormat.java (r5rsIdentifierMinusInteriorColons): A fix
+	for Savannah #16660: Additional fix for vertical-bar symbol quoting.
+
 2006-05-16  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (getNamedPart): Add missing name mangling.

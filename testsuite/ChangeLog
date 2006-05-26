@@ -1,3 +1,13 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* cycle1.scm: New test fiels for mutually dependent modules.
+	* cycle2.scm: The other module.
+	* obj-test.scm: Test that cycle works.
+	* Makefile.am: Update for new tests and files.
+	(check-obj): Test that cycle works.
+	(inlining.log): Also test quite quality of cycl1 and cycle2.
+	* inlining.expected: Add expected sizes for new methods.
+
 2006-05-20  Per Bothner  <per@bothner.com>
 
 	* module2.scm: Fix typo <a8711> -> <A8711> in module-export.

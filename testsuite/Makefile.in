@@ -210,7 +210,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   ppfile.out scribble.html.in \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
-  inlining-test.scm inlining.expected
+  inlining-test.scm inlining.expected cycle1.scm cycle2.scm
 
 all: all-am
 
@@ -418,7 +418,7 @@ check-mac: testing.zip
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
 check-obj: testing.zip module2.class module3.class classes2.class \
-  MyFunc.class MyModule.class
+  MyFunc.class MyModule.class cycle1.class cycle2.class
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
@@ -536,15 +536,22 @@ check-pitfalls:
 check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. scribble.html
 
+cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
+	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^
+
 InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
-inlining.log: InliningTest.class Makefile
+inlining.log: InliningTest.class cycle1.class cycle2.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr >inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize cycle1.class isIsEven >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \

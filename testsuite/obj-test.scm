@@ -1,4 +1,4 @@
-(test-init "Objects" 123)
+(test-init "Objects" 129)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -359,3 +359,11 @@
 (test (*:toString "gnu.math.IntNum") 'getClassTest
       (*:getName (getClassTest '123)))
 
+(require <cycle1>)
+(test #t is-even? 8)
+(test #f is-even? 3)
+(require <cycle2>)
+(test #t is-even? 8)
+(test #f is-even? 3)
+(test #f is-odd? 8)
+(test #t is-odd? 3)

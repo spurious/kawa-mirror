@@ -1,3 +1,7 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (seenErrorsOrWarnings): New method.
+
 2006-04-10  Dean Ferreyra <dferreyra@igc.org>
             Per Bothner  <per@bothner.com>
 

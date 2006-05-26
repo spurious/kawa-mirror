@@ -37,6 +37,8 @@ public class SourceMessages
   /** Return true iff errors (not warnings) have been seen. */
   public boolean seenErrors() { return errorCount > 0; }
 
+  public boolean seenErrorsOrWarnings() { return firstError != null; }
+
   /** Get the number of errors (not counting warnings). */
   public int getErrorCount() { return errorCount; }
 

@@ -421,48 +421,33 @@
     line etc (otherwise they just go in directory order
     and the compile fails).
   -->
-      <fileset id="lib-scm-1" dir="${src.dir}/kawa/lib"> 
+      <fileset id="lib-scm" dir="${src.dir}/kawa/lib"> 
         <include name="prim_syntax.scm"/>
-      </fileset>
-      <fileset id="lib-scm-2" dir="${src.dir}/kawa/lib"> 
         <include name="std_syntax.scm"/>
         <include name="syntax.scm"/>
         <include name="reflection.scm"/>
-      </fileset>
-      <fileset id="lib-scm-3" dir="${src.dir}/kawa/lib">
         <include name="lists.scm"/>
         <include name="characters.scm"/>
-      </fileset>
-      <fileset id="lib-scm-4" dir="${src.dir}/kawa/lib">
-        <include name="strings.scm"/> <!--Depends on lists-->
+        <include name="strings.scm"/>
 	<include name="parameters.scm"/>
-      </fileset>
-      <fileset id="lib-scm-5" dir="${src.dir}/kawa/lib">
         <include name="thread.scm"/>
         <include name="keywords.scm"/>
         <include name="numbers.scm"/>
         <include name="vectors.scm"/>
-        <include name="ports.scm"/> <!--Depends on strings-->
-      </fileset>
-      <fileset id="lib-scm-6" dir="${src.dir}/kawa/lib">
-        <include name="misc.scm"/> <!--Depends on ports-->
-        <include name="files.scm"/> <!--Depends on lists, ports-->
+        <include name="ports.scm"/>
+        <include name="misc.scm"/>
+        <include name="files.scm"/>
         <include name="uniform.scm"/>
         <include name="arrays.scm"/>
         <include name="trace.scm"/>
         <include name="windows.scm"/>
-        <include name="system.scm"/> <!--Depends on vectors-->
+        <include name="system.scm"/>
       </fileset>
 
   <target name="check-lib-scm-classes">
     <uptodate property="lib-scm-classes-uptodate">
       <mapper type="glob" from="*.scm" to="${build.dir}/kawa/lib/*.class"/>
-      <srcfiles refid="lib-scm-1"/> 
-      <srcfiles refid="lib-scm-2"/> 
-      <srcfiles refid="lib-scm-3"/>
-      <srcfiles refid="lib-scm-4"/>
-      <srcfiles refid="lib-scm-5"/>
-      <srcfiles refid="lib-scm-6"/>
+      <srcfiles refid="lib-scm"/> 
     </uptodate>
   </target>
 
@@ -476,12 +461,7 @@
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P kawa.lib. --module-static-run --warn-undefined-variable"/>
       <arg value="-C"/>
-      <fileset refid="lib-scm-1"/>
-      <fileset refid="lib-scm-2"/>
-      <fileset refid="lib-scm-3"/>
-      <fileset refid="lib-scm-4"/>
-      <fileset refid="lib-scm-5"/>
-      <fileset refid="lib-scm-6"/>
+      <fileset refid="lib-scm"/>
     </apply>
   </target>
   

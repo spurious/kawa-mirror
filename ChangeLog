@@ -1,4 +1,9 @@
-2006-05-22  Per Bothner  <per@bothner.com>
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* build.xml: Major simplification, since the modules in kawa/lib
+	can be named in any order in the compilation command.
+
+2006-05-25  Per Bothner  <per@bothner.com>
 
 	Handle module dependencies and cycles.
 	* kawa/lang/CompileFile.java (compile_to_files): Remove method.

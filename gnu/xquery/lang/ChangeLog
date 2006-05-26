@@ -1,3 +1,9 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	Handle module dependencies and cycles.	
+	* XQParser.java (parse): Pass ModuleInfo to require.importDefinitions.
+	* XQuery.java (parse): Use new Compilation.pushNewModule method.
+	
 2006-05-21  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse): Fix typo in error message.

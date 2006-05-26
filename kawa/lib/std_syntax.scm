@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 ;;; Definitions for some standard syntax.
 
 (module-export cond case and or let let* letrec do delay

@@ -1,3 +1,31 @@
+2006-05-22  Per Bothner  <per@bothner.com>
+
+	Handle module dependencies and cycles.
+	* Compilation.java (state, getState, setState): New field and accessors.
+	(PROLOG_PARSING, PROLOG_PARSED, BODY_PARSED, RESOLVED, WALKED,
+	COMPILE_SETUP, COMPILED, CLASS_WRITTEN, ERROR_SEEN): New constants.
+	(minfo, lexer, pendingImports): New fields.
+	(pushPendingImport): New method.
+	(compileModule, compileToFiles): Remove method.  Replaced by ...
+	(process): New method.
+	(outputClass): Add some cleanups.
+	(compileToArchive): Replace call to compileModule by call to process.
+	(compileWalkedModule): Rename to generateBytecode.
+	(pushNewModule): Add overload.
+	* ModuleExp.java (allocChildClasses): New method.
+	* LambdaExp.java (allocChildClasses): Simply because of above method.
+	(allocChildMethods): New method.
+	(setCallersNeedStaticLink): Stop on ModuleExp.
+	* Language.java (PARSE_PROLOG): New flag.
+	(parse): New method.
+	* ModuleExp.java (evalToClass): Use new Compilation.process.
+	* ModuleInfo.java (comp, dependencies, numDependencies): New fields.
+	(addDependency, getClassType): New methods.
+	(loadByStages, loadEager): New methods.
+	* ModuleManager.java (find): New method.
+	* ReferenceExp.java (apply): Chase aliases.
+	Also, if value is a LambdaExp, evaluate value rather than de-reference.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (toString): New method

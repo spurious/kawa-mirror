@@ -1,6 +1,8 @@
 ;; This implements SRFI-39 "Parameter objects".
 (module-export make-parameter parameterize)
 
+(require <kawa.lib.prim_syntax>)
+
 (define (make-parameter init #!optional (converter #!null))
   (if (not (eq? converter #!null))
       (set! init (converter init)))

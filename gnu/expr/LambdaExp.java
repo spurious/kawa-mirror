@@ -184,7 +184,7 @@ public class LambdaExp extends ScopeExp
     for (ApplyExp app = nameDecl.firstCall;  app != null;  app = app.nextCall)
       {
         LambdaExp caller = app.context;
-        for (; caller != outer; caller = caller.outerLambda())
+        for (; caller != outer && !(caller instanceof ModuleExp); caller = caller.outerLambda())
           caller.setNeedsStaticLink();
       }
   }
@@ -977,70 +977,67 @@ public class LambdaExp extends ScopeExp
   // Can we merge this with allocParameters?
   public void allocChildClasses (Compilation comp)
   {
-    if (this instanceof ModuleExp)
-      ((ModuleExp) this).allocFields(comp);
-    else
-      {
-	Method main = getMainMethod();
+    Method main = getMainMethod();
 	
-	Declaration decl = firstDecl();
-	for (;;)
-	  {
-	    if (decl == firstArgsArrayArg && argsArray != null)
-	      {
-		getVarScope().addVariable(argsArray);
-	      } 
-	    if (! getInlineOnly()
-		&& getCallConvention() >= Compilation.CALL_WITH_CONSUMER
-		&& (firstArgsArrayArg == null ? decl == null
-		    : argsArray != null ? decl == firstArgsArrayArg
-		    : decl == firstArgsArrayArg.nextDecl()))
-	      {
-		Variable var =
-		  getVarScope().addVariable(null,
-					    Compilation.typeCallContext,
-					    "$ctx");
-		var.setParameter(true);
-	      } 
-	    if (decl == null)
-	      break;
-	    Variable var = decl.var;
-	    // i is the register to use for the current parameter
-            if (var != null)
-              ;
-	    else if (decl.isSimple () && ! decl.isIndirectBinding())
-	      {
-		// For a simple parameter not captured by an inferior lambda,
-		// just allocate it in the incoming register.
-                var = decl.allocateVariable(null);
-		//var.allocateLocal(code);
-	      }
-	    else
-	      {
-		// This variable was captured by an inner lambda.
-		// Its home location is in the heapFrame.
-		// Later, we copy it from its incoming register
-		// to its home location heapFrame.  Here we just create and
-		// assign a Variable for the incoming (register) value.
-		String vname
-                  = Compilation.mangleName(decl.getName()).intern();
-		Type vtype = decl.getType().getImplementationType();
-                var = decl.var = getVarScope().addVariable(null, vtype, vname);
-		//getVarScope().addVariableAfter(var, decl);
-		var.setParameter (true);
-		//var.allocateLocal(code);
-	      }
-	    decl = decl.nextDecl();
-	  }
+    Declaration decl = firstDecl();
+    for (;;)
+      {
+        if (decl == firstArgsArrayArg && argsArray != null)
+          {
+            getVarScope().addVariable(argsArray);
+          } 
+        if (! getInlineOnly()
+            && getCallConvention() >= Compilation.CALL_WITH_CONSUMER
+            && (firstArgsArrayArg == null ? decl == null
+                : argsArray != null ? decl == firstArgsArrayArg
+                : decl == firstArgsArrayArg.nextDecl()))
+          {
+            Variable var =
+              getVarScope().addVariable(null,
+                                        Compilation.typeCallContext,
+                                        "$ctx");
+            var.setParameter(true);
+          } 
+        if (decl == null)
+          break;
+        Variable var = decl.var;
+        // i is the register to use for the current parameter
+        if (var != null)
+          ;
+        else if (decl.isSimple () && ! decl.isIndirectBinding())
+          {
+            // For a simple parameter not captured by an inferior lambda,
+            // just allocate it in the incoming register.
+            var = decl.allocateVariable(null);
+            //var.allocateLocal(code);
+          }
+        else
+          {
+            // This variable was captured by an inner lambda.
+            // Its home location is in the heapFrame.
+            // Later, we copy it from its incoming register
+            // to its home location heapFrame.  Here we just create and
+            // assign a Variable for the incoming (register) value.
+            String vname
+              = Compilation.mangleName(decl.getName()).intern();
+            Type vtype = decl.getType().getImplementationType();
+            var = decl.var = getVarScope().addVariable(null, vtype, vname);
+            //getVarScope().addVariableAfter(var, decl);
+            var.setParameter (true);
+            //var.allocateLocal(code);
+          }
+        decl = decl.nextDecl();
       }
 
     declareClosureEnv();
 
-    if (comp.usingCPStyle() && comp.curClass == comp.mainClass)
-      return;
-
     allocFrame(comp);
 
+    allocChildMethods(comp);
+  }
+
+  void allocChildMethods (Compilation comp)
+  {
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
@@ -1049,7 +1046,7 @@ public class LambdaExp extends ScopeExp
 	    ObjectType closureEnvType;
 	    if (! child.getNeedsClosureEnv())
 	      closureEnvType = null;
-	    else if (this instanceof ClassExp)
+	    else if (this instanceof ClassExp || this instanceof ModuleExp)
 	      closureEnvType = getCompiledClassType(comp);
             else
               {

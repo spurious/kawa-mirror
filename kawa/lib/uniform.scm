@@ -1,5 +1,9 @@
 ;; Uniform vectors, as specified by SRFI-4.
 
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+
 (define (s8vector? x) :: <boolean>
   (instance? x <s8vector>))
 

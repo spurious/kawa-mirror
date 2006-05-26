@@ -72,12 +72,30 @@ public class ReferenceExp extends AccessExp
     throws Throwable
   {
     Object value;
+    if (binding != null && binding.isAlias() && ! getDontDereference()
+        && binding.value instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) binding.value;
+        if (rexp.getDontDereference() && rexp.binding != null)
+          {
+            Expression v = rexp.binding.getValue();
+            if (v instanceof QuoteExp || v instanceof ReferenceExp
+                || v instanceof LambdaExp)
+              {
+                v.apply(ctx);
+                return;
+              }
+          }
+        value = binding.value.eval(ctx);
+      }
     // This isn't just an optimization; it's needed for module imports.
-    if (binding != null && binding.value instanceof QuoteExp
+    else if (binding != null
+        && (binding.value instanceof QuoteExp
+            || binding.value instanceof LambdaExp)
         && binding.value != QuoteExp.undefined_exp
         && (! getDontDereference() || binding.isIndirectBinding()))
       {
-        value = binding.getConstantValue();
+        value = binding.value.eval(ctx);
       }
     else if (binding != null
              && binding.field != null && binding.field.getStaticFlag()

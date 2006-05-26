@@ -4,8 +4,10 @@ import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 import gnu.lists.*;
 import java.util.Vector;
+import gnu.bytecode.ClassType;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -351,7 +353,7 @@ public class repl extends Procedure0or1
 		kawa.standard.load.loadSource(freader, Environment.user(), null);
 		return -1;
 	      }
-	    catch (gnu.text.SyntaxException ex)
+	    catch (SyntaxException ex)
 	      {
 		ex.printAll(OutPort.errDefault(), 20);
 	      }
@@ -421,31 +423,7 @@ public class repl extends Procedure0or1
 	    ++iArg;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    for ( ; iArg < maxArg;  iArg++)
-	      {
-		arg = args[iArg];
-		getLanguageFromFilenameExtension(arg);
-		try
-		  {
-		    System.err.println("(compiling "+arg+")");
-		    SourceMessages messages = new SourceMessages();
-
-		    CompileFile.compile_to_files(arg,
-						 compilationDirectory,
-						 compilationTopname,
-						 messages);
-		    boolean sawErrors = messages.seenErrors();
-		    messages.checkErrors(System.err, 50);
-		    if (sawErrors)
-		      System.exit(-1);
-		  }
-		catch (Throwable ex)
-		  {
-		    System.err.println("Internal error while compiling "+arg);
-		    ex.printStackTrace(System.err);
-		    System.exit(-1);
-		  }
-	      }
+            compileFiles(args, iArg, maxArg);
 	    return -1;
 	  }
 	else if (arg.equals("--output-format")
@@ -734,6 +712,96 @@ public class repl extends Procedure0or1
           }
       }
     return something_done ? -1 : iArg;
+  }
+
+  public static void compileFiles (String[] args, int iArg, int maxArg)
+  {
+    ModuleManager manager = ModuleManager.getInstance();
+    Compilation[] comps = new Compilation[maxArg-iArg];
+    ModuleInfo[] infos = new ModuleInfo[maxArg-iArg];
+    SourceMessages messages = new SourceMessages();
+    for (int i = iArg; i < maxArg;  i++)
+      {
+        String arg = args[i];
+        getLanguageFromFilenameExtension(arg);
+        Language language = Language.getDefaultLanguage();
+        try
+          {
+            InPort fstream;
+            try
+              {
+                fstream = InPort.openFile(arg);
+              }
+            catch (java.io.FileNotFoundException ex)
+              {
+                System.err.println(ex);
+                System.exit(-1);
+                break; // Kludge to shut up compiler.
+              }
+            
+            Compilation comp
+              = language.parse(fstream, messages, Language.PARSE_PROLOG);
+
+            if (compilationTopname != null)
+              {
+                String cname
+                  = Compilation.mangleNameIfNeeded(compilationTopname);
+                ClassType ctype = new ClassType(cname);
+                ModuleExp mexp = comp.getModule();
+                mexp.setType(ctype);
+                mexp.setName(compilationTopname);
+                comp.mainClass = ctype;
+              }
+            
+            infos[i-iArg] = manager.find(comp);
+            comps[i-iArg] = comp;
+
+          }
+        catch (Throwable ex)
+          {
+            if (! (ex instanceof SyntaxException)
+                || ((SyntaxException) ex).getMessages() != messages)
+              {
+                System.err.println("Internal error while compiling "+arg);
+                ex.printStackTrace(System.err);
+                System.exit(-1);
+              }
+          }
+        if (messages.seenErrorsOrWarnings())
+          {
+            System.err.println("(compiling "+arg+')');
+            if (messages.checkErrors(System.err, 20))
+              System.exit(1);
+          }
+      }
+
+    for (int i = iArg; i < maxArg;  i++)
+      {
+        String arg = args[i];
+        Compilation comp = comps[i-iArg];
+        Language language = comp.getLanguage();
+        try
+          {
+            System.err.println("(compiling "+arg+" to "+comp.mainClass.getName()+')');
+
+            infos[i-iArg].loadByStages(Compilation.CLASS_WRITTEN);
+            boolean sawErrors = messages.seenErrors();
+            messages.checkErrors(System.err, 50);
+            if (sawErrors)
+              System.exit(-1);
+            comps[i-iArg] = comp; 
+            sawErrors = messages.seenErrors();
+            messages.checkErrors(System.err, 50);
+            if (sawErrors)
+              System.exit(-1);
+          }
+        catch (Throwable ex)
+          {
+            System.err.println("Internal error while compiling "+arg);
+            ex.printStackTrace(System.err);
+            System.exit(-1);
+          }
+      }
   }
 
   /** A list of standard command-line fluid names to map to static fields.

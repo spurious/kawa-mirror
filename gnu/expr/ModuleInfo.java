@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.FieldLocation;
+import gnu.text.*;
 
 public class ModuleInfo
 {
@@ -11,13 +12,41 @@ public class ModuleInfo
   public String className;
 
   ModuleExp exp;
+  Compilation comp;
 
+  public Compilation getCompilation() { return comp; }
+  
   public Class moduleClass;
+
+  ModuleInfo[] dependencies;
+  int numDependencies;
 
   /** Maybe just use a a URL?. */
   public String sourceURL;
   public long lastCheckedTime;
   public long lastModifiedTime;
+
+  public synchronized void addDependency (ModuleInfo dep)
+  {
+    if (dependencies == null)
+      dependencies = new ModuleInfo[8];
+    else if (numDependencies == dependencies.length)
+      {
+        ModuleInfo[] deps = new ModuleInfo[2 * numDependencies];
+        System.arraycopy(dependencies, 0, deps, 0, numDependencies);
+        dependencies = deps;
+      }
+    dependencies[numDependencies++] = dep;
+  }
+
+  public ClassType getClassType ()
+  {
+    if (moduleClass != null)
+      return (ClassType) Type.make(moduleClass);
+    if (comp != null && comp.mainClass != null)
+      return comp.mainClass;
+    return ClassType.make(className);
+  }
 
   public synchronized ModuleExp getModuleExp ()
   {
@@ -129,8 +158,8 @@ public class ModuleInfo
         Declaration vdecl = floc.getDeclaration();
         ReferenceExp fref = new ReferenceExp(vdecl);
         fdecl.setAlias(true);
-        if (floc.isIndirectLocation())
-          fref.setDontDereference(true);
+        fref.setDontDereference(true);
+        fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
         fdecl.setValue(fref);
         if (vdecl.isProcedureDecl())
           fdecl.setProcedureDecl(true);
@@ -152,5 +181,61 @@ public class ModuleInfo
               }
           }
       }
+  }
+
+  public int getState () { return comp == null ? Compilation.CLASS_WRITTEN : comp.getState(); }
+
+  public void loadByStages (int wantedState)
+  {
+    int state = getState();
+    if (state + 1 >= wantedState)
+      return;
+    loadByStages(wantedState - 2);
+    state = getState();
+    if (state >= wantedState) // Most likely? if ERROR_SEEN.
+      return;
+    comp.setState(state+1);
+    int ndeps = numDependencies;
+    for (int idep = 0;  idep < ndeps;  idep++)
+      {
+        ModuleInfo dep = dependencies[idep];
+        if (dep.comp != null)
+          dep.comp.process(wantedState);
+      }
+    state = getState();
+    if (state >= wantedState) // Most likely? if ERROR_SEEN.
+      return;
+    comp.setState(state & ~1);
+    comp.process(wantedState);
+  }
+
+  /** Eagerly process the module and dependencies.
+   * @return true on success; false if we were unable to because of
+   * an error or a cyclic dependency.
+   */
+  public boolean loadEager (int wantedState)
+  {
+    if (comp == null && className != null)
+      return false;
+    int state = getState();
+    if (state >= wantedState)
+      return true;
+    if ((state & 1) != 0)
+      return false;
+    comp.setState(state + 1);
+    int ndeps = numDependencies;
+    for (int idep = 0;  idep < ndeps;  idep++)
+      {
+        ModuleInfo dep = dependencies[idep];
+        if (! dep.loadEager(wantedState))
+          {
+            comp.setState(state);
+            return false;
+          }
+      }
+    if (getState() == state+1)
+      comp.setState(state);
+    comp.process(wantedState);
+    return getState() == wantedState;
   }
 }

@@ -1,3 +1,9 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.strings>)
+(require <kawa.lib.ports>)
+
 #|
 (define (equal? x y) :: <boolean>
   (or (eq? x y)

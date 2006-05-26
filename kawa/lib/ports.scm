@@ -1,3 +1,10 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.strings>)
+(require <kawa.lib.characters>)
+(require <kawa.lib.numbers>)
+
 (define (open-input-file path) :: <input-port>
   (invoke-static <input-port> 'openFile path))
 

@@ -1,3 +1,6 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+
 (define-syntax (primitive-constructor form)
   (syntax-case form ()
     ((_ class (type ...))

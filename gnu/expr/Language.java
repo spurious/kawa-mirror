@@ -522,6 +522,10 @@ public abstract class Language
   /** Flag to tell parse to only read a single line if possible.
    * Multiple lines may be read if syntactically required. */
   public static final int PARSE_ONE_LINE = 2;
+  /** Flag to tell parser to continue until we have the module name.
+   * The parser is allowed to continue further, but must stop before
+   * any module import. */
+  public static final int PARSE_PROLOG = 4;
 
   /** Parse one or more expressions.
    * @param port the InPort to read the expressions from.
@@ -532,8 +536,8 @@ public abstract class Language
    *   May return null if PARSE_ONE_LINE on end-of-file.
    */
   public final Compilation parse(InPort port,
-				    gnu.text.SourceMessages messages,
-				    int options)
+                                 gnu.text.SourceMessages messages,
+                                 int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Lexer lexer = getLexer(port, messages);
@@ -542,6 +546,12 @@ public abstract class Language
 
   public abstract Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException;
+
+  public boolean parse (Compilation comp, int options)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    return true;
+  }
 
   /** Perform any need post-processing after we've read all the modules
    * to be compiled.

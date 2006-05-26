@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 (define (keyword? object) :: <boolean>
   (invoke-static <keyword> 'isKeyword object))
 

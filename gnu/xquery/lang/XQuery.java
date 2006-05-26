@@ -103,7 +103,7 @@ public class XQuery extends Language
     Compilation tr = new Compilation(this, parser.getMessages(),
 				     parser.lexical);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = tr.pushNewModule(lexer.getName());
+    ModuleExp mexp = tr.pushNewModule(lexer);
     tr.mustCompileHere();
     if ((options & PARSE_ONE_LINE) != 0)
       {

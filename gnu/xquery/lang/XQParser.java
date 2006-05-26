@@ -3580,7 +3580,7 @@ public class XQParser extends Lexer
 	  parseSeparator();
  	ModuleExp module = comp.getModule();
 	Vector forms = new Vector();
-	require.importDefinitions(ClassType.make(Compilation.mangleURI(uri)),
+	require.importDefinitions(ModuleInfo.find(Compilation.mangleURI(uri)),
                                   uri, forms, module, comp);
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);

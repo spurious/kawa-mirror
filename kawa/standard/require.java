@@ -103,8 +103,15 @@ public class require extends Syntax
   public boolean scanForDefinitions (Pair st, Vector forms,
                                      ScopeExp defs, Translator tr)
   {
+    if (tr.getState() == Compilation.PROLOG_PARSING)
+      {
+        tr.setState(Compilation.PROLOG_PARSED);
+        tr.pendingForm = st;
+        // FIXME - we want to call 'run' here anyway, rather than have
+        // it be emitted at the end of the 'body'.
+        return true;
+      }
     Object name = ((Pair) st.cdr).car;
-    // Type type = Scheme.expType(tr.rewrite(name));
     Type type = null;
     Pair p;
     if (name instanceof Pair
@@ -148,21 +155,34 @@ public class require extends Syntax
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
-    return importDefinitions((ClassType) type, null, forms, defs, tr);
+    return importDefinitions(ModuleInfo.find(type.getName()),
+                             null, forms, defs, tr);
   }
 
-  public static boolean importDefinitions (ClassType type, String uri,
-                                           Vector forms,
-					   ScopeExp defs, Compilation tr)
+  public static boolean importDefinitions (ModuleInfo info, String uri,
+                                    Vector forms,
+                                    ScopeExp defs, Compilation tr)
   {
+    if (tr.minfo != null && tr.minfo.getState() < Compilation.BODY_PARSED)
+      {
+        tr.minfo.addDependency(info);
+
+        if (! info.loadEager(Compilation.COMPILED)
+            && info.getState() < Compilation.RESOLVED)
+          {
+            // Oops.  We found a cycle.
+            tr.pushPendingImport(info, defs);
+            return true;
+          }
+      }
+
     Language language = tr.getLanguage();
+    ClassType type = info.getClassType();
+    String tname = info.className;
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
-    String tname = type.getName();
-    Object instance = null;
     boolean isRunnable = type.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
-    ModuleInfo info = ModuleInfo.find(tname);
     Expression[] args = { new QuoteExp(tname) };
     Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
     Field instanceField = null;
@@ -170,7 +190,6 @@ public class require extends Syntax
     int formsStart = forms.size();
     ClassType typeFieldLocation
       = ClassType.make("gnu.kawa.reflect.FieldLocation");
-    Class rclass = type.getReflectClass();
 
     ModuleExp mod = info.setupModuleExp();
 
@@ -181,10 +200,8 @@ public class require extends Syntax
         Object fdname = fdecl.getSymbol();
         boolean isAlias = fdecl.isIndirectBinding();
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
-
-        if (! isStatic && instance == null)
+        if (! isStatic && decl == null)
           {
-            instance = info.getInstance();
             String iname = tname.replace('.', '$') + "$instance";
             decl = new Declaration(iname.intern(), type);
             decl.setPrivate(true);
@@ -193,6 +210,7 @@ public class require extends Syntax
             defs.addDeclaration(decl);
             if (immediate)
               {
+                Object instance = info.getInstance();
                 decl.noteValue(new QuoteExp(instance));
               }
             else
@@ -215,11 +233,14 @@ public class require extends Syntax
         if (fdecl.isPrivate())
           continue;
 
-        String fname = fdecl.field.getName();
-        if (fname.equals("$instance"))
+        if (fdecl.field != null)
           {
-            instanceField = fdecl.field;
-            continue;
+            String fname = fdecl.field.getName();
+            if (fname.equals("$instance"))
+              {
+                instanceField = fdecl.field;
+                continue;
+              }
           }
 
         // We create an alias in the current context that points
@@ -241,7 +262,7 @@ public class require extends Syntax
               aname = Symbol.make(uri, sname);
           }
         boolean isImportedInstance
-          = fdecl.field.getName().endsWith("$instance");
+          = fdecl.field != null && fdecl.field.getName().endsWith("$instance");
 
         Declaration adecl;
         Declaration existing = defs.lookup(aname);
@@ -279,6 +300,8 @@ public class require extends Syntax
           } 
         if (fdecl.getFlag(Declaration.IS_CONSTANT))
          adecl.setFlag(Declaration.IS_CONSTANT);
+        if (fdecl.getFlag(Declaration.IS_SYNTAX))
+          adecl.setFlag(Declaration.IS_SYNTAX);
         if (fdecl.isProcedureDecl())
           adecl.setProcedureDecl(true);
         if (isStatic)

@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 (define (scheme-window #!optional share) :: <void>
   (let* ((language :: <gnu.expr.Language>
 		 (kawa.standard.Scheme:getInstance))

@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 (define (vector? x) :: <boolean>
   (instance? x <vector>))
 

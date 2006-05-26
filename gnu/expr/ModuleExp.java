@@ -67,7 +67,8 @@ public class ModuleExp extends LambdaExp
         loader.setResourceContext(url);
 	comp.loader = loader;
 
-	comp.compileWalkedModule(mexp);
+        comp.setState(Compilation.WALKED);
+        comp.process(Compilation.COMPILED);
 
 	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
@@ -343,6 +344,14 @@ public class ModuleExp extends LambdaExp
     return (isStatic()
             && (getFlag(STATIC_RUN_SPECIFIED)
                 || Compilation.moduleStatic == 2));
+  }
+
+  public void allocChildClasses (Compilation comp)
+  {
+    declareClosureEnv();
+    if (! comp.usingCPStyle())
+      return;
+    allocFrame(comp);
   }
 
   void allocFields (Compilation comp)

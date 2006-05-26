@@ -1,3 +1,9 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.reflection>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.ports>)
+
 (define (file-exists? filename)
   ((primitive-virtual-method "java.io.File" "exists" "boolean" ())
    (->pathname filename)))
@@ -105,7 +111,7 @@
             (let ((x (read p)))
               (if (eof-object? x)
                   (begin (close-input-port p) '())
-                  (cons (datum->syntax-object k x) (f))))))))
+                  (<pair> (datum->syntax-object k x) (f))))))))
     (syntax-case x ()
       ((k filename)
        (let ((fn (syntax-object->datum (syntax filename))))

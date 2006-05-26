@@ -7,6 +7,11 @@
 	       length reverse list-tail list-ref list? reverse!
 	       memq memv member assq assv assoc)
 
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.reflection>)
+
 (define (pair? x) :: <boolean>
   (<pair>:instance? x))
 

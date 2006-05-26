@@ -41,37 +41,68 @@ public abstract class LispLanguage extends Language
     SourceMessages messages = lexer.getMessages();
     kawa.lang.Translator tr = new Translator (this, messages);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = tr.pushNewModule(lexer.getName());
+    if ((options & PARSE_PROLOG) != 0)
+      tr.setState(Compilation.PROLOG_PARSING);
+    tr.pushNewModule(lexer);
+    if (! parse(tr, options))
+      return null;
+    if (tr.getState() == Compilation.PROLOG_PARSING)
+      tr.setState(Compilation.PROLOG_PARSED);
+    return tr;
+  }
+
+  public boolean parse (Compilation comp, int options)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    kawa.lang.Translator tr = (kawa.lang.Translator) comp;
+    Lexer lexer = tr.lexer;
+    ModuleExp mexp = tr.mainLambda;
     Values forms = new Values();
-    int first = tr.formStack.size();
     LispReader reader = (LispReader) lexer;
     Compilation save_comp = Compilation.getCurrent();
     try
       {
         Compilation.setCurrent(tr);
+        if (tr.pendingForm != null)
+          {
+            tr.scanForm(tr.pendingForm, mexp);
+            tr.pendingForm = null;
+          }
         for (;;)
           {
             Object sexp = reader.readCommand();
             if (sexp == Sequence.eofValue)
               {
                 if ((options & PARSE_ONE_LINE) != 0)
-                  return null;  // FIXME
+                  return false;  // FIXME
                 break;
               }
             tr.scanForm(sexp, mexp);
             if ((options & PARSE_ONE_LINE) != 0)
               break;
+            if ((options & PARSE_PROLOG) != 0
+                && tr.getState() >= Compilation.PROLOG_PARSED)
+              {
+                return true;
+              }
           }
         if (lexer.peek() == ')')
           lexer.fatal("An unexpected close paren was read.");
-        tr.firstForm = first;
+
+        // Must be done before any other module imports this module.
         tr.finishModule(mexp);
+
+        if ((options & PARSE_PROLOG) == 0)
+          {
+            tr.firstForm = 0;
+          }
+        tr.setState(Compilation.BODY_PARSED);
       }
     finally
       {
         Compilation.setCurrent(save_comp);
       }
-    return tr;
+    return true;
   }
 
   /** Resolve names and other post-parsing processing. */

@@ -1,3 +1,7 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java (parse): Call new Compilation.pushNewModule.
+
 2006-04-11  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (instance): Make public.

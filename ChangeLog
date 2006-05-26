@@ -1,3 +1,30 @@
+2006-05-22  Per Bothner  <per@bothner.com>
+
+	Handle module dependencies and cycles.
+	* kawa/lang/CompileFile.java (compile_to_files): Remove method.
+	* kawa/repl.java (compileFiles): New method.
+	(processArgs): Simplify by using compileFiles.
+	* kawa/lang/Eval.java (evalBody): Add now-needed cast.
+	* kawa/lang/Translator.java (pendingForm): New field.
+	(lookup): Replace call to lookupGlobal, which creates new Declaration
+	if needed, with call to ModuleExp.lookup, which doesn't.
+	(scanForm): Special-case check for begin Syntax.
+	(scanForm): Handle deferred processing created by require or begin.
+	(finishModule):: Simplification - don't need to check IS_UNKNOWN.
+	(resolveModule): Handle any deferred pending imports.
+	* kawa/standard/require.java (scanForDefinitions): If we're in the
+	PROLOG_PARSING state, defer handling until the next pass.
+	(importDefinitions): New parameter list.
+	Check for cycles, and if so pushPendingImport.
+	Various tweaks to handle the case when no class has been generated yet.
+
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Syntax.java (scanForm): Slightly better error message,
+	in case the ErrorEsp is erroneously compiled or evaluated.
+
+	* kawa/lang/SyntaxTemplate.java (execute): Simplify debug logic.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Syntax.java (scanForm): Slightly better error message,

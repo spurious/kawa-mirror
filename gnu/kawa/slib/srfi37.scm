@@ -42,6 +42,8 @@
  option?
  args-fold)
 
+(require <gnu.kawa.slib.DefineRecordType>)
+
 (define-record-type option-type
   (option names required-arg? optional-arg? processor)
   option?

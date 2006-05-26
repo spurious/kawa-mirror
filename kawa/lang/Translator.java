@@ -44,6 +44,7 @@ public class Translator extends Compilation
 
   public Stack formStack = new Stack();
   public int firstForm;
+  public Object pendingForm;
 
   public LambdaExp curMethodLambda;
 
@@ -191,14 +192,16 @@ public class Translator extends Compilation
     if (decl != null
 	&& (getLanguage().getNamespaceOf(decl) & namespace) != 0)
       return decl;
-    return lookupGlobal(name, namespace);
+    return currentModule().lookup(name, getLanguage(), namespace);
   }
 
+  /** Find global Declaration, creating one if not found. */
   public Declaration lookupGlobal(Object name)
   {
     return lookupGlobal(name, -1);
   }
 
+  /** Find global Declaration, creating one if not found. */
   public Declaration lookupGlobal(Object name, int namespace)
   {
     ModuleExp module = currentModule();
@@ -981,6 +984,11 @@ public class Translator extends Compilation
                       syntax = (Syntax) obj;
                   }
               }
+            // Recognize deferred begin created in scanBody for pendingForms.
+            // A seemingly-cleaned (obj instanceof Syntax) causes problems
+            // with some Syntax forms, such as define.
+            else if (obj == kawa.standard.begin.begin)
+              syntax = (Syntax) obj;
           }
         finally
           {
@@ -1053,6 +1061,16 @@ public class Translator extends Compilation
 	    Pair pair = (Pair) body;
 	    int first = formStack.size();
 	    scanForm(pair.car, defs);
+            if (getState() == Compilation.PROLOG_PARSED)
+              {
+                // We've seen a require form during the initial pass when
+                // we're looking module names.  Defer the require and any
+                // following forms in this body.
+                if (pair.car != pendingForm)
+                  pair = makePair(pair, pendingForm, pair.cdr);
+                pendingForm = new Pair(kawa.standard.begin.begin, pair);
+                return LList.Empty;
+              }
 	    int fsize = formStack.size();
 	    if (makeList)
 	      {
@@ -1223,8 +1241,7 @@ public class Translator extends Compilation
     for (Declaration decl = mexp.firstDecl();
 	 decl != null;  decl = decl.nextDecl())
       {
-	if (decl.getFlag(Declaration.NOT_DEFINING)
-	    && ! decl.getFlag(Declaration.IS_UNKNOWN))
+	if (decl.getFlag(Declaration.NOT_DEFINING))
 	  {
 	    String msg1 = "'";
 	    String msg2
@@ -1264,6 +1281,27 @@ public class Translator extends Compilation
 
   public void resolveModule(ModuleExp mexp)
   {
+    int numPending = pendingImports == null ? 0 : pendingImports.size();
+    for (int i = 0;  i < numPending;  )
+      {
+        ModuleInfo info = (ModuleInfo) pendingImports.elementAt(i++);
+        ScopeExp defs = (ScopeExp) pendingImports.elementAt(i++);
+        Expression posExp = (Expression) pendingImports.elementAt(i++);
+        if (mexp == defs)
+          {
+            // process(BODY_PARSED);
+            Expression savePos = new ReferenceExp((Object) null);
+            savePos.setLine(this);
+            setLine(posExp);
+            kawa.standard.require.importDefinitions(info, null,
+                                                    formStack, defs, this);
+            setLine(savePos);
+            pendingImports.setElementAt(null, i-3);
+            pendingImports.setElementAt(null, i-2);
+            pendingImports.setElementAt(null, i-1);
+          }
+      }
+
     processAccesses();
 
     setModule(mexp);

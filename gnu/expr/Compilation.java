@@ -39,6 +39,36 @@ public class Compilation
   /** Contains "$instance" if the module is static; otherwise null. */
   Variable moduleInstanceVar;
 
+  /** A code, one of the following constants, indicating how far along
+   * we are in the parsing/compilation process.
+   * These codes are even integers for completed stages and odd integers
+   * for begun but not completed stages. */
+  private int state;
+  /** Returns a code indicating how far along
+   * we are in the parsing/compilation process. */
+  public int getState () { return state; }
+  public void setState (int state) { this.state = state; }
+  /** State code for initial pre-parse looking for module name. */
+  public static final int PROLOG_PARSING = 1;
+  /** We have determined the module name and class, but not finished parsing. */
+  public static final int PROLOG_PARSED = 2;
+  /** State code indicating the entire module has been parsed. */
+  public static final int BODY_PARSED = 4;
+  /** State code for lexical bindings having been resolved. */ 
+  public static final int RESOLVED = 6;
+  /** State code when various inlining and optimization passes are done. */
+  public static final int WALKED = 8;
+  /** State code that various compile-only data has been determined. */
+  public static final int COMPILE_SETUP = 10;
+  /** State code indicating the bytecode has been generated. */
+  public static final int COMPILED = 12;
+  /** State code indicating that bytecode has been written to its target. */
+  public static final int CLASS_WRITTEN = 14;
+  public static final int ERROR_SEEN = 100;
+
+  public ModuleInfo minfo;
+  public Lexer lexer;
+
   /** Used to access the "main" instance.
    * This is used for two different purposes, which may be confusing:
    * <ul>
@@ -53,6 +83,19 @@ public class Compilation
    * named {@code "$main"} that points back to {@code mainClass}.</li></ul>
    */
   Field moduleInstanceMainField;
+
+  protected java.util.Stack pendingImports;
+
+  public void pushPendingImport (ModuleInfo info, ScopeExp defs)
+  {
+    if (pendingImports == null)
+      pendingImports = new java.util.Stack();
+    pendingImports.push(info);
+    pendingImports.push(defs);
+    Expression posExp = new ReferenceExp((Object) null);
+    posExp.setLine(this);
+    pendingImports.push(posExp);
+  }
 
   /** If true, minimize the number of classes generated.
    * Do this even if it makes things a little slower. */
@@ -881,59 +924,6 @@ public class Compilation
     FindTailCalls.findTailCalls(mexp, this);
   }
 
-  /** Create a new Compilation environment.
-   * @param lexp top-level function
-   */
-  public void compileModule (ModuleExp lexp)
-  {
-    if (messages.seenErrors())
-      return;
-
-    addMainClass(lexp);
-
-    // Do various code re-writes and optimization.
-    walkModule(lexp);
-
-    Compilation saveCompilation = Compilation.getCurrent();
-    try
-      {
-        Compilation.setCurrent(this);
-	compileWalkedModule(lexp);
-      }
-    catch (Throwable ex)
-      {
-	error('f', "internal compile error - caught "+ex);
-	messages.printAll(OutPort.errDefault(), 20);
-	messages.clear();
-	throw WrappedException.wrapIfNeeded(ex);
-      }
-    finally
-      {
-        Compilation.setCurrent(saveCompilation);
-      }
-  }
-
-  public void compileToFiles (ModuleExp mexp, String directory)
-    throws java.io.IOException
-  {
-    if (directory == null || directory.length() == 0)
-      directory = "";
-    else if (directory.charAt(directory.length() - 1) != File.separatorChar)
-      directory = directory + File.separatorChar;
-
-    /* DEBUGGING:
-    OutPort perr = OutPort.errDefault();
-    perr.println ("[Expression to compile topname:"+topname);
-    this.print (perr);
-    perr.println();
-    perr.flush();
-    */
-
-    compileModule(mexp);
-    if (! messages.seenErrors())
-      outputClass(directory);
-  }
-
   public void outputClass (String directory) throws IOException
   {
     char dirSep = File.separatorChar;
@@ -947,7 +937,14 @@ public class Compilation
 	if (parent != null)
 	  new File(parent).mkdirs();
 	clas.writeToFile(out_name);
+
+        clas.cleanupAfterCompilation();
       }
+
+    minfo.comp = null;
+    mainLambda.body = null;
+    mainLambda = null;
+    litTable = null;
   }
 
   public void compileToArchive (ModuleExp mexp, String fname)
@@ -963,7 +960,9 @@ public class Compilation
 	fname = fname + ".zip";
 	makeJar = false;
       }
-    compileModule(mexp);
+
+    process(COMPILED);
+
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();
@@ -1799,17 +1798,90 @@ public class Compilation
     return method;
   }
 
+  /** Parse/walk/compile this module as needed and requested.
+   * This method does not process any dependent modules (expect indirectly,
+   * such as may be done by a require form).
+   * @param wantedState the desired value of getState().
+   */
+  public void process (int wantedState)
+  {
+    Compilation saveCompilation = Compilation.getCurrent();
+    try
+      {
+        Compilation.setCurrent(this);
+        ModuleExp mexp = getModule();
+        if (wantedState >= BODY_PARSED && getState() < BODY_PARSED-1)
+          {
+            setState(BODY_PARSED-1);
+            language.parse(this, 0);
+            lexer.close();
+            lexer = null;
+            if (pendingImports != null)
+              return;
+          }
+        if (wantedState >= RESOLVED && getState() < RESOLVED)
+          {
+            addMainClass(mexp);
+            language.resolve(this);
+            setState(messages.seenErrors() ? ERROR_SEEN : RESOLVED);
+          }
+        if (wantedState >= WALKED && getState() < WALKED)
+          {
+            walkModule(mexp);
+            setState(messages.seenErrors() ? ERROR_SEEN : WALKED);
+          }
+        if (wantedState >= COMPILE_SETUP && getState() < COMPILE_SETUP)
+          {
+            litTable = new LitTable(this);
+            mexp.setCanRead(true);
+            FindCapturedVars.findCapturedVars(mexp, this);
+            mexp.allocFields(this);
+            mexp.allocChildMethods(this);
+            setState(messages.seenErrors() ? ERROR_SEEN : COMPILE_SETUP);
+          }
+        if (wantedState >= COMPILED && getState() < COMPILED)
+          {
+            generateBytecode();
+            setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
+          }
+        if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
+          { 
+            // FIXME should avoid refereence to kawa.repl
+            String directory = kawa.repl.compilationDirectory;
+            if (directory == null || directory.length() == 0)
+              directory = "";
+            else if (directory.charAt(directory.length() - 1)
+                     != java.io.File.separatorChar)
+              directory = directory + java.io.File.separatorChar;
+            outputClass(directory);
+            setState(CLASS_WRITTEN);
+          }
+      }
+    catch (gnu.text.SyntaxException ex)
+      {
+        setState(ERROR_SEEN);
+        if (ex.getMessages() != getMessages())
+          throw new RuntimeException ("confussing syntax error: "+ex);
+        // otherwise ignore it - it's already been recorded in messages.
+      }
+    catch (java.io.IOException ex)
+      {
+        ex.printStackTrace();
+        error('f', "caught "+ex);
+        setState(ERROR_SEEN);
+      }
+    finally
+      {
+        Compilation.setCurrent(saveCompilation);
+      }
+  }
+
   /** The guts of compiling a module to one or more classes.
    * Assumes walkModule has been done.
    */
-  void compileWalkedModule (ModuleExp module)
+  void generateBytecode ()
   {
-    module.setCanRead(true);
-    FindCapturedVars.findCapturedVars(module, this);
-
-    if (messages.seenErrors())
-      return;
-
+    ModuleExp module = getModule();
     if (debugPrintFinalExpr)
       {
 	OutPort dout = OutPort.errDefault();
@@ -1831,7 +1903,6 @@ public class Compilation
 	generateConstructor(moduleClass, module);
       }
 
-    litTable = new LitTable(this);
     String name;
     ClassType new_class = module.type;
     if (new_class == typeProcedure)
@@ -2173,6 +2244,12 @@ public class Compilation
         pushScope(scope);
         lexical.push(scope);
       }
+  }
+
+  public ModuleExp pushNewModule (Lexer lexer)
+  {
+    this.lexer = lexer;
+    return pushNewModule(lexer.getName());
   }
 
   public ModuleExp pushNewModule (String filename)

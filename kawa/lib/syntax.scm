@@ -1,3 +1,7 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.reflection>)
+
 ;; Helper routines for define-procedure.
 (define (add-procedure-properties
 	 (proc :: <gnu.expr.GenericProc>)

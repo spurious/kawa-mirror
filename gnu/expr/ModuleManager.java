@@ -1,5 +1,6 @@
 package gnu.expr;
 import java.net.*;
+import gnu.bytecode.ClassType;
 
 public class ModuleManager
 {
@@ -12,6 +13,17 @@ public class ModuleManager
   /** Chain of all modules managed by this ModuleManager.
    * Linked together by ModuleInfo's next field. */
   ModuleInfo modules;
+
+  public ModuleInfo find (Compilation comp)
+  {
+    ModuleExp mexp = comp.getModule();
+    ClassType ctype = mexp.classFor(comp);
+    ModuleInfo info = findWithClassName(ctype.getName());
+    info.exp = mexp;
+    info.comp = comp;
+    comp.minfo = info;
+    return info;
+  }
 
   public void add (ModuleInfo info)
   {

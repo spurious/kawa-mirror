@@ -1,5 +1,7 @@
 2006-05-25  Per Bothner  <per@bothner.com>
 
+	* srfi37.scm: Add needed require.
+
 	* swing.scm (modle-export): Remove removed frame function.
 
 2006-05-11  Per Bothner  <per@bothner.com>

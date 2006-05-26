@@ -388,7 +388,7 @@ public class XslTranslator extends Lexer implements Consumer
     this.comp = comp;
     if (comp.exprStack == null)
       comp.exprStack = new Stack();
-    ModuleExp mexp = comp.pushNewModule(getName());
+    ModuleExp mexp = comp.pushNewModule(this);
     comp.mustCompileHere();
     beginDocument(mexp);
     parser.parse();

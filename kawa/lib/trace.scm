@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 (define-syntax %do-trace
   (syntax-rules ()
 		((%do-trace proc flag)

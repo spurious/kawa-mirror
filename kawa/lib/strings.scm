@@ -1,3 +1,8 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.lists>)
+
 (define (string? x) :: <boolean>
   (instance? x <string>))
 

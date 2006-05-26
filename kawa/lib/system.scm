@@ -1,3 +1,8 @@
+(require <kawa.lib.prim_syntax>)
+(require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
+(require <kawa.lib.vectors>)
+
 (define (make-process args env)
   (let* ((arargs
 	  (cond ((vector? args) (convert-vector-to-string-array args))
@@ -85,7 +90,6 @@
 		   (make <gnu.text.SourceMessages>))
 	 (comp :: <gnu.expr.Compilation>
 	       (invoke-static <kawa.lang.CompileFile> 'read source messages)))
-    (*:resolve (*:getLanguage comp) comp)
     (if (invoke messages 'seenErrors)
 	(primitive-throw (make <gnu.text.SyntaxException> messages)))
     (invoke comp 'compileToArchive

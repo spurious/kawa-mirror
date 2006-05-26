@@ -1,5 +1,7 @@
 ;;; Procedures for implementing SRFI-25 arrays.
 
+(require <kawa.lib.prim_syntax>)
+
 (define-alias <array>  <gnu.lists.Array>)
 
 (define (array? x) :: <boolean>

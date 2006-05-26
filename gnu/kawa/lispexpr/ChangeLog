@@ -1,3 +1,8 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	Handle module dependencies and cycles.
+	* LispLanguage.java (parse): New method overloading.
+
 2006-05-01  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getLexer): Since all subclasses except BRL and Q2

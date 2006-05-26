@@ -1,5 +1,29 @@
 2006-05-22  Per Bothner  <per@bothner.com>
 
+	* arrays.scm: Add require declaration for kawa.lib modules we depend on.
+	* characters.scm: Likewise.
+	* files.scm: Likewise.
+	* keywords.scm: Likewise.
+	* lists.scm: Likewise.
+	* misc.scm: Likewise.
+	* numbers.scm: Likewise.
+	* parameters.scm: Likewise.
+	* ports.scm: Likewise.
+	* reflection.scm: Likewise.
+	* std_syntax.scm: Likewise.
+	* strings.scm: Likewise.
+	* syntax.scm: Likewise.
+	* system.scm: Likewise.
+	* thread.scm: Likewise.
+	* trace.scm: Likewise.
+	* uniform.scm: Likewise.
+	* vectors.scm: Likewise.
+	* windows.scm: Likewise.
+	* system.scm (compile-file): Remove resolve call.
+	* files.scm: Inline cons call.
+
+2006-05-22  Per Bothner  <per@bothner.com>
+
 	* strings.scm (string->list): Inline cons.
 	* numbers.scm (make-quantity): Add explicit toString call.
 	* std_syntax.scm: Remove bogus export.

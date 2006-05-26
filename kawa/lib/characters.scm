@@ -1,3 +1,5 @@
+(require <kawa.lib.prim_syntax>)
+
 (define (char? x)
   (instance? x <character>))
 

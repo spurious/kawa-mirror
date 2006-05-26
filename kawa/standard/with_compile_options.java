@@ -2,8 +2,6 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.mapping.Values;
-import java.util.Vector;
 import java.util.Stack;
 
 public class with_compile_options extends Syntax

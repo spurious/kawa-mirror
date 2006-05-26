@@ -2,7 +2,6 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.bytecode.ClassType;
-import gnu.mapping.*;
 import gnu.expr.*;
 
 /**

@@ -1,5 +1,8 @@
 2006-05-25  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/try_catch.java: Remove unneded import.
+	* kawa/standard/with_compile_options.java: Likewise.
+
 	* build.xml: Major simplification, since the modules in kawa/lib
 	can be named in any order in the compilation command.
 

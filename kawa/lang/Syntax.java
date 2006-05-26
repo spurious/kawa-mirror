@@ -63,7 +63,7 @@ abstract public class Syntax implements Printable, Named
   {
     boolean ok = scanForDefinitions(st, tr.formStack, defs, tr);
     if (! ok)
-      tr.formStack.add(new ErrorExp("syntax error"));
+      tr.formStack.add(new ErrorExp("syntax error expanding "+this));
   }
 
   /** Check if a statement is a definition, for initial pass.

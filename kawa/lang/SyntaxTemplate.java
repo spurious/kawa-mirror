@@ -392,7 +392,7 @@ public class SyntaxTemplate implements Externalizable
 	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
         err.print(" tscope: ");
         err.print(templateScope);
-        if (vars != null)
+        if (false && vars != null)
           {
             err.print(" vars: ");
             for (int i = 0;  i < vars.length;  i++)

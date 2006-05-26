@@ -1,3 +1,10 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Syntax.java (scanForm): Slightly better error message,
+	in case the ErrorEsp is erroneously compiled or evaluated.
+
+	* kawa/lang/SyntaxTemplate.java (execute): Simplify debug logic.
+
 2006-05-23  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxRule.java: Remove unneeded import.

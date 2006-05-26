@@ -88,12 +88,12 @@ implements XMLReader, Locator
 
   public String getPublicId()
   {
-    return null;
+    return xmlParser.getPublicId();
   }
 
   public String getSystemId()
   {
-    return xmlParser.getName(); // ???
+    return xmlParser.getSystemId();
   }
 
   public int getColumnNumber()

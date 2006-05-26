@@ -1,3 +1,7 @@
+2006-05-25  Per Bothner  <per@bothner.com>
+
+	* swing.scm (modle-export): Remove removed frame function.
+
 2006-05-11  Per Bothner  <per@bothner.com>
 
 	* genwrite.scm (generic-write): Remove special handling of atomic types.

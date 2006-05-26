@@ -2,7 +2,7 @@
 	       with-paint with-composite composite-src-over composite-src
 	       button Button Label Column Row Text Window run-application
 	       Image image-read image-width image-height
-	       rotation with-transform color-red frame menubar menu menuitem
+	       rotation with-transform color-red menubar menu menuitem
 	       polygon scroll)
 
 (module-compile-options warn-undefined-variable: #t

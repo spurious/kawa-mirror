@@ -1,3 +1,12 @@
+2006-05-30  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (classfileFormatVersion): New field.
+	(major_version, minor_version): Remove constants.
+	(getClassfileMajorVersion, getClassfileMinorVersion.
+	setClassfileVersion, setClassfileVersionJava5): New me thods.
+	(writeToStream): Write major/minor version values instead of constants
+	* ClassFileInput.java (readHeader): Read and remember version numbers.
+
 2006-05-23  Per Bothner  <per@bothner.com>
 
 	* ClassFileInput.java: Remove unused local variables.

@@ -8,8 +8,25 @@ import java.util.Vector;
 public class ClassType extends ObjectType 
   implements AttrContainer, Externalizable
 {
-  public static final int minor_version = 3;
-  public static final int major_version = 45;
+  // An old but generally valid default value.
+  int classfileFormatVersion = 45 * 0x10000 + 3;
+
+  public short getClassfileMajorVersion ()
+  {
+    return (short) (classfileFormatVersion >> 16);
+  }
+  public short getClassfileMinorVersion ()
+  {
+    return (short) (classfileFormatVersion & 0xFFFF);
+  }
+  public void setClassfileVersion (int major, int minor)
+  {
+    classfileFormatVersion = (major & 0xFFFF) * 0x10000 + (minor * 0xFFFF);
+  }
+  public void setClassfileVersionJava5 ()
+  {
+    setClassfileVersion(49, 0);
+  }
 
   /** Find a ClassType with the given name, or create a new one.
    * Use this for "library classes", where you need the field/method types,
@@ -844,8 +861,8 @@ public class ClassType extends ObjectType
     doFixups ();
 
     dstr.writeInt (0xcafebabe);  // magic
-    dstr.writeShort (minor_version);
-    dstr.writeShort (major_version);
+    dstr.writeShort(getClassfileMinorVersion());
+    dstr.writeShort(getClassfileMajorVersion());
 
     // Write out the constant pool.
     if (constants == null)

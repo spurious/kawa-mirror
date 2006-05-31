@@ -51,8 +51,9 @@ public class ClassFileInput extends DataInputStream
     int magic = readInt();
     if (magic != 0xcafebabe)
       return false;
-    readShort(); // minor_version
-    readShort(); // major_version
+    int minor = readUnsignedShort();
+    int major = readUnsignedShort();
+    ctype.classfileFormatVersion = major * 0x10000 + minor;
     return true;
   }
 

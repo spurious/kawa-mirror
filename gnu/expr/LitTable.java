@@ -242,6 +242,8 @@ public class LitTable implements ObjectOutput
 	  push(obj, Type.float_type);
 	else if (obj instanceof Character)
 	  push(obj, Type.char_type);
+        else if (obj instanceof Class)
+          push(obj, Type.java_lang_Class_type);
 	else
 	  error(obj.getClass().getName()+" does not implement Externalizable");
 	int nargs = stackPointer - oldStack;
@@ -550,13 +552,18 @@ public class LitTable implements ObjectOutput
 	code.emitPushPrimArray(literal.value, (ArrayType) literal.type);
 	store(literal, ignore, code);
       }
+    else if (literal.value instanceof Class)
+      {
+	comp.loadClassRef(((Class) literal.value).getName());
+	store(literal, ignore, code);
+      }
     else if (literal.value instanceof ClassType
 	     && ! ((ClassType) literal.value).isExisting())
       {
 	// We need to special case ClassTypes that are (currently)
 	// non-existing, because the corresponding reflective Class
 	// needs to be loaded using the correct ClassLoader.
-	comp.loadClassRef(((ClassType) literal.value));
+	comp.loadClassRef((ClassType) literal.value);
 	code.emitInvokeStatic(Compilation.typeType.getDeclaredMethod("make", 1));
 	code.emitCheckcast(Compilation.typeClassType);
 	store(literal, ignore, code);

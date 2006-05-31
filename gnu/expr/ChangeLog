@@ -1,3 +1,11 @@
+2006-05-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass): If JAVA5, set appropriate classfile
+	version number.
+	(loadClassRef): If classfile version number is suitable, use ldc on
+	class "literal".
+	* LitTable.java (writeObject, emit): Handle java.lang.Class objects.
+
 2006-05-22  Per Bothner  <per@bothner.com>
 
 	Handle module dependencies and cycles.

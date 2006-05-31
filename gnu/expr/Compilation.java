@@ -1024,6 +1024,9 @@ public class Compilation
         classes[0] = mainClass;
       }
     classes[numClasses++] = new_class;
+    /* #ifdef JAVA5 */
+    // new_class.setClassfileVersionJava5();
+    /* #endif */
   }
 
   public void addMainClass (ModuleExp module)
@@ -2546,14 +2549,13 @@ public class Compilation
   public void loadClassRef (String className)
   {
     CodeAttr code = getCode();
-    // The following conditional should be for JAVA5, but that causes
-    // a verification error I haven't managed to figure out.  FIXME.
-    /* #ifdef false */
-    // code.emitPushClass(className);
-    /* #else */
-    code.emitPushString(className);
-    code.emitInvokeStatic(getForNameHelper());
-    /* #endif */
+    if (curClass.getClassfileMajorVersion() >= 49) // Java5 feature
+      code.emitPushClass(className);
+    else
+      {
+        code.emitPushString(className);
+        code.emitInvokeStatic(getForNameHelper());
+      }
   }
 
   /** Generate a method to find a named Class without initializing it.

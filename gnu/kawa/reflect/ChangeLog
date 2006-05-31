@@ -1,3 +1,7 @@
+2006-05-30  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (inline): Fix bug in handling of "class" pseudo-field.
+
 2006-05-09  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (lookupMember): If null caller - as when evaluating -

@@ -310,8 +310,8 @@ public class DisplayFormat extends AbstractFormat
   void writeReadableSymbol (String sym, Consumer out)
   {
     /* #ifdef use:java.util.regex */
-    // Use |...| if symbol doesn't follow R5RS conventions
-    // for identifiers or has a colon in the interior.
+    /* Use |...| if symbol doesn't follow R5RS conventions
+       for identifiers or has a colon in the interior. */
     if (! r5rsIdentifierMinusInteriorColons.matcher(sym).matches())
       {
         int len = sym.length();

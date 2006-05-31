@@ -1,3 +1,7 @@
+2006-05-31  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (loadCompiled): Use WrapedException.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/try_catch.java: Remove unneded import.

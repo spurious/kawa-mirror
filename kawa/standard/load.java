@@ -39,17 +39,10 @@ public class load extends Procedure1 {
 	if (inst instanceof Runnable)
 	  ((Runnable)inst).run();
       }
-    catch (ClassNotFoundException ex)
+    catch (Throwable ex)
       {
-	throw new RuntimeException ("class not found in load");
-      }
-    catch (InstantiationException ex)
-      {
-	throw new RuntimeException ("class not instantiable: in load");
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new RuntimeException ("class illegal access: in load");
+        throw new WrappedException("exception during load of \""+name+'\"',
+                                   ex);
       }
     finally
       {

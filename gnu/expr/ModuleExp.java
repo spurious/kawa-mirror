@@ -70,7 +70,6 @@ public class ModuleExp extends LambdaExp
         comp.setState(Compilation.WALKED);
         comp.process(Compilation.COMPILED);
 
-	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
 	  return null;
 
@@ -151,14 +150,16 @@ public class ModuleExp extends LambdaExp
   /** Flag to force compilation, even when not required. */
   public static boolean alwaysCompile = false;
 
-  public final static void evalModule (Environment env, CallContext ctx,
-                                       Compilation comp, URL url)
+  public final static boolean evalModule (Environment env, CallContext ctx,
+                                       Compilation comp, URL url,
+                                       OutPort msg)
     throws Throwable
   {
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
     Environment orig_env = Environment.getCurrent();
     Compilation orig_comp = Compilation.getCurrent();
+    SourceMessages messages = comp.getMessages();
     ClassLoader savedLoader = null;
     Thread thread = null; // Non-null if we need to restore context ClassLoader.
     try
@@ -173,18 +174,17 @@ public class ModuleExp extends LambdaExp
 
         comp.walkModule(mexp);
 
-	if (comp.getMessages().seenErrors())
-	  return;
+        if (msg != null ? messages.checkErrors(msg, 20) : messages.seenErrors())
+          return false;
 
 	if (! alwaysCompile && ! comp.mustCompile)
 	  { // optimization - don't generate unneeded Class.
 	    if (Compilation.debugPrintFinalExpr)
 	      {
-		OutPort dout = OutPort.errDefault();
-		dout.println ("[Evaluating final module \""+mexp.getName()+"\":");
-		mexp.print(dout);
-		dout.println(']');
-		dout.flush();
+		msg.println ("[Evaluating final module \""+mexp.getName()+"\":");
+		mexp.print(msg);
+		msg.println(']');
+		msg.flush();
 	      }
 	    mexp.body.apply(ctx);
 	  }
@@ -197,7 +197,7 @@ public class ModuleExp extends LambdaExp
 	      {
 		Class clas = evalToClass(comp, url);
 		if (clas == null)
-		  return;
+		  return false;
                 try
                   {
                     thread = Thread.currentThread();
@@ -257,6 +257,9 @@ public class ModuleExp extends LambdaExp
 			env.addLocation(sym, property, loc);
 		      }
 		  }
+                if (msg != null ? messages.checkErrors(msg, 20)
+                    : messages.seenErrors())
+                  return false;
                 if (inst instanceof ModuleBody)
                   ((ModuleBody) inst).run(ctx);
 	      }
@@ -276,6 +279,7 @@ public class ModuleExp extends LambdaExp
         if (thread != null)
           thread.setContextClassLoader(savedLoader);
       }
+    return true;
   }
 
   /** Call-back from compiled code to initialize literals in immediate mode.

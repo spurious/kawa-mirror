@@ -1,3 +1,10 @@
+2006-05-31  Per Bothner  <per@bothner.com>
+
+	Fix so warnings get printed before evaluation.
+	* ModuleExp.java (evalModule): Take extra err parameter.
+	If non-null, use it to display warnings and errors.  Return boolean.
+	* Language.java (eval): Update ModuleExp.evalModule call.
+
 2006-05-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (addClass): If JAVA5, set appropriate classfile

@@ -118,7 +118,7 @@ public class load extends Procedure1 {
 	  {
 	    ctx.consumer = out;
 	    ctx.values = Values.noArgs;
-	    ModuleExp.evalModule(env, ctx, comp, url);
+	    ModuleExp.evalModule(env, ctx, comp, url, null);
 	    if (messages.seenErrors())
 	      throw new SyntaxException(messages);
 	  }

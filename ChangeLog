@@ -1,5 +1,11 @@
 2006-05-31  Per Bothner  <per@bothner.com>
 
+	* kawa/Shell.java (run): Update to use new ModuleExp.evalModule call.
+	This handles printing of errors - and now also warnings.
+	Plus remove redundant runUntilDone.
+	* kawa/lang/Eval.java (evalBody): Update ModuleExp.evalModule call.
+	* kawa/standard/load.java (loadSource): Likewise.
+
 	* kawa/standard/load.java (loadCompiled): Use WrapedException.
 
 2006-05-25  Per Bothner  <per@bothner.com>

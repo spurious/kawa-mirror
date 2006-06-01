@@ -227,10 +227,8 @@ public class Shell
 		      }
 		  }
 
-		ModuleExp.evalModule(env, ctx, comp, url);
-		if (messages.checkErrors(perr, 20))
+		if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
 		  continue;
-		ctx.runUntilDone();
 		if (ch < 0)
 		  break;
 	      }

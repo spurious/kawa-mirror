@@ -1,3 +1,7 @@
+2006-05-31  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (eval): Update ModuleExp.evalModule call.
+
 2006-05-21  Per Bothner  <per@bothner.com>
 
 	* expected-1.errs: Update for fixed typo in error message.

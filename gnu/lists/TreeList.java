@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -101,6 +101,7 @@ public class TreeList extends AbstractSequence
   // 0xF113 COMMENT
   // 0xF114 PROCESSING_INSTRUCTION
   // 0xF115 CDATA_SECTION
+  // 0xF116 JOINER
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -194,6 +195,9 @@ public class TreeList extends AbstractSequence
    * [comment text], (length) number of characters.
    */
   static final int CDATA_SECTION = 0xF115;
+
+  /** Suppress spacing between non-node items. */
+  static final int JOINER = 0xF116;
 
   /** The beginning of an attribute.
    * [BEGIN_ATTRIBUTE_LONG]
@@ -676,15 +680,25 @@ public class TreeList extends AbstractSequence
     return false;
   }
 
+  protected void writeJoiner ()
+  {
+    ensureSpace(1);
+    data[gapStart++] = JOINER;
+  }
+
   public void writeChars(String str)
   {
     int len = str.length();
+    if (len == 0)
+      writeJoiner();
     for (int i = 0;  i < len;  i++)
       writeChar(str.charAt(i));
   }
 
   public void write(char[] buf, int off, int len)
   {
+    if (len == 0)
+      writeJoiner();
     ensureSpace(len);
     while (len > 0)
       {
@@ -810,7 +824,7 @@ public class TreeList extends AbstractSequence
 	    int end = getIntN(index+3);
 	    index = end + (end < 0 ? data.length : index);
 	  }
-	else if (datum == END_ATTRIBUTE)
+	else if (datum == END_ATTRIBUTE || datum == JOINER)
 	  index++;
 	else if (datum == BASE_URI)
 	  index += 3;
@@ -1032,6 +1046,8 @@ public class TreeList extends AbstractSequence
 	      pos += 2;
 	      if (out instanceof XConsumer)
 		((XConsumer) out).writeCDATA(data, pos, length);
+              else
+                out.write(data, pos, length);
 	      pos += length;
 	    }
 	    continue;
@@ -1050,6 +1066,9 @@ public class TreeList extends AbstractSequence
 	  case BOOL_TRUE:
 	    out.writeBoolean(datum != BOOL_FALSE);
 	    continue;
+          case JOINER:
+            out.writeChars("");
+            continue;
 	  case CHAR_FOLLOWS:
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
 	    pos++;
@@ -1252,6 +1271,8 @@ public class TreeList extends AbstractSequence
 	    if (seen) sbuf.append(sep); else seen = true;
 	    sbuf.append(datum != BOOL_FALSE);
 	    continue;
+          case JOINER:
+            continue;
 	  case CHAR_FOLLOWS:
 	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
 	    sbuf.append(data, pos, 1 + datum - CHAR_FOLLOWS);
@@ -1429,6 +1450,7 @@ public class TreeList extends AbstractSequence
       case POSITION_REF_FOLLOWS: // FIXME	
       case POSITION_PAIR_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
+      case JOINER: // FIXME
       default:
 	return Sequence.OBJECT_VALUE;
       }
@@ -1579,6 +1601,8 @@ public class TreeList extends AbstractSequence
       case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
 	return objects[getIntN(index+1)];
+      case JOINER:
+        return "";
       case POSITION_PAIR_FOLLOWS: //FIXME
 	AbstractSequence seq = (AbstractSequence) objects[getIntN(index+1)];
 	ipos = getIntN(index+3);
@@ -1611,6 +1635,7 @@ public class TreeList extends AbstractSequence
       return -1;
     char datum = data[index];
     index++;
+    boolean spaceNeeded = false;
     if (datum <= MAX_CHAR_SHORT)
       {
 	sbuf.append(datum);
@@ -1619,7 +1644,10 @@ public class TreeList extends AbstractSequence
     if (datum >= OBJECT_REF_SHORT
 	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
       {
+        if (spaceNeeded)
+          sbuf.append(' ');
 	value = objects[datum-OBJECT_REF_SHORT];
+        spaceNeeded = false;
       }
     else if (datum >= BEGIN_GROUP_SHORT
 	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
@@ -1658,21 +1686,37 @@ public class TreeList extends AbstractSequence
 	    }
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
+            if (spaceNeeded)
+              sbuf.append(' ');
 	    sbuf.append(datum != BOOL_FALSE);
+            spaceNeeded = true;
 	    return index;
 	  case INT_FOLLOWS:
+            if (spaceNeeded)
+              sbuf.append(' ');
 	    sbuf.append(getIntN(index));
+            spaceNeeded = true;
 	    return index + 2;
 	  case LONG_FOLLOWS:
+            if (spaceNeeded)
+              sbuf.append(' ');
 	    sbuf.append(getLongN(index));
+            spaceNeeded = true;
 	    return index + 4;
 	  case FLOAT_FOLLOWS:
+            if (spaceNeeded)
+              sbuf.append(' ');
 	    sbuf.append(Float.intBitsToFloat(getIntN(index)));
+            spaceNeeded = true;
 	    return index + 2;
 	  case DOUBLE_FOLLOWS:
+            if (spaceNeeded)
+              sbuf.append(' ');
 	    sbuf.append(Double.longBitsToDouble(getLongN(index)));
+            spaceNeeded = true;
 	    return index + 4;
 	  case CHAR_FOLLOWS:
+            spaceNeeded = false;
 	    sbuf.append(data[index]);
 	    return index + 1;
 	  case BEGIN_DOCUMENT:
@@ -1681,11 +1725,15 @@ public class TreeList extends AbstractSequence
 	    index = j + (j < 0 ? data.length + 1 : index);
 	    break;
 	  case BEGIN_GROUP_LONG:	
+            spaceNeeded = false;
 	    doChildren = index + 2;
 	    j = getIntN(index);
 	    j += j < 0 ? data.length : index-1;
 	    index = j + 7;
 	    break;
+          case JOINER:
+            spaceNeeded = false;
+            break;
 	  case END_GROUP_SHORT:
 	  case END_GROUP_LONG:
 	  case END_ATTRIBUTE:
@@ -1783,6 +1831,9 @@ public class TreeList extends AbstractSequence
 	  case BASE_URI:
 	    pos += 3;
 	    break;
+          case JOINER:
+            pos += 1;
+            break;
 	  case PROCESSING_INSTRUCTION:
 	  case COMMENT:
 	  case BEGIN_DOCUMENT:
@@ -1914,6 +1965,9 @@ public class TreeList extends AbstractSequence
 	    next = pos + 1;
 	    if (checkText) break;
 	    continue;
+          case JOINER:
+	    next = pos + 1;
+            continue;
 	  case LONG_FOLLOWS:
 	  case DOUBLE_FOLLOWS:
 	    next = pos + 5;
@@ -2000,6 +2054,7 @@ public class TreeList extends AbstractSequence
 	return  j + 1;
       case BOOL_FALSE:
       case BOOL_TRUE:
+      case JOINER:
 	return pos;
       case CHAR_FOLLOWS:
 	return pos + 1;
@@ -2251,6 +2306,7 @@ public class TreeList extends AbstractSequence
 			break;
 		      case BOOL_FALSE: out.print("= false");  break;
 		      case BOOL_TRUE:  out.print("= true");  break;
+		      case JOINER:  out.print("= joiner");  break;
 		      case CHAR_FOLLOWS:
 			out.print("=CHAR_FOLLOWS"); toskip = 1;  break;
 		      case CHAR_PAIR_FOLLOWS:

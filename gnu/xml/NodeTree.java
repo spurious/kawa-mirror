@@ -19,6 +19,8 @@ public class NodeTree extends TreeList
     seq.consumeNext(ipos, this);
   }
 
+  int gapStartLastAtomic = -1;
+
   /** If v is a node, make a copy of it. */
   public void writeObject(Object v)
   {
@@ -29,8 +31,24 @@ public class NodeTree extends TreeList
       }
     else if (v instanceof TreeList)
       ((TreeList) v).consume(this);
-    else // Atomize.
-      MakeText.text$C(v, this);
+    // Using super.writeObject would be nice, but there are edge cases.
+    // Specifically, atomic nodes with a zero-length string-value.
+    // Handling that case correctly and efficiently is left for later.  FIXME.
+    // else
+    //  super.writeObject(v);
+    else
+      {
+        if (gapStartLastAtomic == gapStart)
+          writeChar(' ');
+        MakeText.text$C(v, this);  // Atomize.
+        gapStartLastAtomic = gapStart;
+      }
+  }
+
+  protected void writeJoiner ()
+  {
+    gapStartLastAtomic = -1;
+    super.writeJoiner();
   }
 
   public int nextPos (int position)

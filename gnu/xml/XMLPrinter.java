@@ -608,38 +608,39 @@ public class XMLPrinter extends PrintConsumer
 
   public void writeChars(String str)
   {
+    prev = '-';
     int len = str.length();
     if (len == 0)
       return;
     closeTag();
     for (int i = 0;  i < len;  i++)
       writeChar(str.charAt(i));
-    prev = '-';
   }
 
   public void write(char[] buf, int off, int len)
   {
-    if (len <= 0)
-      return;
-    closeTag();
-    int limit = off + len;
-    int count = 0;
-    while (off < limit)
+    if (len > 0)
       {
-	char c = buf[off++];
-	if (c >= 127 || c == '\n' || c == '\r' || c == '<' || c == '>'
-	    || c == '&' || (c == '"' && inAttribute))
-	  {
-	    if (count > 0)
-	      super.write(buf, off - 1 - count, count);
-	    writeChar(c);
-	    count = 0;
-	  }
-	else
-	  count++;
+        closeTag();
+        int limit = off + len;
+        int count = 0;
+        while (off < limit)
+          {
+            char c = buf[off++];
+            if (c >= 127 || c == '\n' || c == '\r' || c == '<' || c == '>'
+                || c == '&' || (c == '"' && inAttribute))
+              {
+                if (count > 0)
+                  super.write(buf, off - 1 - count, count);
+                writeChar(c);
+                count = 0;
+              }
+            else
+              count++;
+          }
+        if (count > 0)
+          super.write(buf, limit - count, count);
       }
-    if (count > 0)
-      super.write(buf, limit - count, count);
     prev = '-';
   }
 

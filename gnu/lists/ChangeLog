@@ -1,3 +1,13 @@
+2006-06-04  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (JOINER): New constant.
+	(writeJoiner): New method.
+	(writeChars, write): Call writeJoiner if no characters.
+	(gotoChildrenStart): Skip bogus/pointless initial JOINER.
+	(stringValue): Add spaces between atomic items.
+	(nextNodeIndex, nextMatching): Skip JOINER.
+	(nextDataIndex, dump): Handle JOINER.
+
 2006-04-13  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (beginGroup):  Fix error in "popping" currentParent.

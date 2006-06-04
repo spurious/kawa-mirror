@@ -30,7 +30,7 @@ public class CastableAs extends InstanceOf
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    exp = Invoke.inlineClassName(exp, 0, (InlineCalls) walker);
+    exp = Invoke.inlineClassName(exp, 1, (InlineCalls) walker);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp))
       return exp;

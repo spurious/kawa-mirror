@@ -1,3 +1,8 @@
+2006-06-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Getting Kawa): Update to discuss Subversion rather than
+	CVS.
+
 2006-04-10  Dean Ferreyra <dferreyra@igc.org>
 
 	* kawa.texi (Options): Document mew

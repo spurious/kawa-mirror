@@ -136,18 +136,19 @@ The same sources are available as a zip file
 A ready-to-run @code{.jar} archive of the pre-compiled classes is in
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.
 
-You can also check out the very latest version via anonymous cvs.
+The Kawa sources are managed using a
+@uref{http://subversion.tigris.org/,Subversion (svn)} repository.
+If you want the very latest version grab
+@uref{http://subversion.tigris.org/project_packages.html,an svn client},
+and then check out the source using this command:
 @example
-cvs -d :pserver:anoncvs@@sources.redhat.com:/cvs/kawa login
-     (password is ``anoncvs'')
-cvs -d :pserver:anoncvs@@sources.redhat.com:/cvs/kawa co kawa
+svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
 @end example
 
-Once you have it checked out, you can update it with @code{cvs update}.
+Once you have it checked out, you can keep it up-to-date with @code{svn update}.
 
 You can also
-@uref{http://sources.redhat.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
-the cvs archive} via cvsweb.
+@uref{http://sourceware.org/viewvc/kawa/,browse the svn archive} via viewvc.
 
 Before installing Kawa, you must have Java working on your
 system.

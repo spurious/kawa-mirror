@@ -1,3 +1,7 @@
+2006-06-06  Per Bothner  <per@bothner.com>
+
+	* srfi-64-test.scm: Updates for srfi-64 implementation changes.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* cycle1.scm: New test fiels for mutually dependent modules.

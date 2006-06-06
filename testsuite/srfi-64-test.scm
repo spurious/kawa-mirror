@@ -51,9 +51,10 @@
 
 ;;;
 ;;;  The `triv-runner' invokes `thunk'
-;;;  and returns a list of 5 lists, each of which
-;;;  is a list of the names of the tests that, respectively,
-;;;  PASS, FAIL, XFAIL, XPASS, and SKIP
+;;;  and returns a list of 6 lists, the first 5 of which
+;;;  are a list of the names of the tests that, respectively,
+;;;  PASS, FAIL, XFAIL, XPASS, and SKIP.
+;;;  The last item is a list of counts.
 ;;;
 
 (define (triv-runner thunk)
@@ -70,6 +71,11 @@
        (error (string-append "bad count " (number->string count)
 			     " but expected "
 			     (number->string expected-count)))))
+    (test-runner-on-bad-end-name!
+     r
+     (lambda (runner begin end)
+       (error (string-append "bad end grojup name " end
+			     " but expected " begin))))
     (test-runner-on-test-end! 
      r 
      (lambda (runner)
@@ -399,7 +405,6 @@
                (test-assert "y" #t)             ; 3 SKIP(COUNT)
                (test-assert "z" #t))))          ; 4
 
-(test-expect-fail 1)
 (test-equal "5.3.2. disjunction is commutative"
             '(("v" "w" "z") () () () ("x" "y") (3 0 0 0 2))
             (triv-runner
@@ -427,7 +432,6 @@
                (test-assert "y" #t)             ; 3 SKIP(COUNT)
                (test-assert "z" #t))))          ; 4
 
-(test-expect-fail 1)
 (test-equal "5.4.2. conjunction is commutative"
             '(("v" "w" "y" "z") () () () ("x") (4 0 0 0 1))
             (triv-runner

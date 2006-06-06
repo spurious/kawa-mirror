@@ -12,41 +12,69 @@ public class export extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Object list = st.cdr;
-    if (defs instanceof ModuleExp)
+    Object savePos = tr.pushPositionOf(st);
+    try
       {
-	((ModuleExp) defs).setFlag(ModuleExp.EXPORT_SPECIFIED);
-      }
-    else
-      {
-	tr.error('e', "\'" + getName() + "\' not at module level");
-	return true;
-      }
-    while (list != LList.Empty)
-      {
-        Object symbol;
-	if (! (st instanceof Pair)
-	    || ! ((symbol = (st = (Pair) list).car) instanceof String
-                  || (symbol instanceof gnu.mapping.Symbol)))
-	  {
-	    tr.error('e', "invalid syntax in '" + getName() + '\'');
-	    return false;
-	  }
-        if (symbol instanceof String)
+        if (defs instanceof ModuleExp)
+          ((ModuleExp) defs).setFlag(ModuleExp.EXPORT_SPECIFIED);
+        else
           {
-            String str = (String) symbol;
-            if (str.startsWith("namespace:"))
-              {
-                tr.error('w', "'namespace:' prefix ignored");
-                symbol = str.substring(10).intern();
-              }
+            tr.error('e', "\'" + getName() + "\' not at module level");
+            return true;
           }
-	Declaration decl = defs.getNoDefine(symbol);
-	if (decl.getFlag(Declaration.NOT_DEFINING))
-	  Translator.setLine(decl, st);
-	decl.setFlag(Declaration.EXPORT_SPECIFIED);
-	list = st.cdr;
+        SyntaxForm restSyntax = null;
+        while (list != LList.Empty)
+          {
+            tr.pushPositionOf(list);
+            while (list instanceof SyntaxForm)
+              {
+                restSyntax = (SyntaxForm) list;
+                list = restSyntax.form;
+              }
+            SyntaxForm nameSyntax = restSyntax;
+            if (list instanceof Pair)
+              {
+                st = (Pair) list;
+                Object symbol = st.car;
+                while (symbol instanceof SyntaxForm)
+                  {
+                    nameSyntax = (SyntaxForm) symbol;
+                    symbol = nameSyntax.form;
+                  }
+                if (symbol instanceof String)
+                  {
+                    String str = (String) symbol;
+                    if (str.startsWith("namespace:"))
+                      {
+                        tr.error('w', "'namespace:' prefix ignored");
+                        symbol = str.substring(10).intern();
+                      }
+                  }
+                if (symbol instanceof String
+                    || symbol instanceof gnu.mapping.Symbol)
+                  {
+                    if (nameSyntax != null)
+                      {
+                        // Difficult to implement correctly.  And probably
+                        // not much point in doing so.  FIXME.
+                      }
+                    Declaration decl = defs.getNoDefine(symbol);
+                    if (decl.getFlag(Declaration.NOT_DEFINING))
+                      Translator.setLine(decl, st);
+                    decl.setFlag(Declaration.EXPORT_SPECIFIED);
+                    list = st.cdr;
+                    continue;
+                  }
+              }
+            tr.error('e', "invalid syntax in '" + getName() + '\'');
+            return false;
+          }
+        return true;
       }
-    return true;
+    finally
+      {
+        tr.popPositionOf(savePos);
+      }
   }
 
   public Expression rewriteForm (Pair form, Translator tr)

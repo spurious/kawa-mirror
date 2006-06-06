@@ -1,3 +1,9 @@
+2006-06-05  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/export.java (scanForDefinitions): Set and later restore
+	current position on exach Pair, for more precise error messages.
+	Also, put in partial support for SyntaxForm inputs.
+
 2006-05-31  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run): Update to use new ModuleExp.evalModule call.

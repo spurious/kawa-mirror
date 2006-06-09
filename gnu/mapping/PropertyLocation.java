@@ -4,7 +4,7 @@ import gnu.lists.*;
 /** Used to implement Lisp-style "property lists".
  * A <code>PropertyLocation</code> is a location whose value is the
  * <code>car</code> of a property list.
- * This class also contaisn a number of static methods useful for
+ * This class also contains a number of static methods useful for
  * working with property lists.
  */
 

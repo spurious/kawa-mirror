@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.Compilation;
 
-public class Record extends NameMap
+public class Record
 {
   public String getTypeName()
   {

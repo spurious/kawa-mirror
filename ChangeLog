@@ -1,5 +1,7 @@
 2006-06-09  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Record.java: No longer implement gnu.mapping.NameMap.
+
 	* kawa/repl.java (compileFiles): Print line number if unexpected
 	exception.
 

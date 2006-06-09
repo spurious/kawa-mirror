@@ -5,12 +5,12 @@ import gnu.mapping.InPort;
 public class FileUtils
 {
   /* #ifndef JAVA2 */
-  static private int tempFileNumber;
+  // static private int tempFileNumber;
   /* #endif */
 
   public static
   /* #ifndef JAVA2 */
-  synchronized
+  // synchronized
   /* #endif */
   File createTempFile (String format)
     throws java.io.IOException

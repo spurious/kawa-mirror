@@ -26,7 +26,7 @@
 (test "complex" record-type-name complex)
 (test '(re im) record-type-field-names complex)
 
-(test 20 'set! (begin (set! (z 'im) 15) (+ (z 're) (z 'im))))
+(test 20 'set! (begin (set! z:im 15) (+ z:re z:im)))
 
 ;; Check name mangling and demangling of records.
 (define funny-record (make-record-type 'lispy-name->foo!? '(a! b-c)))
@@ -36,8 +36,8 @@
 (define make-funny-record2 (record-constructor funny-record '(b-c a!)))
 (define lt1 (make-funny-record1 10 12))
 (test 10 'accessor21 ((record-accessor funny-record 'a!) lt1))
-((record-modifier funny-record 'b-c) lt1 (+ 2 (lt1 'b-c)))
-(set! (lt1 'a!) 9)
+((record-modifier funny-record 'b-c) lt1 (+ 2 lt1:b-c))
+(set! lt1:a! 9)
 (test (make-funny-record2 14 9) 'funny-record lt1)
 
 (test '(10 \10 20 \20) 'object-with-field-1

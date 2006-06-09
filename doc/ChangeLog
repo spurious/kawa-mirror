@@ -1,7 +1,7 @@
 2006-06-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Getting Kawa): Improve sectioning.
-	Discus how to handle proxies - thanks to david.ocallaghan@cs.tcd.ie.
+	Discuss how to handle proxies - thanks to david.ocallaghan@cs.tcd.ie.
 
 2006-06-06  Per Bothner  <per@bothner.com>
 

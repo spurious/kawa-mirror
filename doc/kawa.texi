@@ -124,6 +124,9 @@ This package has nothing to do with the defunct
 @node Getting Kawa, Running Java, , Installation
 @section Getting Kawa
 
+You can compile Kawa from the source distribution.
+Alternatively, you can install the pre-compiled binary distribution.
+
 You can get Kawa sources and binaries from the Kawa ftp site
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/},
 or from a @uref{http://www.gnu.org/order/ftp.html,mirror site}.
@@ -136,6 +139,8 @@ The same sources are available as a zip file
 A ready-to-run @code{.jar} archive of the pre-compiled classes is in
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.
 
+@subsection Getting the development sources using SVN
+
 The Kawa sources are managed using a
 @uref{http://subversion.tigris.org/,Subversion (svn)} repository.
 If you want the very latest version grab
@@ -145,21 +150,25 @@ and then check out the source using this command:
 svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
 @end example
 
+If you're beyond a firewall or HTTP proxy, you can edit
+@code{http-proxy-host} and @code{http-proxy-port}
+in @code{~/.subversion/servers} as described
+@uref{http://subversion.tigris.org/faq.html#proxy, here},.
+and then do:
+@example
+svn -q checkout http://sourceware.org/svn/kawa/trunk kawa
+@end example
+
 Once you have it checked out, you can keep it up-to-date with @code{svn update}.
 
 You can also
 @uref{http://sourceware.org/viewvc/kawa/,browse the svn archive} via viewvc.
 
-Before installing Kawa, you must have Java working on your
-system.
-
-You can compile Kawa from the source distribution.
-Alternatively, you can install the pre-compiled binary distribution.
-
 @node Running Java, Binary distribution, Getting Kawa, Installation
 @section Getting and running Java
 
-You will need a working Java system.  Kawa has been reported to
+Before installing Kawa, you will need a working Java system.
+Kawa has been reported to
 work with JDK from 1.1 through 1.6.0-beta, Kaffe, Symantec Cafe, J++, and GCJ.
 The released Kawa jar file assumes some JDK 1.4 functionality.
 If those features are missing, you may need to build Kawa from source.

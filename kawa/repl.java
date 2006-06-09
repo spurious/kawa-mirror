@@ -797,7 +797,19 @@ public class repl extends Procedure0or1
           }
         catch (Throwable ex)
           {
-            System.err.println("Internal error while compiling "+arg);
+            StringBuffer sbuf = new StringBuffer();
+            String file = comp.getFile();
+            int line = comp.getLine();
+            if (file != null && line > 0)
+              {
+                sbuf.append(file);
+                sbuf.append(':');
+                sbuf.append(line);
+                sbuf.append(": ");
+              }
+            sbuf.append("internal error while compiling ");
+            sbuf.append(arg);
+            System.err.println(sbuf.toString());
             ex.printStackTrace(System.err);
             System.exit(-1);
           }

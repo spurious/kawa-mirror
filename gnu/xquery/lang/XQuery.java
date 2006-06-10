@@ -606,53 +606,53 @@ public class XQuery extends Language
     define_method("in-scope-prefixes", "gnu.xquery.util.NodeUtils",
                   "inScopePrefixes$X");
 
-    define_method("years-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("years-from-duration", "gnu.xquery.util.TimeUtils",
                   "yearsFromDuration");
-    define_method("months-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("months-from-duration", "gnu.xquery.util.TimeUtils",
                   "monthsFromDuration");
-    define_method("days-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("days-from-duration", "gnu.xquery.util.TimeUtils",
                   "daysFromDuration");
-    define_method("hours-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("hours-from-duration", "gnu.xquery.util.TimeUtils",
                   "hoursFromDuration");
-    define_method("minutes-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("minutes-from-duration", "gnu.xquery.util.TimeUtils",
                   "minutesFromDuration");
-    define_method("seconds-from-duration", "gnu.xquery.utils.TimeUtils",
+    define_method("seconds-from-duration", "gnu.xquery.util.TimeUtils",
                   "secondsFromDuration");
-    define_method("year-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("year-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "yearFromDateTime");
-    define_method("month-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("month-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "monthFromDateTime");
-    define_method("day-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("day-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "dayFromDateTime");
-    define_method("hours-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("hours-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "hoursFromDateTime");
-    define_method("minutes-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("minutes-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "minutesFromDateTime");
-    define_method("seconds-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("seconds-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "secondsFromDateTime");
-    define_method("timezone-from-dateTime", "gnu.xquery.utils.TimeUtils",
+    define_method("timezone-from-dateTime", "gnu.xquery.util.TimeUtils",
                   "timezoneFromDateTime");
-    define_method("year-from-date", "gnu.xquery.utils.TimeUtils",
+    define_method("year-from-date", "gnu.xquery.util.TimeUtils",
                   "yearFromDate");
-    define_method("month-from-date", "gnu.xquery.utils.TimeUtils",
+    define_method("month-from-date", "gnu.xquery.util.TimeUtils",
                   "monthFromDate");
-    define_method("day-from-date", "gnu.xquery.utils.TimeUtils",
+    define_method("day-from-date", "gnu.xquery.util.TimeUtils",
                   "dayFromDate");
-    define_method("timezone-from-date", "gnu.xquery.utils.TimeUtils",
+    define_method("timezone-from-date", "gnu.xquery.util.TimeUtils",
                   "timezoneFromDate");
-    define_method("hours-from-time", "gnu.xquery.utils.TimeUtils",
+    define_method("hours-from-time", "gnu.xquery.util.TimeUtils",
                   "hoursFromTime");
-    define_method("minutes-from-time", "gnu.xquery.utils.TimeUtils",
+    define_method("minutes-from-time", "gnu.xquery.util.TimeUtils",
                   "minutesFromTime");
-    define_method("seconds-from-time", "gnu.xquery.utils.TimeUtils",
+    define_method("seconds-from-time", "gnu.xquery.util.TimeUtils",
                   "secondsFromTime");
-    define_method("timezone-from-time", "gnu.xquery.utils.TimeUtils",
+    define_method("timezone-from-time", "gnu.xquery.util.TimeUtils",
                   "timezoneFromTime");
-    define_method("adjust-dateTime-to-timezone", "gnu.xquery.utils.TimeUtils",
+    define_method("adjust-dateTime-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustDateTimeToTimezone"); // overloaded
-    define_method("adjust-date-to-timezone", "gnu.xquery.utils.TimeUtils",
+    define_method("adjust-date-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustDateTimeToTimezone"); // overloaded
-    define_method("adjust-time-to-timezone", "gnu.xquery.utils.TimeUtils",
+    define_method("adjust-time-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustDateTimeToTimezone"); // overloaded
 
     define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");

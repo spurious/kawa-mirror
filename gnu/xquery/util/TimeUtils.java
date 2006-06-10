@@ -1,4 +1,4 @@
-package gnu.xquery.utils;
+package gnu.xquery.util;
 import gnu.kawa.xml.*;
 import gnu.math.*;
 import gnu.mapping.WrongType;

@@ -1,3 +1,7 @@
+2006-06-10  Per Bothner  <per@bothner.com>
+
+	* TimeUtils.java: Fix typo in package statement.
+
 2006-06-04  Per Bothner  <per@bothner.com>
 
 	* CastableAs.java (inline): Fix thinko.

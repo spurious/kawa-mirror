@@ -1,3 +1,8 @@
+2006-06-10  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Fix packages names for functions in
+	TimeUtils class.
+
 2006-05-31  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (evalToFocusProc): Update ModuleExp.evalModule call.

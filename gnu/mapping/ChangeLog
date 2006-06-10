@@ -1,3 +1,17 @@
+2006-06-09  Per Bothner  <per@bothner.com>
+
+	* PropertySet.java: New class, implements Named.
+	(properties, nameKey, getName, getSymbol, setSymbol, setName,
+	getProperty, setProperty, removeProperty): Move fields and methods
+	from Procedure to here.
+	* Procedure.java: Change to extends PropertySet.  Remove moved methods.
+	(name): Remove deprecated method.
+	* Environment.java: Extend PropertySet, rather than NameMap
+	and thence indirectly Procedure.
+	(getChecked): New method, moved from NameMap.
+	* NameMap.java: Remove no-longer-needed class.
+	* Makefile.am: Update accordingly.
+
 2006-05-20  Per Bothner  <per@bothner.com>
 
 	* InheritingEnvironment.java (lookup): Explictly check isBound.

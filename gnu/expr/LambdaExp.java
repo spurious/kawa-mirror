@@ -1705,7 +1705,7 @@ public class LambdaExp extends ScopeExp
 
   public synchronized void setProperty(Object key, Object value)
   {
-    properties = Procedure.setProperty(properties, key, value);
+    properties = PropertySet.setProperty(properties, key, value);
   }
 
   /** If non-null, the type of values returned by this function.

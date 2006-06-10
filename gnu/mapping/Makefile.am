@@ -18,7 +18,6 @@ java_sources=\
   LocationProc.java \
   LogWriter.java \
   MethodProc.java \
-  NameMap.java \
   Named.java \
   NamedLocation.java \
   Namespace.java \
@@ -38,6 +37,7 @@ java_sources=\
   ProcedureN.java \
   ProcLocation.java \
   PropertyLocation.java \
+  PropertySet.java \
   ReadOnlyLocation.java \
   RunnableClosure.java \
   Setter.java \

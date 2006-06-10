@@ -10,7 +10,7 @@ import java.util.Hashtable;
  */
 
 public abstract class Environment
-  extends NameMap
+  extends PropertySet
   // implements java.util.map.Map<EnvironmentKey, Object>
 {
   static Environment global;
@@ -158,6 +158,18 @@ public abstract class Environment
     return isBound(sym, property);
   }
 
+  /** Get the value bound to the given name.
+   * @exception gnu.mapping.UnboundLocationException the name has no binding
+   * @see Environment#get(Object)
+   */
+  public final Object getChecked(String name)
+  {
+    Object value = get(name, Location.UNBOUND);
+    if (value == Location.UNBOUND)
+      throw new UnboundLocationException(name+" in "+this);
+    return value;
+  }
+
   public Object get (Symbol key, Object property, Object defaultValue)
   {
     Location loc = lookup(key, property);
@@ -201,6 +213,11 @@ public abstract class Environment
     return val;
   }
 
+  /** Get the value bound to the given name.
+   * Returns null if the name has no binding
+   * (for compatibility with Java2 Collections framework).
+   * @see Environment#getChecked(String)
+   */
   public final Object get (Object key)
   {
     Object property = null;

@@ -1,3 +1,9 @@
+2006-06-09  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (setProperty): Update name to new PropertySet.
+	* ProcInitializer.java (emitLoadModuleMethod): The setProperty method
+	is now in the new class PropertySet, rather than in Procedure.
+
 2006-05-31  Per Bothner  <per@bothner.com>
 
 	Fix so warnings get printed before evaluation.

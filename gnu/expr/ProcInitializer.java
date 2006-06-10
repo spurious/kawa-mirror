@@ -90,7 +90,7 @@ public class ProcInitializer extends Initializer
                   ((Expression) val).compile(comp, target);
                 else
                   comp.compileConstant(val, target);
-		Method m = (Compilation.typeProcedure
+		Method m = (ClassType.make("gnu.mapping.PropertySet")
 			    .getDeclaredMethod("setProperty", 2));
 		code.emitInvokeVirtual(m);
 	      }

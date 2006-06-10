@@ -17,7 +17,7 @@ import java.io.*;
  */
 
 public class Namespace
-  implements Externalizable
+  implements Externalizable, HasNamedParts
 {
   /** Map namepsace names (and nick-names) to Namespaces. */
   static final Hashtable nsTable = new Hashtable(50);
@@ -82,6 +82,11 @@ public class Namespace
 	nsTable.put(name, ns);
 	return ns;
       }
+  }
+
+  public Object get (String name)
+  {
+    return Environment.getCurrent().get(getSymbol(getName()));
   }
 
   /** Get a Symbol matching the given name.

@@ -8,6 +8,7 @@ java_sources=\
   Environment.java \
   EnvironmentKey.java \
   Future.java \
+  HasNamedParts.java \
   HasSetter.java \
   IndirectableLocation.java \
   InheritingEnvironment.java \

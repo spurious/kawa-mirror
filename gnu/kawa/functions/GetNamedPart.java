@@ -216,61 +216,60 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     return getNamedPart(container, sym);
   }
 
+  public static Object getTypePart (Type type, String name)
+    throws Throwable
+  {
+    if (name.equals(CLASSTYPE_FOR))
+      return type;
+
+    if (type instanceof ObjectType)
+      {
+        if (name.equals(INSTANCEOF_METHOD_NAME))
+          return new NamedPart(type, name, 'I');
+        if (name.equals(CAST_METHOD_NAME))
+          return new NamedPart(type, name, 'C');
+        if (name.equals("new"))
+          return new NamedPart(type, name, 'N');
+        if (name.equals(".length")
+            || (name.length() > 1 && name.charAt(0) == '.'
+                && type instanceof ClassType))
+          return new NamedPart(type, name, 'D');
+      }
+
+    if (type instanceof ClassType)
+      {
+        try
+          {
+            return gnu.kawa.reflect.SlotGet.staticField(type, name);
+          }
+        catch (Throwable ex)
+          {
+            // FIXME!
+          }
+        return ClassMethods.apply(ClassMethods.classMethods, type, name);
+      }
+    return getMemberPart(type, name);
+  }
+
   public static Object getNamedPart (Object container, Symbol part)
     throws Throwable
   {
-    /*
-    if (container implements HasNamedParts)
-      return ((HasNamedParts) container).getNamedPart(part);
-    */
     String name = part.getName();
-    if (container instanceof Namespace)
-      {
-        Namespace ns = (Namespace) container;
-        String uri = ns.getName();
-        if (uri.startsWith("class:"))
-          container = ClassType.make(uri.substring(6));
-        else
-          return Environment.getCurrent().get(ns.getSymbol(name));
-      }
+    if (container instanceof HasNamedParts)
+      return ((HasNamedParts) container).get(name);
     if (container instanceof Class)
       container = (ClassType) Type.make((Class) container);
     if (container instanceof Type)
-      {
-        if (name.equals(CLASSTYPE_FOR))
-          return container;
+      return getTypePart((Type) container, name);
+    return getMemberPart(container, part.toString());
+  }
 
-        if (container instanceof ObjectType)
-          {
-            if (name.equals(INSTANCEOF_METHOD_NAME))
-              return new NamedPart(container, part, 'I');
-            if (name.equals(CAST_METHOD_NAME))
-              return new NamedPart(container, part, 'C');
-            if (name.equals("new"))
-              return new NamedPart(container, part, 'N');
-            if (name.equals(".length")
-                || (name.length() > 1 && name.charAt(0) == '.'
-                    && container instanceof ClassType))
-              return new NamedPart(container, part, 'D');
-          }
-
-        if (container instanceof ClassType)
-          {
-            try
-              {
-                return gnu.kawa.reflect.SlotGet.staticField(container, part.toString());
-              }
-            catch (Throwable ex)
-              {
-                // FIXME!
-              }
-            return ClassMethods.apply(ClassMethods.classMethods, container, part);
-          }
-      }
-
+  public static Object getMemberPart(Object container, String name)
+    throws Throwable
+  {
     try
       {
-        return gnu.kawa.reflect.SlotGet.field(container, part.toString());
+        return gnu.kawa.reflect.SlotGet.field(container, name);
       }
     catch (Throwable ex)
       {
@@ -281,7 +280,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
                                             Language.getDefaultLanguage());
     if (methods != null)
       return new NamedPart(container, name, 'M', methods);
-    throw new RuntimeException("no part '"+part+"' in "+container+" m:"+methods);
+    throw new RuntimeException("no part '"+name+"' in "+container);
   }
 
   public Procedure getSetter()

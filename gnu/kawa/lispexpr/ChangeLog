@@ -1,3 +1,10 @@
+2006-06-10  Per Bothner  <per@bothner.com>
+
+	* ClassNamespace.java: New class, extends Namespace.
+	* Makefile.am: Update accordingly.
+	* DefineNamespace.java (scanForDefinitions): Creat a ClassNamespace
+	rather than a plain Namespace if uri starts with "class:".
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	Handle module dependencies and cycles.

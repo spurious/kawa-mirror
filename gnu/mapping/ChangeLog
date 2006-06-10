@@ -1,5 +1,7 @@
 2006-06-10  Per Bothner  <per@bothner.com>
 
+	* Namespace.java  (nsTable): Make protected.
+
 	* HasNamedParts.java: New interface.
 	* Makefile.am: Update accordingly.
 	* Namespace.java: Implement HasNamedParts.

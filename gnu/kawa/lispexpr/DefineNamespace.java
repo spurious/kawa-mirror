@@ -53,8 +53,20 @@ public class DefineNamespace extends Syntax
     if (p2.car instanceof FString)
       {
         literal = p2.car.toString();
-        value = new QuoteExp(Namespace.getInstance(literal));
-	decl.setType(ClassType.make("gnu.mapping.Namespace"));
+        Namespace namespace;
+        if (literal.startsWith("class:"))
+          {
+            String cname = literal.substring(6);
+            namespace
+              = ClassNamespace.getInstance(literal, ClassType.make(cname));
+            decl.setType(ClassType.make("gnu.kawa.lispexpr.ClassNamespace"));
+          }
+        else
+          {
+            namespace = Namespace.getInstance(literal);
+            decl.setType(ClassType.make("gnu.mapping.Namespace"));
+          }
+        value = new QuoteExp(namespace);
 	decl.setFlag(Declaration.TYPE_SPECIFIED);
        }
     else

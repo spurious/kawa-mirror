@@ -20,7 +20,7 @@ public class Namespace
   implements Externalizable, HasNamedParts
 {
   /** Map namepsace names (and nick-names) to Namespaces. */
-  static final Hashtable nsTable = new Hashtable(50);
+  protected static final Hashtable nsTable = new Hashtable(50);
 
   /** The Namespace with the empty name. */
   public static final Namespace EmptyNamespace = getInstance("");

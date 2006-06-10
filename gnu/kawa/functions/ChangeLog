@@ -1,3 +1,10 @@
+2006-06-10  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (getNamedPart): Move functionality to ...
+	(getTypePart, getMemberPart): ... new methods.
+	(getNamedPart): Handle container that impleemnts HasNamedParts. Remove
+	special support for Namespace - which now implements HasNamedParts.
+
 2006-05-31  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeReadableSymbol): Change comment style

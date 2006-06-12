@@ -199,7 +199,7 @@ public class LList extends ExtSequence
 
   public Object get (int index)
   {
-    throw new ArrayIndexOutOfBoundsException (index);
+    throw new IndexOutOfBoundsException();
   }
   
   /* Count the length of a list.

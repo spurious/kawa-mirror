@@ -35,6 +35,9 @@ extends
   /** See java.util.List. */
   public Object get (int index);
 
+  /** See java.util.List. */
+  public Object set (int index, Object value);
+
   public void fill(Object value);
 
   public java.util.Enumeration elements();

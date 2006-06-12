@@ -1,3 +1,10 @@
+2006-06-12  Per Bothner  <per@bothner.com>
+
+	* LList.java (get): Throw IndexOutOfBoundsException rather than
+	ArrayIndexOutOfBoundsException since we're not an array.
+
+	* Sequence.java (set): Declare new method.
+
 2006-06-04  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (JOINER): New constant.

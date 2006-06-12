@@ -1,3 +1,7 @@
+2006-06-12  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isSubclass): New method.
+
 2006-05-30  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (classfileFormatVersion): New field.

@@ -983,6 +983,23 @@ public class ClassType extends ObjectType
     return false;
   }
 
+  /** A more efficient version of isSubclass(ClassType.make(cname)).
+   * Does not cause the named class be loaded if it hasn't been.
+   * @param cname a class name - cannot be an interface name
+   */
+  public final boolean isSubclass (String cname)
+  {
+    ClassType ctype = this;
+    for (;;)
+      {
+        if (cname.equals(ctype.getName()))
+          return true;
+        ctype = ctype.getSuperclass();
+        if (ctype == null)
+          return false;
+      }
+  }
+
   public final boolean isSubclass(ClassType other)
   {
     if (other.isInterface())

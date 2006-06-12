@@ -240,22 +240,11 @@ public class SlotGet extends Procedure2
     if (isStatic)
       {
         type = language.getTypeFor(arg0);
-        Class rclass = null;
-	if (type instanceof ClassType && ((ClassType) type).isExisting())
-	  {
-	    try
-	      {
-                rclass = type.getReflectClass();
-	      }
-	    catch (Exception ex)
-	      {
-		comp.error('e', "unknown class: " + type.getName());
-	      }
-          }
+        int known = Invoke.checkKnownClass(type, comp);
         if ("class".equals(name))
           {
-            if (rclass != null)
-              return QuoteExp.getInstance(rclass);
+            if (known > 0)
+              return QuoteExp.getInstance(type.getReflectClass());
             Method method
               = Compilation.typeType.getDeclaredMethod("getReflectClass", 0);
             return new ApplyExp(method, new Expression[] { arg0 });

@@ -301,6 +301,29 @@ public class Invoke extends ProcedureN implements CanInline
     return fields;
   }
 
+  /** Check if class exists.
+   * @return -1 is class actually exists;
+   * -1 is class should exist, but doesn't;
+   * and 0 otherwise.
+   */
+  public static int checkKnownClass (Type type, Compilation comp)
+  {
+    if (type instanceof ClassType && ((ClassType) type).isExisting())
+      {
+        try
+          {
+            type.getReflectClass();
+            return 1;
+          }
+        catch (Exception ex)
+          {
+            comp.error('e', "unknown class: " + type.getName());
+            return -1;
+          }
+      }
+    return 0;
+  }
+
   /** Resolve class specifier to ClassType at inline time.
    * This is an optimization to avoid having a module-level binding
    * created for the class name. */
@@ -316,17 +339,7 @@ public class Invoke extends ProcedureN implements CanInline
 	Type type = language.getTypeFor(args[carg]);
 	if (! (type instanceof Type))
 	  return exp;
-	if (type instanceof ClassType && ((ClassType) type).isExisting())
-	  {
-	    try
-	      {
-		type.getReflectClass();
-	      }
-	    catch (Exception ex)
-	      {
-		comp.error('e', "unknown class: " + type.getName());
-	      }
-	  }
+        checkKnownClass(type, comp);
 	Expression[] nargs = new Expression[args.length];
 	System.arraycopy(args, 0, nargs, 0, args.length);
 	nargs[carg] = new QuoteExp(type);

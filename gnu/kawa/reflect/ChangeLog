@@ -1,3 +1,9 @@
+2006-06-12  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (checkKnownClass): New method.
+	(inlineClassName): Use it.
+	* SlotGet.java (inline): Likewise.
+
 2006-05-30  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (inline): Fix bug in handling of "class" pseudo-field.

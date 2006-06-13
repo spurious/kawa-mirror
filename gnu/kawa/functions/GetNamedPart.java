@@ -105,7 +105,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     boolean isInstanceOperator = context == QuoteExp.nullExp;
     Compilation comp = walker.getCompilation();
     Language language = comp.getLanguage();
-    Type typeval = language.getTypeFor(context);
+    Type typeval = language.getTypeFor(context, false);
     ClassType caller = comp == null ? null
       : comp.curClass != null ? comp.curClass
       : comp.mainClass;

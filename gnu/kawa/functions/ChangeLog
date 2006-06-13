@@ -1,3 +1,23 @@
+2006-06-12  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Update to call getTypeFor in non-lenient
+	mode, so we don't interpret a string as a class name, for example.
+	* ApplyToArgs.java (inline): Likewise.
+	Also call Invoke.checkKnownClass to catch unknown classes.
+
+	* ApplyToArgs.java (inline): Trabslate indexing a List value to call to
+	a get method.
+	(applyN): If proc is a List value, call List:get method.
+	* Setter.java (apply1): If argument is a List, create SetList instance,
+	so an application of the latter will call its set method.
+	(inline): If argument has List type, create SetListExp for same reason.
+	(class SetList): New non-public class, extends Procedure2.
+	(class SetListExp): New non-public class, extends ApplyExp.
+
+	* Setter.java (class SetArray): New elementType field.
+	(<init>): Set elementType field using langauge and component type.
+	(apply2): Coerce value to elementType.
+
 2006-06-10  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (getNamedPart): Move functionality to ...

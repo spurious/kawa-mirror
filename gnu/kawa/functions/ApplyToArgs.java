@@ -140,6 +140,12 @@ public class ApplyToArgs extends ProcedureN
         args[0] = proc;
         Type ptype = proc.getType();
         ApplyExp result;
+        Compilation comp = walker.getCompilation();
+        Language language = comp.getLanguage();
+        // This might be more cleanly handled at the type specifier. FIXME
+        if (Invoke.checkKnownClass(ptype, comp) < 0)
+          return exp;
+        ClassType ctype;
         if (ptype.isSubtype(Compilation.typeProcedure))
           {
             Expression[] rargs = new Expression[nargs];
@@ -147,7 +153,7 @@ public class ApplyToArgs extends ProcedureN
             result = new ApplyExp(proc, rargs);
           }
         else if (ptype.isSubtype(Compilation.typeType)
-            || walker.getCompilation().getLanguage().getTypeFor(proc) != null)
+                 || language.getTypeFor(proc,false) != null)
           {
             result = new ApplyExp(Invoke.make, args);
           }
@@ -156,6 +162,16 @@ public class ApplyToArgs extends ProcedureN
             Type elementType = ((ArrayType) ptype).getComponentType();
             result = new ApplyExp(new ArrayGet(elementType), args);
           }
+        else if (ptype instanceof ClassType
+                 && (ctype = (ClassType) ptype).isSubclass(typeList)
+                 && nargs == 1)
+          {
+            // We search for a "get(int)" method, rather than just using
+            // typeList.getDeclaredMethod("get", 1) to see if we make a
+            // a virtual call rather than an interface call.
+            Method get = ctype.getMethod("get", new Type[] { Type.int_type });
+            result = new ApplyExp(get, args);
+          }
         else
           return exp;
         result.setLine(exp);
@@ -163,6 +179,13 @@ public class ApplyToArgs extends ProcedureN
       }
     return exp;
   }
+
+  static final ClassType typeList
+  /* #ifdef JAVA2 */
+  = ClassType.make("java.util.List");
+  /* #else */
+  // = ClassType.make("gnu.lists.Sequence");
+  /* #endif */
 
   public Object applyN (Object[] args) throws Throwable
   {
@@ -176,6 +199,23 @@ public class ApplyToArgs extends ProcedureN
     if (proc instanceof gnu.bytecode.Type)
       {
         return gnu.kawa.reflect.Invoke.make.applyN(args);
+      }
+    if (proc instanceof
+        /* #ifdef JAVA2 */
+        java.util.List
+        /* #else */
+        // gnu.lists.Sequence
+        /* #endif */
+        )
+      {
+        if (args.length != 2)
+          throw new WrongArguments(this, args.length); // FIXME
+        int index = ((Number) rargs[0]).intValue();
+        /* #ifdef JAVA2 */
+        return ((java.util.List) proc).get(index);
+        /* #else */
+        // return ((gnu.lists.Sequence) proc).get(index);
+        /* #endif */
       }
     Class pclass = proc.getClass();
     if (pclass.isArray())

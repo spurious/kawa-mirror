@@ -598,18 +598,18 @@ public abstract class Language
     return string2Type(name);
   }
 
-  public final Type getTypeFor (Object spec)
+  public final Type getTypeFor (Object spec, boolean lenient)
   {
     if (spec instanceof Type)
       return (Type) spec;
     if (spec instanceof Class)
       return getTypeFor((Class) spec);
-    if (spec instanceof String || spec instanceof FString)
+    if (lenient
+        && (spec instanceof FString
+            || spec instanceof String
+            || (spec instanceof Symbol && ((Symbol) spec).hasEmptyNamespace())
+            || spec instanceof CharSeq))
       return getTypeFor(spec.toString());
-    if (spec instanceof Symbol)
-      return getTypeFor(((Symbol) spec).getName());
-    if (spec instanceof CharSeq)
-      return ClassType.make(spec.toString());
     if (spec instanceof Namespace)
       {
         String uri = ((Namespace) spec).getName();
@@ -622,15 +622,20 @@ public abstract class Language
   /** "Coerce" a language-specific "type specifier" object to a Type. */
   public final Type asType(Object spec)
   {
-    Type type = getTypeFor(spec);
+    Type type = getTypeFor(spec, true);
     return type == null ? (Type) spec : type;
   }
 
-  public Type getTypeFor(Expression exp)
+  public final Type getTypeFor (Expression exp)
+  {
+    return getTypeFor(exp, true);
+  }
+
+  public Type getTypeFor (Expression exp, boolean lenient)
   {
     if (exp instanceof QuoteExp)
       {
-        return getTypeFor(((QuoteExp) exp).getValue());
+        return getTypeFor(((QuoteExp) exp).getValue(), lenient);
       }
     else if (exp instanceof ReferenceExp)
       {
@@ -656,7 +661,7 @@ public abstract class Language
 		  }
 	      }
 	    else if (! decl.getFlag(Declaration.IS_UNKNOWN))
-	      return getTypeFor(exp);
+	      return getTypeFor(exp, lenient);
 	  }
 	Object val = getEnvironment().get(name);
 	if (val instanceof Type)

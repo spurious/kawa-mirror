@@ -838,7 +838,7 @@ public class Translator extends Compilation
       exp.setLine (getLine(), getColumn());
   }
 
-  /** Extract a type from the car fo a pair. */
+  /** Extract a type from the car of a pair. */
   public Type exp2Type(Pair typeSpecPair)
   {
     Object saved = pushPositionOf(typeSpecPair);

@@ -1,3 +1,10 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): If container implements HasNamedparts,
+	optimize for that case.
+
+	* GetNamedPart.java (inline): Warn if no known part.
+
 2006-06-12  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Update to call getTypeFor in non-lenient

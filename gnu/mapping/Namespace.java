@@ -89,6 +89,11 @@ public class Namespace
     return Environment.getCurrent().get(getSymbol(getName()));
   }
 
+  public boolean isConstant (String key)
+  {
+    return false;
+  }
+
   /** Get a Symbol matching the given name.
    * Creates a new Symbol if one is not found.
    * Equivalent to Common Lisp's "intern" function.

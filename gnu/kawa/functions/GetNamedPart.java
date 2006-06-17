@@ -93,11 +93,13 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         || ! (exp instanceof GetNamedExp))
       return exp;
     Expression context = args[0];
+    Declaration decl = null;
     if (context instanceof ReferenceExp)
       {
         ReferenceExp rexp = (ReferenceExp) context;
         if ("*".equals(rexp.getName()))
           return GetNamedInstancePart.makeExp(args[1]);
+        decl = rexp.getBinding();
       }
 
     String mname = ((QuoteExp) args[1]).getValue().toString();
@@ -190,10 +192,32 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             aexp.setLine(exp);
             return ((InlineCalls) walker).walkApplyOnly(aexp);
           }
+
+        if (type.isSubtype(typeHasNamedParts))
+          {
+            Object val;
+            if (decl != null
+                && (val = Declaration.followAliases(decl).getConstantValue()) != null)
+              {
+                HasNamedParts value = (HasNamedParts) val;
+                if (value.isConstant(mname))
+                  {
+                    val = value.get(mname);
+                    return QuoteExp.getInstance(val);
+                  }
+              }
+            return new ApplyExp(typeHasNamedParts.getDeclaredMethod("get", 1),
+                                args).setLine(exp);
+          }
       }
 
+    if (comp.getBooleanOption("warn-invoke-unknown-method", ! comp.immediate))
+      comp.error('w', "no known slot '"+mname+"' in "+type.getName());
     return exp;
   }
+
+  static final ClassType typeHasNamedParts
+  = ClassType.make("gnu.mapping.HasNamedParts");
 
   public Object apply2 (Object container, Object part)
     throws Throwable

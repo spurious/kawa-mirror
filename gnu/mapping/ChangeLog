@@ -1,5 +1,8 @@
 2006-06-16  Per Bothner  <per@bothner.com>
 
+	* HasNamedParts.java (isConstant): New method.
+	* Namespace.java (isConstant): New method.
+
 	* IndirectableLocation.java (getBaseForce): New method.
 
 2006-06-10  Per Bothner  <per@bothner.com>

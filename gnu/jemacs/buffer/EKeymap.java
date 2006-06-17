@@ -426,7 +426,7 @@ implements gnu.mapping.Named
     if ((key & (PRESSED << 16)) == 0)
       { // It's a KEY_TYPED (keyChar) event.
         char ch = (char) key;
-        return ch < ' ' || ch >= 127;
+        return (ch < ' ' && ch != metaKey) || ch >= 127;
       }
     else
       { // It's a KEY_PRESSED (keyCODE) event.
@@ -435,7 +435,8 @@ implements gnu.mapping.Named
         // we prefer the KEY_TYPED events (as they don't depend on the
         // keyboard layout).
 	if (code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_SHIFT
-	    || code == KeyEvent.VK_ALT || code == KeyEvent.VK_META)
+	    || code == KeyEvent.VK_ALT || code == KeyEvent.VK_META
+            || code == KeyEvent.VK_ESCAPE)
 	  return true;
         return (mods & ~SHIFT_MASK) == 0
 	  && code >= KeyEvent.VK_SPACE && code < KeyEvent.VK_DELETE;

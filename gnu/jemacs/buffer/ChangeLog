@@ -1,3 +1,7 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* EKeymap.java (ignorable): Can ignore metaKey press but not typed.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* BufferReader.java: Moved from gnu.jemacs.swing.

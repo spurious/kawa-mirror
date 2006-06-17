@@ -4,7 +4,7 @@
 (define-syntax no-warn
   (syntax-rules ()
     ((no_warn exp)
-     (with-compile-options warn-invoke-unknown-method: #f exo))))
+     (with-compile-options warn-invoke-unknown-method: #f exp))))
 
 ;; Bug reported 2005-05-08 by dominique.boucher@nuecho.com.
 (define (neg-abs x)
@@ -27,5 +27,3 @@
 	(cons 'prefix-test:var2 prefix-test:var2)
 	(cons 'prefix-test:var2:var3 prefix-test:var2:var3)
 	(cons 'prefix-test:filler:var4 prefix-test:filler:var4)))
-
-

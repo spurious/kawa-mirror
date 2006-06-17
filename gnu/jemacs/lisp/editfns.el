@@ -13,6 +13,9 @@
 (defun backward-char (&optional (count 1) buffer)
   (invoke (decode-buffer buffer) 'backwardChar count))
 
+(defun pos-visible-in-window-p (&optional pos window partially)
+  t) ;; FIXME
+
 (defun interactive-p () nil) ;;; FIXME
 
 #|

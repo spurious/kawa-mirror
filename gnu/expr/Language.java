@@ -11,6 +11,7 @@ import gnu.text.SourceMessages;
 import gnu.kawa.reflect.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import gnu.kawa.lispexpr.ClassNamespace; // FIXME
 
 /**
  * Contains various language-dependent methods.
@@ -666,6 +667,8 @@ public abstract class Language
 	Object val = getEnvironment().get(name);
 	if (val instanceof Type)
 	  return (Type) val;
+        if (val instanceof ClassNamespace)
+          return ((ClassNamespace) val).getClassType();
         int len = name.length();
         if (len > 2 && name.charAt(0) == '<'
             && name.charAt(len-1) == '>')

@@ -1,3 +1,7 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (typeFrom): Handle ClassNamespace.
+
 2006-06-12  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (checkKnownClass): New method.

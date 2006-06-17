@@ -4,6 +4,7 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
 import java.lang.reflect.Array;
+import gnu.kawa.lispexpr.ClassNamespace; // FIXME
 
 public class Invoke extends ProcedureN implements CanInline
 {
@@ -68,6 +69,8 @@ public class Invoke extends ProcedureN implements CanInline
       return ClassType.make(arg.toString());
     if (arg instanceof Symbol)
       return ClassType.make(((Symbol) arg).getName());
+    if (arg instanceof ClassNamespace)
+      return ((ClassNamespace) arg).getClassType();
     throw new WrongType(thisProc, 0, arg, "class-specifier");
   }
 

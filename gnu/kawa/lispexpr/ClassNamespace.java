@@ -8,6 +8,11 @@ public class ClassNamespace extends Namespace implements Externalizable
 {
   ClassType ctype;
 
+  public ClassType getClassType ()
+  {
+    return ctype;
+  }
+
   public static ClassNamespace getInstance (String name, ClassType ctype)
   {
     synchronized (nsTable)

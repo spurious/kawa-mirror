@@ -36,6 +36,10 @@ public interface Consumer
    * This is only allowed immediately after a beginGroup. */
   public void beginAttribute(String attrName, Object attrType);
 
+  /** End of an attribute or end of an actual parameter.
+   * The former use matches a beginAttribute; the latter may not,
+   * and can be used to separate parameters in a parameter list.
+   * This double duty suggsts the method should at least be re-named. */
   public void endAttribute();
 
   public void writeObject(Object v);

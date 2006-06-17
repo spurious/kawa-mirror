@@ -416,14 +416,6 @@ public class TreeList extends AbstractSequence
 
   public void writeObject(Object v)
   {
-    if (v instanceof SeqPosition)
-      {
-	// A SeqPosition is used as a temporary cursor (see NodeType),
-	// so we need to save the current position.
-	SeqPosition pos = (SeqPosition) v;
-        writePosition(pos.sequence, pos.ipos);
-	return;
-      }
     ensureSpace(3);
     int index = find(v);
     if (index < 0x1000)
@@ -594,7 +586,9 @@ public class TreeList extends AbstractSequence
 
   public void endAttribute()
   {
-    if (data[gapEnd] != END_ATTRIBUTE || attrStart <= 0)
+    if (attrStart <= 0)
+      return;
+    if (data[gapEnd] != END_ATTRIBUTE)
       throw new Error("unexpected endAttribute");
     // Move the END_ATTRIBUTES to before the gap.
     gapEnd++;

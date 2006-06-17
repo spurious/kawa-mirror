@@ -1,3 +1,12 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* MakeElement.java: Add support for interpreting keyword parameters
+	as attribute constructors.
+	(tag): New field.
+	* Nodes.java (inAttribute): New field.
+	(beginAttribute): Set it.
+	(endAttribute): Ignore if inAttribute not set.
+
 2006-03-27  Per Bothner  <per@bothner.com>
 
 	* BinaryObject.java: New abstract class.

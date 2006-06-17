@@ -1,3 +1,9 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (endAttribute): Ignore unmatched endAttribute.
+	(writeObject): Interpret a Key as a beginAttribure.
+	* NodeTree.java: Likewise.
+
 2006-06-04  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (gapStartLastAtomic): New field.

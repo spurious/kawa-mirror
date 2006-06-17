@@ -1,5 +1,10 @@
 2006-06-16  Per Bothner  <per@bothner.com>
 
+	* XmlNamespace.java: New class, extends Namespace.
+	* Makefile.am: Update accordingly.
+	* DefineNamespace.java (scanForDefinitions): Re-implement makeXML
+	handling to create an XmlNamespace..
+
 	* ClassNamespace.java (getClassType): New method.
 
 2006-06-10  Per Bothner  <per@bothner.com>

@@ -1,3 +1,11 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite_pair): Remove no-longer-needed
+	and non-working handling of xml namespaces.
+	(remove): Remove old AutoloadProcedure special handling.
+	(asXmlNamespace): Remove unneeded method.
+	* kawa/standard/Scheme.java (initSchame): Change "html" definition.
+
 2006-06-09  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Record.java: No longer implement gnu.mapping.NameMap.

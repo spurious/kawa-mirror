@@ -7,6 +7,7 @@ import gnu.mapping.*;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XName;
 import gnu.kawa.xml.MakeText;  // FIXME
+import gnu.expr.Keyword; // FIXME
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -20,6 +21,7 @@ public class NodeTree extends TreeList
   }
 
   int gapStartLastAtomic = -1;
+  private static final int SAW_KEYWORD = -2;
 
   /** If v is a node, make a copy of it. */
   public void writeObject(Object v)
@@ -31,6 +33,11 @@ public class NodeTree extends TreeList
       }
     else if (v instanceof TreeList)
       ((TreeList) v).consume(this);
+    else if (v instanceof gnu.expr.Keyword)
+      {
+        beginAttribute(((Keyword) v).getName(), v);
+        gapStartLastAtomic = SAW_KEYWORD;
+      }
     // Using super.writeObject would be nice, but there are edge cases.
     // Specifically, atomic nodes with a zero-length string-value.
     // Handling that case correctly and efficiently is left for later.  FIXME.
@@ -43,6 +50,14 @@ public class NodeTree extends TreeList
         MakeText.text$C(v, this);  // Atomize.
         gapStartLastAtomic = gapStart;
       }
+  }
+
+  public void endAttribute()
+  {
+    if (gapStartLastAtomic == SAW_KEYWORD)
+      gapStartLastAtomic = -1;
+    else
+      super.endAttribute();
   }
 
   protected void writeJoiner ()

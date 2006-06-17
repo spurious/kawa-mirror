@@ -321,29 +321,6 @@ public class Translator extends Compilation
     boolean mapKeywordsToAttributes = false;
     Stack vec = new Stack();
 
-    if (func instanceof ReferenceExp)
-      {
-        // Check if function symbol is an "xml namespace".
-        Object sym = ((ReferenceExp) func).getSymbol();
-        String uri;
-        Object q;
-        if (sym instanceof Symbol
-            && (uri = ((Symbol) sym).getNamespaceURI()) != null
-            && (q = p.car) instanceof Pair
-            && (q = ((Pair) p.car).cdr) instanceof Pair
-            && (q = ((Pair) q).car) instanceof String)
-          {
-            String prefix = (String) q;
-            if (prefix.equals(asXmlNamespace(uri)))
-              {
-                mapKeywordsToAttributes = true;
-                Object type = new gnu.xml.SName((Symbol) sym, prefix);
-                func = new QuoteExp(gnu.kawa.xml.MakeElement.makeElement);
-                vec.addElement(new QuoteExp(type));
-              }
-          }
-      }
-
     ScopeExp save_scope = current_scope;
     for (int i = 0; i < cdr_length;)
       {
@@ -545,21 +522,6 @@ public class Translator extends Compilation
     return name;
   }
 
-  /** Check if a uri has been registered as an "XML namespace".
-   * @return the corresponding prefix.if so, or null otherwise.
-   */
-  Object asXmlNamespace (String uri)
-  {
-    if (uri == null || uri.length() == 0)
-      return null;
-    Symbol magic = Symbol.make(uri, DefineNamespace.XML_NAMESPACE_MAGIC);
-    Declaration xml_decl = lexical.lookup(magic, false);
-    Object val;
-    if (xml_decl == null)
-      return env.get(magic, null);
-    return Declaration.followAliases((Declaration) xml_decl).getConstantValue();
-  }
-
   public void setCurrentScope (ScopeExp scope)
   {
     super.setCurrentScope(scope);
@@ -678,19 +640,8 @@ public class Translator extends Compilation
                 || (separate && decl.isProcedureDecl()))
               decl = null;
           }
-        else if ((value = resolve(symbol, function)) instanceof Named)
+        else
           {
-            if (value instanceof AutoloadProcedure)
-              {
-                try
-                  {
-                    value = ((AutoloadProcedure) value).getLoaded();
-                  }
-                catch (RuntimeException ex)
-                  {
-                  }
-              }
-            Named proc = (Named) value;
 	    Location loc
 	      = env.lookup(symbol,
 			   function && separate ? EnvironmentKey.FUNCTION

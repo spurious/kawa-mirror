@@ -61,6 +61,12 @@ public class DefineNamespace extends Syntax
               = ClassNamespace.getInstance(literal, ClassType.make(cname));
             decl.setType(ClassType.make("gnu.kawa.lispexpr.ClassNamespace"));
           }
+        else if (makeXML)
+          {
+            namespace
+              = XmlNamespace.getInstance(name, literal);
+            decl.setType(ClassType.make("gnu.kawa.lispexpr.XmlNamespace"));
+          }
         else
           {
             namespace = Namespace.getInstance(literal);
@@ -73,21 +79,6 @@ public class DefineNamespace extends Syntax
       value = tr.rewrite_car (p2, false);
     decl.noteValue(value);
     forms.addElement(SetExp.makeDefinition(decl, value));
-    if (makeXML)
-      {
-        if (literal == null)
-          tr.error('e', "define-xml-namespace must be bound to string literal");
-        else
-          {
-            Symbol sym = Symbol.make(literal, XML_NAMESPACE_MAGIC);
-            value = new QuoteExp(name);
-            decl = defs.getDefine(sym, 'w', tr);
-            tr.push(decl);
-            decl.setFlag(Declaration.IS_CONSTANT);
-            decl.noteValue(value);
-            forms.addElement(SetExp.makeDefinition(decl, value));
-          }
-      }
     return true;
   }
 

@@ -10,6 +10,7 @@ import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
 import gnu.mapping.ThreadLocation;
 import java.math.BigDecimal;
+import gnu.expr.Keyword;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -59,6 +60,7 @@ public class XMLPrinter extends PrintConsumer
   private static final int WORD = -2;
   private static final int ELEMENT_START = -3;
   private static final int ELEMENT_END = -4;
+  private static final int KEYWORD = -5;
   int prev = ' ';
 
   public XMLPrinter (Writer out, boolean autoFlush)
@@ -465,9 +467,15 @@ public class XMLPrinter extends PrintConsumer
 
   public void endAttribute()
   {
-    super.write('"');
-    inAttribute = false;
-    prev = ' ';
+    if (inAttribute)
+      {
+        if (prev != KEYWORD)
+          {
+            super.write('"');
+            inAttribute = false;
+          }
+        prev = ' ';
+      }
   }
 
   public void writeDouble (double d)
@@ -577,6 +585,12 @@ public class XMLPrinter extends PrintConsumer
         if (pos.sequence instanceof NodeTree)
           prev = '-';
 	return;
+      }
+    if (v instanceof Keyword)
+      {
+        beginAttribute(((Keyword) v).getName(), v);
+        prev = KEYWORD;
+        return;
       }
     closeTag();
     if (v instanceof UnescapedData)

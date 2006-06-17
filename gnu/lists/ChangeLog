@@ -1,3 +1,11 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+	* Consumer.java (endAttribute): Note we allow unmatched endAttribute,
+	to indicate end of a parameter in a function parameter list.
+	* TreeList.java (endAttribute): Handle unmatched endAttribute.
+
+	* TreeList.java (writeObject): No special handling of SeqPosition.
+	It is not needed, and is wrong if given a JEmacs marker.
+
 2006-06-12  Per Bothner  <per@bothner.com>
 
 	* LList.java (get): Throw IndexOutOfBoundsException rather than

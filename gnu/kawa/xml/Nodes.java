@@ -20,6 +20,7 @@ public class Nodes extends Values
   int count;
 
   int nesting = 0;
+  boolean inAttribute;
   NodeTree curFragment;
 
   public void writePosition (AbstractSequence seq, int ipos)
@@ -165,10 +166,14 @@ public class Nodes extends Values
   {
     maybeStartNonTextNode();
     curFragment.beginAttribute(attrName, attrType);
+    inAttribute = true;
   }
 
   public void endAttribute()
   {
+    if (! inAttribute)
+      return;
+    inAttribute = false;
     curFragment.endAttribute();
     maybeEndNonTextNode();
   }

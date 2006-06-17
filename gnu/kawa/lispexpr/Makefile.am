@@ -21,7 +21,8 @@ java_sources = \
   ReaderTypespec.java \
   ReaderVector.java \
   ReadTable.java \
-  ReadTableEntry.java
+  ReadTableEntry.java \
+  XmlNamespace.java
 
 KAWA = $(JAVA) kawa.repl
 

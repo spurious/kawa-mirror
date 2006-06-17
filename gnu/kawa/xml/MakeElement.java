@@ -14,6 +14,24 @@ public class MakeElement extends NodeConstructor
 
   public int numArgs() { return 0xFFFFF001; }
 
+  /** Optional tag.  If non-null, the element tag is this value,
+   * rather than the first parameter. */
+  public Object tag;
+
+  private boolean handlingKeywordParameters;
+
+  /** Should {@code KEYWORD: EXPRESSION} be mapped to an
+   * attribute constructor? */
+  public boolean isHandlingKeywordParameters ()
+  {
+    return handlingKeywordParameters;
+  }
+
+  public void setHandlingKeywordParameters (boolean value)
+  {
+    handlingKeywordParameters = value;
+  }
+
   NamespaceBinding namespaceNodes;
 
   public NamespaceBinding getNamespaceNodes ()
@@ -103,7 +121,7 @@ public class MakeElement extends NodeConstructor
     Consumer out = pushNodeContext(ctx);
     try
       {
-	Object type = ctx.getNextArg();
+	Object type = tag != null ? tag : ctx.getNextArg();
 	if (namespaceNodes != null)
 	  beginGroup(out, type, namespaceNodes);
 	else
@@ -118,6 +136,9 @@ public class MakeElement extends NodeConstructor
 	      ((Consumable) arg).consume(out);
 	    else
 	      ctx.writeValue(arg);
+            // Handling Keyword values is actually done by the Consumer.
+            if (isHandlingKeywordParameters())
+              out.endAttribute();
 	  }
 	endGroup(out, type);
       }
@@ -136,7 +157,17 @@ public class MakeElement extends NodeConstructor
     CodeAttr code = comp.getCode();
     code.emitLoad(consumer);
     code.emitDup();
-    args[0].compile(comp, Target.pushObject);
+    int i;
+    if (tag == null)
+      {
+        args[0].compile(comp, Target.pushObject);
+        i = 1;
+      }
+    else
+      {
+        comp.compileConstant(tag, Target.pushObject);
+        i = 0;
+      }
     code.emitDup(1, 1); // dup_x1
     // Stack:  consumer, tagtype, consumer, tagtype
     if (namespaceNodes != null)
@@ -146,8 +177,16 @@ public class MakeElement extends NodeConstructor
       }
     else
       code.emitInvokeStatic(beginGroupMethod2);
-    for (int i = 1;  i < nargs;  i++)
-      compileChild(args[i], comp, target);
+    for (;  i < nargs;  i++)
+      {
+        compileChild(args[i], comp, target);
+        if (isHandlingKeywordParameters())
+          {
+            code.emitLoad(consumer);
+            if (isHandlingKeywordParameters())
+              code.emitInvokeInterface(MakeAttribute.endAttributeMethod);
+          }
+      }
     code.emitInvokeStatic(endGroupMethod);
   }
 

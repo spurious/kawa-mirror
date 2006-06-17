@@ -9,11 +9,11 @@ public class BufferLocal extends IndirectableLocation
 {
   boolean all;
 
-  Buffer cachedBuffer;
-
   final Symbol name;
 
-  /** Index in <code>cachedBuffer</code>'s <code>LocalBindings</code> array. */
+  Buffer cachedBuffer;
+
+  /** Index in <code>cachedBuffer</code>'s <code>localBindings</code> array. */
   int cachedIndex;
 
   BufferLocal (Symbol name, boolean all)
@@ -30,7 +30,8 @@ public class BufferLocal extends IndirectableLocation
   public static void make(Symbol symbol, boolean all)
   {
     Environment env = Environment.getCurrent();
-    Location base = env.getLocation(symbol, null).getBase();
+    NamedLocation loc = env.getLocation(symbol, null, true);
+    Location base = loc.getBase();
     if (base instanceof BufferLocal)
       {
 	if (all)
@@ -38,8 +39,10 @@ public class BufferLocal extends IndirectableLocation
 	return;
       }
     BufferLocal bloc = new BufferLocal(symbol, all);
-    bloc.base = base;
-    env.addLocation(symbol, null, bloc);
+    // Not sure if this is 100% correct.  FIXME.
+    // We have to be careful to avoid cycles, handle INDIERCT_DEFINES, etc.
+    bloc.base = loc.getBaseForce();
+    bloc.setAlias(loc);
   }
 
   public Object get (Object defaultValue)
@@ -172,7 +175,7 @@ public class BufferLocal extends IndirectableLocation
 	localBindings[avail] = n;
 	cachedBuffer = buffer;
 	cachedIndex = ++avail;
-	localBindings[avail+1] = newValue;
+	localBindings[avail] = newValue;
       }
     else if (base == null)
       value = newValue;

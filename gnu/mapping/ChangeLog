@@ -1,3 +1,7 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* IndirectableLocation.java (getBaseForce): New method.
+
 2006-06-10  Per Bothner  <per@bothner.com>
 
 	* Namespace.java  (nsTable): Make protected.

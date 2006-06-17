@@ -1,5 +1,9 @@
 2006-06-16  Per Bothner  <per@bothner.com>
 
+	* BufferLocal.java (make): Fix some bit-rot.
+
+	* BufferLocal.java (set): Fix off-by-one error.
+
 	* EKeymap.java (ignorable): Can ignore metaKey press but not typed.
 
 2005-12-11  Per Bothner  <per@bothner.com>

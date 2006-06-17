@@ -49,6 +49,14 @@ public abstract class IndirectableLocation extends Location
     return base == null ? this : base.getBase();
   }
 
+  public Location getBaseForce ()
+  {
+    if (base == null)
+      return new PlainLocation(getKeySymbol(), getKeyProperty(), value);
+    else
+      return base;
+  }
+
   public void setBase (Location base)
   { 
     this.base = base;

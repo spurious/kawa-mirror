@@ -1,3 +1,7 @@
+2006-06-16  Per Bothner  <per@bothner.com>
+
+	* moduleFT.scm: Suppress some warnings.
+
 2006-06-09  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm: Test new colon motation of types created by

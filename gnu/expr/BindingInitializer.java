@@ -7,9 +7,6 @@ public class BindingInitializer extends Initializer
   Declaration decl;
   Expression value;
 
-  static final Method makeSymbolMethod
-  = Compilation.typeSymbol.getDeclaredMethod("makeUninterned", 1);
-
   /** Create a BindingInitializer and link it into the correct
    * intializer chain. */
   public static void create (Declaration decl, Expression value,

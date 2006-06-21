@@ -284,7 +284,7 @@ public class Shell
   {
     run(language, env, new CharArrayInPort(str),
 	ModuleBody.getMainPrintValues() ? OutPort.outDefault() : null,
-	OutPort.errDefault(), null);
+	OutPort.errDefault());
   }
 
   public static void runFile (String fname, int skipLines)

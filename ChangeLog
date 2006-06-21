@@ -1,3 +1,8 @@
+2006-06-21  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (runString): Call the other run method so that
+	getOutputConsumer gets called.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite_pair): Remove no-longer-needed

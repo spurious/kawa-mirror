@@ -22,7 +22,7 @@ public class Setter extends Procedure1 implements CanInline, HasSetter
   {
     if (! (arg instanceof Procedure))
       {
-        /* #ifdef JAVA */
+        /* #ifdef JAVA2 */
         if (arg instanceof java.util.List)
           return new SetList((java.util.List) arg);
         /* #else */

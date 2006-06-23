@@ -1,3 +1,9 @@
+2006-06-23  Per Bothner  <per@bothner.com>
+
+	* DComplex.java (hypot): Make conditional on #ifndef JAVA5.
+	(power, log, sqrt): Use Math.hypot #ifdef JAVA5.
+	* Complex.java (abd): Likewise.
+
 2006-05-23  Per Bothner  <per@bothner.com>
 
 	* Duration.java (add): Remove unused local variable add.

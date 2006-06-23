@@ -77,7 +77,11 @@ public abstract class Complex extends Quantity
 
   public Numeric abs ()
   {  
+    /* #ifdef JAVA5 */
+    // return new DFloNum(Math.hypot(doubleRealValue(), doubleImagValue()));
+    /* #else */
     return new DFloNum(DComplex.hypot(doubleRealValue(), doubleImagValue()));
+    /* #endif */
   }
 
   public RealNum angle()

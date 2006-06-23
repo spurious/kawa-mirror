@@ -17,6 +17,10 @@
     (set3-mod0-v1 (- gv1 9))
     (list gv1 mod0-v1 mod0-v2 (mod0-f1) (mod0-m1))))
 
+;; This didn't use to compile, because of macro expansion problems.
+(define (test3-import2)
+  (mod0-m1))
+
 (define factorial-4 (my-factorial 4))
 
 (define (list-length-4 arg)

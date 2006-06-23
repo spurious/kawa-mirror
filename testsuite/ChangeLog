@@ -1,3 +1,7 @@
+2006-06-23  Per Bothner  <per@bothner.com>
+
+	* module3.scm (test3-import2): New compilation-only test.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* moduleFT.scm: Suppress some warnings.

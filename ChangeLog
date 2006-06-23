@@ -1,3 +1,8 @@
+2006-06-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (check_if_Syntax): Inherit macroScope
+	if from current TemplateScope.
+
 2006-06-21  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (runString): Call the other run method so that

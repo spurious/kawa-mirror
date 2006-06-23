@@ -234,7 +234,11 @@ public class Translator extends Compilation
                   = ((ReferenceExp) decl.getValue()).contextDecl();
                 if (context != null)
                   macroContext = context;
+                else if (current_scope instanceof TemplateScope)
+                  macroContext = ((TemplateScope) current_scope).macroContext;
               }
+            else if (current_scope instanceof TemplateScope)
+              macroContext = ((TemplateScope) current_scope).macroContext;
             Object obj = dval.eval(env);
             return obj instanceof Syntax ? (Syntax) obj : null;
           }

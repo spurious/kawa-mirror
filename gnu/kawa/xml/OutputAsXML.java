@@ -7,30 +7,18 @@ import gnu.lists.*;
 import gnu.xml.*;
 
 /** A 1-argument Procedure that takes a value and return output in XML syntax.
- * The result Consumer is typically an OutPort.
  */
 
-public class OutputAsXML extends MethodProc
+public class OutputAsXML extends Procedure1
 {
-   public int numArgs() { return 0x1001; }
+  public int numArgs() { return 0x1001; }
 
-    public void apply (CallContext ctx)
+  public Object apply1 (Object arg)
   {
-    Consumer consumer = ctx.consumer;
-    Object value = ctx.getNextArg();
-    ctx.lastArg();
-    XMLPrinter out = new XMLPrinter(consumer);
-    out.writeObject(value);
-    /*
-    ctx.consumer = out;
-    try
-      {
-	...;
-      }
-    finally
-      {
-	ctx.consumer = consumer;
-      }
-    */
+    CharArrayOutPort port = new CharArrayOutPort();
+    XMLPrinter out = new XMLPrinter(port);
+    out.writeObject(arg);
+    out.flush();
+    return new FString(port.toCharArray());
   }
 }

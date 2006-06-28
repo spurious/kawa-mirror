@@ -1,3 +1,8 @@
+2006-06-27  Per Bothner  <per@bothner.com>
+
+	* OutputAsXML.java: Change implementation so it returns an FString
+	value.  Alas, we lose some optimization.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* MakeElement.java: Add support for interpreting keyword parameters

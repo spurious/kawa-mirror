@@ -1,3 +1,10 @@
+2006-06-27  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java (getConstructor): New method.
+	* Invoke.java (typeFrom): Allow any ObjectType.
+	(applyN): If dtype is a TypeValue, check for non-null getConstructor.
+	(inline): Likewise.  Merge in private method into public method.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (typeFrom): Handle ClassNamespace.

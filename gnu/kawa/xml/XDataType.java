@@ -3,6 +3,7 @@
 
 package gnu.kawa.xml;
 import gnu.bytecode.*;
+import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.mapping.Printable;
 import gnu.math.*;
@@ -468,4 +469,9 @@ public class XDataType extends Type implements TypeValue
   public static final Float FLOAT_ZERO = makeFloat(0);
   public static final Float FLOAT_ONE = makeFloat(1);
   public static final BigDecimal DECIMAL_ONE = BigDecimal.valueOf(1);
+
+  public Procedure getConstructor ()
+  {
+    return null;
+  }
 }

@@ -3,6 +3,7 @@
 
 package gnu.kawa.reflect;
 import gnu.bytecode.*;
+import gnu.mapping.Procedure;
 import gnu.mapping.Values;
 import gnu.lists.*;
 import java.io.*;
@@ -120,6 +121,11 @@ public class OccurrenceType extends ObjectType
 			     Compilation comp, Target target)
   {
     gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
+  }
+
+  public Procedure getConstructor ()
+  {
+    return null;
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

@@ -1,3 +1,7 @@
+2006-06-27  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (getConstructor): New method.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* XmlNamespace.java: New class, extends Namespace.

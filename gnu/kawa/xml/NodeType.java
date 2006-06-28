@@ -3,6 +3,7 @@
 
 package gnu.kawa.xml;
 import gnu.bytecode.*;
+import gnu.mapping.Procedure;
 import gnu.lists.*;
 import java.io.*;
 import gnu.expr.*;
@@ -175,6 +176,11 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
     = typeNodeType.getDeclaredMethod("coerceForce", 2);
   static final Method coerceOrNullMethod
     = typeNodeType.getDeclaredMethod("coerceOrNull", 2);
+
+  public Procedure getConstructor ()
+  {
+    return null;
+  }
 
   public String toString ()
   {

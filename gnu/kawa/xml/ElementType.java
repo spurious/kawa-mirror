@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -7,7 +7,7 @@ import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
 import java.io.*;
-import gnu.mapping.Symbol;
+import gnu.mapping.*;
 
 public class ElementType extends NodeType
 implements TypeValue, Externalizable, GroupPredicate
@@ -173,6 +173,14 @@ implements TypeValue, Externalizable, GroupPredicate
     code.emitPushString(qname.getNamespaceURI());
     code.emitPushString(qname.getLocalName());
     code.emitInvokeStatic(coerceOrNullMethod);
+  }
+
+  public Procedure getConstructor ()
+  {
+    gnu.kawa.xml.MakeElement element = new gnu.kawa.xml.MakeElement();
+    element.tag = qname;
+    element.setHandlingKeywordParameters(true);
+    return element;
   }
 
   public static final ClassType typeElementType

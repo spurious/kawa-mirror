@@ -1,8 +1,9 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.Procedure;
 
 /** A Type or a Type expression.
  * Can be used for higher-level types that do not map directly to a Type.
@@ -38,4 +39,11 @@ public interface TypeValue
    */
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target);
+
+  /** Get the constructor function for this type.
+   * Returns null if there is no contructor function.
+   * Also returns null if this extends ClassType or ArrayType and
+   * standard Java constructors (<init> methods) should be used.
+   */
+  public Procedure getConstructor ();
 }

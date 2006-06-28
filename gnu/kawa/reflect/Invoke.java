@@ -62,8 +62,7 @@ public class Invoke extends ProcedureN implements CanInline
   {
     if (arg instanceof Class)
       arg = Type.make((Class) arg);
-    if (arg instanceof ClassType
-        || (thisProc.kind == 'N' && arg instanceof ArrayType))
+    if (arg instanceof ObjectType)
       return (ObjectType) arg;
     if (arg instanceof String || arg instanceof FString)
       return ClassType.make(arg.toString());
@@ -115,6 +114,17 @@ public class Invoke extends ProcedureN implements CanInline
     if (kind == 'N')
       {
 	mname = null;
+        if (dtype instanceof TypeValue)
+          {
+            Procedure constructor = ((TypeValue) dtype).getConstructor();
+            if (constructor != null)
+              {
+                nargs--;
+                Object[] xargs = new Object[nargs];
+                System.arraycopy(args, 1, xargs, 0, nargs);
+                return constructor.applyN(xargs);
+              }
+          }
 	if (dtype instanceof PairClassType)
 	  {
 	    PairClassType ptype = (PairClassType) dtype;
@@ -355,11 +365,7 @@ public class Invoke extends ProcedureN implements CanInline
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    return inline(exp, walker.getCompilation());
-  }
-
-  private Expression inline (ApplyExp exp, Compilation comp)
-  {
+    Compilation comp = walker.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (! comp.mustCompile
@@ -372,8 +378,7 @@ public class Invoke extends ProcedureN implements CanInline
     Type type0 = (kind == 'V' || kind == '*' ? arg0.getType() : language.getTypeFor(arg0));
     if (type0 instanceof PairClassType)
       type = ((PairClassType) type0).instanceType;
-    else if (type0 instanceof ClassType
-             || (kind == 'N' && type0 instanceof ArrayType))
+    else if (type0 instanceof ObjectType)
       type = (ObjectType) type0;
     else
       type = null;
@@ -470,6 +475,17 @@ public class Invoke extends ProcedureN implements CanInline
       }
     else if (type != null && name != null)
       {
+        if (type instanceof TypeValue && kind == 'N')
+          {
+            Procedure constructor = ((TypeValue) type).getConstructor();
+            if (constructor != null)
+              {
+                Expression[] xargs = new Expression[nargs];
+                System.arraycopy(args, 1, xargs, 0, nargs-1);
+                return ((InlineCalls) walker)
+                  .walkApplyOnly(new ApplyExp(constructor, xargs));
+              }
+          }
         PrimProcedure[] methods;
         int okCount, maybeCount;
         ClassType caller = comp == null ? null

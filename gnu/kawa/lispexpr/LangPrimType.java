@@ -4,6 +4,7 @@ import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
 import gnu.text.Char;
+import gnu.mapping.Procedure;
 import gnu.mapping.Values;
 
 /** Use to implement some special types that convert differently. */
@@ -237,5 +238,10 @@ public class LangPrimType extends PrimType implements TypeValue
 			     Compilation comp, Target target)
   {
     gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
+  }
+
+  public Procedure getConstructor ()
+  {
+    return null;
   }
 }

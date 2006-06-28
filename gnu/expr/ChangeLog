@@ -1,3 +1,7 @@
+2006-06-27  Per Bothner  <per@bothner.com>
+
+	* TypeValue.java (getConstructor): New method.
+
 2006-06-21  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (makeSymbolMethod): Remove unused field.

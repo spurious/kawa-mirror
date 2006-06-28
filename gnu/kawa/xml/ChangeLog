@@ -1,5 +1,9 @@
 2006-06-27  Per Bothner  <per@bothner.com>
 
+	* XDataType.java (getConstructor): New method.
+	* ElementType.java (getConstructor): New method.
+	* NodeType.java (getConstructor): New method.
+
 	* OutputAsXML.java: Change implementation so it returns an FString
 	value.  Alas, we lose some optimization.
 

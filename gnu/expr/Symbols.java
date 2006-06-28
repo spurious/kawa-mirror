@@ -50,19 +50,6 @@ public class Symbols
   */
 
   /**
-   * Generate a new un-interned Symbol with a unique name.
-   * @return the new Symbol
-   */
-  public static final String generate ()
-  {
-    String str = new String("GS." + Integer.toString(generateInt()));
-    /* DEBUGGING:
-    gensyms.addElement(str);
-    */
-    return str;
-  }
-
-  /**
    * Generate a new (interned) symbol with a unique name.
    * @return the new symbol
    */

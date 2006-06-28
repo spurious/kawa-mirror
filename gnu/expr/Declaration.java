@@ -766,8 +766,14 @@ public class Declaration
     */
     sbuf.append("/fl:");
     sbuf.append(Integer.toHexString(flags));
+    Expression tx = typeExp;
     Type t = getType();
-    if (t != null && t != Type.pointer_type)
+    if (tx != null && ! (tx instanceof QuoteExp))
+      {
+	sbuf.append("::");
+        sbuf.append(tx);
+      }
+    else if (type != null && t != Type.pointer_type)
       {
 	sbuf.append("::");
 	sbuf.append(t.getName());

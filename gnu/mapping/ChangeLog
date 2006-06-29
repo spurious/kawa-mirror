@@ -1,3 +1,20 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* Namespace.java (prefix): New field.
+	(getInstance): Name is interned.
+	(make): New factory method.
+	(<init>(String, int)): Remove constructor.
+	(writeExternal, readExternal): Write/read prefix,  Intern name.
+	(readResolve): Take prefix into account, if givem.
+	* Symbol.java: Optionally extend javax.xml.namespace.QName.
+	However, this is not fully working or recommended.
+	A few methods to be compatible with QName, including getPrefix.
+	(make, makeUninterned): New factory methods.
+	(equals): New static method.
+	(equals): Use new method.
+	(toString): If available, emit prefix rather than uri.
+	* ThreadLocation.java (<init>): Use new Symbol.makeUninterned.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* HasNamedParts.java (isConstant): New method.

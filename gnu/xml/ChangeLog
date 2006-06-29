@@ -1,3 +1,11 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* SName.java: Remove file.
+	* Makefile.am: Update accordingly.
+	* XName.java: Extends Symbol rather than SName.
+	* XMLPrinter.java: Update SName -> Symbol.
+	* ParsedXMLToConsumer.java (closeStartTag): Create Symbol with prefix.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (endAttribute): Ignore unmatched endAttribute.

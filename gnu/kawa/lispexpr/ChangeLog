@@ -1,3 +1,9 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* XmlNamespace.java (prefix): Remove field, since now in parent class.
+	(get) Simplify - can now just use getSymbol.
+	* LispPackage.java (lookup): Update to use new Symbol constructor.
+
 2006-06-27  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (getConstructor): New method.

@@ -18,10 +18,8 @@ public class QNameUtils
   {
     if (qname == null ||qname == Values.empty)
       return Values.empty;
-    if (qname instanceof SName)
-      return qname;
     if (qname instanceof Symbol)
-      return new SName((Symbol) qname, "");
+      return qname;
     // FIXME should atomicize here!
     String name = qname.toString();
     int colon = name.indexOf(':');
@@ -42,7 +40,7 @@ public class QNameUtils
 	throw new RuntimeException("invalid QName syntax '"+name+"'");
       }
     String uri = resolvePrefix(prefix, constructorNamespaces, prologNamespaces);
-    return SName.make(uri, localPart, prefix == null ? "" : prefix);
+    return Symbol.make(uri, localPart, prefix == null ? "" : prefix);
   }
 
   public static String resolvePrefix (String prefix,
@@ -74,7 +72,7 @@ public class QNameUtils
 
   /** This implements the <code>fn:QName</code> standard function. */
 
-  public static SName makeQName (Object paramURI, String paramQName)
+  public static Symbol makeQName (Object paramURI, String paramQName)
   {
     if (paramURI == null || paramURI == Values.empty)
       paramURI = "";
@@ -90,15 +88,13 @@ public class QNameUtils
 	localPart = paramQName.substring(colon+1);
 	prefix = paramQName.substring(0, colon).intern();
       }
-    return new SName(namespaceURI, localPart, prefix);
+    return Symbol.make(namespaceURI, localPart, prefix);
   }
 
   public static Object localNameFromQName (Object name)
   {
     if (name == Values.empty || name == null)
       return name;
-    if (name instanceof SName)
-      return ((SName) name).getLocalPart();
     if (name instanceof Symbol)
       return ((Symbol) name).getName();
     throw WrongType.make(null, "local-name-from-QName", 1, name);
@@ -108,8 +104,8 @@ public class QNameUtils
   {
     if (name == Values.empty || name == null)
       return name;
-    if (name instanceof SName)
-      return ((SName) name).getPrefix();
+    if (name instanceof Symbol)
+      return ((Symbol) name).getPrefix();
     throw WrongType.make(null, "prefix-from-QName", 1, name);
   }
 
@@ -117,8 +113,6 @@ public class QNameUtils
   {
     if (name == Values.empty || name == null)
       return name;
-    if (name instanceof SName)
-      return ((SName) name).getNamespaceURI();
     if (name instanceof Symbol)
       return ((Symbol) name).getNamespaceURI();
     throw WrongType.make(null, "namespace-uri", 1, name);

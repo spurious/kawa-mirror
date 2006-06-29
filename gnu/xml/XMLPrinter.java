@@ -9,6 +9,7 @@ import gnu.math.RealNum;
 import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
 import gnu.mapping.ThreadLocation;
+import gnu.mapping.Symbol;
 import java.math.BigDecimal;
 import gnu.expr.Keyword;
 
@@ -247,9 +248,9 @@ public class XMLPrinter extends PrintConsumer
 
   protected void writeQName (Object name)
   {
-    if (name instanceof SName)
+    if (name instanceof Symbol)
       {
-        SName sname = (SName) name;
+        Symbol sname = (Symbol) name;
         String prefix = sname.getPrefix();
         if (prefix != null && prefix.length() > 0)
           {
@@ -320,7 +321,7 @@ public class XMLPrinter extends PrintConsumer
 	pout.startLogicalBlock("", "", 2);
       }
     super.write('<');
-    Object name = type instanceof SName ? type : typeName;
+    Object name = type instanceof Symbol ? type : typeName;
     writeQName(name);
     groupNameStack[groupNesting] = name;
     NamespaceBinding groupBindings = null;

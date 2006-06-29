@@ -1,3 +1,9 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/TracedProcedure.java (curIndentSym): Use new
+	Symbol.makeUninterned method.
+	* Makefile.am: New (always-disabled) PreProcess macro JAXP-QName.
+
 2006-06-23  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (check_if_Syntax): Inherit macroScope

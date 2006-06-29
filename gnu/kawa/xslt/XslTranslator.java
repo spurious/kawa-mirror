@@ -69,9 +69,9 @@ public class XslTranslator extends Lexer implements Consumer
 	if (! (arg0 instanceof QuoteExp))
 	  return null;
 	Object tag = ((QuoteExp) arg0).getValue();
-	if (! (tag instanceof SName))
+	if (! (tag instanceof Symbol))
 	  return null;
-	SName stag = (SName) tag;
+	Symbol stag = (Symbol) tag;
 	if (stag.getLocalPart() == name && stag.getNamespaceURI() == ns)
 	  {
 	    comp.exprStack.removeElementAt(i);
@@ -96,8 +96,6 @@ public class XslTranslator extends Lexer implements Consumer
   {
     if (type instanceof QuoteExp)
       type = ((QuoteExp) type).getValue();
-    if (type instanceof SName)
-      type = ((SName) type).getSymbol();
     if (! (type instanceof Symbol))
       return null;
     Symbol qname = (Symbol) type;
@@ -127,7 +125,8 @@ public class XslTranslator extends Lexer implements Consumer
 	// This gets rid of namespace "nodes".   That's not really right.
 	// We do want to get rid of xmlns:xsl, though, at least.  FIXME.
 	XName xn = (XName) type;
-	type = new SName(xn.getSymbol(), xn.getPrefix());
+	type = Symbol.make(xn.getNamespaceURI(), xn.getLocalPart(),
+                           xn.getPrefix());
       }
     nesting.append((char) comp.exprStack.size());
     push(type);

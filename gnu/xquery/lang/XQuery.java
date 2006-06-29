@@ -752,7 +752,7 @@ public class XQuery extends Language
       "anyURI", XDataType.anyURIType,
       "hexBinary", XDataType.hexBinaryType,
       "base64Binary", XDataType.base64BinaryType,
-      "QName", "gnu.xml.SName",
+      "QName", "gnu.mapping.Symbol",
       "anyAtomicType", Type.pointer_type
     };
 
@@ -905,11 +905,10 @@ public class XQuery extends Language
     return sbuf.toString();
   }
 
-  public static Object getExternal (SName name, Object type)
+  public static Object getExternal (Symbol name, Object type)
   {
     Environment env = Environment.getCurrent();
-    Symbol symbol = name.getSymbol();
-    Object value = env.get(symbol, null, null);
+    Object value = env.get(name, null, null);
     if (value == null)
       throw new RuntimeException("unbound external "+name);
     if (type instanceof XDataType)

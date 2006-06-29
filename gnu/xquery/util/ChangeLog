@@ -1,3 +1,8 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* QNameUtils.java: Update SName -> Symbol.
+	* Compare.java: Likewise.
+
 2006-06-10  Per Bothner  <per@bothner.com>
 
 	* TimeUtils.java: Fix typo in package statement.

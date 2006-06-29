@@ -661,7 +661,7 @@ public class XQResolveNames extends ResolveNames
       return gnu.kawa.functions.GetModuleClass.getModuleClassURI(comp);
   }
 
-  static NamespaceBinding maybeAddNamespace(SName qname,
+  static NamespaceBinding maybeAddNamespace(Symbol qname,
 					    NamespaceBinding bindings)
   {
     if (qname == null) // Happens if prevously-reported unknown prefix.

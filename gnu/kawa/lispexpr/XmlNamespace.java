@@ -1,15 +1,13 @@
 package gnu.kawa.lispexpr;
 import gnu.mapping.*;
-import gnu.xml.SName;
 import java.io.*;
+import gnu.kawa.xml.ElementType; // FIXME
 
 public class XmlNamespace extends Namespace
   implements Externalizable
 {
   public static final XmlNamespace HTML =
     getInstance("html", "http://www.w3.org/1999/xhtml");
-
-  String prefix;
 
   public static XmlNamespace getInstance (String prefix, String uri)
   {
@@ -29,15 +27,7 @@ public class XmlNamespace extends Namespace
 
   public Object get (String name)
   {
-    gnu.kawa.xml.MakeElement element = new gnu.kawa.xml.MakeElement();
-    String uri = getName();
-    Symbol sym = getSymbol(name);
-    if (uri == null || uri.equals("") || this == HTML)
-      element.tag = sym;
-    else
-      element.tag = new SName(sym, uri);
-    element.setHandlingKeywordParameters(true);
-    return element;
+    return ElementType.make(getSymbol(name));
   }
 
   public boolean isConstant (String key)

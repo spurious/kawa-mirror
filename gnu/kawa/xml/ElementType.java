@@ -12,6 +12,10 @@ import gnu.mapping.*;
 public class ElementType extends NodeType
 implements TypeValue, Externalizable, GroupPredicate
 {
+  public static final String MATCH_ANY_LOCALNAME = "";
+  public static final Symbol MATCH_ANY_QNAME
+    = new Symbol(null, MATCH_ANY_LOCALNAME);
+
   Symbol qname;
 
   /** An element type for match by name.
@@ -20,7 +24,14 @@ implements TypeValue, Externalizable, GroupPredicate
    * @param namespaceURI full name of namespace, or null for any namespace. */
   public static ElementType make (String namespaceURI, String localName)
   {
-    return new ElementType(Symbol.make(namespaceURI, localName));
+    Symbol qname;
+    if (namespaceURI != null)
+      qname = Symbol.make(namespaceURI, localName);
+    else if (localName == MATCH_ANY_LOCALNAME)
+      qname = MATCH_ANY_QNAME;
+    else
+      qname = new Symbol(null, localName);
+    return new ElementType(qname);
   }
 
   public static ElementType make (Symbol qname)
@@ -76,8 +87,14 @@ implements TypeValue, Externalizable, GroupPredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
+    if (groupType instanceof Symbol)
+      {
+	Symbol qname = (Symbol) groupType;
+	curNamespaceURI = qname.getNamespaceURI();
+	curLocalName = qname.getLocalName();
+      }
     /* #ifdef JAXP-1.3 */
-    // if (groupType instanceof javax.xml.namespace.QName)
+    // else if (groupType instanceof javax.xml.namespace.QName)
     // {
     //   javax.xml.namespace.QName qtype
     //     = (javax.xml.namespace.QName) groupType;
@@ -85,25 +102,13 @@ implements TypeValue, Externalizable, GroupPredicate
     //   curLocalName = qtype.getLocalPart();
     // }
     /* #endif */
-    /* #ifndef JAXP-1.3 */
-    if (groupType instanceof SName)
-     {
-       SName qtype = (SName) groupType;
-       curNamespaceURI = qtype.getNamespaceURI();
-       curLocalName = qtype.getLocalPart();
-     }
-    /* #endif */
-    else if (groupType instanceof Symbol)
-      {
-	Symbol qname = (Symbol) groupType;
-	curNamespaceURI = qname.getNamespaceURI();
-	curLocalName = qname.getLocalName();
-      }
     else
       {
 	curNamespaceURI = "";
 	curLocalName = groupType.toString().intern();  // FIXME
       }
+    if (localName != null && localName.length() == 0)
+      localName = null;
     return ((localName == curLocalName || localName == null)
 	    && (namespaceURI == curNamespaceURI || namespaceURI == null));
   }
@@ -120,31 +125,28 @@ implements TypeValue, Externalizable, GroupPredicate
     KElement pos = (KElement) NodeType.coerceOrNull(obj, GROUP_OK);
     if (pos == null)
       return null;
+    if (localName != null && localName.length() == 0)
+      localName = null;
+    //if (namespaceURI != null && namespaceURI.length() == 0)
+    // namespaceURI = null;
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
+    if (curName instanceof Symbol)
+      {
+	Symbol qname = (Symbol) curName;
+	curNamespaceURI = qname.getNamespaceURI();
+	curLocalName = qname.getLocalName();
+      }
     /* #ifdef JAXP-1.3 */
-    // if (curName instanceof javax.xml.namespace.QName)
+    // else if (curName instanceof javax.xml.namespace.QName)
     // {
     //   javax.xml.namespace.QName qtype
     //     = (javax.xml.namespace.QName) curName;
     //   curNamespaceURI = qtype.getNamespaceURI();
     //   curLocalName = qtype.getLocalPart();
     // }
-    /* #else */
-    if (curName instanceof SName)
-      {
-        SName qtype = (SName) curName;
-        curNamespaceURI = qtype.getNamespaceURI();
-        curLocalName = qtype.getLocalPart();
-      }
     /* #endif */
-    else if (curName instanceof Symbol)
-      {
-	Symbol qname = (Symbol) curName;
-	curNamespaceURI = qname.getNamespaceURI();
-	curLocalName = qname.getLocalName();
-      }
     else
       {
 	curNamespaceURI = "";

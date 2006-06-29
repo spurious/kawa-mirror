@@ -1,3 +1,7 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add three tests of html/xml construction.
+
 2006-06-23  Per Bothner  <per@bothner.com>
 
 	* module3.scm (test3-import2): New compilation-only test.

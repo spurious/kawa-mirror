@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 147)
+(test-init "Miscellaneous" 150)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -699,3 +699,12 @@
     (set! bug14697-result (string-append bug14697-result " "
 					 (number->string i)))))
 (test " 1 2 3 4 5 6 7 8 9 10" 'bug14697 bug14697-result)
+
+(require 'xml)
+(test "<html:code>Foo</html:code>" 'html-contructor-1
+      (as-xml (html:code "Foo")))
+(test "<html:a href=\"foo.html\">Foo</html:a>" 'html-contructor-1
+      (as-xml (html:a href:"foo.html" "Foo")))
+(define-xml-namespace h "HTML")
+(test "<h:code>Foo</h:code>" 'html-contructor-3
+      (as-xml (h:code "Foo")))

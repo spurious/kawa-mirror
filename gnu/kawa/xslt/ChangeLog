@@ -1,3 +1,7 @@
+2006-06-28  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Update SName -> Symbol.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java (parse): Call new Compilation.pushNewModule.

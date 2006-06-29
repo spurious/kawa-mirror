@@ -199,7 +199,7 @@ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
 JAVA4_FEATURES = +JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex
-NO_JAVA4_FEATURES = -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5
+NO_JAVA4_FEATURES = -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5 -JAXP-QName
 
 # JDK 1.1
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
@@ -215,19 +215,19 @@ select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 
 # JDK 1.4, GCJ-4.x, without JAXP (default - matches CVS)
 select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) -use:org.w3c.dom.Node -JAXP-1.3 \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) -use:org.w3c.dom.Node -JAXP-1.3 -JAXP-QName \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=4
 
 # JDK 1.4, GCJ-4.x with JAXP 1.3
 select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=4x
 
 # JDK 1.5
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess +JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess +JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=5
 

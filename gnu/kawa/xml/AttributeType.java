@@ -20,7 +20,14 @@ implements TypeValue, Externalizable, AttributePredicate
 
   public static AttributeType make (String namespaceURI, String localName)
   {
-    return new AttributeType(Symbol.make(namespaceURI, localName));
+    Symbol qname;
+    if (namespaceURI != null)
+      qname = Symbol.make(namespaceURI, localName);
+    else if (localName == ElementType.MATCH_ANY_LOCALNAME)
+      qname = ElementType.MATCH_ANY_QNAME;
+    else
+      qname = new Symbol(null, localName);
+    return new AttributeType(qname);
   }
 
   public static AttributeType make (Symbol qname)
@@ -76,33 +83,28 @@ implements TypeValue, Externalizable, AttributePredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
+    if (attrType instanceof Symbol)
+      {
+	Symbol qname = (Symbol) attrType;
+	curNamespaceURI = qname.getNamespaceURI();
+	curLocalName = qname.getLocalName();
+      }
     /* #ifdef JAXP-1.3 */
-    // if (attrType instanceof javax.xml.namespace.QName)
+    // else if (attrType instanceof javax.xml.namespace.QName)
     //   {
     //     javax.xml.namespace.QName qtype
     //       = (javax.xml.namespace.QName) attrType;
     //     curNamespaceURI = qtype.getNamespaceURI();
     //     curLocalName = qtype.getLocalPart();
     //   }
-    /* #else */
-    if (attrType instanceof SName)
-      {
-        SName qtype = (SName) attrType;
-        curNamespaceURI = qtype.getNamespaceURI();
-        curLocalName = qtype.getLocalPart();
-      }
     /* #endif */
-    else if (attrType instanceof Symbol)
-      {
-	Symbol qname = (Symbol) attrType;
-	curNamespaceURI = qname.getNamespaceURI();
-	curLocalName = qname.getLocalName();
-      }
     else
       {
 	curNamespaceURI = "";
 	curLocalName = attrType.toString().intern();  // FIXME
       }
+    if (localName != null && localName.length() == 0)
+      localName = null;
     return ((localName == curLocalName || localName == null)
 	    && (namespaceURI == curNamespaceURI || namespaceURI == null));
   }
@@ -119,31 +121,26 @@ implements TypeValue, Externalizable, AttributePredicate
     SeqPosition pos = NodeType.coerceOrNull(obj, ATTRIBUTE_OK);
     if (pos == null)
       return null;
+    if (localName != null && localName.length() == 0)
+      localName = null;
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
+    if (curName instanceof Symbol)
+      {
+	Symbol qname = (Symbol) curName;
+	curNamespaceURI = qname.getNamespaceURI();
+	curLocalName = qname.getLocalName();
+      }
     /* #ifdef JAXP-1.3 */
-    // if (curName instanceof javax.xml.namespace.QName)
+    // else if (curName instanceof javax.xml.namespace.QName)
     //   {
     //     javax.xml.namespace.QName qtype
     //       = (javax.xml.namespace.QName) curName;
     //     curNamespaceURI = qtype.getNamespaceURI();
     //     curLocalName = qtype.getLocalPart();
     //   }
-    /* #else */
-    if (curName instanceof SName)
-      {
-        SName qtype = (SName) curName;
-        curNamespaceURI = qtype.getNamespaceURI();
-        curLocalName = qtype.getLocalPart();
-      }
     /* #endif */
-    else if (curName instanceof Symbol)
-      {
-	Symbol qname = (Symbol) curName;
-	curNamespaceURI = qname.getNamespaceURI();
-	curLocalName = qname.getLocalName();
-      }
     else
       {
 	curNamespaceURI = "";

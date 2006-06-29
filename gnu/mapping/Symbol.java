@@ -1,8 +1,17 @@
-// Copyright (c) 1996-2000, 2002, 2004  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2002, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
 import java.io.*;
+
+// Enable JAXP-QName if Symbol should extend javax.xml.namespace.QName.
+// This is not the default, even when JAXP-1.3 is defined, because it makes
+// symbols bigger and some operations (such as equals and handling of
+// uninterned symbols) slower, without much benefit.
+// This option needs some work.
+/* #ifdef JAXP-QName */
+// import javax.xml.namespace.QName;
+/* #endif */
 
 /** A Symbol is a name, usually in a specific Namespace.
  * A Symbol is stateless:  Comon Lisp-style "value", "function" and
@@ -13,6 +22,9 @@ import java.io.*;
  */
 
 public class Symbol
+  /* #ifdef JAXP-QName */
+  // extends QName
+  /* #endif */
   implements
   EnvironmentKey,
   /* #ifdef JAVA2 */
@@ -20,7 +32,9 @@ public class Symbol
   /* #endif */
   Externalizable
 {
+  /* #ifndef JAXP-QName */
   protected String name;
+  /* #endif */
   Namespace namespace;
 
   public final Symbol getKeySymbol () { return this; }
@@ -34,11 +48,24 @@ public class Symbol
     return symbol == this && property == null;
   }
 
+  /* #ifndef JAXP-QName */
   public final String getNamespaceURI()
   {
     Namespace ns = getNamespace();
     return ns == null ? null : ns.getName();
   }
+
+  public final String getLocalPart()
+  {
+    return name;
+  }
+
+  public final String getPrefix ()
+  {
+    Namespace ns = namespace;
+    return ns == null ? "" : ns.prefix;
+  }
+  /* #endif */
 
   public final boolean hasEmptyNamespace ()
   {
@@ -52,12 +79,25 @@ public class Symbol
    * Useful when thinking of a Symbol as an XML QName. */
   public final String getLocalName()
   {
+    /* #ifdef JAXP-QName */
+    // return getLocalPart();
+    /* #else */
     return name;
+    /* #endif */
   }
 
   public final String getName()
   {
+    /* #ifdef JAXP-QName */
+    // return getLocalPart();
+    /* #else */
     return name;
+    /* #endif */
+  }
+
+  public static Symbol make (String uri, String name, String prefix)
+  {
+    return Namespace.make(uri, prefix).getSymbol(name.intern());
   }
 
   /** Find or create a symbol in a specificed environment.
@@ -65,6 +105,7 @@ public class Symbol
    *   (resolved using Environment.getInstance), or null (in which case
    *   an uninterned symbol is created).
    * @param name The "local name" or "print name" of the desired symbol.
+   * @param prefix namespace prefix, or null
    */
   public static Symbol make (Object namespace, String name)
   {
@@ -72,22 +113,50 @@ public class Symbol
       ? Namespace.getInstance((String) namespace)
       : (Namespace) namespace;
     if (ns == null || name == null)
-      return new Symbol(name, ns);
+      return makeUninterned(name);
     return ns.getSymbol(name.intern());
   }
 
   public Symbol ()
   {
+    /* #ifdef JAXP-QName */
+    // super("");
+    /* #endif */
   }
 
-  public Symbol (String name)
+  public static Symbol makeUninterned (String name)
   {
-    this.name = name;
+    /* #ifdef JAXP-QName */
+    // Namespace ns = Namespace.getInstance("kawa.gensym");
+    // String sname = name;
+    // int i = 0;
+    // for (;;)
+    //   {
+    //     int hash = sname.hashCode();
+    //     synchronized (ns)
+    //       {
+    //         Symbol sym = ns.lookup(sname, hash, false);
+    //         if (sym == null)
+    //           return ns.add(new Symbol(ns, sname.intern()), hash);
+    //       }
+    //     sname = name + '.' + ++i;
+    //   }
+    /* #else */
+    return new Symbol(null, name);
+    /* #endif */
   }
 
-  public Symbol (String name, Namespace ns)
+  /** Create new Symbol in a given namespace.
+   * Does not enter the result in the namespace's symbol table.
+   * @param name an interned String
+   */
+  public Symbol (Namespace ns, String name)
   {
+    /* #ifdef JAXP-QName */
+    // super(ns == null ? "" : ns.getName(), name, ns == null ? "" : ns.prefix);
+    /* #else */
     this.name = name;
+    /* #endif */
     this.namespace = ns;
   }
 
@@ -108,18 +177,38 @@ public class Symbol
     return getLocalName().compareTo(other.getLocalName());
   }
 
+  public static boolean equals (Symbol sym1, Symbol sym2)
+  {
+    if (sym1 == sym2)
+      return true;
+    /* #ifdef JAXP-QName */
+    // if (sym1.getLocalPart() == sym2.getLocalPart())
+    /* #else */
+    if (sym1.name == sym2.name)
+    /* #endif */
+      {
+        Namespace namespace1 = sym1.namespace;
+        Namespace namespace2 = sym2.namespace;
+        return (namespace1 != null && namespace2 != null
+                && (namespace1 == namespace2
+                    || namespace1.name == namespace2.name));
+      }
+    return false;
+  }
+
+  /* #ifndef JAXP-QName */
   /** Just tests for identity.
    * Otherwise hashTables that have Symbols as keys will break. */
-  public boolean equals (Object o)
+  public final boolean equals (Object o)
   {
-    return this == o;
+    return o instanceof Symbol && equals(this, (Symbol) o);
   }
 
   public int hashCode ()
   {
     return name == null ? 0 : name.hashCode();
   }
-
+  /* #endif */
 
   public final Namespace getNamespace()
   {
@@ -132,7 +221,7 @@ public class Symbol
   }
 
   /** Conventional value used as a property key for function bindings. */
-  public static final Object FUNCTION = new Symbol("(function)", null);
+  public static final Symbol FUNCTION = makeUninterned("(function)");
 
   /** Conventional value used as a <code>Symbol</code> name to
    * access an <code>Object</code>'s property list.
@@ -144,7 +233,7 @@ public class Symbol
    * (In the future we'll do somethingg clever so that get(SYMBOL, KEY)
    * as the same as getf(get(PLIST, SYMBOL), KEY) - but much faster.)
    */
-  public static final Symbol PLIST = new Symbol("(property-list)", null);
+  public static final Symbol PLIST = makeUninterned("(property-list)");
 
   public String toString()
   {
@@ -152,28 +241,39 @@ public class Symbol
     String uri = getNamespaceURI();
     if (uri == null || uri.length() == 0)
       return getName();
-    return '{'+getNamespaceURI()+"}"+getName();
+    StringBuffer sbuf = new StringBuffer();
+    String prefix = getPrefix();
+    if (prefix == null || prefix.length() == 0)
+      {
+        sbuf.append('{');
+        sbuf.append(getNamespaceURI());
+        sbuf.append('}');
+      }
+    else
+      {
+        sbuf.append(prefix);
+        sbuf.append(':');
+      }
+    sbuf.append(getName());
+    return sbuf.toString();
   }
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
     Namespace ns = getNamespace();
-    String name;
-    if (ns != null && (name = ns.getName()) != null
-	&& Namespace.getInstance(name) == ns)
-      out.writeObject(name);
-    else
-      out.writeObject(ns);
+    out.writeObject(ns);
     out.writeObject(getName());
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    Object ns = in.readObject();
-    namespace = (ns instanceof String ? Namespace.getInstance((String) ns)
-		 : (Namespace) ns);
+    /* #ifdef JAXP-QName */
+    // throw new Error("Symbol.readExternal not implemented"); // FIXME!
+    /* #else */
+    namespace = (Namespace) in.readObject();
     name = (String) in.readObject();
+    /* #endif */
   }
 
   public Object readResolve() throws ObjectStreamException

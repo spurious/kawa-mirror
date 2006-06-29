@@ -7,7 +7,7 @@ import java.io.*;
 
 /** A QName with namespace nodes [and future optional type annotation]. */
 
-public class XName extends SName implements Externalizable
+public class XName extends Symbol implements Externalizable
 {
   NamespaceBinding namespaceNodes;
 
@@ -15,32 +15,15 @@ public class XName extends SName implements Externalizable
   {
   }
 
-  public XName (Symbol qname, NamespaceBinding namespaceNodes)
+  public XName (Symbol symbol, NamespaceBinding namespaceNodes)
   {
-    super(qname, "");
+    super(symbol.getNamespace(), symbol.getName());
     this.namespaceNodes = namespaceNodes;
-  }
-
-  public XName (Symbol qname, String prefix, NamespaceBinding namespaceNodes)
-  {
-    super(qname, prefix);
-    this.namespaceNodes = namespaceNodes;
-  }
-
-  public XName (SName name, NamespaceBinding namespaceNodes)
-  {
-    this(name.symbol, name.getPrefix(), namespaceNodes);
   }
 
   public final NamespaceBinding getNamespaceNodes () { return namespaceNodes; }
   public final void setNamespaceNodes (NamespaceBinding nodes)
   { this.namespaceNodes = nodes; }
-
-  /** @deprecated */
-  public final String getLocalName()
-  {
-    return getLocalPart();
-  }
 
   String lookupNamespaceURI (String prefix)
   {
@@ -64,18 +47,4 @@ public class XName extends SName implements Externalizable
     super.readExternal(in);
     namespaceNodes = (NamespaceBinding) in.readObject();
   }
-
-  /* #ifdef JAXP-1.3 */
-  // public Object readResolve() throws ObjectStreamException
-  // {
-  //   Namespace ns = symbol.getNamespace();
-  //   if (ns instanceof NamespacePair)
-  //     {
-  //       NamespacePair np = (NamespacePair) ns;
-  //       return new XName(Symbol.make(np.realNamespace, symbol.getName()),
-  //                        ns.getName(), namespaceNodes);
-  //     }
-  //   return this;
-  // }
-  /* #endif */
 }

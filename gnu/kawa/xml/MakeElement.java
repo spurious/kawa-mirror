@@ -44,7 +44,7 @@ public class MakeElement extends NodeConstructor
     namespaceNodes = bindings;
   }
 
-  public static SName getTagName (ApplyExp exp)
+  public static Symbol getTagName (ApplyExp exp)
   {
     Expression[] args = exp.getArgs();
     if (args.length > 0)
@@ -53,8 +53,8 @@ public class MakeElement extends NodeConstructor
 	if (arg0 instanceof QuoteExp)
 	  {
 	    Object val = ((QuoteExp) arg0).getValue();
-	    if (val instanceof SName)
-	      return (SName) val;
+	    if (val instanceof Symbol)
+	      return (Symbol) val;
 	  }
       }
     return null;
@@ -64,21 +64,16 @@ public class MakeElement extends NodeConstructor
 				NamespaceBinding namespaceNodes)
   {
     String name;
-    SName type;
-    if (qname instanceof SName)
+    XName type;
+    if (qname instanceof Symbol)
       {
-	type = new XName((SName) qname, namespaceNodes);
+	type = new XName((Symbol) qname, namespaceNodes);
 	name = type.toString();
-      }
-    else if (qname instanceof Symbol)
-      {
-	type = new XName((Symbol) qname, "", namespaceNodes);
-	name = type.getLocalPart();
       }
     else
       {
 	name = qname.toString();
-	type = new XName(Symbol.make("", name), "", namespaceNodes);
+	type = new XName(Symbol.make("", name, ""), namespaceNodes);
       }
     out.beginGroup(name, type);
   }
@@ -86,21 +81,16 @@ public class MakeElement extends NodeConstructor
   public static void beginGroup(Consumer out, Object qname)
   {
     String name;
-    SName type;
-    if (qname instanceof SName)
+    Symbol type;
+    if (qname instanceof Symbol)
       {
-	type = (SName) qname;
+	type = (Symbol) qname;
 	name = type.toString();
-      }
-    else if (qname instanceof Symbol)
-      {
-	type = new SName((Symbol) qname, "");
-	name = type.getLocalPart();
       }
     else
       {
 	name = qname.toString();
-	type = SName.make("", name, "");
+	type = Symbol.make("", name, "");
       }
     out.beginGroup(name, type);
   }

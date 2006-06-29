@@ -4,7 +4,6 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.xml.SName;
 
 public class NodeName extends Procedure1
 {
@@ -26,7 +25,7 @@ public class NodeName extends Procedure1
     if (nodeName == null)
       return Values.empty;
     if (nodeName instanceof String)
-      return SName.make("", nodeName.toString(), "");
+      return Symbol.make("", nodeName.toString(), "");
     return nodeName;
   }
 

@@ -12,7 +12,7 @@ public class TracedProcedure extends ProcedureN
   boolean enabled;
 
   static int indentationStep = 2;
-  static Symbol curIndentSym = new Symbol("current-indentation", null);
+  static Symbol curIndentSym = Symbol.makeUninterned("current-indentation");
 
   public TracedProcedure (Procedure proc, boolean enable)
   {

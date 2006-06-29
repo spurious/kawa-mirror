@@ -14,7 +14,13 @@ public class Keyword extends Symbol
 
   private Keyword (String name)
   {
-    super(name);
+    super(keywordNamespace, name);
+  }
+
+  /** Used for constructing literals (int gnu.expr.LitTable). */
+  public Keyword (Namespace namespace, String name)
+  {
+    super(namespace, name);
   }
 
   /** Get the corresponding non-keyword symbol.
@@ -22,7 +28,7 @@ public class Keyword extends Symbol
    */
   public Symbol asSymbol ()
   {
-    return Namespace.EmptyNamespace.getSymbol(name);
+    return Namespace.EmptyNamespace.getSymbol(getName());
   }
 
   /**
@@ -56,12 +62,12 @@ public class Keyword extends Symbol
 
   public final String toString()
   {
-    return name+':';
+    return getName()+':';
   }
 
   public void print(java.io.PrintWriter ps)
   {
-    Symbols.print(name, ps);
+    Symbols.print(getName(), ps);
     ps.print(':');
   }
 
@@ -107,30 +113,5 @@ public class Keyword extends Symbol
 	  return vals[i+1];
       }
     return dfault;
-  }
-
-  /**
-   * @serialData Write the keyword name (without colons) using writeUTF.
-   */
-
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    out.writeUTF(name);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    name = in.readUTF();
-  }
-
-  public Object readResolve() throws ObjectStreamException
-  {
-    int hash = name.hashCode();
-    Keyword keyword = (Keyword) keywordNamespace.lookup(name, hash, false);
-    if (keyword != null)
-      return keyword;
-    keywordNamespace.add(this, hash);
-    return this;
   }
 }

@@ -146,9 +146,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		    mappingTable[bucket] = info;
 		  }
 		info.uri = uri;
-		info.qname = Symbol.make(uri, local);
+		info.qname = Symbol.make(uri, local, prefix);
 		type = new XName(info.qname,
-				 prefix == null ? "" : prefix,
 				 namespaceBindings);
 		info.type = type;
 		break;

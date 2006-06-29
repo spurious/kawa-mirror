@@ -1,5 +1,8 @@
 2006-06-28  Per Bothner  <per@bothner.com>
 
+	* Keyword.java:  Various updates to use getName() rather than name,
+	in case JAXP-QName is enabled.
+
 	* Symbols.java (generate): Remove unused method.
 
 	* Declaration.java (printInfo): Also print non-constant typeExp.

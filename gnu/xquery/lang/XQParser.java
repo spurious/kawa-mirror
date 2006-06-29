@@ -42,13 +42,13 @@ public class XQParser extends Lexer
   public static boolean warnOldVersion = true;
 
   /** The internal name of the variable containing '.', the context node. */
-  static final Symbol DOT_VARNAME = Symbol.make(null, "$dot$");
+  static final Symbol DOT_VARNAME = Symbol.makeUninterned("$dot$");
 
   /** The pseduo-function position() is mapped to a reference. */
-  static final Symbol POSITION_VARNAME = Symbol.make(null, "$position$");
+  static final Symbol POSITION_VARNAME = Symbol.makeUninterned("$position$");
 
   /** The pseduo-function last() is mapped to a reference to this variable. */
-  static final Symbol LAST_VARNAME = Symbol.make(null, "$last$");
+  static final Symbol LAST_VARNAME = Symbol.makeUninterned("$last$");
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -1328,7 +1328,7 @@ public class XQParser extends Lexer
     getRawToken();
     if (curToken == ')')
       {
-        qname = QuoteExp.voidExp;
+        qname = QuoteExp.getInstance(ElementType.MATCH_ANY_QNAME);
         getRawToken();
       }
     else
@@ -1357,7 +1357,7 @@ public class XQParser extends Lexer
                                         ? "gnu.kawa.xml.AttributeType"
                                         : "gnu.kawa.xml.ElementType");
     ApplyExp elt = new ApplyExp(nodeType.getDeclaredMethod("make", 1),
-                                new Expression[] { qname });;
+                                new Expression[] { qname });
     elt.setFlag(ApplyExp.INLINE_IF_CONSTANT);
     return elt;
   }
@@ -1763,23 +1763,26 @@ public class XQParser extends Lexer
 	  syntaxError("invalid characters after 'NCName:'");
 	local = null;
       }
+    if (uri == null && prefix == null)
+      {
+        Symbol qname;
+        if (local == null)
+          local = ElementType.MATCH_ANY_LOCALNAME;
+        else
+          local = local.intern();
+        return QuoteExp.getInstance(new Symbol(null, local));
+      }
     Expression[] name = new Expression[2];
     if (uri != null)
       name[0] = new QuoteExp(uri);
-    else if (prefix == null)
-      name[0] = QuoteExp.nullExp;
     else
       name[0] = new ApplyExp(new ReferenceExp(XQResolveNames.resolvePrefixDecl),
                              new Expression[] { QuoteExp.getInstance(prefix.intern()) });
-    name[1] = new QuoteExp(local == null ? null : local.intern());
+    name[1] = new QuoteExp(local == null ? "" : local);
     return new ApplyExp(Compilation.typeSymbol.getDeclaredMethod("make", 2),
                         name);
   }
 
-  /** This is deprecated because it only sees namespace prefix in the
-   * module prefix.  It doesn't see prefixes in namespace attributes.
-   * The correct solution is to defer namespace resolution to "resolve" time,
-   * as parseNameTest does. */
   Expression parseQName (boolean attribute)
       throws java.io.IOException, SyntaxException
   {
@@ -1787,7 +1790,7 @@ public class XQParser extends Lexer
     if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
       return parseNameTest(attribute);
     else if (curToken == OP_MUL)
-      return QuoteExp.getInstance(new Symbol(null));
+      return QuoteExp.getInstance(ElementType.MATCH_ANY_QNAME);
     else
       return syntaxError("expected QName or *");
   }
@@ -2370,7 +2373,7 @@ public class XQParser extends Lexer
   }
 
   /** Generate code to cast argument to a QName
-   * (which is implemented using <code>SName</code>). */
+   * (which is implemented using <code>Symbol</code>). */
   Expression castQName (Expression value)
   {
     return new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
@@ -3526,7 +3529,7 @@ public class XQParser extends Lexer
 		getRawToken();
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri in namespace declaration");
-		uri = new String(tokenBuffer, 0, tokenBufferLength);
+		uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 		decl = pushNamespace(prefix, uri);
                 checkAllowedNamespaceDeclaration(prefix, uri);
 		comp.mainLambda.addDeclaration(decl);

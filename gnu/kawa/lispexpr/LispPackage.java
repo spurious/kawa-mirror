@@ -57,7 +57,7 @@ public class LispPackage extends Namespace
       }
 
     if (create)
-      return add(new Symbol(name), hash);
+      return add(new Symbol(this, name), hash);
     else
       return null;
   }

@@ -6,7 +6,6 @@ import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.math.*;
 import gnu.expr.*;
-import gnu.xml.SName;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 
@@ -130,7 +129,7 @@ public class Compare extends Procedure2 implements CanInline
         */
       }
     int comp;
-    if (arg1 instanceof SName && arg2 instanceof SName)
+    if (arg1 instanceof Symbol && arg2 instanceof Symbol)
       comp = arg1.equals(arg2) ? 0 : -3;
     else
       {

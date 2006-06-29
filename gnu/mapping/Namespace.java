@@ -25,7 +25,10 @@ public class Namespace
   /** The Namespace with the empty name. */
   public static final Namespace EmptyNamespace = getInstance("");
 
+  /** Should be interned. */
   String name;
+
+  protected String prefix = "";
 
   /** Get the name of this Namespace. */
   public final String getName () { return name; }
@@ -45,12 +48,6 @@ public class Namespace
     capacity = 1 << log2Size;
     table = new SymbolRef[capacity];
     mask = capacity - 1;
-  }
-
-  /** A kludge used for serializing SName. */
-  protected Namespace (String name, int dummy)
-  {
-    this.name = name;
   }
 
   public static Namespace getDefault ()
@@ -78,12 +75,29 @@ public class Namespace
 	if (ns != null)
 	  return ns;
 	ns = new Namespace ();
-	ns.setName(name);
+	ns.setName(name.intern());
 	nsTable.put(name, ns);
 	return ns;
       }
   }
 
+  public static Namespace make (String uri, String prefix)
+  {
+    if (prefix == null || prefix.length() == 0)
+      return getInstance(uri);
+    String xname = prefix + " -> "+ uri;
+    synchronized (nsTable)
+      {
+	Object old = nsTable.get(xname);
+	if (old instanceof Namespace)
+	  return (Namespace) old;
+	Namespace ns = new Namespace();
+        ns.setName(uri);
+        ns.prefix = prefix;
+	nsTable.put(xname, ns);
+	return ns;
+      }
+  }
   public Object get (String name)
   {
     return Environment.getCurrent().get(getSymbol(getName()));
@@ -130,7 +144,7 @@ public class Namespace
 	  }
 	else
 	  {
-	    if (sym.name.equals(key))
+	    if (sym.getLocalPart().equals(key))
 	      return sym;
 	    prev = ref;
 	  }
@@ -171,7 +185,7 @@ public class Namespace
 	  }
 	*/
 	if (create)
-	  return add(new Symbol(key), hash);
+	  return add(new Symbol(this, key), hash);
 	else
 	  return null;
       }
@@ -181,7 +195,7 @@ public class Namespace
   {
     synchronized (this)
       {
-	String name = symbol.name;
+	String name = symbol.getLocalPart();
 	int hash = name.hashCode();
 	int index = hash & mask;
 	SymbolRef prev = null;
@@ -250,12 +264,14 @@ public class Namespace
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(getName());
+    out.writeObject(prefix);
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    setName((String) in.readObject());
+    name = ((String) in.readObject()).intern();
+    prefix = (String) in.readObject();
   }
 
   public Object readResolve() throws ObjectStreamException
@@ -263,10 +279,12 @@ public class Namespace
     String name = getName();
     if (name != null)
       {
-	Namespace ns = (Namespace) nsTable.get(name);
+        String xname = (prefix == null || prefix.length() == 0 ? name
+                        : (prefix + " -> "+ name));
+	Namespace ns = (Namespace) nsTable.get(xname);
 	if (ns != null)
 	  return ns;
-	nsTable.put(name, this);
+	nsTable.put(xname, this);
       }
     return this;
    
@@ -303,8 +321,7 @@ class SymbolRef
   {
     /* #ifdef JAVA2 */
     super(sym);
-    /* #endif */
-    /* #ifndef JAVA2 */
+    /* #else */
     // this.sym = sym;
     /* #endif */
   }

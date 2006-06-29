@@ -37,7 +37,7 @@ public class ThreadLocation extends Location implements Named
    * However, the binding is not bound to the name as a visible binding. */
   public ThreadLocation (String name)
   {
-    this.name = new Symbol(name);
+    this.name = Symbol.makeUninterned(name);
     this.property = ANONYMOUS;
     unlink = true;
     global = new SharedLocation(this.name, null, 0);
@@ -49,7 +49,7 @@ public class ThreadLocation extends Location implements Named
     String str = name == null ? null : name.toString();
     this.property = ANONYMOUS;
     unlink = true;
-    global = new SharedLocation(new Symbol(str), null, 0);
+    global = new SharedLocation(Symbol.makeUninterned(str), null, 0);
   }
 
   public ThreadLocation (Symbol name, Object property, Location global)

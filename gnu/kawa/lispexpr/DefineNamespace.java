@@ -63,8 +63,7 @@ public class DefineNamespace extends Syntax
           }
         else if (makeXML)
           {
-            namespace
-              = XmlNamespace.getInstance(name, literal);
+            namespace = XmlNamespace.getInstance(name, literal);
             decl.setType(ClassType.make("gnu.kawa.lispexpr.XmlNamespace"));
           }
         else

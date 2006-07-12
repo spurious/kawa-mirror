@@ -137,6 +137,8 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             // However, it makes optimzing the 'setter' case harder.
             return new QuoteExp(new NamedPart(typeval, mname, 'D'));
           }
+        if (Invoke.checkKnownClass(typeval, comp) < 0)
+          return exp;
         PrimProcedure[] methods
           = ClassMethods.getMethods((ClassType) typeval,
                                     Compilation.mangleName(mname),

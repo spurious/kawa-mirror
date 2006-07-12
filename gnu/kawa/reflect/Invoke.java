@@ -315,7 +315,7 @@ public class Invoke extends ProcedureN implements CanInline
   }
 
   /** Check if class exists.
-   * @return -1 is class actually exists;
+   * @return 1 if class actually exists;
    * -1 is class should exist, but doesn't;
    * and 0 otherwise.
    */

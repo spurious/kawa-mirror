@@ -241,6 +241,8 @@ public class SlotGet extends Procedure2
       {
         type = language.getTypeFor(arg0);
         int known = Invoke.checkKnownClass(type, comp);
+        if (known < 0)
+          return exp;
         if ("class".equals(name))
           {
             if (known > 0)

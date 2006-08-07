@@ -1,4 +1,4 @@
-(test-init "macros" 92)
+(test-init "macros" 93)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -427,6 +427,13 @@
       (let ((x 1))
 	(let-syntax ((m (lambda (form)
 			  (let ((x 2))
+			    (quasisyntax (list x ,x))))))
+	  (m))))
+
+(test '(1 3) 'srfi-72-example-3
+      (let ((x 1))
+	(let-syntax ((m (lambda (form)
+			  (let ((x (car '(3))))
 			    (quasisyntax (list x ,x))))))
 	  (m))))
 

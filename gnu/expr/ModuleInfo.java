@@ -199,8 +199,7 @@ public class ModuleInfo
     for (int idep = 0;  idep < ndeps;  idep++)
       {
         ModuleInfo dep = dependencies[idep];
-        if (dep.comp != null)
-          dep.comp.process(wantedState);
+        dep.loadByStages(wantedState);
       }
     state = getState();
     if (state >= wantedState) // Most likely? if ERROR_SEEN.

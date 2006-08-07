@@ -88,15 +88,6 @@ public class ReferenceExp extends AccessExp
           }
         value = binding.value.eval(ctx);
       }
-    // This isn't just an optimization; it's needed for module imports.
-    else if (binding != null
-        && (binding.value instanceof QuoteExp
-            || binding.value instanceof LambdaExp)
-        && binding.value != QuoteExp.undefined_exp
-        && (! getDontDereference() || binding.isIndirectBinding()))
-      {
-        value = binding.value.eval(ctx);
-      }
     else if (binding != null
              && binding.field != null && binding.field.getStaticFlag()
              && (! getDontDereference() || binding.isIndirectBinding()))

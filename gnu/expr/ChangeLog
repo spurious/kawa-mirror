@@ -1,5 +1,10 @@
 2006-08-07  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (apply): Only skip declarations whose init value is
+	undefined_exp, which matches compile logic, rather than checking
+	CAN_READ, which may not have been set if we're in a let-syntax.
+	* ReferenceExp.java (apply): Remove questionable optimization.
+
 	* ModuleInfo.java (loadByStages):  Call recursively to handle
 	complex dependencies.
 

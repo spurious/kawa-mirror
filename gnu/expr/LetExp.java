@@ -46,9 +46,10 @@ public class LetExp extends ScopeExp
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl(), i++)
           {
-            if ((decl.flags & Declaration.CAN_READ+Declaration.CAN_CALL) == 0)
+            Expression init = inits[i];
+            if (init == QuoteExp.undefined_exp)
               continue;
-            Object value = inits[i].eval(ctx);
+            Object value = init.eval(ctx);
             Type type = decl.type;
             if (type != null && type != Type.pointer_type)
               value = type.coerceFromObject(value);
@@ -161,7 +162,7 @@ public class LetExp extends ScopeExp
 	Expression init = inits[i];
         decl.allocateVariable(code);
 	if (! decl.needsInit()
-	    || (decl.isIndirectBinding() && inits[i] == QuoteExp.undefined_exp))
+	    || (decl.isIndirectBinding() && init == QuoteExp.undefined_exp))
 	  varTarget = Target.Ignore;
 	else
 	  {

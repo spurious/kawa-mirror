@@ -1,3 +1,10 @@
+2006-08-08  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateBytecode): Remove no-longer-executed calls
+	to generateClassName, addClass, and setSourceFile.
+	(addClass(ModuleExp,ClassType)): Inline in remaining singler caller
+	addMainClass.
+
 2006-08-07  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (apply): Only skip declarations whose init value is

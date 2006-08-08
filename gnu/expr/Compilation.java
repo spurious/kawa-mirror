@@ -1034,12 +1034,8 @@ public class Compilation
     mustCompile = true;
 
     mainClass = module.classFor(this);
-    addClass(module, mainClass);
-    getConstructor(mainClass, module);
-  }
 
-  ClassType addClass (ModuleExp module, ClassType type)
-  {
+    ClassType type = mainClass;
     ClassType[] interfaces = module.getInterfaces();
     if (interfaces != null)
       type.setInterfaces(interfaces);
@@ -1059,7 +1055,7 @@ public class Compilation
 
     module.type = type;
     addClass(type);
-    return type;
+    getConstructor(mainClass, module);
   }
 
   public final Method getConstructor (LambdaExp lexp)
@@ -1906,21 +1902,7 @@ public class Compilation
 	generateConstructor(moduleClass, module);
       }
 
-    String name;
-    ClassType new_class = module.type;
-    if (new_class == typeProcedure)
-      {
-	name = generateClassName(module.getJavaName());
-	new_class = addClass(module, new ClassType(name));
-      }
-    curClass = new_class;
-
-
-    String filename = module.getFile();
-    module.type = new_class;
-    if (filename != null)
-      new_class.setSourceFile (filename);
-
+    curClass = module.type;
     int arg_count;
     LambdaExp saveLambda = curLambda;
     curLambda = module;
@@ -1962,7 +1944,7 @@ public class Compilation
     code = getCode();
     // if (usingCPStyle())   code.addParamLocals();
 
-    thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
+    thisDecl = method.getStaticFlag() ? null : module.declareThis(module.type);
     module.closureEnv = module.thisVariable;
     module.heapFrame = module.isStatic() ? null : module.thisVariable;
     module.allocChildClasses(this);

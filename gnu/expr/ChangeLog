@@ -1,5 +1,8 @@
 2006-08-08  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (load): When CREATE_FIELD_REFERENCE in immediate
+	mode use new FieldLocationa dn StaticFieldLocation factory methods.
+
 	* ModuleExp.java (evalToClass): Don't value value1 to Compilation here.
 	(evalModule): Set it here instead.  For future recursive evalToClass. 
 

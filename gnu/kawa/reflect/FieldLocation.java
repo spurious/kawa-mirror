@@ -321,6 +321,16 @@ public class FieldLocation extends ClassMemberLocation
     return ((Location) v).isBound();
   }
 
+  public static FieldLocation make (Object instance, Declaration decl)
+  {
+    gnu.bytecode.Field fld = decl.field;
+    ClassType ctype = fld.getDeclaringClass();
+    FieldLocation loc = new FieldLocation(instance, ctype, fld.getName());
+    loc.setDeclaration(decl);
+    //maybe setKindFlags();
+    return loc;
+  }
+
   public static FieldLocation make (/*Object name,*/ Object instance, String cname, String fldName)
   {
     return new FieldLocation(/*name,*/ instance, ClassType.make(cname), fldName);

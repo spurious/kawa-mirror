@@ -169,20 +169,26 @@ public class Declaration
           throw new Error("internal error: cannot take location of "+this);
         Method meth;
         ClassType ltype;
+        boolean immediate = comp.immediate;
         if (field.getStaticFlag())
           {
             ltype = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
-            meth = ltype.getDeclaredMethod("make", 2);
+            meth = ltype.getDeclaredMethod("make", immediate ? 1 : 2);
           }
         else
           {
             ltype = ClassType.make("gnu.kawa.reflect.FieldLocation");
-            meth = ltype.getDeclaredMethod("make", 3);
+            meth = ltype.getDeclaredMethod("make", immediate ? 2 : 3);
 
             loadOwningObject(owner, comp);
           }
-        comp.compileConstant(field.getDeclaringClass().getName());
-        comp.compileConstant(field.getName());
+        if (immediate)
+          comp.compileConstant(this);
+        else
+          {
+            comp.compileConstant(field.getDeclaringClass().getName());
+            comp.compileConstant(field.getName());
+          }
         code.emitInvokeStatic(meth);
         rtype = ltype;
       }

@@ -33,6 +33,16 @@ public class StaticFieldLocation extends FieldLocation
     return loc;
   }
 
+  public static StaticFieldLocation make (Declaration decl)
+  {
+    gnu.bytecode.Field fld = decl.field;
+    ClassType ctype = fld.getDeclaringClass();
+    StaticFieldLocation loc = new StaticFieldLocation(ctype, fld.getName());
+    loc.setDeclaration(decl);
+    //maybe setKindFlags();
+    return loc;
+  }
+
   public static StaticFieldLocation make (/*Object name,*/ String cname, String fldName)
   { 
     return new StaticFieldLocation(cname, fldName);

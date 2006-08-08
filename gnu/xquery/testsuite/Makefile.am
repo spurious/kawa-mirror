@@ -23,6 +23,16 @@ TestMisc.class:  TestMisc.java
 TestSuite.class:  TestSuite.java
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
 
+RunXQTS.class:  RunXQTS.java
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
+
+XQTS_DIR = @XQTS_PATH@
+XQTS_CATALOG = $(XQTS_DIR)/XQTSCatalog.xml
+
+check-XQTS: RunXQTS.class
+	CLASSPATH=$(KAWALIB) \
+	  $(JAVA) gnu.xquery.testsuite.RunXQTS $(XQTS_DIR)
+
 check-misc: TestMisc.class
 	CLASSPATH=$(KAWALIB) $(JAVA) gnu.xquery.testsuite.TestMisc
 

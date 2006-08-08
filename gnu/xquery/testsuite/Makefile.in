@@ -145,6 +145,7 @@ WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
 WITH_SWT_FALSE = @WITH_SWT_FALSE@
 WITH_SWT_TRUE = @WITH_SWT_TRUE@
+XQTS_PATH = @XQTS_PATH@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -227,6 +228,8 @@ EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
 
+XQTS_DIR = @XQTS_PATH@
+XQTS_CATALOG = $(XQTS_DIR)/XQTSCatalog.xml
 all: all-am
 
 .SUFFIXES:
@@ -430,6 +433,13 @@ TestMisc.class:  TestMisc.java
 
 TestSuite.class:  TestSuite.java
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
+
+RunXQTS.class:  RunXQTS.java
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
+
+check-XQTS: RunXQTS.class
+	CLASSPATH=$(KAWALIB) \
+	  $(JAVA) gnu.xquery.testsuite.RunXQTS $(XQTS_DIR)
 
 check-misc: TestMisc.class
 	CLASSPATH=$(KAWALIB) $(JAVA) gnu.xquery.testsuite.TestMisc

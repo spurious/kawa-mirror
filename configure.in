@@ -22,6 +22,9 @@ AC_ARG_ENABLE(xml,
 AC_ARG_WITH(servlet,
   AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 
+AC_ARG_WITH(XQTS,
+  AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
+
 AC_ARG_ENABLE(echo2,
   AS_HELP_STRING(--enable-echo2,Enable support for the Echo2 web toolkit),
   enable_echo2=$enableval, enable_echo2=yes)
@@ -138,6 +141,9 @@ case ${with_servlet} in
   "") ;;
   *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
 esac
+
+XQTS_PATH=${with_XQTS:XQTS}
+AC_SUBST(XQTS_PATH)
 
 AC_SUBST(conf_classpath)
 AC_SUBST(pathsep)

@@ -1,3 +1,8 @@
+2006-08-08  Per Bothner  <per@bothner.com>
+
+	* configure.in (--with-XQTS): New flag.
+	(XQTS_PATH): New substitution variable.
+
 2006-06-28  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/TracedProcedure.java (curIndentSym): Use new

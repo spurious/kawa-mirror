@@ -1,5 +1,8 @@
 2006-08-08  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): Don't value value1 to Compilation here.
+	(evalModule): Set it here instead.  For future recursive evalToClass. 
+
 	* Compilation.java (generateBytecode): Remove no-longer-executed calls
 	to generateClassName, addClass, and setSourceFile.
 	(addClass(ModuleExp,ClassType)): Inline in remaining singler caller

@@ -119,9 +119,6 @@ public class ModuleExp extends LambdaExp
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
 	*/
 
-        CallContext ctx = CallContext.getInstance();
-        ctx.value1 = comp;
-
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType ctype = comp.classes[iClass];
@@ -208,6 +205,8 @@ public class ModuleExp extends LambdaExp
                   {
                     thread = null;
                   }
+
+                ctx.value1 = comp;
                 Object inst;
                 try
                   {

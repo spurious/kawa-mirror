@@ -67,8 +67,7 @@ public class ModuleExp extends LambdaExp
         loader.setResourceContext(url);
 	comp.loader = loader;
 
-        comp.setState(Compilation.WALKED);
-        comp.process(Compilation.COMPILED);
+        comp.minfo.loadByStages(Compilation.COMPILED);
 
 	if (messages.seenErrors())
 	  return null;
@@ -170,6 +169,7 @@ public class ModuleExp extends LambdaExp
           comp.addMainClass(mexp);
 
         comp.walkModule(mexp);
+        comp.setState(Compilation.WALKED);
 
         if (msg != null ? messages.checkErrors(msg, 20) : messages.seenErrors())
           return false;

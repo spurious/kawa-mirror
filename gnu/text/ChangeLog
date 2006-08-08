@@ -1,3 +1,7 @@
+2006-08-08  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (lastModified): New static method.
+
 2006-05-25  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (seenErrorsOrWarnings): New method.

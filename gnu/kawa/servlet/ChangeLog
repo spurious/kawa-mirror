@@ -1,3 +1,11 @@
+2006-08-08  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (LAST_MODIFIED_CACHE_TIME): Moved field
+	to ModuleManager.
+	(getModule): Use ModuleManager's lastModifiedCacheTime instead.
+
+	* KawaPageServlet.java (getModule): Initialize module state to WALKED.
+
 2006-02-09  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): ModuleExp.evalToClass now does a

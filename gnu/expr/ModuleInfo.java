@@ -15,6 +15,13 @@ public class ModuleInfo
   Compilation comp;
 
   public Compilation getCompilation() { return comp; }
+
+  public void setCompilation (Compilation comp)
+  {
+    comp.minfo = this;
+    this.comp = comp;
+    this.exp = comp.mainLambda;
+  }
   
   public Class moduleClass;
 
@@ -53,6 +60,8 @@ public class ModuleInfo
     ModuleExp m = exp;
     if (m == null)
       {
+        if (comp != null)
+          return comp.mainLambda;
         ClassType ctype = ClassType.make(className);
         m = new ModuleExp();
         m.type = ctype;
@@ -228,7 +237,8 @@ public class ModuleInfo
         ModuleInfo dep = dependencies[idep];
         if (! dep.loadEager(wantedState))
           {
-            comp.setState(state);
+            if (getState() == state+1)
+              comp.setState(state);
             return false;
           }
       }

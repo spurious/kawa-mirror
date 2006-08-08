@@ -71,6 +71,21 @@ public class URI_utils
     return (URL) uri;
   }
 
+  public static long lastModified (Object uri)
+  {
+    try
+      {
+        uri = toFileOrURL(uri);
+        if (uri instanceof File)
+          return ((File) uri).lastModified();
+        return ((URL) uri).openConnection().getLastModified();
+      }
+    catch (Throwable ex)
+      {
+        return 0;
+      }
+  }
+
   public static Object toFileOrURL (Object uri)
     throws java.io.IOException
   {

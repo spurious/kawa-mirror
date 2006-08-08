@@ -78,7 +78,8 @@ public class ModuleContext
   public Object findInstance (ModuleInfo info)
   {
     Object inst = table.get(info.className);
-    if (inst == null)
+    if (inst == null || info.moduleClass == null
+        || ! info.moduleClass.isInstance(inst))
       inst = makeInstance(info);
     return inst;
   }

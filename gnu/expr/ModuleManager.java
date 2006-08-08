@@ -10,6 +10,10 @@ public class ModuleManager
    * Later, might have multiple managers. */
   public static ModuleManager getInstance() { return instance; }
 
+  public static final long LAST_MODIFIED_CACHE_TIME = 1000;
+  /** Number millseconds before we re-check file's modified time. */
+  public long lastModifiedCacheTime = LAST_MODIFIED_CACHE_TIME;
+
   /** Chain of all modules managed by this ModuleManager.
    * Linked together by ModuleInfo's next field. */
   ModuleInfo modules;
@@ -19,9 +23,7 @@ public class ModuleManager
     ModuleExp mexp = comp.getModule();
     ClassType ctype = mexp.classFor(comp);
     ModuleInfo info = findWithClassName(ctype.getName());
-    info.exp = mexp;
-    info.comp = comp;
-    comp.minfo = info;
+    info.setCompilation(comp);
     return info;
   }
 

@@ -1815,6 +1815,7 @@ public class Compilation
             language.parse(this, 0);
             lexer.close();
             lexer = null;
+            setState(messages.seenErrors() ? ERROR_SEEN : BODY_PARSED);
             if (pendingImports != null)
               return;
           }
@@ -2245,7 +2246,10 @@ public class Compilation
     if (Compilation.generateAppletDefault)
       module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     if (immediate)
-      module.setFlag(ModuleExp.IMMEDIATE);
+      {
+        module.setFlag(ModuleExp.IMMEDIATE);
+        new ModuleInfo().setCompilation(this);
+      }
     mainLambda = module;
     push(module);
     return module;

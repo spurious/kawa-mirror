@@ -1,5 +1,22 @@
 2006-08-08  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java (setCompilation): New method.
+	(getModuleExp): If we have Compilation, use its mainLambda.
+	* Compilation.java (pushNewModule): Set setCompilation on ModuleInfo.
+	* ModuleManager.java (LAST_MODIFIED_CACHE_TIME): New constant.
+	Moved from gnu/kawa/servlet/KawaPageServlet.java.
+	(lastModifiedCacheTime): New field.
+	(find): Use new setCompilation method.
+	* ModuleContext.java (findInstance): Don't re-use instance
+	if it isn't of the needed class.
+
+	* ModuleInfo.java (loadEager):  Don't set to lower state, except to
+	clear "busy" bit.
+	* ModuleExp.java (evalToClass): Use loadByStages rather than process
+	to properly handle dependencies and cycles.
+	(evalModule): Init state to WALKED here rather than in evalToClass.
+	* Compilation.java (process): Set state after BODY_PARSED.
+
 	* Declaration.java (load): When CREATE_FIELD_REFERENCE in immediate
 	mode use new FieldLocationa dn StaticFieldLocation factory methods.
 

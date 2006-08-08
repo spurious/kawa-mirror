@@ -26,7 +26,6 @@ import javax.servlet.http.*;
  */
 public class KawaPageServlet extends KawaServlet
 {
-  private static long LAST_MODIFIED_CACHE_TIME = 1000;
   private ServletContext context;
 
   public void init(ServletConfig config)
@@ -68,12 +67,12 @@ public class KawaPageServlet extends KawaServlet
       mcontext = ModuleContext.getContext();
     ModuleInfo minfo = (ModuleInfo) mmap.get(path);
     long now = System.currentTimeMillis();
+    ModuleManager mmanager = mcontext.getManager();
+
     // avoid hitting the disk too much
     if (minfo != null
-        && now - minfo.lastCheckedTime < LAST_MODIFIED_CACHE_TIME)
+        && now - minfo.lastCheckedTime < mmanager.lastModifiedCacheTime)
       return mcontext.findInstance(minfo);
-
-    ModuleManager mmanager = mcontext.getManager();
 
     URL url = context.getResource(path);
     String upath = path;
@@ -177,6 +176,7 @@ public class KawaPageServlet extends KawaServlet
         ModuleExp mexp = comp.getModule();
         comp.addMainClass(mexp);
         comp.walkModule(mexp);
+        comp.setState(Compilation.WALKED);
         cl = ModuleExp.evalToClass(comp, url);
       }
 

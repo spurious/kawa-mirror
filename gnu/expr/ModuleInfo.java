@@ -139,6 +139,22 @@ public class ModuleInfo
     return ModuleManager.getInstance().findWithClassName(className);
   }
 
+  public static ModuleInfo find (Type type)
+  {
+    ModuleInfo info = ModuleManager.getInstance().findWithClassName(type.getName());
+    if (type instanceof ObjectType && ((ObjectType) type).isExisting())
+      {
+        try
+          {
+            info.moduleClass = type.getReflectClass();
+          }
+        catch (Exception ex)
+          {
+          }
+      }
+    return info;
+  }
+
   public static void register (Object instance)
   {
     ModuleInfo info = find(instance.getClass().getName());
@@ -246,5 +262,38 @@ public class ModuleInfo
       comp.setState(state);
     comp.process(wantedState);
     return getState() == wantedState;
+  }
+
+  public void clearClass ()
+  {
+    moduleClass = null;
+    numDependencies = 0;
+    dependencies = null;
+  }
+
+  /** Check if this module and its dependencies are up-to-dete.
+   * Only checks the sourceURL's modification time if it is at least
+   * ModifiedCacheTime since last time we checked.
+   * As as side-effects update lastModifiedTime and lastCheckedTime.
+   */
+  public boolean checkCurrent (ModuleManager manager, long now)
+  {
+    if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
+      return true;
+    lastCheckedTime = now;
+    long lastModifiedTime = URI_utils.lastModified(sourceURL);
+    if (moduleClass == null || lastModifiedTime > this.lastModifiedTime)
+      {
+        moduleClass = null;
+        this.lastModifiedTime = lastModifiedTime;
+        return false;
+      }
+    for (int i = numDependencies;  --i >= 0; )
+      {
+        ModuleInfo dep = dependencies[i];
+        if (! dep.checkCurrent(manager, now))
+          return false;
+      }
+    return true;
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2005 Per M.A. Bothner.
+// Copyright (C) 2005, 2006 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package kawa.standard;
@@ -10,7 +10,9 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.kawa.functions.Convert;
+import gnu.text.*;
 import java.util.*;
+import java.io.*;
 
 public class require extends Syntax
 {
@@ -111,7 +113,8 @@ public class require extends Syntax
         // it be emitted at the end of the 'body'.
         return true;
       }
-    Object name = ((Pair) st.cdr).car;
+    Pair args = (Pair) st.cdr;
+    Object name = args.car;
     Type type = null;
     Pair p;
     if (name instanceof Pair
@@ -133,6 +136,10 @@ public class require extends Syntax
 	  }
 	type = ClassType.make((String) name);
       }
+    else if (name instanceof FString)
+      {
+        return importDefinitions(null, name.toString(), null, forms, defs, tr);
+      }
     else
       {
 	if (name instanceof String)
@@ -147,6 +154,13 @@ public class require extends Syntax
 		if (str.indexOf('.') < 0)
 		  str = tr.classPrefix + str;
 		type = Scheme.string2Type(str);
+                if (args.cdr instanceof Pair
+                    && ((Pair) args.cdr).car instanceof FString)
+                  {
+                    return importDefinitions(type,
+                                             ((Pair) args.cdr).car.toString(),
+                                             null, forms, defs, tr);
+                  }
 	      }
 	  }
       }
@@ -155,9 +169,55 @@ public class require extends Syntax
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
-    return importDefinitions(ModuleInfo.find(type.getName()),
-                             null, forms, defs, tr);
+    return importDefinitions(ModuleInfo.find(type), null, forms, defs, tr);
   }
+
+  public static boolean
+  importDefinitions (Type type, String sourceName, String uri,
+                     Vector forms,
+                     ScopeExp defs, Compilation tr)
+  {
+    ModuleManager manager = ModuleManager.getInstance();
+    Language language = Language.getDefaultLanguage();
+    SourceMessages messages = tr.getMessages();
+    try
+      {
+        sourceName = URI_utils.resolve(sourceName, defs.getFile()).toString();
+        ModuleInfo info = manager.findWithSourcePath(sourceName);
+        long now = System.currentTimeMillis();
+        if (info != null
+            && ((info.getState() & 1) != 0
+                || info.checkCurrent(manager, now)))
+          {
+            return importDefinitions(info, null, forms, defs, tr);
+          }
+        InPort fstream;
+        try
+          {
+            fstream = InPort.openFile(sourceName);
+          }
+        catch (java.io.FileNotFoundException ex)
+          {
+            if (info == null)
+              throw ex;
+            return importDefinitions(info, null, forms, defs, tr);
+          }
+        Compilation comp
+          = language.parse(fstream, messages, Language.PARSE_PROLOG);
+        ModuleExp mexp = comp.getModule();
+        ClassType ctype = mexp.classFor(comp);
+        info.className = ctype.getName();
+        info.setCompilation(comp);
+        info.clearClass();
+        return importDefinitions(info, uri, forms, defs, tr);
+      }
+    catch (Throwable ex)
+      {
+        throw WrappedException.wrapIfNeeded(ex);
+      }
+  }
+                     
+  static int n;
 
   public static boolean importDefinitions (ModuleInfo info, String uri,
                                     Vector forms,
@@ -180,7 +240,8 @@ public class require extends Syntax
     ClassType type = info.getClassType();
     String tname = info.className;
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
-    boolean isRunnable = type.isSubtype(Compilation.typeRunnable);
+    boolean isRunnable = info.getState() < Compilation.RESOLVED
+      || type.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
     Expression[] args = { new QuoteExp(tname) };
@@ -188,8 +249,6 @@ public class require extends Syntax
     Field instanceField = null;
     dofind.setLine(tr);
     int formsStart = forms.size();
-    ClassType typeFieldLocation
-      = ClassType.make("gnu.kawa.reflect.FieldLocation");
 
     ModuleExp mod = info.setupModuleExp();
 
@@ -208,25 +267,19 @@ public class require extends Syntax
             decl.setFlag(Declaration.IS_CONSTANT
                          |Declaration.MODULE_REFERENCE);
             defs.addDeclaration(decl);
-            if (immediate)
-              {
-                Object instance = info.getInstance();
-                decl.noteValue(new QuoteExp(instance));
-              }
-            else
-              {
-                decl.noteValue(dofind);
-                SetExp sexp = new SetExp(decl, dofind);
-                sexp.setLine(tr);
-                sexp.setDefining(true);
-                forms.addElement(sexp);
-                formsStart = forms.size();
-                decl.setFlag(Declaration.EARLY_INIT);
-                // If Runnable, we need to set decl value in initializer,
-                // and later 'run' it, so it needs to be stored in a field.
-                if (isRunnable)
-                  decl.setSimple(false);
-              }
+
+            decl.noteValue(dofind);
+            SetExp sexp = new SetExp(decl, dofind);
+            sexp.setLine(tr);
+            sexp.setDefining(true);
+            forms.addElement(sexp);
+            formsStart = forms.size();
+            decl.setFlag(Declaration.EARLY_INIT);
+            // If Runnable, we need to set decl value in initializer,
+            // and later 'run' it, so it needs to be stored in a field.
+            if (isRunnable)
+              decl.setSimple(false);
+
             decl.setFlag(Declaration.TYPE_SPECIFIED);
           }
 
@@ -306,26 +359,25 @@ public class require extends Syntax
           adecl.setProcedureDecl(true);
         if (isStatic)
           adecl.setFlag(Declaration.STATIC_SPECIFIED);
-        if (! immediate)
-          {
-            SetExp sexp = new SetExp(adecl, fref);
-            adecl.setFlag(Declaration.EARLY_INIT);
-            sexp.setDefining(true);
-            if (isImportedInstance)
-              {
-                // Make sure the "MODULE$instance" declarations are
-                // initialized first, since we may need then for
-                // imported declarations that are re-exported.  (The
-                // instance may be needed for FieldLocation values.)
-                forms.insertElementAt(sexp, formsStart);
-                formsStart++;
-              }
-            else
-              forms.addElement(sexp);
 
-            declPairs.add(adecl);
-            declPairs.add(fdecl);
+        SetExp sexp = new SetExp(adecl, fref);
+        adecl.setFlag(Declaration.EARLY_INIT);
+        sexp.setDefining(true);
+        if (isImportedInstance)
+          {
+            // Make sure the "MODULE$instance" declarations are
+            // initialized first, since we may need then for
+            // imported declarations that are re-exported.  (The
+            // instance may be needed for FieldLocation values.)
+            forms.insertElementAt(sexp, formsStart);
+            formsStart++;
           }
+        else
+          forms.addElement(sexp);
+
+        declPairs.add(adecl);
+        declPairs.add(fdecl);
+
         adecl.noteValue(fref);
         adecl.setFlag(Declaration.IS_IMPORTED);
         tr.push(adecl);  // Add to translation env.
@@ -358,33 +410,21 @@ public class require extends Syntax
 
     if (isRunnable)
       {
-	if (immediate)
-	  {
-            dofind = new ApplyExp(ClassType.make("gnu.expr.ModuleInfo")
-                                  .getDeclaredMethod("getRunInstance", 0),
-                                  new Expression[] { new QuoteExp(info)});
-	    forms.addElement(gnu.kawa.functions.Convert
-                             .makeCoercion(dofind,
-                                           new QuoteExp(Type.void_type)));
-	  }
-	else
+        Method run = Compilation.typeRunnable.getDeclaredMethod("run", 0);
+        if (decl != null) // Need to make sure 'run' is invoked.
+          dofind = new ReferenceExp(decl);
+        else
           {
-            Method run = Compilation.typeRunnable.getDeclaredMethod("run", 0);
-            if (decl != null) // Need to make sure 'run' is invoked.
-              dofind = new ReferenceExp(decl);
-            else
-              {
-                if (instanceField != null)
-                  { //Optimization
-                    args = new Expression[]
-                      { new QuoteExp(type), new QuoteExp("$instance") };
-                    dofind = new ApplyExp(SlotGet.staticField, args);
-                  }
+            if (instanceField != null)
+              { //Optimization
+                args = new Expression[]
+                  { new QuoteExp(type), new QuoteExp("$instance") };
+                dofind = new ApplyExp(SlotGet.staticField, args);
               }
-            dofind = new ApplyExp(run, new Expression[] { dofind });
-            dofind.setLine(tr);
-            forms.addElement(dofind);
-	  }
+          }
+        dofind = new ApplyExp(run, new Expression[] { dofind });
+        dofind.setLine(tr);
+        forms.addElement(dofind);
       }
     tr.mustCompileHere();
     return true;

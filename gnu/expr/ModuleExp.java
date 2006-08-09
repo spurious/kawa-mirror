@@ -124,7 +124,22 @@ public class ModuleExp extends LambdaExp
             ctype.setReflectClass(loader.loadClass(ctype.getName(), false));
             ctype.setExisting(true);
           }
-	return loader.loadClass (mexp.getJavaName(), true);
+
+	Class clas = loader.loadClass (mexp.getJavaName(), true);
+
+        ModuleInfo minfo = comp.minfo;
+        minfo.moduleClass = clas;
+        int ndeps = minfo.numDependencies;
+
+        for (int idep = 0;  idep < ndeps;  idep++)
+          {
+            ModuleInfo dep = minfo.dependencies[idep];
+            if (dep.moduleClass == null)
+              dep.moduleClass = evalToClass(dep.comp, null);
+            comp.loader.addClass(dep.moduleClass);
+          }
+
+        return clas;
       }
     catch (java.io.IOException ex)
       {

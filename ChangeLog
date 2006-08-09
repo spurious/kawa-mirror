@@ -1,5 +1,12 @@
 2006-08-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (scanForDefinition): Handle extended
+	'(require [CLASS] "SOURCE")' syntax.
+	(importDefinitions): New overloaded method, handles above new cases.
+	Parse module if appropriate.
+	(importDefinitions): Handle non-compiled class.
+	Remove most special handling of immediate mode.
+
 	* configure.in (--with-XQTS): New flag.
 	(XQTS_PATH): New substitution variable.
 

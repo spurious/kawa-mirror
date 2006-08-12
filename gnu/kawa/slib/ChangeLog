@@ -1,3 +1,10 @@
+2006-08-11  Per Bothner  <per@bothner.com>
+
+	* testing.scm (%test-comp1body):  Remove inccorect setting of
+	expected-value property - to R5RS standard function exp.
+
+	* testing.scm (test-assert): Fix thinko expr -> test-expression.
+	
 2006-06-06  Per Bothner  <per@bothner.com>
 
 	* testing.scm: Rename non-exported names to consistently start with %.

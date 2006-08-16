@@ -1,5 +1,15 @@
 2006-08-16  Per Bothner  <per@bothner.com>
 
+	Change the way an immediate-compiled <clinit> can find its
+	Compilation in order to import literals.  This is more robust.
+	* ModuleExp.java (evalModule): No longer need to set context's value1.
+	(setupLiterals): Move to Compilation.java.
+	* Compilation.java (setupLiterals):: Moved.  Also take integer 'key'
+	parameter and pass it to findForImmediateLiterals.
+	(generateBytecode): Update accordingly.
+	(keyUninitialized, chainUninitialized, nextUninitialized): New fields.
+	(registerForImmediateLiterals, findForImmediateLiterals): New methods.
+
 	* ModuleExp.java (evalToClass): Don't call extra loadClass to get main
 	class.  This may use inconsistent name mangling, and is redundant.
 

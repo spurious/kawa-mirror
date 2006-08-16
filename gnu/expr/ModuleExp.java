@@ -224,7 +224,6 @@ public class ModuleExp extends LambdaExp
                     thread = null;
                   }
 
-                ctx.value1 = comp;
                 Object inst;
                 try
                   {
@@ -297,45 +296,6 @@ public class ModuleExp extends LambdaExp
           thread.setContextClassLoader(savedLoader);
       }
     return true;
-  }
-
-  /** Call-back from compiled code to initialize literals in immediate mode.
-   * In non-immediate mode (i.e. generating class files) the compiler emits
-   * code to "re-construct" literal values.  However, in immediate mode
-   * that would be wasteful, plus we would get values that are similar (equals)
-   * to but not necessarily identical (eq) to the compile-time literal.
-   * So we need to pass the literal values to the compiled code, by using
-   * reflectiion to initialize various static fields.  This method does that.
-   * It is called from start of the the generated static initializer, which
-   * helps makes things more consistent between immediate and non-immediate
-   * mode.
-   */
-  public static void setupLiterals ()
-  {
-    CallContext ctx = CallContext.getInstance();
-    Compilation comp = (Compilation) ctx.value1;
-    try
-      {
-        Class clas = comp.loader.loadClass(comp.mainClass.getName(), true);
-
-	/* Pass literal values to the compiled code. */
-	for (Literal init = comp.litTable.literalsChain;  init != null;
-	     init = init.next)
-	  {
-	    /* DEBUGGING:
-	    OutPort out = OutPort.errDefault();
-	    out.print("init["+init.index+"]=");
-	    out.print(init.value);
-	    out.println();
-	    */
-            clas.getDeclaredField(init.field.getName())
-              .set(null, init.value);
-	  }
-      }
-    catch (Throwable ex)
-      {
-        throw new WrappedException("internal error", ex);
-      }
   }
 
   ClassType superType;

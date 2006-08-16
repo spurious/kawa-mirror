@@ -2091,8 +2091,11 @@ public class Compilation
 	try
 	  {
             if (immediate)
-              code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleExp")
-                                    .getDeclaredMethod("setupLiterals", 0));
+              {
+                code.emitPushInt(registerForImmediateLiterals(this));
+                code.emitInvokeStatic(ClassType.make("gnu.expr.Compilation")
+                                      .getDeclaredMethod("setupLiterals", 1));
+              }
             else
               litTable.emit();
 	  }
@@ -2592,6 +2595,85 @@ public class Compilation
     if (function && getLanguage().hasSeparateFunctionNamespace())
       return env.getFunction(symbol, null);
     return env.get(symbol, null);
+  }
+
+  /** A key we can pass from the compiler to identity a Compilation. */
+  private int keyUninitialized;
+  /** Chain of immediate Compilation whose setupLiterals hasn't been called. */
+  private static Compilation chainUninitialized;
+  /** Next in chain headed by chainUninitialized. */
+  private Compilation nextUninitialized;
+
+  /** Call-back from compiled code to initialize literals in immediate mode.
+   * In non-immediate mode (i.e. generating class files) the compiler emits
+   * code to "re-construct" literal values.  However, in immediate mode
+   * that would be wasteful, plus we would get values that are similar (equals)
+   * to but not necessarily identical (eq) to the compile-time literal.
+   * So we need to pass the literal values to the compiled code, by using
+   * reflectiion to initialize various static fields.  This method does that.
+   * It is called from start of the the generated static initializer, which
+   * helps makes things more consistent between immediate and non-immediate
+   * mode.
+   */
+  public static void setupLiterals (int key)
+  {
+    Compilation comp = Compilation.findForImmediateLiterals(key);
+    try
+      {
+        Class clas = comp.loader.loadClass(comp.mainClass.getName(), true);
+
+	/* Pass literal values to the compiled code. */
+	for (Literal init = comp.litTable.literalsChain;  init != null;
+	     init = init.next)
+	  {
+	    /* DEBUGGING:
+	    OutPort out = OutPort.errDefault();
+	    out.print("init["+init.index+"]=");
+	    out.print(init.value);
+	    out.println();
+	    */
+            clas.getDeclaredField(init.field.getName())
+              .set(null, init.value);
+	  }
+      }
+    catch (Throwable ex)
+      {
+        throw new WrappedException("internal error", ex);
+      }
+  }
+
+  public static synchronized int
+  registerForImmediateLiterals (Compilation comp)
+  {
+    int i = 0;
+    for (Compilation c = chainUninitialized;  c != null;  c = c.nextUninitialized)
+      {
+        if (i <= c.keyUninitialized)
+          i = c.keyUninitialized + 1;
+      }
+    comp.keyUninitialized = i;
+    comp.nextUninitialized = chainUninitialized;
+    chainUninitialized = comp;
+    return i;
+  }
+
+  public static synchronized Compilation findForImmediateLiterals (int key)
+  {
+    Compilation prev = null;
+    for (Compilation comp = chainUninitialized; ; )
+      {
+        Compilation next = comp.nextUninitialized;
+        if (comp.keyUninitialized == key)
+          {
+            if (prev == null)
+              chainUninitialized = next;
+            else
+              prev.nextUninitialized = next;
+            return comp;
+          }
+        prev = comp;
+        comp = next;
+      }
   }
 
   /** Current lexical scope - map name to Declaration. */

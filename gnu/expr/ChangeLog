@@ -1,5 +1,10 @@
 2006-08-16  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (lastZipCounter): New static field.
+	(evalToClass):  For zip dump file name use max of lastZipCounter
+	and interactiveCounter, to avoid overwriting an old file in more
+	complex multi-module situations.
+
 	* BindingInitializer.java (emit): Emit line number if available.
 
 	* Compilation.java (addMainClass): Remove special-casing for immediate.

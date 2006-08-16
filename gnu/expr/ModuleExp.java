@@ -36,6 +36,8 @@ public class ModuleExp extends LambdaExp
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
 
+  static int lastZipCounter;
+
   /** Numeric identifier for this interactive "command".
    * Incremented by Shell.run, and used to set the module name,
    * and maybe the name of the --debug-dump-zip output file.
@@ -44,9 +46,6 @@ public class ModuleExp extends LambdaExp
    * need to be named differently, and it doesn't matter
    * if there is a race condition on the counter.) */
   public static int interactiveCounter;
-
-  ///** A cache if this has already been evaluated. */
-  //Procedure thisValue;
 
   public static Class evalToClass (Compilation comp, URL url)
   {
@@ -76,9 +75,11 @@ public class ModuleExp extends LambdaExp
 	if (dumpZipPrefix != null)
 	  {
 	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
-	    if (interactiveCounter >= 0)
-	      // Incremented by Shell.run.
-	      zipname.append(interactiveCounter);
+            
+            lastZipCounter++;
+	    if (interactiveCounter > lastZipCounter)
+	      lastZipCounter = interactiveCounter;
+            zipname.append(lastZipCounter);
 	    zipname.append(".zip");
 	    java.io.FileOutputStream zfout
 	      = new java.io.FileOutputStream(zipname.toString());

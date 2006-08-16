@@ -119,14 +119,16 @@ public class ModuleExp extends LambdaExp
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
 	*/
 
+        Class clas = null;
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType ctype = comp.classes[iClass];
-            ctype.setReflectClass(loader.loadClass(ctype.getName(), false));
+            Class cclass = loader.loadClass(ctype.getName(), false);
+            ctype.setReflectClass(cclass);
             ctype.setExisting(true);
+            if (iClass == 0)
+              clas = cclass;
           }
-
-	Class clas = loader.loadClass (mexp.getJavaName(), true);
 
         ModuleInfo minfo = comp.minfo;
         minfo.moduleClass = clas;

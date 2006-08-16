@@ -1,3 +1,7 @@
+2006-08-16  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addMainClass): Remove special-casing for immediate.
+
 2006-08-08  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (find(Type)): New static method.

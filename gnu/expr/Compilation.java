@@ -1049,7 +1049,7 @@ public class Compilation
 	else
 	  sup = getModuleType();
       }
-    if (! generateServlet && ! immediate)
+    if (! generateServlet)
       type.addInterface(typeRunnable);
     type.setSuper(sup);
 

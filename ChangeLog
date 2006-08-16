@@ -1,3 +1,10 @@
+2006-08-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa/Version.java): If .svn/entries exists, extract
+	SVN revision number and date and add that to the Kawa version string.
+	(CLEANFILES): Move kawa/Version.java from -MAINTAINERCLEANFILES.
+	(MAINTAINERCLEANFILES): Remove since no longer needed.
+
 2006-08-08  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (scanForDefinition): Handle extended

@@ -84,9 +84,8 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   gnu/jemacs/jar-manifest gnu/jemacs/status.html \
   kawa/Version.java jar-manifest Make-rules
 
-MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp
-CLEANFILES = *.jar
+CLEANFILES = *.jar kawa/Version.java
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -165,7 +164,8 @@ uninstall-bytecode-jar:
 	  $(DESTDIR)$(javadir)/bytecode.jar
 
 kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
-	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/kawa/Version.java.in >$@
+	test -f .svn/entries && SVN_REVISION=" (revision `sed -n 's|.* revision="\(.*\)".*|\1|p' .svn/entries|head -n 1` `sed -n 's|.* committed-date="\(.*\)T.*|\1|p' .svn/entries|head -n 1`)" ; \
+	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
 all-recursive:  kawa/Version.java selected-java-source
 all: kawa-@VERSION@.jar

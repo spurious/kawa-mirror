@@ -5,6 +5,7 @@ package gnu.kawa.xml;
 import java.util.Calendar;
 import gnu.bytecode.*;
 import gnu.math.*;
+import java.util.GregorianCalendar;
 
 public class XTimeType extends XDataType
 {
@@ -70,6 +71,13 @@ public class XTimeType extends XDataType
     return new NumberFormatException("Unrecognized "+name+": '"+str+'\'');
   }
   */
+
+  /** Return the current date or time in this type. */
+  public DateTime now ()
+  {
+    return new DateTime(XTimeType.components(typeCode),
+                        (GregorianCalendar) GregorianCalendar.getInstance());
+  }
 
   public Object valueOf (String value)
   {

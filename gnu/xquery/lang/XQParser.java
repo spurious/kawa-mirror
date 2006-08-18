@@ -1485,7 +1485,7 @@ public class XQParser extends Lexer
     if (curToken == OP_EMPTY_SEQUENCE)
       {
         parseSimpleKindType();
-        return QuoteExp.getInstance(Type.void_type);
+        return QuoteExp.getInstance(OccurrenceType.getInstance(Type.pointer_type, 0, 0));
       }
     if (curToken == OP_ITEM)
       {
@@ -1496,9 +1496,12 @@ public class XQParser extends Lexer
       {
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
 	getRawToken();
-	Type type = interpreter.getTypeFor(tname); 
+	Type type = interpreter.getTypeFor(tname);
 	if (type == null)
-	  type = ClassType.make(tname);
+          {
+            error('e', "unknown type "+tname, "XPST0051");
+            type = Type.pointer_type;
+          }
 	return QuoteExp.getInstance(type);
       }
     else

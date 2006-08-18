@@ -1,3 +1,13 @@
+2006-08-18  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (CURRENT_DATETIME_BUILTIN, CURRENT_DATE_BUILTIN,
+	CURRENT_TIME_BUILTIN): New constants.
+	(currentDateTimeDecl; currentDateDecl, currentTimeDecl): New fields.
+	(resolveModule): New method generates code to initialize the above
+	declarations.
+	(walkApplyExp): Handle fn:current-dataTime, fn:current-date, and
+	fn:current-time standard functions.
+
 2006-08-17  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseItemType): The sementics of empty-sequence()

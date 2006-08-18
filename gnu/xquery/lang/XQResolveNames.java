@@ -11,6 +11,9 @@ import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.QNameUtils;
+import java.util.Vector;
+import gnu.math.DateTime;
+import gnu.math.IntNum;
 
 public class XQResolveNames extends ResolveNames
 {
@@ -70,9 +73,22 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>unordered</code> function. */
   public static final int UNORDERED_BUILTIN = -18;
 
+  /** Code number for the special <code>current-dateTime</code> function. */
+  public static final int CURRENT_DATETIME_BUILTIN = -19;
+
+  /** Code number for the special <code>current-date</code> function. */
+  public static final int CURRENT_DATE_BUILTIN = -20;
+
+  /** Code number for the special <code>current-time</code> function. */
+  public static final int CURRENT_TIME_BUILTIN = -21;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
+
+  public Declaration currentDateTimeDecl;
+  public Declaration currentDateDecl;
+  public Declaration currentTimeDecl;
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
@@ -129,6 +145,9 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("string", STRING_BUILTIN);
     pushBuiltin("normalize-space", NORMALIZE_SPACE_BUILTIN);
     pushBuiltin("unordered", UNORDERED_BUILTIN);
+    pushBuiltin("current-dateTime", CURRENT_DATETIME_BUILTIN);
+    pushBuiltin("current-date", CURRENT_DATE_BUILTIN);
+    pushBuiltin("current-time", CURRENT_TIME_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -340,6 +359,55 @@ public class XQResolveNames extends ResolveNames
     return result;
   }
 
+  public void resolveModule(ModuleExp exp)
+  {
+    super.resolveModule(exp);
+
+    if (currentDateTimeDecl != null)
+      {
+        // Some expression in this module calls one of the current-XXX
+        // functions, so calculate it and stash it, since these functions
+        // are required to be 'stable'.
+        // PROBLEM: We may get different results for calls in different
+        // modules.  These functions should stash the current-dataTime in
+        // in teh actual dynamic context.  FIXME.
+        Vector vec = new Vector();
+        vec.addElement(new SetExp(currentDateTimeDecl,
+                                  new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("now", 0),
+                                               Expression.noExpressions)));
+        Method cast = ClassType.make("gnu.math.DateTime").getDeclaredMethod("cast", 1);
+        if (currentDateDecl != null)
+          {
+            Expression[] args = { new ReferenceExp(currentDateTimeDecl),
+                                  new QuoteExp(IntNum.make(DateTime.DATE_MASK)) };
+            vec.addElement(new SetExp(currentDateDecl,
+                                      new ApplyExp(cast, args)));
+          }
+        if (currentTimeDecl != null)
+          {
+            Expression[] args = { new ReferenceExp(currentDateTimeDecl),
+                                  new QuoteExp(IntNum.make(DateTime.TIME_MASK)) };
+            vec.addElement(new SetExp(currentTimeDecl,
+                                      new ApplyExp(cast, args)));
+          }
+        Expression body = exp.body;
+        Expression[] exps;
+        if (body instanceof BeginExp)
+          {
+            BeginExp bexp = (BeginExp) body;
+            int blen = bexp.getExpressionCount();
+            exps = bexp.getExpressions();
+            for (int i = 0;  i < blen;  i++)
+              vec.addElement(exps[i]);
+          }
+        else
+          vec.addElement(body);
+        exps = new Expression[vec.size()];
+        vec.copyInto(exps);
+        exp.body = new BeginExp(exps);
+      }
+  }
+
   NamespaceBinding constructorNamespaces;
 
   /**
@@ -424,6 +492,7 @@ public class XQResolveNames extends ResolveNames
 	Declaration decl = ((ReferenceExp) func).getBinding();
 	int code;
         Expression err;
+        ModuleExp mexp;
 	if (decl != null && (code = decl.getCode()) < 0)
 	  {
 	    switch (code)
@@ -610,7 +679,27 @@ public class XQResolveNames extends ResolveNames
                     .getDeclaredMethod("distinctValues$X", 3);
                   return withCollator(meth, exp.getArgs(),
                                       "fn:distinct-values", 1);
+
                 }
+              case CURRENT_DATETIME_BUILTIN:
+                mexp = getCompilation().mainLambda;
+                if (currentDateTimeDecl == null)
+                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
+                return new ReferenceExp(currentDateTimeDecl);
+              case CURRENT_DATE_BUILTIN:
+                mexp = getCompilation().mainLambda;
+                if (currentDateTimeDecl == null)
+                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
+                if (currentDateDecl == null)
+                  currentDateDecl = mexp.addDeclaration("date", XTimeType.dateType);
+                return new ReferenceExp(currentDateDecl);
+              case CURRENT_TIME_BUILTIN:
+                mexp = getCompilation().mainLambda;
+                if (currentDateTimeDecl == null)
+                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
+                if (currentTimeDecl == null)
+                  currentTimeDecl = mexp.addDeclaration("time", XTimeType.timeType);
+                return new ReferenceExp(currentTimeDecl);
 	      }
 	  }
       }

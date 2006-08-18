@@ -229,4 +229,9 @@ public class TimeUtils
     else
       return dtime.adjustTimezone((int) ((Duration) zone).getTotalMinutes());
   }
+
+  public static DateTime now ()
+  {
+    return gnu.kawa.xml.XTimeType.dateTimeType.now();
+  }
 }

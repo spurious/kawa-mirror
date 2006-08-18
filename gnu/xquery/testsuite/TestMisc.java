@@ -378,7 +378,7 @@ public class TestMisc
     evalNodeNames(some_elements+"($b, $a, $b, $d) except ()", "a;b;d;");
 
     // Check for catching errors:
-    evalTest("+ +", "*** syntax error - <string>:1:3: missing expression [XPST0003]");
+    evalTest("+ +", "*** syntax error - <string>:1:4: missing expression [XPST0003]");
 
     evalTest("declare namespace x1='XXX",
 	     "*** caught SyntaxException - <string>:1:22: "

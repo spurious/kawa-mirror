@@ -1637,7 +1637,7 @@ public class XQParser extends Lexer
       {
         int op = curToken;
         getRawToken();
-        exp = parseUnionExpr();
+        exp = parseUnaryExpr();
         Expression func
           = makeFunctionExp("gnu.xquery.util.ArithOp",
                             op == OP_ADD ? "plus" : "minus",
@@ -3065,6 +3065,7 @@ public class XQParser extends Lexer
 			    args);
 
       }
+    flworDeclsCount = flworDeclsFirst;
     flworDeclsFirst = flworDeclsSave;
     return exp;
   }

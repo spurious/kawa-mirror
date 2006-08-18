@@ -1,3 +1,7 @@
+2006-08-18  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java  (getExpressionCount): New method.
+
 2006-08-16  Per Bothner  <per@bothner.com>
 
 	Change the way an immediate-compiled <clinit> can find its

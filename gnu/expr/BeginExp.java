@@ -87,6 +87,7 @@ public class BeginExp extends Expression
   }
 
   public final Expression[] getExpressions() { return exps; }
+  public final int getExpressionCount() { return length; }
 
   public final void setExpressions(Expression[] exps)
   {

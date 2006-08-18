@@ -13,28 +13,37 @@ public class TimeUtils
   {
     if (XTimeType.dateTimeType.isInstance(value))
       return (DateTime) value;
-    throw new WrongType(fun, 1, "xs:dateTime");
+    if (value instanceof KNode || value instanceof UntypedAtomic)
+      return DateTime.parse(StringValue.stringValue(value),
+                            DateTime.DATE_MASK|DateTime.TIME_MASK);
+    throw new WrongType(fun, 1, value, "xs:dateTime");
   }
 
   static DateTime coerceToDate (String fun, Object value)
   {
     if (XTimeType.dateType.isInstance(value))
       return (DateTime) value;
-    throw new WrongType(fun, 1, "xs:date");
+    if (value instanceof KNode || value instanceof UntypedAtomic)
+      return DateTime.parse(StringValue.stringValue(value),
+                            DateTime.DATE_MASK);
+    throw new WrongType(fun, 1, value, "xs:date");
   }
 
   static DateTime coerceToTime (String fun, Object value)
   {
     if (XTimeType.timeType.isInstance(value))
       return (DateTime) value;
-    throw new WrongType(fun, 1, "xs:time");
+    if (value instanceof KNode || value instanceof UntypedAtomic)
+      return DateTime.parse(StringValue.stringValue(value),
+                            DateTime.TIME_MASK);
+    throw new WrongType(fun, 1, value, "xs:time");
   }
 
   static Duration coerceToDuration (String fun, Object value)
   {
     if (value instanceof Duration)
       return (Duration) value;
-    throw new WrongType(fun, 1, "xs:duration");
+    throw new WrongType(fun, 1, value, "xs:duration");
   }
 
   static Object timeZoneFromXTime (DateTime time)

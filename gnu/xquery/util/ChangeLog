@@ -1,3 +1,9 @@
+2006-08-17  Per Bothner  <per@bothner.com>
+
+	* TimeUtils.java (coerceToDateTime, coerceToDate, coerceToTime):
+	Convert node and xs:untypedAtomic as needed.
+	Also throw more informative WrongType constructor.
+
 2006-06-28  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java: Update SName -> Symbol.

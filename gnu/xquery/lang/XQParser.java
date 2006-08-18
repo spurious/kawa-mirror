@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003, 2004  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2004, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -3072,10 +3072,10 @@ public class XQParser extends Lexer
   /** Parse a let- or a for-expression.
    * Assume the 'let'/'for'-token has been seen, and we've read '$'.
    *
-   * If we see the 'order' keyword of an 'order by' clause then we top
+   * If we see the 'order' keyword of an 'order by' clause then we stop
    * parsing, and return a result as if we instead saw a
    * 'return make-tuple($x, ...)'.  The 'order by' clause will get
-   * parser by the outer-mot 'for' or 'let'.
+   * parsed by the outer-most 'for' or 'let'.
    */
   public Expression parseFLWRInner (boolean isFor)
       throws java.io.IOException, SyntaxException

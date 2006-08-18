@@ -1,3 +1,7 @@
+2006-08-17  Per Bothner  <per@bothner.com>
+
+	* WrongType.java (<init>(String,int,Object,String)): New constructor.
+
 2006-06-28  Per Bothner  <per@bothner.com>
 
 	* Namespace.java (prefix): New field.

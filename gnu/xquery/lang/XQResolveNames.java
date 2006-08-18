@@ -370,7 +370,7 @@ public class XQResolveNames extends ResolveNames
         // are required to be 'stable'.
         // PROBLEM: We may get different results for calls in different
         // modules.  These functions should stash the current-dataTime in
-        // in teh actual dynamic context.  FIXME.
+        // in the actual dynamic context.  FIXME.
         Vector vec = new Vector();
         vec.addElement(new SetExp(currentDateTimeDecl,
                                   new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("now", 0),

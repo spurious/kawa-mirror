@@ -88,7 +88,7 @@ implements TypeValue, Externalizable
   public static final ClassType typeProcessingInstructionType
     = ClassType.make("gnu.kawa.xml.ProcessingInstructionType");
   static final Method coerceMethod
-    = typeProcessingInstructionType.getDeclaredMethod("coerce", 3);
+    = typeProcessingInstructionType.getDeclaredMethod("coerce", 2);
   static final Method coerceOrNullMethod
     = typeProcessingInstructionType.getDeclaredMethod("coerceOrNull", 3);
 

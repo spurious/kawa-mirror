@@ -517,6 +517,11 @@ public abstract class Language
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  {
+    return new Compilation(this, messages);
+  }
+
   /** Flag to tell parse that expression will be evaluated immediately.
    * I.e. we're not creating class files for future execution. */
   public static final int PARSE_IMMEDIATE = 1;
@@ -545,14 +550,24 @@ public abstract class Language
     return parse(lexer, options);
   }
 
-  public abstract Compilation parse(Lexer lexer, int options)
-    throws java.io.IOException, gnu.text.SyntaxException;
-
-  public boolean parse (Compilation comp, int options)
+  public final Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    return true;
+    SourceMessages messages = lexer.getMessages();
+    Compilation tr = getCompilation(lexer, messages);
+    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
+    if ((options & PARSE_PROLOG) != 0)
+      tr.setState(Compilation.PROLOG_PARSING);
+    tr.pushNewModule(lexer);
+    if (! parse(tr, options))
+      return null;
+    if (tr.getState() == Compilation.PROLOG_PARSING)
+      tr.setState(Compilation.PROLOG_PARSED);
+    return tr;
   }
+
+  public abstract boolean parse (Compilation comp, int options)
+    throws java.io.IOException, gnu.text.SyntaxException;
 
   /** Perform any need post-processing after we've read all the modules
    * to be compiled.

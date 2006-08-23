@@ -1,3 +1,9 @@
+2006-08-22  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (getCompilation): New method.
+	(parse): Change interface, with passed-in Compilation.
+	Merge existing and new expressions in passed-in ModuleExp.
+
 2006-08-18  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (CURRENT_DATETIME_BUILTIN, CURRENT_DATE_BUILTIN,

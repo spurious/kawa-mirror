@@ -92,24 +92,26 @@ public class XQuery extends Language
     return new XQParser(inp, messages, this);
   }
 
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  {
+    return new Compilation(this, messages, ((XQParser) lexer).lexical);
+  }
+
   /** Special parser flag used by <code>evalToFocusProc</code>. */
   public static final int PARSE_WITH_FOCUS = 0x10000;
 
-  public Compilation parse(Lexer lexer, int options)
+  public boolean parse (Compilation tr, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    XQParser parser = (XQParser) lexer;
+    ModuleExp mexp = tr.mainLambda;
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, parser.getMessages(),
-				     parser.lexical);
-    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = tr.pushNewModule(lexer);
     tr.mustCompileHere();
+    XQParser parser = (XQParser) tr.lexer;
     if ((options & PARSE_ONE_LINE) != 0)
       {
-	Expression sexp = ((XQParser) lexer).parse(tr);
+	Expression sexp = parser.parse(tr);
 	if (sexp == null)
-	  return null;
+	  return false;
 	mexp.body = sexp;
       }
     else if ((options & PARSE_WITH_FOCUS) != 0)
@@ -121,16 +123,29 @@ public class XQuery extends Language
 	lexp.addDeclaration(XQParser.POSITION_VARNAME, Type.int_type);
 	lexp.addDeclaration(XQParser.LAST_VARNAME, Type.int_type);
 	tr.push(lexp);
-	lexp.body = ((XQParser) lexer).parse(tr);
+	lexp.body = parser.parse(tr);
 	tr.pop(lexp);
 	mexp.body = lexp;
       }
     else
       {
 	Vector exps = new Vector(10);
+        Expression sexp = mexp.body;
+        if (sexp instanceof BeginExp)
+          {
+            BeginExp bexp = (BeginExp) sexp;
+            int blen = bexp.getExpressionCount();
+            Expression[] bexps = bexp.getExpressions();
+            for (int i = 0;  i < blen;  i++)
+              exps.addElement(bexps[i]);
+          }
+        else if (sexp != null && sexp != QuoteExp.voidExp)
+          {
+            exps.addElement(sexp);
+          }
 	for (;;)
 	  {
-	    Expression sexp = ((XQParser) lexer).parse(tr);
+	    sexp = parser.parse(tr);
 	    if (sexp == null)
 	      break;
 	    exps.addElement(sexp);
@@ -160,9 +175,9 @@ public class XQuery extends Language
 
     XQResolveNames resolver = new XQResolveNames(tr);
     resolver.functionNamespacePath = parser.functionNamespacePath;
-    resolver.parser =  (XQParser) lexer;
+    resolver.parser = parser;
     resolver.resolveModule(mexp); // FIXME should move to resolve(Compilation)
-    return tr;
+    return true;
   }
 
   public void resolve (Compilation comp)

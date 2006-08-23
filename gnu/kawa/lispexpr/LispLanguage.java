@@ -35,20 +35,9 @@ public abstract class LispLanguage extends Language
     return new LispReader(inp, messages);
   }
 
-  public Compilation parse(Lexer lexer, int options)
-    throws java.io.IOException, gnu.text.SyntaxException
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
   {
-    SourceMessages messages = lexer.getMessages();
-    kawa.lang.Translator tr = new Translator (this, messages);
-    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    if ((options & PARSE_PROLOG) != 0)
-      tr.setState(Compilation.PROLOG_PARSING);
-    tr.pushNewModule(lexer);
-    if (! parse(tr, options))
-      return null;
-    if (tr.getState() == Compilation.PROLOG_PARSING)
-      tr.setState(Compilation.PROLOG_PARSED);
-    return tr;
+    return new Translator (this, messages);
   }
 
   public boolean parse (Compilation comp, int options)

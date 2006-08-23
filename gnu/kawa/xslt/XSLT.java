@@ -71,14 +71,19 @@ public class XSLT extends XQuery
     return new XslTranslator(inp, messages, this);
   }
 
-  public Compilation parse(Lexer lexer, int options)
+  /** Override {@code XQuery} implementation to get {@code Language} default.
+   */
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  {
+    return new Compilation(this, messages);
+  }
+
+  public boolean parse (Compilation comp, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation comp = new Compilation(this, lexer.getMessages());
-    comp.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ((XslTranslator) lexer).parse(comp);
-    return comp;
+    ((XslTranslator) comp.lexer).parse(comp);
+    return true;
   }
 
   /** The compiler insert calls to this method for applications and applets. */

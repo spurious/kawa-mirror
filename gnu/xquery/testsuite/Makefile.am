@@ -4,7 +4,7 @@ KAWALIB = $(top_builddir)
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
-EXTRA_CLEAN = tmp* *.log testing.zip *.class
+EXTRA_CLEAN = tmp* *.log testing.zip *.class Mod1/*.class Mod2/*.class
 
 java_sources = TestMisc.java TestSuite.java
 
@@ -73,11 +73,13 @@ check-format-users:
 	  |sed 's/^ *//'>tmp-format-users.html
 	@if diff -b -B $(srcdir)/exp-format-users.html tmp-format-users.html; then echo '#  format-users test passes'; else echo FAIL format-users test; fi
 
-./Mod1.class: mod1.xql
+./Mod1/mod1.class: mod1.xql
 	$(KAWA) --module-static -d ../../.. -C $<
-./Mod2.class: mod2.xql
+./Mod2/mod2.class: mod2.xql
 	$(KAWA) -d ../../.. -C $<
-usemod.class: usemod.xql ./Mod1.class ./Mod2.class
+./Mod2/mod2a.class: mod2a.xql
+	$(KAWA) -d ../../.. -C $<
+usemod.class: usemod.xql ./Mod1/mod1.class ./Mod2/mod2.class ./Mod2/mod2a.class
 	CLASSPATH=$(KAWALIB) $(KAWA) --main -C $<
 check-mod: usemod.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) usemod >tmp-usemod

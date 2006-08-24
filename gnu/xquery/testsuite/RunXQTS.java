@@ -6,7 +6,6 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.xml.*;
-import java.net.URL;
 import gnu.kawa.xml.Document;
 import gnu.mapping.Symbol;
 import gnu.xquery.lang.*;
@@ -18,9 +17,11 @@ import java.util.Stack;
 public class RunXQTS extends FilterConsumer
 {
   Hashtable sources = new Hashtable();
+  Hashtable modules = new Hashtable();
   static XQuery xqueryLanguage = XQuery.getInstance();
 
   Hashtable expectedFailures = new Hashtable();
+  ModuleManager manager = ModuleManager.getInstance();
   Object failExpected;
 
   boolean verbose = false;
@@ -88,8 +89,6 @@ public class RunXQTS extends FilterConsumer
   }
 
   int nesting = 0;
-  boolean inTestSuite = false;
-  boolean inTest = false;
   String currentTag;
   boolean inStartTag;
   int attrValueStart;
@@ -119,10 +118,10 @@ public class RunXQTS extends FilterConsumer
                    "fn:lang not implemented");
 
     // The rest are XQTS errors.
-    expectFailures("op-add-yearMonthDuration-to-dateTime-8|"
-                  +"op-subtract-yearMonthDuration-from-dateTime2args-5",
-                  "handling of 'year zero'");
-    //expectFailures("orderDecl-2", "testsuite error");
+    expectFailures("op-add-dayTimeDuration-to-dateTime-8|"
+                   +"op-add-dayTimeDuration-to-date-8|"
+                   +"op-subtract-dayTimeDuration-from-date-8",
+                   "handling of 'year zero'");
     expectFailures("fn-doc-5|fn-doc-6|fn-doc-7|fn-doc-8|fn-doc-9|fn-doc-10"
                    +"|fn-doc-11|fn-doc-12|fn-doc-13|fn-doc-14|fn-doc-15"
                    +"|fn-doc-16|fn-doc-18|fn-doc-19|fn-doc-20|fn-doc-21"
@@ -221,6 +220,7 @@ public class RunXQTS extends FilterConsumer
         testQueryName = null;
         expectedError = null;
         outputFileAlts.clear();
+        manager.clear();
       }
     else if ("query".equals(currentTag))
       {
@@ -231,6 +231,12 @@ public class RunXQTS extends FilterConsumer
         String ID = attributes.getValue("ID");
         String filename = attributes.getValue("FileName");
         sources.put(ID, filename);
+      }
+    else if (testName == null && "module".equals(currentTag))
+      {
+        String ID = attributes.getValue("ID");
+        String filename = attributes.getValue("FileName");
+        modules.put(ID, filename);
       }
     inStartTag = false;
   }
@@ -257,13 +263,15 @@ public class RunXQTS extends FilterConsumer
         if (failed)
           xfailCount++;
         else
-          xpassCount++;
+          {
+            System.out.println("XPASS: "+testName);
+            xpassCount++;
+          }
       }
 
     if (! verbose
         && failed == (failExpected != null))
       return;
-    //System.err.println("("+testName +" result:"+result+" failed:"+failed+" failExpected:"+failExpected);
     log.print("  <test-case name=\"");
     log.print(testName);
     log.print("\" result='");
@@ -498,6 +506,7 @@ public class RunXQTS extends FilterConsumer
             System.err.println("caught "+ex);
             ex.printStackTrace();
           }
+        testName = null;
       }
     else if ("expected-error".equals(typeName))
       {
@@ -560,6 +569,16 @@ public class RunXQTS extends FilterConsumer
         outputFileAlts.push(sbuf.substring(elementStartIndex));
         compare = attributes.getValue("compare");
       }
+    else if (testName != null && "module".equals(typeName))
+      {
+        String uri = attributes.getValue("namespace");
+        String module = sbuf.substring(elementStartIndex);
+        String mfile = (String) modules.get(module);
+        String mpath = directory + '/' + mfile + XQueryFileExtension;
+        String mclass = Compilation.mangleURI(uri)
+          + '.' + XQuery.makeClassName(mpath);
+        manager.register(mclass, mpath, uri);
+      }
     /*
     if ("test-suite".equals(typeName) && nesting == 0)
       inTestSuite = false;
@@ -581,7 +600,6 @@ public class RunXQTS extends FilterConsumer
       base.endGroup(typeName);
     */
     sbuf.setLength(elementStartIndex);
-
   }
 
   public void beginAttribute(String attrName, Object attrType)

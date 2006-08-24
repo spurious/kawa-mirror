@@ -1,5 +1,8 @@
 2006-08-24  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java: Add support for modules.
+	Update for newer testsuite, and new fixes.
+
 	* mod2a.xql: New module, in same namespace as mod2.xql.
 	* usemod.xql: Also pull in a variable for mod2a.
 	* usemod.exp: Update expected output.

@@ -1,5 +1,13 @@
 2006-08-23  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (makeClassName): New static method.
+	* XQParser.java (parse): Change handling of module declaration.
+	Generated class name now depends on URI *and& makeClassName.
+	Fix handling of module import to handle multiple modules, and handle
+	'at' location "hint".
+
+2006-08-23  Per Bothner  <per@bothner.com>
+
 	* XQParser.java (parse): Set file/line on initializer
 	of external variables.
 

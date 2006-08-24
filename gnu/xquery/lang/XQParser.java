@@ -3546,9 +3546,17 @@ public class XQParser extends Lexer
 		if (command == MODULE_NAMESPACE_TOKEN)
                   {
                     ModuleExp module = comp.getModule();
-                    module.setName(Compilation.mangleURI(uri));
-                    comp.mainClass = new ClassType(Compilation.mangleURI(uri));
+                    String className = Compilation.mangleURI(uri)
+                      + '.' + XQuery.makeClassName(module.getFile());
+                    module.setName(className);
+                    comp.mainClass = new ClassType(className);
                     module.setType(comp.mainClass);
+                    ModuleManager manager = ModuleManager.getInstance();
+                    ModuleInfo info = manager.find(comp);
+                    info.setNamespaceUri(uri);
+                    module.setType(comp.mainClass);
+                    if (uri.length() == 0)
+                      return syntaxError("zero-length module namespace", "XQST0088");
                   }
                 return SetExp.makeDefinition(decl, decl.getValue());
 	      }
@@ -3582,20 +3590,70 @@ public class XQParser extends Lexer
             comp.mainLambda.addDeclaration(pushNamespace(prefix, uri));
           }
 	getRawToken();
+        String at;
+ 	ModuleExp module = comp.getModule();
+	Vector forms = new Vector();
+        String packageName = Compilation.mangleURI(uri);
+        comp.setLine(port.getName(), startLine, startColumn);
 	if (match("at"))
 	  {
 	    getRawToken();
-	    if (curToken != STRING_TOKEN)
-	      return syntaxError("missing module location");
-	    String at = new String(tokenBuffer, 0, tokenBufferLength);
+            for (;;)
+              {
+                if (curToken != STRING_TOKEN)
+                  return syntaxError("missing module location");
+                at = new String(tokenBuffer, 0, tokenBufferLength);
+                String className = Compilation.mangleURI(uri)
+                  + '.' + XQuery.makeClassName(at);
+                require.importDefinitions(className, at,
+                                          uri, forms, module, comp);
+                next = skipSpace(nesting != 0);
+                if (next != ',')
+                  {
+                    unread(next);
+                    break;
+                  }
+              }
 	    parseSeparator();
 	  }
-	else if (curToken != ';')
-	  parseSeparator();
- 	ModuleExp module = comp.getModule();
-	Vector forms = new Vector();
-	require.importDefinitions(ModuleInfo.find(Compilation.mangleURI(uri)),
-                                  uri, forms, module, comp);
+	else
+          {
+            ModuleManager manager = ModuleManager.getInstance();
+            int n = 0;
+            try
+              {
+                manager.loadPackageInfo(packageName);
+              }
+            catch (ClassNotFoundException ex)
+              {
+                // Do nothing.  If there is no such module,
+                // that will be reported below.
+              }
+            catch (Throwable ex)
+              {
+                error('e', "error loading map for "+uri+" - "+ex);
+              }
+            for (ModuleInfo info = manager.firstModule();  info != null;
+                 info = info.nextModule())
+              {
+                if (! uri.equals(info.getNamespaceUri()))
+                  continue;
+                n++;
+                if (info.sourceURL != null)
+                  require.importDefinitions(info.className, info.sourceURL, uri, forms, module, comp);
+                else
+                  require.importDefinitions(info, uri, forms, module, comp);
+              }
+            if (n == 0)
+              error('e', "no module found for "+uri);
+            at = null;
+            if (curToken != ';')
+              parseSeparator();
+          }
+        if (comp.pendingImports != null && comp.pendingImports.size() > 0)
+          {
+            error('e', "module import forms a cycle", "XQST0073");
+          }
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);
 	return BeginExp.canonicalize(inits);

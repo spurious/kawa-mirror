@@ -920,6 +920,18 @@ public class XQuery extends Language
     return sbuf.toString();
   }
 
+  public static String makeClassName (String source)
+  {
+    source = source.replace(java.io.File.separatorChar, '/');
+    int sl = source.lastIndexOf('/');
+    if (sl >= 0)
+      source = source.substring(sl+1);
+    int dot = source.lastIndexOf('.');
+    if (dot >= 0)
+      source = source.substring(0, dot);
+    return Compilation.mangleNameIfNeeded(source);
+  }
+
   public static Object getExternal (Symbol name, Object type)
   {
     Environment env = Environment.getCurrent();

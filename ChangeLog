@@ -1,5 +1,10 @@
 2006-08-23  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (importDefinitions): Change type paraneter
+	to className String.  Handle appropriate exceptions.
+	Various tweaks to handle cycles etc.
+	(scanForDefinitions): Update accordingly.
+
 	* kawa/standard/require.java (importDefinitions): Minor simplification.
 	Also, don't make instance decl private if immediate.
 	Set column number of alias decl, in addition to line number.

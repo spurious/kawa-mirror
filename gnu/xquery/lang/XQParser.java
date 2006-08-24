@@ -10,6 +10,7 @@ import gnu.expr.*;
 import gnu.math.IntNum;
 import java.util.Vector;
 import java.util.Stack;
+import java.io.File;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
 import gnu.bytecode.*;
@@ -3432,6 +3433,7 @@ public class XQParser extends Lexer
     Declaration decl;
     String prefix, uri;
     Object val;
+    Expression exp;
     switch (curToken)
       {
       case DEFINE_QNAME_TOKEN:
@@ -3453,7 +3455,7 @@ public class XQParser extends Lexer
 	getRawToken();
 	peekNonSpace("unexpected end-of-file after 'define function'");
 	char save = pushNesting('d');
-	Expression exp = parseFunctionDefinition(declLine, declColumn);
+	exp = parseFunctionDefinition(declLine, declColumn);
 	popNesting(save);
 	parseSeparator();
 	exp.setFile(getName());
@@ -3512,7 +3514,10 @@ public class XQParser extends Lexer
 	      init = err;
 	  }
         decl.noteValue(init);
-	return SetExp.makeDefinition(decl, init);
+	exp = SetExp.makeDefinition(decl, init);
+	exp.setFile(getName());
+	exp.setLine(startLine, startColumn);
+	return exp;
 
       case DECLARE_NAMESPACE_TOKEN:
       case MODULE_NAMESPACE_TOKEN:
@@ -3568,6 +3573,8 @@ public class XQParser extends Lexer
 	  }
 	if (curToken != STRING_TOKEN)
 	  return syntaxError("missing uri in namespace declaration");
+        if (tokenBufferLength == 0)
+          return syntaxError("zero-length target namespace", "XQST0088");
 	uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (prefix != null)
           {
@@ -3781,7 +3788,7 @@ public class XQParser extends Lexer
         baseURI = (String) val;
 	return QuoteExp.voidExp;
       }
-    Expression exp = parseExprSequence(EOF_TOKEN);
+    exp = parseExprSequence(EOF_TOKEN);
     if (curToken == EOL_TOKEN)
       unread('\n');
     exp.setFile(getName());

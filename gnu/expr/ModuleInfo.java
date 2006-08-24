@@ -1,3 +1,6 @@
+// Copyright (c) 2006 Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
@@ -6,10 +9,24 @@ import gnu.text.*;
 
 public class ModuleInfo
 {
-  /** Next element in list head by ModuleManager.modules. */
+  /** Next element in list head by {@link ModuleManager#modules}. */
+  public ModuleInfo nextModule () { return next; }
   ModuleInfo next;
 
+  /** Name of class that implements module.
+   * Must be non-null unless we're currently compiling the module,
+   * in which case sourceURL and comp must both be non-null.
+   */
   public String className;
+
+  public Class moduleClass;
+
+  /** The namespace URI associated with this module, or {@code null}.
+   * This is null for Scheme modules, but non-null for XQuery modules.
+   */
+  public String getNamespaceUri () { return uri; }
+  public void setNamespaceUri (String uri) { this.uri = uri; }
+  String uri;
 
   ModuleExp exp;
   Compilation comp;
@@ -20,16 +37,22 @@ public class ModuleInfo
   {
     comp.minfo = this;
     this.comp = comp;
-    this.exp = comp.mainLambda;
+    ModuleExp mod = comp.mainLambda;
+    this.exp = mod;
+    if (mod != null)
+      this.sourceURL = mod.getFile();
   }
   
-  public Class moduleClass;
-
   ModuleInfo[] dependencies;
   int numDependencies;
 
-  /** Maybe just use a a URL?. */
+  /** Location of source for module, if known.
+   * This is a absoluete URI, absolute filename,
+   * or filename relative to current working directory.
+   * Null if source not known; in that case className must be non-null.
+   */
   public String sourceURL;
+
   public long lastCheckedTime;
   public long lastModifiedTime;
 
@@ -282,7 +305,51 @@ public class ModuleInfo
       return true;
     lastCheckedTime = now;
     long lastModifiedTime = URI_utils.lastModified(sourceURL);
-    if (moduleClass == null || lastModifiedTime > this.lastModifiedTime)
+    if (moduleClass == null && className != null)
+      {
+        try
+          {
+            /* #ifdef JAVA2 */
+            moduleClass = Class.forName(className, false,
+                                        manager.defaultClassLoader);
+            /* #else */
+            // moduleClass = Class.forName(className);
+            /* #endif */
+          }
+        catch (ClassNotFoundException ex)
+          {
+            this.lastModifiedTime = lastModifiedTime;
+            return false;
+          }
+      }
+    if (this.lastModifiedTime == 0 && moduleClass != null)
+      {
+        String classFilename = className;
+        int dot = classFilename.lastIndexOf('.');
+        if (dot >= 0)
+          classFilename = classFilename.substring(dot+1);
+        classFilename = classFilename + ".class";
+        java.net.URL resource = moduleClass.getResource(classFilename);
+        if (resource != null)
+          {
+            try
+              {
+                this.lastModifiedTime = resource.openConnection().getLastModified();
+              }
+            catch (java.io.IOException ex)
+              {
+                resource = null;
+              }
+          }
+        if (resource == null)
+          {
+            // Couldn't open timestand of the .class file.
+            // Assume it is current.
+            this.lastModifiedTime = lastModifiedTime;
+            return true;
+          }
+      }
+    if (className == null || lastModifiedTime > this.lastModifiedTime)
       {
         moduleClass = null;
         this.lastModifiedTime = lastModifiedTime;

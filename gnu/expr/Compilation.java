@@ -84,7 +84,7 @@ public class Compilation
    */
   Field moduleInstanceMainField;
 
-  protected java.util.Stack pendingImports;
+  public java.util.Stack pendingImports;
 
   public void pushPendingImport (ModuleInfo info, ScopeExp defs)
   {
@@ -1000,14 +1000,8 @@ public class Compilation
   // FIXME - make this settable, as it does make .class files bigger.
   public static boolean emitSourceDebugExtAttr = true;
 
-  public void addClass (ClassType new_class)
+  private void registerClass (ClassType new_class)
   {
-    if (mainLambda.filename != null)
-      {
-	if (emitSourceDebugExtAttr)
-	  new_class.setStratum(getLanguage().getName());
-	new_class.setSourceFile(mainLambda.filename);
-      }
     if (classes == null)
       classes = new ClassType[20];
     else if (numClasses >= classes.length)
@@ -1024,6 +1018,17 @@ public class Compilation
         classes[0] = mainClass;
       }
     classes[numClasses++] = new_class;
+  }
+
+  public void addClass (ClassType new_class)
+  {
+    if (mainLambda.filename != null)
+      {
+	if (emitSourceDebugExtAttr)
+	  new_class.setStratum(getLanguage().getName());
+	new_class.setSourceFile(mainLambda.filename);
+      }
+    registerClass(new_class);
     /* #ifdef JAVA5 */
     // new_class.setClassfileVersionJava5();
     /* #endif */
@@ -2132,6 +2137,75 @@ public class Compilation
 	  }
 	code.emitInvokeVirtual(typeModuleBody.getDeclaredMethod("runAsMain", 0));
 	code.emitReturn();
+      }
+
+    String uri;
+    if (minfo != null && (uri = minfo.getNamespaceUri()) != null)
+      {
+        // Need to generate a ModuleSet for this class, so XQuery can find
+        // this module and other modules in the same namespace.
+        ModuleManager manager = ModuleManager.getInstance();
+        String mainPrefix = mainClass.getName();
+        int dot = mainPrefix.lastIndexOf('.');
+        if (dot < 0)
+          {
+            mainPrefix = "";
+          }
+        else
+          {
+            String mainPackage = mainPrefix.substring(0, dot);
+            try
+              {
+                manager.loadPackageInfo(mainPackage);
+              }
+            catch (ClassNotFoundException ex)
+              {
+                // Do nothing.
+              }
+            catch (Throwable ex)
+              {
+                error('e', "error loading map for "+mainPackage+" - "+ex);
+              }
+            mainPrefix = mainPrefix.substring(0, dot+1);
+          }
+        ClassType mapClass = new ClassType(mainPrefix + ModuleSet.MODULES_MAP);
+        ClassType typeModuleSet = ClassType.make("gnu.expr.ModuleSet");
+        mapClass.setSuper(typeModuleSet);
+        registerClass(mapClass);
+
+        method = mapClass.addMethod("<init>", Access.PUBLIC,
+                                apply0args, Type.void_type);
+        Method superConstructor
+          = typeModuleSet.addMethod("<init>", Access.PUBLIC,
+                                    apply0args, Type.void_type);
+        code = method.startCode();
+        code.emitPushThis();
+        code.emitInvokeSpecial(superConstructor);
+        code.emitReturn();
+
+        ClassType typeModuleManager = ClassType.make("gnu.expr.ModuleManager");
+        Type[] margs = { typeModuleManager };
+        method = mapClass.addMethod("register", margs, Type.void_type,
+                                    Access.PUBLIC);
+        code = method.startCode();
+        Method reg = typeModuleManager.getDeclaredMethod("register", 3);
+
+        for (ModuleInfo mi = manager.firstModule();
+             mi != null;  mi = mi.nextModule())
+          {
+            String miClassName = mi.className;
+            if (miClassName == null
+                || ! miClassName.startsWith(mainPrefix))
+              continue;
+            String moduleSource = mi.sourceURL;
+            String moduleUri = mi.getNamespaceUri();
+            code.emitLoad(code.getArg(1));
+            compileConstant(miClassName);
+            compileConstant(moduleSource);
+            compileConstant(moduleUri);
+            code.emitInvokeVirtual(reg);
+          }
+        code.emitReturn();
       }
   }
 

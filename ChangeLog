@@ -1,3 +1,9 @@
+2006-08-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Minor simplification.
+	Also, don't make instance decl private if immediate.
+	Set column number of alias decl, in addition to line number.
+
 2006-08-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa/Version.java): If .svn/entries exists, extract

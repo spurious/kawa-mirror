@@ -217,13 +217,11 @@ public class require extends Syntax
       }
   }
                      
-  static int n;
-
   public static boolean importDefinitions (ModuleInfo info, String uri,
                                     Vector forms,
                                     ScopeExp defs, Compilation tr)
   {
-    if (tr.minfo != null && tr.minfo.getState() < Compilation.BODY_PARSED)
+    if (tr.minfo != null && tr.getState() < Compilation.BODY_PARSED)
       {
         tr.minfo.addDependency(info);
 
@@ -263,7 +261,8 @@ public class require extends Syntax
           {
             String iname = tname.replace('.', '$') + "$instance";
             decl = new Declaration(iname.intern(), type);
-            decl.setPrivate(true);
+            if (! immediate)
+              decl.setPrivate(true);
             decl.setFlag(Declaration.IS_CONSTANT
                          |Declaration.MODULE_REFERENCE);
             defs.addDeclaration(decl);
@@ -341,7 +340,7 @@ public class require extends Syntax
             adecl.setIndirectBinding(true);
           }
         adecl.setFile(tr.getFile());
-        adecl.setLine(tr.getLine());
+        adecl.setLine(tr.getLine(), tr.getColumn());
         ReferenceExp fref = new ReferenceExp(fdecl);
         fref.setContextDecl(decl);
         if (! isImportedInstance)

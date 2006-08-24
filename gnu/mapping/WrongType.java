@@ -187,7 +187,7 @@ public class WrongType extends WrappedException
       }
     Object expectType = expectedType;
     if (expectType == null && number > 0 && proc instanceof MethodProc)
-      expectType = ((MethodProc) proc).getParameterType(number);
+      expectType = ((MethodProc) proc).getParameterType(number-1);
     if (expectType != null && expectType != Type.pointer_type)
       {
 	sbuf.append(" (expected: ");

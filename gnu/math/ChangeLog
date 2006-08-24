@@ -1,3 +1,15 @@
+2006-08-23  Per Bothner  <per@bothner.com>
+
+	* Duration.java (times): Do rounding as specified for XQuery F&O.
+
+	* DateTime.java (minDate): New field.
+	(<init>): Do setGregorianChange to minDate to disable Julian calendar.
+
+	* DateTime.java (parseDate): Fix handling of non-positive years.
+	(getYear): Fix off-by-one bug for BC years.
+	(add): Handle the case when we have a non-positive year.
+	(toStringDate): Fix printing of BC years.
+
 2006-06-23  Per Bothner  <per@bothner.com>
 
 	* DComplex.java (hypot): Make conditional on #ifndef JAVA5.

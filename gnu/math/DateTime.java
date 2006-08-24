@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package gnu.math;
+import java.util.Date;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.GregorianCalendar;
@@ -84,9 +85,13 @@ public class DateTime extends Quantity implements Cloneable
     return copy;
   }
 
+  private static final Date minDate = new Date(Long.MIN_VALUE);
+
   public DateTime (int mask)
   {
     calendar = new GregorianCalendar();
+    // Never use Julian calendar.
+    calendar.setGregorianChange(minDate);
     calendar.clear();
     this.mask = mask;
   }
@@ -149,12 +154,13 @@ public class DateTime extends Quantity implements Cloneable
         pos = part & 0xffff;
         if (pos != start+4 && (pos <=start+4 || str.charAt(start) == '0'))
           return -1;
-        calendar.set(Calendar.YEAR, year);
-        if (negYear)
+        if (negYear || year == 0)
           {
             calendar.set(Calendar.ERA, GregorianCalendar.BC);
-            // year is off-by-one? FIXME
+            calendar.set(Calendar.YEAR, year+1);
           }
+        else
+          calendar.set(Calendar.YEAR, year);
       }
     if ((mask & (MONTH_MASK|DAY_MASK)) == 0)
       return pos;
@@ -347,7 +353,7 @@ public class DateTime extends Quantity implements Cloneable
   {
     int year = calendar.get(Calendar.YEAR);
     if (calendar.get(Calendar.ERA) == GregorianCalendar.BC)
-      year = -year; // off-by-one? FIXME
+      year = 1 - year;
     return year;
   }
 
@@ -468,17 +474,28 @@ public class DateTime extends Quantity implements Cloneable
     if (y.months != 0)
       {
         int month = 12 * r.getYear() + r.calendar.get(Calendar.MONTH);
-        month += k* y.months;
-        int year = month / 12;
-        month = month % 12;
+        month += k * y.months;
         int day = r.calendar.get(Calendar.DATE);
+        int year, daysInMonth;
+        if (month >= 12)
+          {
+            year = month / 12;
+            month = month % 12;
+            r.calendar.set(Calendar.ERA, GregorianCalendar.AD);
+            daysInMonth = daysInMonth(month, year);
+          }
+        else
+          {
+            month = 11 - month;
+            r.calendar.set(Calendar.ERA, GregorianCalendar.BC);
+            year = (month / 12) + 1;
+            month = 11 - (month % 12);
+            daysInMonth = daysInMonth(month, 1);
+          }
         
-        int daysInMonth = daysInMonth(month, year);
         if (day > daysInMonth)
           day = daysInMonth;
-        r.calendar.set(Calendar.ERA,
-                       month < 0 ? GregorianCalendar.BC : GregorianCalendar.AD);
-        r.calendar.set(year < 0 ? -year : year, month, day);
+        r.calendar.set(year, month, day);
       }
     long nanos = y.seconds * 1000000000L + y.nanos;
     if (nanos != 0)
@@ -542,9 +559,14 @@ public class DateTime extends Quantity implements Cloneable
     int mask = components();
     if ((mask & YEAR_MASK) != 0)
       {
+        int year = calendar.get(Calendar.YEAR);
         if (calendar.get(Calendar.ERA) == GregorianCalendar.BC)
-          sbuf.append('-');
-        append(calendar.get(Calendar.YEAR), sbuf, 4);
+          {
+            year--;
+            if (year != 0)
+              sbuf.append('-');
+          }
+        append(year, sbuf, 4);
       }
     else
       sbuf.append('-');

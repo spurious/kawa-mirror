@@ -258,7 +258,7 @@ public class Duration extends Quantity implements Externalizable
     double months = x.months * y;
     double nanos = (x.seconds * 1000000000L + x.nanos) * y;
     Duration d = new Duration();
-    d.months = (int) (months < 0 ? months - 0.5 : months + 0.5);
+    d.months = (int) Math.floor(months + 0.5);
     d.seconds = (int) (nanos / 1000000000L);
     d.nanos = (int) (nanos % 1000000000L);
     d.unit = x.unit;

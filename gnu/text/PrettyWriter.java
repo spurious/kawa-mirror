@@ -94,8 +94,10 @@ public class PrettyWriter extends java.io.Writer
   }
 
   /** Stack of logical blocks in effect at the buffer start.
-   * I.e. blocks for which reallyStartLogicalBlock has been called. */
+   * I.e. blocks for which {@code reallyStartLogicalBlock} has been called.
+   * Each block uses {@code LOGICAL_BLOCK_LENGTH} {@code int} in this array. */
   int[] blocks = new int[10 * LOGICAL_BLOCK_LENGTH];
+  /** Number of {@code int}s used by each block in the {@code blocks} array. */
   static final private int LOGICAL_BLOCK_LENGTH = 6;
   static final private int BLOCK_START_COLUMN = -1;
   static final private int BLOCK_SECTION_COLUMN = -2;
@@ -103,6 +105,7 @@ public class PrettyWriter extends java.io.Writer
   static final private int BLOCK_PREFIX_LENGTH = -4;
   static final private int BLOCK_SUFFIX_LENGTH = -5;
   static final private int BLOCK_SECTION_START_LINE = -6;
+  /** The "stack pointer" in the {@code blocks} array. */
   int blockDepth = LOGICAL_BLOCK_LENGTH;
 
   /** Buffer holding the per-line prefix active at the buffer start.
@@ -1005,7 +1008,7 @@ public class PrettyWriter extends java.io.Writer
     // Hook.
   }
 
-  /** Output a newline.
+  /** Output a new line.
    * @param newline index of a newline queue item
    */
   void outputLine (int newline)  throws IOException
@@ -1084,7 +1087,7 @@ public class PrettyWriter extends java.io.Writer
 
   void outputPartialLine ()
   {
-    int fillPtr = bufferFillPointer;
+    //log("outputPartialLine");
     int tail = queueTail;
     while (queueSize > 0 && getQueueType(tail) == QITEM_NOP_TYPE)
       {
@@ -1095,6 +1098,7 @@ public class PrettyWriter extends java.io.Writer
 	  tail = 0;
 	queueTail = tail;
       }
+    int fillPtr = bufferFillPointer;
     int count = queueSize > 0 ? posnIndex (queueInts[tail + QITEM_POSN])
       : fillPtr;
     int newFillPtr = fillPtr - count;
@@ -1293,6 +1297,10 @@ public class PrettyWriter extends java.io.Writer
 	    out.print('(');
 	    out.print(skind);
 	    out.println(')');
+	    break;
+          case QITEM_INDENTATION_TYPE:
+	    printQueueWord(start, QITEM_INDENTATION_KIND, "kind", out);
+	    printQueueWord(start, QITEM_INDENTATION_AMOUNT, "amount", out);
 	    break;
 	  default:
 	    for (int i = 2;  i < size;  i++)

@@ -1,3 +1,7 @@
+2006-08-26  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Minor debugging+comment improvements.
+
 2006-08-08  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (lastModified): New static method.

@@ -1,3 +1,10 @@
+2006-08-26  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (compare): Add exact 'exact' parameter. Use to
+	control exact-vs-inexact conversion/promotion.
+	(apply2): Update accordingly.
+	(applyWithPromotion): New static method.
+
 2006-07-12  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Check that class is known.

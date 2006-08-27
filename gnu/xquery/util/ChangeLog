@@ -1,3 +1,11 @@
+2006-08-27  Per Bothner  <per@bothner.com>
+
+	* OrderedTuples.java (cmp): Update NumberCompare.compare call.
+	* Compare.java (apply): Move atomic value handle to ...
+	(atomicCompare): ... new static method.
+	Use new NumberCompare.applyWithPromotion method.
+	* SequenceUtils.java (deepEqual): New static method.
+
 2006-08-18  Per Bothner  <per@bothner.com>
 
 	* TimeUtils.java (now): New static method.

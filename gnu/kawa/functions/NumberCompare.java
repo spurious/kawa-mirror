@@ -116,14 +116,22 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 
   static public boolean apply2 (int flags, Object arg1, Object arg2)
   {
-    return ((1 << (3 + compare(arg1, arg2))) & flags) != 0;
+    return ((1 << (3 + compare(arg1, arg2, true))) & flags) != 0;
+  }
+  
+  static public boolean applyWithPromotion (int flags, Object arg1, Object arg2)
+  {
+    return ((1 << (3 + compare(arg1, arg2, false))) & flags) != 0;
   }
   
   /** Compare two numbers.
+   * @param exact true if we should compare exact/inexact numbers exactly
+   *   (by converting the inexact number to exact), or inexactly (by
+   *   "promoting" the exact to inexact) (as required for XQuery).
    * @return 1 if {@code arg1>arg2}; 0 if {@code arg1==arg2};
    * -1 if {@codearg1<arg2}; -2 if either is {@code NaN};
    * -3 if not comparable (either is not a number). */
-  static public int compare (Object arg1, Object arg2)
+  static public int compare (Object arg1, Object arg2, boolean exact)
   {
     int code1 = Arithmetic.classifyValue(arg1);
     int code2 = Arithmetic.classifyValue(arg2);
@@ -162,7 +170,9 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
                               Arithmetic.asRatNum(arg2));
         break;
       case Arithmetic.FLOAT_CODE:
-        if (code1 > Arithmetic.RATNUM_CODE && code2 > Arithmetic.RATNUM_CODE)
+        if (! exact
+            || (code1 > Arithmetic.RATNUM_CODE
+                && code2 > Arithmetic.RATNUM_CODE))
           {
             float f1 = Arithmetic.asFloat(arg1);
             float f2 = Arithmetic.asFloat(arg2);
@@ -172,7 +182,9 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
         // else fall through, to handle exact-inexact comparison
       case Arithmetic.DOUBLE_CODE:
       case Arithmetic.FLONUM_CODE:
-        if (code1 > Arithmetic.RATNUM_CODE && code2 > Arithmetic.RATNUM_CODE)
+        if (! exact
+            || (code1 > Arithmetic.RATNUM_CODE
+                && code2 > Arithmetic.RATNUM_CODE))
           {
             double d1 = Arithmetic.asDouble(arg1);
             double d2 = Arithmetic.asDouble(arg2);

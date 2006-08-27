@@ -1,3 +1,9 @@
+2006-08-27  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (DEEP_EQUAL_BUILTIN): New constant.
+	(<init>): Define fn:deep-equal.
+	(walkApplyExp): Map deep-equal to SequenceUtils.deepEqual.
+
 2006-08-23  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (makeClassName): New static method.

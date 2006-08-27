@@ -84,8 +84,15 @@ public class Compare extends Procedure2 implements CanInline
 	    index = next;
 	  }
       }
-    arg1 = KNode.atomicValue(arg1);
-    arg2 = KNode.atomicValue(arg2);
+    return atomicCompare(flags,
+                         KNode.atomicValue(arg1),
+                         KNode.atomicValue(arg2),
+                         collator);
+  }
+
+  public static boolean atomicCompare(int flags, Object arg1, Object arg2,
+                                      NamedCollator collator)
+  {
     if (arg1 instanceof Number || arg2 instanceof Number)
       {
 	if (arg1 instanceof UntypedAtomic)
@@ -108,7 +115,7 @@ public class Compare extends Procedure2 implements CanInline
             else
               arg2 = new DFloNum(str);
           }
-	return NumberCompare.apply2(flags, arg1, arg2);
+	return NumberCompare.applyWithPromotion(flags, arg1, arg2);
       }
     if (arg1 instanceof UntypedAtomic)
       {

@@ -173,7 +173,7 @@ int cmp(int a, int b)  throws Throwable
               c = isNaN1 == (emptyOrder == 'L') ? -1 : 1;
             }
           else if (val1 instanceof Number && val2 instanceof Number)
-            c = NumberCompare.compare(val1, val2);
+            c = NumberCompare.compare(val1, val2, false);
           else
             c = collator.compare(val1.toString(), val2.toString());
         }

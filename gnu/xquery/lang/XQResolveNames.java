@@ -82,6 +82,9 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>current-time</code> function. */
   public static final int CURRENT_TIME_BUILTIN = -21;
 
+  /** Code number for the special <code>deep-equal</code> function. */
+  public static final int DEEP_EQUAL_BUILTIN = -22;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -148,6 +151,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("current-dateTime", CURRENT_DATETIME_BUILTIN);
     pushBuiltin("current-date", CURRENT_DATE_BUILTIN);
     pushBuiltin("current-time", CURRENT_TIME_BUILTIN);
+    pushBuiltin("deep-equal", DEEP_EQUAL_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -680,6 +684,13 @@ public class XQResolveNames extends ResolveNames
                   return withCollator(meth, exp.getArgs(),
                                       "fn:distinct-values", 1);
 
+                }
+              case DEEP_EQUAL_BUILTIN:
+                {
+                  Method meth = ClassType.make("gnu.xquery.util.SequenceUtils")
+                    .getDeclaredMethod("deepEqual", 3);
+                  return withCollator(meth, exp.getArgs(),
+                                      "fn:deep-equal", 2);
                 }
               case CURRENT_DATETIME_BUILTIN:
                 mexp = getCompilation().mainLambda;

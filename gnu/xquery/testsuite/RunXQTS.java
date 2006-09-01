@@ -69,7 +69,7 @@ public class RunXQTS extends FilterConsumer
       {
 	try
 	  {
-            RunXQTS runner = new RunXQTS();
+            RunXQTS runner = new RunXQTS(new CharArrayOutPort());
             runner.directory = args[i];
             runner.catalog = runner.directory + "/XQTSCatalog.xml";
             System.err.println("catalog: "+runner.catalog);
@@ -92,21 +92,20 @@ public class RunXQTS extends FilterConsumer
   String currentTag;
   boolean inStartTag;
   int attrValueStart;
-  int elementStartIndex;
+  // Start in cout's buffer of current element, indexed by nesting level.
+  int[] elementStartIndex = new int[20];
   String expectedError;
   AttributesImpl attributes = new AttributesImpl();
-
-  StringWriter sout;
-  StringBuffer sbuf;
-  XMLPrinter xout;
 
   String query = null;
   String expect = null;
 
-  public RunXQTS()
+  CharArrayOutPort cout;
+
+  public RunXQTS(CharArrayOutPort out)
   {
-    this(new StringWriter());
-    sbuf = sout.getBuffer();
+    super(out);
+    this.cout = out;
 
     //badFormatting("CastableAs200");
     expectedFailures.put("Axes085", "actually pass? different char encoding");    
@@ -155,26 +154,11 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
-  private RunXQTS(StringWriter sout)
-  {
-    this(sout, new XMLPrinter(sout));
-  }
-
-  private RunXQTS(StringWriter sout, XMLPrinter xout)
-  {
-    super(xout);
-    xout.escapeText = false;
-    xout.escapeNonAscii = false;
-    this.sout = sout;
-    this.xout = xout;
-  }
-
   public void beginGroup(String typeName, Object type)
   {
     attributes.clear();
     inStartTag = true;
     currentTag = typeName;
-    //System.err.println("beginGroup "+currentTag);
     /*
     System.err.println("beginGroup "+typeName);
     if ("test-suite".equals(typeName) && nesting == 0)
@@ -187,7 +171,7 @@ public class RunXQTS extends FilterConsumer
       inTest = true;
     else if (inTestSuite ? nesting == 2 : nesting == 1)
       {
-	sbuf.setLength(0);
+	cout.setLength(0);
 	currentTag = typeName;
       }
     else if (currentTag == null)
@@ -200,7 +184,7 @@ public class RunXQTS extends FilterConsumer
 
   public void handleStartTag ()
   {
-    elementStartIndex = sbuf.length();
+    elementStartIndex[nesting] = cout.length();
     if ("test-suite".equals(currentTag))
       {
         XQueryQueryOffsetPath = attributes.getValue("XQueryQueryOffsetPath");
@@ -489,7 +473,6 @@ public class RunXQTS extends FilterConsumer
 
   public void endGroup(String typeName)
   {
-    nesting--;
     if (inStartTag)
       handleStartTag();
     if ("test-case".equals(typeName))
@@ -510,7 +493,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if ("expected-error".equals(typeName))
       {
-        expectedError = sbuf.substring(elementStartIndex);
+        expectedError = cout.toSubString(elementStartIndex[nesting]);
         //System.err.println("expected-error: '"+expectedError+"'");
       }
     else if ("input-query".equals(typeName))
@@ -540,7 +523,7 @@ public class RunXQTS extends FilterConsumer
       }
    else if ("input-file".equals(typeName))
       {
-        String inputFile = sbuf.substring(elementStartIndex);
+        String inputFile = cout.toSubString(elementStartIndex[nesting]);
         // KLUDGE around testsuite bug!
         if ("userdefined".equals(inputFile))
           inputFile = "emptydoc";
@@ -566,13 +549,13 @@ public class RunXQTS extends FilterConsumer
       }
     else if ("output-file".equals(typeName))
       {
-        outputFileAlts.push(sbuf.substring(elementStartIndex));
+        outputFileAlts.push(cout.toSubString(elementStartIndex[nesting]));
         compare = attributes.getValue("compare");
       }
     else if (testName != null && "module".equals(typeName))
       {
         String uri = attributes.getValue("namespace");
-        String module = sbuf.substring(elementStartIndex);
+        String module = cout.toSubString(elementStartIndex[nesting]);
         String mfile = (String) modules.get(module);
         String mpath = directory + '/' + mfile + XQueryFileExtension;
         String mclass = Compilation.mangleURI(uri)
@@ -599,23 +582,23 @@ public class RunXQTS extends FilterConsumer
     else
       base.endGroup(typeName);
     */
-    sbuf.setLength(elementStartIndex);
+    cout.setLength(elementStartIndex[nesting]);
+    nesting--;
   }
 
   public void beginAttribute(String attrName, Object attrType)
   {
     super.beginAttribute(attrName, attrType);
-    attrValueStart = sbuf.length();
+    attrValueStart = cout.length();
   }
 
   public void endAttribute()
   {
     super.endAttribute();
-    String attrValue = sbuf.substring(attrValueStart, sbuf.length()-1);
+    String attrValue = cout.toSubString(attrValueStart, cout.length()-1);
     String uri = null;
     String local = attributeName;
-    sbuf.setLength(attrValueStart);
-    //System.err.println("saw attribute "+attributeName+"/"+attributeType+"::"+attributeType.getClass().getName()+" = "+attrValue);
+    cout.setLength(attrValueStart);
     attributes.addAttribute(uri, local, attributeName, "CDATA", attrValue);
   }
 

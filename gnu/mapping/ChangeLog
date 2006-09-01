@@ -1,3 +1,8 @@
+2006-08-31  Per Bothner  <per@bothner.com>
+
+	* CharArrayOutPort.java (length, setLength, reset. toSubString):
+	New methods.
+
 2006-08-23  Per Bothner  <per@bothner.com>
 
 	* WrongType.java (getMessage): Fix off-by-one error.

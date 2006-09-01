@@ -11,6 +11,22 @@ public class CharArrayOutPort extends OutPort
     super(null, false, "<string>");
   }
 
+  public int length ()
+  {
+    return bout.bufferFillPointer;
+  }
+
+  public void setLength (int length)
+  {
+    bout.bufferFillPointer = length;
+  }
+
+  public void reset ()
+  {
+    bout.bufferFillPointer = 0;
+  }
+
+  /** Returns the written data as a freshly copied {@code char} array. */
   public char[] toCharArray()
   {
     int length = bout.bufferFillPointer;
@@ -34,9 +50,31 @@ public class CharArrayOutPort extends OutPort
     return false;
   }
 
-  public String toString()
+  /** Returns the written data as a new {@code String}. */
+  public String toString ()
   {
     return new String(bout.buffer, 0, bout.bufferFillPointer);
+  }
+
+  /** Returns a substring of the written data as a new {@code String}.
+   * Equivalent to {@code toString().substring(beginIndex, endIndex)}
+   * but more efficient.
+   */
+  public String toSubString (int beginIndex, int endIndex)
+  {
+    if (endIndex > bout.bufferFillPointer)
+      throw new IndexOutOfBoundsException();
+    return new String(bout.buffer, beginIndex, endIndex - beginIndex);
+  }
+
+  /** Returns a substring of the written data as a new {@code String}.
+   * Equivalent to {@code toString().substring(beginIndex)}
+   * but more efficient.
+   */
+  public String toSubString (int beginIndex)
+  {
+    return new String(bout.buffer, beginIndex,
+                      bout.bufferFillPointer - beginIndex);
   }
 }
 

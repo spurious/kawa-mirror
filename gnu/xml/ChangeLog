@@ -1,3 +1,13 @@
+2006-09-01  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Improved comments handling.
+	(inComment): New field.
+	(COMMENT): New constant.
+	(writeChar): Put space between consequitive '-' in comment.
+	(write): Check for '-' in comment.
+	(beginComment, endCOmment): New methods.
+	(writeComments): Re-implement using above methods.
+
 2006-06-28  Per Bothner  <per@bothner.com>
 
 	* SName.java: Remove file.

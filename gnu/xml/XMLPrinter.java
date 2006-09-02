@@ -26,6 +26,8 @@ public class XMLPrinter extends PrintConsumer
   boolean printXMLdecl = false;
   boolean inAttribute = false;
   boolean inStartTag = false;
+  /** 0: not in comment; 1: in comment normal; 2: in comment after '-'. */
+  int inComment;
   boolean needXMLdecl = false;
   boolean canonicalize = true;
   boolean htmlCompat = true;
@@ -61,7 +63,8 @@ public class XMLPrinter extends PrintConsumer
   private static final int WORD = -2;
   private static final int ELEMENT_START = -3;
   private static final int ELEMENT_END = -4;
-  private static final int KEYWORD = -5;
+  private static final int COMMENT = -5;
+  private static final int KEYWORD = -6;
   int prev = ' ';
 
   public XMLPrinter (Writer out, boolean autoFlush)
@@ -144,23 +147,44 @@ public class XMLPrinter extends PrintConsumer
   public void writeChar(int v)
   {
     closeTag();
-    if (printIndent >= 0 && (v == ' ' || v == '\t'))
+    if (printIndent >= 0)
       {
-        ((OutPort) out).writeSpaceFill();
-        prev = ' ';
-	return;
-      }
-    if (printIndent >= 0 && (v == '\r' || v == '\n'))
-      {
-	if (v != '\n' || prev != '\r')
-	  ((OutPort) out).writeBreak(PrettyWriter.NEWLINE_MANDATORY);
-	return;
+        if ((v == ' ' || v == '\t') && ! inAttribute)
+          {
+            ((OutPort) out).writeSpaceFill();
+            prev = ' ';
+            if (inComment > 0)
+              inComment = 1;
+            return;
+          }
+        if ((v == '\r' || v == '\n'))
+          {
+            if (v != '\n' || prev != '\r')
+              ((OutPort) out).writeBreak(PrettyWriter.NEWLINE_MANDATORY);
+            if (inComment > 0)
+              inComment = 1;
+            return;
+          }
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
+    //if (! escapeText)
     if (! escapeText)
       {
 	super.write((char) v);
 	prev = v;
+      }
+    else if (inComment > 0)
+      {
+        if (v == '-')
+          {
+            if (inComment == 1)
+              inComment = 2;
+            else
+              super.write(' ');
+          }
+        else
+          inComment = 1;
+        super.write((char) v);
       }
     else
       {
@@ -315,7 +339,7 @@ public class XMLPrinter extends PrintConsumer
     if (printIndent >= 0)
       {
 	OutPort pout = (OutPort) out;
-	if (prev == ELEMENT_START || prev == ELEMENT_END)
+	if (prev == ELEMENT_START || prev == ELEMENT_END || prev == COMMENT)
 	  pout.writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
 			  : PrettyWriter.NEWLINE_LINEAR);
 	pout.startLogicalBlock("", "", 2);
@@ -642,8 +666,10 @@ public class XMLPrinter extends PrintConsumer
         while (off < limit)
           {
             char c = buf[off++];
-            if (c >= 127 || c == '\n' || c == '\r' || c == '<' || c == '>'
-                || c == '&' || (c == '"' && inAttribute))
+            if (c >= 127 || c == '\n' || c == '\r'
+                || (inComment > 0 ? (c == '-' || inComment == 2)
+                    : (c == '<' || c == '>'
+                       || c == '&' || (c == '"' && inAttribute))))
               {
                 if (count > 0)
                   super.write(buf, off - 1 - count, count);
@@ -668,13 +694,39 @@ public class XMLPrinter extends PrintConsumer
   {
   }
 
-  public void writeComment(char[] chars, int offset, int length)
+  public void beginComment ()
   {
     closeTag();
+    if (printIndent >= 0)
+      {
+	if (prev == ELEMENT_START || prev == ELEMENT_END || prev == COMMENT)
+	  ((OutPort) out).writeBreak(printIndent > 0
+                                     ? PrettyWriter.NEWLINE_MANDATORY
+                                     : PrettyWriter.NEWLINE_LINEAR);
+      }
     print("<!--");
-    super.write(chars, offset, length);
+    inComment = 1;
+  }
+
+  public void endComment ()
+  {
     print("-->");
-    prev = '>';
+    prev = COMMENT;
+    inComment = 0;
+  }
+
+  public void writeComment(String chars)
+  {
+    beginComment();
+    writeChars(chars);
+    endComment();
+  }
+
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    beginComment();
+    write(chars, offset, length);
+    endComment();
   }
 
   public void writeCDATA (char[] chars, int offset, int length)

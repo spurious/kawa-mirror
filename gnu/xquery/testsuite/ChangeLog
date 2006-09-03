@@ -1,3 +1,13 @@
+2006-09-02  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Use XMLPrinter for XQTS.log instead of
+	"hand-formatted" XML.
+	(log): Remove OutPort field.
+	(xqlog): Replace it bey XMLPrinter field.
+	(main): Initialize appropriately.
+	(handleStartTag, report, evalTest, endGroup): Update appropriately.
+	(report): Always emit <test-case> report regardless of verbose flag.
+
 2006-08-31  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: No point in using an XMLPrinter to filter the

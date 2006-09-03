@@ -43,7 +43,7 @@ public class RunXQTS extends FilterConsumer
   Stack outputFileAlts = new Stack();
 
   String logFileName = "XQTS.log";
-  OutPort log;
+  XMLPrinter xqlog;
 
   private void summaryReport (int count, String label)
   {
@@ -73,11 +73,17 @@ public class RunXQTS extends FilterConsumer
             runner.directory = args[i];
             runner.catalog = runner.directory + "/XQTSCatalog.xml";
             System.err.println("catalog: "+runner.catalog);
-            runner.log = OutPort.openFile(runner.logFileName);
+            XMLPrinter xqlog
+              = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)));
+            runner.xqlog = xqlog;
+            xqlog.beginDocument();
+            xqlog.beginGroup("test-suite-result", "test-suite-result");
             System.err.println("log file: "+runner.logFileName);
 	    Document.parse(runner.catalog, runner);
             runner.summaryReport();
-            runner.log.close();
+            xqlog.endGroup("test-suite-result");
+            xqlog.endDocument();
+            xqlog.close();
 	  }
 	catch (Throwable ex)
 	  {
@@ -195,7 +201,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if ("test-group".equals(currentTag))
       {
-        log.println("<!--test-group "+attributes.getValue("name")+"-->");
+        xqlog.writeComment("test-group "+attributes.getValue("name"));
       }
     else if ("test-case".equals(currentTag))
       {
@@ -253,26 +259,22 @@ public class RunXQTS extends FilterConsumer
           }
       }
 
-    if (! verbose
-        && failed == (failExpected != null))
-      return;
-    log.print("  <test-case name=\"");
-    log.print(testName);
-    log.print("\" result='");
-
-    log.print(result);
+    xqlog.beginAttribute("result", "result");
+    xqlog.writeChars(result);
+    xqlog.endAttribute();
 
     if (failed && failExpected != null)
       {
-        log.print("' reason='");
-        log.print(failExpected);
+        xqlog.beginAttribute("reason", "reason");
+        xqlog.writeChars(failExpected.toString());
+        xqlog.endAttribute();
       }
     if (comment != null)
       {
-        log.print("' comment='");
-        log.print(comment);
+        xqlog.beginAttribute("comment", "comment");
+        xqlog.writeChars(comment);
+        xqlog.endAttribute();
       }
-    log.println("' />");
   }
 
   public void evalTest (String testName)
@@ -331,8 +333,6 @@ public class RunXQTS extends FilterConsumer
         return;
       }
 
-
-
     CallContext ctx = CallContext.getInstance();
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
@@ -359,9 +359,9 @@ public class RunXQTS extends FilterConsumer
             report("fail", "caught "+ex);
             if (verbose)
               {
-                log.println("  <!--");
-                ex.printStackTrace(log);
-                log.println("-->");
+                xqlog.beginComment();
+                ex.printStackTrace(xqlog);
+                xqlog.endComment();
               }
           }
         return;
@@ -427,19 +427,23 @@ public class RunXQTS extends FilterConsumer
             report("fail", null);
             if (verbose && expectedFailures.get(testName) == null)
               {
-                log.print("  <!-- compare: ");
-                log.print(compare);
-                log.println("-->");
-                log.print("  <!-- expected: [");
-                log.print(expected);
-                log.println("]-->");
-                log.print("  <!-- actual: [");
-                log.print(actual);
-                log.println("]-->");
+                xqlog.beginComment();
+                xqlog.writeChars("compare: ");
+                xqlog.writeChars(compare);
+                xqlog.endComment();
+                xqlog.beginComment();
+                xqlog.writeChars(" expected: [");
+                xqlog.writeChars(expected);
+                xqlog.writeChar(']');
+                xqlog.endComment();
+                xqlog.beginComment();
+                xqlog.writeChars(" actual: [");
+                xqlog.writeChars(actual);
+                xqlog.writeChar(']');
+                xqlog.endComment();
               }
           }
       }
-    log.flush();
   }
 
   public boolean equalsXML(String arg1 /* result */, String arg2 /*expected*/)
@@ -481,7 +485,14 @@ public class RunXQTS extends FilterConsumer
         //TestMisc.evalTest(query, expect);
         try
           {
+            xqlog.beginGroup("test-case", "test-case");
+            xqlog.beginAttribute("name", "name");
+            xqlog.writeChars(testName);
+            xqlog.endAttribute();
+            // Other attributes and <test-case> body written by evalTest.
             evalTest(testName);
+            xqlog.endGroup("test-case");
+            //xqlog.flush();
           }
         catch (Throwable ex)
           {

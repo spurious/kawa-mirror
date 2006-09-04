@@ -3,62 +3,8 @@ import gnu.lists.FString;
 import gnu.text.LineBufferedReader;
 import gnu.mapping.*;
 
-public class read_line extends ProcedureN
+public class read_line
 {
-  public int numArgs() { return 0x2000; }
-
-  public Object applyN(Object[] args)
-  {
-    int len = args.length;
-    if (len == 0)
-      return apply0();
-    if (len == 1)
-      return apply2(args[0], "trim");
-    if (len == 2)
-      return apply2(args[0], args[1]);
-    throw new WrongArguments(this, len);
-  }
-   
-  public final Object apply0 ()
-  {
-    return apply2(InPort.inDefault(), "trim");
-  }
-
-  public final Object apply1 (Object arg1)
-  {
-    return apply2(arg1, "trim");
-  }
-
-  public Object apply2 (Object arg1, Object arg2)
-  {
-    LineBufferedReader in;
-    String handling;
-    try
-      {
-        in = (LineBufferedReader) arg1;
-      }
-    catch (ClassCastException ex)
-      {
-        throw WrongType.make(ex, this, 1, arg1);
-      }
-    try
-      {
-        handling = (String) arg2;
-      }
-    catch (ClassCastException ex)
-      {
-        throw WrongType.make(ex, this, 2, arg2);
-      }
-    try
-      {
-        return apply(in, handling);
-      }
-    catch (java.io.IOException e)
-      {
-	throw new WrappedException(e);
-      }
-  }
-
   public static Object apply(LineBufferedReader in, String handling)
     throws java.io.IOException
   {

@@ -237,7 +237,6 @@ TemplateScope.java \
 SyntaxTemplate.java \
 AutoloadSyntax.java \
 CompileFile.java \
-loadcompiled.java \
 SyntaxForm.java \
 Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \

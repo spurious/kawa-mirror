@@ -219,7 +219,6 @@ append.java \
 fluid_let.java \
 expt.java \
 vector_append.java \
-read.java \
 readchar.java \
 read_line.java \
 char_ready_p.java \

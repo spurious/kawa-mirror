@@ -1,5 +1,10 @@
 2006-09-03  Per Bothner  <per@bothner.com>
 
+	* ports.scm (read): New function, transcribed from
+	kawa/standard/read.java.
+	(read-line): New function, transcribeconverted from argument-handling
+	part of kawa/standard/read_line.java.
+
 	* numbers.scm (atan): New function, transcribed from
 	kawa/standard/atan.java.
 	* numbers.scm (string->number): New function, transcribed from

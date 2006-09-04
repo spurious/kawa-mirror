@@ -1,5 +1,15 @@
 2006-09-03  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/loadcompiled.java: Remove unused class.
+	* kawa/lang/Makefile.am: Update accordingly.
+	* kawa/standard/read.java: Removed class, replaced by function read
+	in kawa/lib/ports.scm.
+	* kawa/standard/Makefile.am: Update accordingly.
+	* kawa/standard/read_line.java: No longer extend ProcedureN.
+	(numArgs, applyN, apply0, apply1, apply2): Remove methods.
+	* kawa/standard/callcc.java (callcc): New static final field.
+	* kawa/standard/Scheme.java: Appropriate updates.
+
 	* kawa/standard/atan.java: Removed class, replaced by function atan
 	in kawa/lib/numbers.scm.
 	* kawa/standard/string2number.java: Removed class, replaced by function

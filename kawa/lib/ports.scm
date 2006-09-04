@@ -192,6 +192,23 @@
 (define (close-output-port (port :: <output-port>))
   (invoke port 'close))
 
+(define (read #!optional (port :: <input-port> (current-input-port)))
+  (let ((lexer (gnu.kawa.lispexpr.LispReader:new port)))
+    (try-catch
+     (let ((result (lexer:readObject)))
+       (if (lexer:seenErrors)
+	   (primitive-throw
+	    (gnu.text.SyntaxException:new (lexer:getMessages))))
+       result)
+     (ex <gnu.text.SyntaxException>
+	 (ex:setHeader "syntax error in read:")
+	 (primitive-throw ex)))))
+
+(define (read-line #!optional
+		   (port :: <gnu.text.LineBufferedReader> (current-input-port))
+		   (handling :: <symbol> 'trim))
+  (kawa.standard.read_line:apply port handling))
+
 (define (transcript-on filename) :: <void>
   (invoke-static <output-port> 'setLogFile (invoke filename 'toString)))
 

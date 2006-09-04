@@ -10,6 +10,8 @@ import gnu.mapping.*;
 
 public class callcc extends MethodProc
 {
+  public static final callcc callcc = new callcc();
+
   public int numArgs() { return 0x1001; }
 
   public int match1 (Object proc, CallContext ctx)

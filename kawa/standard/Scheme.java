@@ -19,12 +19,6 @@ import gnu.math.Unit;
 
 public class Scheme extends LispLanguage
 {
-  /** Define a procedure to be autoloaded. */
-  protected void define_proc (String name, String className)
-  {
-    define (name, new AutoloadProcedure (name, className, this));
-  }
-
   public static final Environment nullEnvironment;
   public static final Environment r4Environment;
   public static final Environment r5Environment;
@@ -351,8 +345,9 @@ public class Scheme extends LispLanguage
       defProcStFld("apply", "gnu.kawa.functions.Apply", "apply");
       defProcStFld("map", "kawa.standard.Scheme", "map");
       defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
-      define_proc ("call-with-current-continuation", "kawa.standard.callcc");
-      define_proc ("call/cc", "kawa.standard.callcc");
+      defProcStFld("call-with-current-continuation",
+                   "kawa.standard.callcc", "callcc");
+      defProcStFld("call/cc", "kawa.standard.callcc", "callcc");
       defProcStFld("force", "kawa.lib.misc");
 
       //-- Section 6.10  -- complete
@@ -368,8 +363,8 @@ public class Scheme extends LispLanguage
       defProcStFld("open-output-file", "kawa.lib.ports");
       defProcStFld("close-input-port", "kawa.lib.ports");
       defProcStFld("close-output-port", "kawa.lib.ports");
-      define_proc ("read", "kawa.standard.read");
-      define_proc ("read-line", "kawa.standard.read_line");
+      defProcStFld("read", "kawa.lib.ports");
+      defProcStFld("read-line", "kawa.lib.ports");
       defProcStFld("read-char", "kawa.standard.readchar", "readChar");
       defProcStFld("peek-char", "kawa.standard.readchar", "peekChar");
       defProcStFld("eof-object?", "kawa.lib.ports");
@@ -565,7 +560,6 @@ public class Scheme extends LispLanguage
       defSntxStFld("parameterize", "kawa.lib.parameters");
 
       defProcStFld("compile-file", "kawa.lib.system");
-      define_proc ("load-compiled", "kawa.lang.loadcompiled");
       defProcStFld("environment-bound?", "kawa.lib.misc");
       defProcStFld("scheme-implementation-version", "kawa.lib.misc");
       defProcStFld("scheme-window", "kawa.lib.windows");

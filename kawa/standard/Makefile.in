@@ -217,9 +217,7 @@ prim_method.java prim_throw.java throw_name.java \
 not.java \
 append.java \
 fluid_let.java \
-atan.java \
 expt.java \
-string2number.java \
 vector_append.java \
 read.java \
 readchar.java \

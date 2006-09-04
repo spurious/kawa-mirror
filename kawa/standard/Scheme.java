@@ -267,7 +267,7 @@ public class Scheme extends LispLanguage
       defProcStFld("tan", "kawa.lib.numbers");
       defProcStFld("asin", "kawa.lib.numbers");
       defProcStFld("acos", "kawa.lib.numbers");
-      define_proc ("atan", "kawa.standard.atan");
+      defProcStFld("atan", "kawa.lib.numbers");
       defProcStFld("sqrt", "kawa.lib.numbers");
       defProcStFld("expt", "kawa.standard.expt");
       defProcStFld("make-rectangular", "kawa.lib.numbers");
@@ -279,7 +279,7 @@ public class Scheme extends LispLanguage
       defProcStFld("exact->inexact", "kawa.lib.numbers");
       defProcStFld("inexact->exact", "kawa.lib.numbers");
       defProcStFld("number->string", "kawa.lib.numbers");
-      define_proc ("string->number", "kawa.standard.string2number");
+      defProcStFld("string->number", "kawa.lib.numbers");
 
       //-- Section 6.6  -- complete
       defProcStFld("char?", "kawa.lib.characters");

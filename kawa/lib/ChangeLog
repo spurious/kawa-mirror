@@ -1,3 +1,10 @@
+2006-09-03  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (atan): New function, transcribed from
+	kawa/standard/atan.java.
+	* numbers.scm (string->number): New function, transcribed from
+	kawa/standard/string2number.java.
+
 2006-05-22  Per Bothner  <per@bothner.com>
 
 	* arrays.scm: Add require declaration for kawa.lib modules we depend on.

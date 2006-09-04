@@ -139,6 +139,12 @@
 (define (acos (x :: <double>)) :: <double>
   (invoke-static <java.lang.Math> 'acos x))
 
+(define-procedure atan
+  (lambda ((y :: <double>) (x :: <double>)) :: <double>
+	  (java.lang.Math:atan2 y x))
+  (lambda ((x :: <double>)) :: <double>
+	  (java.lang.Math:atan x)))
+
 (define (sqrt (num :: <quantity>)) :: <quantity>
   (gnu.math.Quantity:make
    (invoke (invoke num 'number) 'sqrt)
@@ -229,6 +235,12 @@
 			#!optional (radix :: <int> 10))
   (make <string>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
+
+(define (string->number (str :: <string>) #!optional (radix :: <int> 10))
+  (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber
+		 str:data 0 (str:length) #\000 radix
+		 gnu.kawa.lispexpr.LispReader:SCM_NUMBERS)))
+    (if (instance? result <gnu.math.Numeric>) result #f)))
 
 (define (quantity->number (q :: <quantity>)) :: <complex>
   (let ((u (q:unit))

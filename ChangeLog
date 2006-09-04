@@ -1,3 +1,12 @@
+2006-09-03  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/atan.java: Removed class, replaced by function atan
+	in kawa/lib/numbers.scm.
+	* kawa/standard/string2number.java: Removed class, replaced by function
+	string->number in kawa/lib/numbers.scm,	
+	* kawa/standard/Makefile.am: Update accordingly.
+	* kawa/standard/Scheme.java (initScheme): Update accordingly.
+
 2006-08-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions): Change type paraneter

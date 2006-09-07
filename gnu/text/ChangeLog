@@ -1,3 +1,9 @@
+2006-09-06  Per Bothner  <per@bothner.com>
+
+	* Char.java: Remove unused private constructor.
+	* SourceMessages.java (error): Remove unused local 'compilation'.
+	* Optiona.java (pushOptionValues): Remove unused local 'oldValue'.
+
 2006-08-26  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Minor debugging+comment improvements.

@@ -91,7 +91,6 @@ public class define_syntax extends Syntax
     tr.currentMacroDefinition = savedMacro;
     macro.expander = rule;
 
-    Object expander;
     if (rule instanceof LambdaExp)
       ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
     Expression args[] = new Expression[3];

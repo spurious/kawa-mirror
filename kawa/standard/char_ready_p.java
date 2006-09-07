@@ -1,5 +1,4 @@
 package kawa.standard;
-import gnu.mapping.*;
 
 public class char_ready_p {
   public static boolean ready (Object arg1)

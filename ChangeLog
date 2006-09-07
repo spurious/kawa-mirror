@@ -1,3 +1,16 @@
+2006-09-06  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Macro.java: Remove unused import(s).
+	* kawa/standard/try_catch.java: Likewise.
+	* kawa/standard/module_static.java: Likewise.
+	* kawa/standard/require.java: Likewise.
+	* kawa/lang/Translator.java: Likewise.
+	* kawa/standard/char_ready_p.java: Likewise.
+	* kawa/lang/Translator.java (rewrite): Remove unused local(s).
+	* kawa.repl (compileFiles): Likewise.
+	* kawa/standard/define_syntax.java (scanForm): Remove unused local.
+	* kawa/standard/require.java: Likewise.
+	
 2006-09-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/loadcompiled.java: Remove unused class.

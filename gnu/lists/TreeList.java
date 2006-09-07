@@ -1805,7 +1805,6 @@ public class TreeList extends AbstractSequence
 	  pos = gapEnd;
 	if (pos >= limit)
 	  return pos;
-	int j;
 	char datum = data[pos];
 	if (datum <= MAX_CHAR_SHORT
 	    || (datum >= OBJECT_REF_SHORT
@@ -1856,7 +1855,6 @@ public class TreeList extends AbstractSequence
     if (predicate instanceof NodePredicate)
       pos = nextNodeIndex(pos, limit);
     boolean checkAttribute = false; // true if attribute nodes could match.
-    boolean checkAll;
     boolean checkNode;
     boolean checkText;
     boolean checkGroup; // true if group nodes could match.
@@ -1865,18 +1863,15 @@ public class TreeList extends AbstractSequence
 	checkNode = true;
 	checkGroup = true;
 	checkText = false;
-	checkAll = false;
       }
     else if (predicate instanceof AttributePredicate)
       {
 	checkNode = true;
 	checkGroup = false;
 	checkText = false;
-	checkAll = false;
       }
     else
       {
-	checkAll = ! (predicate instanceof NodePredicate);
 	checkNode = true;
 	checkGroup = true;
 	checkText = true;

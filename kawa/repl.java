@@ -779,7 +779,6 @@ public class repl extends Procedure0or1
       {
         String arg = args[i];
         Compilation comp = comps[i-iArg];
-        Language language = comp.getLanguage();
         try
           {
             System.err.println("(compiling "+arg+" to "+comp.mainClass.getName()+')');

@@ -2,7 +2,6 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
-import gnu.bytecode.Member;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
@@ -10,7 +9,6 @@ import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
-import gnu.kawa.functions.GetNamedInstancePart;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -637,7 +635,6 @@ public class Translator extends Compilation
 	symbol = exp instanceof String ? env.getSymbol((String) exp)
 	  : (Symbol) exp;
 	boolean separate = getLanguage().hasSeparateFunctionNamespace();
-        Object value;
         if (decl != null)
           {
             if (! isLexical(decl)

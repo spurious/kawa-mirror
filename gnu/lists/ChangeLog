@@ -1,4 +1,10 @@
+2006-09-06  Per Bothner  <per@bothner.com>
+
+	* SimpleVector.java (remove): Remove unused local 'result'.
+	* TreeList.java (nextMatching): Removed unused locals 'j' and checkAll.
+
 2006-06-16  Per Bothner  <per@bothner.com>
+	
 	* Consumer.java (endAttribute): Note we allow unmatched endAttribute,
 	to indicate end of a parameter in a function parameter list.
 	* TreeList.java (endAttribute): Handle unmatched endAttribute.

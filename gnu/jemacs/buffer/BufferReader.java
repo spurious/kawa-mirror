@@ -1,5 +1,4 @@
 package gnu.jemacs.buffer;
-import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
 import java.io.*;
 import gnu.lists.CharBuffer;

@@ -1,3 +1,7 @@
+2006-09-06  Per Bothner  <per@bothner.com>
+
+	* BufferReader.java: Remove redundant import 'gnu.jemacs.buffer.*'.
+
 2006-06-16  Per Bothner  <per@bothner.com>
 
 	* BufferLocal.java (make): Fix some bit-rot.

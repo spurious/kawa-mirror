@@ -34,11 +34,6 @@ public class Char
   {
   }
 
-  private Char (char ch)
-  {
-    value = (int) ch;
-  }
-
   private Char (int ch)
   {
     value = ch;

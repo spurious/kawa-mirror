@@ -291,7 +291,6 @@ public abstract class SimpleVector extends AbstractSequence
     int index = indexOf(o);
     if (index < 0)
       return false;
-    Object result = get(index);
     shift(index + 1, index, 1);
     size = size - 1;
     clearBuffer(size, 1);

@@ -12,7 +12,6 @@ import gnu.kawa.reflect.*;
 import gnu.kawa.functions.Convert;
 import gnu.text.*;
 import java.util.*;
-import java.io.*;
 
 public class require extends Syntax
 {
@@ -253,7 +252,6 @@ public class require extends Syntax
           }
       }
 
-    Language language = tr.getLanguage();
     ClassType type = info.getClassType();
     String tname = info.className;
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
@@ -274,7 +272,6 @@ public class require extends Syntax
          fdecl != null;  fdecl = fdecl.nextDecl())
       {
         Object fdname = fdecl.getSymbol();
-        boolean isAlias = fdecl.isIndirectBinding();
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
         if (! isStatic && decl == null)
           {

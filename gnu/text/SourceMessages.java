@@ -65,7 +65,6 @@ public class SourceMessages
       errorCount = 1000;
     else if (error.severity != 'w')
       errorCount++;
-    Compilation compilation = Compilation.getCurrent();
     if ((SourceMessages.debugStackTraceOnError
          && (error.severity == 'e' || error.severity == 'f'))
         || SourceMessages.debugStackTraceOnWarning && error.severity == 'w')

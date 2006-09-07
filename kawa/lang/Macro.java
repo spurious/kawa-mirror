@@ -3,7 +3,6 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
-import gnu.bytecode.ClassType;
 
 public class Macro extends Syntax implements Printable, Externalizable
 {

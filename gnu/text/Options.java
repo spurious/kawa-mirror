@@ -181,7 +181,7 @@ public class Options
   }
 
   /** Get current option value.
-   * Only look in local table, in in inherited previous Options.
+   * Only look in local table, not in inherited Options.
    * Return null if there is no binding (even when get would
    * throw an except on an unknonw option).
    */
@@ -213,7 +213,6 @@ public class Options
     for (int i = 0;  i < len;  )
       {
 	String key = (String) options.elementAt(i++);
-	Object oldValue = getLocal(key);
 	Object newValue = options.elementAt(i);
 	options.setElementAt(newValue, i++);
 	set(key, options.elementAt(i++));

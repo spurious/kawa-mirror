@@ -1,3 +1,7 @@
+2006-09-06  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (format): Remove unused local 'buf_size'.
+
 2006-08-23  Per Bothner  <per@bothner.com>
 
 	* Duration.java (times): Do rounding as specified for XQuery F&O.

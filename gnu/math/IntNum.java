@@ -1098,7 +1098,6 @@ public class IntNum extends RatNum implements Externalizable
 	  work = words;
 	int len = ival;
 
-	int buf_size = len * (MPN.chars_per_word (radix) + 1);
 	if (radix == 16)
 	  {
 	    if (neg)

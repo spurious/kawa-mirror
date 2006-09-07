@@ -445,7 +445,7 @@ public class XQuery extends Language
 			       Object item, int position, int size)
     throws Throwable
   {
-   return applyWithFocus(evalToFocusProc(expr), item, position, size);
+    return applyWithFocus(evalToFocusProc(expr), item, position, size);
   }
 
   /** Evaluate an expression with a given focus (context).

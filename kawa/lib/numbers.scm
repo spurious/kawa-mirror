@@ -1,5 +1,6 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
+(require <kawa.lib.syntax>)
 
 (define (number? x) :: <boolean> (instance? x <number>))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))

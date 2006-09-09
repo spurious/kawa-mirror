@@ -651,12 +651,23 @@ public class Translator extends Compilation
 	      loc = loc.getBase();
             if (loc instanceof FieldLocation)
               {
-                decl = ((FieldLocation) loc).getDeclaration();
-                if (! inlineOk(null)
-                    // A kludge - we get a bunch of testsuite failures
-                    // if we don't inline $lookup$.  FIXME.
-                    && decl != kawa.standard.Scheme.getNamedPartDecl)
-                  decl = null;
+                FieldLocation floc = (FieldLocation) loc;
+                try
+                  {
+                    decl = floc.getDeclaration();
+                    if (! inlineOk(null)
+                        // A kludge - we get a bunch of testsuite failures
+                        // if we don't inline $lookup$.  FIXME.
+                        && decl != kawa.standard.Scheme.getNamedPartDecl)
+                      decl = null;
+                  }
+                catch (Throwable ex)
+                  {
+                    error('e',
+                          "exception loading '" + exp
+                          + "' - " + ex.getMessage());
+                    decl = null;
+                  }
               }
 	    /*
             else if (Compilation.inlineOk && function)

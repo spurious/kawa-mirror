@@ -1,3 +1,8 @@
+2006-09-08  Per Bothner  <per@bothner.com>
+
+	* Translator.java (reqrite): Catch missing (un-compiled) class when
+	loading a field - could be a missing require declaration.
+
 2006-09-06  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java: Remove unused import(s).

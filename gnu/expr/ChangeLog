@@ -1,3 +1,7 @@
+2006-09-08  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (toString): New method.
+
 2006-09-06  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (apply): For now revert 2006-08-07.  It causes Ant

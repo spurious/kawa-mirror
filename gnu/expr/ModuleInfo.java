@@ -363,4 +363,22 @@ public class ModuleInfo
       }
     return true;
   }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append("ModuleInfo[");
+    if (moduleClass != null)
+      {
+        sbuf.append("class: ");
+        sbuf.append(moduleClass);
+      }
+    else if (className != null)
+      {
+        sbuf.append("class-name: ");
+        sbuf.append(className);
+      }
+    sbuf.append(']');
+    return sbuf.toString();
+  }
 }

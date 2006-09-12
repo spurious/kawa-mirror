@@ -399,7 +399,7 @@ public class URI_utils
         rstr = rstr.replace(fileSep, '/');
       }
     /* #ifdef use:java.net.URI */
-    URI resolved =  toURI(base).resolve(rstr);
+    URI resolved =  toURI(base).resolve(new URI(null, rstr, null));
     /* #else */
     // /* The following is an appximation of URI's rsolve method. */
     // /* For example, it doesn't simplify "../" to "". */

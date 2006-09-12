@@ -188,7 +188,6 @@ public class Lexer extends Reader
        throws java.io.IOException
   {
     int sign = read();
-    boolean neg = false;
     boolean overflow = false;
     int c;
     if (sign == '+' || sign == '-')

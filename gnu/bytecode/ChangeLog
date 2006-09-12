@@ -1,3 +1,7 @@
+2006-09-11  Per Bothner  <per@bothner.com>
+
+	* SourceDebugExtAttr.java: Remove unused local variable.
+
 2006-06-12  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isSubclass): New method.

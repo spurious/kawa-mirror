@@ -1,5 +1,4 @@
 package gnu.text;
-import java.io.*;
 
 /** Represents an error message from processing a "source" file. */
 

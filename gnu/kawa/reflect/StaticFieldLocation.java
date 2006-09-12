@@ -1,6 +1,5 @@
 package gnu.kawa.reflect;
 import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
 import gnu.mapping.*;
 import gnu.expr.*;
 

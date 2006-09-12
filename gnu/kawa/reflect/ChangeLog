@@ -1,3 +1,9 @@
+2006-09-11  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java: Remove unused local variable.
+	* Invoke.java: Likewise.
+	* StaticFieldLocation.java: Remove unused import.
+
 2006-08-08  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (make): New factory method for immediate mode.

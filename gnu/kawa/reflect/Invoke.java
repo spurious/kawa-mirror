@@ -83,7 +83,6 @@ public class Invoke extends ProcedureN implements CanInline
         int nargs = args.length;
         Procedure.checkArgCount(this, nargs);
         Object arg0 = args[0];
-        String mname;
         ClassType dtype = (ClassType)
           ((kind == 'S' || kind == 's') ? typeFrom(arg0, this)
            : Type.make(arg0.getClass()));
@@ -412,7 +411,6 @@ public class Invoke extends ProcedureN implements CanInline
     else
       return exp;
 
-    Declaration decl;
     if (kind == 'N' && type instanceof ArrayType)
       {
         ArrayType atype = (ArrayType) type;

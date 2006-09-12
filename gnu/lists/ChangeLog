@@ -1,3 +1,7 @@
+2006-09-11  Per Bothner  <per@bothner.com>
+
+	* TreeList.java: Remove unused local variables.
+
 2006-09-06  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (remove): Remove unused local 'result'.

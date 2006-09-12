@@ -859,9 +859,7 @@ public class TreeList extends AbstractSequence
 	  index = gapEnd;
 	if (index == data.length)
 	  return -1;
-	int j;
 	datum = data[index];
-	int parent_offset;
 	switch (datum)
 	  {
 	  case END_GROUP_SHORT:
@@ -2010,7 +2008,6 @@ public class TreeList extends AbstractSequence
   public int nextPos (int position)
   {
     int index = posToDataIndex(position);
-    int i0 = index;
     if (index == data.length)
       return 0;
     if (index >= gapEnd)

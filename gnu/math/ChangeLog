@@ -1,3 +1,7 @@
+2006-09-11  Per Bothner  <per@bothner.com>
+
+	* RealNum.java: Remove unused local variable.
+
 2006-09-06  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (format): Remove unused local 'buf_size'.

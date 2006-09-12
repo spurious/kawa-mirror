@@ -153,7 +153,6 @@ public class FieldLocation extends ClassMemberLocation
 	  return null;
         ModuleInfo info = ModuleInfo.find(t.getName());
         ModuleExp mexp = info.getModuleExp();
-        Declaration vdecl;
         for (d = mexp.firstDecl();  d != null; d = d.nextDecl())
           {
             if (d.field != null && d.field.getName().equals(fname))

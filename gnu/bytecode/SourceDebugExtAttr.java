@@ -292,7 +292,6 @@ public class SourceDebugExtAttr  extends Attribute
 
   public void print (ClassTypeWriter dst) 
   {
-    ClassType ctype = (ClassType) container;
     dst.print("Attribute \"");
     dst.print(getName());
     dst.print("\", length:");

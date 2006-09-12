@@ -294,7 +294,6 @@ public abstract class RealNum extends Complex
         int ndigits = len - (neg ? 2 : 1);
         int dot = dstr.indexOf('.');
         // Number of fractional digits is len-dot-1.
-        int nfrac = len - dot - 1;
         // We want ndigits-1 fractional digits.  Hence we need to move the
         // decimal point ndigits-1-(len-dot-1) == ndigits-len+dot positions
         // to the left. This becomes the exponent we need.

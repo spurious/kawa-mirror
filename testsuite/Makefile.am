@@ -15,7 +15,8 @@ endif
 all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
-  $(SERVLET_TESTS) $(SAX2_TESTS) check-inlining check-use-slots
+  check-interpreted-cycle $(SERVLET_TESTS) $(SAX2_TESTS) \
+  check-inlining check-use-slots
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -179,6 +180,15 @@ check-scribble: scribble.class
 
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^
+
+check-interpreted-cycle:
+	CLASSPATH=.. $(KAWA) \
+	  -e '(require "cycle1.scm")' \
+	  -e '(test-begin "interpreted cycle")' \
+	  -e '(test-assert (is-even? 6))' \
+	  -e '(test-equal #f (is-even? 7))' \
+	  -e '(test-error (is-odd? 4))' \
+	  -e '(test-end)'
 
 InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \

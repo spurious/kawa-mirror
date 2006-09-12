@@ -9,4 +9,3 @@
 
 (define (is-odd? (x :: <int>)) :: <boolean>
   (if (= x 0) #f (is-even? (- x one))))
-

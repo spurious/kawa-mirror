@@ -1,3 +1,11 @@
+2006-09-12  Per Bothner  <per@bothner.com>
+
+	Add testing for require using filename, and immediate mode.
+	* cycle1.scm: Add module-name, and require filename rather than
+	class name.
+	* Makefile.am (check-interpreted-cycle): New rule.
+	(check): Invoke it,
+
 2006-08-07  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm (srfi-72-example-3): Add new let-syntax test.

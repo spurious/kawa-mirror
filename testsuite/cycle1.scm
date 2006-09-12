@@ -1,6 +1,6 @@
-;(module-name <cycle1>)
+(module-name <cycle1>)
 (module-export is-even?)
-(require <cycle2>)
+(require "cycle2.scm")
 
 (define one :: <int> -2)
 ; Verifies that body is executed exactly once.
@@ -8,5 +8,3 @@
 
 (define (is-even? (x :: <int>)) :: <boolean>
   (if (= x 0) #t (is-odd? (- x one))))
-
-

@@ -1,3 +1,10 @@
+2006-09-12  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Fix some memory leaks.
+	(evalTest): Make sure to close in even on SyntaxException.
+	Close xout.  Close expectStream.
+	(endGroup): Move outer output operations outside try/catch.
+
 2006-09-02  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Use XMLPrinter for XQTS.log instead of

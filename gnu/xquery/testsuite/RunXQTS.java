@@ -306,12 +306,12 @@ public class RunXQTS extends FilterConsumer
     try
       {
         comp = xqueryLanguage.parse(in, messages, Language.PARSE_IMMEDIATE);
-        in.close();
         if (messages.seenErrors())
           throw new SyntaxException(messages);
       }
     catch (SyntaxException ex)
       {
+        in.close();
         SourceError error = messages.getErrors();
         if (error != null && expectedError != null
             && expectedError.equals(error.code))
@@ -332,11 +332,13 @@ public class RunXQTS extends FilterConsumer
           report("fail", "static error: "+error.message);
         return;
       }
+    in.close();
 
     CallContext ctx = CallContext.getInstance();
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
-    ctx.consumer = new XMLPrinter(out, false);
+    XMLPrinter xout = new XMLPrinter(out, false);
+    ctx.consumer = xout;
     try
       {
         ModuleExp.evalModule(env, ctx, comp, null, null);
@@ -382,11 +384,11 @@ public class RunXQTS extends FilterConsumer
         return;
       }
 
-    ctx.consumer = save;
-    
     String actual = new String(out.toCharArray());
     byte[] expectedBytes = new byte[1024];
-
+    xout.close();
+    ctx.consumer = save;
+    
     int numOutputFileAlts = outputFileAlts.size();
     for (int ialt = 0;  ialt < numOutputFileAlts;  ialt++)
       {
@@ -408,6 +410,7 @@ public class RunXQTS extends FilterConsumer
               break;
             expectedLength += n;
           }
+        expectStream.close();
         String expected = new String(expectedBytes, 0, expectedLength, "UTF-8");
         expected = expected.replaceAll("\r", "");
         actual = actual.replaceAll("\r", "");
@@ -482,17 +485,14 @@ public class RunXQTS extends FilterConsumer
     if ("test-case".equals(typeName))
       {
         if (--maxTests == 0)  System.exit(0); // FIXME
-        //TestMisc.evalTest(query, expect);
+        xqlog.beginGroup("test-case", "test-case");
+        xqlog.beginAttribute("name", "name");
+        xqlog.writeChars(testName);
+        xqlog.endAttribute();
         try
           {
-            xqlog.beginGroup("test-case", "test-case");
-            xqlog.beginAttribute("name", "name");
-            xqlog.writeChars(testName);
-            xqlog.endAttribute();
             // Other attributes and <test-case> body written by evalTest.
             evalTest(testName);
-            xqlog.endGroup("test-case");
-            //xqlog.flush();
           }
         catch (Throwable ex)
           {
@@ -500,6 +500,8 @@ public class RunXQTS extends FilterConsumer
             System.err.println("caught "+ex);
             ex.printStackTrace();
           }
+        xqlog.endGroup("test-case");
+        //xqlog.flush();
         testName = null;
       }
     else if ("expected-error".equals(typeName))
@@ -520,6 +522,7 @@ public class RunXQTS extends FilterConsumer
           {
             in = InPort.openFile(filename);
             Object value = XQuery.getInstance().eval(in);
+            in.close();
             //System.err.println("input-query: evaluated to "+value);
             Environment current = Environment.getCurrent();
             current.put(symbol, null, value);

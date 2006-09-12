@@ -1,3 +1,9 @@
+2006-09-12  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite): Som re-arranging.
+	If we have a FieldLocation, use it's instance to set contextDecl.
+	(checkMemberContext): Inline into caller and remove.
+
 2006-09-08  Per Bothner  <per@bothner.com>
 
 	* Translator.java (reqrite): Catch missing (un-compiled) class when

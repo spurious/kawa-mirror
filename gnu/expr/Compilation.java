@@ -1113,7 +1113,10 @@ public class Compilation
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
 
-    if (curClass == mainClass && ! immediate)
+    if (curClass == mainClass
+        // Optimization: No pointing in calling register if we aren't
+        // compiling a named module.
+        && minfo != null && minfo.sourceURL != null)
       {
 	code.emitPushThis();
 	code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleInfo")

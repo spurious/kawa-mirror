@@ -88,7 +88,27 @@ public class ReferenceExp extends AccessExp
           }
         value = binding.value.eval(ctx);
       }
-    // This isn't just an optimization; it's needed for module imports.
+    else if (binding != null && binding.field != null
+             && binding.field.getDeclaringClass().isExisting()
+             && (! getDontDereference() || binding.isIndirectBinding()))
+      {
+        try
+          {
+            Object instance = binding.field.getStaticFlag() ? null
+              : contextDecl().getValue().eval(ctx);
+            value = binding.field.getReflectField().get(instance);
+          }
+        catch (Exception ex)
+          {
+            String msg = "exception evaluating "+symbol
+              +" from "+binding.field+" - "+ex;
+            // We abuse msg as a UnboundLocationException name.
+            throw new UnboundLocationException(msg, getFile(),
+                                               getLine(), getColumn());
+          }
+      }
+    // This isn't just an optimization - it's needed for evaluating procedural
+    // macros (e.g. syntax-case) defined in a not-yet-compiled module.
     else if (binding != null
         && (binding.value instanceof QuoteExp
             || binding.value instanceof LambdaExp)
@@ -97,22 +117,9 @@ public class ReferenceExp extends AccessExp
       {
         value = binding.value.eval(ctx);
       }
-    else if (binding != null
-             && binding.field != null && binding.field.getStaticFlag()
-             && (! getDontDereference() || binding.isIndirectBinding()))
-      {
-        try
-          {
-            value = binding.field.getReflectField().get(null);
-          }
-        catch (Exception ex)
-          {
-            throw WrappedException.wrapIfNeeded(ex);
-          }
-      }
     else if (binding == null
              || (binding.context instanceof ModuleExp
-                 && ! binding.isPrivate()))
+                && ! binding.isPrivate()))
       {
         Environment env = ctx.getEnvironment();
         Symbol sym = symbol instanceof Symbol ? (Symbol) symbol

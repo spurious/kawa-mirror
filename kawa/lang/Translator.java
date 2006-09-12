@@ -560,6 +560,7 @@ public class Translator extends Compilation
 	     || (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)))
       {
 	Declaration decl = lexical.lookup(exp, function);
+        Declaration cdecl = null;
 
         // If we're nested inside a class (in a ClassExp) then the field
         // and methods names of this class and super-classes/interfaces
@@ -640,6 +641,22 @@ public class Translator extends Compilation
             if (! isLexical(decl)
                 || (separate && decl.isProcedureDecl()))
               decl = null;
+            else if (current_scope instanceof TemplateScope && decl.needsContext())
+              cdecl = ((TemplateScope) current_scope).macroContext;
+            else if (decl.getFlag(Declaration.FIELD_OR_METHOD)
+                     && ! decl.isStatic())
+              {
+                scope = currentScope();
+                for (;;)
+                  {
+                    if (scope == null)
+                      throw new Error("internal error: missing "+decl);
+                    if (scope.outer == decl.context) // I.e. same class.
+                      break;
+                    scope = scope.outer;
+                  }
+                cdecl = scope.firstDecl();
+              }
           }
         else
           {
@@ -660,6 +677,11 @@ public class Translator extends Compilation
                         // if we don't inline $lookup$.  FIXME.
                         && decl != kawa.standard.Scheme.getNamedPartDecl)
                       decl = null;
+                    if (decl != null && ! decl.isStatic())
+                      {
+                        cdecl = new Declaration("(module-instance)");
+                        cdecl.setValue(new QuoteExp(floc.getInstance()));
+                      }
                   }
                 catch (Throwable ex)
                   {
@@ -683,11 +705,7 @@ public class Translator extends Compilation
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
 
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
-	if (current_scope instanceof TemplateScope
-            && decl != null && decl.needsContext())
-	  rexp.setContextDecl(((TemplateScope) current_scope).macroContext);
-        else
-          checkMemberContext(rexp, decl);
+        rexp.setContextDecl(cdecl);
         rexp.setLine(this);
 	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
@@ -699,23 +717,6 @@ public class Translator extends Compilation
       return (Expression) exp;
     else
       return QuoteExp.getInstance(Quote.quote(exp, this));
-  }
-
-  public void checkMemberContext (AccessExp exp, Declaration decl)
-  {
-    if (decl == null || ! decl.getFlag(Declaration.FIELD_OR_METHOD)
-        || decl.isStatic())
-      return;
-    ScopeExp scope = currentScope();
-    for (;;)
-      {
-        if (scope == null)
-          throw new Error("internal error: missing "+decl);
-        if (scope.outer == decl.context) // I.e. same class.
-          break;
-        scope = scope.outer;
-      }
-    exp.setContextDecl(scope.firstDecl());
   }
 
   public static void setLine(Expression exp, Object pair)

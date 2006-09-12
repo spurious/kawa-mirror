@@ -1,10 +1,12 @@
 2006-09-12  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): Use URI_utils.toURL.
+
 	* ReferenceExp.java (apply): Get value from field even if non-static by
 	using the contextDecl.  Prefer value from field over Declaration's
 	value since latter may not have correct context if a LambdaExp.
 	* Compilation.java (generateConstructor): We may need to register a
-	module even in immediate mode, as long as teh module is named.
+	module even in immediate mode, as long as the module is named.
 
 2006-09-08  Per Bothner  <per@bothner.com>
 

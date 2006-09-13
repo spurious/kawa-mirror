@@ -1,5 +1,9 @@
 2006-09-13  Per Bothner  <per@bothner.com>
 
+	* PrettyWriter.java (maybeOutput): New parameter 'flushing'.
+	If flushing, force output, using outputPartialLine.
+	(forcePrettyOutput): Call maybeOutput in flushing mode.
+
 	* PrettyWriter.java (getColumnNumber): Fix off-by-one error.
 
 2006-09-12  Per Bothner  <per@bothner.com>

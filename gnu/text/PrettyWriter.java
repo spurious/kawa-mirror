@@ -537,8 +537,7 @@ public class PrettyWriter extends java.io.Writer
 	todo -= size;
 	entry += size;
       }
-    maybeOutput (kind == NEWLINE_LITERAL
-		 || kind == NEWLINE_MANDATORY);
+    maybeOutput (kind == NEWLINE_LITERAL || kind == NEWLINE_MANDATORY, false);
   }
 
   public final void writeBreak(int kind)
@@ -821,7 +820,7 @@ public class PrettyWriter extends java.io.Writer
       return available;
     else if (isPrettyPrinting && fillPtr > lineLength)
       {
-	if (! maybeOutput(false))
+	if (! maybeOutput(false, false))
 	  outputPartialLine();
 	return ensureSpaceInBuffer(want);
       }
@@ -836,7 +835,7 @@ public class PrettyWriter extends java.io.Writer
       }
   }
 
-  boolean maybeOutput(boolean forceNewlines) // DONE
+  boolean maybeOutput(boolean forceNewlines, boolean flushing)
   {
     boolean outputAnything = false;
     //log("maybeOutput("+forceNewlines+"):");  dumpQueue();
@@ -851,6 +850,7 @@ public class PrettyWriter extends java.io.Writer
 	  {
 	  case QITEM_NEWLINE_TYPE:
 	    boolean cond;
+            int fits = -1;
 	    switch (queueInts[next+QITEM_NEWLINE_KIND])
 	      {
 	      default: // LINEAR, LITERAL, or MANDATORY:
@@ -877,10 +877,10 @@ public class PrettyWriter extends java.io.Writer
 		    if (end >= queueInts.length)
 		      end -= queueInts.length;
 		  }
-		int fits = fitsOnLine(end, forceNewlines);
+		fits = fitsOnLine(end, forceNewlines);
 		if (fits > 0)
 		  cond = false;
-		else if (fits < 0)
+		else if (fits < 0 || flushing)
 		  cond = true;
 		else
 		  break loop;
@@ -891,7 +891,10 @@ public class PrettyWriter extends java.io.Writer
 		outputAnything = true;
 		try
 		  {
-		    outputLine(next);
+                    if (flushing && fits == 0)
+                      outputPartialLine();
+                    else
+                      outputLine(next);
 		  }
 		catch (IOException ex)
 		  {
@@ -917,7 +920,7 @@ public class PrettyWriter extends java.io.Writer
 	    int end = queueInts[next + QITEM_SECTION_START_SECTION_END];
 	    // Convert relative offset to absolute index:
 	    end = end > 0 ? (end + next) % queueInts.length : -1;
-	    int fits = fitsOnLine (end, forceNewlines);
+	    fits = fitsOnLine (end, forceNewlines);
 	    //log("block-start @"+next+" end:"+end+" force:"+forceNewlines+" fits:"+fits);
 	    if (fits > 0)
 	      {
@@ -931,7 +934,7 @@ public class PrettyWriter extends java.io.Writer
 		queueSize -= endr;
 		//log("remove block -> next:"+next+" endr:"+endr+" qSize:"+queueSize);
 	      }
-	    else if (fits < 0)
+	    else if (fits < 0 || flushing)
 	      {
 		String prefix = queueStrings[next + QITEM_BLOCK_START_PREFIX];
 		String suffix = queueStrings[next + QITEM_BLOCK_START_SUFFIX];
@@ -1121,7 +1124,9 @@ public class PrettyWriter extends java.io.Writer
 
   public void forcePrettyOutput () throws IOException
   {
-    maybeOutput(false);
+    maybeOutput(false, true);
+    if (bufferFillPointer > 0)
+      outputPartialLine();
     expandTabs(-1);
     bufferStartColumn = getColumnNumber();
     out.write(buffer, 0, bufferFillPointer);

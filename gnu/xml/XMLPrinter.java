@@ -266,8 +266,12 @@ public class XMLPrinter extends PrintConsumer
 
   public void endDocument()
   {
-    if (printIndent >= 0)
-      ((OutPort) out).endLogicalBlock("");
+    if (out instanceof OutPort)
+      {
+        if (printIndent >= 0)
+          ((OutPort) out).endLogicalBlock("");
+        ((OutPort) out).freshLine();
+      }
   }
 
   protected void writeQName (Object name)

@@ -10,5 +10,3 @@
 				  (values-append "The query string was: "
 						 query)
 				  "There was no query string."))))
-#\newline
-

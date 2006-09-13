@@ -1,3 +1,7 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* HelloCgiS.scm: No longer need to explicitly print a #\newline.
+
 2006-09-12  Per Bothner  <per@bothner.com>
 
 	Add testing for require using filename, and immediate mode.

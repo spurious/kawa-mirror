@@ -1165,7 +1165,7 @@ public class PrettyWriter extends java.io.Writer
 	  return bufferStartColumn + bufferFillPointer;
 	char ch = buffer[i];
 	if (ch == '\n' || ch == '\r')
-	  return bufferFillPointer - i;
+	  return bufferFillPointer - (i+1);
       }
   }
 

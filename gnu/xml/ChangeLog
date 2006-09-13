@@ -1,3 +1,7 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (endDocument): Invoke freshLine on OutPort.
+
 2006-09-01  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Improved comments handling.

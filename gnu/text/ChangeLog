@@ -1,3 +1,7 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (getColumnNumber): Fix off-by-one error.
+
 2006-09-12  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (resolve):  Make sure invalid URI characters are

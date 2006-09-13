@@ -57,6 +57,7 @@ public class Document
         tree.beginDocument();
         tree.writeBaseUri(uri);
         parser.parse();
+        parser.close();
         if (messages.seenErrors())
           throw new SyntaxException("document function read invalid XML",
                                     messages);

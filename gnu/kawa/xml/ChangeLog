@@ -1,3 +1,10 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* Document.java (close): New method.
+	* KNode.java (toString): Add missing close call on XMLPrinter.
+
+	* XMLParser.java (parseCached): Add missing close call on XMLParser.
+
 2006-08-18  Per Bothner  <per@bothner.com>
 
 	* XTimeType.java (now): New method.

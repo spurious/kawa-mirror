@@ -385,6 +385,7 @@ public abstract class KNode extends SeqPosition
     CharArrayOutPort wr = new CharArrayOutPort();
     XMLPrinter xp = new XMLPrinter(wr);
     ((NodeTree) sequence).consumeNext(ipos, xp);
+    xp.close();
     wr.close();
     return wr.toString();
   }

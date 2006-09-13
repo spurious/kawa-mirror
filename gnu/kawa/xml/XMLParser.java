@@ -132,4 +132,10 @@ public class XMLParser extends XMLParserChar
     int col = ((LineBufferedReader) in).getColumnNumber();
     return col < 0 ? -1 : col + 1;
   }
+
+  public void close ()
+    throws java.io.IOException
+  {
+    in.close();
+  }
 }

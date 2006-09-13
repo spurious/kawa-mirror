@@ -1,5 +1,7 @@
 2006-09-13  Per Bothner  <per@bothner.com>
 
+	* KProcessingInstruction.java (getNodeType): Fix cut-and-paste error.
+
 	* Document.java (close): New method.
 	* KNode.java (toString): Add missing close call on XMLPrinter.
 

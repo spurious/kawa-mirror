@@ -15,7 +15,7 @@ public class KProcessingInstruction extends KNode
     super(seq, ipos);
   }
 
-  public short getNodeType () { return Node.TEXT_NODE; }
+  public short getNodeType () { return Node.PROCESSING_INSTRUCTION_NODE; }
 
   public String getNodeName()
   {

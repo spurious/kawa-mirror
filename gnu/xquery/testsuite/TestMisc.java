@@ -537,7 +537,7 @@ public class TestMisc
     CharArrayOutPort wr = new CharArrayOutPort();
     gnu.xml.XMLPrinter xp = new gnu.xml.XMLPrinter(wr);
     xp.writeObject(value);
-    wr.close();
+    xp.close();
     return wr.toString();
   }
 

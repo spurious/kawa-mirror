@@ -1,5 +1,8 @@
 2006-09-13  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java (main): Update XMLPrinter construction.
+	We want to print XML decl, use 'XML' style, and pretty-print.
+
 	* TestMisc.java (toString): Do close on XMLPrinter.
 
 2006-09-12  Per Bothner  <per@bothner.com>

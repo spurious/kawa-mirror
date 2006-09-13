@@ -22,13 +22,26 @@ public class OutPort extends PrintConsumer implements Printable
    * The value zero means it is unregistered. */
   protected int index;
   
-  OutPort(Writer base, PrettyWriter out, boolean autoflush)
+  protected OutPort(Writer base, PrettyWriter out, boolean autoflush)
   {
     super(out, autoflush);
     this.bout = out;
     this.base = base;
     if (closeOnExit())
       index = WriterManager.instance.register(out);
+  }
+
+  protected OutPort (OutPort out, boolean autoflush)
+  {
+    this(out, out.bout, autoflush);
+  }
+
+  protected OutPort (Writer out, boolean autoflush)
+  {
+    this(out,
+         (out instanceof OutPort ? ((OutPort) out).bout
+          : new PrettyWriter(out, true)),
+         autoflush);
   }
 
   public OutPort(Writer base, boolean printPretty, boolean autoflush)

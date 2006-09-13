@@ -1,6 +1,7 @@
 package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.text.Char;
+import java.io.Writer;
 
 /** A format that prints in XML syntax.
  * This may be a bad idea - maybe we should just use XMLConsumer.
@@ -72,9 +73,9 @@ public class XMLFormat extends AbstractFormat
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
-    else if (obj instanceof Consumable && out instanceof Consumer)
+    else if (obj instanceof Consumable && out instanceof Writer)
       //((Printable) obj).print((PrintWriter) out);
-      ((Consumable) out).consume(new gnu.xml.XMLPrinter((Consumer) out));
+      ((Consumable) out).consume(new gnu.xml.XMLPrinter((Writer) out));
     else if (obj == null)
       ;
     else
@@ -87,7 +88,8 @@ public class XMLFormat extends AbstractFormat
 
   public void format (Object value, Consumer out)
   {
-    gnu.xml.XMLPrinter xout = new gnu.xml.XMLPrinter(out);
+    Writer w = out instanceof Writer ? (Writer) out : new ConsumerWriter(out);
+    gnu.xml.XMLPrinter xout = new gnu.xml.XMLPrinter(w);
     xout.writeObject(value);
   }
 }

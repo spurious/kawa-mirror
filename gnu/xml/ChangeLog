@@ -1,5 +1,16 @@
 2006-09-13  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java: Change to extend OutPort rather than PrintConsumer.
+	Simpler pretty-printing - just use super's methods rather than
+	casting out field to OutPort.
+	(<init>, make): Change constructors and factory method appropriately.
+	(setPrintXMLdecl): New setter.
+	(inDocument): New field.
+	(isWordChar): Remove method - use method inherited from OutPort.
+	(setIndentMode): New helper method, using code moved from beginGroup.
+	(beginGroup, beginDocument): Call setIndentMode.
+	(beginGrouop): Move startLogicalBlock before namespace output.
+
 	* XMLPrinter.java (endDocument): Invoke freshLine on OutPort.
 
 2006-09-01  Per Bothner  <per@bothner.com>

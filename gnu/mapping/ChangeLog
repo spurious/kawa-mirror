@@ -1,3 +1,10 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* OutPort.java: Various changes to support XMLPrinter extending this.
+	(<init>(Writer,PrettyPriter,boolean)): Make protected.
+	(<init>(OutPort,boolean)): New protected constructor.
+	(<init>(Writer,boolean)): New protected constructor.
+
 2006-08-31  Per Bothner  <per@bothner.com>
 
 	* CharArrayOutPort.java (length, setLength, reset. toSubString):

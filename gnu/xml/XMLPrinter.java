@@ -15,7 +15,7 @@ import gnu.expr.Keyword;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
-public class XMLPrinter extends PrintConsumer
+public class XMLPrinter extends OutPort
   implements PositionConsumer, XConsumer
 {
   /** Controls whether to add extra indentation.
@@ -24,6 +24,8 @@ public class XMLPrinter extends PrintConsumer
   int printIndent = -1;
 
   boolean printXMLdecl = false;
+  public void setPrintXMLdecl (boolean value) { printXMLdecl = value; }
+  boolean inDocument;
   boolean inAttribute = false;
   boolean inStartTag = false;
   /** 0: not in comment; 1: in comment normal; 2: in comment after '-'. */
@@ -67,30 +69,19 @@ public class XMLPrinter extends PrintConsumer
   private static final int KEYWORD = -6;
   int prev = ' ';
 
+  public XMLPrinter (OutPort out, boolean autoFlush)
+  {
+    super(out, autoFlush);
+  }
+
   public XMLPrinter (Writer out, boolean autoFlush)
   {
     super(out, autoFlush);
   }
 
-  public XMLPrinter (Consumer out, boolean autoFlush)
-  {
-    super(out, autoFlush);
-  }
-
-  /** To disambiguate between Writer and Consumer versions. */
-  public XMLPrinter (PrintConsumer out, boolean autoFlush)
-  {
-    super((Writer) out, autoFlush);
-  }
-
   public XMLPrinter (OutputStream out, boolean autoFlush)
   {
-    super(out, autoFlush);
-  }
-
-  public XMLPrinter (Consumer out)
-  {
-    super(out, false);
+    super(new OutputStreamWriter(out), true, autoFlush);
   }
 
   public XMLPrinter (Writer out)
@@ -98,19 +89,19 @@ public class XMLPrinter extends PrintConsumer
     super(out);
   }
 
-  public XMLPrinter (PrintConsumer out)
-  {
-    super((Writer) out, false);
-  }
-
   public XMLPrinter (OutputStream out)
   {
-    super(out, false);
+    super(new OutputStreamWriter(out), true, false);
   }
 
-  public static XMLPrinter make(Consumer out, Object style)
+  public XMLPrinter (OutputStream out, String fname)
   {
-    XMLPrinter xout = new XMLPrinter(out);
+    super(new OutputStreamWriter(out), true, false, fname);
+  }
+
+  public static XMLPrinter make(OutPort out, Object style)
+  {
+    XMLPrinter xout = new XMLPrinter(out, true);
     xout.setStyle(style);
     return xout;
   }
@@ -139,11 +130,6 @@ public class XMLPrinter extends PrintConsumer
       escapeText = false;
   }
 
-  protected static final boolean isWordChar(char ch)
-  {
-    return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
-  }
-
   public void writeChar(int v)
   {
     closeTag();
@@ -151,7 +137,7 @@ public class XMLPrinter extends PrintConsumer
       {
         if ((v == ' ' || v == '\t') && ! inAttribute)
           {
-            ((OutPort) out).writeSpaceFill();
+            writeSpaceFill();
             prev = ' ';
             if (inComment > 0)
               inComment = 1;
@@ -160,7 +146,7 @@ public class XMLPrinter extends PrintConsumer
         if ((v == '\r' || v == '\n'))
           {
             if (v != '\n' || prev != '\r')
-              ((OutPort) out).writeBreak(PrettyWriter.NEWLINE_MANDATORY);
+              writeBreak(PrettyWriter.NEWLINE_MANDATORY);
             if (inComment > 0)
               inComment = 1;
             return;
@@ -210,9 +196,7 @@ public class XMLPrinter extends PrintConsumer
   private void startWord()
   {
     closeTag();
-    if (prev == WORD
-        && ! (out instanceof OutPort
-              && ((OutPort) out).getColumnNumber() == 0))
+    if (prev == WORD && getColumnNumber() != 0)
       super.write(' ');
     prev = WORD;
   }
@@ -228,9 +212,7 @@ public class XMLPrinter extends PrintConsumer
     if (inStartTag && ! inAttribute)
       {
 	if (printIndent >= 0)
-	  {
-	    ((OutPort) out).endLogicalBlock("");
-	  }
+          endLogicalBlock("");
 	super.write('>');
 	inStartTag = false;
 	prev = ELEMENT_START;
@@ -241,7 +223,7 @@ public class XMLPrinter extends PrintConsumer
 	super.write("<?xml version=\"1.0\"?>\n");
 	if (printIndent >= 0)
 	  {
-	    ((OutPort) out).startLogicalBlock("", "", 2);
+	    startLogicalBlock("", "", 2);
 	  }
 	needXMLdecl = false;
       }
@@ -252,26 +234,40 @@ public class XMLPrinter extends PrintConsumer
     startWord();
   }
 
+  void setIndentMode ()
+  {
+    Object xmlIndent = indentLoc.get(null);
+    String indent = xmlIndent == null ? null : xmlIndent.toString();
+    if (indent == null)
+      printIndent = -1;
+    else if (indent.equals("pretty"))
+      printIndent = 0;
+    else if (indent.equals("always") || indent.equals("yes"))
+      printIndent = 1;
+    else // if (ident.equals("no")) or default:
+      printIndent = -1;
+  }
+
   public void beginDocument()
   {
     if (printXMLdecl)
       {
-	// We should emit an XML declaration, but don't emit it set, in case
+	// We should emit an XML declaration, but don't emit it yet, in case
 	// we get it later as a processing instruction.
 	needXMLdecl = true;
       }
+    setIndentMode();
+    inDocument = true;
     if (printIndent >= 0 && ! needXMLdecl)
-      ((OutPort) out).startLogicalBlock("", "", 2);
+      startLogicalBlock("", "", 2);
   }
 
   public void endDocument()
   {
-    if (out instanceof OutPort)
-      {
-        if (printIndent >= 0)
-          ((OutPort) out).endLogicalBlock("");
-        ((OutPort) out).freshLine();
-      }
+    inDocument = false;
+    if (printIndent >= 0)
+      endLogicalBlock("");
+    freshLine();
   }
 
   protected void writeQName (Object name)
@@ -296,22 +292,8 @@ public class XMLPrinter extends PrintConsumer
     closeTag();
     if (groupNesting == 0)
       {
-        if (out instanceof OutPort)
-          {
-            Object xmlIndent = indentLoc.get(null);
-            String indent = xmlIndent == null ? null : xmlIndent.toString();
-            if (indent == null)
-              printIndent = -1;
-            else if (indent.equals("pretty"))
-              printIndent = 0;
-            else if (indent.equals("always") || indent.equals("yes"))
-              printIndent = 1;
-            else // if (ident.equals("no")) or default:
-              printIndent = -1;
-          }
-        else
-          printIndent = -1;
-
+        if (! inDocument)
+          setIndentMode();
         Object systemIdentifier = doctypeSystem.get(null);
         if (systemIdentifier != null)
           {
@@ -335,22 +317,22 @@ public class XMLPrinter extends PrintConsumer
                   }
                 super.write(systemId);
                 super.write("\">");
-                if (out instanceof OutPort)
-                  ((OutPort) out).println();
+                println();
               }
           }
       }
     if (printIndent >= 0)
       {
-	OutPort pout = (OutPort) out;
 	if (prev == ELEMENT_START || prev == ELEMENT_END || prev == COMMENT)
-	  pout.writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
+	  writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
 			  : PrettyWriter.NEWLINE_LINEAR);
-	pout.startLogicalBlock("", "", 2);
+	startLogicalBlock("", "", 2);
       }
     super.write('<');
     Object name = type instanceof Symbol ? type : typeName;
     writeQName(name);
+    if (printIndent >= 0)
+      startLogicalBlock("", "", 1);
     groupNameStack[groupNesting] = name;
     NamespaceBinding groupBindings = null;
     namespaceSaveStack[groupNesting++] = namespaceBindings;
@@ -421,8 +403,6 @@ public class XMLPrinter extends PrintConsumer
     if (isHtml
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = false;
-    if (printIndent >= 0)
-      ((OutPort) out).startLogicalBlock("", "", 1);
   }
 
   static final String HtmlEmptyTags
@@ -443,7 +423,7 @@ public class XMLPrinter extends PrintConsumer
       {
 	if (printIndent >= 0)
 	  {
-	    ((OutPort) out).endLogicalBlock("");
+	    endLogicalBlock("");
 	  }
 	super.write(isHtml
 		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
@@ -454,11 +434,10 @@ public class XMLPrinter extends PrintConsumer
       {
 	if (printIndent >= 0)
 	  {
-	    OutPort pout = (OutPort) out;
-	    pout.setIndentation(0, false);
+	    setIndentation(0, false);
 	    if (prev == ELEMENT_END)
-	      pout.writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
-			      : PrettyWriter.NEWLINE_LINEAR);
+	      writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
+                         : PrettyWriter.NEWLINE_LINEAR);
 	  }
 	super.write("</");
         writeQName(groupNameStack[groupNesting-1]);
@@ -466,8 +445,7 @@ public class XMLPrinter extends PrintConsumer
       }
     if (printIndent >= 0)
       {
-	OutPort pout = (OutPort) out;
-	pout.endLogicalBlock("");
+	endLogicalBlock("");
       }
     prev = ELEMENT_END;
     if (isHtml && ! escapeText
@@ -488,7 +466,7 @@ public class XMLPrinter extends PrintConsumer
     inAttribute = true;
     super.write(' ');
     if (printIndent >= 0)
-      ((OutPort) out).writeBreakFill();
+      writeBreakFill();
     super.write(attrName);
     super.write("=\"");
     prev = ' ';
@@ -704,9 +682,8 @@ public class XMLPrinter extends PrintConsumer
     if (printIndent >= 0)
       {
 	if (prev == ELEMENT_START || prev == ELEMENT_END || prev == COMMENT)
-	  ((OutPort) out).writeBreak(printIndent > 0
-                                     ? PrettyWriter.NEWLINE_MANDATORY
-                                     : PrettyWriter.NEWLINE_LINEAR);
+	  writeBreak(printIndent > 0 ? PrettyWriter.NEWLINE_MANDATORY
+                     : PrettyWriter.NEWLINE_LINEAR);
       }
     print("<!--");
     inComment = 1;

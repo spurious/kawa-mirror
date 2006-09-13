@@ -1,3 +1,10 @@
+2006-09-13  Per Bothner  <per@bothner.com>
+
+	* Shell.java (xmlPrinterClasses): Update for changed XMLPrinter
+	constructors.
+
+	* Shell.java (run): Call flush.
+
 2006-09-12  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite): Som re-arranging.

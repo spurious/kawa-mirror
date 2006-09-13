@@ -54,7 +54,7 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
-  private void summaryReport  ()
+  private void summaryReport ()
   {
     summaryReport(passCount, "# of expected passes      ");
     summaryReport(xfailCount, "# of expected failures    ");
@@ -62,7 +62,7 @@ public class RunXQTS extends FilterConsumer
     summaryReport(failCount, "# of unexpected failures  ");
   }
 
-  public static void main(String[] args)
+  public static void main (String[] args)
   {
     gnu.xquery.lang.XQuery.registerEnvironment();
     for (int i = 0;  i < args.length;  i++)
@@ -74,11 +74,16 @@ public class RunXQTS extends FilterConsumer
             runner.catalog = runner.directory + "/XQTSCatalog.xml";
             System.err.println("catalog: "+runner.catalog);
             XMLPrinter xqlog
-              = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)));
+              = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)),
+                               runner.logFileName);
             runner.xqlog = xqlog;
+            xqlog.setPrintXMLdecl(true);
+            xqlog.setStyle("xml");
+            Object saveIndent = XMLPrinter.indentLoc.get(null);
+            XMLPrinter.indentLoc.set("pretty");
             xqlog.beginDocument();
+            XMLPrinter.indentLoc.set(saveIndent);
             xqlog.beginGroup("test-suite-result", "test-suite-result");
-            System.err.println("log file: "+runner.logFileName);
 	    Document.parse(runner.catalog, runner);
             runner.summaryReport();
             xqlog.endGroup("test-suite-result");

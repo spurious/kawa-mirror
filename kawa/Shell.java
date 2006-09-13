@@ -14,7 +14,7 @@ public class Shell
   private static Class[] noClasses = { };
   private static  Class[] boolClasses = { Boolean.TYPE };
   private static  Class[] xmlPrinterClasses
-    = {gnu.lists.Consumer.class,  java.lang.Object.class };
+    = {gnu.mapping.OutPort.class,  java.lang.Object.class };
   private static  Class[] httpPrinterClasses
     = {gnu.mapping.OutPort.class };
   private static Object portArg = "(port)";
@@ -229,6 +229,8 @@ public class Shell
 
 		if (! ModuleExp.evalModule(env, ctx, comp, url, perr))
 		  continue;
+                if (out instanceof Writer)
+                  ((Writer) out).flush();
 		if (ch < 0)
 		  break;
 	      }

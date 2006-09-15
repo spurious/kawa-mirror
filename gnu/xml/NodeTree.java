@@ -217,6 +217,39 @@ public class NodeTree extends TreeList
     return index >= 0 && data[index] == BEGIN_ATTRIBUTE_LONG;
   }
 
+  /** Find named attribute.
+   * @param namepaceURI need not be interned,
+   *   or null which matches any namespace
+   * @param localName need not be interned,
+   *   or null which matches any local name
+   * @return attribute ipos or 0
+   */
+  public int getAttribute (int parent, String namespaceURI, String localName)
+  {
+    return getAttributeI(parent,
+                         namespaceURI == null ? null : namespaceURI.intern(),
+                         localName == null ? null : localName.intern());
+  }
+
+  /** Find named attribute.
+   * @param namepaceURI an interned String or null which matches any namespace
+   * @param localName an interned String, or null which matches any local name
+   * @return attribute ipos or 0
+   */
+  public int getAttributeI (int parent, String namespaceURI, String localName)
+  {
+    int attr = firstAttributePos(parent);
+    for (;;)
+      {
+        if (attr == 0 || getNextKind(attr) != Sequence.ATTRIBUTE_VALUE)
+          return 0;
+        if ((localName == null || posLocalName(attr) == localName)
+            && (namespaceURI == null || posNamespaceURI(attr) == namespaceURI))
+          return attr;
+        attr = nextPos(attr);
+      }
+  }
+
   /** Return the type-value of the node at the specified position. */
   public Object typedValue (int ipos)
   {

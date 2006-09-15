@@ -883,6 +883,16 @@ public class TreeList extends AbstractSequence
     return -1;
   }
 
+  public int getAttributeCount (int parent)
+  {
+    int n = 0;
+    for (int attr = firstAttributePos(parent);
+         attr != 0 && getNextKind(attr) == Sequence.ATTRIBUTE_VALUE;
+         attr = nextPos(attr))
+      n++;
+    return n;
+  }
+
   public boolean gotoAttributesStart(TreePosition pos)
   {
     int index = gotoAttributesStart(pos.ipos >> 1);
@@ -1879,7 +1889,7 @@ public class TreeList extends AbstractSequence
       {
 	if (pos == gapStart)
 	  pos = gapEnd;
-	if (pos >= limit)
+	if (pos >= limit && limit != -1)
 	  return 0;
 	int j;
 	char datum = data[pos];
@@ -1996,7 +2006,7 @@ public class TreeList extends AbstractSequence
 	      throw new Error("unknown code:"+(int) datum);
 	    continue;
 	  }
-	if (pos > start && predicate.isInstancePos(this, pos << 1))
+ 	if (pos > start && predicate.isInstancePos(this, pos << 1))
 	  {
 	    if (pos >= gapEnd)
 	      pos -= gapEnd - gapStart;

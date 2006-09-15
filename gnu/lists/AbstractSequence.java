@@ -559,6 +559,17 @@ public abstract class AbstractSequence
     return 0;
   }
 
+  public int firstChildPos (int ipos, ElementPredicate predicate)
+  {
+    int child = firstChildPos(ipos);
+    if (child == 0)
+      return 0;
+    if (predicate.isInstancePos(this, child))
+      return child;
+    else
+      return nextMatching(child, predicate, endPos(), false);
+  }
+
   /** Like firstChildPos.
    * Problem: Should this stop before we get to children?
    * I think so, but that requires changes to TreeList. */

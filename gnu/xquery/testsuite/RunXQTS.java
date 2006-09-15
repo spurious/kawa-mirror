@@ -24,7 +24,7 @@ public class RunXQTS extends FilterConsumer
   ModuleManager manager = ModuleManager.getInstance();
   Object failExpected;
 
-  boolean verbose = false;
+  boolean verbose = true;
 
   String directory;
   String catalog;
@@ -119,6 +119,7 @@ public class RunXQTS extends FilterConsumer
     this.cout = out;
 
     //badFormatting("CastableAs200");
+    expectedFailures.put("static-context-1", "unchecked unknownType in element(*,TypeName)");
     expectedFailures.put("Axes085", "actually pass? different char encoding");    
     expectedFailures.put("NodTest003", "actually pass? different char encoding");    
     expectedFailures.put("op-subtract-dayTimeDuration-from-dateTime-1", "straddles time change");
@@ -127,16 +128,6 @@ public class RunXQTS extends FilterConsumer
                    +"fn-lang-7|fn-lang-8|fn-lang-9|fn-lang-10|fn-lang-11",
                    "fn:lang not implemented");
 
-    // The rest are XQTS errors.
-    expectFailures("op-add-dayTimeDuration-to-dateTime-8|"
-                   +"op-add-dayTimeDuration-to-date-8|"
-                   +"op-subtract-dayTimeDuration-from-date-8",
-                   "handling of 'year zero'");
-    expectFailures("fn-doc-5|fn-doc-6|fn-doc-7|fn-doc-8|fn-doc-9|fn-doc-10"
-                   +"|fn-doc-11|fn-doc-12|fn-doc-13|fn-doc-14|fn-doc-15"
-                   +"|fn-doc-16|fn-doc-18|fn-doc-19|fn-doc-20|fn-doc-21"
-                   +"|fn-doc-22",
-                   "testsuite error (#2900) - bad fn:doc argument");
   }
 
   private void badFormatting(String testName)
@@ -565,6 +556,15 @@ public class RunXQTS extends FilterConsumer
             ex.printStackTrace();
             System.exit(-1);
           }
+      }
+   else if ("input-URI".equals(typeName))
+      {
+        String inputFile = cout.toSubString(elementStartIndex[nesting]);
+        String variable = attributes.getValue("variable");
+        String path = "file://" + directory + '/' + sources.get(inputFile);
+        Symbol symbol = Symbol.make("", variable);
+        Environment.getCurrent().put(symbol, null,
+                                     gnu.kawa.xml.XDataType.toURI(path));
       }
     else if ("output-file".equals(typeName))
       {

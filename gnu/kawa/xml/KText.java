@@ -3,7 +3,9 @@
 
 package gnu.kawa.xml;
 import gnu.xml.*;
-import org.w3c.dom.*;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.*;
+/* #endif */
 
 public class KText extends KCharacterData
   /* #ifdef use:org.w3c.dom.Node */
@@ -22,31 +24,37 @@ public class KText extends KCharacterData
     return new KText(tree, 0);
   }
 
-  public short getNodeType () { return Node.TEXT_NODE; }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public short getNodeType () { return Node.TEXT_NODE; }
+  /* #endif */
 
   public String getNodeName()
   {
     return "#text";
   }
 
-  public Text splitText(int offset)
-    throws DOMException
-  {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   "splitText not supported");
-  }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public Text splitText(int offset)
+  //   throws DOMException
+  // {
+  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   // "splitText not supported");
+  // }
+  /* #endif */
 
   public String getWholeText ()
   {
     throw new UnsupportedOperationException("getWholeText not implemented yet");
   }
 
-  public Text replaceWholeText (String content)
-    throws DOMException
-  {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   "splitText not supported");
-  }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public Text replaceWholeText (String content)
+  //   throws DOMException
+  // {
+  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   // "splitText not supported");
+  // }
+  /* #endif */
 
   public boolean hasAttributes ()
   {

@@ -3,7 +3,9 @@
 
 package gnu.kawa.xml;
 import gnu.xml.*;
-import org.w3c.dom.*;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.*;
+/* #endif */
 
 public class KCDATASection extends KText
   /* #ifdef use:org.w3c.dom.Node */
@@ -15,7 +17,9 @@ public class KCDATASection extends KText
     super(seq, ipos);
   }
 
-  public short getNodeType () { return Node.CDATA_SECTION_NODE; }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public short getNodeType () { return Node.CDATA_SECTION_NODE; }
+  /* #endif */
 
   public String getNodeName()
   {

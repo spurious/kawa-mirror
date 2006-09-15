@@ -3,7 +3,9 @@
 
 package gnu.kawa.xml;
 import gnu.xml.*;
-import org.w3c.dom.*;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.*;
+/* #endif */
 
 public class KAttr extends KNode
   /* #ifdef use:org.w3c.dom.Node */
@@ -20,17 +22,24 @@ public class KAttr extends KNode
     return sequence.getNextTypeName(ipos);
   }
 
-  public short getNodeType () { return Node.ATTRIBUTE_NODE; }
+  /* #ifdef use:org.w3c.dom.Node */
+  // public short getNodeType () { return Node.ATTRIBUTE_NODE; }
+  /* #endif */
 
   public String getValue ()
   {
     return getNodeValue();
   }
 
+  public static Object getObjectValue (NodeTree sequence, int ipos)
+  {
+    return sequence.getPosNext(ipos+10);
+  }
+
   /** Get attribute value as (typed) Object, rather than string. */
   public Object getObjectValue ()
   {
-    return sequence.getPosNext(ipos+10);
+    return getObjectValue((NodeTree) sequence, ipos);
   }
 
   /* #ifdef use:org.w3c.dom.Node */

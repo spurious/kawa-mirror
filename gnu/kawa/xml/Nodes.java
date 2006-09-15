@@ -5,7 +5,9 @@ package gnu.kawa.xml;
 import gnu.mapping.Values;
 import gnu.lists.*;
 import gnu.xml.*;
-import org.w3c.dom.*;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.*;
+/* #endif */
 
 /** Manages a sequence of node references. */
 

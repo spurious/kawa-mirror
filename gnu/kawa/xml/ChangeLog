@@ -1,5 +1,26 @@
 2006-09-14  Per Bothner  <per@bothner.com>
 
+	* KNode.java (getNodeValue): New static methods.
+	(getNodeValue): Use new method.
+	* KElement.java (getAttribute, getAttributeNS, getAttributeNode,
+	getAttributeNS): New implementations.
+	(hasAttribute, hasAttributeNS): Optimization.
+	* KAttr.java (getObjectValue): New static method.
+	(getObjectValue): Use new method.
+	* KProcessingInstruction.java (getNodeName): Fix copy-paste error.
+
+	* KNode.java: Fix PreProcessing so we don't use org.w3c.dom
+	except when use:org.w3c.dom.Node is selected.
+	* KCharacterData.java: Likweise.
+	* KElement.java: Likewise.
+	* KComment.java: Likewise.
+	* KAttr.java: Likewise.
+	* KText.java: Likewise.
+	* KCDATASection.java: Likewise.
+	* KDocument.java: Likewise.
+	* Nodes.java: Likewise.
+	* KProcessingInstruction.java: Likewise.
+
 	* XDataType.java (toURI): Make public.
 
 	* AttributeAxis.java (scan): Optimize - break when no more attributes.

@@ -4,8 +4,9 @@
 package gnu.kawa.xml;
 import gnu.lists.*;
 import gnu.xml.*;
-import org.w3c.dom.*;
-import org.w3c.dom.Document;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.*;
+/* #endif */
 import gnu.mapping.*;
 
 public abstract class KNode extends SeqPosition
@@ -102,7 +103,9 @@ public abstract class KNode extends SeqPosition
     return false;
   }
 
-  public abstract short getNodeType ();
+  /* #ifdef use:org.w3c.dom.Node */
+  // public abstract short getNodeType ();
+  /* #endif */
 
   public String getNodeName ()
   {
@@ -124,6 +127,18 @@ public abstract class KNode extends SeqPosition
     return ((NodeTree) sequence).posLocalName(ipos);
   }
 
+  public static String getNodeValue (NodeTree seq, int ipos)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    getNodeValue(seq, ipos, sbuf);
+    return sbuf.toString();
+  }
+
+  public static void getNodeValue (NodeTree seq, int ipos, StringBuffer sbuf)
+  {
+    seq.stringValue(seq.posToDataIndex(ipos), sbuf);
+  }
+
   public String getNodeValue()
   {
     StringBuffer sbuf = new StringBuffer();
@@ -133,8 +148,7 @@ public abstract class KNode extends SeqPosition
 
   public void getNodeValue (StringBuffer sbuf)
   {
-    NodeTree tlist = (NodeTree) sequence;
-    tlist.stringValue(tlist.posToDataIndex(ipos), sbuf);
+    getNodeValue((NodeTree) sequence, ipos, sbuf);
   }
 
   public boolean hasChildNodes()

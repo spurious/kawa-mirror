@@ -481,4 +481,29 @@ public class Duration extends Quantity implements Externalizable
   {
     throw new Error("number needs to be implemented!");
   }
+
+  public int hashCode ()
+  {
+    return months ^ (int) seconds ^ nanos;
+  }
+
+  /** Compare for equality.
+   * Ignores unit.
+   */
+  public static boolean equals (Duration x, Duration y)
+  {
+    return x.months == y.months
+      && x.seconds == y.seconds
+      && x.nanos == y.nanos;
+  }
+
+  /** Compare for equality.
+   * Ignores unit.
+   */
+  public boolean equals (Object obj)
+  {
+    if (obj == null || ! (obj instanceof Duration))
+      return false;
+    return Duration.equals (this, (Duration) obj);
+  }
 }

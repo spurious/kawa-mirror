@@ -1,3 +1,11 @@
+2006-09-14  Per Bothner  <per@bothner.com>
+
+	* XDataType.java (toURI): Make public.
+
+	* AttributeAxis.java (scan): Optimize - break when no more attributes.
+
+	* ChildAxis.java (scan): Make use of new filtering fileChildPos method.
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* KProcessingInstruction.java (getNodeType): Fix cut-and-paste error.

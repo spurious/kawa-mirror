@@ -17,19 +17,11 @@ public class ChildAxis extends TreeScanner
 
   public void scan (AbstractSequence seq, int ipos, PositionConsumer out)
   {
-    int child = seq.firstChildPos(ipos);
-    TreeList tl = (TreeList)seq;
-    if (child == 0)
-      return;
-    int limit = seq.nextPos(ipos);
-    if (type.isInstancePos(seq, child))
-      out.writePosition(seq, child);
-    for (;;)
+    int child = seq.firstChildPos(ipos, type);
+    while (child != 0)
       {
-	child = seq.nextMatching(child, type, limit, false);
-	if (child == 0)
-	  break;
 	out.writePosition(seq, child);
+      	child = seq.nextMatching(child, type, -1, false);
       }
   }
 }

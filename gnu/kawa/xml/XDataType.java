@@ -385,7 +385,7 @@ public class XDataType extends Type implements TypeValue
   }
 
   /* #ifdef use:java.net.URI */
-  private static java.net.URI toURI (Object value)
+  public static java.net.URI toURI (Object value)
   {
     try
       {
@@ -397,7 +397,7 @@ public class XDataType extends Type implements TypeValue
       }
   }
   /* #else */
-  // private static String toURI (Object value)
+  // public static String toURI (Object value)
   // {
   //   return gnu.text.URI_utils.toURI(value);
   // }

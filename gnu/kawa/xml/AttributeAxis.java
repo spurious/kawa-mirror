@@ -18,11 +18,12 @@ public class AttributeAxis extends TreeScanner
   public void scan (AbstractSequence seq, int ipos, PositionConsumer out)
   {
     ipos = seq.firstAttributePos(ipos);
-    // FIXME this also interates over children, at least for TreeList.
     while (ipos != 0)
       {
 	if (type.isInstancePos(seq, ipos))
 	  out.writePosition(seq, ipos);
+        else if (seq.getNextKind(ipos) != Sequence.ATTRIBUTE_VALUE)
+          break;
 	ipos = seq.nextPos(ipos);
       }
   }

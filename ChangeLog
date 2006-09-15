@@ -1,3 +1,7 @@
+2006-09-14  Per Bothner  <per@bothner.com>
+
+	* build.xml (java4-features): Don't use org.w3c.dom.Node by default.
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* Shell.java (xmlPrinterClasses): Update for changed XMLPrinter

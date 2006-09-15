@@ -1,11 +1,15 @@
-// Copyright (c) 2001, 2004  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2004, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
 import gnu.mapping.Values;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.kawa.xml.KNode;
+import gnu.xml.NodeTree;
+import gnu.kawa.xml.*;
+/* #ifdef use:org.w3c.dom.Node */
+// import org.w3c.dom.Node;
+/* #endif */
 
 public class SequenceUtils
 {
@@ -68,7 +72,6 @@ public class SequenceUtils
         if (ipos == 0)
           break;
       }
-    int count;
     for (int i = n-1;  --i >= 0; )
       vals.consumePosRange(poses[i], poses[i+1], out);
   }
@@ -90,6 +93,97 @@ public class SequenceUtils
       }
     else if (Compare.apply(Compare.TRUE_IF_EQU, seqParam, srchParam, collator))
       out.writeInt(1);
+  }
+
+  public static final NodeType textOrElement
+    = new NodeType("element-or-text", NodeType.GROUP_OK|NodeType.TEXT_OK);
+
+  public static boolean deepEqualChildren (NodeTree seq1, int ipos1,
+                                           NodeTree seq2, int ipos2,
+                                           NamedCollator collator)
+  {
+    NodeType filter = textOrElement;
+    int child1 = seq1.firstChildPos(ipos1, filter);
+    int child2 = seq2.firstChildPos(ipos2, filter);
+    for (;;)
+      {
+	if (child1 == 0 || child2 == 0)
+          return child1 == child2;
+        if (! deepEqual(seq1, child1, seq2, child2, collator))
+          return false;
+        child1 = seq1.nextMatching(child1, filter, -1, false);
+        child2 = seq2.nextMatching(child2, filter, -1, false);
+      }
+  }
+
+  public static boolean deepEqual (NodeTree seq1, int ipos1,
+                                   NodeTree seq2, int ipos2,
+                                   NamedCollator collator)
+  {
+    int kind1 = seq1.getNextKind(ipos1);
+    int kind2 = seq1.getNextKind(ipos2);
+    switch (kind1)
+      {
+      case Sequence.GROUP_VALUE:
+        if (kind1 != kind2)
+          return false;
+        // Assumes local-name and namespace-URI are interned.
+        String loc1 = seq1.posLocalName(ipos1);
+        String loc2 = seq2.posLocalName(ipos2);
+        if (loc1 != loc2)
+          return false;
+        String ns1 = seq1.posNamespaceURI(ipos1);
+        String ns2 = seq2.posNamespaceURI(ipos2);
+        if (ns1 != ns2)
+          return false;
+        int attr1 = seq1.firstAttributePos(ipos1);
+        int nattr1 = 0;
+        for (;;)
+          {
+            if (attr1 == 0
+                || seq1.getNextKind(attr1) != Sequence.ATTRIBUTE_VALUE)
+              break;
+            nattr1++;
+            String local = seq1.posLocalName(attr1);
+            String ns = seq1.posNamespaceURI(attr1);
+            int attr2 = seq2.getAttributeI(ipos2, ns, local);
+            if (attr2 == 0)
+              return false;
+            String aval1 = KNode.getNodeValue(seq1, attr1);
+            String aval2 = KNode.getNodeValue(seq2, attr2);
+            if (! Compare.atomicCompare(Compare.TRUE_IF_EQU,
+                                        aval1, aval2,
+                                        collator))
+              return false;
+            attr1 = seq1.nextPos(attr1);
+          }
+        int nattr2 = seq2.getAttributeCount(ipos2);
+        if (nattr1 != nattr2)
+          return false;
+        /* ... fall through ... */
+      case Sequence.DOCUMENT_VALUE:
+        return deepEqualChildren(seq1, ipos1, seq2, ipos2, collator);
+      case Sequence.ATTRIBUTE_VALUE:
+        if (seq1.posLocalName(ipos1) != seq2.posLocalName(ipos2)
+            || seq1.posNamespaceURI(ipos1) != seq2.posNamespaceURI(ipos2))
+          return false;
+        return Compare.atomicCompare(Compare.TRUE_IF_EQU,
+                                     KAttr.getObjectValue(seq1, ipos1),
+                                     KAttr.getObjectValue(seq2, ipos2),
+                                     collator);
+      case Sequence.PROCESSING_INSTRUCTION_VALUE:
+        if (! seq1.posTarget(ipos1).equals(seq2.posTarget(ipos2)))
+          return false;
+        return KNode.getNodeValue(seq1, ipos1)
+          .equals(KNode.getNodeValue(seq2, ipos2));
+      case Sequence.COMMENT_VALUE:
+      case Sequence.CDATA_VALUE:
+      default:
+        if (kind1 != kind2)
+          return false;
+        return KNode.getNodeValue(seq1, ipos1)
+          .equals(KNode.getNodeValue(seq2, ipos2));
+      }
   }
 
   public static boolean deepEqual (Object arg1, Object arg2,
@@ -142,16 +236,9 @@ public class SequenceUtils
           {
             KNode node1 = (KNode) item1;
             KNode node2 = (KNode) item2;
-            int kind1 = node1.getNodeType();
-            int kind2 = node2.getNodeType();
-            if (kind1 != kind2)
-              return false;
-            switch (kind1)
-              {
-              default:
-                if (! item1.equals(item2)) // FIXME - use eq
-                  return false;
-              }
+            return deepEqual((NodeTree) node1.sequence, node1.ipos,
+                             (NodeTree) node2.sequence, node2.ipos,
+                             collator);
           }
         else
           return false;

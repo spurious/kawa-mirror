@@ -1,3 +1,9 @@
+2006-09-14  Per Bothner  <per@bothner.com>
+
+	* SequenceUtils.java (deepEqualChaildren, deepEqual): New methods.
+	(deepEqual): Fix handling of nodes to use new methods.
+	(textOrElement): New constant.
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* XMLFormat.java (writeObject): Update for XMLPrinter changes.

@@ -79,6 +79,7 @@ public class RunXQTS extends FilterConsumer
             runner.xqlog = xqlog;
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");
+            xqlog.escapeNonAscii = false;
             Object saveIndent = XMLPrinter.indentLoc.get(null);
             XMLPrinter.indentLoc.set("pretty");
             xqlog.beginDocument();

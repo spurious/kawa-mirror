@@ -67,6 +67,7 @@ public class XQParser extends Lexer
   boolean emptyOrderDeclarationSeen;
 
   String baseURI = null;
+  boolean baseURIDeclarationSeen;
 
   boolean boundarySpacePreserve;
   boolean boundarySpaceDeclarationSeen;
@@ -2092,8 +2093,13 @@ public class XQParser extends Lexer
 	    unread();
 	    error("invalid character reference");
 	  }
-	else
-	  tokenBufferAppend(value);
+        // See definition of 'Char' in XML 1.1 2nd ed Specification.
+	else if ((value > 0 && value <= 0xD7FF)
+                 || (value >= 0xE000 && value <= 0xFFFD)
+                 || (value >= 0x10000 && value <= 0x10FFFF))
+          tokenBufferAppend(value);
+        else
+          error('e', "invalid character value "+value, "XQST0090");
       }
     else
       {
@@ -2329,11 +2335,29 @@ public class XQParser extends Lexer
 	  {
 	    skip();
 	    getDelimited("-->");
-	    Expression[] args =
-	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
-	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.CommentConstructor",
-					       "commentConstructor"),
-			       args);
+            boolean bad = false;
+            int i = tokenBufferLength;
+            boolean sawHyphen = true;
+            while (--i >= 0)
+              {
+                boolean curHyphen = tokenBuffer[i] == '-';
+                if (sawHyphen && curHyphen)
+                  {
+                    bad = true;
+                    break;
+                  }
+                sawHyphen = curHyphen;
+              }
+            if (bad)
+              exp = syntaxError("consecutive or final hyphen in comment");
+            else
+              {
+                Expression[] args =
+                  { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
+                exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.CommentConstructor",
+                                                   "commentConstructor"),
+                                   args);
+              }
 	  }
 	else if (next == '[' && read() == 'C' && read() == 'D'
 		 && read() == 'A' && read() == 'T' && read() == 'A'
@@ -3760,7 +3784,7 @@ public class XQParser extends Lexer
       case DECLARE_COPY_NAMESPACES_TOKEN:
 	getRawToken();
         if (copyNamespacesDeclarationSeen && ! interactive)
-          syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0067");
+          syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0055");
         constructionModeDeclarationSeen = true;
 	if (match("preserve"))
           copyNamespacesNoPreserve = false;
@@ -3817,7 +3841,7 @@ public class XQParser extends Lexer
           {
             String version = new String(tokenBuffer, 0, tokenBufferLength);
             if (! version.equals("1.0"))
-              error('w', "unrecognized xquery version "+version, "XQST0031");
+              error('e', "unrecognized xquery version "+version, "XQST0031");
             getRawToken();
           }
         else
@@ -3830,6 +3854,20 @@ public class XQParser extends Lexer
             else
               {
                 String encoding = new String(tokenBuffer, 0, tokenBufferLength);
+                int i = tokenBufferLength;
+                boolean bad = i == 0;
+                while (--i >= 0 && ! bad)
+                  {
+                    ch = tokenBuffer[i];
+                    if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
+                      continue;
+                    if (i > 0
+                        || ! ((ch >= '0' && ch <= '9')
+                              || ch == '.' || ch == '_' || ch == '-'))
+                      bad = true;
+                  }
+                if (bad)
+                  error('e', "invalid encoding name syntax", "XQST0087");
                 // ignore encoding specification.
                 getRawToken();
               }
@@ -3839,6 +3877,9 @@ public class XQParser extends Lexer
         return QuoteExp.voidExp;
 
       case DECLARE_BASE_URI_TOKEN:
+        if (baseURIDeclarationSeen && ! interactive)
+          syntaxError("duplicate 'declare base-uri' seen", "XQST0032");
+        baseURIDeclarationSeen = true;
         val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;

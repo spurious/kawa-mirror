@@ -1,3 +1,13 @@
+2006-09-17  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (baseURIDeclarationSeen): New field.
+	(parse): Complain if duplicate base-uri declaration.
+	(parseEntityOrCharRef): Check that char ref is valid XML character.
+	(parseXMLConstructor): Check for invalid comment contents.
+	(parse): Fix error code for duplicate copy-namespaces declaration.
+	(parse): Invalid version number should be error, not warning.
+	(parse): Check that encoding has valid form.
+
 2006-08-27  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (DEEP_EQUAL_BUILTIN): New constant.

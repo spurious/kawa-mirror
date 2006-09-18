@@ -1,5 +1,11 @@
 2006-09-18  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (check): Also run check-XQTS, if WITH_XQTS configured.
+	(check-without-XQTS): Check except for XQTS.
+
+	* Makefile.am (check-XQTS): Also check fn:trace output.
+	* XQTS-trace.exp: New file - expected fn:trace output.
+
 	* RunXQTS.java (main): Clear escapeNonAscii.
 
 2006-09-14  Per Bothner  <per@bothner.com>

@@ -1,3 +1,7 @@
+2006-09-18  Per Bothner  <per@bothner.com>
+
+	* configure.in (WITH_XQTS): New AM_CONDITIONAL.
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* build.xml (java4-features): Don't use org.w3c.dom.Node by default.

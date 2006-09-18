@@ -11,7 +11,7 @@ java_sources = TestMisc.java TestSuite.java
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql \
-  bad-1.xql expected-1.errs \
+  bad-1.xql expected-1.errs XQTS-trace.exp \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
 
@@ -32,6 +32,9 @@ XQTS_CATALOG = $(XQTS_DIR)/XQTSCatalog.xml
 check-XQTS: RunXQTS.class
 	CLASSPATH=$(KAWALIB) \
 	  $(JAVA) gnu.xquery.testsuite.RunXQTS $(XQTS_DIR)
+	@if diff -b $(srcdir)/XQTS-trace.exp XQuery-trace.log; \
+	  then echo '# XQTS trace output matches'; \
+	  else echo FAIL XQuery trace output mismatch; fi
 
 check-misc: TestMisc.class
 	CLASSPATH=$(KAWALIB) $(JAVA) gnu.xquery.testsuite.TestMisc
@@ -95,5 +98,11 @@ check-bad-1: bad-1.log
 	  then echo '# bad-1 test passes'; \
 	  else echo FAIL bad-1 test; fi
 
-check:  check-misc check-suite check-maketab1 check-multab check-descend \
-	  check-format-users check-mod check-bad-1
+check-without-XQTS:  check-misc check-suite check-maketab1 check-multab \
+	  check-descend check-format-users check-mod check-bad-1
+
+if WITH_XQTS
+check: check-without-XQTS check-XQTS
+else
+check: check-without-XQTS
+endif

@@ -689,7 +689,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar JAVA_SOURCE LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBTOOL SED GREP EGREP FGREP LD NM AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP CXXCPP GCJ ac_ct_GCJ GCJFLAGS GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_ECHO2_TRUE ENABLE_ECHO2_FALSE ENABLE_JEMACS_TRUE ENABLE_JEMACS_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_SWT_TRUE WITH_SWT_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE XQTS_PATH conf_classpath pathsep filesep JAVA JAVAC JAVACFLAGS GCJ_COMPILED_SELECTED GCJ_SELECTED TOP_BUILDDIR JEMACS_VERSION BYTECODE_VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar JAVA_SOURCE LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LIBTOOL SED GREP EGREP FGREP LD NM AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP CXXCPP GCJ ac_ct_GCJ GCJFLAGS GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_ECHO2_TRUE ENABLE_ECHO2_FALSE ENABLE_JEMACS_TRUE ENABLE_JEMACS_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_SWT_TRUE WITH_SWT_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE WITH_XQTS_TRUE WITH_XQTS_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE XQTS_PATH conf_classpath pathsep filesep JAVA JAVAC JAVACFLAGS GCJ_COMPILED_SELECTED GCJ_SELECTED TOP_BUILDDIR JEMACS_VERSION BYTECODE_VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files='Make_rules'
 
 # Initialize some variables set by options.
@@ -16459,6 +16459,16 @@ fi
 
 
 
+if test "$with_XQTS" != "no"; then
+  WITH_XQTS_TRUE=
+  WITH_XQTS_FALSE='#'
+else
+  WITH_XQTS_TRUE='#'
+  WITH_XQTS_FALSE=
+fi
+
+
+
 if test "$enable_kawa_frontend" = "yes"; then
   ENABLE_KAWA_FRONTEND_TRUE=
   ENABLE_KAWA_FRONTEND_FALSE='#'
@@ -16494,6 +16504,7 @@ XQTS_PATH=${with_XQTS:XQTS}
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
+
 
 
 
@@ -16735,6 +16746,13 @@ if test -z "${WITH_SAX2_TRUE}" && test -z "${WITH_SAX2_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"WITH_SAX2\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"WITH_SAX2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WITH_XQTS_TRUE}" && test -z "${WITH_XQTS_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WITH_XQTS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WITH_XQTS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -17664,6 +17682,8 @@ s,@WITH_AWT_TRUE@,$WITH_AWT_TRUE,;t t
 s,@WITH_AWT_FALSE@,$WITH_AWT_FALSE,;t t
 s,@WITH_SAX2_TRUE@,$WITH_SAX2_TRUE,;t t
 s,@WITH_SAX2_FALSE@,$WITH_SAX2_FALSE,;t t
+s,@WITH_XQTS_TRUE@,$WITH_XQTS_TRUE,;t t
+s,@WITH_XQTS_FALSE@,$WITH_XQTS_FALSE,;t t
 s,@ENABLE_KAWA_FRONTEND_TRUE@,$ENABLE_KAWA_FRONTEND_TRUE,;t t
 s,@ENABLE_KAWA_FRONTEND_FALSE@,$ENABLE_KAWA_FRONTEND_FALSE,;t t
 s,@XQTS_PATH@,$XQTS_PATH,;t t

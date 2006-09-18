@@ -1,3 +1,10 @@
+2006-09-17  Per Bothner  <per@bothner.com>
+
+	* Debug.java: Parameterize output file and options using static.
+	(tracePrefix, tracePort, traaceFilename, traceShouldFlush,
+	traceShouldAppend): New static fields.
+	(trace): Make synchronized.
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* SequenceUtils.java (deepEqualChaildren, deepEqual): New methods.

@@ -1,5 +1,10 @@
 2006-09-19  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java (main): Don't clear escapeNonAscii on xqlog after all.
+	(evalTest): Instead clear it for "actual" output.
+	Also canonicalizeCDATA to disable output of CDATA sections.
+	(<init>): Remove an expected failure, which now passes.
+
 	* RunXQTS.java (main): Remove bogus TestMisc.printSummary call.
 
 	* RunXQTS.java (expectedError): Replace single String by ...

@@ -83,7 +83,6 @@ public class RunXQTS extends FilterConsumer
             runner.xqlog = xqlog;
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");
-            xqlog.escapeNonAscii = false;
             Object saveIndent = XMLPrinter.indentLoc.get(null);
             XMLPrinter.indentLoc.set("pretty");
             xqlog.beginDocument();
@@ -123,7 +122,6 @@ public class RunXQTS extends FilterConsumer
 
     //badFormatting("CastableAs200");
     expectedFailures.put("static-context-1", "unchecked unknownType in element(*,TypeName)");
-    expectedFailures.put("Axes085", "actually pass? different char encoding");    
     expectedFailures.put("NodTest003", "actually pass? different char encoding");    
     expectedFailures.put("op-subtract-dayTimeDuration-from-dateTime-1", "straddles time change");
     expectFailures("surrogates03|surrogates06|surrogates07|surrogates08|surrogates10", "surrogates not properly implemented");
@@ -338,6 +336,8 @@ public class RunXQTS extends FilterConsumer
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
     XMLPrinter xout = new XMLPrinter(out, false);
+    xout.escapeNonAscii = false;
+    xout.canonicalizeCDATA = true;
     ctx.consumer = xout;
     try
       {

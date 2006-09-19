@@ -41,6 +41,10 @@ public class RunXQTS extends FilterConsumer
   int xfailCount;
 
   Stack outputFileAlts = new Stack();
+  /** Set of expected error codes.  The format is "|Error1}...|ErrorN|". */
+  StringBuffer expectedErrorsBuf = new StringBuffer("|");
+  /** Same as expectedErrorBuf.toString() after collecting expected-errors. */
+  String expectedErrors;
 
   String logFileName = "XQTS.log";
   XMLPrinter xqlog;
@@ -97,7 +101,6 @@ public class RunXQTS extends FilterConsumer
 	    System.err.println("caught "+ex+" while processing "+args[i]);
 	  }
       }
-    TestMisc.printSummary();
   }
 
   int nesting = 0;
@@ -106,7 +109,6 @@ public class RunXQTS extends FilterConsumer
   int attrValueStart;
   // Start in cout's buffer of current element, indexed by nesting level.
   int[] elementStartIndex = new int[20];
-  String expectedError;
   AttributesImpl attributes = new AttributesImpl();
 
   String query = null;
@@ -205,8 +207,8 @@ public class RunXQTS extends FilterConsumer
         testName = attributes.getValue("name");
         testFilePath = attributes.getValue("FilePath");
         testQueryName = null;
-        expectedError = null;
         outputFileAlts.clear();
+        expectedErrorsBuf.setLength(1);
         manager.clear();
       }
     else if ("query".equals(currentTag))
@@ -284,6 +286,7 @@ public class RunXQTS extends FilterConsumer
       = directory + '/' + XQueryQueryOffsetPath + testFilePath
       + testQueryName + XQueryFileExtension;
     InPort in;
+    expectedErrors = expectedErrorsBuf.toString();
     try
       {
         in = InPort.openFile(filename);
@@ -310,21 +313,21 @@ public class RunXQTS extends FilterConsumer
       {
         in.close();
         SourceError error = messages.getErrors();
-        if (error != null && expectedError != null
-            && expectedError.equals(error.code))
+        String errorString = error == null ? "" : "|" + error.code + "|";
+        if (expectedErrors.indexOf(errorString) >= 0)
           {
             report("pass", null);
             return;
           }
-        if ("XQST0009".equals(error.code))
+        if (errorString.equals("|XQST0009|"))
           {
 
             if (failExpected == null)
               failExpected = "'import schema' not implemented";
             report("fail", null);
           }
-        else if (expectedError != null)
-          report("pass", "static error: "+error+" expected:"+expectedError);
+        else if (expectedErrors.length() > 1)
+          report("pass", "static error: "+error+" expected:"+expectedErrors);
         else
           report("fail", "static error: "+error.message);
         return;
@@ -343,16 +346,16 @@ public class RunXQTS extends FilterConsumer
     catch (Throwable ex)
       {
         if (ex instanceof NumberFormatException
-            && "FORG0001".equals(expectedError))
-          report("pass", "caught NumberFormatException expected:"+expectedError);
+            && expectedErrors.indexOf("|FORG0001|") >= 0)
+          report("pass", "caught NumberFormatException expected:"+expectedErrors);
         else if (ex instanceof ClassCastException
-                 && ("XPTY0004".equals(expectedError)
-                     || "XPTY0020".equals(expectedError)
-                     || "FORG0001".equals(expectedError)
-                     || "FOAR0002".equals(expectedError)))
-          report("pass", "caught ClassCastException expected:"+expectedError);
-        else if (expectedError != null)
-          report("pass", "caught "+ex+" expected:"+expectedError);
+                 && (expectedErrors.indexOf("|XPTY0004|") >= 0
+                     || expectedErrors.indexOf("|XPTY0020|") >= 0
+                     || expectedErrors.indexOf("|FORG0001|") >= 0
+                     || expectedErrors.indexOf("|FOAR0002|") >= 0))
+          report("pass", "caught ClassCastException expected:"+expectedErrors);
+        else if (expectedErrors.length() > 1)
+          report("pass", "caught "+ex+" expected:"+expectedErrors);
         else
           {
             report("fail", "caught "+ex);
@@ -368,16 +371,10 @@ public class RunXQTS extends FilterConsumer
 
     if (messages.seenErrors())
       {
-        if (expectedError != null)
-          report("pass", "error: "+messages.getErrors()+" expected: "+expectedError);
+        if (expectedErrors.length() > 1)
+          report("pass", "error: "+messages.getErrors()+" expected: "+expectedErrors);
         else
           report("fail", "error: "+messages.getErrors());
-        return;
-      }
-
-    if (expectedError != null)
-      {
-        report("fail", "expected error: "+expectedError);
         return;
       }
 
@@ -387,6 +384,8 @@ public class RunXQTS extends FilterConsumer
     ctx.consumer = save;
     
     int numOutputFileAlts = outputFileAlts.size();
+    boolean foundMatchingOutput = false;
+    String expected = null;
     for (int ialt = 0;  ialt < numOutputFileAlts;  ialt++)
       {
         String outname  = directory + '/' + ResultOffsetPath + testFilePath
@@ -408,21 +407,32 @@ public class RunXQTS extends FilterConsumer
             expectedLength += n;
           }
         expectStream.close();
-        String expected = new String(expectedBytes, 0, expectedLength, "UTF-8");
+        expected = new String(expectedBytes, 0, expectedLength, "UTF-8");
         expected = expected.replaceAll("\r", "");
         actual = actual.replaceAll("\r", "");
         if (expected.equals(actual))
           {
             report("pass", null);
+            foundMatchingOutput = true;
             break;
           }
         else if (("XML".equals(compare) || "Fragment".equals(compare))
                  && equalsXML(actual, expected))
           {
             report("pass", "(ignoring any spaces)");
+            foundMatchingOutput = true;
             break;
           }
-        else if (ialt == numOutputFileAlts-1)
+      }
+
+    if (! foundMatchingOutput)
+      {
+        if (expectedErrors.length() > 1)
+          {
+            report("fail", "expected error: "+expectedErrors);
+            return;
+          }
+        else
           {
             report("fail", null);
             if (verbose && expectedFailures.get(testName) == null)
@@ -503,8 +513,8 @@ public class RunXQTS extends FilterConsumer
       }
     else if ("expected-error".equals(typeName))
       {
-        expectedError = cout.toSubString(elementStartIndex[nesting]);
-        //System.err.println("expected-error: '"+expectedError+"'");
+        expectedErrorsBuf.append(cout.toSubString(elementStartIndex[nesting]));
+        expectedErrorsBuf.append('|');
       }
     else if ("input-query".equals(typeName))
       {

@@ -1,3 +1,13 @@
+2006-09-19  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (main): Remove bogus TestMisc.printSummary call.
+
+	* RunXQTS.java (expectedError): Replace single String by ...
+	(expectedErrorsBuf): ... buffer of sequence of error codes.
+	(evalTest): Update to handle set of possible expected error codes.
+	If both <output-file> and <expected-error> both seen, then it's ok
+	to not cause an error if an <output-file> matches.
+
 2006-09-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check): Also run check-XQTS, if WITH_XQTS configured.

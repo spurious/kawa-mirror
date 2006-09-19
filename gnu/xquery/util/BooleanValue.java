@@ -24,19 +24,25 @@ public class BooleanValue extends Procedure1
       }
     if (value instanceof SeqPosition)
       return true;
-    if (value instanceof String || value instanceof UntypedAtomic)
+    if (value instanceof String
+        /* #ifdef use:java.net.URI */
+        || value instanceof java.net.URI
+        /* #endif */
+        || value instanceof UntypedAtomic)
       return value.toString().length() > 0;
     if (value instanceof Values)
       {
 	Values values = (Values) value;
-	value = values.getPosNext(0);
-	if (value == Sequence.eofValue)
+	Object value1 = values.getPosNext(0);
+	if (value1 == Sequence.eofValue)
 	  return false;
 	int next = values.nextDataIndex(0);
 	if (next < 0)
-	  return booleanValue(value);
+	  return booleanValue(value1);
+        if (value1 instanceof SeqPosition)
+          return true;
       }
-    return true;
+    throw new WrongType("fn:boolean", 1, value, "boolean-convertible-value");
   }
 
   public Object apply1(Object arg)

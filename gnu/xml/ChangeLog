@@ -1,3 +1,8 @@
+2006-09-19  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (canonicalizeCDATA) New option field.
+	(writeCDATA): Call plain write if canonicalizeCDATA.
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (getAttribute, getAttributeI): New methods.

@@ -32,6 +32,7 @@ public class XMLPrinter extends OutPort
   int inComment;
   boolean needXMLdecl = false;
   boolean canonicalize = true;
+  public boolean canonicalizeCDATA;
   boolean htmlCompat = true;
   public boolean escapeText = true;
   public boolean escapeNonAscii = true;
@@ -712,6 +713,11 @@ public class XMLPrinter extends OutPort
 
   public void writeCDATA (char[] chars, int offset, int length)
   {
+    if (canonicalizeCDATA)
+      {
+        write(chars, offset, length);
+        return;
+      }
     closeTag();
     print("<![CDATA[");
     int limit = offset+length;

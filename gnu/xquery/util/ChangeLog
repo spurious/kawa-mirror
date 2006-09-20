@@ -1,5 +1,8 @@
 2006-09-19  Per Bothner  <per@bothner.com>
 
+	* HandleExtension.java: New class.
+	* Makefile.am: Update accordingly.
+
 	* BooleanValue.java (booleanValue): Throw WrongType exception
 	when appropriate.  Handle URI similar to String/UntypedAtomic.
 

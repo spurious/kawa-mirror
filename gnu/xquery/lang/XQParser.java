@@ -18,6 +18,7 @@ import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
+import gnu.xquery.util.HandleExtension;
 import kawa.standard.require;
 
 /** A class to read xquery forms. */
@@ -294,8 +295,9 @@ public class XQParser extends Lexer
   static final int AXIS_PRECEDING = 10;
   static final int AXIS_PRECEDING_SIBLING = 11;
   static final int AXIS_SELF = 12;
-  // Token types for binary operators.
   static final int OP_WHERE      = 196;
+  static final int PRAGMA_START_TOKEN = 197; // '{#'
+  // Token types for binary operators.
   static final int OP_BASE        = 400;
   static final int OP_OR         = OP_BASE;      // 'or'
   static final int OP_AND        = OP_BASE + 1;  // 'and'
@@ -414,6 +416,8 @@ public class XQParser extends Lexer
 	  {
 	    if (checkNext(':'))
 	      skipComment();
+            else if (checkNext('#'))
+              return setToken(PRAGMA_START_TOKEN, 2);
 	    else
 	      return setToken('(', 1);
 	  }
@@ -2697,6 +2701,43 @@ public class XQParser extends Lexer
       {
       case '(':
         exp = parseParenExpr();
+        break;
+
+      case PRAGMA_START_TOKEN:
+        Stack extArgs = new Stack();
+        for (;;)
+          {
+            getRawToken();
+            Expression qname = parseQName(false);
+            extArgs.push(qname);
+            StringBuffer sbuf = new StringBuffer();
+            int ch = skipSpace();
+            while (ch != '#' || peek() != ')')
+              {
+                if (ch < 0)
+                  eofError("pragma ended by end-of-file");
+                sbuf.append((char) ch);
+                ch = read();
+              }
+            read(); // skip ')'
+            extArgs.push(QuoteExp.getInstance(sbuf.toString()));
+            getRawToken();
+            if (curToken != PRAGMA_START_TOKEN)
+              break;
+          }
+        if (curToken == '{')
+          {
+            LambdaExp lexp = new LambdaExp(0);
+            comp.push(lexp);
+            lexp.body = parseEnclosedExpr();
+            comp.pop(lexp);
+            extArgs.push(lexp);
+            args = new Expression[extArgs.size()];
+            extArgs.copyInto(args);
+            exp = new ApplyExp(HandleExtension.handleExtension, args);
+          }
+        else
+          exp = syntaxError("missing '{' after pragma");
         break;
 
       case '{':

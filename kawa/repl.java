@@ -678,7 +678,7 @@ public class repl extends Procedure0or1
                         ThreadLocation loc = (ThreadLocation)
                           clas.getDeclaredField(fname).get(null);
                         loc.setGlobal(value);
-                        continue;
+                        break;
                       }
                     catch (Throwable ex)
                       {

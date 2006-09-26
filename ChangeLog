@@ -1,3 +1,8 @@
+2006-09-26  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (processArgs): If we find a matching propertyField,
+	break instead of continue.
+
 2006-09-18  Per Bothner  <per@bothner.com>
 
 	* configure.in (WITH_XQTS): New AM_CONDITIONAL.

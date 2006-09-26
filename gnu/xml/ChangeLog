@@ -1,5 +1,14 @@
 2006-09-26  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java (htmlCompat): Replace field by ...
+	(useEmptyElementTag):: ... new field.
+	(setStyle, endGroup): Update appropriately.
+
+	* XMLPrinter.java (writeChar): Use hex for character references.
+
+	* XMLPrinter.java (beginGroup): If canonicalizing sort namespace
+	declarations by prefix.
+
 	* ParsedXMLToConsumer.java (closeStartTag): Use new TreeList methods
 	setGroupAnd and setAttributeName instead of calling setIntN directly.
 

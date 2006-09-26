@@ -262,7 +262,7 @@ public class TestMisc
     evalTest("declare namespace m1 = 'bb'; declare namespace m2 = 'cc';"
 	     + "let $m1:x := 3 return let $m2:x := 4 return"
 	     + "  <m2:a a:c='{$a:x}' xmlns:a='bb'>{ count($a:x) }</m2:a>",
-	     "<m2:a xmlns:m2=\"cc\" xmlns:a=\"bb\" a:c=\"3\">1</m2:a>");
+	     "<m2:a xmlns:a=\"bb\" xmlns:m2=\"cc\" a:c=\"3\">1</m2:a>");
 
     evalTest("doc('tab.xml')/result/row[1]/descendant::*",
 	     "<fld1"+tabNsNodes+">a1</fld1>"

@@ -33,7 +33,13 @@ public class XMLPrinter extends OutPort
   boolean needXMLdecl = false;
   boolean canonicalize = true;
   public boolean canonicalizeCDATA;
-  boolean htmlCompat = true;
+  /** Handling of empty elements.
+   * 0: No element element tags, as required for canonical XML:
+   * {@code <br></br>}.
+   * 1: Use XML-style empty element tags: {@code <br/>}
+   * 1: Use HTML-compatible empty element tags: {@code <br />}
+   */
+  public int useEmptyElementTag = 2;
   public boolean escapeText = true;
   public boolean escapeNonAscii = true;
   boolean isHtml = false;
@@ -119,14 +125,14 @@ public class XMLPrinter extends OutPort
   public void setStyle (Object style)
   {
     this.style = style;
-    htmlCompat = false;
+    useEmptyElementTag = canonicalize ? 0 : 1;
     if ("html".equals(style))
       {
 	isHtml = true;
-	htmlCompat = true;
+	useEmptyElementTag = 2;
       }
     if ("xhtml".equals(style))
-      htmlCompat = true;
+      useEmptyElementTag = 2;
     if ("plain".equals(style))
       escapeText = false;
   }
@@ -184,8 +190,10 @@ public class XMLPrinter extends OutPort
 	  super.write("&amp;");
 	else if (v == '\"' && inAttribute)
 	  super.write("&quot;");
-	else if (escapeNonAscii && v >= 127)
-	  super.write("&#"+v+";");
+	else if ((escapeNonAscii && v >= 127)
+                 //|| (inAttribute && v < ' ')
+                 )
+	  super.write("&#x"+Integer.toHexString(v)+";");
 	else
 	  {
 	    super.write((char) v);
@@ -342,8 +350,36 @@ public class XMLPrinter extends OutPort
 	groupBindings = ((XName) type).namespaceNodes;
 	NamespaceBinding join
 	  = NamespaceBinding.commonAncestor(groupBindings, namespaceBindings);
+        int numBindings = groupBindings == null ? 0
+          : groupBindings.count(join);
+        NamespaceBinding[] sortedBindings = new NamespaceBinding[numBindings];
+        int i = 0;
 	for (NamespaceBinding ns = groupBindings;  ns != join;  ns = ns.next)
+          {
+            int j = i;
+            if (canonicalize)
+              {
+                String uri = ns.getUri();
+                String prefix = ns.getPrefix();
+                while (--j >= 0)
+                  {
+                    NamespaceBinding ns_j = sortedBindings[j];
+                    // If (compare(ns, ns_j) >= 0) break:
+                    String prefix_j = ns_j.getPrefix();
+                    if (prefix == prefix_j || prefix_j == null)
+                      break;
+                    if (prefix != null && prefix.compareTo(prefix_j) >= 0)
+                      break;
+                    sortedBindings[j+1] = ns_j;
+                  }
+                j++;
+              }
+            sortedBindings[j] = ns;
+            i++;
+          }
+	for (i = 0;  i < numBindings;  i++)
 	  {
+            NamespaceBinding ns = sortedBindings[i];
 	    String prefix = ns.prefix;
 	    String uri = ns.uri;
 	    if (uri == namespaceBindings.resolve(prefix)
@@ -418,7 +454,7 @@ public class XMLPrinter extends OutPort
 
   public void endGroup(String typeName)
   {
-    if (canonicalize && ! htmlCompat)
+    if (useEmptyElementTag == 0)
       closeTag();
     if (inStartTag)
       {
@@ -428,7 +464,7 @@ public class XMLPrinter extends OutPort
 	  }
 	super.write(isHtml
 		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
-		 : (htmlCompat ? " />" : "/>"));
+		 : (useEmptyElementTag == 2 ? " />" : "/>"));
 	inStartTag = false;
       }
     else

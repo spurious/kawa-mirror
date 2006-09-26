@@ -69,6 +69,7 @@ public class TreeList extends AbstractSequence
 	data = new char[gapEnd];
       }
     objects = null;
+    oindex = 0;
     resizeObjects();
   }
 
@@ -510,6 +511,12 @@ public class TreeList extends AbstractSequence
     currentParent = gapStart - 3;
   }
 
+  /** Called from ParsedXMLToConsumer, only. */
+  public void setGroupName (int groupIndex, int nameIndex)
+  {
+    setIntN(groupIndex + 1, nameIndex);
+  }
+
   public void endGroup(String typeName)
   {
     if (data[gapEnd] != END_GROUP_LONG)
@@ -582,6 +589,11 @@ public class TreeList extends AbstractSequence
     setIntN(gapStart + 2, gapEnd - data.length);
     gapStart += 4;
     data[gapEnd] = END_ATTRIBUTE;
+  }
+
+  public void setAttributeName (int attrIndex, int nameIndex)
+  {
+    setIntN(attrIndex + 1, nameIndex);
   }
 
   public void endAttribute()
@@ -2185,7 +2197,7 @@ public class TreeList extends AbstractSequence
 
   public void dump (java.io.PrintWriter out)
   {
-    out.println(getClass().getName()+" @"+System.identityHashCode(this)
+    out.println(getClass().getName()+" @"+Integer.toHexString(System.identityHashCode(this))
 		       + " gapStart:"+gapStart+" gapEnd:"+gapEnd+" length:"+data.length);
     dump(out, 0, data.length);
   }
@@ -2193,6 +2205,8 @@ public class TreeList extends AbstractSequence
   public void dump (java.io.PrintWriter out, int start, int limit)
   {
     int toskip = 0;
+    // Skip follow-on words.
+    boolean skipFollowingWords = true;
     for (int i = start;  i < limit;  i++)
       {
 	
@@ -2200,7 +2214,7 @@ public class TreeList extends AbstractSequence
 	  {
 	    int j;  long l;
 	    int ch = data[i];
-	    out.print(""+i+": 0x"+Integer.toHexString(ch)+'='+((short) ch));
+            out.print(""+i+": 0x"+Integer.toHexString(ch)+'='+((short) ch));
 	    if (--toskip < 0)
 	      {
 		if (ch <= MAX_CHAR_SHORT)
@@ -2355,10 +2369,13 @@ public class TreeList extends AbstractSequence
 		      case POSITION_PAIR_FOLLOWS:
 			out.print("=POSITION_PAIR_FOLLOWS seq:");
 			{
-			  j = getIntN(i+1);  out.print(j);  out.print("=@");
+			  j = getIntN(i+1);  out.print(j);
+                          out.print('=');
 			  Object seq = objects[j];
+                          out.print(seq==null?null:seq.getClass().getName());
+                          out.print('@');
 			  if (seq == null) out.print("null");
-			  else out.print(System.identityHashCode(seq));
+			  else out.print(Integer.toHexString(System.identityHashCode(seq)));
 			  out.print(" ipos:");
 			  out.print(getIntN(i+3));
 			}
@@ -2372,7 +2389,7 @@ public class TreeList extends AbstractSequence
 		  }
 	      }
 	    out.println();
-	    if (false && toskip > 0)
+	    if (skipFollowingWords && toskip > 0)
 	      {
 		i += toskip;
 		toskip = 0;

@@ -174,9 +174,9 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		info.index = index;
 	      }
 	    if (i == 0)
-	      tlist.setIntN(tlist.gapEnd + 1, index);
+              tlist.setGroupName(tlist.gapEnd, index);
 	    else if (! isNsNode || namespacePrefixes)
-	      tlist.setIntN(startIndexes[i] + 1, index);
+              tlist.setAttributeName(startIndexes[i], index);
 	  }
 	else
 	  {

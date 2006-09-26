@@ -1,3 +1,13 @@
+2006-09-26  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (clear): Also reset oindex field.
+
+	* TreeList.java (dump): Print hash code in hex.
+
+	* TreeList.java (dump): Normally suppress printing follow-on words.
+
+	* TreeList.java (setGroupName, setAttributeName): New methods
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (getAttributeCount): New method.

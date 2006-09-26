@@ -593,6 +593,8 @@ public class XQuery extends Language
     define_method("contains", "gnu.xquery.util.StringUtils", "contains");
     define_method("starts-with", "gnu.xquery.util.StringUtils", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringUtils", "endsWith");
+    define_method("codepoint-equal", "gnu.xquery.util.StringUtils",
+                  "codepointEqual");
     define_method("string-join", "gnu.xquery.util.StringUtils", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringUtils", "concat$V");
     define_method("matches", "gnu.xquery.util.StringUtils", "matches");
@@ -669,6 +671,7 @@ public class XQuery extends Language
                   "adjustDateTimeToTimezone"); // overloaded
     define_method("adjust-time-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustDateTimeToTimezone"); // overloaded
+    define_method("dateTime", "gnu.xquery.util.TimeUtils", "dateTime");
 
     define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");
     define_method("one-or-more", "gnu.xquery.util.SequenceUtils", "oneOrMore");

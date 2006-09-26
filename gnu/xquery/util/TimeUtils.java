@@ -234,4 +234,25 @@ public class TimeUtils
   {
     return gnu.kawa.xml.XTimeType.dateTimeType.now();
   }
+
+  public static DateTime dateTime (DateTime arg1, DateTime arg2)
+  {
+    DateTime date = coerceToDate("dateTime", arg1);
+    DateTime time = coerceToTime("dateTime", arg2);
+    StringBuffer sbuf = new StringBuffer();
+    date.toStringDate(sbuf);
+    sbuf.append('T');
+    time.toStringTime(sbuf);
+    boolean hasZone1 = ! date.isZoneUnspecified();
+    boolean hasZone2 = ! time.isZoneUnspecified();
+    if (hasZone1 || hasZone2)
+      {
+        int zone1 = date.getZoneMinutes();
+        int zone2 = time.getZoneMinutes();
+        if (hasZone1 && hasZone2 && zone1 != zone2)
+          throw new Error("dateTime: incompatible timezone in arguments");
+        DateTime.toStringZone(hasZone1 ? zone1 : zone2, sbuf);
+      }
+    return (DateTime) XTimeType.dateTimeType.valueOf(sbuf.toString());
+  }
 }

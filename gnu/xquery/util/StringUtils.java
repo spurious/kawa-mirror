@@ -427,4 +427,15 @@ public class StringUtils
     // throw new Error("fn:replace requires java.util.regex (JDK 1.4 or equivalent)");
     /* #endif */
   }
+
+  public static Object codepointEqual (Object arg1, Object arg2)
+  {
+    if (arg1 == null || arg1 == Values.empty)
+      return arg1;
+    if (arg2 == null || arg2 == Values.empty)
+      return arg2;
+    String str1 = StringValue.stringValue(arg1);
+    String str2 = StringValue.stringValue(arg2);
+    return str1.equals(str2) ? Boolean.TRUE : Boolean.FALSE;
+  }
 }

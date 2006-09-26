@@ -66,7 +66,7 @@ public class NumberValue extends Procedure1
   {
     if (value == null || value == Values.empty)
       return value;
-    value = numberValue(value);
+    value = numberCast(value);
     if (value instanceof Double)
       {
         Double d = (Double) value;

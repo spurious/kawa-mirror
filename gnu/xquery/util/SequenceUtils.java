@@ -236,9 +236,10 @@ public class SequenceUtils
           {
             KNode node1 = (KNode) item1;
             KNode node2 = (KNode) item2;
-            return deepEqual((NodeTree) node1.sequence, node1.ipos,
-                             (NodeTree) node2.sequence, node2.ipos,
-                             collator);
+            if (! deepEqual((NodeTree) node1.sequence, node1.ipos,
+                            (NodeTree) node2.sequence, node2.ipos,
+                            collator))
+              return false;
           }
         else
           return false;

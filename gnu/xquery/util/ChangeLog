@@ -1,5 +1,7 @@
 2006-09-26  Per Bothner  <per@bothner.com>
 
+	* TimeUtils.java (dateTime):  Handle empty sequence arguments.
+
 	* NumberValue.java (abs): Use numberCast, rather than numberValue.
 	The latter always returns a double, which is not always right.
 

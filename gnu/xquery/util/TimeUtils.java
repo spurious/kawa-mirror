@@ -235,8 +235,10 @@ public class TimeUtils
     return gnu.kawa.xml.XTimeType.dateTimeType.now();
   }
 
-  public static DateTime dateTime (DateTime arg1, DateTime arg2)
+  public static Object dateTime (Object arg1, Object arg2)
   {
+    if (arg1 == null || arg1 == Values.empty) return arg1;
+    if (arg2 == null || arg2 == Values.empty) return arg2;
     DateTime date = coerceToDate("dateTime", arg1);
     DateTime time = coerceToTime("dateTime", arg2);
     StringBuffer sbuf = new StringBuffer();

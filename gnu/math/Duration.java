@@ -255,6 +255,8 @@ public class Duration extends Quantity implements Externalizable
 
   public static Duration times (Duration x, double y)
   {
+    if (Double.isNaN(y))
+      throw new ArithmeticException("multiplying a duration by NaN");
     double months = x.months * y;
     double nanos = (x.seconds * 1000000000L + x.nanos) * y;
     Duration d = new Duration();

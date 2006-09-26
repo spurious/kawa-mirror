@@ -1,3 +1,8 @@
+2006-09-26  Per Bothner  <per@bothner.com>
+
+	* Duration.java (times) Throw ArithmeticException if y is NaN,
+	as required by XQuery Functions & Operators specification.
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* Duration.java (hashCode, equals, equals): New methods.

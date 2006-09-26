@@ -28,6 +28,7 @@ public class RunXQTS extends FilterConsumer
 
   String directory;
   String catalog;
+  String XQTSVersion;
   String ResultOffsetPath;
   String XQueryQueryOffsetPath;
   String XQueryXQueryOffsetPath;
@@ -66,6 +67,29 @@ public class RunXQTS extends FilterConsumer
     summaryReport(failCount, "# of unexpected failures  ");
   }
 
+  public static final String XQTS_RESULT_NAMESPACE
+  = "http://www.w3.org/2005/02/query-test-XQTSResult";
+
+  static Object testSuiteResultGroupType;
+  static
+  {
+    NamespaceBinding namespaceNodes
+      = new NamespaceBinding(null, XQTS_RESULT_NAMESPACE,
+                             NamespaceBinding.predefinedXML);
+    Symbol sym = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite-result", "");
+    testSuiteResultGroupType = new XName(sym, namespaceNodes);
+  }
+  static Object implementationGroupType
+    = Symbol.make(XQTS_RESULT_NAMESPACE, "implementation", "");
+  static Object syntaxGroupType
+    = Symbol.make(XQTS_RESULT_NAMESPACE, "syntax", "");
+  static Object testRunGroupType
+    = Symbol.make(XQTS_RESULT_NAMESPACE, "test-run", "");
+  static Object testSuiteGroupType
+    = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite", "");
+  static Object testCaseGroupType
+    = Symbol.make(XQTS_RESULT_NAMESPACE, "test-case", "");
+
   public static void main (String[] args)
   {
     gnu.xquery.lang.XQuery.registerEnvironment();
@@ -87,11 +111,10 @@ public class RunXQTS extends FilterConsumer
             XMLPrinter.indentLoc.set("pretty");
             xqlog.beginDocument();
             XMLPrinter.indentLoc.set(saveIndent);
-            xqlog.beginGroup("test-suite-result", "test-suite-result");
+
 	    Document.parse(runner.catalog, runner);
-            runner.summaryReport();
-            xqlog.endGroup("test-suite-result");
             xqlog.endDocument();
+            runner.summaryReport();
             xqlog.close();
 	  }
 	catch (Throwable ex)
@@ -128,7 +151,7 @@ public class RunXQTS extends FilterConsumer
     expectFailures("fn-lang-2|fn-lang-3|fn-lang-4|fn-lang-5|fn-lang-6|"
                    +"fn-lang-7|fn-lang-8|fn-lang-9|fn-lang-10|fn-lang-11",
                    "fn:lang not implemented");
-
+    expectFailures("PathExprErr-2", "no check for mixed nodes+atomics from path expression");
   }
 
   private void badFormatting(String testName)
@@ -195,6 +218,31 @@ public class RunXQTS extends FilterConsumer
         XQueryFileExtension = attributes.getValue("XQueryFileExtension");
         XQueryXFileExtension = attributes.getValue("XQueryXFileExtension");
         ResultOffsetPath = attributes.getValue("ResultOffsetPath");
+        XQTSVersion = attributes.getValue("version");
+ 
+        xqlog.beginGroup("test-suite-result", testSuiteResultGroupType);
+        xqlog.beginGroup("implementation", implementationGroupType);
+            xqlog.beginAttribute("name", "name");
+            xqlog.writeChars("Qexo");
+            xqlog.endAttribute();
+            xqlog.beginAttribute("version", "version");
+            xqlog.writeChars(kawa.Version.getVersion());
+            xqlog.endAttribute();
+            xqlog.endGroup("implementation");
+            xqlog.beginGroup("syntax", syntaxGroupType);
+            xqlog.writeChars("XQuery");
+            xqlog.endGroup("syntax");
+            xqlog.beginGroup("test-run", testRunGroupType);
+            xqlog.beginAttribute("dateRun", "dateRun");
+            xqlog.writeChars(gnu.kawa.xml.XTimeType.dateType.now().toString());
+            xqlog.endAttribute();
+            xqlog.beginGroup("test-suite", testSuiteGroupType);
+            xqlog.beginAttribute("version", "version");
+            xqlog.writeChars(XQTSVersion);
+            xqlog.endAttribute();
+            xqlog.endGroup("test-suite");
+            xqlog.endGroup("test-run");
+
       }
     else if ("test-group".equals(currentTag))
       {
@@ -336,6 +384,7 @@ public class RunXQTS extends FilterConsumer
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
     XMLPrinter xout = new XMLPrinter(out, false);
+    xout.useEmptyElementTag = 1;
     xout.escapeNonAscii = false;
     xout.canonicalizeCDATA = true;
     ctx.consumer = xout;
@@ -492,7 +541,7 @@ public class RunXQTS extends FilterConsumer
     if ("test-case".equals(typeName))
       {
         if (--maxTests == 0)  System.exit(0); // FIXME
-        xqlog.beginGroup("test-case", "test-case");
+        xqlog.beginGroup("test-case", testCaseGroupType);
         xqlog.beginAttribute("name", "name");
         xqlog.writeChars(testName);
         xqlog.endAttribute();
@@ -582,6 +631,10 @@ public class RunXQTS extends FilterConsumer
         outputFileAlts.push(cout.toSubString(elementStartIndex[nesting]));
         compare = attributes.getValue("compare");
       }
+    else if ("test-suite".equals(typeName))
+      {
+        xqlog.endGroup("test-suite-result");
+      }
     else if (testName != null && "module".equals(typeName))
       {
         String uri = attributes.getValue("namespace");
@@ -593,8 +646,6 @@ public class RunXQTS extends FilterConsumer
         manager.register(mclass, mpath, uri);
       }
     /*
-    if ("test-suite".equals(typeName) && nesting == 0)
-      inTestSuite = false;
     else if ("test".equals(typeName)
 	&& (nesting == 0 || (inTestSuite && nesting == 1)))
       {

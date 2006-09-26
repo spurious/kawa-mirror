@@ -1,5 +1,8 @@
 2006-09-26  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java: Various changes to approximate schema-defined format.
+	(XQTS_RESULT_NAMESPACE): New constant for namespace to use.
+
 	* TestMisc.java: Update now that namespace declarations are sorted.
 
 2006-09-19  Per Bothner  <per@bothner.com>

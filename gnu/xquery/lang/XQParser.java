@@ -2129,6 +2129,9 @@ public class XQParser extends Lexer
       }
   }
 
+  /** Count of enclosed expressions seen in element or attribute content. */
+  int enclosedExpressionsSeen;
+
   /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
    *   '\"' if parsing AttributeContent depending on the starting quote
@@ -2190,6 +2193,7 @@ public class XQParser extends Lexer
 	    else
 	      {
 		unread(next);
+                enclosedExpressionsSeen++;
 		Expression exp = parseEnclosedExpr();
 		if (delimiter != '<')
 		  exp = stringValue(exp); // FIXME
@@ -2464,6 +2468,7 @@ public class XQParser extends Lexer
 	if (ch != '=')
 	  return syntaxError("missing '=' after attribute");
 	ch = skipSpace();
+        int enclosedExpressionsStart = enclosedExpressionsSeen;
 	if (ch == '{')
 	  {
 	    if (warnOldVersion)
@@ -2478,7 +2483,7 @@ public class XQParser extends Lexer
 	    String ns = "";
 	    if (n == 1)
 	      ns = "";
-	    else if (n > 2 || ! (vec.elementAt(vecSize+1) instanceof QuoteExp))
+	    else if (enclosedExpressionsSeen > enclosedExpressionsStart)
 	      syntaxError("enclosed expression not allowed in namespace declaration");
 	    else
 	      ns = ((QuoteExp) vec.elementAt(vecSize+1)).getValue()

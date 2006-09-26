@@ -1,5 +1,10 @@
 2006-09-26  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (enclosedExpressionsSeen): New field.
+	(parseContent): Increment enclosedExpressionsSeen.
+	(parseElementConstructor): Use enclosedExpressionsSeen to detect
+	non-literal namespace declaration.
+
 	* XQResolveNames.java (walkApplyExp): Check for duplicate attributes
 	in MakeElement call.  Remove excess increment of loop counter.
 

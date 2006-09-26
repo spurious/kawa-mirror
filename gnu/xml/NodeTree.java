@@ -52,6 +52,28 @@ public class NodeTree extends TreeList
       }
   }
 
+  public static String
+  duplicateAttributeMessage (Symbol attrSymbol, String groupName)
+  {
+    StringBuffer sbuf = new StringBuffer("duplicate attribute: ");
+    String uri = attrSymbol.getNamespaceURI();
+    if (uri != null && uri.length() > 0)
+      {
+        sbuf.append('{');
+        sbuf.append('}');
+        sbuf.append(uri);
+      }
+    sbuf.append(attrSymbol.getLocalPart());
+    if (groupName != null)
+      {
+        sbuf.append(" in <");
+        sbuf.append(groupName);
+        sbuf.append('>');
+      }
+    return sbuf.toString();
+    
+  }
+
   public void endAttribute()
   {
     if (gapStartLastAtomic == SAW_KEYWORD)

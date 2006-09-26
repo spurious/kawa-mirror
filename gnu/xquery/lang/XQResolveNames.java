@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 2003, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -735,15 +735,38 @@ public class XQResolveNames extends ResolveNames
 	nsBindings = maybeAddNamespace(MakeElement.getTagName(exp),
 				       nsBindings);
 	Expression[] args = exp.getArgs();
+        Symbol[] attrSyms = new Symbol[args.length];
+        int nattrSyms = 0;
 	for (int i = 0;  i < args.length;  i++)
 	  {
-	    Expression arg = args[i++];
+	    Expression arg = args[i];
 	    if (arg instanceof ApplyExp)
 	      {
 		ApplyExp app = (ApplyExp) arg;
 		if (app.getFunction() == MakeAttribute.makeAttributeExp)
-		  nsBindings = maybeAddNamespace(MakeElement.getTagName(app),
-						 nsBindings);
+                  {
+                    Symbol sym = MakeElement.getTagName(app);
+                    if (sym != null)
+                      {
+                        for (int j = 0;  ;  j++)
+                          {
+                            if (j == nattrSyms)
+                              {
+                                attrSyms[nattrSyms++] = sym;
+                                break;
+                              }
+                            if (sym.equals(attrSyms[j]))
+                              {
+                                getCompilation().setLine(app);
+                                Symbol groupSym = MakeElement.getTagName(exp);
+                                String groupName = groupSym == null ? null
+                                  : groupSym.toString();
+                                messages.error('e', NodeTree.duplicateAttributeMessage(sym, groupName), "XQST0040");
+                              }
+                          }
+                      }
+                    nsBindings = maybeAddNamespace(sym, nsBindings);
+                  }
 	      }
 	  }
 	if (nsBindings != null)

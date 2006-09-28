@@ -558,6 +558,8 @@ public class XQuery extends Language
 		  "isEmptySequence");
     define_method("exists", "gnu.xquery.util.SequenceUtils",
 		  "exists");
+    define_method("remove", "gnu.xquery.util.SequenceUtils",
+		  "remove$X");
     define_method("reverse", "gnu.xquery.util.SequenceUtils",
 		  "reverse$X");
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
@@ -681,7 +683,7 @@ public class XQuery extends Language
 
     // FIXME - should be imported?
     defProcStFld("children", "gnu.kawa.xml.Children", "children");
-    defProcStFld("not", "kawa.standard.Scheme");
+    define_method("not", "gnu.xquery.util.BooleanValue", "not");
 
     defaultNamespace = qexoFunctionNamespace;
     defProcStFld("response-header", "gnu.kawa.servlet.HTTP");

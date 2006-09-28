@@ -71,20 +71,26 @@ public class NumberValue extends Procedure1
       {
         Double d = (Double) value;
         double x = d.doubleValue();
+        if (x >= 0)
+          return d;
+        x = -x;
         /* #ifdef JAVA5 */
-        // return x < 0 ? Double.valueOf(-x) : d;
+        // return Double.valueOf(x);
         /* #else */
-        return x < 0 ? new Double(-x) : d;
+        return new Double(x);
         /* #endif */
       }
     if (value instanceof Float)
       {
         Float d = (Float) value;
         float x = d.floatValue();
+        if (x >= 0)
+          return d;
+        x = -x;
         /* #ifdef JAVA5 */
-        // return x < 0 ? Float.valueOf(-x) : d;
+        // return Float.valueOf(x) ;
         /* #else */
-        return x < 0 ? new Float(-x) : d;
+        return new Float(x);
         /* #endif */
       }
     if (value instanceof BigDecimal)

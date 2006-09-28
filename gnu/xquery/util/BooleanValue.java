@@ -45,6 +45,11 @@ public class BooleanValue extends Procedure1
     throw new WrongType("fn:boolean", 1, value, "boolean-convertible-value");
   }
 
+  public static boolean not(Object value)
+  {
+    return ! booleanValue(value);
+  }
+
   public Object apply1(Object arg)
   {
     return booleanValue(arg) ? Boolean.TRUE : Boolean.FALSE;

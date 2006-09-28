@@ -1,3 +1,14 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* NumberValue.java (abd): Fix so abd(-0) is 0.
+
+	* StringUtils.java (encodeForUri): Fixes to match updated
+	specification of fn-encode-for-uri.
+
+	* BooleanValue.java (not): New static method.
+
+	* SequenceUtils.java (remove$X): New static method.
+
 2006-09-26  Per Bothner  <per@bothner.com>
 
 	* TimeUtils.java (dateTime):  Handle empty sequence arguments.

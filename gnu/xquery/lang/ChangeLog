@@ -1,3 +1,10 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Declare fn:remove function.
+
+	* XQuery.java (initXQuery): Fix fn:not function to use new
+	BooleanValue.not method.
+
 2006-09-26  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (enclosedExpressionsSeen): New field.

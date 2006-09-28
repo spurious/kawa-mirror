@@ -46,6 +46,28 @@ public class SequenceUtils
     return ! (arg instanceof Values && ((Values) arg).isEmpty());
   }
 
+  public static void remove$X (Object arg, long position, CallContext ctx)
+  {
+    Consumer out = ctx.consumer;
+    if (arg instanceof Values)
+      {
+        Values values = (Values) arg;
+        int ipos  = 0;
+        long i = 0;
+        for (;;)
+          {
+            int next = values.nextPos(ipos);
+            if (next == 0)
+              break;
+            if (++i != position )
+              values.consumePosRange(ipos, next, out);
+            ipos = next;
+          }
+      }
+    else if (position != 1)
+      out.writeObject(arg);
+  }
+
   /** Implements the standard XQuery function {@code reverse}. */
   public static void reverse$X (Object arg, CallContext ctx)
   {

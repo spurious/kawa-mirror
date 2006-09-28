@@ -418,12 +418,12 @@ public class Duration extends Quantity implements Externalizable
 
   public int getMinutes ()
   {
-    return (int) ((seconds / 60) % (24 * 60));
+    return (int) ((seconds / 60) % 60);
   }
 
   public int getSecondsOnly ()
   {
-    return (int) (seconds % (24 * 60 * 60));
+    return (int) (seconds % 60);
   }
 
   public int getNanoSecondsOnly ()

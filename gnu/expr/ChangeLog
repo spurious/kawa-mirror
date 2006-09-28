@@ -1,3 +1,7 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalToClass): Don't write exception to err output.
+
 2006-09-12  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): Use URI_utils.toURL.

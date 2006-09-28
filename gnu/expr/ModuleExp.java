@@ -152,8 +152,6 @@ public class ModuleExp extends LambdaExp
     catch (Throwable ex)
       {
 	comp.error('f', "internal compile error - caught "+ex);
-	comp.messages.printAll(OutPort.errDefault(), 20);
-	comp.messages.clear();
 	throw WrappedException.wrapIfNeeded(ex);
       }
   }

@@ -1,3 +1,4 @@
+XQuery-trace: msg 123
 XQuery-trace: The Value of $var is:  123
 XQuery-trace: The Value of $var + 1 is:  2
 XQuery-trace: The Value of $var + 1 is:  3
@@ -60,3 +61,5 @@ XQuery-trace: The value of 'for $var in (fn:true(),fn:false(),fn:true() return $
 XQuery-trace: The value of the empty sequence is: 
 XQuery-trace: The value of the zero length string is: 
 XQuery-trace: The value of the complex expression on the other argument is: aAbB
+XQuery-trace: trace message a string
+XQuery-trace: trace message 

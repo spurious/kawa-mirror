@@ -1,5 +1,7 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* XQTS-trace.exp: Update for latest XQTS.
+
 	* RunXQTS.java: Handle Inspect results as "cannot-tell".
 	Make properly namespace-compatible.  Fix so XQTS.log validates.
 	(writeBeginGroup, writeBeginAttribute, writeAttribute,

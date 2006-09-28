@@ -1,3 +1,12 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Handle Inspect results as "cannot-tell".
+	Make properly namespace-compatible.  Fix so XQTS.log validates.
+	(writeBeginGroup, writeBeginAttribute, writeAttribute,
+	writeQexoAttribute): New convenience methods.
+	(currentElementType, currentElementSymbol, elementTypeStack,
+	tagMatches): Use for proper namespace-compatible and nested matching.
+
 2006-09-26  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Various changes to approximate schema-defined format.

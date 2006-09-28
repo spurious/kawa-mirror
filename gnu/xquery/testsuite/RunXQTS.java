@@ -40,6 +40,7 @@ public class RunXQTS extends FilterConsumer
   int xpassCount;
   int failCount;
   int xfailCount;
+  int cannotTellCount;
 
   Stack outputFileAlts = new Stack();
   /** Set of expected error codes.  The format is "|Error1}...|ErrorN|". */
@@ -65,6 +66,7 @@ public class RunXQTS extends FilterConsumer
     summaryReport(xfailCount, "# of expected failures    ");
     summaryReport(xpassCount, "# of unexpected successes ");
     summaryReport(failCount, "# of unexpected failures  ");
+    summaryReport(cannotTellCount, "# of cannot-tell (Inspect) results  ");
   }
 
   public static final String XQTS_RESULT_NAMESPACE
@@ -75,20 +77,44 @@ public class RunXQTS extends FilterConsumer
   {
     NamespaceBinding namespaceNodes
       = new NamespaceBinding(null, XQTS_RESULT_NAMESPACE,
-                             NamespaceBinding.predefinedXML);
+            new NamespaceBinding("q",
+                                 XQuery.QEXO_FUNCTION_NAMESPACE,
+                                 NamespaceBinding.predefinedXML));
     Symbol sym = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite-result", "");
     testSuiteResultGroupType = new XName(sym, namespaceNodes);
   }
-  static Object implementationGroupType
-    = Symbol.make(XQTS_RESULT_NAMESPACE, "implementation", "");
-  static Object syntaxGroupType
-    = Symbol.make(XQTS_RESULT_NAMESPACE, "syntax", "");
   static Object testRunGroupType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-run", "");
   static Object testSuiteGroupType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite", "");
   static Object testCaseGroupType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-case", "");
+
+  private void writeBeginGroup (String name)
+  {
+    xqlog.beginGroup(name, Symbol.make(XQTS_RESULT_NAMESPACE, name, ""));
+  }
+
+  private void writeBeginAttribute (String name)
+  {
+    xqlog.beginAttribute(name, name);
+  }
+
+  private void writeAttribute (String name, String value)
+  {
+    writeBeginAttribute(name);
+    xqlog.writeChars(value);
+    xqlog.endAttribute();
+  }
+
+  private void writeQexoAttribute (String name, String value)
+  {
+    xqlog.beginAttribute("q:"+name,
+                         Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
+                                     name, "q"));
+    xqlog.writeChars(value);
+    xqlog.endAttribute();
+  }
 
   public static void main (String[] args)
   {
@@ -107,6 +133,7 @@ public class RunXQTS extends FilterConsumer
             runner.xqlog = xqlog;
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");
+            xqlog.useEmptyElementTag = 1;
             Object saveIndent = XMLPrinter.indentLoc.get(null);
             XMLPrinter.indentLoc.set("pretty");
             xqlog.beginDocument();
@@ -127,6 +154,9 @@ public class RunXQTS extends FilterConsumer
 
   int nesting = 0;
   String currentTag;
+  Object currentElementType;
+  Symbol currentElementSymbol;
+  Stack elementTypeStack = new Stack();
   boolean inStartTag;
   int attrValueStart;
   // Start in cout's buffer of current element, indexed by nesting level.
@@ -148,10 +178,12 @@ public class RunXQTS extends FilterConsumer
     expectedFailures.put("NodTest003", "actually pass? different char encoding");    
     expectedFailures.put("op-subtract-dayTimeDuration-from-dateTime-1", "straddles time change");
     expectFailures("surrogates03|surrogates06|surrogates07|surrogates08|surrogates10", "surrogates not properly implemented");
-    expectFailures("fn-lang-2|fn-lang-3|fn-lang-4|fn-lang-5|fn-lang-6|"
-                   +"fn-lang-7|fn-lang-8|fn-lang-9|fn-lang-10|fn-lang-11",
-                   "fn:lang not implemented");
     expectFailures("PathExprErr-2", "no check for mixed nodes+atomics from path expression");
+    /* It's sort-of caught - but as a ClassFormatError.
+    expectFailures("function-declaration-022|K-FunctionProlog-26|"
+                   +"K-FunctionProlog-27|K-FunctionProlog-28",
+                   "duplicate function definition not properly caught");
+    */
   }
 
   private void badFormatting(String testName)
@@ -182,9 +214,14 @@ public class RunXQTS extends FilterConsumer
 
   public void beginGroup(String typeName, Object type)
   {
+    if (inStartTag)
+      handleStartTag();
     attributes.clear();
     inStartTag = true;
     currentTag = typeName;
+    elementTypeStack.push(currentElementType);
+    currentElementType = type;
+    currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
     /*
     System.err.println("beginGroup "+typeName);
     if ("test-suite".equals(typeName) && nesting == 0)
@@ -208,10 +245,18 @@ public class RunXQTS extends FilterConsumer
     nesting++;
   }
 
+  boolean tagMatches (String localName)
+  {
+    if (localName.equals(currentElementSymbol.getLocalName()))
+      // also check uri FIXME
+      return true;
+    return false;
+  }
+
   public void handleStartTag ()
   {
     elementStartIndex[nesting] = cout.length();
-    if ("test-suite".equals(currentTag))
+    if (tagMatches("test-suite"))
       {
         XQueryQueryOffsetPath = attributes.getValue("XQueryQueryOffsetPath");
         XQueryXQueryOffsetPath = attributes.getValue("XQueryXQueryOffsetPath");
@@ -221,53 +266,60 @@ public class RunXQTS extends FilterConsumer
         XQTSVersion = attributes.getValue("version");
  
         xqlog.beginGroup("test-suite-result", testSuiteResultGroupType);
-        xqlog.beginGroup("implementation", implementationGroupType);
-            xqlog.beginAttribute("name", "name");
-            xqlog.writeChars("Qexo");
-            xqlog.endAttribute();
-            xqlog.beginAttribute("version", "version");
-            xqlog.writeChars(kawa.Version.getVersion());
-            xqlog.endAttribute();
-            xqlog.endGroup("implementation");
-            xqlog.beginGroup("syntax", syntaxGroupType);
-            xqlog.writeChars("XQuery");
-            xqlog.endGroup("syntax");
-            xqlog.beginGroup("test-run", testRunGroupType);
-            xqlog.beginAttribute("dateRun", "dateRun");
-            xqlog.writeChars(gnu.kawa.xml.XTimeType.dateType.now().toString());
-            xqlog.endAttribute();
-            xqlog.beginGroup("test-suite", testSuiteGroupType);
-            xqlog.beginAttribute("version", "version");
-            xqlog.writeChars(XQTSVersion);
-            xqlog.endAttribute();
-            xqlog.endGroup("test-suite");
-            xqlog.endGroup("test-run");
+        writeBeginGroup("implementation");
+        writeAttribute("name", "Qexo");
+        writeAttribute("version", kawa.Version.getVersion());
+        writeBeginGroup("organization");
+        writeAttribute("name", "GNU / Per Bothner");
+        xqlog.endGroup("organization");
+        writeBeginGroup("submittor");
+        String user = System.getProperty("user.name");
+        if ("bothner".equals(user))
+          {
+            writeAttribute("name", "Per Bothner");
+            writeAttribute("email", "per@bothner.com");
+          }
+        else
+          writeAttribute("name", user);
+        xqlog.endGroup("submittor");
+        xqlog.endGroup("implementation");
+        writeBeginGroup("syntax");
+        xqlog.writeChars("XQuery");
+        xqlog.endGroup("syntax");
+        xqlog.beginGroup("test-run", testRunGroupType);
+        writeAttribute("dateRun",
+                       gnu.kawa.xml.XTimeType.dateType.now().toString());
+        xqlog.beginGroup("test-suite", testSuiteGroupType);
+        writeAttribute("version", XQTSVersion);
+        xqlog.endGroup("test-suite");
+        xqlog.endGroup("test-run");
 
       }
-    else if ("test-group".equals(currentTag))
+    else if (tagMatches("test-group"))
       {
         xqlog.writeComment("test-group "+attributes.getValue("name"));
       }
-    else if ("test-case".equals(currentTag))
+    else if (tagMatches("test-case"))
       {
         testName = attributes.getValue("name");
+        scenario = attributes.getValue("scenario");
         testFilePath = attributes.getValue("FilePath");
         testQueryName = null;
         outputFileAlts.clear();
         expectedErrorsBuf.setLength(1);
         manager.clear();
       }
-    else if ("query".equals(currentTag))
+    else if (tagMatches("query"))
       {
         testQueryName = attributes.getValue("name");
       }
-    else if ("source".equals(currentTag))
+    else if (tagMatches("source"))
       {
         String ID = attributes.getValue("ID");
         String filename = attributes.getValue("FileName");
         sources.put(ID, filename);
       }
-    else if (testName == null && "module".equals(currentTag))
+    else if (testName == null && tagMatches("module"))
       {
         String ID = attributes.getValue("ID");
         String filename = attributes.getValue("FileName");
@@ -277,6 +329,7 @@ public class RunXQTS extends FilterConsumer
   }
 
   String testName;
+  String scenario;
   String testQueryName;
   String testFilePath;
   String testQuery;
@@ -290,6 +343,8 @@ public class RunXQTS extends FilterConsumer
       {
         if (failed)
           failCount++;
+        else if ("cannot tell".equals(result))
+          cannotTellCount++;
         else
           passCount++;
       }
@@ -304,22 +359,22 @@ public class RunXQTS extends FilterConsumer
           }
       }
 
-    xqlog.beginAttribute("result", "result");
-    xqlog.writeChars(result);
-    xqlog.endAttribute();
+    writeAttribute("result", result);
 
     if (failed && failExpected != null)
       {
-        xqlog.beginAttribute("reason", "reason");
-        xqlog.writeChars(failExpected.toString());
-        xqlog.endAttribute();
+        StringBuffer sbuf = new StringBuffer("(expected-to-fail: ");
+        sbuf.append(failExpected.toString());
+        sbuf.append(')');
+        if (comment != null)
+          {
+            sbuf.append("; ");
+            sbuf.append(comment);
+          }
+        comment = sbuf.toString();
       }
     if (comment != null)
-      {
-        xqlog.beginAttribute("comment", "comment");
-        xqlog.writeChars(comment);
-        xqlog.endAttribute();
-      }
+      writeAttribute("comment", comment);
   }
 
   public void evalTest (String testName)
@@ -410,9 +465,12 @@ public class RunXQTS extends FilterConsumer
             report("fail", "caught "+ex);
             if (verbose)
               {
-                xqlog.beginComment();
-                ex.printStackTrace(xqlog);
-                xqlog.endComment();
+                CharArrayWriter wr = new CharArrayWriter();
+                PrintWriter pr = new PrintWriter(wr);
+                ex.printStackTrace(pr);
+                pr.flush();
+                writeQexoAttribute("stack", wr.toString());
+                wr.close();
               }
           }
         return;
@@ -424,6 +482,13 @@ public class RunXQTS extends FilterConsumer
           report("pass", "error: "+messages.getErrors()+" expected: "+expectedErrors);
         else
           report("fail", "error: "+messages.getErrors());
+        return;
+      }
+
+    if ("trivial".equals(scenario))
+      {
+        failExpected = "trivial embedding not implemented";
+        report("fail", null);
         return;
       }
 
@@ -465,6 +530,12 @@ public class RunXQTS extends FilterConsumer
             foundMatchingOutput = true;
             break;
           }
+        else if ("Inspect".equals(compare))
+          {
+            report("cannot tell", null);
+            foundMatchingOutput = true;
+            break;
+          }
         else if (("XML".equals(compare) || "Fragment".equals(compare))
                  && equalsXML(actual, expected))
           {
@@ -486,20 +557,9 @@ public class RunXQTS extends FilterConsumer
             report("fail", null);
             if (verbose && expectedFailures.get(testName) == null)
               {
-                xqlog.beginComment();
-                xqlog.writeChars("compare: ");
-                xqlog.writeChars(compare);
-                xqlog.endComment();
-                xqlog.beginComment();
-                xqlog.writeChars(" expected: [");
-                xqlog.writeChars(expected);
-                xqlog.writeChar(']');
-                xqlog.endComment();
-                xqlog.beginComment();
-                xqlog.writeChars(" actual: [");
-                xqlog.writeChars(actual);
-                xqlog.writeChar(']');
-                xqlog.endComment();
+                writeQexoAttribute("compare", compare);
+                writeQexoAttribute("expected", expected);
+                writeQexoAttribute("actual", actual);
               }
           }
       }
@@ -538,13 +598,11 @@ public class RunXQTS extends FilterConsumer
   {
     if (inStartTag)
       handleStartTag();
-    if ("test-case".equals(typeName))
+    if (tagMatches("test-case"))
       {
         if (--maxTests == 0)  System.exit(0); // FIXME
         xqlog.beginGroup("test-case", testCaseGroupType);
-        xqlog.beginAttribute("name", "name");
-        xqlog.writeChars(testName);
-        xqlog.endAttribute();
+        writeAttribute("name", testName);
         try
           {
             // Other attributes and <test-case> body written by evalTest.
@@ -560,12 +618,12 @@ public class RunXQTS extends FilterConsumer
         //xqlog.flush();
         testName = null;
       }
-    else if ("expected-error".equals(typeName))
+    else if (tagMatches("expected-error"))
       {
         expectedErrorsBuf.append(cout.toSubString(elementStartIndex[nesting]));
         expectedErrorsBuf.append('|');
       }
-    else if ("input-query".equals(typeName))
+    else if (tagMatches("input-query"))
       {
         String variable = attributes.getValue("variable");
         Symbol symbol = Symbol.make("", variable);
@@ -579,7 +637,6 @@ public class RunXQTS extends FilterConsumer
             in = InPort.openFile(filename);
             Object value = XQuery.getInstance().eval(in);
             in.close();
-            //System.err.println("input-query: evaluated to "+value);
             Environment current = Environment.getCurrent();
             current.put(symbol, null, value);
           }
@@ -591,7 +648,7 @@ public class RunXQTS extends FilterConsumer
             System.exit(-1);
           }
       }
-   else if ("input-file".equals(typeName))
+    else if (tagMatches("input-file"))
       {
         String inputFile = cout.toSubString(elementStartIndex[nesting]);
         // KLUDGE around testsuite bug!
@@ -617,7 +674,7 @@ public class RunXQTS extends FilterConsumer
             System.exit(-1);
           }
       }
-   else if ("input-URI".equals(typeName))
+    else if (tagMatches("input-URI"))
       {
         String inputFile = cout.toSubString(elementStartIndex[nesting]);
         String variable = attributes.getValue("variable");
@@ -626,16 +683,16 @@ public class RunXQTS extends FilterConsumer
         Environment.getCurrent().put(symbol, null,
                                      gnu.kawa.xml.XDataType.toURI(path));
       }
-    else if ("output-file".equals(typeName))
+    else if (tagMatches("output-file"))
       {
         outputFileAlts.push(cout.toSubString(elementStartIndex[nesting]));
         compare = attributes.getValue("compare");
       }
-    else if ("test-suite".equals(typeName))
+    else if (tagMatches("test-suite"))
       {
         xqlog.endGroup("test-suite-result");
       }
-    else if (testName != null && "module".equals(typeName))
+    else if (testName != null && tagMatches("module"))
       {
         String uri = attributes.getValue("namespace");
         String module = cout.toSubString(elementStartIndex[nesting]);
@@ -665,6 +722,9 @@ public class RunXQTS extends FilterConsumer
     */
     cout.setLength(elementStartIndex[nesting]);
     nesting--;
+    Object type = elementTypeStack.pop();
+    currentElementType = type;
+    currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
   }
 
   public void beginAttribute(String attrName, Object attrType)
@@ -677,10 +737,28 @@ public class RunXQTS extends FilterConsumer
   {
     super.endAttribute();
     String attrValue = cout.toSubString(attrValueStart, cout.length()-1);
-    String uri = null;
-    String local = attributeName;
+    String uri;
+    String local;
+    String qname;
+    if (attributeType instanceof Symbol)
+      {
+        Symbol sym = (Symbol) attributeType;
+        uri = sym.getNamespaceURI();
+        local = sym.getLocalPart();
+        String prefix = sym.getPrefix();
+        if (prefix == null || prefix.length() == 0)
+          qname = local;
+        else
+          qname = prefix+":"+local;
+      }
+    else
+      {
+        uri = null;
+        local = attributeName;
+        qname = attributeName;
+      }
     cout.setLength(attrValueStart);
-    attributes.addAttribute(uri, local, attributeName, "CDATA", attrValue);
+    attributes.addAttribute(uri, local, qname, "CDATA", attrValue);
   }
 
   public void beforeContent ()

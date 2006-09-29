@@ -1,5 +1,7 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): Declare fn:error.
+
 	* XQuery.java (initXQuery): Declare fn:remove function.
 
 	* XQuery.java (initXQuery): Fix fn:not function to use new

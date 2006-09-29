@@ -29,7 +29,8 @@ java_sources = \
   TimeUtils.java \
   ValuesEvery.java \
   ValuesFilter.java \
-  XMLFormat.java
+  XMLFormat.java \
+  XQException.java
 
 PACKAGE_FNAME = gnu-xquery-util
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

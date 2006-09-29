@@ -568,6 +568,8 @@ public class XQuery extends Language
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
+    define_method("error", "gnu.xquery.util.XQException",
+                  "error"); // overloaded
     defProcStFld("write-to", "gnu.kawa.xml.WriteTo", "writeTo");
     defProcStFld("write-to-if-changed", "gnu.kawa.xml.WriteTo",
                  "writeToIfChanged");

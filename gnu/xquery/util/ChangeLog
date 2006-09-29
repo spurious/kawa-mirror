@@ -1,5 +1,8 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* XQException.java: New class, extends RuntimeException.
+	* Makefile.am: Update accordingly/
+
 	* ValuesFilter.java (matches): Simplify and fix to match specification.
 
 	* CastAs.java (apply2): Handle OccurrenceType.

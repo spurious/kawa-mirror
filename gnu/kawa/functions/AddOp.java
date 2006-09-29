@@ -344,7 +344,6 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
       }
     else
       ApplyExp.compile(exp, comp, target);
-    
   }
 
   /** Classify an expression according to its numeric type.

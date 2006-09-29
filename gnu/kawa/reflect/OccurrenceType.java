@@ -18,6 +18,10 @@ public class OccurrenceType extends ObjectType
   int minOccurs;
   int maxOccurs;
 
+  public Type getBase () { return base; }
+  public int minOccurs() { return minOccurs; }
+  public int maxOccurs() { return maxOccurs; }
+
   public OccurrenceType (Type base, int minOccurs, int maxOccurs)
   {
     this.base = base;
@@ -44,6 +48,16 @@ public class OccurrenceType extends ObjectType
 
   public Object coerceFromObject (Object obj)
   {
+    if (obj instanceof Values)
+      {
+      }
+    else
+      {
+        // Assumes that base is an item type.  FIXME.
+	if (minOccurs <= 1 && maxOccurs != 0)
+          return base.coerceFromObject(obj);
+      }
+    // FIXME
     if (! isInstance(obj))
       throw new ClassCastException();
     return obj;

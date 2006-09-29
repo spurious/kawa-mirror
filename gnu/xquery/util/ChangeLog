@@ -1,5 +1,8 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* CastAs.java (apply2): Handle OccurrenceType.
+	(compile): Suppress inherited/incorrect inlining.
+
 	* NumberValue.java (abd): Fix so abd(-0) is 0.
 
 	* StringUtils.java (encodeForUri): Fixes to match updated

@@ -117,9 +117,6 @@ public class TestMisc
 
     evalTest("(doc('tab.xml')/result/row/*)[2]",
 	     "<fld2"+tabNsNodes+" align=\"right\"><!--ignore-this-comment-->12</fld2>");
-    evalTest("(doc('tab.xml')/result/row/*)[2 to 3]",
-	     "<fld2"+tabNsNodes+" align=\"right\"><!--ignore-this-comment-->12</fld2>"
-	     +" <fld1"+tabNsNodes+" align=\"left\">b1</fld1>");
     evalTest("(doc('tab.xml')/result/row/*)[position()>1]",
 	     "<fld2"+tabNsNodes+" align=\"right\"><!--ignore-this-comment-->12</fld2>"
 	     +"<fld1"+tabNsNodes+" align=\"left\">b1</fld1>"

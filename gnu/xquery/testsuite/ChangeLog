@@ -1,5 +1,7 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* TestMisc.java: Remove invalid query.
+
 	* XQTS-trace.exp: Update for latest XQTS.
 
 	* RunXQTS.java: Handle Inspect results as "cannot-tell".

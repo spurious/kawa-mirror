@@ -1,5 +1,11 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (OP_EQ, OP_NE, OP_LT, OP_LE, OP_GT, OP_NE): New token
+	constants for 'eq' etc, distinct from OP_EQU for '=' etc.
+	(peekOperator): Fix to return new tokens.
+	(prioty): Update for new tokens.
+	(makeBinary): Update for new token.
+
 	* XQuery.java (initXQuery): Declare fn:error.
 
 	* XQuery.java (initXQuery): Declare fn:remove function.

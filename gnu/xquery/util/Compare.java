@@ -25,6 +25,7 @@ public class Compare extends Procedure2 implements CanInline
   static final int TRUE_IF_LSS = 1 << (RESULT_LSS + 3);
   static final int TRUE_IF_NAN = 1 << (RESULT_NAN + 3);
   static final int TRUE_IF_NEQ = 1 << (RESULT_NEQ + 3);
+  static final int VALUE_COMPARISON = 1 << 5;
 
   int flags;
 
@@ -159,6 +160,15 @@ public class Compare extends Procedure2 implements CanInline
 
   public Object apply2 (Object arg1, Object arg2)
   {
+    if ((flags & VALUE_COMPARISON) != 0)
+      {
+        if (arg1 == null || arg1 == Values.empty) return arg1;
+        if (arg2 == null || arg2 == Values.empty) return arg2;
+        return atomicCompare(flags,
+                             KNode.atomicValue(arg1),
+                             KNode.atomicValue(arg2),
+                             null) ? Boolean.TRUE: Boolean.FALSE;
+      }
     return apply(flags, arg1, arg2, null) ? Boolean.TRUE : Boolean.FALSE;
   }
 
@@ -169,6 +179,19 @@ public class Compare extends Procedure2 implements CanInline
   public static final Compare $Gr$Eq= make(">=",TRUE_IF_GRT|TRUE_IF_EQU);
   public static final Compare $Ls   = make("<",TRUE_IF_LSS);
   public static final Compare $Ls$Eq= make("<=",TRUE_IF_LSS|TRUE_IF_EQU);
+
+  public static final Compare valEq =
+    make("eq",TRUE_IF_EQU|VALUE_COMPARISON);
+  public static final Compare valNe =
+    make("ne",TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_NEQ|VALUE_COMPARISON);
+  public static final Compare valGt =
+    make("gt",TRUE_IF_GRT|VALUE_COMPARISON);
+  public static final Compare valGe =
+    make("ge",TRUE_IF_GRT|TRUE_IF_EQU|VALUE_COMPARISON);
+  public static final Compare valLt =
+    make("lt",TRUE_IF_LSS|VALUE_COMPARISON);
+  public static final Compare valLe =
+    make("le",TRUE_IF_LSS|TRUE_IF_EQU|VALUE_COMPARISON);
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {

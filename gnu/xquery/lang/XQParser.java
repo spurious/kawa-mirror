@@ -332,6 +332,13 @@ public class XQParser extends Lexer
   static final int OP_CASTABLE_AS= OP_BASE + 24;  // 'castable' 'as'
   static final int OP_CAST_AS    = OP_BASE + 25;  // 'cast' 'as'
 
+  static final int OP_EQ = OP_BASE + 26; // 'eq'
+  static final int OP_NE = OP_BASE + 27; // 'ne'
+  static final int OP_LT = OP_BASE + 28; // 'lt'
+  static final int OP_LE = OP_BASE + 29; // 'le
+  static final int OP_GT = OP_BASE + 30; // 'gt'
+  static final int OP_GE = OP_BASE + 31; // 'ge'
+
   static final int OP_NODE = 230; // 'node' followed by '('
   static final int OP_TEXT = 231; // 'text' followed by '('
   static final int OP_COMMENT = 232; // 'comment' followed by '('
@@ -734,23 +741,19 @@ public class XQParser extends Lexer
               curToken = OP_RANGE_TO;
             else if (c1 == 'i' && c2 == 's')
               curToken = OP_IS;
-
-            // The ValueComp operators 'eq' ... are mapped to the
-            // corresponding GeneralComp operators '=' ...
-            // So we fail to catch certain errors.  FIXME.
             else if (c1 == 'e' && c2 == 'q')
-              curToken = OP_EQU;
+              curToken = OP_EQ;
             else if (c1 == 'n' && c2 == 'e')
-              curToken = OP_NEQ;
+              curToken = OP_NE;
             else if (c1 == 'g')
               {
-                if (c2 == 'e')  curToken = OP_GEQ;
-                else if (c2 == 't')  curToken = OP_GRT;
+                if (c2 == 'e')  curToken = OP_GE;
+                else if (c2 == 't')  curToken = OP_GT;
               }
             else if (c1 == 'l')
               {
-                if (c2 == 'e')  curToken = OP_LEQ;
-                else if (c2 == 't')  curToken = OP_LSS;
+                if (c2 == 'e')  curToken = OP_LE;
+                else if (c2 == 't')  curToken = OP_LT;
               }
             break;
 
@@ -1200,6 +1203,8 @@ public class XQParser extends Lexer
         return 2;
       case OP_EQU:  case OP_NEQ:
       case OP_LSS:  case OP_GRT:  case OP_LEQ:  case OP_GEQ:
+      case OP_EQ:  case OP_NE:
+      case OP_LT:  case OP_GT:  case OP_LE:  case OP_GE:
       case OP_IS:  case OP_ISNOT:
       case OP_GRTGRT:  case OP_LSSLSS:
         return 3;
@@ -1225,8 +1230,6 @@ public class XQParser extends Lexer
 	return 0;
       }
   }
-
-  int count = 0;
 
   static Expression makeBinary(Expression func,
 			       Expression exp1, Expression exp2)
@@ -1267,6 +1270,24 @@ public class XQParser extends Lexer
 	break;
       case OP_MOD:
 	func = makeFunctionExp("gnu.xquery.util.ArithOp", "mod", "mod");
+	break;
+      case OP_EQ:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valEq", "eq");
+	break;
+      case OP_NE:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valNe", "ne");
+	break;
+      case OP_LT:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valLt", "lt");
+	break;
+      case OP_LE:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valLe", "le");
+	break;
+      case OP_GT:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valGt", "gt");
+	break;
+      case OP_GE:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "valGe", "ge");
 	break;
       case OP_EQU:
 	func = makeFunctionExp("gnu.xquery.util.Compare", "=");

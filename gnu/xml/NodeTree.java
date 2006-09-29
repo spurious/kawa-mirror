@@ -293,6 +293,25 @@ public class NodeTree extends TreeList
     return (String) objects[getIntN(index+1)];
   }
 
+  /** Look for matching attribute in ancestor or self.
+   * @param namespace namespaceURI (interned) of required attribute
+   * @param name localName(interned) of required attribute 
+   * @return attribute ipos or 0
+   */
+  public int ancestorAttribute (int ipos,
+                                String namespace, String name)
+  {
+    for (;;)
+      {
+        if (ipos == -1)
+          return 0;
+        int attr = getAttributeI(ipos, namespace, name);
+        if (attr != 0)
+          return attr;
+        ipos = parentPos(ipos);
+      }
+  }
+
   public String toString ()
   {
     CharArrayOutPort wr = new CharArrayOutPort();

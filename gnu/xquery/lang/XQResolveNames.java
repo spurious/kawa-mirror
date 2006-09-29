@@ -82,8 +82,17 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>current-time</code> function. */
   public static final int CURRENT_TIME_BUILTIN = -21;
 
+  /** Code number for the special <code>implicit-timezone</code> function. */
+  public static final int IMPLICIT_TIMEZONE_BUILTIN = -22;
+
+  /** Code number for the special <code>lang</code> function. */
+  public static final int LANG_BUILTIN = -23;
+
+  /** Code number for the special <code>name</code> function. */
+  public static final int NAME_BUILTIN = -24;
+
   /** Code number for the special <code>deep-equal</code> function. */
-  public static final int DEEP_EQUAL_BUILTIN = -22;
+  public static final int DEEP_EQUAL_BUILTIN = -25;
 
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
@@ -92,6 +101,7 @@ public class XQResolveNames extends ResolveNames
   public Declaration currentDateTimeDecl;
   public Declaration currentDateDecl;
   public Declaration currentTimeDecl;
+  public Declaration currentTimezoneDecl;
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
@@ -136,9 +146,11 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("compare", COMPARE_BUILTIN);
     pushBuiltin("distinct-values", DISTINCT_VALUES_BUILTIN);
     pushBuiltin("local-name", LOCAL_NAME_BUILTIN);
+    pushBuiltin("name", NAME_BUILTIN);
     pushBuiltin("namespace-uri", NAMESPACE_URI_BUILTIN);
     pushBuiltin("root", ROOT_BUILTIN);
     pushBuiltin("base-uri", BASE_URI_BUILTIN);
+    pushBuiltin("lang", LANG_BUILTIN);
     pushBuiltin("static-base-uri", STATIC_BASE_URI_BUILTIN);
     pushBuiltin("resolve-uri", RESOLVE_URI_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
@@ -151,6 +163,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("current-dateTime", CURRENT_DATETIME_BUILTIN);
     pushBuiltin("current-date", CURRENT_DATE_BUILTIN);
     pushBuiltin("current-time", CURRENT_TIME_BUILTIN);
+    pushBuiltin("implicit-timezone", IMPLICIT_TIMEZONE_BUILTIN);
     pushBuiltin("deep-equal", DEEP_EQUAL_BUILTIN);
   }
 
@@ -394,6 +407,12 @@ public class XQResolveNames extends ResolveNames
             vec.addElement(new SetExp(currentTimeDecl,
                                       new ApplyExp(cast, args)));
           }
+        if (currentTimezoneDecl != null)
+          {
+            Expression[] args = { new ReferenceExp(currentDateTimeDecl) };
+            vec.addElement(new SetExp(currentTimezoneDecl,
+                                      new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("timezoneFromDateTime", 1), args)));
+          }
         Expression body = exp.body;
         Expression[] exps;
         if (body instanceof BeginExp)
@@ -463,7 +482,11 @@ public class XQResolveNames extends ResolveNames
         System.arraycopy(args, 0, xargs, 0, minArgs);
         Declaration dot = lookup.lookup(XQParser.DOT_VARNAME, -1);
         if (dot == null)
-          return getCompilation().syntaxError("undefined context for " + name);
+          {
+            String message = "undefined context for " + name;
+            messages.error('e', message, "XPDY0002");
+            return new ErrorExp(message);
+          }
         xargs[minArgs] = new ReferenceExp(dot);
         args = xargs;
       }
@@ -577,6 +600,12 @@ public class XQResolveNames extends ResolveNames
                     .getDeclaredMethod("localName", 1);
                   return withContext(meth, exp.getArgs(), "fn:local-name", 0);
                 }
+              case NAME_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("name", 1);
+                  return withContext(meth, exp.getArgs(), "fn:name", 0);
+                }
               case ROOT_BUILTIN:
 		{
                   Method meth = ClassType.make("gnu.kawa.xml.Nodes")
@@ -588,6 +617,12 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.kawa.functions.BaseUri")
                     .getDeclaredMethod("baseUri", 1);
                   return withContext(meth, exp.getArgs(), "fn:base-uri", 0);
+                }
+              case LANG_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("lang", 2);
+                  return withContext(meth, exp.getArgs(), "fn:lang", 1);
                 }
 
               case STATIC_BASE_URI_BUILTIN:
@@ -693,11 +728,15 @@ public class XQResolveNames extends ResolveNames
                                       "fn:deep-equal", 2);
                 }
               case CURRENT_DATETIME_BUILTIN:
+                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
+                  return err;
                 mexp = getCompilation().mainLambda;
                 if (currentDateTimeDecl == null)
                   currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
                 return new ReferenceExp(currentDateTimeDecl);
               case CURRENT_DATE_BUILTIN:
+                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
+                  return err;
                 mexp = getCompilation().mainLambda;
                 if (currentDateTimeDecl == null)
                   currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
@@ -705,12 +744,23 @@ public class XQResolveNames extends ResolveNames
                   currentDateDecl = mexp.addDeclaration("date", XTimeType.dateType);
                 return new ReferenceExp(currentDateDecl);
               case CURRENT_TIME_BUILTIN:
+                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
+                  return err;
                 mexp = getCompilation().mainLambda;
                 if (currentDateTimeDecl == null)
                   currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
                 if (currentTimeDecl == null)
                   currentTimeDecl = mexp.addDeclaration("time", XTimeType.timeType);
                 return new ReferenceExp(currentTimeDecl);
+              case IMPLICIT_TIMEZONE_BUILTIN:
+                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
+                  return err;
+                mexp = getCompilation().mainLambda;
+                if (currentDateTimeDecl == null)
+                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
+                if (currentTimeDecl == null)
+                  currentTimezoneDecl = mexp.addDeclaration("timezone", XTimeType.dayTimeDurationType);
+                return new ReferenceExp(currentTimezoneDecl);
 	      }
 	  }
       }

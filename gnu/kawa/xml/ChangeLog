@@ -1,3 +1,7 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* XTimeType.java (now): Also set TIMEZONE_MASK and hence timezone.
+
 2006-09-14  Per Bothner  <per@bothner.com>
 
 	* KNode.java (getNodeValue): New static methods.

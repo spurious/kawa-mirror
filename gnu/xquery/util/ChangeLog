@@ -1,5 +1,9 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (name, getLang, lang, documentUri): New static
+	methods to implement new fn:xxx functions.
+	(localName): Change return type.  Inline QNameUtils.localNameFromQName.
+
 	* Compare.java (VALUE_COMPARISON): New mask bit.
 	(apply2): Check for VALUE_COMPARISON.
 	(valEq, valNe, Vallt, valNe, valGt, valGe): New static fields.

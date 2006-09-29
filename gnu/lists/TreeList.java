@@ -99,10 +99,11 @@ public class TreeList extends AbstractSequence
   // 0xF110 BEGIN_DOCUMENT
   // 0xF111 END_DOCUMENT
   // 0xF112 BASE_URI: Not a node, but a property of the previous node (start).
-  // 0xF113 COMMENT
+  // 0xF113 DOCUMENT_URI: Not a node, but a property of the previous document.
   // 0xF114 PROCESSING_INSTRUCTION
   // 0xF115 CDATA_SECTION
   // 0xF116 JOINER
+  // 0xF117 COMMENT
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -180,7 +181,7 @@ public class TreeList extends AbstractSequence
    * [length] 2 shorts
    * [comment text], (length) number of characters.
    */
-  static final int COMMENT = 0xF113;
+  static final int COMMENT = 0xF117;
 
   /** A processing-instruction node follows.
    * [PROCESSING_INSTRUCTION]
@@ -239,6 +240,14 @@ public class TreeList extends AbstractSequence
    * [index]. 2 shorts, where objects[index] is the base-uri value.
    */
   static final int BASE_URI = 0xF112;
+
+  /** The document-uri property of a node.
+   * This is not an actual value, but it is a property of the previous
+   * document node, or the surrounding node just after a BEGIN_XXX entry.
+   * [DOCUMENT_URI]
+   * [index]. 2 shorts, where objects[index] is the document-uri value.
+   */
+  static final int DOCUMENT_URI = 0xF113;
 
   /** Beginning of a group, compact form.
    *
@@ -437,6 +446,17 @@ public class TreeList extends AbstractSequence
     ensureSpace(3);
     int index = find(uri);
     data[gapStart++] = BASE_URI;
+    setIntN(gapStart, index);
+    gapStart += 2;
+  }
+
+  /** Write/set the document-uri property of the current document.
+   * Only allowed immediately following beginDocument.   */
+  public void writeDocumentUri (Object uri)
+  {
+    ensureSpace(3);
+    int index = find(uri);
+    data[gapStart++] = DOCUMENT_URI;
     setIntN(gapStart, index);
     gapStart += 2;
   }
@@ -832,7 +852,7 @@ public class TreeList extends AbstractSequence
 	  }
 	else if (datum == END_ATTRIBUTE || datum == JOINER)
 	  index++;
-	else if (datum == BASE_URI)
+	else if (datum == BASE_URI || datum == DOCUMENT_URI)
 	  index += 3;
 	else
 	  break;
@@ -1045,6 +1065,11 @@ public class TreeList extends AbstractSequence
 	      ((XConsumer) out).writeBaseUri(objects[getIntN(pos)]);
 	    pos += 2;
 	    continue;
+	  case DOCUMENT_URI:
+	    if (out instanceof TreeList)
+	      ((TreeList) out).writeDocumentUri(objects[getIntN(pos)]);
+	    pos += 2;
+	    continue;
 	  case COMMENT:
 	    {
 	      int length = getIntN(pos);
@@ -1241,6 +1266,7 @@ public class TreeList extends AbstractSequence
 	  {
 	  case BEGIN_DOCUMENT:
 	  case BASE_URI:
+	  case DOCUMENT_URI:
 	    pos += 2;
 	    continue;
 	  case COMMENT:
@@ -1461,6 +1487,7 @@ public class TreeList extends AbstractSequence
       case PROCESSING_INSTRUCTION:
 	return Sequence.PROCESSING_INSTRUCTION_VALUE;
       case BASE_URI:  // FIXME
+      case DOCUMENT_URI:  // FIXME
       case POSITION_REF_FOLLOWS: // FIXME	
       case POSITION_PAIR_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
@@ -1685,6 +1712,7 @@ public class TreeList extends AbstractSequence
 	switch (datum)
 	  {
 	  case BASE_URI:
+	  case DOCUMENT_URI:
 	    return index + 2;
 	  case PROCESSING_INSTRUCTION:
 	    index += 2;
@@ -1842,6 +1870,7 @@ public class TreeList extends AbstractSequence
 	switch (datum)
 	  {
 	  case BASE_URI:
+	  case DOCUMENT_URI:
 	    pos += 3;
 	    break;
           case JOINER:
@@ -1923,6 +1952,7 @@ public class TreeList extends AbstractSequence
 	switch (datum)
 	  {
 	  case BASE_URI:
+	  case DOCUMENT_URI:
 	    next = pos + 3;
 	    continue;
 	  case BEGIN_DOCUMENT:
@@ -2115,8 +2145,10 @@ public class TreeList extends AbstractSequence
 	    || datum == BEGIN_DOCUMENT)
 	  {
 	    int next = index + 3;
-	    if (datum == PROCESSING_INSTRUCTION)
-	      next = index + 2 + getIntN(index);
+            if (datum == PROCESSING_INSTRUCTION)
+              next = next + 2 + getIntN(next);
+            if (next == DOCUMENT_URI)
+              next = next + 3;
 	    if (next == gapStart)
 	      next = gapEnd;
 	    if (next < data.length && data[next] == BASE_URI)
@@ -2125,6 +2157,24 @@ public class TreeList extends AbstractSequence
 	pos = parentPos(pos);
 	if (pos == -1)
 	  break;
+      }
+    return null;
+  }
+
+  public Object documentUriOfPos (int pos)
+  {
+    int index = posToDataIndex(pos);
+    if (index == data.length)
+      return null;
+    if (data[index] == BEGIN_DOCUMENT)
+      {
+        int next = index + 3;
+        if (next == BASE_URI)
+          next = next + 3;
+        if (next == gapStart)
+          next = gapEnd;
+        if (next < data.length && data[next] == DOCUMENT_URI)
+          return objects[getIntN(next+1)];
       }
     return null;
   }
@@ -2287,6 +2337,12 @@ public class TreeList extends AbstractSequence
 			out.print(objects[j]);
 			toskip = 2;
 			break;
+		      case DOCUMENT_URI:
+			out.print("=DOCUMENT_URI: ");
+			j = getIntN(i+1);
+			out.print(objects[j]);
+			toskip = 2;
+			break;
 		      case COMMENT:
 			out.print("=COMMENT: '");
 			j = getIntN(i+1);
@@ -2307,7 +2363,7 @@ public class TreeList extends AbstractSequence
 			out.print(objects[j]);
 			out.print(" '");
 			j = getIntN(i+3);
-			out.write(data, i+3, j);
+			out.write(data, i+5, j);
 			out.print('\'');
 			toskip = 4+j;
 			break;

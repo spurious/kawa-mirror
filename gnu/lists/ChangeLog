@@ -1,3 +1,14 @@
+2006-09-28  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (DOCUMENT_URI): New constant.
+	(writeDocumentUri): New method.
+	(documentUriOfPos): New method.
+	(gotoChildrenStart, consumeIRange, toString, getNextKind, stringValue,
+	nextNodeIndex, nextMatching, baseUriOfPos, dump): Handle DOCUMENT_URI.
+
+	* TreeList.java (dump, baseUriOfPos): Fix bugs in handling of
+	PROCESSING_INSTRUCTION.
+
 2006-09-26  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (clear): Also reset oindex field.

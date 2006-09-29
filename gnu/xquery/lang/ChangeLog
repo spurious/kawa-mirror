@@ -1,5 +1,16 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (IMPLICIT_TIMEZONE_BUILTIN, LANG_BUILTIN,
+	NAME_BUILTIN): New constants.
+	(<init>): Declare new builtins.
+	(walkApplyExp): Handle new builtins.
+	(currentTimezoneDecl): New field.
+	(resolveModule): Initialzie currentTimezoneDecl if needed.
+
+	* XQResolveNames.java (withContext): Add code to error message.
+	
+	* XQuery.java (initXQuery): Declare fn:document-uri.
+
 	* XQParser.java (OP_EQ, OP_NE, OP_LT, OP_LE, OP_GT, OP_NE): New token
 	constants for 'eq' etc, distinct from OP_EQU for '=' etc.
 	(peekOperator): Fix to return new tokens.

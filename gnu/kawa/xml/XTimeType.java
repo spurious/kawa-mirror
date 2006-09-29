@@ -75,7 +75,7 @@ public class XTimeType extends XDataType
   /** Return the current date or time in this type. */
   public DateTime now ()
   {
-    return new DateTime(XTimeType.components(typeCode),
+    return new DateTime(XTimeType.components(typeCode)|DateTime.TIMEZONE_MASK,
                         (GregorianCalendar) GregorianCalendar.getInstance());
   }
 

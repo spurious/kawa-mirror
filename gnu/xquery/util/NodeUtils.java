@@ -9,14 +9,24 @@ import gnu.lists.Consumer;
 
 public class NodeUtils
 {
-  public static Object localName (Object node)
+  public static String name (Object node)
   {
     if (node == Values.empty || node == null)
       return "";
     Object name = NodeName.nodeName(node);
     if (name == null || name == Values.empty)
       return "";
-    return QNameUtils.localNameFromQName(name);
+    return name.toString();
+  }
+
+  public static String localName (Object node)
+  {
+    if (node == Values.empty || node == null)
+      return "";
+    Object name = NodeName.nodeName(node);
+    if (name == null || name == Values.empty)
+      return "";
+    return ((Symbol) name).getName();
   }
 
   public static Object namespaceURI (Object node)
@@ -66,5 +76,45 @@ public class NodeUtils
       }
     else
       out.writeObject(KNode.atomicValue(arg));
+  }
+
+  public static String getLang (KNode node)
+  {
+    NodeTree seq = (NodeTree) node.sequence;
+    int attr = seq.ancestorAttribute(node.ipos,
+                                     gnu.xml.NamespaceBinding.XML_NAMESPACE,
+                                     "lang");
+    if (attr == 0)
+      return null;
+    else
+      return KNode.getNodeValue(seq, attr);
+  }
+
+  public static boolean lang (Object testlang, Object node)
+  {
+    String teststr;
+    if (testlang == null || testlang == Values.empty)
+      teststr = "";
+    else
+      teststr = StringValue.stringValue(testlang);
+    String lang = getLang((KNode) node);
+    if (lang == null)
+      return false;
+    int langlen = lang.length();
+    int testlen = teststr.length();
+    if (langlen > testlen && lang.charAt(testlen) == '-')
+      lang = lang.substring(0, testlen);
+    return lang.equalsIgnoreCase(teststr);
+  }
+
+  public static Object documentUri (Object arg)
+  {
+    if (arg == null || arg == Values.empty)
+      return arg;
+    if (! (arg instanceof KNode))
+      throw new WrongType("xs:document-uri", 1, arg, "node()?");
+    KNode node = (KNode) arg;
+    Object uri = ((NodeTree) node.sequence).documentUriOfPos(node.ipos);
+    return uri == null ? Values.empty : uri;
   }
 }

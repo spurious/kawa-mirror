@@ -626,6 +626,7 @@ public class XQuery extends Language
 		  "namespaceURIForPrefix");
     define_method("in-scope-prefixes", "gnu.xquery.util.NodeUtils",
                   "inScopePrefixes$X");
+    define_method("document-uri", "gnu.xquery.util.NodeUtils", "documentUri");
 
     define_method("years-from-duration", "gnu.xquery.util.TimeUtils",
                   "yearsFromDuration");

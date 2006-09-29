@@ -1,5 +1,7 @@
 2006-09-28  Per Bothner  <per@bothner.com>
 
+	* ValuesFilter.java (matches): Simplify and fix to match specification.
+
 	* CastAs.java (apply2): Handle OccurrenceType.
 	(compile): Suppress inherited/incorrect inlining.
 

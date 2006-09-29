@@ -38,31 +38,11 @@ public class ValuesFilter extends MethodProc implements CanInline
 
   static public boolean matches(Object result, long count)
   {
-    if (result instanceof Boolean)
-      return ((Boolean) result).booleanValue();
+    if (result instanceof Values)
+      result = ((Values) result).canonicalize();
     if (result instanceof Number)
       return count == ((Number) result).longValue();
-    if (result instanceof String)
-      return result.toString().length() > 0;
-    if (result instanceof KNode)
-      return true;
-    if (result instanceof Values)
-      {
-	Values values = (Values) result;
-	int index = 0;
-	for (;;)
-	  {
-	    int next = values.nextDataIndex(index);
-	    if (next < 0)
-	      return false;
-	    if (matches(values.getPosNext(index << 1), count))
-	      return true;
-	    index = next;
-	  }
-      }
-    if (result instanceof TreeList)
-      return ! ((TreeList) result).isEmpty();
-    throw new Error("unimplemented condition type:"+result.getClass().getName()); // FIXME
+    return BooleanValue.booleanValue(result);
   }
 
   public void apply (CallContext ctx) throws Throwable

@@ -25,7 +25,7 @@
 
 	* TreeList.java (nextMatching): Allow -1 for 'limit'.
 
-	* AbstractSequence.java (firstChildPos)int,ElementPredicate)): New.
+	* AbstractSequence.java (firstChildPos(int,ElementPredicate)): New.
 
 2006-09-11  Per Bothner  <per@bothner.com>
 

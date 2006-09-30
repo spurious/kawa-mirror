@@ -1,5 +1,9 @@
 2006-09-29  Per Bothner  <per@bothner.com>
 
+	* TestSuite.java: Simlify/fix so it works again after the recent
+	change to have XMLPrinter extend OutPort.  Now need to force flushing.
+	Use a CharArrayOutPort rather than a StringWriter.
+
 	* use-cases.xml: Revert order of expected namespace declarations,
 	to match canonical output.
 

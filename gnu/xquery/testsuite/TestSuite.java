@@ -2,6 +2,7 @@ package gnu.xquery.testsuite;
 import java.io.*;
 import gnu.lists.*;
 import gnu.xml.*;
+import gnu.mapping.CharArrayOutPort;
 import gnu.kawa.xml.Document;
 
 /** Run a suite of XQuery tests, as read from an xml file. */
@@ -30,29 +31,27 @@ public class TestSuite extends FilterConsumer
   boolean inTest = false;
   String currentTag;
 
-  StringWriter sout;
-  StringBuffer sbuf;
+  CharArrayOutPort cout;
   XMLPrinter xout;
 
   String query = null;
   String expect = null;
 
-  public TestSuite()
+  private TestSuite()
   {
-    this(new StringWriter());
-    sbuf = sout.getBuffer();
+    this(new CharArrayOutPort());
   }
 
-  private TestSuite(StringWriter sout)
+  private TestSuite(CharArrayOutPort cout)
   {
-    this(sout, new XMLPrinter(sout));
+    this(cout, new XMLPrinter(cout));
     xout.escapeText = false;
   }
 
-  private TestSuite(StringWriter sout, XMLPrinter xout)
+  private TestSuite(CharArrayOutPort cout, XMLPrinter xout)
   {
     super(xout);
-    this.sout = sout;
+    this.cout = cout;
     this.xout = xout;
   }
 
@@ -65,7 +64,7 @@ public class TestSuite extends FilterConsumer
       inTest = true;
     else if (inTestSuite ? nesting == 2 : nesting == 1)
       {
-	sbuf.setLength(0);
+        cout.setLength(0);
 	currentTag = typeName;
       }
     else if (currentTag == null)
@@ -89,9 +88,15 @@ public class TestSuite extends FilterConsumer
     else if (inTestSuite ? nesting == 2 : nesting == 1)
       {
 	if ("query".equals(typeName))
-	  query = sout.toString();
+          {
+            xout.flush();
+            query = cout.toString();
+          }
 	else if ("expect".equals(typeName))
-	  expect = sout.toString();
+          {
+            xout.flush();
+            expect = cout.toString();
+          }
 	currentTag = null;
       }
     else

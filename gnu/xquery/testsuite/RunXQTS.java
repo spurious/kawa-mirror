@@ -287,8 +287,9 @@ public class RunXQTS extends FilterConsumer
         xqlog.writeChars("XQuery");
         xqlog.endGroup("syntax");
         xqlog.beginGroup("test-run", testRunGroupType);
-        writeAttribute("dateRun",
-                       gnu.kawa.xml.XTimeType.dateType.now().toString());
+        StringBuffer sbuf = new StringBuffer();
+        gnu.kawa.xml.XTimeType.dateTimeType.now().toStringDate(sbuf);
+        writeAttribute("dateRun", sbuf.toString());
         xqlog.beginGroup("test-suite", testSuiteGroupType);
         writeAttribute("version", XQTSVersion);
         xqlog.endGroup("test-suite");

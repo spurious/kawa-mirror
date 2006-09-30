@@ -1,3 +1,7 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (handleStartTag): Only write date without timezone.
+
 2006-09-29  Per Bothner  <per@bothner.com>
 
 	* TestSuite.java: Simlify/fix so it works again after the recent

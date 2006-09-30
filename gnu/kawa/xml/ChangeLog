@@ -1,3 +1,8 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* AncestorAxis.java (scan):  Fix logic error.
+	* AncestorOrSelfAxis.java (svan): Likewise.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* XTimeType.java (now): Also set TIMEZONE_MASK and hence timezone.

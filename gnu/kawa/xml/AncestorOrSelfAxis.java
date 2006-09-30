@@ -18,10 +18,11 @@ public class AncestorOrSelfAxis extends TreeScanner
   private static void scan (AbstractSequence seq, int ipos, int end,
 			    NodePredicate type, PositionConsumer out)
   {
-    if (ipos != end && type.isInstancePos(seq, ipos))
+    if (ipos != end)
       {
 	scan(seq, seq.parentPos(ipos), end, type, out);
-	out.writePosition(seq, ipos);
+        if (type.isInstancePos(seq, ipos))
+          out.writePosition(seq, ipos);
       }
   }
 

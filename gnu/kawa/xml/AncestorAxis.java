@@ -19,10 +19,11 @@ public class AncestorAxis extends TreeScanner
 			    NodePredicate type, PositionConsumer out)
   {
     ipos = seq.parentPos(ipos);
-    if (ipos != end && type.isInstancePos(seq, ipos))
+    if (ipos != end)
       {
 	scan(seq, ipos, end, type, out);
-	out.writePosition(seq, ipos);
+        if (type.isInstancePos(seq, ipos))
+          out.writePosition(seq, ipos);
       }
   }
 

@@ -21,7 +21,7 @@ public class Document
     XMLParser parser = new XMLParser(name, messages, out);
     out.beginDocument();
     if (out instanceof TreeList)
-      ((TreeList) out).writeBaseUri(name);
+      ((TreeList) out).writeDocumentUri(name);
     parser.parse();
     if (messages.seenErrors())
       throw new SyntaxException("document function read invalid XML",
@@ -55,7 +55,7 @@ public class Document
         SourceMessages messages = new SourceMessages();
         XMLParser parser = new XMLParser(uri, messages, tree);
         tree.beginDocument();
-        tree.writeBaseUri(uri);
+        tree.writeDocumentUri(uri);
         parser.parse();
         parser.close();
         if (messages.seenErrors())

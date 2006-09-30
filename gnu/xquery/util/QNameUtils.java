@@ -16,11 +16,12 @@ public class QNameUtils
 				     NamespaceBinding constructorNamespaces,
 				     NamespaceBinding prologNamespaces)
   {
-    if (qname == null ||qname == Values.empty)
-      return Values.empty;
+    qname = KNode.atomicValue(qname);
     if (qname instanceof Symbol)
       return qname;
-    // FIXME should atomicize here!
+    if (qname instanceof Values
+        || ! (qname instanceof String || qname instanceof UntypedAtomic))
+      throw new RuntimeException("bad argument to QName");
     String name = qname.toString();
     int colon = name.indexOf(':');
     String prefix, localPart;

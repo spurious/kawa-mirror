@@ -1,5 +1,7 @@
 2006-09-30  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (resolveQName): Catch errors.
+
 	* Reduce.java (sum): Use XQuery-specific ArithOp, rather than
 	Scheme-appropriate gnu.kawa.functions.AddOp instance.
 

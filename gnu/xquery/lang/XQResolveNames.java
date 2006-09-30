@@ -243,7 +243,8 @@ public class XQResolveNames extends ResolveNames
 	  }
 
 	Declaration old = lookup.lookup(name, function);
-	if (old != null
+	if (XQParser.warnHidePreviousDeclaration
+            && old != null
 	    && (! (name instanceof Symbol)
 		|| ((Symbol) name).getNamespace() != null))
 	  comp.error('w', decl, "declaration ",

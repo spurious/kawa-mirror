@@ -42,6 +42,7 @@ public class XQParser extends Lexer
   int seenLast;
 
   public static boolean warnOldVersion = true;
+  public static boolean warnHidePreviousDeclaration = false;
 
   /** The internal name of the variable containing '.', the context node. */
   static final Symbol DOT_VARNAME = Symbol.makeUninterned("$dot$");

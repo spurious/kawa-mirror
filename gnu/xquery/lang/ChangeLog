@@ -1,3 +1,10 @@
+2006-09-29  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (warnHidePreviousDeclaration): New flag	field,
+	currently off.
+	* XQResolveNames.java (push): Only warn about hidden previous
+	declaration of warnHidePreviousDeclaration.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (IMPLICIT_TIMEZONE_BUILTIN, LANG_BUILTIN,

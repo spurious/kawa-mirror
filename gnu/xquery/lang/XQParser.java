@@ -95,6 +95,9 @@ public class XQParser extends Lexer
   /* Total number of currently active for/let Declarations. */
   int flworDeclsCount;
 
+  int parseCount;
+  int commentCount;
+
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
    * and returns that.  If there are no more non-space characters,
@@ -179,6 +182,7 @@ public class XQParser extends Lexer
   final void skipComment()
     throws java.io.IOException, SyntaxException
   {
+    commentCount++;
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() - 1;
     int prev = 0;
@@ -2025,7 +2029,9 @@ public class XQParser extends Lexer
 	    lexp.addDeclaration(LAST_VARNAME, Type.int_type);
 	    comp.push(lexp);
 	    dot.noteValue(null);
-	    Expression cond = parseExprSequence(']');
+	    Expression cond = parseExprSequence(']', false);
+            if (curToken == EOF_TOKEN)
+              eofError("missing ']' - unexpected end-of-file");
 	    char kind;
 	    Expression valuesFilter;
 	    if (axis < 0)
@@ -2379,7 +2385,7 @@ public class XQParser extends Lexer
                 sawHyphen = curHyphen;
               }
             if (bad)
-              exp = syntaxError("consecutive or final hyphen in comment");
+              exp = syntaxError("consecutive or final hyphen in XML comment");
             else
               {
                 Expression[] args =
@@ -2600,18 +2606,22 @@ public class XQParser extends Lexer
   {
     getRawToken();
     char saveReadState = pushNesting('(');
-    Expression exp = parseExprSequence(')');
+    Expression exp = parseExprSequence(')', true);
     popNesting(saveReadState);
     if (curToken == EOF_TOKEN)
       eofError("missing ')' - unexpected end-of-file");
     return exp;
   }
 
-  Expression parseExprSequence(int rightToken)
+  Expression parseExprSequence(int rightToken, boolean optional)
       throws java.io.IOException, SyntaxException
   {
     if (curToken == rightToken || curToken == EOF_TOKEN)
-      return QuoteExp.voidExp;
+      {
+        if (! optional)
+          syntaxError("missing expression");
+        return QuoteExp.voidExp;
+      }
     Expression exp = null;
     for (;;)
       {
@@ -2952,7 +2962,7 @@ public class XQParser extends Lexer
         getRawToken();
         if (token == TEXT_TOKEN || token == COMMENT_TOKEN
             || token == PI_TOKEN)
-          vec.addElement(parseExprSequence('}'));
+          vec.addElement(parseExprSequence('}', token == PI_TOKEN));
         else if (curToken != '}')
           {
             vec.addElement(parseExpr());
@@ -2975,7 +2985,7 @@ public class XQParser extends Lexer
       case ORDERED_LBRACE_TOKEN:
       case UNORDERED_LBRACE_TOKEN:
         getRawToken();
-        exp = parseExprSequence('}');
+        exp = parseExprSequence('}', false);
         break;
 
       default:
@@ -3495,6 +3505,7 @@ public class XQParser extends Lexer
     int ch = skipSpace();
     if (ch < 0)
       return null;
+    parseCount++;
     unread(ch);
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() + 1;
@@ -3904,6 +3915,10 @@ public class XQParser extends Lexer
 	return QuoteExp.voidExp;
 
       case XQUERY_VERSION_TOKEN:
+        if (parseCount != 1)
+          error('e', "'xquery version' does not start module");
+        else if (commentCount > 0)
+          error('w', "comments should not precede 'xquery version'");
         getRawToken();
         if (curToken == STRING_TOKEN)
           {
@@ -3929,7 +3944,7 @@ public class XQParser extends Lexer
                     ch = tokenBuffer[i];
                     if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
                       continue;
-                    if (i > 0
+                    if (i == 0
                         || ! ((ch >= '0' && ch <= '9')
                               || ch == '.' || ch == '_' || ch == '-'))
                       bad = true;
@@ -3955,7 +3970,7 @@ public class XQParser extends Lexer
         baseURI = (String) val;
 	return QuoteExp.voidExp;
       }
-    exp = parseExprSequence(EOF_TOKEN);
+    exp = parseExprSequence(EOF_TOKEN, true);
     if (curToken == EOL_TOKEN)
       unread('\n');
     exp.setFile(getName());

@@ -107,7 +107,7 @@ public class XQuery extends Language
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     tr.mustCompileHere();
     XQParser parser = (XQParser) tr.lexer;
-    if ((options & PARSE_ONE_LINE) != 0)
+    if (parser.isInteractive())
       {
 	Expression sexp = parser.parse(tr);
 	if (sexp == null)
@@ -147,7 +147,14 @@ public class XQuery extends Language
 	  {
 	    sexp = parser.parse(tr);
 	    if (sexp == null)
-	      break;
+              {
+                if (parser.parseCount == 0 && !parser.isInteractive())
+                  {
+                    parser.error('e', "empty module", "XPST0003");
+                    return false;
+                  }
+                break;
+              }
 	    exps.addElement(sexp);
 	  }
 	int nexps = exps.size();

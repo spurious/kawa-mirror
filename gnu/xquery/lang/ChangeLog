@@ -1,3 +1,24 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseCount, commentCount): New fields.
+	(skipComment): Increment commentCount.
+	(parse): Increment parseCount.
+	Warn/error if stuff before XQUERY_VERSION_TOKEN.
+	* XQuery.java (parse): Error if we saw an empty module.
+
+	* XQuery.java (parse): Don't PARSE_ONE_LINE if reading from a file.
+
+	* XQParser.java (parse): Fix thinko in logic for checking encoding
+	specification 'xquery version' declaration.
+
+	* XQParser.java (parseExprSequence): New parameter 'optional'.
+	Error if empty body and optional is false.
+	(parseStepQualifiers, parseParenExpr,
+	parseMaybePrimaryExpr): Update callers.
+	(parseStepQualifiers): Error if unexpected EOF_TOKEN.
+
+	* XQParser.java (parseXMLConstructor): Improved error message.
+
 2006-09-29  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (warnHidePreviousDeclaration): New flag	field,

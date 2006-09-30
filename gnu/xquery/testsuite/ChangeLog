@@ -1,5 +1,8 @@
 2006-09-29  Per Bothner  <per@bothner.com>
 
+	* use-cases.xml: Revert order of expected namespace declarations,
+	to match canonical output.
+
 	* Makefile.am (TestSuite.class): Also depend on TestMisc.class.
 
 2006-09-28  Per Bothner  <per@bothner.com>

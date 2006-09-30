@@ -1529,23 +1529,22 @@ declare namespace music = "http://www.example.org/music/records";
   }
 </Q2>
 </query>
-<NOTE>The order of emitted namespace declaration was changed.</NOTE>
 <expect><![CDATA[
 <Q2>
   <title
      xmlns="http://www.example.org/music/records"
-     xmlns:ma="http://www.example.com/AuctionWatch"
-     xmlns:xlink="http://www.w3.org/1999/xlink"
      xmlns:anyzone="http://www.example.com/auctioneers#anyzone"
      xmlns:eachbay="http://www.example.com/auctioneers#eachbay"
+     xmlns:ma="http://www.example.com/AuctionWatch"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
      xmlns:yabadoo="http://www.example.com/auctioneers#yabadoo"
   >In a Silent Way</title>
   <title
     xmlns="http://www.example.org/music/records"
-    xmlns:ma="http://www.example.com/AuctionWatch"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:anyzone="http://www.example.com/auctioneers#anyzone"
     xmlns:eachbay="http://www.example.com/auctioneers#eachbay"
+    xmlns:ma="http://www.example.com/AuctionWatch"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:yabadoo="http://www.example.com/auctioneers#yabadoo"
   >Think of One ...</title>
 </Q2>

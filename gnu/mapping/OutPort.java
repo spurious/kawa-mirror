@@ -68,7 +68,10 @@ public class OutPort extends PrintConsumer implements Printable
 
   public OutPort (Writer out)
   {
-    this(out, false, false);
+    this(out,
+         out instanceof OutPort ? ((OutPort) out).bout
+         : new PrettyWriter(out, false),
+         false);
   }
 
   public OutPort (Writer base, Object name)
@@ -327,7 +330,17 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void close()
   {
-    super.close();
+    try
+      {
+        if (base instanceof OutPort && ((OutPort) base).bout == bout)
+          base.close();
+        else
+          out.close();
+      }
+    catch (IOException ex)
+      {
+        setError();
+      }
     if (index > 0)
       WriterManager.instance.unregister(index);
   }

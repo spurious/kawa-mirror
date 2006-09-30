@@ -1,3 +1,12 @@
+2006-09-29  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (<init>): Optimize this constructor if Writer is an
+	OutPort, as with two of the other constructors.
+	(close): If we did above optimization, make sure to close the
+	base class, rather than using super's close.  The latter also closes
+	the PrettyWriter's buffer in the case of a CharArrayOutPort, which
+	we don't want, so let overriding of close geta chance to work.
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* OutPort.java: Various changes to support XMLPrinter extending this.

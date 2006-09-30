@@ -1,3 +1,7 @@
+2006-09-29  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (TestSuite.class): Also depend on TestMisc.class.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Remove invalid query.

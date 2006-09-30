@@ -433,7 +433,7 @@ all:
 TestMisc.class:  TestMisc.java
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
 
-TestSuite.class:  TestSuite.java
+TestSuite.class:  TestSuite.java TestMisc.class
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
 
 RunXQTS.class:  RunXQTS.java

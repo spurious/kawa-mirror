@@ -2329,22 +2329,6 @@ public class XQParser extends Lexer
     return new ApplyExp(string, args);
   }
 
-  Expression parseNameSpec(String defaultNamespaceUri, boolean attribute)
-      throws java.io.IOException, SyntaxException
-  {
-    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
-      {
-	String name = new String(tokenBuffer, 0, tokenBufferLength);
-	return new QuoteExp(name.intern());
-      }
-    else if (curToken == '{')
-      {
-	return parseEnclosedExpr();
-      }
-    else
-      return null;
-  }
-
   Declaration makeNamespaceDecl (String prefix, String uri)
   {
     String sym = prefix == null ? XQuery.DEFAULT_ELEMENT_PREFIX : prefix.intern();
@@ -2416,9 +2400,22 @@ public class XQParser extends Lexer
 	    || getRawToken() != NCNAME_TOKEN)
 	  syntaxError("missing target after '<?'");
 	String target = new String(tokenBuffer, 0, tokenBufferLength);
-	skipSpace();
-	unread();
+        int nspaces = 0;
+        for (;;)
+          {
+            int ch = read();
+            if (ch < 0)
+              break;
+            if (! Character.isWhitespace((char) ch))
+              {
+                unread();
+                break;
+              }
+            nspaces++;
+          }
 	getDelimited("?>");
+        if (nspaces == 0 && tokenBufferLength > 0)
+          syntaxError("target must be followed by space or '?>'");
 	String content = new String(tokenBuffer, 0, tokenBufferLength);
 	Expression[] args = { new QuoteExp(target), new QuoteExp(content) };
 	exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.MakeProcInst",
@@ -2907,11 +2904,12 @@ public class XQParser extends Lexer
 
         if (token == ELEMENT_TOKEN || token == ATTRIBUTE_TOKEN)
           {
-            // FIXME - rethink this after next spec revision, which
-            // will hopefully clarify namespace management here.
-            Expression element
-              = parseNameSpec(defaultElementNamespace, token != ELEMENT_TOKEN);
-            if (element == null)
+            Expression element;
+            if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+              element = parseNameTest(token != ELEMENT_TOKEN);
+            else if (curToken == '{')
+              element = parseEnclosedExpr();
+            else
               return syntaxError("missing element/attribute name");
             vec.addElement(castQName(element));
             if (token == ELEMENT_TOKEN)

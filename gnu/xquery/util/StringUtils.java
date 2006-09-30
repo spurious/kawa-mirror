@@ -209,8 +209,14 @@ public class StringUtils
 
   private static void appendCodepoint (Object code, StringBuffer sbuf)
   {
-    IntNum i =(IntNum)  gnu.kawa.xml.XIntegerType.integerType.cast(code);
-    sbuf.append((char) i.intValue());
+    IntNum I = (IntNum)  gnu.kawa.xml.XIntegerType.integerType.cast(code);
+    int i = I.intValue();
+    if (i <= 0
+        || (i > 0xD7FF
+            && (i < 0xE000 || (i > 0xFFFD || i < 0x10000) || i > 0x10FFFF)))
+      throw new IllegalArgumentException("codepoints-to-string: "+i+" is not a valid XML character [FOCH0001]");
+    // FIXME - handle surrugates
+    sbuf.append((char) i);
   }
 
   public static String codepointsToString (Object arg)

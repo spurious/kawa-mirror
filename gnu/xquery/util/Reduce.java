@@ -7,8 +7,7 @@ import gnu.lists.*;
 
 public class Reduce extends Procedure1
 {
-  public static final Reduce sum
-    = new Reduce("sum", gnu.kawa.functions.AddOp.$Pl);
+  public static final Reduce sum = new Reduce("sum", ArithOp.add);
 
   protected Procedure combiner;
 

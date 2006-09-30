@@ -1,3 +1,10 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* Reduce.java (sum): Use XQuery-specific ArithOp, rather than
+	Scheme-appropriate gnu.kawa.functions.AddOp instance.
+
+	* StringUtils.java (appendCodepoint): Check codepoints for validity.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java (name, getLang, lang, documentUri): New static

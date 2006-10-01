@@ -116,7 +116,10 @@ public class Compare extends Procedure2 implements CanInline
             else
               arg2 = new DFloNum(str);
           }
-	return NumberCompare.applyWithPromotion(flags, arg1, arg2);
+        int code = NumberCompare.compare(arg1, arg2, false);
+        if (code == -3)
+          throw new IllegalArgumentException("values cannot be compared");
+        return NumberCompare.checkCompareCode(code, flags);
       }
     if (arg1 instanceof UntypedAtomic)
       {

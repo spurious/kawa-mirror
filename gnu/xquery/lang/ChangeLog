@@ -1,5 +1,10 @@
 2006-09-30  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (MIN_BUILTIN, MAX_BUILTIN): New constants.
+	(<init>): Declare new builtins.
+	(walkApplyExp): Handle new builtins.
+	* XQuery.java (initXQuery): No longer declare fn:min and fn:max here.
+
 	* XQParser.java (parseNameSpec): Use parseNameTest so we get correct
 	namespace-resolution.  And then inline into single caller,
 	parseMaybePrimaryExpr.

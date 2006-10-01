@@ -119,9 +119,14 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     return ((1 << (3 + compare(arg1, arg2, true))) & flags) != 0;
   }
   
+  public static boolean checkCompareCode (int code, int flags)
+  {
+    return ((1 << (3 + code)) & flags) != 0;
+  }
+
   static public boolean applyWithPromotion (int flags, Object arg1, Object arg2)
   {
-    return ((1 << (3 + compare(arg1, arg2, false))) & flags) != 0;
+    return checkCompareCode(compare(arg1, arg2, false), flags);
   }
   
   /** Compare two numbers.
@@ -135,6 +140,13 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
   {
     int code1 = Arithmetic.classifyValue(arg1);
     int code2 = Arithmetic.classifyValue(arg2);
+    return compare(arg1, code1, arg2, code2, exact);
+  }
+
+  static public int compare (Object arg1, int code1,
+                             Object arg2, int code2,
+                             boolean exact)
+  {
     if (code1 < 0 || code2 < 0)
       return -3;
     int code = code1 < code2 ? code2 : code1;

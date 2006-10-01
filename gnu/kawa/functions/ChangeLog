@@ -1,3 +1,11 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (checkCompareCode): New static method.
+	(applyWithPromotion): Use checkCompareCode.
+	(compare(Object,int,Object,int,boolean)): New method.
+	(compare(Object,Object,boolean): Use new method.
+	* Arithmetic.java (convert): New static method.
+
 2006-08-26  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (compare): Add exact 'exact' parameter. Use to

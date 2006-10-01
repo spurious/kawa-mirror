@@ -94,6 +94,12 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>deep-equal</code> function. */
   public static final int DEEP_EQUAL_BUILTIN = -25;
 
+  /** Code number for the special <code>min</code> function. */
+  public static final int MIN_BUILTIN = -26;
+
+  /** Code number for the special <code>max</code> function. */
+  public static final int MAX_BUILTIN = -27;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -165,6 +171,8 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("current-time", CURRENT_TIME_BUILTIN);
     pushBuiltin("implicit-timezone", IMPLICIT_TIMEZONE_BUILTIN);
     pushBuiltin("deep-equal", DEEP_EQUAL_BUILTIN);
+    pushBuiltin("min", MIN_BUILTIN);
+    pushBuiltin("max", MAX_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -727,6 +735,20 @@ public class XQResolveNames extends ResolveNames
                     .getDeclaredMethod("deepEqual", 3);
                   return withCollator(meth, exp.getArgs(),
                                       "fn:deep-equal", 2);
+                }
+              case MIN_BUILTIN:
+                {
+                  Method meth = ClassType.make("gnu.xquery.util.MinMax")
+                    .getDeclaredMethod("min", 2);
+                  return withCollator(meth, exp.getArgs(),
+                                      "fn:min", 1);
+                }
+              case MAX_BUILTIN:
+                {
+                  Method meth = ClassType.make("gnu.xquery.util.MinMax")
+                    .getDeclaredMethod("max", 2);
+                  return withCollator(meth, exp.getArgs(),
+                                      "fn:max", 1);
                 }
               case CURRENT_DATETIME_BUILTIN:
                 if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)

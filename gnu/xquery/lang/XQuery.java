@@ -555,8 +555,6 @@ public class XQuery extends Language
     defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
     defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
     defProcStFld("count", "gnu.kawa.functions.CountValues", "countValues");
-    defProcStFld("min", "gnu.xquery.util.MinMax", "min");
-    defProcStFld("max", "gnu.xquery.util.MinMax", "max");
     defProcStFld("sum", "gnu.xquery.util.Reduce", "sum");
     defProcStFld("avg", "gnu.xquery.util.Average", "avg");
     defProcStFld("sublist", "gnu.xquery.util.SubList", "subList"); // deprecated

@@ -1,3 +1,7 @@
+2006-09-30  Per Bothner  <per@bothner.com>
+
+	* Duration.java (valueOf): Fix off-by-one error.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* Duration.java (getMinutes, getSecondsOnly): Fix thinkos.

@@ -149,7 +149,7 @@ public class Duration extends Quantity implements Externalizable
             pos = ((int) part) >> 16;
           }
         if (ch == '.' && pos + 1 < len
-            && Character.digit(str.charAt(pos+1), 10) >= 0)
+            && Character.digit(str.charAt(pos), 10) >= 0)
           {
             int nfrac = 0;
             for (; pos < len; nfrac++)

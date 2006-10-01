@@ -1,5 +1,10 @@
 2006-09-30  Per Bothner  <per@bothner.com>
 
+	* ArithOp.java (apply2): 'idiv' result must sometimes be cast to
+	integer.
+
+	* ValuesFilter.java (matches): Fix number case to match spec.
+
 	* QNameUtils.java (resolveQName): Catch errors.
 
 	* Reduce.java (sum): Use XQuery-specific ArithOp, rather than

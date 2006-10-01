@@ -139,7 +139,8 @@ public class ArithOp extends Procedure1or2
             // OR: d1 = Arithmetic.asBigDecimal(arg1);
             BigDecimal d2 = (BigDecimal) XDataType.decimalType.cast(arg2);
             // OR: d2 = Arithmetic.asBigDecimal(arg2);
-            return d1.divide(d2, 0, BigDecimal.ROUND_DOWN);
+            return Arithmetic.asIntNum(d1.divide(d2, 0,
+                                                 BigDecimal.ROUND_DOWN));
           }
         else if (code <= Arithmetic.FLOAT_CODE)
           {

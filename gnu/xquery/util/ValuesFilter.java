@@ -9,6 +9,7 @@ import gnu.expr.*;
 import gnu.kawa.xml.*;
 import gnu.math.IntNum;
 import gnu.kawa.functions.AddOp;
+import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.functions.ValuesMap;
 
 public class ValuesFilter extends MethodProc implements CanInline
@@ -41,7 +42,20 @@ public class ValuesFilter extends MethodProc implements CanInline
     if (result instanceof Values)
       result = ((Values) result).canonicalize();
     if (result instanceof Number)
-      return count == ((Number) result).longValue();
+      {
+        if (result instanceof IntNum)
+          return IntNum.compare((IntNum) result, count) == 0;
+        if (result instanceof Double || result instanceof Float
+            || result instanceof gnu.math.DFloNum)
+          return ((Number) result).doubleValue() == (double) count;
+        if (result instanceof Long || result instanceof Integer
+            || result instanceof Short || result instanceof Byte)
+          return count == ((Number) result).longValue();
+        // Non-optimal for BigDecimal and BigInteger.  FIXME.
+        return NumberCompare.applyWithPromotion(Compare.TRUE_IF_EQU,
+                                                IntNum.make(count),
+                                                result);
+      }
     return BooleanValue.booleanValue(result);
   }
 

@@ -1,3 +1,23 @@
+2006-10-04  Per Bothner  <per@bothner.com>
+
+	* NumberValue.java (isNaN): New static utility method.
+	* DistinctValues.java (hash): Change algorithm so equal real numbers
+	have the same hash value.
+	(matches): Return true if both values satisfy NumberValue.isNaN.
+	* Compare.java (LENIENT_COMPARISON, LENIENT_EQ): New flags.
+	(equalityComparison): New helper method.
+	(atomicCompare): Fix handling of UntypedAtomic and Boolean.
+	More compliant handling for DateTime and Duration.  Error on
+	mismatched types if not lenient and not an equality comparison.
+	($Ex$Eq, valNe): Should also be true if either argument is NaN.
+	* MinMax.java (minMax): Add hack for NaN.
+	* IntegerRange.java (apply): Do atomization and handle UntypedAtomic.
+	* SequenceUtils.java (indexOf$X): Comparison should be lenient.
+	(deepEqualItems): New helper, to check for NaN.
+	(deepEqual, deepEqualChildren): Use new helper method.
+
+	* NamedCollator.java (UNICODE_CODEPOINT_COLLATION): Match XQTS.
+
 2006-09-30  Per Bothner  <per@bothner.com>
 
 	* Compare.java (atomicCompare): Throw exception if not comparable.

@@ -4,6 +4,7 @@ import gnu.mapping.*;
 import gnu.kawa.util.*;
 import gnu.xml.*;
 import gnu.kawa.xml.*;
+import gnu.math.*;
 
 public class DistinctValues
 {
@@ -80,18 +81,28 @@ class DistinctValuesHashTable extends GeneralHashTable
 
   public int hash (Object key)
   {
+    if (key == null)
+      return 0;
+    if (key instanceof Number
+        && (key instanceof RealNum || !(key instanceof Numeric)))
+      {
+        int hash = Float.floatToIntBits(((Number) key).floatValue());
+        if (hash == 0x80000000) // Map -0.0 to 0
+          hash = 0;
+        return hash;
+      }
     // This mostly-works, but isn't reliable FIXME.
-    // Since DFloNum's hasCode returns the integer value,
-    // we correctly hash decimal and integers together.
-    // However, there are other problems, including that we ignore collation.
-    return key == null ? 0 : key.hashCode();
+    // One problem is that we ignore collation.
+    return key.hashCode();
   }
 
   public boolean matches (Object value1, Object value2)
   {
     if (value1 == value2)
       return true;
-    return Compare.apply(Compare.TRUE_IF_EQU, value1, value2, collator);
+    if (NumberValue.isNaN(value1) && NumberValue.isNaN(value2))
+      return true;
+    return Compare.apply(Compare.LENIENT_EQ, value1, value2, collator);
   }
 }
 

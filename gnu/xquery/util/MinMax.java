@@ -50,7 +50,12 @@ public class MinMax
                    throw new IllegalArgumentException("values cannot be compared");
                  int code = code1 < code2 ? code2 : code1;
                  boolean castNeeded;
-                 if (! NumberCompare.checkCompareCode(rcode, flags))
+                 if (rcode == -2)
+                   {
+                     result = NumberValue.NaN;
+                     castNeeded = true; // For simplicity.
+                   }
+                 else if (! NumberCompare.checkCompareCode(rcode, flags))
                    {
                      castNeeded = code != code2;
                      result = cur;

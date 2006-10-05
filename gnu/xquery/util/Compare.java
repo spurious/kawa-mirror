@@ -6,8 +6,7 @@ import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.math.*;
 import gnu.expr.*;
-import gnu.kawa.xml.KNode;
-import gnu.kawa.xml.UntypedAtomic;
+import gnu.kawa.xml.*;
 
 /** Compares two values (or sequences) according to XPath semantics. */
 
@@ -26,6 +25,8 @@ public class Compare extends Procedure2 implements CanInline
   static final int TRUE_IF_NAN = 1 << (RESULT_NAN + 3);
   static final int TRUE_IF_NEQ = 1 << (RESULT_NEQ + 3);
   static final int VALUE_COMPARISON = 1 << 5;
+  static final int LENIENT_COMPARISON = 1 << 6;
+  static final int LENIENT_EQ = (TRUE_IF_EQU|LENIENT_COMPARISON);
 
   int flags;
 
@@ -91,57 +92,113 @@ public class Compare extends Procedure2 implements CanInline
                          collator);
   }
 
+  public static boolean equalityComparison (int flags)
+  {
+    return ((flags & TRUE_IF_GRT) != 0) == ((flags & TRUE_IF_LSS) != 0);
+  }
+
   public static boolean atomicCompare(int flags, Object arg1, Object arg2,
                                       NamedCollator collator)
   {
-    if (arg1 instanceof Number || arg2 instanceof Number)
-      {
-	if (arg1 instanceof UntypedAtomic)
-          {
-            String str = arg1.toString();
-            if (arg2 instanceof DateTime)
-              arg1 = DateTime.parse(str, ((DateTime) arg2).components());
-            else if (arg2 instanceof Duration)
-              arg1 = Duration.parse(str, ((Duration) arg2).unit());
-            else
-              arg1 = new DFloNum(str);
-          }
-	if (arg2 instanceof UntypedAtomic)
-          {
-            String str = arg2.toString();
-            if (arg1 instanceof DateTime)
-              arg2 = DateTime.parse(str, ((DateTime) arg1).components());
-            else if (arg1 instanceof Duration)
-              arg2 = Duration.parse(str, ((Duration) arg1).unit());
-            else
-              arg2 = new DFloNum(str);
-          }
-        int code = NumberCompare.compare(arg1, arg2, false);
-        if (code == -3)
-          throw new IllegalArgumentException("values cannot be compared");
-        return NumberCompare.checkCompareCode(code, flags);
-      }
     if (arg1 instanceof UntypedAtomic)
       {
-        if (arg2 instanceof String || arg2 instanceof UntypedAtomic)
-          arg1 = arg1.toString();
-        /*
+        String str = arg1.toString();
+        if ((flags & VALUE_COMPARISON) != 0)
+          arg1 = str;
+        else if (arg2 instanceof DateTime)
+          arg1 = DateTime.parse(str, ((DateTime) arg2).components());
+        else if (arg2 instanceof Duration)
+          arg1 = Duration.parse(str, ((Duration) arg2).unit());
+        else if (arg2 instanceof Number)
+          arg1 = new DFloNum(str);
+        else if (arg2 instanceof Boolean)
+          arg1 = XDataType.booleanType.valueOf(str);
         else
-          arg1 = XDataType.getTypeOf(arg2).cast(arg1);
-        */
+          arg1 = str;
       }
     if (arg2 instanceof UntypedAtomic)
       {
-        if (arg1 instanceof String || arg1 instanceof UntypedAtomic)
-          arg2 = arg2.toString();
-        /*
+        String str = arg2.toString();
+        if ((flags & VALUE_COMPARISON) != 0)
+          arg2 = str;
+        else if (arg1 instanceof DateTime)
+          arg2 = DateTime.parse(str, ((DateTime) arg1).components());
+        else if (arg1 instanceof Duration)
+          arg2 = Duration.parse(str, ((Duration) arg1).unit());
+        else if (arg1 instanceof Number)
+          arg2 = new DFloNum(str);
+        else if (arg1 instanceof Boolean)
+          arg2 = XDataType.booleanType.valueOf(str);
         else
-          arg2 = XDataType.getTypeOf(arg1).cast(arg2);
-        */
+          arg2 = str;
       }
     int comp;
-    if (arg1 instanceof Symbol && arg2 instanceof Symbol)
-      comp = arg1.equals(arg2) ? 0 : -3;
+    if (arg1 instanceof Number || arg2 instanceof Number)
+      {
+        if (arg1 instanceof Duration)
+          {
+            if (! (arg2 instanceof Duration))
+              comp = -3;
+            else
+              {
+                Duration d1 = (Duration) arg1;
+                Duration d2 = (Duration) arg2;
+                if ((d1.unit != d2.unit || d1.unit == Unit.duration)
+                    && ! equalityComparison(flags))
+                  comp = -3;
+                else
+                  comp = Duration.compare(d1, d2);
+              }
+          }
+        else if (arg1 instanceof DateTime)
+          {
+            if (! (arg2 instanceof DateTime))
+              comp = -3;
+            else
+              {
+                DateTime d1 = (DateTime) arg1;
+                DateTime d2 = (DateTime) arg2;
+                int m1 = d1.components();
+                int m2 = d2.components();
+                if (m1 != m2)
+                  comp = -3;
+                else if (! equalityComparison(flags)
+                         && m1 != DateTime.TIME_MASK
+                         && m1 != DateTime.DATE_MASK
+                         && m1 != (DateTime.DATE_MASK|DateTime.TIME_MASK))
+                  comp = -3;
+                else
+                  comp = DateTime.compare(d1, d2);
+              }
+          }
+        else if (arg2 instanceof Duration || arg2 instanceof DateTime)
+          comp = -3;
+        else
+          comp = NumberCompare.compare(arg1, arg2, false);
+        if (comp == -3 && (flags & LENIENT_COMPARISON) == 0)
+          throw new IllegalArgumentException("values cannot be compared");
+        return NumberCompare.checkCompareCode(comp, flags);
+      }
+    if (arg1 instanceof Symbol)
+      {
+        if (arg2 instanceof Symbol && equalityComparison(flags))
+          comp = arg1.equals(arg2) ? 0 : -2;
+        else
+          comp = -3;
+      }
+    else if (arg1 instanceof Boolean)
+      {
+        if (arg2 instanceof Boolean)
+          {
+            boolean b1 = ((Boolean) arg1).booleanValue();
+            boolean b2 = ((Boolean) arg2).booleanValue();
+            comp = b1 == b2 ? 0 : b2 ? -1 : 1;
+          }
+        else
+          comp = -3;
+      }
+    else if (arg2 instanceof Boolean || arg2 instanceof Symbol)
+      comp = -3;
     else
       {
         String str1 = arg1.toString();
@@ -152,13 +209,11 @@ public class Compare extends Procedure2 implements CanInline
         else
         /* #endif */
           comp = str1.compareTo(str2);
+        comp = comp < 0 ? -1 : comp > 0 ? 1 : 0;
       }
-    if (comp < 0)
-      return (flags & TRUE_IF_LSS+TRUE_IF_NEQ) != 0;
-    else if (comp > 0)
-      return (flags & TRUE_IF_GRT+TRUE_IF_NEQ) != 0;
-    else
-      return (flags & TRUE_IF_EQU) != 0;
+    if (comp == -3 && (flags & LENIENT_COMPARISON) == 0)
+      throw new IllegalArgumentException("values cannot be compared");
+    return NumberCompare.checkCompareCode(comp, flags);
   }
 
   public Object apply2 (Object arg1, Object arg2)
@@ -177,7 +232,7 @@ public class Compare extends Procedure2 implements CanInline
 
   public static final Compare $Eq   = make("=",TRUE_IF_EQU);
   public static final Compare $Ex$Eq
-  = make("!=",TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_NEQ);
+  = make("!=",TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_NAN|TRUE_IF_NEQ);
   public static final Compare $Gr   = make(">",TRUE_IF_GRT);
   public static final Compare $Gr$Eq= make(">=",TRUE_IF_GRT|TRUE_IF_EQU);
   public static final Compare $Ls   = make("<",TRUE_IF_LSS);
@@ -186,7 +241,7 @@ public class Compare extends Procedure2 implements CanInline
   public static final Compare valEq =
     make("eq",TRUE_IF_EQU|VALUE_COMPARISON);
   public static final Compare valNe =
-    make("ne",TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_NEQ|VALUE_COMPARISON);
+    make("ne",TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_NAN|TRUE_IF_NEQ|VALUE_COMPARISON);
   public static final Compare valGt =
     make("gt",TRUE_IF_GRT|VALUE_COMPARISON);
   public static final Compare valGe =

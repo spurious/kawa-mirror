@@ -1,10 +1,12 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.math.IntNum;
 import gnu.mapping.*;
+import gnu.kawa.xml.KNode;
+import gnu.kawa.xml.UntypedAtomic;
 
 public class IntegerRange extends MethodProc // implements Inlineable
 {
@@ -64,9 +66,15 @@ public class IntegerRange extends MethodProc // implements Inlineable
     Object first = ctx.getNextArg();
     Object last = ctx.getNextArg();
     ctx.lastArg();
+    first = KNode.atomicValue(first);
+    last = KNode.atomicValue(last);
     if (first == Values.empty || first == null
         || last == Values.empty || last == null)
       return;
+    if (first instanceof UntypedAtomic)
+      first = IntNum.valueOf(first.toString().trim(), 10);
+    if (last instanceof UntypedAtomic)
+      last = IntNum.valueOf(last.toString().trim(), 10);
     integerRange((IntNum) first, (IntNum) last, ctx.consumer);
   }
 }

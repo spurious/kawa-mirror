@@ -14,7 +14,7 @@ implements Externalizable
   String name;
 
   public static final String UNICODE_CODEPOINT_COLLATION
-    = "http://www.w3.org/2005/04/xpath-functions/collation/codepoint";
+  = "http://www.w3.org/2005/xpath-functions/collation/codepoint";
 
   public static NamedCollator make (String name)
   {

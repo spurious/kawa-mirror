@@ -7,6 +7,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.NodeTree;
 import gnu.kawa.xml.*;
+import gnu.math.DFloNum;
 /* #ifdef use:org.w3c.dom.Node */
 // import org.w3c.dom.Node;
 /* #endif */
@@ -108,12 +109,12 @@ public class SequenceUtils
         int ipos = vals.startPos();
         int i = 1;
         for (; (ipos = vals.nextPos(ipos)) != 0; i++)
-          if (Compare.apply(Compare.TRUE_IF_EQU,
+          if (Compare.apply(Compare.LENIENT_EQ,
                             vals.getPosPrevious(ipos),
                             srchParam, collator))
             out.writeInt(i);
       }
-    else if (Compare.apply(Compare.TRUE_IF_EQU, seqParam, srchParam, collator))
+    else if (Compare.apply(Compare.LENIENT_EQ, seqParam, srchParam, collator))
       out.writeInt(1);
   }
 
@@ -173,9 +174,7 @@ public class SequenceUtils
               return false;
             String aval1 = KNode.getNodeValue(seq1, attr1);
             String aval2 = KNode.getNodeValue(seq2, attr2);
-            if (! Compare.atomicCompare(Compare.TRUE_IF_EQU,
-                                        aval1, aval2,
-                                        collator))
+            if (! deepEqualItems(aval1, aval2, collator))
               return false;
             attr1 = seq1.nextPos(attr1);
           }
@@ -189,10 +188,9 @@ public class SequenceUtils
         if (seq1.posLocalName(ipos1) != seq2.posLocalName(ipos2)
             || seq1.posNamespaceURI(ipos1) != seq2.posNamespaceURI(ipos2))
           return false;
-        return Compare.atomicCompare(Compare.TRUE_IF_EQU,
-                                     KAttr.getObjectValue(seq1, ipos1),
-                                     KAttr.getObjectValue(seq2, ipos2),
-                                     collator);
+        return deepEqualItems(KAttr.getObjectValue(seq1, ipos1),
+                              KAttr.getObjectValue(seq2, ipos2),
+                              collator);
       case Sequence.PROCESSING_INSTRUCTION_VALUE:
         if (! seq1.posTarget(ipos1).equals(seq2.posTarget(ipos2)))
           return false;
@@ -206,6 +204,14 @@ public class SequenceUtils
         return KNode.getNodeValue(seq1, ipos1)
           .equals(KNode.getNodeValue(seq2, ipos2));
       }
+  }
+
+  public static boolean deepEqualItems (Object arg1, Object arg2,
+                                        NamedCollator collator)
+  {
+    if (NumberValue.isNaN(arg1) || NumberValue.isNaN(arg1))
+      return true;
+    return Compare.atomicCompare(Compare.TRUE_IF_EQU, arg1, arg2, collator);
   }
 
   public static boolean deepEqual (Object arg1, Object arg2,
@@ -246,7 +252,7 @@ public class SequenceUtils
           {
             try
               {
-                if (! Compare.atomicCompare(Compare.TRUE_IF_EQU, arg1, arg2, collator))
+                if (! deepEqualItems(arg1, arg2, collator))
                   return false;
               }
             catch (Throwable ex)

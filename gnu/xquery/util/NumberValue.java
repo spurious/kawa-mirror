@@ -14,6 +14,13 @@ public class NumberValue extends Procedure1
  
   public static final Double NaN = new Double(Double.NaN);
 
+  public static boolean isNaN (Object arg)
+  {
+    return ((arg instanceof Double || arg instanceof Float
+             || arg instanceof DFloNum)
+            && Double.isNaN(((Number) arg).doubleValue()));
+  }
+
   public Object apply1(Object arg)
   {
     if (arg != Values.empty && arg != null)

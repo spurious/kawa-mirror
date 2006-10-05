@@ -343,7 +343,10 @@ public class RunXQTS extends FilterConsumer
     if (failExpected == null)
       {
         if (failed)
-          failCount++;
+          {
+            System.out.println("FAIL: "+testName);
+            failCount++;
+          }
         else if ("cannot tell".equals(result))
           cannotTellCount++;
         else

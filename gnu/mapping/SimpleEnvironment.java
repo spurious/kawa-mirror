@@ -16,10 +16,6 @@ public class SimpleEnvironment extends Environment
   int num_bindings;
   int currentTimestamp;
 
-  /* #ifdef JAVA2 */
-  java.lang.ref.ReferenceQueue queue = new java.lang.ref.ReferenceQueue();
-  /* #endif */
-
   /** Size does not include inherited Locations. */
   public int size () { return num_bindings; }
 

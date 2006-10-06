@@ -1,3 +1,7 @@
+2006-10-06  Per Bothner  <per@bothner.com>
+
+	* SimpleEnvironment.java (queue): Remove unused static field.
+
 2006-09-29  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (<init>): Optimize this constructor if Writer is an

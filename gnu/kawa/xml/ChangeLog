@@ -1,5 +1,7 @@
 2006-10-06  Per Bothner  <per@bothner.com>
 
+	* KProcessingInstruction.java (coerceOrNullMethod): Fix buglet.
+
 	* XTimeType.java (fixedTimeZone): New static field and helper method.
 	(now): Use fxiedTimeZone to match XQuery specification.
 	(parseDateTime): New static helepr method.

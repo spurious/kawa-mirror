@@ -90,7 +90,7 @@ implements TypeValue, Externalizable
   static final Method coerceMethod
     = typeProcessingInstructionType.getDeclaredMethod("coerce", 2);
   static final Method coerceOrNullMethod
-    = typeProcessingInstructionType.getDeclaredMethod("coerceOrNull", 3);
+    = typeProcessingInstructionType.getDeclaredMethod("coerceOrNull", 2);
 
   public void writeExternal(ObjectOutput out) throws IOException
   {

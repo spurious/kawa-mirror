@@ -28,24 +28,34 @@ public class StringUtils
     return ((Number) value).doubleValue();
   }
 
-  static int asDoubleRounded (Object value)
-  {
-    return (int) (asDouble(value) + 0.5);
-  }
-
   public static Object substring (Object str, Object start)
   {
-    int i = asDoubleRounded(start) - 1;
-
+    double d1 = asDouble(start);
+    if (Double.isNaN(d1))
+      return "";
+    int i = (int) (d1 - 0.5);
+    if (i < 0)
+      i = 0;
     return StringValue.stringValue(str).substring(i);
   }
 
   public static Object substring (Object str, Object start, Object length)
   {
-    int i = asDoubleRounded(start) - 1;
-    int len = asDoubleRounded(length);
-
-    return StringValue.stringValue(str).substring(i, i + len);
+    double d1 = asDouble(start);
+    double d2 = asDouble(length);
+    if (Double.isNaN(d1) || Double.isNaN(d2))
+      return "";
+    int i = (int) (d1 - 0.5);
+    int j = i + (int) (d2 + 0.5);
+    if (i < 0)
+      i = 0;
+    String s = StringValue.stringValue(str);
+    int len = s.length();
+    if (j > len)
+      j = len;
+    else if (j <= i)
+      return "";
+    return s.substring(i, j);
   }
 
   public static Object stringLength (Object str)

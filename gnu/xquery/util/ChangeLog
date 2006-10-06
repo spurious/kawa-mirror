@@ -1,5 +1,8 @@
 2006-10-06  Per Bothner  <per@bothner.com>
 
+	* StringUtils.java (substring): Fixes to match specification.
+	(asDoubleRounded): Removed - no longer used.
+
 	* TimeUtils.java (coerceToDateTime, coerceToDate, coerceToTime):
 	Change to use new XTimeType.parseDateTime helper method.
 	* Compare.java (atomicCompare): Likewise.

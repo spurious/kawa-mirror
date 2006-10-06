@@ -6,6 +6,7 @@ import java.util.Calendar;
 import gnu.bytecode.*;
 import gnu.math.*;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class XTimeType extends XDataType
 {
@@ -76,13 +77,38 @@ public class XTimeType extends XDataType
   public DateTime now ()
   {
     return new DateTime(XTimeType.components(typeCode)|DateTime.TIMEZONE_MASK,
-                        (GregorianCalendar) GregorianCalendar.getInstance());
+                        (GregorianCalendar) Calendar.getInstance(fixedTimeZone()));
+
+  }
+
+  private static TimeZone fixedTimeZone;
+  private static synchronized TimeZone fixedTimeZone ()
+  {
+    if (fixedTimeZone == null)
+      {
+        int offset = TimeZone.getDefault().getRawOffset() / 60000;
+        fixedTimeZone = DateTime.minutesToTimeZone(offset);
+      }
+    return fixedTimeZone;
+  }
+
+
+  public static DateTime parseDateTime (String value, int mask)
+  {
+    DateTime time = DateTime.parse(value, mask);
+    // Replace an implicit timezone by by one that is fixed wrt DST.
+    // I.e. TimeZone.getDefault() may be a timezone whose offset varies
+    // depending upon whether Daylight Savings Time is in effect.
+    // Replace it by one with a fixed offset.  This is required for
+    // XQuery semantics, though I believe it is wrong.
+    if (time.isZoneUnspecified())
+      time.setTimeZone(fixedTimeZone());
+    return time;
   }
 
   public Object valueOf (String value)
   {
-    int mask = XTimeType.components(typeCode);
-    return DateTime.parse(value, mask);
+    return parseDateTime(value, XTimeType.components(typeCode));
   }
 
   public boolean isInstance (Object obj)

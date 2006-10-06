@@ -106,7 +106,7 @@ public class Compare extends Procedure2 implements CanInline
         if ((flags & VALUE_COMPARISON) != 0)
           arg1 = str;
         else if (arg2 instanceof DateTime)
-          arg1 = DateTime.parse(str, ((DateTime) arg2).components());
+          arg1 = XTimeType.parseDateTime(str, ((DateTime) arg2).components());
         else if (arg2 instanceof Duration)
           arg1 = Duration.parse(str, ((Duration) arg2).unit());
         else if (arg2 instanceof Number)
@@ -122,7 +122,7 @@ public class Compare extends Procedure2 implements CanInline
         if ((flags & VALUE_COMPARISON) != 0)
           arg2 = str;
         else if (arg1 instanceof DateTime)
-          arg2 = DateTime.parse(str, ((DateTime) arg1).components());
+          arg2 = XTimeType.parseDateTime(str, ((DateTime) arg1).components());
         else if (arg1 instanceof Duration)
           arg2 = Duration.parse(str, ((Duration) arg1).unit());
         else if (arg1 instanceof Number)

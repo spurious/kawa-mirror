@@ -1,3 +1,9 @@
+2006-10-06  Per Bothner  <per@bothner.com>
+
+	* TimeUtils.java (coerceToDateTime, coerceToDate, coerceToTime):
+	Change to use new XTimeType.parseDateTime helper method.
+	* Compare.java (atomicCompare): Likewise.
+
 2006-10-04  Per Bothner  <per@bothner.com>
 
 	* NumberValue.java (isNaN): New static utility method.

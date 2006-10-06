@@ -605,6 +605,23 @@ public class DateTime extends Quantity implements Cloneable
     return calendar.getTimeZone().getRawOffset() / 60000;
   }
 
+  /** Get a TimeZone object for a given offset.
+   * @param minutes timezone offset in minutes.
+   */
+  public static TimeZone minutesToTimeZone (int minutes)
+  {
+    if (minutes == 0)
+      return DateTime.GMT;
+    StringBuffer sbuf = new StringBuffer("GMT");
+    toStringZone(minutes, sbuf);
+    return TimeZone.getTimeZone(sbuf.toString());
+  }
+
+  public void setTimeZone (TimeZone timeZone)
+  {
+    calendar.setTimeZone(timeZone);
+  }
+
   public void toStringZone(StringBuffer sbuf)
   {
     if (isZoneUnspecified())

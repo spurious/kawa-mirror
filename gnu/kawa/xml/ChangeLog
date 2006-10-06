@@ -1,3 +1,10 @@
+2006-10-06  Per Bothner  <per@bothner.com>
+
+	* XTimeType.java (fixedTimeZone): New static field and helper method.
+	(now): Use fxiedTimeZone to match XQuery specification.
+	(parseDateTime): New static helepr method.
+	(valueOf): Use parseDateTime
+
 2006-09-30  Per Bothner  <per@bothner.com>
 
 	* Document.java (parse, parseCached): Use new writeDocumentUri

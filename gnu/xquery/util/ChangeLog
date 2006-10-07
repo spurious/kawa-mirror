@@ -1,5 +1,7 @@
 2006-10-06  Per Bothner  <per@bothner.com>
 
+	* ArithOp.java (apply2): Fix errors in handling invalid argument types.
+
 	* StringUtils.java (substring): Fixes to match specification.
 	(asDoubleRounded): Removed - no longer used.
 

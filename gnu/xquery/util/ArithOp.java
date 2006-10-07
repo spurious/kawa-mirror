@@ -83,7 +83,8 @@ public class ArithOp extends Procedure1or2
     switch (op)
       {
       case 'd': // 'div'
-        if (code1 < 0 || code2 < 0) ;
+        if (code1 < 0 || code2 < 0)
+          break;
         else if (code <= Arithmetic.RATNUM_CODE)
           {
             BigDecimal d1 = (BigDecimal) XDataType.decimalType.cast(arg1);
@@ -125,9 +126,10 @@ public class ArithOp extends Procedure1or2
           return new BigDecimal(Duration.div((Duration) arg1, (Duration) arg2));
         else if (code >= 0)
           return Arithmetic.asNumeric(arg1).div(Arithmetic.asNumeric(arg2));
-        break;
       case 'i': // 'idiv'
-        if (code <= Arithmetic.INTNUM_CODE)
+        if (code1 < 0 || code2 < 0)
+          break;
+        else if (code <= Arithmetic.INTNUM_CODE)
           {
             IntNum i1 = Arithmetic.asIntNum(arg1);
             IntNum i2 = Arithmetic.asIntNum(arg2);
@@ -155,7 +157,9 @@ public class ArithOp extends Procedure1or2
             return RealNum.toExactInt(d, RealNum.TRUNCATE); 
           }
       case 'm': // 'mod'
-        if (code <= Arithmetic.INTNUM_CODE)
+        if (code1 < 0 || code2 < 0)
+          break;
+        else if (code <= Arithmetic.INTNUM_CODE)
           {
             IntNum i1 = Arithmetic.asIntNum(arg1);
             IntNum i2 = Arithmetic.asIntNum(arg2);

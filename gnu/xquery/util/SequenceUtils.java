@@ -47,6 +47,42 @@ public class SequenceUtils
     return ! (arg instanceof Values && ((Values) arg).isEmpty());
   }
 
+  public static void insertBefore$X (Object target, long position,
+                                     Object inserts, CallContext ctx)
+  {
+    Consumer out = ctx.consumer;
+    boolean written = false;
+    if (position <= 0)
+      position = 1;
+    if (target instanceof Values)
+      {
+        Values values = (Values) target;
+        int ipos  = 0;
+        long i = 0;
+        for (;;)
+          {
+            int next = values.nextPos(ipos);
+            if ((next == 0 && ! written) || ++i == position)
+              {
+                Values.writeValues(inserts, out);
+                written = true;
+              }
+            if (next == 0)
+              break;
+            values.consumePosRange(ipos, next, out);
+            ipos = next;
+          }
+      }
+    else
+      {
+        if (position <= 1)
+          Values.writeValues(inserts, out);
+        out.writeObject(target);
+        if (position > 1)
+          Values.writeValues(inserts, out);
+      }
+  }
+
   public static void remove$X (Object arg, long position, CallContext ctx)
   {
     Consumer out = ctx.consumer;

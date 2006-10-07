@@ -563,6 +563,8 @@ public class XQuery extends Language
 		  "isEmptySequence");
     define_method("exists", "gnu.xquery.util.SequenceUtils",
 		  "exists");
+    define_method("insert-before", "gnu.xquery.util.SequenceUtils",
+		  "insertBefore$X");
     define_method("remove", "gnu.xquery.util.SequenceUtils",
 		  "remove$X");
     define_method("reverse", "gnu.xquery.util.SequenceUtils",
@@ -608,6 +610,7 @@ public class XQuery extends Language
     define_method("concat", "gnu.xquery.util.StringUtils", "concat$V");
     define_method("matches", "gnu.xquery.util.StringUtils", "matches");
     define_method("replace", "gnu.xquery.util.StringUtils", "replace");
+    define_method("tokenize", "gnu.xquery.util.StringUtils", "tokenize$X");
     define_method("string-to-codepoints", "gnu.xquery.util.StringUtils",
 		  "stringToCodepoints$X");
     define_method("codepoints-to-string", "gnu.xquery.util.StringUtils",
@@ -621,6 +624,8 @@ public class XQuery extends Language
                   "roundHalfToEven");
 
     define_method("QName", "gnu.xquery.util.QNameUtils", "makeQName");
+    define_method("resolve-QName", "gnu.xquery.util.QNameUtils",
+                  "resolveQNameUsingElement");
     define_method("prefix-from-QName", "gnu.xquery.util.QNameUtils",
 		  "prefixFromQName");
     define_method("local-name-from-QName", "gnu.xquery.util.QNameUtils",

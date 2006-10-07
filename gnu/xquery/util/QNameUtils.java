@@ -5,6 +5,37 @@ import gnu.kawa.xml.*;
 
 public class QNameUtils
 {
+  public static Object resolveQNameUsingElement (Object qname, KElement node)
+  {
+    qname = KNode.atomicValue(qname);
+    if (qname == Values.empty || qname == null)
+      return qname;
+    if (qname instanceof Values
+        || ! (qname instanceof String || qname instanceof UntypedAtomic))
+      throw new RuntimeException("bad argument to QName");
+    String name = qname.toString();
+    int colon = name.indexOf(':');
+    String prefix, localPart, uri;
+    if (colon < 0)
+      {
+	localPart = name;
+	prefix = null;
+        uri = "";
+      }
+    else
+      {
+	prefix = name.substring(0, colon).intern();
+	localPart = name.substring(colon+1);
+        uri =  node.lookupNamespaceURI(prefix);
+      }
+    if (! validNCName(localPart)
+	|| (prefix != null && ! validNCName(prefix)))
+      {
+	throw new RuntimeException("invalid QName syntax '"+name+"'");
+      }
+    return Symbol.make(uri, localPart, prefix == null ? "" : prefix);
+  }
+
   /** Method called from compiled code to "cast" to a QName.
    * @param qname The value to cast to QName.
    * @param constructorNamespaces Namespace bindings from namespace
@@ -49,12 +80,20 @@ public class QNameUtils
                                       NamespaceBinding prologNamespaces)
   {
     String uri;
-    if (constructorNamespaces == null)
-      uri = null;
-    else
-      uri = constructorNamespaces.resolve(prefix);
-    if (uri == null)
-      uri = prologNamespaces.resolve(prefix);
+
+    for (NamespaceBinding ns = constructorNamespaces; ; ns = ns.getNext())
+      {
+        if (ns == null)
+          {
+            uri = prologNamespaces.resolve(prefix);
+            break;
+          }
+	if (ns.getPrefix() == prefix || ns.getUri() == null)
+          {
+            uri = ns.getUri();
+            break;
+          }
+      }
     if (uri == null)
       {
 	if (prefix == null)
@@ -89,6 +128,11 @@ public class QNameUtils
 	localPart = paramQName.substring(colon+1);
 	prefix = paramQName.substring(0, colon).intern();
       }
+    if (! validNCName(localPart)
+	|| (colon >= 0 && ! validNCName(prefix)))
+      throw new IllegalArgumentException("invalid QName syntax '"+paramQName+"'");
+    if (colon >= 0 && namespaceURI.length() == 0)
+      throw new IllegalArgumentException("empty uri for '"+paramQName+"'");
     return Symbol.make(namespaceURI, localPart, prefix);
   }
 
@@ -106,7 +150,12 @@ public class QNameUtils
     if (name == Values.empty || name == null)
       return name;
     if (name instanceof Symbol)
-      return ((Symbol) name).getPrefix();
+      {
+        String prefix = ((Symbol) name).getPrefix();
+        if (prefix == null || prefix.length() == 0)
+          return Values.empty;
+        return prefix;
+      }
     throw WrongType.make(null, "prefix-from-QName", 1, name);
   }
 
@@ -119,13 +168,17 @@ public class QNameUtils
     throw WrongType.make(null, "namespace-uri", 1, name);
   }
 
-  public static Object namespaceURIForPrefix (String prefix,
+  public static Object namespaceURIForPrefix (Object prefix,
 					      Object element)
   {
     KNode el = KNode.coerce(element);
     if (el == null)
-      throw WrongType.make(null, "anmespace-uri-for-prefix", 2, element);
-    String uri = el.lookupNamespaceURI(prefix);
+      throw WrongType.make(null, "namespace-uri-for-prefix", 2, element);
+    if (prefix == null || prefix == Values.empty)
+      prefix = "";
+    else if (! (prefix instanceof String || prefix instanceof UntypedAtomic))
+      throw WrongType.make(null, "namespace-uri-for-prefix", 1, element);
+    String uri = el.lookupNamespaceURI(prefix.toString());
     if (uri == null)
       return Values.empty;
     else

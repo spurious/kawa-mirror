@@ -1,3 +1,21 @@
+2006-10-07  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (tokenize$X): New method.
+
+	* QNameUtils.java (resolveQNameUsingElement): New method.
+
+	* QNameUtils.java (resolveQName): "Inline" call to method resolve in
+	NamespaceBinding because resolve is wrong for "undeclare".
+
+	* QNameUtils.java (makeQName): Call validNCName - currently a dummy.
+
+	* QNameUtils.java (prefixFromQName): Fix return value for no match.
+
+	* QNameUtils.java (namespaceURIForPrefix): Handle empty sequence
+	or bad types for prefix.
+
+	* SequenceUtils.java (insertBefore$X): New method.
+
 2006-10-06  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java (localName, namespaceURI): Add error-checking.

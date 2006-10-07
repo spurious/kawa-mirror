@@ -8,6 +8,7 @@ import gnu.mapping.*;
 import gnu.kawa.xml.StringValue;
 import gnu.kawa.xml.UntypedAtomic;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class StringUtils
 {
@@ -442,6 +443,44 @@ public class StringUtils
     /* #else */
     // throw new Error("fn:replace requires java.util.regex (JDK 1.4 or equivalent)");
     /* #endif */
+  }
+
+  public static void tokenize$X (Object arg, String pattern, CallContext ctx)
+  {
+    tokenize$X(arg, pattern, "", ctx);
+  }
+
+  public static void tokenize$X (Object arg, String pattern,
+                                 String flags, CallContext ctx)
+  {
+    /* #ifdef use:java.util.regex */
+    String str;
+    if (arg instanceof String || arg instanceof UntypedAtomic)
+      str = arg.toString();
+    else if (arg == null || arg == Values.empty)
+      str = "";
+    else
+      throw new ClassCastException();
+    Consumer out = ctx.consumer;
+    Matcher matcher = makePattern(pattern, flags).matcher(str);
+    int len = str.length();
+    if (len == 0)
+      return;
+    int start = 0;
+    for (;;)
+      {
+        boolean matched = matcher.find();
+        if (! matched)
+          {
+            out.writeObject(str.substring(start));
+            break;
+          }
+        int end = matcher.start();
+        out.writeObject(str.substring(start, end));
+        start = matcher.end();
+        if (start == end)
+          throw new IllegalArgumentException("pattern matches empty string");
+      }
   }
 
   public static Object codepointEqual (Object arg1, Object arg2)

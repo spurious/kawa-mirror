@@ -23,6 +23,8 @@ public class NodeUtils
   {
     if (node == Values.empty || node == null)
       return "";
+    if (! (node instanceof KNode))
+      throw new WrongType("local-name", 1, node, "node()?");
     Object name = NodeName.nodeName(node);
     if (name == null || name == Values.empty)
       return "";
@@ -33,6 +35,8 @@ public class NodeUtils
   {
     if (node == Values.empty || node == null)
       return "";
+    if (! (node instanceof KNode))
+      throw new WrongType("namespace-uri", 1, node, "node()?");
     Object name = NodeName.nodeName(node);
     if (name == null || name == Values.empty)
       return "";
@@ -47,7 +51,21 @@ public class NodeUtils
          ns = ns.getNext())
       {
         String prefix = ns.getPrefix();
-        out.writeObject(prefix == null ? "" : prefix);
+        // Check for duplicates.  This is an O(n^2) algorthm, but these
+        // lists are usually quite short ...
+        for (NamespaceBinding ns2 = bindings;  ; ns2 = ns2.getNext())
+           {
+             if (ns2 == ns)
+               {
+                 out.writeObject(prefix == null ? "" : prefix);
+                 break;
+               }
+             if (ns2.getPrefix() == prefix)
+               {
+                 // Previously written.
+                 break;
+               }
+           }
       }
   }
 

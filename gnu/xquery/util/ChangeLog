@@ -1,5 +1,9 @@
 2006-10-06  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (localName, namespaceURI): Add error-checking.
+
+	* NodeUtils.java (prefixesFromNodetype): Remove duplicates from result.
+
 	* ArithOp.java (apply2): Fix errors in handling invalid argument types.
 
 	* StringUtils.java (substring): Fixes to match specification.

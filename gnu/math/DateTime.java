@@ -19,6 +19,7 @@ public class DateTime extends Quantity implements Cloneable
 {
   Unit unit = Unit.date;
 
+  /** Fractional seconds, in units of nanoseconds. */
   int nanoSeconds;
   GregorianCalendar calendar;
   int mask;
@@ -141,16 +142,17 @@ public class DateTime extends Quantity implements Cloneable
         negYear = true;
       }
     int pos = start;
-    int part;
+    int part, year, month;
     if ((mask & YEAR_MASK) == 0)
       {
         if (! negYear)
           return -1;
+        year = -1;
       }
     else
       {
         part = parseDigits(str, pos);
-        int year = part >> 16;
+        year = part >> 16;
         pos = part & 0xffff;
         if (pos != start+4 && (pos <=start+4 || str.charAt(start) == '0'))
           return -1;
@@ -170,22 +172,25 @@ public class DateTime extends Quantity implements Cloneable
     if ((mask & MONTH_MASK) != 0)
       {
         part = parseDigits(str, start);
-        int month = part >> 16;
+        month = part >> 16;
         pos = part & 0xffff;
-        if (month > 0 && month <= 12 && pos == start + 2)
-          {
-            calendar.set(Calendar.MONTH, month-1);
-          }
+        if (month <= 0 || month > 12 || pos != start + 2)
+          return -1;
+        calendar.set(Calendar.MONTH, month-1);
         if ((mask & DAY_MASK) == 0)
           return pos;
       }
+    else
+      month = -1;
     if (pos >= len || str.charAt(pos) != '-')
       return -1;
     start = pos+1;
     part = parseDigits(str, start);
     int day = part >> 16;
     pos = part & 0xffff;
-    if (day > 0 && day <= 31 && pos == start+2)
+    if (day > 0
+        && day <= (((mask & DATE_MASK) == DATE_MASK) ? daysInMonth(month-1, year) : 31)
+        && pos == start+2)
       {
         calendar.set(Calendar.DATE, day);
         return pos;
@@ -251,7 +256,10 @@ public class DateTime extends Quantity implements Cloneable
       return start;
     start++;
     int part = parseDigits(str, start);
-    int minute = 60 * (part >> 16);
+    int hour = part >> 16;
+    if (hour > 14)
+      return 0;
+    int minute = 60 * hour;
     int pos = part & 0xffff;
     if (pos != start+2)
       return 0;
@@ -261,8 +269,11 @@ public class DateTime extends Quantity implements Cloneable
           {
             start = pos+1;
             part = parseDigits(str, start);
-            minute += (part >> 16);
             pos = part & 0xffff;
+            part >>= 16;
+            if (part > 0 && (part >= 60 || hour == 14))
+              return 0;
+            minute += part;
             if (pos!=start+2)
               return 0;
           }
@@ -470,6 +481,9 @@ public class DateTime extends Quantity implements Cloneable
 
   public static DateTime add (DateTime x, Duration y, int k)
   {
+    if (y.unit == Unit.duration
+        || (y.unit == Unit.month && (x.mask & DATE_MASK) != DATE_MASK))
+      throw new IllegalArgumentException("invalid date/time +/- duration combinatuion");
     DateTime r = new DateTime(x.mask, (GregorianCalendar) x.calendar.clone());
     if (y.months != 0)
       {
@@ -497,14 +511,21 @@ public class DateTime extends Quantity implements Cloneable
           day = daysInMonth;
         r.calendar.set(year, month, day);
       }
-    long nanos = y.seconds * 1000000000L + y.nanos;
+    long nanos = x.nanoSeconds + k * (y.seconds * 1000000000L + y.nanos);
     if (nanos != 0)
       {
-        nanos = x.nanoSeconds + k * nanos;
-        long millis = x.calendar.getTimeInMillis();
-        millis += nanos / 1000000L;
+        if ((x.mask & TIME_MASK) == 0)
+          { // Truncate to 00:00:00
+            long nanosPerDay = 1000000000L * 24 * 60 * 60;
+            long mod = nanos % nanosPerDay;
+            if (mod < 0)
+              mod += nanosPerDay;
+            nanos -= mod;
+          }
+        long millis = r.calendar.getTimeInMillis();
+        millis += (nanos / 1000000000L) * 1000;
         r.calendar.setTimeInMillis(millis);
-        r.nanoSeconds = (int) (nanos % 1000000L);
+        r.nanoSeconds = (int) (nanos % 1000000000L);
       }
     return r;
   }

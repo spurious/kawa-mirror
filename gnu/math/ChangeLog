@@ -1,5 +1,21 @@
 2006-10-06  Per Bothner  <per@bothner.com>
 
+	* DateTime.java (parseDate): Check that day and month are in range.
+	(parseZoneMinutes): Check that time zone offset is in range.
+	(add): Check that argument types are allowed.
+
+	* DateTime.java (add): Fix some logic errors.
+	If TIME_MASK is clear, truncate to 00:00:00.
+
+	* Duration.java (valueOf): Plain "P" is an error.
+
+	* Duration (add):  Handle Duration+DateTime as DateTime+Duration.
+	(div): Check for divide by 0.0 or NaN.
+	(add, times): More checking for invalid arguments.
+
+	* Numeric.java (compare): Tweak specification of return codes.
+	* Duration.java (compare): Return -2 if unequal.
+
 	* DateTime.java (minutesToTimeZone): New static method.
 	(setTimeZone): New method.
 

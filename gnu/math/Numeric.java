@@ -37,8 +37,11 @@ public abstract class Numeric extends java.lang.Number
   public static final int TRUNCATE = 3;
   public static final int ROUND = 4;
 
-  /** Return 1 if this>obj; 0 if this==obj; -1 if this<obj;
-   * -2 if either is NaN; -3 if not comparable (not equal). */
+  /** Return an integer for which of {# code this} or {#code obj} is larger.
+   * Return 1 if {@code this>obj}; 0 if {@code this==obj};
+   * -1 if {@code this<obj};
+   * -2 if {@code this!=obj} otherwise (for example if either is NaN);
+   * -3 if not comparable (incompatible types). */
   public int compare (Object obj)
   {
     return -3;

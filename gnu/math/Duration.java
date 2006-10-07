@@ -85,7 +85,7 @@ public class Duration extends Quantity implements Externalizable
       }
     else
       negative = false;
-    if (pos == len || str.charAt(pos) != 'P')
+    if (pos + 1 >= len || str.charAt(pos) != 'P')
       return null;
     pos++;
     int months = 0, seconds = 0, nanos = 0;
@@ -189,6 +189,8 @@ public class Duration extends Quantity implements Externalizable
   {
     if (y instanceof Duration)
       return Duration.add (this, (Duration) y, k);
+    if (y instanceof DateTime && k == 1)
+      return DateTime.add((DateTime) y, this, 1);
     throw new IllegalArgumentException ();
   }
 
@@ -230,7 +232,12 @@ public class Duration extends Quantity implements Externalizable
   public Numeric div (Object y)
   {
     if (y instanceof RealNum)
-      return Duration.times(this, 1.0 / ((RealNum) y).doubleValue());
+      {
+        double dy = ((RealNum) y).doubleValue();
+        if (dy == 0 || Double.isNaN(dy))
+          throw new ArithmeticException("divide of duration by 0 or NaN");
+        return Duration.times(this, 1.0 / dy);
+      }
     if (y instanceof Duration)
       return new DFloNum(div(this, (Duration) y));
     return ((Numeric)y).divReversed (this);
@@ -249,15 +256,21 @@ public class Duration extends Quantity implements Externalizable
     d.months = (int) months;
     d.seconds = (int) (nanos / 1000000000L);
     d.nanos = (int) (nanos % 1000000000L);
-    d.unit = x.unit == y.unit ? x.unit : Unit.duration;
+    if (x.unit != y.unit || x.unit == Unit.duration)
+      throw new ArithmeticException("cannot add these duration types");
+    d.unit = x.unit;
     return d;
   }
 
   public static Duration times (Duration x, double y)
   {
+    if (x.unit == Unit.duration)
+      throw new IllegalArgumentException("cannot multiply general duration");
     if (Double.isNaN(y))
       throw new ArithmeticException("multiplying a duration by NaN");
     double months = x.months * y;
+    if (Double.isInfinite(months))
+      throw new ArithmeticException("overflow when multiplying a duration");
     double nanos = (x.seconds * 1000000000L + x.nanos) * y;
     Duration d = new Duration();
     d.months = (int) Math.floor(months + 0.5);
@@ -278,7 +291,7 @@ public class Duration extends Quantity implements Externalizable
       return 1;
     if (months == 0)
       return nanos < 0 ? -1 : nanos > 0 ? 1 : 0;
-    return -3;
+    return -2;
   }
 
   public int compare (Object obj)

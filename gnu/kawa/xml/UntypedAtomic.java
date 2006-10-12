@@ -19,4 +19,15 @@ public class UntypedAtomic
   {
     this.text = text;
   }
+
+  public int hashCode ()
+  {
+    return text.hashCode();
+  }
+
+  public boolean equals (Object arg)
+  {
+    return arg instanceof UntypedAtomic
+      && text.equals(((UntypedAtomic) arg).text);
+  }
 }

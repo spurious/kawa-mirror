@@ -75,7 +75,12 @@ public class MinMax
 	  }
       }
     else
-      return convert(arg);
+      {
+        arg = convert(arg);
+        // An easy way to check that arg has a valid type.
+        Compare.atomicCompare(Compare.TRUE_IF_GRT, arg, arg, collation);
+        return arg;
+      }
   }
 
   static Object convert (Object arg)

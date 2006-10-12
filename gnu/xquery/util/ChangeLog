@@ -1,5 +1,8 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* MinMax.java (minMax): Add a dummy compare for singleton case,
+	which is a easy way to check for an invalid value.
+
 	* SubList.java: Use double lower and upper boand, to match 
 	specification.  This fixes some corner cases.
 

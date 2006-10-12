@@ -49,7 +49,7 @@ public class Duration extends Quantity implements Externalizable
   {
     Duration d = Duration.valueOf(str, unit);
     if (d == null)
-      throw new IllegalArgumentException("not a valid "+unit.getName()+": '"+str+"'");
+      throw new IllegalArgumentException("not a valid "+unit.getName()+" duration: '"+str+"'");
     return d;
   }
 
@@ -108,8 +108,12 @@ public class Duration extends Quantity implements Externalizable
         part = scanPart(str, pos);
         ch = (char) part;
       }
+    if (unit == Unit.month && pos != len)
+      return null;
     if (ch == 'D')
       {
+        if (unit == Unit.month)
+          return null;
         seconds = (24 * 60 * 60) * (int) (part >> 32);
         pos = ((int) part) >> 16;
         part = scanPart (str, pos);
@@ -120,13 +124,12 @@ public class Duration extends Quantity implements Externalizable
       {
         // No time part
       }
-    else if (str.charAt(pos) != 'T')
+    else if (str.charAt(pos) != 'T' || ++pos == len)
       return null;
     else // saw 'T'
       {
         if (unit == Unit.month)
           return null;
-        pos++; // Skip 'T'.
         part = scanPart (str, pos);
         ch = (char) part;
         if (ch == 'H')

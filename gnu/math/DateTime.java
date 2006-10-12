@@ -188,12 +188,18 @@ public class DateTime extends Quantity implements Cloneable
     part = parseDigits(str, start);
     int day = part >> 16;
     pos = part & 0xffff;
-    if (day > 0
-        && day <= (((mask & DATE_MASK) == DATE_MASK) ? daysInMonth(month-1, year) : 31)
-        && pos == start+2)
+    if (day > 0 && pos == start+2)
       {
-        calendar.set(Calendar.DATE, day);
-        return pos;
+        int maxDay;
+        if ((mask & MONTH_MASK) == 0)
+          maxDay = 31;
+        else
+          maxDay = daysInMonth(month-1, (mask & YEAR_MASK) != 0 ? year : 2000);
+        if (day <= maxDay)
+          {
+            calendar.set(Calendar.DATE, day);
+            return pos;
+          }
       }
     return -1;
   }
@@ -278,6 +284,8 @@ public class DateTime extends Quantity implements Cloneable
               return 0;
           }
       }
+    else // The minutes part is not optional.
+      return 0;
     if (minute > 840)
       return 0;
     if (ch == '-')
@@ -307,7 +315,8 @@ public class DateTime extends Quantity implements Cloneable
             part = parseDigits(str, start);
             int second = part >> 16;
             pos = part & 0xffff;
-            if (second <= 60 && pos == start+2)
+            // We don't allow/handle leap seconds.
+            if (second < 60 && pos == start+2)
               {
                 if (pos + 1 < len && str.charAt(pos) == '.'
                     && Character.digit(str.charAt(pos+1), 10) >= 0)
@@ -330,6 +339,9 @@ public class DateTime extends Quantity implements Cloneable
                       nanos = 10 * nanos;
                     nanoSeconds = nanos;
                   }
+                if (hour == 24
+                    && (minute != 0 || second != 0 || nanoSeconds != 0))
+                  return -1;
                 calendar.set(Calendar.HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE, minute);
                 calendar.set(Calendar.SECOND, second);

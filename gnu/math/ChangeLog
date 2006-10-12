@@ -1,3 +1,15 @@
+2006-10-11  Per Bothner  <per@bothner.com>
+
+	* Duration.java (parse): Slightly improved error message.
+
+	* Duration.java (valueOf): Catch more errors.
+
+	* DateTime.java (parsedate): Before strict about syntax, and
+	range of days in month.
+	(parseZoneMinutes): The minutes part of the offset is not optional.
+	(parseTime): We don' allow leap seconds - i.e. second 60.
+	(parseTime): If the hour is 24, minutes and seconds must be 0.
+
 2006-10-06  Per Bothner  <per@bothner.com>
 
 	* DateTime.java (parseDate): Check that day and month are in range.

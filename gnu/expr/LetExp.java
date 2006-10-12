@@ -199,17 +199,22 @@ public class LetExp extends ScopeExp
     return walker.walkLetExp(this);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  public void walkInitializers (ExpWalker walker)
   {
     Declaration decl = firstDecl();
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
-	Expression init0 = inits[i];
-	Expression init = walker.walk(init0);
-	inits[i] = init;
-	if (decl.value == init0)
+        Expression init0 = inits[i];
+        Expression init = walker.walk(init0);
+        inits[i] = init;
+        if (decl.value == init0)
           decl.value = init;
       }
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    walkInitializers(walker);
     if (walker.exitValue == null)
       body = (Expression) walker.walk(body);
   }

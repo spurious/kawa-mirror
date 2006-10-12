@@ -51,6 +51,15 @@ public class ResolveNames extends ExpWalker
     return exp;
   }
 
+  protected Expression walkLetExp (LetExp exp)
+  {
+    exp.walkInitializers(this);
+    push(exp);
+    exp.body = (Expression) walk(exp.body);
+    lookup.pop(exp);
+    return exp;
+  }
+
   public Declaration lookup (Expression exp, Object symbol, boolean function)
   {
     return lookup.lookup(symbol, function);

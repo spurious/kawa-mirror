@@ -1,5 +1,10 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (walkInitializers): New method.
+	(walkChildren): Use walkInitializers.
+	* ResolveNames.java (walkLetExp): New method. Uses walkInitializers
+	to walk initializers *before* pushing declarations.
+
 	* PrimProcedure.java (<init>): New convenience constructor.
 
 	* PrimProcedure.java (compileInvoke): Fix handling of IgnoreTarget

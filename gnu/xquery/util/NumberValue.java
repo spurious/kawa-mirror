@@ -78,9 +78,11 @@ public class NumberValue extends Procedure1
       {
         Double d = (Double) value;
         double x = d.doubleValue();
-        if (x >= 0)
+        long bits = Double.doubleToRawLongBits(x);
+        if (bits >= 0)
           return d;
-        x = -x;
+        bits &= 0x7fffffffffffffffL;
+        x = Double.longBitsToDouble(bits);
         /* #ifdef JAVA5 */
         // return Double.valueOf(x);
         /* #else */
@@ -91,9 +93,11 @@ public class NumberValue extends Procedure1
       {
         Float d = (Float) value;
         float x = d.floatValue();
-        if (x >= 0)
+        int bits = Float.floatToRawIntBits(x);
+        if (bits >= 0)
           return d;
-        x = -x;
+        bits &= 0x7fffffff;
+        x = Float.intBitsToFloat(bits);
         /* #ifdef JAVA5 */
         // return Float.valueOf(x) ;
         /* #else */

@@ -1,5 +1,8 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* CommentConstructor.java (apply): Handle the case when an argument
+	is multiple Values.
+
 	* Base64Binary.java (toString): Fix buglet.
 
 2006-10-06  Per Bothner  <per@bothner.com>

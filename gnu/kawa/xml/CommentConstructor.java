@@ -27,7 +27,14 @@ public class CommentConstructor extends MethodProc // NodeConstructor
 	      break;
 	    if (i > 0)
 	      sbuf.append(' ');
-	    StringValue.stringValue(arg, sbuf);
+            if (arg instanceof Values)
+              {
+                Values vals = (Values) arg;
+                for (int it = 0;  (it = vals.nextPos(it)) != 0; )
+                  StringValue.stringValue(vals.getPosPrevious(it), sbuf);
+              }
+            else
+              StringValue.stringValue(arg, sbuf);
 	  }
 	int len = sbuf.length();
 	char[] buf = new char[len];

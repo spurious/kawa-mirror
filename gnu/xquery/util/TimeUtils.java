@@ -226,8 +226,13 @@ public class TimeUtils
     DateTime dtime = (DateTime) time;
     if (zone == Values.empty || zone == null)
       return dtime.withZoneUnspecified();
-    else
-      return dtime.adjustTimezone((int) ((Duration) zone).getTotalMinutes());
+    Duration d = (Duration) zone;
+    if (d.getNanoSecondsOnly() != 0 || d.getSecondsOnly() != 0)
+      throw new IllegalArgumentException("timezone offset with fractional minute");
+    int delta = (int) d.getTotalMinutes();
+    if (delta < -14 * 60 || delta > 14 * 60)
+      throw new IllegalArgumentException("timezone offset out of range");
+    return dtime.adjustTimezone(delta);
   }
 
   public static DateTime now ()

@@ -1,3 +1,11 @@
+2006-10-11  Per Bothner  <per@bothner.com>
+
+	* BooleanValue.java (booleanValue): Don't allow non-RealNum Numerics.
+	Specifically disallow Duration and DateTime values.
+
+	* TimeUtils.java (adjustDateTimeToTimezone): Check that zone offset
+	is within range and an integral number of minutes.
+
 2006-10-07  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (tokenize$X): New method.

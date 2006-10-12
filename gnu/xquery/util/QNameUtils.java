@@ -106,8 +106,7 @@ public class QNameUtils
 
   public static boolean validNCName (String name)
   {
-    // FIXME should check the syntax is valid for an NCName.
-    return true;
+    return XName.isName(name);
   }
 
   /** This implements the <code>fn:QName</code> standard function. */

@@ -1,5 +1,8 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (validNCName): Implement using new XName.isName
+	method.
+
 	* StringUtils.java (concat$V): Add initial 2 parameters, so we can
 	catch calls with too few arguments.
 	Also, use StringBuilder if JAVA5.

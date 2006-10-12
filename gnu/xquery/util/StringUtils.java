@@ -181,11 +181,17 @@ public class StringUtils
     return s.toString();
   }
 
-  public static String concat$V (Object[] args)
+  public static String concat$V (Object arg1, Object arg2, Object[] args)
   {
+    String str1 = StringValue.stringValue(arg1);
+    String str2 = StringValue.stringValue(arg2);
+    /* #ifdef JAVA5 */
+    // StringBuilder result = new StringBuilder(str1);
+    /* #else */
+    StringBuffer result = new StringBuffer(str1);
+    /* #endif */
+    result.append(str2);
     int count = args.length;
-    java.lang.StringBuffer result = new java.lang.StringBuffer();
-
     for (int i = 0; i < count; i++)
       result.append(StringValue.stringValue(args[i]));
     return result.toString();

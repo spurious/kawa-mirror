@@ -1,5 +1,8 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* NodeTree.java (posLookupNamespaceURI): Simplify.  No need to search
+	up the document hierarchy since each element has NamespaceBindings.
+
 	* XName.java (isNameStart, isNamePart): New functions,
 	moved from XQParser.java.
 	(isName): New method.

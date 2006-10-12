@@ -176,42 +176,14 @@ public class NodeTree extends TreeList
 
   public String posLookupNamespaceURI (int ipos, String prefix)
   {
-    boolean seenDocument = false;
-    int plen = prefix.length();
-    for (;;)
-      {
-	int kind = getNextKind(ipos);
-	switch (kind)
-	  {
-	  case Sequence.DOCUMENT_VALUE:
-	    if (seenDocument)
-	      return null;
-	    ipos = posFirstChild(ipos);
-	    // Avoid a loop bouncing between document and its element.
-   	    seenDocument = true;
-	    continue;
-	  case Sequence.GROUP_VALUE:
-	    Object type = getNextTypeObject(ipos);
-	    if (type instanceof XName)
-	      return ((XName) type).lookupNamespaceURI(prefix);
-	    else if (type instanceof Symbol)
-	      {
-		String name = getNextTypeName(ipos);
-		if (prefix != null && name != null && name.length() > plen
-		    && name.charAt(plen) == ':' && name.startsWith(prefix))
-		  return ((Symbol) type).getNamespaceURI();
-		else if (prefix == null && name != null
-			 && name.indexOf(':') < 0)
-		  return ((Symbol) type).getNamespaceURI();
-	      }
-	    /* ... else fall through ... */
-	  default:
-	    int parent = parentPos(ipos);
-	    if (parent == -1)
-	      return null;
-	    ipos = parent;
-	  }
-      }
+    int kind = getNextKind(ipos);
+    if (kind != Sequence.GROUP_VALUE)
+      throw new IllegalArgumentException("argument must be an element");
+    Object type = getNextTypeObject(ipos);
+    if (type instanceof XName)
+      return ((XName) type).lookupNamespaceURI(prefix);
+    else
+      return null;
   }
 
   public String posLookupPrefix (int ipos, String namespaceURI)

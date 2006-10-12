@@ -1,5 +1,9 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (resolveQNameUsingElement): Collapse white space.
+	Throw exception if unknown namespace for prefix.
+	Internalize prefix before calling lookupNamespaceURI.
+
 	* QNameUtils.java (validNCName): Implement using new XName.isName
 	method.
 

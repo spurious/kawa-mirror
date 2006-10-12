@@ -13,7 +13,7 @@ public class QNameUtils
     if (qname instanceof Values
         || ! (qname instanceof String || qname instanceof UntypedAtomic))
       throw new RuntimeException("bad argument to QName");
-    String name = qname.toString();
+    String name = XDataType.replaceWhitespace(qname.toString(), true);
     int colon = name.indexOf(':');
     String prefix, localPart, uri;
     if (colon < 0)
@@ -27,6 +27,8 @@ public class QNameUtils
 	prefix = name.substring(0, colon).intern();
 	localPart = name.substring(colon+1);
         uri =  node.lookupNamespaceURI(prefix);
+        if (uri == null)
+          throw new RuntimeException("unknown namespace for '"+name+"'");
       }
     if (! validNCName(localPart)
 	|| (prefix != null && ! validNCName(prefix)))
@@ -53,7 +55,7 @@ public class QNameUtils
     if (qname instanceof Values
         || ! (qname instanceof String || qname instanceof UntypedAtomic))
       throw new RuntimeException("bad argument to QName");
-    String name = qname.toString();
+    String name = XDataType.replaceWhitespace(qname.toString(), true);
     int colon = name.indexOf(':');
     String prefix, localPart;
     if (colon < 0)
@@ -173,11 +175,18 @@ public class QNameUtils
     KNode el = KNode.coerce(element);
     if (el == null)
       throw WrongType.make(null, "namespace-uri-for-prefix", 2, element);
+    String str;
     if (prefix == null || prefix == Values.empty)
-      prefix = "";
+      str = null;
     else if (! (prefix instanceof String || prefix instanceof UntypedAtomic))
       throw WrongType.make(null, "namespace-uri-for-prefix", 1, element);
-    String uri = el.lookupNamespaceURI(prefix.toString());
+    else
+      {
+        str = prefix.toString().intern();
+        if (str == "")
+          str = null;
+      }
+    String uri = el.lookupNamespaceURI(str);
     if (uri == null)
       return Values.empty;
     else

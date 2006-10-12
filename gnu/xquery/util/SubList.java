@@ -14,14 +14,15 @@ public class SubList extends MethodProc
 
   public int numArgs() { return 0x3002; }
 
-  public static void subList(Object seq, int first, int length, Consumer out)
+  public static void subList(Object seq, double start, double end,
+                             Consumer out)
   {
-    first--;
     if (seq instanceof Values)
       {
 	Values vals = (Values) seq;
+        int n = 0;
 	int i = 0;
-	while (--first >= 0)
+	while (++n < start)
 	  {
 	    i = vals.nextDataIndex(i);
 	    if (i < 0)
@@ -29,7 +30,7 @@ public class SubList extends MethodProc
 	  }
 	int startPosition = i;
 	int endPosition = i;
-	while (--length >= 0)
+	while (n++ < end)
 	  {
 	    i = vals.nextDataIndex(i);
 	    if (i < 0)
@@ -40,35 +41,21 @@ public class SubList extends MethodProc
       }
     else
       {
-	if (length > 0 && first == 0)
+	if (start <= 1 && end >= 2)
 	  out.writeObject(seq);
       }
-  }
-
-  public static Object subList(Object seq, int first, int length)
-  {
-    Values vals = new Values();
-    subList(seq, first, length, vals);
-    int count  = vals.size();
-    if (count == 0)
-      return Values.empty;
-    if (count == 1)
-      return vals.get(0);
-    return vals;
-  }
-
-  public static Object subList(Object seq, int first)
-  {
-    return subList(seq, first, Integer.MAX_VALUE);
   }
 
   public void apply (CallContext ctx)
   {
     Consumer consumer = ctx.consumer;
     Object seq = ctx.getNextArg();
-    int first = ctx.getNextIntArg();
-    int length = ctx.getNextIntArg(Integer.MAX_VALUE);
+    double d1 = Math.round(StringUtils.asDouble(ctx.getNextArg()));
+    Object eof = Sequence.eofValue; 
+    Object arg2 = ctx.getNextArg(eof);
     ctx.lastArg();
-    subList(seq, first, length, consumer);
+    double d2 = arg2 != eof ? Math.round(StringUtils.asDouble(arg2))
+      : Double.POSITIVE_INFINITY;
+    subList(seq, d1, d1 + d2, consumer);
   }
 }

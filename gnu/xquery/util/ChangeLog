@@ -1,5 +1,8 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* SubList.java: Use double lower and upper boand, to match 
+	specification.  This fixes some corner cases.
+
 	* NumberValue.java (abs): Calculate abs by clearing sign bit.
 	This fixes handling of -0.
 

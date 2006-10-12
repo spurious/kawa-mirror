@@ -120,7 +120,7 @@ public class DisplayFormat extends AbstractFormat
              && out instanceof PrintWriter)
       {
         write("#,(URI ", out);
-        Strings.printQuoted(obj.toString(), (PrintWriter) out, 0);
+        Strings.printQuoted(obj.toString(), (PrintWriter) out, 1);
         out.writeChar(')');
       }
     /* #endif */
@@ -129,7 +129,7 @@ public class DisplayFormat extends AbstractFormat
       {
 	CharSeq str = (CharSeq) obj;
 	if (getReadableOutput () && out instanceof PrintWriter)
-	  Strings.printQuoted(str, (PrintWriter) out, 0);
+	  Strings.printQuoted(str, (PrintWriter) out, 1);
 	else if (obj instanceof FString) // FIXME Do we need this case?
 	  {
 	    FString fstr = (FString) obj;

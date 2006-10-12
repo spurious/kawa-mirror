@@ -1,3 +1,7 @@
+2006-10-11  Per Bothner  <per@bothner.com>
+
+	* Base64Binary.java (toString): Fix buglet.
+
 2006-10-06  Per Bothner  <per@bothner.com>
 
 	* KProcessingInstruction.java (coerceOrNullMethod): Fix buglet.

@@ -126,7 +126,7 @@ public class Base64Binary extends BinaryObject
       {
       case 1:
         sbuf.append(ENCODING.charAt((value >> 2) & 63));
-        sbuf.append(ENCODING.charAt((value << 6) & 63));
+        sbuf.append(ENCODING.charAt((value << 4) & 63));
         sbuf.append("==");
         break;
       case 2:

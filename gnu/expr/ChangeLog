@@ -1,3 +1,10 @@
+2006-10-11  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (<init>): New convenience constructor.
+
+	* PrimProcedure.java (compileInvoke): Fix handling of IgnoreTarget
+	for a method that takesContext().
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): Don't write exception to err output.

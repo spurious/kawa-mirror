@@ -246,6 +246,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
   }
 
+  public PrimProcedure (String className, String methodName, int numArgs)
+  {
+    this(ClassType.make(className).getDeclaredMethod(methodName, numArgs));
+  }
+
   public PrimProcedure(java.lang.reflect.Method method, Language language)
   {
     this(((ClassType) language.getTypeFor(method.getDeclaringClass()))
@@ -527,10 +532,29 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         code.emitInvokeMethod(method, op_code);
       }
     else if (target instanceof IgnoreTarget
-             || (target instanceof ConsumerTarget
+               || (target instanceof ConsumerTarget
                  && ((ConsumerTarget) target).isContextTarget()))
       {
+        Field consumerFld = null;
+        Variable saveCallContext = null;
         comp.loadCallContext();
+        if (target instanceof IgnoreTarget)
+          {
+            ClassType typeCallContext = Compilation.typeCallContext;
+            consumerFld = typeCallContext.getDeclaredField("consumer");
+            
+            // Consumer saveConsumer = ctx.consumer;
+            // ctx.consumer = VoidConsumer.instance:
+            code.pushScope();
+            saveCallContext = code.addLocal(typeCallContext);
+            code.emitDup();
+            code.emitGetField(consumerFld);
+            code.emitStore(saveCallContext);
+            code.emitDup();
+            code.emitGetStatic(ClassType.make("gnu.lists.VoidConsumer")
+                               .getDeclaredField("instance"));
+            code.emitPutField(consumerFld);
+          }
         code.emitInvokeMethod(method, op_code);
         if (isTailCall)
           {
@@ -538,6 +562,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             code.emitInvoke(Compilation.typeCallContext
                             .getDeclaredMethod("runUntilDone", 0));
           }
+        if (target instanceof IgnoreTarget)
+          {
+            // ctx.consumer = saveConsumer
+            comp.loadCallContext();
+            code.emitLoad(saveCallContext);
+            code.emitPutField(consumerFld);
+            code.popScope();
+         }
         return;
       }
     else

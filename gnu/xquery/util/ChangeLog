@@ -1,5 +1,7 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* SequenceUtils.java (deepEqualItems): Fix thinko: '||' -> '&&'.
+
 	* BooleanValue.java (booleanValue): Don't allow non-RealNum Numerics.
 	Specifically disallow Duration and DateTime values.
 

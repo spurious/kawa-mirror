@@ -245,7 +245,7 @@ public class SequenceUtils
   public static boolean deepEqualItems (Object arg1, Object arg2,
                                         NamedCollator collator)
   {
-    if (NumberValue.isNaN(arg1) || NumberValue.isNaN(arg1))
+    if (NumberValue.isNaN(arg1) && NumberValue.isNaN(arg2))
       return true;
     return Compare.atomicCompare(Compare.TRUE_IF_EQU, arg1, arg2, collator);
   }

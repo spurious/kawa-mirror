@@ -1,3 +1,8 @@
+2006-10-11  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (errInitial): Don't pretty-print error output.
+	(errDefault): Fix typo - get errLocation, not outLocation.
+
 2006-10-06  Per Bothner  <per@bothner.com>
 
 	* SimpleEnvironment.java (queue): Remove unused static field.

@@ -232,6 +232,7 @@ java_sources = \
   QNameUtils.java \
   Reduce.java \
   RelativeStep.java \
+  RelativeStepFilter.java \
   SequenceUtils.java \
   StringUtils.java \
   SubList.java \

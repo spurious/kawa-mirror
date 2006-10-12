@@ -1,3 +1,10 @@
+2006-10-12  Per Bothner  <per@bothner.com>
+
+	* RelativeStepFilter.java: New class, extends FilterConsumer.
+	* Makefile.am: Update accordingly.
+	* RelativeStep.java (apply, inline): Make use of RelativeStepFilter.
+	This allows a relative step to return atoms rather just nodes.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java (resolveQNameUsingElement): Collapse white space.

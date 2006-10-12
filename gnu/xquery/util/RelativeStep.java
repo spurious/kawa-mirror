@@ -27,8 +27,6 @@ public class RelativeStep extends MethodProc implements CanInline
     Object next = ctx.getNextArg();
     Procedure proc = (Procedure) next;
     Consumer out = ctx.consumer;
-    SortedNodes nodes = new SortedNodes();
-    ctx.consumer = nodes;
     IntNum countObj;
     Nodes values;
     if (arg instanceof Nodes)
@@ -41,15 +39,15 @@ public class RelativeStep extends MethodProc implements CanInline
     int count = values.size();
     int it = 0;
     countObj = IntNum.make(count);
+    RelativeStepFilter filter = new RelativeStepFilter(out);
     for (int pos = 1; pos <= count; pos++)
       {
 	it = values.nextPos(it);
 	Object dot = values.getPosPrevious(it);
 	proc.check3(dot, IntNum.make(pos), countObj, ctx);
-	ctx.runUntilDone();
+        Values.writeValues(ctx.runUntilValue(), filter);
       }
-    nodes.consume(out);
-    ctx.consumer = out;
+    filter.finish();
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
@@ -66,6 +64,17 @@ public class RelativeStep extends MethodProc implements CanInline
 	|| (lexp2 = (LambdaExp) exp2).min_args != 3
 	|| lexp2.max_args != 3)
       return exp;
+
+    exp2 = lexp2.body;
+
+    // 'A' - atomic; 'N' - nodes; 'S' - pre-sorted nodes; ' ' - unknown.
+    char expectedKind = ' ';
+    // Future optimizations:  [FIXME]
+    // If E2 is a child:: step, then change E1 to SortNodes(E1),
+    // and set expectedKind to 'S'.
+    // If type(E1) <= node()?, and E2 is a AxisStep,
+    // then set expectedType to 'S'.
+    // Otherwise, if E2 is an AxisStep, set expectedType to 'N'.
 
     Declaration dotArg = lexp2.firstDecl();
     Declaration posArg = dotArg.nextDecl();
@@ -98,7 +107,25 @@ public class RelativeStep extends MethodProc implements CanInline
     lastLet.body
       = valuesMapWithPos.inline(new ApplyExp(valuesMapWithPos, mapArgs),
 				walker);
-    return new ApplyExp(SortNodes.sortNodes,
-			new Expression[] { comp.letDone(lastLet) });
+    if (expectedKind == 'A' || expectedKind == 'S')
+      return lastLet;
+    Procedure sort;
+    if (expectedKind == 'N')
+      sort = SortNodes.sortNodes;
+    else
+      // FIXME should support generating code that doesn't write everything
+      // to a temporary before using RelativeStepFilter.  See SortNodes.
+      sort = new PrimProcedure("gnu.xquery.util.RelativeStep",
+                               "maybeSortNodes$X", 2);
+    return new ApplyExp(sort,
+                        new Expression[] { comp.letDone(lastLet) });
+  }
+
+  public static void maybeSortNodes$X (Object arg, CallContext ctx)
+  {
+    Consumer out = ctx.consumer;
+    RelativeStepFilter filter = new RelativeStepFilter(out);
+    Values.writeValues(arg, filter);
+    filter.finish();
   }
 }

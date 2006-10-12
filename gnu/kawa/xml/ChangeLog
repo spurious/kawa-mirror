@@ -1,5 +1,10 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* XDataType.java (replaceWhitespace): New static method.
+	(valueOf): Do replaceWhitespace for anyURI.
+
+	* XDataType.java (value): Check syntax of decimal literals.
+
 	* UntypedAtomic.java (hashCode, equals): New methods.
 	Needed for distinct-values.
 

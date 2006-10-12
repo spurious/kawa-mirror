@@ -412,7 +412,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return new UntypedAtomic(value);
       case ANY_URI_TYPE_CODE:
-        return toURI(value);
+        return toURI(replaceWhitespace(value, true));
       case BOOLEAN_TYPE_CODE:
         value = value.trim();
         if (value.equals("true") || value.equals("1"))
@@ -429,7 +429,14 @@ public class XDataType extends Type implements TypeValue
           : (Object) Double.valueOf(value);
       case DECIMAL_TYPE_CODE:
         value = value.trim();
-        // FIXME - this is a little too liberal.
+        // The BigDecimal constructor accepts an exponent.
+        // So check and complain if that exists.
+        for (int i = value.length();  --i >= 0; )
+          {
+            char ch = value.charAt(i);
+            if (ch == 'e' || ch == 'E')
+              throw new IllegalArgumentException("not a valid decimal: '"+value+"'");
+          }
         return new java.math.BigDecimal(value);
       case DURATION_TYPE_CODE:
         return Duration.parseDuration(value);
@@ -453,6 +460,64 @@ public class XDataType extends Type implements TypeValue
     /* #else */
     return new Float(value);
     /* #endif */
+  }
+
+  public static String replaceWhitespace (String str, boolean collapse)
+  {
+    /* #ifdef JAVA5 */
+    // StringBuilder sbuf = null;
+    /* #else */
+    StringBuffer sbuf = null;
+    /* #endif */
+    int len = str.length();
+    // 1: previous was single space.
+    // 2: previous was multiple spaces or other whitespace.
+    int prevSpace = collapse ? 1 : 0;
+    for (int i = 0;  i < len;  )
+      {
+        char ch = str.charAt(i++);
+        int isSpace = ch == ' ' ? 1
+        : ch == '\t' || ch == '\r' || ch == '\n' ? 2 : 0;
+        if (sbuf == null
+            && (isSpace == 2
+                || (isSpace == 1 && prevSpace > 0 && collapse)
+                || (isSpace == 1 && i == len && collapse)))
+          {
+            /* #ifdef JAVA5 */
+            // sbuf = new StringBuilder();
+            /* #else */
+            sbuf = new StringBuffer();
+            /* #endif */
+            int k = prevSpace > 0 ? i - 2 : i - 1;
+            for (int j = 0;  j < k;  j++)
+              sbuf.append(str.charAt(j));
+            ch = ' ';
+           }
+        if (collapse)
+          {
+            if (prevSpace > 0 && isSpace == 0)
+              {
+                if (sbuf != null && sbuf.length() > 0)
+                  sbuf.append(' ');
+                prevSpace = 0;
+              }
+            else if (isSpace == 2 || (isSpace == 1 && prevSpace > 0))
+              prevSpace = 2;
+            else if (isSpace > 0)
+              prevSpace = 1;
+            else
+              prevSpace = 0;
+            if (prevSpace > 0)
+              continue;
+          }
+        if (sbuf != null)
+          sbuf.append(ch);
+      }
+    if (sbuf != null)
+      return sbuf.toString();
+    else
+      return str;
+
   }
 
   public static Double makeDouble (double value)

@@ -1,5 +1,9 @@
 2006-10-11  Per Bothner  <per@bothner.com>
 
+	* StringUtils.java (concat$V): Add initial 2 parameters, so we can
+	catch calls with too few arguments.
+	Also, use StringBuilder if JAVA5.
+
 	* MinMax.java (minMax): Add a dummy compare for singleton case,
 	which is a easy way to check for an invalid value.
 

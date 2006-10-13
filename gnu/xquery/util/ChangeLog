@@ -1,5 +1,8 @@
 2006-10-12  Per Bothner  <per@bothner.com>
 
+	* NumberValue.java (numberValue): Do atomization.
+	If argument is not coercible to double, return NaN.
+
 	* RelativeStepFilter.java: New class, extends FilterConsumer.
 	* Makefile.am: Update accordingly.
 	* RelativeStep.java (apply, inline): Make use of RelativeStepFilter.

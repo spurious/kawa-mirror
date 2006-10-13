@@ -61,12 +61,26 @@ public class NumberValue extends Procedure1
 
   public static Object numberValue (Object value)
   {
-    if (value instanceof Double || value == Values.empty || value == null)
-      return value;
-    else if (value instanceof Number)
-      return XDataType.makeDouble(((Number) value).doubleValue());
+    value = KNode.atomicValue(value);
+    double d;
+    if (value instanceof UntypedAtomic || value instanceof String)
+      {
+        try
+          {
+            return XDataType.doubleType
+              .valueOf(StringValue.stringValue(value));
+          }
+        catch (Throwable ex)
+          {
+            d = Double.NaN;
+          }
+      }
+    else if (value instanceof Number
+             && (value instanceof RealNum || ! (value instanceof Numeric)))
+      d = (((Number) value).doubleValue());
     else
-      return XDataType.doubleType.valueOf(StringValue.stringValue(value));
+      d = Double.NaN;
+    return XDataType.makeDouble(d);
   }
 
   public static Object abs (Object value)

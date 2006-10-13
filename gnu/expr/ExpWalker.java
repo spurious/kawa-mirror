@@ -11,6 +11,8 @@ public class ExpWalker
   /** Get the Compilation associated with this walker. */
   public Compilation getCompilation () { return comp; }
 
+  public SourceMessages getMessages () { return messages; }
+
   protected Expression walkExpression (Expression exp)
   {
     exp.walkChildren(this);

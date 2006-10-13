@@ -1,3 +1,7 @@
+2006-10-12  Per Bothner  <per@bothner.com>
+
+	* ExpWalker.java (getMessages): New convenience method.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (walkInitializers): New method.

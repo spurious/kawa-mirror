@@ -103,6 +103,12 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>number</code> function. */
   public static final int NUMBER_BUILTIN = -28;
 
+  /** Code number for internal function to handle extensions. */
+  public static final int HANDLE_EXTENSION_BUILTIN = -29;
+
+  public static final Declaration handleExtensionDecl
+    = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -794,6 +800,34 @@ public class XQResolveNames extends ResolveNames
                 if (currentTimezoneDecl == null)
                   currentTimezoneDecl = mexp.addDeclaration("timezone", XTimeType.dayTimeDurationType);
                 return new ReferenceExp(currentTimezoneDecl);
+              case HANDLE_EXTENSION_BUILTIN:
+                {
+                  Compilation comp = getCompilation();
+                  Expression[] args = exp.getArgs();
+                  int i = 0;
+                  for (;  i < args.length - 1;  i += 2)
+                    {
+                      Expression pname = args[i];
+                      String qname = (String) ((QuoteExp) pname).getValue();
+                      Symbol psymbol = namespaceResolve(qname, false);
+                      if (psymbol == null)
+                        ; // error emitted in namespaceResolve
+                      else if (psymbol.getNamespaceURI().length() == 0)
+                        comp.error('e', "pragma name cannot be in the empty namespace");
+                      else
+                        {
+                          Expression replacement
+                            = checkPragma(psymbol, args[i+1]);
+                          if (replacement != null)
+                            return replacement;
+                        }
+                    }
+                  if (i < args.length)
+                    return args[args.length-1];
+                  String msg = "no recognized pragma or default in extension expression";
+                  getMessages().error('e', msg, "XQST0079");
+                  return new ErrorExp(msg);
+                }
 	      }
 	  }
       }
@@ -856,6 +890,12 @@ public class XQResolveNames extends ResolveNames
 	  make.setNamespaceNodes(nsBindings);
       }
     return exp;
+  }
+
+  public Expression
+  checkPragma (Symbol name, Expression contents)
+  {
+    return null;
   }
 
   Expression getBaseUriExpr ()

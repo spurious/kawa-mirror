@@ -528,7 +528,8 @@ public class RunXQTS extends FilterConsumer
         expected = new String(expectedBytes, 0, expectedLength, "UTF-8");
         expected = expected.replaceAll("\r", "");
         actual = actual.replaceAll("\r", "");
-        if (expected.equals(actual))
+        boolean matches = matches(actual, expected, compare);
+        if (matches)
           {
             report("pass", null);
             foundMatchingOutput = true;
@@ -540,13 +541,15 @@ public class RunXQTS extends FilterConsumer
             foundMatchingOutput = true;
             break;
           }
+        /*
         else if (("XML".equals(compare) || "Fragment".equals(compare))
-                 && equalsXML(actual, expected))
+                 && matches(actual, expected, compare))
           {
             report("pass", "(ignoring any spaces)");
             foundMatchingOutput = true;
             break;
           }
+        */ 
       }
 
     if (! foundMatchingOutput)
@@ -569,11 +572,33 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
-  public boolean equalsXML(String arg1 /* result */, String arg2 /*expected*/)
+  private static int grabAttribute (String str, int start)
+  {
+    char inAttr = 0;
+    for (int i = start; ; )
+      {
+        if (i >= str.length())
+          return -1;
+        char ch = str.charAt(i++);
+        if (inAttr == 0 && (ch == '\"' || ch == '\''))
+          inAttr = ch;
+        else if (ch == inAttr)
+          return i;
+      }
+  }
+
+  public static boolean matches (String arg1 /* result */,
+                                 String arg2 /*expected*/,
+                                 String compare)
   {
     int len1 = arg1.length();
     int len2 = arg2.length();
     int i1 = 0, i2 = 0;
+    boolean intag = false;
+    int start_attr1 = 0;
+    int start_attr2 = 0;
+    boolean isXML = "XML".equals(compare) || "Fragment".equals(compare);
+    char inAttr = 0;
     for (;;)
       {
         if (i1 == len1 && i2 == len2)
@@ -582,8 +607,94 @@ public class RunXQTS extends FilterConsumer
         int c2 = i2 == len2 ? -1 : arg2.charAt(i2);
         if (c1 == c2)
           {
+            if (c1 == '<' && isXML)
+              {
+                intag = true;
+                start_attr1 = 0;
+                start_attr2 = 0;
+                inAttr = 0;
+              }
+            else if (intag && c1 == '>')
+              {
+                intag = false;
+              }
+            else if (intag && Character.isWhitespace((char) c1)
+                     && inAttr == 0)
+
+              {
+                start_attr1 = i1+1;
+                start_attr2 = i2+1;;
+              }
+            else if (intag && inAttr == 0 && (c1 == '"' || c1 == '\''))
+              {
+                inAttr = (char) c1;
+              }
+            else if (intag && inAttr == c1)
+              {
+                start_attr1 = 0;
+                start_attr2 = 0;
+                inAttr = 0;
+              }
             i1++;
             i2++;
+          }
+        else if (intag && start_attr1 > 0)
+          {
+            i1 = start_attr1;
+            i2 = start_attr2;
+            Stack attrs1 = new Stack();
+            Stack attrs2 = new Stack();
+            for (;;)
+              {
+                int end1 = grabAttribute(arg1, i1);
+                int end2 = grabAttribute(arg2, i2);
+                if (end1 < 0 || end2 < 0)
+                  return false;
+                String attr1 = arg1.substring(i1, end1);
+                attrs1.push(attr1);
+                String attr2 = arg2.substring(i2, end2);
+                attrs2.push(attr2);
+                i1 = end1;
+                i2 = end2;
+                for (;;)
+                  {
+                    if (i1 >= len1) return false;
+                    c1 = arg1.charAt(i1++);
+                    if (! Character.isWhitespace((char) c1))
+                      break;                }
+                for (;;)
+                  {
+                    if (i2 >= len2) return false;
+                    c2 = arg2.charAt(i2++);
+                    if (! Character.isWhitespace((char) c2))
+                      break;
+                  }
+                boolean done1 = c1 == '/' || c1 == '>';
+                boolean done2 = c2 == '/' || c2 == '>';
+                if (done1 && done2)
+                  break;
+                if (done1 || done2)
+                  return false;
+                i1--;
+                i2--;
+              }
+            // Same number of attributes.
+            // Do an O(n^2) search to make sure the sets are equal.
+            for (int i = attrs1.size();  --i >= 0; )
+              {
+                String attr1 = (String) attrs1.elementAt(i);
+                for (int j = attrs2.size();  ; )
+                  {
+                    if (--j < 0)
+                      return false;
+                    String attr2 = (String) attrs2.elementAt(j);
+                    if (attr1.equals(attr2))
+                      break;
+                  }
+              }
+            start_attr1 = 0;
+            start_attr2 = 0;
+            intag = false;
           }
         else if (c1 == ' ' || c1 == '\n' || c1 == '\t' || c1 == '\r')
           {
@@ -598,6 +709,8 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
+  String selectedTest;
+
   public void endGroup(String typeName)
   {
     if (inStartTag)
@@ -605,20 +718,24 @@ public class RunXQTS extends FilterConsumer
     if (tagMatches("test-case"))
       {
         if (--maxTests == 0)  System.exit(0); // FIXME
-        xqlog.beginGroup("test-case", testCaseGroupType);
-        writeAttribute("name", testName);
-        try
+        if (selectedTest == null
+            || selectedTest.equals(testName))
           {
-            // Other attributes and <test-case> body written by evalTest.
-            evalTest(testName);
+            xqlog.beginGroup("test-case", testCaseGroupType);
+            writeAttribute("name", testName);
+            try
+              {
+                // Other attributes and <test-case> body written by evalTest.
+                evalTest(testName);
+              }
+            catch (Throwable ex)
+              {
+                System.err.println("test-case name:"+testName);
+                System.err.println("caught "+ex);
+                ex.printStackTrace();
+              }
+            xqlog.endGroup("test-case");
           }
-        catch (Throwable ex)
-          {
-            System.err.println("test-case name:"+testName);
-            System.err.println("caught "+ex);
-            ex.printStackTrace();
-          }
-        xqlog.endGroup("test-case");
         //xqlog.flush();
         testName = null;
       }

@@ -1,3 +1,8 @@
+2006-10-13  Per Bothner  <per@bothner.com>
+
+	* HandleExtension.java: Remove no-longer needed file.
+	* Makefile.am: Update accordingly.
+
 2006-10-12  Per Bothner  <per@bothner.com>
 
 	* NumberValue.java (numberValue): Do atomization.

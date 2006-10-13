@@ -18,7 +18,6 @@ import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
-import gnu.xquery.util.HandleExtension;
 import kawa.standard.require;
 
 /** A class to read xquery forms. */
@@ -2742,14 +2741,24 @@ public class XQParser extends Lexer
         for (;;)
           {
             getRawToken();
-            Expression qname = parseQName(false);
+            Expression qname;
+            if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
+              qname = syntaxError("missing pragma name");
+            else
+              qname = QuoteExp.getInstance(new String(tokenBuffer, 0, tokenBufferLength));
             extArgs.push(qname);
             StringBuffer sbuf = new StringBuffer();
-            int ch = skipSpace();
+            int ch;
+            int spaces = -1;
+            do { ch = read(); spaces++; }
+            while (ch >= 0 && Character.isWhitespace((char) ch));
             while (ch != '#' || peek() != ')')
               {
                 if (ch < 0)
                   eofError("pragma ended by end-of-file");
+                if (spaces == 0)
+                  error("missing space between pragma and extension content");
+                spaces = 1;
                 sbuf.append((char) ch);
                 ch = read();
               }
@@ -2761,14 +2770,18 @@ public class XQParser extends Lexer
           }
         if (curToken == '{')
           {
-            LambdaExp lexp = new LambdaExp(0);
-            comp.push(lexp);
-            lexp.body = parseEnclosedExpr();
-            comp.pop(lexp);
-            extArgs.push(lexp);
+            getRawToken();
+            if (curToken != '}')
+              {
+                char saveReadState = pushNesting('{');
+                extArgs.push(parseExprSequence('}', false));
+                popNesting(saveReadState);
+                if (curToken == EOF_TOKEN)
+                  eofError("missing '}' - unexpected end-of-file");
+              }
             args = new Expression[extArgs.size()];
             extArgs.copyInto(args);
-            exp = new ApplyExp(HandleExtension.handleExtension, args);
+            exp = new ApplyExp(new ReferenceExp(XQResolveNames.handleExtensionDecl), args);
           }
         else
           exp = syntaxError("missing '{' after pragma");

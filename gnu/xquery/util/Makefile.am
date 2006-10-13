@@ -11,7 +11,6 @@ java_sources = \
   Compare.java \
   Debug.java \
   DistinctValues.java \
-  HandleExtension.java \
   IntegerRange.java \
   ItemAt.java \
   MinMax.java \

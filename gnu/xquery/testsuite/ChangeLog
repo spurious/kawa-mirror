@@ -1,3 +1,13 @@
+2006-10-13  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (equalsXML): Rename to matches.  In XML mode, do
+	XML-aware comparison with soem canonicalization.  Specifically,
+	sort attributes and namespace declarations before comparing.
+	(evalTest): Use new matches function.
+
+	*  RunXQTS.java (selectedTest): New field.
+	(endGroup): Skip test if not matching selectedTest,
+
 2006-10-04  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (report): Write FAIL to stderr if unexpected failure.

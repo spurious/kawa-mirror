@@ -541,15 +541,6 @@ public class RunXQTS extends FilterConsumer
             foundMatchingOutput = true;
             break;
           }
-        /*
-        else if (("XML".equals(compare) || "Fragment".equals(compare))
-                 && matches(actual, expected, compare))
-          {
-            report("pass", "(ignoring any spaces)");
-            foundMatchingOutput = true;
-            break;
-          }
-        */ 
       }
 
     if (! foundMatchingOutput)

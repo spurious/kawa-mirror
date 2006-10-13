@@ -572,7 +572,6 @@ public class XQuery extends Language
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("boolean", "gnu.xquery.util.BooleanValue", "booleanValue");
-    defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     define_method("error", "gnu.xquery.util.XQException",

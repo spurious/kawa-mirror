@@ -100,6 +100,9 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>max</code> function. */
   public static final int MAX_BUILTIN = -27;
 
+  /** Code number for the special <code>number</code> function. */
+  public static final int NUMBER_BUILTIN = -28;
+
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
@@ -173,6 +176,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("deep-equal", DEEP_EQUAL_BUILTIN);
     pushBuiltin("min", MIN_BUILTIN);
     pushBuiltin("max", MAX_BUILTIN);
+    pushBuiltin("number", NUMBER_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -614,6 +618,12 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
                     .getDeclaredMethod("name", 1);
                   return withContext(meth, exp.getArgs(), "fn:name", 0);
+                }
+              case NUMBER_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NumberValue")
+                    .getDeclaredMethod("numberValue", 1);
+                  return withContext(meth, exp.getArgs(), "fn:number", 0);
                 }
               case ROOT_BUILTIN:
 		{

@@ -791,7 +791,7 @@ public class XQResolveNames extends ResolveNames
                 mexp = getCompilation().mainLambda;
                 if (currentDateTimeDecl == null)
                   currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
-                if (currentTimeDecl == null)
+                if (currentTimezoneDecl == null)
                   currentTimezoneDecl = mexp.addDeclaration("timezone", XTimeType.dayTimeDurationType);
                 return new ReferenceExp(currentTimezoneDecl);
 	      }

@@ -1,5 +1,7 @@
 2006-10-12  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkApplyExp): Fix typo.
+
 	* XQResolveNames.java (NUMBER_BUILTIN): New constant.
 	(<init>): Push number function.
 	(walkApplyExp): Handle fn:number.

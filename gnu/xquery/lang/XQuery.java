@@ -25,15 +25,17 @@ import gnu.kawa.xml.*;
 public class XQuery extends Language
 {
   public static final String XQUERY_FUNCTION_NAMESPACE
-    = "http://www.w3.org/2004/10/xpath-functions";
+    = "http://www.w3.org/2005/xpath-functions";
   public static final String KAWA_FUNCTION_NAMESPACE
     = "http://kawa.gnu.org/";
   public static final String QEXO_FUNCTION_NAMESPACE
     = "http://qexo.gnu.org/";
   public static final String LOCAL_NAMESPACE
-    = "http://www.w3.org/2004/10/xquery-local-functions";
+    = "http://www.w3.org/2005/xquery-local-functions";
   public static final String SCHEMA_NAMESPACE
     = "http://www.w3.org/2001/XMLSchema";
+  public static final String SCHEMA_INSTANCE_NAMESPACE
+    = "http://www.w3.org/2001/XMLSchema-instance";
   public static final String XHTML_NAMESPACE
     = "http://www.w3.org/1999/xhtml";
   public static final Namespace xqueryFunctionNamespace

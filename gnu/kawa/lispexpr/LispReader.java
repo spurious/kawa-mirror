@@ -5,7 +5,7 @@ import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
 
-/** A Lexer to reading S-expressions in generic Lisp-like syntax.
+/** A Lexer for reading S-expressions in generic Lisp-like syntax.
  * This class may have outlived its usefulness: It's mostly just a
  * wrapper around a LineBufferedReader plus a helper token-buffer.
  * The functionality should be moved to ReadTable, though it is

@@ -1003,16 +1003,16 @@ public class Translator extends Compilation
 	      {
 		setCurrentScope(sf.scope);
 		int first = formStack.size();
-		scanBody(sf.form, defs, false);
-		Object f = wrapSyntax(popForms(first), sf);
-		if (makeList)
-		  {
-		    if (lastPair == null)
+		Object f = scanBody(sf.form, defs, makeList);
+                if (makeList)
+                  {
+                    f = wrapSyntax(f, sf);
+                    if (lastPair == null)
 		      return f;
-		    lastPair.cdr = f;
-		    return list;
-		  }
-		formStack.add(f);
+                    lastPair.cdr = f;
+                    return list;
+                  }
+		formStack.add(wrapSyntax(popForms(first), sf));
 		return null;
 	      }
 	    finally

@@ -1,3 +1,9 @@
+2006-10-14  Per Bothner  <per@bothner.com>
+	    Chris Wegrzyn <chris.wegrzyn@gmail.com>
+
+	* mac-test.scm: New test based on Savannah bug #17984 "Compile time
+	error in expansion of hygienic macros ending in literals".
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* HelloCgiS.scm: No longer need to explicitly print a #\newline.
@@ -98,7 +104,7 @@
 2006-02-10  Per Bothner  <per@bothner.com>
 	    Dean Ferreyra <dferreyra@igc.org>
 
-	* num-test.scm: New testcase base on Savannah bug #11427
+	* num-test.scm: New testcase based on Savannah bug #11427
 	"<java.lang.Integer> in the interpreter gives ClassCastException".
 
 2006-02-10  Per Bothner  <per@bothner.com>

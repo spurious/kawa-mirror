@@ -1,4 +1,4 @@
-(test-init "macros" 93)
+(test-init "macros" 94)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -444,3 +444,14 @@
        (let-syntax ((m (lambda (form)
                     (quasisyntax (list x-72-x3 ,x-72-x3)))))
 	 (m)))
+
+;; Based on Savannah bug #17984 Chris Wegrzyn <chris.wegrzyn@gmail.com>
+;; Compile time error in expansion of hygienic macros ending in literals
+(define thisfails
+  (letrec-syntax
+      ((outer
+	(syntax-rules ()
+	  ((outer expr)
+	   (begin expr "this fails")))))
+    (outer "third")))
+(test "this fails" 'savannah-bug-17984 thisfails)

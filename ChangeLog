@@ -1,3 +1,10 @@
+2006-10-14  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (scanBody): Fix and simplify handling
+	of SyntaxForm when we need to makeList by asking recursive call
+	to make the list. This fixes Savannah bug #17984 "Compile time
+	error in expansion of hygienic macros ending in literals".
+
 2006-09-26  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): If we find a matching propertyField,

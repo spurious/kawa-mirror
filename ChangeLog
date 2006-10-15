@@ -1,3 +1,8 @@
+2006-10-15  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (processArgs): Set Language.requirePedantic static
+	if --pedantic flag was seen.
+
 2006-10-14  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (scanBody): Fix and simplify handling

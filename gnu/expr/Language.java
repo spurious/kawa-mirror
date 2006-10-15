@@ -533,6 +533,8 @@ public abstract class Language
    * any module import. */
   public static final int PARSE_PROLOG = 4;
 
+  public static boolean requirePedantic;
+
   /** Parse one or more expressions.
    * @param port the InPort to read the expressions from.
    * @param messages where to send error messages and warnings
@@ -555,6 +557,8 @@ public abstract class Language
   {
     SourceMessages messages = lexer.getMessages();
     Compilation tr = getCompilation(lexer, messages);
+    if (requirePedantic)
+      tr.pedantic = true;
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);

@@ -69,6 +69,9 @@ public class Compilation
   public ModuleInfo minfo;
   public Lexer lexer;
 
+  boolean pedantic;
+  public boolean isPedantic() { return pedantic; }
+
   /** Used to access the "main" instance.
    * This is used for two different purposes, which may be confusing:
    * <ul>
@@ -2425,6 +2428,12 @@ public class Compilation
 
   public void error(char severity, Declaration decl, String msg1, String msg2)
   {
+    error(severity, msg1 + decl.getName() + msg2, null, decl);
+  }
+
+  public void error(char severity, String message,
+                    String code, Declaration decl)
+  {
     if (severity == 'w' && getBooleanOption("warn-as-error", false))
       severity = 'e';
     
@@ -2438,8 +2447,7 @@ public class Compilation
 	line = decl_line;
 	column = decl.getColumn();
       }
-    messages.error(severity, filename, line, column,
-		   msg1 + decl.getName() + msg2);
+    messages.error(severity, filename, line, column, message, code);
   }
 
   /**

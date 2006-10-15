@@ -1,3 +1,7 @@
+2006-10-15  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (error): New overloaded method.
+
 2006-09-13  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (maybeOutput): New parameter 'flushing'.

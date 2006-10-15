@@ -132,6 +132,15 @@ public class SourceMessages
     error(new SourceError(severity, filename, line, column, message));
   }
 
+  public void error(char severity, String filename, int line, int column,
+		    String message, String code)
+  {
+    SourceError err = new SourceError(severity, filename, line, column,
+                                      message);
+    err.code = code;
+    error(err);
+  }
+
   /** Record a new error at the current default source file location.
    * @param severity is the seriousness of the error
    *  - one of 'w' (for warning), 'e' (for error), or 'f' (for fatal error)

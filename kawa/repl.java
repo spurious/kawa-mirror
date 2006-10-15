@@ -581,6 +581,10 @@ public class repl extends Procedure0or1
 	    Compilation.defaultCallConvention
 	      = Compilation.CALL_WITH_RETURN;
 	  }
+        else if (arg.equals("--pedantic"))
+          {
+            Language.requirePedantic = true;
+          }
 	else if (arg.equals("--help"))
 	  {
 	    printOptions(System.out);

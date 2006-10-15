@@ -1173,7 +1173,7 @@ public class XQParser extends Lexer
     // However, keep the xdt prefix for the sake of old code,
     // but as an alias for xs.
     pushNamespace("xdt", XQuery.SCHEMA_NAMESPACE);
-    pushNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    pushNamespace("xsi", XQuery.SCHEMA_INSTANCE_NAMESPACE);
     pushNamespace("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
     pushNamespace("html", XQuery.XHTML_NAMESPACE);
     pushNamespace("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);

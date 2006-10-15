@@ -2,6 +2,8 @@
 
 	* XQuery.java (SCHEMA_INSTANCE_NAMESPACE): New URI, for xsi.
 	(XQUERY_FUNCTION_NAMESPACE, LOCAL_NAMESPACE): Update URIs.
+	* XQParser.java (pushStandardNamespaces): Bind "xsi" prefix
+	to SCHEMA_INSTANCE_NAMESPACE.
 
 2006-10-13  Per Bothner  <per@bothner.com>
 

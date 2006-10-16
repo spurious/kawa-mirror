@@ -28,6 +28,10 @@ public class XQParser extends Lexer
   int curToken;
   Object curValue;
 
+  /** Normally null.
+   * 'C' means parsing the type of a 'cast as' or 'castable as'. */
+  int parseContext;
+
   /** Value of getLineNumber() at start of current token.
    * Sometimes set otherwise, to report errors. */
   int curLine;
@@ -97,6 +101,8 @@ public class XQParser extends Lexer
 
   int parseCount;
   int commentCount;
+  /** An error message if comments are disallowed.  Normally null. */
+  String errorIfComment;
 
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
@@ -161,6 +167,7 @@ public class XQParser extends Lexer
     int seenDashes = 0;
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() - 2;
+    warnOldVersion("use (: :) instead of old-style comment {-- --}");
     for (;;)
       {
 	int ch = read();
@@ -185,6 +192,12 @@ public class XQParser extends Lexer
     commentCount++;
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() - 1;
+    if (errorIfComment != null)
+      {
+        curLine = startLine;
+        curColumn = startColumn;
+        error('e', errorIfComment);
+      }
     int prev = 0;
     int commentNesting = 0;
     char saveReadState = pushNesting(':');
@@ -557,6 +570,7 @@ public class XQParser extends Lexer
 		    ch = (char) next;
 		    if (! Character.isDigit(ch))
 		      {
+                        checkSeparator(ch);
 			unread();
 			break;
 		      }
@@ -572,7 +586,10 @@ public class XQParser extends Lexer
 	      {
 		ch = seenDot ? DECIMAL_TOKEN : INTEGER_TOKEN;
 		if (next >= 0)
-		  unread(next);
+                  {
+                    checkSeparator((char) next);
+                    unread(next);
+                  }
 	      }
 	  }
         else if (ch == '.')
@@ -811,8 +828,7 @@ public class XQParser extends Lexer
           case 10:
             if (match("instanceof")) // obsolete
               {
-                if (warnOldVersion)
-		  error('w', "use 'instanceof of' (two words) instead of 'instanceof'");
+                warnOldVersion("use 'instanceof of' (two words) instead of 'instanceof'");
                 curToken = OP_INSTANCEOF;
               }
             break;
@@ -1044,9 +1060,7 @@ public class XQParser extends Lexer
 	  case 'e':
 	    if (lookingAt("default", /*"e"+*/ "lement"))
 	      {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'default element' by 'declare default element namespace'");
+		warnOldVersion("replace 'default element' by 'declare default element namespace'");
 		return curToken = DEFAULT_ELEMENT_TOKEN;
 	      }
 	    break;
@@ -1055,16 +1069,12 @@ public class XQParser extends Lexer
 	      return curToken = DECLARE_FUNCTION_TOKEN;
 	    if (lookingAt("define", /*"f"+*/ "unction"))
 	      {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'define function' by 'declare function'");
+                warnOldVersion("replace 'define function' by 'declare function'");
 		return curToken = DECLARE_FUNCTION_TOKEN;
 	      }
 	    if (lookingAt("default", /*"f"+*/ "unction"))
 	      {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'default function' by 'declare default function namespace'");
+		warnOldVersion("replace 'default function' by 'declare default function namespace'");
 		return curToken = DEFAULT_FUNCTION_TOKEN;
 	      }
 	    break;
@@ -1077,9 +1087,7 @@ public class XQParser extends Lexer
 	      return curToken = DECLARE_NAMESPACE_TOKEN;
 	    if (lookingAt("default", /*"n"+*/ "amespace"))
 	      {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'default namespace' by 'declare default element namespace'");
+		warnOldVersion("replace 'default namespace' by 'declare default element namespace'");
 		return curToken = DEFAULT_ELEMENT_TOKEN;
 	      }
 	    if (lookingAt("module", /*"n"+*/ "amespace"))
@@ -1098,9 +1106,7 @@ public class XQParser extends Lexer
 	      return curToken = DECLARE_VARIABLE_TOKEN;
 	    if (lookingAt("define", /*"v"+*/ "ariable"))
 	      {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'define variable' by 'declare variable'");
+                warnOldVersion("replace 'define variable' by 'declare variable'");
 		return curToken = DECLARE_VARIABLE_TOKEN;
 	      }
             if (lookingAt("xquery", /*"v"+*/ "ersion"))
@@ -1109,9 +1115,7 @@ public class XQParser extends Lexer
 	  case 'x':
 	    if (lookingAt("declare", /*"x"+*/ "mlspace"))
               {
-		if (warnOldVersion)
-		  error('w',
-			"replace 'define xmlspace' by 'declare boundary-space'");
+		warnOldVersion("replace 'define xmlspace' by 'declare boundary-space'");
                 return curToken = DECLARE_BOUNDARY_SPACE_TOKEN;
               }
 	    break;
@@ -1436,6 +1440,18 @@ public class XQParser extends Lexer
 	min = 1;
 	max = 1;
       }
+    if (parseContext == 'C')
+      {
+        if (max != 1)
+          return syntaxError("type to 'cast as' or 'castable as' must be a 'SingleType'");
+        if (etype instanceof QuoteExp)
+          {
+            Object t = ((QuoteExp) etype).getValue();
+            if (t instanceof NodeType || t == Type.pointer_type)
+              return syntaxError("type to 'cast as' or 'castable as' must an atomic type");
+              
+          }
+      }
     if (min != max)
       {
 	getRawToken();
@@ -1609,7 +1625,10 @@ public class XQParser extends Lexer
 	popNesting(saveReadState);
         if (token >= OP_INSTANCEOF && token <= OP_CAST_AS)
           {
+            if (token == OP_CAST_AS || token == OP_CASTABLE_AS)
+              parseContext = 'C';
             Expression type = parseDataType();
+            parseContext = '\0';
             Expression[] args = new Expression[2];
             Expression func;
             switch (token)
@@ -2252,9 +2271,14 @@ public class XQParser extends Lexer
 		next = read();
 		if (next == '/')
 		  break;
-		result.addElement(parseXMLConstructor(next));
+                Expression content = parseXMLConstructor(next);
+		result.addElement(content);
 		tokenBufferLength = 0;
-		skippable = skipBoundarySpace;
+                if (content instanceof ApplyExp
+                    && ((ApplyExp) content).getFunction() == makeCDATA)
+                  skippable = false;
+                else
+                  skippable = skipBoundarySpace;
 	      }
 	  }
 	else if (next == '&')
@@ -2264,6 +2288,11 @@ public class XQParser extends Lexer
 	  }
 	else
 	  {
+            if (delimiter != '<'
+                && (next == '\t' || next == '\n' || next == '\r'))
+              next = ' ';
+            if (next == '<')
+              error('e', "'<' must be quoted in a direct attribute value");
 	    if (skippable)
 	      skippable = Character.isWhitespace((char) next);
 	    tokenBufferAppend((char) next);
@@ -2277,6 +2306,8 @@ public class XQParser extends Lexer
   Expression parseEnclosedExpr()
       throws java.io.IOException, SyntaxException
   {
+    String saveErrorIfComment = errorIfComment;
+    errorIfComment = null;
     char saveReadState = pushNesting('{');
     peekNonSpace("unexpected end-of-file after '{'");
     int startLine = getLineNumber() + 1;
@@ -2303,6 +2334,7 @@ public class XQParser extends Lexer
     exp.setFile(getName());
     exp.setLine(startLine, startColumn);
     popNesting(saveReadState);
+    errorIfComment = saveErrorIfComment;
     return exp;
   }
 
@@ -2335,6 +2367,9 @@ public class XQParser extends Lexer
     decl.noteValue(new QuoteExp(uri));
     return decl;
   }
+
+  static final Expression makeCDATA =
+    makeFunctionExp("gnu.kawa.xml.MakeCDATA", "makeCDATA");
 
   /** Parse an ElementConstructor or other constructs starting with '<'.
    * Assume initial '<' has been processed.
@@ -2382,9 +2417,7 @@ public class XQParser extends Lexer
 	    getDelimited("]]>");
 	    Expression[] args =
 	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
-	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.MakeCDATA",
-					       "makeCDATA"),
-			       args);
+	    exp = new ApplyExp(makeCDATA, args);
 	  }
 	else
 	  exp = syntaxError("'<!' must be followed by '--' or '[CDATA['");
@@ -2440,7 +2473,7 @@ public class XQParser extends Lexer
   }
 
   /** Parse ElementConstructor.
-   * Assume initial '<' has been processed,
+   * Assume initial {@code '<'} has been processed,
    * and we're looking at the next token..
    * Reads through end of the end tag.  FIXME
    */
@@ -2451,12 +2484,11 @@ public class XQParser extends Lexer
     // because of constructs like this:  <a x="{$x:v}" xmlns:x="xx"/>
     // Instead we defer namespaced lookup until XQResolveNames.  (Mostly -
     // some places still incorrectly do premature namespace resolution.)
-    if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
-      return syntaxError("expected QName after '<'");
     String startTag = new String(tokenBuffer, 0, tokenBufferLength);
     Vector vec = new Vector();
     Expression[] args;
     vec.addElement(castQName(new QuoteExp(startTag)));
+    errorIfComment = "comment not allowed in element start tag";
     NamespaceBinding namespaceOuter = namespaceBindings;
     int ch;
     for (;;)
@@ -2489,13 +2521,15 @@ public class XQParser extends Lexer
 	vec.addElement(castQName(new QuoteExp(attrName)));
 	ch = skipSpace();
 	if (ch != '=')
-	  return syntaxError("missing '=' after attribute");
+          {
+            errorIfComment = null;
+            return syntaxError("missing '=' after attribute");
+          }
 	ch = skipSpace();
         int enclosedExpressionsStart = enclosedExpressionsSeen;
 	if (ch == '{')
 	  {
-	    if (warnOldVersion)
-	      error('w', "enclosed attribute value expression should be quoted");
+            warnOldVersion("enclosed attribute value expression should be quoted");
 	    vec.addElement(stringValue(parseEnclosedExpr()));
 	  }
 	else
@@ -2515,6 +2549,19 @@ public class XQParser extends Lexer
             checkAllowedNamespaceDeclaration(definingNamespace, ns);
 	    if (definingNamespace == "")
 	      definingNamespace = null;
+            for (NamespaceBinding nsb = namespaceBindings;
+                 nsb != namespaceOuter;  nsb = nsb.getNext())
+              {
+                if (nsb.getPrefix() == definingNamespace)
+                  {
+                    error('e',
+                          definingNamespace == null
+                          ? "duplicate default namespace declaration"
+                          : "duplicate namespace prefix '"+definingNamespace+'\'',
+                          "XQST0071");
+                    break;
+                  }
+              }
 	    namespaceBindings
 	      = new NamespaceBinding(definingNamespace,
 				     ns == "" ? null : ns,
@@ -2532,6 +2579,7 @@ public class XQParser extends Lexer
 	    vec.addElement(aexp);
 	  }
       }
+    errorIfComment = null;
     boolean empty = false;
     if (ch == '/')
       {
@@ -2546,17 +2594,18 @@ public class XQParser extends Lexer
 	if (ch != '>')
 	  return syntaxError("missing '>' after start element");
 	parseContent('<', vec);
-	ch = skipSpace();
-	if (ch >= 0 && ch != '>')
+	ch = peek();
+        if (ch >= 0)
 	  {
-	    unread(ch);
-	    getRawToken();
-	    if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
+            if (! XName.isNameStart((char) ch))
 	      return syntaxError("invalid tag syntax after '</'");
+	    getRawToken();
 	    String tag = new String(tokenBuffer, 0, tokenBufferLength);
 	    if (! (tag.equals(startTag)))
 	      return syntaxError("'<"+startTag+">' closed by '</"+tag+">'");
+            errorIfComment = "comment not allowed in element end tag";
 	    ch = skipSpace();
+            errorIfComment = null;
 	  }
 	if (ch != '>')
 	  return syntaxError("missing '>' after end element");
@@ -3017,8 +3066,13 @@ public class XQParser extends Lexer
   public Expression parseIfExpr()
       throws java.io.IOException, SyntaxException
   {
-    char save = pushNesting('i');
-    Expression cond = parseParenExpr();
+    char saveReadState1 = pushNesting('i');
+    getRawToken();
+    char saveReadState2 = pushNesting('(');
+    Expression cond = parseExprSequence(')', false);
+    popNesting(saveReadState2);
+    if (curToken == EOF_TOKEN)
+      eofError("missing ')' - unexpected end-of-file");
     getRawToken();
     if (! match("then"))
       syntaxError("missing 'then'");
@@ -3029,7 +3083,7 @@ public class XQParser extends Lexer
       syntaxError("missing 'else'");
     else
       getRawToken();
-    popNesting(save);
+    popNesting(saveReadState1);
     Expression elsePart = parseExpr();
     return new IfExp(booleanValue(cond), thenPart, elsePart);
   }
@@ -3425,8 +3479,6 @@ public class XQParser extends Lexer
     if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
       return syntaxError("missing function name");
     String name = new String(tokenBuffer, 0, tokenBufferLength);
-    if (name.indexOf(':') < 0)
-      error('w', "defined function must have qualified name");
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -3604,8 +3656,7 @@ public class XQParser extends Lexer
 	  }
 	if (curToken == '{')
 	  {
-	    if (warnOldVersion)
-	      error('w', "obsolete '{' in variable declaration");
+	    warnOldVersion("obsolete '{' in variable declaration");
 	    init = parseEnclosedExpr();
 	    parseSeparator();
 	  }
@@ -3716,9 +3767,9 @@ public class XQParser extends Lexer
         comp.setLine(port.getName(), startLine, startColumn);
 	if (match("at"))
 	  {
-	    getRawToken();
             for (;;)
               {
+                getRawToken();
                 if (curToken != STRING_TOKEN)
                   return syntaxError("missing module location");
                 at = new String(tokenBuffer, 0, tokenBufferLength);
@@ -3807,13 +3858,12 @@ public class XQParser extends Lexer
 	    String msg = "expected 'namespace' keyword";
 	    if (curToken != STRING_TOKEN && curToken != OP_EQU)
 	      return declError(msg);
-	    else if (warnOldVersion)
-	      error('w', msg);
+	    else
+	      warnOldVersion(msg);
 	  }
 	if (curToken == OP_EQU || curToken == COLON_EQUAL_TOKEN)
 	  {
-	    if (warnOldVersion)
-	      error('w', "extra '=' in default namespace declaration");
+	    warnOldVersion("extra '=' in default namespace declaration");
 	    getRawToken();
 	  }
 	if (curToken != STRING_TOKEN)
@@ -3840,8 +3890,7 @@ public class XQParser extends Lexer
 	getRawToken();
 	if (curToken == OP_EQU)
 	  {
-	    if (warnOldVersion)
-	      error('w', "obsolate '=' in boundary-space declaration");
+	    warnOldVersion("obsolate '=' in boundary-space declaration");
 	    getRawToken();
 	  }
         if (boundarySpaceDeclarationSeen && ! interactive)
@@ -3853,8 +3902,7 @@ public class XQParser extends Lexer
 	  boundarySpacePreserve = false;
 	else if (match("skip"))
           {
-	    if (warnOldVersion)
-	      error('w', "update: declare boundary-space skip -> strip");
+	    warnOldVersion("update: declare boundary-space skip -> strip");
             boundarySpacePreserve = false;
           }
 	else
@@ -4171,4 +4219,9 @@ public class XQParser extends Lexer
     throw new SyntaxException(messages);
   }
 
+  void warnOldVersion (String message)
+  {
+    if (warnOldVersion || comp.isPedantic())
+      error(comp.isPedantic() ? 'e' : 'w', message);
+  }
 }

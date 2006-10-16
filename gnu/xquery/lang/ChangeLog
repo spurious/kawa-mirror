@@ -1,5 +1,38 @@
 2006-10-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (warnOldVersion): New convenience method.
+	Call it lots of places we used to check for warnOldVersion.
+
+	* XQParser.java (parseContext): New field, to catch some
+	context-dependent errors.
+	(parseDataType): Error if disallowed types in cast context.
+	(parseBinaryExpr): Set parseContext so we can catch above error.
+
+	* XQParser.java (errorIfComment): New field.
+	(skipComment): Emit error if errorIfComment is non-null.
+	(parseEnclosedExpr): Save/clear/restore errorIfComment.
+	(parseElementConstructor): Disallow comments in direct constructor.
+	Error if QName does not immeditately follow '</'.
+
+	* XQParser.java (parseElementConstructor): Error if there are
+	duplicate namespace declaration attributes.
+
+	* XQParser.java (parseContent): Normalize attribute whitespace.
+	Complain if literal '<' in attribute value.
+	
+	* XQParser.java (getRawToken): Check there is a separator after number.
+
+	* XQParser.java (makeCDATA): New static field.
+	(parseXMLConstructor): Use makeCDATA field to parse CDATA.
+	(parseContent): Boundary-space not skippable before/after CDATA.
+
+	* XQParser.java (parseIfExpr): Don't use parseParenExpr, because that
+	allows an missing expression, which is not allowed here.
+
+	* XQParser.java (parse): Fix bad parse of 'at' in 'import module'.
+
+2006-10-15  Per Bothner  <per@bothner.com>
+
 	* XQParser.java (parseFLWRExpression): Coerce let value to its type.
 	(parse): Coerce 'declare variable' value to its type.
 

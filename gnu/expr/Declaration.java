@@ -920,6 +920,33 @@ public class Declaration
     return decl;
   }
 
+  /** Similar to {@code getDeclarationFromStatic},
+   * but also do {@code noteValue} with the field's value.
+   */
+  public static Declaration
+  getDeclarationValueFromStatic (String className,
+                                 String fieldName, String name)
+  {
+    try
+      {
+	Class cls = Class.forName(className);
+	java.lang.reflect.Field fld = cls.getDeclaredField(fieldName);
+	Object value = fld.get(null);
+
+	Declaration decl
+          = new Declaration(name,
+                            ClassType.make(className)
+                            .getDeclaredField(fieldName));
+	decl.noteValue(new QuoteExp(value));
+	decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
+        return decl;
+      }
+    catch (Exception ex)
+      {
+	throw new WrappedException(ex);
+      }
+  }
+
   public static Declaration getDeclaration(Named proc)
   {
     return getDeclaration(proc, proc.getName());

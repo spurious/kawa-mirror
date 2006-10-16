@@ -4070,24 +4070,9 @@ public class XQParser extends Lexer
   public static Expression makeFunctionExp(String className,
 					   String fieldName, String name)
   {
-    try
-      {
-	Class cls = Class.forName(className);
-	java.lang.reflect.Field fld = cls.getDeclaredField(fieldName);
-	Procedure proc = (Procedure) fld.get(null);
-	//return new QuoteExp(proc);
-
-	ClassType type = ClassType.make(className);
-	gnu.bytecode.Field procField = type.getDeclaredField(fieldName);
-	Declaration decl = new Declaration(name, procField);
-	decl.noteValue(new QuoteExp(proc));
-	decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
-	return new ReferenceExp(name, decl);
-      }
-    catch (Exception ex)
-      {
-	throw new WrappedException(ex);
-      }
+    return new ReferenceExp(name,
+                            Declaration.getDeclarationValueFromStatic
+                            (className, fieldName, name));
   }
 
   static final Expression funcForwardFilter

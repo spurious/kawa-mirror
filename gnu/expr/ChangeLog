@@ -1,3 +1,7 @@
+2006-10-16  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (getDeclarationValueFromStatic): New static method.
+
 2006-10-15  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (error): New overloaded method.

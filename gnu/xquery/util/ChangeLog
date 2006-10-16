@@ -1,3 +1,7 @@
+2006-10-16  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (appendCodepoint): Fix thinko.
+
 2006-10-13  Per Bothner  <per@bothner.com>
 
 	* HandleExtension.java: Remove no-longer needed file.

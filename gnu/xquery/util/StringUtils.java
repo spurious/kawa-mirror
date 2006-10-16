@@ -230,7 +230,7 @@ public class StringUtils
     int i = I.intValue();
     if (i <= 0
         || (i > 0xD7FF
-            && (i < 0xE000 || (i > 0xFFFD || i < 0x10000) || i > 0x10FFFF)))
+            && (i < 0xE000 || (i > 0xFFFD && i < 0x10000) || i > 0x10FFFF)))
       throw new IllegalArgumentException("codepoints-to-string: "+i+" is not a valid XML character [FOCH0001]");
     // FIXME - handle surrugates
     sbuf.append((char) i);

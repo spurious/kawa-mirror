@@ -1,3 +1,12 @@
+2006-10-15  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (error): New overloaded method.
+
+	* Compilation.java (pedantic): New flag field.
+	(isPedantic): New method.
+	* Language.java (requirePedantic): New static field.
+	(parse): Set Compilation's pedantic flag from requirePedantic.
+
 2006-10-12  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (getMessages): New convenience method.

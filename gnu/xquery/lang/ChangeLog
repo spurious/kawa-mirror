@@ -1,5 +1,29 @@
 2006-10-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (seenDeclaration): New flag to catch errors where
+	namespace declaration etc follow var/function/option decl.
+
+	* XQParser.java (DECLARE_OPTION_TOKEN): New constant.
+	(peekOperand): Recognize 'declare option'.
+	(parse): Handle DECLARE_OPTION_TOKEN.
+	(handleOption): New method.
+	
+	* XQParser.java (parse): Complain about duplicate namespace prefix.
+	(pushNamespace): Remove now-redundant intern.
+	(builtinNamespaces): New static field.  Initialize by clinit.
+	Remove support for 'xdt' prefix.
+	(pushStandardNamespaces): Simplify - now just iterate over
+	builtinNamespaces and makeNamespaceDecl+push for each.
+	Imline now-simplified function init <init>.
+
+	* XQResolveNames.java (namespaceResolve): Move to ...
+	* XQParser.java (namespaceResolve): ... here.
+	* XQResolveNames.java: Update callers of namespaceResolve.
+	* XQResolveNames.java (push): Move check for bad namespace uri for
+	function to ...
+	* XQParser.java (parseFunctionDefinition): ... here so we can catch
+	the error at parse-time.
+
 	* XQParser.java (makeFunctionExp): Simplify using new method
 	getDeclarationValueFromStatic in Declaration.
 

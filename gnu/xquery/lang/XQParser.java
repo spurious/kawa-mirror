@@ -31,6 +31,8 @@ public class XQParser extends Lexer
   /** Normally null.
    * 'C' means parsing the type of a 'cast as' or 'castable as'. */
   int parseContext;
+  /** True if we've seen a VarDecl, FunctionDecl, or OptionDecl. */
+  boolean seenDeclaration;
 
   /** Value of getLineNumber() at start of current token.
    * Sometimes set otherwise, to report errors. */
@@ -287,6 +289,7 @@ public class XQParser extends Lexer
   static final int DECLARE_BASE_URI_TOKEN = 'B'; // <"declare" "base-uri">
   static final int DECLARE_ORDERING_TOKEN = 'U'; // <"declare" "ordering">
   static final int DECLARE_CONSTRUCTION_TOKEN = 'K'; // <"declare" "construction">
+  static final int DECLARE_OPTION_TOKEN = 'o'; // <"declare" "option">
   static final int DECLARE_COPY_NAMESPACES_TOKEN = 'L'; // <"declare" "copy-namespaces">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
   static final int XQUERY_VERSION_TOKEN = 'Y'; // <"xquery" "version">
@@ -1096,6 +1099,8 @@ public class XQParser extends Lexer
 	  case 'o':
 	    if (lookingAt("declare", /*"o"+*/ "rdering"))
 	      return curToken = DECLARE_ORDERING_TOKEN;
+	    if (lookingAt("declare", /*"o"+*/ "ption"))
+	      return curToken = DECLARE_OPTION_TOKEN;
 	    break;
 	  case 's':
 	    if (lookingAt("import", /*"s"+*/ "chema"))
@@ -1160,26 +1165,8 @@ public class XQParser extends Lexer
       return decl;
     if (prefix == XQuery.DEFAULT_ELEMENT_PREFIX)
       prefix = null;
-    else
-      prefix = prefix.intern();
     prologNamespaces = new NamespaceBinding(prefix, uri, prologNamespaces);
     return decl;
-  }
-
-  private void pushStandardNamespaces ()
-  {
-    pushNamespace("xml", NamespaceBinding.XML_NAMESPACE);
-    pushNamespace("xs", XQuery.SCHEMA_NAMESPACE);
-    // Recently xdt types have been moved into the xs namespace.
-    // However, keep the xdt prefix for the sake of old code,
-    // but as an alias for xs.
-    pushNamespace("xdt", XQuery.SCHEMA_NAMESPACE);
-    pushNamespace("xsi", XQuery.SCHEMA_INSTANCE_NAMESPACE);
-    pushNamespace("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
-    pushNamespace("html", XQuery.XHTML_NAMESPACE);
-    pushNamespace("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);
-    pushNamespace("qexo", XQuery.QEXO_FUNCTION_NAMESPACE);
-    pushNamespace("local", XQuery.LOCAL_NAMESPACE);
   }
 
   public XQParser(InPort port, SourceMessages messages, XQuery interp)
@@ -1188,7 +1175,12 @@ public class XQParser extends Lexer
     interpreter = interp;
     lexical = new NameLookup(interp);
     nesting = 1;
-    pushStandardNamespaces();
+
+    // Push standard namespaces into lexical scope.
+    NamespaceBinding ns = builtinNamespaces;
+    prologNamespaces = ns;
+    for (;  ns != null;  ns = ns.getNext())
+      lexical.push(makeNamespaceDecl (ns.getPrefix(), ns.getUri()));
   }
 
   public void setInteractive(boolean v)
@@ -3475,10 +3467,26 @@ public class XQParser extends Lexer
   public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
-    String local, uri;
     if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
       return syntaxError("missing function name");
     String name = new String(tokenBuffer, 0, tokenBufferLength);
+    Symbol sym = namespaceResolve(name, true);
+    String uri = sym.getNamespaceURI();
+    if (uri == NamespaceBinding.XML_NAMESPACE
+        || uri == XQuery.SCHEMA_NAMESPACE
+        || uri == XQuery.SCHEMA_INSTANCE_NAMESPACE
+        || uri == XQuery.XQUERY_FUNCTION_NAMESPACE)
+      {
+        error('e', 
+              "cannot declare function in standard namespace '"+uri+'\'',
+              "XQST0045");
+      }
+    else if (uri == "")
+      {
+        error(comp.isPedantic() ? 'e' : 'w',
+              "cannot declare function in empty namespace",
+              "XQST0060");
+      }
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -3487,7 +3495,7 @@ public class XQParser extends Lexer
     lexp.setFile(getName());
     lexp.setLine(declLine, declColumn);
     lexp.setName(name);
-    Declaration decl = comp.currentScope().addDeclaration(name);
+    Declaration decl = comp.currentScope().addDeclaration(sym);
     if (comp.isStatic())
       decl.setFlag(Declaration.STATIC_SPECIFIED);
     comp.push(decl);
@@ -3540,7 +3548,56 @@ public class XQParser extends Lexer
 
   String defaultElementNamespace = "";
   NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
-  NamespaceBinding prologNamespaces = NamespaceBinding.predefinedXML;
+  NamespaceBinding prologNamespaces;
+  static NamespaceBinding builtinNamespaces;
+  static {
+    NamespaceBinding ns = NamespaceBinding.predefinedXML;
+    ns = new NamespaceBinding("xml", NamespaceBinding.XML_NAMESPACE, ns);
+    ns = new NamespaceBinding("xs", XQuery.SCHEMA_NAMESPACE, ns);
+    ns = new NamespaceBinding("xsi", XQuery.SCHEMA_INSTANCE_NAMESPACE, ns);
+    ns = new NamespaceBinding("fn", XQuery.XQUERY_FUNCTION_NAMESPACE, ns);
+    ns = new NamespaceBinding("html", XQuery.XHTML_NAMESPACE, ns);
+    ns = new NamespaceBinding("kawa", XQuery.KAWA_FUNCTION_NAMESPACE, ns);
+    ns = new NamespaceBinding("qexo", XQuery.QEXO_FUNCTION_NAMESPACE, ns);
+    ns = new NamespaceBinding("local", XQuery.LOCAL_NAMESPACE, ns);
+    builtinNamespaces = ns;
+  }
+
+  protected Symbol namespaceResolve (String name, boolean function)
+  {
+    int colon = name.indexOf(':');
+    String prefix = colon >= 0 ? name.substring(0, colon)
+      : function ? XQuery.DEFAULT_FUNCTION_PREFIX
+      : XQuery.DEFAULT_ELEMENT_PREFIX; 
+    String nssym = prefix.intern();
+    Declaration decl = lexical.lookup(nssym, -1);
+    Object uri = null;
+    if (decl != null)
+      uri = decl.getConstantValue();
+
+    if (! (uri instanceof String))
+      {
+	if (colon < 0)
+	  uri = "";
+	else
+	  {
+	    try
+	      {
+		Class cl = Class.forName(prefix);
+		uri = "class:" + prefix;
+	      }
+	    catch (Exception ex)
+	      {
+		error('e',
+                               "unknown namespace prefix '" + prefix + "'",
+                               "XPST0081");
+		return null;
+	      }
+	  }
+      }
+    String local = colon < 0 ? name : name.substring(colon+1);
+    return Symbol.make(uri, local);
+  }
 
   void parseSeparator ()
     throws java.io.IOException, SyntaxException
@@ -3631,6 +3688,7 @@ public class XQParser extends Lexer
 	parseSeparator();
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
+        seenDeclaration = true;
 	return exp;
 
       case DECLARE_VARIABLE_TOKEN:
@@ -3687,10 +3745,13 @@ public class XQParser extends Lexer
 	exp = SetExp.makeDefinition(decl, init);
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
+        seenDeclaration = true;
 	return exp;
 
       case DECLARE_NAMESPACE_TOKEN:
       case MODULE_NAMESPACE_TOKEN:
+        if (seenDeclaration && ! interactive)
+          error('e', "namespace declared after function/variable/option");
 	int command = curToken;
 	next = skipSpace(nesting != 0);
 	if (next >= 0)
@@ -3709,6 +3770,13 @@ public class XQParser extends Lexer
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri in namespace declaration");
 		uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
+                prefix = prefix.intern();
+                if (prologNamespaces.resolve(prefix, builtinNamespaces)
+                    != null)
+                  error('e',
+                      "duplicate declarations for the same namespace prefix '"
+                        +prefix+"'",
+                        "XQST0033");
 		decl = pushNamespace(prefix, uri);
                 checkAllowedNamespaceDeclaration(prefix, uri);
 		comp.mainLambda.addDeclaration(decl);
@@ -3757,7 +3825,7 @@ public class XQParser extends Lexer
 	if (prefix != null)
           {
             checkAllowedNamespaceDeclaration(prefix, uri);
-            comp.mainLambda.addDeclaration(pushNamespace(prefix, uri));
+            comp.mainLambda.addDeclaration(pushNamespace(prefix.intern(), uri));
           }
 	getRawToken();
         String at;
@@ -3967,6 +4035,24 @@ public class XQParser extends Lexer
         parseSeparator();
 	return QuoteExp.voidExp;
 
+      case DECLARE_OPTION_TOKEN:
+	getRawToken();
+        if (curToken != QNAME_TOKEN)
+          syntaxError("expected QName after 'declare option'");
+        else
+          {
+            String str = new String(tokenBuffer, 0, tokenBufferLength);
+            getRawToken();
+            if (curToken != STRING_TOKEN)
+              syntaxError("expected string literal after 'declare option <QName>'");
+            else
+              handleOption(namespaceResolve(str, false),
+                           new String(tokenBuffer, 0, tokenBufferLength));
+          }
+        parseSeparator();
+        seenDeclaration = true;
+	return QuoteExp.voidExp;
+
       case DECLARE_ORDERING_TOKEN:
 	getRawToken();
 	if (match("ordered"))
@@ -4040,6 +4126,11 @@ public class XQParser extends Lexer
     exp.setFile(getName());
     exp.setLine(startLine, startColumn);
     return exp;
+  }
+
+  public void handleOption (Symbol name, String value)
+  {
+    // Nothing, for now.
   }
 
   public final static String[] axisNames = new String[COUNT_OP_AXIS];

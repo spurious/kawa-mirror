@@ -1,3 +1,7 @@
+2006-10-16  Per Bothner  <per@bothner.com>
+
+	* expected-1.errs: Update for changed error message.
+
 2006-10-13  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (equalsXML): Rename to matches.  In XML mode, do

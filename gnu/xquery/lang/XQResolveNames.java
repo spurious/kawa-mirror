@@ -188,42 +188,6 @@ public class XQResolveNames extends ResolveNames
   public Namespace[] functionNamespacePath
     = XQuery.defaultFunctionNamespacePath;
 
-  protected Symbol namespaceResolve (String name, boolean function)
-  {
-    int colon = name.indexOf(':');
-    String prefix = colon >= 0 ? name.substring(0, colon)
-      : function ? XQuery.DEFAULT_FUNCTION_PREFIX
-      : XQuery.DEFAULT_ELEMENT_PREFIX; 
-    String nssym = prefix.intern();
-    Declaration decl = lookup.lookup(nssym, -1);
-    Object uri = null;
-    if (decl != null)
-      uri = decl.getConstantValue();
-
-    if (! (uri instanceof String))
-      {
-	if (colon < 0)
-	  uri = "";
-	else
-	  {
-	    try
-	      {
-		Class cl = Class.forName(prefix);
-		uri = "class:" + prefix;
-	      }
-	    catch (Exception ex)
-	      {
-		messages.error('e',
-                               "unknown namespace prefix '" + prefix + "'",
-                               "XPST0081");
-		return null;
-	      }
-	  }
-      }
-    String local = colon < 0 ? name : name.substring(colon+1);
-    return Symbol.make(uri, local);
-  }
-
   protected void push (ScopeExp exp)
   {
     Compilation comp = getCompilation();
@@ -250,34 +214,15 @@ public class XQResolveNames extends ResolveNames
 		int saveLine = comp.getLine();
 		int saveColumn = comp.getColumn();
 		comp.setLine(decl.getFile(), line, decl.getColumn());
-		name = namespaceResolve((String) name, function);
+		name = parser.namespaceResolve((String) name, function);
 		comp.setLine(saveFilename, saveLine, saveColumn);
 	      }
 	    else
-	      name = namespaceResolve((String) name, function);
+	      name = parser.namespaceResolve((String) name, function);
 	    if (name == null)
               continue;
             decl.setName(name);
 	  }
-        if (function)
-          {
-            String uri = ((Symbol) name).getNamespaceURI();
-            if (uri == NamespaceBinding.XML_NAMESPACE
-                || uri == XQuery.SCHEMA_NAMESPACE
-                || uri == XQuery.SCHEMA_INSTANCE_NAMESPACE
-                || uri == XQuery.XQUERY_FUNCTION_NAMESPACE)
-              {
-                comp.error('e', 
-                           "cannot declare function in standard namespace '"
-                           +uri+'\'',
-                           "XQST0045", decl);
-              }
-            else if (uri == "" && comp.isPedantic())
-              {
-                comp.error('e', "cannot declare function in empty namespace",
-                           "XQST0060", decl);
-              }
-          }
 
 	Declaration old = lookup.lookup(name, function);
         if (old != null)
@@ -373,7 +318,7 @@ public class XQResolveNames extends ResolveNames
               }
             else
               {
-                sym = namespaceResolve(name, function);
+                sym = parser.namespaceResolve(name, function);
                 if (sym != null)
                   {
                     decl = lookup.lookup(sym, function);
@@ -840,7 +785,7 @@ public class XQResolveNames extends ResolveNames
                     {
                       Expression pname = args[i];
                       String qname = (String) ((QuoteExp) pname).getValue();
-                      Symbol psymbol = namespaceResolve(qname, false);
+                      Symbol psymbol = parser.namespaceResolve(qname, false);
                       if (psymbol == null)
                         ; // error emitted in namespaceResolve
                       else if (psymbol.getNamespaceURI().length() == 0)

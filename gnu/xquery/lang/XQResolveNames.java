@@ -259,14 +259,42 @@ public class XQResolveNames extends ResolveNames
               continue;
             decl.setName(name);
 	  }
+        if (function)
+          {
+            String uri = ((Symbol) name).getNamespaceURI();
+            if (uri == NamespaceBinding.XML_NAMESPACE
+                || uri == XQuery.SCHEMA_NAMESPACE
+                || uri == XQuery.SCHEMA_INSTANCE_NAMESPACE
+                || uri == XQuery.XQUERY_FUNCTION_NAMESPACE)
+              {
+                comp.error('e', 
+                           "cannot declare function in standard namespace '"
+                           +uri+'\'',
+                           "XQST0045", decl);
+              }
+            else if (uri == "" && comp.isPedantic())
+              {
+                comp.error('e', "cannot declare function in empty namespace",
+                           "XQST0060", decl);
+              }
+          }
 
 	Declaration old = lookup.lookup(name, function);
-	if (XQParser.warnHidePreviousDeclaration
-            && old != null
-	    && (! (name instanceof Symbol)
-		|| ((Symbol) name).getNamespace() != null))
-	  comp.error('w', decl, "declaration ",
-		     " hides previous declaration");
+        if (old != null)
+          {
+            if (decl.context == old.context
+                // FIXME we don't handle duplicate functions correctly.
+                && ! decl.isProcedureDecl() && ! old.isProcedureDecl())
+              {
+                comp.error('e', decl, "duplicate declaration of '", "'");
+                comp.error('e', old, "(this is the previous declaration of '", "')");
+              }
+            else if (XQParser.warnHidePreviousDeclaration
+                && (! (name instanceof Symbol)
+                    || ((Symbol) name).getNamespace() != null))
+              comp.error('w', decl, "declaration ",
+                         " hides previous declaration");
+          }
 	lookup.push(decl);
       }
   }
@@ -385,9 +413,12 @@ public class XQResolveNames extends ResolveNames
     Expression result = super.walkSetExp(exp);
     Declaration decl = exp.getBinding();
     Object name;
+    Expression new_value;
     if (decl != null && ! getCompilation().immediate
 	&& (name = decl.getSymbol()) instanceof Symbol
-	&& XQuery.LOCAL_NAMESPACE.equals(((Symbol) name).getNamespaceURI()))
+	&& XQuery.LOCAL_NAMESPACE.equals(((Symbol) name).getNamespaceURI())
+        && (! ((new_value = exp.getNewValue()) instanceof ApplyExp)
+            || ((ApplyExp) new_value).getFunction() != XQParser.getExternalFunction))
       {
 	decl.setFlag(Declaration.PRIVATE_SPECIFIED);
 	decl.setPrivate(true);

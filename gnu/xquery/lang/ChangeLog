@@ -1,5 +1,18 @@
 2006-10-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseFLWRExpression): Coerce let value to its type.
+	(parse): Coerce 'declare variable' value to its type.
+
+	* XQParser.java (getExternalFunction): New static field.
+	(parse): Use new field.
+	* XQResolveNames.java (walkSetExp): Don't make declaration private
+	for 'local' namespace if variabel is external.
+
+	* XQResolveNames.java (push): Check for disallowed uri of function.
+	Print error if duplicate variable declaration in same scope.
+	* XQParser.java (parseFLWRExpression): Pass error code to new error
+	variant.
+
 	* XQuery.java (isNameStart, isNamePart): Removed, since now in
 	gnu.xml.XPath.  Update callers.
 	(checkSeparator): Nwe convenience method.

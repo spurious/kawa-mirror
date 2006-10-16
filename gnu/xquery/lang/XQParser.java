@@ -3147,8 +3147,8 @@ public class XQParser extends Lexer
                         collation = NamedCollator.make((String) uri);
                       }
                     catch (Exception name)
-                      { // err:XQ0076
-                        error("unknown collation '"+uri+"'");
+                      {
+                        error('e', "unknown collation '"+uri+"'", "XQST0076");
                       }
                   }
                 getRawToken();
@@ -3256,6 +3256,8 @@ public class XQParser extends Lexer
 	sc = let;
       }
     inits[0] = parseExprSingle();
+    if (type != null && ! isFor) // FIXME - for now
+      inits[0] = Convert.makeCoercion(inits[0], type);
     popNesting(saveNesting);
     comp.push(sc);
     sc.addDeclaration(decl);
@@ -3506,6 +3508,10 @@ public class XQParser extends Lexer
       unread(next);
   }
 
+  public static final QuoteExp getExternalFunction =
+    QuoteExp.getInstance(new PrimProcedure("gnu.xquery.lang.XQuery",
+                                           "getExternal", 2));
+
   /** Parse an expression.
    * Return null on EOF. */
   public Expression parse(Compilation comp)
@@ -3610,9 +3616,7 @@ public class XQParser extends Lexer
                 castQName(new QuoteExp(decl.getSymbol())),
                 type==null ? QuoteExp.nullExp : type
               };
-            init = new ApplyExp(ClassType.make("gnu.xquery.lang.XQuery")
-                                .getDeclaredMethod("getExternal", 2),
-                                args);
+            init = new ApplyExp(getExternalFunction, args);
             init.setFile(getName());
             init.setLine(curLine, curColumn);
             getRawToken();
@@ -3626,6 +3630,8 @@ public class XQParser extends Lexer
 	    if (init == null)
 	      init = err;
 	  }
+        if (type != null)
+          init = Convert.makeCoercion(init, type);
         decl.noteValue(init);
 	exp = SetExp.makeDefinition(decl, init);
 	exp.setFile(getName());

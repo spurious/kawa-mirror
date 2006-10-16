@@ -13,6 +13,7 @@ import java.util.Stack;
 import java.io.File;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
+import gnu.xml.XName;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
@@ -372,16 +373,6 @@ public class XQParser extends Lexer
   static final int PI_TOKEN = 255; // 'processing-instruction' followed by '{' or alpha
   static final int DOCUMENT_TOKEN = 256; // ;document' followed by '{'
   
-  public static boolean isNameStart(char ch)
-  {
-    return Character.isLetter(ch) || ch == '_';
-  }
-
-  public static boolean isNamePart(char ch)
-  {
-    return Character.isUnicodeIdentifierPart(ch) || ch == '-' || ch == '.';
-  }
-
   private int saveToken;
   private Object saveValue;
 
@@ -407,6 +398,12 @@ public class XQParser extends Lexer
     curLine = port.getLineNumber() + 1;
     curColumn = port.getColumnNumber() + 1 - width;
     return token;
+  }
+
+  void checkSeparator (char ch)
+  {
+    if (XName.isNameStart(ch))
+      error('e', "missing separator", "XPST0003");
   }
 
   int getRawToken()
@@ -584,14 +581,14 @@ public class XQParser extends Lexer
               ch = DOTDOT_TOKEN;
 	    break;
           }
-	else if (isNameStart(ch))
+	else if (XName.isNameStart(ch))
 	  {
 	    for (;;)
 	      {
 		tokenBufferAppend(ch);
 		next = read();
 		ch = (char) next;
-		if (! isNamePart(ch))
+		if (! XName.isNamePart(ch))
 		  break;
 	      }
 	    if (next < 0)
@@ -606,7 +603,7 @@ public class XQParser extends Lexer
 		    if (next < 0)
 		      eofError("unexpected end-of-file after NAME ':'");
 		    ch = (char) next;
-		    if (isNameStart(ch))
+		    if (XName.isNameStart(ch))
 		      {
 			tokenBufferAppend(':');
 			for (;;)
@@ -614,7 +611,7 @@ public class XQParser extends Lexer
 			    tokenBufferAppend(ch);
 			    next = read();
 			    ch = (char) next;
-			    if (! isNamePart(ch))
+			    if (! XName.isNamePart(ch))
 			      break;
 			  }
 			ch = QNAME_TOKEN;
@@ -845,7 +842,7 @@ public class XQParser extends Lexer
 	  {
 	    if (ch < 0)
 	      return true;
-	    if ( ! isNamePart((char) ch))
+	    if ( ! XName.isNamePart((char) ch))
 	      {
 		unread();
 		return true;
@@ -894,7 +891,7 @@ public class XQParser extends Lexer
               {
                 if (next == '(')
                   return curToken = OP_ATTRIBUTE;
-                if (next == '{' || isNameStart((char) next))
+                if (next == '{' || XName.isNameStart((char) next))
                   {
                     unread();
                     return curToken = ATTRIBUTE_TOKEN;
@@ -928,7 +925,7 @@ public class XQParser extends Lexer
               {
                 if (next == '(')
                   return curToken = OP_ELEMENT;
-                if (next == '{' || isNameStart((char) next))
+                if (next == '{' || XName.isNameStart((char) next))
                   {
                     unread();
                     return curToken = ELEMENT_TOKEN;
@@ -967,7 +964,7 @@ public class XQParser extends Lexer
               {
                 if (next == '(')
                   return curToken = OP_PI;
-                if (next == '{' || isNameStart((char) next))
+                if (next == '{' || XName.isNameStart((char) next))
                   {
                     unread();
                     return curToken = PI_TOKEN;
@@ -1122,7 +1119,7 @@ public class XQParser extends Lexer
 	if (next >= 0)
 	  {
 	    unread();
-	    if (isNameStart((char) next) && curValue.equals("define"))
+	    if (XName.isNameStart((char) next) && curValue.equals("define"))
 	      {
 		getRawToken();
 		curToken = DEFINE_QNAME_TOKEN;
@@ -1770,7 +1767,7 @@ public class XQParser extends Lexer
 	    next = read();
 	    if (next < 0)
 	      eofError("unexpected end-of-file after '*:'");
-	    if (isNameStart((char) next))
+	    if (XName.isNameStart((char) next))
 	      {
 		unread();
 		getRawToken();
@@ -2138,7 +2135,7 @@ public class XQParser extends Lexer
 	while (next >= 0)
 	  {
 	    char ch = (char) next;
-	    if (! isNamePart(ch))
+	    if (! XName.isNamePart(ch))
 	      break;
 	    tokenBufferAppend(ch);
 	    next = read();
@@ -2395,7 +2392,7 @@ public class XQParser extends Lexer
     else if (next == '?')
       {
 	next = peek();
-	if (next < 0 || ! isNameStart((char) next)
+	if (next < 0 || ! XName.isNameStart((char) next)
 	    || getRawToken() != NCNAME_TOKEN)
 	  syntaxError("missing target after '<?'");
 	String target = new String(tokenBuffer, 0, tokenBufferLength);
@@ -2421,6 +2418,8 @@ public class XQParser extends Lexer
 					   "makeProcInst"),
 			   args);
       }
+    else if (next < 0 || ! XName.isNameStart((char) next))
+      exp = syntaxError("expected QName after '<'");
     else
       {
 	unread(next);
@@ -3640,7 +3639,7 @@ public class XQParser extends Lexer
 	if (next >= 0)
 	  {
 	    unread();
-	    if (isNameStart((char) next))
+	    if (XName.isNameStart((char) next))
 	      {
 		getRawToken();
 		if (curToken != NCNAME_TOKEN)

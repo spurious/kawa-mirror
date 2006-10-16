@@ -1,5 +1,10 @@
 2006-10-15  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (isNameStart, isNamePart): Removed, since now in
+	gnu.xml.XPath.  Update callers.
+	(checkSeparator): Nwe convenience method.
+	(parseXMLConstructor): Check that tag name immediately follows '<'.
+
 	* XQuery.java (SCHEMA_INSTANCE_NAMESPACE): New URI, for xsi.
 	(XQUERY_FUNCTION_NAMESPACE, LOCAL_NAMESPACE): Update URIs.
 	* XQParser.java (pushStandardNamespaces): Bind "xsi" prefix

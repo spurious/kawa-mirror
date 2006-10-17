@@ -1,5 +1,9 @@
 2006-10-16  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalModule): If Declaration is an alias for
+	one that needsContext(), then create a StaticFieldLocation.
+	Set the latter's Declaration.
+
 	* Declaration.java (getDeclarationValueFromStatic): New static method.
 
 2006-10-15  Per Bothner  <per@bothner.com>

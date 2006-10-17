@@ -1,3 +1,10 @@
+2006-10-16  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (scanForm): Call rewrite to search lexical
+	scope, so we can also indirectly set macroScope.
+	This fixes Savannah bug #17993 "Unbound location exception when
+	require-d syntax calls some procedures".
+
 2006-10-15  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): Set Language.requirePedantic static

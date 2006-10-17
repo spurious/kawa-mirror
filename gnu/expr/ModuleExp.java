@@ -244,9 +244,11 @@ public class ModuleExp extends LambdaExp
 		    // Would it be better to check if fld is FINAL?
                     // If it is, gets its value; otherwise create
                     // a FieldLocation to access it?  FIXME.
-		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
+                    Expression dvalue = decl.getValue();
+		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING)
+                        && ! (dvalue instanceof ReferenceExp
+                              && ((ReferenceExp) dvalue).getBinding().needsContext()))
 		      {
-			Expression dvalue = decl.getValue();
 			Object value;
 			if (dvalue instanceof QuoteExp
 			    && dvalue != QuoteExp.undefined_exp)
@@ -261,10 +263,10 @@ public class ModuleExp extends LambdaExp
 		      }
 		    else
 		      {
-                        Location loc
+                        StaticFieldLocation loc
                           = new StaticFieldLocation(fld.getDeclaringClass(),
                                                     fld.getName());
-			// Perhaps set loc.decl = decl?
+			loc.setDeclaration(decl);
 			env.addLocation(sym, property, loc);
 		      }
 		  }

@@ -938,14 +938,18 @@ public class Translator extends Compilation
             if (obj instanceof String
                 || (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))
               {
-                Declaration decl = lexical.lookup(obj, true);
-                if (decl != null)
-                  syntax = check_if_Syntax(decl);
-                else
+                Expression func = rewrite(obj, true);
+                if (func instanceof ReferenceExp)
                   {
-                    obj = resolve(obj, true);
-                    if (obj instanceof Syntax)
-                      syntax = (Syntax) obj;
+                    Declaration decl = ((ReferenceExp) func).getBinding();
+                    if (decl != null)
+                      syntax = check_if_Syntax(decl);
+                    else
+                      {
+                        obj = resolve(obj, true);
+                        if (obj instanceof Syntax)
+                          syntax = (Syntax) obj;
+                      }
                   }
               }
             // Recognize deferred begin created in scanBody for pendingForms.

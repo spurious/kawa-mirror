@@ -111,16 +111,6 @@ public class StringUtils
   public static Object translate (Object str, Object map, Object trans)
   {
     String sv = coerceToString(str, "translate", 1, "");
-    /*
-    if (str instanceof KNode)
-      str = KNode.atomicValue(str);
-    if (str == Values.empty || str == null)
-      sv = "";
-    else if (str instanceof UntypedAtomic || str instanceof String)
-      sv = str.toString();
-    else
-      throw new WrongType("translate", 1, str, "xs:string?");
-    */
     map = KNode.atomicValue(map);
     if (! (map instanceof UntypedAtomic || map instanceof String))
       throw new WrongType("translate", 2, str, "xs:string");

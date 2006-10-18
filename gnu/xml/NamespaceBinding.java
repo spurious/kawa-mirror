@@ -1,31 +1,37 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
 import java.io.*;
 
-/** A "namespace node" as a link in a linked list. */
+/** A "namespace node" as a link in a linked list.
+ *
+ * The list may contain duplicates - i.e. multiple namespace bindings
+ * for the same prefix but (usually) different uris.  In that case the
+ * first binding "wins".  One reason for allowing duplicates it to allow
+ * sharing of the lists between a child and its parent element.
+ */
 
 public final class NamespaceBinding implements Externalizable
 {
   /** Namespace prefix.  An interned String.
    * A default namespace declaration is represented using null. */
+  public final String getPrefix () { return prefix; }
+  public final void setPrefix (String prefix) { this.prefix = prefix; }
   String prefix;
 
   /** Namespace uri.  An interned String.
    * The value null "undeclares" any following namespaces; it corresponds
    * to an empty uri as in the XML Namespaces 1.1 Candidate Recommendation. */
+  public final String getUri () { return uri; }
+  public final void setUri (String uri) { this.uri = uri; }
   String uri;
 
   NamespaceBinding next;
 
   int depth;
 
-  public final String getPrefix () { return prefix; }
-  public final String getUri () { return uri; }
   public final NamespaceBinding getNext () { return next; }
-  public final void setPrefix (String prefix) { this.prefix = prefix; }
-  public final void setUri (String uri) { this.uri = uri; }
   public final void setNext (NamespaceBinding next) { this.next = next; }
 
   //  public NamespaceBinding () { }
@@ -135,6 +141,27 @@ public final class NamespaceBinding implements Externalizable
     for (NamespaceBinding ns = this;  ns != fencePost;  ns = ns.next)
       count++;
     return count;
+  }
+
+  /** Combine bindings from two lists.
+   * The bindings in {@code list2} take preference.
+   */
+  public static NamespaceBinding merge (NamespaceBinding list1,
+                                        NamespaceBinding list2)
+  {
+    NamespaceBinding join = commonAncestor(list1, list2);
+    if (join == list1)
+      return list2;
+    return mergeHelper(list1, list2);
+  }
+
+  private static NamespaceBinding mergeHelper (NamespaceBinding list,
+                                               NamespaceBinding node)
+  {
+    if (node == predefinedXML)
+      return list;
+    list = mergeHelper(list, node.next);
+    return maybeAdd(node.prefix, node.uri, list);
   }
 
   /** Append a new NamespaceBinding if not redundant. */

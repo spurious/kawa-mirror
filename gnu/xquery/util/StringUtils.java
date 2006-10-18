@@ -6,20 +6,40 @@ import gnu.lists.*;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.kawa.xml.StringValue;
+import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class StringUtils
 {
+  private static String ERROR_VALUE = "<error>";
+
+  static String coerceToString (Object arg, String functionName,
+                                int iarg, String onEmpty)
+  {
+    if (arg instanceof KNode)
+      arg = KNode.atomicValue(arg);
+    if ((arg == Values.empty || arg == null) && onEmpty != ERROR_VALUE)
+      return onEmpty;
+    if (arg instanceof UntypedAtomic 
+        /* #ifdef use:java.net.URI */
+        || arg instanceof java.net.URI
+        /* #endif */
+        || arg instanceof String)
+      return arg.toString();
+    throw new WrongType(functionName, iarg, arg,
+                        onEmpty == ERROR_VALUE ? "xs:string" : "xs:string?");
+  }
+
   public static Object lowerCase (Object node)
   {
-    return StringValue.stringValue(node).toLowerCase();
+    return coerceToString(node, "lower-case", 1, "").toLowerCase();
   }
 
   public static Object upperCase (Object node)
   {
-    return StringValue.stringValue(node).toUpperCase();
+    return coerceToString(node, "upper-case", 1, "").toUpperCase();
   }
 
   static double asDouble (Object value)
@@ -37,37 +57,36 @@ public class StringUtils
     int i = (int) (d1 - 0.5);
     if (i < 0)
       i = 0;
-    return StringValue.stringValue(str).substring(i);
+    return coerceToString(str, "substring", 1, "").substring(i);
   }
 
   public static Object substring (Object str, Object start, Object length)
   {
-    double d1 = asDouble(start);
-    double d2 = asDouble(length);
-    if (Double.isNaN(d1) || Double.isNaN(d2))
-      return "";
-    int i = (int) (d1 - 0.5);
-    int j = i + (int) (d2 + 0.5);
-    if (i < 0)
-      i = 0;
-    String s = StringValue.stringValue(str);
+    String s = coerceToString(str, "substring", 1, "");
     int len = s.length();
-    if (j > len)
-      j = len;
-    else if (j <= i)
+    // Don't use Math.round because it returns 0 given NaN!
+    // We pre-subtract 1 before rounding.
+    double d1 = Math.floor(asDouble(start)-0.5);
+    double d2 = d1 + Math.floor(asDouble(length)+0.5);
+    if (d1 <= 0)
+      d1 = 0;
+    if (d2 > len)
+      d2 = len;
+    if (d2 > d1)
+      return s.substring((int) d1, (int) d2);
+    else // Including the case where either is NaN.
       return "";
-    return s.substring(i, j);
   }
 
   public static Object stringLength (Object str)
   {
-    return IntNum.make(StringValue.stringValue(str).length());
+    return IntNum.make(coerceToString(str, "string-length", 1, "").length());
   }
 
   public static Object substringBefore (Object str, Object find)
   {
-    String s = StringValue.stringValue(str);
-    String f = StringValue.stringValue(find);
+    String s = coerceToString(str, "substring-before", 1, "");
+    String f = coerceToString(find, "substring-before", 2, "");
     int flen = f.length();
 
     if (flen==0)
@@ -78,8 +97,8 @@ public class StringUtils
 
   public static Object substringAfter (Object str, Object find)
   {
-    String s = StringValue.stringValue(str);
-    String f = StringValue.stringValue(find);
+    String s = coerceToString(str, "substring-after", 1, "");
+    String f = coerceToString(find, "substring-after", 2, "");
     int flen = f.length();
 
     if (flen==0)
@@ -91,15 +110,32 @@ public class StringUtils
 
   public static Object translate (Object str, Object map, Object trans)
   {
-    String m = StringValue.stringValue(map);
+    String sv = coerceToString(str, "translate", 1, "");
+    /*
+    if (str instanceof KNode)
+      str = KNode.atomicValue(str);
+    if (str == Values.empty || str == null)
+      sv = "";
+    else if (str instanceof UntypedAtomic || str instanceof String)
+      sv = str.toString();
+    else
+      throw new WrongType("translate", 1, str, "xs:string?");
+    */
+    map = KNode.atomicValue(map);
+    if (! (map instanceof UntypedAtomic || map instanceof String))
+      throw new WrongType("translate", 2, str, "xs:string");
+    String m = map.toString();
     int mlen = m.length();
-    String sv = StringValue.stringValue(str);
+
+    trans = KNode.atomicValue(trans);
+    if (! (trans instanceof UntypedAtomic || trans instanceof String))
+      throw new WrongType("translate", 3, str, "xs:string");
+    String t = trans.toString();
 
     if (mlen==0) return sv;
 
     int slen = sv.length();
     StringBuffer s = new StringBuffer(slen);
-    String t = StringValue.stringValue(trans);
     int tlen = t.length();
 
     for (int i=0;i < slen;i++)
@@ -128,7 +164,7 @@ public class StringUtils
 	throw new IndexOutOfBoundsException("Invalid string-pad count");
       }
 
-    String sv = StringValue.stringValue(str);
+    String sv = coerceToString(str, "string-pad", 1, "");
     int slen = sv.length();
     StringBuffer s = new StringBuffer(count*slen);
     for (int i=0; i<count; i++) s.append(sv);
@@ -138,31 +174,31 @@ public class StringUtils
 
   public static Object contains (Object str, Object contain)
   {
-    String s = StringValue.stringValue(str);
-    String c = StringValue.stringValue(contain);
+    String s = coerceToString(str, "contains", 1, "");
+    String c = coerceToString(contain, "contains", 2, "");
 
     return s.indexOf(c) <0 ? Boolean.FALSE : Boolean.TRUE;
   }
 
   public static Object startsWith (Object str, Object with)
   {
-    String s = StringValue.stringValue(str);
-    String w = StringValue.stringValue(with);
+    String s = coerceToString(str, "starts-with", 1, "");
+    String w = coerceToString(with, "starts-with", 2, "");
 
     return s.startsWith(w) ? Boolean.TRUE : Boolean.FALSE;
   }
 
   public static Object endsWith (Object str, Object with)
   {
-    String s = StringValue.stringValue(str);
-    String w = StringValue.stringValue(with);
+    String s = coerceToString(str, "ends-with", 1, "");
+    String w = coerceToString(with, "ends-with", 2, "");
     return s.endsWith(w) ? Boolean.TRUE : Boolean.FALSE;
   }
 
   public static Object stringJoin (Object strseq, Object join)
   {
     StringBuffer s = new StringBuffer();
-    String glue = StringValue.stringValue(join);
+    String glue = coerceToString(join, "string-join", 2, ERROR_VALUE);
     int glen = glue.length();
     int index=0;
     boolean started = false;
@@ -211,9 +247,7 @@ public class StringUtils
 
   public static void stringToCodepoints$X (Object arg, CallContext ctx)
   {
-    if (arg == Values.empty || arg == null)
-      return;
-    String str = StringValue.stringValue(arg);
+    String str = coerceToString(arg, "string-to-codepoints", 1, "");
     int len = str.length();
     Consumer out = ctx.consumer;
     for (int i = 0;  i < len;  i++)
@@ -338,9 +372,7 @@ public class StringUtils
 
   public static String normalizeSpace (Object arg)
   {
-    if (arg == Values.empty || arg == null)
-      return "";
-    String str = StringValue.stringValue(arg);
+    String str = coerceToString(arg, "normalize-space", 1, "");
     int len = str.length();
     StringBuffer sbuf = null;
     int skipped = 0;
@@ -491,12 +523,10 @@ public class StringUtils
 
   public static Object codepointEqual (Object arg1, Object arg2)
   {
-    if (arg1 == null || arg1 == Values.empty)
-      return arg1;
-    if (arg2 == null || arg2 == Values.empty)
-      return arg2;
-    String str1 = StringValue.stringValue(arg1);
-    String str2 = StringValue.stringValue(arg2);
+    String str1 = coerceToString(arg1, "codepoint-equal", 1, null);
+    String str2 = coerceToString(arg2, "codepoint-equal", 2, null);
+    if (str1 == null || str2 == null)
+      return Values.empty;
     return str1.equals(str2) ? Boolean.TRUE : Boolean.FALSE;
   }
 }

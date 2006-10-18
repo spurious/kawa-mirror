@@ -1,3 +1,18 @@
+2006-10-17  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (coerceToString): New static helper method to
+	correctly coerce to xs:string or xs:string?.
+	(lowerCase, upperCase, substring, stringLength, substringBefore,
+	substringAfter, translate, stringPad, contains, startsWith, endsWith,
+	stringJoin, stringToCodepoints$X, normalizeSpace, codepointEqual):
+	Use coerceToString.
+
+	* StringUtils.java (substring): Various fixes to (hopefully this time)
+	pedantically match the specification.
+
+	* QNameUtils.java (resolveQNameUsingElement): If no prefix, check
+	for a default namespace.  Convetr resturn to URI, rather than string.
+
 2006-10-16  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (appendCodepoint): Fix thinko.

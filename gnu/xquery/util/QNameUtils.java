@@ -18,16 +18,20 @@ public class QNameUtils
     String prefix, localPart, uri;
     if (colon < 0)
       {
-	localPart = name;
 	prefix = null;
-        uri = "";
+	localPart = name;
       }
     else
       {
 	prefix = name.substring(0, colon).intern();
 	localPart = name.substring(colon+1);
-        uri =  node.lookupNamespaceURI(prefix);
-        if (uri == null)
+      }
+    uri = node.lookupNamespaceURI(prefix);
+    if (uri == null)
+      {
+        if (prefix == null)
+          uri = "";
+        else
           throw new RuntimeException("unknown namespace for '"+name+"'");
       }
     if (! validNCName(localPart)
@@ -165,7 +169,7 @@ public class QNameUtils
     if (name == Values.empty || name == null)
       return name;
     if (name instanceof Symbol)
-      return ((Symbol) name).getNamespaceURI();
+      return XDataType.toURI(((Symbol) name).getNamespaceURI());
     throw WrongType.make(null, "namespace-uri", 1, name);
   }
 

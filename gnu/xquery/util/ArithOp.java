@@ -165,10 +165,25 @@ public class ArithOp extends Procedure1or2
             IntNum i2 = Arithmetic.asIntNum(arg2);
             return IntNum.remainder(i1, i2);
           }
-        else
+        else if (code <= Arithmetic.RATNUM_CODE)
           {
-            // FIXME should be optimized - and error handling may be wrong.
             return sub.apply2(arg1, mul.apply2(idiv.apply2(arg1, arg2), arg2));
+          }
+        else if (code <= Arithmetic.FLOAT_CODE)
+          {
+            float f1 = Arithmetic.asFloat(arg1);
+            float f2 = Arithmetic.asFloat(arg2);
+            return gnu.kawa.xml.XDataType.makeFloat(f1 % f2);
+          }
+        else if (code <= Arithmetic.FLONUM_CODE)
+          {
+            double d1 = Arithmetic.asDouble(arg1);
+            double d2 = Arithmetic.asDouble(arg2);
+            double d = d1 % d2;
+            if (code == Arithmetic.FLONUM_CODE)
+              return DFloNum.make(d);
+            else
+              return gnu.kawa.xml.XDataType.makeDouble(d);
           }
       }
     throw new UnsupportedOperationException(getName());

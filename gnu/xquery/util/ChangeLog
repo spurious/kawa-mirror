@@ -1,5 +1,8 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* ArithOp.java (apply3): Implement mod on float or double using
+	standard Java '%' operator.  This fixes a negative-zero issue.
+
 	* NamedCollator.java (getName): New method.
 
 2006-10-17  Per Bothner  <per@bothner.com>

@@ -1,3 +1,7 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* XIntegerType.java (negativeIntegerType): Fix thinko.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (replaceWhitespace): New static method.

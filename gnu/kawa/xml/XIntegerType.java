@@ -47,7 +47,7 @@ public class XIntegerType extends XDataType
   public static final XIntegerType negativeIntegerType =
     new XIntegerType("negativeInteger", nonPositiveIntegerType,
                      NEGATIVE_INTEGER_TYPE_CODE,
-                     null, IntNum.one());
+                     null, IntNum.minusOne());
   public static final XIntegerType nonNegativeIntegerType =
     new XIntegerType("nonNegativeInteger", integerType,
                      NONNEGATIVE_INTEGER_TYPE_CODE,

@@ -1,3 +1,18 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (useComments): New flag.
+	(writeVerbose): New helper method, for extra information.
+	By default write them as comments.
+	(evalTest): Use writeVerbose.
+
+	* RunXQTS.java (contextItem): New field.
+	(endGroup): Handle <contextItem>.
+	(evalTest): Handle contextItem.
+
+	* RunXQTS.java (main): Set pedantic mode.
+
+	* RunXQTS.java (evalTest): Allow wildcards in expectedFailures.
+
 2006-10-16  Per Bothner  <per@bothner.com>
 
 	* expected-1.errs: Update for changed error message.

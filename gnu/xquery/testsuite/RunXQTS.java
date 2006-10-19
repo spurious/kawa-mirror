@@ -25,6 +25,7 @@ public class RunXQTS extends FilterConsumer
   Object failExpected;
 
   boolean verbose = true;
+  boolean useComments = true;
 
   String directory;
   String catalog;
@@ -35,6 +36,7 @@ public class RunXQTS extends FilterConsumer
   String XQueryFileExtension;
   String XQueryXFileExtension;
   String compare;
+  Object contextItem;
 
   int passCount;
   int xpassCount;
@@ -116,9 +118,29 @@ public class RunXQTS extends FilterConsumer
     xqlog.endAttribute();
   }
 
+  private void writeVerbose (String name, String value)
+  {
+    if (useComments)
+      {
+        // The tricky part is to make sure that the result can be validated.
+        // Specifically, no spaces are allowed in a <test-case>.
+        xqlog.printIndent = -1;
+        xqlog.beginComment();
+        xqlog.printIndent = 0;
+        xqlog.writeBreakFill();
+        xqlog.writeChars(name); xqlog.writeChars(": ");
+        xqlog.writeChars(value);
+        xqlog.writeBreakFill();
+        xqlog.endComment();
+      }
+    else
+      writeQexoAttribute(name, value);
+  }
+
   public static void main (String[] args)
   {
     gnu.xquery.lang.XQuery.registerEnvironment();
+    Language.requirePedantic = true;
     for (int i = 0;  i < args.length;  i++)
       {
 	try
@@ -385,6 +407,13 @@ public class RunXQTS extends FilterConsumer
     throws Throwable
   {
     failExpected = expectedFailures.get(testName);
+    if (failExpected == null)
+      {
+        // Check for a wildcard: replace a final non-negative integer by '*'.
+        int len = testName.length();
+        while (--len > 0 && Character.digit(testName.charAt(len), 10) >= 0);
+        failExpected = expectedFailures.get(testName.substring(0, len+1)+'*');
+      }
     Environment env = Environment.getCurrent();
     SourceMessages messages = new SourceMessages();
     String filename
@@ -408,9 +437,16 @@ public class RunXQTS extends FilterConsumer
         throw ex;
       }
     Compilation comp;
+    Procedure withContextProc = null;
     try
       {
-        comp = xqueryLanguage.parse(in, messages, Language.PARSE_IMMEDIATE);
+        if (contextItem != null)
+          {
+            withContextProc = xqueryLanguage.evalToFocusProc(in, messages);
+            comp = null;
+          }
+        else
+          comp = xqueryLanguage.parse(in, messages, Language.PARSE_IMMEDIATE);
         if (messages.seenErrors())
           throw new SyntaxException(messages);
       }
@@ -440,6 +476,11 @@ public class RunXQTS extends FilterConsumer
     in.close();
 
     CallContext ctx = CallContext.getInstance();
+    if (contextItem != null)
+      {
+	gnu.math.IntNum one = gnu.math.IntNum.one();
+        withContextProc.check3(contextItem, one, one, ctx);
+      }
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
     XMLPrinter xout = new XMLPrinter(out, false);
@@ -449,7 +490,10 @@ public class RunXQTS extends FilterConsumer
     ctx.consumer = xout;
     try
       {
-        ModuleExp.evalModule(env, ctx, comp, null, null);
+        if (contextItem != null)
+          ctx.runUntilDone();
+        else
+          ModuleExp.evalModule(env, ctx, comp, null, null);
       }
     catch (Throwable ex)
       {
@@ -473,7 +517,7 @@ public class RunXQTS extends FilterConsumer
                 PrintWriter pr = new PrintWriter(wr);
                 ex.printStackTrace(pr);
                 pr.flush();
-                writeQexoAttribute("stack", wr.toString());
+                writeVerbose("stack", wr.toString());
                 wr.close();
               }
           }
@@ -503,6 +547,7 @@ public class RunXQTS extends FilterConsumer
     
     int numOutputFileAlts = outputFileAlts.size();
     boolean foundMatchingOutput = false;
+    boolean displayDifference = false;
     String expected = null;
     for (int ialt = 0;  ialt < numOutputFileAlts;  ialt++)
       {
@@ -539,6 +584,7 @@ public class RunXQTS extends FilterConsumer
           {
             report("cannot tell", null);
             foundMatchingOutput = true;
+            displayDifference = verbose;
             break;
           }
       }
@@ -554,12 +600,14 @@ public class RunXQTS extends FilterConsumer
           {
             report("fail", null);
             if (verbose && expectedFailures.get(testName) == null)
-              {
-                writeQexoAttribute("compare", compare);
-                writeQexoAttribute("expected", expected);
-                writeQexoAttribute("actual", actual);
-              }
+              displayDifference = true;
           }
+      }
+    if (displayDifference)
+      {
+        writeVerbose("compare", compare);
+        writeVerbose("expected", expected);
+        writeVerbose("actual", actual);
       }
   }
 
@@ -729,6 +777,7 @@ public class RunXQTS extends FilterConsumer
           }
         //xqlog.flush();
         testName = null;
+        contextItem = null;
       }
     else if (tagMatches("expected-error"))
       {
@@ -760,22 +809,33 @@ public class RunXQTS extends FilterConsumer
             System.exit(-1);
           }
       }
-    else if (tagMatches("input-file"))
+    else if (tagMatches("input-file") || tagMatches("contextItem"))
       {
         String inputFile = cout.toSubString(elementStartIndex[nesting]);
         // KLUDGE around testsuite bug!
         if ("userdefined".equals(inputFile))
           inputFile = "emptydoc";
-        String variable = attributes.getValue("variable");
         String path = directory + '/' + sources.get(inputFile);
 
-        Symbol symbol = Symbol.make("", variable);
-        Object value;
+        String variable;
+        Symbol symbol;
+        if (tagMatches("input-file"))
+          {
+            variable = attributes.getValue("variable");
+            symbol = Symbol.make("", variable);
+          }
+        else // tagMatches("contextItem")
+          {
+            variable = null;
+            symbol = null;
+          }
         try
           {
-            value = gnu.kawa.xml.Document.parseCached(path);
-            Environment current = Environment.getCurrent();
-            current.put(symbol, null, value);
+            Object value = gnu.kawa.xml.Document.parseCached(path);
+            if (symbol != null)
+              Environment.getCurrent().put(symbol, null, value);
+            else
+              contextItem = value;
           }
         catch (Throwable ex)
           {

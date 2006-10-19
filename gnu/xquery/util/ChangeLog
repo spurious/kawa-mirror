@@ -1,3 +1,7 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* NamedCollator.java (getName): New method.
+
 2006-10-17  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (coerceToString): New static helper method to

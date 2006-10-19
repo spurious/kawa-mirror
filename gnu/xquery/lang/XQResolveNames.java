@@ -103,8 +103,11 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>number</code> function. */
   public static final int NUMBER_BUILTIN = -28;
 
+  /** Code number for the special <code>default-collation</code> function. */
+  public static final int DEFAULT_COLLATION_BUILTIN = -29;
+
   /** Code number for internal function to handle extensions. */
-  public static final int HANDLE_EXTENSION_BUILTIN = -29;
+  public static final int HANDLE_EXTENSION_BUILTIN = -30;
 
   public static final Declaration handleExtensionDecl
     = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
@@ -183,6 +186,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("min", MIN_BUILTIN);
     pushBuiltin("max", MAX_BUILTIN);
     pushBuiltin("number", NUMBER_BUILTIN);
+    pushBuiltin("default-collation", DEFAULT_COLLATION_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -742,6 +746,12 @@ public class XQResolveNames extends ResolveNames
                   return withCollator(meth, exp.getArgs(),
                                       "fn:max", 1);
                 }
+              case DEFAULT_COLLATION_BUILTIN:
+                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
+                  return err;
+                NamedCollator coll = parser.defaultCollator;
+                return QuoteExp.getInstance(coll != null ? coll.getName()
+                          : NamedCollator.UNICODE_CODEPOINT_COLLATION);
               case CURRENT_DATETIME_BUILTIN:
                 if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
                   return err;

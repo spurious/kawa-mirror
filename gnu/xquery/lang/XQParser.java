@@ -3897,21 +3897,28 @@ public class XQParser extends Lexer
 	return BeginExp.canonicalize(inits);
 
       case DEFAULT_COLLATION_TOKEN:
+	if (defaultCollator != null && ! interactive)
+          error('e', "duplicate default collation declaration", "XQST0038");
         val = parseURILiteral();
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;
 	String collation = (String) val;
 	try
 	  {
+            if (! InPort.uriSchemeSpecified(collation))
+              {
+                String base = baseURI;
+                if (base == null)
+                  base = CallContext.getInstance().getBaseUri();
+                collation = URI_utils.resolve(collation, base).toString();
+              }
 	    defaultCollator = NamedCollator.make(collation);
 	  }
-	catch (Exception name)
-	  { // err:XQ0038
+	catch (Exception ex)
+	  {
 	    defaultCollator = NamedCollator.codepointCollation;
-	    return declError("unknown collation '"+collation+"'");
+	    error('e', "unknown collation '"+collation+"'", "XQST0038");
 	  }
-	if (defaultCollator != null && ! interactive) // err:XQ0038
-          return declError("duplicate default collation declaration");
 	parseSeparator();
 	return QuoteExp.voidExp;
 

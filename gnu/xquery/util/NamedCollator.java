@@ -24,6 +24,11 @@ implements Externalizable
     return coll;
   }
 
+  public String getName ()
+  {
+    return name;
+  }
+
   public static NamedCollator find (String name)
   {
     return make(name);

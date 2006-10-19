@@ -1,3 +1,14 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parse): Fix various problems with 'default collation'.
+	Error if duplicate seen.  Resolve relative collation against base-uri.
+	Don't return early on error, since that causes needless parse errors.
+	Include error codes in messages.
+
+	* XQResolveNames.java (DEFAULT_COLLATION_BUILTIN): New constant,
+	(<init>): Push fn:default-collation.
+	(walkApplyExp): Handle DEFAULT_COLLATION_BUILTIN.
+
 2006-10-16  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (seenDeclaration): New flag to catch errors where

@@ -1,5 +1,13 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* DateTime.java (cast): Copy nameseconds.
+
+	* DateTime.java (compare): Semi-kludge to "normalize" date-less
+	time values, adjusting for timezone to asme date 0.
+
+	* DateTime.java (adjustTimezone): Don't set millis if original did not
+	have timezone.  If it did, and was a time-less date, clear time fields
+
 	* Duration.java (times): Check for overflow.
 
 2006-10-11  Per Bothner  <per@bothner.com>

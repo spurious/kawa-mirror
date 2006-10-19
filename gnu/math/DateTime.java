@@ -72,8 +72,9 @@ public class DateTime extends Quantity implements Cloneable
         copy.calendar.clear(Calendar.HOUR_OF_DAY); 
         copy.calendar.clear(Calendar.MINUTE);
         copy.calendar.clear(Calendar.SECOND);
-        copy.nanoSeconds = 0;
       }
+    else
+      copy.nanoSeconds = nanoSeconds;
     if ((extraComponents & YEAR_MASK) != 0)
       {
         copy.calendar.clear(Calendar.YEAR);
@@ -427,6 +428,11 @@ public class DateTime extends Quantity implements Cloneable
   {
     long millis1 = date1.calendar.getTimeInMillis();
     long millis2 = date2.calendar.getTimeInMillis();
+    if (((date1.mask | date2.mask) & DATE_MASK) == 0)
+      {
+        if (millis1 < 0) millis1 += 24 * 60 * 60 * 1000;
+        if (millis2 < 0) millis2 += 24 * 60 * 60 * 1000;
+      }
     int nanos1 = date1.nanoSeconds;
     int nanos2 = date2.nanoSeconds;
     millis1 += nanos1 / 1000000;
@@ -475,7 +481,6 @@ public class DateTime extends Quantity implements Cloneable
   public DateTime adjustTimezone (int newOffset)
   {
     DateTime r = new DateTime(mask, (GregorianCalendar) calendar.clone());
-    long millis = calendar.getTimeInMillis();
     TimeZone zone;
     if (newOffset == 0)
       zone = GMT;
@@ -486,8 +491,20 @@ public class DateTime extends Quantity implements Cloneable
         zone = TimeZone.getTimeZone(sbuf.toString());
       }
     r.calendar.setTimeZone(zone);
-    r.calendar.setTimeInMillis(millis);
-    r.mask |= TIMEZONE_MASK;
+    if ((r.mask & TIMEZONE_MASK) != 0)
+      {
+        long millis = calendar.getTimeInMillis();
+        r.calendar.setTimeInMillis(millis);
+        if ((mask & TIME_MASK) == 0)
+          {
+            r.calendar.set(Calendar.HOUR_OF_DAY, 0); 
+            r.calendar.set(Calendar.MINUTE, 0); 
+            r.calendar.set(Calendar.SECOND, 0);
+            r.nanoSeconds = 0;
+          }
+      }
+    else
+      r.mask |= TIMEZONE_MASK;
     return r;
   }
 

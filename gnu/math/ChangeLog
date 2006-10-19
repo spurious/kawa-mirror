@@ -1,3 +1,7 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* Duration.java (times): Check for overflow.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* Duration.java (parse): Slightly improved error message.

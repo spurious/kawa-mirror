@@ -269,11 +269,9 @@ public class Duration extends Quantity implements Externalizable
   {
     if (x.unit == Unit.duration)
       throw new IllegalArgumentException("cannot multiply general duration");
-    if (Double.isNaN(y))
-      throw new ArithmeticException("multiplying a duration by NaN");
     double months = x.months * y;
-    if (Double.isInfinite(months))
-      throw new ArithmeticException("overflow when multiplying a duration");
+    if (Double.isInfinite(months) || Double.isNaN(months))
+      throw new ArithmeticException("overflow/NaN when multiplying a duration");
     double nanos = (x.seconds * 1000000000L + x.nanos) * y;
     Duration d = new Duration();
     d.months = (int) Math.floor(months + 0.5);

@@ -21,7 +21,9 @@ public class XMLPrinter extends OutPort
   /** Controls whether to add extra indentation.
    * -1: don't add indentation; 0: pretty-print (avoid needless newlines);
    * 1: indent (force). */
-  int printIndent = -1;
+  public int printIndent = -1;
+  /** When indentating, should attributes be lined up? */
+  public boolean indentAttributes;
 
   boolean printXMLdecl = false;
   public void setPrintXMLdecl (boolean value) { printXMLdecl = value; }
@@ -98,7 +100,7 @@ public class XMLPrinter extends OutPort
 
   public XMLPrinter (OutputStream out)
   {
-    super(new OutputStreamWriter(out), true, false);
+    super(new OutputStreamWriter(out), false, false);
   }
 
   public XMLPrinter (OutputStream out, String fname)
@@ -191,9 +193,10 @@ public class XMLPrinter extends OutPort
 	else if (v == '\"' && inAttribute)
 	  super.write("&quot;");
 	else if ((escapeNonAscii && v >= 127)
-                 //|| (inAttribute && v < ' ')
-                 )
-	  super.write("&#x"+Integer.toHexString(v)+";");
+                 // We must escape control characters in attributes,
+                 // since otherwise they get normalized to ' '.
+                 || (inAttribute && v < ' '))
+	  super.write("&#x"+Integer.toHexString(v).toUpperCase()+";");
 	else
 	  {
 	    super.write((char) v);
@@ -216,11 +219,11 @@ public class XMLPrinter extends OutPort
     super.print(v);
   }
 
-  private void closeTag()
+  public void closeTag()
   {
     if (inStartTag && ! inAttribute)
       {
-	if (printIndent >= 0)
+	if (printIndent >= 0 && indentAttributes)
           endLogicalBlock("");
 	super.write('>');
 	inStartTag = false;
@@ -293,7 +296,7 @@ public class XMLPrinter extends OutPort
         super.write(sname.getLocalPart());
       }
     else
-      super.write((String) name);
+      super.write(name == null ? "{null name}" : (String) name);
   }
 
   public void beginGroup(String typeName, Object type)
@@ -340,8 +343,8 @@ public class XMLPrinter extends OutPort
     super.write('<');
     Object name = type instanceof Symbol ? type : typeName;
     writeQName(name);
-    if (printIndent >= 0)
-      startLogicalBlock("", "", 1);
+    if (printIndent >= 0 && indentAttributes)
+      startLogicalBlock("", "", 2);
     groupNameStack[groupNesting] = name;
     NamespaceBinding groupBindings = null;
     namespaceSaveStack[groupNesting++] = namespaceBindings;
@@ -354,36 +357,45 @@ public class XMLPrinter extends OutPort
           : groupBindings.count(join);
         NamespaceBinding[] sortedBindings = new NamespaceBinding[numBindings];
         int i = 0;
+        boolean sortNamespaces = true; //canonicalize;
+      check_namespaces:
 	for (NamespaceBinding ns = groupBindings;  ns != join;  ns = ns.next)
           {
             int j = i;
-            if (canonicalize)
+            boolean skip = false;
+            String uri = ns.getUri();
+            String prefix = ns.getPrefix();
+            while (--j >= 0)
               {
-                String uri = ns.getUri();
-                String prefix = ns.getPrefix();
-                while (--j >= 0)
-                  {
-                    NamespaceBinding ns_j = sortedBindings[j];
-                    // If (compare(ns, ns_j) >= 0) break:
-                    String prefix_j = ns_j.getPrefix();
-                    if (prefix == prefix_j || prefix_j == null)
-                      break;
-                    if (prefix != null && prefix.compareTo(prefix_j) >= 0)
-                      break;
-                    sortedBindings[j+1] = ns_j;
-                  }
-                j++;
+                NamespaceBinding ns_j = sortedBindings[j];
+                // If (compare(ns, ns_j) >= 0) break:
+                String prefix_j = ns_j.getPrefix();
+                if (prefix == prefix_j)
+                  continue check_namespaces;
+                // If we're not canonicalizing, we just want to suppress
+                // duplicates, rather than putting them in order.
+                if (! sortNamespaces)
+                  continue;
+                if (prefix_j == null)
+                  break;
+                if (prefix != null && prefix.compareTo(prefix_j) >= 0)
+                  break;
+                sortedBindings[j+1] = ns_j;
               }
+            if (sortNamespaces)
+              j++;
+            else
+              j = i;
             sortedBindings[j] = ns;
             i++;
           }
+        numBindings = i;
 	for (i = 0;  i < numBindings;  i++)
 	  {
             NamespaceBinding ns = sortedBindings[i];
 	    String prefix = ns.prefix;
 	    String uri = ns.uri;
-	    if (uri == namespaceBindings.resolve(prefix)
-		|| uri == groupBindings.resolve(prefix, ns))
+	    if (uri == namespaceBindings.resolve(prefix))
 	      // A matching namespace declaration is already in scope.
 	      continue;
 	    super.write(' '); // prettyprint break
@@ -458,7 +470,7 @@ public class XMLPrinter extends OutPort
       closeTag();
     if (inStartTag)
       {
-	if (printIndent >= 0)
+	if (printIndent >= 0 && indentAttributes)
 	  {
 	    endLogicalBlock("");
 	  }
@@ -785,7 +797,7 @@ public class XMLPrinter extends OutPort
     print("<?");
     print(target);
     print(' ');
-    write(content, offset, length);
+    super.write(content, offset, length);
     print("?>");
     prev = '>';
   }

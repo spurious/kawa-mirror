@@ -1,3 +1,20 @@
+2006-10-19  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (printIndent): Make public.
+	(<init>): Default is without pretty-printing.
+
+	* XMLPrinter.java (indentAttributes): New field - for now always false.
+	Old behavior was equivalent to true.
+	(beginGroup, endGroup, closetag): Don't add extra pretty-printing
+	block for attributes, unless indentAttributes.
+
+	* XMLPrinter.java (beginGroup): By default sort namespace declarations.
+
+	* XMLPrinter.java (writeChar): Escape control characters in attributes,
+	since otherwise they get normalized to plain space.
+
+	* XMLPrinter.java (writeChar): Uppercase hex character escapes.
+
 2006-10-17  Per Bothner  <per@bothner.com>
 
 	* NamespaceBinding.java (merge, mergeHelper): New method.

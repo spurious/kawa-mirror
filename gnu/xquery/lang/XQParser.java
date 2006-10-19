@@ -1357,13 +1357,25 @@ public class XQParser extends Lexer
       }
     else
       {
-        qname = parseQName(attribute);
+        if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+          qname = parseNameTest(attribute);
+        else
+          {
+            if (curToken != OP_MUL)
+              syntaxError("expected QName or *");
+            qname = QuoteExp.getInstance(ElementType.MATCH_ANY_QNAME);
+          }
 
         getRawToken();
         if (curToken == ',')
           {
             getRawToken();
-            Expression tname = parseQName(true);
+            if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+              {
+                Expression tname = parseNameTest(true);
+              }
+            else
+               syntaxError("expected QName");
             getRawToken();
           }
         if (curToken == ')')
@@ -1757,8 +1769,7 @@ public class XQParser extends Lexer
   Expression parseNameTest (boolean attribute)
       throws java.io.IOException, SyntaxException
   {
-    String local = null, prefix = null, uri = null;
-    Expression uriExp;
+    String local = null, prefix = null;
     if (curToken == QNAME_TOKEN)
       {
 	int colon = tokenBufferLength;
@@ -1771,6 +1782,7 @@ public class XQParser extends Lexer
     else if (curToken == OP_MUL)
       {
  	int next = read();
+        local = ElementType.MATCH_ANY_LOCALNAME;
 	if (next != ':')
 	  unread(next);
 	else
@@ -1785,17 +1797,20 @@ public class XQParser extends Lexer
 		if (curToken != NCNAME_TOKEN)
 		  syntaxError("invalid name test");
 		else
-		  local = new String(tokenBuffer, 0, tokenBufferLength);
+		  local = new String(tokenBuffer, 0, tokenBufferLength)
+                    .intern();
 	      }
 	    else if (next != '*')
 	      syntaxError("missing local-name after '*:'");
 	  }
+        return QuoteExp.getInstance(new Symbol(null, local));
       }
     else if (curToken == NCNAME_TOKEN)
       {
 	local = new String(tokenBuffer, 0, tokenBufferLength);
-	uri = attribute ? "" : defaultElementNamespace;
-        return new QuoteExp(Namespace.getInstance(uri).getSymbol(local.intern()));
+        if (attribute)
+          return new QuoteExp(Namespace.EmptyNamespace.getSymbol(local.intern()));
+        prefix = null;
       }
     else if (curToken == NCNAME_COLON_TOKEN)
       {
@@ -1803,38 +1818,20 @@ public class XQParser extends Lexer
 	int next = read();
 	if (next != '*')
 	  syntaxError("invalid characters after 'NCName:'");
-	local = null;
+	local = ElementType.MATCH_ANY_LOCALNAME;
       }
-    if (uri == null && prefix == null)
-      {
-        Symbol qname;
-        if (local == null)
-          local = ElementType.MATCH_ANY_LOCALNAME;
-        else
-          local = local.intern();
-        return QuoteExp.getInstance(new Symbol(null, local));
-      }
-    Expression[] name = new Expression[2];
-    if (uri != null)
-      name[0] = new QuoteExp(uri);
-    else
-      name[0] = new ApplyExp(new ReferenceExp(XQResolveNames.resolvePrefixDecl),
-                             new Expression[] { QuoteExp.getInstance(prefix.intern()) });
-    name[1] = new QuoteExp(local == null ? "" : local);
-    return new ApplyExp(Compilation.typeSymbol.getDeclaredMethod("make", 2),
-                        name);
-  }
-
-  Expression parseQName (boolean attribute)
-      throws java.io.IOException, SyntaxException
-  {
-    String local = null, uri = null;
-    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-      return parseNameTest(attribute);
-    else if (curToken == OP_MUL)
-      return QuoteExp.getInstance(ElementType.MATCH_ANY_QNAME);
-    else
-      return syntaxError("expected QName or *");
+    if (prefix != null)
+      prefix = prefix.intern();
+    Expression[] args = new Expression[3];
+    args[0] = new ApplyExp(new ReferenceExp(XQResolveNames.resolvePrefixDecl),
+                           new Expression[] { QuoteExp.getInstance(prefix) });
+    args[1] = new QuoteExp(local == null ? "" : local);
+    args[2] = new QuoteExp(prefix);
+    ApplyExp make = new ApplyExp(Compilation.typeSymbol
+                                 .getDeclaredMethod("make", 3),
+                                 args);
+    make.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+    return make;
   }
 
   Expression parseNodeTest(int axis)
@@ -2351,8 +2348,9 @@ public class XQParser extends Lexer
 
   Declaration makeNamespaceDecl (String prefix, String uri)
   {
-    String sym = prefix == null ? XQuery.DEFAULT_ELEMENT_PREFIX : prefix.intern();
-    Declaration decl = new Declaration(sym);
+    if (prefix == null)
+      prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
+    Declaration decl = new Declaration(prefix);
     decl.setType(gnu.bytecode.Type.tostring_type);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
     decl.setPrivate(true);
@@ -3566,14 +3564,15 @@ public class XQParser extends Lexer
   protected Symbol namespaceResolve (String name, boolean function)
   {
     int colon = name.indexOf(':');
-    String prefix = colon >= 0 ? name.substring(0, colon)
+    String prefix = colon >= 0 ? name.substring(0, colon).intern()
       : function ? XQuery.DEFAULT_FUNCTION_PREFIX
       : XQuery.DEFAULT_ELEMENT_PREFIX; 
-    String nssym = prefix.intern();
-    Declaration decl = lexical.lookup(nssym, -1);
+    Declaration decl = lexical.lookup(prefix, -1);
     Object uri = null;
     if (decl != null)
       uri = decl.getConstantValue();
+    else if (prefix == XQuery.DEFAULT_ELEMENT_PREFIX)
+      uri = "";
 
     if (! (uri instanceof String))
       {

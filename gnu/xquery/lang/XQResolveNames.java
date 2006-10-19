@@ -572,7 +572,7 @@ public class XQResolveNames extends ResolveNames
 		      try
 			{
 			  Object val = ((QuoteExp) args[0]).getValue();
-			  val = QNameUtils.resolvePrefix(val.toString(),
+			  val = QNameUtils.resolvePrefix(val == null ? null : val.toString(),
                                                          constructorNamespaces,
                                                          parser.prologNamespaces);
 			  return new QuoteExp(val);

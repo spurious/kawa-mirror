@@ -320,9 +320,9 @@ public class TestMisc
 	     "true true true");
     evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instance of text ( )",
 	     "true false true");
-    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instance of element(a,*)",
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instance of element(a)",
 	     "false false false");
-    evalTest("for $n in <a>xx<b/>yy</a>/node() return $n instance of element(b,*)",
+    evalTest("for $n in <a>xx<b/>yy</a>/node() return $n instance of element(b)",
 	     "false true false");
     // FIXME: evalTest("<a>xx<b/>yy</a>/node() instance of node()", "false");
     evalTest("<a>xx<b/>yy</a>/node() instance of node()?", "false");

@@ -1,5 +1,7 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* TestMisc..java: The type syntax 'element(X,*)' is invalid.
+
 	* RunXQTS.java (useComments): New flag.
 	(writeVerbose): New helper method, for extra information.
 	By default write them as comments.

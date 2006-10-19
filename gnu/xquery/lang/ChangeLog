@@ -1,5 +1,17 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseQName): Remove misleading-named method.
+	(parseNamedNodeType): Inline parseQName, with fixes.
+
+	* XQParser.java (parseNameTest): Also pass prefix to Symbol.make.
+	Default element namespace must be resolved a resolve-time.
+	Inline Symbol.make if constant - but later.
+	(makeNamespaceDecl): Don't need to intern already-intered prefix.
+	(namespaceResolve): Minor optimization.
+	Handle the DEFAULT_ELEMENT_PREFIX case.
+	* XQResolveNames.java (walkApplyExp): If if prefix for resolvePrefix
+	is null, which it is for the default namespace.
+
 	* XQParser.java (parse): Fix various problems with 'default collation'.
 	Error if duplicate seen.  Resolve relative collation against base-uri.
 	Don't return early on error, since that causes needless parse errors.

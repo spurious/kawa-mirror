@@ -1,5 +1,10 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (resolveURI): New static method.
+
+	* Reduce.java: Re-write to a 'static class'.
+	Try hard to follow the specification.
+
 	* ArithOp.java (apply3): Implement mod on float or double using
 	standard Java '%' operator.  This fixes a negative-zero issue.
 

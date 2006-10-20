@@ -135,7 +135,7 @@ public class TestMisc
     evalTest("string(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
     evalTest("string(doc('tab.xml')/result/row/fld1/@align)", "left");
-    evalTest("string(doc('tab.xml')/result/row/fld2/@align)",
+    evalTest("doc('tab.xml')/result/row/fld2/@align/string()",
 	     "rightright");
  
     evalTest("for $x in children(<a>xy{3+4}kl<c>def</c>{9}{11}</a>)" +
@@ -220,22 +220,22 @@ public class TestMisc
     evalTest("declare namespace xx='XXX';\n <xx:a>XX</xx:a>",
 	     "<xx:a xmlns:xx=\"XXX\">XX</xx:a>");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='XXX';\n"
-	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
+	     + "(<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab/string()",
 	     "X1X2");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
 	     "X2");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
-	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*)",
+	     + "(<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*/string()",
 	     "X1X2");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
-	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:*)",
+	     + "(<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:*/string()",
 	     "X1X2");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x1:*)",
 	     "X1");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
-	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:ab)",
+	     + "(<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:ab/string()",
 	     "X1X2");
     evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:cd>X2</x2:cd></top>)/*:cd)",
@@ -244,14 +244,14 @@ public class TestMisc
 	     + "string(doc('tab.xml')/result/h:row)",
 	     "\nc1\n33\n44\nc2\n");
     evalTest("declare namespace xx='H';\n"
-	     + "string(doc('tab.xml')/result/xx:row)",
+	     + "doc('tab.xml')/result/xx:row/string()",
 	     "\nc1\n33\n44\nc2\n");
-    evalTest("string(doc('tab.xml')/result/*:row)",
+    evalTest("doc('tab.xml')/result/*:row/string()",
 	     "\na1\n12\n\nb1\n22\n\nc1\n33\n44\nc2\n");
-    evalTest("string(doc('tab.xml')/result/*:row/*:fld1)",
+    evalTest("doc('tab.xml')/result/*:row/*:fld1/string()",
 	     "a1b1c1c2");
     evalTest("declare namespace k='J';\n"
-	     + "string(doc('tab.xml')/result/*:row/k:fld1)",
+	     + "doc('tab.xml')/result/*:row/k:fld1/string()",
 	     "c1c2");
     evalTest("declare namespace k='J';\n"
 	     + "string(doc('tab.xml')/result/*:row[k:fld1])",

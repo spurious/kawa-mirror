@@ -1,5 +1,8 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* TestMisc..java: Applying fn:string to a sequence of two or more items
+	is invalid.  Use string() as a step instead.
+
 	* TestMisc..java: The type syntax 'element(X,*)' is invalid.
 
 	* RunXQTS.java (useComments): New flag.

@@ -117,6 +117,7 @@ public class XTimeType extends XDataType
       return false;
     int thisMask = components(this.typeCode);
     int objMask = ((DateTime) obj).components();
-    return (thisMask & ~objMask) == 0;
+    //return (thisMask & ~objMask) == 0;
+    return thisMask == objMask;
   }
 }

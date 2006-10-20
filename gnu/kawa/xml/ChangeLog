@@ -1,5 +1,8 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* XTimeType.java (isInstance):  Component masks have to match, not
+	just be a subset: An xs:gYearMonth is not an instance of an xs:gYear.
+
 	* XIntegerType.java (negativeIntegerType): Fix thinko.
 
 2006-10-11  Per Bothner  <per@bothner.com>

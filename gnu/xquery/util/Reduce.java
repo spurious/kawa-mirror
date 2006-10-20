@@ -4,45 +4,40 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.math.Numeric;
+import gnu.math.IntNum;
+import gnu.kawa.functions.AddOp;
 
-public class Reduce extends Procedure1
+public class Reduce
 {
-  public static final Reduce sum = new Reduce("sum", ArithOp.add);
-
-  protected Procedure combiner;
-
-  public Reduce (String name, Procedure combiner)
-  {
-    super(name);
-    this.combiner = combiner;
-  }
-
-  public Object combine(Object arg1, Object arg2)
+  public static Object sum (Object arg)
     throws Throwable
   {
-    if (arg1 == Values.empty)
-      return arg2; // FIXME - verify that arg2 is appropriate;
-    return combiner.apply2(arg1, arg2);
+    return sum(arg, IntNum.zero());
   }
 
-  public Object apply1(Object arg)
+  public static Object sum (Object arg, Object zero)
     throws Throwable
   {
-    Object result = Values.empty;
     if (arg instanceof Values)
       {
 	TreeList tlist = (TreeList) arg;
 	int pos = 0;
+        Object next = tlist.getPosNext(pos);
+        if (next == Sequence.eofValue)
+          return zero;
+        Object result = MinMax.convert(next);
 	for (;;)
 	  {
-	    Object next = tlist.getPosNext(pos);
+            pos = tlist.nextPos(pos);
+	    next = tlist.getPosNext(pos);
 	    if (next == Sequence.eofValue)
 	      return result;
-	    result = combine(result, next);
-            pos = tlist.nextPos(pos);
+            next = MinMax.convert(next);
+	    result = AddOp.apply2(1, result, next);
 	  }
       }
     else
-      return combine(result, arg);
+      return (Number) MinMax.convert(arg);
   }
 }

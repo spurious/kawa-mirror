@@ -2,6 +2,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.xml.*;
 import gnu.kawa.xml.*;
+import gnu.text.URI_utils;
 
 public class QNameUtils
 {
@@ -195,5 +196,17 @@ public class QNameUtils
       return Values.empty;
     else
       return uri;
+  }
+
+  public static Object resolveURI (Object relative, Object base)
+    throws java.net.URISyntaxException
+  {
+    if (relative instanceof KNode)
+      relative = KNode.atomicValue(relative);
+    if (base instanceof KNode)
+      base = KNode.atomicValue(base);
+    if (relative == Values.empty || relative == null)
+      return relative;
+    return URI_utils.resolve(relative, base);
   }
 }

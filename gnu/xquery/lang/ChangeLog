@@ -1,5 +1,11 @@
 2006-10-19  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): fn:sum is now defined using define_method.
+	Undeclare string-pad.
+
+	* XQResolveNames.java (walkApplyExp): Use new XQuery-specific function
+	for RESOLVE_URI_BUILTIN.
+
 	* XQParser.java (parseQName): Remove misleading-named method.
 	(parseNamedNodeType): Inline parseQName, with fixes.
 

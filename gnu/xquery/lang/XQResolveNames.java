@@ -713,8 +713,8 @@ public class XQResolveNames extends ResolveNames
                     margs[1] = getBaseUriExpr();
                   else
                     margs[1] = args[1];
-                  Method meth = ClassType.make("gnu.text.URI_utils")
-                    .getDeclaredMethod("resolve", 2);
+                  Method meth = ClassType.make("gnu.xquery.util.QNameUtils")
+                    .getDeclaredMethod("resolveURI", 2);
                   return new ApplyExp(meth, margs);
                 }
               case DISTINCT_VALUES_BUILTIN:

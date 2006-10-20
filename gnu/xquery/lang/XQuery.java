@@ -557,7 +557,7 @@ public class XQuery extends Language
     defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
     defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
     defProcStFld("count", "gnu.kawa.functions.CountValues", "countValues");
-    defProcStFld("sum", "gnu.xquery.util.Reduce", "sum");
+    define_method("sum", "gnu.xquery.util.Reduce", "sum"); // Overloaded
     defProcStFld("avg", "gnu.xquery.util.Average", "avg");
     defProcStFld("sublist", "gnu.xquery.util.SubList", "subList"); // deprecated
     defProcStFld("subsequence", "gnu.xquery.util.SubList", "subList");
@@ -601,7 +601,8 @@ public class XQuery extends Language
     define_method("iri-to-uri", "gnu.xquery.util.StringUtils", "iriToUri");
     define_method("escape-html-uri", "gnu.xquery.util.StringUtils",
                   "escapeHtmlUri");
-    define_method("string-pad", "gnu.xquery.util.StringUtils", "stringPad");
+    // Non-standard (in F&O example appendix).  Put in qexo namespace?
+    // define_method("string-pad", "gnu.xquery.util.StringUtils", "stringPad");
     define_method("contains", "gnu.xquery.util.StringUtils", "contains");
     define_method("starts-with", "gnu.xquery.util.StringUtils", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringUtils", "endsWith");

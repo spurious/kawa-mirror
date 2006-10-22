@@ -5,6 +5,7 @@ package gnu.mapping;
 import java.io.*;
 
 /** Concrete implementation of <code>Environment</code>.
+ * (Should consider merging this code with Table2D.)
  */
 
 public class SimpleEnvironment extends Environment

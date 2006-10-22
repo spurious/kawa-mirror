@@ -47,6 +47,7 @@ java_sources=\
   SharedLocation.java \
   SimpleEnvironment.java \
   Symbol.java \
+  Table2D.java \
   ThreadLocation.java \
   TtyInPort.java \
   UnboundLocationException.java \

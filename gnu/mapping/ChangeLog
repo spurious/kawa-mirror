@@ -1,3 +1,8 @@
+2006-10-21  Per Bothner  <per@bothner.com>
+
+	* Table2D.java: New class.
+	* Makefile.am: Update accordingly.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (errInitial): Don't pretty-print error output.

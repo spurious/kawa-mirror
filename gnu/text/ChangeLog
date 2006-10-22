@@ -1,3 +1,8 @@
+2006-10-21  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java: Don't use WeakHashMap to map URI to ClassLoader.
+	Use new class table2D instead.
+
 2006-10-15  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (error): New overloaded method.

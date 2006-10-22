@@ -2,15 +2,13 @@ package gnu.text;
 /* #ifdef use:java.net.URI */
 import java.net.URI;
 /* #endif */
-/* #ifdef JAVA2 */
-import java.util.WeakHashMap;
-/* #endif */
 import java.net.URL;
 import java.net.URLConnection;
 import java.io.*;
 import gnu.lists.FString;
 import gnu.mapping.CallContext;
 import gnu.mapping.InPort;
+import gnu.mapping.Table2D;
 
 public class URI_utils
 {
@@ -276,27 +274,31 @@ public class URI_utils
   // }
   /* #endif */
 
-  /* #ifdef JAVA2 */
-  static WeakHashMap resourceMap;
-  /* #endif */
+  private static gnu.mapping.Symbol keyClassLoader =
+    new gnu.mapping.Symbol(null, "(class-loader)");
 
-  synchronized static ClassLoader getClassLoaderForURI (Object uri)
+  static ClassLoader getClassLoaderForURI (Object uri)
   {
-    /* #ifdef JAVA2 */
-    if (resourceMap == null) return null;
-    return (ClassLoader) resourceMap.get(uri);
-    /* #else */
-    // return null;
-    /* #endif */
+    // We use Table.2D as a weak map from URI objects to a ClassLoader,
+    // for "class-resource:" URIs.  Earlier we used java.util.WeakHashMap,
+    // but that didn't work, possibly because what we really need is the
+    // non-standard WeakIdentityHashMap. So instead, I wrote a new Table2D
+    // class, which should be useful in its own right, and may also have
+    // less overhead. --PB.
+    Table2D table = Table2D.getInstance();
+    synchronized (table)
+      {
+        return (ClassLoader) table.get(uri, keyClassLoader, null);
+      }
   }
 
-  synchronized static void setClassLoaderForURI (Object uri, ClassLoader loader)
+  static private void setClassLoaderForURI (Object uri, ClassLoader loader)
   {
-    /* #ifdef JAVA2 */
-    if (resourceMap == null)
-      resourceMap = new WeakHashMap();
-    resourceMap.put(uri, loader);
-    /* #endif */
+    Table2D table = Table2D.getInstance();
+    synchronized (table)
+      {
+        table.put(uri, keyClassLoader, loader);
+      }
   }
 
   /** A special URI-scheme for accessing resources relative to a ClassLoader.
@@ -340,7 +342,8 @@ public class URI_utils
     /* #else */
     // String uri = str;
     /* #endif */
-    setClassLoaderForURI(uri, clas.getClassLoader());
+    ClassLoader loader = clas.getClassLoader();
+    setClassLoaderForURI(uri, loader);
     return uri;
   }
 
@@ -434,7 +437,10 @@ public class URI_utils
     // String resolved = sbuf.toString();
     /* #endif */
      if (resolved.toString().startsWith(CLASS_RESOURCE_URI_PREFIX))
-      setClassLoaderForURI(resolved, getClassLoaderForURI(base));
+       {
+         ClassLoader loader = getClassLoaderForURI(base);
+         setClassLoaderForURI(resolved, loader);
+       }
     return resolved;
   }
 }

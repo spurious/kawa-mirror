@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003, 2005  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2005, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -144,14 +144,6 @@ public class XMLPrinter extends OutPort
     closeTag();
     if (printIndent >= 0)
       {
-        if ((v == ' ' || v == '\t') && ! inAttribute)
-          {
-            writeSpaceFill();
-            prev = ' ';
-            if (inComment > 0)
-              inComment = 1;
-            return;
-          }
         if ((v == '\r' || v == '\n'))
           {
             if (v != '\n' || prev != '\r')
@@ -161,8 +153,7 @@ public class XMLPrinter extends OutPort
             return;
           }
       }
-    // if (v >= 0x10000) emit surrogtes FIXME;
-    //if (! escapeText)
+    // if (v >= 0x10000) emit surrogates FIXME;
     if (! escapeText)
       {
 	super.write((char) v);
@@ -208,7 +199,15 @@ public class XMLPrinter extends OutPort
   private void startWord()
   {
     closeTag();
-    if (prev == WORD && getColumnNumber() != 0)
+    if (prev == WORD
+        // This is wrong, since we want ("", "x") to print as " x".
+        // The problem is interactive i/o.  After output from one command,
+        // Kawa does a freshLine() before printing the prompt.  We want
+        // the freshline to clear the WORD state, but there is no way to
+        // do that currently. One solution may be to move support for
+        // spacing between WORD objects into he language-independent layer.
+        // That way Scheme can print muliple values better. FIXME.
+        && getColumnNumber() != 0)
       super.write(' ');
     prev = WORD;
   }
@@ -357,7 +356,7 @@ public class XMLPrinter extends OutPort
           : groupBindings.count(join);
         NamespaceBinding[] sortedBindings = new NamespaceBinding[numBindings];
         int i = 0;
-        boolean sortNamespaces = true; //canonicalize;
+        boolean sortNamespaces = canonicalize;
       check_namespaces:
 	for (NamespaceBinding ns = groupBindings;  ns != join;  ns = ns.next)
           {

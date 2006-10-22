@@ -1,3 +1,11 @@
+2006-10-21  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeChar): Converting space to writeSpaceFill
+	seems like a bad idea.
+
+	* XMLPrinter.java (beginGroup): Only sort namespace declarations
+	if canonicalize is true.
+
 2006-10-19  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (printIndent): Make public.

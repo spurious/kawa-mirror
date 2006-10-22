@@ -333,6 +333,7 @@ public class NodeTree extends TreeList
 	index = parentOrEntityI(index);
 	if (index == -1)
           return base;
+        pos = index << 1;
       }
   }
 

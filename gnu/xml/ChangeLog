@@ -1,5 +1,7 @@
 2006-10-22  Per Bothner  <per@bothner.com>
 
+	* NodeTree.jave (baseUriOfPos): Need to update pos variable to parent.
+
 	* XMLPrinter.java (beginEntity, endEntity): New methods, for XCosumer.
 	* NodeTree.java (baseUriOfPos): New method, moved from TreeList.
 

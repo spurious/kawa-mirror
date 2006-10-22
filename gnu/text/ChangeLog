@@ -1,5 +1,12 @@
 2006-10-21  Per Bothner  <per@bothner.com>
 
+	* PrettyWriter.java (isPrettyPrinting): Replace public boolean by ...
+	(prettyPrintingMode): non-public new 3-valued int.
+	(isPrettyPrinting, setPrettyPrinting, getPrettyPrintingMode,
+	setPrettyPrintingMode):  New access functions.
+	(write, write): Only translate ' ' to NEWLINE_SPACE if
+	prettyPrintingMode == 2.
+
 	* URI_utils.java: Don't use WeakHashMap to map URI to ClassLoader.
 	Use new class table2D instead.
 

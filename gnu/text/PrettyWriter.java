@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2004  Per M.A. Bothner.
+// Copyright (c) 2001, 2004, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -19,20 +19,20 @@ public class PrettyWriter extends java.io.Writer
   public PrettyWriter(java.io.Writer out)
   {
     this.out = out;
-    isPrettyPrinting = true;
+    prettyPrintingMode = 1;
   }
 
   public PrettyWriter(java.io.Writer out, int lineLength)
   {
     this.out = out;
     this.lineLength = lineLength;
-    isPrettyPrinting = lineLength > 1;
+    prettyPrintingMode = lineLength > 1 ? 1 : 0;
   }
 
-  public PrettyWriter(java.io.Writer out, boolean isPrettyPrinting)
+  public PrettyWriter(java.io.Writer out, boolean prettyPrintingMode)
   {
     this.out = out;
-    this.isPrettyPrinting = isPrettyPrinting;
+    this.prettyPrintingMode = prettyPrintingMode ? 1 : 0;
   }
 
   /** Line length we should format to. */
@@ -46,7 +46,34 @@ public class PrettyWriter extends java.io.Writer
   public static ThreadLocation indentLoc
     = new ThreadLocation("indent");
 
-  public boolean isPrettyPrinting;
+  /** The current pretty-printing mode.
+   * See setPrettyPrintingMode for valid values. */
+  int prettyPrintingMode;
+
+  /** Control pretty-printing mode.
+   * @param mode the value 0 disables pretty-printing;
+   *   the value 1 enables ecplicit pretty-printing;
+   *   the value 2 enables pretty-printing with auto-fill, which means that
+   *   spaces are treated like enqueing NEWLINE_SPACE (essentiall a 'fill').
+   */
+  public void setPrettyPrintingMode (int mode)
+  { prettyPrintingMode = mode; }
+
+  /** Return pretty-printing mode.
+   * @return 0, 1, 2, as described for {@link #setPrettyPrintingMode(int)}.
+   */
+  public int getPrettyPrintingMode () { return prettyPrintingMode; }
+
+  /** Is pretty printing enabled? */
+  public boolean isPrettyPrinting () { return prettyPrintingMode > 0; }
+
+  /** Turn pretty printing on or off.
+   * Equivalent to {@code setPrettyPrintingMode(mode?1:0)}.
+   */
+  public void setPrettyPrinting (boolean mode)
+  {
+    prettyPrintingMode = mode ? 0 : 1;
+  }
 
   public static int initialBufferSize = 126;
 
@@ -252,7 +279,7 @@ public class PrettyWriter extends java.io.Writer
   public void write (int ch)
   {
     //log("{WRITE-ch: "+((char)ch)+"}");
-    if (ch == '\n' && isPrettyPrinting)
+    if (ch == '\n' && prettyPrintingMode > 0)
       enqueueNewline(NEWLINE_LITERAL);
     else
       {
@@ -260,7 +287,7 @@ public class PrettyWriter extends java.io.Writer
 	int fillPointer = bufferFillPointer;
 	buffer[fillPointer] = (char) ch;
 	bufferFillPointer = 1 + fillPointer;
-	if (ch == ' ' && isPrettyPrinting && currentBlock < 0)
+	if (ch == ' ' && prettyPrintingMode > 1 && currentBlock < 0)
 	  enqueueNewline(NEWLINE_SPACE);
       }
   }
@@ -285,7 +312,7 @@ public class PrettyWriter extends java.io.Writer
 	while (--cnt >= 0)
 	  {
 	    char ch = str.charAt(start++);
-	    if (ch == '\n' && isPrettyPrinting)
+	    if (ch == '\n' && prettyPrintingMode > 0)
 	      {
 		bufferFillPointer = fillPointer;
 		enqueueNewline(NEWLINE_LITERAL);
@@ -294,7 +321,7 @@ public class PrettyWriter extends java.io.Writer
 	    else
 	      {
 		buffer[fillPointer++] = (char) ch;
-		if (ch == ' ' && isPrettyPrinting && currentBlock < 0)
+		if (ch == ' ' && prettyPrintingMode > 1 && currentBlock < 0)
 		  {
 		    bufferFillPointer = fillPointer;
 		    enqueueNewline(NEWLINE_SPACE);
@@ -322,7 +349,7 @@ public class PrettyWriter extends java.io.Writer
 	for (int i = start;  i < end;  i++)
 	  {
 	    char c;
-	    if (isPrettyPrinting
+	    if (prettyPrintingMode > 0
 		&& ((c = str[i]) == '\n'
 		    || (c == ' ' && currentBlock < 0)))
 	      {
@@ -542,7 +569,7 @@ public class PrettyWriter extends java.io.Writer
 
   public final void writeBreak(int kind)
   {
-    if (isPrettyPrinting)
+    if (prettyPrintingMode > 0)
       enqueueNewline(kind);
   }
 
@@ -557,7 +584,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void addIndentation(int amount, boolean current)
   {
-    if (isPrettyPrinting)
+    if (prettyPrintingMode > 0)
       enqueueIndent((current ? QITEM_INDENTATION_CURRENT
 		     : QITEM_INDENTATION_BLOCK),
 		    amount);
@@ -588,7 +615,7 @@ public class PrettyWriter extends java.io.Writer
       }
     if (prefix != null)
       write(prefix);
-    if (! isPrettyPrinting)
+    if (prettyPrintingMode == 0)
       return;
     int start = enqueue (QITEM_BLOCK_START_TYPE,
 			 QITEM_BLOCK_START_SIZE);
@@ -666,7 +693,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void endLogicalBlock (String suffix)
   {
-    if (isPrettyPrinting)
+    if (prettyPrintingMode > 0)
       endLogicalBlock();
     else if (suffix != null)
       write(suffix);
@@ -818,7 +845,7 @@ public class PrettyWriter extends java.io.Writer
     int available = length - fillPtr;
     if (available > 0)
       return available;
-    else if (isPrettyPrinting && fillPtr > lineLength)
+    else if (prettyPrintingMode > 0 && fillPtr > lineLength)
       {
 	if (! maybeOutput(false, false))
 	  outputPartialLine();
@@ -1160,7 +1187,7 @@ public class PrettyWriter extends java.io.Writer
     buffer = null;
   }
 
-  /** Not meaningful if isPrettyPrinting. */
+  /** Not meaningful if {@code prettyPrintingMode > 0}. */
   public int getColumnNumber ()
   {
     int i = bufferFillPointer;

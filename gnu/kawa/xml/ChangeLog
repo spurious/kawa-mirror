@@ -1,5 +1,7 @@
 2006-10-22  Per Bothner  <per@bothner.com>
 
+	* Document.java (parseCached): Also call beginEntity/endEntity.
+
 	* MakeWithBaseUri.java: New class, extends NodeConstructor.
 	* Makefile.am: Update accordingly.
 	* KNode.java (make): Skip BEGIN_ENTITY instructions.

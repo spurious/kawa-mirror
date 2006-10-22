@@ -18,6 +18,8 @@ public class Document
   {
     SourceMessages messages = new SourceMessages();
     XMLParser parser = new XMLParser(name, messages, out);
+    if (out instanceof XConsumer)
+      ((XConsumer) out).beginEntity(name);
     out.beginDocument();
     if (out instanceof TreeList)
       ((TreeList) out).writeDocumentUri(name);
@@ -26,6 +28,8 @@ public class Document
       throw new SyntaxException("document function read invalid XML",
 				messages);
     out.endDocument();
+    if (out instanceof XConsumer)
+      ((XConsumer) out).endEntity();
   }
 
   public static KDocument parse (Object uri) throws Throwable

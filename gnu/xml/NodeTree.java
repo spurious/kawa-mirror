@@ -38,17 +38,27 @@ public class NodeTree extends TreeList
         beginAttribute(((Keyword) v).getName(), v);
         gapStartLastAtomic = SAW_KEYWORD;
       }
-    // Using super.writeObject would be nice, but there are edge cases.
-    // Specifically, atomic nodes with a zero-length string-value.
-    // Handling that case correctly and efficiently is left for later.  FIXME.
-    // else
-    //  super.writeObject(v);
     else
       {
-        if (gapStartLastAtomic == gapStart)
-          writeChar(' ');
-        MakeText.text$C(v, this);  // Atomize.
-        gapStartLastAtomic = gapStart;
+        if (v instanceof UnescapedData)
+          {
+            super.writeObject(v);
+            gapStartLastAtomic = -1;
+          }
+        else
+          {
+            if (gapStartLastAtomic == gapStart)
+              writeChar(' ');
+            // Using super.writeObject would be nice, but there are edge cases.
+            // Specifically, atomic nodes with a zero-length string-value.
+            // For example: <elem>{""}</elem>
+            // Thus should result in zero text nodss.
+            // Handling that case correctly and efficiently is left for later.
+            // FIXME.
+            //  super.writeObject(v);
+            MakeText.text$C(v, this);  // Atomize.
+            gapStartLastAtomic = gapStart;
+          }
       }
   }
 

@@ -1,5 +1,8 @@
 2006-10-21  Per Bothner  <per@bothner.com>
 
+	* OutPort.java (errInitial): Since retty-printing no longer by default
+	automatically translates ' ' to fill we can revert 10-11 change.
+
 	* Table2D.java: New class.
 	* Makefile.am: Update accordingly.
 

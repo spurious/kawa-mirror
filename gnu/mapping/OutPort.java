@@ -90,9 +90,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
 
-  // It seems better to not pretty-print the error output, since unexpected
-  // line break in the middle of an error message may be confusing.
-  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), false, true, "<stderr>");
+  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
 
   public static final ThreadLocation outLocation
     = new ThreadLocation("out-default");

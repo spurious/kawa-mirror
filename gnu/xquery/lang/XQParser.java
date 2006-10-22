@@ -2260,7 +2260,7 @@ public class XQParser extends Lexer
 		next = read();
 		if (next == '/')
 		  break;
-                Expression content = parseXMLConstructor(next);
+                Expression content = parseXMLConstructor(next, true);
 		result.addElement(content);
 		tokenBufferLength = 0;
                 if (content instanceof ApplyExp
@@ -2365,7 +2365,7 @@ public class XQParser extends Lexer
    * Assume initial '<' has been processed.
    * @param next next character (after '<').
    */
-  Expression parseXMLConstructor(int next)
+  Expression parseXMLConstructor (int next, boolean inElementContent)
       throws java.io.IOException, SyntaxException
   {
     Expression exp;
@@ -2404,6 +2404,8 @@ public class XQParser extends Lexer
 		 && read() == 'A' && read() == 'T' && read() == 'A'
 		 && read() == '[')
 	  {
+            if (! inElementContent)
+              error('e', "CDATA section must be in element content");
 	    getDelimited("]]>");
 	    Expression[] args =
 	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
@@ -2520,7 +2522,7 @@ public class XQParser extends Lexer
 	if (ch == '{')
 	  {
             warnOldVersion("enclosed attribute value expression should be quoted");
-	    vec.addElement(stringValue(parseEnclosedExpr()));
+	    vec.addElement(parseEnclosedExpr());
 	  }
 	else
 	  parseContent((char) ch, vec);
@@ -2850,7 +2852,7 @@ public class XQParser extends Lexer
 	  }
 	else 
 	  {
-	    exp = parseXMLConstructor(next);
+	    exp = parseXMLConstructor(next, false);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn);
 	  }

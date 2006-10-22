@@ -147,6 +147,17 @@ public class NodeUtils
     return uri == null ? Values.empty : uri;
   }
 
+  public static Object nilled (Object arg)
+  {
+    if (arg == null || arg == Values.empty)
+      return arg;
+    if (! (arg instanceof KNode))
+      throw new WrongType("nilled", 1, arg, "node()?");
+    if (! (arg instanceof KElement))
+      return Values.empty;
+    return Boolean.FALSE;
+  }
+
   public static Object baseUri (Object arg)
   /* #ifdef use:java.net.URI */
     throws java.net.URISyntaxException

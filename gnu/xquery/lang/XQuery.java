@@ -585,6 +585,7 @@ public class XQuery extends Language
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("nilled", "gnu.xquery.util.NodeUtils", "nilled");
     define_method("data", "gnu.xquery.util.NodeUtils", "data$X");
     define_method("lower-case", "gnu.xquery.util.StringUtils", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringUtils", "upperCase");
@@ -685,9 +686,9 @@ public class XQuery extends Language
     define_method("adjust-dateTime-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustDateTimeToTimezone"); // overloaded
     define_method("adjust-date-to-timezone", "gnu.xquery.util.TimeUtils",
-                  "adjustDateTimeToTimezone"); // overloaded
+                  "adjustDateToTimezone"); // overloaded
     define_method("adjust-time-to-timezone", "gnu.xquery.util.TimeUtils",
-                  "adjustDateTimeToTimezone"); // overloaded
+                  "adjustTimeToTimezone"); // overloaded
     define_method("dateTime", "gnu.xquery.util.TimeUtils", "dateTime");
 
     define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");

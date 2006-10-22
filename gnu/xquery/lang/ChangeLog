@@ -1,5 +1,10 @@
 2006-10-22  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initQuery): Declare fn:nilled.
+
+	* XQuery.java (adjust-date-to-timezone, adjust-time-to-timezone):
+	These are now implemented using separate methods.
+
 	* XQParser.java (wrapWithBaseUri): New method.
 	(parseXMLConstructor, parseMaybePrimaryExpr): Use it to set
 	base-uri property of constructed elements and documents.

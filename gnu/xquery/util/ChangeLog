@@ -1,5 +1,11 @@
 2006-10-22  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (nilled): New method, implements fn:nilled.
+
+	* TimeUtils.java (adjustDateTimeToTimezone): Move body of method to ...
+	(adjustDateTimeToTimezoneRaw): ... new method.
+	(adjustDateToTimezone, adjustTimeToTimezone): New methods.
+
 	* NodeUtils.java (root): New method, replaces method in Nodes.
 	(baseUri): New method.
 

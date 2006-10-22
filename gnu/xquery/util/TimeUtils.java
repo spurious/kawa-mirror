@@ -223,7 +223,38 @@ public class TimeUtils
   {
     if (time == Values.empty || time == null)
       return time;
-    DateTime dtime = (DateTime) time;
+    DateTime dtime = coerceToDateTime("adjust-dateTime-to-timezone", time);
+    return adjustDateTimeToTimezoneRaw(dtime, zone);
+  }
+
+  public static Object adjustDateToTimezone (Object time)
+  {
+    return adjustDateToTimezone(time, getImplicitTimezone());
+  }
+
+  public static Object adjustDateToTimezone (Object time, Object zone)
+  {
+    if (time == Values.empty || time == null)
+      return time;
+    DateTime dtime = coerceToDate("adjust-date-to-timezone", time);
+    return adjustDateTimeToTimezoneRaw(dtime, zone);
+  }
+
+  public static Object adjustTimeToTimezone (Object time)
+  {
+    return adjustTimeToTimezone(time, getImplicitTimezone());
+  }
+
+  public static Object adjustTimeToTimezone (Object time, Object zone)
+  {
+    if (time == Values.empty || time == null)
+      return time;
+    DateTime dtime = coerceToTime("adjust-time-to-timezone", time);
+    return adjustDateTimeToTimezoneRaw(dtime, zone);
+  }
+
+  static Object adjustDateTimeToTimezoneRaw (DateTime dtime, Object zone)
+  {
     if (zone == Values.empty || zone == null)
       return dtime.withZoneUnspecified();
     Duration d = (Duration) zone;

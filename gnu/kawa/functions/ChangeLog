@@ -1,3 +1,10 @@
+2006-10-22  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java: Remove class.
+	(baseUri(Object)): Wasn't used.
+	(baseUri()):  Replaced by calling CallContext.getBaseUri directly.
+	* Makefile.am: Update accordingly.
+
 2006-10-11  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObject): Use escapes if readably

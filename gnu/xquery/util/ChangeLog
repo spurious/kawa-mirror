@@ -1,3 +1,8 @@
+2006-10-22  Per Bothner  <per@bothner.com>
+
+	* NodeUtils.java (root): New method, replaces method in Nodes.
+	(baseUri): New method.
+
 2006-10-19  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java (resolveURI): New static method.

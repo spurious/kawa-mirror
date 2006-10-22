@@ -11,7 +11,6 @@ java_sources=\
   Arrays.java \
   ArrayRef.java \
   ArraySet.java \
-  BaseUri.java \
   ConstantFunction0.java \
   Convert.java \
   CountValues.java \

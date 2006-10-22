@@ -653,12 +653,6 @@ public abstract class AbstractSequence
     return nextIndex(pos.ipos);
   }
 
-  /** Return of the base-uri property, if known, of the node at pos. */
-  public Object baseUriOfPos (int pos)
-  {
-    return null;
-  }
-
   /** Compare two positions, and indicate if they are the same position. */
   public boolean equals(int ipos1, int ipos2)
   {

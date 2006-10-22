@@ -281,6 +281,14 @@ public class XMLPrinter extends OutPort
     freshLine();
   }
 
+  public void beginEntity (Object base)
+  {
+  }
+
+  public void endEntity ()
+  {
+  }
+
   protected void writeQName (Object name)
   {
     if (name instanceof Symbol)

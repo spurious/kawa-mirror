@@ -1,5 +1,12 @@
 2006-10-22  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (wrapWithBaseUri): New method.
+	(parseXMLConstructor, parseMaybePrimaryExpr): Use it to set
+	base-uri property of constructed elements and documents.
+	* XQResolveNames.java (staticBaseUriDecl): New static field.
+	(apply): Updates for moved methods.
+	Use getBaseUriExpr for STATIC_BASE_URI_BUILTIN.
+
 	* XQParser.java (parseXMLConstructor): Take extra inElementContent
 	parameter.  Complain if CDATA section seen and !inElementContent.
 	(parseContent, parseMaybePrimaryExpr): Update callers.

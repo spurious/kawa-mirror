@@ -1,3 +1,17 @@
+2006-10-22  Per Bothner  <per@bothner.com>
+
+	* XConsumer.java (writeBaseUri): Remove method.
+	(beginEntity, endEntity): New methods.
+	* TreeList.java (BASE_URI): Removed constant.
+	(BEGIN_ENTITY, BEGIN_ENTITY_SIZE, END_ENITY): New constants.
+	(BEGIN_DOCUMENT): Now also includes parent_offset operand.
+	(beginDocument): Also store parent offset.
+	(writeBaseUri): Removed method.
+	(beginEntity, endEntity): New methods.
+	(parentOrEntityPos, parentOrEntityI, getNextKindI): New methods.
+	(parentPos): Use new methods.
+	* AbstractSequence.java (baseUriOfPos): Remove method.
+
 2006-09-28  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (DOCUMENT_URI): New constant.

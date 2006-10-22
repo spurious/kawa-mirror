@@ -96,6 +96,17 @@ public class NodeUtils
       out.writeObject(KNode.atomicValue(arg));
   }
 
+  /** Return the root node of the argument. */
+  public static Object root (Object arg)
+  {
+    if (arg == null || arg == Values.empty)
+      return arg;
+    if (! (arg instanceof KNode))
+      throw new WrongType("root", 1, arg, "node()?");
+    KNode node = (KNode) arg;
+    return gnu.kawa.xml.Nodes.root((NodeTree) node.sequence, node.getPos());
+  }
+
   public static String getLang (KNode node)
   {
     NodeTree seq = (NodeTree) node.sequence;
@@ -133,6 +144,20 @@ public class NodeUtils
       throw new WrongType("xs:document-uri", 1, arg, "node()?");
     KNode node = (KNode) arg;
     Object uri = ((NodeTree) node.sequence).documentUriOfPos(node.ipos);
+    return uri == null ? Values.empty : uri;
+  }
+
+  public static Object baseUri (Object arg)
+  /* #ifdef use:java.net.URI */
+    throws java.net.URISyntaxException
+  /* #end */
+  {
+    if (arg == null || arg == Values.empty)
+      return arg;
+    if (! (arg instanceof KNode))
+      throw new WrongType("base-uri", 1, arg, "node()?");
+    KNode node = (KNode) arg;
+    Object uri = ((NodeTree) node.sequence).baseUriOfPos(node.ipos, true);
     return uri == null ? Values.empty : uri;
   }
 }

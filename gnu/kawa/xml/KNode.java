@@ -57,7 +57,16 @@ public abstract class KNode extends SeqPosition
 
   public static KNode make(NodeTree seq, int ipos)
   {
-    int kind = seq.getNextKind(ipos);
+    int index = seq.posToDataIndex(ipos);
+    while (index < seq.data.length
+           && seq.data[index] == TreeList.BEGIN_ENTITY)
+      {
+        index += TreeList.BEGIN_ENTITY_SIZE;
+        if (index == seq.gapStart)
+          index = seq.gapEnd;
+        ipos = index << 1;
+      }
+    int kind = seq.getNextKindI(seq.posToDataIndex(ipos));
     switch (kind)
       {
       case Sequence.GROUP_VALUE:
@@ -342,12 +351,6 @@ public abstract class KNode extends SeqPosition
   public boolean hasAttributes ()
   {
     return false;
-  }
-
-  public String getBaseURI ()
-  {
-    Object uri = sequence.baseUriOfPos(ipos);
-    return uri == null ? null : uri.toString();
   }
 
   public boolean isDefaultNamespace (String namespaceURI)

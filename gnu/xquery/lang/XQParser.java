@@ -1747,7 +1747,7 @@ public class XQParser extends Lexer
 	  dot = syntaxError("context item is undefined", "XPDY0002");
         else
           dot = new ReferenceExp(DOT_VARNAME, dotDecl);
-	step1 = new ApplyExp(ClassType.make("gnu.kawa.xml.Nodes")
+	step1 = new ApplyExp(ClassType.make("gnu.xquery.util.NodeUtils")
 			     .getDeclaredMethod("root", 1),
 			     new Expression[] { dot } );
 	int next = skipSpace(nesting != 0);
@@ -2451,6 +2451,8 @@ public class XQParser extends Lexer
 	getRawToken();
 	char saveReadState = pushNesting('<');
 	exp = parseElementConstructor();
+        if (! inElementContent)
+          exp = wrapWithBaseUri(exp);
 	popNesting(saveReadState);
       }
     return exp;
@@ -2631,6 +2633,17 @@ public class XQParser extends Lexer
     if (nsBindings != NamespaceBinding.predefinedXML)
       mkElement.setNamespaceNodes(nsBindings);
     return result;
+  }
+
+  Expression wrapWithBaseUri (Expression exp)
+  {
+    if (baseURI == null)
+      return exp;
+    return new ApplyExp(MakeWithBaseUri.makeWithBaseUri,
+                        new Expression[] { 
+                          new ApplyExp(new ReferenceExp(XQResolveNames.staticBaseUriDecl), Expression.noExpressions),
+                          exp })
+      .setLine(exp);
   }
 
   /** Parse ParenthesizedExpr.
@@ -3031,6 +3044,8 @@ public class XQParser extends Lexer
         exp = new ApplyExp(func, args);
         exp.setFile(getName());
         exp.setLine(startLine, startColumn);
+        if (token == DOCUMENT_TOKEN || token == ELEMENT_TOKEN)
+          exp = wrapWithBaseUri(exp);
         break;
 
       case ORDERED_LBRACE_TOKEN:

@@ -180,12 +180,6 @@ public class Nodes extends Values
     maybeEndNonTextNode();
   }
 
-  public void writeBaseUri (Object uri)
-  {
-    maybeStartNonTextNode();
-    curFragment.writeBaseUri(uri);
-  }
-
   public void writeComment(char[] chars, int offset, int length)
   {
     maybeStartNonTextNode();
@@ -216,6 +210,18 @@ public class Nodes extends Values
   public void endDocument()
   {
     curFragment.endDocument();
+    maybeEndNonTextNode();
+  }
+
+  public void beginEntity(Object base)
+  {
+    maybeStartNonTextNode();
+    curFragment.beginEntity(base);
+  }
+
+  public void endEntity()
+  {
+    curFragment.endEntity();
     maybeEndNonTextNode();
   }
 
@@ -301,8 +307,16 @@ public class Nodes extends Values
     return getIntN(i+3);
   }
 
-  private static KNode root (NodeTree seq, int ipos)
+  public static KNode root (NodeTree seq, int ipos)
   {
+    int root;
+    if (seq.gapStart > TreeList.BEGIN_ENTITY_SIZE
+        && seq.data[0] == TreeList.BEGIN_ENTITY)
+      root = TreeList.BEGIN_ENTITY;
+    else
+      root = 0;
+    return KNode.make(seq, root);
+    /*
     int end = seq.endPos();
     for (;;)
       {
@@ -311,12 +325,6 @@ public class Nodes extends Values
 	  return KNode.make(seq, ipos);
 	ipos = parent;
       }
-  }
-
-  /** Return the root node of the argument. */
-  public static SeqPosition root (Object node)
-  {
-    KNode spos = (KNode) node;
-    return root((NodeTree) spos.sequence, spos.getPos());
+    */
   }
 }

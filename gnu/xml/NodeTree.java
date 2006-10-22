@@ -1,9 +1,10 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.text.URI_utils;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XName;
 import gnu.kawa.xml.MakeText;  // FIXME
@@ -291,6 +292,47 @@ public class NodeTree extends TreeList
         if (attr != 0)
           return attr;
         ipos = parentPos(ipos);
+      }
+  }
+
+  /** Return of the base-uri property, if known, of the node at pos. */
+  public Object baseUriOfPos (int pos, boolean resolveRelative)
+  /* #ifdef use:java.net.URI */
+    throws java.net.URISyntaxException
+  /* #end */
+  {
+    Object base = null;
+    int index = posToDataIndex(pos);
+    for (;;)
+      {
+	if (index == data.length)
+	  return null;
+	char datum = data[index];
+        Object uri = null;
+        if (datum == BEGIN_ENTITY)
+          {
+            int oindex = getIntN(index+1);
+            if (oindex >= 0)
+              uri = objects[oindex];
+          }
+	else if ((datum >= BEGIN_GROUP_SHORT
+	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	    || datum == BEGIN_GROUP_LONG)
+          {
+            int attr = getAttributeI(pos, NamespaceBinding.XML_NAMESPACE, "base");
+            if (attr != 0)
+              uri = KNode.getNodeValue(this, attr);
+          }
+        if (uri != null)
+          {
+            base = base == null || ! resolveRelative ? uri
+              : URI_utils.resolve(base, uri);
+            if (URI_utils.isAbsolute(base) || ! resolveRelative)
+              return base;
+          }
+	index = parentOrEntityI(index);
+	if (index == -1)
+          return base;
       }
   }
 

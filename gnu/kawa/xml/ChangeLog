@@ -1,3 +1,15 @@
+2006-10-22  Per Bothner  <per@bothner.com>
+
+	* MakeWithBaseUri.java: New class, extends NodeConstructor.
+	* Makefile.am: Update accordingly.
+	* KNode.java (make): Skip BEGIN_ENTITY instructions.
+	(getBaseURI): Remove pointless method.
+	* Document.java (parseCached): Inline call to removed BaseUri.baseUri.
+	* Nodes.java (writeBaseUri): Removed method.
+	(beginEntity, endEntity): New methods, for XConsumer.
+	(root): Alternative and more efficient implementation.
+	(root(Object)): Remove pointless method.
+
 2006-10-19  Per Bothner  <per@bothner.com>
 
 	* XTimeType.java (isInstance):  Component masks have to match, not

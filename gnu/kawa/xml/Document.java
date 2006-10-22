@@ -7,7 +7,6 @@ import gnu.lists.*;
 import gnu.xml.*;
 import java.net.URL;
 import gnu.text.*;
-import gnu.kawa.functions.BaseUri;
 
 /** Implement the XQuery function 'document'. */
 
@@ -83,7 +82,7 @@ public class Document
         if (! InPort.uriSchemeSpecified(name))
           {
             if (base == null)
-              base = BaseUri.baseUri();
+              base = CallContext.getInstance().getBaseUri();
             uri = URI_utils.resolve(uri, base);
           }
       }

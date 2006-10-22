@@ -124,10 +124,12 @@ public class XQResolveNames extends ResolveNames
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
 
+  public static final Declaration staticBaseUriDecl
+    = makeBuiltin("static-base-uri", STATIC_BASE_URI_BUILTIN);
+
   public static final Declaration resolvePrefixDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "(resolve-prefix)"),
                   RESOLVE_PREFIX_BUILTIN);
-
 
   /** Create a <code>Declaration</code> for a builtin function. */
   public static Declaration makeBuiltin (String name, int code)
@@ -160,6 +162,7 @@ public class XQResolveNames extends ResolveNames
     super(comp);
     lookup.push(lastDecl);
     lookup.push(xsQNameDecl);
+    lookup.push(staticBaseUriDecl);
     pushBuiltin("position", POSITION_BUILTIN);
     pushBuiltin("compare", COMPARE_BUILTIN);
     pushBuiltin("distinct-values", DISTINCT_VALUES_BUILTIN);
@@ -169,7 +172,6 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("root", ROOT_BUILTIN);
     pushBuiltin("base-uri", BASE_URI_BUILTIN);
     pushBuiltin("lang", LANG_BUILTIN);
-    pushBuiltin("static-base-uri", STATIC_BASE_URI_BUILTIN);
     pushBuiltin("resolve-uri", RESOLVE_URI_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
@@ -613,13 +615,13 @@ public class XQResolveNames extends ResolveNames
                 }
               case ROOT_BUILTIN:
 		{
-                  Method meth = ClassType.make("gnu.kawa.xml.Nodes")
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
                     .getDeclaredMethod("root", 1);
                   return withContext(meth, exp.getArgs(), "fn:root", 0);
                 }
               case BASE_URI_BUILTIN:
 		{
-                  Method meth = ClassType.make("gnu.kawa.functions.BaseUri")
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
                     .getDeclaredMethod("baseUri", 1);
                   return withContext(meth, exp.getArgs(), "fn:base-uri", 0);
                 }
@@ -635,9 +637,7 @@ public class XQResolveNames extends ResolveNames
 		  Expression[] args = exp.getArgs();
                   if ((err = checkArgCount(args, decl, 0, 0)) != null)
                     return err;
-                  String result = parser.baseURI;
-                  return result == null ? QuoteExp.voidExp
-                    : QuoteExp.getInstance(result);
+                  return getBaseUriExpr();
                 }
               case NAMESPACE_URI_BUILTIN:
 		{

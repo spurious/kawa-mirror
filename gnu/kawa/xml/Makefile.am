@@ -43,6 +43,7 @@ java_sources = \
   MakeResponseHeader.java \
   MakeText.java \
   MakeUnescapedData.java \
+  MakeWithBaseUri.java \
   NodeCompare.java \
   NodeConstructor.java \
   NodeName.java \

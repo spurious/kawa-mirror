@@ -11,7 +11,6 @@ public class GeneralHashTable
 // FUTURE: implements java.util.Map
 {
   protected HashNode[] table;
-  int log2Size;
   private int mask;
   protected int num_bindings;
 
@@ -22,7 +21,7 @@ public class GeneralHashTable
 
   public GeneralHashTable (int capacity)
   {
-    log2Size = 4;
+    int log2Size = 4;
     while (capacity > (1 << log2Size))
       log2Size++;
     capacity = 1 << log2Size;
@@ -111,7 +110,11 @@ public class GeneralHashTable
 	if (node == null)
 	  {
             if (++num_bindings >= table.length)
-              rehash();
+              {
+                rehash();
+                index = hash & mask;
+                first = table[index];
+              }
             node = makeEntry(key, hash, value);
             node.next = first;
             table[index] = node;
@@ -170,7 +173,6 @@ public class GeneralHashTable
 	  }
       }
     table = newTable;
-    log2Size++;
     mask = newMask;
   }
 

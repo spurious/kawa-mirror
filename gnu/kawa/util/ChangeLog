@@ -1,3 +1,10 @@
+2006-10-24  Per Bothner  <per@bothner.com>
+
+	* GeneralHashTable.java (log2Size): Remove unneeded field.
+
+	* GeneralHashTable.java (put): We need to update the index and first
+	variable after a rehash.
+
 2006-09-08  Per Bothner  <per@bothner.com>
 
 	* ConsumeProc.java: Remove unused class.

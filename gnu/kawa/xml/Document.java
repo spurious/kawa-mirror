@@ -57,6 +57,7 @@ public class Document
         NodeTree tree = new NodeTree();
         SourceMessages messages = new SourceMessages();
         XMLParser parser = new XMLParser(uri, messages, tree);
+        tree.beginEntity(uri);
         tree.beginDocument();
         tree.writeDocumentUri(uri);
         parser.parse();
@@ -65,7 +66,8 @@ public class Document
           throw new SyntaxException("document function read invalid XML",
                                     messages);
         tree.endDocument();
-        val = new KDocument(tree, 0);
+        tree.endEntity();
+        val = new KDocument(tree, TreeList.BEGIN_ENTITY_SIZE << 1);
         loc.set(val);
         return val;
       }

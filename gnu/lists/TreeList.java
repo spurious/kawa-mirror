@@ -221,14 +221,17 @@ public class TreeList extends AbstractSequence
   static final int END_ATTRIBUTE = 0xF10A;
 
   /** Beginning of a document (or top-level value).
+   * Used to distinguish a document from its element node.
    * [end_offset], 2 shorts, giving the location of the following
    *   END_DOCUMENT.  If the attribute straddles the gap, then
    *   end_offset is a negative offset relative to data.length.
    *   (Therefore allocating more space for the gap does not require
    *   adjusting end_offset.)  Otherwise, the end_offset is relative
    *   to the BEGIN_DOCUMENT word.
-   * [parent_offset], in 2 shorts.  (This would normally be a BEGIN_ENTITY.)
-   * Used to distinguish a document from its element node.
+   * [parent_offset], in 2 shorts.  The parent node, or -1 if no parent.
+   * Otherwise, a negative value is a relative offset, while a non-negative
+   * value is absolute.  (Use the latter when gap is between this node and
+   * its parent.  The parent would normally be a BEGIN_ENTITY.
    */
   protected static final int BEGIN_DOCUMENT = 0xF110;
 
@@ -237,7 +240,7 @@ public class TreeList extends AbstractSequence
 
   /** End of an entity (typically a file, possibly included).
    * [base_uri], 2 short, given an index of a base-uri object
-   * [parent_offset], in 2 shorts.  (This would normally be a BEGIN_ENTITY.)
+   * [parent_offset], in 2 shorts, encoded as for BEGIN_DOCUMENT.
    */
   public static final int BEGIN_ENTITY = 0xF112;
   public static final int BEGIN_ENTITY_SIZE = 5;
@@ -321,7 +324,7 @@ public class TreeList extends AbstractSequence
    */
   protected static final int END_GROUP_LONG = 0xF10C;
 
-  int currentParent = 0;
+  int currentParent = -1;
 
   public void ensureSpace(int needed)
   {
@@ -492,7 +495,7 @@ public class TreeList extends AbstractSequence
       throw new Error("nested document");
     docStart = p+1;
     setIntN(p+1, gapEnd - data.length);
-    setIntN(p+3, currentParent-p);  // parent_offset
+    setIntN(p+3, currentParent == -1 ? -1 : currentParent-p);  // parent_offset
     currentParent = p;
     gapStart = p + 5;
     currentParent = p;
@@ -501,14 +504,16 @@ public class TreeList extends AbstractSequence
 
   public void endDocument()
   {
-    if (data[gapEnd] != END_DOCUMENT || docStart <= 0)
+    if (data[gapEnd] != END_DOCUMENT || docStart <= 0
+        || data[currentParent] != BEGIN_DOCUMENT)
       throw new Error("unexpected endDocument");
     // Move the END_DOCUMENT to before the gap.
     gapEnd++;
     setIntN(docStart, gapStart - docStart + 1);
     docStart = 0;
     data[gapStart++] = END_DOCUMENT;
-    currentParent = 0;
+    int parent = getIntN(currentParent+3);
+    currentParent = parent >= -1 ? parent : currentParent + parent;
   }
 
   public void beginEntity (Object base)
@@ -518,7 +523,7 @@ public class TreeList extends AbstractSequence
     int p = gapStart;
     data[p] = BEGIN_ENTITY;
     setIntN(p+1, find(base));
-    setIntN(p+3, currentParent=p);  // parent_offset
+    setIntN(p+3, currentParent == -1 ? -1 : currentParent-p);  // parent_offset
     gapStart = p + 5;
     currentParent = p;
     data[gapEnd] = END_ENTITY;
@@ -526,11 +531,14 @@ public class TreeList extends AbstractSequence
 
   public void endEntity ()
   {
-    if (data[gapEnd] != END_ENTITY)
+    if (data[gapEnd] != END_ENTITY
+        || data[currentParent] != BEGIN_ENTITY)
       throw new Error("unexpected endEntity");
     // Move the END_ENTITY to before the gap.
     gapEnd++;
     data[gapStart++] = END_ENTITY;
+    int parent = getIntN(currentParent+3);
+    currentParent = parent >= -1 ? parent : currentParent + parent;
   }
 
   public void beginGroup(int index)
@@ -879,9 +887,10 @@ public class TreeList extends AbstractSequence
 
   public int parentPos (int ipos)
   {
+    int index = posToDataIndex(ipos);
     for (;;)
       {
-        int index = parentOrEntityI(posToDataIndex(ipos));
+        index = parentOrEntityI(index);
         if (index == -1)
           return -1;
         if (data[index] != BEGIN_ENTITY)
@@ -903,7 +912,10 @@ public class TreeList extends AbstractSequence
     if (datum == BEGIN_DOCUMENT || datum == BEGIN_ENTITY)
       {
 	int parent_offset = getIntN(index+3);
-	return parent_offset == 0 ? -1 : index - parent_offset;
+        if (parent_offset >= -1)
+          return parent_offset;
+        else
+          return index + parent_offset;
       }
     if (datum >= BEGIN_GROUP_SHORT
 	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
@@ -1222,7 +1234,6 @@ public class TreeList extends AbstractSequence
 	    pos += 4;
 	    continue;
 	  default:
-	    dump();
 	    throw new Error("unknown code:"+(int) datum);
 	  }
       }
@@ -1462,7 +1473,6 @@ public class TreeList extends AbstractSequence
 	    pos += 4;
 	    continue;
 	  default:
-	    dump();
 	    throw new Error("unknown code:"+(int) datum);
 	  }
       }
@@ -2192,6 +2202,7 @@ public class TreeList extends AbstractSequence
       case COMMENT:
 	return pos + 2 + getIntN(pos);
       default:
+        dump();
 	throw new Error("unknown code:"+Integer.toHexString((int) datum));
       }
   }
@@ -2362,11 +2373,17 @@ public class TreeList extends AbstractSequence
 			j += j < 0 ? data.length : i;
 			out.print("=BEGIN_DOCUMENT end:");
 			out.print(j);
+                        out.print(" parent:");
+			j = getIntN(i+3);
+			out.print(j);
 			toskip = 4;
 			break;
 		      case BEGIN_ENTITY:
 			j = getIntN(i+1);
 			out.print("=BEGIN_ENTITY base:");
+			out.print(j);
+                        out.print(" parent:");
+			j = getIntN(i+3);
 			out.print(j);
 			toskip = 4;
 			break;

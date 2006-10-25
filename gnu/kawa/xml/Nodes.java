@@ -312,7 +312,7 @@ public class Nodes extends Values
     int root;
     if (seq.gapStart > TreeList.BEGIN_ENTITY_SIZE
         && seq.data[0] == TreeList.BEGIN_ENTITY)
-      root = TreeList.BEGIN_ENTITY;
+      root = TreeList.BEGIN_ENTITY_SIZE << 1;
     else
       root = 0;
     return KNode.make(seq, root);

@@ -714,6 +714,8 @@ public class IntNum extends RatNum implements Externalizable
 	  }
       }
 
+    while (rlen > 1 && ywords[rlen-1] == 0)
+      rlen--;
     if (ywords[rlen-1] < 0)
       {
         ywords[rlen] = 0;

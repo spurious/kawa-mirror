@@ -34,9 +34,9 @@ public class LetExp extends ScopeExp
       }
     else if (level >= evalFrames.length)
       {
-        evalFrames = new Object[level+10][];
-        System.arraycopy(ctx.evalFrames, 0, evalFrames, 0, evalFrames.length);
-        ctx.evalFrames = evalFrames;
+        Object[][] newFrames = new Object[level+10][];
+        System.arraycopy(evalFrames, 0, newFrames, 0, evalFrames.length);
+        ctx.evalFrames = evalFrames = newFrames;
       }
     evalFrames[level] = evalFrame;
 

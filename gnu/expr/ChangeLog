@@ -1,3 +1,11 @@
+2006-10-25  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java: Change to extends GeneralHashTable.
+	(map): Remove Hashtable field - use this/super instead.
+	(push): Just push to front of hash bucket chain.  Don't use a Vector.
+	(pop): Just remove from chain HashNode with matching Declaration.
+	(lookup): Just loop though HashNode chain.
+
 2006-10-16  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): If Declaration is an alias for

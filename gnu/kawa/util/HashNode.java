@@ -12,7 +12,7 @@ public class HashNode
 implements java.util.Map.Entry
 /* #endif */
 {
-  HashNode next;
+  public HashNode next;
   int hash;
   Object key;
   Object value;

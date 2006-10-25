@@ -1,14 +1,15 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import java.util.*;
+import gnu.kawa.util.GeneralHashTable;
+import gnu.kawa.util.HashNode;
 
 /** Manages the set of declarations "currently" in scope. */
 
-public class NameLookup
+public class NameLookup extends GeneralHashTable
 {
-  Hashtable map = new Hashtable(100);
   Language language;
 
   public NameLookup (Language language)
@@ -21,22 +22,13 @@ public class NameLookup
     Object symbol = decl.getSymbol();
     if (symbol == null)
       return;
-    Object old = map.get(symbol);
-    if (old == null)
-      map.put(symbol, decl);
-    else
-      {
-	Vector v;
-	if (old instanceof Vector)
-	  v = (Vector) old;
-	else
-	  {
-	    v = new Vector(10);
-	    v.addElement(old);
-	    map.put(symbol, v);
-	  }
-	v.addElement(decl);
-      }
+    if (++num_bindings >= table.length)
+      rehash();
+    int hash = hash(symbol);
+    HashNode node = makeEntry(symbol, hash, decl);
+    int index = hash & mask;
+    node.next = table[index];
+    table[index] = node;
   }
 
   public boolean pop (Declaration decl)
@@ -44,27 +36,24 @@ public class NameLookup
     Object symbol = decl.getSymbol();
     if (symbol == null)
       return false;
-    Object entry = map.get(symbol);
-    if (entry == decl)
+    int hash = hash(symbol);
+    HashNode prev = null;
+    int index = hash & this.mask;
+    HashNode node = table[index];
+    while (node != null)
       {
-	map.remove(symbol);
-	return true;
-      }
-    else if (entry instanceof Vector)
-      {
-	Vector v = (Vector) entry;
-	int size = v.size();
-	for (int i = size; --i >= 0; )
+	HashNode next = node.next;
+        if (node.getValue() == decl)
 	  {
-	    if (v.elementAt(i) == decl)
-	      {
-		while (++i < size)
-		  v.setElementAt(v.elementAt(i), i - 1);
-		v.setSize(size - 1);
-		return true;
-	      }
-	    
+	    if (prev == null)
+	      table[index] = next;
+	    else
+	      prev.next = next;
+	    num_bindings--;
+	    return true;
 	  }
+	prev = node;
+	node = next;
       }
     return false;
   }
@@ -85,23 +74,13 @@ public class NameLookup
 
   public Declaration lookup (Object symbol, int namespace)
   {
-    Object r = map.get(symbol);
-    if (r == null)
-      return null;
-    if (r instanceof Declaration)
+    int hash = hash(symbol);
+    int index = hash & this.mask;
+    for (HashNode node = table[index];
+	 node != null;  node = node.next)
       {
-	Declaration decl = (Declaration) r;
-	if (decl.getSymbol() == symbol
-	    && (language.getNamespaceOf(decl) & namespace) != 0)
-	  return decl;
-	return null;
-      }
-    Vector v = (Vector) r;
-    int size = v.size();
-    for (int i = size; --i >= 0; )
-      {
-	Declaration decl = (Declaration) v.elementAt(i);
-	if (decl.getSymbol() == symbol
+        Declaration decl = (Declaration) node.getValue();
+	if (symbol.equals(decl.getSymbol())
 	    && (language.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
       }

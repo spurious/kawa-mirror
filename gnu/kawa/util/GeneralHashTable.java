@@ -11,7 +11,7 @@ public class GeneralHashTable
 // FUTURE: implements java.util.Map
 {
   protected HashNode[] table;
-  private int mask;
+  protected int mask;
   protected int num_bindings;
 
   public GeneralHashTable ()
@@ -152,7 +152,7 @@ public class GeneralHashTable
     return null;
   }
 
-  void rehash ()
+  protected void rehash ()
   {
     HashNode[] oldTable = table;
     int oldCapacity = oldTable.length;
@@ -161,7 +161,26 @@ public class GeneralHashTable
     int newMask = newCapacity - 1;
     for (int i = oldCapacity;  --i >= 0;)
       {
-	for (HashNode element = oldTable[i];  element != null; )
+        HashNode chain = oldTable[i];
+        if (chain != null && chain.next != null)
+          {
+            // Reverse the old chain in place, so that after re-hashing the
+            // new chain has the same order.. This is useful for some
+            // subclasses (specifically gnu.expr.NameLookup), and it is
+            // cheap to so here where extra cache misses are unlikely.
+            HashNode prev = null;
+            do
+              {
+                HashNode node = chain;
+                chain = node.next;
+                node.next = prev;
+                prev = node;
+              }
+            while (chain != null);
+            chain = prev;
+          }
+
+	for (HashNode element = chain;  element != null; )
 	  {
 	    HashNode next = element.next;
 	    int hash = hash(element);

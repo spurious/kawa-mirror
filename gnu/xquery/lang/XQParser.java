@@ -1422,7 +1422,19 @@ public class XQParser extends Lexer
   {
     Expression etype = parseItemType();
     if (etype == null)
-      return syntaxError("bad syntax - expected DataType");
+      {
+        if (curToken == OP_EMPTY_SEQUENCE)
+          {
+            parseSimpleKindType();
+            if (curToken == '?' || curToken == OP_ADD || curToken == OP_MUL)
+              {
+                getRawToken();
+                return syntaxError("occurrence-indicator meaningless after empty-sequence()");
+              }
+            return QuoteExp.getInstance(OccurrenceType.emptySequenceType);
+          }
+        return syntaxError("bad syntax - expected DataType");
+      }
     int min, max;
     if (curToken == '?')
       {
@@ -1448,13 +1460,6 @@ public class XQParser extends Lexer
       {
         if (max != 1)
           return syntaxError("type to 'cast as' or 'castable as' must be a 'SingleType'");
-        if (etype instanceof QuoteExp)
-          {
-            Object t = ((QuoteExp) etype).getValue();
-            if (t instanceof NodeType || t == Type.pointer_type)
-              return syntaxError("type to 'cast as' or 'castable as' must an atomic type");
-              
-          }
       }
     if (min != max)
       {
@@ -1528,32 +1533,36 @@ public class XQParser extends Lexer
   {
     peekOperand();
     Expression etype = parseMaybeKindTest();
+    Type type;
     if (etype != null)
-      return etype;
-    if (curToken == OP_EMPTY_SEQUENCE)
+      {
+        if (parseContext == 'C')
+          // Kludge to force error below.
+          type = Type.pointer_type;
+        else
+          return etype;
+      }
+    else if (curToken == OP_ITEM)
       {
         parseSimpleKindType();
-        return QuoteExp.getInstance(OccurrenceType.getInstance(Type.pointer_type, 0, 0));
+        type = Type.pointer_type;
       }
-    if (curToken == OP_ITEM)
-      {
-        parseSimpleKindType();
-        return QuoteExp.getInstance(Type.pointer_type);
-      }
-    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+    else if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
 	getRawToken();
-	Type type = interpreter.getTypeFor(tname);
+	type = interpreter.getTypeFor(tname);
 	if (type == null)
           {
             error('e', "unknown type "+tname, "XPST0051");
             type = Type.pointer_type;
           }
-	return QuoteExp.getInstance(type);
       }
     else
       return null;
+    if (parseContext == 'C' && type == Type.pointer_type)
+      return syntaxError("type to 'cast as' or 'castable as' must be atomic");
+    return QuoteExp.getInstance(type);
   }
 
   /** Parse a <code>URILiteral</code>..

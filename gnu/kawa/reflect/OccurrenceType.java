@@ -36,6 +36,9 @@ public class OccurrenceType extends ObjectType
     return new OccurrenceType(base, minOccurs, maxOccurs);
   }
 
+  public static final Type emptySequenceType =
+    OccurrenceType.getInstance(Type.pointer_type, 0, 0);
+
   public Type getImplementationType()
   {
     return Type.pointer_type;

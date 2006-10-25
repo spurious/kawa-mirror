@@ -255,7 +255,7 @@ public class XDataType extends Type implements TypeValue
     switch (typeCode)
       {
       case STRING_TYPE_CODE:
-        return StringValue.stringValue(value);
+        return StringValue.asString(value);
       case UNTYPED_ATOMIC_TYPE_CODE:
         return new UntypedAtomic(StringValue.stringValue(value));
       case ANY_URI_TYPE_CODE:
@@ -453,15 +453,6 @@ public class XDataType extends Type implements TypeValue
       }
   }
 
-  public static Float makeFloat (float value)
-  {
-    /* #ifdef JAVA5 */
-    // return Float.valueOf(value);
-    /* #else */
-    return new Float(value);
-    /* #endif */
-  }
-
   public static String replaceWhitespace (String str, boolean collapse)
   {
     /* #ifdef JAVA5 */
@@ -518,6 +509,15 @@ public class XDataType extends Type implements TypeValue
     else
       return str;
 
+  }
+
+  public static Float makeFloat (float value)
+  {
+    /* #ifdef JAVA5 */
+    // return Float.valueOf(value);
+    /* #else */
+    return new Float(value);
+    /* #endif */
   }
 
   public static Double makeDouble (double value)

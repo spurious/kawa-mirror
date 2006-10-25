@@ -671,7 +671,8 @@ public class XQResolveNames extends ResolveNames
                 }
 
               case STRING_BUILTIN:
-                return withContext(XQParser.stringValueMethod,
+                return withContext(ClassType.make("gnu.kawa.xml.StringValue")
+                                   .getDeclaredMethod("asString", 1),
                                    exp.getArgs(), "fn:string", 0);
 
               case INDEX_OF_BUILTIN:

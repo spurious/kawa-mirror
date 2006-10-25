@@ -7,6 +7,17 @@ import java.math.BigDecimal;
 
 public class StringValue
 {
+  public static String asString (Object node)
+  {
+    if (node == Values.empty || node == null)
+      return "";
+    else if (node instanceof Values)
+      throw new ClassCastException();
+    StringBuffer sbuf = new StringBuffer(100);
+    stringValue(node, sbuf);
+    return sbuf.toString();
+  }
+
   public static String stringValue (Object node)
   {
     StringBuffer sbuf = new StringBuffer(100);

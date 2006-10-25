@@ -1,5 +1,8 @@
 2006-10-25  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkApplyExp): Use new StringValue.asString
+	method for fn:string.
+
 	* XQParser.java (parseDataType):  For OP_EMPTY_SEQUENCE use new
 	OccurrenceType.emptySequenceType field.  Error if repeat indicator.
 	(parseItemType): No longer allow OP_EMPTY_SEQUENCE here.

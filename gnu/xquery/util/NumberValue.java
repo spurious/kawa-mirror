@@ -190,7 +190,10 @@ public class NumberValue extends Procedure1
     if (value instanceof BigDecimal)
       {
         BigDecimal dec = (BigDecimal) value;
-        return Arithmetic.asIntNum(dec.divide(XDataType.DECIMAL_ONE, 0, BigDecimal.ROUND_HALF_UP).toBigInteger());
+        int mode = dec.signum() >= 0 ? BigDecimal.ROUND_HALF_UP
+          : BigDecimal.ROUND_HALF_DOWN;
+        dec = dec.divide(XDataType.DECIMAL_ONE, 0, mode);
+        return Arithmetic.asIntNum(dec.toBigInteger());
       }
     return ((RealNum) value).toInt(Numeric.ROUND);
   }

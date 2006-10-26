@@ -7,7 +7,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 
 /** Sort argument nodes in document order.
- * Implements the standard XQuery function distinct-nodes.
  * Uses the SortedNodes class to do the actual work. */
 
 public class SortNodes extends Procedure1 implements Inlineable

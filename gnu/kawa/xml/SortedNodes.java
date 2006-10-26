@@ -27,7 +27,8 @@ public class SortedNodes extends Nodes
   }
 
   /** Find index where to put position (seq, ipos).
-   * Require index>=start && index<end, where end==start+POS_SIZE*count.
+   * Require {@code index>=start && index<end},
+   * where {@code end==start+POS_SIZE*count}.
    * Require all position before index are "less than" (seq, ipos),
    * and all positions after are "greater than" (seq, ipos).
    * If there is no such index (because it is "same as"), return -1.

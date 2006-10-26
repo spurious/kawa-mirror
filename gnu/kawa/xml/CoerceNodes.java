@@ -6,8 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-/** Sort argument nodes in document order.
- * Implements the standard XQuery function distinct-nodes.
+/** Coerces an item sequence to a node sequence.
  * Uses the Nodes class to do the actual work. */
 
 public class CoerceNodes extends Procedure1 implements Inlineable

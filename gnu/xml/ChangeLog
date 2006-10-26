@@ -1,3 +1,21 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	Re-write, mainly to correctly set in-scope namespaces of element.
+	* NodeTree.java (groupLevel, groupNamespaces, gapStartTag, attrIndexes,
+	workStack, attrCount, inAttribute, copyNamespacesMode): New fields.
+	(COPY_NAMESPACES_PRESERVE, COPY_NAMESPACES_INHERIT): New fields.
+	(writeObject): When converting Keyword as attribute, convert to Symbol.
+	(closeTag): New method, called a number of places.
+	(beginGroup*2, setGroupName, endGroup, rememberGroup, beginDocument,
+	endDocument, setAttributeName, checkAttributeSymbol, beginDocument,
+	ensureSpaceInWorkStack, rememberAttribute, beginAttribute*2, writeChar,
+	checkWriteAtomic, write, writeBoolean,	writeFloat, writeDouble,
+	writeInt, writeLong, writeDocumentUri, error, checkValidComment,
+	writeComment, checkProcessingInstruction): New methods.
+	(endAttribute): Major change.
+	* ParsedXMLToConsumer.java (closeStartTag): New new TreeList constants.
+	If tlist is a NodeTree, calls its closeTag in turn.
+
 2006-10-25  Per Bothner  <per@bothner.com>
 
 	* NamespaceBinding.java:(setNext): Also set depth field.

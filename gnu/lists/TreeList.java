@@ -212,13 +212,13 @@ public class TreeList extends AbstractSequence
    *   (Therefore allocating more space for the gap does not require
    *   adjusting end_offset.)  Otherwise, the end_offset is relative
    *   to the BEGIN_ATTRIBUTE_LONG word.
-   * Kludge warning:  ParsedXMLToConsumer.endAttributes has hard-wired in the
-   * size of BEGIN_ATTRIBUTE_LONG and END_ATTRIBUTE.
    */
   protected static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
+  public static final int BEGIN_ATTRIBUTE_LONG_SIZE = 5;
 
   /** The end of an attribute of a node. */
   static final int END_ATTRIBUTE = 0xF10A;
+  public static final int END_ATTRIBUTE_SIZE = 1;
 
   /** Beginning of a document (or top-level value).
    * Used to distinguish a document from its element node.
@@ -555,9 +555,15 @@ public class TreeList extends AbstractSequence
     currentParent = gapStart - 3;
   }
 
-  /** Called from ParsedXMLToConsumer, only. */
   public void setGroupName (int groupIndex, int nameIndex)
   {
+    if (data[groupIndex] == BEGIN_GROUP_LONG)
+      {
+        int j = getIntN(groupIndex+1);
+        groupIndex = j + (j < 0 ? data.length : groupIndex);
+      }
+    if (groupIndex < gapEnd)
+      throw new Error("setGroupName before gapEnd");
     setIntN(groupIndex + 1, nameIndex);
   }
 

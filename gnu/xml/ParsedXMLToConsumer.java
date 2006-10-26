@@ -187,9 +187,9 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		cons.beginAttribute(name, type);
 		int start = startIndexes[i];
 		int end = i < attrCount ? startIndexes[i+1] : tlist.gapStart;
-		// Kludge:  Hard-wired in the size of BEGIN_ATTRIBUTE_LONG
-		// and END_ATTRIBUTE from TreeList.  
-		tlist.consumeIRange(start + 5, end - 1, cons);
+		tlist.consumeIRange(start + TreeList.BEGIN_ATTRIBUTE_LONG_SIZE,
+                                    end - TreeList.END_ATTRIBUTE_SIZE,
+                                    cons);
 		cons.endAttribute();
 	      }
 	  }
@@ -200,6 +200,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 	// Remove temporarily stored attributes.
 	tlist.clear();
       }
+    else if (tlist instanceof NodeTree)
+      ((NodeTree) tlist).closeTag();
     attrCount = 0;
   }
 

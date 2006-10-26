@@ -16,6 +16,35 @@ import gnu.expr.Keyword; // FIXME
 
 public class NodeTree extends TreeList
 {
+  // A lot of these fields are only used while the tree is being constructed.
+  // They should idealy be moved out to a separate class, perhaps NodeFilter.
+  // However, we want to avoid allocating a NodeFilter each time we create
+  // a NodeTree, so perhaps NodeFilter could also be a front-end for
+  // Nodes.  Unclear what is the most efficient general solution.  Probably
+  // similar to what ParsedXMLToConsumer does - and maybe combine those.
+  // FIXME. For now these fields are marked as transient.
+
+  /** Number of active beginGroup and beginDocument calls. */
+  transient protected int groupLevel;
+
+  transient NamespaceBinding groupNamespaces;
+
+  transient int gapStartTag;
+  transient int[] attrIndexes;
+
+  /** A helper stack. The first groupLevel items are NamespaceBinding
+   * objects for the active groups.  Then there are 2*attrCount items -
+   * a name and type for the current group and each attribute. */
+  transient Object[] workStack;
+
+  /** One more than the number of attributes. */
+  transient int attrCount;
+  transient boolean inAttribute;
+
+  public static final int COPY_NAMESPACES_PRESERVE = 1;
+  public static final int COPY_NAMESPACES_INHERIT = 2;
+  public transient int copyNamespacesMode = COPY_NAMESPACES_PRESERVE;
+
   public void writePosition(AbstractSequence seq, int ipos)
   {
     seq.consumeNext(ipos, this);
@@ -36,11 +65,13 @@ public class NodeTree extends TreeList
       ((TreeList) v).consume(this);
     else if (v instanceof gnu.expr.Keyword)
       {
-        beginAttribute(((Keyword) v).getName(), v);
+        Keyword k = (Keyword) v;
+        beginAttribute(k.getName(), k.asSymbol());
         gapStartLastAtomic = SAW_KEYWORD;
       }
     else
       {
+        closeTag();
         if (v instanceof UnescapedData)
           {
             super.writeObject(v);
@@ -59,6 +90,170 @@ public class NodeTree extends TreeList
             //  super.writeObject(v);
             MakeText.text$C(v, this);  // Atomize.
             gapStartLastAtomic = gapStart;
+          }
+      }
+  }
+
+  public void beginGroup(String typeName, Object type)
+  {
+    closeTag();
+    groupLevel++;
+    if (true) // for now
+      {
+        gapStartTag = gapStart;
+        super.beginGroup(0);
+        rememberGroup(typeName, type);
+        attrCount = 1;
+      }
+  }
+
+  public void beginGroup(int index)
+  {
+    closeTag();
+    groupLevel++;
+    attrCount = 1;
+    super.beginGroup(index);
+  }
+
+  public void setGroupName (int groupIndex, int nameIndex)
+  {
+    gapStartTag = groupIndex;
+    super.setGroupName(groupIndex, nameIndex);
+    String groupName = (String) objects[nameIndex]; 
+    Object groupType = objects[nameIndex+1];
+    rememberGroup(groupName, groupType);
+  }
+
+  public void endGroup (String typeName)
+  {
+    closeTag();
+    groupLevel--;
+    super.endGroup(typeName);
+    if (groupLevel == 0)
+      {
+        workStack = null;
+        attrIndexes = null;
+      }
+  }
+
+  protected void rememberGroup (String typeName, Object type)
+  {
+    String groupName = typeName == null ? "" : typeName;
+    if (copyNamespacesMode == 0)
+      groupNamespaces = NamespaceBinding.predefinedXML;
+    else if (copyNamespacesMode == COPY_NAMESPACES_INHERIT)
+      groupNamespaces = groupLevel <= 1 ? NamespaceBinding.predefinedXML
+        : (NamespaceBinding) workStack[groupLevel-2];
+    else if (copyNamespacesMode == COPY_NAMESPACES_PRESERVE
+             || groupLevel <= 1)
+      {
+        groupNamespaces
+          = (type instanceof XName ? ((XName) type).getNamespaceNodes()
+             : NamespaceBinding.predefinedXML);
+      }
+    else
+      {
+        NamespaceBinding inherited
+          = (NamespaceBinding) workStack[groupLevel-2];
+        if (type instanceof XName)
+          {
+            NamespaceBinding preserved = ((XName) type).getNamespaceNodes();
+            groupNamespaces = NamespaceBinding.merge(inherited, preserved);
+          }
+        else
+          groupNamespaces = inherited;
+      }
+    ensureSpaceInWorkStack(groupLevel-1);
+    workStack[groupLevel-1] = groupNamespaces;
+    workStack[groupLevel] = groupName;
+    workStack[groupLevel+1] = type;
+  }
+
+  protected void ensureSpaceInWorkStack (int oldSize)
+  {
+    if (workStack == null)
+      {
+        workStack = new Object[20];
+      }
+    // May need to extend array by three, in rememberGroup..
+    else if (oldSize + 3 > workStack.length)
+      {
+        Object[] tmpn = new Object[2 * workStack.length];
+        System.arraycopy(workStack, 0, tmpn, 0, oldSize);
+        workStack = tmpn;
+      }
+  }
+
+  protected void rememberAttribute (String attrName, Object attrType)
+  {
+    if (attrIndexes == null)
+      {
+        attrIndexes = new int[10];
+      }
+    else if (attrCount >= attrIndexes.length)
+      {
+        int[] tmpi = new int[2 * attrCount];
+        System.arraycopy(attrIndexes, 0, tmpi, 0, attrCount);
+        attrIndexes = tmpi;
+      }
+    int oldSize = groupLevel + 2 * attrCount;
+    ensureSpaceInWorkStack(oldSize);
+    workStack[oldSize] = attrName;
+    workStack[oldSize + 1] = attrType;
+    attrCount++;
+  }
+
+  public void beginAttribute (String attrName, Object attrType)
+  {
+    if (groupLevel <= 1 && docStart != 0)
+      error("attribute not allowed at document level");
+    inAttribute = true;
+    if (attrCount == 0 && groupLevel > 0)
+      error("attribute '"+attrName+"' follows non-attribute content");
+    checkAttributeSymbol((Symbol) attrType); // ???
+
+    if (groupLevel == 0)
+      {
+        super.beginAttribute(super.find(attrName, attrType));
+      }
+    else
+      {
+        rememberAttribute(attrName, attrType);
+        attrIndexes[attrCount-1] = super.gapStart;
+        super.beginAttribute(0);
+      }
+  }
+
+  public void beginAttribute(int index)
+  {
+    inAttribute = true;
+    super.beginAttribute(index);
+  }
+
+  /** Called from ParsedXMLToConsumer, only. */
+  public void setAttributeName (int attrIndex, int nameIndex)
+  {
+    super.setAttributeName(attrIndex, nameIndex);
+    String attrName = (String) objects[nameIndex]; 
+    Object attrType = objects[nameIndex+1];
+    rememberAttribute(attrName, attrType);
+    attrIndexes[attrCount-1] = attrIndex;
+  }
+
+  void checkAttributeSymbol (Symbol sym)
+  {
+    String local = sym.getLocalPart();
+    String uri = sym.getNamespaceURI();
+    if (uri == "http://www.w3.org/2000/xmlns/"
+        || (uri == "" && local == "xmlns"))
+      error("arttribute name cannot be 'xmlns or in xmlns namespace");
+    for (int i = 1; i < attrCount;  i++)
+      {
+        Symbol symi = (Symbol) workStack[groupLevel+2*i+1];
+        if (local == symi.getLocalPart()
+            && uri == symi.getNamespaceURI())
+          {
+            error(duplicateAttributeMessage(sym, (String) workStack[groupLevel]));
           }
       }
   }
@@ -87,16 +282,270 @@ public class NodeTree extends TreeList
 
   public void endAttribute()
   {
+    if (! inAttribute)
+      return;
     if (gapStartLastAtomic == SAW_KEYWORD)
       gapStartLastAtomic = -1;
+    else if (attrCount > 0)
+      {
+        inAttribute = false;
+        super.endAttribute();
+      }
+  }
+
+  public void beginDocument()
+  {
+    closeTag();
+        ensureSpaceInWorkStack(groupLevel);
+        Object inherited;
+        if (groupLevel++ == 0)
+          {
+            super.beginDocument();
+            inherited = NamespaceBinding.predefinedXML;
+          }
+        else
+          {
+            writeJoiner();
+            // copy "inherited" namespace bindings list
+            inherited = workStack[groupLevel-2];
+          }
+        workStack[groupLevel-1] = inherited;
+  }
+
+  public void endDocument ()
+  {
+    closeTag();
+    if (--groupLevel == 0)
+      super.endDocument();
     else
-      super.endAttribute();
+      {
+        workStack[groupLevel] = null;
+        writeJoiner();
+      }
+  }
+
+  protected void closeTag ()
+  {
+    if (attrCount > 0 && ! inAttribute)
+      {
+        NamespaceBinding outer = groupLevel <= 1 ? NamespaceBinding.predefinedXML
+        : (NamespaceBinding) workStack[groupLevel-2];
+        NamespaceBinding bindings = groupNamespaces;
+        for (int i = attrCount;  --i >= 0; )
+          {
+            Symbol sym = (Symbol) workStack[groupLevel+2*i+1];
+            String prefix = sym.getPrefix();
+            if (prefix == "")
+              prefix = null;
+            String uri = sym.getNamespaceURI();
+            if (uri == "")
+              uri = null;
+            boolean isOuter = false;
+            for (NamespaceBinding ns = bindings; ; ns = ns.next)
+              {
+                if (ns == outer)
+                  isOuter = true;
+                if (ns == null)
+                  {
+                    if (prefix != null || uri != null)
+                      bindings = new NamespaceBinding(prefix, uri, bindings);
+                    break;
+                  }
+                if (ns.prefix == prefix)
+                  {
+                    if (ns.uri != uri)
+                      {
+                        if (isOuter)
+                          bindings = new NamespaceBinding(prefix, uri, bindings);
+                        else
+                          {
+                            // Try to find an alternative existing prefix:
+                            String nprefix;
+                            for (NamespaceBinding ns2 = bindings;
+                                 ; ns2 = ns2.next)
+                              {
+                                if (ns2 == null)
+                                  {
+                                    // We have to generate a new prefix.
+                                    for (int j = 1;  ; j++)
+                                      {
+                                        nprefix = ("_ns_"+j).intern();
+                                        if (bindings.resolve(nprefix) == null)
+                                          break;
+                                      }
+                                    break;
+                                  }
+                                if (ns2.uri == uri)
+                                  {
+                                    nprefix = ns2.prefix;
+                                    if (bindings.resolve(nprefix) == uri)
+                                      break;
+                                  }
+                                  }
+                            bindings = new NamespaceBinding(nprefix, uri, bindings);
+                            String local = sym.getLocalName();
+                            workStack[groupLevel+2*i+1] = nprefix+":"+local;
+                            if (uri == null)
+                              uri = "";
+                            workStack[groupLevel+2*i+1] = Symbol.make(uri, local, nprefix);
+                          }
+                      }
+                    break;
+                  }
+              }
+          }
+        Object groupType = workStack[groupLevel+1];
+        if (! (groupType instanceof XName)
+            || bindings != ((XName) groupType).getNamespaceNodes())
+          groupType = new XName((Symbol) groupType, bindings);
+
+        int groupIndex = super.find(workStack[groupLevel], groupType);
+        super.setGroupName(gapStartTag, groupIndex);
+
+        if (attrIndexes != null)
+          {
+            for (int i = attrCount;  --i > 0; )
+              {
+                int j = groupLevel + 2*i;
+                int attrObjectIndex = super.find(workStack[j], workStack[j+1]);
+                super.setAttributeName(attrIndexes[i], attrObjectIndex);
+                workStack[j] = null;
+                workStack[j+1] = null;
+              }
+
+          }
+        workStack[groupLevel] = null;
+        workStack[groupLevel+1] = null;
+        attrCount = 0;
+      }
+  }
+
+  protected boolean checkWriteAtomic ()
+  {
+    closeTag();
+    return true;
+ }
+
+  public void writeChars(String v)
+  {
+    if (v.length() == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      super.writeChars(v);
+  }
+
+  public void write(char[] buf, int off, int len)
+  {
+    if (len == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      super.write(buf, off, len);
+  }
+
+  public void writeChar(int v)
+  {
+    if (checkWriteAtomic())
+      super.writeChar(v);
+  }
+
+  public void writeBoolean (boolean v)
+  {
+    if (checkWriteAtomic())
+      super.writeBoolean(v);
+  }
+
+  public void writeFloat (float v)
+  {
+    if (checkWriteAtomic())
+      super.writeFloat(v);
+  }
+
+  public void writeDouble (double v)
+  {
+    if (checkWriteAtomic())
+      super.writeDouble(v);
+  }
+
+  public void writeInt(int v)
+  {
+    if (checkWriteAtomic())
+      super.writeInt(v);
+  }
+
+  public void writeLong (long v)
+  {
+    if (checkWriteAtomic())
+      super.writeLong(v);
+  }
+
+  public void writeDocumentUri (Object uri)
+  {
+    if (groupLevel == 1)
+      super.writeDocumentUri(uri);
+  }
+
+  protected void checkValidComment (char[] chars, int offset, int length)
+  {
+    int i = length;
+    boolean sawHyphen = true;
+    while (--i >= 0)
+      {
+        boolean curHyphen = chars[offset+i] == '-';
+        if (sawHyphen && curHyphen)
+          {
+            error("consecutive or final hyphen in XML comment");
+            break;
+          }
+        sawHyphen = curHyphen;
+      }
+  }
+
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    checkValidComment(chars, offset, length);
+    closeTag();
+    super.writeComment(chars, offset, length);
+  }
+
+  public void checkProcessingInstruction (String target)
+  {
+    int len = target.length();
+    if (len == 3 && "xml".equalsIgnoreCase(target))
+      error("process-instruction target mey not be 'xml' (ignoring case)");
+    if (! XName.isName(target, true))
+      error("process-instruction target '"+target+"' is not a valid Name");
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    checkProcessingInstruction(target);
+    for (int i = offset+length;  --i >= offset; )
+      {
+        char ch = content[i];
+        while (ch == '>' && --i >= offset)
+          {
+            ch = content[i];
+            if (ch == '?')
+              {
+                error("'?>' is not allowed in a processing-instruction: proc: "+target+" -> "+new String(content, offset, length));
+                break;
+              }
+          }
+      }
+    closeTag();
+    super.writeProcessingInstruction(target, content, offset, length);
   }
 
   protected void writeJoiner ()
   {
     gapStartLastAtomic = -1;
     super.writeJoiner();
+  }
+
+  protected void error (String message)
+  {
+    throw new RuntimeException(message);
   }
 
   public int nextPos (int position)

@@ -1,5 +1,9 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* MakeElement.java (copyNamespacesMode): New field.
+	(beginGroup): Make copyNamespacesMode parameter.
+	(apply, compileToNode): Update appropriately.
+
 	* XmlNamespace.java: Renamed from gnu.kawa.lispexpr.XmlNamespace.
 	(XHTML_NAMESPACE): New constant.
 	(HTML): Use "" as prefix, to match xhtml recommendation.

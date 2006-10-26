@@ -18,6 +18,8 @@ public class MakeElement extends NodeConstructor
    * rather than the first parameter. */
   public Object tag;
 
+  public int copyNamespacesMode = NodeTree.COPY_NAMESPACES_PRESERVE;
+
   private boolean handlingKeywordParameters;
 
   /** Should {@code KEYWORD: EXPRESSION} be mapped to an
@@ -61,6 +63,7 @@ public class MakeElement extends NodeConstructor
   }
 
   public static void beginGroup(Consumer out, Object qname,
+                                int copyNamespacesMode,
 				NamespaceBinding namespaceNodes)
   {
     String name;
@@ -76,9 +79,12 @@ public class MakeElement extends NodeConstructor
 	type = new XName(Symbol.make("", name, ""), namespaceNodes);
       }
     out.beginGroup(name, type);
+    if (out instanceof NodeTree)
+      ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
 
-  public static void beginGroup(Consumer out, Object qname)
+  public static void beginGroup(Consumer out, Object qname,
+                                int copyNamespacesMode)
   {
     String name;
     Symbol type;
@@ -113,9 +119,9 @@ public class MakeElement extends NodeConstructor
       {
 	Object type = tag != null ? tag : ctx.getNextArg();
 	if (namespaceNodes != null)
-	  beginGroup(out, type, namespaceNodes);
+	  beginGroup(out, type, copyNamespacesMode, namespaceNodes);
 	else
-	  beginGroup(out, type);
+	  beginGroup(out, type, copyNamespacesMode);
 	Object endMarker = Special.dfault;
 	for (;;)
 	  {
@@ -160,21 +166,21 @@ public class MakeElement extends NodeConstructor
       }
     code.emitDup(1, 1); // dup_x1
     // Stack:  consumer, tagtype, consumer, tagtype
+    code.emitPushInt(copyNamespacesMode);
     if (namespaceNodes != null)
       {
 	comp.compileConstant(namespaceNodes, Target.pushObject);
-	code.emitInvokeStatic(beginGroupMethod3);
+	code.emitInvokeStatic(beginGroupMethod4);
       }
     else
-      code.emitInvokeStatic(beginGroupMethod2);
+      code.emitInvokeStatic(beginGroupMethod3);
     for (;  i < nargs;  i++)
       {
         compileChild(args[i], comp, target);
         if (isHandlingKeywordParameters())
           {
             code.emitLoad(consumer);
-            if (isHandlingKeywordParameters())
-              code.emitInvokeInterface(MakeAttribute.endAttributeMethod);
+            code.emitInvokeInterface(MakeAttribute.endAttributeMethod);
           }
       }
     code.emitInvokeStatic(endGroupMethod);
@@ -187,10 +193,10 @@ public class MakeElement extends NodeConstructor
 
   static final ClassType typeMakeElement
     = ClassType.make("gnu.kawa.xml.MakeElement");
-  static final Method beginGroupMethod2
-    = typeMakeElement.getDeclaredMethod("beginGroup", 2);
   static final Method beginGroupMethod3
     = typeMakeElement.getDeclaredMethod("beginGroup", 3);
+  static final Method beginGroupMethod4
+    = typeMakeElement.getDeclaredMethod("beginGroup", 4);
   static final Method endGroupMethod
     = typeMakeElement.getDeclaredMethod("endGroup", 2);
 }

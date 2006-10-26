@@ -13,6 +13,7 @@ import java.util.Stack;
 import java.io.File;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
+import gnu.xml.NodeTree;
 import gnu.xml.XName;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
@@ -83,9 +84,10 @@ public class XQParser extends Lexer
 
   boolean orderingModeUnordered;
 
-  boolean copyNamespacesNoInherit;
-  boolean copyNamespacesNoPreserve;
+  /** True if we've seen a 'copy-namespaces' declaration'. */
   boolean copyNamespacesDeclarationSeen;
+  int copyNamespacesMode
+  = NodeTree.COPY_NAMESPACES_PRESERVE|NodeTree.COPY_NAMESPACES_INHERIT;
 
   /** The static construction mode. True if "strip"; false if "preserve". */
   boolean constructionModeStrip;
@@ -2630,6 +2632,7 @@ public class XQParser extends Lexer
     args = new Expression[vec.size()];
     vec.copyInto(args);
     MakeElement mkElement = new MakeElement();
+    mkElement.copyNamespacesMode = copyNamespacesMode;
     // Ths is just the chain of NamespaceBindings for namespace declaration
     // attributes from this immediate constructor.  At resolve time we chain
     // this list onto the list from outer element constructors.
@@ -2982,7 +2985,11 @@ public class XQParser extends Lexer
               return syntaxError("missing element/attribute name");
             vec.addElement(castQName(element));
             if (token == ELEMENT_TOKEN)
-              func = new QuoteExp(new MakeElement());
+              {
+                MakeElement mk = new MakeElement();
+                mk.copyNamespacesMode = copyNamespacesMode;
+                func = new QuoteExp(mk);
+              }
             else
               func = MakeAttribute.makeAttributeExp;
             getRawToken();
@@ -4035,11 +4042,11 @@ public class XQParser extends Lexer
 	getRawToken();
         if (copyNamespacesDeclarationSeen && ! interactive)
           syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0055");
-        constructionModeDeclarationSeen = true;
+        copyNamespacesDeclarationSeen = true;
 	if (match("preserve"))
-          copyNamespacesNoPreserve = false;
+          copyNamespacesMode |= NodeTree.COPY_NAMESPACES_PRESERVE;
 	else if (match("no-preserve"))
-          copyNamespacesNoPreserve = true;
+          copyNamespacesMode &= ~NodeTree.COPY_NAMESPACES_PRESERVE;
 	else
 	  return syntaxError("expected 'preserve' or 'no-preserve' after 'declare copy-namespaces'");
         getRawToken();
@@ -4047,9 +4054,9 @@ public class XQParser extends Lexer
           return syntaxError("missing ',' in copy-namespaces declaration");
         getRawToken();
 	if (match("inherit"))
-          copyNamespacesNoInherit = false;
+          copyNamespacesMode |= NodeTree.COPY_NAMESPACES_INHERIT;
 	else if (match("no-inherit"))
-          copyNamespacesNoInherit = true;
+          copyNamespacesMode &= ~NodeTree.COPY_NAMESPACES_INHERIT;
 	else
 	  return syntaxError("expected 'inherit' or 'no-inherit' in copy-namespaces declaration");
 	parseSeparator();

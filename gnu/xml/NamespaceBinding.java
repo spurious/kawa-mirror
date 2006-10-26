@@ -34,7 +34,6 @@ public final class NamespaceBinding implements Externalizable
   public final NamespaceBinding getNext () { return next; }
   public final void setNext (NamespaceBinding next)
   {
-    if (this==next) new Error("cycle "+next).printStackTrace();
     this.next = next;
     this.depth = next == null ? 0 : next.depth + 1;
   }

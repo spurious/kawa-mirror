@@ -177,11 +177,24 @@ implements TypeValue, Externalizable, GroupPredicate
     code.emitInvokeStatic(coerceOrNullMethod);
   }
 
+  NamespaceBinding namespaceNodes;
+  public NamespaceBinding getNamespaceNodes ()
+  {
+    return namespaceNodes;
+  }
+
+  public void setNamespaceNodes (NamespaceBinding bindings)
+  {
+    namespaceNodes = bindings;
+  }
+
   public Procedure getConstructor ()
   {
     gnu.kawa.xml.MakeElement element = new gnu.kawa.xml.MakeElement();
     element.tag = qname;
     element.setHandlingKeywordParameters(true);
+    if (namespaceNodes != null)
+      element.setNamespaceNodes(namespaceNodes);
     return element;
   }
 

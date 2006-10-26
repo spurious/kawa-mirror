@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 150)
+(test-init "Miscellaneous" 151)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -701,10 +701,12 @@
 (test " 1 2 3 4 5 6 7 8 9 10" 'bug14697 bug14697-result)
 
 (require 'xml)
-(test "<html:code>Foo</html:code>" 'html-contructor-1
+(test "<code xmlns=\"http://www.w3.org/1999/xhtml\">Foo</code>" 'html-contructor-1
       (as-xml (html:code "Foo")))
-(test "<html:a href=\"foo.html\">Foo</html:a>" 'html-contructor-1
+(test "<a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"foo.html\">Foo</a>" 'html-contructor-2
       (as-xml (html:a href:"foo.html" "Foo")))
 (define-xml-namespace h "HTML")
-(test "<h:code>Foo</h:code>" 'html-contructor-3
+(test "<h:code xmlns:h=\"HTML\">Foo</h:code>" 'html-contructor-3
       (as-xml (h:code "Foo")))
+(test "<b xmlns=\"http://www.w3.org/1999/xhtml\"><code>Foo</code></b>" 'html-contructor-4
+      (as-xml (html:b (html:code "Foo"))))

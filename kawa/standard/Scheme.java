@@ -750,7 +750,7 @@ public class Scheme extends LispLanguage
                     "gnu.text.PrettyWriter", "lineLengthLoc");
       defAliasStFld("*print-miser-width*",
                     "gnu.text.PrettyWriter", "miserWidthLoc");
-      defAliasStFld("html", "gnu.kawa.lispexpr.XmlNamespace", "HTML");
+      defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");
 
       kawaEnvironment.setLocked();
   }

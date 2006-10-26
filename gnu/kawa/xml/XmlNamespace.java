@@ -1,13 +1,16 @@
-package gnu.kawa.lispexpr;
+package gnu.kawa.xml;
 import gnu.mapping.*;
 import java.io.*;
-import gnu.kawa.xml.ElementType; // FIXME
+import gnu.xml.NamespaceBinding;
 
 public class XmlNamespace extends Namespace
   implements Externalizable
 {
-  public static final XmlNamespace HTML =
-    getInstance("html", "http://www.w3.org/1999/xhtml");
+  public static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+  public static final XmlNamespace HTML = getInstance("", XHTML_NAMESPACE);
+  public static final NamespaceBinding HTML_BINDINGS =
+    new NamespaceBinding(null, XHTML_NAMESPACE,
+                         NamespaceBinding.predefinedXML);
 
   public static XmlNamespace getInstance (String prefix, String uri)
   {
@@ -27,7 +30,10 @@ public class XmlNamespace extends Namespace
 
   public Object get (String name)
   {
-    return ElementType.make(getSymbol(name));
+    ElementType type = ElementType.make(getSymbol(name));
+    if (this == XmlNamespace.HTML)
+      type.setNamespaceNodes(XmlNamespace.HTML_BINDINGS);
+    return type;
   }
 
   public boolean isConstant (String key)
@@ -52,7 +58,7 @@ public class XmlNamespace extends Namespace
   {
     String xname = prefix + " -> "+ getName();
     Namespace ns = (Namespace) nsTable.get(xname);
-    if (ns instanceof ClassNamespace)
+    if (ns instanceof XmlNamespace)
       return ns;
     nsTable.put(xname, this);
     return this;

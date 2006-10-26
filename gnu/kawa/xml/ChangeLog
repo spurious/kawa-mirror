@@ -1,3 +1,16 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	* XmlNamespace.java: Renamed from gnu.kawa.lispexpr.XmlNamespace.
+	(XHTML_NAMESPACE): New constant.
+	(HTML): Use "" as prefix, to match xhtml recommendation.
+	(HTML_BINDINGS): New field.
+	(get): Set namespace nodes if this is HTML.
+	(readResolve): Fix copy/paste error.
+	* Makefile.am: Update accordingly.
+	* ElementType.java (namespaceNodes): New field.
+	(getNamespaceNodes, setNamespaceNodes): New methods.
+	(getConstructor): If namespaceNodes set, copy to MakeElement instance.
+
 2006-10-25  Per Bothner  <per@bothner.com>
 
 	* StringValue.java (asString): New static method.

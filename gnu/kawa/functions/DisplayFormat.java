@@ -8,6 +8,7 @@ import gnu.math.RatNum;
 import gnu.math.IntNum;
 import java.io.PrintWriter;
 import gnu.text.Char;
+import gnu.kawa.xml.XmlNamespace;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
 /* #endif */
@@ -113,7 +114,16 @@ public class DisplayFormat extends AbstractFormat
     else if (obj instanceof Character)
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Symbol)
-      writeObject(obj.toString(), out);
+      {
+        Symbol sym = (Symbol) obj;
+        if (sym.getNamespace() == XmlNamespace.HTML)
+          {
+            write("html:", out);
+            write(sym.getLocalPart(), out);
+          }
+        else
+          writeObject(obj.toString(), out);
+      }
     /* #ifdef use:java.net.URI */
     /* #ifdef use:java.lang.CharSequence */
     else if (obj instanceof java.net.URI && getReadableOutput()

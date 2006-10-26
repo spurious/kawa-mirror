@@ -1,3 +1,8 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObject): Write HTML symbol with
+	"Html:" prefix.
+
 2006-10-22  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java: Remove class.

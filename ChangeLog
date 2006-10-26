@@ -1,5 +1,7 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme (initScheme): Update class for 'html' prefix.
+
 	* kawa/repl.java (processArgs): Use Symbol.parse to process
 	parameter initialization.
 

@@ -4,6 +4,7 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.bytecode.ClassType;
+import gnu.kawa.xml.XmlNamespace;
 
 public class DefineNamespace extends Syntax
 {
@@ -64,7 +65,7 @@ public class DefineNamespace extends Syntax
         else if (makeXML)
           {
             namespace = XmlNamespace.getInstance(name, literal);
-            decl.setType(ClassType.make("gnu.kawa.lispexpr.XmlNamespace"));
+            decl.setType(ClassType.make("gnu.kawa.xml.XmlNamespace"));
           }
         else
           {

@@ -444,9 +444,9 @@ class MPN
     return size;
   }
 
-  /** Compare x[0:size-1] with y[0:size-1], treating them as unsigned integers.
-   * @result -1, 0, or 1 depending on if x<y, x==y, or x>y.
-   * This is basically the same as gmp's mpn_cmp function.
+  /** Compare {@code x[0:size-1]} with {@code y[0:size-1]}, treating them as unsigned integers.
+   * @return -1, 0, or 1 depending on if {@code x<y}, {@code x==y}, or {@code x>y}.
+   * This is basically the same as gmp's {@code mpn_cmp} function.
    */
   public static int cmp (int[] x, int[] y, int size)
   {
@@ -465,8 +465,9 @@ class MPN
     return 0;
   }
 
-  /** Compare x[0:xlen-1] with y[0:ylen-1], treating them as unsigned integers.
-   * @result -1, 0, or 1 depending on if x<y, x==y, or x>y.
+  /** Compare {@code x[0:xlen-1]} with {@code y[0:ylen-1]}, treating them as unsigned integers.
+   * @return -1, 0, or 1 depending on
+   * whether {@code x<y}, {@code x==y}, or {@code x>y}.
    */
   public static int cmp (int[] x, int xlen, int[] y, int ylen)
   {

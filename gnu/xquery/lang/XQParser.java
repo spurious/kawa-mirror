@@ -1869,32 +1869,49 @@ public class XQParser extends Lexer
     if (etype == null)
       getRawToken();
 
-    String axisName;
-    switch (axis)
+    Expression makeAxisStep;
+    if (axis == AXIS_CHILD || axis == -1)
+      makeAxisStep = makeChildAxisStep;
+    else if (axis == AXIS_DESCENDANT)
+      makeAxisStep = makeDescendantAxisStep;
+    else
       {
-      default: /*case AXIS_CHILD: case -1: */ axisName = "Child";  break;
-      case AXIS_DESCENDANT:         axisName = "Descendant";       break;
-      case AXIS_DESCENDANT_OR_SELF: axisName = "DescendantOrSelf"; break;
-      case AXIS_SELF:               axisName = "Self";             break;
-      case AXIS_PARENT:             axisName = "Parent";           break;
-      case AXIS_ANCESTOR:           axisName = "Ancestor";         break;
-      case AXIS_ANCESTOR_OR_SELF:   axisName = "AncestorOrSelf";   break;
-      case AXIS_FOLLOWING:          axisName = "Following";        break;
-      case AXIS_FOLLOWING_SIBLING:  axisName = "FollowingSibling"; break;
-      case AXIS_PRECEDING:          axisName = "Preceding";        break;
-      case AXIS_PRECEDING_SIBLING:  axisName = "PrecedingSibling"; break;
-      case AXIS_ATTRIBUTE:          axisName = "Attribute";        break;
+        String axisName;
+        switch (axis)
+          {
+          case AXIS_DESCENDANT_OR_SELF: axisName = "DescendantOrSelf"; break;
+          case AXIS_SELF:               axisName = "Self";             break;
+          case AXIS_PARENT:             axisName = "Parent";           break;
+          case AXIS_ANCESTOR:           axisName = "Ancestor";         break;
+          case AXIS_ANCESTOR_OR_SELF:   axisName = "AncestorOrSelf";   break;
+          case AXIS_FOLLOWING:          axisName = "Following";        break;
+          case AXIS_FOLLOWING_SIBLING:  axisName = "FollowingSibling"; break;
+          case AXIS_PRECEDING:          axisName = "Preceding";        break;
+          case AXIS_PRECEDING_SIBLING:  axisName = "PrecedingSibling"; break;
+          case AXIS_ATTRIBUTE:          axisName = "Attribute";        break;
+          default: throw new Error();
+          }
+        makeAxisStep
+          = QuoteExp.getInstance(new PrimProcedure
+                                 ("gnu.kawa.xml."+axisName+"Axis",
+                                  "make", 1));
       }
-    ClassType axisClass = ClassType.make("gnu.kawa.xml."+axisName+"Axis");
-    ApplyExp mkAxis = new ApplyExp(axisClass.getDeclaredMethod("make", 1),
-				   args);
+    ApplyExp mkAxis = new ApplyExp(makeAxisStep, args);
     mkAxis.setFlag(ApplyExp.INLINE_IF_CONSTANT);
     return new ApplyExp(mkAxis, new Expression[] { dot });
   }
 
+  public static QuoteExp makeChildAxisStep
+  = QuoteExp.getInstance(new PrimProcedure("gnu.kawa.xml.ChildAxis", "make", 1));
+  public static QuoteExp makeDescendantAxisStep
+  = QuoteExp.getInstance(new PrimProcedure("gnu.kawa.xml.DescendantAxis", "make", 1));
+
   Expression parseRelativePathExpr(Expression exp)
       throws java.io.IOException, SyntaxException
   {
+    // If the previous operator was '//', then the corresponding E1.
+    Expression beforeSlashSlash = null;
+
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	boolean descendants = curToken == SLASHSLASH_TOKEN;
@@ -1913,12 +1930,27 @@ public class XQParser extends Lexer
 	    Expression[] args = { dot };
 	    TreeScanner op = DescendantOrSelfAxis.make(anyNodeTest);
 	    lexp.body = new ApplyExp(op, args);
-	    //descendants = false; // FIXME Actually simplify below.
+            beforeSlashSlash = exp;
 	  }
 	else
 	  {
 	    getRawToken();
-	    lexp.body = parseStepExpr();
+            Expression exp2 = parseStepExpr();
+
+            // Optimize: 'E1//child::TEST to E1/descendant::TEST
+            Expression func;
+            ApplyExp aexp;
+            if (beforeSlashSlash != null
+                && exp2 instanceof ApplyExp
+                && (func = ((ApplyExp) exp2).getFunction()) instanceof ApplyExp
+                && (aexp = (ApplyExp) func).getFunction() == makeChildAxisStep)
+              {
+                aexp.setFunction(makeDescendantAxisStep);
+                exp = beforeSlashSlash;
+              }
+
+            lexp.body = exp2;
+            beforeSlashSlash = null;
 	  }
 	comp.pop(lexp);
 
@@ -3358,8 +3390,8 @@ public class XQParser extends Lexer
             Expression[] args = new Expression[ndecls];
             for (int i = 0;  i < ndecls;  i++)
               args[i] = new ReferenceExp(flworDecls[flworDeclsFirst+i]);
-            body = new ApplyExp(ClassType.make("gnu.xquery.util.OrderedMap")
-                                .getDeclaredMethod("makeTuple$V", 1),
+            body = new ApplyExp(new PrimProcedure("gnu.xquery.util.OrderedMap",
+                                                  "makeTuple$V", 1),
                                 args);
           }
         else

@@ -1,3 +1,13 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (makeChildAxisStep, makeDescendantAxisStep):
+	New constant static fields.
+	(parseNodeTest): Make use of above constants.
+	Use relatively-new PrimProcedure convenience constructor.
+	(parseFLWRInner): Likewise new PrimProcedure convenience constructor.
+	(parseRelativePathExpr): Optimize 'E1//child::TEST' to
+	'E1/descendant::TEST'.
+
 2006-10-25  Per Bothner  <per@bothner.com>
 
 	No longer create Declarations for namespaces.

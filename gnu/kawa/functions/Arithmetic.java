@@ -218,7 +218,7 @@ public class Arithmetic
   }
 
   /** Coerce a number to one of the Arithmetic.XXX_CODE types.
-   * Assumes {@ code > Arithmetic.classifyValue(value)}, though
+   * Assumes {@code > Arithmetic.classifyValue(value)}, though
    * the converse might also work.
    */
   public static Object convert (Object value, int code)

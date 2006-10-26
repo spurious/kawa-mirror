@@ -134,7 +134,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
    *   (by converting the inexact number to exact), or inexactly (by
    *   "promoting" the exact to inexact) (as required for XQuery).
    * @return 1 if {@code arg1>arg2}; 0 if {@code arg1==arg2};
-   * -1 if {@codearg1<arg2}; -2 if either is {@code NaN};
+   * -1 if {@code arg1<arg2}; -2 if either is {@code NaN};
    * -3 if not comparable (either is not a number). */
   static public int compare (Object arg1, Object arg2, boolean exact)
   {

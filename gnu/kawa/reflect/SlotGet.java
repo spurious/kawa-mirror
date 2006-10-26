@@ -194,7 +194,7 @@ public class SlotGet extends Procedure2
   }
 
   /** Get a named property - field or 'get' accessor method.
-   * @param type the class type declaring the property.
+   * @param clas the class type declaring the property.
    * @param name the source (unmangled) name of the property.
    */
   public static Member

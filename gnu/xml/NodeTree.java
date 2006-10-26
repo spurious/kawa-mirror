@@ -223,7 +223,7 @@ public class NodeTree extends TreeList
   }
 
   /** Find named attribute.
-   * @param namepaceURI need not be interned,
+   * @param namespaceURI need not be interned,
    *   or null which matches any namespace
    * @param localName need not be interned,
    *   or null which matches any local name
@@ -237,7 +237,7 @@ public class NodeTree extends TreeList
   }
 
   /** Find named attribute.
-   * @param namepaceURI an interned String or null which matches any namespace
+   * @param namespaceURI an interned String or null which matches any namespace
    * @param localName an interned String, or null which matches any local name
    * @return attribute ipos or 0
    */

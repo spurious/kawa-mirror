@@ -1,5 +1,8 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* configure.in (AC_INIT): Set version to 1.8.90.
+	* build.xml (version.release): Likewise.
+
 	* kawa/standard/Scheme (initScheme): Update class for 'html' prefix.
 
 	* kawa/repl.java (processArgs): Use Symbol.parse to process

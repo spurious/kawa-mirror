@@ -95,17 +95,21 @@ public class Symbol
     /* #endif */
   }
 
+  /** Find or create a symbol in a specificed namespace.
+   * @param uri a namespace uri.
+   * @param name The "local name" or "print name" of the desired symbol.
+   * @param prefix namespace prefix, or {@code ""}
+   */
   public static Symbol make (String uri, String name, String prefix)
   {
     return Namespace.make(uri, prefix).getSymbol(name.intern());
   }
 
-  /** Find or create a symbol in a specificed environment.
+  /** Find or create a symbol in a specificed namespace.
    * @param namespace can be an Namespace, or a namespace/environment name
-   *   (resolved using Environment.getInstance), or null (in which case
+   *   (resolved using Namespace.getInstance), or null (in which case
    *   an uninterned symbol is created).
    * @param name The "local name" or "print name" of the desired symbol.
-   * @param prefix namespace prefix, or null
    */
   public static Symbol make (Object namespace, String name)
   {
@@ -115,6 +119,54 @@ public class Symbol
     if (ns == null || name == null)
       return makeUninterned(name);
     return ns.getSymbol(name.intern());
+  }
+
+  /** Parse a String as a Symbol.
+   * Recognizes:
+   * <ul>
+   * <li>{@code "{namespace-uri}local-name"} - which creates a
+   * symbol with that namespace-uri and an empty prefix;
+   * </li>
+   * <li>{@code "prefix:local-name"}- which creates a symbol with that prefix
+   * and an "unknown" namespace-uri, using {@link #makeWithUnknownNamespace};
+   * </li>
+   * <li>and plain {@code "local-name"} - which creates a symbol in
+   * {@link Namespace#EmptyNamespace}.
+   * </li></ul>
+   */
+  public static Symbol parse (String symbol)
+  {
+    if (symbol.charAt(0) == '{')
+      {
+        int rbrace = symbol.lastIndexOf('}');
+        if (rbrace <= 0)
+          {
+            throw new RuntimeException("missing '}' in property name '"+symbol+"'");
+          }
+        return Symbol.make(symbol.substring(1, rbrace), symbol.substring(rbrace+1), "");
+      }
+    int colon = symbol.indexOf(':');
+    if (colon > 0)
+      {
+        return Symbol.makeWithUnknownNamespace(symbol.substring(colon+1),
+                                               symbol.substring(0, colon));
+      }
+    else
+      {
+        return Symbol.make("", symbol, "");
+      }
+  }
+
+  /** Make a placeholder symbol with a known prefix and unknown namespace-uri.
+   * This is convenient for processing definition commands like
+   * {@code "prefix:name=value"} - such as on the Kawa command-line -
+   * where we don't yet know the namespace-uri.  Code that later looks
+   * for a value should look both under the true namespace-uri and
+   less LOG.JA   * using this method (or {@link Namespace#makeUnknownNamespace}).
+   */
+  public static Symbol makeWithUnknownNamespace (String local, String prefix)
+  {
+    return Namespace.makeUnknownNamespace(prefix).getSymbol(local.intern());
   }
 
   public Symbol ()

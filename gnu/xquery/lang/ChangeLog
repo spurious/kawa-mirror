@@ -1,5 +1,8 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (getExternal): Make use of new makeWithUnknownNamespace
+	method in Symbol to look for definitions with prefix-only.
+
 	* XQParser.java (makeChildAxisStep, makeDescendantAxisStep):
 	New constant static fields.
 	(parseNodeTest): Make use of above constants.

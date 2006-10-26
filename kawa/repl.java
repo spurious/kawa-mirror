@@ -661,12 +661,12 @@ public class repl extends Procedure0or1
 	  }
 	else
           {
-            int eq = arg.indexOf('=');
-            if (eq <= 0)
+            int ci = arg.indexOf('=');
+            if (ci <= 0)
               return iArg;
-            String key = arg.substring(0, eq);
-            String value = arg.substring(eq+1);
-            String uri, local;
+            String key = arg.substring(0, ci);
+            String value = arg.substring(ci+1);
+            String uri, local, prefix = "";
             for (int i = 0; ; i++)
               {
                 String[] propertyField = propertyFields[i];
@@ -692,23 +692,7 @@ public class repl extends Procedure0or1
                       }
                   }
               }
-            if (key.charAt(0) == '{')
-              {
-                int rbrace = key.lastIndexOf('}');
-                if (rbrace <= 0)
-                  {
-                    System.err.println("missing '}' in property name '"+key+"'");
-                    System.exit (-1);
-                  }
-                uri = key.substring(1, rbrace);
-                local = key.substring(rbrace+1);
-              }
-            else
-              {
-                uri = "";
-                local = key;
-              }
-            Symbol symbol = Symbol.make(uri, local);
+            Symbol symbol = Symbol.parse(key);
             // Run Language's static initializer.
             Language.getDefaultLanguage();
             Environment current = Environment.getCurrent();

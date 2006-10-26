@@ -98,6 +98,21 @@ public class Namespace
 	return ns;
       }
   }
+
+  /** Create a "placeholder" for a namespace with a known prefix
+   * but unknown uri.
+   * @see Symbol#makeWithUnknownNamespace
+   */
+  public static Namespace makeUnknownNamespace (String prefix)
+  {
+    String uri;
+    if (prefix == null || prefix == "")
+      uri = "";
+    else
+      uri = "http://kawa.gnu.org/unknown-namespace/"+prefix;
+    return Namespace.make(uri, prefix);
+  }
+
   public Object get (String name)
   {
     return Environment.getCurrent().get(getSymbol(getName()));

@@ -171,6 +171,9 @@ public class XQuery extends Language
 	    mexp.body = new BeginExp(arr);
 	  }
       }
+    // It seems silly to pop all the declarations, and then push them
+    // in resolveModule.  The complication is that imported variable
+    // declarations are pushed eagerly in the first pass.
     tr.pop(mexp);
 
     if (false)
@@ -958,6 +961,10 @@ public class XQuery extends Language
   {
     Environment env = Environment.getCurrent();
     Object value = env.get(name, null, null);
+    if (value == null)
+      value = env.get(Symbol.makeWithUnknownNamespace(name.getLocalName(),
+                                                      name.getPrefix()),
+                      null, null);
     if (value == null)
       throw new RuntimeException("unbound external "+name);
     if (type instanceof XDataType)

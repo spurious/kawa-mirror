@@ -1937,7 +1937,7 @@ public class XQParser extends Lexer
 	    getRawToken();
             Expression exp2 = parseStepExpr();
 
-            // Optimize: 'E1//child::TEST to E1/descendant::TEST
+            // Optimize: 'E1//child::TEST' to 'E1/descendant::TEST'
             Expression func;
             ApplyExp aexp;
             if (beforeSlashSlash != null

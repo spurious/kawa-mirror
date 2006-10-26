@@ -639,13 +639,15 @@ public class Compilation
     return true;
   }
 
+  /** Convert a string to a safe Java identifier.
+   * @param reversible if we should use an invertible mapping.
+   */
   public static String mangleName (String name, boolean reversible)
   {
     return mangleName(name, reversible ? 1 : -1);
   }
 
   /** Convert a string to a safe Java identifier.
-   * @param reversible if we should use an invertible mapping.
    * @param kind -1 - non-reversible;
    *  0: reversible, except that '$' is not mapped;
    *  1: reversible

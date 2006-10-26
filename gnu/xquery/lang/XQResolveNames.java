@@ -374,10 +374,57 @@ public class XQResolveNames extends ResolveNames
     return result;
   }
 
+  private Declaration moduleDecl;
+  private Expression walkStatements (Expression exp)
+  {
+    // The tricky part here is interleaving declarations and statements
+    // so that a variable declaration is only visible *after* we have
+    // walked its initializing expression.
+    if (exp instanceof BeginExp)
+      {
+        BeginExp bbody = (BeginExp) exp;
+        Expression[] exps = bbody.getExpressions();
+        int nexps = bbody.getExpressionCount();
+        for (int i = 0;  i < nexps;  i++)
+          {
+            exps[i] = walkStatements(exps[i]);
+          }
+      }
+    else if (exp instanceof SetExp)
+      {
+        Declaration decl = moduleDecl;
+        while (decl != null && decl.isNamespaceDecl())
+          decl = decl.nextDecl();
+        SetExp sexp = (SetExp) exp;
+        exp = walkSetExp(sexp);
+        if (sexp.isDefining() && sexp.getBinding() == decl)
+          {
+            if (! decl.isProcedureDecl() && ! decl.isNamespaceDecl())
+              push(decl);
+            decl = decl.nextDecl();
+          }
+        moduleDecl = decl;
+      }
+    else
+      exp = walk(exp);
+    return exp;
+  }
+
   public void resolveModule(ModuleExp exp)
   {
-    super.resolveModule(exp);
+    currentLambda = exp;
+    for (Declaration decl = exp.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+        if (decl.isProcedureDecl())
+	  push(decl);
+        else if (decl.isNamespaceDecl())
+          lookup.push(decl);
+      }
+    moduleDecl = exp.firstDecl();
+    exp.body = walkStatements(exp.body);
 
+    Expression[] exps;
     if (currentDateTimeDecl != null)
       {
         // Some expression in this module calls one of the current-XXX
@@ -412,7 +459,6 @@ public class XQResolveNames extends ResolveNames
                                       new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("timezoneFromDateTime", 1), args)));
           }
         Expression body = exp.body;
-        Expression[] exps;
         if (body instanceof BeginExp)
           {
             BeginExp bexp = (BeginExp) body;

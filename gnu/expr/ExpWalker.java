@@ -112,7 +112,7 @@ public class ExpWalker
   protected Expression walkLangExp (LangExp exp)
   { return walkExpression(exp); }
 
-  LambdaExp currentLambda = null;
+  protected LambdaExp currentLambda = null;
 
   /** If exitValue is set to non-null, the walk stops. */
   Object exitValue = null;

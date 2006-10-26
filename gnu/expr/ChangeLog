@@ -1,3 +1,7 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	* ExpWalker.java (currentLambda): Make protected, for XQResolveNames.
+
 2006-10-25  Chris Wegrzyn <chris.wegrzyn@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

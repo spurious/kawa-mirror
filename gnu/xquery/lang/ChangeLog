@@ -1,5 +1,8 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkStatements): New recursive helper method.
+	(resolveModule): Use it, to properly handle module-level variables.
+
 	* XQParser.java (copyNamespacesDeclarationSeen, copyNamespacesMode):
 	New fields, whihc replace the old ...
 	(copyNamespacesNoInherit, copyNamespacesNoPreserve): .. removed fields.

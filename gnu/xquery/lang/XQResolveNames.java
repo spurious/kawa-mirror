@@ -134,7 +134,7 @@ public class XQResolveNames extends ResolveNames
   /** Create a <code>Declaration</code> for a builtin function. */
   public static Declaration makeBuiltin (String name, int code)
   {
-    return makeBuiltin (Symbol.make(XQuery.XQUERY_FUNCTION_NAMESPACE, name),
+    return makeBuiltin (Symbol.make(XQuery.XQUERY_FUNCTION_NAMESPACE, name, "fn"),
 			code);
   }
 
@@ -196,58 +196,54 @@ public class XQResolveNames extends ResolveNames
 
   protected void push (ScopeExp exp)
   {
-    Compilation comp = getCompilation();
     for (Declaration decl = exp.firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.isNamespaceDecl())
-	  lookup.push(decl);
+        push(decl);
       }
-    // Can't do namespace resolution until now.
-    for (Declaration decl = exp.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      {
-	if (decl.isNamespaceDecl())
-	  continue;
-	Object name = decl.getSymbol();
-	boolean function = decl.isProcedureDecl();
-	if (name instanceof String)
-	  {
-	    int line = decl.getLine();
-	    if (line > 0 && comp != null)
-	      {
-		String saveFilename = comp.getFile();
-		int saveLine = comp.getLine();
-		int saveColumn = comp.getColumn();
-		comp.setLine(decl.getFile(), line, decl.getColumn());
-		name = parser.namespaceResolve((String) name, function);
-		comp.setLine(saveFilename, saveLine, saveColumn);
-	      }
-	    else
-	      name = parser.namespaceResolve((String) name, function);
-	    if (name == null)
-              continue;
-            decl.setName(name);
-	  }
+  }
 
-	Declaration old = lookup.lookup(name, function);
-        if (old != null)
+  void push (Declaration decl)
+  {
+    Compilation comp = getCompilation();
+    Object name = decl.getSymbol();
+    boolean function = decl.isProcedureDecl();
+    if (name instanceof String)
+      {
+        int line = decl.getLine();
+        if (line > 0 && comp != null)
           {
-            if (decl.context == old.context
-                // FIXME we don't handle duplicate functions correctly.
-                && ! decl.isProcedureDecl() && ! old.isProcedureDecl())
-              {
-                comp.error('e', decl, "duplicate declaration of '", "'");
-                comp.error('e', old, "(this is the previous declaration of '", "')");
-              }
-            else if (XQParser.warnHidePreviousDeclaration
-                && (! (name instanceof Symbol)
-                    || ((Symbol) name).getNamespace() != null))
-              comp.error('w', decl, "declaration ",
-                         " hides previous declaration");
+            String saveFilename = comp.getFile();
+            int saveLine = comp.getLine();
+            int saveColumn = comp.getColumn();
+            comp.setLine(decl.getFile(), line, decl.getColumn());
+            name = parser.namespaceResolve((String) name, function);
+            comp.setLine(saveFilename, saveLine, saveColumn);
           }
-	lookup.push(decl);
+        else
+          name = parser.namespaceResolve((String) name, function);
+        if (name == null)
+          return;
+        decl.setName(name);
       }
+
+    Declaration old = lookup.lookup(name, function);
+    if (old != null)
+      {
+        if (decl.context == old.context
+            // FIXME we don't handle duplicate functions correctly.
+            && ! decl.isProcedureDecl() && ! old.isProcedureDecl())
+          {
+            comp.error('e', decl, "duplicate declaration of '", "'");
+            comp.error('e', old, "(this is the previous declaration of '", "')");
+          }
+        else if (XQParser.warnHidePreviousDeclaration
+                 && (! (name instanceof Symbol)
+                     || ((Symbol) name).getNamespace() != null))
+          comp.error('w', decl, "declaration ",
+                     " hides previous declaration");
+      }
+    lookup.push(decl);
   }
 
   Declaration flookup (Symbol sym)
@@ -304,13 +300,14 @@ public class XQResolveNames extends ResolveNames
         else // if (symbol instanceof String)
           {
             String name = (String) symbol;
-            if (function && name.indexOf(':') < 0)
+            if (name.indexOf(':') < 0)
               {
-                for (int i = 0;  i < functionNamespacePath.length;  i++)
+                name = name.intern();
+                if (function)
                   {
-                    sym = functionNamespacePath[i].lookup(name);
-                    if (sym != null)
+                    for (int i = 0;  i < functionNamespacePath.length;  i++)
                       {
+                        sym = functionNamespacePath[i].getSymbol(name);
                         decl = lookup.lookup(sym, function);
                         if (decl != null)
                           break;
@@ -322,7 +319,7 @@ public class XQResolveNames extends ResolveNames
                       }
                   }
               }
-            else
+            if (decl == null)
               {
                 sym = parser.namespaceResolve(name, function);
                 if (sym != null)
@@ -432,8 +429,6 @@ public class XQResolveNames extends ResolveNames
       }
   }
 
-  NamespaceBinding constructorNamespaces;
-
   /**
    * Coerce argument to NamedCallator, or return default collator.
    * @param args argument list
@@ -508,12 +503,24 @@ public class XQResolveNames extends ResolveNames
   protected Expression walkApplyExp (ApplyExp exp)
   {
     Expression func = exp.getFunction();
-    NamespaceBinding namespaceSave = constructorNamespaces;
+    NamespaceBinding namespaceSave = parser.constructorNamespaces;
     Object proc = exp.getFunctionValue();
     if (proc instanceof MakeElement)
-      constructorNamespaces = ((MakeElement) proc).getNamespaceNodes();
+      {
+        MakeElement mk = (MakeElement) proc;
+        NamespaceBinding nschain = namespaceSave;
+        for (NamespaceBinding ns = mk.getNamespaceNodes(); ns != null;)
+          {
+            NamespaceBinding next = ns.getNext();
+            ns.setNext(nschain);
+            nschain = ns;
+            ns = next;
+          }
+        mk.setNamespaceNodes(nschain);
+        parser.constructorNamespaces = nschain;
+      }
     super.walkApplyExp(exp);
-    constructorNamespaces = namespaceSave;
+    parser.constructorNamespaces = namespaceSave;
     func = exp.getFunction();
     if (func instanceof ReferenceExp)
       {
@@ -544,7 +551,7 @@ public class XQResolveNames extends ResolveNames
 			{
 			  Object val = ((QuoteExp) args[0]).getValue();
 			  val = QNameUtils.resolveQName(val,
-                                                        constructorNamespaces,
+                                                        parser.constructorNamespaces,
                                                         parser.prologNamespaces);
 			  return new QuoteExp(val);
 			}
@@ -555,7 +562,7 @@ public class XQResolveNames extends ResolveNames
 		    }
 		  Expression[] xargs = {
 		    args[0],
-		    new QuoteExp(constructorNamespaces),
+		    new QuoteExp(parser.constructorNamespaces),
 		    new QuoteExp(parser.prologNamespaces) };
 		  Method meth
 		    = (ClassType.make("gnu.xquery.util.QNameUtils")
@@ -571,22 +578,20 @@ public class XQResolveNames extends ResolveNames
                     return err;
 		  if (args[0] instanceof QuoteExp)
 		    {
-		      try
-			{
-			  Object val = ((QuoteExp) args[0]).getValue();
-			  val = QNameUtils.resolvePrefix(val == null ? null : val.toString(),
-                                                         constructorNamespaces,
-                                                         parser.prologNamespaces);
-			  return new QuoteExp(val);
-			}
-		      catch (RuntimeException ex)
-			{
-			  return getCompilation().syntaxError(ex.getMessage());
-			}
+                      Object val = ((QuoteExp) args[0]).getValue();
+                      String prefix = val == null ? null : val.toString();
+                      val = QNameUtils.lookupPrefix(prefix,
+                                                    parser.constructorNamespaces,
+                                                    parser.prologNamespaces);
+                      if (val == null)
+                        return getCompilation()
+                          .syntaxError("unknown namespace prefix '"
+                                       +prefix+"'");
+                      return new QuoteExp(val);
 		    }
 		  Expression[] xargs = {
 		    args[0],
-		    new QuoteExp(constructorNamespaces),
+		    new QuoteExp(parser.constructorNamespaces),
 		    new QuoteExp(parser.prologNamespaces) };
 		  PrimProcedure pproc
 		    = new PrimProcedure(ClassType.make("gnu.xquery.util.QNameUtils")

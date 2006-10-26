@@ -1,5 +1,9 @@
 2006-10-25  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (lookupPrefix): New method based on resolvePrefix,
+	but on failure return null rather than throwing exception 
+	(resolvePrefix): Now just a wrapper around lookupPrefix.
+
 	* NumberValue.java (round): Fix rounding of negative BigDecimals.
 
 2006-10-22  Per Bothner  <per@bothner.com>

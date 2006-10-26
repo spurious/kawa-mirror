@@ -82,9 +82,12 @@ public class QNameUtils
     return Symbol.make(uri, localPart, prefix == null ? "" : prefix);
   }
 
-  public static String resolvePrefix (String prefix,
-                                      NamespaceBinding constructorNamespaces,
-                                      NamespaceBinding prologNamespaces)
+  /** Search for a uri matching the given prefix.
+   * @return uri or null if there is no binding for prefix.
+   */
+  public static String lookupPrefix (String prefix,
+                                     NamespaceBinding constructorNamespaces,
+                                     NamespaceBinding prologNamespaces)
   {
     String uri;
 
@@ -101,13 +104,21 @@ public class QNameUtils
             break;
           }
       }
+    if (uri == null && prefix == null)
+      uri = "";
+    return uri;
+  }
+
+  /** Search for a uri matching the given prefix.
+   * Throw exception if there is no binding and the prefix is non-empty.
+   */
+  public static String resolvePrefix (String prefix,
+                                      NamespaceBinding constructorNamespaces,
+                                      NamespaceBinding prologNamespaces)
+  {
+    String uri = lookupPrefix(prefix, constructorNamespaces, prologNamespaces);
     if (uri == null)
-      {
-	if (prefix == null)
-	  uri = "";
-	else
-	  throw new RuntimeException("unknown namespace prefix '"+prefix+"'");
-      }
+      throw new RuntimeException("unknown namespace prefix '"+prefix+"'");
     return uri;
   }
 

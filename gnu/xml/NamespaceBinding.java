@@ -32,7 +32,12 @@ public final class NamespaceBinding implements Externalizable
   int depth;
 
   public final NamespaceBinding getNext () { return next; }
-  public final void setNext (NamespaceBinding next) { this.next = next; }
+  public final void setNext (NamespaceBinding next)
+  {
+    if (this==next) new Error("cycle "+next).printStackTrace();
+    this.next = next;
+    this.depth = next == null ? 0 : next.depth + 1;
+  }
 
   //  public NamespaceBinding () { }
 
@@ -40,8 +45,7 @@ public final class NamespaceBinding implements Externalizable
   {
     this.prefix = prefix;
     this.uri = uri;
-    this.next = next;
-    this.depth = next == null ? 0 : next.depth + 1;
+    setNext(next);
   }
 
   public static final String XML_NAMESPACE

@@ -1,5 +1,41 @@
 2006-10-25  Per Bothner  <per@bothner.com>
 
+	No longer create Declarations for namespaces.
+	Do create Symbols with prefixes for variable and functions.
+	* XQuery.java (DEFAULT_ELEMENT_PREFIX): Use null, for consistency
+	with NamespaceBinding.
+	(DEFAULT_FUNCTION_PREFIX): Also change this constant for good measure.
+	(parse): Set state to BODY_PARSED so we don't resolve twice.
+	* XQParser.java (pushNamespace): Don't makeNamespaceDecl.
+	But we now need to push DEFAULT_FUNCTION_PREFIX.
+	(<init>): Don't need to push Declarations for builtin namespaces.
+	(makeNamespaceDecl): Remove method.
+	(parseElementConstructor): Don't need to create a lexical scope for
+	namespace bindings.  Make list of NamespaceBindings for local namespace
+	attributes. but not inherited ones.
+	(parse): Likewise defer setting namespace bindinsg for computer
+	element constructors.
+	(constructorNamespaces): New field, moved from XQResolveNames.
+	(namespaceResolve): To map prefix to uri search NamespaceBinding lists
+	with QNameUtils.lookupPrefix, not using NameLookup and Declarationss.
+	And we no longer need to use an exception handler for the error case.
+	(parse): Do namespaceResolve at parse time for 'declare variable'
+	and 'declare function'.  Don't push Declaration yet, though.
+	Update searching for duplicate namespace declaration.
+	Error if duplicate default namespace declarations seen.
+	* XQResolveNames.java (makeBuiltin): Set 'fn' prefix.
+	(push(Declaration)): New method.
+	(push(ScopeExp)): Use previous new function.
+	Simplify, since we don't have to handle namaspace declarations first.
+	(walkReferenceExp): When searching in functionNamespacePath we can't
+	just check if the Namespace has a matching symbol, since a different
+	Namespace can have the same uri but different prefix.
+	(constructorNamespaces): Field moved to XQParser.
+	(walkApplyExp): Update accordingly.
+	(walkApplyExp): Have to merge in namespace nodes from inherited
+	constructors now, rather than in parseElementConstructor.
+	(walkApplyExp): Use QNameUtils.lookupPrefix rather than resolvePrefix.
+
 	* XQResolveNames.java (walkApplyExp): Use new StringValue.asString
 	method for fn:string.
 

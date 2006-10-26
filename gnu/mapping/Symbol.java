@@ -41,11 +41,11 @@ public class Symbol
   public final Object getKeyProperty () { return null; }
   public boolean matches (EnvironmentKey key)
   {
-    return key.getKeySymbol() == this && key.getKeyProperty() == null;
+    return equals(key.getKeySymbol(), this) && key.getKeyProperty() == null;
   }
   public boolean matches (Symbol symbol, Object property)
   {
-    return symbol == this && property == null;
+    return equals(symbol, this) && property == null;
   }
 
   /* #ifndef JAXP-QName */
@@ -181,6 +181,8 @@ public class Symbol
   {
     if (sym1 == sym2)
       return true;
+    if (sym1 == null || sym2 == null)
+      return false;
     /* #ifdef JAXP-QName */
     // if (sym1.getLocalPart() == sym2.getLocalPart())
     /* #else */

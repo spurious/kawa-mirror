@@ -52,9 +52,9 @@ public class XQuery extends Language
   static boolean charIsInt = false;
 
   /** Pseudo-namespace "prefix" for the default element namespace. */
-  public static final String DEFAULT_ELEMENT_PREFIX = "elements$";
+  public static final String DEFAULT_ELEMENT_PREFIX = null;
   /** Pseudo-namespace "prefix" for the default function namespace. */
-  public static final String DEFAULT_FUNCTION_PREFIX = "functions$";
+  public static final String DEFAULT_FUNCTION_PREFIX = "(functions)";
 
   Namespace defaultNamespace;
 
@@ -186,6 +186,7 @@ public class XQuery extends Language
     resolver.functionNamespacePath = parser.functionNamespacePath;
     resolver.parser = parser;
     resolver.resolveModule(mexp); // FIXME should move to resolve(Compilation)
+    tr.setState(Compilation.BODY_PARSED);
     return true;
   }
 

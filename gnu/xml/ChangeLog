@@ -1,3 +1,8 @@
+2006-10-25  Per Bothner  <per@bothner.com>
+
+	* NamespaceBinding.java:(setNext): Also set depth field.
+	(<init>): Use setNext.
+
 2006-10-22  Per Bothner  <per@bothner.com>
 
 	* NodeTree.jave (baseUriOfPos): Need to update pos variable to parent.

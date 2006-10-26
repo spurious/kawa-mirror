@@ -21,13 +21,13 @@ public class KeyPair implements EnvironmentKey
 
   public final boolean matches (EnvironmentKey key)
   {
-    return key.getKeySymbol() == this.name
+    return Symbol.equals(key.getKeySymbol(), this.name)
       && key.getKeyProperty() == this.property;
   }
 
   public final boolean matches (Symbol symbol, Object property)
   {
-    return symbol == this.name && property == this.property;
+    return Symbol.equals(symbol, this.name) && property == this.property;
   }
 
   public boolean equals (Object x)

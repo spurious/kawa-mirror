@@ -19,6 +19,7 @@ import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
+import gnu.xquery.util.QNameUtils;
 import kawa.standard.require;
 
 /** A class to read xquery forms. */
@@ -1157,16 +1158,11 @@ public class XQParser extends Lexer
             "XQST0070");
   }
 
-  Declaration pushNamespace(String prefix, String uri)
+  void pushNamespace(String prefix, String uri)
   {
-    Declaration decl = makeNamespaceDecl (prefix, uri);
-    lexical.push(decl);
-    if (prefix == XQuery.DEFAULT_FUNCTION_PREFIX)
-      return decl;
-    if (prefix == XQuery.DEFAULT_ELEMENT_PREFIX)
-      prefix = null;
+    if (uri.length() == 0)
+      uri = null;
     prologNamespaces = new NamespaceBinding(prefix, uri, prologNamespaces);
-    return decl;
   }
 
   public XQParser(InPort port, SourceMessages messages, XQuery interp)
@@ -1179,8 +1175,6 @@ public class XQParser extends Lexer
     // Push standard namespaces into lexical scope.
     NamespaceBinding ns = builtinNamespaces;
     prologNamespaces = ns;
-    for (;  ns != null;  ns = ns.getNext())
-      lexical.push(makeNamespaceDecl (ns.getPrefix(), ns.getUri()));
   }
 
   public void setInteractive(boolean v)
@@ -2355,18 +2349,6 @@ public class XQParser extends Lexer
     return new ApplyExp(string, args);
   }
 
-  Declaration makeNamespaceDecl (String prefix, String uri)
-  {
-    if (prefix == null)
-      prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
-    Declaration decl = new Declaration(prefix);
-    decl.setType(gnu.bytecode.Type.tostring_type);
-    decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
-    decl.setPrivate(true);
-    decl.noteValue(new QuoteExp(uri));
-    return decl;
-  }
-
   static final Expression makeCDATA =
     makeFunctionExp("gnu.kawa.xml.MakeCDATA", "makeCDATA");
 
@@ -2492,7 +2474,7 @@ public class XQParser extends Lexer
     Expression[] args;
     vec.addElement(castQName(new QuoteExp(startTag)));
     errorIfComment = "comment not allowed in element start tag";
-    NamespaceBinding namespaceOuter = namespaceBindings;
+    NamespaceBinding nsBindings = null;
     int ch;
     for (;;)
       {
@@ -2552,8 +2534,8 @@ public class XQParser extends Lexer
             checkAllowedNamespaceDeclaration(definingNamespace, ns);
 	    if (definingNamespace == "")
 	      definingNamespace = null;
-            for (NamespaceBinding nsb = namespaceBindings;
-                 nsb != namespaceOuter;  nsb = nsb.getNext())
+            for (NamespaceBinding nsb = nsBindings;
+                 nsb != null;  nsb = nsb.getNext())
               {
                 if (nsb.getPrefix() == definingNamespace)
                   {
@@ -2565,10 +2547,10 @@ public class XQParser extends Lexer
                     break;
                   }
               }
-	    namespaceBindings
+	    nsBindings
 	      = new NamespaceBinding(definingNamespace,
 				     ns == "" ? null : ns,
-				     namespaceBindings);
+				     nsBindings);
 	  }
 	else
 	  {
@@ -2616,31 +2598,11 @@ public class XQParser extends Lexer
     args = new Expression[vec.size()];
     vec.copyInto(args);
     MakeElement mkElement = new MakeElement();
+    // Ths is just the chain of NamespaceBindings for namespace declaration
+    // attributes from this immediate constructor.  At resolve time we chain
+    // this list onto the list from outer element constructors.
+    mkElement.setNamespaceNodes(nsBindings);
     Expression result = new ApplyExp(new QuoteExp(mkElement), args);
-
-    // Reverse current set of namespace bindings to match input order.
-   NamespaceBinding nsBindings
-     = namespaceBindings.reversePrefix(namespaceOuter);
-    if (namespaceOuter != nsBindings)
-      {
-	int count = nsBindings.count(namespaceOuter);
-	Expression [] inits = new Expression[count];
-	LetExp let = new LetExp(inits);
-	int i = 0;
-	for (NamespaceBinding ns = nsBindings;
-	     ns != namespaceOuter;  ns = ns.getNext())
-	  {
-	    Declaration decl = makeNamespaceDecl(ns.getPrefix(), ns.getUri());
-	    let.addDeclaration(decl);
-	    inits[i++] = decl.getValue();
-	  }
-
-	let.setBody(result);
-	result = let;
-	namespaceBindings = namespaceOuter;
-      }
-    if (nsBindings != NamespaceBinding.predefinedXML)
-      mkElement.setNamespaceNodes(nsBindings);
     return result;
   }
 
@@ -2988,12 +2950,7 @@ public class XQParser extends Lexer
               return syntaxError("missing element/attribute name");
             vec.addElement(castQName(element));
             if (token == ELEMENT_TOKEN)
-              {
-                MakeElement mk = new MakeElement();
-                if (namespaceBindings != NamespaceBinding.predefinedXML)
-                  mk.setNamespaceNodes(namespaceBindings);
-                func = new QuoteExp(mk);
-              }
+              func = new QuoteExp(new MakeElement());
             else
               func = MakeAttribute.makeAttributeExp;
             getRawToken();
@@ -3522,7 +3479,6 @@ public class XQParser extends Lexer
     Declaration decl = comp.currentScope().addDeclaration(sym);
     if (comp.isStatic())
       decl.setFlag(Declaration.STATIC_SPECIFIED);
-    comp.push(decl);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
     decl.setFile(getName());
@@ -3571,8 +3527,16 @@ public class XQParser extends Lexer
   Compilation comp;
 
   String defaultElementNamespace = "";
-  NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
+
+  /** Chain of namespace bindings from namespace declaration attributes
+   * in outer direct element constructors.  This is only non-empty during
+   * resolve time, but it is declared here so namespaceResolve can use it. */
+  NamespaceBinding constructorNamespaces = NamespaceBinding.predefinedXML;
+
+  /** Chain of namespace bindings from declarations in prolog,
+   *  followed by the builtinNamespaces. */
   NamespaceBinding prologNamespaces;
+
   static NamespaceBinding builtinNamespaces;
   static {
     NamespaceBinding ns = NamespaceBinding.predefinedXML;
@@ -3592,19 +3556,15 @@ public class XQParser extends Lexer
     int colon = name.indexOf(':');
     String prefix = colon >= 0 ? name.substring(0, colon).intern()
       : function ? XQuery.DEFAULT_FUNCTION_PREFIX
-      : XQuery.DEFAULT_ELEMENT_PREFIX; 
-    Declaration decl = lexical.lookup(prefix, -1);
-    Object uri = null;
-    if (decl != null)
-      uri = decl.getConstantValue();
-    else if (prefix == XQuery.DEFAULT_ELEMENT_PREFIX)
-      uri = "";
+      : XQuery.DEFAULT_ELEMENT_PREFIX;
+    String uri = QNameUtils.lookupPrefix(prefix, constructorNamespaces,
+                                         prologNamespaces);
 
-    if (! (uri instanceof String))
+    if (uri == null)
       {
 	if (colon < 0)
 	  uri = "";
-	else
+	else if (! comp.isPedantic())
 	  {
 	    try
 	      {
@@ -3613,15 +3573,19 @@ public class XQParser extends Lexer
 	      }
 	    catch (Exception ex)
 	      {
-		error('e',
-                               "unknown namespace prefix '" + prefix + "'",
-                               "XPST0081");
-		return null;
-	      }
+                uri = null;
+              }
 	  }
+        if (uri == null)
+          {
+            error('e',
+                  "unknown namespace prefix '" + prefix + "'",
+                  "XPST0081");
+            uri = "(unknown namespace)";
+          }
       }
     String local = colon < 0 ? name : name.substring(colon+1);
-    return Symbol.make(uri, local);
+    return Symbol.make((String) uri, local, prefix);
   }
 
   void parseSeparator ()
@@ -3721,10 +3685,12 @@ public class XQParser extends Lexer
 	decl = parseVariableDeclaration();
 	if (decl == null)
 	  return syntaxError("missing Variable");
+        Object name = decl.getSymbol();
+        if (name instanceof String)
+          decl.setSymbol(namespaceResolve((String) name, false));
 	comp.currentScope().addDeclaration(decl);
 	getRawToken();
 	Expression type = parseOptionalTypeDeclaration();
-	comp.push(decl);
 	decl.setCanRead(true);
 	//decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
 	decl.setFlag(Declaration.IS_CONSTANT);
@@ -3796,15 +3762,21 @@ public class XQParser extends Lexer
 		  return syntaxError("missing uri in namespace declaration");
 		uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
                 prefix = prefix.intern();
-                if (prologNamespaces.resolve(prefix, builtinNamespaces)
-                    != null)
-                  error('e',
-                      "duplicate declarations for the same namespace prefix '"
-                        +prefix+"'",
-                        "XQST0033");
-		decl = pushNamespace(prefix, uri);
+                for (NamespaceBinding ns = prologNamespaces;
+                     ns != builtinNamespaces;
+                     ns = ns.getNext())
+                  {
+                    if (ns.getPrefix() == prefix)
+                      {
+                        error('e',
+                              "duplicate declarations for the same namespace prefix '"
+                              +prefix+"'",
+                              "XQST0033");
+                        break;
+                      }
+                  }
+		pushNamespace(prefix, uri);
                 checkAllowedNamespaceDeclaration(prefix, uri);
-		comp.mainLambda.addDeclaration(decl);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
                   {
@@ -3821,7 +3793,7 @@ public class XQParser extends Lexer
                     if (uri.length() == 0)
                       return syntaxError("zero-length module namespace", "XQST0088");
                   }
-                return SetExp.makeDefinition(decl, decl.getValue());
+                return QuoteExp.voidExp;
 	      }
 	  }
 
@@ -3850,7 +3822,7 @@ public class XQParser extends Lexer
 	if (prefix != null)
           {
             checkAllowedNamespaceDeclaration(prefix, uri);
-            comp.mainLambda.addDeclaration(pushNamespace(prefix.intern(), uri));
+            pushNamespace(prefix.intern(), uri);
           }
 	getRawToken();
         String at;
@@ -3950,6 +3922,12 @@ public class XQParser extends Lexer
       case DEFAULT_ELEMENT_TOKEN:
       case DEFAULT_FUNCTION_TOKEN:
 	boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
+        prefix = forFunctions ? XQuery.DEFAULT_FUNCTION_PREFIX
+          : XQuery.DEFAULT_ELEMENT_PREFIX;
+        if (prologNamespaces.resolve(prefix, builtinNamespaces) != null)
+          error('e',
+                "duplicate default namespace declaration",
+                "XQST0066");
 	getRawToken();
 	if (match("namespace"))
 	  getRawToken();
@@ -3971,20 +3949,17 @@ public class XQParser extends Lexer
 	uri = new String(tokenBuffer, 0, tokenBufferLength);
 	if (forFunctions)
 	  {
-	    prefix = XQuery.DEFAULT_FUNCTION_PREFIX;
 	    functionNamespacePath = new Namespace[1];
 	    functionNamespacePath[0] = Namespace.getInstance(uri);
 	  }
 	else
 	  {
-	    prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
 	    defaultElementNamespace = uri;
 	  }
-	decl = pushNamespace(prefix, uri);
+	pushNamespace(prefix, uri);
         checkAllowedNamespaceDeclaration(prefix, uri);
-	comp.mainLambda.addDeclaration(decl);
 	parseSeparator();
-	return SetExp.makeDefinition(decl, decl.getValue());
+	return QuoteExp.voidExp;
 
       case DECLARE_BOUNDARY_SPACE_TOKEN:
 	getRawToken();

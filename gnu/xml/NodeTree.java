@@ -820,10 +820,12 @@ public class NodeTree extends TreeList
     // FIXME when we support validation.
     StringBuffer sbuf = new StringBuffer();
     stringValue(posToDataIndex(ipos), sbuf);
-    // FIXME this should be untypedAtomic.   For now the caller takes care of
-    // it by converting a String to UntypedAtomic, but this won't work once
-    // we do validation.
-    return sbuf.toString();
+    String str = sbuf.toString();
+    int kind = getNextKind(ipos);
+    if (kind == Sequence.PROCESSING_INSTRUCTION_VALUE
+        || kind == Sequence.COMMENT_VALUE)
+      return str;
+    return new UntypedAtomic(str);
   }
 
   /** Get the target of a process-instruction. */

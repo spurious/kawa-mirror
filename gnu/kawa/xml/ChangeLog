@@ -1,5 +1,8 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* KNode.java (atomicValue): Don't convert to UntypedAtomic here;
+	thatis now handled by NodeTree.typevalue when it is appropriate.
+
 	* MakeElement.java (beginGroup): Copy copyNamespacesMode to output
 	Consumer if it is a NodeTree.
 

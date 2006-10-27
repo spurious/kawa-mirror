@@ -27,10 +27,7 @@ public abstract class KNode extends SeqPosition
     if (value instanceof KNode)
       {
         KNode node = (KNode) value;
-        Object val = ((NodeTree) node.sequence).typedValue(node.ipos);
-        if (val instanceof String) // Kludge.  FIXME.
-          val = new UntypedAtomic((String) val);
-        return val;
+        return ((NodeTree) node.sequence).typedValue(node.ipos);
       }
     return value;
   }

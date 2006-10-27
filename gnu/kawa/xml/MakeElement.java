@@ -99,6 +99,8 @@ public class MakeElement extends NodeConstructor
 	type = Symbol.make("", name, "");
       }
     out.beginGroup(name, type);
+    if (out instanceof NodeTree)
+      ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
 
   public static void endGroup(Consumer out, Object type)

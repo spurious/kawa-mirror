@@ -1,7 +1,10 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* MakeElement.java (beginGroup): Copy copyNamespacesMode to output
+	Consumer if it is a NodeTree.
+
 	* MakeElement.java (copyNamespacesMode): New field.
-	(beginGroup): Make copyNamespacesMode parameter.
+	(beginGroup): New copyNamespacesMode parameter.
 	(apply, compileToNode): Update appropriately.
 
 	* XmlNamespace.java: Renamed from gnu.kawa.lispexpr.XmlNamespace.

@@ -351,7 +351,7 @@ public class require extends Syntax
                 && (Declaration.followAliases(existing)
                     == Declaration.followAliases(fdecl)))
               continue;
-            adecl = defs.getDefine(aname, 'w', tr);
+            adecl = defs.getDefine(aname, 'e', tr);
             adecl.setAlias(true);
             adecl.setIndirectBinding(true);
           }

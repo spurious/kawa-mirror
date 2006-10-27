@@ -787,7 +787,7 @@ public class RunXQTS extends FilterConsumer
     else if (tagMatches("input-query"))
       {
         String variable = attributes.getValue("variable");
-        Symbol symbol = Symbol.make("", variable);
+        Symbol symbol = Symbol.parse(variable);
         String name = attributes.getValue("name");
         String filename
           = directory + '/' + XQueryQueryOffsetPath + testFilePath
@@ -822,7 +822,7 @@ public class RunXQTS extends FilterConsumer
         if (tagMatches("input-file"))
           {
             variable = attributes.getValue("variable");
-            symbol = Symbol.make("", variable);
+            symbol = Symbol.parse(variable);
           }
         else // tagMatches("contextItem")
           {
@@ -851,7 +851,7 @@ public class RunXQTS extends FilterConsumer
         String inputFile = cout.toSubString(elementStartIndex[nesting]);
         String variable = attributes.getValue("variable");
         String path = "file://" + directory + '/' + sources.get(inputFile);
-        Symbol symbol = Symbol.make("", variable);
+        Symbol symbol = Symbol.parse(variable);
         Environment.getCurrent().put(symbol, null,
                                      gnu.kawa.xml.XDataType.toURI(path));
       }

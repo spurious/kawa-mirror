@@ -1,3 +1,7 @@
+2006-10-26  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (endGroup): Use Symbol.parse wher appropriate.
+
 2006-10-19  Per Bothner  <per@bothner.com>
 
 	* TestMisc..java: Applying fn:string to a sequence of two or more items

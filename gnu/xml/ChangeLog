@@ -1,5 +1,11 @@
 2006-10-26  Per Bothner  <per@bothner.com>
 
+	* NodeTree.java: Support "in-line" stringizing of nodes in
+	attribute and similar contexts.
+	(stringizingLevel, stringizingElementLevel): New field.
+	(writteXxx): Check stringizingLevel.
+	* NodeTree.java (endAttribute): If name is 'xml:id' normalize value.
+
 	Re-write, mainly to correctly set in-scope namespaces of element.
 	* NodeTree.java (groupLevel, groupNamespaces, gapStartTag, attrIndexes,
 	workStack, attrCount, inAttribute, copyNamespacesMode): New fields.

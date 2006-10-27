@@ -7,8 +7,10 @@ import gnu.mapping.*;
 import gnu.text.URI_utils;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XName;
-import gnu.kawa.xml.MakeText;  // FIXME
-import gnu.expr.Keyword; // FIXME
+import gnu.kawa.xml.MakeText;  // FIXME - bad cross-package dependency.
+import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
+import gnu.kawa.xml.XDataType; // FIXME - bad cross-package dependency.
+import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -45,17 +47,40 @@ public class NodeTree extends TreeList
   public static final int COPY_NAMESPACES_INHERIT = 2;
   public transient int copyNamespacesMode = COPY_NAMESPACES_PRESERVE;
 
+  /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
+   * If couns the number of nested beginAttributes that are active.
+   * (In the future it should also count begun comment and
+   * processing-instruction constructors, when those support nesting.)
+   */
+  transient protected int stringizingLevel;
+  /** Value of stringizingLevel when beginGroup was seen.
+   * More specifically, the outer-most beginGroup seen when
+   * {@code stringizingLevel > 0}.
+   * All output should be supressed if 
+   * {@code stringizingLevel > stringizingElementLevel && stringizingElementLevel > 0}.
+   * This happens, for example, after this sequence: beginAttribute, beginGroup,
+   * beginAttribute.  In this case the inner attribute should be ignored,
+   * because it is not port of the string value of the beginGroup.
+   */
+  transient protected int stringizingElementLevel;
+
   public void writePosition(AbstractSequence seq, int ipos)
   {
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return;
     seq.consumeNext(ipos, this);
   }
 
-  int gapStartLastAtomic = -1;
+  transient int gapStartLastAtomic = -1;
   private static final int SAW_KEYWORD = -2;
 
   /** If v is a node, make a copy of it. */
   public void writeObject(Object v)
   {
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return;
     if (v instanceof SeqPosition)
       {
 	SeqPosition pos = (SeqPosition) v;
@@ -84,7 +109,7 @@ public class NodeTree extends TreeList
             // Using super.writeObject would be nice, but there are edge cases.
             // Specifically, atomic nodes with a zero-length string-value.
             // For example: <elem>{""}</elem>
-            // Thus should result in zero text nodss.
+            // Thus should result in zero text nodes.
             // Handling that case correctly and efficiently is left for later.
             // FIXME.
             //  super.writeObject(v);
@@ -98,13 +123,17 @@ public class NodeTree extends TreeList
   {
     closeTag();
     groupLevel++;
-    if (true) // for now
+    if (stringizingLevel == 0)
       {
         gapStartTag = gapStart;
         super.beginGroup(0);
         rememberGroup(typeName, type);
         attrCount = 1;
       }
+    else if (stringizingElementLevel == 0)
+      stringizingElementLevel = stringizingLevel;
+    else
+      stringizingLevel++;
   }
 
   public void beginGroup(int index)
@@ -112,7 +141,12 @@ public class NodeTree extends TreeList
     closeTag();
     groupLevel++;
     attrCount = 1;
-    super.beginGroup(index);
+    if (stringizingLevel == 0)
+      super.beginGroup(index);
+    else if (stringizingElementLevel == 0)
+      stringizingElementLevel = stringizingLevel;
+    else
+      stringizingLevel++;
   }
 
   public void setGroupName (int groupIndex, int nameIndex)
@@ -128,7 +162,15 @@ public class NodeTree extends TreeList
   {
     closeTag();
     groupLevel--;
-    super.endGroup(typeName);
+    if (stringizingLevel == 0)
+      super.endGroup(typeName);
+    if (stringizingElementLevel > 0)
+      {
+        if (stringizingElementLevel == stringizingLevel)
+          stringizingElementLevel = 0;
+        else
+          stringizingLevel--;
+      }
     if (groupLevel == 0)
       {
         workStack = null;
@@ -208,6 +250,8 @@ public class NodeTree extends TreeList
     if (groupLevel <= 1 && docStart != 0)
       error("attribute not allowed at document level");
     inAttribute = true;
+    if (stringizingLevel++ > 0)
+      return;
     if (attrCount == 0 && groupLevel > 0)
       error("attribute '"+attrName+"' follows non-attribute content");
     checkAttributeSymbol((Symbol) attrType); // ???
@@ -227,6 +271,8 @@ public class NodeTree extends TreeList
   public void beginAttribute(int index)
   {
     inAttribute = true;
+    if (stringizingLevel++ > 0)
+      return;
     super.beginAttribute(index);
   }
 
@@ -286,9 +332,41 @@ public class NodeTree extends TreeList
       return;
     if (gapStartLastAtomic == SAW_KEYWORD)
       gapStartLastAtomic = -1;
-    else if (attrCount > 0)
+    else if (--stringizingLevel == 0 && attrCount > 0)
       {
         inAttribute = false;
+        int i = groupLevel + 2 * attrCount-2;
+        Object name;
+        boolean isId;
+        if (workStack == null || i >= workStack.length)
+          {
+            // This can happend when we're called from ParsedXMLToConsumer.
+            // Ideally we need the latter to eagerly pass xml:XXX and NCName
+            // attributes (without waiting until the end of the element for
+            // namespace processing).  FIXME.
+            name = null;
+            isId = false;
+          }
+        else
+          {
+            name = workStack[i];
+            isId = "xml:id".equals(name);
+          }
+        if (isId)
+          {
+            int attrIndex = attrIndexes[attrCount-1];
+            /* #ifdef JAVA5 */
+            // StringBuilder sbuf = new StringBuilder();
+            /* #else */
+            StringBuffer sbuf = new StringBuffer();
+            /* #endif */
+            stringValue(attrIndex, sbuf);
+            String id = XDataType.replaceWhitespace(sbuf.toString(), true);
+            gapStart = attrIndex + BEGIN_ATTRIBUTE_LONG_SIZE;
+            int len = id.length();
+            for (i = 0;  i < len;  i++)
+              super.writeChar(id.charAt(i));
+          }
         super.endAttribute();
       }
   }
@@ -296,6 +374,11 @@ public class NodeTree extends TreeList
   public void beginDocument()
   {
     closeTag();
+    if (stringizingLevel > 0)
+      writeJoiner();
+    // We need to increment groupLevel so that endDocument can decrement it.
+    else
+      {
         ensureSpaceInWorkStack(groupLevel);
         Object inherited;
         if (groupLevel++ == 0)
@@ -310,11 +393,16 @@ public class NodeTree extends TreeList
             inherited = workStack[groupLevel-2];
           }
         workStack[groupLevel-1] = inherited;
+      }
   }
 
   public void endDocument ()
   {
-    closeTag();
+    if (stringizingLevel > 0)
+      {
+        writeJoiner();
+        return;
+      }
     if (--groupLevel == 0)
       super.endDocument();
     else
@@ -322,11 +410,16 @@ public class NodeTree extends TreeList
         workStack[groupLevel] = null;
         writeJoiner();
       }
+    if (groupLevel == 0)
+      {
+        workStack = null;
+        attrIndexes = null;
+      }
   }
 
   protected void closeTag ()
   {
-    if (attrCount > 0 && ! inAttribute)
+    if (attrCount > 0 && stringizingLevel == 0)
       {
         NamespaceBinding outer = groupLevel <= 1 ? NamespaceBinding.predefinedXML
         : (NamespaceBinding) workStack[groupLevel-2];
@@ -422,6 +515,9 @@ public class NodeTree extends TreeList
 
   protected boolean checkWriteAtomic ()
   {
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return false;
     closeTag();
     return true;
  }
@@ -503,8 +599,14 @@ public class NodeTree extends TreeList
   public void writeComment(char[] chars, int offset, int length)
   {
     checkValidComment(chars, offset, length);
-    closeTag();
-    super.writeComment(chars, offset, length);
+    if (stringizingLevel == 0)
+      {
+        closeTag();
+        super.writeComment(chars, offset, length);
+      }
+    else if (stringizingLevel < stringizingElementLevel
+             || stringizingElementLevel == 0)
+      super.write(chars, offset, length);
   }
 
   public void checkProcessingInstruction (String target)
@@ -533,14 +635,22 @@ public class NodeTree extends TreeList
               }
           }
       }
-    closeTag();
-    super.writeProcessingInstruction(target, content, offset, length);
+    if (stringizingLevel == 0)
+      {
+        closeTag();
+        super.writeProcessingInstruction(target, content, offset, length);
+      }
+    else if (stringizingLevel < stringizingElementLevel
+             || stringizingElementLevel == 0)
+      super.write(content, offset, length);
   }
 
   protected void writeJoiner ()
   {
     gapStartLastAtomic = -1;
-    super.writeJoiner();
+    if (stringizingLevel <= stringizingElementLevel
+       || stringizingElementLevel == 0)
+      super.writeJoiner();
   }
 
   protected void error (String message)

@@ -2910,31 +2910,6 @@ public class XQParser extends Lexer
 	exp = new ReferenceExp(name);
         break;
       case FNAME_TOKEN:
-	/*
-	if (colon >= 0)
-	  {
-	    String local, uri;
-	    String prefix = new String(tokenBuffer, 0, colon);
-	    colon++;
-	    local = new String(tokenBuffer, colon, tokenBufferLength - colon);
-	    uri = (String) lookupNamespace(prefix);
-	    if (uri == null)
-	      {
-		try
-		  {
-		    Class clas = Class.forName(prefix);
-		    uri = "class:" + prefix;
-		  }
-		catch (Exception ex)
-		  {
-		    syntaxError("unknown namespace '" + prefix + "'");
-		    uri = defaultFunctionNamespace;
-		  }
-	      }
-	    name = Symbol.make(uri, local);
-	  }
-	else
-	*/
 	name = new String(tokenBuffer, 0, tokenBufferLength);
 	char save = pushNesting('(');
 	getRawToken();

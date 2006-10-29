@@ -56,18 +56,29 @@ public class ExpWalker
     return walkExpression(exp);
   }
 
-  protected Expression walkScopeExp (ScopeExp exp)
+  protected final void walkDeclarationType (Declaration decl)
   {
-    for (Declaration decl = exp.firstDecl(); decl != null;
-         decl = decl.nextDecl())
+    Expression texp1 = decl.getTypeExp();
+    if (texp1 != null)
       {
-        Expression texp1 = decl.getTypeExp();
-        if (texp1 == null)
-          continue;
         Expression texp2 = texp1.walk(this);
         if (texp2 != texp1)
           decl.setTypeExp(texp2);
       }
+  }
+
+  protected final void walkDeclarationTypes (ScopeExp exp)
+  {
+    for (Declaration decl = exp.firstDecl(); decl != null;
+         decl = decl.nextDecl())
+      {
+        walkDeclarationType(decl);
+      }
+  }
+
+  protected Expression walkScopeExp (ScopeExp exp)
+  {
+    walkDeclarationTypes(exp);
     return walkExpression(exp);
   }
 

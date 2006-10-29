@@ -45,6 +45,7 @@ public class ResolveNames extends ExpWalker
 
   protected Expression walkScopeExp (ScopeExp exp)
   {
+    walkDeclarationTypes(exp);
     push(exp);
     exp.walkChildren(this);
     lookup.pop(exp);
@@ -53,6 +54,7 @@ public class ResolveNames extends ExpWalker
 
   protected Expression walkLetExp (LetExp exp)
   {
+    walkDeclarationTypes(exp);
     exp.walkInitializers(this);
     push(exp);
     exp.body = (Expression) walk(exp.body);

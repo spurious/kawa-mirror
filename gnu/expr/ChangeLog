@@ -1,5 +1,9 @@
 2006-10-29  Per Bothner  <per@bothner.com>
 
+	* ExpWalker.java (walkDeclarationType, walkDeclarationTypes): New.
+	(walkScopeExp): Use walkDeclarationTypes.
+	* ResolveNames.java (walkScopeExp): Likewise.
+
 	* Expression.java (toString): New method
 	* ApplyExp.java (toString): New method
 

@@ -28,17 +28,18 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Object selector = ctx.getNextArg();
-    Object[] args = { selector };
-    for (int i = 2;  i < ctx.count;  i++)
+    Object[] args = ctx.getArgs();
+    Object selector = args[0];
+    int n = args.length-1;
+    for (int i = 1;  i < n;  i++)
       {
-	MethodProc caseProc = (MethodProc) ctx.getNextArg();
-	// FIXME this does not work.
-	if (caseProc.matchN(args, ctx) >= 0)
+	MethodProc caseProc = (MethodProc) args[i];
+        int m = caseProc.match1(selector, ctx);
+	if (m >= 0)
 	  return;
       }
-    Procedure defaultProc = (Procedure) ctx.getNextArg();
-    defaultProc.check0(ctx);
+    Procedure defaultProc = (Procedure) args[n];
+    defaultProc.check1(selector, ctx);
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)

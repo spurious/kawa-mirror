@@ -21,6 +21,9 @@ public class XName extends Symbol implements Externalizable
     this.namespaceNodes = namespaceNodes;
   }
 
+  /** Namespace nodes associated with an element.
+   * These are in inverse document/parse order.
+   */
   public final NamespaceBinding getNamespaceNodes () { return namespaceNodes; }
   public final void setNamespaceNodes (NamespaceBinding nodes)
   { this.namespaceNodes = nodes; }

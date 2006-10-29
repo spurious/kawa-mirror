@@ -38,6 +38,18 @@ public final class NamespaceBinding implements Externalizable
     this.depth = next == null ? 0 : next.depth + 1;
   }
 
+  /** Chain the first list in front of the second list.
+   * (The name {@code nconc} comes from Common Lisp.)
+   */
+  public final static NamespaceBinding
+  nconc (NamespaceBinding list1, NamespaceBinding list2)
+  {
+    if (list1 == null)
+      return list2;
+    list1.setNext(nconc(list1.next, list2));
+    return list1;
+  }
+
   //  public NamespaceBinding () { }
 
   public NamespaceBinding (String prefix, String uri, NamespaceBinding next)

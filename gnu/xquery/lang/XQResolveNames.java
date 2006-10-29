@@ -554,14 +554,8 @@ public class XQResolveNames extends ResolveNames
     if (proc instanceof MakeElement)
       {
         MakeElement mk = (MakeElement) proc;
-        NamespaceBinding nschain = namespaceSave;
-        for (NamespaceBinding ns = mk.getNamespaceNodes(); ns != null;)
-          {
-            NamespaceBinding next = ns.getNext();
-            ns.setNext(nschain);
-            nschain = ns;
-            ns = next;
-          }
+        NamespaceBinding nschain
+          = NamespaceBinding.nconc(mk.getNamespaceNodes(), namespaceSave);
         mk.setNamespaceNodes(nschain);
         parser.constructorNamespaces = nschain;
       }

@@ -46,11 +46,16 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   // the value of namespaceBindings at the beginGroup.
   NamespaceBinding[] namespaceBindingsAtBeginGroup = new NamespaceBinding[20];
 
+  /** Non-null if we're processing a nameapace declaration attribute.
+   * In that case it is the prefix we defining,
+   * or {@code ""} in the case of a default namespace.  */
+  String currentNamespacePrefix;
+
   /** Number of beginGroups seen without close endGroup. */
   int nesting;
 
   /** Used if we need to save attribute values of namespace attributes. */
-  StringBuffer stringValue;
+  StringBuffer stringValue = new StringBuffer();
 
   /** True if namespace declarations should be passed through as attributes.
    * Like SAX2's http://xml.org/features/namespace-prefixes. */
@@ -77,14 +82,69 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   private void endAttribute()
   {
     inAttribute = false;
-    if (stringValue == null || namespacePrefixes)
+    if (currentNamespacePrefix == null || namespacePrefixes)
       tlist.endAttribute();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
-	String uri = stringValue.toString();
-	uri = uri.length() == 0 ? null : uri.intern();
-	namespaceBindings.uri = uri;
-	stringValue = null;
+        int hash = stringValue.hashCode();
+
+	int bucket = hash & mappingTableMask;
+	MappingInfo info = mappingTable[bucket];
+        String prefix = currentNamespacePrefix == "" ? null
+          : currentNamespacePrefix;
+        // Search for a matching already-seen NamespaceBinding list.
+        // We hash these to so we can share lists that are equal but
+        // appear multiple times in the same XML file, as sometimes happens.
+        // This not only saves memory, but keeps hash bucket chains short,
+        // which is important since we don't resize the table.
+
+        for (;; info = info.nextInBucket)
+          {
+            if (info == null)
+              {
+                info = new MappingInfo();
+                info.nextInBucket = mappingTable[bucket];
+                mappingTable[bucket] = info;
+                String uri = stringValue.toString().intern();
+                // It seems best to hash on the namespace uri, since it is more
+                // likely t be unique than a shorter prefix.  We re-use the
+                // same MappingInfo table that is mainly used for tag lookup,
+                // but re-interpreting the meaning of the various fields.
+                // Since MappingInfo hashes on the 'tag', we store the uri
+                // in that field.
+                info.tagHash = hash;
+                info.prefix = "";
+                info.local = uri;
+                info.tag = uri;
+                info.uri = uri;
+                // We don't actually use this Symbol, but if closeStartTag
+                // should come upon this MappingInfo it should be consistent.
+                Symbol sym = Symbol.make(uri, uri, "");
+                if (uri == "")
+                  uri = null;
+                NamespaceBinding namespaceNodes
+                  = new NamespaceBinding(prefix, uri, namespaceBindings);
+                info.type = new XName(sym, namespaceNodes);
+                break;
+              }
+            XName type = info.type;
+            if (info.tagHash == hash
+                && type != null)
+              {
+                NamespaceBinding namespaceNodes = type.namespaceNodes;
+                if (namespaceNodes != null
+                    && namespaceNodes.getNext() == namespaceBindings
+                    && namespaceNodes.getPrefix() == prefix
+                    && info.match(stringValue))
+                  {
+                    break;
+                  }
+              }
+          }
+        namespaceBindings = info.type.namespaceNodes;
+
+        stringValue.setLength(0);
+	currentNamespacePrefix = null;
       }
   }
 
@@ -107,10 +167,6 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     if (! inStartTag || inAttribute)
       return;
     inStartTag = false;
-
-    NamespaceBinding prevBindings = namespaceBindingsAtBeginGroup[nesting-1];
-    // Reverse current set of bindings to match input order.
-    namespaceBindings = namespaceBindings.reversePrefix(prevBindings);
 
     for (int i = 0;  i <= attrCount; i++)
       {
@@ -208,7 +264,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   private void writeChar(int v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append((char) v);
 	if (! namespacePrefixes)
@@ -220,7 +276,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeBoolean(boolean v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(v);
 	if (! namespacePrefixes)
@@ -232,7 +288,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeFloat(float v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(v);
 	if (! namespacePrefixes)
@@ -244,7 +300,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeDouble(double v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(v);
 	if (! namespacePrefixes)
@@ -256,7 +312,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeInt(int v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       stringValue.append(v);
     base.writeInt(v);
   }
@@ -264,7 +320,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeLong(long v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(v);
 	if (! namespacePrefixes)
@@ -276,7 +332,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   public void writeObject(Object v)
   {
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(v);
 	if (! namespacePrefixes)
@@ -311,7 +367,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
           }
       }
     closeStartTag();
-    if (stringValue != null)
+    if (currentNamespacePrefix != null)
       {
 	stringValue.append(data, start, length);
 	if (! namespacePrefixes)
@@ -382,21 +438,17 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       {
 	if (prefix == "xmlns")
 	  {
-	    namespaceBindings
-	      = new NamespaceBinding(local, null, namespaceBindings);
-	    stringValue = new StringBuffer(100);
+            currentNamespacePrefix = local;
 	  }
       }
     else
       {
 	if (name == "xmlns")
 	  {
-	    namespaceBindings
-	      = new NamespaceBinding(null, null, namespaceBindings);
-	    stringValue = new StringBuffer(100);
+            currentNamespacePrefix = "";
 	  }
       }
-    if (stringValue == null || namespacePrefixes)
+    if (currentNamespacePrefix == null || namespacePrefixes)
       tlist.beginAttribute(0);
     inAttribute = true;
   }
@@ -635,10 +687,22 @@ final class MappingInfo
   /** If non-negative: An index into a TreeList objects array. */
   int index = -1;
 
-  /** An optimization of 'new String(data, start, next).equals(tag)'. */
+  /** An optimization of {@code new String(data, start, next).equals(tag)}. */
   boolean match (char[] data, int start, int length)
   {
     return match(tag, data, start, length);
+  }
+
+  /** An optimization of {@code sbug.toString().equals(tag)}. */
+  boolean match (StringBuffer sbuf)
+  {
+    int length = sbuf.length();
+    if (tag.length () != length)
+      return false;
+    for (int i = 0;  i < length;  i++)
+      if (sbuf.charAt(i) != tag.charAt(i))
+	return false;
+    return true;
   }
 
   static boolean match (String tag, char[] data, int start, int length)

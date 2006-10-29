@@ -1,3 +1,21 @@
+2006-10-29  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java: "Hash-cons" NamespaceBindings, to speed
+	up parsing of XML file with lots of identical namespace declaration
+	attributes - such as XQTS's XQTSCatalog.xml.
+	(currentNamespacePrefix): New field.
+	(stringValue): Pre-allocate rather than allocating one each time.
+	(emitBeginAttribute)): Update accordingly.
+	(endAttribute): Search for or allocate NamespaceBinding.
+	(closeStartTag): Don't reverse NamespaceBinding list.
+	(writeChar etc): Check currentNamespacePrefix rather than stringValue -
+	which now never null.
+	(MappingInfo.match(StringBuffer)): New method.
+	* XName.java: Specify that namespace bindings are in inverse
+	document/parsing order, since that makes parsing easier.
+	* NamespaceBinding.java (nconc): New static helper method.
+	* XMLPrinter.java (beginGroup): Print/sort bindings in reverse order.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (typeValue): Convert to UntypedAtomic for nodes

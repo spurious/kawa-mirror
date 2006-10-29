@@ -1,3 +1,9 @@
+2006-10-29  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (walkApplyExp): Use NamespaceBinding.nconc
+	instead of reversing bindings, since the chain should be in
+	inverse "document order".
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (walkStatements): New recursive helper method.

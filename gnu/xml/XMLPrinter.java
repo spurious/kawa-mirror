@@ -375,17 +375,19 @@ public class XMLPrinter extends OutPort
             while (--j >= 0)
               {
                 NamespaceBinding ns_j = sortedBindings[j];
-                // If (compare(ns, ns_j) >= 0) break:
+                // If (compare(ns, ns_j) <= 0) break:
                 String prefix_j = ns_j.getPrefix();
                 if (prefix == prefix_j)
                   continue check_namespaces;
                 // If we're not canonicalizing, we just want to suppress
                 // duplicates, rather than putting them in order.
+                // Note we put the bindings in reverse order, since that's
+                // the following print loop expects.
                 if (! sortNamespaces)
                   continue;
-                if (prefix_j == null)
+                if (prefix == null)
                   break;
-                if (prefix != null && prefix.compareTo(prefix_j) >= 0)
+                if (prefix_j != null && prefix.compareTo(prefix_j) <= 0)
                   break;
                 sortedBindings[j+1] = ns_j;
               }
@@ -397,7 +399,9 @@ public class XMLPrinter extends OutPort
             i++;
           }
         numBindings = i;
-	for (i = 0;  i < numBindings;  i++)
+        // Note we print the bindings in reverse order, since the chain
+        // is in reverse document order.
+        for (i = numBindings; --i >= 0; )
 	  {
             NamespaceBinding ns = sortedBindings[i];
 	    String prefix = ns.prefix;

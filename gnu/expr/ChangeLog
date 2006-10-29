@@ -1,3 +1,8 @@
+2006-10-29  Per Bothner  <per@bothner.com>
+
+	* Expression.java (toString): New method
+	* ApplyExp.java (toString): New method
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (currentLambda): Make protected, for XQResolveNames.

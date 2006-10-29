@@ -517,4 +517,8 @@ public class ApplyExp extends Expression
       }
   }
 
+  public String toString ()
+  {
+    return "ApplyExp/"+args.length+'['+func+']';
+  }
 }

@@ -315,4 +315,12 @@ public abstract class Expression extends Procedure0 implements Printable
 
   /** True if evaluating may have side-effects. */
   public boolean side_effects () { return true; }
+
+  public String toString ()
+  {
+    String tname = getClass().getName();
+    if (tname.startsWith("gnu.expr."))
+      tname = tname.substring(9);
+    return tname+"@"+Integer.toHexString(hashCode());
+  }
 }

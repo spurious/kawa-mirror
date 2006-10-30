@@ -1,5 +1,7 @@
 2006-10-30  Per Bothner  <per@bothner.com>
 
+	* KNode.java (base): New convenience method.
+
 	* ElementType.java (anyElement): New static final field.
 
 2006-10-29  Per Bothner  <per@bothner.com>

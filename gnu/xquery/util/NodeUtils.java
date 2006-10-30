@@ -168,8 +168,7 @@ public class NodeUtils
       return arg;
     if (! (arg instanceof KNode))
       throw new WrongType("base-uri", 1, arg, "node()?");
-    KNode node = (KNode) arg;
-    Object uri = ((NodeTree) node.sequence).baseUriOfPos(node.ipos, true);
+    Object uri = ((KNode) arg).baseURI();
     return uri == null ? Values.empty : uri;
   }
 

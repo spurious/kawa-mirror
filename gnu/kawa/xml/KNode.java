@@ -365,6 +365,14 @@ public abstract class KNode extends SeqPosition
     return ((NodeTree) sequence).posLookupPrefix(ipos, namespaceURI);
   }
 
+  public Object baseURI ()
+  /* #ifdef use:java.net.URI */
+    throws java.net.URISyntaxException
+  /* #end */
+  {
+    return ((NodeTree) sequence).baseUriOfPos(ipos, true);
+  }
+
   /* #ifdef use:org.w3c.dom.Node */
   // public short compareDocumentPosition (Node other)
   //   throws DOMException

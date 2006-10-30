@@ -1,5 +1,7 @@
 2006-10-30  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (baseUri): Use new KNode baseURI convenience method.
+
 	* NodeUtils.java (getIDs, id$X, idScan, idref): New static methods,
 	implementing fn:id and a dummy fn.idref.
 

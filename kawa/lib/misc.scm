@@ -106,8 +106,8 @@
 
 (define (base-uri #!optional (node #!null))
   (let ((uri (if (eq? node #!null)
-		 (invoke-static <gnu.kawa.functions.BaseUri> 'baseUri)
-		 (invoke-static <gnu.kawa.functions.BaseUri> 'baseUri node))))
+		 ((gnu.mapping.CallContext:getInstance):getBaseUri)
+		 ((as <gnu.kawa.xml.KNode> node):baseURI))))
     (if (eq? uri #!void) #f uri)))
 
 #|

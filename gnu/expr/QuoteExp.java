@@ -88,7 +88,11 @@ public class QuoteExp extends Expression
     if (comp.inlineOk(proc))
       {
 	if (proc instanceof Inlineable)
-	  return new ApplyExp(this, exp.getArgs()).setLine(exp);
+          {
+            if (exp.getFunction() == this)
+              return exp;
+            return new ApplyExp(this, exp.getArgs()).setLine(exp);
+          }
 	PrimProcedure mproc
 	  = PrimProcedure.getMethodFor(proc, decl, exp.args,
 				       comp.getLanguage());

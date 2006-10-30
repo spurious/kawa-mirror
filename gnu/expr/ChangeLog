@@ -1,3 +1,7 @@
+2006-10-30  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (inline): Minor optimization - reuse ApplyExp.
+
 2006-10-29  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (walkDeclarationType, walkDeclarationTypes): New.

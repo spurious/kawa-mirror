@@ -953,8 +953,9 @@ public class XQResolveNames extends ResolveNames
   Expression getBaseUriExpr ()
   {
     Compilation comp = getCompilation();
-    if (parser.baseURI != null)
-      return QuoteExp.getInstance(parser.baseURI);
+    String staticBaseUri = parser.getStaticBaseUri();
+    if (staticBaseUri != null)
+      return QuoteExp.getInstance(staticBaseUri);
     else
       return gnu.kawa.functions.GetModuleClass.getModuleClassURI(comp);
   }

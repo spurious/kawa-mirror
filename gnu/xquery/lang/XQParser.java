@@ -21,6 +21,7 @@ import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
 import gnu.xquery.util.QNameUtils;
+import gnu.xquery.util.ValuesFilter;
 import kawa.standard.require;
 
 /** A class to read xquery forms. */
@@ -78,6 +79,17 @@ public class XQParser extends Lexer
 
   String baseURI = null;
   boolean baseURIDeclarationSeen;
+  public String getStaticBaseUri ()
+  {
+    if (baseURI == null)
+      {
+        Environment env = Environment.getCurrent();
+        Object value = env.get(Symbol.make("", "base-uri"), null, null);
+        if (value != null)
+          baseURI = value.toString();
+      }
+    return baseURI;
+  }
 
   boolean boundarySpacePreserve;
   boolean boundarySpaceDeclarationSeen;
@@ -2648,7 +2660,7 @@ public class XQParser extends Lexer
 
   Expression wrapWithBaseUri (Expression exp)
   {
-    if (baseURI == null)
+    if (getStaticBaseUri() == null)
       return exp;
     return new ApplyExp(MakeWithBaseUri.makeWithBaseUri,
                         new Expression[] { 
@@ -3923,7 +3935,7 @@ public class XQParser extends Lexer
 	  {
             if (! InPort.uriSchemeSpecified(collation))
               {
-                String base = baseURI;
+                String base = getStaticBaseUri();
                 if (base == null)
                   base = CallContext.getInstance().getBaseUri();
                 collation = URI_utils.resolve(collation, base).toString();

@@ -1,5 +1,10 @@
 2006-10-30  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (getStaticBaseUri): New method.  If baseURI hasn't
+	been set yet, try 'base-uri' in the environment (from command-line).
+	(wrapWithBaseUri, parse): Use getStaticBaseUri.
+	* XQResolveNames.java (getBaseUriExpr): Likewise.
+
 	* XQResolveNames.java (ID_BUILTIN, IDREF_BUILTIN): New constants.
 	(<init>): Push fn:id and fn:idref.
 	(walkApplyExp): Handle ID_BUILTIN and IDREF_BUILTIN.

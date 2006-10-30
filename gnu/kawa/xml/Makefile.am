@@ -49,6 +49,7 @@ java_sources = \
   NodeName.java \
   Nodes.java \
   NodeType.java \
+  Notation.java \
   OutputAsXML.java \
   ParentAxis.java \
   PrecedingAxis.java \

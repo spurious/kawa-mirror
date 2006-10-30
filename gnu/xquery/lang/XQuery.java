@@ -792,6 +792,7 @@ public class XQuery extends Language
       "anyURI", XDataType.anyURIType,
       "hexBinary", XDataType.hexBinaryType,
       "base64Binary", XDataType.base64BinaryType,
+      "NOTATION", XDataType.NotationType,
       "QName", "gnu.mapping.Symbol",
       "anyAtomicType", Type.pointer_type
     };

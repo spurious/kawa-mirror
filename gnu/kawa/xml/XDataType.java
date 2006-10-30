@@ -106,6 +106,11 @@ public class XDataType extends Type implements TypeValue
                   /* #endif */
                   ANY_URI_TYPE_CODE);
 
+  public static final XDataType NotationType =
+    new XDataType("NOTATION",
+                  ClassType.make("gnu.kawa.xml.Notation"),
+                  NOTATION_TYPE_CODE);
+
   public static final XDataType decimalType =
     // A decimal value is implemented using java.math.BigDecimal.
     // However, the integer sub-type is implemented using gnu.math.IntNum.

@@ -1556,8 +1556,13 @@ public class XQParser extends Lexer
       }
     else
       return null;
-    if (parseContext == 'C' && type == Type.pointer_type)
-      return syntaxError("type to 'cast as' or 'castable as' must be atomic");
+    if (parseContext == 'C')
+      {
+        if (type == Type.pointer_type)
+          return syntaxError("type to 'cast as' or 'castable as' must be atomic", "XPST0080");
+        if (type == XDataType.NotationType)
+          return syntaxError("type to 'cast as' or 'castable as' cannot be NOTATION", "XPST0080");
+      }
     return QuoteExp.getInstance(type);
   }
 

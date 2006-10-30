@@ -1,3 +1,9 @@
+2006-10-29  Per Bothner  <per@bothner.com>
+
+	* Notation.java: New class.
+	* Makefile.am: Update accordingly.
+	* XDataType.java (NotationType): New static field.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* KNode.java (atomicValue): Don't convert to UntypedAtomic here;

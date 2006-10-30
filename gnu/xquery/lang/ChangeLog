@@ -1,5 +1,9 @@
 2006-10-29  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (typeName): Map 'NOTATION' to NotationType.
+	* XQParser.java (parseItemType): Error if 'cast as' or 'castable as'
+	NOTATION.  Better error message for other bad type.
+
 	* XQResolveNames.java (walkApplyExp): Use NamespaceBinding.nconc
 	instead of reversing bindings, since the chain should be in
 	inverse "document order".

@@ -1,3 +1,8 @@
+2006-10-30  Per Bothner  <per@bothner.com>
+
+	* NodeUtils.java (getIDs, id$X, idScan, idref): New static methods,
+	implementing fn:id and a dummy fn.idref.
+
 2006-10-25  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java (lookupPrefix): New method based on resolvePrefix,

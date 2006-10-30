@@ -10,6 +10,7 @@ import gnu.xml.XName;
 import gnu.kawa.xml.MakeText;  // FIXME - bad cross-package dependency.
 import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
 import gnu.kawa.xml.XDataType; // FIXME - bad cross-package dependency.
+import gnu.kawa.xml.ElementType; // FIXME - bad cross-package dependency.
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
@@ -905,5 +906,119 @@ public class NodeTree extends TreeList
     consume(xp);
     wr.close();
     return wr.toString();
+  }
+
+  /** If non-null, a hash-table of ID names. */
+  String[] idNames;
+  /** If non-null, a mapping of element ipos values mapped by idNames.
+   * If {@code idNames[i]} is non-null, then {@code idOffsets[i]} is the
+   * ipos value of the first element that has the former as its ID property. */
+  int[] idOffsets;
+  /** Number of non-null entries in idNames. */
+  int idCount;
+
+  public void makeIDtableIfNeeded ()
+  {
+    if (idNames != null)
+      return;
+    // Force allocation - in case there are no xml:id nodes,
+    // so we don't scan multiple times.
+    int size = 64;
+    idNames = new String[size];
+    idOffsets = new int[size];
+    int limit = endPos();
+    int ipos = 0;
+    for (;;)
+      {
+	ipos = nextMatching(ipos, ElementType.anyElement, limit, true);
+	if (ipos == 0)
+	  break;
+        // Until we do validation, we only recognize 'xml:id' as setting
+        // the is-id property.  FIXME.
+        int attr = getAttributeI(ipos, NamespaceBinding.XML_NAMESPACE, "id");
+        if (attr != 0)
+          {
+            enterID(KNode.getNodeValue(this, attr), ipos);
+          }
+      }
+  }
+
+  void enterID (String name, int offset)
+  {
+    int size;
+    String[] tmpNames = idNames;
+    int[] tmpOffsets = idOffsets;
+    if (tmpNames == null)
+      {
+        size = 64;
+        idNames = new String[size];
+        idOffsets = new int[size];
+      }
+    else if (4 * idCount >= 3 * (size = idNames.length))
+      {
+        idNames = new String[2 * size];
+        idOffsets = new int[2 * size];
+        idCount = 0;
+        for (int i = size;  --i >= 0; )
+          {
+            String oldName = tmpNames[i];
+            if (oldName != null)
+              enterID(oldName, tmpOffsets[i]);
+          }
+        tmpNames = idNames;
+        tmpOffsets = idOffsets;
+        size = 2 * size;
+      }
+    int hash = name.hashCode();
+    int mask = size - 1;
+    int index = hash & mask;
+    // Must be odd - or more specifically relatively prime with size,
+    int step = (~hash << 1) | 1;
+    for (;;)
+      {
+        String oldName = tmpNames[index];
+        if (oldName == null)
+          {
+            tmpNames[index] = name;
+            tmpOffsets[index] = offset;
+            break;
+          }
+        if (oldName.equals(name)) // intern and == ?? FIXME
+          {
+            // Nothing to do.
+            return;
+          }
+        index = (index + step) & mask;
+      }
+    idCount++;
+  }
+
+  /** Look for an element with matching ID.
+   * Returns an element ipos, or -1 if not found.
+   * Since we don't do any validation, for now only attributes with the
+   * name {@code xml:id} are recognized has having the {@code is-id} property.
+   * Assumes makeIDtableIfNeeded has been called at soem point.
+   */
+  public int lookupID (String name)
+  {
+    String[] tmpNames = idNames;
+    int[] tmpOffsets = idOffsets;
+    int size = idNames.length;
+    int hash = name.hashCode();
+    int mask = size - 1;
+    int index = hash & mask;
+    // Must be odd - or more specifically relatively prime with size,
+    int step = (~hash << 1) | 1;
+    for (;;)
+      {
+        String oldName = tmpNames[index];
+        if (oldName == null)
+          return -1;
+        if (oldName.equals(name)) // intern and == ?? FIXME
+          {
+            return tmpOffsets[index];
+          }
+        index = (index + step) & mask;
+      }
   }
 }

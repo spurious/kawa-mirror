@@ -18,6 +18,8 @@ implements TypeValue, Externalizable, GroupPredicate
 
   Symbol qname;
 
+  public static final ElementType anyElement = make(null, null);
+
   /** An element type for match by name.
    * @param localName if null matches any local name; otherwise must
    *  be intered, and matches by identity.

@@ -5,7 +5,8 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.xml.*;
 import gnu.kawa.xml.*;
-import gnu.lists.Consumer;
+import gnu.lists.*;
+import java.util.Stack;
 
 public class NodeUtils
 {
@@ -104,7 +105,7 @@ public class NodeUtils
     if (! (arg instanceof KNode))
       throw new WrongType("root", 1, arg, "node()?");
     KNode node = (KNode) arg;
-    return gnu.kawa.xml.Nodes.root((NodeTree) node.sequence, node.getPos());
+    return Nodes.root((NodeTree) node.sequence, node.getPos());
   }
 
   public static String getLang (KNode node)
@@ -170,5 +171,117 @@ public class NodeUtils
     KNode node = (KNode) arg;
     Object uri = ((NodeTree) node.sequence).baseUriOfPos(node.ipos, true);
     return uri == null ? Values.empty : uri;
+  }
+
+  /** Extract canditate IDREFs from arg.
+   * @return null (if no IDREFs); a String (if a single IDREF);
+   *   or a Stack (if more than one IDREFs).
+   */
+  static Object getIDs (Object arg, Object collector)
+  {
+    if (arg instanceof KNode)
+      arg = KNode.atomicValue(arg);
+    if (arg instanceof Values)
+      {
+        Object[] ar = ((Values) arg).getValues();
+        for (int i = ar.length; --i >= 0; )
+          collector = getIDs(ar[i], collector);
+      }
+    else
+      {
+        String str = StringUtils.coerceToString(arg, "fn:id", 1, "");
+        int len = str.length();
+        int i = 0;
+        while (i < len)
+          {
+            char ch = str.charAt(i++);
+            if (Character.isWhitespace(ch))
+              continue;
+            int start = XName.isNameStart(ch) ? i - 1 : len;
+            while (i < len)
+              {
+                ch = str.charAt(i);
+                if (Character.isWhitespace(ch))
+                  break;
+                i++;
+                if (start < len && ! XName.isNamePart(ch))
+                  start = len;
+              }
+            if (start < len)
+              {
+                String ref = str.substring(start, i);
+                if (collector == null)
+                  collector = ref;
+                else
+                  {
+                    Stack st;
+                    if (collector instanceof Stack)
+                      st = (Stack) collector;
+                    else
+                      {
+                        st = new Stack();
+                        st.push(collector);
+                        collector = st;
+                      }
+                    st.push(ref);
+                  }
+              }
+            i++;
+          }
+      }
+    return collector;
+  }
+
+  public static void id$X (Object arg1, Object arg2, CallContext ctx)
+  {
+    KNode node = (KNode) arg2;
+    NodeTree ntree = (NodeTree) node.sequence;
+    KDocument root
+      = (KDocument) Nodes.root(ntree, node.ipos);
+    Consumer out = ctx.consumer;
+    Object idrefs = getIDs(arg1, null);
+    if (idrefs == null)
+      return;
+    ntree.makeIDtableIfNeeded();
+    if (out instanceof PositionConsumer
+        && (idrefs instanceof String || out instanceof SortedNodes))
+      idScan(idrefs, ntree, (PositionConsumer) out);
+    else if (idrefs instanceof String)
+      {
+        int pos = ntree.lookupID((String) idrefs);
+        if (pos != -1)
+          out.writeObject(KNode.make(ntree, pos));
+      }
+    else
+      {
+        SortedNodes nodes = new SortedNodes();
+        idScan(idrefs, ntree, nodes);
+        Values.writeValues(nodes, out);
+      }
+  }
+
+  private static void idScan (Object ids, NodeTree seq, PositionConsumer out)
+  {
+    if (ids instanceof String)
+      {
+        int pos = seq.lookupID((String) ids);
+        if (pos != -1)
+          out.writePosition(seq, pos);
+      }
+    else if (ids instanceof Stack)
+      {
+        Stack st = (Stack) ids;
+        int n = st.size();
+        for (int i = 0;  i < n;  i++)
+          idScan(st.elementAt(i), seq, out);
+      }
+  }
+
+  public static Object idref (Object arg1, Object arg2)
+  {
+    KNode node = (KNode) arg2;
+    KDocument root
+      = (KDocument) Nodes.root((NodeTree) node.sequence, node.getPos());
+    return Values.empty;
   }
 }

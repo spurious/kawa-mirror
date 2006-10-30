@@ -1,3 +1,9 @@
+2006-10-30  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (ID_BUILTIN, IDREF_BUILTIN): New constants.
+	(<init>): Push fn:id and fn:idref.
+	(walkApplyExp): Handle ID_BUILTIN and IDREF_BUILTIN.
+
 2006-10-29  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (typeName): Map 'NOTATION' to NotationType.

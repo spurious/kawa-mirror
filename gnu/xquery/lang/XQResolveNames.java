@@ -106,8 +106,14 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>default-collation</code> function. */
   public static final int DEFAULT_COLLATION_BUILTIN = -29;
 
+  /** Code number for the special <code>id</code> function. */
+  public static final int ID_BUILTIN = -30;
+
+  /** Code number for the special <code>idref</code> function. */
+  public static final int IDREF_BUILTIN = -31;
+
   /** Code number for internal function to handle extensions. */
-  public static final int HANDLE_EXTENSION_BUILTIN = -30;
+  public static final int HANDLE_EXTENSION_BUILTIN = -32;
 
   public static final Declaration handleExtensionDecl
     = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
@@ -189,6 +195,8 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("max", MAX_BUILTIN);
     pushBuiltin("number", NUMBER_BUILTIN);
     pushBuiltin("default-collation", DEFAULT_COLLATION_BUILTIN);
+    pushBuiltin("id", ID_BUILTIN);
+    pushBuiltin("idref", IDREF_BUILTIN);
   }
 
   public Namespace[] functionNamespacePath
@@ -675,6 +683,18 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
                     .getDeclaredMethod("lang", 2);
                   return withContext(meth, exp.getArgs(), "fn:lang", 1);
+                }
+              case ID_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("id$X", 3);
+                  return withContext(meth, exp.getArgs(), "fn:id", 1);
+                }
+              case IDREF_BUILTIN:
+		{
+                  Method meth = ClassType.make("gnu.xquery.util.NodeUtils")
+                    .getDeclaredMethod("idref", 2);
+                  return withContext(meth, exp.getArgs(), "fn:idref", 1);
                 }
 
               case STATIC_BASE_URI_BUILTIN:

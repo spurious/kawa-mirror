@@ -1,5 +1,7 @@
 2006-10-30  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (getExternal): Fall back to general coerceFromObject.
+
 	* XQParser.java (getStaticBaseUri): New method.  If baseURI hasn't
 	been set yet, try 'base-uri' in the environment (from command-line).
 	(wrapWithBaseUri, parse): Use getStaticBaseUri.

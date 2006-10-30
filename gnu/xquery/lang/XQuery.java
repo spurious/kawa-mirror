@@ -968,6 +968,8 @@ public class XQuery extends Language
                       null, null);
     if (value == null)
       throw new RuntimeException("unbound external "+name);
+    if (type == null)
+      return value;
     if (type instanceof XDataType)
       return ((XDataType) type).cast(value);
     if (type instanceof ClassType)
@@ -975,12 +977,20 @@ public class XQuery extends Language
         String cname = ((ClassType) type).getName();
         // KLUDGE - FIXME
         if ("gnu.math.IntNum".equals(cname))
-          value = IntNum.valueOf(value.toString());
-        else if ("gnu.math.RealNum".equals(cname))
-          value = gnu.math.DFloNum.make(Double.parseDouble(value.toString()));
-        else
-          throw new Error("cast to "+cname+" for external "
-                          +name+" not implemented");
+          return IntNum.valueOf(value.toString());
+        if ("gnu.math.RealNum".equals(cname))
+          return gnu.math.DFloNum.make(Double.parseDouble(value.toString()));
+      }
+    try
+      {
+        value = ((Type) type).coerceFromObject(value);
+      }
+    catch (ClassCastException ex)
+      {
+        throw new WrongType(name.toString(),
+                            WrongType.ARG_VARNAME,
+                            value,
+                            type.toString());
       }
     return value;
   }

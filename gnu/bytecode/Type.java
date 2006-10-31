@@ -29,7 +29,11 @@ public abstract class Type {
   }
 
   // Maps java.lang.Class to corresponding Type.
-  static java.util.Hashtable mapClassToType;
+  /* #ifdef JAVA2 */
+  static java.util.WeakHashMap mapClassToType;
+  /* #else */
+  // static java.util.Hashtable mapClassToType;
+  /* #endif */
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
   static java.util.Hashtable mapNameToType;
@@ -68,7 +72,13 @@ public abstract class Type {
   public static void registerTypeForClass(Class clas, Type type)
   {
     if (mapClassToType == null)
-      mapClassToType = new java.util.Hashtable(100);
+      {
+        /* #ifdef JAVA2 */
+        mapClassToType = new java.util.WeakHashMap(100);
+        /* #else */
+        // mapClassToType = new java.util.Hashtable(100);
+        /* #endif */
+      }
     mapClassToType.put(clas, type);
     type.reflectClass = clas;
   }

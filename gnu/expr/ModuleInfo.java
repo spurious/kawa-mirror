@@ -103,11 +103,21 @@ public class ModuleInfo
     if ((mod.flags & ModuleExp.LAZY_DECLARATIONS) == 0)
       return mod;
     mod.setFlag(false, ModuleExp.LAZY_DECLARATIONS);
-    ClassType type = ClassType.make(className);
+    ClassType type;
+    Class rclass;
+    if (moduleClass != null)
+      {
+        rclass = moduleClass;
+        type = (ClassType) Type.make(rclass);
+      }
+    else
+      {
+        type = ClassType.make(className);
+        rclass = type.getReflectClass();
+      }
     Object instance = null;
 
     Language language = Language.getDefaultLanguage();
-    Class rclass = type.getReflectClass();
     for (Field fld = type.getFields();  fld != null;  fld = fld.getNext())
       {
 	int flags = fld.getFlags();

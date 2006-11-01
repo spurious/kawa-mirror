@@ -64,7 +64,14 @@ public class QuoteExp extends Expression
 
   public void compile (Compilation comp, Target target)
   {
-    comp.compileConstant(value, target);
+    if (type == null || type == Type.pointer_type
+        || target instanceof IgnoreTarget)
+      comp.compileConstant(value, target);
+    else
+      {
+        comp.compileConstant(value, StackTarget.getInstance(type));
+        target.compileFromStack(comp, type);
+      }
   }
  
   protected Expression walk (ExpWalker walker)

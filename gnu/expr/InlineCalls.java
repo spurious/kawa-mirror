@@ -55,13 +55,11 @@ public class InlineCalls extends ExpWalker
       }
     if (test instanceof QuoteExp)
       {
-	Language language = comp.getLanguage();
-	if (language.isTrue(((QuoteExp) test).getValue()))
-	  return exp.then_clause;
-	else
-	  return exp.else_clause == null ? QuoteExp.voidExp : exp.else_clause;
+        return walk(comp.getLanguage().isTrue(((QuoteExp) test).getValue())
+                    ? exp.then_clause
+                    : exp.else_clause == null ? QuoteExp.voidExp
+                    : exp.else_clause);
       }
-
     exp.test = test;
     if (exitValue == null)
       exp.then_clause = walk(exp.then_clause);

@@ -1,5 +1,11 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* QuoteExp.java (compile): Handle the case when we have an
+	explicit type for the constant, whih may require special conversion.
+
+	* InlineCalls.java (walkIfExp): Must walk then/else
+	after constant folding.
+
 	* ApplyExp.java (getArg, setArg): New method.
 
 	* ApplyExp (print): Also print type if interesting.

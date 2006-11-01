@@ -1,3 +1,11 @@
+2006-10-31  Per Bothner  <per@bothner.com>
+
+	* NodeType.java (documentNodeTest, textNodeTest, commentNodeTest,
+	anyNodeTest): New static fields, moved to XQParser.
+	* DescendantOrSelfAxis.java (anyNode): New static field.
+	(<init>): New private constructor.
+	(make): Return anyNode if appropriate.  Use new constructor.
+
 2006-10-30  Per Bothner  <per@bothner.com>
 
 	* KNode.java (base): New convenience method.

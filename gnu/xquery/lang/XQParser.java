@@ -21,6 +21,7 @@ import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
 import gnu.xquery.util.QNameUtils;
+import gnu.xquery.util.RelativeStep;
 import gnu.xquery.util.ValuesFilter;
 import kawa.standard.require;
 
@@ -1497,22 +1498,22 @@ public class XQParser extends Lexer
 
       case OP_TEXT:
         parseSimpleKindType();
-        type = textNodeTest;
+        type = NodeType.textNodeTest;
         break;
 
       case OP_COMMENT:
         parseSimpleKindType();
-        type = commentNodeTest;
+        type = NodeType.commentNodeTest;
         break;
 
       case OP_DOCUMENT:
         parseSimpleKindType();
-        type = documentNodeTest;
+        type = NodeType.documentNodeTest;
         break;
 
       case OP_NODE:
         parseSimpleKindType();
-        type = anyNodeTest;
+        type = NodeType.anyNodeTest;
         break;
 
       case OP_PI:
@@ -1947,7 +1948,7 @@ public class XQParser extends Lexer
 	    curToken = '/';
 	    Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
 	    Expression[] args = { dot };
-	    TreeScanner op = DescendantOrSelfAxis.make(anyNodeTest);
+	    TreeScanner op = DescendantOrSelfAxis.anyNode;
 	    lexp.body = new ApplyExp(op, args);
             beforeSlashSlash = exp;
 	  }
@@ -2032,7 +2033,7 @@ public class XQParser extends Lexer
 	if (axis == AXIS_PARENT)
 	  {
 	    Expression[] args = { exp };
-	    exp = new ApplyExp(ParentAxis.make(anyNodeTest), args);
+	    exp = new ApplyExp(ParentAxis.make(NodeType.anyNodeTest), args);
 	  }
         // Note that '..' is an AbbrevReverseStep,
         // but '.' is a FilterExpr - and hence not a valid ForwardStep.
@@ -4210,15 +4211,6 @@ public class XQParser extends Lexer
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "reverseFilter");
   static final Expression funcExprFilter
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "exprFilter");
-
-  static final NodeType documentNodeTest
-  = new NodeType("document-node", NodeType.DOCUMENT_OK);
-  static final NodeType textNodeTest
-    = new NodeType("text", NodeType.TEXT_OK);
-  static final NodeType commentNodeTest
-    = new NodeType("comment", NodeType.COMMENT_OK);
-  static final NodeType anyNodeTest
-    = new NodeType("node");
 
   /** Helper method for debugging. */
   String tokenString()

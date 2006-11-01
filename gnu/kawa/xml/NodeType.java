@@ -202,4 +202,13 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
       setName(name);
     kinds = in.readInt();
   }
+
+  public static final NodeType documentNodeTest =
+    new NodeType("document-node", DOCUMENT_OK);
+  public static final NodeType textNodeTest =
+    new NodeType("text", TEXT_OK);
+  public static final NodeType commentNodeTest =
+    new NodeType("comment", COMMENT_OK);
+  public static final NodeType anyNodeTest =
+    new NodeType("node");
 }

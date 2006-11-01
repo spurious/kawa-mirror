@@ -8,11 +8,19 @@ import gnu.lists.*;
 
 public class DescendantOrSelfAxis extends TreeScanner
 {
+  public static final DescendantOrSelfAxis anyNode =
+    new DescendantOrSelfAxis(NodeType.anyNodeTest);
+
+  private DescendantOrSelfAxis (NodePredicate type)
+  {
+    this.type = type;
+  }
+
   public static DescendantOrSelfAxis make (NodePredicate type)
   {
-    DescendantOrSelfAxis axis = new DescendantOrSelfAxis();
-    axis.type = type;
-    return axis;
+    if (type == NodeType.anyNodeTest)
+      return anyNode;
+    return new DescendantOrSelfAxis(type);
   }
 
   public void scan (AbstractSequence seq, int ipos, PositionConsumer out)

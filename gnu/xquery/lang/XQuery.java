@@ -739,10 +739,15 @@ public class XQuery extends Language
     Language.setDefaults(new XQuery());
   }
 
+  static public QuoteExp falseExp =
+    new QuoteExp(Boolean.FALSE, XDataType.booleanType);
+  static public QuoteExp trueExp =
+    new QuoteExp(Boolean.TRUE, XDataType.booleanType);
+
   public static final ConstantFunction0 falseFunction
-    = new ConstantFunction0("false", Boolean.FALSE);
+    = new ConstantFunction0("false", falseExp);
   public static final ConstantFunction0 trueFunction
-    = new ConstantFunction0("true", Boolean.TRUE);
+    = new ConstantFunction0("true", trueExp);
 
   public static final XMLFormat writeFormat = new XMLFormat();
 
@@ -755,8 +760,6 @@ public class XQuery extends Language
   {
     return new XMLPrinter(out, false);
   }
-
-  LangPrimType booleanType;
 
   static Object[] typeMap =
     { "string", XDataType.stringType,
@@ -828,11 +831,7 @@ public class XQuery extends Language
       {
 	String name = clas.getName();
 	if (name.equals("boolean"))
-	  {
-	    if (booleanType == null)
-	      booleanType = new LangPrimType(Type.boolean_type, this);
-	    return booleanType;
-	  }
+          return XDataType.booleanType;
 	return Scheme.getNamedType(name);
       }
     else if (! clas.isArray())

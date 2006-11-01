@@ -1,3 +1,9 @@
+2006-10-31  Per Bothner  <per@bothner.com>
+
+	* ConstantFunction0.java (constant): New QuoteExp field.
+	(<init>): Newo constructor takes QuoteExp.
+	(inline): Return constant field.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObject): Write HTML symbol with

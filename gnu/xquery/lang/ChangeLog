@@ -1,5 +1,17 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (trueExp, falseExp): New static fields.
+	(booleanType): Remove field - use XDataType.booleanType instead.
+	(getTypeFor): Update accordingly.
+	* XQParser.java (parseBinaryExpr): Use now type-correct constants.
+	This simplifies optimizations at inlining time.
+
+	* XQParser.java: Use QuoteExps that directly use RelativeStep
+	and ValuesFilter instances.
+	(funcForwardFilter, funcReverseFilter, funcExprFilter): Removed.
+
+	* XQResolveNames.java:  Set type for doc and doc-available calls.
+
 	* XQParser.java (documentNodeTest, textNodeTest, commentNodeTest,
 	anyNodeTest): Removed fields, now in NodeType.
 	Update various references.

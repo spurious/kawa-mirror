@@ -1,5 +1,8 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (compare): Compare wapped always if not ClassType.
+	For example for XDataType.  Also a simplification.
+
 	* Type.java (mapClassToType): Use WeakHashMap if JAVA2.
 
 2006-09-11  Per Bothner  <per@bothner.com>

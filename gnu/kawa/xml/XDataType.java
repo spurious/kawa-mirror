@@ -94,7 +94,7 @@ public class XDataType extends Type implements TypeValue
                   HEX_BINARY_TYPE_CODE);
 
   public static final XDataType booleanType =
-    new XDataType("boolean", ClassType.make("java.lang.Boolean"),
+    new XDataType("boolean", Type.boolean_type,
                   BOOLEAN_TYPE_CODE);
 
   public static final XDataType anyURIType =
@@ -114,7 +114,7 @@ public class XDataType extends Type implements TypeValue
   public static final XDataType decimalType =
     // A decimal value is implemented using java.math.BigDecimal.
     // However, the integer sub-type is implemented using gnu.math.IntNum.
-    // So we use their common supertype as teh implementationType.
+    // So we use their common supertype as the implementationType.
     new XDataType("decimal", ClassType.make("java.lang.Number"),
                   DECIMAL_TYPE_CODE);
 
@@ -158,9 +158,33 @@ public class XDataType extends Type implements TypeValue
     implementationType.emitCoerceFromObject(code);
   }
 
-  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  public void emitCoerceToObject (CodeAttr code)
+  {
+    if (typeCode == BOOLEAN_TYPE_CODE)
+      implementationType.emitCoerceToObject(code);
+    else
+      super.emitCoerceToObject(code);
+  }
+
+ public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
   {
     CodeAttr code = comp.getCode();
+    if (typeCode == BOOLEAN_TYPE_CODE)
+      {
+        if (incoming != null)
+          code.emitLoad(incoming);
+        Type.boolean_ctype.emitIsInstance(code);
+        code.emitIfIntNotZero();
+        if (decl != null)
+          {
+            // Error if incoming is null.
+            code.emitLoad(incoming);
+            Type.boolean_type.emitCoerceFromObject(code);
+            decl.compileStore(comp);
+          }
+        return;
+      }
+
     comp.compileConstant(this, Target.pushObject);
     if (incoming == null)
       code.emitSwap();

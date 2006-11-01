@@ -1,5 +1,8 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* ConsumerTarget.java (compileFromStack): Resolve to
+	implementationType.
+
 	* QuoteExp.java (compile): Handle the case when we have an
 	explicit type for the constant, whih may require special conversion.
 

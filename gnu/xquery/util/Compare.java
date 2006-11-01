@@ -256,6 +256,8 @@ public class Compare extends Procedure2 implements CanInline
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
+    if (exp.getTypeRaw() == null)
+      exp.setType(XDataType.booleanType);
     return exp;
   }
 }

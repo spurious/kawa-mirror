@@ -766,7 +766,13 @@ public class XQResolveNames extends ResolveNames
                   if ((err = checkArgCount(args, decl, 1, 1)) != null)
                     return err;
                   Expression base = getBaseUriExpr();
-                  return new ApplyExp(meth, new Expression[]{ args[0], base });
+                  ApplyExp aexp
+                    = new ApplyExp(meth, new Expression[]{ args[0], base });
+                  if (code == DOC_BUILTIN)
+                    aexp.setType(NodeType.documentNodeTest);
+                  else
+                    aexp.setType(XDataType.booleanType);
+                  return aexp;
                 }
               case RESOLVE_URI_BUILTIN:
                 {

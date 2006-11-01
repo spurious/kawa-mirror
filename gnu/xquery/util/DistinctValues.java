@@ -126,6 +126,11 @@ class DistinctValuesConsumer extends FilterConsumer implements PositionConsumer
     writeObject(((NodeTree) seq).typedValue(ipos));
   }
 
+  public void writeBoolean(boolean v)
+  {
+    writeObject(v ? Boolean.TRUE : Boolean.FALSE);
+  }
+
   public void writeObject (Object value)
   {
     if (value instanceof Values)

@@ -94,6 +94,7 @@ public class ConsumerTarget extends Target
     String methodName = null;
     Method method = null;
     boolean islong = false;
+    stackType = stackType.getImplementationType();
     if (stackType instanceof PrimType)
       {
 	char sig = stackType.getSignature().charAt(0);

@@ -11,11 +11,20 @@ import gnu.expr.*;
 public class ConstantFunction0 extends Procedure0 implements CanInline
 {
   final Object value;
+  final QuoteExp constant;
 
   public ConstantFunction0(String name, Object value)
   {
     super(name);
     this.value = value;
+    this.constant = QuoteExp.getInstance(value);
+  }
+
+  public ConstantFunction0(String name, QuoteExp constant)
+  {
+    super(name);
+    this.value = constant.getValue();
+    this.constant = constant;
   }
 
   public Object apply0() { return value; }
@@ -28,6 +37,6 @@ public class ConstantFunction0 extends Procedure0 implements CanInline
 	String message = WrongArguments.checkArgCount(this, nargs);
 	return walker.noteError(message);
       }
-    return new QuoteExp(value);
+    return constant;
   }
 }

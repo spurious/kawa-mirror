@@ -1021,12 +1021,8 @@ public class ClassType extends ObjectType
   {
     if (other == nullType)
       return 1;
-    if (other instanceof PrimType)
-      return swappedCompareResult(((PrimType) other).compare(this));
-    if (other instanceof ArrayType)
-      return swappedCompareResult(((ArrayType) other).compare(this));
     if (! (other instanceof ClassType))
-      return -3;
+      return swappedCompareResult(other.compare(this));
     String name = getName();
     if (name != null && name.equals(other.getName()))
       return 0;

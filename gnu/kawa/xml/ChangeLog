@@ -1,5 +1,9 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* XDataType.java (booleanType): Use Type.boolean_type.
+	(emitCoerceToObject, emitTestIf): Need special handling for xs:boolean
+	since it is a primitive type.
+
 	* NodeType.java (documentNodeTest, textNodeTest, commentNodeTest,
 	anyNodeTest): New static fields, moved to XQParser.
 	* DescendantOrSelfAxis.java (anyNode): New static field.

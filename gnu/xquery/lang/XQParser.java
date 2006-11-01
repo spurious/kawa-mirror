@@ -1697,9 +1697,9 @@ public class XQParser extends Lexer
 	  {
 	    Expression exp2 = parseBinaryExpr(tokPriority+1);
 	    if (token == OP_AND)
-	      exp = new IfExp(booleanValue(exp), booleanValue(exp2), QuoteExp.falseExp);
+	      exp = new IfExp(booleanValue(exp), booleanValue(exp2), XQuery.falseExp);
 	    else if (token == OP_OR)
-	      exp = new IfExp(booleanValue(exp), QuoteExp.trueExp, booleanValue(exp2));
+	      exp = new IfExp(booleanValue(exp), XQuery.trueExp, booleanValue(exp2));
 	    else
 	      exp = makeBinary(token, exp, exp2);
 	  }
@@ -2009,9 +2009,7 @@ public class XQParser extends Lexer
 	*/
 
 	Expression[] args = new Expression[] { exp, lexp };
-	Expression func = makeFunctionExp("gnu.xquery.util.RelativeStep",
-					  "relativeStep");
-	exp = new ApplyExp(func, args);
+	exp = new ApplyExp(RelativeStep.relativeStep, args);
       }
     return exp;
   }
@@ -2092,23 +2090,23 @@ public class XQParser extends Lexer
             if (curToken == EOF_TOKEN)
               eofError("missing ']' - unexpected end-of-file");
 	    char kind;
-	    Expression valuesFilter;
+	    Procedure valuesFilter;
 	    if (axis < 0)
 	      {
 		kind = 'P';
-		valuesFilter = funcExprFilter;
+		valuesFilter = ValuesFilter.exprFilter;
 	      }
 	    else if (axis == AXIS_ANCESTOR || axis == AXIS_ANCESTOR_OR_SELF
 		     || axis == AXIS_PARENT || axis == AXIS_PRECEDING
 		     || axis == AXIS_PRECEDING_SIBLING)
 	      {
 		kind = 'R';
-		valuesFilter = funcReverseFilter;
+		valuesFilter = ValuesFilter.reverseFilter;
 	      }
 	    else
 	      {
 		kind = 'F';
-		valuesFilter = funcForwardFilter;
+		valuesFilter = ValuesFilter.forwardFilter;
 	      }
 	    /*)
 	    boolean sawPosition = seenPosition > saveSeenPosition;
@@ -4204,13 +4202,6 @@ public class XQParser extends Lexer
                             Declaration.getDeclarationValueFromStatic
                             (className, fieldName, name));
   }
-
-  static final Expression funcForwardFilter
-    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "forwardFilter");
-  static final Expression funcReverseFilter
-    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "reverseFilter");
-  static final Expression funcExprFilter
-    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "exprFilter");
 
   /** Helper method for debugging. */
   String tokenString()

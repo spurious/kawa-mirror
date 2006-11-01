@@ -1,3 +1,11 @@
+2006-10-31  Per Bothner  <per@bothner.com>
+
+	* DistinctValues.java (writeBoolean): New method.
+	* Compare.java (inline): Set return type to boolean.
+	* BooleanValue: New implements CanInline.
+	(inline): Optimize constant case and when argument is already boolean.
+	(<init>): Takes name - needed for PrimProcedure.getMethodFor,
+
 2006-10-30  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java (baseUri): Use new KNode baseURI convenience method.

@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.Type;
 
 /**
  * An Expression that evaluates to a constant value.
@@ -12,15 +13,22 @@ public class QuoteExp extends Expression
 
   public final Object getValue() { return value; }
 
+  public final Object valueIfConstant() { return value; }
+
+  protected Type type;
   public final gnu.bytecode.Type getType()
   {
+    if (type != null)
+      return type;
     if (value == Values.empty)
-      return gnu.bytecode.Type.void_type;
-    if (value == null)
-      return gnu.bytecode.Type.nullType;
-    if (this == undefined_exp)
-      return gnu.bytecode.Type.pointer_type;
-    return gnu.bytecode.Type.make(value.getClass());
+      type = gnu.bytecode.Type.void_type;
+    else if (value == null)
+      type = gnu.bytecode.Type.nullType;
+    else if (this == undefined_exp)
+      type = gnu.bytecode.Type.pointer_type;
+    else
+      type = gnu.bytecode.Type.make(value.getClass());
+    return type;
   }
 
   static public QuoteExp undefined_exp
@@ -44,6 +52,8 @@ public class QuoteExp extends Expression
   }
 
   public QuoteExp (Object val) { value = val; }
+
+  public QuoteExp (Object val, Type type) { value = val; this.type = type; }
   
   protected boolean mustCompile () { return false; }
 

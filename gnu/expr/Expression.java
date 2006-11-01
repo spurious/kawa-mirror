@@ -289,6 +289,12 @@ public abstract class Expression extends Procedure0 implements Printable
     return Type.pointer_type;
   }
 
+  /** Return value if it is constant, or null if non-constant or unknown. */
+  public Object valueIfConstant ()
+  {
+    return null;
+  }
+
   protected int flags;
   protected static final int NEXT_AVAIL_FLAG = 1;
 

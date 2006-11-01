@@ -30,6 +30,8 @@ public class ApplyExp extends Expression
   public final int getArgCount() { return args.length; }
   public void setFunction(Expression func) { this.func = func; }
   public void setArgs(Expression[] args) { this.args = args; }
+  public Expression getArg(int i) { return args[i]; }
+  public void setArg(int i, Expression arg) { args[i] = arg; }
   public final boolean isTailCall() { return getFlag(TAILCALL); }
   public final void setTailCall(boolean tailCall)
   { setFlag(tailCall, TAILCALL); }
@@ -401,6 +403,11 @@ public class ApplyExp extends Expression
     out.startLogicalBlock("(Apply", ")", 2);
     if (isTailCall())
       out.print (" [tailcall]");
+    if (type != null && type != Type.pointer_type)
+      {
+        out.print(" => ");
+        out.print(type);
+      }
     out.writeSpaceFill();
     printLineColumn(out);
     func.print(out);
@@ -444,6 +451,16 @@ public class ApplyExp extends Expression
 
   /** Cache for getType(). */
   protected Type type;
+
+  public final gnu.bytecode.Type getTypeRaw()
+  {
+    return type;
+  }
+
+  public final void setType (gnu.bytecode.Type type)
+  {
+    this.type = type;
+  }
 
   public final gnu.bytecode.Type getType()
   {

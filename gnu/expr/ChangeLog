@@ -1,5 +1,18 @@
 2006-10-31  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (getArg, setArg): New method.
+
+	* ApplyExp (print): Also print type if interesting.
+
+	* ApplyExp (getTypeRaw, setType): New methods.
+	* QuoteExp.java (type): New field.
+	(getType): Update to use/set type field.
+	* IfExp.java (getType): New method.
+
+	* Expression.java (valueIfConstant): New method.
+	* QuoteExp.java	 (valueIfConstant): New method.
+	(<init>): New constructor which also takes explicit type.
+
 	* ModuleInfo.java (setupModuleExp): If moduleClass is non-null,
 	use that as the Class.  This fixes Savannah bug #15881 "classnotfound
 	exception compiling application of define-syntax macro".

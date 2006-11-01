@@ -132,6 +132,16 @@ public class IfExp extends Expression
      else_clause = walker.walk(else_clause);
   }
 
+  public gnu.bytecode.Type getType()
+  {
+    Type t1 = then_clause.getType();
+    Type t2 = else_clause == null ? Type.void_type : else_clause.getType();
+    if (t1 == t2)
+      return t1;
+    // FIXME - implement union types
+    return Type.pointer_type;
+  }
+
   public void print (OutPort out)
   {
     out.startLogicalBlock("(If ", false, ")");

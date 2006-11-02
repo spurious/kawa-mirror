@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.reflect;
@@ -33,6 +33,9 @@ public class OccurrenceType extends ObjectType
   {
     if (minOccurs == 1 && maxOccurs == 1)
       return base;
+    if (minOccurs == 0 && maxOccurs < 0
+        && (base == SingletonType.instance || base == Type.pointer_type))
+      return Type.pointer_type;
     return new OccurrenceType(base, minOccurs, maxOccurs);
   }
 
@@ -46,6 +49,18 @@ public class OccurrenceType extends ObjectType
 
   public int compare(Type other)
   {
+    if (other instanceof OccurrenceType)
+      {
+        OccurrenceType occOther = (OccurrenceType) other;
+        if (minOccurs == occOther.minOccurs
+            && maxOccurs == occOther.maxOccurs)
+          return base.compare(occOther.getBase());
+      }
+    /*
+    Type primeThis = itemPrimeType(getBase());
+    Type primeOther = itemPrimeType(other);
+    FIXME: Compare primThis with primOther AND the occurrence numbers.
+    */
     return -2;
   }
 
@@ -143,6 +158,96 @@ public class OccurrenceType extends ObjectType
   public Procedure getConstructor ()
   {
     return null;
+  }
+
+  /** Return a conservative estimage on the min/max number of items of a type.
+   * @return {@code maxCount << 12 | minCount & 0xFFF},
+   * where a {@code maxCount} of -1 means unbounded.
+   */
+  public static int itemCountRange (Type type)
+  {
+    if (type instanceof SingletonType)
+      return (1 << 12) | 1;
+    if (type instanceof OccurrenceType)
+      {
+        OccurrenceType occ = (OccurrenceType) type;
+        int min = occ.minOccurs();
+        int max = occ.maxOccurs();
+        int bnum = itemCountRange(occ.getBase());
+        if ((min == 1 && max == 1)
+            || bnum == 0)
+          return bnum;
+        if (max > 0xfffff)
+          max = -1;
+        if (max == 0)
+          return 0;
+        int bmin = bnum & 0xfff;
+        int bmax = bnum >> 12;
+        if (bnum != 1001)
+          {
+            if (min > 0xfff)
+              min = 0xfff;
+            min = min * bmin;
+            if (min > 0xfff)
+              min = 0xfff;
+            if (max < 0 || bmax < 0)
+              max = -1;
+            else
+              max = max * bmax;
+            if (max > 0xfffff)
+              max = -1;
+          }
+        return (max << 12) | min;
+      }
+    if (type instanceof PrimType)
+      return type.isVoid() ? 0 : 1001;
+    if (type instanceof ArrayType)
+      return 1001;
+    if (type instanceof ClassType)
+      {
+	int cmp = type.compare(Compilation.typeValues);
+	if (cmp == -3)
+	  return 1001;
+      }
+    return -1 << 12;
+  }
+
+  /** Returna a quantifer kind for a sequence type.
+   * @return '0' if type is known to be a void (0-item) type;
+   *         '1' if type is known to be a single-item type;
+   *         '?' if type matches a sequence of 0 or 1 items;
+   *         '+' if type matches a sequence of 1 or more items;
+   *         '*' otherwise.
+   */
+  public static char itemCountCode (Type type)
+  {
+    int num = itemCountRange(type);
+    int min = num & 0xFFF;
+    int max = num >> 12;
+    return max == 0 ? '0'
+      : min == 0 ? (max == 1 ? '?' : '*')
+      : min == 1 && max == 1 ? '1' : '+';
+  }
+
+  public static boolean itemCountIsZeroOrOne (Type type)
+  {
+    // cute hack for: max == 0 || max == 1.
+    return (itemCountRange(type) >> 13) == 0;
+  }
+
+  public static boolean itemCountIsOne (Type type)
+  {
+    return itemCountRange(type) == 1001;
+  }
+
+  /** QUery formal semantics "prime type"
+   */
+  public static Type itemPrimeType (Type type)
+  {
+    while (type instanceof OccurrenceType)
+      type = ((OccurrenceType) type).getBase();
+    return itemCountIsOne(type) ? type : SingletonType.instance;
+      
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

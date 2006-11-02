@@ -13,6 +13,7 @@ java_sources = \
   InstanceOf.java \
   Invoke.java \
   OccurrenceType.java \
+  SingletonType.java \
   SlotGet.java \
   SlotSet.java \
   StaticFieldLocation.java \

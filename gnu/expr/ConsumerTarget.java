@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.reflect.OccurrenceType;
 
 /**
  * A Target which is some variable that implements gnu.lists.Consumer.
@@ -112,7 +113,7 @@ public class ConsumerTarget extends Target
       }
     else
       {
-	if (SeriesTarget.isSingletonType(stackType))
+	if (OccurrenceType.itemCountIsOne(stackType))
 	  methodName = "writeObject";
 	else
 	  {

@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.reflect.OccurrenceType;
 
 /** The value in the result (as a sequence of values) is passed to a function.
  */
@@ -41,7 +42,7 @@ public class SeriesTarget extends Target
   {
     CodeAttr code = comp.getCode();
 
-    if (isSingletonType(stackType))
+    if (OccurrenceType.itemCountIsOne(stackType))
       {
 	compileFromStackSimple(comp, stackType);
 	return;
@@ -99,20 +100,4 @@ public class SeriesTarget extends Target
   }
 
   public Type getType() { return Type.pointer_type; }
-
-  public static boolean isSingletonType (Type type)
-  {
-    if (type instanceof PrimType)
-      return ! type.isVoid();
-    if (type instanceof ArrayType)
-      return true;
-    if (type instanceof ClassType)
-      {
-	int cmp = type.compare(Compilation.typeValues);
-	if (cmp == -3)
-	  return true;
-      }
-    return false;
-  }
-
 }

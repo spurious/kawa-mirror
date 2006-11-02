@@ -1,5 +1,10 @@
 2006-11-01  Per Bothner  <per@bothner.com>
 
+	* SeriesTarget.java (isSingletonType): Removed, replaced by
+	new and enhanced OccurrenceType.itemCountIsOne.
+	(compileFromStack): Update accordingly.
+	* ConsumerTarget.java (compileFromStack): Likewise.
+
 	* ApplyExp.java (inlineIfConstant): Trivial improvement.
 
 2006-10-31  Per Bothner  <per@bothner.com>

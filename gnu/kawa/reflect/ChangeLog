@@ -1,3 +1,14 @@
+2006-11-01  Per Bothner  <per@bothner.com>
+
+	* SingletonType.java: New class, extends ObjectType.
+	* Makefile.am: Update accordingly.
+	* OccurrenceType.java (getInstance): Add a special case.
+	(compare): Add slightly more intelligence.
+	(itemCountIsOne): New static method, expanded on and replacing
+	SeriesTarget.isSingletonType.
+	(itemCountRange, itemCountCode, itemCountIsZeroOrOne,
+	itemPrimeType): New static methods.
+
 2006-10-29  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (apply): Fix so it actually works.

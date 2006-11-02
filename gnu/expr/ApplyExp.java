@@ -491,7 +491,7 @@ public class ApplyExp extends Expression
 
   public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
   {
-    return inlineIfConstant(proc, walker.getCompilation().getMessages());
+    return inlineIfConstant(proc, walker.getMessages());
   }
 
   /** Inline this ApplyExp if parameters are constant.

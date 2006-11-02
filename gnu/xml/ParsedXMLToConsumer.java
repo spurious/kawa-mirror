@@ -353,6 +353,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     namespaceBindings = NamespaceBinding.predefinedXML;
   }
 
+  /** Process raw text. */
   public void emitCharacters(char[] data, int start, int length)
   {
     // Skip whitespace not in an element.
@@ -376,6 +377,10 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     base.write(data, start, length);
   }
 
+  /** Process a CDATA section.
+   * The data (starting at start for length char).
+   * Does not include the delimiters (i.e. {@code "<![CDATA["}
+   * and {@code "]]>"} are excluded). */
   public void emitCDATA(char[] data, int start, int length)
   {
     closeStartTag();
@@ -385,6 +390,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       emitCharacters(data, start, length);
   }
 
+  /** Process a start tag, with the given element name. */
   public void emitBeginElement(char[] data, int start, int count)
   {
     MappingInfo info = lookupTag(data, start, count);
@@ -414,6 +420,11 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     names[depth++] = name;
   }
 
+  /** Process an attribute, with the given attribute name.
+   * The attribute value is given using emitCharacters.
+   * The value is terminated by either another emitBeginAttribute
+   * or an emitEndAttributes.
+   */
   public void emitBeginAttribute(char[] data, int start, int count)
   {
     MappingInfo info = lookupTag(data, start, count);
@@ -453,12 +464,17 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     inAttribute = true;
   }
 
+  /** Process the end of a start tag.
+   * There are no more attributes. */
   public void emitEndAttributes()
   {
     if (inAttribute)
       endAttribute();
   }
 
+  /** Process an end tag.
+   * An abbreviated tag (such as {@code '<br/>'}) has a name==null.
+   */
   public void emitEndElement(char[] data, int start, int length)
   {
     if (inAttribute)
@@ -501,7 +517,10 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     base.endGroup(old);
   }
 
-  /** Handles the predefined entities, such as "&lt;" and "&quot;". */
+  /** Process an entity reference.
+   * The entity name is given.
+   * This handles the predefined entities, such as "&lt;" and "&quot;".
+   */
   public void emitEntityReference(char[] name, int start, int length)
   {
     char c0 = name[start];
@@ -532,11 +551,17 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     writeChar(ch);
   }
 
+  /** Process a character entity reference.
+   * The string encoding of the character (e.g. "xFF" or "255") is given,
+   * as well as the character value. */
   public void emitCharacterReference(int value, char[] name, int start, int length)
   {
     writeChar(value);
   }
 
+  /** Process a comment.
+   * The data (starting at start for length chars).
+   * Does not include the delimiters (i.e. "<!--" and "-->" are excluded). */
   public void emitComment(char[] data, int start, int length)
   {
     closeStartTag();
@@ -544,7 +569,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       ((XConsumer) base).writeComment(data, start, length);
   }
 
-  /** Process a processing incluction. */
+  /** Process a processing instruction. */
   public void emitProcessingInstruction(char[] buffer,
                                         int tstart, int tlength,
                                         int dstart, int dlength)
@@ -713,5 +738,55 @@ final class MappingInfo
       if (data[start+i] != tag.charAt(i))
 	return false;
     return true;
+  }
+
+  public void error(XMLParserChar parser, String message)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    error(parser, message, sbuf);
+    System.err.println(sbuf);
+  }
+
+  public static void error(XMLParserChar parser, String message, StringBuffer sbuf)
+  {
+    /*
+    String name = port.getName();
+    if (name != null)
+      sbuf.append(name);
+    */
+    int line = 1;
+    int lstart = 0;
+    int i = 0;
+    int pos = parser.pos;
+    char[] buffer = parser.buffer;
+    while (i < pos)
+      {
+        char ch = buffer[i++];
+        if (ch == '\n')
+          {
+            line++;
+            lstart = i;
+          }
+        else if (ch == '\r')
+          {
+            if (i < pos && buffer[i] == '\n')
+              i++;
+            line++;
+            lstart = i;
+          }
+      }
+    sbuf.append(':');
+    sbuf.append(line);
+    int column = pos - lstart;
+    sbuf.append(':');
+    sbuf.append(column + 1);
+    sbuf.append(": ");
+
+    sbuf.append("xml parse error");
+    if (message != null)
+      {
+        sbuf.append(" - ");
+        sbuf.append(message);
+      }
   }
 }

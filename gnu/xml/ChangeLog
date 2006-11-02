@@ -1,3 +1,11 @@
+2006-11-01  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java: Merged in ParsedXMLHandler.java.in
+	functionality - i.e. javadoc comments and the error methods.
+	* ParsedXMLHandler.java.in: Removed, since never used directly.
+	* Makefile.am: Update accordingly and simplify.  Remove never-used
+	and questionable support for byte parsing and handling.	
+
 2006-10-30  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java: Add support for a tble of ID mappings,

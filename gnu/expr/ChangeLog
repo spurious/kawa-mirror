@@ -1,3 +1,15 @@
+2006-11-03  Per Bothner  <per@bothner.com>
+
+	Minor optimization to avoid storing unused parameters of
+	inline-only functions.  Happens most for XQuery implied paramaters,
+	such as position() when it is unused.
+	* ApplyExp.java (pushArgs): New helper method.  Don't push
+	ignorable parameters.
+	(compile): Use it, for both inline-only and tail-calls.
+	(popParams): Also pass along Declaration, so we can check ignorable().
+	* LambdaExp (allocChildClasses):   Don't allocate Variable if
+	parameter is ignorabled() and function is inline-only.
+
 2006-11-01  Per Bothner  <per@bothner.com>
 
 	* SeriesTarget.java (isSingletonType): Removed, replaced by

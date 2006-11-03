@@ -1002,7 +1002,8 @@ public class LambdaExp extends ScopeExp
           break;
         Variable var = decl.var;
         // i is the register to use for the current parameter
-        if (var != null)
+        if (var != null
+            || (getInlineOnly() && decl.ignorable()))
           ;
         else if (decl.isSimple () && ! decl.isIndirectBinding())
           {

@@ -279,12 +279,7 @@ public class ApplyExp extends Expression
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
 	&& func_lambda.min_args == args_length)
       {
-	Declaration param = func_lambda.firstDecl();
-	for (int i = 0; i < args_length; ++i)
-	  {
-	    exp.args[i].compile(comp, param.getType());
-	    param = param.nextDecl();
-	  }
+        pushArgs(func_lambda, exp.args, comp);
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
@@ -353,12 +348,7 @@ public class ApplyExp extends Expression
       }
     else if (tail_recurse)
       {
-	Declaration param = func_lambda.firstDecl();
-	for (int i = 0; i < args_length; ++i)
-	  {
-	    exp.args[i].compile(comp, param.getType());
-	    param = param.nextDecl();
-	  }
+        pushArgs(func_lambda, exp.args, comp);
         method = null;
       }
     else
@@ -419,33 +409,53 @@ public class ApplyExp extends Expression
     out.endLogicalBlock(")");
   }
 
+  /** Only used for inline- and tail-calls. */
+  private static void pushArgs (LambdaExp lexp, Expression[] args, Compilation comp)
+  {
+    Declaration param = lexp.firstDecl();
+    int args_length = args.length;
+    for (int i = 0; i < args_length; ++i)
+      {
+        Expression arg = args[i];
+        if (param.ignorable())
+          arg.compile(comp, Target.Ignore);
+        else
+          arg.compile(comp, param.getType());
+        param = param.nextDecl();
+      }
+  }
+
   private static void popParams (CodeAttr code, LambdaExp lexp,
                                  boolean toArray)
   {
-    Variable params = lexp.getVarScope().firstVar();
-    if (params != null && params.getName() == "this")
-      params = params.nextVar();
-    if (params != null && params.getName() == "$ctx")
-      params = params.nextVar();
-    if (params != null && params.getName() == "argsArray")
+    Variable vars = lexp.getVarScope().firstVar();
+    Declaration decls = lexp.firstDecl();
+    if (vars != null && vars.getName() == "this")
+      vars = vars.nextVar();
+    if (vars != null && vars.getName() == "$ctx")
+      vars = vars.nextVar();
+    if (vars != null && vars.getName() == "argsArray")
       {
 	if (toArray)
 	  {
-	    popParams (code, params, 1);
+	    popParams (code, 1, decls, vars);
 	    return;
 	  }
-        params = params.nextVar();
+        vars = vars.nextVar();
       }
-    popParams (code, params, lexp.min_args);
+    popParams (code, lexp.min_args, decls, vars);
   }
 
   // Recursive helper function.
-  private static void popParams (CodeAttr code, Variable vars, int count)
+  private static void popParams (CodeAttr code, int count,
+                                 Declaration decl, Variable vars)
   {
     if (count > 0)
       {
-	popParams (code, vars.nextVar(), count - 1);
-	code.emitStore(vars);
+	popParams (code, count - 1, decl.nextDecl(),
+                   decl.getVariable() == null ? vars : vars.nextVar());
+        if (! decl.ignorable())
+          code.emitStore(vars);
       }
   }
 

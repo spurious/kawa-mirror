@@ -107,7 +107,7 @@ public class TreeList extends AbstractSequence
   // 0xF118 DOCUMENT_URI: Not a node, but a property of the previous document.
 
   /** The largest Unicode character that can be encoded in one char. */
-  static final int MAX_CHAR_SHORT = 0x9FFF;
+  public static final int MAX_CHAR_SHORT = 0x9FFF;
 
   /** The smallest integer that can use the short int encoding. */
   static final int MIN_INT_SHORT = -0x1000;  // -4096
@@ -1726,13 +1726,19 @@ public class TreeList extends AbstractSequence
       }
   }
 
+  public void stringValue (int startIndex, int endIndex, StringBuffer sbuf)
+  {
+    int index = startIndex;
+    while (index < endIndex && index >= 0)
+      index = stringValue(false, index, sbuf);
+  }
+
   public int stringValue(int index, StringBuffer sbuf)
   {
     int next = nextNodeIndex(index, -1 >>> 1);
     if (next > index)
       {
-	while (index < next && index >= 0)
-	  index = stringValue(false, index, sbuf);
+        stringValue(index, next, sbuf);
 	return index;
       }
     else

@@ -1,3 +1,8 @@
+2006-11-05  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java (stringValue): Remove field.  Store
+	namespace atribute value in the tlist itself.
+
 2006-11-01  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java: Merged in ParsedXMLHandler.java.in

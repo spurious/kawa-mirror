@@ -54,9 +54,6 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   /** Number of beginGroups seen without close endGroup. */
   int nesting;
 
-  /** Used if we need to save attribute values of namespace attributes. */
-  StringBuffer stringValue = new StringBuffer();
-
   /** True if namespace declarations should be passed through as attributes.
    * Like SAX2's http://xml.org/features/namespace-prefixes. */
   public boolean namespacePrefixes = false;
@@ -84,10 +81,32 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     inAttribute = false;
     if (currentNamespacePrefix == null || namespacePrefixes)
       tlist.endAttribute();
+    else if (tlist instanceof NodeTree)
+      ((NodeTree) tlist).stringizingLevel--;
     if (currentNamespacePrefix != null)
       {
-        int hash = stringValue.hashCode();
+        int attrStart = startIndexes[attrCount];
+        int attrEnd = tlist.gapStart;
 
+        // Check that the namespace attribute value is plain characters
+        // so we an use the in-place buffer.  Calculate hash whil we're at it.
+        StringBuffer attrCopy = null;
+        int hash = 0;
+        for (int i = attrStart;  i < attrEnd;  i++)
+          {
+            char datum = tlist.data[i];
+            if ((datum & 0xFFFF) > TreeList.MAX_CHAR_SHORT)
+              {
+                StringBuffer sbuf = new StringBuffer();
+                tlist.stringValue(attrStart, tlist.gapStart-attrStart,
+                                  attrCopy);
+                hash = attrCopy.hashCode();
+                break;
+              }
+            hash = 31 * hash + datum;
+          }
+
+        tlist.gapStart = attrStart;
 	int bucket = hash & mappingTableMask;
 	MappingInfo info = mappingTable[bucket];
         String prefix = currentNamespacePrefix == "" ? null
@@ -105,9 +124,14 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
                 info = new MappingInfo();
                 info.nextInBucket = mappingTable[bucket];
                 mappingTable[bucket] = info;
-                String uri = stringValue.toString().intern();
+                String uri;
+                if (attrCopy == null)
+                  uri = new String(tlist.data, attrStart, attrEnd-attrStart);
+                else
+                  uri = attrCopy.toString();
+                uri = uri.intern();
                 // It seems best to hash on the namespace uri, since it is more
-                // likely t be unique than a shorter prefix.  We re-use the
+                // likely to be unique than a shorter prefix.  We re-use the
                 // same MappingInfo table that is mainly used for tag lookup,
                 // but re-interpreting the meaning of the various fields.
                 // Since MappingInfo hashes on the 'tag', we store the uri
@@ -135,7 +159,9 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
                 if (namespaceNodes != null
                     && namespaceNodes.getNext() == namespaceBindings
                     && namespaceNodes.getPrefix() == prefix
-                    && info.match(stringValue))
+                    && (attrCopy == null
+                        ? info.match(tlist.data, attrStart, attrEnd-attrStart)
+                        : info.match(attrCopy)))
                   {
                     break;
                   }
@@ -143,7 +169,6 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
           }
         namespaceBindings = info.type.namespaceNodes;
 
-        stringValue.setLength(0);
 	currentNamespacePrefix = null;
       }
   }
@@ -266,13 +291,14 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     closeStartTag();
     if (currentNamespacePrefix != null)
       {
-	stringValue.append((char) v);
+        tlist.writeChar(v);
 	if (! namespacePrefixes)
 	  return;
       }
     base.writeChar(v);
   }
 
+  /*
   public void writeBoolean(boolean v)
   {
     closeStartTag();
@@ -340,6 +366,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       }
     base.writeObject(v);
   }
+  */
 
   public ParsedXMLToConsumer(Consumer out)
   {
@@ -370,7 +397,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     closeStartTag();
     if (currentNamespacePrefix != null)
       {
-	stringValue.append(data, start, length);
+        tlist.write(data, start, length);
 	if (! namespacePrefixes)
 	  return;
       }
@@ -461,6 +488,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       }
     if (currentNamespacePrefix == null || namespacePrefixes)
       tlist.beginAttribute(0);
+    else if (tlist instanceof NodeTree)
+      ((NodeTree) tlist).stringizingLevel++;
     inAttribute = true;
   }
 

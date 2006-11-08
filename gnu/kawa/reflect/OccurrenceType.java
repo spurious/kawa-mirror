@@ -183,7 +183,7 @@ public class OccurrenceType extends ObjectType
           return 0;
         int bmin = bnum & 0xfff;
         int bmax = bnum >> 12;
-        if (bnum != 1001)
+        if (bnum != 0x1001)
           {
             if (min > 0xfff)
               min = 0xfff;
@@ -200,14 +200,14 @@ public class OccurrenceType extends ObjectType
         return (max << 12) | min;
       }
     if (type instanceof PrimType)
-      return type.isVoid() ? 0 : 1001;
+      return type.isVoid() ? 0 : 0x1001;
     if (type instanceof ArrayType)
-      return 1001;
-    if (type instanceof ClassType)
+      return 0x1001;
+    if (type instanceof ObjectType)
       {
 	int cmp = type.compare(Compilation.typeValues);
 	if (cmp == -3)
-	  return 1001;
+	  return 0x1001;
       }
     return -1 << 12;
   }
@@ -237,7 +237,7 @@ public class OccurrenceType extends ObjectType
 
   public static boolean itemCountIsOne (Type type)
   {
-    return itemCountRange(type) == 1001;
+    return itemCountRange(type) == 0x1001;
   }
 
   /** QUery formal semantics "prime type"

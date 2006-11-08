@@ -1,3 +1,9 @@
+2006-11-07  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java (itemCountRange, itemCountIsOne): Fix thinko
+	replacing 1001 by 0x1001.  Compare base if it is ObjectType,
+	not only ClassType.
+
 2006-11-01  Per Bothner  <per@bothner.com>
 
 	* SingletonType.java: New class, extends ObjectType.

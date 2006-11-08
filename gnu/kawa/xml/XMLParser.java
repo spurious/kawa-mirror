@@ -17,11 +17,11 @@ public class XMLParser extends XMLParserChar
 
   public XMLParser(LineBufferedReader reader, SourceMessages messages, Consumer out)
   {
-    this(reader, new ParsedXMLToConsumer(out), messages, out);
+    this(reader, new XMLFilter(out), messages, out);
     
   }
 
-  private XMLParser(LineBufferedReader reader, ParsedXMLToConsumer resolver,
+  private XMLParser(LineBufferedReader reader, XMLFilter resolver,
 		    SourceMessages messages, Consumer out)
   {
     super(null, 0, 0, resolver);
@@ -32,13 +32,13 @@ public class XMLParser extends XMLParserChar
 
   public XMLParser(LineBufferedReader reader, Consumer out, SourceMessages messages)
   {
-    super(null, 0, 0, new ParsedXMLToConsumer(out));
+    super(null, 0, 0, new XMLFilter(out));
     in = reader;
     this.messages = messages;
   }
 
   private XMLParser(Object uri, Consumer out, SourceMessages messages,
-		    ParsedXMLToConsumer resolver,
+		    XMLFilter resolver,
 		    LineBufferedReader lreader)
     throws java.io.IOException
   {
@@ -52,7 +52,7 @@ public class XMLParser extends XMLParserChar
   public XMLParser(Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    this(uri, out, messages, new ParsedXMLToConsumer(out),
+    this(uri, out, messages, new XMLFilter(out),
 	 new LineBufferedReader(new java.io.BufferedInputStream(URI_utils.getInputStream(uri))));
   }
 

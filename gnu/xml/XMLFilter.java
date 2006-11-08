@@ -7,7 +7,7 @@ import gnu.lists.XConsumer;
 import gnu.lists.TreeList;
 import gnu.mapping.Symbol;
 
-public class ParsedXMLToConsumer extends ParsedXMLHandler
+public class XMLFilter
 {
   Consumer base;
 
@@ -368,7 +368,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   }
   */
 
-  public ParsedXMLToConsumer(Consumer out)
+  public XMLFilter (Consumer out)
   {
     this.base = out;
     this.cons = out;
@@ -704,6 +704,56 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       }
   }
   */
+
+  public void error(XMLParserChar parser, String message)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    error(parser, message, sbuf);
+    System.err.println(sbuf);
+  }
+
+  public static void error(XMLParserChar parser, String message, StringBuffer sbuf)
+  {
+    /*
+    String name = port.getName();
+    if (name != null)
+      sbuf.append(name);
+    */
+    int line = 1;
+    int lstart = 0;
+    int i = 0;
+    int pos = parser.pos;
+    char[] buffer = parser.buffer;
+    while (i < pos)
+      {
+        char ch = buffer[i++];
+        if (ch == '\n')
+          {
+            line++;
+            lstart = i;
+          }
+        else if (ch == '\r')
+          {
+            if (i < pos && buffer[i] == '\n')
+              i++;
+            line++;
+            lstart = i;
+          }
+      }
+    sbuf.append(':');
+    sbuf.append(line);
+    int column = pos - lstart;
+    sbuf.append(':');
+    sbuf.append(column + 1);
+    sbuf.append(": ");
+
+    sbuf.append("xml parse error");
+    if (message != null)
+      {
+        sbuf.append(" - ");
+        sbuf.append(message);
+      }
+  }
 }
 
 final class MappingInfo
@@ -767,55 +817,5 @@ final class MappingInfo
       if (data[start+i] != tag.charAt(i))
 	return false;
     return true;
-  }
-
-  public void error(XMLParserChar parser, String message)
-  {
-    StringBuffer sbuf = new StringBuffer();
-    error(parser, message, sbuf);
-    System.err.println(sbuf);
-  }
-
-  public static void error(XMLParserChar parser, String message, StringBuffer sbuf)
-  {
-    /*
-    String name = port.getName();
-    if (name != null)
-      sbuf.append(name);
-    */
-    int line = 1;
-    int lstart = 0;
-    int i = 0;
-    int pos = parser.pos;
-    char[] buffer = parser.buffer;
-    while (i < pos)
-      {
-        char ch = buffer[i++];
-        if (ch == '\n')
-          {
-            line++;
-            lstart = i;
-          }
-        else if (ch == '\r')
-          {
-            if (i < pos && buffer[i] == '\n')
-              i++;
-            line++;
-            lstart = i;
-          }
-      }
-    sbuf.append(':');
-    sbuf.append(line);
-    int column = pos - lstart;
-    sbuf.append(':');
-    sbuf.append(column + 1);
-    sbuf.append(": ");
-
-    sbuf.append("xml parse error");
-    if (message != null)
-      {
-        sbuf.append(" - ");
-        sbuf.append(message);
-      }
   }
 }

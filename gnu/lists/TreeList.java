@@ -20,8 +20,8 @@ public class TreeList extends AbstractSequence
   XConsumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
-  // for the sake of ParsedXMLToConsumer.  FIXME.  Perhaps an abstract class
-  // in gnu.lists that ParsedXMLToConsumer extend?
+  // for the sake of XMLFilter.  FIXME.  Perhaps an abstract class
+  // in gnu.lists that XMLFilter extend?
 
   public Object[] objects; 
   public int oindex;

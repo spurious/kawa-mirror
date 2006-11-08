@@ -24,7 +24,7 @@ public class NodeTree extends TreeList
   // However, we want to avoid allocating a NodeFilter each time we create
   // a NodeTree, so perhaps NodeFilter could also be a front-end for
   // Nodes.  Unclear what is the most efficient general solution.  Probably
-  // similar to what ParsedXMLToConsumer does - and maybe combine those.
+  // similar to what XMLFilter does - and maybe combine those.
   // FIXME. For now these fields are marked as transient.
 
   /** Number of active beginGroup and beginDocument calls. */
@@ -277,7 +277,7 @@ public class NodeTree extends TreeList
     super.beginAttribute(index);
   }
 
-  /** Called from ParsedXMLToConsumer, only. */
+  /** Called from XMLFilter, only. */
   public void setAttributeName (int attrIndex, int nameIndex)
   {
     super.setAttributeName(attrIndex, nameIndex);
@@ -341,7 +341,7 @@ public class NodeTree extends TreeList
         boolean isId;
         if (workStack == null || i >= workStack.length)
           {
-            // This can happend when we're called from ParsedXMLToConsumer.
+            // This can happend when we're called from XMLFilter.
             // Ideally we need the latter to eagerly pass xml:XXX and NCName
             // attributes (without waiting until the end of the element for
             // namespace processing).  FIXME.

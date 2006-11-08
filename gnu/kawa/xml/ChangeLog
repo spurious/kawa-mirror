@@ -1,3 +1,7 @@
+2006-11-08  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java: Update for ParsedXMLToConsumer -> XMLFilter rename.
+
 2006-10-31  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (booleanType): Use Type.boolean_type.

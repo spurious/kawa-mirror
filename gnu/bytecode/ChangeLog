@@ -1,3 +1,8 @@
+2006-11-07  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (instructionLineMode): New static option field.
+	(assignConstants): Handle instructionLineMode.
+
 2006-10-31  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (compare): Compare wapped always if not ClassType.

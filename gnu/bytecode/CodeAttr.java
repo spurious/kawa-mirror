@@ -155,6 +155,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     return fixup_offsets[index] & 15;
   }
 
+  /** If true we get a line number entry for each instruction.
+   * Normally false, but can be a convenient hack to allow instruction-level
+   * stepping/debugging and stacktraces.  In this case {@code LINE==PC}. */
+  public static boolean instructionLineMode = false;
+
   /** The stack of currently active conditionals. */
   IfState if_stack;
 
@@ -2402,10 +2407,21 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void assignConstants (ClassType cl)
   {
-    super.assignConstants(cl);
     if (locals != null && locals.container == null && ! locals.isEmpty())
       locals.addToFrontOf(this);
     processFixups();
+    if (instructionLineMode)
+      {
+        // A kludge to low-level debugging:
+        // Define a "line number" for each instrction.
+        if (lines == null)
+          lines = new LineNumbersAttr(this);
+        lines.linenumber_count = 0;
+        int codeLen = getCodeLength();
+        for (int i = 0;  i < codeLen;  i++)
+          lines.put(i, i);
+      }
+    super.assignConstants(cl);
     Attribute.assignConstants(this, cl);
   }
 

@@ -48,22 +48,17 @@ public class AppendValues extends MethodProc implements CanInline, Inlineable
 	for (int i = 0;  i < nargs;  i++)
 	  args[i].compileWithPosition(comp, target);
       }
-    else if (target instanceof SeriesTarget)
+    else if (target instanceof SeriesTarget && nargs > 0)
       {
 	CodeAttr code = comp.getCode();
 	SeriesTarget serTarget = (SeriesTarget) target;
 	Label done = serTarget.done;
+        serTarget.done = null;
 	for (int i = 0;  i < nargs;  i++)
 	  {
-	    Label next;
-	    if (i + 1 < nargs)
-	      next = new Label(code);
-	    else
-	      next = done;
-	    serTarget.done = next;
+	    if (i + 1 == nargs) // Last one
+              serTarget.done = done;
 	    args[i].compileWithPosition(comp, serTarget);
-	    if (i + 1 < nargs)
-	      next.define(code);
 	  }
       }
     else

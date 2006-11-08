@@ -1,5 +1,13 @@
 2006-11-07  Per Bothner  <per@bothner.com>
 
+	* SeriesTarget.java (done): Can now be null.
+	(compileFromStackSimple): Do goto 'done' if needed.
+	(compileFromStack): Handle the case when 'done==null'.
+	Bemore specific about "function" parameter type - it is a singleton.
+	(toString): New method.
+	* Compilation.java (compileConstant): Fix handling when literal is
+	Values and target is a SeriesTarget.
+
 	* ScopeExp.java (replaceFollowing): Also set context of newDecl.
 
 2006-11-03  Per Bothner  <per@bothner.com>

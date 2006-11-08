@@ -1,9 +1,10 @@
-// Copyright (c) 2000, 2001 Per M.A. Bothner.
+// Copyright (c) 2000, 2001, 2006 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
+import gnu.kawa.reflect.SingletonType;
 
 /** The value in the result (as a sequence of values) is passed to a function.
  */
@@ -16,7 +17,8 @@ public class SeriesTarget extends Target
   /** A function to call (using jsr/jsr_w). */
   public Label function;
 
-  /** Where to go when done. */
+  /** Where to go when done executing the Expression whose target this is.
+   * If null, execution should continue just after the Expression. */
   public Label done;
 
   /** A surrounding Scope for local Variables.
@@ -32,6 +34,8 @@ public class SeriesTarget extends Target
     StackTarget.convert(comp, stackType, param.getType());
     param.compileStore(comp);
     code.emitJsr(function);
+    if (done != null && code.reachableHere())
+       code.emitGoto(done);
     // Make sure we don't free the local variable slots for any variable
     // slots prematurely.  I.e. any local variables in use at this point
     // must be protected from being re-used in the Jsr subroutine.
@@ -63,6 +67,18 @@ public class SeriesTarget extends Target
     Variable indexVar = code.addLocal(Type.int_type);
     Variable valuesVar = code.addLocal(Type.pointer_type);
     Variable nextVar = code.addLocal(Type.int_type); 
+    Label doneLabel = done;
+    boolean doneGiven;
+    if (doneLabel == null)
+      {
+        doneGiven = false;
+        doneLabel = new Label(code);
+      }
+    else
+      {
+        doneGiven = true;
+        done = null;  // To suppress goto in compileFromStackSimple.
+      }
     StackTarget.convert(comp, stackType, Type.pointer_type);
     code.emitStore(valuesVar);
     code.emitPushInt(0);
@@ -75,14 +91,18 @@ public class SeriesTarget extends Target
     code.emitInvokeStatic(Compilation.typeValues.getDeclaredMethod("nextIndex", 2));
     code.emitDup(Type.int_type);
     code.emitStore(nextVar);
-    code.emitGotoIfIntLtZero(done);
+    code.emitGotoIfIntLtZero(doneLabel);
     code.emitLoad(valuesVar);
     code.emitLoad(indexVar);
     code.emitInvokeStatic(Compilation.typeValues.getDeclaredMethod("nextValue", 2));
-    compileFromStackSimple(comp, Type.pointer_type);
+    compileFromStackSimple(comp, SingletonType.getInstance());
     code.emitLoad(nextVar);
     code.emitStore(indexVar);
     code.emitGoto(top);
+    if (doneGiven)
+      done = doneLabel;
+    else
+      doneLabel.define(code);
 
     /*
     if (stackType is singleton type)
@@ -97,6 +117,11 @@ public class SeriesTarget extends Target
 	code.emitFi();
       }
     */
+  }
+
+  public String toString()
+  {
+    return "SeriesTarget[param: "+param+"; func:"+function+" done:"+done+"]";
   }
 
   public Type getType() { return Type.pointer_type; }

@@ -415,14 +415,36 @@ public class Compilation
   {
     if (target instanceof IgnoreTarget)
       return;
-    if (value instanceof Values
-	&& (target instanceof ConsumerTarget
-	    || target instanceof SeriesTarget))
+    if (value instanceof Values)
       {
 	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  compileConstant(values[i], target);
-	return;
+        int len = values.length;
+        if (target instanceof ConsumerTarget)
+          {
+            for (int i = 0;  i < len;  i++)
+              {
+                compileConstant(values[i], target);
+              } 
+            return;
+          }
+        else if (target instanceof SeriesTarget)
+          {
+            SeriesTarget starget = (SeriesTarget) target;
+            Label saveDone = starget.done;
+            if (len > 0)
+              {
+                starget.done = null;
+                for (int i = 0;  i < len;  i++)
+                  {
+                    if (i+1 == len)
+                      starget.done = saveDone;
+                    compileConstant(values[i], target);
+                  }
+              }
+            else if (saveDone != null && getCode().reachableHere())
+              getCode().emitGoto(saveDone);
+            return;
+          }
       }
     if (target instanceof ConditionalTarget)
       {

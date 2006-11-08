@@ -16,13 +16,17 @@ import gnu.math.IntNum;
 
 public class ValuesMap extends MethodProc implements CanInline, Inlineable
 {
-  public static final ValuesMap valuesMap = new ValuesMap();
-  public static final ValuesMap valuesMapWithPos = new ValuesMap();
-  static { valuesMapWithPos.startCounter = 1; }
+  public static final ValuesMap valuesMap = new ValuesMap(-1);
+  public static final ValuesMap valuesMapWithPos = new ValuesMap(1);
+
+  private ValuesMap (int startCounter)
+  {
+    this.startCounter = startCounter;
+  }
 
   /** If non-negative also define a counter variable.
    * Used for XQuery's 'at' clause in a FLWOR expression. */
-  public int startCounter = -1;
+  private final int startCounter;
 
   public int numArgs() { return 0x2002; }
 
@@ -115,7 +119,10 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     else
       counter = null;
     starget.function = new Label(code);
-    starget.done = new Label(code);
+    if (target instanceof SeriesTarget)
+      starget.done = ((SeriesTarget) target).done;
+    else
+      starget.done = new Label(code);
     // If the param Declaration is captured, then it gets messy initializing
     // it.  So just cheat and create a helper varaible.
     if (param.isSimple())
@@ -127,8 +134,6 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     Variable retAddr = code.addLocal(retAddrType);
     vals.compileWithPosition(comp, starget);
 
-    if (code.reachableHere())
-      code.emitGoto(starget.done);
     starget.function.define(code);
     code.pushType(retAddrType);
     code.emitStore(retAddr);
@@ -139,14 +144,25 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
       }
     else
       args = new Expression[] { new ReferenceExp(param) };
-    new ApplyExp(lambda, args).compile(comp, target);
+    Expression app = new ApplyExp(lambda, args);
+    if (target instanceof SeriesTarget)
+      {
+        SeriesTarget atarget = (SeriesTarget) target;
+        Label done = atarget.done;
+        atarget.done = null;
+        app.compile(comp, target);
+        atarget.done = done;
+      }
+    else
+      app.compile(comp, target);
     if (startCounter >= 0)
       {
 	code.emitInc(counter, (short) 1);
       }
     code.emitRet(retAddr);
     code.popScope();
-    starget.done.define(code);
+    if (! (target instanceof SeriesTarget))
+      starget.done.define(code);
   }
 
   public Type getReturnType (Expression[] args)

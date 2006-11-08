@@ -83,6 +83,7 @@ public abstract class ScopeExp extends Expression
     if (last == oldDecl)
       last = newDecl;
     oldDecl.next = null;
+    newDecl.context = this;
   }
 
   public void remove (Declaration decl)

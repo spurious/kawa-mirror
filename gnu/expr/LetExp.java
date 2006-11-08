@@ -160,8 +160,10 @@ public class LetExp extends ScopeExp
       {
 	Target varTarget;
 	Expression init = inits[i];
-        decl.allocateVariable(code);
-	if (! decl.needsInit()
+        boolean needsInit = decl.needsInit();
+	if (needsInit)
+          decl.allocateVariable(code);
+	if (! needsInit
 	    || (decl.isIndirectBinding() && init == QuoteExp.undefined_exp))
 	  varTarget = Target.Ignore;
 	else

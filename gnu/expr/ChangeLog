@@ -1,5 +1,8 @@
 2006-11-07  Per Bothner  <per@bothner.com>
 
+	* LetExp.java (compile): Don't allocateVarianble unless Declaration
+	needsInit().
+
 	* SeriesTarget.java (done): Can now be null.
 	(compileFromStackSimple): Do goto 'done' if needed.
 	(compileFromStack): Handle the case when 'done==null'.

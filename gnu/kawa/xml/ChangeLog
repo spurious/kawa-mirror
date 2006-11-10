@@ -1,3 +1,11 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* MakeAttribute.java: Update for Consumer changes.
+	* MakeResponseHeader.java: Likewise.
+	* HttpPrinter.java: Likewise.
+	* MakeElement.java: Likewise.
+	* Nodes.java: Likewise.
+
 2006-11-08  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java: Update for ParsedXMLToConsumer -> XMLFilter rename.

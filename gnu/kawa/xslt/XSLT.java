@@ -145,12 +145,12 @@ public class XSLT extends XQuery
 	      }
 	    else
 	      {
-		out.beginGroup(name, type);
+		out.beginGroup(type);
 		// FIXME emit attributes
 		pos.push(doc, doc.firstChildPos(ipos));
 		process(doc, pos, ctx);
 		pos.pop();
-		out.endGroup(name);
+		out.endGroup();
 	      }
 	    ipos = doc.nextDataIndex(ipos >>> 1) << 1;
 	    pos.gotoNext();

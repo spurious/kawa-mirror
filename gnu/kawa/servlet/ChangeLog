@@ -1,3 +1,7 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* ReplSession.java: Update for Consumer changes.
+
 2006-08-08  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (LAST_MODIFIED_CACHE_TIME): Moved field

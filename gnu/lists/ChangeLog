@@ -1,3 +1,20 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* Consumer.java (beginGroup, endGroup): Remove typeName parameter.
+	(beginAttribute): Remove attrName parameter.
+	* PrintConsumer.java: Update for Consumer changes
+	* TreeList.java: Likewise.
+	(find(Object,Object)): Removed.
+	*getNextTypeName): Since we don't store group/attribute String names
+	any more, change to just do toString of getNextTypeObject.
+	(getNextTypeIndex): Now just inline in getNextTypeObject.
+	* AbstractFormat.java: Update for Consumer changes
+	* LList.java: Likewise.
+	* FVector.java: Likewise.
+	* NamedChildrenFilter.java: Likewise.
+	* FilterConsumer.java: Likewise.
+	(attributeName): Remove no-longer-needed field.
+
 2006-11-05  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (MAX_CHAR_SHORT): Make public.

@@ -92,7 +92,7 @@ public class NodeTree extends TreeList
     else if (v instanceof gnu.expr.Keyword)
       {
         Keyword k = (Keyword) v;
-        beginAttribute(k.getName(), k.asSymbol());
+        beginAttribute(k.asSymbol());
         gapStartLastAtomic = SAW_KEYWORD;
       }
     else
@@ -120,7 +120,7 @@ public class NodeTree extends TreeList
       }
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup (Object type)
   {
     closeTag();
     groupLevel++;
@@ -128,7 +128,7 @@ public class NodeTree extends TreeList
       {
         gapStartTag = gapStart;
         super.beginGroup(0);
-        rememberGroup(typeName, type);
+        rememberGroup(type);
         attrCount = 1;
       }
     else if (stringizingElementLevel == 0)
@@ -154,17 +154,16 @@ public class NodeTree extends TreeList
   {
     gapStartTag = groupIndex;
     super.setGroupName(groupIndex, nameIndex);
-    String groupName = (String) objects[nameIndex]; 
-    Object groupType = objects[nameIndex+1];
-    rememberGroup(groupName, groupType);
+    Object groupType = objects[nameIndex];
+    rememberGroup(groupType);
   }
 
-  public void endGroup (String typeName)
+  public void endGroup ()
   {
     closeTag();
     groupLevel--;
     if (stringizingLevel == 0)
-      super.endGroup(typeName);
+      super.endGroup();
     if (stringizingElementLevel > 0)
       {
         if (stringizingElementLevel == stringizingLevel)
@@ -179,9 +178,8 @@ public class NodeTree extends TreeList
       }
   }
 
-  protected void rememberGroup (String typeName, Object type)
+  protected void rememberGroup (Object type)
   {
-    String groupName = typeName == null ? "" : typeName;
     if (copyNamespacesMode == 0)
       groupNamespaces = NamespaceBinding.predefinedXML;
     else if (copyNamespacesMode == COPY_NAMESPACES_INHERIT)
@@ -208,7 +206,7 @@ public class NodeTree extends TreeList
       }
     ensureSpaceInWorkStack(groupLevel-1);
     workStack[groupLevel-1] = groupNamespaces;
-    workStack[groupLevel] = groupName;
+    workStack[groupLevel] = null; // FIXME - was groupName;
     workStack[groupLevel+1] = type;
   }
 
@@ -227,7 +225,7 @@ public class NodeTree extends TreeList
       }
   }
 
-  protected void rememberAttribute (String attrName, Object attrType)
+  protected void rememberAttribute (Object attrType)
   {
     if (attrIndexes == null)
       {
@@ -241,12 +239,12 @@ public class NodeTree extends TreeList
       }
     int oldSize = groupLevel + 2 * attrCount;
     ensureSpaceInWorkStack(oldSize);
-    workStack[oldSize] = attrName;
+    workStack[oldSize] = null;  // FIXME: was: attrName;
     workStack[oldSize + 1] = attrType;
     attrCount++;
   }
 
-  public void beginAttribute (String attrName, Object attrType)
+  public void beginAttribute (Object attrType)
   {
     if (groupLevel <= 1 && docStart != 0)
       error("attribute not allowed at document level");
@@ -254,16 +252,16 @@ public class NodeTree extends TreeList
     if (stringizingLevel++ > 0)
       return;
     if (attrCount == 0 && groupLevel > 0)
-      error("attribute '"+attrName+"' follows non-attribute content");
+      error("attribute follows non-attribute content");
     checkAttributeSymbol((Symbol) attrType); // ???
 
     if (groupLevel == 0)
       {
-        super.beginAttribute(super.find(attrName, attrType));
+        super.beginAttribute(super.find(attrType));
       }
     else
       {
-        rememberAttribute(attrName, attrType);
+        rememberAttribute(attrType);
         attrIndexes[attrCount-1] = super.gapStart;
         super.beginAttribute(0);
       }
@@ -281,9 +279,8 @@ public class NodeTree extends TreeList
   public void setAttributeName (int attrIndex, int nameIndex)
   {
     super.setAttributeName(attrIndex, nameIndex);
-    String attrName = (String) objects[nameIndex]; 
-    Object attrType = objects[nameIndex+1];
-    rememberAttribute(attrName, attrType);
+    Object attrType = objects[nameIndex];
+    rememberAttribute(attrType);
     attrIndexes[attrCount-1] = attrIndex;
   }
 
@@ -493,7 +490,7 @@ public class NodeTree extends TreeList
             || bindings != ((XName) groupType).getNamespaceNodes())
           groupType = new XName((Symbol) groupType, bindings);
 
-        int groupIndex = super.find(workStack[groupLevel], groupType);
+        int groupIndex = super.find(groupType);
         super.setGroupName(gapStartTag, groupIndex);
 
         if (attrIndexes != null)
@@ -501,7 +498,7 @@ public class NodeTree extends TreeList
             for (int i = attrCount;  --i > 0; )
               {
                 int j = groupLevel + 2*i;
-                int attrObjectIndex = super.find(workStack[j], workStack[j+1]);
+                int attrObjectIndex = super.find(workStack[j+1]);
                 super.setAttributeName(attrIndexes[i], attrObjectIndex);
                 workStack[j] = null;
                 workStack[j+1] = null;

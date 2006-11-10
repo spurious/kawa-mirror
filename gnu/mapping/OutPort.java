@@ -264,35 +264,35 @@ public class OutPort extends PrintConsumer implements Printable
 
   //public void writeChar(int v);
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     if (objectFormat != null)
-      objectFormat.beginGroup(typeName, type, this);
+      objectFormat.beginGroup(type, this);
     else
       {
 	print('(');
-	print(typeName);
+	print(type);
       }
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
     if (objectFormat != null)
-      objectFormat.endGroup(typeName,this);
+      objectFormat.endGroup(this);
     else
       print(')');
   }
 
   /** Write a attribute for the current group.
    * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     if (objectFormat != null)
-      objectFormat.beginAttribute(attrName, attrType, this);
+      objectFormat.beginAttribute(attrType, this);
     else
       {
         print(' ');
-        print(attrName);
+        print(attrType);
         print(": ");
       }
   }

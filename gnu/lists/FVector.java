@@ -188,13 +188,11 @@ public class FVector extends SimpleVector
 
   public void consume(Consumer out)
   {
-    String typeName = "#vector"; 
-    String type = typeName;
-    out.beginGroup(typeName, type);
+    out.beginGroup("#vector");
     int len = size;
     for (int i = 0;  i < len;  i++)
       out.writeObject(data[i]);
-    out.endGroup(typeName);
+    out.endGroup();
   }
 
   /**

@@ -29,12 +29,12 @@ public interface Consumer
   public void beginDocument();
   public void endDocument();
 
-  public void beginGroup(String typeName, Object type);
-  public void endGroup(String typeName);
+  public void beginGroup(Object type);
+  public void endGroup();
 
   /** Write a attribute for the current group.
    * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(String attrName, Object attrType);
+  public void beginAttribute(Object attrType);
 
   /** End of an attribute or end of an actual parameter.
    * The former use matches a beginAttribute; the latter may not,

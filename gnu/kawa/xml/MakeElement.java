@@ -66,19 +66,12 @@ public class MakeElement extends NodeConstructor
                                 int copyNamespacesMode,
 				NamespaceBinding namespaceNodes)
   {
-    String name;
     XName type;
     if (qname instanceof Symbol)
-      {
-	type = new XName((Symbol) qname, namespaceNodes);
-	name = type.toString();
-      }
+      type = new XName((Symbol) qname, namespaceNodes);
     else
-      {
-	name = qname.toString();
-	type = new XName(Symbol.make("", name, ""), namespaceNodes);
-      }
-    out.beginGroup(name, type);
+      type = new XName(Symbol.make("", qname.toString(), ""), namespaceNodes);
+    out.beginGroup(type);
     if (out instanceof NodeTree)
       ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
@@ -86,31 +79,19 @@ public class MakeElement extends NodeConstructor
   public static void beginGroup(Consumer out, Object qname,
                                 int copyNamespacesMode)
   {
-    String name;
     Symbol type;
     if (qname instanceof Symbol)
-      {
-	type = (Symbol) qname;
-	name = type.toString();
-      }
+      type = (Symbol) qname;
     else
-      {
-	name = qname.toString();
-	type = Symbol.make("", name, "");
-      }
-    out.beginGroup(name, type);
+      type = Symbol.make("", qname.toString(), "");
+    out.beginGroup(type);
     if (out instanceof NodeTree)
       ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
 
-  public static void endGroup(Consumer out, Object type)
+  public static void endGroup(Consumer out, Object type/*FIXME:unused*/)
   {
-    String name;
-    if (type instanceof Symbol)
-      name = ((Symbol) type).getLocalName();
-    else
-      name = type.toString();
-    out.endGroup(name);
+    out.endGroup();
   }
 
   public void apply (CallContext ctx)

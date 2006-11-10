@@ -306,7 +306,7 @@ public class XMLPrinter extends OutPort
       super.write(name == null ? "{null name}" : (String) name);
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     closeTag();
     if (groupNesting == 0)
@@ -321,7 +321,7 @@ public class XMLPrinter extends OutPort
               {
                 Object publicIdentifier = doctypePublic.get(null);
                 super.write("<!DOCTYPE ");
-                super.write(typeName);
+                super.write(type.toString());
                 String publicId = publicIdentifier == null ? null
                   : publicIdentifier.toString();
                 if (publicId != null && publicId.length() > 0)
@@ -348,11 +348,10 @@ public class XMLPrinter extends OutPort
 	startLogicalBlock("", "", 2);
       }
     super.write('<');
-    Object name = type instanceof Symbol ? type : typeName;
-    writeQName(name);
+    writeQName(type);
     if (printIndent >= 0 && indentAttributes)
       startLogicalBlock("", "", 2);
-    groupNameStack[groupNesting] = name;
+    groupNameStack[groupNesting] = type;
     NamespaceBinding groupBindings = null;
     namespaceSaveStack[groupNesting++] = namespaceBindings;
     if (type instanceof XName)
@@ -460,9 +459,14 @@ public class XMLPrinter extends OutPort
       }
 
     inStartTag = true;
-    if (isHtml
-	&& ("script".equals(typeName) || "style".equals(typeName)))
-      escapeText = false;
+    if (isHtml)
+      {
+        String typeName = (type instanceof Symbol
+                           ? ((Symbol) type).getLocalPart()
+                           : type.toString());
+	if ("script".equals(typeName) || "style".equals(typeName))
+          escapeText = false;
+      }
   }
 
   static final String HtmlEmptyTags
@@ -475,10 +479,14 @@ public class XMLPrinter extends OutPort
       && HtmlEmptyTags.charAt(index+name.length()) == '/';
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
     if (useEmptyElementTag == 0)
       closeTag();
+    Object type = groupNameStack[groupNesting-1];
+    String typeName = ! isHtml ? null // not needed
+      : type instanceof Symbol ? ((Symbol) type).getLocalPart()
+      : type.toString();
     if (inStartTag)
       {
 	if (printIndent >= 0 && indentAttributes)
@@ -500,7 +508,7 @@ public class XMLPrinter extends OutPort
                          : PrettyWriter.NEWLINE_LINEAR);
 	  }
 	super.write("</");
-        writeQName(groupNameStack[groupNesting-1]);
+        writeQName(type);
 	super.write(">");
       }
     if (printIndent >= 0)
@@ -519,7 +527,7 @@ public class XMLPrinter extends OutPort
 
   /** Write a attribute for the current group.
    * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     if (inAttribute)
       super.write('"');
@@ -527,7 +535,7 @@ public class XMLPrinter extends OutPort
     super.write(' ');
     if (printIndent >= 0)
       writeBreakFill();
-    super.write(attrName);
+    super.write(attrType.toString()); // FIXME: use Symbol.print
     super.write("=\"");
     prev = ' ';
   }
@@ -655,7 +663,7 @@ public class XMLPrinter extends OutPort
       }
     if (v instanceof Keyword)
       {
-        beginAttribute(((Keyword) v).getName(), v);
+        beginAttribute(((Keyword) v).getName());
         prev = KEYWORD;
         return;
       }

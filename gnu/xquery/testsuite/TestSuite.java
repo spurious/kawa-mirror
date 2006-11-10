@@ -1,5 +1,6 @@
 package gnu.xquery.testsuite;
 import java.io.*;
+import java.util.Stack;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.mapping.CharArrayOutPort;
@@ -30,6 +31,7 @@ public class TestSuite extends FilterConsumer
   boolean inTestSuite = false;
   boolean inTest = false;
   String currentTag;
+  Stack groupStack = new Stack();
 
   CharArrayOutPort cout;
   XMLPrinter xout;
@@ -55,8 +57,9 @@ public class TestSuite extends FilterConsumer
     this.xout = xout;
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
+    String typeName = type.toString();
     if ("testsuite".equals(typeName) && nesting == 0)
       inTestSuite = true;
     else if ("test".equals(typeName)
@@ -70,13 +73,16 @@ public class TestSuite extends FilterConsumer
     else if (currentTag == null)
       throw new RuntimeException("saw <"+typeName+"> not in <test>");
     else
-      base.beginGroup(typeName, type);
+      base.beginGroup(type);
     nesting++;
+    groupStack.push(type);
   }
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
     nesting--;
+    Object type = groupStack.pop();
+    String typeName = type.toString();
     if ("testsuite".equals(typeName) && nesting == 0)
       inTestSuite = false;
     else if ("test".equals(typeName)
@@ -100,6 +106,6 @@ public class TestSuite extends FilterConsumer
 	currentTag = null;
       }
     else
-      base.endGroup(typeName);
+      base.endGroup();
   }
 }

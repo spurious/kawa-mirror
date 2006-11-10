@@ -1,3 +1,8 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Update for Consumer changes.
+	* XSLT.java: Likewise.
+
 2006-08-22  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (getCompilation): New method.

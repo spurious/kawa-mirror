@@ -1,3 +1,8 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* ConsumeSAXHandler.java: Update for Consumer changes.
+	* ContentConsumer.java: Likewise.
+
 2006-05-26  Per Bothner  <per@bothner.com>
 
 	* KawaXMLReader.java (getPublicId): Get from xmlParser.

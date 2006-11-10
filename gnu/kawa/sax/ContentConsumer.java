@@ -56,7 +56,7 @@ public class ContentConsumer implements Consumer
     inStartTag = 0;
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     if (inStartTag == 1)
       endStartTag();
@@ -88,16 +88,16 @@ public class ContentConsumer implements Consumer
       }
     names[i] = namespaceURI;
     names[i+1] = localName;
-    names[i+2] = typeName;
+    names[i+2] = type.toString();
     inStartTag = 1;
     nesting++;
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     attrURI = ((Symbol) attrType).getNamespaceURI();
     attrLocalName = ((Symbol) attrType).getLocalName();
-    attrQName = attrName;
+    attrQName = attrType.toString();
     inStartTag = 2;
   }
 
@@ -133,7 +133,7 @@ public class ContentConsumer implements Consumer
       }
   }
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
     endStartTag();
     flushStrBuffer();

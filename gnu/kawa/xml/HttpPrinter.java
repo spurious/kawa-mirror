@@ -16,7 +16,7 @@ public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
   StringBuffer sbuf = new StringBuffer(100);
-  String currentHeader;
+  Object currentHeader;
 
   /** 1 - implicit; 2: explicit. */
   private int seenBeginDocument;
@@ -89,19 +89,19 @@ public class HttpPrinter extends FilterConsumer
     headers.addElement(value);
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     if (base == null)
-      currentHeader = attrName;
+      currentHeader = attrType;
     else
-      base.beginAttribute(attrName, attrType);
+      base.beginAttribute(attrType);
   }
 
   public void endAttribute()
   {
     if (currentHeader != null)
       {
-	addHeader(currentHeader, sbuf.toString());
+	addHeader(currentHeader.toString(), sbuf.toString());
 	sbuf.setLength(0);
 	currentHeader = null;
       }
@@ -145,27 +145,28 @@ public class HttpPrinter extends FilterConsumer
     sbuf.setLength(0);
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     if (sawContentType == null)
       {
 	String mimeType;
 	if (! seenXmlHeader)
 	  mimeType = "text/html";
-	else if (typeName.equals("html"))
+	else if (type instanceof Symbol
+                 && "html".equals(((Symbol) type).getLocalPart()))
 	  mimeType = "text/xhtml";
 	else
 	  mimeType = "text/xml";
 	addHeader("Content-type", mimeType);
       }
     beginData();
-    base.beginGroup(typeName, type);
+    base.beginGroup(type);
     groupNesting++;
   }
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
-    super.endGroup(typeName);
+    super.endGroup();
     groupNesting--;
     if (groupNesting == 0 && seenBeginDocument == 1)
       endDocument();

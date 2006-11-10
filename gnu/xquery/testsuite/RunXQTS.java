@@ -94,12 +94,12 @@ public class RunXQTS extends FilterConsumer
 
   private void writeBeginGroup (String name)
   {
-    xqlog.beginGroup(name, Symbol.make(XQTS_RESULT_NAMESPACE, name, ""));
+    xqlog.beginGroup(Symbol.make(XQTS_RESULT_NAMESPACE, name, ""));
   }
 
   private void writeBeginAttribute (String name)
   {
-    xqlog.beginAttribute(name, name);
+    xqlog.beginAttribute(name);
   }
 
   private void writeAttribute (String name, String value)
@@ -111,8 +111,7 @@ public class RunXQTS extends FilterConsumer
 
   private void writeQexoAttribute (String name, String value)
   {
-    xqlog.beginAttribute("q:"+name,
-                         Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
+    xqlog.beginAttribute(Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
                                      name, "q"));
     xqlog.writeChars(value);
     xqlog.endAttribute();
@@ -175,7 +174,6 @@ public class RunXQTS extends FilterConsumer
   }
 
   int nesting = 0;
-  String currentTag;
   Object currentElementType;
   Symbol currentElementSymbol;
   Stack elementTypeStack = new Stack();
@@ -234,13 +232,12 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     if (inStartTag)
       handleStartTag();
     attributes.clear();
     inStartTag = true;
-    currentTag = typeName;
     elementTypeStack.push(currentElementType);
     currentElementType = type;
     currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
@@ -262,7 +259,7 @@ public class RunXQTS extends FilterConsumer
     else if (currentTag == null)
       throw new RuntimeException("saw <"+typeName+"> not in <test>");
     else
-      base.beginGroup(typeName, type);
+      base.beginGroup(type);
     */
     nesting++;
   }
@@ -287,13 +284,13 @@ public class RunXQTS extends FilterConsumer
         ResultOffsetPath = attributes.getValue("ResultOffsetPath");
         XQTSVersion = attributes.getValue("version");
  
-        xqlog.beginGroup("test-suite-result", testSuiteResultGroupType);
+        xqlog.beginGroup(testSuiteResultGroupType);
         writeBeginGroup("implementation");
         writeAttribute("name", "Qexo");
         writeAttribute("version", kawa.Version.getVersion());
         writeBeginGroup("organization");
         writeAttribute("name", "GNU / Per Bothner");
-        xqlog.endGroup("organization");
+        xqlog.endGroup();
         writeBeginGroup("submittor");
         String user = System.getProperty("user.name");
         if ("bothner".equals(user))
@@ -303,19 +300,19 @@ public class RunXQTS extends FilterConsumer
           }
         else
           writeAttribute("name", user);
-        xqlog.endGroup("submittor");
-        xqlog.endGroup("implementation");
+        xqlog.endGroup();
+        xqlog.endGroup();
         writeBeginGroup("syntax");
         xqlog.writeChars("XQuery");
-        xqlog.endGroup("syntax");
-        xqlog.beginGroup("test-run", testRunGroupType);
+        xqlog.endGroup();
+        xqlog.beginGroup(testRunGroupType);
         StringBuffer sbuf = new StringBuffer();
         gnu.kawa.xml.XTimeType.dateTimeType.now().toStringDate(sbuf);
         writeAttribute("dateRun", sbuf.toString());
-        xqlog.beginGroup("test-suite", testSuiteGroupType);
+        xqlog.beginGroup(testSuiteGroupType);
         writeAttribute("version", XQTSVersion);
-        xqlog.endGroup("test-suite");
-        xqlog.endGroup("test-run");
+        xqlog.endGroup();
+        xqlog.endGroup();
 
       }
     else if (tagMatches("test-group"))
@@ -750,7 +747,7 @@ public class RunXQTS extends FilterConsumer
 
   String selectedTest;
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
     if (inStartTag)
       handleStartTag();
@@ -760,7 +757,7 @@ public class RunXQTS extends FilterConsumer
         if (selectedTest == null
             || selectedTest.equals(testName))
           {
-            xqlog.beginGroup("test-case", testCaseGroupType);
+            xqlog.beginGroup(testCaseGroupType);
             writeAttribute("name", testName);
             try
               {
@@ -773,7 +770,7 @@ public class RunXQTS extends FilterConsumer
                 System.err.println("caught "+ex);
                 ex.printStackTrace();
               }
-            xqlog.endGroup("test-case");
+            xqlog.endGroup();
           }
         //xqlog.flush();
         testName = null;
@@ -862,7 +859,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("test-suite"))
       {
-        xqlog.endGroup("test-suite-result");
+        xqlog.endGroup();
       }
     else if (testName != null && tagMatches("module"))
       {
@@ -890,7 +887,7 @@ public class RunXQTS extends FilterConsumer
 	currentTag = null;
       }
     else
-      base.endGroup(typeName);
+      base.endGroup();
     */
     cout.setLength(elementStartIndex[nesting]);
     nesting--;
@@ -899,9 +896,9 @@ public class RunXQTS extends FilterConsumer
     currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
-    super.beginAttribute(attrName, attrType);
+    super.beginAttribute(attrType);
     attrValueStart = cout.length();
   }
 
@@ -909,26 +906,12 @@ public class RunXQTS extends FilterConsumer
   {
     super.endAttribute();
     String attrValue = cout.toSubString(attrValueStart, cout.length()-1);
-    String uri;
-    String local;
-    String qname;
-    if (attributeType instanceof Symbol)
-      {
-        Symbol sym = (Symbol) attributeType;
-        uri = sym.getNamespaceURI();
-        local = sym.getLocalPart();
-        String prefix = sym.getPrefix();
-        if (prefix == null || prefix.length() == 0)
-          qname = local;
-        else
-          qname = prefix+":"+local;
-      }
-    else
-      {
-        uri = null;
-        local = attributeName;
-        qname = attributeName;
-      }
+    Symbol sym = (Symbol) attributeType;
+    String uri = sym.getNamespaceURI();
+    String local = sym.getLocalPart();
+    String prefix = sym.getPrefix();
+    String qname = (prefix == null || prefix.length() == 0 ? local
+                    : prefix+":"+local);
     cout.setLength(attrValueStart);
     attributes.addAttribute(uri, local, qname, "CDATA", attrValue);
   }

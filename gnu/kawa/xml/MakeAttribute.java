@@ -16,7 +16,7 @@ public class MakeAttribute extends NodeConstructor
 
   public static void beginAttribute(Consumer out, Object type)
   {
-    out.beginAttribute(type.toString(), type);
+    out.beginAttribute(type);
   }
 
   public void apply (CallContext ctx)

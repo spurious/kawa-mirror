@@ -152,22 +152,22 @@ public class Nodes extends Values
       finishFragment();
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup (Object type)
   {
     maybeStartNonTextNode();
-    curFragment.beginGroup(typeName, type);
+    curFragment.beginGroup(type);
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
-    curFragment.endGroup(typeName);
+    curFragment.endGroup();
     maybeEndNonTextNode();
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     maybeStartNonTextNode();
-    curFragment.beginAttribute(attrName, attrType);
+    curFragment.beginAttribute(attrType);
     inAttribute = true;
   }
 

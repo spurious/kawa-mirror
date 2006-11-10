@@ -101,11 +101,11 @@ public class PrintConsumer extends PrintWriter
   public void endDocument() { }
 
 
-  public void beginGroup(String typeName, Object type) { }
+  public void beginGroup(Object type) { }
 
-  public void endGroup(String typeName) { }
+  public void endGroup() { }
 
-  public void beginAttribute(String attrName, Object attrType) { }
+  public void beginAttribute(Object attrType) { }
 
   public void endAttribute() { }
 

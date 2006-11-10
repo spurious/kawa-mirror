@@ -26,8 +26,6 @@ public class XslTranslator extends Lexer implements Consumer
 
   /** We seen a beginAttribute but not the closing endAttribute. */
   boolean inAttribute;
-  /** The 'attribute name' from the most recent beginAttribute. */
-  String attributeName;
   /** The 'attribute type' from the most recent beginAttribute. */
   Object attributeType;
   /** Buffer to acumulate the value of the current attribute. */
@@ -109,7 +107,7 @@ public class XslTranslator extends Lexer implements Consumer
     // FIXME
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   { 
     String xslTag = isXslTag(type);
     if (xslTag == "template")
@@ -132,11 +130,10 @@ public class XslTranslator extends Lexer implements Consumer
     push(type);
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
     if (inAttribute)
       error('f', "internal error - attribute inside attribute");
-    attributeName = attrName;
     attributeType = attrType;
     attributeValue.setLength(0);
     nesting.append((char) comp.exprStack.size());
@@ -153,7 +150,7 @@ public class XslTranslator extends Lexer implements Consumer
     inAttribute = false;
   }
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
     int nlen = nesting.length()-1;
     int start = nesting.charAt(nlen);

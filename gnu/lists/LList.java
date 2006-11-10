@@ -297,9 +297,7 @@ public class LList extends ExtSequence
   public void consume(Consumer out)
   {
     Object list = this;
-    String typeName = "list";
-    String type = typeName;
-    out.beginGroup(typeName, type);
+    out.beginGroup("list");
     while (list instanceof Pair)
       {
 	if (list != this)
@@ -314,7 +312,7 @@ public class LList extends ExtSequence
 	out.writeChars(". ");
 	out.writeObject(checkNonList(list));
       }
-    out.endGroup(typeName);
+    out.endGroup();
   }
 
   public void readExternal(ObjectInput in)

@@ -251,7 +251,7 @@ public class XMLFilter
 		|| tlist.objects[index] != name
 		|| tlist.objects[index+1] != type)
 	      {
-		index = tlist.find(name, type);
+		index = tlist.find(type);
 		info.index = index;
 	      }
 	    if (i == 0)
@@ -262,10 +262,10 @@ public class XMLFilter
 	else
 	  {
 	    if (i == 0)
-	      cons.beginGroup(name, type);
+	      cons.beginGroup(type);
 	    else if (! isNsNode || namespacePrefixes)
 	      {
-		cons.beginAttribute(name, type);
+		cons.beginAttribute(type);
 		int start = startIndexes[i];
 		int end = i < attrCount ? startIndexes[i+1] : tlist.gapStart;
 		tlist.consumeIRange(start + TreeList.BEGIN_ATTRIBUTE_LONG_SIZE,
@@ -543,7 +543,7 @@ public class XMLFilter
     if (nesting <= 0)
       return; // Only if error.
     namespaceBindings = namespaceBindingsAtBeginGroup[--nesting];
-    base.endGroup(old);
+    base.endGroup();
   }
 
   /** Process an entity reference.

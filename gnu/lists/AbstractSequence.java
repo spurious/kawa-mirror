@@ -832,13 +832,11 @@ public abstract class AbstractSequence
   public void consume(Consumer out)
   {
     boolean isSequence = this instanceof Sequence;
-    String typeName = "#sequence"; 
-    String type = typeName;
     if (isSequence)
-      out.beginGroup(typeName, type);
+      out.beginGroup("#sequence");
     consumePosRange(startPos(), endPos(), out);
     if (isSequence)
-      out.endGroup(typeName);
+      out.endGroup();
   }
 
   public void toString (String sep, StringBuffer sbuf)

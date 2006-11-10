@@ -6,7 +6,7 @@ import gnu.lists.PrintConsumer;
 import java.io.*;
 import gnu.xml.*;
 
-/** The server state for a browser-base "read-eval-print-loop" session. */
+/** The server state for a browser-based "read-eval-print-loop" session. */
 
 public class ReplSession extends Writer
 {
@@ -230,21 +230,21 @@ class OutBufferWriter extends OutPort
       xout.writeChar(str.charAt(i));
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup (Object type)
   {
     nesting++;
-    xout.beginGroup(typeName, type);
+    xout.beginGroup(type);
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
     nesting--;
-    xout.endGroup(typeName);
+    xout.endGroup();
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute (Object attrType)
   {
-    xout.beginAttribute(attrName, attrType);
+    xout.beginAttribute(attrType);
   }
 
   public void endAttribute()

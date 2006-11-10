@@ -43,7 +43,7 @@ public class NamedChildrenFilter extends FilterConsumer
     super.endDocument();
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
     if (skipping && level == 1 // && axis is child::
 	// || axis is descdendent-or-self::
@@ -71,14 +71,14 @@ public class NamedChildrenFilter extends FilterConsumer
 	  }
       }
 
-    super.beginGroup(typeName, type);
+    super.beginGroup(type);
     level++;
   }
 
-  public void endGroup(String typeName)
+  public void endGroup()
   {
     level--;
-    super.endGroup(typeName);
+    super.endGroup();
     if (! skipping && matchLevel == level)
       skipping = true;
   }

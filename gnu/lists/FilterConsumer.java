@@ -12,8 +12,6 @@ public class FilterConsumer
   protected boolean skipping;
   /** We seen a beginAttribute but not the closing endAttribute. */
   protected boolean inAttribute;
-  /** The 'attribute name' from the most recent beginAttribute. */
-  protected String attributeName;
   /** The 'attribute type' from the most recent beginAttribute. */
   protected Object attributeType;
 
@@ -80,25 +78,24 @@ public class FilterConsumer
       base.endDocument();
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup (Object type)
   {
     if (! skipping)
-      base.beginGroup(typeName, type);
+      base.beginGroup(type);
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
     if (! skipping)
-      base.endGroup(typeName);
+      base.endGroup();
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute (Object attrType)
   {
-    attributeName = attrName;
     attributeType = attrType;
     inAttribute = true;
     if (! skipping)
-      base.beginAttribute(attrName, attrType);
+      base.beginAttribute(attrType);
   }
 
   public void endAttribute()

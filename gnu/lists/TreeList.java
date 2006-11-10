@@ -376,18 +376,6 @@ public class TreeList extends AbstractSequence
     return oindex++;
   }
 
-  public int find (Object arg1, Object arg2)
-  {
-    int i = oindex;
-    int i2 = i + 2;
-    if (i2 > objects.length)
-      resizeObjects();
-    objects[i] = arg1;
-    objects[i+1] = arg2;
-    oindex = i2;
-    return i;
-  }
-
   /** Get a 32-bit int from the data array. */
   final protected int getIntN(int index)
   {
@@ -480,9 +468,9 @@ public class TreeList extends AbstractSequence
     gapStart = i + length;
   }
 
-  public void beginGroup(String typeName, Object type)
+  public void beginGroup(Object type)
   {
-    beginGroup(find(typeName, type));
+    beginGroup(find(type));
   }
 
   public void beginDocument()
@@ -567,10 +555,10 @@ public class TreeList extends AbstractSequence
     setIntN(groupIndex + 1, nameIndex);
   }
 
-  public void endGroup(String typeName)
+  public void endGroup ()
   {
     if (data[gapEnd] != END_GROUP_LONG)
-      throw new Error("unexpected endGroup "+typeName);
+      throw new Error("unexpected endGroup");
     int index = getIntN(gapEnd + 1);
     int begin = getIntN(gapEnd + 3);
     int parent = getIntN(gapEnd + 5);
@@ -602,9 +590,9 @@ public class TreeList extends AbstractSequence
       }
   }
 
-  public void beginAttribute(String attrName, Object attrType)
+  public void beginAttribute(Object attrType)
   {
-    beginAttribute(find(attrName, attrType));
+    beginAttribute(find(attrType));
   }
 
   public void beginAttribute(int index)
@@ -1089,7 +1077,7 @@ public class TreeList extends AbstractSequence
 	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
 	  {
 	    index = datum-BEGIN_GROUP_SHORT;
-	    out.beginGroup(objects[index].toString(), objects[index+1]);
+	    out.beginGroup(objects[index]);
 	    pos += 2;
 	    continue;
 	  }
@@ -1199,25 +1187,24 @@ public class TreeList extends AbstractSequence
 	    pos += 2;
 	    continue;
 	  case END_GROUP_SHORT:
-	    index = data[pos++];
-	    index = data[pos - 2 - index] - BEGIN_GROUP_SHORT;
-	    out.endGroup(objects[index].toString());
+	    pos++;
+	    out.endGroup();
 	    continue;
 	  case BEGIN_GROUP_LONG:
 	    index = getIntN(pos);
 	    index += index >= 0 ? pos - 1 : data.length;
 	    pos += 2;
 	    index = getIntN(index + 1);
-	    out.beginGroup(objects[index].toString(), objects[index+1]);
+	    out.beginGroup(objects[index]);
 	    continue;
 	  case END_GROUP_LONG:
 	    index = getIntN(pos);
-	    out.endGroup(objects[index].toString());
+	    out.endGroup();
 	    pos += 6;
 	    continue;
 	  case BEGIN_ATTRIBUTE_LONG:
 	    index = getIntN(pos);
-	    out.beginAttribute(objects[index].toString(), objects[index+1]);
+	    out.beginAttribute(objects[index]);
 	    pos += 4;
 	    continue;
 	  case END_ATTRIBUTE:
@@ -1564,22 +1551,14 @@ public class TreeList extends AbstractSequence
 
   }
 
-  /** Return index in objects array for type or typename of a node.
-   * @param ipos the argument node
-   * @param select 0 if we want the type-name or 1 if we want the
-   *   type-object.  This parameter is ignored if the node is a
-   *   PROCESSING_INSTRUCTION, which only has a single entry in the
-   *   objects array.
-   * @return index in objects array, or -1 the node has no type.
-   */
-  private int getNextTypeIndex(int ipos, int select)
+  public Object getNextTypeObject (int ipos)
   {
     int index = posToDataIndex(ipos);
     char datum;
     for (;;)
       {
         if (index == data.length)
-          return -1;
+          return null;
         datum = data[index];
         if (datum != BEGIN_ENTITY)
           break;
@@ -1587,30 +1566,26 @@ public class TreeList extends AbstractSequence
       }
     if (datum >= BEGIN_GROUP_SHORT
 	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return datum-BEGIN_GROUP_SHORT + select;
+      index = datum-BEGIN_GROUP_SHORT;
     else if (datum == BEGIN_GROUP_LONG)
       {
 	int j = getIntN(index+1);
 	j += j < 0 ? data.length : index;
-	return getIntN(j + 1)+select;
+	index = getIntN(j + 1);
       }
     else if (datum == BEGIN_ATTRIBUTE_LONG)
-      return getIntN(index + 1)+select;
+      index = getIntN(index + 1);
     else if (datum == PROCESSING_INSTRUCTION)
-      return getIntN(index + 1);
-    return -1;
+      index = getIntN(index + 1);
+    else
+      return null;
+    return index < 0 ? null : objects[index];
   }
 
   public String getNextTypeName(int ipos)
   {
-    int index = getNextTypeIndex(ipos, 0);
-    return index < 0 ? null : (String) objects[index];
-  }
-
-  public Object getNextTypeObject(int ipos)
-  {
-    int index = getNextTypeIndex(ipos, 1);
-    return index < 0 ? null : objects[index];
+    Object type = getNextTypeObject(ipos);
+    return type == null ? null : type.toString();
   }
 
   public Object getPosPrevious(int ipos)
@@ -2346,7 +2321,7 @@ public class TreeList extends AbstractSequence
 		  {
 		    ch = ch - BEGIN_GROUP_SHORT;
 		    j = data[i+1] + i;
-		    out.print("=BEGIN_GROUP_SHORT end:"+j+" index#"+((int)ch)+"=<"+objects[ch]+"::"+objects[ch+1]+'>');
+		    out.print("=BEGIN_GROUP_SHORT end:"+j+" index#"+((int)ch)+"=<"+objects[ch]+'>');
 		    toskip = 2;
 		  }
 		else if (ch >= INT_SHORT_ZERO + MIN_INT_SHORT
@@ -2462,7 +2437,7 @@ public class TreeList extends AbstractSequence
 			out.print("=BEGIN_GROUP_LONG end:");
 			out.print(j);
 			j = getIntN(j + 1);
-			out.print(" -> #"+j+"=<"+objects[j]+"::"+objects[j+1]+'>');
+			out.print(" -> #"+j+"=<"+objects[j]+'>');
 			toskip = 2;
 			break;
 		      case END_GROUP_LONG:
@@ -2480,7 +2455,7 @@ public class TreeList extends AbstractSequence
 		      case BEGIN_ATTRIBUTE_LONG:
 			j = getIntN(i+1);
 			out.print("=BEGIN_ATTRIBUTE name:"+j
-				  +"="+objects[j]+"::"+objects[j+1]);
+				  +"="+objects[j]);
 			j = getIntN(i+3);
 			j += j < 0 ? data.length : i;
 			out.print(" end:"+j);

@@ -1,3 +1,9 @@
+2006-11-09  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Update for Consumer changes,
+	* NodeTree.java: Likewise.
+	* XMLFilter,java: Likewise.
+
 2006-11-08  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java: Renamed to ...

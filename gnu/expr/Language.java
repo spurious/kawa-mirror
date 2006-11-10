@@ -465,34 +465,6 @@ public abstract class Language
     return environ.get (name);
   }
 
-  public void print (Object obj, OutPort out)
-  {
-    print(obj, out, false);
-  }
-
-  public void print (Object value, OutPort out, boolean readable)
-  {
-    if (value == Values.empty)
-      return;
-    AbstractFormat saveFormat = out.objectFormat;
-    try
-      {
-	out.objectFormat = getFormat(readable);
-	if (value instanceof Values)
-	  {
-	    Object[] values = ((Values) value).getValues();
-	    for (int i = 0;  i < values.length;  i++)
-	      out.println(values[i]);
-	  }
-	else
-	  out.println(value);
-      }
-    finally
-      {
-	out.objectFormat = saveFormat;
-      }
-  }
-
   public AbstractFormat getFormat(boolean readable)
   {
     return null;

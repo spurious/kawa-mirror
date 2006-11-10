@@ -749,13 +749,6 @@ public class XQuery extends Language
   public static final ConstantFunction0 trueFunction
     = new ConstantFunction0("true", trueExp);
 
-  public static final XMLFormat writeFormat = new XMLFormat();
-
-  public AbstractFormat getFormat(boolean readable)
-  {
-    return writeFormat;
-  }
-
   public Consumer getOutputConsumer(java.io.Writer out)
   {
     return new XMLPrinter(out, false);

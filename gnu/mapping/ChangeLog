@@ -1,3 +1,7 @@
+2006-11-12  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (parse): Don't die if zero-length string.
+
 2006-11-09  Per Bothner  <per@bothner.com>
 
 	* OutPort.java: Update for Consumer changes.

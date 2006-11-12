@@ -136,7 +136,7 @@ public class Symbol
    */
   public static Symbol parse (String symbol)
   {
-    if (symbol.charAt(0) == '{')
+    if (symbol.length() > 0 && symbol.charAt(0) == '{')
       {
         int rbrace = symbol.lastIndexOf('}');
         if (rbrace <= 0)

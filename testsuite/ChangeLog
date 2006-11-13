@@ -1,3 +1,8 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Update and extend test for adding spaces
+	between words.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Updata/update some XmlNamespace tests.

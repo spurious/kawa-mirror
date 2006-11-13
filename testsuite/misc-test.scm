@@ -167,11 +167,13 @@
 (test #t eof-object? (peek-char str-inport))
 (close-input-port str-inport)
 
-(test "a(b c)" 'open-output-string
+(test "a/b (c d)" 'open-output-string
       (let ((q (open-output-string))
-            (x '(a b c)))
+            (x '(a b c d)))
         (write (car x) q)
-        (write (cdr x) q)
+	(display "/" q)
+        (write (cadr x) q)
+        (write (cddr x) q)
         (get-output-string q)))
 
 ;;; From: Hallvard Traetteberg <Hallvard.Traetteberg@idi.ntnu.no>

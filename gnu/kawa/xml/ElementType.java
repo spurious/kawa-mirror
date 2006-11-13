@@ -55,7 +55,7 @@ implements TypeValue, Externalizable, GroupPredicate
 
   public Type getImplementationType()
   {
-    return Type.pointer_type;
+    return ClassType.make("gnu.kawa.xml.KElement");
   }
 
   public final String getNamespaceURI () { return qname.getNamespaceURI(); }

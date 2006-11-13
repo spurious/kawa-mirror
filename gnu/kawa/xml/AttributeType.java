@@ -49,7 +49,7 @@ implements TypeValue, Externalizable, AttributePredicate
 
   public Type getImplementationType()
   {
-    return Type.pointer_type;
+    return ClassType.make("gnu.kawa.xml.KAttr");
   }
 
   public final String getNamespaceURI () { return qname.getNamespaceURI(); }

@@ -31,7 +31,8 @@ implements TypeValue, Externalizable
 
   public Type getImplementationType()
   {
-    return Type.pointer_type;
+    return ClassType.make("gnu.kawa.xml.KProcessingInstruction");
+
   }
 
   public void emitCoerceFromObject (CodeAttr code)

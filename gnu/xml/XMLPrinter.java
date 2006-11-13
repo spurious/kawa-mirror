@@ -199,23 +199,24 @@ public class XMLPrinter extends OutPort
   private void startWord()
   {
     closeTag();
-    if (prev == WORD
-        // This is wrong, since we want ("", "x") to print as " x".
-        // The problem is interactive i/o.  After output from one command,
-        // Kawa does a freshLine() before printing the prompt.  We want
-        // the freshline to clear the WORD state, but there is no way to
-        // do that currently. One solution may be to move support for
-        // spacing between WORD objects into he language-independent layer.
-        // That way Scheme can print muliple values better. FIXME.
-        && getColumnNumber() != 0)
-      super.write(' ');
-    prev = WORD;
+    writeWordStart();
   }
 
   public void writeBoolean(boolean v)
   {
     startWord();
     super.print(v);
+    writeWordEnd();
+  }
+
+  protected void startNumber()
+  {
+    startWord();
+  }
+
+  protected void endNumber()
+  {
+    writeWordEnd();
   }
 
   public void closeTag()
@@ -238,11 +239,6 @@ public class XMLPrinter extends OutPort
 	  }
 	needXMLdecl = false;
       }
-  }
-
-  protected void startNumber()
-  {
-    startWord();
   }
 
   void setIndentMode ()
@@ -648,17 +644,18 @@ public class XMLPrinter extends OutPort
 
   public void writeObject(Object v)
   {
-    if (v instanceof Consumable && ! (v instanceof UnescapedData))
-      {
-	((Consumable) v).consume(this);
-	return;
-      }
     if (v instanceof SeqPosition)
       {
+        bout.clearWordEnd();
 	SeqPosition pos = (SeqPosition) v;
 	pos.sequence.consumeNext(pos.ipos, this);
         if (pos.sequence instanceof NodeTree)
           prev = '-';
+	return;
+      }
+    if (v instanceof Consumable && ! (v instanceof UnescapedData))
+      {
+	((Consumable) v).consume(this);
 	return;
       }
     if (v instanceof Keyword)
@@ -670,6 +667,7 @@ public class XMLPrinter extends OutPort
     closeTag();
     if (v instanceof UnescapedData)
       {
+        bout.clearWordEnd();
 	super.write(((UnescapedData) v).getData());
         prev = '-';
       }
@@ -680,6 +678,7 @@ public class XMLPrinter extends OutPort
 	startWord();
 	prev = ' ';
 	print(v);
+        writeWordEnd();
 	prev = WORD;
       }
   }

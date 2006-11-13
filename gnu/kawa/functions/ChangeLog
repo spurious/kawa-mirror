@@ -1,3 +1,9 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObject): Rename to writeObjectRaw.
+	(writeObject): New method calls writeObjectRaw, but adds extra
+	spaces between "words".
+
 2006-11-07  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java (compile): Fix handling of SeriesTarget.

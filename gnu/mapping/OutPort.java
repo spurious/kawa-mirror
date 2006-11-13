@@ -306,6 +306,21 @@ public class OutPort extends PrintConsumer implements Printable
       print(' ');
   }
 
+  /** Note the end of a "word".  See {@link #writeWordStart}. */
+  public void writeWordEnd ()
+  {
+    bout.writeWordEnd();
+  }
+
+  /** Maybe write a word-separating space.
+   * Specifically, write a space if the previous output
+   * was {@link #writeWordEnd}.  Otherwise, do nothing.
+   */
+  public void writeWordStart ()
+  {
+    bout.writeWordStart();
+  }
+
   public void freshLine()
   {
     int col = bout.getColumnNumber();

@@ -107,6 +107,25 @@ public class DisplayFormat extends AbstractFormat
 
   public void writeObject(Object obj, Consumer out)
   {
+    boolean space = false;
+    if (out instanceof OutPort
+        && ! (obj instanceof gnu.kawa.xml.UntypedAtomic)
+        && ! (obj instanceof Values)
+        && (getReadableOutput()
+            || ! (obj instanceof FString
+                  || obj instanceof Char
+                  || obj instanceof Character)))
+      {
+        ((OutPort) out).writeWordStart();
+        space = true;
+      }
+    writeObjectRaw(obj, out);
+    if (space)
+      ((OutPort) out).writeWordEnd();
+  }
+
+  public void writeObjectRaw(Object obj, Consumer out)
+  {
     if (obj instanceof Boolean)
       writeBoolean(((Boolean)obj).booleanValue(), out);
     else if (obj instanceof Char)

@@ -38,6 +38,10 @@ public class PrintConsumer extends PrintWriter
   {
   }
 
+  protected void endNumber()
+  {
+  }
+
   /* #ifdef JAVA5 */
   // public PrintConsumer append (char c)
   // {
@@ -76,24 +80,28 @@ public class PrintConsumer extends PrintWriter
   {
     startNumber();
     print(v);
+    endNumber();
   }
 
   public void writeDouble(double v)
   {
     startNumber();
     print(v);
+    endNumber();
   }
 
   public void writeInt(int v)
   {
     startNumber();
     print(v);
+    endNumber();
   }
 
   public void writeLong(long v)
   {
     startNumber();
     print(v);
+    endNumber();
   }
 
   public void beginDocument() { }

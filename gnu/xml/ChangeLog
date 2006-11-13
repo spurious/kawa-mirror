@@ -1,3 +1,9 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (XMLPrinter):  Now uses writeWordStart.
+	(endNumber): New override.
+	(writeObject): Use new writeWordStart/writeWordEnd to maybe add spaces.
+
 2006-11-09  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Update for Consumer changes,

@@ -1,3 +1,9 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (wordEndSeen): New field.
+	(writeWordEnd, writeWordStart, clearWordEnd): New method.
+	(write*2, enqueueNewline): Clear wordEndSeen.
+
 2006-10-21  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (isPrettyPrinting): Replace public boolean by ...

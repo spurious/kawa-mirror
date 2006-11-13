@@ -276,8 +276,33 @@ public class PrettyWriter extends java.io.Writer
     return blocks[blockDepth+BLOCK_SECTION_START_LINE];
   }
 
+  boolean wordEndSeen;
+
+  /** Note the end of a "word".  See {@link #writeWordStart}. */
+  public void writeWordEnd ()
+  {
+    wordEndSeen = true;
+  }
+
+  /** Maybe write a word-separating space.
+   * Specifically, write a space if the previous output
+   * was {@link #writeWordEnd}.  Otherwise, do nothing.
+   */
+  public void writeWordStart ()
+  {
+    if (wordEndSeen)
+      write(' ');
+    wordEndSeen = false;
+  }
+
+  public void clearWordEnd ()
+  {
+    wordEndSeen = false;
+  }
+
   public void write (int ch)
   {
+    wordEndSeen = false;
     //log("{WRITE-ch: "+((char)ch)+"}");
     if (ch == '\n' && prettyPrintingMode > 0)
       enqueueNewline(NEWLINE_LITERAL);
@@ -299,6 +324,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void write (String str, int start, int count)
   {
+    wordEndSeen = false;
     //log("{WRITE-str: "+str.substring(start, start+count)+"}");
     while (count > 0)
       {
@@ -340,6 +366,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void write (char[] str, int start, int count)
   {
+    wordEndSeen = false;
     //log("{WRITE: "+new String(str, start, count)+"}");
     int end = start + count;
   retry:
@@ -535,6 +562,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void enqueueNewline (int kind)
   {
+    wordEndSeen = false;
     int depth = pendingBlocksCount;
     //enqueueExtraLog = " kind:"+(char) kind;
     int newline = enqueue(QITEM_NEWLINE_TYPE, QITEM_NEWLINE_SIZE);

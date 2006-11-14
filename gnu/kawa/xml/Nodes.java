@@ -23,7 +23,8 @@ public class Nodes extends Values
 
   int nesting = 0;
   boolean inAttribute;
-  NodeTree curFragment;
+  NodeTree curNode;
+  XMLFilter curFragment;
 
   public void writePosition (AbstractSequence seq, int ipos)
   {
@@ -227,12 +228,14 @@ public class Nodes extends Values
 
   void startFragment ()
   {
-    curFragment = new NodeTree();
-    writePosition(curFragment, 0);
+    curNode = new NodeTree();
+    curFragment = new XMLFilter(curNode);
+    writePosition(curNode, 0);
   }
 
   void finishFragment ()
   {
+    curNode = null;
     curFragment = null;
   }
 

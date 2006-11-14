@@ -1,175 +1,287 @@
- // Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
-import gnu.lists.Consumer;
-import gnu.lists.XConsumer;
-import gnu.lists.TreeList;
+import gnu.lists.*;
+import gnu.text.SourceLocator;
+import gnu.text.SourceMessages;
 import gnu.mapping.Symbol;
+import gnu.kawa.xml.MakeText;  // FIXME - bad cross-package dependency.
+import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
+import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
-public class XMLFilter
+/** Fixup XML input events.
+ * Handles namespace resolution, and adds "namespace nodes" if needed.
+ * Does various error checking.
+ * This wrapper should be used when creating a NodeTree,
+ * has is done XQuery node constructor expressions.
+ * Can also be called directly from XMLParser, in which case we use a slightly
+ * lower-level interface where we array char array segments rather than
+ * Strings.  This is to avoid duplicate String allocation and interning.
+ * The combination XMLParser+XMLFilter+NodeTree makes for a fast and
+ * compact way to read an XML file into a DOM.
+ * Future: Subsume ConsumeSAXHandler as well.  FIXME
+ */
+
+public class XMLFilter implements XConsumer, PositionConsumer
 {
+  /** This is where we save attributes while processing a begin element.
+   * It may be the final output if {@code out instanceof NodeTree}. */
+  TreeList tlist;
+
+  /** The specified target Consumer that accepts the output.
+   * In contrast, base may be either {@code ==out} or {@code ==tlist}. */
+  public Consumer out;
+
   Consumer base;
 
-  /** Stack of entered but not exited element tag names. */
-  String[] names = new String[10];
-  /** Active length of names stack. */
-  int depth = 0;
+  public static final int COPY_NAMESPACES_PRESERVE = 1;
+  public static final int COPY_NAMESPACES_INHERIT = 2;
+  public transient int copyNamespacesMode = COPY_NAMESPACES_PRESERVE;
 
-  XMLParserChar parser;
+  /** A helper stack.
+   * This is logically multiple separate stacks, but we combine them into
+   * a single array.  While this makes the code a little harder to read,
+   * it reduces memory overhead and (more importantly) should improve locality.
+   * For each nested document or group there is the saved value of
+   * namespaceBindings followed by a either a MappingInfo or Symbol
+   * from the emitBeginElement/beginGroup.  This is followed by a MappingInfo
+   * or Symbol for each attribute we seen for the current group. */
+  Object[] workStack;
+  NamespaceBinding namespaceBindings;
 
-  // List of unresolcved MappingInfos for begin tag and each attribute.
-  // Used while processing a single start tag.
-  // We always have pendingNames.length == startIndexes.length.
-  MappingInfo[] pendingNames = new MappingInfo[10];
+  private SourceMessages messages;
+  SourceLocator locator;
 
-  // List of indexes in tlist.data of begin of group and attribute.
-  int[] startIndexes = new int[10];
+  public void setSourceLocator (SourceLocator locator)
+  { this.locator = locator; }
+  public void setMessages (SourceMessages messages)
+  { this.messages = messages; }
 
-  // Number of attributes seen for the current start element.
-  int attrCount;
+  /** Twice the number of active beginGroup and beginDocument calls. */
+  protected int nesting;
+
+  int previous = 0;
+  private static final int SAW_KEYWORD = 2;
+  private static final int SAW_WORD = 1;
+
+  /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
+   * If counts the number of nested beginAttributes that are active.
+   * (In the future it should also count begun comment and
+   * processing-instruction constructors, when those support nesting.)
+   */
+  protected int stringizingLevel;
+  /** Value of stringizingLevel when beginGroup was seen.
+   * More specifically, the outer-most beginGroup seen when
+   * {@code stringizingLevel > 0}.
+   * All output should be supressed if 
+   * {@code stringizingLevel > stringizingElementLevel && stringizingElementLevel > 0}.
+   * This happens, for example, after this sequence: beginAttribute, beginGroup,
+   * beginAttribute.  In this case the inner attribute should be ignored,
+   * because it is not port of the string value of the beginGroup.
+   */
+  protected int stringizingElementLevel;
+
+  // List of indexes in tlist.data of begin of attribute.
+  int[] startIndexes = null;
+
+  /** The number of attributes.
+   * Zero means we've seen an element start tag.
+   * Gets reset to -1 when we no longer in the element header. */
+  int attrCount = -1;
 
   boolean inStartTag;
 
   /** True if currently processing an attribute value.. */
   boolean inAttribute;
 
-  // This is where we save attributes while processing a begin element.
-  // It may be the final output if cons instanceof NodeTree.
-  TreeList tlist;
-
-  // The specified target Consumer that accepts the output.
-  // In contrast, base may be either ==cons or ==tlist.
-  Consumer cons;
-
-  // For each beginGroup seen (and not yet seen the endGroup),
-  // the value of namespaceBindings at the beginGroup.
-  NamespaceBinding[] namespaceBindingsAtBeginGroup = new NamespaceBinding[20];
-
-  /** Non-null if we're processing a nameapace declaration attribute.
-   * In that case it is the prefix we defining,
+  /** Non-null if we're processing a namespace declaration attribute.
+   * In that case it is the prefix we're defining,
    * or {@code ""} in the case of a default namespace.  */
   String currentNamespacePrefix;
-
-  /** Number of beginGroups seen without close endGroup. */
-  int nesting;
 
   /** True if namespace declarations should be passed through as attributes.
    * Like SAX2's http://xml.org/features/namespace-prefixes. */
   public boolean namespacePrefixes = false;
 
   /** Map either lexical-QName or expanded-QName to a MappingInfo.
-   * This is conceptually two hash tables merged into a single data structure.
+   * This is conceptually three hash tables merged into a single data structure.
    * (1) when we first see a tag (a QName as a lexical form before namespace
    * resolution), we map the tag String to an preliminary info entry that
-   * has a null qname field.  These are entered into the pendingNames table.
+   * has a null qname field.
    * (2) After see the namespace declaration, we use the same table and keys,
    * but name the uri and qtype.namespaceNodes also have to match.
+   * (3) Used for hash-consing NamespaceBindings.
    */
   MappingInfo[] mappingTable = new MappingInfo[128];
   int mappingTableMask = mappingTable.length - 1;
 
   boolean mismatchReported;
 
-  public void setParser (XMLParserChar parser)
+  public void setLocator (SourceLocator locator)
   {
-    this.parser = parser;
+    this.locator = locator;
   }
 
-  private void endAttribute()
+  /** Functionally equivalent to
+   * {@code new NamespaceBinding(prefix, uri, oldBindings},
+   * but uses "hash consing".
+   */
+  public NamespaceBinding
+  findNamespaceBinding (String prefix, String uri, NamespaceBinding oldBindings)
   {
-    inAttribute = false;
-    if (currentNamespacePrefix == null || namespacePrefixes)
-      tlist.endAttribute();
-    else if (tlist instanceof NodeTree)
-      ((NodeTree) tlist).stringizingLevel--;
-    if (currentNamespacePrefix != null)
+    int hash = uri == null ? 0 : uri.hashCode();
+    if (prefix != null)
+      hash ^= prefix.hashCode();
+    int bucket = hash & mappingTableMask;
+    MappingInfo info = mappingTable[bucket];
+    for (;; info = info.nextInBucket)
       {
-        int attrStart = startIndexes[attrCount];
-        int attrEnd = tlist.gapStart;
-
-        // Check that the namespace attribute value is plain characters
-        // so we an use the in-place buffer.  Calculate hash whil we're at it.
-        StringBuffer attrCopy = null;
-        int hash = 0;
-        for (int i = attrStart;  i < attrEnd;  i++)
+        if (info == null)
           {
-            char datum = tlist.data[i];
-            if ((datum & 0xFFFF) > TreeList.MAX_CHAR_SHORT)
-              {
-                StringBuffer sbuf = new StringBuffer();
-                tlist.stringValue(attrStart, tlist.gapStart-attrStart,
-                                  attrCopy);
-                hash = attrCopy.hashCode();
-                break;
-              }
-            hash = 31 * hash + datum;
+            info = new MappingInfo();
+            info.nextInBucket = mappingTable[bucket];
+            mappingTable[bucket] = info;
+            info.tagHash = hash;
+            info.prefix = prefix;
+            info.local = uri;
+            info.uri = uri;
+            Symbol sym = Symbol.make(uri, uri, prefix); // FIXME?
+            if (uri == "")
+              uri = null;
+            NamespaceBinding namespaces
+              = new NamespaceBinding(prefix, uri, oldBindings);
+            info.namespaces = namespaces;
+            info.type = new XName(sym, namespaces); // FIXME? wasted?
+            return info.namespaces;
           }
-
-        tlist.gapStart = attrStart;
-	int bucket = hash & mappingTableMask;
-	MappingInfo info = mappingTable[bucket];
-        String prefix = currentNamespacePrefix == "" ? null
-          : currentNamespacePrefix;
-        // Search for a matching already-seen NamespaceBinding list.
-        // We hash these to so we can share lists that are equal but
-        // appear multiple times in the same XML file, as sometimes happens.
-        // This not only saves memory, but keeps hash bucket chains short,
-        // which is important since we don't resize the table.
-
-        for (;; info = info.nextInBucket)
+        Object type = info.type;
+        NamespaceBinding namespaces;
+        if (info.tagHash == hash
+            && info.prefix == prefix
+            && (namespaces = info.namespaces) != null
+            && namespaces.getNext() == namespaceBindings
+            && namespaces.getPrefix() == prefix
+            && info.uri == uri)
           {
-            if (info == null)
+            return info.namespaces;
+          }
+      }
+  }
+
+  /** Return a MappingInfo containing a match namespaces.
+   * Specifically, return a {@code  MappingInfo info} is such that
+   * {@code info.namespaces} is equal to
+   * {@code new NamespaceBinding(prefix, uri, oldBindings)}, where {@code uri}
+   * is {@code new String(uriChars, uriStart, uriLength).intern())}.
+   */
+  public MappingInfo lookupNamespaceBinding (String prefix,
+                                             char[] uriChars,
+                                             int uriStart, int uriLength,
+                                             int uriHash,
+                                             NamespaceBinding oldBindings)
+  {
+    int hash = prefix == null ? uriHash : prefix.hashCode() ^ uriHash;
+    // Search for a matching already-seen NamespaceBinding list.
+    // We hash these to so we can share lists that are equal but
+    // appear multiple times in the same XML file, as sometimes happens.
+    // This not only saves memory, but keeps hash bucket chains short,
+    // which is important since we don't resize the table.
+    int bucket = hash & mappingTableMask;
+    MappingInfo info = mappingTable[bucket];
+    for (;; info = info.nextInBucket)
+      {
+        if (info == null)
+          {
+            info = new MappingInfo();
+            info.nextInBucket = mappingTable[bucket];
+            mappingTable[bucket] = info;
+            String uri = new String(uriChars, uriStart, uriLength).intern();
+            // We re-use the same MappingInfo table that is mainly used
+            // for tag lookup, but re-interpreting the meaning of the
+            // various fields. Since MappingInfo hashes on prefix^local,
+            // we must do the same here.
+            info.tagHash = hash;
+            info.prefix = prefix;
+            info.local = uri;
+            info.uri = uri;
+            // We don't actually use this Symbol, but if closeStartTag
+            // should come upon this MappingInfo it should be consistent.
+            Symbol sym = Symbol.make(uri, uri, prefix);
+            if (uri == "")
+              uri = null;
+            NamespaceBinding namespaces
+              = new NamespaceBinding(prefix, uri, oldBindings);
+            info.namespaces = namespaces;
+            info.type = new XName(sym, namespaces);
+            return info;
+          }
+        Object type = info.type;
+        NamespaceBinding namespaces;
+        if (info.tagHash == hash
+            && info.prefix == prefix
+            && (namespaces = info.namespaces) != null
+            && namespaces.getNext() == namespaceBindings
+            && namespaces.getPrefix() == prefix
+            && MappingInfo.equals(info.uri, uriChars, uriStart, uriLength))
+          {
+            return info;
+          }
+      }
+  }
+
+  public void endAttribute()
+  {
+    if (! inAttribute)
+      ;
+    else if (previous == SAW_KEYWORD)
+      previous = 0;
+    else if (--stringizingLevel == 0 /*&& attrCount >= 0*/)
+      {
+        inAttribute = false;
+        if (currentNamespacePrefix == null || namespacePrefixes)
+          tlist.endAttribute();
+        if (currentNamespacePrefix != null)
+          {
+            int attrStart = startIndexes[attrCount-1]; 
+            int uriStart = attrStart;
+            int uriEnd = tlist.gapStart;
+            int uriLength = uriEnd - uriStart;
+            char[] data = tlist.data;
+
+            // Check that the namespace attribute value is plain characters
+            // so we an use the in-place buffer.
+            // Calculate hash while we're at it.
+            int uriHash = 0;
+            for (int i = uriStart;  i < uriEnd;  i++)
               {
-                info = new MappingInfo();
-                info.nextInBucket = mappingTable[bucket];
-                mappingTable[bucket] = info;
-                String uri;
-                if (attrCopy == null)
-                  uri = new String(tlist.data, attrStart, attrEnd-attrStart);
-                else
-                  uri = attrCopy.toString();
-                uri = uri.intern();
-                // It seems best to hash on the namespace uri, since it is more
-                // likely to be unique than a shorter prefix.  We re-use the
-                // same MappingInfo table that is mainly used for tag lookup,
-                // but re-interpreting the meaning of the various fields.
-                // Since MappingInfo hashes on the 'tag', we store the uri
-                // in that field.
-                info.tagHash = hash;
-                info.prefix = "";
-                info.local = uri;
-                info.tag = uri;
-                info.uri = uri;
-                // We don't actually use this Symbol, but if closeStartTag
-                // should come upon this MappingInfo it should be consistent.
-                Symbol sym = Symbol.make(uri, uri, "");
-                if (uri == "")
-                  uri = null;
-                NamespaceBinding namespaceNodes
-                  = new NamespaceBinding(prefix, uri, namespaceBindings);
-                info.type = new XName(sym, namespaceNodes);
-                break;
-              }
-            XName type = info.type;
-            if (info.tagHash == hash
-                && type != null)
-              {
-                NamespaceBinding namespaceNodes = type.namespaceNodes;
-                if (namespaceNodes != null
-                    && namespaceNodes.getNext() == namespaceBindings
-                    && namespaceNodes.getPrefix() == prefix
-                    && (attrCopy == null
-                        ? info.match(tlist.data, attrStart, attrEnd-attrStart)
-                        : info.match(attrCopy)))
+                char datum = data[i];
+                if ((datum & 0xFFFF) > TreeList.MAX_CHAR_SHORT)
                   {
+                    StringBuffer sbuf = new StringBuffer();
+                    tlist.stringValue(uriStart, uriLength, sbuf);
+                    uriHash = sbuf.hashCode();
+                    uriStart = 0;
+                    uriEnd = uriLength = sbuf.length();
+                    data = new char[sbuf.length()];
+                    sbuf.getChars(0, uriEnd, data, 0);
                     break;
                   }
+                uriHash = 31 * uriHash + datum;
               }
-          }
-        namespaceBindings = info.type.namespaceNodes;
+            tlist.gapStart = attrStart;
+            if (currentNamespacePrefix != null)
+              {
+                String prefix = currentNamespacePrefix == "" ? null
+                  : currentNamespacePrefix;
+                MappingInfo info
+                  = lookupNamespaceBinding(prefix, data, uriStart, uriLength,
+                                           uriHash, namespaceBindings);
+                namespaceBindings = info.namespaces;
+              }
 
-	currentNamespacePrefix = null;
+            currentNamespacePrefix = null;
+          }
       }
   }
 
@@ -181,75 +293,227 @@ public class XMLFilter
     if (uri != null)
       return uri;
     if (prefix != null)
-      parser.error('e', "unknown namespace prefix '" + prefix + '\'');
+      {
+        error('e', "unknown namespace prefix '" + prefix + '\'');
+      }
     return "";
   }
 
-  NamespaceBinding namespaceBindings;
-
   void closeStartTag ()
   {
-    if (! inStartTag || inAttribute)
+    if (attrCount < 0 || stringizingLevel > 0)
       return;
     inStartTag = false;
+    previous = 0;
+
+    if (inAttribute) // Should only happen on erroneous input.
+      endAttribute();
+    NamespaceBinding outer = nesting == 0 ? NamespaceBinding.predefinedXML
+      : (NamespaceBinding) workStack[nesting-2];
+      
+    NamespaceBinding bindings = namespaceBindings;
+
+    // This first pass is to check that there are namespace declarations for
+    // each Symbol.
+    for (int i = 0;  i <= attrCount; i++)
+      {
+        Object saved = workStack[nesting+i-1];
+        if (saved instanceof Symbol)
+          {
+            Symbol sym = (Symbol) saved;
+            String prefix = sym.getPrefix();
+            if (prefix == "")
+              prefix = null;
+            String uri = sym.getNamespaceURI();
+            if (uri == "")
+              uri = null;
+            if (i > 0 && prefix == null && uri == null)
+              continue;
+            boolean isOuter = false;
+            for (NamespaceBinding ns = bindings; ; ns = ns.next)
+              {
+                if (ns == outer)
+                  isOuter = true;
+                if (ns == null)
+                  {
+                    if (prefix != null || uri != null)
+                      bindings = findNamespaceBinding(prefix, uri, bindings);
+                    break;
+                  }
+                if (ns.prefix == prefix)
+                  {
+                    if (ns.uri != uri)
+                      {
+                        if (isOuter)
+                          bindings = findNamespaceBinding(prefix, uri, bindings);
+                        else
+                          {
+                            // Try to find an alternative existing prefix:
+                            String nprefix;
+                            for (NamespaceBinding ns2 = bindings;
+                                 ; ns2 = ns2.next)
+                              {
+                                if (ns2 == null)
+                                  {
+                                    // We have to generate a new prefix.
+                                    for (int j = 1;  ; j++)
+                                      {
+                                        nprefix = ("_ns_"+j).intern();
+                                        if (bindings.resolve(nprefix) == null)
+                                          break;
+                                      }
+                                    break;
+                                  }
+                                if (ns2.uri == uri)
+                                  {
+                                    nprefix = ns2.prefix;
+                                    if (bindings.resolve(nprefix) == uri)
+                                      break;
+                                  }
+                              }
+                            bindings = findNamespaceBinding(nprefix, uri, bindings);
+                            String local = sym.getLocalName();
+                            if (uri == null)
+                              uri = "";
+                            workStack[nesting+i-1]
+                              = Symbol.make(uri, local, nprefix);
+                          }
+                      }
+                    break;
+                  }
+              }
+          }
+
+      }
 
     for (int i = 0;  i <= attrCount; i++)
       {
-	MappingInfo info = pendingNames[i];
-	String name = info.tag;
-	String prefix = info.prefix;
-	String local = info.local;
-	boolean isNsNode = i > 0 && ( name == "xmlns" || prefix == "xmlns");
-	String uri = isNsNode ? "(namespace-node)" : resolve(prefix, i > 0);
-	int hash = info.tagHash;
-	int bucket = hash & mappingTableMask;
-	info = mappingTable[bucket];
-	MappingInfo tagMatch = null;
-	XName type;
-	for (;;)
+        Object saved = workStack[nesting+i-1];
+        MappingInfo info;
+        boolean isNsNode = false;
+        String prefix, uri, local;
+        if (saved instanceof MappingInfo || out == tlist)
+          {
+            if (saved instanceof MappingInfo)
+              {
+                info = (MappingInfo) saved;
+                prefix = info.prefix;
+                local = info.local;
+                if (i > 0
+                    && ((prefix == null && local == "xmlns")
+                        || prefix == "xmlns"))
+                  {
+                    isNsNode = true;
+                    uri = "(namespace-node)";
+                  }
+                else
+                  uri = resolve(prefix, i > 0);
+              }
+            else
+              {
+                Symbol symbol = (Symbol) saved;
+                info = lookupTag(symbol);
+                prefix = info.prefix;
+                local = info.local;
+                uri = symbol.getNamespaceURI();
+              }
+            int hash = info.tagHash;
+            int bucket = hash & mappingTableMask;
+
+            info = mappingTable[bucket];
+            MappingInfo tagMatch = null;
+            Object type;
+            for (;; info = info.nextInBucket)
+              {
+                if (info == null)
+                  {
+                    info = tagMatch;
+                    info = new MappingInfo();
+                    info.tagHash = hash;
+                    info.prefix = prefix;
+                    info.local = local;
+                    info.nextInBucket = mappingTable[bucket];
+                    mappingTable[bucket] = info;
+                    info.uri = uri;
+                    info.qname = Symbol.make(uri, local, prefix);
+                    if (i == 0)
+                      {
+                        type = new XName(info.qname, bindings);
+                        info.type = type;
+                        info.namespaces = bindings;
+                      }
+                    break;
+                  }
+                if (info.tagHash == hash
+                    && info.local == local
+                    && info.prefix == prefix)
+                  {
+                    if (info.uri == null)
+                      {
+                        info.uri = uri;
+                        info.qname = Symbol.make(uri, local, prefix);
+                      }
+                    else if (info.uri != uri)
+                      continue;
+                    if (i == 0)
+                      {
+                        if (info.namespaces == bindings)
+                          {
+                            type = info.type;
+                            break;
+                          }
+                        if (info.namespaces == null)
+                          {
+                            info.namespaces = bindings;
+                            type = new XName(info.qname, bindings);
+                            info.type = type;
+                            break;
+                          }
+                      }
+                    else
+                      {
+                        type = info.qname;
+                        break;
+                      }
+                  }
+              }
+            workStack[nesting+i-1] = info;
+          }
+        else
+          {
+            Symbol sym = (Symbol) saved;
+            uri = sym.getNamespaceURI();
+            local = sym.getLocalName();
+            info = null;
+          }
+
+        // Check for duplicated attribute names.
+        for (int j = 1;  j < i;  j++)
+          {
+            Object other = workStack[nesting+j-1];
+            Symbol osym;
+            if (other instanceof Symbol)
+              osym = (Symbol) other;
+            else if (other instanceof MappingInfo)
+              osym = ((MappingInfo) other).qname;
+            else
+              continue;
+            if (local == osym.getLocalPart()
+                && uri == osym.getNamespaceURI())
+              {
+                Object tag = workStack[nesting-1];
+                if (tag instanceof MappingInfo)
+                  tag = ((MappingInfo) tag).qname;
+                error('e', XMLFilter.duplicateAttributeMessage(osym, tag));
+              }
+          }
+
+	if (out == tlist)
 	  {
-	    if (info == null)
-	      {
-		info = tagMatch;
-		if (tagMatch != null)
-		  {
-		    // A mappingTable entry created by lookupTag.
-		    // Might as well make it do double duty here as well.
-		  }
-		else
-		  {
-		    info = new MappingInfo();
-		    info.tag = name;
-		    info.tagHash = hash;
-		    info.prefix = prefix;
-		    info.local = local;
-		    info.nextInBucket = mappingTable[bucket];
-		    mappingTable[bucket] = info;
-		  }
-		info.uri = uri;
-		info.qname = Symbol.make(uri, local, prefix);
-		type = new XName(info.qname,
-				 namespaceBindings);
-		info.type = type;
-		break;
-	      }
-	    if (info.tag == name)
-	      {
-		type = info.type;
-		if (info.qname == null)
-		  tagMatch = info;
-		else if (info.uri == uri
-			 && type.namespaceNodes == namespaceBindings)
-		  break;
-	      }
-	    info = info.nextInBucket;
-	  }
-	if (cons == tlist)
-	  {
+            Object type = i == 0 ? info.type : info.qname;
 	    int index = info.index;
-	    if (info.index <= 0
-		|| tlist.objects[index] != name
-		|| tlist.objects[index+1] != type)
+	    if (index <= 0
+		|| tlist.objects[index] != type)
 	      {
 		index = tlist.find(type);
 		info.index = index;
@@ -257,122 +521,142 @@ public class XMLFilter
 	    if (i == 0)
               tlist.setGroupName(tlist.gapEnd, index);
 	    else if (! isNsNode || namespacePrefixes)
-              tlist.setAttributeName(startIndexes[i], index);
+              tlist.setAttributeName(startIndexes[i-1], index);
 	  }
 	else
 	  {
+            Object type = info == null ? saved
+              : i == 0 ? info.type : info.qname;
 	    if (i == 0)
-	      cons.beginGroup(type);
+	      out.beginGroup(type);
 	    else if (! isNsNode || namespacePrefixes)
 	      {
-		cons.beginAttribute(type);
-		int start = startIndexes[i];
-		int end = i < attrCount ? startIndexes[i+1] : tlist.gapStart;
+		out.beginAttribute(type);
+		int start = startIndexes[i-1];
+		int end = i < attrCount ? startIndexes[i] : tlist.gapStart;
 		tlist.consumeIRange(start + TreeList.BEGIN_ATTRIBUTE_LONG_SIZE,
                                     end - TreeList.END_ATTRIBUTE_SIZE,
-                                    cons);
-		cons.endAttribute();
+                                    out);
+		out.endAttribute();
 	      }
 	  }
       }
-    if (cons != tlist)
+    if (out != tlist)
       {
-	base = cons;
+	base = out;
 	// Remove temporarily stored attributes.
 	tlist.clear();
       }
-    else if (tlist instanceof NodeTree)
-      ((NodeTree) tlist).closeTag();
-    attrCount = 0;
+    attrCount = -1;
   }
 
-  private void writeChar(int v)
+  protected boolean checkWriteAtomic ()
   {
+    previous = 0;
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return false;
     closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-        tlist.writeChar(v);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.writeChar(v);
+    return true;
+ }
+
+  public void writeChar(int v)
+  {
+    if (checkWriteAtomic())
+      base.writeChar(v);
   }
 
-  /*
-  public void writeBoolean(boolean v)
+  public void writeBoolean (boolean v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-	stringValue.append(v);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.writeBoolean(v);
+    if (checkWriteAtomic())
+      base.writeBoolean(v);
   }
 
-  public void writeFloat(float v)
+  public void writeFloat (float v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-	stringValue.append(v);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.writeFloat(v);
+    if (checkWriteAtomic())
+      base.writeFloat(v);
   }
 
-  public void writeDouble(double v)
+  public void writeDouble (double v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-	stringValue.append(v);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.writeDouble(v);
+    if (checkWriteAtomic())
+      base.writeDouble(v);
   }
 
   public void writeInt(int v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      stringValue.append(v);
-    base.writeInt(v);
+    if (checkWriteAtomic())
+      base.writeInt(v);
   }
 
-  public void writeLong(long v)
+  public void writeLong (long v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-	stringValue.append(v);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.writeLong(v);
+    if (checkWriteAtomic())
+      base.writeLong(v);
   }
 
+  public void writeDocumentUri (Object uri)
+  {
+    if (nesting == 2 && base instanceof TreeList)
+      ((TreeList) base).writeDocumentUri(uri);
+  }
+
+  public void consume (SeqPosition position)
+  {
+    writePosition(position.sequence, position.ipos);
+  }
+
+  public void writePosition(AbstractSequence seq, int ipos)
+  {
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return;
+    seq.consumeNext(ipos, this);
+  }
+
+  /** If v is a node, make a copy of it. */
   public void writeObject(Object v)
   {
-    closeStartTag();
-    if (currentNamespacePrefix != null)
+    if (stringizingLevel > stringizingElementLevel
+        && stringizingElementLevel > 0)
+      return;
+    if (v instanceof SeqPosition)
       {
-	stringValue.append(v);
-	if (! namespacePrefixes)
-	  return;
+	SeqPosition pos = (SeqPosition) v;
+	writePosition(pos.sequence, pos.getPos());
       }
-    base.writeObject(v);
+    else if (v instanceof TreeList)
+      ((TreeList) v).consume(this);
+    else if (v instanceof Keyword)
+      {
+        Keyword k = (Keyword) v;
+        beginAttribute(k.asSymbol());
+        previous = SAW_KEYWORD;
+      }
+    else
+      {
+        closeStartTag();
+        if (v instanceof UnescapedData)
+          {
+            base.writeObject(v);
+            previous = 0;
+          }
+        else
+          {
+            if (previous == SAW_WORD)
+              writeChar(' ');
+            MakeText.text$C(v, this);  // Atomize.
+            previous = SAW_WORD;
+          }
+      }
   }
-  */
 
   public XMLFilter (Consumer out)
   {
     this.base = out;
-    this.cons = out;
-    if (cons instanceof NodeTree)
+    this.out = out;
+    if (out instanceof NodeTree)
       this.tlist = (NodeTree) out;
     else
       tlist = new TreeList(); // just for temporary storage
@@ -381,9 +665,12 @@ public class XMLFilter
   }
 
   /** Process raw text. */
-  public void emitCharacters(char[] data, int start, int length)
+  public void write (char[] data, int start, int length)
   {
     // Skip whitespace not in an element.
+    // This works semi-accidentally, since XMLParser doesn't call beginDocument
+    // which otherwise would increment nesting.  Perhaps shipping toplevel
+    // whitespace should be handled internally in XMLParser.  FIXME.
     if (nesting == 0)
       {
         for (int i = 0; ; i++)
@@ -394,82 +681,185 @@ public class XMLFilter
               break;
           }
       }
-    closeStartTag();
-    if (currentNamespacePrefix != null)
-      {
-        tlist.write(data, start, length);
-	if (! namespacePrefixes)
-	  return;
-      }
-    base.write(data, start, length);
+    if (length == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      base.write(data, start, length);
+  }
+
+  public void writeChars(String v)
+  {
+    if (v.length() == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      base.writeChars(v);
+  }
+
+  protected void writeJoiner ()
+  {
+    previous = 0;
+    if ((stringizingLevel <= stringizingElementLevel
+         || stringizingElementLevel == 0)
+         && base instanceof TreeList)
+      ((TreeList) base).writeJoiner();
   }
 
   /** Process a CDATA section.
    * The data (starting at start for length char).
    * Does not include the delimiters (i.e. {@code "<![CDATA["}
    * and {@code "]]>"} are excluded). */
-  public void emitCDATA(char[] data, int start, int length)
+  public void writeCDATA(char[] data, int start, int length)
+  {
+    if (checkWriteAtomic())
+      {
+        if (base instanceof XConsumer)
+          ((XConsumer) base).writeCDATA(data, start, length);
+        else
+          write(data, start, length);
+      }
+  }
+
+  protected void beginGroupCommon ()
   {
     closeStartTag();
-    if (base instanceof XConsumer)
-      ((XConsumer) base).writeCDATA(data, start, length);
+    if (stringizingLevel == 0)
+      {
+        ensureSpaceInWorkStack(nesting);
+        workStack[nesting] = namespaceBindings;
+        tlist.beginGroup(0);
+        base = tlist;
+        attrCount = 0;
+      }
+    else if (stringizingElementLevel == 0)
+      stringizingElementLevel = stringizingLevel;
     else
-      emitCharacters(data, start, length);
+      stringizingLevel++;
+    nesting += 2;
   }
 
   /** Process a start tag, with the given element name. */
   public void emitBeginElement(char[] data, int start, int count)
-  {
-    MappingInfo info = lookupTag(data, start, count);
-    String name = info.tag;
+  { 
     closeStartTag();
-    if (nesting >= namespaceBindingsAtBeginGroup.length)
-      {
-	NamespaceBinding[] tmp = new NamespaceBinding[2 * nesting];
-	System.arraycopy(namespaceBindingsAtBeginGroup, 0, tmp, 0, nesting);
-	namespaceBindingsAtBeginGroup = tmp;
-      }
-    namespaceBindingsAtBeginGroup[nesting++] = namespaceBindings;
-    inStartTag = true;
+    MappingInfo info = lookupTag(data, start, count);
+    beginGroupCommon();
+    ensureSpaceInWorkStack(nesting-1);
+    workStack[nesting-1] = info;
+  }
 
-    startIndexes[0] = tlist.gapStart;
-    tlist.beginGroup(0);
-    base = tlist;
-
-    attrCount = 0;
-    pendingNames[0] = info;
-    if (depth >= names.length)
+  public void beginGroup(Object type)
+  {
+    beginGroupCommon();
+    if (stringizingLevel == 0)
       {
-	String[] tmp = new String[2 * depth];
-	System.arraycopy(names, 0, tmp, 0, depth);
-	names = tmp;
+        ensureSpaceInWorkStack(nesting-1);
+        workStack[nesting-1] = type;
+        if (copyNamespacesMode == 0)
+          namespaceBindings = NamespaceBinding.predefinedXML;
+        else if (copyNamespacesMode == COPY_NAMESPACES_PRESERVE)
+          namespaceBindings
+            = (type instanceof XName ? ((XName) type).getNamespaceNodes()
+               : NamespaceBinding.predefinedXML);
+        else
+          {
+            NamespaceBinding inherited
+              = (NamespaceBinding) workStack[nesting-2];
+            if (copyNamespacesMode == COPY_NAMESPACES_INHERIT)
+              namespaceBindings = inherited;
+            else if (type instanceof XName)
+              {
+                NamespaceBinding preserved = ((XName) type).getNamespaceNodes();
+                NamespaceBinding join = NamespaceBinding.commonAncestor(inherited, preserved);
+                if (join == inherited)
+                  namespaceBindings = preserved;
+                else
+                  namespaceBindings = mergeHelper(inherited, preserved);
+              }
+            else
+              namespaceBindings = inherited;
+          }
       }
-    names[depth++] = name;
+  }
+
+  private NamespaceBinding mergeHelper (NamespaceBinding list,
+                                        NamespaceBinding node)
+  {
+    if (node == NamespaceBinding.predefinedXML)
+      return list;
+    list = mergeHelper(list, node.next);
+    String uri = node.uri;
+    if (list == null)
+      {
+	if (uri == null)
+	  return list;
+	list = NamespaceBinding.predefinedXML;
+      }
+    String prefix = node.prefix;
+    String found = list.resolve(prefix);
+    if (found == null ? uri == null : found.equals(uri))
+      return list;
+    return findNamespaceBinding(prefix, uri, list);
+  }
+
+  private boolean beginAttributeCommon()
+  {
+    if (inAttribute)
+      endAttribute();
+    inAttribute = true;
+    if (stringizingLevel++ > 0)
+      return false;
+
+    if (attrCount < 0) // A disembodied attribute.
+      attrCount = 0; 
+    ensureSpaceInWorkStack(nesting+attrCount);
+    ensureSpaceInStartIndexes(attrCount);
+    startIndexes[attrCount] = tlist.gapStart;
+    attrCount++;
+    return true;
+  }
+
+  public void beginAttribute (Object attrType)
+  {
+    previous = 0;
+    if (attrType instanceof Symbol)
+      {
+        Symbol sym = (Symbol) attrType;
+        String local = sym.getLocalPart();
+        String uri = sym.getNamespaceURI();
+        if (uri == "http://www.w3.org/2000/xmlns/"
+            || (uri == "" && local == "xmlns"))
+          error('e', "arttribute name cannot be 'xmlns' or in xmlns namespace");
+      }
+    /*
+    if (groupLevel <= 1 && docStart != 0)
+      error("attribute not allowed at document level");
+    */
+    if (! beginAttributeCommon())
+      return;
+    workStack[nesting+attrCount-1] = attrType;
+    /*
+    if (attrCount == 0 && groupLevel > 0)
+      error("attribute '"+attrName+"' follows non-attribute content");
+    checkAttributeSymbol((Symbol) attrType); // ???
+    */
+    if (nesting == 0)
+      base.beginAttribute(attrType);
+    else
+      tlist.beginAttribute(0);
   }
 
   /** Process an attribute, with the given attribute name.
-   * The attribute value is given using emitCharacters.
+   * The attribute value is given using {@code write}.
    * The value is terminated by either another emitBeginAttribute
    * or an emitEndAttributes.
    */
   public void emitBeginAttribute(char[] data, int start, int count)
   {
+    if (! beginAttributeCommon())
+      return;
+
     MappingInfo info = lookupTag(data, start, count);
-    String name = info.tag;
-    if (inAttribute)
-      endAttribute();
-    attrCount++;
-    if (attrCount >= startIndexes.length)
-      {
-	MappingInfo[] tmp = new MappingInfo[2 * pendingNames.length];
-	System.arraycopy(pendingNames, 0, tmp, 0, pendingNames.length);
-	pendingNames = tmp;
-	int[] itmp = new int[2 * startIndexes.length];
-	System.arraycopy(startIndexes, 0, itmp, 0, attrCount);
-	startIndexes = itmp;
-      }
-    pendingNames[attrCount] = info;
-    startIndexes[attrCount] = tlist.gapStart;
+    workStack[nesting+attrCount-1] = info;
     String prefix = info.prefix;
     String local = info.local;
     if (prefix != null)
@@ -481,16 +871,13 @@ public class XMLFilter
       }
     else
       {
-	if (name == "xmlns")
+	if (local == "xmlns" && prefix == null)
 	  {
             currentNamespacePrefix = "";
 	  }
       }
     if (currentNamespacePrefix == null || namespacePrefixes)
       tlist.beginAttribute(0);
-    else if (tlist instanceof NodeTree)
-      ((NodeTree) tlist).stringizingLevel++;
-    inAttribute = true;
   }
 
   /** Process the end of a start tag.
@@ -508,42 +895,68 @@ public class XMLFilter
   {
     if (inAttribute)
       {
-	parser.error('e', "unclosed attribute"); // FIXME
+	error('e', "unclosed attribute"); // FIXME
 	endAttribute();
       }
-    if (depth == 0)
+    if (nesting == 0)
       {
-	parser.error('e', "unmatched end element"); // FIXME
+	error('e', "unmatched end element"); // FIXME
 	return;
       }
-    String old = names[depth-1];
-    if (data != null && ! MappingInfo.match(old, data, start, length))
+    if (data != null)
       {
-	if (! mismatchReported && parser != null)
-	  {
-	    mismatchReported = true;
-	    int nlen = length + 3;
-	    parser.pos -= nlen;
-	    StringBuffer sbuf = new StringBuffer("</");
-	    sbuf.append(data, start, length);
-	    sbuf.append("> matching <");
-	    sbuf.append(old);
-	    sbuf.append('>');
-	    parser.error('e', sbuf.toString());
-	    parser.pos += nlen;
-	  }
-      }
-
-    if (depth > 0) // Sanity check, in case of error.
-      {
-	names[depth-1] = null;  // For the sake of Gc.
-	depth--;
+        MappingInfo info = lookupTag(data, start, length);
+        Object old = workStack[nesting-1];
+        if (old instanceof MappingInfo && ! mismatchReported)
+          {
+            MappingInfo mold = (MappingInfo) old;
+            if (info.local != mold.local || info.prefix != mold.prefix)
+              {
+                StringBuffer sbuf = new StringBuffer("</");
+                sbuf.append(data, start, length);
+                sbuf.append("> matching <");
+                String oldPrefix = mold.prefix;
+                if (oldPrefix != null)
+                  {
+                    sbuf.append(oldPrefix);
+                    sbuf.append(':');
+                  }
+                sbuf.append(mold.local);
+                sbuf.append('>');
+                error('e', sbuf.toString());
+                mismatchReported = true;
+              }
+          }
       }
     closeStartTag();
     if (nesting <= 0)
       return; // Only if error.
-    namespaceBindings = namespaceBindingsAtBeginGroup[--nesting];
-    base.endGroup();
+    endGroup();
+  }
+
+  public void endGroup ()
+  {
+    closeStartTag();
+    nesting -= 2;
+    if (stringizingLevel == 0)
+      {
+        namespaceBindings = (NamespaceBinding) workStack[nesting];
+        base.endGroup();
+      }
+    if (stringizingElementLevel > 0)
+      {
+        if (stringizingElementLevel == stringizingLevel)
+          stringizingElementLevel = 0;
+        else
+          stringizingLevel--;
+      }
+    /*
+    if (nesting == 0)
+      {
+        workStack = null;
+        attrIndexes = null;
+      }
+    */
   }
 
   /** Process an entity reference.
@@ -591,11 +1004,49 @@ public class XMLFilter
   /** Process a comment.
    * The data (starting at start for length chars).
    * Does not include the delimiters (i.e. "<!--" and "-->" are excluded). */
-  public void emitComment(char[] data, int start, int length)
+  public void writeComment(char[] chars, int start, int length)
   {
-    closeStartTag();
-    if (base instanceof XConsumer)
-      ((XConsumer) base).writeComment(data, start, length);
+    //checkValidComment(chars, offset, length);
+    if (stringizingLevel == 0)
+      {
+        closeStartTag();
+        if (base instanceof XConsumer)
+          ((XConsumer) base).writeComment(chars, start, length);
+      }
+    else if (stringizingLevel < stringizingElementLevel
+             || stringizingElementLevel == 0)
+      base.write(chars, start, length);
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    /*
+    checkProcessingInstruction(target);
+    for (int i = offset+length;  --i >= offset; )
+      {
+        char ch = content[i];
+        while (ch == '>' && --i >= offset)
+          {
+            ch = content[i];
+            if (ch == '?')
+              {
+                error("'?>' is not allowed in a processing-instruction: proc: "+target+" -> "+new String(content, offset, length));
+                break;
+              }
+          }
+      }
+    */
+    if (stringizingLevel == 0)
+      {
+        closeStartTag();
+        if (base instanceof XConsumer)
+          ((XConsumer) base)
+            .writeProcessingInstruction(target, content, offset, length);
+      }
+    else if (stringizingLevel < stringizingElementLevel
+             || stringizingElementLevel == 0)
+      base.write(content, offset, length);
   }
 
   /** Process a processing instruction. */
@@ -609,13 +1060,48 @@ public class XMLFilter
         && buffer[tstart+1] == 'm'
         && buffer[tstart+2] == 'l')
       return;
+    String target = new String(buffer, tstart, tlength);
+    writeProcessingInstruction(target, buffer, dstart, dlength);
+  }
+
+  public void beginDocument()
+  {
     closeStartTag();
-    if (base instanceof XConsumer)
+    if (stringizingLevel > 0)
+      writeJoiner();
+    // We need to increment groupLevel so that endDocument can decrement it.
+    else
       {
-	String target = new String(buffer, tstart, tlength);
-	((XConsumer) base).writeProcessingInstruction(target,
-						      buffer, dstart, dlength);
+        if (nesting == 0)
+          base.beginDocument();
+        else
+          writeJoiner();
+        ensureSpaceInWorkStack(nesting);
+        workStack[nesting] = namespaceBindings;
+        nesting += 2;
       }
+  }
+
+  public void endDocument ()
+  {
+    if (stringizingLevel > 0)
+      {
+        writeJoiner();
+        return;
+      }
+    nesting -= 2;
+    namespaceBindings = (NamespaceBinding) workStack[nesting];
+    if (nesting == 0)
+      base.endDocument();
+    else
+      writeJoiner();
+    /*
+    if (nesting == 0)
+      {
+        workStack = null;
+        attrIndexes = null;
+      }
+    */
   }
 
   /** Process a DOCTYPE declaration. */
@@ -626,29 +1112,26 @@ public class XMLFilter
     // FIXME?
   }
 
-  /** Calculate a hashCode for a string of characters in a char array.
-   * Equivalent to <code>new String(data, start, length).hashCode()</code>
-   * but more efficient as we don't have to allocate the String.
-   */
-  static int hash (char[] data, int start, int length)
+  public void beginEntity (Object baseUri)
   {
-    int hash = 0;
-    for (int i = 0;  i < length;  i++)
-      hash = 31 * hash + data[start+i];
-    return hash;
+    if (base instanceof XConsumer)
+      ((XConsumer) base).beginEntity(baseUri);
   }
 
-  /** Look up an attribute/element tag (a QName as a lexical string
-   * before namespace resolution), and return a MappingInfo with the
-   * tag, tagHash, prefix, and local fields set.
-   * The trick is to avoid allocating a new String for each element or
-   * attribute node we see, but only allocate a new String when we see a
-   * tag we haven't seen.  So we calculate the hash code using the
-   * characters in the array, rather than using String's hashCode.
-   */
-  MappingInfo lookupTag (char[] data, int start, int length)
+  public void endEntity ()
   {
-    int hash = hash(data, start, length);
+    if (base instanceof XConsumer)
+      ((XConsumer) base).endEntity();
+  }
+
+  MappingInfo lookupTag (Symbol qname)
+  {
+    String local = qname.getLocalPart();
+    String prefix = qname.getPrefix();
+    if (prefix == "")
+      prefix = null;
+    String uri = qname.getNamespaceURI();
+    int hash = MappingInfo.hash(prefix, local);
     int index = hash & mappingTableMask;
     MappingInfo first = mappingTable[index];
     MappingInfo info = first;
@@ -658,21 +1141,77 @@ public class XMLFilter
 	  {
 	    // No match found - create a new MappingInfo and Strings.
 	    info = new MappingInfo();
-	    String tag = new String(data, start, length).intern();
-	    info.tag = tag;
+            info.qname = qname;
+            info.prefix = prefix;
+            info.uri = uri;
+            info.local = local;
 	    info.tagHash = hash;
 	    info.nextInBucket = first;
-	    int colon = tag.indexOf(':');
-	    if (colon > 0)
+	    mappingTable[index] = first;
+	    return info;
+	  }
+        if (qname == info.qname)
+          return info;
+        if (local == info.local && info.qname == null
+            && uri == info.uri && prefix == info.prefix)
+          {
+            info.qname = qname;
+            return info;
+          }
+	info = info.nextInBucket;
+      }
+  }
+
+  /** Look up an attribute/element tag (a QName as a lexical string
+   * before namespace resolution), and return a MappingInfo with the
+   * tagHash, prefix, and local fields set.
+   * The trick is to avoid allocating a new String for each element or
+   * attribute node we see, but only allocate a new String when we see a
+   * tag we haven't seen.  So we calculate the hash code using the
+   * characters in the array, rather than using String's hashCode.
+   */
+  MappingInfo lookupTag (char[] data, int start, int length)
+  {
+    // Calculate hash code.  Also note presence+position of ':'.
+    int hash = 0;
+    int prefixHash = 0;
+    int colon = -1;
+    for (int i = 0;  i < length;  i++)
+      {
+        char ch = data[start+i];
+        if (ch == ':' && colon < 0)
+          {
+            colon = i;
+            prefixHash = hash;
+            hash = 0;
+          }
+        else
+          hash = 31 * hash + ch;
+      }
+    hash = prefixHash ^ hash;
+    int index = hash & mappingTableMask;
+    MappingInfo first = mappingTable[index];
+    MappingInfo info = first;
+    for (;;)
+      {
+	if (info == null)
+	  {
+	    // No match found - create a new MappingInfo and Strings.
+	    info = new MappingInfo();
+	    info.tagHash = hash;
+	    if (colon >= 0)
 	      {
-		info.prefix = tag.substring(0, colon).intern();
-		info.local = tag.substring(colon+1).intern();
+		info.prefix = new String(data, start, colon).intern();
+                colon++;
+                int lstart = start+colon;
+		info.local = new String(data, lstart, length-colon).intern();
 	      }
 	    else
 	      {
 		info.prefix = null;
-		info.local = tag;
+		info.local = new String(data, start, length).intern();
 	      }
+	    info.nextInBucket = first;
 	    mappingTable[index] = first;
 	    return info;
 	  }
@@ -683,76 +1222,68 @@ public class XMLFilter
       }
   }
 
-  /*
-  private void popNamespaces ()
+  private void ensureSpaceInWorkStack (int oldSize)
   {
-    for (each namespace to be popped)
+    if (workStack == null)
       {
-	MappingInfo mapping = mapping_for_namespace(...);
-	for (; mapping != null;  mapping = mapping.nextForPrefix)
-	  {
-	    // Unlink mapping from hash bucket:
-	    MappingInfo next = mapping.nextInBucket;
-	    MappingInfo prev = mapping.prevInBucket;
-	    if (next != null)
-	      next.prevInBucket = prev;
-	    if (prev != null)
-	      prev.nextInBucket = next;
-	    else
-	      mappingTable[hashIndex] = next;
-	  }
+        workStack = new Object[20];
+      }
+    else if (oldSize >= workStack.length)
+      {
+        Object[] tmpn = new Object[2*workStack.length];
+        System.arraycopy(workStack, 0, tmpn, 0, oldSize);
+        workStack = tmpn;
       }
   }
-  */
 
-  public void error(XMLParserChar parser, String message)
+  private void ensureSpaceInStartIndexes (int oldSize)
   {
-    StringBuffer sbuf = new StringBuffer();
-    error(parser, message, sbuf);
-    System.err.println(sbuf);
+    if (startIndexes == null)
+      {
+        startIndexes = new int[20];
+      }
+    else if (oldSize >= startIndexes.length)
+      {
+        int[] tmpn = new int[2*startIndexes.length];
+        System.arraycopy(startIndexes, 0, tmpn, 0, oldSize);
+        startIndexes = tmpn;
+      }
   }
 
-  public static void error(XMLParserChar parser, String message, StringBuffer sbuf)
+  public static String
+  duplicateAttributeMessage (Symbol attrSymbol, Object groupName)
   {
-    /*
-    String name = port.getName();
-    if (name != null)
-      sbuf.append(name);
-    */
-    int line = 1;
-    int lstart = 0;
-    int i = 0;
-    int pos = parser.pos;
-    char[] buffer = parser.buffer;
-    while (i < pos)
+    StringBuffer sbuf = new StringBuffer("duplicate attribute: ");
+    String uri = attrSymbol.getNamespaceURI();
+    if (uri != null && uri.length() > 0)
       {
-        char ch = buffer[i++];
-        if (ch == '\n')
-          {
-            line++;
-            lstart = i;
-          }
-        else if (ch == '\r')
-          {
-            if (i < pos && buffer[i] == '\n')
-              i++;
-            line++;
-            lstart = i;
-          }
+        sbuf.append('{');
+        sbuf.append('}');
+        sbuf.append(uri);
       }
-    sbuf.append(':');
-    sbuf.append(line);
-    int column = pos - lstart;
-    sbuf.append(':');
-    sbuf.append(column + 1);
-    sbuf.append(": ");
+    sbuf.append(attrSymbol.getLocalPart());
+    if (groupName != null)
+      {
+        sbuf.append(" in <");
+        sbuf.append(groupName);
+        sbuf.append('>');
+      }
+    return sbuf.toString();
+  }
 
-    sbuf.append("xml parse error");
-    if (message != null)
-      {
-        sbuf.append(" - ");
-        sbuf.append(message);
-      }
+  public void error(char severity, String message)
+  {
+    if (messages == null)
+      throw new RuntimeException(message);
+    else if (locator != null)
+      messages.error(severity, locator, message);
+    else
+      messages.error(severity, message);
+  }
+
+  public boolean ignoring()
+  {
+    return false;
   }
 }
 
@@ -764,11 +1295,7 @@ final class MappingInfo
   // maybe future: MappingInfo prevInBucket;
   // maybe future: MappingInfo nextForPrefix;
 
-  /** The source (unresolved) QName as it appears in the XML file.
-   * This String is interned. */
-  String tag;
-
-  /** The hashCode of tag. */
+  /** The cached value of {@code hash(prefix, local)}. */
   int tagHash;
 
   /** The prefix part of tag: - the part before the colon.
@@ -776,8 +1303,7 @@ final class MappingInfo
   String prefix;
 
   /** The local name part of tag: - the part after the colon. 
-   * It is the same as tag if there is no colon in tag.
-   * Either way it is interned.  */
+   * It is interned.  */
   String local;
 
   /** The namespace URI. */
@@ -786,19 +1312,61 @@ final class MappingInfo
   /** The Symbol/type for the resolved QName. */
   Symbol qname;
 
-  XName type;
+  NamespaceBinding namespaces;
+
+  Object type;
 
   /** If non-negative: An index into a TreeList objects array. */
   int index = -1;
 
-  /** An optimization of {@code new String(data, start, next).equals(tag)}. */
-  boolean match (char[] data, int start, int length)
+  static int hash (String prefix, String local)
   {
-    return match(tag, data, start, length);
+    int hash = local.hashCode();
+    if (prefix != null)
+      hash ^= prefix.hashCode();
+    return hash;
   }
 
-  /** An optimization of {@code sbug.toString().equals(tag)}. */
-  boolean match (StringBuffer sbuf)
+  /** Hash a QName, handling an optional prefix+colon. */
+  static int hash (char[] data, int start, int length)
+  {
+    int hash = 0;
+    int prefixHash = 0;
+    int colonPos = -1;
+    for (int i = 0;  i < length;  i++)
+      {
+        char ch = data[start+i];
+        if (ch == ':' && colonPos < 0)
+          {
+            colonPos = i;
+            prefixHash = hash;
+            hash = 0;
+          }
+        else
+          hash = 31 * hash + ch;
+      }
+    return prefixHash ^ hash;
+  }
+
+  /** Match {@code "[prefix:]length"} against {@code new String(data, start, next)}. */
+  boolean match (char[] data, int start, int length)
+  {
+    if (prefix != null)
+      {
+        int localLength = local.length();
+        int prefixLength = prefix.length();
+        return length == prefixLength + 1 + localLength
+          && data[prefixLength] == ':'
+          && equals(prefix, data, start, prefixLength)
+          && equals(local, data, start+prefixLength+1, localLength);
+      }
+    else
+      return equals(local, data, start, length);
+  }
+
+  /** An optimization of {@code sbuf.toString().equals(tag)}.
+  */
+  static boolean equals (String tag, StringBuffer sbuf)
   {
     int length = sbuf.length();
     if (tag.length () != length)
@@ -809,7 +1377,7 @@ final class MappingInfo
     return true;
   }
 
-  static boolean match (String tag, char[] data, int start, int length)
+  static boolean equals (String tag, char[] data, int start, int length)
   {
     if (tag.length () != length)
       return false;

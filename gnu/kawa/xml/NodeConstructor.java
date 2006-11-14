@@ -16,32 +16,31 @@ implements Inlineable
 
   public static Consumer pushNodeConsumer (Consumer out)
   {
-    if (out instanceof Values && ! (out instanceof Nodes))
-      return new NodeTree();
-    else
+    if (out instanceof XMLFilter)
       return out;
+    else
+      return new XMLFilter(new NodeTree());
   }
 
   public static void popNodeConsumer (Consumer saved, Consumer current)
   {
     if (saved != current)
-      saved.writeObject(current instanceof NodeTree
-                        ? (Object) KNode.make((NodeTree) current)
+      saved.writeObject(current instanceof XMLFilter
+                        ? (Object) KNode.make((NodeTree) ((XMLFilter) current).out)
                         : (Object) current);
   }
 
   public static XConsumer pushNodeContext (CallContext ctx)
   {
     Consumer out = ctx.consumer;
-    if ((out instanceof Values && ! (out instanceof Nodes))
-	|| ! (out instanceof XConsumer))
-      {
-	NodeTree node = new NodeTree();
-	ctx.consumer = node;
-	return node;
-      }
-    else
+    if (out instanceof XMLFilter)
       return (XConsumer) out;
+    else
+      {
+	XMLFilter filter = new XMLFilter(new NodeTree());
+	ctx.consumer = filter;
+	return filter;
+      }
   }
 
   public static void popNodeContext (Consumer saved, CallContext ctx)
@@ -49,8 +48,8 @@ implements Inlineable
     Object current = ctx.consumer;
     if (saved != current)
       {
-	if (current instanceof NodeTree)
-	  current = KNode.make((NodeTree) current);
+	if (current instanceof XMLFilter)
+	  current = KNode.make((NodeTree) ((XMLFilter) current).out);
 	saved.writeObject(current);
 	ctx.consumer = saved;
       }
@@ -82,10 +81,20 @@ implements Inlineable
   public static void compileUsingNodeTree(Expression exp,
 					  Compilation comp, Target target)
   {
-    Method makeMethod = typeNodeTree.getDeclaredMethod("make", 0);
-    Method makeKNodeMethod = typeKNode.getDeclaredMethod("make", 1);
+    Method makeMethod = typeNodeConstructor.getDeclaredMethod("makeNode", 0);
+    Method makeKNodeMethod = typeNodeConstructor.getDeclaredMethod("finishNode", 1);
     ConsumerTarget.compileUsingConsumer(exp, comp, target,
 					makeMethod, makeKNodeMethod);
+  }
+
+  public static XMLFilter makeNode ()
+  {
+    return new XMLFilter(new NodeTree());
+  }
+
+  public static KNode finishNode (XMLFilter filter)
+  {
+    return KNode.make((NodeTree) filter.out);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

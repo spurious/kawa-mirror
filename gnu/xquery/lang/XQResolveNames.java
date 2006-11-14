@@ -936,7 +936,7 @@ public class XQResolveNames extends ResolveNames
                                 Symbol groupSym = MakeElement.getTagName(exp);
                                 String groupName = groupSym == null ? null
                                   : groupSym.toString();
-                                messages.error('e', NodeTree.duplicateAttributeMessage(sym, groupName), "XQST0040");
+                                messages.error('e', XMLFilter.duplicateAttributeMessage(sym, groupName), "XQST0040");
                               }
                           }
                       }

@@ -18,7 +18,7 @@ public class MakeElement extends NodeConstructor
    * rather than the first parameter. */
   public Object tag;
 
-  public int copyNamespacesMode = NodeTree.COPY_NAMESPACES_PRESERVE;
+  public int copyNamespacesMode = XMLFilter.COPY_NAMESPACES_PRESERVE;
 
   private boolean handlingKeywordParameters;
 
@@ -71,9 +71,9 @@ public class MakeElement extends NodeConstructor
       type = new XName((Symbol) qname, namespaceNodes);
     else
       type = new XName(Symbol.make("", qname.toString(), ""), namespaceNodes);
+    if (out instanceof XMLFilter)
+      ((XMLFilter) out).copyNamespacesMode = copyNamespacesMode;
     out.beginGroup(type);
-    if (out instanceof NodeTree)
-      ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
 
   public static void beginGroup(Consumer out, Object qname,
@@ -84,9 +84,9 @@ public class MakeElement extends NodeConstructor
       type = (Symbol) qname;
     else
       type = Symbol.make("", qname.toString(), "");
+    if (out instanceof XMLFilter)
+      ((XMLFilter) out).copyNamespacesMode = copyNamespacesMode;
     out.beginGroup(type);
-    if (out instanceof NodeTree)
-      ((NodeTree) out).copyNamespacesMode = copyNamespacesMode;
   }
 
   public static void endGroup(Consumer out, Object type/*FIXME:unused*/)

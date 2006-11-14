@@ -19,7 +19,7 @@ import gnu.text.URI_utils;
  * @author Per Bothner
  */
 
-public class @XMLParser@
+abstract public class @XMLParser@
 {
   protected @CHAR@[] buffer;
   protected int pos;
@@ -142,7 +142,7 @@ public class @XMLParser@
               }
             length = pos - length;
             if (length > 0)
-              out.emitCharacters(buffer, start, length);
+              out.write(buffer, start, length);
 	    start = buffer.length;
             break handleChar;
 
@@ -242,9 +242,9 @@ public class @XMLParser@
 		else
 		  break handleChar;
 	      }
-	    message = "Invalid character reference";
-	    state = SAW_ERROR;
-	    continue mainLoop;
+            error('e', "invalid character reference");
+	    state = TEXT_STATE;
+            break handleChar;
 
           case SAW_AMP_STATE:
             if (ch == '#')
@@ -336,7 +336,7 @@ public class @XMLParser@
 			if (buffer[pos-2] == '-'
 			    && buffer[pos-3] == '-')
 			  {
-			    out.emitComment(buffer, start + 2, length - 4);
+			    out.writeComment(buffer, start + 2, length - 4);
 			    break exclLoop;
 			  }
 		      }
@@ -352,7 +352,7 @@ public class @XMLParser@
 			if (buffer[pos-2] == ']'
 			    && buffer[pos-3] == ']')
 			  {
-			    out.emitCDATA(buffer, start + 7, pos - 10 - start);
+			    out.writeCDATA(buffer, start + 7, pos - 10 - start);
 			    break exclLoop;
 			  }
 		      }
@@ -611,14 +611,5 @@ public class @XMLParser@
     this(url.openConnection().getInputStream(), out);
   }
 
-  public static @XMLParser@ open (Object uri, @ParsedXMLHandler@ out)
-    throws IOException
-  {
-    return new @XMLParser@(URI_utils.getInputStream(uri), out);
-  }
-
-  public void error(char severity, String message)
-  {
-    out.error(this, message);
-  }
+  public abstract void error(char severity, String message);
 }

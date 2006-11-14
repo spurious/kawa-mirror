@@ -10,47 +10,38 @@ import java.net.*;
 public class XMLParser extends XMLParserChar
                        implements gnu.text.SourceLocator
 {
-  SourceMessages messages;
+  XMLFilter filter;
 
   public XMLParser(LineBufferedReader reader, SourceMessages messages, Consumer out)
   {
-    this(reader, new XMLFilter(out), messages, out);
+    this(reader, new XMLFilter(out), messages);
     
-  }
-
-  private XMLParser(LineBufferedReader reader, XMLFilter resolver,
-		    SourceMessages messages, Consumer out)
-  {
-    super(null, 0, 0, resolver);
-    in = reader;
-    this.messages = messages;
-    resolver.setParser(this);
-  }
-
-  public XMLParser(LineBufferedReader reader, Consumer out, SourceMessages messages)
-  {
-    super(null, 0, 0, new XMLFilter(out));
-    in = reader;
-    this.messages = messages;
-  }
-
-  private XMLParser(Object uri, Consumer out, SourceMessages messages,
-		    XMLFilter resolver,
-		    LineBufferedReader lreader)
-    throws java.io.IOException
-  {
-    super(null, 0, 0, resolver);
-    in = lreader;
-    resolver.setParser(this);
-    lreader.setName(uri);
-    this.messages = messages;
   }
 
   public XMLParser(Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    this(uri, out, messages, new XMLFilter(out),
+    this(uri, messages, new XMLFilter(out),
 	 new LineBufferedReader(new java.io.BufferedInputStream(URI_utils.getInputStream(uri))));
+  }
+
+  private XMLParser(LineBufferedReader reader, XMLFilter resolver,
+		    SourceMessages messages)
+  {
+    super(null, 0, 0, resolver);
+    this.filter = resolver;
+    in = reader;
+    resolver.setMessages(messages);
+    resolver.setSourceLocator(this);
+  }
+
+  private XMLParser(Object uri, SourceMessages messages,
+		    XMLFilter resolver,
+		    LineBufferedReader lreader)
+    throws java.io.IOException
+  {
+    this(lreader, resolver, messages);
+    lreader.setName(uri);
   }
 
   public int fill(char[] buffer,  int start, int pos)
@@ -99,13 +90,7 @@ public class XMLParser extends XMLParserChar
     catch (Exception ex)
       {
       }
-    String filename = reader.getName();
-    if (filename != null && filename.startsWith("file:"))
-      filename = filename.substring(5);
-    int line = reader.getLineNumber();
-    int column = reader.getColumnNumber();
-    messages.error(severity, filename, line + 1, column >= 0 ? column + 1 : 0,
-		   message);
+    filter.error(severity, message);
   }
 
   public String getPublicId ()
@@ -132,7 +117,7 @@ public class XMLParser extends XMLParserChar
   public int getColumnNumber()
   {
     int col = ((LineBufferedReader) in).getColumnNumber();
-    return col < 0 ? -1 : col + 1;
+    return col < 0 ? -1 : col;
   }
 
   public boolean isStableSourceLocation()

@@ -1,3 +1,16 @@
+2006-11-14  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java: Merge in "filtering" functionality from NodeTree.
+	Primarily namespace-copying and error checking.
+	* NodeTree.java: All event-handling fields and methods (such as
+	writeObject) moved to XMLFilter.
+	* XMLParser.java.in: Update for some XMLFilter method renaming.
+	Make abstract, so we can make error method abstract.
+	Handle "invalid character reference" by calling error directly.
+	(open): Remove static method.
+	* NamespaceBinding.java (merge, mergeHelper): Remove methods.
+	Their functionality has been moved to XMLFilter.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (XMLPrinter):  Now uses writeWordStart.

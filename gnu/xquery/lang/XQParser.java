@@ -14,6 +14,7 @@ import java.io.File;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
 import gnu.xml.NodeTree;
+import gnu.xml.XMLFilter;
 import gnu.xml.XName;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
@@ -100,7 +101,7 @@ public class XQParser extends Lexer
   /** True if we've seen a 'copy-namespaces' declaration'. */
   boolean copyNamespacesDeclarationSeen;
   int copyNamespacesMode
-  = NodeTree.COPY_NAMESPACES_PRESERVE|NodeTree.COPY_NAMESPACES_INHERIT;
+  = XMLFilter.COPY_NAMESPACES_PRESERVE|XMLFilter.COPY_NAMESPACES_INHERIT;
 
   /** The static construction mode. True if "strip"; false if "preserve". */
   boolean constructionModeStrip;
@@ -4035,9 +4036,9 @@ public class XQParser extends Lexer
           syntaxError("duplicate 'declare copy-namespaces' seen", "XQST0055");
         copyNamespacesDeclarationSeen = true;
 	if (match("preserve"))
-          copyNamespacesMode |= NodeTree.COPY_NAMESPACES_PRESERVE;
+          copyNamespacesMode |= XMLFilter.COPY_NAMESPACES_PRESERVE;
 	else if (match("no-preserve"))
-          copyNamespacesMode &= ~NodeTree.COPY_NAMESPACES_PRESERVE;
+          copyNamespacesMode &= ~XMLFilter.COPY_NAMESPACES_PRESERVE;
 	else
 	  return syntaxError("expected 'preserve' or 'no-preserve' after 'declare copy-namespaces'");
         getRawToken();
@@ -4045,9 +4046,9 @@ public class XQParser extends Lexer
           return syntaxError("missing ',' in copy-namespaces declaration");
         getRawToken();
 	if (match("inherit"))
-          copyNamespacesMode |= NodeTree.COPY_NAMESPACES_INHERIT;
+          copyNamespacesMode |= XMLFilter.COPY_NAMESPACES_INHERIT;
 	else if (match("no-inherit"))
-          copyNamespacesMode &= ~NodeTree.COPY_NAMESPACES_INHERIT;
+          copyNamespacesMode &= ~XMLFilter.COPY_NAMESPACES_INHERIT;
 	else
 	  return syntaxError("expected 'inherit' or 'no-inherit' in copy-namespaces declaration");
 	parseSeparator();

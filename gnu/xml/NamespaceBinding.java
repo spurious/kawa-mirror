@@ -158,27 +158,6 @@ public final class NamespaceBinding implements Externalizable
     return count;
   }
 
-  /** Combine bindings from two lists.
-   * The bindings in {@code list2} take preference.
-   */
-  public static NamespaceBinding merge (NamespaceBinding list1,
-                                        NamespaceBinding list2)
-  {
-    NamespaceBinding join = commonAncestor(list1, list2);
-    if (join == list1)
-      return list2;
-    return mergeHelper(list1, list2);
-  }
-
-  private static NamespaceBinding mergeHelper (NamespaceBinding list,
-                                               NamespaceBinding node)
-  {
-    if (node == predefinedXML)
-      return list;
-    list = mergeHelper(list, node.next);
-    return maybeAdd(node.prefix, node.uri, list);
-  }
-
   /** Append a new NamespaceBinding if not redundant. */
   public static NamespaceBinding maybeAdd(String prefix, String uri,
 					  NamespaceBinding bindings)

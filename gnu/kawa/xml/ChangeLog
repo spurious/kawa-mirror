@@ -1,5 +1,16 @@
 2006-11-14  Per Bothner  <per@bothner.com>
 
+	* XMLParser.java: Make use of enhanced XMLFilter.
+	(messages): Remove field.
+	(filter): New field.
+	(error): Defer error reporting to XMLFilter.
+	(getColumnNumber): Subtract one to get just-read column.
+	* MakeElement.java: Namespaces copying is now handled by XMLFilter.
+	* Nodes.java: Must now filter XConsumer events using XMLFilter.
+	* NodeConstructor.java (pushNodeConsumer, popNodeConsumer,
+	pushNodeContext, popNodeContext, compileUsingNodeTree): Likewise.
+	(makeName, finishNode): Convenience methods for compiled code.
+
 	* SortedNodes.java (curFragment): Remove unused/bogus field.
 
 2006-11-13  Per Bothner  <per@bothner.com>

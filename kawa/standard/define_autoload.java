@@ -66,7 +66,7 @@ public class define_autoload extends Syntax
       ;
     File file = new File(filespec);
     if (! file.isAbsolute())
-      file = new File(new File(tr.getFile()).getParent(), filespec);
+      file = new File(new File(tr.getFileName()).getParent(), filespec);
     String filename = file.getPath();
     int dot = filename.lastIndexOf('.');
     Language language;

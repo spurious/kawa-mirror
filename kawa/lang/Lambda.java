@@ -59,7 +59,7 @@ public class Lambda extends Syntax implements Printable
   {
     rewriteFormals(lexp, formals, tr, templateScopeRest);
     if (body instanceof PairWithPosition)
-      lexp.setFile(((PairWithPosition) body).getFile());
+      lexp.setFile(((PairWithPosition) body).getFileName());
     body = rewriteAttrs(lexp, body, tr);
     rewriteBody(lexp, body, tr);
   }
@@ -69,8 +69,8 @@ public class Lambda extends Syntax implements Printable
   {
     if (lexp.getSymbol() == null)
       {
-        String filename = lexp.getFile();
-        int line = lexp.getLine();
+        String filename = lexp.getFileName();
+        int line = lexp.getLineNumber();
         if (filename != null && line > 0)
           lexp.setSourceLocation(filename, line);
       }

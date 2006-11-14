@@ -1,5 +1,7 @@
 2006-11-13  Per Bothner  <per@bothner.com>
 
+	* XMLParser.java: Implement gnu.text.SourceLocation.
+
 	* AttributeType.java (getImplementationType): Be more specific.
 	* ElementType.java (getImplementationType): Likewise.
 	* ProcessingInstructionType.java (getImplementationType): Likewise.

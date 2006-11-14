@@ -1,9 +1,11 @@
 package gnu.lists;
 import java.io.*;
+import gnu.text.SourceLocator;
 
 /** A <code>Pair</code> with the file name and position it was read from. */
 
 public class PairWithPosition extends Pair
+  implements gnu.text.SourceLocator
 {
   String filename;
   /** An encoding of lineNumber+(columnNumber<<20).
@@ -17,7 +19,11 @@ public class PairWithPosition extends Pair
 
   public final void setLine (int lineno, int colno)
   {
-    position = lineno + (colno << 20);
+    if (lineno < 0)
+      lineno = 0;
+    if (colno < 0)
+      colno = 0;
+    position = (lineno << 12) + colno;
   }
 
   public final void setLine (int lineno)
@@ -25,34 +31,48 @@ public class PairWithPosition extends Pair
     setLine (lineno, 0);
   }
 
-  public final String getFile ()
+  public final String getFileName ()
   {
     return filename;
   }
 
-  /** Get the line number of (the start of) this pair.
-    * The "first" line is line 1. */
-  public final int getLine ()
+  public String getPublicId ()
   {
-    return position & 0xFFFFF;
+    return null;
   }
 
-  public final int getColumn ()
+  public String getSystemId ()
   {
-    return position >>> 20;
+    return filename;
   }
+
+  /** Get the line number of (the start of) this Expression.
+    * The "first" line is line 1; unknown is -1. */
+  public final int getLineNumber()
+  {
+    int line = position >> 12;
+    return line == 0 ? -1 : line;
+  }
+
+  public final int getColumnNumber()
+  {
+    int column = position & ((1 << 12) - 1);
+    return column == 0 ? -1 : column;
+  }
+
+  public boolean isStableSourceLocation() { return true; }
 
   /** Only for serialization. */
   public PairWithPosition ()
   {
   }
 
-  public PairWithPosition (PairWithPosition where,
+  public PairWithPosition (SourceLocator where,
                            Object car, Object cdr)
   {
     super (car, cdr);
-    filename = where.filename;
-    position = where.position;
+    filename = where.getFileName();
+    setLine(where.getLineNumber(), where.getColumnNumber());
   }
 
   public PairWithPosition (Object car, Object cdr)

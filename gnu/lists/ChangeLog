@@ -1,5 +1,8 @@
 2006-11-13  Per Bothner  <per@bothner.com>
 
+	* PairWithPosition.java: Implement SourceLocation.
+	(position): Change interpretation.
+
 	* PrintConsumer.java (endNumber): New method, to be overridden.
 	(writeFloat, writeDouble, writeInt, writeLong): Call endNumber.
 

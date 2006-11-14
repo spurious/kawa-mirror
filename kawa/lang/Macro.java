@@ -194,9 +194,9 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
-    String save_filename = tr.getFile();
-    int save_line = tr.getLine();
-    int save_column = tr.getColumn();
+    String save_filename = tr.getFileName();
+    int save_line = tr.getLineNumber();
+    int save_column = tr.getColumnNumber();
     Syntax saveSyntax = tr.currentSyntax;
     try
       {

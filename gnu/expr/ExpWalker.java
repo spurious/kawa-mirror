@@ -4,6 +4,7 @@ import gnu.text.SourceMessages;
 /** Class for doing a tree-walk over an Expression tree. */
 
 public class ExpWalker
+  implements gnu.text.SourceLocator
 {
   protected SourceMessages messages;
   Compilation comp;
@@ -32,13 +33,13 @@ public class ExpWalker
    * if you do, you may also want to override walkExps. */
   public Expression walk(Expression exp)
   {
-    int line = exp.getLine();
+    int line = exp.getLineNumber();
     if (messages != null && line > 0)
       {
-	String saveFile = messages.getFile();
-	int saveLine = messages.getLine();
-	int saveColumn = messages.getColumn();
-	messages.setLine(exp.getFile(), line, exp.getColumn());
+	String saveFile = messages.getFileName();
+	int saveLine = messages.getLineNumber();
+	int saveColumn = messages.getColumnNumber();
+	messages.setLine(exp.getFileName(), line, exp.getColumnNumber());
 	Expression ret = exp.walk(this);
 	messages.setLine(saveFile, saveLine, saveColumn);
 	return ret;
@@ -145,9 +146,9 @@ public class ExpWalker
     int saveColumn;
     if (messages != null)
       {
-	saveFile = messages.getFile();
-	saveLine = messages.getLine();
-	saveColumn = messages.getColumn();
+	saveFile = messages.getFileName();
+	saveLine = messages.getLineNumber();
+	saveColumn = messages.getColumnNumber();
       }
     else
       {
@@ -159,10 +160,10 @@ public class ExpWalker
     for (int i = 0;  i < n && exitValue == null;  i++)
       {
 	Expression exp = exps[i];
-	int line = exp.getLine();
+	int line = exp.getLineNumber();
 	if (messages != null && line > 0)
 	  {
-	    messages.setLine(exp.getFile(), line, exp.getColumn());
+	    messages.setLine(exp.getFileName(), line, exp.getColumnNumber());
 	    mustRestore = true;
 	  }
 	else if (mustRestore)
@@ -200,9 +201,14 @@ public class ExpWalker
     return new ErrorExp (message);
   }
 
-  public final String getFile() { return messages.getFile(); }
-  public final int getLine() { return messages.getLine(); }
-  public final int getColumn() { return messages.getColumn(); }
+  public final String getFileName() { return messages.getFileName(); }
+  public final int getLineNumber() { return messages.getLineNumber(); }
+  public final int getColumnNumber() { return messages.getColumnNumber(); }
+  public String getPublicId() { return messages.getPublicId(); }
+  public String getSystemId() { return messages.getSystemId(); }
+  /** Normally same as getSystemId. */
+
+  public boolean isStableSourceLocation() { return false; }
 
   public void setFile(String filename) { messages.setFile(filename); }
   public void setLine(int line) { messages.setLine(line); }

@@ -522,8 +522,7 @@ public class object extends Syntax
       {
         Declaration decl = (Declaration) d;
         SetExp sexp = new SetExp(decl, initValue);
-        sexp.setFile(decl.getFile());
-        sexp.setLine(decl.getLine(), decl.getColumn());
+        sexp.setLocation(decl);
         decl.noteValue(null);
         initValue = sexp;
       }

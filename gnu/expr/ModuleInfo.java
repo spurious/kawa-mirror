@@ -40,7 +40,7 @@ public class ModuleInfo
     ModuleExp mod = comp.mainLambda;
     this.exp = mod;
     if (mod != null)
-      this.sourceURL = mod.getFile();
+      this.sourceURL = mod.getFileName();
   }
   
   ModuleInfo[] dependencies;

@@ -1,3 +1,18 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRules.java: Update for SourceLocation changes.
+	* kawa/lang/Lambda.java: Likewise.
+	* kawa/lang/SyntaxPattern.java: Likewise.
+	* kawa/lang/Eval.java: Likewise.
+	* kawa/lang/Macro.java: Likewise.
+	* kawa/standard/object.java: Likewise.
+	* kawa/standard/require.java: Likewise.
+	* kawa/standard/define_class.java: Likewise.
+	* kawa/standard/define_autoload.java: Likewise.
+	* kawa/repl.java: Likewise.
+	* kawa/lang/Translator.java: Likewise.
+	(setLine, setLine): Generalize/simplify.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java: Error rather than warning on

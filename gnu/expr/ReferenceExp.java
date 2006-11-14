@@ -103,8 +103,7 @@ public class ReferenceExp extends AccessExp
             String msg = "exception evaluating "+symbol
               +" from "+binding.field+" - "+ex;
             // We abuse msg as a UnboundLocationException name.
-            throw new UnboundLocationException(msg, getFile(),
-                                               getLine(), getColumn());
+            throw new UnboundLocationException(msg, this);
           }
       }
     // This isn't just an optimization - it's needed for evaluating procedural
@@ -134,8 +133,7 @@ public class ReferenceExp extends AccessExp
             Object unb = gnu.mapping.Location.UNBOUND;
             value = env.get(sym, property, unb);
             if (value == unb)
-              throw new UnboundLocationException(sym, getFile(),
-                                                 getLine(), getColumn());
+              throw new UnboundLocationException(sym, this);
           }
         ctx.writeValue(value);
         return;

@@ -71,11 +71,7 @@ public class defun extends Syntax implements Printable
 	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr, null);
 	    lexp.setSymbol(name);
 	    if (p2 instanceof PairWithPosition)
-	      {
-		PairWithPosition pp = (PairWithPosition) p2;
-		lexp.setFile (pp.getFile ());
-		lexp.setLine (pp.getLine (), pp.getColumn ());
-	      }
+              lexp.setLocation((PairWithPosition) p2);
 	    value = lexp;
 	    SetExp sexp = new SetExp (name, value);
 	    sexp.setDefining(true);

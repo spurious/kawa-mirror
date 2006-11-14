@@ -172,7 +172,7 @@ public class CheckedTarget extends StackTarget
         if (comp.method.getDeclaringClass() == proc.getCompiledClassType(comp))
           thisIsProc = true;
       }
-    int line = comp.getLine();
+    int line = comp.getLineNumber();
     if (line > 0)
       code.putLineNumber(line);
     code.emitNew(typeWrongType);

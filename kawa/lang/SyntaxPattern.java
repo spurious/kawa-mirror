@@ -133,14 +133,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	System.err.print(" for ");
 	System.err.print(macro);
       }
-    String file = tr.getFile();
+    String file = tr.getFileName();
     if (file != null)
       {
 	System.err.print(" file=");
 	System.err.print(file);
       }
-    int line = tr.getLine();
-    if (line != 0)
+    int line = tr.getLineNumber();
+    if (line > 0)
       {
 	System.err.print(" line=");
 	System.err.print(line);
@@ -358,8 +358,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    int n = (nesting << 1) + (matchCar ? 1 : 0);
 	    patternScope.patternNesting.append((char) n);
             Declaration decl = patternScope.addDeclaration(pattern);
-            decl.setFile(tr.getFile());
-            decl.setLine(tr.getLine(), tr.getColumn());
+            decl.setLocation(tr);
 	    tr.push(decl);
 	    addInt(program, (i << 3) | (matchCar ? MATCH_ANY_CAR : MATCH_ANY));
 	    return;

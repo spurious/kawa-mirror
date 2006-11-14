@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.text.SourceLocator;
 
 /**
  * The static information associated with a local variable binding.
@@ -33,7 +34,8 @@ import gnu.mapping.*;
  * procedure prologue, so the parameters henceforth act like local variables.
  */
 
-public class Declaration
+public class Declaration 
+  implements SourceLocator
 {
   static int counter;
   /** Unique id number, to ease print-outs and debugging.
@@ -251,8 +253,8 @@ public class Declaration
             String filename;
             int line;
             if (access != null
-                && (filename = access.getFile()) != null
-                && (line = access.getLine()) > 0)
+                && (filename = access.getFileName()) != null
+                && (line = access.getLineNumber()) > 0)
               {
                 // Wrap call to Location.get by a catch handler that
                 // calls setLine on the UnboundLocationException.
@@ -260,7 +262,7 @@ public class Declaration
                   = ClassType.make("gnu.mapping.UnboundLocationException");
                 // See comment in CheckedTarget.emitCheckedCoerce.
                 boolean isInTry = code.isInTry();
-                int column = access.getColumn();
+                int column = access.getColumnNumber();
                 Label startTry = new Label(code);
                 startTry.define(code);
                 code.emitInvokeVirtual(Compilation.getLocationMethod);
@@ -712,6 +714,12 @@ public class Declaration
   String filename;
   int position;
 
+  public final void setLocation (SourceLocator location)
+  {
+    this.filename = location.getFileName();
+    setLine(location.getLineNumber(), location.getColumnNumber());
+  }
+
   public final void setFile (String filename)
   {
     this.filename = filename;
@@ -719,6 +727,10 @@ public class Declaration
 
   public final void setLine (int lineno, int colno)
   {
+    if (lineno < 0)
+      lineno = 0;
+    if (colno < 0)
+      colno = 0;
     position = (lineno << 12) + colno;
   }
 
@@ -727,22 +739,36 @@ public class Declaration
     setLine (lineno, 0);
   }
 
-  public final String getFile ()
+  public final String getFileName ()
+  {
+    return filename;
+  }
+
+  public String getPublicId ()
+  {
+    return null;
+  }
+
+  public String getSystemId ()
   {
     return filename;
   }
 
   /** Get the line number of (the start of) this Expression.
-    * The "first" line is line 1. */
-  public final int getLine ()
+    * The "first" line is line 1; unknown is -1. */
+  public final int getLineNumber()
   {
-    return position >> 12;
+    int line = position >> 12;
+    return line == 0 ? -1 : line;
   }
 
-  public final int getColumn ()
+  public final int getColumnNumber()
   {
-    return position & ((1 << 12) - 1);
+    int column = position & ((1 << 12) - 1);
+    return column == 0 ? -1 : column;
   }
+
+  public boolean isStableSourceLocation() { return true; }
 
   public void printInfo(OutPort out)
   {
@@ -757,12 +783,12 @@ public class Declaration
     sbuf.append('/');
     sbuf.append(id);
     /*
-    int line = getLine();
+    int line = getLineNumber();
     if (line != 0)
       {
 	sbuf.append("/line:");
 	sbuf.append(line);
-	int column = getColumn();
+	int column = getColumnNumber();
 	if (column != 0)
 	  {
 	    sbuf.append(':');

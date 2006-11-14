@@ -11,7 +11,7 @@ import gnu.expr.Compilation;
  * Does not handle localization of messages.
  */
 
-public class SourceMessages
+public class SourceMessages implements SourceLocator
 {
   // Number of errors (not counting warnings).  A value of 1000 is "fatal".
   private int errorCount = 0;
@@ -22,6 +22,8 @@ public class SourceMessages
   SourceError lastError;
 
   public SourceError getErrors() { return firstError; }
+
+  SourceLocator locator;
 
   String current_filename;
   int current_line;
@@ -132,11 +134,24 @@ public class SourceMessages
     error(new SourceError(severity, filename, line, column, message));
   }
 
+  public void error(char severity, SourceLocator location, String message)
+  {
+    error(new SourceError(severity, location, message));
+  }
+
   public void error(char severity, String filename, int line, int column,
 		    String message, String code)
   {
     SourceError err = new SourceError(severity, filename, line, column,
                                       message);
+    err.code = code;
+    error(err);
+  }
+
+  public void error(char severity, SourceLocator location,
+		    String message, String code)
+  {
+    SourceError err = new SourceError(severity, location,  message);
     err.code = code;
     error(err);
   }
@@ -231,12 +246,46 @@ public class SourceMessages
     return false;
   }
 
+  /** Links our location to the one give. */
+  public final void setSourceLocator (SourceLocator locator)
+  {
+    this.locator = locator == this ? null : locator;
+  }
+
+  /** Copies the current position of locator. */
+  public final void setLocation (SourceLocator locator)
+  {
+    this.locator = null;
+    current_line = locator.getLineNumber();
+    current_column = locator.getColumnNumber();
+    current_filename = locator.getFileName();
+  }
+
+  public String getPublicId ()
+  {
+    return locator == null ? null : locator.getPublicId();
+  }
+  public String getSystemId ()
+  {
+    return locator == null ? current_filename : locator.getSystemId();
+  }
+
+  public boolean isStableSourceLocation () { return false; }
+
   /** The default filename to use for a new error. */
-  public final String getFile() { return current_filename; }
+  public final String getFileName() { return current_filename; }
+
   /** The default line number to use for a new error. */
-  public final int getLine() { return current_line; }
+  public final int getLineNumber ()
+  {
+    return locator == null ? current_line : locator.getLineNumber();
+  }
+
   /** The default column number to use for a new error. */
-  public final int getColumn() { return current_column; }
+  public final int getColumnNumber ()
+  {
+    return locator == null ? current_column : locator.getColumnNumber();
+  }
 
   /** Set the default filename to use for a new error. */
   public void setFile(String filename) { current_filename = filename; }

@@ -1086,9 +1086,9 @@ public class LambdaExp extends ScopeExp
     int j = 0;
 
     code.locals.enterScope(getVarScope());
-    int line = getLine();
-    if (line != 0)
-      code.putLineNumber(getFile(), line);
+    int line = getLineNumber();
+    if (line > 0)
+      code.putLineNumber(getFileName(), line);
 
     for (Declaration decl = firstDecl();  decl != null;  )
       {
@@ -1472,7 +1472,7 @@ public class LambdaExp extends ScopeExp
     else
       target = Target.pushValue(getReturnType());
     body.compileWithPosition(comp, target,
-			     body.getLine() > 0 ? body : this);
+			     body.getLineNumber() > 0 ? body : this);
     comp.callContextVar = callContextSave;
   }
 
@@ -1678,9 +1678,9 @@ public class LambdaExp extends ScopeExp
   {
     String str = getExpClassName()+':'+getSymbol()+'/'+id+'/';
 
-	int l = getLine();
+	int l = getLineNumber();
 	if (l <= 0 && body != null)
-	  l = body.getLine();
+	  l = body.getLineNumber();
 	if (l > 0)
 	  str = str + "l:" + l;
 

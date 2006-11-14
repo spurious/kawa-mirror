@@ -8,10 +8,7 @@ import gnu.text.*;
 import java.net.*;
 
 public class XMLParser extends XMLParserChar
-                       /* #ifdef JAXP-1.3 */
-                       // implements
-                       // org.xml.sax.Locator
-                       /* #endif */
+                       implements gnu.text.SourceLocator
 {
   SourceMessages messages;
 
@@ -121,6 +118,11 @@ public class XMLParser extends XMLParserChar
     return ((LineBufferedReader) in).getName();
   }
 
+  public String getFileName ()
+  {
+    return ((LineBufferedReader) in).getName();
+  }
+
   public int getLineNumber()
   {
     int line = ((LineBufferedReader) in).getLineNumber();
@@ -131,6 +133,11 @@ public class XMLParser extends XMLParserChar
   {
     int col = ((LineBufferedReader) in).getColumnNumber();
     return col < 0 ? -1 : col + 1;
+  }
+
+  public boolean isStableSourceLocation()
+  {
+    return false;
   }
 
   public void close ()

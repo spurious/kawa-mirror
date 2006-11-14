@@ -70,9 +70,9 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	Pair syntax_rule_pair = (Pair) syntax_rule;
 	Object pattern = syntax_rule_pair.car;
 
-	String save_filename = tr.getFile();
-	int save_line = tr.getLine();
-	int save_column = tr.getColumn();
+	String save_filename = tr.getFileName();
+	int save_line = tr.getLineNumber();
+	int save_column = tr.getColumnNumber();
 
 	try
 	  {

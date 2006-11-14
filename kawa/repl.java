@@ -785,8 +785,8 @@ public class repl extends Procedure0or1
         catch (Throwable ex)
           {
             StringBuffer sbuf = new StringBuffer();
-            String file = comp.getFile();
-            int line = comp.getLine();
+            String file = comp.getFileName();
+            int line = comp.getLineNumber();
             if (file != null && line > 0)
               {
                 sbuf.append(file);

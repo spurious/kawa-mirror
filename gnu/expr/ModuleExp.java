@@ -436,7 +436,7 @@ public class ModuleExp extends LambdaExp
   {
     if (type != null && type != Compilation.typeProcedure)
       return (ClassType) type;
-    String fileName = getFile();
+    String fileName = getFileName();
     File file = null;
     String mname = getName();
     if (mname != null)
@@ -508,7 +508,7 @@ public class ModuleExp extends LambdaExp
 	if (name == null)
 	  name = getName();
 	if (name == null)
-	  name = getFile();
+	  name = getFileName();
 	out.writeObject(name);
       }
   }

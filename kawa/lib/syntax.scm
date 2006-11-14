@@ -72,7 +72,7 @@
   (cond ((instance? form <kawa.lang.SyntaxForm>)
 	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
 	((instance? form <gnu.lists.PairWithPosition>)
-	 (let ((str (*:getFile (as  <gnu.lists.PairWithPosition> form))))
+	 (let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
 	   (if (eq? str #!null) #f  (make <string> str))))
 	(else
 	 #f)))
@@ -81,7 +81,7 @@
   (cond ((instance? form <kawa.lang.SyntaxForm>)
 	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
 	((instance? form <gnu.lists.PairWithPosition>)
-	 (*:getLine (as <gnu.lists.PairWithPosition> form)))
+	 (*:getLineNumber (as <gnu.lists.PairWithPosition> form)))
 	(else
 	 #f)))
 
@@ -90,7 +90,7 @@
   (cond ((instance? form <kawa.lang.SyntaxForm>)
 	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
 	((instance? form <gnu.lists.PairWithPosition>)
-	 (- (*:getColumn (as <gnu.lists.PairWithPosition> form)) 0))
+	 (- (*:getColumnNumber (as <gnu.lists.PairWithPosition> form)) 0))
 	(else
 	 #f)))
 

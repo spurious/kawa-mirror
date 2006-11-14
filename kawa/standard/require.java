@@ -188,7 +188,7 @@ public class require extends Syntax
     SourceMessages messages = tr.getMessages();
     try
       {
-        sourceName = URI_utils.resolve(sourceName, defs.getFile()).toString();
+        sourceName = URI_utils.resolve(sourceName, defs.getFileName()).toString();
       }
     catch (java.net.URISyntaxException ex)
       {
@@ -355,8 +355,7 @@ public class require extends Syntax
             adecl.setAlias(true);
             adecl.setIndirectBinding(true);
           }
-        adecl.setFile(tr.getFile());
-        adecl.setLine(tr.getLine(), tr.getColumn());
+        adecl.setLocation(tr);
         ReferenceExp fref = new ReferenceExp(fdecl);
         fref.setContextDecl(decl);
         if (! isImportedInstance)

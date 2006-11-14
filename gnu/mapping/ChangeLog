@@ -1,5 +1,7 @@
 2006-11-13  Per Bothner  <per@bothner.com>
 
+	* UnboundLocationException.java: New constructor.
+
 	* OutPort.java (writeWordEnd, writeWordStart): New methods.
 
 2006-11-12  Per Bothner  <per@bothner.com>

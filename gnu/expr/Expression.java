@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
+import gnu.text.SourceLocator;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.
@@ -8,7 +9,8 @@ import gnu.mapping.*;
  * @author	Per Bothner
  */
 
-public abstract class Expression extends Procedure0 implements Printable
+public abstract class Expression extends Procedure0
+  implements Printable, SourceLocator
 {
   public final Object eval (CallContext ctx) throws Throwable
   {
@@ -89,13 +91,13 @@ public abstract class Expression extends Procedure0 implements Printable
    */
   public void printLineColumn(OutPort out)
   {
-    int line = getLine ();
+    int line = getLineNumber();
     if (line > 0)
       {
 	out.print("line:");
 	out.print(line);
-	int column = getColumn();
-	if (column != 0)
+	int column = getColumnNumber();
+	if (column > 0)
 	  {
 	    out.print(':');
 	    out.print(column);
@@ -109,10 +111,10 @@ public abstract class Expression extends Procedure0 implements Printable
   /** Same as compile, but emit line number beforehard. */
   public final void compileWithPosition(Compilation comp, Target target)
   {
-    int line = getLine ();
+    int line = getLineNumber ();
     if (line > 0)
       {
-        comp.getCode().putLineNumber(getFile(), line);
+        comp.getCode().putLineNumber(getFileName(), line);
         compileNotePosition(comp, target, this);
       }
     else
@@ -124,10 +126,10 @@ public abstract class Expression extends Procedure0 implements Printable
   public final void compileWithPosition(Compilation comp, Target target,
 					Expression position)
   {
-    int line = position.getLine ();
+    int line = position.getLineNumber ();
     if (line > 0)
       {
-        comp.getCode().putLineNumber(position.getFile(), line);
+        comp.getCode().putLineNumber(position.getFileName(), line);
         compileNotePosition(comp, target, position);
       }
     else
@@ -138,9 +140,9 @@ public abstract class Expression extends Procedure0 implements Printable
   public final void compileNotePosition(Compilation comp, Target target,
 					Expression position)
   {
-    String saveFilename = comp.getFile();
-    int saveLine = comp.getLine();
-    int saveColumn = comp.getColumn();
+    String saveFilename = comp.getFileName();
+    int saveLine = comp.getLineNumber();
+    int saveColumn = comp.getColumnNumber();
     comp.setLine(position);
     compile(comp, target);
     // This might logically belong in a `finally' clause.
@@ -233,10 +235,16 @@ public abstract class Expression extends Procedure0 implements Printable
     return let;
   }
   
+  /** Copies the current location. */
+  public final void setLocation (SourceLocator location)
+  {
+    this.filename = location.getFileName();
+    setLine(location.getLineNumber(), location.getColumnNumber());
+  }
+
   public final Expression setLine(Expression old)
   {
-    this.filename = old.filename;
-    this.position = old.position;
+    setLocation(old);
     return this;
   }
 
@@ -247,6 +255,10 @@ public abstract class Expression extends Procedure0 implements Printable
 
   public final void setLine (int lineno, int colno)
   {
+    if (lineno < 0)
+      lineno = 0;
+    if (colno < 0)
+      colno = 0;
     position = (lineno << 12) + colno;
   }
 
@@ -255,7 +267,7 @@ public abstract class Expression extends Procedure0 implements Printable
     setLine (lineno, 0);
   }
 
-  public final String getFile ()
+  public final String getFileName ()
   {
     return filename;
   }
@@ -263,25 +275,39 @@ public abstract class Expression extends Procedure0 implements Printable
   /** Set line number from current position in <code>Compilation</code>. */
   public void setLine (Compilation comp)
   {
-    int line = comp.getLine();
-    if (line != 0)
+    int line = comp.getLineNumber();
+    if (line > 0)
       {
-	setFile(comp.getFile());
-	setLine(line, comp.getColumn());
+	setFile(comp.getFileName());
+	setLine(line, comp.getColumnNumber());
       }
   }
 
-  /** Get the line number of (the start of) this Expression.
-    * The "first" line is line 1. */
-  public final int getLine ()
+  public String getPublicId ()
   {
-    return position >> 12;
+    return null;
   }
 
-  public final int getColumn ()
+  public String getSystemId ()
   {
-    return position & ((1 << 12) - 1);
+    return filename;
   }
+
+  /** Get the line number of (the start of) this Expression.
+    * The "first" line is line 1; unknown is -1. */
+  public final int getLineNumber()
+  {
+    int line = position >> 12;
+    return line == 0 ? -1 : line;
+  }
+
+  public final int getColumnNumber()
+  {
+    int column = position & ((1 << 12) - 1);
+    return column == 0 ? -1 : column;
+  }
+
+  public boolean isStableSourceLocation() { return true; }
 
   /** Return the Type used to represent the values of this Expression. */
   public Type getType()

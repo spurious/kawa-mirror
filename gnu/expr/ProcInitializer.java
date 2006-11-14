@@ -114,10 +114,10 @@ public class ProcInitializer extends Initializer
 
   public void reportError (String message, Compilation comp)
   {
-    String saveFile = comp.getFile();
-    int saveLine = comp.getLine();
-    int saveColumn = comp.getColumn();
-    comp.setLine(proc);
+    String saveFile = comp.getFileName();
+    int saveLine = comp.getLineNumber();
+    int saveColumn = comp.getColumnNumber();
+    comp.setLocation(proc);
     String name = proc.getName();
     StringBuffer sbuf = new StringBuffer(message);
     if (name == null)

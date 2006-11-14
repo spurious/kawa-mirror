@@ -9,6 +9,7 @@ import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
+import gnu.text.SourceLocator;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -719,24 +720,16 @@ public class Translator extends Compilation
       return QuoteExp.getInstance(Quote.quote(exp, this));
   }
 
-  public static void setLine(Expression exp, Object pair)
+  public static void setLine(Expression exp, Object location)
   {
-    if (pair instanceof PairWithPosition)
-      {
-	PairWithPosition expPos = (PairWithPosition) pair;
-	exp.setFile(expPos.getFile());
-	exp.setLine(expPos.getLine(), expPos.getColumn());
-      }
+    if (location instanceof SourceLocator)
+      exp.setLocation((SourceLocator) location);
   }
 
-  public static void setLine(Declaration decl, Object pair)
+  public static void setLine(Declaration decl, Object location)
   {
-    if (pair instanceof PairWithPosition)
-      {
-	PairWithPosition declPos = (PairWithPosition) pair;
-	decl.setFile(declPos.getFile());
-	decl.setLine(declPos.getLine(), declPos.getColumn());
-      }
+    if (location instanceof SourceLocator)
+      decl.setLocation((SourceLocator) location);
   }
 
   PairWithPosition positionPair;
@@ -753,12 +746,11 @@ public class Translator extends Compilation
     PairWithPosition ppair = (PairWithPosition) pair;
     Object saved;
     if (positionPair == null
-	|| positionPair.getFile() != getFile()
-	|| positionPair.getLine() != getLine()
-	|| positionPair.getColumn() != getColumn())
+	|| positionPair.getFileName() != getFileName()
+	|| positionPair.getLineNumber() != getLineNumber()
+	|| positionPair.getColumnNumber() != getColumnNumber())
       {
-	saved = PairWithPosition.make(Special.eof, positionPair,
-				      getFile(), getLine(), getColumn());
+        saved = new PairWithPosition(this, Special.eof, positionPair);
       }
     else
       saved = positionPair;
@@ -781,13 +773,10 @@ public class Translator extends Compilation
   }
 
 
-  public void setLine (Object pair)
+  public void setLine (Object location)
   {
-    if (pair instanceof PairWithPosition)
-      {
-	PairWithPosition pos = (PairWithPosition) pair;
-	setLine(pos.getFile(), pos.getLine(), pos.getColumn());
-      }
+    if (location instanceof SourceLocator)
+      setLocation((SourceLocator) location);
   }
 
   /** Set the line position of the argument to the current position. */
@@ -796,10 +785,7 @@ public class Translator extends Compilation
   {
     if (exp instanceof QuoteExp)
       return;
-    if (exp.getFile () == null)
-      exp.setFile(getFile());
-    if (exp.getLine () == 0)
-      exp.setLine (getLine(), getColumn());
+    exp.setLocation(this);
   }
 
   /** Extract a type from the car of a pair. */
@@ -965,9 +951,9 @@ public class Translator extends Compilation
           }
 	if (syntax != null)
 	  {
-	    String save_filename = getFile();
-	    int save_line = getLine();
-	    int save_column = getColumn();
+	    String save_filename = getFileName();
+	    int save_line = getLineNumber();
+	    int save_column = getColumnNumber();
 	    try
 	      {
 		setLine(st_pair);

@@ -50,7 +50,7 @@ public class lambda extends Lambda
 	  }
       }
     if (body instanceof PairWithPosition)
-      lexp.setFile(((PairWithPosition) body).getFile());
+      lexp.setFile(((PairWithPosition) body).getFileName());
     FluidLetExp let = null;
 
     int decl_count = lexp.min_args;

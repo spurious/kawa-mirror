@@ -3,6 +3,7 @@ package gnu.text;
 /** Represents an error message from processing a "source" file. */
 
 public class SourceError
+  implements SourceLocator
 {
   /** Used to chain to the "next" message. */
   public SourceError next;
@@ -46,6 +47,12 @@ public class SourceError
     this.message = message;
   }
 
+  public SourceError(char severity, SourceLocator location, String message)
+  {
+    this(severity, location.getFileName(), location.getLineNumber(),
+         location.getColumnNumber(), message);
+  }
+
   /** Create a new SourceError using the current line/column from
    * a <code>LineBufferedReader</code>. */
   public SourceError(LineBufferedReader port, char severity, String message)
@@ -64,7 +71,7 @@ public class SourceError
   {
     StringBuffer buffer = new StringBuffer ();
     buffer.append (filename == null ? "<unknown>" : filename);
-    if (line != 0 || column != 0)
+    if (line > 0 || column > 0)
       {
 	buffer.append (':');
 	buffer.append (line);
@@ -140,4 +147,11 @@ public class SourceError
       }
     out.println(line);
   }
+
+  public int getLineNumber () { return line == 0 ? -1 : line; }
+  public int getColumnNumber () { return column == 0 ? -1 : column; }
+  public String getPublicId() { return null; }
+  public String getSystemId() { return filename; }
+  public String getFileName() { return filename; }
+  public boolean isStableSourceLocation() { return true; }
 }

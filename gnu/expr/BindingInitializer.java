@@ -47,9 +47,9 @@ public class BindingInitializer extends Initializer
 	  }
       }
 
-    int line = decl.getLine();
+    int line = decl.getLineNumber();
     if (line > 0)
-      code.putLineNumber(decl.getFile(), line);
+      code.putLineNumber(decl.getFileName(), line);
 
     if (field != null && ! field.getStaticFlag())
       code.emitPushThis();

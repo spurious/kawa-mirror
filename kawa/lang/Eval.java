@@ -94,7 +94,7 @@ public class Eval extends Procedure1or2
           }
 
 	if (body instanceof PairWithPosition)
-	  mod.setFile(((PairWithPosition) body).getFile());
+	  mod.setFile(((PairWithPosition) body).getFileName());
 	mod.setName (evalFunctionName);
 	ModuleExp.evalModule(env, ctx, tr, null, null);
 	if (messages.seenErrors())

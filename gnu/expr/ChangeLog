@@ -1,3 +1,25 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* Expression.java: Implement SourceLocator.
+	(setLocation): New method.
+	(getFile, getLine, getColumn): Rename to getFileName, getLineNumnber,
+	getColumnNumber.
+	* ExpWalker.java: Implement SourceLocator.
+	* Declaration.java: Implement SourceLocator.
+	(getFile, getLine, getColumn): Rename to getFileName, getLineNumnber,
+	getColumnNumber.
+	* Compilation: Implement SourceLocator.
+	(error): Generalize.
+	* ClassExp.java: Update.
+	* LambdaExp.java: Update.
+	* ModuleInfo.java: Update.
+	* ErrorExp.java: Update.
+	* BindingInitializer.java: Update.
+	* ModuleExp.java: Update.
+	* ProcInitializer.java: Update.
+	* CheckedTarget.java: Update.
+	* ReferenceExp.java: Use new UnboundLocationException constructor.
+
 2006-11-09  Per Bothner  <per@bothner.com>
 
 	* Language.java (print): Remove unused methods.

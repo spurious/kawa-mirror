@@ -50,11 +50,7 @@ public class define_class extends Syntax
       return super.scanForDefinitions(st, forms, defs, tr);
     Declaration decl = tr.define(name, nameSyntax, defs);
     if (p instanceof PairWithPosition)
-      {
-        PairWithPosition declPos = (PairWithPosition) p;
-        decl.setFile(declPos.getFile());
-        decl.setLine(declPos.getLine(), declPos.getColumn());
-      }
+      decl.setLocation((PairWithPosition) p);
     ClassExp oexp = new ClassExp(isSimple);
     decl.noteValue(oexp);
     decl.setFlag(Declaration.IS_CONSTANT);

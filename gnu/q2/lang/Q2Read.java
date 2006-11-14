@@ -106,7 +106,7 @@ public class Q2Read extends LispReader
 		if (n == LList.Empty)
 		  break;
 		PairWithPosition np = (PairWithPosition) n;
-		int pColumn = np.getColumn()-1;
+		int pColumn = np.getColumnNumber()-1;
 		if (pColumn >= column)
 		  {
 		    if (pColumn > column)
@@ -114,7 +114,7 @@ public class Q2Read extends LispReader
 		    n = np.cdr;
 		    if (n != LList.Empty)
 		      {
-			if (((PairWithPosition) n).getColumn()-1==column)
+			if (((PairWithPosition) n).getColumnNumber()-1==column)
 			  {
 			    p = (PairWithPosition) n;
 			    continue;

@@ -16,7 +16,7 @@ import java.util.Stack;
  * we create a new Compilation.
  */
 
-public class Compilation
+public class Compilation implements SourceLocator
 {
   /** True if the form is too complex to evaluate,and we must compile it.
    * This is because it contains a construct we know how to compile, but not
@@ -1312,9 +1312,9 @@ public class Compilation
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
-	    int line = source.getLine();
+	    int line = source.getLineNumber();
 	    if (line > 0)
-	      code.putLineNumber(source.getFile(), line);
+	      code.putLineNumber(source.getFileName(), line);
 
 	    Variable ctxVar = code.getArg(i == 5 ? 3 : i+2);
 
@@ -1446,9 +1446,9 @@ public class Compilation
 
 	    aswitch.addCase(source.getSelectorValue(this) + i, code);
 
-	    int line = source.getLine();
+	    int line = source.getLineNumber();
 	    if (line > 0)
-	      code.putLineNumber(source.getFile(), line);
+	      code.putLineNumber(source.getFileName(), line);
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
@@ -1645,9 +1645,9 @@ public class Compilation
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
-	    int line = source.getLine();
+	    int line = source.getLineNumber();
 	    if (line > 0)
-	      code.putLineNumber(source.getFile(), line);
+	      code.putLineNumber(source.getFileName(), line);
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
@@ -1992,9 +1992,9 @@ public class Compilation
 	callStackContext.setParameter(true);
       }
 
-    int line = module.getLine();
+    int line = module.getLineNumber();
     if (line > 0)
-      code.putLineNumber(module.getFile(), line);
+      code.putLineNumber(module.getFileName(), line);
 
     module.allocParameters(this);
     module.enterFunction(this);
@@ -2424,16 +2424,16 @@ public class Compilation
   public void setMessages (SourceMessages messages)
   { this.messages = messages; }
  
-  public void error(char severity, String message, Expression location)
+  public void error(char severity, String message, SourceLocator location)
   {
-    String file = location.getFile();
-    int line = location.getLine();
-    int column = location.getColumn();
+    String file = location.getFileName();
+    int line = location.getLineNumber();
+    int column = location.getColumnNumber();
     if (file == null || line <= 0)
       {
-        file = getFile();
-        line = getLine();
-        column = getColumn();
+        file = getFileName();
+        line = getLineNumber();
+        column = getColumnNumber();
       }
 
     if (severity == 'w' && getBooleanOption("warn-as-error", false))
@@ -2446,8 +2446,7 @@ public class Compilation
     if (severity == 'w' && getBooleanOption("warn-as-error", false))
       severity = 'e';
     
-    messages.error(severity, getFile(), getLine(), getColumn(),
-		   message);
+    messages.error(severity, this, message);
   }
 
   public void error(char severity, Declaration decl, String msg1, String msg2)
@@ -2461,15 +2460,15 @@ public class Compilation
     if (severity == 'w' && getBooleanOption("warn-as-error", false))
       severity = 'e';
     
-    String filename = getFile();
-    int line = getLine();
-    int column = getColumn();
-    int decl_line = decl.getLine();
+    String filename = getFileName();
+    int line = getLineNumber();
+    int column = getColumnNumber();
+    int decl_line = decl.getLineNumber();
     if (decl_line > 0)
       {
-	filename = decl.getFile();
+	filename = decl.getFileName();
 	line = decl_line;
-	column = decl.getColumn();
+	column = decl.getColumnNumber();
       }
     messages.error(severity, filename, line, column, message, code);
   }
@@ -2485,15 +2484,20 @@ public class Compilation
     return new ErrorExp (message);
   }
 
-  public final String getFile() { return messages.getFile(); }
-  public final int getLine() { return messages.getLine(); }
-  public final int getColumn() { return messages.getColumn(); }
+  public final int getLineNumber()  { return messages.getLineNumber(); }
+  public final int getColumnNumber() { return messages.getColumnNumber(); }
+  public final String getFileName() { return messages.getFileName(); }
+  public String getPublicId() { return messages.getPublicId(); }
+  public String getSystemId() { return messages.getSystemId(); }
+  public boolean isStableSourceLocation() { return false; }
 
   public void setFile(String filename) { messages.setFile(filename); }
   public void setLine(int line) { messages.setLine(line); }
   public void setColumn(int column) { messages.setColumn(column); }
   public final void setLine(Expression position)
-  { setLine(position.filename, position.getLine(), position.getColumn()); }
+  { messages.setLocation(position); }
+  public final void setLocation (SourceLocator position)
+  { messages.setLocation(position); }
 
   public void setLine(String filename, int line, int column)
   {

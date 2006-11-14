@@ -130,7 +130,7 @@
 		    (make <string>
 		     (gnu.text.URI_utils:resolve
 		      (field path-pair 'car)
-		      (gnu.lists.PairWithPosition:getFile path-pair)))))))))
+		      (gnu.lists.PairWithPosition:getFileName path-pair)))))))))
 
 #|
 (define-syntax source-file
@@ -140,6 +140,6 @@
 		  (let ((form (syntax-object->datum (syntax (form)))))
 		    (if (instance? form <gnu.lists.PairWithPosition>)
 			(list (quote quote)
-			      (datum->syntax-object form (gnu.lists.PairWithPosition:getFile form)))
+			      (datum->syntax-object form (gnu.lists.PairWithPosition:getFileName form)))
 			#f))))))
 |#

@@ -218,13 +218,13 @@ public class XQResolveNames extends ResolveNames
     boolean function = decl.isProcedureDecl();
     if (name instanceof String)
       {
-        int line = decl.getLine();
+        int line = decl.getLineNumber();
         if (line > 0 && comp != null)
           {
-            String saveFilename = comp.getFile();
-            int saveLine = comp.getLine();
-            int saveColumn = comp.getColumn();
-            comp.setLine(decl.getFile(), line, decl.getColumn());
+            String saveFilename = comp.getFileName();
+            int saveLine = comp.getLineNumber();
+            int saveColumn = comp.getColumnNumber();
+            comp.setLocation(decl);
             name = parser.namespaceResolve((String) name, function);
             comp.setLine(saveFilename, saveLine, saveColumn);
           }

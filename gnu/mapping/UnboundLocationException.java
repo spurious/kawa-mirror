@@ -1,4 +1,5 @@
 package gnu.mapping;
+import gnu.text.SourceLocator;
 
 /** An undefined symbol was evaluated. */
 
@@ -25,6 +26,17 @@ public class UnboundLocationException extends RuntimeException
     this.filename = filename;
     this.line = line;
     this.column = column;
+  }
+
+  public UnboundLocationException (Object symbol, SourceLocator location)
+  {
+    this.symbol = symbol;
+    if (location != null)
+      {
+        this.filename = location.getFileName();
+        this.line = location.getLineNumber();
+        this.column = location.getColumnNumber();
+      }
   }
 
   public UnboundLocationException (Location loc)

@@ -1,5 +1,14 @@
 2006-11-13  Per Bothner  <per@bothner.com>
 
+	* SourceLocator.java: New interface.
+	* Makefile.am (java_sources): Update accordingly.
+	* SourceError.java: Implement SourceLocator.
+	(<init>): New constructor.
+	* Source<Messages.java: Implement SourceLocator.
+	(locator): New field.
+	(error): New overloads.
+	(setSourceLocator, setLocation): New methods.
+
 	* PrettyWriter.java (wordEndSeen): New field.
 	(writeWordEnd, writeWordStart, clearWordEnd): New method.
 	(write*2, enqueueNewline): Clear wordEndSeen.

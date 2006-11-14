@@ -374,7 +374,7 @@ public class ClassExp extends LambdaExp
 	if (type != instanceType)
 	  usedSuperClasses(instanceType, comp);
 
-	String filename = getFile();
+	String filename = getFileName();
 	if (filename != null)
 	  new_class.setSourceFile (filename);
 
@@ -397,9 +397,9 @@ public class ClassExp extends LambdaExp
 	  {
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;
-            String saveFilename = comp.getFile();
-            int saveLine = comp.getLine();
-            int saveColumn = comp.getColumn();
+            String saveFilename = comp.getFileName();
+            int saveLine = comp.getLineNumber();
+            int saveColumn = comp.getColumnNumber();
             comp.setLine(child);
 	    comp.method = child.getMainMethod();
 	    //comp.curClass = comp.method.getDeclaringClass();

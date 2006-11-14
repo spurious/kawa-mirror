@@ -3812,7 +3812,7 @@ public class XQParser extends Lexer
                   {
                     ModuleExp module = comp.getModule();
                     String className = Compilation.mangleURI(uri)
-                      + '.' + XQuery.makeClassName(module.getFile());
+                      + '.' + XQuery.makeClassName(module.getFileName());
                     module.setName(className);
                     comp.mainClass = new ClassType(className);
                     module.setType(comp.mainClass);

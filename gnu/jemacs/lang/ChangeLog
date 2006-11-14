@@ -1,3 +1,7 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* lambda.java: Update for SourceLocation-related changes.
+
 2006-05-01  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (getLexer): Remove method - use super version.

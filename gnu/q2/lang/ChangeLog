@@ -1,3 +1,7 @@
+2006-11-13  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java: Update getColumn -> getColumnNumber.
+
 2006-05-01  Per Bothner  <per@bothner.com>
 
 	* Q2.java (createReadTable): Update getInitial -> createInitial.

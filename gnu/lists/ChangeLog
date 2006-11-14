@@ -1,3 +1,9 @@
+2006-11-14  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (writeJoiner): Make public.
+
+	* TreeList.java (dump): Write identityHashCode in hex.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* PairWithPosition.java: Implement SourceLocation.

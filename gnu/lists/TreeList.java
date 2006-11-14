@@ -724,7 +724,7 @@ public class TreeList extends AbstractSequence
     return false;
   }
 
-  protected void writeJoiner ()
+  public void writeJoiner ()
   {
     ensureSpace(1);
     data[gapStart++] = JOINER;
@@ -2314,7 +2314,7 @@ public class TreeList extends AbstractSequence
 		    Object obj = objects[ch];
 		    out.print("=Object#"+((int)ch)+'='
 			      +obj+':'+obj.getClass().getName()
-			      +'@'+System.identityHashCode(obj));
+			      +'@'+Integer.toHexString(System.identityHashCode(obj)));
 		  }
 		else if (ch >= BEGIN_GROUP_SHORT
 			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)

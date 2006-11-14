@@ -14,7 +14,6 @@ import gnu.xml.*;
 public class SortedNodes extends Nodes
 {
   int nesting = 0;
-  NodeTree curFragment;
 
   int compareIndex(int index, AbstractSequence seq2, int ipos2)
   {

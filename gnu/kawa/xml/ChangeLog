@@ -1,3 +1,7 @@
+2006-11-14  Per Bothner  <per@bothner.com>
+
+	* SortedNodes.java (curFragment): Remove unused/bogus field.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java: Implement gnu.text.SourceLocation.

@@ -1,3 +1,8 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* CommentConstructor.java (apply): Insert spaces between values of
+	multiple values, not just multiple arguments.
+
 2006-11-14  Per Bothner  <per@bothner.com>
 
 	* MakeProcInst.java (procInst$C): Remove now-redundant testing.

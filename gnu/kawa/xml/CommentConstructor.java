@@ -20,21 +20,30 @@ public class CommentConstructor extends MethodProc // NodeConstructor
       {
 	StringBuffer sbuf = new StringBuffer();
 	Object endMarker = Location.UNBOUND;
-	for (int i = 0;; i++)
+        boolean first = true;
+	for (int i = 0; ; i++)
 	  {
 	    Object arg = ctx.getNextArg(endMarker);
 	    if (arg == endMarker)
 	      break;
-	    if (i > 0)
-	      sbuf.append(' ');
             if (arg instanceof Values)
               {
                 Values vals = (Values) arg;
                 for (int it = 0;  (it = vals.nextPos(it)) != 0; )
-                  StringValue.stringValue(vals.getPosPrevious(it), sbuf);
+                  {
+                    if (! first)
+                      sbuf.append(' ');
+                    first = false;
+                    StringValue.stringValue(vals.getPosPrevious(it), sbuf);
+                  }
               }
             else
-              StringValue.stringValue(arg, sbuf);
+              {
+                if (! first)
+                  sbuf.append(' ');
+                first = false;
+                StringValue.stringValue(arg, sbuf);
+              }
 	  }
 	int len = sbuf.length();
 	char[] buf = new char[len];

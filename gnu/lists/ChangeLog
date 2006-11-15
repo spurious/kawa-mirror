@@ -1,3 +1,7 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (dump): Check for out-of-range object index.
+
 2006-11-14  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (writeJoiner): Make public.

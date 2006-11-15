@@ -2437,7 +2437,12 @@ public class TreeList extends AbstractSequence
 			out.print("=BEGIN_GROUP_LONG end:");
 			out.print(j);
 			j = getIntN(j + 1);
-			out.print(" -> #"+j+"=<"+objects[j]+'>');
+			out.print(" -> #");
+			out.print(j);
+                        if (j >= 0 && j+1 < objects.length)
+                          out.print("=<"+objects[j]+'>');
+                        else
+                          out.print("=<out-of-bounds>");
 			toskip = 2;
 			break;
 		      case END_GROUP_LONG:

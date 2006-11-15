@@ -1,3 +1,7 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseURILiteral): Normalize whitespace.
+
 2006-11-14  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Update for functionality moved NodeTree -> XMLFilter.

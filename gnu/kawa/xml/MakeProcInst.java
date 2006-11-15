@@ -19,12 +19,7 @@ public class MakeProcInst extends NodeConstructor
     target = KNode.atomicValue(target);
     if (! (target instanceof String || target instanceof UntypedAtomic))
       throw new ClassCastException("invalid type of processing-instruction target [XPTY0004]");
-    String tname = target.toString();
-    if (tname.toLowerCase().startsWith("xml"))
-      throw new IllegalArgumentException("processing-instruction target starts with 'xml' [XQDY0064]");
-    if (tname.indexOf(':') >= 0) // Actually should check NCName format.  FIXME
-      throw new IllegalArgumentException("processing-instruction target is not a NCName [XQDY0041]");
-      
+     
     if (! (out instanceof XConsumer))
       return;
     StringBuffer sbuf = new StringBuffer();
@@ -46,7 +41,7 @@ public class MakeProcInst extends NodeConstructor
       start++;
     char[] chars = new char[length-start];
     sbuf.getChars(start, length, chars, 0);
-    ((XConsumer) out).writeProcessingInstruction(tname,
+    ((XConsumer) out).writeProcessingInstruction(target.toString(),
                                                  chars, 0, chars.length);
   }
 

@@ -66,7 +66,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   private static final int SAW_WORD = 1;
 
   /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
-   * If counts the number of nested beginAttributes that are active.
+   * It counts the number of nested beginAttributes that are active.
    * (In the future it should also count begun comment and
    * processing-instruction constructors, when those support nesting.)
    */
@@ -1001,12 +1001,36 @@ public class XMLFilter implements XConsumer, PositionConsumer
     writeChar(value);
   }
 
+  protected void checkValidComment (char[] chars, int offset, int length)
+  {
+    int i = length;
+    boolean sawHyphen = true;
+    while (--i >= 0)
+      {
+        boolean curHyphen = chars[offset+i] == '-';
+        if (sawHyphen && curHyphen)
+          {
+            error('e', "consecutive or final hyphen in XML comment");
+            break;
+          }
+        sawHyphen = curHyphen;
+      }
+  }
+
   /** Process a comment.
    * The data (starting at start for length chars).
    * Does not include the delimiters (i.e. "<!--" and "-->" are excluded). */
-  public void writeComment(char[] chars, int start, int length)
+  public void writeComment (char[] chars, int start, int length)
   {
-    //checkValidComment(chars, offset, length);
+    checkValidComment(chars, start, length);
+    commentFromParser(chars, start, length);
+  }
+
+  /** Process a comment, when called from an XML parser.
+   * The data (starting at start for length chars).
+   * Does not include the delimiters (i.e. "<!--" and "-->" are excluded). */
+  public void commentFromParser (char[] chars, int start, int length)
+  {
     if (stringizingLevel == 0)
       {
         closeStartTag();
@@ -1021,8 +1045,6 @@ public class XMLFilter implements XConsumer, PositionConsumer
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length)
   {
-    /*
-    checkProcessingInstruction(target);
     for (int i = offset+length;  --i >= offset; )
       {
         char ch = content[i];
@@ -1031,12 +1053,25 @@ public class XMLFilter implements XConsumer, PositionConsumer
             ch = content[i];
             if (ch == '?')
               {
-                error("'?>' is not allowed in a processing-instruction: proc: "+target+" -> "+new String(content, offset, length));
+                error('e', "'?>' is not allowed in a processing-instruction");
                 break;
               }
           }
       }
-    */
+
+    if ("xml".equalsIgnoreCase(target))
+      error('e',
+            "processing-instruction target may not be 'xml' (ignoring case)");
+    if (! XName.isName(target, true))
+      error('e',
+            "processing-instruction target '"+target+"' is not a valid Name");
+
+    processingInstructionCommon(target, content, offset, length);
+  }
+
+  void processingInstructionCommon (String target, char[] content,
+                                    int offset, int length)
+  {
     if (stringizingLevel == 0)
       {
         closeStartTag();
@@ -1050,7 +1085,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   }
 
   /** Process a processing instruction. */
-  public void emitProcessingInstruction(char[] buffer,
+  public void processingInstructionFromParser(char[] buffer,
                                         int tstart, int tlength,
                                         int dstart, int dlength)
   {
@@ -1061,7 +1096,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
         && buffer[tstart+2] == 'l')
       return;
     String target = new String(buffer, tstart, tlength);
-    writeProcessingInstruction(target, buffer, dstart, dlength);
+    processingInstructionCommon(target, buffer, dstart, dlength);
   }
 
   public void beginDocument()

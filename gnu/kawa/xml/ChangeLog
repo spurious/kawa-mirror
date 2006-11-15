@@ -1,5 +1,7 @@
 2006-11-14  Per Bothner  <per@bothner.com>
 
+	* MakeProcInst.java (procInst$C): Remove now-redundant testing.
+
 	* XMLParser.java: Make use of enhanced XMLFilter.
 	(messages): Remove field.
 	(filter): New field.

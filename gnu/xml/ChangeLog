@@ -1,5 +1,13 @@
 2006-11-14  Per Bothner  <per@bothner.com>
 
+	* XMLFilter.java (checkValidComment): New method.
+	(writeComment): Rename to commentFromParser.
+	(writeComment): Also do checkValidComment.
+	(emitProcessingInstruction): Rename to processingInstructionFromParser.
+	(processingInstructionCommon): New method.
+	(writeProcessingInstruction): Add error checks.
+	* XMLParser.java.in: Update method calls.
+
 	* XMLFilter.java: Merge in "filtering" functionality from NodeTree.
 	Primarily namespace-copying and error checking.
 	* NodeTree.java: All event-handling fields and methods (such as

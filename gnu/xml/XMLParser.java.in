@@ -309,8 +309,8 @@ abstract public class @XMLParser@
 		    && buffer[end = pos - 2] == '?'
 		    && end >= dstart)
 		  {
-		    out.emitProcessingInstruction(buffer, start, length,
-						  dstart, end - dstart);
+		    out.processingInstructionFromParser(buffer, start, length,
+                                                        dstart, end - dstart);
 		    start = limit;
 		    dstart = -1;
 		    state = TEXT_STATE;
@@ -336,7 +336,7 @@ abstract public class @XMLParser@
 			if (buffer[pos-2] == '-'
 			    && buffer[pos-3] == '-')
 			  {
-			    out.writeComment(buffer, start + 2, length - 4);
+			    out.commentFromParser(buffer, start + 2, length - 4);
 			    break exclLoop;
 			  }
 		      }

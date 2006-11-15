@@ -236,7 +236,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
       ;
     else if (previous == SAW_KEYWORD)
       previous = 0;
-    else if (--stringizingLevel == 0 /*&& attrCount >= 0*/)
+    else if (--stringizingLevel == 0)
       {
         inAttribute = false;
         if (currentNamespacePrefix == null || namespacePrefixes)
@@ -541,6 +541,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
 	      }
 	  }
       }
+    for (int i = 1;  i <= attrCount; i++)
+      workStack[nesting+i-1] = null; // For GC.
     if (out != tlist)
       {
 	base = out;
@@ -730,10 +732,16 @@ public class XMLFilter implements XConsumer, PositionConsumer
         base = tlist;
         attrCount = 0;
       }
-    else if (stringizingElementLevel == 0)
-      stringizingElementLevel = stringizingLevel;
     else
-      stringizingLevel++;
+      {
+        if (previous == SAW_WORD)
+          writeChar(' ');
+        previous = 0;
+        if (stringizingElementLevel == 0)
+          stringizingElementLevel = stringizingLevel;
+        else
+          stringizingLevel++;
+      }
     nesting += 2;
   }
 
@@ -803,8 +811,6 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   private boolean beginAttributeCommon()
   {
-    if (inAttribute)
-      endAttribute();
     inAttribute = true;
     if (stringizingLevel++ > 0)
       return false;
@@ -830,18 +836,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
             || (uri == "" && local == "xmlns"))
           error('e', "arttribute name cannot be 'xmlns' or in xmlns namespace");
       }
-    /*
-    if (groupLevel <= 1 && docStart != 0)
-      error("attribute not allowed at document level");
-    */
+    if (nesting == 2 && workStack[1] == null)
+      error('e', "attribute not allowed at document level");
+    if (attrCount < 0 && nesting > 0)
+      error('e', "attribute '"+attrType+"' follows non-attribute content");
     if (! beginAttributeCommon())
       return;
     workStack[nesting+attrCount-1] = attrType;
-    /*
-    if (attrCount == 0 && groupLevel > 0)
-      error("attribute '"+attrName+"' follows non-attribute content");
-    checkAttributeSymbol((Symbol) attrType); // ???
-    */
     if (nesting == 0)
       base.beginAttribute(attrType);
     else
@@ -855,6 +856,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
    */
   public void emitBeginAttribute(char[] data, int start, int count)
   {
+    if (inAttribute)
+      endAttribute();
     if (! beginAttributeCommon())
       return;
 
@@ -941,14 +944,20 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (stringizingLevel == 0)
       {
         namespaceBindings = (NamespaceBinding) workStack[nesting];
+        workStack[nesting] = null;
+        workStack[nesting+1] = null;
         base.endGroup();
       }
-    if (stringizingElementLevel > 0)
+    else
       {
-        if (stringizingElementLevel == stringizingLevel)
-          stringizingElementLevel = 0;
-        else
-          stringizingLevel--;
+        previous = SAW_WORD;
+        if (stringizingElementLevel > 0)
+          {
+            if (stringizingElementLevel == stringizingLevel)
+              stringizingElementLevel = 0;
+            else
+              stringizingLevel--;
+          }
       }
     /*
     if (nesting == 0)
@@ -1104,7 +1113,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     closeStartTag();
     if (stringizingLevel > 0)
       writeJoiner();
-    // We need to increment groupLevel so that endDocument can decrement it.
+    // We need to increment nesting so that endDocument can decrement it.
     else
       {
         if (nesting == 0)
@@ -1113,6 +1122,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
           writeJoiner();
         ensureSpaceInWorkStack(nesting);
         workStack[nesting] = namespaceBindings;
+        // The following should be redundant, but just in case ...
+        // Having workStack[nesting+1] be null identifies that nesting
+        // level as being a document rather than an element.
+        workStack[nesting+1] = null;
         nesting += 2;
       }
   }
@@ -1126,6 +1139,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
       }
     nesting -= 2;
     namespaceBindings = (NamespaceBinding) workStack[nesting];
+    workStack[nesting] = null;
+    workStack[nesting+1] = null;
     if (nesting == 0)
       base.endDocument();
     else

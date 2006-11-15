@@ -1,3 +1,18 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (beginGroupCommon, endGroup): When stringizing
+	element, may need to add space before/after.
+
+	* XMLFilter.java (beginAttributeCommon): Move endAttribute call to
+	emitBeginAttribute, since we may have nested stringized attributes
+	when called from XQuery element/attribute constructors.
+
+	* XMLFilter.java (beginAttribute): Add (restore) some error checks.
+	(beginDocument): Make sure "start tag" is null so above
+	test for in a document is reliable.
+	(closeStartTag, endGroup, endDocument): Clear popped workStack
+	elements to possibly improve GC.
+
 2006-11-14  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java (checkValidComment): New method.

@@ -1,3 +1,8 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (orderingModeSeen): New field.
+	(parse): Error if duplicate ordering declaration.
+
 2006-11-15  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseURILiteral): Normalize whitespace.

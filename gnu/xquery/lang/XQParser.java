@@ -97,6 +97,7 @@ public class XQParser extends Lexer
   boolean boundarySpaceDeclarationSeen;
 
   boolean orderingModeUnordered;
+  boolean orderingModeSeen;
 
   /** True if we've seen a 'copy-namespaces' declaration'. */
   boolean copyNamespacesDeclarationSeen;
@@ -4093,6 +4094,9 @@ public class XQParser extends Lexer
 	return QuoteExp.voidExp;
 
       case DECLARE_ORDERING_TOKEN:
+        if (orderingModeSeen && ! interactive)
+          syntaxError("duplicate 'declare ordering' seen", "XQST0065");
+        orderingModeSeen = true;
 	getRawToken();
 	if (match("ordered"))
           orderingModeUnordered = false;

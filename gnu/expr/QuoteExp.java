@@ -21,22 +21,23 @@ public class QuoteExp extends Expression
     if (type != null)
       return type;
     if (value == Values.empty)
-      type = gnu.bytecode.Type.void_type;
+      return Type.void_type;
     else if (value == null)
-      type = gnu.bytecode.Type.nullType;
+      return Type.nullType;
     else if (this == undefined_exp)
-      type = gnu.bytecode.Type.pointer_type;
+      return Type.pointer_type;
     else
-      type = gnu.bytecode.Type.make(value.getClass());
-    return type;
+      return Type.make(value.getClass());
   }
 
-  static public QuoteExp undefined_exp
-  = new QuoteExp (Undefined.getInstance());
-  static public QuoteExp voidExp = new QuoteExp (Values.empty);
+  static public QuoteExp undefined_exp =
+    new QuoteExp (Undefined.getInstance());
+  static public QuoteExp voidExp =
+    new QuoteExp (Values.empty, Type.void_type);
   static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
   static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
-  static public QuoteExp nullExp = new QuoteExp(null);
+  static public QuoteExp nullExp =
+    new QuoteExp(null, Type.nullType);
 
   public static QuoteExp getInstance (Object value)
   {
@@ -65,7 +66,9 @@ public class QuoteExp extends Expression
   public void compile (Compilation comp, Target target)
   {
     if (type == null || type == Type.pointer_type
-        || target instanceof IgnoreTarget)
+        || target instanceof IgnoreTarget
+        || (type instanceof gnu.bytecode.ObjectType
+            && type.isInstance(value)))
       comp.compileConstant(value, target);
     else
       {

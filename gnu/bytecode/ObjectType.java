@@ -96,6 +96,13 @@ public class ObjectType extends Type
     return this == nullType ? pointer_type : this;
   }
 
+  public boolean isInstance (Object obj)
+  {
+    if (this == nullType)
+      return obj == null;
+    return super.isInstance(obj);
+  }
+
   public int compare(Type other)
   {
     // Assume this == nullType.

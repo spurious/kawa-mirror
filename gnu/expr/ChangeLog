@@ -1,3 +1,9 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (compile): Use compileConstant directly in more cases.
+	(getType): Don't cache result - it changes the behavior of compile.
+	(voidExp, nullExp): Set type explicitly.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* Expression.java: Implement SourceLocator.

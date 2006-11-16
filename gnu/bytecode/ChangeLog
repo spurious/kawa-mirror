@@ -1,3 +1,7 @@
+2006-11-15  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (isInstance): New method - handle nullType.
+
 2006-11-07  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (instructionLineMode): New static option field.

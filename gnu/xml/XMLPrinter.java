@@ -717,8 +717,8 @@ public class XMLPrinter extends OutPort
             char c = buf[off++];
             if (c >= 127 || c == '\n' || c == '\r'
                 || (inComment > 0 ? (c == '-' || inComment == 2)
-                    : (c == '<' || c == '>'
-                       || c == '&' || (c == '"' && inAttribute))))
+                    : (c == '<' || c == '>' || c == '&'
+                       || (inAttribute && (c == '"' || c < ' ' )))))
               {
                 if (count > 0)
                   super.write(buf, off - 1 - count, count);

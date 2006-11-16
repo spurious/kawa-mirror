@@ -1,5 +1,7 @@
 2006-11-15  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java (write): Attribute character < ' ' must be escaped.
+
 	* XMLFilter.java (beginGroupCommon, endGroup): When stringizing
 	element, may need to add space before/after.
 

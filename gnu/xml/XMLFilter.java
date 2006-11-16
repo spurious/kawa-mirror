@@ -148,16 +148,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
             info.prefix = prefix;
             info.local = uri;
             info.uri = uri;
-            Symbol sym = Symbol.make(uri, uri, prefix); // FIXME?
             if (uri == "")
               uri = null;
             NamespaceBinding namespaces
               = new NamespaceBinding(prefix, uri, oldBindings);
             info.namespaces = namespaces;
-            info.type = new XName(sym, namespaces); // FIXME? wasted?
             return info.namespaces;
           }
-        Object type = info.type;
         NamespaceBinding namespaces;
         if (info.tagHash == hash
             && info.prefix == prefix
@@ -207,18 +204,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
             info.prefix = prefix;
             info.local = uri;
             info.uri = uri;
-            // We don't actually use this Symbol, but if closeStartTag
-            // should come upon this MappingInfo it should be consistent.
-            Symbol sym = Symbol.make(uri, uri, prefix);
             if (uri == "")
               uri = null;
             NamespaceBinding namespaces
               = new NamespaceBinding(prefix, uri, oldBindings);
             info.namespaces = namespaces;
-            info.type = new XName(sym, namespaces);
             return info;
           }
-        Object type = info.type;
         NamespaceBinding namespaces;
         if (info.tagHash == hash
             && info.prefix == prefix
@@ -475,8 +467,9 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     info.qname = Symbol.make(uri, local, prefix);
                     if (i == 0)
                       {
-                        type = new XName(info.qname, bindings);
-                        info.type = type;
+                        XName xname = new XName(info.qname, bindings);
+                        type = xname;
+                        info.type = xname;
                         info.namespaces = bindings;
                       }
                     break;
@@ -492,18 +485,21 @@ public class XMLFilter implements XConsumer, PositionConsumer
                       }
                     else if (info.uri != uri)
                       continue;
+                    else if (info.qname == null)
+                      info.qname = Symbol.make(uri, local, prefix);
                     if (i == 0)
                       {
-                        if (info.namespaces == bindings)
+                        if (info.namespaces == bindings
+                            || info.namespaces == null)
                           {
                             type = info.type;
-                            break;
-                          }
-                        if (info.namespaces == null)
-                          {
                             info.namespaces = bindings;
-                            type = new XName(info.qname, bindings);
-                            info.type = type;
+                            if (type == null)
+                              {
+                                XName xname = new XName(info.qname, bindings);
+                                type = xname;
+                                info.type = xname;
+                              }
                             break;
                           }
                       }
@@ -1243,8 +1239,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
         if (qname == info.qname)
           return info;
         if (local == info.local && info.qname == null
-            && uri == info.uri && prefix == info.prefix)
+            && (uri == info.uri || info.uri == null)
+            && prefix == info.prefix)
           {
+            info.uri = uri;
             info.qname = qname;
             return info;
           }
@@ -1396,15 +1394,23 @@ final class MappingInfo
    * It is interned.  */
   String local;
 
-  /** The namespace URI. */
+  /** The namespace URI.
+   * The value null means "unknown". */
   String uri;
 
-  /** The Symbol/type for the resolved QName. */
+  /** The Symbol for the resolved QName.
+   * If non-null, it must be the case that {@code uri!= null}, and
+   * {@code qname==Symbol.make(uri, local, prefix==null?"":prefix)}.
+   */
   Symbol qname;
 
   NamespaceBinding namespaces;
 
-  Object type;
+  /** An XName matching the other fields.
+   * If non-null, we must have {@code qname!=null}, {@code namespaces!=null},
+   * {@code type.namespaceNodes == namespaces}, and
+   * {@code type.equals(qname)}. */
+  XName type;
 
   /** If non-negative: An index into a TreeList objects array. */
   int index = -1;

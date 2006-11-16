@@ -1,5 +1,7 @@
 2006-11-16  Per Bothner  <per@bothner.com>
 
+	* XMLFilter.java (writePosition): Write word spaces if stringizing.
+
 	* XMLFilter.java: Allocates qname and type fields in MappingInfo
 	lazily, as needed.  As a side effect, this fixes a crash.
 

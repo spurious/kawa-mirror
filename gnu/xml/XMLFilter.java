@@ -647,7 +647,14 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (stringizingLevel > stringizingElementLevel
         && stringizingElementLevel > 0)
       return;
+    if (stringizingLevel > 0 && previous == SAW_WORD)
+      {
+        writeChar(' ');
+        previous = 0;
+      }
     seq.consumeNext(ipos, this);
+    if (stringizingLevel > 0)
+      previous = SAW_WORD;
   }
 
   /** If v is a node, make a copy of it. */

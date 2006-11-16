@@ -9,6 +9,7 @@ import gnu.mapping.Symbol;
 import gnu.kawa.xml.MakeText;  // FIXME - bad cross-package dependency.
 import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
+import gnu.kawa.xml.XDataType; // FIXME - bad cross-package dependency.
 
 /** Fixup XML input events.
  * Handles namespace resolution, and adds "namespace nodes" if needed.
@@ -92,8 +93,9 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   boolean inStartTag;
 
-  /** True if currently processing an attribute value.. */
-  boolean inAttribute;
+  /** The local name if currently processing an attribute value. */
+  String attrLocalName;
+  String attrPrefix;
 
   /** Non-null if we're processing a namespace declaration attribute.
    * In that case it is the prefix we're defining,
@@ -232,17 +234,54 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   public void endAttribute()
   {
-    if (! inAttribute)
+    if (attrLocalName == null)
       ;
     else if (previous == SAW_KEYWORD)
       previous = 0;
     else if (--stringizingLevel == 0)
       {
-        inAttribute = false;
+        if (attrLocalName == "id" && attrPrefix == "xml")
+          {
+            // Need to normalize xml:id attributes.
+            int valStart
+              = startIndexes[attrCount-1] + TreeList.BEGIN_ATTRIBUTE_LONG_SIZE; 
+            int valEnd = tlist.gapStart;
+            char[] data = tlist.data;
+            for (int i = valStart;  ;  )
+              {
+                if (i >= valEnd)
+                  {
+                    // It's normalized.  Nothing to do.
+                    break;
+                  }
+                char datum = data[i++];
+                if (((datum & 0xFFFF) > TreeList.MAX_CHAR_SHORT)
+                    || datum == '\t' || datum == '\r' || datum == '\n'
+                    || (datum == ' ' && (i == valEnd || data[i] == ' ')))
+                  {
+                    // It's either not normalized, or the value contains
+                    // chars values above MAX_CHAR_SHORT or non-chars.
+                    // We could try to normalize in place but why bother?
+                    // I'm assuming xml:id are going be normalized already.
+                    // The exception is characters above MAX_CHAR_SHORT, but
+                    // let's defer that until TreeList gets re-written.
+                    StringBuffer sbuf = new StringBuffer();
+                    tlist.stringValue(valStart, valEnd, sbuf);
+                    tlist.gapStart = valStart;
+                    tlist.writeChars(XDataType
+                                     .replaceWhitespace(sbuf.toString(), true));
+                    break;
+                  }
+              }
+          }
+
+        attrLocalName = null;
+        attrPrefix = null;
         if (currentNamespacePrefix == null || namespacePrefixes)
           tlist.endAttribute();
         if (currentNamespacePrefix != null)
           {
+            // Handle raw namespace attribute from parser.
             int attrStart = startIndexes[attrCount-1]; 
             int uriStart = attrStart;
             int uriEnd = tlist.gapStart;
@@ -259,7 +298,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                 if ((datum & 0xFFFF) > TreeList.MAX_CHAR_SHORT)
                   {
                     StringBuffer sbuf = new StringBuffer();
-                    tlist.stringValue(uriStart, uriLength, sbuf);
+                    tlist.stringValue(uriStart, uriEnd, sbuf);
                     uriHash = sbuf.hashCode();
                     uriStart = 0;
                     uriEnd = uriLength = sbuf.length();
@@ -270,15 +309,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
                 uriHash = 31 * uriHash + datum;
               }
             tlist.gapStart = attrStart;
-            if (currentNamespacePrefix != null)
-              {
-                String prefix = currentNamespacePrefix == "" ? null
-                  : currentNamespacePrefix;
-                MappingInfo info
-                  = lookupNamespaceBinding(prefix, data, uriStart, uriLength,
-                                           uriHash, namespaceBindings);
-                namespaceBindings = info.namespaces;
-              }
+
+            String prefix = currentNamespacePrefix == "" ? null
+              : currentNamespacePrefix;
+            MappingInfo info
+              = lookupNamespaceBinding(prefix, data, uriStart, uriLength,
+                                       uriHash, namespaceBindings);
+            namespaceBindings = info.namespaces;
 
             currentNamespacePrefix = null;
           }
@@ -306,7 +343,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     inStartTag = false;
     previous = 0;
 
-    if (inAttribute) // Should only happen on erroneous input.
+    if (attrLocalName != null) // Should only happen on erroneous input.
       endAttribute();
     NamespaceBinding outer = nesting == 0 ? NamespaceBinding.predefinedXML
       : (NamespaceBinding) workStack[nesting-2];
@@ -811,7 +848,6 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   private boolean beginAttributeCommon()
   {
-    inAttribute = true;
     if (stringizingLevel++ > 0)
       return false;
 
@@ -831,6 +867,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
       {
         Symbol sym = (Symbol) attrType;
         String local = sym.getLocalPart();
+        attrLocalName = local;
+        attrPrefix = sym.getPrefix();
         String uri = sym.getNamespaceURI();
         if (uri == "http://www.w3.org/2000/xmlns/"
             || (uri == "" && local == "xmlns"))
@@ -856,7 +894,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
    */
   public void emitBeginAttribute(char[] data, int start, int count)
   {
-    if (inAttribute)
+    if (attrLocalName != null)
       endAttribute();
     if (! beginAttributeCommon())
       return;
@@ -865,6 +903,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
     workStack[nesting+attrCount-1] = info;
     String prefix = info.prefix;
     String local = info.local;
+    attrLocalName = local;
+    attrPrefix = prefix;
     if (prefix != null)
       {
 	if (prefix == "xmlns")
@@ -887,7 +927,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
    * There are no more attributes. */
   public void emitEndAttributes()
   {
-    if (inAttribute)
+    if (attrLocalName != null)
       endAttribute();
   }
 
@@ -896,7 +936,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
    */
   public void emitEndElement(char[] data, int start, int length)
   {
-    if (inAttribute)
+    if (attrLocalName != null)
       {
 	error('e', "unclosed attribute"); // FIXME
 	endAttribute();

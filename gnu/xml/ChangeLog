@@ -1,5 +1,11 @@
 2006-11-15  Per Bothner  <per@bothner.com>
 
+	* XMLFilter.java: (Re)implement normalization of xml:id attributes.
+	(endAttribute): Do the normalization here.
+	(endAttribute): Fix error in call to stringValue.
+	(attrLocalName, attrPrefix): New fields.
+	(inAttribute): Remove fields - used attrLocalName!=null instead.
+
 	* XMLPrinter.java (write): Attribute character < ' ' must be escaped.
 
 	* XMLFilter.java (beginGroupCommon, endGroup): When stringizing

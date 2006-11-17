@@ -2283,8 +2283,6 @@ public class XQParser extends Lexer
 		unread(next);
                 enclosedExpressionsSeen++;
 		Expression exp = parseEnclosedExpr();
-		if (delimiter != '<')
-		  exp = stringValue(exp); // FIXME
 		result.addElement(exp);
 		tokenBufferLength = 0;
 		prevEnclosed = result.size();
@@ -2381,16 +2379,6 @@ public class XQParser extends Lexer
     popNesting(saveReadState);
     errorIfComment = saveErrorIfComment;
     return exp;
-  }
-
-  public static final Method stringValueMethod
-  = ClassType.make("gnu.kawa.xml.StringValue")
-    .getDeclaredMethod("stringValue", 1);
-
-  /** Coerce the value of an expresison to a string value. */
-  public static Expression stringValue(Expression exp)
-  {
-    return new ApplyExp(stringValueMethod, new Expression[] { exp });
   }
 
   /** Coerce the value of an expresison to a boolean value. */

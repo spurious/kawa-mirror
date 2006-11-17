@@ -1,5 +1,10 @@
 2006-11-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (stringValue): Remove static method.
+	(stringValueMethod): Remove static field.
+	(parseContent): Don't need to take sprintValue here - now handled
+	by XMLFilter.
+
 	* XQParser.java (orderingModeSeen): New field.
 	(parse): Error if duplicate ordering declaration.
 

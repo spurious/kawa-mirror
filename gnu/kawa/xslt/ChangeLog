@@ -1,3 +1,7 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+       * XslTranslator.java (endGroup): "Inline" removed XQParser.stringValue.
+
 2006-11-09  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java: Update for Consumer changes.

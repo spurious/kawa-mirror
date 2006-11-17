@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.xml.*;
 
 public class MakeText extends NodeConstructor
 {
@@ -17,9 +18,9 @@ public class MakeText extends NodeConstructor
   {
     if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
       return arg;
-    StringBuffer sbuf = new StringBuffer();
-    StringValue.stringValue(arg, sbuf);
-    return KText.make(sbuf.toString());
+    NodeTree node = new NodeTree();
+    text$C(arg, new XMLFilter(node));
+    return KText.make(node);
   }
 
   public static void text$C (Object arg, Consumer out)
@@ -70,9 +71,17 @@ public class MakeText extends NodeConstructor
     text$X(ctx.getNextArg(null), ctx);
   }
 
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    // We can't use NodeConstructor's compile method, because a node
+    // constructor may return a non-node when given an empty sequence.  Sigh.
+    ApplyExp.compile(exp, comp, target);
+  }
+
   public void compileToNode (ApplyExp exp, Compilation comp,
 				      ConsumerTarget target)
   {
+    // This only gets called via NodeConstructor's compileChild.
     CodeAttr code = comp.getCode();
     Expression[] args = exp.getArgs();
     args[0].compile(comp, Target.pushObject);

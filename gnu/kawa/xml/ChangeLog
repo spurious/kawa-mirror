@@ -1,3 +1,7 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+	* NodeType.java (compare): New method.
+
 2006-11-15  Per Bothner  <per@bothner.com>
 
 	* CommentConstructor.java (apply): Insert spaces between values of

@@ -1,3 +1,9 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+	* SingletonType.java (compare, coerceToSingleton, coerceFromObject,
+	emitCoerceFromObject): New methods.
+	* OccurrenceType.java (emptySequenceType): Use SingletonType for base.
+
 2006-11-07  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java (itemCountRange, itemCountIsOne): Fix thinko

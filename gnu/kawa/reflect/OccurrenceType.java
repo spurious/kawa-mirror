@@ -40,7 +40,7 @@ public class OccurrenceType extends ObjectType
   }
 
   public static final Type emptySequenceType =
-    OccurrenceType.getInstance(Type.pointer_type, 0, 0);
+    OccurrenceType.getInstance(SingletonType.instance, 0, 0);
 
   public Type getImplementationType()
   {

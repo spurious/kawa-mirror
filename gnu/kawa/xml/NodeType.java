@@ -53,6 +53,11 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
     return typeKNode;
   }
 
+  public int compare(Type other)
+  {
+    return getImplementationType().compare(other);
+  }
+
   public boolean isInstance (Object obj)
   { 
     if (obj instanceof KNode)

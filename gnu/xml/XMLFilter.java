@@ -896,15 +896,36 @@ public class XMLFilter implements XConsumer, PositionConsumer
         workStack[nesting-1] = type;
         if (copyNamespacesMode == 0)
           namespaceBindings = NamespaceBinding.predefinedXML;
-        else if (copyNamespacesMode == COPY_NAMESPACES_PRESERVE)
+        else if (copyNamespacesMode == COPY_NAMESPACES_PRESERVE
+                 || nesting == 2)
           namespaceBindings
             = (type instanceof XName ? ((XName) type).getNamespaceNodes()
                : NamespaceBinding.predefinedXML);
         else
           {
-            NamespaceBinding inherited
-              = (NamespaceBinding) workStack[nesting-2];
-            if (copyNamespacesMode == COPY_NAMESPACES_INHERIT)
+            NamespaceBinding inherited;
+            // Start at 2, since workStack[0] just saves the predefinedXML.
+            for (int i = 2;  ;  i += 2)
+              {
+                if (i == nesting)
+                  {
+                    inherited = null;
+                    break;
+                  }
+                if (workStack[i+1] != null)
+                  { // Found an element, as opposed to a document.
+                    inherited = (NamespaceBinding) workStack[i];
+                    break;
+                  }
+              }
+            if (inherited == null)
+              {
+                // This is the outer-most group.
+                namespaceBindings
+                  = (type instanceof XName ? ((XName) type).getNamespaceNodes()
+                     : NamespaceBinding.predefinedXML);
+              }
+            else if (copyNamespacesMode == COPY_NAMESPACES_INHERIT)
               namespaceBindings = inherited;
             else if (type instanceof XName)
               {

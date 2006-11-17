@@ -76,7 +76,7 @@ public class Nodes extends Values
 	writePosition(tlist, 0);
 	return;
       }
-    startFragment();
+    handleNonNode();
     curFragment.writeObject(v);
     return;
   }
@@ -85,45 +85,52 @@ public class Nodes extends Values
   {
     if (curFragment == null)
       {
-	startFragment();
-	// OR: throw some exception.
+        throw new IllegalArgumentException("non-node where node required");
+      }
+  }
+
+  void handleNonNode ()
+  {
+    if (curFragment == null)
+      {
+        throw new ClassCastException("atomic value where node is required");
       }
   }
 
   public void writeFloat (float v)
   {
-    maybeStartTextNode();
+    handleNonNode();
     curFragment.writeFloat(v);
   }
 
   public void writeDouble (double v)
   {
-    maybeStartTextNode();
+    handleNonNode();
     curFragment.writeDouble(v);
   }
 
   public void writeLong(long v)
   {
-    maybeStartTextNode();
+    handleNonNode();
     curFragment.writeLong(v);
   }
 
   public void writeInt(int v)
   {
-    maybeStartTextNode();
+    handleNonNode();
     curFragment.writeInt(v);
+  }
+
+  public void writeBoolean (boolean v)
+  {
+    handleNonNode();
+    curFragment.writeBoolean(v);
   }
 
   public void writeChar (int v)
   {
     maybeStartTextNode();
     curFragment.writeChar(v);
-  }
-
-  public void writeBoolean (boolean v)
-  {
-    maybeStartTextNode();
-    curFragment.writeBoolean(v);
   }
 
   public void writeChars (String str)

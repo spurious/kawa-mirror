@@ -1,5 +1,8 @@
 2006-11-17  Per Bothner  <per@bothner.com>
 
+	* Nodes.java: Minor changes to increase (potential) flexibility.
+	(handleNonNode): New method.
+
 	* MakeText.java (apply1): Use text$C method for stringization since
 	StringValue.stringValue doesn't handle multiple values right.
 	(compile): New method to prevent bad inlining.

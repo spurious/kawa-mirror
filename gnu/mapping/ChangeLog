@@ -1,3 +1,7 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (print): Remove unused method.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* UnboundLocationException.java: New constructor.

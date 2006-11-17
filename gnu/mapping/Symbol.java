@@ -212,15 +212,6 @@ public class Symbol
     this.namespace = ns;
   }
 
-  public void print(java.io.PrintWriter ps)
-  {
-    ps.print ("#<symbol ");
-    String name = getName();
-    if (name != null)
-      ps.print(name);
-    ps.print ('>');
-  }
-
   public int compareTo(Object o)
   {
     Symbol other = (Symbol) o;

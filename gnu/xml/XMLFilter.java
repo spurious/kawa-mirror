@@ -69,19 +69,19 @@ public class XMLFilter implements XConsumer, PositionConsumer
   /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
    * It counts the number of nested beginAttributes that are active.
    * (In the future it should also count begun comment and
-   * processing-instruction constructors, when those support nesting.)
-   */
+   * processing-instruction constructors, when those support nesting.) */
   protected int stringizingLevel;
-  /** Value of stringizingLevel when beginGroup was seen.
-   * More specifically, the outer-most beginGroup seen when
-   * {@code stringizingLevel > 0}.
-   * All output should be supressed if 
-   * {@code stringizingLevel > stringizingElementLevel && stringizingElementLevel > 0}.
-   * This happens, for example, after this sequence: beginAttribute, beginGroup,
-   * beginAttribute.  In this case the inner attribute should be ignored,
-   * because it is not port of the string value of the beginGroup.
-   */
-  protected int stringizingElementLevel;
+  /** Value of {@code nesting} just before outermost beginGroup
+   * while {@code stringizingLevel > 0}.
+   * I.e. if we're nested inside a group nested inside an attribute
+   * then {@code stringizingElementNesting >= 0},
+   * otherwise {@code stringizingElementNesting == -1}. */
+  protected int stringizingElementNesting = -1;
+  /** Postive if all output should be ignored.
+   * This happens if we're inside an attribute value inside an element which
+   * is stringized because it is in turm inside an outer attribute. Phew.
+   * If gets increment by nested attributes so we can tell when to stop. */
+  protected int ignoringLevel;
 
   // List of indexes in tlist.data of begin of attribute.
   int[] startIndexes = null;
@@ -227,10 +227,15 @@ public class XMLFilter implements XConsumer, PositionConsumer
   public void endAttribute()
   {
     if (attrLocalName == null)
-      ;
-    else if (previous == SAW_KEYWORD)
-      previous = 0;
-    else if (--stringizingLevel == 0)
+      return;
+    if (previous == SAW_KEYWORD)
+      {
+        previous = 0;
+        return;
+      }
+    if (stringizingElementNesting >= 0)
+      ignoringLevel--;
+    if (--stringizingLevel == 0)
       {
         if (attrLocalName == "id" && attrPrefix == "xml")
           {
@@ -588,8 +593,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   protected boolean checkWriteAtomic ()
   {
     previous = 0;
-    if (stringizingLevel > stringizingElementLevel
-        && stringizingElementLevel > 0)
+    if (ignoringLevel > 0)
       return false;
     closeStartTag();
     return true;
@@ -644,24 +648,23 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   public void writePosition(AbstractSequence seq, int ipos)
   {
-    if (stringizingLevel > stringizingElementLevel
-        && stringizingElementLevel > 0)
+    if (ignoringLevel > 0)
       return;
     if (stringizingLevel > 0 && previous == SAW_WORD)
       {
-        writeChar(' ');
+        if (stringizingElementNesting < 0)
+          writeChar(' ');
         previous = 0;
       }
     seq.consumeNext(ipos, this);
-    if (stringizingLevel > 0)
+    if (stringizingLevel > 0 && stringizingElementNesting < 0)
       previous = SAW_WORD;
   }
 
   /** If v is a node, make a copy of it. */
   public void writeObject(Object v)
   {
-    if (stringizingLevel > stringizingElementLevel
-        && stringizingElementLevel > 0)
+    if (ignoringLevel > 0)
       return;
     if (v instanceof SeqPosition)
       {
@@ -740,9 +743,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   protected void writeJoiner ()
   {
     previous = 0;
-    if ((stringizingLevel <= stringizingElementLevel
-         || stringizingElementLevel == 0)
-         && base instanceof TreeList)
+    if (ignoringLevel == 0)
       ((TreeList) base).writeJoiner();
   }
 
@@ -774,13 +775,11 @@ public class XMLFilter implements XConsumer, PositionConsumer
       }
     else
       {
-        if (previous == SAW_WORD)
+        if (previous == SAW_WORD && stringizingElementNesting < 0)
           writeChar(' ');
         previous = 0;
-        if (stringizingElementLevel == 0)
-          stringizingElementLevel = stringizingLevel;
-        else
-          stringizingLevel++;
+        if (stringizingElementNesting < 0)
+          stringizingElementNesting = nesting;
       }
     nesting += 2;
   }
@@ -851,6 +850,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   private boolean beginAttributeCommon()
   {
+    if (stringizingElementNesting >= 0)
+      ignoringLevel++;
     if (stringizingLevel++ > 0)
       return false;
 
@@ -993,14 +994,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
       }
     else
       {
-        previous = SAW_WORD;
-        if (stringizingElementLevel > 0)
+        if (stringizingElementNesting == nesting)
           {
-            if (stringizingElementLevel == stringizingLevel)
-              stringizingElementLevel = 0;
-            else
-              stringizingLevel--;
+            stringizingElementNesting = -1;
+            previous = SAW_WORD;
           }
+        else
+          previous = 0;
       }
     /*
     if (nesting == 0)
@@ -1089,8 +1089,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
         if (base instanceof XConsumer)
           ((XConsumer) base).writeComment(chars, start, length);
       }
-    else if (stringizingLevel < stringizingElementLevel
-             || stringizingElementLevel == 0)
+    else if (stringizingElementNesting < 0)
       base.write(chars, start, length);
   }
 
@@ -1131,8 +1130,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
           ((XConsumer) base)
             .writeProcessingInstruction(target, content, offset, length);
       }
-    else if (stringizingLevel < stringizingElementLevel
-             || stringizingElementLevel == 0)
+    else if (stringizingElementNesting < 0)
       base.write(content, offset, length);
   }
 
@@ -1378,7 +1376,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   public boolean ignoring()
   {
-    return false;
+    return ignoringLevel > 0;
   }
 }
 

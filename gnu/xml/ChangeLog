@@ -1,5 +1,11 @@
 2006-11-16  Per Bothner  <per@bothner.com>
 
+	* XMLFilter.java: Slightly more complicated rules to check for when to
+	stringize, when to ignore, and when to add space.
+	(ignoringLevel): New field.  Check it when we should ignore all output.
+	(stringizingElementLevel): Replace by stringizingElementNesting.
+	Slighty different value.
+
 	* XMLFilter.java (writePosition): Write word spaces if stringizing.
 
 	* XMLFilter.java: Allocates qname and type fields in MappingInfo

@@ -147,7 +147,9 @@ public class ReferenceExp extends AccessExp
 
   public void compile (Compilation comp, Target target)
   {
-    binding.load(this, flags, comp, target);
+    if (! (target instanceof ConsumerTarget)
+        || ! ((ConsumerTarget) target).compileWrite(this, comp))
+      binding.load(this, flags, comp, target);
   }
 
   protected Expression walk (ExpWalker walker)

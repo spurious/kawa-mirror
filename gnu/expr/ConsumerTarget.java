@@ -91,6 +91,17 @@ public class ConsumerTarget extends Target
 
   public void compileFromStack(Compilation comp, Type stackType)
   {
+    compileFromStack(comp, stackType, -1);
+  }
+
+  /** Write stack value to Consumer.
+   * @param consumerPushed if -1, then Consumer has not been pushed;
+   *   if 1, Consumer was pushed before value, and value is a known singleton;
+   *   if 0, Consumer was pushed before value, otherwise.
+   */
+  void compileFromStack(Compilation comp,
+                        Type stackType, int consumerPushed)
+  {
     CodeAttr code = comp.getCode();
     String methodName = null;
     Method method = null;
@@ -113,18 +124,22 @@ public class ConsumerTarget extends Target
       }
     else
       {
-	if (OccurrenceType.itemCountIsOne(stackType))
+	if (consumerPushed == 1 || OccurrenceType.itemCountIsOne(stackType))
 	  methodName = "writeObject";
 	else
 	  {
 	    method = (Compilation.typeValues
 		      .getDeclaredMethod("writeValues", 2));
 	    code.emitLoad(consumer);
+            if (consumerPushed == 0)
+              code.emitSwap();
 	    code.emitInvokeStatic(method);
 	    return;
 	  }
       }
-    if (islong)
+    if (consumerPushed >= 0)
+      ;
+    else if (islong)
       {
 	code.pushScope();
 	Variable temp = code.addLocal(stackType);
@@ -143,6 +158,23 @@ public class ConsumerTarget extends Target
     if (method != null)
       code.emitInvokeInterface(method);
   }
+
+  public boolean compileWrite (Expression exp, Compilation comp)
+  {
+    Type stackType = exp.getType();
+    Type implType = stackType.getImplementationType();
+    if ((implType instanceof PrimType && ! implType.isVoid())
+        || gnu.kawa.reflect.OccurrenceType.itemCountIsOne(implType))
+      {
+        // Optimization to avoid a 'swap'.
+        comp.getCode().emitLoad(this.consumer);
+        Target starget = StackTarget.getInstance(implType);
+        exp.compile(comp, starget);
+        compileFromStack(comp, implType, 1);
+        return true;
+      }
+    return false;
+   }
 
   public Type getType() { return Compilation.scmSequenceType; }
 }

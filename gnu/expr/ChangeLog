@@ -1,3 +1,9 @@
+2006-11-16  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (compileFromStack): New overload.
+	(compileWrite): New method, to optimize awa a swap.
+	* ReferenceExp.java (compile): Use compileWrite.
+
 2006-11-15  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (compile): Use compileConstant directly in more cases.

@@ -287,7 +287,7 @@ public class TestMisc
 	     " ;  ;  ;  ; j ; h ; j ; k ;");
     evalTest("for $n in doc('tab.xml')/result/*:row/*:fld1 "
 	     + "return <n>{namespace-uri-from-QName(node-name($n))}</n>",
-	     "<n></n><n></n><n>J</n><n>J</n>");
+	     "<n /><n /><n>J</n><n>J</n>");
     evalTest("for $n in doc('tab.xml')/result/*:row/*:fld1 return "
 	     + "('[', for $p in ('', 'k', 'h') return"
 	     + " (namespace-uri-for-prefix($p,$n),';'), ']')",

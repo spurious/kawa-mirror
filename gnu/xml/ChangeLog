@@ -1,3 +1,10 @@
+2006-11-17  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeChar):
+	* XMLFilter.java (textFromParserf): New method that performs
+	line-ending normalization.
+	* XMLParser.java.in (parse): Call XMLFilter's textFromParser.
+
 2006-11-16  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java: Slightly more complicated rules to check for when to

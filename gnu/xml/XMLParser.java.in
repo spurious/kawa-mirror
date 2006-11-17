@@ -142,7 +142,7 @@ abstract public class @XMLParser@
               }
             length = pos - length;
             if (length > 0)
-              out.write(buffer, start, length);
+              out.textFromParser(buffer, start, length);
 	    start = buffer.length;
             break handleChar;
 

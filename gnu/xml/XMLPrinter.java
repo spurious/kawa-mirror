@@ -186,7 +186,7 @@ public class XMLPrinter extends OutPort
 	else if ((escapeNonAscii && v >= 127)
                  // We must escape control characters in attributes,
                  // since otherwise they get normalized to ' '.
-                 || (inAttribute && v < ' '))
+                 || (v < ' ' && (inAttribute || (v != '\t' && v != '\n'))))
 	  super.write("&#x"+Integer.toHexString(v).toUpperCase()+";");
 	else
 	  {

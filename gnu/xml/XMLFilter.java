@@ -63,8 +63,9 @@ public class XMLFilter implements XConsumer, PositionConsumer
   protected int nesting;
 
   int previous = 0;
+  private static final int SAW_CR = 1;
   private static final int SAW_KEYWORD = 2;
-  private static final int SAW_WORD = 1;
+  private static final int SAW_WORD = 3;
 
   /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
    * It counts the number of nested beginAttributes that are active.
@@ -712,6 +713,14 @@ public class XMLFilter implements XConsumer, PositionConsumer
   /** Process raw text. */
   public void write (char[] data, int start, int length)
   {
+    if (length == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      base.write(data, start, length);
+  }
+
+  public void textFromParser (char[] data, int start, int length)
+  {
     // Skip whitespace not in an element.
     // This works semi-accidentally, since XMLParser doesn't call beginDocument
     // which otherwise would increment nesting.  Perhaps shipping toplevel
@@ -726,10 +735,94 @@ public class XMLFilter implements XConsumer, PositionConsumer
               break;
           }
       }
-    if (length == 0)
-      writeJoiner();
-    else if (checkWriteAtomic())
-      base.write(data, start, length);
+    else if (length > 0)
+      {
+        if (previous == SAW_CR)
+          {
+            char ch = data[start];
+            previous = 0;
+            if (ch == '\n' || ch == 0x85)
+              {
+                start++;
+                length--;
+              }
+          }
+        if (! checkWriteAtomic())
+          return;
+
+        // The complication here is line-end normalization,
+        // with minimal overhead.
+        int limit = start + length;
+        TreeList blist = base instanceof TreeList ? (TreeList) base : null;
+      outerLoop:
+        for (int i = start;  ;  i++)
+          {
+            char ch;
+            // We optimize the case that base instanceof TreeList.
+            if (blist != null)
+              {
+                blist.ensureSpace(limit-i);
+                char[] bdata = blist.data;
+                int gapStart = blist.gapStart;
+                for (;; i++)
+                  {
+                    if (i >= limit)
+                      {
+                        blist.gapStart = gapStart;
+                        break outerLoop;
+                      }
+                    ch = data[i];
+                    if (ch != '\r' && ch < 0x85) // Quick trest first.
+                      bdata[gapStart++] = ch;
+                    else if (ch > TreeList.MAX_CHAR_SHORT)
+                      {
+                        blist.gapStart = gapStart;
+                        blist.writeChar(ch);
+                        continue outerLoop;
+                      }
+                    else if (ch == '\r' || ch == 0x85 || ch == 0x2028)
+                      {
+                        blist.gapStart = gapStart;
+                        start = i+1;
+                        break;
+                      }
+                    else
+                      bdata[gapStart++] = ch;
+                  }
+              }
+            else if (i >= limit)
+              ch = 0;
+            else
+              {
+                ch = data[i];
+                if (ch >= ' ' && ch < 0x85) // Quick(er) test.
+                  continue;
+                if (ch != '\r' && ch != 0x85 && ch != 0x2028)
+                  continue;
+              }
+            if (i > start)
+              {
+                base.write(data, start, i-start);
+              }
+            if (i >= limit)
+              break;
+            start = i+1;
+            if (ch == '\r')
+              {
+                if (start < limit)
+                  {
+                    ch = data[i+1];
+                    if (ch == '\n')
+                      continue; // Handled next iteration.
+                    if (ch == 0x85)
+                      i++;
+                  }
+                else
+                  previous = SAW_CR;
+              }
+            base.writeChar('\n');
+          }
+      }
   }
 
   public void writeChars(String v)

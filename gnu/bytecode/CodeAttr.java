@@ -1190,8 +1190,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitStore (Variable var)
   {
-   if (var.dead ())
-      throw new Error ("attempting to push dead variable");
+    if (var.dead ())
+      throw new Error("attempting to push dead variable");
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to store in unassigned "+var

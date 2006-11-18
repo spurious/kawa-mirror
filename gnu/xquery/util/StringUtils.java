@@ -509,6 +509,9 @@ public class StringUtils
         if (start == end)
           throw new IllegalArgumentException("pattern matches empty string");
       }
+    /* #else */
+    // throw new Error("fn:tokenize requires java.util.regex (JDK 1.4 or equivalent)");
+    /* #endif */
   }
 
   public static Object codepointEqual (Object arg1, Object arg2)

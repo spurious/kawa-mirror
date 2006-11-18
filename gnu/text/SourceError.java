@@ -104,8 +104,8 @@ public class SourceError
             buffer.append(stackTrace[i].toString());
           }
         /* #else */
-        // StringWriter writer = new StringWriter();
-        // PrintWriter pwriter = new PrintWriter(writer);
+        // java.io.StringWriter writer = new java.io.StringWriter();
+        // java.io.PrintWriter pwriter = new java.io.PrintWriter(writer);
         // fakeException.printStackTrace(pwriter);
         // pwriter.close();
         // buffer.append("\n");

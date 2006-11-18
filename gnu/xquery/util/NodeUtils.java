@@ -160,9 +160,6 @@ public class NodeUtils
   }
 
   public static Object baseUri (Object arg)
-  /* #ifdef use:java.net.URI */
-    throws java.net.URISyntaxException
-  /* #end */
   {
     if (arg == null || arg == Values.empty)
       return arg;

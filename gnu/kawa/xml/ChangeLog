@@ -1,3 +1,10 @@
+2006-11-18  Per Bothner  <per@bothner.com>
+
+	* KNode.java (getOwnerDocument): Fully-qualify return type,
+	to avoid confusion.
+	(getBaseURI): Restore - needed for JAXP.
+	(baseURI): Remove throws clause.
+
 2006-11-17  Per Bothner  <per@bothner.com>
 
 	* Nodes.java: Update writeChar -> append.

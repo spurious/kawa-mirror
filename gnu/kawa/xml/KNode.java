@@ -327,7 +327,7 @@ public abstract class KNode extends SeqPosition
   //   return make(tree);
   // }
 
-  // public Document getOwnerDocument ()
+  // public org.w3c.dom.Document getOwnerDocument ()
   // {
   //   int kind = sequence.getNextKind(ipos);
   //   if (kind == Sequence.DOCUMENT_VALUE)
@@ -365,10 +365,13 @@ public abstract class KNode extends SeqPosition
     return ((NodeTree) sequence).posLookupPrefix(ipos, namespaceURI);
   }
 
+  public String getBaseURI ()
+  {
+    Object uri = ((NodeTree) sequence).baseUriOfPos(ipos, true);
+    return uri == null ? null : uri.toString();
+  }
+
   public Object baseURI ()
-  /* #ifdef use:java.net.URI */
-    throws java.net.URISyntaxException
-  /* #end */
   {
     return ((NodeTree) sequence).baseUriOfPos(ipos, true);
   }

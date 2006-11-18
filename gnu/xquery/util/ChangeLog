@@ -1,5 +1,7 @@
 2006-11-18  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (baseUri): Remove throws clause.
+
 	* StringUtils.java (tokenize$X): Add missing thow for the PreProcess
 	case that we don't have java.util.regex.
 

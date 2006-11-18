@@ -216,9 +216,6 @@ public class NodeTree extends TreeList
 
   /** Return of the base-uri property, if known, of the node at pos. */
   public Object baseUriOfPos (int pos, boolean resolveRelative)
-  /* #ifdef use:java.net.URI */
-    throws java.net.URISyntaxException
-  /* #end */
   {
     Object base = null;
     int index = posToDataIndex(pos);
@@ -244,8 +241,16 @@ public class NodeTree extends TreeList
           }
         if (uri != null)
           {
-            base = base == null || ! resolveRelative ? uri
-              : URI_utils.resolve(base, uri);
+            try
+              {
+                base = base == null || ! resolveRelative ? uri
+                  : URI_utils.resolve(base, uri);
+              }
+            catch (java.net.URISyntaxException ex)
+              {
+                // Or maybe return null;
+                throw new WrappedException(ex);
+              }
             if (URI_utils.isAbsolute(base) || ! resolveRelative)
               return base;
           }

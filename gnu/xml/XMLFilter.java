@@ -827,12 +827,41 @@ public class XMLFilter implements XConsumer, PositionConsumer
       }
   }
 
-  public void writeChars(String v)
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq)
   {
-    if (v.length() == 0)
+    if (csq == null)
+      csq = "null";
+    int len = csq.length();
+    if (len == 0)
       writeJoiner();
     else if (checkWriteAtomic())
-      base.writeChars(v);
+      base.append(csq, 0, len);
+    return this;
+  }
+
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    if (end == start)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      base.append(csq, start, end);
+    return this;
+  }
+  /* #else */
+  // public Consumer append (String v)
+  // {
+  //   if (v.length() == 0)
+  //     writeJoiner();
+  //   else if (checkWriteAtomic())
+  //     base.writeChars(v);
+  //   return this;
+  // }
+  /* #endif */
+
+  public void writeChars(String v)
+  {
+    append(v);
   }
 
   protected void writeJoiner ()

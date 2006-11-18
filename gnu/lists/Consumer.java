@@ -52,8 +52,10 @@ public interface Consumer
   public void write(char[] buf, int off, int len);
 
   public Consumer append (char c);
-  /* #ifdef JAVA5 */
-  // public Consumer append (CharSequence csq);
-  // public Consumer append (CharSequence csq, int start, int end);
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq);
+  public Consumer append (CharSequence csq, int start, int end);
+  /* #else */
+  // public Consumer append (String str);
   /* #endif */
 }

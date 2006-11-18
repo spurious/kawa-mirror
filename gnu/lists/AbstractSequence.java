@@ -76,36 +76,6 @@ public abstract class AbstractSequence
     /* #endif */
   }
 
-  public Consumer append (char c)
-  {
-    throw unsupported("append");
-  }
-
-  /* #ifdef JAVA5 */
-  // public AbstractSequence append (CharSequence csq)
-  //   throws java.io.IOException
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   return append(csq, 0, csq.length());
-  // }
-
-  // public AbstractSequence append (CharSequence csq, int start, int end)
-  //   throws java.io.IOException
-  // {
-  //   if (csq instanceof CharSeq)
-  //     ((CharSeq) csq).writeTo(start, end - start, (Appendable) this);
-  //   else
-  //     {
-  //       if (csq == null)
-  //         csq = "null";
-  //       for (int i = start; i < end;  i++)
-  //         append(csq.charAt(i));
-  //     }
-  //   return this;
-  // }
-  /* #endif */
-
   public Object set(int index, Object element)
   {
     throw unsupported("set");

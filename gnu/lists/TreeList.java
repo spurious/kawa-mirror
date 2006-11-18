@@ -761,21 +761,31 @@ public class TreeList extends AbstractSequence
     gapStart = i + length;
   }
 
-  /* #ifdef JAVA5 */
-  // public TreeList append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   return append(csq, 0, csq.length());
-  // }
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    return append(csq, 0, csq.length());
+  }
 
-  // public TreeList append (CharSequence csq, int start, int end)
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    for (int i = start; i < end;  i++)
+      append(csq.charAt(i));
+    return this;
+  }
+  /* #else */
+  // public Consumer append (String str)
   // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   for (int i = start; i < end;  i++)
-  //     append(csq.charAt(i));
-  //   return this;
+  //   if (str == null)
+  //     str = "null";
+  //    int len = str.length();
+  //    for (int i = 0; i < len;  i++)
+  //      append(str.charAt(i));
+  //    return this;
   // }
   /* #endif */
 

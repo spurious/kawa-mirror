@@ -139,7 +139,13 @@ public class XMLPrinter extends OutPort
       escapeText = false;
   }
 
-  public Consumer append (char v)
+  public
+  /* #ifdef JAVA5 */
+  // OutPort
+  /* #else */
+  Consumer
+  /* #endif */
+  append (char v)
   {
     closeTag();
     if (printIndent >= 0)

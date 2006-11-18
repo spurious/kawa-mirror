@@ -10,10 +10,14 @@ import java.io.*;
  */
 
 public class FString extends SimpleVector
-implements CharSeq, Externalizable, Consumable
+  implements
   /* #ifdef JAVA2 */
-  , Comparable
+  Comparable,
   /* #endif */
+  /* #ifdef JAVA5 */
+  // Appendable,
+  /* #endif */
+  CharSeq, Externalizable, Consumable
 {
   public char[] data;
   protected static char[] empty = new char[0];
@@ -112,6 +116,16 @@ implements CharSeq, Externalizable, Consumable
 	System.arraycopy(data, 0, tmp, 0,
 			 oldLength < length ? oldLength : length);
 	data = tmp;
+      }
+  }
+
+  public void ensureBufferLength (int sz)
+  {
+    if (sz > data.length)
+      {
+        char[] d = new char[sz < 60 ? 120 : 2 * sz];
+        System.arraycopy(data, 0, d, 0, sz);
+        data = d;
       }
   }
 
@@ -371,41 +385,46 @@ implements CharSeq, Externalizable, Consumable
       out.write(data, i, end - i);
   }
 
+  public FString append (char c)
+  {
+    int sz = size;
+    if (sz >= data.length)
+      ensureBufferLength(sz+1);
+    char[] d = data;
+    d[sz] = c;
+    size = sz + 1;
+    return this;
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public FString append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    return append(csq, 0, csq.length());
+  }
+
+  public FString append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    /* FIXME optimize to use getChars if csq is a CharSeq. */
+    for (int i = start; i < end;  i++)
+      append(csq.charAt(i));
+    return this;
+  }
+  /* #else */
+  // public FString append (String str)
+  // {
+  //   int len = str.length();
+  //   ensureBufferLength(size+len);
+  //   str.getChars(0, len, data, size);
+  //   size += len;
+  //   return this;
+  // }
+  /* #endif */
+
   /* #ifdef JAVA5 */
-  // public FString append (char c)
-  // {
-  //   int sz = size;
-  //   char[] d;
-  //   if (sz >= data.length)
-  //     {
-  //       d = new char[sz < 60 ? 120 : 2 * sz];
-  //       System.arraycopy(data, 0, d, 0, sz);
-  //       data = d;
-  //     }
-  //   else
-  //     d = data;
-  //   d[sz] = c;
-  //   size = sz + 1;
-  //   return this;
-  // }
-
-  // public FString append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   return append(csq, 0, csq.length());
-  // }
-
-  // public FString append (CharSequence csq, int start, int end)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   /* FIXME optimize to use getChars if csq is a CharSeq. */
-  //   for (int i = start; i < end;  i++)
-  //     append(csq.charAt(i));
-  //   return this;
-  // }
-
   // public void writeTo(int start, int count, Appendable dest)
   //    throws java.io.IOException
   // {

@@ -42,25 +42,55 @@ public class PrintConsumer extends PrintWriter
   {
   }
 
-  public Consumer append (char c)
+  public
+  /* #ifdef JAVA5 */
+  // PrintConsumer
+  /* #else */
+  Consumer
+  /* #endif */
+  append (char c)
   {
     print(c);
     return this;
   }
 
+  /* #ifdef use:java.lang.CharSequence */
+  public
   /* #ifdef JAVA5 */
-  // public PrintConsumer append (CharSequence 
-  //   if (csq == null)
-  //     csq = "null";
-  //   return append(csq, 0, csq.length());
-  // }
+  // PrintConsumer
+  /* #else */
+  Consumer
+  /* #endif */
+  append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
+    return this;
+  }
 
-  // public PrintConsumer append (CharSequence csq, int start, int end)
+  public
+  /* #ifdef JAVA5 */
+  // PrintConsumer
+  /* #else */
+  Consumer
+  /* #endif */
+  append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    for (int i = start; i < end;  i++)
+      append(csq.charAt(i));
+    return this;
+  }
+  /* #else */
+  // public Consumer append (String str)
   // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   for (int i = start; i < end;  i++)
-  //     append(csq.charAt(i));
+  //   if (str == null)
+  //     str = "null";
+  //   int len = str.length();
+  //   for (int i = 0; i < len;  i++)
+  //     append(str.charAt(i));
   //   return this;
   // }
   /* #endif */

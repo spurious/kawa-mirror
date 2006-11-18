@@ -187,7 +187,13 @@ public class OutPort extends PrintConsumer implements Printable
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
   }
 
-  public Consumer append (char i)
+  public
+  /* #ifdef JAVA5 */
+  // OutPort
+  /* #else */
+  Consumer
+  /* #endif */
+  append (char i)
   {
     write (i);
     return this;

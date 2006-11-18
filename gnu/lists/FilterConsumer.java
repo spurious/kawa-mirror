@@ -132,20 +132,28 @@ public class FilterConsumer
       base.write(buf, off, len);
   }
 
-  /* #ifdef JAVA5 */
-  // public Consumer append (CharSequence csq)
-  // {
-  //   beforeContent();
-  //   if (! skipping)
-  //     base.append(csq);
-  //   return this;
-  // }
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq)
+  {
+    beforeContent();
+    if (! skipping)
+      base.append(csq);
+    return this;
+  }
 
-  // public Consumer append (CharSequence csq, int start, int end)
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    beforeContent();
+    if (! skipping)
+      base.append(csq, start, end);
+    return this;
+  }
+  /* #else */
+  // public Consumer append (String str)
   // {
   //   beforeContent();
   //   if (! skipping)
-  //     base.append(csq, start, end);
+  //     base.append(str);
   //   return this;
   // }
   /* #endif */

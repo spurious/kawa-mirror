@@ -236,22 +236,27 @@ public class XslTranslator extends Lexer implements Consumer
     return this;
   }
 
-  /* #ifdef JAVA5 */
-  // public Consumer append (CharSequence csq)
-  // {
-  //   if (inAttribute)
-  //     attributeValue.append(csq);
-  //   else
-  //     push(csq.toString());
-  //   return this;
-  // }
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq)
+  {
+    if (inAttribute)
+      attributeValue.append(csq);
+    else
+      push(csq.toString());
+    return this;
+  }
 
-  // public Consumer append (CharSequence csq, int start, int end)
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    return append(csq.subSequence(start, end));
+  }
+  /* #else */
+  // public Consumer append (String str)
   // {
   //   if (inAttribute)
-  //     attributeValue.append(csq, start, end);
+  //     attributeValue.append(str);
   //   else
-  //     push(csq.subSequence(start, end).toString());
+  //     push(str);
   //   return this;
   // }
   /* #endif */
@@ -331,10 +336,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeChars(String str)
   {
-    if (inAttribute)
-      attributeValue.append(str);
-    else
-      push(str);
+    append(str);
   }
 
   public void write(char[] buf, int off, int len)

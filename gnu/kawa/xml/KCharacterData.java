@@ -35,7 +35,7 @@ public abstract class KCharacterData extends KNode
   // public void setData(String data)  throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setData not supported");
+  //                          "setData not supported");
   // }
   // public String substringData(int offset, int count)
   //   throws DOMException
@@ -66,7 +66,7 @@ public abstract class KCharacterData extends KNode
   // public void replaceData (int offset, int count, String arg)  throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "replaceData not supported");
+  //                          "replaceData not supported");
   // }
   /* #endif */
 }

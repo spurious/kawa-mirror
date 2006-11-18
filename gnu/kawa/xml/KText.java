@@ -38,7 +38,7 @@ public class KText extends KCharacterData
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "splitText not supported");
+  //                          "splitText not supported");
   // }
   /* #endif */
 
@@ -52,7 +52,7 @@ public class KText extends KCharacterData
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "splitText not supported");
+  //                          "splitText not supported");
   // }
   /* #endif */
 

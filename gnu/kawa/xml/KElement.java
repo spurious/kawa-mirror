@@ -71,7 +71,7 @@ public class KElement extends KNode
   //    throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setIdAttributeNS not supported");
+  //                          "setIdAttributeNS not supported");
   // }
 
   // /** Not implemented. */
@@ -147,10 +147,10 @@ public class KElement extends KNode
   /* #ifdef use:org.w3c.dom.Node */
   // /** Not implemented. */
   // public void setAttributeNS (String namespaceURI, String qualifiedName, 
-			      // String value) throws DOMException
+  //                             String value) throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "setAttributeNS not supported");
+  //                          "setAttributeNS not supported");
   // }
   /* #endif */
 
@@ -160,7 +160,7 @@ public class KElement extends KNode
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-			   // "removeAttributeNS not supported");
+  //                          "removeAttributeNS not supported");
   // }
   /* #endif */
  

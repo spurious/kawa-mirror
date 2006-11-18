@@ -96,7 +96,7 @@ public class KDocument extends KNode
 
   // /** Not implemented. */
   // public ProcessingInstruction createProcessingInstruction (String target, 
-							    // String data)
+  //                                                           String data)
   // {
   //   throw new UnsupportedOperationException("createProcessingInstruction not implemented");
   // }
@@ -200,14 +200,14 @@ public class KDocument extends KNode
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-			   // "renameNode not implemented");
+  //                          "renameNode not implemented");
   // }
 
   // public Node adoptNode (Node source)
   //   throws DOMException
   // {
   //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-			   // "adoptNode not implemented");
+  //                          "adoptNode not implemented");
   // }
   /* #endif */
 

@@ -1,5 +1,7 @@
 2006-11-18  Per Bothner  <per@bothner.com>
 
+	* ObjectType.java: Share some code between JAVA2 and non-JAVA2 case.
+
 	* Type.java (getSizeInWords): New method.
 	* Variable.java (reserveLocal): Use getSizeInWords.
 

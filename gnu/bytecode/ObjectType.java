@@ -60,12 +60,13 @@ public class ObjectType extends Type
       {
 	if (reflectClass == null)
 	  {
+            String cname = getInternalName().replace('/', '.');
 	    /* #ifdef JAVA2 */
 	    /* Specifies optional 'initialize' argument. */
-	    reflectClass = Class.forName(getInternalName().replace('/', '.'),
+	    reflectClass = Class.forName(cname,
                                          false, getClass().getClassLoader());
 	    /* #else */
-	    // reflectClass = Class.forName(getInternalName().replace('/', '.'));
+	    // reflectClass = Class.forName(cname);
 	    /* #endif */
 	  }
         flags |= EXISTING_CLASS;

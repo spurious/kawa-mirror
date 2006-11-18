@@ -104,7 +104,7 @@ public class DisplayFormat extends AbstractFormat
     if (list != LList.Empty)
       {
 	out.writeSpaceFill();
-	out.writeChars(". ");
+	out.append(". ");
 	writeObject(LList.checkNonList(list), (Consumer) out);
       }
     out.endLogicalBlock(")");

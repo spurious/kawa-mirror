@@ -78,6 +78,8 @@ public class XMLPrinter extends OutPort
   private static final int KEYWORD = -6;
   int prev = ' ';
 
+  char savedHighSurrogate; // should perhaps be combined with prev?
+
   public XMLPrinter (OutPort out, boolean autoFlush)
   {
     super(out, autoFlush);
@@ -220,8 +222,6 @@ public class XMLPrinter extends OutPort
       }
     return this;
   }
-
-  char savedHighSurrogate;
 
   private void startWord()
   {
@@ -442,7 +442,7 @@ public class XMLPrinter extends OutPort
 	    super.write("=\"");
 	    inAttribute = true;
 	    if (uri != null)
-	      writeChars(uri);
+	      append(uri);
 	    inAttribute = false;
 	    super.write('\"');
 	  }
@@ -666,7 +666,7 @@ public class XMLPrinter extends OutPort
       v = formatDouble(((Number) v).doubleValue());
     else if (v instanceof Float)
       v = formatFloat(((Float) v).floatValue());
-    writeChars(v == null ? "(null)" : v.toString());
+    append(v == null ? "(null)" : v.toString());
   }
 
   public void writeObject(Object v)
@@ -721,16 +721,26 @@ public class XMLPrinter extends OutPort
     return false;
   }
 
-  public void writeChars(String str)
+  /* #ifdef use:java.lang.CharSequence */
+  public
+  /* #ifdef JAVA5 */
+  // PrintConsumer
+  /* #else */
+  Consumer
+  /* #endif */
+  append (CharSequence csq, int start, int end)
   {
     prev = '-';
-    int len = str.length();
-    if (len == 0)
-      return;
-    closeTag();
-    for (int i = 0;  i < len;  i++)
-      append(str.charAt(i));
+    super.append(csq, start, end);
+    return this;
   }
+  /* #else */
+  // public Consumer append(String str)
+  // {
+  //   prev = '-';
+  //   return super.append(str);
+  // }
+  /* #endif */
 
   public void write(char[] buf, int off, int len)
   {
@@ -793,7 +803,7 @@ public class XMLPrinter extends OutPort
   public void writeComment(String chars)
   {
     beginComment();
-    writeChars(chars);
+    append(chars);
     endComment();
   }
 

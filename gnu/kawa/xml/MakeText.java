@@ -47,7 +47,7 @@ public class MakeText extends NodeConstructor
           StringValue.stringValue(arg, sbuf);
         str = sbuf.toString();
       }
-    out.writeChars(str);
+    out.append(str);
   }
 
   public static void text$X (Object arg, CallContext ctx)

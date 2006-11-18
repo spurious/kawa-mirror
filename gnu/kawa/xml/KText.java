@@ -20,7 +20,7 @@ public class KText extends KCharacterData
   public static KText make (String text)
   {
     NodeTree tree = new NodeTree();
-    tree.writeChars(text);
+    tree.append(text);
     return new KText(tree, 0);
   }
 

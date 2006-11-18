@@ -267,8 +267,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     StringBuffer sbuf = new StringBuffer();
                     tlist.stringValue(valStart, valEnd, sbuf);
                     tlist.gapStart = valStart;
-                    tlist.writeChars(XDataType
-                                     .replaceWhitespace(sbuf.toString(), true));
+                    tlist.append(XDataType
+                                 .replaceWhitespace(sbuf.toString(), true));
                     break;
                   }
               }
@@ -854,15 +854,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
   //   if (v.length() == 0)
   //     writeJoiner();
   //   else if (checkWriteAtomic())
-  //     base.writeChars(v);
+  //     base.append(v);
   //   return this;
   // }
   /* #endif */
-
-  public void writeChars(String v)
-  {
-    append(v);
-  }
 
   protected void writeJoiner ()
   {

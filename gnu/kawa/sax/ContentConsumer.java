@@ -209,12 +209,31 @@ public class ContentConsumer implements Consumer
     strBuffer.append(v);
   }
 
-  public void writeChars(String v)
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
+    return this;
+  }
+
+  public Consumer append (CharSequence csq, int start, int end)
   {
     if (inStartTag == 1)
       endStartTag();
-    strBuffer.append(v);
+    strBuffer.append(csq, start, end);
+    return this;
   }
+  /* #else */
+  // public Consumer append (String v)
+  // {
+  //   if (inStartTag == 1)
+  //     endStartTag();
+  //   strBuffer.append(v);
+  //   return this;
+  // }
+  /* #endif */
 
   public void writeObject(Object v)
   {
@@ -229,7 +248,7 @@ public class ContentConsumer implements Consumer
     else if (v instanceof Char)
       ((Char) v).print(this);
     else
-      writeChars(v == null ? "(null)" : v.toString());
+      append(v == null ? "(null)" : v.toString());
   }
 
   public void writeBoolean(boolean v)

@@ -1,5 +1,8 @@
 2006-11-18  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java: Update writeChars -> append.
+	* XMLFilter.java: Likewise.
+
 	* XMLPrinter.java (append): Change return type if JAVA5.
 	* XMLFilter.java: Add append methods.
 

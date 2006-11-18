@@ -15,7 +15,11 @@ import java.util.Vector;
 public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
+  /* #ifdef JAVA */
+  // StringBuilder sbuf = new StringBuilder(100);
+  /* #else */
   StringBuffer sbuf = new StringBuffer(100);
+  /* #endif */
   Object currentHeader;
 
   /** 1 - implicit; 2: explicit. */
@@ -141,7 +145,11 @@ public class HttpPrinter extends FilterConsumer
 	    throw new RuntimeException(ex.toString());
 	  }
       }
-    writeChars(sbuf.toString());
+    /* #ifdef use:java.lang.CharSequence */
+    append(sbuf);
+    /* #else */
+    // append(sbuf.toString());
+    /* #endif */
     sbuf.setLength(0);
   }
 
@@ -183,13 +191,48 @@ public class HttpPrinter extends FilterConsumer
       }
   }
 
-  public void writeChars(String str)
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq, int start, int end)
   {
     if (base == null)
-      sbuf.append(str);
+      {
+        /* #ifdef JAVA5 */
+        // sbuf.append(csq, start, end);
+        /* #else */
+        if (csq == null)
+          csq = "null";
+        sbuf.append(csq.subSequence(start, end).toString());
+        /* #endif */
+      }
     else
-      base.writeChars(str);
+      base.append(csq, start, end);
+    return this;
   }
+
+  public Consumer append (CharSequence csq)
+  {
+    if (base == null)
+      {
+        /* #ifdef JAVA5 */
+        // sbuf.append(csq);
+        /* #else */
+        sbuf.append(csq.toString());
+        /* #endif */
+      }
+    else
+      base.append(csq);
+    return this;
+  }
+  /* #else */
+  // public Consumer append (String str)
+  // {
+  //   if (base == null)
+  //     sbuf.append(str);
+  //   else
+  //     base.append(str);
+  //   return this;
+  // }
+  /* #endif */
 
   public void write(char[] buf, int off, int len)
   {

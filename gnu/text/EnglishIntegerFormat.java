@@ -137,7 +137,11 @@ public class EnglishIntegerFormat extends java.text.NumberFormat
   {
     StringBuffer sbuf = new StringBuffer();
     format (value, sbuf, null);
-    out.writeChars(sbuf.toString());
+    /* #ifdef use:java.lang.CharSequence */
+    out.append(sbuf);
+    /* #else */
+    // out.append(sbuf.toString());
+    /* #endif */
   }
 
   public void writeObject (Object value, Consumer out)

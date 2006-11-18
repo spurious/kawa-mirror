@@ -47,8 +47,6 @@ public interface Consumer
    * The producer can use this information to skip ahead. */
   public boolean ignoring();
 
-  public void writeChars(String str);
-  // public void writeChars(AbstractString str);
   public void write(char[] buf, int off, int len);
 
   public Consumer append (char c);

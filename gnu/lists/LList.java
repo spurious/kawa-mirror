@@ -309,7 +309,7 @@ public class LList extends ExtSequence
     if (list != Empty)
       {
 	out.append(' ');
-	out.writeChars(". ");
+	out.append(". ");
 	out.writeObject(checkNonList(list));
       }
     out.endGroup();

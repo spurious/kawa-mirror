@@ -118,13 +118,6 @@ public class FilterConsumer
     return base.ignoring();
   }
 
-  public void writeChars(String str)
-  {
-    beforeContent();
-    if (! skipping)
-      base.writeChars(str);
-  }
-
   public void write(char[] buf, int off, int len)
   {
     beforeContent();
@@ -135,9 +128,9 @@ public class FilterConsumer
   /* #ifdef use:java.lang.CharSequence */
   public Consumer append (CharSequence csq)
   {
-    beforeContent();
-    if (! skipping)
-      base.append(csq);
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
     return this;
   }
 

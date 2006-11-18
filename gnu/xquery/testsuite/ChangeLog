@@ -1,3 +1,7 @@
+2006-11-18  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Update writeChars -> append.
+
 2006-11-16  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Update expected result.

@@ -9,7 +9,7 @@ public abstract class AbstractFormat extends java.text.Format
     if (out instanceof OutPort)
       ((OutPort) out).write(str);
     else
-      out.writeChars(str);
+      out.append(str);
   }
 
   public void append (char v, Consumer out)

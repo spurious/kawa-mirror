@@ -150,9 +150,4 @@ public class PrintConsumer extends PrintWriter
   {
     return false;
   }
-
-  public void writeChars(String str)
-  {
-    print(str);
-  }
 }

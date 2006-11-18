@@ -722,15 +722,6 @@ public class TreeList extends AbstractSequence
     data[gapStart++] = JOINER;
   }
 
-  public void writeChars(String str)
-  {
-    int len = str.length();
-    if (len == 0)
-      writeJoiner();
-    for (int i = 0;  i < len;  i++)
-      append(str.charAt(i));
-  }
-
   public void write(char[] buf, int off, int len)
   {
     if (len == 0)
@@ -1149,7 +1140,7 @@ public class TreeList extends AbstractSequence
 	    out.writeBoolean(datum != BOOL_FALSE);
 	    continue;
           case JOINER:
-            out.writeChars("");
+            out.append("");
             continue;
 	  case CHAR_FOLLOWS:
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);

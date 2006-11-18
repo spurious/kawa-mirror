@@ -134,11 +134,21 @@ public class Nodes extends Values
     return this;
   }
 
-  public void writeChars (String str)
-  {
+  /* #ifdef use:java.lang.CharSequence */
+  public Consumer append (CharSequence csq, int start, int end)
+  { 
     maybeStartTextNode();
-    curFragment.writeChars(str);
+    curFragment.append(csq, start, end);
+    return this;
   }
+  /* #else */
+  // public Consumer append (String str)
+  // {
+  //   maybeStartTextNode();
+  //   curFragment.append(str);
+  //   return this;
+  // }
+  /* #endif */
 
   public void write(char[] buf, int off, int len)
   {

@@ -334,11 +334,6 @@ public class XslTranslator extends Lexer implements Consumer
       push(v);
   }
 
-  public void writeChars(String str)
-  {
-    append(str);
-  }
-
   public void write(char[] buf, int off, int len)
   {
     if (inAttribute)

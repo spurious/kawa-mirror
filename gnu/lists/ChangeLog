@@ -1,5 +1,14 @@
 2006-11-18  Per Bothner  <per@bothner.com>
 
+	* Consumer.java (writeChars): Remove method.
+	* PrintConsumer.java (writeChars): Likewise.
+	* TreeList.java (writeChars): Likewise.
+	* FilterConsumer.java (writeChars): Likewise.
+	(append(CharSequence)): Just call the general case.
+	* AbstractFormat.java: Update writeChars -> append.
+	* LList.java: Likewise.
+
+
 	* Consumer.java (append): Make append methods conditional on
 	CharSequence (which is Java4), rather than JAVA5.
 	Add fallback case that takes a String.

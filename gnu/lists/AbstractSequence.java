@@ -76,7 +76,7 @@ public abstract class AbstractSequence
     /* #endif */
   }
 
-  public AbstractSequence append (char c)
+  public Consumer append (char c)
   {
     throw unsupported("append");
   }

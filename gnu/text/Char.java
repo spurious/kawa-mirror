@@ -1,6 +1,7 @@
 package gnu.text;
 import java.io.*;
 import java.util.Hashtable;
+import gnu.lists.Consumer;
 
 /**
  * A wrapper for characters.
@@ -37,6 +38,22 @@ public class Char
   private Char (int ch)
   {
     value = ch;
+  }
+
+  public void print (Consumer out)
+  {
+    print(value, out);
+  }
+
+  public static void print (int i, Consumer out)
+  {
+    if (i >= 0x10000)
+      {
+        out.append((char) (((i - 0x10000) >> 10) + 0xD800));
+        out.append((char) ((i & 0x3FF) + 0xDC00));
+      }
+    else
+      out.append((char) i);
   }
 
   public final char charValue ()

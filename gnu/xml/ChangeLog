@@ -1,5 +1,10 @@
 2006-11-17  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java (savedHighSurrogate): New field,
+	(writeChar): Rename to append.  Combine surrogates if escaping.
+	* XMLFIlter.java: Update writeChar -> append.
+	(emitCharacterReference): Handle non-base-plane character values.
+
 	* XMLFilter.java (beginGroup): Fix logic for inherited namespace:
 	it should only inherit from outermost element, if there is one.
 

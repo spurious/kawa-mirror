@@ -107,9 +107,10 @@ public class ConsumerTarget extends Target
     Method method = null;
     boolean islong = false;
     stackType = stackType.getImplementationType();
+    char sig;
     if (stackType instanceof PrimType)
       {
-	char sig = stackType.getSignature().charAt(0);
+	sig = stackType.getSignature().charAt(0);
 	switch (sig)
 	  {
 	  case 'B': case 'S': case 'I':
@@ -117,13 +118,14 @@ public class ConsumerTarget extends Target
 	  case 'J':	methodName = "writeLong";  islong = true; break;
 	  case 'F':	methodName = "writeFloat";  break;
 	  case 'D':	methodName = "writeDouble"; islong = true; break;
-	  case 'C':	methodName = "writeChar";  break;
+	  case 'C':	methodName = "append";  break;
 	  case 'Z':	methodName = "writeBoolean";  break;
 	  case 'V':     return;
 	  }
       }
     else
       {
+        sig = '\0';
 	if (consumerPushed == 1 || OccurrenceType.itemCountIsOne(stackType))
 	  methodName = "writeObject";
 	else
@@ -157,6 +159,8 @@ public class ConsumerTarget extends Target
       method = Compilation.typeConsumer.getDeclaredMethod(methodName, 1);
     if (method != null)
       code.emitInvokeInterface(method);
+    if (sig == 'C')
+      code.emitPop(1); // Pop consumer result.
   }
 
   public boolean compileWrite (Expression exp, Compilation comp)

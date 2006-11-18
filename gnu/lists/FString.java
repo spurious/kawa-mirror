@@ -355,7 +355,7 @@ implements CharSeq, Externalizable, Consumable
     int index = ipos >>> 1;
     if (index >= size)
       return false;
-    out.writeChar(data[index]);
+    out.append(data[index]);
     return true;
   }
 

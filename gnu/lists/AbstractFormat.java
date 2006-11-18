@@ -12,9 +12,9 @@ public abstract class AbstractFormat extends java.text.Format
       out.writeChars(str);
   }
 
-  public void writeChar(int v, Consumer out)
+  public void append (char v, Consumer out)
   {
-    out.writeChar(v);
+    out.append(v);
   }
 
   /** Write a long.

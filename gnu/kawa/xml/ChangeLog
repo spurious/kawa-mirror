@@ -1,5 +1,7 @@
 2006-11-17  Per Bothner  <per@bothner.com>
 
+	* Nodes.java: Update writeChar -> append.
+
 	* Nodes.java: Minor changes to increase (potential) flexibility.
 	(handleNonNode): New method.
 

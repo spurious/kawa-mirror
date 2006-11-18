@@ -18,7 +18,6 @@ public interface Consumer
   // extends Appendable
   /* #endif */
 {
-  public void writeChar(int v);
   public void writeBoolean(boolean v);
 
   public void writeFloat(float v);
@@ -52,8 +51,8 @@ public interface Consumer
   // public void writeChars(AbstractString str);
   public void write(char[] buf, int off, int len);
 
+  public Consumer append (char c);
   /* #ifdef JAVA5 */
-  // public Consumer append (char c);
   // public Consumer append (CharSequence csq);
   // public Consumer append (CharSequence csq, int start, int end);
   /* #endif */

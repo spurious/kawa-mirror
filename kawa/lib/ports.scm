@@ -81,7 +81,7 @@
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))
   :: <void>
-  (invoke port 'writeChar (char->integer ch)))
+  (gnu.text.Char:print (char->integer ch) port))
 
 ;; SRFI-6
 (define (open-input-string (str :: <string>)) :: <input-port>

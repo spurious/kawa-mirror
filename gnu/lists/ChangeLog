@@ -1,3 +1,16 @@
+2006-11-17  Per Bothner  <per@bothner.com>
+
+	* Consumer.java (append): Make unconditional, rather than JAVA5-only.
+	(writeChar): Remove, replaced by append.
+	* PrintConsumer.java: Also rename writeChar to append, but return void.
+	* AbstractFormat.java: Update writeChar -> append.
+	* AbstractSequence.java: Likewise.
+	* FilterConsumer.java: Likewise.
+	* LLIst.java: Likewise.
+	* TreeList.java: Likewise.
+	(CHAR_PAIR_FOLLOWS): Remove code - doesn't really work.
+	Use a surrugate pair instead.
+
 2006-11-15  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (dump): Check for out-of-range object index.

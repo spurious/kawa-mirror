@@ -69,19 +69,24 @@ public class DisplayFormat extends AbstractFormat
   public void writeChar(int v, Consumer out)
   {
     if (! getReadableOutput ())
-      out.writeChar(v);
+      Char.print(v, out);
     else
       {
 	if (language == 'E'
 	    && v > ' ')
 	  {
-	    out.writeChar('?');
-	    out.writeChar(v);
+	    out.append('?');
+            Char.print(v, out);
 	  }
 	// else if (language == 'E') ...
 	else
 	  write(Char.toScmReadableString(v), out);
       }
+  }
+
+  public void append (char v, Consumer out)
+  {
+    writeChar(v, out);
   }
 
   public void writeList(LList value, OutPort out)
@@ -129,7 +134,7 @@ public class DisplayFormat extends AbstractFormat
     if (obj instanceof Boolean)
       writeBoolean(((Boolean)obj).booleanValue(), out);
     else if (obj instanceof Char)
-      writeChar(((Char)obj).charValue(), out);
+      writeChar(((Char)obj).intValue(), out);
     else if (obj instanceof Character)
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Symbol)
@@ -150,7 +155,7 @@ public class DisplayFormat extends AbstractFormat
       {
         write("#,(URI ", out);
         Strings.printQuoted(obj.toString(), (PrintWriter) out, 1);
-        out.writeChar(')');
+        out.append(')');
       }
     /* #endif */
     /* #endif */
@@ -361,13 +366,13 @@ public class DisplayFormat extends AbstractFormat
                   }
                 else if (! inVerticalBars)
                   {
-                    out.writeChar('|');
+                    out.append('|');
                     inVerticalBars = true;
                   }
-                out.writeChar(ch);
+                out.append(ch);
               }
             if (inVerticalBars)
-              out.writeChar('|');
+              out.append('|');
           }
         return;
       }

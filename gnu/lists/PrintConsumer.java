@@ -42,15 +42,14 @@ public class PrintConsumer extends PrintWriter
   {
   }
 
-  /* #ifdef JAVA5 */
-  // public PrintConsumer append (char c)
-  // {
-  //   writeChar(c);
-  //   return this;
-  // }
+  public Consumer append (char c)
+  {
+    print(c);
+    return this;
+  }
 
-  // public PrintConsumer append (CharSequence csq)
-  // {
+  /* #ifdef JAVA5 */
+  // public PrintConsumer append (CharSequence 
   //   if (csq == null)
   //     csq = "null";
   //   return append(csq, 0, csq.length());
@@ -65,11 +64,6 @@ public class PrintConsumer extends PrintWriter
   //   return this;
   // }
   /* #endif */
-
-  public void writeChar(int v)
-  {
-    print((char) v);
-  }
 
   public void writeBoolean(boolean v)
   {

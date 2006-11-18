@@ -127,10 +127,11 @@ public class Nodes extends Values
     curFragment.writeBoolean(v);
   }
 
-  public void writeChar (int v)
+  public Consumer append (char v)
   {
     maybeStartTextNode();
-    curFragment.writeChar(v);
+    curFragment.append(v);
+    return this;
   }
 
   public void writeChars (String str)

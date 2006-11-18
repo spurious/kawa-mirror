@@ -187,14 +187,10 @@ public class OutPort extends PrintConsumer implements Printable
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
   }
 
-  /**
-   * Write a character value to a byte-stream.
-   * The default transation generates UTF-8 multi-bytes.
-   * We support character values above 0xFFFF for future extension.
-   */
-  public void writeChar (int i)
+  public Consumer append (char i)
   {
     write (i);
+    return this;
   }
 
   //  java.text.FieldPosition fieldPosition;
@@ -261,8 +257,6 @@ public class OutPort extends PrintConsumer implements Printable
       }
     ps.print ('>');
   }
-
-  //public void writeChar(int v);
 
   public void beginGroup(Object type)
   {

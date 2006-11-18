@@ -3,6 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
+import gnu.text.Char;
 import gnu.text.SourceLocator;
 import gnu.text.SourceMessages;
 import gnu.mapping.Symbol;
@@ -600,10 +601,11 @@ public class XMLFilter implements XConsumer, PositionConsumer
     return true;
  }
 
-  public void writeChar(int v)
+  public Consumer append (char v)
   {
     if (checkWriteAtomic())
-      base.writeChar(v);
+      base.append(v);
+    return this;
   }
 
   public void writeBoolean (boolean v)
@@ -654,7 +656,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (stringizingLevel > 0 && previous == SAW_WORD)
       {
         if (stringizingElementNesting < 0)
-          writeChar(' ');
+          append(' ');
         previous = 0;
       }
     seq.consumeNext(ipos, this);
@@ -691,7 +693,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
         else
           {
             if (previous == SAW_WORD)
-              writeChar(' ');
+              append(' ');
             MakeText.text$C(v, this);  // Atomize.
             previous = SAW_WORD;
           }
@@ -777,7 +779,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     else if (ch > TreeList.MAX_CHAR_SHORT)
                       {
                         blist.gapStart = gapStart;
-                        blist.writeChar(ch);
+                        blist.append(ch);
                         continue outerLoop;
                       }
                     else if (ch == '\r' || ch == 0x85 || ch == 0x2028)
@@ -820,7 +822,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                 else
                   previous = SAW_CR;
               }
-            base.writeChar('\n');
+            base.append('\n');
           }
       }
   }
@@ -869,7 +871,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     else
       {
         if (previous == SAW_WORD && stringizingElementNesting < 0)
-          writeChar(' ');
+          append(' ');
         previous = 0;
         if (stringizingElementNesting < 0)
           stringizingElementNesting = nesting;
@@ -1156,7 +1158,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 	else if (c0 == 'a' && c1 == 'p' && c2 == 'o' && c3 == 's')
 	  ch = '\'';
       }
-    writeChar(ch);
+    append(ch);
   }
 
   /** Process a character entity reference.
@@ -1164,7 +1166,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
    * as well as the character value. */
   public void emitCharacterReference(int value, char[] name, int start, int length)
   {
-    writeChar(value);
+    if (value >= 0x10000)
+      Char.print(value, this);
+    else
+      append((char) value);
   }
 
   protected void checkValidComment (char[] chars, int offset, int length)

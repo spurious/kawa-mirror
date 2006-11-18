@@ -139,7 +139,7 @@ public class XMLPrinter extends OutPort
       escapeText = false;
   }
 
-  public void writeChar(int v)
+  public Consumer append (char v)
   {
     closeTag();
     if (printIndent >= 0)
@@ -150,13 +150,12 @@ public class XMLPrinter extends OutPort
               writeBreak(PrettyWriter.NEWLINE_MANDATORY);
             if (inComment > 0)
               inComment = 1;
-            return;
+            return this;
           }
       }
-    // if (v >= 0x10000) emit surrogates FIXME;
     if (! escapeText)
       {
-	super.write((char) v);
+	super.write(v);
 	prev = v;
       }
     else if (inComment > 0)
@@ -170,7 +169,7 @@ public class XMLPrinter extends OutPort
           }
         else
           inComment = 1;
-        super.write((char) v);
+        super.write(v);
       }
     else
       {
@@ -187,14 +186,36 @@ public class XMLPrinter extends OutPort
                  // We must escape control characters in attributes,
                  // since otherwise they get normalized to ' '.
                  || (v < ' ' && (inAttribute || (v != '\t' && v != '\n'))))
-	  super.write("&#x"+Integer.toHexString(v).toUpperCase()+";");
+          {
+            int i = v;
+            if (v >= 0xD800)
+              {
+                if (v < 0xDC00)
+                  {
+                    savedHighSurrogate = v;
+                    return this;
+                  }
+                else if (v < 0xE000)
+                  { // low surrogate
+                    //if (highSurrogate < 0xDC00 || highSurrogate > 0xE000)
+                    // error();
+                    i = (savedHighSurrogate - 0xDC00) * 0x400
+                      + (i - 0xDC00) + 0x10000;
+                    savedHighSurrogate = 0;
+                  }
+              }
+            super.write("&#x"+Integer.toHexString(i).toUpperCase()+";");
+          }
 	else
 	  {
-	    super.write((char) v);
+	    super.write(v);
 	    prev = v;
 	  }
       }
+    return this;
   }
+
+  char savedHighSurrogate;
 
   private void startWord()
   {
@@ -672,7 +693,7 @@ public class XMLPrinter extends OutPort
         prev = '-';
       }
     else if (v instanceof Char)
-      writeChar(((Char) v).intValue());
+      Char.print(((Char) v).intValue(), this);
     else
       {
 	startWord();
@@ -702,7 +723,7 @@ public class XMLPrinter extends OutPort
       return;
     closeTag();
     for (int i = 0;  i < len;  i++)
-      writeChar(str.charAt(i));
+      append(str.charAt(i));
   }
 
   public void write(char[] buf, int off, int len)
@@ -722,7 +743,7 @@ public class XMLPrinter extends OutPort
               {
                 if (count > 0)
                   super.write(buf, off - 1 - count, count);
-                writeChar(c);
+                append(c);
                 count = 0;
               }
             else

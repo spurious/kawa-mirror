@@ -1,3 +1,7 @@
+2006-11-17  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Update writeChar -> append.
+
 2006-11-16  Per Bothner  <per@bothner.com>
 
        * XslTranslator.java (endGroup): "Inline" removed XQParser.stringValue.

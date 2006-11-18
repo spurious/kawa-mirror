@@ -87,7 +87,6 @@ public class TreeList extends AbstractSequence
   // 0xF104 A B:      FLOAT_FOLLOWS 32-bit float (big-endian)
   // 0xF105 A B C D:  DOUBLE_FOLLOWS 64-bit double (big-endian)
   // 0xF106: CHAR_FOLLOWS
-  // 0xF107: CHAR_PAIR_FOLLOWS
   // 0xF108: BEGIN_GROUP_LONG
   // 0xF109: BEGIN_ATTRIBUTE_LONG
   // 0xF10A: END_ATTRIBUTE
@@ -173,9 +172,6 @@ public class TreeList extends AbstractSequence
 
   /** A 16-bit (non-compact) Unicode char follows. */
   static final int CHAR_FOLLOWS = 0xF106;
-
-  /** A surrogate pair follows.  (not implemented). */
-  static final int CHAR_PAIR_FOLLOWS = CHAR_FOLLOWS + 1;
 
   /** A comment node follows.
    * [COMMENT]
@@ -647,21 +643,17 @@ public class TreeList extends AbstractSequence
     data[gapStart++] = END_ATTRIBUTE;
   }
 
-  public void writeChar(int i)
+  public Consumer append (char c)
   {
     ensureSpace(3);
-    if (i <= MAX_CHAR_SHORT)
-      data[gapStart++] = (char) i;
-    else if (i < 0x10000)
-      {
-	data[gapStart++] = CHAR_FOLLOWS;
-	data[gapStart++] = (char) i;
-      }
+    if (c <= MAX_CHAR_SHORT)
+      data[gapStart++] = c;
     else
       {
-	data[gapStart++] = CHAR_PAIR_FOLLOWS;
-	// write surrogates FIXME.
+	data[gapStart++] = CHAR_FOLLOWS;
+	data[gapStart++] = c;
       }
+    return this;
   }
 
   public void writeBoolean(boolean v)
@@ -736,7 +728,7 @@ public class TreeList extends AbstractSequence
     if (len == 0)
       writeJoiner();
     for (int i = 0;  i < len;  i++)
-      writeChar(str.charAt(i));
+      append(str.charAt(i));
   }
 
   public void write(char[] buf, int off, int len)
@@ -752,7 +744,7 @@ public class TreeList extends AbstractSequence
 	  data[gapStart++] = ch;
 	else
 	  {
-	    writeChar(ch);
+	    append(ch);
 	    ensureSpace(len);
 	  }
       }
@@ -770,12 +762,6 @@ public class TreeList extends AbstractSequence
   }
 
   /* #ifdef JAVA5 */
-  // public TreeList append (char c)
-  // {
-  //   writeChar(c);
-  //   return this;
-  // }
-
   // public TreeList append (CharSequence csq)
   // {
   //   if (csq == null)
@@ -1159,10 +1145,6 @@ public class TreeList extends AbstractSequence
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
 	    pos++;
 	    continue;
-	  case CHAR_PAIR_FOLLOWS:
-	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
-	    pos += 2;
-	    continue;
 	  case POSITION_PAIR_FOLLOWS:
 	    {
 	      AbstractSequence seq = (AbstractSequence) objects[getIntN(pos)];
@@ -1367,12 +1349,6 @@ public class TreeList extends AbstractSequence
 	    seen = false;
 	    pos++;
 	    continue;
-	  case CHAR_PAIR_FOLLOWS:
-	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
-	    sbuf.append(data, pos, 1 + datum - CHAR_FOLLOWS);
-	    seen = false;
-	    pos += 2;
-	    continue;
 	  case POSITION_PAIR_FOLLOWS:
 	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
 	    if (seen) sbuf.append(sep); else seen = true;
@@ -1518,8 +1494,6 @@ public class TreeList extends AbstractSequence
       case DOUBLE_FOLLOWS:
 	return Sequence.DOUBLE_VALUE;
       case CHAR_FOLLOWS:
-      case CHAR_PAIR_FOLLOWS:
-	return Sequence.CHAR_VALUE;
       case BEGIN_DOCUMENT:
 	return Sequence.DOCUMENT_VALUE;
       case BEGIN_ENTITY:
@@ -1666,10 +1640,6 @@ public class TreeList extends AbstractSequence
 	return Convert.toObject(Double.longBitsToDouble(getLongN(index+1)));
       case CHAR_FOLLOWS:
 	return Convert.toObject(data[index+1]);
-	/*
-      case CHAR_PAIR_FOLLOWS:
-	return Sequence.CHAR_VALUE;
-	*/
       case BEGIN_ATTRIBUTE_LONG:
 	{
 	  int end_offset = getIntN(index+3);
@@ -1852,7 +1822,6 @@ public class TreeList extends AbstractSequence
 	    break;
 	  case POSITION_REF_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
-	  case CHAR_PAIR_FOLLOWS:
 	  default:
 	    throw new Error("unimplemented: "+Integer.toHexString(datum)+" at:"+index);
 	  }
@@ -2020,7 +1989,6 @@ public class TreeList extends AbstractSequence
 	    continue;
 	  case POSITION_REF_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
-	  case CHAR_PAIR_FOLLOWS:
 	  case INT_FOLLOWS:
 	    next = pos + 3;
 	    if (checkText) break;
@@ -2161,7 +2129,6 @@ public class TreeList extends AbstractSequence
 	return pos + 1;
       case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
-      case CHAR_PAIR_FOLLOWS:
       case INT_FOLLOWS:
 	return pos + 2;
       case POSITION_PAIR_FOLLOWS:
@@ -2415,8 +2382,6 @@ public class TreeList extends AbstractSequence
 		      case JOINER:  out.print("= joiner");  break;
 		      case CHAR_FOLLOWS:
 			out.print("=CHAR_FOLLOWS"); toskip = 1;  break;
-		      case CHAR_PAIR_FOLLOWS:
-			out.print("=CHAR_PAIR_FOLLOWS"); toskip = 2;  break;
 		      case POSITION_REF_FOLLOWS:
 		      case OBJECT_REF_FOLLOWS:
 			toskip = 2;  break;

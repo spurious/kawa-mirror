@@ -24,11 +24,12 @@ public class FilterConsumer
   {
   }
 
-  public void writeChar(int v)
+  public Consumer append (char c)
   {
     beforeContent();
     if (! skipping)
-      base.writeChar(v);
+      base.append(c);
+    return this;
   }
 
   public void writeBoolean(boolean v)
@@ -132,14 +133,6 @@ public class FilterConsumer
   }
 
   /* #ifdef JAVA5 */
-  // public Consumer append (char c)
-  // {
-  //   beforeContent();
-  //   if (! skipping)
-  //     base.append(c);
-  //   return this;
-  // }
-
   // public Consumer append (CharSequence csq)
   // {
   //   beforeContent();

@@ -202,11 +202,11 @@ public class ContentConsumer implements Consumer
       }
   }
 
-  public void writeChar(int v)
+  public Consumer append (char v)
   {
     if (inStartTag == 1)
       endStartTag();
-    strBuffer.append((char) v);
+    strBuffer.append(v);
   }
 
   public void writeChars(String v)
@@ -227,7 +227,7 @@ public class ContentConsumer implements Consumer
 	pos.sequence.consumeNext(pos.ipos, this);
       }
     else if (v instanceof Char)
-      writeChar(((Char) v).intValue());
+      ((Char) v).print(this);
     else
       writeChars(v == null ? "(null)" : v.toString());
   }

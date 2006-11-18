@@ -38,7 +38,7 @@ class FilterValueConsumer implements Consumer
 {
   Convert convert;
 
-  public void writeChar (int v)
+  public Consumer append (char v)
   {
     writeObject(convert.charToObject(v));
   }

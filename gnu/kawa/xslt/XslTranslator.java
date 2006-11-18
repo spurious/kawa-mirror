@@ -227,21 +227,16 @@ public class XslTranslator extends Lexer implements Consumer
       }
   }
 
-  public void writeChar(int v)
+  public Consumer append (char v)
   {
     if (inAttribute)
       attributeValue.append(v);
     else
-      push(String.valueOf((char) v));
+      push(String.valueOf(v));
+    return this;
   }
 
   /* #ifdef JAVA5 */
-  // public Consumer append (char c)
-  // {
-  //   writeChar(c);
-  //   return this;
-  // }
-
   // public Consumer append (CharSequence csq)
   // {
   //   if (inAttribute)

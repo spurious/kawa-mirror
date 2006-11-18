@@ -301,14 +301,14 @@ public class LList extends ExtSequence
     while (list instanceof Pair)
       {
 	if (list != this)
-	  out.writeChar(' ');
+	  out.append(' ');
 	Pair pair = (Pair) list;
 	out.writeObject(pair.car);
 	list = pair.cdr;
       }
     if (list != Empty)
       {
-	out.writeChar(' ');
+	out.append(' ');
 	out.writeChars(". ");
 	out.writeObject(checkNonList(list));
       }

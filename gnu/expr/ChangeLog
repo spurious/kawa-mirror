@@ -1,3 +1,12 @@
+2006-11-18  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateBytecode): Save/restore callContextVar
+	within clinit.
+	(clinitMethod, callContextVarForInit): New fields.
+	(generateBytecode): Save $ctx for "run" method in callContextVar.
+	(loadCallContext): For now don't try to reuse/cache variable
+	expect within clinit.
+
 2006-11-17  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java: Update writeChar -> append.

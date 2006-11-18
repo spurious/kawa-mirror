@@ -169,6 +169,8 @@ public class Compilation implements SourceLocator
   /** The current method. */
   public Method method;
 
+  Method clinitMethod;
+
   public final CodeAttr getCode() { return method.getCode(); }
 
   int method_counter;
@@ -1987,9 +1989,9 @@ public class Compilation implements SourceLocator
 
     if (module.isHandlingTailCalls() || usingCPStyle())
       {
-	Variable callStackContext = new Variable ("$ctx", typeCallContext);
-	module.getVarScope().addVariableAfter(thisDecl, callStackContext);
-	callStackContext.setParameter(true);
+	callContextVar = new Variable ("$ctx", typeCallContext);
+	module.getVarScope().addVariableAfter(thisDecl, callContextVar);
+	callContextVar.setParameter(true);
       }
 
     int line = module.getLineNumber();
@@ -2018,8 +2020,11 @@ public class Compilation implements SourceLocator
     if (curClass == mainClass)
       {
 	Method save_method = method;
+        Variable callContextSave = callContextVar;
+        callContextVar = null;
 
 	initMethod = startClassInit();
+        clinitMethod = initMethod;
 	code = getCode();
 
         startLiterals = new Label(code);
@@ -2099,6 +2104,7 @@ public class Compilation implements SourceLocator
 	  }
 
 	method = save_method;
+        callContextVar = callContextSave;
       }
 
     module.compileEnd(this);
@@ -2115,13 +2121,19 @@ public class Compilation implements SourceLocator
 	fswitch.finish(code);
       }
 
-    if (startLiterals != null)
+    if (startLiterals != null || callContextVar != null)
       {
 	method = initMethod;
 	code = getCode();
 
 	Label endLiterals = new Label(code);
 	code.fixupChain(startLiterals, endLiterals);
+
+        if (callContextVarForInit != null)
+          {
+            code.emitInvokeStatic(getCallContextInstanceMethod);
+            code.emitStore(callContextVarForInit);
+          }
 
 	try
 	  {
@@ -2250,21 +2262,41 @@ public class Compilation implements SourceLocator
 
   /** If non-null, contains the value of the current CallContext. */
   Variable callContextVar;
+  Variable callContextVarForInit;
 
   /** Generate code to push the current CallContext on the JVM stack. */
   public final void loadCallContext()
   {
     CodeAttr code = getCode();
-    if (callContextVar == null)
+    if (callContextVar != null)
+      code.emitLoad(callContextVar);
+    // We're cautious about re-using a previously extracted CallContext,
+    // because it's tricky to manage the variables safely.
+    // A possible solution is to inject a Variable into the current scope,
+    // and making sure each separate straight-line block has its own scope.
+    // (If the current scope is in the same "basic block" as an outer scope,
+    // we can use that instead.)  FIXME
+    else if (method == clinitMethod)
       {
-        code.emitInvokeStatic(getCallContextInstanceMethod);
-        code.emitDup();
+        // The variable is initialized just after literals.
         callContextVar = new Variable("$ctx", typeCallContext);
-        curLambda.getVarScope().addVariable(code, callContextVar);
-        code.emitStore(callContextVar);
+        // To make sure it doesn't clash with variables that have already
+        // allocated and freed for previous initialzier.
+        callContextVar.reserveLocal(code.getMaxLocals(), code);
+        code.emitLoad(callContextVar);
+        callContextVarForInit = callContextVar;
       }
     else
-      code.emitLoad(callContextVar);
+      {
+        code.emitInvokeStatic(getCallContextInstanceMethod);
+        if (false) // Somewhat risky - defer re-using for now.  See above.
+          {
+            code.emitDup();
+            callContextVar = new Variable("$ctx", typeCallContext);
+            code.getCurrentScope().addVariable(code, callContextVar);
+            code.emitStore(callContextVar);
+          }
+      }
   }
 
   public void freeLocalField (Field field)

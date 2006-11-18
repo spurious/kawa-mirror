@@ -135,6 +135,7 @@ public abstract class Type {
   }
 
   public final int getSize() { return size; }
+  public int getSizeInWords () { return size > 4 ? 2 : 1; }
 
   public final boolean isVoid () { return size == 0; }
 

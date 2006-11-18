@@ -85,7 +85,7 @@ public class Variable extends Location implements java.util.Enumeration
    * @return true iff we succeeded (i.e. the slot was unused) */
   public boolean reserveLocal (int varIndex, CodeAttr code)
   {
-    int size = getType().size > 4 ? 2 : 1;
+    int size = getType().getSizeInWords();
     if (code.locals.used == null)
       code.locals.used = new Variable[20+size];
     else if (code.getMaxLocals() + size >= code.locals.used.length) {
@@ -126,7 +126,7 @@ public class Variable extends Location implements java.util.Enumeration
     flags &= ~LIVE_FLAG;
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)
-      code.locals.used [offset + size] = null;
+      code.locals.used[offset + size] = null;
   }
 
   boolean shouldEmit ()

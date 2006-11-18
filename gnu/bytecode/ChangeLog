@@ -1,3 +1,8 @@
+2006-11-18  Per Bothner  <per@bothner.com>
+
+	* Type.java (getSizeInWords): New method.
+	* Variable.java (reserveLocal): Use getSizeInWords.
+
 2006-11-15  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (isInstance): New method - handle nullType.

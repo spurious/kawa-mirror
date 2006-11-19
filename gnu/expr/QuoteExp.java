@@ -31,7 +31,7 @@ public class QuoteExp extends Expression
   }
 
   static public QuoteExp undefined_exp =
-    new QuoteExp (Undefined.getInstance());
+    new QuoteExp (Special.undefined);
   static public QuoteExp voidExp =
     new QuoteExp (Values.empty, Type.void_type);
   static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
@@ -43,7 +43,7 @@ public class QuoteExp extends Expression
   {
     if (value == null)
       return nullExp;
-    if (value == Undefined.getInstance())
+    if (value == Special.undefined)
       return undefined_exp;
     if (value == Values.empty)
       return voidExp;

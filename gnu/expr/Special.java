@@ -8,11 +8,12 @@ public class Special extends Object implements Printable, Externalizable
 {
   private String name;
 
-  public static Special optional = new Special("optional");
-  public static Special rest = new Special("rest");
-  public static Special key = new Special("key");
-  public static Special dfault = new Special("default");
-  public static Object eof = gnu.lists.Sequence.eofValue;
+  public static final Special undefined = new Special("undefined");
+  public static final Special optional = new Special("optional");
+  public static final Special rest = new Special("rest");
+  public static final Special key = new Special("key");
+  public static final Special dfault = new Special("default");
+  public static final Object eof = gnu.lists.Sequence.eofValue;
   // Also:
   // #!void is the same as Values.Empty.
   // #!null is Java null.

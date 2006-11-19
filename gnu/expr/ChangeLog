@@ -1,3 +1,12 @@
+2006-11-19  Per Bothner  <per@bothner.com>
+
+	* Special.java (undefined): New static field.
+	(optional, rest, key, dfault, eof): Make final.
+	* Undefined.java: Removed class.
+	* Makefile.am: Update accordingly.
+	* Copilation.java (scmUndefinedType): Remove unused field.
+	* QuoteExp.java: Update Undefined.getInstance() -> Special.undefined.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateBytecode): Save/restore callContextVar

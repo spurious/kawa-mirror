@@ -67,8 +67,7 @@ java_sources = \
   Target.java \
   ThisExp.java \
   TryExp.java \
-  TypeValue.java \
-  Undefined.java
+  TypeValue.java
 
 EXTRA_DIST = package.html
 

@@ -1,3 +1,7 @@
+2006-11-19  Per Bothner  <per@bothner.com>
+
+	* LispReader.java: Update Undefined.undefined -> Special.undefined.
+
 2006-10-26  Per Bothner  <per@bothner.com>
 
 	* XmlNamespace.java: MOved to gnu.kawa.xml.XmlNamespace.

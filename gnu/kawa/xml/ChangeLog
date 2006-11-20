@@ -1,4 +1,14 @@
+2006-11-19  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java: Fix PreProcess directive.
+
 2006-11-18  Per Bothner  <per@bothner.com>
+
+	* MakeResponseHeader.java: Update writeChars -> append.
+	* HttpPrinter.java: Likewise.
+	* KText.java: Likewise.
+	* MakeText.java: Likewise.
+	* Nodes.java: Likewise.
 
 	* KNode.java (getOwnerDocument): Fully-qualify return type,
 	to avoid confusion.

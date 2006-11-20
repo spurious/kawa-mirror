@@ -15,7 +15,7 @@ import java.util.Vector;
 public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
-  /* #ifdef JAVA */
+  /* #ifdef JAVA5 */
   // StringBuilder sbuf = new StringBuilder(100);
   /* #else */
   StringBuffer sbuf = new StringBuffer(100);

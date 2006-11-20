@@ -1,3 +1,8 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (XQTS_JAVA_FLAGS): New macro.
+	(check-XQTS): Use it.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Update writeChars -> append.

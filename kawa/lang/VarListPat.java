@@ -1,5 +1,6 @@
 package kawa.lang;
 import gnu.lists.*;
+import gnu.text.Printable;
 
 /** A Pattern that will match a list of a given minimum length. */
 
@@ -34,4 +35,11 @@ public class VarListPat extends Pattern {
   }
 
   public int varCount () { return min_length + 1; }
+
+  public void print (Consumer out)
+  {
+    out.append("#<varlist-pattern min:");
+    out.append(Integer.toString(min_length));
+    out.append('>');
+  }
 }

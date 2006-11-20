@@ -3,6 +3,7 @@ import java.text.Format;
 import java.text.FieldPosition;
 import java.io.Writer;
 import java.io.CharArrayWriter;
+import gnu.lists.Consumer;
 
 public abstract class ReportFormat extends Format
 {
@@ -118,6 +119,7 @@ public abstract class ReportFormat extends Format
     return start + nargs;
   }
 
+  /** (Parameters in non-standard order.) */
   public static void print (Writer dst, String str)
     throws java.io.IOException
   {
@@ -125,6 +127,16 @@ public abstract class ReportFormat extends Format
       ((java.io.PrintWriter) dst).print(str);
     else
       dst.write(str.toCharArray());
+  }
+
+  public static void print (Object value, Consumer out)
+  {
+    if (value instanceof Printable)
+      ((Printable) value).print(out);
+    else
+      // Should we use out.writeObject?
+      // We need make consistent rules to avoid infinite recursion.
+      out.append(value == null ? "null" : value.toString());
   }
 
   public Object parseObject(String text, java.text.ParsePosition status)

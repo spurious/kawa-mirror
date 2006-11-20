@@ -1,6 +1,7 @@
 package gnu.mapping;
 import java.io.*;
 import gnu.lists.*;
+import gnu.text.Printable;
 
 /** Encapsulate multiple values in a single object.
  * In Scheme and Lisp mainly used to return multiple values from a function.
@@ -105,22 +106,35 @@ public class Values extends TreeList implements Printable, Externalizable
     return proc.applyN (toArray());
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
     if (this == empty)
       {
-	ps.print("#!void");
+	out.append("#!void");
 	return;
       }
     Object[] vals = toArray();  // FIXME!
     int size = vals.length;
-    ps.print("#<values");
-    for (int i = 0; i < size; i++)
+    boolean readable = true;  // FIXME
+    if (readable)
+      out.append("#<values");
+    for (int i = 0;;)
       {
-	ps.print(" ");
-	ps.print(vals[i]);
+        int next = nextDataIndex(i);
+        if (next < 0)
+          break;
+	out.append(' ');
+        if (i >= gapEnd)
+          i -= gapEnd - gapStart;
+        Object val = getPosNext(i << 1);
+        if (val instanceof Printable)
+          ((Printable) val).print(out);
+        else
+          out.writeObject(val);
+        i = next;
       }
-    ps.print (">");
+    if (readable)
+      out.append('>');
   }
 
   /**

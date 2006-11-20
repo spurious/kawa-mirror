@@ -1,3 +1,20 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRules.java (print): Update since parameter is
+	now a Consumer.
+	* kawa/lang/Promise.java (print): Likewise.
+	* kawa/lang/Lambda.java (print): Likewise.
+	* kawa/lang/AnyPat.java (print): Likewise.
+	* kawa/lang/PairPat.java (print): Likewise.
+	* kawa/lang/EqualPat.java (print): Likewise.
+	* kawa/lang/ListPat.java (print): Likewise.
+	* kawa/lang/ListRepeatPat.java (print): Likewise.
+	* kawa/lang/VarListPat.java (print): Likewise.
+	* kawa/lang/Macro.java (print): Likewise.
+	* kawa/lang/Syntax.java (print): Likewise.
+	* kawa/lang/SyntaxPattern.java (print): New method.
+	* kawa/lang/Pattern.java: Now implements Printable.
+
 2006-11-19  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java: Remove redundant 'implements Printable'.

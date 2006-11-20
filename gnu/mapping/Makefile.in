@@ -235,7 +235,6 @@ java_sources = \
   CharArrayInPort.java \
   CharArrayOutPort.java \
   PlainLocation.java \
-  Printable.java \
   Procedure.java \
   Procedure0.java \
   Procedure0or1.java \

@@ -1,6 +1,7 @@
 package gnu.expr;
-import gnu.mapping.Printable;
+import gnu.text.Printable;
 import java.io.*;
+import gnu.lists.Consumer;
 
 /** A class of special one-of-a-kind builtin values. */
 
@@ -43,10 +44,10 @@ public class Special extends Object implements Printable, Externalizable
     return "#!" + name;
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#!");
-    ps.print(name);
+    out.append("#!");
+    out.append(name);
   }
 
   /**

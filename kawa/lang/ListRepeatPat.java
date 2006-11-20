@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.text.Printable;
 
 public class ListRepeatPat extends Pattern implements Printable, Externalizable
 {
@@ -21,11 +22,11 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
     return new ListRepeatPat (element_pattern);
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#<list-repeat-pattern ");
-    ps.print(element_pattern);
-    ps.print('>');
+    out.append("#<list-repeat-pattern ");
+    element_pattern.print(out);
+    out.append('>');
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars)

@@ -1,6 +1,7 @@
 package gnu.mapping;
 import java.io.*;
-import gnu.text.URI_utils;
+import gnu.text.*;
+import gnu.lists.Consumer;
 
 public class InPort extends gnu.text.LineBufferedReader implements Printable
 {
@@ -129,15 +130,15 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 		      Environment.user().get("port-char-encoding"));
   }
 
-  public void print(java.io.PrintWriter ps)
+   public void print (Consumer out)
   {
-    ps.print ("#<input-port");
-    Object name = getName();
+    out.append("#<input-port");
+    String name = getName();
     if (name != null)
       {
-	ps.print (' ');
-	ps.print (name);
+	out.append(' ');
+	out.append(name);
       }
-    ps.print ('>');
+    out.append('>');
   }
 }

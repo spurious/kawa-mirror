@@ -1,4 +1,6 @@
 package gnu.mapping;
+import gnu.lists.Consumer;
+import java.io.PrintWriter;
 
 /**
  * Similar to CharArrayWriter.
@@ -75,6 +77,16 @@ public class CharArrayOutPort extends OutPort
   {
     return new String(bout.buffer, beginIndex,
                       bout.bufferFillPointer - beginIndex);
+  }
+
+  public void writeTo (Consumer out)
+  {
+    out.write(bout.buffer, 0, bout.bufferFillPointer);
+  }
+
+  public void writeTo (int start, int count, Consumer out)
+  {
+    out.write(bout.buffer, start, count);
   }
 }
 

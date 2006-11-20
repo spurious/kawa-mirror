@@ -1,7 +1,10 @@
 package gnu.expr;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
+import gnu.text.Printable;
 import gnu.text.SourceLocator;
+import gnu.lists.Consumer;
+import java.io.PrintWriter;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.
@@ -71,15 +74,22 @@ public abstract class Expression extends Procedure0
 			        + getClass() + ".eval called");
   }
 
-  public final void print (java.io.PrintWriter ps)
+  public final void print (Consumer out)
   {
-    if (ps instanceof OutPort)
-      print((OutPort) ps);
+    if (out instanceof OutPort)
+      print((OutPort) out);
+    else if (out instanceof PrintWriter)
+      {
+	OutPort port = new OutPort((PrintWriter) out);
+	print(port);
+	port.close();
+      }
     else
       {
-	OutPort out = new OutPort(ps);
-	print(out);
-	out.close();
+	CharArrayOutPort port = new CharArrayOutPort();
+	print(port);
+	port.close();
+        port.writeTo(out);
       }
   }
 

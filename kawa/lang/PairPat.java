@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.text.Printable;
 
 public class PairPat extends Pattern implements Printable, Externalizable
 {
@@ -35,13 +36,13 @@ public class PairPat extends Pattern implements Printable, Externalizable
 	    && cdr.match (pair.cdr, vars, start_vars + car_count));
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print ("#<pair-pattern car: ");
-    ps.print(car);
-    ps.print (" cdr: ");
-    ps.print(cdr);
-    ps.print ('>');
+    out.append("#<pair-pattern car: ");
+    car.print(out);
+    out.append(" cdr: ");
+    cdr.print(out);
+    out.append('>');
   }
 
   public int varCount () { return car_count + cdr_count; }

@@ -9,6 +9,7 @@ import gnu.math.IntNum;
 import java.io.PrintWriter;
 import gnu.text.Char;
 import gnu.kawa.xml.XmlNamespace;
+import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
 /* #endif */
@@ -212,8 +213,8 @@ public class DisplayFormat extends AbstractFormat
       }
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
-    else if (obj instanceof Printable && out instanceof PrintWriter)
-      ((Printable) obj).print((PrintWriter) out);
+    else if (obj instanceof Printable)
+      ((Printable) obj).print(out);
     else if (obj instanceof RatNum)
       {
         int b = 10;

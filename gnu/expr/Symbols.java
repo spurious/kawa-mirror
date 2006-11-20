@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.lists.Consumer;
 
 /** Utility class containing various routines to manipulate Scheme symbols.
   * Note Scheme symbols are represented using java.lang.String objects,
@@ -73,10 +74,10 @@ public class Symbols
     return make (name);
   }
 
-  public static void print(String name, java.io.PrintWriter ps)
+  public static void print(String name, Consumer out)
   {
-    boolean readable = (ps instanceof OutPort)
-      && ((OutPort)ps).printReadable;
+    boolean readable = (out instanceof OutPort)
+      && ((OutPort)out).printReadable;
     if (readable)
       {
 	int len = name.length ();
@@ -91,12 +92,12 @@ public class Symbols
 		  || ((ch == '+' || ch == '-') && (i > 0 || len == 1))
 		  || (Character.isDigit (ch) && i > 0)
 		  || (ch == '.' && (i == 0 || name.charAt (i - 1) == '.'))))
-	      ps.print ('\\');
-	    ps.print (ch);
+	      out.append('\\');
+	    out.append(ch);
 	  }
       }
     else
-      ps.print(name);
+      out.append(name);
   }
 
 }

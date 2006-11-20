@@ -1,3 +1,7 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* XDataType.java (update): Change parameter to take Consumer.
+
 2006-11-19  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java: Fix PreProcess directive.

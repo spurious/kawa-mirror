@@ -10,7 +10,7 @@ import gnu.kawa.functions.Convert;
  * @author	Per Bothner
  */
 
-public class Lambda extends Syntax implements Printable
+public class Lambda extends Syntax
 {
   public Object optionalKeyword;
   public Object restKeyword;
@@ -620,9 +620,8 @@ public class Lambda extends Syntax implements Printable
       tr.curMethodLambda = null;
   }
 
-
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#<builtin lambda>");
+    out.append("#<builtin lambda>");
   }
 }

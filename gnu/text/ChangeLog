@@ -1,3 +1,10 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* Printable.java: Moved from gnu.mapping.
+	Change parameter type to Consumer.
+	* Makefile.am: Update accordingly.
+	* ReportFormat.java (print): New static convenience method.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* EnglishIntegerFormat.java: Update writeChars -> append.

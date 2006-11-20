@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.text.Printable;
 
 /**
  * Abstract class for "syntax" objects.
@@ -81,14 +82,14 @@ abstract public class Syntax implements Printable, Named
     return true;
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#<syntax ");
+    out.append("#<syntax ");
     String name = this.getName();
     if (name == null)
-      ps.print ("<unnamed>");
+      out.append("<unnamed>");
     else
-      ps.print(name);
-    ps.print ('>');
+      out.append(name);
+    out.append('>');
   }
 }

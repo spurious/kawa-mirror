@@ -1,3 +1,12 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* Printable.java: Moved to gnu.text.
+	* Makefile.am: Update accordingly.
+	* CharArrayOutPort.java (writeTo): New methods.
+	* InPort.java (print): Update since parameter is now a Consumer.
+	* Values.java (print): Likewise.
+	* OutPort.java (print): Likewise.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (append): Change return type if JAVA5.

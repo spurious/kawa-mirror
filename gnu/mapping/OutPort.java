@@ -253,15 +253,15 @@ public class OutPort extends PrintConsumer implements Printable
       super.print(v == null ? "null" : v);
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print ("#<output-port");
+    out.append("#<output-port");
     if (name != null)
       {
-	ps.print (' ');
-	ps.print (name);
+	out.append(' ');
+	out.append(name.toString());
       }
-    ps.print ('>');
+    out.append('>');
   }
 
   public void beginGroup(Object type)

@@ -1,5 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
+import gnu.text.Printable;
+import gnu.lists.Consumer;
 
 /** Implement Scheme "promises".
  * @author Per Bothner
@@ -29,15 +31,15 @@ public class Promise implements Printable
     return result;
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
     if (result == null)
-      ps.print("#<promise - not forced yet>");
+      out.append("#<promise - not forced yet>");
     else
       {
-	ps.print("#<promise - forced to a ");
-	ps.print(result.getClass().getName());
-	ps.print ('>');
+	out.append("#<promise - forced to a ");
+	out.append(result.getClass().getName());
+	out.append ('>');
       }
   }
 }

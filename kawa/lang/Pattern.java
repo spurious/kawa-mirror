@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
 import gnu.expr.Compilation;
+import gnu.text.Printable;
 
 /**
  * A Pattern is used to match against objects.
@@ -8,7 +9,7 @@ import gnu.expr.Compilation;
  * @author	Per Bothner
  */
 
-abstract public class Pattern
+abstract public class Pattern implements Printable
 {
   /**
    * Match this Pattern against an object.

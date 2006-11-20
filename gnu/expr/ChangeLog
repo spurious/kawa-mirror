@@ -1,3 +1,10 @@
+2006-11-20  Per Bothner  <per@bothner.com>
+
+	* Keyword.java (print): Update since parameter is now a Consumer.
+	* Special.java: Likewise.
+	* Symbols.java (print): Change parameter to take a Consumer.
+	* Expression.java (print): Handle general Consumer.
+
 2006-11-19  Per Bothner  <per@bothner.com>
 
 	* Special.java (undefined): New static field.

@@ -1,6 +1,8 @@
 package gnu.expr;
 import gnu.mapping.*;
 import java.io.*;
+import gnu.text.Printable;
+import gnu.lists.Consumer;
 
 public class Keyword extends Symbol
   implements Printable, Externalizable
@@ -65,10 +67,10 @@ public class Keyword extends Symbol
     return getName()+':';
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    Symbols.print(getName(), ps);
-    ps.print(':');
+    Symbols.print(getName(), out);
+    out.append(':');
   }
 
   /**

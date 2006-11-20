@@ -5,9 +5,10 @@ package gnu.kawa.xml;
 import gnu.bytecode.*;
 import gnu.mapping.Procedure;
 import gnu.expr.*;
-import gnu.mapping.Printable;
+import gnu.text.Printable;
 import gnu.math.*;
 import java.math.BigDecimal;
+import gnu.lists.Consumer;
 
 /** An atomic type as used in XML Schema and related languages.
  * For example the {code xs:decimal} type is {@code XDataType.decimalType}.
@@ -247,13 +248,14 @@ public class XDataType extends Type implements TypeValue
     return value.toString();
   }
 
-  public void print (Object value, java.io.PrintWriter out)
+
+  public void print (Object value, Consumer out)
   {
     if (value instanceof Printable)
       ((Printable) value).print(out);
     else
       //out.print(value);
-      out.print(toString(value));
+      out.append(toString(value));
   }
 
   public boolean castable (Object value)

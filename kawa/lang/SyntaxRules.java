@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.text.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
 {
@@ -272,9 +273,11 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 			   + literal_identifiers[0]);
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print ("#<macro " + literal_identifiers[0] + ">");
+    out.append("#<macro ");
+    ReportFormat.print(literal_identifiers[0], out);
+    out.append('>');
   }
 
   /**

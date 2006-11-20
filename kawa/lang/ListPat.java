@@ -1,5 +1,6 @@
 package kawa.lang;
 import gnu.lists.*;
+import gnu.text.*;
 
 /** Match a list whose length in in the range [min_length..max_length]. */
 
@@ -70,4 +71,15 @@ public class ListPat extends Pattern
   }
 
   public int varCount () { return max_length; }
+
+  public void print (Consumer out)
+  {
+    out.append("#<list-pattern min:");
+    out.append(Integer.toString(min_length));
+    out.append(" max:");
+    out.append(Integer.toString(max_length));
+    out.append(" default:");
+    ReportFormat.print(default_value, out);
+    out.append('>');
+  }
 }

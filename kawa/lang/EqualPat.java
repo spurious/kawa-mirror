@@ -1,6 +1,8 @@
 package kawa.lang;
 import gnu.mapping.*;
 import java.io.*;
+import gnu.text.*;
+import gnu.lists.Consumer;
 
 /**
  * A pattern that requires an exact match (using equal?).
@@ -28,11 +30,11 @@ public class EqualPat extends Pattern implements Printable, Externalizable
 
   public int varCount () { return 0; }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#<equals: ");
-    ps.print(value);
-    ps.print('>');
+    out.append("#<equals: ");
+    ReportFormat.print(value, out);
+    out.append('>');
   }
 
   /**

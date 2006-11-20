@@ -4,6 +4,7 @@ import gnu.expr.*;
 import java.io.*;
 import gnu.lists.*;
 import java.util.Vector;
+import gnu.text.*;
 
 /** This encodes a pattern from a Scheem syntax-case or syntax-rules. */
 
@@ -671,5 +672,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
       }
     tr.popPositionOf(savePos);
     return literals;
+  }
+
+  public void print (Consumer out)
+  {
+    out.append("#<syntax-pattern>");
   }
 }

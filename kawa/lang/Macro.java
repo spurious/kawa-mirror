@@ -3,6 +3,7 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
+import gnu.text.Printable;
 
 public class Macro extends Syntax implements Printable, Externalizable
 {
@@ -110,11 +111,11 @@ public class Macro extends Syntax implements Printable, Externalizable
     return "#<macro "+getName()+'>';
   }
 
-  public void print(java.io.PrintWriter ps)
+  public void print (Consumer out)
   {
-    ps.print("#<macro ");
-    ps.print(getName());
-    ps.print ('>');
+    out.append("#<macro ");
+    out.append(getName());
+    out.append ('>');
   }
 
   public Object expand (Object form, Translator tr)

@@ -6,7 +6,7 @@ import gnu.mapping.*;
 
 /** Implement the ELisp `while' syntax form. */
 
-public class While extends Syntax implements Printable
+public class While extends Syntax
 {
   static kawa.standard.begin begin = new kawa.standard.begin();
 

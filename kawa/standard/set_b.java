@@ -10,7 +10,7 @@ import gnu.kawa.functions.Setter;
  * @author	Per Bothner
  */
 
-public class set_b extends Syntax implements Printable
+public class set_b extends Syntax
 {
   public static final set_b set = new set_b();
   static { set.setName("set!"); }

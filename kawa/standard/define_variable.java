@@ -6,7 +6,7 @@ import gnu.lists.*;
 
 /** "define-variable" is like define, but ignored if variable already bound. */
 
-public class define_variable extends Syntax implements Printable
+public class define_variable extends Syntax
 {
   public static final define_variable define_variable = new define_variable();
   static { define_variable.setName("define-variable"); }

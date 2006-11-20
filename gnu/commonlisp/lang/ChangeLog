@@ -1,3 +1,8 @@
+2006-11-19  Per Bothner  <per@bothner.com>
+
+	* defun.java: Remove redundant 'implements Printable'.
+	* setq.java: Likewise.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* defun.java: Update for SourceLocation-related changes.

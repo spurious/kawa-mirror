@@ -12,7 +12,7 @@ import java.util.Stack;
  * @author	Per Bothner
  */
 
-public class let extends Syntax implements Printable
+public class let extends Syntax
 {
   public static final let let = new let();
   static { let.setName("let"); }

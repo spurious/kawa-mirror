@@ -10,7 +10,7 @@ import java.util.Vector;
  * @author	Per Bothner
  */
 
-public class setq extends Syntax implements Printable
+public class setq extends Syntax
 {
   public Expression rewriteForm (Pair form, Translator tr)
   {

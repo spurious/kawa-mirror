@@ -5,7 +5,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 
-public class define_alias extends Syntax implements Printable
+public class define_alias extends Syntax
 {
   public static final define_alias define_alias = new define_alias();
   static { define_alias.setName("define-alias"); }

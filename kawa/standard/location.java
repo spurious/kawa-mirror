@@ -12,7 +12,7 @@ import gnu.kawa.reflect.Invoke;
  * @author	Per Bothner
  */
 
-public class location extends Syntax implements Printable
+public class location extends Syntax
 {
   public static final location location = new location();
   static { location.setName("location"); }

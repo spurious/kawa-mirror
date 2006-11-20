@@ -9,7 +9,7 @@ import gnu.lists.*;
  * @author	Per Bothner
  */
 
-public class begin extends Syntax implements Printable
+public class begin extends Syntax
 {
   public static final begin begin = new begin();
   static { begin.setName("begin"); }

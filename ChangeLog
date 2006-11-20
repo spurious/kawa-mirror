@@ -1,3 +1,16 @@
+2006-11-19  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Quote.java: Remove redundant 'implements Printable'.
+	* kawa/standard/location.java: Likewise.
+	* kawa/standard/let.java: Likewise.
+	* kawa/standard/define.java: Likewise.
+	* kawa/standard/define_variable.java: Likewise.
+	* kawa/standard/define_alias.java: Likewise.
+	* kwa/standard/fluid_let.java: Likewise.
+	* kawa/standard/begin.java: Likewise.
+	* kawa/standard/let_syntax.java: Likewise.
+	* kawa/standard/set_b.java: Likewise.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxRules.java: Update for SourceLocation changes.

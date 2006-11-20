@@ -9,7 +9,7 @@ import gnu.lists.*;
  * @author	Per Bothner
  */
 
-public class fluid_let extends Syntax implements Printable
+public class fluid_let extends Syntax
 {
   public static final fluid_let fluid_let = new fluid_let();
   static { fluid_let.setName("fluid-set"); }

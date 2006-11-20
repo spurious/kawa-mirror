@@ -8,7 +8,7 @@ import java.util.Stack;
 /** Implementation of the standard Scheme let-syntax and letrec-syntax forms.
  * Not quite working yet. */
 
-public class let_syntax extends Syntax implements Printable
+public class let_syntax extends Syntax
 {
   public static final let_syntax let_syntax
     = new let_syntax(false, "let-syntax");

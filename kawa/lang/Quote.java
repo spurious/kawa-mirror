@@ -15,7 +15,7 @@ import gnu.kawa.functions.GetNamedPart;
  * @author	Per Bothner
  */
 
-public class Quote extends Syntax implements Printable
+public class Quote extends Syntax
 {
   public static final Quote plainQuote = new Quote("quote", false);
   public static final Quote quasiQuote = new Quote("quasiquote", true);

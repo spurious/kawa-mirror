@@ -9,7 +9,7 @@ import kawa.lang.*;
  * @author	Per Bothner
  */
 
-public class defun extends Syntax implements Printable
+public class defun extends Syntax
 {
   kawa.lang.Lambda lambdaSyntax;
 

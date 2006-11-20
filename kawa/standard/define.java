@@ -18,7 +18,7 @@ import gnu.lists.*;
  * @author	Per Bothner
  */
 
-public class define extends Syntax implements Printable
+public class define extends Syntax
 {
   public static final define defineRaw = new define(Scheme.lambda);
 

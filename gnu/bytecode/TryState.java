@@ -30,6 +30,9 @@ public class TryState {
   /** If we are inside a try, the type of variable matched. */
   ClassType try_type;
 
+  /** Only used in emitWithCleanupStart mode. */
+  Type[] savedTypes;
+
   public TryState (CodeAttr code)
   {
     previous = code.try_stack;

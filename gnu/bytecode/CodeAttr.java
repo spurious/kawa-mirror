@@ -1937,7 +1937,10 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public void emitWithCleanupStart ()
   {
-    new TryState(this);
+    int savedSP = SP;
+    SP = 0;
+    emitTryStart(false, null);
+    SP = savedSP;
   }
 
   /** Called after a <code><var>body</var></code> that has a <code><var>cleanup</var></code> clause.
@@ -1946,13 +1949,20 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitWithCleanupCatch (Variable catchVar)
   {
     emitTryEnd();
+    Type[] savedTypes;
+    if (SP > 0)
+      {
+        savedTypes = new Type[SP];
+        System.arraycopy(stack_types, 0, savedTypes, 0, SP);
+        SP = 0;
+      }
+    else
+      savedTypes = null;
+    try_stack.savedTypes = savedTypes;
+
     try_stack.saved_result = catchVar;
     int save_SP = SP;
     emitCatchStart(catchVar);
-    // Don't trash stack_types, and set things up so the SP has the
-    // right value after emitWithCleanupDone (assuming the handler leaves
-    // the stack empty after the throw).  The + 1 for the incoming exception.
-    SP = save_SP + 1;
   }
 
   /** Called after generating a <code><var>cleanup</var></code> handler. */
@@ -1965,7 +1975,18 @@ public class CodeAttr extends Attribute implements AttrContainer
       emitLoad(catchVar);
     emitThrow();
     emitCatchEnd();
+    Type[] savedTypes = try_stack.savedTypes;
     emitTryCatchEnd();
+    if (savedTypes != null)
+      {
+        SP = savedTypes.length;
+        if (SP >= stack_types.length)
+          stack_types = savedTypes;
+        else
+          System.arraycopy(savedTypes, 0, stack_types, 0, SP);
+      }
+    else
+      SP = 0;
   }
 
 

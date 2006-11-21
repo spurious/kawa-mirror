@@ -22,7 +22,9 @@ public class IsEqv extends Procedure2 implements CanInline
   {
     if (arg1==arg2)
       return true;
-    if (arg1 instanceof Char || arg1 instanceof Numeric)
+    if (arg1 instanceof Char || arg1 instanceof Numeric
+        // Symbols can now be equals even if not ==, due to namespace support.
+        || arg1 instanceof Symbol)
       return arg1.equals (arg2);
     return false;
    }
@@ -37,7 +39,8 @@ public class IsEqv extends Procedure2 implements CanInline
     if (exp instanceof QuoteExp)
       {
         Object value = ((QuoteExp) exp).getValue();
-        return ! (value instanceof Numeric || value instanceof Char);
+        return ! (value instanceof Numeric || value instanceof Char
+                  || value instanceof Symbol);
       }
     return false;
   }

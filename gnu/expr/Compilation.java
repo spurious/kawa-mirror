@@ -2267,7 +2267,7 @@ public class Compilation implements SourceLocator
   public final void loadCallContext()
   {
     CodeAttr code = getCode();
-    if (callContextVar != null)
+    if (callContextVar != null && ! callContextVar.dead())
       code.emitLoad(callContextVar);
     // We're cautious about re-using a previously extracted CallContext,
     // because it's tricky to manage the variables safely.
@@ -2288,13 +2288,10 @@ public class Compilation implements SourceLocator
     else
       {
         code.emitInvokeStatic(getCallContextInstanceMethod);
-        if (false) // Somewhat risky - defer re-using for now.  See above.
-          {
-            code.emitDup();
-            callContextVar = new Variable("$ctx", typeCallContext);
-            code.getCurrentScope().addVariable(code, callContextVar);
-            code.emitStore(callContextVar);
-          }
+        code.emitDup();
+        callContextVar = new Variable("$ctx", typeCallContext);
+        code.getCurrentScope().addVariable(code, callContextVar);
+        code.emitStore(callContextVar);
       }
   }
 

@@ -48,7 +48,7 @@ public class Variable extends Location implements java.util.Enumeration
 
   Scope scope;
 
-  final boolean dead () { return (flags & LIVE_FLAG) == 0; }
+  public final boolean dead () { return (flags & LIVE_FLAG) == 0; }
 
   private void setFlag (boolean setting, int flag)
   {

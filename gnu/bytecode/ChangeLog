@@ -1,5 +1,7 @@
 2006-11-20  Per Bothner  <per@bothner.com>
 
+	* Variable.java (dead): Make public.
+
 	* CodeAttr.java (emitWithCleanupStart): Use emitTryStart.
 	(emitWithCleanupCatch): Need to save and then clear stack_types.
 	(emitWithCleanupDone): Restore stack_types.

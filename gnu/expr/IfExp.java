@@ -98,6 +98,9 @@ public class IfExp extends Expression
     if (! trueInherited /* && trueLabel.hasFixups()*/)
       {
 	trueLabel.define(code);
+        // An alternative to saving and restoring callContextVar
+        // would be to surround the compile with a pushScope and popScope.
+        // That would also release any "dangling" callContextVar.
         Variable callContextSave = comp.callContextVar;
 	then_clause.compileWithPosition(comp, target);
         comp.callContextVar = callContextSave;
@@ -106,6 +109,7 @@ public class IfExp extends Expression
       {
 	code.emitElse();
 	falseLabel.define(code);
+        // See note above for then_clause.
         Variable callContextSave = comp.callContextVar;
 	if (else_clause == null)
 	  comp.compileConstant(Values.empty, target);

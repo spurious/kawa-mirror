@@ -193,7 +193,6 @@ public class RunXQTS extends FilterConsumer
     super(out);
     this.cout = out;
 
-    //badFormatting("CastableAs200");
     expectedFailures.put("static-context-1", "unchecked unknownType in element(*,TypeName)");
     expectedFailures.put("NodTest003", "actually pass? different char encoding");    
     expectedFailures.put("op-subtract-dayTimeDuration-from-dateTime-1", "straddles time change");
@@ -204,11 +203,6 @@ public class RunXQTS extends FilterConsumer
                    +"K-FunctionProlog-27|K-FunctionProlog-28",
                    "duplicate function definition not properly caught");
     */
-  }
-
-  private void badFormatting(String testName)
-  {
-    expectedFailures.put(testName, "incorrect double/float formating");    
   }
 
   private void expectFailures (String testNames, String reason)

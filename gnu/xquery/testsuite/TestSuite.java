@@ -1,5 +1,4 @@
 package gnu.xquery.testsuite;
-import java.io.*;
 import java.util.Stack;
 import gnu.lists.*;
 import gnu.xml.*;

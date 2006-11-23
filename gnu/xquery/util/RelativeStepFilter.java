@@ -13,7 +13,8 @@ import gnu.kawa.xml.*;
  * {@code RelativeStepFilter(for $dot in E1 return E2)}.
  */
 
-class RelativeStepFilter extends FilterConsumer implements PositionConsumer
+public class RelativeStepFilter extends FilterConsumer
+  implements PositionConsumer
 {
   // 'A' for atomic, 'N' for nodes, '\0' for neither.
   char seen;

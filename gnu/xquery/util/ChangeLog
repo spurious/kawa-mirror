@@ -1,3 +1,13 @@
+2006-11-23  Per Bothner  <per@bothner.com>
+
+	* RelativeStep.java: Implement inlineable.
+	(inline): Note that 2nd argument is inline-only.
+	Do some optimizations/rewriting.
+	(compile, getReturnType): New methods.
+	(maybeSortNodes$X): Remove method.
+	(extractStep): New static method.
+	* RelativeStepFilter.java: Make class public.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* ValuesFilter.java: Also implement Inlineable.

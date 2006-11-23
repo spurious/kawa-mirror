@@ -18,6 +18,7 @@ import gnu.xml.XMLFilter;
 import gnu.xml.XName;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
+import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.Convert;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.CastableAs;
@@ -1942,6 +1943,7 @@ public class XQParser extends Lexer
 	LambdaExp lexp = new LambdaExp(3);
 	Declaration dotDecl = lexp.addDeclaration(DOT_VARNAME);
 	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
+        dotDecl.setType(SingletonType.getInstance());
 	dotDecl.noteValue (null);  // Does not have a known value.
 	lexp.addDeclaration(POSITION_VARNAME, LangPrimType.intType);
 	lexp.addDeclaration(LAST_VARNAME, LangPrimType.intType);
@@ -2085,6 +2087,10 @@ public class XQParser extends Lexer
 	    lexp.setFile(getName());
 	    lexp.setLine(startLine, startColumn);
 	    Declaration dot = lexp.addDeclaration(DOT_VARNAME);
+            if (axis >= 0)
+              dot.setType(NodeType.anyNodeTest);
+            else
+              dot.setType(SingletonType.getInstance());
 	    lexp.addDeclaration(POSITION_VARNAME, Type.int_type);
 	    lexp.addDeclaration(LAST_VARNAME, Type.int_type);
 	    comp.push(lexp);

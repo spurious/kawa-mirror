@@ -1,3 +1,12 @@
+2006-11-23  Per Bothner  <per@bothner.com>
+
+	* TreeScanner.java: Implement CanInline.
+	(inline): New method - set type based on that of predicate.
+	(getPredicate): New method.
+	* NodeConstructor.java (typeNodeTree): Remve static field, in favor of:
+	(typeXMLFilter): New static field.
+	(compile): Updated looked-for type of ConsumerTarget variable.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* NodeConstructor.java (pushNodeConsumer, pushNodeContext):

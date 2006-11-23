@@ -108,8 +108,7 @@ implements Inlineable
 	ConsumerTarget ctarget = (ConsumerTarget) target;
 	Variable cvar = ctarget.getConsumerVariable();
 	Type ctype = cvar.getType();
-	if (ctype.isSubtype(typeNodeTree)
-	    || ctype.isSubtype(CoerceNodes.typeNodes))
+	if (ctype.isSubtype(typeXMLFilter))
 	  compileToNode(exp, comp, ctarget);
 	else
 	  {
@@ -136,7 +135,7 @@ implements Inlineable
             Type saveType = cvar.getType();
             // For slightly improved code generation.  We can potentially use
             // the faster invokevirtual rather than invokeinterface.
-            cvar.setType(ClassType.make("gnu.xml.XMLFilter"));
+            cvar.setType(typeXMLFilter);
 	    compileToNode(exp, comp, ctarget);
             cvar.setType(saveType);
 	    code.emitTryEnd();
@@ -166,8 +165,8 @@ implements Inlineable
     return Compilation.typeObject;
   }
 
-  static final ClassType typeNodeTree
-    = ClassType.make("gnu.xml.NodeTree");
+  static final ClassType typeXMLFilter
+    = ClassType.make("gnu.xml.XMLFilter");
   static final ClassType typeKNode
     = ClassType.make("gnu.kawa.xml.KNode");
   static final ClassType typeNodeConstructor
@@ -180,6 +179,4 @@ implements Inlineable
     = typeNodeConstructor.getDeclaredMethod("pushNodeConsumer", 1);
   static final Method popNodeConsumerMethod
     = typeNodeConstructor.getDeclaredMethod("popNodeConsumer", 2);
-
-
 }

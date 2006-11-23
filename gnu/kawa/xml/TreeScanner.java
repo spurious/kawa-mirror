@@ -2,8 +2,10 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
+import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.expr.*;
 import java.io.*;
 
 /** Abstract class that scans part of a node tree.
@@ -15,9 +17,11 @@ import java.io.*;
  */
 
 public abstract class TreeScanner extends MethodProc
-  implements Externalizable
+  implements Externalizable, CanInline
 {
   public NodePredicate type;
+
+  public NodePredicate getNodePredicate () { return type; }
 
   public abstract void scan (AbstractSequence seq, int ipos,
 			     PositionConsumer out);
@@ -47,5 +51,12 @@ public abstract class TreeScanner extends MethodProc
   public String toString ()
   {
     return "#<" + getClass().getName() + ' ' + type + '>';
+  }
+
+  public Expression inline (ApplyExp exp, ExpWalker walker)
+  {
+    if (exp.getTypeRaw() == null && type instanceof Type)
+      exp.setType(NodeSetType.getInstance((Type) type));
+    return exp;
   }
 }

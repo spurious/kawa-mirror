@@ -32,7 +32,7 @@ XQTS_JAVA_FLAGS = -Xmx100m
 
 check-XQTS: RunXQTS.class
 	CLASSPATH=$(KAWALIB) \
-	  $(JAVA) $(XQTS-JAVA_FLAGS) gnu.xquery.testsuite.RunXQTS $(XQTS_DIR)
+	  $(JAVA) $(XQTS_JAVA_FLAGS) gnu.xquery.testsuite.RunXQTS $(XQTS_DIR)
 	@if diff -b $(srcdir)/XQTS-trace.exp XQuery-trace.log; \
 	  then echo '# XQTS trace output matches'; \
 	  else echo FAIL XQuery trace output mismatch; fi

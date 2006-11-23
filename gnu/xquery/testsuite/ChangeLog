@@ -1,5 +1,7 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (check-XQTS): Fix typo.
+
 	* RunXQTS.java: Rename Consumer methods append->write.
 
 	* RunXQTS.java (badFormatting): Remove unused method.

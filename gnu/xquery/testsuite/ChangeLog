@@ -1,5 +1,13 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java (matches); Ignore spaces only if isXML.
+
+	* RunXQTS.java (externalVariablesSet): New field.
+	(endGroup): Use it to remove extenal variables bindings for this query.
+
+	* RunXQTS.java (<init>): Update expected failures.
+	(evalTest): Check for some unimplemented types and functions.
+
 	* Makefile.am (check-XQTS): Fix typo.
 
 	* RunXQTS.java: Rename Consumer methods append->write.

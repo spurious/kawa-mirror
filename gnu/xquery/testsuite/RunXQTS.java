@@ -44,6 +44,8 @@ public class RunXQTS extends FilterConsumer
   int xfailCount;
   int cannotTellCount;
 
+  Stack externalVariablesSet = new Stack();
+
   Stack outputFileAlts = new Stack();
   /** Set of expected error codes.  The format is "|Error1}...|ErrorN|". */
   StringBuffer expectedErrorsBuf = new StringBuffer("|");
@@ -193,16 +195,77 @@ public class RunXQTS extends FilterConsumer
     super(out);
     this.cout = out;
 
-    expectedFailures.put("static-context-1", "unchecked unknownType in element(*,TypeName)");
-    expectedFailures.put("NodTest003", "actually pass? different char encoding");    
-    expectedFailures.put("op-subtract-dayTimeDuration-from-dateTime-1", "straddles time change");
+    expectFailures("K-ReplaceFunc-8", "allow bad regex replacement string");
+    expectFailures("trivial-1|trivial-2|trivial-3|trivial-4",
+                   "testsuite error - bug 3974");
+    expectFailures("Constr-namespace-13", "testsuite error? missing namespace undeclaration");
+    expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
+    expectFailures("NodTest003", "actually pass? different char encoding");
+    expectFailures("extvardeclwithouttypetobind-6",
+                   "mystery - testsuite error?");
+    expectFailures("K-FunctionProlog-11|K-FunctionProlog-41",
+                   "item() is treated as equivalent to item()*");
+    expectFailures("ForExprType030|LocalNameFromQNameFunc005|CastAs671|"
+                   +"CastAs672",
+                   "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
     expectFailures("surrogates03|surrogates06|surrogates07|surrogates08|surrogates10", "surrogates not properly implemented");
-    expectFailures("PathExprErr-2", "no check for mixed nodes+atomics from path expression");
-    /* It's sort-of caught - but as a ClassFormatError.
-    expectFailures("function-declaration-022|K-FunctionProlog-26|"
-                   +"K-FunctionProlog-27|K-FunctionProlog-28",
-                   "duplicate function definition not properly caught");
-    */
+    expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
+    expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
+                   +"ST-Axes006|ST-Axes007|ST-Axes008|ST-Axes009|ST-Axes010|"
+                   +"ST-Axes011|ST-Axes012|ST-Axes013|ST-Axes014|ST-Axes015",
+                   "depends on static typing feature");
+    expectFailures("fn-id-dtd-5|fn-id-dtd-7|fn-id-dtd-8|fn-id-dtd-9|"
+                   +"fn-id-dtd-12|fn-id-dtd-13|fn-id-dtd-15|fn-id-dtd-16|"
+                   +"fn-id-dtd-17|fn-id-dtd-18|fn-id-dtd-19|"
+                   +"fn-id-dtd-20|fn-id-dtd-21|fn-id-dtd-23|",
+                   "fn:id only works with xml:id so far");
+    expectFailures("fn-idref-dtd-5|fn-idref-dtd-7|fn-idref-dtd-8|"
+                   +"fn-idref-dtd-9|fn-idref-dtd-12|fn-idref-dtd-13|"
+                   +"fn-idref-dtd-14|fn-idref-dtd-15|fn-idref-dtd-16|"
+                   +"fn-idref-dtd-17|fn-idref-dtd-18|fn-idref-dtd-19|"
+                   +"fn-idref-dtd-20|fn-idref-dtd-21|fn-idref-dtd-23|",
+                   "fn:idref doesn't do much yet");
+    expectFailures("fn-normalize-unicode1args-*|fn-normalize-unicode2args-*|"
+                   +"fn-normalize-unicode-*|K-NormalizeUnicodeFunc-*",
+                   // See http://unicode.org/reports/tr15/Normalizer.java
+                   "fn:normalize-unicode not unimplemented yet");
+    expectFailures("fn-collection-1|fn-collection-2|fn-collection-3|"
+                   +"fn-collection-4|fn-collection-4d|fn-collection-5|"
+                   +"fn-collection-6|fn-collection-7|fn-collection-8|"
+                   +"fn-collection-9|fn-collection-10|"
+                   +"fn-collection-5d|fn-collection-10d",
+                   "fn:collection not unimplemented yet");
+    expectFailures("default_namespace-020|function-declaration-020|K-FunctionProlog-30"
+                   /* These are sort-of caught - but as a ClassFormatError.
+                      +"|function-declaration-022|K-FunctionProlog-26|"
+                      +"K-FunctionProlog-27|K-FunctionProlog-28"*/,
+                   "duplicate function definition not handled");
+    // RunXQTS failures rather than Qexo errors:
+    // Some work under gcj but not JDK 1.4.x or 1.5.0_05:
+    expectFailures("fn-numberulng1args-2|orderBy25|orderBy35|orderBy45|"
+                   +"orderBy55|orderbylocal-25|orderbylocal-35|orderbylocal-45|"
+                   +"orderbylocal-55|orderbywithout-14|orderbywithout-21|"
+                   +"orderbywithout-30|orderbywithout-37|"
+                   +"extvardeclwithtype-6|vardeclwithtype-6",
+                   "inaccurate formatting of xs:float");
+    expectFailures("vardeclerr|K-InternalVariablesWith-17|K-InternalVariablesWith-18",
+                   "missing check for circular definitions");
+    expectFailures("K-TimeAddDTD-1|K-TimeAddDTD-2|K-TimeSubtractDTD-1",
+                   "bad interaction between fields and millis");
+    expectFailures("op-time-greater-than-2",
+                   "comparing xs:time doesn't handle differing typezones");
+    expectFailures("K-SubstringBeforeFunc-5|K-SubstringAfterFunc-5|"
+                   +"K-ContainsFunc-5|K-StartsWithFunc-5|K-EndsWithFunc-5",
+                   "some string functions don't support collation argument");
+    expectFailures("K-CodepointToStringFunc-8|K-CodepointToStringFunc-11|"
+                   +"K-CodepointToStringFunc-12|K-CodepointToStringFunc-14|"
+                   +"K-CodepointToStringFunc-15",
+                   "test-case excessively strict about disallowed characetrs");
+    expectFailures("caselessmatch04",
+                   "regex/unicode special case");
+    expectFailures("caselessmatch10|caselessmatch11",
+                   // Need to translate [xxx-[yyy]] to [xxx&&[^yyy]].
+                   "regex range subtraction not implemented");
   }
 
   private void expectFailures (String testNames, String reason)
@@ -449,13 +512,39 @@ public class RunXQTS extends FilterConsumer
         if (expectedErrors.indexOf(errorString) >= 0)
           {
             report("pass", null);
-            return;
           }
-        if (errorString.equals("|XQST0009|"))
+        else if (errorString.equals("|XQST0009|"))
           {
 
             if (failExpected == null)
               failExpected = "'import schema' not implemented";
+            report("fail", null);
+          }
+        else if (error.message != null
+                 && error.message.indexOf("unknown type xs:NOTATION") >= 0
+                 && (expectedErrors.equals("|XPST0080|")
+                     || expectedErrors.equals("|XPST0017|")))
+          {
+            report("fail", null);
+          }
+        else if (error.message != null
+                 && error.message.indexOf("unknown type xs:ENTITY") >= 0
+                 && (expectedErrors.equals("|XPTY0004|")))
+          {
+            report("fail", null);
+          }
+        else if (error.message != null
+                 && error.message.indexOf("unknown function") >= 0
+                 && (expectedErrors.equals("|XPDY0002|")
+                     || expectedErrors.equals("|XPTY0004|")
+                     || expectedErrors.equals("|XQDY0025|")
+                     || expectedErrors.equals("|FODC0001|")
+                     || (expectedErrors.equals("|XPST0017|")
+                         && (error.message.endsWith(" fn:collection")
+                             || error.message.endsWith(" fn:id")
+                             || error.message.endsWith(" fn:idref")))))
+
+          {
             report("fail", null);
           }
         else if (expectedErrors.length() > 1)
@@ -726,11 +815,11 @@ public class RunXQTS extends FilterConsumer
             start_attr2 = 0;
             intag = false;
           }
-        else if (c1 == ' ' || c1 == '\n' || c1 == '\t' || c1 == '\r')
+        else if (isXML && (c1 == ' ' || c1 == '\n' || c1 == '\t' || c1 == '\r'))
           {
             i1++;
           }
-        else if (c2 == ' ' || c2 == '\n' || c2 == '\t' || c2 == '\r')
+        else if (isXML && (c2 == ' ' || c2 == '\n' || c2 == '\t' || c2 == '\r'))
           {
             i2++;
           }
@@ -769,6 +858,9 @@ public class RunXQTS extends FilterConsumer
         //xqlog.flush();
         testName = null;
         contextItem = null;
+        Environment env = Environment.getCurrent();
+        while (! externalVariablesSet.empty())
+          env.remove((Symbol) externalVariablesSet.pop());
       }
     else if (tagMatches("expected-error"))
       {
@@ -791,6 +883,7 @@ public class RunXQTS extends FilterConsumer
             in.close();
             Environment current = Environment.getCurrent();
             current.put(symbol, null, value);
+            externalVariablesSet.push(symbol);
           }
         catch (Throwable ex)
           {
@@ -814,7 +907,8 @@ public class RunXQTS extends FilterConsumer
           {
             variable = attributes.getValue("variable");
             symbol = Symbol.parse(variable);
-          }
+            externalVariablesSet.push(symbol);
+         }
         else // tagMatches("contextItem")
           {
             variable = null;
@@ -843,6 +937,7 @@ public class RunXQTS extends FilterConsumer
         String variable = attributes.getValue("variable");
         String path = "file://" + directory + '/' + sources.get(inputFile);
         Symbol symbol = Symbol.parse(variable);
+        externalVariablesSet.push(symbol);
         Environment.getCurrent().put(symbol, null,
                                      gnu.kawa.xml.XDataType.toURI(path));
       }

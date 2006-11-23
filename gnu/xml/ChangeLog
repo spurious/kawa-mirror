@@ -1,3 +1,7 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (endGroup): Set previous in all cases.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Update writeChars -> append.

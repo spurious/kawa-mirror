@@ -1125,6 +1125,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   {
     closeStartTag();
     nesting -= 2;
+    previous = 0;
     if (stringizingLevel == 0)
       {
         namespaceBindings = (NamespaceBinding) workStack[nesting];
@@ -1132,15 +1133,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
         workStack[nesting+1] = null;
         base.endGroup();
       }
-    else
+    else if (stringizingElementNesting == nesting)
       {
-        if (stringizingElementNesting == nesting)
-          {
-            stringizingElementNesting = -1;
-            previous = SAW_WORD;
-          }
-        else
-          previous = 0;
+        stringizingElementNesting = -1;
+        previous = SAW_WORD;
       }
     /*
     if (nesting == 0)

@@ -127,18 +127,17 @@ public class Nodes extends Values
     curFragment.writeBoolean(v);
   }
 
-  public Consumer append (char v)
+  public void write (int v)
   {
     maybeStartTextNode();
-    curFragment.append(v);
-    return this;
+    curFragment.write(v);
   }
 
   /* #ifdef use:java.lang.CharSequence */
   public Consumer append (CharSequence csq, int start, int end)
   { 
     maybeStartTextNode();
-    curFragment.append(csq, start, end);
+    curFragment.write(csq, start, end);
     return this;
   }
   /* #else */
@@ -154,6 +153,22 @@ public class Nodes extends Values
   {
     maybeStartTextNode();
     curFragment.write(buf, off, len);
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public void write(CharSequence str, int start, int length)
+  /* #else */
+  // public void write(String str, int start, int length)
+  /* #endif */
+  {
+    maybeStartTextNode();
+    curFragment.write(str, start, length);
+  }
+
+  public void write (String str)
+  {
+    maybeStartTextNode();
+    curFragment.write(str);
   }
 
   private void maybeStartNonTextNode ()

@@ -70,7 +70,7 @@ public class Keyword extends Symbol
   public void print (Consumer out)
   {
     Symbols.print(getName(), out);
-    out.append(':');
+    out.write(':');
   }
 
   /**

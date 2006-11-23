@@ -254,8 +254,7 @@ public class XDataType extends Type implements TypeValue
     if (value instanceof Printable)
       ((Printable) value).print(out);
     else
-      //out.print(value);
-      out.append(toString(value));
+      out.write(toString(value));
   }
 
   public boolean castable (Object value)

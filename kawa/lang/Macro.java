@@ -113,9 +113,9 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<macro ");
-    out.append(getName());
-    out.append ('>');
+    out.write("#<macro ");
+    out.write(getName());
+    out.write ('>');
   }
 
   public Object expand (Object form, Translator tr)

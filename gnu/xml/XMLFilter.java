@@ -267,7 +267,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     StringBuffer sbuf = new StringBuffer();
                     tlist.stringValue(valStart, valEnd, sbuf);
                     tlist.gapStart = valStart;
-                    tlist.append(XDataType
+                    tlist.write(XDataType
                                  .replaceWhitespace(sbuf.toString(), true));
                     break;
                   }
@@ -601,11 +601,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
     return true;
  }
 
-  public Consumer append (char v)
+  public void write (int v)
   {
     if (checkWriteAtomic())
-      base.append(v);
-    return this;
+      base.write(v);
   }
 
   public void writeBoolean (boolean v)
@@ -656,7 +655,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (stringizingLevel > 0 && previous == SAW_WORD)
       {
         if (stringizingElementNesting < 0)
-          append(' ');
+          write(' ');
         previous = 0;
       }
     seq.consumeNext(ipos, this);
@@ -693,7 +692,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
         else
           {
             if (previous == SAW_WORD)
-              append(' ');
+              write(' ');
             MakeText.text$C(v, this);  // Atomize.
             previous = SAW_WORD;
           }
@@ -719,6 +718,23 @@ public class XMLFilter implements XConsumer, PositionConsumer
       writeJoiner();
     else if (checkWriteAtomic())
       base.write(data, start, length);
+  }
+
+  public void write(String str)
+  {
+    write(str, 0, str.length());
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public void write(CharSequence str, int start, int length)
+  /* #else */
+  // public void write(String str, int start, int length)
+  /* #endif */
+  {
+    if (length == 0)
+      writeJoiner();
+    else if (checkWriteAtomic())
+      base.write(str, start, length);
   }
 
   public void textFromParser (char[] data, int start, int length)
@@ -779,7 +795,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     else if (ch > TreeList.MAX_CHAR_SHORT)
                       {
                         blist.gapStart = gapStart;
-                        blist.append(ch);
+                        blist.write(ch);
                         continue outerLoop;
                       }
                     else if (ch == '\r' || ch == 0x85 || ch == 0x2028)
@@ -822,42 +838,18 @@ public class XMLFilter implements XConsumer, PositionConsumer
                 else
                   previous = SAW_CR;
               }
-            base.append('\n');
+            base.write('\n');
           }
       }
   }
 
-  /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq)
+  public void write (String str, int start, int length)
   {
-    if (csq == null)
-      csq = "null";
-    int len = csq.length();
-    if (len == 0)
+    if (length == 0)
       writeJoiner();
     else if (checkWriteAtomic())
-      base.append(csq, 0, len);
-    return this;
+      base.write(str, start, length);
   }
-
-  public Consumer append (CharSequence csq, int start, int end)
-  {
-    if (end == start)
-      writeJoiner();
-    else if (checkWriteAtomic())
-      base.append(csq, start, end);
-    return this;
-  }
-  /* #else */
-  // public Consumer append (String v)
-  // {
-  //   if (v.length() == 0)
-  //     writeJoiner();
-  //   else if (checkWriteAtomic())
-  //     base.append(v);
-  //   return this;
-  // }
-  /* #endif */
 
   protected void writeJoiner ()
   {
@@ -895,7 +887,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     else
       {
         if (previous == SAW_WORD && stringizingElementNesting < 0)
-          append(' ');
+          write(' ');
         previous = 0;
         if (stringizingElementNesting < 0)
           stringizingElementNesting = nesting;
@@ -1178,7 +1170,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 	else if (c0 == 'a' && c1 == 'p' && c2 == 'o' && c3 == 's')
 	  ch = '\'';
       }
-    append(ch);
+    write(ch);
   }
 
   /** Process a character entity reference.
@@ -1189,7 +1181,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (value >= 0x10000)
       Char.print(value, this);
     else
-      append((char) value);
+      write(value);
   }
 
   protected void checkValidComment (char[] chars, int offset, int length)
@@ -1353,6 +1345,30 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (base instanceof XConsumer)
       ((XConsumer) base).endEntity();
   }
+
+  /* #ifdef JAVA5 */
+  // public XMLFilter append (char c)
+  // {
+  //   write(c);
+  //   return this;
+  // }
+
+  // public XMLFilter append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   append(csq, 0, csq.length());
+  //   return this;
+  // }
+
+  // public XMLFilter append (CharSequence csq, int start, int end)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   write(csq, start, end-start);
+  //   return this;
+  // }
+  /* #endif */
 
   MappingInfo lookupTag (Symbol qname)
   {

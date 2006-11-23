@@ -34,12 +34,12 @@ public class Promise implements Printable
   public void print (Consumer out)
   {
     if (result == null)
-      out.append("#<promise - not forced yet>");
+      out.write("#<promise - not forced yet>");
     else
       {
-	out.append("#<promise - forced to a ");
-	out.append(result.getClass().getName());
-	out.append ('>');
+	out.write("#<promise - forced to a ");
+	out.write(result.getClass().getName());
+	out.write ('>');
       }
   }
 }

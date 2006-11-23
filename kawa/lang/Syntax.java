@@ -84,12 +84,9 @@ abstract public class Syntax implements Printable, Named
 
   public void print (Consumer out)
   {
-    out.append("#<syntax ");
+    out.write("#<syntax ");
     String name = this.getName();
-    if (name == null)
-      out.append("<unnamed>");
-    else
-      out.append(name);
-    out.append('>');
+    out.write(name == null ? "<unnamed>" : name);
+    out.write('>');
   }
 }

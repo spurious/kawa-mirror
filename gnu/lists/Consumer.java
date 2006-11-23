@@ -1,4 +1,4 @@
-// Copyright (c) 2000, 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2000, 2001, 2006  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -47,13 +47,19 @@ public interface Consumer
    * The producer can use this information to skip ahead. */
   public boolean ignoring();
 
-  public void write(char[] buf, int off, int len);
-
-  public Consumer append (char c);
+  public void write(int ch);
+  public void write(String string);
   /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq);
-  public Consumer append (CharSequence csq, int start, int end);
+  public void write(CharSequence string, int start, int length);
   /* #else */
-  // public Consumer append (String str);
+  // public void write(String string, int start, int length);
+  /* #endif */
+  
+  public void write(char[] buf, int start, int length);
+
+  /* #ifdef JAVA5 */
+  // public Consumer append (char c);
+  // public Consumer append (CharSequence csq);
+  // public Consumer append (CharSequence csq, int start, int end);
   /* #endif */
 }

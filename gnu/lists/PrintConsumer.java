@@ -42,57 +42,42 @@ public class PrintConsumer extends PrintWriter
   {
   }
 
-  public
   /* #ifdef JAVA5 */
-  // PrintConsumer
-  /* #else */
-  Consumer
-  /* #endif */
-  append (char c)
-  {
-    print(c);
-    return this;
-  }
-
-  /* #ifdef use:java.lang.CharSequence */
-  public
-  /* #ifdef JAVA5 */
-  // PrintConsumer
-  /* #else */
-  Consumer
-  /* #endif */
-  append (CharSequence csq)
-  {
-    if (csq == null)
-      csq = "null";
-    append(csq, 0, csq.length());
-    return this;
-  }
-
-  public
-  /* #ifdef JAVA5 */
-  // PrintConsumer
-  /* #else */
-  Consumer
-  /* #endif */
-  append (CharSequence csq, int start, int end)
-  {
-    if (csq == null)
-      csq = "null";
-    for (int i = start; i < end;  i++)
-      append(csq.charAt(i));
-    return this;
-  }
-  /* #else */
-  // public Consumer append (String str)
+  // public PrintConsumer append (char c)
   // {
-  //   if (str == null)
-  //     str = "null";
-  //   int len = str.length();
-  //   for (int i = 0; i < len;  i++)
-  //     append(str.charAt(i));
+  //   print(c);
   //   return this;
   // }
+
+  // public PrintConsumer append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   append(csq, 0, csq.length());
+  //   return this;
+  // }
+
+  // public PrintConsumer append (CharSequence csq, int start, int end)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   for (int i = start; i < end;  i++)
+  //     append(csq.charAt(i));
+  //   return this;
+  // }
+  /* #endif */
+
+  /* #ifdef use:java.lang.CharSequence */
+  public void write (CharSequence csq, int start, int end)
+  {
+    if (csq instanceof String)
+      write((String) csq, start, end);
+    else
+      {
+        for (int i = start; i < end;  i++)
+          write(csq.charAt(i));
+      }
+  }
   /* #endif */
 
   public void writeBoolean(boolean v)

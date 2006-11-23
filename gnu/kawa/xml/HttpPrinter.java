@@ -205,7 +205,7 @@ public class HttpPrinter extends FilterConsumer
         /* #endif */
       }
     else
-      base.append(csq, start, end);
+      base.write(csq, start, end);
     return this;
   }
 
@@ -219,8 +219,10 @@ public class HttpPrinter extends FilterConsumer
         sbuf.append(csq.toString());
         /* #endif */
       }
+    else if (csq == null)
+      base.write("null");
     else
-      base.append(csq);
+      base.write(csq, 0, csq.length());
     return this;
   }
   /* #else */

@@ -676,6 +676,6 @@ public class SyntaxPattern extends Pattern implements Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<syntax-pattern>");
+    out.write("#<syntax-pattern>");
   }
 }

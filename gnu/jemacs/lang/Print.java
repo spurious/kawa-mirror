@@ -62,12 +62,12 @@ public class Print extends DisplayFormat
     return sbuf.toString();
   }
 
-  public void append (char v, Consumer out)
+  public void write (int v, Consumer out)
   {
     if (getReadableOutput ())
       write(Print.escapeChar(v), out);
     else
-      out.append(v);
+      out.write(v);
   }
 
 }

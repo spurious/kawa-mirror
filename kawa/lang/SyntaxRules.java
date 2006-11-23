@@ -275,9 +275,9 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<macro ");
+    out.write("#<macro ");
     ReportFormat.print(literal_identifiers[0], out);
-    out.append('>');
+    out.write('>');
   }
 
   /**

@@ -21,7 +21,7 @@ public class MakeResponseHeader extends MethodProc
     ctx.lastArg();
     Consumer out = ctx.consumer;
     out.beginAttribute(key);
-    out.append(val.toString());
+    out.write(val.toString());
     out.endAttribute();
   }
 

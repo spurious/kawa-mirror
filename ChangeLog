@@ -1,3 +1,18 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRules.java: Rename Consumer methods append->write.
+	* kawa/lang/Promise.java: Likewise.
+	* kawa/lang/Lambda.java: Likewise.
+	* kawa/lang/SyntaxPattern.java: Likewise.
+	* kawa/lang/AnyPat.java: Likewise.
+	* kawa/lang/PairPat.java: Likewise.
+	* kawa/lang/Macro.java: Likewise.
+	* kawa/lang/EqualPat.java: Likewise.
+	* kawa/lang/ListPat.java: Likewise.
+	* kawa/lang/ListRepeatPat.java: Likewise.
+	* kawa/lang/Syntax.java: Likewise.
+	* kawa/lang/VarListPat.java: Likewise.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxRules.java (print): Update since parameter is

@@ -32,9 +32,9 @@ public class EqualPat extends Pattern implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<equals: ");
+    out.write("#<equals: ");
     ReportFormat.print(value, out);
-    out.append('>');
+    out.write('>');
   }
 
   /**

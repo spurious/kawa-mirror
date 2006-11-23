@@ -1,3 +1,9 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* Char.java: Rename Consumer methods append->write.
+	* EnglishIntegerFormat.java: Likewise.
+	* ReportFormat.java: Likewise.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* Printable.java: Moved from gnu.mapping.

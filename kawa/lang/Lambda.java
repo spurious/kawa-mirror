@@ -622,6 +622,6 @@ public class Lambda extends Syntax
 
   public void print (Consumer out)
   {
-    out.append("#<builtin lambda>");
+    out.write("#<builtin lambda>");
   }
 }

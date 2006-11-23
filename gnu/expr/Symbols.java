@@ -92,12 +92,12 @@ public class Symbols
 		  || ((ch == '+' || ch == '-') && (i > 0 || len == 1))
 		  || (Character.isDigit (ch) && i > 0)
 		  || (ch == '.' && (i == 0 || name.charAt (i - 1) == '.'))))
-	      out.append('\\');
-	    out.append(ch);
+	      out.write('\\');
+	    out.write(ch);
 	  }
       }
     else
-      out.append(name);
+      out.write(name);
   }
 
 }

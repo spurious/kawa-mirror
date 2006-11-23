@@ -16,7 +16,7 @@ public class AnyPat extends Pattern implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<match any>");
+    out.write("#<match any>");
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars)

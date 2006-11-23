@@ -67,7 +67,7 @@ public class DisplayFormat extends AbstractFormat
     write (language == 'S' ? (v ? "#t" : "#f") : (v ? "t" : "nil"), out);
   }
 
-  public void writeChar(int v, Consumer out)
+  public void write (int v, Consumer out)
   {
     if (! getReadableOutput ())
       Char.print(v, out);
@@ -76,18 +76,13 @@ public class DisplayFormat extends AbstractFormat
 	if (language == 'E'
 	    && v > ' ')
 	  {
-	    out.append('?');
+	    out.write('?');
             Char.print(v, out);
 	  }
 	// else if (language == 'E') ...
 	else
 	  write(Char.toScmReadableString(v), out);
       }
-  }
-
-  public void append (char v, Consumer out)
-  {
-    writeChar(v, out);
   }
 
   public void writeList(LList value, OutPort out)
@@ -105,7 +100,7 @@ public class DisplayFormat extends AbstractFormat
     if (list != LList.Empty)
       {
 	out.writeSpaceFill();
-	out.append(". ");
+	out.write(". ");
 	writeObject(LList.checkNonList(list), (Consumer) out);
       }
     out.endLogicalBlock(")");
@@ -135,9 +130,9 @@ public class DisplayFormat extends AbstractFormat
     if (obj instanceof Boolean)
       writeBoolean(((Boolean)obj).booleanValue(), out);
     else if (obj instanceof Char)
-      writeChar(((Char)obj).intValue(), out);
+      write(((Char) obj).intValue(), out);
     else if (obj instanceof Character)
-      writeChar(((Character)obj).charValue(), out);
+      write(((Character) obj).charValue(), out);
     else if (obj instanceof Symbol)
       {
         Symbol sym = (Symbol) obj;
@@ -156,7 +151,7 @@ public class DisplayFormat extends AbstractFormat
       {
         write("#,(URI ", out);
         Strings.printQuoted(obj.toString(), (PrintWriter) out, 1);
-        out.append(')');
+        out.write(')');
       }
     /* #endif */
     /* #endif */
@@ -367,13 +362,13 @@ public class DisplayFormat extends AbstractFormat
                   }
                 else if (! inVerticalBars)
                   {
-                    out.append('|');
+                    out.write('|');
                     inVerticalBars = true;
                   }
-                out.append(ch);
+                out.write(ch);
               }
             if (inVerticalBars)
-              out.append('|');
+              out.write('|');
           }
         return;
       }

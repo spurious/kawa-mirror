@@ -1,3 +1,16 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	Partially revert changes from 11-17 and 11-18.
+	However, we've renamed writeChar and writeChars to write,
+	* Consumer.java (append*3): Only define in JAVA5 case.
+	(write): New/renamed methods.
+	* FilterConsumer.java: Rename Consumer methods append->write.
+	* PrintConsumer.java: Likewise.
+	* TreeList.java: Likewise.
+	* FString.java: Update accordingly.
+	* AbstractFormat.java: Likewise.
+	* LList.java: Likewise.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* Consumer.java (writeChars): Remove method.

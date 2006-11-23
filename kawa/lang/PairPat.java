@@ -38,11 +38,11 @@ public class PairPat extends Pattern implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<pair-pattern car: ");
+    out.write("#<pair-pattern car: ");
     car.print(out);
-    out.append(" cdr: ");
+    out.write(" cdr: ");
     cdr.print(out);
-    out.append('>');
+    out.write('>');
   }
 
   public int varCount () { return car_count + cdr_count; }

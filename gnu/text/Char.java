@@ -49,11 +49,11 @@ public class Char
   {
     if (i >= 0x10000)
       {
-        out.append((char) (((i - 0x10000) >> 10) + 0xD800));
-        out.append((char) ((i & 0x3FF) + 0xDC00));
+        out.write((char) (((i - 0x10000) >> 10) + 0xD800));
+        out.write((char) ((i & 0x3FF) + 0xDC00));
       }
     else
-      out.append((char) i);
+      out.write((char) i);
   }
 
   public final char charValue ()

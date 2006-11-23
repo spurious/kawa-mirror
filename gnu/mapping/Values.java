@@ -110,20 +110,20 @@ public class Values extends TreeList implements Printable, Externalizable
   {
     if (this == empty)
       {
-	out.append("#!void");
+	out.write("#!void");
 	return;
       }
     Object[] vals = toArray();  // FIXME!
     int size = vals.length;
     boolean readable = true;  // FIXME
     if (readable)
-      out.append("#<values");
+      out.write("#<values");
     for (int i = 0;;)
       {
         int next = nextDataIndex(i);
         if (next < 0)
           break;
-	out.append(' ');
+	out.write(' ');
         if (i >= gapEnd)
           i -= gapEnd - gapStart;
         Object val = getPosNext(i << 1);
@@ -134,7 +134,7 @@ public class Values extends TreeList implements Printable, Externalizable
         i = next;
       }
     if (readable)
-      out.append('>');
+      out.write('>');
   }
 
   /**

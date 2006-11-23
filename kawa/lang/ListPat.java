@@ -74,12 +74,12 @@ public class ListPat extends Pattern
 
   public void print (Consumer out)
   {
-    out.append("#<list-pattern min:");
-    out.append(Integer.toString(min_length));
-    out.append(" max:");
-    out.append(Integer.toString(max_length));
-    out.append(" default:");
+    out.write("#<list-pattern min:");
+    out.write(Integer.toString(min_length));
+    out.write(" max:");
+    out.write(Integer.toString(max_length));
+    out.write(" default:");
     ReportFormat.print(default_value, out);
-    out.append('>');
+    out.write('>');
   }
 }

@@ -105,7 +105,7 @@ public class RunXQTS extends FilterConsumer
   private void writeAttribute (String name, String value)
   {
     writeBeginAttribute(name);
-    xqlog.append(value);
+    xqlog.write(value);
     xqlog.endAttribute();
   }
 
@@ -113,7 +113,7 @@ public class RunXQTS extends FilterConsumer
   {
     xqlog.beginAttribute(Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
                                      name, "q"));
-    xqlog.append(value);
+    xqlog.write(value);
     xqlog.endAttribute();
   }
 
@@ -127,8 +127,8 @@ public class RunXQTS extends FilterConsumer
         xqlog.beginComment();
         xqlog.printIndent = 0;
         xqlog.writeBreakFill();
-        xqlog.append(name); xqlog.append(": ");
-        xqlog.append(value);
+        xqlog.write(name); xqlog.write(": ");
+        xqlog.write(value);
         xqlog.writeBreakFill();
         xqlog.endComment();
       }
@@ -297,7 +297,7 @@ public class RunXQTS extends FilterConsumer
         xqlog.endGroup();
         xqlog.endGroup();
         writeBeginGroup("syntax");
-        xqlog.append("XQuery");
+        xqlog.write("XQuery");
         xqlog.endGroup();
         xqlog.beginGroup(testRunGroupType);
         StringBuffer sbuf = new StringBuffer();

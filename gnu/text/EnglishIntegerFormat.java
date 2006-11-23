@@ -138,9 +138,9 @@ public class EnglishIntegerFormat extends java.text.NumberFormat
     StringBuffer sbuf = new StringBuffer();
     format (value, sbuf, null);
     /* #ifdef use:java.lang.CharSequence */
-    out.append(sbuf);
+    out.write(sbuf, 0, sbuf.length());
     /* #else */
-    // out.append(sbuf.toString());
+    // out.write(sbuf.toString());
     /* #endif */
   }
 

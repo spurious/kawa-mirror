@@ -187,18 +187,6 @@ public class OutPort extends PrintConsumer implements Printable
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
   }
 
-  public
-  /* #ifdef JAVA5 */
-  // OutPort
-  /* #else */
-  Consumer
-  /* #endif */
-  append (char i)
-  {
-    write (i);
-    return this;
-  }
-
   //  java.text.FieldPosition fieldPosition;
 
   /** If non-null, use this to print numbers. */
@@ -255,13 +243,13 @@ public class OutPort extends PrintConsumer implements Printable
 
   public void print (Consumer out)
   {
-    out.append("#<output-port");
+    out.write("#<output-port");
     if (name != null)
       {
-	out.append(' ');
-	out.append(name.toString());
+	out.write(' ');
+	out.write(name.toString());
       }
-    out.append('>');
+    out.write('>');
   }
 
   public void beginGroup(Object type)

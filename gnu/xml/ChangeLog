@@ -1,5 +1,11 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	Partially revert changes from 11-17 and 11-18.
+	* XMLFilter.java: Rename Consumer methods append->write.
+	* XMLPrinter.java: Likewise.
+	Write to bout rather than super - avoids cycle and more efficient.
+	(write(String,int,int)): New method.
+
 	* XMLFilter.java (endGroup): Set previous in all cases.
 
 2006-11-18  Per Bothner  <per@bothner.com>

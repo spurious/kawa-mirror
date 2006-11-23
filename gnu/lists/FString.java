@@ -369,7 +369,7 @@ public class FString extends SimpleVector
     int index = ipos >>> 1;
     if (index >= size)
       return false;
-    out.append(data[index]);
+    out.write(data[index]);
     return true;
   }
 

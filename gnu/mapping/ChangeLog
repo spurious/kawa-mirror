@@ -1,3 +1,10 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* InPort.java: Rename Consumer methods append->write.
+	* Values.java: Likewise.
+	* OutPort.java: Likewise.
+	(append): Remove method.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* Printable.java: Moved to gnu.text.

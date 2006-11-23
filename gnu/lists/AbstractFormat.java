@@ -6,19 +6,16 @@ public abstract class AbstractFormat extends java.text.Format
 {
   protected void write(String str, Consumer out)
   {
-    if (out instanceof OutPort)
-      ((OutPort) out).write(str);
-    else
-      out.append(str);
+    out.write(str);
   }
 
-  public void append (char v, Consumer out)
+  public void write (int v, Consumer out)
   {
-    out.append(v);
+    out.write(v);
   }
 
   /** Write a long.
-   * The default is to call writeLong on teh Consumer. */
+   * The default is to call writeLong on the Consumer. */
   public void writeLong(long v, Consumer out)
   {
     out.writeLong(v);

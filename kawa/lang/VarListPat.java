@@ -38,8 +38,8 @@ public class VarListPat extends Pattern {
 
   public void print (Consumer out)
   {
-    out.append("#<varlist-pattern min:");
-    out.append(Integer.toString(min_length));
-    out.append('>');
+    out.write("#<varlist-pattern min:");
+    out.writeInt(min_length);
+    out.write('>');
   }
 }

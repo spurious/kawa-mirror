@@ -46,8 +46,8 @@ public class Special extends Object implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#!");
-    out.append(name);
+    out.write("#!");
+    out.write(name);
   }
 
   /**

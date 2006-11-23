@@ -24,9 +24,9 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
 
   public void print (Consumer out)
   {
-    out.append("#<list-repeat-pattern ");
+    out.write("#<list-repeat-pattern ");
     element_pattern.print(out);
-    out.append('>');
+    out.write('>');
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars)

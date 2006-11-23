@@ -1,3 +1,7 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java: Partially revert changes from 11-17 and 11-18.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* IsEqv.java (apply, nonNumeric): Symbols can be eqv even if not ==.

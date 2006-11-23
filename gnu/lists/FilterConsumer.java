@@ -24,12 +24,11 @@ public class FilterConsumer
   {
   }
 
-  public Consumer append (char c)
+  public void write (int v)
   {
     beforeContent();
     if (! skipping)
-      base.append(c);
-    return this;
+      base.write(v);
   }
 
   public void writeBoolean(boolean v)
@@ -125,28 +124,46 @@ public class FilterConsumer
       base.write(buf, off, len);
   }
 
-  /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq)
+  public void write (String str)
   {
-    if (csq == null)
-      csq = "null";
-    append(csq, 0, csq.length());
-    return this;
+    write(str, 0, str.length());
   }
 
-  public Consumer append (CharSequence csq, int start, int end)
+  /* #ifdef use:java.lang.CharSequence */
+  public void write (CharSequence str, int start, int length)
+  /* #else */
+  // public void write (String str, int start, int length)
+  /* #endif */
   {
     beforeContent();
     if (! skipping)
-      base.append(csq, start, end);
-    return this;
+      base.write(str, start, length);
   }
-  /* #else */
-  // public Consumer append (String str)
+
+  /* #ifdef JAVA5 */
+  // public Consumer append (char c)
+  // {
+  //   write(c);
+  //   return this;
+  // }
+
+  // public Consumer append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   append(csq, 0, csq.length());
+  //   return this;
+  // }
+
+  // public Consumer append (CharSequence csq, int start, int end)
   // {
   //   beforeContent();
   //   if (! skipping)
-  //     base.append(str);
+  //     {
+  //       if (csq == null)
+  //         csq = "null";
+  //       base.append(csq, start, end);
+  //     }
   //   return this;
   // }
   /* #endif */

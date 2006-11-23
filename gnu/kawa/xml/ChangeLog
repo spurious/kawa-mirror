@@ -1,3 +1,11 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	Partially revert changes from 11-17 and 11-18.
+	* XDataType.java: Rename Consumer methods append->write.
+	* MakeResponseHeader.java: Likewise.
+	* HttpPrinter.java: Likewise.
+	* Nodes.java: Likewise.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (update): Change parameter to take Consumer.

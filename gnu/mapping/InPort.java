@@ -132,13 +132,13 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 
    public void print (Consumer out)
   {
-    out.append("#<input-port");
+    out.write("#<input-port");
     String name = getName();
     if (name != null)
       {
-	out.append(' ');
-	out.append(name);
+	out.write(' ');
+	out.write(name);
       }
-    out.append('>');
+    out.write('>');
   }
 }

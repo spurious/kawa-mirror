@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
+import gnu.text.Char;
 
 /** A compact representation of a tree, that is a nested list structure.
  * The data structure can store anything that can be emitted to a Consumer.
@@ -645,15 +646,22 @@ public class TreeList extends AbstractSequence
 
   public Consumer append (char c)
   {
+    write(c);
+    return this;
+  }
+
+  public void write (int c)
+  {
     ensureSpace(3);
     if (c <= MAX_CHAR_SHORT)
-      data[gapStart++] = c;
-    else
+      data[gapStart++] = (char) c;
+    else if (c < 0x10000)
       {
 	data[gapStart++] = CHAR_FOLLOWS;
-	data[gapStart++] = c;
+	data[gapStart++] = (char) c;
       }
-    return this;
+    else
+      Char.print(c, this);
   }
 
   public void writeBoolean(boolean v)
@@ -735,8 +743,36 @@ public class TreeList extends AbstractSequence
 	  data[gapStart++] = ch;
 	else
 	  {
-	    append(ch);
+	    write(ch);
 	    ensureSpace(len);
+	  }
+      }
+  }
+
+  public void write (String str)
+  {
+    write(str, 0, str.length());
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public void write (CharSequence str, int start, int length)
+  /* #else */
+  // public void write (String str, int start, int length)
+  /* #endif */
+  {
+    if (length == 0)
+      writeJoiner();
+    ensureSpace(length);
+    while (length > 0)
+      {
+	char ch = str.charAt(start++);
+	length--;
+	if (ch <= MAX_CHAR_SHORT)
+	  data[gapStart++] = ch;
+	else
+	  {
+	    write(ch);
+	    ensureSpace(length);
 	  }
       }
   }
@@ -1140,7 +1176,7 @@ public class TreeList extends AbstractSequence
 	    out.writeBoolean(datum != BOOL_FALSE);
 	    continue;
           case JOINER:
-            out.append("");
+            out.write("");
             continue;
 	  case CHAR_FOLLOWS:
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);

@@ -136,7 +136,7 @@ public abstract class ReportFormat extends Format
     else
       // Should we use out.writeObject?
       // We need make consistent rules to avoid infinite recursion.
-      out.append(value == null ? "null" : value.toString());
+      out.write(value == null ? "null" : value.toString());
   }
 
   public Object parseObject(String text, java.text.ParsePosition status)

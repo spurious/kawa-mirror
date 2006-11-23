@@ -214,23 +214,22 @@ class OutBufferWriter extends OutPort
 
   public void write (int c)
   {
-    if (c > 0x10000)
-      Char.print(c, xout);
-    else
-      xout.append((char) c);
+    xout.write(c);
   }
 
-  public void write (String str, int off, int len)
+  /* #ifdef use:java.lang.CharSequence */
+  public void write(CharSequence str, int start, int length)
+  /* #else */
+  // public void write(String str, int start, int length)
+  /* #endif */
   {
-    for (int i = 0;  i < len; i++)
-      xout.append(str.charAt(off+i));
+    xout.write(str, start, length);
   }
 
   public void write (String str)
   {
     int len = str.length();
-    for (int i = 0;  i < len; i++)
-      xout.append(str.charAt(i));
+    xout.write(str, 0, len);
   }
 
   public void beginGroup (Object type)

@@ -2220,6 +2220,9 @@ public class XQParser extends Lexer
   /** Count of enclosed expressions seen in element or attribute content. */
   int enclosedExpressionsSeen;
 
+  static Expression makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
+                                               "makeText");
+
   /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
    *   '\"' if parsing AttributeContent depending on the starting quote
@@ -2233,8 +2236,6 @@ public class XQParser extends Lexer
     int prevEnclosed = startSize - 1;
     boolean skipBoundarySpace = ! boundarySpacePreserve && delimiter == '<';
     boolean skippable = skipBoundarySpace;
-    Expression makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
-                                          "makeText");
     for (;;)
       {
 	int next = read();
@@ -2249,17 +2250,10 @@ public class XQParser extends Lexer
             {
               String text;
               if (tokenBufferLength > 0 && ! skippable)
-                {
-                  text = new String(tokenBuffer, 0, tokenBufferLength);
-                  if (next == delimiter && startSize == result.size())
-                    {
-                      // This is partly an optimization, but it also to
-                      // avoid an error for namespace declaration attributes.
-                      result.addElement(new QuoteExp(text));
-                      break addText;
-                    }
-                }
+                text = new String(tokenBuffer, 0, tokenBufferLength);
               else if (next == '{' && prevEnclosed == result.size())
+                // Handle the <a>{E1}{E2}</a> case - we must insert a
+                // joiner between E1 ad E2 to avoid a space being inserted.
                 text = "";
               else
                 break addText; // Don't need to add anything.
@@ -2569,8 +2563,15 @@ public class XQParser extends Lexer
 	    else if (enclosedExpressionsSeen > enclosedExpressionsStart)
 	      syntaxError("enclosed expression not allowed in namespace declaration");
 	    else
-	      ns = ((QuoteExp) vec.elementAt(vecSize+1)).getValue()
+              {
+                Object x = vec.elementAt(vecSize+1);
+                ApplyExp ax;
+                if (x instanceof ApplyExp
+                    && (ax = (ApplyExp) x).getFunction() == makeText)
+                  x = ax.getArg(0);
+                ns = ((QuoteExp) x).getValue()
 		.toString().intern();
+              }
 	    vec.setSize(vecSize);
             checkAllowedNamespaceDeclaration(definingNamespace, ns);
 	    if (definingNamespace == "")

@@ -1,3 +1,9 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseContent): Don't "optimize" simple text to
+	avoid use of MakeText, since the latter is now optimized.
+	(parseElementConstructor): Now needs to unwrap MakeText.
+
 2006-11-16  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (stringValue): Remove static method.

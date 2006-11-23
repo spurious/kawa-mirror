@@ -732,7 +732,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * Returns a String, where each char, coerced to an int, is the length
    * of a substring of the input that is at most 0xFFFF bytes.
    */
-  public final String calculateSplit (String str)
+  public static final String calculateSplit (String str)
   {
     int strLength = str.length();
     StringBuffer sbuf = new StringBuffer(20);

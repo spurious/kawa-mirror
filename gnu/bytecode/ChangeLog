@@ -1,3 +1,7 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (calculateSplit): Make static.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* Variable.java (dead): Make public.

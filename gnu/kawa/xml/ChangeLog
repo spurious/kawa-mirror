@@ -1,5 +1,11 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* NodeConstructor.java (pushNodeConsumer, pushNodeContext):
+	Change return type to XMLFilter.
+	 (compile): Temporarily set more precise Consumer type.
+	* MakeText.java (compileToNode): Optimize/inline the case that
+	the text is a literal String.
+
 	Partially revert changes from 11-17 and 11-18.
 	* XDataType.java: Rename Consumer methods append->write.
 	* MakeResponseHeader.java: Likewise.

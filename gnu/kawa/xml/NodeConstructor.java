@@ -14,10 +14,10 @@ implements Inlineable
   public abstract void compileToNode (ApplyExp exp, Compilation comp,
 				      ConsumerTarget target);
 
-  public static Consumer pushNodeConsumer (Consumer out)
+  public static XMLFilter pushNodeConsumer (Consumer out)
   {
     if (out instanceof XMLFilter)
-      return out;
+      return (XMLFilter) out;
     else
       return new XMLFilter(new NodeTree());
   }
@@ -30,11 +30,11 @@ implements Inlineable
                         : (Object) current);
   }
 
-  public static XConsumer pushNodeContext (CallContext ctx)
+  public static XMLFilter pushNodeContext (CallContext ctx)
   {
     Consumer out = ctx.consumer;
     if (out instanceof XMLFilter)
-      return (XConsumer) out;
+      return (XMLFilter) out;
     else
       {
 	XMLFilter filter = new XMLFilter(new NodeTree());
@@ -133,7 +133,12 @@ implements Inlineable
 	      }
 	    code.emitStore(cvar);
 	    code.emitTryStart(true, Type.void_type);
+            Type saveType = cvar.getType();
+            // For slightly improved code generation.  We can potentially use
+            // the faster invokevirtual rather than invokeinterface.
+            cvar.setType(ClassType.make("gnu.xml.XMLFilter"));
 	    compileToNode(exp, comp, ctarget);
+            cvar.setType(saveType);
 	    code.emitTryEnd();
 	    code.emitFinallyStart();
 	    code.emitLoad(saved);

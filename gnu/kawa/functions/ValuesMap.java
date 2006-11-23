@@ -105,26 +105,38 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
 	return;
       }
     Expression vals = args[1];
+    compileInlined(lambda, vals, startCounter, null, comp, target);
+  }
+
+  public static void compileInlined(LambdaExp lambda, Expression vals,
+                                    int startCounter, Method matchesMethod,
+                                    Compilation comp, Target target)
+  {
     Declaration param = lambda.firstDecl();
     CodeAttr code = comp.getCode();
     SeriesTarget starget = new SeriesTarget();
     starget.scope = code.pushScope();
     Variable counter;
+    Declaration counterDecl;
     if (startCounter >= 0)
       {
 	counter = starget.scope.addVariable(code, Type.int_type, "position");
 	code.emitPushInt(startCounter);
 	code.emitStore(counter);
+        counterDecl = new Declaration(counter);
       }
     else
-      counter = null;
+      {
+        counter = null;
+        counterDecl = null;
+      }
     starget.function = new Label(code);
     if (target instanceof SeriesTarget)
       starget.done = ((SeriesTarget) target).done;
     else
       starget.done = new Label(code);
     // If the param Declaration is captured, then it gets messy initializing
-    // it.  So just cheat and create a helper varaible.
+    // it.  So just cheat and create a helper variable.
     if (param.isSimple())
       param.allocateVariable(code);
     else
@@ -137,14 +149,25 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     starget.function.define(code);
     code.pushType(retAddrType);
     code.emitStore(retAddr);
+    Expression[] args;
     if (startCounter >= 0)
       {
 	args = new Expression[] { new ReferenceExp(param),
-	new ReferenceExp(new Declaration(counter))};
+                                  new ReferenceExp(counterDecl) };
       }
     else
       args = new Expression[] { new ReferenceExp(param) };
     Expression app = new ApplyExp(lambda, args);
+    if (matchesMethod != null)
+      {
+        // Major kludge - used by ValuesFilter.
+        if (app.getType().getImplementationType() != Type.boolean_type)
+          app = new ApplyExp(matchesMethod,
+                             new Expression[] {
+                               app,
+                               new ReferenceExp(counterDecl) });
+        app = new IfExp(app, new ReferenceExp(param), QuoteExp.voidExp);
+      }
     if (target instanceof SeriesTarget)
       {
         SeriesTarget atarget = (SeriesTarget) target;

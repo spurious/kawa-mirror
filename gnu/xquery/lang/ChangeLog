@@ -1,5 +1,8 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkApplyExp): On position() and last()
+	set can-read flag on corresponding Declaration.
+
 	* XQParser.java (parseContent): Don't "optimize" simple text to
 	avoid use of MakeText, since the latter is now optimized.
 	(parseElementConstructor): Now needs to unwrap MakeText.

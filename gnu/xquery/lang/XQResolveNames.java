@@ -587,6 +587,9 @@ public class XQResolveNames extends ResolveNames
 		decl = lookup.lookup(sym, -1);
 		if (decl == null)
 		  error('e', "undefined context for " + sym.getName());
+                else
+                  // So ValuesFilter.inline can tell whether last() is used.
+                  decl.setCanRead(true);
 		return new ReferenceExp(sym, decl);
 	      case XS_QNAME_BUILTIN:
 		{

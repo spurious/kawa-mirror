@@ -12,7 +12,7 @@ import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.functions.ValuesMap;
 
-public class ValuesFilter extends MethodProc implements CanInline
+public class ValuesFilter extends MethodProc implements CanInline, Inlineable
 {
   /** 'F' if following a ForwardStep; 'R' if following a ReverseStep;
    * 'P' if following a PrimaryExpr. */
@@ -83,13 +83,17 @@ public class ValuesFilter extends MethodProc implements CanInline
     int count = values.size();
     int it = 0;
     IntNum countObj = IntNum.make(count);
+    // The filter procedures takes 3 arguments is last() is needed,
+    // or 2 arguments if inline has determined we don't need last().
+    int pmax = proc.maxArgs();
     for (int i = 0;  i < count;  i++)
       {
 	it = values.nextPos(it);
 	Object dot = values.getPosPrevious(it);
 	int pos = kind == 'R' ? (count - i) : (i + 1);
 	IntNum posObj = IntNum.make(pos);
-	Object pred_res = proc.apply3(dot, posObj, countObj);
+	Object pred_res = pmax == 2 ? proc.apply2(dot, posObj)
+          : proc.apply3(dot, posObj, countObj);
 	if (matches(pred_res, pos))
 	  out.writeObject(dot);
       }
@@ -106,71 +110,130 @@ public class ValuesFilter extends MethodProc implements CanInline
 	|| lexp2.max_args != 3)
       return exp;
 
-    if (kind == 'P') // FIXME
-      return exp;
+    exp.setType(args[0].getType());
 
     Compilation parser = walker.getCompilation();
 
+    Declaration dotArg = lexp2.firstDecl();
+    Declaration posArg = dotArg.nextDecl();
+    Declaration lastArg = posArg.nextDecl();
+
+    lexp2.setInlineOnly(true);
+    lexp2.returnContinuation = exp;
+
+    // Splice out lastArg
+    lexp2.remove(posArg, lastArg);
+    lexp2.min_args = 2;
+    lexp2.max_args = 2;
+
+    if (! lastArg.getCanRead() && kind != 'R')
+      {
+        // Don't need to do anything more - lastArg is not needed.
+        return exp;
+      }
+
     parser.letStart();
-    ClassType typeSortedNodes = SortNodes.typeSortedNodes;
-    Declaration sequence
-      = parser.letVariable("sequence", typeSortedNodes,
-			   new ApplyExp(SortNodes.sortNodes,
-					new Expression [] {args[0]}));
+    Expression seq = args[0];
+    Type seqType;
+    Method sizeMethod;
+    if (kind == 'P')
+      {
+        seqType = seq.getType();
+        sizeMethod = Compilation.typeValues.getDeclaredMethod("countValues", 1);
+      }
+    else
+      {
+        seqType = SortNodes.typeSortedNodes;
+        seq = new ApplyExp(SortNodes.sortNodes, new Expression [] {seq});
+        sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
+      }
+    Declaration sequence = parser.letVariable("sequence", seqType, seq);
     parser.letEnter();
-    parser.letStart();
-    Method sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
-    Declaration lastDecl
-      = parser.letVariable("last", Type.int_type,
-			   new ApplyExp(sizeMethod,
-					new Expression[] {
-					  new ReferenceExp(sequence)}));
-    parser.letEnter();
 
-    LambdaExp mapLambda = new LambdaExp(2);
-    Declaration dotDecl = mapLambda.addDeclaration("dot");
-    Declaration atDecl = mapLambda.addDeclaration("position", Type.int_type);
-
-    Declaration posDecl = atDecl;
-
+    Expression pred = lexp2.body;
     if (kind == 'R')
       {
-	parser.letStart();
+        Declaration posIncoming = new Declaration(null, Type.int_type);
 	Expression init
 	  = new ApplyExp(AddOp.$Mn,
 			 new Expression[] {
-			   new ReferenceExp(lastDecl),
-			   new ReferenceExp(posDecl)});
+			   new ReferenceExp(lastArg),
+			   new ReferenceExp(posIncoming)});
 	init
 	  = new ApplyExp(AddOp.$Pl,
 			 new Expression[] {
 			   init,
 			   new QuoteExp(IntNum.one())});
-	posDecl = parser.letVariable("pos", Type.int_type, init);
-	parser.letEnter();
+        LetExp let = new LetExp(new Expression[] { init });
+        lexp2.replaceFollowing(dotArg, posIncoming);
+        let.add(posArg);
+        let.body = pred;
+        pred = let;
       }
 
-    Expression applyPredicate = new ApplyExp(lexp2,
-					     new Expression[] { 
-					       new ReferenceExp(dotDecl),
-					       new ReferenceExp(posDecl),
-					       new ReferenceExp(lastDecl)});
-    Expression body = new IfExp(new ApplyExp(matchesMethod,
-					    new Expression[] {
-					      applyPredicate,
-					      new ReferenceExp(posDecl) }),
-				new ReferenceExp(dotDecl),
-				QuoteExp.voidExp);
-    if (kind == 'R')
-      body = parser.letDone(body);
-    mapLambda.body = body;
+    Type predType = lexp2.body.getType();
+    if (predType != XDataType.booleanType) // Overly conservative, but simple.
+      pred = new ApplyExp(matchesMethod,
+                          new Expression[] { pred,
+                                             new ReferenceExp(posArg) });
+    pred = new IfExp(pred,
+                     new ReferenceExp(dotArg),
+                     QuoteExp.voidExp);
+    lexp2.body = pred;
 
     ApplyExp doMap
       = new ApplyExp(ValuesMap.valuesMapWithPos,
-		     new Expression[] { mapLambda,
+		     new Expression[] { lexp2,
 					new ReferenceExp(sequence) });
-    body = ValuesMap.valuesMapWithPos.inline(doMap, walker);
-    return parser.letDone(parser.letDone(body));
+    doMap.setType(dotArg.getType());
+    lexp2.returnContinuation = doMap;
+
+    Expression lastInit = new ApplyExp(sizeMethod,
+                                       new Expression[] {
+                                         new ReferenceExp(sequence)});
+
+    LetExp let2 = new LetExp(new Expression[] { lastInit });
+    let2.add(lastArg);
+    let2.body = ValuesMap.valuesMapWithPos.inline(doMap, walker);
+
+
+    return parser.letDone(let2);
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    Expression exp1 = args[0];
+    Expression exp2 = args[1];
+    if (target instanceof IgnoreTarget)
+      {
+        exp1.compile(comp, target);
+        exp2.compile(comp, target);
+        return;
+      }
+    if (! (exp2 instanceof LambdaExp))
+      {
+        ApplyExp.compile(exp, comp, target);
+        return;
+      }
+
+    if (! (target instanceof ConsumerTarget))
+      {
+	ConsumerTarget.compileUsingConsumer(exp, comp, target);
+	return;
+      }
+    // Should also handle SeriesTarget - later? FIXME
+
+    // At this point, we don't depend on last().
+    LambdaExp lexp2 = (LambdaExp) exp2;
+    ValuesMap.compileInlined(lexp2, exp1, 1, matchesMethod, comp, target);
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    // Needlessly conservative, but it shouldn't matter, since this
+    // shouldn't be called if the ApplyExp.setType has been done.
+    return Type.pointer_type;
   }
 
   public static final ValuesFilter forwardFilter = new ValuesFilter('F');

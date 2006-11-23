@@ -1,5 +1,7 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* Values.java (countValues): New static method.
+
 	* InPort.java: Rename Consumer methods append->write.
 	* Values.java: Likewise.
 	* OutPort.java: Likewise.

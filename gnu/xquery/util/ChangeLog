@@ -1,3 +1,12 @@
+2006-11-22  Per Bothner  <per@bothner.com>
+
+	* ValuesFilter.java: Also implement Inlineable.
+	(apply): Filter procedure can take 2 or 3 arguments.
+	(inline): If last() is not needed, just splice it out and return.
+	Otherwise rewrite to LetExp as before - but leave some work for compile.
+	(compile): New method.  Defer hard work to ValuesMap.compileInlined.
+	(getReturnType): New method.
+
 2006-11-20  Per Bothner  <per@bothner.com>
 
 	* Compare.java (inline): Partially inline in the value-comparson case.

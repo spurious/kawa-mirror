@@ -1,5 +1,7 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* ValuesMap.java (compileInlined): New method, used by ValuesFilter.
+
 	* DisplayFormat.java: Partially revert changes from 11-17 and 11-18.
 
 2006-11-20  Per Bothner  <per@bothner.com>

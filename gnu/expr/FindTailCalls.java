@@ -1,4 +1,5 @@
 package gnu.expr;
+import gnu.bytecode.Type;
 
 /** Does setTailCall on ApplyExp's that are tail-calls.
     Also setCanRead, setCanCall, setCanWrite on Declarations
@@ -323,7 +324,15 @@ public class FindTailCalls extends ExpWalker
   {
     Declaration decl = Declaration.followAliases(exp.binding);
     if (decl != null)
-      decl.setCanRead(true);
+      {
+        // Replace references to a void variable (including one whose value
+        // is the empty sequence in XQuery) by an empty constant.  This is
+        // not so much an optimization as avoiding the complications and
+        // paradoxes of variables and expression that are void.
+        if (decl.type == Type.void_type)
+          return QuoteExp.voidExp;
+        decl.setCanRead(true);
+      }
     Declaration ctx = exp.contextDecl();
     if (ctx != null)
       ctx.setCanRead(true);

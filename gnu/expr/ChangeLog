@@ -1,5 +1,8 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
+	* FindTailCalls.java (walkReferenceExp): If the variable has void
+	type replace it by the void constant.
+
 	* Keyword.java: Rename Consumer methods append->write.
 	* Special.java: Likewise.
 	* Symbols.java: Likewise.

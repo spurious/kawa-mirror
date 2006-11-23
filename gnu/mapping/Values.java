@@ -215,4 +215,9 @@ public class Values extends TreeList implements Printable, Externalizable
     else
       out.writeObject(value);
   }
+
+  public static int countValues (Object value)
+  {
+    return value instanceof Values ? ((Values) value).size() : 1;
+  }
 }

@@ -823,6 +823,26 @@ public class RunXQTS extends FilterConsumer
           {
             i2++;
           }
+        // If isXML, then "/>" matches "></ANYNAME>".
+        else if (isXML && c1 == '/' && c2 == '>'
+                 && i1 + 1 < len1 && i2 + 2 < len2
+                 && arg1.charAt(i1+1) == '>'
+                 && arg2.charAt(i2+1) == '<'
+                 && arg2.charAt(i2+2) == '/')
+          {
+            for (i2 = i2 + 3; ; i2++)
+              {
+                if (i2 >= len2)
+                  return false;
+                char c = arg2.charAt(i2);
+                if (c == '>')
+                  break;
+                if (! XName.isNamePart(c))
+                  return false;
+              }
+            i1 = i1 + 2;
+            i2 = i2 + 1;
+          }
         else
           return false;
       }

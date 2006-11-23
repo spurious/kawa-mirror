@@ -1,6 +1,8 @@
 2006-11-22  Per Bothner  <per@bothner.com>
 
-	* RunXQTS.java (matches); Ignore spaces only if isXML.
+	* RunXQTS.java (matches): If isXML, match "/>" and "></ANYNAME>".
+
+	* RunXQTS.java (matches): Ignore spaces only if isXML.
 
 	* RunXQTS.java (externalVariablesSet): New field.
 	(endGroup): Use it to remove extenal variables bindings for this query.

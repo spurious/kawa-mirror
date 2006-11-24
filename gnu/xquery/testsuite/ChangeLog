@@ -1,3 +1,9 @@
+2006-11-24  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (<init>): Update expected failures.
+
+	* RunXQTS.java (matches): Match character entities in expected result.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (matches): If isXML, match "/>" and "></ANYNAME>".

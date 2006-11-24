@@ -205,10 +205,11 @@ public class RunXQTS extends FilterConsumer
                    "mystery - testsuite error?");
     expectFailures("K-FunctionProlog-11|K-FunctionProlog-41",
                    "item() is treated as equivalent to item()*");
-    expectFailures("ForExprType030|LocalNameFromQNameFunc005|CastAs671|"
-                   +"CastAs672",
+    expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
+                   +"CastAs671|CastAs672",
                    "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
-    expectFailures("surrogates03|surrogates06|surrogates07|surrogates08|surrogates10", "surrogates not properly implemented");
+    expectFailures("surrogates12|surrogates13|surrogates15",
+                   "surrogates not handled by java.util.regex");
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
                    +"ST-Axes006|ST-Axes007|ST-Axes008|ST-Axes009|ST-Axes010|"
@@ -263,6 +264,8 @@ public class RunXQTS extends FilterConsumer
                    "test-case excessively strict about disallowed characetrs");
     expectFailures("caselessmatch04",
                    "regex/unicode special case");
+    expectFailures("string-queries-results-q4",
+                   "function conversion incorrect for user-defined functions");
     expectFailures("caselessmatch10|caselessmatch11",
                    // Need to translate [xxx-[yyy]] to [xxx&&[^yyy]].
                    "regex range subtraction not implemented");
@@ -842,6 +845,33 @@ public class RunXQTS extends FilterConsumer
               }
             i1 = i1 + 2;
             i2 = i2 + 1;
+          }
+        else if (c2 == '&' && i2 + 2 < len2
+                 && arg2.charAt(i2+1) == '#')
+          {
+            if (c1 >= 0xD800 && c1 < 0xDC00 && i1 + 1 < len1)
+              c1 = (c1 - 0xD800) * 0x400
+                  + (arg1.charAt(++i1) - 0xDC00) + 0x10000;
+            i2 = i2 + 2;
+            int base = 10;
+            if (arg2.charAt(i2) == 'x')
+              {
+                i2++;
+                base = 16;
+              }
+            int semi = arg2.indexOf(';', i2);
+            try
+              {
+                c2 = Integer.parseInt(arg2.substring(i2, semi), base);
+              }
+            catch (Throwable ex)
+              {
+                return false;
+              }
+            i1 = i1 + 1;
+            i2 = semi+1;
+            if (c1 != c2)
+              return false;
           }
         else
           return false;

@@ -1,3 +1,10 @@
+2006-11-24  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (write(int)): Fix typo in surrogates support.
+	* XName.java (isNameStart, isNamePart): Change parameter to int
+	so we can handle non-base-plane characters.
+	(isName): Handle surrogates.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	Partially revert changes from 11-17 and 11-18.

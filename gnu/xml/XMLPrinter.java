@@ -201,7 +201,7 @@ public class XMLPrinter extends OutPort
                   { // low surrogate
                     //if (highSurrogate < 0xDC00 || highSurrogate > 0xE000)
                     // error();
-                    i = (savedHighSurrogate - 0xDC00) * 0x400
+                    i = (savedHighSurrogate - 0xD800) * 0x400
                       + (i - 0xDC00) + 0x10000;
                     savedHighSurrogate = 0;
                   }

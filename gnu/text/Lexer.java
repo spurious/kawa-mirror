@@ -275,7 +275,9 @@ public class Lexer extends Reader
   {
     if (ch > 0x10000)
       {
-	// append surrogates - fixme.
+        tokenBufferAppend(((ch - 0x10000) >> 10) + 0xD800);
+        ch = (ch & 0x3FF) + 0xDC00;
+        // fall through to append low surrogate.
       }
     int len = tokenBufferLength;
     char[] buffer = tokenBuffer;

@@ -51,14 +51,23 @@ public class XName extends Symbol implements Externalizable
     namespaceNodes = (NamespaceBinding) in.readObject();
   }
 
-  public static boolean isNameStart(char ch)
+  public static boolean isNameStart(int ch)
   {
-    return Character.isLetter(ch) || ch == '_';
+    /* #ifdef JAVA5 */
+    // return Character.isLetter(ch) || ch == '_';
+    /* #else */
+    return ch >= 0x10000 || Character.isLetter((char) ch) || ch == '_';
+    /* #endif */
   }
 
-  public static boolean isNamePart(char ch)
+  public static boolean isNamePart(int ch)
   {
-    return Character.isUnicodeIdentifierPart(ch) || ch == '-' || ch == '.';
+    /* #ifdef JAVA5 */
+    // return Character.isUnicodeIdentifierPart(ch) || ch == '-' || ch == '.';
+    /* #else */
+    return ch >= 0x10000 || Character.isUnicodeIdentifierPart((char) ch)
+      || ch == '-' || ch == '.';
+    /* #endif */
   }
 
   public static boolean isName (String value)
@@ -69,12 +78,15 @@ public class XName extends Symbol implements Externalizable
   public static boolean isName (String value, boolean prohibitColon)
   {
     int len = value.length();
-    if (len == 0 || ! XName.isNameStart(value.charAt(0)))
+    if (len == 0)
       return false;
-    for (int i = len;  --i > 0; )
+    for (int i = 0;  i < len;  )
       {
-        char ch = value.charAt(i);
-        if (! XName.isNamePart(ch) && (ch != ':' || prohibitColon))
+        boolean first = i == 0;
+        int ch = value.charAt(i++);
+        if (ch >= 0xD800 && ch < 0xDC00 && i < len)
+          ch = (ch - 0xD800) * 0x400 + (value.charAt(i++) - 0xDC00) + 0x10000;
+        if (! (first ? XName.isNameStart(ch) : XName.isNamePart(ch)))
           return false;
       }
     return true;

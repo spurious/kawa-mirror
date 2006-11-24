@@ -48,6 +48,7 @@ java_sources = \
   NodeConstructor.java \
   NodeName.java \
   Nodes.java \
+  NodeSetType.java \
   NodeType.java \
   Notation.java \
   OutputAsXML.java \

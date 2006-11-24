@@ -57,7 +57,18 @@ public class StringUtils
     int i = (int) (d1 - 0.5);
     if (i < 0)
       i = 0;
-    return coerceToString(str, "substring", 1, "").substring(i);
+    String s = coerceToString(str, "substring", 1, "");
+    int len = s.length();
+    int offset = 0;
+    while (--i >= 0)
+      {
+        if (offset >= len)
+          return "";
+        char ch = s.charAt(offset++);
+        if (ch >= 0xD800 && ch < 0xDC00 && offset < len)
+          offset++;
+      }
+    return s.substring(offset);
   }
 
   public static Object substring (Object str, Object start, Object length)
@@ -72,15 +83,45 @@ public class StringUtils
       d1 = 0;
     if (d2 > len)
       d2 = len;
-    if (d2 > d1)
-      return s.substring((int) d1, (int) d2);
-    else // Including the case where either is NaN.
+    if (d2 <= d1)  // Including the case where either is NaN.
       return "";
+    int i1 = (int) d1;
+    int i2 = (int) d2 - i1;
+    int offset = 0;
+    while (--i1 >= 0)
+      {
+        if (offset >= len)
+          return "";
+        char ch = s.charAt(offset++);
+        if (ch >= 0xD800 && ch < 0xDC00 && offset < len)
+          offset++;
+      }
+    i1 = offset;
+    while (--i2 >= 0)
+      {
+        if (offset >= len)
+          return "";
+        char ch = s.charAt(offset++);
+        if (ch >= 0xD800 && ch < 0xDC00 && offset < len)
+          offset++;
+      }
+    i2 = offset;
+    return s.substring(i1, i2);
   }
 
   public static Object stringLength (Object str)
   {
-    return IntNum.make(coerceToString(str, "string-length", 1, "").length());
+    String s = coerceToString(str, "string-length", 1, "");
+    int slen = s.length();
+    int len = 0;
+    for (int i = 0;  i < slen; )
+      {
+        char ch = s.charAt(i++);
+        if (ch >= 0xD800 && ch < 0xDC00 && i < slen)
+          i++;
+        len++;
+      }
+    return IntNum.make(len);
   }
 
   public static Object substringBefore (Object str, Object find)
@@ -128,17 +169,44 @@ public class StringUtils
     StringBuffer s = new StringBuffer(slen);
     int tlen = t.length();
 
-    for (int i=0;i < slen;i++)
+  mainLoop:
+    for (int i=0; i < slen;)
       {
-        char c = sv.charAt(i);
-        int j = m.indexOf(c);
-        if (j >= 0)
+        char c1 = sv.charAt(i++);
+        char c2 = 0;
+        if (c1 >= 0xD800 && c1 < 0xDC00 && i < slen)
+          c2 = sv.charAt(i++);
+        int j = 0;
+        for (int mi = 0; mi < mlen; )
           {
-            if (j>=tlen)
-              continue;
-            c = t.charAt(j);
-	  }
-        s.append(c);
+            char m1 = m.charAt(mi++);
+            char m2 = 0;
+            if (m1 >= 0xD800 && m1 < 0xDC00 && mi < mlen)
+              m2 = m.charAt(mi++);
+            if (m1 == c1 && m2 == c2)
+              {
+                for (int ti = 0; ; j--)
+                  {
+                    if (ti >= tlen)
+                      continue mainLoop;
+                    char t1 = t.charAt(ti++);
+                    char t2 = 0;
+                    if (t1 >= 0xD800 && t1 < 0xDC00 && ti < tlen)
+                      t2 = t.charAt(ti++);
+                    if (j == 0)
+                      {
+                        c1 = t1;
+                        c2 = t2;
+                        break;
+                      }
+                  }
+                break;
+              }
+            j++;
+          }
+        s.append(c1);
+        if (c2 != 0)
+          s.append(c2);
       }
 
     return s.toString();
@@ -240,11 +308,12 @@ public class StringUtils
     String str = coerceToString(arg, "string-to-codepoints", 1, "");
     int len = str.length();
     Consumer out = ctx.consumer;
-    for (int i = 0;  i < len;  i++)
+    for (int i = 0;  i < len;  )
       {
-        char ch = str.charAt(i);
-        // Should handle surrogates - but then we should do so generally. FIXME.
-        out.writeInt((int) ch);
+        int ch = str.charAt(i++);
+        if (ch >= 0xD800 && ch < 0xDC00 && i < len)
+          ch = (ch - 0xD800) * 0x400 + (str.charAt(i++) - 0xDC00) + 0x10000;
+        out.writeInt(ch);
       }
   }
 
@@ -256,7 +325,11 @@ public class StringUtils
         || (i > 0xD7FF
             && (i < 0xE000 || (i > 0xFFFD && i < 0x10000) || i > 0x10FFFF)))
       throw new IllegalArgumentException("codepoints-to-string: "+i+" is not a valid XML character [FOCH0001]");
-    // FIXME - handle surrugates
+    if (i >= 0x10000)
+      {
+        sbuf.append((char) (((i - 0x10000) >> 10) + 0xD800));
+        i = (i & 0x3FF) + 0xDC00;
+      }
     sbuf.append((char) i);
   }
 

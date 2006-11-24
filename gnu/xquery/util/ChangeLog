@@ -1,3 +1,10 @@
+2006-11-24  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (stringLength): Have to loop checking for surrogates.
+	(substring, substring): Likewise must check for surrogates.
+	(translate): Handle surrogates in all 3 arguments.
+	(stringToCodepoints$X, appendCodepoint): Handle surrogates.
+
 2006-11-23  Per Bothner  <per@bothner.com>
 
 	* RelativeStep.java: Implement inlineable.

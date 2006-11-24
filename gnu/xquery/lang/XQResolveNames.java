@@ -115,8 +115,17 @@ public class XQResolveNames extends ResolveNames
   /** Code number for internal function to handle extensions. */
   public static final int HANDLE_EXTENSION_BUILTIN = -32;
 
+  public static final int CAST_AS_BUILTIN = -33;
+  public static final int CASTABLE_AS_BUILTIN = -34;
+
   public static final Declaration handleExtensionDecl
     = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
+
+  public static final Declaration castAsDecl
+    = makeBuiltin("(cast as)", CAST_AS_BUILTIN);
+
+  public static final Declaration castableAsDecl
+    = makeBuiltin("(castable as)", CASTABLE_AS_BUILTIN);
 
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
@@ -591,6 +600,37 @@ public class XQResolveNames extends ResolveNames
                   // So ValuesFilter.inline can tell whether last() is used.
                   decl.setCanRead(true);
 		return new ReferenceExp(sym, decl);
+              case CAST_AS_BUILTIN:
+                {
+		  Expression[] args = exp.getArgs();
+                  if (args[0].valueIfConstant() == Compilation.typeSymbol)
+                    return walkApplyExp(XQParser.castQName(args[1]));
+                  func
+                    = XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
+                  return new ApplyExp(func, args);
+                }
+              case CASTABLE_AS_BUILTIN:
+                {
+		  Expression[] args = exp.getArgs();
+                  if (args[1].valueIfConstant() == Compilation.typeSymbol
+                      && args[0] instanceof QuoteExp)
+                    {
+                      Object value = ((QuoteExp) args[0]).getValue();  
+                      try
+                        {
+                          QNameUtils.resolveQName(value,
+                                                  parser.constructorNamespaces,
+                                                  parser.prologNamespaces);
+                          return XQuery.trueExp;
+                        }
+                      catch (RuntimeException ex)
+                        {	
+                          return XQuery.falseExp;
+                        }
+                    }
+                  func = XQParser.makeFunctionExp("gnu.xquery.lang.XQParser",                                       "castableAs");
+                  return new ApplyExp(func, args);
+                }
 	      case XS_QNAME_BUILTIN:
 		{
 		  Expression[] args = exp.getArgs();

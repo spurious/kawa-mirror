@@ -1433,22 +1433,22 @@ public class XQParser extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression etype = parseItemType();
+    int min, max;
     if (etype == null)
       {
-        if (curToken == OP_EMPTY_SEQUENCE)
+        if (curToken != OP_EMPTY_SEQUENCE)
+          return syntaxError("bad syntax - expected DataType");
+        parseSimpleKindType();
+        if (curToken == '?' || curToken == OP_ADD || curToken == OP_MUL)
           {
-            parseSimpleKindType();
-            if (curToken == '?' || curToken == OP_ADD || curToken == OP_MUL)
-              {
-                getRawToken();
-                return syntaxError("occurrence-indicator meaningless after empty-sequence()");
-              }
-            return QuoteExp.getInstance(OccurrenceType.emptySequenceType);
+            getRawToken();
+            return syntaxError("occurrence-indicator meaningless after empty-sequence()");
           }
-        return syntaxError("bad syntax - expected DataType");
+        etype = QuoteExp.getInstance(OccurrenceType.emptySequenceType);
+        min = 0;
+        max = 0;
       }
-    int min, max;
-    if (curToken == '?')
+    else if (curToken == '?')
       {
 	min = 0;
 	max = 1;
@@ -1673,8 +1673,7 @@ public class XQParser extends Lexer
               case OP_CASTABLE_AS:
                 args[0] = exp;
                 args[1] = type;
-                func = makeFunctionExp("gnu.xquery.lang.XQParser",
-                                       "castableAs");
+                func = new ReferenceExp(XQResolveNames.castableAsDecl);
                 break;
               case OP_TREAT_AS:
                 args[0] = type;
@@ -1685,7 +1684,7 @@ public class XQParser extends Lexer
               default: // i.e. case OP_CAST_AS:
                 args[0] = type;
                 args[1] = exp;
-                func = makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
+                func = new ReferenceExp(XQResolveNames.castAsDecl);
                 break;
               }
             exp = new ApplyExp(func, args);
@@ -2492,7 +2491,7 @@ public class XQParser extends Lexer
 
   /** Generate code to cast argument to a QName
    * (which is implemented using <code>Symbol</code>). */
-  Expression castQName (Expression value)
+  static ApplyExp castQName (Expression value)
   {
     return new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
 			new Expression[] { value });
@@ -2778,7 +2777,9 @@ public class XQParser extends Lexer
     else
       {
 	lexp.body = QuoteExp.voidExp;
-	error('w', "no 'default' clause in 'typeswitch'");
+	 error(comp.isPedantic() ? 'e' : 'w',
+               "no 'default' clause in 'typeswitch'",
+               "XPST0003");
       }
     vec.addElement(lexp);
     popNesting(save);

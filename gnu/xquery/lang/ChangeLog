@@ -1,3 +1,19 @@
+2006-11-24  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseDataType): Re-organize so we get error message
+	if we see empty-sequence for 'cast as'/'castable as'.
+
+	* XQResolveNames.java (CAST_AS_BUILTIN,
+	CASTABLE_AS_BUILTIN): New constants.
+	(castAsDecl, castableAsDecl): New static fields.
+	(walkApplyExp): Support new builtins.  Specifically, inline literals
+	in the QName case as required.
+	* XQParser.java (parseBinaryExpr): Use new decls for OP_CASTABLE_AS
+	and OP_CAST_AS.
+	(castQName): Make static and chaneg return type - for walkApplyExp.
+
+	* XQParser.java (parseTypeSwitch): Error if pedantic and no default.
+
 2006-11-23  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseRelativePathExpr): Set dot's type.

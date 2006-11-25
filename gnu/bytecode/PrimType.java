@@ -189,14 +189,25 @@ public class PrimType extends Type {
     String otherName = other.getName();
     if (otherName == null)
        return -1;
-    // This is very incomplete!  FIXME.
     switch (sig1)
       {
       case 'V':
         return 1;
+      case 'Z':
+      case 'C':
+        break;
       case 'D':
         if (otherName.equals("java.lang.Double")
-            || otherName.equals("gnu.math.DFloat"))
+            || otherName.equals("gnu.math.DFloNum"))
+          return 0; // Or maybe 1?
+        if (otherName.equals("java.lang.Float"))
+          return 1;
+        break;
+      case 'F':
+        if (otherName.equals("java.lang.Double")
+            || otherName.equals("gnu.math.DFloNum"))
+          return -1;
+        if (otherName.equals("java.lang.Float"))
           return 0; // Or maybe 1?
         break;
       case 'I':
@@ -204,7 +215,12 @@ public class PrimType extends Type {
           return 0; // Or maybe 1?
         if (otherName.equals("gnu.math.IntNum"))
           return -1;
-        break;
+        /* fall through */
+      default:
+        if (otherName.equals("java.lang.Double")
+            || otherName.equals("java.lang.Float")
+            || otherName.equals("gnu.math.DFloNum"))
+          return -1;
       }
     if (otherName.equals("java.lang.Object")
 	|| other == tostring_type)

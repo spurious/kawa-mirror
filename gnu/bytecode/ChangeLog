@@ -1,3 +1,7 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare): Add some more special cases.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (calculateSplit): Make static.

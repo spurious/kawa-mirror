@@ -1,5 +1,8 @@
 2006-11-25  Per Bothner  <per@bothner.com>
 
+	* GenericProc.java (matchN): Make a pre-pass to prefer those methods
+	that are applicable.
+
 	* PrimProcedure.java (matchN): Trivial re-arranging - move tr/catch
 	inwards so it is only "executed" when we need to do a coercion.
 

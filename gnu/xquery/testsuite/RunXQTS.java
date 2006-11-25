@@ -208,7 +208,7 @@ public class RunXQTS extends FilterConsumer
     expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
                    +"CastAs671|CastAs672",
                    "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
-    expectFailures("surrogates12|surrogates13|surrogates15",
+    expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
                    "surrogates not handled by java.util.regex");
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
@@ -226,8 +226,17 @@ public class RunXQTS extends FilterConsumer
                    +"fn-idref-dtd-17|fn-idref-dtd-18|fn-idref-dtd-19|"
                    +"fn-idref-dtd-20|fn-idref-dtd-21|fn-idref-dtd-23|",
                    "fn:idref doesn't do much yet");
-    expectFailures("fn-normalize-unicode1args-*|fn-normalize-unicode2args-*|"
-                   +"fn-normalize-unicode-*|K-NormalizeUnicodeFunc-*",
+    expectFailures("fn-normalize-unicode1args-1|fn-normalize-unicode1args-2|"
+                   +"fn-normalize-unicode1args-3|fn-normalize-unicode1args-4|"
+                   +"fn-normalize-unicode1args-5|fn-normalize-unicode1args-6|"
+                   +"fn-normalize-unicode2args-1|fn-normalize-unicode2args-2|"
+                   +"fn-normalize-unicode2args-3|fn-normalize-unicode-1|"
+                   +"fn-normalize-unicode-3|fn-normalize-unicode-4|"
+                   +"fn-normalize-unicode-5|fn-normalize-unicode-6|"
+                   +"fn-normalize-unicode-7|K-NormalizeUnicodeFunc-4|"
+                   +"K-NormalizeUnicodeFunc-5|K-NormalizeUnicodeFunc-6|"
+                   +"K-NormalizeUnicodeFunc-7|K-NormalizeUnicodeFunc-8|"
+                   +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
                    // See http://unicode.org/reports/tr15/Normalizer.java
                    "fn:normalize-unicode not unimplemented yet");
     expectFailures("fn-collection-1|fn-collection-2|fn-collection-3|"

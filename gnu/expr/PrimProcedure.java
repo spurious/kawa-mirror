@@ -175,21 +175,23 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       extraArg = null;
     for (int i = extraCount;  i < args.length; i++)
       {
-        try
+        Object arg = args[i];
+        Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
+        if (type != Type.pointer_type)
           {
-            Object arg = args[i];
-            Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
-            if (type != Type.pointer_type)
-              arg = type.coerceFromObject(arg);
-            if (i < fixArgs)
-              rargs[i-extraCount] = arg;
-            else if (restArray != null) // I.e. using array rather than LList.
-              restArray[i - fixArgs] = arg;
+            try
+              {
+                arg = type.coerceFromObject(arg);
+              }
+            catch (ClassCastException ex)
+              {
+                return NO_MATCH_BAD_TYPE|(i+1);
+              }
           }
-        catch (ClassCastException ex)
-          {
-            return NO_MATCH_BAD_TYPE|(i+1);
-          }
+        if (i < fixArgs)
+          rargs[i-extraCount] = arg;
+        else if (restArray != null) // I.e. using array rather than LList.
+          restArray[i - fixArgs] = arg;
       }
     ctx.value1 = extraArg;
     ctx.values = rargs;

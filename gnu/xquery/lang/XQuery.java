@@ -613,6 +613,8 @@ public class XQuery extends Language
     define_method("ends-with","gnu.xquery.util.StringUtils", "endsWith");
     define_method("codepoint-equal", "gnu.xquery.util.StringUtils",
                   "codepointEqual");
+    define_method("normalize-unicode", "gnu.xquery.util.StringUtils",
+                  "normalizeUnicode");
     define_method("string-join", "gnu.xquery.util.StringUtils", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringUtils", "concat$V");
     define_method("matches", "gnu.xquery.util.StringUtils", "matches");

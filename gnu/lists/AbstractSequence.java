@@ -67,7 +67,12 @@ public abstract class AbstractSequence
 
   protected RuntimeException unsupported (String text)
   {
-    text = getClass().getName() + " does not implement " + text;
+    return unsupportedException(getClass().getName()
+                                + " does not implement " + text);
+  }
+
+  public static RuntimeException unsupportedException (String text)
+  {
     /* #ifdef JAVA2 */
     return new UnsupportedOperationException(text);
     /* #endif */

@@ -1,3 +1,7 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* XQuery.java: Add declaration of fn:normalize-unicode.
+
 2006-11-24  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseDataType): Re-organize so we get error message

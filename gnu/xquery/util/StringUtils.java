@@ -595,4 +595,18 @@ public class StringUtils
       return Values.empty;
     return str1.equals(str2) ? Boolean.TRUE : Boolean.FALSE;
   }
+
+  public static Object normalizeUnicode (Object arg)
+  {
+    return normalizeUnicode(arg, "NFC");
+  }
+
+  public static Object normalizeUnicode (Object arg, String form)
+  {
+    String str = coerceToString(arg, "normalize-unicode", 1, null);
+    form = form.trim().toUpperCase();
+    if ("".equals(form))
+      return str;
+    throw AbstractSequence.unsupportedException("normalize-unicode form "+form);
+  }
 }

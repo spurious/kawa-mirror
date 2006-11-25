@@ -1,3 +1,7 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (normalizeUnicode): New placeholder/dummy methods.
+
 2006-11-24  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (stringLength): Have to loop checking for surrogates.

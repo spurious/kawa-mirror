@@ -1,3 +1,7 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java: Remove needless import.
+
 2006-11-24  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (tokenBufferAppend): Implement surrogates support.

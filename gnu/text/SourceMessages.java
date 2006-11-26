@@ -3,8 +3,6 @@
 
 package gnu.text;
 
-import gnu.expr.Compilation;
-
 /** A collection of (zero or more) SourceErrors.
  * Has a "current line number" which clients can use as the default line
  * number, or clients can explicitly provide a line number.

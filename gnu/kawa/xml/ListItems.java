@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 /* #endif */
 
-/* A function that maps a List into the sequence of ite elements. */
+/** A function that maps a List into the sequence of its elements. */
 
 public class ListItems extends MethodProc
 {

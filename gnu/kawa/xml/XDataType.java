@@ -9,6 +9,7 @@ import gnu.text.Printable;
 import gnu.math.*;
 import java.math.BigDecimal;
 import gnu.lists.Consumer;
+import gnu.xml.TextUtils;
 
 /** An atomic type as used in XML Schema and related languages.
  * For example the {code xs:decimal} type is {@code XDataType.decimalType}.
@@ -285,9 +286,9 @@ public class XDataType extends Type implements TypeValue
     switch (typeCode)
       {
       case STRING_TYPE_CODE:
-        return StringValue.asString(value);
+        return TextUtils.asString(value);
       case UNTYPED_ATOMIC_TYPE_CODE:
-        return new UntypedAtomic(StringValue.stringValue(value));
+        return new UntypedAtomic(TextUtils.stringValue(value));
       case ANY_URI_TYPE_CODE:
         return toURI(value);
       case BOOLEAN_TYPE_CODE:
@@ -442,7 +443,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return new UntypedAtomic(value);
       case ANY_URI_TYPE_CODE:
-        return toURI(replaceWhitespace(value, true));
+        return toURI(TextUtils.replaceWhitespace(value, true));
       case BOOLEAN_TYPE_CODE:
         value = value.trim();
         if (value.equals("true") || value.equals("1"))
@@ -481,64 +482,6 @@ public class XDataType extends Type implements TypeValue
       default:
         throw new RuntimeException("valueOf not implemented for "+name);
       }
-  }
-
-  public static String replaceWhitespace (String str, boolean collapse)
-  {
-    /* #ifdef JAVA5 */
-    // StringBuilder sbuf = null;
-    /* #else */
-    StringBuffer sbuf = null;
-    /* #endif */
-    int len = str.length();
-    // 1: previous was single space.
-    // 2: previous was multiple spaces or other whitespace.
-    int prevSpace = collapse ? 1 : 0;
-    for (int i = 0;  i < len;  )
-      {
-        char ch = str.charAt(i++);
-        int isSpace = ch == ' ' ? 1
-        : ch == '\t' || ch == '\r' || ch == '\n' ? 2 : 0;
-        if (sbuf == null
-            && (isSpace == 2
-                || (isSpace == 1 && prevSpace > 0 && collapse)
-                || (isSpace == 1 && i == len && collapse)))
-          {
-            /* #ifdef JAVA5 */
-            // sbuf = new StringBuilder();
-            /* #else */
-            sbuf = new StringBuffer();
-            /* #endif */
-            int k = prevSpace > 0 ? i - 2 : i - 1;
-            for (int j = 0;  j < k;  j++)
-              sbuf.append(str.charAt(j));
-            ch = ' ';
-           }
-        if (collapse)
-          {
-            if (prevSpace > 0 && isSpace == 0)
-              {
-                if (sbuf != null && sbuf.length() > 0)
-                  sbuf.append(' ');
-                prevSpace = 0;
-              }
-            else if (isSpace == 2 || (isSpace == 1 && prevSpace > 0))
-              prevSpace = 2;
-            else if (isSpace > 0)
-              prevSpace = 1;
-            else
-              prevSpace = 0;
-            if (prevSpace > 0)
-              continue;
-          }
-        if (sbuf != null)
-          sbuf.append(ch);
-      }
-    if (sbuf != null)
-      return sbuf.toString();
-    else
-      return str;
-
   }
 
   public static Float makeFloat (float value)

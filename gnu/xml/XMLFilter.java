@@ -7,10 +7,7 @@ import gnu.text.Char;
 import gnu.text.SourceLocator;
 import gnu.text.SourceMessages;
 import gnu.mapping.Symbol;
-import gnu.kawa.xml.MakeText;  // FIXME - bad cross-package dependency.
-import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
-import gnu.kawa.xml.XDataType; // FIXME - bad cross-package dependency.
 
 /** Fixup XML input events.
  * Handles namespace resolution, and adds "namespace nodes" if needed.
@@ -267,8 +264,8 @@ public class XMLFilter implements XConsumer, PositionConsumer
                     StringBuffer sbuf = new StringBuffer();
                     tlist.stringValue(valStart, valEnd, sbuf);
                     tlist.gapStart = valStart;
-                    tlist.write(XDataType
-                                 .replaceWhitespace(sbuf.toString(), true));
+                    tlist.write(TextUtils
+                                .replaceWhitespace(sbuf.toString(), true));
                     break;
                   }
               }
@@ -693,7 +690,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
           {
             if (previous == SAW_WORD)
               write(' ');
-            MakeText.text$C(v, this);  // Atomize.
+            TextUtils.textValue(v, this);  // Atomize.
             previous = SAW_WORD;
           }
       }

@@ -1,4 +1,5 @@
 package gnu.xquery.util;
+import gnu.xml.*;
 import gnu.kawa.xml.*;
 import gnu.math.*;
 import gnu.mapping.WrongType;
@@ -14,7 +15,7 @@ public class TimeUtils
     if (XTimeType.dateTimeType.isInstance(value))
       return (DateTime) value;
     if (value instanceof KNode || value instanceof UntypedAtomic)
-      return XTimeType.parseDateTime(StringValue.stringValue(value),
+      return XTimeType.parseDateTime(TextUtils.stringValue(value),
                                      DateTime.DATE_MASK|DateTime.TIME_MASK);
     throw new WrongType(fun, 1, value, "xs:dateTime");
   }
@@ -24,7 +25,7 @@ public class TimeUtils
     if (XTimeType.dateType.isInstance(value))
       return (DateTime) value;
     if (value instanceof KNode || value instanceof UntypedAtomic)
-      return XTimeType.parseDateTime(StringValue.stringValue(value),
+      return XTimeType.parseDateTime(TextUtils.stringValue(value),
                                      DateTime.DATE_MASK);
     throw new WrongType(fun, 1, value, "xs:date");
   }
@@ -34,7 +35,7 @@ public class TimeUtils
     if (XTimeType.timeType.isInstance(value))
       return (DateTime) value;
     if (value instanceof KNode || value instanceof UntypedAtomic)
-      return XTimeType.parseDateTime(StringValue.stringValue(value),
+      return XTimeType.parseDateTime(TextUtils.stringValue(value),
                                      DateTime.TIME_MASK);
     throw new WrongType(fun, 1, value, "xs:time");
   }

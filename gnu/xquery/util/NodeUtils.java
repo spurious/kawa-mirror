@@ -126,7 +126,7 @@ public class NodeUtils
     if (testlang == null || testlang == Values.empty)
       teststr = "";
     else
-      teststr = StringValue.stringValue(testlang);
+      teststr = TextUtils.stringValue(testlang);
     String lang = getLang((KNode) node);
     if (lang == null)
       return false;

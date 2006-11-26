@@ -59,7 +59,6 @@ java_sources = \
   SelfAxis.java \
   SortNodes.java \
   SortedNodes.java \
-  StringValue.java \
   TreeScanner.java \
   UnionNodes.java \
   UntypedAtomic.java \

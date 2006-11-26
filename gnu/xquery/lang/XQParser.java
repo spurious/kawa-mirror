@@ -12,10 +12,7 @@ import java.util.Vector;
 import java.util.Stack;
 import java.io.File;
 import gnu.kawa.xml.*;
-import gnu.xml.NamespaceBinding;
-import gnu.xml.NodeTree;
-import gnu.xml.XMLFilter;
-import gnu.xml.XName;
+import gnu.xml.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.reflect.SingletonType;
@@ -1593,7 +1590,7 @@ public class XQParser extends Lexer
     if (curToken != STRING_TOKEN)
       return declError("expected a URILiteral");
     String str = new String(tokenBuffer, 0, tokenBufferLength);
-    str = XDataType.replaceWhitespace(str, true);
+    str = TextUtils.replaceWhitespace(str, true);
     // FUTURE: An implementation MAY raise a static error if the value
     // of a URILiteral is of nonzero length and is not in the lexical
     // space of xs:anyURI, or if it is a string that represents a

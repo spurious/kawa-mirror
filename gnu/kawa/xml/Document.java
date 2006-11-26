@@ -84,7 +84,7 @@ public class Document
       return uri;
     if (! (uri instanceof URL))
       {
-        String name = StringValue.stringValue(uri);
+        String name = TextUtils.stringValue(uri);
         if (! InPort.uriSchemeSpecified(name))
           {
             if (base == null)

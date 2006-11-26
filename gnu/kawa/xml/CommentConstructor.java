@@ -4,6 +4,7 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.xml.TextUtils;
 
 public class CommentConstructor extends MethodProc // NodeConstructor
 {
@@ -34,7 +35,7 @@ public class CommentConstructor extends MethodProc // NodeConstructor
                     if (! first)
                       sbuf.append(' ');
                     first = false;
-                    StringValue.stringValue(vals.getPosPrevious(it), sbuf);
+                    TextUtils.stringValue(vals.getPosPrevious(it), sbuf);
                   }
               }
             else
@@ -42,7 +43,7 @@ public class CommentConstructor extends MethodProc // NodeConstructor
                 if (! first)
                   sbuf.append(' ');
                 first = false;
-                StringValue.stringValue(arg, sbuf);
+                TextUtils.stringValue(arg, sbuf);
               }
 	  }
 	int len = sbuf.length();

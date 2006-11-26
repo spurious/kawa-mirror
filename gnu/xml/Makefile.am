@@ -12,6 +12,7 @@ java_sources = \
   NamedChildrenFilter.java \
   NamespaceBinding.java \
   NodeTree.java \
+  TextUtils.java \
   XMLFilter.java \
   XMLPrinter.java \
   XName.java

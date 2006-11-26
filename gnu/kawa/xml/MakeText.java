@@ -19,35 +19,8 @@ public class MakeText extends NodeConstructor
     if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
       return arg;
     NodeTree node = new NodeTree();
-    text$C(arg, new XMLFilter(node));
+    TextUtils.textValue(arg, new XMLFilter(node));
     return KText.make(node);
-  }
-
-  public static void text$C (Object arg, Consumer out)
-  {
-    if (arg == null || (arg instanceof Values && ((Values) arg).isEmpty()))
-      return;
-    String str;
-    if (arg instanceof String)
-      str = (String) arg;
-    else
-      {
-        StringBuffer sbuf = new StringBuffer();
-        if (arg instanceof Values)
-          {
-            Object[] vals = ((Values) arg).getValues();
-            for (int i = 0;  i < vals.length; i++)
-              {
-                if (i > 0)
-                  sbuf.append(' ');
-                StringValue.stringValue(vals[i], sbuf);
-              }
-          }
-        else
-          StringValue.stringValue(arg, sbuf);
-        str = sbuf.toString();
-      }
-    out.write(str);
   }
 
   public static void text$X (Object arg, CallContext ctx)
@@ -58,7 +31,7 @@ public class MakeText extends NodeConstructor
     Consumer out = NodeConstructor.pushNodeContext(ctx);
     try
       {
-        text$C(arg, out);
+        TextUtils.textValue(arg, out);
       }
     finally
       {
@@ -111,7 +84,7 @@ public class MakeText extends NodeConstructor
       }
     texp.compile(comp, Target.pushObject);
     code.emitLoad(cvar);
-    code.emitInvokeStatic(ClassType.make("gnu.kawa.xml.MakeText")
-                          .getDeclaredMethod("text$C", 2));
+    code.emitInvokeStatic(ClassType.make("gnu.xml.TextUtils")
+                          .getDeclaredMethod("textValue", 2));
   }
 }

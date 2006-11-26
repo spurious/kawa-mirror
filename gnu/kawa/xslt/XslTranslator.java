@@ -163,7 +163,7 @@ public class XslTranslator extends Lexer implements Consumer
 	if (select != null)
 	  {
 	    Expression exp = interpreter.parseXPath(select, getMessages());
-	    exp = new ApplyExp(ClassType.make("gnu.kawa.xml.StringValue")
+	    exp = new ApplyExp(ClassType.make("gnu.xml.TextUtils")
                                .getDeclaredMethod("stringValue", 1),
                                new Expression[] { exp });
 	    comp.exprStack.pop();

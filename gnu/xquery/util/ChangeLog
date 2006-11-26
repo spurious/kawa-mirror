@@ -1,5 +1,13 @@
 2006-11-25  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java: Update StringValue -> TextUtils.
+	* ArithOp.java: Likewise.
+	* NumberValue.java: Likewise.
+	* StringUtils.java: Likewise.
+	* MinMax.java: Likewise.
+	* TimeUtils.java: Likewise.
+	* QNameUtils.java: Update XDataType -> TextUtils.
+
 	* StringUtils.java (normalizeUnicode): New placeholder/dummy methods.
 
 2006-11-24  Per Bothner  <per@bothner.com>

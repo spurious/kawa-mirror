@@ -1,3 +1,16 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* StringValue.java: Class moved to gnu.xml.TextUtils.
+	* Makefile.am: Update acordingly.
+	* XDataType.java (replaceWhitespace): Move static method to TextUtils.
+	* MakeText.java (text$C): Move to TextUtils and rename to textValue.
+	* XDataType.java: Update accordingly.
+	* Document.java: Likewise.
+	* CommentConstructor.java: Likewise.
+	* MakeCDATA.java: Likewise.
+	* MakeText.java: Likewise.
+	* MakeProcInst.java: Likewise.
+
 2006-11-24  Per Bothner  <per@bothner.com>
 
 	* NodeSetType.java: New class, extends OccurrenceType.

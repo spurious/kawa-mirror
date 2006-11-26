@@ -4,6 +4,7 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.xml.TextUtils;
 
 public class MakeCDATA extends MethodProc // NodeConstructor
 {
@@ -23,7 +24,7 @@ public class MakeCDATA extends MethodProc // NodeConstructor
 	    Object arg = ctx.getNextArg(endMarker);
 	    if (arg == endMarker)
 	      break;
-	    StringValue.stringValue(arg, sbuf);
+	    TextUtils.stringValue(arg, sbuf);
 	  }
 	int n = sbuf.length();
 	char[] chars = new char[n];

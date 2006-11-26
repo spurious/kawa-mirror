@@ -779,7 +779,7 @@ public class XQResolveNames extends ResolveNames
                 }
 
               case STRING_BUILTIN:
-                return withContext(ClassType.make("gnu.kawa.xml.StringValue")
+                return withContext(ClassType.make("gnu.xml.TextUtils")
                                    .getDeclaredMethod("asString", 1),
                                    exp.getArgs(), "fn:string", 0);
 

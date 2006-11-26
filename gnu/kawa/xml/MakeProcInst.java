@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.xml.TextUtils;
 
 public class MakeProcInst extends NodeConstructor
 {
@@ -30,11 +31,11 @@ public class MakeProcInst extends NodeConstructor
           {
             if (i > 0)
               sbuf.append(' ');
-            StringValue.stringValue(vals[i], sbuf);
+            TextUtils.stringValue(vals[i], sbuf);
           }
       }
     else
-      StringValue.stringValue(content, sbuf);
+      TextUtils.stringValue(content, sbuf);
     int length = sbuf.length();
     int start = 0;
     while (start < length && Character.isWhitespace(sbuf.charAt(start)))

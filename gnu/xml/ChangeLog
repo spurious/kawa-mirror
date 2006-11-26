@@ -1,3 +1,11 @@
+2006-11-25  Per Bothner  <per@bothner.com>
+
+	* TextUtils.java: New file, moved from gnu.kawa.xml.StringValue.
+	(textValue): Moved from MakeText and renamed from text$C.
+	(replaceWhitespace): Moved from XDataType.
+	* Makefile.am: Update accordingly.
+	* XMLFiliter.java: Update.  Now need 3 fewer imports.
+
 2006-11-24  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (write(int)): Fix typo in surrogates support.

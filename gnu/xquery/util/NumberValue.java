@@ -7,6 +7,7 @@ import gnu.mapping.*;
 import java.math.BigDecimal;
 import gnu.kawa.functions.Arithmetic;
 import gnu.kawa.xml.*;
+import gnu.xml.TextUtils;
 
 public class NumberValue extends Procedure1
 {
@@ -55,7 +56,7 @@ public class NumberValue extends Procedure1
           }
       }
     if (value instanceof KNode || value instanceof UntypedAtomic)
-      return (Double) XDataType.doubleType.valueOf(StringValue.stringValue(value));
+      return (Double) XDataType.doubleType.valueOf(TextUtils.stringValue(value));
     return (Number) value;
   }
 
@@ -68,7 +69,7 @@ public class NumberValue extends Procedure1
         try
           {
             return XDataType.doubleType
-              .valueOf(StringValue.stringValue(value));
+              .valueOf(TextUtils.stringValue(value));
           }
         catch (Throwable ex)
           {

@@ -2,6 +2,7 @@ package gnu.xquery.util;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.xml.TextUtils;
 import gnu.kawa.xml.*;
 import gnu.kawa.functions.*;
 import java.math.*;
@@ -35,7 +36,7 @@ public class ArithOp extends Procedure1or2
     if (arg1 == Values.empty || arg1 == null)
       return arg1;
     if (arg1 instanceof KNode || arg1 instanceof UntypedAtomic)
-      arg1 = XDataType.doubleType.valueOf(StringValue.stringValue(arg1));
+      arg1 = XDataType.doubleType.valueOf(TextUtils.stringValue(arg1));
     switch (op)
       {
       case 'P':
@@ -65,9 +66,9 @@ public class ArithOp extends Procedure1or2
     if (arg2 == Values.empty || arg2 == null)
       return arg2;
     if (arg1 instanceof KNode || arg1 instanceof UntypedAtomic)
-      arg1 = XDataType.doubleType.valueOf(StringValue.stringValue(arg1));
+      arg1 = XDataType.doubleType.valueOf(TextUtils.stringValue(arg1));
     if (arg2 instanceof KNode || arg2 instanceof UntypedAtomic)
-      arg2 = XDataType.doubleType.valueOf(StringValue.stringValue(arg2));
+      arg2 = XDataType.doubleType.valueOf(TextUtils.stringValue(arg2));
     switch (op)
       {
       case '+':

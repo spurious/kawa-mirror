@@ -3,8 +3,8 @@
 
 package gnu.xquery.util;
 import gnu.mapping.*;
-import gnu.kawa.xml.KNode;
 import gnu.lists.*;
+import gnu.xml.TextUtils;
 import gnu.kawa.xml.*;
 import gnu.kawa.functions.*;
 
@@ -88,7 +88,7 @@ public class MinMax
     arg =  KNode.atomicValue(arg);
     if (arg instanceof UntypedAtomic)
       arg = (Double)
-        XDataType.doubleType.valueOf(StringValue.stringValue(arg));
+        XDataType.doubleType.valueOf(TextUtils.stringValue(arg));
     return arg;
   }
 }

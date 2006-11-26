@@ -5,7 +5,7 @@ package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.math.*;
 import gnu.mapping.*;
-import gnu.kawa.xml.StringValue;
+import gnu.xml.TextUtils;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 import java.util.regex.Pattern;
@@ -268,7 +268,7 @@ public class StringUtils
 
 	if (started && glen > 0)
           s.append(glue);
-        s.append(StringValue.stringValue(obj));
+        s.append(TextUtils.stringValue(obj));
 	started=true;
       }
 
@@ -277,8 +277,8 @@ public class StringUtils
 
   public static String concat$V (Object arg1, Object arg2, Object[] args)
   {
-    String str1 = StringValue.stringValue(arg1);
-    String str2 = StringValue.stringValue(arg2);
+    String str1 = TextUtils.stringValue(arg1);
+    String str2 = TextUtils.stringValue(arg2);
     /* #ifdef JAVA5 */
     // StringBuilder result = new StringBuilder(str1);
     /* #else */
@@ -287,7 +287,7 @@ public class StringUtils
     result.append(str2);
     int count = args.length;
     for (int i = 0; i < count; i++)
-      result.append(StringValue.stringValue(args[i]));
+      result.append(TextUtils.stringValue(args[i]));
     return result.toString();
   }
 

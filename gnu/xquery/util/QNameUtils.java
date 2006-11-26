@@ -14,7 +14,7 @@ public class QNameUtils
     if (qname instanceof Values
         || ! (qname instanceof String || qname instanceof UntypedAtomic))
       throw new RuntimeException("bad argument to QName");
-    String name = XDataType.replaceWhitespace(qname.toString(), true);
+    String name = TextUtils.replaceWhitespace(qname.toString(), true);
     int colon = name.indexOf(':');
     String prefix, localPart, uri;
     if (colon < 0)
@@ -60,7 +60,7 @@ public class QNameUtils
     if (qname instanceof Values
         || ! (qname instanceof String || qname instanceof UntypedAtomic))
       throw new RuntimeException("bad argument to QName");
-    String name = XDataType.replaceWhitespace(qname.toString(), true);
+    String name = TextUtils.replaceWhitespace(qname.toString(), true);
     int colon = name.indexOf(':');
     String prefix, localPart;
     if (colon < 0)

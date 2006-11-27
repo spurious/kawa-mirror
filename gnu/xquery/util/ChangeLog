@@ -1,3 +1,7 @@
+2006-11-26  Per Bothner  <per@bothner.com>
+
+	* NodeUtils.java (collection): New skeletal methods.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java: Update StringValue -> TextUtils.

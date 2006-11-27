@@ -1,4 +1,4 @@
-// Copyright (c) 2005  Per M.A. Bothner.
+// Copyright (c) 2005, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -279,5 +279,16 @@ public class NodeUtils
     KDocument root
       = (KDocument) Nodes.root((NodeTree) node.sequence, node.getPos());
     return Values.empty;
+  }
+
+  public static Object collection ()
+  {
+    return collection(Values.empty);
+  }
+
+  public static Object collection (Object arg)
+  {
+    String str = StringUtils.coerceToString(arg, "collection", 1, null);
+    throw AbstractSequence.unsupportedException("collection");
   }
 }

@@ -702,6 +702,7 @@ public class XQuery extends Language
     define_method("exactly-one", "gnu.xquery.util.SequenceUtils", "exactlyOne");
 
     defProcStFld("distinct-nodes", "gnu.kawa.xml.SortNodes", "sortNodes");
+    define_method("collection", "gnu.xquery.util.NodeUtils", "collection");
 
     // FIXME - should be imported?
     defProcStFld("children", "gnu.kawa.xml.Children", "children");

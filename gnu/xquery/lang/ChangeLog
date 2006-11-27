@@ -1,3 +1,7 @@
+2006-11-26  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (initXQuery): Declare fn:collection.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Update XDataType -> TextUtils.

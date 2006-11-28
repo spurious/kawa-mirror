@@ -202,7 +202,7 @@ public class GenericProc extends MethodProc
     Type[] atypes = new Type[alen];
     Language language = Language.getDefaultLanguage();
     // As a rough approximation of finding the "best match", and also
-    // an approximation of what we do when selecting a method at comile-time,
+    // an approximation of what we do when selecting a method at compile-time,
     // let's make a pre-pass to check which methods are applicable.
     for (int j = 0;  j < alen;  j++)
       {

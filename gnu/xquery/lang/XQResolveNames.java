@@ -244,16 +244,11 @@ public class XQResolveNames extends ResolveNames
         decl.setName(name);
       }
 
-    Declaration old = lookup.lookup(name, function);
+    Declaration old = lookup.lookup(name, XQuery.instance.getNamespaceOf(decl));
     if (old != null)
       {
-        if (decl.context == old.context
-            // FIXME we don't handle duplicate functions correctly.
-            && ! decl.isProcedureDecl() && ! old.isProcedureDecl())
-          {
-            comp.error('e', decl, "duplicate declaration of '", "'");
-            comp.error('e', old, "(this is the previous declaration of '", "')");
-          }
+        if (decl.context == old.context)
+          ScopeExp.duplicateDeclarationError(old, decl, comp);
         else if (XQParser.warnHidePreviousDeclaration
                  && (! (name instanceof Symbol)
                      || ((Symbol) name).getNamespace() != null))
@@ -284,11 +279,18 @@ public class XQResolveNames extends ResolveNames
 
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
+    return walkReferenceExp(exp, null);
+  }
+
+  protected Expression walkReferenceExp (ReferenceExp exp, ApplyExp call)
+  {
     if (exp.getBinding() == null)
       {
 	Object symbol = exp.getSymbol();
         boolean function = exp.isProcedureName();
-	Declaration decl = lookup.lookup(symbol, function);
+        int namespace = call == null ? XQuery.VALUE_NAMESPACE
+          : XQuery.namespaceForFunctions(call.getArgCount());
+	Declaration decl = lookup.lookup(symbol, namespace);
         Symbol sym;
         if (decl != null)
           ;
@@ -341,7 +343,7 @@ public class XQResolveNames extends ResolveNames
                 sym = parser.namespaceResolve(name, function);
                 if (sym != null)
                   {
-                    decl = lookup.lookup(sym, function);
+                    decl = lookup.lookup(sym, namespace);
                     if (decl == null && function)
                       {
                         String uri = sym.getNamespaceURI();
@@ -539,7 +541,7 @@ public class XQResolveNames extends ResolveNames
       {
         Expression[] xargs = new Expression[minArgs+1];
         System.arraycopy(args, 0, xargs, 0, minArgs);
-        Declaration dot = lookup.lookup(XQParser.DOT_VARNAME, -1);
+        Declaration dot = lookup.lookup(XQParser.DOT_VARNAME, false);
         if (dot == null)
           {
             String message = "undefined context for " + name;
@@ -576,7 +578,12 @@ public class XQResolveNames extends ResolveNames
         mk.setNamespaceNodes(nschain);
         parser.constructorNamespaces = nschain;
       }
-    super.walkApplyExp(exp);
+    if (func instanceof ReferenceExp)
+      func = walkReferenceExp((ReferenceExp) func, exp);
+    else
+      func = walk(func);
+    exp.setFunction(func);
+    walkExps(exp.getArgs());
     parser.constructorNamespaces = namespaceSave;
     func = exp.getFunction();
     if (func instanceof ReferenceExp)
@@ -593,7 +600,7 @@ public class XQResolveNames extends ResolveNames
 	      case LAST_BUILTIN:
 		Symbol sym = code == LAST_BUILTIN ? XQParser.LAST_VARNAME
 		  : XQParser.POSITION_VARNAME;
-		decl = lookup.lookup(sym, -1);
+		decl = lookup.lookup(sym, false);
 		if (decl == null)
 		  error('e', "undefined context for " + sym.getName());
                 else

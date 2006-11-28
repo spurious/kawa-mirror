@@ -262,6 +262,7 @@ public class require extends Syntax
     Expression[] args = { new QuoteExp(tname) };
     Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
     Field instanceField = null;
+    Language language = tr.getLanguage();
     dofind.setLine(tr);
     int formsStart = forms.size();
 
@@ -333,10 +334,10 @@ public class require extends Syntax
           = fdecl.field != null && fdecl.field.getName().endsWith("$instance");
 
         Declaration adecl;
-        Declaration existing = defs.lookup(aname);
+        Declaration old = defs.lookup(aname, language, language.getNamespaceOf(fdecl));
         if (isImportedInstance)
           {
-            if (existing != null)
+            if (old != null)
               continue;
             adecl = defs.addDeclaration(aname);
             adecl.setFlag(Declaration.IS_CONSTANT
@@ -344,14 +345,25 @@ public class require extends Syntax
             adecl.setType(fdecl.getType());
             adecl.setFlag(Declaration.TYPE_SPECIFIED);
           }
+        else if (old != null
+                 && ! old.getFlag(Declaration.NOT_DEFINING)
+                 && (Declaration.followAliases(old)
+                     == Declaration.followAliases(fdecl)))
+          continue;
         else
           {
-            if (existing != null
-                && ! existing.getFlag(Declaration.NOT_DEFINING)
-                && (Declaration.followAliases(existing)
-                    == Declaration.followAliases(fdecl)))
-              continue;
-            adecl = defs.getDefine(aname, 'e', tr);
+            if (old != null
+                && (old.getFlag(Declaration.NOT_DEFINING | Declaration.IS_UNKNOWN)))
+              {
+                old.setFlag(false, Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
+                adecl = old;
+              }
+            else
+              {
+                adecl = defs.addDeclaration(aname);
+                if (old != null)
+                  ScopeExp.duplicateDeclarationError(old, adecl, tr);
+              }
             adecl.setAlias(true);
             adecl.setIndirectBinding(true);
           }

@@ -146,11 +146,14 @@ public abstract class ScopeExp extends Expression
    */
   public Declaration lookup (Object sym)
   {
-    for (Declaration decl = firstDecl();
-         decl != null;  decl = decl.nextDecl())
+    if (sym != null)
       {
-	if (decl.symbol == sym)
-	  return decl;
+        for (Declaration decl = firstDecl();
+             decl != null;  decl = decl.nextDecl())
+          {
+            if (sym.equals(decl.symbol))
+              return decl;
+          }
       }
     return null;
   }
@@ -160,8 +163,8 @@ public abstract class ScopeExp extends Expression
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.symbol == sym
-	    && (language.getNamespaceOf(decl) & namespace) != 0)
+	if (sym.equals(decl.symbol)
+	    && language.hasNamespace(decl, namespace))
 	  return decl;
       }
     return null;
@@ -190,11 +193,19 @@ public abstract class ScopeExp extends Expression
       decl.flags &= ~ (Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
     else
       {
-        parser.error(severity, "duplicate definition of '"+name+"' here");
-        parser.error(severity, decl, "previous definition of '", "' here");
-	decl = addDeclaration(name);
+	Declaration newDecl = addDeclaration(name);
+        duplicateDeclarationError(decl, newDecl, parser);
+        decl = newDecl;
       }
     return decl;
+  }
+
+  public static void duplicateDeclarationError (Declaration oldDecl,
+                                                Declaration newDecl,
+                                                Compilation comp)
+  {
+    comp.error('e', newDecl, "duplicate declaration of '", "'");
+    comp.error('e', oldDecl, "(this is the previous declaration of '", "')");
   }
 
   /**

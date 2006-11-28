@@ -1764,7 +1764,7 @@ public class XQParser extends Lexer
     Expression step1;
     if (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
-	Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+	Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
         Expression dot;
 	if (dotDecl == null)
 	  dot = syntaxError("context item is undefined", "XPDY0002");
@@ -1880,7 +1880,7 @@ public class XQParser extends Lexer
     else
       return null;
 
-    Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+    Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
     Expression dot;
     if (dotDecl == null)
       dot = syntaxError("node test when context item is undefined", "XPDY0002");
@@ -2023,7 +2023,7 @@ public class XQParser extends Lexer
       {
 	axis = curToken == '.' ? AXIS_SELF : AXIS_PARENT;
 	getRawToken();
-	Declaration dotDecl = comp.lookup(DOT_VARNAME, -1);
+	Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
         Expression exp;
 	if (dotDecl == null)
 	  exp = syntaxError("context item is undefined", "XPDY0002");
@@ -3505,6 +3505,7 @@ public class XQParser extends Lexer
     Declaration decl = comp.currentScope().addDeclaration(sym);
     if (comp.isStatic())
       decl.setFlag(Declaration.STATIC_SPECIFIED);
+    lexp.setFlag(LambdaExp.OVERLOADABLE_FIELD);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
     decl.setFile(getName());

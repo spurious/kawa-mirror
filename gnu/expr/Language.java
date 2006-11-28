@@ -723,11 +723,23 @@ public abstract class Language
   public static final int NAMESPACE_PREFIX_NAMESPACE = 1<<2;
 
   /** Return the namespace (e.g value or function) of a Declaration.
-   * Return a bitmask of all the namespces "covered" by the Declaration.
+   * Return a bitmask of all the namespaces "covered" by the Declaration.
+   * Note this isn't a namespace in the XML sense; if a Declaration has
+   * a specific namespace URI, then that is part of its symbol.
+   * This namespace bitmap is a separate dimension, for the use of
+   * languages that have separate namespaces for different kinds of
+   * declarations, such as variables and functions.
    */
   public int getNamespaceOf(Declaration decl)
   {
     return VALUE_NAMESPACE;
+  }
+
+  /** True if a Declaration is in the specified namespace.
+   * @param namespace normally a bitmask as returned by getNamespaceOf. */
+  public boolean hasNamespace (Declaration decl, int namespace)
+  {
+    return (getNamespaceOf(decl) & namespace) != 0;
   }
 
   public void emitPushBoolean(boolean value, CodeAttr code)

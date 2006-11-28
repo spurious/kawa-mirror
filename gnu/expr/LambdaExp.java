@@ -127,7 +127,8 @@ public class LambdaExp extends ScopeExp
   /** True if any parameter default expression captures a parameter. */
   static final int DEFAULT_CAPTURES_ARG = 512;
   public static final int SEQUENCE_RESULT = 1024;
-  protected static final int NEXT_AVAIL_FLAG = 2048;
+  public static final int OVERLOADABLE_FIELD = 2048;
+  protected static final int NEXT_AVAIL_FLAG = 4096;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -543,6 +544,7 @@ public class LambdaExp extends ScopeExp
   {
     if (nameDecl != null && nameDecl.field != null)
       return nameDecl.field;
+    ClassType frameType = getOwningLambda().getHeapFrameType();
     String name = getName();
     String fname
       = name == null ? "lambda" : Compilation.mangleNameIfNeeded(name);
@@ -563,6 +565,13 @@ public class LambdaExp extends ScopeExp
           }
 	if (! nameDecl.isPrivate() || external_access)
 	  fflags |= Access.PUBLIC;
+        if ((flags & OVERLOADABLE_FIELD) != 0)
+          {
+            String fname0 = fname;
+            int suffix = min_args == max_args ? min_args : 1;
+            do { fname = fname0 + '$' + suffix++; }
+            while (frameType.getDeclaredField(fname) != null);
+          }
       }
     else
       {
@@ -570,7 +579,6 @@ public class LambdaExp extends ScopeExp
 	if (! getNeedsClosureEnv())
 	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
-    ClassType frameType = getOwningLambda().getHeapFrameType();
     Type rtype = Compilation.typeModuleMethod;
     Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)

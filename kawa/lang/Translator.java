@@ -188,8 +188,7 @@ public class Translator extends Compilation
   public Declaration lookup(Object name, int namespace)
   {
     Declaration decl = lexical.lookup(name, namespace);
-    if (decl != null
-	&& (getLanguage().getNamespaceOf(decl) & namespace) != 0)
+    if (decl != null && getLanguage().hasNamespace(decl, namespace))
       return decl;
     return currentModule().lookup(name, getLanguage(), namespace);
   }

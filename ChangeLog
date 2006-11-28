@@ -1,3 +1,10 @@
+2006-11-27  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (lookup): New hasNamespace.
+	* kawa/standard/require.java (importDefinitions): Inline getDefine.
+	Do check for duplicate declaration using getNamespaceOf.
+	Use ScopeExp.duplicateDeclarationError.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxRules.java: Rename Consumer methods append->write.

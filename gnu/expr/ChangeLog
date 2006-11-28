@@ -1,3 +1,14 @@
+2006-11-27  Per Bothner  <per@bothner.com>
+
+	* Language.java (hasNamespace): New method.
+	* NameLookup.java (lookup): Use hasNamespace,
+	* ScopeExp.java (lookup): Compare symbols using equals.
+	(lookup): Check namespace using hasNamespace.
+	(duplicateDeclarationError): New static method.
+	(getDefine): Use duplicateDeclarationError.
+	* LambdaExp.java (OVERLOADABLE_FIELD): New constant,
+	(allocFieldFor): If OVERLOADABLE_FIELD add unique suffix.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (matchN): Make a pre-pass to prefer those methods

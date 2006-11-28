@@ -1,5 +1,18 @@
 2006-11-27  Per Bothner  <per@bothner.com>
 
+	Handle multiple functions with the same name and different arity.
+	* XQuery.java (namespaceForFunctions): New static method.
+	(VARIADIC_FUNCTION_NAMESPACE): New constant,
+	(getNamespaceOf): Rewrite - now also encodes argument count.
+	(hasNamespace): New method.
+	* XQParser.java )parseFunctionDefinition): Set OVERLOADABLE_FIELD flag.
+	(parsePathExpr, parseNodeTest, parseStepExpr): Change to match
+	new namespace int convention,
+	* XQResolveNames.java (walkReferenceExp(ReferenceExp,ApplyExp)):
+	New method. If a called function, encode arg count in namespace.
+	(walkApplyExp): Call walkReferenceExp on caller if appropriate.
+	(withContext): Update for new namespace encoding.
+
 	* XQParser.java (parseFunctionDefinition): Try to recover from
 	syntax error in parameter list.
 

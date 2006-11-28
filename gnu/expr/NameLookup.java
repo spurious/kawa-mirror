@@ -81,7 +81,7 @@ public class NameLookup extends GeneralHashTable
       {
         Declaration decl = (Declaration) node.getValue();
 	if (symbol.equals(decl.getSymbol())
-	    && (language.getNamespaceOf(decl) & namespace) != 0)
+	    && language.hasNamespace(decl, namespace))
 	  return decl;
       }
     return null;

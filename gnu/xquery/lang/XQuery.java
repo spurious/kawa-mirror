@@ -197,11 +197,55 @@ public class XQuery extends Language
   {
   }
 
+  public static int namespaceForFunctions (int argCount)
+  {
+    return (argCount << 2) | FUNCTION_NAMESPACE;
+  }
+
+  public static final int VARIADIC_FUNCTION_NAMESPACE =
+    (-1 << 2) | FUNCTION_NAMESPACE;
+
   public int getNamespaceOf(Declaration decl)
   {
-    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE
-      //: decl.isNamespaceDecl() ? NAMESPACE_PREFIX_NAMESPACE
-      : VALUE_NAMESPACE;
+    if (decl.isProcedureDecl())
+      {
+        if (decl.getCode() < 0)
+          return VARIADIC_FUNCTION_NAMESPACE;
+        Expression value = decl.getValue();
+        if (value instanceof LambdaExp)
+          {
+            LambdaExp lexp = (LambdaExp) value;
+            if (lexp.min_args == lexp.max_args)
+              return namespaceForFunctions(lexp.min_args);
+          }
+        else if (value instanceof QuoteExp)
+          {
+            Object val = ((QuoteExp) value).getValue();
+            if (val instanceof Procedure)
+              {
+                Procedure proc = (Procedure) val;
+                int min = proc.minArgs();
+                int max = proc.maxArgs();
+                if (min == max)
+                  return namespaceForFunctions(min);
+              }
+          }
+        else if (value instanceof ReferenceExp)
+          return getNamespaceOf(((ReferenceExp) value).getBinding());
+        // I believe we only get here after an error.
+        return VARIADIC_FUNCTION_NAMESPACE;
+      }
+    return VALUE_NAMESPACE;
+  }
+
+  public boolean hasNamespace (Declaration decl, int namespace)
+  {
+    int dnspace = getNamespaceOf(decl);
+    return (dnspace == namespace
+            || (dnspace == VARIADIC_FUNCTION_NAMESPACE
+                && (namespace & FUNCTION_NAMESPACE) != 0)
+            || (namespace == VARIADIC_FUNCTION_NAMESPACE
+                && (dnspace & FUNCTION_NAMESPACE) != 0));
   }
 
   public Symbol getSymbol (String name)

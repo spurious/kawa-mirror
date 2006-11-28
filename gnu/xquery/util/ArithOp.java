@@ -58,6 +58,30 @@ public class ArithOp extends Procedure1or2
     throw new UnsupportedOperationException(getName());
   }
 
+  public static BigDecimal div (BigDecimal d1, BigDecimal d2)
+  {
+    /* #ifdef JAVA5 */
+    // return d1.divide(d2, MathContext.DECIMAL128);
+    /* #else */
+    BigDecimal d = d1.divide(d2, 18, BigDecimal.ROUND_HALF_EVEN);
+    /* #ifdef JAVA2 */
+    BigInteger unscaled = d.unscaledValue();
+    if (unscaled.signum() == 0)
+      return BigDecimal.valueOf(0);
+    int sc = 0;
+    while (sc < 18)
+      {
+        BigInteger[] divmod = unscaled.divideAndRemainder(TEN);
+        if (divmod[1].signum() != 0)
+          break;
+        sc++;
+        unscaled = divmod[0];
+      }
+    return sc == 0 ? d : new BigDecimal(unscaled, d.scale() - sc);
+    /* #endif */
+    /* #endif */
+  }
+
   public Object apply2 (Object arg1, Object arg2)
     throws java.lang.Throwable
   {
@@ -92,26 +116,7 @@ public class ArithOp extends Procedure1or2
             // OR: d1 = Arithmetic.asBigDecimal(arg1);
             BigDecimal d2 = (BigDecimal) XDataType.decimalType.cast(arg2);
             // OR: d2 = Arithmetic.asBigDecimal(arg2);
-            /* #ifdef JAVA5 */
-            // return d1.divide(d2, MathContext.DECIMAL128);
-            /* #else */
-            BigDecimal d = d1.divide(d2, 18, BigDecimal.ROUND_HALF_EVEN);
-            /* #ifdef JAVA2 */
-            BigInteger unscaled = d.unscaledValue();
-            if (unscaled.signum() == 0)
-              return BigDecimal.valueOf(0);
-            int sc = 0;
-            while (sc < 18)
-              {
-                BigInteger[] divmod = unscaled.divideAndRemainder(TEN);
-                if (divmod[1].signum() != 0)
-                  break;
-                sc++;
-                unscaled = divmod[0];
-              }
-            return sc == 0 ? d : new BigDecimal(unscaled, d.scale() - sc);
-            /* #endif */
-            /* #endif */
+            return div(d1, d2);
           }
         else if (code == Arithmetic.FLOAT_CODE)
           {
@@ -124,7 +129,27 @@ public class ArithOp extends Procedure1or2
                              / ((Number) arg2).doubleValue());
           }
         else if (arg1 instanceof Duration && arg2 instanceof Duration)
-          return new BigDecimal(Duration.div((Duration) arg1, (Duration) arg2));
+          {
+            Duration dur1 = (Duration) arg1;
+            Duration dur2 = (Duration) arg2;
+            if (dur1.unit() == Unit.second && dur2.unit() == Unit.second)
+              {
+                long s1 = dur1.getTotalSeconds();
+                long s2 = dur2.getTotalSeconds();
+                int n1 = dur1.getNanoSecondsOnly();
+                int n2 = dur2.getNanoSecondsOnly();
+                BigDecimal sec1 = TimeUtils.secondsBigDecimalFromDuration(s1, n1);
+                BigDecimal sec2 = TimeUtils.secondsBigDecimalFromDuration(s2, n2);
+                return div(sec1, sec2);
+              }
+            if (dur1.unit() == Unit.month && dur2.unit() == Unit.month)
+              {
+                BigDecimal m1 = BigDecimal.valueOf(dur1.getTotalMonths());
+                BigDecimal m2 = BigDecimal.valueOf(dur2.getTotalMonths());
+                return div(m1, m2);
+              }
+            throw new ArithmeticException("divide of incompatible durations");
+          }
         else if (code >= 0)
           return Arithmetic.asNumeric(arg1).div(Arithmetic.asNumeric(arg2));
       case 'i': // 'idiv'

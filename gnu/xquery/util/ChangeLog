@@ -1,3 +1,11 @@
+2006-11-28  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java (div(BigDecimal,BigDecimal)): New static method.
+	(apply2): Use new div method.
+	(apply2): Use BigDecimal division for Duration division.
+	* TimeUtils.java (secondsBigDecimalFromDuration): New static method.
+	(secondsFromDuration): Use secondsBigDecimalFromDuration.
+
 2006-11-26  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java (collection): New skeletal methods.

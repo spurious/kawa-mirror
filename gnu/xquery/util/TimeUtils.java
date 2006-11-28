@@ -189,25 +189,35 @@ public class TimeUtils
     return asInteger(coerceToDuration("minutes-from-duration", arg).getMinutes());
   }
 
+  public static BigDecimal secondsBigDecimalFromDuration (long s, int n)
+  {
+    if (n == 0)
+      return BigDecimal.valueOf(s);
+    int scale = 9;
+    // A simple way to make sure s * 1000000000L doesn't overflow:
+    boolean huge = (int) s != s;
+    long ns = huge ? n : s * 1000000000L + n;
+    while (ns % 10 == 0)
+      {
+        ns = ns / 10;
+        scale--;
+      }
+    BigDecimal dec = new BigDecimal(BigInteger.valueOf(ns), scale);
+    if (huge)
+      dec = BigDecimal.valueOf(s).add(dec);
+    return dec;
+  }
+
   public static Object secondsFromDuration (Object arg)
   {
     if (arg == null || arg == Values.empty) return arg;
-    Duration d = coerceToDuration("minutes-from-duration", arg);
+    Duration d = coerceToDuration("seconds-from-duration", arg);
     int s = d.getSecondsOnly();
     int n = d.getNanoSecondsOnly();
     if (n == 0)
       return asInteger(s);
     else
-      {
-        int scale = 9;
-        long ns = s * 1000000000L + n;
-        while (ns % 10 == 0)
-          {
-            ns = ns / 10;
-            scale--;
-          }
-        return new BigDecimal(BigInteger.valueOf(ns), scale);
-      }
+      return secondsBigDecimalFromDuration(s, n);
   }
 
   public static Duration getImplicitTimezone ()

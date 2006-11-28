@@ -1,3 +1,13 @@
+2006-11-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Some extra check for library module namespaces.
+	(libraryModuleNamespace): New field.
+	(parse): Set libraryModuleNamespace.
+	Error if duplicate module declaration
+	(parseFunctionDefinition): Error if function namespace differs
+	from library module namespace.
+	(parse): Likewise for 'declare variable'.
+
 2006-11-27  Per Bothner  <per@bothner.com>
 
 	Handle multiple functions with the same name and different arity.

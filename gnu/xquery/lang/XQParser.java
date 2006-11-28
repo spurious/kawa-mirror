@@ -37,6 +37,8 @@ public class XQParser extends Lexer
   /** True if we've seen a VarDecl, FunctionDecl, or OptionDecl. */
   boolean seenDeclaration;
 
+  String libraryModuleNamespace;
+
   /** Value of getLineNumber() at start of current token.
    * Sometimes set otherwise, to report errors. */
   int curLine;
@@ -3494,6 +3496,11 @@ public class XQParser extends Lexer
               "cannot declare function in empty namespace",
               "XQST0060");
       }
+    else if (libraryModuleNamespace != null && uri != libraryModuleNamespace
+             && (! XQuery.LOCAL_NAMESPACE.equals(uri) || comp.isPedantic()))
+      {
+        error('e', "function not in namespace of library module", "XQST0048");
+      }
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -3729,6 +3736,14 @@ public class XQParser extends Lexer
         Object name = decl.getSymbol();
         if (name instanceof String)
           decl.setSymbol(namespaceResolve((String) name, false));
+        if (libraryModuleNamespace != null)
+          {
+            uri = ((Symbol) decl.getSymbol()).getNamespaceURI();
+            if (uri != libraryModuleNamespace
+                && (! XQuery.LOCAL_NAMESPACE.equals(uri) || comp.isPedantic()))
+              error('e', "variable not in namespace of library module"
+                    , "XQST0048");
+          }
 	comp.currentScope().addDeclaration(decl);
 	getRawToken();
 	Expression type = parseOptionalTypeDeclaration();
@@ -3782,9 +3797,12 @@ public class XQParser extends Lexer
 
       case DECLARE_NAMESPACE_TOKEN:
       case MODULE_NAMESPACE_TOKEN:
-        if (seenDeclaration && ! interactive)
-          error('e', "namespace declared after function/variable/option");
 	int command = curToken;
+        if (command == MODULE_NAMESPACE_TOKEN
+            && libraryModuleNamespace != null )
+          error('e', "duplicate module declaration");
+        else if (seenDeclaration && ! interactive)
+          error('e', "namespace declared after function/variable/option");
 	next = skipSpace(nesting != 0);
 	if (next >= 0)
 	  {
@@ -3833,6 +3851,7 @@ public class XQParser extends Lexer
                     module.setType(comp.mainClass);
                     if (uri.length() == 0)
                       return syntaxError("zero-length module namespace", "XQST0088");
+                    libraryModuleNamespace = uri;
                   }
                 return QuoteExp.voidExp;
 	      }

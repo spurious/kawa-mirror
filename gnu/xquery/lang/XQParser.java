@@ -3512,6 +3512,7 @@ public class XQParser extends Lexer
     comp.push(lexp);
     if (curToken != ')')
       {
+      paramLoop:
 	for (;;)
 	  {
 	    Declaration param = parseVariableDeclaration();
@@ -3528,8 +3529,21 @@ public class XQParser extends Lexer
 	    if (curToken == ')')
 	      break;
 	    if (curToken != ',')
-	      return syntaxError("missing ',' in parameter list");
-	    getRawToken();
+              {
+                Expression err = syntaxError("missing ',' in parameter list");
+                for (;;)
+                  {
+                    getRawToken();
+                    if (curToken < 0 || curToken == ';' || curToken == ';')
+                      return err;
+                    if (curToken == ')')
+                      break paramLoop;
+                    if (curToken == ',')
+                      break;
+                  }
+              }
+            else
+              getRawToken();
 	  }
       }
     getRawToken();

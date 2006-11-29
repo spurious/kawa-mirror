@@ -88,7 +88,8 @@ public class Duration extends Quantity implements Externalizable
     if (pos + 1 >= len || str.charAt(pos) != 'P')
       return null;
     pos++;
-    int months = 0, seconds = 0, nanos = 0;
+    int months = 0, nanos = 0;
+    long seconds = 0;
     long part = scanPart(str, pos);
     pos = ((int) part) >> 16;
     char ch = (char) part;
@@ -114,7 +115,7 @@ public class Duration extends Quantity implements Externalizable
       {
         if (unit == Unit.month)
           return null;
-        seconds = (24 * 60 * 60) * (int) (part >> 32);
+        seconds = (long) (24 * 60 * 60) * (int) (part >> 32);
         pos = ((int) part) >> 16;
         part = scanPart (str, pos);
       }

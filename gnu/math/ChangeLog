@@ -1,3 +1,8 @@
+2006-11-29  Per Bothner  <per@bothner.com>
+
+	* Duration.java (valueOf): Calculate seconds using long to
+	minimize risk over overflow.
+
 2006-10-25  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (quotient): Must strip off excess zeroe from remainder

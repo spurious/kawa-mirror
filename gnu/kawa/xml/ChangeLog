@@ -1,3 +1,8 @@
+2006-11-29  Per Bothner  <per@bothner.com>
+
+	* Document.java (docAvailable): Moved to gnu.xquery.util/NodeUtils.
+	(parseCached): Moved to NodeUtils and renamed to docCached.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* StringValue.java: Class moved to gnu.xml.TextUtils.

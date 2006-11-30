@@ -1,3 +1,8 @@
+2006-11-29  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (walkApplyExp): Update for moved methods
+	implementing fn:doc and fn:doc-available.
+
 2006-11-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Some extra check for library module namespaces.

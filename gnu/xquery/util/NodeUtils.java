@@ -7,6 +7,8 @@ import gnu.xml.*;
 import gnu.kawa.xml.*;
 import gnu.lists.*;
 import java.util.Stack;
+import java.net.*;
+import gnu.text.URI_utils;
 
 public class NodeUtils
 {
@@ -290,5 +292,74 @@ public class NodeUtils
   {
     String str = StringUtils.coerceToString(arg, "collection", 1, null);
     throw AbstractSequence.unsupportedException("collection");
+  }
+
+  /** Parse an XML document, caching the result.
+   * Only positive results are cached; failures are not.)
+   * This implements the standard XQuery <code>fn:doc</code> function.
+   */
+  public static Object docCached (Object uri, Object base)
+    throws Throwable
+  {
+    if (! (uri instanceof URL))
+      {
+        if (! (uri instanceof java.io.File)
+            /* #ifdef use:java.net.URI */
+            && ! (uri instanceof URI)
+            /* #endif */
+            )
+          uri = StringUtils.coerceToString(uri, "doc-available", 1, null);
+        if (uri == Values.empty || uri == null)
+          return uri;
+        if (! URI_utils.isAbsolute(uri))
+          {
+            if (base == null)
+              base = CallContext.getInstance().getBaseUri();
+            uri = URI_utils.resolve(uri, base);
+          }
+      }
+    return Document.parseCached(uri);
+  }
+
+  /** Check if an XML document is available, caching the result.
+   * Only positive results are cached; failures are not.  Thus it is possible
+   * for a false result to be followed by a true result, but not vice versa.
+   * This implements the standard XQuery <code>fn:doc-available</code> function.
+   */
+  public static boolean availableCached (Object uri, Object base)
+  {
+    if (! (uri instanceof URL))
+      {
+        if (! (uri instanceof java.io.File)
+            /* #ifdef use:java.net.URI */
+            && ! (uri instanceof URI)
+            /* #endif */
+            )
+          uri = StringUtils.coerceToString(uri, "doc-available", 1, null);
+        if (uri == Values.empty || uri == null)
+          return false;
+        if (! URI_utils.isAbsolute(uri))
+          {
+            try
+              {
+                if (base == null)
+                  base = CallContext.getInstance().getBaseUri();
+                uri = URI_utils.resolve(uri, base);
+              }
+            catch (Throwable ex)
+              {
+                return false;
+              }
+          }
+      }
+    try
+      {
+        Document.parseCached(uri);
+        return true;
+      }
+    catch (Throwable ex)
+      {
+        return false;
+      }
   }
 }

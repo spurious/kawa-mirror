@@ -800,11 +800,11 @@ public class XQResolveNames extends ResolveNames
               case DOC_AVAILABLE_BUILTIN:
                 {
                   Expression[] args = exp.getArgs();
-                  ClassType cl = ClassType.make("gnu.kawa.xml.Document");
+                  ClassType cl = ClassType.make("gnu.xquery.util.NodeUtils");
                   String mname;
                   if (code == DOC_BUILTIN)
                     {
-                      mname = "parseCached";
+                      mname = "docCached";
                       if (parser.warnOldVersion
                           && "document".equals(decl.getName()))
                         getCompilation()

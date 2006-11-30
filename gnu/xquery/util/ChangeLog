@@ -1,3 +1,9 @@
+2006-11-29  Per Bothner  <per@bothner.com>
+
+	* NodeUtils.java (docAvailable): Moved from gnu.kawa.xml.Document.
+	(docCached): Moved and renamed from Document/parseCahched.
+	(docCached, docAvailable): Use StringUtils.coerceToString.
+
 2006-11-28  Per Bothner  <per@bothner.com>
 
 	* ArithOp.java (div(BigDecimal,BigDecimal)): New static method.

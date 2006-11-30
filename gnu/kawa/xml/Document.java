@@ -72,46 +72,4 @@ public class Document
         return val;
       }
   }
-
-  /** Parse an XML document, caching the result.
-   * Only positive results are cached; failures are not.)
-   * This implements the standard XQuery <code>fn:doc</code> function.
-   */
-  public static Object parseCached (Object uri, Object base)
-    throws Throwable
-  {
-    if (uri == Values.empty || uri == null)
-      return uri;
-    if (! (uri instanceof URL))
-      {
-        String name = TextUtils.stringValue(uri);
-        if (! InPort.uriSchemeSpecified(name))
-          {
-            if (base == null)
-              base = CallContext.getInstance().getBaseUri();
-            uri = URI_utils.resolve(uri, base);
-          }
-      }
-    return parseCached(uri);
-  }
-
-  /** Check if an XML document is available, caching the result.
-   * Only positive results are cached; failures are not.  Thus it is possible
-   * for a false result to be followed by a true result, but not vice versa.
-   * This implements the standard XQuery <code>fn:doc-available</code> function.
-   */
-  public static boolean availableCached (Object url, Object base)
-  {
-    if (url == Values.empty || url == null)
-      return false;
-   try
-      {
-        parseCached(url, base);
-        return true;
-      }
-    catch (Throwable ex)
-      {
-        return false;
-      }
-  }
 }

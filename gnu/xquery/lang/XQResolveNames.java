@@ -40,8 +40,8 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>namespace-uri</code> function. */
   public static final int NAMESPACE_URI_BUILTIN = -7;
 
-  /** Code number for the special <code>root</code> function. */
-  public static final int ROOT_BUILTIN = -8;
+  /** Code number for the special <code>collection</code> function. */
+  public static final int COLLECTION_BUILTIN = -8;
 
   /** Code number for the special <code>doc</code> function. */
   public static final int DOC_BUILTIN = -9;
@@ -112,11 +112,14 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>idref</code> function. */
   public static final int IDREF_BUILTIN = -31;
 
-  /** Code number for internal function to handle extensions. */
-  public static final int HANDLE_EXTENSION_BUILTIN = -32;
+  /** Code number for the special <code>root</code> function. */
+  public static final int ROOT_BUILTIN = -32;
 
   public static final int CAST_AS_BUILTIN = -33;
   public static final int CASTABLE_AS_BUILTIN = -34;
+
+  /** Code number for internal function to handle extensions. */
+  public static final int HANDLE_EXTENSION_BUILTIN = -35;
 
   public static final Declaration handleExtensionDecl
     = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
@@ -188,6 +191,7 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("base-uri", BASE_URI_BUILTIN);
     pushBuiltin("lang", LANG_BUILTIN);
     pushBuiltin("resolve-uri", RESOLVE_URI_BUILTIN);
+    pushBuiltin("collection", COLLECTION_BUILTIN);
     pushBuiltin("doc", DOC_BUILTIN);
     pushBuiltin("document", DOC_BUILTIN); // Obsolete
     pushBuiltin("doc-available", DOC_AVAILABLE_BUILTIN);
@@ -795,6 +799,24 @@ public class XQResolveNames extends ResolveNames
                   Method meth = ClassType.make("gnu.xquery.util.SequenceUtils")
                     .getDeclaredMethod("indexOf$X", 4);
                   return withCollator(meth, exp.getArgs(), "fn:index-of", 2);
+                }
+              case COLLECTION_BUILTIN:
+                {
+                  Expression[] args = exp.getArgs();
+                  ClassType cl = ClassType.make("gnu.xquery.util.NodeUtils");
+                  Method meth = cl.getDeclaredMethod("collection", 2);
+                  if ((err = checkArgCount(args, decl, 0, 1)) != null)
+                    return err;
+                  Expression base = getBaseUriExpr();
+                  Expression uri = args.length > 0 ? args[0]
+                    : QuoteExp.voidExp;
+                  ApplyExp aexp
+                    = new ApplyExp(meth, new Expression[]{ uri, base });
+                  if (code == DOC_BUILTIN)
+                    aexp.setType(NodeType.documentNodeTest);
+                  else
+                    aexp.setType(XDataType.booleanType);
+                  return aexp;
                 }
               case DOC_BUILTIN:
               case DOC_AVAILABLE_BUILTIN:

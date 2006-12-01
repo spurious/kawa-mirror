@@ -1,3 +1,10 @@
+2006-12-01  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (COLLECTION_BUILTIN): New constant.
+	(<init>): Declare fn:collection.
+	(walkApplyExp): Handle COLLECTION_BUILTIN.
+	* XQuery.java (initXQuery): Remove declaration of fn:collection.
+
 2006-11-29  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (walkApplyExp): Update for moved methods

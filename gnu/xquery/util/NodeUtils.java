@@ -9,6 +9,9 @@ import gnu.lists.*;
 import java.util.Stack;
 import java.net.*;
 import gnu.text.URI_utils;
+import gnu.expr.PrimProcedure;
+import gnu.bytecode.ClassType;
+import gnu.xquery.lang.XQuery;
 
 public class NodeUtils
 {
@@ -283,22 +286,99 @@ public class NodeUtils
     return Values.empty;
   }
 
-  public static Object collection ()
+  /** Internal namespace used to manage cached collections. */
+  static String collectionNamespace = "http://gnu.org/kawa/cached-collections";
+
+  /** Add a uri-to-value binding that setSavedCollection can later return. */
+  public static void setSavedCollection (Object uri, Object value,
+                                         Environment env)
   {
-    return collection(Values.empty);
+    if (uri == null)
+      uri = "#default";
+    Symbol sym = Symbol.make(collectionNamespace, uri.toString());
+    env.put(sym, null, value);
   }
 
-  public static Object collection (Object arg)
+  /** Add a uri-to-value binding that setSavedCollection can later return. */
+  public static void setSavedCollection (Object uri, Object value)
   {
-    String str = StringUtils.coerceToString(arg, "collection", 1, null);
-    throw AbstractSequence.unsupportedException("collection");
+    setSavedCollection(uri, value, Environment.getCurrent());
   }
 
-  /** Parse an XML document, caching the result.
-   * Only positive results are cached; failures are not.)
-   * This implements the standard XQuery <code>fn:doc</code> function.
+  /** Default resolver for fn:collection.
+   * Return nodes previously bound using setSavedCollection.
    */
-  public static Object docCached (Object uri, Object base)
+  public static Object getSavedCollection (Object uri, Environment env)
+  {
+    if (uri == null)
+      uri = "#default";
+    Symbol sym = Symbol.make(collectionNamespace, uri.toString());
+    Object coll = env.get(sym, null, null);
+    if (coll == null)
+      throw new RuntimeException("collection '"+uri+"' not found");
+    return coll;
+  }
+
+  /** Default resolver for fn:collection.
+   * Return nodes previously bound using setSavedCollection.
+   */
+  public static Object getSavedCollection (Object uri)
+  {
+    return getSavedCollection(uri, Environment.getCurrent());
+  }
+
+  /** Symbol used to bind a collection resolver. */
+  public static final Symbol collectionResolverSymbol = 
+    Symbol.make(XQuery.LOCAL_NAMESPACE, "collection-resolver", "qexo");
+
+  public static Object collection (Object uri, Object base)
+    throws Throwable
+  {
+    uri = resolve(uri, base, "collection");
+    Environment env = Environment.getCurrent();
+    Symbol rsym = NodeUtils.collectionResolverSymbol;
+    Object rvalue = env.get(rsym, null, null);
+    if (rvalue == null)
+      {
+        rvalue = env.get(Symbol.makeWithUnknownNamespace(rsym.getLocalName(),
+                                                           rsym.getPrefix()),
+                           null, null);
+      }
+    String str;
+    int colon;
+    if (rvalue == null)
+      {
+        return getSavedCollection(uri);
+      }
+    else if ((rvalue instanceof String || rvalue instanceof UntypedAtomic)
+             && (colon = (str = rvalue.toString()).indexOf(':')) > 0)
+      {
+        String cname = str.substring(0, colon);
+        String mname = str.substring(colon+1);
+        Class rclass;
+        try
+          {
+            rclass = Class.forName(cname);
+          }
+        catch (ClassNotFoundException ex)
+          {
+            throw new RuntimeException("invalid collection-resolver: class "+cname+" not found");
+          }
+        catch (Throwable ex)
+          {
+            throw new RuntimeException("invalid collection-resolver: "+ex);
+          }
+        ClassType rclassType = ClassType.make(cname);
+        rvalue = gnu.kawa.reflect.ClassMethods.apply(rclassType, mname, '\0', XQuery.instance);
+        if (rvalue == null)
+          throw new RuntimeException("invalid collection-resolver: no method "+mname+" in "+cname);
+      }
+    if (! (rvalue instanceof Procedure))
+      throw new RuntimeException("invalid collection-resolver: "+rvalue);
+    return ((Procedure) rvalue).apply1(uri);
+  }
+
+  static Object resolve (Object uri, Object base, String fname)
     throws Throwable
   {
     if (! (uri instanceof URL))
@@ -308,9 +388,9 @@ public class NodeUtils
             && ! (uri instanceof URI)
             /* #endif */
             )
-          uri = StringUtils.coerceToString(uri, "doc-available", 1, null);
+          uri = StringUtils.coerceToString(uri, fname, 1, null);
         if (uri == Values.empty || uri == null)
-          return uri;
+          return null;
         if (! URI_utils.isAbsolute(uri))
           {
             if (base == null)
@@ -318,6 +398,19 @@ public class NodeUtils
             uri = URI_utils.resolve(uri, base);
           }
       }
+    return uri;
+  }
+
+  /** Parse an XML document, caching the result.
+   * Only positive results are cached; failures are not.)
+   * This implements the standard XQuery <code>fn:doc</code> function.
+   */
+  public static Object docCached (Object uri, Object base)
+    throws Throwable
+  {
+    uri = resolve(uri, base, "doc");
+    if (uri == null)
+      return Values.empty;
     return Document.parseCached(uri);
   }
 
@@ -327,31 +420,11 @@ public class NodeUtils
    * This implements the standard XQuery <code>fn:doc-available</code> function.
    */
   public static boolean availableCached (Object uri, Object base)
+    throws Throwable
   {
-    if (! (uri instanceof URL))
-      {
-        if (! (uri instanceof java.io.File)
-            /* #ifdef use:java.net.URI */
-            && ! (uri instanceof URI)
-            /* #endif */
-            )
-          uri = StringUtils.coerceToString(uri, "doc-available", 1, null);
-        if (uri == Values.empty || uri == null)
-          return false;
-        if (! URI_utils.isAbsolute(uri))
-          {
-            try
-              {
-                if (base == null)
-                  base = CallContext.getInstance().getBaseUri();
-                uri = URI_utils.resolve(uri, base);
-              }
-            catch (Throwable ex)
-              {
-                return false;
-              }
-          }
-      }
+    uri = resolve(uri, base, "doc-available");
+    if (uri == null)
+      return false;
     try
       {
         Document.parseCached(uri);

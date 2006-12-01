@@ -6,11 +6,12 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.xml.*;
-import gnu.kawa.xml.Document;
+import gnu.kawa.xml.*;
 import gnu.mapping.Symbol;
 import gnu.xquery.lang.*;
 import org.xml.sax.helpers.AttributesImpl;
 import java.util.Stack;
+import gnu.xquery.util.NodeUtils;
 
 /** Run a suite of XQuery tests, as read from an xml file. */
 
@@ -54,6 +55,9 @@ public class RunXQTS extends FilterConsumer
 
   String logFileName = "XQTS.log";
   XMLPrinter xqlog;
+
+  String collectionID;
+  Values collectionDocuments;
 
   private void summaryReport (int count, String label)
   {
@@ -201,14 +205,13 @@ public class RunXQTS extends FilterConsumer
     expectFailures("Constr-namespace-13", "testsuite error? missing namespace undeclaration");
     expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
     expectFailures("NodTest003", "actually pass? different char encoding");
-    expectFailures("extvardeclwithouttypetobind-6",
-                   "mystery - testsuite error?");
     expectFailures("K-FunctionProlog-11|K-FunctionProlog-41",
                    "item() is treated as equivalent to item()*");
     expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
                    +"CastAs671|CastAs672",
                    "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
     expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
+                   // These are fixed in JDK 1.6.0.
                    "surrogates not handled by java.util.regex");
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
@@ -239,24 +242,13 @@ public class RunXQTS extends FilterConsumer
                    +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
                    // See http://unicode.org/reports/tr15/Normalizer.java
                    "fn:normalize-unicode not unimplemented yet");
-    expectFailures("fn-collection-1|fn-collection-2|fn-collection-3|"
-                   +"fn-collection-4|fn-collection-4d|fn-collection-5|"
-                   +"fn-collection-6|fn-collection-7|fn-collection-8|"
-                   +"fn-collection-9|fn-collection-10|"
-                   +"fn-collection-5d|fn-collection-10d",
-                   "fn:collection not unimplemented yet");
-    expectFailures("default_namespace-020|function-declaration-020|K-FunctionProlog-30"
-                   /* These are sort-of caught - but as a ClassFormatError.
-                      +"|function-declaration-022|K-FunctionProlog-26|"
-                      +"K-FunctionProlog-27|K-FunctionProlog-28"*/,
-                   "duplicate function definition not handled");
     // RunXQTS failures rather than Qexo errors:
     // Some work under gcj but not JDK 1.4.x or 1.5.0_05:
     expectFailures("fn-numberulng1args-2|orderBy25|orderBy35|orderBy45|"
                    +"orderBy55|orderbylocal-25|orderbylocal-35|orderbylocal-45|"
                    +"orderbylocal-55|orderbywithout-14|orderbywithout-21|"
                    +"orderbywithout-30|orderbywithout-37|"
-                   +"extvardeclwithtype-6|vardeclwithtype-6",
+                   +"extvardeclwithtype-6|extvardeclwithouttypetobind-6|extvardeclwithouttype-6|vardeclwithtype-6",
                    "inaccurate formatting of xs:float");
     expectFailures("vardeclerr|K-InternalVariablesWith-17|K-InternalVariablesWith-18",
                    "missing check for circular definitions");
@@ -273,7 +265,7 @@ public class RunXQTS extends FilterConsumer
                    "test-case excessively strict about disallowed characetrs");
     expectFailures("caselessmatch04",
                    "regex/unicode special case");
-    expectFailures("string-queries-results-q4",
+    expectFailures("string-queries-results-q4|K2-FunctionProlog-7",
                    "function conversion incorrect for user-defined functions");
     expectFailures("caselessmatch10|caselessmatch11",
                    // Need to translate [xxx-[yyy]] to [xxx&&[^yyy]].
@@ -414,6 +406,12 @@ public class RunXQTS extends FilterConsumer
         String filename = attributes.getValue("FileName");
         modules.put(ID, filename);
       }
+    else if (tagMatches("collection"))
+      {
+        collectionID = attributes.getValue("ID");
+        collectionDocuments = new Values();
+        sources.put(collectionID, collectionDocuments);
+      }
     inStartTag = false;
   }
 
@@ -552,8 +550,8 @@ public class RunXQTS extends FilterConsumer
                      || expectedErrors.equals("|XQDY0025|")
                      || expectedErrors.equals("|FODC0001|")
                      || (expectedErrors.equals("|XPST0017|")
-                         && (error.message.endsWith(" fn:collection")
-                             || error.message.endsWith(" fn:id")
+                         && (// error.message.endsWith(" fn:collection") || 
+                             error.message.endsWith(" fn:id")
                              || error.message.endsWith(" fn:idref")))))
 
           {
@@ -889,6 +887,11 @@ public class RunXQTS extends FilterConsumer
 
   String selectedTest;
 
+  public String getElementValue ()
+  {
+    return cout.toSubString(elementStartIndex[nesting]);
+  }
+
   public void endGroup()
   {
     if (inStartTag)
@@ -923,7 +926,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("expected-error"))
       {
-        expectedErrorsBuf.append(cout.toSubString(elementStartIndex[nesting]));
+        expectedErrorsBuf.append(getElementValue());
         expectedErrorsBuf.append('|');
       }
     else if (tagMatches("input-query"))
@@ -954,7 +957,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("input-file") || tagMatches("contextItem"))
       {
-        String inputFile = cout.toSubString(elementStartIndex[nesting]);
+        String inputFile = getElementValue();
         // KLUDGE around testsuite bug!
         if ("userdefined".equals(inputFile))
           inputFile = "emptydoc";
@@ -992,17 +995,53 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("input-URI"))
       {
-        String inputFile = cout.toSubString(elementStartIndex[nesting]);
+        String inputFile = getElementValue();
         String variable = attributes.getValue("variable");
-        String path = "file://" + directory + '/' + sources.get(inputFile);
+        Object inputValue = sources.get(inputFile);
+        String path = inputValue instanceof Values ? "collection:"+inputFile
+          : "file://" + directory + '/' + inputValue;
         Symbol symbol = Symbol.parse(variable);
         externalVariablesSet.push(symbol);
         Environment.getCurrent().put(symbol, null,
                                      gnu.kawa.xml.XDataType.toURI(path));
       }
+    else if (tagMatches("defaultCollection"))
+      {
+        String inputFile = getElementValue();
+        Object inputValue = sources.get(inputFile);
+        Object val = NodeUtils.getSavedCollection("collection:"+inputFile);
+        NodeUtils.setSavedCollection("#default", val);
+      }
+    else if (tagMatches("collection"))
+      {
+        NodeUtils.setSavedCollection("collection:"+collectionID, 
+                                     collectionDocuments.canonicalize());
+        collectionID = null;
+        collectionDocuments = null;
+      }
+    else if (tagMatches("input-document"))
+      {
+        String inputName = getElementValue();
+        String path = "file://" + directory + '/' + sources.get(inputName);
+        if (collectionID == null)
+          throw new Error("<input-document> not in <collection>");
+        try
+          {
+            KDocument value = (KDocument) Document.parseCached(path);
+            collectionDocuments.writeObject(value);
+          }
+         catch (Throwable ex)
+          {
+            System.err.println("caught "+ex);
+            System.err.println("reading data file "+path);
+            System.err.println("for collection "+collectionID);
+            ex.printStackTrace();
+            System.exit(-1);
+          }
+      }
     else if (tagMatches("output-file"))
       {
-        outputFileAlts.push(cout.toSubString(elementStartIndex[nesting]));
+        outputFileAlts.push(getElementValue());
         compare = attributes.getValue("compare");
       }
     else if (tagMatches("test-suite"))
@@ -1012,7 +1051,7 @@ public class RunXQTS extends FilterConsumer
     else if (testName != null && tagMatches("module"))
       {
         String uri = attributes.getValue("namespace");
-        String module = cout.toSubString(elementStartIndex[nesting]);
+        String module = getElementValue();
         String mfile = (String) modules.get(module);
         String mpath = directory + '/' + mfile + XQueryFileExtension;
         String mclass = Compilation.mangleURI(uri)

@@ -252,7 +252,7 @@ public class XslTranslator extends Lexer implements Consumer
       }
   }
 
-  /* #ifdef JAVA */
+  /* #ifdef JAVA5 */
   // public Consumer append (char v)
   // {
   //   if (inAttribute)

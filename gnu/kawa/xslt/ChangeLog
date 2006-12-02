@@ -1,3 +1,7 @@
+2006-12-01  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Fix PreProcess typo JAVA -> JAVA5.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java: StringValue.stringValue now in TextUtils.

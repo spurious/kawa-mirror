@@ -9,6 +9,8 @@ import java.util.*;
 
 public class PreProcess
 {
+  // JAVA5:
+  // Hashtable<String,Boolean> keywords = new Hashtable<String,Boolean>();
   Hashtable keywords = new Hashtable();
 
   String filename;

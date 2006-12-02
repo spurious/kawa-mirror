@@ -210,9 +210,10 @@ public class RunXQTS extends FilterConsumer
     expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
                    +"CastAs671|CastAs672",
                    "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
-    expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
-                   // These are fixed in JDK 1.6.0.
-                   "surrogates not handled by java.util.regex");
+    /* #ifndef JAVA6 */
+    // expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
+    //                "surrogates not handled by java.util.regex");
+    /* #endif */
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
                    +"ST-Axes006|ST-Axes007|ST-Axes008|ST-Axes009|ST-Axes010|"
@@ -229,33 +230,34 @@ public class RunXQTS extends FilterConsumer
                    +"fn-idref-dtd-17|fn-idref-dtd-18|fn-idref-dtd-19|"
                    +"fn-idref-dtd-20|fn-idref-dtd-21|fn-idref-dtd-23|",
                    "fn:idref doesn't do much yet");
-    expectFailures("fn-normalize-unicode1args-1|fn-normalize-unicode1args-2|"
-                   +"fn-normalize-unicode1args-3|fn-normalize-unicode1args-4|"
-                   +"fn-normalize-unicode1args-5|fn-normalize-unicode1args-6|"
-                   +"fn-normalize-unicode2args-1|fn-normalize-unicode2args-2|"
-                   +"fn-normalize-unicode2args-3|fn-normalize-unicode-1|"
-                   +"fn-normalize-unicode-3|fn-normalize-unicode-4|"
-                   +"fn-normalize-unicode-5|fn-normalize-unicode-6|"
-                   +"fn-normalize-unicode-7|K-NormalizeUnicodeFunc-4|"
-                   +"K-NormalizeUnicodeFunc-5|K-NormalizeUnicodeFunc-6|"
-                   +"K-NormalizeUnicodeFunc-7|K-NormalizeUnicodeFunc-8|"
-                   +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
-                   // See http://unicode.org/reports/tr15/Normalizer.java
-                   "fn:normalize-unicode not unimplemented yet");
+    /* #ifndef use:java.text.Normalizer */
+    // expectFailures("fn-normalize-unicode1args-1|"
+    //                +"fn-normalize-unicode1args-2|"
+    //                +"fn-normalize-unicode1args-3|"
+    //                +"fn-normalize-unicode1args-4|"
+    //                +"fn-normalize-unicode1args-5|"
+    //                +"fn-normalize-unicode1args-6|"
+    //                +"fn-normalize-unicode2args-1|"
+    //                +"fn-normalize-unicode2args-2|"
+    //                +"fn-normalize-unicode2args-3|"
+    //                +"fn-normalize-unicode-1|"
+    //                +"fn-normalize-unicode-3|fn-normalize-unicode-4|"
+    //                +"fn-normalize-unicode-5|fn-normalize-unicode-6|"
+    //                +"fn-normalize-unicode-7|K-NormalizeUnicodeFunc-4|"
+    //                +"K-NormalizeUnicodeFunc-5|K-NormalizeUnicodeFunc-6|"
+    //                +"K-NormalizeUnicodeFunc-7|K-NormalizeUnicodeFunc-8|"
+    //                +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
+    //                // See http://unicode.org/reports/tr15/Normalizer.java
+    //                "fn:normalize-unicode not unimplemented yet");
+    /* #endif */
     // RunXQTS failures rather than Qexo errors:
     // Some work under gcj but not JDK 1.4.x or 1.5.0_05:
-    expectFailures("fn-numberulng1args-2|orderBy25|orderBy35|orderBy45|"
-                   +"orderBy55|orderbylocal-25|orderbylocal-35|orderbylocal-45|"
-                   +"orderbylocal-55|orderbywithout-14|orderbywithout-21|"
-                   +"orderbywithout-30|orderbywithout-37|"
-                   +"extvardeclwithtype-6|extvardeclwithouttypetobind-6|extvardeclwithouttype-6|vardeclwithtype-6",
-                   "inaccurate formatting of xs:float");
     expectFailures("vardeclerr|K-InternalVariablesWith-17|K-InternalVariablesWith-18",
                    "missing check for circular definitions");
     expectFailures("K-TimeAddDTD-1|K-TimeAddDTD-2|K-TimeSubtractDTD-1",
                    "bad interaction between fields and millis");
     expectFailures("op-time-greater-than-2",
-                   "comparing xs:time doesn't handle differing typezones");
+                   "comparing xs:time doesn't handle differing timezones");
     expectFailures("K-SubstringBeforeFunc-5|K-SubstringAfterFunc-5|"
                    +"K-ContainsFunc-5|K-StartsWithFunc-5|K-EndsWithFunc-5",
                    "some string functions don't support collation argument");
@@ -825,6 +827,38 @@ public class RunXQTS extends FilterConsumer
             start_attr2 = 0;
             intag = false;
           }
+        else if (isFloatChar(c1)
+                 ? (isFloatChar(c2) || (i2 > 0 && isFloatChar(arg2.charAt(i2-1))))
+                 : (isFloatChar(c2) && (i1 > 0 && isFloatChar(arg1.charAt(i1-1)))))
+          {
+            int start1 = i1, start2 = i2;
+            while (start1 > 0 && isFloatChar(arg1.charAt(start1-1)))
+              start1--;
+            while (start2 > 0 && isFloatChar(arg2.charAt(start2-1)))
+              start2--;
+            int end1 = i1, end2 = i2;
+            while (end1 < len1 && isFloatChar(arg1.charAt(end1)))
+              end1++;
+            while (end2 < len2 && isFloatChar(arg2.charAt(end2)))
+              end2++;
+            if (end1 <= start1 || end2 <= start2)
+              return false;
+            String word1 = arg1.substring(start1, end1);
+            String word2 = arg2.substring(start2, end2);
+            try
+              {
+                float f1 = Float.parseFloat(word1);
+                float f2 = Float.parseFloat(word2);
+                if (Float.floatToIntBits(f1) != Float.floatToIntBits(f2))
+                  return false;
+              }
+            catch (Throwable ex)
+              {
+                return false;
+              }
+            i1 = end1;
+            i2 = end2;
+          }
         else if (isXML && (c1 == ' ' || c1 == '\n' || c1 == '\t' || c1 == '\r'))
           {
             i1++;
@@ -883,6 +917,12 @@ public class RunXQTS extends FilterConsumer
         else
           return false;
       }
+  }
+
+  static boolean isFloatChar (int c)
+  {
+    return (c >= '0' && c <= '9')
+      || c == '.' || c == '-' || c == '+' || c == 'E';
   }
 
   String selectedTest;

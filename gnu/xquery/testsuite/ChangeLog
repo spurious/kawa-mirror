@@ -1,5 +1,12 @@
 2006-12-01  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java (matches): If floating-point literal seem in
+	otherwise non-matching output, compare values as float.
+	(<init>): Update accordingly.
+
+	* RunXQTS.java (<init>): Some tests pass if JAVA6 and
+	use:java.text.Normalizer, and add PreProcess conditionals for that.
+
 	* XQTS-trace.exp: Update for improved output formatting.
 
 	* RunXQTS.java: Add support for collection.  Various updates.

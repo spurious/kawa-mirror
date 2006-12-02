@@ -1,5 +1,7 @@
 2006-12-01  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java: Suppress unchecked warnings if JAVA5.
+
 	* NodeUtils.java (collection): Replace old methods.
 	(setSavedCollection, getSavedCollection): New static methods.
 	(collectionResolverSymbol): New constant.

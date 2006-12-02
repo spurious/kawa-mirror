@@ -174,9 +174,13 @@ public class NodeUtils
     return uri == null ? Values.empty : uri;
   }
 
+  /* #ifdef JAVA5 */
+  // @SuppressWarnings("unchecked")
+  /* #endif */
   /** Extract canditate IDREFs from arg.
-   * @return null (if no IDREFs); a String (if a single IDREF);
-   *   or a Stack (if more than one IDREFs).
+   * @return {@code null} (if no {@code IDREF}s);
+   *   a {@code String} (if a single {@code IDREF});
+   *   or a {@code Stack<String>} (if more than one {@code IDREF}s).
    */
   static Object getIDs (Object arg, Object collector)
   {

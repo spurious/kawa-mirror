@@ -130,7 +130,7 @@ AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
-AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" != "no")
+AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`

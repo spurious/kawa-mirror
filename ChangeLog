@@ -1,3 +1,7 @@
+2006-12-02  Per Bothner  <per@bothner.com>
+
+	* configure.in (WITH_XQTS): Default to false.
+
 2006-12-01  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.8.91.

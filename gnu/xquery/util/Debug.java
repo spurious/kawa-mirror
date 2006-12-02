@@ -1,5 +1,6 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
+import gnu.xml.XMLPrinter;
 
 public class Debug
 {
@@ -29,7 +30,9 @@ public class Debug
     out.print(tracePrefix);
     out.print(message);
     out.print(' ');
-    out.println(value);
+    XMLPrinter xout = new XMLPrinter(out, false);
+    xout.writeObject(value);
+    out.println();
     if (traceShouldFlush)
       out.flush();
     return value;

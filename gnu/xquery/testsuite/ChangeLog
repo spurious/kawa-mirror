@@ -1,5 +1,7 @@
 2006-12-01  Per Bothner  <per@bothner.com>
 
+	* XQTS-trace.exp: Update for improved output formatting.
+
 	* RunXQTS.java: Add support for collection.  Various updates.
 	(getElementValue): New convenience method.
 

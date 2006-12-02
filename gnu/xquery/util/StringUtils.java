@@ -10,6 +10,9 @@ import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+/* #ifdef use:java.text.Normalizer */
+// import java.text.Normalizer;
+/* #endif */
 
 public class StringUtils
 {
@@ -603,10 +606,25 @@ public class StringUtils
 
   public static Object normalizeUnicode (Object arg, String form)
   {
-    String str = coerceToString(arg, "normalize-unicode", 1, null);
+    String str = coerceToString(arg, "normalize-unicode", 1, "");
     form = form.trim().toUpperCase();
     if ("".equals(form))
       return str;
+    /* #ifdef use:java.text.Normalizer */
+    // Normalizer.Form nform;
+    // if ("NFC".equals(form))
+    //   nform = Normalizer.Form.NFC;
+    // else if ("NFD".equals(form))
+    //   nform = Normalizer.Form.NFD;
+    // else if ("NFKC".equals(form))
+    //   nform = Normalizer.Form.NFKC;
+    // else if ("NFKD".equals(form))
+    //   nform = Normalizer.Form.NFKD;
+    // else
+    //   throw new RuntimeException("normalize-unicode: unknown normalization form '"+form+'\'');
+    // return Normalizer.normalize(str, nform);
+    /* #else */
     throw AbstractSequence.unsupportedException("normalize-unicode form "+form);
+    /* #endif */
   }
 }

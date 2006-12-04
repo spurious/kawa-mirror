@@ -1,3 +1,7 @@
+2006-12-04  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST): Add two missing files.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Update and extend test for adding spaces

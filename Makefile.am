@@ -189,7 +189,7 @@ selected-java-source: Makefile
 
 $(srcdir)/patch-source-list:
 	(cd $(srcdir); \
-	find . -name '*.java' -exec grep -lE ' #ifdef ' '{}' ';') \
+	find . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@
 
 COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|

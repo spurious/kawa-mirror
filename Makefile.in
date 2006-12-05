@@ -824,7 +824,7 @@ selected-java-source: Makefile
 
 $(srcdir)/patch-source-list:
 	(cd $(srcdir); \
-	find . -name '*.java' -exec grep -lE ' #ifdef ' '{}' ';') \
+	find . -name '*.java' -exec grep -lE ' #endif ' '{}' ';') \
 	  | sed -e 's|./||' | sort > $@
 
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java

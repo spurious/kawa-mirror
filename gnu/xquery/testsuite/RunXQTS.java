@@ -1,6 +1,6 @@
 package gnu.xquery.testsuite;
 import java.io.*;
-import java.util.Hashtable;
+import java.util.*;
 import gnu.lists.*;
 import gnu.text.*;
 import gnu.mapping.*;
@@ -10,18 +10,27 @@ import gnu.kawa.xml.*;
 import gnu.mapping.Symbol;
 import gnu.xquery.lang.*;
 import org.xml.sax.helpers.AttributesImpl;
-import java.util.Stack;
 import gnu.xquery.util.NodeUtils;
 
 /** Run a suite of XQuery tests, as read from an xml file. */
 
 public class RunXQTS extends FilterConsumer
 {
-  Hashtable sources = new Hashtable();
-  Hashtable modules = new Hashtable();
   static XQuery xqueryLanguage = XQuery.getInstance();
 
+  /* #ifdef JAVA5 */
+  // HashMap<String,String> expectedFailures = new HashMap<String,String>();
+  // HashMap<String,String> modules = new HashMap<String,String>();
+  // HashMap<String,Object> sources = new HashMap<String,Object>();
+  // Stack<Symbol> externalVariablesSet = new Stack<Symbol>();
+  // Stack<String> outputFileAlts = new Stack<String>();
+  /* #else */
   Hashtable expectedFailures = new Hashtable();
+  Hashtable modules = new Hashtable();
+  Hashtable sources = new Hashtable();
+  Stack externalVariablesSet = new Stack();
+  Stack outputFileAlts = new Stack();
+  /* #endif */
   ModuleManager manager = ModuleManager.getInstance();
   Object failExpected;
 
@@ -45,9 +54,6 @@ public class RunXQTS extends FilterConsumer
   int xfailCount;
   int cannotTellCount;
 
-  Stack externalVariablesSet = new Stack();
-
-  Stack outputFileAlts = new Stack();
   /** Set of expected error codes.  The format is "|Error1}...|ErrorN|". */
   StringBuffer expectedErrorsBuf = new StringBuffer("|");
   /** Same as expectedErrorBuf.toString() after collecting expected-errors. */
@@ -182,7 +188,11 @@ public class RunXQTS extends FilterConsumer
   int nesting = 0;
   Object currentElementType;
   Symbol currentElementSymbol;
+  /* #ifdef JAVA5 */
+  // Stack<Object> elementTypeStack = new Stack<Object>();
+  /* #else */
   Stack elementTypeStack = new Stack();
+  /* #endif */
   boolean inStartTag;
   int attrValueStart;
   // Start in cout's buffer of current element, indexed by nesting level.
@@ -210,7 +220,7 @@ public class RunXQTS extends FilterConsumer
     expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
                    +"CastAs671|CastAs672",
                    "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
-    /* #ifndef JAVA6 */
+    /* #ifndef JAVA5 */
     expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
                    "surrogates not handled by java.util.regex");
     /* #endif */
@@ -772,8 +782,13 @@ public class RunXQTS extends FilterConsumer
           {
             i1 = start_attr1;
             i2 = start_attr2;
+            /* #ifdef JAVA5 */
+            // Stack<String> attrs1 = new Stack<String>();
+            // Stack<String> attrs2 = new Stack<String>();
+            /* #else */
             Stack attrs1 = new Stack();
             Stack attrs2 = new Stack();
+            /* #endif */
             for (;;)
               {
                 int end1 = grabAttribute(arg1, i1);

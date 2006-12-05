@@ -6,7 +6,7 @@ ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 EXTRA_CLEAN = tmp* *.log testing.zip *.class Mod1/*.class Mod2/*.class
 
-java_sources = TestMisc.java TestSuite.java
+java_sources = TestMisc.java TestSuite.java RunXQTS.java
 
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \

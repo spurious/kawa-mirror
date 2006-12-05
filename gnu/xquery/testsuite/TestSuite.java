@@ -30,7 +30,11 @@ public class TestSuite extends FilterConsumer
   boolean inTestSuite = false;
   boolean inTest = false;
   String currentTag;
+  /* #ifdef JAVA5 */
+  // Stack<Object> groupStack = new Stack<Object>();
+  /* #else */
   Stack groupStack = new Stack();
+  /* #endif */
 
   CharArrayOutPort cout;
   XMLPrinter xout;

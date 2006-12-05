@@ -289,8 +289,8 @@ public class ClassType extends ObjectType
 
   public final void setInterface(boolean val)
   {
-    if (val) access_flags |= Access.INTERFACE;
-    else access_flags &= ~Access.INTERFACE;
+    if (val) access_flags |= Access.INTERFACE|Access.ABSTRACT;
+    else access_flags &= ~Access.INTERFACE|Access.ABSTRACT;
   }
 
   public ClassType () { }
@@ -1032,9 +1032,9 @@ public class ClassType extends ObjectType
     if (cother.isSubclass(this))
       return 1;
     if (this == tostring_type)
-      return 1;
+      return cother == Type.pointer_type ? -1 : 1;
     if (cother == tostring_type)
-      return -1;
+      return this == Type.pointer_type ? 1 : -1;
     if (this.isInterface() || cother.isInterface())
       return -2;
     return -3;

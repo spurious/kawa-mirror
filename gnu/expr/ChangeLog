@@ -1,3 +1,7 @@
+2006-12-05  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (registerClass): Don't set Access.SUPER if interface.
+
 2006-12-04  Per Bothner  <per@bothner.com>
 
 	* Language.java (parse): New final method that takes option ModuleInfo.

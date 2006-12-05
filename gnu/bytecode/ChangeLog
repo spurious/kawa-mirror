@@ -1,5 +1,9 @@
 2006-12-05  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (setInterface): Also set/clear Access.ABSTRACT.
+
+	* ClassType.java (compare): tostring_type is less specific than Object.
+
 	* Method.java (types): Add generic parameters if JAVA5.
 	* ZipLoader.java (loadedClasses): Likewise.
 	* Type.java (mapClassToType, mapNameToType): Likewise.

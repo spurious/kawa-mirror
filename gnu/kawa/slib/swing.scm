@@ -159,19 +159,20 @@
 	(invoke menuitem 'addActionListener (make-action-listener oncommand)))
     menuitem))
 
-(define (polygon initial #!rest (more-points :: <object[]>))
+(define (polygon (initial :: <complex>) #!rest (more-points :: <object[]>))
   (let ((path :: <java.awt.geom.GeneralPath>
 	      (make <java.awt.geom.GeneralPath>))
 	(n-points :: <int>
 		  ((primitive-array-length <object>) more-points)))
-    (invoke path 'moveTo
-	    (real-part initial) (imag-part initial))
+    (path:moveTo ((real-part initial):doubleValue)
+		 ((imag-part initial):doubleValue))
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i n-points)
 	 (invoke path 'closePath)
 	 path)
-      (let ((pt ((primitive-array-get <object>) more-points i)))
-	(invoke path 'lineTo (real-part pt) (imag-part pt))))))
+      (let ((pt :: <complex> ((primitive-array-get <object>) more-points i)))
+	(path:lineTo ((real-part pt):doubleValue)
+		     ((imag-part pt):doubleValue))))))
 
 (define (scroll contents #!key w h)
   (if (instance? contents <gnu.kawa.models.Paintable>)

@@ -201,12 +201,11 @@
       (define (end-of-format?)
 	(>= pos fl))
       (define (incomplete)
-	(slib:error 'printf "conversion specification incomplete"
-		    format-string))
+	(error 'printf "conversion specification incomplete"
+	       format-string))
       (define (wna)
-	(slib:error 'printf "wrong number of arguments"
-		    (length args)
-		    format-string))
+	(error 'printf "wrong number of arguments"
+	       (length args) format-string))
       (define (out* strs)
 	(if (string? strs) (out strs)
 	    (let out-loop ((strs strs))
@@ -224,9 +223,9 @@
 	  (must-advance)
 	  (and (case fc
 		 ((#\n #\N) (out #\newline))
-		 ((#\t #\T) (out slib:tab))
+		 ((#\t #\T) (out #\tab))
 		 ;;((#\r #\R) (out #\return))
-		 ((#\f #\F) (out slib:form-feed))
+		 ((#\f #\F) (out #\page))
 		 ((#\newline) #t)
 		 (else (out fc)))
 	       (loop args)))
@@ -552,15 +551,14 @@
     cnt))
 
 (define (printf format . args)
-  (apply stdio:fprintf (current-output-port) format args))
+  (apply fprintf (current-output-port) format args))
 
 (define (sprintf str format . args)
   (let* ((cnt 0)
 	 (s (cond ((string? str) str)
 		  ((number? str) (make-string str))
 		  ((not str) (make-string 100))
-		  (else (slib:error 'sprintf "first argument not understood"
-				    str))))
+		  (else (error 'sprintf "first argument not understood" str))))
 	 (end (string-length s)))
     (apply stdio:iprintf
 	   (lambda (x)

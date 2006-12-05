@@ -819,6 +819,8 @@ selected-java-source: Makefile
 	then $(MAKE) select-java4x; \
 	elif test "@JAVA_SOURCE@" = 5; \
 	then $(MAKE) select-java5; \
+	elif test "@JAVA_SOURCE@" = 6; \
+	then $(MAKE) select-java6; \
 	else echo Unrecognized JAVA_SOURCE: @JAVA_SOURCE@; exit 1; \
 	fi
 

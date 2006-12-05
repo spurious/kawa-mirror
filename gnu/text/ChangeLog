@@ -1,3 +1,12 @@
+2006-12-04  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (FiletoURL): Avoid deprecated File.toURL
+	if File.toURI is available.
+
+	* URI_utils.java (makeClassResourceURI): Use StringBuilder #ifdef JAVA5.
+
+	* URI_utils.java (relativize): New static method.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java: Remove needless import.

@@ -48,7 +48,11 @@ public class URI_utils
     try
       {
         /* #ifdef JAVA2 */
-        return file.toURL();
+        /* #ifdef use:java.net.URI */
+        return file.toURI().toURL();
+        /* #else */
+        // return file.toURL();
+        /* #endif */
         /* #else */
         // char fileSep = File.separatorChar;
         // return new URL("file:" + file.getAbsolutePath().replace(fileSep, '/'));
@@ -319,7 +323,11 @@ public class URI_utils
   {
     String cname = clas.getName();
     int dot = cname.lastIndexOf('.');
+    /* #ifdef JAVA5 */
+    // StringBuilder sbuf = new StringBuilder();
+    /* #else */
     StringBuffer sbuf = new StringBuffer();
+    /* #endif */
     sbuf.append(CLASS_RESOURCE_URI_PREFIX);
     if (dot >= 0)
       {
@@ -442,5 +450,54 @@ public class URI_utils
          setClassLoaderForURI(resolved, loader);
        }
     return resolved;
+  }
+
+  /** Convert an absolute URI to one relatve to a given base.
+   * This goes beyond java.net.URI.relativize in that if the arguments
+   * have a common prefix, it can create a relative URI using "../" steps.
+   */
+  public static Object relativize (Object in, Object base)
+    throws java.net.URISyntaxException, java.io.IOException
+  {
+    String baseStr = URI_utils.toURI(base).normalize().toString();
+    String inStr = URI_utils.toURI(URI_utils.toURL(in)).normalize().toString();
+    int baseLen = baseStr.length();
+    int inLen = inStr.length();
+    int i = 0;
+    int sl = 0;
+    int colon = 0;
+    for (; i < baseLen && i < inLen;  i++)
+      {
+        char cb = baseStr.charAt(i);
+        char ci = inStr.charAt(i);
+        if (cb != ci)
+          break;
+        if (cb == '/')
+          sl = i;
+        if (cb == ':')
+          colon = i;
+      }
+    if (colon > 0
+        && (sl > colon + 2 || baseLen <= colon+2 || baseStr.charAt(colon+2) != '/')
+        && (colon + 2 != CLASS_RESOURCE_URI_PREFIX_LENGTH
+            || ! inStr.substring(0, colon + 2).equals(CLASS_RESOURCE_URI_PREFIX)
+            || getClassLoaderForURI(base) == getClassLoaderForURI(in)))
+      {
+        baseStr = baseStr.substring(sl+1);
+        inStr = inStr.substring(sl+1);
+      }
+    else
+      return in;
+    /* #ifdef JAVA5 */
+    // StringBuilder sbuf = new StringBuilder();
+    /* #else */
+    StringBuffer sbuf = new StringBuffer();
+    /* #endif */
+    sl = 0;
+    for (i = baseLen = baseStr.length(); --i >= 0; )
+      if (baseStr.charAt(i) == '/') // sep?
+        sbuf.append("../");
+    sbuf.append(inStr);
+    return sbuf.toString();
   }
 }

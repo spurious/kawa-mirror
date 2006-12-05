@@ -1,5 +1,9 @@
 2006-12-04  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java (compilationDirectory): Removed static field, replaced
+	by non-static field in ModuleManager.
+	(processArgs): Use ModuleManager's new setCompilationDirectory method.
+
 	* kawa/standard/load.java (pply): Don't temporarily setBaseUri.
 
 	* Makefile.am (patch-source-list): Change pattern so we catch

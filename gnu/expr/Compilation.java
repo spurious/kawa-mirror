@@ -1882,14 +1882,8 @@ public class Compilation implements SourceLocator
           }
         if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
           { 
-            // FIXME should avoid refereence to kawa.repl
-            String directory = kawa.repl.compilationDirectory;
-            if (directory == null || directory.length() == 0)
-              directory = "";
-            else if (directory.charAt(directory.length() - 1)
-                     != java.io.File.separatorChar)
-              directory = directory + java.io.File.separatorChar;
-            outputClass(directory);
+            ModuleManager manager = ModuleManager.getInstance();
+            outputClass(manager.getCompilationDirectory());
             setState(CLASS_WRITTEN);
           }
       }

@@ -13,7 +13,6 @@ import gnu.bytecode.ClassType;
 
 public class repl extends Procedure0or1
 {
-  public static String compilationDirectory = null;
   public static String compilationTopname = null;
 
   Language language;
@@ -402,7 +401,8 @@ public class repl extends Procedure0or1
 	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    compilationDirectory = args[iArg];
+            ModuleManager manager = ModuleManager.getInstance();
+	    manager.setCompilationDirectory(args[iArg]);
 	  }
 	else if (arg.equals ("-P"))
 	  {

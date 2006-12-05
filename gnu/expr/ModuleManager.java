@@ -11,6 +11,22 @@ public class ModuleManager
 {
   public ClassLoader defaultClassLoader = ClassLoader.getSystemClassLoader();
 
+  private String compilationDirectory = "";
+  public void setCompilationDirectory (String path)
+  {
+    if (path == null)
+      path = "";
+    int plen = path.length();
+    if (plen > 0)
+      {
+        char sep = java.io.File.separatorChar; // Or '/' if path is a URL??
+        if (path.charAt(plen - 1) != sep)
+          path = path + sep;
+      }
+    compilationDirectory = path;
+  }
+  public String getCompilationDirectory () { return compilationDirectory; }
+
   static ModuleManager instance = new ModuleManager();
 
   /** For now assumes a single global ModuleManager.

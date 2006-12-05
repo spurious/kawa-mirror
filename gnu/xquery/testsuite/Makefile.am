@@ -10,7 +10,7 @@ java_sources = TestMisc.java TestSuite.java
 
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
-  auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql \
+  auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql mod2a.xql \
   bad-1.xql expected-1.errs XQTS-trace.exp \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html

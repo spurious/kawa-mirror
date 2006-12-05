@@ -206,7 +206,7 @@ APPLETVIEWER = appletviewer
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  srfi-64-test.scm use-slots.scm \
+  srfi-64-test.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \
@@ -546,7 +546,7 @@ cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 
 check-interpreted-cycle:
 	CLASSPATH=.. $(KAWA) \
-	  -e '(require "cycle1.scm")' \
+	  -e '(require "$(srcdir)/cycle1.scm")' \
 	  -e '(test-begin "interpreted cycle")' \
 	  -e '(test-assert (is-even? 6))' \
 	  -e '(test-equal #f (is-even? 7))' \

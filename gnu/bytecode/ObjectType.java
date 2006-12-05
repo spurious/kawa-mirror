@@ -110,6 +110,9 @@ public class ObjectType extends Type
     return other == nullType ? 0 : -1;
   }
 
+  /* #ifdef JAVA5 */
+  // @SuppressWarnings("unchecked")
+  /* #endif */
   /** Convert an object to a value of this Type.
    * Throw a ClassCastException when this is not possible. */
   public Object coerceFromObject (Object obj)

@@ -236,7 +236,11 @@ public class Method implements AttrContainer, Member {
     if (len < 3 || signature.charAt(0) != '(')
       throw new ClassFormatError("bad method signature");
     int pos = 1;
+    /* #ifdef JAVA5 */
+    // java.util.Stack<Type> types = new java.util.Stack<Type>();
+    /* #else */
     java.util.Stack types = new java.util.Stack();
+    /* #endif */
     for (;;)
       {
 	int arg_sig_len = Type.signatureLength(signature, pos);

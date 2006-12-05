@@ -1063,10 +1063,18 @@ public class ClassType extends ObjectType
   public Object readResolve() throws ObjectStreamException
   {
     String name = getName();
-    Type found = lookupType(name);
-    if (found != null)
-      return found;
-    mapNameToType.put(name, this);
+    /* #ifdef JAVA5 */
+    // java.util.HashMap<String,Type> map = mapNameToType;
+    /* #else */
+    java.util.Hashtable map = mapNameToType;
+    /* #endif */
+    synchronized (map)
+      {
+        Type found = (Type) map.get(name);
+        if (found != null)
+          return found;
+        map.put(name, this);
+      }
     return this;
   }
 

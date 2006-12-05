@@ -1,3 +1,13 @@
+2006-12-05  Per Bothner  <per@bothner.com>
+
+	* Method.java (types): Add generic parameters if JAVA5.
+	* ZipLoader.java (loadedClasses): Likewise.
+	* Type.java (mapClassToType, mapNameToType): Likewise.
+	(lookupType, getType, registerTypeForClass, make, <clinit>):
+	Update, add synchronization.
+	* ClassType.java (readResolve): Likewise.
+	* ObjectType.java: Suppress warning.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (compare): Add some more special cases.

@@ -19,8 +19,12 @@ public class ZipLoader extends ClassLoader
   /** name of ZipFile */
   private String zipname;
 
-  /* A list of pairs of (name, class) of already loaded classes. */
+  /* #ifdef JAVA5 */
+  // /* A list of pairs of (name, class) of already loaded classes. */
+  // private java.util.Vector<Object> loadedClasses;
+  /* #else */
   private java.util.Vector loadedClasses;
+  /* #endif */
 
   public ZipLoader (String name) throws java.io.IOException
   {
@@ -34,7 +38,11 @@ public class ZipLoader extends ClassLoader
 	if (! ent.isDirectory())
 	  size++;
       }
+    /* #ifdef JAVA5 */
+    // loadedClasses = new java.util.Vector<Object>(size);
+    /* #else */
     loadedClasses = new java.util.Vector(size);
+    /* #endif */
   }
 
   public Class loadClass (String name, boolean resolve)

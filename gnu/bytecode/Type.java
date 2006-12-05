@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.util.*;
 
 public abstract class Type {
   String signature;
@@ -30,17 +31,30 @@ public abstract class Type {
 
   // Maps java.lang.Class to corresponding Type.
   /* #ifdef JAVA2 */
-  static java.util.WeakHashMap mapClassToType;
+  /* #ifdef JAVA5 */
+  // static WeakHashMap<Class,Type> mapClassToType;
   /* #else */
-  // static java.util.Hashtable mapClassToType;
+  static WeakHashMap mapClassToType;
+  /* #endif */
+  /* #else */
+  // static Hashtable mapClassToType;
   /* #endif */
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
+  /* #ifdef JAVA5 */
+  // static java.util.HashMap<String,Type> mapNameToType;
+  /* #else */
   static java.util.Hashtable mapNameToType;
+  /* #endif */
 
   public static Type lookupType (String name)
   {
+    /* #ifdef JAVA5 */
+    // java.util.HashMap<String,Type> map = mapNameToType;
+    // synchronized (map) { return map.get(name); }
+    /* #else */
     return (Type) mapNameToType.get(name);
+    /* #endif */
   }
 
   /** Find an Type with the given name, or create a new one.
@@ -50,42 +64,56 @@ public abstract class Type {
    */
   public static Type getType (String name)
   {
-    Type type = lookupType(name);
-    if (type == null)
+    /* #ifdef JAVA5 */
+    // java.util.HashMap<String,Type> map = mapNameToType;
+    /* #else */
+    java.util.Hashtable map = mapNameToType;
+    /* #endif */
+    synchronized (map)
       {
-	if (name.endsWith("[]"))
-	  {
-	    type = ArrayType.make(name);
-	  }
-	else
-	  {
-	    ClassType cl = new ClassType(name);
-            cl.flags |= ClassType.EXISTING_CLASS;
-	    type = cl;
-	  }
-	mapNameToType.put(name, type);
+        Type type = (Type) map.get(name);
+        if (type == null)
+          {
+            if (name.endsWith("[]"))
+              type = ArrayType.make(name);
+            else
+              {
+                ClassType cl = new ClassType(name);
+                cl.flags |= ClassType.EXISTING_CLASS;
+                type = cl;
+              }
+            map.put(name, type);
+          }
+        return type;
       }
-    return type;
   }
 
   /** Register that the Type for class is type. */
-  public static void registerTypeForClass(Class clas, Type type)
+  public synchronized static void registerTypeForClass(Class clas, Type type)
   {
-    if (mapClassToType == null)
-      {
-        /* #ifdef JAVA2 */
-        mapClassToType = new java.util.WeakHashMap(100);
-        /* #else */
-        // mapClassToType = new java.util.Hashtable(100);
-        /* #endif */
-      }
-    mapClassToType.put(clas, type);
+    /* #ifdef JAVA2 */
+    /* #ifdef JAVA5 */
+    // WeakHashMap<Class,Type> map = mapClassToType;
+    // if (map == null)
+    //   mapClassToType = map = new WeakHashMap<Class,Type>(100);
+    /* #else */
+    WeakHashMap map = mapClassToType;
+    if (map == null)
+      mapClassToType = map = new WeakHashMap(100);
+    /* #endif */
+    /* #else */
+    // Hashtable map = mapClassToType;
+    // if (map == null)
+    //   mapClassToType = map = new Hashtable(100);
+    /* #endif */
+    map.put(clas, type);
     type.reflectClass = clas;
   }
 
-  public static Type make(Class reflectClass)
+  public synchronized static Type make(Class reflectClass)
   {
     Type type;
+    
     if (mapClassToType != null)
       {
 	Object t = mapClassToType.get(reflectClass);
@@ -99,16 +127,24 @@ public abstract class Type {
     else
       {
 	String name = reflectClass.getName();
-	type = lookupType(name);
-	if (type == null
-            || (type.reflectClass != reflectClass
-                && type.reflectClass != null))
-	  {
-	    ClassType cl = new ClassType(name);
-	    cl.flags |= ClassType.EXISTING_CLASS;
-	    type = cl;
-	    mapNameToType.put(name, type);
-	  }
+        /* #ifdef JAVA5 */
+        // java.util.HashMap<String,Type> map = mapNameToType;
+        /* #else */
+        java.util.Hashtable map = mapNameToType;
+        /* #endif */
+        synchronized (map)
+          {
+            type = (Type) map.get(name);
+            if (type == null
+                || (type.reflectClass != reflectClass
+                    && type.reflectClass != null))
+              {
+                ClassType cl = new ClassType(name);
+                cl.flags |= ClassType.EXISTING_CLASS;
+                type = cl;
+                mapNameToType.put(name, type);
+              }
+          }
       }
     registerTypeForClass(reflectClass, type);
     return type;
@@ -427,8 +463,13 @@ public abstract class Type {
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
-  static {
-	mapNameToType = new java.util.Hashtable();
+  static
+  {
+    /* #ifdef JAVA5 */
+    // mapNameToType = new java.util.HashMap<String,Type>();
+    /* #else */
+    mapNameToType = new java.util.Hashtable();
+    /* #endif */
 	mapNameToType.put("byte",    byte_type);
 	mapNameToType.put("short",   short_type);
 	mapNameToType.put("int",     int_type);

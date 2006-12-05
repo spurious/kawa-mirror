@@ -49,7 +49,7 @@ extends WebContainerServlet
           servlet = (Echo2Servlet) ctx.servlet;
         else
           {
-            servlet = new Echo2Servlet (minfo.sourceURL, minfo.moduleClass);
+            servlet = new Echo2Servlet (minfo.sourceAbsPath, minfo.moduleClass);
             KawaServlet script = (KawaServlet) ctx.servlet;
             servlet.script = script;
             servlet.setDisplay(window.display);

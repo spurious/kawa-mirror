@@ -204,7 +204,7 @@ public class Shell
 	    int opts = Language.PARSE_IMMEDIATE|Language.PARSE_ONE_LINE;
 	    try
 	      {
-		Compilation comp = language.parse(lexer, opts);
+		Compilation comp = language.parse(lexer, opts, null);
 		boolean sawError = messages.checkErrors(perr, 20);
 		if (comp == null) // ??? end-of-file
 		  break;

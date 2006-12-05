@@ -15,7 +15,7 @@ public class ModuleInfo
 
   /** Name of class that implements module.
    * Must be non-null unless we're currently compiling the module,
-   * in which case sourceURL and comp must both be non-null.
+   * in which case sourcePath and comp must both be non-null.
    */
   public String className;
 
@@ -40,18 +40,46 @@ public class ModuleInfo
     ModuleExp mod = comp.mainLambda;
     this.exp = mod;
     if (mod != null)
-      this.sourceURL = mod.getFileName();
+      {
+        String fileName = mod.getFileName();
+        this.sourcePath = fileName;
+        this.sourceAbsPath = absPath(fileName);
+      }
+  }
+
+  public static String absPath (String path)
+  {
+    Object url;
+    try
+      {
+        url = URI_utils.toURL(path);
+      }
+    catch (Throwable ex)
+      {
+        throw WrappedException.wrapIfNeeded(ex);
+      }
+    /* #ifdef use:java.net.URI */
+    try
+      {
+        url = URI_utils.toURI(url).normalize();
+      }
+    catch (Throwable ex)
+      {
+      }
+    /* #endif */
+    return url.toString();
   }
   
   ModuleInfo[] dependencies;
   int numDependencies;
 
   /** Location of source for module, if known.
-   * This is a absoluete URI, absolute filename,
+   * This is an absolute URI, absolute filename,
    * or filename relative to current working directory.
    * Null if source not known; in that case className must be non-null.
    */
-  public String sourceURL;
+  public String sourcePath;
+  public String sourceAbsPath;
 
   public long lastCheckedTime;
   public long lastModifiedTime;
@@ -305,7 +333,7 @@ public class ModuleInfo
   }
 
   /** Check if this module and its dependencies are up-to-dete.
-   * Only checks the sourceURL's modification time if it is at least
+   * Only checks the sourcePath's modification time if it is at least
    * ModifiedCacheTime since last time we checked.
    * As as side-effects update lastModifiedTime and lastCheckedTime.
    */
@@ -314,7 +342,7 @@ public class ModuleInfo
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
       return true;
     lastCheckedTime = now;
-    long lastModifiedTime = URI_utils.lastModified(sourceURL);
+    long lastModifiedTime = URI_utils.lastModified(sourceAbsPath);
     if (moduleClass == null && className != null)
       {
         try

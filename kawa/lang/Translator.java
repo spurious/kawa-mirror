@@ -1246,7 +1246,7 @@ public class Translator extends Compilation
             Expression savePos = new ReferenceExp((Object) null);
             savePos.setLine(this);
             setLine(posExp);
-            kawa.standard.require.importDefinitions(info, null,
+            kawa.standard.require.importDefinitions(null, info, null,
                                                     formStack, defs, this);
             setLine(savePos);
             pendingImports.setElementAt(null, i-3);

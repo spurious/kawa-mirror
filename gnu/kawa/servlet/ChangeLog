@@ -1,3 +1,7 @@
+2006-12-04  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java: Update to use ModuleInfo.sourceAbsPath.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* ReplSession.java: Partially revert changes from 11-17 and 11-18.

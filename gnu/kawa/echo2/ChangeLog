@@ -1,3 +1,7 @@
+2006-12-04  Per Bothner  <per@bothner.com>
+
+	* Echo2Servlet.java: Update to use ModuleInfo.sourceAbsPath.
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	New package.

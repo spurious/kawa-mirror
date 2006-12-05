@@ -137,7 +137,14 @@ public class require extends Syntax
       }
     else if (name instanceof FString)
       {
-        return importDefinitions(null, name.toString(), null, forms, defs, tr);
+        String sourceName = name.toString();
+        ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
+        if (info == null)
+          {
+            tr.error('e', "malformed URL: "+sourceName);
+            return false;
+          }
+        return importDefinitions(null, info, null, forms, defs, tr);
       }
     else
       {
@@ -155,8 +162,15 @@ public class require extends Syntax
                 if (args.cdr instanceof Pair
                     && ((Pair) args.cdr).car instanceof FString)
                   {
+                    String sourceName = ((Pair) args.cdr).car.toString();
+                    ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
+                    if (info == null)
+                      {
+                        tr.error('e', "malformed URL: "+sourceName);
+                        return false;
+                      }
                     return importDefinitions(str,
-                                             ((Pair) args.cdr).car.toString(),
+                                             info,
                                              null, forms, defs, tr);
                   }
 		type = Scheme.string2Type(str);
@@ -168,77 +182,73 @@ public class require extends Syntax
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
-    return importDefinitions(ModuleInfo.find(type), null, forms, defs, tr);
+    importDefinitions(null, ModuleInfo.find(type), null, forms, defs, tr);
+    return true;
   }
 
-  /** Import a module with a known source path.
-   * @param className Optional fully-qualified name of module's class,
-   *   or null if unknown.
-   * @param sourceName The source path of the modules source code.
-   *   Non-optional (must be non-null).  If it is relative, it is
-   *  resolved agains the current module's path.
-   */
-  public static boolean
-  importDefinitions (String className, String sourceName, String uri,
-                     Vector forms,
-                     ScopeExp defs, Compilation tr)
+  public static ModuleInfo lookupModuleFromSourcePath (String sourceName, ScopeExp defs)
   {
     ModuleManager manager = ModuleManager.getInstance();
-    Language language = Language.getDefaultLanguage();
-    SourceMessages messages = tr.getMessages();
     try
       {
         sourceName = URI_utils.resolve(sourceName, defs.getFileName()).toString();
       }
     catch (java.net.URISyntaxException ex)
       {
-        tr.error('e', "malformed URL: "+sourceName);
-        return false;
+        return null;
       }
-    ModuleInfo info = manager.findWithSourcePath(sourceName);
-    long now = System.currentTimeMillis();
-    if ((info.getState() & 1) != 0
-        || info.checkCurrent(manager, now))
-      {
-        return importDefinitions(info, uri, forms, defs, tr);
-      }
-    Compilation comp;
-    try
-      {
-        InPort fstream = InPort.openFile(sourceName);
-        info.clearClass();
-        info.className = className;
-        comp = language.parse(fstream, messages, Language.PARSE_PROLOG);
-        comp.immediate = tr.immediate;
-      }
-    catch (java.io.FileNotFoundException ex)
-      {
-        tr.error('e', "not found: "+ex.getMessage());
-        return false;
-      }
-    catch (java.io.IOException ex)
-      {
-        tr.error('e', "caught "+ex);
-        return false;
-      }
-    catch (SyntaxException ex)
-      {
-        if (ex.getMessages() != messages)
-          throw new RuntimeException ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-        return false;
-      }
-    ModuleExp mexp = comp.getModule();
-    ClassType ctype = mexp.classFor(comp);
-    info.className = ctype.getName();
-    info.setCompilation(comp);
-    return importDefinitions(info, uri, forms, defs, tr);
+    return manager.findWithSourcePath(sourceName);
   }
-                     
-  public static boolean importDefinitions (ModuleInfo info, String uri,
-                                    Vector forms,
-                                    ScopeExp defs, Compilation tr)
+
+  /** Import a module with a known source path.
+   * @param className Optional fully-qualified name of module's class,
+   *   or null if unknown.
+   */
+  public static boolean
+  importDefinitions (String className, ModuleInfo info, String uri,
+                     Vector forms,
+                     ScopeExp defs, Compilation tr)
   {
+    ModuleManager manager = ModuleManager.getInstance();
+    String sourceName = info.sourcePath;
+    long now;
+    if ((info.getState() & 1) == 0
+        && sourceName != null
+        && ! info.checkCurrent(manager, (now = System.currentTimeMillis())))
+      {
+        SourceMessages messages = tr.getMessages();
+        Language language = Language.getDefaultLanguage();
+        Compilation comp;
+        try
+          {
+            InPort fstream = InPort.openFile(info.sourceAbsPath);
+            info.clearClass();
+            info.className = className;
+            comp = language.parse(fstream, messages, info);
+            comp.immediate = tr.immediate;
+          }
+        catch (java.io.FileNotFoundException ex)
+          {
+            tr.error('e', "not found: "+ex.getMessage());
+            return false;
+          }
+        catch (java.io.IOException ex)
+          {
+            tr.error('e', "caught "+ex);
+            return false;
+          }
+        catch (SyntaxException ex)
+          {
+            if (ex.getMessages() != messages)
+              throw new RuntimeException ("confussing syntax error: "+ex);
+            // otherwise ignore it - it's already been recorded in messages.
+            return false;
+          }
+        ModuleExp mexp = comp.getModule();
+        ClassType ctype = mexp.classFor(comp);
+        info.className = ctype.getName();
+      }
+
     if (tr.minfo != null && tr.getState() < Compilation.BODY_PARSED)
       {
         tr.minfo.addDependency(info);

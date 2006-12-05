@@ -921,9 +921,7 @@ public class Compilation implements SourceLocator
 
   public Compilation (Language language, SourceMessages messages)
   {
-    this.language = language;
-    this.messages = messages;
-    lexical = new NameLookup(language);
+    this(language, messages, new NameLookup(language));
   }
 
   public Compilation (Language language, SourceMessages messages,
@@ -1144,7 +1142,7 @@ public class Compilation implements SourceLocator
     if (curClass == mainClass
         // Optimization: No pointing in calling register if we aren't
         // compiling a named module.
-        && minfo != null && minfo.sourceURL != null)
+        && minfo != null && minfo.sourcePath != null)
       {
 	code.emitPushThis();
 	code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleInfo")
@@ -2232,10 +2230,31 @@ public class Compilation implements SourceLocator
             if (miClassName == null
                 || ! miClassName.startsWith(mainPrefix))
               continue;
-            String moduleSource = mi.sourceURL;
+            String moduleSource = mi.sourcePath;
             String moduleUri = mi.getNamespaceUri();
             code.emitLoad(code.getArg(1));
             compileConstant(miClassName);
+            if (! URI_utils.isAbsolute(moduleSource))
+              try
+                {
+                  // If the source path was relative, emit it as relative.
+                  // But make it relative to the compilation directory,
+                  // to allows sources to be moved along with binaries.
+                  char sep = File.separatorChar;
+                  String path = manager.getCompilationDirectory();
+                  path = path + mainPrefix.replace('.', sep);
+                  path = URI_utils.toURL(path).toString();
+                  int plen = path.length();
+                  if (plen > 0 && path.charAt(plen-1) != sep)
+                    path = path + sep;
+                  moduleSource = URI_utils.relativize(mi.sourceAbsPath, path).toString();
+                }
+              catch (Throwable ex)
+                {
+                  throw new WrappedException("exception while fixing up '"
+                                             +moduleSource+'\'',
+                                             ex);
+                }
             compileConstant(moduleSource);
             compileConstant(moduleUri);
             code.emitInvokeVirtual(reg);

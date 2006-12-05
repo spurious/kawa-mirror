@@ -520,11 +520,18 @@ public abstract class Language
                                  int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Lexer lexer = getLexer(port, messages);
-    return parse(lexer, options);
+    return parse(getLexer(port, messages), options, null);
   }
 
-  public final Compilation parse(Lexer lexer, int options)
+  public final Compilation parse(InPort port,
+                                 gnu.text.SourceMessages messages,
+                                 ModuleInfo info)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    return parse(getLexer(port, messages), Language.PARSE_PROLOG, info);
+  }
+
+  public final Compilation parse(Lexer lexer, int options, ModuleInfo info)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     SourceMessages messages = lexer.getMessages();
@@ -535,6 +542,8 @@ public abstract class Language
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);
+    if (info != null)
+      info.setCompilation(tr);
     if (! parse(tr, options))
       return null;
     if (tr.getState() == Compilation.PROLOG_PARSING)

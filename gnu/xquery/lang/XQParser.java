@@ -3885,6 +3885,9 @@ public class XQParser extends Lexer
             pushNamespace(prefix.intern(), uri);
           }
 	getRawToken();
+        // Make sure we have a ModuleInfo before we call importDefinitions.
+        ModuleManager.getInstance().find(comp);
+
         String at;
  	ModuleExp module = comp.getModule();
 	Vector forms = new Vector();
@@ -3900,7 +3903,11 @@ public class XQParser extends Lexer
                 at = new String(tokenBuffer, 0, tokenBufferLength);
                 String className = Compilation.mangleURI(uri)
                   + '.' + XQuery.makeClassName(at);
-                require.importDefinitions(className, at,
+
+                ModuleInfo info = require.lookupModuleFromSourcePath(at, module);
+                if (info == null)
+                  comp.error('e', "malformed URL: "+at);
+                require.importDefinitions(className, info,
                                           uri, forms, module, comp);
                 next = skipSpace(nesting != 0);
                 if (next != ',')
@@ -3934,10 +3941,7 @@ public class XQParser extends Lexer
                 if (! uri.equals(info.getNamespaceUri()))
                   continue;
                 n++;
-                if (info.sourceURL != null)
-                  require.importDefinitions(info.className, info.sourceURL, uri, forms, module, comp);
-                else
-                  require.importDefinitions(info, uri, forms, module, comp);
+                require.importDefinitions(info.className, info, uri, forms, module, comp);
               }
             if (n == 0)
               error('e', "no module found for "+uri);

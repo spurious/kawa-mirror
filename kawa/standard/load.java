@@ -161,75 +161,66 @@ public class load extends Procedure1 {
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    String savedBaseUri = ctx.getBaseUri();
-    try
+    boolean isUri = InPort.uriSchemeSpecified(name);
+    // Resolve a relative URI.  However, if the base uri matches the
+    // default base uri (i.e. the current directory) just leave it as
+    // a filename, rather than coercing it to a URI.
+    String resolved = name;
+    if (! isUri)
       {
-        boolean isUri = InPort.uriSchemeSpecified(name);
-        // Resolve a relative URI.  However, if the base uri matches the
-        // default base uri (i.e. the current directory) just leave it as
-        // a filename, rather than coercing it to a URI.
-        String resolved = name;
-        if (! isUri)
-          {
-            Object base = savedBaseUri;
-            if (! URI_utils.isAbsolute(base))
-              base = URI_utils.resolve(base, ctx.getBaseUriDefault());
-            resolved = URI_utils.resolve(name, base).toString();
-            if (relative && ! savedBaseUri.equals(ctx.getBaseUriDefault()))
-              name = resolved;
-          }
-	ctx.setBaseUri(name);
-	if (name.endsWith (".zip") || name.endsWith(".jar"))
-	  {
-	    loadCompiled (name, env);
-	    return;
-	  }
-        URL url = new URL(resolved);
-	char file_separator = System.getProperty ("file.separator").charAt(0);
+        String baseUri = ctx.getBaseUri();
+        Object base = baseUri;
+        if (! URI_utils.isAbsolute(base))
+          base = URI_utils.resolve(base, ctx.getBaseUriDefault());
+        resolved = URI_utils.resolve(name, base).toString();
+        if (relative && ! baseUri.equals(ctx.getBaseUriDefault()))
+          name = resolved;
+      }
+    if (name.endsWith (".zip") || name.endsWith(".jar"))
+      {
+        loadCompiled (name, env);
+        return;
+      }
+    URL url = new URL(resolved);
+    char file_separator = System.getProperty ("file.separator").charAt(0);
 
-	if (name.endsWith (".class"))
-	  {
-	    name = name.substring (0, name.length () - 6);
-	    name = name.replace ('/', '.');
-	    if (file_separator != '/')
-	      name = name.replace (file_separator, '.');
-	    loadClassFile (name, env);
-	    return;
-	  }
-        InputStream fs = new BufferedInputStream(URI_utils.getInputStream(url));
-        fs.mark(5);
-        int char0 = fs.read ();
-        if (char0 == -1)
-          return; // Sequence.eofValue;
-        if (char0 == 'P')
+    if (name.endsWith (".class"))
+      {
+        name = name.substring (0, name.length () - 6);
+        name = name.replace ('/', '.');
+        if (file_separator != '/')
+          name = name.replace (file_separator, '.');
+        loadClassFile (name, env);
+        return;
+      }
+    InputStream fs = new BufferedInputStream(URI_utils.getInputStream(url));
+    fs.mark(5);
+    int char0 = fs.read ();
+    if (char0 == -1)
+      return; // Sequence.eofValue;
+    if (char0 == 'P')
+      {
+        int char1 = fs.read ();
+        if (char1 == 'K')
           {
-            int char1 = fs.read ();
-            if (char1 == 'K')
+            int char2 = fs.read ();
+            if (char2 == '\003')
               {
-                int char2 = fs.read ();
-                if (char2 == '\003')
+                int char3 = fs.read ();
+                if (char3 == '\004')
                   {
-                    int char3 = fs.read ();
-                    if (char3 == '\004')
-                      {
-                        fs.close ();
-                        loadCompiled (name, env);
-                        return;
-                      }
+                    fs.close ();
+                    loadCompiled (name, env);
+                    return;
                   }
               }
           }
-        fs.reset();
-        InPort src = InPort.openFile(fs, name);
-        while (--skipLines >= 0)
-          src.skipRestOfLine();
-        loadSource (src, env, url);
-        src.close();
-        return;
       }
-    finally
-      {
-	ctx.setBaseUri(savedBaseUri);
-      }
+    fs.reset();
+    InPort src = InPort.openFile(fs, name);
+    while (--skipLines >= 0)
+      src.skipRestOfLine();
+    loadSource (src, env, url);
+    src.close();
   }
 }

@@ -1,5 +1,7 @@
 2006-12-04  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/load.java (pply): Don't temporarily setBaseUri.
+
 	* Makefile.am (patch-source-list): Change pattern so we catch
 	files that only use #ifndef and not #ifdef,
 

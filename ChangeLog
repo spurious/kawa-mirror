@@ -1,5 +1,7 @@
 2006-12-05  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java: Update copyright year printed by --version to 2007.
+
 	* Makefile.am (kawa/Version.java): Use svnversion command.
 
 	* Makefile.am (selected-java-source): Handle JAVA_SOURCE = 6.

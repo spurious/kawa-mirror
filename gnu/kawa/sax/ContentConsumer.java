@@ -21,7 +21,11 @@ public class ContentConsumer implements Consumer
   String attrQName, attrURI, attrLocalName;
   AttributesImpl attributes = new AttributesImpl();
   char[] chBuffer;
+  /* #ifdef JAVA5 */
+  // StringBuilder strBuffer = new StringBuilder(200);
+  /* #else */
   StringBuffer strBuffer = new StringBuffer(200);
+  /* #endif */
   /** 1 if in start-tag, 2 if in attribute value, 0 otherwise. */
   int inStartTag;
 
@@ -202,7 +206,19 @@ public class ContentConsumer implements Consumer
       }
   }
 
-  public Consumer append (char v)
+  public void write (int v)
+  {
+    if (inStartTag == 1)
+      endStartTag();
+    if (v >= 0x10000)
+      {
+        strBuffer.append((char) (((v - 0x10000) >> 10) + 0xD800));
+        v = (v & 0x3FF) + 0xDC00;
+      }
+    strBuffer.append((char) v);
+  }
+
+  public void write (String v)
   {
     if (inStartTag == 1)
       endStartTag();
@@ -210,27 +226,42 @@ public class ContentConsumer implements Consumer
   }
 
   /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq)
-  {
-    if (csq == null)
-      csq = "null";
-    append(csq, 0, csq.length());
-    return this;
-  }
-
-  public Consumer append (CharSequence csq, int start, int end)
+  public void write (CharSequence str, int start, int end)
+  /* #else */
+  // public void write (String str, int start, int end)
+  /* #endif */
   {
     if (inStartTag == 1)
       endStartTag();
-    strBuffer.append(csq, start, end);
-    return this;
+    /* #ifdef use:java.lang.CharSequence */
+    /* #ifdef JAVA5 */
+    // strBuffer.append(str, start, end);
+    /* #else */
+    strBuffer.append(str.subSequence(start, end).toString());
+    /* #endif */
+    /* #else */
+    // strBuffer.append(str, start, end);
+    /* #endif */
   }
-  /* #else */
-  // public Consumer append (String v)
+
+  /* #ifdef JAVA5 */
+  // public ContentConsumer append (char c)
   // {
-  //   if (inStartTag == 1)
-  //     endStartTag();
-  //   strBuffer.append(v);
+  //   write(c);
+  //   return this;
+  // }
+  // public ContentConsumer append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   write(csq, 0, csq.length());
+  //   return this;
+  // }
+  // public ContentConsumer append (CharSequence csq, int start, int end)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   write(csq, start, end);
   //   return this;
   // }
   /* #endif */
@@ -248,7 +279,7 @@ public class ContentConsumer implements Consumer
     else if (v instanceof Char)
       ((Char) v).print(this);
     else
-      append(v == null ? "(null)" : v.toString());
+      write(v == null ? "(null)" : v.toString());
   }
 
   public void writeBoolean(boolean v)

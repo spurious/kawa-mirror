@@ -1,3 +1,8 @@
+2006-12-05  Per Bothner  <per@bothner.com>
+
+	* ConsumeSAXHandler.java: Update append -> write.
+	* ContentConsumer.java: Fix Consumer-churn-related bitrot.
+
 2006-11-18  Per Bothner  <per@bothner.com>
 
 	* ConsumeSAXHandler.java: Update writeChars -> append.

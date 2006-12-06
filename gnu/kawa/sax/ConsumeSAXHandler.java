@@ -43,7 +43,7 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
     for (int i = 0;  i < numAttributes;  i++)
       {
 	out.beginAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
-	out.append(atts.getValue(i));
+	out.write(atts.getValue(i));
 	out.endAttribute();
       }
   }
@@ -68,7 +68,7 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 	String type = atts.getType(i);
 	String value = atts.getValue(i);
 	out.beginAttribute(name);  // FIXME
-	out.append(value);
+	out.write(value);
 	out.endAttribute();
       }
   }

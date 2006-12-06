@@ -54,7 +54,7 @@ public class RunXQTS extends FilterConsumer
   int xfailCount;
   int cannotTellCount;
 
-  /** Set of expected error codes.  The format is "|Error1}...|ErrorN|". */
+  /** Set of expected error codes.  The format is "|Error1|..|ErrorN|". */
   StringBuffer expectedErrorsBuf = new StringBuffer("|");
   /** Same as expectedErrorBuf.toString() after collecting expected-errors. */
   String expectedErrors;
@@ -561,8 +561,7 @@ public class RunXQTS extends FilterConsumer
                      || expectedErrors.equals("|XQDY0025|")
                      || expectedErrors.equals("|FODC0001|")
                      || (expectedErrors.equals("|XPST0017|")
-                         && (// error.message.endsWith(" fn:collection") || 
-                             error.message.endsWith(" fn:id")
+                         && (error.message.endsWith(" fn:id")
                              || error.message.endsWith(" fn:idref")))))
 
           {

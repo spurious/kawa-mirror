@@ -112,8 +112,10 @@ public class object extends Syntax
 	    int nKeywords = 0;
 	    boolean seenInit = false;
 	    Pair initPair = null;
-	    while (args instanceof Pair)
+	    while (args != LList.Empty)
 	      {
+                while (args instanceof SyntaxForm)
+                  args = ((SyntaxForm) args).form;
 		pair = (Pair) args;
 		Pair keyPair = pair;
 		Object key = pair.car;
@@ -381,8 +383,14 @@ public class object extends Syntax
 		int nKeywords = 0;
 		Object args = pair_car instanceof Keyword ? pair : pair.cdr;
 		Pair initPair = null;
-		while (args instanceof Pair)
+                SyntaxForm initSyntax = null;
+		while (args != LList.Empty)
 		  {
+                    while (args instanceof SyntaxForm)
+                      {
+                        memberSyntax = (SyntaxForm) args;
+                        args = memberSyntax.form;
+                      }
 		    pair = (Pair) args;
 		    Object key = pair.car;
 		    Object savedPos2 = tr.pushPositionOf(pair);
@@ -402,6 +410,7 @@ public class object extends Syntax
 				 || key == init_valueKeyword)
 			  {
 			    initPair = pair;
+                            initSyntax = memberSyntax;
 			  }
 			else
 			  {
@@ -412,6 +421,7 @@ public class object extends Syntax
 		      {
 			// CLtL:2 explicitly prohibits this as an extension.
 			initPair = pair;
+                        initSyntax = memberSyntax;
 		      }
 		    else if (args instanceof Pair && nKeywords == 0
 			     && initPair == null && type == null
@@ -420,6 +430,7 @@ public class object extends Syntax
 			// Backward compatibility.
 			type = key;
 			initPair = pair;
+                        initSyntax = memberSyntax;
 			args = pair.cdr;
 		      }
 		    else
@@ -436,7 +447,7 @@ public class object extends Syntax
                       ? ((Declaration) d).getFlag(Declaration.STATIC_SPECIFIED)
                       : d == Boolean.TRUE;
 		    if (inits.elementAt(init_index++) == null)
-                      rewriteInit(d, oexp, initPair, tr, memberSyntax);
+                      rewriteInit(d, oexp, initPair, tr, initSyntax);
 		  }
 	      }
 	    else if (pair_car instanceof Pair)
@@ -488,7 +499,7 @@ public class object extends Syntax
   }
 
   private static void rewriteInit (Object d, ClassExp oexp, Pair initPair,
-                                   Translator tr, SyntaxForm memberSyntax)
+                                   Translator tr, SyntaxForm initSyntax)
   {
     boolean isStatic = d instanceof Declaration
       ? ((Declaration) d).getFlag(Declaration.STATIC_SPECIFIED)
@@ -517,7 +528,7 @@ public class object extends Syntax
     tr.push(initMethod);
     LambdaExp saveLambda = tr.curMethodLambda;
     tr.curMethodLambda = initMethod;
-    Expression initValue = tr.rewrite_car(initPair, memberSyntax);
+    Expression initValue = tr.rewrite_car(initPair, initSyntax);
     if (d instanceof Declaration)
       {
         Declaration decl = (Declaration) d;

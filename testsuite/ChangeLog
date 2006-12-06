@@ -1,5 +1,7 @@
 2006-12-05  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (CLEANFILES): Remove all tmp* files.
+
 	* Makefile.m (EXTRA_DIST): Add two more missing files.
 
 2006-12-04  Per Bothner  <per@bothner.com>

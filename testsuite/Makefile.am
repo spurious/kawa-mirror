@@ -218,7 +218,7 @@ ASupport.class: $(srcdir)/ASupport.scm Base.class
 check-use-slots: ASupport.class
 	$(KAWA) $(OPTIONS) -f $(srcdir)/use-slots.scm
 
-CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
+CLEANFILES = tmp* *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   srfi-64-test.scm use-slots.scm ASupport.scm Base.java \

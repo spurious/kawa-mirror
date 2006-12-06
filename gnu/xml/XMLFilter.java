@@ -13,7 +13,7 @@ import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
  * Handles namespace resolution, and adds "namespace nodes" if needed.
  * Does various error checking.
  * This wrapper should be used when creating a NodeTree,
- * has is done XQuery node constructor expressions.
+ * as is done for XQuery node constructor expressions.
  * Can also be called directly from XMLParser, in which case we use a slightly
  * lower-level interface where we array char array segments rather than
  * Strings.  This is to avoid duplicate String allocation and interning.
@@ -736,11 +736,12 @@ public class XMLFilter implements XConsumer, PositionConsumer
 
   public void textFromParser (char[] data, int start, int length)
   {
-    // Skip whitespace not in an element.
-    // This works semi-accidentally, since XMLParser doesn't call beginDocument
-    // which otherwise would increment nesting.  Perhaps shipping toplevel
-    // whitespace should be handled internally in XMLParser.  FIXME.
-    if (nesting == 0)
+    // We skip whitespace not in an element.
+    int elementNesting = nesting;
+    // Don't count nested document nodes.
+    while (elementNesting > 0 && workStack[elementNesting-1] == null)
+      elementNesting -= 2;
+    if (elementNesting == 0)
       {
         for (int i = 0; ; i++)
           {

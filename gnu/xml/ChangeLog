@@ -1,3 +1,7 @@
+2006-12-06  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (textFromParser): Fix test for nesting.
+
 2006-11-25  Per Bothner  <per@bothner.com>
 
 	* TextUtils.java: New file, moved from gnu.kawa.xml.StringValue.

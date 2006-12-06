@@ -1,5 +1,9 @@
 2006-12-05  Per Bothner  <per@bothner.com>
 
+	* configure.in: Make --with-sax the default.
+
+	* Makefile.am (dist-kawa-@VERSION@.jar): Fix various bitrot.
+
 	* kawa/repl.java: Update copyright year printed by --version to 2007.
 
 	* Makefile.am (kawa/Version.java): Use svnversion command.

@@ -43,7 +43,7 @@ AC_ARG_WITH(awt,
   AS_HELP_STRING(--with-awt,Assume AWT is available (default on)))
 
 AC_ARG_WITH(sax2,
-  AS_HELP_STRING(--with-sax2,Assume SAX2 is available))
+  AS_HELP_STRING(--with-sax2, Assume SAX2 is available (default on)))
 
 AC_ARG_WITH(java-source,
   AS_HELP_STRING(--with-java-source=NUM,Assume functionality of given Java/JDK version))
@@ -129,7 +129,7 @@ AM_CONDITIONAL(ENABLE_SERVLET,
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" != "no")
 AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")
-AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
+AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" != "no")
 AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" != "" -a "$with_XQTS" != "no")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 

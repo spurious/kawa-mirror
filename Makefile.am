@@ -39,9 +39,9 @@ dist-kawa-@VERSION@.jar:
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && rm $$srcdir/patch-source-list
-	  && $$srcdir/configure --with-servlet --with-sax2 --with-swing --with-awt --with-java-source=2\
-	  && $(MAKE) \
+	  && rm -f $$srcdir/patch-source-list \
+	  && $$srcdir/configure --with-servlet --with-java-source=4 \
+	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
 	  && $(JAR) cmf $$srcdir/jar-manifest \
 	    ../kawa-@VERSION@.jar \
 	    `find . -name '*.class' -print` \

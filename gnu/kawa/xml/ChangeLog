@@ -1,3 +1,7 @@
+2006-12-06  Per Bothner  <per@bothner.com>
+
+	* ElementType.java: GroupPredicate was renamed to ElementPredicate.
+
 2006-11-29  Per Bothner  <per@bothner.com>
 
 	* Document.java (docAvailable): Moved to gnu.xquery.util/NodeUtils.

@@ -1,3 +1,7 @@
+2006-12-06  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java: ElementPredicate was renamed to ItemPredicate.
+
 2006-11-16  Per Bothner  <per@bothner.com>
 
 	* SingletonType.java (compare, coerceToSingleton, coerceFromObject,

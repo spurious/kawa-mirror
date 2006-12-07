@@ -10,7 +10,7 @@ import java.io.*;
 import gnu.mapping.*;
 
 public class ElementType extends NodeType
-implements TypeValue, Externalizable, GroupPredicate
+implements TypeValue, Externalizable, ElementPredicate
 {
   public static final String MATCH_ANY_LOCALNAME = "";
   public static final Symbol MATCH_ANY_QNAME

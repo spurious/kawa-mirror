@@ -8,6 +8,6 @@ package gnu.lists;
  * a sequence of primtive values only matches the first as a "text" node.
  */
 
-public interface NodePredicate extends ElementPredicate
+public interface NodePredicate extends ItemPredicate
 {
 }

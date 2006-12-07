@@ -3,12 +3,11 @@
 
 package gnu.lists;
 
-/** A predicate (or type) on an element of a sequence.
- * Element is here used in the sense of 'element of a sequence",
- * not the XML sense of 'element node'.
+/** A predicate that (only) matches a GROUP_VALUE.
+ * If using XML terminology:  only matches element nodes.
  */
 
-public interface ElementPredicate
+public interface ElementPredicate extends NodePredicate
 {
-  public boolean isInstancePos (AbstractSequence seq, int ipos);
+  public boolean isInstance(AbstractSequence seq, int ipos, Object groupType);
 }

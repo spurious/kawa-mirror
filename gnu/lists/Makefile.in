@@ -235,7 +235,7 @@ java_sources = \
   GapVector.java \
   GeneralArray.java \
   GeneralArray1.java \
-  GroupPredicate.java \
+  ItemPredicate.java \
   LList.java \
   LListPosition.java \
   NodePredicate.java \

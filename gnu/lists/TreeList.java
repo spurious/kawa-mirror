@@ -1958,7 +1958,7 @@ public class TreeList extends AbstractSequence
       }
   }
 
-  public int nextMatching(int startPos, ElementPredicate predicate,
+  public int nextMatching(int startPos, ItemPredicate predicate,
 			  int endPos, boolean descend)
   {
     int start = posToDataIndex(startPos);
@@ -1970,7 +1970,7 @@ public class TreeList extends AbstractSequence
     boolean checkNode;
     boolean checkText;
     boolean checkGroup; // true if group nodes could match.
-    if (predicate instanceof GroupPredicate)
+    if (predicate instanceof ElementPredicate)
       {
 	checkNode = true;
 	checkGroup = true;

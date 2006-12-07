@@ -149,7 +149,7 @@ public abstract class AbstractSequence
    * @param descend if true do depth-first traversal.
    * @return poistion of next match or 0 if none found
    */
-  public int nextMatching(int startPos, ElementPredicate type,
+  public int nextMatching(int startPos, ItemPredicate type,
 			  int endPos, boolean descend)
   {
     if (descend)
@@ -534,7 +534,7 @@ public abstract class AbstractSequence
     return 0;
   }
 
-  public int firstChildPos (int ipos, ElementPredicate predicate)
+  public int firstChildPos (int ipos, ItemPredicate predicate)
   {
     int child = firstChildPos(ipos);
     if (child == 0)

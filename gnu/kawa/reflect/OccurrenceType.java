@@ -88,9 +88,9 @@ public class OccurrenceType extends ObjectType
 	Values vals = (Values) obj;
 	int pos = vals.startPos();
 	int n = 0;
-	if (base instanceof ElementPredicate)
+	if (base instanceof ItemPredicate)
 	  {
-	    ElementPredicate pred = (ElementPredicate) base;
+	    ItemPredicate pred = (ItemPredicate) base;
 	    for (;;)
 	      {
 		boolean matches;

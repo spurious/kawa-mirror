@@ -134,7 +134,7 @@ public class XSLT extends XQuery
 	  case Sequence.DOCUMENT_VALUE:
 	    ipos = doc.firstChildPos(ipos);
 	    break;
-	  case Sequence.GROUP_VALUE:
+	  case Sequence.ELEMENT_VALUE:
 	    Object type = pos.getNextTypeObject();
 	    Procedure proc = TemplateTable.nullModeTable.find(pos.getNextTypeName());
 	    String name = pos.getNextTypeName();
@@ -145,12 +145,12 @@ public class XSLT extends XQuery
 	      }
 	    else
 	      {
-		out.beginGroup(type);
+		out.startElement(type);
 		// FIXME emit attributes
 		pos.push(doc, doc.firstChildPos(ipos));
 		process(doc, pos, ctx);
 		pos.pop();
-		out.endGroup();
+		out.endElement();
 	      }
 	    ipos = doc.nextDataIndex(ipos >>> 1) << 1;
 	    pos.gotoNext();

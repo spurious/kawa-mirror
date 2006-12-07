@@ -10,9 +10,9 @@ public class FilterConsumer
 {
   protected Consumer base;
   protected boolean skipping;
-  /** We seen a beginAttribute but not the closing endAttribute. */
+  /** We seen a startAttribute but not the closing endAttribute. */
   protected boolean inAttribute;
-  /** The 'attribute type' from the most recent beginAttribute. */
+  /** The 'attribute type' from the most recent startAttribute. */
   protected Object attributeType;
 
   public FilterConsumer (Consumer base)
@@ -66,10 +66,10 @@ public class FilterConsumer
       base.writeLong(v);
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     if (! skipping)
-      base.beginDocument();
+      base.startDocument();
   }
 
   public void endDocument()
@@ -78,24 +78,24 @@ public class FilterConsumer
       base.endDocument();
   }
 
-  public void beginGroup (Object type)
+  public void startElement (Object type)
   {
     if (! skipping)
-      base.beginGroup(type);
+      base.startElement(type);
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
     if (! skipping)
-      base.endGroup();
+      base.endElement();
   }
 
-  public void beginAttribute (Object attrType)
+  public void startAttribute (Object attrType)
   {
     attributeType = attrType;
     inAttribute = true;
     if (! skipping)
-      base.beginAttribute(attrType);
+      base.startAttribute(attrType);
   }
 
   public void endAttribute()

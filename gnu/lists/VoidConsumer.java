@@ -17,7 +17,7 @@ public class VoidConsumer extends FilterConsumer
     skipping = true;
   }
 
-  /** True if consumer is ignoring rest of group.
+  /** True if consumer is ignoring rest of element.
    * The producer can use this information to skip ahead. */
   public boolean ignoring()
   {

@@ -66,7 +66,7 @@ extends
   public static final int CHAR_VALUE = PRIM_VALUE + 13;
   public static final int CDATA_VALUE = 31;
   public static final int OBJECT_VALUE = 32;
-  public static final int GROUP_VALUE = 33;
+  public static final int ELEMENT_VALUE = 33;
   public static final int DOCUMENT_VALUE = 34;
   public static final int ATTRIBUTE_VALUE = 35;
   public static final int COMMENT_VALUE = 36;

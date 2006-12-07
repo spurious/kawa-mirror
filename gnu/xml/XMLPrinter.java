@@ -62,13 +62,13 @@ public class XMLPrinter extends OutPort
   /** Chain of currently active namespace nodes. */
   NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
 
-  /** Stack of namespaceBindings as of active beginGroup calls. */
+  /** Stack of namespaceBindings as of active startElement calls. */
   NamespaceBinding[] namespaceSaveStack = new NamespaceBinding[20];
 
-  Object[] groupNameStack = new Object[20];
+  Object[] elementNameStack = new Object[20];
 
-  /** Difference between number of beginGroup and endGroup calls so far. */
-  int groupNesting;
+  /** Difference between number of startElement and endElement calls so far. */
+  int elementNesting;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
@@ -275,7 +275,7 @@ public class XMLPrinter extends OutPort
       printIndent = -1;
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     if (printXMLdecl)
       {
@@ -322,10 +322,10 @@ public class XMLPrinter extends OutPort
       bout.write(name == null ? "{null name}" : (String) name);
   }
 
-  public void beginGroup(Object type)
+  public void startElement(Object type)
   {
     closeTag();
-    if (groupNesting == 0)
+    if (elementNesting == 0)
       {
         if (! inDocument)
           setIndentMode();
@@ -367,21 +367,21 @@ public class XMLPrinter extends OutPort
     writeQName(type);
     if (printIndent >= 0 && indentAttributes)
       startLogicalBlock("", "", 2);
-    groupNameStack[groupNesting] = type;
-    NamespaceBinding groupBindings = null;
-    namespaceSaveStack[groupNesting++] = namespaceBindings;
+    elementNameStack[elementNesting] = type;
+    NamespaceBinding elementBindings = null;
+    namespaceSaveStack[elementNesting++] = namespaceBindings;
     if (type instanceof XName)
       {
-	groupBindings = ((XName) type).namespaceNodes;
+	elementBindings = ((XName) type).namespaceNodes;
 	NamespaceBinding join
-	  = NamespaceBinding.commonAncestor(groupBindings, namespaceBindings);
-        int numBindings = groupBindings == null ? 0
-          : groupBindings.count(join);
+	  = NamespaceBinding.commonAncestor(elementBindings, namespaceBindings);
+        int numBindings = elementBindings == null ? 0
+          : elementBindings.count(join);
         NamespaceBinding[] sortedBindings = new NamespaceBinding[numBindings];
         int i = 0;
         boolean sortNamespaces = canonicalize;
       check_namespaces:
-	for (NamespaceBinding ns = groupBindings;  ns != join;  ns = ns.next)
+	for (NamespaceBinding ns = elementBindings;  ns != join;  ns = ns.next)
           {
             int j = i;
             boolean skip = false;
@@ -448,7 +448,7 @@ public class XMLPrinter extends OutPort
 		 ns != join;  ns = ns.next)
 	      {
 		String prefix = ns.prefix;
-		if (ns.uri != null && groupBindings.resolve(prefix) == null)
+		if (ns.uri != null && elementBindings.resolve(prefix) == null)
 		  {
 		    bout.write(' '); // prettyprint break
 		    if (prefix == null)
@@ -462,16 +462,16 @@ public class XMLPrinter extends OutPort
 		  }
 	      }
 	  }
-	namespaceBindings = groupBindings;
+	namespaceBindings = elementBindings;
       }
-    if (groupNesting >= namespaceSaveStack.length)
+    if (elementNesting >= namespaceSaveStack.length)
       {
-	NamespaceBinding[] nstmp = new NamespaceBinding[2 * groupNesting];
-	System.arraycopy(namespaceSaveStack, 0, nstmp, 0, groupNesting);
+	NamespaceBinding[] nstmp = new NamespaceBinding[2 * elementNesting];
+	System.arraycopy(namespaceSaveStack, 0, nstmp, 0, elementNesting);
 	namespaceSaveStack = nstmp;
-	Object[] nmtmp = new Object[2 * groupNesting];
-	System.arraycopy(groupNameStack, 0, nmtmp, 0, groupNesting);
-	groupNameStack = nmtmp;
+	Object[] nmtmp = new Object[2 * elementNesting];
+	System.arraycopy(elementNameStack, 0, nmtmp, 0, elementNesting);
+	elementNameStack = nmtmp;
       }
 
     inStartTag = true;
@@ -495,11 +495,11 @@ public class XMLPrinter extends OutPort
       && HtmlEmptyTags.charAt(index+name.length()) == '/';
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
     if (useEmptyElementTag == 0)
       closeTag();
-    Object type = groupNameStack[groupNesting-1];
+    Object type = elementNameStack[elementNesting-1];
     String typeName = ! isHtml ? null // not needed
       : type instanceof Symbol ? ((Symbol) type).getLocalPart()
       : type.toString();
@@ -536,14 +536,14 @@ public class XMLPrinter extends OutPort
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = true;
 
-    namespaceBindings = namespaceSaveStack[--groupNesting];
-    namespaceSaveStack[groupNesting] = null;
-    groupNameStack[groupNesting] = null;
+    namespaceBindings = namespaceSaveStack[--elementNesting];
+    namespaceSaveStack[elementNesting] = null;
+    elementNameStack[elementNesting] = null;
   }
 
-  /** Write a attribute for the current group.
-   * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(Object attrType)
+  /** Write a attribute for the current element.
+   * This is only allowed immediately after a startElement. */
+  public void startAttribute (Object attrType)
   {
     if (inAttribute)
       bout.write('"');
@@ -680,7 +680,7 @@ public class XMLPrinter extends OutPort
       }
     if (v instanceof Keyword)
       {
-        beginAttribute(((Keyword) v).getName());
+        startAttribute(((Keyword) v).getName());
         prev = KEYWORD;
         return;
       }
@@ -707,7 +707,7 @@ public class XMLPrinter extends OutPort
    * a Sequence or a Consumable. */
   //public void writeAll(Object sequence);
 
-  /** True if consumer is ignoring rest of group.
+  /** True if consumer is ignoring rest of element.
    * The producer can use this information to skip ahead. */
   public boolean ignoring()
   {

@@ -76,30 +76,30 @@ implements TypeValue, Externalizable, ElementPredicate
   public boolean isInstancePos (AbstractSequence seq, int ipos)
   {
     int kind = seq.getNextKind(ipos);
-    if (kind == Sequence.GROUP_VALUE)
+    if (kind == Sequence.ELEMENT_VALUE)
       return isInstance(seq, ipos, seq.getNextTypeObject(ipos));
     if (kind == Sequence.OBJECT_VALUE)
       return isInstance(seq.getPosNext(ipos));
     return false;
   }
 
-  public boolean isInstance(AbstractSequence seq, int ipos, Object groupType)
+  public boolean isInstance(AbstractSequence seq, int ipos, Object elementType)
   {
     String namespaceURI = qname.getNamespaceURI();
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
-    if (groupType instanceof Symbol)
+    if (elementType instanceof Symbol)
       {
-	Symbol qname = (Symbol) groupType;
+	Symbol qname = (Symbol) elementType;
 	curNamespaceURI = qname.getNamespaceURI();
 	curLocalName = qname.getLocalName();
       }
     /* #ifdef JAXP-1.3 */
-    // else if (groupType instanceof javax.xml.namespace.QName)
+    // else if (elementType instanceof javax.xml.namespace.QName)
     // {
     //   javax.xml.namespace.QName qtype
-    //     = (javax.xml.namespace.QName) groupType;
+    //     = (javax.xml.namespace.QName) elementType;
     //   curNamespaceURI = qtype.getNamespaceURI();
     //   curLocalName = qtype.getLocalPart();
     // }
@@ -107,7 +107,7 @@ implements TypeValue, Externalizable, ElementPredicate
     else
       {
 	curNamespaceURI = "";
-	curLocalName = groupType.toString().intern();  // FIXME
+	curLocalName = elementType.toString().intern();  // FIXME
       }
     if (localName != null && localName.length() == 0)
       localName = null;
@@ -124,7 +124,7 @@ implements TypeValue, Externalizable, ElementPredicate
   public static KElement coerceOrNull (Object obj,
 				       String namespaceURI, String localName)
   {
-    KElement pos = (KElement) NodeType.coerceOrNull(obj, GROUP_OK);
+    KElement pos = (KElement) NodeType.coerceOrNull(obj, ELEMENT_OK);
     if (pos == null)
       return null;
     if (localName != null && localName.length() == 0)

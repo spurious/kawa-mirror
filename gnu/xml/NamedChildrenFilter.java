@@ -31,10 +31,10 @@ public class NamedChildrenFilter extends FilterConsumer
     skipping = true;
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     level++;
-    super.beginDocument();
+    super.startDocument();
   }
 
   public void endDocument()
@@ -43,7 +43,7 @@ public class NamedChildrenFilter extends FilterConsumer
     super.endDocument();
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   {
     if (skipping && level == 1 // && axis is child::
 	// || axis is descdendent-or-self::
@@ -71,14 +71,14 @@ public class NamedChildrenFilter extends FilterConsumer
 	  }
       }
 
-    super.beginGroup(type);
+    super.startElement(type);
     level++;
   }
 
-  public void endGroup()
+  public void endElement ()
   {
     level--;
-    super.endGroup();
+    super.endElement();
     if (! skipping && matchLevel == level)
       skipping = true;
   }

@@ -186,22 +186,22 @@ public class Nodes extends Values
       finishFragment();
   }
 
-  public void beginGroup (Object type)
+  public void startElement (Object type)
   {
     maybeStartNonTextNode();
-    curFragment.beginGroup(type);
+    curFragment.startElement(type);
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
-    curFragment.endGroup();
+    curFragment.endElement();
     maybeEndNonTextNode();
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute(Object attrType)
   {
     maybeStartNonTextNode();
-    curFragment.beginAttribute(attrType);
+    curFragment.startAttribute(attrType);
     inAttribute = true;
   }
 
@@ -235,10 +235,10 @@ public class Nodes extends Values
     maybeEndNonTextNode();
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     maybeStartNonTextNode();
-    curFragment.beginDocument();
+    curFragment.startDocument();
   }
 
   public void endDocument()

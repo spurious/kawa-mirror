@@ -20,7 +20,7 @@ public class Document
     XMLParser parser = new XMLParser(name, messages, out);
     if (out instanceof XConsumer)
       ((XConsumer) out).beginEntity(name);
-    out.beginDocument();
+    out.startDocument();
     if (out instanceof TreeList)
       ((TreeList) out).writeDocumentUri(name);
     parser.parse();
@@ -58,7 +58,7 @@ public class Document
         SourceMessages messages = new SourceMessages();
         XMLParser parser = new XMLParser(uri, messages, tree);
         tree.beginEntity(uri);
-        tree.beginDocument();
+        tree.startDocument();
         tree.writeDocumentUri(uri);
         parser.parse();
         parser.close();

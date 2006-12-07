@@ -60,7 +60,7 @@ extends HttpServlet
       }
     */
 
-    ctx.consumer.beginDocument();
+    ctx.consumer.startDocument();
     try
       {
 	run(ctx);

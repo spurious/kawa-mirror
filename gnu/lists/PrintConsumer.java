@@ -113,16 +113,16 @@ public class PrintConsumer extends PrintWriter
     endNumber();
   }
 
-  public void beginDocument() { }
+  public void startDocument () { }
 
   public void endDocument() { }
 
 
-  public void beginGroup(Object type) { }
+  public void startElement (Object type) { }
 
-  public void endGroup() { }
+  public void endElement () { }
 
-  public void beginAttribute(Object attrType) { }
+  public void startAttribute (Object attrType) { }
 
   public void endAttribute() { }
 

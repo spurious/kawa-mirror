@@ -60,7 +60,7 @@ public class ContentConsumer implements Consumer
     inStartTag = 0;
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   {
     if (inStartTag == 1)
       endStartTag();
@@ -97,7 +97,7 @@ public class ContentConsumer implements Consumer
     nesting++;
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute(Object attrType)
   {
     attrURI = ((Symbol) attrType).getNamespaceURI();
     attrLocalName = ((Symbol) attrType).getLocalName();
@@ -113,7 +113,7 @@ public class ContentConsumer implements Consumer
     inStartTag = 1;
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     try
       {
@@ -121,7 +121,7 @@ public class ContentConsumer implements Consumer
       }
     catch (SAXException ex)
       {
-	error("beginDocument", ex);
+	error("startDocument", ex);
       }
   }
 
@@ -137,7 +137,7 @@ public class ContentConsumer implements Consumer
       }
   }
 
-  public void endGroup()
+  public void endElement ()
   {
     endStartTag();
     flushStrBuffer();

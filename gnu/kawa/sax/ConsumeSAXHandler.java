@@ -26,7 +26,7 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 
   public void startDocument()
   {
-    out.beginDocument();
+    out.startDocument();
   }
 
   public void endDocument()
@@ -38,11 +38,11 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 			    String qName, Attributes atts)
         throws SAXException
   {
-    out.beginGroup(Symbol.make(namespaceURI, localName));
+    out.startElement(Symbol.make(namespaceURI, localName));
     int numAttributes = atts.getLength();
     for (int i = 0;  i < numAttributes;  i++)
       {
-	out.beginAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
+	out.startAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
 	out.write(atts.getValue(i));
 	out.endAttribute();
       }
@@ -52,14 +52,14 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 			  String qName)
     throws SAXException
   {
-    out.endGroup();
+    out.endElement();
   }
 
   public void startElement (String name, AttributeList atts)
     throws SAXException
   {
     name = name.intern();  // ???
-    out.beginGroup(name);  // FIXME
+    out.startElement(name);  // FIXME
     int attrLength = atts.getLength();
     for (int i = 0; i < attrLength; i++)
       {
@@ -67,7 +67,7 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 	name = name.intern();  // ?
 	String type = atts.getType(i);
 	String value = atts.getValue(i);
-	out.beginAttribute(name);  // FIXME
+	out.startAttribute(name);  // FIXME
 	out.write(value);
 	out.endAttribute();
       }
@@ -76,7 +76,7 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
   public void endElement (String name)
     throws SAXException
   {
-    out.endGroup();
+    out.endElement();
   }
 
   public void characters (char ch[], int start, int length)

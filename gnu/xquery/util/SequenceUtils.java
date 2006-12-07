@@ -155,7 +155,7 @@ public class SequenceUtils
   }
 
   public static final NodeType textOrElement
-    = new NodeType("element-or-text", NodeType.GROUP_OK|NodeType.TEXT_OK);
+    = new NodeType("element-or-text", NodeType.ELEMENT_OK|NodeType.TEXT_OK);
 
   public static boolean deepEqualChildren (NodeTree seq1, int ipos1,
                                            NodeTree seq2, int ipos2,
@@ -183,7 +183,7 @@ public class SequenceUtils
     int kind2 = seq1.getNextKind(ipos2);
     switch (kind1)
       {
-      case Sequence.GROUP_VALUE:
+      case Sequence.ELEMENT_VALUE:
         if (kind1 != kind2)
           return false;
         // Assumes local-name and namespace-URI are interned.

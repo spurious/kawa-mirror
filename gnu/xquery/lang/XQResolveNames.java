@@ -1005,10 +1005,10 @@ public class XQResolveNames extends ResolveNames
                             if (sym.equals(attrSyms[j]))
                               {
                                 getCompilation().setLine(app);
-                                Symbol groupSym = MakeElement.getTagName(exp);
-                                String groupName = groupSym == null ? null
-                                  : groupSym.toString();
-                                messages.error('e', XMLFilter.duplicateAttributeMessage(sym, groupName), "XQST0040");
+                                Symbol elementSym = MakeElement.getTagName(exp);
+                                String elementName = elementSym == null ? null
+                                  : elementSym.toString();
+                                messages.error('e', XMLFilter.duplicateAttributeMessage(sym, elementName), "XQST0040");
                               }
                           }
                       }

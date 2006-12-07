@@ -252,10 +252,10 @@ public class OutPort extends PrintConsumer implements Printable
     out.write('>');
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   {
     if (objectFormat != null)
-      objectFormat.beginGroup(type, this);
+      objectFormat.startElement(type, this);
     else
       {
 	print('(');
@@ -263,20 +263,20 @@ public class OutPort extends PrintConsumer implements Printable
       }
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
     if (objectFormat != null)
-      objectFormat.endGroup(this);
+      objectFormat.endElement(this);
     else
       print(')');
   }
 
-  /** Write a attribute for the current group.
-   * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(Object attrType)
+  /** Write a attribute for the current element.
+   * This is only allowed immediately after a startElement. */
+  public void startAttribute (Object attrType)
   {
     if (objectFormat != null)
-      objectFormat.beginAttribute(attrType, this);
+      objectFormat.startAttribute(attrType, this);
     else
       {
         print(' ');
@@ -285,7 +285,7 @@ public class OutPort extends PrintConsumer implements Printable
       }
   }
 
-  /** No more attributes in this group. */
+  /** No more attributes in this element. */
   public void endAttribute()
   {
     if (objectFormat != null)

@@ -294,7 +294,7 @@ abstract public class @XMLParser@
             continue mainLoop;
           case BEGIN_ELEMENT_STATE:
             this.pos = pos;
-            out.emitBeginElement(buffer, start, length);
+            out.emitStartElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
 	    start = limit;
             continue mainLoop;
@@ -443,7 +443,7 @@ abstract public class @XMLParser@
             if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
 		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
-            out.emitBeginAttribute(buffer, start, length);
+            out.emitStartAttribute(buffer, start, length);
 	    start = limit;
             if (ch == '=')
               {

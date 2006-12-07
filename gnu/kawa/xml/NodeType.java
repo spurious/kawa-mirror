@@ -19,7 +19,7 @@ import gnu.xml.*;
 public class NodeType extends ObjectType implements TypeValue, NodePredicate, Externalizable
 {
   public static final int TEXT_OK = 1;
-  public static final int GROUP_OK = 2;
+  public static final int ELEMENT_OK = 2;
   public static final int ATTRIBUTE_OK = 4;
   public static final int DOCUMENT_OK = 8;
   public static final int COMMENT_OK = 16;
@@ -99,8 +99,8 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
 	  case Sequence.CHAR_VALUE:
 	  case Sequence.OBJECT_VALUE:
 	    return (kinds & TEXT_OK) != 0;
-	  case Sequence.GROUP_VALUE:
-	    return (kinds & GROUP_OK) != 0;
+	  case Sequence.ELEMENT_VALUE:
+	    return (kinds & ELEMENT_OK) != 0;
 	  case Sequence.ATTRIBUTE_VALUE:
 	    return (kinds & ATTRIBUTE_OK) != 0;
 	  case Sequence.DOCUMENT_VALUE:

@@ -42,10 +42,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
    * This is logically multiple separate stacks, but we combine them into
    * a single array.  While this makes the code a little harder to read,
    * it reduces memory overhead and (more importantly) should improve locality.
-   * For each nested document or group there is the saved value of
+   * For each nested document or element there is the saved value of
    * namespaceBindings followed by a either a MappingInfo or Symbol
-   * from the emitBeginElement/beginGroup.  This is followed by a MappingInfo
-   * or Symbol for each attribute we seen for the current group. */
+   * from the emitBeginElement/startElement.  This is followed by a MappingInfo
+   * or Symbol for each attribute we seen for the current element. */
   Object[] workStack;
   NamespaceBinding namespaceBindings;
 
@@ -57,7 +57,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   public void setMessages (SourceMessages messages)
   { this.messages = messages; }
 
-  /** Twice the number of active beginGroup and beginDocument calls. */
+  /** Twice the number of active startElement and startDocument calls. */
   protected int nesting;
 
   int previous = 0;
@@ -66,13 +66,13 @@ public class XMLFilter implements XConsumer, PositionConsumer
   private static final int SAW_WORD = 3;
 
   /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
-   * It counts the number of nested beginAttributes that are active.
+   * It counts the number of nested startAttributes that are active.
    * (In the future it should also count begun comment and
    * processing-instruction constructors, when those support nesting.) */
   protected int stringizingLevel;
-  /** Value of {@code nesting} just before outermost beginGroup
+  /** Value of {@code nesting} just before outermost startElement
    * while {@code stringizingLevel > 0}.
-   * I.e. if we're nested inside a group nested inside an attribute
+   * I.e. if we're nested inside a element nested inside an attribute
    * then {@code stringizingElementNesting >= 0},
    * otherwise {@code stringizingElementNesting == -1}. */
   protected int stringizingElementNesting = -1;
@@ -556,7 +556,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 		info.index = index;
 	      }
 	    if (i == 0)
-              tlist.setGroupName(tlist.gapEnd, index);
+              tlist.setElementName(tlist.gapEnd, index);
 	    else if (! isNsNode || namespacePrefixes)
               tlist.setAttributeName(startIndexes[i-1], index);
 	  }
@@ -565,10 +565,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
             Object type = info == null ? saved
               : i == 0 ? info.type : info.qname;
 	    if (i == 0)
-	      out.beginGroup(type);
+	      out.startElement(type);
 	    else if (! isNsNode || namespacePrefixes)
 	      {
-		out.beginAttribute(type);
+		out.startAttribute(type);
 		int start = startIndexes[i-1];
 		int end = i < attrCount ? startIndexes[i] : tlist.gapStart;
 		tlist.consumeIRange(start + TreeList.BEGIN_ATTRIBUTE_LONG_SIZE,
@@ -675,7 +675,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     else if (v instanceof Keyword)
       {
         Keyword k = (Keyword) v;
-        beginAttribute(k.asSymbol());
+        startAttribute(k.asSymbol());
         previous = SAW_KEYWORD;
       }
     else
@@ -871,14 +871,14 @@ public class XMLFilter implements XConsumer, PositionConsumer
       }
   }
 
-  protected void beginGroupCommon ()
+  protected void startElementCommon ()
   {
     closeStartTag();
     if (stringizingLevel == 0)
       {
         ensureSpaceInWorkStack(nesting);
         workStack[nesting] = namespaceBindings;
-        tlist.beginGroup(0);
+        tlist.startElement(0);
         base = tlist;
         attrCount = 0;
       }
@@ -894,18 +894,18 @@ public class XMLFilter implements XConsumer, PositionConsumer
   }
 
   /** Process a start tag, with the given element name. */
-  public void emitBeginElement(char[] data, int start, int count)
+  public void emitStartElement(char[] data, int start, int count)
   { 
     closeStartTag();
     MappingInfo info = lookupTag(data, start, count);
-    beginGroupCommon();
+    startElementCommon();
     ensureSpaceInWorkStack(nesting-1);
     workStack[nesting-1] = info;
   }
 
-  public void beginGroup(Object type)
+  public void startElement(Object type)
   {
-    beginGroupCommon();
+    startElementCommon();
     if (stringizingLevel == 0)
       {
         ensureSpaceInWorkStack(nesting-1);
@@ -936,7 +936,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
               }
             if (inherited == null)
               {
-                // This is the outer-most group.
+                // This is the outer-most element.
                 namespaceBindings
                   = (type instanceof XName ? ((XName) type).getNamespaceNodes()
                      : NamespaceBinding.predefinedXML);
@@ -978,7 +978,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     return findNamespaceBinding(prefix, uri, list);
   }
 
-  private boolean beginAttributeCommon()
+  private boolean startAttributeCommon()
   {
     if (stringizingElementNesting >= 0)
       ignoringLevel++;
@@ -994,7 +994,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     return true;
   }
 
-  public void beginAttribute (Object attrType)
+  public void startAttribute (Object attrType)
   {
     previous = 0;
     if (attrType instanceof Symbol)
@@ -1012,25 +1012,25 @@ public class XMLFilter implements XConsumer, PositionConsumer
       error('e', "attribute not allowed at document level");
     if (attrCount < 0 && nesting > 0)
       error('e', "attribute '"+attrType+"' follows non-attribute content");
-    if (! beginAttributeCommon())
+    if (! startAttributeCommon())
       return;
     workStack[nesting+attrCount-1] = attrType;
     if (nesting == 0)
-      base.beginAttribute(attrType);
+      base.startAttribute(attrType);
     else
-      tlist.beginAttribute(0);
+      tlist.startAttribute(0);
   }
 
   /** Process an attribute, with the given attribute name.
    * The attribute value is given using {@code write}.
-   * The value is terminated by either another emitBeginAttribute
+   * The value is terminated by either another emitStartAttribute
    * or an emitEndAttributes.
    */
-  public void emitBeginAttribute(char[] data, int start, int count)
+  public void emitStartAttribute (char[] data, int start, int count)
   {
     if (attrLocalName != null)
       endAttribute();
-    if (! beginAttributeCommon())
+    if (! startAttributeCommon())
       return;
 
     MappingInfo info = lookupTag(data, start, count);
@@ -1054,7 +1054,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 	  }
       }
     if (currentNamespacePrefix == null || namespacePrefixes)
-      tlist.beginAttribute(0);
+      tlist.startAttribute(0);
   }
 
   /** Process the end of a start tag.
@@ -1108,10 +1108,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
     closeStartTag();
     if (nesting <= 0)
       return; // Only if error.
-    endGroup();
+    endElement();
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
     closeStartTag();
     nesting -= 2;
@@ -1121,7 +1121,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
         namespaceBindings = (NamespaceBinding) workStack[nesting];
         workStack[nesting] = null;
         workStack[nesting+1] = null;
-        base.endGroup();
+        base.endElement();
       }
     else if (stringizingElementNesting == nesting)
       {
@@ -1278,7 +1278,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     processingInstructionCommon(target, buffer, dstart, dlength);
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     closeStartTag();
     if (stringizingLevel > 0)
@@ -1287,7 +1287,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     else
       {
         if (nesting == 0)
-          base.beginDocument();
+          base.startDocument();
         else
           writeJoiner();
         ensureSpaceInWorkStack(nesting);
@@ -1497,7 +1497,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   }
 
   public static String
-  duplicateAttributeMessage (Symbol attrSymbol, Object groupName)
+  duplicateAttributeMessage (Symbol attrSymbol, Object elementName)
   {
     StringBuffer sbuf = new StringBuffer("duplicate attribute: ");
     String uri = attrSymbol.getNamespaceURI();
@@ -1508,10 +1508,10 @@ public class XMLFilter implements XConsumer, PositionConsumer
         sbuf.append(uri);
       }
     sbuf.append(attrSymbol.getLocalPart());
-    if (groupName != null)
+    if (elementName != null)
       {
         sbuf.append(" in <");
-        sbuf.append(groupName);
+        sbuf.append(elementName);
         sbuf.append('>');
       }
     return sbuf.toString();

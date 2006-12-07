@@ -1,5 +1,17 @@
 2006-12-06  Per Bothner  <per@bothner.com>
 
+	* NodeType.java (GROUP_OK): Renamed to ELEMENT_OK.
+	* KNode.java: Update for renamed Sequence constant.
+	* MakeAttribute.java: Update for renamed Consumer methods.
+	* MakeResponseHeader.java: Likewise.
+	* Document.java: Likewise.
+	* HttpPrinter.java: Likewise.
+	* DocumentConstructor.java: Likewise.
+	* MakeElement.java: Likewise.
+	* ElementType.java: Likewise.
+	* Nodes.java: Likewise.
+	* OutPOrt.java: Likewise.
+
 	* ElementType.java: GroupPredicate was renamed to ElementPredicate.
 
 2006-11-29  Per Bothner  <per@bothner.com>

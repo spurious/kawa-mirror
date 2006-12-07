@@ -20,7 +20,7 @@ public class DocumentConstructor extends NodeConstructor
     try
       {
 	Object endMarker = Location.UNBOUND;
-	out.beginDocument();
+	out.startDocument();
 	for (;;)
 	  {
 	    Object arg = ctx.getNextArg(endMarker);
@@ -47,15 +47,15 @@ public class DocumentConstructor extends NodeConstructor
     int nargs = args.length;
     CodeAttr code = comp.getCode();
     code.emitLoad(consumer);
-    code.emitInvokeInterface(beginDocumentMethod);
+    code.emitInvokeInterface(startDocumentMethod);
     for (int i = 0;  i < nargs;  i++)
       compileChild(args[i], comp, target);
     code.emitLoad(consumer);
     code.emitInvokeInterface(endDocumentMethod);
   }
 
-  static final Method beginDocumentMethod
-    = Compilation.typeConsumer.getDeclaredMethod("beginDocument", 0);
+  static final Method startDocumentMethod
+    = Compilation.typeConsumer.getDeclaredMethod("startDocument", 0);
   static final Method endDocumentMethod
     = Compilation.typeConsumer.getDeclaredMethod("endDocument", 0);
 

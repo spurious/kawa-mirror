@@ -31,9 +31,9 @@ public class TestSuite extends FilterConsumer
   boolean inTest = false;
   String currentTag;
   /* #ifdef JAVA5 */
-  // Stack<Object> groupStack = new Stack<Object>();
+  // Stack<Object> elementStack = new Stack<Object>();
   /* #else */
-  Stack groupStack = new Stack();
+  Stack elementStack = new Stack();
   /* #endif */
 
   CharArrayOutPort cout;
@@ -60,7 +60,7 @@ public class TestSuite extends FilterConsumer
     this.xout = xout;
   }
 
-  public void beginGroup(Object type)
+  public void startElement(Object type)
   {
     String typeName = type.toString();
     if ("testsuite".equals(typeName) && nesting == 0)
@@ -76,15 +76,15 @@ public class TestSuite extends FilterConsumer
     else if (currentTag == null)
       throw new RuntimeException("saw <"+typeName+"> not in <test>");
     else
-      base.beginGroup(type);
+      base.startElement(type);
     nesting++;
-    groupStack.push(type);
+    elementStack.push(type);
   }
 
-  public void endGroup()
+  public void endElement ()
   {
     nesting--;
-    Object type = groupStack.pop();
+    Object type = elementStack.pop();
     String typeName = type.toString();
     if ("testsuite".equals(typeName) && nesting == 0)
       inTestSuite = false;
@@ -109,6 +109,6 @@ public class TestSuite extends FilterConsumer
 	currentTag = null;
       }
     else
-      base.endGroup();
+      base.endElement();
   }
 }

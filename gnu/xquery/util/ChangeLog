@@ -1,4 +1,8 @@
-2006-12-01  Per Bothner  <per@bothner.com>
+2006-12-06  Per Bothner  <per@bothner.com>
+
+	* SequenceUtils.java: Update for renamed Consumer methods.
+
+`2006-12-01  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (normalizeUnicode): Add working implementation,
 	using java.text.Normalizer (Java 6 only).

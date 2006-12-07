@@ -1,3 +1,7 @@
+2006-12-06  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java: Update for renamed Consumer methods.
+
 2006-12-04  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse): Get ModuleInfo for this compilation.

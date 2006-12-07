@@ -14,9 +14,9 @@ public class MakeAttribute extends NodeConstructor
 
   public int numArgs() { return 0xFFFFF001; }
 
-  public static void beginAttribute(Consumer out, Object type)
+  public static void startAttribute(Consumer out, Object type)
   {
-    out.beginAttribute(type);
+    out.startAttribute(type);
   }
 
   public void apply (CallContext ctx)
@@ -26,7 +26,7 @@ public class MakeAttribute extends NodeConstructor
     try
       {
 	Object type = ctx.getNextArg();
-	beginAttribute(out, type);
+	startAttribute(out, type);
 	Object endMarker = Special.dfault;
 	for (;;)
 	  {
@@ -57,7 +57,7 @@ public class MakeAttribute extends NodeConstructor
     code.emitDup();
     args[0].compile(comp, Target.pushObject);
     // Stack:  consumer, consumer, tagtype
-    code.emitInvokeStatic(beginAttributeMethod);
+    code.emitInvokeStatic(startAttributeMethod);
     for (int i = 1;  i < nargs;  i++)
       compileChild(args[i], comp, target);
     code.emitInvokeInterface(endAttributeMethod);
@@ -65,8 +65,8 @@ public class MakeAttribute extends NodeConstructor
 
   static final ClassType typeMakeAttribute
     = ClassType.make("gnu.kawa.xml.MakeAttribute");
-  static final Method beginAttributeMethod
-    = typeMakeAttribute.getDeclaredMethod("beginAttribute", 2);
+  static final Method startAttributeMethod
+    = typeMakeAttribute.getDeclaredMethod("startAttribute", 2);
   static final Method endAttributeMethod
     = Compilation.typeConsumer.getDeclaredMethod("endAttribute", 0);
 

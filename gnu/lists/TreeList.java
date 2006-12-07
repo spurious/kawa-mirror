@@ -76,7 +76,7 @@ public class TreeList extends AbstractSequence
 
   // The data array contains an encoding of values, as follows:
   // 0x0000 ... 0x9FFF:  A single Unicode character.
-  // 0xAXXX: BEGIN_GROUP_SHORT
+  // 0xAXXX: BEGIN_ELEMENT_SHORT
   // 0xBXXX:  negative integer ((short)0x0XXX<<4)>>4, range -4096 to -1
   // 0xCXXX:  positive integer 0x0XXX, in the range 0 to 4095
   // 0xDXXX:  positive integer 0x1XXX, in the range 4096 to 8191
@@ -88,11 +88,11 @@ public class TreeList extends AbstractSequence
   // 0xF104 A B:      FLOAT_FOLLOWS 32-bit float (big-endian)
   // 0xF105 A B C D:  DOUBLE_FOLLOWS 64-bit double (big-endian)
   // 0xF106: CHAR_FOLLOWS
-  // 0xF108: BEGIN_GROUP_LONG
+  // 0xF108: BEGIN_ELEMENT_LONG
   // 0xF109: BEGIN_ATTRIBUTE_LONG
   // 0xF10A: END_ATTRIBUTE
-  // 0xF10B: END_GROUP_SHORT
-  // 0xF10C: END_GROUP_LONG
+  // 0xF10B: END_ELEMENT_SHORT
+  // 0xF10C: END_ELEMENT_LONG
   // 0xF10D A B: OBJECT_REF_FOLLOWS:  The object in objects[(A,B)].
   // 0xF10E A B: POSITION_REF_FOLLOWS:  The TreePosition in objects[(A,B)].
   // 0xF10F A B C D: POSITION_PAIR_FOLLOWS
@@ -252,74 +252,74 @@ public class TreeList extends AbstractSequence
    */
   protected static final int DOCUMENT_URI = 0xF118;
 
-  /** Beginning of a group, compact form.
+  /** Beginning of an element, compact form.
    *
-   * [BEGIN_GROUP_SHORT + index], where objects[index] is the group's
+   * [BEGIN_ELEMENT_SHORT + index], where objects[index] is the element's
    *   type name and objects[index+1] is the type object.
    * [end_offset], the unsigned offset (from the initial word)
-   *   to the corresponding END_GROUP_SHORT.
+   *   to the corresponding END_ELEMENT_SHORT.
    * [parent_offset], the (unsigned absolute value of the) offset
-   *   to the outer BEGIN_GROUP_SHORT/BEGIN_GROUP_LONG/BEGIN_DOCUMENT.
+   *   to the outer BEGIN_ELEMENT_SHORT/BEGIN_ELEMENT_LONG/BEGIN_DOCUMENT.
    *.  (If these is no parent, then parent_offset==0.)
    *
-   * This should is used when index < BEGIN_GROUP_SHORT_INDEX_MAX,
+   * This should is used when index < BEGIN_ELEMENT_SHORT_INDEX_MAX,
    * both end_offset and parent_offset fit in 16 bits,
-   * and the group does not straddle the gap.
+   * and the element does not straddle the gap.
    */
-  protected static final int BEGIN_GROUP_SHORT = 0xA000;
-  protected static final int BEGIN_GROUP_SHORT_INDEX_MAX = 0xFFF;
+  protected static final int BEGIN_ELEMENT_SHORT = 0xA000;
+  protected static final int BEGIN_ELEMENT_SHORT_INDEX_MAX = 0xFFF;
 
-  /** End of a group, compact form.
+  /** End of an element, compact form.
    *
-   * [END_GROUP_SHORT]
+   * [END_ELEMENT_SHORT]
    * [begin_offset], the unsigned absolute value of the offset to the
    *   matching BEGIN.  (This is the same as the matching end_offset.)
    *
    */
-  protected static final int END_GROUP_SHORT = 0xF10B;
+  protected static final int END_ELEMENT_SHORT = 0xF10B;
 
-  /** Begin of a group, non-compact form.
+  /** Begin of an element, non-compact form.
    *
-   * [BEGIN_GROUP_LONG]
-   * [end_offset], in 2 shorts.  The position of the matching END_GROUP_LONG.
-   *   If the group straddles the gap, then end_offset is a negative offset
+   * [BEGIN_ELEMENT_LONG]
+   * [end_offset], in 2 shorts.  The position of the matching END_ELEMENT_LONG.
+   *   If the element straddles the gap, then end_offset is a negative offset
    *   relative to data.length.  (Therefore allocating more space for the
-   *   gap does not require adjusting any end_offset.)   If the group and
+   *   gap does not require adjusting any end_offset.)   If the element and
    *   and its children are all on the same side of the gap, then end_offset
-   *   is a positive offset relative to the BEGIN_GROUP_LONG word.  (Hence
-   *   shifting an entire group when the gap is moved does not require
+   *   is a positive offset relative to the BEGIN_ELEMENT_LONG word.  (Hence
+   *   shifting an entire element when the gap is moved does not require
    *   changing its end_offset.)
    *
-   * Note that the space taken by a BEGIN_GROUP_LONG is the same that
-   * needed for a BEGIN_GROUP_SHORT (but a END_GROUP_LONG takes much
-   * more space than a END_GROUP_SHORT).  This is to make it easier
-   * to convert a BEGIN_GROUP_LONG to a BEGIN_GROUP_SHORT or vice
+   * Note that the space taken by a BEGIN_ELEMENT_LONG is the same that
+   * needed for a BEGIN_ELEMENT_SHORT (but a END_ELEMENT_LONG takes much
+   * more space than a END_ELEMENT_SHORT).  This is to make it easier
+   * to convert a BEGIN_ELEMENT_LONG to a BEGIN_ELEMENT_SHORT or vice
    * versa, as needed.
    */
-  protected static final int BEGIN_GROUP_LONG =  0xF108;
+  protected static final int BEGIN_ELEMENT_LONG =  0xF108;
 
-  /** End of a group, non-compact form.
+  /** End of n element, non-compact form.
    *
-   * [END_GROUP_LONG]
-   * [index], 2 shorts where objects[index] is the group's type name and
+   * [END_ELEMENT_LONG]
+   * [index], 2 shorts where objects[index] is the element's type name and
    *   objects[index+1] is the type object.
    * [begin_offset], in 2 shorts.  The position of the matching
-   *   BEGIN_GROUP_LONG.  If the group straddles the gap, then begin_offset
+   *   BEGIN_ELEMENT_LONG.  If the element straddles the gap, then begin_offset
    *   is the actual index (i.e. relative to the start of data) of the
-   *   matching BEGIN_GROUP_LONG.  (Therefore allocating more space for the
-   *   gap does not require adjusting begin_offset.)  If the group does not
+   *   matching BEGIN_ELEMENT_LONG.  (Therefore allocating more space for the
+   *   gap does not require adjusting begin_offset.)  If the element does not
    *   straddle the gap, then begin_offset is a negative offset relative
-   *   to the END_GROUP_LONG word.  (Hence shifting an entire group when
+   *   to the END_ELEMENT_LONG word.  (Hence shifting an entire element when
    *   the gap is moved does not require changing its begin_offset.)
    *   relative to data.length.
-   * [parent_offset], in 2 shorts.  The position of the outer BEGIN_GROUP_LONG,
-   *   BEGIN_GROUP_SHORT or BEGIN_DOCUMENT.  If the difference straddles
-   *   the gap (i.e. either this group straddles the gap or the parent group
-   *   does and the gap precedes this group), then parent_offset is the
-   *   actual index of the parent group.  Otherwise, then parent_offset is a
-   *   negative offset relative to the END_GROUP_LONG word.
+   * [parent_offset], in 2 shorts.  The position of the outer BEGIN_ELEMENT_LONG,
+   *   BEGIN_ELEMENT_SHORT or BEGIN_DOCUMENT.  If the difference straddles
+   *   the gap (i.e. either this element straddles the gap or the parent element
+   *   does and the gap precedes this element), then parent_offset is the
+   *   actual index of the parent element.  Otherwise, then parent_offset is a
+   *   negative offset relative to the END_ELEMENT_LONG word.
    */
-  protected static final int END_GROUP_LONG = 0xF10C;
+  protected static final int END_ELEMENT_LONG = 0xF10C;
 
   int currentParent = -1;
 
@@ -430,7 +430,7 @@ public class TreeList extends AbstractSequence
   }
 
   /** Write/set the document-uri property of the current document.
-   * Only allowed immediately following beginDocument.   */
+   * Only allowed immediately following startDocument.   */
   public void writeDocumentUri (Object uri)
   {
     ensureSpace(3);
@@ -465,12 +465,12 @@ public class TreeList extends AbstractSequence
     gapStart = i + length;
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   {
-    beginGroup(find(type));
+    startElement(find(type));
   }
 
-  public void beginDocument()
+  public void startDocument ()
   {
     ensureSpace(5+1);
     gapEnd--;
@@ -526,36 +526,36 @@ public class TreeList extends AbstractSequence
     currentParent = parent >= -1 ? parent : currentParent + parent;
   }
 
-  public void beginGroup(int index)
+  public void startElement(int index)
   {
     ensureSpace(3 + 7);
     gapEnd -= 7;
-    data[gapStart++] = BEGIN_GROUP_LONG;
+    data[gapStart++] = BEGIN_ELEMENT_LONG;
     setIntN(gapStart, gapEnd - data.length); // end_offset
     gapStart += 2;
-    data[gapEnd] = END_GROUP_LONG;
+    data[gapEnd] = END_ELEMENT_LONG;
     setIntN(gapEnd + 1, index);  // begin_offset
     setIntN(gapEnd + 3, gapStart - 3);  // begin_offset
     setIntN(gapEnd + 5, currentParent);  // parent_offset
     currentParent = gapStart - 3;
   }
 
-  public void setGroupName (int groupIndex, int nameIndex)
+  public void setElementName (int elementIndex, int nameIndex)
   {
-    if (data[groupIndex] == BEGIN_GROUP_LONG)
+    if (data[elementIndex] == BEGIN_ELEMENT_LONG)
       {
-        int j = getIntN(groupIndex+1);
-        groupIndex = j + (j < 0 ? data.length : groupIndex);
+        int j = getIntN(elementIndex+1);
+        elementIndex = j + (j < 0 ? data.length : elementIndex);
       }
-    if (groupIndex < gapEnd)
-      throw new Error("setGroupName before gapEnd");
-    setIntN(groupIndex + 1, nameIndex);
+    if (elementIndex < gapEnd)
+      throw new Error("setElementName before gapEnd");
+    setIntN(elementIndex + 1, nameIndex);
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
-    if (data[gapEnd] != END_GROUP_LONG)
-      throw new Error("unexpected endGroup");
+    if (data[gapEnd] != END_ELEMENT_LONG)
+      throw new Error("unexpected endElement");
     int index = getIntN(gapEnd + 1);
     int begin = getIntN(gapEnd + 3);
     int parent = getIntN(gapEnd + 5);
@@ -563,21 +563,21 @@ public class TreeList extends AbstractSequence
     gapEnd += 7;
     int offset = gapStart - begin;
     int parentOffset = begin - parent;
-    if (index < BEGIN_GROUP_SHORT_INDEX_MAX
+    if (index < BEGIN_ELEMENT_SHORT_INDEX_MAX
 	&& offset < 0x10000 && parentOffset < 0x10000)
       {
-	data[begin] = (char) (BEGIN_GROUP_SHORT | index);
+	data[begin] = (char) (BEGIN_ELEMENT_SHORT | index);
 	data[begin + 1] = (char) offset;  // end_offset
 	data[begin + 2] = (char) parentOffset;
-	data[gapStart] = END_GROUP_SHORT;
+	data[gapStart] = END_ELEMENT_SHORT;
 	data[gapStart + 1] = (char) offset; // begin_offset
 	gapStart += 2;
       }
     else
       {
-	data[begin] = BEGIN_GROUP_LONG;
+	data[begin] = BEGIN_ELEMENT_LONG;
 	setIntN(begin + 1, offset);
-	data[gapStart] = END_GROUP_LONG;
+	data[gapStart] = END_ELEMENT_LONG;
 	setIntN(gapStart + 1, index);
 	setIntN(gapStart + 3, - offset);
 	if (parent >= gapStart || begin <= gapStart)
@@ -587,15 +587,15 @@ public class TreeList extends AbstractSequence
       }
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute (Object attrType)
   {
-    beginAttribute(find(attrType));
+    startAttribute(find(attrType));
   }
 
-  public void beginAttribute(int index)
+  public void startAttribute (int index)
   {
     /* This needs to be tested.  FIXME.  Anyway only solves limited problem.
-    // If there is whitespace and nothing else between the BEGIN_GROUP_LONG
+    // If there is whitespace and nothing else between the BEGIN_ELEMENT_LONG
     // and the current position, get rid of the spaces.
     int i = currentParent;
     if (i > 0 && (i += 3) < gapStart)
@@ -874,9 +874,9 @@ public class TreeList extends AbstractSequence
     if (index == data.length)
       return -1;
     char datum = data[index];
-    if ((datum >= BEGIN_GROUP_SHORT
-	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-	|| datum == BEGIN_GROUP_LONG)
+    if ((datum >= BEGIN_ELEMENT_SHORT
+	 && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
+	|| datum == BEGIN_ELEMENT_LONG)
       index += 3;
     else if (datum == BEGIN_DOCUMENT || datum == BEGIN_ENTITY)
       index += 5;
@@ -934,13 +934,13 @@ public class TreeList extends AbstractSequence
         else
           return index + parent_offset;
       }
-    if (datum >= BEGIN_GROUP_SHORT
-	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+    if (datum >= BEGIN_ELEMENT_SHORT
+	 && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
       {
 	int parent_offset = data[index+2];
 	return parent_offset == 0 ? -1 : index - parent_offset;
       }
-    if (datum == BEGIN_GROUP_LONG)
+    if (datum == BEGIN_ELEMENT_LONG)
       {
 	int end_offset = getIntN(index+1);
 	end_offset += end_offset < 0 ? data.length : index;
@@ -960,9 +960,9 @@ public class TreeList extends AbstractSequence
 	datum = data[index];
 	switch (datum)
 	  {
-	  case END_GROUP_SHORT:
+	  case END_ELEMENT_SHORT:
 	    return index - data[index+1];
-	  case END_GROUP_LONG:
+	  case END_ELEMENT_LONG:
 	    int begin_offset = getIntN(index+3);
 	    if (begin_offset < 0)
 	      begin_offset += index;
@@ -1013,9 +1013,9 @@ public class TreeList extends AbstractSequence
     if (index == data.length)
       return -1;
     char datum = data[index];
-    if ((datum >= BEGIN_GROUP_SHORT
-	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-	|| datum == BEGIN_GROUP_LONG)
+    if ((datum >= BEGIN_ELEMENT_SHORT
+	 && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
+	|| datum == BEGIN_ELEMENT_LONG)
       return index + 3;
     else
       return -1;
@@ -1096,11 +1096,11 @@ public class TreeList extends AbstractSequence
 	    out.writeObject(objects[datum-OBJECT_REF_SHORT]);
 	    continue;
 	  }
-	if (datum >= BEGIN_GROUP_SHORT
-	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	if (datum >= BEGIN_ELEMENT_SHORT
+	    && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
 	  {
-	    index = datum-BEGIN_GROUP_SHORT;
-	    out.beginGroup(objects[index]);
+	    index = datum-BEGIN_ELEMENT_SHORT;
+	    out.startElement(objects[index]);
 	    pos += 2;
 	    continue;
 	  }
@@ -1120,7 +1120,7 @@ public class TreeList extends AbstractSequence
 	switch (datum)
 	  {
 	  case BEGIN_DOCUMENT:
-	    out.beginDocument();
+	    out.startDocument();
 	    pos += 4;
 	    continue;
 	  case END_DOCUMENT:
@@ -1205,25 +1205,25 @@ public class TreeList extends AbstractSequence
 	    out.writeObject(objects[getIntN(pos)]);
 	    pos += 2;
 	    continue;
-	  case END_GROUP_SHORT:
+	  case END_ELEMENT_SHORT:
 	    pos++;
-	    out.endGroup();
+	    out.endElement();
 	    continue;
-	  case BEGIN_GROUP_LONG:
+	  case BEGIN_ELEMENT_LONG:
 	    index = getIntN(pos);
 	    index += index >= 0 ? pos - 1 : data.length;
 	    pos += 2;
 	    index = getIntN(index + 1);
-	    out.beginGroup(objects[index]);
+	    out.startElement(objects[index]);
 	    continue;
-	  case END_GROUP_LONG:
+	  case END_ELEMENT_LONG:
 	    index = getIntN(pos);
-	    out.endGroup();
+	    out.endElement();
 	    pos += 6;
 	    continue;
 	  case BEGIN_ATTRIBUTE_LONG:
 	    index = getIntN(pos);
-	    out.beginAttribute(objects[index]);
+	    out.startAttribute(objects[index]);
 	    pos += 4;
 	    continue;
 	  case END_ATTRIBUTE:
@@ -1305,11 +1305,11 @@ public class TreeList extends AbstractSequence
 	    sbuf.append(objects[datum-OBJECT_REF_SHORT]);
 	    continue;
 	  }
-	if (datum >= BEGIN_GROUP_SHORT
-	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	if (datum >= BEGIN_ELEMENT_SHORT
+	    && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
 	  {
 	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
-	    index = datum-BEGIN_GROUP_SHORT;
+	    index = datum-BEGIN_ELEMENT_SHORT;
 	    if (seen) sbuf.append(sep);
 	    sbuf.append('<');
 	    sbuf.append(objects[index].toString());
@@ -1404,7 +1404,7 @@ public class TreeList extends AbstractSequence
 	    sbuf.append(objects[getIntN(pos)]);
 	    pos += 2;
 	    continue;
-	  case BEGIN_GROUP_LONG:
+	  case BEGIN_ELEMENT_LONG:
 	    index = getIntN(pos);
 	    index += index >= 0 ? pos - 1 : data.length;
 	    pos += 2;
@@ -1416,12 +1416,12 @@ public class TreeList extends AbstractSequence
 	    seen = false;
 	    inStartTag = true;
 	    continue;
-	  case END_GROUP_LONG:
-	  case END_GROUP_SHORT:
-	    if (datum == END_GROUP_SHORT)
+	  case END_ELEMENT_LONG:
+	  case END_ELEMENT_SHORT:
+	    if (datum == END_ELEMENT_SHORT)
 	      {
 		index = data[pos++];
-		index = data[pos - 2 - index] - BEGIN_GROUP_SHORT;
+		index = data[pos - 2 - index] - BEGIN_ELEMENT_SHORT;
 	      }
 	    else
 	      {
@@ -1490,8 +1490,8 @@ public class TreeList extends AbstractSequence
     if (index == data.length)
       return false;
     char ch = data[index];
-    return ch != END_ATTRIBUTE && ch != END_GROUP_SHORT
-      && ch != END_GROUP_LONG && ch != END_DOCUMENT;
+    return ch != END_ATTRIBUTE && ch != END_ELEMENT_SHORT
+      && ch != END_ELEMENT_LONG && ch != END_DOCUMENT;
   }
 
   public int getNextKind(int ipos)
@@ -1509,9 +1509,9 @@ public class TreeList extends AbstractSequence
     if (datum >= OBJECT_REF_SHORT
 	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
       return Sequence.OBJECT_VALUE;
-    if (datum >= BEGIN_GROUP_SHORT
-	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return Sequence.GROUP_VALUE;
+    if (datum >= BEGIN_ELEMENT_SHORT
+	    && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
+      return Sequence.ELEMENT_VALUE;
     if ((datum & 0xFF00) == BYTE_PREFIX)
       return Sequence.TEXT_BYTE_VALUE;
     if (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
@@ -1535,10 +1535,10 @@ public class TreeList extends AbstractSequence
 	return Sequence.DOCUMENT_VALUE;
       case BEGIN_ENTITY:
         return getNextKind((index+BEGIN_ENTITY_SIZE) << 1);
-      case BEGIN_GROUP_LONG:
-	return Sequence.GROUP_VALUE;
-      case END_GROUP_SHORT:
-      case END_GROUP_LONG:
+      case BEGIN_ELEMENT_LONG:
+	return Sequence.ELEMENT_VALUE;
+      case END_ELEMENT_SHORT:
+      case END_ELEMENT_LONG:
       case END_ATTRIBUTE:
       case END_DOCUMENT:
       case END_ENTITY:
@@ -1575,10 +1575,10 @@ public class TreeList extends AbstractSequence
           break;
         index += BEGIN_ENTITY_SIZE;
       }
-    if (datum >= BEGIN_GROUP_SHORT
-	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      index = datum-BEGIN_GROUP_SHORT;
-    else if (datum == BEGIN_GROUP_LONG)
+    if (datum >= BEGIN_ELEMENT_SHORT
+	&& datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
+      index = datum-BEGIN_ELEMENT_SHORT;
+    else if (datum == BEGIN_ELEMENT_LONG)
       {
 	int j = getIntN(index+1);
 	j += j < 0 ? data.length : index;
@@ -1639,8 +1639,8 @@ public class TreeList extends AbstractSequence
     if (datum >= OBJECT_REF_SHORT
 	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
       return objects[datum-OBJECT_REF_SHORT];
-    if (datum >= BEGIN_GROUP_SHORT
-	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+    if (datum >= BEGIN_ELEMENT_SHORT
+	    && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
       return copyToList(index, index + data[index+1] + 2);
     /*
     if ((datum & 0xFF00) == BYTE_PREFIX)
@@ -1683,14 +1683,14 @@ public class TreeList extends AbstractSequence
 	  end_offset += end_offset < 0 ? data.length : index;
 	  return copyToList(index, end_offset+1);
 	}
-      case BEGIN_GROUP_LONG:
+      case BEGIN_ELEMENT_LONG:
 	{
 	  int end_offset = getIntN(index+1);
 	  end_offset += end_offset < 0 ? data.length : index;
 	  return copyToList(index, end_offset+7);
 	}
-      case END_GROUP_SHORT:
-      case END_GROUP_LONG:
+      case END_ELEMENT_SHORT:
+      case END_ELEMENT_LONG:
       case END_ATTRIBUTE:
       case END_DOCUMENT:
 	return Sequence.eofValue;
@@ -1727,7 +1727,7 @@ public class TreeList extends AbstractSequence
       return stringValue(false, index, sbuf);
   }
 
-  public int stringValue(boolean inGroup, int index, StringBuffer sbuf)
+  public int stringValue(boolean inElement, int index, StringBuffer sbuf)
   {
     Object value = null;
     int doChildren = 0, j;
@@ -1751,8 +1751,8 @@ public class TreeList extends AbstractSequence
 	value = objects[datum-OBJECT_REF_SHORT];
         spaceNeeded = false;
       }
-    else if (datum >= BEGIN_GROUP_SHORT
-	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+    else if (datum >= BEGIN_ELEMENT_SHORT
+	     && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
       {
 	doChildren = index + 2;
 	index = data[index] + index + 1;
@@ -1782,7 +1782,7 @@ public class TreeList extends AbstractSequence
 	    {
 	      int length = getIntN(index);
 	      index += 2;
-	      if (! inGroup || datum == CDATA_SECTION)
+	      if (! inElement || datum == CDATA_SECTION)
 		sbuf.append(data, index, length);
 	      return index + length;
 	    }
@@ -1827,7 +1827,7 @@ public class TreeList extends AbstractSequence
 	    j = getIntN(index);
 	    index = j + (j < 0 ? data.length + 1 : index);
 	    break;
-	  case BEGIN_GROUP_LONG:	
+	  case BEGIN_ELEMENT_LONG:	
             spaceNeeded = false;
 	    doChildren = index + 2;
 	    j = getIntN(index);
@@ -1837,14 +1837,14 @@ public class TreeList extends AbstractSequence
           case JOINER:
             spaceNeeded = false;
             break;
-	  case END_GROUP_SHORT:
-	  case END_GROUP_LONG:
+	  case END_ELEMENT_SHORT:
+	  case END_ELEMENT_LONG:
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
 	  case END_ENTITY:
 	    return -1;
 	  case BEGIN_ATTRIBUTE_LONG:
-	    if (! inGroup)
+	    if (! inElement)
 	      doChildren = index + 4;
 	    int end = getIntN(index+2);
 	    index = end + (end < 0 ? data.length + 1: index);
@@ -1853,7 +1853,7 @@ public class TreeList extends AbstractSequence
 	    {
 	      AbstractSequence seq = (AbstractSequence) objects[getIntN(index)];
 	      int ipos = getIntN(index+2);
-	      ((TreeList) seq).stringValue(inGroup, ipos >> 1, sbuf);
+	      ((TreeList) seq).stringValue(inElement, ipos >> 1, sbuf);
 	      index += 4;
 	    }
 	    break;
@@ -1925,8 +1925,8 @@ public class TreeList extends AbstractSequence
 	    pos++;
 	    continue;
 	  }
-	if (datum >= BEGIN_GROUP_SHORT
-	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	if (datum >= BEGIN_ELEMENT_SHORT
+	    && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
 	  return pos;
 	switch (datum)
 	  {
@@ -1939,14 +1939,14 @@ public class TreeList extends AbstractSequence
 	  case PROCESSING_INSTRUCTION:
 	  case COMMENT:
 	  case BEGIN_DOCUMENT:
-	  case BEGIN_GROUP_LONG:
+	  case BEGIN_ELEMENT_LONG:
 	  case BEGIN_ATTRIBUTE_LONG:
 	    return pos;
           case BEGIN_ENTITY:
             pos += 5;
             break;
-	  case END_GROUP_SHORT:
-	  case END_GROUP_LONG:
+	  case END_ELEMENT_SHORT:
+	  case END_ELEMENT_LONG:
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
 	    return pos;
@@ -1969,23 +1969,23 @@ public class TreeList extends AbstractSequence
     boolean checkAttribute = false; // true if attribute nodes could match.
     boolean checkNode;
     boolean checkText;
-    boolean checkGroup; // true if group nodes could match.
+    boolean checkElement; // true if element nodes could match.
     if (predicate instanceof ElementPredicate)
       {
 	checkNode = true;
-	checkGroup = true;
+	checkElement = true;
 	checkText = false;
       }
     else if (predicate instanceof AttributePredicate)
       {
 	checkNode = true;
-	checkGroup = false;
+	checkElement = false;
 	checkText = false;
       }
     else
       {
 	checkNode = true;
-	checkGroup = true;
+	checkElement = true;
 	checkText = true;
       }
     int next;
@@ -2033,7 +2033,7 @@ public class TreeList extends AbstractSequence
 	  case CHAR_FOLLOWS:
 	    next = pos + 2;
 	    continue;
-	  case END_GROUP_SHORT:
+	  case END_ELEMENT_SHORT:
 	    if (! descend)
 	      return 0;
 	    next = pos + 2;
@@ -2042,7 +2042,7 @@ public class TreeList extends AbstractSequence
 	    next = pos + 5;
 	    if (checkText) break;
 	    continue;
-	  case END_GROUP_LONG:
+	  case END_ELEMENT_LONG:
 	    if (! descend)
 	      return 0;
 	    next = pos + 7;
@@ -2090,7 +2090,7 @@ public class TreeList extends AbstractSequence
 	    next = pos + 3 + getIntN(pos+1);
 	    if (checkText) break;
 	    continue;	
-	  case BEGIN_GROUP_LONG:
+	  case BEGIN_ELEMENT_LONG:
 	    if (descend)
 	      next = pos + 3;
 	    else
@@ -2098,17 +2098,17 @@ public class TreeList extends AbstractSequence
 		j = getIntN(pos+1);
 		next = j + (j < 0 ? data.length :  pos) + 7;
 	      }
-	    if (checkGroup) break;
+	    if (checkElement) break;
 	    continue;
 	  default:
-	    if (datum >= BEGIN_GROUP_SHORT
-		&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	    if (datum >= BEGIN_ELEMENT_SHORT
+		&& datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
 	      {
 		if (descend)
 		  next = pos + 3;
 		else
 		  next = pos + data[pos+1] + 2;
-		if (checkGroup) break;
+		if (checkElement) break;
 	      }
 	    else
 	      throw new Error("unknown code:"+(int) datum);
@@ -2147,8 +2147,8 @@ public class TreeList extends AbstractSequence
 	|| (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
 	    && datum <= INT_SHORT_ZERO + MAX_INT_SHORT))
       return pos;
-    if (datum >= BEGIN_GROUP_SHORT
-	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+    if (datum >= BEGIN_ELEMENT_SHORT
+	&& datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
       return data[pos] + pos + 1;
     switch (datum)
       {
@@ -2170,12 +2170,12 @@ public class TreeList extends AbstractSequence
 	return pos + 2;
       case POSITION_PAIR_FOLLOWS:
 	return pos + 4;
-      case END_GROUP_SHORT:
-      case END_GROUP_LONG:
+      case END_ELEMENT_SHORT:
+      case END_ELEMENT_LONG:
       case END_ATTRIBUTE:
       case END_DOCUMENT:
 	return -1;
-      case BEGIN_GROUP_LONG:
+      case BEGIN_ELEMENT_LONG:
 	j = getIntN(pos);
 	j += j < 0 ? data.length : pos-1;
 	return  j + 7;
@@ -2220,8 +2220,8 @@ public class TreeList extends AbstractSequence
     // It's difficult to optimize this, because because if (say) isAfter(ipos1)
     // then we need nextDataIndex((ipos1>>>1)-1).  In that case comparing
     // (ipos1>>>1)-1 and (pos2>>>1)-1 tells us nothing, since the former
-    // could be a BEGIN_GROUP, while the latter might be a node inside
-    // the group.
+    // could be a BEGIN_ELEMENT, while the latter might be a node inside
+    // the element.
     int i1 = posToDataIndex(ipos1);
     int i2 = posToDataIndex(ipos2);
     return i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
@@ -2320,12 +2320,12 @@ public class TreeList extends AbstractSequence
 			      +obj+':'+obj.getClass().getName()
 			      +'@'+Integer.toHexString(System.identityHashCode(obj)));
 		  }
-		else if (ch >= BEGIN_GROUP_SHORT
-			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+		else if (ch >= BEGIN_ELEMENT_SHORT
+			 && ch <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
 		  {
-		    ch = ch - BEGIN_GROUP_SHORT;
+		    ch = ch - BEGIN_ELEMENT_SHORT;
 		    j = data[i+1] + i;
-		    out.print("=BEGIN_GROUP_SHORT end:"+j+" index#"+((int)ch)+"=<"+objects[ch]+'>');
+		    out.print("=BEGIN_ELEMENT_SHORT end:"+j+" index#"+((int)ch)+"=<"+objects[ch]+'>');
 		    toskip = 2;
 		  }
 		else if (ch >= INT_SHORT_ZERO + MIN_INT_SHORT
@@ -2422,21 +2422,21 @@ public class TreeList extends AbstractSequence
 		      case POSITION_REF_FOLLOWS:
 		      case OBJECT_REF_FOLLOWS:
 			toskip = 2;  break;
-		      case END_GROUP_SHORT:
-			out.print("=END_GROUP_SHORT begin:");
+		      case END_ELEMENT_SHORT:
+			out.print("=END_ELEMENT_SHORT begin:");
 			j = i - data[i+1];
 			out.print(j);
-			j = data[j] - BEGIN_GROUP_SHORT;
+			j = data[j] - BEGIN_ELEMENT_SHORT;
 			out.print(" -> #");
 			out.print(j);
 			out.print("=<");
 			out.print(objects[j]);
 			out.print('>');
 			toskip = 1;  break;
-		      case BEGIN_GROUP_LONG:
+		      case BEGIN_ELEMENT_LONG:
 			j = getIntN(i+1);
 			j += j < 0 ? data.length : i;
-			out.print("=BEGIN_GROUP_LONG end:");
+			out.print("=BEGIN_ELEMENT_LONG end:");
 			out.print(j);
 			j = getIntN(j + 1);
 			out.print(" -> #");
@@ -2447,9 +2447,9 @@ public class TreeList extends AbstractSequence
                           out.print("=<out-of-bounds>");
 			toskip = 2;
 			break;
-		      case END_GROUP_LONG:
+		      case END_ELEMENT_LONG:
 			j = getIntN(i+1);
-			out.print("=END_GROUP_LONG name:"+j
+			out.print("=END_ELEMENT_LONG name:"+j
 				  +"=<"+objects[j]+'>');
 			j = getIntN(i+3);
 			j = j < 0 ? i + j : j;

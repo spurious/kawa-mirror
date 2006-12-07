@@ -74,7 +74,7 @@ implements XMLReader, Locator
     SourceMessages messages = new SourceMessages();
     XMLParser parser = new XMLParser(new LineBufferedReader(reader),
 				     messages, this);
-    beginDocument();
+    startDocument();
     parser.parse();
     String err = messages.toString(20);
     if (err != null)

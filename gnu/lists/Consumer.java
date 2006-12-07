@@ -25,25 +25,25 @@ public interface Consumer
   public void writeInt(int v);
   public void writeLong(long v);
 
-  public void beginDocument();
+  public void startDocument();
   public void endDocument();
 
-  public void beginGroup(Object type);
-  public void endGroup();
+  public void startElement(Object type);
+  public void endElement();
 
-  /** Write a attribute for the current group.
-   * This is only allowed immediately after a beginGroup. */
-  public void beginAttribute(Object attrType);
+  /** Write a attribute for the current element.
+   * This is only allowed immediately after a startElement. */
+  public void startAttribute(Object attrType);
 
   /** End of an attribute or end of an actual parameter.
-   * The former use matches a beginAttribute; the latter may not,
+   * The former use matches a startAttribute; the latter may not,
    * and can be used to separate parameters in a parameter list.
    * This double duty suggsts the method should at least be re-named. */
   public void endAttribute();
 
   public void writeObject(Object v);
 
-  /** True if consumer is ignoring rest of group.
+  /** True if consumer is ignoring rest of element.
    * The producer can use this information to skip ahead. */
   public boolean ignoring();
 

@@ -20,7 +20,7 @@ public class MakeResponseHeader extends MethodProc
     Object val = ctx.getNextArg();
     ctx.lastArg();
     Consumer out = ctx.consumer;
-    out.beginAttribute(key);
+    out.startAttribute(key);
     out.write(val.toString());
     out.endAttribute();
   }

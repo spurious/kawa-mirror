@@ -66,7 +66,7 @@ public abstract class KNode extends SeqPosition
     int kind = seq.getNextKindI(seq.posToDataIndex(ipos));
     switch (kind)
       {
-      case Sequence.GROUP_VALUE:
+      case Sequence.ELEMENT_VALUE:
 	return new KElement(seq, ipos);
       case Sequence.ATTRIBUTE_VALUE:
 	return new KAttr(seq, ipos);

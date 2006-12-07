@@ -24,9 +24,9 @@ public class XslTranslator extends Lexer implements Consumer
   ModuleExp mexp;
   Compilation comp;
 
-  /** We seen a beginAttribute but not the closing endAttribute. */
+  /** We seen a startAttribute but not the closing endAttribute. */
   boolean inAttribute;
-  /** The 'attribute type' from the most recent beginAttribute. */
+  /** The 'attribute type' from the most recent startAttribute. */
   Object attributeType;
   /** Buffer to acumulate the value of the current attribute. */
   StringBuffer attributeValue = new StringBuffer(100);
@@ -107,7 +107,7 @@ public class XslTranslator extends Lexer implements Consumer
     // FIXME
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   { 
     String xslTag = isXslTag(type);
     if (xslTag == "template")
@@ -130,7 +130,7 @@ public class XslTranslator extends Lexer implements Consumer
     push(type);
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute (Object attrType)
   {
     if (inAttribute)
       error('f', "internal error - attribute inside attribute");
@@ -150,7 +150,7 @@ public class XslTranslator extends Lexer implements Consumer
     inAttribute = false;
   }
 
-  public void endGroup()
+  public void endElement ()
   {
     int nlen = nesting.length()-1;
     int start = nesting.charAt(nlen);
@@ -336,15 +336,15 @@ public class XslTranslator extends Lexer implements Consumer
       push(IntNum.make(v));
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     
   }
 
-  public void beginDocument(ModuleExp mexp)
+  public void startDocument(ModuleExp mexp)
   {
     this.mexp = mexp;
-    beginDocument();
+    startDocument();
   }
 
   public void endDocument()
@@ -425,7 +425,7 @@ public class XslTranslator extends Lexer implements Consumer
       comp.exprStack = new Stack();
     ModuleExp mexp = comp.pushNewModule(this);
     comp.mustCompileHere();
-    beginDocument(mexp);
+    startDocument(mexp);
     parser.parse();
     endDocument();
     comp.pop(mexp);

@@ -86,7 +86,7 @@ public class RunXQTS extends FilterConsumer
   public static final String XQTS_RESULT_NAMESPACE
   = "http://www.w3.org/2005/02/query-test-XQTSResult";
 
-  static Object testSuiteResultGroupType;
+  static Object testSuiteResultElementType;
   static
   {
     NamespaceBinding namespaceNodes
@@ -95,35 +95,35 @@ public class RunXQTS extends FilterConsumer
                                  XQuery.QEXO_FUNCTION_NAMESPACE,
                                  NamespaceBinding.predefinedXML));
     Symbol sym = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite-result", "");
-    testSuiteResultGroupType = new XName(sym, namespaceNodes);
+    testSuiteResultElementType = new XName(sym, namespaceNodes);
   }
-  static Object testRunGroupType
+  static Object testRunElementType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-run", "");
-  static Object testSuiteGroupType
+  static Object testSuiteElementType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-suite", "");
-  static Object testCaseGroupType
+  static Object testCaseElementType
     = Symbol.make(XQTS_RESULT_NAMESPACE, "test-case", "");
 
-  private void writeBeginGroup (String name)
+  private void writeStartElement (String name)
   {
-    xqlog.beginGroup(Symbol.make(XQTS_RESULT_NAMESPACE, name, ""));
+    xqlog.startElement(Symbol.make(XQTS_RESULT_NAMESPACE, name, ""));
   }
 
-  private void writeBeginAttribute (String name)
+  private void writeStartAttribute (String name)
   {
-    xqlog.beginAttribute(name);
+    xqlog.startAttribute(name);
   }
 
   private void writeAttribute (String name, String value)
   {
-    writeBeginAttribute(name);
+    writeStartAttribute(name);
     xqlog.write(value);
     xqlog.endAttribute();
   }
 
   private void writeQexoAttribute (String name, String value)
   {
-    xqlog.beginAttribute(Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
+    xqlog.startAttribute(Symbol.make(XQuery.QEXO_FUNCTION_NAMESPACE,
                                      name, "q"));
     xqlog.write(value);
     xqlog.endAttribute();
@@ -169,7 +169,7 @@ public class RunXQTS extends FilterConsumer
             xqlog.useEmptyElementTag = 1;
             Object saveIndent = XMLPrinter.indentLoc.get(null);
             XMLPrinter.indentLoc.set("pretty");
-            xqlog.beginDocument();
+            xqlog.startDocument();
             XMLPrinter.indentLoc.set(saveIndent);
 
 	    Document.parse(runner.catalog, runner);
@@ -304,7 +304,7 @@ public class RunXQTS extends FilterConsumer
       }
   }
 
-  public void beginGroup(Object type)
+  public void startElement(Object type)
   {
     if (inStartTag)
       handleStartTag();
@@ -314,10 +314,10 @@ public class RunXQTS extends FilterConsumer
     currentElementType = type;
     currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
     /*
-    System.err.println("beginGroup "+typeName);
+    System.err.println("startElement "+typeName);
     if ("test-suite".equals(typeName) && nesting == 0)
       inTestSuite = true;
-    else if ("test-group".equals(typeName))
+    else if ("test-element".equals(typeName))
       {
       }
     else if ("test".equals(typeName)
@@ -331,7 +331,7 @@ public class RunXQTS extends FilterConsumer
     else if (currentTag == null)
       throw new RuntimeException("saw <"+typeName+"> not in <test>");
     else
-      base.beginGroup(type);
+      base.startElement(type);
     */
     nesting++;
   }
@@ -356,14 +356,14 @@ public class RunXQTS extends FilterConsumer
         ResultOffsetPath = attributes.getValue("ResultOffsetPath");
         XQTSVersion = attributes.getValue("version");
  
-        xqlog.beginGroup(testSuiteResultGroupType);
-        writeBeginGroup("implementation");
+        xqlog.startElement(testSuiteResultElementType);
+        writeStartElement("implementation");
         writeAttribute("name", "Qexo");
         writeAttribute("version", kawa.Version.getVersion());
-        writeBeginGroup("organization");
+        writeStartElement("organization");
         writeAttribute("name", "GNU / Per Bothner");
-        xqlog.endGroup();
-        writeBeginGroup("submittor");
+        xqlog.endElement();
+        writeStartElement("submittor");
         String user = System.getProperty("user.name");
         if ("bothner".equals(user))
           {
@@ -372,24 +372,24 @@ public class RunXQTS extends FilterConsumer
           }
         else
           writeAttribute("name", user);
-        xqlog.endGroup();
-        xqlog.endGroup();
-        writeBeginGroup("syntax");
+        xqlog.endElement();
+        xqlog.endElement();
+        writeStartElement("syntax");
         xqlog.write("XQuery");
-        xqlog.endGroup();
-        xqlog.beginGroup(testRunGroupType);
+        xqlog.endElement();
+        xqlog.startElement(testRunElementType);
         StringBuffer sbuf = new StringBuffer();
         gnu.kawa.xml.XTimeType.dateTimeType.now().toStringDate(sbuf);
         writeAttribute("dateRun", sbuf.toString());
-        xqlog.beginGroup(testSuiteGroupType);
+        xqlog.startElement(testSuiteElementType);
         writeAttribute("version", XQTSVersion);
-        xqlog.endGroup();
-        xqlog.endGroup();
+        xqlog.endElement();
+        xqlog.endElement();
 
       }
-    else if (tagMatches("test-group"))
+    else if (tagMatches("test-element"))
       {
-        xqlog.writeComment("test-group "+attributes.getValue("name"));
+        xqlog.writeComment("test-element "+attributes.getValue("name"));
       }
     else if (tagMatches("test-case"))
       {
@@ -945,7 +945,7 @@ public class RunXQTS extends FilterConsumer
     return cout.toSubString(elementStartIndex[nesting]);
   }
 
-  public void endGroup()
+  public void endElement()
   {
     if (inStartTag)
       handleStartTag();
@@ -955,7 +955,7 @@ public class RunXQTS extends FilterConsumer
         if (selectedTest == null
             || selectedTest.equals(testName))
           {
-            xqlog.beginGroup(testCaseGroupType);
+            xqlog.startElement(testCaseElementType);
             writeAttribute("name", testName);
             try
               {
@@ -968,7 +968,7 @@ public class RunXQTS extends FilterConsumer
                 System.err.println("caught "+ex);
                 ex.printStackTrace();
               }
-            xqlog.endGroup();
+            xqlog.endElement();
           }
         //xqlog.flush();
         testName = null;
@@ -1099,7 +1099,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("test-suite"))
       {
-        xqlog.endGroup();
+        xqlog.endElement();
       }
     else if (testName != null && tagMatches("module"))
       {
@@ -1131,7 +1131,7 @@ public class RunXQTS extends FilterConsumer
 	currentTag = null;
       }
     else
-      base.endGroup();
+      base.endElement();
     */
     cout.setLength(elementStartIndex[nesting]);
     nesting--;
@@ -1140,9 +1140,9 @@ public class RunXQTS extends FilterConsumer
     currentElementSymbol = type instanceof Symbol ? (Symbol) type : null;
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute(Object attrType)
   {
-    super.beginAttribute(attrType);
+    super.startAttribute(attrType);
     attrValueStart = cout.length();
   }
 

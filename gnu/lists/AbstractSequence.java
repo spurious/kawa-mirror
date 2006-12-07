@@ -808,10 +808,10 @@ public abstract class AbstractSequence
   {
     boolean isSequence = this instanceof Sequence;
     if (isSequence)
-      out.beginGroup("#sequence");
+      out.startElement("#sequence");
     consumePosRange(startPos(), endPos(), out);
     if (isSequence)
-      out.endGroup();
+      out.endElement();
   }
 
   public void toString (String sep, StringBuffer sbuf)

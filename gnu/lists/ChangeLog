@@ -1,5 +1,22 @@
 2006-12-06  Per Bothner  <per@bothner.com>
 
+	* Consumer.java (beginDocument): Renamed to startDocument.
+	(beginGroup): Renamed to startElement.
+	(endGroup): Renamed to endElement.
+	(beginAttribute): Renamed to startAttribute.
+	* TreeList.java (BEGIN_GROUP_SHORT): Renamed to BEGIN_ELEMENT_SHORT.
+	(BEGIN_GROUP_SHORT_INDEX_MAX): Renamed to BEGIN_ELEMENT_SHORT_INDEX_MAX.
+	(END_GROUP_SHORT): Renamed to END_ELEMENT_SHORT.
+	(BEGIN_GROUP_LONG): Renamed to BEGIN_ELEMENT_LONG.
+	(END_GROUP_LONG): Renamed to END_ELEMENT_LONG.
+	* Sequence.java (GROUP_VALUE): Renamed to ELEMENT_VALUE.
+	* FilterConsumer.java: Update accordingly.
+	* AbstractFormat.java: Likewise.
+	* LList.java: Likewise.
+	* PrintConsumer.java: Likewise.
+	* FVector.java: Likewise.
+	* AbstractSequence.java: Likewise.
+
 	* ElementPredicate.java: Renamed to ItemPredicate.
 	* GroupPredicate.java: Renamed to ElementPredicate.
 	* Makefile.am: Update accordingly.

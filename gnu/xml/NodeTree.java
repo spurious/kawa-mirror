@@ -105,7 +105,7 @@ public class NodeTree extends TreeList
   public String posLookupNamespaceURI (int ipos, String prefix)
   {
     int kind = getNextKind(ipos);
-    if (kind != Sequence.GROUP_VALUE)
+    if (kind != Sequence.ELEMENT_VALUE)
       throw new IllegalArgumentException("argument must be an element");
     Object type = getNextTypeObject(ipos);
     if (type instanceof XName)
@@ -125,7 +125,7 @@ public class NodeTree extends TreeList
     if (index < 0)
       return -1;
     char datum = data[index];
-    if (datum == END_GROUP_SHORT || datum == END_GROUP_LONG
+    if (datum == END_ELEMENT_SHORT || datum == END_ELEMENT_LONG
 	|| datum == END_DOCUMENT)
       return -1;
     return index << 1;
@@ -231,9 +231,9 @@ public class NodeTree extends TreeList
             if (oindex >= 0)
               uri = objects[oindex];
           }
-	else if ((datum >= BEGIN_GROUP_SHORT
-	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-	    || datum == BEGIN_GROUP_LONG)
+	else if ((datum >= BEGIN_ELEMENT_SHORT
+	     && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
+	    || datum == BEGIN_ELEMENT_LONG)
           {
             int attr = getAttributeI(pos, NamespaceBinding.XML_NAMESPACE, "base");
             if (attr != 0)

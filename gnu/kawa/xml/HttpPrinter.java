@@ -23,12 +23,12 @@ public class HttpPrinter extends FilterConsumer
   Object currentHeader;
 
   /** 1 - implicit; 2: explicit. */
-  private int seenBeginDocument;
+  private int seenStartDocument;
 
   protected String sawContentType;
 
-  /** Difference between number of beginGroup and endGroup calls so far. */
-  private int groupNesting;
+  /** Difference between number of startElement and endElement calls so far. */
+  private int elementNesting;
 
   protected OutputStream ostream;
   OutPort writer;
@@ -93,12 +93,12 @@ public class HttpPrinter extends FilterConsumer
     headers.addElement(value);
   }
 
-  public void beginAttribute(Object attrType)
+  public void startAttribute(Object attrType)
   {
     if (base == null)
       currentHeader = attrType;
     else
-      base.beginAttribute(attrType);
+      base.startAttribute(attrType);
   }
 
   public void endAttribute()
@@ -131,10 +131,10 @@ public class HttpPrinter extends FilterConsumer
 	else if ("text/plain".equalsIgnoreCase(sawContentType))
 	  style = "plain";
 	base = XMLPrinter.make(writer, style);
-        if (seenBeginDocument == 0)
+        if (seenStartDocument == 0)
           {
-            base.beginDocument();
-            seenBeginDocument = 1;
+            base.startDocument();
+            seenStartDocument = 1;
           }
 	try
 	  {
@@ -153,7 +153,7 @@ public class HttpPrinter extends FilterConsumer
     sbuf.setLength(0);
   }
 
-  public void beginGroup(Object type)
+  public void startElement (Object type)
   {
     if (sawContentType == null)
       {
@@ -168,15 +168,15 @@ public class HttpPrinter extends FilterConsumer
 	addHeader("Content-type", mimeType);
       }
     beginData();
-    base.beginGroup(type);
-    groupNesting++;
+    base.startElement(type);
+    elementNesting++;
   }
 
-  public void endGroup()
+  public void endElement ()
   {
-    super.endGroup();
-    groupNesting--;
-    if (groupNesting == 0 && seenBeginDocument == 1)
+    super.endElement();
+    elementNesting--;
+    if (elementNesting == 0 && seenStartDocument == 1)
       endDocument();
   }
 
@@ -244,11 +244,11 @@ public class HttpPrinter extends FilterConsumer
       base.write(buf, off, len);
   }
 
-  public void beginDocument()
+  public void startDocument()
   {
     if (base != null)
-      base.beginDocument();
-    seenBeginDocument = 2;
+      base.startDocument();
+    seenStartDocument = 2;
   }
 
   public void endDocument()

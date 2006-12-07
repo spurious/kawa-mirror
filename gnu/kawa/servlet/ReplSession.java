@@ -232,21 +232,21 @@ class OutBufferWriter extends OutPort
     xout.write(str, 0, len);
   }
 
-  public void beginGroup (Object type)
+  public void startElement (Object type)
   {
     nesting++;
-    xout.beginGroup(type);
+    xout.startElement(type);
   }
 
-  public void endGroup ()
+  public void endElement ()
   {
     nesting--;
-    xout.endGroup();
+    xout.endElement();
   }
 
-  public void beginAttribute (Object attrType)
+  public void startAttribute (Object attrType)
   {
-    xout.beginAttribute(attrType);
+    xout.startAttribute(attrType);
   }
 
   public void endAttribute()

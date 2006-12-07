@@ -34,19 +34,19 @@ public abstract class AbstractFormat extends java.text.Format
     out.writeBoolean(v);
   }
 
-  public void beginGroup (Object type, Consumer out)
+  public void startElement (Object type, Consumer out)
   {
     write("(", out);
     write(type.toString(), out);
     write(" ", out);
   }
 
-  public void endGroup (Consumer out)
+  public void endElement (Consumer out)
   {
     write(")", out);
   }
 
-  public void beginAttribute (Object attrType, Consumer out)
+  public void startAttribute (Object attrType, Consumer out)
   {
     write(attrType.toString(), out);
     write(": ", out);

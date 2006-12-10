@@ -1,5 +1,4 @@
 package kawa;
-import kawa.lang.CompileFile;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
@@ -666,7 +665,6 @@ public class repl extends Procedure0or1
               return iArg;
             String key = arg.substring(0, ci);
             String value = arg.substring(ci+1);
-            String uri, local, prefix = "";
             for (int i = 0; ; i++)
               {
                 String[] propertyField = propertyFields[i];

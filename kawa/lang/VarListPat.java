@@ -1,6 +1,5 @@
 package kawa.lang;
 import gnu.lists.*;
-import gnu.text.Printable;
 
 /** A Pattern that will match a list of a given minimum length. */
 

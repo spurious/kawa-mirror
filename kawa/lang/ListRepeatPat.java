@@ -1,5 +1,4 @@
 package kawa.lang;
-import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.*;
 import gnu.text.Printable;

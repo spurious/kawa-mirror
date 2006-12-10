@@ -1,5 +1,11 @@
 2006-12-09  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/CompileFile.java: Remove unneded import.
+	* kawa/lang/PairPat.java: Likewise.
+	* kawa/lang/ListRepeatPat.java: Likewise.
+	* kawa/lang/VarListPat.java: Likewise.
+	* kawa/repl.java: Remove unused local variables.
+
 	* build.xml: Update handling of XMLParser.java to match that of make.
 
 2006-12-06  Per Bothner  <per@bothner.com>

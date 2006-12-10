@@ -1,5 +1,4 @@
 package kawa.lang;
-import java.io.*;
 import gnu.mapping.*;
 import gnu.bytecode.ClassType;
 import gnu.expr.*;

@@ -188,10 +188,6 @@
     -->
 
     <xcopy dataOnly="true">
-      <linestripperset id="strip-byte-subs">
-        <linestripper first="if CHAR is char" last="endif CHAR is char" />
-      </linestripperset>
-
       <linestripperset id="strip-char-subs">
         <linestripper first="if CHAR is byte" last="endif CHAR is byte" />
       </linestripperset>
@@ -294,18 +290,10 @@
           value="Automatically generated file - DO NOT EDIT!.  -*- buffer-read-only: t -*-" />
       </filterset>
       
-      <filterset id="filter-byte-subs">
-        <filter token="CHAR" value="byte" />
-        <filter token="XMLParser" value="XMLParserByte" />
-        <filter token="ParsedXMLHandler" value="ParsedXMLHandlerByte" />
-        <filter token="if CHAR is byte" value="" />
-        <filter token="endif CHAR is byte" value="" />
-      </filterset>
-
       <filterset id="filter-char-subs">
         <filter token="CHAR" value="char" />
         <filter token="XMLParser" value="XMLParserChar" />
-        <filter token="ParsedXMLHandler" value="ParsedXMLHandler" />
+        <filter token="ParsedXMLHandler" value="XMLFilter" />
         <filter token="if CHAR is char" value="" />
         <filter token="endif CHAR is char" value="" />
       </filterset>
@@ -330,33 +318,6 @@
       <filterset refid="filter-do-not-edit"/>
       <filterset refid="filter-char-subs"/>
       <linestripperset refid="strip-char-subs"/>
-    </xcopy>
-
-    <xcopy todir="${build.preprocessed}/gnu/xml" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/xml" />
-      <mapper type="glob" from="*ParsedXMLHandler.java.in" to="*ParsedXMLHandler.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-char-subs"/>
-      <linestripperset refid="strip-char-subs"/>
-    </xcopy>
-
-    <xcopy todir="${build.preprocessed}/gnu/xml" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/xml" />
-      <mapper type="glob" from="*XMLParser.java.in" to="*XMLParserByte.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-byte-subs"/>
-      <linestripperset refid="strip-byte-subs"/>
-    </xcopy>
-
-    <xcopy todir="${build.preprocessed}/gnu/xml" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/xml" />
-      <mapper type="glob" from="*ParsedXMLHandler.java.in" to="*ParsedXMLHandlerByte.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-byte-subs"/>
-      <linestripperset refid="strip-byte-subs"/>
     </xcopy>
 
   </target>

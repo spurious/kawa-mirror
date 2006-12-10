@@ -1,3 +1,7 @@
+2006-12-09  Per Bothner  <per@bothner.com>
+
+	* build.xml: Update handling of XMLParser.java to match that of make.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/object.java (rewriteForm, scanClassDef): Handle

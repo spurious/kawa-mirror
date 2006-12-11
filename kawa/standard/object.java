@@ -119,6 +119,8 @@ public class object extends Syntax
 		pair = (Pair) args;
 		Pair keyPair = pair;
 		Object key = pair.car;
+                while (key instanceof SyntaxForm)
+                  key = ((SyntaxForm) key).form;
 		Object savedPos2 = tr.pushPositionOf(pair);
 		args = pair.cdr;
 		if ((key == "::" || key instanceof Keyword)
@@ -393,6 +395,8 @@ public class object extends Syntax
                       }
 		    pair = (Pair) args;
 		    Object key = pair.car;
+                    while (key instanceof SyntaxForm)
+                      key = ((SyntaxForm) key).form;
 		    Object savedPos2 = tr.pushPositionOf(pair);
 		    args = pair.cdr;
 		    if ((key == "::" || key instanceof Keyword)

@@ -1,4 +1,4 @@
-(test-init "macros" 94)
+(test-init "macros" 95)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -455,3 +455,15 @@
 	   (begin expr "this fails")))))
     (outer "third")))
 (test "this fails" 'savannah-bug-17984 thisfails)
+
+;; Savannah bug #18504 Margus Freudenthal <margus@cyber.ee>
+;; Cannot generate (define-simple-class) using syntax-case macros
+(define-syntax aa
+  (lambda (x)
+    (syntax-case x ()
+      ((_ cl arg argtype)
+       #`(define-simple-class cl ()
+           (arg type: argtype))))))
+(aa MyClass myparam <String>)
+(define aa-instance (MyClass myparam: "sarg"))
+(test (as <String> "sarg") 'savannah-bug-18504 aa-instance:myparam)

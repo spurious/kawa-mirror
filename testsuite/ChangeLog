@@ -1,3 +1,9 @@
+2006-12-12  Per Bothner  <per@bothner.com>
+	    Chris Wegrzyn <chris.wegrzyn@gmail.com>
+
+	* mac-test.scm: Testcase for Savannah bug #18105: "with-syntax causes
+	NullPointerException during compilation but not in repl".
+
 2006-12-11  Per Bothner  <per@bothner.com>
 	    Margus Freudenthal <margus@cyber.ee>
 

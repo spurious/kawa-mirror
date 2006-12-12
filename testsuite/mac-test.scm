@@ -1,4 +1,4 @@
-(test-init "macros" 95)
+(test-init "macros" 96)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -467,3 +467,15 @@
 (aa MyClass myparam <String>)
 (define aa-instance (MyClass myparam: "sarg"))
 (test (as <String> "sarg") 'savannah-bug-18504 aa-instance:myparam)
+
+;; Savannah bug #18105: Chris Wegrzyn <chris.wegrzyn@gmail.com>
+;; with-syntax causes NullPointerException during compilation but not in repl
+(begin
+  (define-syntax crashing-syntax
+    (lambda (x)
+      (syntax-case x ()
+	((k args e1)
+	 (with-syntax ((bodye1 (syntax e1)))
+		      (syntax
+		       (lambda args (begin bodye1))))))))
+  (test 3 'savannah-bug-18105 ((crashing-syntax (arg1 arg2) 3) 1 2)))

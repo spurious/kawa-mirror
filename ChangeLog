@@ -1,3 +1,10 @@
+2006-12-11  Chris Wegrzyn <chris.wegrzyn@gmail.com>
+
+	* kawa/standard/syntax_case.java (rewriteForm): Make sure input form
+	is nested inside LetExp used to implement syntax-case.
+	This fixes Savannah bug #18105 "with-syntax causes
+	NullPointerException during compilation but not in repl".
+
 2006-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/object.java (scanClassDef, rewriteForm): Handle

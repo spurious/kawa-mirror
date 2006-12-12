@@ -1,5 +1,7 @@
 2006-12-11  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkLetExp): Check for null (unknown) declaration.
+
 	* Keyword.java (writeExternal, readExternal, readResolve): New methods,
 	since serialization inherited from Symbol doesn't match 'make'.
 

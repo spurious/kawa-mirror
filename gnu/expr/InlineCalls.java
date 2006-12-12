@@ -92,11 +92,11 @@ public class InlineCalls extends ExpWalker
       {
         ReferenceExp ref = (ReferenceExp) exp.body;
         Declaration d = ref.getBinding();
-        if (d.context == exp && ! ref.getDontDereference())
+        if (d != null && d.context == exp && ! ref.getDontDereference())
           {
             if ( n == 1)
               return exp.inits[0];
-            // Can also optimize of n > 1, but have to check if any
+            // Can also optimize if n > 1, but have to check if any
             // other inits can cause side-effects.  Probably not worth it.
           }
       }

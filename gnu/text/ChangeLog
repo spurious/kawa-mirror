@@ -1,3 +1,11 @@
+2006-12-12  Per Bothner  <per@bothner.com>
+
+	* WriterManager.java (WriterRef): New class extends WeakReference.
+	Use it to prefernt a strong reference from WriterManager to Writer.
+	(register, unregister): Change to return/take Object rather than index.
+	This fixes Savannah bug #15876: "Ports are not reclaimed automatically
+	when becoming inaccesible".
+
 2006-12-04  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java (FiletoURL): Avoid deprecated File.toURL

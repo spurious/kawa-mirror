@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2006  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -13,75 +13,62 @@ import java.io.*;
 
 public class WriterManager implements Runnable
 {
-  public static WriterManager instance = new WriterManager();
+  public static final WriterManager instance = new WriterManager();
 
-  Writer[] ports;
-  int[] freeList;
-  int freeListHead = -1;
+  WriterRef first;
 
-  public synchronized int register (Writer port)
+  /** Register a Writer.
+   * @return an object that can be passed to {@link #unregister}.
+   */
+  public synchronized WriterRef register (Writer port)
   {
-    if (freeListHead < 0)
+    WriterRef ref = new WriterRef(port);
+    WriterRef first = this.first; // Copy field to local variable.
+    if (first != null)
       {
-	int oldSize, newSize;
-	if (ports == null)
-	  {
-	    oldSize = 0;
-	    newSize = 20;
-	  }
-	else
-	  {
-	    oldSize = ports.length;
-	    newSize = 2 * oldSize;
-	  }
-	int[] newFreeList = new int[newSize];
-	Writer[] newPorts = new Writer[newSize];
-	if (oldSize > 0)
-	  {
-	    System.arraycopy(ports, 0, newPorts, 0, oldSize);
-	    System.arraycopy(freeList, 0, newFreeList, 0, oldSize);
-	  }
-	for (int i = oldSize;  i < newSize;  i++)
-	  {
-	    newFreeList[i] = freeListHead;
-	    freeListHead = i;
-	  }
-	ports = newPorts;
-	freeList = newFreeList;
+        ref.next = first.next;
+        first.prev = ref;
       }
-    int index = freeListHead;
-    ports[index] = port;
-    freeListHead = freeList[index];
-    freeList[index] = -2;
-    return index + 1;
+    this.first = ref;
+    return ref;
   }
 
-  public synchronized void unregister (int index)
+  /** Unregister a Writer.
+   * @param key the object returned by the correspodning {@link #register}.
+   */
+  public synchronized void unregister (Object key)
   {
-    if (--index < 0)
+    if (key == null)
       return;
-    ports[index] = null;
-    freeList[index] = freeListHead;
-    freeListHead = index;
+    WriterRef ref = (WriterRef) key;
+    WriterRef next = ref.next;
+    WriterRef prev = ref.prev;
+    if (next != null)
+      next.prev = prev;
+    if (prev != null)
+      prev.next = next;
+    if (ref == first)
+      first = next;
   }
 
-  public void run()
+  public synchronized void run()
   {
-    if (ports == null)
-      return;
-    for (int i = ports.length;  --i >= 0; )
+    for (WriterRef ref = first;  ref != null;  ref = ref.next)
       {
-	Writer port = ports[i];
-	try
-	  {
-	    if (port != null)
-	      port.close();
-	  }
-	catch (Exception ex)
-	  {
-	    // ignore
-	  }
+        Object port = ref.get();
+        if (port != null)
+          {
+            try
+              {
+                ((Writer) port).close();
+              }
+            catch (Exception ex)
+              {
+                // ignore
+              }
+          }
       }
+    first = null;
   }
 
   /** Try to register this as a shutdown hook.
@@ -104,5 +91,19 @@ public class WriterManager implements Runnable
       {
 	return false;
       }
+  }
+}
+
+class WriterRef
+/* #ifdef JAVA2 */
+extends java.lang.ref.WeakReference
+/* #endif */
+{
+  WriterRef next;
+  WriterRef prev;
+
+  public WriterRef (Writer wr)
+  {
+    super(wr);
   }
 }

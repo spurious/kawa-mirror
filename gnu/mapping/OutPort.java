@@ -20,7 +20,7 @@ public class OutPort extends PrintConsumer implements Printable
 
   /** An index into the WriterManager's internal table.
    * The value zero means it is unregistered. */
-  protected int index;
+  protected Object unregisterRef;
   
   protected OutPort(Writer base, PrettyWriter out, boolean autoflush)
   {
@@ -28,7 +28,7 @@ public class OutPort extends PrintConsumer implements Printable
     this.bout = out;
     this.base = base;
     if (closeOnExit())
-      index = WriterManager.instance.register(out);
+      unregisterRef = WriterManager.instance.register(out);
   }
 
   protected OutPort (OutPort out, boolean autoflush)
@@ -344,8 +344,7 @@ public class OutPort extends PrintConsumer implements Printable
       {
         setError();
       }
-    if (index > 0)
-      WriterManager.instance.unregister(index);
+    WriterManager.instance.unregister(unregisterRef);
   }
 
   /** True if the port should be automatically closed on exit.

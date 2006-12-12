@@ -116,4 +116,21 @@ public class Keyword extends Symbol
       }
     return dfault;
   }
+
+  public void writeExternal (ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+  }
+
+  public void readExternal (ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    name = (String) in.readObject();
+  }
+
+  public Object readResolve () throws ObjectStreamException
+  {
+    return make(keywordNamespace, getName());
+  }
 }
+

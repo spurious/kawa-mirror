@@ -247,13 +247,6 @@ public class Shell
 		perr.println("Invalid parameter, was: "+ e.getMessage());
 		e.printStackTrace(perr);
 	      }
-	    catch (gnu.text.SyntaxException e)
-	      {
-		e.printAll(perr, 20);
-		e.clear();
-		if (! interactive)
-		  return;
-	      }
 	    catch (java.io.IOException e)
 	      {
 		messages.printAll(perr, 20);
@@ -266,8 +259,18 @@ public class Shell
 	      }
 	    catch (Throwable e)
 	      {
-		messages.printAll(perr, 20);
-		e.printStackTrace(perr);
+                SyntaxException se;
+                if (e instanceof SyntaxException
+                    && (se = (SyntaxException) e).getMessages() == messages)
+                  {
+                    se.printAll(perr, 20);
+                    se.clear();
+                  }
+                else
+                  {
+                    messages.printAll(perr, 20);
+                    e.printStackTrace(perr);
+                  }
 		if (! interactive)
 		  return;
 	      }

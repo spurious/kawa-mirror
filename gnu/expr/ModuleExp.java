@@ -228,6 +228,12 @@ public class ModuleExp extends LambdaExp
                   {
                     inst = clas.newInstance();
                   }
+                /* #ifdef use:java.lang.Throwable.getCause */
+                catch (ExceptionInInitializerError ex)
+                  {
+                    throw ex.getCause();
+                  }
+                /* #endif */
 
 		// Import declarations defined in module into the Environment.
 		for (Declaration decl = mexp.firstDecl();

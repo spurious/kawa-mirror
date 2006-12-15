@@ -1,9 +1,12 @@
 package gnu.text;
 
 public interface SourceLocator
-  // These also work with JAXP_1.2 - i.e. JAVA4.
+  /* #ifdef SAX2 */
+  extends
   /* #ifdef JAXP-1.3 */
-  // extends javax.xml.transform.SourceLocator, org.xml.sax.Locator
+  // javax.xml.transform.SourceLocator, 
+  /* #endif */
+  org.xml.sax.Locator
   /* #endif */
 {
   /** Return current column number.

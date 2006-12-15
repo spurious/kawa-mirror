@@ -6266,8 +6266,8 @@ to KRL, even in BRL-compatibility mode.
 @section Reporting bugs
 
 To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
-best to use the @uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa,
-bug-submission page}.
+best to use the
+@uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa,bug-submission page}.
 You can browse and comment on existing bug reports
 using the @uref{http://savannah.gnu.org/bugs/?group=kawa, Kawa Bugzilla page}.
 

@@ -146,9 +146,15 @@ case ${with_servlet} in
   *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
 esac
 
+case ${with_sax2} in
+  yes) SAX2_PREPROCESS="+SAX2";;
+  no) SAX2_PREPROCESS="-SAX2";;
+  *) SAX2_PREPROCESS=""
+esac
+
 XQTS_PATH=${with_XQTS:XQTS}
 AC_SUBST(XQTS_PATH)
-
+AC_SUBST(SAX2_PREPROCESS)
 AC_SUBST(conf_classpath)
 AC_SUBST(pathsep)
 AC_SUBST(filesep)

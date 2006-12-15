@@ -203,8 +203,8 @@ COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
-JAVA4_FEATURES = +JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex
-NO_JAVA4_FEATURES = -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer
+JAVA4_FEATURES = +JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex $(or @SAX2_PREPROCESS@,+SAX2)
+NO_JAVA4_FEATURES = -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer $(or @SAX2_PREPROCESS@,-SAX2)
 JAVA5_FEATURES = +JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName
 
 # JDK 1.1

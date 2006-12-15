@@ -1,3 +1,9 @@
+2006-12-14  Per Bothner  <per@bothner.com>
+
+	* configure.in (SAX2_PREPROCESS): New substiution varible.
+	* Makefile.m (JAVA4_FEATURES, NO_JAVA4_FEATURES): Define preprocess
+	variable SAX2 depending on whether --with-sax2 was specified.
+
 2006-12-12  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run): Only special handling of SyntaxException if

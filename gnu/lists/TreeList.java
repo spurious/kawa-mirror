@@ -2156,8 +2156,18 @@ public class TreeList extends AbstractSequence
 	j = getIntN(pos);
 	j += j < 0 ? data.length : pos-1;
 	return  j + 1;
-        //case BEGIN_ENTITY: // FIXME???
-        //return j + 5;
+      case BEGIN_ENTITY:
+        j = pos + (BEGIN_ENTITY_SIZE-1);
+        for (;;)
+          {
+            if (j == gapStart)
+              j = gapEnd;
+            if (j == data.length)
+              return -1; // actually error.
+            if (data[j] == END_ENTITY)
+              return j + 1;
+            j = nextDataIndex(j);
+          }
       case BOOL_FALSE:
       case BOOL_TRUE:
       case JOINER:

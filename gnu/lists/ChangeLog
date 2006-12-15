@@ -1,3 +1,7 @@
+2006-12-14  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (nextDataIndex): Handle BEGIN_ENTITY.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* Consumer.java (beginDocument): Renamed to startDocument.

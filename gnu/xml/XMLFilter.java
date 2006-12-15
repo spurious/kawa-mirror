@@ -7,6 +7,9 @@ import gnu.text.Char;
 import gnu.text.SourceLocator;
 import gnu.text.SourceMessages;
 import gnu.mapping.Symbol;
+/* #ifdef SAX2 */
+import org.xml.sax.*;
+/* #endif */
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
 /** Fixup XML input events.
@@ -19,10 +22,13 @@ import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
  * Strings.  This is to avoid duplicate String allocation and interning.
  * The combination XMLParser+XMLFilter+NodeTree makes for a fast and
  * compact way to read an XML file into a DOM.
- * Future: Subsume ConsumeSAXHandler as well.  FIXME
  */
 
-public class XMLFilter implements XConsumer, PositionConsumer
+public class XMLFilter implements
+                       /* #ifdef SAX2 */
+                       DocumentHandler, ContentHandler,
+                       /* #endif */
+                       XConsumer, PositionConsumer
 {
   /** This is where we save attributes while processing a begin element.
    * It may be the final output if {@code out instanceof NodeTree}. */
@@ -326,9 +332,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
     if (uri != null)
       return uri;
     if (prefix != null)
-      {
-        error('e', "unknown namespace prefix '" + prefix + '\'');
-      }
+      error('e', "unknown namespace prefix '" + prefix + '\'');
     return "";
   }
 
@@ -734,6 +738,15 @@ public class XMLFilter implements XConsumer, PositionConsumer
       base.write(str, start, length);
   }
 
+  final boolean inElement ()
+  {
+    int i = nesting;
+    // Don't count nested document nodes.
+    while (i > 0 && workStack[i-1] == null)
+      i -= 2;
+    return i != 0;
+  }
+
   public void textFromParser (char[] data, int start, int length)
   {
     // We skip whitespace not in an element.
@@ -1063,6 +1076,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
   {
     if (attrLocalName != null)
       endAttribute();
+    closeStartTag();
   }
 
   /** Process an end tag.
@@ -1075,7 +1089,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
 	error('e', "unclosed attribute"); // FIXME
 	endAttribute();
       }
-    if (nesting == 0)
+    if (! inElement())
       {
 	error('e', "unmatched end element"); // FIXME
 	return;
@@ -1269,7 +1283,7 @@ public class XMLFilter implements XConsumer, PositionConsumer
                                         int dstart, int dlength)
   {
     // Skip XML declaration.
-    if (nesting == 0 && tlength == 3
+    if (tlength == 3 && ! inElement()
         && buffer[tstart] == 'x'
         && buffer[tstart+1] == 'm'
         && buffer[tstart+2] == 'l')
@@ -1530,6 +1544,96 @@ public class XMLFilter implements XConsumer, PositionConsumer
   public boolean ignoring()
   {
     return ignoringLevel > 0;
+  }
+
+  public void setDocumentLocator(Locator locator)
+  {
+    if (locator instanceof SourceLocator)
+      this.locator = (SourceLocator) locator;
+    else
+      {
+        // create SourceLocator that indirects to given locator.  FIXME.
+      }
+  }
+
+  public void startElement (String namespaceURI, String localName,
+			    String qName, Attributes atts)
+  {
+    startElement(Symbol.make(namespaceURI, localName));
+    int numAttributes = atts.getLength();
+    for (int i = 0;  i < numAttributes;  i++)
+      {
+	startAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
+	write(atts.getValue(i));
+	endAttribute();
+      }
+  }
+
+  public void endElement (String namespaceURI, String localName,
+			  String qName)
+  {
+    endElement();
+  }
+
+  public void startElement (String name, AttributeList atts)
+  {
+    name = name.intern();  // ???
+    startElement(name);  // FIXME
+    int attrLength = atts.getLength();
+    for (int i = 0; i < attrLength; i++)
+      {
+	name = atts.getName(i);
+	name = name.intern();  // ?
+	String type = atts.getType(i);
+	String value = atts.getValue(i);
+	startAttribute(name);  // FIXME
+	write(value);
+	endAttribute();
+      }
+  }
+
+  public void endElement (String name)
+    throws SAXException
+  {
+    endElement();
+  }
+
+  public void characters (char ch[], int start, int length)
+    throws SAXException
+  {
+    write(ch, start, length);
+  }
+
+  public void ignorableWhitespace (char ch[], int start, int length)
+    throws SAXException
+  {
+    // FIXME
+    write(ch, start, length);
+  }
+
+  public void processingInstruction(String target, String data)
+  {
+    // FIXME - this could be done more efficiently by copying the
+    // string into tlist.
+    char[] chars = data.toCharArray();
+    processingInstructionCommon(target, chars, 0, chars.length);
+  }
+
+  public void startPrefixMapping (String prefix, String uri)
+  {
+    namespaceBindings = findNamespaceBinding(prefix.intern(),
+                                             uri.intern(),
+                                             namespaceBindings);
+  }
+
+  public void endPrefixMapping (String prefix)
+  {
+    namespaceBindings = namespaceBindings.getNext();
+  }
+
+  public void skippedEntity (String name)
+  {
+    // FIXME
   }
 }
 

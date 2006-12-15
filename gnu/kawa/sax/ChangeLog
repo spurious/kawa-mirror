@@ -1,3 +1,9 @@
+2006-12-14  Per Bothner  <per@bothner.com>
+
+	* ConsumeSAXHandler.java: Remove class.  No longer needed now
+	that XMLFIlter implements DocumentHandler and ContentHandler.
+	* Makefile.am: Update accordingly.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* ConsumeSAXHandler.java: Update for renamed Consumer methods.

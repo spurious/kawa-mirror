@@ -3,7 +3,6 @@
 include $(top_srcdir)/Make-rules
 
 java_sources=\
-  ConsumeSAXHandler.java \
   ContentConsumer.java \
   KawaXMLReader.java
 

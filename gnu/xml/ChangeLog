@@ -1,3 +1,16 @@
+2006-12-14  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java (inElement): New method.
+	(emitEndElement, processingInstructionFromParser): Use it.
+
+	* XMLFilter.java (emitEndAttributes): Do closeStartTag().
+
+	* XMLFilter.java: Implement DocumentHandler, ContentHandler if SAX2.
+	(setDocumentLocator, startElement*2, endElement*2, characters,
+	ignorableWhitespace, processingInstruction, skippedEntity):
+	Moved methods from ConsumeSAXHandler.
+	(startPrefixMapping, endPrefixMapping): Ditto, but with implementation.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java.in: Update for renamed Consumer methods.

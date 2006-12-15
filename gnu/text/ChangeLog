@@ -1,5 +1,9 @@
 2006-12-14  Per Bothner  <per@bothner.com>
 
+	* LineBufferedReader.java (BUFFER_SIZE): Increase to 8192.
+
+	* LineBufferedReader.java (incrLineNumber): New method.
+
 	* SourceLocator.java: Extend org.xml.sax.Locator if SAX2 is set
 	regardless of JAXP-1.3.
 

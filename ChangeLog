@@ -1,3 +1,7 @@
+2006-12-15  Per Bothner  <per@bothner.com>
+
+	* build.xml: Update for XMLParser changes.
+
 2006-12-14  Per Bothner  <per@bothner.com>
 
 	* configure.in (SAX2_PREPROCESS): New substiution varible.

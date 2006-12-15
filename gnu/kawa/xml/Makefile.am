@@ -67,7 +67,6 @@ java_sources = \
   XInteger.java \
   XIntegerType.java \
   XTimeType.java \
-  XMLParser.java \
   XmlNamespace.java
 
 PACKAGE_FNAME = gnu-kawa-xml

@@ -1,13 +1,10 @@
-// -*-Java-*-
-// Copyright (c) 2001, 2002, 2006  Per M.A. Bothner and Brainfood Inc.
-// This is free software;  for terms and warranty disclaimer see ./COPYING.
-
 package gnu.xml;
 import java.io.*;
-import java.net.*;
+import gnu.text.*;
+import gnu.lists.*;
 import gnu.text.URI_utils;
 
-/** Reads XML from a @CHAR@ array.
+/** Reads XML from a char array.
  * Assumes a state-less character encoding containing ascii as a sub-set,
  * and where no byte in a multi-byte character is the same as a xml special
  * character.  Any bytes with high-order bit set are treated as if they
@@ -19,14 +16,8 @@ import gnu.text.URI_utils;
  * @author Per Bothner
  */
 
-abstract public class @XMLParser@
+public class XMLParser
 {
-  protected @CHAR@[] buffer;
-  protected int pos;
-  protected int limit;
-
-  @ParsedXMLHandler@ out;
-
   private static final int EXPECT_NAME_MODIFIER = 1;
   private static final int SKIP_SPACES_MODIFIER = 2;
   private static final int INIT_STATE = 0;
@@ -47,17 +38,176 @@ abstract public class @XMLParser@
   private static final int SAW_AMP_STATE = 25;  // Saw '&'.  
   private static final int SAW_AMP_SHARP_STATE = 26;  // Saw '&#'.  
   private static final int EXPECT_RIGHT_STATE = 27;
-  private static final int SAW_ERROR = 28;
-  private static final int SAW_EOF_ERROR = 30;  // Unexpected end-of-file.
+  private static final int PREV_WAS_CR_STATE = 28;
+  private static final int SAW_ERROR = 30;
+  private static final int SAW_EOF_ERROR = 31;  // Unexpected end-of-file.
 
-  public void parse()
+  public static void parse (Object uri, SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    parse(new BufferedInputStream(URI_utils.getInputStream(uri)),
+          uri, messages, out);
+  }
+
+  public static void parse (InputStream strm, Object uri,
+                            SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    BufferedInputStream bin = (strm instanceof BufferedInputStream
+                               ? (BufferedInputStream) strm
+                               : new BufferedInputStream(strm));
+    bin.mark(200);
+    int b1 = bin.read();
+    int b2 = b1 < 0 ? -1 : bin.read();
+    int b3 = b2 < 0 ? -1 : bin.read();
+    int b4 = b3 < 0 ? -1 : bin.read();
+    String encoding;
+    // John Cowan's XML encoding sniffer:
+    // http://recycledknowledge.blogspot.com/2005/07/hello-i-am-xml-encoding-sniffer.html
+    char tentative;
+    if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF)
+      tentative = 'u'; // "UTF-8"
+    else if (((b1 == 0xFF && b2 == 0xFE) || (b1 == 0xFe && b2 == 0xFF))
+             && ! (b3 == 0 && b4 == 0))
+      tentative = 'U'; // "UTF-16"
+    else if (b1 == 0x4C && b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
+      tentative = 'E'; // "EBCDIC-unknown"
+    else
+      tentative = '\0';
+    int n;
+    if (tentative == 'u')
+      {
+        n = 3;
+        encoding = "UTF-8";
+      }
+    else
+      {
+        n = 0;
+        encoding = null;
+        for (;;)
+          {
+            int b;
+            if (++n == 200 || (b = bin.read()) < 0)
+              {
+                n = 0;
+                break;
+              }
+            if (b == (tentative != 'E' ? '>' : 0x4C/*'>' in EBCDIC*/))
+              {
+                // No encoding declaration.
+                n = 0;
+                if (tentative == 'U')
+                  {
+                    n = 2;
+                    encoding = b2 == 0xFF ? "UTF-16BE" : "UTF-16LE";
+                  }
+                else if (tentative == 'E')
+                  throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
+                else
+                  {
+                    // Technically the encoding declaration is required in the
+                    // first two cases.  But let's be nice to Windows users.
+                    if (b1 == 0 && b2 == 0x3C && b3 == 0 && b4 == 0x3F)
+                      encoding = "UTF-16BE";
+                    else if (b1 == 0x3C && b2 == 0 && b3 == 0x3F && b4 == 0)
+                      encoding = "UTF-16LE";
+                    else
+                      encoding = "UTF-8";
+                  }
+                break;
+              }
+            if (b == (tentative != 'E' ? 'g' : 0x87/*'g' in EBCDIC*/))
+              {
+                // Seen a 'g' - presumably in "encoding".
+                for (;;)
+                  {
+                    b = bin.read();
+                    if (b < 0)
+                      break;
+                    if (tentative != 'E' ? (b == '\'' || b == '\"')
+                        : (b == 0x7D || b == 0x7F))
+                      {
+                        int terminator = b;
+                        // Seen quote that starts encoding declaration.
+                        StringBuffer sbuf = new StringBuffer();
+                        for (;;)
+                          {
+                            if (++n == 200 || (b = bin.read()) < 0)
+                              break;
+                            if (b < 0)
+                              break;
+                            if (b == 0)
+                              continue;
+                            if (b != terminator)
+                              {
+                                if (tentative == 'E')
+                                  {
+                                    // Map invariant EBCDIC to ASCII.
+                                    // http://publib.boulder.ibm.com/iseries/v5r2/ic2924/index.htm?info/nls/rbagsinvariantcharset.htm
+                                    throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
+                                  }
+                                sbuf.append((char) b);
+                                continue;
+                              }
+                            encoding = sbuf.toString();
+                            break;
+                          }
+                        break;
+                      }
+                  }
+                n = tentative == 'U' ? 2 : 0;
+                break;
+              }
+          }
+      }
+    bin.reset();
+    while (--n >= 0) bin.read();
+    Reader reader;
+    if (encoding != null)
+      reader = new InputStreamReader(bin, encoding);
+    else
+      reader = new InputStreamReader(bin); // Or maybe error??
+    LineBufferedReader in = new LineBufferedReader(reader);
+    in.setName(uri);
+    parse(in, messages, out);
+    in.close();
+  }
+
+  public static void parse (LineBufferedReader in, SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    XMLFilter filter = new XMLFilter(out);
+    filter.setMessages(messages);
+    filter.setSourceLocator(in);
+    filter.startDocument();
+    Object uri = in.getURI();
+    if (uri != null)
+      filter.writeDocumentUri(uri);
+    parse(in, filter);
+    filter.endDocument();
+  }
+
+  public static void parse (LineBufferedReader in, SourceMessages messages, XMLFilter filter)
+    throws java.io.IOException
+  {
+    filter.setMessages(messages);
+    filter.setSourceLocator(in);
+    filter.startDocument();
+    Object uri = in.getURI();
+    if (uri != null)
+      filter.writeDocumentUri(uri);
+    parse(in, filter);
+    filter.endDocument();
+    in.close();
+  }
+
+  public static void parse (LineBufferedReader in, XMLFilter out)
   {
     // Cache fields in local variables, for speed.
-    @CHAR@[] buffer = this.buffer;
-    int pos = this.pos;
-    int limit = this.limit;
-    @ParsedXMLHandler@ out = this.out;
-    
+    char[] buffer = in.buffer;
+    int pos = in.pos;
+    int limit = in.limit;
+
     // The flow logic of this method is unusual.  It is one big state machine,
     // but with two "subroutines": SKIP_SPACES_MODIFIER and EXPECT_NAME_MODIFIER.
     // There is also a "subroutine" to get a new character (and leave it in 'ch')
@@ -77,9 +227,9 @@ abstract public class @XMLParser@
     // 1: seen '&'
 
     // The next two varibles are only relevant if state==INIT_STATE:
-    @CHAR@ terminator = (@CHAR@) '<';
+    char terminator = (char) '<';
     int continue_state = SAW_LEFT_STATE;
-    @CHAR@ ch = (@CHAR@) ' '; // ???
+    char ch = (char) ' '; // ???
     int length = 0;
     int dstart = -1;
     String message = null;
@@ -96,8 +246,8 @@ abstract public class @XMLParser@
             break handleChar;
 
           case SAW_ERROR:
-            this.pos = pos;
-            error('e', message);
+            in.pos = pos;
+            out.error('e', message);
             for (;;)
               {
                 if (pos >= limit)
@@ -111,8 +261,8 @@ abstract public class @XMLParser@
               }
 
           case SAW_EOF_ERROR:
-            this.pos = pos;
-            error('f', "unexpected end-of-file");
+            in.pos = pos;
+            out.error('f', "unexpected end-of-file");
             return;
 
           case TEXT_STATE:
@@ -120,6 +270,9 @@ abstract public class @XMLParser@
             // terminator=='<').  It also handles attribute values (in
             // which case terminator is '\'' or '"').
             start = pos - 1;
+            int lineIncr = 0;
+            int lineStart = -1;
+            // Not length now, but used to calculate length when done.
             length = pos;
             for (;;)
               {
@@ -133,6 +286,64 @@ abstract public class @XMLParser@
                     state = SAW_AMP_STATE;
                     break;
                   }
+                if (ch == '\r')
+                  {
+                    length = pos - length;
+                    in.pos = pos;
+                    if (length > 0)
+                      out.textFromParser(buffer, start, length);
+                    if (pos < limit)
+                      {
+                        ch = buffer[pos];
+                        if (ch == '\n')
+                          {
+                            start = pos;
+                            length = ++pos;
+                          }
+                        else
+                          {
+                            out.linefeedFromParser();
+                            if (ch == 0x85)
+                              {
+                                start = pos++;
+                                length = pos + 1;
+                              }
+                            else
+                              {
+                                lineIncr++;
+                                lineStart = pos;
+                                start = pos;
+                                length = ++pos;
+                                continue;
+                              }
+                          } 
+                        lineIncr++;
+                        lineStart = pos;
+                      }
+                    else
+                      {
+                        out.linefeedFromParser();
+                        state = PREV_WAS_CR_STATE;
+                        break handleChar;
+                      }
+                  }
+                else if (ch == 0x85 || ch == 0x2028)
+                  {
+                    length = pos - length;
+                    in.pos = pos-1;
+                    if (length > 0)
+                      out.textFromParser(buffer, start, length);
+                    out.linefeedFromParser();
+                    lineIncr++;
+                    lineStart = pos;
+                    length = pos + 1;
+                    start = pos;
+                  }
+                else if (ch == '\n')
+                  {
+                    lineIncr++;
+                    lineStart = pos;
+                  }
                 if (pos == limit)
                   {
                     length--;
@@ -142,9 +353,29 @@ abstract public class @XMLParser@
               }
             length = pos - length;
             if (length > 0)
-              out.textFromParser(buffer, start, length);
+              {
+                in.pos = pos;
+                out.textFromParser(buffer, start, length);
+              }
+            if (lineStart >= 0)
+              in.incrLineNumber(lineIncr, lineStart);
 	    start = buffer.length;
             break handleChar;
+
+          case PREV_WAS_CR_STATE:
+            // The previous character was a '\r', and we passed along '\n'
+            // to out.  If the new character is '\n' or 0x85 ignore it.
+            state = TEXT_STATE;
+            if (ch == '\n' | ch == 0x85)
+              {
+                in.incrLineNumber(1, pos);
+                break handleChar;
+              }
+            else
+              {
+                in.incrLineNumber(1, pos-1);
+                continue;
+              }
 
           case SKIP_SPACES_MODIFIER + EXPECT_RIGHT_STATE:
           case SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE:
@@ -164,6 +395,7 @@ abstract public class @XMLParser@
           case EXPECT_NAME_MODIFIER + SAW_ENTITY_REF:
           case EXPECT_NAME_MODIFIER + DOCTYPE_NAME_SEEN_STATE:
           case EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE:
+            length = start+1;
             // "Subroutine" for reading a Name.
             for (;;)
               {
@@ -188,7 +420,7 @@ abstract public class @XMLParser@
 					(ch >= 0x2C00 && ch <= 0x2FEF) ||
 					(ch >= 0x3001 && ch <= 0xD7FF) ||
 					(ch >= 0xF900 && ch <= 0xFFFD))))))) ||
-		    (pos > start &&
+		    (pos > length &&
 		     (ch >= '0' && ch <= '9') ||
 		      ch == '.' || ch == '-' ||
 		     ch == 0xB7 ||
@@ -199,13 +431,16 @@ abstract public class @XMLParser@
                 else
                   {
 		    state -= EXPECT_NAME_MODIFIER;
-		    length = pos - 1 - start;
+		    length = pos - length;
 		    if (length == 0)
 		      {
 			if (state == ATTRIBUTE_SEEN_NAME_STATE)
-			  message = "missing attribute name";
+			  message = "missing or invalid attribute name";
+                        else if (state == BEGIN_ELEMENT_STATE
+                                 || state == END_ELEMENT_STATE)
+			  message = "missing or invalid element name";
 			else
-			  message = "missing name";
+			  message = "missing or invalid name";
 			state = SAW_ERROR;
 		      }
                     continue mainLoop;
@@ -220,6 +455,7 @@ abstract public class @XMLParser@
 	      {
 		if (ch == ';')
 		  {
+                    in.pos = pos;
 		    out.emitCharacterReference(length,
 					       buffer, start, pos-1-start);
 		    state = TEXT_STATE;
@@ -242,7 +478,8 @@ abstract public class @XMLParser@
 		else
 		  break handleChar;
 	      }
-            error('e', "invalid character reference");
+            in.pos = pos;
+            out.error('e', "invalid character reference");
 	    state = TEXT_STATE;
             break handleChar;
 
@@ -260,11 +497,9 @@ abstract public class @XMLParser@
             continue mainLoop;
 
           case SAW_ENTITY_REF:
+            in.pos = pos;
             if (ch != ';')
-              {
-                this.pos = pos;
-                error('w', "missing ';'");
-              }
+              out.error('w', "missing ';'");
             out.emitEntityReference(buffer, start, length);
 	    start = limit;
             state = TEXT_STATE;
@@ -293,7 +528,7 @@ abstract public class @XMLParser@
             state = EXPECT_NAME_MODIFIER + BEGIN_ELEMENT_STATE;
             continue mainLoop;
           case BEGIN_ELEMENT_STATE:
-            this.pos = pos;
+            in.pos = pos;
             out.emitStartElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
 	    start = limit;
@@ -309,6 +544,7 @@ abstract public class @XMLParser@
 		    && buffer[end = pos - 2] == '?'
 		    && end >= dstart)
 		  {
+                    in.pos = pos;
 		    out.processingInstructionFromParser(buffer, start, length,
                                                         dstart, end - dstart);
 		    start = limit;
@@ -336,6 +572,7 @@ abstract public class @XMLParser@
 			if (buffer[pos-2] == '-'
 			    && buffer[pos-3] == '-')
 			  {
+                            in.pos = pos;
 			    out.commentFromParser(buffer, start + 2, length - 4);
 			    break exclLoop;
 			  }
@@ -352,6 +589,7 @@ abstract public class @XMLParser@
 			if (buffer[pos-2] == ']'
 			    && buffer[pos-3] == ']')
 			  {
+                            in.pos = pos;
 			    out.writeCDATA(buffer, start + 7, pos - 10 - start);
 			    break exclLoop;
 			  }
@@ -392,7 +630,10 @@ abstract public class @XMLParser@
           case DOCTYPE_NAME_SEEN_STATE:  /* Seen '<!DOCTYPE' S* Name */
 	    if (dstart < 0)
 	      {
+                // First type - i.e. not after a handelChar call.
 		dstart = pos - 1;
+                dstart -= start; // Make relative.
+                dstart <<= 1; // Add bit for whether in a '['.
 		terminator = 0;
 	      }
             for (;;)
@@ -404,15 +645,26 @@ abstract public class @XMLParser@
                     else if (terminator == ch)
                       terminator = 0;
                   }
-                if (ch == '>' && terminator == 0)
+                else if (terminator == 0) // I.e. not inside a string.
                   {
-                    out.emitDoctypeDecl(buffer, start, length,
-                                        dstart, pos - 1 - dstart);
-                    terminator = (@CHAR@) '<';
-		    start = limit;
-		    dstart = -1;
-                    state = TEXT_STATE;
-                    break handleChar;
+                    // Low-order bit of dstart is 1 if we've seen a '['.
+                    if (ch == '[')
+                      dstart |= 1;
+                    else if (ch == ']')
+                      dstart &= ~1;
+                    else if (ch == '>' && (dstart & 1) == 0)
+                      {
+                        in.pos = pos;
+                        dstart >>= 1;
+                        dstart += start;
+                        out.emitDoctypeDecl(buffer, start, length,
+                                            dstart, pos - 1 - dstart);
+                        terminator = (char) '<';
+                        start = limit;
+                        dstart = -1;
+                        state = TEXT_STATE;
+                        break handleChar;
+                      }
                   }
                 if (pos < limit)
 		  ch = buffer[pos++];
@@ -421,10 +673,11 @@ abstract public class @XMLParser@
               }
 
           case MAYBE_ATTRIBUTE_STATE:
-            terminator = (@CHAR@) '<';
+            terminator = '<';
             continue_state = SAW_LEFT_STATE;
             if (ch == '/')
               {
+                in.pos = pos;
                 out.emitEndAttributes();
                 out.emitEndElement(null, 0, 0);
                 state = EXPECT_RIGHT_STATE;
@@ -432,6 +685,7 @@ abstract public class @XMLParser@
               }
             if (ch == '>')
               {
+                in.pos = pos;
                 out.emitEndAttributes();
                 state = TEXT_STATE;
                 break handleChar;
@@ -443,6 +697,7 @@ abstract public class @XMLParser@
             if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
 		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
+            in.pos = pos;
             out.emitStartAttribute(buffer, start, length);
 	    start = limit;
             if (ch == '=')
@@ -475,7 +730,7 @@ abstract public class @XMLParser@
             continue mainLoop;
 
           case END_ELEMENT_STATE:  // Seen '</' Name.
-            this.pos = pos;
+            in.pos = pos;
             out.emitEndElement(buffer, start, length);
 	    start = limit;
             // Skip spaces then goto EXPECT_RIGHT_STATE.
@@ -499,117 +754,41 @@ abstract public class @XMLParser@
         else
           {
 	    int saved = pos - start;
-	    int count = fill(buffer, start, pos);
-	    if (count > 0)
-	      {
-		pos = this.pos;
-		buffer = this.buffer;
-		limit = pos + count;
-		start = saved >= 0 ? pos - saved : limit;
-		ch = buffer[pos++];
-	      }
-	    else
-	      {
-		if (state == TEXT_STATE)
-		  return;
-		state = SAW_EOF_ERROR;
-	      }
+            try
+              {
+                if (saved > 0)
+                  {
+                    in.pos = start;
+                    in.mark(saved + 1);
+                  }
+                in.pos = pos;
+                int x = in.read();
+                if (x <= 0)
+                  {
+                    if (state == TEXT_STATE || state == PREV_WAS_CR_STATE)
+                      return;
+                    state = SAW_EOF_ERROR;
+                    continue;
+                  }
+                if (saved > 0)
+                  {
+                    in.reset();
+                    in.skip(saved);
+                  }
+                else
+                  in.unread_quick();
+              }
+            catch (java.io.IOException ex)
+              {
+                throw new RuntimeException(ex.getMessage());
+              }
+            pos = in.pos;
+            buffer = in.buffer;
+
+            limit = in.limit;
+            start = saved > 0 ? pos - saved : limit;
+            ch = buffer[pos++];
           }
       }
   }
-
-@if CHAR is byte@
-  protected InputStream in;
-@endif CHAR is byte@
-@if CHAR is char@
-  protected Reader in;
-@endif CHAR is char@
-
-  /** Fill the buffer with more data.
-   * @param start start of current token.
-   * @param pos index of current read position
-   */
-  public int fill(@CHAR@[] buffer, int start, int pos)
-  {
-    if (in == null)
-      return -1;
-    int saved = pos - start;
-    if (saved > 0)
-      {
-	if (saved >= buffer.length)
-	  {
-	    @CHAR@[] tmp = new @CHAR@[saved+100];
-	    System.arraycopy(buffer, start, tmp, 0, saved);
-	    buffer = tmp;
-	    this.buffer = tmp;
-	  }
-	else if (start > 0)
-	  System.arraycopy(buffer, start, buffer, 0, saved);
-	pos = saved;
-      }
-    else
-      {
-	pos = 0;
-      }
-    try
-      {	
-	this.pos = pos;
-	return in.read(buffer, pos, buffer.length - pos);
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new RuntimeException(ex.getMessage());
-      }
-  }
-
-@if CHAR is byte@
-  public @XMLParser@(InputStream in, @ParsedXMLHandler@ out)
-  {
-    this.in = in; 
-    buffer = new byte[1024];
-    pos = 0;
-    limit = 0;
-
-    this.out = out;
-  }
-@endif CHAR is byte@
-@if CHAR is char@
-  public @XMLParser@(InputStream in, @ParsedXMLHandler@ out)
-  {
-    this.in = new InputStreamReader(in); 
-    buffer = new char[1024];
-    pos = 0;
-    limit = 0;
-
-    this.out = out;
-  }
-@endif CHAR is char@
-
-@if CHAR is char@
-  public @XMLParser@(Reader in, @ParsedXMLHandler@ out)
-  {
-    this.in = in;
-    buffer = new char[1024];
-    pos = 0;
-    limit = 0;
-
-    this.out = out;
-  }
-@endif CHAR is char@
-
-  public @XMLParser@(@CHAR@[] buffer, int pos, int limit,
-		     @ParsedXMLHandler@ out)
-  {
-    this.buffer = buffer;
-    this.pos = pos;
-    this.limit = limit;
-    this.out = out;
-  }
-
-  public @XMLParser@(URL url, @ParsedXMLHandler@ out)  throws IOException
-  {
-    this(url.openConnection().getInputStream(), out);
-  }
-
-  public abstract void error(char severity, String message);
 }

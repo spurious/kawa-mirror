@@ -4,7 +4,6 @@
 package gnu.kawa.sax;
 import org.xml.sax.*;
 import gnu.xml.*;
-import gnu.kawa.xml.XMLParser;
 import java.io.*;
 import gnu.text.*;
 
@@ -12,10 +11,8 @@ import gnu.text.*;
  */
 
 public class KawaXMLReader extends ContentConsumer
-implements XMLReader, Locator
+  implements XMLReader
 {
-  XMLParser xmlParser;
-
   public boolean getFeature (String name)
   {
     return false;
@@ -72,39 +69,17 @@ implements XMLReader, Locator
     if (reader == null)
       reader = new InputStreamReader(input.getByteStream());
     SourceMessages messages = new SourceMessages();
-    XMLParser parser = new XMLParser(new LineBufferedReader(reader),
-				     messages, this);
-    startDocument();
-    parser.parse();
+    gnu.xml.XMLFilter filter = new gnu.xml.XMLFilter(this);
+    LineBufferedReader lin = new LineBufferedReader(reader);
+    filter.setSourceLocator(lin);
+    getContentHandler().setDocumentLocator(filter);
+    XMLParser.parse(lin, messages, filter);
     String err = messages.toString(20);
     if (err != null)
-      throw new SAXParseException(err, this);
-    endDocument();
+      throw new SAXParseException(err, filter);
   }
 
   public void parse (String systemId)
   {
-  }
-
-  public String getPublicId()
-  {
-    return xmlParser.getPublicId();
-  }
-
-  public String getSystemId()
-  {
-    return xmlParser.getSystemId();
-  }
-
-  public int getColumnNumber()
-  {
-    int column = xmlParser.getColumnNumber();
-    return column <= 0 ? -1 : column + 1;
-  }
-
-  public int getLineNumber()
-  {
-    int line = xmlParser.getLineNumber();
-    return line <= 0 ? -1 : line + 1;
   }
 }

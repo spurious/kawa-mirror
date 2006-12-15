@@ -3,9 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
-import gnu.text.Char;
-import gnu.text.SourceLocator;
-import gnu.text.SourceMessages;
+import gnu.text.*;
 import gnu.mapping.Symbol;
 /* #ifdef SAX2 */
 import org.xml.sax.*;
@@ -28,6 +26,7 @@ public class XMLFilter implements
                        /* #ifdef SAX2 */
                        DocumentHandler, ContentHandler,
                        /* #endif */
+                       gnu.text.SourceLocator,
                        XConsumer, PositionConsumer
 {
   /** This is where we save attributes while processing a begin element.
@@ -57,7 +56,10 @@ public class XMLFilter implements
 
   private SourceMessages messages;
   SourceLocator locator;
+  LineBufferedReader in;
 
+  public void setSourceLocator (LineBufferedReader in)
+  { this.in = in;  this.locator = this; }
   public void setSourceLocator (SourceLocator locator)
   { this.locator = locator; }
   public void setMessages (SourceMessages messages)
@@ -67,9 +69,8 @@ public class XMLFilter implements
   protected int nesting;
 
   int previous = 0;
-  private static final int SAW_CR = 1;
-  private static final int SAW_KEYWORD = 2;
-  private static final int SAW_WORD = 3;
+  private static final int SAW_KEYWORD = 1;
+  private static final int SAW_WORD = 2;
 
   /** If {@code stringizingLevel > 0} then stringize rather than copy nodes.
    * It counts the number of nested startAttributes that are active.
@@ -124,11 +125,6 @@ public class XMLFilter implements
   int mappingTableMask = mappingTable.length - 1;
 
   boolean mismatchReported;
-
-  public void setLocator (SourceLocator locator)
-  {
-    this.locator = locator;
-  }
 
   /** Functionally equivalent to
    * {@code new NamespaceBinding(prefix, uri, oldBindings},
@@ -747,110 +743,34 @@ public class XMLFilter implements
     return i != 0;
   }
 
+  public void linefeedFromParser ()
+  {
+    if (inElement() && checkWriteAtomic())
+      base.write('\n');
+  }
+
   public void textFromParser (char[] data, int start, int length)
   {
     // We skip whitespace not in an element.
-    int elementNesting = nesting;
-    // Don't count nested document nodes.
-    while (elementNesting > 0 && workStack[elementNesting-1] == null)
-      elementNesting -= 2;
-    if (elementNesting == 0)
+    if (! inElement())
       {
         for (int i = 0; ; i++)
           {
             if (i == length)
               return;
             if (! Character.isWhitespace(data[start+i]))
-              break;
+              {
+                error('e', "text at document level");
+                break;
+              }
           }
       }
     else if (length > 0)
       {
-        if (previous == SAW_CR)
-          {
-            char ch = data[start];
-            previous = 0;
-            if (ch == '\n' || ch == 0x85)
-              {
-                start++;
-                length--;
-              }
-          }
         if (! checkWriteAtomic())
           return;
 
-        // The complication here is line-end normalization,
-        // with minimal overhead.
-        int limit = start + length;
-        TreeList blist = base instanceof TreeList ? (TreeList) base : null;
-      outerLoop:
-        for (int i = start;  ;  i++)
-          {
-            char ch;
-            // We optimize the case that base instanceof TreeList.
-            if (blist != null)
-              {
-                blist.ensureSpace(limit-i);
-                char[] bdata = blist.data;
-                int gapStart = blist.gapStart;
-                for (;; i++)
-                  {
-                    if (i >= limit)
-                      {
-                        blist.gapStart = gapStart;
-                        break outerLoop;
-                      }
-                    ch = data[i];
-                    if (ch != '\r' && ch < 0x85) // Quick trest first.
-                      bdata[gapStart++] = ch;
-                    else if (ch > TreeList.MAX_CHAR_SHORT)
-                      {
-                        blist.gapStart = gapStart;
-                        blist.write(ch);
-                        continue outerLoop;
-                      }
-                    else if (ch == '\r' || ch == 0x85 || ch == 0x2028)
-                      {
-                        blist.gapStart = gapStart;
-                        start = i+1;
-                        break;
-                      }
-                    else
-                      bdata[gapStart++] = ch;
-                  }
-              }
-            else if (i >= limit)
-              ch = 0;
-            else
-              {
-                ch = data[i];
-                if (ch >= ' ' && ch < 0x85) // Quick(er) test.
-                  continue;
-                if (ch != '\r' && ch != 0x85 && ch != 0x2028)
-                  continue;
-              }
-            if (i > start)
-              {
-                base.write(data, start, i-start);
-              }
-            if (i >= limit)
-              break;
-            start = i+1;
-            if (ch == '\r')
-              {
-                if (start < limit)
-                  {
-                    ch = data[i+1];
-                    if (ch == '\n')
-                      continue; // Handled next iteration.
-                    if (ch == 0x85)
-                      i++;
-                  }
-                else
-                  previous = SAW_CR;
-              }
-            base.write('\n');
-          }
+        base.write(data, start, length);
       }
   }
 
@@ -1634,6 +1554,40 @@ public class XMLFilter implements
   public void skippedEntity (String name)
   {
     // FIXME
+  }
+
+  public String getPublicId ()
+  {
+    return null;
+  }
+
+  public String getSystemId ()
+  {
+    return in == null ? null : in.getName();
+  }
+
+  public String getFileName ()
+  {
+    return in == null ? null : in.getName();
+  }
+
+  public int getLineNumber()
+  {
+    if (in == null)
+      return -1;
+    int line = in.getLineNumber();
+    return line < 0 ? -1 : line + 1;
+  }
+
+  public int getColumnNumber()
+  {
+    int col;
+    return in != null && (col = in.getColumnNumber()) > 0 ? col : -1;
+  }
+
+  public boolean isStableSourceLocation()
+  {
+    return false;
   }
 }
 

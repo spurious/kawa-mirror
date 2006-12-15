@@ -17,17 +17,12 @@ public class Document
   public static void parse (Object name, Consumer out) throws Throwable
   {
     SourceMessages messages = new SourceMessages();
-    XMLParser parser = new XMLParser(name, messages, out);
     if (out instanceof XConsumer)
       ((XConsumer) out).beginEntity(name);
-    out.startDocument();
-    if (out instanceof TreeList)
-      ((TreeList) out).writeDocumentUri(name);
-    parser.parse();
+    gnu.xml.XMLParser.parse(name, messages, out);
     if (messages.seenErrors())
       throw new SyntaxException("document function read invalid XML",
 				messages);
-    out.endDocument();
     if (out instanceof XConsumer)
       ((XConsumer) out).endEntity();
   }
@@ -56,16 +51,11 @@ public class Document
 
         NodeTree tree = new NodeTree();
         SourceMessages messages = new SourceMessages();
-        XMLParser parser = new XMLParser(uri, messages, tree);
         tree.beginEntity(uri);
-        tree.startDocument();
-        tree.writeDocumentUri(uri);
-        parser.parse();
-        parser.close();
+        gnu.xml.XMLParser.parse(uri, messages, tree);
         if (messages.seenErrors())
           throw new SyntaxException("document function read invalid XML",
                                     messages);
-        tree.endDocument();
         tree.endEntity();
         val = new KDocument(tree, TreeList.BEGIN_ENTITY_SIZE << 1);
         loc.set(val);

@@ -32,7 +32,7 @@ public class XslTranslator extends Lexer implements Consumer
   StringBuffer attributeValue = new StringBuffer(100);
 
   XSLT interpreter;
-  XMLParser parser;
+  InPort in;
 
   /** Non-null if we're inside an xsl:template. */
   LambdaExp templateLambda;
@@ -42,7 +42,7 @@ public class XslTranslator extends Lexer implements Consumer
   {
     super(inp, messages);
     this.interpreter = interpreter;
-    parser = new XMLParser(inp, messages, this);
+    this.in = inp;
   }
 
   static final String XSL_TRANSFORM_URI
@@ -419,6 +419,7 @@ public class XslTranslator extends Lexer implements Consumer
   }
 
   public void parse (Compilation comp)
+    throws java.io.IOException
   {
     this.comp = comp;
     if (comp.exprStack == null)
@@ -426,7 +427,7 @@ public class XslTranslator extends Lexer implements Consumer
     ModuleExp mexp = comp.pushNewModule(this);
     comp.mustCompileHere();
     startDocument(mexp);
-    parser.parse();
+    XMLParser.parse(in, getMessages(), this);
     endDocument();
     comp.pop(mexp);
   }

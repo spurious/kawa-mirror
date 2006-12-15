@@ -26,7 +26,7 @@ import java.io.*;
 public class LineBufferedReader extends FilterReader
 {
   /** Default (initial buffer) size. */
-  final static int BUFFER_SIZE = 1024;
+  final static int BUFFER_SIZE = 8192;
 
   /** The input buffer, containing the current line etc. */
   public char[] buffer;
@@ -84,13 +84,14 @@ public class LineBufferedReader extends FilterReader
   }
 
   /** The position that marks the start of the current or marked line.
-    * If the readAheadLimit > 0 && markPos < pos, then it is the start of the
-    * line containing the markPos.
+    * If the {@code readAheadLimit > 0 && markPos < pos},
+    * then it is the start of the line containing the {@code markPos}.
     * If we are at the end of a line, and have not started reading the next
     * one (and are therefore allowed by unread back to the old line),
-    * the current line is still the old line; lineStartPos does not
+    * the current line is still the old line; {@code lineStartPos} does not
     * get set to the new pos until we read/peek the first char of the new line.
-    * If lineStartPos < 0, it means we went beyond the buffer maximum. */
+    * If {@code lineStartPos < 0}, it means we went beyond the buffer maximum.
+    */
   int lineStartPos;
 
   Object name;
@@ -126,9 +127,9 @@ public class LineBufferedReader extends FilterReader
   {
   }
 
-  /** Called by read() when it needs its buffer filled.
+  /** Called by {@code read()} when it needs its buffer filled.
     * Read characters into buffer, starting at off, for len.
-    * Can assume that len > 0.  Only called if pos>=limit.
+    * Can assume that len > 0.  Only called if {@code pos>=limit}.
     * Return -1 if EOF, otherwise number of read chars.
     * This can be usefully overridden by sub-classes. */
   public int fill (int len) throws java.io.IOException
@@ -180,7 +181,7 @@ public class LineBufferedReader extends FilterReader
       }
   }
 
-  /* Make sure there is enough space for space more characters in buffer. */
+  /* Make sure there is enough space for more characters in buffer. */
 
   private void reserve (char[] buffer, int reserve)
     throws java.io.IOException
@@ -391,6 +392,12 @@ public class LineBufferedReader extends FilterReader
   public void setLineNumber (int lineNumber)
   {
     this.lineNumber += lineNumber - getLineNumber();
+  }
+
+  public void incrLineNumber (int lineDelta, int lineStartPos)
+  {
+    lineNumber += lineDelta;
+    this.lineStartPos = lineStartPos;
   }
 
   /** Return the current (zero-based) column number. */
@@ -689,5 +696,4 @@ public class LineBufferedReader extends FilterReader
       unread_quick();
     return c;
   }
-
 }

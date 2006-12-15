@@ -1,3 +1,9 @@
+2006-12-14  Per Bothner  <per@bothner.com>
+
+	* XMLParser.jav: Removed class.  Now handled by new gnu.xml,XMLParser.
+	* Makefile.am: Update accordingly.
+	* Document.java: Update for new XMLParser API.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* NodeType.java (GROUP_OK): Renamed to ELEMENT_OK.

@@ -1,3 +1,11 @@
+2006-12-16  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java (XMLStreamReader): New static method.
+	(parse): Use it.
+
+	* XMLParser.java (parse): Call incrLineNumber immediately at each
+	line, rather than deferring it.
+
 2006-12-15  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java (closeStartTag): If out is a ContentConsumer, call

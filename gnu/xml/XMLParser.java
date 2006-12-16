@@ -49,8 +49,10 @@ public class XMLParser
           uri, messages, out);
   }
 
-  public static void parse (InputStream strm, Object uri,
-                            SourceMessages messages, Consumer out)
+  /** Creates an InputStreamReader by looking for an XML encoding declaration
+   * or autodetecting. */
+
+  public static InputStreamReader XMLStreamReader (InputStream strm)
     throws java.io.IOException
   {
     BufferedInputStream bin = (strm instanceof BufferedInputStream
@@ -162,11 +164,19 @@ public class XMLParser
       }
     bin.reset();
     while (--n >= 0) bin.read();
-    Reader reader;
+    InputStreamReader reader;
     if (encoding != null)
       reader = new InputStreamReader(bin, encoding);
     else
       reader = new InputStreamReader(bin); // Or maybe error??
+    return reader;
+  }
+
+  public static void parse (InputStream strm, Object uri,
+                            SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    Reader reader = XMLStreamReader(strm);
     LineBufferedReader in = new LineBufferedReader(reader);
     in.setName(uri);
     parse(in, messages, out);
@@ -270,8 +280,6 @@ public class XMLParser
             // terminator=='<').  It also handles attribute values (in
             // which case terminator is '\'' or '"').
             start = pos - 1;
-            int lineIncr = 0;
-            int lineStart = -1;
             // Not length now, but used to calculate length when done.
             length = pos;
             for (;;)
@@ -310,15 +318,13 @@ public class XMLParser
                               }
                             else
                               {
-                                lineIncr++;
-                                lineStart = pos;
+                                in.incrLineNumber(1, pos);
                                 start = pos;
                                 length = ++pos;
                                 continue;
                               }
                           } 
-                        lineIncr++;
-                        lineStart = pos;
+                        in.incrLineNumber(1, pos);
                       }
                     else
                       {
@@ -334,15 +340,13 @@ public class XMLParser
                     if (length > 0)
                       out.textFromParser(buffer, start, length);
                     out.linefeedFromParser();
-                    lineIncr++;
-                    lineStart = pos;
+                    in.incrLineNumber(1, pos);
                     length = pos + 1;
                     start = pos;
                   }
                 else if (ch == '\n')
                   {
-                    lineIncr++;
-                    lineStart = pos;
+                    in.incrLineNumber(1, pos);
                   }
                 if (pos == limit)
                   {
@@ -357,8 +361,6 @@ public class XMLParser
                 in.pos = pos;
                 out.textFromParser(buffer, start, length);
               }
-            if (lineStart >= 0)
-              in.incrLineNumber(lineIncr, lineStart);
 	    start = buffer.length;
             break handleChar;
 

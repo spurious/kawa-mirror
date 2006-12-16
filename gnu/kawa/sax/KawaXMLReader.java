@@ -67,7 +67,7 @@ public class KawaXMLReader extends ContentConsumer
   {
     Reader reader = input.getCharacterStream();
     if (reader == null)
-      reader = new InputStreamReader(input.getByteStream());
+      reader = XMLParser.XMLStreamReader(input.getByteStream());
     SourceMessages messages = new SourceMessages();
     gnu.xml.XMLFilter filter = new gnu.xml.XMLFilter(this);
     LineBufferedReader lin = new LineBufferedReader(reader);

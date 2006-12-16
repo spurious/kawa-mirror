@@ -43,6 +43,13 @@ public class MySAXApp extends DefaultHandler
     ////////////////////////////////////////////////////////////////////
 
 
+    org.xml.sax.Locator locator;
+
+    public void setDocumentLocator(org.xml.sax.Locator locator)
+    {
+      this.locator = locator;
+    }
+
     public void startDocument ()
     {
 	System.out.println("Start document");
@@ -55,9 +62,30 @@ public class MySAXApp extends DefaultHandler
     }
 
 
+  void printLineNumber ()
+  {
+      int line = -1, col = -1;
+      if (locator != null)
+        {
+          line = locator.getLineNumber();
+          col = locator.getColumnNumber();
+        }
+      if (line > 0)
+        {
+          System.out.print(line);
+          if (col > 0)
+            {
+              System.out.print(':');
+              System.out.print(col);
+            }
+          System.out.print(": ");
+        }
+  }
+
     public void startElement (String uri, String name,
 			      String qName, Attributes atts)
     {
+        printLineNumber();
 	if ("".equals (uri))
 	    System.out.println("Start element: " + qName);
 	else
@@ -67,6 +95,7 @@ public class MySAXApp extends DefaultHandler
 
     public void endElement (String uri, String name, String qName)
     {
+        printLineNumber();
 	if ("".equals (uri))
 	    System.out.println("End element: " + qName);
 	else
@@ -76,6 +105,7 @@ public class MySAXApp extends DefaultHandler
 
     public void characters (char ch[], int start, int length)
     {
+        printLineNumber();
 	System.out.print("Characters:    \"");
 	for (int i = start; i < start + length; i++) {
 	    switch (ch[i]) {

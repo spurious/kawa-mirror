@@ -43,7 +43,7 @@ public class ContentConsumer implements Consumer
     throw new RuntimeException("caught "+ex+" in "+method);
   }
 
-  void endStartTag()
+  public void endStartTag()
   {
     if (inStartTag != 1)
       return;

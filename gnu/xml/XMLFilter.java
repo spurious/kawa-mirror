@@ -7,6 +7,7 @@ import gnu.text.*;
 import gnu.mapping.Symbol;
 /* #ifdef SAX2 */
 import org.xml.sax.*;
+import gnu.kawa.sax.*;
 /* #endif */
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
@@ -578,6 +579,12 @@ public class XMLFilter implements
 	      }
 	  }
       }
+
+    /* #ifdef SAX2 */
+    if (out instanceof ContentConsumer)
+      ((ContentConsumer) out).endStartTag();
+    /* #endif */
+      
     for (int i = 1;  i <= attrCount; i++)
       workStack[nesting+i-1] = null; // For GC.
     if (out != tlist)

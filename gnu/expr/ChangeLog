@@ -1,3 +1,7 @@
+2006-12-15  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (setLine): Moved from Translator.
+
 2006-12-12  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): If ExceptionInInitializerError is

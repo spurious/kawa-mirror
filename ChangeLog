@@ -1,5 +1,9 @@
 2006-12-15  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (setLine): Moved to Compilation.
+	Compiling with gcj complained about an ambiguity and it seems
+	just as clean to move it to avoid the problem.
+
 	* build.xml: Update for XMLParser changes.
 
 2006-12-14  Per Bothner  <per@bothner.com>

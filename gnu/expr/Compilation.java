@@ -2538,6 +2538,11 @@ public class Compilation implements SourceLocator
   public void setColumn(int column) { messages.setColumn(column); }
   public final void setLine(Expression position)
   { messages.setLocation(position); }
+  public void setLine (Object location)
+  {
+    if (location instanceof SourceLocator)
+      messages.setLocation((SourceLocator) location);
+  }
   public final void setLocation (SourceLocator position)
   { messages.setLocation(position); }
 

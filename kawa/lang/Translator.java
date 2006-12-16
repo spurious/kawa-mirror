@@ -771,13 +771,6 @@ public class Translator extends Compilation
       positionPair = (PairWithPosition) positionPair.cdr;
   }
 
-
-  public void setLine (Object location)
-  {
-    if (location instanceof SourceLocator)
-      setLocation((SourceLocator) location);
-  }
-
   /** Set the line position of the argument to the current position. */
 
   public void setLineOf (Expression exp)

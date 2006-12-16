@@ -104,8 +104,8 @@ public class LineBufferedReader extends FilterReader
     * (due to either calling reset or excessive reading ahead). */
   protected int readAheadLimit = 0;
 
-  /** The position of the mark (assuming readAheadLinit > 0).
-    * (Garbage if readAheadLimit <= 0). */
+  /** The position of the mark (assuming {@code readAheadLinit > 0}).
+    * (Garbage if {@code readAheadLimit <= 0}). */
   protected int markPos;
 
   public LineBufferedReader (InputStream in)

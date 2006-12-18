@@ -1,3 +1,7 @@
+2006-12-18  Per Bothner  <per@bothner.com>
+
+	* ModuleBody.java (runAsMain): Remove long-deprecated method.
+
 2006-12-15  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (setLine): Moved from Translator.

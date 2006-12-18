@@ -95,15 +95,6 @@ public abstract class ModuleBody extends Procedure0
     mainPrintValues = value;
   }
 
-  /** This is invoked by main when ModuleBody is compiled with --main.
-   * @deprecated
-   */
-  public final void runAsMain (String[] args)
-  {
-    processArgs(args);
-    runAsMain();
-  }
-
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public static void processArgs (String[] args)
   {
@@ -118,6 +109,7 @@ public abstract class ModuleBody extends Procedure0
     try
       {
 	CallContext ctx = CallContext.getInstance();
+        // FIXME - not appropriate for XQuery.
 	ClassMemberLocation.defineAll(this, ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {

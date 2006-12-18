@@ -694,7 +694,7 @@ public class repl extends Procedure0or1
             // Run Language's static initializer.
             Language.getDefaultLanguage();
             Environment current = Environment.getCurrent();
-            current.put(symbol, null, value);
+            current.define(symbol, null, value);
           }
       }
     return something_done ? -1 : iArg;

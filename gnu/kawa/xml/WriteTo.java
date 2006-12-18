@@ -5,6 +5,7 @@ package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.xml.*;
 import java.io.*;
+import gnu.text.URI_utils;
 
 /** Write a value to a named file. */
 
@@ -15,44 +16,49 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
   public static final WriteTo writeToIfChanged = new WriteTo();
   static { writeToIfChanged.ifChanged = true; }
 
-  public static void writeTo(Object value, String fileName) throws Throwable
+  public static void writeTo(Object value, Object fileName) throws Throwable
   {
-    OutPort out = new OutPort(new java.io.FileWriter(fileName), fileName);
+    OutputStream outs = URI_utils.getOutputStream(fileName);
+    OutPort out = new OutPort(outs, fileName);
     XMLPrinter consumer = new XMLPrinter(out, false);
     Values.writeValues(value, consumer);
     out.close();
   }
 
-  public static void writeToIfChanged (Object value, String filename)
+  public static void writeToIfChanged (Object value, Object filename)
     throws Throwable
   {
-    File file = new File(filename);
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     OutPort out = new OutPort(bout, filename);
     XMLPrinter consumer = new XMLPrinter(out, false);
     Values.writeValues(value, consumer);
     out.close();
     byte[] bbuf = bout.toByteArray();
-    if (file.exists())
+    try
       {
-        int oldlen = (int) file.length();
-        if (bbuf.length == oldlen)
+        InputStream ins = new BufferedInputStream(URI_utils.getInputStream(filename));
+        for (int i = 0;  ; )
           {
-            byte[] old = new byte[oldlen];
-            DataInputStream fin
-              = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-            fin.readFully(old);
-            fin.close();
-            for (int i = oldlen;  --i >= 0; )
+            int b = ins.read();
+            boolean atend = i == bbuf.length;
+            if (b < 0)
               {
-                if (--i >= 0)
-                  return;
-                if (old[i] != bbuf[i])
+                if (! atend)
                   break;
+                ins.close();
+                return;
               }
+            if (atend || bbuf[i++] != b)
+              break;
           }
+        ins.close();
       }
-    OutputStream fout = new BufferedOutputStream(new FileOutputStream(file));
+    catch (Throwable ex)
+      {
+        // fall through
+      }
+    OutputStream fout
+      = new BufferedOutputStream(URI_utils.getOutputStream(filename));
     fout.write(bbuf);
     fout.close();
   }

@@ -218,6 +218,10 @@ public class QNameUtils
       base = KNode.atomicValue(base);
     if (relative == Values.empty || relative == null)
       return relative;
+    if (relative instanceof UntypedAtomic)
+      relative = relative.toString();
+    if (base instanceof UntypedAtomic)
+      base = base.toString();
     return URI_utils.resolve(relative, base);
   }
 }

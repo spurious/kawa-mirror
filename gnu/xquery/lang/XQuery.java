@@ -568,40 +568,6 @@ public class XQuery extends Language
   {
     ModuleBody.setMainPrintValues(true);
 
-    /*
-    Environment scmEnv = Scheme.builtin();
-
-    Environment saveEnv = Environment.getCurrent();
-    try
-      {
-	Environment.setCurrent(scmEnv);
-	SymbolEnumeration e = scmEnv.enumerateAllSymbols();
-	while (e.hasMoreElements())
-	  {
-	    Symbol b = e.nextSymbol();
-	    Object val = b.get(null);
-	    if (val instanceof Procedure)
-	      extensionsEnvEnv.getSymbol(b.getName()).setFunctionValue(val);
-	  }
-	// Force it to be loaded now, so we can over-ride let* length etc.
-	loadClass("kawa.lib.std_syntax");
-	loadClass("kawa.lib.lists");
-	loadClass("kawa.lib.strings");
-	loadClass("gnu.commonlisp.lisp.PrimOps");
-	loadClass("gnu.kawa.slib.XStrings");
-      }
-    catch (Throwable ex)
-      {
-	// Ignore.  We get a ClassNotFoundException if gnu.kawa.servlet.HTTP
-	// was not built.  We get a NoClassDefFoundError if gnu.kawa.servlet.HTTP
-	// can't find servlets in the classpath.
-      }
-    finally
-      {
-	Environment.setCurrent(saveEnv);
-      }
-    */
-
     defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
     defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
     defProcStFld("count", "gnu.kawa.functions.CountValues", "countValues");
@@ -782,7 +748,7 @@ public class XQuery extends Language
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Language.setDefaults(new XQuery());
+    Language.setDefaults(instance);
   }
 
   static public QuoteExp falseExp =

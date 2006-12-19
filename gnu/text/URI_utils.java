@@ -73,6 +73,21 @@ public class URI_utils
     return (URL) uri;
   }
 
+  public static boolean exists (Object uri)
+  {
+    try
+      {
+        uri = toFileOrURL(uri);
+        if (uri instanceof File)
+          return ((File) uri).exists();
+        return ((URL) uri).openConnection().getLastModified() != 0;
+      }
+    catch (Throwable ex)
+      {
+        return false;
+      }
+  }
+
   public static long lastModified (Object uri)
   {
     try

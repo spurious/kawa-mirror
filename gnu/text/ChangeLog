@@ -1,3 +1,7 @@
+2006-12-18  Per Bothner  <per@bothner.com>
+
+	* URI_utils.java (exists): New static method.
+
 2006-12-14  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (BUFFER_SIZE): Increase to 8192.

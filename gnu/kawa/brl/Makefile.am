@@ -10,7 +10,6 @@ java_sources = \
 PACKAGE_FNAME = gnu-kawa-brl
 GCJ_INPUTS =  $(java_Java)
 java_SCM = progfun.scm
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 EXTRA_DIST = $(java_SCM)
 
 all: Makefile java-classes.stamp scm-classes.stamp  $(@GCJ_COMPILED_SELECTED@)

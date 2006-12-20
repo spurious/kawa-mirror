@@ -6,12 +6,11 @@ include $(top_srcdir)/Make-rules
 java_SCM = PrimOps.scm
 
 PACKAGE_FNAME = gnu-commonlisp-lisp
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 EXTRA_DIST = $(java_SCM)
 
 EXTRA_GCJ_INPUTS = *.class
-all: Makefile ../../../kawa/java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 ../../../kawa/java-classes.stamp:
 	cd ../../../kawa; $(MAKE)

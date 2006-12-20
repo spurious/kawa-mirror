@@ -87,8 +87,8 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GCJ = gcj
 GCJDEPMODE = @GCJDEPMODE@
-#GCJFLAGS = -gdwarf-2
-GCJFLAGS = -g -O
+#GCJFLAGS = -gdwarf-2 -O
+GCJFLAGS = -g -O -findirect-dispatch
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 GCJ_SELECTED = @GCJ_SELECTED@
 GREP = @GREP@
@@ -208,10 +208,9 @@ java_Java = $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
-DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
-ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
-# Compiler to use for compiling builtin .scm/.el/.cl files.
-ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
+KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
+  -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
+
 java_sources = \
   Buffer.java \
   BufferLocal.java \
@@ -239,8 +238,7 @@ EXTRA_DIST = emacs.scm package.html
 GCJ_INPUTS = *emacs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
-@ENABLE_JEMACS_TRUE@ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+@ENABLE_JEMACS_TRUE@ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 all: all-am
 
 .SUFFIXES:
@@ -405,13 +403,9 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-# Make sure $(KAWA1) is available, if --enable-gcj-compiled.
-$(TO_TOPDIR)/kawa1$(exeext):
-	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
-
 $(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
 	$(CLASSPATH_ENV) $(LIBTOOL) --mode=compile $(GCJ) $(GCJFLAGS) -c \
-	  $^ $(EXTRA_GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
+	  *.class -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
@@ -419,21 +413,17 @@ java-classes.stamp: $(java_Java)
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 scm-classes.stamp: $(java_SCM)
-	$(CLASSPATH_ENV) \
-	  $(KAWA1) -d $(top_builddir) --module-static-run $(SCM_COMPILE_FLAGS) \
-	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. -C $?
+	$(KAWA_COMPILER) --module-static-run $(SCM_COMPILE_FLAGS) -C $?
 	echo timestamp > scm-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 clisp-classes.stamp: $(java_CLISP)
-	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --clisp -C $?
+	$(KAWA_COMPILER) --clisp -C $?
 	echo timestamp > clisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 
 elisp-classes.stamp: $(java_ELISP)
-	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
+	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
 all: Makefile $(ALL)

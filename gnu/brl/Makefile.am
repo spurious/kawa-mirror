@@ -7,7 +7,6 @@ java_sources = \
 
 PACKAGE_FNAME = gnu-brl
 GCJ_INPUTS =  $(java_Java)
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 java_SCM = stringfun.scm
 EXTRA_DIST = $(java_SCM)

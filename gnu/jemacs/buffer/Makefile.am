@@ -30,9 +30,8 @@ EXTRA_DIST = emacs.scm package.html
 GCJ_INPUTS = *emacs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 if ENABLE_JEMACS
-ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 endif
 all: Makefile $(ALL)

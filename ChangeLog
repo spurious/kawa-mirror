@@ -1,5 +1,12 @@
 2006-12-20  Per Bothner  <per@bothner.com>
 
+	* configure.in (--with-gcj): New option.
+	(WITH_GCJ_DBTOOL): New AM_CONDITIONAL.
+	Change some defaults depending on other options.
+	* Makefile.am (install-jar): Run gcj-dbtool, if so configured.
+	* Make-rules (EXTRA_DBTOOL_GCJFLAGS): New macro.  
+	Compile with -findirect-dispatch only if WITH_GCJ_DBTOOL.
+
 	* Make-rules: Remove kawa1 hooks - use '$(JAVA) kawa.repl' to compile.
 	(GCJFLAGS): Add -findirect-dispatch.
 	* configure.in: Add AC_DISABLE_STATIC.

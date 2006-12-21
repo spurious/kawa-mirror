@@ -20,6 +20,7 @@ endif
 javadir=$(datadir)/java
 
 JAR = jar
+GCJ_DBTOOL = gcj-dbtool
 
 kawa-@VERSION@.jar: ./kawa-jar.stamp
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
@@ -145,6 +146,9 @@ install-jar:
 	  $(DESTDIR)$(javadir)/kawa-@VERSION@.jar
 	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
 	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
+if WITH_GCJ_DBTOOL
+	$(GCJ_DBTOOL) -f $(DESTDIR)`$(GCJ_DBTOOL) -p` $(DESTDIR)$(javadir)/kawa-@VERSION@.jar $(libdir)/libkawa-$(VERSION).so
+endif
 
 install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
 	@$(NORMAL_INSTALL)

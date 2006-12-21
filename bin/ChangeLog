@@ -1,5 +1,12 @@
 2006-12-20  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Conditionalize on WITH_GCJ_DBTOOL.  If true, kawa binary
+	is built like the without-gcj case, with so found automagically.
+	Otherwise, do traditional compilatilon and link.
+	Pass appropriate flags when building kawa and gckawa.
+
+	* Makefile.am (LIBADD_SAX2): New macro - missing SAX2 classes.
+
 	* kawapath.c (get_classpath): Remove support for a kawa zip file.
 
 	* Makefile.am: Remove kawa1 hooks - we just use '$JAVA kawa.repl' now.

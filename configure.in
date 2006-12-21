@@ -16,6 +16,9 @@ AC_ARG_ENABLE(kawa-frontend,
 AC_ARG_WITH(gcj,
   AS_HELP_STRING(--with-gcj,Compile Kawa using GCJ (GNU Compiler for Java)))
 
+AC_ARG_WITH(gcj-dbtool,
+  AS_HELP_STRING(--with-gcj-dbtool,Compile Kawa using GCJ and gcj-dbtool))
+
 AC_ARG_ENABLE(xml,
   AS_HELP_STRING(--disable-xml,Don't build support for XML processing),
   enable_xml=$enableval, enable_xml=yes)
@@ -84,8 +87,12 @@ TOP_BUILDDIR=`pwd`
 
 LT_INIT
 
+test "${with_gcj_dbtool}" = "yes" -a -z "${with_gcj}" && with_gcj="yes"
 case ${with_gcj} in
   yes)
+    test -z "$enable_kawa_frontend" && enable_kawa_frontend="yes"
+    test -z "${with_gcj_dbtool}" && with_gcj_dbtool=no
+
     GCJ_COMPILED_SELECTED=ENABLE_GCJ_COMPILED
     GCJ_SELECTED=WITH_GCJ
     JAVA=${JAVA-gij}
@@ -122,6 +129,7 @@ JAVACFLAGS=${JAVACFLAGS--g}
 enable_servlet=${enable_servlet-${with_servlet}}
 
 AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
+AM_CONDITIONAL(WITH_GCJ_DBTOOL, test "$with_gcj_dbtool" = "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")

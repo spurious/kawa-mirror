@@ -1,16 +1,29 @@
+KAWAJAR = kawa-$(VERSION).jar
+KAWALIB = $(datadir)/java/$(KAWAJAR)
+WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"'
+
 if WITH_GCJ
 bin_SCRIPTS = gckawa qexo
 if ENABLE_KAWA_FRONTEND
-KAWAPROGS = kawa-bin kawa
-else
-KAWAPROGS = kawa-bin
+KAWAPROGS_KAWA = kawa
 endif
+if WITH_GCJ_DBTOOL
+AM_CFLAGS = -fPIC
+CDEFS = $(WITHOUT_GCJ_DEFS)
 else
+CDEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
+KAWAPROGS_KAWA_BIN = kawa-bin
+endif
+DEFSy = 
+KAWAPROGS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN)
+else
+CDEFS = $(WITHOUT_GCJ_DEFS)
 bin_SCRIPTS = qexo
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS = kawa
 endif
 endif
+DEFS = $(CDEFS)
 
 bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
@@ -20,21 +33,20 @@ kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
 CLEANFILES = kawa.sh qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
-AM_CFLAGS = -fPIC
 LIBTOOL = $(top_builddir)/libtool
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-WITH_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
-WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"' -DKAWAJAR='"kawa-$(VERSION).jar"'
-DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
-LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo \
+if WITH_SAX2
+LIBADD_SAX2 = gnu-kawa-sax.lo
+endif
+LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo $(LIBADD_SAX2) \
   gnu-xquery-lang.lo gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 endif
 if WITH_SWING
@@ -60,7 +72,7 @@ kawa.sh:
 if WITH_GCJ
 	echo 'exec `echo "$$0" | sed -e '"'"'s|/kawa[^/]*$$|/kawa-bin|'"'"'` "$$@"' >> tmp
 else
-	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
+	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
@@ -69,13 +81,13 @@ endif
 	chmod +x tmp
 	mv tmp kawa.sh
 
-gckawa:
+gckawa: Makefile
 	echo '#!/bin/sh' >tmp
 	echo 'LD_LIBRARY_PATH=$(libdir):$$LD_LIBRARY_PATH' >>tmp
-	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
+	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp
-	echo 'exec gcj "$$@" -L$(libdir) -lkawa' >>tmp
+	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(EXTRA_LDFLAGS) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
 
@@ -121,7 +133,12 @@ WITHOUT_GCJ_LIBS =
 if WITH_GCJ
 lib_LTLIBRARIES     = libkawa.la
 endif
-libkawa_la_LDFLAGS = -Wl,-Bsymbolic
+if WITH_GCJ_DBTOOL
+EXTRA_LDFLAGS = -Wl,-Bsymbolic
+EXTRA_GCJFLAGS = -fPIC -findirect-dispatch
+endif
+libkawa_VERSION = $(VERSION)
+libkawa_la_LDFLAGS = $(EXTRA_LDFLAGS) -release $(libkawa_VERSION)
 libkawa_la_SOURCES = 
 libkawa_la_LIBADD = \
   gnu-bytecode.lo \

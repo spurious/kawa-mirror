@@ -34,13 +34,11 @@ get_classpath(const char *progname)
 	}
     }
   i = strlen (path);
-  if (i > 4
-      && (strcmp (path+i-4, ".zip") == 0
-	  || strcmp (path+i-4, ".jar") == 0))
+  if (i > 4 && strcmp (path+i-4, ".jar") == 0)
     {
       if (access (path, R_OK) < 0)
 	{
-	  perror ("KAWALIB does not specify a readable .zip/.jar file");
+	  perror ("KAWALIB does not specify a readable .jar file");
 	  exit(0);
 	}
     }

@@ -197,25 +197,39 @@ public class Invoke extends ProcedureN implements CanInline
         int err = proc.matchN(args, vars);
         if (err == 0)
           return vars.runUntilValue();
-        else if ((nargs & 1) == 1)
+
+        if ((nargs & 1) == 1)
           {
             // Check if args is a set of (keyword,value)-pairs.
-            for (int i = 1;  i < nargs;  i += 2)
+            for (int i = 1;  ;  i += 2)
               {
+                if (i == nargs)
+                  {
+                    Object result;
+                    result = proc.apply1(args[0]);
+                    for (i = 1;  i < nargs;  i += 2)
+                      {
+                        Keyword key = (Keyword) args[i];
+                        Object arg = args[i+1];
+                        SlotSet.apply(false, result, key.getName(), arg);
+                      }
+                    return result;
+                  }
                 if (! (args[i] instanceof Keyword))
-                  throw MethodProc.matchFailAsException(err, proc, args);
+                  break;
               }
-
-            Object result;
-            result = proc.apply1(args[0]);
-            for (int i = 1;  i < nargs;  i += 2)
-              {
-                Keyword key = (Keyword) args[i];
-                Object arg = args[i+1];
-                SlotSet.apply(false, result, key.getName(), arg);
-              }
-            return result;
           }
+        MethodProc vproc = ClassMethods.apply((ClassType) dtype, "valueOf",
+                                              '\0', language);
+        if (vproc != null)
+          {
+            Object[] margs = new Object[nargs-1];
+            System.arraycopy(args, 1, margs, 0, nargs-1);
+            err = vproc.matchN(margs, vars);
+            if (err == 0)
+              return vars.runUntilValue();
+          }
+
         throw MethodProc.matchFailAsException(err, proc, args);
       }
   }
@@ -224,11 +238,6 @@ public class Invoke extends ProcedureN implements CanInline
   {
     return (-1 << 12) | (kind == 'N' ? 1 : 2);
   }
-
-  private PrimProcedure[] cacheMethods;
-  private Expression[] cacheArgs;
-  private int cacheDefinitelyApplicableMethodCount;
-  private int cachePossiblyApplicableMethodCount;
 
   protected MethodProc lookupMethods(ClassType dtype, Object name)
   {
@@ -257,13 +266,20 @@ public class Invoke extends ProcedureN implements CanInline
   }
 
   protected PrimProcedure[] getMethods(ClassType ctype, String mname,
-                                       Expression[] args, int margsLength, 
-                                       int argsStartIndex, int objIndex,
-				       ClassType caller)
+                                        ClassType caller)
   {
-    if (args == cacheArgs)
-      return cacheMethods;
+    return ClassMethods.getMethods(ctype, mname,
+                                   kind == 'P' ? 'P'
+                                   : kind == '*' || kind == 'V' ? 'V'
+                                   : '\0',
+                                   caller, language);
+  }
 
+  private static long selectApplicable(PrimProcedure[] methods,
+                                       ClassType ctype,
+                                       Expression[] args, int margsLength, 
+                                       int argsStartIndex, int objIndex)
+  {
     Type[] atypes = new Type[margsLength];
 
     int dst = 0;
@@ -273,20 +289,7 @@ public class Invoke extends ProcedureN implements CanInline
          src < args.length && dst < atypes.length; 
          src++, dst++)
       atypes[dst] = args[src].getType();
-
-    PrimProcedure[] methods
-      = ClassMethods.getMethods(ctype, mname,
-                                kind == 'P' ? 'P'
-                                : kind == '*' || kind == 'V' ? 'V'
-                                : '\0',
-                                caller, language);
-    
-    long num = ClassMethods.selectApplicable(methods, atypes);
-    cacheArgs = args;
-    cacheDefinitelyApplicableMethodCount = (int) (num >> 32);
-    cachePossiblyApplicableMethodCount = (int) num;
-    cacheMethods = methods;
-    return cacheMethods;
+    return ClassMethods.selectApplicable(methods, atypes);
   }
 
   /** Return an array if args (starting with start) is a set of
@@ -489,142 +492,150 @@ public class Invoke extends ProcedureN implements CanInline
         ClassType caller = comp == null ? null
           : comp.curClass != null ? comp.curClass
           : comp.mainClass;
-        synchronized (this)
+        ClassType ctype = (ClassType) type;
+        try
           {
-            try
-              {
-                methods = getMethods((ClassType) type, name, args, 
-                                     margsLength, argsStartIndex, objIndex,
-				     caller);
-              }
-            catch (Exception ex)
-              {
-                comp.error('w', "unknown class: " + type.getName());
-                methods = null;
-              }
-            okCount = cacheDefinitelyApplicableMethodCount;
-            maybeCount = cachePossiblyApplicableMethodCount;
+            methods = getMethods(ctype, name, caller);
+            long num = selectApplicable(methods, ctype, args, 
+                                        margsLength, argsStartIndex, objIndex);
+            okCount = (int) (num >> 32);
+            maybeCount = (int) num;
           }
-        if (methods != null)
+        catch (Exception ex)
           {
-            int index = -1;
-            if (methods.length == 0)
-	      {
-		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
-		  comp.error('w', "no accessible method '"+name+"' in "+type.getName());
-	      }
-            else if (okCount + maybeCount == 0)
+            comp.error('w', "unknown class: " + type.getName());
+            return exp;
+          }
+        int index = -1;
+        Object[] slots;
+        if (okCount + maybeCount == 0
+            && kind == 'N'
+            && (ClassMethods.selectApplicable(methods,
+                                              new Type[] { Compilation.typeClassType })
+                >> 32) == 1
+            && (slots = checkKeywords(type, args, 1, caller)) != null)
+          {
+            StringBuffer errbuf = null;
+            for (int i = 0;  i < slots.length;  i++)
               {
-                Object[] slots;
-                if (kind == 'N'
-                    && (ClassMethods.selectApplicable(methods,
-                                                      new Type[] { Compilation.typeClassType })
-                        >> 32) == 1
-                    && (slots = checkKeywords(type, args, 1, caller)) != null)
+                if (slots[i] instanceof String)
                   {
-                    StringBuffer errbuf = null;
-                    for (int i = 0;  i < slots.length;  i++)
+                    if (errbuf == null)
                       {
-                        if (slots[i] instanceof String)
-                          {
-                            if (errbuf == null)
-                              {
-                                errbuf = new StringBuffer();
-                                errbuf.append("no field or setter ");
-                              }
-                            else
-                              errbuf.append(", ");
-                            errbuf.append('`');
-                            errbuf.append(slots[i]);
-                            errbuf.append('\'');
-                          }
-                      }
-                    if (errbuf != null)
-                      {
-                        errbuf.append(" in class ");
-                        errbuf.append(type.getName());
-                        comp.error('w', errbuf.toString());
+                        errbuf = new StringBuffer();
+                        errbuf.append("no field or setter ");
                       }
                     else
-                      {
-			ApplyExp e = new ApplyExp(methods[0],
-                                                  new Expression[] { arg0 });
-                        for (int i = 0;  i < slots.length;  i++)
-                          {
-			    Expression[] sargs
-			      = { e, new QuoteExp(slots[i]), args[2 * i + 2] };
-			    e = new ApplyExp(SlotSet.setFieldReturnObject,
-					     sargs);
-                         }
-			return e.setLine(exp);
-                      }
+                      errbuf.append(", ");
+                    errbuf.append('`');
+                    errbuf.append(slots[i]);
+                    errbuf.append('\'');
                   }
+              }
+            if (errbuf != null)
+              {
+                errbuf.append(" in class ");
+                errbuf.append(type.getName());
+                comp.error('w', errbuf.toString());
+                return exp;
+              }
+            else
+              {
+                ApplyExp e = new ApplyExp(methods[0],
+                                          new Expression[] { arg0 });
+                for (int i = 0;  i < slots.length;  i++)
+                  {
+                    Expression[] sargs
+                      = { e, new QuoteExp(slots[i]), args[2 * i + 2] };
+                    e = new ApplyExp(SlotSet.setFieldReturnObject, sargs);
+                  }
+                return e.setLine(exp);
+              }
+          }
+        int nmethods = methods.length;
+        if (okCount + maybeCount == 0 && kind == 'N')
+          {
+            methods = invokeStatic.getMethods(ctype, "valueOf", caller);
+            argsStartIndex = 1;
+            margsLength = nargs - 1;
+            long num = selectApplicable(methods, ctype, args,
+                                        margsLength, argsStartIndex, -1);
+            okCount = (int) (num >> 32);
+            maybeCount = (int) num;
+          }
+        if (okCount + maybeCount == 0)
+          {
+            if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+              {
+                if (kind=='N')
+                  name = name+"/valueOf";
+                if (nmethods + methods.length == 0)
+                  comp.error('w', "no accessible method '"+name+"' in "+type.getName());
                 else
                   comp.error('w', "no possibly applicable method '"
                              +name+"' in "+type.getName());
               }
-            else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
-              index = 0;
-            else if (okCount > 0)
+          }
+        else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
+          index = 0;
+        else if (okCount > 0)
+          {
+            index = MethodProc.mostSpecific(methods, okCount);
+            if (index < 0)
               {
-                index = MethodProc.mostSpecific(methods, okCount);
-                if (index < 0)
-		  {
-		    if (kind == 'S')
-		      {
-			// If we didn't find a most specific method,
-			// check if there is one that is static.  If so,
-			// prefer that - after all, we're using invoke-static.
-			for (int i = 0;  i < okCount;  i++)
-			  {
-			    if (methods[i].getStaticFlag())
-			      {
-				if (index >= 0)
-				  {
-				    index = -1;
-				    break;
-				  }
-				else
-				  index = i;
-			      }
-			  }
-		      }
-		  }
-                if (index < 0
-		    && comp.getBooleanOption("warn-invoke-unknown-method",
-					     true))
-		  {
-                    StringBuffer sbuf = new StringBuffer();
-                    sbuf.append("more than one definitely applicable method `");
-                    sbuf.append(name);
-                    sbuf.append("' in ");
-                    sbuf.append(type.getName());
-                    append(methods, okCount, sbuf);
-		    comp.error('w', sbuf.toString());
-		  }
+                if (kind == 'S')
+                  {
+                    // If we didn't find a most specific method,
+                    // check if there is one that is static.  If so,
+                    // prefer that - after all, we're using invoke-static.
+                    for (int i = 0;  i < okCount;  i++)
+                      {
+                        if (methods[i].getStaticFlag())
+                          {
+                            if (index >= 0)
+                              {
+                                index = -1;
+                                break;
+                              }
+                            else
+                              index = i;
+                          }
+                      }
+                  }
               }
-	    else if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+            if (index < 0
+                && comp.getBooleanOption("warn-invoke-unknown-method", true))
               {
                 StringBuffer sbuf = new StringBuffer();
-                sbuf.append("more than one possibly applicable method '");
+                sbuf.append("more than one definitely applicable method `");
                 sbuf.append(name);
                 sbuf.append("' in ");
                 sbuf.append(type.getName());
-                append(methods, maybeCount, sbuf);
+                append(methods, okCount, sbuf);
                 comp.error('w', sbuf.toString());
-	      }
-            if (index >= 0)
-              {
-                Expression[] margs = new Expression[margsLength];
-                int dst = 0;
-                if (objIndex >= 0)
-                  margs[dst++] = args[objIndex];
-                for (int src = argsStartIndex; 
-                     src < args.length && dst < margs.length; 
-                     src++, dst++)
-                  margs[dst] = args[src];
-                return new ApplyExp(methods[index], margs).setLine(exp);
               }
+          }
+        else if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+          {
+            StringBuffer sbuf = new StringBuffer();
+            sbuf.append("more than one possibly applicable method '");
+            sbuf.append(name);
+            sbuf.append("' in ");
+            sbuf.append(type.getName());
+            append(methods, maybeCount, sbuf);
+            comp.error('w', sbuf.toString());
+          }
+        if (index >= 0)
+          {
+            Expression[] margs = new Expression[margsLength];
+            int dst = 0;
+            if (objIndex >= 0)
+              margs[dst++] = args[objIndex];
+            for (int src = argsStartIndex; 
+                 src < args.length && dst < margs.length; 
+                 src++, dst++)
+              margs[dst] = args[src];
+            return new ApplyExp(methods[index], margs).setLine(exp);
           }
       }
     return exp;
@@ -668,10 +679,10 @@ public class Invoke extends ProcedureN implements CanInline
   public static synchronized PrimProcedure
   getStaticMethod(ClassType type, String name, Expression[] args)
   {
-    PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 
-                                                      args.length, 0, -1, null);
-    int okCount = invokeStatic.cacheDefinitelyApplicableMethodCount;
-    int maybeCount = invokeStatic.cachePossiblyApplicableMethodCount;
+    PrimProcedure[] methods = invokeStatic.getMethods(type, name, null);
+    long num = selectApplicable(methods, type, args, args.length, 0, -1);
+    int okCount = (int) (num >> 32);
+    int maybeCount = (int) num;
     int index;
     if (methods == null)
       index = -1;

@@ -148,7 +148,7 @@ public class HttpPrinter extends FilterConsumer
     /* #ifdef use:java.lang.CharSequence */
     append(sbuf);
     /* #else */
-    // append(sbuf.toString());
+    // write(sbuf.toString());
     /* #endif */
     sbuf.setLength(0);
   }
@@ -225,15 +225,6 @@ public class HttpPrinter extends FilterConsumer
       base.write(csq, 0, csq.length());
     return this;
   }
-  /* #else */
-  // public Consumer append (String str)
-  // {
-  //   if (base == null)
-  //     sbuf.append(str);
-  //   else
-  //     base.append(str);
-  //   return this;
-  // }
   /* #endif */
 
   public void write(char[] buf, int off, int len)

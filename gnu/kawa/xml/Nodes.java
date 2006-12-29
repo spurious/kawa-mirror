@@ -140,13 +140,6 @@ public class Nodes extends Values
     curFragment.write(csq, start, end);
     return this;
   }
-  /* #else */
-  // public Consumer append (String str)
-  // {
-  //   maybeStartTextNode();
-  //   curFragment.append(str);
-  //   return this;
-  // }
   /* #endif */
 
   public void write(char[] buf, int off, int len)

@@ -240,7 +240,7 @@ public class ContentConsumer implements Consumer
     strBuffer.append(str.subSequence(start, end).toString());
     /* #endif */
     /* #else */
-    // strBuffer.append(str, start, end);
+    // strBuffer.append(str.substring(start, end));
     /* #endif */
   }
 

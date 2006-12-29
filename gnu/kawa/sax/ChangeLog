@@ -1,3 +1,7 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* ContentConsumer.java (write): Fix non-CharSequence PreProcess-case.
+
 2006-12-16  Per Bothner  <per@bothner.com>
 
 	* KawaXMLReader.java (parse): Use new XMLParser.XMLStreamReader.

@@ -1,3 +1,9 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (begindata): Fix non-CharSequence PreProcess-case.
+	(append(String)): Removed, for same reason.
+	* Nodes.java (append): Removed, for same reason.
+
 2006-12-18  Per Bothner  <per@bothner.com>
 
 	* WriteTo.java (writeTo, writeToIfChanged): Change filename to

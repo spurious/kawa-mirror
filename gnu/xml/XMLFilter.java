@@ -344,7 +344,7 @@ public class XMLFilter implements
       endAttribute();
     NamespaceBinding outer = nesting == 0 ? NamespaceBinding.predefinedXML
       : (NamespaceBinding) workStack[nesting-2];
-      
+
     NamespaceBinding bindings = namespaceBindings;
 
     // This first pass is to check that there are namespace declarations for
@@ -589,9 +589,9 @@ public class XMLFilter implements
       workStack[nesting+i-1] = null; // For GC.
     if (out != tlist)
       {
-	base = out;
-	// Remove temporarily stored attributes.
-	tlist.clear();
+        base = out;
+        // Remove temporarily stored attributes.
+        tlist.clear();
       }
     attrCount = -1;
   }
@@ -779,14 +779,6 @@ public class XMLFilter implements
 
         base.write(data, start, length);
       }
-  }
-
-  public void write (String str, int start, int length)
-  {
-    if (length == 0)
-      writeJoiner();
-    else if (checkWriteAtomic())
-      base.write(str, start, length);
   }
 
   protected void writeJoiner ()
@@ -1473,31 +1465,30 @@ public class XMLFilter implements
     return ignoringLevel > 0;
   }
 
+  /* #ifdef SAX2 */
   public void setDocumentLocator(Locator locator)
   {
     if (locator instanceof SourceLocator)
       this.locator = (SourceLocator) locator;
     else
-      {
-        // create SourceLocator that indirects to given locator.  FIXME.
-      }
+      ; // create SourceLocator that indirects to given locator.  FIXME.
   }
 
   public void startElement (String namespaceURI, String localName,
-			    String qName, Attributes atts)
+                            String qName, Attributes atts)
   {
     startElement(Symbol.make(namespaceURI, localName));
     int numAttributes = atts.getLength();
     for (int i = 0;  i < numAttributes;  i++)
       {
-	startAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
-	write(atts.getValue(i));
-	endAttribute();
+        startAttribute(Symbol.make(atts.getURI(i), atts.getLocalName(i)));
+        write(atts.getValue(i));
+        endAttribute();
       }
   }
 
   public void endElement (String namespaceURI, String localName,
-			  String qName)
+                          String qName)
   {
     endElement();
   }
@@ -1509,13 +1500,13 @@ public class XMLFilter implements
     int attrLength = atts.getLength();
     for (int i = 0; i < attrLength; i++)
       {
-	name = atts.getName(i);
-	name = name.intern();  // ?
-	String type = atts.getType(i);
-	String value = atts.getValue(i);
-	startAttribute(name);  // FIXME
-	write(value);
-	endAttribute();
+        name = atts.getName(i);
+        name = name.intern();  // ?
+        String type = atts.getType(i);
+        String value = atts.getValue(i);
+        startAttribute(name);  // FIXME
+        write(value);
+        endAttribute();
       }
   }
 
@@ -1534,9 +1525,9 @@ public class XMLFilter implements
   public void ignorableWhitespace (char ch[], int start, int length)
     throws SAXException
   {
-    // FIXME
-    write(ch, start, length);
+    write(ch, start, length); // FIXME
   }
+  /* #endif */
 
   public void processingInstruction(String target, String data)
   {

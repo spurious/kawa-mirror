@@ -1,3 +1,9 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* XMLFilter.java Fix case when SAX2 is not PreProcess-selected.
+	De-tabify so PreProcess doesn't get confused.
+	(write): Remove duplicate when PreProcess to not use CharSequence.
+
 2006-12-16  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java (XMLStreamReader): New static method.

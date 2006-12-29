@@ -1,3 +1,7 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inline): Fix off-by-one error.
+
 2006-12-23  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN, inline): Look for "valueOf" method if there

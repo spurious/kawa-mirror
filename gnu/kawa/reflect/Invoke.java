@@ -481,7 +481,7 @@ public class Invoke extends ProcedureN implements CanInline
             Procedure constructor = ((TypeValue) type).getConstructor();
             if (constructor != null)
               {
-                Expression[] xargs = new Expression[nargs];
+                Expression[] xargs = new Expression[nargs-1];
                 System.arraycopy(args, 1, xargs, 0, nargs-1);
                 return ((InlineCalls) walker)
                   .walkApplyOnly(new ApplyExp(constructor, xargs));

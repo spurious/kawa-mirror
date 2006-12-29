@@ -3,6 +3,9 @@ import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.text.URI_utils;
+/* #ifdef use:java.nio */
+import java.nio.charset.*;
+/* #endif */
 
 /** Reads XML from a char array.
  * Assumes a state-less character encoding containing ascii as a sub-set,
@@ -39,146 +42,96 @@ public class XMLParser
   private static final int SAW_AMP_SHARP_STATE = 26;  // Saw '&#'.  
   private static final int EXPECT_RIGHT_STATE = 27;
   private static final int PREV_WAS_CR_STATE = 28;
-  private static final int SAW_ERROR = 30;
-  private static final int SAW_EOF_ERROR = 31;  // Unexpected end-of-file.
+  private static final int INIT_LEFT_QUEST_STATE = 30;
+  private static final int INIT_TEXT_STATE = 31;
+  private static final int INIT_LEFT_STATE = 34;
+  private static final int INVALID_VERSION_DECL = 35;
+  private static final int SAW_ERROR = 36;
+  private static final int SAW_EOF_ERROR = 37;  // Unexpected end-of-file.
+
+  static final String BAD_ENCODING_SYNTAX = "bad encoding declaration";
 
   public static void parse (Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    parse(new BufferedInputStream(URI_utils.getInputStream(uri)),
-          uri, messages, out);
+    parse(URI_utils.getInputStream(uri), uri, messages, out);
   }
 
-  /** Creates an InputStreamReader by looking for an XML encoding declaration
-   * or autodetecting. */
-
-  public static InputStreamReader XMLStreamReader (InputStream strm)
+  public static LineInputStreamReader XMLStreamReader (InputStream strm)
     throws java.io.IOException
   {
-    BufferedInputStream bin = (strm instanceof BufferedInputStream
-                               ? (BufferedInputStream) strm
-                               : new BufferedInputStream(strm));
-    bin.mark(200);
-    int b1 = bin.read();
-    int b2 = b1 < 0 ? -1 : bin.read();
-    int b3 = b2 < 0 ? -1 : bin.read();
-    int b4 = b3 < 0 ? -1 : bin.read();
-    String encoding;
-    // John Cowan's XML encoding sniffer:
-    // http://recycledknowledge.blogspot.com/2005/07/hello-i-am-xml-encoding-sniffer.html
-    char tentative;
+    LineInputStreamReader in = new LineInputStreamReader(strm);
+    /* #ifndef use:java.nio */
+    // in.markStart();
+    /* #endif */
+    int b1 = in.getByte();
+    int b2 = b1 < 0 ? -1 : in.getByte();
+    int b3 = b2 < 0 ? -1 : in.getByte();
     if (b1 == 0xEF && b2 == 0xBB && b3 == 0xBF)
-      tentative = 'u'; // "UTF-8"
-    else if (((b1 == 0xFF && b2 == 0xFE) || (b1 == 0xFe && b2 == 0xFF))
-             && ! (b3 == 0 && b4 == 0))
-      tentative = 'U'; // "UTF-16"
-    else if (b1 == 0x4C && b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
-      tentative = 'E'; // "EBCDIC-unknown"
-    else
-      tentative = '\0';
-    int n;
-    if (tentative == 'u')
       {
-        n = 3;
-        encoding = "UTF-8";
+        in.resetStart(3);
+        in.setCharset("UTF-8");
+      }
+    else if (b1 == 0xFF && b2 == 0xFE && b3 != 0)
+      {
+        in.resetStart(2);
+        in.setCharset("UTF-16LE");
+      }
+    else if (b1 == 0xFE && b2 == 0xFF && b3 != 0)
+      {
+        in.resetStart(2);
+        in.setCharset("UTF-16BE");
       }
     else
       {
-        n = 0;
-        encoding = null;
-        for (;;)
+        int b4 = b3 < 0 ? -1 : in.getByte();
+        if (b1 == 0x4C && b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
+          throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
+        in.resetStart(0);
+        if ((b1 == '<' && ((b2 == '?' && b3 == 'x' && b4 == 'm')
+                           || (b2 == 0 && b3 == '?' && b4 == 0)))
+            || (b1 == 0 && b2 == '<' && b3 == 0 && b4 == '?'))
           {
-            int b;
-            if (++n == 200 || (b = bin.read()) < 0)
+            char[] buffer = in.buffer;
+            if (buffer == null)
+              in.buffer = buffer = new char[LineBufferedReader.BUFFER_SIZE];
+            int pos = 0;
+            int quote = 0;
+            for (;;)
               {
-                n = 0;
-                break;
-              }
-            if (b == (tentative != 'E' ? '>' : 0x4C/*'>' in EBCDIC*/))
-              {
-                // No encoding declaration.
-                n = 0;
-                if (tentative == 'U')
+                int b = in.getByte();
+                if (b == 0)
+                  continue;
+                if (b < 0) // Unexpected EOF - handled later.
+                  break;
+                buffer[pos++] = (char) (b & 0xFF);
+                if (quote == 0)
                   {
-                    n = 2;
-                    encoding = b2 == 0xFF ? "UTF-16BE" : "UTF-16LE";
-                  }
-                else if (tentative == 'E')
-                  throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
-                else
-                  {
-                    // Technically the encoding declaration is required in the
-                    // first two cases.  But let's be nice to Windows users.
-                    if (b1 == 0 && b2 == 0x3C && b3 == 0 && b4 == 0x3F)
-                      encoding = "UTF-16BE";
-                    else if (b1 == 0x3C && b2 == 0 && b3 == 0x3F && b4 == 0)
-                      encoding = "UTF-16LE";
-                    else
-                      encoding = "UTF-8";
-                  }
-                break;
-              }
-            if (b == (tentative != 'E' ? 'g' : 0x87/*'g' in EBCDIC*/))
-              {
-                // Seen a 'g' - presumably in "encoding".
-                for (;;)
-                  {
-                    b = bin.read();
-                    if (b < 0)
+                    if (b == '>')
                       break;
-                    if (tentative != 'E' ? (b == '\'' || b == '\"')
-                        : (b == 0x7D || b == 0x7F))
-                      {
-                        int terminator = b;
-                        // Seen quote that starts encoding declaration.
-                        StringBuffer sbuf = new StringBuffer();
-                        for (;;)
-                          {
-                            if (++n == 200 || (b = bin.read()) < 0)
-                              break;
-                            if (b < 0)
-                              break;
-                            if (b == 0)
-                              continue;
-                            if (b != terminator)
-                              {
-                                if (tentative == 'E')
-                                  {
-                                    // Map invariant EBCDIC to ASCII.
-                                    // http://publib.boulder.ibm.com/iseries/v5r2/ic2924/index.htm?info/nls/rbagsinvariantcharset.htm
-                                    throw new RuntimeException("XMLParser: EBCDIC encodings not supported");
-                                  }
-                                sbuf.append((char) b);
-                                continue;
-                              }
-                            encoding = sbuf.toString();
-                            break;
-                          }
-                        break;
-                      }
+                    if (b == '\'' || b == '\"')
+                      quote = b;
                   }
-                n = tentative == 'U' ? 2 : 0;
-                break;
+                else if (b == quote)
+                  quote = 0;
               }
+            in.pos = 0;
+            in.limit = pos;
           }
+        else
+          in.setCharset("UTF-8");
       }
-    bin.reset();
-    while (--n >= 0) bin.read();
-    InputStreamReader reader;
-    if (encoding != null)
-      reader = new InputStreamReader(bin, encoding);
-    else
-      reader = new InputStreamReader(bin); // Or maybe error??
-    return reader;
+    in.setKeepFullLines(false);
+    return in;
   }
 
   public static void parse (InputStream strm, Object uri,
                             SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    Reader reader = XMLStreamReader(strm);
-    LineBufferedReader in = new LineBufferedReader(reader);
-    in.setName(uri);
+    LineInputStreamReader in = XMLStreamReader(strm);
+    if (uri != null)
+      in.setName(uri);
     parse(in, messages, out);
     in.close();
   }
@@ -253,7 +206,32 @@ public class XMLParser
           {
           case INIT_STATE:
             state = TEXT_STATE;
+            state = INIT_TEXT_STATE;
             break handleChar;
+
+          case INIT_TEXT_STATE:
+            if (ch == '<')
+              {
+                state = INIT_LEFT_STATE;
+                break handleChar;
+              }
+            state = TEXT_STATE;
+            continue mainLoop;
+
+          case INIT_LEFT_STATE:
+            if (ch == '?')
+              {
+                start = pos;
+                state = EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + INIT_LEFT_QUEST_STATE;
+                break handleChar;
+              }
+            state = SAW_LEFT_STATE;
+            continue mainLoop;
+
+          case INVALID_VERSION_DECL:
+            pos = dstart;
+            message = "invalid xml version specifier";
+            /* ... fall thorugh ... */
 
           case SAW_ERROR:
             in.pos = pos;
@@ -382,11 +360,17 @@ public class XMLParser
           case SKIP_SPACES_MODIFIER + EXPECT_RIGHT_STATE:
           case SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE:
           case SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE:
+          case SKIP_SPACES_MODIFIER + INIT_LEFT_QUEST_STATE:
           case SKIP_SPACES_MODIFIER + DOCTYPE_SEEN_STATE:
             // "Subroutine" for skipping whitespace.
-            if (ch == ' ' || ch == '\t'|| ch == '\n' || ch == '\r'
-		|| ch == '\u0085' || ch == '\u2028')
+            if (ch == ' ' || ch == '\t')
               break handleChar;
+            if (ch == '\n' || ch == '\r'
+		|| ch == '\u0085' || ch == '\u2028')
+              {
+                in.incrLineNumber(1, pos);
+break handleChar;
+              }
             // Not a space, so "return" to next state.
             state -= SKIP_SPACES_MODIFIER;
             continue mainLoop;
@@ -397,6 +381,7 @@ public class XMLParser
           case EXPECT_NAME_MODIFIER + SAW_ENTITY_REF:
           case EXPECT_NAME_MODIFIER + DOCTYPE_NAME_SEEN_STATE:
           case EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE:
+          case EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + INIT_LEFT_QUEST_STATE:
             length = start+1;
             // "Subroutine" for reading a Name.
             for (;;)
@@ -530,13 +515,14 @@ public class XMLParser
             state = EXPECT_NAME_MODIFIER + BEGIN_ELEMENT_STATE;
             continue mainLoop;
           case BEGIN_ELEMENT_STATE:
-            in.pos = pos;
+            in.pos = pos-length;  // position of start of name, for errors.
             out.emitStartElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
 	    start = limit;
             continue mainLoop;
 
           case SAW_LEFT_QUEST_STATE: // Seen '<?' Name Spaces
+          case INIT_LEFT_QUEST_STATE: // Seen '<?' Name Spaces
 	    if (dstart < 0)
 	      dstart = pos - 1;
             for (;;)
@@ -547,8 +533,145 @@ public class XMLParser
 		    && end >= dstart)
 		  {
                     in.pos = pos;
-		    out.processingInstructionFromParser(buffer, start, length,
-                                                        dstart, end - dstart);
+                    if (length == 3
+                        && buffer[start] == 'x'
+                        && buffer[start+1] == 'm'
+                        && buffer[start+2] == 'l')
+                      {
+                        if (state == INIT_LEFT_QUEST_STATE)
+                          {
+                            if (end <= dstart+7
+                                || buffer[dstart] != 'v'
+                                || buffer[dstart+1] != 'e'
+                                || buffer[dstart+2] != 'r'
+                                || buffer[dstart+3] != 's'
+                                || buffer[dstart+4] != 'i'
+                                || buffer[dstart+5] != 'o'
+                                || buffer[dstart+6] != 'n')
+                              {
+                                pos = dstart;
+                                message = "xml declaration without version";
+                                state = SAW_ERROR;
+                                continue mainLoop;
+                              }
+                            dstart += 7;
+                            ch = buffer[dstart];
+                            while (Character.isWhitespace(ch)
+                                   && ++dstart < end)
+                              ch = buffer[dstart];
+                            if (ch != '=')
+                              {
+                                state = INVALID_VERSION_DECL;
+                                continue mainLoop;
+                              }
+                            ch = buffer[++dstart];
+                            while (Character.isWhitespace(ch)
+                                   && ++dstart < end)
+                              ch = buffer[dstart];
+                            if (ch != '\'' && ch != '\"')
+                              {
+                                state = INVALID_VERSION_DECL;
+                                continue mainLoop;
+                              }
+                            char quote = ch;
+                            int i = ++dstart;
+                            for (;; i++)
+                              {
+                                if (i == end)
+                                  {
+                                    state = INVALID_VERSION_DECL;
+                                    continue mainLoop;
+                                  }
+                                ch = buffer[i];
+                                if (ch == quote)
+                                  break;
+                              }
+                            if (i == dstart + 3 && buffer[dstart] == '1'
+                                && buffer[dstart+1] == '.'
+                                && (ch = buffer[dstart+2]) == '0' || ch == '1')
+                              {
+                                // Save version number, if that is useful.
+                              }
+                            else
+                              {
+                                state = INVALID_VERSION_DECL;
+                                continue mainLoop;
+                              }
+                            dstart = i+1;
+                            while (dstart < end
+                                   && Character.isWhitespace(buffer[dstart]))
+                              dstart++;
+                            if (end > dstart + 7
+                                && buffer[dstart] == 'e'
+                                && buffer[dstart+1] == 'n'
+                                && buffer[dstart+2] == 'c'
+                                && buffer[dstart+3] == 'o'
+                                && buffer[dstart+4] == 'd'
+                                && buffer[dstart+5] == 'i'
+                                && buffer[dstart+6] == 'n'
+                                && buffer[dstart+7] == 'g')
+                              {
+                                dstart += 8;
+                                ch = buffer[dstart];
+                                while (Character.isWhitespace(ch)
+                                       && ++dstart < end)
+                                  ch = buffer[dstart];
+                                if (ch != '=')
+                                  {
+                                    message = BAD_ENCODING_SYNTAX;
+                                    state = SAW_ERROR;
+                                    continue mainLoop;
+                                  }
+                                ch = buffer[++dstart];
+                                while (Character.isWhitespace(ch)
+                                       && ++dstart < end)
+                                  ch = buffer[dstart];
+                                if (ch != '\'' && ch != '\"')
+                                  {
+                                    message = BAD_ENCODING_SYNTAX;
+                                    state = SAW_ERROR;
+                                    continue mainLoop;
+                                  }
+                                quote = ch;
+                                i = ++dstart;
+                                for (;; i++)
+                                  {
+                                    if (i == end)
+                                      {
+                                        message = BAD_ENCODING_SYNTAX;
+                                        state = SAW_ERROR;
+                                        continue mainLoop;
+                                      }
+                                    ch = buffer[i];
+                                    if (ch == quote)
+                                      break;
+                                  }
+                                String encoding = new String(buffer,dstart, i-dstart);
+                                if (in instanceof LineInputStreamReader)
+                                  ((LineInputStreamReader) in).setCharset(encoding);
+                                dstart = i+1;
+                                while (dstart < end
+                                       && Character.isWhitespace(buffer[dstart]))
+                                  dstart++;
+                              }
+                            if (end != dstart)
+                              {
+                                message = "junk at end of xml declaration";
+                                pos = dstart;
+                                state = SAW_ERROR;
+                                continue mainLoop;
+                              }
+                          }
+                        else
+                          {
+                            message = "<?xml must be at start of file";
+                            state = SAW_ERROR;
+                            continue mainLoop;
+                          }
+                      }
+                    else
+                      out.processingInstructionFromParser(buffer, start, length,
+                                                          dstart, end - dstart);
 		    start = limit;
 		    dstart = -1;
 		    state = TEXT_STATE;
@@ -699,7 +822,7 @@ public class XMLParser
             if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
 		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
-            in.pos = pos;
+            in.pos = pos-length; // position of start of name, for errors.
             out.emitStartAttribute(buffer, start, length);
 	    start = limit;
             if (ch == '=')
@@ -707,6 +830,7 @@ public class XMLParser
                 state = ATTRIBUTE_SEEN_EQ_STATE;
                 break handleChar;
               }
+            out.emitEndAttributes();
             message = "missing or misplaced '=' after attribute name";
             state = SAW_ERROR;
             continue mainLoop;
@@ -765,7 +889,7 @@ public class XMLParser
                   }
                 in.pos = pos;
                 int x = in.read();
-                if (x <= 0)
+                if (x < 0)
                   {
                     if (state == TEXT_STATE || state == PREV_WAS_CR_STATE)
                       return;

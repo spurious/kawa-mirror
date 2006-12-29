@@ -1,4 +1,4 @@
-// Copyright (c) 2004  Per M.A. Bothner.
+// Copyright (c) 2004, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -23,10 +23,15 @@ import java.io.*;
   * @author Per Bothner <bothner@cygnus.com>
   */
 
-public class LineBufferedReader extends FilterReader
+public class LineBufferedReader extends Reader
 {
+  public void close () throws IOException { in.close(); }
+
+  // Not used by LineInputStreamReader subclass!
+  protected Reader in;
+
   /** Default (initial buffer) size. */
-  final static int BUFFER_SIZE = 8192;
+  public final static int BUFFER_SIZE = 8192;
 
   /** The input buffer, containing the current line etc. */
   public char[] buffer;
@@ -72,6 +77,22 @@ public class LineBufferedReader extends FilterReader
   /* If true in flags, char before start of buffer was '\r'. */
   private static final int PREV_WAS_CR = 4;
 
+  /** If true in flags, we don't need to keep the whole line.
+   * I.e. the application doesn't need to scan to the beginning of line. */
+  private static final int DONT_KEEP_FULL_LINES = 8;
+
+  /** Should we preserve the complete current line?
+   * The default is true, but in some cases there can be a performance
+   * improvement if we don't need to keep a long line when filling the buffer.
+   */
+  public void setKeepFullLines (boolean keep)
+  {
+    if (keep)
+      flags &= ~DONT_KEEP_FULL_LINES;
+    else
+      flags |= DONT_KEEP_FULL_LINES;
+  }
+
   /** True if CR and CRLF should be converted to LF. */
   public final boolean getConvertCR () { return (flags & CONVERT_CR) != 0; }
 
@@ -92,7 +113,7 @@ public class LineBufferedReader extends FilterReader
     * get set to the new pos until we read/peek the first char of the new line.
     * If {@code lineStartPos < 0}, it means we went beyond the buffer maximum.
     */
-  int lineStartPos;
+  private int lineStartPos;
 
   Object name;
 
@@ -110,12 +131,12 @@ public class LineBufferedReader extends FilterReader
 
   public LineBufferedReader (InputStream in)
   {
-    super (new InputStreamReader(in));
+    this.in = new InputStreamReader(in);
   }
 
   public LineBufferedReader (Reader in)
   {
-    super (in);
+    this.in = in;
   }
 
   /** A hook to allow sub-classes to perform some action at start of line.
@@ -204,7 +225,9 @@ public class LineBufferedReader extends FilterReader
 	  }
 
 	reserve -= buffer.length;
-	if (saveStart < lineStartPos && reserve <= saveStart)
+	if (reserve <= saveStart
+            && (saveStart <= lineStartPos
+                || (flags & DONT_KEEP_FULL_LINES) != 0))
 	  ;
 	else if (reserve <= lineStartPos && saveStart > lineStartPos)
 	  saveStart = lineStartPos;

@@ -3966,7 +3966,7 @@ public class XQParser extends Lexer
 	String collation = (String) val;
 	try
 	  {
-            if (! InPort.uriSchemeSpecified(collation))
+            if (! Path.uriSchemeSpecified(collation))
               {
                 String base = getStaticBaseUri();
                 if (base == null)

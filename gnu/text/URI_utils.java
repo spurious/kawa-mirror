@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.io.*;
 import gnu.lists.FString;
 import gnu.mapping.CallContext;
-import gnu.mapping.InPort;
 import gnu.mapping.Table2D;
 
 public class URI_utils
@@ -22,7 +21,7 @@ public class URI_utils
     if (uri instanceof URI)
       return ((URI) uri).isAbsolute();
     /* #endif */
-    return InPort.uriSchemeSpecified(uri.toString());
+    return Path.uriSchemeSpecified(uri.toString());
   }
 
   /** Handle name that starts with "class-resource:/". */
@@ -111,11 +110,11 @@ public class URI_utils
     String str = uri.toString();
     if (str.startsWith(CLASS_RESOURCE_URI_PREFIX))
       return resourceURL(uri, str);
-    if (! InPort.uriSchemeSpecified(str))
+    if (! Path.uriSchemeSpecified(str))
       {
         CallContext ctx = CallContext.getInstance();
         String base = ctx.getBaseUriRaw();
-        if (base == null || ! InPort.uriSchemeSpecified(base))
+        if (base == null || ! Path.uriSchemeSpecified(base))
           {
             char fileSep = File.separatorChar;
             str = str.replace('/', fileSep);
@@ -243,7 +242,7 @@ public class URI_utils
     throws java.net.URISyntaxException
   /* #endif */
   {
-    if (InPort.uriSchemeSpecified(str))
+    if (Path.uriSchemeSpecified(str))
       return str;
     char fileSep = File.separatorChar;
     if (fileSep != '/')
@@ -261,7 +260,7 @@ public class URI_utils
       }
     catch (java.net.URISyntaxException ex)
       {
-        if (InPort.uriSchemeSpecified(str))
+        if (Path.uriSchemeSpecified(str))
           throw ex;
         char fileSep = File.separatorChar;
         if (fileSep != '/')
@@ -396,7 +395,7 @@ public class URI_utils
     else if (relative instanceof String || relative instanceof FString)
       {
         rstr = relative.toString();
-        if (InPort.uriSchemeSpecified(rstr))
+        if (Path.uriSchemeSpecified(rstr))
           return toURI(rstr);
       }
     else if (relative instanceof File)
@@ -440,7 +439,7 @@ public class URI_utils
     //   {
     //     /* Rstr is an absolute file name, but doesn't have a uri scheme. */
     //     int baseLen = sbase.length();
-    //     int pathStart = InPort.uriSchemeLength(sbase);
+    //     int pathStart = Path.uriSchemeLength(sbase);
     //     if (pathStart <= 1)
     //       return rstr;
     //     pathStart++;

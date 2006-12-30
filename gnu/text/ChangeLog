@@ -1,5 +1,9 @@
 2006-12-29  Per Bothner  <per@bothner.com>
 
+	* URI_utils.java: Update for move of uriSchemeSpecified and
+	uriSchemeLength from InPort to Path.
+	* URIPath.java: Likewise.
+
 	* Path.java: New class.
 	* FilePath.java: New class, extends Path.
 	* URIPath.java: New class, extends Path.

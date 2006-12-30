@@ -6,7 +6,7 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
-import gnu.text.URI_utils;
+import gnu.text.*;
 import java.net.URL;
 
 public class load extends Procedure1 {
@@ -161,7 +161,7 @@ public class load extends Procedure1 {
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    boolean isUri = InPort.uriSchemeSpecified(name);
+    boolean isUri = Path.uriSchemeSpecified(name);
     // Resolve a relative URI.  However, if the base uri matches the
     // default base uri (i.e. the current directory) just leave it as
     // a filename, rather than coercing it to a URI.

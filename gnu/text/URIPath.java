@@ -138,9 +138,9 @@ public class URIPath
     //   sbuf.append('/');
     // if (rstr.length() > 0 && rstr.charAt(0) == '/')
     //   { 
-   //     /* Rstr is an absolute file name, but doesn't have a uri scheme. */
+    //     /* Rstr is an absolute file name, but doesn't have a uri scheme. */
     //     int baseLen = sbase.length();
-    //     int pathStart = InPort.uriSchemeLength(sbase);
+    //     int pathStart = Path.uriSchemeLength(sbase);
     //     if (pathStart <= 1)
     //       return rstr;
     //     pathStart++;

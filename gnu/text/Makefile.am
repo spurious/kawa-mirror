@@ -5,7 +5,8 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   Char.java PrettyWriter.java Options.java \
   Printable.java \
-  URI_utils.java SourceLocator.java \
+  Path.java FilePath.java URIPath.java URLPath.java \
+  ResourceStreamHandler.java URI_utils.java SourceLocator.java \
   LineBufferedReader.java LineInputStreamReader.java \
   SourceError.java Lexer.java SyntaxException.java \
   QueueReader.java SourceMessages.java NullReader.java \

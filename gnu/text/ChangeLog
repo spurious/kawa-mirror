@@ -1,5 +1,12 @@
 2006-12-29  Per Bothner  <per@bothner.com>
 
+	* Path.java: New class.
+	* FilePath.java: New class, extends Path.
+	* URIPath.java: New class, extends Path.
+	* URLPath.java: New class, extends URIPath.
+	* ResourceStreamHandler.java: New class, extends URLStreamHandler.
+	* Makefile.am: Update accordingly.
+
 	* LineInputStreamReader.java: New class, extends LineBufferedReader.
 	* Makefile.am: Update accordingly.
 	* LineBufferedReader.java: Extend Reader rather than FilterReader.

@@ -35,9 +35,7 @@ public class BooleanValue extends Procedure1 implements CanInline
     if (value instanceof SeqPosition)
       return true;
     if (value instanceof String
-        /* #ifdef use:java.net.URI */
-        || value instanceof java.net.URI
-        /* #endif */
+        || value instanceof gnu.text.Path
         || value instanceof UntypedAtomic)
       return value.toString().length() > 0;
     if (value instanceof Values)

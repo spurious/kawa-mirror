@@ -44,8 +44,8 @@ public class GetModuleClass extends Procedure0
         comp.mustCompileHere();
         decl = new Declaration(CLASS_RESOURCE_NAME);
         decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
-        Method maker = ClassType.make("gnu.text.URI_utils")
-          .getDeclaredMethod("makeClassResourceURI", 1);
+        Method maker = ClassType.make("gnu.text.URLPath")
+          .getDeclaredMethod("classResourcePath", 1);
         Expression clas
           = new ApplyExp(gnu.kawa.functions.GetModuleClass.getModuleClass,
                          Expression.noExpressions);

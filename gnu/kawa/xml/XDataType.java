@@ -10,6 +10,7 @@ import gnu.math.*;
 import java.math.BigDecimal;
 import gnu.lists.Consumer;
 import gnu.xml.TextUtils;
+import gnu.text.URIPath;
 
 /** An atomic type as used in XML Schema and related languages.
  * For example the {code xs:decimal} type is {@code XDataType.decimalType}.
@@ -100,13 +101,7 @@ public class XDataType extends Type implements TypeValue
                   BOOLEAN_TYPE_CODE);
 
   public static final XDataType anyURIType =
-    new XDataType("anyURI",
-                  /* #ifdef use:java.net.URI */
-                  ClassType.make("java.net.URI"),
-                  /* #else */
-                  // ClassType.make("java.lang.String"),
-                  /* #endif */
-                  ANY_URI_TYPE_CODE);
+    new XDataType("anyURI", ClassType.make("gnu.text.Path"), ANY_URI_TYPE_CODE);
 
   public static final XDataType NotationType =
     new XDataType("NOTATION",
@@ -211,11 +206,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return obj instanceof gnu.kawa.xml.UntypedAtomic;
       case ANY_URI_TYPE_CODE:
-        /* #ifdef use:java.net.URI */
-        return obj instanceof java.net.URI;
-        /* #else */
-        // return obj instanceof String;
-        /* #endif */
+        return obj instanceof gnu.text.Path;
       case BOOLEAN_TYPE_CODE:
         return obj instanceof java.lang.Boolean;
       case FLOAT_TYPE_CODE:
@@ -290,7 +281,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return new UntypedAtomic(TextUtils.stringValue(value));
       case ANY_URI_TYPE_CODE:
-        return toURI(value);
+        return URIPath.makeURI(value);
       case BOOLEAN_TYPE_CODE:
         if (value instanceof Boolean)
           return (((Boolean)value).booleanValue() ? Boolean.TRUE
@@ -415,25 +406,6 @@ public class XDataType extends Type implements TypeValue
     return implementationType.compare(other); // FIXME
   }
 
-  /* #ifdef use:java.net.URI */
-  public static java.net.URI toURI (Object value)
-  {
-    try
-      {
-        return gnu.text.URI_utils.toURI(value);
-      }
-    catch (java.net.URISyntaxException ex)
-      {
-        return (java.net.URI) value;
-      }
-  }
-  /* #else */
-  // public static String toURI (Object value)
-  // {
-  //   return gnu.text.URI_utils.toURI(value);
-  // }
-  /* #endif */
-
   public Object valueOf (String value)
   {
     switch (typeCode)
@@ -443,7 +415,7 @@ public class XDataType extends Type implements TypeValue
       case UNTYPED_ATOMIC_TYPE_CODE:
         return new UntypedAtomic(value);
       case ANY_URI_TYPE_CODE:
-        return toURI(TextUtils.replaceWhitespace(value, true));
+        return URIPath.makeURI(TextUtils.replaceWhitespace(value, true));
       case BOOLEAN_TYPE_CODE:
         value = value.trim();
         if (value.equals("true") || value.equals("1"))

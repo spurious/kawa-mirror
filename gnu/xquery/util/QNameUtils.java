@@ -2,7 +2,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.xml.*;
 import gnu.kawa.xml.*;
-import gnu.text.URI_utils;
+import gnu.text.*;
 
 public class QNameUtils
 {
@@ -181,7 +181,7 @@ public class QNameUtils
     if (name == Values.empty || name == null)
       return name;
     if (name instanceof Symbol)
-      return XDataType.toURI(((Symbol) name).getNamespaceURI());
+      return URIPath.makeURI(((Symbol) name).getNamespaceURI());
     throw WrongType.make(null, "namespace-uri", 1, name);
   }
 
@@ -222,6 +222,10 @@ public class QNameUtils
       relative = relative.toString();
     if (base instanceof UntypedAtomic)
       base = base.toString();
-    return URI_utils.resolve(relative, base);
+    Path baseP = base instanceof Path ? (Path) base : URIPath.makeURI(base);
+    if (relative instanceof Path)
+      return baseP.resolve((Path) relative);
+    else
+      return baseP.resolve(relative.toString());
   }
 }

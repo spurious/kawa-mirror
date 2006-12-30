@@ -1,3 +1,8 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* GetModuleClass.java (getModuleClassURI): Update to use URLPath
+	and ResourceStreamHandler.
+
 2006-11-22  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (compileInlined): New method, used by ValuesFilter.

@@ -8,10 +8,10 @@ import gnu.kawa.xml.*;
 import gnu.lists.*;
 import java.util.Stack;
 import java.net.*;
-import gnu.text.URI_utils;
 import gnu.expr.PrimProcedure;
 import gnu.bytecode.ClassType;
 import gnu.xquery.lang.XQuery;
+import gnu.text.Path;
 
 public class NodeUtils
 {
@@ -385,24 +385,16 @@ public class NodeUtils
   static Object resolve (Object uri, Object base, String fname)
     throws Throwable
   {
-    if (! (uri instanceof URL))
-      {
-        if (! (uri instanceof java.io.File)
-            /* #ifdef use:java.net.URI */
-            && ! (uri instanceof URI)
-            /* #endif */
-            )
-          uri = StringUtils.coerceToString(uri, fname, 1, null);
-        if (uri == Values.empty || uri == null)
-          return null;
-        if (! URI_utils.isAbsolute(uri))
-          {
-            if (base == null)
-              base = CallContext.getInstance().getBaseUri();
-            uri = URI_utils.resolve(uri, base);
-          }
-      }
-    return uri;
+    if (! (uri instanceof java.io.File)
+        && ! (uri instanceof Path)
+        /* #ifdef use:java.net.URI */
+        && ! (uri instanceof URI)
+        /* #endif */
+        && ! (uri instanceof URL))
+      uri = StringUtils.coerceToString(uri, fname, 1, null);
+    if (uri == Values.empty || uri == null)
+      return null;
+    return Path.currentPath().resolve(Path.valueOf(uri));
   }
 
   /** Parse an XML document, caching the result.

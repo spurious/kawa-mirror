@@ -210,8 +210,6 @@ public class RunXQTS extends FilterConsumer
     this.cout = out;
 
     expectFailures("K-ReplaceFunc-8", "allow bad regex replacement string");
-    expectFailures("trivial-1|trivial-2|trivial-3|trivial-4",
-                   "testsuite error - bug 3974");
     expectFailures("Constr-namespace-13", "testsuite error? missing namespace undeclaration");
     expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
     expectFailures("NodTest003", "actually pass? different char encoding");
@@ -1055,8 +1053,7 @@ public class RunXQTS extends FilterConsumer
           : "file://" + directory + '/' + inputValue;
         Symbol symbol = Symbol.parse(variable);
         externalVariablesSet.push(symbol);
-        Environment.getCurrent().put(symbol, null,
-                                     gnu.kawa.xml.XDataType.toURI(path));
+        Environment.getCurrent().put(symbol, null, Path.valueOf(path));
       }
     else if (tagMatches("defaultCollection"))
       {

@@ -26,6 +26,7 @@ public class StringUtils
     if ((arg == Values.empty || arg == null) && onEmpty != ERROR_VALUE)
       return onEmpty;
     if (arg instanceof UntypedAtomic 
+        || arg instanceof gnu.text.Path
         /* #ifdef use:java.net.URI */
         || arg instanceof java.net.URI
         /* #endif */

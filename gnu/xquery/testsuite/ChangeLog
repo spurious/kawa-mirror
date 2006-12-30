@@ -1,3 +1,9 @@
+2006-12-29  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (endElement): Update to use Path.valueOf.
+
+	* RunXQTS.java (<init>): Remove explicit listing of trivial-* to fail.
+
 2006-12-06  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Update for renamed Consumer methods.

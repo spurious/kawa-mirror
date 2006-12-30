@@ -856,10 +856,8 @@ public class XQuery extends Language
           return XDataType.decimalType;
         if (name.equals("gnu.math.Duration"))
           return XDataType.durationType;
-        /* #ifdef use:java.net.URI */
-        if (name.equals("java.net.URI"))
+        if (name.equals("gnu.text.Path"))
           return  XDataType.anyURIType;
-        /* #endif */
       }
     return Type.make(clas);
   }

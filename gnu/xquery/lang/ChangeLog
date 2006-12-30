@@ -1,5 +1,7 @@
 2006-12-29  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (getTypeFor): Update to map Path to URI.
+
 	* XQuery.java: Update for move of uriSchemeSpecified
 	from InPort to Path.
 

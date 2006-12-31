@@ -217,6 +217,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
 java_sources = \
   ClassNamespace.java \
   DefineNamespace.java \
+  LangObjType.java \
   LangPrimType.java \
   LispLanguage.java \
   LispPackage.java \

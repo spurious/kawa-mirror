@@ -5,6 +5,7 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   ClassNamespace.java \
   DefineNamespace.java \
+  LangObjType.java \
   LangPrimType.java \
   LispLanguage.java \
   LispPackage.java \

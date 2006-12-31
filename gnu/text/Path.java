@@ -4,7 +4,7 @@
 package gnu.text;
 import java.io.*;
 import java.net.*;
-import gnu.mapping.WrappedException; // FIXME
+import gnu.mapping.*;
 
 /** A generalized path/location, including File and URIs. */
 
@@ -35,7 +35,7 @@ public abstract class Path
     return defaultPath;
   }
 
-  public static Path valueOf (Object path)
+  public static Path coerceToPathOrNull (Object path)
   {
     if (path instanceof Path)
       return (Path) path;
@@ -47,13 +47,25 @@ public abstract class Path
     /* #endif */
     if (path instanceof File)
       return FilePath.valueOf((File) path);
+    String str;
     if (path instanceof gnu.lists.FString) // FIXME: || UntypedAtomic
-      path = path.toString();
-    String str = (String) path;
+      str = path.toString();
+    else if (! (path instanceof String))
+      return null;
+    else
+      str = (String) path;
     if (Path.uriSchemeSpecified(str))
       return URIPath.valueOf(str);
     else
       return FilePath.valueOf(str);
+  }
+
+  public static Path valueOf (Object arg)
+  {
+    Path path = coerceToPathOrNull(arg);
+    if (path == null)
+      throw new WrongType((String) null, WrongType.ARG_CAST, arg, "path");
+    return path;
   }
 
   public static URL toURL (String str)

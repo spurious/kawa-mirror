@@ -5,7 +5,7 @@ package gnu.text;
 import java.io.*;
 import java.net.*;
 import gnu.lists.FString;
-import gnu.mapping.WrappedException; // FIXME
+import gnu.mapping.*;
 
 /** A Path that wraps a URI.
  * The URI can be a java.net.URI, or a String, if compiled without URI support.
@@ -29,7 +29,7 @@ public class URIPath
   // private URIPath (String uri) { this.uri = uri; } 
   /* #endif */
 
-  public static URIPath makeURI (Object path)
+  public static URIPath coerceToURIPathOrNull (Object path)
   {
     if (path instanceof URIPath)
       return (URIPath) path;
@@ -42,9 +42,19 @@ public class URIPath
     String str;
     if (path instanceof File || path instanceof Path || path instanceof FString)
       str = path.toString();
-    else
+    else if (path instanceof String)
       str = (String) path;
+    else
+      return null;
     return URIPath.valueOf(str);
+  }
+
+  public static URIPath makeURI (Object arg)
+  {
+    URIPath path = coerceToURIPathOrNull(arg);
+    if (path == null)
+      throw new WrongType((String) null, WrongType.ARG_CAST, arg, "URI");
+    return path;
   }
 
   /* #ifdef use:java.net.URI */

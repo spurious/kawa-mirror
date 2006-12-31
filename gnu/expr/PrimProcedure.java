@@ -36,6 +36,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public Type getReturnType (Expression[] args) { return retType; }
 
+  public Method getMethod () { return method; }
+
   /** Return true iff the last parameter is a "rest" argument. */
   public boolean takesVarArgs()
   {

@@ -4,7 +4,7 @@
 package gnu.text;
 import java.io.*;
 import java.net.*;
-import gnu.mapping.WrappedException; // FIXME
+import gnu.mapping.*;
 
 /** A wrapper around a {@code java.io.File} that extends {@code Path}. */
 
@@ -51,7 +51,7 @@ public class FilePath
     return new FilePath(file);
   }
 
-  public static FilePath makeFilePath (Object path)
+  public static FilePath coerceToFilePathOrNull (Object path)
   {
     if (path instanceof FilePath)
       return (FilePath) path;
@@ -67,10 +67,21 @@ public class FilePath
     /* #endif */
     if (path instanceof File)
       return FilePath.valueOf((File) path);
+    String str;
     if (path instanceof gnu.lists.FString) // FIXME: || UntypedAtomic
-      path = path.toString();
-    String str = (String) path;
+      str = path.toString();
+    else if (path instanceof String)
+      str = (String) path;
+    else
+      return null;
     return FilePath.valueOf(str);
+  }
+  public static FilePath makeFilePath (Object arg)
+  {
+    FilePath path = coerceToFilePathOrNull(arg);
+    if (path == null)
+      throw new WrongType((String) null, WrongType.ARG_CAST, arg, "filepath");
+    return path;
   }
 
   public boolean isAbsolute ()

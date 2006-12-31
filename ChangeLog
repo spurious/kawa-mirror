@@ -1,3 +1,9 @@
+2006-12-30  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (processArgs): Use InetAddress.getByName(null)
+	instead of "localhost".  This avoid a problem on FC6 when localhost
+	is missing in /etc/hosts and seems like the Right Thing anyway.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java: Update for move of uriSchemeLength

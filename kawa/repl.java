@@ -1,5 +1,6 @@
 package kawa;
 import java.io.*;
+import java.net.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
@@ -454,7 +455,7 @@ public class repl extends Procedure0or1
 	      }
 	    try
 	      {
-		java.net.Socket socket = new java.net.Socket("localhost",port);
+		Socket socket = new Socket(InetAddress.getByName(null), port);
 		Telnet conn = new Telnet(socket, true);
 		java.io.InputStream sin = conn.getInputStream();
 		java.io.OutputStream sout = conn.getOutputStream();

@@ -73,7 +73,7 @@ public class URIPath
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
-   /* #else */
+    /* #else */
     // return new URIPath(uri)
     /* #endif */
   }

@@ -1,3 +1,7 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* URIPath.jva: Fix bad indenttain of PreProcess directive.
+
 2007-01-01  Per Bothner  <per@bothner.com>
 
 	* Path.java: Fix typo.

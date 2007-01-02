@@ -196,7 +196,7 @@ public class URIPath
 
   public String toString ()
   {
-  /* #ifdef use:java.net.URI */
+    /* #ifdef use:java.net.URI */
     return uri.toString();
     /* #else */
     // return uri;

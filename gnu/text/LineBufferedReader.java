@@ -529,7 +529,7 @@ public class LineBufferedReader extends Reader
     int ch = read();
     if (ch < 0)
       return null;
-    if (ch == '\r' || ch == 'n')
+    if (ch == '\r' || ch == '\n')
       return "";
     int start = pos - 1;
     while (pos < limit)
@@ -537,6 +537,7 @@ public class LineBufferedReader extends Reader
 	ch = buffer[pos++];
 	if (ch == '\r' || ch == '\n')
           {
+            int end = pos - 1;
             if (ch != '\n' && ! getConvertCR())
               {
                 if (pos >= limit)
@@ -547,11 +548,11 @@ public class LineBufferedReader extends Reader
                 if (buffer[pos] == '\n')
                   pos++;
               }
-            return new String(buffer, start, pos - start);
+            return new String(buffer, start, end - start);
           }
       }
     StringBuffer sbuf = new StringBuffer(100);
-    sbuf.append(buffer, start, pos);
+    sbuf.append(buffer, start, pos - start);
     readLine(sbuf, 'I');
     return sbuf.toString();
   }

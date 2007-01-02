@@ -27,7 +27,7 @@ public abstract class Path
 
   public static Path currentPath ()
   {
-    /* #ifde JAVA2 */
+    /* #ifdef JAVA2 */
     Object path = pathLocation.get();
     if (path != null)
       return (Path) path;

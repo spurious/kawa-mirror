@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  FixupHtmlToc.java \
   GeneralHashTable.java \
   HashNode.java \
   RangeTable.java

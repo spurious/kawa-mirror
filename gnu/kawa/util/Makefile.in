@@ -215,6 +215,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
 java_sources = \
+  FixupHtmlToc.java \
   GeneralHashTable.java \
   HashNode.java \
   RangeTable.java

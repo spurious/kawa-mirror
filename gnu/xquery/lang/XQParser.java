@@ -1616,8 +1616,7 @@ public class XQParser extends Lexer
       {
         // FIXME old code tweaked line/column
         // as in:
-        // exp.setFile(getName());
-        // exp.setLine(startLine, startColumn - 3);
+        // maybeSetLine(exp, startLine, startColumn - 3);
 
       case IF_LPAREN_TOKEN:
         return parseIfExpr();
@@ -2082,8 +2081,7 @@ public class XQParser extends Lexer
 	    int saveSawLast = seenLast;
 	    getRawToken();
 	    LambdaExp lexp = new LambdaExp(3);
-	    lexp.setFile(getName());
-	    lexp.setLine(startLine, startColumn);
+            maybeSetLine(lexp, startLine, startColumn);
 	    Declaration dot = lexp.addDeclaration(DOT_VARNAME);
             if (axis >= 0)
               dot.setType(NodeType.anyNodeTest);
@@ -2119,8 +2117,7 @@ public class XQParser extends Lexer
 	    boolean sawPosition = seenPosition > saveSeenPosition;
 	    boolean sawLast = seenLast > saveSeenLast;
 	    */
-	    cond.setFile(getName());
-	    cond.setLine(startLine, startColumn);
+	    maybeSetLine(cond, startLine, startColumn);
 	    comp.pop(lexp);
 	    lexp.body = cond;
 	    getRawToken();
@@ -2372,8 +2369,7 @@ public class XQParser extends Lexer
 	exp = makeExprSequence(exp, parseExpr());
 
       }
-    exp.setFile(getName());
-    exp.setLine(startLine, startColumn);
+    maybeSetLine(exp, startLine, startColumn);
     popNesting(saveReadState);
     errorIfComment = saveErrorIfComment;
     return exp;
@@ -2605,8 +2601,7 @@ public class XQParser extends Lexer
 	      args[i] = (Expression) vec.elementAt(vecSize + i);
 	    vec.setSize(vecSize);
 	    ApplyExp aexp = new ApplyExp(makeAttr, args);
-	    aexp.setFile(getName());
-	    aexp.setLine(startLine, startColumn);
+	    maybeSetLine(aexp, startLine, startColumn);
 	    vec.addElement(aexp);
 	  }
       }
@@ -2886,8 +2881,7 @@ public class XQParser extends Lexer
 	else 
 	  {
 	    exp = parseXMLConstructor(next, false);
-	    exp.setFile(getName());
-	    exp.setLine(startLine, startColumn);
+            maybeSetLine(exp, startLine, startColumn);
 	  }
         break;
 
@@ -2947,9 +2941,7 @@ public class XQParser extends Lexer
 	ReferenceExp rexp = new ReferenceExp(name, null);
 	rexp.setProcedureName(true);
 	exp = new ApplyExp(rexp, args);
-
-	exp.setFile(getName());
-	exp.setLine(startLine, startColumn);
+        maybeSetLine(exp, startLine, startColumn);
 	popNesting(save);
         break;
 
@@ -3036,8 +3028,7 @@ public class XQParser extends Lexer
         args = new Expression[vec.size()];
         vec.copyInto(args);
         exp = new ApplyExp(func, args);
-        exp.setFile(getName());
-        exp.setLine(startLine, startColumn);
+        maybeSetLine(exp, startLine, startColumn);
         if (token == DOCUMENT_TOKEN || token == ELEMENT_TOKEN)
           exp = wrapWithBaseUri(exp);
         break;
@@ -3132,8 +3123,7 @@ public class XQParser extends Lexer
     if (name == null)
       return null;
     Declaration decl = new Declaration(name);
-    decl.setFile(getName());
-    decl.setLine(getLineNumber() + 1,
+    maybeSetLine(decl, getLineNumber() + 1,
 		 getColumnNumber() + 1 - tokenBufferLength);
     return decl;
   }
@@ -3218,8 +3208,7 @@ public class XQParser extends Lexer
         getRawToken();
 
         LambdaExp lexp = new LambdaExp(flworDeclsCount-flworDeclsFirst);
-        //lexp.setFile(getName());
-        //lexp.setLine(declLine, declColumn);
+        //maybeSetLine(lexp, declLine, declColumn);
         for (int i = flworDeclsFirst;  i < flworDeclsCount;  i++)
           lexp.addDeclaration(flworDecls[i].getSymbol());
         comp.push(lexp);
@@ -3394,8 +3383,7 @@ public class XQParser extends Lexer
           body = parseExprSingle();
 	if (cond != null)
           body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
-	body.setFile(getName());
-	body.setLine(bodyLine, bodyColumn);
+	maybeSetLine(body, bodyLine, bodyColumn);
       }
     comp.pop(sc);
     if (isFor)
@@ -3462,8 +3450,7 @@ public class XQParser extends Lexer
 	if (sawSatisfies)
 	  getRawToken();
 	body = parseExprSingle();
-	body.setFile(getName());
-	body.setLine(bodyLine, bodyColumn);
+	maybeSetLine(body, bodyLine, bodyColumn);
       }
     comp.pop(lexp);
     lexp.body = body;
@@ -3506,8 +3493,7 @@ public class XQParser extends Lexer
       return syntaxError("missing parameter list:"+curToken);
     getRawToken();
     LambdaExp lexp = new LambdaExp();
-    lexp.setFile(getName());
-    lexp.setLine(declLine, declColumn);
+    maybeSetLine(lexp, declLine, declColumn);
     lexp.setName(name);
     Declaration decl = comp.currentScope().addDeclaration(sym);
     if (comp.isStatic())
@@ -3515,8 +3501,7 @@ public class XQParser extends Lexer
     lexp.setFlag(LambdaExp.OVERLOADABLE_FIELD);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
-    decl.setFile(getName());
-    decl.setLine(declLine, declColumn);
+    maybeSetLine(decl, declLine, declColumn);
     comp.push(lexp);
     if (curToken != ')')
       {
@@ -3723,8 +3708,7 @@ public class XQParser extends Lexer
 	exp = parseFunctionDefinition(declLine, declColumn);
 	popNesting(save);
 	parseSeparator();
-	exp.setFile(getName());
-	exp.setLine(startLine, startColumn);
+        maybeSetLine(exp, startLine, startColumn);
         seenDeclaration = true;
 	return exp;
 
@@ -3773,8 +3757,7 @@ public class XQParser extends Lexer
                 type==null ? QuoteExp.nullExp : type
               };
             init = new ApplyExp(getExternalFunction, args);
-            init.setFile(getName());
-            init.setLine(curLine, curColumn);
+            maybeSetLine(init, curLine, curColumn);
             getRawToken();
 	  }
 	else
@@ -3790,8 +3773,7 @@ public class XQParser extends Lexer
           init = Convert.makeCoercion(init, type);
         decl.noteValue(init);
 	exp = SetExp.makeDefinition(decl, init);
-	exp.setFile(getName());
-	exp.setLine(startLine, startColumn);
+	maybeSetLine(exp, startLine, startColumn);
         seenDeclaration = true;
 	return exp;
 
@@ -4197,8 +4179,7 @@ public class XQParser extends Lexer
     exp = parseExprSequence(EOF_TOKEN, true);
     if (curToken == EOL_TOKEN)
       unread('\n');
-    exp.setFile(getName());
-    exp.setLine(startLine, startColumn);
+    maybeSetLine(exp, startLine, startColumn);
     return exp;
   }
 
@@ -4357,5 +4338,25 @@ public class XQParser extends Lexer
   {
     if (warnOldVersion || comp.isPedantic())
       error(comp.isPedantic() ? 'e' : 'w', message);
+  }
+
+  public void maybeSetLine (Expression exp, int line, int column)
+  {
+    String file = getName();
+    if (file != null)
+      {
+        exp.setFile(file);
+	exp.setLine(line, column);
+      }
+  }
+
+  public void maybeSetLine (Declaration decl, int line, int column)
+  {
+    String file = getName();
+    if (file != null)
+      {
+        decl.setFile(file);
+	decl.setLine(line, column);
+      }
   }
 }

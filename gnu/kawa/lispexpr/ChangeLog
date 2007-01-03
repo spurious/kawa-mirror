@@ -1,5 +1,8 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* LangObjType.java: Extens ObjectType rather than ClassType.
+	(compare, getMethod): New methods.
+
 	* ReadTable.java (getReaderCtor): Generalize from Procedure to Object.
 	* ReaderDispatchMisc.java (read): For "#," allow Type for
 	constructor function.

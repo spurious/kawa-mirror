@@ -4,7 +4,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.*;
 
-public class LangObjType extends ClassType implements TypeValue
+public class LangObjType extends ObjectType implements TypeValue
 {
   final int typeCode;
   private static final int PATH_TYPE_CODE = 1;
@@ -29,6 +29,17 @@ public class LangObjType extends ClassType implements TypeValue
   }
 
   ClassType implementationType;
+
+  public int compare(Type other)
+  {
+    return getImplementationType().compare(other);
+  }
+
+  public int getMethods (Filter filter, int searchSupers,
+                         java.util.Vector result, String context)
+  {
+    return implementationType.getMethods(filter, searchSupers, result, context);
+  }
 
   public java.lang.Class getReflectClass()
   {

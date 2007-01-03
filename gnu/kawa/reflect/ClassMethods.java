@@ -91,7 +91,7 @@ public class ClassMethods extends Procedure2
    * @param caller if non-null, check that methods are accessible in it.
    * @return an array containing the methods.
    */
-  public static PrimProcedure[] getMethods(ClassType dtype, String mname,
+  public static PrimProcedure[] getMethods(ObjectType dtype, String mname,
                                            char mode,
                                            ClassType caller,
                                            Language language)
@@ -169,7 +169,7 @@ public class ClassMethods extends Procedure2
    * @param mode one of 'P' (use invokespecial). 'V' (require this argument
    *  even if method is static), or '\0' (otherwise).
    */
-  public static MethodProc apply(ClassType dtype, String mname,
+  public static MethodProc apply(ObjectType dtype, String mname,
                                  char mode, Language language)
   {
     PrimProcedure[] methods = getMethods(dtype, mname, mode, null, language);

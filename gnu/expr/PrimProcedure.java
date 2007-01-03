@@ -219,7 +219,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
               paramTypes[0] = method.getDeclaringClass().getOuterLinkType().getReflectClass();
 	    if (is_constructor)
 	      member = clas.getConstructor(paramTypes);
-	    else
+	    else if (method != Type.clone_method)
 	      member = clas.getMethod(method.getName(), paramTypes);
 	  }
 	Object result;
@@ -237,6 +237,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
             result = (((java.lang.reflect.Constructor) member)
                       .newInstance(args));
+          }
+        else if (method == Type.clone_method)
+          {
+            // The special Type.clone_method is only used for array types.
+            Object arr = ctx.value1;
+            Class elClass = arr.getClass().getComponentType();
+            int n = java.lang.reflect.Array.getLength(arr);
+            result = java.lang.reflect.Array.newInstance(elClass, n);
+            System.arraycopy(arr, 0, result, 0, n);
           }
 	else
 	  result = retType.coerceToObject(((java.lang.reflect.Method) member)

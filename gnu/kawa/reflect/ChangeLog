@@ -1,3 +1,10 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods, apply): Generalize from ClassType
+	to ObjectType.
+	* Invoke.java (apply, applyN, lookupMethods, selectApplicable):
+	Likewise.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inline): Fix off-by-one error.

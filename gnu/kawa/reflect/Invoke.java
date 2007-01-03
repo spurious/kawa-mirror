@@ -83,7 +83,7 @@ public class Invoke extends ProcedureN implements CanInline
         int nargs = args.length;
         Procedure.checkArgCount(this, nargs);
         Object arg0 = args[0];
-        ClassType dtype = (ClassType)
+        ObjectType dtype = (ObjectType)
           ((kind == 'S' || kind == 's') ? typeFrom(arg0, this)
            : Type.make(arg0.getClass()));
         Procedure proc = lookupMethods(dtype, args[1]);
@@ -181,7 +181,7 @@ public class Invoke extends ProcedureN implements CanInline
       {
         mname = args[1];
       }
-    MethodProc proc = lookupMethods((ClassType) dtype, mname);
+    MethodProc proc = lookupMethods((ObjectType) dtype, mname);
     if (kind != 'N')
       {
         Object[] margs = new Object[nargs-(kind == 'S' || kind == 's' ? 2 : 1)];
@@ -239,7 +239,7 @@ public class Invoke extends ProcedureN implements CanInline
     return (-1 << 12) | (kind == 'N' ? 1 : 2);
   }
 
-  protected MethodProc lookupMethods(ClassType dtype, Object name)
+  protected MethodProc lookupMethods(ObjectType dtype, Object name)
   {
     String mname;
     if (kind == 'N')
@@ -265,7 +265,7 @@ public class Invoke extends ProcedureN implements CanInline
     return proc;
   }
 
-  protected PrimProcedure[] getMethods(ClassType ctype, String mname,
+  protected PrimProcedure[] getMethods(ObjectType ctype, String mname,
                                         ClassType caller)
   {
     return ClassMethods.getMethods(ctype, mname,
@@ -276,7 +276,7 @@ public class Invoke extends ProcedureN implements CanInline
   }
 
   private static long selectApplicable(PrimProcedure[] methods,
-                                       ClassType ctype,
+                                       ObjectType ctype,
                                        Expression[] args, int margsLength, 
                                        int argsStartIndex, int objIndex)
   {
@@ -492,7 +492,7 @@ public class Invoke extends ProcedureN implements CanInline
         ClassType caller = comp == null ? null
           : comp.curClass != null ? comp.curClass
           : comp.mainClass;
-        ClassType ctype = (ClassType) type;
+        ObjectType ctype = (ObjectType) type;
         try
           {
             methods = getMethods(ctype, name, caller);

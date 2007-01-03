@@ -1,5 +1,7 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (apply): Special handling for "clone" of array.
+
 	* LitTable.java (emit): Also look for 'valueOf' for factor method.
 
 2006-12-30  Per Bothner  <per@bothner.com>

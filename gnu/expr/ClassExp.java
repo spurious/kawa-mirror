@@ -382,15 +382,6 @@ public class ClassExp extends LambdaExp
 	comp.curLambda = this;
 
 	allocFrame(comp);
-	if (getNeedsStaticLink())
-	  {
-            Variable parentFrame = saveLambda.heapFrame != null
-              ? saveLambda.heapFrame
-              : saveLambda.closureEnv;
-            if (parentFrame != null)
-              closureEnvField = staticLinkField
-                = instanceType.setOuterLink((ClassType) parentFrame.getType());
-	  }
 	CodeAttr code;
 
 	for (LambdaExp child = firstChild;  child != null; )

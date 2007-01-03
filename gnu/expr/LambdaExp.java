@@ -1066,6 +1066,25 @@ public class LambdaExp extends ScopeExp
               }
 	    child.addMethodFor(comp, closureEnvType);
 	  }
+        if (child instanceof ClassExp)
+          {
+            ClassExp cl = (ClassExp) child;
+            if (cl.getNeedsStaticLink())
+              {
+                ClassType parentFrameType;
+                if (this instanceof ModuleExp || this instanceof ClassExp)
+                  parentFrameType = (ClassType) getType();
+                else
+                  {
+                    Variable parentFrame = this.heapFrame != null
+                      ? this.heapFrame
+                      : this.closureEnv;
+                    parentFrameType = (ClassType) parentFrame.getType();
+                  }
+                cl.closureEnvField = cl.staticLinkField
+                  = cl.instanceType.setOuterLink(parentFrameType);
+              }
+          }
       }
   }
 

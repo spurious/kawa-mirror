@@ -1,3 +1,11 @@
+2007-01-03  Per Bothner  <per@bothner.com>
+
+	* classes2.scm (make-TestCapture1): New function, to test for a bug
+	reported by Margus Freudenthal <margus@cyber.ee>.
+	* obj-test.scm: Call make-TestCapture1.
+
+	* obj-test.scm (make-ClsD)L New function, to check compiled make call.
+
 2006-12-16  Per Bothner  <per@bothner.com>
 
 	* MySAXApp.java: Add printing of line:column numbers.

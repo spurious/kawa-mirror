@@ -23,6 +23,10 @@
   (let ((d :: <SimpleDateTest> (date-test-ns:new)))
     (date-test-ns:get-year d)))
 
+;; Test that we can make <TestCapture1> before <TestCapture1> is defined.
+(define (make-TestCapture1)
+  (make <TestCapture1>))
+
 (define-simple-class <TestCapture1> ()
   (z :: <integer> init: 11)
   ((ff farg)

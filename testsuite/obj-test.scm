@@ -268,7 +268,8 @@
 (test 22 'obj4-c (slot-ref obj4 'c))
 (test 44 'obj4-f (invoke obj4 'f 2))
 
-(define obj5 (make <ClsD>))
+(define (make-ClsD) (make <ClsD>))
+(define obj5 (make-ClsD))
 (test 23 'obj5-d (slot-ref obj5 'd))
 
 (define obj6 (make <ClsE>))
@@ -276,7 +277,7 @@
 (test 29 'obj6-e (slot-ref obj6 'e))
 (test 156 'obj6-f (invoke obj6 'f 7))
 
-(define test-capture-1 (make <TestCapture1>))
+(define test-capture-1 (make-TestCapture1))
 (test '(56 11 21) 'test-capture-1 ((car (invoke test-capture-1 'ff 99)) 21))
 (define test-capture-2 (make <TestCapture2>))
 (test '(56 22) 'test-capture-2 ((car (invoke test-capture-2 'ff 99)) 22))

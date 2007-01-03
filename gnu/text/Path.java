@@ -134,13 +134,6 @@ public abstract class Path
 
   public abstract long getLastModified ();
  
-  public Path resolve (Path relative)
-  {
-    if (relative.isAbsolute())
-      return relative;
-    return resolve(relative.toString());
-  }
-
   public abstract String getScheme ();
 
   public String getAuthority ()
@@ -184,7 +177,14 @@ public abstract class Path
   /* #endif */
   public String toURIString () { return toURI().toString(); }
 
-  // FIXME merge in URI_urils.toFileOrURL(Object) functionality.  FIXME.
+  public Path resolve (Path relative)
+  {
+    if (relative.isAbsolute())
+      return relative;
+    return resolve(relative.toString());
+  }
+
+  // FIXME merge in URI_utils.toFileOrURL(Object) functionality.  FIXME.
   public abstract Path resolve (String relative);
 
   public static InputStream openInputStream (Object uri) throws IOException

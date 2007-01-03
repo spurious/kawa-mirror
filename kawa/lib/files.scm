@@ -22,8 +22,7 @@
   (let ((s (p:getUserInfo)))
     (if (eq? s #!null) #f (<string> s))))
 (define (path-host (p :: path))
-  (let ((s (p:getHost)))
-    (if (eq? s #!null) #f (<string> s))))
+  (p:getHost))
 (define (path-path (p :: path))
   (let ((s (p:getPath)))
     (if (eq? s #!null) #f (<string> s))))
@@ -113,8 +112,8 @@
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
 
-(define (resolve-uri uri base) :: path
-  (gnu.text.URIPath:resolve uri base))
+(define (resolve-uri (uri :: path) (base :: path)) :: path
+  (base:resolve uri))
 
 (define-syntax module-uri
   (lambda (form)

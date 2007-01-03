@@ -1,5 +1,9 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* files.scm (path-query): Fix copy-paste thinko.
+
+	* files.scm (resolve-uri): Fix implementation.
+
 	* file.scm (path?, filepath?, URI?, absolute-path? path-scheme,
 	path-authority, path-user-info, path-host, path-port, path-path,
 	path-fragment, path-query): New functions.

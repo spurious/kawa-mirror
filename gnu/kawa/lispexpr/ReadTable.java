@@ -150,10 +150,10 @@ public class ReadTable extends RangeTable
   }
 
   /** Resolve a SRFI-10 constructor tags to a functions. */
-  public synchronized Procedure getReaderCtor (String key)
+  public synchronized Object getReaderCtor (String key)
   {
     initCtorTable();
-    return (Procedure) ctorTable.get(key, null);
+    return ctorTable.get(key, null);
   }
 
   public static ReadTable getCurrent()

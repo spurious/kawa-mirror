@@ -6,6 +6,7 @@ import gnu.text.*;
 import gnu.mapping.InPort;
 import gnu.mapping.Values;
 import gnu.mapping.Procedure;
+import gnu.bytecode.Type;
 import gnu.lists.*;
 
 public class ReaderDispatchMisc extends ReadTableEntry
@@ -112,23 +113,31 @@ public class ReaderDispatchMisc extends ReadTableEntry
             && ((Pair) list).car instanceof String)
           {
             name = (String) ((Pair) list).car;
-            Procedure proc = ReadTable.getCurrent().getReaderCtor(name);
+            Object proc = ReadTable.getCurrent().getReaderCtor(name);
             if (proc == null)
               in.error("unknown reader constructor "+name);
+            else if (! (proc instanceof Procedure || proc instanceof Type))
+              in.error("reader constructor must be procedure or type name");
             else
               {
-                length--;  // Subtract 1 for the consrutcor name.
-                Object[] args = new Object[length];
+                length--;  // Subtract 1 for the constructor name.
+                int parg = proc instanceof Type ? 1 : 0;
+                Object[] args = new Object[parg+length];
                 Object argList = ((Pair) list).cdr;
                 for (int i = 0;  i < length;  i++)
                   {
                     Pair pair = (Pair) argList;
-                    args[i] = pair.car;
+                    args[parg+i] = pair.car;
                     argList = pair.cdr;
                   }
                 try
                   {
-                    return proc.applyN(args);
+                    if (parg > 0)
+                      {
+                        args[0] = proc;
+                        return gnu.kawa.reflect.Invoke.make.applyN(args);
+                      }
+                    return ((Procedure) proc).applyN(args);
                   }
                 catch (Throwable ex)
                   {

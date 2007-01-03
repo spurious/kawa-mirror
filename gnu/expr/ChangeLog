@@ -1,5 +1,7 @@
 2007-01-03  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): If no url given, use Path.currentPath.
+
 	* LambdaExp.java (allocChildMethods): For non-static ClassExp do
 	setOuterLink here, so we can call constructor before class is compiled.
 	* ClassExp.java (compile): Don't setOuterLink here any more.

@@ -3951,9 +3951,9 @@ public class XQParser extends Lexer
             if (! Path.uriSchemeSpecified(collation))
               {
                 String base = getStaticBaseUri();
-                if (base == null)
-                  base = CallContext.getInstance().getBaseUri();
-                collation = URI_utils.resolve(collation, base).toString();
+                Path basePath = base == null ? Path.currentPath()
+                  : Path.valueOf(base);
+                collation = basePath.resolve(collation).toString();
               }
 	    defaultCollator = NamedCollator.make(collation);
 	  }

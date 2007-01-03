@@ -55,11 +55,7 @@ public class ModuleExp extends LambdaExp
       {
 	ArrayClassLoader loader = new ArrayClassLoader ();
         if (url == null)
-          {
-            CallContext ctx = CallContext.getInstance();
-            String base = ctx.getBaseUri();
-            url = URI_utils.toURL(base);
-          }
+          url = Path.currentPath().toURL();
         loader.setResourceContext(url);
 	comp.loader = loader;
 

@@ -564,7 +564,10 @@ public class LitTable implements ObjectOutput
 	// non-existing, because the corresponding reflective Class
 	// needs to be loaded using the correct ClassLoader.
 	comp.loadClassRef((ClassType) literal.value);
-	code.emitInvokeStatic(Compilation.typeType.getDeclaredMethod("make", 1));
+        Method meth = Compilation.typeType.getDeclaredMethod("valueOf", 1);
+        if (meth == null)
+          meth = Compilation.typeType.getDeclaredMethod("make", 1);
+	code.emitInvokeStatic(meth);
 	code.emitCheckcast(Compilation.typeClassType);
 	store(literal, ignore, code);
       }
@@ -576,8 +579,10 @@ public class LitTable implements ObjectOutput
 	boolean makeStatic = false;
 	if (! useDefaultInit)
 	  {
-	    // look for matching "make" method;
-	    method = getMethod(type, "make", literal, true);
+	    // look for matching "valueOf" or "make" method;
+	    method = getMethod(type, "valueOf", literal, true);
+            if (method == null)
+              method = getMethod(type, "make", literal, true);
 	    // otherwise look for matching constructor;
 	    if (method != null)
 	      makeStatic = true;

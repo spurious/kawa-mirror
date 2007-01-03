@@ -2,6 +2,7 @@ package gnu.jemacs.buffer;
 import gnu.mapping.*;
 import gnu.expr.Language;
 import java.io.*;
+import gnu.text.*;
 
 public class ReplMode extends ProcessMode
 {
@@ -22,7 +23,7 @@ public class ReplMode extends ProcessMode
     err = new OutPort(processWriter, true, true);
     PipedReader preader = new PipedReader();
     toInferior = new PipedWriter(preader);
-    in = new TtyInPort(preader, "<stdin>", out);
+    in = new TtyInPort(preader, Path.valueOf("/dev/stdin"), out);
     thread = new Future (new kawa.repl(language),
 			 environment, in, out, err);
     thread.setPriority(Thread.currentThread().getPriority() + 1);

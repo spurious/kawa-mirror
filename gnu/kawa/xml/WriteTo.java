@@ -5,7 +5,7 @@ package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.xml.*;
 import java.io.*;
-import gnu.text.URI_utils;
+import gnu.text.Path;
 
 /** Write a value to a named file. */
 
@@ -16,27 +16,29 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
   public static final WriteTo writeToIfChanged = new WriteTo();
   static { writeToIfChanged.ifChanged = true; }
 
-  public static void writeTo(Object value, Object fileName) throws Throwable
+  public static void writeTo(Object value, Object path) throws Throwable
   {
-    OutputStream outs = URI_utils.getOutputStream(fileName);
-    OutPort out = new OutPort(outs, fileName);
+    Path ppath = Path.valueOf(path);
+    OutputStream outs = ppath.openOutputStream();
+    OutPort out = new OutPort(outs, ppath);
     XMLPrinter consumer = new XMLPrinter(out, false);
     Values.writeValues(value, consumer);
     out.close();
   }
 
-  public static void writeToIfChanged (Object value, Object filename)
+  public static void writeToIfChanged (Object value, Object path)
     throws Throwable
   {
+    Path ppath = Path.valueOf(path);
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    OutPort out = new OutPort(bout, filename);
+    OutPort out = new OutPort(bout, ppath);
     XMLPrinter consumer = new XMLPrinter(out, false);
     Values.writeValues(value, consumer);
     out.close();
     byte[] bbuf = bout.toByteArray();
     try
       {
-        InputStream ins = new BufferedInputStream(URI_utils.getInputStream(filename));
+        InputStream ins = new BufferedInputStream(ppath.openInputStream());
         for (int i = 0;  ; )
           {
             int b = ins.read();
@@ -58,7 +60,7 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
         // fall through
       }
     OutputStream fout
-      = new BufferedOutputStream(URI_utils.getOutputStream(filename));
+      = new BufferedOutputStream(ppath.openOutputStream());
     fout.write(bbuf);
     fout.close();
   }

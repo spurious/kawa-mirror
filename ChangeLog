@@ -1,3 +1,13 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* kawa/GuiConsole.java (<init>): Update to use Path.
+	* kawa/TelnetRepl.java (serve): Likewise.
+	* kawa/GuiInPort.java (<init>): Likewise.
+	* kawa/standard/load.java (apply): Generalize from String name.
+	(apply2); Update accordingly.
+	* kawa/standard/require.java (lookupModuleFromSourcePath): Allow
+	base name (i.e. current getFileName() result) to be null.
+
 2006-12-30  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): Use InetAddress.getByName(null)

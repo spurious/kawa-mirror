@@ -3,6 +3,7 @@ package kawa;
 import java.awt.*;
 import java.awt.event.*;
 import gnu.mapping.*;
+import gnu.text.Path;
 
 import gnu.expr.Language;
 import kawa.standard.Scheme;
@@ -50,9 +51,12 @@ public class GuiConsole extends Frame implements ActionListener {
     window_number++;
     kawa.repl.exitIncrement();
 
-    out_p = new OutPort(message.getStdout(), true, "<msg_stdout>");
-    err_p = new OutPort(message.getStderr(), true, "<msg_stderr>");
-    InPort in_p = new GuiInPort(in_r, "<msg_stdin>", out_p, message);
+    out_p = new OutPort(message.getStdout(), true,
+                        Path.valueOf("<msg_stdout>"));
+    err_p = new OutPort(message.getStderr(), true,
+                        Path.valueOf("<msg_stderr>"));
+    InPort in_p = new GuiInPort(in_r, Path.valueOf("<msg_stdin>"),
+                                out_p, message);
 
     this.setLayout(new BorderLayout(0,0));
 

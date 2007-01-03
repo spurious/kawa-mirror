@@ -1,3 +1,8 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (openReader): Update to use getPath.
+	* MarkerReader.java (<init>): Likewise.
+
 2005-12-11  Per Bothner  <per@bothner.com>
 
 	* BufferReader.java: Moved to gnu.jemacs.buffer.

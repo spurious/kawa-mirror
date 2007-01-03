@@ -191,7 +191,9 @@ public class require extends Syntax
     ModuleManager manager = ModuleManager.getInstance();
     try
       {
-        sourceName = URI_utils.resolve(sourceName, defs.getFileName()).toString();
+        String baseName = defs.getFileName();
+        if (baseName != null)
+          sourceName = URI_utils.resolve(sourceName, baseName).toString();
       }
     catch (java.net.URISyntaxException ex)
       {

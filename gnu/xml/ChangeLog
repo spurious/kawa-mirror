@@ -1,3 +1,8 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (<init>): Update to take Path.
+	* XMLParser.java: Update to use gnu.text.Path.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java: Change handling of encoding detection.

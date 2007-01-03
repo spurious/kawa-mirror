@@ -9,7 +9,7 @@ import gnu.lists.*;
 
 public class OutPort extends PrintConsumer implements Printable
 {
-  Object name;
+  Path path;
   private Writer base;
 
   // To keep track of column-numbers, we use a helper class.
@@ -50,10 +50,10 @@ public class OutPort extends PrintConsumer implements Printable
   }
 
   public OutPort(Writer base, boolean printPretty,
-		 boolean autoflush, Object name)
+		 boolean autoflush, Path path)
   {
     this(base, new PrettyWriter(base, printPretty), autoflush);
-    this.name = name;
+    this.path = path;
   }
 
   public OutPort (OutputStream out)
@@ -61,9 +61,9 @@ public class OutPort extends PrintConsumer implements Printable
     this (out, null);
   }
 
-  public OutPort (OutputStream out, Object name)
+  public OutPort (OutputStream out, Path path)
   {
-    this(new OutputStreamWriter(out), true, name);
+    this(new OutputStreamWriter(out), true, path);
   }
 
   public OutPort (Writer out)
@@ -74,23 +74,23 @@ public class OutPort extends PrintConsumer implements Printable
          false);
   }
 
-  public OutPort (Writer base, Object name)
+  public OutPort (Writer base, Path path)
   {
     this(base, false, false);
-    this.name = name;
+    this.path = path;
   }
 
-  public OutPort (Writer base, boolean autoflush, Object name)
+  public OutPort (Writer base, boolean autoflush, Path path)
   {
     this (base, false, autoflush);
-    this.name = name;
+    this.path = path;
   }
 
   public boolean printReadable;
 
-  static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
+  static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, Path.valueOf("/dev/stdout"));
 
-  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
+  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, Path.valueOf("/dev/stderr"));
 
   public static final ThreadLocation outLocation
     = new ThreadLocation("out-default");
@@ -122,7 +122,8 @@ public class OutPort extends PrintConsumer implements Printable
     throws java.io.IOException
   {
       Object conv = Environment.user().get("port-char-encoding");
-      java.io.OutputStream strm = URI_utils.getOutputStream(fname);
+      Path path = Path.valueOf(fname);
+      java.io.OutputStream strm = path.openOutputStream();
       strm = new java.io.BufferedOutputStream(strm);
       java.io.Writer wr;
       if (conv == null || conv == Boolean.TRUE)
@@ -133,7 +134,7 @@ public class OutPort extends PrintConsumer implements Printable
 	    conv = "8859_1";
 	  wr = new java.io.OutputStreamWriter(strm, conv.toString());
 	}
-      return new OutPort(wr, fname);
+      return new OutPort(wr, path);
   }
 
   public void echo (char[] buf, int off, int len)  throws java.io.IOException
@@ -244,10 +245,10 @@ public class OutPort extends PrintConsumer implements Printable
   public void print (Consumer out)
   {
     out.write("#<output-port");
-    if (name != null)
+    if (path != null)
       {
 	out.write(' ');
-	out.write(name.toString());
+	out.write(path.toString());
       }
     out.write('>');
   }

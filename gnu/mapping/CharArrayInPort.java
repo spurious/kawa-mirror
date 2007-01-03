@@ -1,5 +1,6 @@
 package gnu.mapping;
-import gnu.text.NullReader;
+import gnu.text.*;
+import gnu.lists.Consumer;
 
 /** An Inport for reading from a char array.
   * Essentially the same as an InPort wrapped around a CharArrayReader, but
@@ -7,9 +8,11 @@ import gnu.text.NullReader;
 
 public class CharArrayInPort extends InPort
 {
+  static final Path stringPath = Path.valueOf("<string>");
+
   public CharArrayInPort (char[] buffer, int len)
   {
-    super(NullReader.nullReader, "<string>");
+    super(NullReader.nullReader, stringPath);
     try
       {
 	setBuffer(buffer);

@@ -1,3 +1,13 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (filename): Rename and change type of field ...
+	 (path): ... to Path.
+	(getPath, setPath): New methods.
+	(getFileName, setFileName): Update to get/set path field.
+	(save): Update to use path. 
+	* BufferReader.java (<init>): Update to use path.
+	* ReplMode.java (<init>): Likewise. 
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Simplify - we use '$JAVA kawa.repl' rather than $KAWA1.

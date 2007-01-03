@@ -1,6 +1,7 @@
 package kawa;
 import gnu.expr.*;
 import gnu.mapping.*;
+import gnu.text.*;
 
 public class TelnetRepl extends Procedure0
 {
@@ -45,8 +46,8 @@ public class TelnetRepl extends Procedure0
     Telnet conn = new Telnet(client, true);
     java.io.OutputStream sout = conn.getOutputStream();
     java.io.InputStream sin = conn.getInputStream();
-    OutPort out = new OutPort(sout);
-    TtyInPort in = new TtyInPort(sin, "<stdin>", out);
+    OutPort out = new OutPort(sout, FilePath.valueOf("/dev/stdout"));
+    TtyInPort in = new TtyInPort(sin, FilePath.valueOf("/dev/stdin"), out);
     /*
     conn.request(Telnet.DO, Telnet.EOF);
     conn.request(Telnet.DO, Telnet.NAWS);

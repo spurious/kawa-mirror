@@ -2,6 +2,7 @@ package kawa;
 
 import java.io.Reader;
 import gnu.mapping.*;
+import gnu.text.Path;
 
 /** A TtyInPort that reads from a MessageArea.
   */
@@ -10,9 +11,9 @@ class GuiInPort extends TtyInPort
 {
   MessageArea buffer;
 
-  public GuiInPort (Reader in, String name, OutPort tie, MessageArea buffer)
+  public GuiInPort (Reader in, Path path, OutPort tie, MessageArea buffer)
   {
-    super (in, name, tie);
+    super (in, path, tie);
     this.buffer = buffer;
   }
 

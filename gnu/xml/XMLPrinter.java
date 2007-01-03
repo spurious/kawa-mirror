@@ -4,7 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
-import gnu.text.Char;
+import gnu.text.*;
 import gnu.math.RealNum;
 import gnu.text.PrettyWriter;
 import gnu.mapping.OutPort;
@@ -105,9 +105,9 @@ public class XMLPrinter extends OutPort
     super(new OutputStreamWriter(out), false, false);
   }
 
-  public XMLPrinter (OutputStream out, String fname)
+  public XMLPrinter (OutputStream out, Path path)
   {
-    super(new OutputStreamWriter(out), true, false, fname);
+    super(new OutputStreamWriter(out), true, false, path);
   }
 
   public static XMLPrinter make(OutPort out, Object style)

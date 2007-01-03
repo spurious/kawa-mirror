@@ -10,7 +10,7 @@ public class CharArrayOutPort extends OutPort
 {
   public CharArrayOutPort()
   {
-    super(null, false, "<string>");
+    super(null, false, CharArrayInPort.stringPath);
   }
 
   public int length ()

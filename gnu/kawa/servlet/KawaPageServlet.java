@@ -148,7 +148,7 @@ public class KawaPageServlet extends KawaServlet
         return null;
       }
     InPort port = new InPort(resourceStream,
-                             path.substring(path.lastIndexOf('/')+1));
+                             URIPath.valueOf(path.substring(path.lastIndexOf('/')+1)));
     Language.setDefaultLanguage(language);
     SourceMessages messages = new SourceMessages();
     Compilation comp;

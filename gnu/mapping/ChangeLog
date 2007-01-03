@@ -1,3 +1,16 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* InPort.java: Use Path object for "filename".
+	(<init>, openFile): Update accordingly.
+	* OutPort.java: Likewise.
+	* TtyInPort.java: Likewise.
+	* CharArrayInPort.java (stringPath): New Path constant.
+	(<init>): Set "filename" to stringPath.
+	* CharArrayOutPort.java: Likewise.
+
+	* InPort.java (systemInPort): Use "/dev/stdin" instead of "<stdin>".
+	* OutPort.java: Similarly use "/dev/stdout" and "/dev/stderr".
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* InPort.java (uriSchemeSpecified, uriSchemeLength): Methods moved

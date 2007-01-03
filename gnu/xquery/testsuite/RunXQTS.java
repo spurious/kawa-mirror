@@ -162,7 +162,7 @@ public class RunXQTS extends FilterConsumer
             System.err.println("catalog: "+runner.catalog);
             XMLPrinter xqlog
               = new XMLPrinter(new BufferedOutputStream(new FileOutputStream(runner.logFileName)),
-                               runner.logFileName);
+                               FilePath.valueOf(runner.logFileName));
             runner.xqlog = xqlog;
             xqlog.setPrintXMLdecl(true);
             xqlog.setStyle("xml");

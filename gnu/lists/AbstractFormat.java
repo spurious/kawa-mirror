@@ -1,6 +1,7 @@
 package gnu.lists;
 import gnu.mapping.*;
 import java.text.FieldPosition;
+import gnu.text.Path;
 
 public abstract class AbstractFormat extends java.text.Format
 {
@@ -90,7 +91,7 @@ public abstract class AbstractFormat extends java.text.Format
       writeObject(obj, (Consumer) out);
     else
       {
-	OutPort port = new OutPort(out, false, true, "<unknown>");
+	OutPort port = new OutPort(out, false, true);
 	writeObject(obj, (Consumer) out);
 	port.close();
       }

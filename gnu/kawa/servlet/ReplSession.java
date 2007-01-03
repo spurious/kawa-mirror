@@ -121,10 +121,10 @@ public class ReplSession extends Writer
     penvironment = Environment.getCurrent();
     qreader = new QueueReader();
 
-    out_p = new OutBufferWriter(this, 'O', "<stdout>");
-    err_p = new OutBufferWriter(this, 'E', "<stderr>");
-    prompt_p = new OutBufferWriter(this, 'P', "<prompt>");
-    in_p = new MyTtyInPort(qreader, "<stdin>", out_p, this);
+    out_p = new OutBufferWriter(this, 'O', Path.valueOf("/dev/stdout"));
+    err_p = new OutBufferWriter(this, 'E', Path.valueOf("/dev/stderr>"));
+    prompt_p = new OutBufferWriter(this, 'P', Path.valueOf("/dev/prompt"));
+    in_p = new MyTtyInPort(qreader, Path.valueOf("/dev/stdin"), out_p, this);
 
     thread = new Future (new kawa.repl(language),
                          penvironment, in_p, out_p, err_p);
@@ -147,10 +147,10 @@ class MyTtyInPort extends TtyInPort
 {
   ReplSession session;
   OutBufferWriter prompt_p;
-  public MyTtyInPort (Reader in, String name, OutPort tie,
+  public MyTtyInPort (Reader in, Path path, OutPort tie,
                       ReplSession session)
   {
-    super(in, name, tie);
+    super(in, path, tie);
     this.session = session;
     this.prompt_p = session.prompt_p;
   }
@@ -203,9 +203,9 @@ class OutBufferWriter extends OutPort
   int nesting = 0;
   XMLPrinter xout;
 
-  public OutBufferWriter (ReplSession session, char kind, String name)
+  public OutBufferWriter (ReplSession session, char kind, Path path)
   {
-    super(session, false, true, name);
+    super(session, false, true, path);
     this.session = session;
     this.kind = kind;
     xout = new XMLPrinter(bout, true);

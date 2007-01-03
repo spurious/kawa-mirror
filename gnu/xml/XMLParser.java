@@ -2,7 +2,7 @@ package gnu.xml;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
-import gnu.text.URI_utils;
+import gnu.text.Path;
 /* #ifdef use:java.nio */
 import java.nio.charset.*;
 /* #endif */
@@ -54,7 +54,7 @@ public class XMLParser
   public static void parse (Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    parse(URI_utils.getInputStream(uri), uri, messages, out);
+    parse(Path.openInputStream(uri), uri, messages, out);
   }
 
   public static LineInputStreamReader XMLStreamReader (InputStream strm)
@@ -143,7 +143,7 @@ public class XMLParser
     filter.setMessages(messages);
     filter.setSourceLocator(in);
     filter.startDocument();
-    Object uri = in.getURI();
+    Object uri = in.getPath();
     if (uri != null)
       filter.writeDocumentUri(uri);
     parse(in, filter);
@@ -156,7 +156,7 @@ public class XMLParser
     filter.setMessages(messages);
     filter.setSourceLocator(in);
     filter.startDocument();
-    Object uri = in.getURI();
+    Object uri = in.getPath();
     if (uri != null)
       filter.writeDocumentUri(uri);
     parse(in, filter);

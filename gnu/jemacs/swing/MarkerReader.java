@@ -21,7 +21,7 @@ public class MarkerReader extends InPort
 
   MarkerReader(Buffer buffer, Marker marker)
   {
-    super(gnu.text.NullReader.nullReader, buffer.getName());
+    super(gnu.text.NullReader.nullReader, buffer.getPath());
     this.marker = marker;
     content = ((gnu.jemacs.swing.SwingBuffer) buffer).content.buffer;
     this.buffer = content.getArray();

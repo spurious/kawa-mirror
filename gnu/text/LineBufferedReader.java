@@ -115,7 +115,7 @@ public class LineBufferedReader extends Reader
     */
   private int lineStartPos;
 
-  Object name;
+  Path path;
 
   /** The current line number (at position of lineStartPos). */
   protected int lineNumber;
@@ -377,20 +377,24 @@ public class LineBufferedReader extends Reader
     return len;
   }
 
-  /** Should return a URI or a String. */
-  public Object getURI ()
+  public Path getPath ()
   {
-    return name;
+    return path;
+  }
+
+  public void setPath (Path path)
+  {
+    this.path = path;
   }
 
   public String getName ()
   {
-    return name == null ? null : name.toString();
+    return path == null ? null : path.toString();
   }
 
   public void setName (Object name)
   {
-    this.name = name;
+    setPath(Path.valueOf(name));
   }
 
   /** Get the current line number.

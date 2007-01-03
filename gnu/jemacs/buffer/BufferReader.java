@@ -2,6 +2,7 @@ package gnu.jemacs.buffer;
 import gnu.mapping.*;
 import java.io.*;
 import gnu.lists.CharBuffer;
+import gnu.text.*;
 
 public class BufferReader extends InPort
 {
@@ -9,9 +10,9 @@ public class BufferReader extends InPort
   int rangeStart;
   int rangeLength;
 
-  public BufferReader(CharBuffer content, String name, int start, int count)
+  public BufferReader(CharBuffer content, Path path, int start, int count)
   {
-    super(gnu.text.NullReader.nullReader, name);
+    super(gnu.text.NullReader.nullReader, path);
     this.content = content;
     buffer = content.getArray();
     rangeStart = start;

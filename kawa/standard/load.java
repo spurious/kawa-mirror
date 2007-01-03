@@ -135,10 +135,9 @@ public class load extends Procedure1 {
     return apply2 (arg1, Environment.getCurrent ());
   }
 
-  public final Object apply2 (Object arg1, Object arg2)
+  public final Object apply2 (Object name, Object arg2)
     throws Throwable
   {
-    String name = arg1.toString();
     try
       {
 	Environment env = (Environment) arg2;
@@ -156,10 +155,11 @@ public class load extends Procedure1 {
       }
   }
 
-  public static final void apply (String name, Environment env,
+  public static final void apply (Object path, Environment env,
 				  boolean relative, int skipLines)
     throws Throwable
   {
+    String name = path.toString(); // FIXME
     CallContext ctx = CallContext.getInstance();
     boolean isUri = Path.uriSchemeSpecified(name);
     // Resolve a relative URI.  However, if the base uri matches the

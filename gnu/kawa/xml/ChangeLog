@@ -1,3 +1,7 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* WriteTo.java: Update to use Path rather than URI_utils.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (anyURIType): Implement using gnu.text.Path.

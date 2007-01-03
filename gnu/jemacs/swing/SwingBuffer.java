@@ -294,7 +294,7 @@ public class SwingBuffer extends Buffer
 
   public InPort openReader (int start, int count)
   {
-    return new BufferReader(content.buffer, getName(), start, count);
+    return new BufferReader(content.buffer, getPath(), start, count);
   }
 
   /**

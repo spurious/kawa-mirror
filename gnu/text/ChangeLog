@@ -1,5 +1,11 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* LineBufferedReader.java (name): Rename and change field type to ...
+	(path): new field.
+	(getPath, setPath): New methods.
+	(getName, setName): Update
+	(getURI): Remove method.
+
 	* LineBufferedReader.java (readLine): Fix 3 little errors.
 
 	* URIPath.jva: Fix bad indenttain of PreProcess directive.

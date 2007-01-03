@@ -1,3 +1,7 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (main): Update to use FilePath.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (endElement): Update to use Path.valueOf.

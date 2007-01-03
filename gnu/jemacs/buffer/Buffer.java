@@ -5,13 +5,13 @@ package gnu.jemacs.buffer;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.text.Char;
+import gnu.text.*;
 import gnu.commonlisp.lang.Symbols; // FIXME
 
 public abstract class Buffer extends AbstractSequence implements CharSeq
 {
   String name;
-  String filename;
+  Path path;
   String encoding;
   //boolean modified;
 
@@ -48,16 +48,21 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
 
   public String getName() { return name; }
 
-  public String getFileName() { return filename; }
+  public Path getPath () { return path; }
+  public void setPath (Path path) { this.path = path; }
+
+  public String getFileName() { return path.toString(); }
 
   public void setFileName(String fname)
   {
+    String filename = getFileName();
     if (filename != null && fileBuffers.get(filename) == this)
       fileBuffers.remove(filename);
     if (name != null && buffers.get(name) == this)
       buffers.remove(name);
-    filename = fname;
-    name = generateNewBufferName(new java.io.File(fname).getName());
+    File file = new File(fname);
+    setPath(FilePath.valueOf(file));
+    name = generateNewBufferName(file.getName());
     buffers.put(name, this);
     fileBuffers.put(filename, this);
     redrawModeline();
@@ -382,7 +387,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
       {
 	if (encoding == null)
 	  encoding = System.getProperty("file.encoding", "UTF8");
-	Writer out = new OutputStreamWriter(new FileOutputStream(filename),
+	Writer out = new OutputStreamWriter(path.openOutputStream(),
 					    encoding);
         save(out);
         out.close();

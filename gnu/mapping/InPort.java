@@ -7,24 +7,24 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 {
   public InPort (Reader in)
   {
-    super (in);
+    super(in);
   }
 
-  public InPort (Reader in, Object name)
+  public InPort (Reader in, Path path)
   {
-    this (in);
-    setName(name);
+    this(in);
+    setPath(path);
   }
 
   public InPort (InputStream in)
   {
-    super (in);
+    super(in);
   }
 
-  public InPort (InputStream in, Object name)
+  public InPort (InputStream in, Path path)
   {
-    this (in);
-    setName(name);
+    this(in);
+    setPath(path);
   }
 
   public static Reader convertToReader (InputStream in, Object conv)
@@ -44,10 +44,10 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
     return new java.io.InputStreamReader(in);
   }
 
-  public InPort (InputStream in, Object name, Object conv)
+  public InPort (InputStream in, Path path, Object conv)
     throws java.io.UnsupportedEncodingException
   {
-    this (convertToReader(in, conv), name);
+    this (convertToReader(in, conv), path);
     if (conv == Boolean.FALSE)
       {
 	// Use a fixed-size buffer.  This prevents really-long "lines"
@@ -63,7 +63,7 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
   }
 
   private static InPort systemInPort
-    = new TtyInPort (System.in, "<stdin>", OutPort.outInitial);
+  = new TtyInPort (System.in, Path.valueOf("/dev/stdin"), OutPort.outInitial);
   public static final ThreadLocation inLocation
     = new ThreadLocation("in-default");
   static { inLocation.setGlobal(systemInPort); }
@@ -81,15 +81,16 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
   public static InPort openFile(Object fname)
     throws java.io.IOException
   {
-    java.io.InputStream strm = URI_utils.getInputStream(fname);
+    Path path = Path.valueOf(fname);
+    java.io.InputStream strm = path.openInputStream();
     strm = new java.io.BufferedInputStream(strm);
-    return openFile(strm, fname);
+    return openFile(strm, path);
   }
 
   public static InPort openFile(InputStream strm, Object fname)
     throws java.io.UnsupportedEncodingException
   {
-    return new InPort(strm, fname,
+    return new InPort(strm, Path.valueOf(fname),
 		      Environment.user().get("port-char-encoding"));
   }
 

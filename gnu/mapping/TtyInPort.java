@@ -1,5 +1,6 @@
 package gnu.mapping;
 import java.io.*;
+import gnu.text.*;
 
 /** An interactive input-port.
     Supports prompting, auto-flush of tied output port, transcripts. */
@@ -24,14 +25,14 @@ public class TtyInPort extends InPort
     this.prompter = prompter;
   }
 
-  public TtyInPort (InputStream in, String name, OutPort tie)
+  public TtyInPort (InputStream in, Path name, OutPort tie)
   {
     super(in, name);
     setConvertCR(true);
     this.tie = tie;
   }
 
-  public TtyInPort (Reader in, String name, OutPort tie)
+  public TtyInPort (Reader in, Path name, OutPort tie)
   {
     super(in, name);
     setConvertCR(true);

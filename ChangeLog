@@ -1,5 +1,9 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* kawa/ChangeLog: New file.
+
+2007-01-02  Per Bothner  <per@bothner.com>
+
 	* kawa/GuiConsole.java (<init>): Update to use Path.
 	* kawa/TelnetRepl.java (serve): Likewise.
 	* kawa/GuiInPort.java (<init>): Likewise.

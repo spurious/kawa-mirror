@@ -1,0 +1,11 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Change URI from function to type.
+	Other new types: path, filepath
+	New functions: path?, filepath?, URI?, absolute-path? path-scheme,
+	path-authority, path-user-info, path-host, path-port, path-path,
+	path-fragment, path-query.
+	(getNamedType): Remove URI - now "URI" rather than "<URI>".
+	(getTypeFor): Handle path, filepath, uri.
+	(createReadTable): URI is now define in LangObjType.
+	Add path and filepath.

@@ -4,6 +4,52 @@
 (require <kawa.lib.syntax>)
 (require <kawa.lib.ports>)
 
+(define (path? path) :: <boolean>
+  (instance? path <gnu.text.Path>))
+(define (filepath? path) :: <boolean>
+  (instance? path <gnu.text.FilePath>))
+(define (URI? path) :: <boolean>
+  (instance? path <gnu.text.URIPath>))
+(define (absolute-path? (path :: path)) :: <boolean>
+  (path:isAbsolute))
+(define (path-scheme (p :: path))
+  (let ((s (p:getScheme)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-authority (p :: path))
+  (let ((s (p:getAuthority)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-user-info (p :: path))
+  (let ((s (p:getUserInfo)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-host (p :: path))
+  (let ((s (p:getHost)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-path (p :: path))
+  (let ((s (p:getPath)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-port (p :: path)) :: <int>
+  (p:getPort))
+(define (path-query (p :: path))
+  (let ((s (p:getQuery)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-fragment (p :: path))
+  (let ((s (p:getFragment)))
+    (if (eq? s #!null) #f (<string> s))))
+
+#|
+(resolve-path path) ;; resolves symlinks
+
+(path->complete-path path [base-path])
+(path->directory-path path)
+(string->path string)
+(path->string path)
+(build-path base-path sub-path ...)
+(expand-path)
+(simplify-path)
+
+(path-extension)
+|#
+
 (define (file-exists? filename)
   ((primitive-virtual-method "java.io.File" "exists" "boolean" ())
    (->pathname filename)))
@@ -49,9 +95,8 @@
    (->pathname dirname)))
 
 ; Taken from MIT Scheme
-(define (->pathname filename)
-  ((primitive-constructor "java.io.File" ("String"))
-    filename))
+(define (->pathname filename) :: path
+  (path filename))
   
 (define (%file-separator)
   (make <string>
@@ -68,11 +113,8 @@
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
 
-(define (URI url) :: <URI>
-  (gnu.text.URI_utils:toURI url))
-
-(define (resolve-uri uri base) :: <URI>
-  (gnu.text.URI_utils:resolve uri base))
+(define (resolve-uri uri base) :: path
+  (gnu.text.URIPath:resolve uri base))
 
 (define-syntax module-uri
   (lambda (form)

@@ -5,26 +5,26 @@
 (require <kawa.lib.characters>)
 (require <kawa.lib.numbers>)
 
-(define (open-input-file path) :: <input-port>
-  (invoke-static <input-port> 'openFile path))
+(define (open-input-file (name :: path)) :: <input-port>
+  (invoke-static <input-port> 'openFile name))
 
-(define (open-output-file path) :: <output-port>
-  (invoke-static <output-port> 'openFile path))
+(define (open-output-file (name :: path)) :: <output-port>
+  (invoke-static <output-port> 'openFile name))
 
-(define (call-with-input-file path (proc :: <procedure>))
+(define (call-with-input-file (path :: path) (proc :: <procedure>))
  (let ((port :: <input-port> (open-input-file path)))
     (try-finally
      (proc port)
      (close-input-port port))))
 
-(define (call-with-output-file pathname proc)
-  (let ((port :: <output-port> (open-output-file pathname)))
+(define (call-with-output-file (path :: path) (proc :: <procedure>))
+  (let ((port :: <output-port> (open-output-file path)))
     (try-finally
      (proc port)
      (close-output-port port))))
 
-(define (with-input-from-file path (proc :: <procedure>))
-  (let ((port :: <input-port> (gnu.mapping.InPort:openFile path))
+(define (with-input-from-file (pathname :: path) (proc :: <procedure>))
+  (let ((port :: <input-port> (gnu.mapping.InPort:openFile pathname))
 	(save :: <input-port> (gnu.mapping.InPort:inDefault)))
     (try-finally
      (begin
@@ -34,7 +34,7 @@
        (gnu.mapping.InPort:setInDefault save)
        (*:close port)))))       
 
-(define (with-output-to-file path (proc :: <procedure>))
+(define (with-output-to-file (path :: path) (proc :: <procedure>))
   (let* ((port :: <output-port> (gnu.mapping.OutPort:openFile path))
 	 (save :: <output-port> (gnu.mapping.OutPort:outDefault)))
     (try-finally

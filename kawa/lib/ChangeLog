@@ -1,3 +1,16 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* file.scm (path?, filepath?, URI?, absolute-path? path-scheme,
+	path-authority, path-user-info, path-host, path-port, path-path,
+	path-fragment, path-query): New functions.
+	(->pathname): Use path constructor.
+	(URI): Remove - now defined in LangObjType.
+	(resolve-uri): Update.
+
+	* ports.scm (open-input-file, open-output-file, call-with-input-file,
+	call-with-output-file, with-input-from-file, with-output-to-file):
+	Cast to path.
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Simplify - we use '$JAVA kawa.repl' rather than $KAWA1.

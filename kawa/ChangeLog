@@ -1,5 +1,11 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* standard/load.java (apply): Take Path parameter.
+	Simplify resolving to URL - let Path.toURL handle it.
+	(apply2): Update accordingly.
+	(loadCompiled): Take Path parameter.
+	* Shell.java (runFile): Update accordingly.
+
 	* standard/Scheme.java (initScheme): Change URI from function to type.
 	Other new types: path, filepath
 	New functions: path?, filepath?, URI?, absolute-path? path-scheme,

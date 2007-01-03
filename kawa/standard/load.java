@@ -51,15 +51,18 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static void loadCompiled (String name, Environment env)
+  public final static void loadCompiled (Path path, Environment env)
     throws Throwable
   {
     Environment orig_env = Environment.getCurrent();
+    String name = path.toString();
     try
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
-	File zfile = new File (name);
+        if (! (path instanceof FilePath))
+          throw new RuntimeException ("load: "+name+" - not a file path");
+	File zfile = ((FilePath) path).toFile();
 	if (!zfile.exists ())
 	  throw new RuntimeException ("load: "+name+" - not found");
 	if (!zfile.canRead ())
@@ -141,7 +144,7 @@ public class load extends Procedure1 {
     try
       {
 	Environment env = (Environment) arg2;
-	apply (name, env, relative, 0);
+	apply(Path.valueOf(name), env, relative, 0);
 	return Values.empty;
       }
     catch (java.io.FileNotFoundException e)
@@ -155,33 +158,17 @@ public class load extends Procedure1 {
       }
   }
 
-  public static final void apply (Object path, Environment env,
+  public static final void apply (Path path, Environment env,
 				  boolean relative, int skipLines)
     throws Throwable
   {
-    String name = path.toString(); // FIXME
-    CallContext ctx = CallContext.getInstance();
-    boolean isUri = Path.uriSchemeSpecified(name);
-    // Resolve a relative URI.  However, if the base uri matches the
-    // default base uri (i.e. the current directory) just leave it as
-    // a filename, rather than coercing it to a URI.
-    String resolved = name;
-    if (! isUri)
-      {
-        String baseUri = ctx.getBaseUri();
-        Object base = baseUri;
-        if (! URI_utils.isAbsolute(base))
-          base = URI_utils.resolve(base, ctx.getBaseUriDefault());
-        resolved = URI_utils.resolve(name, base).toString();
-        if (relative && ! baseUri.equals(ctx.getBaseUriDefault()))
-          name = resolved;
-      }
+    String name = path.toString();
     if (name.endsWith (".zip") || name.endsWith(".jar"))
       {
-        loadCompiled (name, env);
+        loadCompiled(path, env);
         return;
       }
-    URL url = new URL(resolved);
+    URL url = path.toURL();
     char file_separator = System.getProperty ("file.separator").charAt(0);
 
     if (name.endsWith (".class"))
@@ -210,14 +197,14 @@ public class load extends Procedure1 {
                 if (char3 == '\004')
                   {
                     fs.close ();
-                    loadCompiled (name, env);
+                    loadCompiled(path, env);
                     return;
                   }
               }
           }
       }
     fs.reset();
-    InPort src = InPort.openFile(fs, name);
+    InPort src = InPort.openFile(fs, path);
     while (--skipLines >= 0)
       src.skipRestOfLine();
     loadSource (src, env, url);

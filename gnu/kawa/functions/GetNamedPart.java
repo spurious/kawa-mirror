@@ -174,10 +174,11 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
 
     if (type instanceof ObjectType)
       {
+        ObjectType otype = (ObjectType) type;
         ClassType ctype
           = type instanceof ClassType ? (ClassType) type : Type.pointer_type;
         PrimProcedure[] methods
-          = ClassMethods.getMethods(ctype, Compilation.mangleName(mname),
+          = ClassMethods.getMethods(otype, Compilation.mangleName(mname),
                                     'V', caller, language);
         if (methods != null && methods.length > 0)
           {

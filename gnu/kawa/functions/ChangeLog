@@ -1,3 +1,7 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Generalize method lookup to ObjectType.
+
 2006-12-29  Per Bothner  <per@bothner.com>
 
 	* GetModuleClass.java (getModuleClassURI): Update to use URLPath

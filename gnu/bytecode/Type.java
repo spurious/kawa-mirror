@@ -504,6 +504,8 @@ public abstract class Type {
     = pointer_type.getDeclaredMethod("toString", 0);
   public static final ClassType number_type
     = ClassType.make("java.lang.Number");
+  public static final Method clone_method
+    = Method.makeCloneMethod(pointer_type);
   public static final Method intValue_method
     = number_type.addMethod("intValue", typeArray0,
 			    int_type, Access.PUBLIC);

@@ -1,3 +1,10 @@
+2007-01-02  Per Bothner  <per@bothner.com>
+
+	* Method.java (makeCloneMethod): New method.
+	* ObjectType.java (getMethods): New method, "moved up" from ClassType.
+	* ArrayType.java (getMethods): New method.
+	* Type.java (clone_method): New static Method field.
+
 2006-12-05  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (setInterface): Also set/clear Access.ABSTRACT.

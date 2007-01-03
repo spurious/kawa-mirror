@@ -1,7 +1,8 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.util.Vector;
 
 public class ArrayType extends ObjectType
 {
@@ -53,6 +54,23 @@ public class ArrayType extends ObjectType
   public Type getComponentType() { return elements; }
 
   public String getInternalName() { return getSignature(); }
+
+  public int getMethods (Filter filter, int searchSupers, Vector result,
+			 String context)
+  {
+    if (searchSupers > 0)
+      {
+        int count = Type.pointer_type.getMethods(filter, 0, result, null);
+        if (searchSupers > 1 && filter.select(Type.clone_method))
+          {
+            if (result != null)
+              result.addElement(Type.clone_method);
+            count++;
+          }
+        return count;
+      }
+    return 0;
+  }
 
   public int compare(Type other)
   {

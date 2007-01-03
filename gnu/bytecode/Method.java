@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -50,6 +50,24 @@ public class Method implements AttrContainer, Member {
 
   CodeAttr code;
   public final CodeAttr getCode () { return code; }
+
+  private Method ()
+  {
+  }
+
+  /** Make a generic "clone" method.
+   * This is used for array types.
+   */
+  public static Method makeCloneMethod (Type returnType)
+  {
+    Method method = new Method();
+    method.name = "clone";
+    method.access_flags = Access.PUBLIC;
+    method.arg_types = Type.typeArray0;
+    method.return_type = returnType;
+    method.classfile = Type.pointer_type;
+    return method;
+  }
 
   Method (ClassType clfile, int flags)
   {

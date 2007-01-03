@@ -1,7 +1,8 @@
-// Copyright (c) 1997, 2000  Per M.A. Bothner.
+// Copyright (c) 1997, 2000, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.util.Vector;
 
 /**
   * Semi-abstract class object reference types.
@@ -102,6 +103,12 @@ public class ObjectType extends Type
     if (this == nullType)
       return obj == null;
     return super.isInstance(obj);
+  }
+
+  public int getMethods (Filter filter, int searchSupers, Vector result,
+			 String context)
+  {
+    return 0;
   }
 
   public int compare(Type other)

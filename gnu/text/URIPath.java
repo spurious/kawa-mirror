@@ -237,12 +237,39 @@ public class URIPath
     /* #endif */
   }
 
+  public String getAuthority ()
+  {
+    /* #ifdef use:java.net.URI */
+    return uri.getAuthority();
+    /* #else */
+    // return Path.uriSchemeSpecified(uri) ? toURL().getAuthority() : null;
+    /* #endif */
+  }
+
+  public String getUserInfo ()
+  {
+    /* #ifdef use:java.net.URI */
+    return uri.getUserInfo();
+    /* #else */
+    // return Path.uriSchemeSpecified(uri) ? toURL().getUserInfo() : -1;
+    /* #endif */
+  }
+
   public int getPort ()
   {
     /* #ifdef use:java.net.URI */
     return uri.getPort();
     /* #else */
     // return Path.uriSchemeSpecified(uri) ? toURL().getPort() : -1;
+    /* #endif */
+  }
+
+  public String getPath ()
+  {
+    /* #ifdef use:java.net.URI */
+    return uri.getPath();
+    /* #else */
+    // return toURL().getPath();
     /* #endif */
   }
 

@@ -1,5 +1,11 @@
 2007-01-02  Per Bothner  <per@bothner.com>
 
+	* Path.java  (getScheme, getPath): New abstract methods.
+	(getAuthority, getUserInfo, getAbsolute): New default methods.
+	* FilePath.jav (getPath): New method.
+	(getScheme): Only return "file" is isAbsolute().
+	* URIPath.java (getAuthority, getUserInfo, getPath): New methods.
+
 	* LineBufferedReader.java (name): Rename and change field type to ...
 	(path): new field.
 	(getPath, setPath): New methods.

@@ -141,10 +141,24 @@ public abstract class Path
     return resolve(relative.toString());
   }
 
-  public String getHost()
+  public abstract String getScheme ();
+
+  public String getAuthority ()
   {
     return null;
   }
+
+  public String getUserInfo ()
+  {
+    return null;
+  }
+
+  public String getHost ()
+  {
+    return null;
+  }
+
+  public abstract String getPath ();
 
   public int getPort ()
   {
@@ -235,5 +249,10 @@ public abstract class Path
         sbuf.append("../");
     sbuf.append(inStr);
     return sbuf.toString();
+  }
+
+  public Path getAbsolute ()
+  {
+    return currentPath().resolve(this);
   }
 }

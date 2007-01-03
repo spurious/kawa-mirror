@@ -99,6 +99,11 @@ public class FilePath
     return file.exists();
   }
 
+  public String getPath ()
+  {
+    return file.getPath();
+  }
+
   public int compareTo (FilePath path)
   {
     return file.compareTo(path.file);
@@ -214,7 +219,7 @@ public class FilePath
 
   public String getScheme ()
   {
-    return "file";
+    return isAbsolute() ? "file" : null;
   }
 
   public Path resolve (String relative)

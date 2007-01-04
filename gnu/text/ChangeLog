@@ -1,5 +1,8 @@
 2007-01-04  Per Bothner  <per@bothner.com>
 
+	* URI_utils.java: Remove class.  Replaced by Path and its subclasses.
+	* Makefile.am: Update accordingly.
+
 	* FilePath.java (path): New field.
 	(<init>): New and updated constructor.
 	(valueOf): Update to set path.

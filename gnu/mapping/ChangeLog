@@ -1,3 +1,9 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (baseUri, baseUriDefault): Remove fields.
+	(getBaseUriDefault, getBaseUriRaw, getBaseUri, setBaseUri): Remove
+	methods.  Code now uses Path.currentPath instead.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* InPort.java: Use Path object for "filename".

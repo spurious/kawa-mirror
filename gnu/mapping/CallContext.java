@@ -344,55 +344,8 @@ public class CallContext // implements Runnable
     Values.writeValues(value, consumer);
   }
 
-  protected String baseUri;
-  protected static String baseUriDefault;
-
-  public static String getBaseUriDefault ()
-  {
-    String uri = baseUriDefault;
-    if (uri == null)
-      {
-        /* #ifdef use:java.net.URI */
-        uri = new java.io.File("").toURI().toString();
-        /* #else */
-	// uri = System.getProperty("user.dir");	
-	// if (uri == null)
-        //   return null;
-	// char sep = java.io.File.separatorChar;
-        // /* Note this does not encode illegal characters using '%'. */
-	// if (sep != '/')
-	//   uri = uri.replace(sep, '/');
-	// uri = ((uri.charAt(0) == '/' ? "file:" : "file:/")
-	// 	   + uri + '/');
-        /* #endif */
-	baseUriDefault = uri;
-      }
-    return uri;
-  }
-
-  public String getBaseUriRaw ()
-  {
-    return baseUri;
-  }
-
-  /* Get the current "base URI", which defaults to the current directory.
-   * However, it may get reset to the "current document". */
-  public String getBaseUri ()
-  {
-    String uri = baseUri;
-    if (uri == null)
-      baseUri = uri = getBaseUriDefault();
-    return uri;
-  }
-
-  /** Set the current "base URI". */
-  public void setBaseUri (String baseUri)
-  {
-    this.baseUri = baseUri;
-  }
-
   /** A stack of currently re-bound fluids variables.
-   * There is one for each active fluids-let or parmaterize variable. */
+   * There is one for each active fluids-let or parameterize variable. */
   Location[] pushedFluids;
   /** The number of active elements of the pushedFluids array. */
   int pushedFluidsCount;

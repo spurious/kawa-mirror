@@ -1,3 +1,10 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* files.scm (resource-uri): Use Path rather than URI_utils resolve.
+	* files.scm (include-relative): Likewise.
+
+	* misc.scm (base-uri): Use Path's currentPath method.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* files.scm (path-query): Fix copy-paste thinko.

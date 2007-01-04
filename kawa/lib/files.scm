@@ -125,7 +125,7 @@
 (define-syntax resource-uri
   (syntax-rules ()
     ((resource-uri uri)
-     (gnu.text.URI_utils:resolve uri (module-uri)))))
+     ((module-uri):resolve uri))))
 
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
 (define (make-temporary-file #!optional (fmt "kawa~d.tmp")) :: <string>
@@ -162,16 +162,15 @@
 (define-syntax (include-relative x)
   (syntax-case x ()
 	       ((_ filename)
-		(let ((path-pair :: <pair>
-				 (syntax-object->datum (syntax (filename)))))
+		(let* ((path-pair :: <gnu.lists.PairWithPosition>
+				  (syntax-object->datum (syntax (filename))))
+		       (base :: path (path-pair:getFileName))
+		       (fname ((field path-pair 'car):toString)))
 		  (list
 		   (datum->syntax-object (syntax filename) 'include)
 		   (datum->syntax-object
 		    (syntax filename)
-		    (make <string>
-		     (gnu.text.URI_utils:resolve
-		      (field path-pair 'car)
-		      (gnu.lists.PairWithPosition:getFileName path-pair)))))))))
+		    (make <string> ((base:resolve fname):toString))))))))
 
 #|
 (define-syntax source-file

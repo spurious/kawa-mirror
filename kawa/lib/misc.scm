@@ -106,7 +106,7 @@
 
 (define (base-uri #!optional (node #!null))
   (let ((uri (if (eq? node #!null)
-		 ((gnu.mapping.CallContext:getInstance):getBaseUri)
+		 (gnu.text.Path:currentPath)
 		 ((as <gnu.kawa.xml.KNode> node):baseURI))))
     (if (eq? uri #!void) #f uri)))
 

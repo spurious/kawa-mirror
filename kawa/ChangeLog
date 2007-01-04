@@ -1,3 +1,8 @@
+2007-01-03  Per Bothner  <per@bothner.com>
+
+	* standard/require.java: Use ModuleInfo's new
+	getSourceAbsPathname method.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* standard/load.java (apply): Take Path parameter.

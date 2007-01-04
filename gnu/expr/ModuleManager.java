@@ -1,8 +1,7 @@
 package gnu.expr;
 import java.net.*;
 import gnu.bytecode.ClassType;
-import gnu.text.URI_utils;
-import gnu.mapping.CallContext;
+import gnu.text.*;
 
 /** A database of known modules as represented by {@link ModuleInfo}..
  * Current there is only a single global instanceof {@code ModuleManager};
@@ -82,20 +81,22 @@ public class ModuleManager
   private ModuleInfo searchWithAbsSourcePath (String sourcePath)
   {
     for (ModuleInfo info = modules;  info != null;  info = info.next)
-      if (sourcePath.equals(info.sourceAbsPath))
+      if (sourcePath.equals(info.getSourceAbsPathname()))
         return info;
     return null;
   }
 
   public synchronized ModuleInfo findWithSourcePath (String sourcePath)
   {
-    String sourceAbsPath = ModuleInfo.absPath(sourcePath);
-    ModuleInfo info = searchWithAbsSourcePath(sourceAbsPath);
+    Path sourceAbsPath = ModuleInfo.absPath(sourcePath);
+    String sourceAbsPathname = sourceAbsPath.toString();
+    ModuleInfo info = searchWithAbsSourcePath(sourceAbsPathname);
     if (info == null)
       {
         info = new ModuleInfo();
         info.sourcePath = sourcePath;
         info.sourceAbsPath = sourceAbsPath;
+        info.sourceAbsPathname = sourceAbsPathname;
         add(info);
       }
     return info;
@@ -114,18 +115,24 @@ public class ModuleManager
    */
   public void register (String moduleClass, String moduleSource, String moduleUri)
   {
-    // Unclear what is the right thing to do a we have an existing module
+    // Unclear what is the right thing to do if we have an existing module
     // with the same source or class name.  One case is when we're explicitly
     // compiling a source file and (in XQuery) importing (other) modules in the
     // same namespace.  In that case the file we're compiling should take
     // precedence over old data in the packages's existing $ModulesMap$ class.
     if (searchWithClassName(moduleClass) != null)
       return;
-    if (searchWithAbsSourcePath(ModuleInfo.absPath(moduleSource)) != null)
+    Path sourcePath = Path.valueOf(moduleSource);
+    Path sourceAbsPath = sourcePath.getCanonical();
+    String sourceAbsPathname = sourceAbsPath.toString();
+    if (searchWithAbsSourcePath(sourceAbsPathname) != null)
       return;
     ModuleInfo info = new ModuleInfo();
-    if (gnu.text.URI_utils.isAbsolute(moduleSource))
-      info.sourceAbsPath = moduleSource;
+    if (sourcePath.isAbsolute())
+      {
+        info.sourceAbsPath = sourcePath;
+        info.sourceAbsPathname = sourceAbsPathname;
+      }
     else
       {
         // Resolve moduleSource against moduleClass path.
@@ -136,8 +143,9 @@ public class ModuleManager
             String setClassName = setClass.getName().replace('.', '/')+".class";
             java.net.URL setClassURL
               = setClass.getClassLoader().getResource(setClassName);
-            Object moduleURI = URI_utils.resolve(moduleSource, setClassURL);
-            info.sourceAbsPath = moduleURI.toString();
+            sourceAbsPath = URLPath.valueOf(setClassURL).resolve(moduleSource);
+            info.sourceAbsPath = sourceAbsPath;
+            info.sourceAbsPathname = sourceAbsPath.toString();
           }
         catch (Throwable ex)
           {

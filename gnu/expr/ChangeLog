@@ -1,5 +1,15 @@
 2007-01-03  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java (sourceAbsPath): Change to Path and non-public.
+	(sourceAbsPathname): New field.
+	(getSourceAbsPath, setSourceAbsPath, getSourceAbsPathname): New methods.
+	(absPath): Radically simplify to use Path's getCanonical.
+	(setCompilation, checkCurrent): Update accordingly.
+	* ModuleManager.java (searchWithAbsSourcePath, findWithSourcePath):
+	Update accordingly.
+	(register): Update to use Path functions.
+	* Compilation.java (generateBytecode): Likewise.
+
 	* ModuleExp.java (evalToClass): If no url given, use Path.currentPath.
 
 	* LambdaExp.java (allocChildMethods): For non-static ClassExp do

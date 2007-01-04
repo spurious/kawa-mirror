@@ -2235,7 +2235,7 @@ public class Compilation implements SourceLocator
             String moduleUri = mi.getNamespaceUri();
             code.emitLoad(code.getArg(1));
             compileConstant(miClassName);
-            if (! URI_utils.isAbsolute(moduleSource))
+            if (! Path.valueOf(moduleSource).isAbsolute())
               try
                 {
                   // If the source path was relative, emit it as relative.
@@ -2244,11 +2244,12 @@ public class Compilation implements SourceLocator
                   char sep = File.separatorChar;
                   String path = manager.getCompilationDirectory();
                   path = path + mainPrefix.replace('.', sep);
-                  path = URI_utils.toURL(path).toString();
+                  path = Path.toURL(path).toString();
                   int plen = path.length();
                   if (plen > 0 && path.charAt(plen-1) != sep)
                     path = path + sep;
-                  moduleSource = URI_utils.relativize(mi.sourceAbsPath, path).toString();
+                  moduleSource
+                    = Path.relativize(mi.getSourceAbsPathname(), path);
                 }
               catch (Throwable ex)
                 {

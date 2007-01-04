@@ -1109,7 +1109,7 @@ public class RunXQTS extends FilterConsumer
 
         ModuleInfo minfo = manager.findWithClassName(mclass);
         minfo.sourcePath = mfile + XQueryFileExtension;
-        minfo.sourceAbsPath = mpath;
+        minfo.setSourceAbsPath(Path.valueOf(mpath));
         minfo.setNamespaceUri(uri);
       }
     /*

@@ -1,3 +1,8 @@
+2007-01-03  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (enElement): Use ModuleInfo's new
+	setSourceAbsPathname method.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (main): Update to use FilePath.

@@ -223,7 +223,7 @@ public class require extends Syntax
         Compilation comp;
         try
           {
-            InPort fstream = InPort.openFile(info.sourceAbsPath);
+            InPort fstream = InPort.openFile(info.getSourceAbsPath());
             info.clearClass();
             info.className = className;
             comp = language.parse(fstream, messages, info);

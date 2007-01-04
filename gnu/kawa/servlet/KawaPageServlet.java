@@ -108,7 +108,7 @@ public class KawaPageServlet extends KawaServlet
     long lastModified = connection.getLastModified();
     if (minfo != null
         && minfo.lastModifiedTime == lastModified
-        && urlString.equals(minfo.sourceAbsPath))
+        && urlString.equals(minfo.getSourceAbsPathname()))
       {
         minfo.lastCheckedTime = now;
         return mcontext.findInstance(minfo);

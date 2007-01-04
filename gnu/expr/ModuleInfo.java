@@ -43,31 +43,14 @@ public class ModuleInfo
       {
         String fileName = mod.getFileName();
         this.sourcePath = fileName;
-        this.sourceAbsPath = absPath(fileName);
+        Path abs = absPath(fileName);
+        this.sourceAbsPath = abs;
       }
   }
 
-  public static String absPath (String path)
+  public static Path absPath (String path)
   {
-    Object url;
-    try
-      {
-        url = URI_utils.toURL(path);
-      }
-    catch (Throwable ex)
-      {
-        throw WrappedException.wrapIfNeeded(ex);
-      }
-    /* #ifdef use:java.net.URI */
-    try
-      {
-        url = URI_utils.toURI(url).normalize();
-      }
-    catch (Throwable ex)
-      {
-      }
-    /* #endif */
-    return url.toString();
+    return Path.valueOf(path).getCanonical();
   }
   
   ModuleInfo[] dependencies;
@@ -79,10 +62,33 @@ public class ModuleInfo
    * Null if source not known; in that case className must be non-null.
    */
   public String sourcePath;
-  public String sourceAbsPath;
+  Path sourceAbsPath;
+  String sourceAbsPathname;
 
   public long lastCheckedTime;
   public long lastModifiedTime;
+
+  public Path getSourceAbsPath ()
+  {
+    return sourceAbsPath;
+  }
+
+  public void setSourceAbsPath (Path path)
+  {
+    sourceAbsPath = path;
+    sourceAbsPathname = null;
+  }
+
+  public String getSourceAbsPathname ()
+  {
+    String str = sourceAbsPathname;
+    if (str == null && sourceAbsPath != null)
+      {
+        str = sourceAbsPath.toString();
+        sourceAbsPathname = str;
+      }
+    return str;
+  }
 
   public synchronized void addDependency (ModuleInfo dep)
   {
@@ -342,7 +348,7 @@ public class ModuleInfo
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
       return true;
     lastCheckedTime = now;
-    long lastModifiedTime = URI_utils.lastModified(sourceAbsPath);
+    long lastModifiedTime = sourceAbsPath.getLastModified();
     if (moduleClass == null && className != null)
       {
         try

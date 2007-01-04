@@ -41,12 +41,4 @@ public class ServletCallContext extends CallContext
   {
     return getServletCallContext().servlet.getServletConfig().getServletContext();
   }
-
-  public String getBaseUri ()
-  {
-    if (baseUri == null)
-      baseUri = request.getRequestURL().toString();
-    return baseUri;
-  }
-
 }

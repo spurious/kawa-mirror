@@ -7,6 +7,7 @@ import javax.servlet.http.*;
 import gnu.mapping.*;
 import gnu.xml.*;
 import java.io.IOException;
+import gnu.text.Path;
 
 public abstract class KawaServlet
 extends HttpServlet
@@ -37,6 +38,7 @@ extends HttpServlet
     ctx.consumer = new ServletPrinter(response);  // FIXME - should re-use
     ctx.request = request;
     ctx.response = response;
+    Path.setCurrentPath(Path.valueOf(request.getRequestURL().toString()));
     ctx.servlet = this;
     ctx.values = Values.noArgs;
 

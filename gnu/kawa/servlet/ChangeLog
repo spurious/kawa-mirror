@@ -1,3 +1,8 @@
+2007-01-03  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java (doGet): Set currentPath to relative to requestURL.
+	* ServletCallContext.java (getBaseUri): Remove method.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java: Update to use URIPath.

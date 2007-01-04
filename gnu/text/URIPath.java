@@ -67,14 +67,14 @@ public class URIPath
     /* #ifdef use:java.net.URI */
     try
       {
-        return new URIPath(new URI(uri));
+        return new URIStringPath(new URI(encodeForUri(uri, 'I')), uri);
       }
     catch (Throwable ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
     /* #else */
-    // return new URIPath(uri)
+    // return new URIStringPath(uri)
     /* #endif */
   }
 
@@ -196,11 +196,7 @@ public class URIPath
 
   public String toString ()
   {
-    /* #ifdef use:java.net.URI */
-    return uri.toString();
-    /* #else */
-    // return uri;
-    /* #endif */
+    return toURIString();
   }
 
   public URL toURL ()
@@ -307,4 +303,83 @@ public class URIPath
     else
       return getAbsolute().getCanonical();
   }
+
+  public static String encodeForUri (String str, char mode)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    int len = str.length();
+    for (int i = 0; i <len;  )
+      {
+        int ch = str.charAt(i++);
+        // Check for surrogate.
+        if (ch >= 0xD800 && ch < 0xDC00 && i < len)
+          ch = (ch - 0xD800) * 0x400
+            + (str.charAt(i++) - 0xDC00) + 0x10000;
+        if (mode == 'H' ? ch >= 32 && ch <= 126
+            : ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+               || (ch >= '0' && ch <= '9')
+               || ch == '-' || ch == '_' || ch == '.' || ch == '~'
+               || (mode == 'I'
+                   && (ch == ';' || ch == '/' || ch == '?' || ch == ':'
+                       || ch == '*' || ch == '\'' || ch == '(' || ch == ')'
+                       || ch == '@' || ch == '&' || ch == '=' || ch == '+'
+                       || ch == '$' || ch == ',' || ch == '[' || ch == ']'
+                       || ch == '#' || ch == '!' || ch == '%'))))
+          sbuf.append((char) ch);
+        else
+          {
+            int pos = sbuf.length();
+            int nbytes = 0;
+            int needed = ch < (1 << 7) ? 1
+              : ch < (1 << 11) ? 2
+              : ch < (1 << 16) ? 3
+              : 4;
+            do
+              {
+                // We insert encodings for the bytes in right-to-left order.
+                int availbits = nbytes == 0 ? 7 : 6 - nbytes;
+                int b;
+                if (ch < (1 << availbits))
+                  {
+                    // The rest fits: handling first bytes.
+                    b = ch;
+                    if (nbytes > 0)
+                      b |= (0xff80 >> nbytes) & 0xff;
+                    ch = 0;
+                  }
+                else
+                  {
+                    b = 0x80 | (ch & 0x3f);
+                    ch >>= 6;
+                  }
+                nbytes++;
+                for (int j = 0; j <= 1; j++)
+                  {
+                    int hex = b & 15;
+                    sbuf.insert(pos,
+                                (char) (hex <= 9 ? hex + '0' : hex - 10 + 'A'));
+                    b >>= 4;
+                  }
+                sbuf.insert(pos, '%');
+              }
+            while (ch != 0);
+          }
+      }
+    return sbuf.toString();
+  }
 }
+
+/* #ifdef use:java.net.URI */
+/** A URIPath that also remembers the "orginal" (unencoded) String. */
+class URIStringPath extends URIPath
+{
+  String uriString;
+  public String toURIString () { return uriString; }
+
+  public URIStringPath (URI uri, String uriString)
+  {
+    super(uri);
+    this.uriString = uriString;
+  }
+}
+/* #endif */

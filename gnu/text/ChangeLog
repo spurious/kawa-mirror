@@ -1,3 +1,12 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* URIPath.java: Do "encoding" when converting String -> URI.
+	(URIStringPath): New class.
+	(valueOf(String)): Use it.
+	(toString): Just use toURIString.
+	(encodeForUri): New method, guts moved from StringUtils.
+	Add untested support for surrogate characters.
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* Path.java (setCurrentPath): New static field.

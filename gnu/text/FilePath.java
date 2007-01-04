@@ -19,16 +19,34 @@ public class FilePath
   /* #endif */
 {
   File file;
+  /** Usually the same as {@code file.toString()}.
+   * One important difference: {@code isDirectory} is true
+   * if {@code path} ends with the {@code '/'} or the {@code separatorChar}.
+   * (
+   * The original String if constructed from a String.
+   */
+  String path;
 
   private FilePath (File file)
   {
     this.file = file;
+    this.path = file.toString();
+  }
+
+  private FilePath (File file, String path)
+  {
+    this.file = file;
+    this.path = path;
   }
 
   public static FilePath valueOf (String str)
   {
-    int len = str.length();
+    String orig = str;
     /* FIXME: Should we expand '~'?
+       Issues: is (path "~/bar") absolute?
+       What about: (base:resolve "~/bar") ?
+       What if base above isn't a FilePath?
+    int len = str.length();
     if (len > 0 && str.charAt(0) == '~' && File.separatorChar == '/')
       {
         if (len == 1 || str.charAt(1) == '/')
@@ -43,7 +61,7 @@ public class FilePath
           }
       }
     */
-    return valueOf(new File(str));
+    return new FilePath(new File(str), orig);
   }
 
   public static FilePath valueOf (File file)
@@ -89,6 +107,18 @@ public class FilePath
     return this == Path.userDirPath || file.isAbsolute();
   }
 
+  public boolean isDirectory ()
+  {
+    int len = path.length();
+    if (len > 0)
+      {
+        char last = path.charAt(len - 1);
+        if (last == '/' || last == File.separatorChar)
+          return true;
+      }
+    return file.isDirectory();
+  }
+
   public long getLastModified ()
   {
     return file.lastModified();
@@ -128,7 +158,7 @@ public class FilePath
 
   public String toString ()
   {
-    return file.toString();
+    return path;
   }
 
   public File toFile ()
@@ -237,7 +267,7 @@ public class FilePath
     if (this == Path.userDirPath)
       nfile = new File(System.getProperty("user.dir"), relative);
     else
-      nfile = new File(file, relative);
+      nfile = new File(isDirectory() ? file : file.getParentFile(), relative);
     return valueOf(nfile);
   }
 

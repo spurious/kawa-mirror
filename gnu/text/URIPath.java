@@ -290,4 +290,21 @@ public class URIPath
     // return toURL().getFragment();
     /* #endif */
   }
+
+  public Path getCanonical ()
+  {
+    if (isAbsolute())
+      {
+        /* #ifdef use:java.net.URI */
+        URI norm = uri.normalize();
+        if (norm == uri)
+          return this;
+        return valueOf(norm);
+        /* #else */
+        // return this; // FIXME!
+        /* #endif */
+      }
+    else
+      return getAbsolute().getCanonical();
+  }
 }

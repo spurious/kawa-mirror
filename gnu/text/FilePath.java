@@ -240,4 +240,18 @@ public class FilePath
       nfile = new File(file, relative);
     return valueOf(nfile);
   }
+
+  public Path getCanonical ()
+  {
+    try
+      {
+        File canon = file.getCanonicalFile();
+        if (! canon.equals(file))
+          return valueOf(canon);
+      }
+    catch (Throwable ex)
+      {
+      }
+    return this;
+  }
 }

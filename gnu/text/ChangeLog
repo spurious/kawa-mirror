@@ -1,3 +1,11 @@
+2007-01-03  Per Bothner  <per@bothner.com>
+
+	* Path.java (setCurrentPath): New static field.
+
+	* Path.java (getCanonical): New method.
+	* URIPath.java (getCanonical): New method.
+	* FilePath.java (getCanonical): New method.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* Path.java  (getScheme, getPath): New abstract methods.

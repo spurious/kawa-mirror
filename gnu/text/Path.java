@@ -35,6 +35,15 @@ public abstract class Path
     return defaultPath;
   }
 
+  public static void setCurrentPath (Path path)
+  {
+    /* #ifdef JAVA2 */
+    pathLocation.set(path);
+    /* #else */
+    // defaultPath = path;
+    /* #endif */
+  }
+
   public static Path coerceToPathOrNull (Object path)
   {
     if (path instanceof Path)
@@ -184,7 +193,6 @@ public abstract class Path
     return resolve(relative.toString());
   }
 
-  // FIXME merge in URI_utils.toFileOrURL(Object) functionality.  FIXME.
   public abstract Path resolve (String relative);
 
   public static InputStream openInputStream (Object uri) throws IOException
@@ -254,5 +262,10 @@ public abstract class Path
   public Path getAbsolute ()
   {
     return currentPath().resolve(this);
+  }
+
+  public Path getCanonical ()
+  {
+    return getAbsolute ();
   }
 }

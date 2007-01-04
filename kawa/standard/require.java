@@ -189,16 +189,9 @@ public class require extends Syntax
   public static ModuleInfo lookupModuleFromSourcePath (String sourceName, ScopeExp defs)
   {
     ModuleManager manager = ModuleManager.getInstance();
-    try
-      {
-        String baseName = defs.getFileName();
-        if (baseName != null)
-          sourceName = URI_utils.resolve(sourceName, baseName).toString();
-      }
-    catch (java.net.URISyntaxException ex)
-      {
-        return null;
-      }
+    String baseName = defs.getFileName();
+    if (baseName != null)
+      sourceName = Path.valueOf(baseName).resolve(sourceName).toString();
     return manager.findWithSourcePath(sourceName);
   }
 

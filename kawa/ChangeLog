@@ -1,3 +1,9 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* standard/load.java (apply): Use Path's openInputStream.
+	* standard/require.java (lookupModuleFromSourcePath): Use Path's
+	resolve method, rather than URI_utils's.
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* standard/require.java: Use ModuleInfo's new

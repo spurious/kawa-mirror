@@ -180,7 +180,7 @@ public class load extends Procedure1 {
         loadClassFile (name, env);
         return;
       }
-    InputStream fs = new BufferedInputStream(URI_utils.getInputStream(url));
+    InputStream fs = new BufferedInputStream(path.openInputStream());
     fs.mark(5);
     int char0 = fs.read ();
     if (char0 == -1)

@@ -4,7 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 import gnu.mapping.*;
-import gnu.text.URI_utils;
+import gnu.text.*;
 import gnu.kawa.xml.KNode;
 import gnu.xml.XName;
 import gnu.kawa.xml.UntypedAtomic;  // FIXME - bad cross-package dependency.
@@ -215,21 +215,21 @@ public class NodeTree extends TreeList
   }
 
   /** Return of the base-uri property, if known, of the node at pos. */
-  public Object baseUriOfPos (int pos, boolean resolveRelative)
+  public Path baseUriOfPos (int pos, boolean resolveRelative)
   {
-    Object base = null;
+    Path uri = null;
     int index = posToDataIndex(pos);
     for (;;)
       {
 	if (index == data.length)
 	  return null;
 	char datum = data[index];
-        Object uri = null;
+        Path base = null;
         if (datum == BEGIN_ENTITY)
           {
             int oindex = getIntN(index+1);
             if (oindex >= 0)
-              uri = objects[oindex];
+              base = URIPath.makeURI(objects[oindex]);
           }
 	else if ((datum >= BEGIN_ELEMENT_SHORT
 	     && datum <= BEGIN_ELEMENT_SHORT+BEGIN_ELEMENT_SHORT_INDEX_MAX)
@@ -237,26 +237,17 @@ public class NodeTree extends TreeList
           {
             int attr = getAttributeI(pos, NamespaceBinding.XML_NAMESPACE, "base");
             if (attr != 0)
-              uri = KNode.getNodeValue(this, attr);
+              base = URIPath.valueOf(KNode.getNodeValue(this, attr));
           }
-        if (uri != null)
+        if (base != null)
           {
-            try
-              {
-                base = base == null || ! resolveRelative ? uri
-                  : URI_utils.resolve(base, uri);
-              }
-            catch (java.net.URISyntaxException ex)
-              {
-                // Or maybe return null;
-                throw new WrappedException(ex);
-              }
-            if (URI_utils.isAbsolute(base) || ! resolveRelative)
-              return base;
+            uri = uri == null || ! resolveRelative ? base : base.resolve(uri);
+            if (uri.isAbsolute() || ! resolveRelative)
+              return uri;
           }
 	index = parentOrEntityI(index);
 	if (index == -1)
-          return base;
+          return uri;
         pos = index << 1;
       }
   }

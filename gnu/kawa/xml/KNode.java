@@ -8,6 +8,7 @@ import gnu.xml.*;
 // import org.w3c.dom.*;
 /* #endif */
 import gnu.mapping.*;
+import gnu.text.Path;
 
 public abstract class KNode extends SeqPosition
   implements
@@ -371,7 +372,7 @@ public abstract class KNode extends SeqPosition
     return uri == null ? null : uri.toString();
   }
 
-  public Object baseURI ()
+  public Path baseURI ()
   {
     return ((NodeTree) sequence).baseUriOfPos(ipos, true);
   }

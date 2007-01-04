@@ -1,3 +1,9 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* NodeTree.java (baseUriOfPos): Change return type to Path.
+	Use Path methods rather than URI_utils.
+	Swap local variable names base and uri to be less confusing.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (<init>): Update to take Path.

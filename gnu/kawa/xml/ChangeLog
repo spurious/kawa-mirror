@@ -1,3 +1,7 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* KNode.java (baseURI): Change return type to Path.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* WriteTo.java: Update to use Path rather than URI_utils.

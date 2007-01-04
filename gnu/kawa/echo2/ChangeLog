@@ -1,3 +1,8 @@
+2007-01-04  Per Bothner  <per@bothner.com>
+
+	* Echo2Display.java (ResourceImageReference:<init>): Change
+	parameter to Path instead of URI.
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Simplify.

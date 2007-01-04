@@ -6,7 +6,7 @@ import nextapp.echo2.app.Extent;
 import nextapp.echo2.app.ContentPane;
 import java.awt.Dimension;
 import java.awt.geom.Dimension2D;
-import gnu.text.URI_utils;
+import gnu.text.*;
 
 public class Echo2Display extends Display
 {
@@ -181,18 +181,11 @@ class Echo2Row
 
 class ResourceImageReference extends nextapp.echo2.app.ResourceImageReference
 {
-  /* #ifdef use:java.net.URI */
-  public ResourceImageReference (java.net.URI resource)
+  public ResourceImageReference (Path resource)
     throws java.io.IOException
   {
-    super(URI_utils.toURL(resource).toString());
+    super(path.toString());
   }
-  /* #else */
-  // public ResourceImageReference (String resource)
-  // {
-  //   super(resource);
-  // }
-  /* #endif */
 
   public void render(java.io.OutputStream out)
     throws java.io.IOException

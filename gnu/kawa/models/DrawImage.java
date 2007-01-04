@@ -4,17 +4,13 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import gnu.mapping.WrappedException;
 import java.net.URL;
-import gnu.text.URI_utils;
+import gnu.text.*;
 
 public class DrawImage extends Model
   implements Paintable, java.io.Serializable
 {
   BufferedImage image;
-  /* #ifdef use:java.net.URI */
-  java.net.URI src;
-  /* #else */
-  // String src;
-  /* #endif */
+  Path src;
   String description;
 
   public DrawImage ()
@@ -32,7 +28,7 @@ public class DrawImage extends Model
       {
         try
           {
-            image = javax.imageio.ImageIO.read(URI_utils.getInputStream(src));
+            image = javax.imageio.ImageIO.read(src.openInputStream());
           }
         catch (Throwable ex)
           {
@@ -71,19 +67,10 @@ public class DrawImage extends Model
     return image;
   }
 
-  public
-  /* #ifdef use:java.net.URI */
-  java.net.URI
-  /* #else */
-  // String
-  /* #endif */
-  getSrc () { return src; }
+  public Path getSrc () { return src; }
 
-  public void setSrc (Object src)
-  /* #ifdef use:java.net.URI */
-    throws java.net.URISyntaxException
-  /* #endif */
+  public void setSrc (Path src)
   {
-    this.src = URI_utils.toURI(src);
+    this.src = src;
   }
 }

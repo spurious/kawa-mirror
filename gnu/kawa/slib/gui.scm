@@ -67,8 +67,8 @@
     ((text-field . args)
      (make <gnu.kawa.models.DrawImage> . args))))
 
-(define (image-read uri) :: <java.awt.image.BufferedImage>
-  (javax.imageio.ImageIO:read (gnu.text.URI_utils:getInputStream uri)))
+(define (image-read (uri :: path)) :: <java.awt.image.BufferedImage>
+  (javax.imageio.ImageIO:read (uri:openInputStream)))
 
 (define (image-width (image  :: <java.awt.image.BufferedImage>)) :: <int>
   (*.getWidth image))

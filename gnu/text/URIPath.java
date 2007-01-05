@@ -101,6 +101,11 @@ public class URIPath
     return URLPath.getLastModified(toURL());
   }
 
+  public long getContentLength ()
+  {
+    return URLPath.getContentLength(toURL());
+  }
+
   /* #ifdef use:java.net.URI */
   public URI toURI () { return uri; }
   public String toURIString () { return uri.toString(); }

@@ -46,6 +46,23 @@ public class URLPath extends URIPath
       }
   }
 
+  public long getContentLength ()
+  {
+    return getLastModified(url);
+  }
+
+  public static int getContentLength (URL url)
+  {
+    try
+      {
+        return url.openConnection().getContentLength();
+      }
+    catch (Throwable ex)
+      {
+        return -1;
+      }
+  }
+
   public URL toURL ()
   {
     return url;

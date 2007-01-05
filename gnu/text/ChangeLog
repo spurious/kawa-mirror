@@ -1,3 +1,10 @@
+2007-01-05  Per Bothner  <per@bothner.com>
+
+	* Path.java (getContentLength): New default method.
+	* FilePath.java (getContentLength): New method.
+	* URLPath.java (getContentLength): New methods, one sttaic.
+	* URIPath.java (getContentLength): New method.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* URI_utils.java: Remove class.  Replaced by Path and its subclasses.

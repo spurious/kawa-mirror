@@ -142,6 +142,11 @@ public abstract class Path
   }
 
   public abstract long getLastModified ();
+
+  public long getContentLength ()
+  {
+    return -1;
+  }
  
   public abstract String getScheme ();
 

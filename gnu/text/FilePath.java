@@ -129,6 +129,12 @@ public class FilePath
     return file.exists();
   }
 
+  public long getContentLength ()
+  {
+    long length = file.length();
+    return length == 0 && ! file.exists() ? -1 : length;
+  }
+ 
   public String getPath ()
   {
     return file.getPath();

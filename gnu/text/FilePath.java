@@ -209,7 +209,7 @@ public class FilePath
   // public static String toURIString (File file)
   // {
   //   if (file.isAbsolute())
-  //     return FiletoURL(file).toString();
+  //     return FilePath.toURL(file).toString();
   //   else
   //     return file.toString().replace(File.separatorChar, '/');
   // }

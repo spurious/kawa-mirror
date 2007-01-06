@@ -26,7 +26,7 @@ public class URIPath
   URIPath (URI uri) { this.uri = uri; } 
   /* #else */
   // String uri;
-  // private URIPath (String uri) { this.uri = uri; } 
+  // protected URIPath (String uri) { this.uri = uri; } 
   /* #endif */
 
   public static URIPath coerceToURIPathOrNull (Object path)
@@ -74,7 +74,7 @@ public class URIPath
         throw WrappedException.wrapIfNeeded(ex);
       }
     /* #else */
-    // return new URIStringPath(uri)
+    // return new URIPath(uri);
     /* #endif */
   }
 
@@ -142,9 +142,9 @@ public class URIPath
       }
 
     /* #else */
-    // /* The following is an appximation of URI's rsolve method. */
+    // /* The following is an appximation of URI's resolve method. */
     // /* For example, it doesn't simplify "../" to "". */
-    // String sbase = toURI(base);
+    // String sbase = uri;
     // int lastSl = sbase.lastIndexOf('/');
     // StringBuffer sbuf = new StringBuffer(sbase);
     // if (lastSl >= 0)
@@ -157,7 +157,7 @@ public class URIPath
     //     int baseLen = sbase.length();
     //     int pathStart = Path.uriSchemeLength(sbase);
     //     if (pathStart <= 1)
-    //       return rstr;
+    //       return URIPath.valueOf(rstr);
     //     pathStart++;
     //     /* Add the "authority" - usually a host-name. */
     //     if (pathStart + 1 < baseLen
@@ -252,7 +252,7 @@ public class URIPath
     /* #ifdef use:java.net.URI */
     return uri.getUserInfo();
     /* #else */
-    // return Path.uriSchemeSpecified(uri) ? toURL().getUserInfo() : -1;
+    // return Path.uriSchemeSpecified(uri) ? toURL().getUserInfo() : null;
     /* #endif */
   }
 
@@ -288,7 +288,8 @@ public class URIPath
     /* #ifdef use:java.net.URI */
     return uri.getFragment();
     /* #else */
-    // return toURL().getFragment();
+    // int hash = uri.lastIndexOf('#');
+    // return hash < 0 ? null : uri.substring(hash+1);
     /* #endif */
   }
 

@@ -74,6 +74,12 @@ case "/${with_java_source}/" in
 esac
 AC_SUBST(JAVA_SOURCE)
 
+if test -z "$with_sax2" ; then
+  case "$JAVA_SOURCE" in
+  1|2|3) with_sax2="no";;
+  esac
+fi
+
 AC_PROG_INSTALL
 AC_PROG_LN_S
 

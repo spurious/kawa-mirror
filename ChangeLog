@@ -1,3 +1,7 @@
+2007-01-05  Per Bothner  <per@bothner.com>
+
+	* configure.in: If JAVA_SOURCE is 1|2|3 default with_sax2 to "no".
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.8.95.

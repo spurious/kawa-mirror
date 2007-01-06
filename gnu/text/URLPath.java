@@ -79,11 +79,11 @@ public class URLPath extends URIPath
         return new URI(url.toString());
         /* #endif */
       }
-     catch (Throwable ex)
+    catch (Throwable ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
- }
+  }
 
   public URI toURI () { return toURI(url); }
   public String toURIString () { return url.toString(); }

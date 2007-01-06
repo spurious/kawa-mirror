@@ -1476,12 +1476,12 @@ error for an @var{expression} to return a number of values that does not
 match its corresponding @var{formals}.
 @example
 (let-values (((a b . c) (values 1 2 3 4)))
-  (list a b c))            --> (1 2 (3 4)) 
+  (list a b c))            @result{} (1 2 (3 4)) 
 
 (let ((a 'a) (b 'b) (x 'x) (y 'y))
   (let-values (((a b) (values x y))
                ((x y) (values a b)))
-    (list a b x y)))       --> (x y a b)
+    (list a b x y)))       @result{} (x y a b)
 @end example
 @end deffn
 
@@ -1500,7 +1500,7 @@ visible, and so on.
 (let ((a 'a) (b 'b) (x 'x) (y 'y))
   (let*-values (((a b) (values x y))
                 ((x y) (values a b)))
-    (list a b x y)))       --> (x y x y)
+    (list a b x y)))       @result{} (x y x y)
 @end example
 @end deffn
 
@@ -1674,9 +1674,9 @@ not a good idea!), you could do:
 @end example
 Note this @emph{only} changes the name property used for printing:
 @example
-+ => #<procedure PLUS>
-(+ 2 3) => 5
-(PLUS 3 4) => ERROR
++ @result{} #<procedure PLUS>
+(+ 2 3) @result{} 5
+(PLUS 3 4) @result{} ERROR
 @end example
 
 As a matter of style, it is cleaner to use the @code{define-procedure}
@@ -2052,7 +2052,7 @@ is available, though not enabled by default.  To use its functions you
 must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
 @example
 (require 'list-lib)
-(iota 5 0 -0.5) ;; => (0.0 -0.5 -1.0 -1.5 -2.0)
+(iota 5 0 -0.5) @result{} (0.0 -0.5 -1.0 -1.5 -2.0)
 @end example
 
 @defun reverse! list
@@ -3054,9 +3054,9 @@ passed to the parameter object, and an unspecified value is returned.
           x
           (error "only booleans are accepted by write-shared")))))
 
-(radix)           ==>  10
+(radix)           @result{}  10
 (radix 2)
-(radix)           ==>  2
+(radix)           @result{}  2
 (write-shared 0)  gives an error
 
 (define prompt
@@ -3067,9 +3067,9 @@ passed to the parameter object, and an unspecified value is returned.
           x
           (with-output-to-string (lambda () (write x)))))))
 
-(prompt)       ==>  "123"
+(prompt)       @result{}  "123"
 (prompt ">")
-(prompt)       ==>  ">"
+(prompt)       @result{}  ">"
 @end example
 @end defun
 
@@ -3087,15 +3087,15 @@ refers to the R5RS grammar nonterminal of that name). The result(s) of
 the parameterize form are the result(s) of the @var{<body>}.
 
 @example
-(radix)                                              ==>  2
-(parameterize ((radix 16)) (radix))                  ==>  16
-(radix)                                              ==>  2
+(radix)                                              @result{}  2
+(parameterize ((radix 16)) (radix))                  @result{}  16
+(radix)                                              @result{}  2
 
 (define (f n) (number->string n (radix)))
 
-(f 10)                                               ==>  "1010"
-(parameterize ((radix 8)) (f 10))                    ==>  "12"
-(parameterize ((radix 8) (prompt (f 10))) (prompt))  ==>  "1010"
+(f 10)                                               @result{}  "1010"
+(parameterize ((radix 8)) (f 10))                    @result{}  "12"
+(parameterize ((radix 8) (prompt (f 10))) (prompt))  @result{}  "1010"
 @end example
 @end deffn
 
@@ -3266,12 +3266,13 @@ A powerful pretty-printer.
 
 @menu
 * Named output formats::
+* Paths:: Paths - file name, URLs, and URIs
 * Files:: File System Interface
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
 @end menu
 
-@node Named output formats, Files, , Input-Output
+@node Named output formats, Paths, , Input-Output
 @subsection Named output formats
 
 The @code{--output-format} (or @code{--format}) command-line switch
@@ -3342,7 +3343,70 @@ to infer an appropriate @code{Content-ty[e} depending on the following value.
 Top-level values are ignored, instead of printed.
 @end table
 
-@node Files, Ports, Named output formats, Input-Output
+@node Paths, Files, Named output formats, Input-Output
+@subsection Paths - file name, URLs, and URIs
+
+A @dfn{Path} is the name of a file or some other @dfn{resource}.
+
+@deffn Type path
+A general path, which can be a @code{filename} or a @code{URI}.
+It can be either a @code{filename} or a @code{URI}.
+Represented using the abstract Java class @code{java.text.Path}.
+
+Coercing a value to a @code{Path} is equivalent to
+calling the @code{path} constructor documented below.
+@end deffn
+
+@deffn Constructor path arg
+Coerces the @var{arg} to a @code{path}.
+If @var{arg} is already a @code{path}, it is returned unchanged.
+If @var{arg} is a @code{java.net.URI}, or a @code{java.net.URL}
+then a @code{URI} value is returned.
+If @var{arg} is a @code{java.io.File}, a @code{filepath} value is returned.
+Otherwise, @var{arg} can be a Scheme string or a @code{java.lang.String}.
+A @code{URI} value is returns if the string starts with a URI scheme
+(such as @code{"http:"}),
+and a @code{filepath} value is returned otherwisw.
+@end deffn
+
+@deffn Predicate path? arg
+True if @var{arg} is a @code{path} - i.e. an instance of a @code{gnu.text.Path}.
+@end deffn
+
+@deffn Type filepath
+The name of a local file.
+Represented using the Java class @code{gnu.text.FilePath},
+which is a wrapper around @code{java.io.File}.
+@end deffn
+
+@deffn Predicate filepath? arg
+True if @var{arg} is a @code{filepath} - i.e. an instance of
+a @code{gnu.text.FilePath}.
+@end deffn
+
+@deffn Type URI
+A Uniform Resource Indicator, which is a generalization of
+the more familiar URL.
+Represented using the Java class @code{gnu.text.URIPath},
+which is a wrapper around @code{java.net.URI}.
+A URI can be a URL, or it be a relative URI.
+@end deffn
+
+@deffn Predicate URI? arg
+True if @var{arg} is a @code{URI} - i.e. an instance of
+a @code{gnu.text.URIPath}.
+@end deffn
+
+@defun path-scheme arg
+Returns the ``URI scheme'' of @var{arg} (coerced to a @code{path}) if it is
+defined, or @code{#f} otherwise.  The URI scheme of a @code{filepath}
+is @code{"file"} if the @code{filepath} is absolute, and @code{#f} otherwise.
+@example
+(path-scheme "http://gnu.org/") @result{} "http"
+@end example
+@end defun
+
+@node Files, Ports, Paths, Input-Output
 @subsection File System Interface
 
 @defun file-exists? filename
@@ -3428,10 +3492,10 @@ garbage collector if it becomes inaccessible.
 (define p
   (open-input-string "(a . (b c . ())) 34"))
 
-(input-port? p)                 -->  #t
-(read p)                        -->  (a b c)
-(read p)                        -->  34
-(eof-object? (peek-char p))     -->  #t
+(input-port? p)                 @result{}  #t
+(read p)                        @result{}  (a b c)
+(read p)                        @result{}  34
+(eof-object? (peek-char p))     @result{}  #t
 @end example
 @end defun
 
@@ -3446,7 +3510,7 @@ if it becomes inaccessible.
   (x '(a b c)))
     (write (car x) q)
     (write (cdr x) q)
-    (get-output-string q))        -->  "a(b c)"
+    (get-output-string q))        @result{}  "a(b c)"
 @end example
 @end defun
 
@@ -4243,13 +4307,13 @@ The above defines @code{kons} to be a constructor,
 @code{set-kar!} to be a modifier,
 and @code{pare?} to be a predicate for @code{pare}s.
 @example
-(pare? (kons 1 2))        --> #t
-(pare? (cons 1 2))        --> #f
-(kar (kons 1 2))          --> 1
-(kdr (kons 1 2))          --> 2
+(pare? (kons 1 2))        @result{} #t
+(pare? (cons 1 2))        @result{} #f
+(kar (kons 1 2))          @result{} 1
+(kdr (kons 1 2))          @result{} 2
 (let ((k (kons 1 2)))
   (set-kar! k 3)
-  (kar k))                --> 3
+  (kar k))                @result{} 3
 @end example
 
 The Kawa compiler creates a new Java class with a name derived from
@@ -4479,7 +4543,7 @@ The part of the name before the colon is a namespace alias (in
 this case @code{Int32}), and the part of the name after the colon is the
 method name.  For example:
 @example
-(Int32:toHexString 255) => ff
+(Int32:toHexString 255) @result{} ff
 @end example
 This invokes the static method @code{toHexString} in the
 Java class @code{java.lang.Integer}, passing it the argument @code{255},
@@ -4764,7 +4828,7 @@ You can set a static field using this syntax:
 The special field name @code{class} can be used to extract the
 @code{java.lang.Class} object for a class-type.  For example:
 @example
-(java.util.Vector:.class) => class java.util.Vector
+(java.util.Vector:.class) @result{} class java.util.Vector
 @end example
 
 To access a instance field named @var{field-name} use the following syntax.
@@ -4779,9 +4843,9 @@ This syntax works with @code{set!} - to set the field use this syntax:
 Here is an example:
 @example
 (define p (list 3 4 5))
-(*:.cdr p) => (4 5)
+(*:.cdr p) @result{} (4 5)
 (set! (*:.cdr p) (list 6 7))
-p => (3 6 7)
+p @result{} (3 6 7)
 @end example
 
 You can specify an explicit class:
@@ -5536,8 +5600,8 @@ You can access the elements of a Java array by treating it as
 a one-argument function, where the argument is the index:
 @example
 (define primes (<integer[]> 2 3 5 7 11 13))
-(primes 0) ==> 2
-(primes 5) ==> 13
+(primes 0) @result{} 2
+(primes 5) @result{} 13
 @end example
 
 You can set an element by treating the array as a function
@@ -5545,13 +5609,13 @@ with a @code{setter}:
 @example
 (set! (primes 0) -2)
 (set! (primes 3) -7)
-primes ==> [-2 3 5 -7 11 13]
+primes @result{} [-2 3 5 -7 11 13]
 @end example
 
 To get the number of elements of an array, you can treat
 it as having a @code{length} field:
 @example
-primes:length ==> 6
+primes:length @result{} 6
 @end example
 
 Here is a longer example.  This is the actual definition of the

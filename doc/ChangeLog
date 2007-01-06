@@ -1,3 +1,9 @@
+2007-01-05  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Use @result{} where appropriate.
+
+	* kawa.texi (Paths): New subsection.
+
 2006-06-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Getting Kawa): Improve sectioning.

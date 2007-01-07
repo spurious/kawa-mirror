@@ -109,14 +109,19 @@ public class FilePath
 
   public boolean isDirectory ()
   {
-    int len = path.length();
-    if (len > 0)
+    if (file.isDirectory())
+      return true;
+    if (! file.exists())
       {
-        char last = path.charAt(len - 1);
-        if (last == '/' || last == File.separatorChar)
-          return true;
+        int len = path.length();
+        if (len > 0)
+          {
+            char last = path.charAt(len - 1);
+            if (last == '/' || last == File.separatorChar)
+              return true;
+          }
       }
-    return file.isDirectory();
+    return false;
   }
 
   public long getLastModified ()

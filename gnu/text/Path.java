@@ -136,6 +136,23 @@ public abstract class Path
 
   public abstract boolean isAbsolute ();
 
+  /** Does this path name a directory?
+   * The default implementation returns true only if the path ends
+   * with '/' or the separatorChar.
+   */
+  public boolean isDirectory ()
+  {
+    String str = toString(); 
+    int len = str.length();
+    if (len > 0)
+      {
+        char last = str.charAt(len - 1);
+        if (last == '/' || last == File.separatorChar)
+          return true;
+      }
+    return false;
+  }
+
   public boolean exists ()
   {
     return getLastModified() != 0;

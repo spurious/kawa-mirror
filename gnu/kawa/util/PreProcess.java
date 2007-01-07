@@ -276,6 +276,7 @@ public class PreProcess
             if (arg.equals(version_features[i]))
               {
                 String features = version_features[i+1];
+                System.err.println("(variant "+arg+" maps to: "+features+")");
                 StringTokenizer tokenizer = new StringTokenizer(features);
                 while (tokenizer.hasMoreTokens())
                   handleArg(tokenizer.nextToken());

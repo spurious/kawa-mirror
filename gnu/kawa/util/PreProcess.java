@@ -16,6 +16,19 @@ public class PreProcess
   String filename;
   int lineno;
 
+  static final String JAVA4_FEATURES = "+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex +SAX2 +use:java.nio";
+  static final String NO_JAVA4_FEATURES = "-use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer -SAX2 -use:java.nio";
+  static final String JAVA5_FEATURES = "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName";
+
+  static String[] version_features = {
+    "java1", "-JAVA2 "+NO_JAVA4_FEATURES,
+    "java2", "+JAVA2 "+NO_JAVA4_FEATURES,
+    "java4", "-JAVA5 "+JAVA4_FEATURES+" -use:org.w3c.dom.Node -JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer",
+    "java4x", "-JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer",
+    "java5", JAVA5_FEATURES+" -JAVA6 -use:java.text.Normalizer",
+    "java6", JAVA5_FEATURES+" +JAVA6 +use:java.text.Normalizer",
+  };
+
   void error(String msg)
   {
     System.err.println(filename+':'+lineno+": "+msg);
@@ -248,6 +261,66 @@ public class PreProcess
       }
   }
 
+  void handleArg (String arg)
+  {
+    if (arg.charAt(0) == '%')
+      {
+        arg = arg.substring(1);
+        for (int i = 0;  ;  i += 2 )
+          {
+            if (i >= version_features.length)
+              {
+                System.err.println("Unknown version: "+arg);
+                System.exit(-1);
+              }
+            if (arg.equals(version_features[i]))
+              {
+                String features = version_features[i+1];
+                StringTokenizer tokenizer = new StringTokenizer(features);
+                while (tokenizer.hasMoreTokens())
+                  handleArg(tokenizer.nextToken());
+                break;
+              }
+          }
+      }
+    else if (arg.charAt(0) == '+')
+      keywords.put(arg.substring(1), Boolean.TRUE);
+    else if (arg.charAt(0) == '-')
+      {
+        int eq = arg.indexOf('=');
+        if (eq > 1)
+          {
+            String keyword
+              = arg.substring(arg.charAt(1) == '-' ? 2 :1, eq);
+            String value = arg.substring(eq+1);
+            Boolean b = Boolean.FALSE;
+            if (value.equalsIgnoreCase("true"))
+              b = Boolean.TRUE;
+            else if (! value.equalsIgnoreCase("false"))
+              {
+                System.err.println("invalid value "+value+" for "+keyword);
+                System.exit(-1);
+              }
+            keywords.put(keyword, b);
+          }
+        else
+          keywords.put(arg.substring(1), Boolean.FALSE);
+      }
+    else
+      {
+        try
+          {
+            filter(arg);
+          }
+        catch (Throwable ex)
+          {
+            System.err.println("caught "+ex);
+            ex.printStackTrace();
+            System.exit(-1);
+          }
+      }
+  }
+
   public static void main (String[] args)
   {
     PreProcess pp = new PreProcess();
@@ -256,44 +329,6 @@ public class PreProcess
     pp.keywords.put("false", Boolean.FALSE);
 
     for (int i = 0;  i < args.length;  i++)
-      {
-	String arg = args[i];
-	if (arg.charAt(0) == '+')
-	  pp.keywords.put(arg.substring(1), Boolean.TRUE);
-	else if (arg.charAt(0) == '-')
-	  {
-	    int eq = arg.indexOf('=');
-	    if (eq > 1)
-	      {
-		String keyword
-		  = arg.substring(arg.charAt(1) == '-' ? 2 :1, eq);
-		String value = arg.substring(eq+1);
-		Boolean b = Boolean.FALSE;
-		if (value.equalsIgnoreCase("true"))
-		  b = Boolean.TRUE;
-		else if (! value.equalsIgnoreCase("false"))
-		  {
-		    System.err.println("invalid value "+value+" for "+keyword);
-		    System.exit(-1);
-		  }
-		pp.keywords.put(keyword, b);
-	      }
-	    else
-	      pp.keywords.put(arg.substring(1), Boolean.FALSE);
-	  }
-	else
-	  {
-	    try
-	      {
-		pp.filter(arg);
-	      }
-	    catch (Throwable ex)
-	      {
-		System.err.println("caught "+ex);
-		ex.printStackTrace();
-		System.exit(-1);
-	      }
-	  }
-      }
+      pp.handleArg(args[i]);
   }
 }

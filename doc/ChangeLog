@@ -1,3 +1,11 @@
+2007-01-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Running Java): Update - mention JDK 1.6. etc.
+
+	* kawa.texi (Extracting Path components): New section,
+	documenting path-authority, path-host, path-user-info,
+	path-port, path-query, and path-fragment.
+
 2007-01-05  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Use @result{} where appropriate.

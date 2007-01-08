@@ -169,13 +169,13 @@ You can also
 
 Before installing Kawa, you will need a working Java system.
 Kawa has been reported to
-work with JDK from 1.1 through 1.6.0-beta, Kaffe, Symantec Cafe, J++, and GCJ.
-The released Kawa jar file assumes some JDK 1.4 functionality.
+work with JDK from 1.1 through 1.6, Kaffe, Symantec Cafe, J++, and GCJ.
+The released Kawa jar file assumes JDK 1.4 or equivalent functionality.
 If those features are missing, you may need to build Kawa from source.
 
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) from Sun.  You can download free copies of
-@uref{http://java.sun.com/j2se/1.4/, JDK 1.4} for various platforms.
+@uref{http://java.sun.com/javase/downloads/index.jsp, JDK 1.6} for various platforms.
 
 If you want to run Kawa on a Macintosh, see
 @uref{http://rdsathene.org/scheme/mackawa.html}.
@@ -199,12 +199,14 @@ The binary release includes only the binary compiled @samp{.class}
 versions of the same @samp{.java} source files in the source release.
 It does not include any documentation, so you probably want the
 source release in addition to the binary release.  The purpose
-of the binary release is just to save you time and trouble of
+of the binary release is just to save you the time and trouble of
 compiling the sources.
 
 The binary release depends on certain "Java 2" features
 correspondiong to JDK 1.4. If you have an older Java implementation (including
 JDK 1.1.x) you will need to get the source distribution.
+The same is true is you want to have Kawa make use of JDK 1.5 or 1.6
+features.
 
 The binary release comes as a @code{.jar} archive
 @samp{kawa-@value{VERSION}.jar}.
@@ -790,7 +792,7 @@ Prints a stack trace with any warning found during compilation.
 @section Running Command Scripts
 
 Unix-like systems support a mechanism where a @dfn{script} can
-specify a programs that should execute it.  The convention
+specify a program that should execute it.  The convention
 is that the first line of the file should start with the two characters
 @samp{#!} followed by the absolute path of the program that should
 process (interpret) the script.
@@ -3397,12 +3399,73 @@ True if @var{arg} is a @code{URI} - i.e. an instance of
 a @code{gnu.text.URIPath}.
 @end deffn
 
+@subsubsection Extracting Path components
+
 @defun path-scheme arg
 Returns the ``URI scheme'' of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.  The URI scheme of a @code{filepath}
 is @code{"file"} if the @code{filepath} is absolute, and @code{#f} otherwise.
 @example
 (path-scheme "http://gnu.org/") @result{} "http"
+@end example
+@end defun
+
+@defun path-authority arg
+Returns the authority part of @var{arg} (coerced to a @code{path}) if it is
+defined, or @code{#f} otherwise.
+The ``authority'' is usually the hostname, but may also include user-info
+or a port-number.
+
+@example
+(path-authority "http://me@@localhost:8000/home") @result{} "me@@localhost:8000"
+@end example
+@end defun
+
+@defun path-host arg
+Returns the name name part of @var{arg} (coerced to a @code{path}) if it is
+defined, or @code{#f} otherwise.
+
+@example
+(path-host "http://me@@localhost:8000/home") @result{} "localhost"
+@end example
+@end defun
+
+@defun path-user-info arg
+Returns the ``user info'' of @var{arg} (coerced to a @code{path}) if it is
+specified, or @code{#f} otherwise.
+
+@example
+(path-host "http://me@@localhost:8000/home") @result{} "me"
+@end example
+@end defun
+
+@defun path-port arg
+Returns the port number of @var{arg} (coerced to a @code{path}) if it is
+specified, or @code{-1} otherwise.  Even if there is a default port
+associated with a URI scheme (such as 80 for @code{http}), the value
+-1 is returned unless the port number is @emph{explictly} specified.
+
+@example
+(path-host "http://me@@localhost:8000/home") @result{} 8000
+(path-host "http://me@@localhost/home") @result{} -1
+@end example
+@end defun
+
+@defun path-query arg
+Returns the query part of @var{arg} (coerced to a @code{path}) if it is
+defined, or @code{#f} otherwise.  The query of a URI is the
+part of after @samp{?}.
+@example
+(path-query "http://gnu.org/home?add-bug") @result{} "add-bug"
+@end example
+@end defun
+
+@defun path-fragment arg
+Returns the fragment part of @var{arg} (coerced to a @code{path}) if it is
+defined, or @code{#f} otherwise.  The fragment of a URI is the
+part of after @samp{#}.
+@example
+(path-query "http://gnu.org/home#top") @result{} "top"
 @end example
 @end defun
 
@@ -5055,8 +5118,8 @@ It can be used to initialize a freshly-allocated instance
 using passed-in parameters.
 You can call a superclass or a sibling constructor using
 the @code{invoke-special} special function.
-(This is general but a admittedly a bit verbose; a more compact
-form will be added in the future.)
+(This is general but admittedly a bit verbose; a more compact
+form may be added in the future.)
 See the example below.
 
 The scope of the @var{body} of a method includes the @var{field-decl}s

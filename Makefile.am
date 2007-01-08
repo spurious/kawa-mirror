@@ -207,43 +207,39 @@ COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
 
-JAVA4_FEATURES = +JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex $(or @SAX2_PREPROCESS@,+SAX2) +use:java.nio
-NO_JAVA4_FEATURES = -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer $(or @SAX2_PREPROCESS@,-SAX2) -use:java.nio
-JAVA5_FEATURES = +JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName
-
 # JDK 1.1
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA2 $(NO_JAVA4_FEATURES) \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java1' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=1
 
 # JDK 1.2+, GCJ-3.x
 select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess +JAVA2 $(NO_JAVA4_FEATURES) \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java2' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=2
 
 # JDK 1.4, GCJ-4.x, without JAXP (default - matches CVS)
 select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) -use:org.w3c.dom.Node -JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java4' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=4
 
 # JDK 1.4, GCJ-4.x with JAXP 1.3
 select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess -JAVA5 $(JAVA4_FEATURES) +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java4x' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=4x
 
 # JDK 1.5
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess $(JAVA5_FEATURES) -JAVA6 -use:java.text.Normalizer \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java5' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=5
 
 # JDK 1.6
 select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess $(JAVA5_FEATURES) +JAVA6 +use:java.text.Normalizer \
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java6' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=6
 

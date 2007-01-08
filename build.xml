@@ -53,11 +53,6 @@
   -->
   <property name="preprocess.overwrite" value="false"/>
 
-  <!--We don't use Node for java4 because there are inconsistencies
-  between the version of DOM used in Java4 and the one in Java 5 (and GCJ). -->
-  <property name="java4-features" value="+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI -use:org.w3c.dom.Node"/>
-  <property name="no-java4-features" value="-use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:org.w3c.dom.Node -JAXP-1.3 -JAVA5"/>
-  
   <target name="all" depends="classes, jar"/>
 
   <target name="classes" 
@@ -231,7 +226,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="-JAVA2 ${no-java4-features}"/>
+      <arg line="%java1"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -242,7 +237,18 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="+JAVA2 ${no-java4-features}"/>
+      <arg line="%java2"/>
+      <arg line="${fileList}"/>
+    </java>
+  </target>
+    
+  <target name="select-java4" depends="build-tools">
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="%java4"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -253,7 +259,18 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="${java4-features} +JAVA5 +JAXP-1.3"/>
+      <arg line="%java5"/>
+      <arg line="${fileList}"/>
+    </java>
+  </target>
+    
+  <target name="select-java6" depends="build-tools">
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="%java6"/>
       <arg line="${fileList}"/>
     </java>
   </target>

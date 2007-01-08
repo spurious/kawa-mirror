@@ -1,3 +1,9 @@
+2007-01-08  Per Bothner  <per@bothner.com>
+
+	* Makefile.am, build.xml: Moved the mapping from "source-version" to
+	"PreProcess feature list" to the single location (PrePorcess.java), so
+	we don't need to duplicate it Makefile.am and build.xml.
+
 2007-01-05  Per Bothner  <per@bothner.com>
 
 	* configure.in: If JAVA_SOURCE is 1|2|3 default with_sax2 to "no".

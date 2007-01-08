@@ -1,15 +1,11 @@
 HIGH PRIORITY:
+* When deferring imports (require) the 'run' actions shouldn't be deferred. FIXME
+* Optimize and/or in the case of ConditionalTarget or <boolean> target.
 * properties of symbols
-* Document fluid-let in manual.
-* rename sublist to subsequence.  deprecate sublist, item-at
-* Should complain if user-defined function called with too many args.
 * Compilation: not implemented mustConvert restarg
 * XQuery distinguish qexo: kawa: fn: default function namespaces.
-* Implement/document external functions, variables.
+* XQuery: Implement/document external functions.
 * Name mangling, document library modules.
-  Document --module-static-run vs --module-static.
-* Finish namespace handling: namespaces in constructed nodes,
-  fn:namespace-for-uri-prefix, get-in-scope-prefixes
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))
 
 Remove pretty-print implementation in slib.

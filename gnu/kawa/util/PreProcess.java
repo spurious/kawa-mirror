@@ -23,6 +23,8 @@ public class PreProcess
   static String[] version_features = {
     "java1", "-JAVA2 "+NO_JAVA4_FEATURES,
     "java2", "+JAVA2 "+NO_JAVA4_FEATURES,
+    // We don't use Node for java4 because there are inconsistencies between
+    // the version of DOM used in Java4 and the one in Java 5 (and GCJ).
     "java4", "-JAVA5 "+JAVA4_FEATURES+" -use:org.w3c.dom.Node -JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer",
     "java4x", "-JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -JAVA6 -use:java.text.Normalizer",
     "java5", JAVA5_FEATURES+" -JAVA6 -use:java.text.Normalizer",

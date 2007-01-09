@@ -6535,13 +6535,10 @@ Daniel Bonniot @email{bonniot@@users.sf.net}).
 @node Software-License, Manual-License, , License
 @section License for the Kawa software
 
-The license for Kawa the software is the
+The license for the Kawa software
+(except the optional JEmacs and BRL features - see below) is the
 @uref{http://opensource.org/licenses/mit-license.php, X11/MIT license}
 which is quoted below.
-
-The Kawa license used to be a "modified Gnu Public License".
-Note that not all of the file files have been updated yet
-to reflect the new license.
 
 @example
 The software (with related files and documentation) in these packages
@@ -6567,31 +6564,48 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 @end example
 
-Kawa uses some math routines from fdlib's libf77, which bear the
-following copyright:
+In the past the Kawa license was a "modified GNU GPL (General
+Public License)".
+If you find any files that contain the old license or otherwise seem
+to contradict the new license, please report that as a bug.
 
-@quotation
-Copyright 1990, 1991, 1992, 1993 by AT&T Bell Laboratories and Bellcore.
- 
-Permission to use, copy, modify, and distribute this software
-and its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the names of AT&T Bell Laboratories or
-Bellcore or any of their entities not be used in advertising or
-publicity pertaining to distribution of the software without
-specific, written prior permission.
- 
-AT&T and Bellcore disclaim all warranties with regard to this
-software, including all implied warranties of merchantability
-and fitness.  In no event shall AT&T or Bellcore be liable for
-any special, indirect or consequential damages or any damages
-whatsoever resulting from loss of use, data or profits, whether
-in an action of contract, negligence or other tortious action,
-arising out of or in connection with the use or performance of
-this software.
-@end quotation
+Some of the JEmacs files are based on Emacs and have a GPL license,
+which is incompatible with non-Free (proprietary) products.  For that
+reason, the @code{gnu.jemacs.*} packages are not included any more in
+the standard @code{.jar} or by default when building from source, to
+avoid surprises.
+To build JEmacs you have to specify the @code{configure}
+flag @code{--enable-jemacs} or the @code{ant} flag
+@code{-Denable-jemacs=true}.
+
+Some code in {@code gnu/brl} and {@code gnu/kawa/brl} is copyight
+Bruce R. Lewis and Eaton Vance Management,
+with a modified-GPL license: no restrictions if used
+unmodified, but otherwise the GPL applies.
+These packages are no longer included by default in Kawa builds,
+but have to be selected with the @code{configure}
+flag @code{--enable-brl} or the @code{ant} flag @code{-Denable-brl=true}.
+
+Kawa uses some math routines from fdlib's libf77,
+which have a AT&T Bell Laboratories and Bellcore copyright.
+See the source file @code{gnu/math/DComplex.java}.
+
+The sorting routine in @code{gnu.xquery.util.OrderedTuples}
+is a re-implementatiomn in Java of code copyrighted by
+Simon Tatham.
+
+Some of the Scheme code in @code{kawa/lib} and @code{gnu/kawa/slib}
+are copyright other parties, and may have slightly different
+license wording, but I believe none of then contradicts the
+main Kawa license or impose extra restrictions.
+Search for the word @code{copyright} in these directories.
+
+Some code has been converted from other languages, with permission.
+This includes the @code{rationalize} method
+in @code{gnu/math/RatNum.java}, based on an algorith of Alan Bawden,
+as expressed by Marc Feeley in C-Gambit.
+The concepts and algorithm of @code{gnu/text/PrettyWriter.java}
+are converted from SBCL, which is in the public domain.
 
 @node Manual-License, , Software-License, License
 @section License for the Kawa manual

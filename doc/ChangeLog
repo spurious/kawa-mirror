@@ -1,3 +1,8 @@
+2007-01-09  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Software-License): Some extra details, updates,
+	and clarifications.
+
 2007-01-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Running Java): Update - mention JDK 1.6. etc.

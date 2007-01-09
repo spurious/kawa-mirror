@@ -34,8 +34,10 @@ AC_ARG_ENABLE(echo2,
   enable_echo2=$enableval, enable_echo2=yes)
 
 AC_ARG_ENABLE(jemacs,
-  AS_HELP_STRING(--enable-jemacs,Build JEmacs),
-  enable_jemacs=$enableval, enable_jemacs=yes)
+  AS_HELP_STRING(--enable-jemacs,Build JEmacs))
+
+AC_ARG_ENABLE(brl,
+  AS_HELP_STRING(--enable-brl,Build BRL emulation and KRL))
 
 AC_ARG_WITH(swing,
   AS_HELP_STRING(--with-swing,Assume Swing is available (default on)))
@@ -137,6 +139,7 @@ enable_servlet=${enable_servlet-${with_servlet}}
 AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(WITH_GCJ_DBTOOL, test "$with_gcj_dbtool" = "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
+AM_CONDITIONAL(ENABLE_BRL, test "$enable_brl" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,

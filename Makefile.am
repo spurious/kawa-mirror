@@ -6,12 +6,16 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
   gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
-  gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
-  $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+if ENABLE_JEMACS
+JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
+endif
 if ENABLE_XML
 XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
+if ENABLE_BRL
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+endif
 XQUERY_SUBDIR = gnu/xquery
 if WITH_SAX2
 SAX_SUBDIR = gnu/kawa/sax

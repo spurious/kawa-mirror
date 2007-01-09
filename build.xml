@@ -57,7 +57,7 @@
 
   <target name="classes" 
           depends="java-classes, lib-scm-classes
-          , slib-scm-classes, commonlisp-scm-classes
+          , slib-scm-classes, commonlisp-scm-classes, brl-classes
           , xml-classes, servlet-classes, jemacs-classes" />
   
   <!-- 
@@ -144,9 +144,11 @@
     <!--
        JEmacs stuff is compiled if Swing is used, unless enable-jemacs is false.
     -->
-    <property name="enable-jemacs" value="${with-swing}"/>
+    <property name="enable-jemacs" value="false"/>
 
     <property name="enable-xml" value="true"/>
+
+    <property name="enable-brl" value="false"/>
 
     <!--
        If javax.servlet.http.HttpServlet is in the classpath, then we'll
@@ -490,7 +492,7 @@
     </apply>
   </target>
   
-  <target name="xml-classes" 
+  <target name="xml-classes"
           depends="build-settings, java-classes" 
           if="${enable-xml}">
     <javac srcdir="${src.dir}"
@@ -503,6 +505,29 @@
       <include name="gnu/kawa/xslt/"/>
       <include name="gnu/xquery/lang/"/>
       <include name="gnu/xquery/util/"/>
+      <patternset refid="with-sax2-${with-sax2}"/>
+    </javac>
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
+      <fileset dir="${src.dir}/gnu/kawa/slib"> 
+        <include name="XML.scm"/>
+        <include name="XStrings.scm"/>
+      </fileset>
+    </apply>
+  </target>
+
+  <target name="brl-classes"
+          depends="build-settings, java-classes" 
+          if="${enable-brl}">
+    <javac srcdir="${src.dir}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}" >
       <include name="gnu/brl/"/>
       <include name="gnu/kawa/brl/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
@@ -525,17 +550,6 @@
       <arg line="-P gnu.kawa.brl. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/brl"> 
         <include name="progfun.scm"/>
-      </fileset>
-    </apply>
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
-      <fileset dir="${src.dir}/gnu/kawa/slib"> 
-        <include name="XML.scm"/>
-        <include name="XStrings.scm"/>
       </fileset>
     </apply>
   </target>

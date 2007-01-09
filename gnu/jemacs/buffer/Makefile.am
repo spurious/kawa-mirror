@@ -31,7 +31,4 @@ GCJ_INPUTS = *emacs*.class
 EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
 
-if ENABLE_JEMACS
-ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-endif
-all: Makefile $(ALL)
+all: Makefile java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)

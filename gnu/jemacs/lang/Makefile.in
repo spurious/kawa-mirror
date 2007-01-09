@@ -73,6 +73,8 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BRL_FALSE = @ENABLE_BRL_FALSE@
+ENABLE_BRL_TRUE = @ENABLE_BRL_TRUE@
 ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
 ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
 ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
@@ -230,7 +232,6 @@ java_SCM = MiscOps.scm NumberOps.scm
 PACKAGE_FNAME = gnu-jemacs-lang
 EXTRA_GCJ_INPUTS = MiscOps*.class NumberOps*.class
 EXTRA_DIST = $(java_SCM) package.html
-@ENABLE_JEMACS_TRUE@ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 all: all-am
 
 .SUFFIXES:
@@ -418,7 +419,7 @@ elisp-classes.stamp: $(java_ELISP)
 	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
-all: Makefile $(ALL)
+all: Makefile java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -107,6 +107,8 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BRL_FALSE = @ENABLE_BRL_FALSE@
+ENABLE_BRL_TRUE = @ENABLE_BRL_TRUE@
 ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
 ENABLE_ECHO2_TRUE = @ENABLE_ECHO2_TRUE@
 ENABLE_JEMACS_FALSE = @ENABLE_JEMACS_FALSE@
@@ -237,12 +239,13 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
   gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
-  gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
-  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
-  $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+
+@ENABLE_JEMACS_TRUE@JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
+@ENABLE_JEMACS_TRUE@  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 
 @ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
-@ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+@ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 @ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
 javadir = $(datadir)/java

@@ -8,8 +8,7 @@ DOTEST = $(KAWA) --elisp\
 EXTRA_DIST = lang-test.el
 CLEANFILES = *.log
 
-if ENABLE_JEMACS
 check:
 	$(DOTEST) -f "$(srcdir)/lang-test.el" -e '(test-report)'
-endif
+
 all:

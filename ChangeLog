@@ -1,3 +1,15 @@
+2007-01-09  Per Bothner  <per@bothner.com>
+
+	* configure.in: Make --disable-jemacs the default.
+	(--enable-brl): New non-default flag.
+	* build.xml (brl-classes): Split new target off from xml-classes.
+	(enable-brl): New property.
+	(enable-jemacs): Make default false.
+	* build.properties (enable-jemacs, enable-brl): Update to match.
+	* Makefile.am: Conditionalize on ENABLE_JEMACS and ENABLE_BRL.
+	* gnu/jemacs/*/Makefile.am: Remove condionalization on
+	ENABLE_JEMACS, since handled in top-level Makefile.
+	
 2007-01-08  Per Bothner  <per@bothner.com>
 
 	* Makefile.am, build.xml: Moved the mapping from "source-version" to

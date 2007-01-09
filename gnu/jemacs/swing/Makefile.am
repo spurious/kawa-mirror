@@ -17,10 +17,8 @@ java_sources = \
 PACKAGE_FNAME = gnu-jemacs-swing
 GCJ_INPUTS =  $(java_Java)
 
-if ENABLE_JEMACS
 if WITH_SWING
 ALL = java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-endif
 endif
 all: Makefile $(ALL)
 

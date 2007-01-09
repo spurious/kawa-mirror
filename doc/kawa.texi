@@ -6578,7 +6578,7 @@ To build JEmacs you have to specify the @code{configure}
 flag @code{--enable-jemacs} or the @code{ant} flag
 @code{-Denable-jemacs=true}.
 
-Some code in {@code gnu/brl} and {@code gnu/kawa/brl} is copyight
+Some code in @code{gnu/brl} and @code{gnu/kawa/brl} is copyright
 Bruce R. Lewis and Eaton Vance Management,
 with a modified-GPL license: no restrictions if used
 unmodified, but otherwise the GPL applies.

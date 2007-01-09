@@ -49,13 +49,11 @@
 (path-extension)
 |#
 
-(define (file-exists? filename)
-  ((primitive-virtual-method "java.io.File" "exists" "boolean" ())
-   (->pathname filename)))
+(define (file-exists? (filename :: path)) :: <boolean>
+  (filename:exists))
 
-(define (file-directory? filename)
-  ((primitive-virtual-method "java.io.File" "isDirectory" "boolean" ())
-   (->pathname filename)))
+(define (file-directory? (filename :: path)) :: <boolean>
+  (filename:isDirectory))
 
 (define (file-readable? filename)
   ((primitive-virtual-method "java.io.File" "canRead" "boolean" ())
@@ -65,9 +63,8 @@
   ((primitive-virtual-method "java.io.File" "canWrite" "boolean" ())
    (->pathname filename)))
 
-;(define (file-modification-time filename)
-;  ((primitive-virtual-method "java.io.File" "lastModified" "long" ())
-;   (->pathname filename)))
+;(define (file-modification-time (filename :: path)) :: <long>
+;  (filename:getLastModified))
 
 (define (delete-file filename)
   ((primitive-virtual-method "java.io.File" "delete" "boolean" ())

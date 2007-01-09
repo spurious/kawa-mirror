@@ -1,3 +1,7 @@
+2007-01-08  Per Bothner  <per@bothner.com>
+
+	* files.scm (file-exists?, file-directory?): Generalize to path.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* files.scm (resource-uri): Use Path rather than URI_utils resolve.

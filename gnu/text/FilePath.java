@@ -193,12 +193,12 @@ public class FilePath
     return file;
   }
 
-  public static URL toURL (File file)
+  public URL toURL ()
   {
+    if (! isAbsolute())
+      return getAbsolute().toURL();
     try
       {
-        // FIXME this resolves relative paths relative to Path.userDirPath,
-        // but should be Path.currentPath().
         /* #ifdef JAVA2 */
         /* #ifdef use:java.net.URI */
         return file.toURI().toURL();
@@ -214,11 +214,6 @@ public class FilePath
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
-  }
-
-  public URL toURL ()
-  {
-    return toURL(file);
   }
 
   /* #ifdef use:java.net.URI */

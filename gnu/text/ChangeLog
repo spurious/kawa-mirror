@@ -1,5 +1,8 @@
 2007-01-09  Per Bothner  <per@bothner.com>
 
+	* FilePath.java (static toURL(File)): Inline in ...
+	(toURL()): Also, if not absolute, make it so.
+
 	* Path.java (getDirectory, getParent, getLast, getExtension):
 	New component extraction methods.
 	* FilePath.java (getLast, getParent): New methods.

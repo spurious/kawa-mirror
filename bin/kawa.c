@@ -82,14 +82,28 @@ extern char * get_classpath(const char *);
 #define COMMAND JAVA
 #endif
 #endif
-#ifndef COMMAND_ARGS
-#ifdef GCJ_COMPILED
-#define COMMAND_ARGS COMMAND
-#else
+#if ! defined(COMMAND_ARGS) && ! defined(GCJ_COMPILED)
 #define COMMAND_ARGS COMMAND, "kawa.repl"
 #endif
-#endif
 
+#ifdef GCJ_COMPILED
+/* Make COMMAND relative to PROGNAME, which is main's argv[0]. */
+
+char*
+get_command (char *progname)
+{
+  char *command = COMMAND;
+  char* rp = strrchr(progname, '/');
+  if (rp != NULL)
+    {
+      int dirlen = rp - progname;
+      char *tmp = malloc (dirlen + strlen(command) + 2);
+      sprintf(tmp, "%.*s/%s", dirlen, progname, command);
+      command = tmp;
+    }
+  return command;
+}
+#endif
 
 #if defined(SUPPORT_PTY) && !defined(SUPPORT_TELNET)
 static int use_telnet = 0;
@@ -604,8 +618,17 @@ main(int argc, char** argv)
 
 	  /* now start the shell */
 	  {
+#if defined(GCJ_COMPILED) && ! defined(COMMAND_ARGS)
+	    char *command_args[2];
+	    char *progname
+	    char *command = get_command (argv[0]);
+	    command_args[0] = command;
+	    command_args[1] = NULL;
+	    execvp(command, command_args);
+#else
 	    static char* command_args[] = { COMMAND_ARGS, NULL };
 	    execvp(COMMAND, command_args);
+#endif
 	  }
 
 	  /* should never be reached */
@@ -646,22 +669,17 @@ main(int argc, char** argv)
 
       if (use_telnet == 2)
 	{
+#ifdef COMMAND_ARGS
 	  static char* command_args[] = { COMMAND_ARGS };
 	  char** out_argv = (char **)
 	    malloc (sizeof(command_args) + (5 + argc) * sizeof(char*));
+#else
+	  char** out_argv = (char **) malloc ((6 + argc) * sizeof(char*));
+#endif
 	  int out_argc = 0;
 	  char port_buf[12];
 	  socklen_t namelen;
 	  int conn;
-#ifdef GCJ_COMPILED
-	  char* rp = strrchr(argv[0], '/');
-	  if (rp != NULL)
-	    {
-	      int dirlen = rp - argv[0];
-	      command_args[0] = malloc (dirlen + strlen(COMMAND) + 2);
-	      sprintf(command_args[0], "%.*s/%s", dirlen, argv[0], COMMAND);
-	    }
-#endif
 	  sock = socket (PF_INET, SOCK_STREAM, 0);
 	  if (sock < 0)
 	    {
@@ -693,14 +711,19 @@ main(int argc, char** argv)
 	      exit(-1);
 	    }
 
+#if defined(GCJ_COMPILED) && ! defined(COMMAND_ARGS)
+	  out_argv[out_argc++] = get_command (argv[0]);
+#else
 	  for (i = 0;  i < sizeof(command_args)/sizeof(char*);  i++)
 	    out_argv[out_argc++] = command_args[i];
+#endif
 	  out_argv[out_argc++] = "--connect";
 	  sprintf (port_buf, "%d", port);
 	  out_argv[out_argc++] = port_buf;
 	  for (i = 1;  i < argc;  i++)
 	    out_argv[out_argc++] = argv[i];
 	  out_argv[out_argc] = NULL;
+
 	  child = fork();
 	  if (child == 0)
 	    {

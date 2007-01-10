@@ -3388,7 +3388,9 @@ a @code{gnu.text.FilePath}.
 
 @deffn Type URI
 A Uniform Resource Indicator, which is a generalization of
-the more familiar URL.
+the more familiar URL.  The general format is specified by
+@uref{http://www.ietf.org/rfc/rfc2396.txt,
+RFC 2396: Uniform Resource Identifiers (URI): Generic Syntax}.
 Represented using the Java class @code{gnu.text.URIPath},
 which is a wrapper around @code{java.net.URI}.
 A URI can be a URL, or it be a relative URI.

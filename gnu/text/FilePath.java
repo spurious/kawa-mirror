@@ -195,6 +195,8 @@ public class FilePath
 
   public URL toURL ()
   {
+    if (this == Path.userDirPath)
+      return resolve("").toURL();
     if (! isAbsolute())
       return getAbsolute().toURL();
     try
@@ -216,23 +218,18 @@ public class FilePath
       }
   }
 
-  /* #ifdef use:java.net.URI */
-  public static String toURIString (File file)
-  {
-    return toURI(file).toString();
-  }
-  /* #else */
-  // public static String toURIString (File file)
+  /* #ifndef use:java.net.URI */
+  // public String toURIString ()
   // {
   //   if (file.isAbsolute())
-  //     return FilePath.toURL(file).toString();
+  //     return toURL().toString();
   //   else
   //     return file.toString().replace(File.separatorChar, '/');
   // }
   /* #endif */
 
   /* #ifdef use:java.net.URI */
-  public static URI toURI (File file)
+  private static URI toURI (File file)
   {
     try
       {
@@ -255,6 +252,8 @@ public class FilePath
 
   public URI toURI ()
   {
+    if (this == Path.userDirPath)
+      return resolve("").toURI();
     return toURI(file);
   }
   /* #endif */

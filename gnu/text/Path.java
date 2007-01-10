@@ -11,9 +11,11 @@ import gnu.mapping.*;
 public abstract class Path
 // Possibly FUTURE: #ifdef JAVA6: implements javax.tools.FileObject
 {
+  /** This is equivalent to the System {@code "user.dir} property.
+   * However, the getProperty is tracked dynamically and resolved
+   * as needed.  */
   public static final FilePath userDirPath =
-    FilePath.valueOf(new File(""));
-  //FilePath.valueOf(new File(System.getProperty("user.dir")));
+    FilePath.valueOf(new File("."));
 
   public static Path defaultPath = userDirPath;
 
@@ -346,7 +348,10 @@ public abstract class Path
 
   public Path getAbsolute ()
   {
-    return currentPath().resolve(this);
+    if (this == Path.userDirPath)
+      return resolve("");
+    else
+      return currentPath().resolve(this);
   }
 
   public Path getCanonical ()

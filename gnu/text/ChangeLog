@@ -1,5 +1,14 @@
 2007-01-09  Per Bothner  <per@bothner.com>
 
+	* URIPath.java (valueOf): Remove unused factory method.
+
+	* Path.java (userDirPath): Define as ".".
+	(getAbsolute): Special handling of userDirPath.
+	* FilePath.java (toURL, toURI): Likewise.
+
+	* FilePath.java (toURIString): Remove in use:URI case.
+	Make in-static in non-use:URI case.
+
 	* FilePath.java (static toURL(File)): Inline in ...
 	(toURL()): Also, if not absolute, make it so.
 

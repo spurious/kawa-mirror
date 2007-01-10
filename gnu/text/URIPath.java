@@ -78,15 +78,6 @@ public class URIPath
     /* #endif */
   }
 
-  public static URIPath valueOf (File file)
-  {
-    /* #ifdef use:java.net.URI */
-    return valueOf(FilePath.toURI(file));
-    /* #else */
-    // return valueOf(FilePath.toURIString(file));
-    /* #endif */
-  }
-
   public boolean isAbsolute ()
   {
     /* #ifdef use:java.net.URI */

@@ -763,7 +763,11 @@ public class Scheme extends LispLanguage
       defProcStFld("path-user-info", "kawa.lib.files");
       defProcStFld("path-host", "kawa.lib.files");
       defProcStFld("path-port", "kawa.lib.files");
-      defProcStFld("path-path", "kawa.lib.files"); // ???
+      defProcStFld("path-file", "kawa.lib.files");
+      defProcStFld("path-parent", "kawa.lib.files");
+      defProcStFld("path-directory", "kawa.lib.files");
+      defProcStFld("path-last", "kawa.lib.files");
+      defProcStFld("path-extension", "kawa.lib.files");
       defProcStFld("path-fragment", "kawa.lib.files");
       defProcStFld("path-query", "kawa.lib.files");
 

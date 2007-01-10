@@ -23,8 +23,20 @@
     (if (eq? s #!null) #f (<string> s))))
 (define (path-host (p :: path))
   (p:getHost))
-(define (path-path (p :: path))
+(define (path-file (p :: path))
   (let ((s (p:getPath)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-directory (p :: path))
+  (let ((s (p:getDirectory)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-parent (p :: path))
+  (let ((s (p:getParent)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-last (p :: path))
+  (let ((s (p:getLast)))
+    (if (eq? s #!null) #f (<string> s))))
+(define (path-extension (p :: path))
+  (let ((s (p:getExtension)))
     (if (eq? s #!null) #f (<string> s))))
 (define (path-port (p :: path)) :: <int>
   (p:getPort))
@@ -37,7 +49,6 @@
 
 #|
 (resolve-path path) ;; resolves symlinks
-
 (path->complete-path path [base-path])
 (path->directory-path path)
 (string->path string)
@@ -45,8 +56,6 @@
 (build-path base-path sub-path ...)
 (expand-path)
 (simplify-path)
-
-(path-extension)
 |#
 
 (define (file-exists? (filename :: path)) :: <boolean>

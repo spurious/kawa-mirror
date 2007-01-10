@@ -1,3 +1,9 @@
+2007-01-09  Per Bothner  <per@bothner.com>
+
+	* files.scm (path-path): Rename to path-file.
+	(pah-directory, path-parent, path-last, path-extension):
+	New functions.
+
 2007-01-08  Per Bothner  <per@bothner.com>
 
 	* files.scm (file-exists?, file-directory?): Generalize to path.

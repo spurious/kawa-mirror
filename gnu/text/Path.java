@@ -184,6 +184,69 @@ public abstract class Path
 
   public abstract String getPath ();
 
+  public Path getDirectory ()
+  {
+    if (isDirectory())
+      return this;
+    else
+      return resolve("");
+  }
+
+  public Path getParent ()
+  {
+    return resolve(isDirectory() ? ".." : "");
+  }
+
+  public String getLast ()
+  {
+    String p = getPath();
+    if (p == null)
+      return null;
+    int len = p.length();
+    int end = len;
+    for (int i = len; ; )
+      {
+        if (--i <= 0)
+          return "";
+        char c = p.charAt(i);
+        if (c == '/'
+            || (this instanceof FilePath
+                && c == File.separatorChar))
+          {
+            if (i+1 == len)
+              end = i;
+            else
+              return p.substring(i+1, end);
+          }
+      }
+  }
+
+  public String getExtension ()
+  {
+    String p = getPath();
+    if (p == null)
+      return null;
+    int len = p.length();
+    for (int i = len; ; )
+      {
+        if (--i <= 0)
+          return null;
+        char c = p.charAt(i);
+        boolean sawDot = false;
+        if (c == '.')
+          {
+            c = p.charAt(i-1);
+            sawDot = true;
+          }
+        if (c == '/'
+            || (this instanceof FilePath
+                && c == File.separatorChar))
+          return null;
+        if (sawDot)
+          return p.substring(i+1);
+      }
+  }
+
   public int getPort ()
   {
     return -1;

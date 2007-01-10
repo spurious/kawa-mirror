@@ -145,6 +145,22 @@ public class FilePath
     return file.getPath();
   }
 
+  public String getLast ()
+  {
+    return file.getName();
+  }
+
+  public
+  /* #ifdef JAVA5 */
+  // FilePath
+  /* #else */
+  Path
+  /* #endif */
+  getParent ()
+  {
+    return FilePath.valueOf(file.getParentFile());
+  }
+
   public int compareTo (FilePath path)
   {
     return file.compareTo(path.file);

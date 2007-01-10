@@ -270,7 +270,7 @@ public class URIPath
     /* #ifdef use:java.net.URI */
     return uri.getPath();
     /* #else */
-    // return toURL().getPath();
+    // return toURL().getFile();
     /* #endif */
   }
 

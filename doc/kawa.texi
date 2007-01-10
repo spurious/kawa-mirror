@@ -3451,6 +3451,66 @@ associated with a URI scheme (such as 80 for @code{http}), the value
 @end example
 @end defun
 
+@defun path-file arg
+Returns the ``path component'' of the @var{arg}
+(coerced to a @code{path}).
+(The name @code{path-path} might be more logical,
+but it is obviously a bit awkward.)
+The path component of a file name is the file name itself.
+For a URI, it is the main hierarchical part of the URI,
+without schema, authority, query, or fragment.
+@example
+(path-file "http://gnu.org/home/me.html?add-bug#body") @result{} "me.html"
+@end example
+@end defun
+
+@defun path-directory arg
+If @var{arg} (coerced to a @code{path}) is directory,
+return @var{arg}; otherwise return the ``parent'' path, without the
+final component.
+@example
+(path-directory "http://gnu.org/home/me/index.html#body")
+  @result{} (path "http://gnu.org/home/me/")
+(path-directory "http://gnu.org/home/me/")
+  @result{} (path "http://gnu.org/home/me/")
+@end example
+@code{(path-directory "./dir")} @code{@result{}} @code{(path "./dir")} if @code{dir} is a directory, and @code{(path ".")} otherwise.
+@end defun
+
+@defun path-parent arg
+Returns the ``parent directory'' of @var{arg} (coerced to a @code{path}).
+If @var{arg} is not a directory, same as @code{path-directory @var{arg}}.
+@example
+(path-parent "a/b/c") @result{} (path "a/b")
+(path-parent "file:/a/b/c") @result{} (path "file:/a/b/c")
+(path-parent "file:/a/b/c/") @result{} (path "file:/a/b/")
+@end example
+@end defun
+
+@defun path-last arg
+The last component of path component
+of @var{arg} (coerced to a @code{path}).
+Returns a substring of @code{(path-file @var{arg})}.
+If that string ends with @samp{/} or the path separator,
+that last character is ignored.
+Returns the tail of the path-string, following
+the last (non-final) @samp{/} or path separator.
+@example
+(path-last "http:/a/b/c") @result{} "c"
+(path-last "http:/a/b/c/") @result{} "c"
+(path-last "a/b/c") @result{} "c"
+@end example
+@end defun
+
+@defun path-extension arg
+Returns the ``extension'' of the @var{arg}
+(coerced to a @code{path}).
+@example
+(path-extension "http://gnu.org/home/me.html?add-bug#body") @result{} "html"
+(path-extension "/home/.init") @result{} #f
+@end example
+@end defun
+
 @defun path-query arg
 Returns the query part of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.  The query of a URI is the
@@ -3474,11 +3534,17 @@ part of after @samp{#}.
 
 @defun file-exists? filename
 Returns true iff the file named @var{filename} actually exists.
+This function is defined on arbitrary @code{path} values:
+for URI values we open a @code{URLConnection}
+and invoke @code{getLastModified()}.
 @end defun
 
 @defun file-directory? filename
 Returns true iff the file named @var{filename} actually exists
 and is a directory.
+This function is defined on arbitrary @code{path} values;
+the default implementation for non-file objects is to
+return @code{#t} iff the path string ends with the character @samp{/}.
 @end defun
 
 @defun file-readable? filename

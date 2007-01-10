@@ -1,5 +1,7 @@
 2007-01-09  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Paths): Document more path functions.
+
 	* kawa.texi (Software-License): Some extra details, updates,
 	and clarifications.
 

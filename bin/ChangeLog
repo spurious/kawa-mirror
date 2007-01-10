@@ -1,5 +1,10 @@
 2007-01-10  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (kawa.sh): Rename to plain 'kawa'.
+	Only build and install if !ENABLE_KAWA_FRONTEND.
+	Hence we use 'kawa' as the executable in all cases.
+	(CLEANFILES): Also remove gckawa.
+
 	* kawa.c (get_command): New helper function.
 	(main): Use it, twice.
 

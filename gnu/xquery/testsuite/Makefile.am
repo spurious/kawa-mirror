@@ -1,9 +1,7 @@
 include $(top_srcdir)/Make-rules
 
 KAWALIB = $(top_builddir)
-DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
-ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
-KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
+KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa
 EXTRA_CLEAN = tmp* *.log testing.zip *.class Mod1/*.class Mod2/*.class
 
 java_sources = TestMisc.java TestSuite.java RunXQTS.java

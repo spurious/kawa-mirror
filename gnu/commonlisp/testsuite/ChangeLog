@@ -1,3 +1,8 @@
+2007-01-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA): Simplify - always use ../../../bin/kawa-bin.
+	(DISABLE_GCJ_COMPILED_KAWA, ENABLE_GCJ_COMPILED_KAWA): Remove macros.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* lang-test.lisp: Add some tests of function, #', and functionp.

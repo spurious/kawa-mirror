@@ -2,37 +2,35 @@ KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
 WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"'
 
-if WITH_GCJ
-bin_SCRIPTS = gckawa qexo
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS_KAWA = kawa
-endif
+else ! ENABLE_KAWA_FRONTEND
+KAWASCRIPTS_KAWA = kawa
+endif ! ENABLE_KAWA_FRONTEND
+
+if WITH_GCJ
+bin_SCRIPTS = gckawa qexo $(KAWASCRIPTS_KAWA)
 if WITH_GCJ_DBTOOL
 AM_CFLAGS = -fPIC
 CDEFS = $(WITHOUT_GCJ_DEFS)
-else
+else !WITH_GCJ_DBTOOL
 CDEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
 KAWAPROGS_KAWA_BIN = kawa-bin
-endif
+endif !WITH_GCJ_DBTOOL
 DEFSy = 
 KAWAPROGS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN)
-else
+else !WITH_GCJ
 CDEFS = $(WITHOUT_GCJ_DEFS)
-bin_SCRIPTS = qexo
-if ENABLE_KAWA_FRONTEND
-KAWAPROGS = kawa
-endif
-endif
+bin_SCRIPTS = qexo $(KAWASCRIPTS_KAWA)
+endif !WITH_GCJ
 DEFS = $(CDEFS)
 
-bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
+bin_PROGRAMS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN) cgi-servlet
 
-EXTRA_PROGRAMS = kawa
-noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
-CLEANFILES = kawa.sh qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp
 LIBTOOL = $(top_builddir)/libtool
 
 READLINE_INCLUDE_PATH =
@@ -67,19 +65,17 @@ LIBADD_SERVLET = gnu-kawa-servlet.lo
 EXTRA_LIB_SERVLET = -l-javax-servlet
 endif
 
-kawa.sh:
+if ! ENABLE_KAWA_FRONTEND
+kawa:
 	echo '#!/bin/sh' >tmp
-if WITH_GCJ
-	echo 'exec `echo "$$0" | sed -e '"'"'s|/kawa[^/]*$$|/kawa-bin|'"'"'` "$$@"' >> tmp
-else
 	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
 	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
-endif
 	chmod +x tmp
-	mv tmp kawa.sh
+	mv tmp kawa
+endif
 
 gckawa: Makefile
 	echo '#!/bin/sh' >tmp
@@ -97,11 +93,6 @@ qexo:
 	echo '  */qexo)' >>tmp
 	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
 	echo '    if test -x $$kawa; then true' >>tmp
-if ENABLE_KAWA_FRONTEND
-else
-	echo '    elif test -x $$kawa.sh; then' >>tmp
-	echo '      kawa=$$kawa.sh' >>tmp
-endif
 	echo '    else' >>tmp
 	echo '      kawa="kawa"' >>tmp
 	echo '    fi' >>tmp
@@ -172,10 +163,6 @@ install-exec-local: install-exec-bindir
 
 install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
-if ENABLE_KAWA_FRONTEND
-else
-	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
-endif
 	$(INSTALL_SCRIPT) qexo $(DESTDIR)$(bindir)/qexo
 if WITH_GCJ
 	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa

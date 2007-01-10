@@ -1,3 +1,8 @@
+2007-01-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA): Simplify - always use ../bin/kawa-bin.
+	(DISABLE_GCJ_COMPILED_KAWA, ENABLE_GCJ_COMPILED_KAWA): Remove macros.
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* classes2.scm (make-TestCapture1): New function, to test for a bug

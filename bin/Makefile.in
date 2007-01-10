@@ -39,8 +39,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-bin_PROGRAMS = $(am__EXEEXT_3) cgi-servlet$(EXEEXT)
-EXTRA_PROGRAMS = kawa$(EXEEXT)
+bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) cgi-servlet$(EXEEXT)
 subdir = bin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in ChangeLog
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -84,13 +83,9 @@ libkawa_la_DEPENDENCIES = gnu-bytecode.lo gnu-lists.lo gnu-expr.lo \
 am_libkawa_la_OBJECTS =
 libkawa_la_OBJECTS = $(am_libkawa_la_OBJECTS)
 @WITH_GCJ_TRUE@am_libkawa_la_rpath = -rpath $(libdir)
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@am__EXEEXT_1 =  \
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@	kawa$(EXEEXT)
+@ENABLE_KAWA_FRONTEND_TRUE@am__EXEEXT_1 = kawa$(EXEEXT)
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@am__EXEEXT_2 =  \
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@	kawa-bin$(EXEEXT)
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@am__EXEEXT_3 =  \
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@	kawa$(EXEEXT)
-@WITH_GCJ_TRUE@am__EXEEXT_3 = $(am__EXEEXT_1) $(am__EXEEXT_2)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_cgi_servlet_OBJECTS = cgi-servlet.$(OBJEXT) kawapath.$(OBJEXT)
@@ -104,7 +99,7 @@ am_kawa_bin_OBJECTS =
 kawa_bin_OBJECTS = $(am_kawa_bin_OBJECTS)
 kawa_bin_LDADD = $(LDADD)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(bin_SCRIPTS) $(noinst_SCRIPTS)
+SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -278,22 +273,21 @@ target_vendor = @target_vendor@
 KAWAJAR = kawa-$(VERSION).jar
 KAWALIB = $(datadir)/java/$(KAWAJAR)
 WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAWAJAR)"'
-@WITH_GCJ_FALSE@bin_SCRIPTS = qexo
-@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa qexo
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS_KAWA = kawa
+@ENABLE_KAWA_FRONTEND_TRUE@KAWAPROGS_KAWA = kawa
+@ENABLE_KAWA_FRONTEND_FALSE@KAWASCRIPTS_KAWA = kawa
+@WITH_GCJ_FALSE@bin_SCRIPTS = qexo $(KAWASCRIPTS_KAWA)
+@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa qexo $(KAWASCRIPTS_KAWA)
 @WITH_GCJ_DBTOOL_TRUE@@WITH_GCJ_TRUE@AM_CFLAGS = -fPIC
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@CDEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
 @WITH_GCJ_DBTOOL_TRUE@@WITH_GCJ_TRUE@CDEFS = $(WITHOUT_GCJ_DEFS)
 @WITH_GCJ_FALSE@CDEFS = $(WITHOUT_GCJ_DEFS)
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@KAWAPROGS_KAWA_BIN = kawa-bin
 @WITH_GCJ_TRUE@DEFSy = 
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@KAWAPROGS = kawa
 @WITH_GCJ_TRUE@KAWAPROGS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN)
-noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES = 
-CLEANFILES = kawa.sh qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp
 READLINE_INCLUDE_PATH = 
 READLINE_LIB_PATH = 
 kawa_EXTRA_LIBS = -lncurses  # For Linux
@@ -440,9 +434,9 @@ clean-binPROGRAMS:
 cgi-servlet$(EXEEXT): $(cgi_servlet_OBJECTS) $(cgi_servlet_DEPENDENCIES) 
 	@rm -f cgi-servlet$(EXEEXT)
 	$(LINK) $(cgi_servlet_LDFLAGS) $(cgi_servlet_OBJECTS) $(cgi_servlet_LDADD) $(LIBS)
-kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES) 
-	@rm -f kawa$(EXEEXT)
-	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
+@ENABLE_KAWA_FRONTEND_TRUE@kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES) 
+@ENABLE_KAWA_FRONTEND_TRUE@	@rm -f kawa$(EXEEXT)
+@ENABLE_KAWA_FRONTEND_TRUE@	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -682,16 +676,15 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	uninstall-libLTLIBRARIES uninstall-local
 
 
-kawa.sh:
-	echo '#!/bin/sh' >tmp
-@WITH_GCJ_TRUE@	echo 'exec `echo "$$0" | sed -e '"'"'s|/kawa[^/]*$$|/kawa-bin|'"'"'` "$$@"' >> tmp
-@WITH_GCJ_FALSE@	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
-@WITH_GCJ_FALSE@	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
-@WITH_GCJ_FALSE@	echo 'export CLASSPATH' >>tmp
-@WITH_GCJ_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-@WITH_GCJ_FALSE@	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
-	chmod +x tmp
-	mv tmp kawa.sh
+@ENABLE_KAWA_FRONTEND_FALSE@kawa:
+@ENABLE_KAWA_FRONTEND_FALSE@	echo '#!/bin/sh' >tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	echo 'export CLASSPATH' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+@ENABLE_KAWA_FRONTEND_FALSE@	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	chmod +x tmp
+@ENABLE_KAWA_FRONTEND_FALSE@	mv tmp kawa
 
 gckawa: Makefile
 	echo '#!/bin/sh' >tmp
@@ -709,8 +702,6 @@ qexo:
 	echo '  */qexo)' >>tmp
 	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
 	echo '    if test -x $$kawa; then true' >>tmp
-@ENABLE_KAWA_FRONTEND_FALSE@	echo '    elif test -x $$kawa.sh; then' >>tmp
-@ENABLE_KAWA_FRONTEND_FALSE@	echo '      kawa=$$kawa.sh' >>tmp
 	echo '    else' >>tmp
 	echo '      kawa="kawa"' >>tmp
 	echo '    fi' >>tmp
@@ -742,7 +733,6 @@ install-exec-local: install-exec-bindir
 
 install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
-@ENABLE_KAWA_FRONTEND_FALSE@	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
 	$(INSTALL_SCRIPT) qexo $(DESTDIR)$(bindir)/qexo
 @WITH_GCJ_TRUE@	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
 

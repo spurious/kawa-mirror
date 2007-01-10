@@ -1,3 +1,8 @@
+2007-01-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA): Simplify - always use ../../../bin/kawa-bin.
+	(DISABLE_GCJ_COMPILED_KAWA, ENABLE_GCJ_COMPILED_KAWA): Remove macros.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Put check rule inside ENABLE_JEMACS conditional.

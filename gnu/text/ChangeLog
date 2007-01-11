@@ -1,3 +1,7 @@
+2007-01-11  Per Bothner  <per@bothner.com>
+
+	* URIPath.java (exists): New method.
+
 2007-01-09  Per Bothner  <per@bothner.com>
 
 	* URIPath.java (valueOf): Remove unused factory method.

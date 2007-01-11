@@ -87,6 +87,23 @@ public class URIPath
     /* #endif */
   }
 
+  public boolean exists ()
+  {
+    try
+      {
+        URLConnection conn = toURL().openConnection();
+        if (conn instanceof HttpURLConnection)
+          return (((HttpURLConnection) conn).getResponseCode()
+                  == HttpURLConnection.HTTP_OK);
+        else
+          return conn.getLastModified() != 0;
+      }
+    catch (Throwable ex)
+      {
+        return false;
+      }
+  }
+
   public long getLastModified ()
   {
     return URLPath.getLastModified(toURL());

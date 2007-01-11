@@ -210,7 +210,6 @@ public class RunXQTS extends FilterConsumer
     this.cout = out;
 
     expectFailures("K-ReplaceFunc-8", "allow bad regex replacement string");
-    expectFailures("Constr-namespace-13", "testsuite error? missing namespace undeclaration");
     expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
     expectFailures("NodTest003", "actually pass? different char encoding");
     expectFailures("K-FunctionProlog-11|K-FunctionProlog-41",

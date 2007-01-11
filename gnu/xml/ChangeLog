@@ -1,3 +1,8 @@
+2007-01-11  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (startElement): Check for undeclare-namespaces
+	in node's namespaceBindings, and ignore if undeclareNamespaces.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (baseUriOfPos): Change return type to Path.

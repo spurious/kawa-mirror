@@ -424,6 +424,8 @@ public class XMLPrinter extends OutPort
 	    if (uri == namespaceBindings.resolve(prefix))
 	      // A matching namespace declaration is already in scope.
 	      continue;
+            if (uri == null && prefix != null && ! undeclareNamespaces)
+              continue;
 	    bout.write(' '); // prettyprint break
 	    if (prefix == null)
 	      bout.write("xmlns");

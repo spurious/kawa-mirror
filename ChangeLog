@@ -1,3 +1,8 @@
+2007-01-11  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa-doc-$(VERSION).tar.gz): Don't build
+	doc/internals.xml since it has been moved to the web site.
+
 2007-01-09  Per Bothner  <per@bothner.com>
 
 	* configure.in: Make --disable-jemacs the default.

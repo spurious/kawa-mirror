@@ -707,7 +707,7 @@ kawa-@VERSION@.jar: ./kawa-jar.stamp
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 
-kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/internals.xml doc/kawa-tour.texi
+kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/kawa-tour.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
 dist-hook:

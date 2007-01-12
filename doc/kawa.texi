@@ -1233,8 +1233,8 @@ find that library.
 * Input-Output::         Input, output, and file handling
 * Types::
 * Objects Classes and Modules::
-* Low-level functions::  The Scheme-Java interface
-* XML tools::            Tools for working with XML and HTML
+* XML tools::            XML, HTML, and the web
+* Low-level functions::  Deprecated low-level functions
 @end menu
 
 @node Features, Syntax and conditional compilation, , Extensions
@@ -4359,6 +4359,11 @@ The Kawa module system is based on the features of the Java class system.
 * Defining new classes::
 * Anonymous classes::
 * Module classes::        Modules and how they are compiled to classes
+* Scheme types in Java::
+* Array operations::      Using Java arrays
+* Loading Java functions into Scheme::
+* Evaluating Scheme expressions from Java::
+* Low-level functions::   Deprecated low-level functions
 @end menu
 
 @deffn Syntax this
@@ -5287,7 +5292,7 @@ in a scope where all the @var{fname}s are visible.
 A @var{method-decl} is as for @code{define-class}.
 @end deffn
 
-@node Module classes, , Anonymous classes, Objects Classes and Modules
+@node Module classes, Scheme types in Java, Anonymous classes, Objects Classes and Modules
 @subsection Modules and how they are compiled to classes
 
 A @dfn{module} is a set of definitions that the module @dfn{exports},
@@ -5632,22 +5637,7 @@ static binding.
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
-@node Low-level functions, , , Extensions
-@subsection The Scheme-Java interface
-
-Kawa has extensive features so you can work with Java objects
-and call Java methods.
-
-@menu
-* Scheme types in Java::
-* Array operations::      Using Java arrays
-* Low-level Method invocation::
-* Low-level Field operations::
-* Loading Java functions into Scheme::
-* Evaluating Scheme expressions from Java::
-@end menu
-
-@node Scheme types in Java, Array operations, Low-level functions, Low-level functions
+@node Scheme types in Java, Array operations, Module classes, Objects Classes and Modules
 @subsection Scheme types in Java
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
@@ -5686,11 +5676,8 @@ The @samp{Procedure2} class provides implementations of all
 the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
-@node Array operations, Low-level Method invocation, Scheme types in Java, Low-level functions
+@node Array operations, Loading Java functions into Scheme, Scheme types in Java, Objects Classes and Modules
 @subsection Using Java Arrays
-
-[The following description only applies to Kawa in CVS or 1.8.1 or newer.
-If you're using an older Kawa, skip to the last sub-section.]
 
 @subsubsection Creating new Java arrays
 
@@ -5771,125 +5758,9 @@ bytecode instructions for array operations.
 
 @subsubsection Old low-level array macros
 
-[The following macros are deprecated in CVS, but you still have to
-use them in Kawa 1.8 or older.]
+The deprecated @ref{Low-level array macros} are also supported.
 
-The following macros evaluate to procedures that can be used to
-manipulate primitive Java array objects.
-The compiler can inline each to a single bytecode instruction
-(not counting type conversion).
-
-@deffn Syntax primitive-array-new element-type
-Evaluates to a one-argument procedure.  Applying the resulting procedure to
-an integer count allocates a new Java array of the specified length,
-and whose elements have type @var{element-type}.
-@end deffn
-
-@deffn Syntax primitive-array-set element-type
-Evaluates to a three-argument procedure.  The first argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type};  the second argument is an index;  and the third
-argument is a value (coercible to @var{element-type}) which replaces
-the value specified by the index in the given array.
-@end deffn
-
-@deffn Syntax primitive-array-get element-type
-Evaluates to a two-argument procedure.  The first argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type};  the second argument is an index.
-Applying the procedure returns the element at the specified index.
-@end deffn
-
-@deffn Syntax primitive-array-length element-type
-Evaluates to a one-argument procedure.  The argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type}.
-Applying the procedure returns the length of the array.
-(Alternatively, you can use @code{(field @var{array} 'length)}.)
-@end deffn
-
-@node Low-level Method invocation, Low-level Field operations, Array operations, Low-level functions
-@subsection Low-level Method invocation
-
-The following lower-level primitives require you to specify
-the parameter and return types explicitly.
-You should probably use the functions @code{invoke} and @code{invoke-static}
-(@pxref{Method operations}) instead.
-
-@deffn Syntax primitive-constructor class (argtype ...)
-Returns a new anonymous procedure, which when called will create
-a new object of the specified class, and will then call the
-constructor matching the specified argument types.
-@end deffn
-
-@deffn Syntax primitive-virtual-method class method rtype (argtype ...)
-Returns a new anonymous procedure, which when called will
-invoke the instance method whose name is the string @var{method}
-in the class whose name is @var{class}.
-@end deffn
-
-@deffn Syntax primitive-static-method class method rtype (argtype ...)
-Returns a new anonymous procedure, which when called will
-invoke the static method whose name is the string @var{method}
-in the class whose name is @var{class}.
-@end deffn
-
-@deffn Syntax primitive-interface-method interface method rtype (argtype ...)
-Returns a new anonymous procedure, which when called will
-invoke the matching method from the interface whose name is @var{interface}.
-@end deffn
-
-The macros return procedure values, just like @code{lambda}.
-If the macros are used directly as the procedure of a procedure call,
-then kawa can inline the correct bytecodes to call the specified methods.
-(Note also that neither macro
-checks that there really is a method that matches the specification.)
-Otherwise, the Java reflection facility is used.
-
-@node Low-level Field operations, Loading Java functions into Scheme, Low-level Method invocation, Low-level functions
-@subsection Low-level field operations
-
-The following macros evaluate to procedures that can be used to
-access or change the fields of objects or static fields.
-The compiler can inline each to a single bytecode instruction
-(not counting type conversion).
-
-These macros are deprecated.
-The @code{fields} and @code{static-field} functions
-(@pxref{Field operations}) are easier to use, more powerful, and
-just as efficient.  However, the high-level functions currently do
-not provide access to non-public fields.
-
-@deffn Syntax primitive-get-field class fname ftype
-Use this to access a field named @var{fname} having type @var{type} in
-class @var{class}.  Evaluates to a new one-argument procedure,
-whose argument is a reference to an object of the specified @var{class}.
-Calling that procedure returns the value of the specified field.
-@end deffn
-
-@deffn Syntax primitive-set-field class fname ftype
-Use this to change a field named @var{fname} having type @var{type} in
-class @var{class}.  Evaluates to a new two-argument procedure,
-whose first argument is a reference to an object of the
-specified @var{class}, and the second argument is the new value.
-Calling that procedure sets the field to the specified value.
-(This macro's name does not end in a @samp{!}, because it does not actually
-set the field.  Rather, it returns a function for setting the field.)
-@end deffn
-
-@deffn Syntax primitive-get-static class fname ftype
-Like @code{primitive-get-field}, but used to access static fields.
-Returns a zero-argument function, which when called returns
-the value of the static field.
-@end deffn
-
-@deffn Syntax primitive-set-static class fname ftype
-Like @code{primitive-set-field}, but used to modify static fields.
-Returns a one-argument function, which when called sets the
-value of the static field to the argument.
-@end deffn
-
-@node Loading Java functions into Scheme, Evaluating Scheme expressions from Java, Low-level Field operations, Low-level functions
+@node Loading Java functions into Scheme, Evaluating Scheme expressions from Java, Array operations, Objects Classes and Modules
 @subsection Loading Java functions into Scheme
 
 When @code{kawa -C} compiles (@pxref{Files compilation}) a Scheme module
@@ -6027,7 +5898,7 @@ public class MyFunc2 extends Procedure2
 @}
 @end example
 
-@node Evaluating Scheme expressions from Java,  , Loading Java functions into Scheme, Low-level functions
+@node Evaluating Scheme expressions from Java, , Loading Java functions into Scheme, Objects Classes and Modules
 @subsection Evaluating Scheme expressions from Java
 
 The following methods are recommended if you need to evaluate a
@@ -6074,20 +5945,13 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node XML tools, , Objects Classes and Modules, Extensions
+@node XML tools, Low-level functions, Objects Classes and Modules, Extensions
 @section Working with XML and HTML
 
-Kawa has a number of experimental features for working with XML.
+Kawa has a number of features for working with XML, HTML,
+and generated web pages.
 These are built on the concepts of the @code{gnu.lists} package.
 
-@menu
-* Server-side scripts::  Writing web-server-side Kawa scripts
-* Servlets::             Installing Kawa programs as Servlets
-* CGI scripts::          Installing Kawa programs as CGI scripts
-* HTTP requests::        Functions for accessing HTTP requests
-* HTTP response::        Functions for generating HTTP response
-* KRL::                  The Kawa Report Language for generating XML/HTML
-@end menu
 
 @subsubsection Scheme functions
 
@@ -6145,6 +6009,15 @@ Kawa command line will parse a source file according to the syntax
 on an XSLT stylesheet.
 See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
 for more information.
+
+@menu
+* Server-side scripts::  Writing web-server-side Kawa scripts
+* Servlets::             Installing Kawa programs as Servlets
+* CGI scripts::          Installing Kawa programs as CGI scripts
+* HTTP requests::        Functions for accessing HTTP requests
+* HTTP response::        Functions for generating HTTP response
+* KRL::                  The Kawa Report Language for generating XML/HTML
+@end menu
 
 @node Server-side scripts, Servlets, , XML tools
 @subsection Writing web-server-side Kawa scripts
@@ -6446,6 +6319,136 @@ to take the rest of the word as the tag name (first argument).
 BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
+
+@node Low-level functions, , XML tools, Extensions
+@section Deprecated low-level functions
+
+These sections document older and less convenient ways
+to call Java methods, access Java fields, and use Java arrays.
+
+@menu
+* Low-level Method invocation::
+* Low-level Field operations::
+* Low-level array macros::
+@end menu
+
+@node Low-level Method invocation, Low-level Field operations, , Low-level functions
+@subsection Low-level Method invocation
+
+The following lower-level primitives require you to specify
+the parameter and return types explicitly.
+You should probably use the functions @code{invoke} and @code{invoke-static}
+(@pxref{Method operations}) instead.
+
+@deffn Syntax primitive-constructor class (argtype ...)
+Returns a new anonymous procedure, which when called will create
+a new object of the specified class, and will then call the
+constructor matching the specified argument types.
+@end deffn
+
+@deffn Syntax primitive-virtual-method class method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the instance method whose name is the string @var{method}
+in the class whose name is @var{class}.
+@end deffn
+
+@deffn Syntax primitive-static-method class method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the static method whose name is the string @var{method}
+in the class whose name is @var{class}.
+@end deffn
+
+@deffn Syntax primitive-interface-method interface method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the matching method from the interface whose name is @var{interface}.
+@end deffn
+
+The macros return procedure values, just like @code{lambda}.
+If the macros are used directly as the procedure of a procedure call,
+then kawa can inline the correct bytecodes to call the specified methods.
+(Note also that neither macro
+checks that there really is a method that matches the specification.)
+Otherwise, the Java reflection facility is used.
+
+@node Low-level Field operations, Low-level array macros, Low-level Method invocation, Low-level functions
+@subsection Low-level field operations
+
+The following macros evaluate to procedures that can be used to
+access or change the fields of objects or static fields.
+The compiler can inline each to a single bytecode instruction
+(not counting type conversion).
+
+These macros are deprecated.
+The @code{fields} and @code{static-field} functions
+(@pxref{Field operations}) are easier to use, more powerful, and
+just as efficient.  However, the high-level functions currently do
+not provide access to non-public fields.
+
+@deffn Syntax primitive-get-field class fname ftype
+Use this to access a field named @var{fname} having type @var{type} in
+class @var{class}.  Evaluates to a new one-argument procedure,
+whose argument is a reference to an object of the specified @var{class}.
+Calling that procedure returns the value of the specified field.
+@end deffn
+
+@deffn Syntax primitive-set-field class fname ftype
+Use this to change a field named @var{fname} having type @var{type} in
+class @var{class}.  Evaluates to a new two-argument procedure,
+whose first argument is a reference to an object of the
+specified @var{class}, and the second argument is the new value.
+Calling that procedure sets the field to the specified value.
+(This macro's name does not end in a @samp{!}, because it does not actually
+set the field.  Rather, it returns a function for setting the field.)
+@end deffn
+
+@deffn Syntax primitive-get-static class fname ftype
+Like @code{primitive-get-field}, but used to access static fields.
+Returns a zero-argument function, which when called returns
+the value of the static field.
+@end deffn
+
+@deffn Syntax primitive-set-static class fname ftype
+Like @code{primitive-set-field}, but used to modify static fields.
+Returns a one-argument function, which when called sets the
+value of the static field to the argument.
+@end deffn
+
+@node Low-level array macros, , Low-level Field operations, Low-level functions
+@subsection Old low-level array macros
+
+The following macros evaluate to procedures that can be used to
+manipulate primitive Java array objects.
+The compiler can inline each to a single bytecode instruction
+(not counting type conversion).
+
+@deffn Syntax primitive-array-new element-type
+Evaluates to a one-argument procedure.  Applying the resulting procedure to
+an integer count allocates a new Java array of the specified length,
+and whose elements have type @var{element-type}.
+@end deffn
+
+@deffn Syntax primitive-array-set element-type
+Evaluates to a three-argument procedure.  The first argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type};  the second argument is an index;  and the third
+argument is a value (coercible to @var{element-type}) which replaces
+the value specified by the index in the given array.
+@end deffn
+
+@deffn Syntax primitive-array-get element-type
+Evaluates to a two-argument procedure.  The first argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type};  the second argument is an index.
+Applying the procedure returns the element at the specified index.
+@end deffn
+
+@deffn Syntax primitive-array-length element-type
+Evaluates to a one-argument procedure.  The argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type}.
+Applying the procedure returns the length of the array.
+(Alternatively, you can use @code{(field @var{array} 'length)}.)
+@end deffn
 
 @node Community, License, Extensions, Top
 @chapter The Kawa Community

@@ -1,3 +1,8 @@
+2007-01-11  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Some re-arranging to move some deprecated functions to
+	a 'Low-level functions' node, now at section level.
+
 2007-01-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Paths): Document more path functions.

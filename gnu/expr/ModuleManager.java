@@ -86,9 +86,9 @@ public class ModuleManager
     return null;
   }
 
-  public synchronized ModuleInfo findWithSourcePath (String sourcePath)
+  public synchronized ModuleInfo
+  findWithSourcePath (Path sourceAbsPath, String sourcePath)
   {
-    Path sourceAbsPath = ModuleInfo.absPath(sourcePath);
     String sourceAbsPathname = sourceAbsPath.toString();
     ModuleInfo info = searchWithAbsSourcePath(sourceAbsPathname);
     if (info == null)
@@ -102,9 +102,16 @@ public class ModuleManager
     return info;
   }
 
+  public ModuleInfo findWithSourcePath (String sourcePath)
+  {
+    return findWithSourcePath(ModuleInfo.absPath(sourcePath), sourcePath);
+  }
+
   public ModuleInfo findWithURL (URL url)
   {
-    return findWithSourcePath(url.toExternalForm());
+    Path sourceAbsPath = URLPath.valueOf(url);
+    String sourcePath = url.toExternalForm();
+    return findWithSourcePath(sourceAbsPath, sourcePath);
   }
 
   /** Called by compiler-generated code.

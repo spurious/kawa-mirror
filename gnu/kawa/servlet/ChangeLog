@@ -1,3 +1,10 @@
+2007-01-13  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): If path match to a directory,
+	keep looking for a file match or +default+.
+	Check if module is current even if it was a +default+.
+	Set InPort's path using ModuleInfo's absolute Path.
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Use ModuleInfo's new

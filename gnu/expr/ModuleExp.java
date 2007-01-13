@@ -439,8 +439,9 @@ public class ModuleExp extends LambdaExp
     if (type != null && type != Compilation.typeProcedure)
       return (ClassType) type;
     String fileName = getFileName();
-    File file = null;
     String mname = getName();
+    String className = null;
+    Path path = null;
     if (mname != null)
       fileName = mname;
     else if (fileName == null)
@@ -449,7 +450,7 @@ public class ModuleExp extends LambdaExp
         if (fileName == null)
           fileName = "$unnamed_input_file$";
       }
-    else if (filename.equals("-") || filename.equals("<stdin>"))
+    else if (filename.equals("-") || filename.equals("/dev/stdin"))
       {
         fileName = getName();
         if (fileName == null)
@@ -457,22 +458,22 @@ public class ModuleExp extends LambdaExp
       }
     else
       {
-        file = new File(fileName);
-        fileName = file.getName();
+        path = Path.valueOf(fileName);
+        fileName = path.getLast();
         int dotIndex = fileName.lastIndexOf('.');
         if (dotIndex > 0)
           fileName = fileName.substring (0, dotIndex);
       }
+    Path parentPath;
     String parent;
-    String className;
     if (getName() == null)
       setName(fileName);
     fileName = Compilation.mangleNameIfNeeded(fileName);
     if (comp.classPrefix.length() == 0
-        && file != null
-        && ! file.isAbsolute()
-        && (parent = file.getParent()) != null
-        && parent.length() > 0 // Probably redundant.
+        && path != null
+        && ! path.isAbsolute()
+        && (parentPath = path.getParent()) != null
+        && (parent = parentPath.toString()).length() > 0 // Probably redundant.
         && parent.indexOf("..") < 0)
       {
         parent = parent.replaceAll(System.getProperty("file.separator"), "/");

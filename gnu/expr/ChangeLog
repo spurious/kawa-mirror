@@ -1,3 +1,12 @@
+2007-01-13  Per Bothner  <per@bothner.com>
+
+	* ModuleManager.java (findWithSourcePath(Path,String)): New method.
+	(findWithURL): Pass actual URL by using new method.
+	* ModuleExp.java (classFor): Update to use Paths and more robust
+	handling of URL-to-classname mapping.
+
+	* ModuleExp.java (classFor): Update "<stdin>" to "/dev/stdin".
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (sourceAbsPath): Change to Path and non-public.

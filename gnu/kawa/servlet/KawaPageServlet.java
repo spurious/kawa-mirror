@@ -74,7 +74,10 @@ public class KawaPageServlet extends KawaServlet
         && now - minfo.lastCheckedTime < mmanager.lastModifiedCacheTime)
       return mcontext.findInstance(minfo);
 
-    URL url = context.getResource(path);
+    int plen = path.length();
+    // If the path matches a directory rather than a file, keep looking.
+    URL url = (plen == 0 || path.charAt(plen-1) == '/') ? null
+      : context.getResource(path);
     String upath = path;
     if (url == null)
       {
@@ -106,15 +109,14 @@ public class KawaPageServlet extends KawaServlet
     URLConnection connection = url.openConnection();
     String urlString = url.toExternalForm();
     long lastModified = connection.getLastModified();
-    if (minfo != null
-        && minfo.lastModifiedTime == lastModified
-        && urlString.equals(minfo.getSourceAbsPathname()))
+    if (minfo == null || ! urlString.equals(minfo.getSourceAbsPathname()))
+      minfo = mmanager.findWithURL(url);
+    if (minfo.lastModifiedTime == lastModified)
       {
         minfo.lastCheckedTime = now;
         return mcontext.findInstance(minfo);
       }
 
-    minfo = mmanager.findWithURL(url);
     minfo.lastModifiedTime = lastModified;
     minfo.lastCheckedTime = now;
     mmap.put(path, minfo);
@@ -147,19 +149,21 @@ public class KawaPageServlet extends KawaServlet
         resourceStream.close();
         return null;
       }
-    InPort port = new InPort(resourceStream,
-                             URIPath.valueOf(path.substring(path.lastIndexOf('/')+1)));
+
+    InPort port = new InPort(resourceStream, minfo.getSourceAbsPath());
     Language.setDefaultLanguage(language);
     SourceMessages messages = new SourceMessages();
     Compilation comp;
     try
       {
         comp = language.parse(port, messages, Language.PARSE_IMMEDIATE);
+        /*
         int dot = path.indexOf('.');
         if (dot < 0)
           dot = path.length();
         String name = path.substring(path.lastIndexOf('/')+1, dot);
         comp.getModule().setName(name);
+        */
         language.resolve(comp);
       }
     catch (SyntaxException ex)

@@ -2771,8 +2771,8 @@ public class Compilation implements SourceLocator
    * that would be wasteful, plus we would get values that are similar (equals)
    * to but not necessarily identical (eq) to the compile-time literal.
    * So we need to pass the literal values to the compiled code, by using
-   * reflectiion to initialize various static fields.  This method does that.
-   * It is called from start of the the generated static initializer, which
+   * reflection to initialize various static fields.  This method does that.
+   * It is called at the start of the generated static initializer, which
    * helps makes things more consistent between immediate and non-immediate
    * mode.
    */

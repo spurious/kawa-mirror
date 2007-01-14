@@ -158,7 +158,11 @@ public class FilePath
   /* #endif */
   getParent ()
   {
-    return FilePath.valueOf(file.getParentFile());
+    File parent = file.getParentFile();
+    if (parent == null)
+      return null;
+    else
+      return FilePath.valueOf(parent);
   }
 
   public int compareTo (FilePath path)

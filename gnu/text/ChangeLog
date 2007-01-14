@@ -1,3 +1,7 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* FilePath.java (getParent): Handle null parent.
+
 2007-01-11  Per Bothner  <per@bothner.com>
 
 	* URIPath.java (exists): New method.

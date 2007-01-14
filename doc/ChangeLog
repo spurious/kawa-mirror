@@ -1,3 +1,8 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Applet compilation): Tweak example to use two archives.
+	Note problem with large Kawa.jar and discuss some solutions.
+
 2007-01-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Some re-arranging to move some deprecated functions to

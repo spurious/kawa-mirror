@@ -1164,26 +1164,38 @@ normal @samp{-C} flag:
 java kawa.repl --applet -C scribble.scm
 @end example
 
-You can then create a @samp{.jar} archive containing your applet.
-You also need to include the Kawa classes in the @samp{.jar},
-or you can include a @code{MANIFEST} file that specifies @code{Class-Path}
-to use a Java 2
-@uref{http://java.sun.com/docs/books/tutorial/ext/basics/download.html,
-download extension}.
+You can then create a @samp{.jar} archive containing your applet:
 @example
-jar cf scribble.jar scribble*.class @i{other-classes ...}
+jar cf scribble.jar scribble*.class
 @end example
 
-Finally, you create an @samp{.html} page referencing your applet:
+Finally, you create an @samp{.html} page referencing your applet
+and its support @code{jar}s:
 @example
 <html><head><title>Scribble testapp</title></head>
 <body><h1>Scribble testapp</h1>
 You can scribble here:
 <br>
-<applet code="scribble.class" archive="scribble.jar" width=200 height=200>
+<applet code="scribble.class" archive="scribble.jar, kawa-@value{VERSION}.jar" width=200 height=200>
 Sorry, Java is needed.</applet>
 </body></html>
 @end example
+
+The problem with using Kawa to write applets is that the Kawa @code{.jar}
+file is quite big, and may take a while to download over a network connection.
+Some possible solutions:
+
+@itemize
+@item
+Try to strip out of the Kawa @code{.jar} any classes your
+applet doesn't need.
+@item
+Java 2 provides a mechanism to install a @uref{http://java.sun.com/docs/books/tutorial/ext/basics/download.html,
+download extension}.
+@item
+Consider some alternative to applets, such as
+@uref{http://java.sun.com/products/javawebstart/,Java Web Start}.
+@end itemize
 
 @node Compiling to executable, , Applet compilation, Compiling
 @subsection Compiling to a native executable

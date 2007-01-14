@@ -209,7 +209,7 @@ public class Compare extends Procedure2 implements CanInline
           comp = collator.compare(str1, str2);
         else
         /* #endif */
-          comp = str1.compareTo(str2);
+          comp = NamedCollator.codepointCompare(str1, str2);
         comp = comp < 0 ? -1 : comp > 0 ? 1 : 0;
       }
     if (comp == -3 && (flags & LENIENT_COMPARISON) == 0)

@@ -46,13 +46,41 @@ implements Externalizable
       }
   }
 
+  /** Compares two strings lexicographically by codepoint.
+   * Same as {@code String.compareTo} but handles surrogate characters.
+   * @return -1, 0, or 1 depending on their relative order.
+   */
+  public static int codepointCompare (String str1, String str2)
+  {
+    int i1 = 0, i2 = 0;
+    int len1 = str1.length();
+    int len2 = str2.length();
+    for (;;)
+      {
+        if (i1 == len1)
+          return i2 == len2 ? 0 : -1;
+        if (i2 == len2)
+          return 1;
+        int c1 = str1.charAt(i1++);
+        if (c1 >= 0xD800 && c1 < 0xDC00 && i1 < len1)
+          c1 =  (c1 - 0xD800) * 0x400
+            + (str1.charAt(i1++) - 0xDC00) + 0x10000;
+        int c2 = str2.charAt(i2++);
+        if (c2 >= 0xD800 && c2 < 0xDC00 && i2 < len2)
+          c2 =  (c2 - 0xD800) * 0x400
+            + (str2.charAt(i2++) - 0xDC00) + 0x10000;
+        if (c1 != c2)
+          return c1 < c2 ? -1 : 1;
+      }
+  }
+
   public int compare (String str1, String str2)
   {
     /* #ifdef JAVA2 */
     if (collator != null)
       return collator.compare(str1, str2);
     /* #endif */
-    return str1.compareTo(str2);
+    return codepointCompare(str1, str2);
   }
 
   /* #ifdef JAVA2 */

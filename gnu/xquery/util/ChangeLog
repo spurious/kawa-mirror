@@ -1,3 +1,9 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* NamedCollator.java (codepointCompare): New method.
+	(compare): Use it.
+	* Compare.java (atomicCompare): Likewise.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* NodeUtils.java (baseUri): Change type of local 'uri' to Path.

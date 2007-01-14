@@ -902,9 +902,10 @@ public class XQParser extends Lexer
     for (i = COUNT_OP_AXIS;  --i >= 0; )
       if (axisNames[i] == name)
 	break;
-    if (i < 0)
+    if (i < 0
+        || i == AXIS_NAMESPACE) // The namespace-axis is XSLT/XPath-only.
       {
-	error("unknown axis name '" + name + '\'');
+	error('e', "unknown axis name '" + name + '\'', "XPST0003");
 	i = AXIS_CHILD;
       }
     return (char) (OP_AXIS_FIRST + i);
@@ -1165,13 +1166,18 @@ public class XQParser extends Lexer
     return curToken;
   }
 
-  void checkAllowedNamespaceDeclaration (String prefix, String uri)
+  void checkAllowedNamespaceDeclaration (String prefix, String uri,
+                                         boolean inConstructor)
   {
-    if ("xml".equals(prefix) || "xmlns".equals(prefix))
+    boolean xmlPrefix = "xml".equals(prefix);
+    if (NamespaceBinding.XML_NAMESPACE.equals(uri))
+      {
+        if (! xmlPrefix || ! inConstructor)
+          error('e', "namespace uri cannot be the same as the prefined xml namespace",
+                "XQST0070");
+      }
+    else if (xmlPrefix || "xmlns".equals(prefix))
       error('e', "namespace prefix cannot be 'xml' or 'xmlns'",
-            "XQST0070");
-    else if (NamespaceBinding.XML_NAMESPACE.equals(uri))
-      error('e', "namespace uri cannot be the same as the prefined xml namespace",
             "XQST0070");
   }
 
@@ -2310,10 +2316,22 @@ public class XQParser extends Lexer
 		if (next == '/')
 		  break;
                 Expression content = parseXMLConstructor(next, true);
-		result.addElement(content);
+                boolean isCDATA = false;
+                boolean emptyCDATA = false;
+                if (content instanceof ApplyExp)
+                  {
+                    ApplyExp aexp = (ApplyExp) content;
+                    if (aexp.getFunction() == makeCDATA)
+                      {
+                        isCDATA = true;
+                        String text = (String) aexp.getArg(0).valueIfConstant();
+                        emptyCDATA = text != null && text.length() == 0;
+                      }
+                  }
+                if (! emptyCDATA)
+                  result.addElement(content);
 		tokenBufferLength = 0;
-                if (content instanceof ApplyExp
-                    && ((ApplyExp) content).getFunction() == makeCDATA)
+                if (isCDATA)
                   skippable = false;
                 else
                   skippable = skipBoundarySpace;
@@ -2573,7 +2591,7 @@ public class XQParser extends Lexer
 		.toString().intern();
               }
 	    vec.setSize(vecSize);
-            checkAllowedNamespaceDeclaration(definingNamespace, ns);
+            checkAllowedNamespaceDeclaration(definingNamespace, ns, true);
 	    if (definingNamespace == "")
 	      definingNamespace = null;
             for (NamespaceBinding nsb = nsBindings;
@@ -3817,7 +3835,7 @@ public class XQParser extends Lexer
                       }
                   }
 		pushNamespace(prefix, uri);
-                checkAllowedNamespaceDeclaration(prefix, uri);
+                checkAllowedNamespaceDeclaration(prefix, uri, false);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
                   {
@@ -3863,7 +3881,7 @@ public class XQParser extends Lexer
 	uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (prefix != null)
           {
-            checkAllowedNamespaceDeclaration(prefix, uri);
+            checkAllowedNamespaceDeclaration(prefix, uri, false);
             pushNamespace(prefix.intern(), uri);
           }
 	getRawToken();
@@ -4003,7 +4021,7 @@ public class XQParser extends Lexer
 	    defaultElementNamespace = uri;
 	  }
 	pushNamespace(prefix, uri);
-        checkAllowedNamespaceDeclaration(prefix, uri);
+        checkAllowedNamespaceDeclaration(prefix, uri, false);
 	parseSeparator();
 	return QuoteExp.voidExp;
 

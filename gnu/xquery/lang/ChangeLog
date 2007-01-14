@@ -1,3 +1,14 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (checkAllowedNamespaceDeclaration): New inConstructor
+	parameter.  If true, allow binding xml prefix to its standard value.
+
+	* XQParser.java (getAxis): Error if AXIS_NAMESPACE.
+	Include error code on error.
+
+	* XQParser.java (parseContent): Ignore if empty CDATA section.
+	This fixes K2-ComputeConAttr-35.xq and K2-ComputeConAttr-36.xq in XQTS.
+
 2007-01-03  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse):  Use Path's resolve rather than deprecated

@@ -2781,7 +2781,7 @@ public class Compilation implements SourceLocator
     Compilation comp = Compilation.findForImmediateLiterals(key);
     try
       {
-        Class clas = comp.loader.loadClass(comp.mainClass.getName(), true);
+        Class clas = comp.loader.loadClass(comp.mainClass.getName());
 
 	/* Pass literal values to the compiled code. */
 	for (Literal init = comp.litTable.literalsChain;  init != null;

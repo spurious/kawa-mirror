@@ -10,8 +10,6 @@ import gnu.text.*;
 
 public class ModuleManager
 {
-  public ClassLoader defaultClassLoader = ClassLoader.getSystemClassLoader();
-
   private String compilationDirectory = "";
   public void setCompilationDirectory (String path)
   {

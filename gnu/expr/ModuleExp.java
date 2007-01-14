@@ -53,7 +53,17 @@ public class ModuleExp extends LambdaExp
     SourceMessages messages = comp.getMessages();
     try
       {
-	ArrayClassLoader loader = new ArrayClassLoader ();
+        ClassLoader parentLoader;
+        try
+          {
+            parentLoader = Thread.currentThread().getContextClassLoader();
+          }
+        catch (SecurityException ex)
+          {
+            parentLoader = comp.getClass().getClassLoader();
+          }
+
+	ArrayClassLoader loader = new ArrayClassLoader(parentLoader);
         if (url == null)
           url = Path.currentPath().toURL();
         loader.setResourceContext(url);
@@ -116,7 +126,7 @@ public class ModuleExp extends LambdaExp
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType ctype = comp.classes[iClass];
-            Class cclass = loader.loadClass(ctype.getName(), false);
+            Class cclass = loader.loadClass(ctype.getName());
             ctype.setReflectClass(cclass);
             ctype.setExisting(true);
             if (iClass == 0)

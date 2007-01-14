@@ -1,3 +1,16 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (find): Set moduleClass field.
+
+	* ModuleInfo.java (checkCurrent): Use context-ClassLoaxder rather than
+	ModuleManager's defaultClassLoader.  Recover from SecurityException.
+	* ModuleManager.java (defaultClassLoader): Remove no-longer-used field.
+	* ModuleExp.java (evalToClass): Pass context ClassLoader as parent
+	of new ArrayClassLoader.  Catch SecurityException.
+	(evalToClass): Use one-argument version of loadClass, since
+	2-argument version is now protected if JAVA2 is enabled.
+	* Compilation.java (setupLiterals): Likewise.
+
 2007-01-13  Per Bothner  <per@bothner.com>
 
 	* ModuleManager.java (findWithSourcePath(Path,String)): New method.

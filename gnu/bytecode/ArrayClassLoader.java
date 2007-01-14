@@ -17,6 +17,11 @@ public class ArrayClassLoader extends ClassLoader
   {
   }
 
+  public ArrayClassLoader (ClassLoader parent)
+  {
+    super(parent);
+  }
+
   /** Get base URL to use for finding resources, or null if none is set. */
   public URL getResourceContext () { return context; }
 
@@ -74,17 +79,26 @@ public class ArrayClassLoader extends ClassLoader
     return super.findResource(name);
   }
 
-  public Class loadClass (String name, boolean resolve)
-       throws ClassNotFoundException
+  /* #ifdef JAVA2 */
+  public Class findClass (String name)
+  /* #else */
+  // public Class loadClass (String name, boolean resolve)
+  /* #endif */
+    throws ClassNotFoundException
   {
     Object r = map.get(name);
     Class clas;
     if (r == null)
       {
-	clas = Class.forName(name);
+        /* #ifdef JAVA2 */
+        throw new ClassNotFoundException(name);
+        /* #else */
+        // clas = Class.forName(name);
+        /* #endif */
       }
     else if (r instanceof byte[])
       {
+        // double-locking? is this safe?  or needed? FIXME.
 	synchronized (this)
 	  {
 	    r = map.get(name);
@@ -100,8 +114,10 @@ public class ArrayClassLoader extends ClassLoader
       }
     else
       clas = (Class) r;
-    if (resolve && clas != null)
-      resolveClass (clas);
+    /* #ifndef JAVA2 */
+    // if (resolve && clas != null)
+    //   resolveClass (clas);
+    /* #endif */
     return clas;
   }
 }

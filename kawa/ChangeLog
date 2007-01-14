@@ -1,3 +1,8 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* lang/Record.java (makeRecordType): Use one-argument version of
+	loadClass, since 2-argument version is now protected.
+
 2007-01-09  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Add new path functions.

@@ -224,7 +224,9 @@ public class ModuleInfo
 
   public static void register (Object instance)
   {
-    ModuleInfo info = find(instance.getClass().getName());
+    Class clas = instance.getClass();
+    ModuleInfo info = find(clas.getName());
+    info.moduleClass = clas;
     ModuleContext.getContext().setInstance(info, instance);
   }
 
@@ -354,8 +356,16 @@ public class ModuleInfo
         try
           {
             /* #ifdef JAVA2 */
-            moduleClass = Class.forName(className, false,
-                                        manager.defaultClassLoader);
+            ClassLoader loader;
+            try
+              {
+                loader = Thread.currentThread().getContextClassLoader();
+              }
+            catch (java.lang.SecurityException ex)
+              {
+                loader = this.getClass().getClassLoader();
+              }
+            moduleClass = Class.forName(className, false, loader);
             /* #else */
             // moduleClass = Class.forName(className);
             /* #endif */

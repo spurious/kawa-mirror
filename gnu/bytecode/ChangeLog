@@ -1,3 +1,9 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* ArrayClassLoader.java: Change to use Java 1.2 delegation model.
+	I.e. implement findClass rather than loadClass if JAVA2 is enabled.
+	(<init>): New constructor, to pass in parent ClassLoader.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* Method.java (makeCloneMethod): New method.

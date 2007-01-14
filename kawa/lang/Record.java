@@ -219,7 +219,7 @@ public class Record
     ArrayClassLoader loader = new ArrayClassLoader(names, arrays);
     try
       {
-	Class reflectClass = loader.loadClass (mangledName, true);
+	Class reflectClass = loader.loadClass (mangledName);
 	Type.registerTypeForClass(reflectClass, clas);
 	return clas;
       }

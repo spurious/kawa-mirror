@@ -1,5 +1,7 @@
 2007-01-14  Per Bothner  <per@bothner.com>
 
+	* Lexer.java (tokenBufferAppend): Fix off-by-one error.
+
 	* FilePath.java (getParent): Handle null parent.
 
 2007-01-11  Per Bothner  <per@bothner.com>

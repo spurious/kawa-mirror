@@ -273,7 +273,7 @@ public class Lexer extends Reader
   /** Append one character to tokenBuffer, resizing it if need be. */
   public void tokenBufferAppend(int ch)
   {
-    if (ch > 0x10000)
+    if (ch >= 0x10000)
       {
         tokenBufferAppend(((ch - 0x10000) >> 10) + 0xD800);
         ch = (ch & 0x3FF) + 0xDC00;

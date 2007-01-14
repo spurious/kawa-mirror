@@ -304,4 +304,50 @@ public class TimeUtils
       }
     return (DateTime) XTimeType.dateTimeType.valueOf(sbuf.toString());
   }
+
+  /* #ifdef JAVA2 */
+  /* #ifdef JAVA5 */
+  // static final ThreadLocal<DateTime> currentDateTimeLocal =
+  //   new ThreadLocal<DateTime>();
+  /* #else */
+  static final ThreadLocal currentDateTimeLocal = new ThreadLocal();
+  /* #endif */
+  /* #else */
+  // static DateTime currentDateTime;
+  /* #endif */
+
+  public static DateTime currentDateTime ()
+  {
+    /* #ifdef JAVA2 */
+    DateTime current = (DateTime) currentDateTimeLocal.get();
+    if (current == null)
+      {
+        current = now();
+        currentDateTimeLocal.set(current);
+      }
+    /* #else */
+    // DateTime current = currentDateTime;
+    // if (current == null)
+    //   {
+    //     current = now();
+    //     currentDateTime = current;
+    //   }
+    /* #endif */
+    return current;
+  }
+
+  public static DateTime currentDate ()
+  {
+    return currentDateTime().cast(DateTime.DATE_MASK);
+  }
+
+  public static DateTime currentTime ()
+  {
+    return currentDateTime().cast(DateTime.TIME_MASK);
+  }
+
+  public static Object implicitTimezone ()
+  {
+    return timeZoneFromXTime(currentDateTime());
+  }
 }

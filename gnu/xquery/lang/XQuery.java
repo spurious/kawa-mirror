@@ -706,6 +706,14 @@ public class XQuery extends Language
     define_method("adjust-time-to-timezone", "gnu.xquery.util.TimeUtils",
                   "adjustTimeToTimezone"); // overloaded
     define_method("dateTime", "gnu.xquery.util.TimeUtils", "dateTime");
+    define_method("current-dateTime", "gnu.xquery.util.TimeUtils",
+                  "currentDateTime");
+    define_method("current-date", "gnu.xquery.util.TimeUtils",
+                  "currentDate");
+    define_method("current-time", "gnu.xquery.util.TimeUtils",
+                  "currentTime");
+    define_method("implicit-timezone", "gnu.xquery.util.TimeUtils",
+                  "implicitTimezone");
 
     define_method("zero-or-one", "gnu.xquery.util.SequenceUtils", "zeroOrOne");
     define_method("one-or-more", "gnu.xquery.util.SequenceUtils", "oneOrMore");

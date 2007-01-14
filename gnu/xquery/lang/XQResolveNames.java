@@ -73,18 +73,6 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>unordered</code> function. */
   public static final int UNORDERED_BUILTIN = -18;
 
-  /** Code number for the special <code>current-dateTime</code> function. */
-  public static final int CURRENT_DATETIME_BUILTIN = -19;
-
-  /** Code number for the special <code>current-date</code> function. */
-  public static final int CURRENT_DATE_BUILTIN = -20;
-
-  /** Code number for the special <code>current-time</code> function. */
-  public static final int CURRENT_TIME_BUILTIN = -21;
-
-  /** Code number for the special <code>implicit-timezone</code> function. */
-  public static final int IMPLICIT_TIMEZONE_BUILTIN = -22;
-
   /** Code number for the special <code>lang</code> function. */
   public static final int LANG_BUILTIN = -23;
 
@@ -133,11 +121,6 @@ public class XQResolveNames extends ResolveNames
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
     = makeBuiltin("last", LAST_BUILTIN);
-
-  public Declaration currentDateTimeDecl;
-  public Declaration currentDateDecl;
-  public Declaration currentTimeDecl;
-  public Declaration currentTimezoneDecl;
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
@@ -199,10 +182,6 @@ public class XQResolveNames extends ResolveNames
     pushBuiltin("string", STRING_BUILTIN);
     pushBuiltin("normalize-space", NORMALIZE_SPACE_BUILTIN);
     pushBuiltin("unordered", UNORDERED_BUILTIN);
-    pushBuiltin("current-dateTime", CURRENT_DATETIME_BUILTIN);
-    pushBuiltin("current-date", CURRENT_DATE_BUILTIN);
-    pushBuiltin("current-time", CURRENT_TIME_BUILTIN);
-    pushBuiltin("implicit-timezone", IMPLICIT_TIMEZONE_BUILTIN);
     pushBuiltin("deep-equal", DEEP_EQUAL_BUILTIN);
     pushBuiltin("min", MIN_BUILTIN);
     pushBuiltin("max", MAX_BUILTIN);
@@ -446,56 +425,6 @@ public class XQResolveNames extends ResolveNames
       }
     moduleDecl = exp.firstDecl();
     exp.body = walkStatements(exp.body);
-
-    Expression[] exps;
-    if (currentDateTimeDecl != null)
-      {
-        // Some expression in this module calls one of the current-XXX
-        // functions, so calculate it and stash it, since these functions
-        // are required to be 'stable'.
-        // PROBLEM: We may get different results for calls in different
-        // modules.  These functions should stash the current-dataTime in
-        // in the actual dynamic context.  FIXME.
-        Vector vec = new Vector();
-        vec.addElement(new SetExp(currentDateTimeDecl,
-                                  new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("now", 0),
-                                               Expression.noExpressions)));
-        Method cast = ClassType.make("gnu.math.DateTime").getDeclaredMethod("cast", 1);
-        if (currentDateDecl != null)
-          {
-            Expression[] args = { new ReferenceExp(currentDateTimeDecl),
-                                  new QuoteExp(IntNum.make(DateTime.DATE_MASK)) };
-            vec.addElement(new SetExp(currentDateDecl,
-                                      new ApplyExp(cast, args)));
-          }
-        if (currentTimeDecl != null)
-          {
-            Expression[] args = { new ReferenceExp(currentDateTimeDecl),
-                                  new QuoteExp(IntNum.make(DateTime.TIME_MASK)) };
-            vec.addElement(new SetExp(currentTimeDecl,
-                                      new ApplyExp(cast, args)));
-          }
-        if (currentTimezoneDecl != null)
-          {
-            Expression[] args = { new ReferenceExp(currentDateTimeDecl) };
-            vec.addElement(new SetExp(currentTimezoneDecl,
-                                      new ApplyExp(ClassType.make("gnu.xquery.util.TimeUtils").getDeclaredMethod("timezoneFromDateTime", 1), args)));
-          }
-        Expression body = exp.body;
-        if (body instanceof BeginExp)
-          {
-            BeginExp bexp = (BeginExp) body;
-            int blen = bexp.getExpressionCount();
-            exps = bexp.getExpressions();
-            for (int i = 0;  i < blen;  i++)
-              vec.addElement(exps[i]);
-          }
-        else
-          vec.addElement(body);
-        exps = new Expression[vec.size()];
-        vec.copyInto(exps);
-        exp.body = new BeginExp(exps);
-      }
   }
 
   /**
@@ -896,40 +825,6 @@ public class XQResolveNames extends ResolveNames
                 NamedCollator coll = parser.defaultCollator;
                 return QuoteExp.getInstance(coll != null ? coll.getName()
                           : NamedCollator.UNICODE_CODEPOINT_COLLATION);
-              case CURRENT_DATETIME_BUILTIN:
-                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
-                  return err;
-                mexp = getCompilation().mainLambda;
-                if (currentDateTimeDecl == null)
-                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
-                return new ReferenceExp(currentDateTimeDecl);
-              case CURRENT_DATE_BUILTIN:
-                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
-                  return err;
-                mexp = getCompilation().mainLambda;
-                if (currentDateTimeDecl == null)
-                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
-                if (currentDateDecl == null)
-                  currentDateDecl = mexp.addDeclaration("date", XTimeType.dateType);
-                return new ReferenceExp(currentDateDecl);
-              case CURRENT_TIME_BUILTIN:
-                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
-                  return err;
-                mexp = getCompilation().mainLambda;
-                if (currentDateTimeDecl == null)
-                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
-                if (currentTimeDecl == null)
-                  currentTimeDecl = mexp.addDeclaration("time", XTimeType.timeType);
-                return new ReferenceExp(currentTimeDecl);
-              case IMPLICIT_TIMEZONE_BUILTIN:
-                if ((err = checkArgCount(exp.getArgs(), decl, 0, 0)) != null)
-                  return err;
-                mexp = getCompilation().mainLambda;
-                if (currentDateTimeDecl == null)
-                  currentDateTimeDecl = mexp.addDeclaration("dateTime", XTimeType.dateTimeType);
-                if (currentTimezoneDecl == null)
-                  currentTimezoneDecl = mexp.addDeclaration("timezone", XTimeType.dayTimeDurationType);
-                return new ReferenceExp(currentTimezoneDecl);
               case HANDLE_EXTENSION_BUILTIN:
                 {
                   Compilation comp = getCompilation();

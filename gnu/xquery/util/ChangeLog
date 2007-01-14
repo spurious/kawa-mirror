@@ -1,5 +1,9 @@
 2007-01-14  Per Bothner  <per@bothner.com>
 
+	* TimeUtils.java (currentDateTimeLocal): New ThreadLocal static.
+	(currentDateTime, currentDate, currentTime, implicitTimezone):
+	New static methods.
+
 	* NamedCollator.java (codepointCompare): New method.
 	(compare): Use it.
 	* Compare.java (atomicCompare): Likewise.

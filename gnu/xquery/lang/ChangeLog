@@ -1,5 +1,17 @@
 2007-01-14  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java: No longer need special handling of
+	current-dateTime etc, since we now use a ThreadLocal.
+	(CURRENT_DATETIME_BUILTIN, CURRENT_DATE_BUILTIN, CURRENT_TIME_BUILTIN,
+	IMPLICIT_TIMEZONE_BUILTIN): Remove constants.
+	(<init>): No longer pushBuiltin on corresponding functions.
+	(walkApplyExp): No longer handle those builtins.
+	(currentDateTimeDecl, currentDateDecl, currentTimeDecl,
+	currentTimezoneDecl): Remove fields.
+	(resolveModule): Remove special hndling of currentDateTimeDecl etc.
+	* XQuery.java (initXQuery): Declarations of current-dateTime,
+	current-date, current-time, implicit-timezone moved to here.
+
 	* XQParser.java (checkAllowedNamespaceDeclaration): New inConstructor
 	parameter.  If true, allow binding xml prefix to its standard value.
 

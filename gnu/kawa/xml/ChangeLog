@@ -1,3 +1,10 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* XIntegerType.java (isUnsignedType, isUnsignedType): New field, method.
+	(<init>): Set isUnsignedType if name starts with "unsigned".
+	(valueOf): Don't allow initial sign if isUnsignedType.
+	Strip off initial '+'.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* KNode.java (baseURI): Change return type to Path.

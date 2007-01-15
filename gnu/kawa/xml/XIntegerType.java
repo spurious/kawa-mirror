@@ -22,6 +22,13 @@ public class XIntegerType extends XDataType
 
   static ClassType typeIntNum = ClassType.make("gnu.math.IntNum");
 
+  boolean isUnsignedType;
+
+  public boolean isUnsignedType ()
+  {
+    return isUnsignedType;
+  }
+
   public static final XIntegerType integerType = 
     new XIntegerType ("integer", decimalType, INTEGER_TYPE_CODE,
                       null, null);
@@ -78,6 +85,7 @@ public class XIntegerType extends XDataType
   {
     // FIXME Should convert NAME to xs:NAME.
     this((Object) name, base, typeCode, min, max);
+    isUnsignedType = name.startsWith("unsigned");
   }
 
   public XIntegerType (Object name, XDataType base, int typeCode,
@@ -142,7 +150,17 @@ public class XIntegerType extends XDataType
 
   public Object valueOf (String value)
   {
-    return valueOf(IntNum.valueOf(value.trim(), 10));
+    value = value.trim();
+    int len = value.length();
+    if (len > 0)
+      {
+        char ch = value.charAt(0);
+        if ((ch == '-' || ch == '+') && isUnsignedType())
+          throw new ClassCastException("cannot cast "+value+" to "+name);
+        else if (ch == '+')
+          value = value.substring(1);
+      }
+    return valueOf(IntNum.valueOf(value, 10));
   }
 
   public IntNum valueOf (String value, int radix)

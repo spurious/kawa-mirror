@@ -214,9 +214,16 @@ public class RunXQTS extends FilterConsumer
     expectFailures("NodTest003", "actually pass? different char encoding");
     expectFailures("K-FunctionProlog-11|K-FunctionProlog-41",
                    "item() is treated as equivalent to item()*");
-    expectFailures("ForExprType030|ForExprType033|LocalNameFromQNameFunc005|"
-                   +"CastAs671|CastAs672",
-                   "xs:normalizedString, xs:NCName, xs:ENTITY not implemented");
+    expectFailures("fn-abs-more-args-023|fn-abs-more-args-024",
+                   "testsuite error (4023): -0 is not  valid unsignedLong/unsignedShort literal");
+    expectFailures("K2-Literals-8|K2-Literals-9",
+                   "testsuite error (4215): bogus K2-Literals-8.txt/K2-Literals-9.txt");
+    expectFailures("K2-DirectConElemAttr-36",
+                   "testsuite error: result should not have leading whitespace");
+    expectFailures("K2-DirectConElem-38",
+                   "testsuite error??: xml namespace def should be optional");
+    expectFailures("K-CodepointToStringFunc-8",
+                   "testsuite error (3776): typo in K-CodepointToStringFunc-8.txt");
     /* #ifndef JAVA5 */
     expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
                    "surrogates not handled by java.util.regex");
@@ -267,10 +274,6 @@ public class RunXQTS extends FilterConsumer
     expectFailures("K-SubstringBeforeFunc-5|K-SubstringAfterFunc-5|"
                    +"K-ContainsFunc-5|K-StartsWithFunc-5|K-EndsWithFunc-5",
                    "some string functions don't support collation argument");
-    expectFailures("K-CodepointToStringFunc-8|K-CodepointToStringFunc-11|"
-                   +"K-CodepointToStringFunc-12|K-CodepointToStringFunc-14|"
-                   +"K-CodepointToStringFunc-15",
-                   "test-case excessively strict about disallowed characetrs");
     expectFailures("caselessmatch04",
                    "regex/unicode special case");
     expectFailures("string-queries-results-q4|K2-FunctionProlog-7",
@@ -581,6 +584,7 @@ public class RunXQTS extends FilterConsumer
     gnu.lists.Consumer save = ctx.consumer;
     CharArrayOutPort out = new CharArrayOutPort();
     XMLPrinter xout = new XMLPrinter(out, false);
+    xout.strict = true;
     xout.useEmptyElementTag = 1;
     xout.escapeNonAscii = false;
     xout.canonicalizeCDATA = true;

@@ -66,6 +66,8 @@ java_sources = \
   XDataType.java \
   XInteger.java \
   XIntegerType.java \
+  XString.java \
+  XStringType.java \
   XTimeType.java \
   XmlNamespace.java
 

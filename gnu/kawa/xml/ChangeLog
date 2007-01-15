@@ -1,5 +1,12 @@
 2007-01-14  Per Bothner  <per@bothner.com>
 
+	* XStringType.java: New class, extends XDataType.
+	* XString.java: New class, implements CharSequence.
+	* Makefile.am: Update accordingly.
+	* XDataType.java (NORMALIZED_STRING_TYPE_CODE, TOKEN_TYPE_CODE,
+	LANGUAGE_TYPE_CODE, NMTOKEN_TYPE_CODE, NAME_TYPE_CODE, NCNAME_TYPE_CODE,
+	ID_TYPE_CODE, IDREF_TYPE_CODE, ENTITY_TYPE_CODE): New constants.
+
 	* XIntegerType.java (isUnsignedType, isUnsignedType): New field, method.
 	(<init>): Set isUnsignedType if name starts with "unsigned".
 	(valueOf): Don't allow initial sign if isUnsignedType.

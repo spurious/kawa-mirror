@@ -810,6 +810,15 @@ public class XQuery extends Language
       "base64Binary", XDataType.base64BinaryType,
       "NOTATION", XDataType.NotationType,
       "QName", "gnu.mapping.Symbol",
+      "normalizedString", XStringType.normalizedStringType,
+      "token", XStringType.tokenType,
+      "language", XStringType.languageType,
+      "NMTOKEN", XStringType.NMTOKENType,
+      "Name", XStringType.NameType,
+      "NCName", XStringType.NCNameType,
+      "ID", XStringType.IDType,
+      "IDREF", XStringType.IDREFType,
+      "ENTITY", XStringType.ENTITYType,
       "anyAtomicType", Type.pointer_type
     };
 

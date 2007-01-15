@@ -29,11 +29,15 @@ public class StringUtils
     if ((arg == Values.empty || arg == null) && onEmpty != ERROR_VALUE)
       return onEmpty;
     if (arg instanceof UntypedAtomic 
-        || arg instanceof Path
+        /* #ifdef use:java.lang.CharSequence */
+        || arg instanceof CharSequence
+        /* #else */
+        // || arg instanceof String
+        /* #endif */
         /* #ifdef use:java.net.URI */
         || arg instanceof java.net.URI
         /* #endif */
-        || arg instanceof String)
+        || arg instanceof Path)
       return arg.toString();
     throw new WrongType(functionName, iarg, arg,
                         onEmpty == ERROR_VALUE ? "xs:string" : "xs:string?");

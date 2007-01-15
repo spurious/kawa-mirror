@@ -158,7 +158,7 @@ public class QNameUtils
     if (name == Values.empty || name == null)
       return name;
     if (name instanceof Symbol)
-      return ((Symbol) name).getName();
+      return XStringType.makeNCName(((Symbol) name).getName());
     throw WrongType.make(null, "local-name-from-QName", 1, name);
   }
 
@@ -171,7 +171,7 @@ public class QNameUtils
         String prefix = ((Symbol) name).getPrefix();
         if (prefix == null || prefix.length() == 0)
           return Values.empty;
-        return prefix;
+        return XStringType.makeNCName(prefix);
       }
     throw WrongType.make(null, "prefix-from-QName", 1, name);
   }

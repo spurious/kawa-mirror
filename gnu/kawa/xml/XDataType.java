@@ -70,6 +70,16 @@ public class XDataType extends Type implements TypeValue
 
   public static final int STRING_TYPE_CODE = 36;
 
+  public static final int NORMALIZED_STRING_TYPE_CODE = 37;
+  public static final int TOKEN_TYPE_CODE = 38;
+  public static final int LANGUAGE_TYPE_CODE = 39;
+  public static final int NMTOKEN_TYPE_CODE = 40;
+  public static final int NAME_TYPE_CODE = 41;
+  public static final int NCNAME_TYPE_CODE = 42;
+  public static final int ID_TYPE_CODE = 43;
+  public static final int IDREF_TYPE_CODE = 44;
+  public static final int ENTITY_TYPE_CODE = 45;
+
   public XDataType (Object name, Type implementationType, int typeCode)
   {
     super(implementationType);

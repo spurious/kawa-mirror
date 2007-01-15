@@ -1,3 +1,9 @@
+2007-01-15  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (coerceToString): Allow any CharSequence.
+	* QNameUtils.java (localNameFromQName, prefixFromQName): Change
+	result types to NCName.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* SequenceUtils.java (isZeroOrOne, coerceToZeroOrOne): New methods.

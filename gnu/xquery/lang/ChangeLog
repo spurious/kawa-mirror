@@ -1,3 +1,8 @@
+2007-01-15  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (typeMap): Add mappings for normalizedString, token,
+	language, NMTOKEN, Name, NCName, ID, IDREF, and ENTITY.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java: No longer need special handling of

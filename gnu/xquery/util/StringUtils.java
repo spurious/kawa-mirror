@@ -8,8 +8,10 @@ import gnu.mapping.*;
 import gnu.xml.TextUtils;
 import gnu.kawa.xml.KNode;
 import gnu.kawa.xml.UntypedAtomic;
+/* #ifdef use:java.util.regex */
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+/* #endif */
 import gnu.text.*;
 /* #ifdef use:java.text.Normalizer */
 // import java.text.Normalizer;
@@ -282,7 +284,9 @@ public class StringUtils
 
   public static String concat$V (Object arg1, Object arg2, Object[] args)
   {
+    arg1 = SequenceUtils.coerceToZeroOrOne(arg1, "concat", 1);
     String str1 = TextUtils.stringValue(arg1);
+    arg2 = SequenceUtils.coerceToZeroOrOne(arg2, "concat", 2);
     String str2 = TextUtils.stringValue(arg2);
     /* #ifdef JAVA5 */
     // StringBuilder result = new StringBuilder(str1);
@@ -292,7 +296,10 @@ public class StringUtils
     result.append(str2);
     int count = args.length;
     for (int i = 0; i < count; i++)
-      result.append(TextUtils.stringValue(args[i]));
+      {
+        Object arg = SequenceUtils.coerceToZeroOrOne(args[i], "concat", i+2);
+        result.append(TextUtils.stringValue(arg));
+      }
     return result.toString();
   }
 

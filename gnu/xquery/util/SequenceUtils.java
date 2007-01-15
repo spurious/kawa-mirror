@@ -14,12 +14,22 @@ import gnu.math.DFloNum;
 
 public class SequenceUtils
 {
-  public static Object zeroOrOne (Object arg)
+  public static boolean isZeroOrOne (Object arg)
   {
     // Assumes arg is normalized.
-    if (arg instanceof Values && ! ((Values) arg).isEmpty())
-      throw new IllegalArgumentException();
-    return arg;
+    return ! (arg instanceof Values) || ((Values) arg).isEmpty();
+  }
+
+  static Object coerceToZeroOrOne (Object arg, String functionName, int iarg)
+  {
+    if (isZeroOrOne(arg))
+      return arg;
+    throw new WrongType(functionName, iarg, arg, "xs:item()?");
+  }
+
+  public static Object zeroOrOne (Object arg)
+  {
+    return coerceToZeroOrOne(arg, "zero-or-one", 1);
   }
 
   public static Object oneOrMore (Object arg)

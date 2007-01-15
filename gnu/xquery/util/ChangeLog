@@ -1,5 +1,7 @@
 2007-01-15  Per Bothner  <per@bothner.com>
 
+	* SequenceUtils.java (deepEquals): Fix typo.
+
 	* StringUtils.java (coerceToString): Allow any CharSequence.
 	* QNameUtils.java (localNameFromQName, prefixFromQName): Change
 	result types to NCName.

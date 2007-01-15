@@ -190,7 +190,7 @@ public class SequenceUtils
                                    NamedCollator collator)
   {
     int kind1 = seq1.getNextKind(ipos1);
-    int kind2 = seq1.getNextKind(ipos2);
+    int kind2 = seq2.getNextKind(ipos2);
     switch (kind1)
       {
       case Sequence.ELEMENT_VALUE:

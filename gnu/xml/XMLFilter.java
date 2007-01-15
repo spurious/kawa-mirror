@@ -1158,6 +1158,7 @@ public class XMLFilter implements
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length)
   {
+    target = TextUtils.replaceWhitespace(target, true);
     for (int i = offset+length;  --i >= offset; )
       {
         char ch = content[i];
@@ -1175,7 +1176,7 @@ public class XMLFilter implements
     if ("xml".equalsIgnoreCase(target))
       error('e',
             "processing-instruction target may not be 'xml' (ignoring case)");
-    if (! XName.isName(target, true))
+    if (! XName.isNCName(target))
       error('e',
             "processing-instruction target '"+target+"' is not a valid Name");
 

@@ -1,3 +1,14 @@
+2007-01-14  Per Bothner  <per@bothner.com>
+
+	* XName.java (isNameStart): Use Character.isUnicodeIdentifierStart.
+	(checkName): New static method.
+	(isNmToken, isName(String), isNCName): New methods.
+	(isName(String,boolean)): Remove method.
+	* XMLFilter.java (writeProcessingInstruction): Update to use isNCName.
+
+	* XMLFilter.java (writeProcessingInstruction): Collapse whitespace
+	in target.
+
 2007-01-11  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (startElement): Check for undeclare-namespaces

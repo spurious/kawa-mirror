@@ -54,41 +54,65 @@ public class XName extends Symbol implements Externalizable
   public static boolean isNameStart(int ch)
   {
     /* #ifdef JAVA5 */
-    // return Character.isLetter(ch) || ch == '_';
+    // return Character.isUnicodeIdentifierStart(ch)
     /* #else */
-    return ch >= 0x10000 || Character.isLetter((char) ch) || ch == '_';
+    return ch >= 0x10000 || Character.isUnicodeIdentifierStart((char) ch)
     /* #endif */
+      || ch == '_';
   }
 
   public static boolean isNamePart(int ch)
   {
     /* #ifdef JAVA5 */
-    // return Character.isUnicodeIdentifierPart(ch) || ch == '-' || ch == '.';
+    // return Character.isUnicodeIdentifierPart(ch)
     /* #else */
     return ch >= 0x10000 || Character.isUnicodeIdentifierPart((char) ch)
-      || ch == '-' || ch == '.';
     /* #endif */
+      || ch == '-' || ch == '.';
+  }
+
+  public static boolean isNmToken (String value)
+  {
+    return checkName(value) >= 0;
   }
 
   public static boolean isName (String value)
   {
-    return isName(value, false);
+    return checkName(value) > 0;
   }
 
-  public static boolean isName (String value, boolean prohibitColon)
+  public static boolean isNCName (String value)
+  {
+    return checkName(value) > 1;
+  }
+
+  /** Check if a string is a valid NMTOKEN, Name, or NCName.
+   * @return 2 if string is an NCName; otherwise 1 if string is a Name;
+   *  otherwise 0 if string is an NMTOKEN; otherwise -1.
+   */
+
+  public static int checkName (String value)
   {
     int len = value.length();
     if (len == 0)
-      return false;
+      return -1;
+    int result = 2;
     for (int i = 0;  i < len;  )
       {
         boolean first = i == 0;
         int ch = value.charAt(i++);
         if (ch >= 0xD800 && ch < 0xDC00 && i < len)
           ch = (ch - 0xD800) * 0x400 + (value.charAt(i++) - 0xDC00) + 0x10000;
-        if (! (first ? XName.isNameStart(ch) : XName.isNamePart(ch)))
-          return false;
+        if (ch == ':')
+          {
+            if (result == 2)
+              result = 1;
+          }
+        else if (! XName.isNamePart(ch))
+          return -1;
+        else if (first && ! XName.isNameStart(ch))
+          result = 0;
       }
-    return true;
+    return result;
   }
 }

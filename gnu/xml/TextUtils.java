@@ -88,6 +88,10 @@ public class TextUtils
     out.write(str);
   }
 
+  /** Create a normalized string.
+   * @return the original string if it was normalized; otherwise a fresh one.
+   * (XStringType.matcyhes assumes the above.)
+   */
   public static String replaceWhitespace (String str, boolean collapse)
   {
     /* #ifdef JAVA5 */

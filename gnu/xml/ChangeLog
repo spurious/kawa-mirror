@@ -1,5 +1,11 @@
 2007-01-14  Per Bothner  <per@bothner.com>
 
+	* XMLPrinter.java (script): New flag.
+	(error): New method.
+	(startAttribute): Call error if string and ! inStartTag.
+
+	* XMLPrinter.java (write): Also escape U+00x85 and U+2028 in attributes.
+
 	* XName.java (isNameStart): Use Character.isUnicodeIdentifierStart.
 	(checkName): New static method.
 	(isNmToken, isName(String), isNCName): New methods.

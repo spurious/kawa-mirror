@@ -59,6 +59,8 @@ public class XMLPrinter extends OutPort
   public static final ThreadLocation indentLoc
     = new ThreadLocation("xml-indent");
 
+  public boolean strict;
+
   /** Chain of currently active namespace nodes. */
   NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
 
@@ -187,7 +189,9 @@ public class XMLPrinter extends OutPort
 	else if ((escapeNonAscii && v >= 127)
                  // We must escape control characters in attributes,
                  // since otherwise they get normalized to ' '.
-                 || (v < ' ' && (inAttribute || (v != '\t' && v != '\n'))))
+                 || (v < ' ' && (inAttribute
+                                 || (v != '\t' && v != '\n'
+                                     && v != 0x85 && v != 0x2028))))
           {
             int i = v;
             if (v >= 0xD800)
@@ -547,6 +551,8 @@ public class XMLPrinter extends OutPort
    * This is only allowed immediately after a startElement. */
   public void startAttribute (Object attrType)
   {
+    if (! inStartTag && strict)
+      error("attribute not in element", "SENR0001");
     if (inAttribute)
       bout.write('"');
     inAttribute = true;
@@ -863,5 +869,10 @@ public class XMLPrinter extends OutPort
   public void consume (SeqPosition position)
   {
     position.sequence.consumeNext(position.ipos, this);
+  }
+
+  public void error (String msg, String code)
+  {
+    throw new RuntimeException("serialization error: "+msg+" ["+code+']');
   }
 }

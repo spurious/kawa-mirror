@@ -1,5 +1,8 @@
 2007-01-15  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseContent): Make sure we don't skip boundary-space
+	before a CDATA section.  Which requires some re-organizing.
+
 	* XQuery.java (typeMap): Add mappings for normalizedString, token,
 	language, NMTOKEN, Name, NCName, ID, IDREF, and ENTITY.
 

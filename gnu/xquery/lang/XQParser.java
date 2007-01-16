@@ -2246,11 +2246,55 @@ public class XQParser extends Lexer
     for (;;)
       {
 	int next = read();
-	if (next == delimiter && delimiter != '<' && checkNext(delimiter))
-	  {
-	    tokenBufferAppend(delimiter);
-	    continue;
-	  }
+        if (next == delimiter)
+          {
+            if (delimiter == '<')
+              {
+                next = read();
+                Expression text = null;
+                if (tokenBufferLength > 0)
+                  {
+                    String str = new String(tokenBuffer, 0, tokenBufferLength);
+                    Expression[] args = { new QuoteExp(str) };
+                    text = new ApplyExp(makeText, args);
+                  }
+                tokenBufferLength = 0;
+                if (next == '/')
+                  {
+                    if (text != null && ! skippable)
+                      result.addElement(text);
+                    break;
+                  }
+                Expression content = parseXMLConstructor(next, true);
+                boolean isCDATA = false;
+                boolean emptyCDATA = false;
+                if (content instanceof ApplyExp)
+                  {
+                    ApplyExp aexp = (ApplyExp) content;
+                    if (aexp.getFunction() == makeCDATA)
+                      {
+                        isCDATA = true;
+                        String str = (String) aexp.getArg(0).valueIfConstant();
+                        emptyCDATA = str != null && str.length() == 0;
+                      }
+                  }
+                if (text != null && (! skippable || isCDATA))
+                  result.addElement(text);
+                if (isCDATA)
+                  skippable = false;
+                else
+                  skippable = skipBoundarySpace;
+                if (! emptyCDATA)
+                  result.addElement(content);
+                tokenBufferLength = 0;
+                continue;
+              }
+            else if (checkNext(delimiter))
+              {
+                tokenBufferAppend(delimiter);
+                continue;
+              }
+          }
 	if (next == delimiter || next < 0 || next == '{')
 	  {
           addText:
@@ -2268,27 +2312,29 @@ public class XQParser extends Lexer
               result.addElement(new ApplyExp(makeText, args));
             }
 	    tokenBufferLength = 0;
-	  }
-	if (next < 0)
-	  eofError("unexpected end-of-file");
-	if (next == '{')
-	  {
-	    next = read();
-	    if (next == '{')
-	      {
-		tokenBufferAppend('{');
-		skippable = false;
-	      }
-	    else
-	      {
-		unread(next);
-                enclosedExpressionsSeen++;
-		Expression exp = parseEnclosedExpr();
-		result.addElement(exp);
-		tokenBufferLength = 0;
-		prevEnclosed = result.size();
-		skippable = skipBoundarySpace;
-	      }
+            if (next == delimiter)
+              break;
+            else if (next < 0)
+              eofError("unexpected end-of-file");
+            else // if (next == '{')
+              {
+                next = read();
+                if (next == '{')
+                  {
+                    tokenBufferAppend('{');
+                    skippable = false;
+                  }
+                else
+                  {
+                    unread(next);
+                    enclosedExpressionsSeen++;
+                    Expression exp = parseEnclosedExpr();
+                    result.addElement(exp);
+                    tokenBufferLength = 0;
+                    prevEnclosed = result.size();
+                    skippable = skipBoundarySpace;
+                  }
+              }
 	  }
 	else if (next == '}')
 	  {
@@ -2302,39 +2348,6 @@ public class XQParser extends Lexer
 	      {
 		error("unexpected '}' in element content");
 		unread(next);
-	      }
-	  }
-	else if (next == delimiter)
-	  {
-	    if (delimiter != '<')
-	      {
-		break;
-	      }
-	    else
-	      {
-		next = read();
-		if (next == '/')
-		  break;
-                Expression content = parseXMLConstructor(next, true);
-                boolean isCDATA = false;
-                boolean emptyCDATA = false;
-                if (content instanceof ApplyExp)
-                  {
-                    ApplyExp aexp = (ApplyExp) content;
-                    if (aexp.getFunction() == makeCDATA)
-                      {
-                        isCDATA = true;
-                        String text = (String) aexp.getArg(0).valueIfConstant();
-                        emptyCDATA = text != null && text.length() == 0;
-                      }
-                  }
-                if (! emptyCDATA)
-                  result.addElement(content);
-		tokenBufferLength = 0;
-                if (isCDATA)
-                  skippable = false;
-                else
-                  skippable = skipBoundarySpace;
 	      }
 	  }
 	else if (next == '&')

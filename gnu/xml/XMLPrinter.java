@@ -187,11 +187,10 @@ public class XMLPrinter extends OutPort
 	else if (v == '\"' && inAttribute)
 	  bout.write("&quot;");
 	else if ((escapeNonAscii && v >= 127)
+                 || v == 0x85 || v == 0x2028
                  // We must escape control characters in attributes,
                  // since otherwise they get normalized to ' '.
-                 || (v < ' ' && (inAttribute
-                                 || (v != '\t' && v != '\n'
-                                     && v != 0x85 && v != 0x2028))))
+                 || (v < ' ' && (inAttribute || (v != '\t' && v != '\n'))))
           {
             int i = v;
             if (v >= 0xD800)

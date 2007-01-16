@@ -1,3 +1,8 @@
+2007-01-16  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (write): Always escape U+00x85 and U+2028
+	not just in attributes.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (script): New flag.

@@ -33,7 +33,15 @@ public abstract class TreeScanner extends MethodProc
     PositionConsumer out = (PositionConsumer) ctx.consumer;
     Object node = ctx.getNextArg();
     ctx.lastArg();
-    KNode spos = (KNode) node;
+    KNode spos;
+    try
+      {
+        spos = (KNode) node;
+      }
+    catch (ClassCastException ex)
+      {
+        throw new WrongType(getDesc(), WrongType.ARG_CAST, node, "node()");
+      }
     scan(spos.sequence, spos.getPos(), out);
   }
 
@@ -46,6 +54,15 @@ public abstract class TreeScanner extends MethodProc
     throws IOException, ClassNotFoundException
   {
     type = (NodePredicate) in.readObject();
+  }
+
+  public String getDesc ()
+  {
+    String thisName = getClass().getName();
+    int dot = thisName.lastIndexOf('.');
+    if (dot > 0)
+      thisName = thisName.substring(dot+1);
+    return thisName+"::"+type;
   }
 
   public String toString ()

@@ -82,6 +82,14 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
     lexp2.max_args = 2;
 
     Type type1 = exp1.getType();
+    if (type1 != null &&NodeType.anyNodeTest.compare(type1) == -3)
+      {
+        Language language = walker.getCompilation().getLanguage();
+        String message = "step input is "+language.formatType(type1)+" - not a node sequence";
+        walker.getMessages().error('e', message);
+        return new ErrorExp(message);
+      }
+      
     Type rtype = exp.getTypeRaw();
     Type rtypePrime;
     int nodeCompare;

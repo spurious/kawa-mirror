@@ -847,6 +847,17 @@ public class XQuery extends Language
     return t != null ? t : Scheme.string2Type(name);
   }
 
+  public String formatType (Type type)
+  {
+    String tname = type.getName();
+    if ("gnu.math.IntNum".equals(tname))
+      return "xs:integer";
+    if ("java.lang.String".equals(tname)
+        || "java.lang.CharSequence".equals(tname))
+      return "xs:string";
+    return type.toString();
+  }
+
   public Type getTypeFor (Class clas)
   {
     if (clas.isPrimitive())

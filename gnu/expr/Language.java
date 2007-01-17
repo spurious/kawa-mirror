@@ -577,6 +577,11 @@ public abstract class Language
     return type;
   }
 
+  public String formatType (Type type)
+  {
+    return type.toString();
+  }
+
   public static Type string2Type (String name)
   {
     Type t;

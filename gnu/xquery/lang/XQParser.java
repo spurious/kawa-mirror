@@ -1946,7 +1946,7 @@ public class XQParser extends Lexer
 	LambdaExp lexp = new LambdaExp(3);
 	Declaration dotDecl = lexp.addDeclaration(DOT_VARNAME);
 	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
-        dotDecl.setType(SingletonType.getInstance());
+        dotDecl.setType(NodeType.anyNodeTest);
 	dotDecl.noteValue (null);  // Does not have a known value.
 	lexp.addDeclaration(POSITION_VARNAME, LangPrimType.intType);
 	lexp.addDeclaration(LAST_VARNAME, LangPrimType.intType);

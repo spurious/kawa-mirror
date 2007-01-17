@@ -91,7 +91,20 @@ public class XDataType extends Type implements TypeValue
   }
 
   public static final XDataType stringType =
-    new XDataType("string", ClassType.make("java.lang.String"),
+    new XDataType("string",
+                  /* #ifdef use:java.lang.CharSequence */
+                  ClassType.make("java.lang.CharSequence"),
+                  /* #else */
+                  // ClassType.make("java.lang.String"),
+                  /* #endif */
+                  STRING_TYPE_CODE);
+
+  /** A value implemented as java.lang.String.
+   * Can be cast from CharSequence.
+   */
+  public static final XDataType stringStringType =
+    new XDataType("String",
+                  ClassType.make("java.lang.String"),
                   STRING_TYPE_CODE);
 
   public static final XDataType untypedAtomicType =
@@ -212,7 +225,11 @@ public class XDataType extends Type implements TypeValue
     switch (typeCode)
       {
       case STRING_TYPE_CODE:
-        return obj instanceof java.lang.String;
+        /* #ifdef use:java.lang.CharSequence */
+        return obj instanceof java.lang.CharSequence;
+        /* #else */
+        // return obj instanceof java.lang.String;
+        /* #endif */
       case UNTYPED_ATOMIC_TYPE_CODE:
         return obj instanceof gnu.kawa.xml.UntypedAtomic;
       case ANY_URI_TYPE_CODE:
@@ -411,7 +428,9 @@ public class XDataType extends Type implements TypeValue
 
   public int compare(Type other)
   {
-    if (this == other)
+    if (this == other
+        || (this == stringStringType && other == stringType)
+        || (this == stringType && other == stringStringType))
       return 0;
     return implementationType.compare(other); // FIXME
   }

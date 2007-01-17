@@ -871,7 +871,7 @@ public class XQuery extends Language
       {
         String name = clas.getName();
         if (name.equals("java.lang.String"))
-          return XDataType.stringType;
+          return XDataType.stringStringType;
         if (name.equals("gnu.kawa.xml.UntypedAtomic"))
           return XDataType.untypedAtomicType;
         if (name.equals("java.lang.Boolean"))

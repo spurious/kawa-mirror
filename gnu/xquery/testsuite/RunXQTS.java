@@ -24,12 +24,14 @@ public class RunXQTS extends FilterConsumer
   // HashMap<String,Object> sources = new HashMap<String,Object>();
   // Stack<Symbol> externalVariablesSet = new Stack<Symbol>();
   // Stack<String> outputFileAlts = new Stack<String>();
+  // Stack<String> outputCompareAlts = new Stack<String>();
   /* #else */
   Hashtable expectedFailures = new Hashtable();
   Hashtable modules = new Hashtable();
   Hashtable sources = new Hashtable();
   Stack externalVariablesSet = new Stack();
   Stack outputFileAlts = new Stack();
+  Stack outputCompareAlts = new Stack();
   /* #endif */
   ModuleManager manager = ModuleManager.getInstance();
   Object failExpected;
@@ -45,7 +47,6 @@ public class RunXQTS extends FilterConsumer
   String XQueryXQueryOffsetPath;
   String XQueryFileExtension;
   String XQueryXFileExtension;
-  String compare;
   Object contextItem;
 
   int passCount;
@@ -216,14 +217,10 @@ public class RunXQTS extends FilterConsumer
                    "item() is treated as equivalent to item()*");
     expectFailures("fn-abs-more-args-023|fn-abs-more-args-024",
                    "testsuite error (4023): -0 is not  valid unsignedLong/unsignedShort literal");
-    expectFailures("K2-Literals-8|K2-Literals-9",
-                   "testsuite error (4215): bogus K2-Literals-8.txt/K2-Literals-9.txt");
+    expectFailures("K2-Serialization-7|K2-Serialization-8",
+                   "testsuite error (4239): &Xx10 missing in K2-Serialization-[78].txt");
     expectFailures("K2-DirectConElemAttr-36",
-                   "testsuite error: result should not have leading whitespace");
-    expectFailures("K2-DirectConElem-38",
-                   "testsuite error??: xml namespace def should be optional");
-    expectFailures("K-CodepointToStringFunc-8",
-                   "testsuite error (3776): typo in K-CodepointToStringFunc-8.txt");
+                   "testsuite error (4216): result should not have leading whitespace");
     /* #ifndef JAVA5 */
     expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
                    "surrogates not handled by java.util.regex");
@@ -276,7 +273,7 @@ public class RunXQTS extends FilterConsumer
                    "some string functions don't support collation argument");
     expectFailures("caselessmatch04",
                    "regex/unicode special case");
-    expectFailures("string-queries-results-q4|K2-FunctionProlog-7",
+    expectFailures("string-queries-results-q4|K2-FunctionProlog-7|K2-FunctionProlog-17|K2-FunctionProlog-18|K2-FunctionProlog-19|K2-FunctionProlog-22",
                    "function conversion incorrect for user-defined functions");
     expectFailures("caselessmatch10|caselessmatch11",
                    // Need to translate [xxx-[yyy]] to [xxx&&[^yyy]].
@@ -398,6 +395,7 @@ public class RunXQTS extends FilterConsumer
         testFilePath = attributes.getValue("FilePath");
         testQueryName = null;
         outputFileAlts.clear();
+        outputCompareAlts.clear();
         expectedErrorsBuf.setLength(1);
         manager.clear();
       }
@@ -650,8 +648,16 @@ public class RunXQTS extends FilterConsumer
     boolean foundMatchingOutput = false;
     boolean displayDifference = false;
     String expected = null;
+    String compare = null;
     for (int ialt = 0;  ialt < numOutputFileAlts;  ialt++)
       {
+        compare = (String) outputCompareAlts.elementAt(ialt);
+        if ("Ignore".equals(compare))
+          {
+            report("pass", null);
+            foundMatchingOutput = true;
+            break;
+          }
         String outname  = directory + '/' + ResultOffsetPath + testFilePath
           + outputFileAlts.elementAt(ialt);
         FileInputStream expectStream = new FileInputStream(outname);
@@ -705,7 +711,7 @@ public class RunXQTS extends FilterConsumer
           }
       }
     if (displayDifference)
-      {
+      { // This only displays a single expected result.
         writeVerbose("compare", compare);
         writeVerbose("expected", expected);
         writeVerbose("actual", actual);
@@ -745,7 +751,54 @@ public class RunXQTS extends FilterConsumer
           return true;
         int c1 = i1 == len1 ? -1 : arg1.charAt(i1);
         int c2 = i2 == len2 ? -1 : arg2.charAt(i2);
-        if (c1 == c2)
+        if ((c1 == '&' && arg1.charAt(i1+1) == '#' && i1 + 3 < len1)
+            || (c2 == '&' && arg2.charAt(i2+1) == '#' && i2 + 3 < len2))
+          {
+            try
+              {
+                if (c1 == '&')
+                  {
+                    int base1 = 10;
+                    i1 += 2;
+                    if (arg1.charAt(i1) == 'x')
+                      {
+                        i1++;
+                        base1 = 16;
+                      }
+                    int semi1 = arg1.indexOf(';', i1);
+                    c1 = Integer.parseInt(arg1.substring(i1, semi1), base1);
+                    i1 = semi1;
+                  }
+                else if (c1 >= 0xD800 && c1 < 0xDC00 && i1 + 1 < len1)
+                  c1 = (c1 - 0xD800) * 0x400
+                    + (arg1.charAt(++i1) - 0xDC00) + 0x10000;
+                if (c2 == '&')
+                  {
+                    int base2 = 10;
+                    i2 += 2;
+                    if (arg2.charAt(i2) == 'x')
+                      {
+                        i2++;
+                        base2 = 16;
+                      }
+                    int semi2 = arg2.indexOf(';', i2);
+                    c2 = Integer.parseInt(arg2.substring(i2, semi2), base2);
+                    i2 = semi2;
+                  }
+                else if (c2 >= 0xD800 && c2 < 0xDC00 && i2 + 1 < len2)
+                  c2 = (c2 - 0xD800) * 0x400
+                    + (arg2.charAt(++i2) - 0xDC00) + 0x10000;
+              }
+            catch (Throwable ex)
+              {
+                return false;
+              }
+            if (c1 != c2)
+              return false;
+            i1++;
+            i2++;
+          }
+        else if (c1 == c2)
           {
             if (c1 == '<' && isXML)
               {
@@ -900,33 +953,6 @@ public class RunXQTS extends FilterConsumer
               }
             i1 = i1 + 2;
             i2 = i2 + 1;
-          }
-        else if (c2 == '&' && i2 + 2 < len2
-                 && arg2.charAt(i2+1) == '#')
-          {
-            if (c1 >= 0xD800 && c1 < 0xDC00 && i1 + 1 < len1)
-              c1 = (c1 - 0xD800) * 0x400
-                  + (arg1.charAt(++i1) - 0xDC00) + 0x10000;
-            i2 = i2 + 2;
-            int base = 10;
-            if (arg2.charAt(i2) == 'x')
-              {
-                i2++;
-                base = 16;
-              }
-            int semi = arg2.indexOf(';', i2);
-            try
-              {
-                c2 = Integer.parseInt(arg2.substring(i2, semi), base);
-              }
-            catch (Throwable ex)
-              {
-                return false;
-              }
-            i1 = i1 + 1;
-            i2 = semi+1;
-            if (c1 != c2)
-              return false;
           }
         else
           return false;
@@ -1095,7 +1121,7 @@ public class RunXQTS extends FilterConsumer
     else if (tagMatches("output-file"))
       {
         outputFileAlts.push(getElementValue());
-        compare = attributes.getValue("compare");
+        outputCompareAlts.push(attributes.getValue("compare"));
       }
     else if (tagMatches("test-suite"))
       {

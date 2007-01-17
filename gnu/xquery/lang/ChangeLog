@@ -1,5 +1,7 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (initXQuery): Change implementation class of node-name.
+
 	* XQParser.java (resolveAgainstBaseUri): New method.
 	(parse): Use it to resolve 'default collation'.
 	(parseFLWRExpression): Use it to resolve 'order by' collation.

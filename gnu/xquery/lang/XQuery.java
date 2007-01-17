@@ -598,7 +598,7 @@ public class XQuery extends Language
     defProcStFld("iterator-items",
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
-    define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("node-name", "gnu.xquery.util.NodeUtils", "nodeName");
     define_method("nilled", "gnu.xquery.util.NodeUtils", "nilled");
     define_method("data", "gnu.xquery.util.NodeUtils", "data$X");
     define_method("lower-case", "gnu.xquery.util.StringUtils", "lowerCase");

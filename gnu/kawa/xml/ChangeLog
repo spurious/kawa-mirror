@@ -1,3 +1,9 @@
+2007-01-17  Per Bothner  <per@bothner.com>
+
+	* KNode.java (getNodeSymbol, getNodeNameObject): New methods.
+	* NodeName.java: Remove no-longer-used class.
+	* Makefile.am: Update accordingly.
+
 2007-01-16  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (stringType): Use java.lang.CharSequence.

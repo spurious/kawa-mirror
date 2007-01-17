@@ -15,11 +15,24 @@ import gnu.text.Path;
 
 public class NodeUtils
 {
+  public static Object nodeName (Object node)
+  {
+    if (node == Values.empty || node == null)
+      return node;
+    if (! (node instanceof KNode))
+      throw new WrongType("node-name", 1, node, "node()?");
+    Object sym = ((KNode) node).getNodeSymbol();
+    if (sym == null)
+      return Values.empty;
+    else
+      return sym;
+  }
+
   public static String name (Object node)
   {
     if (node == Values.empty || node == null)
       return "";
-    Object name = NodeName.nodeName(node);
+    Object name = ((KNode) node).getNodeNameObject();
     if (name == null || name == Values.empty)
       return "";
     return name.toString();
@@ -31,22 +44,25 @@ public class NodeUtils
       return "";
     if (! (node instanceof KNode))
       throw new WrongType("local-name", 1, node, "node()?");
-    Object name = NodeName.nodeName(node);
+    Object name = ((KNode) node).getNodeNameObject();
     if (name == null || name == Values.empty)
       return "";
-    return ((Symbol) name).getName();
+    if (name instanceof Symbol)
+      return ((Symbol) name).getName();
+    return name.toString();
   }
 
   public static Object namespaceURI (Object node)
   {
-    if (node == Values.empty || node == null)
-      return "";
-    if (! (node instanceof KNode))
-      throw new WrongType("namespace-uri", 1, node, "node()?");
-    Object name = NodeName.nodeName(node);
-    if (name == null || name == Values.empty)
-      return "";
-    return QNameUtils.namespaceURIFromQName(name);
+    if (node != Values.empty && node != null)
+      {
+        if (! (node instanceof KNode))
+          throw new WrongType("namespace-uri", 1, node, "node()?");
+        Object name = ((KNode) node).getNodeNameObject();
+        if (name instanceof Symbol)
+          return QNameUtils.namespaceURIFromQName(name);
+      }
+    return "";
   }
 
   public static void prefixesFromNodetype (XName name, Consumer out)
@@ -80,7 +96,7 @@ public class NodeUtils
     //if (node instanceof KElement)
       {
         KElement element = (KElement) node;
-        Object type = element.sequence.getNextTypeObject(element.ipos);
+        Object type = element.getNodeNameObject();
         if (type instanceof XName)
           prefixesFromNodetype((XName) type, ctx.consumer);
         else

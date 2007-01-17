@@ -1,5 +1,9 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* NodeUtils.java (nodeName): New method.
+	(name, localName, namespaceURI, inScopePrefixes$X): Use KNode's new
+	getNodeNameObject method.
+
 	* QNameUtils.java (localNameFromQName, prefixFromQName,
 	namespaceURIFromQName, namespaceURIForPrefix):
 	Fix throwing of WrongType.

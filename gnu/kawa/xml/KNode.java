@@ -119,6 +119,26 @@ public abstract class KNode extends SeqPosition
     return sequence.getNextTypeName(ipos);
   }
 
+  /** The Data Model's node-name accessor.
+   * Return the node's name as a SSymbol (QName) or null if there is none.
+   */
+  public Symbol getNodeSymbol ()
+  {
+    Object type = ((NodeTree) sequence).getNextTypeObject(ipos);
+    if (type == null)
+      return null;
+    if (type instanceof Symbol)
+      return (Symbol) type;
+    return Namespace.EmptyNamespace.getSymbol(type.toString().intern());
+  }
+
+  /** Get the raw "type object" of a node.
+   */
+  public Object getNodeNameObject ()
+  {
+    return ((NodeTree) sequence).getNextTypeObject(ipos);
+  }
+
   public String getNamespaceURI ()
   {
     return ((NodeTree) sequence).posNamespaceURI(ipos);

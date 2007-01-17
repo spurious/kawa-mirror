@@ -46,7 +46,6 @@ java_sources = \
   MakeWithBaseUri.java \
   NodeCompare.java \
   NodeConstructor.java \
-  NodeName.java \
   Nodes.java \
   NodeSetType.java \
   NodeType.java \

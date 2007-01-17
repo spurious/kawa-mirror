@@ -157,9 +157,9 @@ public class QNameUtils
   {
     if (name == Values.empty || name == null)
       return name;
-    if (name instanceof Symbol)
-      return XStringType.makeNCName(((Symbol) name).getName());
-    throw WrongType.make(null, "local-name-from-QName", 1, name);
+    if (! (name instanceof Symbol))
+      throw new WrongType("local-name-from-QName", 1, name, "xs:QName");
+    return XStringType.makeNCName(((Symbol) name).getName());
   }
 
   public static Object prefixFromQName (Object name)
@@ -173,16 +173,21 @@ public class QNameUtils
           return Values.empty;
         return XStringType.makeNCName(prefix);
       }
-    throw WrongType.make(null, "prefix-from-QName", 1, name);
+    throw new WrongType("prefix-from-QName", 1, name, "xs:QName");
   }
 
   public static Object namespaceURIFromQName (Object name)
   {
     if (name == Values.empty || name == null)
       return name;
-    if (name instanceof Symbol)
-      return URIPath.makeURI(((Symbol) name).getNamespaceURI());
-    throw WrongType.make(null, "namespace-uri", 1, name);
+    try
+      {
+        return URIPath.makeURI(((Symbol) name).getNamespaceURI());
+      }
+    catch (ClassCastException ex)
+      {
+        throw new WrongType("namespace-uri", 1, name, "xs:QName");
+      }
   }
 
   public static Object namespaceURIForPrefix (Object prefix,
@@ -190,12 +195,12 @@ public class QNameUtils
   {
     KNode el = KNode.coerce(element);
     if (el == null)
-      throw WrongType.make(null, "namespace-uri-for-prefix", 2, element);
+      throw new WrongType("namespace-uri-for-prefix", 2, element, "node()");
     String str;
     if (prefix == null || prefix == Values.empty)
       str = null;
     else if (! (prefix instanceof String || prefix instanceof UntypedAtomic))
-      throw WrongType.make(null, "namespace-uri-for-prefix", 1, element);
+      throw new WrongType("namespace-uri-for-prefix", 1, element, "xs:string");
     else
       {
         str = prefix.toString().intern();

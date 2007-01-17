@@ -1,3 +1,9 @@
+2007-01-17  Per Bothner  <per@bothner.com>
+
+	* QNameUtils.java (localNameFromQName, prefixFromQName,
+	namespaceURIFromQName, namespaceURIForPrefix):
+	Fix throwing of WrongType.
+
 2007-01-16  Per Bothner  <per@bothner.com>
 
 	* RelativeStep.java (inline): Error if 1st arg incompatible with node.

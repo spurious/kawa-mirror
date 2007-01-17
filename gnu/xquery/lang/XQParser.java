@@ -93,6 +93,16 @@ public class XQParser extends Lexer
     return baseURI;
   }
 
+  public String resolveAgainstBaseUri (String uri)
+  {
+    if (Path.uriSchemeSpecified(uri))
+      return uri;
+    String base = getStaticBaseUri();
+    Path basePath = base == null ? Path.currentPath()
+      : Path.valueOf(base);
+    return basePath.resolve(uri).toString();
+  }
+
   boolean boundarySpacePreserve;
   boolean boundarySpaceDeclarationSeen;
 
@@ -2058,6 +2068,11 @@ public class XQParser extends Lexer
 	axis = AXIS_ATTRIBUTE;
 	unqualifiedStep = parseNodeTest(axis);
       }
+    else if (curToken == OP_ATTRIBUTE)
+      {
+	axis = AXIS_ATTRIBUTE;
+	unqualifiedStep = parseNodeTest(axis);
+      }
     else
       {
 	unqualifiedStep = parseNodeTest(-1);
@@ -3220,7 +3235,8 @@ public class XQParser extends Lexer
                   {
                     try
                       {
-                        collation = NamedCollator.make((String) uri);
+                        String uriString = resolveAgainstBaseUri((String) uri);
+                        collation = NamedCollator.make(uriString);
                       }
                     catch (Exception name)
                       {
@@ -3979,13 +3995,7 @@ public class XQParser extends Lexer
 	String collation = (String) val;
 	try
 	  {
-            if (! Path.uriSchemeSpecified(collation))
-              {
-                String base = getStaticBaseUri();
-                Path basePath = base == null ? Path.currentPath()
-                  : Path.valueOf(base);
-                collation = basePath.resolve(collation).toString();
-              }
+            collation = resolveAgainstBaseUri(collation);
 	    defaultCollator = NamedCollator.make(collation);
 	  }
 	catch (Exception ex)

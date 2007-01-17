@@ -143,6 +143,15 @@ public class XMLPrinter extends OutPort
       escapeText = false;
   }
 
+  boolean mustHexEscape (int v)
+  {
+    return (v >= 127 && (v <= 159 || escapeNonAscii))
+      || v == 0x2028
+      // We must escape control characters in attributes,
+      // since otherwise they get normalized to ' '.
+      || (v < ' ' && (inAttribute || (v != '\t' && v != '\n')));
+  }
+
   public void write (int v)
   {
     closeTag();
@@ -186,11 +195,7 @@ public class XMLPrinter extends OutPort
 	  bout.write("&amp;");
 	else if (v == '\"' && inAttribute)
 	  bout.write("&quot;");
-	else if ((escapeNonAscii && v >= 127)
-                 || v == 0x85 || v == 0x2028
-                 // We must escape control characters in attributes,
-                 // since otherwise they get normalized to ' '.
-                 || (v < ' ' && (inAttribute || (v != '\t' && v != '\n'))))
+	else if (mustHexEscape(v))
           {
             int i = v;
             if (v >= 0xD800)
@@ -731,7 +736,7 @@ public class XMLPrinter extends OutPort
         while (start < limit)
           {
             char c = str.charAt(start++);
-            if (c >= 127 || c == '\n' || c == '\r'
+            if (mustHexEscape(c)
                 || (inComment > 0 ? (c == '-' || inComment == 2)
                     : (c == '<' || c == '>' || c == '&'
                        || (inAttribute && (c == '"' || c < ' ' )))))
@@ -760,7 +765,7 @@ public class XMLPrinter extends OutPort
         while (off < limit)
           {
             char c = buf[off++];
-            if (c >= 127 || c == '\n' || c == '\r'
+            if (mustHexEscape(c)
                 || (inComment > 0 ? (c == '-' || inComment == 2)
                     : (c == '<' || c == '>' || c == '&'
                        || (inAttribute && (c == '"' || c < ' ' )))))

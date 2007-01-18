@@ -503,6 +503,12 @@ public class TreeList extends AbstractSequence
 
   public void beginEntity (Object base)
   {
+    // Ideally, we want to ignore a beginEnity if and only if it is redundant.
+    // There are also problems in the current implementation with
+    // nested (or maybe any non-top-level?) BEGIN_ENTITY nodes.
+    // So for now, let's keep it simple.
+    if (gapStart != 0)
+      return;
     ensureSpace(BEGIN_ENTITY_SIZE+1);
     gapEnd--;
     int p = gapStart;
@@ -516,8 +522,11 @@ public class TreeList extends AbstractSequence
 
   public void endEntity ()
   {
-    if (data[gapEnd] != END_ENTITY
-        || data[currentParent] != BEGIN_ENTITY)
+    // See comment in beginEntity.
+    if (gapEnd + 1 != data.length || data[gapEnd] != END_ENTITY)
+      return;
+    if (/*data[gapEnd] != END_ENTITY || */
+        data[currentParent] != BEGIN_ENTITY)
       throw new Error("unexpected endEntity");
     // Move the END_ENTITY to before the gap.
     gapEnd++;
@@ -1824,8 +1833,7 @@ public class TreeList extends AbstractSequence
 	  case BEGIN_DOCUMENT:
 	  case BEGIN_ENTITY:
 	    doChildren = index + 4;
-	    j = getIntN(index);
-	    index = j + (j < 0 ? data.length + 1 : index);
+	    index = nextDataIndex(index-1);
 	    break;
 	  case BEGIN_ELEMENT_LONG:	
             spaceNeeded = false;
@@ -1949,6 +1957,7 @@ public class TreeList extends AbstractSequence
 	  case END_ELEMENT_LONG:
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
+	  case END_ENTITY:
 	    return pos;
 	  case CDATA_SECTION:
 	  default:
@@ -2184,6 +2193,7 @@ public class TreeList extends AbstractSequence
       case END_ELEMENT_LONG:
       case END_ATTRIBUTE:
       case END_DOCUMENT:
+      case END_ENTITY:
 	return -1;
       case BEGIN_ELEMENT_LONG:
 	j = getIntN(pos);
@@ -2203,7 +2213,6 @@ public class TreeList extends AbstractSequence
       case COMMENT:
 	return pos + 2 + getIntN(pos);
       default:
-        dump();
 	throw new Error("unknown code:"+Integer.toHexString((int) datum));
       }
   }

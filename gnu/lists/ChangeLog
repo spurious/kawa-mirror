@@ -1,3 +1,9 @@
+2007-01-17  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (beginEntity, endEntity): Ignore if not at top level.
+	(stringValue): Fix END_ENTITY handling.
+	(nextNodeIndex, nextDataIndex): Handle END_ENTITY.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java (writeObject): Leave file path null.

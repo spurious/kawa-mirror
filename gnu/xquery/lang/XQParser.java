@@ -1565,14 +1565,14 @@ public class XQParser extends Lexer
       {
         if (parseContext == 'C')
           // Kludge to force error below.
-          type = Type.pointer_type;
+          type = XDataType.anyAtomicType;
         else
           return etype;
       }
     else if (curToken == OP_ITEM)
       {
         parseSimpleKindType();
-        type = Type.pointer_type;
+        type = SingletonType.getInstance();
       }
     else if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
@@ -1589,8 +1589,10 @@ public class XQParser extends Lexer
       return null;
     if (parseContext == 'C')
       {
-        if (type == Type.pointer_type)
+        if (type == SingletonType.getInstance())
           return syntaxError("type to 'cast as' or 'castable as' must be atomic", "XPST0080");
+        if (type == XDataType.anyAtomicType)
+          return syntaxError("type to 'cast as' or 'castable as' cannot be anyAtomicType", "XPST0080");
         if (type == XDataType.NotationType)
           return syntaxError("type to 'cast as' or 'castable as' cannot be NOTATION", "XPST0080");
       }

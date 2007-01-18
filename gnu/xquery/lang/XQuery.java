@@ -819,7 +819,7 @@ public class XQuery extends Language
       "ID", XStringType.IDType,
       "IDREF", XStringType.IDREFType,
       "ENTITY", XStringType.ENTITYType,
-      "anyAtomicType", Type.pointer_type
+      "anyAtomicType", XDataType.anyAtomicType
     };
 
   public static Type getStandardType (String name)

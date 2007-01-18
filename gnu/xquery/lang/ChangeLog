@@ -1,5 +1,10 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (typeMap): use new XDataType.anyAtomicType.
+	* XQParser.java (parseItemType): Explicitly test
+	for XDataType.anyAtomicType, which is now different from item().
+	Use SingletonType.getInstance(); for item().
+
 	* XQuery.java (initXQuery): Change implementation class of node-name.
 
 	* XQParser.java (resolveAgainstBaseUri): New method.

@@ -1,5 +1,9 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XDataType.java (ANY_ATOMIC_TYPE_CODE): New constant.
+	(anyAtomicType): New static.
+	(isInstance): Handle ANY_ATOMIC_TYPE_CODE.
+
 	* KNode.java (getNodeSymbol, getNodeNameObject): New methods.
 	* NodeName.java: Remove no-longer-used class.
 	* Makefile.am: Update accordingly.

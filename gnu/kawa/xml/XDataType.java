@@ -4,10 +4,12 @@
 package gnu.kawa.xml;
 import gnu.bytecode.*;
 import gnu.mapping.Procedure;
+import gnu.mapping.Values;
 import gnu.expr.*;
 import gnu.text.Printable;
 import gnu.math.*;
 import java.math.BigDecimal;
+import gnu.lists.SeqPosition;
 import gnu.lists.Consumer;
 import gnu.xml.TextUtils;
 import gnu.text.URIPath;
@@ -28,6 +30,7 @@ public class XDataType extends Type implements TypeValue
   /** One of the {@code XXXX_TYPE_CODE} constants. */
   int typeCode;
 
+  public static final int ANY_ATOMIC_TYPE_CODE = 1;
   public static final int DECIMAL_TYPE_CODE = 2;
   public static final int INTEGER_TYPE_CODE = 3;
   public static final int NON_POSITIVE_INTEGER_TYPE_CODE = 4;
@@ -89,6 +92,11 @@ public class XDataType extends Type implements TypeValue
     this.implementationType = implementationType;
     this.typeCode = typeCode;
   }
+
+  public static final XDataType anyAtomicType =
+    new XDataType("anyAtomicType",
+                  Type.pointer_type,
+                  ANY_ATOMIC_TYPE_CODE);
 
   public static final XDataType stringType =
     new XDataType("string",
@@ -224,6 +232,8 @@ public class XDataType extends Type implements TypeValue
   {
     switch (typeCode)
       {
+      case ANY_ATOMIC_TYPE_CODE:
+        return ! (obj instanceof Values || obj instanceof SeqPosition);
       case STRING_TYPE_CODE:
         /* #ifdef use:java.lang.CharSequence */
         return obj instanceof java.lang.CharSequence;

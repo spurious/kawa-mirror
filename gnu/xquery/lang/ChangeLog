@@ -1,5 +1,11 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (baseURI): Change type to Path.
+	(setStaticBaseUri, fixupStaticBaseUri): New methods.
+	(getStaticBaseUri): Try Environment, then LineBufferedReader,
+	then currentPath.  Then coerce to an absolute URI.
+	(resolveAgainstBaseUri): Making absolute is no longer done here.
+
 	* XQuery.java (typeMap): use new XDataType.anyAtomicType.
 	* XQParser.java (parseItemType): Explicitly test
 	for XDataType.anyAtomicType, which is now different from item().

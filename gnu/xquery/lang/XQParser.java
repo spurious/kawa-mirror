@@ -79,18 +79,65 @@ public class XQParser extends Lexer
   char defaultEmptyOrder = 'L';
   boolean emptyOrderDeclarationSeen;
 
-  String baseURI = null;
+  Path baseURI = null;
   boolean baseURIDeclarationSeen;
+
+  public void setStaticBaseUri (String uri)
+  {
+    try
+      {
+        baseURI = fixupStaticBaseUri(URIPath.valueOf(uri));
+      }
+    catch (Throwable ex)
+      {
+        if (ex instanceof WrappedException)
+          ex = ((WrappedException) ex).getCause();
+        error('e', "invalid URI: "+ex.getMessage());
+      }
+  }
+
+  static Path fixupStaticBaseUri (Path path)
+  {
+    path = path.getAbsolute();
+    if (path instanceof FilePath)
+      path = URIPath.valueOf(path.toURI());
+    return path;
+ }
+
   public String getStaticBaseUri ()
   {
-    if (baseURI == null)
+    Path path = baseURI;
+    if (path == null)
       {
         Environment env = Environment.getCurrent();
         Object value = env.get(Symbol.make("", "base-uri"), null, null);
         if (value != null)
-          baseURI = value.toString();
+          {
+            if (value instanceof Path)
+              path = (Path) path;
+            else
+              path = URIPath.valueOf(value.toString());
+          }
+
+        if (path == null)
+          {
+            LineBufferedReader port = getPort();
+            path = port.getPath();
+            if (path instanceof FilePath
+                && (! path.exists()
+                    || port instanceof TtyInPort
+                    || port instanceof CharArrayInPort))
+              path = null;
+          }
+
+        if (path == null)
+          path = Path.currentPath();
+
+        path = fixupStaticBaseUri(path);
+        baseURI = path;
       }
-    return baseURI;
+
+    return path.toString();
   }
 
   public String resolveAgainstBaseUri (String uri)
@@ -98,8 +145,7 @@ public class XQParser extends Lexer
     if (Path.uriSchemeSpecified(uri))
       return uri;
     String base = getStaticBaseUri();
-    Path basePath = base == null ? Path.currentPath()
-      : Path.valueOf(base);
+    Path basePath = Path.valueOf(base);
     return basePath.resolve(uri).toString();
   }
 
@@ -4216,7 +4262,7 @@ public class XQParser extends Lexer
         if (val instanceof Expression) // an ErrorExp
           return (Expression) val;
 	parseSeparator();
-        baseURI = (String) val;
+        setStaticBaseUri((String) val);
 	return QuoteExp.voidExp;
       }
     exp = parseExprSequence(EOF_TOKEN, true);

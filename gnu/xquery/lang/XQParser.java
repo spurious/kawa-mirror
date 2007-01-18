@@ -2839,20 +2839,23 @@ public class XQParser extends Lexer
 	comp.pop(lexp);
 	vec.addElement(lexp);
       }
-    if (curToken == '$')
-      {
-	decl = parseVariableDeclaration();
-	if (decl == null)
-	  return syntaxError("missing Variable after '$'");
-	getRawToken();
-      }
-    else
-      decl = new Declaration("(arg)");
-    LambdaExp lexp = new LambdaExp(1);
-    lexp.addDeclaration(decl);
+
     if (match("default"))
       {
+        LambdaExp lexp = new LambdaExp(1);
 	getRawToken();
+
+        if (curToken == '$')
+          {
+            decl = parseVariableDeclaration();
+            if (decl == null)
+              return syntaxError("missing Variable after '$'");
+            getRawToken();
+          }
+        else
+          decl = new Declaration("(arg)");
+        lexp.addDeclaration(decl);
+
 	if (match("return"))
 	  getRawToken();
 	else
@@ -2861,15 +2864,14 @@ public class XQParser extends Lexer
 	Expression defaultExpr = parseExpr();
 	lexp.body = defaultExpr;
 	comp.pop(lexp);
+        vec.addElement(lexp);
       }
     else
       {
-	lexp.body = QuoteExp.voidExp;
-	 error(comp.isPedantic() ? 'e' : 'w',
+        error(comp.isPedantic() ? 'e' : 'w',
                "no 'default' clause in 'typeswitch'",
                "XPST0003");
       }
-    vec.addElement(lexp);
     popNesting(save);
     Expression[] args = new Expression[vec.size()];
     vec.copyInto(args);

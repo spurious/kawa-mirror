@@ -67,28 +67,38 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
     args[0].compile(comp, Target.pushObject);
     code.emitStore(selector);
 
-    for (int i = 1;  i < args.length - 1;  i++)
+    for (int i = 1;  i < args.length;  )
       {
 	if (i > 1)
 	  code.emitElse();
 
-	if (args[i] instanceof LambdaExp)
+        Expression arg = args[i++];
+
+	if (arg instanceof LambdaExp)
 	  {
-	    LambdaExp lambda = (LambdaExp) args[i];
+	    LambdaExp lambda = (LambdaExp) arg;
 	    Declaration param = lambda.firstDecl();
 	    Type type = param.getType();
-	    param.allocateVariable(code);
+            if (! param.getCanRead())
+              param = null;
+            else
+              param.allocateVariable(code);
 
 	    if (type instanceof TypeValue)
 	      ((TypeValue) type).emitTestIf(selector, param, comp);
 	    else
 	      {
-		code.emitLoad(selector);
-		type.emitIsInstance(code);
-		code.emitIfIntNotZero();
-
-		code.emitLoad(selector);
-		param.compileStore(comp);
+                if (i < args.length)
+                  {
+                    code.emitLoad(selector);
+                    type.emitIsInstance(code);
+                    code.emitIfIntNotZero();
+                  }
+                if (param != null)
+                  {
+                    code.emitLoad(selector);
+                    param.compileStore(comp);
+                  }
 	      }
 	    lambda.allocChildClasses(comp);
 	    lambda.body.compileWithPosition(comp, target);
@@ -98,13 +108,7 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
 	    throw new Error("not implemented: typeswitch arg not LambdaExp");
 	  }
       }
-    int i = args.length - 2;
-    if (i > 0)
-      code.emitElse();
-    LambdaExp lambda = (LambdaExp) args[args.length - 1];
-    lambda.allocChildClasses(comp);
-    lambda.body.compileWithPosition(comp, target); // FIXME target
-    while (--i >= 0)
+    for (int i = args.length - 2; --i >= 0; )
       code.emitFi();
     
     code.popScope();

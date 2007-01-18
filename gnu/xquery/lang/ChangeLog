@@ -1,5 +1,8 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseTypeSwitch): Fix parsing of default case
+	with variable declaration.
+
 	* XQParser.java (parsePathExpr): Use new rootDocument node for '/'
 	non-infix operator to coerce to document-node.
 

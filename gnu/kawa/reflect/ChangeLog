@@ -1,3 +1,9 @@
+2007-01-17  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (compile): Handle default case similarly as
+	other cases - specifically with variable.
+	Minor optimization in case variable is unused.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods, apply): Generalize from ClassType

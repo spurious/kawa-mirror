@@ -129,6 +129,20 @@ public class NodeUtils
     return Nodes.root((NodeTree) node.sequence, node.getPos());
   }
 
+  /** Return root node, coerced to a document node.
+   * Used to implement '/'-rooted path expressions.
+   */
+  public static KDocument rootDocument (Object arg)
+  {
+    if (! (arg instanceof KNode))
+      throw new WrongType("root-document", 1, arg, "node()?");
+    KNode node = (KNode) arg;
+    node = Nodes.root((NodeTree) node.sequence, node.getPos());
+    if (! (node instanceof KDocument))
+      throw new WrongType("root-document", 1, arg, "document()");
+    return (KDocument) node;
+  }
+
   public static String getLang (KNode node)
   {
     NodeTree seq = (NodeTree) node.sequence;

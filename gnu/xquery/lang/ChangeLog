@@ -1,5 +1,8 @@
 2007-01-17  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parsePathExpr): Use new rootDocument node for '/'
+	non-infix operator to coerce to document-node.
+
 	* XQParser.java (baseURI): Change type to Path.
 	(setStaticBaseUri, fixupStaticBaseUri): New methods.
 	(getStaticBaseUri): Try Environment, then LineBufferedReader,

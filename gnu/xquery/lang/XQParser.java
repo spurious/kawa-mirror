@@ -1836,7 +1836,7 @@ public class XQParser extends Lexer
         else
           dot = new ReferenceExp(DOT_VARNAME, dotDecl);
 	step1 = new ApplyExp(ClassType.make("gnu.xquery.util.NodeUtils")
-			     .getDeclaredMethod("root", 1),
+			     .getDeclaredMethod("rootDocument", 1),
 			     new Expression[] { dot } );
 	int next = skipSpace(nesting != 0);
         unread(next);

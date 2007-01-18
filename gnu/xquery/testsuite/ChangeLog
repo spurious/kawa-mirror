@@ -1,3 +1,7 @@
+2007-01-17  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (<init>): Update expected failures.
+
 2007-01-16  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (compare): Remove by stack field outputCompareAlts.

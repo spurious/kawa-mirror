@@ -47,7 +47,7 @@ public class SingletonType extends ObjectType // implements TypeValue
     if (obj instanceof Values)
       obj = ((Values) obj).canonicalize();
     if (obj == null || obj instanceof Values)
-      throw new ClassCastException("value if not a singleton");
+      throw new ClassCastException("value is not a singleton");
     return obj;
   }
 

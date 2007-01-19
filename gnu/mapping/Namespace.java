@@ -113,9 +113,9 @@ public class Namespace
     return Namespace.make(uri, prefix);
   }
 
-  public Object get (String name)
+  public Object get (String key)
   {
-    return Environment.getCurrent().get(getSymbol(getName()));
+    return Environment.getCurrent().get(getSymbol(key));
   }
 
   public boolean isConstant (String key)

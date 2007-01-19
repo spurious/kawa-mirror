@@ -1,3 +1,10 @@
+2007-01-19  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (makeExp): Use new ClassType.getContextClass.
+
+	* GetNamedPart.java (makeExp): Don't look for class if there is
+	a binding in current environment.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Generalize method lookup to ObjectType.

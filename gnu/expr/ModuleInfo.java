@@ -355,20 +355,7 @@ public class ModuleInfo
       {
         try
           {
-            /* #ifdef JAVA2 */
-            ClassLoader loader;
-            try
-              {
-                loader = Thread.currentThread().getContextClassLoader();
-              }
-            catch (java.lang.SecurityException ex)
-              {
-                loader = this.getClass().getClassLoader();
-              }
-            moduleClass = Class.forName(className, false, loader);
-            /* #else */
-            // moduleClass = Class.forName(className);
-            /* #endif */
+            moduleClass = ClassType.getContextClass(className);
           }
         catch (ClassNotFoundException ex)
           {

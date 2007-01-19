@@ -1,3 +1,9 @@
+2007-01-19  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (thisClassLoader): New field.
+	(getContextClass): New static method.
+	(getReflectClass): Use getContextClass.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java: Change to use Java 1.2 delegation model.

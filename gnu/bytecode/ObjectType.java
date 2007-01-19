@@ -54,22 +54,60 @@ public class ObjectType extends Type
     return getName().replace('.', '/');
   }
 
+  /* #ifdef JAVA2 */
+  /* #ifndef JAVA5 */
+  static ClassLoader thisClassLoader;
+  static
+  {
+    try
+      {
+        thisClassLoader
+          = Class.forName("gnu.mapping.ObjectType").getClassLoader();
+      }
+    catch (Throwable ex)
+      {
+      }
+  }
+  /* #endif */
+  /* #endif */
+
+  /** Get named class using context class loader.
+   * If the security policy prohibits that, fall back to this class's loader.
+   */
+  public static Class getContextClass (String cname)
+    throws java.lang.ClassNotFoundException
+  {
+    /* #ifdef JAVA2 */
+    ClassLoader loader;
+    try
+      {
+        loader = Thread.currentThread().getContextClassLoader();
+      }
+    catch (java.lang.SecurityException ex)
+      {
+        // The ObjectType.class syntax works for JDK 1.4, but it's just
+        // syntactic sugar, so might as well use the more general solution.
+        /* #ifdef JAVA5 */
+        // loader = ObjectType.class.getClassLoader();
+        /* #else */
+        loader = thisClassLoader;
+        /* #endif */
+      }
+    /* Specifies optional 'initialize' argument. */
+    return Class.forName(cname, false, loader);
+    /* #else */
+    // return Class.forName(cname);
+    /* #endif */
+  }
+
+
   /** Get the java.lang.Class object for the representation type. */
   public Class getReflectClass()
   {
     try
       {
 	if (reflectClass == null)
-	  {
-            String cname = getInternalName().replace('/', '.');
-	    /* #ifdef JAVA2 */
-	    /* Specifies optional 'initialize' argument. */
-	    reflectClass = Class.forName(cname,
-                                         false, getClass().getClassLoader());
-	    /* #else */
-	    // reflectClass = Class.forName(cname);
-	    /* #endif */
-	  }
+          reflectClass = getContextClass(getInternalName().replace('/', '.'));
         flags |= EXISTING_CLASS;
       }
     catch (java.lang.ClassNotFoundException ex)

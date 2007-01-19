@@ -39,6 +39,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
   {
     ReferenceExp rexp;
     String combinedName = combineName(clas, member);
+    Environment env = Environment.getCurrent();
     if (combinedName != null)
       {
         Translator tr = (Translator) Compilation.getCurrent();
@@ -46,7 +47,6 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         if (! Declaration.isUnknown(decl))
           return new ReferenceExp(decl);
 
-        Environment env = Environment.getCurrent();
         Symbol symbol = env.defaultNamespace().lookup(combinedName);
         Object property = null; // FIXME?
         if (symbol != null && env.isBound(symbol, property))
@@ -55,19 +55,20 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     if (clas instanceof ReferenceExp
         && (rexp = (ReferenceExp) clas).isUnknown())
       {
-        String name = rexp.getName();
-        try
+        Object rsym = rexp.getSymbol();
+        Symbol sym = rsym instanceof Symbol ? (Symbol) rsym
+          : env.getSymbol(rsym.toString());
+        if (env.get(sym, null) == null)
           {
-            /* #ifdef JAVA2 */
-            Class cl = Class.forName(name, false,
-                                     clas.getClass().getClassLoader());
-            /* #else */
-            // Class cl = Class.forName(name);
-            /* #endif */
-            clas = QuoteExp.getInstance(Type.make(cl));
-          }
-        catch (Throwable ex)
-          {
+            String name = rexp.getName();
+            try
+              {
+                Class cl = ClassType.getContextClass(name);
+                clas = QuoteExp.getInstance(Type.make(cl));
+              }
+            catch (Throwable ex)
+              {
+              }
           }
       }
     Expression[] args = { clas, member };

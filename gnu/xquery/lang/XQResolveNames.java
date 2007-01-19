@@ -395,13 +395,11 @@ public class XQResolveNames extends ResolveNames
     else if (exp instanceof SetExp)
       {
         Declaration decl = moduleDecl;
-        while (decl != null && decl.isNamespaceDecl())
-          decl = decl.nextDecl();
         SetExp sexp = (SetExp) exp;
         exp = walkSetExp(sexp);
         if (sexp.isDefining() && sexp.getBinding() == decl)
           {
-            if (! decl.isProcedureDecl() && ! decl.isNamespaceDecl())
+            if (! decl.isProcedureDecl())
               push(decl);
             decl = decl.nextDecl();
           }
@@ -420,8 +418,6 @@ public class XQResolveNames extends ResolveNames
       {
         if (decl.isProcedureDecl())
 	  push(decl);
-        else if (decl.isNamespaceDecl())
-          lookup.push(decl);
       }
     moduleDecl = exp.firstDecl();
     exp.body = walkStatements(exp.body);

@@ -1,5 +1,9 @@
 (define as-xml (make <gnu.kawa.xml.OutputAsXML>))
 
+(define-constant comment <gnu.kawa.xml.KComment>)
+
+(define-constant processing-instruction <gnu.kawa.xml.KProcessingInstruction>)
+
 ;;; Parse an XML file (specified by a URL or url string), giving a <document>.
 (define (parse-xml-from-url url) :: <document>
   (invoke-static <gnu.kawa.xml.Document> 'parse url))

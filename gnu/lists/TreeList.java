@@ -451,6 +451,17 @@ public class TreeList extends AbstractSequence
     gapStart = i + length;
   }
 
+  public void writeComment(String comment, int offset, int length)
+  {
+    ensureSpace(3+length);
+    int i = gapStart;
+    data[i++] = COMMENT;
+    setIntN(i, length);
+    i += 2;
+    comment.getChars(offset, offset+length, data, i);
+    gapStart = i + length;
+  }
+
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length)
   {
@@ -462,6 +473,20 @@ public class TreeList extends AbstractSequence
     setIntN(i+2, length);
     i += 4;
     System.arraycopy(content, offset, data, i, length);
+    gapStart = i + length;
+  }
+
+  public void writeProcessingInstruction(String target, String content,
+					 int offset, int length)
+  {
+    ensureSpace(5+length);
+    int i = gapStart;
+    data[i++] = PROCESSING_INSTRUCTION;
+    int index = find(target);
+    setIntN(i, index);
+    setIntN(i+2, length);
+    i += 4;
+    content.getChars(offset, offset+length, data, i);
     gapStart = i + length;
   }
 

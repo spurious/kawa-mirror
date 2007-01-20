@@ -1,3 +1,7 @@
+2007-01-20  Per Bothner  <per@bothner.com>
+
+	* XML.scm (commmet, processing-instruction): New constants.
+
 2007-01-04  Per Bothner  <per@bothner.com>
 
 	* gui.scm (uri): Use Path's openInputStream method.

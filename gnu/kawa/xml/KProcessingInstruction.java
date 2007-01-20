@@ -43,4 +43,11 @@ public class KProcessingInstruction extends KNode
   {
     return ((NodeTree) sequence).posTarget(ipos);
   }
+
+  public static KProcessingInstruction valueOf (String target, String content)
+  {
+    NodeTree tree = new NodeTree();
+    tree.writeProcessingInstruction(target, content, 0, content.length());
+    return new KProcessingInstruction(tree, 0);
+  }
 }

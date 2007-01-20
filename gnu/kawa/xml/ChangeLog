@@ -1,5 +1,8 @@
 2007-01-20  Per Bothner  <per@bothner.com>
 
+	* KComment.java (valueOf): New factory method.
+	* KProcessingInstruction.java (valueOf): New factory method.
+
 	* XmlNamespace.java (getInstance): Intern parameters.
 	Add " [xml]" to namespace name to make unique.
 

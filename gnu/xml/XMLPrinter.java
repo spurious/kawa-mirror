@@ -12,6 +12,7 @@ import gnu.mapping.ThreadLocation;
 import gnu.mapping.Symbol;
 import java.math.BigDecimal;
 import gnu.expr.Keyword;
+import gnu.kawa.xml.XmlNamespace;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -39,7 +40,7 @@ public class XMLPrinter extends OutPort
    * 0: No element element tags, as required for canonical XML:
    * {@code <br></br>}.
    * 1: Use XML-style empty element tags: {@code <br/>}
-   * 1: Use HTML-compatible empty element tags: {@code <br />}
+   * 2: Use HTML-compatible empty element tags: {@code <br />}
    */
   public int useEmptyElementTag = 2;
   public boolean escapeText = true;
@@ -136,7 +137,12 @@ public class XMLPrinter extends OutPort
       {
 	isHtml = true;
 	useEmptyElementTag = 2;
+        // Pre-establish the html namespace, so it doesn't get printed.
+        if (namespaceBindings == NamespaceBinding.predefinedXML)
+          namespaceBindings = XmlNamespace.HTML_BINDINGS;
       }
+    else if (namespaceBindings == XmlNamespace.HTML_BINDINGS)
+      namespaceBindings = NamespaceBinding.predefinedXML;
     if ("xhtml".equals(style))
       useEmptyElementTag = 2;
     if ("plain".equals(style))

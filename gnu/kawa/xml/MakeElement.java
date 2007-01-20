@@ -12,7 +12,7 @@ public class MakeElement extends NodeConstructor
 {
   public static final MakeElement makeElement = new MakeElement();
 
-  public int numArgs() { return 0xFFFFF001; }
+  public int numArgs() { return tag == null ? 0xFFFFF001 : 0xFFFFF000; }
 
   /** Optional tag.  If non-null, the element tag is this value,
    * rather than the first parameter. */

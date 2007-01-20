@@ -14,15 +14,15 @@ public class XmlNamespace extends Namespace
 
   public static XmlNamespace getInstance (String prefix, String uri)
   {
-    String xname = prefix + " -> "+ uri;
+    String xname = prefix + " [xml] -> "+ uri;
     synchronized (nsTable)
       {
 	Object old = nsTable.get(xname);
 	if (old instanceof XmlNamespace)
 	  return (XmlNamespace) old;
 	XmlNamespace ns = new XmlNamespace();
-        ns.setName(uri);
-        ns.prefix = prefix;
+        ns.setName(uri.intern());
+        ns.prefix = prefix.intern();
 	nsTable.put(xname, ns);
 	return ns;
       }

@@ -1,3 +1,10 @@
+2007-01-20  Per Bothner  <per@bothner.com>
+
+	* XmlNamespace.java (getInstance): Intern parameters.
+	Add " [xml]" to namespace name to make unique.
+
+	* MakeElement.java (numArgs): Fix for case when tag is non-null.
+
 2007-01-17  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (ANY_ATOMIC_TYPE_CODE): New constant.

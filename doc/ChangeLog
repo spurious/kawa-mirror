@@ -1,3 +1,11 @@
+2007-01-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Symbols and namespaces): New section.
+	(Special named constants, Keywords): Move under new section.
+	(Namespaces): New node.
+	(XML tools): Add introduction.
+	(Formatting XML, Creating HTML nodes, Creating XML nodes): New nodes.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Applet compilation): Tweak example to use two archives.

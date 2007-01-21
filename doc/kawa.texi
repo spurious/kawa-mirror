@@ -1227,12 +1227,15 @@ find that library.
 @node Extensions, Community, Running, Top
 @chapter Scheme Extensions and Language Reference
 
+This manual mostly documents how Kawa Scheme differs from
+standard (R5RS) Scheme, though the goal is to merge in
+information about standard Scheme here as well.
+
 @menu
 * Features::             Summary of Kawa Scheme Features
 * Syntax and conditional compilation::
 * Multiple values::
-* Special named constants::
-* Keywords::
+* Symbols and namespaces::
 * Procedures::
 * Numbers::              Quantities and Numbers
 * Data structures::
@@ -1458,7 +1461,7 @@ feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 @end deffn
 
-@node Multiple values, Special named constants, Syntax and conditional compilation, Extensions
+@node Multiple values, Symbols and namespaces, Syntax and conditional compilation, Extensions
 @section Multiple values
 
 The multiple-value feature was added in R5RS.
@@ -1554,46 +1557,109 @@ The values resulting from evaluating each argument are appended
 together.
 @end defun
 
-@node Special named constants, Keywords, Multiple values, Extensions
-@section Special named constants
+@node Symbols and namespaces, Procedures, Multiple values, Extensions
+@section Symbols and namespaces
 
-@defvr Constant #!optional
-Special self-evaluating literal used in lambda parameter lists
-before optional parameters.
-@end defvr
+An identifier is a name that appears in a program.
 
-@defvr Constant #!rest
-Special self-evaluating literal used in lambda parameter lists
-before the rest parameter.
-@end defvr
+A symbol is an object representing a string that cannot be
+modified. This string is called the symbol's name. Unlike strings, two
+symbols whose names are spelled the same way are indistinguishable.
+A symbol immutable (unmodifyable) and normally viewed as atomic.
+Symbols are useful for many applications; for instance, they may be
+used the way enumerated values are used in other languages.
 
-@defvr Constant #!key
-Special self-evaluating literal used in lambda parameter lists
-before keyword parameters.
-@end defvr
+@menu
+* Namespaces::
+* Keywords::
+* Special named constants::
+@end menu
 
-@defvr Constant #!eof
-The end-of-file object.
+@node Namespaces, Keywords, , Symbols and namespaces
+@subsection Namespaces and compound symbols
 
-Note that if the Scheme reader sees this literal at top-level,
-it is returned literally.  This is indistinguishable from
-coming to the end of the input file.  If you do not want to end reading,
-but want the actual value of @code{#!eof}, you should quote it.
-@end defvr
+A compound symbol is one whose name is unique
+within a specific namespace, rather than globally.
+It is written using the infix colon operator:
+@example
+@var{namespace}:@var{local-name}
+@end example
 
-@defvr Constant #!void
-The void value.  Same as @code{(values)}.
-If this is the value of an expression in a read-eval-print loop,
-nothing is printed.
-@end defvr
+A namespace is a mapping from @var{local-name} strings to symbols.
+A simple namespace is named by a string,
+and there is only one such namespace by that name.
+A namespace is usually referenced using a shorter @dfn{namespace prefix},
+as in this example:
+@example
+(define-namespace geom "http://foo.org/lib/geometry")
+(define (geom:translate x y)
+  (java.awt.geom.AffineTransform:getTranslateInstance x y))
+(define geom:zero (geom:translate 0 0))
+geom:zero
+  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+@end example
 
-@defvr Constant #!null
-The Java @code{null} value.  This is not really a Scheme value,
-but is useful when interfacing to low-level Java code.
-@end defvr
+@defun namespace namespace-name
+Return the simple namespace whose name is the @var{namespace-name}, a string.
+If no such namespace exists, create it.
+The @var{namespace-name} is commonly a URI, especially when working with XML,
+in which case it is called a @var{namespace-URI}.  However, any non-empty
+string is allowed.  Two namespaces are the same (@code{eq?}) if they have
+the same (@code{equal?}) @var{namespace-name}s.
+@end defun
 
-@node Keywords, Procedures, Special named constants, Extensions
-@section Keywords
+You can use a namespace-value directly in a compound name:
+@example
+(namespace "http://foo.org/lib/geometry"):zero
+  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+@end example
+
+The reader macro @code{#,namespace} is equivalent to the
+@code{namespace} function, but it is invoked at read-time:
+@example
+(eq? #,(namespace "foo") (namespace "foo")) @result{} #t
+@end example
+
+@deffn Syntax define-namespace name namespace-name
+Defines @var{name} as a @dfn{namespace prefix} - a lexically scoped
+"nickname" for the namespace (or package)
+whose full name is @var{namespace-name}, which should be a string literal.
+
+Any symbols in the scope of this definitions that contain a colon, and
+where the part before the colon matches the @var{name} will be
+treated as being in the package/namespace whose global unique name
+is the @var{namespace-name}.
+
+Has mostly the same effect as:
+@example
+(define-constant @var{name} #,(namespace @var{namespace-name})
+@end example
+
+However, using @code{define-namespace} (rather than @code{define-constant})
+is recommended if you want to use compound symbols as names of
+variables, especially local variables, or if you want to quote
+compound symbols.
+
+(A namespace is similar to a Common Lisp package,
+and the @var{namespace-name} is like the name of the package.
+However, a namespace alias belongs to the lexical scope,
+while a Common Lisp package nickname is global
+and belongs to the package itself.)
+
+If the namespace-name starts with the string @code{"class:"}, then the
+@var{name} can be used for invoking Java methods
+(@pxref{Method operations}) and accessing fields (@pxref{Field operations}).
+@end deffn
+
+@deffn Syntax define-private-namespace name namespace-name
+Same as @code{define-namespace}, but the prefix @var{name}
+is local to the current module.
+@end deffn
+
+The variation @code{define-xml-namespace} is used for @ref{Creating XML nodes}.
+
+@node Keywords, Special named constants, Namespaces, Symbols and namespaces
+@subsection Keywords
 
 Keywords are similar to symbols.  The main difference is that keywords are
 self-evaluating and therefore do not need to be quoted in expressions.
@@ -1631,7 +1697,45 @@ Returns the keyword whose name is @var{string}.
 (The @var{string} does not include a final @code{#\:}.)
 @end defun
 
-@node Procedures, Numbers, Keywords, Extensions
+@node Special named constants, , Keywords, Symbols and namespaces
+@subsection Special named constants
+
+@defvr Constant #!optional
+Special self-evaluating literal used in lambda parameter lists
+before optional parameters.
+@end defvr
+
+@defvr Constant #!rest
+Special self-evaluating literal used in lambda parameter lists
+before the rest parameter.
+@end defvr
+
+@defvr Constant #!key
+Special self-evaluating literal used in lambda parameter lists
+before keyword parameters.
+@end defvr
+
+@defvr Constant #!eof
+The end-of-file object.
+
+Note that if the Scheme reader sees this literal at top-level,
+it is returned literally.  This is indistinguishable from
+coming to the end of the input file.  If you do not want to end reading,
+but want the actual value of @code{#!eof}, you should quote it.
+@end defvr
+
+@defvr Constant #!void
+The void value.  Same as @code{(values)}.
+If this is the value of an expression in a read-eval-print loop,
+nothing is printed.
+@end defvr
+
+@defvr Constant #!null
+The Java @code{null} value.  This is not really a Scheme value,
+but is useful when interfacing to low-level Java code.
+@end defvr
+
+@node Procedures, Numbers, Symbols and namespaces, Extensions
 @section Procedures
 
 @defun apply proc [arg1 ...] args
@@ -3332,18 +3436,10 @@ printed in a way that they can be read back by a Common Lisp reader.
 For example, strings have quotation marks, and character values are
 written like @samp{#\A}.
 @item xml
-Values are printed in XML format.
-"Groups" or "elements" are written as using xml element syntax.
-Plain characters (such as @samp{<}) are escaped (such as @samp{&lt;}).
-@item xhtml
-Same as @code{xml}, but follows the xhtml compatibility guidelines.
-@item html
-Values are printed in HTML format.
-Mostly same as @code{xml} format, but certain element without body,
-are written without a closing tag.   For example @code{<img>} is written
-without @code{</img>}, which would be illegal for html, but required for xml.
-Plain characters (such as @samp{<}) are not escaped inside @code{<script>}
-or @code{<style>} elements.
+@itemx xhtml
+@itemx html
+Values are printed in XML, XHTML, or HTML format.
+This is discussed in more detail in @ref{Formatting XML}.
 @item cgi
 The output should be a follow the CGI standards.  I.e. assume that this
 script is invoked by a web server as a CGI script/program, and that the
@@ -3352,7 +3448,7 @@ followed by the actual response data.
 To generate the response headers, use the @code{response-header} function.
 If the @code{Content-type} response header has not been specified, and
 it is required by the CGI standard, Kawa will attempt
-to infer an appropriate @code{Content-ty[e} depending on the following value.
+to infer an appropriate @code{Content-type} depending on the following value.
 @item ignore
 Top-level values are ignored, instead of printed.
 @end table
@@ -4668,10 +4764,39 @@ should avoid using it in names in your source file.
 You can call a Java method as if it were a Scheme procedure
 using various mechanisms.
 
-@subsubsection Invoking a method with a prefixed name
+@subsubsection Using colon notation
 
-The most convenient way to do it is to
-use @code{define-namespace} to define an alias for a Java class:
+The general form of the @uref{PathExpressions.html,colon notation} is this:
+@example
+@var{container}@var{:}@var{part-name}
+@end example
+This evaluates to the ``part'' named @var{part-name} in a given @var{container}.
+If the @var{container} is a class (i.e. a @code{java.lang.Class} or
+a @code{gnu.bytecode.ClassType}), then the ``parts'' of
+the class are its static methods and fields.
+
+The simplest case is when the class is a fully-qualified class name:
+@example
+(java.lang.Math:sqrt 9.0) @result{} 3.0
+@end example
+This is only allowed when the name is of a class that exists
+and is accessible both at compile-time and run-time,
+and the name is not otherwise lexically bound.
+
+You can also for the @var{container} use an expression that
+evalutes to a type or class.  Most commonly you'd use
+a class identifier:
+@example
+(<java.lang.Math>:sqrt 9.0) @result{} 3.0
+@end example
+or even (though Kawa does not promise to compile this efficiently):
+@example
+(let ((math <java.lang.Math>)) math:sqrt 9.0) @result{} 3.0
+@end example
+
+@subsubsection Using a namespace prefix
+
+You can also use @code{define-namespace} to define an alias for a Java class:
 @example
 (define-namespace Int32 "class:java.lang.Integer")
 @end example
@@ -4679,12 +4804,21 @@ In this example the name @code{Int32} is a @dfn{namespace alias}
 for the namespace whose full name is @code{"class:java.lang.Integer"}.
 The full name should be the 6 characters @code{"class:"} followed
 by the fully-qualified name of a Java class.
-Equivalently, you can use a name for a class, such as:
+
+Instead of a @var{vamespace-uri} you can use a variable that names
+a class, usually of the form @code{<@var{classname}>}.
+The following is equivalent to the above:
 @example
 (define-namespace Int32 <java.lang.Integer>)
 @end example
-The latter syntax also works for classes defined in the module,
-or aliases, since the name is first searched in the lexical scope.
+However, there is one important difference: The @code{<@var{classname}>}
+is first searched in the lexical scope.
+It may resolve to a class defined in the current compilation unit
+(perhaps defined using @code{define-simple-class}),
+or imported from another module,
+or an alias (such as from @code{define-alias}).
+Only if @code{<@var{classname}>} is @emph{not} found in the current
+scope is it tried as the class name @var{classname}.
 
 You can name a method using a @dfn{qualified name} containing a colon.
 The part of the name before the colon is a namespace alias (in
@@ -4715,6 +4849,8 @@ You can also write:
 (Int32:new "255")
 @end example
 Kawa is smart enough to convert the Kawa string to a Java String.
+
+@subsubsection Invoking non-static methods
 
 To invoke a non-static method you can use a special prefix @code{*}:
 @example
@@ -4911,12 +5047,22 @@ array element type must be compatible with all the extra arguments.)
 @node Allocating objects, Field operations, Method operations, Objects Classes and Modules
 @subsection  Allocating objects
 
+You can create a instance of a class-type
+by ``calling'' the class-type as a function:
+@example
+(<java.util.Vector> 20)
+@end example
+I.e. if you call a type as if were a function,
+then the type is coerced to an instance-constructor function.
+
 Often the most convenient way to allocate a new object
-is to use the namespace-colon syntax discussed in the pervious section.
+is to use the namespace-colon syntax discussed in the previous section.
 For example:
 @example
 (java.util.Vector:new 20)
 @end example 
+
+A third slightly more verbose option is to use the @code{make} builtin function.
 
 @defun make type args ...
 Constructs a new object instance of the specified @var{type},
@@ -4941,8 +5087,10 @@ For example, the following are all equivalent:
 (slot-set! p 'x 3)
 (set! (slot-ref p 'y) 4)
 @end example
-
 @end defun
+
+All of these will usually be optimized to efficient bytecode, assuming
+Kawa knows at compile-time which class you're using.
 
 @node Field operations, Defining new classes, Allocating objects, Objects Classes and Modules
 @subsection Accessing fields of Java objects
@@ -5408,57 +5556,8 @@ This is similar to the Common Lisp @code{defvar} form.
 However, the Kawa version is (currently) only allowed at module level.
 @end deffn
 
-@deffn Syntax define-namespace name namespace-uri
-Defines @var{name} as @dfn{namespace alias} - a lexically scoped
-"nickname" for the namespace (or package)
-whose full name is @var{namespace-uri}, which should be a string literal.
-Any symbols in the scope of this definitions that contain a colon, and
-where the part before the colon matches the @var{name} will be
-treated as being in the package/namespace whose global unique name
-is the @var{namespace-uri}.
-
-(A namespace is similar to a Common Lisp package,
-and the @var{namespace-uri} is like the name of the package.
-However, a namespace alias belongs to the lexical scope,
-while a Common Lisp package nickname is global
-and belongs to the package itself.)
-
-The features is currently used for XML (to be documented).
-In XML terminology, a name containing a colon is a @dfn{qualified name}.
-The part of the name before the colon is a @dfn{namespace prefix},
-which is an aliases for a locally-visible @dfn{namespace uri}.
-The latter is an arbitrary string, but for uniqueness it is
-recommended that it be a uri belonging to the organization
-that defines the namespace.  (It need to correspond to an
-actual browsable location, even though it looks like one.)
-The part of a name following the colon is the @var{local part} of the name.
-
-If the namespace starts with the strings @code{"class:"}, then the
-@var{name} can be used for invoking Java methods
-(@pxref{Method operations}) and accessing fields (@pxref{Field operations}).
-
-Instead of a @var{vamespace-uri} you can use a variable that names
-a class, usually of the form @code{<@var{classname}>}.
-The following are equivalent:
-@example
-(define-namespace sb "class:java.lang.StringBuffer")
-(define-namespace sb <java.lang.StringBuffer>)
-@end example
-However, there is one important difference: The @code{<@var{classname}>}
-is first searched in the lexical scope.
-It may resolve to a class defined in the current compilation unit
-(perhaps defined using @code{define-simple-class}),
-or imported from another module,
-or an alias (such as from @code{define-alias}).
-Only if @code{<@var{classname}>} is @emph{not} found in the current
-scope is it tried as the class name @var{classname}.
-@end deffn
-
-@deffn Syntax define-private-namespace name namespace-uri
-Same as @code{define-namespace}, but the prefix @var{name}
-is local to the current module.
-
-@end deffn
+For @code{define-namespace} and @code{define-private-namespace}
+see @ref{Namespaces}.
 
 @subsubsection How a module becomes a class
 
@@ -5962,10 +6061,225 @@ System.out.println(x);
 
 Kawa has a number of features for working with XML, HTML,
 and generated web pages.
-These are built on the concepts of the @code{gnu.lists} package.
 
+In Kawa you don't write XML or HTML directly.
+Instead you write expressions that evaluate to ``node objects''
+corresponding to elements, attributes, and text.
+You then write these node objects using either an XML or HTML format.
 
-@subsubsection Scheme functions
+Many web-page-generating tools require you to work directly
+with raw HTML, as for example:
+@example
+(display "<p>Don't use the <code>&lt;blink&gt;</code> tag.</p>")
+@end example
+
+In Kawa you would instead do:
+@example
+(display (html:p "Don't use the " (html:code "<blink>") " tag."))
+@end example
+
+The conversion from node objects to XML or HTML is handled by
+the formatter (or serializer).
+Some advantages of doing it this way are:
+@itemize
+@item
+You don't have to worry about quoting special characters.
+Missing or incorrect quoting is a common source of bugs
+and security problems on systems that work directly with text, such as PHP.
+@item
+Some errors such as mismatched element tags are automatically avoided.
+@item
+The generated generated XML can be validated as it is generated,
+or even using compile-time type-checking.  (Kawa doesn't yet do either.)
+@item
+In application that also reads XML,
+you can treat XML that is read in and XML that is generated using
+the same functions.
+@end itemize
+
+@menu
+* Formatting XML::
+* Creating HTML nodes::
+* Creating XML nodes::
+* Server-side scripts::  Writing web-server-side Kawa scripts
+* Servlets::             Installing Kawa programs as Servlets
+* CGI scripts::          Installing Kawa programs as CGI scripts
+* HTTP requests::        Functions for accessing HTTP requests
+* HTTP response::        Functions for generating HTTP response
+* XML beyond Scheme::    Using non-Scheme languages for XML/HTML
+@end menu
+
+@node Formatting XML, Creating HTML nodes, , XML tools
+@subsection Formatting XML
+
+The easiest way to generate HTML or XML output is to run Kawa
+with the appropriate @ref{Named output formats, , @code{--output-format} option}.
+
+The intentation is that these output modes should be compatible with
+@uref{http://www.w3.org/TR/2006/PR-xslt-xquery-serialization-20061121/,
+XSLT 2.0 and XQuery 1.0 Serialization}.
+(However, that specifies many options, most
+of which have not yet been implemented.
+
+@table @code
+@item xml
+Values are printed in XML format.
+"Groups" or "elements" are written as using xml element syntax.
+Plain characters (such as @samp{<}) are escaped (such as @samp{&lt;}).
+@item xhtml
+Same as @code{xml}, but follows the xhtml compatibility guidelines.
+@item html
+Values are printed in HTML format.
+Mostly same as @code{xml} format, but certain elements without body,
+are written without a closing tag.   For example @code{<img>} is written
+without @code{</img>}, which would be illegal for html, but required for xml.
+Plain characters (such as @samp{<}) are not escaped inside @code{<script>}
+or @code{<style>} elements.
+@end table
+
+To illustrate:
+@example
+$ kawa --output-format html
+#|kawa:1|# (html:img src:"img.jpg")
+<img src="img.jpg">
+@end example
+@example
+$ kawa --output-format xhtml
+#|kawa:1|# (html:img src:"img.jpg")
+<img xmlns="http://www.w3.org/1999/xhtml" src="img.jpg" />
+@end example
+@example
+$ kawa --output-format xml
+#|kawa:1|# (html:img src:"img.jpg")
+<img xmlns="http://www.w3.org/1999/xhtml" src="img.jpg"></img>
+@end example
+And here is the default @code{scheme} formatting:
+@example
+$ kawa
+#|kawa:1|# (html:img src:"img.jpg")
+(@{http://www.w3.org/1999/xhtml@}img src: img.jpg )
+@end example
+
+@defun as-xml value
+Return a value (or multiple values) that when printed will
+print @var{value} in XML syntax.
+@example
+(require 'xml)
+(as-xml (make-element 'p "Some " (make-element 'em "text") "."))
+@end example
+prints @code{<p>Some <em>text</em>.</p>}.
+@end defun
+
+@defun unescaped-data data
+Creates a special value which causes @code{data} to be printed,
+as is, without normal escaping.  For example, when the output format
+is XML, then printing @code{"<?xml?>"} prints as @samp{&lt;?xml?&gt;},
+but @code{(unescaped-data "<?xml?>")} prints as  @samp{<?xml?>}.
+@end defun
+
+@node Creating HTML nodes, Creating XML nodes, Formatting XML, XML tools
+@subsection Creating HTML nodes
+
+The @code{html} prefix names a special namespace
+(@pxref{Namespaces}) of functions to create HTML element nodes.
+For example, @code{html:em} is a constructor that
+when called creates a element node whose tag is @code{em}.
+If this element node is formatted as HTML, the
+result has an @code{<em>} tag.
+
+@deffn Syntax html:@var{tag} attributes ... content ...
+Creates an element node whose tag is @var{tag}.
+The parameters are first zero or more attributes, followed
+by zero of more child values.
+An attribute is either an attribute value (possibly
+created using @code{make-attribute}), or a pair of arguments:
+A keyword followed by the attribute value.
+Child values are usually either strings (text content),
+or nested element nodes, but can also be comment or processing-instruction
+nodes.
+@example
+(html:a href: "http://gnu.org/" "the "(html:i "GNU")" homepage")
+@end example
+@end deffn
+
+The compound identifier @code{html:@var{tag}} is actually
+a type: When you call it as a function you're using Kawa's
+standard coercion of a type to its constructor function.
+This means you can do type tests:
+@example
+(define some-node ...)
+(if (instance? some-node html:blink)
+  (error "blinking not allowed!"))
+@end example
+
+Object identity is currently not fully specified.  Specifically,
+it is undefined if a nested (child) element node is copied
+``by value'' or ``by reference''.  This is related to whether
+nodes have a parent reference.  In the XPath/XQuery data model
+nodes do have a parent reference, and child nodes are conceptually
+copied.  (In the actual implemention copying is commonly avoided.)
+Kawa/Scheme currently followed the XQuery copying semantics,
+which may not be the most appropriate for Scheme.
+
+@node Creating XML nodes, Server-side scripts, Creating HTML nodes, XML tools
+@subsection Creating XML nodes
+
+The XML data model is similar to HTML, with one important addition:
+XML tags may be @dfn{qualified names}, which are similar
+to @ref{Namespaces, , compound symbols}.
+
+@deffn Syntax define-xml-namespace prefix "namespace-uri"
+Defines a namespace with prefix @var{prefix} and URI @var{namespace-uri}.
+This is similar to @code{define-namespace} but with two important differences:
+@itemize
+@item
+Every symbol in the namespace automatically maps to
+an element-constructor-type, as with  the @code{html} namespace.
+@item
+The @var{prefix} is a component of the namespace object, and
+hence indirectly of any symbols belongining to the namespace.
+@end itemize
+@end deffn
+
+@example
+$ kawa --output-format xml
+#|kawa:1|# (define-xml-namespace na "Namespace1")
+#|kawa:2|# (define-xml-namespace nb "Namespace1")
+#|kawa:3|# (define xa (na:em "Info"))
+#|kawa:4|# xa
+<na:em xmlns:na="Namespace1">Info</na:em>
+#|kawa:5|# (define xb (nb:em "Info"))
+#|kawa:6|# xa
+<nb:em xmlns:nb="Namespace1">Info</nb:em>
+@end example
+
+Note that the prefix is part of the qualified name
+(it is actually part of the namespace object),
+and it is used when printing the tag.
+Two qualified names (symbols) that have the same
+local-name and the same namespace-name are considered
+equal, even if they have different prefix.  You can think of
+the prefix as annotation used when printing, but not
+otherwise part of the ``meaning'' of a compound symbol.
+They are the same object if they also have the same prefix.
+This is an important different from traditional Lisp/Scheme symbols,
+but it is how XML QNames work.
+@example
+#|kawa:7|# (instance? xb na:em)
+true
+#|kawa:8|# (eq? 'na:em 'nb:em)
+false
+#|kawa:9|# (equal? 'na:em 'nb:em)
+true
+#|kawa:10|# (eqv? 'na:em 'nb:em)
+true
+@end example
+(Note that @code{#t} is printed as @code{true} when using XML formatting.)
+
+The predefined @code{html} prefix could be defined thus:
+@example
+(define-xml-namespace html "http://www.w3.org/1999/xhtml")
+@end example
 
 @defun make-element tag [attribute ...] child ...
 Create a representation of a XML element, corresponding to
@@ -5991,47 +6305,36 @@ but it can be any attribute-valued expression.
 
 @defun make-attribute name value...
 Create an "attribute", which is a name-value pair.
-For now, @var{name} should be a symbol
+For now, @var{name} should be a symbol.
 @end defun
 
-@defun as-xml value
-Return a value (or multiple values) that when printed will
-print @var{value} in XML syntax.
+You must do this to use the following types and functions:
 @example
 (require 'xml)
-(as-xml (make-element 'p "Some " (make-element 'em "text") "."))
 @end example
-prints @code{<p>Some <em>text</em>.</p>}.
-@end defun
 
-@subsubsection xquery language
+@deffn Type comment
+Instances of this type represent comment values,
+specifically including comments in XML files.
+Comment nodes are currently ignored when printing using Scheme formatting,
+though that may change.
+@end deffn
+@deffn Constructor comment comment-text
+Create a comment object with the specified @var{comment-text}.
+@end deffn
 
-W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
-and a draft has been released.
-If you start Kawa with the @code{--xquery} it selects the "XQuery"
-source language; this also prints output using XML syntax.
-See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
-for examples and more information.
+@deffn Type processing-instruction
+Instances of this type represent ``processing instructions'',
+such as may appear in XML files.
+Processing-instruction nodes are currently ignored when printing using
+Scheme formatting, though that may change.
+@end deffn
+@deffn Constructor processing-instruction target contents
+Crreate a processing-instruction object with the specified @var{target}
+(a simple symbol) and @var{contents} (a string).
+@end deffn
 
-@subsubsection XSL transformations
-
-There is an experimental implementation of the XSLT (XML Stylesheet
-Language Transformations) language.  Selecting @code{--xslt} at the
-Kawa command line will parse a source file according to the syntax
-on an XSLT stylesheet.
-See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
-for more information.
-
-@menu
-* Server-side scripts::  Writing web-server-side Kawa scripts
-* Servlets::             Installing Kawa programs as Servlets
-* CGI scripts::          Installing Kawa programs as CGI scripts
-* HTTP requests::        Functions for accessing HTTP requests
-* HTTP response::        Functions for generating HTTP response
-* KRL::                  The Kawa Report Language for generating XML/HTML
-@end menu
-
-@node Server-side scripts, Servlets, , XML tools
+@node Server-side scripts, Servlets, Creating XML nodes, XML tools
 @subsection Writing web-server-side Kawa scripts
 
 You can compile a Kawa program (written in any supported
@@ -6236,15 +6539,8 @@ Returns false if there was no query string.
 Corresponds to the CGI variable @code{QUERY_STRING}.
 @end defun
 
-@node HTTP response, KRL, HTTP requests, XML tools
+@node HTTP response, XML beyond Scheme, HTTP requests, XML tools
 @subsection Generating HTTP responses
-
-@defun unescaped-data data
-Creates a special value which causes @code{data} to be printed,
-as is, without normal escaping.  For example, when the output format
-is XML, then printing @code{"<?xml?>"} prints as @samp{&lt;?xml?&gt;},
-but @code{(unescaped-data "<?xml?>")} prints as  @samp{<?xml?>}.
-@end defun
 
 If using plain Scheme, you need to do the following
 before using these functions.
@@ -6280,8 +6576,33 @@ response message of @var{message}.
 (For now this is the same as @code{error-response}.)
 @end defun
 
-@node KRL, , HTTP response, XML tools
-@subsection KRL - The Kawa Report Language for generating XML/HTML
+@node XML beyond Scheme, , HTTP response, XML tools
+@subsection Using non-Scheme languages for XML/HTML 
+
+@subsubsection XSuery language
+
+Bundled with Kawa is a fairly complete implementation of W3C's
+new @uref{http://www.w3c.org/XML/Query,XML Query language}.
+If you start Kawa with the @code{--xquery} it selects the "XQuery"
+source language; this also prints output using XML syntax.
+See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
+for examples and more information.
+
+@subsubsection XSL transformations
+
+There is an experimental implementation of the XSLT (XML Stylesheet
+Language Transformations) language.  Selecting @code{--xslt} at the
+Kawa command line will parse a source file according to the syntax
+on an XSLT stylesheet.
+See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
+for more information.
+
+@menu
+* KRL::              KRL - The Kawa Report Language for generating XML/HTML
+@end menu
+
+@node KRL, , ,  XML beyond Scheme
+@subsubsection KRL - The Kawa Report Language for generating XML/HTML
 
 KRL (the "Kawa Report Language") is powerful Kawa dialect for embedding
 Scheme code in text files such as HTML or XML templates.  You select

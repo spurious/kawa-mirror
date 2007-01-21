@@ -1,3 +1,7 @@
+2007-01-20  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getContextClass): Fix so PreProcess doesn't break.
+
 2007-01-19  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (thisClassLoader): New field.

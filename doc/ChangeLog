@@ -1,5 +1,8 @@
 2007-01-20  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Remove subsection on using Jikes.
+	Some updates on using gcj, mentioning --with-gcj-dbtool.
+
 	* kawa.texi (Symbols and namespaces): New section.
 	(Special named constants, Keywords): Move under new section.
 	(Namespaces): New node.

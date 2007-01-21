@@ -438,26 +438,6 @@ targets as appropriate.  Alternatively you can add @code{ant.jar} to the
 directory in Kawa's source directory (the one containing the @code{build.xml}
 file).
 
-@subsection Using the Jikes compiler
-
-@uref{http://oss.software.ibm.com/developerworks/opensource/jikes/project/,Jikes}
-is a Java source-to-bytecode compiler that is much faster than Sun's
-@code{javac}.  (Note that this only speeds up building Kawa from source, not
-actually running Kawa.)
-The instructions for using jikes are as above, except that you
-need to specify Jikes at @code{configure} time, setting the @code{JAVAC}
-environment variable.  If @code{jikes} is in your execution path, do:
-@example
-JAVAC=jikes ./configure
-@end example
-
-You also need to inform Jikes where it should find the standard Java classes
-(since Jikes is a compiler only).  For example:
-@example
-CLASSPATH=.:/opt/jdk1.3/jre/lib/rt.jar
-export CLASSPATH
-@end example
-
 @subsection Compiling Kawa to native code with GCJ
 
 The GNU Compiler for the Java(tm) Programming Language
@@ -465,10 +445,10 @@ The GNU Compiler for the Java(tm) Programming Language
 GNU Compiler Collection (@uref{http://gcc.gnu.org/,GCC}).
 It can compile Java source or bytecode
 files into native code on supported systems.
-Version 3.3 or later of GCC is recommended,
+Version 4.1 or later of GCC is recommended,
 and only Intel x86-based Linux/GNU system have been tested with Kawa.
 
-First, get and install GCC 3.3.  Set @code{PREFIX} to where
+First, get and install GCC.  Set @code{PREFIX} to where
 you want to install GCJ, and configure it with these options:
 @example
 ./configure --enable-threads --enable-languages=c++,java --prefix $PREFIX
@@ -485,17 +465,19 @@ export LD_LIBRARY_PATH
 @end example
 
 To build Kawa, you need to specify @code{--with-gcj} to
-@code{configure} which tells it to use GCJ.  Currently you also
-need to specify @code{--without-awt --without-swing} because
-GCJ does not yet support AWT or Swing:
+@code{configure} which tells it to use GCJ.
 @example
-./configure --with-gcj --without-awt --without-swing --prefix $PREFIX
+./configure --with-gcj --prefix $PREFIX
 @end example
 Then as before:
 @example
 make
 make install
 @end example
+
+Alternatively, you can use configure option
+@code{--with-gcj-dbtool}.  This allows gcj to automatically
+find the kawa shared libraries from the @code{.jar} file.
 
 @subsection Building Kawa under MS-Windows
 
@@ -507,8 +489,8 @@ for a solution.  Alternatively you can run
 the class @code{org.apache.tools.ant.Main} directly from the Ant jar.
 
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
-environment.  If you want to build Kawa from source under Windows
-(95, 98, or NT), you could use a Unix empulation package, such
+environment.  If you want to build Kawa from source under Windows,
+you could use a Unix empulation package, such
 as the free @uref{http://sources.redhat.com/cygwin/,Cygwin}.
 However, there are some problems with filenames that make this
 more complicated than it should be.  It should be possible
@@ -670,6 +652,11 @@ Set the default language to XSLT (XML Stylesheet Language Transformations).
 (The implementation is @emph{very} incomplete.)
 See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
 for more information.
+@item --pedantic
+Try to follow the approprate language specification to the letter,
+even in corner cases, and even if it means giving up some
+Kawa convenience features.  This flags so far only affects
+the XQuery parser, but that will hopefully change.
 @end table
 
 @subsection Options for setting variable

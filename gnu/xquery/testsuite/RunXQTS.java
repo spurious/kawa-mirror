@@ -213,18 +213,12 @@ public class RunXQTS extends FilterConsumer
     expectFailures("K-ReplaceFunc-8", "allow bad regex replacement string");
     expectFailures("K2-MatchesFunc-1", "allow bad regex pattern");
     expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
-    expectFailures("K2-ErrorFunc-1",
-                   "testsuite error (4241) - missing error case");
     expectFailures("fn-abs-more-args-023|fn-abs-more-args-024",
                    "testsuite error (4023): -0 is not  valid unsignedLong/unsignedShort literal");
-    expectFailures("K2-Serialization-7|K2-Serialization-8",
-                   "testsuite error (4239): &Xx10 missing in K2-Serialization-[78].txt");
-    expectFailures("K2-DirectConElemAttr-36",
-                   "testsuite error (4216): result should not have leading whitespace");
     expectFailures("ST-WhereExpr001",
                    "testsuite error (4024) - should not require error");
     expectFailures("K2-SeqExprCast-207",
-                   "testsuite error(4252) - implementations need not validate lexical form of anyURI");
+                   "was testsuite error(4252) - now mismatch between '>' and '&gt;'");
     /* #ifndef JAVA5 */
     expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
                    "surrogates not handled by java.util.regex");

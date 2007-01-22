@@ -1,5 +1,14 @@
 2007-01-21  Per Bothner  <per@bothner.com>
 
+	No longer ship libtool.  By default we don't use libtool any more
+	but there is a non-default option to use libtool from our path.
+	* configure.in (--with-libtool): New option.
+	Otherwise remove libtool-related macros.
+	* Make-rules: For building with gcj, create .o files rather than
+	.lo files, unless WITH_LIBTOOL.
+	* ltmain.sh: Remove file.
+	* Makefile.am (EXTRA_DIST): Remove ltmain.sh.
+
 	* kawa.cmd: Remove unused file.
 
 2007-01-20  Per Bothner  <per@bothner.com>

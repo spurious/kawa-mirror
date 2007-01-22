@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -48,44 +47,10 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(bindir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
-@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@am__DEPENDENCIES_1 = gnu-kawa-sax.lo
-@ENABLE_XML_TRUE@am__DEPENDENCIES_2 = gnu-xml.lo gnu-kawa-xml.lo \
-@ENABLE_XML_TRUE@	gnu-xquery-util.lo $(am__DEPENDENCIES_1) \
-@ENABLE_XML_TRUE@	gnu-xquery-lang.lo gnu-brl.lo gnu-kawa-brl.lo \
-@ENABLE_XML_TRUE@	gnu-kawa-xslt.lo
-@ENABLE_SERVLET_TRUE@am__DEPENDENCIES_3 = gnu-kawa-servlet.lo
-@WITH_SWING_TRUE@am__DEPENDENCIES_4 = gnu-kawa-swingviews.lo
-@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@am__DEPENDENCIES_5 =  \
-@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@	gnu-jemacs-swing.lo
-@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@am__DEPENDENCIES_6 =  \
-@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@	gnu-jemacs-swt.lo
-@ENABLE_JEMACS_TRUE@am__DEPENDENCIES_7 = gnu-jemacs-lang.lo \
-@ENABLE_JEMACS_TRUE@	gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
-@ENABLE_JEMACS_TRUE@	$(am__DEPENDENCIES_5) \
-@ENABLE_JEMACS_TRUE@	$(am__DEPENDENCIES_6)
-libkawa_la_DEPENDENCIES = gnu-bytecode.lo gnu-lists.lo gnu-expr.lo \
-	gnu-kawa-functions.lo gnu-kawa-lispexpr.lo gnu-kawa-reflect.lo \
-	gnu-kawa-util.lo gnu-kawa-models.lo gnu-mapping.lo gnu-math.lo \
-	gnu-text.lo gnu-commonlisp-lang.lo kawa-lang.lo kawa-repl.lo \
-	kawa-standard.lo $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3) \
-	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_7) gnu-ecmascript.lo \
-	gnu-kawa-slib.lo gnu-commonlisp-lisp.lo kawa-lib.lo
-am_libkawa_la_OBJECTS =
-libkawa_la_OBJECTS = $(am_libkawa_la_OBJECTS)
-@WITH_GCJ_TRUE@am_libkawa_la_rpath = -rpath $(libdir)
 @ENABLE_KAWA_FRONTEND_TRUE@am__EXEEXT_1 = kawa$(EXEEXT)
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@am__EXEEXT_2 =  \
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@	kawa-bin$(EXEEXT)
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_cgi_servlet_OBJECTS = cgi-servlet.$(OBJEXT) kawapath.$(OBJEXT)
@@ -93,8 +58,8 @@ cgi_servlet_OBJECTS = $(am_cgi_servlet_OBJECTS)
 cgi_servlet_LDADD = $(LDADD)
 am_kawa_OBJECTS = kawa.$(OBJEXT) kawapath.$(OBJEXT)
 kawa_OBJECTS = $(am_kawa_OBJECTS)
-am__DEPENDENCIES_8 =
-kawa_DEPENDENCIES = $(am__DEPENDENCIES_8) $(am__DEPENDENCIES_8)
+am__DEPENDENCIES_1 =
+kawa_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_kawa_bin_OBJECTS =
 kawa_bin_OBJECTS = $(am_kawa_bin_OBJECTS)
 kawa_bin_LDADD = $(LDADD)
@@ -105,16 +70,15 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libkawa_la_SOURCES) $(cgi_servlet_SOURCES) $(kawa_SOURCES) \
+SOURCES = $(cgi_servlet_SOURCES) $(kawa_SOURCES) $(kawa_bin_SOURCES)
+DIST_SOURCES = $(cgi_servlet_SOURCES) $(kawa_SOURCES) \
 	$(kawa_bin_SOURCES)
-DIST_SOURCES = $(libkawa_la_SOURCES) $(cgi_servlet_SOURCES) \
-	$(kawa_SOURCES) $(kawa_bin_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -122,7 +86,6 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
-AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -131,10 +94,8 @@ BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
-CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
-CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -143,7 +104,6 @@ DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGREP = @EGREP@
 ENABLE_BRL_FALSE = @ENABLE_BRL_FALSE@
 ENABLE_BRL_TRUE = @ENABLE_BRL_TRUE@
 ENABLE_ECHO2_FALSE = @ENABLE_ECHO2_FALSE@
@@ -157,13 +117,11 @@ ENABLE_SERVLET_TRUE = @ENABLE_SERVLET_TRUE@
 ENABLE_XML_FALSE = @ENABLE_XML_FALSE@
 ENABLE_XML_TRUE = @ENABLE_XML_TRUE@
 EXEEXT = @EXEEXT@
-FGREP = @FGREP@
 GCJ = @GCJ@
 GCJDEPMODE = @GCJDEPMODE@
 GCJFLAGS = @GCJFLAGS@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 GCJ_SELECTED = @GCJ_SELECTED@
-GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -173,19 +131,15 @@ JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
 JAVA_SOURCE = @JAVA_SOURCE@
 JEMACS_VERSION = @JEMACS_VERSION@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LIBTOOL = $(top_builddir)/libtool
-LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
-NM = @NM@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -194,9 +148,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-RANLIB = @RANLIB@
 SAX2_PREPROCESS = @SAX2_PREPROCESS@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -208,6 +160,8 @@ WITH_GCJ_DBTOOL_FALSE = @WITH_GCJ_DBTOOL_FALSE@
 WITH_GCJ_DBTOOL_TRUE = @WITH_GCJ_DBTOOL_TRUE@
 WITH_GCJ_FALSE = @WITH_GCJ_FALSE@
 WITH_GCJ_TRUE = @WITH_GCJ_TRUE@
+WITH_LIBTOOL_FALSE = @WITH_LIBTOOL_FALSE@
+WITH_LIBTOOL_TRUE = @WITH_LIBTOOL_TRUE@
 WITH_SAX2_FALSE = @WITH_SAX2_FALSE@
 WITH_SAX2_TRUE = @WITH_SAX2_TRUE@
 WITH_SWING_FALSE = @WITH_SWING_FALSE@
@@ -217,11 +171,9 @@ WITH_SWT_TRUE = @WITH_SWT_TRUE@
 WITH_XQTS_FALSE = @WITH_XQTS_FALSE@
 WITH_XQTS_TRUE = @WITH_XQTS_TRUE@
 XQTS_PATH = @XQTS_PATH@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_GCJ = @ac_ct_GCJ@
-ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -255,7 +207,6 @@ install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -287,60 +238,61 @@ WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAW
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES = 
-CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp
+CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
 READLINE_INCLUDE_PATH = 
 READLINE_LIB_PATH = 
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
-@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@LIBADD_SAX2 = gnu-kawa-sax.lo
-@ENABLE_XML_TRUE@LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo $(LIBADD_SAX2) \
-@ENABLE_XML_TRUE@  gnu-xquery-lang.lo gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
+@WITH_LIBTOOL_FALSE@OEXT = .o
+@WITH_LIBTOOL_TRUE@OEXT = .lo
+@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@LIBADD_SAX2 = gnu-kawa-sax$(OEXT)
+@ENABLE_XML_TRUE@LIBADD_XML = gnu-xml$(OEXT) gnu-kawa-xml$(OEXT) gnu-xquery-util$(OEXT) $(LIBADD_SAX2) \
+@ENABLE_XML_TRUE@  gnu-xquery-lang$(OEXT) gnu-brl$(OEXT) gnu-kawa-brl$(OEXT) gnu-kawa-xslt$(OEXT)
 
-@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
-@WITH_SWING_TRUE@LIBADD_SWINGVIEWS = gnu-kawa-swingviews.lo
-@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
-@ENABLE_JEMACS_TRUE@LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
+@ENABLE_JEMACS_TRUE@@WITH_SWING_TRUE@LIBADD_JEMACS_SWING = gnu-jemacs-swing$(OEXT)
+@WITH_SWING_TRUE@LIBADD_SWINGVIEWS = gnu-kawa-swingviews$(OEXT)
+@ENABLE_JEMACS_TRUE@@WITH_SWT_TRUE@LIBADD_JEMACS_SWT = gnu-jemacs-swt$(OEXT)
+@ENABLE_JEMACS_TRUE@LIBADD_JEMACS = gnu-jemacs-lang$(OEXT) gnu-jemacs-buffer$(OEXT) gnu-jemacs-lisp$(OEXT) \
 @ENABLE_JEMACS_TRUE@  $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
 
-@ENABLE_SERVLET_TRUE@LIBADD_SERVLET = gnu-kawa-servlet.lo
+@ENABLE_SERVLET_TRUE@LIBADD_SERVLET = gnu-kawa-servlet$(OEXT)
 @ENABLE_SERVLET_TRUE@EXTRA_LIB_SERVLET = -l-javax-servlet
-WITH_GCJ_LIBS = libkawa.la
+@WITH_LIBTOOL_FALSE@LIBKAWA_LIB = libkawa-$(libkawa_VERSION).so
+@WITH_LIBTOOL_TRUE@LIBKAWA_LIB = libkawa.la
+WITH_GCJ_LIBS = $(LIBKAWA_LIB)
 WITHOUT_GCJ_LIBS = 
-#lib_LTLIBRARIES = $(@GCJ_SELECTED@_LIBS)
 #EXTRA_LTLIBRARIES = libkawa.la
-@WITH_GCJ_TRUE@lib_LTLIBRARIES = libkawa.la
-@WITH_GCJ_DBTOOL_TRUE@EXTRA_LDFLAGS = -Wl,-Bsymbolic
+@WITH_GCJ_DBTOOL_TRUE@LDFLAGS_DBTOOL = -Wl,-Bsymbolic
 @WITH_GCJ_DBTOOL_TRUE@EXTRA_GCJFLAGS = -fPIC -findirect-dispatch
 libkawa_VERSION = $(VERSION)
-libkawa_la_LDFLAGS = $(EXTRA_LDFLAGS) -release $(libkawa_VERSION)
-libkawa_la_SOURCES = 
-libkawa_la_LIBADD = \
-  gnu-bytecode.lo \
-  gnu-lists.lo \
-  gnu-expr.lo \
-  gnu-kawa-functions.lo \
-  gnu-kawa-lispexpr.lo \
-  gnu-kawa-reflect.lo \
-  gnu-kawa-util.lo \
-  gnu-kawa-models.lo \
-  gnu-mapping.lo \
-  gnu-math.lo \
-  gnu-text.lo \
-  gnu-commonlisp-lang.lo \
-  kawa-lang.lo \
-  kawa-repl.lo \
-  kawa-standard.lo \
+libkawa_OFILES = \
+  gnu-bytecode$(OEXT) \
+  gnu-lists$(OEXT) \
+  gnu-expr$(OEXT) \
+  gnu-kawa-functions$(OEXT) \
+  gnu-kawa-lispexpr$(OEXT) \
+  gnu-kawa-reflect$(OEXT) \
+  gnu-kawa-util$(OEXT) \
+  gnu-kawa-models$(OEXT) \
+  gnu-mapping$(OEXT) \
+  gnu-math$(OEXT) \
+  gnu-text$(OEXT) \
+  gnu-commonlisp-lang$(OEXT) \
+  kawa-lang$(OEXT) \
+  kawa-repl$(OEXT) \
+  kawa-standard$(OEXT) \
   $(LIBADD_XML) \
   $(LIBADD_SERVLET) \
   $(LIBADD_SWINGVIEWS) \
   $(LIBADD_JEMACS) \
-  gnu-ecmascript.lo \
-  gnu-kawa-slib.lo \
-  gnu-commonlisp-lisp.lo \
-  kawa-lib.lo
+  gnu-ecmascript$(OEXT) \
+  gnu-kawa-slib$(OEXT) \
+  gnu-commonlisp-lisp$(OEXT) \
+  kawa-lib$(OEXT)
 
+LIBTOOL = libtool
 all: all-am
 
 .SUFFIXES:
@@ -374,35 +326,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
-	  else :; fi; \
-	done
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-	  test "$$dir" != "$$p" || dir=.; \
-	  echo "rm -f \"$${dir}/so_locations\""; \
-	  rm -f "$${dir}/so_locations"; \
-	done
-libkawa.la: $(libkawa_la_OBJECTS) $(libkawa_la_DEPENDENCIES) 
-	$(LINK) $(am_libkawa_la_rpath) $(libkawa_la_LDFLAGS) $(libkawa_la_OBJECTS) $(libkawa_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -575,11 +498,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS)
-install-binPROGRAMS: install-libLTLIBRARIES
-
+all-am: Makefile $(PROGRAMS) $(SCRIPTS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -609,8 +530,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -631,7 +551,7 @@ info-am:
 install-data-am:
 
 install-exec-am: install-binPROGRAMS install-binSCRIPTS \
-	install-exec-local install-libLTLIBRARIES
+	install-exec-local
 
 install-info: install-info-am
 
@@ -658,22 +578,21 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
-	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
+	uninstall-info-am uninstall-local
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-binSCRIPTS install-data install-data-am install-exec \
-	install-exec-am install-exec-local install-info \
-	install-info-am install-libLTLIBRARIES install-man \
+	clean-generic clean-libtool ctags distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-binPROGRAMS install-binSCRIPTS install-data \
+	install-data-am install-exec install-exec-am \
+	install-exec-local install-info install-info-am install-man \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-binSCRIPTS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-local
+	uninstall-local
 
 
 @ENABLE_KAWA_FRONTEND_FALSE@kawa:
@@ -692,7 +611,7 @@ gckawa: Makefile
 	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp
-	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(EXTRA_LDFLAGS) -lkawa' >>tmp
+	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
 
@@ -713,21 +632,26 @@ qexo:
 	chmod +x tmp
 	mv tmp qexo
 
-gnu-commonlisp-lang.lo:
+gnu-commonlisp-lang$(OEXT):
 	cd ../gnu/commonlisp/lang && $(MAKE)
-kawa-lang.lo:
+kawa-lang$(OEXT):
 	cd ../kawa/lang && $(MAKE)
-kawa-standard.lo:
+kawa-standard$(OEXT):
 	cd ../kawa/standard && $(MAKE)
-kawa-repl.lo:
-	cd ../kawa && $(MAKE) ../bin/kawa-repl.lo
-gnu-xquery-lang.lo:
+kawa-repl$(OEXT):
+	cd ../kawa && $(MAKE) ../bin/kawa-repl$(OEXT)
+gnu-xquery-lang$(OEXT):
 	cd ../gnu/xquery/lang && $(MAKE)
-gnu-xquery-util.lo:
+gnu-xquery-util$(OEXT):
 	cd ../gnu/xquery/util && $(MAKE)
 
-kawa-bin$(EXEEXT): libkawa.la
-	../libtool --mode=link --tag=GCJ $(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+$(LIBKAWA_LIB): $(libkawa_OFILES)
+@WITH_LIBTOOL_TRUE@	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $(LIBKAWA_LIB) -rpath $(libdir) -release $(libkawa_VERSION) $(libkawa_OFILES)
+@WITH_LIBTOOL_FALSE@	$(CC) -shared -Wl,-soname -Wl,libkawa-$(libkawa_VERSION).so -o libkawa-$(libkawa_VERSION).so $(libkawa_OFILES)
+
+kawa-bin$(EXEEXT): $(LIBKAWA_LIB)
+@WITH_LIBTOOL_TRUE@	$(LIBTOOL) --mode=link --tag=GCJ $(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+@WITH_LIBTOOL_FALSE@	$(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa-$(libkawa_VERSION).so $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
 
 install-exec-local: install-exec-bindir
 

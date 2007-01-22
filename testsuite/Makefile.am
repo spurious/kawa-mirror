@@ -1,7 +1,11 @@
 ## Process this with automake to create Makefile.in
 
 KAWALIB = ../kawa-$(VERSION).jar
+if WITH_GCJ
+KAWA = LD_LIBRARY_PATH=../bin KAWALIB=$(KAWALIB) ../bin/kawa
+else
 KAWA = KAWALIB=$(KAWALIB) ../bin/kawa
+endif
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 if ENABLE_SERVLET

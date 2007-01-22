@@ -1,3 +1,7 @@
+2007-01-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA): Set LD_LIBRARY_PATH if WITH_GCJ.
+
 2007-01-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA): Simplify - always use ../bin/kawa-bin.

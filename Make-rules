@@ -5,7 +5,6 @@ CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@path
 JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
-LIBTOOL = $(TO_TOPDIR)/libtool
 #GCJFLAGS = -gdwarf-2 -O
 if WITH_GCJ_DBTOOL
 EXTRA_DBTOOL_GCJFLAGS = -findirect-dispatch
@@ -13,15 +12,25 @@ endif
 GCJFLAGS = -g -O $(EXTRA_DBTOOL_GCJFLAGS)
 OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
-ENABLE_GCJ_COMPILED = $(EXTRA_GCJ_COMPILED) $(OFILES_DIR)/$(PACKAGE_FNAME).lo
+if WITH_LIBTOOL
+LIBTOOL = libtool
+PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
+else
+PACKAGE_OFILE = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+endif
+ENABLE_GCJ_COMPILED = $(EXTRA_GCJ_COMPILED) $(PACKAGE_OFILE)
 java_Java= $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 
-$(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
+$(PACKAGE_OFILE):  $(GCJ_DEPS)
+if WITH_LIBTOOL
 	$(CLASSPATH_ENV) $(LIBTOOL) --mode=compile $(GCJ) $(GCJFLAGS) -c \
-	  *.class -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
+	  *.class -o $(PACKAGE_OFILE)
+else
+	$(CLASSPATH_ENV) $(GCJ) $(GCJFLAGS) -c -fPIC *.class -o $(PACKAGE_OFILE)
+endif
 
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?

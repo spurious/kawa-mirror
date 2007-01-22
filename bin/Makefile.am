@@ -30,8 +30,7 @@ bin_PROGRAMS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN) cgi-servlet
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
-CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp
-LIBTOOL = $(top_builddir)/libtool
+CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
@@ -40,28 +39,34 @@ kawa_EXTRA_LIBS = -lncurses  # For Linux
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
+if WITH_LIBTOOL
+OEXT = .lo
+else
+OEXT = .o
+endif
+
 if ENABLE_XML
 if WITH_SAX2
-LIBADD_SAX2 = gnu-kawa-sax.lo
+LIBADD_SAX2 = gnu-kawa-sax$(OEXT)
 endif
-LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo $(LIBADD_SAX2) \
-  gnu-xquery-lang.lo gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
+LIBADD_XML = gnu-xml$(OEXT) gnu-kawa-xml$(OEXT) gnu-xquery-util$(OEXT) $(LIBADD_SAX2) \
+  gnu-xquery-lang$(OEXT) gnu-brl$(OEXT) gnu-kawa-brl$(OEXT) gnu-kawa-xslt$(OEXT)
 endif
 if WITH_SWING
 if ENABLE_JEMACS
-LIBADD_JEMACS_SWING = gnu-jemacs-swing.lo
+LIBADD_JEMACS_SWING = gnu-jemacs-swing$(OEXT)
 endif
-LIBADD_SWINGVIEWS = gnu-kawa-swingviews.lo
+LIBADD_SWINGVIEWS = gnu-kawa-swingviews$(OEXT)
 endif
 if ENABLE_JEMACS
 if WITH_SWT
-LIBADD_JEMACS_SWT = gnu-jemacs-swt.lo
+LIBADD_JEMACS_SWT = gnu-jemacs-swt$(OEXT)
 endif
-LIBADD_JEMACS = gnu-jemacs-lang.lo gnu-jemacs-buffer.lo gnu-jemacs-lisp.lo \
+LIBADD_JEMACS = gnu-jemacs-lang$(OEXT) gnu-jemacs-buffer$(OEXT) gnu-jemacs-lisp$(OEXT) \
   $(LIBADD_JEMACS_SWING) $(LIBADD_JEMACS_SWT)
 endif
 if ENABLE_SERVLET
-LIBADD_SERVLET = gnu-kawa-servlet.lo
+LIBADD_SERVLET = gnu-kawa-servlet$(OEXT)
 EXTRA_LIB_SERVLET = -l-javax-servlet
 endif
 
@@ -83,7 +88,7 @@ gckawa: Makefile
 	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp
-	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(EXTRA_LDFLAGS) -lkawa' >>tmp
+	echo 'exec gcj $(EXTRA_GCJFLAGS) "$$@" -L$(libdir) $(LDFLAGS_DBTOOL) -lkawa' >>tmp
 	chmod +x tmp
 	mv tmp gckawa
 
@@ -104,60 +109,72 @@ qexo:
 	chmod +x tmp
 	mv tmp qexo
 
-gnu-commonlisp-lang.lo:
+gnu-commonlisp-lang$(OEXT):
 	cd ../gnu/commonlisp/lang && $(MAKE)
-kawa-lang.lo:
+kawa-lang$(OEXT):
 	cd ../kawa/lang && $(MAKE)
-kawa-standard.lo:
+kawa-standard$(OEXT):
 	cd ../kawa/standard && $(MAKE)
-kawa-repl.lo:
-	cd ../kawa && $(MAKE) ../bin/kawa-repl.lo
-gnu-xquery-lang.lo:
+kawa-repl$(OEXT):
+	cd ../kawa && $(MAKE) ../bin/kawa-repl$(OEXT)
+gnu-xquery-lang$(OEXT):
 	cd ../gnu/xquery/lang && $(MAKE)
-gnu-xquery-util.lo:
+gnu-xquery-util$(OEXT):
 	cd ../gnu/xquery/util && $(MAKE)
 
-WITH_GCJ_LIBS =  libkawa.la
-WITHOUT_GCJ_LIBS =
-#lib_LTLIBRARIES = $(@GCJ_SELECTED@_LIBS)
-#EXTRA_LTLIBRARIES = libkawa.la
-if WITH_GCJ
-lib_LTLIBRARIES     = libkawa.la
+if WITH_LIBTOOL
+LIBKAWA_LIB = libkawa.la
+else
+LIBKAWA_LIB = libkawa-$(libkawa_VERSION).so
 endif
+WITH_GCJ_LIBS = $(LIBKAWA_LIB)
+WITHOUT_GCJ_LIBS =
+#EXTRA_LTLIBRARIES = libkawa.la
 if WITH_GCJ_DBTOOL
-EXTRA_LDFLAGS = -Wl,-Bsymbolic
+LDFLAGS_DBTOOL = -Wl,-Bsymbolic
 EXTRA_GCJFLAGS = -fPIC -findirect-dispatch
 endif
 libkawa_VERSION = $(VERSION)
-libkawa_la_LDFLAGS = $(EXTRA_LDFLAGS) -release $(libkawa_VERSION)
-libkawa_la_SOURCES = 
-libkawa_la_LIBADD = \
-  gnu-bytecode.lo \
-  gnu-lists.lo \
-  gnu-expr.lo \
-  gnu-kawa-functions.lo \
-  gnu-kawa-lispexpr.lo \
-  gnu-kawa-reflect.lo \
-  gnu-kawa-util.lo \
-  gnu-kawa-models.lo \
-  gnu-mapping.lo \
-  gnu-math.lo \
-  gnu-text.lo \
-  gnu-commonlisp-lang.lo \
-  kawa-lang.lo \
-  kawa-repl.lo \
-  kawa-standard.lo \
+libkawa_OFILES = \
+  gnu-bytecode$(OEXT) \
+  gnu-lists$(OEXT) \
+  gnu-expr$(OEXT) \
+  gnu-kawa-functions$(OEXT) \
+  gnu-kawa-lispexpr$(OEXT) \
+  gnu-kawa-reflect$(OEXT) \
+  gnu-kawa-util$(OEXT) \
+  gnu-kawa-models$(OEXT) \
+  gnu-mapping$(OEXT) \
+  gnu-math$(OEXT) \
+  gnu-text$(OEXT) \
+  gnu-commonlisp-lang$(OEXT) \
+  kawa-lang$(OEXT) \
+  kawa-repl$(OEXT) \
+  kawa-standard$(OEXT) \
   $(LIBADD_XML) \
   $(LIBADD_SERVLET) \
   $(LIBADD_SWINGVIEWS) \
   $(LIBADD_JEMACS) \
-  gnu-ecmascript.lo \
-  gnu-kawa-slib.lo \
-  gnu-commonlisp-lisp.lo \
-  kawa-lib.lo
+  gnu-ecmascript$(OEXT) \
+  gnu-kawa-slib$(OEXT) \
+  gnu-commonlisp-lisp$(OEXT) \
+  kawa-lib$(OEXT)
 
-kawa-bin$(EXEEXT): libkawa.la
-	../libtool --mode=link --tag=GCJ $(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+LIBTOOL = libtool
+
+$(LIBKAWA_LIB): $(libkawa_OFILES)
+if WITH_LIBTOOL
+	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $(LIBKAWA_LIB) -rpath $(libdir) -release $(libkawa_VERSION) $(libkawa_OFILES)
+else
+	$(CC) -shared -Wl,-soname -Wl,libkawa-$(libkawa_VERSION).so -o libkawa-$(libkawa_VERSION).so $(libkawa_OFILES)
+endif
+
+kawa-bin$(EXEEXT): $(LIBKAWA_LIB)
+if WITH_LIBTOOL
+	$(LIBTOOL) --mode=link --tag=GCJ $(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+else
+	$(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa-$(libkawa_VERSION).so $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+endif
 
 install-exec-local: install-exec-bindir
 

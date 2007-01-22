@@ -251,5 +251,6 @@ set-selected-java-source:
 	test "@JAVA_SOURCE@" = `cat $(srcdir)/selected-java-source` \
 	  || echo "@JAVA_SOURCE@" >$(srcdir)/selected-java-source
 
-distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
-  kawa-@VERSION@-src.zip jemacs-@JEMACS_VERSION@.jar bytecode-@BYTECODE_VERSION@.jar
+distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
+# Consider also:
+# kawa-@VERSION@-src.zip jemacs-@JEMACS_VERSION@.jar bytecode-@BYTECODE_VERSION@.jar

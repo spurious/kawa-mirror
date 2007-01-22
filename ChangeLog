@@ -1,3 +1,7 @@
+2007-01-21  Per Bothner  <per@bothner.com>
+
+	* kawa.cmd: Remove unused file.
+
 2007-01-20  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.9.0.

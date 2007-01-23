@@ -1,3 +1,8 @@
+2007-01-22  Per Bothner  <per@bothner.com>
+
+	* ReplSession.java: (class OutBufferWriter): Extend XMLPrinter,
+	now that XMLPrinter extends OutPort.
+
 2007-01-13  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): If path match to a directory,

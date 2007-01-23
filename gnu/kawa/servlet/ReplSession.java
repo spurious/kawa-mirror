@@ -104,7 +104,6 @@ public class ReplSession extends Writer
     String result = outBuffer.toString();
     outBuffer.setLength(0);
     outAvailable = false;
-    //System.err.println("grabOutRaw ["+result+"]");
     return result;
   }
 
@@ -191,7 +190,7 @@ class MyTtyInPort extends TtyInPort
   }
 }
 
-class OutBufferWriter extends OutPort
+class OutBufferWriter extends XMLPrinter
 {
   ReplSession session;
   /** Which port this is:
@@ -201,63 +200,25 @@ class OutBufferWriter extends OutPort
    */
   char kind;
   int nesting = 0;
-  XMLPrinter xout;
 
   public OutBufferWriter (ReplSession session, char kind, Path path)
   {
-    super(session, false, true, path);
+    super(session, true);
+    // setPath(path); // FIXME need to implement super.setPath
     this.session = session;
     this.kind = kind;
-    xout = new XMLPrinter(bout, true);
-    out = xout;
-  }
-
-  public void write (int c)
-  {
-    xout.write(c);
-  }
-
-  /* #ifdef use:java.lang.CharSequence */
-  public void write(CharSequence str, int start, int length)
-  /* #else */
-  // public void write(String str, int start, int length)
-  /* #endif */
-  {
-    xout.write(str, start, length);
-  }
-
-  public void write (String str)
-  {
-    int len = str.length();
-    xout.write(str, 0, len);
   }
 
   public void startElement (Object type)
   {
     nesting++;
-    xout.startElement(type);
+    super.startElement(type);
   }
 
   public void endElement ()
   {
     nesting--;
-    xout.endElement();
-  }
-
-  public void startAttribute (Object attrType)
-  {
-    xout.startAttribute(attrType);
-  }
-
-  public void endAttribute()
-  {
-    xout.endAttribute();
-  }
-
-  public void println ()
-  {
-    bout.write('\n');
-    flush();
+    super.endElement();
   }
 
   final void flushToSessionBuffer ()  throws java.io.IOException

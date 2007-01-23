@@ -1,3 +1,8 @@
+2007-01-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA): Use bin's kawa.sh directly.
+	(various *.class): We need to set CLASSPATH explicitly now.
+
 2007-01-21  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (<init>): Update expected failures.

@@ -1,3 +1,11 @@
+2007-01-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: A number of changes to avoid using libtool - except
+	when WITH_LIBTOOL is selected.  Various 'install' fixes.
+	(LIBADD_BRL): Don't add brl.o files unless we --enable-brl.
+	(kawa.sh): Fix WITH_GCJ_NO_DBTOOL case.
+	(WITH_GCJ_LIBS, WITHOUT_GCJ_LIBS): Remove unused macros.
+
 2007-01-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  If WITH_LIBTOOL, call libtoll in path "by hand".

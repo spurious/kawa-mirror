@@ -1,3 +1,7 @@
+2007-01-23  Per Bothner  <per@bothner.com>
+
+	* configure.in (WITH_GCJ_NO_DBTOOL): New conditional.
+
 2007-01-22  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.9.1.

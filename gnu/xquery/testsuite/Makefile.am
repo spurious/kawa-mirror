@@ -1,7 +1,7 @@
 include $(top_srcdir)/Make-rules
 
 KAWALIB = $(top_builddir)
-KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa
+KAWA = ../../../bin/kawa.sh
 EXTRA_CLEAN = tmp* *.log testing.zip *.class Mod1/*.class Mod2/*.class
 
 java_sources = TestMisc.java TestSuite.java RunXQTS.java
@@ -76,13 +76,13 @@ check-format-users:
 	@if diff -b -B $(srcdir)/exp-format-users.html tmp-format-users.html; then echo '#  format-users test passes'; else echo FAIL format-users test; fi
 
 ./Mod1/mod1.class: mod1.xql
-	$(KAWA) --module-static -d ../../.. -C $<
+	$(CLASSPATH_ENV) $(KAWA) --module-static -d ../../.. -C $<
 ./Mod2/mod2.class: mod2.xql
-	$(KAWA) -d ../../.. -C $<
+	$(CLASSPATH_ENV) $(KAWA) -d ../../.. -C $<
 ./Mod2/mod2a.class: mod2a.xql
-	$(KAWA) -d ../../.. -C $<
+	$(CLASSPATH_ENV) $(KAWA) -d ../../.. -C $<
 usemod.class: usemod.xql ./Mod1/mod1.class ./Mod2/mod2.class ./Mod2/mod2a.class
-	CLASSPATH=$(KAWALIB) $(KAWA) --main -C $<
+	$(CLASSPATH_ENV) $(KAWA) --main -C $<
 check-mod: usemod.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) usemod >tmp-usemod
 	@if diff -b $(srcdir)/usemod.exp tmp-usemod; \

@@ -136,6 +136,8 @@ enable_servlet=${enable_servlet-${with_servlet}}
 
 AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(WITH_GCJ_DBTOOL, test "$with_gcj_dbtool" = "yes")
+AM_CONDITIONAL(WITH_GCJ_NO_DBTOOL,
+  test "$with_gcj" = "yes" -a "$with_gcj_dbtool" != "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
 AM_CONDITIONAL(ENABLE_BRL, test "$enable_brl" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")

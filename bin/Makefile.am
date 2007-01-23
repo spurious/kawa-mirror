@@ -4,9 +4,9 @@ WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(KAWALIB)"' -DKAWAJAR='"$(KAW
 
 if ENABLE_KAWA_FRONTEND
 KAWAPROGS_KAWA = kawa
-else ! ENABLE_KAWA_FRONTEND
-KAWASCRIPTS_KAWA = kawa
-endif ! ENABLE_KAWA_FRONTEND
+endif
+KAWASCRIPTS_KAWA = kawa.sh
+noinst_SCRIPTS = kawa.sh
 
 if WITH_GCJ
 bin_SCRIPTS = gckawa qexo $(KAWASCRIPTS_KAWA)
@@ -18,7 +18,6 @@ CDEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
 KAWAPROGS_KAWA_BIN = kawa-bin
 endif !WITH_GCJ_DBTOOL
 DEFSy = 
-KAWAPROGS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN)
 else !WITH_GCJ
 CDEFS = $(WITHOUT_GCJ_DEFS)
 bin_SCRIPTS = qexo $(KAWASCRIPTS_KAWA)
@@ -30,7 +29,7 @@ bin_PROGRAMS = $(KAWAPROGS_KAWA) $(KAWAPROGS_KAWA_BIN) cgi-servlet
 kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
-CLEANFILES = qexo kawa$(EXEEXT) kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
+CLEANFILES = qexo kawa$(EXEEXT) kawa.sh kawa-bin$(EXEEXT) gckawa tmp *.stamp *.so *.la
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
@@ -49,8 +48,11 @@ if ENABLE_XML
 if WITH_SAX2
 LIBADD_SAX2 = gnu-kawa-sax$(OEXT)
 endif
-LIBADD_XML = gnu-xml$(OEXT) gnu-kawa-xml$(OEXT) gnu-xquery-util$(OEXT) $(LIBADD_SAX2) \
-  gnu-xquery-lang$(OEXT) gnu-brl$(OEXT) gnu-kawa-brl$(OEXT) gnu-kawa-xslt$(OEXT)
+if ENABLE_BRL
+LIBADD_BRL = gnu-brl$(OEXT) gnu-kawa-brl$(OEXT) 
+endif
+LIBADD_XML = gnu-xml$(OEXT) gnu-kawa-xml$(OEXT) $(LIBADD_SAX2) $(LIBADD_BRL) \
+  gnu-xquery-util$(OEXT) gnu-xquery-lang$(OEXT) gnu-kawa-xslt$(OEXT)
 endif
 if WITH_SWING
 if ENABLE_JEMACS
@@ -70,17 +72,33 @@ LIBADD_SERVLET = gnu-kawa-servlet$(OEXT)
 EXTRA_LIB_SERVLET = -l-javax-servlet
 endif
 
-if ! ENABLE_KAWA_FRONTEND
-kawa:
+kawa.sh:
 	echo '#!/bin/sh' >tmp
-	echo 'KAWALIB=$${KAWALIB-$(KAWALIB)}' >>tmp
+	echo 'thisfile=`which $$0`' >>tmp
+	echo 'thisdir=`dirname $$thisfile`' >>tmp
+if ENABLE_KAWA_FRONTEND
+# In this case kawa.sh is only used for pre-install testing.
+# We don't need to set KAWALIB, since kawapath.c looks for it in "..".
+	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir' >>tmp
+	echo 'export LD_LIBRARY_PATH' >>tmp
+	echo 'exec $$thisdir/kawa "$$@"' >>tmp
+else
+if WITH_GCJ_NO_DBTOOL
+	echo 'LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$$thisdir:$(libdir)' >>tmp
+	echo 'export LD_LIBRARY_PATH' >>tmp
+	echo 'exec $$thisdir/kawa-bin "$$@"' >>tmp
+else
+	echo 'if test -f $$thisdir/../$(KAWAJAR)' >>tmp
+	echo 'then KAWALIB=$${KAWALIB-$$thisdir/../$(KAWAJAR)}' >>tmp
+	echo 'else KAWALIB=$${KAWALIB-$(KAWALIB)}; fi' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
 	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
-	chmod +x tmp
-	mv tmp kawa
 endif
+endif
+	chmod +x tmp
+	mv tmp kawa.sh
 
 gckawa: Makefile
 	echo '#!/bin/sh' >tmp
@@ -97,7 +115,9 @@ qexo:
 	echo 'case $$0 in' >>tmp
 	echo '  */qexo)' >>tmp
 	echo '    kawa=`echo $$0 | sed -e '"'"'s|qexo$$|kawa|'"'"'`' >>tmp
-	echo '    if test -x $$kawa; then true' >>tmp
+	echo '    if test -x $$kawa.sh; then' >>tmp
+	echo '      kawa=$$kawa.sh' >>tmp
+	echo '    elif test -x $$kawa; then true' >>tmp
 	echo '    else' >>tmp
 	echo '      kawa="kawa"' >>tmp
 	echo '    fi' >>tmp
@@ -127,8 +147,7 @@ LIBKAWA_LIB = libkawa.la
 else
 LIBKAWA_LIB = libkawa-$(libkawa_VERSION).so
 endif
-WITH_GCJ_LIBS = $(LIBKAWA_LIB)
-WITHOUT_GCJ_LIBS =
+
 #EXTRA_LTLIBRARIES = libkawa.la
 if WITH_GCJ_DBTOOL
 LDFLAGS_DBTOOL = -Wl,-Bsymbolic
@@ -176,13 +195,49 @@ else
 	$(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa-$(libkawa_VERSION).so $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
 endif
 
-install-exec-local: install-exec-bindir
+kawa$(EXEEXT): $(kawa_OBJECTS)
+	$(CCLD) -o kawa$(EXEEXT) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
 
-install-exec-bindir: $(noninst_SCRIPTS)
-	$(mkinstalldirs) $(bindir)
+cgi-servlet$(EXEEXT): $(cgi_servlet_OBJECTS)
+	$(CCLD) -o cgi-servlet$(EXEEXT) $(cgi_servlet_LDFLAGS) $(cgi_servlet_OBJECTS) $(LIBS)
+
+install-binSCRIPTS: $(bin_SCRIPTS)
 	$(INSTALL_SCRIPT) qexo $(DESTDIR)$(bindir)/qexo
+if ! ENABLE_KAWA_FRONTEND
+	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
+endif
 if WITH_GCJ
 	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
+endif
+
+if WITH_LIBTOOL
+LIBTOOL_INSTALL = $(LIBTOOL) --mode=install
+endif
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
+if ENABLE_KAWA_FRONTEND
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa$(EXEEXT) $(DESTDIR)$(bindir)/kawa$(EXEEXT)
+endif
+if WITH_GCJ
+if ! WITH_GCJ_DBTOOL
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa-bin$(EXEEXT) $(DESTDIR)$(bindir)/kawa-bin$(EXEEXT)
+endif
+endif
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
+
+if WITH_GCJ
+install-exec-local: install-libkawa
+endif
+
+install-libkawa: $(LIBKAWA_LIB)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
+if WITH_LIBTOOL
+	$(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $(LIBKAWA_LIB) $(DESTDIR)$(libdir)/$(LIBKAWA_LIB)
+else
+	$(INSTALL_DATA) $(LIBKAWA_LIB) $(INSTALL_STRIP_FLAG) $(DESTDIR)$(libdir)/$(LIBKAWA_LIB)
 endif
 
 uninstall-local: uninstall-exec-bindir

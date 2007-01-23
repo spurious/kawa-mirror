@@ -124,6 +124,8 @@ WITH_AWT_TRUE = @WITH_AWT_TRUE@
 WITH_GCJ_DBTOOL_FALSE = @WITH_GCJ_DBTOOL_FALSE@
 WITH_GCJ_DBTOOL_TRUE = @WITH_GCJ_DBTOOL_TRUE@
 WITH_GCJ_FALSE = @WITH_GCJ_FALSE@
+WITH_GCJ_NO_DBTOOL_FALSE = @WITH_GCJ_NO_DBTOOL_FALSE@
+WITH_GCJ_NO_DBTOOL_TRUE = @WITH_GCJ_NO_DBTOOL_TRUE@
 WITH_GCJ_TRUE = @WITH_GCJ_TRUE@
 WITH_LIBTOOL_FALSE = @WITH_LIBTOOL_FALSE@
 WITH_LIBTOOL_TRUE = @WITH_LIBTOOL_TRUE@
@@ -187,7 +189,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 KAWALIB = ../../..
-KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa
+KAWA = ../../../bin/kawa.sh
 DOTEST = $(KAWA) --elisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 

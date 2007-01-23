@@ -1,5 +1,5 @@
 KAWALIB = ../../..
-KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa
+KAWA = ../../../bin/kawa.sh
 DOTEST = $(KAWA) --clisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 

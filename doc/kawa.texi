@@ -133,8 +133,8 @@ or from a @uref{http://www.gnu.org/order/ftp.html,mirror site}.
 
 The latest release of the Kawa source code is
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.tar.gz}.
-The same sources are available as a zip file
-@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}-src.zip}.
+(To unpack @code{.tar.gz} files Windows users can use
+@uref{http://www.7-zip.org/,7-Zip}, which is Free Software.)
 
 A ready-to-run @code{.jar} archive of the pre-compiled classes is in
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.

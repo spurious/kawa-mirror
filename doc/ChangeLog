@@ -1,3 +1,8 @@
+2007-01-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Getting Kawa): Remove reference to kawa-VERSION-src.zip.
+	Add suggestion to use 7-zip to unpack on Windows.
+
 2007-01-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Remove subsection on using Jikes.

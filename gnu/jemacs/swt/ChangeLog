@@ -1,3 +1,7 @@
+2007-01-30  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (java_sources): Add 3 files that had been left out.
+
 2005-11-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (ALL): New macro, only if ENABLE_JEMACS and ENABLE_SWT.

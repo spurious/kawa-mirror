@@ -216,9 +216,12 @@ java_sources = \
   SwtBuffer.java \
   SwtCharBuffer.java \
   SwtFrame.java \
+  SwtHelper.java \
+  SwtKeyMapper.java \
   SwtMenu.java \
   SwtToolkit.java \
-  SwtWindow.java
+  SwtWindow.java \
+  SwtWindowWidget.java
 
 PACKAGE_FNAME = gnu-jemacs-swt
 GCJ_INPUTS = $(java_Java)

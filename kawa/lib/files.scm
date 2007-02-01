@@ -58,34 +58,30 @@
 (simplify-path)
 |#
 
-(define (file-exists? (filename :: path)) :: <boolean>
-  (filename:exists))
+(define (file-exists? (file :: path)) :: <boolean>
+  (file:exists))
 
-(define (file-directory? (filename :: path)) :: <boolean>
-  (filename:isDirectory))
+(define (file-directory? (file :: path)) :: <boolean>
+  (file:isDirectory))
 
-(define (file-readable? filename)
-  ((primitive-virtual-method "java.io.File" "canRead" "boolean" ())
-   (->pathname filename)))
+(define (file-readable? (file :: filepath)) :: <boolean>
+  ((file:toFile):canRead))
 
-(define (file-writable? filename)
-  ((primitive-virtual-method "java.io.File" "canWrite" "boolean" ())
-   (->pathname filename)))
+(define (file-writable? (file :: filepath)) :: <boolean>
+  ((file:toFile):canWrite))
 
 ;(define (file-modification-time (filename :: path)) :: <long>
 ;  (filename:getLastModified))
 
-(define (delete-file filename)
-  ((primitive-virtual-method "java.io.File" "delete" "boolean" ())
-   (->pathname filename)))
+(define (delete-file (file :: filepath)) :: <void>
+  (if (not ((file:toFile):delete))
+      (primitive-throw (<java.io.IOException>:new
+			(format #f "cannot delete ~a" file)))))
 
-(define (rename-file oldname newname)
-  ((primitive-virtual-method "java.io.File" "renameTo" "boolean"
-			     ("java.io.File"))
-   (->pathname oldname) (->pathname newname)))
+(define (rename-file (oldname :: filepath) (newname :: filepath))
+  ((oldname:toFile):renameTo (newname:toFile)))
 
-
-(define (copy-file from to)
+(define (copy-file (from :: path) (to :: path)) :: <void>
   (let ((in (open-input-file from))
 	(out (open-output-file to)))
     (do ((ch (read-char in) (read-char in)))
@@ -95,9 +91,8 @@
 	 #!void)
       (write-char ch out))))
 
-(define (create-directory dirname)
-  ((primitive-virtual-method <java.io.File> "mkdir" <boolean> ())
-   (->pathname dirname)))
+(define (create-directory (dirname :: filepath))
+  ((dirname:toFile):mkdir))
 
 ; Taken from MIT Scheme
 (define (->pathname filename) :: path

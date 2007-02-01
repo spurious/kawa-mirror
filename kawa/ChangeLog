@@ -1,3 +1,8 @@
+2007-01-31  Per Bothner  <per@bothner.com>
+
+	* MessageArea.java (enter): Fix osme off-by-one issues.
+	Fixes (hopefully) Savannah bug #16313.
+
 2007-01-14  Per Bothner  <per@bothner.com>
 
 	* lang/Record.java (makeRecordType): Use one-argument version of

@@ -48,25 +48,27 @@ public class MessageArea extends TextArea
 	if (len != length) {
 	  System.err.println("(actual) len:"+len + " (saved) length:"+length);
 	}
-	int lineAfter = str.indexOf('\n', pos);
 	endMark = -1;
-	if (lineAfter < 0)
-	  lineAfter = len;
-	int lineBefore = pos == 0 ? 0 : 1 + str.lastIndexOf('\n', pos-1);
-	if (pos >= outputMark || outputMark <= lineAfter) {
-	  lineAfter = str.indexOf('\n', outputMark);
+	if (pos >= outputMark) {
+	  int lineAfter = str.indexOf('\n', outputMark);
 	  if (lineAfter < 0) {
-	    lineAfter = len;
 	    append("\n");
+            str = str.substring(outputMark, len)+'\n';
+            lineAfter = len;
 	  }
-	  else
+	  else {
 	    endMark = len;
-	  str = str.substring(outputMark, lineAfter);
-	  str = str + '\n';
+            str = str.substring(outputMark, lineAfter+1);
+          }
 	  outputMark = lineAfter+1;
 	}
 	else {
-	  str = str.substring(lineBefore, lineAfter+1);
+          int lineBefore = pos == 0 ? 0 : 1 + str.lastIndexOf('\n', pos-1);
+          int lineAfter = str.indexOf('\n', pos);
+          if (lineAfter < 0)
+            str = str.substring(lineBefore, len)+'\n';
+          else
+            str = str.substring(lineBefore, lineAfter+1);
 	  out_stream.write(str);
 	}
 

@@ -417,21 +417,28 @@ public class LambdaExp extends ScopeExp
 	  parent = parent.outerLambda();
 	Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
-	if (isClassMethod())
-	  closureEnv = declareThis(type);
+	if (isClassMethod() && ! "*init*".equals(getName()))
+          closureEnv = declareThis(type);
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
 		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;
 	else if (! isClassGenerated() && ! getInlineOnly())
 	  {
 	    Method primMethod = getMainMethod();
-	    if (! primMethod.getStaticFlag())
+            boolean isInit = "*init*".equals(getName());
+	    if (! primMethod.getStaticFlag()
+                && ! isInit)
 	      closureEnv = declareThis(primMethod.getDeclaringClass());
 	    else
 	      {
 		Type envType = primMethod.getParameterTypes()[0];
 		closureEnv = new Variable("closureEnv", envType);
-		getVarScope().addVariableAfter(null, closureEnv);
+                Variable prev;
+                if (isInit)
+                  prev = declareThis(primMethod.getDeclaringClass());
+                else
+                  prev = null;
+                getVarScope().addVariableAfter(prev, closureEnv);
 		closureEnv.setParameter(true);
 	      }
 	  }

@@ -403,10 +403,16 @@ public class ClassExp extends LambdaExp
 	    comp.method.initCode();
             child.allocChildClasses(comp);
 	    child.allocParameters(comp);
-	    child.enterFunction(comp);
             if ("*init*".equals(child.getName()))
               {
                 code = comp.getCode();
+
+                if (staticLinkField != null)
+                  {
+                    code.emitPushThis();
+                    code.emitLoad(code.getCurrentScope().getVariable(1));
+                    code.emitPutField(staticLinkField);
+                  }
 
                 // Extract "first" expression to see if it is special.
                 Expression bodyFirst = child.body;
@@ -452,6 +458,7 @@ public class ClassExp extends LambdaExp
                         code.emitInvokeSpecial(superConstructor);
                       }
                   }
+                child.enterFunction(comp);
                 if (calledInit != instanceType)
                   comp.callInitMethods(getCompiledClassType(comp),
                                        new Vector(10));
@@ -462,7 +469,10 @@ public class ClassExp extends LambdaExp
                   child.compileBody(comp);
               }
             else
-              child.compileBody(comp);
+              {
+                child.enterFunction(comp);
+                child.compileBody(comp);
+              }
 	    child.compileEnd(comp);
 	    child.compileChildMethods(comp);
 	    comp.method = save_method;

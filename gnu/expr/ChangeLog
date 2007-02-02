@@ -1,3 +1,13 @@
+2007-02-01  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compile): Alwaus set thisType to null
+	if constructor.
+	* ClassExp.java (compile): If there is a staticLinkField,
+	have to set it in *init*.
+	Defer enterFunction until after super init call.
+	* LambdaExp.java (declareClosureEnv): If *init* needs closureEnv,
+	we need to pass it as an extra parameter, not through 'this'.
+
 2007-01-19  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (checkCurrent): Use ClassType.getContextClass.

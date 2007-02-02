@@ -506,10 +506,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             args[0].compile(comp, Target.pushValue(Compilation.typeClassType));
             code.emitInvokeStatic(ClassType.make("gnu.expr.PairClassType").getDeclaredMethod("extractStaticLink", 1));
             code.emitCheckcast(mclass.getOuterLinkType());
-            thisType = Type.void_type;
           }
-        else
-          thisType = null;
+        thisType = null;
         startArg = 1;
       }
     else if (takesTarget() && method.getStaticFlag())

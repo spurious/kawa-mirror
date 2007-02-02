@@ -1,4 +1,4 @@
-(test-init "Objects" 129)
+(test-init "Objects" 130)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -291,6 +291,10 @@
 (test '(1 2 3) my-func-1 2 3)
 (require <MyModule>)
 (test '(#t 5 6) my-func-t 5 6)
+
+(define TestCapturedFieldRef-instance (<TestCapturedFieldRef> 7))
+(incr-field-function 2)
+(test 109 'test-captured-field-ref TestCapturedFieldRef-instance:var)
 
 (define-record-type pare
   (kons x y-part)

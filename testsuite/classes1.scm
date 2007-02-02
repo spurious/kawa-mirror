@@ -89,3 +89,13 @@
 (define-simple-class <IdClass2> (<IdClass1>)
   (allocation: 'class init: (get-new-count))
   (var2 init-form: (get-new-count)))
+
+(module-static incr-field-function)
+(define incr-field-function #f)
+(define-simple-class <TestCapturedFieldRef> ()
+  (var 100)
+  ((*init* var0)
+   (set! var (+ var var0))
+   (set! incr-field-function
+	 (lambda (delta)
+	   (set! var (+ var delta))))))

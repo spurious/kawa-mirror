@@ -1,3 +1,9 @@
+2007-02-01  Per Bothner  <per@bothner.com>
+	    Kjetil S. Matheussen <k.s.matheussen@notam02.no>
+
+	* classes1.scm, obj-test.scm: A test for closure that captures
+	class field.
+
 2007-01-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA): Use bin's kawa.sh directly.

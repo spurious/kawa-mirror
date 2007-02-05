@@ -524,14 +524,6 @@ public class Translator extends Compilation
     return name;
   }
 
-  public void setCurrentScope (ScopeExp scope)
-  {
-    super.setCurrentScope(scope);
-    while (scope != null && ! (scope instanceof PatternScope))
-      scope = scope.outer;
-    patternScope = (PatternScope) scope;
-  }
-
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */

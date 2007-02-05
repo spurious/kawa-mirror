@@ -1,3 +1,8 @@
+2007-02-05  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (setCurrentScope): Change needed to handle
+	macros that generate macros.  Not quite right, but an improvement.
+
 2007-01-31  Per Bothner  <per@bothner.com>
 
 	* MessageArea.java (enter): Fix osme off-by-one issues.

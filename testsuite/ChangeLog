@@ -1,3 +1,8 @@
+2007-02-05  Luis Casillas <luis@casillas.org>
+	    Kjetil S. Matheussen <k.s.matheussen@notam02.no>
+
+	* mac-test.scm: New test of macro generating macro.
+
 2007-02-01  Per Bothner  <per@bothner.com>
 	    Kjetil S. Matheussen <k.s.matheussen@notam02.no>
 

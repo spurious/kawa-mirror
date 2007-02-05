@@ -1,4 +1,4 @@
-(test-init "macros" 96)
+(test-init "macros" 97)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -479,3 +479,27 @@
 		      (syntax
 		       (lambda args (begin bodye1))))))))
   (test 3 'savannah-bug-18105 ((crashing-syntax (arg1 arg2) 3) 1 2)))
+
+;; Luis Casillas <luis@casillas.org> posted to Kawa list 2007-02-02:
+(define (alter-syntax-datum proc stx)
+  ;; must use define-syntax-datum in PLT
+  (datum->syntax-object stx (proc (syntax-object->datum stx))))
+(define-syntax define-symbol-altering-macro
+  (syntax-rules ()
+    ((_ (macro-name arg) expr . exprs)
+     (define-symbol-altering-macro macro-name (lambda (arg) expr . exprs)))
+    ((_ macro-name proc)
+     (define-syntax macro-name
+       (lambda (stx)
+         (syntax-case stx ()
+           ((_ sym . args)
+            (let ((new-sym (alter-syntax-datum proc (syntax sym))))
+              ;; must use #, in PLT
+              #`(,new-sym . args)))))))))
+(define-symbol-altering-macro (call-reversename sym)
+  (string->symbol
+   (list->string
+    (reverse
+     (string->list
+      (symbol->string sym))))))
+(test 7 'symbol-altering-macro (call-reversename xam 3 2 7 6))

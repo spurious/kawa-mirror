@@ -31,6 +31,13 @@
     ((define-macro name function)
      (%define-macro name function))))
 
+(define-syntax define-syntax-case
+   (syntax-rules ()
+     ((define-syntax-case name literals . parts)
+      (define-syntax name
+        (lambda (form)
+      (syntax-case form literals . parts))))))
+
 (define (gentemp) :: <symbol>
   (invoke-static <gnu.expr.Symbols> 'gentemp))
 

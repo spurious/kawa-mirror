@@ -502,6 +502,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("define-macro", "kawa.lib.syntax");
       defSntxStFld("%define-macro", "kawa.standard.define_syntax",
                    "define_macro");
+      defSntxStFld("define-syntax-case", "kawa.lib.syntax");
       defSntxStFld("syntax-case", "kawa.standard.syntax_case", "syntax_case");
       defSntxStFld("%define-syntax", "kawa.standard.define_syntax",
                    "define_syntax");

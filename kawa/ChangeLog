@@ -1,5 +1,7 @@
 2007-02-05  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Declare define-syntax-case.
+
 	* lang/Translator.java (setCurrentScope): Change needed to handle
 	macros that generate macros.  Not quite right, but an improvement.
 

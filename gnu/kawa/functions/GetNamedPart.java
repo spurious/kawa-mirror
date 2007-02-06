@@ -186,16 +186,6 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             nexp.methods = methods;
             return nexp.setProcedureKind('M');
           }
-        Member part = SlotGet.lookupMember(ctype, mname, caller);
-        if (part != null
-            || (mname.equals("length") && type instanceof ArrayType))
-          {
-            // FIXME: future kludge to avoid re-doing SlotGet.getField.
-            // args = new Expression[] { context, new QuoteExp(part) });
-            ApplyExp aexp = new ApplyExp(SlotGet.field, args);
-            aexp.setLine(exp);
-            return ((InlineCalls) walker).walkApplyOnly(aexp);
-          }
 
         if (type.isSubtype(typeHasNamedParts))
           {
@@ -212,6 +202,17 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
               }
             return new ApplyExp(typeHasNamedParts.getDeclaredMethod("get", 1),
                                 args).setLine(exp);
+          }
+
+        Member part = SlotGet.lookupMember(ctype, mname, caller);
+        if (part != null
+            || (mname.equals("length") && type instanceof ArrayType))
+          {
+            // FIXME: future kludge to avoid re-doing SlotGet.getField.
+            // args = new Expression[] { context, new QuoteExp(part) });
+            ApplyExp aexp = new ApplyExp(SlotGet.field, args);
+            aexp.setLine(exp);
+            return ((InlineCalls) walker).walkApplyOnly(aexp);
           }
       }
 

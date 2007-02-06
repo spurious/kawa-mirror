@@ -1,3 +1,8 @@
+2007-02-05  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Check if container implements
+	HasNamedParts *before* looking for field/method.
+
 2007-01-19  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (makeExp): Use new ClassType.getContextClass.

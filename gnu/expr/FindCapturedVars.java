@@ -331,10 +331,6 @@ public class FindCapturedVars extends ExpWalker
       }
     if (decl.getFlag(Declaration.IS_UNKNOWN))
       {
-	Type type = getCompilation().getLanguage().getTypeFor(exp);
-	if (type instanceof Externalizable && ! exp.getDontDereference())
-	  return new QuoteExp(type);
-
 	if (comp.getBooleanOption("warn-undefined-variable", false))
 	  {
 	    Object resolved

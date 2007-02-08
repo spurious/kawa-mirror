@@ -1038,6 +1038,48 @@ public class Scheme extends LispLanguage
     return string2Type(name);
   }
 
+  public Type getTypeFor (Expression exp, boolean lenient)
+  {
+    Type type = super.getTypeFor(exp, lenient);
+    if (type == null && exp instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) exp;
+        Declaration decl = rexp.getBinding();
+        if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
+          {
+            // If the identifier is the nameof a valid class in the classpath,
+            // use that.  This is Scheme-specific for now - we don't want this
+            // for ELisp, because it has dynamic scoping, so this case
+            // would be triggered too often.
+            String name = rexp.getName();
+            int len = name.length();
+            int rank = 0;
+            while (len > 2
+                   && name.charAt(len-2) == '[' && name.charAt(len-1) == ']')
+              {
+                len -= 2;
+                rank++;
+              }
+            if (rank != 0)
+              name = name.substring(0, len);
+            try
+              {
+                Class clas = ClassType.getContextClass(name);
+                if (clas != null)
+                  {
+                    type = Type.make(clas);
+                    while (--rank >= 0)
+                      type = ArrayType.make(type);
+                  }
+              }
+            catch (Throwable ex)
+              {
+              }
+          }
+      }
+    return type;
+  }
+
   /** Convert expression to a Type.
    * Allow "TYPE" or 'TYPE or <TYPE>.
    */

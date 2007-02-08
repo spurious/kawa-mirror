@@ -650,7 +650,6 @@ public abstract class Language
         String name = rexp.getName();
         if (decl != null)
 	  {
-	    name = decl.getName();
 	    exp = decl.getValue();
 	    if (decl.isAlias()
 		&& exp instanceof QuoteExp)

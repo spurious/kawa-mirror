@@ -1,5 +1,11 @@
 2007-02-08  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java  (walkReferenceExp): Map name->class using getTypeFor
+	here, rather than later, in FindCapturedVars.
+	* FindCapturedVars.java (walkReferenceExp): Don't do getTypeFor here.
+
+	* Language.java (getTypeFor): Remove redundant assignment.
+
 	* TypeValue.java: Extend java.lang.reflect.Type if JAVA5.
 
 2007-02-01  Per Bothner  <per@bothner.com>

@@ -238,7 +238,7 @@ EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
 PACKAGE_FNAME = kawa-lib
 EXTRA_GCJ_COMPILED = scm-classes.stamp
 EXTRA_GCJ_INPUTS = *.class
-SCM_COMPILE_FLAGS = --warn-undefined-variable
+SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
 all: all-am
 
 .SUFFIXES:

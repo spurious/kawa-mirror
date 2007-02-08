@@ -86,7 +86,7 @@ public class ObjectType extends Type
     catch (java.lang.SecurityException ex)
       {
         /* The .class syntax below also works for JDK 1.4, but it's just
-           syntactic sugar, so no benefit it using it. */
+           syntactic sugar, so there is no benefit in using it. */
         /* #ifdef JAVA5 */
         // loader = ObjectType.class.getClassLoader();
         /* #else */

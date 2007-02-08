@@ -1,3 +1,7 @@
+2007-02-08  Per Bothner  <per@bothner.com>
+
+	* TypeValue.java: Extend java.lang.reflect.Type if JAVA5.
+
 2007-02-01  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compile): Alwaus set thisType to null

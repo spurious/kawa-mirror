@@ -4,7 +4,11 @@
 package gnu.bytecode;
 import java.util.*;
 
-public abstract class Type {
+public abstract class Type
+/* #ifdef JAVA5 */
+//  implements java.lang.reflect.Type
+/* #endif */
+{
   String signature;
   // Fully-qualified name (in external format, i.e. using '.' to separate).
   String this_name;

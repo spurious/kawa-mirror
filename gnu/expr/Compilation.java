@@ -1150,7 +1150,7 @@ public class Compilation implements SourceLocator
                               .getDeclaredMethod("register", 1));
       }
 
-    if (lexp.initChain != null)
+    if (lexp != null && lexp.initChain != null)
       {
 	// Create dummy lambda, for its closureEnv.  This may be needed
 	// if init.value contains a reference that uses our heap frame.
@@ -1929,7 +1929,7 @@ public class Compilation implements SourceLocator
 	moduleClass = new ClassType(generateClassName("frame"));
 	moduleClass.setSuper(neededSuper);
 	addClass(moduleClass);
-	generateConstructor(moduleClass, module);
+	generateConstructor(moduleClass, null);
       }
 
     curClass = module.type;

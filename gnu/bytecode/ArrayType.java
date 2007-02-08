@@ -2,9 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.io.*;
 import java.util.Vector;
 
 public class ArrayType extends ObjectType
+  implements Externalizable
 {
   public Type elements;
 
@@ -55,6 +57,36 @@ public class ArrayType extends ObjectType
 
   public String getInternalName() { return getSignature(); }
 
+  /* #ifdef JAVA2 */
+  public Class getReflectClass()
+  {
+    try
+      {
+	if (reflectClass == null)
+          {
+            String cname = getInternalName().replace('/', '.');
+            Class elClass = elements.getReflectClass();
+            reflectClass = Class.forName(cname, false,
+                                         elClass.getClassLoader());
+          }
+        flags |= EXISTING_CLASS;
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+        if ((flags & EXISTING_CLASS) != 0)
+          {
+	    RuntimeException rex
+              = new RuntimeException("no such array class: "+getName());
+            /* #ifdef use:java.lang.Throwable.getCause */
+            rex.initCause(ex);
+            /* #endif */
+            throw rex;
+          }
+      }
+    return reflectClass;
+  }
+  /* #endif */
+
   public int getMethods (Filter filter, int searchSupers, Vector result,
 			 String context)
   {
@@ -83,5 +115,28 @@ public class ArrayType extends ObjectType
       return -1;
     else
       return -3;
+  }
+
+  public void writeExternal (ObjectOutput out) throws IOException
+  {
+    out.writeObject(elements);
+  }
+
+  public void readExternal (ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    elements = (Type) in.readObject();
+  }
+
+  public Object readResolve () throws ObjectStreamException
+  {
+    ArrayType array_type = elements.array_type;
+    if (array_type != null)
+      return array_type;
+    else
+      {
+	elements.array_type = this;
+        return this;
+      }
   }
 }

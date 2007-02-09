@@ -1,5 +1,8 @@
 2007-02-08  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (walkClassExp): If class needs static link,
+	then init methods do so as well.
+
 	* Compilation.java (generateConstructor): Allow lexp to be null.
 	(generateBytecode): Call generateConstructor on moduleClss with null
 	lexp.  This prevents emitting initializers in wrong class.

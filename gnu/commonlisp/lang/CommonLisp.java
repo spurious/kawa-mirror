@@ -11,7 +11,6 @@ import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.functions.NumberCompare;
-import gnu.kawa.lispexpr.ReadTable;
 
 public class CommonLisp extends Lisp2
 {

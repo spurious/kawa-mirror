@@ -1,4 +1,4 @@
-;; Copyright (c) 2005, 2006 Per Bothner
+;; Copyright (c) 2005, 2006, 2007 Per Bothner
 ;;
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -108,7 +108,7 @@
 		(> (vector-length obj) 1)
 		(eq (vector-ref obj 0) %test-runner-cookie)))
 	 (define (alloc)
-	   (let ((runner (make-vector 22)))
+	   (let ((runner (make-vector 23)))
 	     (vector-set! runner 0 %test-runner-cookie)
 	     runner))
 	 (begin
@@ -156,6 +156,7 @@
 )
 
 (define (test-runner-reset runner)
+    (test-result-alist! runner '())
     (test-runner-pass-count! runner 0)
     (test-runner-fail-count! runner 0)
     (test-runner-xpass-count! runner 0)

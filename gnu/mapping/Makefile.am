@@ -45,6 +45,7 @@ java_sources=\
   Setter1.java \
   SharedLocation.java \
   SimpleEnvironment.java \
+  SimpleSymbol.java \
   Symbol.java \
   Table2D.java \
   ThreadLocation.java \

@@ -200,7 +200,13 @@ public class Namespace
 	  }
 	*/
 	if (create)
-	  return add(new Symbol(this, key), hash);
+          {
+            if (this == EmptyNamespace)
+              sym = new SimpleSymbol(key);
+            else
+              sym = new Symbol(this, key);
+            return add(sym, hash);
+          }
 	else
 	  return null;
       }

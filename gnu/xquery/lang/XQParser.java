@@ -4083,7 +4083,7 @@ public class XQParser extends Lexer
 	  }
 	if (curToken != STRING_TOKEN)
 	  return declError("missing namespace uri");
-	uri = new String(tokenBuffer, 0, tokenBufferLength);
+	uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (forFunctions)
 	  {
 	    functionNamespacePath = new Namespace[1];

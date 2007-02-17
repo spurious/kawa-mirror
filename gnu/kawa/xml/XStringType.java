@@ -91,13 +91,17 @@ public class XStringType extends XDataType
     boolean status;
     switch (typeCode)
       {
+        /* #ifndef use:java.util.regex */
+        // ; case LANGUAGE_TYPE_CODE:
+        // ; case NMTOKENType:
+        /* #endif */
       case NORMALIZED_STRING_TYPE_CODE:
       case TOKEN_TYPE_CODE:
         // Assumes that TextUtils.replaceWhitespace returns the original
         // string if it was original normalized.
         // This is suboptimal, but the extra cost is minor when the string
         // is already normalized, which presumably is the common case.
-        boolean collapse = typeCode == TOKEN_TYPE_CODE;
+        boolean collapse = typeCode != NORMALIZED_STRING_TYPE_CODE;
         status = value == TextUtils.replaceWhitespace(value, collapse);
         break;
       case NAME_TYPE_CODE:
@@ -113,7 +117,11 @@ public class XStringType extends XDataType
         status = XName.isNmToken(value);
         break;
       default:
+        /* #ifdef use:java.util.regex */
         status = pattern == null || pattern.matcher(value).matches();
+        /* #else */
+        // status = true;
+        /* #endif */
       }
     // If we haven't returned a more specific error message:
     return status ? null : "not a valid XML "+getName();

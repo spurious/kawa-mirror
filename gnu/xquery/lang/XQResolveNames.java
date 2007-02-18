@@ -310,7 +310,7 @@ public class XQResolveNames extends ResolveNames
                     for (int i = 0;  i < functionNamespacePath.length;  i++)
                       {
                         sym = functionNamespacePath[i].getSymbol(name);
-                        decl = lookup.lookup(sym, function);
+                        decl = lookup.lookup(sym, namespace);
                         if (decl != null)
                           break;
                         if (! function)

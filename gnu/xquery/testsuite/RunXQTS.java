@@ -1009,28 +1009,32 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("input-query"))
       {
-        String variable = attributes.getValue("variable");
-        Symbol symbol = Symbol.parse(variable);
-        String name = attributes.getValue("name");
-        String filename
-          = directory + '/' + XQueryQueryOffsetPath + testFilePath
-          + name + XQueryFileExtension;
-        InPort in;
-        try
+        if (selectedTest == null
+            || selectedTest.equals(testName))
           {
-            in = InPort.openFile(filename);
-            Object value = XQuery.getInstance().eval(in);
-            in.close();
-            Environment current = Environment.getCurrent();
-            current.put(symbol, null, value);
-            externalVariablesSet.push(symbol);
-          }
-        catch (Throwable ex)
-          {
-            System.err.println("input-query: cannot open "+filename);
-            System.err.println("caught "+ex);
-            ex.printStackTrace();
-            System.exit(-1);
+            String variable = attributes.getValue("variable");
+            Symbol symbol = Symbol.parse(variable);
+            String name = attributes.getValue("name");
+            String filename
+              = directory + '/' + XQueryQueryOffsetPath + testFilePath
+              + name + XQueryFileExtension;
+            InPort in;
+            try
+              {
+                in = InPort.openFile(filename);
+                Object value = XQuery.getInstance().eval(in);
+                in.close();
+                Environment current = Environment.getCurrent();
+                current.put(symbol, null, value);
+                externalVariablesSet.push(symbol);
+              }
+            catch (Throwable ex)
+              {
+                System.err.println("input-query: cannot open "+filename);
+                System.err.println("caught "+ex);
+                ex.printStackTrace();
+                System.exit(-1);
+              }
           }
       }
     else if (tagMatches("input-file") || tagMatches("contextItem"))

@@ -46,16 +46,22 @@ public class define_alias extends Syntax
             Expression arg = tr.rewrite_car(p, formSyntax);
             if (arg instanceof ReferenceExp)
               ((ReferenceExp) arg).setDontDereference(true);
+            else if (arg instanceof QuoteExp)
+              {
+                decl.setIndirectBinding(false);
+                decl.setFlag(Declaration.IS_CONSTANT);
+              }
             else
-              arg = location.rewrite(arg, tr);
+              {
+                arg = location.rewrite(arg, tr);
+                decl.setType(ClassType.make("gnu.mapping.Location"));
+              }
             tr.mustCompileHere(); // For simplicity.
             tr.push(decl);
             SetExp sexp = new SetExp(decl, arg);
             tr.setLineOf(sexp);
             decl.noteValue(arg);
             sexp.setDefining (true);
-            if (! (arg instanceof ReferenceExp))
-              decl.setType(ClassType.make("gnu.mapping.Location"));
             forms.addElement(sexp);
             return true;
           }

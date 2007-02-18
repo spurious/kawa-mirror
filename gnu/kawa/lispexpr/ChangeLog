@@ -1,6 +1,14 @@
+2007-02-18  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (checkDefaultBinding): New method.
+	* LangObjType.java (typeClass, typeType, typeClassType): New constants.
+	(compare, emitTestIf, emitCoerceFromObject): Handle new types.
+	(coerceToClassOrNull. coerceToClass, coerceToClassTypeOrNull,
+	coerceToClassType, coerceToTypeOrNull, coerceToType): New statics.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
-	* LangObjType.java: Extens ObjectType rather than ClassType.
+	* LangObjType.java: Extends ObjectType rather than ClassType.
 	(compare, getMethod): New methods.
 
 	* ReadTable.java (getReaderCtor): Generalize from Procedure to Object.

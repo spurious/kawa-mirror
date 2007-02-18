@@ -159,4 +159,13 @@ public abstract class LispLanguage extends Language
       return getSymbol((String) sym);
     return (Symbol) sym;
   }
+
+  /** If a symbol is lexically unbound, look for a default binding.
+   * The default implementation does nothing.
+   * @return null if no binidng, or an Expression.
+   */
+  public Expression checkDefaultBinding (Symbol name, Translator tr)
+  {
+    return null;
+  }
 }

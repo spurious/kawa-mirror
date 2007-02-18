@@ -10,6 +10,9 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int PATH_TYPE_CODE = 1;
   private static final int FILEPATH_TYPE_CODE = 2;
   private static final int URI_TYPE_CODE = 3;
+  private static final int CLASS_TYPE_CODE = 4;
+  private static final int TYPE_TYPE_CODE = 5;
+  private static final int CLASSTYPE_TYPE_CODE = 6;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -21,18 +24,49 @@ public class LangObjType extends ObjectType implements TypeValue
     new LangObjType("URI", "gnu.text.URIPath",
                     URI_TYPE_CODE);
 
+  public static final LangObjType typeClass =
+    new LangObjType("class", "java.lang.Class",
+                    CLASS_TYPE_CODE);
+  public static final LangObjType typeType =
+    new LangObjType("type", "gnu.bytecode.Type",
+                    TYPE_TYPE_CODE);
+  public static final LangObjType typeClassType =
+    new LangObjType("class-type", "gnu.bytecode.ClassType",
+                    CLASSTYPE_TYPE_CODE);
+
   LangObjType(String name, String implClass, int typeCode)
   {
     super(name);
     this.implementationType = ClassType.make(implClass);
     this.typeCode = typeCode;
+    this.setSignature(this.implementationType.getSignature());
   }
 
   ClassType implementationType;
 
   public int compare(Type other)
   {
-    return getImplementationType().compare(other);
+    switch (typeCode)
+      {
+      case CLASS_TYPE_CODE:
+        if (other == typeType || other == typeClassType
+            || other == typeType.implementationType
+            || other == typeClassType.implementationType)
+          return -1;
+        break;
+      case TYPE_TYPE_CODE:
+        if (other == typeClass || other == typeClassType
+            || other == typeClass.implementationType
+            || other == typeClassType.implementationType)
+          return 1;
+      case CLASSTYPE_TYPE_CODE:
+        if (other == typeClass || other == typeClass.implementationType)
+          return 1;
+        if (other == typeType || other == typeClass.implementationType)
+          return -1;
+        break;
+      }
+    return getImplementationType().compare(other.getImplementationType());
   }
 
   public int getMethods (Filter filter, int searchSupers,
@@ -64,11 +98,76 @@ public class LangObjType extends ObjectType implements TypeValue
     gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
   }
 
- public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  public static Class coerceToClassOrNull (Object type)
+  {
+    if (type instanceof Class)
+      return (Class) type;
+    if (type instanceof Type)
+      {
+        if (type instanceof ClassType
+            && ! (type instanceof PairClassType))
+          return ((ClassType) type).getReflectClass();
+        // FIXME: Handle ArrayType and PrimType.
+      }
+    return null;
+  }
+
+  public static Class coerceToClass (Object obj)
+  {
+    Class coerced = coerceToClassOrNull(obj);
+    if (coerced == null && obj != null)
+      throw new ClassCastException("cannot cast "+obj+" to type");
+    return coerced;
+  }
+
+  public static ClassType coerceToClassTypeOrNull (Object type)
+  {
+    if (type instanceof ClassType)
+      return (ClassType) type;
+    if (type instanceof Class)
+      {
+        Language language = Language.getDefaultLanguage();
+        Type t = language.getTypeFor((Class) type);
+        if (t instanceof ClassType)
+          return (ClassType) t;
+      }
+    return null;
+  }
+
+  public static ClassType coerceToClassType (Object obj)
+  {
+    ClassType coerced = coerceToClassTypeOrNull(obj);
+    if (coerced == null && obj != null)
+      throw new ClassCastException("cannot cast "+obj+" to class-type");
+    return coerced;
+  }
+
+  public static Type coerceToTypeOrNull (Object type)
+  {
+    if (type instanceof Type)
+      return (Type) type;
+    if (type instanceof Class)
+      {
+        Language language = Language.getDefaultLanguage();
+        return language.getTypeFor((Class) type);
+      }
+    return null;
+  }
+
+  public static Type coerceToType (Object obj)
+  {
+    Type coerced = coerceToTypeOrNull(obj);
+    if (coerced == null && obj != null)
+       throw new ClassCastException("cannot cast "+obj+" to type");
+    return coerced;
+  }
+
+  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
   {
     CodeAttr code = comp.getCode();
     if (incoming != null)
       code.emitLoad(incoming);
+    ClassType methodDeclaringClass = implementationType;
     String mname;
     switch (typeCode)
       {
@@ -81,9 +180,21 @@ public class LangObjType extends ObjectType implements TypeValue
       case URI_TYPE_CODE:
         mname = "coerceToURIPathOrNull";
         break;
+      case CLASS_TYPE_CODE:
+        methodDeclaringClass = typeLangObjType;
+        mname = "coerceToClassOrNull";
+        break;
+      case CLASSTYPE_TYPE_CODE:
+        methodDeclaringClass = typeLangObjType;
+        mname = "coerceToClassTypeOrNull";
+        break;
+      case TYPE_TYPE_CODE:
+        methodDeclaringClass = typeLangObjType;
+        mname = "coerceToTypeOrNull";
+        break;
       default: mname = null;
       }
-    code.emitInvokeStatic(implementationType.getDeclaredMethod(mname, 1));
+    code.emitInvokeStatic(methodDeclaringClass.getDeclaredMethod(mname, 1));
     if (decl != null)
       {
         code.emitDup();
@@ -102,13 +213,32 @@ public class LangObjType extends ObjectType implements TypeValue
         return FilePath.makeFilePath(obj);
       case URI_TYPE_CODE:
         return URIPath.makeURI(obj);
+      case CLASS_TYPE_CODE:
+        return coerceToClass(obj);
+      case CLASSTYPE_TYPE_CODE:
+        return coerceToClassType(obj);
+      case TYPE_TYPE_CODE:
+        return coerceToType(obj);
       default: return null;
       }
   }
 
   public void emitCoerceFromObject (CodeAttr code)
   {
-    code.emitInvoke(((PrimProcedure) getConstructor()).getMethod());
+    switch (typeCode)
+      {
+      case CLASS_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToClass", 1));
+        break;
+      case CLASSTYPE_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToClassType", 1));
+        break;
+      case TYPE_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToType", 1));
+        break;
+      default:
+        code.emitInvoke(((PrimProcedure) getConstructor()).getMethod());
+      }
   }
 
   public Procedure getConstructor ()
@@ -124,4 +254,7 @@ public class LangObjType extends ObjectType implements TypeValue
       default: return null;
       }
   }
+
+  public static final ClassType typeLangObjType =
+    ClassType.make("gnu.kawa.lispexpr.LangObjType");
 }

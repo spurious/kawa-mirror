@@ -651,7 +651,14 @@ public abstract class Language
         if (decl != null)
 	  {
 	    exp = decl.getValue();
-	    if (decl.isAlias()
+            if (exp instanceof QuoteExp
+                && decl.getFlag(Declaration.IS_CONSTANT)
+                && ! decl.isIndirectBinding())
+              {
+		Object val = ((QuoteExp) exp).getValue();
+                return getTypeFor(val, lenient);
+              }
+	    else if (decl.isAlias()
 		&& exp instanceof QuoteExp)
 	      {
 		Object val = ((QuoteExp) exp).getValue();

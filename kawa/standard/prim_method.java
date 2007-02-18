@@ -66,6 +66,8 @@ public class prim_method extends Syntax
       {
         ClassType cl = null;
         Type ctype = tr.exp2Type((Pair) obj);
+        if (ctype != null)
+          ctype = ctype.getImplementationType();
         try
           {
             cl = (ClassType) ctype;

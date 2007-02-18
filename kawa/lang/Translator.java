@@ -683,6 +683,13 @@ public class Translator extends Compilation
                     decl = null;
                   }
               }
+            else
+              {
+                Expression e
+                  = ((LispLanguage) getLanguage()).checkDefaultBinding(symbol, this);
+                if (e != null)
+                  return e;
+              }
 	    /*
             else if (Compilation.inlineOk && function)
               {

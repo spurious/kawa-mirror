@@ -963,8 +963,9 @@ public class Scheme extends LispLanguage
 	types.put ("string-output-port",
                    ClassType.make("gnu.mapping.CharArrayOutPort"));
 	types.put ("record", ClassType.make("kawa.lang.Record"));
-	types.put ("type", ClassType.make("gnu.bytecode.Type"));
-	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
+	types.put ("type", LangObjType.typeType);
+	types.put ("class-type", LangObjType.typeClassType);
+	types.put ("class", LangObjType.typeClass);
 
         types.put ("s8vector", ClassType.make("gnu.lists.S8Vector"));
         types.put ("u8vector", ClassType.make("gnu.lists.U8Vector"));
@@ -1011,6 +1012,12 @@ public class Scheme extends LispLanguage
       return LangObjType.URIType;
     if ("gnu.text.FilePath".equals(name))
       return LangObjType.filepathType;
+    if ("java.lang.Class".equals(name))
+      return LangObjType.typeClass;
+    if ("gnu.bytecode.Type".equals(name))
+      return LangObjType.typeType;
+    if ("gnu.bytecode.ClassType".equals(name))
+      return LangObjType.typeClassType;
     return Type.make(clas);
   }
 
@@ -1038,54 +1045,62 @@ public class Scheme extends LispLanguage
     return string2Type(name);
   }
 
-  public Type getTypeFor (Expression exp, boolean lenient)
-  {
-    Type type = super.getTypeFor(exp, lenient);
-    if (type == null && exp instanceof ReferenceExp)
-      {
-        ReferenceExp rexp = (ReferenceExp) exp;
-        Declaration decl = rexp.getBinding();
-        if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
-          {
-            // If the identifier is the nameof a valid class in the classpath,
-            // use that.  This is Scheme-specific for now - we don't want this
-            // for ELisp, because it has dynamic scoping, so this case
-            // would be triggered too often.
-            String name = rexp.getName();
-            int len = name.length();
-            int rank = 0;
-            while (len > 2
-                   && name.charAt(len-2) == '[' && name.charAt(len-1) == ']')
-              {
-                len -= 2;
-                rank++;
-              }
-            if (rank != 0)
-              name = name.substring(0, len);
-            try
-              {
-                Class clas = ClassType.getContextClass(name);
-                if (clas != null)
-                  {
-                    type = Type.make(clas);
-                    while (--rank >= 0)
-                      type = ArrayType.make(type);
-                  }
-              }
-            catch (Throwable ex)
-              {
-              }
-          }
-      }
-    return type;
-  }
-
   /** Convert expression to a Type.
    * Allow "TYPE" or 'TYPE or <TYPE>.
    */
   public static Type exp2Type (Expression exp)
   {
     return getInstance().getTypeFor(exp);
+  }
+
+  /** If a symbol is lexically unbound, look for a default binding.
+   * If the symbol is the name of an existing Java type/class,
+   * return that Class.
+   * Handles both with and without (semi-deprecated) angle-brackets:
+   * {@code <java.lang.Integer>} and {@code java.lang.Integer}.
+   * Also handles arrays, such as {@code java.lang.String[]}.
+   */
+  public Expression checkDefaultBinding (Symbol symbol, Translator tr)
+  {
+    String name = symbol.toString();
+    int len = name.length();
+    if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
+      {
+        name = name.substring(1, len-1);
+        len -= 2;
+      }
+    int rank = 0;
+    while (len > 2 && name.charAt(len-2) == '[' && name.charAt(len-1) == ']')
+      {
+        len -= 2;
+        rank++;
+      }
+    if (rank != 0)
+      name = name.substring(0, len);
+    try
+      {
+        Type type = Type.lookupType(name);
+        Class clas;
+        if (type instanceof gnu.bytecode.PrimType)
+          clas = type.getReflectClass();
+        else
+          clas = ClassType.getContextClass(name);
+        if (clas != null)
+          {
+            if (rank > 0)
+              {
+                type = Type.make(clas);
+                while (--rank >= 0)
+                  type = gnu.bytecode.ArrayType.make(type);
+                clas = type.getReflectClass();
+              }
+            return QuoteExp.getInstance(clas);
+          }
+      }
+    catch (Throwable ex)
+      {
+      }
+    return null;
   }
 
   public Expression makeApply (Expression func, Expression[] args)

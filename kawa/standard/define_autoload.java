@@ -34,8 +34,13 @@ public class define_autoload extends Syntax
       {
 	for (;;)
 	  {
-	    if (! (p.car instanceof FString))
+            /* #ifdef use:java.lang.CharSequence */
+	    if (! (p.car instanceof CharSequence))
 	      break;
+            /* #else */
+	    // if (! (p.car instanceof String || p.car instanceof CharSeq))
+	    //   break;
+            /* #endif */
 	    if (! scanFile(p.car.toString(), defs, tr))
 	      return false;
 	    Object rest = p.cdr;

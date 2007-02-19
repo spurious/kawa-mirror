@@ -39,7 +39,7 @@ public class ReaderDispatch extends ReadTableEntry
 
   /** Create a fresh instance and initialize it appropriately for Common Lisp.
    */
-  public static ReaderDispatch create()
+  public static ReaderDispatch create(ReadTable rtable)
   {
     ReaderDispatch tab = new ReaderDispatch();
     ReaderDispatchMisc entry = ReaderDispatchMisc.getInstance();
@@ -58,7 +58,7 @@ public class ReaderDispatch extends ReadTableEntry
     tab.set('|', entry);
     tab.set('!', entry);
     tab.set('\\', entry);
-    tab.set('\'', new ReaderQuote("function"));
+    tab.set('\'', new ReaderQuote(rtable.makeSymbol("function")));
     tab.set('(', new ReaderVector(')'));
     return tab;
   }

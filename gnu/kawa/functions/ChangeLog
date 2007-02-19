@@ -1,3 +1,15 @@
+2007-02-18  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (combine, makeExp): Handle String->Symbol change.
+	* GetNamedInstancePart.java (makeExp): Likewise.
+	* MakeProcedure.java (inline): Likewise.
+	* Format.java (format$V): Likewise.
+	* DisplayFormat.java (writeObject, writeObjectRaw):
+	Handle String/Symbol rep changes.
+	(writeReadableSymbol(Symbol,Consumer)): New method.
+	* IsEqual.java (apply): Explicit recursion, since equal String
+	and FString should compare as equal? for Scheme.
+	
 2007-02-05  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Check if container implements

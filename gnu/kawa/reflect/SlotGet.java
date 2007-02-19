@@ -63,13 +63,19 @@ public class SlotGet extends Procedure2
           isName = mname;
         fname = null;
       }
-    else if (! (arg2 instanceof String) && ! (arg2 instanceof FString))
-      throw new WrongType(this, 2, arg2, "string");
-    else
+    else if (arg2 instanceof SimpleSymbol
+             /* #ifdef use:java.lang.CharSequence */
+             || arg2 instanceof CharSequence
+             /* #else */
+             // || arg2 instanceof gnu.lists.CharSeq || arg2 instanceof String
+             /* #endif */
+             )
       {
         name = arg2.toString();
         fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
       }
+    else
+      throw new WrongType(this, 2, arg2, "string");
     // "intern" fname if it is "class" or "length":
     if ("class".equals(fname))
       fname = "class";

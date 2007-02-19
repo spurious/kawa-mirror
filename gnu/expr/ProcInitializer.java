@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.PropertySet;
 
 public class ProcInitializer extends Initializer
 {
@@ -80,7 +81,7 @@ public class ProcInitializer extends Initializer
 	  {
 	    Object key = proc.properties[i];
 	    // Skip "name" property since we've taken care of that specially.
-	    if (key != null && key != "name")
+	    if (key != null && key != PropertySet.nameKey)
 	      {
 		Object val = proc.properties[i+1];
 		code.emitDup(1);

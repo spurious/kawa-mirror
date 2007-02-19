@@ -68,14 +68,14 @@ public class ReadTable extends RangeTable
     set('\177',entry);
     set('\b', entry);
     set('\"', new ReaderString());
-    set('#',  ReaderDispatch.create());
+    set('#',  ReaderDispatch.create(this));
     set(';',  ReaderIgnoreRestOfLine.getInstance());
     set('(',  ReaderParens.getInstance('(', ')'));
 
-    set('\'', new ReaderQuote(LispLanguage.quote_sym));
-    set('`',  new ReaderQuote(LispLanguage.quasiquote_sym));
-    set(',',  new ReaderQuote(LispLanguage.unquote_sym,
-				 '@', LispLanguage.unquotesplicing_sym));
+    set('\'', new ReaderQuote(makeSymbol(LispLanguage.quote_sym)));
+    set('`',  new ReaderQuote(makeSymbol(LispLanguage.quasiquote_sym)));
+    set(',',  new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
+                              '@', makeSymbol(LispLanguage.unquotesplicing_sym)));
 
     setBracketMode();  // Sets the entries for '[', ']', and '<'.
 
@@ -198,6 +198,6 @@ public class ReadTable extends RangeTable
 
   protected Object makeSymbol (String name)
   {
-    return name.intern();
+    return Namespace.EmptyNamespace.getSymbol(name.intern());
   }
 }

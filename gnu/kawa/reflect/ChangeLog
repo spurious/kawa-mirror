@@ -1,3 +1,8 @@
+2007-02-18  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (apply2): Also allow SimpleSymbol or SimpleSymbol.
+	* SlotSet.java (apply3): Generalize method name type.
+
 2007-01-17  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (compile): Handle default case similarly as

@@ -259,14 +259,15 @@ public class GenericProc extends MethodProc
 	Object arg = args[i];
 	if (arg instanceof Keyword)
 	  {
-	    String name = ((Keyword) arg).getName();
+            Keyword key = (Keyword) arg;
+	    String name = key.getName();
 	    Object value = args[++i];
 	    if (name == "name")
 	      setName(value.toString());
 	    else if (name == "method")
 	      add((MethodProc) value);
 	    else
-	      setProperty(name, value);
+	      setProperty(key.asSymbol(), value);
 	  }
 	else
 	  add((MethodProc) arg);

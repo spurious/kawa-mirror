@@ -8,11 +8,11 @@ import gnu.mapping.*;
 
 public class NamedException extends RuntimeException
 {
-  String name;
+  Symbol name;
   // Arguments to throw (including, for efficiency, the name).
   Object[] args;
 
-  public NamedException (String name, Object[] args)
+  public NamedException (Symbol name, Object[] args)
   {
     this.name = name;
     this.args = args;

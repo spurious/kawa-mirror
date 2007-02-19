@@ -332,7 +332,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		tr.popPositionOf(savePos);
 	      }
 	  }
-	else if (pattern instanceof String || pattern instanceof Symbol)
+	else if (pattern instanceof Symbol)
 	  {
 	    for (int j = literal_identifiers.length;  --j >= 0; )
 	      {
@@ -560,8 +560,6 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    Object lit = literals[value];
 	    // We should be using Translator's matches routine, but the current
 	    // Translator isn't available, so here is a special-purpose kludge.
-	    if (lit instanceof String && obj instanceof Symbol)
-	      obj = ((Symbol) obj).getName();
 	    return lit.equals(obj);
 	  case MATCH_ANY:
 	    if (syntax != null)
@@ -664,8 +662,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  }
 	else
 	  wrapped = literal; // FIXME
-	if (! (literal instanceof String 
-               || literal instanceof gnu.mapping.Symbol))
+	if (! (literal instanceof Symbol))
           tr.error('e', "non-symbol '"+literal+"' in literals list");
 	literals[i] = wrapped;
 	list = pair.cdr;

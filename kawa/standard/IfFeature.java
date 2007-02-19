@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
+import gnu.mapping.SimpleSymbol;
 
 public class IfFeature
 {
@@ -11,8 +12,8 @@ public class IfFeature
 	SyntaxForm sf = (SyntaxForm) form;
 	form = sf.form;
       }
-    if (form instanceof String)
-      return hasFeature((String) form);
+    if (form instanceof String || form instanceof SimpleSymbol)
+      return hasFeature(form.toString());
     return false;  // FIXME - return error
   }
 

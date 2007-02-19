@@ -26,7 +26,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     String name1;
     Object name2;
     if (part2 instanceof QuoteExp
-        && (name2 = ((QuoteExp) part2).getValue()) instanceof String
+        && (name2 = ((QuoteExp) part2).getValue()) instanceof SimpleSymbol
         && ((part1 instanceof ReferenceExp
              && (name1 = ((ReferenceExp) part1).getSimpleName()) != null)
             || (part1 instanceof GetNamedExp
@@ -43,11 +43,11 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     if (combinedName != null)
       {
         Translator tr = (Translator) Compilation.getCurrent();
-        Declaration decl = tr.lexical.lookup(combinedName, false/*FIXME*/);
+        Symbol symbol = Namespace.EmptyNamespace.getSymbol(combinedName);
+        Declaration decl = tr.lexical.lookup(symbol, false/*FIXME*/);
         if (! Declaration.isUnknown(decl))
           return new ReferenceExp(decl);
 
-        Symbol symbol = env.defaultNamespace().lookup(combinedName);
         Object property = null; // FIXME?
         if (symbol != null && env.isBound(symbol, property))
           return new ReferenceExp(combinedName);

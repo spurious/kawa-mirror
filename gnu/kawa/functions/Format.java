@@ -84,8 +84,12 @@ public class Format extends ProcedureN
       {
 	return formatToString(args, 1);
       }
-    else if (port_arg instanceof FString
-	     || port_arg instanceof MessageFormat
+    else if (port_arg instanceof MessageFormat
+             /* #ifdef use:java.lang.CharSequence */
+             || port_arg instanceof CharSequence
+             /* #else */
+             // || port_arg instanceof String || port_arg instanceof CharSeq
+             /* #endif */
 	     || port_arg instanceof ReportFormat)
       {
 	return formatToString(args, 0);

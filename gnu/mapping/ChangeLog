@@ -1,4 +1,10 @@
-2007-02-16  Per Bothner  <per@bothner.com>
+2007-02-18  Per Bothner  <per@bothner.com>
+
+	* PropertySet.java (nameKey): Change type to Symbol.
+	* Procedure.java (setterKey): Likewise.
+	* CharArrayInPort.java (make): New factory method.
+
+2007-02-17  Per Bothner  <per@bothner.com>
 
 	* Namespace.java (lookup): Return SimpleSymbol if appropriate.
 

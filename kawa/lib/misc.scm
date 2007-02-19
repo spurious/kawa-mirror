@@ -16,14 +16,13 @@
   (or (eq? x #t) (eq? x #f)))
 
 (define (symbol? x) :: <boolean>
-  (or (instance? x <java.lang.String>)
-      (instance? x <gnu.mapping.Symbol>)))
+  (instance? x <gnu.mapping.Symbol>))
 
-(define (symbol->string (s <symbol>))
-  (make <string> s))
+(define (symbol->string (s <symbol>)) :: constant-string
+  (s:toString))
 
 (define (string->symbol (str <string>))
-  (invoke (invoke str 'toString) 'intern))
+  (gnu.mapping.SimpleSymbol:valueOf (str:toString)))
 
 (define (procedure? x) :: <boolean>
   (instance? x <function>))
@@ -66,11 +65,9 @@
 (define (interaction-environment)
   (invoke-static <gnu.mapping.Environment> 'user))
 
-(define (scheme-implementation-version)
-  (constant-fold
-   (primitive-constructor <string> (<java.lang.String>))
-   (constant-fold (primitive-static-method <kawa.Version> "getVersion"
-					   <java.lang.String> ()))))
+(define (scheme-implementation-version) :: constant-string
+  (kawa.Version:getVersion))
+
 (define (set-procedure-property! proc :: <procedure> key value)
   (invoke proc 'setProperty key value))
 

@@ -102,7 +102,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
   public Object apply3 (Object obj, Object fname, Object value)
   {
-    apply(isStatic, obj, (String) fname, value);
+    // Should actually check type rather than just calling toString.  FIXME.
+    apply(isStatic, obj, fname.toString(), value);
     return returnSelf ? obj : Values.empty;
   }
 

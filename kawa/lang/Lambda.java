@@ -147,7 +147,7 @@ public class Lambda extends Syntax
 	  lexp.min_args++;
 	bindings = pair.cdr;
       }
-    if (bindings instanceof String || bindings instanceof Symbol)
+    if (bindings instanceof Symbol)
       {
 	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
 	  {
@@ -223,7 +223,7 @@ public class Lambda extends Syntax
 	    tr.syntaxError("'::' must follow parameter name");
 	    return;
 	  }
-	if (pair_car instanceof String || pair_car instanceof Symbol)
+	if (pair_car instanceof Symbol)
           {
             name = pair_car;
             if (pair.cdr instanceof Pair
@@ -250,8 +250,7 @@ public class Lambda extends Syntax
 		pair_car = sf.form;
 		templateScope = sf.scope;
 	      }
-	    if ((pair_car instanceof String
-		 || pair_car instanceof Symbol)
+	    if (pair_car instanceof Symbol
 		&& p.cdr instanceof Pair)
 	      {
 		name = pair_car;
@@ -339,7 +338,7 @@ public class Lambda extends Syntax
 	bindings = sf.form;
 	templateScopeRest = sf.scope;
       }
-    if (bindings instanceof String || bindings instanceof Symbol)
+    if (bindings instanceof Symbol)
       {
 	Declaration decl = new Declaration(bindings);
 	decl.setType(Compilation.scmListType);
@@ -407,8 +406,14 @@ public class Lambda extends Syntax
 	  {
 	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
 	    if (! (attrExpr instanceof QuoteExp)
-		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
-		      || attrValue instanceof FString))
+		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof SimpleSymbol
+                      /* #ifdef use:java.lang.CharSequence */
+		      || attrValue instanceof CharSequence
+                      /* #else */
+		      // || attrValue instanceof String
+                      // || attrValue instanceof CharSeq
+                      /* #endif */
+                      ))
 	      tr.error('e', "access: value not a constant symbol or string");
 	    else if (lexp.nameDecl == null)
 	      tr.error('e', "access: not allowed for anonymous function");
@@ -438,8 +443,14 @@ public class Lambda extends Syntax
 	  {
 	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
 	    if (! (attrExpr instanceof QuoteExp)
-		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
-		      || attrValue instanceof FString))
+		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof SimpleSymbol
+                      /* #ifdef use:java.lang.CharSequence */
+		      || attrValue instanceof CharSequence
+                      /* #else */
+		      // || attrValue instanceof String
+                      // || attrValue instanceof CharSeq
+                      /* #endif */
+		      ))
 	      tr.error('e', "allocation: value not a constant symbol or string");
 	    else if (lexp.nameDecl == null)
 	      tr.error('e', "allocation: not allowed for anonymous function");

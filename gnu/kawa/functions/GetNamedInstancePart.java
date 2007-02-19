@@ -28,7 +28,7 @@ public class GetNamedInstancePart extends ProcedureN
     if (member instanceof QuoteExp)
       {
         Object val = ((QuoteExp) member).getValue();
-        if (val instanceof String)
+        if (val instanceof SimpleSymbol)
           return QuoteExp.getInstance(new GetNamedInstancePart(val.toString()));
       }
     Expression[] args = new Expression[2];

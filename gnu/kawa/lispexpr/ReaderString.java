@@ -66,8 +66,13 @@ public class ReaderString extends ReadTableEntry
 		break;
 	      }
 	  }
-	return new gnu.lists.FString (in.tokenBuffer, startPos,
-				      in.tokenBufferLength - startPos);
+        /* #ifdef use:java.lang.CharSequence */
+	return new String(in.tokenBuffer, startPos,
+                          in.tokenBufferLength - startPos);
+        /* #else */
+        // return new gnu.lists.FString (in.tokenBuffer, startPos,
+        //                               in.tokenBufferLength - startPos);
+        /* #endif */
       }
     finally
       {

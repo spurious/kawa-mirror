@@ -22,7 +22,7 @@ public abstract class LispLanguage extends Language
   static public final String unquotesplicing_sym = "unquote-splicing";
   static public final String quasiquote_sym = "quasiquote";
   /** Used for Kawa infix ':' operator. */
-  static public final String lookup_sym = "$lookup$";
+  static public final Symbol lookup_sym = Namespace.EmptyNamespace.getSymbol("$lookup$");
 
   /** The default <code>ReadTable</code> for this language. */
   public ReadTable defaultReadTable = createReadTable();

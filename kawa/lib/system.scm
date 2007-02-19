@@ -89,7 +89,7 @@
   (let* ((messages :: <gnu.text.SourceMessages>
 		   (make <gnu.text.SourceMessages>))
 	 (comp :: <gnu.expr.Compilation>
-	       (invoke-static <kawa.lang.CompileFile> 'read source messages)))
+	       (invoke-static <kawa.lang.CompileFile> 'read (source:toString) messages)))
     (if (invoke messages 'seenErrors)
 	(primitive-throw (make <gnu.text.SyntaxException> messages)))
     (invoke comp 'compileToArchive

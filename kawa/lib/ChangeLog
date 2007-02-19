@@ -1,5 +1,20 @@
 2007-02-18  Per Bothner  <per@bothner.com>
 
+	* files.scm: Change various functions to return java.lang.String
+	rather than converting to FString.
+	* keywords.scm: Likewise.
+	* syntax.scm: Likewise.
+	* reflection.scm: Likewise.
+	* ports.scm: Likewise.
+	(define-alias-parameter): Simplify - use Symbol directly.
+	(open-input-string, call-with-input-string): Use new
+	CharArrayInPort.make factory method.
+	* numbers.scm (string->number): Use new LispReader.parseNumber method.
+	* strings.scm: Update for new string typing.
+	* misc.scm (scheme-implementation-version): Simplify.
+	(symbol->string): Now returns a constant-string.
+	* system.scm (compile-file): Explicitly call toString.
+
 	* files.scm (path-directory, path-parent): Add toString invocation.
 
 2007-02-08  Per Bothner  <per@bothner.com>

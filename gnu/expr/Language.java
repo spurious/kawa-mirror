@@ -716,6 +716,16 @@ public abstract class Language
           }
 	fdname = Compilation.demangleName(fname, true).intern();
       }
+    if (fdname instanceof String)
+      {
+        String uri = mod.getNamespaceUri();
+        String sname = (String) fdname;
+        Symbol sym;
+        if (uri == null)
+          fdname = SimpleSymbol.valueOf(sname);
+        else
+          fdname = Symbol.make(uri, sname);
+      }
     Type dtype = isAlias ? Type.pointer_type
       : getTypeFor(ftype.getReflectClass());
     Declaration fdecl = mod.addDeclaration(fdname, dtype);

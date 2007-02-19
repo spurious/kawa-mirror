@@ -80,7 +80,7 @@
 	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
 	((instance? form <gnu.lists.PairWithPosition>)
 	 (let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
-	   (if (eq? str #!null) #f  (make <string> str))))
+	   (if (eq? str #!null) #f  str)))
 	(else
 	 #f)))
 

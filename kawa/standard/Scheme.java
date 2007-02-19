@@ -81,9 +81,8 @@ public class Scheme extends LispLanguage
     String cname = "gnu.kawa.functions.GetNamedPart";
     String fname = "getNamedPart";
     getNamedPartDecl = Declaration.getDeclarationFromStatic(cname, fname);
-    Symbol lookup_sym = instance.getSymbol("$lookup$");
     StaticFieldLocation loc
-      = StaticFieldLocation.define(instance.environ, lookup_sym, null,
+      = StaticFieldLocation.define(instance.environ, LispLanguage.lookup_sym, null,
                                    cname, fname);
     loc.setProcedure();
     loc.setDeclaration(getNamedPartDecl);
@@ -946,13 +945,19 @@ public class Scheme extends LispLanguage
 	types.put ("real", ClassType.make("gnu.math.RealNum"));
 	types.put ("rational", ClassType.make("gnu.math.RatNum"));
 	types.put ("integer", ClassType.make("gnu.math.IntNum"));
-	types.put ("symbol", ClassType.make("java.lang.String"));
+	types.put ("symbol", ClassType.make("gnu.mapping.Symbol"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
 	types.put ("list", ClassType.make("gnu.lists.LList"));
 	types.put ("pair", ClassType.make("gnu.lists.Pair"));
 	types.put ("pair-with-position",
 		   ClassType.make("gnu.lists.PairWithPosition"));
-	types.put ("string", ClassType.make("gnu.lists.FString"));
+        /* #ifdef use:java.lang.CharSequence */
+	types.put ("string", ClassType.make("java.lang.CharSequence"));
+        /* #else */
+        // /* better would be a union of CharSeq and java.lang.String. */
+	// types.put ("string", ClassType.make("gnu.lists.FString"));
+        /* #endif */
+	types.put ("constant-string", ClassType.make("java.lang.String"));
 	types.put ("abstract-string", ClassType.make("gnu.lists.CharSeq"));
 	types.put ("character", ClassType.make("gnu.text.Char"));
 	types.put ("vector", ClassType.make("gnu.lists.FVector"));
@@ -1117,13 +1122,18 @@ public class Scheme extends LispLanguage
     return new ApplyExp(new ReferenceExp(applyFieldDecl), exps);
   }
 
+  public Symbol asSymbol (String ident)
+  {
+    return Namespace.EmptyNamespace.getSymbol(ident);
+  }
+
   public ReadTable createReadTable ()
   {
     ReadTable tab = ReadTable.createInitial();
     tab.postfixLookupOperator = ':';
     ReaderDispatch dispatchTable = (ReaderDispatch) tab.lookup('#');
-    dispatchTable.set('\'', new ReaderQuote("syntax"));
-    dispatchTable.set('`', new ReaderQuote("quasisyntax"));
+    dispatchTable.set('\'', new ReaderQuote(asSymbol("syntax")));
+    dispatchTable.set('`', new ReaderQuote(asSymbol("quasisyntax")));
     dispatchTable.set(',', ReaderDispatchMisc.getInstance());
     tab.putReaderCtorFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
     tab.putReaderCtorFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");

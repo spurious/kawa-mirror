@@ -325,7 +325,7 @@ public class SyntaxTemplate implements Externalizable
 	template_program.append((char) BUILD_NIL);
 	return -2;
       }
-    else if (form instanceof String
+    else if (form instanceof Symbol
 	     && tr != null && tr.patternScope != null)
       {
 	int pattern_var_num = indexOf(tr.patternScope.pattern_names, form);
@@ -350,7 +350,7 @@ public class SyntaxTemplate implements Externalizable
 	literals_index = literals_vector.size ();
 	literals_vector.addElement(form);
       }
-    if (form instanceof String || form instanceof Symbol)
+    if (form instanceof Symbol)
       tr.noteAccess(form, tr.currentScope());
     if (! (form instanceof SyntaxForm) && form != dots3)
       template_program.append((char) (BUILD_SYNTAX));

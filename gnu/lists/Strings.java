@@ -44,7 +44,7 @@ public class Strings
                                   /* #ifdef use:java.lang.CharSequence */
                                   CharSequence str,
                                   /* #else */
-                                  // CharSeq str,
+                                  // String str,
                                   /* #endif */
 				  java.io.PrintWriter ps, int escapes)
   {

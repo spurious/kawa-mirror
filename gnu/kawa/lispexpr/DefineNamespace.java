@@ -30,14 +30,14 @@ public class DefineNamespace extends Syntax
   {
     Pair p1, p2;
     if (! (st.cdr instanceof Pair)
-        || ! ((p1 = (Pair) st.cdr).car instanceof String)
+        || ! ((p1 = (Pair) st.cdr).car instanceof Symbol)
 	|| ! (p1.cdr instanceof Pair)
 	|| (p2 = (Pair) p1.cdr).cdr != LList.Empty)
       {
 	tr.error('e', "invalid syntax for define-namespace");
 	return false;
       }
-    String name = (String) p1.car;
+    Symbol name = (Symbol) p1.car;
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
@@ -51,7 +51,12 @@ public class DefineNamespace extends Syntax
     Translator.setLine(decl, p1);
     Expression value;
     String literal = null;
-    if (p2.car instanceof FString)
+    if
+      /* #ifdef use:java.lang.CharSequence */
+      (p2.car instanceof CharSequence) 
+      /* #else */
+      // (p2.car instanceof CharSeq || p2.car instanceof String) 
+      /* #endif */
       {
         literal = p2.car.toString();
         Namespace namespace;
@@ -64,7 +69,7 @@ public class DefineNamespace extends Syntax
           }
         else if (makeXML)
           {
-            namespace = XmlNamespace.getInstance(name, literal);
+            namespace = XmlNamespace.getInstance(name.getName(), literal);
             decl.setType(ClassType.make("gnu.kawa.xml.XmlNamespace"));
           }
         else

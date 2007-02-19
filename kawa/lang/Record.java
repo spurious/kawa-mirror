@@ -261,7 +261,7 @@ public class Record
       {
 	if ((field.getModifiers() & (Modifier.STATIC|Modifier.PUBLIC))
 	    == Modifier.PUBLIC)
-	  vec.addElement(field.getSourceName());
+	  vec.addElement(SimpleSymbol.valueOf(field.getSourceName()));
       }
     for (int i = vec.size();  --i >= 0; )
       {

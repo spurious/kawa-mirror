@@ -9,13 +9,13 @@
   (let ((a :: <Base> (make <A>)))
     (test-begin "A through Base")
     (test-equal "invoke getTargetAxisName()"
-		'|field value| (invoke a 'getTargetAxisName))
-    (test-equal "slot-ref with literal" '|field value|
+		"field value" (invoke a 'getTargetAxisName))
+    (test-equal "slot-ref with literal" "field value"
 		(slot-ref a 'target-axis-name))
     ;; slot-set! with literal
     (slot-set! a 'target-axis-name 'still-from-field)
     ;; slot-ref with runtime symbol
-    (test-equal '|still-from-field| (slot-ref a slot-name))
+    (test-equal "still-from-field" (slot-ref a slot-name))
     ;; slot-set! with runtime symbol
     (slot-set! a slot-name 'still-still-from-field)
     (test-end))
@@ -23,7 +23,7 @@
   (let ((a :: <A> (make <A>)))
     (test-begin "A as A")
     (test-equal "invoke getTargetAxisName()"
-		'|field value| (invoke a 'getTargetAxisName))
+		"field value" (invoke a 'getTargetAxisName))
     (test-equal "slot-ref with literal" "field value"
 		(slot-ref a 'target-axis-name))
     ;; slot-set! with literal
@@ -37,13 +37,13 @@
   (let ((a :: <Base> (make <A2>)))
     (test-begin "A2 through Base")
     (test-equal "invoke getTargetAxisName()"
-		'|field value| (invoke a 'getTargetAxisName))
-    (test-equal "slot-ref with literal" '|field value|
+		"field value" (invoke a 'getTargetAxisName))
+    (test-equal "slot-ref with literal" "field value"
 		(slot-ref a 'target-axis-name))
     ;; slot-set! with literal
     (slot-set! a 'target-axis-name 'still-from-field)
     ;; slot-ref with runtime symbol
-    (test-equal '|still-from-field| (slot-ref a slot-name))
+    (test-equal "still-from-field" (slot-ref a slot-name))
     ;; slot-set! with runtime symbol
     (slot-set! a slot-name 'still-still-from-field)
     (test-end))
@@ -51,13 +51,13 @@
   (let ((a :: <A2> (make <A2>)))
     (test-begin "A2 as A2")
     (test-equal "invoke getTargetAxisName()"
-		'|field value| (invoke a 'getTargetAxisName))
-    (test-equal "slot-ref with literal" '|field value|
+		"field value" (invoke a 'getTargetAxisName))
+    (test-equal "slot-ref with literal" "field value"
 		(slot-ref a 'target-axis-name))
     ;; slot-set! with literal
     (slot-set! a 'target-axis-name 'still-from-field)
     ;; slot-ref with runtime symbol
-    (test-equal '|still-from-field| (slot-ref a slot-name))
+    (test-equal "still-from-field" (slot-ref a slot-name))
     ;; slot-set! with runtime symbol
     (slot-set! a slot-name 'still-still-from-field)
     (test-end))

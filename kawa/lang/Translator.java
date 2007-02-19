@@ -174,9 +174,30 @@ public class Translator extends Compilation
     if (form instanceof SyntaxForm)
       {
 	// FIXME
-	return literal == ((SyntaxForm) form).form;
+	form = ((SyntaxForm) form).form;
       }
-    if (form instanceof Symbol && ! selfEvaluatingSymbol(form))
+    if (form instanceof SimpleSymbol && ! selfEvaluatingSymbol(form))
+      {
+	ReferenceExp rexp = getOriginalRef(lexical.lookup(form, -1));
+	if (rexp != null)
+	  form = rexp.getSymbol();
+      }
+    return form instanceof SimpleSymbol
+      && ((Symbol) form).getLocalPart() == literal;
+  }
+
+  public boolean matches(Object form, SyntaxForm syntax, Symbol literal)
+  {
+    if (syntax != null)
+      {
+        // FIXME
+      }
+    if (form instanceof SyntaxForm)
+      {
+	// FIXME
+	form = ((SyntaxForm) form).form;
+      }
+    if (form instanceof SimpleSymbol && ! selfEvaluatingSymbol(form))
       {
 	ReferenceExp rexp = getOriginalRef(lexical.lookup(form, -1));
 	if (rexp != null)
@@ -502,7 +523,7 @@ public class Translator extends Compilation
 
   public Object namespaceResolve (Object name)
   {
-    if (! (name instanceof String))
+    if (! (name instanceof SimpleSymbol))
       {
         Pair p;
         if (name instanceof Pair
@@ -512,13 +533,12 @@ public class Translator extends Compilation
           {
             Expression part1 = rewrite(p.car);
             Expression part2 = rewrite(((Pair) p.cdr).car);
-
             Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
               return sym;
             String combinedName = GetNamedPart.combineName(part1, part2);
             if (combinedName != null)
-              return combinedName;
+              return Namespace.EmptyNamespace.getSymbol(combinedName);
           }
       }
     return name;
@@ -548,8 +568,7 @@ public class Translator extends Compilation
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair((Pair) exp, function);
-    else if (exp instanceof String
-	     || (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)))
+    else if (exp instanceof Symbol && ! selfEvaluatingSymbol(exp))
       {
 	Declaration decl = lexical.lookup(exp, function);
         Declaration cdecl = null;
@@ -560,8 +579,7 @@ public class Translator extends Compilation
         ScopeExp scope = current_scope;
         int decl_nesting = decl == null ? -1 : ScopeExp.nesting(decl.context);
         String dname;
-        if (exp instanceof String
-            || (exp instanceof Symbol && ((Symbol) exp).hasEmptyNamespace()))
+        if (exp instanceof Symbol && ((Symbol) exp).hasEmptyNamespace())
           dname = exp.toString();
         else
           {
@@ -605,7 +623,6 @@ public class Translator extends Compilation
           }
 
 	Object nameToLookup;
-	Symbol symbol = null;
 	if (decl != null)
 	  {
 	    nameToLookup = decl.getSymbol();
@@ -625,8 +642,7 @@ public class Translator extends Compilation
 	  {
 	    nameToLookup = exp;
 	  }
-	symbol = exp instanceof String ? env.getSymbol((String) exp)
-	  : (Symbol) exp;
+	Symbol symbol = (Symbol) exp;
 	boolean separate = getLanguage().hasSeparateFunctionNamespace();
         if (decl != null)
           {
@@ -912,8 +928,7 @@ public class Translator extends Compilation
                 Expression part2 = rewrite(((Pair) p.cdr).car);
                 obj = namespaceResolve(part1, part2);
               }
-            if (obj instanceof String
-                || (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))
+            if (obj instanceof Symbol && ! selfEvaluatingSymbol(obj))
               {
                 Expression func = rewrite(obj, true);
                 if (func instanceof ReferenceExp)

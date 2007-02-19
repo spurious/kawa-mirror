@@ -84,11 +84,7 @@ public class FString extends SimpleVector
 
   public FString(CharSeq seq)
   {
-    int size = seq.size();
-    char[] data = new char[size];
-    seq.getChars(0, size, data, 0);
-    this.data = data;
-    this.size = size;
+    this(seq, 0, seq.size());
   }
 
   public FString(CharSeq seq, int offset, int length)
@@ -98,6 +94,22 @@ public class FString extends SimpleVector
     this.data = data;
     this.size = length;
   }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public FString (CharSequence seq)
+  {
+    this(seq, 0, seq.length());
+  }
+
+  public FString(CharSequence seq, int offset, int length)
+  {
+    char[] data = new char[length];
+    for (int i = length; --i >= 0; )
+      data[i] = seq.charAt(offset+i);
+    this.data = data;
+    this.size = length;
+  }
+  /* #endif */
 
   public int length() { return size; }
 
@@ -229,7 +241,50 @@ public class FString extends SimpleVector
     size = newSize;
     return s.size > 0;
   }
-    
+
+  /* #ifdef use:java.lang.CharSequence */
+  public boolean addAll (CharSequence s)
+  {
+    int ssize = s.length();
+    int newSize = size + ssize;
+    if (data.length < newSize)
+      setBufferLength(newSize);
+    if (s instanceof FString)
+      System.arraycopy(((FString) s).data, 0, data, size, ssize);
+    else if (s instanceof String)
+      ((String) s).getChars(0, ssize, data, size);
+    else if (s instanceof CharSeq)
+      ((CharSeq) s).getChars(0, ssize, data, size);
+    else
+      for (int i = ssize; --i >= 0; )
+        data[size+i] = s.charAt(i);
+    size = newSize;
+    return ssize > 0;
+  }
+  /* #else */
+  // public boolean addAll (String s)
+  // {
+  //   int ssize = s.length();
+  //   int newSize = size + ssize;
+  //   if (data.length < newSize)
+  //     setBufferLength(newSize);
+  //   s.getChars(0, ssize, data, size);
+  //   size = newSize;
+  //   return ssize > 0;
+  // }
+
+  // public boolean addAll (CharSeq s)
+  // {
+  //   int ssize = s.length();
+  //   int newSize = size + ssize;
+  //   if (data.length < newSize)
+  //     setBufferLength(newSize);
+  //   s.getChars(0, ssize, data, size);
+  //   size = newSize;
+  //   return ssize > 0;
+  // }
+  /* #endif */
+
   /** Append arguments to this FString.
    * Used to implement Scheme's string-append and string-append/shared.
    * @param args an array of FString value
@@ -239,12 +294,32 @@ public class FString extends SimpleVector
   {
     int total = size;
     for (int i = startIndex; i < args.length; ++i)
-      total += ((FString) args[i]).size;
+      {
+        Object arg = args[i];
+        /* #ifdef use:java.lang.CharSequence */
+        total += ((CharSequence) arg).length();
+        /* #else */
+        // if (arg instanceof String)
+        //   total += ((String) arg).length();
+        // else
+        //   total += ((CharSeq) arg).length();
+        /* #endif */
+      }
     if (data.length < total)
-    setBufferLength(total);
+      setBufferLength(total);
     
     for (int i = startIndex; i < args.length; ++i)
-      addAll((FString) args[i]);
+      {
+        Object arg = args[i];
+        /* #ifdef use:java.lang.CharSequence */
+        addAll((CharSequence) arg);
+        /* #else */
+        // if (arg instanceof String)
+        //   addAll((String) arg);
+        // else
+        //   addAll((CharSeq) arg);
+        /* #endif */
+      }
   }
   
   public String toString ()

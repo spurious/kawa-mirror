@@ -122,12 +122,12 @@ public class require extends Syntax
 	name = p.cdr;
 	if (! (name instanceof Pair)
 	    || (p = (Pair) name).cdr != LList.Empty
-	    || ! (p.car instanceof String))
+	    || ! (p.car instanceof Symbol))
 	  {
 	    tr.error('e', "invalid quoted symbol for 'require'");
 	    return false;
 	  }
-	name = mapFeature((String) p.car);
+	name = mapFeature(p.car.toString());
 	if (name == null)
 	  {
 	    tr.error('e', "unknown feature name '"+p.car+"' for 'require'");
@@ -135,7 +135,12 @@ public class require extends Syntax
 	  }
 	type = ClassType.make((String) name);
       }
-    else if (name instanceof FString)
+    else if
+      /* #ifdef use:java.lang.CharSequence */
+      // (name instanceof CharSequence)
+      /* #else */
+      (name instanceof String || name instanceof CharSeq)
+      /* #endif */
       {
         String sourceName = name.toString();
         ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
@@ -148,9 +153,9 @@ public class require extends Syntax
       }
     else
       {
-	if (name instanceof String)
+	if (name instanceof Symbol)
 	  {
-	    String str = (String) name;
+	    String str = name.toString();
 	    int len = str.length();
 	    if (len > 2
 		&& str.charAt(0) == '<'
@@ -159,19 +164,27 @@ public class require extends Syntax
 		str = str.substring(1, len-1);
 		if (str.indexOf('.') < 0)
 		  str = tr.classPrefix + str;
-                if (args.cdr instanceof Pair
-                    && ((Pair) args.cdr).car instanceof FString)
+                if (args.cdr instanceof Pair)
                   {
-                    String sourceName = ((Pair) args.cdr).car.toString();
-                    ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
-                    if (info == null)
+                    name = ((Pair) args.cdr).car;
+                    if
+                      /* #ifdef use:java.lang.CharSequence */
+                      // (name instanceof CharSequence)
+                      /* #else */
+                      (name instanceof String || name instanceof CharSeq)
+                      /* #endif */
                       {
-                        tr.error('e', "malformed URL: "+sourceName);
-                        return false;
+                        String sourceName = name.toString();
+                        ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
+                        if (info == null)
+                          {
+                            tr.error('e', "malformed URL: "+sourceName);
+                            return false;
+                          }
+                        return importDefinitions(str,
+                                                 info,
+                                                 null, forms, defs, tr);
                       }
-                    return importDefinitions(str,
-                                             info,
-                                             null, forms, defs, tr);
                   }
 		type = Scheme.string2Type(str);
 	      }
@@ -277,12 +290,12 @@ public class require extends Syntax
     for (Declaration fdecl = mod.firstDecl();
          fdecl != null;  fdecl = fdecl.nextDecl())
       {
-        Object fdname = fdecl.getSymbol();
+        Symbol aname = (Symbol) fdecl.getSymbol();
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
         if (! isStatic && decl == null)
           {
             String iname = tname.replace('.', '$') + "$instance";
-            decl = new Declaration(iname.intern(), type);
+            decl = new Declaration(SimpleSymbol.valueOf(iname), type);
             if (! immediate)
               decl.setPrivate(true);
             decl.setFlag(Declaration.IS_CONSTANT
@@ -323,18 +336,7 @@ public class require extends Syntax
         // But if the binding is re-exported (or EXTERNAL_ACCESS
         // gets set), then we need a separate declaration.
         // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
-        Object aname;
 
-        if (fdname instanceof Symbol)
-          aname = fdname;
-        else
-          {
-            String sname = fdname.toString();
-            if (uri == null)
-              aname = sname.intern();
-            else
-              aname = Symbol.make(uri, sname);
-          }
         boolean isImportedInstance
           = fdecl.field != null && fdecl.field.getName().endsWith("$instance");
 
@@ -432,7 +434,7 @@ public class require extends Syntax
                 String iname
                   = (xdecl.field.getDeclaringClass().getName().replace('.', '$')
                      + "$instance");
-                Declaration cdecl = defs.lookup(iname.intern());
+                Declaration cdecl = defs.lookup(SimpleSymbol.valueOf(iname));
                 cdecl.setFlag(Declaration.EXPORT_SPECIFIED);
                 aref.setContextDecl(cdecl);
               }

@@ -312,6 +312,8 @@ public class ModuleExp extends LambdaExp
 
   ModuleInfo info;
 
+  public String getNamespaceUri () { return info.uri; }
+
   public final ClassType getSuperType() { return superType; }
   public final void setSuperType(ClassType s) { superType = s; }
   public final ClassType[] getInterfaces() { return interfaces; }

@@ -54,9 +54,9 @@ public class Symbols
    * Generate a new (interned) symbol with a unique name.
    * @return the new symbol
    */
-  public static final String gentemp ()
+  public static final SimpleSymbol gentemp ()
   {
-    return Symbols.make("GS." + Integer.toString(generateInt()));
+    return SimpleSymbol.valueOf("GS." + Integer.toString(generateInt()));
   }
 
   /**

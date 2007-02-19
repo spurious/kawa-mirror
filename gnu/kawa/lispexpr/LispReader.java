@@ -287,6 +287,8 @@ public class LispReader extends Lexer
     if (ch < 0 || ch == ':' || (entry = rtable.lookup(ch)) == null
         || ch == rtable.postfixLookupOperator)
       return false;
+    if (ch == ',')
+      return true;
     int kind = entry.getKind();
     return kind == ReadTable.CONSTITUENT
       || kind == ReadTable.NON_TERMINATING_MACRO
@@ -314,7 +316,7 @@ public class LispReader extends Lexer
         ch = port.read();
         Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
         value = LList.list2(value,
-                            LList.list2(LispLanguage.quote_sym, rightOperand));
+                            LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
         value = PairWithPosition.make(LispLanguage.lookup_sym, value,
                                       port.getName(), line+1, column+1);
       }
@@ -353,6 +355,22 @@ public class LispReader extends Lexer
 
   static final int SCM_COMPLEX = 1;
   public static final int SCM_NUMBERS = SCM_COMPLEX;
+
+  public static Object parseNumber
+  /* #ifdef use:java.lang.CharSequence */
+  (CharSequence str, int radix)
+  /* #else */
+  // (CharSeq str, int radix)
+  /* #endif */
+  {
+    char[] buf;
+    if (str instanceof FString)
+      buf = ((FString) str).data;
+    else
+      buf = str.toString().toCharArray();
+    int len = str.length();
+    return parseNumber(buf, 0, len, '\0', radix, LispReader.SCM_NUMBERS);
+  }
 
   /** Parse a number.
    * @param buffer contains the characters of the number

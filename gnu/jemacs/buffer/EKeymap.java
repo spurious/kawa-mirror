@@ -180,15 +180,39 @@ implements gnu.mapping.Named
   public void defineKey(Object keySpec, Object binding)
   {
     EKeymap keymap = this;
-    if (keySpec instanceof Sequence && ! (keySpec instanceof LList))
+    if ((keySpec instanceof Sequence
+         /* #ifdef use:java.lang.CharSequence */
+         || keySpec instanceof CharSequence
+         /* #else */
+         // || keySpec instanceof String
+         /* #endif */
+         ) && ! (keySpec instanceof LList))
       {
         // Handle key sequence.
-	Sequence value = (Sequence) keySpec;
-        boolean hackMeta = keySpec instanceof FString;
-        int len = value.size();
+	Sequence seq;
+        int len;
+        String str;
+        /* #ifdef use:java.lang.CharSequence */
+        boolean hackMeta = keySpec instanceof CharSequence;
+        /* #else */
+        // boolean hackMeta = keySpec instanceof String || keySpec instanceof CharSeq;
+        /* #endif */
+        if (keySpec instanceof Sequence)
+          {
+            seq = (Sequence) keySpec;
+            len = seq.size();
+            str = null;
+          }
+        else
+          {
+            seq = null;
+            str = keySpec.toString();
+            len = str.length();
+          }
         for (int i = 0;  i < len; )
           {
-            Object keyValue = value.get(i);
+            Object keyValue = (seq != null ? seq.get(i)
+                               : Convert.toObject(str.charAt(i)));
             boolean sawMeta = false;
             i++;
 	    int key = asKeyStroke(keyValue);

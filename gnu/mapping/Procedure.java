@@ -11,7 +11,7 @@ package gnu.mapping;
 public abstract class Procedure extends PropertySet
 {
   private static final String sourceLocationKey = "source-location";
-  private static final String setterKey = "setter";
+  private static final Symbol setterKey = Namespace.EmptyNamespace.getSymbol("setter");
 
   public void setSourceLocation (String file, int line)
   {

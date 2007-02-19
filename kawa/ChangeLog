@@ -1,5 +1,23 @@
 2007-02-18  Per Bothner  <per@bothner.com>
 
+	* lang/NamedException.java: Use Symbol rather than String for name.
+	* lang/Lambda.java: Names are now Symbol, not String.
+	Strings are now CharSequence rather than only FString.
+	* standard/define_autoload.java: Likewise.
+	* standard/define_unit.java: Likewise.
+	* lang/SyntaxPattern.java: Likewise.
+	* standard/require.java: Likewise.  Assume fdecl's name is Symbol.
+	* lang/Translator.java: Likewise.
+	(matches): New method, handles Symbols.
+	* lang/SyntaxTemplate.java: Names are now Symbol, not String.
+	* lang/Record.java (typeFieldNames): Likewise.
+	* standard/define_syntax.java: Likewise.
+	* standard/throw_name.java: Likewise.
+	* standard/IfFeature.java: Likewise.
+	* standard/module_static.java: Likewise.
+	* standard/object.java: Likewise.
+	* standard/Scheme.java: Update for new type scheme.
+
 	* lang/Translator.java (rewrite): Handle rewriting class name to class
 	by calling checkDefaultBinding.
 	* standard/Scheme.java (initScheme, getType): Define class and type

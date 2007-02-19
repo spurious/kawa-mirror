@@ -2,6 +2,8 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.mapping.Symbol;
+import gnu.mapping.SimpleSymbol;
 
 public class module_static extends Syntax
 {
@@ -32,7 +34,8 @@ public class module_static extends Syntax
              && tr.matches((st = (Pair) st.car).car, Scheme.quote_sym))
       {
         if ((st = (Pair)st.cdr) != LList.Empty
-            && st.car == "init-run")
+            && st.car instanceof SimpleSymbol
+            && st.car.toString() == "init-run")
           {
             // (module-static 'init-run) implies (module-static #t)
             ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
@@ -52,12 +55,12 @@ public class module_static extends Syntax
 	while (list != LList.Empty)
 	  {
 	    if (! (list instanceof Pair)
-		|| ! ((st = (Pair) list).car instanceof String))
+		|| ! ((st = (Pair) list).car instanceof Symbol))
 	      {
 		tr.error('e', "invalid syntax in '" + getName() + '\'');
 		return false;
 	      }
-	    String symbol = (String) st.car;
+	    Symbol symbol = (Symbol) st.car;
 	    Declaration decl = defs.getNoDefine(symbol);
 	    if (decl.getFlag(Declaration.NOT_DEFINING))
 	      Translator.setLine(decl, st);

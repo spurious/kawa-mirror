@@ -234,13 +234,11 @@
 
 (define (number->string (arg :: <java.lang.Number>)
 			#!optional (radix :: <int> 10))
-  (make <string>
+  (make <gnu.lists.FString>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
 
 (define (string->number (str :: <string>) #!optional (radix :: <int> 10))
-  (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber
-		 str:data 0 (str:length) #\000 radix
-		 gnu.kawa.lispexpr.LispReader:SCM_NUMBERS)))
+  (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str radix)))
     (if (instance? result <gnu.math.Numeric>) result #f)))
 
 (define (quantity->number (q :: <quantity>)) :: <complex>

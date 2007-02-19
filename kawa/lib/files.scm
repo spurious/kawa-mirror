@@ -14,38 +14,38 @@
   (path:isAbsolute))
 (define (path-scheme (p :: path))
   (let ((s (p:getScheme)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-authority (p :: path))
   (let ((s (p:getAuthority)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-user-info (p :: path))
   (let ((s (p:getUserInfo)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-host (p :: path))
   (p:getHost))
 (define (path-file (p :: path))
   (let ((s (p:getPath)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-directory (p :: path))
   (let ((s (p:getDirectory)))
-    (if (eq? s #!null) #f (<string> (s:toString)))))
+    (if (eq? s #!null) #f (s:toString))))
 (define (path-parent (p :: path))
   (let ((s (p:getParent)))
-    (if (eq? s #!null) #f (<string> (s:toString)))))
+    (if (eq? s #!null) #f (s:toString))))
 (define (path-last (p :: path))
   (let ((s (p:getLast)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-extension (p :: path))
   (let ((s (p:getExtension)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-port (p :: path)) :: <int>
   (p:getPort))
 (define (path-query (p :: path))
   (let ((s (p:getQuery)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 (define (path-fragment (p :: path))
   (let ((s (p:getFragment)))
-    (if (eq? s #!null) #f (<string> s))))
+    (if (eq? s #!null) #f s)))
 
 #|
 (resolve-path path) ;; resolves symlinks
@@ -99,14 +99,13 @@
   (path filename))
   
 (define (%file-separator)
-  (make <string>
-   (invoke-static <java.lang.System> 'getProperty 'file.separator)))
+  (invoke-static <java.lang.System> 'getProperty 'file.separator))
 
 (define (system-tmpdir)
   (let ((name :: <java.lang.String> ; Java2 only
 	 (invoke-static <java.lang.System> 'getProperty 'java.io.tmpdir)))
     (if (not (eq? name #!null))
-	(make <string> name)
+	name
 	(let ((sep (%file-separator)))
 	  (if (equal? sep "\\") "C:\\temp" "/tmp")))))
 
@@ -130,7 +129,7 @@
 
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
 (define (make-temporary-file #!optional (fmt "kawa~d.tmp")) :: <string>
-  (make <string> (gnu.kawa.functions.FileUtils:createTempFile fmt)))
+  (gnu.kawa.functions.FileUtils:createTempFile fmt))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, which is again based on Chez Scheme.
@@ -171,7 +170,7 @@
 		   (datum->syntax-object (syntax filename) 'include)
 		   (datum->syntax-object
 		    (syntax filename)
-		    (make <string> ((base:resolve fname):toString))))))))
+		    ((base:resolve fname):toString)))))))
 
 #|
 (define-syntax source-file

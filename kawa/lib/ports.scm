@@ -56,9 +56,7 @@
     ((define-alias-parameter name type location)
      (begin
        (define-constant name :: <gnu.mapping.LocationProc>
-	 (gnu.mapping.LocationProc:makeNamed
-	  (gnu.mapping.Symbol:make '|| 'name)
-	  location))
+	 (gnu.mapping.LocationProc:makeNamed 'name location))
        (gnu.mapping.LocationProc:pushConverter
 	name
 	(lambda (arg)
@@ -85,19 +83,17 @@
 
 ;; SRFI-6
 (define (open-input-string (str :: <string>)) :: <input-port>
-  (make <gnu.mapping.CharArrayInPort>
-    (field str 'data) (field str 'size)))
+  (make <gnu.mapping.CharArrayInPort> str))
 
 (define (open-output-string) :: <string-output-port>
   (<string-output-port>))
 
 (define (get-output-string (output-port  <string-output-port>))
-  (<string> (output-port:toCharArray)))
+  (<gnu.lists.FString> (output-port:toCharArray)))
 
 (define (call-with-input-string (str :: <string>) (proc :: <procedure>))
   (let* ((port :: <gnu.mapping.CharArrayInPort>
-	  (make <gnu.mapping.CharArrayInPort>
-	    (field str 'data) (field str 'size)))
+	  (make <gnu.mapping.CharArrayInPort> str))
 	 (result (proc port)))
     (close-input-port port)
     result))
@@ -108,7 +104,7 @@
     (proc port)
     (let ((chars :: <char[]> (invoke port 'toCharArray)))
       (invoke port 'close)
-      (make <string> chars))))
+      (make <gnu.lists.FString> chars))))
 
 (define (force-output #!optional (port (current-output-port)))
   ((primitive-virtual-method <java.io.Writer> "flush" <void> ())

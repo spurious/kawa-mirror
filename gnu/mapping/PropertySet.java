@@ -5,7 +5,7 @@ public abstract class PropertySet implements Named
   /** If non-null, a sequence of (key, value)-pairs. */
   private Object[] properties;
 
-  private static final String nameKey = "name";
+  public static final Symbol nameKey = Namespace.EmptyNamespace.getSymbol("name");
 
   public String getName()
   {

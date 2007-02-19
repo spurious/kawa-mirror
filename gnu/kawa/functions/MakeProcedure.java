@@ -69,7 +69,7 @@ public class MakeProcedure extends ProcedureN implements CanInline
                 else if (keyword == "method")
                   ;
                 else
-                  proc.setProperty(keyword, next);
+                  proc.setProperty(Namespace.EmptyNamespace.getSymbol(keyword), next);
               }
           }
         return method;

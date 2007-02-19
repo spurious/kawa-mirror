@@ -4,6 +4,7 @@ import kawa.lang.*;
 import gnu.lists.*;
 import java.util.Vector;
 import gnu.mapping.Symbol;
+import gnu.mapping.Namespace;
 import gnu.bytecode.Type;
 import gnu.kawa.functions.Convert;
 
@@ -23,6 +24,8 @@ public class object extends Syntax
   static final Keyword init_formKeyword = Keyword.make("init-form");
   static final Keyword init_valueKeyword = Keyword.make("init-value");
   static final Keyword init_keywordKeyword = Keyword.make("init-keyword");
+
+  static final Symbol coloncolon = Namespace.EmptyNamespace.getSymbol("::");
 
   public object(Lambda lambda)
   {
@@ -123,14 +126,14 @@ public class object extends Syntax
                   key = ((SyntaxForm) key).form;
 		Object savedPos2 = tr.pushPositionOf(pair);
 		args = pair.cdr;
-		if ((key == "::" || key instanceof Keyword)
+		if ((key == coloncolon || key instanceof Keyword)
 		    && args instanceof Pair)
 		  {
 		    nKeywords++;
 		    pair = (Pair) args;
 		    Object value = pair.car;
 		    args = pair.cdr;
-		    if (key == "::" || key == typeKeyword)
+		    if (key == coloncolon || key == typeKeyword)
 		      typePair = pair;
 		    else if (key == allocationKeyword)
 		      {
@@ -399,14 +402,14 @@ public class object extends Syntax
                       key = ((SyntaxForm) key).form;
 		    Object savedPos2 = tr.pushPositionOf(pair);
 		    args = pair.cdr;
-		    if ((key == "::" || key instanceof Keyword)
+		    if ((key == coloncolon || key instanceof Keyword)
 			&& args instanceof Pair)
 		      {
 			nKeywords++;
 			pair = (Pair) args;
 			Object value = pair.car;
 			args = pair.cdr;
-			if (key == "::" || key == typeKeyword)
+			if (key == coloncolon || key == typeKeyword)
 			  type = value;
 			else if (key == initKeyword
 				 || key == initformKeyword
@@ -563,8 +566,8 @@ public class object extends Syntax
 	     && tr.matches((pair = (Pair) exp).car, Scheme.quote_sym)
 	     && pair.cdr instanceof Pair
 	     && (pair = (Pair) pair.cdr).cdr == LList.Empty
-	     && pair.car instanceof String)
-      value = (String) pair.car;
+	     && pair.car instanceof gnu.mapping.SimpleSymbol)
+      value = pair.car.toString();
     else
       return false;
     return tag == null || tag.equals(value);

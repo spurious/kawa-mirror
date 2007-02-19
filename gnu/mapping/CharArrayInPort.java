@@ -1,6 +1,6 @@
 package gnu.mapping;
 import gnu.text.*;
-import gnu.lists.Consumer;
+import gnu.lists.*;
 
 /** An Inport for reading from a char array.
   * Essentially the same as an InPort wrapped around a CharArrayReader, but
@@ -9,6 +9,35 @@ import gnu.lists.Consumer;
 public class CharArrayInPort extends InPort
 {
   static final Path stringPath = Path.valueOf("<string>");
+
+  public CharArrayInPort make
+  /* #ifdef use:java.lang.CharSequence */
+  (CharSequence seq)
+  /* #else */ 
+  // (CharSeq seq)
+  /* #endif */
+  {
+    if (seq instanceof FString)
+      {
+        FString fstr = (FString) seq;
+        return new CharArrayInPort(fstr.data, fstr.size);
+      }
+    else
+      {
+        int len = seq.length();
+        char[] buf = new char[len];
+        /* #ifdef use:java.lang.CharSequence */
+        if (seq instanceof String)
+          ((String) seq).getChars(0, len, buf, 0);
+        else if (! (seq instanceof CharSeq))
+          for (int i = len; --i >= 0; )
+            buf[i] = seq.charAt(i);
+        else
+        /* #endif */
+          ((CharSeq) seq).getChars(0, len, buf, 0);
+        return new CharArrayInPort(buf, len);
+      }
+  }
 
   public CharArrayInPort (char[] buffer, int len)
   {

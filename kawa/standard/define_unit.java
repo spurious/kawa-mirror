@@ -30,9 +30,9 @@ public class define_unit extends Syntax
       {
 	Pair p = (Pair) st.cdr;
 	Object q = p.car;
-	if (q instanceof String)
+	if (q instanceof gnu.mapping.SimpleSymbol)
 	  {
-	    String name = (String) q;
+	    String name = q.toString();
 	    String sym = (name + "$unit").intern();
 	    Declaration decl = defs.getDefine(sym, 'w', tr);
 	    tr.push(decl);
@@ -46,7 +46,13 @@ public class define_unit extends Syntax
 	    else if (p.cdr instanceof Pair)
 	      {
 		Object v = ((Pair) p.cdr).car;
-		if (base && v instanceof FString)
+		if (base &&
+                    /* #ifdef use:java.lang.CharSequence */
+                    v instanceof CharSequence
+                    /* #else */
+                    // (v instanceof String || v instanceof CharSeq)
+                    /* #endif */
+                    )
 		  unit = BaseUnit.make(name, v.toString());
 		else if (! base && v instanceof Quantity)
 		  unit = Unit.make(name, (Quantity) v);

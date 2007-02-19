@@ -40,7 +40,7 @@
 (set! lt1:a! 9)
 (test (make-funny-record2 14 9) 'funny-record lt1)
 
-(test '(10 \10 20 \20) 'object-with-field-1
+(test '(10 "10" 20 "20") 'object-with-field-1
        (let*
 	   ((obj (object (<object>)
 			 (fld 10)
@@ -54,7 +54,7 @@
 		(str2 (as <String> obj)))
 	     (list val1 str1 val2 str2)))))
 
-(test '(100 \100 20 \20) 'object-with-field-2
+(test '(100 "100" 20 "20") 'object-with-field-2
        (let*
 	   ((val0 100)
 	    (obj (object (<object>)
@@ -122,7 +122,7 @@
              (format #f "{arg1: ~s arg2: ~s}" arg1 arg2)))))
 
 (test "{arg1: 23 arg2: 12}" 'object-with-closure-3
-      (symbol->string (as <String> ((document-filter 23) 12))))
+      (as <String> ((document-filter 23) 12)))
 
 (define i100 (force-eval make <integer> ival: 100))
 (define i200 (force-compile make <integer> ival: 200))
@@ -341,8 +341,8 @@
 (define colon-test-list-1 (list 11 12 13 14))
 (test 13 'colon-test-3 colon-test-list-1:cdr:cdr:car)
 (test '(12 13 14) 'colon-test-4 colon-test-list-1:cdr)
-(test '|(11 12 13 14)| 'colon-test-5 (colon-test-list-1:toString))
-(test '|(12 13 14)| 'colon-test-6 (colon-test-list-1:cdr:toString))
+(test "(11 12 13 14)" 'colon-test-5 (colon-test-list-1:toString))
+(test "(12 13 14)" 'colon-test-6 (colon-test-list-1:cdr:toString))
 
 ;; Test for Savannah bug #4289
 (define pa-data (pa-new 10))

@@ -113,8 +113,12 @@ public class DisplayFormat extends AbstractFormat
         && ! (obj instanceof gnu.kawa.xml.UntypedAtomic)
         && ! (obj instanceof Values)
         && (getReadableOutput()
-            || ! (obj instanceof FString
-                  || obj instanceof Char
+            || ! (obj instanceof Char
+                  /* #ifdef use:java.lang.CharSequence */
+                  || obj instanceof CharSequence
+                  /* #else */
+                  // || obj instanceof String || obj instanceof CharSeq
+                  /* #endif */
                   || obj instanceof Character)))
       {
         ((OutPort) out).writeWordStart();
@@ -141,6 +145,8 @@ public class DisplayFormat extends AbstractFormat
             write("html:", out);
             write(sym.getLocalPart(), out);
           }
+        else if (readable)
+          writeReadableSymbol(sym, out);
         else
           writeObject(obj.toString(), out);
       }
@@ -155,18 +161,35 @@ public class DisplayFormat extends AbstractFormat
       }
     /* #endif */
     /* #endif */
-    else if (obj instanceof CharSeq)
+    else if
+      /* #ifdef use:java.lang.CharSequence */
+      (obj instanceof CharSequence) 
+      /* #else */
+      // (obj instanceof CharSeq || obj instanceof String) 
+      /* #endif */
       {
-	CharSeq str = (CharSeq) obj;
+        /* #ifdef use:java.lang.CharSequence */
+	CharSequence str = (CharSequence) obj;
+        /* #else */
+	// String str = obj.toString();
+        /* #endif */
 	if (getReadableOutput () && out instanceof PrintWriter)
 	  Strings.printQuoted(str, (PrintWriter) out, 1);
-	else if (obj instanceof FString) // FIXME Do we need this case?
-	  {
-	    FString fstr = (FString) obj;
-	    out.write(fstr.data, 0, fstr.size());
-	  }
-	else
-	  str.consume(0, str.size(), out);
+        else if (obj instanceof String)
+          {
+            out.write((String) obj);
+          }
+	else if (obj instanceof CharSeq)
+          {
+            CharSeq seq = (CharSeq) obj;
+            seq.consume(0, seq.size(), out);
+          }
+        else
+          {
+            int len = str.length();
+            for (int i = 0; i < len;  i++)
+              out.write(str.charAt(i));
+          }
       }
     else if (obj instanceof LList && out instanceof OutPort)
       writeList((LList) obj, (OutPort) out);
@@ -275,8 +298,6 @@ public class DisplayFormat extends AbstractFormat
           }
 	if (asString == null)
 	  write("#!null", out);
-	else if (readable && obj instanceof String)
-          writeReadableSymbol(asString, out);
         else
           write(asString, out);
       }
@@ -336,6 +357,24 @@ public class DisplayFormat extends AbstractFormat
                     + "([a-zA-Z]|[!$%&*/<=>?^_~]|[0-9]|([-+.@]))*[:]?)"
                     + "|([-+]|[.][.][.])");
   /* #endif */
+
+  void writeReadableSymbol (Symbol sym, Consumer out)
+  {
+    String prefix = sym.getPrefix();
+    String uri = sym.getNamespaceURI();
+    if (prefix != null && prefix.length() > 0)
+      {
+        writeReadableSymbol(prefix, out);
+        out.write(':');
+      }
+    else if (uri != null && uri.length() > 0)
+      {
+        out.write('{');
+        out.write(uri);
+        out.write('}');
+      }
+    writeReadableSymbol(sym.getName(), out);
+  }
 
   void writeReadableSymbol (String sym, Consumer out)
   {

@@ -1,3 +1,7 @@
+2007-02-18  Per Bothner  <per@bothner.com>
+
+	* EKeymap.java (defineKey): Change since strings are now CharSequence.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (filename): Rename and change type of field ...

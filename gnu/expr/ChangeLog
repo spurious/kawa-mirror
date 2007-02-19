@@ -1,5 +1,13 @@
 2007-02-18  Per Bothner  <per@bothner.com>
 
+	* Language.java (declFromField): Convert String to Symbol.
+	* GenericProc.java (setProperties): Map Keyword to Symbol.
+	* ModuleExp.java (getNamespaceUri): New method.
+	* ProcInitializer.java (emitLoadModuleMethod): Update name handling.
+	* Symbols.java (gentemp): Change return type to SimpleSymbol.
+
+2007-02-18  Per Bothner  <per@bothner.com>
+
 	* Language.java (getTypeFor): Handle Ref bound to constant.
 
 2007-02-08  Per Bothner  <per@bothner.com>

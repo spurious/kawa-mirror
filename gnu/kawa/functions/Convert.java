@@ -19,7 +19,11 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    Type type = (Type) arg1;
+    Type type;
+    if (arg1 instanceof Class)
+      type = Type.make((Class) arg1);
+    else
+      type = (Type) arg1;
     return type.coerceFromObject (arg2);
   }
 

@@ -79,6 +79,8 @@ public class ClassExp extends LambdaExp
     ClassType typeType;
     int nargs;
     boolean needsLink = getNeedsClosureEnv();
+    if (isSimple() && ! needsLink)
+      return;
     if (isMakingClassPair() || needsLink)
       {
         if (new_class == instanceType)
@@ -230,11 +232,8 @@ public class ClassExp extends LambdaExp
 	else
 	  superTypes[j++] = t;
       }
-    if (! isSimple())
+    if (! isSimple() && superType == null)
       {
-        if (superType != null)
-          comp.error('e', "non-simple class inherts from non-interface "+superType.getName());
-          
         ClassType[] interfaces = { type };
         // Can we better.  FIXME.
         instanceType.setSuper(Type.pointer_type);

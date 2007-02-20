@@ -190,13 +190,14 @@ public class ApplyToArgs extends ProcedureN
   public Object applyN (Object[] args) throws Throwable
   {
     Object proc = args[0];
-    Object[] rargs = new Object[args.length-1];
-    System.arraycopy(args, 1, rargs, 0, rargs.length);
     if (proc instanceof Procedure)
       {
+        Object[] rargs = new Object[args.length-1];
+        System.arraycopy(args, 1, rargs, 0, rargs.length);
         return ((Procedure) proc).applyN(rargs);
       }
-    if (proc instanceof gnu.bytecode.Type)
+    if (proc instanceof gnu.bytecode.Type
+        || proc instanceof Class)
       {
         return gnu.kawa.reflect.Invoke.make.applyN(args);
       }
@@ -210,7 +211,7 @@ public class ApplyToArgs extends ProcedureN
       {
         if (args.length != 2)
           throw new WrongArguments(this, args.length); // FIXME
-        int index = ((Number) rargs[0]).intValue();
+        int index = ((Number) args[1]).intValue();
         /* #ifdef JAVA2 */
         return ((java.util.List) proc).get(index);
         /* #else */
@@ -222,7 +223,7 @@ public class ApplyToArgs extends ProcedureN
       {
         if (args.length != 2)
           throw new WrongArguments(this, args.length); // FIXME
-        return java.lang.reflect.Array.get(proc, ((Number) rargs[0]).intValue());
+        return java.lang.reflect.Array.get(proc, ((Number) args[1]).intValue());
       }
     throw new WrongType(this, 0, proc, "procedure");
   }

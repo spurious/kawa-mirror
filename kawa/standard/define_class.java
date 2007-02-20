@@ -54,7 +54,7 @@ public class define_class extends Syntax
     ClassExp oexp = new ClassExp(isSimple);
     decl.noteValue(oexp);
     decl.setFlag(Declaration.IS_CONSTANT);
-    decl.setType(Compilation.typeClassType);
+    decl.setType(isSimple ? Compilation.typeClass : Compilation.typeClassType);
     tr.mustCompileHere();
 
     String cname = name instanceof Symbol ? ((Symbol) name).getName()

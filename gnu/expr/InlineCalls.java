@@ -37,14 +37,6 @@ public class InlineCalls extends ExpWalker
         if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
           return walkQuoteExp((QuoteExp) dval);
       }
-    if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
-      {
-        Type type = getCompilation().getLanguage().getTypeFor(exp);
-
-        if (type instanceof java.io.Externalizable
-            && ! exp.getDontDereference())
-          return new QuoteExp(type);
-      }
     return super.walkReferenceExp(exp);
   }
 

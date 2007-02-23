@@ -1,3 +1,7 @@
+2007-02-22  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (print): Don't modify value field.
+
 2007-02-19  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compilePushClass): If simple, return Class object.

@@ -1,3 +1,10 @@
+2007-02-23  Per Bothner  <per@bothner.com>
+
+	* inlining-test.scm (factoriali1, factoriali2, factoriall1,
+	factorialI1): New functions.
+	* Makefile.am (inlining.log): Also check most of the new functions.
+	* inlining.expected: Update.
+
 2007-02-18  Per Bothner  <per@bothner.com>
 
 	* use-slots.scm: Update as a String is no longer a symbol.

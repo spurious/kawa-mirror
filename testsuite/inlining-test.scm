@@ -132,3 +132,16 @@
 (define-namespace xx "XX")
 (define xx:two 222)
 (define list-two (list 'xx:Two))
+
+(define (factoriali1 x :: int) :: int
+  (if (< x 1) 1
+      (* x (factoriali1 (- x 1)))))
+(define (factoriali2 x :: <int>) :: <int>
+  (if (< x 1) 1
+      (* x (factoriali2 (- x 1)))))
+(define (factoriall1 x :: long) :: long
+  (if (< x 1) 1
+      (* x (factoriall1 (- x 1)))))
+(define (factorialI1 x :: <integer>) :: <integer>
+  (if (< x 1) 1
+      (* x (factorialI1 (- x 1)))))

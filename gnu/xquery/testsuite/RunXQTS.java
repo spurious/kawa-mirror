@@ -1025,12 +1025,12 @@ public class RunXQTS extends FilterConsumer
                 Object value = XQuery.getInstance().eval(in);
                 in.close();
                 Environment current = Environment.getCurrent();
-                current.put(symbol, null, value);
+                current.define(symbol, null, value);
                 externalVariablesSet.push(symbol);
               }
             catch (Throwable ex)
               {
-                System.err.println("input-query: cannot open "+filename);
+                System.err.println("input-query for "+testName+": cannot open "+filename);
                 System.err.println("caught "+ex);
                 ex.printStackTrace();
                 System.exit(-1);

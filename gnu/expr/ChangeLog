@@ -1,3 +1,8 @@
+2007-02-23  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateApplyMethodsWithContext,
+	generateApplyMethodsWithContext): Save/set/restore source location.
+
 2007-02-22  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (print): Don't modify value field.

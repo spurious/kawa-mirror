@@ -250,6 +250,13 @@ public class SourceMessages implements SourceLocator
     this.locator = locator == this ? null : locator;
   }
 
+  public final SourceLocator swapSourceLocator (SourceLocator locator)
+  {
+    SourceLocator save = this.locator;
+    this.locator = locator;
+    return save;
+  }
+
   /** Copies the current position of locator. */
   public final void setLocation (SourceLocator locator)
   {

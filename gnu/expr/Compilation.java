@@ -1446,6 +1446,7 @@ public class Compilation implements SourceLocator
 
 	    aswitch.addCase(source.getSelectorValue(this) + i, code);
 
+            SourceLocator saveLoc1 = messages.swapSourceLocator(source);
 	    int line = source.getLineNumber();
 	    if (line > 0)
 	      code.putLineNumber(source.getFileName(), line);
@@ -1506,8 +1507,12 @@ public class Compilation implements SourceLocator
 		  }
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
-		  CheckedTarget.emitCheckedCoerce(this, source,
-						  k+1, ptype);
+                  {
+                    SourceLocator saveLoc2 = messages.swapSourceLocator(var);
+                    CheckedTarget.emitCheckedCoerce(this, source,
+                                                    k+1, ptype);
+                    messages.swapSourceLocator(saveLoc2);
+                  }
 		var = var.nextDecl();
 	      }
 
@@ -1545,6 +1550,7 @@ public class Compilation implements SourceLocator
 	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
 	      Target.pushObject.compileFromStack(this,
 						 source.getReturnType());
+            messages.swapSourceLocator(saveLoc1);
 	    code.emitReturn();
           }
       }
@@ -1585,7 +1591,7 @@ public class Compilation implements SourceLocator
 	String mname = null;
 	Type[] applyArgs = null;
 
-	for (int j = numApplyMethods;  --j >= 0; )
+	for (int j = 0;  j < numApplyMethods;  j++)
 	  {
 	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
 	    // Select the subset of source.primMethods[*] that are suitable
@@ -1645,6 +1651,7 @@ public class Compilation implements SourceLocator
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
+            SourceLocator saveLoc1 = messages.swapSourceLocator(source);
 	    int line = source.getLineNumber();
 	    if (line > 0)
 	      code.putLineNumber(source.getFileName(), line);
@@ -1706,8 +1713,12 @@ public class Compilation implements SourceLocator
 		  }
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
-		  CheckedTarget.emitCheckedCoerce(this, source,
-						  k+1, ptype, pvar);
+                  {
+                    SourceLocator saveLoc2 = messages.swapSourceLocator(var);
+                    CheckedTarget.emitCheckedCoerce(this, source,
+                                                    k+1, ptype, pvar);
+                    messages.swapSourceLocator(saveLoc2);
+                  }
 		var = var.nextDecl();
 	      }
 
@@ -1786,6 +1797,7 @@ public class Compilation implements SourceLocator
 	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
 	      Target.pushObject.compileFromStack(this,
 						 source.getReturnType());
+            messages.swapSourceLocator(saveLoc1);
 	    code.emitReturn();
           }
 	if (needThisApply)

@@ -264,6 +264,35 @@ public class FieldLocation extends ClassMemberLocation
       }
   }
 
+  public Object setWithSave (Object newValue, CallContext ctx)
+  {
+    if ((flags & KIND_FLAGS_SET) == 0)
+      setKindFlags();
+    if ((flags & INDIRECT_LOCATION) == 0)
+      return super.setWithSave(newValue, ctx);
+    else
+      {
+	Object v;
+	if ((flags & VALUE_SET) != 0)
+	  v = value;
+	else
+	  {
+	    flags |= VALUE_SET;
+	    v = getFieldValue();
+	    value = v;
+	  }
+	return ((Location) v).setWithSave(newValue, ctx);
+      }
+  }
+
+  public void setRestore (Object oldValue, CallContext ctx)
+  {
+    if ((flags & INDIRECT_LOCATION) == 0)
+      super.setRestore(oldValue, ctx);
+    else
+      ((Location) value).setRestore(oldValue, ctx);
+  }
+
   public boolean isConstant ()
   {
     if ((flags & KIND_FLAGS_SET) == 0)

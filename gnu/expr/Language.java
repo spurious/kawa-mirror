@@ -666,7 +666,7 @@ public abstract class Language
 		  {
 		    Location loc = (Location) val;
 		    if (loc.isBound())
-		      return asType(loc.get());
+		      return getTypeFor(loc.get(), lenient);
 		    if (! (loc instanceof Named))
 		      return null;
 		    name = ((Named) loc).getName();

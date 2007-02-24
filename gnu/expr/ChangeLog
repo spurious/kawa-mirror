@@ -1,5 +1,7 @@
 2007-02-23  Per Bothner  <per@bothner.com>
 
+	* Language.java (getTypeFor): Don't use asType, which can throw.
+
 	* Compilation.java (generateApplyMethodsWithContext,
 	generateApplyMethodsWithContext): Save/set/restore source location.
 

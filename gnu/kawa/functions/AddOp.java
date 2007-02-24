@@ -262,15 +262,6 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
     return exp;
   }
 
-  /*
-  static ClassType typeInteger = ClassType.make("java.lang.Integer");
-  static ClassType typeLong = ClassType.make("java.lang.Long");
-  */
-  static ClassType typeIntNum = ClassType.make("gnu.math.IntNum");
-  static ClassType typeDFloNum = ClassType.make("gnu.math.DFloNum");
-  static ClassType typeRealNum = ClassType.make("gnu.math.RealNum");
-  static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
-
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
@@ -280,34 +271,25 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	comp.compileConstant(IntNum.zero(), target);
 	return;
       }
-    Type type = getReturnType(args);
-    Type ttype = target.getType();
     if (len == 1 || target instanceof IgnoreTarget)
       {
 	// FIXME implement optimization for unary
 	ApplyExp.compile(exp, comp, target);
 	return;
       }
-    PrimType ptype = null;
-    if (ttype instanceof PrimType)
+    Type type = getReturnType(args);
+    int kind = Arithmetic.classifyType(type);
+    if (kind == 0)
       {
-	char sig = type.getSignature().charAt(0);
-	if (sig == 'V' || sig == 'Z' || sig == 'C')
-	 ptype = null; // error
-	else if (sig == 'D' || sig == 'F')
-	  {
-	    if (type.isSubtype(typeRealNum))
-	      ptype = LangPrimType.doubleType;
-	  }
-	else
-	  {
-	    if (type.isSubtype(typeIntNum))
-	      ptype = sig == 'J' ? LangPrimType.longType : LangPrimType.intType;
-	  }
+	ApplyExp.compile(exp, comp, target);
+	return;
       }
-    if (ptype != null)
+    Type targetType = target.getType();
+    int tkind = Arithmetic.classifyType(targetType);
+    Type wtype;
+    if ((tkind == Arithmetic.INT_CODE || tkind == Arithmetic.LONG_CODE)
+        && kind >= Arithmetic.INT_CODE && kind <= Arithmetic.INTNUM_CODE)
       {
-	CodeAttr code = comp.getCode();
 	// FIXME would be nice to use iinc when appropriate!
 	// We would need to use a special LocalVariableTarget,
 	// created by SetExp when dest is a local variable.
@@ -315,35 +297,62 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	// && target instanceof LocalVariableTarget
 	// && one arg is QuoteExp && other arg is same local as target
 	// => then emit iinc.
-	args[0].compile(comp, ttype);
-	for (int i = 1;  i < len;  i++)
-	  {
-	    args[i].compile(comp, ptype);
-	    if (plusOrMinus > 0)
-	      code.emitAdd(ptype);
-	    else
-	      code.emitSub(ptype);
-	  }
-	target.compileFromStack(comp, ttype);
+        kind = tkind;
+        wtype = tkind == Arithmetic.INT_CODE ? LangPrimType.intType
+          : LangPrimType.longType;
       }
-    else if (type.isSubtype(typeDFloNum))
+    else if ((tkind == Arithmetic.DOUBLE_CODE
+              || tkind == Arithmetic.FLOAT_CODE)
+             
+             && kind > 0 && kind <= Arithmetic.REALNUM_CODE)
       {
-	PrimType dtype = LangPrimType.doubleType;
-	Target dtarget = new StackTarget(dtype);
-	CodeAttr code = comp.getCode();
-	args[0].compile(comp, dtarget);
-	for (int i = 1;  i < len;  i++)
-	  {
-	    args[i].compile(comp, dtarget);
-	    if (plusOrMinus > 0)
-	      code.emitAdd(dtype);
-	    else
-	      code.emitSub(dtype);
-	  }
-	target.compileFromStack(comp, dtype);
+        kind = tkind;
+        wtype = tkind == Arithmetic.FLOAT_CODE ? LangPrimType.floatType
+          : LangPrimType.doubleType;
+
+      }
+    else if (kind == Arithmetic.FLOAT_CODE)
+      wtype = LangPrimType.floatType;
+    else if (kind == Arithmetic.DOUBLE_CODE || kind == Arithmetic.FLONUM_CODE)
+      {
+        kind = Arithmetic.DOUBLE_CODE;
+        wtype = LangPrimType.doubleType;
       }
     else
-      ApplyExp.compile(exp, comp, target);
+      wtype = type;
+
+    if (kind != Arithmetic.INT_CODE
+        && kind != Arithmetic.LONG_CODE
+        && kind != Arithmetic.FLOAT_CODE
+        && kind != Arithmetic.DOUBLE_CODE)
+      {
+        // FIXME
+        ApplyExp.compile(exp, comp, target);
+        return;
+      }
+      
+    Target wtarget = StackTarget.getInstance(wtype);
+
+    CodeAttr code = comp.getCode();
+    for (int i = 0;  i < len;  i++)
+      {
+        args[i].compile(comp, wtarget);
+        if (i == 0)
+          continue;
+        switch (kind)
+          {
+          case Arithmetic.INT_CODE:
+          case Arithmetic.LONG_CODE:
+          case Arithmetic.FLOAT_CODE:
+          case Arithmetic.DOUBLE_CODE:
+            if (plusOrMinus > 0)
+              code.emitAdd((PrimType) wtype);
+            else
+              code.emitSub((PrimType) wtype);
+            break;
+          }
+      }
+    target.compileFromStack(comp, wtype);
   }
 
   /** Classify an expression according to its numeric type.
@@ -366,13 +375,13 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	else
 	  return 4;
       }
-    else if (type.isSubtype(typeIntNum))
+    else if (type.isSubtype(Arithmetic.typeIntNum))
       return 4;
-    else if (type.isSubtype(typeDFloNum))
+    else if (type.isSubtype(Arithmetic.typeDFloNum))
       return 3;
-    else if (type.isSubtype(typeRealNum))
+    else if (type.isSubtype(Arithmetic.typeRealNum))
       return 2;
-    else if (type.isSubtype(typeNumeric))
+    else if (type.isSubtype(Arithmetic.typeNumeric))
       return 1;
     else
       return 0;
@@ -382,43 +391,17 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
   {
     int len = args.length;
     if (len == 0)
-      return typeIntNum;
+      return Arithmetic.typeIntNum;
     Type type = Type.pointer_type;
-    int kind0 = 0;
+    int kindr = 0;
     for (int i = 0;  i < len;  i++)
       {
 	Expression arg = args[i];
-	int kind = classify(arg.getType());
+	int kind = Arithmetic.classifyType(arg.getType());
 
-	if (kind == 0)
-	  return Type.pointer_type;
-
-	if (i == 0)
-	  kind0 = kind;
-
-	if (kind0 == 4 && kind == 4)
-	  type = typeIntNum;
-	else if (kind0 >= 2 && kind >= 2)
-	  {
-	    if (kind0 == 3 || kind == 3)
-	      {
-		type = typeDFloNum;
-		kind0 = 3;
-	      }
-	    else
-	      {
-		type = typeRealNum;
-		kind0 = 2;
-	      }
-	  }
-	else if (kind0 >= 1 && kind >= 1)
-	  {
-	    type = typeNumeric;
-	    kind0 = 1;
-	  }
-	else
-	  return Type.pointer_type;
+	if (i == 0 || kind == 0 || kind > kindr)
+	  kindr = kind;
       }
-    return type;
+    return Arithmetic.kindType(kindr);
   }
 }

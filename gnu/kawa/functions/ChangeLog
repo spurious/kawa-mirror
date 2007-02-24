@@ -1,3 +1,17 @@
+2007-02-23  Per Bothner  <per@bothner.com>
+
+	* Arithmetic.java (REALNUM_CODE): New constant.
+	(classifyValue): Update appropriately.
+	(kindType, classifyType): New static methods.
+	(convert): Handle NUMERIC_CODE and REALNUM_CODE.
+	(typeDFloNum etc): Move from AddOp.java.
+	* NumberCompare.java: Update AddOp -> Arithmetic for static fields.
+	* DivideOp.java: Likewise.
+	* AddOp.java (typeDFloNum etc): Move to Arithmetic.java.
+	(compile): Make use of classifyType.
+	Make logic more generalizable - also fixing a bug relating to long.
+	(getReturnType): Make use of classifyType.
+
 2007-02-19  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java (applyN): Handle Class like Type.

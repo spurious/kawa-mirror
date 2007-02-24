@@ -268,7 +268,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		&& (kind0 < long_KIND || kind1 < long_KIND))
 	      {
 		Type[] ctypes = new Type[2];
-		ctypes[0] = AddOp.typeIntNum;
+		ctypes[0] = Arithmetic.typeIntNum;
 		if (kind1 >= long_KIND)
 		  {
 		    ctypes[1] = Type.long_type;
@@ -288,9 +288,9 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		      mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
 		  }
 		else
-		  ctypes[1] = AddOp.typeIntNum;
+		  ctypes[1] = Arithmetic.typeIntNum;
 		Method cmeth
-		  = AddOp.typeIntNum.getDeclaredMethod("compare", ctypes);
+		  = Arithmetic.typeIntNum.getDeclaredMethod("compare", ctypes);
 		PrimProcedure compare = new PrimProcedure(cmeth);
 		arg0 = new ApplyExp(compare, args);
 		arg1 = new QuoteExp(IntNum.zero());
@@ -388,13 +388,13 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	  return long_KIND;
 	return int_KIND;
       }
-     if (type.isSubtype(AddOp.typeIntNum))
+     if (type.isSubtype(Arithmetic.typeIntNum))
        return IntNum_KIND;
-     if (type.isSubtype(AddOp.typeDFloNum))
+     if (type.isSubtype(Arithmetic.typeDFloNum))
        return double_KIND;
-     if (type.isSubtype(AddOp.typeRealNum))
+     if (type.isSubtype(Arithmetic.typeRealNum))
        return RealNum_KIND;
-     if (type.isSubtype(AddOp.typeNumeric))
+     if (type.isSubtype(Arithmetic.typeNumeric))
        return Numeric_KIND;
     return Unknown_KIND;
   }

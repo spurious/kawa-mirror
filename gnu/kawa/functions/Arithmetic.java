@@ -4,6 +4,8 @@
 package gnu.kawa.functions;
 import gnu.math.*;
 import java.math.*;
+import gnu.bytecode.*;
+import gnu.kawa.lispexpr.LangPrimType;
 
 public class Arithmetic
 {
@@ -25,8 +27,10 @@ public class Arithmetic
   public static final int DOUBLE_CODE = 8;
   /** Promotion code for gnu.math.FloNum. */
   public static final int FLONUM_CODE = 9;
+  /** Promotion code for gnu.math.RealNum. */
+  public static final int REALNUM_CODE = 10;
   /** Promotion code for other gnu.math.Numeric. */
-  public static final int NUMERIC_CODE = 10;
+  public static final int NUMERIC_CODE = 11;
 
   public static int classifyValue (Object value)
   {
@@ -38,6 +42,8 @@ public class Arithmetic
 	  return RATNUM_CODE;
 	else if (value instanceof DFloNum)
 	  return FLONUM_CODE;
+	else if (value instanceof RealNum)
+	  return REALNUM_CODE;
 	else
 	  return NUMERIC_CODE;
       }
@@ -61,6 +67,94 @@ public class Arithmetic
       }
     else
       return -1;
+  }
+
+  public static Type kindType (int kind)
+  {
+    switch (kind)
+      {
+      case INT_CODE:
+        return LangPrimType.intType;
+      case LONG_CODE:
+        return LangPrimType.longType;
+      case BIGINTEGER_CODE:
+        return ClassType.make("java.math.BigInteger");
+      case INTNUM_CODE:
+        return typeIntNum;
+      case BIGDECIMAL_CODE:
+        return ClassType.make("java.math.BigDecimal");
+      case RATNUM_CODE:
+        return typeRatNum;
+      case FLOAT_CODE:
+        return LangPrimType.floatType;
+      case DOUBLE_CODE:
+        return LangPrimType.doubleType;
+      case FLONUM_CODE:
+        return typeDFloNum;
+      case REALNUM_CODE:
+        return typeRealNum;
+      case NUMERIC_CODE:
+        return typeNumeric;
+      default:
+        return Type.pointer_type;
+      }
+  }
+
+  /*
+  static ClassType typeInteger = ClassType.make("java.lang.Integer");
+  static ClassType typeLong = ClassType.make("java.lang.Long");
+  */
+  static ClassType typeDFloNum = ClassType.make("gnu.math.DFloNum");
+  static ClassType typeRatNum = ClassType.make("gnu.math.RatNum");
+  static ClassType typeRealNum = ClassType.make("gnu.math.RealNum");
+  static ClassType typeNumber = ClassType.make("java.lang.Number");
+  static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
+  static ClassType typeIntNum = ClassType.make("gnu.math.IntNum");
+
+  public static int classifyType (Type type)
+  {
+    int kind = 0;
+    if (type instanceof PrimType)
+      {
+	char sig = type.getSignature().charAt(0);
+	if (sig == 'V' || sig == 'Z' || sig == 'C')
+	  return 0;
+	else if (sig == 'D')
+	  return DOUBLE_CODE;
+	else if (sig == 'F')
+	  return FLOAT_CODE;
+        else if (sig == 'J')
+          return LONG_CODE;
+	else
+	  return INT_CODE;
+      }
+    String tname = type.getName();
+    if (type.isSubtype(typeIntNum))
+      return INTNUM_CODE;
+    else if (type.isSubtype(typeRatNum))
+      return RATNUM_CODE;
+    else if (type.isSubtype(typeDFloNum))
+      return FLONUM_CODE;
+    else if ("java.lang.Double".equals(tname))
+      return DOUBLE_CODE;
+    else if ("java.lang.Float".equals(tname))
+      return FLOAT_CODE;
+    else if ("java.lang.Long".equals(tname))
+      return LONG_CODE;
+    else if ("java.lang.Integer".equals(tname)
+             || "java.lang.Short".equals(tname)
+             || "java.lang.Byte".equals(tname))
+      return INT_CODE;
+    else if ("java.math.BigInteger".equals(tname))
+      return BIGINTEGER_CODE;
+    else if ("java.math.BigDecimal".equals(tname))
+      return BIGDECIMAL_CODE;
+    else if (type.isSubtype(typeRealNum))
+      return REALNUM_CODE;
+    else if (type.isSubtype(typeNumeric))
+      return NUMERIC_CODE;
+    else
+      return 0;
   }
 
   public static int asInt (Object value)
@@ -211,7 +305,6 @@ public class Arithmetic
         if (radix == 10)
           return Double.toString(Arithmetic.asDouble(number));
         // else fall through:
-      case Arithmetic.RATNUM_CODE:
       default:
         return Arithmetic.asNumeric(number).toString(radix);
       }
@@ -273,6 +366,10 @@ public class Arithmetic
         if (value instanceof DFloNum)
           return value;
         return DFloNum.make(Arithmetic.asDouble(value));
+      case Arithmetic.NUMERIC_CODE:
+        return Arithmetic.asNumeric(value);
+      case Arithmetic.REALNUM_CODE:
+        return (RealNum) Arithmetic.asNumeric(value);
       default:
         return (Number) value;
       }

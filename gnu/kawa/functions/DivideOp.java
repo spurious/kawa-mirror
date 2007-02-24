@@ -67,7 +67,7 @@ public class DivideOp extends ProcedureN implements CanInline
 	      return opt;
 	  }
 	if (kind0 >= 2 &&  kind1 >= 2)
-	  return new ApplyExp(AddOp.typeRealNum.getDeclaredMethod("divide", 2),
+	  return new ApplyExp(Arithmetic.typeRealNum.getDeclaredMethod("divide", 2),
 			      args);
       }
     return exp;

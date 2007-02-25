@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.text.*;
 
 public class BindingInitializer extends Initializer
 {
@@ -48,9 +49,10 @@ public class BindingInitializer extends Initializer
       }
 
     int line = decl.getLineNumber();
+    SourceMessages messages = comp.getMessages();
+    SourceLocator saveLoc = messages.swapSourceLocator(decl);
     if (line > 0)
       code.putLineNumber(decl.getFileName(), line);
-
     if (field != null && ! field.getStaticFlag())
       code.emitPushThis();
 
@@ -62,38 +64,41 @@ public class BindingInitializer extends Initializer
 
 	Object name = decl.getSymbol();
 
-	if (decl.isAlias())
+	if (decl.getFlag(Declaration.IS_UNKNOWN
+                         |Declaration.IS_DYNAMIC|Declaration.IS_FLUID))
+	  {
+            if (name instanceof String)
+              name = Namespace.EmptyNamespace.getSymbol((String) name);
+            comp.compileConstant(name, Target.pushObject);
+            if (property == null)
+              code.emitPushNull();
+            else
+              comp.compileConstant(property, Target.pushObject);
+            code.emitInvokeStatic(typeThreadLocation.getDeclaredMethod("getInstance", 2));
+	  }
+        /*
+         * This option supports module-local dynamic variables.
+         * I.e. A lexically bound "cell" whose value is fluid (dynamic and
+         * thread-local).  Don't know how useful this is - at the least
+         * it seems rather heavy-weight for a plain Scheme 'define'.
+        else if (! decl.isAlias())
+          {
+            Type[] atypes = new Type[1];
+            if (name instanceof Symbol)
+              atypes[0] = Compilation.typeSymbol;
+            else
+              atypes[0] = Type.tostring_type;
+            comp.compileConstant(name, Target.pushObject);
+            Method m = typeThreadLocation
+              .getDeclaredMethod("makePrivate", atypes);
+            code.emitInvokeStatic(m);
+          }
+        */
+        else
           {
             comp.compileConstant(name, Target.pushObject);
             code.emitInvokeStatic(makeLocationMethod(name));
           }
-	else
-	  {
-	    ClassType t = ClassType.make("gnu.mapping.ThreadLocation");
-	    if (decl.getFlag(Declaration.IS_UNKNOWN
-			     |Declaration.IS_DYNAMIC|Declaration.IS_FLUID))
-	      {
-                if (name instanceof String)
-                  name = Namespace.EmptyNamespace.getSymbol((String) name);
-                comp.compileConstant(name, Target.pushObject);
-		if (property == null)
-		  code.emitPushNull();
-		else
-		  comp.compileConstant(property, Target.pushObject);
-		code.emitInvokeStatic(t.getDeclaredMethod("getInstance", 2));
-	      }
-	    else
-	      {
-                Type[] atypes = new Type[1];
-                if (name instanceof Symbol)
-                  atypes[0] = Compilation.typeSymbol;
-                else
-                  atypes[0] = Type.tostring_type;
-                comp.compileConstant(name, Target.pushObject);
-		code.emitInvokeStatic(t.getDeclaredMethod("makePrivate",
-                                                          atypes));
-	      }
-	  }
       }
     else
       {
@@ -113,7 +118,11 @@ public class BindingInitializer extends Initializer
       code.emitPutStatic(field);
     else
       code.emitPutField(field);
+    messages.swapSourceLocator(saveLoc);
   }
+
+  static final ClassType typeThreadLocation =
+    ClassType.make("gnu.mapping.ThreadLocation");
 
   public static Method makeLocationMethod (Object name)
   {

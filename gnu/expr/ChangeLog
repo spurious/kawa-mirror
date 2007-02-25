@@ -1,3 +1,10 @@
+2007-02-25  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java (emit): Don't create private ThreadLocation -
+	it seems like expensive overkill.
+
+	* BindingInitializer.java (emit): Save/set/restore source location.
+
 2007-02-23  Per Bothner  <per@bothner.com>
 
 	* Language.java (getTypeFor): Don't use asType, which can throw.

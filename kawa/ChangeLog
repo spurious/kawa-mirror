@@ -1,6 +1,12 @@
 2007-02-25  Per Bothner  <per@bothner.com>
 
-	* kawa/Lambda.java (rewriteBody): Allow constant Type or Class in
+	* standard/Scheme.java (checkDefaultBinding): Map 'NAME?' to
+	'(lambda (x) (instance? x NAME)'.
+
+	* standard/Scheme.java (getNamedType): Remove redundant efinition
+	of 'java.lang.Object'.
+
+	* lang/Lambda.java (rewriteBody): Allow constant Type or Class in
 	deprecated '<TYPE> BODY' syntax.
 
 2007-02-19  Per Bothner  <per@bothner.com>

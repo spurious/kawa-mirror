@@ -935,7 +935,6 @@ public class Scheme extends LispLanguage
 	types.put ("never-returns", Type.neverReturnsType);
 
 	types.put ("Object", Type.pointer_type);
-	types.put ("java.lang.Object", Type.pointer_type);
 	types.put ("String", Type.tostring_type);
 
 	types.put ("object", Type.pointer_type);
@@ -1069,6 +1068,36 @@ public class Scheme extends LispLanguage
   {
     String name = symbol.toString();
     int len = name.length();
+    if (len > 1 && name.charAt(len-1) == '?')
+      {
+        Namespace namespace = symbol.getNamespace();
+        String local = symbol.getLocalPart();
+        int llen = local.length();
+        if (llen > 1)
+          {
+            String tlocal = local.substring(0, llen-1).intern();
+            Symbol tsymbol = namespace.getSymbol(tlocal);
+            Expression texp = tr.rewrite(tsymbol, false);
+            if (texp instanceof ReferenceExp)
+              {
+                Declaration decl = ((ReferenceExp) texp).getBinding();
+                if (decl == null || decl.getFlag(Declaration.IS_UNKNOWN))
+                  texp = null;
+              }
+            else if (! (texp instanceof QuoteExp))
+              texp = null;
+            if (texp != null)
+              {
+                LambdaExp lexp = new LambdaExp(1);
+                lexp.setSymbol(symbol);
+                Declaration param = lexp.addDeclaration((Object) null);
+                lexp.body = new ApplyExp(instanceOf,
+                                         new Expression[] {
+                                           new ReferenceExp(param), texp, });
+                return lexp;
+              }
+          }
+      }
     if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
       {
         name = name.substring(1, len-1);

@@ -598,9 +598,12 @@ public class Lambda extends Syntax
     tr.curLambda = saveLambda;
     Expression[] exps;
     int len;
+    Object val;
     if (lexp.body instanceof BeginExp
         && (len = (exps = ((BeginExp) lexp.body).getExpressions()).length) > 1
-        && exps[0] instanceof ReferenceExp)
+        && (exps[0] instanceof ReferenceExp
+            || ((val = exps[0].valueIfConstant()) instanceof Type
+                || val instanceof Class)))
       {
 	// Handle '<TYPENAME> BODY':
         Expression rexp = exps[0];

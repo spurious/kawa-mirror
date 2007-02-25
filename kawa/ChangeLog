@@ -1,3 +1,8 @@
+2007-02-25  Per Bothner  <per@bothner.com>
+
+	* kawa/Lambda.java (rewriteBody): Allow constant Type or Class in
+	deprecated '<TYPE> BODY' syntax.
+
 2007-02-19  Per Bothner  <per@bothner.com>
 
 	* standard/define_class.java (scanForDefinitions): We now return

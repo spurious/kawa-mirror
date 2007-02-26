@@ -370,8 +370,11 @@ class GetNamedExp extends ApplyExp
     return this;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
+    if (! argsInlined)
+      exp.walkArgs(walker);
     Expression[] pargs = getArgs();
     Expression context = pargs[0];
     Expression[] args = exp.getArgs();

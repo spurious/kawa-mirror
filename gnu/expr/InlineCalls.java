@@ -17,14 +17,15 @@ public class InlineCalls extends ExpWalker
 
   protected Expression walkApplyExp(ApplyExp exp)
   {
-    super.walkApplyExp(exp);
-    return walkApplyOnly(exp);
+    Expression func = walk(exp.func);
+    exp.func = func;
+    return func.inline(exp, this, null, false);
   }
 
   /** Walk an ApplyExp assuming function and arguments have been walked. */
   public Expression walkApplyOnly(ApplyExp exp)
   {
-    return exp.func.inline(exp, this, null);
+    return exp.func.inline(exp, this, null, true);
   }
 
   protected Expression walkReferenceExp (ReferenceExp exp)

@@ -1583,8 +1583,44 @@ public class LambdaExp extends ScopeExp
     ctx.writeValue(new Closure(this, ctx));
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
+    Expression[] args = exp.getArgs();
+    if (! argsInlined && min_args == max_args
+        && min_args == args.length
+        // Since we re-use the Lambda in-place, we only want to do this
+        // for anonymous functions applied directly, as in:
+        // (apply (lambda (...) ...) ...)
+        // More general function inlining is desirable but more complex.
+        && exp.func == this && this.nameDecl == null)
+      {
+        Expression[] stats = new Expression[args.length+1];
+        LetExp let = new LetExp(args);
+        Declaration prev = null;
+        int i = 0;
+        for (Declaration param = firstDecl(); param != null; i++)
+          {
+            Declaration next = param.nextDecl();
+            remove(prev, param);
+            let.add(prev, param);
+            Expression arg = args[i];
+            stats[i] = new SetExp(param, arg);
+            param.setValue(arg);
+            prev = param;
+            param = next;
+          }
+        for (Declaration param = let.firstDecl(); param != null; )
+          {
+            Declaration next = param.nextDecl();
+            param = next;
+          }
+        stats[i] = body;
+        let.body = new BeginExp(stats);
+        return walker.walk(let);
+      }
+    if (! argsInlined)
+      exp.args = walker.walkExps(exp.args, exp.args.length);
     int args_length = exp.args.length;
     String msg = WrongArguments.checkArgCount(getName(),
                                               min_args, max_args, args_length);

@@ -156,25 +156,29 @@ public class ReferenceExp extends AccessExp
   {
     return walker.walkReferenceExp(this);
   }
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
     decl = this.binding; // We don't use the passed-in Declaration.
     if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
       {
         decl = Declaration.followAliases(decl);
-        if (decl.isIndirectBinding())
-          return exp;
-        Expression dval = decl.getValue();
-        if (dval != null)
-          return dval.inline(exp, walker, decl);
+        if (! (decl.isIndirectBinding()))
+          {
+            Expression dval = decl.getValue();
+            if (dval != null)
+              return dval.inline(exp, walker, decl, argsInlined);
+          }
       }
     else if (getSymbol() instanceof Symbol)
       {
         Symbol symbol = (Symbol) getSymbol();
         Object fval = Environment.getCurrent().getFunction(symbol, null);
         if (fval instanceof Procedure)
-          return new QuoteExp(fval).inline(exp, walker, null);
+          return new QuoteExp(fval).inline(exp, walker, null, argsInlined);
       }
+    if (! argsInlined)
+      exp.args = walker.walkExps(exp.args, exp.args.length);
     return exp;
   }
 

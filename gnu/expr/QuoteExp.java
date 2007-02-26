@@ -82,7 +82,8 @@ public class QuoteExp extends Expression
     return walker.walkQuoteExp(this);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
     if (this == QuoteExp.undefined_exp)
       return exp;
@@ -96,6 +97,8 @@ public class QuoteExp extends Expression
     String msg = WrongArguments.checkArgCount(proc, nargs);
     if (msg != null)
       return walker.noteError(msg);
+    if (! argsInlined)
+      exp.args = walker.walkExps(exp.args, exp.args.length);
     if (proc instanceof CanInline)
       return ((CanInline) proc).inline(exp, walker);
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))

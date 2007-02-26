@@ -1,3 +1,14 @@
+2007-02-26  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (walkArgs): New method.
+	* Expression.java (inline): Take extra boolean argsWalked parameter.
+	* LambdaExp.java (inline): Take argsInlined parameter.
+	Also inline lambda directly in function-call position.
+	* QuoteExp.java (inline): Take argsInlined parameter.
+	* ReferenceExp.java (inline): Take argsInlined parameter.
+	* InlineCalls.java (walkApplyExp): Delegate/defer walking args to
+	Expression.inline method.
+
 2007-02-25  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (emit): Don't create private ThreadLocation -

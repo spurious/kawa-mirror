@@ -211,11 +211,15 @@ public abstract class Expression extends Procedure0
    * @param exp an application whose function expression can be simplified
    *  to this expression.
    * @param walker the context for the current inlining pass
-   * @param decl if non-null, a Declaration bound to this expression
-   * @return an Expression equivalent to te passed-in exp.
+   * @param decl if non-null, a Declaration bound to this expression.
+   * @param argsInlined true iff {@code exp.getArgs()} have been walked.
+   * @return an Expression equivalent to the passed-in exp.
    */
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
+    if (! argsInlined)
+      exp.args = walker.walkExps(exp.args, exp.args.length);
     return exp;
   }
 

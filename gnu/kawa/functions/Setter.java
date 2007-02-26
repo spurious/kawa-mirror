@@ -153,8 +153,11 @@ class SetArrayExp extends ApplyExp
     elementType = arrayType.getComponentType();
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
+    if (! argsInlined)
+      exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {
@@ -177,8 +180,11 @@ class SetListExp extends ApplyExp
     super(func, args);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker, Declaration decl)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            Declaration decl, boolean argsInlined)
   {
+    if (! argsInlined)
+      exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {

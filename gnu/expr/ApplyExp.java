@@ -381,6 +381,11 @@ public class ApplyExp extends Expression
     return walker.walkApplyExp(this);
   }
 
+  public void walkArgs (ExpWalker walker)
+  {
+    args = walker.walkExps(args, args.length);
+  }
+
   protected void walkChildren(ExpWalker walker)
   {
     func = walker.walk(func);

@@ -1,3 +1,11 @@
+2007-02-26  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (inline): Update for new CanInline api.
+	* SlotGet.java (inline): Likewise.
+	* InstanceOf.java (inline): Likewise.
+	* Invoke.java (inline): Likewise.
+	* SlotSet.java (inline): Likewise.
+
 2007-02-23  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (setWithSave, setRestore): New methods.

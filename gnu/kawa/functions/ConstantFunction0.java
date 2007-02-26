@@ -29,8 +29,9 @@ public class ConstantFunction0 extends Procedure0 implements CanInline
 
   public Object apply0() { return value; }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     int nargs = exp.getArgCount();
     if (nargs != 0 && walker != null)
       {

@@ -252,8 +252,9 @@ public class Compare extends Procedure2 implements CanInline
   public static final Compare valLe =
     make("le",TRUE_IF_LSS|TRUE_IF_EQU|VALUE_COMPARISON);
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;

@@ -17,7 +17,47 @@ public class InlineCalls extends ExpWalker
 
   protected Expression walkApplyExp(ApplyExp exp)
   {
-    Expression func = walk(exp.func);
+    Expression func = exp.func;
+
+    // Replace (apply (lambda (param ...) body ...) arg ...)
+    // by: (let ((param arg) ...) body ...).
+    // Note this should be done *before* we walk the lambda, so we can
+    // walk the body with params bound to the known args.
+    if (func instanceof LambdaExp)
+      {
+        Expression[] args = exp.args;
+        LambdaExp lexp = (LambdaExp) func;
+        if (lexp.min_args == lexp.max_args
+            && lexp.min_args == args.length
+            // Since we re-use the Lambda in-place, we only want to do this
+            // for anonymous functions applied directly, as in:
+            // (apply (lambda (...) ...) ...)
+            // More general function inlining is desirable but more complex.
+            && lexp.nameDecl == null)
+          {
+            LetExp let = new LetExp(args);
+            Declaration prev = null;
+            int i = 0;
+            for (Declaration param = lexp.firstDecl(); param != null; i++)
+              {
+                Declaration next = param.nextDecl();
+                lexp.remove(prev, param);
+                let.add(prev, param);
+                Expression arg = args[i];
+                param.setValue(arg);
+                prev = param;
+                param = next;
+              }
+            for (Declaration param = let.firstDecl(); param != null; )
+              {
+                Declaration next = param.nextDecl();
+                param = next;
+              }
+            let.body = lexp.body;
+            return walk(let);
+          }
+      }
+    func = walk(func);
     exp.func = func;
     return func.inline(exp, this, null, false);
   }

@@ -97,10 +97,10 @@ public class QuoteExp extends Expression
     String msg = WrongArguments.checkArgCount(proc, nargs);
     if (msg != null)
       return walker.noteError(msg);
-    if (! argsInlined)
-      exp.args = walker.walkExps(exp.args, exp.args.length);
     if (proc instanceof CanInline)
       return ((CanInline) proc).inline(exp, walker);
+    if (! argsInlined)
+      exp.args = walker.walkExps(exp.args, exp.args.length);
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
       {
 	Expression e = exp.inlineIfConstant(proc, walker);

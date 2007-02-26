@@ -13,8 +13,9 @@ public class MakeUnescapedData extends Procedure1 implements CanInline
     return new UnescapedData(arg == null ? "" : arg.toString());
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length == 1 && args[0] instanceof QuoteExp)
       return new QuoteExp(apply1(((QuoteExp) args[0]).getValue()));

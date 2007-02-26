@@ -26,8 +26,9 @@ public class AppendValues extends MethodProc implements CanInline, Inlineable
       }
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       return args[0];

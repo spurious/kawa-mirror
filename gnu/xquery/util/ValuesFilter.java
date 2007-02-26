@@ -100,8 +100,9 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
     return;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker); // FIXME - be smarter about type propagation
     Expression[] args = exp.getArgs();
     Expression exp2 = args[1];
     LambdaExp lexp2;

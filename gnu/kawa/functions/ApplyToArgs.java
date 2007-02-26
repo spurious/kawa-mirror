@@ -130,29 +130,38 @@ public class ApplyToArgs extends ProcedureN
 
   Language language;
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length - 1;
     if (nargs >= 0)
       {
         Expression proc = args[0];
+        if (proc instanceof LambdaExp)
+          {
+            Expression[] rargs = new Expression[nargs];
+            System.arraycopy(args, 1, rargs, 0, nargs);
+            return walker.walk(new ApplyExp(proc, rargs));
+          }
+        proc = walker.walk(proc);
         args[0] = proc;
         Type ptype = proc.getType();
         ApplyExp result;
         Compilation comp = walker.getCompilation();
         Language language = comp.getLanguage();
-        // This might be more cleanly handled at the type specifier. FIXME
-        if (Invoke.checkKnownClass(ptype, comp) < 0)
-          return exp;
-        ClassType ctype;
         if (ptype.isSubtype(Compilation.typeProcedure))
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            result = new ApplyExp(proc, rargs);
+            return proc.inline(new ApplyExp(proc, rargs), walker, null, false);
           }
-        else if (ptype.isSubtype(Compilation.typeType)
+        for (int i = 1; i <= nargs;  i++)
+          args[i] = walker.walk(args[i]);
+        // This might be more cleanly handled at the type specifier. FIXME
+        if (Invoke.checkKnownClass(ptype, comp) < 0)
+          return exp;
+        ClassType ctype;
+        if (ptype.isSubtype(Compilation.typeType)
                  || language.getTypeFor(proc,false) != null)
           {
             result = new ApplyExp(Invoke.make, args);

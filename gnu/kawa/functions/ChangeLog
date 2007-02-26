@@ -1,5 +1,21 @@
 2007-02-26  Per Bothner  <per@bothner.com>
 
+	* NumberCompare.java (inline): Update for new CanInline api.
+	* DivideOp.java (inline): Likewise.
+	* GetNamedPart.java (inline): Likewise.
+	* ConstantFunction0.java (inline): Likewise.
+	* AppendValues.java (inline): Likewise.
+	* SetNamedPart.java (inline): Likewise.
+	* ValuesMap.java (inline): Likewise.
+	* GetNamedInstancePart.java (inline): Likewise.
+	* Setter.java (inline): Likewise.
+	* MultiplyOp.java (inline): Likewise.
+	* Convert.java (inline): Likewise.
+	* MakeProcedure.java (inline): Likewise.
+	* IsEqv.java (inline): Likewise.
+	* AddOp.java (inline): Likewise.
+	* ApplyToArgs.java (inline): Likewise.  Defer walkArgs.
+	
 	* GetNamedPart.java (inline): Update to extra argsInlined parameter.
 	* Setter.java (SetArrayExp.inline): Likewise.
 	(SetListExp.inline): Likewise.

@@ -40,8 +40,9 @@ public class DivideOp extends ProcedureN implements CanInline
     return result;
    }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;

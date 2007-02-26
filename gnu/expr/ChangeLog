@@ -1,5 +1,14 @@
 2007-02-26  Per Bothner  <per@bothner.com>
 
+	* CanInline.java (inline): Change so that arguments need to be walked.
+	Change 2nd paramter type ExpWalker->InlineCalls.
+	* QuoteExp.java (inline): Don't walkArgs before calling CanInline's
+	inline method - do it wafter if we don't.
+	* LambdaExp.java (inline): Move (apply (lambda ...) ...) optimization
+	to InlineCalls since it needs to be done before func is walked.
+	* InlineCalls.java (walkApplyExp): Do (apply (lambda ...) ...)
+	optimization here.
+
 	* ApplyExp.java (walkArgs): New method.
 	* Expression.java (inline): Take extra boolean argsWalked parameter.
 	* LambdaExp.java (inline): Take argsInlined parameter.

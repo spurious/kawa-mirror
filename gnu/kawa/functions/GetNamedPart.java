@@ -87,8 +87,9 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     return makeExp(new QuoteExp(type), new QuoteExp(member));
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp)
         || ! (exp instanceof GetNamedExp))
@@ -151,7 +152,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
           }
         ApplyExp aexp = new ApplyExp(SlotGet.staticField, args);
         aexp.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(aexp);
+        return walker.walkApplyOnly(aexp);
                             
       }
     if (typeval != null)
@@ -212,7 +213,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
             // args = new Expression[] { context, new QuoteExp(part) });
             ApplyExp aexp = new ApplyExp(SlotGet.field, args);
             aexp.setLine(exp);
-            return ((InlineCalls) walker).walkApplyOnly(aexp);
+            return walker.walkApplyOnly(aexp);
           }
       }
 
@@ -489,8 +490,9 @@ class NamedPart extends ProcedureN
     return 0xfffff000;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     switch (kind)
       {
@@ -511,7 +513,7 @@ class NamedPart extends ProcedureN
           }
         ApplyExp aexp = new ApplyExp(proc, xargs);
         aexp.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(aexp);
+        return walker.walkApplyOnly(aexp);
       }
     return exp;
   }
@@ -638,8 +640,9 @@ class NamedPartSetter extends gnu.mapping.Setter
     return 0xfffff000;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     NamedPart get = (NamedPart) this.getter;
     if (get.kind == 'D')
       {
@@ -662,7 +665,7 @@ class NamedPartSetter extends gnu.mapping.Setter
           return exp;
         ApplyExp aexp = new ApplyExp(proc, xargs);
         aexp.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(aexp);
+        return walker.walkApplyOnly(aexp);
       }
     return exp;
   }

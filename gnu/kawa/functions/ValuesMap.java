@@ -77,8 +77,9 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     return null;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     LambdaExp lexp = canInline(exp);
     if (lexp != null)
       {

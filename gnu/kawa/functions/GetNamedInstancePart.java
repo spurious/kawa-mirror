@@ -63,8 +63,9 @@ public class GetNamedInstancePart extends ProcedureN
 
   public int numArgs() { return isField ? 0x1001 : 0xfffff001; }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     Expression[] xargs;
     Procedure proc;
@@ -82,7 +83,7 @@ public class GetNamedInstancePart extends ProcedureN
         System.arraycopy(args, 1, xargs, 2, nargs-1);
         proc = Invoke.invoke;
       }
-    return ((InlineCalls) walker).walkApplyOnly(new ApplyExp(proc, xargs));
+    return walker.walkApplyOnly(new ApplyExp(proc, xargs));
   }
 
   public Object applyN (Object[] args)
@@ -140,13 +141,14 @@ class SetNamedInstancePart extends Procedure2
     pname = name;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     Expression[] xargs = new Expression[]
       { args[0], new QuoteExp(pname), args[1] };
     Procedure proc = SlotSet.set$Mnfield$Ex;
-    return ((InlineCalls) walker).walkApplyOnly(new ApplyExp(proc, xargs));
+    return walker.walkApplyOnly(new ApplyExp(proc, xargs));
   }
 
   public Object apply2 (Object instance, Object value)

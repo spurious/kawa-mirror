@@ -226,8 +226,9 @@ public class SlotGet extends Procedure2
       return method;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Compilation comp = walker.getCompilation();
     Language language = comp.getLanguage();
     Type type;
@@ -333,7 +334,7 @@ public class SlotGet extends Procedure2
                            QuoteExp.getInstance(isName),
                            QuoteExp.getInstance(language)});
         nexp.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(nexp);
+        return walker.walkApplyOnly(nexp);
       }
     return exp;
   }

@@ -92,8 +92,9 @@ public class MultiplyOp extends ProcedureN implements CanInline
     return result;
    }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     if (! walker.getCompilation().mustCompile)
       return exp;
     Expression folded = exp.inlineIfConstant(this, walker);

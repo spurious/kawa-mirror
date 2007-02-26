@@ -137,7 +137,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
   public static Expression pairwise(Procedure proc,
                                     Expression rproc, Expression[] args,
-				    ExpWalker walker)
+				    InlineCalls walker)
   {
     int len = args.length;
     Expression prev = args[0];
@@ -155,8 +155,9 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
     return prev;
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     // Inlining may yield PrimProcedure instructions of bytecode instructions
     // which we don't know how to interpret (yet).
     if (! walker.getCompilation().mustCompile)

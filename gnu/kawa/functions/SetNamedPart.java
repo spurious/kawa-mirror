@@ -11,8 +11,9 @@ public class SetNamedPart extends Procedure3 implements HasSetter, CanInline
   public static final SetNamedPart setNamedPart = new SetNamedPart();
   static { setNamedPart.setName("setNamedPart"); }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     if (args.length != 3 || ! (args[1] instanceof QuoteExp))
       return exp;

@@ -28,9 +28,10 @@ public class CastableAs extends InstanceOf
   static final Method castableMethod
     = CastAs.typeXDataType.getDeclaredMethod("castable", 1);
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
-    exp = Invoke.inlineClassName(exp, 1, (InlineCalls) walker);
+    exp.walkArgs(walker);
+    exp = Invoke.inlineClassName(exp, 1, walker);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp))
       return exp;

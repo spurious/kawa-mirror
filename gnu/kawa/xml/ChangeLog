@@ -1,3 +1,8 @@
+2007-02-26  Per Bothner  <per@bothner.com>
+
+	* MakeUnescapedData.java (inline): Update for new CanInline api.
+	* TreeScanner.java (inline): Likewise.
+
 2007-02-16  Per Bothner  <per@bothner.com>
 
 	* XStringType.java: Semi-handle the non-use:regex PreProcess case.

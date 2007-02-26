@@ -17,8 +17,9 @@ public class MakeProcedure extends ProcedureN implements CanInline
     return GenericProc.make(args);
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     Expression[] args = exp.getArgs();
     int alen = args.length;
     Expression method = null;

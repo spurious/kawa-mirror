@@ -70,8 +70,9 @@ public abstract class TreeScanner extends MethodProc
     return "#<" + getClass().getName() + ' ' + type + '>';
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker)
   {
+    exp.walkArgs(walker);
     if (exp.getTypeRaw() == null && type instanceof Type)
       exp.setType(NodeSetType.getInstance((Type) type));
     return exp;

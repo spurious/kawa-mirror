@@ -782,23 +782,34 @@
  (kawa
   (define-syntax %test-error
     (syntax-rules ()
+      ((%test-error r #t expr)
+       (cond ((%test-on-test-begin r)
+	      (test-result-set! r 'expected-error #t)
+	      (%test-on-test-end r
+				 (try-catch
+				  (let ()
+				    (test-result-set! r 'actual-value expr)
+				    #f)
+				  (ex <java.lang.Throwable>
+				      (test-result-set! r 'actual-error ex)
+				      #t)))
+	      (%test-report-result))))
       ((%test-error r etype expr)
-       (let ()
-	 (if (%test-on-test-begin r)
-	     (let ((et etype))
-	       (test-result-set! r 'expected-error et)
-	       (%test-on-test-end r
-				  (try-catch
-				   (let ()
-				     (test-result-set! r 'actual-value expr)
-				     #f)
-				   (ex <java.lang.Throwable>
-				       (test-result-set! r 'actual-error ex)
-				       (cond ((and (instance? et <gnu.bytecode.ClassType>)
-						   (gnu.bytecode.ClassType:isSubclass et <java.lang.Throwable>))
-					      (instance? ex et))
-					     (else #t)))))
-	       (%test-report-result))))))))
+       (if (%test-on-test-begin r)
+	   (let ((et etype))
+	     (test-result-set! r 'expected-error et)
+	     (%test-on-test-end r
+				(try-catch
+				 (let ()
+				   (test-result-set! r 'actual-value expr)
+				   #f)
+				 (ex <java.lang.Throwable>
+				     (test-result-set! r 'actual-error ex)
+				     (cond ((and (instance? et <gnu.bytecode.ClassType>)
+						 (gnu.bytecode.ClassType:isSubclass et <java.lang.Throwable>))
+					    (instance? ex et))
+					   (else #t)))))
+	     (%test-report-result)))))))
  ((and srfi-34 srfi-35)
   (define-syntax %test-error
     (syntax-rules ()

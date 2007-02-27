@@ -1,3 +1,13 @@
+2007-02-27  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkSetExp, walkFluidLetExp): Don't setCanWrite
+	on Declaration here - which should be done before InlineCalls.
+	* ResolveNames.java (walkSetExp): Invoke Declaration.setCanWrite.
+	* FindCapturedVars.java (allocUnboundDecl): Do setCanWrite.
+	* InlineCalls.java (walkReferenceExp): Add optimization to use
+	variable used toinitialize variable.
+	(walkApplyExp): Don't param.setValue if getCanWrite.
+
 2007-02-26  Per Bothner  <per@bothner.com>
 
 	* CanInline.java (inline): Change so that arguments need to be walked.

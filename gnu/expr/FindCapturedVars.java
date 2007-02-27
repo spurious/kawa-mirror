@@ -329,6 +329,7 @@ public class FindCapturedVars extends ExpWalker
 	if (currentModule.isStatic())
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);
+	decl.setCanWrite(true);
 	decl.setFlag(Declaration.IS_UNKNOWN);
 	decl.setIndirectBinding(true);
 	unknownDecls.put(key, decl);

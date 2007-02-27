@@ -72,6 +72,7 @@ public class set_b extends Syntax
     sexp.setContextDecl(ref.contextDecl());
     if (decl != null)
       {
+        decl.setCanWrite(true);
 	sexp.setBinding(decl);
 	decl = Declaration.followAliases(decl);
 	if (decl != null)

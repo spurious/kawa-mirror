@@ -2,8 +2,10 @@ package gnu.expr;
 import gnu.bytecode.Type;
 
 /** Does setTailCall on ApplyExp's that are tail-calls.
-    Also setCanRead, setCanCall, setCanWrite on Declarations
-    and setCanRead, setCanCall on LambdaExp when appropriate. */
+ * Also setCanRead, setCanCall on Declarations
+ * and setCanRead, setCanCall on LambdaExp when appropriate.
+ * (setCnWrite on Declarations needs to be set before this.)
+ */
 
 public class FindTailCalls extends ExpWalker
 {
@@ -116,12 +118,8 @@ public class FindTailCalls extends ExpWalker
          decl != null; decl = decl.nextDecl())
       {
         decl.setCanRead(true);
-        decl.setCanWrite(true);
         if (decl.base != null)
-          {
-            decl.base.setCanRead(true);
-            decl.base.setCanWrite(true);
-          }
+          decl.base.setCanRead(true);
       }
     boolean save = inTailContext;
     inTailContext = false;
@@ -369,8 +367,6 @@ public class FindTailCalls extends ExpWalker
 	      }
 	    decl = Declaration.followAliases(decl);
 	  }
-	if (decl != null)
-	  decl.setCanWrite();
         Declaration ctx = exp.contextDecl();
         if (ctx != null)
           ctx.setCanRead(true);

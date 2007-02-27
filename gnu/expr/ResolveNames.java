@@ -82,7 +82,12 @@ public class ResolveNames extends ExpWalker
   protected Expression walkSetExp (SetExp exp)
   {
     if (exp.binding == null)
-      exp.binding = lookup(exp, exp.getSymbol(), exp.isFuncDef());
+      {
+        Declaration decl = lookup(exp, exp.getSymbol(), exp.isFuncDef());
+        if (decl != null)
+          decl.setCanWrite(true);
+        exp.binding = decl;
+      }
     return super.walkSetExp(exp);
   }
 }

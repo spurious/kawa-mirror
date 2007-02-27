@@ -44,7 +44,8 @@ public class InlineCalls extends ExpWalker
                 lexp.remove(prev, param);
                 let.add(prev, param);
                 Expression arg = args[i];
-                param.setValue(arg);
+                if ( ! param.getCanWrite())
+                  param.setValue(arg);
                 prev = param;
                 param = next;
               }
@@ -71,12 +72,23 @@ public class InlineCalls extends ExpWalker
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
     Declaration decl = exp.getBinding();
-    if (decl != null && decl.getFlag(Declaration.IS_CONSTANT)
-        && decl.field == null)
+    if (decl != null && decl.field == null && ! decl.getCanWrite())
       {
-	Expression dval = decl.getValue();
+        Expression dval = decl.getValue();
         if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
           return walkQuoteExp((QuoteExp) dval);
+        if (dval instanceof ReferenceExp && ! decl.isAlias())
+          {
+            ReferenceExp rval = (ReferenceExp) dval;
+            Declaration rdecl = rval.getBinding();
+            Type dtype = decl.getType();
+            if (rdecl != null && ! rdecl.getCanWrite()
+                && (dtype == null || dtype == Type.pointer_type
+                    // We could also allow (some) widening conversions.
+                    || dtype == rdecl.getType())
+                && ! rval.getDontDereference())
+              return walkReferenceExp(rval);
+          }
       }
     return super.walkReferenceExp(exp);
   }

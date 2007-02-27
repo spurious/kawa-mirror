@@ -85,7 +85,9 @@ public class fluid_let extends Syntax
                 if (found.isLexical())
                   found.setIndirectBinding(true);
                 decl.base = found;
+                found.setCanWrite(true);
               }
+            decl.setCanWrite(true);
             decl.setFluid(true);
             decl.setIndirectBinding(true);
             if (value == null)

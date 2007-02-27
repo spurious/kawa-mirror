@@ -68,6 +68,7 @@ public class lambda extends Lambda
 	     arg = arg.nextDecl(), i++)
 	  {
 	    Declaration decl = let.addDeclaration(arg.getSymbol());
+            decl.setCanWrite(true);
 	    decl.setFluid(true);
 	    decl.setIndirectBinding(true);
 	    inits[i] = new ReferenceExp(arg);

@@ -34,6 +34,10 @@ InliningTest.isPair9(java.lang.Object)boolean: 5 bytes
 InliningTest.isPair10(java.lang.Object)boolean: 5 bytes
 InliningTest.isPair11(java.lang.Object)boolean: 5 bytes
 InliningTest.isPair12(java.lang.Object)boolean: 5 bytes
+InliningTest.isPair13(java.lang.Object)boolean: 5 bytes
+InliningTest.isPair14(java.lang.Object)boolean: 5 bytes
+InliningTest.isPair15(java.lang.Object)boolean: 5 bytes
+InliningTest.isPair16(java.lang.Object)boolean: 5 bytes
 InliningTest.isEmpty1(gnu.lists.Pair)boolean: 5 bytes
 InliningTest.castToPair1(java.lang.Object)gnu.lists.Pair: 5 bytes
 InliningTest.castToPair2(java.lang.Object)gnu.lists.Pair: 5 bytes
@@ -71,5 +75,6 @@ InliningTest.setIarr1(int[],int,int)void: 5 bytes
 InliningTest.factoriali1(int)int: 18 bytes
 InliningTest.factoriali2(int)int: 18 bytes
 InliningTest.factoriall1(long)long: 19 bytes
+InliningTest.plusLambda1()int: 3 bytes
 cycle1.isIsEven(int)boolean: 22 bytes
 cycle2.isIsOdd(int)boolean: 22 bytes

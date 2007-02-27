@@ -57,6 +57,10 @@
 (define (is-pair10 x) (instance? x Pair1:<>))
 (define (is-pair11 x) (instance? x Pair2:<>))
 (define (is-pair12 x) (instance? x Pair3:<>))
+(define (is-pair13 x) (gnu.lists.Pair? x))
+(define (is-pair14 x) (Pair1? x))
+(define (is-pair15 x) (Pair2? x))
+(define (is-pair16 x) (Pair3? x))
 
 (define (cast-to-pair1 x) (<pair>:@ x))
 (define (cast-to-pair2 x) (gnu.lists.Pair:@ x))
@@ -145,3 +149,6 @@
 (define (factorialI1 x :: <integer>) :: <integer>
   (if (< x 1) 1
       (* x (factorialI1 (- x 1)))))
+
+(define (plus-lambda1) :: int
+  ((lambda (x y) (+ x y)) 3 4))

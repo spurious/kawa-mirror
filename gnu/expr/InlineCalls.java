@@ -64,7 +64,7 @@ public class InlineCalls extends ExpWalker
   }
 
   /** Walk an ApplyExp assuming function and arguments have been walked. */
-  public Expression walkApplyOnly(ApplyExp exp)
+  public final Expression walkApplyOnly(ApplyExp exp)
   {
     return exp.func.inline(exp, this, null, true);
   }

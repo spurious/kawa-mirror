@@ -3,6 +3,7 @@ import java.io.*;
 import gnu.bytecode.*;
 import java.lang.reflect.Array;
 import java.util.*;
+import gnu.mapping.Table2D;
 
 /** Manages the literals of a Compilation.
  * Implements ObjectOutput, because we use externalization to determine
@@ -19,7 +20,18 @@ public class LitTable implements ObjectOutput
   // Hashtable literalTable = new Hashtable(100);
   /* #endif */
 
-  static Hashtable staticTable =  new Hashtable (100);
+  /** A table mapping objects to public static final field literals.
+   * When we a need a literal for a value that is an instance of some
+   * class we automatically search the class for static fields.
+   * We use a {@code Table2D} primarily to make use of weak references,
+   * but we also use the 2nd argument:
+   * {@code staticTable(value, null, defaultValue)} yields a Literal
+   * if there is a public static final field for {@code value},
+   * and {@code defaultValue} otherwise.
+   * {@code staticTable(class, Boolean.TRUE, null) != null} if and only if
+   * we have scanned {@code class} (a {@code java.lang.Class} object).
+   */
+  static Table2D staticTable =  new Table2D (100);
 
   int literalsCount;
 
@@ -279,7 +291,7 @@ public class LitTable implements ObjectOutput
 
     synchronized (staticTable)
       {
-	literal = (Literal) staticTable.get(value);
+	literal = (Literal) staticTable.get(value, null, null);
 	if ((literal == null || literal.value != value)
 	    && valueType instanceof ClassType)
 	  {
@@ -287,10 +299,10 @@ public class LitTable implements ObjectOutput
 	    int needed_mod = Access.STATIC | Access.FINAL | Access.PUBLIC;
 	    Class fldClass = valueClass;
 	    ClassType fldType = (ClassType) valueType;
-	    while (staticTable.get(fldClass) == null)
+	    while (staticTable.get(fldClass, Boolean.TRUE, null) == null)
 	      {
 		// This is a convention to note that we've scanned valueType.
-		staticTable.put(fldClass, fldClass);
+		staticTable.put(fldClass, Boolean.TRUE, fldClass);
 		for (Field fld = fldType.getFields();
 		     fld != null;  fld = fld.getNext())
 		  {
@@ -304,8 +316,7 @@ public class LitTable implements ObjectOutput
 				|| ! fldClass.isInstance(litValue))
 			      continue;
 			    Literal lit = new Literal (litValue, fld, this);
-			    staticTable.put(litValue, lit);
-			    staticTable.put(lit, litValue);
+			    staticTable.put(litValue, null, lit);
 			    if (value == litValue)
 			      literal = lit;
 			  }

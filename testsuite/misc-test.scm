@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 151)
+(test-init "Miscellaneous" 152)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -713,3 +713,15 @@
       (as-xml (h:code "Foo")))
 (test "<b xmlns=\"http://www.w3.org/1999/xhtml\"><code>Foo</code></b>" 'html-contructor-4
       (as-xml (html:b (html:code "Foo"))))
+
+;; Based on Savannah bug#18736, "intenal compile error -- svn rev 5816".
+;; From Thomas Kirk <tk@research.att.com>
+(test #t 'test-savannah-18736
+      (let* ((elapsed 0)
+	     (oldtime (java.lang.System:currentTimeMillis))
+	     (val ((lambda () (sleep 0.002))))
+	     (ignored
+	      (begin
+		(set! elapsed (- (java.lang.System:currentTimeMillis) oldtime))
+		val)))
+	(> elapsed 1)))

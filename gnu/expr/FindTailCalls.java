@@ -327,7 +327,8 @@ public class FindTailCalls extends ExpWalker
         // is the empty sequence in XQuery) by an empty constant.  This is
         // not so much an optimization as avoiding the complications and
         // paradoxes of variables and expression that are void.
-        if (decl.type == Type.void_type)
+        Type type = decl.type;
+        if (type != null && type.isVoid())
           return QuoteExp.voidExp;
         decl.setCanRead(true);
       }

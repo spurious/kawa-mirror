@@ -1,5 +1,9 @@
 2007-02-28  Per Bothner  <per@bothner.com>
 
+	* FindTailCalls.java (walkReferenceExp): Check for void type using
+	isVoid rather than identify with Type.void_type.
+	Fixes Savannah bug#18736, "intenal compile error -- svn rev 5816".
+
 	* LitTable.java (staticTable): Change type to Table2D.
 	(findLiteral): Avoid clash in use of staticTable.
 

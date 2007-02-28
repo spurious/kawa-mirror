@@ -10,6 +10,7 @@ public class Invoke extends ProcedureN implements CanInline
 {
   /** The kind on invoke operation.
    *  'N' - make (new).
+   *  'P' - invoke-special.
    *  'S' - invoke-static (static or non-static):
    *        The first operand is a Class or Type, the second is the name,
    *        and if the is non-static the 3rd is the receiver.
@@ -566,15 +567,17 @@ public class Invoke extends ProcedureN implements CanInline
           }
         if (okCount + maybeCount == 0)
           {
-            if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+            if (kind == 'P'
+                || comp.getBooleanOption("warn-invoke-unknown-method", true))
               {
                 if (kind=='N')
                   name = name+"/valueOf";
-                if (nmethods + methods.length == 0)
-                  comp.error('w', "no accessible method '"+name+"' in "+type.getName());
-                else
-                  comp.error('w', "no possibly applicable method '"
-                             +name+"' in "+type.getName());
+                String message = 
+                  (nmethods + methods.length == 0
+                   ? "no accessible method '"+name+"' in "+type.getName()
+                   : ("no possibly applicable method '"
+                      +name+"' in "+type.getName()));
+                comp.error(kind == 'P' ? 'e' : 'w', message);
               }
           }
         else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
@@ -605,7 +608,8 @@ public class Invoke extends ProcedureN implements CanInline
                   }
               }
             if (index < 0
-                && comp.getBooleanOption("warn-invoke-unknown-method", true))
+                && (kind == 'P'
+                    || comp.getBooleanOption("warn-invoke-unknown-method", true)))
               {
                 StringBuffer sbuf = new StringBuffer();
                 sbuf.append("more than one definitely applicable method `");
@@ -613,10 +617,11 @@ public class Invoke extends ProcedureN implements CanInline
                 sbuf.append("' in ");
                 sbuf.append(type.getName());
                 append(methods, okCount, sbuf);
-                comp.error('w', sbuf.toString());
+                comp.error(kind == 'P' ? 'e' : 'w', sbuf.toString());
               }
           }
-        else if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+        else if (kind == 'P'
+                 || comp.getBooleanOption("warn-invoke-unknown-method", true))
           {
             StringBuffer sbuf = new StringBuffer();
             sbuf.append("more than one possibly applicable method '");
@@ -624,7 +629,7 @@ public class Invoke extends ProcedureN implements CanInline
             sbuf.append("' in ");
             sbuf.append(type.getName());
             append(methods, maybeCount, sbuf);
-            comp.error('w', sbuf.toString());
+            comp.error(kind == 'P' ? 'e' : 'w', sbuf.toString());
           }
         if (index >= 0)
           {

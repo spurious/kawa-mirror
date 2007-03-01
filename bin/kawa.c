@@ -542,6 +542,10 @@ main(int argc, char** argv)
     out_argv[out_argc++] = command_args[i];
 #endif
 
+#ifndef GCJ_COMPILED
+  putenv (get_classpath(argv[0]));
+#endif
+
   if (! isatty(0))
     {
       out_argv[out_argc++] = "--no-prompt";
@@ -555,10 +559,6 @@ main(int argc, char** argv)
 
 #ifdef DEBUG
   logfile = fopen("LOG", "w");
-#endif
-
-#ifndef GCJ_COMPILED
-  putenv (get_classpath(argv[0]));
 #endif
 
   if (! use_telnet)

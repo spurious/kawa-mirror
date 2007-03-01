@@ -532,6 +532,15 @@ public class LambdaExp extends ScopeExp
 	  code.popScope(); // Undoes pushScope in method.initCode.
       }
 
+    for (LambdaExp child = firstChild;  child != null; )
+      {
+	if (! child.getCanRead() && ! child.getInlineOnly())
+	  {
+	    child.compileAsMethod(comp);
+	  }
+	child = child.nextSibling;
+      }
+
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);
     
@@ -1369,18 +1378,6 @@ public class LambdaExp extends ScopeExp
     comp.callContextVar = callContextSave;
   }
 
-  void compileChildMethods (Compilation comp)
-  {
-    for (LambdaExp child = firstChild;  child != null; )
-      {
-	if (! child.getCanRead() && ! child.getInlineOnly())
-	  {
-	    child.compileAsMethod(comp);
-	  }
-	child = child.nextSibling;
-      }
-  }
-
   void compileAsMethod (Compilation comp)
   {
     if ((flags & METHODS_COMPILED) != 0)
@@ -1486,7 +1483,6 @@ public class LambdaExp extends ScopeExp
 	  }
       }
 
-    compileChildMethods(comp);
     comp.method = save_method;
     comp.curLambda = save_lambda;
   }

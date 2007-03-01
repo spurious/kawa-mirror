@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 152)
+(test-init "Miscellaneous" 153)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -719,9 +719,22 @@
 (test #t 'test-savannah-18736
       (let* ((elapsed 0)
 	     (oldtime (java.lang.System:currentTimeMillis))
-	     (val ((lambda () (sleep 0.002))))
+	     (val ((lambda () (sleep 0.015))))
 	     (ignored
 	      (begin
 		(set! elapsed (- (java.lang.System:currentTimeMillis) oldtime))
 		val)))
-	(> elapsed 1)))
+	;; While time resolution is non-portable, assume a sleep of 20ms
+	;; will be detectable as taking at least 10ms.
+	(>= elapsed 10)))
+
+;; Test for Savannah bug #18909 "Recursive call to function in closure causes
+;; NullPointerException".  Chris Wegrzyn <chris.wegrzyn@gmail.com>
+(define (savannah-18909-outerproc foo)
+  (define (innerproc)
+    (if foo
+	(lambda () (innerproc))
+	'()))
+  (innerproc))
+(define savannah-18909-destroy ((savannah-18909-outerproc #t))) 
+(test savannah-18909-destroy 'savannah-18909 (savannah-18909-destroy))

@@ -288,7 +288,6 @@ public class ApplyExp extends Expression
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
 	func_lambda.compileEnd(comp);
-	func_lambda.compileChildMethods(comp);
 	func_lambda.popScope(code);
 	comp.curLambda = saveLambda;
 	return;

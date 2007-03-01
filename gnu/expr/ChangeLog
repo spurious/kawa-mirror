@@ -1,3 +1,15 @@
+2007-03-01  Per Bothner  <per@bothner.com>
+	    Chris Wegrzyn <chris.wegrzyn@gmail.com>
+
+	* LambdaExp.java (compileEnd): Merge in compileChildMethods, calling
+	before it before it used to be called.
+	This fixes Savannah bug #18909 "Recursive call to function in closure
+	causes NullPointerException".
+	(compileChildMethods): Remove method.
+	* ApplyExp.java (compile): Remove compileChildMethods call.
+	* ClassExp.java (compile): Likewise.
+	* Compilation.java (generateBytecode): Likewise.
+
 2007-02-28  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkReferenceExp): Check for void type using

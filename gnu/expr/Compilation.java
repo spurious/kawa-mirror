@@ -2015,7 +2015,6 @@ public class Compilation implements SourceLocator
       }
 
     module.compileBody(this);
-    module.compileChildMethods(this);
 
     Label startLiterals = null;
     Label afterLiterals = null;

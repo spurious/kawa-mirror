@@ -1,3 +1,9 @@
+2007-02-28  Per Bothner  <per@bothner.com>
+
+	* kawa.c (main): If input is not tty, invoke command immediately
+	wih telnet/pty processing (which do the wrong thing),
+	passing new --no-prompt option.
+
 2007-01-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: A number of changes to avoid using libtool - except

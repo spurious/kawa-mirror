@@ -525,6 +525,34 @@ main(int argc, char** argv)
   fd_set in_set;
   static char empty_string[1] = "";
   char *prompt = empty_string;
+
+#ifdef COMMAND_ARGS
+  static char* command_args[] = { COMMAND_ARGS };
+  char** out_argv = (char **)
+    malloc (sizeof(command_args) + (5 + argc) * sizeof(char*));
+#else
+  char** out_argv = (char **) malloc ((6 + argc) * sizeof(char*));
+#endif
+  int out_argc = 0;
+
+#if defined(GCJ_COMPILED) && ! defined(COMMAND_ARGS)
+  out_argv[out_argc++] = get_command (argv[0]);
+#else
+  for (i = 0;  i < sizeof(command_args)/sizeof(char*);  i++)
+    out_argv[out_argc++] = command_args[i];
+#endif
+
+  if (! isatty(0))
+    {
+      out_argv[out_argc++] = "--no-prompt";
+      for (i = 1;  i < argc;  i++)
+	out_argv[out_argc++] = argv[i];
+      out_argv[out_argc] = NULL;
+      execvp(out_argv[0], out_argv);
+      perror ("failed to exec " COMMAND);
+      exit (-1);
+    }
+
 #ifdef DEBUG
   logfile = fopen("LOG", "w");
 #endif
@@ -669,14 +697,6 @@ main(int argc, char** argv)
 
       if (use_telnet == 2)
 	{
-#ifdef COMMAND_ARGS
-	  static char* command_args[] = { COMMAND_ARGS };
-	  char** out_argv = (char **)
-	    malloc (sizeof(command_args) + (5 + argc) * sizeof(char*));
-#else
-	  char** out_argv = (char **) malloc ((6 + argc) * sizeof(char*));
-#endif
-	  int out_argc = 0;
 	  char port_buf[12];
 	  socklen_t namelen;
 	  int conn;
@@ -711,12 +731,6 @@ main(int argc, char** argv)
 	      exit(-1);
 	    }
 
-#if defined(GCJ_COMPILED) && ! defined(COMMAND_ARGS)
-	  out_argv[out_argc++] = get_command (argv[0]);
-#else
-	  for (i = 0;  i < sizeof(command_args)/sizeof(char*);  i++)
-	    out_argv[out_argc++] = command_args[i];
-#endif
 	  out_argv[out_argc++] = "--connect";
 	  sprintf (port_buf, "%d", port);
 	  out_argv[out_argc++] = port_buf;

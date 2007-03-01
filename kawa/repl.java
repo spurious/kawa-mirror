@@ -561,6 +561,8 @@ public class repl extends Procedure0or1
 	  {
 	    gnu.expr.Compilation.inlineOk = false;
 	  }
+        else if (arg.equals("--no-prompt"))
+          kawa.Shell.dontPrompt = true;
 	else if (arg.equals("--inline"))
 	  {
 	    gnu.expr.Compilation.inlineOk = true;
@@ -712,6 +714,7 @@ public class repl extends Procedure0or1
         String arg = args[i];
         getLanguageFromFilenameExtension(arg);
         Language language = Language.getDefaultLanguage();
+        Compilation comp = null;
         try
           {
             InPort fstream;
@@ -726,7 +729,7 @@ public class repl extends Procedure0or1
                 break; // Kludge to shut up compiler.
               }
             
-            Compilation comp
+            comp
               = language.parse(fstream, messages, Language.PARSE_PROLOG);
 
             if (compilationTopname != null)
@@ -748,11 +751,7 @@ public class repl extends Procedure0or1
           {
             if (! (ex instanceof SyntaxException)
                 || ((SyntaxException) ex).getMessages() != messages)
-              {
-                System.err.println("Internal error while compiling "+arg);
-                ex.printStackTrace(System.err);
-                System.exit(-1);
-              }
+              internalError(ex, comp, arg);
           }
         if (messages.seenErrorsOrWarnings())
           {
@@ -783,23 +782,31 @@ public class repl extends Procedure0or1
           }
         catch (Throwable ex)
           {
-            StringBuffer sbuf = new StringBuffer();
-            String file = comp.getFileName();
-            int line = comp.getLineNumber();
-            if (file != null && line > 0)
-              {
-                sbuf.append(file);
-                sbuf.append(':');
-                sbuf.append(line);
-                sbuf.append(": ");
-              }
-            sbuf.append("internal error while compiling ");
-            sbuf.append(arg);
-            System.err.println(sbuf.toString());
-            ex.printStackTrace(System.err);
-            System.exit(-1);
+            internalError(ex, comp, arg);
           }
       }
+  }
+
+  static void internalError (Throwable ex, Compilation comp, Object arg)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    if (comp != null)
+      {
+        String file = comp.getFileName();
+        int line = comp.getLineNumber();
+        if (file != null && line > 0)
+          {
+            sbuf.append(file);
+            sbuf.append(':');
+            sbuf.append(line);
+            sbuf.append(": ");
+          }
+      }
+    sbuf.append("internal error while compiling ");
+    sbuf.append(arg);
+    System.err.println(sbuf.toString());
+    ex.printStackTrace(System.err);
+    System.exit(-1);
   }
 
   /** A list of standard command-line fluid names to map to static fields.

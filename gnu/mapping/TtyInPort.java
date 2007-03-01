@@ -51,27 +51,30 @@ public class TtyInPort extends InPort
 
   public void lineStart (boolean revisited) throws java.io.IOException
   {
-    if (! revisited && prompter != null)
+    if (! revisited)
       {
-	try
-	  {
-	    tie.freshLine();
-	    Object prompt = prompter.apply1(this);
-	    if (prompt != null)
-	      {
-		String string = prompt.toString();
-		if (string != null && string.length() > 0)
-		  {
-		    tie.print(string);
-		    tie.flush();
-		    tie.clearBuffer();
-		    promptEmitted = true;
-		  }
-	      }
-	  }
-	catch (Throwable ex)
-	  { throw new java.io.IOException("Error when evaluating prompt:"
-					  + ex); }
+        tie.freshLine();
+        if (prompter != null)
+          {
+            try
+              {
+                Object prompt = prompter.apply1(this);
+                if (prompt != null)
+                  {
+                    String string = prompt.toString();
+                    if (string != null && string.length() > 0)
+                      {
+                        tie.print(string);
+                        tie.flush();
+                        tie.clearBuffer();
+                        promptEmitted = true;
+                      }
+                  }
+              }
+            catch (Throwable ex)
+              { throw new java.io.IOException("Error when evaluating prompt:"
+                                              + ex); }
+          }
       }
   }
 

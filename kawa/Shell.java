@@ -146,10 +146,12 @@ public class Shell
       }
   }
 
+  public static boolean dontPrompt;
+
   public static void run (Language language, Environment env)
   {
     InPort inp = InPort.inDefault ();
-    if (inp instanceof TtyInPort)
+    if (! dontPrompt && inp instanceof TtyInPort)
       {
 	Procedure prompter = language.getPrompter();
 	if (prompter != null)

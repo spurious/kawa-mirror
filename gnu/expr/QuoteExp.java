@@ -32,6 +32,8 @@ public class QuoteExp extends Expression
 
   static public QuoteExp undefined_exp =
     new QuoteExp (Special.undefined);
+  static public QuoteExp abstractExp =
+    new QuoteExp(Special.abstractSpecial);
   static public QuoteExp voidExp =
     new QuoteExp (Values.empty, Type.void_type);
   static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
@@ -47,6 +49,7 @@ public class QuoteExp extends Expression
       return undefined_exp;
     if (value == Values.empty)
       return voidExp;
+    // Note we deliberately don't map abstractSpecial to abstractExp.
     if (value instanceof Boolean)
       return ((Boolean) value).booleanValue() ? trueExp : falseExp;
     return new QuoteExp(value);

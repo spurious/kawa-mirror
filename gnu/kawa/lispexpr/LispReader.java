@@ -1192,6 +1192,8 @@ public class LispReader extends Lexer
       return Special.dfault;
     if (name.equals("undefined"))
       return Special.undefined;
+    if (name.equals("abstract"))
+      return Special.abstractSpecial;
     if (name.equals("null"))
       return null;
     reader.error("unknown named constant #!"+name);

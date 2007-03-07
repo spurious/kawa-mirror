@@ -108,13 +108,14 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
   public static void setCoercedReturnValue (LambdaExp lexp, Expression type,
 					    Language language)
   {
+    if (! lexp.isAbstract())
+      {
+        Expression value = lexp.body;
+        lexp.body = Convert.makeCoercion(value, type);
+        lexp.body.setLine(value);
+      }
     gnu.bytecode.Type rtype = language.getTypeFor(type);
     if (rtype != null)
-      {
-	Expression value = lexp.body;
-	lexp.body = Convert.makeCoercion(value, type);
-	lexp.body.setLine(value);
-	lexp.setReturnType(rtype);
-      }
+      lexp.setReturnType(rtype);
   }
 }

@@ -14,6 +14,7 @@ public class Special extends Object implements Printable, Externalizable
   public static final Special rest = new Special("rest");
   public static final Special key = new Special("key");
   public static final Special dfault = new Special("default");
+  public static final Special abstractSpecial = new Special("abstract");
   public static final Object eof = gnu.lists.Sequence.eofValue;
   // Also:
   // #!void is the same as Values.Empty.

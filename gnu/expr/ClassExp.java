@@ -9,6 +9,9 @@ public class ClassExp extends LambdaExp
   public boolean isSimple() { return simple; }
   public void setSimple(boolean value) { simple = value; }
 
+  public final boolean isAbstract () { return getFlag(IS_ABSTRACT); }
+  public static final int IS_ABSTRACT = NEXT_AVAIL_FLAG;
+
   /** True if there is at least one explicit "<init>" ("*init*"} method. */
   boolean explicitInit;
 
@@ -292,8 +295,14 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
+        if (child.isAbstract())
+          setFlag(IS_ABSTRACT);
         if ("*init*".equals(child.getName()))
-          explicitInit = true;
+          {
+            explicitInit = true;
+            if (child.isAbstract())
+              comp.error('e', "*init* method cannot be abstract", child);
+          }
 	if ((child != initMethod && child != clinitMethod)
 	    || ! isMakingClassPair())
 	  child.addMethodFor(type, comp, null);
@@ -303,6 +312,8 @@ public class ClassExp extends LambdaExp
       }
     if (! explicitInit)
       Compilation.getConstructor(instanceType, this);
+    if (isAbstract())
+      instanceType.setModifiers(instanceType.getModifiers() | Access.ABSTRACT);
   }
 
   /** Return implementation method matching name and param types.
@@ -383,8 +394,11 @@ public class ClassExp extends LambdaExp
 	allocFrame(comp);
 	CodeAttr code;
 
-	for (LambdaExp child = firstChild;  child != null; )
+	for (LambdaExp child = firstChild;  child != null;
+             child = child.nextSibling)
 	  {
+            if (child.isAbstract())
+              continue;
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;
             String saveFilename = comp.getFileName();
@@ -477,15 +491,25 @@ public class ClassExp extends LambdaExp
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;
             comp.setLine(saveFilename, saveLine, saveColumn);
-	    child = child.nextSibling;
 	  }
         if (! explicitInit)
           comp.generateConstructor(instanceType, this);
         else if (initChain != null)
           initChain.reportError("unimplemented: explicit constructor cannot initialize ", comp);
 
-	Method[] methods = type.getMethods(AbstractMethodFilter.instance, 2);
-	for (int i = 0;  i < methods.length;  i++)
+	Method[] methods;
+        int nmethods;
+        if (isAbstract())
+          {
+            methods = null;
+            nmethods = 0;
+          }
+        else
+          {
+            methods = type.getMethods(AbstractMethodFilter.instance, 2);
+            nmethods = methods.length;
+          }
+	for (int i = 0;  i < nmethods;  i++)
 	  {
 	    Method meth = methods[i];
 	    String mname = meth.getName();

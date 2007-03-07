@@ -730,6 +730,8 @@ public class Translator extends Compilation
       return rewrite(((LangExp) exp).getLangValue(), function);
     else if (exp instanceof Expression)
       return (Expression) exp;
+    else if (exp == Special.abstractSpecial)
+      return QuoteExp.abstractExp;
     else
       return QuoteExp.getInstance(Quote.quote(exp, this));
   }

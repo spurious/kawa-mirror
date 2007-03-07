@@ -1,3 +1,9 @@
+2007-03-06  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteBody): Canonicale BeginExp.
+	Don't coerce body if isAbstract().
+	* lang/Translator.java (rewrite): Handle literal #!abstract.
+
 2007-02-28  Per Bothner  <per@bothner.com>
 
 	* Shell.java (dontPrompt): New global flag.

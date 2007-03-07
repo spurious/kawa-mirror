@@ -614,13 +614,14 @@ public class Lambda extends Syntax
           {
             Expression[] new_body = new Expression[len];
             System.arraycopy(exps, 1, new_body, 0, len);
-            lexp.body = new BeginExp(new_body);
+            lexp.body = BeginExp.canonicalize(new_body);
           }
         Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
       }
     else if (lexp.returnType != null
              && lexp.returnType != Type.pointer_type
-             && lexp.returnType != Type.void_type)
+             && lexp.returnType != Type.void_type
+             && lexp.body != QuoteExp.abstractExp)
       {
 	Expression value = lexp.body;
 	lexp.body = Convert.makeCoercion(value, lexp.returnType);

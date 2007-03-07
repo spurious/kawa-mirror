@@ -1,3 +1,17 @@
+2007-03-06  Per Bothner  <per@bothner.com>
+
+	* Special.java (abstractSpecial): New constant.
+	* QuoteExp.java (abstractExp): New static field.
+	* LambdaExp.java (isAbstract): New method.
+	(addMethodFor): Set ABSTRACT modifier is isAbstract().
+	(compileAsMethod): Ignore is isAbstract().
+	(getReturnType): Don't use body's type is isAbstract().
+	* ClassExp.java (IS_ABSTRACT): New flag.
+	(isAbstract): New method.
+	(declareParts): Set abstract flag if method is abstract.
+	Error if *init* method is abstract.
+	(compile): Skip abstract methods.
+
 2007-03-01  Per Bothner  <per@bothner.com>
 	    Chris Wegrzyn <chris.wegrzyn@gmail.com>
 

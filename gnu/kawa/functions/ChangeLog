@@ -1,3 +1,8 @@
+2007-03-06  Per Bothner  <per@bothner.com>
+
+	* Convert.java (setCoercedReturnValue): Don't coerce result
+	if function is abstract.
+
 2007-02-26  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (inline): Update for new CanInline api.

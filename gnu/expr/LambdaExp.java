@@ -225,6 +225,11 @@ public class LambdaExp extends ScopeExp
     return isModuleBody() || this instanceof ClassExp;
   }
 
+  public boolean isAbstract ()
+  {
+    return body == QuoteExp.abstractExp;
+  }
+
   /** Specify the calling convention used for this function.
    * @return One of the CALL_WITH_xxx values in Compilation. */
   public int getCallConvention ()
@@ -869,7 +874,7 @@ public class LambdaExp extends ScopeExp
 	    mflags = (mflags & ~Access.PUBLIC+Access.PROTECTED)+Access.PRIVATE;
 	  }
       }
-    if (ctype.isInterface())
+    if (ctype.isInterface() || isAbstract())
       mflags |= Access.ABSTRACT;
     if (! isStatic)
       declareThis(ctype);
@@ -1380,7 +1385,7 @@ public class LambdaExp extends ScopeExp
 
   void compileAsMethod (Compilation comp)
   {
-    if ((flags & METHODS_COMPILED) != 0)
+    if ((flags & METHODS_COMPILED) != 0 || isAbstract())
       return;
     flags |= METHODS_COMPILED;
     Method save_method = comp.method;
@@ -1754,7 +1759,7 @@ public class LambdaExp extends ScopeExp
       {
 	returnType = Type.pointer_type;  // To guards against cycles.
 	// body may not be set if define scan'd but not yet rewrit'ten.
-	if (body != null)
+	if (body != null && ! isAbstract())
 	  returnType = body.getType();
       }
     return returnType;

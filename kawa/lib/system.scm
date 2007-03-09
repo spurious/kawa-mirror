@@ -79,7 +79,7 @@
     arr))
 
 (define command-parse :: <function>
-  (if (equal? (java.lang.System:getProperty '|file.separator|) '|/|)
+  (if (equal? (java.lang.System:getProperty "file.separator") "/")
       tokenize-string-using-shell
       tokenize-string-to-string-array))
 

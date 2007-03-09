@@ -1,3 +1,8 @@
+2007-03-08  Per Bothner  <per@bothner.com>
+
+	* system.scm (command-parse): Update - symbols are no longer
+	java.lang.String objects.
+
 2007-02-18  Per Bothner  <per@bothner.com>
 
 	* files.scm: Change various functions to return java.lang.String

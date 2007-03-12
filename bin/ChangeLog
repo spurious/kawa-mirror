@@ -1,3 +1,16 @@
+2007-03-11  Per Bothner  <per@bothner.com>
+
+	* kawa.c (sig_child): Exit with status from inferior.
+	(main): Don't handle SIGCHLD handler.
+	Call sig_child explicitly on inferior eof.
+
+	* kawa.c (set_edit_mode): New function.
+	(main): Call it.
+
+	* kawa.c: Incomplete merge from rlfe.c and remove some old crud
+	for non-working pty handling.  Maybe fix it later.
+	(get_master_pty): Remove function.
+
 2007-02-28  Per Bothner  <per@bothner.com>
 
 	* kawa.c (main): If input is not tty, invoke command immediately

@@ -1,6 +1,6 @@
 /* A front-end using readline to "cook" input lines for Kawa.
  *
- * Copyright (C) 1999  Per Bothner
+ * Copyright (C) 1999, 2004, 2007 Per Bothner
  * 
  * This front-end program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -113,8 +114,11 @@ static int use_telnet = 2;
 static int use_telnet = PREFERRED_PROTOCOL;
 #endif
 
+#define APPLICATION_NAME "kawa"
+
 static int in_from_inferior_fd;
 static int out_to_inferior_fd;
+static void set_edit_mode ();
 
 #ifdef DEBUG
 FILE *logfile = NULL;
@@ -122,22 +126,31 @@ FILE *logfile = NULL;
 #define DPRINT1(FMT, V1) (fprintf(logfile, FMT, V1), fflush(logfile))
 #define DPRINT2(FMT, V1, V2) (fprintf(logfile, FMT, V1, V2), fflush(logfile))
 #else
-#define DPRINT0(FMT) /* Do nothing */
-#define DPRINT1(FMT, V1) /* Do nothing */
-#define DPRINT2(FMT, V1, V2) /* Do nothing */
+#define DPRINT0(FMT) ((void) 0) /* Do nothing */
+#define DPRINT1(FMT, V1) ((void) 0) /* Do nothing */
+#define DPRINT2(FMT, V1, V2) ((void) 0) /* Do nothing */
 #endif
 
+struct termios orig_term;
+
 static pid_t child = -1;
+
+/* This could also be used as a SIGCHLD handler.
+   However, in that case for some reason we're not getting the
+   correct exit code. */
 
 static void
 sig_child (int signo)
 {
   int status;
-  wait (&status);
-  DPRINT0 ("(Child process died.)\n");
+  waitpid (child, &status, 0);
+  DPRINT2("(Child process died.  status:%d, exited:%d.)\n", status, WIFEXITED (status));
+  fflush(stderr);
   if (use_telnet)
     rl_deprep_terminal ();
-  exit (0);
+  else
+    tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
+  exit (WIFEXITED (status) ? WEXITSTATUS (status) : 0);
 }
 
 #if SUPPORT_PTY
@@ -152,50 +165,6 @@ void sigwinch_handler(int signal) {
    propagate_sigwinch = 1;
 }
 
-/* get_master_pty() takes a double-indirect character pointer in which
- * to put a slave name, and returns an integer file descriptor.
- * If it returns < 0, an error has occurred.
- * Otherwise, it has returned the master pty file descriptor, and fills
- * in *name with the name of the corresponding slave pty.
- * Once the slave pty has been opened, you are responsible to free *name.
- */
-
-int get_master_pty(char **name) { 
-   int i, j;
-   /* default to returning error */
-   int master = -1;
-
-   /* create a dummy name to fill in */
-   *name = strdup("/dev/ptyXX");
-
-   /* search for an unused pty */
-   for (i=0; i<16 && master <= 0; i++) {
-      for (j=0; j<16 && master <= 0; j++) {
-         (*name)[8] = "pqrstuvwxyzPQRST"[i];
-         (*name)[9] = "0123456789abcdef"[j];
-         /* open the master pty */
-         if ((master = open(*name, O_RDWR)) < 0) {
-            if (errno == ENOENT) {
-               /* we are out of pty devices */
-               free (*name);
-               return (master);
-            }
-         }
-      }
-   }
-   if ((master < 0) && (i == 16) && (j == 16)) {
-      /* must have tried every pty unsuccessfully */
-      free (*name);
-      return (master);
-   }
-
-   /* By substituting a letter, we change the master pty
-    * name into the slave pty name.
-    */
-   (*name)[5] = 't';
-
-   return (master);
-}
 
 /* get_slave_pty() returns an integer file descriptor.
  * If it returns < 0, an error has occurred.
@@ -478,13 +447,23 @@ line_handler (char *line)
 {
   if (line == NULL)
     {
+      if (use_telnet)
+	{
 #if SUPPORT_TELNET
-      static char buf[2];
-      buf[0] = IAC;
-      buf[1] = xEOF;
-      write (out_to_inferior_fd, buf, 2);
-      DPRINT0("Sent EOF.\n");
+	  static char buf[2];
+	  buf[0] = IAC;
+	  buf[1] = xEOF;
+	  write (out_to_inferior_fd, buf, 2);
+	  DPRINT0("Sent EOF.\n");
 #endif
+	}
+      else
+	{
+	  char buf[1];
+	  DPRINT0("saw eof!\n");
+	  buf[0] = '\004'; /* ctrl/d */
+	  write (out_to_inferior_fd, buf, 1);
+	}
     }
   else
     {
@@ -520,7 +499,7 @@ main(int argc, char** argv)
   struct sigaction act;
   struct winsize ws;
 #endif
-  struct termios ot, t;
+  struct termios t;
   int maxfd;
   fd_set in_set;
   static char empty_string[1] = "";
@@ -558,15 +537,19 @@ main(int argc, char** argv)
     }
 
 #ifdef DEBUG
-  logfile = fopen("LOG", "w");
+  logfile = fopen("kawa-frontend.log", "w");
 #endif
+
+  set_edit_mode ();
+
+  rl_readline_name = APPLICATION_NAME;
 
   if (! use_telnet)
     {
 #if SUPPORT_PTY
-      if ((master = get_master_pty(&name)) < 0)
+      if ((master = OpenPTY(&name)) < 0)
 	{
-	  perror("ptypair: could not open master pty");
+	  perror("kawa-frontend: could not open master pty");
 	  exit(1);
 	}
 
@@ -578,14 +561,13 @@ main(int argc, char** argv)
       act.sa_flags = 0;
       if (sigaction(SIGWINCH, &act, NULL) < 0)
 	{
-	  perror("ptypair: could not handle SIGWINCH ");
+	  perror("kawa-frontend: could not handle SIGWINCH ");
 	  exit(1);
 	}
 
       if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) < 0)
 	{
-	  perror("ptypair: could not get window size");
-	  exit(1);
+	  perror("kawa-frontend: could not get window size");
 	}
 
       if ((child = fork()) < 0)
@@ -601,12 +583,13 @@ main(int argc, char** argv)
 	  /* We are in the child process */
 	  close(master);
 
+#ifdef TIOCSCTTY
 	  if ((slave = get_slave_pty(name)) < 0)
 	    {
-	      perror("ptypair: could not open slave pty");
+	      perror("kawa-frontend: could not open slave pty");
 	      exit(1);
 	    }
-	  free(name);
+#endif
 
 	  /* We need to make this process a session group leader, because
 	   * it is on a new PTY, and things like job control simply will
@@ -621,10 +604,18 @@ main(int argc, char** argv)
 	    }
 
 	  /* Tie us to our new controlling tty. */
+#ifdef TIOCSCTTY
 	  if (ioctl(slave, TIOCSCTTY, NULL))
 	    {
 	      perror("could not set new controlling tty");
 	    }
+#else
+	  if ((slave = get_slave_pty(name)) < 0)
+	    {
+	      perror("kawa-frontend: could not open slave pty");
+	      exit(1);
+	    }
+#endif
 
 	  /* make slave pty be standard in, out, and error */
 	  dup2(slave, STDIN_FILENO);
@@ -663,22 +654,14 @@ main(int argc, char** argv)
 	  exit(1);
 	}
 
-      /* parent */
-      signal (SIGCHLD, sig_child);
-      free(name);
-
       /* Note that we only set termios settings for standard input;
        * the master side of a pty is NOT a tty.
        */
-      tcgetattr(STDIN_FILENO, &ot);
-      t = ot;
-#if 1
-      t.c_lflag |= (ICANON | ISIG | ECHO | ECHOCTL | ECHOE | \
-		     ECHOK | ECHOKE | ECHONL | ECHOPRT );
-#else
+      tcgetattr(STDIN_FILENO, &orig_term);
+      t = orig_term;
       t.c_lflag &= ~(ICANON | ISIG | ECHO | ECHOCTL | ECHOE | \
 		     ECHOK | ECHOKE | ECHONL | ECHOPRT );
-#endif
+      t.c_iflag &= ~ICRNL;
       t.c_iflag |= IGNBRK;
       t.c_cc[VMIN] = 1;
       t.c_cc[VTIME] = 0;
@@ -751,7 +734,6 @@ main(int argc, char** argv)
 	      perror ("failed to fork " COMMAND);
 	      exit (-1);
 	    }
-	  signal (SIGCHLD, sig_child);
 
 	  conn = accept (sock, (struct sockaddr*) &address, &namelen);
 	  if (conn < 0)
@@ -883,7 +865,7 @@ main(int argc, char** argv)
 	      rl_callback_read_char ();
 	    }
 	}
-      else // input from Kawa inferior.
+      else /* output from Kawa inferior. */
 	{
 	  int i;
 	  int count;
@@ -893,11 +875,10 @@ main(int argc, char** argv)
 			sizeof(buf) - buf_count);
 	  if (count <= 0)
 	    {
-	      DPRINT0 ("(Connection closed by foreign host.)\n");
-	      if (use_telnet)
-		rl_deprep_terminal ();
-	      exit (0);
+	      DPRINT0 ("(Connection closed by inferior)\n");
+	      sig_child(-1);
 	    }
+	  DPRINT2("from inferior [%*.s]\n", count, buf+buf_count);
 #if SUPPORT_TELNET
 	  count = process_telnet_input (buf + buf_count, count);
 #endif
@@ -916,4 +897,32 @@ main(int argc, char** argv)
 	  DPRINT2("-> i: %d, buf_count: %d\n", i, buf_count);
 	}
     }
+}
+
+static void set_edit_mode ()
+{
+  int vi = 0;
+  char *shellopts;
+
+  shellopts = getenv ("SHELLOPTS");
+  while (shellopts != 0)
+    {
+      if (strncmp ("vi", shellopts, 2) == 0)
+	{
+	  vi = 1;
+	  break;
+	}
+      shellopts = index (shellopts + 1, ':');
+    }
+
+  if (!vi)
+    {
+      if (getenv ("EDITOR") != 0)
+	vi |= strcmp (getenv ("EDITOR"), "vi") == 0;
+    }
+
+  if (vi)
+    rl_variable_bind ("editing-mode", "vi");
+  else
+    rl_variable_bind ("editing-mode", "emacs");
 }

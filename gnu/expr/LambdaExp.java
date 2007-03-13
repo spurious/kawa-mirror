@@ -373,19 +373,10 @@ public class LambdaExp extends ScopeExp
    * except in the case that outer.getInlineOnly(). */
   boolean inlinedIn (LambdaExp outer)
   {
-    if (! getInlineOnly())
-      return false;
-    for (ScopeExp exp = getCaller(); exp != null;  exp = exp.outer)
+    for (LambdaExp exp = this; exp.getInlineOnly(); exp = exp.getCaller())
       {
-	if (exp instanceof LambdaExp)
-	  {
-	    
-	    LambdaExp result = (LambdaExp) exp;
-	    if (result == outer)
-	      return true;
-	    if (! result.getInlineOnly())
-	      return false;
-	  }
+        if (exp == outer)
+          return true;
       }
     return false;
   }
@@ -1222,7 +1213,7 @@ public class LambdaExp extends ScopeExp
 
             if (staticLinkField != null)
               {
-                code.emitDup(heapFrame.getType());
+                code.emitDup(frameType);
                 code.emitLoad(closureEnv);
                 code.emitPutField(staticLinkField);
               }

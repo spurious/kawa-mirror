@@ -1,5 +1,11 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* standard/object.java (matchAccess, accessString): New static methods.
+	(scanClassDef): Handle interface: and access: class properties.
+	(rewriteClassDef): Skip over class-level keyword specifier pairs.
+	* standard/define_class.java (scanForDefinitions): Immediate error
+	is name missing or invalid.  Resolve qualified (colon) names.
+
 	* Record.java (makeRecordType): Don't access acces_flags directly.
 
 2007-03-06  Per Bothner  <per@bothner.com>

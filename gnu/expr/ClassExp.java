@@ -10,7 +10,8 @@ public class ClassExp extends LambdaExp
   public void setSimple(boolean value) { simple = value; }
 
   public final boolean isAbstract () { return getFlag(IS_ABSTRACT); }
-  public static final int IS_ABSTRACT = NEXT_AVAIL_FLAG;
+  public static final int IS_ABSTRACT = LambdaExp.NEXT_AVAIL_FLAG;
+  public static final int INTERFACE_SPECIFIED = 2 * LambdaExp.NEXT_AVAIL_FLAG;
 
   /** True if there is at least one explicit "<init>" ("*init*"} method. */
   boolean explicitInit;
@@ -314,6 +315,16 @@ public class ClassExp extends LambdaExp
       Compilation.getConstructor(instanceType, this);
     if (isAbstract())
       instanceType.setModifiers(instanceType.getModifiers() | Access.ABSTRACT);
+    if (getFlag(INTERFACE_SPECIFIED))
+      instanceType.setInterface(true);
+    if (nameDecl != null)
+      {
+        short access = nameDecl.getAccessFlags((short) 0);
+        if (access != 0)
+          instanceType.setModifiers((instanceType.getModifiers()
+                                     & ~Access.PUBLIC)
+                                    | access);
+      }
   }
 
   /** Return implementation method matching name and param types.

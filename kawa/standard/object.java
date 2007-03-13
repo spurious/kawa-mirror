@@ -16,6 +16,7 @@ public class object extends Syntax
 
   Lambda lambda;
   public static final Keyword accessKeyword = Keyword.make("access");
+  public static final Keyword interfaceKeyword = Keyword.make("interface");
   public static final Keyword throwsKeyword = Keyword.make("throws");
   static final Keyword typeKeyword = Keyword.make("type");
   public static final Keyword allocationKeyword = Keyword.make("allocation");
@@ -61,6 +62,7 @@ public class object extends Syntax
     Object components = pair.cdr;
     LambdaExp method_list = null;
     LambdaExp last_method = null;
+    int classAccessFlag = 0;
     // First pass (get Declarations).
     Vector inits = new Vector(20);
     for (Object obj = components;  obj != LList.Empty;  )
@@ -78,13 +80,46 @@ public class object extends Syntax
 	Object pair_car = pair.car;
 	while (pair_car instanceof SyntaxForm)
 	  pair_car = ((SyntaxForm) pair_car).form;
+	obj = pair.cdr; // Next member.
+	Object savedPos1 = tr.pushPositionOf(pair);
+        if (pair_car instanceof Keyword)
+          {
+            while (obj instanceof SyntaxForm)
+              obj = ((SyntaxForm) obj).form;
+            if (obj instanceof Pair)
+              {
+                if (pair_car == interfaceKeyword)
+                  {
+                    Object val = ((Pair) obj).car;
+                    if (val != Boolean.FALSE)
+                      oexp.setFlag(ClassExp.INTERFACE_SPECIFIED);
+                    obj = ((Pair) obj).cdr;
+                    tr.popPositionOf(savedPos1);
+                    continue;
+                  }
+                if (pair_car == accessKeyword)
+                  {
+                    if (oexp.nameDecl == null)
+                      tr.error('e', "access specifier for anonymous class");
+                    else if (classAccessFlag != 0)
+                      tr.error('e', "duplicate access specifiers");
+                    else
+                      {
+                        classAccessFlag = matchAccess(((Pair) obj).car, tr);
+                        if ((classAccessFlag & (Declaration.PRIVATE_ACCESS|Declaration.PROTECTED_ACCESS)) != 0)
+                          tr.error('e', "invalid class access specifier");
+                      }
+                    obj = ((Pair) obj).cdr;
+                    tr.popPositionOf(savedPos1);
+                    continue;
+                  }
+              }
+          }
 	if (! (pair_car instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
 	    return null;
 	  }
-	obj = pair.cdr; // Next member.
-	Object savedPos1 = tr.pushPositionOf(pair);
 	pair = (Pair) pair_car;
 	pair_car = pair.car;
 	while (pair_car instanceof SyntaxForm)
@@ -97,7 +132,6 @@ public class object extends Syntax
 	    Object args;
 	    Declaration decl;
 	    int allocationFlag = 0;
-	    String accessFlagName = null;
 	    int accessFlag = 0;
 	    if (sname instanceof Keyword)
 	      {
@@ -171,38 +205,14 @@ public class object extends Syntax
 		      }
 		    else if (key == accessKeyword)
 		      {
-			String newAccessFlag = null;
-			if (matches(value, "private", tr))
-			  {
-			    newAccessFlag = "private";
-			    accessFlag = Declaration.PRIVATE_ACCESS;
-			  }
-			else if (matches(value, "protected", tr))
-			  {
-			    newAccessFlag = "protected";
-			    accessFlag = Declaration.PROTECTED_ACCESS;
-			  }
-			else if (matches(value, "public", tr))
-			  {
-			    newAccessFlag = "public";
-			    accessFlag = Declaration.PUBLIC_ACCESS;
-			  }
-			else if (matches(value, "package", tr))
-			  {
-			    newAccessFlag = "package";
-			    accessFlag = Declaration.PACKAGE_ACCESS;
-			  }
-			else
-			  {
-			    tr.error('e', "unknown access specifier");
-			  }
-			if (accessFlagName != null && newAccessFlag != null)
-			  {
-			    tr.error('e', "duplicate access specifiers - "
-				     + accessFlagName + " and "
-				     + newAccessFlag);
-			  }
-			accessFlagName = newAccessFlag;
+                        int newAccessFlag = matchAccess(value, tr);
+                        if (newAccessFlag == 0)
+                          tr.error('e', "unknown access specifier");
+                        else if (accessFlag != 0)
+                          tr.error('e', "duplicate access specifiers - "
+                                   + accessString(accessFlag) + " and "
+                                   + accessString(newAccessFlag));
+			accessFlag = newAccessFlag;
 		      }
 		    else
 		      {
@@ -296,6 +306,9 @@ public class object extends Syntax
 	  tr.error ('e', "invalid field/method definition");
 	tr.popPositionOf(savedPos1);
       }
+  if (classAccessFlag != 0)
+    oexp.nameDecl.setFlag(classAccessFlag);
+
     Object[] result = {
       oexp,
       components,
@@ -373,6 +386,13 @@ public class object extends Syntax
 	try
 	  {
 	    obj = pair.cdr; // Next member.
+            if (pair_car instanceof Keyword
+                && obj instanceof Pair)
+              {
+                // Handled at scan time.
+                obj = ((Pair) obj).cdr;
+                continue;
+              }
 	    pair = (Pair) pair_car;
 	    pair_car = pair.car;
 	    SyntaxForm memberCarSyntax = memberSyntax;
@@ -571,5 +591,32 @@ public class object extends Syntax
     else
       return false;
     return tag == null || tag.equals(value);
+  }
+
+  static int matchAccess (Object value, Translator tr)
+  {
+    if (matches(value, "private", tr))
+      return Declaration.PRIVATE_ACCESS;
+    else if (matches(value, "protected", tr))
+      return Declaration.PROTECTED_ACCESS;
+    else if (matches(value, "public", tr))
+      return Declaration.PUBLIC_ACCESS;
+    else if (matches(value, "package", tr))
+      return Declaration.PACKAGE_ACCESS;
+    else
+      return 0;
+  }
+
+  static String accessString (int accessFlag)
+  {
+    if (accessFlag == Declaration.PRIVATE_ACCESS)
+      return "private";
+    if (accessFlag == Declaration.PROTECTED_ACCESS)
+      return "protected";
+    if (accessFlag == Declaration.PUBLIC_ACCESS)
+      return "public";
+    if (accessFlag == Declaration.PACKAGE_ACCESS)
+      return "package";
+    return "<internal error>";
   }
 }

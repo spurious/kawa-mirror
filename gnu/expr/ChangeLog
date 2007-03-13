@@ -1,11 +1,15 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (INTERFACE_SPECIFIED): New flag bit.
+	(declareParts): Set interface if INTERFACE_SPECIFIED.
+	Set class-level access flag (PUBLIC or package access).
+
 	* Compilation.java (registerClass): Use new addModifiers method.
 
 2007-03-13  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (inlineIn): Fix logic.
-
+`<
 2007-03-06  Per Bothner  <per@bothner.com>
 
 	* Special.java (abstractSpecial): New constant.

@@ -46,8 +46,12 @@ public class define_class extends Syntax
 	nameSyntax = (SyntaxForm) name;
 	name = nameSyntax.form;
       }
+    name = tr.namespaceResolve(name);
     if (! (name instanceof String || name instanceof Symbol))
-      return super.scanForDefinitions(st, forms, defs, tr);
+      {
+	tr.error('e', "missing class name");
+	return false;
+      }
     Declaration decl = tr.define(name, nameSyntax, defs);
     if (p instanceof PairWithPosition)
       decl.setLocation((PairWithPosition) p);

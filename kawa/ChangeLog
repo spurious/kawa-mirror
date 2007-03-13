@@ -1,5 +1,11 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* Shell.java (printError): New static method.
+	(run, runString, runFile): Change return type to boolean
+	or Throwable to allow better error handling.  Use printError.
+	* repl.java (processArgs): If error and not interactive, exit(-1).
+	* standard/load.java (loadSource): Chaneg to new run API.
+
 	* standard/object.java (matchAccess, accessString): New static methods.
 	(scanClassDef): Handle interface: and access: class properties.
 	(rewriteClassDef): Skip over class-level keyword specifier pairs.

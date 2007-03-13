@@ -101,17 +101,20 @@ public class load extends Procedure1 {
     Language language = Language.getDefaultLanguage();
     Consumer out = (print ? kawa.Shell.getOutputConsumer(OutPort.outDefault())
 		    : new VoidConsumer());
+    SourceMessages messages = new SourceMessages();
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more efficient.
     // Unfortunately, it is difficult to get macros to work properly.
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run(language, env, port, out, OutPort.errDefault(), url);
+        Throwable ex
+          = kawa.Shell.run(language, env, port, out, null, url, messages);
+        if (ex != null)
+          throw ex;
       }
     else
       {
-	SourceMessages messages = new SourceMessages();
 	Compilation comp
           = language.parse(port, messages, Language.PARSE_IMMEDIATE);
 	ModuleExp mexp = comp.getModule();

@@ -148,21 +148,32 @@ public class Shell
 
   public static boolean dontPrompt;
 
-  public static void run (Language language, Environment env)
+  public static boolean run (Language language, Environment env)
   {
     InPort inp = InPort.inDefault ();
+    SourceMessages messages = new SourceMessages();
+    OutPort perr;
     if (! dontPrompt && inp instanceof TtyInPort)
       {
 	Procedure prompter = language.getPrompter();
 	if (prompter != null)
 	  ((TtyInPort)inp).setPrompter(prompter);
+        perr = OutPort.errDefault();
       }
+    else
+      perr = null;
 
-    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault());
+    Throwable ex = run(language, env, inp, OutPort.outDefault(),
+                       perr, messages);
+    if (ex == null)
+      return true;
+    printError(ex, messages, OutPort.errDefault());
+    return false;
   }
 
-  public static void run (Language language,  Environment env,
-			  InPort inp, OutPort pout, OutPort perr)
+  public static Throwable run (Language language,  Environment env,
+                               InPort inp, OutPort pout, OutPort perr,
+                               SourceMessages messages)
   {
     Consumer out;
     AbstractFormat saveFormat = null;
@@ -171,7 +182,7 @@ public class Shell
     out = getOutputConsumer(pout);
     try
       {
-	run(language, env, inp, out, perr, null);
+	return run(language, env, inp, out, perr, null, messages);
       }
     finally
       {
@@ -180,15 +191,26 @@ public class Shell
       }
   }
 
-  public static void run (Language language,  Environment env,
-			  InPort inp, Consumer out, OutPort perr,
-                          java.net.URL url)
+  public static boolean run (Language language,  Environment env,
+                             InPort inp, Consumer out, OutPort perr,
+                             java.net.URL url)
   {
     SourceMessages messages = new SourceMessages();
+    Throwable ex = run(language, env, inp, out, perr, url, messages);
+    if (ex != null)
+      printError(ex, messages, perr);
+    return ex == null;
+  }
+
+  public static Throwable run (Language language,  Environment env,
+                               InPort inp, Consumer out, OutPort perr,
+                               java.net.URL url, SourceMessages messages)
+  {
     Language saveLanguage = Language.getDefaultLanguage();
     Lexer lexer = language.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
-    boolean interactive = inp instanceof TtyInPort;
+    //boolean interactive = inp instanceof TtyInPort;
+    boolean interactive = perr != null;
     lexer.setInteractive(interactive);
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
@@ -207,7 +229,13 @@ public class Shell
 	    try
 	      {
 		Compilation comp = language.parse(lexer, opts, null);
-		boolean sawError = messages.checkErrors(perr, 20);
+                boolean sawError;
+                if (interactive)
+                  sawError = messages.checkErrors(perr, 20);
+                else if (messages.seenErrors())
+                  throw new SyntaxException(messages);
+                else
+                  sawError = false;
 		if (comp == null) // ??? end-of-file
 		  break;
 		if (sawError)
@@ -236,45 +264,11 @@ public class Shell
 		if (ch < 0)
 		  break;
 	      }
-	    catch (WrongArguments e)
-	      {
-		messages.printAll(perr, 20);
-		if (e.usage != null)
-		  perr.println("usage: "+e.usage);
-		e.printStackTrace(perr);
-	      }
-	    catch (java.lang.ClassCastException e)
-	      {
-		messages.printAll(perr, 20);
-		perr.println("Invalid parameter, was: "+ e.getMessage());
-		e.printStackTrace(perr);
-	      }
-	    catch (java.io.IOException e)
-	      {
-		messages.printAll(perr, 20);
-		String msg = new SourceError(inp, 'e', "").toString();
-		msg = msg.substring(0, msg.length() - 2);
-		perr.println(msg + " (or later): caught IOException");
-		e.printStackTrace(perr);
-		if (! interactive)
-		  return;
-	      }
 	    catch (Throwable e)
 	      {
-                SyntaxException se;
-                if (e instanceof SyntaxException
-                    && (se = (SyntaxException) e).getMessages() == messages)
-                  {
-                    se.printAll(perr, 20);
-                    se.clear();
-                  }
-                else
-                  {
-                    messages.printAll(perr, 20);
-                    e.printStackTrace(perr);
-                  }
 		if (! interactive)
-		  return;
+		  return e;
+                printError(e, messages, perr);
 	      }
 	  }
       }
@@ -285,16 +279,54 @@ public class Shell
         if (language != saveLanguage)
           Language.setDefaultLanguage(saveLanguage);
       }
+    return null;
   }
 
-  public static void runString (String str, Language language, Environment env)
+  public static void printError (Throwable ex, SourceMessages messages,
+                                 OutPort perr)
   {
-    run(language, env, new CharArrayInPort(str),
-	ModuleBody.getMainPrintValues() ? OutPort.outDefault() : null,
-	OutPort.errDefault());
+    if (ex instanceof WrongArguments)
+      {
+        WrongArguments e = (WrongArguments) ex;
+        messages.printAll(perr, 20);
+        if (e.usage != null)
+          perr.println("usage: "+e.usage);
+        e.printStackTrace(perr);
+      }
+    else if (ex instanceof ClassCastException)
+      {
+        messages.printAll(perr, 20);
+        perr.println("Invalid parameter, was: "+ ex.getMessage());
+        ex.printStackTrace(perr);
+      }
+    /*
+    else if (ex instanceof java.io.IOException)
+      {
+        messages.printAll(perr, 20);
+        String msg = new SourceError(inp, 'e', "").toString();
+        msg = msg.substring(0, msg.length() - 2);
+        perr.println(msg + " (or later): caught IOException");
+        ex.printStackTrace(perr);
+      }
+    */
+    else
+      {
+        SyntaxException se;
+        if (ex instanceof SyntaxException
+            && (se = (SyntaxException) ex).getMessages() == messages)
+          {
+            se.printAll(perr, 20);
+            se.clear();
+          }
+        else
+          {
+            messages.printAll(perr, 20);
+            ex.printStackTrace(perr);
+          }
+      }
   }
 
-  public static void runFile (String fname, int skipLines)
+  public static boolean runFile (String fname, int skipLines)
   {
     Environment env = Environment.getCurrent();
     try
@@ -308,21 +340,22 @@ public class Shell
           }
 	else
 	  kawa.standard.load.apply(Path.valueOf(fname), env, false, skipLines);
+        return true;
       }
     catch (gnu.text.SyntaxException e)
       {
 	e.printAll(OutPort.errDefault(), 20);
+        return false;
       }
     catch (FileNotFoundException e)
       {
 	System.err.println("Cannot open file "+fname);
-	System.exit(1);
+        return false;
       }
     catch (Throwable e)
       {
 	e.printStackTrace(System.err);
-	System.exit(1);
+        return false;
       }
   }
-  
 }

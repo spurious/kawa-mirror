@@ -169,7 +169,8 @@ public class repl extends Procedure0or1
 	  scmHomeDirectory = Boolean.FALSE;
 	Environment.getCurrent().put("home-directory", scmHomeDirectory);
 	if (initFile != null && initFile.exists())
-	  Shell.runFile(initFile.getPath(), 0);
+	  if (! Shell.runFile(initFile.getPath(), 0))
+            System.exit(-1);
       }
   }
 
@@ -236,7 +237,16 @@ public class repl extends Procedure0or1
 	    if (arg.equals ("-c"))
 	      checkInitFile();
 	    Language language = Language.getDefaultLanguage();
-	    Shell.runString(args[iArg], language, Environment.getCurrent());
+            SourceMessages messages = new SourceMessages();
+            Throwable ex = Shell.run(language, Environment.getCurrent(),
+                                     new CharArrayInPort(args[iArg]),
+                                     OutPort.outDefault(),
+                                     null, messages);
+            if (ex != null)
+              {
+                Shell.printError(ex, messages, OutPort.errDefault());
+                System.exit(-1);
+              }
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -248,7 +258,8 @@ public class repl extends Procedure0or1
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    Shell.runFile (filename, 0);
+	    if (! Shell.runFile (filename, 0))
+              System.exit(-1);
 	    something_done = true;
 	  }
 	else if (arg.startsWith("--script"))
@@ -273,7 +284,8 @@ public class repl extends Procedure0or1
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    Shell.runFile(filename, skipLines);
+	    if (! Shell.runFile(filename, skipLines))
+              System.exit(-1);
             return -1;
 	  }
 	else if (arg.equals("\\"))
@@ -283,6 +295,7 @@ public class repl extends Procedure0or1
 	      bad_option (arg);
 	    String filename = args[iArg];
 	    InPort freader;
+            SourceMessages messages = new SourceMessages();
 	    try
 	      {
 		InputStream fstream = new BufferedInputStream(new FileInputStream(filename));
@@ -349,21 +362,26 @@ public class repl extends Procedure0or1
 		// FIXME adjust line number
 		setArgs(args, iArg+1);
 		checkInitFile();
-		kawa.standard.load.loadSource(freader, Environment.user(), null);
-		return -1;
-	      }
-	    catch (SyntaxException ex)
-	      {
-		ex.printAll(OutPort.errDefault(), 20);
-	      }
-	    catch (java.io.FileNotFoundException ex)
-	      {
-		System.err.println("Cannot open file "+filename);
-		System.exit(1);
+                OutPort err = OutPort.errDefault();
+                Throwable ex = Shell.run(Language.getDefaultLanguage(),
+                                         Environment.getCurrent(),
+                                         freader, OutPort.outDefault(), null,
+                                         messages);
+                messages.printAll(err, 20);
+                if (ex != null)
+                  {
+                    if (ex instanceof SyntaxException)
+                      {
+                        SyntaxException se = (SyntaxException) ex;
+                        if (se.getMessages() == messages)
+                          System.exit(1);
+                      }
+                    throw ex;
+                  }
 	      }
 	    catch (Throwable ex)
 	      {
-		ex.printStackTrace(System.err);
+                Shell.printError(ex, messages,  OutPort.errDefault());
 		System.exit(1);
 	      }
 	    return -1;
@@ -835,21 +853,25 @@ public class repl extends Procedure0or1
 	int iArg = processArgs(args, 0, args.length);
 	if (iArg < 0)
 	  return;
+        boolean ok;
 	if (iArg < args.length)
 	  {
 	    String filename = args[iArg];
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    Shell.runFile(filename, 0);
+	    ok = Shell.runFile(filename, 0);
 	  }
 	else
 	  {
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(Language.getDefaultLanguage(), Environment.getCurrent());
+	    ok = Shell.run(Language.getDefaultLanguage(),
+                           Environment.getCurrent());
 	  }
+        if (! ok)
+          System.exit(-1);
       }
     finally
       {

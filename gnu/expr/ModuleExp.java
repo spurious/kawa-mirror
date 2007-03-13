@@ -195,7 +195,7 @@ public class ModuleExp extends LambdaExp
 
 	if (! alwaysCompile && ! comp.mustCompile)
 	  { // optimization - don't generate unneeded Class.
-	    if (Compilation.debugPrintFinalExpr)
+	    if (Compilation.debugPrintFinalExpr && msg != null)
 	      {
 		msg.println ("[Evaluating final module \""+mexp.getName()+"\":");
 		mexp.print(msg);

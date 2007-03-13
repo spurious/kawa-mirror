@@ -4,7 +4,7 @@ import gnu.bytecode.Type;
 /** Does setTailCall on ApplyExp's that are tail-calls.
  * Also setCanRead, setCanCall on Declarations
  * and setCanRead, setCanCall on LambdaExp when appropriate.
- * (setCnWrite on Declarations needs to be set before this.)
+ * (setCanWrite on Declarations needs to be set before this.)
  */
 
 public class FindTailCalls extends ExpWalker

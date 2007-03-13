@@ -1,5 +1,7 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalModule): Don't fail if msg is null.
+
 	* ClassExp.java (INTERFACE_SPECIFIED): New flag bit.
 	(declareParts): Set interface if INTERFACE_SPECIFIED.
 	Set class-level access flag (PUBLIC or package access).

@@ -7,6 +7,8 @@ package gnu.text;
  * Has a "current line number" which clients can use as the default line
  * number, or clients can explicitly provide a line number.
  * Does not handle localization of messages.
+ *
+ * Similar functionality as JAVA6's javax.tools.DiagnosticCollector.
  */
 
 public class SourceMessages implements SourceLocator

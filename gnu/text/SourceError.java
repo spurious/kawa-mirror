@@ -1,8 +1,10 @@
 package gnu.text;
 
-/** Represents an error message from processing a "source" file. */
+/** Represents an error message from processing a "source" file.
+ */
 
 public class SourceError
+  // FIXME: If JAVA6, should implement: javax.tools.Diagnostic
   implements SourceLocator
 {
   /** Used to chain to the "next" message. */

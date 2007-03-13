@@ -1036,8 +1036,8 @@ public class Compilation implements SourceLocator
 	System.arraycopy (classes, 0, new_classes, 0, numClasses);
 	classes = new_classes;
       }
-    new_class.access_flags |= new_class.isInterface() ? Access.PUBLIC
-      : Access.PUBLIC|Access.SUPER;
+    new_class.addModifiers(new_class.isInterface() ? Access.PUBLIC
+                           : Access.PUBLIC|Access.SUPER);
     if (new_class == mainClass && numClasses > 0)
       {
         // Ensure mainClass is written first when writing an archive.

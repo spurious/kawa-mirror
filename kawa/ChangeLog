@@ -1,3 +1,7 @@
+2007-03-13  Per Bothner  <per@bothner.com>
+
+	* Record.java (makeRecordType): Don't access acces_flags directly.
+
 2007-03-06  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteBody): Canonicale BeginExp.

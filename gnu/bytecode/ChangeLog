@@ -1,3 +1,8 @@
+2007-03-13  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (access_flags): Make non-public.
+	(addModifiers): New method.
+
 2007-02-08  Per Bothner  <per@bothner.com>
 
 	* ArrayType.java: Implement Externalizable.

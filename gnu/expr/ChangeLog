@@ -1,5 +1,9 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (registerClass): Use new addModifiers method.
+
+2007-03-13  Per Bothner  <per@bothner.com>
+
 	* LambdaExp.java (inlineIn): Fix logic.
 
 2007-03-06  Per Bothner  <per@bothner.com>

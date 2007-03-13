@@ -172,7 +172,7 @@ public class Record
     String mangledName = Compilation.mangleNameIfNeeded(name);
     ClassType clas = new ClassType(mangledName);
     clas.setSuper(superClass);
-    clas.access_flags = Access.PUBLIC;
+    clas.setModifiers(Access.PUBLIC|Access.SUPER);
 
     // Generate the (default) constructor.
     Method constructor = clas.addMethod ("<init>", Type.typeArray0,

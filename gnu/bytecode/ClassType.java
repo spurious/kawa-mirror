@@ -57,7 +57,7 @@ public class ClassType extends ObjectType
 
   ClassType[] interfaces;
   int[] interfaceIndexes;
-  public int access_flags;
+  int access_flags;
 
   Attribute attributes;
   public final Attribute getAttributes () { return attributes; }
@@ -91,6 +91,7 @@ public class ClassType extends ObjectType
 
   /** Set the modifiers (access flags) for this class. */
   public final void setModifiers(int flags) { access_flags = flags; }
+  public final void addModifiers(int flags) { access_flags |= flags; }
 
   public final boolean hasOuterLink ()
   {

@@ -699,7 +699,7 @@ public class Translator extends Compilation
                     decl = null;
                   }
               }
-            else
+            else if (loc == null || ! loc.isBound())
               {
                 Expression e
                   = ((LispLanguage) getLanguage()).checkDefaultBinding(symbol, this);

@@ -1,5 +1,8 @@
 2007-03-13  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (rewrite): Only call checkDefaultBinding
+	if there is no binidng in the dynamic Environment.
+
 	* Shell.java (printError): New static method.
 	(run, runString, runFile): Change return type to boolean
 	or Throwable to allow better error handling.  Use printError.

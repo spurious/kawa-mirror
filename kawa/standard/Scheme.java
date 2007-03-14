@@ -807,11 +807,6 @@ public class Scheme extends LispLanguage
         int len = nam.length();
 	if (nam.endsWith("$unit"))
 	  val = Unit.lookup(nam.substring(0, nam.length()-5));
-	else if (len > 2 && nam.charAt(0) == '<' && nam.charAt(len-1) == '>')
-          {
-            String tname = nam.substring(1, len-1);
-            val = Scheme.string2Type(tname);
-          }
 	if (val != null)
           {
             loc = new PlainLocation(name, null);
@@ -1112,13 +1107,25 @@ public class Scheme extends LispLanguage
     if (rank != 0)
       name = name.substring(0, len);
     try
-      {
-        Type type = Type.lookupType(name);
+      { 
         Class clas;
-        if (type instanceof gnu.bytecode.PrimType)
-          clas = type.getReflectClass();
+        Type type = getNamedType(name);
+        if (type != null)
+          {
+            // Somewhat inconsistent: Types named by getNamedType are Type,
+            // while standard type/classes are Class.  FIXME.
+            while (--rank >= 0)
+              type = gnu.bytecode.ArrayType.make(type);
+            return QuoteExp.getInstance(type);
+          }
         else
-          clas = ClassType.getContextClass(name);
+          {
+            type = Type.lookupType(name);
+            if (type instanceof gnu.bytecode.PrimType)
+              clas = type.getReflectClass();
+            else
+              clas = ClassType.getContextClass(name);
+          }
         if (clas != null)
           {
             if (rank > 0)

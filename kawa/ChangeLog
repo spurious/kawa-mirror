@@ -1,3 +1,9 @@
+2007-03-14  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (lookupBuiltin): Remove handling of '<TYPE>'
+	here, since we want it handled by checkDefaultBinding.
+	(checkDefaultBinding): Use getNamedType rather than lookupType.
+	
 2007-03-13  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): Only call checkDefaultBinding

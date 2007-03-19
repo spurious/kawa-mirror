@@ -1,3 +1,13 @@
+2007-03-19  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (setClassName): Inline into setTypes and remove.
+	(setTypes): Allow define-simple-class to define interface and
+	define-class to define class.
+	(CLASS_SPECIFIED): New flag.
+	(isMakingClassPair): No longer same as !simple.
+	* Compilation.java (callInitMethods): Don't create separate instance
+	class just because class is a PairClassType.
+
 2007-03-13  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): Don't fail if msg is null.

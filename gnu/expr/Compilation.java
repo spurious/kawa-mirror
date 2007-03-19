@@ -1210,19 +1210,22 @@ public class Compilation implements SourceLocator
       }
 
     int clEnvArgs = 1;
-    if (clas instanceof PairClassType)
-      clas = ((PairClassType) clas).instanceType;
-    else if (clas.isInterface())
-      {
-	try
-	  {
-	    clas = ((ClassType)
-		    Type.make(Class.forName(clas.getName() + "$class")));
-	  }
-	catch (Throwable ex)
-	  {
-	    return;
-	  }
+    if (clas.isInterface())
+      {	
+        if (clas instanceof PairClassType)
+          clas = ((PairClassType) clas).instanceType;
+        else
+          {
+            try
+              {
+                clas = ((ClassType)
+                        Type.make(Class.forName(clas.getName() + "$class")));
+              }
+            catch (Throwable ex)
+              {
+                return;
+              }
+          }
       }
     else
       clEnvArgs = 0;

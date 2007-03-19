@@ -12,6 +12,7 @@ public class ClassExp extends LambdaExp
   public final boolean isAbstract () { return getFlag(IS_ABSTRACT); }
   public static final int IS_ABSTRACT = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int INTERFACE_SPECIFIED = 2 * LambdaExp.NEXT_AVAIL_FLAG;
+  public static final int CLASS_SPECIFIED = 4 * LambdaExp.NEXT_AVAIL_FLAG;
 
   /** True if there is at least one explicit "<init>" ("*init*"} method. */
   boolean explicitInit;
@@ -25,7 +26,7 @@ public class ClassExp extends LambdaExp
   /** True if we should make a pair of an interface and a class. */
   public boolean isMakingClassPair()
   {
-    return ! simple;
+    return type != instanceType;
   }
 
   /** List of base classes and implemented interfaces. */
@@ -53,13 +54,7 @@ public class ClassExp extends LambdaExp
     if (simple)
       instanceType = type = new ClassType();
     else
-      {
-        PairClassType ptype = new PairClassType();
-        type = ptype;
-        instanceType = new ClassType();
-        ptype.setInterface(true);
-        ptype.instanceType = instanceType;
-      }
+      instanceType = type = new PairClassType(); // For now.
     setCanRead(true);
   }
 
@@ -126,8 +121,67 @@ public class ClassExp extends LambdaExp
     return type;
   }
 
-  public void setClassName (Compilation comp)
+  public void setTypes(Compilation comp)
   {
+    int nsupers = supers == null ? 0 : supers.length;
+    ClassType[] superTypes = new ClassType[nsupers];
+    ClassType superType = null;
+    int j = 0;
+    for (int i = 0;  i < nsupers;  i++)
+      {
+	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
+	if (! (st instanceof ClassType))
+          {
+            comp.setLine(supers[i]);
+            comp.error('e', "invalid super type");
+            continue;
+          }
+	ClassType t = (ClassType) st;
+	int modifiers;
+	try
+	  {
+	    modifiers = t.getModifiers();
+	  }
+	catch (RuntimeException ex)
+	  {
+	    modifiers = 0;
+	    if (comp != null)
+	      comp.error('e', "unknown super-type "+t.getName());
+	  }
+	if ((modifiers & Access.INTERFACE) == 0)
+	  {
+	    if (j < i)
+              comp.error('e', "duplicate superclass for "+this);
+	    superType = t;
+	  }
+	else
+	  superTypes[j++] = t;
+      }
+    if (superType != null && (flags & INTERFACE_SPECIFIED) != 0)
+      comp.error('e', "cannot be interface since has superclass");
+    if (! simple && superType == null && (flags & CLASS_SPECIFIED) == 0)
+      {
+        PairClassType ptype = (PairClassType) type;
+        instanceType = new ClassType();
+        ptype.setInterface(true);
+        ptype.instanceType = instanceType;
+        ClassType[] interfaces = { type };
+        // Can we better.  FIXME.
+        instanceType.setSuper(Type.pointer_type);
+        instanceType.setInterfaces(interfaces);
+      }
+    type.setSuper(superType == null ? Type.pointer_type : superType);
+
+    ClassType[] interfaces;
+    if (j == nsupers)
+      interfaces = superTypes;
+    else
+      {
+	interfaces = new ClassType[j];
+	System.arraycopy(superTypes, 0, interfaces, 0, j);
+      }
+    type.setInterfaces(interfaces);
+
     if (type.getName() == null)
       {
 	String name = getName();
@@ -193,67 +247,6 @@ public class ClassExp extends LambdaExp
             comp.addClass(instanceType);
           }
       }
-  }
-
-  public void setTypes(Compilation comp)
-  {
-    int len = supers == null ? 0 : supers.length;
-    ClassType[] superTypes = new ClassType[len];
-    ClassType superType = null;
-    int j = 0;
-    for (int i = 0;  i < len;  i++)
-      {
-        // setTypes may be called at name-resolution time (so we can can
-        // resolve against inherited field and method names).  Therefore do
-        // inlining now.  Needed (for example) for deprecated PREXIX:<> syntax.
-        supers[i] = new InlineCalls(comp).walk(supers[i]);
-
-	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
-	if (! (st instanceof ClassType))
-          {
-            comp.setLine(supers[i]);
-            comp.error('e', "invalid super type");
-            continue;
-          }
-	ClassType t = (ClassType) st;
-	int modifiers;
-	try
-	  {
-	    modifiers = t.getModifiers();
-	  }
-	catch (RuntimeException ex)
-	  {
-	    modifiers = 0;
-	    if (comp != null)
-	      comp.error('e', "unknown super-type "+t.getName());
-	  }
-	if ((modifiers & Access.INTERFACE) == 0)
-	  {
-	    if (j < i)
-              comp.error('e', "duplicate superclass for "+this);
-	    superType = t;
-	  }
-	else
-	  superTypes[j++] = t;
-      }
-    if (! isSimple() && superType == null)
-      {
-        ClassType[] interfaces = { type };
-        // Can we better.  FIXME.
-        instanceType.setSuper(Type.pointer_type);
-        instanceType.setInterfaces(interfaces);
-      }
-    type.setSuper(superType == null ? Type.pointer_type : superType);
-
-    ClassType[] interfaces;
-    if (j == len)
-      interfaces = superTypes;
-    else
-      {
-	interfaces = new ClassType[j];
-	System.arraycopy(superTypes, 0, interfaces, 0, j);
-      }
-    type.setInterfaces(interfaces);
   }
 
   boolean partsDeclared;

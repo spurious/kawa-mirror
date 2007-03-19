@@ -1,5 +1,9 @@
 2007-03-19  Per Bothner  <per@bothner.com>
 
+	* standard/object.java (scanClassDef): If interface:#f is specified
+	set CLASS_SPECIFIED flag.
+	(rewriteClassDef): ClassExp.setClassName was merged into setTypes.
+
 	* standard/Scheme.java (checkDefaultBinding): Demangle possible class
 	name if there is no '.' in name.
 	* standard/require.java (scanForDefinitions): Delegate class-name

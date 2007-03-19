@@ -91,7 +91,9 @@ public class object extends Syntax
                 if (pair_car == interfaceKeyword)
                   {
                     Object val = ((Pair) obj).car;
-                    if (val != Boolean.FALSE)
+                    if (val == Boolean.FALSE)
+                      oexp.setFlag(ClassExp.CLASS_SPECIFIED);
+                    else
                       oexp.setFlag(ClassExp.INTERFACE_SPECIFIED);
                     obj = ((Pair) obj).cdr;
                     tr.popPositionOf(savedPos1);
@@ -348,7 +350,6 @@ public class object extends Syntax
       }
     oexp.supers = supers;
 
-    oexp.setClassName(tr);
     oexp.setTypes(tr);
 
     // First a pass over init-form: specifiers, since these are evaluated

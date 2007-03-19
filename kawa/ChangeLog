@@ -1,3 +1,11 @@
+2007-03-19  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (checkDefaultBinding): Demangle possible class
+	name if there is no '.' in name.
+	* standard/require.java (scanForDefinitions): Delegate class-name
+	lookup to Translator.require.
+	* lang/Translator.java (selfEvaluatingSymbol): Make public.
+
 2007-03-14  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (lookupBuiltin): Remove handling of '<TYPE>'

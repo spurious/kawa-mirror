@@ -151,43 +151,29 @@ public class require extends Syntax
           }
         return importDefinitions(null, info, null, forms, defs, tr);
       }
-    else
+    else if (name instanceof Symbol && ! tr.selfEvaluatingSymbol(name))
       {
-	if (name instanceof Symbol)
-	  {
-	    String str = name.toString();
-	    int len = str.length();
-	    if (len > 2
-		&& str.charAt(0) == '<'
-		&& str.charAt(len-1) == '>')
-	      {
-		str = str.substring(1, len-1);
-		if (str.indexOf('.') < 0)
-		  str = tr.classPrefix + str;
-                if (args.cdr instanceof Pair)
+        type = tr.getLanguage().getTypeFor(tr.rewrite(name, false));
+        if (type instanceof ClassType && args.cdr instanceof Pair)
+          {
+            name = ((Pair) args.cdr).car;
+            if
+              /* #ifdef use:java.lang.CharSequence */
+              // (name instanceof CharSequence)
+              /* #else */
+              (name instanceof String || name instanceof CharSeq)
+              /* #endif */
+              {
+                String sourceName = name.toString();
+                ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
+                if (info == null)
                   {
-                    name = ((Pair) args.cdr).car;
-                    if
-                      /* #ifdef use:java.lang.CharSequence */
-                      // (name instanceof CharSequence)
-                      /* #else */
-                      (name instanceof String || name instanceof CharSeq)
-                      /* #endif */
-                      {
-                        String sourceName = name.toString();
-                        ModuleInfo info = lookupModuleFromSourcePath(sourceName, defs);
-                        if (info == null)
-                          {
-                            tr.error('e', "malformed URL: "+sourceName);
-                            return false;
-                          }
-                        return importDefinitions(str,
-                                                 info,
-                                                 null, forms, defs, tr);
-                      }
+                    tr.error('e', "malformed URL: "+sourceName);
+                    return false;
                   }
-		type = Scheme.string2Type(str);
-	      }
+                return importDefinitions(type.getName(), info, null,
+                                         forms, defs, tr);
+              }
 	  }
       }
     if (type == null)

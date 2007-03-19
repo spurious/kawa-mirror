@@ -154,7 +154,7 @@ public class Translator extends Compilation
     return null;
   }
 
-  final boolean selfEvaluatingSymbol (Object obj)
+  public final boolean selfEvaluatingSymbol (Object obj)
   {
     return ((LispLanguage) getLanguage()).selfEvaluatingSymbol(obj);
   }

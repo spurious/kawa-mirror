@@ -1124,7 +1124,14 @@ public class Scheme extends LispLanguage
             if (type instanceof gnu.bytecode.PrimType)
               clas = type.getReflectClass();
             else
-              clas = ClassType.getContextClass(name);
+              {
+                String cname;
+                if (name.indexOf('.') < 0)
+                  cname = tr.classPrefix + Compilation.mangleNameIfNeeded(name);
+                else
+                  cname = name;
+                clas = ClassType.getContextClass(cname);
+              }
           }
         if (clas != null)
           {

@@ -1,3 +1,7 @@
+2007-03-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Re-order some sections.
+
 2007-01-28  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Getting Kawa): Remove reference to kawa-VERSION-src.zip.

@@ -4445,20 +4445,19 @@ Here are the currently supported features.
 The Kawa module system is based on the features of the Java class system.
 
 @menu
-* Record types::          Defining Record Types
-* Dynamic records::       Creating New Record Types On-the-fly
-* Mangling::              Mapping Scheme names to Java names
-* Method operations::     Calling Java methods from Scheme
-* Allocating objects::
-* Field operations::      Accessing fields of Java objects
 * Defining new classes::
 * Anonymous classes::
 * Module classes::        Modules and how they are compiled to classes
+* Record types::          Defining Record Types
+* Dynamic records::       Creating New Record Types On-the-fly
+* Method operations::     Calling Java methods from Scheme
+* Allocating objects::
+* Field operations::      Accessing fields of Java objects
+* Mangling::              Mapping Scheme names to Java names
 * Scheme types in Java::
 * Array operations::      Using Java arrays
 * Loading Java functions into Scheme::
 * Evaluating Scheme expressions from Java::
-* Low-level functions::   Deprecated low-level functions
 @end menu
 
 @deffn Syntax this
@@ -4470,7 +4469,551 @@ it using parentheses: @samp{(this)}.  A planned extension will
 allow an optional class specifier (needed for nested clases).
 @end deffn
 
-@node Record types, Dynamic records, Objects Classes and Modules, Objects Classes and Modules
+@node Defining new classes, Anonymous classes, , Objects Classes and Modules
+@subsection Defining new classes
+
+Kawa provides various mechanisms for defining new classes.
+The @code{define-class} and @code{define-simple-class} forms
+will usually be the preferred mechanisms.  They have basically
+the same syntax, but have a couple of differences.
+@code{define-class} allows multiple inheritance as well as true nested
+(first-class) class objects.  However, the implementation
+is more complex: code using it is slightly slower, and the mapping to
+Java classes is a little less obvious.   (Each Scheme class is implemented
+as a pair of an interface and an implementation class.)
+A class defined by @code{define-simple-class} is slightly more
+efficient, and it is easier to access it from Java code.
+
+The syntax of @code{define-class} are mostly compatible with that
+in the Guile and Stk dialects of Scheme.
+
+@deffn Syntax define-class name (supers ...) field-or-method-decl ...
+@deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
+@display
+@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
+@var{field-decl} ::= (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] [@var{option-keyword} @var{option-value}]* @var{body})
+@end display
+Defines a new class named @var{name}.  If @code{define-simple-class} is
+used, creates a normal Java class named @var{name} in the current package.
+(If @var{name} has the form @code{<xyx>} the Java implementation
+type is named @code{xyz}.)  For @code{define-class} the implementation is
+unspecified.  In most cases, the compiler creates a class pair,
+consisting of a Java interface and a Java implementation class.
+
+The class inherits from the classes and interfaces listed in @var{supers}.
+This is a list of names of classes that are in scope (perhaps imported
+using @code{require}), or names for existing classes or interfaces
+surrounded by @code{<>}, such as @code{<gnu.lists.Sequence>}.
+If @code{define-simple-class} is used, at most one of these may be
+the name of a normal Java class or classes defined using
+@code{define-simple-class}; the rest must be interfaces or classes
+defined using @code{define-class}.
+If @code{define-class} is used, @emph{all} of the classes listed
+in @var{supers} should be interfaces or classes defined using
+@code{define-class}.
+
+Each @var{field-decl} declares a instance "slot" (field)
+with the given @var{fname}. 
+By default it is publicly visible, but you can specify
+a different visiblity with the @code{access:} specifier.
+ If @var{ftype} is specified it is the
+type of the slot.  The following @var{option-keyword}s are implemented:
+@table @asis
+@item @code{type:} @var{ftype}
+Specifies that @var{ftype} is the type of (the values of) the field.
+Equivalent to @samp{:: @var{ftype}}.
+@item @code{allocation:} @var{kind}
+If @var{kind} is @code{'class} or @code{'static} a single slot is shared
+between all instances of the class (and its sub-classes).
+Not yet implemented for @code{define-class},
+only for @code{define-simple-class}.
+In Java terms this is a @code{static} field.
+
+If @var{kind} is @code{'instance} then
+each instance has a separate value "slot", and they
+are not shared. In Java terms, this is a non-@code{static} field.
+This is the default.
+
+You can use a keyword like @code{class:} or a string like @code{"class"}
+if you prefer instead of a quoted symbol like @code{'class};
+the latter is recommended.
+@item @code{access:} @var{kind}
+Specifies the Java access permission on the field.
+Can be one of @code{'private}, @code{'protected},
+@code{'public} (which is the default in Kawa),
+or @code{'package} (which the default "unnamed" permission
+in Java code).
+@item @code{init:} @var{expr}
+An expression used to initialize the slot.
+The expression is evaluated in a scope that includes the field and
+method names of the current class.
+@item @code{init-form:} @var{expr}
+An expression used to initialize the slot.
+The lexical environment of the @var{expr} is that of the @code{define-class};
+it does @emph{not} include the field and method names of the current class.
+or @code{define-simple-class}.
+@item @code{init-value:} @var{value}
+A value expression used to initialize the slot.
+For now this is synonymous with @var{init-form:}, but that may change
+(depending on what other implementation do), so to be safe only use
+@code{init-value:} with a literal.
+@item @code{init-keyword:} @code{@var{name}:}
+A keyword that that can be used to initialize instance in @code{make} calls.
+For now, this is ignored, and @var{name} should be the same as the
+field's @var{fname}.
+@end table
+
+The @var{fname} can be left out.  That indicates a "dummy slot",
+which is useful for initialization not tied to a specific field.
+In this example, @code{x} is the only actual field.  It is first
+initialized to 10, but if @code{(some-condition)} is true
+then its value is doubled.
+@example
+(define-simple-class <my-class> ()
+  (allocation: 'class
+   init: (perform-actions-when-the-class-is-initizalized))
+  (x init: 10)
+  (init: (if (some-condition) (set! x (* x 2)))))
+@end example
+
+Each @var{method-decl} declares method,
+which is by default public and non-static, and whose name is @var{method-name}.
+(If @var{method-name} is not a valid
+Java method name, it is mapped to something reasonable.
+For example @code{foo-bar?} is mapped to @code{isFooBar}.)
+The types of the method arguments can be specified in the
+@var{formal-arguments}.  The return type can be specified by @var{rtype},
+or is otherwise the type of the @var{body}.
+Currently, the @var{formal-arguments} cannot contain optional, rest,
+or keyword parameters.  (The plan is to allow optional parameters,
+implemented using multiple overloaded methods.)
+
+A @var{method-decl} in a @code{define-simple-class}
+can have the following @var{option-keyword}s:
+@table @asis
+@item @code{access:} @var{kind}
+Specifies the Java access permission on the method.
+Can be one of @code{'private}, @code{'protected},
+@code{'public}, or @code{'package}.
+@item @code{allocation:} @var{kind}
+If @var{kind} is @code{'class} or @code{'static} creates a static method.
+@item @code{throws:} ( @var{exception-class-name} ... )
+Specifies a list of checked exception that the method may throw.
+Equivalent to a @code{throws} specification in Java code.
+For example:
+@example
+(define-simple-class <T>
+  (prefix)
+  ((lookup name) throws: (<java.io.FileNotFoundException>)
+   (make <java.io.FileReader> (string-append prefix name))))
+@end example
+@end table
+
+The special @var{method-name} @samp{*init*} can be used to name
+a non-default constructor (in a @code{define-simple-class} only).
+It can be used to initialize a freshly-allocated instance
+using passed-in parameters.
+You can call a superclass or a sibling constructor using
+the @code{invoke-special} special function.
+(This is general but admittedly a bit verbose; a more compact
+form may be added in the future.)
+See the example below.
+
+The scope of the @var{body} of a method includes the @var{field-decl}s
+and @var{field-decl}s of the body, including those inherited from
+superclasses and implemented interfaces.
+@end deffn
+
+In the following example we define a simple class @code{<2d-vector>}
+and a class @code{<3d-vector>} that extends it.  (This is for illustration
+only - defining 3-dimensional points as an extension
+of 2-dimensional points does not really make sense.)
+
+@example
+(define-simple-class <2d-vector> ()
+  (x type: <double> init-keyword: x:)
+  (y type: <double> init-keyword: y:)
+  (zero-2d :: <2d-vector> allocation: 'static
+   init-value: (make <2d-vector> 0))
+  ;; An object initializer (constructor) method.
+  ((*init* (x0 :: <double>) (y0 :: <double>))
+   (set! x x0)
+   (set! y y0))
+  ((*init* (xy0 :: <double>))
+   ;; Call above 2-argument constructor.
+   (invoke-special <2d-vector> (this) '*init* xy0 xy0))
+  ;; Need a default constructor as well, for the  (make ..) below.
+  ((*init*) #!void)
+  ((add (other :: <2d-vector>)) :: <2d-vector>
+   ;; Kawa compiles this using primitive Java types!
+   (make <2d-vector>
+     x: (+ x (slot-ref other 'x))
+     y: (+ y (slot-ref other 'y))))
+  ((scale (factor :: <double>)) :: <2d-vector>
+   (make <2d-vector> x: (* factor x) y: (* factor y))))
+
+(define-simple-class <3d-vector> (<2d-vector>)
+  (z type: <double> init-value: 0.0 init-keyword: z:)
+  ;; A constructor which calls the superclass constructor.
+  ((*init* (x0 :: <double>) (y0 :: <double>) (z0 :: <double>))
+   (invoke-special <2d-vector> (this) '*init* x0 y0)
+   (set! z z0))
+  ;; Need a default constructor for the  (make ..) below.
+  ((*init*) #!void)
+  ((scale (factor :: <double>)) :: <2d-vector>
+   ;; Note we cannot override the return type to <3d-vector>
+   ;; because Java does not allow that.  Should hide that. .
+   (make <3d-vector>
+     ;; Unfortunately, slot names of inherited classes are not visible.
+     ;; Until this is fixed, use slot-ref.
+     x: (* factor (slot-ref (this) 'x))
+     y: (* factor (*:.y (this))) ;; Alternative syntax.
+     z: (* factor z))))
+@end example
+
+Note we define both explicit non-default constructor methods,
+and we associate fields with keywords, so they can be named
+in a @code{make} call.  The latter requires a default constructor,
+and since having non-default constructors suppresses
+the implicit default constructor we have to explicitly define it.
+Using both styles of constructors is rather redundant, though.
+
+@node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
+@subsection Anonymous classes
+
+@deffn Syntax object (supers ...) field-or-method-decl ...
+Returns a new instance of an anonymous (inner) class.
+The syntax is similar to @code{define-class}.
+@display
+@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
+@var{field-decl} ::= (@var{fname} [[[::] @var{ftype}] @var{finit}])
+    | (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
+@end display
+
+Returns a new instance of a unique (anonymous) class.
+The class inherits from the list of @var{supers}, where at most one of the
+elements should be the base class being extended from, and the rest
+are interfaces.
+
+This is roughly equivalent to:
+@example
+(begin
+  (define-simple-class @var{hname} (@var{supers} ...) @var{field-or-method-decl} ...)
+  (make @var{hname}))
+@end example
+
+A @var{field-decl} is as for @code{define-class}, except
+that we also allow an abbreviated syntax.
+Each @var{field-decl} declares a public instance field.
+If @var{ftype} is given, it specifies the type of the field.
+If @var{finit} is given, it is an expression whose value
+becomes the initial value of the field.
+The @var{finit} is evaluated at the same time as the @code{object}
+expression is evaluated,
+in a scope where all the @var{fname}s are visible.
+
+A @var{method-decl} is as for @code{define-class}.
+@end deffn
+
+@node Module classes, Record types, Anonymous classes, Objects Classes and Modules
+@subsection Modules and how they are compiled to classes
+
+A @dfn{module} is a set of definitions that the module @dfn{exports},
+as well as some @dfn{actions} (expressions evaluated for their side effect).
+The top-level forms in a Scheme source file compile a module;
+the source file is the @dfn{module source}.
+When Kawa compiles the module source, the result is the
+@dfn{module class}.  Each exported definition is translated to
+a public field in the module class.
+
+There are two kinds of module class:
+A @dfn{static module} is a class (or gets compiled to a class)
+all of whose public fields a static, and that does not have a
+public constructor.  A JVM can only have a single global instance of
+a static module.
+An @dfn{instance module} has a public default constructor,
+and usually has at least one non-static public field.
+There can be multiple instances
+of an instance module; each instance is called a @dfn{module instance}.
+However, only a single instance of a module can be @dfn{registered}
+in an environment, so in most cases there is only a single
+instance of instance modules.  Registering an instance in an environment
+means creating a binding mapping a magic name (derived from the class name)
+to the instance.
+
+In fact, any Java class class that has the properties of either
+an instance module or a static module, is a module, and can be
+loaded or imported as such;  the class need not have written
+using Scheme.
+
+@subsubsection Name visibility
+
+The definitions that a module exports are accessible to other modules.
+These are the "public" definitions, to use Java terminology.
+By default, all the identifiers declared at the top-level of a module
+are exported, except those defined using @code{define-private}.
+However, a major purpose of using modules is to control the set of
+names exported.  One reason is to reduce the chance of accidental
+name conflicts between separately developed modules.  An even more
+important reason is to enforce an interface:  Client modules should
+only use the names that are part of a documented interface, and should
+not use internal implementation procedures (since those may change).
+
+If there is a @code{module-export} declaration in the module, then
+only those names listed in a @code{module-export} are exported.
+There can be more than one @code{module-export}, and they can be
+anywhere in the Scheme file.  As a matter of good style, I recommend
+a single @code{module-export} near the beginning of the file.
+
+@deffn Syntax module-export name ...
+Make the definition for each @var{name} be exported.
+Note that it is an error if there is no definition for @var{name}
+in the current module, or if it is defined using @code{define-private}.
+@end deffn
+
+In this module, @code{fact} is public and @code{worker} is private:
+@example
+(module-export fact)
+(define (worker x) ...)
+(define (fact x) ...)
+@end example
+
+Alternatively, you can write:
+@example
+(define-private (worker x) ...)
+(define (fact x) ...)
+@end example
+
+@subsubsection Definitions
+
+In addition to @code{define} (which can take an optional type specifier),
+Kawa has some extra definition forms.
+
+@deffn Syntax define-private name [:: type] value
+@deffnx Syntax define-private (name formals) body
+Same as @code{define}, except that @code{name} is not exported.
+@end deffn
+
+@deffn Syntax define-constant name [:: type] value
+Definites @var{name} to have the given @var{value}.
+The value is readonly, and you cannot assign to it.
+(This is not fully enforced.)
+If the definition is at module level, then the compiler
+will create a @code{final} field with the given name and type.
+The @var{value} is evaluated as normal; however, if it is a
+compile-time constant, it defaults to being static.
+@end deffn
+
+@deffn Syntax define-variable name [init]
+If @var{init} is specified and @var{name} does not have a global variable
+binding, then @var{init} is evaluated, and @var{name} bound to the result.
+Otherwise, the value bound to @var{name} does not change.
+(Note that @var{init} is not evaluated
+if @var{name} does have a global variable binding.)
+
+Also, declares to the compiler that @var{name} will be looked up
+in the dynamic environment. This can be useful for shutting up
+warnings from @code{--warn-undefined-variable}.
+
+This is similar to the Common Lisp @code{defvar} form.
+However, the Kawa version is (currently) only allowed at module level.
+@end deffn
+
+For @code{define-namespace} and @code{define-private-namespace}
+see @ref{Namespaces}.
+
+@subsubsection How a module becomes a class
+
+If you want to just use a Scheme module as a module (i.e. @code{load}
+or @code{require} it), you don't care how it gets translated
+into a module class.  However, Kawa gives you some control over how this
+is done, and you can use a Scheme module to define a class which
+you can use with other Java classes.  This style of class definition
+is an alternative to @code{define-class},
+which lets you define classes and instances fairly conveniently.
+
+The default name of the module class is the main part of the
+filename of the Scheme source file (with directories and extensions
+sripped off).  That can be overridden by the @code{-T} Kawa
+command-line flag.  The package-prefix specified by the @code{-P}
+flag is prepended to give the fully-qualified class name.
+
+@deffn Syntax module-name <name>
+Sets the name of the generated class, overriding the default.
+If there is no @samp{.} in the @var{name}, the package-prefix
+(specified by the @code{-P} Kawa command-line flag) is prepended.
+@end deffn
+
+By default, the base class of the generated module class is unspecified;
+you cannot count on it being more specific than @code{Object}.
+However, you can override it with @code{module-extends}.
+
+@deffn Syntax module-extends <class>
+Specifies that the class generated from the immediately surrounding
+module should extend (be a sub-class of) the class @code{<@var{class}>}.
+@end deffn
+
+@deffn Syntax module-implements <interface> ...
+Specifies that the class generated from the immediately surrounding
+module should implement the interfaces listed.
+@end deffn
+
+Note that the compiler does @emph{not} currently check that all the
+abstract methods requires by the base class or implemented interfaces
+are actually provided, and have the correct signatures.  This will
+hopefully be fixed, but for now, if you are forgot a method, you will
+probably get a verifier error
+
+For each top-level exported definition the compiler creates a
+corresponding public field with a similar (mangled) name.
+By default, there is some indirection:  The value of the Scheme variable
+is not that of the field itself.  Instead, the field is a
+@code{gnu.mapping.Symbol} object, and the value Scheme variable is
+defined to be the value stored in the @code{Symbol}.
+Howewer, if you specify an explicit type, then the field will
+have the specified type, instead of being a @code{Symbol}.
+The indirection using @code{Symbol} is also avoided if you use
+@code{define-constant}.
+
+If the Scheme definition defines a procedure (which is not re-assigned
+in the module), then the compiler assumes the variable as bound as a
+constant procedure.  The compiler generates one or more methods
+corresponding to the body of the Scheme procedure. It also generates
+a public field with the same name; the value of the field is an
+instance of a subclass of @code{<gnu.mapping.Procedure>} which when
+applied will execute the correct method (depending on the actual arguments).
+The field is used when the procedure used as a value (such as being passed
+as an argument to @code{map}), but when the compiler is able to do so,
+it will generate code to call the correct method directly.
+
+You can control the signature of the generated method by declaring
+the parameter types and the return type of the method.  See the
+applet (@pxref{Applet compilation}) example for how this can be done.
+If the procedures has optional parameters, then the compiler will
+generate multiple methods, one for each argument list length.
+(In rare cases the default expression may be such that this is
+not possible, in which case an "variable argument list" method
+is generated instead.  This only happens when there is a nested
+scope @emph{inside} the default expression, which is very contrived.)
+If there are @code{#!keyword} or @code{#!rest} arguments, the compiler
+generate a "variable argument list" method.  This is a method whose
+last parameter is either an array or a @code{<list>}, and whose
+name has @code{$V} appended to indicate the last parameter is a list.
+
+Top-leval macros (defined using either @code{define-syntax}
+or @code{defmacro}) create a field whose type is currently a sub-class of
+@code{kawa.lang.Syntax};  this allows importing modules to detect
+that the field is a macro and apply the macro at compile time.
+
+@deffn Syntax module-static name ...
+@deffnx Syntax module-static @code{#t}
+@deffnx Syntax module-static @code{#f}
+@deffnx Syntax module-static @code{'init-run}
+Control whether the generated fields and methods are static.
+If @code{#t}  or @code{'init-run} is specified, then the module will be a
+static module, @emph{all} definitions will be static.
+If @code{'init-run} is specified, in addition the module body
+is evaluated in the class's static initializer.
+(Otherwise, it is run the first time it is @code{require}'d.)
+Otherwise, the module is an instance module.  However, the @var{name}s
+that are explicitly listed will be compiled to static fields and methods.
+If @code{#f} is specified, then all exported names will
+be compiled to non-static (instance) fields and methods.
+
+By default, if no @code{module-static} is specified, the following rules apply:
+@enumerate
+@item
+If there is a @code{module-extends} or @code{module-implements}
+declaration, then @code{(module-static #f)} is implied.
+@item
+If the @code{--module-static} command-line parameter is specified,
+then @code{(module-static #t)} is implied.
+@item
+(Not yet implemented: If there are no top-level actions and all
+definitions are procedure definitions, macro definitions, or
+constant definitions, then @code{(module-static #t)} is implied.)
+@item
+Otherwise, a method will be static iff it doesn't need to reference non-static
+fields or methods of the module instance.  In that case, the corresponding
+field will also be static.
+@end enumerate
+
+Note @code{(module-static #t)} usually produces more efficient
+code, and is recommended if a module contains only procedure or macro
+definitions.  (This may become the default.)
+However, a static module means that all environments in a JVM
+share the same bindings, which you may not want if you use
+multiple top-level environments.
+@end deffn
+
+Unfortuntely, the Java class verifier does not allow fields to have
+arbitrary names.  Therefore, the name of a field that represents a
+Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
+The implementation can recover the original name of a field @code{X}
+as @code{((gnu.mapping.Named) X).getName()} because all the standard
+compiler-generate field types implemented the @code{Named} interface.
+
+The top-level actions of a module will get compiled to a @code{run}
+method.  If there is an explicit @code{method-extends}, then the
+module class will also automatically implement @code{java.lang.Runnable}.
+(Otherwise, the class does not implement @code{Runnable}, since in that
+case the @code{run} method return an @code{Object} rather than @code{void}.
+This will likely change.)
+
+@subsubsection Requiring (importing) a module
+
+You can import a module into the current namespace with @code{require}.
+
+@deffn Syntax require modulespec
+The @var{modulespec} can be either a @code{<@var{classname}>}
+or a @code{'@var{featurename}}.  In either case the names
+exported by the specified module (class) are added to the current
+set of visible names.
+
+If @var{modulespec} is @code{<@var{classname}>} where @var{classname}
+is an instance module (it has a public default constructor),
+and if no module instance for that class
+has been registered in the current environment, then a new instance
+is created and registered (using a "magic" identifier).
+If the module class either inherits from @code{gnu.expr.ModuleBody}
+or implements @code{java.lang.Runnable} then the corresponding @code{run}
+method is executed.  (This is done @emph{after} the instance is
+registered so that cycles can be handled.)  These actions (creating,
+registering, and running the module instance) are done both at compile
+time and at run time, if necessary.
+
+All the public fields of the module class are then incorporated
+in the current set of local visible names in the current module.
+This is done at compile time - no new bindings are created at run-time
+(except for the magic binding used to register the module instance),
+and the imported bindings are private to the current module.
+References to the imported bindings will be compiled as field
+references, using the module instance (except for static fields).
+
+If the @var{modulespec} is @code{'@var{featurename}} then the
+@var{featurename} is looked up (at compile time) in the "feature table"
+which yields the implementing @code{<@var{classname}>}.
+@end deffn
+
+@deffn Syntax provide 'featurename
+Declare that @code{'@var{featurename}} is available.
+A following @code{cond-expand} in this scope will match @var{featurename}.
+@end deffn
+
+Using @code{require} and @code{provide} with @var{featurename}s is
+similar to the same-named macros in SLib, Emacs, and Common Lisp.
+However, in Kawa these are not functions, but instead they
+are syntax forms that are processed at compile time.  That is
+why only quoted @var{featurename}s are supported.
+This is consistent with Kawa emphasis on compilation and
+static binding.
+
+For some examples, you may want to look in the @code{gnu/kawa/slib}
+directory.
+
+@node Record types, Dynamic records, Module classes, Objects Classes and Modules
 @subsection Record types
 
 The @code{define-record-type} form can be used for creating new data
@@ -4558,7 +5101,7 @@ In any case, the package is the same as that of the surrounding module.
 Kawa generates efficient code for the resulting functions,
 without needing to use run-time reflection.
 
-@node Dynamic records, Mangling, Record types, Objects Classes and Modules
+@node Dynamic records, Method operations, Record types, Objects Classes and Modules
 @subsection Creating New Record Types On-the-fly
 
 Calling the @code{make-record-type} procedure creates a new record data
@@ -4674,78 +5217,7 @@ created the type represented by @var{rtd}.@refill
 Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
 
-@node Mangling, Method operations, Dynamic records, Objects Classes and Modules
-@subsection Mapping Scheme names to Java names
-
-Programs use "names" to refer to various values and procedures.
-The definition of what is a "name" is different in different
-programming languages.  A name in Scheme (and other Lisp-like
-languages) can in principle contain any character (if using a
-suitable quoting convention), but typically names consist of
-"words" (one or more letters) separated by hyphens, such
-as @samp{make-temporary-file}.  Digits
-and some special symbols are also used.  Standard Scheme
-is case-insensitive;  this means that the names @samp{loop},
-@samp{Loop}, and @samp{LOOP} are all the same name.  Kawa
-is by default case-sensitive, but we recommend that you
-avoid using upper-case letters as a general rule.
-
-The Java language and the Java virtual machine uses names for
-classes, variables, fields and methods.  These names can
-contain upper- and lower-case letters, digits, and the special
-symbols @samp{_} and @samp{$}.
-
-Given a name in a Scheme program,
-Kawa needs to map that name into a valid Java name.  A typical
-Scheme name such as @samp{make-temporary-file} is not a valid
-Java name.  The convention for Java names is to use
-"mixed-case" words, such as @samp{makeTemporaryFile}.
-So Kawa will translate a Scheme-style name into a Java-style
-name.  The basic rule is simple:  Hyphens are dropped, and
-a letter that follows a hyphen is translated to its
-upper-case (actually "title-case") equivalent.  Otherwise,
-letters are translated as is.
-
-Some special characters are handled specially.  A final @samp{?}
-is replaced by an @emph{initial} @samp{is}, with the following
-letter converted to titlecase.  Thus @samp{number?} is
-converted to @samp{isNumber} (which fits with Java conventions),
-and @samp{file-exists?} is converted to @samp{isFileExists}
-(which doesn't really).
-The pair @samp{->} is translated to @samp{$To$}.
-For example @samp{list->string} is translated to @samp{list$To$string}.
-
-Some symbols are mapped to a mnemonic sequence, starting with a dollar-sign,
-followed by a two-character abbreviation.  For example, the less-than
-symbol @samp{<} is mangled as @samp{$Ls}.
-See the source code to the @code{mangleName} method in the
-@code{gnu.expr.Compilation} class for the full list.
-Characters that do not have a mnemonic abbreviation are
-mangled as @samp{$} followed by a four-hex-digit unicode value.
-For example @samp{Tamil vowel sign ai} is mangled as @samp{$0bc8}.
-
-Note that this mapping may map different Scheme names to the
-same Java name.  For example @samp{string?}, @samp{String?},
-@samp{is-string}, @samp{is-String},
-and @samp{isString} are all mapped to the same Java identifier
-@samp{isString}.  Code that uses such "Java-clashing" names
-is @emph{not} supported.  There is very partial support for
-renaming names in the case of a clash, and there may be better
-support in the future.  However, some of the nice features of
-Kawa depend on being able to map Scheme name to Java names
-naturally, so we urge you to @emph{not} write code that
-"mixes" naming conventions by using (say) the names @samp{open-file}
-and @samp{openFile} to name two different objects.
-
-The above mangling is used to generate Java method names.
-Each top-level definition is also mapped to a Java field.
-The name of this field is also mangled, but using a mostly
-reversible mapping:  The Scheme function @samp{file-exists?}
-is mapped to the method name @samp{file$Mnexists$Qu}.
-Because @samp{$} is used to encode special characters, you
-should avoid using it in names in your source file.
-
-@node Method operations, Allocating objects, Mangling, Objects Classes and Modules
+@node Method operations, Allocating objects, Dynamic records, Objects Classes and Modules
 @subsection Calling Java methods from Scheme
 
 You can call a Java method as if it were a Scheme procedure
@@ -5079,7 +5551,7 @@ For example, the following are all equivalent:
 All of these will usually be optimized to efficient bytecode, assuming
 Kawa knows at compile-time which class you're using.
 
-@node Field operations, Defining new classes, Allocating objects, Objects Classes and Modules
+@node Field operations, Mangling, Allocating objects, Objects Classes and Modules
 @subsection Accessing fields of Java objects
 
 The recommmended way to access fields 
@@ -5191,551 +5663,78 @@ A synonym for @code{(field @var{object} @var{fieldname})}.
 A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
 @end defun
 
-@node Defining new classes, Anonymous classes, Field operations, Objects Classes and Modules
-@subsection Defining new classes
-
-Kawa provides various mechanisms for defining new classes.
-The @code{define-class} and @code{define-simple-class} forms
-will usually be the preferred mechanisms.  They have basically
-the same syntax, but have a couple of differences.
-@code{define-class} allows multiple inheritance as well as true nested
-(first-class) class objects.  However, the implementation
-is more complex: code using it is slightly slower, and the mapping to
-Java classes is a little less obvious.   (Each Scheme class is implemented
-as a pair of an interface and an implementation class.)
-A class defined by @code{define-simple-class} is slightly more
-efficient, and it is easier to access it from Java code.
-
-The syntax of @code{define-class} are mostly compatible with that
-in the Guile and Stk dialects of Scheme.
-
-@deffn Syntax define-class name (supers ...) field-or-method-decl ...
-@deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
-@display
-@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
-@var{field-decl} ::= (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] [@var{option-keyword} @var{option-value}]* @var{body})
-@end display
-Defines a new class named @var{name}.  If @code{define-simple-class} is
-used, creates a normal Java class named @var{name} in the current package.
-(If @var{name} has the form @code{<xyx>} the Java implementation
-type is named @code{xyz}.)  For @code{define-class} the implementation is
-unspecified.  In most cases, the compiler creates a class pair,
-consisting of a Java interface and a Java implementation class.
-
-The class inherits from the classes and interfaces listed in @var{supers}.
-This is a list of names of classes that are in scope (perhaps imported
-using @code{require}), or names for existing classes or interfaces
-surrounded by @code{<>}, such as @code{<gnu.lists.Sequence>}.
-If @code{define-simple-class} is used, at most one of these may be
-the name of a normal Java class or classes defined using
-@code{define-simple-class}; the rest must be interfaces or classes
-defined using @code{define-class}.
-If @code{define-class} is used, @emph{all} of the classes listed
-in @var{supers} should be interfaces or classes defined using
-@code{define-class}.
-
-Each @var{field-decl} declares a instance "slot" (field)
-with the given @var{fname}. 
-By default it is publicly visible, but you can specify
-a different visiblity with the @code{access:} specifier.
- If @var{ftype} is specified it is the
-type of the slot.  The following @var{option-keyword}s are implemented:
-@table @asis
-@item @code{type:} @var{ftype}
-Specifies that @var{ftype} is the type of (the values of) the field.
-Equivalent to @samp{:: @var{ftype}}.
-@item @code{allocation:} @var{kind}
-If @var{kind} is @code{'class} or @code{'static} a single slot is shared
-between all instances of the class (and its sub-classes).
-Not yet implemented for @code{define-class},
-only for @code{define-simple-class}.
-In Java terms this is a @code{static} field.
-
-If @var{kind} is @code{'instance} then
-each instance has a separate value "slot", and they
-are not shared. In Java terms, this is a non-@code{static} field.
-This is the default.
-
-You can use a keyword like @code{class:} or a string like @code{"class"}
-if you prefer instead of a quoted symbol like @code{'class};
-the latter is recommended.
-@item @code{access:} @var{kind}
-Specifies the Java access permission on the field.
-Can be one of @code{'private}, @code{'protected},
-@code{'public} (which is the default in Kawa),
-or @code{'package} (which the default "unnamed" permission
-in Java code).
-@item @code{init:} @var{expr}
-An expression used to initialize the slot.
-The expression is evaluated in a scope that includes the field and
-method names of the current class.
-@item @code{init-form:} @var{expr}
-An expression used to initialize the slot.
-The lexical environment of the @var{expr} is that of the @code{define-class};
-it does @emph{not} include the field and method names of the current class.
-or @code{define-simple-class}.
-@item @code{init-value:} @var{value}
-A value expression used to initialize the slot.
-For now this is synonymous with @var{init-form:}, but that may change
-(depending on what other implementation do), so to be safe only use
-@code{init-value:} with a literal.
-@item @code{init-keyword:} @code{@var{name}:}
-A keyword that that can be used to initialize instance in @code{make} calls.
-For now, this is ignored, and @var{name} should be the same as the
-field's @var{fname}.
-@end table
-
-The @var{fname} can be left out.  That indicates a "dummy slot",
-which is useful for initialization not tied to a specific field.
-In this example, @code{x} is the only actual field.  It is first
-initialized to 10, but if @code{(some-condition)} is true
-then its value is doubled.
-@example
-(define-simple-class <my-class> ()
-  (allocation: 'class
-   init: (perform-actions-when-the-class-is-initizalized))
-  (x init: 10)
-  (init: (if (some-condition) (set! x (* x 2)))))
-@end example
-
-Each @var{method-decl} declares method,
-which is by default public and non-static, and whose name is @var{method-name}.
-(If @var{method-name} is not a valid
-Java method name, it is mapped to something reasonable.
-For example @code{foo-bar?} is mapped to @code{isFooBar}.)
-The types of the method arguments can be specified in the
-@var{formal-arguments}.  The return type can be specified by @var{rtype},
-or is otherwise the type of the @var{body}.
-Currently, the @var{formal-arguments} cannot contain optional, rest,
-or keyword parameters.  (The plan is to allow optional parameters,
-implemented using multiple overloaded methods.)
-
-A @var{method-decl} in a @code{define-simple-class}
-can have the following @var{option-keyword}s:
-@table @asis
-@item @code{access:} @var{kind}
-Specifies the Java access permission on the method.
-Can be one of @code{'private}, @code{'protected},
-@code{'public}, or @code{'package}.
-@item @code{allocation:} @var{kind}
-If @var{kind} is @code{'class} or @code{'static} creates a static method.
-@item @code{throws:} ( @var{exception-class-name} ... )
-Specifies a list of checked exception that the method may throw.
-Equivalent to a @code{throws} specification in Java code.
-For example:
-@example
-(define-simple-class <T>
-  (prefix)
-  ((lookup name) throws: (<java.io.FileNotFoundException>)
-   (make <java.io.FileReader> (string-append prefix name))))
-@end example
-@end table
-
-The special @var{method-name} @samp{*init*} can be used to name
-a non-default constructor (in a @code{define-simple-class} only).
-It can be used to initialize a freshly-allocated instance
-using passed-in parameters.
-You can call a superclass or a sibling constructor using
-the @code{invoke-special} special function.
-(This is general but admittedly a bit verbose; a more compact
-form may be added in the future.)
-See the example below.
-
-The scope of the @var{body} of a method includes the @var{field-decl}s
-and @var{field-decl}s of the body, including those inherited from
-superclasses and implemented interfaces.
-@end deffn
-
-In the following example we define a simple class @code{<2d-vector>}
-and a class @code{<3d-vector>} that extends it.  (This is for illustration
-only - defining 3-dimensional points as an extension
-of 2-dimensional points does not really make sense.)
-
-@example
-(define-simple-class <2d-vector> ()
-  (x type: <double> init-keyword: x:)
-  (y type: <double> init-keyword: y:)
-  (zero-2d :: <2d-vector> allocation: 'static
-   init-value: (make <2d-vector> 0))
-  ;; An object initializer (constructor) method.
-  ((*init* (x0 :: <double>) (y0 :: <double>))
-   (set! x x0)
-   (set! y y0))
-  ((*init* (xy0 :: <double>))
-   ;; Call above 2-argument constructor.
-   (invoke-special <2d-vector> (this) '*init* xy0 xy0))
-  ;; Need a default constructor as well, for the  (make ..) below.
-  ((*init*) #!void)
-  ((add (other :: <2d-vector>)) :: <2d-vector>
-   ;; Kawa compiles this using primitive Java types!
-   (make <2d-vector>
-     x: (+ x (slot-ref other 'x))
-     y: (+ y (slot-ref other 'y))))
-  ((scale (factor :: <double>)) :: <2d-vector>
-   (make <2d-vector> x: (* factor x) y: (* factor y))))
-
-(define-simple-class <3d-vector> (<2d-vector>)
-  (z type: <double> init-value: 0.0 init-keyword: z:)
-  ;; A constructor which calls the superclass constructor.
-  ((*init* (x0 :: <double>) (y0 :: <double>) (z0 :: <double>))
-   (invoke-special <2d-vector> (this) '*init* x0 y0)
-   (set! z z0))
-  ;; Need a default constructor for the  (make ..) below.
-  ((*init*) #!void)
-  ((scale (factor :: <double>)) :: <2d-vector>
-   ;; Note we cannot override the return type to <3d-vector>
-   ;; because Java does not allow that.  Should hide that. .
-   (make <3d-vector>
-     ;; Unfortunately, slot names of inherited classes are not visible.
-     ;; Until this is fixed, use slot-ref.
-     x: (* factor (slot-ref (this) 'x))
-     y: (* factor (*:.y (this))) ;; Alternative syntax.
-     z: (* factor z))))
-@end example
-
-Note we define both explicit non-default constructor methods,
-and we associate fields with keywords, so they can be named
-in a @code{make} call.  The latter requires a default constructor,
-and since having non-default constructors suppresses
-the implicit default constructor we have to explicitly define it.
-Using both styles of constructors is rather redundant, though.
-
-@node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
-@subsection Anonymous classes
-
-@deffn Syntax object (supers ...) field-or-method-decl ...
-Returns a new instance of an anonymous (inner) class.
-The syntax is similar to @code{define-class}.
-@display
-@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
-@var{field-decl} ::= (@var{fname} [[[::] @var{ftype}] @var{finit}])
-    | (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
-@end display
-
-Returns a new instance of a unique (anonymous) class.
-The class inherits from the list of @var{supers}, where at most one of the
-elements should be the base class being extended from, and the rest
-are interfaces.
-
-This is roughly equivalent to:
-@example
-(begin
-  (define-simple-class @var{hname} (@var{supers} ...) @var{field-or-method-decl} ...)
-  (make @var{hname}))
-@end example
-
-A @var{field-decl} is as for @code{define-class}, except
-that we also allow an abbreviated syntax.
-Each @var{field-decl} declares a public instance field.
-If @var{ftype} is given, it specifies the type of the field.
-If @var{finit} is given, it is an expression whose value
-becomes the initial value of the field.
-The @var{finit} is evaluated at the same time as the @code{object}
-expression is evaluated,
-in a scope where all the @var{fname}s are visible.
-
-A @var{method-decl} is as for @code{define-class}.
-@end deffn
-
-@node Module classes, Scheme types in Java, Anonymous classes, Objects Classes and Modules
-@subsection Modules and how they are compiled to classes
-
-A @dfn{module} is a set of definitions that the module @dfn{exports},
-as well as some @dfn{actions} (expressions evaluated for their side effect).
-The top-level forms in a Scheme source file compile a module;
-the source file is the @dfn{module source}.
-When Kawa compiles the module source, the result is the
-@dfn{module class}.  Each exported definition is translated to
-a public field in the module class.
-
-There are two kinds of module class:
-A @dfn{static module} is a class (or gets compiled to a class)
-all of whose public fields a static, and that does not have a
-public constructor.  A JVM can only have a single global instance of
-a static module.
-An @dfn{instance module} has a public default constructor,
-and usually has at least one non-static public field.
-There can be multiple instances
-of an instance module; each instance is called a @dfn{module instance}.
-However, only a single instance of a module can be @dfn{registered}
-in an environment, so in most cases there is only a single
-instance of instance modules.  Registering an instance in an environment
-means creating a binding mapping a magic name (derived from the class name)
-to the instance.
-
-In fact, any Java class class that has the properties of either
-an instance module or a static module, is a module, and can be
-loaded or imported as such;  the class need not have written
-using Scheme.
-
-@subsubsection Name visibility
-
-The definitions that a module exports are accessible to other modules.
-These are the "public" definitions, to use Java terminology.
-By default, all the identifiers declared at the top-level of a module
-are exported, except those defined using @code{define-private}.
-However, a major purpose of using modules is to control the set of
-names exported.  One reason is to reduce the chance of accidental
-name conflicts between separately developed modules.  An even more
-important reason is to enforce an interface:  Client modules should
-only use the names that are part of a documented interface, and should
-not use internal implementation procedures (since those may change).
-
-If there is a @code{module-export} declaration in the module, then
-only those names listed in a @code{module-export} are exported.
-There can be more than one @code{module-export}, and they can be
-anywhere in the Scheme file.  As a matter of good style, I recommend
-a single @code{module-export} near the beginning of the file.
-
-@deffn Syntax module-export name ...
-Make the definition for each @var{name} be exported.
-Note that it is an error if there is no definition for @var{name}
-in the current module, or if it is defined using @code{define-private}.
-@end deffn
-
-In this module, @code{fact} is public and @code{worker} is private:
-@example
-(module-export fact)
-(define (worker x) ...)
-(define (fact x) ...)
-@end example
-
-Alternatively, you can write:
-@example
-(define-private (worker x) ...)
-(define (fact x) ...)
-@end example
-
-@subsubsection Definitions
-
-In addition to @code{define} (which can take an optional type specifier),
-Kawa has some extra definition forms.
-
-@deffn Syntax define-private name [:: type] value
-@deffnx Syntax define-private (name formals) body
-Same as @code{define}, except that @code{name} is not exported.
-@end deffn
-
-@deffn Syntax define-constant name [:: type] value
-Definites @var{name} to have the given @var{value}.
-The value is readonly, and you cannot assign to it.
-(This is not fully enforced.)
-If the definition is at module level, then the compiler
-will create a @code{final} field with the given name and type.
-The @var{value} is evaluated as normal; however, if it is a
-compile-time constant, it defaults to being static.
-@end deffn
-
-@deffn Syntax define-variable name [init]
-If @var{init} is specified and @var{name} does not have a global variable
-binding, then @var{init} is evaluated, and @var{name} bound to the result.
-Otherwise, the value bound to @var{name} does not change.
-(Note that @var{init} is not evaluated
-if @var{name} does have a global variable binding.)
-
-Also, declares to the compiler that @var{name} will be looked up
-in the dynamic environment. This can be useful for shutting up
-warnings from @code{--warn-undefined-variable}.
-
-This is similar to the Common Lisp @code{defvar} form.
-However, the Kawa version is (currently) only allowed at module level.
-@end deffn
-
-For @code{define-namespace} and @code{define-private-namespace}
-see @ref{Namespaces}.
-
-@subsubsection How a module becomes a class
-
-If you want to just use a Scheme module as a module (i.e. @code{load}
-or @code{require} it), you don't care how it gets translated
-into a module class.  However, Kawa gives you some control over how this
-is done, and you can use a Scheme module to define a class which
-you can use with other Java classes.  This style of class definition
-is an alternative to @code{define-class},
-which lets you define classes and instances fairly conveniently.
-
-The default name of the module class is the main part of the
-filename of the Scheme source file (with directories and extensions
-sripped off).  That can be overridden by the @code{-T} Kawa
-command-line flag.  The package-prefix specified by the @code{-P}
-flag is prepended to give the fully-qualified class name.
-
-@deffn Syntax module-name <name>
-Sets the name of the generated class, overriding the default.
-If there is no @samp{.} in the @var{name}, the package-prefix
-(specified by the @code{-P} Kawa command-line flag) is prepended.
-@end deffn
-
-By default, the base class of the generated module class is unspecified;
-you cannot count on it being more specific than @code{Object}.
-However, you can override it with @code{module-extends}.
-
-@deffn Syntax module-extends <class>
-Specifies that the class generated from the immediately surrounding
-module should extend (be a sub-class of) the class @code{<@var{class}>}.
-@end deffn
-
-@deffn Syntax module-implements <interface> ...
-Specifies that the class generated from the immediately surrounding
-module should implement the interfaces listed.
-@end deffn
-
-Note that the compiler does @emph{not} currently check that all the
-abstract methods requires by the base class or implemented interfaces
-are actually provided, and have the correct signatures.  This will
-hopefully be fixed, but for now, if you are forgot a method, you will
-probably get a verifier error
-
-For each top-level exported definition the compiler creates a
-corresponding public field with a similar (mangled) name.
-By default, there is some indirection:  The value of the Scheme variable
-is not that of the field itself.  Instead, the field is a
-@code{gnu.mapping.Symbol} object, and the value Scheme variable is
-defined to be the value stored in the @code{Symbol}.
-Howewer, if you specify an explicit type, then the field will
-have the specified type, instead of being a @code{Symbol}.
-The indirection using @code{Symbol} is also avoided if you use
-@code{define-constant}.
-
-If the Scheme definition defines a procedure (which is not re-assigned
-in the module), then the compiler assumes the variable as bound as a
-constant procedure.  The compiler generates one or more methods
-corresponding to the body of the Scheme procedure. It also generates
-a public field with the same name; the value of the field is an
-instance of a subclass of @code{<gnu.mapping.Procedure>} which when
-applied will execute the correct method (depending on the actual arguments).
-The field is used when the procedure used as a value (such as being passed
-as an argument to @code{map}), but when the compiler is able to do so,
-it will generate code to call the correct method directly.
-
-You can control the signature of the generated method by declaring
-the parameter types and the return type of the method.  See the
-applet (@pxref{Applet compilation}) example for how this can be done.
-If the procedures has optional parameters, then the compiler will
-generate multiple methods, one for each argument list length.
-(In rare cases the default expression may be such that this is
-not possible, in which case an "variable argument list" method
-is generated instead.  This only happens when there is a nested
-scope @emph{inside} the default expression, which is very contrived.)
-If there are @code{#!keyword} or @code{#!rest} arguments, the compiler
-generate a "variable argument list" method.  This is a method whose
-last parameter is either an array or a @code{<list>}, and whose
-name has @code{$V} appended to indicate the last parameter is a list.
-
-Top-leval macros (defined using either @code{define-syntax}
-or @code{defmacro}) create a field whose type is currently a sub-class of
-@code{kawa.lang.Syntax};  this allows importing modules to detect
-that the field is a macro and apply the macro at compile time.
-
-@deffn Syntax module-static name ...
-@deffnx Syntax module-static @code{#t}
-@deffnx Syntax module-static @code{#f}
-@deffnx Syntax module-static @code{'init-run}
-Control whether the generated fields and methods are static.
-If @code{#t}  or @code{'init-run} is specified, then the module will be a
-static module, @emph{all} definitions will be static.
-If @code{'init-run} is specified, in addition the module body
-is evaluated in the class's static initializer.
-(Otherwise, it is run the first time it is @code{require}'d.)
-Otherwise, the module is an instance module.  However, the @var{name}s
-that are explicitly listed will be compiled to static fields and methods.
-If @code{#f} is specified, then all exported names will
-be compiled to non-static (instance) fields and methods.
-
-By default, if no @code{module-static} is specified, the following rules apply:
-@enumerate
-@item
-If there is a @code{module-extends} or @code{module-implements}
-declaration, then @code{(module-static #f)} is implied.
-@item
-If the @code{--module-static} command-line parameter is specified,
-then @code{(module-static #t)} is implied.
-@item
-(Not yet implemented: If there are no top-level actions and all
-definitions are procedure definitions, macro definitions, or
-constant definitions, then @code{(module-static #t)} is implied.)
-@item
-Otherwise, a method will be static iff it doesn't need to reference non-static
-fields or methods of the module instance.  In that case, the corresponding
-field will also be static.
-@end enumerate
-
-Note @code{(module-static #t)} usually produces more efficient
-code, and is recommended if a module contains only procedure or macro
-definitions.  (This may become the default.)
-However, a static module means that all environments in a JVM
-share the same bindings, which you may not want if you use
-multiple top-level environments.
-@end deffn
-
-Unfortuntely, the Java class verifier does not allow fields to have
-arbitrary names.  Therefore, the name of a field that represents a
-Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
-The implementation can recover the original name of a field @code{X}
-as @code{((gnu.mapping.Named) X).getName()} because all the standard
-compiler-generate field types implemented the @code{Named} interface.
-
-The top-level actions of a module will get compiled to a @code{run}
-method.  If there is an explicit @code{method-extends}, then the
-module class will also automatically implement @code{java.lang.Runnable}.
-(Otherwise, the class does not implement @code{Runnable}, since in that
-case the @code{run} method return an @code{Object} rather than @code{void}.
-This will likely change.)
-
-@subsubsection Requiring (importing) a module
-
-You can import a module into the current namespace with @code{require}.
-
-@deffn Syntax require modulespec
-The @var{modulespec} can be either a @code{<@var{classname}>}
-or a @code{'@var{featurename}}.  In either case the names
-exported by the specified module (class) are added to the current
-set of visible names.
-
-If @var{modulespec} is @code{<@var{classname}>} where @var{classname}
-is an instance module (it has a public default constructor),
-and if no module instance for that class
-has been registered in the current environment, then a new instance
-is created and registered (using a "magic" identifier).
-If the module class either inherits from @code{gnu.expr.ModuleBody}
-or implements @code{java.lang.Runnable} then the corresponding @code{run}
-method is executed.  (This is done @emph{after} the instance is
-registered so that cycles can be handled.)  These actions (creating,
-registering, and running the module instance) are done both at compile
-time and at run time, if necessary.
-
-All the public fields of the module class are then incorporated
-in the current set of local visible names in the current module.
-This is done at compile time - no new bindings are created at run-time
-(except for the magic binding used to register the module instance),
-and the imported bindings are private to the current module.
-References to the imported bindings will be compiled as field
-references, using the module instance (except for static fields).
-
-If the @var{modulespec} is @code{'@var{featurename}} then the
-@var{featurename} is looked up (at compile time) in the "feature table"
-which yields the implementing @code{<@var{classname}>}.
-@end deffn
-
-@deffn Syntax provide 'featurename
-Declare that @code{'@var{featurename}} is available.
-A following @code{cond-expand} in this scope will match @var{featurename}.
-@end deffn
-
-Using @code{require} and @code{provide} with @var{featurename}s is
-similar to the same-named macros in SLib, Emacs, and Common Lisp.
-However, in Kawa these are not functions, but instead they
-are syntax forms that are processed at compile time.  That is
-why only quoted @var{featurename}s are supported.
-This is consistent with Kawa emphasis on compilation and
-static binding.
-
-For some examples, you may want to look in the @code{gnu/kawa/slib}
-directory.
-
-@node Scheme types in Java, Array operations, Module classes, Objects Classes and Modules
+@node Mangling, Scheme types in Java, Field operations, Objects Classes and Modules
+@subsection Mapping Scheme names to Java names
+
+Programs use "names" to refer to various values and procedures.
+The definition of what is a "name" is different in different
+programming languages.  A name in Scheme (and other Lisp-like
+languages) can in principle contain any character (if using a
+suitable quoting convention), but typically names consist of
+"words" (one or more letters) separated by hyphens, such
+as @samp{make-temporary-file}.  Digits
+and some special symbols are also used.  Standard Scheme
+is case-insensitive;  this means that the names @samp{loop},
+@samp{Loop}, and @samp{LOOP} are all the same name.  Kawa
+is by default case-sensitive, but we recommend that you
+avoid using upper-case letters as a general rule.
+
+The Java language and the Java virtual machine uses names for
+classes, variables, fields and methods.  These names can
+contain upper- and lower-case letters, digits, and the special
+symbols @samp{_} and @samp{$}.
+
+Given a name in a Scheme program,
+Kawa needs to map that name into a valid Java name.  A typical
+Scheme name such as @samp{make-temporary-file} is not a valid
+Java name.  The convention for Java names is to use
+"mixed-case" words, such as @samp{makeTemporaryFile}.
+So Kawa will translate a Scheme-style name into a Java-style
+name.  The basic rule is simple:  Hyphens are dropped, and
+a letter that follows a hyphen is translated to its
+upper-case (actually "title-case") equivalent.  Otherwise,
+letters are translated as is.
+
+Some special characters are handled specially.  A final @samp{?}
+is replaced by an @emph{initial} @samp{is}, with the following
+letter converted to titlecase.  Thus @samp{number?} is
+converted to @samp{isNumber} (which fits with Java conventions),
+and @samp{file-exists?} is converted to @samp{isFileExists}
+(which doesn't really).
+The pair @samp{->} is translated to @samp{$To$}.
+For example @samp{list->string} is translated to @samp{list$To$string}.
+
+Some symbols are mapped to a mnemonic sequence, starting with a dollar-sign,
+followed by a two-character abbreviation.  For example, the less-than
+symbol @samp{<} is mangled as @samp{$Ls}.
+See the source code to the @code{mangleName} method in the
+@code{gnu.expr.Compilation} class for the full list.
+Characters that do not have a mnemonic abbreviation are
+mangled as @samp{$} followed by a four-hex-digit unicode value.
+For example @samp{Tamil vowel sign ai} is mangled as @samp{$0bc8}.
+
+Note that this mapping may map different Scheme names to the
+same Java name.  For example @samp{string?}, @samp{String?},
+@samp{is-string}, @samp{is-String},
+and @samp{isString} are all mapped to the same Java identifier
+@samp{isString}.  Code that uses such "Java-clashing" names
+is @emph{not} supported.  There is very partial support for
+renaming names in the case of a clash, and there may be better
+support in the future.  However, some of the nice features of
+Kawa depend on being able to map Scheme name to Java names
+naturally, so we urge you to @emph{not} write code that
+"mixes" naming conventions by using (say) the names @samp{open-file}
+and @samp{openFile} to name two different objects.
+
+The above mangling is used to generate Java method names.
+Each top-level definition is also mapped to a Java field.
+The name of this field is also mangled, but using a mostly
+reversible mapping:  The Scheme function @samp{file-exists?}
+is mapped to the method name @samp{file$Mnexists$Qu}.
+Because @samp{$} is used to encode special characters, you
+should avoid using it in names in your source file.
+
+@node Scheme types in Java, Array operations, Mangling, Objects Classes and Modules
 @subsection Scheme types in Java
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.

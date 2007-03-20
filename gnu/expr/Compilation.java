@@ -1134,14 +1134,11 @@ public class Compilation implements SourceLocator
 	code.emitLoad(code.getCurrentScope().getVariable(1));
 	code.emitPutField(lexp.staticLinkField);
       }
-    Method superConstructor
-      = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
-				       apply0args, Type.void_type);
-    code.emitPushThis();
-    code.emitInvokeSpecial(superConstructor);
+    ClassType superClass = clas.getSuperclass();
+    ClassExp.invokeDefaultSuperConstructor(superClass, this, lexp);
 
     if (curClass == mainClass
-        // Optimization: No pointing in calling register if we aren't
+        // Optimization: No point in calling ModuleInfo.register if we aren't
         // compiling a named module.
         && minfo != null && minfo.sourcePath != null)
       {

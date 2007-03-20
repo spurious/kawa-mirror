@@ -1081,7 +1081,7 @@ public class LambdaExp extends ScopeExp
         if (child instanceof ClassExp)
           {
             ClassExp cl = (ClassExp) child;
-            if (cl.getNeedsStaticLink())
+            if (cl.getNeedsClosureEnv())
               {
                 ClassType parentFrameType;
                 if (this instanceof ModuleExp || this instanceof ClassExp)

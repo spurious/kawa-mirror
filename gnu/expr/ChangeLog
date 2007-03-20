@@ -1,5 +1,18 @@
 2007-03-19  Per Bothner  <per@bothner.com>
 
+	Fix for Savannah bug #18846: Cannot inherit from non-static class
+	* ClassExp.java (superClassIndex): New field.
+	(setTypes): Set superClassIndex.
+	(walkChildren): Walk supers array.
+	(loadSuperStaticLink, invokeDefaultSuperConstructor): New methods.
+	(compile): Call invokeDefaultSuperConstructor.
+	* Compilation.java (generateConstructor): Likewise.
+ 	* PrimProcedure.java (compile): Use new ClassExp.loadSuperStaticLink.
+	* LambdaExp.java (allocChildMethods): Neeed static link
+	if getNeedsClosureEnv.
+
+	* ClassExp.java (print): Print supers array.
+
 	* ClassExp.java (setClassName): Inline into setTypes and remove.
 	(setTypes): Allow define-simple-class to define interface and
 	define-class to define class.

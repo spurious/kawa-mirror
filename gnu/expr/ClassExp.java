@@ -31,6 +31,8 @@ public class ClassExp extends LambdaExp
 
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
+  /** Index in supers array of class we extend, or -1. */
+  public int superClassIndex = -1;
 
   /** An artificial method named {@code "$finit$"} for evaluating
    * non-static initializations.
@@ -153,6 +155,7 @@ public class ClassExp extends LambdaExp
 	    if (j < i)
               comp.error('e', "duplicate superclass for "+this);
 	    superType = t;
+            superClassIndex = i;
 	  }
 	else
 	  superTypes[j++] = t;
@@ -465,15 +468,7 @@ public class ClassExp extends LambdaExp
                   {
                     // Call default super constructor if there isn't an explicit
                     // call to a super constructor.
-                    Method superConstructor
-                      = superClass.getDeclaredMethod("<init>", 0);
-                    if (superConstructor == null)
-                      comp.error('e', "super class does not have a default constructor");
-                    else
-                      {
-                        code.emitPushThis();
-                        code.emitInvokeSpecial(superConstructor);
-                      }
+                    invokeDefaultSuperConstructor(superClass, comp, this);
                   }
                 child.enterFunction(comp);
                 if (calledInit != instanceType)
@@ -617,6 +612,7 @@ public class ClassExp extends LambdaExp
   {
     LambdaExp save = walker.currentLambda;
     walker.currentLambda = this;
+    supers = walker.walkExps(supers, supers.length);
     try
       {
 	for (LambdaExp child = firstChild;
@@ -638,6 +634,38 @@ public class ClassExp extends LambdaExp
       }
   }
 
+  static void loadSuperStaticLink (Expression superExp, ClassType superClass,
+                                   Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    // This can be optimized in most cases. FIXME.
+    superExp.compile(comp, Target.pushValue(Compilation.typeClassType));
+    code.emitInvokeStatic(ClassType.make("gnu.expr.PairClassType").getDeclaredMethod("extractStaticLink", 1));
+    code.emitCheckcast(superClass.getOuterLinkType());
+  }
+
+  static void invokeDefaultSuperConstructor (ClassType superClass,
+                                             Compilation comp,
+                                             LambdaExp lexp)
+  {
+    CodeAttr code = comp.getCode();
+    Method superConstructor
+      = superClass.getDeclaredMethod("<init>", 0);
+    if (superConstructor == null)
+      comp.error('e', "super class does not have a default constructor");
+    else
+      {
+        code.emitPushThis();
+        if (superClass.hasOuterLink() && lexp instanceof ClassExp)
+          {
+            ClassExp clExp = (ClassExp) lexp;
+            Expression superExp = clExp.supers[clExp.superClassIndex];
+            loadSuperStaticLink(superExp, superClass, comp);
+          }
+        code.emitInvokeSpecial(superConstructor);
+      }
+  }
+
   public void print (OutPort out)
   {
     out.startLogicalBlock("("+getExpClassName()+"/", ")", 2);
@@ -649,7 +677,17 @@ public class ClassExp extends LambdaExp
       }
     out.print(id);
     out.print("/fl:");  out.print(Integer.toHexString(flags));
-    out.print(" (");
+    if (supers.length > 0)
+      {
+
+        out.print(" supers:");
+        for (int i = 0;  i < supers.length;  i++)
+          {
+            supers[i].print(out);
+            out.print(' ');
+          }
+      }
+    out.print('(');
     Special prevMode = null;
     int i = 0;
     int key_args = keywords == null ? 0 : keywords.length;

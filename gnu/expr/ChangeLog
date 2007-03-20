@@ -1,3 +1,11 @@
+2007-03-20  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (declareParts): Checking INTERFACE_SPECIFIED must be
+	done earlier, in setTypes, before addClass is done.
+	* ClassExp.java (compile): Don't generateConstructor if interface.
+	(declareParts): Don't getConstructor if interface.
+	* FindCapturedVars.java (walkClassExp): Likewise.
+
 2007-03-19  Per Bothner  <per@bothner.com>
 
 	Fix for Savannah bug #18846: Cannot inherit from non-static class

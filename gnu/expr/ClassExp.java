@@ -173,6 +173,8 @@ public class ClassExp extends LambdaExp
         instanceType.setSuper(Type.pointer_type);
         instanceType.setInterfaces(interfaces);
       }
+    else if (getFlag(INTERFACE_SPECIFIED))
+      instanceType.setInterface(true);
     type.setSuper(superType == null ? Type.pointer_type : superType);
 
     ClassType[] interfaces;
@@ -307,12 +309,10 @@ public class ClassExp extends LambdaExp
           // FIXME this is wrong if the method is static
 	  child.addMethodFor(instanceType, comp, type);
       }
-    if (! explicitInit)
+    if (! explicitInit && ! instanceType.isInterface())
       Compilation.getConstructor(instanceType, this);
     if (isAbstract())
       instanceType.setModifiers(instanceType.getModifiers() | Access.ABSTRACT);
-    if (getFlag(INTERFACE_SPECIFIED))
-      instanceType.setInterface(true);
     if (nameDecl != null)
       {
         short access = nameDecl.getAccessFlags((short) 0);
@@ -491,7 +491,7 @@ public class ClassExp extends LambdaExp
 	    comp.curLambda = save_lambda;
             comp.setLine(saveFilename, saveLine, saveColumn);
 	  }
-        if (! explicitInit)
+        if (! explicitInit && ! instanceType.isInterface())
           comp.generateConstructor(instanceType, this);
         else if (initChain != null)
           initChain.reportError("unimplemented: explicit constructor cannot initialize ", comp);

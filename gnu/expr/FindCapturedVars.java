@@ -80,7 +80,7 @@ public class FindCapturedVars extends ExpWalker
   protected Expression walkClassExp (ClassExp exp)
   {
     Expression ret = super.walkClassExp(exp);
-    if (! exp.explicitInit)
+    if (! exp.explicitInit && ! exp.instanceType.isInterface())
       // Make sure <init> has been declared, in case we need to invoke it.
       Compilation.getConstructor(exp.instanceType, exp);
     else if (exp.getNeedsClosureEnv())

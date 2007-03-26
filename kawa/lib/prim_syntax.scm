@@ -17,7 +17,7 @@
   (syntax-rules (:: $lookup$)
     ((define ($lookup$ part1 'part2) :: type value)
      (%define ($lookup$ part1 'part2) 1 type value))
-    ((define ($lookup$ part1 'part2)value)
+    ((define ($lookup$ part1 'part2) value)
      (%define ($lookup$ part1 'part2) 0 #!null value))
     ((define (name . formals) . body)
      (%define name 2 #t formals . body))
@@ -47,10 +47,10 @@
 
 (%define-syntax define-constant
   (syntax-rules (:: $lookup$)
-    ((define-constant (($lookup$ part1 'part2) . formals) . body)
-     (%define ($lookup$ part1 'part2) 10 #t formals . body))
     ((define-constant ($lookup$ part1 'part2) :: type value)
      (%define ($lookup$ part1 'part2) 9 type value))
+    ((define-constant ($lookup$ part1 'part2) value)
+     (%define ($lookup$ part1 'part2) 8 #!null value))
     ((define-constant (name . formals) . body)
      (%define name 10 #t formals . body))
     ((define-constant name :: type value)

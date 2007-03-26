@@ -1,3 +1,8 @@
+2007-03-25  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (define-constant): Fix matching of"compound names"
+	i.e. ($lookup$ PART1 'PART2), like we do for define and define-private.
+
 2007-03-08  Per Bothner  <per@bothner.com>
 
 	* system.scm (command-parse): Update - symbols are no longer

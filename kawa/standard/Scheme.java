@@ -15,6 +15,7 @@ import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.xml.XmlNamespace;
 import gnu.math.Unit;
 
 public class Scheme extends LispLanguage
@@ -44,7 +45,6 @@ public class Scheme extends LispLanguage
 
   public static final ApplyToArgs applyToArgs;
   static final Declaration applyFieldDecl;
-  public static final Declaration getNamedPartDecl;
 
   static {
     // (null-environment)
@@ -78,14 +78,7 @@ public class Scheme extends LispLanguage
 
     // Declare the special symbol $lookup$ (from the reader)
     // and bind it to getNamedPartDecl.
-    String cname = "gnu.kawa.functions.GetNamedPart";
-    String fname = "getNamedPart";
-    getNamedPartDecl = Declaration.getDeclarationFromStatic(cname, fname);
-    StaticFieldLocation loc
-      = StaticFieldLocation.define(instance.environ, LispLanguage.lookup_sym, null,
-                                   cname, fname);
-    loc.setProcedure();
-    loc.setDeclaration(getNamedPartDecl);
+    instance.environ.addLocation(LispLanguage.lookup_sym, null, Translator.getNamedPartLocation);
 
     repl = new kawa.repl(instance);
     instance.initScheme();
@@ -1061,12 +1054,14 @@ public class Scheme extends LispLanguage
    */
   public Expression checkDefaultBinding (Symbol symbol, Translator tr)
   {
+    Namespace namespace = symbol.getNamespace();
+    String local = symbol.getLocalPart();
+    if (namespace instanceof XmlNamespace)
+      return QuoteExp.getInstance(((XmlNamespace) namespace).get(local));
     String name = symbol.toString();
     int len = name.length();
     if (len > 1 && name.charAt(len-1) == '?')
       {
-        Namespace namespace = symbol.getNamespace();
-        String local = symbol.getLocalPart();
         int llen = local.length();
         if (llen > 1)
           {
@@ -1153,12 +1148,6 @@ public class Scheme extends LispLanguage
 
   public Expression makeApply (Expression func, Expression[] args)
   {
-    if (func instanceof ReferenceExp
-        && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
-      {
-        // FIXME don't copy the args array in makeExp ...
-        return GetNamedPart.makeExp(args[0], args[1]);
-      }
     Expression[] exps = new Expression[args.length+1];
     exps[0] = func;
     System.arraycopy(args, 0, exps, 1, args.length);

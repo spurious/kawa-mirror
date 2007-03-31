@@ -1,3 +1,13 @@
+2007-03-31  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (getNamedPartDecl): Moved from Scheme.java.
+	(getNamedPartLocation): New field.
+	(rewrite_pair): Handle getNamedPartDecl here.  Most important change
+	is that we also do namespaceResolve.
+	* standard/Scheme.java (getNamedPartDecl): MOved to Translator.
+	(checkDefaultBinding): Handle symbols in XmlNamespace.
+	(makeApply): Don't handle getNamedPartDecl here.
+
 2007-03-19  Per Bothner  <per@bothner.com>
 
 	* standard/object.java (scanClassDef): If interface:#f is specified

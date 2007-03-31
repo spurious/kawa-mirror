@@ -47,6 +47,20 @@ public class Translator extends Compilation
 
   public LambdaExp curMethodLambda;
 
+  public static final Declaration getNamedPartDecl;
+  public static final StaticFieldLocation getNamedPartLocation;
+  static {
+    // Declare the special symbol $lookup$ (from the reader)
+    // and bind it to getNamedPartDecl.
+    String cname = "gnu.kawa.functions.GetNamedPart";
+    String fname = "getNamedPart";
+    getNamedPartDecl = Declaration.getDeclarationFromStatic(cname, fname);
+    StaticFieldLocation loc = new StaticFieldLocation(cname, fname);
+    loc.setProcedure();
+    loc.setDeclaration(getNamedPartDecl);
+    getNamedPartLocation = loc;
+  }
+
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
   {
@@ -387,6 +401,17 @@ public class Translator extends Compilation
     if (save_scope != current_scope)
       setCurrentScope(save_scope);
 
+    if (func instanceof ReferenceExp
+        && (((ReferenceExp) func).getBinding()==getNamedPartDecl))
+      {
+        Expression part1 = args[0];
+        Expression part2 = args[1];
+        Symbol sym = namespaceResolve(part1, part2);
+        if (sym != null)
+          return rewrite(sym, function);
+        // FIXME don't copy the args array in makeExp ...
+        return GetNamedPart.makeExp(part1, part2);
+      }
     return ((LispLanguage) getLanguage()).makeApply(func, args);
   }
 
@@ -683,7 +708,7 @@ public class Translator extends Compilation
                     if (! inlineOk(null)
                         // A kludge - we get a bunch of testsuite failures
                         // if we don't inline $lookup$.  FIXME.
-                        && decl != kawa.standard.Scheme.getNamedPartDecl)
+                        && decl != getNamedPartDecl)
                       decl = null;
                     if (decl != null && ! decl.isStatic())
                       {

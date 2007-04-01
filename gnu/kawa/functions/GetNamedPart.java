@@ -201,6 +201,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
                     return QuoteExp.getInstance(val);
                   }
               }
+            args = new Expression[] { args[0], QuoteExp.getInstance(mname) };
             return new ApplyExp(typeHasNamedParts.getDeclaredMethod("get", 1),
                                 args).setLine(exp);
           }

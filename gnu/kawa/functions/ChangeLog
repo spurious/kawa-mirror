@@ -1,3 +1,8 @@
+2007-03-31  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Make sure we pass a String (rather than
+	a SimpleSymbol) to HasNamedParts.get.
+
 2007-03-06  Per Bothner  <per@bothner.com>
 
 	* Convert.java (setCoercedReturnValue): Don't coerce result

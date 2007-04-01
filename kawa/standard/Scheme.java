@@ -1234,12 +1234,14 @@ public class Scheme extends LispLanguage
         len -= 2;
         rank++;
       }
+
+    String cname = name;
     if (rank != 0)
-      name = name.substring(0, len);
+      cname = name.substring(0, len);
     try
       { 
         Class clas;
-        Type type = getNamedType(name);
+        Type type = getNamedType(cname);
         if (type != null)
           {
             // Somewhat inconsistent: Types named by getNamedType are Type,
@@ -1250,16 +1252,14 @@ public class Scheme extends LispLanguage
           }
         else
           {
-            type = Type.lookupType(name);
+            type = Type.lookupType(cname);
             if (type instanceof gnu.bytecode.PrimType)
               clas = type.getReflectClass();
             else
               {
-                String cname;
-                if (name.indexOf('.') < 0)
-                  cname = tr.classPrefix + Compilation.mangleNameIfNeeded(name);
-                else
-                  cname = name;
+                if (cname.indexOf('.') < 0)
+                  cname = (tr.classPrefix
+                           + Compilation.mangleNameIfNeeded(cname));
                 clas = ClassType.getContextClass(cname);
               }
           }
@@ -1274,6 +1274,12 @@ public class Scheme extends LispLanguage
               }
             return QuoteExp.getInstance(clas);
           }
+      }
+    catch (ClassNotFoundException ex)
+      {
+        Package pack = gnu.bytecode.ArrayClassLoader.getContextPackage(name);
+        if (pack != null)
+          return QuoteExp.getInstance(pack);
       }
     catch (Throwable ex)
       {

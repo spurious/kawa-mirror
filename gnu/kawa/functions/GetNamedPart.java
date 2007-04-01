@@ -290,6 +290,17 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
       return ((HasNamedParts) container).get(name);
     if (container instanceof Class)
       container = (ClassType) Type.make((Class) container);
+    if (container instanceof Package)
+      {
+        try
+          {
+            String pname = ((Package) container).getName();
+            return ClassType.getContextClass(pname + '.' + name);
+          }
+        catch (Throwable ex)
+          {
+          }
+      }
     if (container instanceof Type)
       return getTypePart((Type) container, name);
     return getMemberPart(container, part.toString());

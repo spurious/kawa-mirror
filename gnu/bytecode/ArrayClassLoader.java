@@ -120,4 +120,21 @@ public class ArrayClassLoader extends ClassLoader
     /* #endif */
     return clas;
   }
+
+  /* #ifdef JAVA2 */
+  public static Package getContextPackage (String cname)
+  {
+    ClassLoader loader;
+    try
+      {
+        loader = Thread.currentThread().getContextClassLoader();
+        if (loader instanceof ArrayClassLoader)
+          return ((ArrayClassLoader) loader).getPackage(cname);
+      }
+    catch (java.lang.SecurityException ex)
+      {
+      }
+    return Package.getPackage(cname);
+  }
+  /* #endif */
 }

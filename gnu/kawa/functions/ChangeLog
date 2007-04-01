@@ -1,3 +1,8 @@
+2007-04-01  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (getNamedPart): If container is a Package
+	get named Class in Package.
+
 2007-03-31  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Make sure we pass a String (rather than

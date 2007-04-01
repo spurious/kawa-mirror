@@ -63,7 +63,8 @@ public class FieldLocation extends ClassMemberLocation
             flags |= CONSTANT;
             if (ftype.isSubtype(Compilation.typeProcedure))
               flags |= PROCEDURE;
-            if (ftype.isSubtype(ClassType.make("kawa.lang.Syntax")))
+            if (ftype instanceof ClassType
+                && ((ClassType) ftype).isSubclass("kawa.lang.Syntax"))
               flags |= SYNTAX;
           }
         else

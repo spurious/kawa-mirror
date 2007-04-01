@@ -1,4 +1,4 @@
-// Copyright (C) 2000 Per M.A. Bothner.
+// Copyright (C) 2000, 2007 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package kawa.standard;
@@ -7,6 +7,7 @@ import gnu.lists.*;
 import gnu.expr.*;
 import gnu.math.*;
 import gnu.bytecode.*;
+import gnu.mapping.*;
 
 public class define_unit extends Syntax
 {
@@ -30,10 +31,10 @@ public class define_unit extends Syntax
       {
 	Pair p = (Pair) st.cdr;
 	Object q = p.car;
-	if (q instanceof gnu.mapping.SimpleSymbol)
+	if (q instanceof SimpleSymbol)
 	  {
 	    String name = q.toString();
-	    String sym = (name + "$unit").intern();
+            Symbol sym = Scheme.unitNamespace.getSymbol(name);
 	    Declaration decl = defs.getDefine(sym, 'w', tr);
 	    tr.push(decl);
 	    Translator.setLine(decl, p);
@@ -79,8 +80,8 @@ public class define_unit extends Syntax
 	|| ! ((p1 = (Pair) obj).car instanceof Declaration))
       return tr.syntaxError ("invalid syntax for "+getName());
     Declaration decl = (Declaration) p1.car;
-    String name = decl.getName();
-    String unit = name.substring(0, name.length() - 5).intern(); // Drop $unit.
+    Symbol symbol = (Symbol) decl.getSymbol();
+    String unit = symbol.getLocalPart();
     ClassType unitType = ClassType.make("gnu.math.Unit");
     decl.setType(unitType);
     if ((value = decl.getValue()) instanceof QuoteExp

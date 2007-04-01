@@ -24,21 +24,6 @@ public class LispReader extends Lexer
     super(port, messages);
   }
 
-  /** Resolve a unit name, if possible.
-   * Returns null if the unit name is unknown. */
-  public static Object lookupUnit (String name)
-  {
-    name = (name + "$unit").intern();
-    try
-      {
-	return Environment.getCurrent().getChecked(name);
-      }
-    catch (UnboundLocationException ex)
-      {
-	return name;
-      }
-  }
-
   /** Read a #|...|#-style comment (which may contain other nested comments).
     * Assumes the initial "#|" has already been read.
     */
@@ -720,92 +705,7 @@ public class LispReader extends Lexer
 		return Complex.make(IntNum.zero (), number);
 	      }
 	  }
-	if (lcount > 0)
-	  {
-	    Object unit = null;
-	    for (;;)
-	      {
-		String word = new String(buffer, pos - lcount, lcount);
-		Object u = lookupUnit(word);
-
-		int power = 1;
-		if (pos < end)
-		  {
-		    ch = buffer[pos];
-		    if (ch == '^' && ++pos < end)
-		      ch = buffer[pos];
-		    boolean neg = ch == '-';
-		    if ((ch == '-' || ch == '+') && ++pos < end)
-		      ch = buffer[pos];
-		    power = -1;
-		    for (;;)
-		      {
-			int d = Character.digit(ch, 10);
-			if (d < 0)
-			  {
-			    if (power < 0)
-			      return "junk after unit name";
-			    break;
-			  }
-			power = power < 0 ? d  : 10 * power + d;
-			if (++pos == end)
-			  break;
-			if (power > 1000000)
-			  return "unit power too large";
-			ch = buffer[pos];
-		      }
-		    if (neg) power = -power;
-		  }
-
-		// "expt" and "*" are too open to name clashes. FIXME.
-		if (power != 1)
-		  {
-		    if (u instanceof Unit)
-		      u = Unit.pow((Unit) u, power);
-		    else
-		      u = LList.list3("expt", u, IntNum.make(power));
-		  }
-		if (unit == null)
-		  unit = u;
-		else if (u instanceof Unit && unit instanceof Unit)
-		  unit = Unit.times((Unit) unit, (Unit) u);
-		else
-		  unit = LList.list3("*", unit, u);
-		if (pos >= end)
-		  break;
-		ch = buffer[pos++];
-		if (ch == '*')
-		  {
-		    if (pos == end)
-		      return "end of token after '*'";
-		    ch = buffer[pos++];
-		  }
-		lcount = 0;
-		for (;;)
-		  {
-		    if (! Character.isLetter(ch))
-		      {
-			pos--;
-			break;
-		      }
-		    lcount++;
-		    if (pos == end)
-		      break;
-		    ch = buffer[pos++];
-		  }
-		if (lcount == 0)
-		  return "excess junk after unit";
-	      }
-
-	    if (unit == null)
-	      return "expected unit";
-	    else if (unit instanceof Unit)
-	      return Quantity.make(number, (Unit) unit);
-	    else
-	      return LList.list3("*", number, unit);
-	  }
-	else
-	  return "excess junk after number";
+        return "excess junk after number";
 	
       }
     return number;
@@ -895,12 +795,14 @@ public class LispReader extends Lexer
 			       '\0', 0, SCM_NUMBERS);
     if (value != null && ! (value instanceof String))
       return value;
+    /* Common Lisp only?  FIXME
     if (isPotentialNumber(tokenBuffer, startPos, endPos))
       {
 	error(value == null ? "not a valid number"
 	      : "not a valid number: " + value);
 	return IntNum.zero();
       }
+    */
     return returnSymbol(startPos, endPos, rtable);
   }
 

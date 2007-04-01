@@ -733,8 +733,13 @@ public abstract class Language
     boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if (isAlias)
       fdecl.setIndirectBinding(true);
-    else if (isFinal && ftype.isSubtype(Compilation.typeProcedure))
-      fdecl.setProcedureDecl(true);
+    else if (isFinal && ftype instanceof ClassType)
+      {
+        if (ftype.isSubtype(Compilation.typeProcedure))
+          fdecl.setProcedureDecl(true);
+        else if (((ClassType) ftype).isSubclass("gnu.mapping.Namespace"))
+          fdecl.setFlag(Declaration.IS_NAMESPACE_PREFIX);
+      }
     if (isStatic)
       fdecl.setFlag(Declaration.STATIC_SPECIFIED);
     fdecl.field = fld; 

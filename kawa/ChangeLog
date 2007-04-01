@@ -1,10 +1,20 @@
 2007-03-31  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (unitNamespace): New constant field.
+	(initScheme): Declare 'unit'.
+	(checkDefaultBinding): Check for symbol whose namespace
+	is XmlNamespace or unitNamespace.
+	Check for simple symbol matching quantity syntax.
+	(lookupBuiltin): Remove method.
+	* standard/let.java (rewrite): Do namespaceResolve.
+	* standard/define_unit.java (rewriteForm): Unit symbol now uses
+	Scheme.unitNamespace, rather than "$unit" suffix.
+
 	* lang/Translator.java (getNamedPartDecl): Moved from Scheme.java.
 	(getNamedPartLocation): New field.
 	(rewrite_pair): Handle getNamedPartDecl here.  Most important change
 	is that we also do namespaceResolve.
-	* standard/Scheme.java (getNamedPartDecl): MOved to Translator.
+	* standard/Scheme.java (getNamedPartDecl): Moved to Translator.
 	(checkDefaultBinding): Handle symbols in XmlNamespace.
 	(makeApply): Don't handle getNamedPartDecl here.
 

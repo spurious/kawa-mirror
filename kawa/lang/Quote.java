@@ -71,6 +71,21 @@ public class Quote extends Syntax
     return true;
   }
 
+  public static Symbol makeSymbol (Namespace ns, Object local)
+  {
+    String name;
+    /* #ifdef use:java.lang.CharSequence */
+    if (local instanceof CharSequence)
+      name = ((CharSequence) local).toString();
+    /* #else */
+    // if (local instanceof gnu.lists.CharSeq)
+    //  name = ((gnu.lists.CharSeq) local).toString();
+    /* #endif */
+    else
+      name = (String) local;
+    return ns.getSymbol(name.intern());
+  }
+
   Object expand_pair (Pair list, int depth, SyntaxForm syntax,
                       Object seen, Translator tr)
   {
@@ -89,6 +104,7 @@ public class Quote extends Syntax
         // What makes things complicated is that to the extent that no changes
         // are needed, we want to return the input list as-is.
         if (expandColonForms()
+            && pair == list
             && tr.matches(pair.car, syntax, LispLanguage.lookup_sym)
             && pair.cdr instanceof Pair
             && (p1 = (Pair) pair.cdr) instanceof Pair
@@ -97,22 +113,28 @@ public class Quote extends Syntax
           {
             Expression part1 = tr.rewrite_car(p1, false);
             Expression part2 = tr.rewrite_car(p2, false);
-            Symbol sym = tr.namespaceResolve(part1, part2);
+            Namespace ns = tr.namespaceResolvePrefix(part1);
+            Symbol sym = tr.namespaceResolve(ns, part2);
             String combinedName;
             if (sym != null)
-              ;
+              cdr = sym;
+            else if (ns != null && depth == 1)
+              cdr = new ApplyExp(ClassType.make("kawa.lang.Quote")
+                                 .getDeclaredMethod("makeSymbol", 2),
+                                 new Expression[] { QuoteExp.getInstance(ns),
+                                                    part2 });
             else if (part1 instanceof ReferenceExp
                      && part2 instanceof QuoteExp)
-              sym = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
+              cdr = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
             else if ((combinedName = GetNamedPart.combineName(part1, part2)) != null)
-              sym = tr.getGlobalEnvironment().getSymbol(combinedName);
+              cdr = tr.getGlobalEnvironment().getSymbol(combinedName);
             else
               {
                 Object save = tr.pushPositionOf(pair);
                 tr.error('e', "'"+p1.car+"' is not a valid prefix");
                 tr.popPositionOf(save);
+                cdr = sym;
               }
-            cdr = sym;
             break;
           }
         else if (depth < 0)

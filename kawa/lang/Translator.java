@@ -415,9 +415,9 @@ public class Translator extends Compilation
     return ((LispLanguage) getLanguage()).makeApply(func, args);
   }
 
-  public Symbol namespaceResolve (Expression context, Expression member)
+  public Namespace namespaceResolvePrefix (Expression context)
   {
-    if (context instanceof ReferenceExp && member instanceof QuoteExp)
+    if (context instanceof ReferenceExp)
       {
         ReferenceExp rexp = (ReferenceExp) context;
         Declaration decl = rexp.getBinding();
@@ -440,12 +440,26 @@ public class Translator extends Compilation
             Namespace ns = (Namespace) val;
             String uri = ns.getName();
             if (uri != null && uri.startsWith("class:"))
-              return null; 
-            String mem = ((QuoteExp) member).getValue().toString().intern();
-            return ns.getSymbol(mem);
+              return null;
+            return ns;
           }
       }
     return null;
+  }
+
+  public Symbol namespaceResolve (Namespace ns, Expression member)
+  {
+    if (ns != null && member instanceof QuoteExp)
+      {
+        String mem = ((QuoteExp) member).getValue().toString().intern();
+        return ns.getSymbol(mem);
+      }
+    return null;
+  }
+
+  public Symbol namespaceResolve (Expression context, Expression member)
+  {
+    return namespaceResolve(namespaceResolvePrefix(context), member);
   }
 
   public static Object stripSyntax (Object obj)

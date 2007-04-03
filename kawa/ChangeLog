@@ -1,3 +1,11 @@
+2007-04-03  Per Bothner  <per@bothner.com>
+
+	* Translator.java (namespaceResolvePrefix): New method.
+	(namespaceResolve(Expression,Expresion)): Use it.
+	(namespaceResolve(Namespace,Expresion)): New method.
+	* Quote.java (makeSymbol): New static method.
+	(expand_pair): Handle `PREFIX:,EXPR.
+
 2007-04-01  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (checkDefaultBinding): If name matches a

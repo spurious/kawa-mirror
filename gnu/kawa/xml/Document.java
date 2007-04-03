@@ -29,15 +29,15 @@ public class Document
 
   public static KDocument parse (Object uri) throws Throwable
   {
-    NodeTree doc = new NodeTree();
-    parse(uri, doc);
-    return new KDocument(doc, 0);
+    NodeTree tree = new NodeTree();
+    parse(uri, (Consumer) tree);
+    return new KDocument(tree, TreeList.BEGIN_ENTITY_SIZE << 1);
   }
 
   /** Internal namespace used to mange cached documents. */
   static String docNamespace = "http://gnu.org/kawa/cached-documents";
 
-  public static Object parseCached (Object uri)
+  public static KDocument parseCached (Object uri)
     throws Throwable
   {
     Symbol sym = Symbol.make(docNamespace, uri.toString());
@@ -47,19 +47,10 @@ public class Document
         NamedLocation loc = env.getLocation(sym, null, true);
         Object val = loc.get(null);
         if (val != null)
-          return val;
-
-        NodeTree tree = new NodeTree();
-        SourceMessages messages = new SourceMessages();
-        tree.beginEntity(uri);
-        gnu.xml.XMLParser.parse(uri, messages, tree);
-        if (messages.seenErrors())
-          throw new SyntaxException("document function read invalid XML",
-                                    messages);
-        tree.endEntity();
-        val = new KDocument(tree, TreeList.BEGIN_ENTITY_SIZE << 1);
-        loc.set(val);
-        return val;
+          return (KDocument) val;
+        KDocument doc = parse(uri);
+        loc.set(doc);
+        return doc;
       }
   }
 }

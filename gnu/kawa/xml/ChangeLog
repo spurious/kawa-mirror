@@ -1,3 +1,8 @@
+2007-04-03  Per Bothner  <per@bothner.com>
+
+	* Document.java (parse(Object)): Adjust index for BEGIN_ENTITY_SIZE.
+	(parseCached): Use parse(Object) method.
+
 2007-02-26  Per Bothner  <per@bothner.com>
 
 	* MakeUnescapedData.java (inline): Update for new CanInline api.

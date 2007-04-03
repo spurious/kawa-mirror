@@ -25,8 +25,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
   {
     String name1;
     Object name2;
-    if (part2 instanceof QuoteExp
-        && (name2 = ((QuoteExp) part2).getValue()) instanceof SimpleSymbol
+    if ((name2 = part2.valueIfConstant()) instanceof SimpleSymbol
         && ((part1 instanceof ReferenceExp
              && (name1 = ((ReferenceExp) part1).getSimpleName()) != null)
             || (part1 instanceof GetNamedExp

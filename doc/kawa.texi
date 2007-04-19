@@ -4487,19 +4487,22 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class name (supers ...) field-or-method-decl ...
+@deffn Syntax define-class name (supers ...) option-pair* field-or-method-decl ...
 @deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
-@display
+@example
+@var{option-pair} ::= @var{option-keyword} @var{option-value}
 @var{field-or-method} ::= @var{field-decl} | @var{method-decl}
-@var{field-decl} ::= (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] [@var{option-keyword} @var{option-value}]* @var{body})
-@end display
+@end example
+
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
 (If @var{name} has the form @code{<xyx>} the Java implementation
 type is named @code{xyz}.)  For @code{define-class} the implementation is
 unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
+@end deffn
+
+@subsubsection General class properties
 
 The class inherits from the classes and interfaces listed in @var{supers}.
 This is a list of names of classes that are in scope (perhaps imported
@@ -4512,6 +4515,33 @@ defined using @code{define-class}.
 If @code{define-class} is used, @emph{all} of the classes listed
 in @var{supers} should be interfaces or classes defined using
 @code{define-class}.
+
+@table @asis
+@item @code{interface:} @var{make-interface}
+Specifies whether Kawa generates a Java class, interface, or both.
+If @var{make-interface} is @code{#t}, then a Java interface is generated.
+In that case all the supertypes must be interfaces, and
+all the declared methods must be abstract.
+If @var{make-interface} is @code{#f}, then a Java class is generated.
+If @code{interface:}  is unspecified, the default is @code{#t}
+for @code{define-simple-class}.  For @code{define-class} the default
+is to generate an interface, and in addition (if needed) a helper
+class that implements the interface.  (In that case any non-abstract methods
+are compiled to static methods.  The methods that implement the interface
+are just wrapper methods that call the real static methods.  This
+allows Kawa to implement true multiple inheritance.)
+
+@item @code{access:} @var{kind}
+Specifies the Java access permission on the class.
+Can be one of @code{'public} (which is the default in Kawa),
+or @code{'package} (which the default "unnamed" permission in Java code).
+@end table
+
+@subsubsection Declaring fields
+
+@example
+@var{field-decl} ::= (@var{fname} [:: @var{ftype}] @var{option-pair}*)
+@end example
 
 Each @var{field-decl} declares a instance "slot" (field)
 with the given @var{fname}. 
@@ -4535,9 +4565,9 @@ each instance has a separate value "slot", and they
 are not shared. In Java terms, this is a non-@code{static} field.
 This is the default.
 
-You can use a keyword like @code{class:} or a string like @code{"class"}
-if you prefer instead of a quoted symbol like @code{'class};
-the latter is recommended.
+@c You can use a keyword like @code{class:} or a string like @code{"class"}
+@c if you prefer instead of a quoted symbol like @code{'class};
+@c the latter is recommended.
 @item @code{access:} @var{kind}
 Specifies the Java access permission on the field.
 Can be one of @code{'private}, @code{'protected},
@@ -4577,7 +4607,13 @@ then its value is doubled.
   (init: (if (some-condition) (set! x (* x 2)))))
 @end example
 
-Each @var{method-decl} declares method,
+@subsubsection Declaring methods
+
+@example
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{option-pair}* @var{body})
+@end example
+
+Each @var{method-decl} declares a method,
 which is by default public and non-static, and whose name is @var{method-name}.
 (If @var{method-name} is not a valid
 Java method name, it is mapped to something reasonable.
@@ -4610,6 +4646,20 @@ For example:
 @end example
 @end table
 
+The scope of the @var{body} of a method includes the @var{field-decl}s
+and @var{field-decl}s of the body, including those inherited from
+superclasses and implemented interfaces.
+
+If the @var{body} is the special form @code{#!abstract},
+then the method is abstract.  This means the method must
+be overridden in a subclass, and you're not allowed to
+create instance of the enclosing class.
+
+@example
+(define-simple-class Searchable () interface: #t
+  ((search value) :: boolean #!abstract))
+@end example
+
 The special @var{method-name} @samp{*init*} can be used to name
 a non-default constructor (in a @code{define-simple-class} only).
 It can be used to initialize a freshly-allocated instance
@@ -4620,10 +4670,7 @@ the @code{invoke-special} special function.
 form may be added in the future.)
 See the example below.
 
-The scope of the @var{body} of a method includes the @var{field-decl}s
-and @var{field-decl}s of the body, including those inherited from
-superclasses and implemented interfaces.
-@end deffn
+@subsubsection Example
 
 In the following example we define a simple class @code{<2d-vector>}
 and a class @code{<3d-vector>} that extends it.  (This is for illustration

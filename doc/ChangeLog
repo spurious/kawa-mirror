@@ -1,3 +1,9 @@
+2007-04-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Document abstract methods,
+	and the interface: and access: class-level specifiers.
+	Divide into sub-sub-sections.
+
 2007-03-19  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Re-order some sections.

@@ -119,8 +119,7 @@ public class Quote extends Syntax
             if (sym != null)
               cdr = sym;
             else if (ns != null && depth == 1)
-              cdr = new ApplyExp(ClassType.make("kawa.lang.Quote")
-                                 .getDeclaredMethod("makeSymbol", 2),
+              cdr = new ApplyExp(quoteType.getDeclaredMethod("makeSymbol", 2),
                                  new Expression[] { QuoteExp.getInstance(ns),
                                                     part2 });
             else if (part1 instanceof ReferenceExp

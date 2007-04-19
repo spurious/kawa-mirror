@@ -345,8 +345,24 @@ public class ClassExp extends LambdaExp
       return;
     else
       {
-	String implTypeName = interfaceType.getName() + "$class";
-	implType = ClassType.make(implTypeName);
+        try
+          {
+            Class reflectClass = interfaceType.getReflectClass();
+            if (reflectClass == null)
+              return;
+            String implTypeName = interfaceType.getName() + "$class";
+            ClassLoader loader = reflectClass.getClassLoader();
+            /* #ifdef JAVA2 */
+            Class implClass = Class.forName(implTypeName, false, loader);
+            /* #else */
+            // Class implClass = Class.forName(implTypeName);
+            /* #endif */
+            implType = (ClassType) Type.make(implClass);
+          }
+        catch (Throwable ex)
+          {
+            return;
+          }
       }
     Type[] itypes = new Type[paramTypes.length + 1];
     itypes[0] = interfaceType;

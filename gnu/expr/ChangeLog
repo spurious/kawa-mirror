@@ -1,3 +1,8 @@
+2007-04-19  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getImplMethods): Don't lose in the case we didn't
+	create a "xxx$class" for a pair type - i.e. if it is abstract.
+
 2007-03-31  Per Bothner  <per@bothner.com>
 
 	* Language.java (declFromField): Set IS_NAMESPACE_PREFIX if

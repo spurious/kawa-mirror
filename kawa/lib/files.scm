@@ -128,8 +128,9 @@
      ((module-uri):resolve uri))))
 
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
-(define (make-temporary-file #!optional (fmt "kawa~d.tmp")) :: <string>
-  (gnu.kawa.functions.FileUtils:createTempFile fmt))
+(define (make-temporary-file #!optional (fmt :: <string> "kawa~d.tmp"))
+  :: filepath
+  (filepath (gnu.kawa.functions.FileUtils:createTempFile (fmt:toString))))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, which is again based on Chez Scheme.

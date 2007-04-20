@@ -1,3 +1,8 @@
+2007-04-20  Per Bothner  <per@bothner.com>
+
+	* files.scm (make-temporary-file):  Update.
+	This fixes Savannah bug #19569, make-temporary-file.
+
 2007-03-25  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm (define-constant): Fix matching of"compound names"

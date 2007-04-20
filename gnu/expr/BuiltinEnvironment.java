@@ -44,7 +44,7 @@ public class BuiltinEnvironment extends Environment
 
   public LocationEnumeration enumerateAllLocations ()
   {
-    return getLangEnvironment().enumerateLocations();
+    return getLangEnvironment().enumerateAllLocations();
   }
 
   protected boolean hasMoreElements (LocationEnumeration it)

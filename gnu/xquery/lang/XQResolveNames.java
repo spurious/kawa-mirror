@@ -737,10 +737,7 @@ public class XQResolveNames extends ResolveNames
                     : QuoteExp.voidExp;
                   ApplyExp aexp
                     = new ApplyExp(meth, new Expression[]{ uri, base });
-                  if (code == DOC_BUILTIN)
-                    aexp.setType(NodeType.documentNodeTest);
-                  else
-                    aexp.setType(XDataType.booleanType);
+                  aexp.setType(NodeType.documentNodeTest);
                   return aexp;
                 }
               case DOC_BUILTIN:

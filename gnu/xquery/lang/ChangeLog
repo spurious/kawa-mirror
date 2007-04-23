@@ -1,5 +1,8 @@
 2007-04-23  Per Bothner  <per@bothner.com>
 
+	* XQResolveNames.java (walkApplyExp): Fix copy/paste error for return
+	type of COLLECTION_BUILTIN.
+
 	* XQParser.java (parse): Use new method of iterating through
 	ModuleManager modules.
 

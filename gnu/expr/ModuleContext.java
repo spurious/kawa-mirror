@@ -1,4 +1,5 @@
-// Copyright (c) 2005  Per M.A. Bothner.
+
+// Copyright (c) 2005, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -31,15 +32,18 @@ public class ModuleContext
     return manager;
   }
 
-  Hashtable table = new Hashtable();
+  /* #ifdef JAVA2 */
+  /* #ifdef JAVA5 */
+  // private static WeakHashMap<Class,Object> table = new WeakHashMap<Class,Object>();
+  /* #else */
+  private static WeakHashMap table = new WeakHashMap();
+  /* #endif */
+  /* #else */
+  // private static Hashtable table = new Hashtable();
+  /* #endif */
 
-  public Object checkInstance (ModuleInfo info)
-  {
-    return table.get(info.className);
-  }
-
-  /** Allocate a new instance of the class corresponding to the argument. */
-  public Object makeInstance (ModuleInfo info)
+  /** If there is no instance of the argument's class, allocated one. */
+  public Object findInstance (ModuleInfo info)
   {
     String cname = info.className;
     Class clas;
@@ -51,42 +55,39 @@ public class ModuleContext
       {
         throw new WrappedException("cannot find module " + cname, ex);
       }
+    return findInstance(clas);
+  }
 
-    Object inst;
-    try
+  public Object findInstance (Class clas)
+  {
+    Object inst = table.get(clas);
+    if (inst == null)
       {
         try
           {
-            inst = clas.getDeclaredField("$instance").get(null);
+            try
+              {
+                inst = clas.getDeclaredField("$instance").get(null);
+              }
+            catch (NoSuchFieldException ex)
+              {
+                // Not a static module - create a new instance.
+                inst = clas.newInstance();
+              }
           }
-        catch (NoSuchFieldException ex)
+        catch (Throwable ex)
           {
-            // Not a static module - create a new instance.
-            inst = clas.newInstance();
+            throw new WrappedException
+              ("exception while initializing module " + clas.getName(), ex);
           }
+        setInstance(inst);
       }
-    catch (Throwable ex)
-      {
-        throw new WrappedException
-          ("exception while initializing module " + cname, ex);
-      }
-    setInstance(info, inst);
     return inst;
   }
 
-  /** If there is no instance of the argument's class, allocated one. */
-  public Object findInstance (ModuleInfo info)
+  public void setInstance (Object instance)
   {
-    Object inst = table.get(info.className);
-    if (inst == null || info.moduleClass == null
-        || ! info.moduleClass.isInstance(inst))
-      inst = makeInstance(info);
-    return inst;
-  }
-
-  public void setInstance (ModuleInfo info, Object instance)
-  {
-    table.put(info.className, instance);
+    table.put(instance.getClass(), instance);
   }
 
   public ModuleInfo findFromInstance (Object instance)
@@ -95,7 +96,7 @@ public class ModuleContext
     String className = instanceClass.getName();
     ModuleInfo info = manager.findWithClassName(className);
     info.moduleClass = instanceClass;
-    setInstance(info, instance);
+    setInstance(instance);
     return info;
   }
 

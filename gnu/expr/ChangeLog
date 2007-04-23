@@ -1,3 +1,14 @@
+2007-04-23  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java (table): Change to use WeakHashMap if JAVA2.
+	Change to map Class to instance rather than class name to instance.
+	(findInstance(Class)): New overloaded method.
+	(fineInstance(ModuleInfo)): Use findInstance(Class).
+	(checkInstance, makeInstance): Remove unused methods.
+	(setInstance): Change to single parameter.
+	(findFromInstance): Update accordingly.
+	* ModuleInfo.java (register): Likewise.
+
 2007-04-20  Per Bothner  <per@bothner.com>
 
 	* BuiltinEnvironment.java (enumerateAllLocations): Fix thinko.

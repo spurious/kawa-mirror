@@ -227,7 +227,7 @@ public class ModuleInfo
     Class clas = instance.getClass();
     ModuleInfo info = find(clas.getName());
     info.moduleClass = clas;
-    ModuleContext.getContext().setInstance(info, instance);
+    ModuleContext.getContext().setInstance(instance);
   }
 
   public Object getInstance ()

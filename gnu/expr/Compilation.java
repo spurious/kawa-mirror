@@ -2235,9 +2235,9 @@ public class Compilation implements SourceLocator
         code = method.startCode();
         Method reg = typeModuleManager.getDeclaredMethod("register", 3);
 
-        for (ModuleInfo mi = manager.firstModule();
-             mi != null;  mi = mi.nextModule())
+        for (int i = manager.numModules;  --i >= 0; )
           {
+            ModuleInfo mi = manager.modules[i];
             String miClassName = mi.className;
             if (miClassName == null
                 || ! miClassName.startsWith(mainPrefix))

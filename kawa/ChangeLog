@@ -1,3 +1,8 @@
+2007-04-23  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (find(String)): Inline call to ModuleInfo's
+	find method - which has been removed.
+
 2007-04-19  Per Bothner  <per@bothner.com>
 
 	* lang/Quote.java (expand_pair): Obvious trivial optimization.

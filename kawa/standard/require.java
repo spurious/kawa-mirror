@@ -98,7 +98,8 @@ public class require extends Syntax
 
   public static Object find(String typeName)
   {
-    return ModuleInfo.find(typeName).getInstance();
+    return ModuleManager.getInstance()
+      .findWithClassName(typeName).getInstance();
   }
 
   public boolean scanForDefinitions (Pair st, Vector forms,

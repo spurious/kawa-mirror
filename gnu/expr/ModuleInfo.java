@@ -9,10 +9,6 @@ import gnu.text.*;
 
 public class ModuleInfo
 {
-  /** Next element in list head by {@link ModuleManager#modules}. */
-  public ModuleInfo nextModule () { return next; }
-  ModuleInfo next;
-
   /** Name of class that implements module.
    * Must be non-null unless we're currently compiling the module,
    * in which case sourcePath and comp must both be non-null.
@@ -201,11 +197,6 @@ public class ModuleInfo
     return ModuleContext.getContext().findFromInstance(instance);
   }
 
-  public static ModuleInfo find (String className)
-  {
-    return ModuleManager.getInstance().findWithClassName(className);
-  }
-
   public static ModuleInfo find (Type type)
   {
     ModuleInfo info = ModuleManager.getInstance().findWithClassName(type.getName());
@@ -213,6 +204,7 @@ public class ModuleInfo
       {
         try
           {
+            // FIXME in this case, GC of the class is prevented!
             info.moduleClass = type.getReflectClass();
           }
         catch (Exception ex)
@@ -224,9 +216,6 @@ public class ModuleInfo
 
   public static void register (Object instance)
   {
-    Class clas = instance.getClass();
-    ModuleInfo info = find(clas.getName());
-    info.moduleClass = clas;
     ModuleContext.getContext().setInstance(instance);
   }
 

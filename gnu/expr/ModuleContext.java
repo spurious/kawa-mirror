@@ -1,4 +1,3 @@
-
 // Copyright (c) 2005, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
@@ -93,9 +92,7 @@ public class ModuleContext
   public ModuleInfo findFromInstance (Object instance)
   {
     Class instanceClass = instance.getClass();
-    String className = instanceClass.getName();
-    ModuleInfo info = manager.findWithClassName(className);
-    info.moduleClass = instanceClass;
+    ModuleInfo info = manager.findWithClass(instanceClass);
     setInstance(instance);
     return info;
   }

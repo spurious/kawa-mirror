@@ -1,3 +1,13 @@
+2007-04-23  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (<init>(Object,Field)): New constructor.
+	(getDeclaration): Use new ModuleInfo.find(Type) factory method.
+	* StaticFieldLocation.java (<init>(Field)): New constructor.
+	* ClassMemberLocation.java: Make abstract.
+	(define): Change to allocate a StaticFieldLocation or FieldLocation,
+	rather than a plain ClassMemberLocation.  This enables Translator's
+	rewrite method map the location to a Declaration.
+
 2007-03-31  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (setKindFlags): Possible optimization.

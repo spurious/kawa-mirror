@@ -15,6 +15,11 @@ public class StaticFieldLocation extends FieldLocation
     super(null, type, mname);
   }
 
+  public StaticFieldLocation (java.lang.reflect.Field field)
+  {
+    super(null, field);
+  }
+
   public Object get (Object defaultValue)
   {
     Object val = super.get(defaultValue);

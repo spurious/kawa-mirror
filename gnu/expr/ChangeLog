@@ -1,5 +1,23 @@
 2007-04-23  Per Bothner  <per@bothner.com>
 
+	* ModuleManager.java (modules): Change from linked list to array.
+	(numModules): New field.
+	(add):  Update appropriately and make private.
+	(getModule(int)): New method.
+	(firstModule): Remove method.
+	(find): xxxx
+	(searchWithClassName, searchWithAbsSourcePath):
+	Update to search in modules array.
+	(clear): Update to free modules array.
+	(findWithClass(Class), findWithClassType): New methods.
+	(find): Use findWithClassType.
+	* ModuleContext.java (findFromInstance):  Use findWithClass.
+	* ModuleInfo.java (next): Remove field.
+	(nextModule): Remove method.
+	(find(String)): Remove - no longer used.
+	(register):   Don't bother looking for ModuleInfo - just setInstance.
+	* Compilation.java (generateBytecode): Iterate over modules array.
+
 	* ModuleContext.java (table): Change to use WeakHashMap if JAVA2.
 	Change to map Class to instance rather than class name to instance.
 	(findInstance(Class)): New overloaded method.

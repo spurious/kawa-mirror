@@ -4014,9 +4014,11 @@ public class XQParser extends Lexer
               {
                 error('e', "error loading map for "+uri+" - "+ex);
               }
-            for (ModuleInfo info = manager.firstModule();  info != null;
-                 info = info.nextModule())
+            for (int i = 0; ; i++)
               {
+                ModuleInfo info = manager.getModule(i);
+                if (info == null)
+                  break;
                 if (! uri.equals(info.getNamespaceUri()))
                   continue;
                 n++;

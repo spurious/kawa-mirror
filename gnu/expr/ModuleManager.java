@@ -36,35 +36,61 @@ public class ModuleManager
   /** Number millseconds before we re-check file's modified time. */
   public long lastModifiedCacheTime = LAST_MODIFIED_CACHE_TIME;
 
-  /** Chain of all modules managed by this ModuleManager.
-   * Linked together by ModuleInfo's next field. */
-  ModuleInfo modules;
-  public ModuleInfo firstModule () { return modules; }
+  /** List of all modules managed by this ModuleManager. */
+  ModuleInfo[] modules;
+  int numModules;
+
+  public ModuleInfo getModule (int index)
+  {
+    return index >= numModules ? null : modules[index];
+  }
 
   public ModuleInfo find (Compilation comp)
   {
     ModuleExp mexp = comp.getModule();
     ClassType ctype = mexp.classFor(comp);
-    ModuleInfo info = findWithClassName(ctype.getName());
+    ModuleInfo info = findWithClassType(ctype);
     info.setCompilation(comp);
     return info;
   }
 
-  public void add (ModuleInfo info)
+  private void add (ModuleInfo info)
   {
-    info.next = modules;
-    modules = info;
+    if (modules == null)
+      modules = new ModuleInfo[10];
+    else if (numModules == modules.length)
+      {
+        ModuleInfo[] tmp = new ModuleInfo[2 * numModules];
+        System.arraycopy(modules, 0, tmp, 0, numModules);
+        modules = tmp;
+      }
+    modules[numModules++] = info;
   }
 
   public ModuleInfo searchWithClassName (String className)
   {
-    for (ModuleInfo info = modules;  info != null;  info = info.next)
-      if (className.equals(info.className))
-        return info;
+    for (int i = numModules;  --i >= 0; )
+      {
+        ModuleInfo info = modules[i];
+        if (className.equals(info.className))
+          return info;
+      }
     return null;
   }
 
-  public synchronized ModuleInfo findWithClassName (String className)
+  public synchronized ModuleInfo findWithClass (Class clas)
+  {
+    ModuleInfo info = findWithClassName(clas.getName());
+    info.moduleClass = clas;
+    return info;
+  }
+
+  public synchronized ModuleInfo findWithClassType (ClassType ctype)
+  {
+    return findWithClassName(ctype.getName());
+  }
+
+  public synchronized ModuleInfo findWithClassName (String className) 
   {
     ModuleInfo info = searchWithClassName(className);
     if (info == null)
@@ -78,9 +104,12 @@ public class ModuleManager
 
   private ModuleInfo searchWithAbsSourcePath (String sourcePath)
   {
-    for (ModuleInfo info = modules;  info != null;  info = info.next)
-      if (sourcePath.equals(info.getSourceAbsPathname()))
-        return info;
+    for (int i = numModules;  --i >= 0; )
+      {
+        ModuleInfo info = modules[i];
+        if (sourcePath.equals(info.getSourceAbsPathname()))
+          return info;
+      }
     return null;
   }
 
@@ -205,13 +234,7 @@ public class ModuleManager
       }
     packageInfoChain = null;
 
-    ModuleInfo module = modules;
-    while (module != null)
-      {
-        ModuleInfo next = module.next;
-        module.next = null;
-        module = next;
-      }
     modules = null;
+    numModules = 0;
   }
 }

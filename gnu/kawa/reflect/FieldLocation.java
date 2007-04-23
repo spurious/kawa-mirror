@@ -123,6 +123,11 @@ public class FieldLocation extends ClassMemberLocation
     super(instance, type, mname);
   }
 
+  public FieldLocation (Object instance, java.lang.reflect.Field field)
+  {
+    super(instance, field);
+    type = (ClassType) Type.make(field.getDeclaringClass());
+  }
 
   public void setDeclaration (Declaration decl)
   {
@@ -152,7 +157,7 @@ public class FieldLocation extends ClassMemberLocation
 	gnu.bytecode.Field procField = t.getDeclaredField(fname);
 	if (procField == null)
 	  return null;
-        ModuleInfo info = ModuleInfo.find(t.getName());
+        ModuleInfo info = ModuleInfo.find(t);
         ModuleExp mexp = info.getModuleExp();
         for (d = mexp.firstDecl();  d != null; d = d.nextDecl())
           {

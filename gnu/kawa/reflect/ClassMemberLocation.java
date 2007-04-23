@@ -9,7 +9,7 @@ import gnu.expr.*;
  * (For now, only fields are supported.)
  */
 
-public class ClassMemberLocation extends Location
+public abstract class ClassMemberLocation extends Location
 {
   Object instance;
   ClassType type;
@@ -34,6 +34,13 @@ public class ClassMemberLocation extends Location
     this.mname = mname;
   }
 
+  public ClassMemberLocation(Object instance, java.lang.reflect.Field field)
+  {
+    this.instance = instance;
+    this.rfield = field;
+    this.mname = field.getName();
+  }
+
   public String getMemberName()
   {
     return mname;
@@ -42,13 +49,6 @@ public class ClassMemberLocation extends Location
   public ClassType getDeclaringClass()
   {
     return type;
-  }
-
-  public ClassMemberLocation(Object instance, java.lang.reflect.Field field)
-  {
-    this.instance = instance;
-    this.rfield = field;
-    this.mname = field.getName();
   }
 
   void setup ()
@@ -173,7 +173,8 @@ public class ClassMemberLocation extends Location
 	sym = Symbol.make(uri == null ? "" : uri,
 			  fdname.toString().intern());
       }
-    boolean isFinal = (rfield.getModifiers() & Access.FINAL) != 0;
+    int rModifiers = rfield.getModifiers();
+    boolean isFinal = (rModifiers & Access.FINAL) != 0;
     Location loc;
     Object property = null;
     if (isAlias && isFinal)
@@ -184,7 +185,12 @@ public class ClassMemberLocation extends Location
       {
 	if (isFinal)
 	  property = language.getEnvPropertyFor(rfield, fvalue);
-	loc = new ClassMemberLocation(instance, rfield);
+        boolean isStatic = (rModifiers & Access.STATIC) != 0;
+        if (isStatic)
+          loc = new StaticFieldLocation(rfield);
+        else
+          loc = new FieldLocation(instance, rfield);
+
       }
     env.addLocation(sym, property, loc);
   }

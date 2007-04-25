@@ -1,5 +1,6 @@
 package gnu.expr;
 import java.net.*;
+import gnu.mapping.WrappedException;
 import gnu.bytecode.ClassType;
 import gnu.text.*;
 
@@ -49,8 +50,13 @@ public class ModuleManager
   {
     ModuleExp mexp = comp.getModule();
     ClassType ctype = mexp.classFor(comp);
-    ModuleInfo info = findWithClassType(ctype);
-    info.setCompilation(comp);
+    String fileName = mexp.getFileName();
+    Path sourceAbsPath = ModuleInfo.absPath(fileName);
+    ModuleInfo info = findWithSourcePath(sourceAbsPath, fileName);
+    info.className = ctype.getName();
+    info.exp = mexp;
+    comp.minfo = info;
+    info.comp = comp;
     return info;
   }
 
@@ -78,28 +84,30 @@ public class ModuleManager
     return null;
   }
 
-  public synchronized ModuleInfo findWithClass (Class clas)
+  public static synchronized ModuleInfo findWithClass (Class clas)
   {
-    ModuleInfo info = findWithClassName(clas.getName());
-    info.moduleClass = clas;
-    return info;
-  }
-
-  public synchronized ModuleInfo findWithClassType (ClassType ctype)
-  {
-    return findWithClassName(ctype.getName());
-  }
-
-  public synchronized ModuleInfo findWithClassName (String className) 
-  {
-    ModuleInfo info = searchWithClassName(className);
+    ModuleInfo info = (ModuleInfo) ModuleInfo.mapClassToInfo.get(clas);
     if (info == null)
       {
         info = new ModuleInfo();
-        info.className = className;
-        add(info);
+        info.setModuleClass(clas);
       }
     return info;
+  }
+
+  public ModuleInfo findWithClassName (String className) 
+  {
+    ModuleInfo info = searchWithClassName(className);
+    if (info != null)
+      return info;
+    try
+      {
+        return findWithClass(ClassType.getContextClass(className));
+      }
+    catch (Throwable ex)
+      {
+        throw WrappedException.wrapIfNeeded(ex);
+      }
   }
 
   private ModuleInfo searchWithAbsSourcePath (String sourcePath)

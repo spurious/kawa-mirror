@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.FieldLocation;
 import gnu.text.*;
+import java.util.*;
 
 public class ModuleInfo
 {
@@ -15,7 +16,19 @@ public class ModuleInfo
    */
   public String className;
 
-  public Class moduleClass;
+  private Class moduleClass;
+
+  // Maps java.lang.Class to corresponding ModuleInfo.
+  /* #ifdef JAVA2 */
+  /* #ifdef JAVA5 */
+  // static WeakHashMap<Class,ModuleInfo> mapClassToInfo
+  //   = new WeakHashMap<Class,ModuleInfo>();
+  /* #else */
+  static WeakHashMap mapClassToInfo = new WeakHashMap();
+  /* #endif */
+  /* #else */
+  // static Hashtable mapClassToInfo = new Hashtable();
+  /* #endif */
 
   /** The namespace URI associated with this module, or {@code null}.
    * This is null for Scheme modules, but non-null for XQuery modules.
@@ -187,9 +200,21 @@ public class ModuleInfo
     Class mclass = moduleClass;
     if (mclass != null)
       return mclass;
-    mclass = Class.forName(className);
+    mclass = ClassType.getContextClass(className);
     moduleClass = mclass;
     return mclass;
+  }
+
+  public Class getModuleClassRaw ()
+  {
+    return moduleClass;
+  }
+
+  public void setModuleClass (Class clas)
+  {
+    mapClassToInfo.put(clas, this);
+    moduleClass = clas;
+    className = clas.getName();
   }
 
   public static ModuleInfo findFromInstance (Object instance)
@@ -197,21 +222,19 @@ public class ModuleInfo
     return ModuleContext.getContext().findFromInstance(instance);
   }
 
-  public static ModuleInfo find (Type type)
+  public static ModuleInfo find (ClassType type)
   {
-    ModuleInfo info = ModuleManager.getInstance().findWithClassName(type.getName());
-    if (type instanceof ObjectType && ((ObjectType) type).isExisting())
+    if (type.isExisting())
       {
         try
           {
-            // FIXME in this case, GC of the class is prevented!
-            info.moduleClass = type.getReflectClass();
+            return ModuleManager.findWithClass(type.getReflectClass());
           }
         catch (Exception ex)
           {
           }
       }
-    return info;
+    return ModuleManager.getInstance().findWithClassName(type.getName());
   }
 
   public static void register (Object instance)

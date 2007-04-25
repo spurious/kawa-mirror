@@ -1,3 +1,22 @@
+2007-04-25  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (mapClassToInfo): New static WeakHashMap.
+	(moduleClass): Make private.
+	(getModuleClassRaw, setModuleClass): New methods.
+	(find): Change parameter to ClassType.
+	If isExisting, first try ModuleManager.findWithClass.
+	* ModuleManager.java (findWithClass): Make static.  Search
+	in ModuleInfo.mapClassToInfo.
+	(findWithClassType): Remove function.
+	(findWithClassName):  Re-implement - first try searchWithClassName,
+	but if no match load Class and try findWithClass.
+	(find): Partially "inline" findWithClassType and
+	setWithCompilation, so we don't try to search for Class yet.
+	* ModuleExp.java (evalToClass): Use setModuleClass.
+
+	* ModuleInf.java (getModuleClass): Use ClassType's
+	getContextClassUse method rather than Class.forName.
+
 2007-04-23  Per Bothner  <per@bothner.com>
 
 	* ModuleManager.java (modules): Change from linked list to array.

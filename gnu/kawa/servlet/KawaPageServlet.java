@@ -197,8 +197,7 @@ public class KawaPageServlet extends KawaServlet
         return null;
       }
 
-    minfo.moduleClass = cl;
-    minfo.className = cl.getName();
+    minfo.setModuleClass(cl);
 
     if (saveClass)
       comp.outputClass(context.getRealPath("WEB-INF/classes")+'/');

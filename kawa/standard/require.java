@@ -177,12 +177,13 @@ public class require extends Syntax
               }
 	  }
       }
-    if (type == null)
+    if (! (type instanceof ClassType))
       {
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
-    importDefinitions(null, ModuleInfo.find(type), null, forms, defs, tr);
+    importDefinitions(null, ModuleInfo.find((ClassType) type), null,
+                      forms, defs, tr);
     return true;
   }
 

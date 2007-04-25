@@ -1,3 +1,8 @@
+2007-04-25  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (scanForDefinitions): Update to pass ClassType
+	to ModuleInfo.find.
+
 2007-04-23  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (find(String)): Inline call to ModuleInfo's

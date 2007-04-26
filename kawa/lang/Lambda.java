@@ -223,6 +223,7 @@ public class Lambda extends Syntax
 	    tr.syntaxError("'::' must follow parameter name");
 	    return;
 	  }
+        pair_car = tr.namespaceResolve(pair_car);
 	if (pair_car instanceof Symbol)
           {
             name = pair_car;
@@ -250,6 +251,7 @@ public class Lambda extends Syntax
 		pair_car = sf.form;
 		templateScope = sf.scope;
 	      }
+            pair_car = tr.namespaceResolve(pair_car);
 	    if (pair_car instanceof Symbol
 		&& p.cdr instanceof Pair)
 	      {

@@ -48,6 +48,7 @@ public class ModuleExp extends LambdaExp
   public static int interactiveCounter;
 
   public static Class evalToClass (Compilation comp, URL url)
+    throws SyntaxException
   {
     ModuleExp mexp = comp.getModule();
     SourceMessages messages = comp.getMessages();
@@ -161,8 +162,9 @@ public class ModuleExp extends LambdaExp
       }
     catch (Throwable ex)
       {
-	comp.error('f', "internal compile error - caught "+ex);
-	throw WrappedException.wrapIfNeeded(ex);
+	comp.getMessages()
+          .error('f', "internal compile error - caught "+ex, ex);
+        throw new SyntaxException(messages);
       }
   }
 

@@ -1,5 +1,8 @@
 2007-04-26  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (evalToClass): If internal exception is thrown,
+	re-throw as a SyntaxException.
+
 	* ApplyExp.java (compile, compileToArray, pushArgs): Use
 	compileWithPosition rather than compile, for arguments.
 	* LetExp.java (compile): Likewise, for init expression.

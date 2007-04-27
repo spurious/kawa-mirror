@@ -167,6 +167,14 @@ public class SourceMessages implements SourceLocator
 			  current_line, current_column, message));
   }
 
+  public void error(char severity, String message, Throwable exception)
+  {
+    SourceError err = new SourceError(severity, current_filename,
+                                      current_line, current_column, message);
+    err.fakeException = exception;
+    error(err);
+  }
+
   public void error(char severity, String message, String code)
   {
     SourceError err = new SourceError(severity, current_filename,

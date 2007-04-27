@@ -88,7 +88,7 @@ public class ApplyExp extends Expression
 	    // is that we have to do some extra stack operations.
 	    // However, these are cheap (and get compiled away when
 	    // compiling to native code).
-	    arg.compile (comp, Target.pushObject);
+	    arg.compileWithPosition(comp, Target.pushObject);
 	    code.emitSwap();
 	    code.emitDup(1, 1);
 	    code.emitSwap();
@@ -99,7 +99,7 @@ public class ApplyExp extends Expression
 	  {
 	    code.emitDup(Compilation.objArrayType);
 	    code.emitPushInt(i);
-	    arg.compile (comp, Target.pushObject);
+	    arg.compileWithPosition(comp, Target.pushObject);
 	  }
 	code.emitArrayStore(Type.pointer_type);
       }
@@ -303,7 +303,7 @@ public class ApplyExp extends Expression
 	if (args_length <= 4)
 	  {
 	    for (int i = 0; i < args_length; ++i)
-	      exp.args[i].compile(comp, Target.pushObject);
+	      exp.args[i].compileWithPosition(comp, Target.pushObject);
 	    comp.loadCallContext();
 	    code.emitInvoke(Compilation.typeProcedure
 			    .getDeclaredMethod("check"+args_length,
@@ -354,7 +354,7 @@ public class ApplyExp extends Expression
       {
 	for (int i = 0; i < args_length; ++i)
           {
-            exp.args[i].compile (comp, Target.pushObject);
+            exp.args[i].compileWithPosition(comp, Target.pushObject);
             if (! code.reachableHere())
               break;
           }
@@ -424,7 +424,8 @@ public class ApplyExp extends Expression
         if (param.ignorable())
           arg.compile(comp, Target.Ignore);
         else
-          arg.compile(comp, param.getType());
+          arg.compileWithPosition(comp,
+                                  StackTarget.getInstance(param.getType()));
         param = param.nextDecl();
       }
   }

@@ -179,7 +179,7 @@ public class LetExp extends ScopeExp
 		  init = QuoteExp.nullExp;
 	      }
 	  }
-	init.compile (comp, varTarget);
+	init.compileWithPosition (comp, varTarget);
       }
 
     code.enterScope(getVarScope());

@@ -357,66 +357,6 @@ public abstract class Language
     environ.define(getSymbol(name), property, proc);
   }
 
-  /** Import all the public fields of an object. */
-  private void defineAll(Object object)
-  {
-    Class clas = object.getClass();
-    java.lang.reflect.Field[] fields = clas.getFields();
-    for (int i = fields.length;  --i >= 0; )
-      {
-	java.lang.reflect.Field field = fields[i];
-	String name = field.getName();
-	if (name.startsWith(Declaration.PRIVATE_PREFIX)
-	    || name.endsWith("$instance"))
-	  continue;
-	if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
-	  {
-	    try
-	      {
-		defineFromFieldValue(field, field.get(object));
-	      }
-	    catch (Throwable ex)
-	      {
-		throw new WrappedException("error accessing field "+field, ex);
-	      }
-	  }
-	else
-	  {
-	    System.err.println("INTERNAL ERROR in defineAll for "
-			       + name + " in " + clas);
-	  }
-      }
-  }
-
-  private void defineFromFieldValue(java.lang.reflect.Field fld, Object value)
-    throws Throwable
-  {
-    if (value instanceof Location)
-      {
-	Location loc = (Location) value;
-	Symbol sym = loc.getKeySymbol();
-	if (sym != null)
-	  {
-	    environ.addLocation(sym, loc.getKeyProperty(), loc);
-	    return;
-	  }
-      }
-    else
-      {
-	Object vname;
-	if (value instanceof Named)
-	  vname = ((Named) value).getSymbol();
-	else
-	  vname = null;
-	if (vname == null)
-	  vname = Compilation.demangleName(fld.getName(), true).intern();
-	Symbol symbol = vname instanceof Symbol ? (Symbol) vname
-	  : environ.getSymbol(vname.toString());
-	Object prop = getEnvPropertyFor(fld, value);
-	environ.define(symbol, prop, value);
-      }
-  }
-
   public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
   {
     if (! hasSeparateFunctionNamespace())
@@ -441,7 +381,7 @@ public abstract class Language
       {
 	Class clas = Class.forName(name);
 	Object inst = clas.newInstance ();
-	defineAll(inst);
+	ClassMemberLocation.defineAll(inst, this, Environment.getCurrent());
 	if (inst instanceof ModuleBody)
 	  ((ModuleBody)inst).run();
       }

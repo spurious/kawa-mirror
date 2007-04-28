@@ -196,11 +196,10 @@ public abstract class ClassMemberLocation extends Location
   }
 
   /** Import all the public fields of an object. */
-  public static void defineAll(Object instance, Environment env)
+  public static void defineAll (Object instance, Language language, Environment env)
     throws IllegalAccessException
   {
     Class clas = instance.getClass();
-    Language language = Language.getDefaultLanguage();
     java.lang.reflect.Field[] fields = clas.getFields();
     for (int i = fields.length;  --i >= 0; )
       {

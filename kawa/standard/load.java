@@ -7,6 +7,7 @@ import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
 import gnu.text.*;
+import gnu.kawa.reflect.ClassMemberLocation;
 import java.net.URL;
 
 public class load extends Procedure1 {
@@ -33,11 +34,7 @@ public class load extends Procedure1 {
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
-	Class clas = Class.forName (name);
-	Object inst = clas.newInstance ();
-	gnu.kawa.reflect.ClassMemberLocation.defineAll(inst, env);
-	if (inst instanceof Runnable)
-	  ((Runnable)inst).run();
+        Language.getDefaultLanguage().loadClass(name);
       }
     catch (Throwable ex)
       {
@@ -72,7 +69,7 @@ public class load extends Procedure1 {
         Object proc = clas == null ? null : clas.newInstance();
         if (! (proc instanceof ModuleBody))
           throw new RuntimeException("load: "+name+" - no module in archive");
-	gnu.kawa.reflect.ClassMemberLocation.defineAll(proc, env);
+	ClassMemberLocation.defineAll(proc, Language.getDefaultLanguage(), env);
 	((ModuleBody) proc).run();
       }
     catch (java.io.IOException ex)

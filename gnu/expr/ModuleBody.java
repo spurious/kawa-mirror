@@ -110,7 +110,7 @@ public abstract class ModuleBody extends Procedure0
       {
 	CallContext ctx = CallContext.getInstance();
         // FIXME - not appropriate for XQuery.
-	ClassMemberLocation.defineAll(this, ctx.getEnvironment());
+	ClassMemberLocation.defineAll(this, Language.getDefaultLanguage(), ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();

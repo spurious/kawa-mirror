@@ -1448,6 +1448,17 @@ feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 @end deffn
 
+@deffn Syntax include@anchor{include} path
+Read the contents of the file at @var{path} as a sequence of forms,
+and treat the result as if the resulting forms were the forms
+of a @code{begin}.
+@end deffn
+
+@deffn Syntax include-relative@anchor{include-relative} path
+Same as @code{include}, except that the @var{path} is relative to the
+path of the source-file containing the @code{include-file}.
+@end deffn
+
 @node Multiple values, Symbols and namespaces, Syntax and conditional compilation, Extensions
 @section Multiple values
 
@@ -2991,11 +3002,17 @@ set to the URL of the document.
 
 @defun load path
 The @var{path} can be an (absolute) URL or a filename.
+Since @code{load} is a run-time function it doesn't work well
+with Kawa's orientation towards compilation.
+It is highly recommended that you use instead use @code{@ref{include, include}}.
 @end defun
 
 @defun load-relative path
 Same as @code{load}, except that @var{path} is a
 URI that is relative to the context's current base URI.
+Since @code{load-relative} is a run-time function it doesn't work well
+with Kawa's orientation towards compilation.
+It is highly recommended that you use instead use @ref{include-relative, include-relative}.
 @end defun
 
 @menu

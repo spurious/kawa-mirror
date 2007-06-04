@@ -1,3 +1,9 @@
+2007-06-03  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Syntax and conditional compilation): Document include
+	and include-relative.
+	(Eval and Environments): Dis-recommend load and load-relative.
+
 2007-04-19  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Document abstract methods,

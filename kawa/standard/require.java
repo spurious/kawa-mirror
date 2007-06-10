@@ -138,9 +138,9 @@ public class require extends Syntax
       }
     else if
       /* #ifdef use:java.lang.CharSequence */
-      // (name instanceof CharSequence)
+      (name instanceof CharSequence)
       /* #else */
-      (name instanceof String || name instanceof CharSeq)
+      // (name instanceof String || name instanceof CharSeq)
       /* #endif */
       {
         String sourceName = name.toString();
@@ -160,9 +160,9 @@ public class require extends Syntax
             name = ((Pair) args.cdr).car;
             if
               /* #ifdef use:java.lang.CharSequence */
-              // (name instanceof CharSequence)
+              (name instanceof CharSequence)
               /* #else */
-              (name instanceof String || name instanceof CharSeq)
+              // (name instanceof String || name instanceof CharSeq)
               /* #endif */
               {
                 String sourceName = name.toString();

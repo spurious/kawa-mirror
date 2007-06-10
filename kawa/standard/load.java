@@ -13,6 +13,13 @@ import java.net.URL;
 public class load extends Procedure1 {
   boolean relative;
 
+  /* #ifdef JAVA2 */
+  private static ThreadLocal currentLoadPath = new ThreadLocal();
+  /* #else */
+  // private static Location currentLoadPath =
+  //   Location.make(null, "load-path");
+  /* #endif */
+
   public load (String name, boolean relative)
   {
     super(name);
@@ -144,12 +151,12 @@ public class load extends Procedure1 {
     try
       {
 	Environment env = (Environment) arg2;
-	apply(Path.valueOf(name), env, relative, 0);
+	apply(name, env, relative, 0);
 	return Values.empty;
       }
     catch (java.io.FileNotFoundException e)
       {
-	throw new RuntimeException ("load: file not readable: " + name);
+	throw new RuntimeException ("cannot load "+e.getMessage());
       }
     catch (SyntaxException ex)
       {
@@ -158,8 +165,27 @@ public class load extends Procedure1 {
       }
   }
 
-  public static final void apply (Path path, Environment env,
+  public static final void apply (Object name, Environment env,
 				  boolean relative, int skipLines)
+    throws Throwable
+  {
+    Path savePath = (Path) currentLoadPath.get();
+    try
+      {
+        Path path = Path.valueOf(name);
+        if (relative && savePath != null)
+          path = savePath.resolve(path);
+        currentLoadPath.set(path);
+        apply(path, env, relative, skipLines);
+      }
+    finally
+      {
+        currentLoadPath.set(savePath);
+      }
+  }
+
+  private static final void apply (Path path, Environment env,
+                                   boolean relative, int skipLines)
     throws Throwable
   {
     String name = path.toString();

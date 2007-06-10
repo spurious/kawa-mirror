@@ -1,5 +1,16 @@
 2007-06-10  Per Bothner  <per@bothner.com>
 
+	Fix Savannah bug #19996 "load-relative trouble".
+	* standard/load.java (currentLoadPath): New ThreadLocal.
+	(apply): New overload to handle relative paths.
+	Make old method private.
+	(apply2): Update to use new apply.
+	* Shell.java (runFile): Likewise.
+
+	* standard/load.java (apply2): Better error message.
+
+2007-06-10  Per Bothner  <per@bothner.com>
+
 	* standard/require.java: Update PreProcess state.
 
 2007-04-27  Per Bothner  <per@bothner.com>

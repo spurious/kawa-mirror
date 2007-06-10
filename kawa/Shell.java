@@ -339,7 +339,7 @@ public class Shell
             kawa.standard.load.loadSource(in, env, null);
           }
 	else
-	  kawa.standard.load.apply(Path.valueOf(fname), env, false, skipLines);
+	  kawa.standard.load.apply(fname, env, false, skipLines);
         return true;
       }
     catch (gnu.text.SyntaxException e)

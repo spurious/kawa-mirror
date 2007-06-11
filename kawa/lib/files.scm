@@ -74,9 +74,9 @@
 ;  (filename:getLastModified))
 
 (define (delete-file (file :: filepath)) :: <void>
-  (if (not ((file:toFile):delete))
+  (if (not (file:delete))
       (primitive-throw (<java.io.IOException>:new
-			(format #f "cannot delete ~a" file)))))
+			((format #f "cannot delete ~a" file):toString)))))
 
 (define (rename-file (oldname :: filepath) (newname :: filepath))
   ((oldname:toFile):renameTo (newname:toFile)))

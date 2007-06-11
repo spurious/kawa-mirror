@@ -22,7 +22,6 @@ public class FilePath
   /** Usually the same as {@code file.toString()}.
    * One important difference: {@code isDirectory} is true
    * if {@code path} ends with the {@code '/'} or the {@code separatorChar}.
-   * (
    * The original String if constructed from a String.
    */
   String path;
@@ -122,6 +121,11 @@ public class FilePath
           }
       }
     return false;
+  }
+
+  public boolean delete ()
+  {
+    return toFile().delete();
   }
 
   public long getLastModified ()
@@ -233,7 +237,7 @@ public class FilePath
   /* #endif */
 
   /* #ifdef use:java.net.URI */
-  private static URI toURI (File file)
+  private static URI toUri (File file)
   {
     try
       {
@@ -254,11 +258,11 @@ public class FilePath
 
   }
 
-  public URI toURI ()
+  public URI toUri ()
   {
     if (this == Path.userDirPath)
       return resolve("").toURI();
-    return toURI(file);
+    return toUri(file);
   }
   /* #endif */
 

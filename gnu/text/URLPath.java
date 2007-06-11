@@ -12,7 +12,7 @@ public class URLPath extends URIPath
   URLPath (URL url)
   {
     /* #ifdef use:java.net.URI */
-    super(toURI(url));;
+    super(toUri(url));;
     /* #else */
     // super(url.toString());
     /* #endif */
@@ -69,7 +69,7 @@ public class URLPath extends URIPath
   }
 
   /* #ifdef use:java.net.URI */
-  public static URI toURI (URL url)
+  public static URI toUri (URL url)
   {
     try
       {
@@ -85,10 +85,10 @@ public class URLPath extends URIPath
       }
   }
 
-  public URI toURI () { return toURI(url); }
+  public URI toUri () { return toUri(url); }
   public String toURIString () { return url.toString(); }
   /* #else */
-  // public String toURI () { return url.toString(); }
+  // public String toUri () { return url.toString(); }
   // public String toURIString () { return uri.toString(); }
   /* #endif */
 

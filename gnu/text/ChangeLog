@@ -1,3 +1,14 @@
+2007-06-11  Per Bothner  <per@bothner.com>
+
+	* Path.java: Implement javax.tools.FileObject, but only #ifdef JAVA6.
+	(toUri): Rename from toURI, to be compatible with FileObject.
+	(toUri): Make final and deprecated.
+	(delete, openReader, openWriter, getCharContent, getName): New methods.
+	* FilePath.java (delete): New method.
+	(toURI): Rename 2 methods to toUri.
+	* URIPath.java: Rename toURI to toUri.
+	* URLPath.java: Likewise.
+
 2007-04-26  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (error): New overload, takes Throwable.

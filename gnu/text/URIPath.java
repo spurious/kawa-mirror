@@ -115,10 +115,10 @@ public class URIPath
   }
 
   /* #ifdef use:java.net.URI */
-  public URI toURI () { return uri; }
+  public URI toUri () { return uri; }
   public String toURIString () { return uri.toString(); }
   /* #else */
-  // public String toURI () { return uri; }
+  // public String toUri () { return uri; }
   // public String toURIString () { return uri; }
   /* #endif */
 

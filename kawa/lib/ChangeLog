@@ -1,3 +1,7 @@
+2007-06-11  Per Bothner  <per@bothner.com>
+
+	* files.scm (delete): Generalize since Path now has a delete method.
+
 2007-04-20  Per Bothner  <per@bothner.com>
 
 	* files.scm (make-temporary-file):  Update.

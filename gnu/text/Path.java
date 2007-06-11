@@ -9,7 +9,9 @@ import gnu.mapping.*;
 /** A generalized path/location, including File and URIs. */
 
 public abstract class Path
-// Possibly FUTURE: #ifdef JAVA6: implements javax.tools.FileObject
+/* #ifdef JAVA6 */
+// implements javax.tools.FileObject
+/* #endif */
 {
   /** This is equivalent to the System {@code "user.dir} property.
    * However, the getProperty is tracked dynamically and resolved
@@ -155,6 +157,11 @@ public abstract class Path
     return false;
   }
 
+  public boolean delete ()
+  {
+    return false;
+  }
+
   public boolean exists ()
   {
     return getLastModified() != 0;
@@ -267,11 +274,15 @@ public abstract class Path
   public abstract URL toURL ();
 
   /* #ifdef use:java.net.URI */
-  public abstract URI toURI ();
+  public abstract URI toUri ();
+  /* @deprecated */
+  public final URI toURI () { return toUri(); }
   /* #else */
-  // public String toURI () { return toURIString(); }
+  // public String toUri () { return toURIString(); }
+  // /* @deprecated */
+  // public final String toURI () { return toUri(); }
   /* #endif */
-  public String toURIString () { return toURI().toString(); }
+  public String toURIString () { return toUri().toString(); }
 
   public Path resolve (Path relative)
   {
@@ -289,6 +300,24 @@ public abstract class Path
 
   public abstract InputStream openInputStream () throws IOException;
   public abstract OutputStream openOutputStream () throws IOException;
+
+  public Reader openReader (boolean ignoreEncodingErrors) throws IOException
+  {
+    throw new UnsupportedOperationException(); // FIXME
+  }
+
+  public Writer openWriter () throws IOException
+  {
+    return new OutputStreamWriter(openOutputStream());
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence getCharContent (boolean ignoreEncodingErrors)
+    throws IOException
+  {
+    throw new UnsupportedOperationException(); // FIXME
+  }
+  /* #endif */
 
   /** Convert an absolute URI to one relatve to a given base.
    * This goes beyond java.net.URI.relativize in that if the arguments
@@ -344,6 +373,11 @@ public abstract class Path
         sbuf.append("../");
     sbuf.append(inStr);
     return sbuf.toString();
+  }
+
+  public String getName ()
+  {
+    return toString();
   }
 
   public Path getAbsolute ()

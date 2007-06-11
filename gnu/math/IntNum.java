@@ -955,13 +955,17 @@ public class IntNum extends RatNum implements Externalizable
 	  return IntNum.abs(x);
 	yval = 1;
       }
-    int len = (xval > yval ? xval : yval) + 1;
+    int len = xval > yval ? xval : yval;
     int[] xwords = new int[len];
     int[] ywords = new int[len];
     x.getAbsolute (xwords);
     y.getAbsolute (ywords);
     len = MPN.gcd (xwords, ywords, len);
     IntNum result = new IntNum (0);
+    // If the high-order bit in the result is set, the number needs one more
+    // word to make the 2^er complement positive.
+    if (xwords[len-1] < 0)
+      xwords[len++] = 0;
     result.ival = len;
     result.words = xwords;
     return result.canonicalize ();

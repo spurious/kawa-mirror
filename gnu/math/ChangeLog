@@ -1,3 +1,10 @@
+2007-06-10  Helge Dietert
+	    Per Bothner  <per@bothner.com>
+
+	* IntNum.java (gcd): If high-order bit is set, we need one more word.
+	Fixes Savannah bug# 20123 "Can't correctly divide
+	1307674368000/2874009600".
+
 2006-11-29  Per Bothner  <per@bothner.com>
 
 	* Duration.java (valueOf): Calculate seconds using long to

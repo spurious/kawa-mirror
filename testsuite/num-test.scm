@@ -1,4 +1,4 @@
-(test-begin "numbers" 1665)
+(test-begin "numbers" 1666)
 
 (test-approximate 1.4 (sqrt 2) 0.02)
 (test-error
@@ -69,6 +69,7 @@
 (test-begin "gcd")
 (test-eqv 3 (gcd 4294967295 3))
 (test-eqv 3 (gcd 4294967298 3))
+(test-eqv 2874009600 (gcd 1307674368000 2874009600))
 (test-end "gcd")
 
 (test-begin "logop")

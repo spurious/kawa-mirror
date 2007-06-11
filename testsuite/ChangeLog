@@ -1,3 +1,8 @@
+2007-06-10  Helge Dietert
+
+	* num-test.scm: add test for Savannah bug# 20123
+	"Can't correctly divide 1307674368000/2874009600".
+
 2007-03-01  Chris Wegrzyn <chris.wegrzyn@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

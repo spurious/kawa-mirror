@@ -1139,6 +1139,8 @@ public class Scheme extends LispLanguage
                     if (! Character.isLetter(ch))
                       {
                         unitEnd = i - 1;
+                        if (unitEnd == unitStart)
+                          break tryQuantity;
                         break;
                       }
                     if (i == len)

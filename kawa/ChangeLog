@@ -1,5 +1,11 @@
 2007-06-10  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (checkDefaultBinding): Fix infinite loop
+	when looking for missing unit.
+	Fixes Savannah bug #19991: '1_' causes OutOfMemoryError in interpreter.
+
+2007-06-10  Per Bothner  <per@bothner.com>
+
 	Fix Savannah bug #19996 "load-relative trouble".
 	* standard/load.java (currentLoadPath): New ThreadLocal.
 	(apply): New overload to handle relative paths.

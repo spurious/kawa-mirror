@@ -1,3 +1,8 @@
+2007-06-20  Thomas Kirk  <tk@research.att.com>
+
+	* IntNum.java (readExternal): Fix logic error.
+	Fixes Sqavannah bug #20213: "fix for gnu.math.IntNum serialization".
+
 2007-06-10  Helge Dietert
 	    Per Bothner  <per@bothner.com>
 

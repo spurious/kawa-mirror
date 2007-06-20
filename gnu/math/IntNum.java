@@ -1558,7 +1558,7 @@ public class IntNum extends RatNum implements Externalizable
     throws IOException, ClassNotFoundException
   {
     int i = in.readInt();
-    if (ival <= (int) 0xC0000000)
+    if (i <= (int) 0xC0000000)
       {
 	i &= 0x7fffffff;
 	if (i == 1)

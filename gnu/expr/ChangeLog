@@ -1,5 +1,7 @@
 2007-09-02  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (setTypeExp): Recognize a quoted Class.
+
 	* Declaration.java (printInto): Add some commented-out debug printing.
 
 2007-06-10  Per Bothner  <per@bothner.com>

@@ -70,13 +70,21 @@ public class Declaration
   public final void setTypeExp (Expression typeExp)
   {
     this.typeExp = typeExp;
-    Object typeValue;
-    Type t = (typeExp instanceof QuoteExp
-              && (typeValue = ((QuoteExp) typeExp).getValue()) instanceof Type
-              ? (Type) typeValue
-              : typeExp instanceof TypeValue
-              ? ((TypeValue) typeExp).getImplementationType()
-              : (Type) Type.pointer_type);
+    Type t;
+    if (typeExp instanceof TypeValue)
+      t = ((TypeValue) typeExp).getImplementationType();
+    else if (typeExp instanceof QuoteExp)
+      {
+        Object typeValue = ((QuoteExp) typeExp).getValue();
+        if (typeValue instanceof Type)
+          t = (Type) typeValue;
+        else if (typeValue instanceof Class)
+          t = Type.make((Class) typeValue);
+        else
+          t = Type.pointer_type;
+      }
+    else
+      t = Type.pointer_type;
     this.type = t;
     if (var != null) var.setType(t);
   }

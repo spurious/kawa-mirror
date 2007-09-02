@@ -31,20 +31,20 @@
 	 (static-field <java.awt.Color> (*:toString value)))))
 
 (define-private (button-keyword (button :: <gnu.kawa.models.Button>)
-				(name :: <java.lang.String>)
+				(name :: <java.lang.String>) ; Assumed interned
 				value)
-  (cond ((eq? name 'foreground)
+  (cond ((eq? name "foreground")
 	  (*:setForeground button (as-color value)))
-	((eq? name 'background)
+	((eq? name "background")
 	 (*:setBackground button (as-color value)))
 	;((eq? name 'width) (*:setWidth button (extent value)))
-	((eq? name 'action)
+	((eq? name "action")
 	 (*:setAction button value))
-	;((eq? name 'image)
+	;((equal? name "image")
 	;#t) ;; not implemented
-	((eq? name 'text)
+	((eq? name "text")
 	 (*:setText button value))
-	((eq? name 'disabled)
+	((eq? name "disabled")
 	 (*:setDisabled button value))	 
 	(else (error (format "unknown button attribute ~s" name)))))
 
@@ -156,13 +156,13 @@
   (*:setContent window pane))
 
 (define-private (window-keyword (instance :: <gnu.kawa.models.Window>)
-				(name :: <java.lang.String>)
+				(name :: <java.lang.String>) ; Assumed interned
 				value)
-  (cond ((eq? name 'title)
+  (cond ((eq? name "title")
 	  (*:setTitle instance value))
-	((eq? name 'content)
+	((eq? name '"content")
 	 (*:setContent instance value))
-	((eq? name 'menubar)
+	((eq? name "menubar")
 	 (*:setMenuBar instance value))
 	(else (error (format "unknown window attribute ~s" name)))))
 

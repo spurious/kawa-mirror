@@ -1,3 +1,8 @@
+2007-09-02  Per Bothner  <per@bothner.com>
+
+	* gui.scm (button-keyword, window-keyword):  The java.lang.String
+	parameter is now a String string, not a symbol.
+
 2007-02-27  Per Bothner  <per@bothner.com>
 
 	* testing.scm (%test-error): Need separate Kawa case for exception

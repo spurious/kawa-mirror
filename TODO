@@ -1,4 +1,5 @@
 HIGH PRIORITY:
+* compile-file doesn't display warnings
 * When deferring imports (require) the 'run' actions shouldn't be deferred. FIXME
 * Optimize and/or in the case of ConditionalTarget or <boolean> target.
 * properties of symbols

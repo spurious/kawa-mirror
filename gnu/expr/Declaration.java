@@ -780,6 +780,17 @@ public class Declaration
   public void printInfo(StringBuffer sbuf)
   {
     sbuf.append(symbol);
+    if (true || // DEBUGGING
+        symbol == null)
+      ;
+    else if (symbol instanceof SimpleSymbol)
+      sbuf.append("[simple-symbol]");
+    else if (symbol instanceof Symbol)
+      sbuf.append("[symbol]");
+    else if (symbol.toString().intern() == symbol)
+      sbuf.append("[interned-string]");
+    else if (symbol instanceof String)
+      sbuf.append("[noninterned-string]");
     sbuf.append('/');
     sbuf.append(id);
     /*

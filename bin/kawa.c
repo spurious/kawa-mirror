@@ -525,7 +525,7 @@ main(int argc, char** argv)
   putenv (get_classpath(argv[0]));
 #endif
 
-  if (! isatty(0))
+  if (! isatty(0) || ! isatty(1))
     {
       out_argv[out_argc++] = "--no-prompt";
       for (i = 1;  i < argc;  i++)

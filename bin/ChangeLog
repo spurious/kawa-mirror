@@ -1,3 +1,8 @@
+2007-09-02  Per Bothner  <per@bothner.com>
+
+	* kawa.c (main): Skip readline-handling if stdout (or stdin)
+	isn't a tty, for example if re-directing output to a file.
+
 2007-03-11  Per Bothner  <per@bothner.com>
 
 	* kawa.c (sig_child): Exit with status from inferior.

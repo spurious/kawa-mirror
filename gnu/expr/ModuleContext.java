@@ -57,6 +57,11 @@ public class ModuleContext
     return findInstance(clas);
   }
 
+  public Object searchInstance (Class clas)
+  {
+    return table.get(clas);
+  }
+
   public Object findInstance (Class clas)
   {
     Object inst = table.get(clas);

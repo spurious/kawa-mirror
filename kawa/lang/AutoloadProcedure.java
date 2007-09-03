@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
+import gnu.kawa.reflect.ClassMemberLocation;
 
 /**
  * Implement autoloading of Procedures.
@@ -15,7 +16,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
    * It must be the name of a class in the CLASSPATH (for example:
    * "kawa.standard.list"), and the class must extend Procedure,
    * and have a default constructor.
-   * If the Procedure is a ModuleMody, apply0() is applied,
+   * If the Procedure is a ModuleBody, apply0() is applied,
    * and that is expected to define the Procedure in the global environment. */
   String className;
 
@@ -71,34 +72,78 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 				+ (name == null ? "" : name.toString ()));
   }
 
+  static final Class classModuleBody;
+  static {
+    /* #ifdef JAVA5 */
+    classModuleBody = gnu.expr.ModuleBody.class;
+    /* #else */
+    // try { classModuleBody = Class.forName("gnu.expr.ModuleBody"); }
+    // catch (Throwable ex) { throw new Error(ex); }
+    /* #endif */
+  }
+
   /** Load the class named in className. */
   void load ()
   {
     Object name = this.getSymbol();
+    Language lang = this.language;
+    if (lang == null)
+      lang = Language.getDefaultLanguage();
+    Environment env = lang.getLangEnvironment();
+    // Should use something like isFunctionBound FIXME
+    Symbol sym = (name instanceof Symbol ? (Symbol) name
+                  : env.getSymbol(name.toString()));
     try
       {
-	loaded = (Procedure) Class.forName (className).newInstance ();
-	if (loaded == this)
-	  throw_error("circularity detected");
-	if (name != null)
-	  {
-	    try
-	      {
-		Object property = (language.hasSeparateFunctionNamespace()
-				   ? EnvironmentKey.FUNCTION
-				   : null);
-		// Should use something like isFunctionBound FIXME
-		Environment env = language.getLangEnvironment();
-		Symbol sym = (name instanceof Symbol ? (Symbol) name
-			      : env.getSymbol(name.toString()));
-		env.put(sym, property, loaded);
-	      }
-	    catch (UnboundLocationException ex)
-	      {
-	      }
-	    if (loaded.getSymbol() == null)
-	      loaded.setSymbol(name);
-	  }
+        Class procClass = Class.forName(className);
+        if (classModuleBody.isAssignableFrom(procClass))
+          {
+            ModuleContext context = ModuleContext.getContext();
+            Object mod = context.searchInstance(procClass);
+            if (mod == null)
+              {
+                try
+                  {
+                    mod = procClass.getDeclaredField("$instance").get(null);
+                  }
+                catch (NoSuchFieldException ex)
+                  {
+                    // Not a static module - create a new instance.
+                    mod = procClass.newInstance();
+                  }
+                ClassMemberLocation.defineAll(mod, lang, env);
+                if (mod instanceof ModuleBody)
+                  ((ModuleBody)mod).run();
+
+              }
+            Object value = env.getFunction(sym, null);
+            if (value == null
+                || !(value instanceof Procedure))
+              throw_error
+                ("invalid ModuleBody class - does not define " + name);
+            loaded = (Procedure) value;
+          }
+        else
+          {
+            loaded = (Procedure) procClass.newInstance ();
+            if (loaded == this)
+              throw_error("circularity detected");
+            if (name != null)
+              {
+                try
+                  {
+                    Object property = (lang.hasSeparateFunctionNamespace()
+                                       ? EnvironmentKey.FUNCTION
+                                       : null);
+                    env.put(sym, property, loaded);
+                  }
+                catch (UnboundLocationException ex)
+                  {
+                  }
+              }
+          }
+        if (name != null && loaded.getSymbol() == null)
+          loaded.setSymbol(name);
       }
     catch (ClassNotFoundException ex)
       {	throw_error ("failed to find class "); }

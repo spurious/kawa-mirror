@@ -1,5 +1,7 @@
 2007-09-02  Per Bothner  <per@bothner.com>
 
+	* ModuleContext.java (searchInstance): New method.
+
 	* Declaration.java (setTypeExp): Recognize a quoted Class.
 
 	* Declaration.java (printInto): Add some commented-out debug printing.

@@ -1,3 +1,8 @@
+2007-09-02  Per Bothner  <per@bothner.com>
+
+	* lang/AutoloadProcedure.java (load): Restore and fix support for
+	class naming a ModuleBody - needed for elisp autoloads.
+
 2007-06-10  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (checkDefaultBinding): Fix infinite loop

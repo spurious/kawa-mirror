@@ -1,3 +1,7 @@
+2007-09-02  Oliver Flasch <oliver.flasch@cs.uni-dortmund.de>
+
+	* XmlNamespace.java (make): New static methods.
+
 2007-04-03  Per Bothner  <per@bothner.com>
 
 	* Document.java (parse(Object)): Adjust index for BEGIN_ENTITY_SIZE.

@@ -28,6 +28,12 @@ public class XmlNamespace extends Namespace
       }
   }
 
+  /** Emitted by compiler to handle literals. */
+  public static XmlNamespace make (String prefix, String name)
+  {
+    return getInstance(prefix, name);
+  }
+
   public Object get (String name)
   {
     ElementType type = ElementType.make(getSymbol(name));

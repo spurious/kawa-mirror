@@ -1171,7 +1171,8 @@ public class PrettyWriter extends java.io.Writer
       {
 	throw new RuntimeException(ex.toString());
       }
-    bufferStartColumn += count;
+    bufferFillPointer = count; // For the sake of the following:
+    bufferStartColumn = getColumnNumber();
     System.arraycopy(buffer, count, buffer, 0, newFillPtr);
     bufferFillPointer = newFillPtr;
     bufferOffset += count;

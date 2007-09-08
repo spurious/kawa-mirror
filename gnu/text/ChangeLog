@@ -1,3 +1,9 @@
+2007-09-07  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (outputPartialLine): Fix setting of
+	bufferStartColumn - needed when not pretty-printing, since in that
+	case the buffer may contain newlines.
+
 2007-06-11  Per Bothner  <per@bothner.com>
 
 	* Path.java: Implement javax.tools.FileObject, but only #ifdef JAVA6.

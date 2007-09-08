@@ -142,7 +142,7 @@ public class LineBufferedReader extends Reader
   /** A hook to allow sub-classes to perform some action at start of line.
     * Called just before the first character of the new line is read.
     * @param revisited true if we have read here before (i.e.
-    *   we did a reset of unread() to get here)
+    *   we did a reset or unread() to get here)
     */
   public void lineStart (boolean revisited) throws java.io.IOException
   {

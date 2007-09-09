@@ -31,4 +31,9 @@ class GuiInPort extends TtyInPort
 	buffer.enter();
       }
   }
+
+  public void emitPrompt (String prompt) throws java.io.IOException
+  {
+    buffer.write(prompt, MessageArea.promptStyle);
+  }
 }

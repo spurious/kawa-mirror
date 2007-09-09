@@ -3,6 +3,12 @@ package kawa;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import gnu.text.Path;
+import gnu.mapping.*;
+import gnu.kawa.swingviews.SwingContent;
 
 /** Simple TextArea that always scrolls to the bottom.  Also creates an
  * out and err PrintWriter so that you can redirect stdout/stderr to
@@ -10,16 +16,43 @@ import java.awt.event.*;
  *
  * @author 	Albert Ting
  */
-public class MessageArea extends TextArea
-  implements KeyListener, TextListener {
-  private kawa.TextAreaWriter out_stream;
-  private PrintWriter out;
-  private PrintWriter err;
+public class MessageArea extends JTextPane
+  implements KeyListener, DocumentListener {
+  private kawa.TextAreaWriter out_stream, err_stream;
   gnu.text.QueueReader in;
+  StyledDocument document;
 
   public int outputMark = 0;
   public int endMark = -1;
   int length = 0;
+
+  public static javax.swing.text.StyleContext styles
+  = new javax.swing.text.StyleContext();
+  static public Style defaultStyle = styles.addStyle("default",null);
+  public static Style inputStyle = styles.addStyle("input", null);
+  public static Style redStyle = styles.addStyle("red", null);
+  static Style blueStyle = styles.addStyle("blue", null);
+  static Style promptStyle = styles.addStyle("prompt", null);
+  static {
+    StyleConstants.setForeground(redStyle, Color.red);
+    StyleConstants.setForeground(blueStyle, Color.blue);
+    StyleConstants.setForeground(promptStyle, Color.green);
+    StyleConstants.setBold(inputStyle, true);
+  }
+
+  private MessageArea(gnu.text.QueueReader in, SwingContent content)
+  {
+    super(new DefaultStyledDocument(content, styles));
+    document = (StyledDocument) getDocument();
+
+    this.in = in;
+
+    out_stream = new kawa.TextAreaWriter(this, "/dev/stdout", defaultStyle);
+    err_stream = new kawa.TextAreaWriter(this, "/dev/stderr", redStyle);
+
+    addKeyListener(this);
+    document.addDocumentListener(this);
+  }
 
   /**
    * simple TextArea that always scrolls to the bottom.  Also creates an
@@ -27,22 +60,14 @@ public class MessageArea extends TextArea
    * these streams, using the System.setOut/setErr methods.
    */
   public MessageArea(gnu.text.QueueReader in) {
-    super();
-
-    this.in = in;
-
-    out_stream = new kawa.TextAreaWriter(this);
-    kawa.TextAreaWriter err_stream = new kawa.TextAreaWriter(this);
-    out = new PrintWriter(out_stream);
-    err = new PrintWriter(err_stream);
-
-    addKeyListener(this);
-    addTextListener(this);
+    this(in, new gnu.kawa.swingviews.SwingContent());
   }
 
   void enter ()
   {
 	int pos = getCaretPosition();
+        // FIXME getText is wasteful.  We can do something smarter
+        // since we have access to SwingContent internals.
 	String str = getText();
 	int len = str.length();
 	if (len != length) {
@@ -52,7 +77,7 @@ public class MessageArea extends TextArea
 	if (pos >= outputMark) {
 	  int lineAfter = str.indexOf('\n', outputMark);
 	  if (lineAfter < 0) {
-	    append("\n");
+            insertString(len, "\n", null);
             str = str.substring(outputMark, len)+'\n';
             lineAfter = len;
 	  }
@@ -61,18 +86,22 @@ public class MessageArea extends TextArea
             str = str.substring(outputMark, lineAfter+1);
           }
 	  outputMark = lineAfter+1;
+          setCaretPosition(outputMark);
 	}
 	else {
           int lineBefore = pos == 0 ? 0 : 1 + str.lastIndexOf('\n', pos-1);
+          Element el = document.getCharacterElement(lineBefore);
           int lineAfter = str.indexOf('\n', pos);
+          // Strip initial prompt:
+          if (el.getAttributes().isEqual(promptStyle))
+            lineBefore = el.getEndOffset();
           if (lineAfter < 0)
             str = str.substring(lineBefore, len)+'\n';
           else
             str = str.substring(lineBefore, lineAfter+1);
-	  out_stream.write(str);
+          setCaretPosition(outputMark);
+          write(str, inputStyle);
 	}
-
-	setCaretPosition(outputMark);
 
 	if (in != null) {
 	  in.append(str);
@@ -90,12 +119,49 @@ public class MessageArea extends TextArea
   public void keyReleased(KeyEvent e) {
   }
 
-  public void keyTyped(KeyEvent e) {
+  public MutableAttributeSet getInputAttributes() {
+    return inputStyle;
   }
 
-  public synchronized void write (String str) {
+  protected void insertString(int pos, String str, AttributeSet style)
+  {
+    try
+      {
+        document.insertString(pos, str, style);
+      }
+    catch (BadLocationException ex)
+      {
+        /* #ifdef use:java.lang.Throwable.getCause */
+        throw new Error(ex);
+        /* #else */
+        // throw new WrappedException(ex);
+        /* #endif */
+      }
+  }
+
+  public void keyTyped(KeyEvent e) {
+    char ch = e.getKeyChar();
+    /* // Perhaps cleaner than using keyPressed for enter?
+    if (ch == KeyEvent.VK_ENTER)
+      {
+        enter();
+        e.consume();
+      }
+    else
+    */
+    if (ch >= ' ' && ch != 127)
+      {
+        int pos = getCaretPosition();
+        char[] chs = { ch };
+        insertString(pos, new String(chs), inputStyle);
+        setCaretPosition(pos+1);
+        e.consume();
+      }
+  }
+
+  public synchronized void write (String str, AttributeSet style) {
     boolean moveCaret = getCaretPosition() == outputMark;
-    insert(str, outputMark);
+    insertString(outputMark, str, style);
     int len = str.length();
     outputMark += len;
     if (moveCaret)
@@ -104,20 +170,45 @@ public class MessageArea extends TextArea
       endMark += len;
   }
 
+  public synchronized void write (Component c)
+  {
+    MutableAttributeSet style = new SimpleAttributeSet();
+    StyleConstants.setComponent(style, c);
+    write(" ", style);
+  }
+
   /** Delete old text, prior to line containing outputMark. */
 
-  public synchronized void deleteOldText () {
+  public synchronized void deleteOldText ()
+  {
     String str = getText();
     int lineBefore = (outputMark <= 0 ? 0
 		      : (str.lastIndexOf('\n', outputMark-1)) + 1);
-    setCaretPosition(outputMark);
-    replaceRange("", 0, lineBefore);
+    try
+      {
+        document.remove(0, lineBefore);
+        outputMark -= lineBefore;
+        setCaretPosition(outputMark);
+        if (endMark > 0)
+          endMark -= lineBefore;
+      }
+    catch (BadLocationException ex)
+      {
+        /* #ifdef use:java.lang.Throwable.getCause */
+        throw new Error(ex);
+        /* #else */
+        // throw new WrappedException(ex);
+        /* #endif */
+      }
   }
 
-  public synchronized void textValueChanged (TextEvent e) {
+  public void changedUpdate (DocumentEvent e) { textValueChanged(e); }
+  public void insertUpdate (DocumentEvent e) { textValueChanged(e); }
+  public void removeUpdate (DocumentEvent e) { textValueChanged(e); }
+
+  public synchronized void textValueChanged (DocumentEvent e) {
     int pos = getCaretPosition();
-    String text = getText();
-    int delta = text.length() - length;
+    int delta = document.getLength() - length;
     length += delta;
     if (pos < outputMark)
       outputMark += delta;
@@ -132,11 +223,11 @@ public class MessageArea extends TextArea
       }
   }
 
-  public PrintWriter getStdout() {
-    return out;
+  public OutPort getStdout() {
+    return out_stream;
   }
-  public PrintWriter getStderr() {
-    return err;
+  public OutPort getStderr() {
+    return err_stream;
   }
 
 }

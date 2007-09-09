@@ -1,10 +1,10 @@
 package kawa;
 
 import java.awt.*;
+import javax.swing.*;
 import java.awt.event.*;
 import gnu.mapping.*;
 import gnu.text.Path;
-
 import gnu.expr.Language;
 import kawa.standard.Scheme;
 
@@ -13,7 +13,7 @@ import kawa.standard.Scheme;
   * @author Per Bothner (extensive changes).
   */
 
-public class GuiConsole extends Frame implements ActionListener {
+public class GuiConsole extends JFrame implements ActionListener {
   private static String CLOSE = "Close";
   private static String EXIT = "Exit";
   private static String NEW = "New";
@@ -27,8 +27,6 @@ public class GuiConsole extends Frame implements ActionListener {
   Future thread;
 
   gnu.text.QueueReader in_r;
-  OutPort out_p, err_p;
-
   MessageArea message = null;
 
   public static void main(String[] args) {
@@ -50,17 +48,14 @@ public class GuiConsole extends Frame implements ActionListener {
     message = new MessageArea(in_r);
     window_number++;
     kawa.repl.exitIncrement();
-
-    out_p = new OutPort(message.getStdout(), true,
-                        Path.valueOf("<msg_stdout>"));
-    err_p = new OutPort(message.getStderr(), true,
-                        Path.valueOf("<msg_stderr>"));
-    InPort in_p = new GuiInPort(in_r, Path.valueOf("<msg_stdin>"),
+    OutPort out_p = message.getStdout();
+    OutPort err_p = message.getStderr();
+    InPort in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
                                 out_p, message);
 
     this.setLayout(new BorderLayout(0,0));
 
-    this.add("Center",message);
+    this.add("Center", new JScrollPane(message));
 
     setupMenus();
     //pack();
@@ -136,7 +131,8 @@ public class GuiConsole extends Frame implements ActionListener {
     this.setMenuBar(menubar);
   }
 
-  public void actionPerformed(ActionEvent e) {
+  public void actionPerformed(ActionEvent e)
+  {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))

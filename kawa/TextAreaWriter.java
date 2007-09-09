@@ -1,20 +1,52 @@
 package kawa;
+import javax.swing.*;
+import javax.swing.text.*;
+import gnu.mapping.*;
+import gnu.text.Path;
 
 /** A Writer that appends its output to a TextArea.
   * Based on code from Albert L. Ting" <alt@artisan.com>.
   */
 
-public class TextAreaWriter extends java.io. Writer
+public class TextAreaWriter extends OutPort
 {
-  java.awt.TextArea area;
+  MessageArea area;
+  AttributeSet style;
   String str="";
 
-  public TextAreaWriter (java.awt.TextArea area)
+  public TextAreaWriter (MessageArea area, String path, AttributeSet style)
   {
+    super(new TextPaneWriter(area, style), true, true, Path.valueOf(path));
     this.area = area;
+    this.style = style;
   }
 
-  public synchronized void write(int x)
+  public void print(Object v)
+  {
+    if (v instanceof java.awt.Component)
+      {
+        flush();
+        area.write((java.awt.Component) v);
+        setColumnNumber(1); // So freshline will Do The Right Thing.
+      }
+    else
+      super.print(v);
+  }
+}
+
+class TextPaneWriter extends java.io.Writer
+{
+  MessageArea area;
+  AttributeSet style;
+  String str="";
+
+  public TextPaneWriter (MessageArea area, AttributeSet style)
+  {
+    this.area = area;
+    this.style = style;
+  }
+
+  public synchronized void write (int x)
   {
     str = str + (char) x;
     if (x == '\n')
@@ -23,13 +55,7 @@ public class TextAreaWriter extends java.io. Writer
 
   public void write (String str)
   {
-    if (area instanceof MessageArea)
-      {
-	MessageArea msg = (MessageArea) area;
-	msg.write(str);
-      }
-    else
-      area.append(str);
+    area.write(str, style);
   }
 
   public synchronized void write (char[] data, int off, int len)
@@ -40,10 +66,11 @@ public class TextAreaWriter extends java.io. Writer
 
   public synchronized void flush()
   {
-    if (! str.equals(""))
+    String s = str;
+    if (! s.equals(""))
       {
-	write(str);
-	str = "";
+        str = "";
+	write(s);
       }
   }
 

@@ -1,3 +1,14 @@
+2007-09-08  Per Bothner  <per@bothner.com>
+
+	Convent -w flag to create Swing JTextPane rather than AWT TextArea.
+	* GuiConsole.java: Change to extend JFrame rather than Frame.
+	* TextAreaWriter.java: Extend OutPort rather than Writer.
+	(print): New method, to handle "writing" Components.
+	(class TextPaneWriter): New class, extends Writer.
+	* MessageArea.java: Extend JTextPane rather than TextArea.
+	Use various styles.
+	* GuiInPort.java (emitPrompt): New method.
+
 2007-09-02  Per Bothner  <per@bothner.com>
 
 	* lang/AutoloadProcedure.java (load): Restore and fix support for

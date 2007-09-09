@@ -10,15 +10,15 @@ import gnu.text.Path;
 import gnu.mapping.*;
 import gnu.kawa.swingviews.SwingContent;
 
-/** Simple TextArea that always scrolls to the bottom.  Also creates an
+/** A JTextPane for a read-eval-print-loop.  Also creates an
  * out and err PrintWriter so that you can redirect stdout/stderr to
  * these streams, using the System.setOut/setErr methods.
  *
  * @author 	Albert Ting
  */
-public class MessageArea extends JTextPane
+public class ReplPane extends JTextPane
   implements KeyListener, DocumentListener {
-  private kawa.TextAreaWriter out_stream, err_stream;
+  private ReplPaneOutPort out_stream, err_stream;
   gnu.text.QueueReader in;
   StyledDocument document;
 
@@ -40,15 +40,15 @@ public class MessageArea extends JTextPane
     StyleConstants.setBold(inputStyle, true);
   }
 
-  private MessageArea(gnu.text.QueueReader in, SwingContent content)
+  private ReplPane(gnu.text.QueueReader in, SwingContent content)
   {
     super(new DefaultStyledDocument(content, styles));
     document = (StyledDocument) getDocument();
 
     this.in = in;
 
-    out_stream = new kawa.TextAreaWriter(this, "/dev/stdout", defaultStyle);
-    err_stream = new kawa.TextAreaWriter(this, "/dev/stderr", redStyle);
+    out_stream = new ReplPaneOutPort(this, "/dev/stdout", defaultStyle);
+    err_stream = new ReplPaneOutPort(this, "/dev/stderr", redStyle);
 
     addKeyListener(this);
     document.addDocumentListener(this);
@@ -59,7 +59,7 @@ public class MessageArea extends JTextPane
    * out and err PrintWriter so that you can redirect stdout/stderr to
    * these streams, using the System.setOut/setErr methods.
    */
-  public MessageArea(gnu.text.QueueReader in) {
+  public ReplPane (gnu.text.QueueReader in) {
     this(in, new gnu.kawa.swingviews.SwingContent());
   }
 

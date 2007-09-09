@@ -27,7 +27,7 @@ public class GuiConsole extends JFrame implements ActionListener {
   Future thread;
 
   gnu.text.QueueReader in_r;
-  MessageArea message = null;
+  ReplPane message = null;
 
   public static void main(String[] args) {
     Language language = Scheme.getInstance();
@@ -45,7 +45,7 @@ public class GuiConsole extends JFrame implements ActionListener {
     this.language = language;
 
     in_r = new gnu.text.QueueReader ();
-    message = new MessageArea(in_r);
+    message = new ReplPane(in_r);
     window_number++;
     kawa.repl.exitIncrement();
     OutPort out_p = message.getStdout();

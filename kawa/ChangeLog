@@ -1,5 +1,9 @@
 2007-09-08  Per Bothner  <per@bothner.com>
 
+	* MessageArea.java: Rename to ReplPane.java.
+	* TextAreaWriter.java: Rename to ReplPaneOutPort.java.
+	* GuiConsole.java, GuiInPort.java, Makefile.am: Update accordingly.
+
 	Convent -w flag to create Swing JTextPane rather than AWT TextArea.
 	* GuiConsole.java: Change to extend JFrame rather than Frame.
 	* TextAreaWriter.java: Extend OutPort rather than Writer.

@@ -4,17 +4,17 @@ import javax.swing.text.*;
 import gnu.mapping.*;
 import gnu.text.Path;
 
-/** A Writer that appends its output to a TextArea.
+/** A Writer that appends its output to a ReplPane.
   * Based on code from Albert L. Ting" <alt@artisan.com>.
   */
 
-public class TextAreaWriter extends OutPort
+public class ReplPaneOutPort extends OutPort
 {
-  MessageArea area;
+  ReplPane area;
   AttributeSet style;
   String str="";
 
-  public TextAreaWriter (MessageArea area, String path, AttributeSet style)
+  public ReplPaneOutPort (ReplPane area, String path, AttributeSet style)
   {
     super(new TextPaneWriter(area, style), true, true, Path.valueOf(path));
     this.area = area;
@@ -36,11 +36,11 @@ public class TextAreaWriter extends OutPort
 
 class TextPaneWriter extends java.io.Writer
 {
-  MessageArea area;
+  ReplPane area;
   AttributeSet style;
   String str="";
 
-  public TextPaneWriter (MessageArea area, AttributeSet style)
+  public TextPaneWriter (ReplPane area, AttributeSet style)
   {
     this.area = area;
     this.style = style;

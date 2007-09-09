@@ -4,14 +4,14 @@ import java.io.Reader;
 import gnu.mapping.*;
 import gnu.text.Path;
 
-/** A TtyInPort that reads from a MessageArea.
+/** A TtyInPort that reads from a ReplPane.
   */
 
 class GuiInPort extends TtyInPort
 {
-  MessageArea buffer;
+  ReplPane buffer;
 
-  public GuiInPort (Reader in, Path path, OutPort tie, MessageArea buffer)
+  public GuiInPort (Reader in, Path path, OutPort tie, ReplPane buffer)
   {
     super (in, path, tie);
     this.buffer = buffer;
@@ -34,6 +34,6 @@ class GuiInPort extends TtyInPort
 
   public void emitPrompt (String prompt) throws java.io.IOException
   {
-    buffer.write(prompt, MessageArea.promptStyle);
+    buffer.write(prompt, ReplPane.promptStyle);
   }
 }

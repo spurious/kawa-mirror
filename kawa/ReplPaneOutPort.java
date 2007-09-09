@@ -1,8 +1,12 @@
 package kawa;
+import java.awt.Component;
 import javax.swing.*;
 import javax.swing.text.*;
 import gnu.mapping.*;
 import gnu.text.Path;
+import gnu.kawa.models.Paintable;
+import gnu.kawa.models.Viewable;
+import gnu.kawa.swingviews.SwingDisplay;
 
 /** A Writer that appends its output to a ReplPane.
   * Based on code from Albert L. Ting" <alt@artisan.com>.
@@ -10,24 +14,45 @@ import gnu.text.Path;
 
 public class ReplPaneOutPort extends OutPort
 {
-  ReplPane area;
+  ReplPane pane;
   AttributeSet style;
   String str="";
 
-  public ReplPaneOutPort (ReplPane area, String path, AttributeSet style)
+  public ReplPaneOutPort (ReplPane pane, String path, AttributeSet style)
   {
-    super(new TextPaneWriter(area, style), true, true, Path.valueOf(path));
-    this.area = area;
+    super(new TextPaneWriter(pane, style), true, true, Path.valueOf(path));
+    this.pane = pane;
     this.style = style;
+  }
+
+  public synchronized void write (Component c)
+  {
+    MutableAttributeSet style = new SimpleAttributeSet();
+    StyleConstants.setComponent(style, c);
+    pane.write(" ", style);
+    setColumnNumber(1); // So freshline will Do The Right Thing.
   }
 
   public void print(Object v)
   {
-    if (v instanceof java.awt.Component)
+    if (v instanceof Component)
       {
         flush();
-        area.write((java.awt.Component) v);
-        setColumnNumber(1); // So freshline will Do The Right Thing.
+        write((Component) v);
+      }
+    else if (v instanceof Paintable)
+      {
+        flush();
+        JPanel panel = new gnu.kawa.swingviews.SwingPaintable((Paintable) v);
+        write((java.awt.Component) panel);
+      }
+    else if (v instanceof Viewable)
+      {
+        flush();
+        JPanel panel = new JPanel();
+        panel.setBackground(pane.getBackground());
+        write((java.awt.Component) panel);
+        ((Viewable) v).makeView(SwingDisplay.getInstance(), panel);
       }
     else
       super.print(v);
@@ -36,13 +61,13 @@ public class ReplPaneOutPort extends OutPort
 
 class TextPaneWriter extends java.io.Writer
 {
-  ReplPane area;
+  ReplPane pane;
   AttributeSet style;
   String str="";
 
-  public TextPaneWriter (ReplPane area, AttributeSet style)
+  public TextPaneWriter (ReplPane pane, AttributeSet style)
   {
-    this.area = area;
+    this.pane = pane;
     this.style = style;
   }
 
@@ -55,7 +80,7 @@ class TextPaneWriter extends java.io.Writer
 
   public void write (String str)
   {
-    area.write(str, style);
+    pane.write(str, style);
   }
 
   public synchronized void write (char[] data, int off, int len)

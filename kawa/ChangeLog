@@ -1,5 +1,9 @@
 2007-09-08  Per Bothner  <per@bothner.com>
 
+	* ReplPane.java (write): Move to ReplPaneOutPort.
+	* ReplPaneOutPort.java (area): Rename field to pane.
+	(print): Add support for Viewable and Paintable.
+
 	* MessageArea.java: Rename to ReplPane.java.
 	* TextAreaWriter.java: Rename to ReplPaneOutPort.java.
 	* GuiConsole.java, GuiInPort.java, Makefile.am: Update accordingly.

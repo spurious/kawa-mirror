@@ -26,6 +26,8 @@ public class ReplPane extends JTextPane
   public int endMark = -1;
   int length = 0;
 
+  //public static javax.swing.text.html.StyleSheet styles
+  // = new javax.swing.text.html.StyleSheet();
   public static javax.swing.text.StyleContext styles
   = new javax.swing.text.StyleContext();
   static public Style defaultStyle = styles.addStyle("default",null);
@@ -42,6 +44,7 @@ public class ReplPane extends JTextPane
 
   private ReplPane(gnu.text.QueueReader in, SwingContent content)
   {
+    //super(new javax.swing.text.html.HTMLDocument(content, styles));
     super(new DefaultStyledDocument(content, styles));
     document = (StyledDocument) getDocument();
 
@@ -168,13 +171,6 @@ public class ReplPane extends JTextPane
       setCaretPosition(outputMark);
     if (endMark >= 0)
       endMark += len;
-  }
-
-  public synchronized void write (Component c)
-  {
-    MutableAttributeSet style = new SimpleAttributeSet();
-    StyleConstants.setComponent(style, c);
-    write(" ", style);
   }
 
   /** Delete old text, prior to line containing outputMark. */

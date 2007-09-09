@@ -49,11 +49,19 @@ public class TtyInPort extends InPort
     return count;
   }
 
+  public void emitPrompt (String prompt) throws java.io.IOException
+  {
+    tie.print(prompt);
+    tie.flush();
+    tie.clearBuffer();
+  }
+
   public void lineStart (boolean revisited) throws java.io.IOException
   {
     if (! revisited)
       {
-        tie.freshLine();
+        if (tie != null)
+          tie.freshLine();
         if (prompter != null)
           {
             try
@@ -64,9 +72,7 @@ public class TtyInPort extends InPort
                     String string = prompt.toString();
                     if (string != null && string.length() > 0)
                       {
-                        tie.print(string);
-                        tie.flush();
-                        tie.clearBuffer();
+                        emitPrompt(string);
                         promptEmitted = true;
                       }
                   }

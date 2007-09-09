@@ -156,37 +156,18 @@ class MyTtyInPort extends TtyInPort
 
   int pcount;
 
-  public void lineStart (boolean revisited) throws java.io.IOException
+  public void emitPrompt (String prompt) throws java.io.IOException
   {
-    if (! revisited && prompter != null)
+    synchronized (session)
       {
-	try
-	  {
-	    tie.freshLine();
-	    Object prompt = prompter.apply1(this);
-	    if (prompt != null)
-	      {
-		String string = prompt.toString();
-		if (string != null && string.length() > 0)
-		  {
-                    synchronized (session)
-                      {
-                        session.out_p.flushToSessionBuffer();
-                        session.outBuffer.append("<div class=\"interaction\"><span std=\"prompt\">");
-                        prompt_p.write(string);
-                        prompt_p.flushToSessionBuffer();
-                        session.outBuffer.append("</span><input std='input' value='' onchange='enterLine(this);'/></div>");
-                        session.flush();
-                      }
-		    tie.clearBuffer();
-		    promptEmitted = true;
-		  }
-	      }
-	  }
-	catch (Throwable ex)
-	  { throw new java.io.IOException("Error when evaluating prompt:"
-					  + ex); }
+        session.out_p.flushToSessionBuffer();
+        session.outBuffer.append("<div class=\"interaction\"><span std=\"prompt\">");
+        prompt_p.write(prompt);
+        prompt_p.flushToSessionBuffer();
+        session.outBuffer.append("</span><input std='input' value='' onchange='enterLine(this);'/></div>");
+        session.flush();
       }
+    tie.clearBuffer();
   }
 }
 

@@ -16,9 +16,6 @@
 (defun zerop (x)
   (= x 0))
 
-(defun boundp (x)
-  (invoke-static 'gnu.commonlisp.lang.Symbols 'isBound x))
-
 (defun define-function (symbol object) (fset symbol object))
 
 (defvar emacs-version

@@ -1,3 +1,8 @@
+2007-09-28  Per Bothner  <per@bothner.com>
+
+	* primitives.el (boundp): Remove method, since it duplicates
+	one defined in gnu/commonlisp/lisp/PrimOps.scm
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Simplify - we use '$JAVA kawa.repl' rather than $KAWA1

@@ -1,3 +1,9 @@
+2007-10-21  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkApplyExp): Add an optimization which also
+	seems to fix Savavvan bug #21363: "ArrayIndexOutOfBoundsException when
+	compiling define-simple-class."
+
 2007-09-02  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (searchInstance): New method.

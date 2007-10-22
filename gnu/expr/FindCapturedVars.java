@@ -42,9 +42,40 @@ public class FindCapturedVars extends ExpWalker
 	      {
 		LambdaExp lexp = (LambdaExp) value;
 		if (! lexp.getNeedsClosureEnv())
-		  skipFunc = true;
+                  skipFunc = true;
 	      }
 	  }
+      }
+    // Similar hack for constructor calls, but here we want to
+    // avoid walking the type argument.
+    else if (exp.func instanceof QuoteExp && exp.getArgCount() > 0)
+      {
+        Object val = ((QuoteExp) exp.func).getValue();
+        Expression arg0 = exp.getArg(0);
+        if (val instanceof PrimProcedure && arg0 instanceof ReferenceExp)
+          {
+            PrimProcedure pproc = (PrimProcedure) val;
+            Declaration decl
+              = Declaration.followAliases(((ReferenceExp) arg0).binding);
+            if (decl != null && decl.context instanceof ModuleExp
+                && ! decl.getFlag(Declaration.NONSTATIC_SPECIFIED))
+              {
+                Expression value = decl.getValue();
+                if (value instanceof ClassExp)
+                  {
+                    Expression[] args = exp.getArgs();
+                    LambdaExp lexp = (LambdaExp) value;
+                    if (! lexp.getNeedsClosureEnv())
+                      {
+                        exp.nextCall = decl.firstCall;
+                        decl.firstCall = exp;
+                        for (int i = 1;  i < args.length;  i++)
+                          args[i].walk(this);
+                        return exp;
+                      }
+                  }
+              }
+          }
       }
     if (! skipFunc)
       exp.func = (Expression) exp.func.walk(this);

@@ -90,7 +90,7 @@
   </fileset>
 
   <target name="run" depends="classes">
-     <java taskname="kawa" classname="kawa.repl" classpath="${build.classes}" />
+     <java taskname="kawa" classname="kawa.repl" classpath="${build.classes}" fork="true"/>
   </target>
   
   <target name="runw" depends="classes">

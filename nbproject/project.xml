@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>Kawa</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>Source Packages</label>
+                    <location>.</location>
+                </source-folder>
+                <source-folder>
+                    <label>Source Packages</label>
+                    <type>java</type>
+                    <location>.</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>all</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="run">
+                    <target>run</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>all</target>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>run-selected-file-in-work3</target>
+                    <context>
+                        <property>run.class</property>
+                        <folder>.</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/ide-file-targets.xml</script>
+                    <target>debug-selected-file-in-work3</target>
+                    <context>
+                        <property>debug.class</property>
+                        <folder>.</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>debug-nb</target>
+                </action>
+            </ide-actions>
+            <export>
+                <type>jar</type>
+                <location>kawa-1.9.3.jar</location>
+                <build-target>all</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>Source Packages</label>
+                        <location>.</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="run"/>
+                    <ide-action name="debug"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>.</package-root>
+                <built-to>kawa-1.9.3.jar</built-to>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

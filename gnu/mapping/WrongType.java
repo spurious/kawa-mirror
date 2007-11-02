@@ -81,6 +81,13 @@ public class WrongType extends WrappedException
     this.expectedType = expectedType;
   }
 
+  public WrongType(int n, Object argValue, Type expectedType)
+  {
+    this.number = n;
+    this.argValue = argValue;
+    this.expectedType = expectedType;
+  }
+
   public WrongType(Procedure proc, int n, Object argValue, String expectedType)
   {
     this(proc.getName(), n, argValue, expectedType);

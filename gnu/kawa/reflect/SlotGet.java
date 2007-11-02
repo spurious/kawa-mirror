@@ -204,7 +204,7 @@ public class SlotGet extends Procedure2
    * @param name the source (unmangled) name of the property.
    */
   public static Member
-  lookupMember (ClassType clas, String name, ClassType caller)
+  lookupMember (ObjectType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);

@@ -210,6 +210,8 @@ public class LangPrimType extends PrimType implements TypeValue
       }
     if (sig1 == 'V' || sig1 == 'Z')
       return 1;
+    if (other instanceof LangObjType)
+      return swappedCompareResult(other.compare(this));
     return super.compare(other);
   }
 

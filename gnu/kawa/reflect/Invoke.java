@@ -311,7 +311,7 @@ public class Invoke extends ProcedureN implements CanInline
         if (! (value instanceof Keyword))
           return null;
         String name = ((Keyword) value).getName();
-        Member slot = SlotSet.lookupMember((ClassType) type, name, caller);
+        Member slot = SlotSet.lookupMember((ObjectType) type, name, caller);
         fields[i] = slot != null ? (Object) slot : (Object) name;
       }
     return fields;

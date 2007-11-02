@@ -2,7 +2,9 @@ package gnu.kawa.lispexpr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.math.IntNum;
 import gnu.text.*;
+import gnu.kawa.functions.Arithmetic;
 
 public class LangObjType extends ObjectType implements TypeValue
 {
@@ -13,6 +15,7 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int CLASS_TYPE_CODE = 4;
   private static final int TYPE_TYPE_CODE = 5;
   private static final int CLASSTYPE_TYPE_CODE = 6;
+  private static final int INTEGER_TYPE_CODE = 7;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -33,6 +36,13 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType typeClassType =
     new LangObjType("class-type", "gnu.bytecode.ClassType",
                     CLASSTYPE_TYPE_CODE);
+
+  public static final LangObjType integerType =
+    new LangObjType("integer", "gnu.math.IntNum",
+                    INTEGER_TYPE_CODE);
+
+  static final ClassType typeArithmetic =
+    ClassType.make("gnu.kawa.functions.Arithmetic");
 
   LangObjType(String name, String implClass, int typeCode)
   {
@@ -65,8 +75,28 @@ public class LangObjType extends ObjectType implements TypeValue
         if (other == typeType || other == typeClass.implementationType)
           return -1;
         break;
+      case INTEGER_TYPE_CODE:
+        if (other instanceof PrimType)
+          {
+            char sig1 = other.getSignature().charAt(0);
+            switch (sig1)
+              {
+              case 'I': case 'J':  case 'S':  case 'B':
+                return 1;
+              }
+          }
       }
     return getImplementationType().compare(other.getImplementationType());
+  }
+
+  public Field getField(String name, int mask)
+  {
+    return implementationType.getField(name, mask);
+  }
+
+  public Method getMethod(String name, Type[] arg_types)
+  {
+    return implementationType.getMethod(name, arg_types);
   }
 
   public int getMethods (Filter filter, int searchSupers,
@@ -96,6 +126,14 @@ public class LangObjType extends ObjectType implements TypeValue
 			     Compilation comp, Target target)
   {
     gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
+  }
+
+  public static IntNum coerceIntNum (Object value)
+  {
+    IntNum ival = IntNum.asIntNumOrNull(value);
+    if (ival == null && value != null)
+        throw new WrongType(WrongType.ARG_CAST, value, integerType);
+    return ival;
   }
 
   public static Class coerceToClassOrNull (Object type)
@@ -192,6 +230,10 @@ public class LangObjType extends ObjectType implements TypeValue
         methodDeclaringClass = typeLangObjType;
         mname = "coerceToTypeOrNull";
         break;
+      case INTEGER_TYPE_CODE:
+        methodDeclaringClass = implementationType;
+        mname = "asIntNumOrNull";
+        break;
       default: mname = null;
       }
     code.emitInvokeStatic(methodDeclaringClass.getDeclaredMethod(mname, 1));
@@ -219,6 +261,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceToClassType(obj);
       case TYPE_TYPE_CODE:
         return coerceToType(obj);
+      case INTEGER_TYPE_CODE:
+        return coerceIntNum(obj);
       default: return null;
       }
   }
@@ -235,6 +279,9 @@ public class LangObjType extends ObjectType implements TypeValue
         break;
       case TYPE_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToType", 1));
+        break;
+      case INTEGER_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceIntNum", 1));
         break;
       default:
         code.emitInvoke(((PrimProcedure) getConstructor()).getMethod());

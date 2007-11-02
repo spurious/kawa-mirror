@@ -910,7 +910,7 @@ public class Scheme extends LispLanguage
 	types.put ("complex", ClassType.make("gnu.math.Complex"));
 	types.put ("real", ClassType.make("gnu.math.RealNum"));
 	types.put ("rational", ClassType.make("gnu.math.RatNum"));
-	types.put ("integer", ClassType.make("gnu.math.IntNum"));
+	types.put ("integer", LangObjType.integerType);
 	types.put ("symbol", ClassType.make("gnu.mapping.Symbol"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
 	types.put ("list", ClassType.make("gnu.lists.LList"));
@@ -977,6 +977,8 @@ public class Scheme extends LispLanguage
       return getNamedType(name);
     if ("java.lang.String".equals(name))
       return Type.tostring_type;
+    if ("gnu.math.IntNum".equals(name))
+      return LangObjType.integerType;
     if ("gnu.text.Path".equals(name))
       return LangObjType.pathType;
     if ("gnu.text.URIPath".equals(name))

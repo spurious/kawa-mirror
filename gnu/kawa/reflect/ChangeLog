@@ -1,3 +1,10 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	Some changes mainly to better handle LangObjType.
+	* SlotGet.java (lookupMember): Generalize to ObjectType.
+	* Slotset.java (lookupMember): Likewise.
+	* Invoke.java (checkKeywords): Likewise, for slot field.
+
 2007-04-27  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (defineAll): Pass Language as new

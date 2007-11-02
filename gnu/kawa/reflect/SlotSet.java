@@ -108,7 +108,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   }
 
   public static Member
-  lookupMember (ClassType clas, String name, ClassType caller)
+  lookupMember (ObjectType clas, String name, ClassType caller)
   {
     gnu.bytecode.Field field
       = clas.getField(Compilation.mangleNameIfNeeded(name), -1);

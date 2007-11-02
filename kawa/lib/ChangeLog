@@ -1,3 +1,10 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (integer?): True for all types convertible to <integer>.
+	(quotient, remainder, modulo): Now generalized to types convertible
+	to integer.  Make use of define-procedure for "overloads".
+	(gcm, lcm): Minor tweak.
+
 2007-06-11  Per Bothner  <per@bothner.com>
 
 	* files.scm (delete): Generalize since Path now has a delete method.

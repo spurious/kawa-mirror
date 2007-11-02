@@ -143,10 +143,20 @@ public class ObjectType extends Type
     return super.isInstance(obj);
   }
 
+  public Field getField(String name, int mask)
+  {
+    return null;
+  }
+
+  public Method getMethod(String name, Type[] arg_types)
+  {
+    return Type.pointer_type.getMethod(name, arg_types);
+  }
+
   public int getMethods (Filter filter, int searchSupers, Vector result,
 			 String context)
   {
-    return 0;
+    return Type.pointer_type.getMethods(filter, searchSupers, result, context);
   }
 
   public int compare(Type other)

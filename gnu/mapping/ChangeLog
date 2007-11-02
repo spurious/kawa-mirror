@@ -1,3 +1,7 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* WrongType.java (<init>): New constructor.
+
 2007-09-08  Per Bothner  <per@bothner.com>
 
 	* TtyInPort.java (emitPrompt): New method, pulled out from lineStart,

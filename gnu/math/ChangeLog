@@ -1,3 +1,7 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (asIntNumOrNull): New static method.
+
 2007-06-20  Thomas Kirk  <tk@research.att.com>
 
 	* IntNum.java (readExternal): Fix logic error.

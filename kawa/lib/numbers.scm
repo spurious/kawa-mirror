@@ -13,7 +13,12 @@
 	   (= (java.lang.Math:IEEEremainder
 	       (gnu.math.DFloNum:doubleValue x)
 	       1.0)
-	      0.0))))
+	      0.0))
+      (and (instance? x <java.lang.Number>)
+	   (or (instance? x <java.lang.Long>)
+	       (instance? x <java.lang.Integer>)
+	       (instance? x <java.lang.Short>)
+	       (instance? x <java.math.BigInteger>)))))
 
 (define (exact? x) :: <boolean> 
   (and (instance? x <number>) (invoke (as <number> x) 'isExact)))
@@ -56,26 +61,32 @@
 (define (abs (x :: <number>)) :: <number>
   (invoke x 'abs))
 
-(define (quotient (x :: <real>) (y :: <real>)) :: <real>
-  (if (and (instance? x <integer>) (instance? y <integer>))
-      (invoke-static <integer> 'quotient x y)
-      (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))))
+(define-procedure quotient
+  ;; (x :: <real>) (y :: <real>)) :: <real>
+  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
+	  (invoke-static <integer> 'quotient x y))
+  (lambda ((x :: <real>) (y :: <real>)) :: <real>
+	  (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))))
 
-(define (remainder (x :: <real>) (y :: <real>)) :: <real> 
-  (if (and (instance? x <integer>) (instance? y <integer>))
-      (invoke-static <integer> 'remainder x y)
-      (if (zero? y)
-	  (if (exact? y) x (exact->inexact x))
-	  (- x (* (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))
-		  y)))))
+(define-procedure remainder
+  ;; (x :: <real>) (y :: <real>)) :: <real> 
+  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
+	  (invoke-static <integer> 'remainder x y))
+  (lambda ((x :: <real>) (y :: <real>)) :: <real>
+	  (if (zero? y)
+	      (if (exact? y) x (exact->inexact x))
+	      (- x (* (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))
+		      y)))))
 
-(define (modulo (x :: <real>) (y :: <real>)) :: <real>
-  (if (and (instance? x <integer>) (instance? y <integer>))
-      (invoke-static <integer> 'modulo x y)
-      (if (zero? y)
-	  (if (exact? y) x (exact->inexact x))
-	  (- x (* (invoke (/ x y) 'toInt (static-field <number> 'FLOOR))
-		  y)))))
+(define-procedure modulo
+  ;; (x :: <real>) (y :: <real>)) :: <real>
+  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
+	  (invoke-static <integer> 'modulo x y))
+  (lambda ((x :: <real>) (y :: <real>)) :: <real>
+	  (if (zero? y)
+	      (if (exact? y) x (exact->inexact x))
+	      (- x (* (invoke (/ x y) 'toInt (static-field <number> 'FLOOR))
+		      y)))))
 
 (define (gcd #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))
@@ -84,16 +95,16 @@
 	(let ((result :: <integer> (args 0)))
 	  (do ((i :: <int> 1 (+ i 1)))
 	      ((>= i n) result)
-	    (set! result (<integer>:gcd result (<integer>:@ (args i)))))))))
+	    (set! result (gnu.math.IntNum:gcd result (<integer>:@ (args i)))))))))
 
 (define (lcm #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))
     (if (zero? n)
 	1
-	(let ((result :: <integer> (<integer>:abs (<integer>:@ (args 0)))))
+	(let ((result :: <integer> (gnu.math.IntNum:abs (<integer>:@ (args 0)))))
 	  (do ((i :: <int> 1 (+ i 1)))
 	      ((>= i n) result)
-	    (set! result (<integer>:lcm result (<integer>:@ (args i)))))))))
+	    (set! result (gnu.math.IntNum:lcm result (<integer>:@ (args i)))))))))
 
 (define (numerator (x :: <rational>)) :: <integer>
   (invoke x 'numerator))

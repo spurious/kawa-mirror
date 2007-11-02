@@ -12,7 +12,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
 {
   public static final GetNamedPart getNamedPart = new GetNamedPart();
 
-  /** PREFIX:<> is equivalent to the ClassType bound to PREFIX. */
+  /** {@code PREFIX:<>} is equivalent to the {@code ClassType} bound to {@code PREFIX}. */
   public static final String CLASSTYPE_FOR = "<>";
 
   /** Pseudo-method-name for the cast operation. */
@@ -114,7 +114,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
       : comp.mainClass;
     GetNamedExp nexp = (GetNamedExp) exp;
 
-    if (typeval instanceof Type)
+    if (typeval != null)
       {
         if (mname.equals(CLASSTYPE_FOR))
           return new QuoteExp(typeval);
@@ -129,7 +129,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
               return nexp.setProcedureKind('C');
           }
       }
-    if (typeval instanceof ClassType)
+    if (typeval instanceof ObjectType)
       {
         if (mname.length() > 1 && mname.charAt(0) == '.')
           {
@@ -141,7 +141,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
         if (Invoke.checkKnownClass(typeval, comp) < 0)
           return exp;
         PrimProcedure[] methods
-          = ClassMethods.getMethods((ClassType) typeval,
+          = ClassMethods.getMethods((ObjectType) typeval,
                                     Compilation.mangleName(mname),
                                     '\0', caller, language);
         if (methods != null && methods.length > 0)
@@ -176,8 +176,6 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     if (type instanceof ObjectType)
       {
         ObjectType otype = (ObjectType) type;
-        ClassType ctype
-          = type instanceof ClassType ? (ClassType) type : Type.pointer_type;
         PrimProcedure[] methods
           = ClassMethods.getMethods(otype, Compilation.mangleName(mname),
                                     'V', caller, language);
@@ -205,7 +203,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
                                 args).setLine(exp);
           }
 
-        Member part = SlotGet.lookupMember(ctype, mname, caller);
+        Member part = SlotGet.lookupMember(otype, mname, caller);
         if (part != null
             || (mname.equals("length") && type instanceof ArrayType))
           {

@@ -184,7 +184,12 @@ public class PrimType extends Type {
     if (other instanceof PrimType)
       return compare(this, (PrimType) other);
     if (! (other instanceof ClassType))
-      return -3;
+      {
+        if (other instanceof ArrayType)
+          return -3;
+        else
+          return swappedCompareResult(other.compare(this));
+      }
     char sig1 = signature.charAt(0);
     String otherName = other.getName();
     if (otherName == null)

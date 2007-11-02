@@ -87,6 +87,19 @@ public class IntNum extends RatNum implements Externalizable
     return result;
   }
 
+  public static IntNum asIntNumOrNull (Object value)
+  {
+    if (value instanceof IntNum)
+      return (IntNum) value;
+    if (value instanceof BigInteger)
+      return IntNum.valueOf(value.toString(), 10);
+    if (value instanceof Number
+        && (value instanceof Integer || value instanceof Long
+            || value instanceof Short || value instanceof Byte))
+      return IntNum.make(((Number) value).longValue());
+    return null;
+  }
+
   /** Make an IntNum from an unsigned 64-bit value. */
   public static IntNum makeU (long value)
   {

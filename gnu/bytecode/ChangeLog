@@ -1,3 +1,9 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getField, getMethod, getMethods): New methods.
+	* PrimType.java (compare): If other is non-ClassType non-ArrayType
+	defer to other (perhaps a LangObjType).
+
 2007-04-01  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java (getContextPackage): New static method.

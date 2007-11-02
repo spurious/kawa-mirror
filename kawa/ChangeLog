@@ -1,3 +1,8 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (getNamedType, getType): The <integer> type
+	is handled by LangObjType.integerType.
+
 2007-09-08  Per Bothner  <per@bothner.com>
 
 	* ReplPane.java (write): Move to ReplPaneOutPort.

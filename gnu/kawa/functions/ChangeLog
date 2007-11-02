@@ -1,3 +1,8 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (inline): Some code that used to only work
+	for ClassType now works for ObjectType (and specifically LangObjType).
+
 2007-04-03  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (combineName): Minor optimization.

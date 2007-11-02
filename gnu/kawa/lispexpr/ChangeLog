@@ -1,3 +1,11 @@
+2007-11-02  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (integerType): New field, represents the
+	"integer" type, using gnu.math.IntNum, but with conversions.
+	* LangObjType.java (getField, getMethod): New methods.
+	* LangPrimType.java (compare): If other is LangObjType,
+	let it handle the compare.
+
 2007-03-31  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber): Don't try to parse quantities.

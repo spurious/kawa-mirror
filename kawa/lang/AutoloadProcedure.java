@@ -75,10 +75,10 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   static final Class classModuleBody;
   static {
     /* #ifdef JAVA5 */
-    classModuleBody = gnu.expr.ModuleBody.class;
+    // classModuleBody = gnu.expr.ModuleBody.class;
     /* #else */
-    // try { classModuleBody = Class.forName("gnu.expr.ModuleBody"); }
-    // catch (Throwable ex) { throw new Error(ex); }
+    try { classModuleBody = Class.forName("gnu.expr.ModuleBody"); }
+    catch (Throwable ex) { throw new Error(ex); }
     /* #endif */
   }
 

@@ -217,6 +217,10 @@ public class FindCapturedVars extends ExpWalker
       return;
     if (decl.field != null && decl.field.getStaticFlag())
       return;
+    // This catches the "(module-instance)" dummy context variable
+    // created in Translator.rewrite.
+    if (comp.immediate && decl.hasConstantValue())
+      return;
 
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();

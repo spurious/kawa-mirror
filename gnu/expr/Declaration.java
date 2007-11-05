@@ -379,6 +379,12 @@ public class Declaration
     return ((QuoteExp) v).getValue();
   }
 
+  public final boolean hasConstantValue ()
+  {
+    Object v = getValue();
+    return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
+  }
+
   /** This prefix is prepended to field names for unknown names. */
   static final String UNKNOWN_PREFIX = "loc$";
 

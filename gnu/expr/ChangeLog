@@ -1,5 +1,9 @@
 2007-11-04  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (hasConstantValue): New method.
+	* FindCapturedVars.java (capture): Return immediately if
+	hasConstantValue.
+
 	* Compilation.java (compileConstant): Recover from dis-allowed null.
 
 	* SetExp.java (compile): If we compile a field reference,

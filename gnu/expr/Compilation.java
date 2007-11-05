@@ -527,7 +527,6 @@ public class Compilation implements SourceLocator
 	      }
 	    sbuf.append(type.getName());
             error('w', sbuf.toString());
-            ex.printStackTrace();
          }
       }
     compileConstant(value);

@@ -1,5 +1,7 @@
 2007-11-04  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (compileConstant): Recover from dis-allowed null.
+
 	* SetExp.java (compile): If we compile a field reference,
 	then we need to note it's a usedClass.
 

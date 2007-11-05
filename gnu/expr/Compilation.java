@@ -519,11 +519,15 @@ public class Compilation implements SourceLocator
 	    else
 	      {
 		sbuf.append("cannot convert literal (of type ");
-                sbuf.append(value.getClass().getName());
+                if (value == null)
+                  sbuf.append("<null>");
+                else
+                  sbuf.append(value.getClass().getName());
 		sbuf.append(") to ");
 	      }
 	    sbuf.append(type.getName());
             error('w', sbuf.toString());
+            ex.printStackTrace();
          }
       }
     compileConstant(value);

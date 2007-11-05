@@ -1,5 +1,8 @@
 2007-11-04  Per Bothner  <per@bothner.com>
 
+	* SetExp.java (compile): If we compile a field reference,
+	then we need to note it's a usedClass.
+
 	* LambdaExp.java (evalDefaultArg): New convenience method.
 	(Closure.matchN): Add handling for keyword parameters.
 

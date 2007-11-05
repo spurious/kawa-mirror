@@ -287,6 +287,7 @@ public class SetExp extends AccessExp
               decl.loadOwningObject(owner, comp);
             type = field.getType();
 	    new_value.compile(comp, decl);
+            comp.usedClass(field.getDeclaringClass());
             if (field.getStaticFlag())
               {
                 if (needValue)

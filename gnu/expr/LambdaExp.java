@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -1575,6 +1575,18 @@ public class LambdaExp extends ScopeExp
     ctx.writeValue(new Closure(this, ctx));
   }
 
+  Object evalDefaultArg(int index, CallContext ctx)
+  {
+    try
+      {
+        return defaultArgs[index].eval(ctx);
+      }
+    catch (Throwable ex)
+      {
+        throw new WrappedException("error evaluating default argument", ex);
+      }
+  }
+
   public Expression inline (ApplyExp exp, InlineCalls walker,
                             Declaration decl, boolean argsInlined)
   {
@@ -1830,6 +1842,7 @@ class Closure extends MethodProc
       : lambda.defaultArgs.length - key_args;
     int i = 0;
     int opt_i = 0;
+    int key_i = 0;
     int min_args = lambda.min_args;
     for (Declaration decl = lambda.firstDecl(); decl != null;
          decl = decl.nextDecl())
@@ -1842,7 +1855,8 @@ class Closure extends MethodProc
             if (i < nargs)
               value = args[i++];
             else
-              value = ((QuoteExp) lambda.defaultArgs[opt_i++]).getValue();
+              value = lambda.evalDefaultArg(opt_i, ctx);
+            opt_i++;
           }
 	else if (lambda.max_args < 0 && i == min_args + opt_args)
           {
@@ -1879,8 +1893,15 @@ class Closure extends MethodProc
             else
               value = LList.makeList(args, i);
           }
-        else // Should never happen
-          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+        else
+          { // Keyword argument.
+            Keyword keyword = lambda.keywords[key_i++];
+            int key_offset = min_args + opt_args;
+            value = Keyword.searchForKeyword(args, key_offset, keyword);
+            if (value == Special.dfault)
+              value = lambda.evalDefaultArg(opt_i, ctx);
+            opt_i++;
+          }
         if (decl.type != null)
           {
             try

@@ -1,3 +1,7 @@
+2007-11-05  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (sqrt): Add overload, to handle java.lang.Float etc.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (integer?): True for all types convertible to <integer>.

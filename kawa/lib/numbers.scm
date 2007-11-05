@@ -157,10 +157,13 @@
   (lambda ((x :: <double>)) :: <double>
 	  (java.lang.Math:atan x)))
 
-(define (sqrt (num :: <quantity>)) :: <quantity>
-  (gnu.math.Quantity:make
-   (invoke (invoke num 'number) 'sqrt)
-   (invoke (invoke num 'unit) 'sqrt)))
+(define-procedure sqrt
+  (lambda ((num :: <quantity>)) :: <quantity>
+	  (gnu.math.Quantity:make
+	   (invoke (invoke num 'number) 'sqrt)
+	   (invoke (invoke num 'unit) 'sqrt)))
+  (lambda ((x :: <double>)) :: <double>
+	  (java.lang.Math:sqrt x)))
 
 (define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
   (invoke-static <complex> 'make x y))

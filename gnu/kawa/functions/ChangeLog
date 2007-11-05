@@ -1,3 +1,8 @@
+2007-11-05  Per Bothner  <per@bothner.com>
+
+	* AddOp.java ($Mn): Generalize to standard java.lang.Number
+	classes, like we already do in apply2.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (inline): Some code that used to only work

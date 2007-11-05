@@ -1,3 +1,7 @@
+2007-11-05  Per Bothner  <per@bothner.com>
+
+	* RatNum.java (neg): New static method.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (asIntNumOrNull): New static method.

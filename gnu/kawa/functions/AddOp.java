@@ -91,7 +91,31 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
   public static Object $Mn(Object arg1)
   {
-    return ((Numeric) arg1).neg();
+    int code = Arithmetic.classifyValue(arg1);
+    switch (code)
+      {
+      case Arithmetic.INT_CODE:
+	return new Integer(- Arithmetic.asInt(arg1));
+      case Arithmetic.LONG_CODE:
+	return new Long(- Arithmetic.asLong(arg1));
+      case Arithmetic.BIGINTEGER_CODE:
+	return Arithmetic.asBigInteger(arg1).negate();
+      case Arithmetic.INTNUM_CODE:
+	return IntNum.neg(Arithmetic.asIntNum(arg1));
+      case Arithmetic.BIGDECIMAL_CODE:
+	return Arithmetic.asBigDecimal(arg1).negate();
+      case Arithmetic.RATNUM_CODE:
+	return RatNum.neg(Arithmetic.asRatNum(arg1));
+      case Arithmetic.FLOAT_CODE:
+	return new Float(- Arithmetic.asFloat(arg1));
+      case Arithmetic.DOUBLE_CODE:
+	return new Double(- Arithmetic.asDouble(arg1));
+      case Arithmetic.FLONUM_CODE:
+	return new DFloNum(- Arithmetic.asDouble(arg1));
+      default:
+        return Arithmetic.asNumeric(arg1).neg();
+      }
+
   }
 
   public static Object $Pl$V (Object arg1, Object arg2,

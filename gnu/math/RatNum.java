@@ -74,6 +74,13 @@ public abstract class RatNum extends RealNum
 			IntNum.times (x_den, y_den));
   }
 
+  public static RatNum neg (RatNum x)
+  {
+    IntNum x_num = x.numerator();
+    IntNum x_den = x.denominator();
+    return RatNum.make(IntNum.neg(x_num), x_den);
+  }
+
   public static RatNum times (RatNum x, RatNum y)
   {
     return RatNum.make (IntNum.times (x.numerator(), y.numerator()),

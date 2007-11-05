@@ -5,6 +5,7 @@ import gnu.expr.*;
 import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
+import gnu.bytecode.ArrayClassLoader;
 
 /** Utility functions (static methods) for kawa.repl.
  * Should probably be merged with kawa.repl.  FIXME. */
@@ -221,6 +222,20 @@ public class Shell
       }
     if (language != saveLanguage)
       Language.setDefaultLanguage(language);
+    try
+      {
+        Thread thread = Thread.currentThread();
+        ClassLoader parentLoader = thread.getContextClassLoader();
+        // Create a "session" ClassLoader.  Use this for remembering classes
+        // created in one command (Compilation) through further command,
+        // while still allowing the classes to be replaced and collected.
+        if (!(parentLoader instanceof ArrayClassLoader))
+          thread.setContextClassLoader(new ArrayClassLoader(parentLoader));
+      }
+    catch (SecurityException ex)
+      {
+        // Nothing - we'll just lose some minor functionality.
+      }
     try
       {
 	for (;;)

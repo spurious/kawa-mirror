@@ -124,6 +124,12 @@ public class ModuleExp extends LambdaExp
 	*/
 
         Class clas = null;
+        // Use the "session" ClassLoader, for remembering classes
+        // created in one command (Compilation) through further command,
+        // while still allowing the classes to be replaced and collected.
+        ArrayClassLoader context = loader;
+        while (context.getParent() instanceof ArrayClassLoader)
+          context = (ArrayClassLoader) context.getParent();
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType ctype = comp.classes[iClass];
@@ -132,6 +138,12 @@ public class ModuleExp extends LambdaExp
             ctype.setExisting(true);
             if (iClass == 0)
               clas = cclass;
+            // Add all classes except the main module class to the "session"
+            // ClassLoader.  Don't add the main module class, as it's
+            // anonymous.  We might go further and skip other anonymous
+            // classes (theough defining which classes are anonymous is tricky).
+            else if (context != loader)
+              context.addClass(cclass);
           }
 
         ModuleInfo minfo = comp.minfo;
@@ -169,7 +181,7 @@ public class ModuleExp extends LambdaExp
   }
 
   /** Flag to force compilation, even when not required. */
-  public static boolean alwaysCompile = false;
+  public static boolean alwaysCompile = true;
 
   public final static boolean evalModule (Environment env, CallContext ctx,
                                        Compilation comp, URL url,
@@ -263,7 +275,7 @@ public class ModuleExp extends LambdaExp
                     // If it is, gets its value; otherwise create
                     // a FieldLocation to access it?  FIXME.
                     Expression dvalue = decl.getValue();
-		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING)
+		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.INDIRECT_BINDING)
                         && ! (dvalue instanceof ReferenceExp
                               && ((ReferenceExp) dvalue).getBinding().needsContext()))
 		      {
@@ -277,7 +289,6 @@ public class ModuleExp extends LambdaExp
 			  env.addLocation(sym, property, (Location) value);
 			else
 			  env.define(sym, property, value);
-			// if IS_CONSTANT ... make Location constant.  FIXME.
 		      }
 		    else
 		      {

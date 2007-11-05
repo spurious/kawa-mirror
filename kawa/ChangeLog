@@ -1,3 +1,7 @@
+2007-11-04  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run): Create "session" ClassLoader.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (getNamedType, getType): The <integer> type

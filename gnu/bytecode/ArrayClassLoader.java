@@ -79,24 +79,26 @@ public class ArrayClassLoader extends ClassLoader
     return super.findResource(name);
   }
 
-  /* #ifdef JAVA2 */
-  public Class findClass (String name)
-  /* #else */
-  // public Class loadClass (String name, boolean resolve)
-  /* #endif */
+  public Class loadClass (String name, boolean resolve)
+    throws ClassNotFoundException
+  {
+    Class clas = loadClass(name);
+    if (resolve)
+      resolveClass(clas);
+    return clas;
+  }
+
+  /** Load named class.
+   * Note we deliberately don't follow the Java2 delegation model,
+   * in order to allow classes to be overridden and replaced.
+   * Specifically, we depend on this for the "session class-loader".
+   */
+  public Class loadClass (String name)
     throws ClassNotFoundException
   {
     Object r = map.get(name);
     Class clas;
-    if (r == null)
-      {
-        /* #ifdef JAVA2 */
-        throw new ClassNotFoundException(name);
-        /* #else */
-        // clas = Class.forName(name);
-        /* #endif */
-      }
-    else if (r instanceof byte[])
+    if (r instanceof byte[])
       {
         // double-locking? is this safe?  or needed? FIXME.
 	synchronized (this)
@@ -112,12 +114,10 @@ public class ArrayClassLoader extends ClassLoader
 	      clas = (Class) r;
 	  }
       }
+    else if (r == null)
+      clas = getParent().loadClass(name);
     else
       clas = (Class) r;
-    /* #ifndef JAVA2 */
-    // if (resolve && clas != null)
-    //   resolveClass (clas);
-    /* #endif */
     return clas;
   }
 

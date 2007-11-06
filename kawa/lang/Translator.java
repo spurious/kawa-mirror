@@ -726,8 +726,13 @@ public class Translator extends Compilation
                       decl = null;
                     if (decl != null && ! decl.isStatic())
                       {
-                        cdecl = new Declaration("(module-instance)");
-                        cdecl.setValue(new QuoteExp(floc.getInstance()));
+                        if (immediate)
+                          {
+                            cdecl = new Declaration("(module-instance)");
+                            cdecl.setValue(new QuoteExp(floc.getInstance()));
+                          }
+                        else
+                          decl = null;
                       }
                   }
                 catch (Throwable ex)

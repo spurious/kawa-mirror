@@ -556,7 +556,9 @@ public class LambdaExp extends ScopeExp
   {
     if (nameDecl != null && nameDecl.field != null)
       return nameDecl.field;
-    ClassType frameType = getOwningLambda().getHeapFrameType();
+    boolean needsClosure = getNeedsClosureEnv();
+    ClassType frameType = needsClosure ? getOwningLambda().getHeapFrameType()
+      : comp.mainClass;
     String name = getName();
     String fname
       = name == null ? "lambda" : Compilation.mangleNameIfNeeded(name);
@@ -588,8 +590,8 @@ public class LambdaExp extends ScopeExp
     else
       {
 	fname = fname + "$Fn" + ++comp.localFieldIndex;
-	if (! getNeedsClosureEnv())
-	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
+        if (! needsClosure)
+          fflags |= Access.STATIC;
       }
     Type rtype = Compilation.typeModuleMethod;
     Field field = frameType.addField (fname, rtype, fflags);
@@ -598,21 +600,26 @@ public class LambdaExp extends ScopeExp
     return field;
   }
 
-  final void addApplyMethod (Compilation comp)
+  final void addApplyMethod (Compilation comp, Field field)
   {
     LambdaExp owner = this;
-    // Similar to getOwningLambda(), but we can't add apply methods
-    // to a ClassExp - at least not unless it extends ModuleBody.
-    for (;;)
-      {
-        owner = owner.outerLambda();
-	if (owner instanceof ModuleExp
-	    || owner.heapFrame != null)
-          break;
-      }
-    ClassType frameType = owner.getHeapFrameType();
-    if (! (frameType.getSuperclass().isSubtype(Compilation.typeModuleBody)))
+    if (field != null && field.getStaticFlag())
       owner = comp.getModule();
+    else
+      {
+        // Similar to getOwningLambda(), but we can't add apply methods
+        // to a ClassExp - at least not unless it extends ModuleBody.
+        for (;;)
+          {
+            owner = owner.outerLambda();
+            if (owner instanceof ModuleExp
+                || owner.heapFrame != null)
+              break;
+          }
+        ClassType frameType = owner.getHeapFrameType();
+        if (! (frameType.getSuperclass().isSubtype(Compilation.typeModuleBody)))
+          owner = comp.getModule();
+      }
     if (owner.applyMethods == null)
       owner.applyMethods = new Vector();
     owner.applyMethods.addElement(this);
@@ -620,15 +627,16 @@ public class LambdaExp extends ScopeExp
 
   public Field compileSetField (Compilation comp)
   {
+    Field field = allocFieldFor(comp);
     if (comp.usingCPStyle())
       compile(comp, Type.pointer_type);
     else
       {
 	compileAsMethod(comp);
-	addApplyMethod(comp);
+	addApplyMethod(comp, field);
       }
 
-    return (new ProcInitializer(this, comp)).field;
+    return (new ProcInitializer(this, comp, field)).field;
   }
 
   public void compile (Compilation comp, Target target)
@@ -711,7 +719,7 @@ public class LambdaExp extends ScopeExp
 	    || (comp.immediate && outer instanceof ModuleExp))
 	  {
 	    compileAsMethod(comp);
-	    addApplyMethod(comp);
+	    addApplyMethod(comp, null);
 	    ProcInitializer.emitLoadModuleMethod(this, comp);
 	  }
 	else

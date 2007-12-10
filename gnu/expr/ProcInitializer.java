@@ -6,11 +6,12 @@ public class ProcInitializer extends Initializer
 {
   LambdaExp proc;
 
-  public ProcInitializer(LambdaExp lexp, Compilation comp)
+  public ProcInitializer(LambdaExp lexp, Compilation comp, Field field)
   {
-    field = lexp.allocFieldFor(comp);
+    this.field = field;
     proc = lexp;
-    LambdaExp heapLambda = lexp.getOwningLambda();
+    LambdaExp heapLambda = field.getStaticFlag() ? comp.getModule()
+      : lexp.getOwningLambda() ;
     if (heapLambda instanceof ModuleExp && comp.isStatic())
       {
 	next = comp.clinitChain;
@@ -30,7 +31,8 @@ public class ProcInitializer extends Initializer
     ClassType procClass = Compilation.typeModuleMethod;
     code.emitNew(procClass);
     code.emitDup(1);
-    LambdaExp owning = proc.getOwningLambda();
+    LambdaExp owning = proc.getNeedsClosureEnv() ? proc.getOwningLambda()
+      : comp.getModule();
     if (owning instanceof ClassExp && owning.staticLinkField != null)
       code.emitLoad(code.getCurrentScope().getVariable(1));
     else if (! (owning instanceof ModuleExp)

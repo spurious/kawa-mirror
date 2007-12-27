@@ -1,3 +1,8 @@
+2007-12-26  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Add regression trest for
+	Red Hat Bugzilla #370851 "XQuery miss-search".
+
 2007-02-23  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (endElement): Define instead of set input-query binding.

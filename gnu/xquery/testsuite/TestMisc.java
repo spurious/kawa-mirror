@@ -343,6 +343,10 @@ public class TestMisc
     evalTest("('2','3') instance of string+", "true");
     evalTest("('2','3') instance of string*", "true");
 
+    // Simplification of
+    // https://bugzilla.redhat.com/show_bug.cgi?id=370851
+    evalTest("document {<A id='a'>10</A>}/A[attribute::node()='10']", "");
+
     evalTest("declare namespace Int='class:java.lang.Integer';\n"
 	     + "Int:toHexString(266)", "10a");
     evalTest("declare namespace File='class:java.io.File';\n"

@@ -18,7 +18,7 @@ public class AttributeAxis extends TreeScanner
   public void scan (AbstractSequence seq, int ipos, PositionConsumer out)
   {
     ipos = seq.firstAttributePos(ipos);
-    while (ipos != 0)
+    while (ipos != 0 && seq.getNextKind(ipos) == Sequence.ATTRIBUTE_VALUE)
       {
 	if (type.isInstancePos(seq, ipos))
 	  out.writePosition(seq, ipos);

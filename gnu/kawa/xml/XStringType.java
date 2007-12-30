@@ -91,10 +91,9 @@ public class XStringType extends XDataType
     boolean status;
     switch (typeCode)
       {
-        /* #ifndef use:java.util.regex */
-        // ; case LANGUAGE_TYPE_CODE:
-        // ; case NMTOKENType:
-        /* #endif */
+      /* #ifndef use:java.util.regex */
+      // case LANGUAGE_TYPE_CODE:
+      /* #endif */
       case NORMALIZED_STRING_TYPE_CODE:
       case TOKEN_TYPE_CODE:
         // Assumes that TextUtils.replaceWhitespace returns the original

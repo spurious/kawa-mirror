@@ -483,9 +483,22 @@ public class FString extends SimpleVector
   {
     if (csq == null)
       csq = "null";
-    /* FIXME optimize to use getChars if csq is a CharSeq. */
-    for (int i = start; i < end;  i++)
-      append(csq.charAt(i));
+    int len = end - start;
+    int sz = size;
+    if (sz+len > data.length)
+      ensureBufferLength(sz+len);
+    char[] d = data;
+    if (csq instanceof String)
+      ((String) csq).getChars(start, end, d, sz);
+    else if (csq instanceof CharSeq)
+      ((CharSeq) csq).getChars(start, end, d, sz);
+    else
+      {
+        int j = sz;
+        for (int i = start; i < end;  i++)
+          d[j++] = csq.charAt(i);;
+      }
+    size = sz;
     return this;
   }
   /* #else */

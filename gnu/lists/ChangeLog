@@ -1,3 +1,7 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* FString.java (append(CharSequence,int,int)): Optimize.
+
 2007-02-18  Per Bothner  <per@bothner.com>
 
 	* FString.java (<init>(CharSeq)): Change implementation.

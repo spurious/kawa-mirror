@@ -1,3 +1,7 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java: Add support for XML 'standalone' declaration.
+
 2007-01-20  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (setStyle): If html, pre-establish html namespace.

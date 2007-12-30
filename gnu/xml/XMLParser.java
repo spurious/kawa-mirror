@@ -49,7 +49,8 @@ public class XMLParser
   private static final int SAW_ERROR = 36;
   private static final int SAW_EOF_ERROR = 37;  // Unexpected end-of-file.
 
-  static final String BAD_ENCODING_SYNTAX = "bad encoding declaration";
+  static final String BAD_ENCODING_SYNTAX = "bad 'encoding' declaration";
+  static final String BAD_STANDALONE_SYNTAX = "bad 'standalone' declaration";
 
   public static void parse (Object uri, SourceMessages messages, Consumer out)
     throws java.io.IOException
@@ -649,6 +650,75 @@ break handleChar;
                                 String encoding = new String(buffer,dstart, i-dstart);
                                 if (in instanceof LineInputStreamReader)
                                   ((LineInputStreamReader) in).setCharset(encoding);
+                                dstart = i+1;
+                                while (dstart < end
+                                       && Character.isWhitespace(buffer[dstart]))
+                                  dstart++;
+                              }
+                            if (end > dstart + 9
+                                && buffer[dstart] == 's'
+                                && buffer[dstart+1] == 't'
+                                && buffer[dstart+2] == 'a'
+                                && buffer[dstart+3] == 'n'
+                                && buffer[dstart+4] == 'd'
+                                && buffer[dstart+5] == 'a'
+                                && buffer[dstart+6] == 'l'
+                                && buffer[dstart+7] == 'o'
+                                && buffer[dstart+8] == 'n'
+                                && buffer[dstart+9] == 'e')
+                              {
+                                dstart += 10;
+                                ch = buffer[dstart];
+                                while (Character.isWhitespace(ch)
+                                       && ++dstart < end)
+                                  ch = buffer[dstart];
+                                if (ch != '=')
+                                  {
+                                    message = BAD_STANDALONE_SYNTAX;
+                                    state = SAW_ERROR;
+                                    continue mainLoop;
+                                  }
+                                ch = buffer[++dstart];
+                                while (Character.isWhitespace(ch)
+                                       && ++dstart < end)
+                                  ch = buffer[dstart];
+                                if (ch != '\'' && ch != '\"')
+                                  {
+                                    message = BAD_STANDALONE_SYNTAX;
+                                    state = SAW_ERROR;
+                                    continue mainLoop;
+                                  }
+                                quote = ch;
+                                i = ++dstart;
+                                for (;; i++)
+                                  {
+                                    if (i == end)
+                                      {
+                                        message = BAD_STANDALONE_SYNTAX;
+                                        state = SAW_ERROR;
+                                        continue mainLoop;
+                                      }
+                                    ch = buffer[i];
+                                    if (ch == quote)
+                                      break;
+                                  }
+                                if (i == dstart+3
+                                    && buffer[dstart] == 'y'
+                                    && buffer[dstart+1] == 'e'
+                                    && buffer[dstart+2] == 's')
+                                  {
+                                  }
+                                else if (i == dstart+2
+                                         && buffer[dstart] == 'n'
+                                         && buffer[dstart+1] == 'o')
+                                  {
+                                  }
+                                else
+                                  {
+                                    message = BAD_STANDALONE_SYNTAX;
+                                    state = SAW_ERROR;
+                                    continue mainLoop;
+                                  }
                                 dstart = i+1;
                                 while (dstart < end
                                        && Character.isWhitespace(buffer[dstart]))

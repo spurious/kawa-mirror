@@ -1,3 +1,9 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* Document.java: Split the uri-to-docujment cache into a string
+	thread-local mp, and a soft global map, so the former can be cleared
+	when done with a module.
+
 2007-12-26  Per Bothner  <per@bothner.com>
 
 	* AttributeAxis.java (scan): Add correct stop condition.

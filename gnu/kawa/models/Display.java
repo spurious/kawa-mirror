@@ -67,7 +67,7 @@ public abstract class Display
 
   public void addText (Text model, Object where)
   {
-    throw new Error("makeView called on DrawImage");
+    throw new Error("makeView called on Text");
   }
 
   public void addSpacer (Spacer model, Object where)

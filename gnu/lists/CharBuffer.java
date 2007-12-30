@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003, 2005  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2005, 2007  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -40,6 +40,72 @@ public class CharBuffer extends StableVector
     return string.charAt(index);
   }
 
+  public int indexOf (int ch, int fromChar)
+  {
+    char c1, c2;
+    if (ch >= 0x10000)
+      {
+        c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+        c2 = (char) ((ch & 0x3FF) + 0xDC00);
+      }
+    else
+      {
+        c1 = (char) ch;
+        c2 = 0;
+      }
+    char[] arr = getArray();
+    int i = fromChar;
+    int limit = gapStart;
+    if (i >= limit)
+      {
+        i = gapEnd;
+        limit = arr.length;
+      }
+    for ( ; ; i++)
+      {
+        if (i == limit)
+          {
+            limit = arr.length;
+            if (i < limit)
+              i = gapEnd;
+            else
+              break;
+          }
+        if (arr[i] == c1
+            && (c2 == 0
+                || (i+1 < limit ? arr[i+1] == c2
+                    : gapEnd < arr.length && arr[gapEnd] == c2)))
+          return i > gapStart ? i - (gapEnd - gapStart) : i;
+      }
+    return -1;
+  }
+
+  public int lastIndexOf (int ch, int fromChar)
+  {
+    char c1, c2;
+    if (ch >= 0x10000)
+      {
+        c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+        c2 = (char) ((ch & 0x3FF) + 0xDC00);
+      }
+    else
+      {
+        c1 = 0;
+        c2 = (char) ch;
+      }
+    for (int i = fromChar; --i >= 0; )
+      {
+        if (charAt(i) == c2)
+          {
+            if (c1 == 0)
+              return i;
+            if (i > 0 && charAt(i-1) == c1)
+              return i - 1;
+          }
+      }
+    return -1;
+  }
+
   /** Copy characters into a destination buffer.
    * Same interface as java.lang.String's getChars. */
   public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
@@ -71,6 +137,17 @@ public class CharBuffer extends StableVector
       index += gapEnd - gapStart;
     string.setCharAt(index, value);
   }
+
+  public String substring (int start, int end)
+  {
+    int sz = size();
+    if (start < 0 || end < start || end > sz)
+      throw new IndexOutOfBoundsException();
+    int len = end - start;
+    start = getSegment(start, len);
+    return new String(getArray(), start, len);
+  }
+  
 
   /* #ifdef use:java.lang.CharSequence */
   public CharSequence subSequence(int start, int end)

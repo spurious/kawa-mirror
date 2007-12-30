@@ -2,6 +2,8 @@
 
 	* FString.java (append(CharSequence,int,int)): Optimize.
 
+	* CharBuffer.java (indexOf, lastIndexOf, substring): New methods.
+
 2007-02-18  Per Bothner  <per@bothner.com>
 
 	* FString.java (<init>(CharSeq)): Change implementation.

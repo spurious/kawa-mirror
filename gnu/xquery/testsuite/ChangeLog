@@ -1,3 +1,10 @@
+2007-12-29  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (isSelected): New method.
+
+	* RunXQTS.java (endElement): Fix handling of </module> to match
+	current ModuleManager - which requires a class given a class-name.
+
 2007-12-26  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Add regression trest for

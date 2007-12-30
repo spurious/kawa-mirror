@@ -963,11 +963,16 @@ public class RunXQTS extends FilterConsumer
       || c == '.' || c == '-' || c == '+' || c == 'E';
   }
 
-  String selectedTest;
-
   public String getElementValue ()
   {
     return cout.toSubString(elementStartIndex[nesting]);
+  }
+
+  String selectedTest;
+
+  boolean isSelected (String testName)
+  {
+    return selectedTest == null || selectedTest.equals(testName);
   }
 
   public void endElement()
@@ -977,8 +982,7 @@ public class RunXQTS extends FilterConsumer
     if (tagMatches("test-case"))
       {
         if (--maxTests == 0)  System.exit(0); // FIXME
-        if (selectedTest == null
-            || selectedTest.equals(testName))
+        if (isSelected(testName))
           {
             xqlog.startElement(testCaseElementType);
             writeAttribute("name", testName);
@@ -1009,8 +1013,7 @@ public class RunXQTS extends FilterConsumer
       }
     else if (tagMatches("input-query"))
       {
-        if (selectedTest == null
-            || selectedTest.equals(testName))
+        if (isSelected(testName))
           {
             String variable = attributes.getValue("variable");
             Symbol symbol = Symbol.parse(variable);
@@ -1069,7 +1072,7 @@ public class RunXQTS extends FilterConsumer
         catch (Throwable ex)
           {
             System.err.println("caught "+ex);
-            System.err.println("reading data file "+path);
+            System.err.println("reading data file "+path+" for "+testName);
             System.err.println("inputFile:"+inputFile+" variable:"+variable+" path:"+path);
             ex.printStackTrace();
             System.exit(-1);
@@ -1137,10 +1140,8 @@ public class RunXQTS extends FilterConsumer
         String mpath = directory + '/' + mfile + XQueryFileExtension;
         String mclass = Compilation.mangleURI(uri)
           + '.' + XQuery.makeClassName(mpath);
-
-        ModuleInfo minfo = manager.findWithClassName(mclass);
-        minfo.sourcePath = mfile + XQueryFileExtension;
-        minfo.setSourceAbsPath(Path.valueOf(mpath));
+        ModuleInfo minfo = manager.findWithSourcePath(mpath);
+        minfo.className = mclass;
         minfo.setNamespaceUri(uri);
       }
     /*

@@ -20,19 +20,14 @@ public class define_variable extends Syntax
     if (p.car instanceof String || p.car instanceof Symbol)
       {
 	Object sym = p.car;
-	if (! (defs instanceof ModuleExp))
-	  tr.error('e', getName() + " must be at module level");
 	Declaration decl = defs.lookup(sym);
 	if (decl != null)
 	  tr.error('e', "duplicate declaration for '"+sym+"'");
-	ModuleExp mod = defs.currentModule();
-	decl = mod.addDeclaration(sym);
+	decl = defs.addDeclaration(sym);
 	tr.push(decl);
 	decl.setSimple(false);
 	decl.setPrivate(true);
 	decl.setFlag(Declaration.IS_DYNAMIC);
-	if (mod.isStatic())
-	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
 	decl.setIndirectBinding(true);

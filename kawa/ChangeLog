@@ -1,3 +1,8 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* standard/define_variable.java (scanForDefinitions): There doesn't
+	seem to be any reason to restrict define-variable to module-level.
+
 2007-11-05  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): If we're not in immediate mode,

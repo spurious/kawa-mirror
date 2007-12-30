@@ -1,3 +1,11 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (cleanupAfterCompilation): New method.
+	(outputClass): Call cleanupAfterCompilation.
+	* ModuleExp.java (evalToClass): Likewise.
+	This fixes a bad memory leak (noticable in RunXQTS).
+	* ModuleInfo.java (getCompilation): Remove unused method.
+
 2007-12-09  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocFieldFor): If we don't need a closure (and

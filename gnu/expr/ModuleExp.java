@@ -96,8 +96,6 @@ public class ModuleExp extends LambdaExp
 	    String className = clas.getName ();
 	    byte[] classBytes = clas.writeToArray ();
 	    loader.addClass(className, classBytes);
-            // This reduces memory leaks if we do lots of evalToClass.
-            clas.cleanupAfterCompilation();
 
 	    if (zout != null)
 	      {
@@ -148,6 +146,7 @@ public class ModuleExp extends LambdaExp
 
         ModuleInfo minfo = comp.minfo;
         minfo.setModuleClass(clas);
+        comp.cleanupAfterCompilation();
         int ndeps = minfo.numDependencies;
 
         for (int idep = 0;  idep < ndeps;  idep++)
@@ -155,10 +154,7 @@ public class ModuleExp extends LambdaExp
             ModuleInfo dep = minfo.dependencies[idep];
             Class dclass = dep.getModuleClassRaw();
             if (dclass == null)
-              {
-                dclass = evalToClass(dep.comp, null);
-                dep.setModuleClass(dclass);
-              }
+              dclass = evalToClass(dep.comp, null);
             comp.loader.addClass(dclass);
           }
 

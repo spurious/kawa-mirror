@@ -966,14 +966,20 @@ public class Compilation implements SourceLocator
 	if (parent != null)
 	  new File(parent).mkdirs();
 	clas.writeToFile(out_name);
-
-        clas.cleanupAfterCompilation();
       }
+    cleanupAfterCompilation();
+    litTable = null;
+  }
 
+  public void cleanupAfterCompilation ()
+  {
+    for (int iClass = 0;  iClass < numClasses;  iClass++)
+      classes[iClass].cleanupAfterCompilation();
+    classes = null;
     minfo.comp = null;
+    minfo.exp = null;
     mainLambda.body = null;
     mainLambda = null;
-    litTable = null;
   }
 
   public void compileToArchive (ModuleExp mexp, String fname)
@@ -2810,6 +2816,7 @@ public class Compilation implements SourceLocator
             clas.getDeclaredField(init.field.getName())
               .set(null, init.value);
 	  }
+        comp.litTable = null;
       }
     catch (Throwable ex)
       {

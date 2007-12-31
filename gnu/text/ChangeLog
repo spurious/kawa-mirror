@@ -1,3 +1,8 @@
+2007-12-30  Per Bothner  <per@bothner.com>
+
+	* QueueReader.java: Make implement Appendable.
+	Add new append methods, that allow more efficient inserts.
+
 2007-09-07  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (outputPartialLine): Fix setting of

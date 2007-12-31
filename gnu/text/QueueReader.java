@@ -1,5 +1,6 @@
 package gnu.text;
 import java.io.*;
+import gnu.lists.CharSeq;
 
 /** An InPort that reads from a queue.
   * The method append can be used to write chars to the end of the queue.
@@ -7,6 +8,9 @@ import java.io.*;
   */
 
 public class QueueReader extends Reader
+  /* #ifdef JAVA5 */
+  // implements Appendable
+  /* #endif */
 {
   char[] buffer;
   int readAheadLimit;
@@ -50,10 +54,46 @@ public class QueueReader extends Reader
     limit = cur_size;
   }
 
-  public void append (String str)
+  /* #ifdef use:java.lang.CharSequence */
+  public QueueReader append (CharSequence csq)
   {
-    append (str.toCharArray());
+    if (csq == null)
+      csq = "null";
+    return append(csq, 0, csq.length());
   }
+
+  public synchronized QueueReader append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    int len = end - start;
+    reserveSpace(len);
+    int sz = limit;
+    char[] d = buffer;
+    if (csq instanceof String)
+      ((String) csq).getChars(start, end, d, sz);
+    else if (csq instanceof CharSeq)
+      ((CharSeq) csq).getChars(start, end, d, sz);
+    else
+      {
+        int j = sz;
+        for (int i = start; i < end;  i++)
+          d[j++] = csq.charAt(i);;
+      }
+    limit = sz + len;
+    notifyAll();
+    return this;
+  }
+  /* #else */
+  // public synchronized void append (String str)
+  // {
+  //   int len = str.length();
+  //   reserveSpace(len);
+  //   str.getChars(offset, offset+len, buffer, limit)l
+  //   limit += len;
+  //   notifyAll();
+  // }
+  /* #endif */
 
   public void append(char[] chars)
   {
@@ -62,29 +102,32 @@ public class QueueReader extends Reader
 
   public synchronized void append(char[] chars, int off, int len)
   {
-    if (buffer == null)
-      buffer = new char[100+len];
-    else if (buffer.length < limit + len)
-      resize(len);
+    reserveSpace(len);
     System.arraycopy(chars, off, buffer, limit, len);
     limit += len;
     notifyAll();
   }
 
-  public synchronized void append(char ch)
+  public synchronized QueueReader append(char ch)
   {
-    if (buffer == null)
-      buffer = new char[100];
-    else if (buffer.length <= limit)
-      resize(1);
+    reserveSpace(1);
     buffer[limit++] = ch;
     notifyAll();
+    return this;
   }
 
   /** For the writer to signal that there is no more data to append. */
   public synchronized void appendEOF ()
   {
     EOFseen = true;
+  }
+
+  protected void reserveSpace (int len)
+  {
+   if (buffer == null)
+      buffer = new char[100+len];
+    else if (buffer.length < limit + len)
+      resize(len);
   }
 
   public synchronized boolean ready ()

@@ -1,5 +1,18 @@
 2007-12-30  Per Bothner  <per@bothner.com>
 
+	Move code out of ReplPane and GuiConsole, until ReplDocument.
+	This allows (in theory) the same repl to be viewed in multiple panes.
+	Also, use a custom ViewFactory to handle Viewable and Paintable,
+	so these can be displayed multiple times.
+	* ReplDocument.java: New class, extends DefaultStyledDocument.
+	* Makefile.am: Update accordingly.
+	* ReplPaneOutPort.java: Write to ReplDocument, with new handling
+	of Viewable and Paintable.
+	* GuiConsole.java" Move fields and methods to ReplDocument.
+	* ReplPane.java: Likewise.
+	(class ReplEditorKit): New class.
+	* GuiInPort.java: Update for moved fields and methods.
+
 	* standard/define_variable.java (scanForDefinitions): There doesn't
 	seem to be any reason to restrict define-variable to module-level.
 

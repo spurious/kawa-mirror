@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import gnu.mapping.*;
-import gnu.text.Path;
 import gnu.expr.Language;
 import kawa.standard.Scheme;
 
@@ -22,15 +21,10 @@ public class GuiConsole extends JFrame implements ActionListener {
 
   static int window_number = 0;
 
-  Language language;
-  Environment environment;
-  Future thread;
-
-  gnu.text.QueueReader in_r;
-  ReplPane message = null;
+  ReplPane pane;
+  ReplDocument document;
 
   public static void main(String[] args) {
-    Language language = Scheme.getInstance();
     new GuiConsole();
   }
 
@@ -42,20 +36,24 @@ public class GuiConsole extends JFrame implements ActionListener {
   public GuiConsole(Language language, Environment penvironment, boolean shared)
   {
     super("Kawa");
-    this.language = language;
 
-    in_r = new gnu.text.QueueReader ();
-    message = new ReplPane(in_r);
+    document = new ReplDocument(language, penvironment, shared);
+    pane = new ReplPane(document);
     window_number++;
     kawa.repl.exitIncrement();
-    OutPort out_p = message.getStdout();
-    OutPort err_p = message.getStderr();
-    InPort in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
-                                out_p, message);
-
+    OutPort out_p = pane.getStdout();
+    OutPort err_p = pane.getStderr();
     this.setLayout(new BorderLayout(0,0));
-
-    this.add("Center", new JScrollPane(message));
+    this.add("Center", new JScrollPane(pane));
+    // Code for testing same ReplDocument in two JFrames.
+    if (false)
+      {
+        JFrame other = new JFrame("frame2");
+        other.setLayout(new BorderLayout(0,0));
+        other.add("Center", new JScrollPane(new ReplPane(pane.document)));
+        other.setSize(700,500);
+        other.setVisible(true);
+      }
 
     setupMenus();
     //pack();
@@ -63,28 +61,12 @@ public class GuiConsole extends JFrame implements ActionListener {
     setSize(700,500);
     setVisible(true);
 
-    thread = new Future (new kawa.repl(language),
-			 penvironment, in_p, out_p, err_p);
-    Environment env = thread.getEnvironment();
-    if (shared)
-      env.setIndirectDefines();
-    this.environment = env;
-    thread.start();
   }
 
   void close () {
-    in_r.appendEOF();
+    pane.document.close(); 
     dispose();
-    // Give thread chance to finish and clean up
-    try {
-      Thread.sleep(100);
-    } catch (InterruptedException ex) {
-    }
-    // Thread.stop is deprecated in JDK 1.2, but I see no good
-    // alternative.  (Thread.destroy is not implemented!)
-    thread.stop(); 
-    kawa.repl.exitDecrement();
- }
+  }
 
   private void setupMenus() {
     MenuBar menubar;
@@ -136,15 +118,15 @@ public class GuiConsole extends JFrame implements ActionListener {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))
-      new GuiConsole(language, Environment.getGlobal(), false);
+      new GuiConsole(document.language, Environment.getGlobal(), false);
     else if (cmd.equals(NEW_SHARED))
-      new GuiConsole(language, environment, true);
+      new GuiConsole(document.language, document.environment, true);
     else if (cmd.equals(EXIT))
       System.exit(0);
     else if (cmd.equals(CLOSE))
       close();
     else if (cmd.equals(PURGE_MESSAGE)) {
-      message.deleteOldText();
+      pane.document.deleteOldText();
     }
     else
       OutPort.outDefault().println("Unknown menu action: "+cmd);

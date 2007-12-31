@@ -9,12 +9,12 @@ import gnu.text.Path;
 
 class GuiInPort extends TtyInPort
 {
-  ReplPane buffer;
+  ReplDocument document;
 
-  public GuiInPort (Reader in, Path path, OutPort tie, ReplPane buffer)
+  public GuiInPort (Reader in, Path path, OutPort tie, ReplDocument document)
   {
     super (in, path, tie);
-    this.buffer = buffer;
+    this.document = document;
   }
 
   /** Overrides lineStart.
@@ -26,14 +26,14 @@ class GuiInPort extends TtyInPort
   public void lineStart (boolean revisited) throws java.io.IOException
   {
     super.lineStart(revisited);
-    if (! revisited && buffer.outputMark < buffer.endMark)
+    if (! revisited && document.outputMark < document.endMark)
       {
-	buffer.enter();
+	((ReplPane) document.pane).enter(); // FIXME
       }
   }
 
   public void emitPrompt (String prompt) throws java.io.IOException
   {
-    buffer.write(prompt, ReplPane.promptStyle);
+    document.write(prompt, ReplDocument.promptStyle);
   }
 }

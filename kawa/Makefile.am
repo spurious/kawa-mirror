@@ -9,7 +9,8 @@ SUBDIRS = lang standard lib
 
 if WITH_AWT
 java_WITH_AWT = \
-  GuiConsole.java ReplPane.java ReplPaneOutPort.java GuiInPort.java
+  GuiConsole.java ReplPane.java ReplDocument.java \
+  ReplPaneOutPort.java GuiInPort.java
 endif
 
 java_sources = Shell.java repl.java Version.java \

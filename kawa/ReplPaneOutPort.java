@@ -14,45 +14,57 @@ import gnu.kawa.swingviews.SwingDisplay;
 
 public class ReplPaneOutPort extends OutPort
 {
-  ReplPane pane;
+  ReplDocument document;
   AttributeSet style;
   String str="";
+  TextPaneWriter tout;
 
-  public ReplPaneOutPort (ReplPane pane, String path, AttributeSet style)
+  public ReplPaneOutPort (ReplDocument document, String path, AttributeSet style)
   {
-    super(new TextPaneWriter(pane, style), true, true, Path.valueOf(path));
-    this.pane = pane;
+    this(new TextPaneWriter(document, style), document, path, style);
+  }
+
+  ReplPaneOutPort (TextPaneWriter tout, ReplDocument document, String path, AttributeSet style)
+  {
+    super(tout, true, true, Path.valueOf(path));
+    this.tout = tout;
+    this.document = document;
     this.style = style;
+  }
+
+  public void write (String str, MutableAttributeSet style)
+  {
+    flush();
+    document.write(str, style);
+    setColumnNumber(1); // So freshline will Do The Right Thing.
   }
 
   public synchronized void write (Component c)
   {
     MutableAttributeSet style = new SimpleAttributeSet();
     StyleConstants.setComponent(style, c);
-    pane.write(" ", style);
-    setColumnNumber(1); // So freshline will Do The Right Thing.
+    write(" ", style);
   }
 
   public void print(Object v)
   {
     if (v instanceof Component)
       {
-        flush();
         write((Component) v);
       }
     else if (v instanceof Paintable)
       {
-        flush();
-        JPanel panel = new gnu.kawa.swingviews.SwingPaintable((Paintable) v);
-        write((java.awt.Component) panel);
+        MutableAttributeSet style = new SimpleAttributeSet();
+        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.PaintableElementName);
+        style.addAttribute(ReplPane.PaintableAttribute, v);
+        write(" ", style);
       }
     else if (v instanceof Viewable)
       {
-        flush();
-        JPanel panel = new JPanel();
-        panel.setBackground(pane.getBackground());
-        write((java.awt.Component) panel);
-        ((Viewable) v).makeView(SwingDisplay.getInstance(), panel);
+        MutableAttributeSet style = new SimpleAttributeSet();
+        style.addAttribute(AbstractDocument.ElementNameAttribute, ReplPane.ViewableElementName);
+        style.addAttribute(ReplPane.ViewableAttribute, v);
+        write(" ", style);
       }
     else
       super.print(v);
@@ -61,13 +73,13 @@ public class ReplPaneOutPort extends OutPort
 
 class TextPaneWriter extends java.io.Writer
 {
-  ReplPane pane;
+  ReplDocument document;
   AttributeSet style;
   String str="";
 
-  public TextPaneWriter (ReplPane pane, AttributeSet style)
+  public TextPaneWriter (ReplDocument document, AttributeSet style)
   {
-    this.pane = pane;
+    this.document = document;
     this.style = style;
   }
 
@@ -80,13 +92,14 @@ class TextPaneWriter extends java.io.Writer
 
   public void write (String str)
   {
-    pane.write(str, style);
+    document.write(str, style);
   }
 
   public synchronized void write (char[] data, int off, int len)
   {
     flush();
-    write(new String(data, off, len));
+    if (len != 0)
+      write(new String(data, off, len));
   }
 
   public synchronized void flush()

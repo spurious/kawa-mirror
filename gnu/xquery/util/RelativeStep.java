@@ -159,7 +159,7 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
           }
       }
     // Now we can rewrite 'descendant-or-self::node()/B' (which is the
-    // expansion of the abbreviated syntax '//B') to /descdendant::B'.
+    // expansion of the abbreviated syntax '//B') to /descendant::B'.
     if (exp1 instanceof ApplyExp && exp2 instanceof ApplyExp)
       {
         ApplyExp aexp1 = (ApplyExp) exp1;
@@ -172,9 +172,8 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
             && (exp12 = aexp1.getArg(1)) instanceof LambdaExp)
           {
             LambdaExp lexp12 = (LambdaExp) exp12;
-            ApplyExp aexp12;
             if (lexp12.body instanceof ApplyExp
-                && (aexp12 = (ApplyExp) lexp12.body).getFunction().valueIfConstant() == DescendantOrSelfAxis.anyNode)
+                && ((ApplyExp) lexp12.body).getFunction().valueIfConstant() == DescendantOrSelfAxis.anyNode)
               {
                 exp.setArg(0, aexp1.getArg(0));
                 aexp2.setFunction(new QuoteExp(DescendantAxis.make(((ChildAxis) p2).getNodePredicate())));

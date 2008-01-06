@@ -4,7 +4,6 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.math.Numeric;
 import gnu.math.IntNum;
 import gnu.kawa.functions.AddOp;
 

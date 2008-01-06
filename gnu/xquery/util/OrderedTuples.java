@@ -198,7 +198,7 @@ int cmp(int a, int b)  throws Throwable
  */
   int listsort(int list) throws Throwable
   {// indexes
-    int p, q, e, tail, oldhead; 
+    int p, q, e, tail; 
     int insize, nmerges, psize, qsize, i;
 
     /*

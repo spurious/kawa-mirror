@@ -72,10 +72,7 @@ public class CastAs extends Convert
       return exp;
     Object type = ((QuoteExp) args[0]).getValue();
     if (type instanceof XDataType)
-      {
-        XDataType xtype = (XDataType) type;
-        return new ApplyExp(castMethod, args);
-      }
+      return new ApplyExp(castMethod, args);
     return exp;
   }
 

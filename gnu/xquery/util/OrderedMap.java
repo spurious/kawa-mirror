@@ -1,5 +1,4 @@
 package gnu.xquery.util;
-import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
@@ -65,7 +64,6 @@ public class OrderedMap extends MethodProc
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Consumer out = ctx.consumer;
     Object[] args = ctx.getArgs();
     Object values = args[0];
     OrderedTuples tuples;

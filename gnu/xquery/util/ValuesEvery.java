@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
-import gnu.lists.*;
 import gnu.mapping.*;
 
 /** Used to implement 'some - satisfies' and 'every - satisfies'.
@@ -26,7 +25,6 @@ public class ValuesEvery extends MethodProc
   public void apply (CallContext ctx) throws Throwable
   {
     Procedure proc = (Procedure) ctx.getNextArg();
-    Consumer out = ctx.consumer;
     Object val = ctx.getNextArg();
     boolean ok = matchAll;
     Procedure.checkArgCount(proc, 1);

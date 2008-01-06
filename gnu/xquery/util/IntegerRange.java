@@ -62,7 +62,6 @@ public class IntegerRange extends MethodProc // implements Inlineable
 
   public void apply (CallContext ctx)
   {
-    Consumer consumer = ctx.consumer;
     Object first = ctx.getNextArg();
     Object last = ctx.getNextArg();
     ctx.lastArg();

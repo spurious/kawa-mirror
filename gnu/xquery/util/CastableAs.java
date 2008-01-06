@@ -37,11 +37,8 @@ public class CastableAs extends InstanceOf
       return exp;
     Object type = ((QuoteExp) args[1]).getValue();
     if (type instanceof XDataType)
-      {
-        XDataType xtype = (XDataType) type;
-        return new ApplyExp(castableMethod,
-                            new Expression[] { args[1], args[0] });
-      }
+      return new ApplyExp(castableMethod,
+                          new Expression[] { args[1], args[0] });
     return exp;
   }
 

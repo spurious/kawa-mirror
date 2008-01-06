@@ -7,10 +7,6 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.NodeTree;
 import gnu.kawa.xml.*;
-import gnu.math.DFloNum;
-/* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.Node;
-/* #endif */
 
 public class SequenceUtils
 {

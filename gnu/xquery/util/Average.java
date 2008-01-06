@@ -5,7 +5,6 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.*;
-import gnu.kawa.functions.AddOp;
 
 public class Average extends Procedure1
 {

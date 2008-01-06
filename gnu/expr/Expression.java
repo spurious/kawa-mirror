@@ -206,7 +206,7 @@ public abstract class Expression extends Procedure0
   protected void walkChildren (ExpWalker walker) { }
 
   /** Apply inlining transformations on a given ApplyExp.
-   * Assumes the ApplyExp's function is the this expression,
+   * Assumes the ApplyExp's function is this expression,
    * or can be optimized to this expression.
    * @param exp an application whose function expression can be simplified
    *  to this expression.

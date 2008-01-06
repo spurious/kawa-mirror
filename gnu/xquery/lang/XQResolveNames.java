@@ -11,9 +11,6 @@ import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.QNameUtils;
-import java.util.Vector;
-import gnu.math.DateTime;
-import gnu.math.IntNum;
 
 public class XQResolveNames extends ResolveNames
 {
@@ -520,7 +517,6 @@ public class XQResolveNames extends ResolveNames
 	Declaration decl = ((ReferenceExp) func).getBinding();
 	int code;
         Expression err;
-        ModuleExp mexp;
 	if (decl != null && (code = decl.getCode()) < 0)
 	  {
 	    switch (code)
@@ -749,7 +745,7 @@ public class XQResolveNames extends ResolveNames
                   if (code == DOC_BUILTIN)
                     {
                       mname = "docCached";
-                      if (parser.warnOldVersion
+                      if (XQParser.warnOldVersion
                           && "document".equals(decl.getName()))
                         getCompilation()
                           .error('w', "replace 'document' by 'doc'");

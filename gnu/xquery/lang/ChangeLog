@@ -1,3 +1,7 @@
+2008-01-06  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java: Clean up to remove warnings with some compilers.
+
 2007-04-23  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (walkApplyExp): Fix copy/paste error for return

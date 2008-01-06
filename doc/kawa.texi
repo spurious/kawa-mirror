@@ -877,12 +877,10 @@ To exit the entire Kawa session, call the
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
-A traditional evaluator is only used for top-level directly entered
-expressions @emph{outside} a lambda.  (It would have been simpler
-to also byte-compile top-level expressions by surrounding them
-by a dummy lambda.  However, this would create a new Class object
-in the Java VM for every top-level expression.  This is undesirable
-unless you have a VM that can garbage collect Class objects.)
+(A traditional interpreter is used for macro-expansion.
+Kawa used to also interpret ``simple'' expressions in interactive mode,
+but always compiling makes things more consistent, and allows for
+better stack traces on errors.)
 
 To save speed when loading large Scheme source files, you probably
 want to pre-compile them and save them on your local disk.
@@ -1989,7 +1987,10 @@ evaluate it during every invocation of the resulting procedure.
 @node Numbers, Data structures, Procedures, Extensions
 @section Quantities and Numbers
 
-Kawa supports the full Scheme set of number operations with soem extensions.
+Kawa supports the full Scheme set of number operations with some extensions.
+
+Kawa converts between Scheme number types
+and Java number types as appropriate.
 
 @menu
 * Quantities::
@@ -2052,6 +2053,11 @@ Define @var{unit-name} as a unit (that can be used in literals)
 equal to the quantity @var{expression}.
 @example
 (define-unit cent 0.01dollar)
+@end example
+The @var{unit-name} is declared in the @code{unit} namespace,
+so the above is equivalent to:
+@example
+(define-constant unit:cent (* 0.01 unit:dollar))
 @end example
 @end deffn
 
@@ -3355,17 +3361,6 @@ Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
 @end defun
 
-@defun instance? value type
-Returns @code{#t} iff @var{value} is an instance of type @var{type}.
-(Undefined if @var{type} is a primitive type, such as @code{<int>}.)
-@end defun
-
-@defun as type value
-Converts or coerces @var{value} to a value of type @var{type}.
-Throws an exception if that cannot be done.
-Not supported for @var{type} to be a primitive type such as @code{<int>}.
-@end defun
-
 @deffn Syntax synchronized object form ...
 Synchronize on the given @var{object}.  (This means getting an
 exclusive lock on the object, by acquiring its @dfn{monitor}.)
@@ -3675,6 +3670,7 @@ but the file can be created in the directory.)
 
 @defun delete-file filename
 Delete the file named @var{filename}.
+On failure, throws an exception.
 @end defun
 
 @defun rename-file oldname newname
@@ -4307,6 +4303,7 @@ that map to primitive Java types or java classes.
 @menu
 * Standard Types::
 * Declaring Types of Variables::
+* Type tests and conversions::
 @end menu
 
 @node Standard Types, Declaring Types of Variables, , Types
@@ -4357,6 +4354,9 @@ This is a sub-type of @code{<rational>}.
 
 @defvar <symbol>
 The type of Scheme symbols.
+(Implemented using the Java class @code{gnu.mapping.Symbol}.)
+(Compatibility note: Previous versions of Kawa implemented
+a simple Scheme symbol using an interned @code{java.lang.String}.)
 @end defvar
 
 @defvar <keyword>
@@ -4372,9 +4372,14 @@ The type of Scheme pairs.  This is a sub-type of @code{<list>}.
 @end defvar
 
 @defvar <string>
-The type of (mutable) Scheme strings.
-This is @emph{not} the same as (non-mutable) Java strings
-(which happen to be the same as @code{<symbol>}).
+The type of Scheme strings.
+(Implemented using @code{java.lang.String} for immutable strings,
+and @code{gnu.lists.FString} for mutable strings.
+Both of these implement the interface @code{java.lang.CharSequence}.
+In the future, we may change the representation for strings
+containing ``surrogate characters'', for efficient indexing.)
+(Compatibility note: Previous versions of Kawa implemented
+always used @code{gnu.lists.FString}.)
 @end defvar
 
 @defvar <character>
@@ -4401,7 +4406,7 @@ The type of Scheme output ports.
 
 @defvar <String>
 This type name is a special case.  It specifies the class
-@code{<java.lang.String>} (just as @code{<symbol>} does).
+@code{<java.lang.String>}.
 However, coercing a value to @code{<String>} is done by
 invoking the @code{toString} method on the value to be coerced.
 Thus it "works" for all objects.
@@ -4409,7 +4414,7 @@ It also works for @code{#!null}.
 
 When Scheme code invokes a Java methods any parameter
 whose type is @code{java.lang.String} is converted
-as if it was decalred as a @code{<String>}.
+as if it was declared as a @code{<String>}.
 @end defvar
 
 More will be added later.
@@ -4431,7 +4436,7 @@ the actual argument is cast at run time to the named class.
 Also, @code{<java.lang.StringBuffer[]>} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
-@node Declaring Types of Variables,  , Standard Types, Types
+@node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
 @subsection Declaring Types of Variables
 
 @deffn Syntax let ((name [:: type] init) ...) body
@@ -4452,6 +4457,38 @@ If @var{type} is not specified, it defaults to @code{<object>}.
 @end deffn
 
 See also @code{define-private}, and @code{define-constant}.
+
+@node Type tests and conversions, , Declaring Types of Variables, Types
+@subsection Type tests and conversions
+
+Scheme defines a number of standard type testing predicates.
+For example @code{(vector? x)} is @code{#t} if and only if
+@code{x} is a vector.
+
+Kawa generalizes this to arbitrary type names:
+If @var{T} is a type-name (that is in scope at compile-time),
+then @code{@var{T}?} is a one-argument function that returns
+@code{#t} if the argument is an instance of the type @code{@var{T}},
+and @code{#f} otherwise:
+@example
+(gnu.lists.FVector? #(123)) @result{} #t
+(let ((iarr (int[] 10))) (int[]? iarr)) @result{} #t 
+@end example
+In general:
+@example
+(@var{T}? @var{x}) @result{} (instance? @var{x} @var{T})
+@end example
+
+@defun instance? value type
+Returns @code{#t} iff @var{value} is an instance of type @var{type}.
+(Undefined if @var{type} is a primitive type, such as @code{<int>}.)
+@end defun
+
+@defun as type value
+Converts or coerces @var{value} to a value of type @var{type}.
+Throws an exception if that cannot be done.
+Not supported for @var{type} to be a primitive type such as @code{<int>}.
+@end defun
 
 @node Objects Classes and Modules, XML tools, Types, Extensions
 @section Object, Classes and Modules
@@ -5573,7 +5610,7 @@ array element type must be compatible with all the extra arguments.)
 You can create a instance of a class-type
 by ``calling'' the class-type as a function:
 @example
-(<java.util.Vector> 20)
+(java.util.Vector 20)
 @end example
 I.e. if you call a type as if were a function,
 then the type is coerced to an instance-constructor function.

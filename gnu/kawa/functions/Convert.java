@@ -84,7 +84,7 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
    * @param type to coerce value to
    * @return expression that coerces value to type
    */
-  public static Expression makeCoercion(Expression value, Expression type)
+  public static ApplyExp makeCoercion(Expression value, Expression type)
   {
     Expression[] exps = new Expression[2];
     exps[0] = type;

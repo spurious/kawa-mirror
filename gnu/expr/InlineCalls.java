@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.functions.Convert;
 
 public class InlineCalls extends ExpWalker
 {
@@ -147,8 +148,14 @@ public class InlineCalls extends ExpWalker
         Declaration d = ref.getBinding();
         if (d != null && d.context == exp && ! ref.getDontDereference())
           {
-            if ( n == 1)
-              return exp.inits[0];
+            if (n == 1)
+              {
+                Expression init = exp.inits[0];
+                Expression texp = d.getTypeExp();
+                if (texp != QuoteExp.classObjectExp)
+                  init = walkApplyOnly(Convert.makeCoercion(init, texp));
+                return init;
+              }
             // Can also optimize if n > 1, but have to check if any
             // other inits can cause side-effects.  Probably not worth it.
           }

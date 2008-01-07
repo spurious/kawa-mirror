@@ -1,3 +1,7 @@
+2008-01-06  Per Bothner  <per@bothner.com>
+
+	* Convert.java (makeCoercion): Make return type more specific.
+
 2007-11-05  Per Bothner  <per@bothner.com>
 
 	* AddOp.java ($Mn): Generalize to standard java.lang.Number

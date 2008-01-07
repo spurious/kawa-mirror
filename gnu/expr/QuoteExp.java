@@ -40,11 +40,15 @@ public class QuoteExp extends Expression
   static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
   static public QuoteExp nullExp =
     new QuoteExp(null, Type.nullType);
+  public static final QuoteExp classObjectExp =
+    new QuoteExp(Type.pointer_type);
 
   public static QuoteExp getInstance (Object value)
   {
     if (value == null)
       return nullExp;
+    if (value == Type.pointer_type)
+      return classObjectExp;
     if (value == Special.undefined)
       return undefined_exp;
     if (value == Values.empty)

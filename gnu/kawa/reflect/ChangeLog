@@ -1,3 +1,8 @@
+2008-01-14  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Also search java.lang.Object when
+	looking for an instance method.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	Some changes mainly to better handle LangObjType.

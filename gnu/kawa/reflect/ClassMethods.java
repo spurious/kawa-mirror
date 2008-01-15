@@ -105,7 +105,10 @@ public class ClassMethods extends Procedure2
     dtype.getMethods(filter, named_class_only ? 0 : 2,
 		     methods,
                      caller == null ? "-" : caller.getPackageName());
-
+    if (! named_class_only &&
+        // If not redundant (i.e. not a normal ClassType), also search Object.
+        ! (dtype instanceof ClassType && ! ((ClassType) dtype).isInterface()))
+      Type.pointer_type.getMethods(filter, 0, methods, null);
     int mlength = (named_class_only ? methods.size()
 		   : removeRedundantMethods(methods));
 

@@ -3402,7 +3402,8 @@ public class XQParser extends Lexer
     popNesting(saveNesting);
     comp.push(sc);
     sc.addDeclaration(decl);
-    decl.setTypeExp(type);
+    if (type != null)
+      decl.setTypeExp(type);
     if (isFor)
       {
 	decl.noteValue (null);  // Does not have a known value.

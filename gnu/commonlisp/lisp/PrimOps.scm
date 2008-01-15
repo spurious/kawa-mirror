@@ -16,12 +16,12 @@
 
 ;; SYMBOLS
 
-(define (boundp symbol) :: |<clisp:boolean>|
+(define (boundp symbol) :: |clisp:boolean|
   ((primitive-static-method <gnu.commonlisp.lang.Symbols> "isBound"
                             <boolean> (<object>))
    symbol))
 
-(define (symbolp x) :: |<clisp:boolean>|
+(define (symbolp x) :: |clisp:boolean|
   (invoke-static <gnu.commonlisp.lang.Symbols> 'isSymbol x))
 
 (define (symbol-name symbol)
@@ -118,7 +118,7 @@
 (define (length (x :: <gnu.lists.Sequence>))
   (invoke x 'size))
 
-(define (arrayp x) <clisp:boolean>
+(define (arrayp x) |clisp:boolean|
   (instance? x <gnu.lists.SimpleVector>))
 
 (define (aref
@@ -138,7 +138,7 @@
 
 ;;; STRINGS
 
-(define (stringp x) <clisp:boolean>
+(define (stringp x) |clisp:boolean|
   (instance? x <string>))
 
 (define (make-string (count :: <int>) ch)

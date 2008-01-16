@@ -1,3 +1,8 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* MakeUnescapedData (inline): Handle new argsInlined parameter.
+	* TreeScanner.java (inline): Likewise.
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	* Document.java: Split the uri-to-docujment cache into a string

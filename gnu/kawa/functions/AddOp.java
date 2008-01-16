@@ -172,16 +172,17 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
         args2[1] = args[i];
         ApplyExp next = new ApplyExp(rproc, args2);
         if (proc instanceof CanInline)
-          prev = ((CanInline) proc).inline(next, walker);
+          prev = ((CanInline) proc).inline(next, walker, true);
         else
           prev = next;
       }
     return prev;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     // Inlining may yield PrimProcedure instructions of bytecode instructions
     // which we don't know how to interpret (yet).
     if (! walker.getCompilation().mustCompile)

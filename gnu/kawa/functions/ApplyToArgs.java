@@ -130,21 +130,25 @@ public class ApplyToArgs extends ProcedureN
 
   Language language;
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length - 1;
     if (nargs >= 0)
       {
         Expression proc = args[0];
-        if (proc instanceof LambdaExp)
+        if (! argsInlined)
           {
-            Expression[] rargs = new Expression[nargs];
-            System.arraycopy(args, 1, rargs, 0, nargs);
-            return walker.walk(new ApplyExp(proc, rargs));
+            if (proc instanceof LambdaExp)
+              {
+                Expression[] rargs = new Expression[nargs];
+                System.arraycopy(args, 1, rargs, 0, nargs);
+                return walker.walk(new ApplyExp(proc, rargs));
+              }
+            proc = walker.walk(proc);
+            args[0] = proc;
           }
-        proc = walker.walk(proc);
-        args[0] = proc;
         Type ptype = proc.getType();
         ApplyExp result;
         Compilation comp = walker.getCompilation();
@@ -153,10 +157,14 @@ public class ApplyToArgs extends ProcedureN
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            return proc.inline(new ApplyExp(proc, rargs), walker, null, false);
+            return proc.inline(new ApplyExp(proc, rargs), walker, null,
+                               argsInlined);
           }
-        for (int i = 1; i <= nargs;  i++)
-          args[i] = walker.walk(args[i]);
+        if (! argsInlined)
+          {
+            for (int i = 1; i <= nargs;  i++)
+              args[i] = walker.walk(args[i]);
+          }
         // This might be more cleanly handled at the type specifier. FIXME
         if (Invoke.checkKnownClass(ptype, comp) < 0)
           return exp;

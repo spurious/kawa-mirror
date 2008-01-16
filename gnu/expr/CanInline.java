@@ -7,10 +7,14 @@ package gnu.expr;
 public interface CanInline
 {
   /** Inline an application of this Procedure and return result.
-   * This method is responsible for walking exp.getArgs();
-   * you can handle this using {@code exp.getArgs(walker)}.
+   * Unless {@code argsInlined} is true, then this method
+   * is responsible for walking {@code exp.getArgs()};
+   * you can handle this using {@code exp.getArgs(walker, argsInlined)}.
+   * (The {@code exp.getFunction()} has been walked, regardless.)
+   * @param argsInlined true if the arguments have been inlined.
    * Can return original expression.
    */
-  public Expression inline (ApplyExp exp, InlineCalls walker);
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined);
 }
 

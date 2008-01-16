@@ -1,3 +1,12 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (inline): Handle new argsInlined parameter.
+	* SlotGet.java (inline): Likewise.
+	* InstanceOf.java (inline): Likewise.
+	* Invoke.java (inline): Likewise.
+	* SlotSet.java (inline): Likewise.
+
+
 2008-01-14  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): Also search java.lang.Object when

@@ -233,9 +233,10 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     return getLanguage().booleanObject(applyN(flags, args));
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;

@@ -30,9 +30,10 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     return Invoke.inlineClassName(exp, 0, walker);
   }
 

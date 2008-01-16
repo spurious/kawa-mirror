@@ -51,10 +51,11 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
     filter.finish();
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
     // FIXME make use of type of E1 to set dot in E2.
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     Expression exp1 = args[0];
     Expression exp2 = args[1];

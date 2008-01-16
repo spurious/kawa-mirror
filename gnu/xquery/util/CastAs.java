@@ -63,9 +63,10 @@ public class CastAs extends Convert
     ClassType.make("gnu.kawa.xml.XDataType");
   static final Method castMethod = typeXDataType.getDeclaredMethod("cast", 1);
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     exp = Invoke.inlineClassName(exp, 0, walker);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[0] instanceof QuoteExp))

@@ -171,9 +171,10 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       }
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     // Unlike, for SlotGet, we do the field-lookup at compile time
     // rather than inline time.  The main reason is that optimizing
     // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)

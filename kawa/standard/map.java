@@ -104,11 +104,12 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       }
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
     // FIXME: We should inline the list arguments first before inlining the
     // procedure argument, for better type inference etc.
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (nargs < 2)

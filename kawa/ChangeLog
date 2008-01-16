@@ -1,3 +1,7 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* standard/map.java (inline): Handle new argsInlined parameter.
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	Move code out of ReplPane and GuiConsole, until ReplDocument.

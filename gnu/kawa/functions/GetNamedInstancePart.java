@@ -63,9 +63,10 @@ public class GetNamedInstancePart extends ProcedureN
 
   public int numArgs() { return isField ? 0x1001 : 0xfffff001; }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     Expression[] xargs;
     Procedure proc;
@@ -141,9 +142,10 @@ class SetNamedInstancePart extends Procedure2
     pname = name;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     Expression[] xargs = new Expression[]
       { args[0], new QuoteExp(pname), args[1] };

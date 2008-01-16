@@ -45,9 +45,10 @@ public class IsEqv extends Procedure2 implements CanInline
     return false;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     if (nonNumeric(args[0]) || nonNumeric(args[1]))
       return new ApplyExp(isEq, args);

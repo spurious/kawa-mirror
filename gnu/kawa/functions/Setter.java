@@ -36,9 +36,10 @@ public class Setter extends Procedure1 implements CanInline, HasSetter
     return ((Procedure)arg).getSetter();
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {

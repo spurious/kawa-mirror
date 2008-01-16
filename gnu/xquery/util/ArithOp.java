@@ -215,9 +215,10 @@ public class ArithOp extends Procedure1or2
     throw new UnsupportedOperationException(getName());
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     // FUTURE
     return exp;
   }

@@ -42,9 +42,10 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
     defaultProc.check1(selector, ctx);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     for (int i = 1;  i < args.length;  i++)
       {

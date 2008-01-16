@@ -86,9 +86,10 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     return makeExp(new QuoteExp(type), new QuoteExp(member));
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp)
         || ! (exp instanceof GetNamedExp))
@@ -499,9 +500,10 @@ class NamedPart extends ProcedureN
     return 0xfffff000;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     switch (kind)
       {
@@ -649,9 +651,10 @@ class NamedPartSetter extends gnu.mapping.Setter
     return 0xfffff000;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     NamedPart get = (NamedPart) this.getter;
     if (get.kind == 'D')
       {

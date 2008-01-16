@@ -366,9 +366,10 @@ public class Invoke extends ProcedureN implements CanInline
     return exp;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Compilation comp = walker.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;

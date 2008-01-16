@@ -226,9 +226,10 @@ public class SlotGet extends Procedure2
       return method;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Compilation comp = walker.getCompilation();
     Language language = comp.getLanguage();
     Type type;

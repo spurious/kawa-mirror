@@ -1,3 +1,14 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* CastableAs.java (inline): Handle new argsInlined parameter.
+	* ArithOp.java (inline): Likewise.
+	* CastAs.java (inline): Likewise.
+	* OrderedMap.java (inline): Likewise.
+	* Compare.java (inline): Likewise.
+	* ValuesFilter.java (inline): Likewise.
+	* RelativeStep.java (inline): Likewise.
+	* BooleanValue.java (inline): Likewise.
+
 2008-01-06  Per Bothner  <per@bothner.com>
 
 	* CastableAs.java: Clean up to remove warnings with some compilers.

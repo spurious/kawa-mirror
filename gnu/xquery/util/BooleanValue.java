@@ -63,9 +63,10 @@ public class BooleanValue extends Procedure1 implements CanInline
     return booleanValue(arg) ? Boolean.TRUE : Boolean.FALSE;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker);
+    exp.walkArgs(walker, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {

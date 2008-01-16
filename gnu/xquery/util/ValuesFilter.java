@@ -100,9 +100,10 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
     return;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker)
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
   {
-    exp.walkArgs(walker); // FIXME - be smarter about type propagation
+    exp.walkArgs(walker, argsInlined); // FIXME - be smarter about type propagation
     Expression[] args = exp.getArgs();
     Expression exp2 = args[1];
     LambdaExp lexp2;
@@ -195,7 +196,7 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
 
     LetExp let2 = new LetExp(new Expression[] { lastInit });
     let2.add(lastArg);
-    let2.body = ValuesMap.valuesMapWithPos.inline(doMap, walker);
+    let2.body = ValuesMap.valuesMapWithPos.inline(doMap, walker, true);
 
 
     return parser.letDone(let2);

@@ -105,7 +105,7 @@ public class QuoteExp extends Expression
     if (msg != null)
       return walker.noteError(msg);
     if (proc instanceof CanInline)
-      return ((CanInline) proc).inline(exp, walker);
+      return ((CanInline) proc).inline(exp, walker, argsInlined);
     if (! argsInlined)
       exp.args = walker.walkExps(exp.args, exp.args.length);
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))

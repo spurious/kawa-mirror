@@ -1,3 +1,22 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (inline): Handle new argsInlined parameter.
+	* DivideOp.java (inline): Likewise.
+	* GetNamedPart.java (inline): Likewise.
+	* ConstantFunction0.java (inline): Likewise.
+	* SetNamedPart.java (inline): Likewise.
+	* AppendValues.java (inline): Likewise.
+	* ValuesMap.java (inline): Likewise.
+	* GetNamedInstancePart.java (inline): Likewise.
+	* Setter.java (inline): Likewise.
+	* ChangeLog (inline): Likewise.
+	* MultiplyOp.java (inline): Likewise.
+	* Convert.java (inline): Likewise.
+	* MakeProcedure.java (inline): Likewise.
+	* IsEqv.java (inline): Likewise.
+	* AddOp.java (inline): Likewise.
+	* ApplyToArgs.java (inline): Likewise. Somewhat fancier in this case.
+
 2008-01-06  Per Bothner  <per@bothner.com>
 
 	* Convert.java (makeCoercion): Make return type more specific.

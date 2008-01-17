@@ -142,7 +142,7 @@ public class GeneralHashTable
 	    if (prev == null)
 	      table[index] = next;
 	    else
-	      prev.next = node;
+	      prev.next = next;
 	    num_bindings--;
 	    return node.getValue();
 	  }

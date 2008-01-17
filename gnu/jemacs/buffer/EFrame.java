@@ -77,7 +77,7 @@ public abstract class EFrame
     return selectedWindow.getNextWindowInFrame(count);
   }
 
-  public abstract void setMenu(LList menu); 
+  public abstract void setMenuBar (LList menu); 
   
   public abstract String ask(String prompt);
 

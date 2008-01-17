@@ -1,3 +1,8 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* EFrame.java (setMenu): Rename to setMenuBar.
+	* emacs.scm (set-menubar-dirty-flag): Update accordingly.
+
 2007-02-18  Per Bothner  <per@bothner.com>
 
 	* EKeymap.java (defineKey): Change since strings are now CharSequence.

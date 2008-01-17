@@ -63,7 +63,7 @@ public class SwingFrame extends EFrame
     return result;
   }
 
-  public void setMenu (LList menu)
+  public void setMenuBar (LList menu)
   {
     menuBar.removeAll();
     java.util.Enumeration e = menu.elements();

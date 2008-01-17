@@ -1,5 +1,7 @@
 2008-01-16  Per Bothner  <per@bothner.com>
 
+	* SwingFrame.java (setMenu): Rename to setMenuBar, following EFrame.
+
 	* SwingMenu.java: Update FString -> CharSequence.
 
 	* SwingFrame.java (setMenuBar): Inline into setMenu.

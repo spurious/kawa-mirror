@@ -91,7 +91,7 @@
 (define current-menubar #!null)
 
 (define (set-menubar-dirty-flag #!optional (frame :: <frame> (selected-frame)))
-  (invoke frame 'setMenu current-menubar))
+  (frame:setMenuBar current-menubar))
 
 
 (define (set-menubar menubar)

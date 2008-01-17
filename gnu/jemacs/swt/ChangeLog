@@ -1,4 +1,6 @@
-2007-01-30  Per Bothner  <per@bothner.com>
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* SwtFrame.java (setMenu): Rename to setMenuBar, following EFrame.
 
 	* SwtFrame.java: Update FString -> CharSequence.
 

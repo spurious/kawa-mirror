@@ -78,7 +78,7 @@ public class SwtFrame extends EFrame
   /**
    * @see gnu.jemacs.buffer.EFrame#setMenu(gnu.lists.LList)
    */
-  public void setMenu (LList list)
+  public void setMenuBar (LList list)
   {
     if (menubar != null)
     {

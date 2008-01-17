@@ -1,3 +1,11 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* SwingMenu.java: Update FString -> CharSequence.
+
+	* SwingFrame.java (setMenuBar): Inline into setMenu.
+	Also insert to-level SwingMenus directly into menu-bar, without
+	creating a dummy top-level SwingMenu first.
+
 2007-01-02  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (openReader): Update to use getPath.

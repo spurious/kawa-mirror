@@ -3,8 +3,6 @@
 
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
-import gnu.lists.FString;
-import gnu.lists.FVector;
 import gnu.lists.LList;
 
 import javax.swing.*;
@@ -65,20 +63,19 @@ public class SwingFrame extends EFrame
     return result;
   }
 
-  public void setMenuBar (EMenu menu)
+  public void setMenu (LList menu)
   {
-    SwingMenu swingMenu = (SwingMenu) menu;
     menuBar.removeAll();
-    // a menubar contain a list of menus, stored inside a single menu
-    while (swingMenu.getMenuComponentCount() > 0)
-      menuBar.add(swingMenu.getMenuComponent(0));
+    java.util.Enumeration e = menu.elements();
+    for (int i = 0;  e.hasMoreElements(); i++)
+      {
+	Object item = e.nextElement();
+        if (item == null)
+          menuBar.add(Box.createHorizontalGlue());
+        else
+          menuBar.add(new SwingMenu((LList) item));
+      }
     menuBar.updateUI();
-  }
-
-  public void setMenu(LList menu)
-  {
-    SwingMenu sMenu = new SwingMenu(menu);
-    setMenuBar(sMenu);
   }
 
   

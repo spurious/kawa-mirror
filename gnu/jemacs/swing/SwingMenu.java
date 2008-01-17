@@ -32,11 +32,13 @@ public class SwingMenu extends JMenu implements EMenu
     for (int i = 0;  e.hasMoreElements(); i++)
       {
 	Object item = e.nextElement();
-	if (item == null)
-	  {
-	    this.add(Box.createHorizontalGlue());
-	  }
-	else if (item instanceof FString)
+	if (
+            /* #ifdef use:java.lang.CharSequence */
+            item instanceof CharSequence
+            /* #else */
+            // item instanceof String || item instanceof CharSeq
+            /* #endif */
+            )
 	  {
 	    if (i == 0)
 		this.setText(item.toString());
@@ -47,15 +49,20 @@ public class SwingMenu extends JMenu implements EMenu
 	else if (item instanceof FVector)
 	  {
 	    FVector menuEntry = (FVector) item;
-
-	    if (menuEntry.get(0) instanceof FString)
+            Object entry = menuEntry.get(0);
+	    if (
+                /* #ifdef use:java.lang.CharSequence */
+                entry instanceof CharSequence
+                /* #else */
+                // entry instanceof String || entry instanceof CharSeq
+                /* #endif */
+                )
 	      {
-		FString txt = (FString) menuEntry.get(0);
 		Object proc = menuEntry.get(1);
 
 		// FIXME handle all possible keywords
 
-		JMenuItem menuItem = new MenuItem (txt.toString(), proc);
+		JMenuItem menuItem = new MenuItem (entry.toString(), proc);
 		this.add(menuItem);
 	      }
 	  }

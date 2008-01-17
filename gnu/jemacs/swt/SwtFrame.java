@@ -78,7 +78,7 @@ public class SwtFrame extends EFrame
   /**
    * @see gnu.jemacs.buffer.EFrame#setMenu(gnu.lists.LList)
    */
-  public void setMenu(LList list)
+  public void setMenu (LList list)
   {
     if (menubar != null)
     {
@@ -107,7 +107,7 @@ public class SwtFrame extends EFrame
         }
         else if (o instanceof Pair)
         {
-          FString menuName = (FString) ((Pair) o).car;
+          CharSequence menuName = (CharSequence) ((Pair) o).car;
           MenuItem menuItem = SwtHelper.newMenuItem(parent, SWT.CASCADE, menuName.toString(), null);
           Menu subMenu = SwtHelper.newMenu(menuItem);
           setMenuHelper(subMenu, (LList) ((Pair) o).cdr);
@@ -115,11 +115,11 @@ public class SwtFrame extends EFrame
         }
         else if (o instanceof FVector) 
         {
-          FString menuItemName = (FString) ((FVector) o).get(0);
+          CharSequence menuItemName = (CharSequence) ((FVector) o).get(0);
           Object command = ((FVector) o).get(1);
           SwtHelper.newMenuItem(parent, SWT.DROP_DOWN, menuItemName.toString(), new MenuCommandHandler(command));
         }
-        else if (o instanceof FString) 
+        else if (o instanceof CharSequence) 
         {
          SwtHelper.newMenuItem(parent, SWT.SEPARATOR, null, null); 
         }

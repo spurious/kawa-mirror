@@ -1,3 +1,7 @@
+2008-01-16  Per Bothner  <per@bothner.com>
+
+	* lambda.java: Update FString -> CharSequence.
+
 2007-02-27  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody): Invoke Declaration.setCanWrite here.

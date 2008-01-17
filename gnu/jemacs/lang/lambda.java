@@ -23,11 +23,20 @@ public class lambda extends Lambda
 
     Pair pair;
     int i = 0;
-    if (body instanceof Pair
-	&& (pair = (Pair) body).car instanceof FString)
+    if (body instanceof Pair)
       {
-	// Process documentation string.  FIXME.
-	body = pair.cdr;
+        pair = (Pair) body;
+	if (
+            /* #ifdef use:java.lang.CharSequence */
+            pair.car instanceof CharSequence
+            /* #else */
+            // pair.car instanceof String || pair.car instanceof CharSeq
+            /* #endif */
+            )
+          {
+            // Process documentation string.  FIXME.
+            body = pair.cdr;
+          }
       }
     Object interactive = null;
     if (body instanceof Pair
@@ -90,7 +99,13 @@ public class lambda extends Lambda
         else
           {
             Object arg = ((Pair) interactive).car;
-            if (arg instanceof FString)
+            if (
+                /* #ifdef use:java.lang.CharSequence */
+                arg instanceof CharSequence
+                /* #else */
+                // arg instanceof String || arg instanceof CharSeq
+                /* #endif */
+                )
               interactive = new QuoteExp(arg.toString());
             else
               {

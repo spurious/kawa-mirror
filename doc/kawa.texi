@@ -4780,6 +4780,24 @@ and since having non-default constructors suppresses
 the implicit default constructor we have to explicitly define it.
 Using both styles of constructors is rather redundant, though.
 
+@subsubsection Synchronized methods
+@cindex synchronized methods
+Kawa doesn't directly support marking a method as @code{synchronized},
+but you can get the same effect using a @code{synchronized} expression:
+
+@example
+(module-static #t)
+(define-simple-class <Bar> ()
+  ;; non-static method
+  ((foo) :: void
+   (synchronized (this)
+		 (synchronized-block)))
+  ;; static method
+  ((baz) allocation: 'static :: void
+   (synchronized <Bar>
+		 (synchronized-block))))
+@end example
+
 @node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
 @subsection Anonymous classes
 

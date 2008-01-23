@@ -8,10 +8,15 @@ import gnu.mapping.*;
 
 public class Apply extends ProcedureN
 {
-  public static final Apply apply = new Apply();
-  static { apply.setName("apply"); }
+  ApplyToArgs applyToArgs;
 
-  private Object[] getArguments (Object[] args, int skip)
+  public Apply(String name, ApplyToArgs applyToArgs)
+  {
+    super(name);
+    this.applyToArgs = applyToArgs;
+  }
+
+  public static Object[] getArguments (Object[] args, int skip, Procedure proc)
   {
     int count = args.length;
     if (count < skip + 1)
@@ -30,7 +35,7 @@ public class Apply extends ProcedureN
     else
       last_count = -1;
     if (last_count < 0)
-      throw new WrongType(this, count, last, "sequence or array");
+      throw new WrongType(proc, count, last, "sequence or array");
     int numArgs = last_count + (count - skip - 1);
     Object[] proc_args = new Object[numArgs];
     int i;
@@ -60,19 +65,14 @@ public class Apply extends ProcedureN
     return proc_args;
   }
 
-  public static Object doApply(Procedure proc, Object[] args) throws Throwable
-  {
-    return proc.applyN(apply.getArguments(args, 0));
-  }
-
   public Object applyN (Object[] args) throws Throwable
   {
-    return ((Procedure) args[0]).applyN(getArguments(args, 1));
+    return applyToArgs.applyN(getArguments(args, 0, this));
   }
 
   public void apply (CallContext ctx) throws Throwable
   {
     Object[] args = ctx.getArgs();
-    ((Procedure) args[0]).checkN(getArguments(args, 1), ctx);
+    applyToArgs.checkN(getArguments(args, 0, this), ctx);
   }
 }

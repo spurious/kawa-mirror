@@ -108,10 +108,9 @@
 		 symbol object))
 
 (define (apply func #!rest (args :: <Object[]>))
-  (invoke-static <gnu.kawa.functions.Apply> 'doApply
-		 (as <function>
-		     (if (symbol? func) (symbol-function func) func))
-		 args))
+  ((as <function>
+       (if (symbol? func) (symbol-function func) func)):applyN
+       (gnu.kawa.functions.Apply:getArguments args 0 apply)))
 
 ;;; ARRAYS
 

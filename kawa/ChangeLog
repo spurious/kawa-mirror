@@ -1,3 +1,8 @@
+2008-01-22  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (apply): New static field.  The "apply"
+	method now depends on applyToArgs.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* standard/map.java (inline): Handle new argsInlined parameter.

@@ -1,3 +1,11 @@
+2008-01-22  Per Bothner  <per@bothner.com>
+
+	* Apply.java: Generalize to handle same kinds of "functions"
+	as ApplyToArgs does.
+	(applyToArgs): New field.
+	(getArguments): make static.
+	(doApply): Remove static method.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (inline): Handle new argsInlined parameter.

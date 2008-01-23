@@ -11,6 +11,7 @@ import java.util.Vector;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
+import gnu.kawa.functions.Apply;
 import gnu.kawa.functions.ApplyToArgs;
 import gnu.kawa.functions.DisplayFormat;
 import gnu.kawa.functions.NumberCompare;
@@ -47,6 +48,7 @@ public class Scheme extends LispLanguage
   public static final NumberCompare numLss;
   public static final NumberCompare numLEq;
 
+  public static final Apply apply;
   public static final ApplyToArgs applyToArgs;
   static final Declaration applyFieldDecl;
 
@@ -66,6 +68,7 @@ public class Scheme extends LispLanguage
     applyFieldDecl
       = Declaration.getDeclarationFromStatic("kawa.standard.Scheme",
                                              "applyToArgs");
+    apply = new Apply("apply", applyToArgs);
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
@@ -338,7 +341,7 @@ public class Scheme extends LispLanguage
 
       //-- Section 6.9  -- complete [except restricted call/cc]
       defProcStFld("procedure?", "kawa.lib.misc");
-      defProcStFld("apply", "gnu.kawa.functions.Apply", "apply");
+      defProcStFld("apply", "kawa.standard.Scheme", "apply");
       defProcStFld("map", "kawa.standard.Scheme", "map");
       defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
       defProcStFld("call-with-current-continuation",

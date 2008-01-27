@@ -170,7 +170,7 @@ You can also
 Before installing Kawa, you will need a working Java system.
 Kawa has been reported to
 work with JDK from 1.1 through 1.6, Kaffe, Symantec Cafe, J++, and GCJ.
-The released Kawa jar file assumes JDK 1.4 or equivalent functionality.
+The released Kawa jar file assumes JDK 1.5 or equivalent functionality.
 If those features are missing, you may need to build Kawa from source.
 
 The discussion below assumes you are using the Java Developer's Kit
@@ -202,10 +202,10 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you the time and trouble of
 compiling the sources.
 
-The binary release depends on certain "Java 2" features
-correspondiong to JDK 1.4. If you have an older Java implementation (including
+The binary release depends on certain "Java 5" features
+correspondiong to JDK 1.5. If you have an older Java implementation (including
 JDK 1.1.x) you will need to get the source distribution.
-The same is true is you want to have Kawa make use of JDK 1.5 or 1.6
+The same is true is you want to have Kawa make use of JDK 1.6
 features.
 
 The binary release comes as a @code{.jar} archive
@@ -357,8 +357,6 @@ Kawa now includes an Ant buildfile (@code{build.xml}).
 Jakarta project.
 If you don't hava Ant installed,
 get it from @uref{http://ant.apache.org/bindownload.cgi}.
-The buildfile should work with Ant 1.3, and has been
-tested with 1.4.1. and 1.5.1.
 The build is entirely Java based and works equally well on *nix, Windows,
 and presumably most any other operating system.
 

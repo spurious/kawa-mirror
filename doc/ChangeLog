@@ -1,5 +1,7 @@
 2008-01-26  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Note the binary jar now requires Java 5.
+
 	* kawa.texi (Syntax and conditional compilation): Document somewhat
 	define-syntax-case and deprecated define-macro.
 

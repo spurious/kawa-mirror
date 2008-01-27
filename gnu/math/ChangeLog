@@ -1,3 +1,12 @@
+2008-01-26  Per Bothner  <per@bothner.com>
+
+	* IntNum.java: Performance improvements for formatting.
+	(format, format): Use StringBulder if JAVA5.
+	Use {StringBuffer,StringBuilder}.append({int,long}) if possible,
+	since JDK (at least current OpenJDK) optimizes those.
+	When we have to do bignum division, divide by 10**9 each time
+	rather than 10 (assuming radix==10).	
+
 2007-11-05  Per Bothner  <per@bothner.com>
 
 	* RatNum.java (neg): New static method.

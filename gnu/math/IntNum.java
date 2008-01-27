@@ -1098,12 +1098,49 @@ public class IntNum extends RatNum implements Externalizable
     return result.canonicalize ();
   }
 
-  public void format (int radix, StringBuffer buffer)
+  /* #ifdef JAVA5 */
+  // public void format (int radix, StringBuffer buffer)
+  // {
+  //   if (radix == 10)
+  //     {
+  //       if (words == null)
+  //         {
+  //           buffer.append(ival);
+  //           return;
+  //         }
+  //       else if (ival <= 2)
+  //         {
+  //           buffer.append(longValue());
+  //           return;
+  //         }
+  //     }
+  //   buffer.append(toString(radix));
+  // }
+  /* #endif */
+
+  public void format (int radix,
+                      /* #ifdef JAVA5 */
+                      // StringBuilder buffer
+                      /* #else */
+                      StringBuffer buffer
+                      /* #endif */
+                      )
   {
     if (words == null)
-      buffer.append(Integer.toString (ival, radix));
+      {
+        if (radix == 10)
+          buffer.append(ival);
+        else
+          buffer.append(Integer.toString (ival, radix));
+      }
     else if (ival <= 2)
-      buffer.append(Long.toString (longValue (), radix));
+      {
+        long lval = longValue();
+        if (radix == 10)
+          buffer.append(lval);
+        else
+          buffer.append(Long.toString (lval, radix));
+      }
     else
       {
 	boolean neg = isNegative ();
@@ -1136,12 +1173,32 @@ public class IntNum extends RatNum implements Externalizable
 	  }
 	else
 	  {
+            int chars_per_word = MPN.chars_per_word(radix);
+            int wradix = radix;
+            for (int j = chars_per_word; --j > 0; )
+              wradix = wradix * radix;
 	    int i = buffer.length();
 	    for (;;)
 	      {
-		int digit = MPN.divmod_1 (work, work, len, radix);
-		buffer.append (Character.forDigit (digit, radix));
+		int wdigit = MPN.divmod_1(work, work, len, wradix);
 		while (len > 0 && work[len-1] == 0) len--;
+                for (int j = chars_per_word; --j >= 0; ) {
+                  int digit;
+                  if (len == 0 && wdigit == 0)
+                    break;
+                  if (wdigit < 0) // Overflow
+                    {
+                      long ldigit = (long) wdigit & 0xFFFFFFFF;
+                      digit = (int)(ldigit % radix);
+                      wdigit = (int) (wdigit / radix);
+                    }
+                  else
+                    {
+                      digit = wdigit % radix;
+                      wdigit = wdigit / radix;
+                    }
+                  buffer.append (Character.forDigit(digit, radix));
+                }
 		if (len == 0)
 		  break;
 	      }
@@ -1167,7 +1224,11 @@ public class IntNum extends RatNum implements Externalizable
     else if (ival <= 2)
       return Long.toString (longValue (), radix);
     int buf_size = ival * (MPN.chars_per_word (radix) + 1);
+    /* #ifdef JAVA5 */
+    // StringBuilder buffer = new StringBuilder (buf_size);
+    /* #else */
     StringBuffer buffer = new StringBuffer (buf_size);
+    /* #endif */
     format(radix, buffer);
     return buffer.toString ();
   }

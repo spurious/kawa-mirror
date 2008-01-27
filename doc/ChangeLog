@@ -1,3 +1,8 @@
+2008-01-26  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Syntax and conditional compilation): Document somewhat
+	define-syntax-case and deprecated define-macro.
+
 2008-01-22  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Add note on simulating synchronized methods.

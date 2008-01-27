@@ -1379,7 +1379,43 @@ Kawa supports most of the @code{syntax-case} feature.
 Pattern ...
 @end deffn
 
+@deffn Syntax define-syntax-case name (literals) (pattern expr) ...
+A convenience macro to make it easy to define @code{syntax-case}-style macros.
+Defines a macros with the given @var{name} and list of @var{literals}.
+Each @var{pattern} has the form of a @code{syntax-rules}-style pattern,
+and it is matched against the macro invocation syntax form.
+When a match is found, the corresponding @var{expr} is evaluated.
+It must evaluate to a syntax form,
+which replaces the macro invocation.
+@end deffn
+
+@deffn Syntax define-macro (name lambda-list) form ...
+@emph{This form is deprecated.}
+Functionally equivalent to @code{defmacro}.
+@end deffn
+
 @deffn Syntax defmacro name lambda-list form ...
+@emph{This form is deprecated.}
+Instead of
+@example
+(defmacro (@var{name} ...)
+  (let ... `(... ,@var{exp} ...)))
+@end example
+you should probably do:
+@example
+(define-syntax-case @var{name} ()
+  ((_ ...) (let #`(... @var{exp} ...))))
+@end example
+and instead of
+@example
+(defmacro (@var{name} ... @var{var} ...) `(... @var{var} ...))
+@end example
+you should probably do:
+@example
+(define-syntax-case @var{name} ()
+  ((_ ... @var{var} ...) #`(... @var{var} ...))
+@end example
+
 Defines an old-style macro a la Common Lisp,
 and installs @code{(lambda @var{lambda-list} @var{form} ...)}
 as the expansion function for @var{name}.
@@ -1387,10 +1423,6 @@ When the translator sees an application of @var{name},
 the expansion function is called with the rest of the application
 as the actual arguments.  The resulting object must be a Scheme
 source form that is futher processed (it may be repeatedly macro-expanded).
-
-If you define a macro with @code{defmacro}, you (currently) cannot use
-the macro in the same compilation as the definition.
-This restriction does not apply to macros defined using @code{syntax-rules}.
 @end deffn
 
 @defun gentemp

@@ -72,7 +72,7 @@ case "/${with_java_source}/" in
   /gcj4/) JAVA_SOURCE=4x ;;
   /1.5*/) JAVA_SOURCE=5 ;;
   /1.6*/) JAVA_SOURCE=6 ;;
-  //) JAVA_SOURCE=4 ;;
+  //) JAVA_SOURCE=5 ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
   (Must be 1, 2, 5, 6, or a JDK version such as 1.4.)]) ;;
 esac

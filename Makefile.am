@@ -37,7 +37,7 @@ kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/kawa-tour.texi
 
 dist-hook:
 	rm -f $(distdir)/patch-source-list
-	$(MAKE) srcdir=`pwd`/$(distdir) select-java4
+	$(MAKE) srcdir=`pwd`/$(distdir) select-java5
 
 dist-kawa-@VERSION@.jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
@@ -45,7 +45,7 @@ dist-kawa-@VERSION@.jar:
 	  && mkdir tmpdir \
 	  && cd tmpdir \
 	  && rm -f $$srcdir/patch-source-list \
-	  && $$srcdir/configure --with-servlet --with-java-source=4 \
+	  && $$srcdir/configure --with-servlet --with-java-source=5 \
 	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
 	  && $(JAR) cmf $$srcdir/jar-manifest \
 	    ../kawa-@VERSION@.jar \

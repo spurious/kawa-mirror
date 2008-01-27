@@ -1,3 +1,8 @@
+2008-01-26  Per Bothner  <per@bothner.com>
+
+	* configure.in: The default for --with-java-source is now 5.
+	* Makefile.am: The default binary builds now require Java 5.
+
 2007-11-01  Per Bothner  <per@bothner.com>
 
 	* build.xml (run): Set fork to true, since otherwise we can't

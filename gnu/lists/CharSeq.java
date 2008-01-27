@@ -35,28 +35,28 @@ public interface CharSeq
   /* #endif */
 
   /* #ifdef JAVA5 */
-  // /** Append a specified subsequence to an <code>Appendable</code>.
-  //  * An allowable implementation is:
-  //  * <code>dest.append(this, start, start+count)</code>.
-  //  * Hence implementors of <code>Appendable</code> should avoid calling
-  //  * <code>writeTo</code> - though they can call <code>getChars</code>.
-  //  */
-  // public void writeTo(int start, int count, Appendable dest)
-  //   throws java.io.IOException;
-
-  // public void writeTo(Appendable dest)
-  //   throws java.io.IOException;
-  /* #else */
-  /**
-   * Write out (part of) this string.
-   * @param start index of initial character to write
-   * @param count number of characters to write
-   * @param dest where to write the characters
+  /** Append a specified subsequence to an <code>Appendable</code>.
+   * An allowable implementation is:
+   * <code>dest.append(this, start, start+count)</code>.
+   * Hence implementors of <code>Appendable</code> should avoid calling
+   * <code>writeTo</code> - though they can call <code>getChars</code>.
    */
-  public void writeTo(int start, int count, java.io.Writer dest)
+  public void writeTo(int start, int count, Appendable dest)
     throws java.io.IOException;
 
-  public void writeTo(java.io.Writer str) throws java.io.IOException;
+  public void writeTo(Appendable dest)
+    throws java.io.IOException;
+  /* #else */
+  // /**
+  //  * Write out (part of) this string.
+  //  * @param start index of initial character to write
+  //  * @param count number of characters to write
+  //  * @param dest where to write the characters
+  //  */
+  // public void writeTo(int start, int count, java.io.Writer dest)
+  //   throws java.io.IOException;
+
+  // public void writeTo(java.io.Writer str) throws java.io.IOException;
   /* #endif */
 
   public void consume(int start, int count, Consumer out);

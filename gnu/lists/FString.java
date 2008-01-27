@@ -15,7 +15,7 @@ public class FString extends SimpleVector
   Comparable,
   /* #endif */
   /* #ifdef JAVA5 */
-  // Appendable,
+  Appendable,
   /* #endif */
   CharSeq, Externalizable, Consumable
 {
@@ -513,41 +513,41 @@ public class FString extends SimpleVector
   /* #endif */
 
   /* #ifdef JAVA5 */
-  // public void writeTo(int start, int count, Appendable dest)
-  //    throws java.io.IOException
-  // {
-  //   if (dest instanceof java.io.Writer)
-  //     {
-  //       try
-  //         {
-  //           ((java.io.Writer) dest).write(data, start, count);
-  //         }
-  //       catch (java.io.IOException ex)
-  //         {
-  //           throw new RuntimeException(ex);
-  //         }
-  //     }
-  //   else
-  //     {
-  //       dest.append(this, start, start+count);
-  //     }
-  // }
+  public void writeTo(int start, int count, Appendable dest)
+     throws java.io.IOException
+  {
+    if (dest instanceof java.io.Writer)
+      {
+        try
+          {
+            ((java.io.Writer) dest).write(data, start, count);
+          }
+        catch (java.io.IOException ex)
+          {
+            throw new RuntimeException(ex);
+          }
+      }
+    else
+      {
+        dest.append(this, start, start+count);
+      }
+  }
 
-  // public void writeTo(Appendable dest) throws java.io.IOException
-  // {
-  //   writeTo(0, size, dest);
-  // }
+  public void writeTo(Appendable dest) throws java.io.IOException
+  {
+    writeTo(0, size, dest);
+  }
   /* #else */
-  public void writeTo(int start, int count, java.io.Writer dest)
-    throws java.io.IOException
-  {
-    dest.write(data, start, count);
-  }
+  // public void writeTo(int start, int count, java.io.Writer dest)
+  //   throws java.io.IOException
+  // {
+  //   dest.write(data, start, count);
+  // }
 
-  public void writeTo(java.io.Writer dest) throws java.io.IOException
-  {
-    dest.write(data, 0, size);
-  }
+  // public void writeTo(java.io.Writer dest) throws java.io.IOException
+  // {
+  //   dest.write(data, 0, size);
+  // }
   /* #endif */
 
   /**

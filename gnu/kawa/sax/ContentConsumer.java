@@ -22,9 +22,9 @@ public class ContentConsumer implements Consumer
   AttributesImpl attributes = new AttributesImpl();
   char[] chBuffer;
   /* #ifdef JAVA5 */
-  // StringBuilder strBuffer = new StringBuilder(200);
+  StringBuilder strBuffer = new StringBuilder(200);
   /* #else */
-  StringBuffer strBuffer = new StringBuffer(200);
+  // StringBuffer strBuffer = new StringBuffer(200);
   /* #endif */
   /** 1 if in start-tag, 2 if in attribute value, 0 otherwise. */
   int inStartTag;
@@ -235,9 +235,9 @@ public class ContentConsumer implements Consumer
       endStartTag();
     /* #ifdef use:java.lang.CharSequence */
     /* #ifdef JAVA5 */
-    // strBuffer.append(str, start, end);
+    strBuffer.append(str, start, end);
     /* #else */
-    strBuffer.append(str.subSequence(start, end).toString());
+    // strBuffer.append(str.subSequence(start, end).toString());
     /* #endif */
     /* #else */
     // strBuffer.append(str.substring(start, end));
@@ -245,25 +245,25 @@ public class ContentConsumer implements Consumer
   }
 
   /* #ifdef JAVA5 */
-  // public ContentConsumer append (char c)
-  // {
-  //   write(c);
-  //   return this;
-  // }
-  // public ContentConsumer append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   write(csq, 0, csq.length());
-  //   return this;
-  // }
-  // public ContentConsumer append (CharSequence csq, int start, int end)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   write(csq, start, end);
-  //   return this;
-  // }
+  public ContentConsumer append (char c)
+  {
+    write(c);
+    return this;
+  }
+  public ContentConsumer append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    write(csq, 0, csq.length());
+    return this;
+  }
+  public ContentConsumer append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    write(csq, start, end);
+    return this;
+  }
   /* #endif */
 
   public void writeObject(Object v)

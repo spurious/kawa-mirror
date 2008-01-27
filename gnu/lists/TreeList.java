@@ -16,7 +16,7 @@ import gnu.text.Char;
 public class TreeList extends AbstractSequence
   implements
   /* #ifdef JAVA5 */
-  // Appendable,
+  Appendable,
   /* #endif */
   XConsumer, PositionConsumer, Consumable
 {

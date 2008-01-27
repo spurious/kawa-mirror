@@ -117,34 +117,34 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   }
   /* #endif */
   /* #ifdef JAVA5 */
-  // /**
-  //  * @see gnu.lists.CharSeq#writeTo(int, int, Appendable)
-  //  */
-  // public void writeTo(int start, int count, Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   getStringContent().writeTo(start, count, dest);
-  // }
-
-  // public void writeTo(Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   writeTo(0, length(), dest);
-  // }
-  /* #else */
   /**
-   * @see gnu.lists.CharSeq#writeTo(int, int, java.io.Writer)
+   * @see gnu.lists.CharSeq#writeTo(int, int, Appendable)
    */
-  public void writeTo(int start, int count, java.io.Writer dest)
+  public void writeTo(int start, int count, Appendable dest)
     throws java.io.IOException
   {
     getStringContent().writeTo(start, count, dest);
   }
 
-  public void writeTo(java.io.Writer str) throws java.io.IOException
+  public void writeTo(Appendable dest)
+    throws java.io.IOException
   {
-    writeTo(0, length(), str);
+    writeTo(0, length(), dest);
   }
+  /* #else */
+  // /**
+  //  * @see gnu.lists.CharSeq#writeTo(int, int, java.io.Writer)
+  //  */
+  // public void writeTo(int start, int count, java.io.Writer dest)
+  //   throws java.io.IOException
+  // {
+  //   getStringContent().writeTo(start, count, dest);
+  // }
+
+  // public void writeTo(java.io.Writer str) throws java.io.IOException
+  // {
+  //   writeTo(0, length(), str);
+  // }
   /* #endif */
 
   /**

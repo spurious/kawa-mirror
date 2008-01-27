@@ -4,12 +4,12 @@
 package gnu.kawa.xml;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 public class KAttr extends KNode
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.Attr
+  implements org.w3c.dom.Attr
   /* #endif */
 {
   public KAttr (NodeTree seq, int ipos)
@@ -23,7 +23,7 @@ public class KAttr extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public short getNodeType () { return Node.ATTRIBUTE_NODE; }
+  public short getNodeType () { return Node.ATTRIBUTE_NODE; }
   /* #endif */
 
   public String getValue ()
@@ -43,22 +43,22 @@ public class KAttr extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public void setValue (String value)
-  //   throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setValue not supported");
-  // }
+  public void setValue (String value)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setValue not supported");
+  }
 
-  // public Node getParentNode()
-  // {
-  //   return null;
-  // }
+  public Node getParentNode()
+  {
+    return null;
+  }
 
-  // public Element  getOwnerElement ()
-  // {
-  //   return (Element) super.getParentNode();
-  // }
+  public Element  getOwnerElement ()
+  {
+    return (Element) super.getParentNode();
+  }
   /* #endif */
 
   public boolean getSpecified ()
@@ -67,14 +67,14 @@ public class KAttr extends KNode
   }
 
   /* #ifdef JAXP-1.3 */
-  // public TypeInfo getSchemaTypeInfo ()
-  // {
-  //   return null;
-  // }
+  public TypeInfo getSchemaTypeInfo ()
+  {
+    return null;
+  }
 
-  // public boolean isId ()
-  // {
-  //   return false;
-  // }
+  public boolean isId ()
+  {
+    return false;
+  }
   /* #endif JAXP-1.3 */
 }

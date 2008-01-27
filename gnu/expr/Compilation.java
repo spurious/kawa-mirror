@@ -1066,7 +1066,7 @@ public class Compilation implements SourceLocator
       }
     registerClass(new_class);
     /* #ifdef JAVA5 */
-    // new_class.setClassfileVersionJava5();
+    new_class.setClassfileVersionJava5();
     /* #endif */
   }
 

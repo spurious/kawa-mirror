@@ -255,9 +255,9 @@ public class Method implements AttrContainer, Member {
       throw new ClassFormatError("bad method signature");
     int pos = 1;
     /* #ifdef JAVA5 */
-    // java.util.Stack<Type> types = new java.util.Stack<Type>();
+    java.util.Stack<Type> types = new java.util.Stack<Type>();
     /* #else */
-    java.util.Stack types = new java.util.Stack();
+    // java.util.Stack types = new java.util.Stack();
     /* #endif */
     for (;;)
       {

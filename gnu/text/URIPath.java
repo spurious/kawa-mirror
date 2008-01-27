@@ -15,9 +15,9 @@ public class URIPath
   extends Path
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // implements Comparable<URIPath>
+  implements Comparable<URIPath>
   /* #else */
-  implements Comparable
+  // implements Comparable
   /* #endif */
   /* #endif */
 {
@@ -191,10 +191,10 @@ public class URIPath
   }
 
   /* #ifndef JAVA5 */
-  public int compareTo (Object obj)
-  {
-    return compareTo((URIPath) obj);
-  }
+  // public int compareTo (Object obj)
+  // {
+  //   return compareTo((URIPath) obj);
+  // }
   /* #endif */
 
   public boolean equals (Object obj)

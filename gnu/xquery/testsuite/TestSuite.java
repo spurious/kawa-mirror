@@ -31,9 +31,9 @@ public class TestSuite extends FilterConsumer
   boolean inTest = false;
   String currentTag;
   /* #ifdef JAVA5 */
-  // Stack<Object> elementStack = new Stack<Object>();
+  Stack<Object> elementStack = new Stack<Object>();
   /* #else */
-  Stack elementStack = new Stack();
+  // Stack elementStack = new Stack();
   /* #endif */
 
   CharArrayOutPort cout;

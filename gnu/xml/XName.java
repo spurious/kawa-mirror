@@ -54,9 +54,9 @@ public class XName extends Symbol implements Externalizable
   public static boolean isNameStart(int ch)
   {
     /* #ifdef JAVA5 */
-    // return Character.isUnicodeIdentifierStart(ch)
+    return Character.isUnicodeIdentifierStart(ch)
     /* #else */
-    return ch >= 0x10000 || Character.isUnicodeIdentifierStart((char) ch)
+    // return ch >= 0x10000 || Character.isUnicodeIdentifierStart((char) ch)
     /* #endif */
       || ch == '_';
   }
@@ -64,9 +64,9 @@ public class XName extends Symbol implements Externalizable
   public static boolean isNamePart(int ch)
   {
     /* #ifdef JAVA5 */
-    // return Character.isUnicodeIdentifierPart(ch)
+    return Character.isUnicodeIdentifierPart(ch)
     /* #else */
-    return ch >= 0x10000 || Character.isUnicodeIdentifierPart((char) ch)
+    // return ch >= 0x10000 || Character.isUnicodeIdentifierPart((char) ch)
     /* #endif */
       || ch == '-' || ch == '.';
   }

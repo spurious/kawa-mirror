@@ -9,7 +9,7 @@ import java.io.*;
 public class PrintConsumer extends PrintWriter
   implements
   /* #ifdef JAVA5 */
-  // Appendable,
+  Appendable,
   /* #endif */
    Consumer
 {
@@ -43,28 +43,28 @@ public class PrintConsumer extends PrintWriter
   }
 
   /* #ifdef JAVA5 */
-  // public PrintConsumer append (char c)
-  // {
-  //   print(c);
-  //   return this;
-  // }
+  public PrintConsumer append (char c)
+  {
+    print(c);
+    return this;
+  }
 
-  // public PrintConsumer append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   append(csq, 0, csq.length());
-  //   return this;
-  // }
+  public PrintConsumer append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
+    return this;
+  }
 
-  // public PrintConsumer append (CharSequence csq, int start, int end)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   for (int i = start; i < end;  i++)
-  //     append(csq.charAt(i));
-  //   return this;
-  // }
+  public PrintConsumer append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    for (int i = start; i < end;  i++)
+      append(csq.charAt(i));
+    return this;
+  }
   /* #endif */
 
   /* #ifdef use:java.lang.CharSequence */

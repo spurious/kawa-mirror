@@ -61,23 +61,23 @@ public class ArithOp extends Procedure1or2
   public static BigDecimal div (BigDecimal d1, BigDecimal d2)
   {
     /* #ifdef JAVA5 */
-    // return d1.divide(d2, MathContext.DECIMAL128);
+    return d1.divide(d2, MathContext.DECIMAL128);
     /* #else */
-    BigDecimal d = d1.divide(d2, 18, BigDecimal.ROUND_HALF_EVEN);
+    // BigDecimal d = d1.divide(d2, 18, BigDecimal.ROUND_HALF_EVEN);
     /* #ifdef JAVA2 */
-    BigInteger unscaled = d.unscaledValue();
-    if (unscaled.signum() == 0)
-      return BigDecimal.valueOf(0);
-    int sc = 0;
-    while (sc < 18)
-      {
-        BigInteger[] divmod = unscaled.divideAndRemainder(TEN);
-        if (divmod[1].signum() != 0)
-          break;
-        sc++;
-        unscaled = divmod[0];
-      }
-    return sc == 0 ? d : new BigDecimal(unscaled, d.scale() - sc);
+    // BigInteger unscaled = d.unscaledValue();
+    // if (unscaled.signum() == 0)
+    //   return BigDecimal.valueOf(0);
+    // int sc = 0;
+    // while (sc < 18)
+    //   {
+    //     BigInteger[] divmod = unscaled.divideAndRemainder(TEN);
+    //     if (divmod[1].signum() != 0)
+    //       break;
+    //     sc++;
+    //     unscaled = divmod[0];
+    //   }
+    // return sc == 0 ? d : new BigDecimal(unscaled, d.scale() - sc);
     /* #endif */
     /* #endif */
   }

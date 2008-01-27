@@ -141,30 +141,30 @@ public class FilterConsumer
   }
 
   /* #ifdef JAVA5 */
-  // public Consumer append (char c)
-  // {
-  //   write(c);
-  //   return this;
-  // }
+  public Consumer append (char c)
+  {
+    write(c);
+    return this;
+  }
 
-  // public Consumer append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   append(csq, 0, csq.length());
-  //   return this;
-  // }
+  public Consumer append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
+    return this;
+  }
 
-  // public Consumer append (CharSequence csq, int start, int end)
-  // {
-  //   beforeContent();
-  //   if (! skipping)
-  //     {
-  //       if (csq == null)
-  //         csq = "null";
-  //       base.append(csq, start, end);
-  //     }
-  //   return this;
-  // }
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    beforeContent();
+    if (! skipping)
+      {
+        if (csq == null)
+          csq = "null";
+        base.append(csq, start, end);
+      }
+    return this;
+  }
   /* #endif */
 }

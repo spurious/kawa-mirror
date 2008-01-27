@@ -15,7 +15,7 @@ package gnu.lists;
 
 public interface Consumer
   /* #ifdef JAVA5 */
-  // extends Appendable
+  extends Appendable
   /* #endif */
 {
   public void writeBoolean(boolean v);
@@ -58,8 +58,8 @@ public interface Consumer
   public void write(char[] buf, int start, int length);
 
   /* #ifdef JAVA5 */
-  // public Consumer append (char c);
-  // public Consumer append (CharSequence csq);
-  // public Consumer append (CharSequence csq, int start, int end);
+  public Consumer append (char c);
+  public Consumer append (CharSequence csq);
+  public Consumer append (CharSequence csq, int start, int end);
   /* #endif */
 }

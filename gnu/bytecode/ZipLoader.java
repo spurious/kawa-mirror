@@ -20,10 +20,10 @@ public class ZipLoader extends ClassLoader
   private String zipname;
 
   /* #ifdef JAVA5 */
-  // /* A list of pairs of (name, class) of already loaded classes. */
-  // private java.util.Vector<Object> loadedClasses;
+  /* A list of pairs of (name, class) of already loaded classes. */
+  private java.util.Vector<Object> loadedClasses;
   /* #else */
-  private java.util.Vector loadedClasses;
+  // private java.util.Vector loadedClasses;
   /* #endif */
 
   public ZipLoader (String name) throws java.io.IOException
@@ -39,9 +39,9 @@ public class ZipLoader extends ClassLoader
 	  size++;
       }
     /* #ifdef JAVA5 */
-    // loadedClasses = new java.util.Vector<Object>(size);
+    loadedClasses = new java.util.Vector<Object>(size);
     /* #else */
-    loadedClasses = new java.util.Vector(size);
+    // loadedClasses = new java.util.Vector(size);
     /* #endif */
   }
 

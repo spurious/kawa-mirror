@@ -95,9 +95,9 @@ public class TextUtils
   public static String replaceWhitespace (String str, boolean collapse)
   {
     /* #ifdef JAVA5 */
-    // StringBuilder sbuf = null;
+    StringBuilder sbuf = null;
     /* #else */
-    StringBuffer sbuf = null;
+    // StringBuffer sbuf = null;
     /* #endif */
     int len = str.length();
     // 1: previous was single space.
@@ -114,9 +114,9 @@ public class TextUtils
                 || (isSpace == 1 && i == len && collapse)))
           {
             /* #ifdef JAVA5 */
-            // sbuf = new StringBuilder();
+            sbuf = new StringBuilder();
             /* #else */
-            sbuf = new StringBuffer();
+            // sbuf = new StringBuffer();
             /* #endif */
             int k = prevSpace > 0 ? i - 2 : i - 1;
             for (int j = 0;  j < k;  j++)

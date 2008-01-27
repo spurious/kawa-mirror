@@ -5,7 +5,7 @@ package gnu.kawa.xml;
 import gnu.lists.*;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 import gnu.mapping.*;
 import gnu.text.Path;
@@ -13,7 +13,7 @@ import gnu.text.Path;
 public abstract class KNode extends SeqPosition
   implements
   /* #ifdef use:org.w3c.dom.Node */
-  // org.w3c.dom.Node,
+  org.w3c.dom.Node,
   /* #endif */
   Consumable
 {
@@ -89,15 +89,15 @@ public abstract class KNode extends SeqPosition
   }
 
   /* #ifdef JAVA5 */
-  // public KNode copy ()
-  // {
-  //   return make((NodeTree) sequence, sequence.copyPos(getPos()));
-  // }
-  /* #else */
-  public SeqPosition copy ()
+  public KNode copy ()
   {
     return make((NodeTree) sequence, sequence.copyPos(getPos()));
   }
+  /* #else */
+  // public SeqPosition copy ()
+  // {
+  //   return make((NodeTree) sequence, sequence.copyPos(getPos()));
+  // }
   /* #endif */
  
   public static KNode make(NodeTree seq)
@@ -111,7 +111,7 @@ public abstract class KNode extends SeqPosition
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public abstract short getNodeType ();
+  public abstract short getNodeType ();
   /* #endif */
 
   public String getNodeName ()
@@ -197,169 +197,169 @@ public abstract class KNode extends SeqPosition
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public Node getParentNode()
-  // {
-  //   int parent = sequence.parentPos(ipos);
-  //   if (parent == -1)
-  //     return null;
-  //   return make((NodeTree) sequence, parent);
-  // }
+  public Node getParentNode()
+  {
+    int parent = sequence.parentPos(ipos);
+    if (parent == -1)
+      return null;
+    return make((NodeTree) sequence, parent);
+  }
 
-  // public Node getPreviousSibling ()
-  // {
-  //   int parent = sequence.parentPos(ipos);
-  //   if (parent == -1)
-  //     parent = 0;
-  //   int index = ((NodeTree) sequence).posToDataIndex(ipos);
-  //   int child = sequence.firstChildPos(parent);
-  //   int previous = 0;
-  //   for (;;)
-  //     {
-  //       previous = child;
-  //       child = sequence.nextPos(child);
-  //       if (child == 0)
-  //         break;
-  //       if (((NodeTree) sequence).posToDataIndex(child) == index)
-  //         break;
-  //     }
-  //   return previous == 0 ? null
-  //     : make((NodeTree) sequence, previous);
-  // }
+  public Node getPreviousSibling ()
+  {
+    int parent = sequence.parentPos(ipos);
+    if (parent == -1)
+      parent = 0;
+    int index = ((NodeTree) sequence).posToDataIndex(ipos);
+    int child = sequence.firstChildPos(parent);
+    int previous = 0;
+    for (;;)
+      {
+        previous = child;
+        child = sequence.nextPos(child);
+        if (child == 0)
+          break;
+        if (((NodeTree) sequence).posToDataIndex(child) == index)
+          break;
+      }
+    return previous == 0 ? null
+      : make((NodeTree) sequence, previous);
+  }
   /* #endif */
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public Node getNextSibling ()
-  // {
-  //   int next = ((NodeTree) sequence).nextPos(ipos);
-  //   return next == 0 ? null
-  //     : make((NodeTree) sequence, next);
-  // }
+  public Node getNextSibling ()
+  {
+    int next = ((NodeTree) sequence).nextPos(ipos);
+    return next == 0 ? null
+      : make((NodeTree) sequence, next);
+  }
 
-  // public Node getFirstChild()
-  // {
-  //   int child = ((NodeTree) sequence).posFirstChild(ipos);
-  //   return make((NodeTree) sequence, child);
-  // }
+  public Node getFirstChild()
+  {
+    int child = ((NodeTree) sequence).posFirstChild(ipos);
+    return make((NodeTree) sequence, child);
+  }
 
-  // public Node getLastChild()
-  // {
-  //   int last = 0;
-  //   int child = sequence.firstChildPos(ipos);
-  //   while (child != 0)
-  //     {
-  //       last = child;
-  //       child = sequence.nextPos(child);
-  //     }
-  //   return last == 0 ? null : make((NodeTree) sequence, last);
-  // }
+  public Node getLastChild()
+  {
+    int last = 0;
+    int child = sequence.firstChildPos(ipos);
+    while (child != 0)
+      {
+        last = child;
+        child = sequence.nextPos(child);
+      }
+    return last == 0 ? null : make((NodeTree) sequence, last);
+  }
 
-  // public NodeList getChildNodes ()
-  // {
-  //   Nodes nodes = new SortedNodes();
-  //   int child = sequence.firstChildPos(ipos);
-  //   while (child != 0)
-  //     {
-  //       nodes.writePosition(sequence, child);
-  //       child = sequence.nextPos(child);
-  //     }
-  //   return nodes;
-  // }
+  public NodeList getChildNodes ()
+  {
+    Nodes nodes = new SortedNodes();
+    int child = sequence.firstChildPos(ipos);
+    while (child != 0)
+      {
+        nodes.writePosition(sequence, child);
+        child = sequence.nextPos(child);
+      }
+    return nodes;
+  }
 
-  // /** Not implemented yet. */
-  // public NodeList getElementsByTagName(String tagname)
-  // {
-  //   throw new UnsupportedOperationException("getElementsByTagName not implemented yet");
-  //   /*
-  //   Nodes nodes = new SortedNodes();
-  //   int child = sequence.firstChildPos(ipos);
-  //   while (child != 0)
-  //     {
-  //       if (matches)
-  //         nodes.writePosition(sequence, child);
-  //       child = sequence.nextPos(child);
-  //     }
-  //   return nodes;
-  //   */
-  // }
+  /** Not implemented yet. */
+  public NodeList getElementsByTagName(String tagname)
+  {
+    throw new UnsupportedOperationException("getElementsByTagName not implemented yet");
+    /*
+    Nodes nodes = new SortedNodes();
+    int child = sequence.firstChildPos(ipos);
+    while (child != 0)
+      {
+        if (matches)
+          nodes.writePosition(sequence, child);
+        child = sequence.nextPos(child);
+      }
+    return nodes;
+    */
+  }
   /* #endif */
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  // public void setNodeValue (String nodeValue)  throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setNodeValue not supported");
-  // }
+  /** Not implemented. */
+  public void setNodeValue (String nodeValue)  throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setNodeValue not supported");
+  }
 
-  // /** Not implemented. */
-  // public void setPrefix (String prefix)  throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setPrefix not supported");
-  // }
+  /** Not implemented. */
+  public void setPrefix (String prefix)  throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setPrefix not supported");
+  }
 
-  // /** Not implemented. */
-  //  public Node insertBefore(Node newChild, Node refChild)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "insertBefore not supported");
-  // }
+  /** Not implemented. */
+   public Node insertBefore(Node newChild, Node refChild)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "insertBefore not supported");
+  }
 
-  // /** Not implemented. */
-  //  public Node replaceChild(Node newChild, Node oldChild)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "replaceChild not supported");
-  // }
+  /** Not implemented. */
+   public Node replaceChild(Node newChild, Node oldChild)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "replaceChild not supported");
+  }
 
-  // /** Not implemented. */
-  //  public Node removeChild(Node oldChild)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "removeChild not supported");
-  // }
+  /** Not implemented. */
+   public Node removeChild(Node oldChild)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "removeChild not supported");
+  }
 
-  // /** Not implemented. */
-  //  public Node appendChild(Node newChild)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "appendChild not supported");
-  // }
+  /** Not implemented. */
+   public Node appendChild(Node newChild)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "appendChild not supported");
+  }
 
-  // /** Not implemented. */
-  //  public void setTextContent (String textContent)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setTextContent not supported");
-  // }
+  /** Not implemented. */
+   public void setTextContent (String textContent)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setTextContent not supported");
+  }
 
-  // /** Only implemented if deep is true. */
-  // public Node cloneNode(boolean deep)
-  // {
-  //   if (! deep)
-  //     throw new UnsupportedOperationException("shallow cloneNode not implemented");
-  //   NodeTree tree = new NodeTree();
-  //   ((NodeTree) sequence).consumeNext(ipos, tree);
-  //   return make(tree);
-  // }
+  /** Only implemented if deep is true. */
+  public Node cloneNode(boolean deep)
+  {
+    if (! deep)
+      throw new UnsupportedOperationException("shallow cloneNode not implemented");
+    NodeTree tree = new NodeTree();
+    ((NodeTree) sequence).consumeNext(ipos, tree);
+    return make(tree);
+  }
 
-  // public org.w3c.dom.Document getOwnerDocument ()
-  // {
-  //   int kind = sequence.getNextKind(ipos);
-  //   if (kind == Sequence.DOCUMENT_VALUE)
-  //     return new KDocument((NodeTree) sequence, 0);
-  //   return null;
-  // }
+  public org.w3c.dom.Document getOwnerDocument ()
+  {
+    int kind = sequence.getNextKind(ipos);
+    if (kind == Sequence.DOCUMENT_VALUE)
+      return new KDocument((NodeTree) sequence, 0);
+    return null;
+  }
 
-  // public NamedNodeMap getAttributes ()
-  // {
-  //   throw new UnsupportedOperationException("getAttributes not implemented yet");
-  // }
+  public NamedNodeMap getAttributes ()
+  {
+    throw new UnsupportedOperationException("getAttributes not implemented yet");
+  }
   /* #endif */
 
   public void normalize ()
@@ -398,32 +398,32 @@ public abstract class KNode extends SeqPosition
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public short compareDocumentPosition (Node other)
-  //   throws DOMException
-  // {
-  //   if (! (other instanceof KNode))
-  //     throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-  //                            "other Node is a "+other.getClass().getName());
-  //   KNode n = (KNode) other;
-  //   AbstractSequence nseq = n.sequence;
-  //   return (short) (sequence == nseq ? nseq.compare(ipos, n.ipos)
-  //                   : (int) sequence.stableCompare(nseq));
-  // }
-  //   
-  // public boolean isSameNode (Node node)
-  // {
-  //   if (! (node instanceof KNode))
-  //     return false;
-  //   KNode n = (KNode) node;
-  //   if (sequence != n.sequence)
-  //     return false;
-  //   return sequence.equals(ipos, n.ipos);
-  // }
+  public short compareDocumentPosition (Node other)
+    throws DOMException
+  {
+    if (! (other instanceof KNode))
+      throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                             "other Node is a "+other.getClass().getName());
+    KNode n = (KNode) other;
+    AbstractSequence nseq = n.sequence;
+    return (short) (sequence == nseq ? nseq.compare(ipos, n.ipos)
+                    : (int) sequence.stableCompare(nseq));
+  }
+    
+  public boolean isSameNode (Node node)
+  {
+    if (! (node instanceof KNode))
+      return false;
+    KNode n = (KNode) node;
+    if (sequence != n.sequence)
+      return false;
+    return sequence.equals(ipos, n.ipos);
+  }
 
-  // public boolean isEqualNode (Node node)
-  // {
-  //   throw new UnsupportedOperationException("getAttributesisEqualNode not implemented yet");
-  // }
+  public boolean isEqualNode (Node node)
+  {
+    throw new UnsupportedOperationException("getAttributesisEqualNode not implemented yet");
+  }
   /* #endif */
 
   public String toString ()
@@ -450,14 +450,14 @@ public abstract class KNode extends SeqPosition
   }
 
   /* #ifdef JAXP-1.3 */
-  // public Object setUserData (String key, Object data, UserDataHandler handler)
-  // {
-  //   throw new UnsupportedOperationException("setUserData not implemented yet");
-  // }
+  public Object setUserData (String key, Object data, UserDataHandler handler)
+  {
+    throw new UnsupportedOperationException("setUserData not implemented yet");
+  }
 
-  // public Object getUserData (String key)
-  // {
-  //   return null;
-  // }
+  public Object getUserData (String key)
+  {
+    return null;
+  }
   /* #endif JAXP-1.3 */
 }

@@ -323,18 +323,18 @@ public class Arithmetic
           return value;
         int i = ((Number) value).intValue();
         /* #ifdef JAVA5 */
-        // return Integer.valueOf(i);
+        return Integer.valueOf(i);
         /* #else */
-        return new Integer(i);
+        // return new Integer(i);
         /* #endif */
       case Arithmetic.LONG_CODE:
         if (value instanceof Long)
           return value;
         long l = ((Number) value).longValue();
         /* #ifdef JAVA5 */
-        // return Long.valueOf(l);
+        return Long.valueOf(l);
         /* #else */
-        return new Long(l);
+        // return new Long(l);
         /* #endif */
       case Arithmetic.BIGINTEGER_CODE:
         return Arithmetic.asBigInteger(value);
@@ -349,18 +349,18 @@ public class Arithmetic
           return value;
         float f = Arithmetic.asFloat(value);
         /* #ifdef JAVA5 */
-        // return Float.valueOf(f);
+        return Float.valueOf(f);
         /* #else */
-        return new Float(f);
+        // return new Float(f);
         /* #endif */
       case Arithmetic.DOUBLE_CODE:
         if (value instanceof Double)
           return value;
         double d = Arithmetic.asDouble(value);
         /* #ifdef JAVA5 */
-        // return Double.valueOf(d);
+        return Double.valueOf(d);
         /* #else */
-        return new Double(d);
+        // return new Double(d);
         /* #endif */
       case Arithmetic.FLONUM_CODE:
         if (value instanceof DFloNum)

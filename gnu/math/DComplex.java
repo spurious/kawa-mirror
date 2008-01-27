@@ -147,9 +147,9 @@ public class DComplex extends Complex implements Externalizable
   {
     double h;
     /* #ifdef JAVA5 */
-    // h = Math.hypot(x_re, x_im);
+    h = Math.hypot(x_re, x_im);
     /* #else */
-    h = DComplex.hypot(x_re, x_im);
+    // h = DComplex.hypot(x_re, x_im);
     /* #endif */
     double logr = Math.log (h);
     double t = Math.atan2 (x_im, x_re);
@@ -162,9 +162,9 @@ public class DComplex extends Complex implements Externalizable
   {
     double h;
     /* #ifdef JAVA5 */
-    // h = Math.hypot(x_re, x_im);
+    h = Math.hypot(x_re, x_im);
     /* #else */
-    h = DComplex.hypot(x_re, x_im);
+    // h = DComplex.hypot(x_re, x_im);
     /* #endif */
     return make(Math.log(h), Math.atan2(x_im, x_re));
   }
@@ -222,9 +222,9 @@ public class DComplex extends Complex implements Externalizable
   public static Complex sqrt (double x_re, double x_im)
   {
     /* #ifdef JAVA5 */
-    // double r = Math.hypot(x_re, x_im);
+    double r = Math.hypot(x_re, x_im);
     /* #else */
-    double r = DComplex.hypot(x_re, x_im);
+    // double r = DComplex.hypot(x_re, x_im);
     /* #endif */
     double nr, ni;
     if (r == 0.0)
@@ -289,93 +289,93 @@ public class DComplex extends Complex implements Externalizable
    */
 
   /* #ifndef JAVA5 */
-  static double hypot (double x, double y)
-  {
-    double a=x,b=y,t1,t2,w;
-    int j,ha,hb;
-    long la = (Double.doubleToLongBits(x) << 1) >>> 1;
-    long lb = (Double.doubleToLongBits(y) << 1) >>> 1;
+  // static double hypot (double x, double y)
+  // {
+  //   double a=x,b=y,t1,t2,w;
+  //   int j,ha,hb;
+  //   long la = (Double.doubleToLongBits(x) << 1) >>> 1;
+  //   long lb = (Double.doubleToLongBits(y) << 1) >>> 1;
 
-    ha = (int)(la >>> 32);        // high word of  x
-    hb = (int)(lb >>> 32);        // high word of  y
-    if (hb > ha)
-      {
-        j=ha; ha=hb; hb=j;
-        long l=la; la=lb; lb=l;
-      }
-    a = Double.longBitsToDouble(la);   // a <- |a|
-    b = Double.longBitsToDouble(lb);   // b <- |b|
-    /* Now a is max (abs(x), abs(y)) and b is min(abs(x), abs(y));
-       la and lb are the long bits of a and b;
-       and ha and hb are the high order bits of la and lb. */
-    if ((ha-hb) > 0x3c00000) // x/y > 2**60
-      return a+b;
-    int k=0;
-    j = 0;  // scale as high-order of double
-    if (ha > 0x5f300000)
-      {   // a>2**500
-        if (ha >= 0x7ff00000)
-          {       // Inf or NaN
-            w = a+b;                 // for sNaN
-            if ((la & 0xfffffffffffffL) == 0)
-              w = a;
-            if ((lb^0x7ff0000000000000L) == 0)
-              w = b;
-            return w;
-          }
-        /* scale a and b by 2**-600 */
-        j = -0x25800000;  k += 600;
-      }
-    if (hb < 0x20b00000)
-      {   // b < 2**-500
-        if (hb <= 0x000fffff)
-          {      // subnormal b or 0  
-            if (lb == 0)
-              return a;
-            t1 = Double.longBitsToDouble(0x7fd0000000000000L); // t1=2^1022
-            b *= t1;
-            a *= t1;
-            k -= 1022;
-          }
-        else
-          {            // scale a and b by 2^600
-            k -= 600;
-            j = 0x25800000;
-          }
-      }
-    if (j != 0)
-      {
-        ha += j; hb += j;
-        la += (j << 32);  lb += (j << 32);
-        a = Double.longBitsToDouble(la);
-        b = Double.longBitsToDouble(lb);
-      }
+  //   ha = (int)(la >>> 32);        // high word of  x
+  //   hb = (int)(lb >>> 32);        // high word of  y
+  //   if (hb > ha)
+  //     {
+  //       j=ha; ha=hb; hb=j;
+  //       long l=la; la=lb; lb=l;
+  //     }
+  //   a = Double.longBitsToDouble(la);   // a <- |a|
+  //   b = Double.longBitsToDouble(lb);   // b <- |b|
+  //   /* Now a is max (abs(x), abs(y)) and b is min(abs(x), abs(y));
+  //      la and lb are the long bits of a and b;
+  //      and ha and hb are the high order bits of la and lb. */
+  //   if ((ha-hb) > 0x3c00000) // x/y > 2**60
+  //     return a+b;
+  //   int k=0;
+  //   j = 0;  // scale as high-order of double
+  //   if (ha > 0x5f300000)
+  //     {   // a>2**500
+  //       if (ha >= 0x7ff00000)
+  //         {       // Inf or NaN
+  //           w = a+b;                 // for sNaN
+  //           if ((la & 0xfffffffffffffL) == 0)
+  //             w = a;
+  //           if ((lb^0x7ff0000000000000L) == 0)
+  //             w = b;
+  //           return w;
+  //         }
+  //       /* scale a and b by 2**-600 */
+  //       j = -0x25800000;  k += 600;
+  //     }
+  //   if (hb < 0x20b00000)
+  //     {   // b < 2**-500
+  //       if (hb <= 0x000fffff)
+  //         {      // subnormal b or 0  
+  //           if (lb == 0)
+  //             return a;
+  //           t1 = Double.longBitsToDouble(0x7fd0000000000000L); // t1=2^1022
+  //           b *= t1;
+  //           a *= t1;
+  //           k -= 1022;
+  //         }
+  //       else
+  //         {            // scale a and b by 2^600
+  //           k -= 600;
+  //           j = 0x25800000;
+  //         }
+  //     }
+  //   if (j != 0)
+  //     {
+  //       ha += j; hb += j;
+  //       la += (j << 32);  lb += (j << 32);
+  //       a = Double.longBitsToDouble(la);
+  //       b = Double.longBitsToDouble(lb);
+  //     }
 
-    /* medium size a and b */
-    w = a-b;
-    if (w>b)
-      {
-        t1 = Double.longBitsToDouble ((long) ha << 32);
-        t2 = a-t1;
-        w  = t1*t1-(b*(-b)-t2*(a+t1)); 
-      }
-    else
-      {
-        a = a+a;
-        double y1 = Double.longBitsToDouble ((long) hb << 32);
-        double y2 = b - y1;
-        t1 = Double.longBitsToDouble (((long) (ha+0x00100000)) << 32);
-        t2 = a - t1;
-        w  = t1*y1-(w*(-w)-(t1*y2+t2*b));
-      }
-    w = Math.sqrt(w);
-    if(k!=0)
-      { // t1 = 2^k
-        t1 = Double.longBitsToDouble (0x3ff0000000000000L + ((long)k << 52));
-        w *= t1;
-      }
-    return w;
-  }
+  //   /* medium size a and b */
+  //   w = a-b;
+  //   if (w>b)
+  //     {
+  //       t1 = Double.longBitsToDouble ((long) ha << 32);
+  //       t2 = a-t1;
+  //       w  = t1*t1-(b*(-b)-t2*(a+t1)); 
+  //     }
+  //   else
+  //     {
+  //       a = a+a;
+  //       double y1 = Double.longBitsToDouble ((long) hb << 32);
+  //       double y2 = b - y1;
+  //       t1 = Double.longBitsToDouble (((long) (ha+0x00100000)) << 32);
+  //       t2 = a - t1;
+  //       w  = t1*y1-(w*(-w)-(t1*y2+t2*b));
+  //     }
+  //   w = Math.sqrt(w);
+  //   if(k!=0)
+  //     { // t1 = 2^k
+  //       t1 = Double.longBitsToDouble (0x3ff0000000000000L + ((long)k << 52));
+  //       w *= t1;
+  //     }
+  //   return w;
+  // }
   /* #endif */
 
   /**

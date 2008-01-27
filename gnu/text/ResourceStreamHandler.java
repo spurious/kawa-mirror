@@ -39,9 +39,9 @@ public class ResourceStreamHandler extends URLStreamHandler
     String cname = clas.getName();
     int dot = cname.lastIndexOf('.');
     /* #ifdef JAVA5 */
-    // StringBuilder sbuf = new StringBuilder();
+    StringBuilder sbuf = new StringBuilder();
     /* #else */
-    StringBuffer sbuf = new StringBuffer();
+    // StringBuffer sbuf = new StringBuffer();
     /* #endif */
     sbuf.append(CLASS_RESOURCE_URI_PREFIX);
     if (dot >= 0)

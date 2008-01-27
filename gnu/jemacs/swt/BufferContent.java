@@ -289,30 +289,30 @@ public class BufferContent extends SwtCharBuffer
   /* #endif */
 
   /* #ifdef JAVA5 */
-  // public void writeTo(int start, int count, Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   dest.append(this, start, start+count);
-  // }
+  public void writeTo(int start, int count, Appendable dest)
+    throws java.io.IOException
+  {
+    dest.append(this, start, start+count);
+  }
 
-  // public void writeTo(Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   dest.append(this, 0, size());
-  // }
+  public void writeTo(Appendable dest)
+    throws java.io.IOException
+  {
+    dest.append(this, 0, size());
+  }
   /* #else */
-  public void writeTo(int start, int count, java.io.Writer dest)
-    throws java.io.IOException
-  {
-    while (--count >= 0)
-      dest.write(charAt(start++));
-  }
+  // public void writeTo(int start, int count, java.io.Writer dest)
+  //   throws java.io.IOException
+  // {
+  //   while (--count >= 0)
+  //     dest.write(charAt(start++));
+  // }
 
-  public void writeTo(java.io.Writer dest)
-    throws java.io.IOException
-  {
-    writeTo(0, size(), dest);
-  }
+  // public void writeTo(java.io.Writer dest)
+  //   throws java.io.IOException
+  // {
+  //   writeTo(0, size(), dest);
+  // }
   /* #endif */
 
   /**

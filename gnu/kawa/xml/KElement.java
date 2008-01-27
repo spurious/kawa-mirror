@@ -4,12 +4,12 @@
 package gnu.kawa.xml;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 public class KElement extends KNode
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.Element
+  implements org.w3c.dom.Element
   /* #endif */
 {
   public KElement (NodeTree seq, int ipos)
@@ -18,7 +18,7 @@ public class KElement extends KNode
   }
   
   /* #ifdef use:org.w3c.dom.Node */
-  // public short getNodeType () { return Node.ELEMENT_NODE; }
+  public short getNodeType () { return Node.ELEMENT_NODE; }
   /* #endif */
 
   public String getTagName ()
@@ -49,55 +49,55 @@ public class KElement extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  // public void setAttribute (String name, String value)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setAttribute not supported");
-  // }
+  /** Not implemented. */
+  public void setAttribute (String name, String value)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setAttribute not supported");
+  }
 
-  // /** Not implemented. */
-  // public void setIdAttribute (String name, boolean isId)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setIdAttribute not supported");
-  // }
+  /** Not implemented. */
+  public void setIdAttribute (String name, boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setIdAttribute not supported");
+  }
 
-  // /** Not implemented. */
-  // public void setIdAttributeNS (String namespaceURI, String localName,
-  //                               boolean isId)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setIdAttributeNS not supported");
-  // }
+  /** Not implemented. */
+  public void setIdAttributeNS (String namespaceURI, String localName,
+                                boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setIdAttributeNS not supported");
+  }
 
-  // /** Not implemented. */
-  // public void setIdAttributeNode (Attr idAttr, boolean isId)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setIdAttributeNode not supported");
-  // }
+  /** Not implemented. */
+  public void setIdAttributeNode (Attr idAttr, boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setIdAttributeNode not supported");
+  }
 
-  // /** Not implemented. */
-  // public void removeAttribute (String name)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "removeAttribute not supported");
-  // }
+  /** Not implemented. */
+  public void removeAttribute (String name)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "removeAttribute not supported");
+  }
   /* #endif */
 
   /* #ifdef JAVA5 */
-  // public KAttr
+  public KAttr
   /* #else */
   /* #ifdef use:org.w3c.dom.Node */
   // public Attr
   /* #else */
-  public KAttr
+  // public KAttr
   /* #endif */
   /* #endif */
   getAttributeNode (String name)
@@ -113,21 +113,21 @@ public class KElement extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  //  public Attr setAttributeNode (Attr newAttr)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setAttributeNode not supported");
-  // }
+  /** Not implemented. */
+   public Attr setAttributeNode (Attr newAttr)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setAttributeNode not supported");
+  }
 
-  // /** Not implemented. */
-  //  public Attr removeAttributeNode (Attr oldAttr)
-  //    throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "removeAttributeNode not supported");
-  // }
+  /** Not implemented. */
+   public Attr removeAttributeNode (Attr oldAttr)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "removeAttributeNode not supported");
+  }
   /* #endif */
 
   public String getAttributeNS (String namespaceURI, String localName)
@@ -145,32 +145,32 @@ public class KElement extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  // public void setAttributeNS (String namespaceURI, String qualifiedName, 
-  //                             String value) throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setAttributeNS not supported");
-  // }
+  /** Not implemented. */
+  public void setAttributeNS (String namespaceURI, String qualifiedName, 
+                              String value) throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setAttributeNS not supported");
+  }
   /* #endif */
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  // public void removeAttributeNS (String namespaceURI, String localName)
-  //   throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "removeAttributeNS not supported");
-  // }
+  /** Not implemented. */
+  public void removeAttributeNS (String namespaceURI, String localName)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "removeAttributeNS not supported");
+  }
   /* #endif */
  
   /* #ifdef JAVA5 */
-  // public KAttr
+  public KAttr
   /* #else */
   /* #ifdef use:org.w3c.dom.Node */
   // public Attr
   /* #else */
-  public KAttr
+  // public KAttr
   /* #endif */
   /* #endif */
   getAttributeNodeNS(String namespaceURI, String localName)
@@ -189,20 +189,20 @@ public class KElement extends KNode
 
   /** Not implemented. */
   /* #ifdef use:org.w3c.dom.Node */
-  // public Attr setAttributeNodeNS (Attr newAttr)
-  //   throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setAttributeNodeNS not supported");
-  // }
+  public Attr setAttributeNodeNS (Attr newAttr)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setAttributeNodeNS not supported");
+  }
   /* #endif */
 
   // Not implemented yet.
   /* #ifdef use:org.w3c.dom.Node */
-  // public NodeList getElementsByTagNameNS(String namespaceURI, String localName)
-  // {
-  //   throw new UnsupportedOperationException("getElementsByTagNameNS not implemented yet");
-  // }
+  public NodeList getElementsByTagNameNS(String namespaceURI, String localName)
+  {
+    throw new UnsupportedOperationException("getElementsByTagNameNS not implemented yet");
+  }
   /* #endif */
 
   /** Not implemented yet. */
@@ -223,9 +223,9 @@ public class KElement extends KNode
   }
 
   /* #ifdef JAXP-1.3 */
-  // public TypeInfo getSchemaTypeInfo ()
-  // {
-  //   return null;
-  // }
+  public TypeInfo getSchemaTypeInfo ()
+  {
+    return null;
+  }
   /* #endif JAXP-1.3 */
 }

@@ -33,9 +33,9 @@ public class ModuleContext
 
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // private static WeakHashMap<Class,Object> table = new WeakHashMap<Class,Object>();
+  private static WeakHashMap<Class,Object> table = new WeakHashMap<Class,Object>();
   /* #else */
-  private static WeakHashMap table = new WeakHashMap();
+  // private static WeakHashMap table = new WeakHashMap();
   /* #endif */
   /* #else */
   // private static Hashtable table = new Hashtable();

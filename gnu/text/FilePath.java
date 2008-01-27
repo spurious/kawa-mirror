@@ -12,9 +12,9 @@ public class FilePath
   extends Path
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // implements Comparable<FilePath>
+  implements Comparable<FilePath>
   /* #else */
-  implements Comparable
+  // implements Comparable
   /* #endif */
   /* #endif */
 {
@@ -156,9 +156,9 @@ public class FilePath
 
   public
   /* #ifdef JAVA5 */
-  // FilePath
+  FilePath
   /* #else */
-  Path
+  // Path
   /* #endif */
   getParent ()
   {
@@ -175,10 +175,10 @@ public class FilePath
   }
 
   /* #ifndef JAVA5 */
-  public int compareTo (Object obj)
-  {
-    return compareTo((FilePath) obj);
-  }
+  // public int compareTo (Object obj)
+  // {
+  //   return compareTo((FilePath) obj);
+  // }
   /* #endif */
 
   public boolean equals (Object obj)

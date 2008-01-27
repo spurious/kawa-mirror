@@ -1099,30 +1099,30 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /* #ifdef JAVA5 */
-  // public void format (int radix, StringBuffer buffer)
-  // {
-  //   if (radix == 10)
-  //     {
-  //       if (words == null)
-  //         {
-  //           buffer.append(ival);
-  //           return;
-  //         }
-  //       else if (ival <= 2)
-  //         {
-  //           buffer.append(longValue());
-  //           return;
-  //         }
-  //     }
-  //   buffer.append(toString(radix));
-  // }
+  public void format (int radix, StringBuffer buffer)
+  {
+    if (radix == 10)
+      {
+        if (words == null)
+          {
+            buffer.append(ival);
+            return;
+          }
+        else if (ival <= 2)
+          {
+            buffer.append(longValue());
+            return;
+          }
+      }
+    buffer.append(toString(radix));
+  }
   /* #endif */
 
   public void format (int radix,
                       /* #ifdef JAVA5 */
-                      // StringBuilder buffer
+                      StringBuilder buffer
                       /* #else */
-                      StringBuffer buffer
+                      // StringBuffer buffer
                       /* #endif */
                       )
   {
@@ -1225,9 +1225,9 @@ public class IntNum extends RatNum implements Externalizable
       return Long.toString (longValue (), radix);
     int buf_size = ival * (MPN.chars_per_word (radix) + 1);
     /* #ifdef JAVA5 */
-    // StringBuilder buffer = new StringBuilder (buf_size);
+    StringBuilder buffer = new StringBuilder (buf_size);
     /* #else */
-    StringBuffer buffer = new StringBuffer (buf_size);
+    // StringBuffer buffer = new StringBuffer (buf_size);
     /* #endif */
     format(radix, buffer);
     return buffer.toString ();

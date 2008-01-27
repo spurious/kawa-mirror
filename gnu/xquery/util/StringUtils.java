@@ -293,9 +293,9 @@ public class StringUtils
     arg2 = SequenceUtils.coerceToZeroOrOne(arg2, "concat", 2);
     String str2 = TextUtils.stringValue(arg2);
     /* #ifdef JAVA5 */
-    // StringBuilder result = new StringBuilder(str1);
+    StringBuilder result = new StringBuilder(str1);
     /* #else */
-    StringBuffer result = new StringBuffer(str1);
+    // StringBuffer result = new StringBuffer(str1);
     /* #endif */
     result.append(str2);
     int count = args.length;

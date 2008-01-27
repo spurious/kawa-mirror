@@ -16,9 +16,9 @@ public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
   /* #ifdef JAVA5 */
-  // StringBuilder sbuf = new StringBuilder(100);
+  StringBuilder sbuf = new StringBuilder(100);
   /* #else */
-  StringBuffer sbuf = new StringBuffer(100);
+  // StringBuffer sbuf = new StringBuffer(100);
   /* #endif */
   Object currentHeader;
 
@@ -197,11 +197,11 @@ public class HttpPrinter extends FilterConsumer
     if (base == null)
       {
         /* #ifdef JAVA5 */
-        // sbuf.append(csq, start, end);
+        sbuf.append(csq, start, end);
         /* #else */
-        if (csq == null)
-          csq = "null";
-        sbuf.append(csq.subSequence(start, end).toString());
+        // if (csq == null)
+        //   csq = "null";
+        // sbuf.append(csq.subSequence(start, end).toString());
         /* #endif */
       }
     else
@@ -214,9 +214,9 @@ public class HttpPrinter extends FilterConsumer
     if (base == null)
       {
         /* #ifdef JAVA5 */
-        // sbuf.append(csq);
+        sbuf.append(csq);
         /* #else */
-        sbuf.append(csq.toString());
+        // sbuf.append(csq.toString());
         /* #endif */
       }
     else if (csq == null)

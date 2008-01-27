@@ -4,12 +4,12 @@
 package gnu.kawa.xml;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 public class KDocument extends KNode
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.Document
+  implements org.w3c.dom.Document
   /* #endif */
 {
   public KDocument (NodeTree seq, int ipos)
@@ -23,29 +23,29 @@ public class KDocument extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public DOMImplementation getImplementation ()
-  // {
-  //   throw new UnsupportedOperationException("getImplementation not implemented");
-  // }
+  public DOMImplementation getImplementation ()
+  {
+    throw new UnsupportedOperationException("getImplementation not implemented");
+  }
 
-  // public DocumentType getDoctype ()
-  // {
-  //   return null;
-  // }
+  public DocumentType getDoctype ()
+  {
+    return null;
+  }
 
-  // public Node getParentNode()
-  // {
-  //   return null;
-  // }
+  public Node getParentNode()
+  {
+    return null;
+  }
 
-  // public Element getDocumentElement ()
-  // {
-  //   return (Element) getFirstChild();
-  // }
+  public Element getDocumentElement ()
+  {
+    return (Element) getFirstChild();
+  }
   /* #endif */
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public short getNodeType () { return Node.DOCUMENT_NODE; }
+  public short getNodeType () { return Node.DOCUMENT_NODE; }
   /* #endif */
 
   public String getNodeValue()
@@ -64,84 +64,84 @@ public class KDocument extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // /** Not implemented. */
-  //  public Element createElement (String tagName)
-  // {
-  //   throw new UnsupportedOperationException("createElement not implemented");
-  // }
+  /** Not implemented. */
+   public Element createElement (String tagName)
+  {
+    throw new UnsupportedOperationException("createElement not implemented");
+  }
 
-  // /** Not implemented. */
-  // public DocumentFragment createDocumentFragment ()
-  // {
-  //   throw new UnsupportedOperationException("createDocumentFragment not implemented");
-  // }
+  /** Not implemented. */
+  public DocumentFragment createDocumentFragment ()
+  {
+    throw new UnsupportedOperationException("createDocumentFragment not implemented");
+  }
 
-  // /** Not implemented. */
-  // public Text createTextNode (String data)
-  // {
-  //   throw new UnsupportedOperationException("createTextNode not implemented");
-  // }
+  /** Not implemented. */
+  public Text createTextNode (String data)
+  {
+    throw new UnsupportedOperationException("createTextNode not implemented");
+  }
 
-  // /** Not implemented. */
-  // public Comment createComment (String data)
-  // {
-  //   throw new UnsupportedOperationException("createComment not implemented");
-  // }
+  /** Not implemented. */
+  public Comment createComment (String data)
+  {
+    throw new UnsupportedOperationException("createComment not implemented");
+  }
 
-  // /** Not implemented. */
-  // public CDATASection createCDATASection (String data)
-  // {
-  //   throw new UnsupportedOperationException("createCDATASection not implemented");
-  // }
+  /** Not implemented. */
+  public CDATASection createCDATASection (String data)
+  {
+    throw new UnsupportedOperationException("createCDATASection not implemented");
+  }
 
-  // /** Not implemented. */
-  // public ProcessingInstruction createProcessingInstruction (String target, 
-  //                                                           String data)
-  // {
-  //   throw new UnsupportedOperationException("createProcessingInstruction not implemented");
-  // }
+  /** Not implemented. */
+  public ProcessingInstruction createProcessingInstruction (String target, 
+                                                            String data)
+  {
+    throw new UnsupportedOperationException("createProcessingInstruction not implemented");
+  }
 
-  // /** Not implemented. */
-  // public Attr createAttribute (String name)
-  // {
-  //   throw new UnsupportedOperationException("createAttribute not implemented");
-  // }
+  /** Not implemented. */
+  public Attr createAttribute (String name)
+  {
+    throw new UnsupportedOperationException("createAttribute not implemented");
+  }
 
-  // /** Not implemented. */
-  // public EntityReference createEntityReference (String name)
-  // {
-  //   throw new UnsupportedOperationException("createEntityReference implemented");
-  // }
+  /** Not implemented. */
+  public EntityReference createEntityReference (String name)
+  {
+    throw new UnsupportedOperationException("createEntityReference implemented");
+  }
 
-  // /** Not implemented. */
-  // public Node importNode (Node importedNode, boolean deep)
-  // {
-  //   throw new UnsupportedOperationException("importNode not implemented");
-  // }
+  /** Not implemented. */
+  public Node importNode (Node importedNode, boolean deep)
+  {
+    throw new UnsupportedOperationException("importNode not implemented");
+  }
 
-  // /** Not implemented. */
-  // public Element createElementNS (String namespaceURI, String qualifiedName)
-  // {
-  //   throw new UnsupportedOperationException("createElementNS not implemented");
+  /** Not implemented. */
+  public Element createElementNS (String namespaceURI, String qualifiedName)
+  {
+    throw new UnsupportedOperationException("createElementNS not implemented");
 
-  // }
+  }
 
-  // /** Not implemented. */
-  // public Attr createAttributeNS (String namespaceURI, String qualifiedName)
-  // {
-  //   throw new UnsupportedOperationException("createAttributeNS not implemented");
-  // }
+  /** Not implemented. */
+  public Attr createAttributeNS (String namespaceURI, String qualifiedName)
+  {
+    throw new UnsupportedOperationException("createAttributeNS not implemented");
+  }
 
-  // /** Not implemented yet. */
-  // public NodeList getElementsByTagNameNS(String namespaceURI, String localName)
-  // {
-  //   throw new UnsupportedOperationException("getElementsByTagNameNS not implemented yet");
-  // }
+  /** Not implemented yet. */
+  public NodeList getElementsByTagNameNS(String namespaceURI, String localName)
+  {
+    throw new UnsupportedOperationException("getElementsByTagNameNS not implemented yet");
+  }
 
-  // public Element getElementById (String elementId)
-  // {
-  //   return null;
-  // }
+  public Element getElementById (String elementId)
+  {
+    return null;
+  }
   /* #endif */
 
   public boolean hasAttributes ()
@@ -196,19 +196,19 @@ public class KDocument extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public Node renameNode (Node n, String namespaceURI, String qualifiedname)
-  //   throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-  //                          "renameNode not implemented");
-  // }
+  public Node renameNode (Node n, String namespaceURI, String qualifiedname)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                           "renameNode not implemented");
+  }
 
-  // public Node adoptNode (Node source)
-  //   throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-  //                          "adoptNode not implemented");
-  // }
+  public Node adoptNode (Node source)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                           "adoptNode not implemented");
+  }
   /* #endif */
 
   public void normalizeDocument ()
@@ -216,11 +216,11 @@ public class KDocument extends KNode
   }
 
   /* #ifdef JAXP-1.3 */
-  // public DOMConfiguration getDomConfig ()
-  // {
-  //   throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-  //                          "getDomConfig not implemented");
-  // }
+  public DOMConfiguration getDomConfig ()
+  {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                           "getDomConfig not implemented");
+  }
   /* #endif JAXP-1.3 */
 }
 

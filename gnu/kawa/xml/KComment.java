@@ -4,12 +4,12 @@
 package gnu.kawa.xml;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 public class KComment extends KCharacterData
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.Comment
+  implements org.w3c.dom.Comment
   /* #endif */
 {
   public KComment (NodeTree seq, int ipos)
@@ -18,7 +18,7 @@ public class KComment extends KCharacterData
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public short getNodeType () { return Node.COMMENT_NODE; }
+  public short getNodeType () { return Node.COMMENT_NODE; }
   /* #endif */
 
   public String getNodeName()

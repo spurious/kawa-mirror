@@ -643,9 +643,9 @@ public class XMLPrinter extends OutPort
   public static String formatDecimal (BigDecimal dec)
   {
     /* #ifdef JAVA5 */
-    // return formatDecimal(dec.toPlainString());
+    return formatDecimal(dec.toPlainString());
     /* #else */
-    return formatDecimal(dec.toString());
+    // return formatDecimal(dec.toString());
     /* #endif */
   }
 

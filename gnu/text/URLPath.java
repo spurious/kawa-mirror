@@ -74,9 +74,9 @@ public class URLPath extends URIPath
     try
       {
         /* #ifdef JAVA5 */
-        // return url.toURI();
+        return url.toURI();
         /* #else */
-        return new URI(url.toString());
+        // return new URI(url.toString());
         /* #endif */
       }
     catch (Throwable ex)

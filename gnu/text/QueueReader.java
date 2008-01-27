@@ -9,7 +9,7 @@ import gnu.lists.CharSeq;
 
 public class QueueReader extends Reader
   /* #ifdef JAVA5 */
-  // implements Appendable
+  implements Appendable
   /* #endif */
 {
   char[] buffer;

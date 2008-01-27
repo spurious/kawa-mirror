@@ -11,7 +11,7 @@ import gnu.mapping.Procedure;
 
 public interface TypeValue
 /* #ifdef JAVA5 */
-//   extends java.lang.reflect.Type
+  extends java.lang.reflect.Type
 /* #endif */
 {
   /** The lower-level Type used to represent instances of this type. */

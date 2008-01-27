@@ -363,9 +363,9 @@ public abstract class Path
     else
       return in;
     /* #ifdef JAVA5 */
-    // StringBuilder sbuf = new StringBuilder();
+    StringBuilder sbuf = new StringBuilder();
     /* #else */
-    StringBuffer sbuf = new StringBuffer();
+    // StringBuffer sbuf = new StringBuffer();
     /* #endif */
     sl = 0;
     for (i = baseLen = baseStr.length(); --i >= 0; )

@@ -57,30 +57,7 @@ implements CharSeq
   }
 
   /* #ifdef JAVA5 */
-  // public void writeTo(int start, int count, Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   int index0 = base.nextIndex(ipos0);
-  //   int index1 = base.nextIndex(ipos0);
-  //   if (start < 0 || count < 0 || index0 + start + count > index1)
-  //     throw new IndexOutOfBoundsException();
-  //   ((CharSeq) base).writeTo(index0 + start, count, dest);
-  // }
-
-  // public void writeTo(Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   int index0 = base.nextIndex(ipos0);
-  //   ((CharSeq) base).writeTo(index0, size(), dest);
-  // }
-  /* #else */
-  /**
-   * Write out (part of) this string.
-   * @param start index of initial character to write
-   * @param count number of characters to write
-   * @param dest where to write the characters
-   */
-  public void writeTo(int start, int count, java.io.Writer dest)
+  public void writeTo(int start, int count, Appendable dest)
     throws java.io.IOException
   {
     int index0 = base.nextIndex(ipos0);
@@ -90,11 +67,34 @@ implements CharSeq
     ((CharSeq) base).writeTo(index0 + start, count, dest);
   }
 
-  public void writeTo(java.io.Writer dest) throws java.io.IOException
+  public void writeTo(Appendable dest)
+    throws java.io.IOException
   {
     int index0 = base.nextIndex(ipos0);
     ((CharSeq) base).writeTo(index0, size(), dest);
   }
+  /* #else */
+  // /**
+  //  * Write out (part of) this string.
+  //  * @param start index of initial character to write
+  //  * @param count number of characters to write
+  //  * @param dest where to write the characters
+  //  */
+  // public void writeTo(int start, int count, java.io.Writer dest)
+  //   throws java.io.IOException
+  // {
+  //   int index0 = base.nextIndex(ipos0);
+  //   int index1 = base.nextIndex(ipos0);
+  //   if (start < 0 || count < 0 || index0 + start + count > index1)
+  //     throw new IndexOutOfBoundsException();
+  //   ((CharSeq) base).writeTo(index0 + start, count, dest);
+  // }
+
+  // public void writeTo(java.io.Writer dest) throws java.io.IOException
+  // {
+  //   int index0 = base.nextIndex(ipos0);
+  //   ((CharSeq) base).writeTo(index0, size(), dest);
+  // }
   /* #endif */
 
   public void consume(int start, int count, Consumer out)

@@ -207,7 +207,7 @@ public class NodeUtils
   }
 
   /* #ifdef JAVA5 */
-  // @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   /* #endif */
   /** Extract canditate IDREFs from arg.
    * @return {@code null} (if no {@code IDREF}s);

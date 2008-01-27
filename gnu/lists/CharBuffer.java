@@ -229,20 +229,20 @@ public class CharBuffer extends StableVector
   }
 
   /* #ifdef JAVA5 */
-  // public void writeTo(int start, int count, Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   if (dest instanceof java.io.Writer)
-  //     writeTo(start, count, (java.io.Writer) dest);
-  //   else
-  //     dest.append(this, start, start+count);
-  // }
+  public void writeTo(int start, int count, Appendable dest)
+    throws java.io.IOException
+  {
+    if (dest instanceof java.io.Writer)
+      writeTo(start, count, (java.io.Writer) dest);
+    else
+      dest.append(this, start, start+count);
+  }
 
-  // public void writeTo(Appendable dest)
-  //   throws java.io.IOException
-  // {
-  //   writeTo(0, size(), dest);
-  // }
+  public void writeTo(Appendable dest)
+    throws java.io.IOException
+  {
+    writeTo(0, size(), dest);
+  }
   /* #endif */
 
   public void writeTo(int start, int count, java.io.Writer dest)

@@ -6,7 +6,7 @@ import java.util.*;
 
 public abstract class Type
 /* #ifdef JAVA5 */
-//  implements java.lang.reflect.Type
+ implements java.lang.reflect.Type
 /* #endif */
 {
   String signature;
@@ -36,9 +36,9 @@ public abstract class Type
   // Maps java.lang.Class to corresponding Type.
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // static WeakHashMap<Class,Type> mapClassToType;
+  static WeakHashMap<Class,Type> mapClassToType;
   /* #else */
-  static WeakHashMap mapClassToType;
+  // static WeakHashMap mapClassToType;
   /* #endif */
   /* #else */
   // static Hashtable mapClassToType;
@@ -46,18 +46,18 @@ public abstract class Type
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
   /* #ifdef JAVA5 */
-  // static java.util.HashMap<String,Type> mapNameToType;
+  static java.util.HashMap<String,Type> mapNameToType;
   /* #else */
-  static java.util.Hashtable mapNameToType;
+  // static java.util.Hashtable mapNameToType;
   /* #endif */
 
   public static Type lookupType (String name)
   {
     /* #ifdef JAVA5 */
-    // java.util.HashMap<String,Type> map = mapNameToType;
-    // synchronized (map) { return map.get(name); }
+    java.util.HashMap<String,Type> map = mapNameToType;
+    synchronized (map) { return map.get(name); }
     /* #else */
-    return (Type) mapNameToType.get(name);
+    // return (Type) mapNameToType.get(name);
     /* #endif */
   }
 
@@ -69,9 +69,9 @@ public abstract class Type
   public static Type getType (String name)
   {
     /* #ifdef JAVA5 */
-    // java.util.HashMap<String,Type> map = mapNameToType;
+    java.util.HashMap<String,Type> map = mapNameToType;
     /* #else */
-    java.util.Hashtable map = mapNameToType;
+    // java.util.Hashtable map = mapNameToType;
     /* #endif */
     synchronized (map)
       {
@@ -97,13 +97,13 @@ public abstract class Type
   {
     /* #ifdef JAVA2 */
     /* #ifdef JAVA5 */
-    // WeakHashMap<Class,Type> map = mapClassToType;
-    // if (map == null)
-    //   mapClassToType = map = new WeakHashMap<Class,Type>(100);
-    /* #else */
-    WeakHashMap map = mapClassToType;
+    WeakHashMap<Class,Type> map = mapClassToType;
     if (map == null)
-      mapClassToType = map = new WeakHashMap(100);
+      mapClassToType = map = new WeakHashMap<Class,Type>(100);
+    /* #else */
+    // WeakHashMap map = mapClassToType;
+    // if (map == null)
+    //   mapClassToType = map = new WeakHashMap(100);
     /* #endif */
     /* #else */
     // Hashtable map = mapClassToType;
@@ -132,9 +132,9 @@ public abstract class Type
       {
 	String name = reflectClass.getName();
         /* #ifdef JAVA5 */
-        // java.util.HashMap<String,Type> map = mapNameToType;
+        java.util.HashMap<String,Type> map = mapNameToType;
         /* #else */
-        java.util.Hashtable map = mapNameToType;
+        // java.util.Hashtable map = mapNameToType;
         /* #endif */
         synchronized (map)
           {
@@ -470,9 +470,9 @@ public abstract class Type
   static
   {
     /* #ifdef JAVA5 */
-    // mapNameToType = new java.util.HashMap<String,Type>();
+    mapNameToType = new java.util.HashMap<String,Type>();
     /* #else */
-    mapNameToType = new java.util.Hashtable();
+    // mapNameToType = new java.util.Hashtable();
     /* #endif */
 	mapNameToType.put("byte",    byte_type);
 	mapNameToType.put("short",   short_type);

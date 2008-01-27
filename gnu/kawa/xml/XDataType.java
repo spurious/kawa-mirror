@@ -339,9 +339,9 @@ public class XDataType extends Type implements TypeValue
           {
             double d = ((Number) value).doubleValue();
             /* #ifdef JAVA5 */
-            // return BigDecimal.valueOf(d);
+            return BigDecimal.valueOf(d);
             /* #else */
-            return new BigDecimal(d);
+            // return new BigDecimal(d);
             /* #endif */
           }
         if (value instanceof Boolean)
@@ -498,18 +498,18 @@ public class XDataType extends Type implements TypeValue
   public static Float makeFloat (float value)
   {
     /* #ifdef JAVA5 */
-    // return Float.valueOf(value);
+    return Float.valueOf(value);
     /* #else */
-    return new Float(value);
+    // return new Float(value);
     /* #endif */
   }
 
   public static Double makeDouble (double value)
   {
     /* #ifdef JAVA5 */
-    // return Double.valueOf(value);
+    return Double.valueOf(value);
     /* #else */
-    return new Double(value);
+    // return new Double(value);
     /* #endif */
   }
 

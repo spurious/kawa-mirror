@@ -6,14 +6,14 @@ import gnu.mapping.Values;
 import gnu.lists.*;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 /** Manages a sequence of node references. */
 
 public class Nodes extends Values
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.NodeList
+  implements org.w3c.dom.NodeList
   /* #endif */
 {
   /** Number of data elements for a POSITION_PAIR_FOLLOWS node reference. */
@@ -289,13 +289,13 @@ public class Nodes extends Values
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public Node item(int index)
-  // {
-  //   if (index >= count)
-  //     return null;
-  //   else
-  //     return (Node) get(index);
-  // }
+  public Node item(int index)
+  {
+    if (index >= count)
+      return null;
+    else
+      return (Node) get(index);
+  }
   /* #endif */
 
   public Object getPosNext(int ipos)

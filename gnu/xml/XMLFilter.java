@@ -1279,27 +1279,27 @@ public class XMLFilter implements
   }
 
   /* #ifdef JAVA5 */
-  // public XMLFilter append (char c)
-  // {
-  //   write(c);
-  //   return this;
-  // }
+  public XMLFilter append (char c)
+  {
+    write(c);
+    return this;
+  }
 
-  // public XMLFilter append (CharSequence csq)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   append(csq, 0, csq.length());
-  //   return this;
-  // }
+  public XMLFilter append (CharSequence csq)
+  {
+    if (csq == null)
+      csq = "null";
+    append(csq, 0, csq.length());
+    return this;
+  }
 
-  // public XMLFilter append (CharSequence csq, int start, int end)
-  // {
-  //   if (csq == null)
-  //     csq = "null";
-  //   write(csq, start, end-start);
-  //   return this;
-  // }
+  public XMLFilter append (CharSequence csq, int start, int end)
+  {
+    if (csq == null)
+      csq = "null";
+    write(csq, start, end-start);
+    return this;
+  }
   /* #endif */
 
   MappingInfo lookupTag (Symbol qname)

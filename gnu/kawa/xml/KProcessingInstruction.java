@@ -4,12 +4,12 @@
 package gnu.kawa.xml;
 import gnu.xml.*;
 /* #ifdef use:org.w3c.dom.Node */
-// import org.w3c.dom.*;
+import org.w3c.dom.*;
 /* #endif */
 
 public class KProcessingInstruction extends KNode
   /* #ifdef use:org.w3c.dom.Node */
-  // implements org.w3c.dom.ProcessingInstruction
+  implements org.w3c.dom.ProcessingInstruction
   /* #endif */
 {
   public KProcessingInstruction (NodeTree seq, int ipos)
@@ -18,7 +18,7 @@ public class KProcessingInstruction extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public short getNodeType () { return Node.PROCESSING_INSTRUCTION_NODE; }
+  public short getNodeType () { return Node.PROCESSING_INSTRUCTION_NODE; }
   /* #endif */
 
   public String getNodeName()
@@ -32,11 +32,11 @@ public class KProcessingInstruction extends KNode
   }
 
   /* #ifdef use:org.w3c.dom.Node */
-  // public void setData(String data)  throws DOMException
-  // {
-  //   throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-  //                          "setData not supported");
-  // }
+  public void setData(String data)  throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                           "setData not supported");
+  }
   /* #endif */
 
   public String getTarget ()

@@ -56,18 +56,18 @@ public class ObjectType extends Type
 
   /* #ifdef JAVA2 */
   /* #ifndef JAVA5 */
-  static ClassLoader thisClassLoader;
-  static
-  {
-    try
-      {
-        thisClassLoader
-          = Class.forName("gnu.mapping.ObjectType").getClassLoader();
-      }
-    catch (Throwable ex)
-      {
-      }
-  }
+  // static ClassLoader thisClassLoader;
+  // static
+  // {
+  //   try
+  //     {
+  //       thisClassLoader
+  //         = Class.forName("gnu.mapping.ObjectType").getClassLoader();
+  //     }
+  //   catch (Throwable ex)
+  //     {
+  //     }
+  // }
   /* #endif */
   /* #endif */
 
@@ -88,9 +88,9 @@ public class ObjectType extends Type
         /* The .class syntax below also works for JDK 1.4, but it's just
            syntactic sugar, so there is no benefit in using it. */
         /* #ifdef JAVA5 */
-        // loader = ObjectType.class.getClassLoader();
+        loader = ObjectType.class.getClassLoader();
         /* #else */
-        loader = thisClassLoader;
+        // loader = thisClassLoader;
         /* #endif */
       }
     /* Specifies optional 'initialize' argument. */
@@ -166,7 +166,7 @@ public class ObjectType extends Type
   }
 
   /* #ifdef JAVA5 */
-  // @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   /* #endif */
   /** Convert an object to a value of this Type.
    * Throw a ClassCastException when this is not possible. */

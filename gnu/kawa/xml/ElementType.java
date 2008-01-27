@@ -96,13 +96,13 @@ implements TypeValue, Externalizable, ElementPredicate
 	curLocalName = qname.getLocalName();
       }
     /* #ifdef JAXP-1.3 */
-    // else if (elementType instanceof javax.xml.namespace.QName)
-    // {
-    //   javax.xml.namespace.QName qtype
-    //     = (javax.xml.namespace.QName) elementType;
-    //   curNamespaceURI = qtype.getNamespaceURI();
-    //   curLocalName = qtype.getLocalPart();
-    // }
+    else if (elementType instanceof javax.xml.namespace.QName)
+    {
+      javax.xml.namespace.QName qtype
+        = (javax.xml.namespace.QName) elementType;
+      curNamespaceURI = qtype.getNamespaceURI();
+      curLocalName = qtype.getLocalPart();
+    }
     /* #endif */
     else
       {
@@ -141,13 +141,13 @@ implements TypeValue, Externalizable, ElementPredicate
 	curLocalName = qname.getLocalName();
       }
     /* #ifdef JAXP-1.3 */
-    // else if (curName instanceof javax.xml.namespace.QName)
-    // {
-    //   javax.xml.namespace.QName qtype
-    //     = (javax.xml.namespace.QName) curName;
-    //   curNamespaceURI = qtype.getNamespaceURI();
-    //   curLocalName = qtype.getLocalPart();
-    // }
+    else if (curName instanceof javax.xml.namespace.QName)
+    {
+      javax.xml.namespace.QName qtype
+        = (javax.xml.namespace.QName) curName;
+      curNamespaceURI = qtype.getNamespaceURI();
+      curLocalName = qtype.getLocalPart();
+    }
     /* #endif */
     else
       {

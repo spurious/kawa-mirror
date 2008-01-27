@@ -232,9 +232,9 @@ public class XslTranslator extends Lexer implements Consumer
     if (inAttribute)
       {
         /* #ifdef JAVA5 */
-        // attributeValue.appendCodePoint(v);
+        attributeValue.appendCodePoint(v);
         /* #else */
-        attributeValue.append((char) v);
+        // attributeValue.append((char) v);
         /* #endif */
       }
     else
@@ -253,37 +253,37 @@ public class XslTranslator extends Lexer implements Consumer
   }
 
   /* #ifdef JAVA5 */
-  // public Consumer append (char v)
-  // {
-  //   if (inAttribute)
-  //     attributeValue.append(v);
-  //   else
-  //     push(String.valueOf(v));
-  //   return this;
-  // }
-
-  // public Consumer append (CharSequence csq)
-  // {
-  //   if (inAttribute)
-  //     attributeValue.append(csq);
-  //   else
-  //     push(csq.toString());
-  //   return this;
-  // }
-
-  // public Consumer append (CharSequence csq, int start, int end)
-  // {
-  //   return append(csq.subSequence(start, end));
-  // }
-  /* #else */
-  public Consumer append (String str)
+  public Consumer append (char v)
   {
     if (inAttribute)
-      attributeValue.append(str);
+      attributeValue.append(v);
     else
-      push(str);
+      push(String.valueOf(v));
     return this;
   }
+
+  public Consumer append (CharSequence csq)
+  {
+    if (inAttribute)
+      attributeValue.append(csq);
+    else
+      push(csq.toString());
+    return this;
+  }
+
+  public Consumer append (CharSequence csq, int start, int end)
+  {
+    return append(csq.subSequence(start, end));
+  }
+  /* #else */
+  // public Consumer append (String str)
+  // {
+  //   if (inAttribute)
+  //     attributeValue.append(str);
+  //   else
+  //     push(str);
+  //   return this;
+  // }
   /* #endif */
 
   void push(Expression exp)

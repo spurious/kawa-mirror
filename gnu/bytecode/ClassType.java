@@ -1065,9 +1065,9 @@ public class ClassType extends ObjectType
   {
     String name = getName();
     /* #ifdef JAVA5 */
-    // java.util.HashMap<String,Type> map = mapNameToType;
+    java.util.HashMap<String,Type> map = mapNameToType;
     /* #else */
-    java.util.Hashtable map = mapNameToType;
+    // java.util.Hashtable map = mapNameToType;
     /* #endif */
     synchronized (map)
       {

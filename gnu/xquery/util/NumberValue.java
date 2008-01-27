@@ -99,9 +99,9 @@ public class NumberValue extends Procedure1
         bits &= 0x7fffffffffffffffL;
         x = Double.longBitsToDouble(bits);
         /* #ifdef JAVA5 */
-        // return Double.valueOf(x);
+        return Double.valueOf(x);
         /* #else */
-        return new Double(x);
+        // return new Double(x);
         /* #endif */
       }
     if (value instanceof Float)
@@ -114,9 +114,9 @@ public class NumberValue extends Procedure1
         bits &= 0x7fffffff;
         x = Float.intBitsToFloat(bits);
         /* #ifdef JAVA5 */
-        // return Float.valueOf(x) ;
+        return Float.valueOf(x) ;
         /* #else */
-        return new Float(x);
+        // return new Float(x);
         /* #endif */
       }
     if (value instanceof BigDecimal)
@@ -207,29 +207,29 @@ public class NumberValue extends Procedure1
     BigDecimal dec = (BigDecimal) XDataType.decimalType.cast(number);
     int prec = precision.intValue();
     /* #ifndef JAVA5 */
-    if (prec < 0)
-      {
-        BigDecimal power = null;
-        int shift = -prec;
-        if (shift >= 6)
-          {
-            BigDecimal million = BigDecimal.valueOf(1000000);
-            power = million;
-            while ((shift -= 6) >= 6)
-              power = power.multiply(million);
-          }
-        if (shift > 0)
-          {
-            int i = 10;
-            while (--shift > 0)
-              i = 10 * i;
-            BigDecimal tens = BigDecimal.valueOf(i);
-            power = power == null ? tens : power.multiply(tens);
-          }
-        dec = dec.divide(power, 0, BigDecimal.ROUND_HALF_EVEN);
-        dec = dec.multiply(power);
-      }
-    else
+    // if (prec < 0)
+    //   {
+    //     BigDecimal power = null;
+    //     int shift = -prec;
+    //     if (shift >= 6)
+    //       {
+    //         BigDecimal million = BigDecimal.valueOf(1000000);
+    //         power = million;
+    //         while ((shift -= 6) >= 6)
+    //           power = power.multiply(million);
+    //       }
+    //     if (shift > 0)
+    //       {
+    //         int i = 10;
+    //         while (--shift > 0)
+    //           i = 10 * i;
+    //         BigDecimal tens = BigDecimal.valueOf(i);
+    //         power = power == null ? tens : power.multiply(tens);
+    //       }
+    //     dec = dec.divide(power, 0, BigDecimal.ROUND_HALF_EVEN);
+    //     dec = dec.multiply(power);
+    //   }
+    // else
     /* #endif */
       dec = dec.setScale(prec, BigDecimal.ROUND_HALF_EVEN);
     if (number instanceof Double)

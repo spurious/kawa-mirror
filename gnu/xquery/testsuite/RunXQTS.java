@@ -19,19 +19,19 @@ public class RunXQTS extends FilterConsumer
   static XQuery xqueryLanguage = XQuery.getInstance();
 
   /* #ifdef JAVA5 */
-  // HashMap<String,String> expectedFailures = new HashMap<String,String>();
-  // HashMap<String,String> modules = new HashMap<String,String>();
-  // HashMap<String,Object> sources = new HashMap<String,Object>();
-  // Stack<Symbol> externalVariablesSet = new Stack<Symbol>();
-  // Stack<String> outputFileAlts = new Stack<String>();
-  // Stack<String> outputCompareAlts = new Stack<String>();
+  HashMap<String,String> expectedFailures = new HashMap<String,String>();
+  HashMap<String,String> modules = new HashMap<String,String>();
+  HashMap<String,Object> sources = new HashMap<String,Object>();
+  Stack<Symbol> externalVariablesSet = new Stack<Symbol>();
+  Stack<String> outputFileAlts = new Stack<String>();
+  Stack<String> outputCompareAlts = new Stack<String>();
   /* #else */
-  Hashtable expectedFailures = new Hashtable();
-  Hashtable modules = new Hashtable();
-  Hashtable sources = new Hashtable();
-  Stack externalVariablesSet = new Stack();
-  Stack outputFileAlts = new Stack();
-  Stack outputCompareAlts = new Stack();
+  // Hashtable expectedFailures = new Hashtable();
+  // Hashtable modules = new Hashtable();
+  // Hashtable sources = new Hashtable();
+  // Stack externalVariablesSet = new Stack();
+  // Stack outputFileAlts = new Stack();
+  // Stack outputCompareAlts = new Stack();
   /* #endif */
   ModuleManager manager = ModuleManager.getInstance();
   Object failExpected;
@@ -190,9 +190,9 @@ public class RunXQTS extends FilterConsumer
   Object currentElementType;
   Symbol currentElementSymbol;
   /* #ifdef JAVA5 */
-  // Stack<Object> elementTypeStack = new Stack<Object>();
+  Stack<Object> elementTypeStack = new Stack<Object>();
   /* #else */
-  Stack elementTypeStack = new Stack();
+  // Stack elementTypeStack = new Stack();
   /* #endif */
   boolean inStartTag;
   int attrValueStart;
@@ -220,8 +220,8 @@ public class RunXQTS extends FilterConsumer
     expectFailures("K2-SeqExprCast-207",
                    "was testsuite error(4252) - now mismatch between '>' and '&gt;'");
     /* #ifndef JAVA5 */
-    expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
-                   "surrogates not handled by java.util.regex");
+    // expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
+    //                "surrogates not handled by java.util.regex");
     /* #endif */
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
@@ -835,11 +835,11 @@ public class RunXQTS extends FilterConsumer
             i1 = start_attr1;
             i2 = start_attr2;
             /* #ifdef JAVA5 */
-            // Stack<String> attrs1 = new Stack<String>();
-            // Stack<String> attrs2 = new Stack<String>();
+            Stack<String> attrs1 = new Stack<String>();
+            Stack<String> attrs2 = new Stack<String>();
             /* #else */
-            Stack attrs1 = new Stack();
-            Stack attrs2 = new Stack();
+            // Stack attrs1 = new Stack();
+            // Stack attrs2 = new Stack();
             /* #endif */
             for (;;)
               {

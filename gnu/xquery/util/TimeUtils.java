@@ -307,10 +307,10 @@ public class TimeUtils
 
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // static final ThreadLocal<DateTime> currentDateTimeLocal =
-  //   new ThreadLocal<DateTime>();
+  static final ThreadLocal<DateTime> currentDateTimeLocal =
+    new ThreadLocal<DateTime>();
   /* #else */
-  static final ThreadLocal currentDateTimeLocal = new ThreadLocal();
+  // static final ThreadLocal currentDateTimeLocal = new ThreadLocal();
   /* #endif */
   /* #else */
   // static DateTime currentDateTime;

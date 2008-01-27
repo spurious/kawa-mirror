@@ -21,10 +21,10 @@ public class ModuleInfo
   // Maps java.lang.Class to corresponding ModuleInfo.
   /* #ifdef JAVA2 */
   /* #ifdef JAVA5 */
-  // static WeakHashMap<Class,ModuleInfo> mapClassToInfo
-  //   = new WeakHashMap<Class,ModuleInfo>();
+  static WeakHashMap<Class,ModuleInfo> mapClassToInfo
+    = new WeakHashMap<Class,ModuleInfo>();
   /* #else */
-  static WeakHashMap mapClassToInfo = new WeakHashMap();
+  // static WeakHashMap mapClassToInfo = new WeakHashMap();
   /* #endif */
   /* #else */
   // static Hashtable mapClassToInfo = new Hashtable();

@@ -29,18 +29,18 @@ public class XmlNamespace extends Namespace
   }
 
   /* #ifdef JAVA5 */
-  // /** Emitted by compiler to handle literals. */
-  // public static XmlNamespace make (String prefix, String name)
-  // {
-  //   return getInstance(prefix, name);
-  // }
-  /* #else */
-  /** Only for use by compiler to handle literals. */
-  public XmlNamespace (String prefix, String uri)
+  /** Emitted by compiler to handle literals. */
+  public static XmlNamespace make (String prefix, String name)
   {
-    setName(uri.intern());
-    prefix = prefix.intern();
+    return getInstance(prefix, name);
   }
+  /* #else */
+  // /** Only for use by compiler to handle literals. */
+  // public XmlNamespace (String prefix, String uri)
+  // {
+  //   setName(uri.intern());
+  //   prefix = prefix.intern();
+  // }
   /* #endif */
   /** Only for use when serializing. */
   public XmlNamespace ()

@@ -51,7 +51,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   public Path getPath () { return path; }
   public void setPath (Path path) { this.path = path; }
 
-  public String getFileName() { return path.toString(); }
+  public String getFileName() { return path == null ? null : path.toString(); }
 
   public void setFileName(String fname)
   {
@@ -60,11 +60,11 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
       fileBuffers.remove(filename);
     if (name != null && buffers.get(name) == this)
       buffers.remove(name);
-    File file = new File(fname);
-    setPath(FilePath.valueOf(file));
-    name = generateNewBufferName(file.getName());
+    Path path = Path.valueOf(fname);
+    setPath(path);
+    name = generateNewBufferName(path.getLast());
     buffers.put(name, this);
-    fileBuffers.put(filename, this);
+    fileBuffers.put(path.toString(), this);
     redrawModeline();
   }
 
@@ -165,12 +165,12 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
 	buffer.encoding = System.getProperty("file.encoding", "UTF8");
         try
           {
-	    Reader in = new InputStreamReader(new FileInputStream(fname),
+	    Reader in = new InputStreamReader(buffer.path.openInputStream(),
 					      buffer.encoding);
             buffer.insertFile(in);
             in.close();
           }
-        catch (java.io.FileNotFoundException ex)
+        catch (java.io.IOException ex)
           {
             Signal.message("New file");
           }

@@ -1,3 +1,12 @@
+2008-02-02  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (read-dialog): Updat single Scheme sumbol is no longer
+	a java.lang.String.
+	* Buffer.java (getFileName, setFileName): Update to semi-recent
+	use of Path.
+	(findFile): Extend to handle arbitrary Paths.
+	Fixes bug reported by Yaroslav Kavenchuk <kavenchuk@gmail.com>.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* EFrame.java (setMenu): Rename to setMenuBar.

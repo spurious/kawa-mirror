@@ -22,9 +22,8 @@
 
 ;;; MINIBUFFERS
 
-(define (read-dialog prompt)
-  (symbol->string
-   (invoke (as <frame> (window-frame)) 'ask prompt)))
+(define (read-dialog prompt) :: <string>
+  (invoke (as <frame> (window-frame)) 'ask prompt))
 
 (define read-from-minibuffer read-dialog)
 

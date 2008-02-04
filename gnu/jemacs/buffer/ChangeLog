@@ -1,3 +1,8 @@
+2008-02-04  Per Bothner  <per@bothner.com>
+
+	* EKeymap.java (ignorable): A KEY_TYPED event with modifiers
+	(except for shift) should also be ignored - use the PRESSED event.
+
 2008-02-02  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (read-dialog): Updat single Scheme sumbol is no longer

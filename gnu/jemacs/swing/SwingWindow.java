@@ -364,12 +364,11 @@ implements java.awt.event.FocusListener,
 
   int toInt(KeyEvent e, int kind)
   {
-    int code = e.getKeyCode();
-    if (code == 0)
-      code = e.getKeyChar();
-    else
-      code |= (e.getModifiers() | kind) << 16;
-    return code;
+    int mods = e.getModifiers();
+    if (kind == 0)
+      mods &= ~ EKeymap.SHIFT_MASK;
+    return (kind == 0 ? e.getKeyChar() : e.getKeyCode())
+      | ((mods | kind) << 16);
   }
 
 /**

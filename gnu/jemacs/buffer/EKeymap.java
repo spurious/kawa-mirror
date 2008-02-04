@@ -450,7 +450,7 @@ implements gnu.mapping.Named
     if ((key & (PRESSED << 16)) == 0)
       { // It's a KEY_TYPED (keyChar) event.
         char ch = (char) key;
-        return (ch < ' ' && ch != metaKey) || ch >= 127;
+        return (mods & ~SHIFT_MASK) != 0 || (ch < ' ' && ch != metaKey) || ch >= 127;
       }
     else
       { // It's a KEY_PRESSED (keyCODE) event.
@@ -543,7 +543,7 @@ implements gnu.mapping.Named
   {
     EKeymap keymap = this;
     int nKeys = nPrefix + (key != 0 ? 1 : 0);
-    boolean pendingMeta = false;
+    boolean pendingMeta = false; // FIXME this is never set
     if (nKeys == 0)
      throw new Error("no keys");
     for (int i = 0;  ; )

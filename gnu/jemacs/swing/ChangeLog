@@ -1,3 +1,9 @@
+2008-02-04  Per Bothner  <per@bothner.com>
+
+	* SwingWindow.java (toInt): We want the modifiers (except for the
+	shift modifier) for KEY_TYPED as well as KEY_PRESSED, since
+	otherwise ctrl-X etc becoms just a plain 'x'.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* SwingFrame.java (setMenu): Rename to setMenuBar, following EFrame.

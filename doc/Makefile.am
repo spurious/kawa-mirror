@@ -27,11 +27,11 @@ qexo.1: $(srcdir)/qexo.man
 	nroff -man $(srcdir)/qexo.man | col -b > qexo1.tmp
 	mv qexo1.tmp qexo.1
 
-../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf kawa-tour.ps
-	tar cf - kawa/*.html kawa.pdf kawa-tour.ps|gzip -c --best >$@
+../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
+	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
 
-EXTRA_DIST = scm2java.html kawa.man qexo.man kawa-tour.tex mdate-sh
-info_TEXINFOS = kawa.texi kawa-tour.texi
+EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
+info_TEXINFOS = kawa.texi
 CLEANFILES = kawa/*.html kawa1.tmp kawa.1 qexo.1
 MAINTAINERCLEANFILES = kawa.txt *.info 
 

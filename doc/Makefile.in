@@ -44,13 +44,13 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-INFO_DEPS = $(srcdir)/kawa.info $(srcdir)/kawa-tour.info
+INFO_DEPS = $(srcdir)/kawa.info
 am__TEXINFO_TEX_DIR = $(srcdir)
-DVIS = kawa.dvi kawa-tour.dvi
-PDFS = kawa.pdf kawa-tour.pdf
-PSS = kawa.ps kawa-tour.ps
-HTMLS = kawa.html kawa-tour.html
-TEXINFOS = kawa.texi kawa-tour.texi
+DVIS = kawa.dvi
+PDFS = kawa.pdf
+PSS = kawa.ps
+HTMLS = kawa.html
+TEXINFOS = kawa.texi
 TEXI2DVI = texi2dvi
 MAKEINFOHTML = $(MAKEINFO) --html
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
@@ -187,8 +187,8 @@ KAWA_HTMLS = kawa/index.html
 GENERATED_HTML = $(KAWA_HTMLS)
 TEXI2PDF = texi2pdf
 man_MANS = kawa.1 qexo.1
-EXTRA_DIST = scm2java.html kawa.man qexo.man kawa-tour.tex mdate-sh
-info_TEXINFOS = kawa.texi kawa-tour.texi
+EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
+info_TEXINFOS = kawa.texi
 CLEANFILES = kawa/*.html kawa1.tmp kawa.1 qexo.1
 MAINTAINERCLEANFILES = kawa.txt *.info 
 HTML_HOME = $$HOME/public_html
@@ -289,10 +289,6 @@ mostlyclean-vti:
 
 maintainer-clean-vti:
 @MAINTAINER_MODE_TRUE@	-rm -f $(srcdir)/stamp-vti $(srcdir)/version.texi
-$(srcdir)/kawa-tour.info: kawa-tour.texi 
-kawa-tour.dvi: kawa-tour.texi 
-kawa-tour.pdf: kawa-tour.texi 
-kawa-tour.html: kawa-tour.texi 
 .dvi.ps:
 	TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	$(DVIPS) -o $@ $<
@@ -373,12 +369,7 @@ dist-info: $(INFO_DEPS)
 mostlyclean-aminfo:
 	-rm -rf kawa.aux kawa.cp kawa.cps kawa.fn kawa.ky kawa.kys kawa.log kawa.pg \
 	  kawa.tmp kawa.toc kawa.tp kawa.tps kawa.vr kawa.dvi kawa.pdf \
-	  kawa.ps kawa.html kawa-tour.aux kawa-tour.cp kawa-tour.cps \
-	  kawa-tour.fn kawa-tour.fns kawa-tour.ky kawa-tour.kys \
-	  kawa-tour.log kawa-tour.pg kawa-tour.pgs kawa-tour.tmp \
-	  kawa-tour.toc kawa-tour.tp kawa-tour.tps kawa-tour.vr \
-	  kawa-tour.vrs kawa-tour.dvi kawa-tour.pdf kawa-tour.ps \
-	  kawa-tour.html
+	  kawa.ps kawa.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \
@@ -668,8 +659,8 @@ qexo.1: $(srcdir)/qexo.man
 	nroff -man $(srcdir)/qexo.man | col -b > qexo1.tmp
 	mv qexo1.tmp qexo.1
 
-../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf kawa-tour.ps
-	tar cf - kawa/*.html kawa.pdf kawa-tour.ps|gzip -c --best >$@
+../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
+	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
 
 # Redundant if configured with  --enable-maintainer-mode.
 # Work around a questionable autoconf feature.

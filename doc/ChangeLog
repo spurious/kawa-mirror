@@ -1,3 +1,9 @@
+2008-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa-tour.texi, kawa-tour.tex: Remove old document.
+	This has been replaced by the "internals" manual.
+	* Makefile.am: Update accordingly.
+
 2008-01-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Note the binary jar now requires Java 5.

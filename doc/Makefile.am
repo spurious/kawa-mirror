@@ -7,10 +7,13 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
              -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
 
-KAWA_HTMLS = kawa/index.html
+KAWA_HTMLDIR = kawa-html
+KAWA_HTMLS = $(KAWA_HTMLDIR)/index.html
 $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
-	$(MAKEINFO) -I$(srcdir) --html $<
-GENERATED_HTML = $(KAWA_HTMLS)
+	$(MAKEINFO) -I$(srcdir) --html $< -o $(KAWA_HTMLDIR)
+HTMLS = $(KAWA_HTMLS)
+
+html: $(KAWA_HTMLS)
 
 TEXI2PDF = texi2pdf
 
@@ -30,9 +33,11 @@ qexo.1: $(srcdir)/qexo.man
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
 	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
 
+clean-local:
+	-rm -rf $(KAWA_HTMLDIR) kawa1.tmp kawa.1 qexo.1
+
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
 info_TEXINFOS = kawa.texi
-CLEANFILES = kawa/*.html kawa1.tmp kawa.1 qexo.1
 MAINTAINERCLEANFILES = kawa.txt *.info 
 
 # Redundant if configured with  --enable-maintainer-mode.

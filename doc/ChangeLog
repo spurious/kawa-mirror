@@ -1,5 +1,8 @@
 2008-02-15  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Some fixes in where the html files generated from
+	kawa.texi are put. Renamed directory to kawa-html.
+
 	* kawa-tour.texi, kawa-tour.tex: Remove old document.
 	This has been replaced by the "internals" manual.
 	* Makefile.am: Update accordingly.

@@ -49,7 +49,6 @@ am__TEXINFO_TEX_DIR = $(srcdir)
 DVIS = kawa.dvi
 PDFS = kawa.pdf
 PSS = kawa.ps
-HTMLS = kawa.html
 TEXINFOS = kawa.texi
 TEXI2DVI = texi2dvi
 MAKEINFOHTML = $(MAKEINFO) --html
@@ -183,13 +182,13 @@ target_vendor = @target_vendor@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUFFIXES = .pdf
-KAWA_HTMLS = kawa/index.html
-GENERATED_HTML = $(KAWA_HTMLS)
+KAWA_HTMLDIR = kawa-html
+KAWA_HTMLS = $(KAWA_HTMLDIR)/index.html
+HTMLS = $(KAWA_HTMLS)
 TEXI2PDF = texi2pdf
 man_MANS = kawa.1 qexo.1
 EXTRA_DIST = scm2java.html kawa.man qexo.man mdate-sh
 info_TEXINFOS = kawa.texi
-CLEANFILES = kawa/*.html kawa1.tmp kawa.1 qexo.1
 MAINTAINERCLEANFILES = kawa.txt *.info 
 HTML_HOME = $$HOME/public_html
 all: all-am
@@ -482,7 +481,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -493,7 +491,7 @@ maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -502,8 +500,6 @@ distclean-am: clean-am distclean-generic
 dvi: dvi-am
 
 dvi-am: $(DVIS)
-
-html: html-am
 
 html-am: $(HTMLS)
 
@@ -624,19 +620,20 @@ uninstall-man: uninstall-man1
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am check check-am clean clean-generic dist-info \
-	distclean distclean-generic distdir dvi dvi-am html html-am \
-	info info-am install install-am install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-man1 install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-aminfo \
-	maintainer-clean-generic maintainer-clean-vti mostlyclean \
-	mostlyclean-aminfo mostlyclean-generic mostlyclean-vti pdf \
-	pdf-am ps ps-am uninstall uninstall-am uninstall-dvi-am \
-	uninstall-html-am uninstall-info-am uninstall-man \
-	uninstall-man1 uninstall-pdf-am uninstall-ps-am
+.PHONY: all all-am check check-am clean clean-generic clean-local \
+	dist-info distclean distclean-generic distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-man1 install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-aminfo maintainer-clean-generic \
+	maintainer-clean-vti mostlyclean mostlyclean-aminfo \
+	mostlyclean-generic mostlyclean-vti pdf pdf-am ps ps-am \
+	uninstall uninstall-am uninstall-dvi-am uninstall-html-am \
+	uninstall-info-am uninstall-man uninstall-man1 \
+	uninstall-pdf-am uninstall-ps-am
 
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi
@@ -646,7 +643,9 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
              -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
 $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
-	$(MAKEINFO) -I$(srcdir) --html $<
+	$(MAKEINFO) -I$(srcdir) --html $< -o $(KAWA_HTMLDIR)
+
+html: $(KAWA_HTMLS)
 
 .texi.pdf:
 	TEXINPUTS=$(top_srcdir)/../texinfo/texinfo.tex:$$TEXINPUTS \
@@ -661,6 +660,9 @@ qexo.1: $(srcdir)/qexo.man
 
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf
 	tar cf - kawa/*.html kawa.pdf|gzip -c --best >$@
+
+clean-local:
+	-rm -rf $(KAWA_HTMLDIR) kawa1.tmp kawa.1 qexo.1
 
 # Redundant if configured with  --enable-maintainer-mode.
 # Work around a questionable autoconf feature.

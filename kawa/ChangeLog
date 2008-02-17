@@ -1,3 +1,10 @@
+2008-02-17  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): If the location is in a field
+	loaded using a ZipLoader or ArrayClassLoader, we don't safely
+	generate code to reference it, except in immediate mode.
+	Fixes Bugzilla #22299: "function misnaming with moduleStatic > 0".
+
 2008-01-22  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (apply): New static field.  The "apply"

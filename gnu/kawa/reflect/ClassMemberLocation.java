@@ -109,6 +109,23 @@ public abstract class ClassMemberLocation extends Location
     return rfld;
   }
 
+  /** Return the {@code Class} this member is in. */
+
+  public Class getRClass ()
+  {
+    java.lang.reflect.Field rfld = this.rfield;
+    if (rfld != null)
+      return rfld.getDeclaringClass();
+    try
+      {
+        return type.getReflectClass();
+      }
+    catch (Exception ex)
+      {
+        return null;
+      }   
+  }
+
   public Object get (Object defaultValue)
   {
     java.lang.reflect.Field rfld = getRField();

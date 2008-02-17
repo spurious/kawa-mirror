@@ -4,6 +4,8 @@ import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.ArrayClassLoader;
+import gnu.bytecode.ZipLoader;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
@@ -724,16 +726,29 @@ public class Translator extends Compilation
                         // if we don't inline $lookup$.  FIXME.
                         && decl != getNamedPartDecl)
                       decl = null;
-                    if (decl != null && ! decl.isStatic())
+                    else if (immediate)
                       {
-                        if (immediate)
+                        if (! decl.isStatic())
                           {
                             cdecl = new Declaration("(module-instance)");
                             cdecl.setValue(new QuoteExp(floc.getInstance()));
                           }
-                        else
+                      }
+                    else if (decl.isStatic())
+                      {
+                        // If the class has been loaded through ZipLoader
+                        // or ArrayClassLoader then it might not be visible
+                        // if loaded through some other ClassLoader.
+                        Class fclass = floc.getRClass();
+                        ClassLoader floader;
+                        if (fclass == null
+                            || ((floader = fclass.getClassLoader())
+                                instanceof ZipLoader)
+                            || floader instanceof ArrayClassLoader)
                           decl = null;
                       }
+                    else
+                      decl = null;
                   }
                 catch (Throwable ex)
                   {

@@ -243,6 +243,7 @@ public class ClassTypeWriter extends PrintWriter
   {
     if (printConstants)
       {
+	print('#');
 	print(index);
 	print('=');
       }

@@ -1,3 +1,9 @@
+2008-02-27  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (compileFromStack): Fix lookup of Consumer
+	method, specifically when the operand is a char.
+	Fixes bug reported by Yaroslav Kavenchuk <kavenchuk@gmail.com>.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* CanInline.java (inline): Take extra argsInlined parameter.

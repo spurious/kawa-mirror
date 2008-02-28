@@ -105,6 +105,7 @@ public class ConsumerTarget extends Target
     CodeAttr code = comp.getCode();
     String methodName = null;
     Method method = null;
+    Type methodArg = null;
     boolean islong = false;
     stackType = stackType.getImplementationType();
     char sig;
@@ -114,12 +115,36 @@ public class ConsumerTarget extends Target
 	switch (sig)
 	  {
 	  case 'B': case 'S': case 'I':
-	    methodName = "writeInt";  break;
-	  case 'J':	methodName = "writeLong";  islong = true; break;
-	  case 'F':	methodName = "writeFloat";  break;
-	  case 'D':	methodName = "writeDouble"; islong = true; break;
-	  case 'C':	methodName = "append";  break;
-	  case 'Z':	methodName = "writeBoolean";  break;
+	    methodName = "writeInt";
+            methodArg = Type.int_type;
+            break;
+	  case 'J':
+            methodName = "writeLong";
+            methodArg = Type.long_type;
+            islong = true;
+            break;
+	  case 'F':
+            methodName = "writeFloat";
+            methodArg = Type.float_type;
+            break;
+	  case 'D':
+            methodName = "writeDouble";
+            methodArg = Type.double_type;
+            islong = true;
+            break;
+	  case 'C':
+            /* #ifdef JAVA5 */
+            methodName = "append";
+            methodArg = Type.char_type;
+            /* #else */
+            // methodName = "write";
+            // methodArg = Type.int_type;
+            /* #endif */
+            break;
+	  case 'Z':	
+            methodName = "writeBoolean";
+            methodArg = Type.boolean_type;
+            break;
 	  case 'V':     return;
 	  }
       }
@@ -127,7 +152,10 @@ public class ConsumerTarget extends Target
       {
         sig = '\0';
 	if (consumerPushed == 1 || OccurrenceType.itemCountIsOne(stackType))
-	  methodName = "writeObject";
+          {
+            methodName = "writeObject";
+            methodArg = Type.pointer_type;
+          }
 	else
 	  {
 	    method = (Compilation.typeValues
@@ -156,7 +184,11 @@ public class ConsumerTarget extends Target
 	code.emitSwap();
       }
     if (method == null && methodName != null)
-      method = Compilation.typeConsumer.getDeclaredMethod(methodName, 1);
+      {
+        Type[] methodArgs = { methodArg };
+        method = Compilation.typeConsumer
+          .getDeclaredMethod(methodName, methodArgs);
+      }
     if (method != null)
       code.emitInvokeInterface(method);
     if (sig == 'C')

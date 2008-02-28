@@ -19,3 +19,4 @@ Ola Rinta-Koski  <ola@cyberell.com>:  ValueStack bug-fix.
 Olin Shivers:  SRFI-1 list-processing library.
 John David Stone: srfi-8 (receive macro)
 Marco Vezzoli <marco.vezzoli@st.com>:  SRFI-1 tailoring for Kawa.
+Albert Ting - old GuiConsole code.

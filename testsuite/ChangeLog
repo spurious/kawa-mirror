@@ -1,3 +1,9 @@
+2008-02-27  Per Bothner  <per@bothner.com>
+	    Yaroslav Kavenchuk <kavenchuk@jenty.by>
+
+	* misc-test.scm: New test-case based on Bug reported using
+	non-implementattion array-type <integer[]>.
+
 2007-06-10  Helge Dietert
 
 	* num-test.scm: add test for Savannah bug# 20123

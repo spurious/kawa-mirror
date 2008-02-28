@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 153)
+(test-init "Miscellaneous" 154)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -738,3 +738,7 @@
   (innerproc))
 (define savannah-18909-destroy ((savannah-18909-outerproc #t))) 
 (test savannah-18909-destroy 'savannah-18909 (savannah-18909-destroy))
+
+;; Bug reported by Yaroslav Kavenchuk <kavenchuk@jenty.by> 2008-02-26:
+(define primes (<integer[]> 2 3 5 7 11 13))
+(test 11 'primes-integer-indexing (primes 4))

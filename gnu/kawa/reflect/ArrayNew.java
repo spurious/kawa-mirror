@@ -15,7 +15,8 @@ public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
 
   public Object apply1 (Object count)
   {
-    return java.lang.reflect.Array.newInstance(element_type.getReflectClass(),
+    Class clas = element_type.getImplementationType().getReflectClass();
+    return java.lang.reflect.Array.newInstance(clas,
 					       ((Number) count).intValue());
   }
 
@@ -23,7 +24,7 @@ public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
   {
     exp.getArgs()[0].compile(comp, Type.int_type);
     CodeAttr code = comp.getCode();
-    code.emitNewArray(element_type);
+    code.emitNewArray(element_type.getImplementationType());
     target.compileFromStack(comp, ArrayType.make(element_type));
   }
 

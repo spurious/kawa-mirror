@@ -1,3 +1,10 @@
+2008-03-01  Per Bothner  <per@bothner.com>
+
+	* EnclosingMethodAttr.java: New extends, extends Attribute.
+	* Makefile.am: Update accordingly.
+	* ClassFileInput.java (readAttribute): Recognize EnclosingMethod
+	attribute.
+
 2008-02-28  Per Bothner  <per@bothner.com>
 
 	* ClassTypeWriter.java (printOptionalIndex): Print '#' first.

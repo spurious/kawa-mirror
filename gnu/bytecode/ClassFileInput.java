@@ -256,6 +256,12 @@ public class ClassFileInput extends DataInputStream
 	  }
 	return new InnerClassesAttr(data, (ClassType) container);
      }
+    else if (name == "EnclosingMethod" && container instanceof ClassType)
+      {
+        int class_index = readUnsignedShort();
+        int method_index = readUnsignedShort();
+	return new EnclosingMethodAttr(class_index, method_index, (ClassType) container);
+     }
     else if (name == "Exceptions" && container instanceof Method)
       {
 	Method meth = (Method)container;

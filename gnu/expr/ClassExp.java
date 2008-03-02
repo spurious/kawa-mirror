@@ -66,7 +66,7 @@ public class ClassExp extends LambdaExp
   {
     if (target instanceof IgnoreTarget)
       return;
-    compile (comp);
+    compileMembers(comp);
     compilePushClass(comp, target);
   }
 
@@ -394,7 +394,7 @@ public class ClassExp extends LambdaExp
       }
   }
 
-  public ClassType compile (Compilation comp)
+  public ClassType compileMembers (Compilation comp)
   {
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;

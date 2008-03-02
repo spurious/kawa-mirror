@@ -1,3 +1,10 @@
+2008-03-02  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compile): Rename to compileMembers.
+	(compile): Update accordingly.
+	* ObjectExp.java: Likewise.
+	* ClassInitializer.java: Likewise.
+
 2008-02-27  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileFromStack): Fix lookup of Consumer

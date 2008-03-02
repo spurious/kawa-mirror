@@ -13,7 +13,7 @@ public class ClassInitializer extends Initializer
   public ClassInitializer(ClassExp cexp, Compilation comp)
   {
     field = cexp.allocFieldFor(comp);
-    cexp.compile (comp);
+    cexp.compileMembers(comp);
     this.cexp = cexp;
     if (field.getStaticFlag())
       {

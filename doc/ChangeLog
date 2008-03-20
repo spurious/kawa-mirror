@@ -1,3 +1,10 @@
+2008-03-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Source distribution): Update from "Java 2" as the
+	default to "Java 5".
+
+	* kawa.texi (Source distribution): Note that parallel make doesn't work.
+
 2008-02-15  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Some fixes in where the html files generated from

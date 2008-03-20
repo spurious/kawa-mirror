@@ -296,18 +296,21 @@ If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
 conflict with the new ones.
 
-If you use a very old or bare-bones Java implementation that not have
-certain "Java 2" features
+If you use an old or bare-bones Java implementation that not have
+certain "Java 5" features
 (such as @code{java.util.List}, @code{java.lang.ref}, or @code{ThreadLocal})
 then you need to convert the Kawa source-code so it doesn't depend
 on those features.
 You do this with the following command:
 @example
+make select-java4
+@end example
+or even (if you have a @emph{very} bare-bases version of Java):
+@example
 make select-java1
 @end example
-Most people should not need to do this.  (You don't need to if you're
-using GCJ, even though it doesn't implement all of Java 2.)  (If you
-need to convert the code back to the default, do: @code{make select-java2}.)
+Most people should not need to do this. (If you
+need to convert the code back to the default, do: @code{make select-java5}.)
 
 Then you need to compile all the .java source files.
 Just run make:
@@ -321,6 +324,9 @@ you need to instead say:
 @example
 make JAVA=kaffe
 @end example
+
+It has been reported that parallel make doesn't work,
+so don't use the @code{-j2} or above options.
 
 You can now test the system by running Kawa in place:
 @example

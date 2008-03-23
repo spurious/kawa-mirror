@@ -1,3 +1,9 @@
+2008-03-23  Per Bothner  <per@bothner.com>
+
+	* EofClass.java (eofValue): Fix type of literal.  This fixes
+	code-generator to #!eof.
+	Fixes Savannah bug #22703 "Wrong type inferred for #!eof".
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	* FString.java (append(CharSequence,int,int)): Optimize.

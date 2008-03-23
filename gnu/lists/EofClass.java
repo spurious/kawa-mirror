@@ -7,7 +7,7 @@ import java.io.*;
 public class EofClass implements Externalizable
 {
   /** Special magic end-of-file marker. */
-  public static final Object eofValue = new EofClass();
+  public static final EofClass eofValue = new EofClass();
 
   public final String toString()
   {

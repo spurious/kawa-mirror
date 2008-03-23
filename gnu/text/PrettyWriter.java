@@ -1216,6 +1216,17 @@ public class PrettyWriter extends java.io.Writer
     buffer = null;
   }
 
+  /** Flush and close this local Writer, but not underlying Writers. */
+  public void closeThis()  throws IOException
+  {
+    if (out != null)
+      { 
+	forcePrettyOutput();
+        out = null;
+      }
+    buffer = null;
+  }
+
   /** Not meaningful if {@code prettyPrintingMode > 0}. */
   public int getColumnNumber ()
   {

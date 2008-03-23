@@ -1,3 +1,7 @@
+2008-03-23  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (closeThis): New method.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* WrongType.java (<init>): New constructor.

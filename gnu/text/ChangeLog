@@ -1,3 +1,7 @@
+2008-03-23  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (closeThis): New method.
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	* QueueReader.java: Make implement Appendable.

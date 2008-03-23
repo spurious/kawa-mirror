@@ -332,6 +332,21 @@ public class OutPort extends PrintConsumer implements Printable
     bout.clearBuffer();
   }
 
+  /** Flush and close this local Writer, but not underlying Writers. */
+  public void closeThis()
+  {
+    try
+      {
+        if (! (base instanceof OutPort && ((OutPort) base).bout == bout))
+          bout.closeThis();
+      }
+    catch (IOException ex)
+      {
+        setError();
+      }
+    WriterManager.instance.unregister(unregisterRef);
+  }
+
   public void close()
   {
     try

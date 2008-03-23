@@ -103,14 +103,14 @@ public class Format extends ProcedureN
       { 
 	OutPort port = new OutPort((java.io.Writer) port_arg);
         format(port, args, 1);
-	port.close();
+	port.closeThis();
 	return Values.empty;
       } 
     else if (port_arg instanceof java.io.OutputStream)
       { 
 	OutPort port = new OutPort((java.io.OutputStream) port_arg);
         format(port, args, 1);
-	port.close();
+	port.closeThis();
 	return Values.empty;
       }
     else

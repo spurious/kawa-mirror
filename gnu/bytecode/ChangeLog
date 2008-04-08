@@ -1,3 +1,9 @@
+2008-04-08  Elliott Hughes <enh@jessies.org>
+	    Per Bothner  <per@bothner.com>
+
+	* package.html: Add example, plus sme other tweaks.
+	* dump.java: Add more javadoc.
+
 2008-04-08  Per Bothner  <per@bothner.com>
 
 	* Access.java: Various new constants.  Explicit support for

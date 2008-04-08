@@ -7,6 +7,17 @@ import java.io.IOException;
 import java.io.FileInputStream;
 
 /** Class to read a ClassType from a DataInputStream (.class file).
+ * 
+ * To print out the contents of a class file foo.class, you can use
+ * the class <code>dump</code> as an application:
+ * <pre>
+ * java gnu.bytecode.dump foo.class
+ * </pre>
+ * This will print out the constant pool, fields, methods, superclass,
+ * and implemented interfaces of class <code>foo</code>.
+ * It is useful for printing out more detailed information
+ * than <code>javap</code> does.
+ * 
  * @author Per Bothner
  */
 
@@ -92,4 +103,3 @@ public class dump extends ClassFileInput
     System.exit(-1);
   }
 }
-

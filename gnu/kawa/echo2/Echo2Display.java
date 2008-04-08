@@ -184,7 +184,7 @@ class ResourceImageReference extends nextapp.echo2.app.ResourceImageReference
   public ResourceImageReference (Path resource)
     throws java.io.IOException
   {
-    super(path.toString());
+    super(resource.toString());
   }
 
   public void render(java.io.OutputStream out)

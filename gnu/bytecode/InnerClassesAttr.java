@@ -78,7 +78,7 @@ public class InnerClassesAttr  extends Attribute
 	  dst.print("(Anonymous)");
 	dst.print(";");
 
-	dst.print(Access.toString(data[4*i+3] & 0xFFFF, 'C'));
+	dst.print(Access.toString(data[4*i+3] & 0xFFFF, Access.INNERCLASS_CONTEXT));
 	dst.println();
       }
   }

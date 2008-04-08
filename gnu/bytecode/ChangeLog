@@ -1,11 +1,18 @@
 2008-04-08  Per Bothner  <per@bothner.com>
 
+	* Access.java: Various new constants.  Explicit support for
+	acess flags in InnerClasses attribute.
+	* InnerClassesAttr.java (print): Pass Access.INNERCLASS_CONTEXT.
+
 	* ClassType.java: Now also implement Member.
 	(getStaticFlag): New method, needed to implement Member.
 	(enclosingMember): New field.
 	(getDeclaringClass, getEnclosingMember, setEnclosingMember,
 	addEnclosingMember, addMethod, addMode): New methods.
 	* ObjectType.java (ADD_ENCLOSING_DONE): Add flag.
+
+	* Access.java (CLASS_CONTEXT, INNERCLASS_CONTEXT, FIELD_CONTEXT,
+	METHOD_CONTEXT, INNERCLASS_MODIFIERS): New constants.
 
 2008-03-01  Per Bothner  <per@bothner.com>
 

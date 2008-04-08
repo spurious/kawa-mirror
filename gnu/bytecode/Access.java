@@ -27,11 +27,30 @@ public class Access {
   static public final short ENUM        = 0x4000;
   // unassigned 0x8000
 
+  /** Value for {@code toString}'s {@code kind} parameter when decoding
+   * a class's access flags. */
+  public static final char CLASS_CONTEXT = 'C';
+  /** Value for {@code toString}'s {@code kind} parameter when decoding
+   * access flags in {@code InnerClasses} attribute. */
+  public static final char INNERCLASS_CONTEXT = 'I';
+  /** Value for {@code toString}'s {@code kind} parameter when decoding
+   * a field's access flags. */
+  public static final char FIELD_CONTEXT = 'F';
+  /** Value for {@code toString}'s {@code kind} parameter when decoding
+   * a methods's access flags. */
+  public static final char METHOD_CONTEXT = 'M';
+
+  /** Mask of access flags valid for a class. */
   public static final short CLASS_MODIFIERS
     = (short)(PUBLIC|FINAL|SUPER|INTERFACE|ABSTRACT|SYNTHETIC|ANNOTATION|ENUM);
+  /** Mask of access flags valid in an {@code InnerClasses} attribute. */
+  public static final short INNERCLASS_MODIFIERS
+    = (short)(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL|INTERFACE|ABSTRACT|SYNTHETIC|ANNOTATION|ENUM);
+  /** Mask of access flags valid for a field. */
   public static final short FIELD_MODIFIERS
     = (short)(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL
 	      |VOLATILE|TRANSIENT|SYNTHETIC|ENUM);
+  /** Mask of access flags valid for a method. */
   public static final short METHOD_MODIFIERS
     = (short)(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL|SYNCHRONIZED
 	      |BRIDGE|VARARGS|NATIVE|ABSTRACT|STRICT|SYNTHETIC);
@@ -42,14 +61,18 @@ public class Access {
   }
 
   /** Return a string naming the access bits in flags.
-   * @param kind 'C' for a class, 'M' for a method, 'F' for a field.
+   * @param kind {@code CLASS_CONTEXT} for a class,
+   *   {@code METHOD_CONTEXT} for a method,
+   *   {@code FIELD_CONTEXT} for a field,
+   *   {@code INNERCLASS_CONTEXT} in an {@code InnerClasses} attribute.
    */
   public static String toString(int flags, char kind)
   {
     short mask
-      = (kind == 'C' ? CLASS_MODIFIERS
-	 : kind == 'F' ? FIELD_MODIFIERS
-	 : kind == 'M' ? METHOD_MODIFIERS
+      = (kind == CLASS_CONTEXT ? CLASS_MODIFIERS
+	 : kind == INNERCLASS_CONTEXT ? INNERCLASS_MODIFIERS
+	 : kind == FIELD_CONTEXT ? FIELD_MODIFIERS
+	 : kind == METHOD_CONTEXT ? METHOD_MODIFIERS
 	 : (CLASS_MODIFIERS|FIELD_MODIFIERS|METHOD_MODIFIERS));
     short bad_flags = (short) (flags & ~mask);
     flags &= mask;

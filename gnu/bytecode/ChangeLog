@@ -1,3 +1,12 @@
+2008-04-08  Per Bothner  <per@bothner.com>
+
+	* ClassType.java: Now also implement Member.
+	(getStaticFlag): New method, needed to implement Member.
+	(enclosingMember): New field.
+	(getDeclaringClass, getEnclosingMember, setEnclosingMember,
+	addEnclosingMember, addMethod, addMode): New methods.
+	* ObjectType.java (ADD_ENCLOSING_DONE): Add flag.
+
 2008-03-01  Per Bothner  <per@bothner.com>
 
 	* EnclosingMethodAttr.java: New extends, extends Attribute.

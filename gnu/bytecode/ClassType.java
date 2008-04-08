@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.Vector;
 
 public class ClassType extends ObjectType 
-  implements AttrContainer, Externalizable
+  implements AttrContainer, Externalizable, Member
 {
   // An old but generally valid default value.
   int classfileFormatVersion = 45 * 0x10000 + 3;
@@ -89,9 +89,69 @@ public class ClassType extends ObjectType
     return access_flags;
   }
 
+  public final boolean getStaticFlag () {
+    return (getModifiers() & Access.STATIC) != 0;
+  }
+
   /** Set the modifiers (access flags) for this class. */
   public final void setModifiers(int flags) { access_flags = flags; }
   public final void addModifiers(int flags) { access_flags |= flags; }
+
+  Member enclosingMember;
+  public ClassType getDeclaringClass()
+  {
+    addEnclosingMember();
+    if (enclosingMember instanceof ClassType)
+      return (ClassType) enclosingMember;
+    else
+      return null;
+  }
+
+  public Member getEnclosingMember ()
+  {
+    addEnclosingMember();
+    return enclosingMember;
+  }
+
+  public void setEnclosingMember (Member member)
+  {
+    enclosingMember = member;
+  }
+
+  public void addEnclosingMember ()
+  {
+    if ((flags & (ADD_ENCLOSING_DONE|EXISTING_CLASS)) != EXISTING_CLASS)
+      return;
+    Class clas = getReflectClass();
+    flags |= ADD_ENCLOSING_DONE;
+
+    Class dclas;
+    /* #ifdef JAVA */
+    dclas = clas.getEnclosingClass();
+    if (dclas == null)
+      return;
+    if (! clas.isMemberClass())
+      {
+        java.lang.reflect.Method rmeth = clas.getEnclosingMethod();
+        if (rmeth != null)
+          {
+            enclosingMember = addMethod(rmeth);
+            return;
+          }
+        java.lang.reflect.Constructor rcons = clas.getEnclosingConstructor();
+        if (rcons != null)
+          {
+            enclosingMember = addMethod(rcons);
+            return;
+          }
+      }
+    enclosingMember = (ClassType) Type.make(dclas);
+    /* #else */
+    // dclas = clas.getDeclaringClass();
+    // if (dclas != null)
+    //   enclosingMember = (ClassType) Type.make(dclas);
+    /* #endif */
+  }
 
   public final boolean hasOuterLink ()
   {
@@ -491,6 +551,29 @@ public class ClassType extends ObjectType
     method.arg_types = arg_types;
     method.return_type = return_type;
     return method;
+  }
+
+  public Method addMethod (java.lang.reflect.Method method)
+  {
+    int modifiers = method.getModifiers();
+    Class[] paramTypes = method.getParameterTypes();
+    int j = paramTypes.length;
+    Type[] args = new Type[j];
+    while (--j >= 0)
+      args[j] = Type.make(paramTypes[j]);
+    Type rtype = Type.make(method.getReturnType());
+    return addMethod(method.getName(), modifiers, args, rtype);
+  }
+
+  public Method addMethod  (java.lang.reflect.Constructor method)
+  {
+    Class[] paramTypes = method.getParameterTypes();
+    int modifiers = method.getModifiers();
+    int j = paramTypes.length;
+    Type[] args = new Type[j];
+    while (--j >= 0)
+      args[j] = Type.make(paramTypes[j]);
+    return addMethod("<init>", modifiers, args, Type.void_type);
   }
 
   public Method addMethod (String name,  String signature, int flags)

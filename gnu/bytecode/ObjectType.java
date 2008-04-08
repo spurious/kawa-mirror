@@ -25,10 +25,11 @@ public class ObjectType extends Type
   // Miscellaneous bits:
   final static int ADD_FIELDS_DONE  = 1;
   final static int ADD_METHODS_DONE = 2;
+  final static int ADD_ENCLOSING_DONE = 4;
   // A ClassType that we can expect to have a corresponding reflectClass.
-  final static int EXISTING_CLASS = 4;
+  final static int EXISTING_CLASS = 16;
 
-  final static int HAS_OUTER_LINK = 8;
+  final static int HAS_OUTER_LINK = 32;
 
   /* */ public int flags;
 

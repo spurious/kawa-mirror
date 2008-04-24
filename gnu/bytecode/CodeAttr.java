@@ -2308,6 +2308,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
 
     byte[] new_code = new byte[new_size];
+    int prev_linenumber = -1;
     int new_pc = 0;
     int next_fixup_index = 0;
     int next_fixup_offset = fixupOffset(0);
@@ -2396,7 +2397,10 @@ public class CodeAttr extends Attribute implements AttrContainer
 		if (lines == null)
 		  lines = new LineNumbersAttr(this);
 		next_fixup_index++;
-		lines.put(fixupOffset(next_fixup_index), new_pc);
+                int linenumber = fixupOffset(next_fixup_index);
+                if (linenumber != prev_linenumber)
+                  lines.put(linenumber, new_pc);
+                prev_linenumber = linenumber;
 		break;
 	      case FIXUP_MOVE:
 		if (label == null)

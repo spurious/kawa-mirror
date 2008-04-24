@@ -1,3 +1,7 @@
+2008-04-24  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (processFixups): Drop redundant line number entries.
+
 2008-04-08  Elliott Hughes <enh@jessies.org>
 	    Per Bothner  <per@bothner.com>
 

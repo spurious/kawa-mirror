@@ -41,7 +41,7 @@ public class SortedNodes extends Nodes
     // in the worst case (but linear if locality is good).
     while (lo < hi)
       {
-	int mid = (lo + hi) >>> 1;
+	int mid = (lo + hi) >> 1;
 	int cmp = compareIndex(start + POS_SIZE * mid, seq, ipos);
 	if (cmp == 0)
 	  return -1;

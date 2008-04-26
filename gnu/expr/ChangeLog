@@ -1,3 +1,7 @@
+2008-04-26  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileToArchive): Do compress .zip files.
+
 2008-03-02  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compile): Rename to compileMembers.

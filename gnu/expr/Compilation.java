@@ -1007,10 +1007,7 @@ public class Compilation implements SourceLocator
       zout = new java.util.jar.JarOutputStream(new FileOutputStream(zar_file));
     else
     /* #endif */
-      {
-	zout = new ZipOutputStream (new FileOutputStream (zar_file));
-	zout.setMethod(ZipOutputStream.STORED); // no compression
-      }
+      zout = new ZipOutputStream(new FileOutputStream(zar_file));
 
     byte[][] classBytes = new byte[numClasses][];
     CRC32 zcrc = new CRC32();

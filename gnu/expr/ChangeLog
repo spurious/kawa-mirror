@@ -1,5 +1,7 @@
 2008-04-26  Per Bothner  <per@bothner.com>
 
+	* ModuleMethod.java (resolveParameterTypes): Don't NPE if name is null.
+
 	* Compilation.java (loadClassRef(String)): Remove method.
 	(loadClassRef(ObjectType)): Generalize from ClassType.
 

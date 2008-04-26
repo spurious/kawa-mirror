@@ -44,38 +44,45 @@ public class ModuleMethod extends MethodProc
   protected void resolveParameterTypes()
   {
     Method method = null;
-    try
+    String name = getName();
+    if (name != null)
       {
-	Class moduleClass = module.getClass();
-	Method[] methods = moduleClass.getDeclaredMethods();
-	String mangledName = Compilation.mangleNameIfNeeded(getName());
-	for (int i = methods.length;  --i >= 0; )
-	  {
-	    if (methods[i].getName().equals(mangledName))
-	      {
-		if (method != null)
-		  {
-		    method = null;
-		    break;
-		  }
-		method = methods[i];
-	      }
-	  }
-	if (method != null)
-	  {
-	    Language lang = Language.getDefaultLanguage();
-	    Class[] parameterClasses = method.getParameterTypes();
-	    int numParamTypes = parameterClasses.length;
-	    gnu.bytecode.Type[] atypes = new gnu.bytecode.Type[numParamTypes];
-	    for (int i = numParamTypes;  --i >= 0; )
-	      {
-		atypes[i] = lang.getTypeFor(parameterClasses[i]);
-	      }
-	    this.argTypes = atypes;
-	  }
-      }
-    catch (Throwable ex)
-      {
+        try
+          {
+            Class moduleClass = module.getClass();
+            Method[] methods = moduleClass.getDeclaredMethods();
+            String mangledName = Compilation.mangleNameIfNeeded(name);
+            for (int i = methods.length;  --i >= 0; )
+              {
+                if (methods[i].getName().equals(mangledName))
+                  {
+                    if (method != null)
+                      {
+                        method = null;
+                        break;
+                      }
+                    method = methods[i];
+                  }
+              }
+            if (method != null)
+              {
+                Language lang = Language.getDefaultLanguage();
+                if (lang != null)
+                  {
+                    Class[] parameterClasses = method.getParameterTypes();
+                    int numParamTypes = parameterClasses.length;
+                    gnu.bytecode.Type[] atypes = new gnu.bytecode.Type[numParamTypes];
+                    for (int i = numParamTypes;  --i >= 0; )
+                      {
+                        atypes[i] = lang.getTypeFor(parameterClasses[i]);
+                      }
+                    this.argTypes = atypes;
+                  }
+              }
+          }
+        catch (Throwable ex)
+          {
+          }
       }
     if (argTypes == null)
       super.resolveParameterTypes();

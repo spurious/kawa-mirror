@@ -565,7 +565,19 @@ public class LitTable implements ObjectOutput
       }
     else if (literal.value instanceof Class)
       {
-	comp.loadClassRef(((Class) literal.value).getName());
+        Class clas = (Class) literal.value;
+        if (clas.isPrimitive())
+          {
+            String cname = clas.getName();
+            if (cname.equals("int"))
+              cname = "integer";
+            cname = "java.lang."
+              +Character.toUpperCase(cname.charAt(0))
+              +cname.substring(1);
+            code.emitGetStatic(ClassType.make(cname).getDeclaredField("TYPE"));
+          }
+        else
+          comp.loadClassRef((ClassType)Type.make(clas));
 	store(literal, ignore, code);
       }
     else if (literal.value instanceof ClassType

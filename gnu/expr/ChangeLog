@@ -1,5 +1,7 @@
 2008-04-26  Per Bothner  <per@bothner.com>
 
+	* LitTable.java (emit): Handle a Class that isPrimitive.
+
 	* Compilation.java (compileToArchive): Do compress .zip files.
 
 2008-03-02  Per Bothner  <per@bothner.com>

@@ -2,8 +2,8 @@ package gnu.expr;
 
 import gnu.bytecode.*;
 /** This is the Target of a boolean expression, in a conditional context.
-  * If the expression evaluates to, transfer to the ifTrue label;
-  * if false, tranfer to the ifFalse label. */
+  * If the expression evaluates to true, transfer to the ifTrue label;
+  * if false, transfer to the ifFalse label. */
 
 public class ConditionalTarget extends Target
 {

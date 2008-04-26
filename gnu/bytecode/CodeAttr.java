@@ -820,6 +820,14 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.java_lang_Class_type);
   }
 
+  /** Push a class constant pool entry.
+   * This is only supported by JDK 1.5 and later. */
+  public final void emitPushClass (ObjectType ctype)
+  {
+    emitPushConstant(getConstants().addClass(ctype));
+    pushType(Type.java_lang_Class_type);
+  }
+
   public void emitPushNull ()
   {
     reserve(1);
@@ -1765,15 +1773,9 @@ public class CodeAttr extends Attribute implements AttrContainer
     reserve(3);
     popType();
     put1(opcode);
-    if (type instanceof ArrayType)
+    if (type instanceof ObjectType)
       {
-	ArrayType atype = (ArrayType) type;
-	CpoolUtf8 name = getConstants().addUtf8(atype.signature);
-	putIndex2(getConstants().addClass(name));
-      }
-    else if (type instanceof ClassType)
-      {
-	putIndex2(getConstants().addClass((ClassType) type));
+	putIndex2(getConstants().addClass((ObjectType) type));
       }
     else
       throw new Error ("unimplemented type " + type

@@ -1,5 +1,8 @@
 2008-04-26  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (loadClassRef(String)): Remove method.
+	(loadClassRef(ObjectType)): Generalize from ClassType.
+
 	* LitTable.java (emit): Handle a Class that isPrimitive.
 
 	* Compilation.java (compileToArchive): Do compress .zip files.

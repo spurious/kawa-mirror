@@ -177,7 +177,7 @@
   (let ((name (invoke buffer 'getFileName)))
     (if (eq? name #!null)
         #f
-        (symbol->string name))))
+        name)))
 
 (define (set-visited-file-name filename #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <buffer> "setFileName" <void>

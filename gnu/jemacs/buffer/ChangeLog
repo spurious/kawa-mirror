@@ -1,3 +1,9 @@
+2008-04-26  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (buffer-file-name): No longer use symbol->string, since
+	java.lang.String is now a <string> rather than a <symbol>
+	Reported by Yaroslav Kavenchuk <kavenchuk@gmail.com>.
+
 2008-02-04  Per Bothner  <per@bothner.com>
 
 	* EKeymap.java (ignorable): A KEY_TYPED event with modifiers

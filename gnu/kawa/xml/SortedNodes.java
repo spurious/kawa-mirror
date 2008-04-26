@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -41,7 +41,7 @@ public class SortedNodes extends Nodes
     // in the worst case (but linear if locality is good).
     while (lo < hi)
       {
-	int mid = (lo + hi) >> 1;
+	int mid = (lo + hi) >>> 1;
 	int cmp = compareIndex(start + POS_SIZE * mid, seq, ipos);
 	if (cmp == 0)
 	  return -1;

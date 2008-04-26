@@ -1,3 +1,8 @@
+2008-04-26  Per Bothner  <per@bothner.com>
+
+	* SwitchState.java (addCase): Use unsigned shift to avoid
+	potential overflow error in binary search.
+
 2008-04-24  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (processFixups): Drop redundant line number entries.

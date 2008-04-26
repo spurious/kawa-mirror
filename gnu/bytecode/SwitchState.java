@@ -1,4 +1,4 @@
-// Copyright (c) 1998, 2004  Per M.A. Bothner.
+// Copyright (c) 1998, 2004, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -108,7 +108,7 @@ public class SwitchState
 	copyBefore = 0;
 	while (low <= hi)
 	{
-	  copyBefore = (low + hi) >> 1;
+	  copyBefore = (low + hi) >>> 1;
 	  if (old_values[copyBefore] >= value)
 	    hi = copyBefore - 1;
 	  else

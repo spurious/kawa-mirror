@@ -844,15 +844,7 @@ public class ClassType extends ObjectType
         java.lang.reflect.Method method = methods[i];
         if (! method.getDeclaringClass().equals(clas))
           continue;
-        int modifiers = method.getModifiers();
-        Class[] paramTypes = method.getParameterTypes();
-        int j = paramTypes.length;
-        Type[] args = new Type[j];
-        while (--j >= 0)
-          args[j] = Type.make(paramTypes[j]);
-        Method meth = addMethod(method.getName(), modifiers);
-        meth.arg_types = args;
-        meth.return_type = Type.make(method.getReturnType());
+        addMethod(method);
       }
 
     java.lang.reflect.Constructor[] cmethods;
@@ -870,17 +862,7 @@ public class ClassType extends ObjectType
         java.lang.reflect.Constructor method = cmethods[i];
         if (! method.getDeclaringClass().equals(clas))
           continue;
-        int modifiers = method.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
-          continue;
-        Class[] paramTypes = method.getParameterTypes();
-        int j = paramTypes.length;
-        Type[] args = new Type[j];
-        while (--j >= 0)
-          args[j] = Type.make(paramTypes[j]);
-        Method meth = addMethod("<init>", modifiers);
-        meth.arg_types = args;
-        meth.return_type = Type.void_type;
+        addMethod(method);
       }
   }
 

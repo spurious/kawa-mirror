@@ -1,3 +1,8 @@
+2008-04-27  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (addMethods): Use addMethod(java.lang.reflect.Method)
+	and addMethod(java.lang.reflect.Constructo).
+
 2008-04-26  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitPushClass(ObjectType)): New method.

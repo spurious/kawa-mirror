@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2003, 2004, 2008 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -832,7 +832,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     reserve(1);
     put1(1);  // aconst_null
-    pushType(Type.pointer_type);
+    pushType(Type.nullType);
   }
 
   public final void emitPushThis()

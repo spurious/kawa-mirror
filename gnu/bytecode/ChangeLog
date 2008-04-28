@@ -1,3 +1,7 @@
+2008-04-28  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitPushNull): Push nullType, rather than pointer_type.
+
 2008-04-27  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (addMethods): Use addMethod(java.lang.reflect.Method)

@@ -1,5 +1,12 @@
 2008-04-28  Per Bothner  <per@bothner.com>
 
+	* StackMapTableAttr.java: New class, extends Attribute.
+	* Makefile.am: Update accordingly.
+	* ClassFileInput.java (readAttribute): Recognize StackMapTable.
+
+	* Type.java (printSignature): New method.
+	* CpoolClass.java (print): Use Type.printSignature for array types.
+
 	* CodeAttr.java (emitPushNull): Push nullType, rather than pointer_type.
 
 2008-04-27  Per Bothner  <per@bothner.com>

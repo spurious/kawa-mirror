@@ -67,6 +67,11 @@ public class CpoolClass extends CpoolEntry {
 	dst.print("Class name: ");
 	dst.printOptionalIndex(name);
       }
-    dst.print(name.string.replace('/', '.'));
+    String str = name.string;
+    int nlen = str.length();
+    if (nlen > 1 && str.charAt(0) == '[')
+      Type.printSignature(str, 0, nlen, dst);
+    else
+      dst.print(str.replace('/', '.'));
   }
 }

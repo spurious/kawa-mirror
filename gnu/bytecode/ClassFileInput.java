@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 2004  Per M.A. Bothner.
+// Copyright (c) 1997, 2004, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -241,6 +241,13 @@ public class ClassFileInput extends DataInputStream
 	    var.offset = readUnsignedShort();
 	  }
 	return attr;
+      }
+    else if (name == "StackMapTable" && container instanceof CodeAttr)
+      {
+        int count = readUnsignedShort();
+        byte[] data = new byte[length-2];
+        readFully(data, 0, length-2);
+        return new StackMapTableAttr(count, data, (CodeAttr) container);
       }
     else if (name == "ConstantValue" && container instanceof Field)
       {

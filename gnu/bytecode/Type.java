@@ -227,6 +227,30 @@ public abstract class Type
     return signatureToType(sig, 0, sig.length());
   }
 
+  public static void printSignature (String sig, int off, int len,
+                                     java.io.PrintWriter out)
+  {
+    if (len == 0)
+      return;
+    char c = sig.charAt(off);
+    Type type;
+    if (len == 1)
+      {
+	type = signatureToPrimitive(c);
+	if (type != null)
+	  out.print(type.getName());
+        return;
+      }
+    if (c == '[')
+      {
+        printSignature(sig, off+1, len-1, out);
+        out.print("[]");
+        return;
+      }
+    if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
+      out.print(sig.substring(off+1,len-1+off).replace('/', '.'));
+  }
+
   /** Return the length of the signature starting at a given string position.
    * Returns -1 for an invalid signature. */
   public static int signatureLength (String sig, int pos)

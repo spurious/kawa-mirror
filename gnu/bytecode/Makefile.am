@@ -28,6 +28,7 @@ PrimType.java \
 Scope.java \
 SourceDebugExtAttr.java \
 SourceFileAttr.java \
+StackMapTableAttr.java \
 Type.java \
 Variable.java \
 VarEnumerator.java \

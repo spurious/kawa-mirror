@@ -1,3 +1,9 @@
+2008-04-30  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkClassExp): Don't complain about static
+	link for simple class if this is an anonymous inner class, as in
+	the Scheme (object ...) macro.
+
 2008-04-26  Per Bothner  <per@bothner.com>
 
 	* ModuleMethod.java (resolveParameterTypes): Don't NPE if name is null.

@@ -123,12 +123,11 @@ public class FindCapturedVars extends ExpWalker
               child.setNeedsStaticLink(true);
           }
       }
-    if (exp.isSimple() && exp.getNeedsClosureEnv())
+    if (exp.isSimple() && exp.getNeedsClosureEnv() && exp.nameDecl != null)
       {
         comp.error('w', "simple class requiring lexical link - use define-class instead");
         //exp.setSimple(false);
-        if (exp.nameDecl != null
-            && exp.nameDecl.getType() == Compilation.typeClass)
+        if (exp.nameDecl.getType() == Compilation.typeClass)
           exp.nameDecl.setType(Compilation.typeClassType);
       }
     return ret;

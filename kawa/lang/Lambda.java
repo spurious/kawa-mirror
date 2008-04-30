@@ -620,15 +620,8 @@ public class Lambda extends Syntax
           }
         Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
       }
-    else if (lexp.returnType != null
-             && lexp.returnType != Type.pointer_type
-             && lexp.returnType != Type.void_type
-             && lexp.body != QuoteExp.abstractExp)
-      {
-	Expression value = lexp.body;
-	lexp.body = Convert.makeCoercion(value, lexp.returnType);
-	lexp.body.setLine(value);
-      }
+    else
+      lexp.setCoercedReturnType(lexp.returnType);
     tr.pop(lexp);
     lexp.countDecls();
     tr.popRenamedAlias(numRenamedAlias);

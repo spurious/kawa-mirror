@@ -1,5 +1,11 @@
 2008-04-30  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (addMethodFor): If a class method has an unspecified
+	parameter or return type, look to see if we can "inherit" the type
+	from a super-class.
+
+	* LambdaExp.java (setCoercedReturnType): New method.
+
 	* FindCapturedVars.java (walkClassExp): Don't complain about static
 	link for simple class if this is an anonymous inner class, as in
 	the Scheme (object ...) macro.

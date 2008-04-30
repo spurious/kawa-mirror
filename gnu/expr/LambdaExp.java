@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.lists.LList;
 import java.util.Vector;
+import gnu.kawa.functions.Convert;
 
 /**
  * Class used to implement Scheme lambda expressions.
@@ -877,6 +878,74 @@ public class LambdaExp extends ScopeExp
       mflags |= Access.ABSTRACT;
     if (! isStatic)
       declareThis(ctype);
+
+    // If a class method has unspecified parameter types, see if we
+    // can "inherit" the parameter types from an inherited method.
+    if (isClassMethod() && outer instanceof ClassExp
+        && min_args == max_args)
+      {
+        Method[] inherited = null;
+        int iarg = 0;
+      param_loop:
+        for (Declaration param = firstDecl(); ;
+             param = param.nextDecl(), iarg++)
+          {
+            if (param == null)
+              {
+                if (returnType != null)
+                  break;
+              }
+            else if (param.isThisParameter())
+              {
+                iarg--;
+                continue;
+              }
+            else if (param.getFlag(Declaration.TYPE_SPECIFIED))
+              continue;
+            if (inherited == null)
+              {
+                final String mangled = nameBuf.toString();
+                gnu.bytecode.Filter filter
+                  = new gnu.bytecode.Filter() {
+                      public boolean select(Object value)
+                      {
+                        gnu.bytecode.Method method = (gnu.bytecode.Method) value;
+                        if (! method.getName().equals(mangled))
+                          return false;
+                        Type[] ptypes = method.getParameterTypes();
+                        return ptypes.length == min_args;
+                      }
+                    };
+                inherited = ctype.getMethods(filter, 2);
+              }
+            Type type = null;
+            for (int i = inherited.length;  --i >= 0; )
+              {
+                Method method = inherited[i];
+                Type ptype = param == null ? method.getReturnType()
+                  : method.getParameterTypes()[iarg];
+                if (type == null)
+                  type = ptype;
+                else if (ptype != type)
+                  {
+                    // More than one method with inconsistent parameter type.
+                    if (param == null)
+                      break param_loop;
+                    else
+                      continue param_loop;
+                  }
+              }
+            if (type != null)
+              {
+                if (param != null)
+                  param.setType(type);
+                else
+                  setCoercedReturnType(type);
+              }
+            if (param == null)
+              break param_loop;
+          }
+      }
 
     Type rtype
       = (getFlag(SEQUENCE_RESULT)
@@ -1780,6 +1849,20 @@ public class LambdaExp extends ScopeExp
   public final void setReturnType (Type returnType)
   {
     this.returnType = returnType;
+  }
+
+  public final void setCoercedReturnType (Type returnType)
+  {
+    this.returnType = returnType;
+    if (returnType != null
+        && returnType != Type.pointer_type
+        && returnType != Type.void_type
+        && body != QuoteExp.abstractExp)
+      {
+        Expression value = body;
+	body = Convert.makeCoercion(value, returnType);
+	body.setLine(value);
+      }
   }
 }
 

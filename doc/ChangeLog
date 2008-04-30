@@ -1,3 +1,8 @@
+2008-04-30  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Paths): Fix documentation of path-file.
+	Bug reported by Ethan Herdrick <info@reatlas.com>. 
+
 2008-03-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Source distribution): Update from "Java 2" as the

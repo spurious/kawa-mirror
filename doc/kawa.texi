@@ -3605,7 +3605,7 @@ The path component of a file name is the file name itself.
 For a URI, it is the main hierarchical part of the URI,
 without schema, authority, query, or fragment.
 @example
-(path-file "http://gnu.org/home/me.html?add-bug#body") @result{} "me.html"
+(path-file "http://gnu.org/home/me.html?add-bug#body") @result{} "/home/me.html"
 @end example
 @end defun
 

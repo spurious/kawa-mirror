@@ -1124,27 +1124,26 @@ Here is an example, based on the scribble applet in Flanagan's
 (define-private last-x 0)
 (define-private last-y 0)
 
-(define (init) <void>
-  (let ((applet :: <java.applet.Applet> (this)))
-    (invoke applet 'addMouseListener
-	    (object (<java.awt.event.MouseAdapter>)
-		    ((mousePressed (e :: <java.awt.event.MouseEvent>)) <void>
-		     (set! last-x (invoke e 'getX))
-		     (set! last-y (invoke e 'getY)))))
-    (invoke applet 'addMouseMotionListener
-	    (object (<java.awt.event.MouseMotionAdapter>)
-		    ((mouseDragged (e :: <java.awt.event.MouseEvent>)) <void>
-		     (let ((g :: <java.awt.Graphics>
-			      (invoke applet 'getGraphics))
-			   (x :: <int> (invoke e 'getX))
-			   (y :: <int> (invoke e 'getY)))
-		       (invoke g 'drawLine last-x last-y x y)
-		       (set! last-x x)
-		       (set! last-y y)))))))
+(define (init) :: void
+  (let ((applet (this)))
+    (applet:addMouseListener
+     (object (java.awt.event.MouseAdapter)
+	     ((mousePressed e)
+	      (set! last-x (e:getX))
+	      (set! last-y (e:getY)))))
+    (applet:addMouseMotionListener
+     (object (java.awt.event.MouseMotionAdapter)
+	     ((mouseDragged e)
+	      (let ((g (applet:getGraphics))
+		    (x (e:getX))
+		    (y (e:getY)))
+		(g:drawLine last-x last-y x y)
+		(set! last-x x)
+		(set! last-y y)))))))
 
-(define (start) <void> (format #t "called start.~%~!"))
-(define (stop) <void> (format #t "called stop.~%~!"))
-(define (destroy) <void> (format #t "called destroy.~%~!"))
+(define (start) :: void (format #t "called start.~%~!"))
+(define (stop) :: void (format #t "called stop.~%~!"))
+(define (destroy) :: void (format #t "called destroy.~%~!"))
 @end example
 
 You compile the program with the @samp{--applet} flag in addition to the

@@ -1,5 +1,8 @@
 2008-04-30  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Applet compilation): Update scribble example to use
+	new syntax etc.
+
 	* kawa.texi (Paths): Fix documentation of path-file.
 	Bug reported by Ethan Herdrick <info@reatlas.com>. 
 

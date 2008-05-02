@@ -75,7 +75,7 @@ public class StackMapTableAttr extends Attribute
       case 7:  // ITEM_Object
         int index = u2(startOffset+1);
         dst.printOptionalIndex(index);
-        dst.printConstantTersely(index, 7);
+        dst.printConstantTersely(index, ConstantPool.CLASS);
         consumed += 2;
         break;
       case 8:  // ITEM_uninitialized

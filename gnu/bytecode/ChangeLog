@@ -1,3 +1,7 @@
+2008-05-02  Per Bothner  <per@bothner.com>
+
+	* StackMapTableAttr.java (print_verification_type): Use named constant.
+
 2008-04-28  Per Bothner  <per@bothner.com>
 
 	* StackMapTableAttr.java: New class, extends Attribute.

@@ -1,3 +1,7 @@
+2008-05-03  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitPushClass(String)): Remove no-longer-needed method.
+
 2008-05-02  Per Bothner  <per@bothner.com>
 
 	* StackMapTableAttr.java (print_verification_type): Use named constant.

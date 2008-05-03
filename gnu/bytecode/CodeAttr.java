@@ -814,14 +814,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /** Push a class constant pool entry.
    * This is only supported by JDK 1.5 and later. */
-  public final void emitPushClass (String name)
-  {
-    emitPushConstant(getConstants().addClass(name));
-    pushType(Type.java_lang_Class_type);
-  }
-
-  /** Push a class constant pool entry.
-   * This is only supported by JDK 1.5 and later. */
   public final void emitPushClass (ObjectType ctype)
   {
     emitPushConstant(getConstants().addClass(ctype));

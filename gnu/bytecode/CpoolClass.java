@@ -8,6 +8,7 @@ import java.io.*;
 
 public class CpoolClass extends CpoolEntry {
   CpoolUtf8 name;
+  ObjectType clas;
 
   CpoolClass () { }
 
@@ -30,14 +31,24 @@ public class CpoolClass extends CpoolEntry {
     return name.string;
   }
 
+  public final String getClassName()
+  {
+    return name.string.replace('/', '.');
+  }
+
   /** Get corresponding ObjectType (ClassType or ArrayType). */
   public final ObjectType getClassType ()
   {
+    ObjectType otype = clas;
+    if (otype != null)
+      return otype;
     String name = this.name.string;
     if (name.charAt (0) == '[')
-      return (ObjectType)Type.signatureToType (name);
+      otype = (ObjectType)Type.signatureToType (name);
     else
-      return ClassType.make (name.replace ('/', '.'));
+      otype = ClassType.make (name.replace ('/', '.'));
+    clas = otype;
+    return otype;
   }
   
   final static int hashCode (CpoolUtf8 name)

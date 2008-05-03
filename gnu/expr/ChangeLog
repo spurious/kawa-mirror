@@ -1,3 +1,8 @@
+2008-05-03  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compileMembers): Set encloding and inner members.
+	* LambdaExp.java (enterFunction): Set enclosing member of frame.
+
 2008-04-30  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor): If a class method has an unspecified

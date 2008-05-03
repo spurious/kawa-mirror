@@ -1,5 +1,25 @@
 2008-05-03  Per Bothner  <per@bothner.com>
 
+	Better support for InnerClasses attributes.
+	* CpoolClass.java (clas): New ObjectType field.
+	(getClassType): Use or set clas field.
+	(getClassName): New convenience method.
+	* ClassType.java (getSimpleName, addMemberClass, getDeclaredClass,
+	addMemberClasses): New methods.
+	(addEnclosingMember): Make non-public.
+	(firstInnerClass, nextInnerClass): New fields.
+	(doFixUps): Add InnerClasses entries as required by JVM spec.
+	* InnerClassesAttr.java (getFirstInnerClasses): New static method.
+	(addClass): New method.
+	(assignConstant): Now just a stub, since addClass does the work.
+	(print): Various updates.
+	* ObjectType.java (ADD_MEMBERCLASSES_DONE): New constant.
+	* EnclosingMethodAttr.java (getFirstEnclosingMethod): New method.
+	(assignConstants): Re-write.
+	* ConstantPool.java (addClass(ObjectType)): Remember clas field.
+	(addmethodRef, addFieldRef): Use addClass(ObjectType).
+	(getForcedClass): New method.
+
 	* CodeAttr.java (emitPushClass(String)): Remove no-longer-needed method.
 
 2008-05-02  Per Bothner  <per@bothner.com>

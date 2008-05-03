@@ -23,17 +23,26 @@ public class EnclosingMethodAttr extends Attribute
     this.method_index = method_index;
   }
 
+  public static EnclosingMethodAttr getFirstEnclosingMethod (Attribute attr)
+  {
+    for (; ; attr = attr.next)
+      {
+        if (attr == null || attr instanceof EnclosingMethodAttr)
+          return (EnclosingMethodAttr) attr;
+      }
+  }
+
   public int getLength() { return 4; }
 
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
-    /*
-    if (class_index == 0)
-      class_index = cl.getConstants().addClass(???).getIndex();
-    if (method_index == 0)
-      method_index = cl.getConstants().addNameAndType(???).getIndex();
-    */
+    if (method != null)
+      {
+        ConstantPool constants = cl.getConstants();
+        class_index = constants.addClass(method.getDeclaringClass()).getIndex();
+        method_index = constants.addNameAndType(method).getIndex();
+      }
   }
 
   public void write (java.io.DataOutputStream dstr)

@@ -97,6 +97,75 @@ public class ClassType extends ObjectType
   public final void setModifiers(int flags) { access_flags = flags; }
   public final void addModifiers(int flags) { access_flags |= flags; }
 
+  public String getSimpleName ()
+  {
+    /* #ifdef JAVA5 */
+    if ((flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
+      {
+        try
+          {
+            return reflectClass.getSimpleName();
+          }
+        catch (Throwable ex)
+          {
+            // ... fall thorugh ...
+          }
+      }
+    /* #endif */
+    String name = getName();
+    int dot = name.lastIndexOf('.');
+    if (dot > 0)
+      name = name.substring(dot+1);
+    int dollar = name.lastIndexOf('$');
+    if (dollar >= 0)
+      {
+        int len = name.length();
+        int start = dollar + 1;
+        while (start < len)
+          {
+            char ch = name.charAt(start);
+            if (ch >= '0' && ch <= '9')
+              start++;
+            else
+              break;
+          }
+        name = name.substring(start);
+      }
+    return name;
+  }
+
+  public void addMemberClass (ClassType member)
+  {
+    ClassType prev = null;
+    ClassType entry = firstInnerClass;
+    while (entry != null)
+      {
+        if (entry == member)
+          return;
+        prev = entry;
+        entry = entry.nextInnerClass;
+      }
+    if (prev == null)
+      firstInnerClass = member;
+    else
+      prev.nextInnerClass = member;
+  }
+
+  public ClassType getDeclaredClass (String simpleName)
+  {
+    addMemberClasses();
+    for (ClassType member = firstInnerClass;  member != null;
+         member = member.nextInnerClass)
+      {
+        if (simpleName.equals(member.getSimpleName()))
+          return member;
+      }
+    return null;
+  }
+
+  ClassType firstInnerClass;
+  ClassType nextInnerClass;
+
   Member enclosingMember;
   public ClassType getDeclaringClass()
   {
@@ -118,7 +187,7 @@ public class ClassType extends ObjectType
     enclosingMember = member;
   }
 
-  public void addEnclosingMember ()
+  void addEnclosingMember ()
   {
     if ((flags & (ADD_ENCLOSING_DONE|EXISTING_CLASS)) != EXISTING_CLASS)
       return;
@@ -151,6 +220,24 @@ public class ClassType extends ObjectType
     // if (dclas != null)
     //   enclosingMember = (ClassType) Type.make(dclas);
     /* #endif */
+  }
+
+  public void addMemberClasses ()
+  {
+    if ((flags & (ADD_MEMBERCLASSES_DONE|EXISTING_CLASS)) != EXISTING_CLASS)
+      return;
+    Class clas = getReflectClass();
+    flags |= ADD_MEMBERCLASSES_DONE;
+    Class[] memberClasses = clas.getClasses();
+    int numMembers = memberClasses.length;
+    if (numMembers > 0)
+      {
+        for (int i = 0;  i < numMembers;  i++)
+          {
+            ClassType member = (ClassType) Type.make(memberClasses[i]);
+            addMemberClass(member);
+          }
+      }
   }
 
   public final boolean hasOuterLink ()
@@ -565,7 +652,7 @@ public class ClassType extends ObjectType
     return addMethod(method.getName(), modifiers, args, rtype);
   }
 
-  public Method addMethod  (java.lang.reflect.Constructor method)
+  public Method addMethod (java.lang.reflect.Constructor method)
   {
     Class[] paramTypes = method.getParameterTypes();
     int modifiers = method.getModifiers();
@@ -915,7 +1002,57 @@ public class ClassType extends ObjectType
     }
     for (Method method = methods; method != null; method = method.next)
       method.assignConstants();
+    if (enclosingMember instanceof Method)
+      {
+        EnclosingMethodAttr attr =
+          EnclosingMethodAttr.getFirstEnclosingMethod(getAttributes());
+        if (attr == null)
+          attr = new EnclosingMethodAttr(this);
+        attr.method = (Method) enclosingMember;
+      }
+    else if (enclosingMember instanceof ClassType)
+      constants.addClass((ClassType) enclosingMember);
+    for (ClassType member = firstInnerClass;  member != null;
+         member = member.nextInnerClass)
+      {
+        constants.addClass(member);
+      }
+
+    InnerClassesAttr innerAttr
+      = InnerClassesAttr.getFirstInnerClasses(getAttributes());
+    if (innerAttr != null)
+      {
+        // Should never happen ...
+        innerAttr.setSkipped(true);
+      }
+
     Attribute.assignConstants(this, this);
+
+    // Add any needed entries to the InnerClasses attribute.  We do this at
+    // the end, because the JVM spec requires the InnerClasses attribute to
+    // have an entry for all non-package-level classes in the constant-pool.
+    // Note that count is not constant in this loop.
+    for (int i = 1; i <= constants.count; i++)
+      {
+	CpoolEntry entry = constants.pool[i];
+        if (! (entry instanceof CpoolClass))
+          continue;
+        CpoolClass centry = (CpoolClass) entry;
+        if (! (centry.clas instanceof ClassType))
+          continue;
+        ClassType ctype = (ClassType) centry.clas;
+        if (ctype.getEnclosingMember() != null)
+          {
+            if (innerAttr == null)
+              innerAttr = new InnerClassesAttr(this);
+            innerAttr.addClass(centry, this);
+          }
+      }
+    if (innerAttr != null)
+      {
+        innerAttr.setSkipped(true);                                       
+        innerAttr.assignConstants(this);
+      }
   }
 
   public void writeToStream (OutputStream stream)

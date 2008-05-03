@@ -1,3 +1,6 @@
+// Copyright (c) 2008  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -403,6 +406,26 @@ public class ClassExp extends LambdaExp
 	ClassType new_class = getCompiledClassType(comp);
 	comp.curClass = new_class;
 
+        LambdaExp outer = outerLambda();
+        Member enclosing = null;
+        if (outer instanceof ClassExp)
+          enclosing = outer.type;
+        else if (outer != null && ! (outer instanceof ModuleExp))
+          enclosing = saveMethod;
+        else if (outer instanceof ModuleExp && type.getName().indexOf('$') > 0)
+         enclosing = outer.type;
+        if (enclosing != null)
+          {
+            new_class.setEnclosingMember(enclosing);
+            if (enclosing instanceof ClassType)
+              ((ClassType) enclosing).addMemberClass(new_class);
+          }
+        if (instanceType != new_class)
+          {
+            instanceType.setEnclosingMember(type);
+            type.addMemberClass(instanceType);
+          }
+              
 	usedSuperClasses(type, comp);
 	if (type != instanceType)
 	  usedSuperClasses(instanceType, comp);

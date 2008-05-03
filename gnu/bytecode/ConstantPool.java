@@ -99,12 +99,9 @@ public class ConstantPool
 
   public CpoolClass addClass (ObjectType otype)
   {
-    return addClass(addUtf8(otype.getInternalName()));
-  }
-
-  public CpoolClass addClass (String name)
-  {
-    return addClass(addUtf8(name.replace('.', '/')));
+    CpoolClass entry = addClass(addUtf8(otype.getInternalName()));
+    entry.clas = otype;
+    return entry;
   }
 
   public CpoolClass addClass (CpoolUtf8 name)
@@ -271,7 +268,7 @@ public class ConstantPool
 
   public CpoolRef addMethodRef (Method method)
   {
-    CpoolClass clas = addClass(method.classfile.this_name);
+    CpoolClass clas = addClass(method.classfile);
     int tag;
     if ((method.getDeclaringClass().getModifiers() & Access.INTERFACE) == 0)
       tag = 10; // CONSTANT_Methodref
@@ -283,7 +280,7 @@ public class ConstantPool
 
   public CpoolRef addFieldRef (Field field)
   {
-    CpoolClass clas = addClass(field.owner.this_name);
+    CpoolClass clas = addClass(field.owner);
     int tag = 9;  // CONSTANT_Fieldref
     CpoolNameAndType nameType = addNameAndType(field);
     return addRef(tag, clas, nameType);
@@ -335,6 +332,11 @@ public class ConstantPool
     return entry;
   }
 
+  CpoolClass getForcedClass (int index)
+  {
+    return (CpoolClass) getForced (index, ConstantPool.CLASS);
+  }
+
   public ConstantPool () { }
 
   public ConstantPool (java.io.DataInputStream dstr)
@@ -372,7 +374,7 @@ public class ConstantPool
 	  case METHODREF:
 	  case INTERFACE_METHODREF:
 	    CpoolRef ref = (CpoolRef) entry;
-	    ref.clas = (CpoolClass) getForced(dstr.readUnsignedShort(), CLASS);
+	    ref.clas = getForcedClass(dstr.readUnsignedShort());
 	    ref.nameAndType = (CpoolNameAndType)
 	      getForced(dstr.readUnsignedShort(), NAME_AND_TYPE);
 	    break;

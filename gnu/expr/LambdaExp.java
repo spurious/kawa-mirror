@@ -1283,6 +1283,7 @@ public class LambdaExp extends ScopeExp
 					       closureEnv.getType());
         if (! (this instanceof ModuleExp) && ! (this instanceof ClassExp))
           {
+            frameType.setEnclosingMember(comp.method);
 	    code.emitNew(frameType);
 	    code.emitDup(frameType);
 	    Method constructor = Compilation.getConstructor(frameType, this);

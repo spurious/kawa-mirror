@@ -107,9 +107,7 @@ public class ClassType extends ObjectType
             return reflectClass.getSimpleName();
           }
         catch (Throwable ex)
-          {
-            // ... fall thorugh ...
-          }
+          { /* ... fall thorugh ... */ }
       }
     /* #endif */
     String name = getName();

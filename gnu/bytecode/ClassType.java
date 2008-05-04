@@ -193,7 +193,7 @@ public class ClassType extends ObjectType
     flags |= ADD_ENCLOSING_DONE;
 
     Class dclas;
-    /* #ifdef JAVA */
+    /* #ifdef JAVA5 */
     dclas = clas.getEnclosingClass();
     if (dclas == null)
       return;

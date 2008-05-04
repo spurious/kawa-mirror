@@ -1050,7 +1050,7 @@ public class ClassType extends ObjectType
       }
     if (innerAttr != null)
       {
-        innerAttr.setSkipped(true);                                       
+        innerAttr.setSkipped(false);                                       
         innerAttr.assignConstants(this);
       }
   }

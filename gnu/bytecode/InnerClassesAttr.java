@@ -51,10 +51,9 @@ public class InnerClassesAttr  extends Attribute
     String name = clas.getSimpleName();
     int name_index = name == null || name.length() == 0 ? 0
       : constants.addUtf8(name).index;
-    data[i] = clas == null ? 0 :
-      (short) constants.addClass(clas).index;
+    data[i] = (short) centry.index;
     ClassType outer = clas.getDeclaringClass();
-    data[1] = outer == null ? 0 :
+    data[i+1] = outer == null ? 0 :
       (short) constants.addClass(outer).index;
     data[i+2] = (short) name_index;
     int flags = clas.getModifiers();
@@ -105,7 +104,6 @@ public class InnerClassesAttr  extends Attribute
         ClassType clas = centry != null && centry.clas instanceof ClassType
           ? (ClassType) centry.clas
           : null;
-        Class rclas = clas == null ? null : clas.getReflectClass();
         dst.print(' ');
         int access = inner_index == 0 && clas != null ? clas.getModifiers()
           : data[4*i+3] & 0xFFFF;
@@ -129,8 +127,8 @@ public class InnerClassesAttr  extends Attribute
           }
         dst.print(name);
         dst.print(" = ");
-        if (clas != null)
-          name = clas.getName();
+        if (centry != null)
+          name = centry.getClassName();
         else
           name = "(Unknown)";
         dst.print(name);

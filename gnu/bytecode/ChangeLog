@@ -1,3 +1,9 @@
+2008-05-04  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (doFixups): Fix thinko.
+	* InnerClassesAttr.java (addClass): Fix thinko.
+	(print): Fix buglets.
+
 2008-05-03  Per Bothner  <per@bothner.com>
 
 	Better support for InnerClasses attributes.

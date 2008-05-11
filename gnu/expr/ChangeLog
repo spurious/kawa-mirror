@@ -1,3 +1,11 @@
+2008-05-10  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (useClass): Call new addClass(ClassType) method,
+	regardless of whether class isExisting(), because the class might be in
+	a not-yet-loadable ClassType in a separate immediate-compiled module.
+	* Declaration.java (load): Also note usedClass on a field's type, not
+	just its declaring class.
+
 2008-05-03  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compileMembers): Set encloding and inner members.

@@ -2474,9 +2474,9 @@ public class Compilation implements SourceLocator
     if (! immediate || ! (type instanceof ClassType))
       return;
     ClassType clas = (ClassType) type;
-    if (loader != null && clas.isExisting())
+    if (loader != null)
       {
-	loader.addClass(clas.getReflectClass());
+	loader.addClass(clas);
       }
   }
 

@@ -1,3 +1,14 @@
+2008-05-10  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (isExisting): Generalize for ArrayType and classes
+	that have a different implementation-type.
+	Immediate impetus is handling tostring_type.
+
+	* ArrayClassLoader.java (addClass(ClassType)): Defer mapping to Class
+	until loadClass, because it could be a class in a module we have't
+	compiled yet.
+	(loadClass): Do deferred handing of ClassType.
+
 2008-05-04  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getSimpleName): Fixed two bugs - wrong PreProcess

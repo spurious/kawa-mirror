@@ -208,6 +208,7 @@ public class Declaration
         if (field != null)
           {
             comp.usedClass(field.getDeclaringClass());
+            comp.usedClass(field.getType());
             if (! field.getStaticFlag())
               {
                 loadOwningObject(owner, comp);

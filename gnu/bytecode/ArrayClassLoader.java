@@ -8,6 +8,7 @@ import java.net.URL;
 
 public class ArrayClassLoader extends ClassLoader
 {
+  /** Map String to union(byte[], Class, ClassType). */
   Hashtable map = new Hashtable(100);
 
   /** If non-null, context to use for finding resources. */
@@ -53,12 +54,8 @@ public class ArrayClassLoader extends ClassLoader
   }
 
   public void addClass (ClassType ctype)
-    throws java.io.IOException
   {
-    if ((ctype.flags & ClassType.EXISTING_CLASS) != 0)
-      addClass(ctype. getReflectClass());
-    else
-      addClass(ctype.getName(), ctype.writeToArray());
+    map.put(ctype.getName(), ctype);
   }
 
   protected URL findResource(String name)
@@ -97,6 +94,14 @@ public class ArrayClassLoader extends ClassLoader
     throws ClassNotFoundException
   {
     Object r = map.get(name);
+    if (r instanceof ClassType)
+      {
+        ClassType ctype = (ClassType) r;
+        if (ctype.isExisting())
+          r = ctype.reflectClass;
+        else
+          r = ctype.writeToArray();
+      }
     Class clas;
     if (r instanceof byte[])
       {

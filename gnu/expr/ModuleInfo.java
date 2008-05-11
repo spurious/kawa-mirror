@@ -1,4 +1,4 @@
-// Copyright (c) 2006 Per M.A. Bothner.
+// Copyright (c) 2006, 2008 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -73,6 +73,9 @@ public class ModuleInfo
   String sourceAbsPathname;
 
   public long lastCheckedTime;
+  /** Last time the source file was modified.
+   * At least the last time we checked ...
+   */
   public long lastModifiedTime;
 
   public Path getSourceAbsPath ()
@@ -357,11 +360,14 @@ public class ModuleInfo
    */
   public boolean checkCurrent (ModuleManager manager, long now)
   {
+    boolean hasClass = moduleClass != null;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
-      return true;
+      return hasClass || comp != null;
     lastCheckedTime = now;
     long lastModifiedTime = sourceAbsPath.getLastModified();
-    if (moduleClass == null && className != null)
+    long oldModifiedTime = this.lastModifiedTime;
+    this.lastModifiedTime = lastModifiedTime;
+    if (! hasClass && className != null)
       {
         try
           {
@@ -369,11 +375,10 @@ public class ModuleInfo
           }
         catch (ClassNotFoundException ex)
           {
-            this.lastModifiedTime = lastModifiedTime;
             return false;
           }
       }
-    if (this.lastModifiedTime == 0 && moduleClass != null)
+    if (oldModifiedTime == 0 && hasClass)
       {
         String classFilename = className;
         int dot = classFilename.lastIndexOf('.');
@@ -385,7 +390,7 @@ public class ModuleInfo
           {
             try
               {
-                this.lastModifiedTime = resource.openConnection().getLastModified();
+                oldModifiedTime = resource.openConnection().getLastModified();
               }
             catch (java.io.IOException ex)
               {
@@ -396,21 +401,22 @@ public class ModuleInfo
           {
             // Couldn't open timestand of the .class file.
             // Assume it is current.
-            this.lastModifiedTime = lastModifiedTime;
             return true;
           }
       }
-    if (className == null || lastModifiedTime > this.lastModifiedTime)
+    if (className == null || lastModifiedTime > oldModifiedTime)
       {
         moduleClass = null;
-        this.lastModifiedTime = lastModifiedTime;
         return false;
       }
     for (int i = numDependencies;  --i >= 0; )
       {
         ModuleInfo dep = dependencies[i];
         if (! dep.checkCurrent(manager, now))
-          return false;
+          {
+            moduleClass = null;
+            return false;
+          }
       }
     return true;
   }

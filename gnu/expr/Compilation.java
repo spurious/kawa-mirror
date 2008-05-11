@@ -977,7 +977,9 @@ public class Compilation implements SourceLocator
       classes[iClass].cleanupAfterCompilation();
     classes = null;
     minfo.comp = null;
-    minfo.exp = null;
+    // We don't clear minfo.exp itself, since it might be re-required.
+    if (minfo.exp != null)
+      minfo.exp.body = null;
     mainLambda.body = null;
     mainLambda = null;
   }

@@ -1,3 +1,11 @@
+2008-05-11  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (checkCurrent):  Fix/rewrite for indirectly
+	imported modules, when we may checkCurrent multiple times.
+	* Compilation.java (cleanupAfterCompilation): Clear module's body,
+	but not minfo.exp itself, so we have the actual list of Declarations,
+	if a module is re-required.
+
 2008-05-10  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (useClass): Call new addClass(ClassType) method,

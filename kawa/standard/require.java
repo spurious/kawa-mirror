@@ -278,6 +278,9 @@ public class require extends Syntax
     for (Declaration fdecl = mod.firstDecl();
          fdecl != null;  fdecl = fdecl.nextDecl())
       {
+        if (fdecl.isPrivate())
+          continue;
+
         Symbol aname = (Symbol) fdecl.getSymbol();
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
         if (! isStatic && decl == null)
@@ -304,9 +307,6 @@ public class require extends Syntax
 
             decl.setFlag(Declaration.TYPE_SPECIFIED);
           }
-
-        if (fdecl.isPrivate())
-          continue;
 
         if (fdecl.field != null)
           {

@@ -1,3 +1,8 @@
+2008-05-11  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): If private, continue
+	earlier - before checking to see if we need an instance handle.
+
 2008-04-30  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteBody): Use new setCoercedReturnType

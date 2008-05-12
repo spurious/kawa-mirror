@@ -1,3 +1,8 @@
+2008-05-11  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Make better use new-ish module
+	framework.  Especially, use checkCurrent to also check dependencies.
+
 2007-09-08  Per Bothner  <per@bothner.com>
 
 	* ReplSession.java: Override new emitPrompt, rather than lineStart.

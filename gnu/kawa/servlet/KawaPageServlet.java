@@ -106,22 +106,16 @@ public class KawaPageServlet extends KawaServlet
 	return null;
       }
 
-    URLConnection connection = url.openConnection();
     String urlString = url.toExternalForm();
-    long lastModified = connection.getLastModified();
     if (minfo == null || ! urlString.equals(minfo.getSourceAbsPathname()))
       minfo = mmanager.findWithURL(url);
-    if (minfo.lastModifiedTime == lastModified)
-      {
-        minfo.lastCheckedTime = now;
-        return mcontext.findInstance(minfo);
-      }
+    if (minfo.checkCurrent(mmanager, now))
+      return mcontext.findInstance(minfo);
 
-    minfo.lastModifiedTime = lastModified;
-    minfo.lastCheckedTime = now;
     mmap.put(path, minfo);
 
-    InputStream resourceStream = connection.getInputStream();
+    Path absPath = minfo.getSourceAbsPath();
+    InputStream resourceStream = absPath.openInputStream();
             
     Language language
       = Language.getInstanceFromFilenameExtension(path);
@@ -150,13 +144,13 @@ public class KawaPageServlet extends KawaServlet
         return null;
       }
 
-    InPort port = new InPort(resourceStream, minfo.getSourceAbsPath());
+    InPort port = new InPort(resourceStream, absPath);
     Language.setDefaultLanguage(language);
     SourceMessages messages = new SourceMessages();
     Compilation comp;
     try
       {
-        comp = language.parse(port, messages, Language.PARSE_IMMEDIATE);
+        comp = language.parse(port, messages, minfo);
         /*
         int dot = path.indexOf('.');
         if (dot < 0)
@@ -179,8 +173,6 @@ public class KawaPageServlet extends KawaServlet
       {
         ModuleExp mexp = comp.getModule();
         comp.addMainClass(mexp);
-        comp.walkModule(mexp);
-        comp.setState(Compilation.WALKED);
         cl = ModuleExp.evalToClass(comp, url);
       }
 

@@ -206,10 +206,8 @@ public class require extends Syntax
                      ScopeExp defs, Compilation tr)
   {
     ModuleManager manager = ModuleManager.getInstance();
-    String sourceName = info.sourcePath;
     long now;
     if ((info.getState() & 1) == 0
-        && sourceName != null
         && ! info.checkCurrent(manager, (now = System.currentTimeMillis())))
       {
         SourceMessages messages = tr.getMessages();

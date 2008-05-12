@@ -1,5 +1,7 @@
 2008-05-11  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java (checkCurrent): Return true if no source path.
+
 	* ModuleInfo.java (checkCurrent):  Fix/rewrite for indirectly
 	imported modules, when we may checkCurrent multiple times.
 	* Compilation.java (cleanupAfterCompilation): Clear module's body,

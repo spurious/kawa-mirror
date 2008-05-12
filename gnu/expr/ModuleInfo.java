@@ -360,6 +360,8 @@ public class ModuleInfo
    */
   public boolean checkCurrent (ModuleManager manager, long now)
   {
+    if (sourceAbsPath == null)
+      return true;
     boolean hasClass = moduleClass != null;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
       return hasClass || comp != null;

@@ -1,5 +1,8 @@
 2008-05-11  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (importDefinitions): Don't need to check
+	for non-null sourceName - that is now handled by checkCurrent.
+
 	* standard/require.java (importDefinitions): If private, continue
 	earlier - before checking to see if we need an instance handle.
 

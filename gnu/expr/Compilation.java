@@ -133,6 +133,14 @@ public class Compilation implements SourceLocator
     return currentOptions.getBoolean(key);
   }
 
+  public static int defaultClassFileVersion =
+    /* #ifdef JAVA5 */
+    ClassType.JDK_1_5_VERSION
+    /* #slse */
+    // ClassType.JDK_1_1_VERSION
+    /* #endif */
+    ;
+
   /** The default calling convention.
    * One of the following CALL_WITHG_xxx values. */
   public static int defaultCallConvention;
@@ -1064,9 +1072,7 @@ public class Compilation implements SourceLocator
 	new_class.setSourceFile(mainLambda.filename);
       }
     registerClass(new_class);
-    /* #ifdef JAVA5 */
-    new_class.setClassfileVersionJava5();
-    /* #endif */
+    new_class.setClassfileVersion(defaultClassFileVersion);
   }
 
   public void addMainClass (ModuleExp module)
@@ -2711,7 +2717,7 @@ public class Compilation implements SourceLocator
         code.emitGetStatic(moduleInstanceMainField);
         code.emitInvokeVirtual(Type.pointer_type.getDeclaredMethod("getClass", 0));
       }
-    else if (curClass.getClassfileMajorVersion() >= 49) // Java5 feature
+    else if (curClass.getClassfileVersion() >= ClassType.JDK_1_5_VERSION)
       code.emitPushClass(clas);
     else
       {

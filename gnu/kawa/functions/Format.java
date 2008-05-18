@@ -69,10 +69,18 @@ public class Format extends ProcedureN
 
   public Object applyN (Object[] args)
   {
-    return format$V(args);
+    /* #ifdef JAVA5 */
+    return format(args);
+    /* #else */
+    // return format$V(args);
+    /* #endif */
   }
 
-  public static Object format$V (Object[] args)
+  /* #ifdef JAVA5 */
+  public static Object format (Object... args)
+  /* #else */
+  // public static Object format$V (Object[] args)
+  /* #endif */
   {
     Object port_arg = args[0];
     if (port_arg == Boolean.TRUE)

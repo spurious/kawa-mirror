@@ -979,11 +979,19 @@ public class LambdaExp extends ScopeExp
 	  atypes[atypes.length-1] = Compilation.typeCallContext;
 	if (plainArgs < numArgs)
 	  {
-	    nameBuf.append("$V");
-	    name = nameBuf.toString();
 	    Type lastType = var.getType();
 	    String lastTypeName = lastType.getName();
+            if (ctype.getClassfileVersion() >= ClassType.JDK_1_5_VERSION
+                && "java.lang.Object[]".equals(lastTypeName))
+              mflags |= Access.VARARGS;
+            else 
+              nameBuf.append("$V");
 	    if (key_args > 0 || numStubs < opt_args
+                // We'd like to support the the #!rest parameter an arbitrary
+                // array type or implementation of java.util.List.  However,
+                // we currently only support gnu.lists.LList and Object[].
+                // For Object[] we prefer to use the Java5 VARARGS feature;
+                // for gnu.lists.LList we use the old $V mechanism.
 		|| ! ("gnu.lists.LList".equals(lastTypeName)
 		      || "java.lang.Object[]".equals(lastTypeName)))
 	      {

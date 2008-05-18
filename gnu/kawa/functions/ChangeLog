@@ -1,3 +1,8 @@
+2008-05-18  Per Bothner  <per@bothner.com>
+
+	* Format.java (format$V): If JAVA5, rename to format, with VARARGS.
+	* Values.java (values$V): If JAVA5, rename to values, with VARARGS.
+
 2008-03-23  Per Bothner  <per@bothner.com>
 
 	* Format.java (format$V): Call closeThis rather than close on

@@ -8,8 +8,16 @@ import java.util.Vector;
 public class ClassType extends ObjectType 
   implements AttrContainer, Externalizable, Member
 {
+  public static final int JDK_1_1_VERSION = 45 * 0x10000 + 3;
+  public static final int JDK_1_2_VERSION = 46 * 0x10000 + 0;
+  public static final int JDK_1_3_VERSION = 47 * 0x10000 + 0;
+  public static final int JDK_1_4_VERSION = 48 * 0x10000 + 0;
+  public static final int JDK_1_5_VERSION = 49 * 0x10000 + 0;
+  public static final int JDK_1_6_VERSION = 50 * 0x10000 + 0;
+  public static final int JDK_1_7_VERSION = 51 * 0x10000 + 0;
+
   // An old but generally valid default value.
-  int classfileFormatVersion = 45 * 0x10000 + 3;
+  int classfileFormatVersion = JDK_1_1_VERSION;
 
   public short getClassfileMajorVersion ()
   {
@@ -23,9 +31,17 @@ public class ClassType extends ObjectType
   {
     classfileFormatVersion = (major & 0xFFFF) * 0x10000 + (minor * 0xFFFF);
   }
+  public void setClassfileVersion (int code)
+  {
+    classfileFormatVersion = code;
+  }
+  public int getClassfileVersion ()
+  {
+    return classfileFormatVersion;
+  }
   public void setClassfileVersionJava5 ()
   {
-    setClassfileVersion(49, 0);
+    setClassfileVersion(JDK_1_5_VERSION);
   }
 
   /** Find a ClassType with the given name, or create a new one.

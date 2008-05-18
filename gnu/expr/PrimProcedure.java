@@ -43,6 +43,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     if (method != null)
       {
+        if ((method.getModifiers() & Access.VARARGS) != 0)
+          return true;
 	String name = method.getName();
 	return name.endsWith("$V") || name.endsWith("$V$X");
       }

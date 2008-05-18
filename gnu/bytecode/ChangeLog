@@ -1,3 +1,11 @@
+2008-05-18  Per Bothner  <per@bothner.com>
+
+	* ClassType.java: Add constants and methods to tweak class file
+	version numbers more cleanly.
+	(setClassFileVersion(int), getClassfileVersion): New methods.
+	(JDK_1_1_VERSION, JDK_1_2_VERSION, JDK_1_3_VERSION, JDK_1_4_VERSION,
+	JDK_1_5_VERSION, JDK_1_6_VERSION, JDK_1_7_VERSION): New constants.
+
 2008-05-10  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (isExisting): Generalize for ArrayType and classes

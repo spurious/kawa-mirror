@@ -1,3 +1,13 @@
+2008-05-18  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (takesVarArgs): Also true if VARARGS flag set.
+	* LambdaExp.java (addMethodFor): If #!rest type is Object[] and we're
+	generate a JDK_1_5 or newer classfile, set VARARGS flag instead of
+	appending "$V" to method name.
+
+	* Compilation.java (defaultClassFileVersion): New constant.
+	(addClass): Use defaultClassFileVersion.
+
 2008-05-11  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (checkCurrent): Return true if no source path.

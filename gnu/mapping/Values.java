@@ -33,7 +33,11 @@ public class Values extends TreeList implements Printable, Externalizable
     return isEmpty() ? noArgs : toArray();
   }
 
-  public static Object values$V(Object[] vals)
+  /* #ifdef JAVA5 */
+  public static Object values(Object... vals)
+  /* #else */
+  // public static Object values$V(Object[] vals)
+  /* #endif */
   {
     return make(vals);
   }

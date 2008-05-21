@@ -122,7 +122,7 @@ public abstract class Language
   public static Language detect (String line)
   {
     String str = line.trim();
-    // Does the line contain the string "kawa:LANGAUGE" for a valid LANGUAGE?
+    // Does the line contain the string "kawa:LANGUAGE" for a valid LANGUAGE?
     int k = str.indexOf("kawa:");
     if (k >= 0)
       {

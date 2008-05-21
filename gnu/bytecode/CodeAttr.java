@@ -304,7 +304,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       stack_types = new_array;
     }
     if (type.size == 8)
-      stack_types[SP++] = Type.void_type;
+      stack_types[SP++] = Type.voidType;
     stack_types[SP++] = type;
     if (SP > max_stack)
       max_stack = SP;
@@ -639,7 +639,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitPushConstant(getConstants().addInt(i));
       }
-    pushType(Type.int_type);
+    pushType(Type.intType);
   }
 
   public void emitPushLong (long i)
@@ -660,7 +660,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitPushConstant(getConstants().addLong(i));
       }
-    pushType(Type.long_type);
+    pushType(Type.longType);
   }
 
   public void emitPushFloat (float x)
@@ -692,7 +692,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitPushConstant(getConstants().addFloat(x));
       }
-    pushType(Type.float_type);
+    pushType(Type.floatType);
   }
 
   public void emitPushDouble (double x)
@@ -724,7 +724,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitPushConstant(getConstants().addDouble(x));
       }
-    pushType(Type.double_type);
+    pushType(Type.doubleType);
   }
 
   /** Calculate how many CONSTANT_String constants we need for a string.
@@ -788,7 +788,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		emitNew(sbufType);
 		emitDup(sbufType);
 		emitPushInt(length);
-		Type[] args1 = { Type.int_type };
+		Type[] args1 = { Type.intType  };
 		emitInvokeSpecial(sbufType.getDeclaredMethod("<init>", args1));
 		Type[] args2 = { Type.string_type };
 		Method appendMethod
@@ -932,7 +932,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     
     reserve(1);
     put1(190);  // arraylength
-    pushType(Type.int_type);
+    pushType(Type.intType);
   }
 
   /* Returns an integer in the range 0 (for 'int') through 4 (for object
@@ -1015,7 +1015,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public void emitNewArray (Type element_type, int dims)
   {
-    if (popType ().promote () != Type.int_type)
+    if (popType ().promote () != Type.intType)
       throw new Error ("non-int dim. spec. in emitNewArray");
 
     if (element_type instanceof PrimType)
@@ -1050,7 +1050,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	throw new Error ("dims out of range in emitNewArray");
       put1(dims);
       while (-- dims > 0) // first dim already popped
-	if (popType ().promote () != Type.int_type)
+	if (popType ().promote () != Type.intType)
 	  throw new Error ("non-int dim. spec. in emitNewArray");
     }
     else
@@ -1124,10 +1124,10 @@ public class CodeAttr extends Attribute implements AttrContainer
     Type type1_raw = popType();
     Type type1 = type1_raw.promote();
 
-    if (type1 != Type.int_type && type1 != Type.long_type)
+    if (type1 != Type.intType && type1 != Type.longType)
       throw new Error ("the value shifted must be an int or a long");
 
-    if (type2 != Type.int_type)
+    if (type2 != Type.intType)
       throw new Error ("the amount of shift must be an int");
 
     emitTypedOp(base_code, type1);
@@ -1217,7 +1217,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
     reserve(6);
-    if (type != Type.int_type)
+    if (type != Type.intType)
       throw new Error("attempting to increment non-int variable");
 
     boolean wide = offset > 255 || inc > 255 || inc < -256;
@@ -1473,7 +1473,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitIfCompare1 (int opcode)
   {
     IfState new_if = new IfState(this);
-    if (popType().promote() != Type.int_type)
+    if (popType().promote() != Type.intType)
       throw new Error ("non-int type to emitIfCompare1");
     reserve(3);
     emitTransfer (new_if.end_label, opcode);
@@ -1708,7 +1708,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  from_sig0 = 'I';
 	if (to.size < 4)
 	  {
-	    emitConvert(from, Type.int_type);
+	    emitConvert(from, Type.intType);
 	    from_sig0 = 'I';
 	  }
 	if (from_sig0 == to_sig0)
@@ -1805,7 +1805,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitInstanceof (Type type)
   {
     emitCheckcast(type, 193);
-    pushType(Type.boolean_type);
+    pushType(Type.booleanType);
   }
 
   public final void emitThrow ()

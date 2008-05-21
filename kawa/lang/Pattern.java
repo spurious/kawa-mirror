@@ -34,7 +34,7 @@ abstract public class Pattern implements Printable
 
   static public ClassType typePattern = ClassType.make("kawa.lang.Pattern");
   private static Type[] matchArgs =
-  { Type.pointer_type, Compilation.objArrayType, Type.int_type };
+  { Type.pointer_type, Compilation.objArrayType, Type.intType  };
   static public final Method matchPatternMethod
-  = typePattern.addMethod("match", matchArgs, Type.boolean_type, Access.PUBLIC);
+  = typePattern.addMethod("match", matchArgs, Type.booleanType, Access.PUBLIC);
 }

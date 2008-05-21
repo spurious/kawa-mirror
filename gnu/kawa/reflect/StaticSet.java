@@ -69,6 +69,6 @@ public class StaticSet extends Procedure1 implements Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return Type.void_type;
+    return Type.voidType;
   }
 }

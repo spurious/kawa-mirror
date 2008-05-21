@@ -22,7 +22,7 @@ public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.getArgs()[0].compile(comp, Type.int_type);
+    exp.getArgs()[0].compile(comp, Type.intType);
     CodeAttr code = comp.getCode();
     code.emitNewArray(element_type.getImplementationType());
     target.compileFromStack(comp, ArrayType.make(element_type));

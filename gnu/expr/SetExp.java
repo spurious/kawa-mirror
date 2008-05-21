@@ -320,7 +320,7 @@ public class SetExp extends AccessExp
 
   public final gnu.bytecode.Type getType()
   {
-    return ! getHasValue() ? Type.void_type
+    return ! getHasValue() ? Type.voidType
       : binding == null ? Type.pointer_type : binding.getType();
   }
 

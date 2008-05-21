@@ -21,7 +21,7 @@ public class QuoteExp extends Expression
     if (type != null)
       return type;
     if (value == Values.empty)
-      return Type.void_type;
+      return Type.voidType;
     else if (value == null)
       return Type.nullType;
     else if (this == undefined_exp)
@@ -35,7 +35,7 @@ public class QuoteExp extends Expression
   static public QuoteExp abstractExp =
     new QuoteExp(Special.abstractSpecial);
   static public QuoteExp voidExp =
-    new QuoteExp (Values.empty, Type.void_type);
+    new QuoteExp (Values.empty, Type.voidType);
   static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
   static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
   static public QuoteExp nullExp =

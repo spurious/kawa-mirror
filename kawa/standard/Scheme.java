@@ -891,7 +891,7 @@ public class Scheme extends LispLanguage
     if (types == null)
       {
 	booleanType
-	  = new LangPrimType(Type.boolean_type, Scheme.getInstance());
+	  = new LangPrimType(Type.booleanType, Scheme.getInstance());
 	types = new Hashtable ();
 	types.put ("void", LangPrimType.voidType);
 	types.put ("int", LangPrimType.intType);

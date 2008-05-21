@@ -950,7 +950,7 @@ public class LambdaExp extends ScopeExp
     Type rtype
       = (getFlag(SEQUENCE_RESULT)
 	 || getCallConvention () >= Compilation.CALL_WITH_CONSUMER)
-      ? Type.void_type
+      ? Type.voidType
       : getReturnType().getImplementationType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
 
@@ -1411,7 +1411,7 @@ public class LambdaExp extends ScopeExp
 		      {
 			Type[] argts = new Type[4];
 			argts[0] = Compilation.objArrayType;
-			argts[1] = Type.int_type;
+			argts[1] = Type.intType;
 			argts[2] = Type.pointer_type;
 			argts[3] = Type.pointer_type;
 			searchForKeywordMethod4
@@ -1428,7 +1428,7 @@ public class LambdaExp extends ScopeExp
 		      {
 			Type[] argts = new Type[3];
 			argts[0] = Compilation.objArrayType;
-			argts[1] = Type.int_type;
+			argts[1] = Type.intType;
 			argts[2] = Type.pointer_type;
 			searchForKeywordMethod3
 			  = Compilation.scmKeywordType.addMethod
@@ -1865,7 +1865,7 @@ public class LambdaExp extends ScopeExp
     this.returnType = returnType;
     if (returnType != null
         && returnType != Type.pointer_type
-        && returnType != Type.void_type
+        && returnType != Type.voidType
         && body != QuoteExp.abstractExp)
       {
         Expression value = body;

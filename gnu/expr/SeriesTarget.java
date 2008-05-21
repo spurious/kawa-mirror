@@ -64,9 +64,9 @@ public class SeriesTarget extends Target
 	 index = value;
        }
     */
-    Variable indexVar = code.addLocal(Type.int_type);
+    Variable indexVar = code.addLocal(Type.intType);
     Variable valuesVar = code.addLocal(Type.pointer_type);
-    Variable nextVar = code.addLocal(Type.int_type); 
+    Variable nextVar = code.addLocal(Type.intType); 
     Label doneLabel = done;
     boolean doneGiven;
     if (doneLabel == null)
@@ -89,7 +89,7 @@ public class SeriesTarget extends Target
     code.emitLoad(valuesVar);
     code.emitLoad(indexVar);
     code.emitInvokeStatic(Compilation.typeValues.getDeclaredMethod("nextIndex", 2));
-    code.emitDup(Type.int_type);
+    code.emitDup(Type.intType);
     code.emitStore(nextVar);
     code.emitGotoIfIntLtZero(doneLabel);
     code.emitLoad(valuesVar);

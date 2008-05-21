@@ -209,7 +209,7 @@ public class ELisp extends Lisp2
 	if (name.equals("boolean"))
 	  {
 	    if (booleanType == null)
-	      booleanType = new LangPrimType(Type.boolean_type, this);
+	      booleanType = new LangPrimType(Type.booleanType, this);
 	    return booleanType;
 	  }
 	return Scheme.getNamedType(name);

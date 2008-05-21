@@ -1,3 +1,11 @@
+2008-05-21  Per Bothner  <per@bothner.com>
+
+	* Type.java (byte_type, short_type, int_type, long_type, float_type,
+	double_type, boolean_type, char_type, void_type): Renamed to
+	respectively, with also names as deprecated aliases:
+	(byteType, shortType, intType, longType, floatType, doubleType,
+	booleanType, charType, voidType): New names.
+
 2008-05-18  Per Bothner  <per@bothner.com>
 
 	* ClassType.java: Add constants and methods to tweak class file

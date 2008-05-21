@@ -4,7 +4,7 @@ import gnu.bytecode.Type;
 
 public class IgnoreTarget extends Target
 {
-  public Type getType() { return Type.void_type; }
+  public Type getType() { return Type.voidType; }
 
   public void compileFromStack(Compilation comp, Type stackType)
   {

@@ -209,7 +209,7 @@ public class ApplyExp extends Expression
                   func_lambda.getOwningLambda().loadHeapFrame(comp);
 	      }
 
-	    pproc.compile(extraArg ? Type.void_type : null,
+	    pproc.compile(extraArg ? Type.voidType : null,
 			  exp, comp, target);
 	    return;
 	  }

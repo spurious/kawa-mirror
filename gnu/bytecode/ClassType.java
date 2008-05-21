@@ -674,7 +674,7 @@ public class ClassType extends ObjectType
     Type[] args = new Type[j];
     while (--j >= 0)
       args[j] = Type.make(paramTypes[j]);
-    return addMethod("<init>", modifiers, args, Type.void_type);
+    return addMethod("<init>", modifiers, args, Type.voidType);
   }
 
   public Method addMethod (String name,  String signature, int flags)

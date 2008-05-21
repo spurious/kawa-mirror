@@ -130,42 +130,42 @@ public class LitTable implements ObjectOutput
 
   public void writeBoolean(boolean v)
   {
-    push(new Boolean(v), Type.boolean_type);
+    push(new Boolean(v), Type.booleanType);
   }
 
   public void writeChar(int v)
   {
-    push(new Character((char) v), Type.char_type);
+    push(new Character((char) v), Type.charType);
   }
 
   public void writeByte(int v)
   {
-    push(new Byte((byte) v), Type.byte_type);
+    push(new Byte((byte) v), Type.byteType);
   }
 
   public void writeShort(int v)
   {
-    push(new Short((short) v), Type.short_type);
+    push(new Short((short) v), Type.shortType);
   }
 
   public void writeInt(int v)
   {
-    push(new Integer(v), Type.int_type);
+    push(new Integer(v), Type.intType);
   }
 
   public void writeLong(long v)
   {
-    push(new Long(v), Type.long_type);
+    push(new Long(v), Type.longType);
   }
 
   public void writeFloat(float v)
   {
-    push(new Float(v), Type.float_type);
+    push(new Float(v), Type.floatType);
   }
 
   public void writeDouble(double v)
   {
-    push(new Double(v), Type.double_type);
+    push(new Double(v), Type.doubleType);
   }
 
   public void writeUTF(String v) 
@@ -241,19 +241,19 @@ public class LitTable implements ObjectOutput
             /* #endif */
           }
 	else if (obj instanceof Integer)
-	  push(obj, Type.int_type);
+	  push(obj, Type.intType);
 	else if (obj instanceof Short)
-	  push(obj, Type.short_type);
+	  push(obj, Type.shortType);
 	else if (obj instanceof Byte)
-	  push(obj, Type.byte_type);
+	  push(obj, Type.byteType);
 	else if (obj instanceof Long)
-	  push(obj, Type.long_type);
+	  push(obj, Type.longType);
 	else if (obj instanceof Double)
-	  push(obj, Type.double_type);
+	  push(obj, Type.doubleType);
 	else if (obj instanceof Float)
-	  push(obj, Type.float_type);
+	  push(obj, Type.floatType);
 	else if (obj instanceof Character)
-	  push(obj, Type.char_type);
+	  push(obj, Type.charType);
         else if (obj instanceof Class)
           push(obj, Type.java_lang_Class_type);
 	else
@@ -413,7 +413,7 @@ public class LitTable implements ObjectOutput
 	    if (aType.isSubtype(pType))
 	      ; // OK so far
 	    else if (pType instanceof ArrayType && iparam < 64
-		     && (aType == Type.int_type || aType == Type.short_type))
+		     && (aType == Type.intType || aType == Type.shortType))
 	      {
 		int count = ((Number) literal.argValues[iarg]).intValue();
 		if (count < 0 && type.getName().equals("gnu.math.IntNum"))

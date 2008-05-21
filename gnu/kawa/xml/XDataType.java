@@ -128,7 +128,7 @@ public class XDataType extends Type implements TypeValue
                   HEX_BINARY_TYPE_CODE);
 
   public static final XDataType booleanType =
-    new XDataType("boolean", Type.boolean_type,
+    new XDataType("boolean", Type.booleanType,
                   BOOLEAN_TYPE_CODE);
 
   public static final XDataType anyURIType =
@@ -207,7 +207,7 @@ public class XDataType extends Type implements TypeValue
           {
             // Error if incoming is null.
             code.emitLoad(incoming);
-            Type.boolean_type.emitCoerceFromObject(code);
+            Type.booleanType.emitCoerceFromObject(code);
             decl.compileStore(comp);
           }
         return;

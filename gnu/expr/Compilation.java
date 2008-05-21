@@ -237,7 +237,7 @@ public class Compilation implements SourceLocator
     = typeProcedure.getDeclaredMethod("setName", 1);
   static Method makeListMethod;
   
-  public static final Type[] int1Args = { Type.int_type };
+  public static final Type[] int1Args = { Type.intType  };
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
 
@@ -252,7 +252,7 @@ public class Compilation implements SourceLocator
   }
 
   static {
-    Type[] makeListArgs = { objArrayType, Type.int_type };
+    Type[] makeListArgs = { objArrayType, Type.intType  };
     makeListMethod = scmListType.addMethod ("makeList",
 					     makeListArgs, scmListType,
 					     Access.PUBLIC|Access.STATIC);
@@ -294,9 +294,9 @@ public class Compilation implements SourceLocator
 						typeObject, Access.PUBLIC);
     Type[] args = new Type[2];
     args[0] = typeProcedure;
-    args[1] = Type.int_type;
+    args[1] = Type.intType;
     checkArgCountMethod
-      = typeProcedure.addMethod("checkArgCount", args, Type.void_type,
+      = typeProcedure.addMethod("checkArgCount", args, Type.voidType,
 				   Access.PUBLIC|Access.STATIC);
   }
 
@@ -347,7 +347,7 @@ public class Compilation implements SourceLocator
     = typeCallContext.getDeclaredField("proc");
   private static Type[] applyCpsArgs = { typeCallContext};
   public static Method applyCpsMethod
-    = typeProcedure.addMethod("apply", applyCpsArgs, Type.void_type,
+    = typeProcedure.addMethod("apply", applyCpsArgs, Type.voidType,
 				 Access.PUBLIC);
 
   public static ClassType[] typeProcedureArray = {
@@ -1122,7 +1122,7 @@ public class Compilation implements SourceLocator
       }
     else
       args = apply0args;
-    return clas.addMethod("<init>", Access.PUBLIC, args, Type.void_type);
+    return clas.addMethod("<init>", Access.PUBLIC, args, Type.voidType);
   }
 
   public final void generateConstructor (LambdaExp lexp)
@@ -1313,7 +1313,7 @@ public class Compilation implements SourceLocator
 		    matchArgs[2] = typeCallContext;
 		  }
 		matchArgs[0] = procType;
-		method = curClass.addMethod (mname, matchArgs, Type.int_type,
+		method = curClass.addMethod (mname, matchArgs, Type.intType,
 					     Access.PUBLIC);
 		code = method.startCode();
 
@@ -1433,7 +1433,7 @@ public class Compilation implements SourceLocator
 
     // First LambdaExp we seen suitable for this i.
     method = curClass.addMethod ("apply", applyArgs,
-				 (Type) Type.void_type,
+				 (Type) Type.voidType,
 				 Access.PUBLIC);
     code = method.startCode();
     Variable ctxVar = code.getArg(1);
@@ -1473,13 +1473,13 @@ public class Compilation implements SourceLocator
 
 	    if (i > 4 && numMethods > 1) // FIXME
 	      {
-		counter = code.addLocal(Type.int_type);
+		counter = code.addLocal(Type.intType);
 		code.emitLoad(ctxVar);
 		code.emitGetField(typeCallContext.getDeclaredField("count"));
 		if (source.min_args != 0)
 		  {
 		    code.emitPushInt(source.min_args);
-		    code.emitSub(Type.int_type);
+		    code.emitSub(Type.intType);
 		  }
 		code.emitStore(counter);
 	      }
@@ -1652,7 +1652,7 @@ public class Compilation implements SourceLocator
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.void_type : (Type) Type.pointer_type,
+					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.voidType : (Type) Type.pointer_type,
 					     Access.PUBLIC);
 		code = method.startCode();
 
@@ -1678,13 +1678,13 @@ public class Compilation implements SourceLocator
 
 	    if (i > 4 && numMethods > 1)
 	      {
-		counter = code.addLocal(Type.int_type);
+		counter = code.addLocal(Type.intType);
 		code.emitLoad(code.getArg(2));
 		code.emitArrayLength();
 		if (source.min_args != 0)
 		  {
 		    code.emitPushInt(source.min_args);
-		    code.emitSub(Type.int_type);
+		    code.emitSub(Type.intType);
 		  }
 		code.emitStore(counter);
 	      }
@@ -1752,13 +1752,13 @@ public class Compilation implements SourceLocator
 			code.pushScope();
 			if (counter == null)
 			  {
-			    counter = code.addLocal(Type.int_type);
+			    counter = code.addLocal(Type.intType);
 			    code.emitLoad(code.getArg(2));
 			    code.emitArrayLength();
 			    if (singleArgs != 0)
 			      {
 				code.emitPushInt(singleArgs);
-				code.emitSub(Type.int_type);
+				code.emitSub(Type.intType);
 			      }
 			    code.emitStore(counter);
 			  }
@@ -1776,7 +1776,7 @@ public class Compilation implements SourceLocator
 			if (singleArgs != 0)
 			  {
 			    code.emitPushInt(singleArgs);
-			    code.emitAdd(Type.int_type);
+			    code.emitAdd(Type.intType);
 			  }
 			code.emitArrayLoad(Type.pointer_type);
 			if (mustConvert)
@@ -1841,7 +1841,7 @@ public class Compilation implements SourceLocator
 
   private Method startClassInit ()
   {
-    method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
+    method = curClass.addMethod ("<clinit>", apply0args, Type.voidType,
 				 Access.PUBLIC|Access.STATIC);
 
     CodeAttr code = method.startCode();
@@ -1989,7 +1989,7 @@ public class Compilation implements SourceLocator
     boolean staticModule = module.isStatic();
     Method apply_method;
     
-    apply_method = curClass.addMethod ("run", arg_types, Type.void_type,
+    apply_method = curClass.addMethod ("run", arg_types, Type.voidType,
 				       Access.PUBLIC+Access.FINAL);
     method = apply_method;
     // For each parameter, assign it to its proper slot.
@@ -2079,7 +2079,7 @@ public class Compilation implements SourceLocator
 	  {
 	    // Compare the run methods in ModuleBody.
 	    method = curClass.addMethod("run", Access.PUBLIC,
-					Type.typeArray0, Type.void_type);
+					Type.typeArray0, Type.voidType);
 	    code = method.startCode();
 	    Variable ctxVar = code.addLocal(typeCallContext);
 	    Variable saveVar = code.addLocal(typeConsumer);
@@ -2098,7 +2098,7 @@ public class Compilation implements SourceLocator
 			       .getDeclaredField("instance"));
 	    code.emitPutField(consumerFld);
 	    // try {
-	    code.emitTryStart(false, Type.void_type);
+	    code.emitTryStart(false, Type.voidType);
 	    // this.apply(ctx):
 	    code.emitPushThis();
 	    code.emitLoad(ctxVar);
@@ -2174,7 +2174,7 @@ public class Compilation implements SourceLocator
       {
 	Type[] args = { new ArrayType(javaStringType) };
 	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,
-				    args, Type.void_type);
+				    args, Type.voidType);
 				    
 	code = method.startCode();
 
@@ -2233,10 +2233,10 @@ public class Compilation implements SourceLocator
         registerClass(mapClass);
 
         method = mapClass.addMethod("<init>", Access.PUBLIC,
-                                apply0args, Type.void_type);
+                                apply0args, Type.voidType);
         Method superConstructor
           = typeModuleSet.addMethod("<init>", Access.PUBLIC,
-                                    apply0args, Type.void_type);
+                                    apply0args, Type.voidType);
         code = method.startCode();
         code.emitPushThis();
         code.emitInvokeSpecial(superConstructor);
@@ -2244,7 +2244,7 @@ public class Compilation implements SourceLocator
 
         ClassType typeModuleManager = ClassType.make("gnu.expr.ModuleManager");
         Type[] margs = { typeModuleManager };
-        method = mapClass.addMethod("register", margs, Type.void_type,
+        method = mapClass.addMethod("register", margs, Type.voidType,
                                     Access.PUBLIC);
         code = method.startCode();
         Method reg = typeModuleManager.getDeclaredMethod("register", 3);

@@ -39,7 +39,7 @@ public class SaveExcursion extends Syntax
       {
 	Expression[] inits2 = new Expression[1];
 	let2 = new LetExp(inits2);
-	savedPointMark = let2.addDeclaration(null, Type.long_type);
+	savedPointMark = let2.addDeclaration(null, Type.longType);
 	Expression[] args = new Expression[1];
 	args[0] = new ReferenceExp(savedBuffer);
 	inits2[0] = Invoke.makeInvokeStatic(typeSaveExcursion,

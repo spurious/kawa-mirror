@@ -71,19 +71,19 @@ public class CheckedTarget extends StackTarget
         Type[] args = new Type[4];
         args[0] = typeClassCastException;
         args[1] = Compilation.javaStringType;
-        args[2] = Type.int_type;
+        args[2] = Type.intType;
 	args[3] = Type.pointer_type;
         initWrongTypeStringMethod
           = typeWrongType.addMethod("<init>", Access.PUBLIC,
-                                    args, Type.void_type);
+                                    args, Type.voidType);
         args = new Type[4];
         args[0] = typeClassCastException;
         args[1] = Compilation.typeProcedure;
-        args[2] = Type.int_type;
+        args[2] = Type.intType;
 	args[3] = Type.pointer_type;
         initWrongTypeProcMethod
           = typeWrongType.addMethod("<init>", Access.PUBLIC,
-                                    args, Type.void_type);
+                                    args, Type.voidType);
       }
   }
 

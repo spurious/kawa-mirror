@@ -143,7 +143,7 @@ public class SwitchState
 	code.emitPushString("bad case value!");
 	Type[] args = { Type.string_type };
 	Method con = ex.addMethod("<init>", Access.PUBLIC,
-				  args, Type.void_type);
+				  args, Type.voidType);
 	code.emitInvokeSpecial(con);
 	code.emitThrow();
       }
@@ -151,7 +151,7 @@ public class SwitchState
     code.fixupChain(switch_label, after_label);
     if (numCases <= 1)
       {
-	code.pushType(Type.int_type);
+	code.pushType(Type.intType);
 	if (numCases == 1)
 	  {
 	    code.emitPushInt(minValue);

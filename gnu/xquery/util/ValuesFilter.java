@@ -155,7 +155,7 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
     Expression pred = lexp2.body;
     if (kind == 'R')
       {
-        Declaration posIncoming = new Declaration(null, Type.int_type);
+        Declaration posIncoming = new Declaration(null, Type.intType);
 	Expression init
 	  = new ApplyExp(AddOp.$Mn,
 			 new Expression[] {

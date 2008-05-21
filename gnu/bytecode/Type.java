@@ -171,7 +171,7 @@ public abstract class Type
   }
 
   public Type promote () {
-    return size < 4 ? int_type : this;
+    return size < 4 ? intType : this;
   }
 
   public final int getSize() { return size; }
@@ -185,15 +185,15 @@ public abstract class Type
   {
     switch(sig)
       {
-      case 'B':  return Type.byte_type;
-      case 'C':  return Type.char_type;
-      case 'D':  return Type.double_type;
-      case 'F':  return Type.float_type;
-      case 'S':  return Type.short_type;
-      case 'I':  return Type.int_type;
-      case 'J':  return Type.long_type;
-      case 'Z':  return Type.boolean_type;
-      case 'V':  return Type.void_type;
+      case 'B':  return Type.byteType;
+      case 'C':  return Type.charType;
+      case 'D':  return Type.doubleType;
+      case 'F':  return Type.floatType;
+      case 'S':  return Type.shortType;
+      case 'I':  return Type.intType;
+      case 'J':  return Type.longType;
+      case 'Z':  return Type.booleanType;
+      case 'V':  return Type.voidType;
       }
     return null;
   }
@@ -472,24 +472,34 @@ public abstract class Type
     throw new Error ("unimplemented emitCoerceFromObject for "+this);
   }
 
-  public static final PrimType byte_type
+  public static final PrimType byteType
     = new PrimType ("byte", "B", 1, java.lang.Byte.TYPE);
-  public static final PrimType short_type
+  public static final PrimType shortType
     = new PrimType ("short", "S", 2, java.lang.Short.TYPE);
-  public static final PrimType int_type
+  public static final PrimType intType
     = new PrimType ("int", "I", 4, java.lang.Integer.TYPE);
-  public static final PrimType long_type
+  public static final PrimType longType
     = new PrimType ("long", "J", 8, java.lang.Long.TYPE);
-  public static final PrimType float_type
+  public static final PrimType floatType
     = new PrimType ("float", "F", 4, java.lang.Float.TYPE);
-  public static final PrimType double_type
+  public static final PrimType doubleType
     = new PrimType ("double", "D", 8, java.lang.Double.TYPE);
-  public static final PrimType boolean_type
+  public static final PrimType booleanType
     = new PrimType ("boolean", "Z", 1, java.lang.Boolean.TYPE);
-  public static final PrimType char_type
+  public static final PrimType charType
     = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
-  public static final PrimType void_type
+  public static final PrimType voidType
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
+
+  /* @deprecated */  public static final PrimType byte_type = byteType;
+  /* @deprecated */  public static final PrimType short_type = shortType;
+  /* @deprecated */  public static final PrimType int_type = intType;
+  /* @deprecated */  public static final PrimType long_type = longType;
+  /* @deprecated */  public static final PrimType float_type = floatType;
+  /* @deprecated */  public static final PrimType double_type = doubleType;
+  /* @deprecated */  public static final PrimType boolean_type = booleanType;
+  /* @deprecated */  public static final PrimType char_type = charType;
+  /* @deprecated */  public static final PrimType void_type = voidType;
 
   static
   {
@@ -498,19 +508,19 @@ public abstract class Type
     /* #else */
     // mapNameToType = new java.util.Hashtable();
     /* #endif */
-	mapNameToType.put("byte",    byte_type);
-	mapNameToType.put("short",   short_type);
-	mapNameToType.put("int",     int_type);
-	mapNameToType.put("long",    long_type);
-	mapNameToType.put("float",   float_type);
-	mapNameToType.put("double",  double_type);
-	mapNameToType.put("boolean", boolean_type);
-	mapNameToType.put("char",    char_type);
-	mapNameToType.put("void",    void_type);
+	mapNameToType.put("byte",    byteType);
+	mapNameToType.put("short",   shortType);
+	mapNameToType.put("int",     intType);
+	mapNameToType.put("long",    longType);
+	mapNameToType.put("float",   floatType);
+	mapNameToType.put("double",  doubleType);
+	mapNameToType.put("boolean", booleanType);
+	mapNameToType.put("char",    charType);
+	mapNameToType.put("void",    voidType);
   }
 
   /** The "return type" of an expression that never returns, such as a throw. */
-  public static final PrimType neverReturnsType = new PrimType (void_type);
+  public static final PrimType neverReturnsType = new PrimType (voidType);
   static { neverReturnsType.this_name = "(never-returns)"; }
 
   /** The magic type of null. */
@@ -536,19 +546,19 @@ public abstract class Type
     = Method.makeCloneMethod(pointer_type);
   public static final Method intValue_method
     = number_type.addMethod("intValue", typeArray0,
-			    int_type, Access.PUBLIC);
+			    intType, Access.PUBLIC);
   public static final Method longValue_method
     = number_type.addMethod("longValue", typeArray0,
-			    long_type, Access.PUBLIC);
+			    longType, Access.PUBLIC);
   public static final Method floatValue_method
     = number_type.addMethod("floatValue", typeArray0,
-			    float_type, Access.PUBLIC);
+			    floatType, Access.PUBLIC);
   public static final Method doubleValue_method
     = number_type.addMethod("doubleValue", typeArray0,
-			    double_type, Access.PUBLIC);
+			    doubleType, Access.PUBLIC);
   public static final Method booleanValue_method
     = boolean_ctype.addMethod("booleanValue", typeArray0,
-			      boolean_type, Access.PUBLIC);
+			      booleanType, Access.PUBLIC);
   public static final ClassType java_lang_Class_type
     = ClassType.make("java.lang.Class");
 

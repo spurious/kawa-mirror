@@ -68,6 +68,6 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return Type.void_type;
+    return Type.voidType;
   }
 }

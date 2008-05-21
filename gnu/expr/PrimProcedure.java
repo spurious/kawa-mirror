@@ -419,7 +419,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    * @param args arguments to evaluate and push.
    * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
-   *   If thisType==Type.void_type, ignore argTypes[0].  (It is used to to
+   *   If thisType==Type.voidType, ignore argTypes[0].  (It is used to to
    *   pass a link to a closure environment, which was pushed by our caller.)
    *   If thisType==null, no special handling of args[0] or argTypes[0].
    */
@@ -429,7 +429,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     String name = getName();
     Type arg_type = null;
     gnu.bytecode.CodeAttr code = comp.getCode();
-    int skipArg = thisType == Type.void_type ? 1 : 0;
+    int skipArg = thisType == Type.voidType ? 1 : 0;
     int arg_count = argTypes.length - skipArg;
     if (takesContext())
       arg_count--;
@@ -587,7 +587,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         comp.loadCallContext();
         stackType = Type.pointer_type;
         code.pushScope();
-        Variable saveIndex = code.addLocal(Type.int_type);
+        Variable saveIndex = code.addLocal(Type.intType);
         comp.loadCallContext();
         code.emitInvokeVirtual(Compilation.typeCallContext.
                                getDeclaredMethod("startFromContext", 0));

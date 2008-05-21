@@ -273,7 +273,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		ctypes[0] = Arithmetic.typeIntNum;
 		if (kind1 >= long_KIND)
 		  {
-		    ctypes[1] = Type.long_type;
+		    ctypes[1] = Type.longType;
 		  }
 		else if (kind0 >= long_KIND
 			 // Simple check to avoid re-ordering side-effects.
@@ -282,7 +282,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 			     || arg0 instanceof ReferenceExp
 			     || arg1 instanceof ReferenceExp))
 		  {
-		    ctypes[1] = Type.long_type;
+		    ctypes[1] = Type.longType;
 		    args = new Expression[2];
 		    args[0] = arg1;
 		    args[1] = arg0;
@@ -300,11 +300,11 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	      }
 	    Type commonType;
 	    if (kind0 >= int_KIND && kind1 >= int_KIND)
-	      commonType = Type.int_type;
+	      commonType = Type.intType;
 	    else if (kind0 >= long_KIND && kind1 >= long_KIND)
-	      commonType = Type.long_type;
+	      commonType = Type.longType;
 	    else
-	      commonType = Type.double_type;
+	      commonType = Type.doubleType;
 	    StackTarget subTarget = new StackTarget(commonType);
 	    ConditionalTarget ctarget = (ConditionalTarget) target;
 	    

@@ -29,7 +29,7 @@ public class ConditionalTarget extends Target
     * its target. */
   public boolean trueBranchComesFirst = true;
 
-  public Type getType() { return Type.boolean_type; }
+  public Type getType() { return Type.booleanType; }
 
   public void compileFromStack(Compilation comp, Type stackType)
   {

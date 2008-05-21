@@ -176,10 +176,10 @@ public class Record
 
     // Generate the (default) constructor.
     Method constructor = clas.addMethod ("<init>", Type.typeArray0,
-					  Type.void_type, Access.PUBLIC);
+					  Type.voidType, Access.PUBLIC);
     Method superConstructor
       = superClass.addMethod ("<init>", Type.typeArray0,
-			       Type.void_type, Access.PUBLIC);
+			       Type.voidType, Access.PUBLIC);
     gnu.bytecode.CodeAttr code = constructor.startCode();
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);

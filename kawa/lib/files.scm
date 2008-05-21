@@ -94,6 +94,14 @@
 (define (create-directory (dirname :: filepath))
   ((dirname:toFile):mkdir))
 
+;; In Scsh and Gambit.
+(define (directory-files (dir :: filepath))
+  (let ((files ((java.io.File (dir:toFile)):list)))
+     (if (eq? files #!null) #f
+         (gnu.lists.LList:makeList files 0)))) 
+
+;; (define (directory-for-each proc directory) ...)
+
 ; Taken from MIT Scheme
 (define (->pathname filename) :: path
   (path filename))

@@ -281,7 +281,7 @@ public class ClassExp extends LambdaExp
 			       flags, Type.typeArray0, ftype);
 		Type[] stypes = { ftype };
 		type.addMethod(slotToMethodName("set",decl.getName()),
-			       flags, stypes, Type.void_type);
+			       flags, stypes, Type.voidType);
 	      }
 	    else
 	      {

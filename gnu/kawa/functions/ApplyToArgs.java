@@ -186,7 +186,7 @@ public class ApplyToArgs extends ProcedureN
             // We search for a "get(int)" method, rather than just using
             // typeList.getDeclaredMethod("get", 1) to see if we make a
             // a virtual call rather than an interface call.
-            Method get = ctype.getMethod("get", new Type[] { Type.int_type });
+            Method get = ctype.getMethod("get", new Type[] { Type.intType  });
             result = new ApplyExp(get, args);
           }
         else

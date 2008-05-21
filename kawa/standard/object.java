@@ -489,7 +489,7 @@ public class object extends Syntax
 		  tr.setCurrentScope(memberSyntax.scope);
                 if ("*init*".equals(meth.getName()))
                   {
-                    meth.setReturnType(Type.void_type);
+                    meth.setReturnType(Type.voidType);
                     if (! oexp.isSimple())
                       tr.error('e', "'*init*' methods only supported for simple classes");
                   }
@@ -566,7 +566,7 @@ public class object extends Syntax
         initValue = sexp;
       }
     else
-      initValue = Convert.makeCoercion(initValue, new QuoteExp(Type.void_type));
+      initValue = Convert.makeCoercion(initValue, new QuoteExp(Type.voidType));
     ((BeginExp) initMethod.body).add(initValue);
     tr.curMethodLambda = saveLambda;
     tr.pop(initMethod);

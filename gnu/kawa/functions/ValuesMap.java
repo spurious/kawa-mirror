@@ -122,7 +122,7 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     Declaration counterDecl;
     if (startCounter >= 0)
       {
-	counter = starget.scope.addVariable(code, Type.int_type, "position");
+	counter = starget.scope.addVariable(code, Type.intType, "position");
 	code.emitPushInt(startCounter);
 	code.emitStore(counter);
         counterDecl = new Declaration(counter);
@@ -163,7 +163,7 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     if (matchesMethod != null)
       {
         // Major kludge - used by ValuesFilter.
-        if (app.getType().getImplementationType() != Type.boolean_type)
+        if (app.getType().getImplementationType() != Type.booleanType)
           app = new ApplyExp(matchesMethod,
                              new Expression[] {
                                app,

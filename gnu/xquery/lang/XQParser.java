@@ -2156,8 +2156,8 @@ public class XQParser extends Lexer
               dot.setType(NodeType.anyNodeTest);
             else
               dot.setType(SingletonType.getInstance());
-	    lexp.addDeclaration(POSITION_VARNAME, Type.int_type);
-	    lexp.addDeclaration(LAST_VARNAME, Type.int_type);
+	    lexp.addDeclaration(POSITION_VARNAME, Type.intType);
+	    lexp.addDeclaration(LAST_VARNAME, Type.intType);
 	    comp.push(lexp);
 	    dot.noteValue(null);
 	    Expression cond = parseExprSequence(']', false);

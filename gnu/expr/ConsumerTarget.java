@@ -116,34 +116,34 @@ public class ConsumerTarget extends Target
 	  {
 	  case 'B': case 'S': case 'I':
 	    methodName = "writeInt";
-            methodArg = Type.int_type;
+            methodArg = Type.intType;
             break;
 	  case 'J':
             methodName = "writeLong";
-            methodArg = Type.long_type;
+            methodArg = Type.longType;
             islong = true;
             break;
 	  case 'F':
             methodName = "writeFloat";
-            methodArg = Type.float_type;
+            methodArg = Type.floatType;
             break;
 	  case 'D':
             methodName = "writeDouble";
-            methodArg = Type.double_type;
+            methodArg = Type.doubleType;
             islong = true;
             break;
 	  case 'C':
             /* #ifdef JAVA5 */
             methodName = "append";
-            methodArg = Type.char_type;
+            methodArg = Type.charType;
             /* #else */
             // methodName = "write";
-            // methodArg = Type.int_type;
+            // methodArg = Type.intType;
             /* #endif */
             break;
 	  case 'Z':	
             methodName = "writeBoolean";
-            methodArg = Type.boolean_type;
+            methodArg = Type.booleanType;
             break;
 	  case 'V':     return;
 	  }

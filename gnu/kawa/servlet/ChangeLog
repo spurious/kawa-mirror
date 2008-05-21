@@ -1,3 +1,10 @@
+2008-05-20  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Don't resolve the module - let
+	that be handled by evalToClass.
+
+	* KawaPageServlet.java (getModule): Log when compiling a module.
+
 2008-05-11  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Make better use new-ish module

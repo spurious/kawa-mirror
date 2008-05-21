@@ -119,29 +119,35 @@ public class KawaPageServlet extends KawaServlet
             
     Language language
       = Language.getInstanceFromFilenameExtension(path);
-    if (language == null)
-      language = Language.detect(resourceStream);
-    if (language == null)
+    if (language != null)
+      ctx.getServletContext().log("Compile "+path+" - a "+language.getName()+" source file (based on extension)");
+    else
       {
-        if (path != upath)
+        language = Language.detect(resourceStream);
+        if (language != null)
+          ctx.getServletContext().log("Compile "+path+" - a "+language.getName()+" source file (detected from content)");
+        else
           {
-            ctx.response.reset();
-            ctx.response.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+            if (path != upath)
+              {
+                ctx.response.reset();
+                ctx.response.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+                return null;
+              }
+            String contentType = context.getMimeType(path);
+            response.setContentType(contentType);
+            ServletOutputStream out = response.getOutputStream();
+            byte[] buffer = new byte[4*1024];
+            for (;;)
+              {
+                int n = resourceStream.read(buffer);
+                if (n < 0)
+                  break;
+                out.write(buffer, 0, n);
+              }
+            resourceStream.close();
             return null;
           }
-        String contentType = context.getMimeType(path);
-        response.setContentType(contentType);
-        ServletOutputStream out = response.getOutputStream();
-        byte[] buffer = new byte[4*1024];
-        for (;;)
-          {
-            int n = resourceStream.read(buffer);
-            if (n < 0)
-              break;
-            out.write(buffer, 0, n);
-          }
-        resourceStream.close();
-        return null;
       }
 
     InPort port = new InPort(resourceStream, absPath);
@@ -158,7 +164,6 @@ public class KawaPageServlet extends KawaServlet
         String name = path.substring(path.lastIndexOf('/')+1, dot);
         comp.getModule().setName(name);
         */
-        language.resolve(comp);
       }
     catch (SyntaxException ex)
       {

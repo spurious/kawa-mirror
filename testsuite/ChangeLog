@@ -1,3 +1,7 @@
+2008-05-20  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Test map over ElementType.
+
 2008-04-30  Per Bothner  <per@bothner.com>
 
 	* scribble.scm: Simplify to make use of new syntax etc.

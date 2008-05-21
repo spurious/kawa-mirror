@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 154)
+(test-init "Miscellaneous" 155)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -713,6 +713,8 @@
       (as-xml (h:code "Foo")))
 (test "<b xmlns=\"http://www.w3.org/1999/xhtml\"><code>Foo</code></b>" 'html-contructor-4
       (as-xml (html:b (html:code "Foo"))))
+
+(test "<list><b xmlns=\"http://www.w3.org/1999/xhtml\">bold 1</b> <b xmlns=\"http://www.w3.org/1999/xhtml\">bold2</b></list>" 'html-contructor-4 (as-xml (map html:b '("bold 1" "bold2"))))
 
 ;; Based on Savannah bug#18736, "intenal compile error -- svn rev 5816".
 ;; From Thomas Kirk <tk@research.att.com>

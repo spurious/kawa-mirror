@@ -62,12 +62,12 @@ public class Scheme extends LispLanguage
     instance = new Scheme(kawaEnvironment);
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
     not = new not(instance, "not");
-    map = new map(true);
-    forEach = new map(false);
     applyToArgs = new ApplyToArgs("apply-to-args", instance);
     applyFieldDecl
       = Declaration.getDeclarationFromStatic("kawa.standard.Scheme",
                                              "applyToArgs");
+    map = new map(true, applyToArgs, applyFieldDecl);
+    forEach = new map(false, applyToArgs, applyFieldDecl);
     apply = new Apply("apply", applyToArgs);
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);

@@ -1,3 +1,9 @@
+2008-05-20  Per Bothner  <per@bothner.com>
+
+	* standard/map.java: Generalize so the 'procedure' can be any valid
+	argument to ApplyToArgs, not just a Procedure.
+	* standard/Scheme.java: Adjust for extra constructor args to map.
+
 2008-05-11  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Don't need to check

@@ -3,6 +3,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.functions.IsEq;
+import gnu.kawa.functions.ApplyToArgs;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.SlotGet;
 
@@ -15,10 +16,16 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
   /** True if we should collect the result into a list. */
   boolean collect;
 
-  public map (boolean collect)
+  final ApplyToArgs applyToArgs;
+  final Declaration applyFieldDecl;
+
+  public map (boolean collect,
+              ApplyToArgs applyToArgs, Declaration applyFieldDecl)
   {
     super (collect ? "map" : "for-each");
     this.collect = collect;
+    this.applyToArgs = applyToArgs;
+    this.applyFieldDecl = applyFieldDecl;
   }
 
   /** An optimized single-list version of map. */
@@ -53,19 +60,23 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 
   public Object apply2 (Object arg1, Object arg2) throws Throwable
   {
-    Procedure proc = (Procedure) arg1;
-    if (collect)
-      return map1 (proc, arg2);
-    forEach1 (proc, arg2);
-    return Values.empty;
+    if (arg1 instanceof Procedure)
+      {
+        Procedure proc = (Procedure) arg1;
+        if (collect)
+          return map1 (proc, arg2);
+        forEach1 (proc, arg2);
+        return Values.empty;
+      }
+    return applyN(new Object[] { arg1, arg2 });
   }
 
   public Object applyN (Object[] args) throws Throwable
   {
-    Procedure proc = (Procedure) (args[0]);
     int arity = args.length - 1;
-    if (arity == 1)
+    if (arity == 1 && args[0] instanceof Procedure)
       {
+        Procedure proc = (Procedure) (args[0]);
 	if (collect)
 	  return map1 (proc, args[1]);
 	forEach1 (proc, args[1]);
@@ -79,7 +90,22 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       result = Values.empty;;
     Object[] rest = new Object [arity];
     System.arraycopy (args, 1, rest, 0, arity);
-    Object[] each_args = new Object [arity];
+    Procedure proc;
+    int need_apply;
+    Object[] each_args;
+    if (args[0] instanceof Procedure)
+      {
+        need_apply = 0;
+        each_args = new Object[arity];
+        proc = (Procedure) args[0];
+      }
+    else
+      {
+        need_apply = 1;
+        each_args = new Object[arity+1];
+        each_args[0] = args[0];
+        proc = applyToArgs;
+      }
     for (;;)
       {
 	for (int i = 0;  i < arity;  i++)
@@ -88,7 +114,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	    if (list == LList.Empty)
 	      return result;
 	    Pair pair = (Pair) list;
-	    each_args[i] = pair.car;
+	    each_args[need_apply+i] = pair.car;
 	    rest[i] = pair.cdr;
 	  }
 	Object value = proc.applyN (each_args);
@@ -156,17 +182,17 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	pargs[i].noteValue(inits3[i]);
       }
     Declaration resultDecl = collect ? lexp.addDeclaration("result") : null;
-    
-    Expression[] doArgs = new Expression[nargs];
+    Expression[] doArgs = new Expression[1+nargs];
     Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	doArgs[i] = walker.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"));
+	doArgs[i+1] = walker.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"));
 	recArgs[i] = walker.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"));
       }
     if (! procSafeForMultipleEvaluation)
       proc = new ReferenceExp(procDecl);
-    Expression doit = walker.walkApplyOnly(new ApplyExp(proc, doArgs));
+    doArgs[0] = proc;
+    Expression doit = walker.walkApplyOnly(new ApplyExp(new ReferenceExp(applyFieldDecl), doArgs));
     Expression rec = walker.walkApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs));
     if (collect)
       {

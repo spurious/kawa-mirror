@@ -1,10 +1,21 @@
+2008-05-22  Per Bothner  <per@bothner.com>
+
+	* Type.java (javalangObjectType, javalangStringType, toStringType,
+	javalangBooleanType, javalangThrowableType, javalangNumberType,
+	javalangClassType): New names for existing static fields.
+	(pointer_type, string_type, tostring_type, boolean_ctype,
+	throwable_type, number_type, java_lang_Class_type): The old names,
+	kept as deprecated aliases.
+	(objectTYpe): New synonym for javalangObjectType.
+
 2008-05-21  Per Bothner  <per@bothner.com>
 
-	* Type.java (byte_type, short_type, int_type, long_type, float_type,
-	double_type, boolean_type, char_type, void_type): Renamed to
-	respectively, with also names as deprecated aliases:
-	(byteType, shortType, intType, longType, floatType, doubleType,
-	booleanType, charType, voidType): New names.
+	* Type.java (byteType, shortType, intType, longType, floatType,
+	doubleType, booleanType, charType, voidType): New names for
+	existing static fields.
+	(byte_type, short_type, int_type, long_type, float_type,
+	double_type, boolean_type, char_type, void_type): The old names,
+	kept as deprecated aliases. 
 
 2008-05-18  Per Bothner  <per@bothner.com>
 

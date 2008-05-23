@@ -150,7 +150,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  { // FIXME
 	    rargs[paramCount-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
-            elementType = Type.pointer_type;
+            elementType = Type.objectType;
 	  }
 	else
 	  {
@@ -181,7 +181,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       {
         Object arg = args[i];
         Type type = i < fixArgs ? argTypes[i-extraCount] : elementType;
-        if (type != Type.pointer_type)
+        if (type != Type.objectType)
           {
             try
               {
@@ -275,7 +275,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public PrimProcedure(Method method)
   {
     init(method);
-    this.retType = method.getName().endsWith("$X") ? Type.pointer_type
+    this.retType = method.getName().endsWith("$X") ? Type.objectType
       : method.getReturnType();
   }
 
@@ -317,16 +317,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (isConstructor())
       retType = method.getDeclaringClass();
     else if (method.getName().endsWith("$X"))
-      retType = Type.pointer_type;
+      retType = Type.objectType;
     else
       {
         retType = language.getLangTypeFor(method.getReturnType());
 
-        // Kludge - tostring_type doesn't have methods.
+        // Kludge - toStringType doesn't have methods.
         // It shouldn't be used as the "type" of anything -
         // it's just a type with a coercion.  FIXME.
-        if (retType == Type.tostring_type)
-          retType = Type.string_type;
+        if (retType == Type.toStringType)
+          retType = Type.javalangStringType;
       }
   }
   
@@ -585,7 +585,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     else
       {
         comp.loadCallContext();
-        stackType = Type.pointer_type;
+        stackType = Type.objectType;
         code.pushScope();
         Variable saveIndex = code.addLocal(Type.intType);
         comp.loadCallContext();
@@ -614,7 +614,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (takesTarget())
       {
         if (index == 0)
-          return isConstructor() ? Type.pointer_type
+          return isConstructor() ? Type.objectType
             : method.getDeclaringClass();
         index--;
       }
@@ -629,7 +629,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (restType instanceof ArrayType)
       return ((ArrayType) restType).getComponentType();
     else // Should be LList or some other Sequence class.
-      return Type.pointer_type;
+      return Type.objectType;
   }
 
   // This is null in JDK 1.1 and something else in JDK 1.2.

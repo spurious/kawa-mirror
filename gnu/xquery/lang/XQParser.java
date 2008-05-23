@@ -1628,7 +1628,7 @@ public class XQParser extends Lexer
 	if (type == null)
           {
             error('e', "unknown type "+tname, "XPST0051");
-            type = Type.pointer_type;
+            type = Type.objectType;
           }
       }
     else

@@ -135,13 +135,13 @@ public class ObjectType extends Type
 
   public Type getImplementationType()
   {
-    return this == nullType ? pointer_type
-      : this == tostring_type ? string_type : this;
+    return this == nullType ? objectType
+      : this == toStringType ? javalangStringType : this;
   }
 
   public Type promote ()
   {
-    return this == nullType ? pointer_type : this;
+    return this == nullType ? objectType : this;
   }
 
   public boolean isInstance (Object obj)
@@ -158,13 +158,13 @@ public class ObjectType extends Type
 
   public Method getMethod(String name, Type[] arg_types)
   {
-    return Type.pointer_type.getMethod(name, arg_types);
+    return Type.objectType.getMethod(name, arg_types);
   }
 
   public int getMethods (Filter filter, int searchSupers, Vector result,
 			 String context)
   {
-    return Type.pointer_type.getMethods(filter, searchSupers, result, context);
+    return Type.objectType.getMethods(filter, searchSupers, result, context);
   }
 
   public int compare(Type other)
@@ -182,7 +182,7 @@ public class ObjectType extends Type
   {
     if (obj != null)
       {
-	if (this == Type.tostring_type)
+	if (this == Type.toStringType)
 	  return obj.toString();
         Class clas = getReflectClass();
         Class objClass = obj.getClass();
@@ -197,7 +197,7 @@ public class ObjectType extends Type
   /** Compile (in given method) cast from Object to this Type. */
   public void emitCoerceFromObject (CodeAttr code)
   {
-    if (this == Type.tostring_type)
+    if (this == Type.toStringType)
       {
 	// This would be nice but it doesn't verify, alas!
 	// code.reserve(4);
@@ -213,7 +213,7 @@ public class ObjectType extends Type
 	code.emitInvokeVirtual(Type.toString_method);
 	code.emitFi();
       }
-    else if (this != Type.pointer_type)
+    else if (this != Type.objectType)
       code.emitCheckcast(this);
   }
 }

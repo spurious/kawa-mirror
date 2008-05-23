@@ -1221,8 +1221,8 @@ public class ClassType extends ObjectType
   {
     if (other.isInterface())
       return implementsInterface(other);
-    if ((this == tostring_type && other == string_type)
-	|| (this == string_type && other == tostring_type))
+    if ((this == toStringType && other == javalangStringType)
+	|| (this == javalangStringType && other == toStringType))
       return true;
     ClassType baseClass = this;
     while (baseClass != null)
@@ -1248,9 +1248,9 @@ public class ClassType extends ObjectType
       return -1;
     if (cother.isSubclass(this))
       return 1;
-    if (this == tostring_type)
+    if (this == toStringType)
       return cother == Type.pointer_type ? -1 : 1;
-    if (cother == tostring_type)
+    if (cother == toStringType)
       return this == Type.pointer_type ? 1 : -1;
     if (this.isInterface() || cother.isInterface())
       return -2;

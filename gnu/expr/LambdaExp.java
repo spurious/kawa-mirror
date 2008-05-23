@@ -630,7 +630,7 @@ public class LambdaExp extends ScopeExp
   {
     Field field = allocFieldFor(comp);
     if (comp.usingCPStyle())
-      compile(comp, Type.pointer_type);
+      compile(comp, Type.objectType);
     else
       {
 	compileAsMethod(comp);
@@ -1227,7 +1227,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    code.emitLoad(argsArray);
 	    code.emitPushInt(j);
-	    code.emitArrayLoad(Type.pointer_type);
+	    code.emitArrayLoad(Type.objectType);
 	    decl.getType().emitCoerceFromObject(code);
 	    code.emitStore(decl.getVariable());
 	  }
@@ -1353,7 +1353,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    Type paramType = param.getType();
 	    Type stackType
-	      = (mainMethod == null || plainArgs >= 0 ? Type.pointer_type
+	      = (mainMethod == null || plainArgs >= 0 ? Type.objectType
 		 : paramType);
 	    // If the parameter is captured by an inferior lambda,
 	    // then the incoming parameter needs to be copied into its
@@ -1372,7 +1372,7 @@ public class LambdaExp extends ScopeExp
 	      { // This is a required parameter, in argsArray[i].
 		code.emitLoad(argsArray);
 		code.emitPushInt(i);
-		code.emitArrayLoad(Type.pointer_type);
+		code.emitArrayLoad(Type.objectType);
 	      }
             else if (i < min_args + opt_args)
 	      { // An optional parameter
@@ -1382,7 +1382,7 @@ public class LambdaExp extends ScopeExp
 		code.emitIfIntLt();
                 code.emitLoad(argsArray);
 		code.emitPushInt(i - plainArgs);
-		code.emitArrayLoad(Type.pointer_type);
+		code.emitArrayLoad(Type.objectType);
 		code.emitElse();
 		defaultArgs[defaultStart + opt_i++].compile(comp, paramType);
 		code.emitFi();
@@ -1412,12 +1412,12 @@ public class LambdaExp extends ScopeExp
 			Type[] argts = new Type[4];
 			argts[0] = Compilation.objArrayType;
 			argts[1] = Type.intType;
-			argts[2] = Type.pointer_type;
-			argts[3] = Type.pointer_type;
+			argts[2] = Type.objectType;
+			argts[3] = Type.objectType;
 			searchForKeywordMethod4
 			  = Compilation.scmKeywordType.addMethod
 			  ("searchForKeyword",  argts,
-			   Type.pointer_type, Access.PUBLIC|Access.STATIC);
+			   Type.objectType, Access.PUBLIC|Access.STATIC);
 		      }
 		    defaultArg.compile(comp, paramType);
 		    code.emitInvokeStatic(searchForKeywordMethod4);
@@ -1429,11 +1429,11 @@ public class LambdaExp extends ScopeExp
 			Type[] argts = new Type[3];
 			argts[0] = Compilation.objArrayType;
 			argts[1] = Type.intType;
-			argts[2] = Type.pointer_type;
+			argts[2] = Type.objectType;
 			searchForKeywordMethod3
 			  = Compilation.scmKeywordType.addMethod
 			  ("searchForKeyword",  argts,
-			   Type.pointer_type, Access.PUBLIC|Access.STATIC);
+			   Type.objectType, Access.PUBLIC|Access.STATIC);
 		      }
 		    code.emitInvokeStatic(searchForKeywordMethod3);
 		    code.emitDup(1);
@@ -1846,7 +1846,7 @@ public class LambdaExp extends ScopeExp
   {
     if (returnType == null)
       {
-	returnType = Type.pointer_type;  // To guards against cycles.
+	returnType = Type.objectType;  // To guards against cycles.
 	// body may not be set if define scan'd but not yet rewrit'ten.
 	if (body != null && ! isAbstract())
 	  returnType = body.getType();
@@ -1864,7 +1864,7 @@ public class LambdaExp extends ScopeExp
   {
     this.returnType = returnType;
     if (returnType != null
-        && returnType != Type.pointer_type
+        && returnType != Type.objectType
         && returnType != Type.voidType
         && body != QuoteExp.abstractExp)
       {
@@ -1964,7 +1964,7 @@ class Closure extends MethodProc
               {
                 int rem = nargs - i;
                 Type elementType = ((ArrayType) decl.type).getComponentType();
-                if (elementType == Type.pointer_type)
+                if (elementType == Type.objectType)
                   {
                     Object[] rest = new Object[rem];
                     System.arraycopy(args, i, rest, 0, rem);

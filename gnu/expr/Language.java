@@ -666,7 +666,7 @@ public abstract class Language
         else
           fdname = Symbol.make(uri, sname);
       }
-    Type dtype = isAlias ? Type.pointer_type
+    Type dtype = isAlias ? Type.objectType
       : getTypeFor(ftype.getReflectClass());
     Declaration fdecl = mod.addDeclaration(fdname, dtype);
     boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;

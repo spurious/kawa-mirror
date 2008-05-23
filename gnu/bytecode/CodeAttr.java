@@ -779,7 +779,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		emitPushString(str.substring(0, firstSegment));
 		emitPushString(str.substring(firstSegment));
 		Method concatMethod
-		  = Type.string_type.getDeclaredMethod("concat", 1);
+		  = Type.javalangStringType.getDeclaredMethod("concat", 1);
 		emitInvokeVirtual(concatMethod);
 	      }
 	    else
@@ -790,7 +790,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		emitPushInt(length);
 		Type[] args1 = { Type.intType  };
 		emitInvokeSpecial(sbufType.getDeclaredMethod("<init>", args1));
-		Type[] args2 = { Type.string_type };
+		Type[] args2 = { Type.javalangStringType    };
 		Method appendMethod
 		  = sbufType.getDeclaredMethod("append", args2);
 		int segStart = 0;
@@ -805,10 +805,10 @@ public class CodeAttr extends Attribute implements AttrContainer
 		emitInvokeVirtual(Type.toString_method);
 	      }
 	    if (str == str.intern())
-	      emitInvokeVirtual(Type.string_type.getDeclaredMethod("intern", 0));
+	      emitInvokeVirtual(Type.javalangStringType.getDeclaredMethod("intern", 0));
 	    return;
 	  }
-	pushType(Type.string_type);
+	pushType(Type.javalangStringType);
       }
   }
 
@@ -817,7 +817,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitPushClass (ObjectType ctype)
   {
     emitPushConstant(getConstants().addClass(ctype));
-    pushType(Type.java_lang_Class_type);
+    pushType(Type.javalangClassType);
   }
 
   public void emitPushNull ()
@@ -2042,7 +2042,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	emitStore(var);
       }
     else
-      pushType(Type.throwable_type);
+      pushType(Type.javalangThrowableType);
   }
 
   public void emitCatchEnd()
@@ -2067,7 +2067,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack.end_try = getLabel();
 
     pushScope();
-    Type except_type = Type.pointer_type;
+    Type except_type = Type.objectType;
     Variable except = addLocal(except_type);
     emitCatchStart(null);
     emitStore(except);
@@ -2076,7 +2076,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitThrow();
     
     try_stack.finally_subr.define(this);
-    Type ret_addr_type = Type.pointer_type;
+    Type ret_addr_type = Type.objectType;
     try_stack.finally_ret_addr = addLocal(ret_addr_type);
     pushType(ret_addr_type);
     emitStore(try_stack.finally_ret_addr);

@@ -32,9 +32,9 @@ public class syntax_case extends Syntax
             ClassType clas = ClassType.make("kawa.standard.syntax_case");
             Type[] argtypes = new Type[2];
             argtypes[0] = Compilation.javaStringType;
-            argtypes[1] = Type.pointer_type;
+            argtypes[1] = Type.objectType;
             Method method = clas.addMethod("error", argtypes,
-                                           Type.pointer_type,
+                                           Type.objectType,
                                            Access.PUBLIC|Access.STATIC);
             call_error = new PrimProcedure(method, language);
           }

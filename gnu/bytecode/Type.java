@@ -397,9 +397,9 @@ public abstract class Type
        ClassType c1 = (ClassType) t1;
        ClassType c2 = (ClassType) t2;
        if (c1.isInterface())
-         return Type.pointer_type;
+         return Type.objectType;
        if (c2.isInterface())
-         return Type.pointer_type;
+         return Type.objectType;
 
        return lowestCommonSuperType(c1.getSuperclass(), c2.getSuperclass());
       }
@@ -526,42 +526,57 @@ public abstract class Type
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
 
-  static public ClassType string_type = ClassType.make("java.lang.String");
+  static public ClassType javalangStringType = ClassType.make("java.lang.String");
   /* The String type. but coercion is handled by toString. */
-  public static final ClassType tostring_type
+  public static final ClassType toStringType
     = new ClassType("java.lang.String");
 
-  public static final ClassType pointer_type
+  public static final ClassType javalangObjectType
     = ClassType.make("java.lang.Object");
-  public static final ClassType boolean_ctype
+  public static final ClassType objectType = javalangObjectType;
+  public static final ClassType javalangBooleanType
     = ClassType.make("java.lang.Boolean");
-  public static final ClassType throwable_type
+  public static final ClassType javalangThrowableType
     = ClassType.make("java.lang.Throwable");
   public static final Type[] typeArray0 = new Type[0];
   public static final Method toString_method
-    = pointer_type.getDeclaredMethod("toString", 0);
-  public static final ClassType number_type
+    = objectType.getDeclaredMethod("toString", 0);
+  public static final ClassType javalangNumberType
     = ClassType.make("java.lang.Number");
   public static final Method clone_method
-    = Method.makeCloneMethod(pointer_type);
+    = Method.makeCloneMethod(objectType);
   public static final Method intValue_method
-    = number_type.addMethod("intValue", typeArray0,
+    = javalangNumberType.addMethod("intValue", typeArray0,
 			    intType, Access.PUBLIC);
   public static final Method longValue_method
-    = number_type.addMethod("longValue", typeArray0,
+    = javalangNumberType.addMethod("longValue", typeArray0,
 			    longType, Access.PUBLIC);
   public static final Method floatValue_method
-    = number_type.addMethod("floatValue", typeArray0,
+    = javalangNumberType.addMethod("floatValue", typeArray0,
 			    floatType, Access.PUBLIC);
   public static final Method doubleValue_method
-    = number_type.addMethod("doubleValue", typeArray0,
+    = javalangNumberType.addMethod("doubleValue", typeArray0,
 			    doubleType, Access.PUBLIC);
   public static final Method booleanValue_method
-    = boolean_ctype.addMethod("booleanValue", typeArray0,
+    = javalangBooleanType.addMethod("booleanValue", typeArray0,
 			      booleanType, Access.PUBLIC);
-  public static final ClassType java_lang_Class_type
+  public static final ClassType javalangClassType
     = ClassType.make("java.lang.Class");
-
+  /** @deprecated */
+  public static final ClassType pointer_type = javalangObjectType;
+  /** @deprecated */
+  public static final ClassType string_type = javalangStringType;
+  /** @deprecated */
+  public static final ClassType tostring_type = toStringType;
+  /** @deprecated */
+  public static final ClassType java_lang_Class_type = javalangClassType;
+  /** @deprecated */
+  public static final ClassType boolean_ctype = javalangBooleanType;
+  /** @deprecated */
+  public static final ClassType throwable_type = javalangThrowableType;
+  /** @deprecated */
+  public static final ClassType number_type = javalangNumberType;
+  
   protected Class reflectClass;
 
   /** Get the java.lang.Class object for the representation type. */

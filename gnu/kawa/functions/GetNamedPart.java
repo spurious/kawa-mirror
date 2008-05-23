@@ -168,7 +168,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter, CanInline
     */
 
     if (type.isSubtype(Compilation.typeClassType)
-        || type.isSubtype(Type.java_lang_Class_type))
+        || type.isSubtype(Type.javalangClassType))
       // The container evaluates to a class (so we should look for a static
       // field or method), but we don't know which class at compile-time.
       // However, we should still optimize it somewhat, above.  FIXME.

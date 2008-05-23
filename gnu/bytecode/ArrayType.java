@@ -92,7 +92,7 @@ public class ArrayType extends ObjectType
   {
     if (searchSupers > 0)
       {
-        int count = Type.pointer_type.getMethods(filter, 0, result, null);
+        int count = Type.objectType.getMethods(filter, 0, result, null);
         if (searchSupers > 1 && filter.select(Type.clone_method))
           {
             if (result != null)
@@ -111,7 +111,7 @@ public class ArrayType extends ObjectType
     if (other instanceof ArrayType)
       return elements.compare(((ArrayType) other).elements);
     else if (other.getName().equals("java.lang.Object")
-	     || other == tostring_type)
+	     || other == toStringType)
       return -1;
     else
       return -3;

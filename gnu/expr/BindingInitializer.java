@@ -87,7 +87,7 @@ public class BindingInitializer extends Initializer
             if (name instanceof Symbol)
               atypes[0] = Compilation.typeSymbol;
             else
-              atypes[0] = Type.tostring_type;
+              atypes[0] = Type.toStringType;
             comp.compileConstant(name, Target.pushObject);
             Method m = typeThreadLocation
               .getDeclaredMethod("makePrivate", atypes);
@@ -130,7 +130,7 @@ public class BindingInitializer extends Initializer
     if (name instanceof Symbol)
       atypes[0] = Compilation.typeSymbol;
     else
-      atypes[0] = Type.string_type;
+      atypes[0] = Type.javalangStringType;
     return Compilation.typeLocation.getDeclaredMethod("make", atypes);
   }
 }

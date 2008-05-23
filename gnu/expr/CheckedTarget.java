@@ -40,19 +40,19 @@ public class CheckedTarget extends StackTarget
 
   public static Target getInstance(Type type, String procname, int argno)
   {
-    return (type == Type.pointer_type ? Target.pushObject
+    return (type == Type.objectType ? Target.pushObject
             : new CheckedTarget(type, procname, argno));
   }
 
   public static Target getInstance(Type type, LambdaExp proc, int argno)
   {
-    return (type == Type.pointer_type ? Target.pushObject
+    return (type == Type.objectType ? Target.pushObject
             : new CheckedTarget(type, proc, argno));
   }
 
   public static Target getInstance(Type type)
   {
-    return (type == Type.pointer_type ? Target.pushObject
+    return (type == Type.objectType ? Target.pushObject
             : new CheckedTarget(type));
   }
 
@@ -72,7 +72,7 @@ public class CheckedTarget extends StackTarget
         args[0] = typeClassCastException;
         args[1] = Compilation.javaStringType;
         args[2] = Type.intType;
-	args[3] = Type.pointer_type;
+	args[3] = Type.objectType;
         initWrongTypeStringMethod
           = typeWrongType.addMethod("<init>", Access.PUBLIC,
                                     args, Type.voidType);
@@ -80,7 +80,7 @@ public class CheckedTarget extends StackTarget
         args[0] = typeClassCastException;
         args[1] = Compilation.typeProcedure;
         args[2] = Type.intType;
-	args[3] = Type.pointer_type;
+	args[3] = Type.objectType;
         initWrongTypeProcMethod
           = typeWrongType.addMethod("<init>", Access.PUBLIC,
                                     args, Type.voidType);
@@ -124,10 +124,10 @@ public class CheckedTarget extends StackTarget
     initWrongType();
     Label startTry = new Label(code);
     Scope tmpScope;
-    if (argValue == null && type != Type.tostring_type)
+    if (argValue == null && type != Type.toStringType)
       {
 	tmpScope = code.pushScope();
-	argValue = code.addLocal(Type.pointer_type);
+	argValue = code.addLocal(Type.objectType);
 	code.emitDup(1);
 	code.emitStore(argValue);
       }
@@ -140,10 +140,10 @@ public class CheckedTarget extends StackTarget
     int endPC = code.getPC();
     // If no cast was needed, no code has been generated.
     // Thus endPC is equal to startPC and we can stop safely.
-    // Also, tostring_type can never raise an exception, so we don't need
+    // Also, toStringType can never raise an exception, so we don't need
     // to catch it.
     if (endPC == startPC
-	|| type == Type.tostring_type)
+	|| type == Type.toStringType)
       {
         // FIXME should remove generated store to argValue, by truncating
         // PC to startPC.  But take care with startPC.position.

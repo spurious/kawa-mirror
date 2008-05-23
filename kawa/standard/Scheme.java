@@ -904,10 +904,10 @@ public class Scheme extends LispLanguage
 	types.put ("double", LangPrimType.doubleType);
 	types.put ("never-returns", Type.neverReturnsType);
 
-	types.put ("Object", Type.pointer_type);
-	types.put ("String", Type.tostring_type);
+	types.put ("Object", Type.objectType);
+	types.put ("String", Type.toStringType);
 
-	types.put ("object", Type.pointer_type);
+	types.put ("object", Type.objectType);
 	types.put ("number", ClassType.make("gnu.math.Numeric"));
 	types.put ("quantity", ClassType.make("gnu.math.Quantity"));
 	types.put ("complex", ClassType.make("gnu.math.Complex"));
@@ -979,7 +979,7 @@ public class Scheme extends LispLanguage
     if (clas.isPrimitive())
       return getNamedType(name);
     if ("java.lang.String".equals(name))
-      return Type.tostring_type;
+      return Type.toStringType;
     if ("gnu.math.IntNum".equals(name))
       return LangObjType.integerType;
     if ("gnu.text.Path".equals(name))

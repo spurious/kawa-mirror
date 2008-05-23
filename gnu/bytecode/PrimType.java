@@ -91,7 +91,7 @@ public class PrimType extends Type {
     char sig1 = (signature == null || signature.length() != 1) ? ' '
       : signature.charAt(0);
     if (sig1 == 'Z')  // boolean
-      boolean_ctype.emitIsInstance(code);
+      javalangBooleanType.emitIsInstance(code);
     else if (sig1 == 'V')
       {
 	code.emitPop(1);
@@ -99,7 +99,7 @@ public class PrimType extends Type {
       }
     // Have left out Character -> char, since not used by Kawa.
     else
-      number_type.emitIsInstance(code);
+      javalangNumberType.emitIsInstance(code);
   }
 
   public void emitCoerceFromObject (CodeAttr code)
@@ -108,14 +108,14 @@ public class PrimType extends Type {
       : signature.charAt(0);
     if (sig1 == 'Z')  // boolean
       {
-	code.emitCheckcast(boolean_ctype);
+	code.emitCheckcast(javalangBooleanType);
 	code.emitInvokeVirtual(booleanValue_method);
       }
     else if (sig1 == 'V')
       code.emitPop(1);
     else
       {
-	code.emitCheckcast(number_type);
+	code.emitCheckcast(javalangNumberType);
 	if (sig1 == 'I' || sig1 == 'S' || sig1 == 'B')
 	  code.emitInvokeVirtual(intValue_method);
 	else if (sig1 == 'J')
@@ -228,7 +228,7 @@ public class PrimType extends Type {
           return -1;
       }
     if (otherName.equals("java.lang.Object")
-	|| other == tostring_type)
+	|| other == toStringType)
       return -1;
     return -2;
   }

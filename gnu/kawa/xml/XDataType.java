@@ -95,7 +95,7 @@ public class XDataType extends Type implements TypeValue
 
   public static final XDataType anyAtomicType =
     new XDataType("anyAtomicType",
-                  Type.pointer_type,
+                  Type.objectType,
                   ANY_ATOMIC_TYPE_CODE);
 
   public static final XDataType stringType =
@@ -201,7 +201,7 @@ public class XDataType extends Type implements TypeValue
       {
         if (incoming != null)
           code.emitLoad(incoming);
-        Type.boolean_ctype.emitIsInstance(code);
+        Type.javalangBooleanType.emitIsInstance(code);
         code.emitIfIntNotZero();
         if (decl != null)
           {

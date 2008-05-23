@@ -190,7 +190,7 @@ public class Compilation implements SourceLocator
   Field fswitchIndex;
 
   // Various standard classes
-  static public ClassType typeObject = Type.pointer_type;
+  static public ClassType typeObject = Type.objectType;
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
   static public ClassType typeString = ClassType.make("java.lang.String");
   static public ClassType javaStringType = typeString;
@@ -206,7 +206,7 @@ public class Compilation implements SourceLocator
   public static ClassType typeType = ClassType.make("gnu.bytecode.Type");
   public static ClassType typeObjectType
     = ClassType.make("gnu.bytecode.ObjectType", typeType);
-  public static ClassType typeClass = Type.java_lang_Class_type;
+  public static ClassType typeClass = Type.javalangClassType;
   static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
@@ -224,7 +224,7 @@ public class Compilation implements SourceLocator
     = typeLanguage.getDeclaredMethod("getSymbolProcedure", 1);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
-			    Type.pointer_type, Access.PUBLIC);
+			    Type.objectType, Access.PUBLIC);
   static public final Method getProcedureBindingMethod
     = typeSymbol.addMethod("getProcedure", Type.typeArray0,
 			    typeProcedure, Access.PUBLIC);
@@ -245,7 +245,7 @@ public class Compilation implements SourceLocator
   = typeEnvironment.getDeclaredMethod("getLocation", 1);
   static public final Method getLocation2EnvironmentMethod;
   static {
-    Type[] args = { typeSymbol, Type.pointer_type };
+    Type[] args = { typeSymbol, Type.objectType    };
     getLocation2EnvironmentMethod
       = typeEnvironment.addMethod("getLocation", args,
 				  typeLocation, Access.PUBLIC|Access.FINAL);
@@ -1340,7 +1340,7 @@ public class Compilation implements SourceLocator
 		    code.emitLoad(ctxVar);
 		    code.emitLoad(code.getArg(k+1));
 		    Type ptype = var.getType();
-		    if (ptype != Type.pointer_type)
+		    if (ptype != Type.objectType)
 		      {
 			if (ptype instanceof TypeValue)
 			  {
@@ -1358,8 +1358,8 @@ public class Compilation implements SourceLocator
 			    trueLabel.define(code);
 			  }
 			else if (ptype instanceof ClassType
-			    && ptype != Type.pointer_type
-			    && ptype != Type.tostring_type)  // FIXME
+			    && ptype != Type.objectType
+			    && ptype != Type.toStringType)  // FIXME
 			  {
 			    code.emitDup();
 			    ptype.emitIsInstance(code);
@@ -1517,10 +1517,10 @@ public class Compilation implements SourceLocator
 		    code.emitGetField(typeCallContext
 				      .getDeclaredField("values"));
 		    code.emitPushInt(k);
-		    code.emitArrayLoad(Type.pointer_type);
+		    code.emitArrayLoad(Type.objectType);
 		  }
 		Type ptype = var.getType();
-		if (ptype != Type.pointer_type)
+		if (ptype != Type.objectType)
                   {
                     SourceLocator saveLoc2 = messages.swapSourceLocator(var);
                     CheckedTarget.emitCheckedCoerce(this, source,
@@ -1652,7 +1652,7 @@ public class Compilation implements SourceLocator
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.voidType : (Type) Type.pointer_type,
+					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.voidType : (Type) Type.objectType,
 					     Access.PUBLIC);
 		code = method.startCode();
 
@@ -1723,10 +1723,10 @@ public class Compilation implements SourceLocator
 		    // Load Object[]args value:
 		    code.emitLoad(code.getArg(2));
 		    code.emitPushInt(k);
-		    code.emitArrayLoad(Type.pointer_type);
+		    code.emitArrayLoad(Type.objectType);
 		  }
 		Type ptype = var.getType();
-		if (ptype != Type.pointer_type)
+		if (ptype != Type.objectType)
                   {
                     SourceLocator saveLoc2 = messages.swapSourceLocator(var);
                     CheckedTarget.emitCheckedCoerce(this, source,
@@ -1778,7 +1778,7 @@ public class Compilation implements SourceLocator
 			    code.emitPushInt(singleArgs);
 			    code.emitAdd(Type.intType);
 			  }
-			code.emitArrayLoad(Type.pointer_type);
+			code.emitArrayLoad(Type.objectType);
 			if (mustConvert)
 			  {
 			    CheckedTarget.emitCheckedCoerce
@@ -2083,7 +2083,7 @@ public class Compilation implements SourceLocator
 	    code = method.startCode();
 	    Variable ctxVar = code.addLocal(typeCallContext);
 	    Variable saveVar = code.addLocal(typeConsumer);
-	    Variable exceptionVar = code.addLocal(Type.throwable_type);
+	    Variable exceptionVar = code.addLocal(Type.javalangThrowableType);
 	    // ctx = CallContext.getInstance();
 	    code.emitInvokeStatic(getCallContextInstanceMethod);
 	    code.emitStore(ctxVar);
@@ -2715,7 +2715,7 @@ public class Compilation implements SourceLocator
         && moduleInstanceMainField != null)
       {
         code.emitGetStatic(moduleInstanceMainField);
-        code.emitInvokeVirtual(Type.pointer_type.getDeclaredMethod("getClass", 0));
+        code.emitInvokeVirtual(Type.objectType.getDeclaredMethod("getClass", 0));
       }
     else if (curClass.getClassfileVersion() >= ClassType.JDK_1_5_VERSION)
       code.emitPushClass(clas);

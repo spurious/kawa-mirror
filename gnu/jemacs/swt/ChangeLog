@@ -1,3 +1,7 @@
+2008-05-23  Per Bothner  <per@bothner.com>
+
+	* SwtBuffer.java (removeRegion): New method.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* SwtFrame.java (setMenu): Rename to setMenuBar, following EFrame.

@@ -351,7 +351,13 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     pointMarker.removeChar(count);
   }
 
-  public abstract void removeAll ();
+  public abstract void removeRegion (int start, int end);
+
+  public void removeAll ()
+  {
+    removeRegion(0, maxDot());
+
+  }
 
   public Marker getPointMarker (boolean share)
   {

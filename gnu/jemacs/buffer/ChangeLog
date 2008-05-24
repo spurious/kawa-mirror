@@ -1,3 +1,8 @@
+2008-05-23  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (removeRegion): New abstract method.
+	(removeall): Make non-abstract by defining in terms of removeRegion.
+
 2008-04-26  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (buffer-file-name): No longer use symbol->string, since

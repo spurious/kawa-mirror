@@ -1,3 +1,8 @@
+2008-05-23  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (removeRegion): Catch exception.
+	(removeall): Remove - use inherited method.
+
 2008-02-04  Per Bothner  <per@bothner.com>
 
 	* SwingWindow.java (toInt): We want the modifiers (except for the

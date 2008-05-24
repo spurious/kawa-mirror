@@ -123,6 +123,12 @@ public class SwtBuffer extends Buffer
   {
     insert(ch, count, null); 
   }
+
+  public void removeRegion (int start, int end)
+  {
+    bufferContent.replaceTextRange(start, end-start, null);
+  }
+
   /**
    * @see gnu.jemacs.buffer.Buffer#removeAll()
    */

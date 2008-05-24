@@ -65,16 +65,10 @@ public class SwingBuffer extends Buffer
   }
 
   public void removeRegion (int start, int end)
-    throws javax.swing.text.BadLocationException
-  {
-    doc.remove(start, end - start);
-  }
-
-  public void removeAll ()
   {
     try
       {
-	doc.remove(0, maxDot());
+	doc.remove(start, end - start);
       }
     catch (javax.swing.text.BadLocationException ex)
       {

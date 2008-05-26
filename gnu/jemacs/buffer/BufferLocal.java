@@ -1,5 +1,6 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
+import gnu.jemacs.lang.ELisp;
 
 /**
  * A buffer-local variable (Location).
@@ -27,32 +28,40 @@ public class BufferLocal extends IndirectableLocation
     return name;
   }
 
-  public static void make(Symbol symbol, boolean all)
+  public static BufferLocal make(Symbol symbol, boolean all)
   {
     Environment env = Environment.getCurrent();
     NamedLocation loc = env.getLocation(symbol, null, true);
     Location base = loc.getBase();
+    BufferLocal bloc;
     if (base instanceof BufferLocal)
       {
+        bloc = (BufferLocal) base;
 	if (all)
-	  ((BufferLocal) base).all = true;
-	return;
+	  bloc.all = true;
       }
-    BufferLocal bloc = new BufferLocal(symbol, all);
-    // Not sure if this is 100% correct.  FIXME.
-    // We have to be careful to avoid cycles, handle INDIERCT_DEFINES, etc.
-    bloc.base = loc.getBaseForce();
-    bloc.setAlias(loc);
+    else
+      {
+        bloc = new BufferLocal(symbol, all);
+        // Not sure if this is 100% correct.  FIXME.
+        // We have to be careful to avoid cycles, handle INDIERCT_DEFINES, etc.
+        bloc.base = loc.getBaseForce();
+        bloc.setAlias(loc);
+      }
+    return bloc;
   }
 
   public Object get (Object defaultValue)
   {
-    Buffer buffer = Buffer.getCurrent();
-    return buffer == null ? base.get(defaultValue) : get(buffer, defaultValue);
+    return get(Buffer.getCurrent(), defaultValue);
   }
 
   public Object get (Buffer buffer, Object defaultValue)
   {
+    if (buffer == null)
+      return base.get(defaultValue);
+    if (this == readOnlyVar)
+      return buffer.getReadOnly() ? ELisp.TRUE : ELisp.FALSE;
     Object[] localBindings = buffer.localBindings;
     if (buffer == cachedBuffer)
       {
@@ -81,12 +90,15 @@ public class BufferLocal extends IndirectableLocation
 
   public boolean isBound ()
   {
-    Buffer buffer = Buffer.getCurrent();
-    return buffer == null ? base.isBound() : isBound(buffer);
+    return isBound(Buffer.getCurrent());
   }
 
   public boolean isBound (Buffer buffer)
   {
+    if (buffer == null)
+      return base.isBound();
+    if (this == readOnlyVar)
+      return true;
     Object[] localBindings = buffer.localBindings;
     Object unb = Location.UNBOUND;
     if (buffer == cachedBuffer)
@@ -115,15 +127,21 @@ public class BufferLocal extends IndirectableLocation
 
   public synchronized final void set (Object newValue)
   {
-    Buffer buffer = Buffer.getCurrent();
-    if (buffer == null)
-      base.set(newValue);
-    else
-      set(buffer, newValue);
+    set(Buffer.getCurrent(), newValue);
   }
 
   public synchronized final void set (Buffer buffer, Object newValue)
   {
+    if (buffer == null)
+      {
+        base.set(newValue);
+        return;
+      }
+    if (this == readOnlyVar)
+      {
+        buffer.setReadOnly(newValue != ELisp.FALSE);
+        return;
+      }
     Object[] localBindings = buffer.localBindings;
     int avail = -1;
     Symbol n = this.getKeySymbol();
@@ -182,4 +200,8 @@ public class BufferLocal extends IndirectableLocation
     else
       base.set(newValue);
   }
+
+  static final BufferLocal readOnlyVar
+  = BufferLocal.make(ELisp.getInstance().getSymbol("buffer-read-only"), true);
+  static { readOnlyVar.set(null, ELisp.FALSE); }
 }

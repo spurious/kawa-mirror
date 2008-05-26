@@ -1366,7 +1366,10 @@ to make one entry in the kill ring."
    ;; just isn't aware of this.  However, there's no harm in putting
    ;; the region's text in the kill ring, anyway.
    ((or (and buffer-read-only (not inhibit-read-only))
-	(text-property-not-all (min beg end) (max beg end) 'read-only nil))
+	#| not supported by JEmacs
+	(text-property-not-all (min beg end) (max beg end) 'read-only nil)
+	|#
+	)
    ;; This is redundant.
    ;; (if verbose (message "Copying %d characters"
    ;;			 (- (max beg end) (min beg end))))

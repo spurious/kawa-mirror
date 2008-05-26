@@ -1,3 +1,8 @@
+2008-05-25  Per Bothner  <per@bothner.com>
+
+	* SwtBuffer.java (insert): Rename to insertChar and change char->int.
+	(insert(char,int)): Remove - use inherited method.
+
 2008-05-23  Per Bothner  <per@bothner.com>
 
 	* SwtBuffer.java (removeRegion): New method.

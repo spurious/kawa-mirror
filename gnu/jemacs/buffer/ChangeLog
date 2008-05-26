@@ -1,3 +1,14 @@
+2008-05-26  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (readOnly): New field.
+	(getReadOnly, setReadOnly): New accessors.
+	* BufferLocal.java (readOnlyVar): New static field.
+	(make): Change return type from void.
+	(set(Buffer,Object)), (get(Buffer,Object), isBound(Buffer)):
+	If buffer is null, set default.
+	Add special handling for readOnlyVar.
+	* emacs.scm (default-value, default-boundp, set-default): New functions.
+
 2008-05-25  Per Bothner  <per@bothner.com>
 
 	Generalize char-insert methods to take 32-bit (or 20-bit) Unicode ints.

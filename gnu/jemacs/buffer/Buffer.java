@@ -14,6 +14,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   Path path;
   String encoding;
   //boolean modified;
+  boolean readOnly;
 
   static Buffer current;
 
@@ -605,5 +606,8 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
    *  @param doRun
    */
   public abstract void invoke(Runnable doRun);
+
+  public boolean getReadOnly () { return readOnly; }
+  public void setReadOnly (boolean readOnly) { this.readOnly = readOnly; }
 
 }

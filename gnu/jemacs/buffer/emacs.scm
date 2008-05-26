@@ -5,6 +5,7 @@
 (define-alias <frame> <gnu.jemacs.buffer.EFrame>)
 (define-alias <keymap> <gnu.jemacs.buffer.EKeymap>)
 (define-alias <toolkit> <gnu.jemacs.buffer.EToolkit>)
+(require <gnu.commonlisp.lisp.PrimOps>)
 
 (define (set-size (win :: <java.awt.Component>) (w :: <int>) (h :: <int>))
   (invoke win w h))
@@ -601,3 +602,22 @@
 (define (make-variable-buffer-local symbol)
   (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #t)
   symbol)
+(define (default-value symbol)
+  (let ((save <buffer>:current))
+    (<buffer>:setCurrent #!null)
+    (try-finally
+     (symbol-value symbol)
+     (<buffer>:setCurrent save))))
+(define (default-boundp symbol)
+  (let ((save <buffer>:current))
+    (<buffer>:setCurrent #!null)
+    (try-finally
+     (boundp symbol)
+     (<buffer>:setCurrent save))))
+(define (set-default symbol value)
+  (let ((save <buffer>:current))
+    (<buffer>:setCurrent #!null)
+    (try-finally
+     (set symbol value)
+     (<buffer>:setCurrent save))))
+  

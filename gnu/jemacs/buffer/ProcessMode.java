@@ -46,7 +46,7 @@ public class ProcessMode extends Mode
       {
 	if (lineMode)
 	  {
-	    buffer.insert('\n', 1, null);
+	    buffer.insertChar('\n', 1, null);
 	    int pos = buffer.getDot();
 	    int markPos = processMark.getOffset();
 
@@ -103,7 +103,7 @@ public class ProcessMode extends Mode
 	  }
       }
     else
-      buffer.insert(ch, count);
+      buffer.insertChar(ch, count);
   }
 
   /**

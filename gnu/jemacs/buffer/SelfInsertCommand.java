@@ -28,7 +28,7 @@ public class SelfInsertCommand extends Procedure0or1
     Buffer buffer = window.buffer;
 
     char ch = (char) window.pendingKeys[window.pendingLength];
-    buffer.insert(ch, count);
+    buffer.insertChar(ch, count);
     return Values.empty;
   }
 }

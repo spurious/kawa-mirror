@@ -1,3 +1,7 @@
+2008-05-25  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (insert): Rename to insertChar and change char->int.
+
 2008-05-23  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (removeRegion): Catch exception.

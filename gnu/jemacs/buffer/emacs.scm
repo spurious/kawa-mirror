@@ -440,7 +440,9 @@
 
 (define (insert-char ch #!optional (count '())
 		     (buffer :: <buffer> (current-buffer)))
-  (invoke buffer 'insert ch (if (eq? count '()) 1 count) #!null))
+  (invoke buffer 'insertChar
+	  (gnu.jemacs.lang.ELisp:asChar ch)
+	  (if (eq? count '()) 1 count) #!null))
 
 (define (insert #!rest (args :: <Object[]>))
   (let ((buffer :: <buffer> (current-buffer)))

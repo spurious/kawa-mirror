@@ -1,3 +1,13 @@
+2008-05-25  Per Bothner  <per@bothner.com>
+
+	Generalize char-insert methods to take 32-bit (or 20-bit) Unicode ints.
+	* Buffer.java (insert): Rename to insertChar and change char->int.
+	* Marker.java (insert): Rename to insertChar and change char->int.
+	Handle char values above 0x10000.
+	Optimize to use char array rather than StringBuffer.
+	* emacs.scm (insert-char): Use renamed insertChar method.
+	Convert value to Uncode value using ELisp.asChar.
+
 2008-05-23  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (removeRegion): New abstract method.

@@ -121,15 +121,33 @@ public final class Marker extends SeqPosition
   }
 
   /** Insert count copies of ch at the current position. */
-  public void insert (char ch, int count, Object style)
+  public void insertChar (int ch, int count, Object style)
   {
     if (count < 0)
       return;
     int n = count > 500 ? 500 : count;
-    StringBuffer sbuf = new StringBuffer(n);
-    for (int i = n;  --i >= 0; )
-      sbuf.append(ch);
-    String str = sbuf.toString();
+    char[] cbuf;
+    if (ch >= 0x10000)
+      {
+        char c1 = (char) (((ch - 0x10000) >> 10) + 0xD800);
+        char c2 = (char) ((ch & 0x3FF) + 0xDC00);
+        int i = 2*n;
+        cbuf = new char[i];
+        while ((i -= 2) >= 0)
+          {
+            cbuf[i] = c1;
+            cbuf[i+1] = c2;
+          }
+      }
+    else
+      {
+        cbuf = new char[n];
+        for (int i = n;  --i >= 0; )
+          {
+            cbuf[i] = (char) ch;
+          }
+      }
+    String str = new String(cbuf);
     for (;;)
       {
 	insert(str, style);
@@ -139,8 +157,7 @@ public final class Marker extends SeqPosition
 	if (count < 500)
 	  {
 	    n = count;
-	    sbuf.setLength(n);
-	    str = sbuf.toString();
+	    str = new String(cbuf, 0, ch >= 0x10000 ? 2*n : n);
 	  }
       }
   }

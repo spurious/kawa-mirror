@@ -92,7 +92,7 @@ public class SwtBuffer extends Buffer
   // ---------------------- Insertion --------------------------
   
   /**
-   * @see gnu.jemacs.buffer.Buffer#insert(java.lang.String, java.lang.Object, int)
+   * @see gnu.jemacs.buffer.Buffer#insertChar(java.lang.String, java.lang.Object, int)
    */
   public void insert(String string, Object style, int ipos)
   {
@@ -100,9 +100,9 @@ public class SwtBuffer extends Buffer
   }
  
   /**
-   * @see gnu.jemacs.buffer.Buffer#insert(char, int, java.lang.Object)
+   * @see gnu.jemacs.buffer.Buffer#insertChar(int, int, java.lang.Object)
    */
-  public void insert(char ch, int count, Object style)
+  public void insertChar(int ch, int count, Object style)
   {
     // TODO: Handle styles !
     char[] charr = new char[count];
@@ -114,14 +114,6 @@ public class SwtBuffer extends Buffer
     
     bufferContent.replaceTextRange(getDot(), 0, new String(charr));
     setDot(getDot() + 1);
-  }
-
-  /**
-   * @see gnu.jemacs.buffer.Buffer#insert(char, int)
-   */
-  public void insert(char ch, int count)
-  {
-    insert(ch, count, null); 
   }
 
   public void removeRegion (int start, int end)

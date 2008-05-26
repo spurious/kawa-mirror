@@ -298,7 +298,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
     AbstractDocument document = marker.buffer;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
-    marker.insert((char) x, 1, x == '\n' ? stylePlain : style);
+    marker.insertChar((char) x, 1, x == '\n' ? stylePlain : style);
     if (mustAdjustPoint)
       marker.buffer.setDot(marker.getOffset());
   }

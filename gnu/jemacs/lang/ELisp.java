@@ -30,10 +30,10 @@ public class ELisp extends Lisp2
     return (gnu.math.Numeric) arg;
   }
 
-  public static char asChar(Object x)
+  public static int asChar (Object x)
   {
     if (x instanceof Char)
-      return ((Char) x).charValue();
+      return ((Char) x).intValue();
     int i;
     if (x instanceof gnu.math.Numeric)
       i = ((gnu.math.Numeric) x).intValue();
@@ -41,9 +41,9 @@ public class ELisp extends Lisp2
       i = ((javax.swing.text.Position) x).getOffset() + 1;
     else
       i = -1;
-    if (i < 0 || i > 0xffff)
+    if (i < 0 || i >= (1<<20))
       throw new gnu.jemacs.buffer.Signal("error", "not a character value");
-    return (char) i;
+    return i;
   }
 
   public String getName()

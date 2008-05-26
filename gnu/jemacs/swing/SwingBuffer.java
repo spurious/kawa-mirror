@@ -138,9 +138,9 @@ public class SwingBuffer extends Buffer
       }
   }
 
-  public void insert (char ch, int count)
+  public void insertChar (int ch, int count)
   {
-    pointMarker.insert(ch, count, inputStyle);
+    pointMarker.insertChar(ch, count, inputStyle);
   }
 
   public void insert (int index, String string, Object style)

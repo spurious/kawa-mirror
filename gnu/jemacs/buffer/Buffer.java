@@ -293,7 +293,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
 
   /** Insert count copies of ch at Pos ipos. */
   /*
-  public void insert (char ch, int count, Object style, int ipos)
+  public void insertChar (char ch, int count, Object style, int ipos)
   {
   }
   */
@@ -315,7 +315,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
       {
 	Object value = values[i];
 	if (value instanceof Char)
-	  insert(((Char) value).charValue(), 1, style);
+	  insertChar(((Char) value).charValue(), 1, style);
 	else
 	  pointMarker.insert(value.toString(), style);
       }
@@ -329,21 +329,21 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   public void insert (Object value, Object style)
   {
     if (value instanceof Char)
-      insert(((Char) value).charValue(), 1, style);
+      insertChar(((Char) value).intValue(), 1, style);
     else
       pointMarker.insert(value.toString(), style);
   }
 
   /** Insert count copies of ch at point. */
-  public void insert (char ch, int count)
+  public void insertChar (int ch, int count)
   {
-    pointMarker.insert(ch, count, null);
+    insertChar(ch, count, null);
   }
 
   /** Insert count copies of ch at point. */
-  public void insert (char ch, int count, Object style)
+  public void insertChar (int ch, int count, Object style)
   {
-    pointMarker.insert(ch, count, style);
+    pointMarker.insertChar(ch, count, style);
   }
 
   public void removeChar (int count)

@@ -1,3 +1,7 @@
+2008-05-25  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (asChar): Generalize to use 20-bit ints.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* lambda.java: Update FString -> CharSequence.

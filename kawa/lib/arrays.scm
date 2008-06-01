@@ -15,7 +15,7 @@
 
 (define (array (shape :: <array>) #!rest (vals :: <Object[]>))
   (invoke-static <gnu.kawa.functions.Arrays> 'makeSimple
-		 shape (make <vector> vals)))
+		 shape (gnu.lists.FVector vals)))
 
 (define (array-rank (array :: <array>)) :: <int>
   (invoke array 'rank))

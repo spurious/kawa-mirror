@@ -1,3 +1,13 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* vectors.scm (vector): "vector" is now a LangObjType, so rename
+	vector function to $make$vector$.
+	When calling FVector constructor name that directly.
+	* arrays.scm (array): Likewise.
+	* string.scm (string): "string" is now a LangObjType, so rename
+	string function to $make$string$.
+	* misc.scm (procedure?): Also allow a LangObjType.
+
 2007-11-05  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (sqrt): Add overload, to handle java.lang.Float etc.

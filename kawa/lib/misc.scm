@@ -25,7 +25,7 @@
   (gnu.mapping.SimpleSymbol:valueOf (str:toString)))
 
 (define (procedure? x) :: <boolean>
-  (instance? x <function>))
+  (or (instance? x <function>) (instance? x gnu.kawa.lispexpr.LangObjType)))
 
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))

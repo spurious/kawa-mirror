@@ -1,3 +1,7 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* MakeList.java (getReturnType): Update to use new Type fields.
+
 2008-05-18  Per Bothner  <per@bothner.com>
 
 	* Format.java (format$V): If JAVA5, rename to format, with VARARGS.

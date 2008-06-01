@@ -9,7 +9,7 @@
 (define (make-string (n :: <int>) #!optional (ch #\Space)) :: <string>
   (make <gnu.lists.FString> n ch))
 
-(define (string #!rest (args :: <Object[]>)) :: <string>
+(define ($make$string$ #!rest (args :: <Object[]>)) :: <string>
   (let* ((n :: <int> args:length)
 	 (str (<gnu.lists.FString> n)))
     (do ((i :: <int> 0 (+ i 1)))

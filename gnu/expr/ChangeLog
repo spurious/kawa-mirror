@@ -1,5 +1,8 @@
 2008-06-01  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (matchN, compileArgs): Also check for new
+	LangObjType.listType.
+
 	* Compilation.java (loadClassRef): Fix classname used when emitting
 	code to load a Class not using Java5 class literals.
 

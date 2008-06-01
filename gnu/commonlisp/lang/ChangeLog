@@ -1,3 +1,8 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (importLocation): Check for LangObjType - needed for
+	vector, string, list etc.
+
 2007-02-14  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java: Remove unneeded import.

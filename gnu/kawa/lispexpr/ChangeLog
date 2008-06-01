@@ -1,3 +1,8 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (vectorType, stringType, listType): New Type statics.
+	(emitIsInstance): Optimize cases that are a plain Java type.
+
 2007-11-02  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (integerType): New field, represents the

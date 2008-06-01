@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.kawa.lispexpr.LangObjType;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
@@ -146,7 +147,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (takesVarArgs)
       {
 	Type restType = argTypes[paramCount-1];
-	if (restType == Compilation.scmListType)
+        if (restType == Compilation.scmListType || restType == LangObjType.listType)
 	  { // FIXME
 	    rargs[paramCount-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
@@ -443,7 +444,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         if (variable && i == fix_arg_count)
           {
             arg_type = argTypes[arg_count-1+skipArg];
-	    if (arg_type == Compilation.scmListType)
+	    if (arg_type == Compilation.scmListType || arg_type == LangObjType.listType)
 	      {
 		gnu.kawa.functions.MakeList.compile(args, startArg+i, comp);
 		break;

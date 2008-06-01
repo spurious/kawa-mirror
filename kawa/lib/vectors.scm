@@ -1,13 +1,13 @@
 (require <kawa.lib.prim_syntax>)
 
 (define (vector? x) :: <boolean>
-  (instance? x <vector>))
+  (instance? x vector))
 
-(define (make-vector (k :: <int>) #!optional (fill #!undefined)) :: <vector>
-  (make <vector> k fill))
+(define (make-vector (k :: <int>) #!optional (fill #!undefined)) :: vector
+  (gnu.lists.FVector k fill))
 
-(define (vector #!rest (args :: <Object[]>)) :: <vector>
-  (make <vector> args))
+(define ($make$vector$ #!rest (args :: <Object[]>)) :: <vector>
+  (gnu.lists.FVector args))
 
 (define (vector-length x :: <vector>) :: <int>
   (invoke x 'size))
@@ -31,7 +31,7 @@
 	(loop (cons (vector-ref vec i) result) i))))
 
 (define (list->vector (x :: <list>)) :: <vector>
-  (make <vector> x))
+  (gnu.lists.FVector x))
 
-(define (vector-fill! (vec :: <vector>) fill) :: <void>
-  (invoke vec 'setAll fill))
+(define (vector-fill! (vec :: vector) fill) :: void
+  (vec:setAll fill))

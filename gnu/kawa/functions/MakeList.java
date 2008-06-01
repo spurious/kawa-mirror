@@ -3,6 +3,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.lispexpr.LangObjType;
 
 /**
  * Implement the Scheme standard function "list".
@@ -84,7 +85,7 @@ public class MakeList extends ProcedureN implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return args.length > 0 ? Compilation.scmPairType : Compilation.scmListType;
+    return args.length > 0 ? Compilation.typePair : LangObjType.listType;
   }
 
 }

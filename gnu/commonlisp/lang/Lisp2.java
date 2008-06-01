@@ -9,6 +9,8 @@ import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.lispexpr.ReadTable;
+import gnu.kawa.lispexpr.ReadTable;
+import gnu.kawa.lispexpr.LangObjType;
 import gnu.kawa.reflect.FieldLocation;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
@@ -148,6 +150,8 @@ public abstract class Lisp2 extends LispLanguage
       {
         if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
           defun(name, val);
+        else if(val instanceof LangObjType)
+          defun(name, ((LangObjType) val).getConstructor());
         else
           define(name.getName(), val);
       }

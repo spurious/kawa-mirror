@@ -6,6 +6,11 @@ import gnu.math.IntNum;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
 
+/** A wrapper around a class type.
+ * A LangObjType is implemented using some class type,
+ * but may have a custom (language-specific) coercion method,
+ * constructor, and name. */
+
 public class LangObjType extends ObjectType implements TypeValue
 {
   final int typeCode;
@@ -16,6 +21,9 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int TYPE_TYPE_CODE = 5;
   private static final int CLASSTYPE_TYPE_CODE = 6;
   private static final int INTEGER_TYPE_CODE = 7;
+  private static final int LIST_TYPE_CODE = 8;
+  private static final int VECTOR_TYPE_CODE = 9;
+  private static final int STRING_TYPE_CODE = 10;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -40,6 +48,24 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType integerType =
     new LangObjType("integer", "gnu.math.IntNum",
                     INTEGER_TYPE_CODE);
+
+  public static final LangObjType vectorType =
+    new LangObjType("vector", "gnu.lists.FVector",
+                    VECTOR_TYPE_CODE);
+
+  public static final LangObjType stringType =
+    new LangObjType("string",
+                    /* #ifdef use:java.lang.CharSequence */
+                    "java.lang.CharSequence",
+                    /* #else */
+                    // /* better would be a union of CharSeq and j.l.String. */
+                    // "gnu.lists.FString",
+                    /* #endif */
+                    STRING_TYPE_CODE);
+
+  public static final LangObjType listType =
+    new LangObjType("list", "gnu.lists.LList",
+                    LIST_TYPE_CODE);
 
   static final ClassType typeArithmetic =
     ClassType.make("gnu.kawa.functions.Arithmetic");
@@ -125,7 +151,18 @@ public class LangObjType extends ObjectType implements TypeValue
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target)
   {
-    gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
+    switch (typeCode)
+      {
+      case STRING_TYPE_CODE:
+      case LIST_TYPE_CODE:
+      case VECTOR_TYPE_CODE:
+        implementationType.emitIsInstance(comp.getCode());
+        target.compileFromStack(comp,
+                                comp.getLanguage().getTypeFor(Boolean.TYPE));
+        break;
+      default:
+        gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
+      }
   }
 
   public static IntNum coerceIntNum (Object value)
@@ -200,11 +237,8 @@ public class LangObjType extends ObjectType implements TypeValue
     return coerced;
   }
 
-  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  Method coercionOrNullMethod()
   {
-    CodeAttr code = comp.getCode();
-    if (incoming != null)
-      code.emitLoad(incoming);
     ClassType methodDeclaringClass = implementationType;
     String mname;
     switch (typeCode)
@@ -234,15 +268,32 @@ public class LangObjType extends ObjectType implements TypeValue
         methodDeclaringClass = implementationType;
         mname = "asIntNumOrNull";
         break;
-      default: mname = null;
+      default:
+        return null;
       }
-    code.emitInvokeStatic(methodDeclaringClass.getDeclaredMethod(mname, 1));
+    return methodDeclaringClass.getDeclaredMethod(mname, 1);
+  }
+
+  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    if (incoming != null)
+      code.emitLoad(incoming);
+    Method method = coercionOrNullMethod();
+    if (method != null)
+      code.emitInvokeStatic(method);
     if (decl != null)
       {
         code.emitDup();
         decl.compileStore(comp);
       }
-    code.emitIfNotNull();
+    if (method != null)
+      code.emitIfNotNull();
+    else
+      {
+        implementationType.emitIsInstance(code);
+        code.emitIfIntNotZero();
+      }
   }
 
   public Object coerceFromObject (Object obj)
@@ -263,7 +314,11 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceToType(obj);
       case INTEGER_TYPE_CODE:
         return coerceIntNum(obj);
-      default: return null;
+      case VECTOR_TYPE_CODE:
+      case LIST_TYPE_CODE:
+        // optimize?
+      default:
+        return super.coerceFromObject(obj);
       }
   }
 
@@ -283,10 +338,21 @@ public class LangObjType extends ObjectType implements TypeValue
       case INTEGER_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceIntNum", 1));
         break;
+      case VECTOR_TYPE_CODE:
+      case STRING_TYPE_CODE:
+      case LIST_TYPE_CODE:
+        code.emitCheckcast(implementationType);
+        break;
       default:
         code.emitInvoke(((PrimProcedure) getConstructor()).getMethod());
       }
   }
+
+  /* #ifdef JAVA5 */
+  static final String VARARGS_SUFFIX = "";
+  /* #else */
+  // static final String VARARGS_SUFFIX = "$V";
+  /* #endif */
 
   public Procedure getConstructor ()
   {
@@ -298,7 +364,14 @@ public class LangObjType extends ObjectType implements TypeValue
         return makeFilepathProc;
       case URI_TYPE_CODE:
         return makeURIProc;
-      default: return null;
+      case VECTOR_TYPE_CODE:
+        return new PrimProcedure("kawa.lib.vectors", "$make$vector$"+VARARGS_SUFFIX, 1);
+      case LIST_TYPE_CODE:
+        return gnu.kawa.functions.MakeList.list;
+      case STRING_TYPE_CODE:
+        return new PrimProcedure("kawa.lib.strings", "$make$string$"+VARARGS_SUFFIX, 1);
+      default:
+        return null;
       }
   }
 

@@ -4,6 +4,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.Type;
 import gnu.kawa.functions.Convert;
+import gnu.kawa.lispexpr.LangObjType;
 
 /**
  * The Syntax transformer that re-writes the lambda builtin.
@@ -329,7 +330,7 @@ public class Lambda extends Syntax
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
 	else if (mode == restKeyword)
-	  decl.setType(Compilation.scmListType);
+	  decl.setType(LangObjType.listType);
 	decl.noteValue(null);  // Does not have a known value.
 	addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
@@ -343,7 +344,7 @@ public class Lambda extends Syntax
     if (bindings instanceof Symbol)
       {
 	Declaration decl = new Declaration(bindings);
-	decl.setType(Compilation.scmListType);
+        decl.setType(LangObjType.listType);
 	decl.noteValue (null);  // Does not have a known value.
 	addParam(decl, templateScopeRest, lexp, tr);
       }

@@ -194,7 +194,6 @@ public class Scheme extends LispLanguage
       defProcStFld("cddddr", "kawa.lib.lists");
       defProcStFld("null?", "kawa.lib.lists");
       defProcStFld("list?", "kawa.lib.lists");
-      defProcStFld("list", "gnu.kawa.functions.MakeList");
       defProcStFld("length", "kawa.lib.lists");
       defProcStFld("append", "kawa.standard.append", "append");
       defProcStFld("reverse", "kawa.lib.lists");
@@ -299,7 +298,6 @@ public class Scheme extends LispLanguage
       //-- Section 6.7  -- complete
       defProcStFld("string?", "kawa.lib.strings");
       defProcStFld("make-string", "kawa.lib.strings");
-      defProcStFld("string", "kawa.lib.strings");
       defProcStFld("string-length", "kawa.lib.strings");
       defProcStFld("string-ref", "kawa.lib.strings");
       defProcStFld("string-set!", "kawa.lib.strings");
@@ -327,7 +325,6 @@ public class Scheme extends LispLanguage
       //-- Section 6.8  -- complete
       defProcStFld("vector?", "kawa.lib.vectors");
       defProcStFld("make-vector", "kawa.lib.vectors");
-      defProcStFld("vector", "kawa.lib.vectors");
       defProcStFld("vector-length", "kawa.lib.vectors");
       defProcStFld("vector-ref", "kawa.lib.vectors");
       defProcStFld("vector-set!", "kawa.lib.vectors");
@@ -755,6 +752,9 @@ public class Scheme extends LispLanguage
       defAliasStFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
       defAliasStFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
       defAliasStFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
+      defAliasStFld("vector", "gnu.kawa.lispexpr.LangObjType", "vectorType");
+      defAliasStFld("string", "gnu.kawa.lispexpr.LangObjType", "stringType");
+      defAliasStFld("list", "gnu.kawa.lispexpr.LangObjType", "listType");
       defProcStFld("path?", "kawa.lib.files");
       defProcStFld("filepath?", "kawa.lib.files");
       defProcStFld("URI?", "kawa.lib.files");
@@ -916,7 +916,6 @@ public class Scheme extends LispLanguage
 	types.put ("integer", LangObjType.integerType);
 	types.put ("symbol", ClassType.make("gnu.mapping.Symbol"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
-	types.put ("list", ClassType.make("gnu.lists.LList"));
 	types.put ("pair", ClassType.make("gnu.lists.Pair"));
 	types.put ("pair-with-position",
 		   ClassType.make("gnu.lists.PairWithPosition"));
@@ -929,7 +928,9 @@ public class Scheme extends LispLanguage
 	types.put ("constant-string", ClassType.make("java.lang.String"));
 	types.put ("abstract-string", ClassType.make("gnu.lists.CharSeq"));
 	types.put ("character", ClassType.make("gnu.text.Char"));
-	types.put ("vector", ClassType.make("gnu.lists.FVector"));
+	types.put ("vector", LangObjType.vectorType);
+	types.put ("string", LangObjType.stringType);
+	types.put ("list", LangObjType.listType);
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("procedure", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
@@ -982,6 +983,10 @@ public class Scheme extends LispLanguage
       return Type.toStringType;
     if ("gnu.math.IntNum".equals(name))
       return LangObjType.integerType;
+    if ("gnu.lists.FVector".equals(name))
+      return LangObjType.vectorType;
+    if ("gnu.lists.LList".equals(name))
+      return LangObjType.listType;
     if ("gnu.text.Path".equals(name))
       return LangObjType.pathType;
     if ("gnu.text.URIPath".equals(name))

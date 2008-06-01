@@ -385,11 +385,11 @@ public class Quote extends Syntax
 		  {
 		    Expression[] arg1 = new Expression[1];
 		    arg1[0] = (Expression) buffer[i];
-		    args[i] = Invoke.makeInvokeStatic(vectorType, "vector", arg1);
+		    args[i] = makeInvokeMakeVector(arg1);
 		  }
 	      }
 	    if (max_state < 3)
-	      result = Invoke.makeInvokeStatic(vectorType, "vector", args);
+	      result = makeInvokeMakeVector(args);
 	    else
 	      result = Invoke.makeInvokeStatic(vectorAppendType, "apply", args);
 	  }
@@ -402,6 +402,17 @@ public class Quote extends Syntax
     map.put(template, result);
     /* #endif */
     return result;
+  }
+
+  private static ApplyExp makeInvokeMakeVector (Expression[] args)
+  {
+    return Invoke.makeInvokeStatic(ClassType.make("kawa.lib.vectors"),
+                                   /* #ifdef JAVA5 */
+                                   "$make$vector$",
+                                   /* #else */
+                                   // "$make$vector$$V",
+                                   /* #endif */
+                                   args);
   }
 
   public Expression rewrite (Object obj, Translator tr)
@@ -462,7 +473,6 @@ public class Quote extends Syntax
     return result;
   }
 
-  static final ClassType vectorType = ClassType.make("kawa.lib.vectors");
   static final ClassType vectorAppendType
     = ClassType.make("kawa.standard.vector_append");
   static final ClassType quoteType = ClassType.make("kawa.lang.Quote");

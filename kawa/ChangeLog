@@ -1,3 +1,11 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: The standard functions string, vector, and list
+	are now LangObjType objects.
+	* lang/Lambda.java: Update to use new LangObjType.listType.
+	* lang/QuoteExp.java (makeInvokeMakeVector): New helper method.
+	Use renamed vector method.
+
 2008-05-20  Per Bothner  <per@bothner.com>
 
 	* standard/map.java: Generalize so the 'procedure' can be any valid

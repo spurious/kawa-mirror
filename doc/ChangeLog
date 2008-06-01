@@ -1,3 +1,8 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Standard Types): The preferred spelling of standard
+	types is now without the angle brackets.
+
 2008-04-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Applet compilation): Update scribble example to use

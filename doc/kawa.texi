@@ -4344,8 +4344,12 @@ that map to primitive Java types or java classes.
 @node Standard Types, Declaring Types of Variables, , Types
 @subsection Standard Types
 
-These types are bound to identifiers having the form @code{<TYPENAME>}.
-(This syntax and most of the names are as in RScheme.)
+These types are predefined with the following names.
+
+Instead if plain @code{@var{typename}} you can also use
+the syntax @code{<@var{typename}>} with angle brackets,
+but that syntax is no longer recommended, because it doesn't
+``fit'' as well with some ways type names are used.
 
 To find which Java classes these types map into, look in
 @code{kawa/standard/Scheme.java}.
@@ -4354,59 +4358,59 @@ Note that the value of these variables are instances
 of @code{gnu.bytecode.Type},
 not (as you might at first expect) @code{java.lang.Class}.
 
-@defvar <object>
+@defvar Object
 An arbitrary Scheme value - and hence an arbitrary Java object.
 @end defvar
 
-@defvar <number>
+@defvar number
 The type of Scheme numbers.
 @end defvar
 
-@defvar <quantity>
+@defvar quantity
 The type of quantities optionally with units.
-This is a sub-type of @code{<number>}.
+This is a sub-type of @code{number}.
 @end defvar
 
-@defvar <complex>
+@defvar complex
 The type of complex numbers.
-This is a sub-type of @code{<quantity>}.
+This is a sub-type of @code{quantity}.
 @end defvar
 
-@defvar <real>
+@defvar real
 The type of real numbers.
-This is a sub-type of @code{<complex>}.
+This is a sub-type of @code{complex}.
 @end defvar
 
-@defvar <rational>
+@defvar rational
 The type of exact rationl numbers.
-This is a sub-type of @code{<real>}.
+This is a sub-type of @code{real}.
 @end defvar
 
-@defvar <integer>
+@defvar integer
 The type of exact Scheme integers.
-This is a sub-type of @code{<rational>}.
+This is a sub-type of @code{rational}.
 @end defvar
 
-@defvar <symbol>
+@defvar symbol
 The type of Scheme symbols.
 (Implemented using the Java class @code{gnu.mapping.Symbol}.)
 (Compatibility note: Previous versions of Kawa implemented
 a simple Scheme symbol using an interned @code{java.lang.String}.)
 @end defvar
 
-@defvar <keyword>
+@defvar keyword
 The type of keyword values.  @xref{Keywords}.
 @end defvar
 
-@defvar <list>
+@defvar list
 The type of Scheme lists (pure and impure, including the empty list).
 @end defvar
 
-@defvar <pair>
-The type of Scheme pairs.  This is a sub-type of @code{<list>}.
+@defvar pair
+The type of Scheme pairs.  This is a sub-type of @code{list}.
 @end defvar
 
-@defvar <string>
+@defvar string
 The type of Scheme strings.
 (Implemented using @code{java.lang.String} for immutable strings,
 and @code{gnu.lists.FString} for mutable strings.
@@ -4417,58 +4421,58 @@ containing ``surrogate characters'', for efficient indexing.)
 always used @code{gnu.lists.FString}.)
 @end defvar
 
-@defvar <character>
+@defvar character
 The type of Scheme character values.  This is a sub-type of
-@code{<object>}, in contrast to type @code{<char>}, which is the
+@code{Object}, in contrast to type @code{char}, which is the
 primitive Java @code{char} type.
 @end defvar
 
-@defvar <vector>
+@defvar vector
 The type of Scheme vectors.
 @end defvar
 
-@defvar <procedure>
+@defvar procedure
 The type of Scheme procedures.
 @end defvar
 
-@defvar <input-port>
+@defvar input-port
 The type of Scheme input ports.
 @end defvar
 
-@defvar <output-port>
+@defvar output-port
 The type of Scheme output ports.
 @end defvar
 
-@defvar <String>
+@defvar String
 This type name is a special case.  It specifies the class
-@code{<java.lang.String>}.
-However, coercing a value to @code{<String>} is done by
+@code{java.lang.String}.
+However, coercing a value to @code{String} is done by
 invoking the @code{toString} method on the value to be coerced.
 Thus it "works" for all objects.
 It also works for @code{#!null}.
 
 When Scheme code invokes a Java methods any parameter
 whose type is @code{java.lang.String} is converted
-as if it was declared as a @code{<String>}.
+as if it was declared as a @code{String}.
 @end defvar
 
 More will be added later.
 
 A type specifier can also be one of the primitive Java types.
-The numeric types @code{<long>}, @code{<int>}, @code{<short>},
-@code{<byte>}, @code{<float>}, and @code{<double>} are converted from the
-corresponding Scheme number classes.  Similarly, @code{<char>}
+The numeric types @code{long}, @code{int}, @code{short},
+@code{byte}, @code{float}, and @code{double} are converted from the
+corresponding Scheme number classes.  Similarly, @code{char}
 can be converted to and from Scheme characters.  The type
 @code{boolean} matches any object, and the result is @code{false}
 if and only if the actual argument is @code{#f}.
 (The value @code{#f} is identical to @code{Boolean.FALSE},
 and @code{#t} is identical to @code{Boolean.TRUE}.)
-The return type @code{<void>} indicates that no value is returned.
+The return type @code{void} indicates that no value is returned.
 
 A type specifier can also be a fully-qualified Java class name
-(for example @code{<java.lang.StringBuffer>}).  In that case,
+(for example @code{java.lang.StringBuffer}).  In that case,
 the actual argument is cast at run time to the named class.
-Also, @code{<java.lang.StringBuffer[]>} represents
+Also, @code{java.lang.StringBuffer[]} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
 @node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
@@ -4479,7 +4483,7 @@ Declare new locals variables with the given @var{name}, initial value
 @var{init}, and optional type specification @var{type}.
 If @var{type} is specified, then the expression @var{init} is evaluated,
 the result coerced to @var{type}, and then assigned to the variable.
-If @var{type} is not specified, it defaults to @code{<object>}.
+If @var{type} is not specified, it defaults to @code{Object}.
 @end deffn
 
 @deffn Syntax let* ((name [:: type] init) ...) body
@@ -4516,7 +4520,7 @@ In general:
 
 @defun instance? value type
 Returns @code{#t} iff @var{value} is an instance of type @var{type}.
-(Undefined if @var{type} is a primitive type, such as @code{<int>}.)
+(Undefined if @var{type} is a primitive type, such as @code{int}.)
 @end defun
 
 @defun as type value

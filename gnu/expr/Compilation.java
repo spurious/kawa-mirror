@@ -136,7 +136,7 @@ public class Compilation implements SourceLocator
   public static int defaultClassFileVersion =
     /* #ifdef JAVA5 */
     ClassType.JDK_1_5_VERSION
-    /* #slse */
+    /* #else */
     // ClassType.JDK_1_1_VERSION
     /* #endif */
     ;
@@ -2721,7 +2721,9 @@ public class Compilation implements SourceLocator
       code.emitPushClass(clas);
     else
       {
-        code.emitPushString(clas.getInternalName());
+        String name = clas instanceof ClassType ? clas.getName()
+          : clas.getInternalName().replace('/', '.');
+        code.emitPushString(name);
         code.emitInvokeStatic(getForNameHelper());
       }
   }

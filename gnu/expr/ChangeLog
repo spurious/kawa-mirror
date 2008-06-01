@@ -1,3 +1,10 @@
+2008-06-01  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (loadClassRef): Fix classname used when emitting
+	code to load a Class not using Java5 class literals.
+
+	* Compilation.java (defaultClassFileVersion): Fix PreProcess typo.
+
 2008-05-31  Per Bothner  <per@bothner.com>
 
 	* Language.java (getTypeFor): If we have a quoted Type/Class use that

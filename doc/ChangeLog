@@ -1,5 +1,7 @@
 2008-06-01  Per Bothner  <per@bothner.com>
 
+	* kawa.texi: Some improvements here and there.
+
 	* kawa.texi (Standard Types): The preferred spelling of standard
 	types is now without the angle brackets.
 

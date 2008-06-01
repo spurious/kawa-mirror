@@ -1860,9 +1860,10 @@ method procedure that is applicable given the actual arguments.
 @strong{Warning:} The current implementation of selecting the "best" method
 is not reliable if there is more than one method.
 It can select depending on argument count, and it can select between
-primitive Java methods.  However, it cannot yet do what you probably
-hope for: select between different Scheme procedures based on
-parameter types.
+primitive Java methods.  However, selecting between different Scheme
+procedures based on parameter types should be considered experimental.
+The main problem is we can't determine the most specific
+method, so Kawa just tries the methods in order.
 @end quotation
 
 @defun make-procedure [keyword: value]... method...
@@ -3438,8 +3439,8 @@ It currently effects how values are printed by a @code{load},
 though that may change.
 
 The default format depends on the current programming language.
-For Scheme, the default is @code{--scheme} for read-eval-print
-interaction, and @code{--ignore} for files that are loaded.
+For Scheme, the default is @code{scheme} for read-eval-print
+interaction, and @code{ignore} for files that are loaded.
 
 The formats currently supported include the following:
 @table @code
@@ -3491,6 +3492,11 @@ Top-level values are ignored, instead of printed.
 @subsection Paths - file name, URLs, and URIs
 
 A @dfn{Path} is the name of a file or some other @dfn{resource}.
+The path mechanism provides a layer of abstraction, so you can
+use the same functions on either a filename or a URL/URI.
+Functions that in standard Scheme take a filename
+have been generalized to take a path or a path string,
+as if using the @code{path} function below.
 
 @deffn Type path
 A general path, which can be a @code{filename} or a @code{URI}.
@@ -3510,7 +3516,7 @@ If @var{arg} is a @code{java.io.File}, a @code{filepath} value is returned.
 Otherwise, @var{arg} can be a Scheme string or a @code{java.lang.String}.
 A @code{URI} value is returns if the string starts with a URI scheme
 (such as @code{"http:"}),
-and a @code{filepath} value is returned otherwisw.
+and a @code{filepath} value is returned otherwise.
 @end deffn
 
 @deffn Predicate path? arg

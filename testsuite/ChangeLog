@@ -1,3 +1,9 @@
+2008-05-31  Per Bothner  <per@bothner.com>
+
+	* module2.scm, obj-test.scm: Language.getTypeFor no longer maps
+	java.lang.String to the toStringType <String>, which mean's we'd get
+	an error casting SimpleSymbol to j.l.String, unless we fix the test.
+
 2008-05-20  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Test map over ElementType.

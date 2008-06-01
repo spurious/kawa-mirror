@@ -163,7 +163,7 @@
 (test 2 list-length-3 '(a b))
 (test 0 length (classify))
 
-(test 3 length-diff1 'abcdef 'abc)
+(test 3 length-diff1 "abcdef" "abc")
 (test 3 length-diff2 'abcdef 'abc)
 (test 3 length-diff3 'abcdef 'abc)
 

@@ -26,12 +26,12 @@
 		      (str2 :: <java.lang.String>))
   (let ((diff (- (invoke str1 'length) (invoke str2 'length))))
     diff))
-(define (length-diff2 (str1 :: <java.lang.String>)
-		      (str2 :: <java.lang.String>))
+(define (length-diff2 (str1 :: <String>)
+		      (str2 :: <String>))
   (let ((diff :: <int> (- (invoke str1 'length) (invoke str2 'length))))
     diff))
-(define (length-diff3 (str1 :: <java.lang.String>)
-		      (str2 :: <java.lang.String>)) :: <int>
+(define (length-diff3 (str1 :: <String>)
+		      (str2 :: <String>)) :: <int>
   (let ((diff :: <int> (- (invoke str1 'length) (invoke str2 'length))))
     diff))
 

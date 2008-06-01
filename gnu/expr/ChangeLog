@@ -1,3 +1,11 @@
+2008-05-31  Per Bothner  <per@bothner.com>
+
+	* Language.java (getTypeFor): If we have a quoted Type/Class use that
+	as is, rather than passing it though getTypeFor(Object,boolean).
+	E.g. if someone explicitly writes a class like java.lang.String use
+	the plain ClassType rather than try to map it to toStringType or
+	generally a LangObjType.
+
 2008-05-18  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (takesVarArgs): Also true if VARARGS flag set.

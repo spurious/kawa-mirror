@@ -581,7 +581,12 @@ public abstract class Language
   {
     if (exp instanceof QuoteExp)
       {
-        return getTypeFor(((QuoteExp) exp).getValue(), lenient);
+        Object value = ((QuoteExp) exp).getValue();
+        if (value instanceof Type)
+          return (Type) value;
+        if (value instanceof Class)
+          return Type.make((Class) value);
+        return getTypeFor(value, lenient);
       }
     else if (exp instanceof ReferenceExp)
       {

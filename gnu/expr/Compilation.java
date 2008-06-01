@@ -196,12 +196,9 @@ public class Compilation implements SourceLocator
   static public ClassType javaStringType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
   static public ClassType scmSequenceType = ClassType.make("gnu.lists.Sequence");
-  static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
   static public ClassType scmListType = ClassType.make("gnu.lists.LList");
   static public ClassType typePair = ClassType.make("gnu.lists.Pair");
-  static public ClassType scmPairType = typePair;
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
-  static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
   public static ClassType typeType = ClassType.make("gnu.bytecode.Type");
   public static ClassType typeObjectType

@@ -1,5 +1,8 @@
 2008-06-01  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (javaIntegerType, scmPairType, scmNamedType):
+	Remove no-longer used fields.
+
 	* PrimProcedure.java (matchN, compileArgs): Also check for new
 	LangObjType.listType.
 

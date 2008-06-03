@@ -265,7 +265,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		program.append((char) MATCH_PAIR);
 		Pair pair = (Pair) pattern;
 		SyntaxForm car_syntax = syntax;
-		Object next = pair.cdr;
+		Object next = pair.getCdr();
 		while (next instanceof SyntaxForm)
 		  {
 		    syntax = (SyntaxForm) next;
@@ -273,10 +273,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		  }
 		boolean repeat = false;
 		if (next instanceof Pair
-		    && tr.matches(((Pair) next).car, SyntaxRule.dots3))
+		    && tr.matches(((Pair) next).getCar(), SyntaxRule.dots3))
 		  {
 		    repeat = true;
-		    next = ((Pair) next).cdr;
+		    next = ((Pair) next).getCdr();
 		    while (next instanceof SyntaxForm)
 		      {
 			syntax = (SyntaxForm) next;
@@ -287,7 +287,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		int subvar0 = patternNames.size();
 		if (context == 'P')
 		  context = '\0';
-		translate(pair.car, program, literal_identifiers,
+		translate(pair.getCar(), program, literal_identifiers,
 			  repeat ? nesting + 1 : nesting,
 			  literals, car_syntax,
 			  context == 'V' ? '\0' : 'P', tr);
@@ -419,12 +419,12 @@ public class SyntaxPattern extends Pattern implements Externalizable
       value = (value << 13) | ((ch = program.charAt(pc++)) >> 3);
     if ((ch & 7) == MATCH_ANY_CAR)
       {
-	if (syntax != null && ! (p.car instanceof SyntaxForm))
-	  p = Translator.makePair(p, syntax.fromDatum(p.car), p.cdr);
+	if (syntax != null && ! (p.getCar() instanceof SyntaxForm))
+	  p = Translator.makePair(p, syntax.fromDatum(p.getCar()), p.getCdr());
 	vars[start_vars + value] = p;
 	return true;
       }
-    return match (p.car, vars, start_vars, pc_start, syntax);
+    return match (p.getCar(), vars, start_vars, pc_start, syntax);
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars,
@@ -476,7 +476,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		    break;
 		  }
 		else if (o instanceof Pair)
-		  o = ((Pair) o).cdr;
+		  o = ((Pair) o).getCdr();
 		else 
 		  return false;
 	      }
@@ -490,7 +490,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	      return false;
 	    pc += value;
 	    value = 0;
-	    obj = p.cdr;
+	    obj = p.getCdr();
 	    continue;	
 	  case MATCH_LREPEAT:
 	    int repeat_pc = pc;
@@ -546,7 +546,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		p = (Pair) obj;
 		if (! match_car (p, vars, start_vars, repeat_pc, syntax))
 		  return false;
-		obj = p.cdr;
+		obj = p.getCdr();
 		for (int j = 0;  j < subvarN;  j++)
 		  arrays[j][i] = vars[subvar0+j];
 	      }
@@ -653,7 +653,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  }
 	Pair pair = (Pair) list;
 	tr.pushPositionOf(pair);
-	Object literal = pair.car;
+	Object literal = pair.getCar();
 	Object wrapped;
 	if (literal instanceof SyntaxForm)
 	  {
@@ -665,7 +665,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	if (! (literal instanceof Symbol))
           tr.error('e', "non-symbol '"+literal+"' in literals list");
 	literals[i] = wrapped;
-	list = pair.cdr;
+	list = pair.getCdr();
       }
     tr.popPositionOf(savePos);
     return literals;

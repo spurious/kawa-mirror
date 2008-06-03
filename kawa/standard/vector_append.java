@@ -56,8 +56,8 @@ public class vector_append extends ProcedureN
 	    while (arg != LList.Empty)
 	      {
 		Pair pair = (Pair) arg;
-		result[position++] = pair.car;
-		arg = pair.cdr;
+		result[position++] = pair.getCar();
+		arg = pair.getCdr();
 	      }
 	  }
       }

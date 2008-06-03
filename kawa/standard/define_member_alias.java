@@ -16,51 +16,53 @@ public class define_member_alias extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Pair p;
-    if (! (st.cdr instanceof Pair)
+    if (! (st.getCdr() instanceof Pair)
         || (tr.currentScope() instanceof ModuleExp)
-        || ! ((p = (Pair) st.cdr).car instanceof String))
+        || ! ((p = (Pair) st.getCdr()).getCar() instanceof String))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Object name = p.car;
+    Object name = p.getCar();
     Declaration decl = defs.addDeclaration((String) name,
                                            Compilation.typeSymbol);
     decl.setIndirectBinding(true);
-    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.cdr));
+    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.getCdr()));
     forms.addElement(st);
     return true;
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     Pair p1;
     if (! (obj instanceof Pair)
-        || ! ((p1 = (Pair) obj).car instanceof String
-              || p1.car instanceof Declaration))
+        || ! ((p1 = (Pair) obj).getCar() instanceof String
+              || p1.getCar() instanceof Declaration))
       return tr.syntaxError("missing name in " + getName());
-    if (p1.cdr instanceof Pair)
+    if (p1.getCdr() instanceof Pair)
       {
         String name;
         Declaration decl;
-        if (p1.car instanceof Declaration)
+        Object p1_car = p1.getCar();
+        if (p1_car instanceof Declaration)
           {
-            decl = (Declaration) p1.car;
+            decl = (Declaration) p1_car;
             name = decl.getName();
           }
         else
           {
-            name = (String) p1.car;
+            name = (String) p1_car;
             decl = null;
           }
-        Pair p2 = (Pair) p1.cdr;
+        Pair p2 = (Pair) p1.getCdr();
         Expression fname = null;
-        Expression arg = tr.rewrite(p2.car);
-        if (p2.cdr == LList.Empty)
+        Expression arg = tr.rewrite(p2.getCar());
+        Object p2_cdr = p2.getCdr();
+        if (p2_cdr == LList.Empty)
           fname = new QuoteExp(gnu.expr.Compilation.mangleName(name));
-        else if (p2.cdr instanceof Pair)
+        else if (p2_cdr instanceof Pair)
           {
-            Pair p3 = (Pair) p2.cdr;
-            if (p3.cdr == LList.Empty)
-              fname = tr.rewrite(p3.car);
+            Pair p3 = (Pair) p2_cdr;
+            if (p3.getCdr() == LList.Empty)
+              fname = tr.rewrite(p3.getCar());
           }
         if (fname != null)
           {

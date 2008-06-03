@@ -30,7 +30,7 @@ public class define_class extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    Object st_cdr = st.cdr;
+    Object st_cdr = st.getCdr();
     SyntaxForm nameSyntax = null;
     while (st_cdr instanceof SyntaxForm)
       {
@@ -40,7 +40,7 @@ public class define_class extends Syntax
     if (! (st_cdr instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st_cdr;
-    Object name = p.car;
+    Object name = p.getCar();
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;
@@ -68,7 +68,7 @@ public class define_class extends Syntax
       cname = cname.substring(1, nlen-1);
     oexp.setName(cname);
 
-    Object members = p.cdr;
+    Object members = p.getCdr();
     while (members instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) members;
@@ -97,15 +97,17 @@ public class define_class extends Syntax
   {
     //FIXME needs work
     Declaration decl = null;
-    if (form.cdr instanceof Pair)
+    Object form_cdr = form.getCdr();
+    if (form_cdr instanceof Pair)
       {
-        form = (Pair) form.cdr;
-	if (! (form.car instanceof Declaration))
+        form = (Pair) form_cdr;
+        Object form_car = form.getCar();
+	if (! (form_car instanceof Declaration))
 	  return tr.syntaxError(this.getName() + " can only be used in <body>");
-	decl = (Declaration) form.car;
+	decl = (Declaration) form_car;
       }
     ClassExp oexp = (ClassExp) decl.getValue();
-    objectSyntax.rewriteClassDef((Object[]) form.cdr, tr);
+    objectSyntax.rewriteClassDef((Object[]) form.getCdr(), tr);
     SetExp sexp = new SetExp(decl, oexp);
     sexp.setDefining (true);
     return sexp;

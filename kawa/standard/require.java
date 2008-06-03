@@ -113,25 +113,25 @@ public class require extends Syntax
         // it be emitted at the end of the 'body'.
         return true;
       }
-    Pair args = (Pair) st.cdr;
-    Object name = args.car;
+    Pair args = (Pair) st.getCdr();
+    Object name = args.getCar();
     Type type = null;
     Pair p;
     if (name instanceof Pair
-        && tr.matches((p = (Pair) name).car, Scheme.quote_sym))
+        && tr.matches((p = (Pair) name).getCar(), Scheme.quote_sym))
       {
-	name = p.cdr;
+	name = p.getCdr();
 	if (! (name instanceof Pair)
-	    || (p = (Pair) name).cdr != LList.Empty
-	    || ! (p.car instanceof Symbol))
+	    || (p = (Pair) name).getCdr() != LList.Empty
+	    || ! (p.getCar() instanceof Symbol))
 	  {
 	    tr.error('e', "invalid quoted symbol for 'require'");
 	    return false;
 	  }
-	name = mapFeature(p.car.toString());
+	name = mapFeature(p.getCar().toString());
 	if (name == null)
 	  {
-	    tr.error('e', "unknown feature name '"+p.car+"' for 'require'");
+	    tr.error('e', "unknown feature name '"+p.getCar()+"' for 'require'");
 	    return false;
 	  }
 	type = ClassType.make((String) name);
@@ -155,9 +155,9 @@ public class require extends Syntax
     else if (name instanceof Symbol && ! tr.selfEvaluatingSymbol(name))
       {
         type = tr.getLanguage().getTypeFor(tr.rewrite(name, false));
-        if (type instanceof ClassType && args.cdr instanceof Pair)
+        if (type instanceof ClassType && args.getCdr() instanceof Pair)
           {
-            name = ((Pair) args.cdr).car;
+            name = ((Pair) args.getCdr()).getCar();
             if
               /* #ifdef use:java.lang.CharSequence */
               (name instanceof CharSequence)

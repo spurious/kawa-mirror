@@ -169,8 +169,8 @@ public class Macro extends Syntax implements Printable, Externalizable
 	      {
 		Pair pair = (Pair) form;
 		if (i > 0)
-		  args[i-1] = pair.car;
-		form = pair.cdr;
+		  args[i-1] = pair.getCar();
+		form = pair.getCdr();
 	      }
 	    result = pr.applyN(args);
 	  }
@@ -181,7 +181,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 	  {
 	    Pair p = (Pair) result;
 	    result = new PairWithPosition((PairWithPosition) form,
-					  p.car, p.cdr);
+					  p.getCar(), p.getCdr());
 	  }
 	return result;
       }

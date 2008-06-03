@@ -25,8 +25,7 @@
   (set! p:car x))
 
 (define (set-cdr! (p <pair>) x)
-  ((primitive-set-field <pair> 'cdr <object>)
-   p x))
+  (set! p:cdr x))
 
 (define-procedure car
   setter: set-car!
@@ -46,13 +45,15 @@
 	   setter: (lambda (arg value)
 		     ,(syntax-case #'slots ()
 			((first1 . rest1)
-			 #`((primitive-set-field <pair> 'first1 <object>)
-			    ,(let loop ((f #'rest1))
-			       (syntax-case f ()
-				 (() #'arg)
-				 ((first . rest)
-				  #`(field (as <pair> ,(loop #'rest))
-					   ',(syntax-object->datum #'first)))))
+			 #`(set!
+			    (field 
+			     ,(let loop ((f #'rest1))
+				(syntax-case f ()
+				  (() #'arg)
+				  ((first . rest)
+				   #`(field (as <pair> ,(loop #'rest))
+					    ',(syntax-object->datum #'first)))))
+			     'first1)
 			    value))))
 	   (lambda (arg) name: 'fname
 		   ,(let loop ((f #'slots))
@@ -116,49 +117,48 @@
 (define (memq x list)
   (let lp ((lst list))
     (and (instance? lst <pair>)
-	 (if (eq? x ((primitive-get-field <pair> 'car <Object>) lst)) lst
-	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+	 (let ((p :: pair lst))
+	   (if (eq? x p:car) lst
+	       (lp p:cdr))))))
 
 (define (memv x list)
   (let lp ((lst list))
     (and (instance? lst <pair>)
-	 (if (eqv? x ((primitive-get-field <pair> 'car <Object>) lst)) lst
-	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+	 (let ((p :: pair lst))
+	   (if (eqv? x p:car) lst
+	       (lp p:cdr))))))
 
 ;;;  The optional test argument is an srfi-1 extension.
 (define (member x list #!optional (test :: <procedure> equal?))
   (let lp ((lst list))
     (and (instance? lst <pair>)
-	 (if (test x ((primitive-get-field <pair> 'car <Object>) lst)) lst
-	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+	 (let ((p :: pair lst))
+	   (if (test x p:car) lst
+	       (lp p:cdr))))))
 
 (define (assq x list)
   (let lp ((list list))
     (if (eq? list '())
 	 #f
-	(let ((pair :: <pair>
-		    ((primitive-get-field <pair> 'car <Object>) list)))
-	  (if (eq? ((primitive-get-field <pair> 'car <Object>) pair) x)
+	(let ((pair :: <pair> (car list)))
+	  (if (eq? pair:car x)
 	      pair
-	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))
+	      (lp (cdr list)))))))
 
 (define (assv x list)
   (let lp ((list list))
     (if (eq? list '())
 	 #f
-	(let ((pair :: <pair>
-		    ((primitive-get-field <pair> 'car <Object>) list)))
-	  (if (eqv? ((primitive-get-field <pair> 'car <Object>) pair) x)
+	(let ((pair :: <pair> (car list)))
+	  (if (eqv? pair:car x)
 	      pair
-	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))
+	      (lp (cdr list)))))))
 
 ;;;  The optional test argument is an srfi-1 extension.
 (define (assoc x list #!optional (test :: <procedure> equal?))
   (let lp ((list list))
     (if (eq? list '())
 	 #f
-	(let ((pair :: <pair>
-		    ((primitive-get-field <pair> 'car <Object>) list)))
-	  (if (test ((primitive-get-field <pair> 'car <Object>) pair) x)
-	      pair
-	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))
+	(let ((pair :: <pair> (car list)))
+	  (if (test pair:car x) pair
+	      (lp (cdr list)))))))

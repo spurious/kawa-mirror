@@ -174,7 +174,7 @@
 		(let* ((path-pair :: <gnu.lists.PairWithPosition>
 				  (syntax-object->datum (syntax (filename))))
 		       (base :: path (path-pair:getFileName))
-		       (fname ((field path-pair 'car):toString)))
+		       (fname ((path-pair:getCar):toString)))
 		  (list
 		   (datum->syntax-object (syntax filename) 'include)
 		   (datum->syntax-object

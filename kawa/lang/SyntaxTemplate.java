@@ -240,16 +240,16 @@ public class SyntaxTemplate implements Externalizable
 	Pair pair = (Pair) form;
 	int ret_cdr = -2;;
 	int save_pc = template_program.length();
-	Object car = pair.car;
+	Object car = pair.getCar();
 
         // Look for (... ...) and translate that to ...
         if (tr.matches(car, dots3))
           {
-            Object cdr = Translator.stripSyntax(pair.cdr);
+            Object cdr = Translator.stripSyntax(pair.getCdr());
             if (cdr instanceof Pair)
               {
                 Pair cdr_pair = (Pair) cdr;
-                if (cdr_pair.car == dots3 && cdr_pair.cdr == LList.Empty)
+                if (cdr_pair.getCar() == dots3 && cdr_pair.getCdr() == LList.Empty)
                   {
                     form = dots3;
                     break check_form;
@@ -263,14 +263,14 @@ public class SyntaxTemplate implements Externalizable
 	template_program.append((char) BUILD_LIST1);
 
 	int num_dots3 = 0;
-	Object rest = pair.cdr;
+	Object rest = pair.getCdr();
 	while (rest instanceof Pair)
 	  {
 	    Pair p = (Pair) rest;
-	    if (! tr.matches(p.car, dots3))
+	    if (! tr.matches(p.getCar(), dots3))
 	      break;
 	    num_dots3++;
-	    rest = p.cdr;
+	    rest = p.getCdr();
 	    template_program.append((char) BUILD_DOTS); // to be patched.
 	  }
 	int ret_car = convert_template(car, syntax, template_program,
@@ -456,7 +456,7 @@ public class SyntaxTemplate implements Externalizable
     if ((ch & 7) == BUILD_VAR_CAR)
       {
 	Pair p = (Pair) get_var(ch >> 3, vars, indexes);
-	return Translator.makePair(p, p.car, LList.Empty);
+	return Translator.makePair(p, p.getCar(), LList.Empty);
       }
     else if ((ch & 7) == BUILD_DOTS)
       {
@@ -474,13 +474,13 @@ public class SyntaxTemplate implements Externalizable
 	    if (last == null)
 	      result = list;
 	    else
-	      last.cdr = list;
+	      last.setCdr(list);
 	    // Normally list is a single Pair, but if it is multiple Pairs,
 	    // find the last Pair so we can properly splice everything.
 	    while (list instanceof Pair)
 	      {
 		last = (Pair) list;
-		list = (LList) last.cdr;
+		list = (LList) last.getCdr();
 	      }
 	  }
 	return result;
@@ -530,11 +530,11 @@ public class SyntaxTemplate implements Externalizable
 	    if (p == null)
 	      result = q;
 	    else
-	      p.cdr = q;
+	      p.setCdr(q);
 	    while (q instanceof Pair)
 	      {
 		p = (Pair) q;
-		q = p.cdr;
+		q = p.getCdr();
 	      }
 	    pc += ch >> 3;
 	    ch = template_program.charAt(pc);
@@ -545,7 +545,7 @@ public class SyntaxTemplate implements Externalizable
 	if (p == null)
 	  result = cdr;
 	else
-	  p.cdr = cdr;
+	  p.setCdr(cdr);
 	return result;
       }
     else if (ch == BUILD_VECTOR)
@@ -566,7 +566,7 @@ public class SyntaxTemplate implements Externalizable
       {
 	Object var = get_var(ch >> 3, vars, indexes);
 	if ((ch & 7) == BUILD_VAR_CAR)
-	  var = ((Pair) var).car;
+	  var = ((Pair) var).getCar();
 	return var;
       }
     else

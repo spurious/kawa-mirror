@@ -86,8 +86,8 @@
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i len) result)
       (let ((pair :: <pair> list))
-	(string-set! result i (field pair 'car))
-	(set! list (field pair 'cdr))))))
+	(string-set! result i pair:car)
+	(set! list pair:cdr)))))
 
 (define (string-copy (str <string>)) :: <gnu.lists.FString>
   (make <gnu.lists.FString> str))

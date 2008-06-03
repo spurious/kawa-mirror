@@ -36,13 +36,13 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     while (list != LList.Empty)
       {
 	Pair pair = (Pair) list;
-	Pair new_pair = new Pair (proc.apply1 (pair.car), LList.Empty);
+	Pair new_pair = new Pair (proc.apply1(pair.getCar()), LList.Empty);
 	if (last == null)
 	  result = new_pair;
 	else
-	  last.cdr = new_pair;
+	  last.setCdr(new_pair);
 	last = new_pair;
-	list = pair.cdr;
+	list = pair.getCdr();
       }
     return result;
   }
@@ -53,8 +53,8 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     while (list != LList.Empty)
       {
 	Pair pair = (Pair) list;
-	proc.apply1 (pair.car);
-	list = pair.cdr;
+	proc.apply1(pair.getCar());
+	list = pair.getCdr();
       }
   }
 
@@ -114,8 +114,8 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	    if (list == LList.Empty)
 	      return result;
 	    Pair pair = (Pair) list;
-	    each_args[need_apply+i] = pair.car;
-	    rest[i] = pair.cdr;
+	    each_args[need_apply+i] = pair.getCar();
+	    rest[i] = pair.getCdr();
 	  }
 	Object value = proc.applyN (each_args);
 	if (collect)
@@ -124,7 +124,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	    if (last == null)
 	      result = new_pair;
 	    else
-	      last.cdr = new_pair;
+	      last.setCdr(new_pair);
 	    last = new_pair;
 	  }
       }

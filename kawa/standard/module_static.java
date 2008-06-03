@@ -13,29 +13,29 @@ public class module_static extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    Object list = st.cdr;
+    Object list = st.getCdr();
     if (! (defs instanceof ModuleExp))
       {
 	tr.error('e', "\'" + getName() + "\' not at module level");
 	return true;
       }
     if (list instanceof Pair
-	&& (st = (Pair) list).cdr == LList.Empty
-	&& st.car instanceof Boolean)
+	&& (st = (Pair) list).getCdr() == LList.Empty
+	&& st.getCar() instanceof Boolean)
       {
-	if (st.car == Boolean.FALSE)
+	if (st.getCar() == Boolean.FALSE)
 	  ((ModuleExp) defs).setFlag(ModuleExp.NONSTATIC_SPECIFIED);
 	else
 	  ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
       }
     else if (list instanceof Pair
-             && (st = (Pair) list).cdr == LList.Empty
-             && st.car instanceof Pair
-             && tr.matches((st = (Pair) st.car).car, Scheme.quote_sym))
+             && (st = (Pair) list).getCdr() == LList.Empty
+             && st.getCar() instanceof Pair
+             && tr.matches((st = (Pair) st.getCar()).getCar(), Scheme.quote_sym))
       {
-        if ((st = (Pair)st.cdr) != LList.Empty
-            && st.car instanceof SimpleSymbol
-            && st.car.toString() == "init-run")
+        if ((st = (Pair)st.getCdr()) != LList.Empty
+            && st.getCar() instanceof SimpleSymbol
+            && st.getCar().toString() == "init-run")
           {
             // (module-static 'init-run) implies (module-static #t)
             ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
@@ -55,17 +55,17 @@ public class module_static extends Syntax
 	while (list != LList.Empty)
 	  {
 	    if (! (list instanceof Pair)
-		|| ! ((st = (Pair) list).car instanceof Symbol))
+		|| ! ((st = (Pair) list).getCar() instanceof Symbol))
 	      {
 		tr.error('e', "invalid syntax in '" + getName() + '\'');
 		return false;
 	      }
-	    Symbol symbol = (Symbol) st.car;
+	    Symbol symbol = (Symbol) st.getCar();
 	    Declaration decl = defs.getNoDefine(symbol);
 	    if (decl.getFlag(Declaration.NOT_DEFINING))
 	      Translator.setLine(decl, st);
 	    decl.setFlag(Declaration.STATIC_SPECIFIED);
-	    list = st.cdr;
+	    list = st.getCdr();
 	  }
       }
     return true;

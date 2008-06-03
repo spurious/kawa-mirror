@@ -44,7 +44,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     Pair rules_pair;
     // SyntaxForm, if any, wrapping rest of rules list.
     SyntaxForm rules_syntax = null;
-    for (int i = 0;  i < rules_count;  i++, srules = rules_pair.cdr)
+    for (int i = 0;  i < rules_count;  i++, srules = rules_pair.getCdr())
       {
 	while (srules instanceof SyntaxForm)
 	  {
@@ -55,7 +55,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 
 	// SyntaxForm, if any, wrapping the current rule.
 	SyntaxForm rule_syntax = rules_syntax;
-	Object syntax_rule = rules_pair.car;
+	Object syntax_rule = rules_pair.getCar();
 	while (syntax_rule instanceof SyntaxForm)
 	  {
 	    rule_syntax = (SyntaxForm) syntax_rule;
@@ -69,7 +69,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	// SyntaxForm, if any, wrapping the current rule's pattern.
 	SyntaxForm pattern_syntax = rule_syntax;
 	Pair syntax_rule_pair = (Pair) syntax_rule;
-	Object pattern = syntax_rule_pair.car;
+	Object pattern = syntax_rule_pair.getCar();
 
 	String save_filename = tr.getFileName();
 	int save_line = tr.getLineNumber();
@@ -80,7 +80,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    // SyntaxForm, if any, wrapping the current rule's template.
 	    SyntaxForm template_syntax = rule_syntax;
 	    tr.setLine(syntax_rule_pair);
-	    syntax_rule = syntax_rule_pair.cdr;
+	    syntax_rule = syntax_rule_pair.getCdr();
 	    while (syntax_rule instanceof SyntaxForm)
 	      {
 		template_syntax = (SyntaxForm) syntax_rule;
@@ -92,12 +92,12 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		return;
 	      }
 	    syntax_rule_pair = (Pair) syntax_rule;
-	    if (syntax_rule_pair.cdr != LList.Empty)
+	    if (syntax_rule_pair.getCdr() != LList.Empty)
 	      {
 		tr.syntaxError ("junk after "+i+"'th syntax rule");
 		return;
 	      }
-	    Object template = syntax_rule_pair.car;
+	    Object template = syntax_rule_pair.getCar();
 
 	    PatternScope patternScope = PatternScope.push(tr);
 	    tr.push(patternScope);
@@ -115,12 +115,12 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    if (pattern instanceof Pair)
 	      {
 		// ?? FIXME
-		literal_identifiers[0] = ((Pair)pattern).car;
+		literal_identifiers[0] = ((Pair)pattern).getCar();
 
 		Pair p = (Pair) pattern;
 		programbuf.append((char) ((1 << 3) | SyntaxPattern.MATCH_PAIR));
 		programbuf.append((char) SyntaxPattern.MATCH_IGNORE);
-		pattern = p.cdr;
+		pattern = p.getCdr();
 	      }
 	    else
 	      {

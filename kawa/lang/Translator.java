@@ -102,7 +102,7 @@ public class Translator extends Compilation
   public final Expression rewrite_car (Pair pair, SyntaxForm syntax)
   {
     if (syntax == null || syntax.scope == current_scope
-	|| pair.car instanceof SyntaxForm)
+	|| pair.getCar() instanceof SyntaxForm)
       return rewrite_car(pair, false);
     ScopeExp save_scope = current_scope;
     try
@@ -118,7 +118,7 @@ public class Translator extends Compilation
 
   public final Expression rewrite_car (Pair pair, boolean function)
   {
-    Object car = pair.car;
+    Object car = pair.getCar();
     if (pair instanceof PairWithPosition)
       return rewrite_with_position (car, function, (PairWithPosition) pair);
     else
@@ -288,9 +288,9 @@ public class Translator extends Compilation
 
   public Expression rewrite_pair (Pair p, boolean function)
   {
-    if (p.car instanceof Syntax)
-      return apply_rewrite((Syntax) p.car, p);
-    Object cdr = p.cdr;
+    if (p.getCar() instanceof Syntax)
+      return apply_rewrite((Syntax) p.getCar(), p);
+    Object cdr = p.getCdr();
 
     Expression func = rewrite_car (p, true);
     Object proc = null;
@@ -353,9 +353,9 @@ public class Translator extends Compilation
     int cdr_length = listLength(cdr);
 
     if (cdr_length == -1)
-      return syntaxError("circular list is not allowed after "+p.car);
+      return syntaxError("circular list is not allowed after "+p.getCar());
     if (cdr_length < 0)
-      return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.car);
+      return syntaxError("dotted list ["+cdr+"] is not allowed after "+p.getCar());
 
     boolean mapKeywordsToAttributes = false;
     Stack vec = new Stack();
@@ -395,7 +395,7 @@ public class Translator extends Compilation
           }
 
         vec.addElement(arg);
-	cdr = cdr_pair.cdr;
+	cdr = cdr_pair.getCdr();
       }
     Expression[] args = new Expression[vec.size()];
     vec.copyInto(args);
@@ -477,7 +477,7 @@ public class Translator extends Compilation
       obj = ((SyntaxForm) obj).form;
     if (! (obj instanceof Pair))
       return null;
-    return stripSyntax(((Pair) obj).car);
+    return stripSyntax(((Pair) obj).getCar());
   }
 
   public static Object safeCdr (Object obj)
@@ -486,7 +486,7 @@ public class Translator extends Compilation
       obj = ((SyntaxForm) obj).form;
     if (! (obj instanceof Pair))
       return null;
-    return stripSyntax(((Pair) obj).cdr);
+    return stripSyntax(((Pair) obj).getCdr());
   }
 
   /** Returns the length of a syntax list.
@@ -513,15 +513,15 @@ public class Translator extends Compilation
 	if (! (fast instanceof Pair))
 	  return -1-n;
 	n++;
-	Object next = ((Pair) fast).cdr;
+	Object next = ((Pair) fast).getCdr();
 	while (next instanceof SyntaxForm)
 	  next = ((SyntaxForm) next).form;
 	if (next == LList.Empty)
 	  return n;
 	if (! (next instanceof Pair))
 	  return -1-n;
-	slow = ((Pair)slow).cdr;
-	fast = ((Pair)next).cdr;
+	slow = ((Pair)slow).getCdr();
+	fast = ((Pair)next).getCdr();
 	n++;
 	if (fast == slow)
 	  return Integer.MIN_VALUE;
@@ -569,11 +569,11 @@ public class Translator extends Compilation
         Pair p;
         if (name instanceof Pair
             && safeCar(p = (Pair) name) == LispLanguage.lookup_sym
-            && p.cdr instanceof Pair
-            && (p = (Pair) p.cdr).cdr instanceof Pair)
+            && p.getCdr() instanceof Pair
+            && (p = (Pair) p.getCdr()).getCdr() instanceof Pair)
           {
-            Expression part1 = rewrite(p.car);
-            Expression part2 = rewrite(((Pair) p.cdr).car);
+            Expression part1 = rewrite(p.getCar());
+            Expression part2 = rewrite(((Pair) p.getCdr()).getCar());
             Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
               return sym;
@@ -843,8 +843,8 @@ public class Translator extends Compilation
       return;
     setLine(saved);
     positionPair = (PairWithPosition) saved;
-    if (positionPair.car == Special.eof)
-      positionPair = (PairWithPosition) positionPair.cdr;
+    if (positionPair.getCar() == Special.eof)
+      positionPair = (PairWithPosition) positionPair.getCdr();
   }
 
   /** Set the line position of the argument to the current position. */
@@ -972,21 +972,21 @@ public class Translator extends Compilation
         ScopeExp save_scope = current_scope;
         try
           {
-            Object obj = st_pair.car;
+            Object obj = st_pair.getCar();
             if (obj instanceof SyntaxForm)
               {
-                SyntaxForm sf = (SyntaxForm) st_pair.car;
+                SyntaxForm sf = (SyntaxForm) st_pair.getCar();
                 setCurrentScope(sf.scope);
                 obj = sf.form;
               }
             Pair p;
             if (obj instanceof Pair
-                && (p = (Pair) obj).car == LispLanguage.lookup_sym
-                && p.cdr instanceof Pair
-                && (p = (Pair) p.cdr).cdr instanceof Pair)
+                && (p = (Pair) obj).getCar() == LispLanguage.lookup_sym
+                && p.getCdr() instanceof Pair
+                && (p = (Pair) p.getCdr()).getCdr() instanceof Pair)
               {
-                Expression part1 = rewrite(p.car);
-                Expression part2 = rewrite(((Pair) p.cdr).car);
+                Expression part1 = rewrite(p.getCar());
+                Expression part2 = rewrite(((Pair) p.getCdr()).getCar());
                 obj = namespaceResolve(part1, part2);
               }
             if (obj instanceof Symbol && ! selfEvaluatingSymbol(obj))
@@ -1066,7 +1066,7 @@ public class Translator extends Compilation
                     f = wrapSyntax(f, sf);
                     if (lastPair == null)
 		      return f;
-                    lastPair.cdr = f;
+                    lastPair.setCdr(f);
                     return list;
                   }
 		formStack.add(wrapSyntax(popForms(first), sf));
@@ -1081,14 +1081,14 @@ public class Translator extends Compilation
 	  {
 	    Pair pair = (Pair) body;
 	    int first = formStack.size();
-	    scanForm(pair.car, defs);
+	    scanForm(pair.getCar(), defs);
             if (getState() == Compilation.PROLOG_PARSED)
               {
                 // We've seen a require form during the initial pass when
                 // we're looking module names.  Defer the require and any
                 // following forms in this body.
-                if (pair.car != pendingForm)
-                  pair = makePair(pair, pendingForm, pair.cdr);
+                if (pair.getCar() != pendingForm)
+                  pair = makePair(pair, pendingForm, pair.getCdr());
                 pendingForm = new Pair(kawa.standard.begin.begin, pair);
                 return LList.Empty;
               }
@@ -1102,12 +1102,12 @@ public class Translator extends Compilation
 		    if (lastPair == null)
 		      list = npair;
 		    else
-		      lastPair.cdr = npair;
+		      lastPair.setCdr(npair);
 		    lastPair = npair;
 		  }
 		formStack.setSize(first);
 	      }
-	    body = pair.cdr;
+	    body = pair.getCdr();
 	  }
 	else
 	  {

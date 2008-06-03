@@ -13,7 +13,7 @@ public class define_alias extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    Object formCdr = st.cdr;
+    Object formCdr = st.getCdr();
     SyntaxForm formSyntax = null;
     while (formCdr instanceof SyntaxForm)
       {
@@ -24,13 +24,13 @@ public class define_alias extends Syntax
       {
         Pair p = (Pair) formCdr;
         SyntaxForm nameSyntax = formSyntax;
-        Object name = p.car;
+        Object name = p.getCar();
         while (name instanceof SyntaxForm)
           {
             nameSyntax = (SyntaxForm) name;
             name = nameSyntax.form;
           }
-        formCdr = p.cdr;
+        formCdr = p.getCdr();
         while (formCdr instanceof SyntaxForm)
           {
             formSyntax = (SyntaxForm) formCdr;
@@ -38,7 +38,7 @@ public class define_alias extends Syntax
           }
         if ((name instanceof String || name instanceof Symbol)
             && formCdr instanceof Pair
-            && (p = (Pair) formCdr).cdr == LList.Empty)
+            && (p = (Pair) formCdr).getCdr() == LList.Empty)
           {
             Declaration decl = tr.define(name, nameSyntax, defs);
             decl.setIndirectBinding(true);

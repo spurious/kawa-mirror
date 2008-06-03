@@ -3,10 +3,10 @@
 ;;; limitations in the Common Lisp support making that difficult.
 
 (define (car x)
-  (if (eq? x '()) x (slot-ref (as <pair> x) 'car)))
+  (if (eq? x '()) x ((as <pair> x):getCar)))
 
 (define (cdr x)
-  (if (eq? x '()) x (slot-ref (as <pair> x) 'cdr)))
+  (if (eq? x '()) x ((as <pair> x):getCdr)))
 
 (define (setcar (p <pair>) x)
   (set-car! p x))

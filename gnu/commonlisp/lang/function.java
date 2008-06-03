@@ -15,13 +15,13 @@ public class function extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     if (obj instanceof Pair)
       {
 	Pair pair = (Pair) obj;
-	if (pair.cdr != LList.Empty)
+	if (pair.getCdr() != LList.Empty)
 	  return tr.syntaxError("too many forms after 'function'");
-	Object name = pair.car;
+	Object name = pair.getCar();
 	if (name instanceof String || name instanceof Symbol)
 	  {
 	    ReferenceExp rexp = new ReferenceExp(name);
@@ -32,7 +32,7 @@ public class function extends Syntax
 	if (name instanceof Pair)
 	  {
 	    pair = (Pair) name;
-	    name = pair.car;
+	    name = pair.getCar();
 	    if (name instanceof String ? "lambda".equals(name)
 		: (name instanceof Symbol
 		   && "lambda".equals(((Symbol) name).getName())))

@@ -51,8 +51,8 @@ public class Apply extends ProcedureN
 	while (last instanceof Pair)
 	  {
 	    Pair pair = (Pair) last;
-	    proc_args[i++] = pair.car;
-	    last = pair.cdr;
+	    proc_args[i++] = pair.getCar();
+	    last = pair.getCdr();
 	    last_count--;
 	  }
 	if (last_count > 0)

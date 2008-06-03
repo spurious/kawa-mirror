@@ -29,15 +29,15 @@ public class DefineNamespace extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Pair p1, p2;
-    if (! (st.cdr instanceof Pair)
-        || ! ((p1 = (Pair) st.cdr).car instanceof Symbol)
-	|| ! (p1.cdr instanceof Pair)
-	|| (p2 = (Pair) p1.cdr).cdr != LList.Empty)
+    if (! (st.getCdr() instanceof Pair)
+        || ! ((p1 = (Pair) st.getCdr()).getCar() instanceof Symbol)
+	|| ! (p1.getCdr() instanceof Pair)
+	|| (p2 = (Pair) p1.getCdr()).getCdr() != LList.Empty)
       {
 	tr.error('e', "invalid syntax for define-namespace");
 	return false;
       }
-    Symbol name = (Symbol) p1.car;
+    Symbol name = (Symbol) p1.getCar();
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
@@ -53,12 +53,12 @@ public class DefineNamespace extends Syntax
     String literal = null;
     if
       /* #ifdef use:java.lang.CharSequence */
-      (p2.car instanceof CharSequence) 
+      (p2.getCar() instanceof CharSequence) 
       /* #else */
-      // (p2.car instanceof CharSeq || p2.car instanceof String) 
+      // (p2.getCar() instanceof CharSeq || p2.getCar() instanceof String) 
       /* #endif */
       {
-        literal = p2.car.toString();
+        literal = p2.getCar().toString();
         Namespace namespace;
         if (literal.startsWith("class:"))
           {

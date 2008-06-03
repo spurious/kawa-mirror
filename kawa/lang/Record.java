@@ -198,12 +198,12 @@ public class Record
     while (fnames != LList.Empty)
       {
 	Pair pair = (Pair) fnames;
-	String fname = pair.car.toString();
+	String fname = pair.getCar().toString();
 	//fnamesBuf.append(fname);  fnamesBuf.append('\n');
 	fld = clas.addField(Compilation.mangleNameIfNeeded(fname),
 			    Type.pointer_type, Access.PUBLIC);
 	fld.setSourceName(fname.intern());
-	fnames = (LList) pair.cdr;
+	fnames = (LList) pair.getCdr();
       }
     /*
     fld = clas.addField("$FieldNames$", Compilation.typeString,

@@ -22,11 +22,11 @@ public class defun extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Pair p;
-    if (! (st.cdr instanceof Pair)
-	|| ! (((p = (Pair) st.cdr).car instanceof String)
-	      || p.car instanceof Symbol))
+    if (! (st.getCdr() instanceof Pair)
+	|| ! (((p = (Pair) st.getCdr()).getCar() instanceof String)
+	      || p.getCar() instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Object sym = p.car;
+    Object sym = p.getCar();
     Declaration decl = defs.lookup(sym);
     if (decl == null)
       {
@@ -39,14 +39,14 @@ public class defun extends Syntax
 
     if (defs instanceof ModuleExp)
       decl.setCanRead(true);
-    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.cdr));
+    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.getCdr()));
     forms.addElement (st);
     return true;
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     Object name = null;
     Expression value = null;
     Declaration decl = null;
@@ -54,21 +54,22 @@ public class defun extends Syntax
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
+        Object p1_car = p1.getCar();
 	
-	if (p1.car instanceof Symbol || p1.car instanceof String)
+	if (p1_car instanceof Symbol || p1_car instanceof String)
 	  {
-	    name = p1.car.toString();
+	    name = p1_car.toString();
 	  }
-	else if (p1.car instanceof Declaration)
+	else if (p1_car instanceof Declaration)
 	  {
-	    decl = (Declaration) p1.car;
+	    decl = (Declaration) p1_car;
 	    name = decl.getSymbol();
 	  }
-	if (name != null && p1.cdr instanceof Pair)
+	if (name != null && p1.getCdr() instanceof Pair)
 	  {
-	    Pair p2 = (Pair) p1.cdr;
+	    Pair p2 = (Pair) p1.getCdr();
 	    LambdaExp lexp = new LambdaExp();
-	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr, null);
+	    lambdaSyntax.rewrite(lexp, p2.getCar(), p2.getCdr(), tr, null);
 	    lexp.setSymbol(name);
 	    if (p2 instanceof PairWithPosition)
               lexp.setLocation((PairWithPosition) p2);

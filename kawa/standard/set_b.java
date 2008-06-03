@@ -17,7 +17,7 @@ public class set_b extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object o1 = form.cdr;
+    Object o1 = form.getCdr();
     SyntaxForm syntax = null;
     while (o1 instanceof SyntaxForm)
       {
@@ -28,7 +28,7 @@ public class set_b extends Syntax
       return tr.syntaxError ("missing name");
     Pair p1 = (Pair) o1;
     Expression name = tr.rewrite_car(p1, syntax);
-    Object o2 = p1.cdr;
+    Object o2 = p1.getCdr();
     while (o2 instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) o2;
@@ -36,7 +36,7 @@ public class set_b extends Syntax
       }
     Pair p2;
     if (! (o2 instanceof Pair)
-	|| (p2 = (Pair) o2).cdr != LList.Empty)
+	|| (p2 = (Pair) o2).getCdr() != LList.Empty)
       return tr.syntaxError ("missing or extra arguments to set!");
     Expression value = tr.rewrite_car(p2, syntax);
 

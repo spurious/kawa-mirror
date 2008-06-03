@@ -30,7 +30,7 @@ public class Lambda extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Expression exp = rewrite(form.cdr, tr);
+    Expression exp = rewrite(form.getCdr(), tr);
     Translator.setLine(exp, form);
     return exp;
   }
@@ -43,7 +43,7 @@ public class Lambda extends Syntax
     LambdaExp lexp = new LambdaExp();
     Pair pair = (Pair) obj;
     Translator.setLine(lexp, pair);
-    rewrite(lexp, pair.car, pair.cdr, tr, null);
+    rewrite(lexp, pair.getCar(), pair.getCdr(), tr, null);
     if (tr.getMessages().getErrorCount() > old_errors)
       return new ErrorExp("bad lambda expression");
     return lexp;
@@ -81,7 +81,7 @@ public class Lambda extends Syntax
     int rest_args = -1;
     int key_args = -1;
     Pair pair;
-    for (; ;  bindings = pair.cdr)
+    for (; ;  bindings = pair.getCdr())
       {
 	if (bindings instanceof SyntaxForm)
 	  {
@@ -93,7 +93,7 @@ public class Lambda extends Syntax
 	  break;
 	pair = (Pair) bindings;
         // An initial pass to count the parameters.
-	Object pair_car = pair.car;
+	Object pair_car = pair.getCar();
 	if (pair_car instanceof SyntaxForm)
 	  pair_car = ((SyntaxForm) pair_car).form;
 	if (pair_car == optionalKeyword)
@@ -136,8 +136,8 @@ public class Lambda extends Syntax
 	      }
 	    key_args = 0;
 	  }
-        else if (tr.matches(pair.car, "::") && pair.cdr instanceof Pair)
-          pair = (Pair) pair.cdr;
+        else if (tr.matches(pair.getCar(), "::") && pair.getCdr() instanceof Pair)
+          pair = (Pair) pair.getCdr();
 	else if (key_args >= 0)
 	  key_args++;
 	else if (rest_args >= 0)
@@ -146,7 +146,7 @@ public class Lambda extends Syntax
 	  opt_args++;
 	else
 	  lexp.min_args++;
-	bindings = pair.cdr;
+	bindings = pair.getCdr();
       }
     if (bindings instanceof Symbol)
       {
@@ -187,7 +187,7 @@ public class Lambda extends Syntax
     opt_args = 0;
     key_args = 0;
     Object mode = null;
-    for (; ;  bindings = pair.cdr)
+    for (; ;  bindings = pair.getCdr())
       {
 	if (bindings instanceof SyntaxForm)
 	  {
@@ -201,7 +201,7 @@ public class Lambda extends Syntax
 	if (! (bindings instanceof Pair))
 	  break;
 	pair = (Pair) bindings;
-	Object pair_car = pair.car;
+	Object pair_car = pair.getCar();
 	if (pair_car instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) pair_car;
@@ -228,16 +228,16 @@ public class Lambda extends Syntax
 	if (pair_car instanceof Symbol)
           {
             name = pair_car;
-            if (pair.cdr instanceof Pair
-                && tr.matches((p = (Pair) pair.cdr).car, "::"))
+            if (pair.getCdr() instanceof Pair
+                && tr.matches((p = (Pair) pair.getCdr()).getCar(), "::"))
               {
-                if (! (pair.cdr instanceof Pair))
+                if (! (pair.getCdr() instanceof Pair))
                   {
                     tr.syntaxError("'::' not followed by a type specifier"
                                    + " (for parameter '" + name + "')");
                     return;
                   }
-                p = (Pair) p.cdr;
+                p = (Pair) p.getCdr();
                 typeSpecPair = p;
                 pair = p;
               }
@@ -245,7 +245,7 @@ public class Lambda extends Syntax
 	else if (pair_car instanceof Pair)
 	  {
 	    p = (Pair) pair_car;
-	    pair_car = p.car;
+	    pair_car = p.getCar();
 	    if (pair_car instanceof SyntaxForm)
 	      {
 		SyntaxForm sf = (SyntaxForm) pair_car;
@@ -254,23 +254,23 @@ public class Lambda extends Syntax
 	      }
             pair_car = tr.namespaceResolve(pair_car);
 	    if (pair_car instanceof Symbol
-		&& p.cdr instanceof Pair)
+		&& p.getCdr() instanceof Pair)
 	      {
 		name = pair_car;
-		p = (Pair) p.cdr;
-		if (tr.matches(p.car, "::"))
+		p = (Pair) p.getCdr();
+		if (tr.matches(p.getCar(), "::"))
 		  {
-		    if (! (p.cdr instanceof Pair))
+		    if (! (p.getCdr() instanceof Pair))
 		      {
 			tr.syntaxError("'::' not followed by a type specifier"
 				       + " (for parameter '" + name + "')");
 			return;
 		      }
-		    p = (Pair) p.cdr;
+		    p = (Pair) p.getCdr();
 		    typeSpecPair = p;
-		    if (p.cdr instanceof Pair)
-		      p = (Pair) p.cdr;
-		    else if (p.cdr == LList.Empty)
+		    if (p.getCdr() instanceof Pair)
+		      p = (Pair) p.getCdr();
+		    else if (p.getCdr() == LList.Empty)
 		      p = null;
 		    else
 		      {
@@ -281,10 +281,10 @@ public class Lambda extends Syntax
 		  }
 		if (p != null && mode != null)
 		  {
-		    defaultValue = p.car;
-		    if (p.cdr instanceof Pair)
-		      p = (Pair) p.cdr;
-		    else if (p.cdr == LList.Empty)
+		    defaultValue = p.getCar();
+		    if (p.getCdr() instanceof Pair)
+		      p = (Pair) p.getCdr();
+		    else if (p.getCdr() == LList.Empty)
 		      p = null;
 		    else
 		      {
@@ -302,10 +302,10 @@ public class Lambda extends Syntax
 			return;
 		      }
 		    typeSpecPair = p;
-		    if (p.cdr != LList.Empty)
+		    if (p.getCdr() != LList.Empty)
 		      {
 			tr.syntaxError("junk at end of specifier for parameter '"
-				       + name + '\''+" after type "+p.car);
+				       + name + '\''+" after type "+p.getCar());
 			return;
 		      }
 		  }
@@ -377,8 +377,8 @@ public class Lambda extends Syntax
 	if (! (body instanceof Pair))
 	  break;
 	Pair pair1 = (Pair) body;
-	Object attrName = Translator.stripSyntax(pair1.car);
-	Object pair1_cdr = pair1.cdr;
+	Object attrName = Translator.stripSyntax(pair1.getCar());
+	Object pair1_cdr = pair1.getCdr();
 	while (pair1_cdr instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) pair1_cdr;
@@ -477,7 +477,7 @@ public class Lambda extends Syntax
 	  }
 	else if (attrName == kawa.standard.object.throwsKeyword)
 	  {
-	    attrValue = pair2.car;
+	    attrValue = pair2.getCar();
 	    int count = Translator.listLength(attrValue);
 	    if (count < 0)
 	      tr.error('e', "throws: not followed by a list");
@@ -504,7 +504,7 @@ public class Lambda extends Syntax
 			tr.error('e', "throws not followed by a classname");
 			tr.popPositionOf(savePos);
 		      }
-		    attrValue = pair3.cdr; 
+		    attrValue = pair3.getCdr(); 
 		  }
 		lexp.setExceptions(exps);
 	      }
@@ -519,7 +519,7 @@ public class Lambda extends Syntax
 	  {
 	    tr.error('w', "unknown procedure property "+attrName);
 	  }
-	body = pair2.cdr;
+	body = pair2.getCdr();
       }
     accessFlag |= allocationFlag;
     if (accessFlag != 0)
@@ -534,14 +534,14 @@ public class Lambda extends Syntax
     while (body instanceof Pair)
       {
 	Pair pair = (Pair) body;
-	if (! (pair.cdr instanceof Pair))
+	if (! (pair.getCdr() instanceof Pair))
 	  break;
-	Object attrName = pair.car;
+	Object attrName = pair.getCar();
 	if (tr.matches(attrName, "::"))
 	  attrName = null;
 	else if (! (attrName instanceof Keyword))
 	  break;
-	body = ((Pair) pair.cdr).cdr;
+	body = ((Pair) pair.getCdr()).getCdr();
       }
     return body;
   }

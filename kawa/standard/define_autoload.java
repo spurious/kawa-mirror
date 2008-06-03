@@ -27,38 +27,38 @@ public class define_autoload extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    if (! (st.cdr instanceof Pair))
+    if (! (st.getCdr() instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Pair p = (Pair) st.cdr;
+    Pair p = (Pair) st.getCdr();
     if (fromFile)
       {
 	for (;;)
 	  {
             /* #ifdef use:java.lang.CharSequence */
-	    if (! (p.car instanceof CharSequence))
+	    if (! (p.getCar() instanceof CharSequence))
 	      break;
             /* #else */
-	    // if (! (p.car instanceof String || p.car instanceof CharSeq))
+	    // if (! (p.getCar() instanceof String || p.getCar() instanceof CharSeq))
 	    //   break;
             /* #endif */
-	    if (! scanFile(p.car.toString(), defs, tr))
+	    if (! scanFile(p.getCar().toString(), defs, tr))
 	      return false;
-	    Object rest = p.cdr;
+	    Object rest = p.getCdr();
 	    if (rest == LList.Empty)
 	      return true;
 	    if (! (rest instanceof Pair))
 	      break;
-	    p = (Pair) p.cdr;
+	    p = (Pair) p.getCdr();
 	  }
 	tr.syntaxError("invalid syntax for define-autoloads-from-file");
 	return false;
       }
-    Object names = p.car;
+    Object names = p.getCar();
     Object filename = null;
-    if (p.cdr instanceof Pair)
+    if (p.getCdr() instanceof Pair)
       {
-	p = (Pair) p.cdr;
-	filename = p.car;
+	p = (Pair) p.getCdr();
+	filename = p.getCar();
 	return process(names, filename, forms, defs, tr);
       }
     tr.syntaxError("invalid syntax for define-autoload");
@@ -182,20 +182,20 @@ public class define_autoload extends Syntax
 		    Pair pair = (Pair) form;
 		    Object value = null;
 		    String name = null;
-		    Object car = pair.car;
+		    Object car = pair.getCar();
 		    String command
 		      = car instanceof String ? car.toString()
 		      : car instanceof Symbol ? ((Symbol) car).getName()
 		      : null;
 		    if (command == "defun")
 		      {
-			name = ((Pair)pair.cdr).car.toString();
+			name = ((Pair)pair.getCdr()).getCar().toString();
 			value = new AutoloadProcedure(name, filename,
 						      tr.getLanguage());
 		      }
 		    else
 		      tr.error('w', "unsupported ;;;###autoload followed by: "
-			       + pair.car);
+			       + pair.getCar());
 		    if (value != null)
 		      {
 			Declaration decl = defs.getDefine(name, 'w', tr);
@@ -239,8 +239,8 @@ public class define_autoload extends Syntax
     if (names instanceof Pair)
       {
 	Pair p = (Pair) names;
-	return (process(p.car, filename, forms, defs, tr)
-		&& process(p.cdr, filename, forms, defs, tr));
+	return (process(p.getCar(), filename, forms, defs, tr)
+		&& process(p.getCdr(), filename, forms, defs, tr));
       }
     if (names == LList.Empty)
       return true;

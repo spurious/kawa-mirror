@@ -110,9 +110,9 @@ public class ReaderDispatchMisc extends ReadTableEntry
             && ((length
                  = LList.listLength(list = reader.readObject(), false))
                 > 0)
-            && ((Pair) list).car instanceof String)
+            && ((Pair) list).getCar() instanceof String)
           {
-            name = (String) ((Pair) list).car;
+            name = (String) ((Pair) list).getCar();
             Object proc = ReadTable.getCurrent().getReaderCtor(name);
             if (proc == null)
               in.error("unknown reader constructor "+name);
@@ -123,12 +123,12 @@ public class ReaderDispatchMisc extends ReadTableEntry
                 length--;  // Subtract 1 for the constructor name.
                 int parg = proc instanceof Type ? 1 : 0;
                 Object[] args = new Object[parg+length];
-                Object argList = ((Pair) list).cdr;
+                Object argList = ((Pair) list).getCdr();
                 for (int i = 0;  i < length;  i++)
                   {
                     Pair pair = (Pair) argList;
-                    args[parg+i] = pair.car;
-                    argList = pair.cdr;
+                    args[parg+i] = pair.getCar();
+                    argList = pair.getCdr();
                   }
                 try
                   {

@@ -31,8 +31,8 @@ public class PairPat extends Pattern implements Printable, Externalizable
     if (! (obj instanceof Pair))
       return false;
     Pair pair = (Pair) obj;
-    return (car.match (pair.car, vars, start_vars)
-	    && cdr.match (pair.cdr, vars, start_vars + car_count));
+    return (car.match (pair.getCar(), vars, start_vars)
+	    && cdr.match (pair.getCdr(), vars, start_vars + car_count));
   }
 
   public void print (Consumer out)

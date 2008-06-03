@@ -11,6 +11,6 @@ public class UnwindProtect extends Syntax
     if (! (obj instanceof Pair))
       return tr.syntaxError("invalid syntax for unwind-protect");
     Pair pair = (Pair) obj;
-    return new TryExp(tr.rewrite(pair.car), tr.rewrite_body(pair.cdr));
+    return new TryExp(tr.rewrite(pair.getCar()), tr.rewrite_body(pair.getCdr()));
   }
 }

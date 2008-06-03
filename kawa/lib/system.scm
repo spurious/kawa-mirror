@@ -46,8 +46,8 @@
     (let loop ((p lst) (i :: <int> 0))
       (if (null? p) arr
 	  (let ((pp :: <pair> p))
-	    ((primitive-array-set <String>) arr i (field pp 'car))
-	    (loop (field pp 'cdr) (+ i 1)))))))
+	    ((primitive-array-set <String>) arr i pp:car)
+	    (loop pp:cdr (+ i 1)))))))
 
 (define (tokenize-string-to-string-array (string :: <String>))
   (let* ((toks (make <java.util.StringTokenizer> string))
@@ -67,8 +67,8 @@
     (let loop ((p rlist) (i :: <int> (- count 1)))
       (if (null? p) arr
 	  (let ((pp :: <pair> p))
-	    ((primitive-array-set <String>) arr i (field pp 'car))
-	    (loop (field pp 'cdr) (- i 1)))))))
+	    ((primitive-array-set <String>) arr i  pp:car)
+	    (loop pp:cdr (- i 1)))))))
 
 (define (tokenize-string-using-shell string)
   (let ((arr :: <java.lang.String[]>

@@ -16,7 +16,7 @@ public class PropertyLocation extends Location
 
   public final Object get (Object defaultValue)
   {
-    return pair.car;
+    return pair.getCar();
   }
 
   public boolean isBound ()
@@ -26,7 +26,7 @@ public class PropertyLocation extends Location
 
   public final void set (Object newValue)
   {
-    pair.car = newValue;
+    pair.setCar(newValue);
   }
 
   /** Get the property list assocated with an object in a given Environment.
@@ -71,10 +71,10 @@ public class PropertyLocation extends Location
 		if (! (p instanceof Pair))
 		  break;
 		Pair pair = (Pair) p;
-		Object property = pair.car;
+		Object property = pair.getCar();
 		if (plistGet(plist, property, null) != null)
 		  env.remove(sym, property);
-		p = ((Pair) pair.cdr).cdr;
+		p = ((Pair) pair.getCdr()).getCdr();
 	      }
 	    // Add/update PropertyLocation bindings from plist.
 	    p = plist;
@@ -83,7 +83,7 @@ public class PropertyLocation extends Location
 		if (! (p instanceof Pair))
 		  break;
 		Pair pair = (Pair) p;
-		Object property = pair.car;
+		Object property = pair.getCar();
 		Location loc = env.lookup(sym, property);
 		PropertyLocation ploc;
 		if (loc != null
@@ -96,10 +96,10 @@ public class PropertyLocation extends Location
 		    ploc = new PropertyLocation();
 		    env.addLocation(sym, property, ploc);
 		  }
-		Pair valuePair = (Pair) pair.cdr;
+		Pair valuePair = (Pair) pair.getCdr();
 		ploc.pair = valuePair;
 		//ploc.plist = plist;
-		p = valuePair.cdr;
+		p = valuePair.getCdr();
 	      }
 	  }
 	lloc.set(plist);
@@ -177,10 +177,10 @@ public class PropertyLocation extends Location
 	    pair = (Pair) plist;
 	    for (;;)
 	      {
-		if (pair.car == property)
+		if (pair.getCar() == property)
 		  break;
-		if (pair.cdr instanceof Pair)
-		  pair = (Pair) pair.cdr;
+		if (pair.getCdr() instanceof Pair)
+		  pair = (Pair) pair.getCdr();
 		else
 		  {
 		    pair = null;
@@ -225,22 +225,22 @@ public class PropertyLocation extends Location
     Pair prev = null;
     for (;;)
       {
-	if (pair.car == property)
+	if (pair.getCar() == property)
 	  break;
-	Object next = pair.cdr;
+	Object next = pair.getCdr();
 	if (! (next instanceof Pair))
 	  return false;
 	prev = pair;
 	pair = (Pair) next;
       }
-    Object tail = ((Pair) pair.cdr).cdr;
+    Object tail = ((Pair) pair.getCdr()).getCdr();
     if (prev == null)
       {
 	plist = tail;
 	ploc.set(plist);
       }
     else
-      prev.cdr = tail;
+      prev.setCdr(tail);
     if (symbol instanceof Symbol)
       env.remove((Symbol) symbol, property);
     return true;
@@ -262,8 +262,8 @@ public class PropertyLocation extends Location
     while (plist instanceof Pair)
       {
 	Pair pair = (Pair) plist;
-	if (pair.car == prop)
-	  return ((Pair) pair.cdr).car;
+	if (pair.getCar() == prop)
+	  return ((Pair) pair.getCdr()).getCar();
       }
     return dfault;
   }
@@ -276,13 +276,13 @@ public class PropertyLocation extends Location
     for (Object p = plist; p instanceof Pair; )
       {
 	Pair pair = (Pair) p;
-	Pair next = (Pair) pair.cdr;
-	if (pair.car == prop)
+	Pair next = (Pair) pair.getCdr();
+	if (pair.getCar() == prop)
 	  {
-	    next.car = value;
+	    next.setCar(value);
 	    return plist;
 	  }
-	p = next.cdr;
+	p = next.getCdr();
       }
     return new Pair(prop, new Pair(value, plist));
   }
@@ -296,13 +296,13 @@ public class PropertyLocation extends Location
     for (Object p = plist; p instanceof Pair; )
       {
 	Pair pair = (Pair) p;
-	Pair next = (Pair) pair.cdr;
-	p = next.cdr;
-	if (pair.car == prop)
+	Pair next = (Pair) pair.getCdr();
+	p = next.getCdr();
+	if (pair.getCar() == prop)
 	  {
 	    if (prev == null)
 	      return p;
-	    prev.cdr = p;
+	    prev.setCdr(p);
 	    return plist;
 	  }
 	prev = next;

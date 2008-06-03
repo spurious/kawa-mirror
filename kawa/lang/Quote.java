@@ -105,11 +105,11 @@ public class Quote extends Syntax
         // are needed, we want to return the input list as-is.
         if (expandColonForms()
             && pair == list
-            && tr.matches(pair.car, syntax, LispLanguage.lookup_sym)
-            && pair.cdr instanceof Pair
-            && (p1 = (Pair) pair.cdr) instanceof Pair
-            && (p2 = (Pair) p1.cdr) instanceof Pair
-            && p2.cdr == LList.Empty)
+            && tr.matches(pair.getCar(), syntax, LispLanguage.lookup_sym)
+            && pair.getCdr() instanceof Pair
+            && (p1 = (Pair) pair.getCdr()) instanceof Pair
+            && (p2 = (Pair) p1.getCdr()) instanceof Pair
+            && p2.getCdr() == LList.Empty)
           {
             Expression part1 = tr.rewrite_car(p1, false);
             Expression part2 = tr.rewrite_car(p2, false);
@@ -130,7 +130,7 @@ public class Quote extends Syntax
             else
               {
                 Object save = tr.pushPositionOf(pair);
-                tr.error('e', "'"+p1.car+"' is not a valid prefix");
+                tr.error('e', "'"+p1.getCar()+"' is not a valid prefix");
                 tr.popPositionOf(save);
                 cdr = sym;
               }
@@ -139,15 +139,15 @@ public class Quote extends Syntax
         else if (depth < 0)
           {
           }
-        else if (tr.matches(pair.car, syntax, LispLanguage.quasiquote_sym))
+        else if (tr.matches(pair.getCar(), syntax, LispLanguage.quasiquote_sym))
           depth++;
-        else if (tr.matches(pair.car, syntax, LispLanguage.unquote_sym))
+        else if (tr.matches(pair.getCar(), syntax, LispLanguage.unquote_sym))
           {
             depth--;
             Pair pair_cdr;
-            if (! (pair.cdr instanceof Pair)
-                || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
-              return tr.syntaxError ("invalid used of " + pair.car +
+            if (! (pair.getCdr() instanceof Pair)
+                || (pair_cdr = (Pair) pair.getCdr()).getCdr() != LList.Empty)
+              return tr.syntaxError ("invalid used of " + pair.getCar() +
 				     " in quasiquote template");
             if (depth == 0)
               {
@@ -155,12 +155,12 @@ public class Quote extends Syntax
                 break;
               }
           }
-        else if (tr.matches(pair.car, syntax, LispLanguage.unquotesplicing_sym))
-          return tr.syntaxError ("invalid used of " + pair.car +
+        else if (tr.matches(pair.getCar(), syntax, LispLanguage.unquotesplicing_sym))
+          return tr.syntaxError ("invalid used of " + pair.getCar() +
 				 " in quasiquote template");
-        if (depth == 1 && pair.car instanceof Pair)
+        if (depth == 1 && pair.getCar() instanceof Pair)
           {
-            Object form = pair.car;
+            Object form = pair.getCar();
             SyntaxForm subsyntax = syntax;
             while (form instanceof SyntaxForm)
               {
@@ -170,7 +170,7 @@ public class Quote extends Syntax
             int splicing = -1;
             if (form instanceof Pair)
               {
-                Object op = ((Pair) form).car;
+                Object op = ((Pair) form).getCar();
                 if (tr.matches(op, subsyntax, LispLanguage.unquote_sym))
                   splicing = 0;
                 else if (tr.matches(op, subsyntax, LispLanguage.unquotesplicing_sym))
@@ -178,7 +178,7 @@ public class Quote extends Syntax
               }
             if (splicing >= 0)
               {
-                form = ((Pair) form).cdr; // skip "unquote[splicing]".
+                form = ((Pair) form).getCdr(); // skip "unquote[splicing]".
                 Vector vec = new Vector();
                 cdr = null;
                 // R5RS allows only a single argument.  But
@@ -195,13 +195,13 @@ public class Quote extends Syntax
                     if (form instanceof Pair)
                       {
                         vec.addElement(tr.rewrite_car((Pair) form, subsyntax));
-                        form = ((Pair) form).cdr;
+                        form = ((Pair) form).getCdr();
                       }
                     else
                       return tr.syntaxError("improper list argument to unquote");
                   }
                 int nargs = vec.size() + 1;
-                cdr = expand(pair.cdr, 1, syntax, seen, tr);
+                cdr = expand(pair.getCdr(), 1, syntax, seen, tr);
                 if (nargs > 1)
                   {
                     Expression[] args = new Expression[nargs];
@@ -214,10 +214,10 @@ public class Quote extends Syntax
                 break;
               }
           }
-        Object car = expand (pair.car, depth, syntax, seen, tr);
-        if (car == pair.car)
+        Object car = expand (pair.getCar(), depth, syntax, seen, tr);
+        if (car == pair.getCar())
           {
-            rest = pair.cdr;
+            rest = pair.getCdr();
             if (rest instanceof Pair)
               {
                 pair = (Pair) rest;
@@ -226,7 +226,7 @@ public class Quote extends Syntax
             cdr = expand(rest, depth, syntax, seen, tr);
             break;
           }
-        cdr = expand (pair.cdr, depth, syntax, seen, tr);
+        cdr = expand (pair.getCdr(), depth, syntax, seen, tr);
         if (car instanceof Expression || cdr instanceof Expression)
           {
             Expression[] args = new Expression[2];
@@ -247,15 +247,15 @@ public class Quote extends Syntax
     Pair prev = null;
     for (;;)
       {
-        Pair q = Translator.makePair(p, p.car, null);
+        Pair q = Translator.makePair(p, p.getCar(), null);
         if (prev == null)
           list = q;
         else
-          prev.cdr = q;
+          prev.setCdr(q);
         prev = q;
-        if (p.cdr == rest)
+        if (p.getCdr() == rest)
           break;
-        p = (Pair) p.cdr;
+        p = (Pair) p.getCdr();
       }
     if (cdr instanceof Expression)
       {
@@ -264,19 +264,19 @@ public class Quote extends Syntax
         if (prev == list)
           {
             // The n==1 case: Only a single pair before rest.
-            args[0] = leaf(list.car, tr);
+            args[0] = leaf(list.getCar(), tr);
 	    return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
           }
         else
           {
-            prev.cdr = LList.Empty;
+            prev.setCdr(LList.Empty);
             args[0] = leaf(list, tr);
 	    return Invoke.makeInvokeStatic(quoteType, "append", args);
           }
       }
     else
       {
-        prev.cdr = cdr;
+        prev.setCdr(cdr);
       }
     return list;
   }
@@ -337,14 +337,14 @@ public class Quote extends Syntax
 	    int element_depth = depth;
 	    Pair pair;
 	    if (element instanceof Pair && depth > QUOTE_DEPTH
-		&& tr.matches((pair = (Pair)element).car, syntax,
+		&& tr.matches((pair = (Pair)element).getCar(), syntax,
 			      LispLanguage.unquotesplicing_sym)
 		&& --element_depth == 0)
 	      {
 		Pair pair_cdr;
-		if (! (pair.cdr instanceof Pair)
-		    || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
-		  return tr.syntaxError ("invalid used of " + pair.car +
+		if (! (pair.getCdr() instanceof Pair)
+		    || (pair_cdr = (Pair) pair.getCdr()).getCdr() != LList.Empty)
+		  return tr.syntaxError ("invalid used of " + pair.getCar() +
 					     " in quasiquote template");
 		buffer[i] = tr.rewrite_car(pair_cdr, syntax);
 		state[i] = 3;
@@ -419,9 +419,9 @@ public class Quote extends Syntax
   {
     Pair pair;
     if (! (obj instanceof Pair)
-	|| (pair = (Pair) obj).cdr != LList.Empty)
+	|| (pair = (Pair) obj).getCdr() != LList.Empty)
       return tr.syntaxError ("wrong number of arguments to quote");
-    return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr), tr);
+    return coerceExpression(expand(pair.getCar(), isQuasi ? 1 : QUOTE_DEPTH, tr), tr);
   }
 
   /** A wrapper around LList.consX to make it a "variable-arg method". */
@@ -453,20 +453,20 @@ public class Quote extends Syntax
             if (list == LList.Empty)
               break;
 	    Pair list_pair = (Pair) list;
-            Object car = list_pair.car;
+            Object car = list_pair.getCar();
             if (syntax != null && ! (car instanceof SyntaxForm))
               car = SyntaxForm.make(car, syntax.scope);
 	    Pair new_pair = new Pair(car, null);
 	    if (last == null)
 	      copy = new_pair;
 	    else
-	      last.cdr = new_pair;
+	      last.setCdr(new_pair);
 	    last = new_pair;
-	    list = list_pair.cdr;
+	    list = list_pair.getCdr();
 	  }
 	if (last != null)
 	  {
-	    last.cdr = result;
+	    last.setCdr(result);
 	    result = copy;
 	  }
       }

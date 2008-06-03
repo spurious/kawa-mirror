@@ -99,9 +99,9 @@ public class LispPackage extends Namespace
     for (Object s = shadowingSymbols;  s != LList.Empty; )
       {
 	Pair p = (Pair) s;
-	if (p.car == sym)
+	if (p.getCar() == sym)
 	  return;
-	s = p.cdr;
+	s = p.getCdr();
       }
     shadowingSymbols = new Pair(sym, shadowingSymbols);
   }
@@ -112,13 +112,13 @@ public class LispPackage extends Namespace
     for (Object s = shadowingSymbols;  s != LList.Empty; )
       {
 	Pair p = (Pair) s;
-	s = p.cdr;
-	if (p.car == sym)
+	s = p.getCdr();
+	if (p.getCar() == sym)
 	  {
 	    if (prev == null)
 	      shadowingSymbols = (LList) s;
 	    else
-	      prev.cdr = s;
+	      prev.setCdr(s);
 	    return true;
 	  }
 	prev = p;

@@ -23,8 +23,8 @@ public class VarListPat extends Pattern {
 	if (obj instanceof Pair)
 	  {
 	    Pair p = (Pair)obj;
-	    vars[start_vars + i] = p.car;
-	    obj = p.cdr;
+	    vars[start_vars + i] = p.getCar();
+	    obj = p.getCdr();
 	  }
 	else
 	  return false;

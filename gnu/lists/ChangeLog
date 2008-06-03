@@ -1,3 +1,8 @@
+2008-06-03  Per Bothner  <per@bothner.com>
+
+	* Pair.java (car, cdr): Make non-public.
+	(getCar, getCdr, setCar, setCdr): New public accessor methods.
+
 2008-03-23  Per Bothner  <per@bothner.com>
 
 	* EofClass.java (eofValue): Fix type of literal.  This fixes

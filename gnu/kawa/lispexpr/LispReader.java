@@ -989,7 +989,7 @@ public class LispReader extends Lexer
 
   protected void setCdr (Object pair, Object cdr)
   {
-    ((Pair) pair).cdr = cdr;
+    ((Pair) pair).setCdr(cdr);
   }
 
   /** Read a number from a LispReader

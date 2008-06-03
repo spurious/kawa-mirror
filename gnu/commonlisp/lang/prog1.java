@@ -25,8 +25,8 @@ public class prog1 extends Syntax
     if (index == 2)
       {
 	Pair pair = (Pair) obj;
-	return new BeginExp(tr.rewrite(pair.car),
-			    prog1.rewrite(pair.cdr, tr));
+	return new BeginExp(tr.rewrite(pair.getCar()),
+			    prog1.rewrite(pair.getCdr(), tr));
       }
     else
       {
@@ -34,13 +34,13 @@ public class prog1 extends Syntax
 	LetExp let = new LetExp(inits);
 	Expression[] body = new Expression[nexps];
 	Pair pair = (Pair) obj;
-	inits[0] = tr.rewrite(pair.car);
-	obj = pair.cdr;
+	inits[0] = tr.rewrite(pair.getCar());
+	obj = pair.getCdr();
 	for (int i = 0;  i < nexps-1;  i++)
 	  {
 	    pair = (Pair) obj;
-	    body[i] = tr.rewrite(pair.car);
-	    obj = pair.cdr;
+	    body[i] = tr.rewrite(pair.getCar());
+	    obj = pair.getCdr();
 	  }
 	Declaration decl = let.addDeclaration((Object) null);
 	body[nexps-1] = new ReferenceExp(decl);

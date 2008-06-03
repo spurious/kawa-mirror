@@ -22,10 +22,10 @@ public class location extends Syntax
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing argument to location");
     Pair pair = (Pair) obj;
-    if (pair.cdr != LList.Empty)
+    if (pair.getCdr() != LList.Empty)
       return tr.syntaxError ("extra arguments to location");
-    //    Expression arg = tr.rewrite(pair.car);
-    Expression[] args = { location.rewrite(tr.rewrite(pair.car), tr) };
+    //    Expression arg = tr.rewrite(pair.getCar());
+    Expression[] args = { location.rewrite(tr.rewrite(pair.getCar()), tr) };
     return Invoke.makeInvokeStatic(thisType, "makeLocationProc", args);
   }
 

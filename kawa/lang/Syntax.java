@@ -57,7 +57,7 @@ abstract public class Syntax implements Printable, Named
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    return rewrite(form.cdr, tr);
+    return rewrite(form.getCdr(), tr);
   }
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)

@@ -21,10 +21,10 @@ public class begin extends Syntax
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
-    Object body = tr.scanBody(st.cdr, defs, true);
+    Object body = tr.scanBody(st.getCdr(), defs, true);
     if (body != LList.Empty)
       // Because rewrite to be called later, with whatever is left after
       // removing declarations.
-      tr.formStack.add(Translator.makePair(st, st.car, body));
+      tr.formStack.add(Translator.makePair(st, st.getCar(), body));
   }
 }

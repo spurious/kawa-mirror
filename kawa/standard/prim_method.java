@@ -53,7 +53,7 @@ public class prim_method extends Syntax
       {
 	Pair p = (Pair)argp;
 	args[i] = tr.exp2Type(p);
-	argp = (LList)p.cdr;
+	argp = (LList)p.getCdr();
       }
     Type rtype = tr.exp2Type(new Pair(match[2], null));
     PrimProcedure proc;
@@ -87,8 +87,8 @@ public class prim_method extends Syntax
           }
         Pair p;
         if (match[1] instanceof Pair
-            && (p = (Pair) match[1]).car == "quote")
-          match[1] = ((Pair) p.cdr).car;
+            && (p = (Pair) match[1]).getCar() == "quote")
+          match[1] = ((Pair) p.getCdr()).getCar();
         proc = new PrimProcedure(op_code, cl,
                                  match[1].toString(), rtype, args);
       }

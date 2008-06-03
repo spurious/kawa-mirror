@@ -26,8 +26,8 @@ public class syntax extends kawa.lang.Quote
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    if (! (form.cdr instanceof Pair)
-	|| (form = (Pair) (form.cdr)).cdr != LList.Empty)
+    if (! (form.getCdr() instanceof Pair)
+	|| (form = (Pair) (form.getCdr())).getCdr() != LList.Empty)
       return tr.syntaxError("syntax forms requires a single form");
     Declaration saveTemplateScopeDecl = tr.templateScopeDecl;
     if (saveTemplateScopeDecl == null)
@@ -44,7 +44,7 @@ public class syntax extends kawa.lang.Quote
 
     try
       {
-        Expression body = coerceExpression(expand(form.car,
+        Expression body = coerceExpression(expand(form.getCar(),
                                                   isQuasi ? 1 : Quote.QUOTE_DEPTH, tr),
                                            tr);
         return saveTemplateScopeDecl == null ? tr.letDone(body) : body;

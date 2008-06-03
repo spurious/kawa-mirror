@@ -199,7 +199,7 @@ public class CallContext // implements Runnable
 	if (last == null)
 	  list = pair;
 	else
-	  last.cdr = pair;
+	  last.setCdr(pair);
 	last = pair;
       }
     return list;

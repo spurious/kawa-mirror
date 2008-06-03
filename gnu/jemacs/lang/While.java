@@ -12,11 +12,11 @@ public class While extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     if (! (obj instanceof Pair))
       return tr.syntaxError("missing arguments for while");
     tr.mustCompileHere();
     form = (Pair) obj;
-    return Expression.makeWhile(form.car, new Pair (begin, form.cdr), tr);
+    return Expression.makeWhile(form.getCar(), new Pair (begin, form.getCdr()), tr);
   }
 }

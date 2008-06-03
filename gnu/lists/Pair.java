@@ -16,8 +16,8 @@ import java.io.*;
 
 public class Pair extends LList implements Externalizable
 {
-   public Object car;
-   public Object cdr;
+  Object car;
+  Object cdr;
 
   public Pair (Object carval, Object cdrval)
   {
@@ -28,6 +28,11 @@ public class Pair extends LList implements Externalizable
   public Pair ()
   {
   }
+
+  public Object getCar () { return car; }
+  public Object getCdr () { return cdr; }
+  public void setCar(Object car) { this.car = car; }
+  public void setCdr(Object cdr) { this.cdr = cdr; }
 
   public int size()
   {

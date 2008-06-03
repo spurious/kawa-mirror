@@ -45,7 +45,7 @@ public class syntax_case extends Syntax
     try
       {
 	if (! (clauses instanceof Pair)
-	    || ! ((clause = ((Pair) clauses).car) instanceof Pair))
+	    || ! ((clause = ((Pair) clauses).getCar()) instanceof Pair))
 	  return tr.syntaxError("syntax-case:  bad clause list");
 	Pair pair = (Pair) clause;
 	PatternScope clauseScope = PatternScope.push(tr);
@@ -53,7 +53,7 @@ public class syntax_case extends Syntax
 	tr.push(clauseScope);
 	int outerVarCount = clauseScope.pattern_names.size();
 	SyntaxPattern pattern
-	  = new SyntaxPattern(pair.car, work.literal_identifiers, tr);
+	  = new SyntaxPattern(pair.getCar(), work.literal_identifiers, tr);
 	int varCount = pattern.varCount();
 	if (varCount > work.maxVars)
 	  work.maxVars = varCount;
@@ -75,20 +75,20 @@ public class syntax_case extends Syntax
 
 	Expression output;
         SyntaxForm syntax = null;
-        Object tail = pair.cdr;
+        Object tail = pair.getCdr();
         while (tail instanceof SyntaxForm)
           {
             syntax = (SyntaxForm) tail;
             tail = syntax.form;
           }
 	pair = (Pair) tail;
-	if (pair.cdr == LList.Empty)
+	if (pair.getCdr() == LList.Empty)
 	  output = tr.rewrite_car(pair, syntax);
 	else
 	  {
 	    Expression fender = tr.rewrite_car(pair, syntax);
-	    if (! (pair.cdr instanceof Pair
-		   && (pair = (Pair) pair.cdr).cdr == LList.Empty))
+	    if (! (pair.getCdr() instanceof Pair
+		   && (pair = (Pair) pair.getCdr()).getCdr() == LList.Empty))
 	      return tr.syntaxError("syntax-case:  bad clause");
 	    output = new IfExp(fender, tr.rewrite_car(pair, syntax),
                                new ExitExp(block));
@@ -98,7 +98,7 @@ public class syntax_case extends Syntax
 	tr.pop(clauseScope);
 	PatternScope.pop(tr);
 	block.setBody(new IfExp(tryMatch, clauseScope, new ExitExp(block)),
-		      rewriteClauses(((Pair) clauses).cdr, work, tr));
+		      rewriteClauses(((Pair) clauses).getCdr(), work, tr));
 	return block;
       }
     finally
@@ -111,8 +111,8 @@ public class syntax_case extends Syntax
   {
     syntax_case_work work = new syntax_case_work();
 
-    Object obj = form.cdr;
-    if (obj instanceof Pair && ((Pair)obj).cdr instanceof Pair)
+    Object obj = form.getCdr();
+    if (obj instanceof Pair && ((Pair)obj).getCdr() instanceof Pair)
       {
 	Expression[] linits = new Expression[2];
 	LetExp let = new LetExp(linits);
@@ -127,14 +127,14 @@ public class syntax_case extends Syntax
 	tr.push(let);
 
         form = (Pair) obj;
-        linits[0] = tr.rewrite(form.car);
+        linits[0] = tr.rewrite(form.getCar());
 	work.inputExpression.noteValue(linits[0]); 
-        obj = form.cdr;
+        obj = form.getCdr();
 
 	form = (Pair) obj;
 	work.literal_identifiers
-	    = SyntaxPattern.getLiteralsList(form.car, null, tr);
-	obj = form.cdr;
+	    = SyntaxPattern.getLiteralsList(form.getCar(), null, tr);
+	obj = form.getCdr();
 
 	let.body = rewriteClauses(obj, work, tr);
 	tr.pop(let);

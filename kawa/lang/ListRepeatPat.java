@@ -52,14 +52,14 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
 	   System.err.print ("(sub-match ["+j+"] ");
 	   System.err.print(element_pattern);
 	   System.err.print (" on ");
-	   System.err.print(pair.car);
+	   System.err.print(pair.getCar());
 	   */
 
-	if (! element_pattern.match (pair.car, element_vars, 0))
+	if (! element_pattern.match (pair.getCar(), element_vars, 0))
 	  return false;
 	for (int i = 0;  i < var_count;  i++)
 	  ((Object[]) vars[start_vars + i]) [j] = element_vars[i];
-	obj = pair.cdr;
+	obj = pair.getCdr();
       }
     return true;
   }

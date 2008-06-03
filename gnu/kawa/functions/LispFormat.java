@@ -542,8 +542,8 @@ public class LispFormat extends CompoundFormat
     while (arg instanceof Pair)
       {
 	Pair pair = (Pair) arg;
-	arr[i++] = pair.car;
-	arg = pair.cdr;
+	arr[i++] = pair.getCar();
+	arg = pair.getCdr();
       }
     if (i < count)
       {

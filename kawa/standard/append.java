@@ -31,19 +31,19 @@ public class append extends ProcedureN
 	while (list instanceof Pair)
 	  {
 	    Pair list_pair = (Pair) list;
-	    Pair new_pair = new Pair (list_pair.car, null);
+	    Pair new_pair = new Pair (list_pair.getCar(), null);
 	    if (last == null)
 	      copy = new_pair;
 	    else
-	      last.cdr = new_pair;
+	      last.setCdr(new_pair);
 	    last = new_pair;
-	    list = list_pair.cdr;
+	    list = list_pair.getCdr();
 	  }
 	if (list != LList.Empty)
 	  throw new WrongType(append, i+1, args[i], "list");
 	if (last != null)
 	  {
-	    last.cdr = result;
+	    last.setCdr(result);
 	    result = copy;
 	  }
       }

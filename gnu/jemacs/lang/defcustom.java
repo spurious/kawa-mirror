@@ -9,10 +9,10 @@ public class defcustom extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    if (! (st.cdr instanceof Pair))
+    if (! (st.getCdr() instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Pair p = (Pair) st.cdr;
-    Object name = p.car;
+    Pair p = (Pair) st.getCdr();
+    Object name = p.getCar();
     if (name instanceof String || name instanceof Symbol)
       {
 	Declaration decl = defs.lookup(name);
@@ -23,7 +23,7 @@ public class defcustom extends Syntax
 	  }
 	else
 	  tr.error('w', "duplicate declaration for `"+name+"'");
-	p = Translator.makePair(p, decl, p.cdr);
+	p = Translator.makePair(p, decl, p.getCdr());
 	st = Translator.makePair(st, this, p);
         if (defs instanceof ModuleExp)
           {
@@ -37,7 +37,7 @@ public class defcustom extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     String name = null;
     Expression value = null;
     Declaration decl = null;
@@ -45,20 +45,20 @@ public class defcustom extends Syntax
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
-	if (p1.car instanceof Declaration)
+	if (p1.getCar() instanceof Declaration)
 	  {
-	    decl = (Declaration) p1.car;
+	    decl = (Declaration) p1.getCar();
 	    name = decl.getName();
-	    if (p1.cdr instanceof Pair)
+	    if (p1.getCdr() instanceof Pair)
 	      {
-		Pair p2 = (Pair) p1.cdr;
-		value = tr.rewrite (p2.car);
-		if (p2.cdr != LList.Empty)
+		Pair p2 = (Pair) p1.getCdr();
+		value = tr.rewrite (p2.getCar());
+		if (p2.getCdr() != LList.Empty)
 		  {
 		    // Handle the defcustom options.  FIXME.
 		  }
 	      }
-	    else if (p1.cdr != LList.Empty)
+	    else if (p1.getCdr() != LList.Empty)
 	      name = null;
 	  }
       }

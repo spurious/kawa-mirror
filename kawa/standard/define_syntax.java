@@ -45,7 +45,7 @@ public class define_syntax extends Syntax
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
     SyntaxForm syntax = null;
-    Object st_cdr = st.cdr;
+    Object st_cdr = st.getCdr();
     while (st_cdr instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) st_cdr;
@@ -56,8 +56,8 @@ public class define_syntax extends Syntax
     if (p instanceof Pair)
       {
 	Pair pp = (Pair) p;
-	name = pp.car;
-	p = pp.cdr;
+	name = pp.getCar();
+	p = pp.getCdr();
       }
     else
       name = null;

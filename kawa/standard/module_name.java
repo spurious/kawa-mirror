@@ -11,14 +11,14 @@ public class module_name extends Syntax
 
   public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
-    Object form_cdr = form.cdr;
+    Object form_cdr = form.getCdr();
     SyntaxForm nameSyntax = null;
     while (form_cdr instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) form_cdr;
 	form_cdr = nameSyntax.form;
       }
-    Object arg = form_cdr instanceof Pair ? ((Pair) form_cdr).car : null;
+    Object arg = form_cdr instanceof Pair ? ((Pair) form_cdr).getCar() : null;
     while (arg instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) arg;
@@ -28,15 +28,15 @@ public class module_name extends Syntax
     Pair p;
     String err = null;
     Declaration decl = null;
-    if (arg instanceof Pair && (p = (Pair) arg).car == "quote")
+    if (arg instanceof Pair && (p = (Pair) arg).getCar() == "quote")
       {
-	arg = p.cdr;
+	arg = p.getCdr();
 	if (! (arg instanceof Pair)
-	    || (p = (Pair) arg).cdr != LList.Empty
-	    || ! (p.car instanceof String))
+	    || (p = (Pair) arg).getCdr() != LList.Empty
+	    || ! (p.getCar() instanceof String))
 	  err = "invalid quoted symbol for 'module-name'";
         else
-          name = (String) p.car;
+          name = (String) p.getCar();
       }
     else if (arg instanceof FString)
       name = arg.toString();

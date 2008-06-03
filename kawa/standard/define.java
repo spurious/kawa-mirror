@@ -41,18 +41,18 @@ public class define extends Syntax
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
-    Pair p1 = (Pair) st.cdr;
-    Pair p2 = (Pair) p1.cdr;
-    Pair p3 = (Pair) p2.cdr;
-    Pair p4 = (Pair) p3.cdr;
+    Pair p1 = (Pair) st.getCdr();
+    Pair p2 = (Pair) p1.getCdr();
+    Pair p3 = (Pair) p2.getCdr();
+    Pair p4 = (Pair) p3.getCdr();
     SyntaxForm nameSyntax = null;
-    Object name = p1.car;
+    Object name = p1.getCar();
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;
 	name = nameSyntax.form;
       }
-    int options = ((Number) Translator.stripSyntax(p2.car)).intValue();
+    int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
     boolean makeConstant = (options & 8) != 0;
 
@@ -83,13 +83,13 @@ public class define extends Syntax
         decl.setType(Compilation.typeProcedure);
 	lexp.setSymbol(name);
 	lexp.nameDecl = decl;
-	Object formals = p4.car;
-	Object body = p4.cdr;
+	Object formals = p4.getCar();
+	Object body = p4.getCdr();
 	Translator.setLine(lexp, p1);
 	lambda.rewriteFormals(lexp, formals, tr, null);
 	Object realBody = lambda.rewriteAttrs(lexp, body, tr);
 	if (realBody != body)
-	  p2 = new Pair(p2.car, new Pair(p3.car, new Pair(formals, realBody)));
+	  p2 = new Pair(p2.getCar(), new Pair(p3.getCar(), new Pair(formals, realBody)));
 	decl.noteValue(lexp);
       }
 
@@ -122,12 +122,12 @@ public class define extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Pair p1 = (Pair) form.cdr;
-    Pair p2 = (Pair) p1.cdr;
-    Pair p3 = (Pair) p2.cdr;
-    Pair p4 = (Pair) p3.cdr;
-    Object name = Translator.stripSyntax(p1.car);
-    int options = ((Number) Translator.stripSyntax(p2.car)).intValue();
+    Pair p1 = (Pair) form.getCdr();
+    Pair p2 = (Pair) p1.getCdr();
+    Pair p3 = (Pair) p2.getCdr();
+    Pair p4 = (Pair) p3.getCdr();
+    Object name = Translator.stripSyntax(p1.getCar());
+    int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;
 
     if (! (name instanceof Declaration))
@@ -138,13 +138,13 @@ public class define extends Syntax
     if ((options & 2) != 0)
       {
 	LambdaExp lexp = (LambdaExp) decl.getValue();
-	Object body = p4.cdr;
+	Object body = p4.getCdr();
 	lambda.rewriteBody(lexp, body, tr);
 	value = lexp;
       }
     else
       {
-	value = tr.rewrite (p4.car);
+	value = tr.rewrite (p4.getCar());
 	decl.noteValue((decl.context instanceof ModuleExp && ! makePrivate
 			&& decl.getCanWrite())
 		       ? null : value);

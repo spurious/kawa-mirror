@@ -22,8 +22,8 @@ public class syntax_error extends Syntax
 	Pair pair = (Pair) obj;
 	if (words > 0)
 	  buffer.append (' ');
-	buffer.append (pair.car);
-	obj = pair.cdr;
+	buffer.append (pair.getCar());
+	obj = pair.getCdr();
 	words++;
       }
     if (obj != LList.Empty)

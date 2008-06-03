@@ -11,7 +11,7 @@ public class export extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    Object list = st.cdr;
+    Object list = st.getCdr();
     Object savePos = tr.pushPositionOf(st);
     try
       {
@@ -35,7 +35,7 @@ public class export extends Syntax
             if (list instanceof Pair)
               {
                 st = (Pair) list;
-                Object symbol = st.car;
+                Object symbol = st.getCar();
                 while (symbol instanceof SyntaxForm)
                   {
                     nameSyntax = (SyntaxForm) symbol;
@@ -62,7 +62,7 @@ public class export extends Syntax
                     if (decl.getFlag(Declaration.NOT_DEFINING))
                       Translator.setLine(decl, st);
                     decl.setFlag(Declaration.EXPORT_SPECIFIED);
-                    list = st.cdr;
+                    list = st.getCdr();
                     continue;
                   }
               }

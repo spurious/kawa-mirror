@@ -14,12 +14,12 @@ public class define_variable extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    if (! (st.cdr instanceof Pair))
+    if (! (st.getCdr() instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Pair p = (Pair) st.cdr;
-    if (p.car instanceof String || p.car instanceof Symbol)
+    Pair p = (Pair) st.getCdr();
+    Object sym = p.getCar();
+    if (sym instanceof String || sym instanceof Symbol)
       {
-	Object sym = p.car;
 	Declaration decl = defs.lookup(sym);
 	if (decl != null)
 	  tr.error('e', "duplicate declaration for '"+sym+"'");
@@ -31,7 +31,7 @@ public class define_variable extends Syntax
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
 	decl.setIndirectBinding(true);
-	p = Translator.makePair(p, decl, p.cdr);
+	p = Translator.makePair(p, decl, p.getCdr());
 	st = Translator.makePair(st, this, p);
       }
     forms.addElement (st);
@@ -40,23 +40,23 @@ public class define_variable extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     Expression value = null;
     Declaration decl = null;
 
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
-	obj = p1.car;
+	obj = p1.getCar();
 	if (obj instanceof String || obj instanceof Symbol)
 	  return tr.syntaxError(getName() + " is only allowed in a <body>");
 	if (obj instanceof Declaration)
 	  {
-	    decl = (Declaration) p1.car;
-	    obj = p1.cdr;
+	    decl = (Declaration) p1.getCar();
+	    obj = p1.getCdr();
 	    if (obj instanceof Pair
-		&& (p1 = (Pair) obj).cdr == LList.Empty)
-	      value = tr.rewrite (p1.car);
+		&& (p1 = (Pair) obj).getCdr() == LList.Empty)
+	      value = tr.rewrite (p1.getCar());
 	    else if (obj != LList.Empty)
 	      decl = null;
 	  }

@@ -37,7 +37,7 @@ public class fluid_let extends Syntax
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing let arguments");
     Pair pair = (Pair) obj;
-    return rewrite(pair.car, pair.cdr, tr);
+    return rewrite(pair.getCar(), pair.getCdr(), tr);
   }
 
   public Expression rewrite (Object bindings, Object body, Translator tr)
@@ -53,28 +53,28 @@ public class fluid_let extends Syntax
           {
             Expression value;
             Pair binding;
-            Object name = bind_pair.car;
+            Object name = bind_pair.getCar();
             if (name instanceof String || name instanceof Symbol)
               {
                 value = defaultInit;
               }
             else if (name instanceof Pair
-                     && ((binding = (Pair) name).car instanceof String
-                         || binding.car instanceof Symbol 
-                         || binding.car instanceof SyntaxForm))
+                     && ((binding = (Pair) name).getCar() instanceof String
+                         || binding.getCar() instanceof Symbol 
+                         || binding.getCar() instanceof SyntaxForm))
               {
-                name = binding.car;
+                name = binding.getCar();
                 if (name instanceof SyntaxForm)
                   name = ((SyntaxForm)name).form;
 
-                if (binding.cdr == LList.Empty)
+                if (binding.getCdr() == LList.Empty)
                   value = defaultInit;
-                else if (! (binding.cdr instanceof Pair)
-                         || (binding = (Pair) binding.cdr).cdr != LList.Empty)
+                else if (! (binding.getCdr() instanceof Pair)
+                         || (binding = (Pair) binding.getCdr()).getCdr() != LList.Empty)
                   return tr.syntaxError("bad syntax for value of " + name
                                         + " in " + getName());
                 else
-                  value = tr.rewrite(binding.car);
+                  value = tr.rewrite(binding.getCar());
               }
             else
               return tr.syntaxError("invalid " + getName() + " syntax");
@@ -94,7 +94,7 @@ public class fluid_let extends Syntax
               value = new ReferenceExp(name);
             inits[i] = value;
             decl.noteValue(null);
-            bindings = bind_pair.cdr;
+            bindings = bind_pair.getCdr();
           }
         finally
           {

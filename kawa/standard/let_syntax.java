@@ -28,8 +28,8 @@ public class let_syntax extends Syntax
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing let-syntax arguments");
     Pair pair = (Pair) obj;
-    Object bindings = pair.car;
-    Object body = pair.cdr;
+    Object bindings = pair.getCar();
+    Object body = pair.getCdr();
     int decl_count = Translator.listLength(bindings);
     if (decl_count < 0)
       return tr.syntaxError("bindings not a proper list");
@@ -51,7 +51,7 @@ public class let_syntax extends Syntax
 	  }
 	SyntaxForm bindingSyntax = listSyntax;
 	Pair bind_pair = (Pair) bindings;
-	Object bind_pair_car = bind_pair.car;
+	Object bind_pair_car = bind_pair.getCar();
 	if (bind_pair_car instanceof SyntaxForm)
 	  {
 	    bindingSyntax = (SyntaxForm) bind_pair_car;
@@ -60,7 +60,7 @@ public class let_syntax extends Syntax
 	if (! (bind_pair_car instanceof Pair))
 	  return tr.syntaxError (getName()+" binding is not a pair");
 	Pair binding = (Pair) bind_pair_car;
-	Object name = binding.car;
+	Object name = binding.getCar();
 	SyntaxForm nameSyntax = bindingSyntax;
 	while (name instanceof SyntaxForm)
 	  {
@@ -69,7 +69,7 @@ public class let_syntax extends Syntax
 	  }
 	if (! (name instanceof String || name instanceof Symbol))
 	  return tr.syntaxError("variable in "+getName()+" binding is not a symbol");
-	Object binding_cdr = binding.cdr;
+	Object binding_cdr = binding.getCdr();
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    bindingSyntax = (SyntaxForm) binding_cdr;
@@ -78,7 +78,7 @@ public class let_syntax extends Syntax
 	if (! (binding_cdr instanceof Pair))
 	  return tr.syntaxError(getName()+" has no value for '"+name+"'");
 	binding = (Pair) binding_cdr;
-	if (binding.cdr != LList.Empty)
+	if (binding.getCdr() != LList.Empty)
 	  return tr.syntaxError("let binding for '"+name+"' is improper list");
 	Declaration decl = new Declaration(name);
         Macro macro = Macro.make(decl);
@@ -99,7 +99,7 @@ public class let_syntax extends Syntax
                                : recursive ? let : tr.currentScope());
         decls[i] = decl;
 	inits[i] = QuoteExp.nullExp;
-	bindings = bind_pair.cdr;
+	bindings = bind_pair.getCdr();
       }
     if (recursive)
       push(let, tr, renamedAliases);

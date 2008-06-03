@@ -27,10 +27,10 @@ public class define_unit extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    if (st.cdr instanceof Pair)
+    if (st.getCdr() instanceof Pair)
       {
-	Pair p = (Pair) st.cdr;
-	Object q = p.car;
+	Pair p = (Pair) st.getCdr();
+	Object q = p.getCar();
 	if (q instanceof SimpleSymbol)
 	  {
 	    String name = q.toString();
@@ -42,11 +42,11 @@ public class define_unit extends Syntax
 	    if (defs instanceof ModuleExp)
 	      decl.setCanRead(true);
 	    Unit unit = null;
-	    if (base && p.cdr == LList.Empty)
+	    if (base && p.getCdr() == LList.Empty)
 	      unit = BaseUnit.make(name, (String) null);
-	    else if (p.cdr instanceof Pair)
+	    else if (p.getCdr() instanceof Pair)
 	      {
-		Object v = ((Pair) p.cdr).car;
+		Object v = ((Pair) p.getCdr()).getCar();
 		if (base &&
                     /* #ifdef use:java.lang.CharSequence */
                     v instanceof CharSequence
@@ -60,7 +60,7 @@ public class define_unit extends Syntax
 	      }
 	    if (unit != null)
 	      decl.noteValue(new QuoteExp(unit));
-	    p = Translator.makePair(p, decl, p.cdr);
+	    p = Translator.makePair(p, decl, p.getCdr());
 	    st = Translator.makePair(st, this, p);
 	    forms.addElement (st);
 	    return true;
@@ -72,14 +72,14 @@ public class define_unit extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     Expression value = null;
     Pair p1;
 
     if (! (obj instanceof Pair)
-	|| ! ((p1 = (Pair) obj).car instanceof Declaration))
+	|| ! ((p1 = (Pair) obj).getCar() instanceof Declaration))
       return tr.syntaxError ("invalid syntax for "+getName());
-    Declaration decl = (Declaration) p1.car;
+    Declaration decl = (Declaration) p1.getCar();
     Symbol symbol = (Symbol) decl.getSymbol();
     String unit = symbol.getLocalPart();
     ClassType unitType = ClassType.make("gnu.math.Unit");
@@ -90,19 +90,19 @@ public class define_unit extends Syntax
     else if (base)
       {
 	String dimension = null;
-	if (p1.cdr != LList.Empty)
+	if (p1.getCdr() != LList.Empty)
 	  {
-	    dimension = ((Pair) p1.cdr).car.toString();
+	    dimension = ((Pair) p1.getCdr()).getCar().toString();
 	  }
 	BaseUnit bunit = BaseUnit.make(unit, dimension);
 	value = new QuoteExp(bunit);
       }
     else
       {
-	if (! (p1.cdr instanceof Pair))
+	if (! (p1.getCdr() instanceof Pair))
 	  return tr.syntaxError("missing value for define-unit");
-	Pair p2 = (Pair) p1.cdr;
-	value = tr.rewrite (p2.car);
+	Pair p2 = (Pair) p1.getCdr();
+	value = tr.rewrite (p2.getCar());
 	Object quantity;
 	if (value instanceof QuoteExp
 	    && (quantity = ((QuoteExp) value).getValue()) instanceof Quantity)

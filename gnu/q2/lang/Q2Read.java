@@ -102,7 +102,7 @@ public class Q2Read extends LispReader
 	    PairWithPosition p = pair;
 	    for (;;)
 	      {
-		Object n = p.cdr;
+		Object n = p.getCdr();
 		if (n == LList.Empty)
 		  break;
 		PairWithPosition np = (PairWithPosition) n;
@@ -111,7 +111,7 @@ public class Q2Read extends LispReader
 		  {
 		    if (pColumn > column)
 		      error('e', "some tokens on previous line indented more than current line");
-		    n = np.cdr;
+		    n = np.getCdr();
 		    if (n != LList.Empty)
 		      {
 			if (((PairWithPosition) n).getColumnNumber()-1==column)
@@ -121,7 +121,7 @@ public class Q2Read extends LispReader
 			  }
 			last = (PairWithPosition)
 			  makePair(np, port.getLineNumber(), column);
-			p.cdr = last;
+			p.setCdr(last);
 		      }
 		    break;
 		  }
@@ -142,22 +142,21 @@ public class Q2Read extends LispReader
 	    pair = cur;
 	    obj = cur;
 	  }
-	else if (last.car instanceof Keyword)
+	else if (last.getCar() instanceof Keyword)
 	  {
-	    Object name = new QuoteExp(((Keyword) last.car).getName());
-	    last.car
-	      = new PairWithPosition(last, MakeAttribute.makeAttribute,
-				     new PairWithPosition(last, name, cur));
+	    Object name = new QuoteExp(((Keyword) last.getCar()).getName());
+	    last.setCar(new PairWithPosition(last, MakeAttribute.makeAttribute,
+                                              new PairWithPosition(last, name, cur)));
 	    continue;
 	  }
 	else
-	  last.cdr = cur;
+	  last.setCdr(cur);
 	last = cur;
       }
     if (! forceList)
       {
 	if (obj == last)
-	  obj = last.car;
+	  obj = last.getCar();
 	else if (last == null)
 	  obj = QuoteExp.voidExp;
       }

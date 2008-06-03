@@ -99,12 +99,12 @@ public class IsEqual extends gnu.mapping.Procedure2
         Pair pair2 = (Pair) arg2;
         for (;;)
           {
-            Object x1 = pair1.car;
-            Object x2 = pair2.car;
+            Object x1 = pair1.getCar();
+            Object x2 = pair2.getCar();
             if (! apply(x1, x2))
               return false;
-            x1 = pair1.cdr;
-            x2 = pair2.cdr;
+            x1 = pair1.getCdr();
+            x2 = pair2.getCdr();
             if (x1 == x2)
               return true;
             if (x1 == null || x2 == null)

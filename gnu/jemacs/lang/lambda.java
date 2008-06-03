@@ -28,34 +28,34 @@ public class lambda extends Lambda
         pair = (Pair) body;
 	if (
             /* #ifdef use:java.lang.CharSequence */
-            pair.car instanceof CharSequence
+            pair.getCar() instanceof CharSequence
             /* #else */
-            // pair.car instanceof String || pair.car instanceof CharSeq
+            // pair.getCar() instanceof String || pair.getCar() instanceof CharSeq
             /* #endif */
             )
           {
             // Process documentation string.  FIXME.
-            body = pair.cdr;
+            body = pair.getCdr();
           }
       }
     Object interactive = null;
     if (body instanceof Pair
-	&& (pair = (Pair) body).car instanceof Pair)
+	&& (pair = (Pair) body).getCar() instanceof Pair)
       {
-	Pair first_application = (Pair) pair.car;
-	Object first_function = first_application.car;
+	Pair first_application = (Pair) pair.getCar();
+	Object first_function = first_application.getCar();
 	if (first_function instanceof Symbol
 	    && ((Symbol) first_function).getName() == "interactive")
 	  {
-	    interactive = first_application.cdr;
+	    interactive = first_application.getCdr();
 	    if (interactive != LList.Empty
 		&& ! (interactive instanceof Pair
-		      && ((Pair) interactive).cdr == LList.Empty))
+		      && ((Pair) interactive).getCdr() == LList.Empty))
 	      {
 		tr.syntaxError ("missing 'interactive' specification");
 		interactive = null;
 	      }
-	    body = pair.cdr;
+	    body = pair.getCdr();
 	  }
       }
     if (body instanceof PairWithPosition)
@@ -98,7 +98,7 @@ public class lambda extends Lambda
           interactive = QuoteExp.nullExp;
         else
           {
-            Object arg = ((Pair) interactive).car;
+            Object arg = ((Pair) interactive).getCar();
             if (
                 /* #ifdef use:java.lang.CharSequence */
                 arg instanceof CharSequence

@@ -11,7 +11,7 @@ public class thisRef extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    if (form.cdr == LList.Empty)
+    if (form.getCdr() == LList.Empty)
       {
         LambdaExp method = tr.curMethodLambda;
         Declaration firstParam = method == null ? null : method.firstDecl();

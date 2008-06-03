@@ -13,10 +13,10 @@ public class with_compile_options extends Syntax
   public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
     Stack stack = new Stack();
-    Object rest = getOptions(form.cdr, stack, this, tr);
+    Object rest = getOptions(form.getCdr(), stack, this, tr);
     if (rest == LList.Empty)
       return;
-    if (rest == form.cdr)
+    if (rest == form.getCdr())
       {
 	tr.scanBody(rest, defs, false);
 	return;
@@ -24,7 +24,7 @@ public class with_compile_options extends Syntax
     rest = tr.scanBody(rest, defs, true);
     rest = new Pair(stack, rest);
     tr.currentOptions.popOptionValues(stack);
-    tr.formStack.add(Translator.makePair(form, form.car, rest));
+    tr.formStack.add(Translator.makePair(form, form.getCar(), rest));
   }
 
   public static Object getOptions (Object form, Stack stack,
@@ -43,7 +43,7 @@ public class with_compile_options extends Syntax
 	if (! (form instanceof Pair))
 	  break;
 	Pair pair = (Pair) form;
-	Object pair_car = Translator.stripSyntax(pair.car);
+	Object pair_car = Translator.stripSyntax(pair.getCar());
 	if (! (pair_car instanceof Keyword))
 	  break;
 	String key = ((Keyword) pair_car).getName();
@@ -51,7 +51,7 @@ public class with_compile_options extends Syntax
 	Object savePos = tr.pushPositionOf(pair);
 	try
 	  {
-	    form = pair.cdr;
+	    form = pair.getCdr();
 	    while (form instanceof SyntaxForm)
 	      {
 		syntax = (SyntaxForm) form;
@@ -63,8 +63,8 @@ public class with_compile_options extends Syntax
 		return LList.Empty;
 	      }
 	    pair = (Pair) form;
-	    Object value = Translator.stripSyntax(pair.car);
-	    form = pair.cdr;
+	    Object value = Translator.stripSyntax(pair.getCar());
+	    form = pair.getCdr();
 	    Object oldValue = options.getLocal(key);
 	    if (options.getInfo(key) == null)
 	      {
@@ -103,13 +103,13 @@ public class with_compile_options extends Syntax
   {
     Object rest;
     Stack stack;
-    Object obj = form.cdr;
+    Object obj = form.getCdr();
     Pair p;
     if (obj instanceof Pair
-	&& (p = (Pair) obj).car instanceof Stack)
+	&& (p = (Pair) obj).getCar() instanceof Stack)
       {
-	stack = (Stack) p.car;
-	rest = p.cdr;
+	stack = (Stack) p.getCar();
+	rest = p.getCdr();
 	tr.currentOptions.pushOptionValues(stack);
       }
     else

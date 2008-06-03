@@ -35,16 +35,16 @@ public class object extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    if (! (form.cdr instanceof Pair))
+    if (! (form.getCdr() instanceof Pair))
       return tr.syntaxError("missing superclass specification in object");
-    Pair pair = (Pair) form.cdr;
+    Pair pair = (Pair) form.getCdr();
     ObjectExp oexp = new ObjectExp();
-    if (pair.car instanceof FString)
+    if (pair.getCar() instanceof FString)
       {
-        // oexp.setName(pair.car.toString());
-	if (! (pair.cdr instanceof Pair))
+        // oexp.setName(pair.getCar().toString());
+	if (! (pair.getCdr() instanceof Pair))
 	  return tr.syntaxError("missing superclass specification after object class name");
-	pair = (Pair) pair.cdr;
+	pair = (Pair) pair.getCdr();
       }
     Object[] saved = scanClassDef(pair, oexp, tr);
     if (saved != null)
@@ -58,8 +58,8 @@ public class object extends Syntax
   public Object[] scanClassDef (Pair pair, ClassExp oexp, Translator tr)
   {
     tr.mustCompileHere();
-    Object superlist = pair.car;
-    Object components = pair.cdr;
+    Object superlist = pair.getCar();
+    Object components = pair.getCdr();
     LambdaExp method_list = null;
     LambdaExp last_method = null;
     int classAccessFlag = 0;
@@ -77,10 +77,10 @@ public class object extends Syntax
 	    return null;
 	  }
 	pair = (Pair) obj;
-	Object pair_car = pair.car;
+	Object pair_car = pair.getCar();
 	while (pair_car instanceof SyntaxForm)
 	  pair_car = ((SyntaxForm) pair_car).form;
-	obj = pair.cdr; // Next member.
+	obj = pair.getCdr(); // Next member.
 	Object savedPos1 = tr.pushPositionOf(pair);
         if (pair_car instanceof Keyword)
           {
@@ -90,12 +90,12 @@ public class object extends Syntax
               {
                 if (pair_car == interfaceKeyword)
                   {
-                    Object val = ((Pair) obj).car;
+                    Object val = ((Pair) obj).getCar();
                     if (val == Boolean.FALSE)
                       oexp.setFlag(ClassExp.CLASS_SPECIFIED);
                     else
                       oexp.setFlag(ClassExp.INTERFACE_SPECIFIED);
-                    obj = ((Pair) obj).cdr;
+                    obj = ((Pair) obj).getCdr();
                     tr.popPositionOf(savedPos1);
                     continue;
                   }
@@ -107,11 +107,11 @@ public class object extends Syntax
                       tr.error('e', "duplicate access specifiers");
                     else
                       {
-                        classAccessFlag = matchAccess(((Pair) obj).car, tr);
+                        classAccessFlag = matchAccess(((Pair) obj).getCar(), tr);
                         if ((classAccessFlag & (Declaration.PRIVATE_ACCESS|Declaration.PROTECTED_ACCESS)) != 0)
                           tr.error('e', "invalid class access specifier");
                       }
-                    obj = ((Pair) obj).cdr;
+                    obj = ((Pair) obj).getCdr();
                     tr.popPositionOf(savedPos1);
                     continue;
                   }
@@ -123,7 +123,7 @@ public class object extends Syntax
 	    return null;
 	  }
 	pair = (Pair) pair_car;
-	pair_car = pair.car;
+	pair_car = pair.getCar();
 	while (pair_car instanceof SyntaxForm)
 	  pair_car = ((SyntaxForm) pair_car).form;
 	if (pair_car instanceof String || pair_car instanceof Symbol
@@ -146,7 +146,7 @@ public class object extends Syntax
 		decl.setSimple(false);
 		decl.setFlag(Declaration.FIELD_OR_METHOD);
 		Translator.setLine(decl, pair);
-		args = pair.cdr;
+		args = pair.getCdr();
 	      }
 	    int nKeywords = 0;
 	    boolean seenInit = false;
@@ -157,18 +157,18 @@ public class object extends Syntax
                   args = ((SyntaxForm) args).form;
 		pair = (Pair) args;
 		Pair keyPair = pair;
-		Object key = pair.car;
+		Object key = pair.getCar();
                 while (key instanceof SyntaxForm)
                   key = ((SyntaxForm) key).form;
 		Object savedPos2 = tr.pushPositionOf(pair);
-		args = pair.cdr;
+		args = pair.getCdr();
 		if ((key == coloncolon || key instanceof Keyword)
 		    && args instanceof Pair)
 		  {
 		    nKeywords++;
 		    pair = (Pair) args;
-		    Object value = pair.car;
-		    args = pair.cdr;
+		    Object value = pair.getCar();
+		    args = pair.getCdr();
 		    if (key == coloncolon || key == typeKeyword)
 		      typePair = pair;
 		    else if (key == allocationKeyword)
@@ -229,12 +229,12 @@ public class object extends Syntax
 		  }
 		else if (args instanceof Pair
 			 && nKeywords == 0 && ! seenInit && typePair == null
-			 && (pair = (Pair) args).cdr == LList.Empty)
+			 && (pair = (Pair) args).getCdr() == LList.Empty)
 		  {
 		    // Backward compatibility.
 		    typePair = keyPair;
 		    initPair = pair;
-		    args = pair.cdr;
+		    args = pair.getCdr();
 		    seenInit = true;
 		  }
 		else
@@ -281,7 +281,7 @@ public class object extends Syntax
 	else if (pair_car instanceof Pair)
 	  { // Method declaration.
 	    Pair mpair = (Pair) pair_car;
-	    Object mname = mpair.car;
+	    Object mname = mpair.getCar();
 	    if (! (mname instanceof String)
 		&& ! (mname instanceof Symbol))
 	      {
@@ -346,7 +346,7 @@ public class object extends Syntax
 	  }
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite_car(superpair, false);
-	superlist = superpair.cdr;
+	superlist = superpair.getCdr();
       }
     oexp.supers = supers;
 
@@ -377,7 +377,7 @@ public class object extends Syntax
 	  }
 	Pair pair = (Pair) obj;
 	Object savedPos1 = tr.pushPositionOf(pair);
-	Object pair_car = pair.car;
+	Object pair_car = pair.getCar();
 	SyntaxForm memberSyntax = componentsSyntax;
 	while (pair_car instanceof SyntaxForm)
 	  {
@@ -386,16 +386,16 @@ public class object extends Syntax
 	  }
 	try
 	  {
-	    obj = pair.cdr; // Next member.
+	    obj = pair.getCdr(); // Next member.
             if (pair_car instanceof Keyword
                 && obj instanceof Pair)
               {
                 // Handled at scan time.
-                obj = ((Pair) obj).cdr;
+                obj = ((Pair) obj).getCdr();
                 continue;
               }
 	    pair = (Pair) pair_car;
-	    pair_car = pair.car;
+	    pair_car = pair.getCar();
 	    SyntaxForm memberCarSyntax = memberSyntax;
 	    while (pair_car instanceof SyntaxForm)
 	      {
@@ -407,7 +407,7 @@ public class object extends Syntax
 	      { // Field declaration.
 		Object type = null;
 		int nKeywords = 0;
-		Object args = pair_car instanceof Keyword ? pair : pair.cdr;
+		Object args = pair_car instanceof Keyword ? pair : pair.getCdr();
 		Pair initPair = null;
                 SyntaxForm initSyntax = null;
 		while (args != LList.Empty)
@@ -418,18 +418,18 @@ public class object extends Syntax
                         args = memberSyntax.form;
                       }
 		    pair = (Pair) args;
-		    Object key = pair.car;
+		    Object key = pair.getCar();
                     while (key instanceof SyntaxForm)
                       key = ((SyntaxForm) key).form;
 		    Object savedPos2 = tr.pushPositionOf(pair);
-		    args = pair.cdr;
+		    args = pair.getCdr();
 		    if ((key == coloncolon || key instanceof Keyword)
 			&& args instanceof Pair)
 		      {
 			nKeywords++;
 			pair = (Pair) args;
-			Object value = pair.car;
-			args = pair.cdr;
+			Object value = pair.getCar();
+			args = pair.getCdr();
 			if (key == coloncolon || key == typeKeyword)
 			  type = value;
 			else if (key == initKeyword
@@ -453,13 +453,13 @@ public class object extends Syntax
 		      }
 		    else if (args instanceof Pair && nKeywords == 0
 			     && initPair == null && type == null
-			     && (pair = (Pair) args).cdr == LList.Empty)
+			     && (pair = (Pair) args).getCdr() == LList.Empty)
 		      {
 			// Backward compatibility.
 			type = key;
 			initPair = pair;
                         initSyntax = memberSyntax;
-			args = pair.cdr;
+			args = pair.getCdr();
 		      }
 		    else
 		      {
@@ -496,7 +496,7 @@ public class object extends Syntax
                 Translator.setLine(meth, pair);
                 LambdaExp saveLambda = tr.curMethodLambda;
                 tr.curMethodLambda = meth;
-		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr,
+		lambda.rewrite(meth, ((Pair) pair_car).getCdr(), pair.getCdr(), tr,
 			       memberCarSyntax != null
 			       && (memberSyntax == null
 				   || memberCarSyntax.scope != memberSyntax.scope)
@@ -584,11 +584,11 @@ public class object extends Syntax
     else if (exp instanceof FString)
       value = ((FString) exp).toString();
     else if (exp instanceof Pair
-	     && tr.matches((pair = (Pair) exp).car, Scheme.quote_sym)
-	     && pair.cdr instanceof Pair
-	     && (pair = (Pair) pair.cdr).cdr == LList.Empty
-	     && pair.car instanceof gnu.mapping.SimpleSymbol)
-      value = pair.car.toString();
+	     && tr.matches((pair = (Pair) exp).getCar(), Scheme.quote_sym)
+	     && pair.getCdr() instanceof Pair
+	     && (pair = (Pair) pair.getCdr()).getCdr() == LList.Empty
+	     && pair.getCar() instanceof gnu.mapping.SimpleSymbol)
+      value = pair.getCar().toString();
     else
       return false;
     return tag == null || tag.equals(value);

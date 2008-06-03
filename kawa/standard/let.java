@@ -22,8 +22,8 @@ public class let extends Syntax
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing let arguments");
     Pair pair = (Pair) obj;
-    Object bindings = pair.car;
-    Object body = pair.cdr;
+    Object bindings = pair.getCar();
+    Object body = pair.getCdr();
     int decl_count = Translator.listLength(bindings);
     if (decl_count < 0)
       return tr.syntaxError("bindings not a proper list");
@@ -43,7 +43,7 @@ public class let extends Syntax
 	    // as well as the cdr - i.e. the remaining bindings.
 	  }
 	Pair bind_pair = (Pair) bindings;
-	Object bind_pair_car = bind_pair.car;
+	Object bind_pair_car = bind_pair.getCar();
 	SyntaxForm syntax = syntaxRest;
 	if (bind_pair_car instanceof SyntaxForm)
 	  {
@@ -53,7 +53,7 @@ public class let extends Syntax
 	if (! (bind_pair_car instanceof Pair))
 	  return tr.syntaxError ("let binding is not a pair:"+bind_pair_car);
 	Pair binding = (Pair) bind_pair_car;
-	Object name = binding.car;
+	Object name = binding.getCar();
 	TemplateScope templateScope;
 	if (name instanceof SyntaxForm)
 	  {
@@ -78,7 +78,7 @@ public class let extends Syntax
 	    renamedAliasesCount++;
 	  }
 
-	Object binding_cdr = binding.cdr;
+	Object binding_cdr = binding.getCdr();
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) binding_cdr;
@@ -87,19 +87,19 @@ public class let extends Syntax
 	if (! (binding_cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for '"+name+"'");
 	binding = (Pair) binding_cdr;
-	binding_cdr = binding.cdr;
+	binding_cdr = binding.getCdr();
 	Pair init;
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) binding_cdr;
 	    binding_cdr = syntax.form;
 	  }
-	if (tr.matches(binding.car, "::"))
+	if (tr.matches(binding.getCar(), "::"))
 	  {
 	    if (! (binding_cdr instanceof Pair)
-		|| (binding = (Pair) binding_cdr).cdr == LList.Empty)
+		|| (binding = (Pair) binding_cdr).getCdr() == LList.Empty)
 	      return tr.syntaxError("missing type after '::' in let");
-	    binding_cdr = binding.cdr;
+	    binding_cdr = binding.getCdr();
 	    while (binding_cdr instanceof SyntaxForm)
 	      {
 		syntax = (SyntaxForm) binding_cdr;
@@ -119,10 +119,10 @@ public class let extends Syntax
 	else
 	  return tr.syntaxError("let binding for '"+name+"' is improper list");
 	inits[i] = tr.rewrite_car (init, syntax);
-	if (init.cdr != LList.Empty)
+	if (init.getCdr() != LList.Empty)
 	  return tr.syntaxError("junk after declaration of "+name);
 	decl.noteValue (inits[i]);
-	bindings = bind_pair.cdr;
+	bindings = bind_pair.getCdr();
       }
 
     for (int i = renamedAliasesCount;  --i >= 0; )

@@ -68,7 +68,7 @@ public class RecordConstructor extends ProcedureN
 	for (int i = 0;  i < nfields;  i++)
 	  {
 	    Pair pair = (Pair) fieldsList;
-	    String fname = pair.car.toString();
+	    String fname = pair.getCar().toString();
 	    for (Field fld = list;  ;  fld = fld.getNext())
 	      {
 		if (fld == null)
@@ -79,7 +79,7 @@ public class RecordConstructor extends ProcedureN
 		    break;
 		  }
 	      }
-	    fieldsList = pair.cdr;
+	    fieldsList = pair.getCdr();
 	  }
       }
   }

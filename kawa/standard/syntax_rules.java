@@ -12,12 +12,12 @@ public class syntax_rules extends Syntax
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Pair pair = (Pair) form.cdr;
+    Pair pair = (Pair) form.getCdr();
 
     Object[] literal_identifiers
-      = SyntaxPattern.getLiteralsList(pair.car, null, tr);
+      = SyntaxPattern.getLiteralsList(pair.getCar(), null, tr);
     SyntaxRules rules
-      = new SyntaxRules (literal_identifiers, pair.cdr, tr);
+      = new SyntaxRules (literal_identifiers, pair.getCdr(), tr);
     return new QuoteExp(rules);
   }
 }

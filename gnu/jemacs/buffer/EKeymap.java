@@ -361,11 +361,11 @@ implements gnu.mapping.Named
     while (key instanceof Pair)
       {
 	Pair pair = (Pair) key;
-	if (pair.cdr == LList.Empty)
-	  key = pair.car;
+	if (pair.getCdr() == LList.Empty)
+	  key = pair.getCar();
 	else
 	  {
-	    Object car = pair.car;
+	    Object car = pair.getCar();
 	    if (car instanceof Symbol)
 	      car = ((Symbol) car).getName();
 	    if (car == "control")
@@ -376,7 +376,7 @@ implements gnu.mapping.Named
 	      m |= SHIFT_MASK;
 	    if (car == "alt")
 	      m |= ALT_MASK;
-	    key = pair.cdr;
+	    key = pair.getCdr();
 	  }
       }
     if (key instanceof Char)

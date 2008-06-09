@@ -244,24 +244,33 @@ public class Quote extends Syntax
     if (list == rest)
       return cdr;
     Pair p = list;
-    Pair prev = null;
+    Pair[] pairs = new Pair[20];
+    int npairs = 0;
     for (;;)
       {
-        Pair q = Translator.makePair(p, p.getCar(), null);
-        if (prev == null)
-          list = q;
-        else
-          prev.setCdr(q);
-        prev = q;
+        if (npairs >= pairs.length)
+          {
+            Pair[] tmp = new Pair[2 * npairs];
+            System.arraycopy(pairs, 0, tmp, 0, npairs);
+            pairs = tmp;
+          }
+        pairs[npairs++] = p;
         if (p.getCdr() == rest)
           break;
         p = (Pair) p.getCdr();
       }
+    Object result = cdr instanceof Expression ? LList.Empty : cdr;
+    while (--npairs >= 0)
+      {
+        p = pairs[npairs];
+        result = Translator.makePair(p, p.getCar(), result);
+      }
+
     if (cdr instanceof Expression)
       {
         Expression[] args = new Expression[2];
         args[1] = (Expression) cdr;
-        if (prev == list)
+        if (npairs == 1)
           {
             // The n==1 case: Only a single pair before rest.
             args[0] = leaf(list.getCar(), tr);
@@ -269,16 +278,11 @@ public class Quote extends Syntax
           }
         else
           {
-            prev.setCdr(LList.Empty);
-            args[0] = leaf(list, tr);
+            args[0] = leaf(result, tr);
 	    return Invoke.makeInvokeStatic(quoteType, "append", args);
           }
       }
-    else
-      {
-        prev.setCdr(cdr);
-      }
-    return list;
+    return result;
   }
 
   private static final Object WORKING = new String("(working)");

@@ -1066,7 +1066,7 @@ public class Translator extends Compilation
                     f = wrapSyntax(f, sf);
                     if (lastPair == null)
 		      return f;
-                    lastPair.setCdr(f);
+                    lastPair.setCdrBackdoor(f);
                     return list;
                   }
 		formStack.add(wrapSyntax(popForms(first), sf));
@@ -1102,7 +1102,7 @@ public class Translator extends Compilation
 		    if (lastPair == null)
 		      list = npair;
 		    else
-		      lastPair.setCdr(npair);
+		      lastPair.setCdrBackdoor(npair);
 		    lastPair = npair;
 		  }
 		formStack.setSize(first);

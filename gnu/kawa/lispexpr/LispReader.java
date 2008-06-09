@@ -980,16 +980,9 @@ public class LispReader extends Lexer
       return Pair.make(car, LList.Empty);
   }
 
-  public Object makePair (Object car, Object cdr)
-  {
-    Object pair = makePair(car, -1, -1);
-    setCdr(pair, cdr);
-    return pair;
-  }
-
   protected void setCdr (Object pair, Object cdr)
   {
-    ((Pair) pair).setCdr(cdr);
+    ((PairWithPosition) pair).setCdrBackdoor(cdr);
   }
 
   /** Read a number from a LispReader

@@ -1,3 +1,11 @@
+2008-06-08  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxTemplate.java: Use Pair.setCdrBackdoor, since the
+	pairs may be PairWithPosition.
+	* lang/Translator.java: Likewise.
+	* lang/Quote.java: Same issue, but instead create the list
+	back-to-front so we don't have to use setCdr.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: The standard functions string, vector, and list

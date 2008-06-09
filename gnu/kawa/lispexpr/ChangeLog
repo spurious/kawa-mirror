@@ -1,3 +1,8 @@
+2008-06-08  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (makePair): Remove unused method.
+	(setCdr): Use setCdrBackdoor, since pairs may be PairWithPosition.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (vectorType, stringType, listType): New Type statics.

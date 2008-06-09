@@ -474,7 +474,7 @@ public class SyntaxTemplate implements Externalizable
 	    if (last == null)
 	      result = list;
 	    else
-	      last.setCdr(list);
+	      last.setCdrBackdoor(list);
 	    // Normally list is a single Pair, but if it is multiple Pairs,
 	    // find the last Pair so we can properly splice everything.
 	    while (list instanceof Pair)
@@ -529,8 +529,8 @@ public class SyntaxTemplate implements Externalizable
 	      = executeToList(pc, vars, nesting, indexes, tr, templateScope);
 	    if (p == null)
 	      result = q;
-	    else
-	      p.setCdr(q);
+            else
+	      p.setCdrBackdoor(q);
 	    while (q instanceof Pair)
 	      {
 		p = (Pair) q;
@@ -544,8 +544,8 @@ public class SyntaxTemplate implements Externalizable
 	Object cdr = execute(pc, vars, nesting, indexes, tr, templateScope);
 	if (p == null)
 	  result = cdr;
-	else
-	  p.setCdr(cdr);
+        else
+	  p.setCdrBackdoor(cdr);
 	return result;
       }
     else if (ch == BUILD_VECTOR)

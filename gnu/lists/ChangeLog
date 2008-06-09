@@ -1,3 +1,12 @@
+2008-06-08  Per Bothner  <per@bothner.com>
+
+	* ImmutablePair.java: New class, extends Pair.
+	(setCar, setCdr): Throw exception.
+	* Makefile.am: Update accordingly.
+	* PairWithPosition.java: New extends ImmutableList.
+	* Pair.java (car, cdr): Make protected.
+	(setCdrBackdoor): New method.
+
 2008-06-03  Per Bothner  <per@bothner.com>
 
 	* Pair.java (car, cdr): Make non-public.

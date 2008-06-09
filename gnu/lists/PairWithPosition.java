@@ -4,7 +4,7 @@ import gnu.text.SourceLocator;
 
 /** A <code>Pair</code> with the file name and position it was read from. */
 
-public class PairWithPosition extends Pair
+public class PairWithPosition extends ImmutablePair
   implements gnu.text.SourceLocator
 {
   String filename;

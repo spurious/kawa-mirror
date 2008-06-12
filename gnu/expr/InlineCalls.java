@@ -90,6 +90,13 @@ public class InlineCalls extends ExpWalker
                 && ! rval.getDontDereference())
               return walkReferenceExp(rval);
           }
+        if (! exp.isProcedureName()
+            && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
+                == Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE))
+          {
+            comp.error('e', "unimplemented: reference to method "+decl.getName()+" as variable");
+            comp.error('e', decl, "here is the definition of ", "");
+          }
       }
     return super.walkReferenceExp(exp);
   }
@@ -174,10 +181,15 @@ public class InlineCalls extends ExpWalker
     return walkScopeExp(exp);
   }
 
-  /*
   protected Expression walkSetExp (SetExp exp)
   {
-    super.walkExp(exp);
+    super.walkSetExp(exp);
+    Declaration decl = exp.getBinding();
+    if (! exp.isDefining() && decl != null
+        && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
+            == (Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)))
+      comp.error('e', "can't assign to method "+decl.getName(), exp);
+    /*
     if (decl != null && ! decl.getFlag(Declaration.TYPE_SPECIFIED))
       {
 	// This is a kludge to handle the a #!rest parameter that
@@ -189,7 +201,7 @@ public class InlineCalls extends ExpWalker
 	if (declType != null && ! exp.new_value.getType().isSubtype(declType))
 	  decl.setType(Type.pointer_type);
       }
+    */
     return exp;
   }
-  */
 }

@@ -1,3 +1,13 @@
+2008-06-11  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkSetExp): New method.  Check that we don't
+	try to assign to a method.
+	(walkReferenceExp): Check that we don't try to access a method as a
+	variable - which isn't supported yet.
+	This fixes Savannah bug #23534: '"uninitialized register 10"
+	(VerifyError) when accessing globals from method within
+	define-simple-class'.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (javaIntegerType, scmPairType, scmNamedType):

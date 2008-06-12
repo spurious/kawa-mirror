@@ -5,11 +5,11 @@ import gnu.kawa.reflect.*;
 import gnu.expr.*;
 import java.io.*;
 
-/** The value of the Kawa Scehem expression '*:PART-NAME'.
+/** The value of the Kawa Scheme expression '*:PART-NAME'.
  * This function invokes a method or accesses a field,
  * if the PART-NAME starts with a '.'.
  *
- * This syntax is semi-depecated, since instead of
+ * This syntax is semi-deprecated, since instead of
  * (*:method-name instance args ...) you can now write
  * (instance:method-name args ...), and
  * instead of (*:.field-name instance) you can write

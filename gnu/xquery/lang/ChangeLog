@@ -1,5 +1,11 @@
 2008-06-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (peekOperand): Only recognize "empty-sequence"
+	if followed by '('.
+
+	* XQParser.java (parseElementConstructor): Whitespace is required
+	before direct attribute constructors.
+
 	* XQuery.java (typeMap): Add "anyType" and "untyped".
 
 2008-01-14  Per Bothner  <per@bothner.com>

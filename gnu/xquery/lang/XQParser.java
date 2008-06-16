@@ -1026,7 +1026,7 @@ public class XQParser extends Lexer
                   }
                 break;
               }
-            if (match("empty-sequence"))
+            if (next == '(' && match("empty-sequence"))
               return curToken = OP_EMPTY_SEQUENCE;
             if (next == '$' && match("every"))
               return curToken = EVERY_DOLLAR_TOKEN;
@@ -2607,9 +2607,17 @@ public class XQParser extends Lexer
     int ch;
     for (;;)
       {
-	ch = skipSpace();
+        boolean sawSpace = false;
+        ch = read();
+        while (ch >= 0 && Character.isWhitespace((char) ch))
+          {
+            ch = read();
+            sawSpace = true;
+          }
 	if (ch < 0 || ch == '>' || ch == '/')
 	  break;
+        if (! sawSpace)
+          syntaxError("missing space before attribute");
 	unread(ch);
 	getRawToken();
 	int vecSize = vec.size();

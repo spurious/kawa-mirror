@@ -16,7 +16,7 @@ public class MakeElement extends NodeConstructor
 
   /** Optional tag.  If non-null, the element tag is this value,
    * rather than the first parameter. */
-  public Object tag;
+  public Symbol tag;
 
   public int copyNamespacesMode = XMLFilter.COPY_NAMESPACES_PRESERVE;
 

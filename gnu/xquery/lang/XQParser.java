@@ -1445,11 +1445,10 @@ public class XQParser extends Lexer
             getRawToken();
             if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
               {
-                Expression tname = parseNameTest(true);
+                Expression tname = parseDataType();
               }
             else
                syntaxError("expected QName");
-            getRawToken();
           }
         if (curToken == ')')
           getRawToken();
@@ -2580,9 +2579,11 @@ public class XQParser extends Lexer
 
   /** Generate code to cast argument to a QName
    * (which is implemented using <code>Symbol</code>). */
-  static ApplyExp castQName (Expression value)
+  static ApplyExp castQName (Expression value, boolean element)
   {
-    return new ApplyExp(new ReferenceExp(XQResolveNames.xsQNameDecl),
+    Declaration fdecl = (element ? XQResolveNames.xsQNameDecl
+                         : XQResolveNames.xsQNameIgnoreDefaultDecl);
+    return new ApplyExp(new ReferenceExp(fdecl),
 			new Expression[] { value });
   }
 
@@ -2601,7 +2602,7 @@ public class XQParser extends Lexer
     String startTag = new String(tokenBuffer, 0, tokenBufferLength);
     Vector vec = new Vector();
     Expression[] args;
-    vec.addElement(castQName(new QuoteExp(startTag)));
+    vec.addElement(castQName(new QuoteExp(startTag), true));
     errorIfComment = "comment not allowed in element start tag";
     NamespaceBinding nsBindings = null;
     int ch;
@@ -2640,7 +2641,7 @@ public class XQParser extends Lexer
 	Expression makeAttr
 	  = definingNamespace != null ? null
 	  : MakeAttribute.makeAttributeExp;
-	vec.addElement(castQName(new QuoteExp(attrName)));
+	vec.addElement(castQName(new QuoteExp(attrName), false));
 	ch = skipSpace();
 	if (ch != '=')
           {
@@ -3068,7 +3069,7 @@ public class XQParser extends Lexer
               element = parseEnclosedExpr();
             else
               return syntaxError("missing element/attribute name");
-            vec.addElement(castQName(element));
+            vec.addElement(castQName(element, token == ELEMENT_TOKEN));
             if (token == ELEMENT_TOKEN)
               {
                 MakeElement mk = new MakeElement();
@@ -3203,7 +3204,7 @@ public class XQParser extends Lexer
 
   /** Parse a Variable. */
   public Object parseVariable ()
-      throws java.io.IOException, SyntaxException
+    throws java.io.IOException, SyntaxException
   {
     if (curToken == '$')
       getRawToken();
@@ -3859,7 +3860,7 @@ public class XQParser extends Lexer
 	  {
             Expression[] args =
               {
-                castQName(new QuoteExp(decl.getSymbol())),
+                castQName(new QuoteExp(decl.getSymbol()), false),
                 type==null ? QuoteExp.nullExp : type
               };
             init = new ApplyExp(getExternalFunction, args);
@@ -4351,6 +4352,8 @@ public class XQParser extends Lexer
         if (curToken >= OP_AXIS_FIRST
             && curToken - OP_AXIS_FIRST < COUNT_OP_AXIS)
           return axisNames[curToken - OP_AXIS_FIRST]+"::-axis("+curToken+")";
+        if (curToken >= ' ' && curToken < 127)
+          return Integer.toString(curToken)+"='"+((char) curToken)+"'";
 	return Integer.toString(curToken);
       }
   }

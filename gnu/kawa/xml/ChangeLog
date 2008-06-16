@@ -1,5 +1,7 @@
 2008-06-16  Per Bothner  <per@bothner.com>
 
+	* MakeElement.java (tag): Give more specific type.
+
 	* XIntegerType.java (valueOf): Initial signs are allowed even
 	for unsigned types, to be compatible XML Schema 1.1 (and maybe
 	XML Schema 1.0, but that is somewhat unclear).

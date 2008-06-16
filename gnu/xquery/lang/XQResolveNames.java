@@ -22,8 +22,8 @@ public class XQResolveNames extends ResolveNames
   /** Code number for the special <code>position</code> function. */
   public static final int POSITION_BUILTIN = -2;
 
-  /** Value of {@code xs:QName()} constructor. */
-  public static final int XS_QNAME_BUILTIN = -3;
+  /** Code number for internal function to handle extensions. */
+  public static final int HANDLE_EXTENSION_BUILTIN = -3;
 
   /** Code number for the special <code>compare</code> function. */
   public static final int COMPARE_BUILTIN = -4;
@@ -103,8 +103,12 @@ public class XQResolveNames extends ResolveNames
   public static final int CAST_AS_BUILTIN = -33;
   public static final int CASTABLE_AS_BUILTIN = -34;
 
-  /** Code number for internal function to handle extensions. */
-  public static final int HANDLE_EXTENSION_BUILTIN = -35;
+  /** Value of {@code xs:QName()} constructor. */
+  public static final int XS_QNAME_BUILTIN = -35;
+
+  /** Like {@code XS_QNAME_BUILTIN}, but ignore the default
+   * element namespace.  The is appropriate fro resolving atributes. */
+  public static final int XS_QNAME_IGNORE_DEFAULT_BUILTIN = -36;
 
   public static final Declaration handleExtensionDecl
     = makeBuiltin("(extension)", HANDLE_EXTENSION_BUILTIN);
@@ -121,6 +125,9 @@ public class XQResolveNames extends ResolveNames
 
   public static final Declaration xsQNameDecl
     = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
+
+  public static final Declaration xsQNameIgnoreDefaultDecl
+    = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "(QName-ignore-default)"), XS_QNAME_IGNORE_DEFAULT_BUILTIN);
 
   public static final Declaration staticBaseUriDecl
     = makeBuiltin("static-base-uri", STATIC_BASE_URI_BUILTIN);
@@ -536,7 +543,7 @@ public class XQResolveNames extends ResolveNames
                 {
 		  Expression[] args = exp.getArgs();
                   if (args[0].valueIfConstant() == Compilation.typeSymbol)
-                    return walkApplyExp(XQParser.castQName(args[1]));
+                    return walkApplyExp(XQParser.castQName(args[1], true));
                   func
                     = XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
                   return new ApplyExp(func, args);
@@ -564,17 +571,23 @@ public class XQResolveNames extends ResolveNames
                   return new ApplyExp(func, args);
                 }
 	      case XS_QNAME_BUILTIN:
+	      case XS_QNAME_IGNORE_DEFAULT_BUILTIN:
 		{
 		  Expression[] args = exp.getArgs();
                   if ((err = checkArgCount(args, decl, 1, 1)) != null)
                     return err;
+                  NamespaceBinding constructorNamespaces
+                    = parser.constructorNamespaces;
+                  if (code == XS_QNAME_IGNORE_DEFAULT_BUILTIN)
+                    constructorNamespaces
+                      = new NamespaceBinding(null, "", constructorNamespaces);
 		  if (args[0] instanceof QuoteExp)
 		    {
 		      try
 			{
 			  Object val = ((QuoteExp) args[0]).getValue();
 			  val = QNameUtils.resolveQName(val,
-                                                        parser.constructorNamespaces,
+                                                        constructorNamespaces,
                                                         parser.prologNamespaces);
 			  return new QuoteExp(val);
 			}
@@ -585,7 +598,7 @@ public class XQResolveNames extends ResolveNames
 		    }
 		  Expression[] xargs = {
 		    args[0],
-		    new QuoteExp(parser.constructorNamespaces),
+		    new QuoteExp(constructorNamespaces),
 		    new QuoteExp(parser.prologNamespaces) };
 		  Method meth
 		    = (ClassType.make("gnu.xquery.util.QNameUtils")
@@ -863,8 +876,10 @@ public class XQResolveNames extends ResolveNames
 
 	// Add namespaces nodes that might be needed.
 	NamespaceBinding nsBindings = make.getNamespaceNodes();
-	nsBindings = maybeAddNamespace(MakeElement.getTagName(exp),
-				       nsBindings);
+        Symbol tag = make.tag;
+        if (tag == null)
+          tag = MakeElement.getTagName(exp);
+	nsBindings = maybeAddNamespace(tag, false, nsBindings);
 	Expression[] args = exp.getArgs();
         Symbol[] attrSyms = new Symbol[args.length];
         int nattrSyms = 0;
@@ -895,8 +910,8 @@ public class XQResolveNames extends ResolveNames
                                 messages.error('e', XMLFilter.duplicateAttributeMessage(sym, elementName), "XQST0040");
                               }
                           }
+                        nsBindings = maybeAddNamespace(sym, true, nsBindings);
                       }
-                    nsBindings = maybeAddNamespace(sym, nsBindings);
                   }
 	      }
 	  }
@@ -922,16 +937,20 @@ public class XQResolveNames extends ResolveNames
       return gnu.kawa.functions.GetModuleClass.getModuleClassURI(comp);
   }
 
-  static NamespaceBinding maybeAddNamespace(Symbol qname,
+  static NamespaceBinding maybeAddNamespace(Symbol qname, boolean isAttribute,
 					    NamespaceBinding bindings)
   {
     if (qname == null) // Happens if prevously-reported unknown prefix.
       return bindings;
     String prefix = qname.getPrefix();
     String uri = qname.getNamespaceURI();
-    return NamespaceBinding.maybeAdd(prefix == "" ? null : prefix,
-                                     uri == "" ? null : uri,
-                                     bindings);
+    if (prefix == "")
+      prefix = null;
+    if (uri == "")
+      uri = null;
+    if (isAttribute && prefix == null && uri == null)
+      return bindings;
+    return NamespaceBinding.maybeAdd(prefix, uri, bindings);
   }
 
   /** Wrap a (known) procedure value as a Declaration. */

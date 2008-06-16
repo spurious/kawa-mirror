@@ -1,5 +1,19 @@
 2008-06-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseNamedNodeType): Use parseDataType.
+
+	* XQResolveNames.java (XS_QNAME_IGNORE_DEFAULT_BUILTIN): New constant.
+	(xsQNameIgnoreDefaultDecl): New static Declaration.
+	(walkApplyExp case CAST_AS_BUILTIN): Update castQName call.
+	(case XS_QNAME_IGNORE_DEFAULT_BUILTIN): Like XS_QNAME_BUILTIN,
+	but force binding from null prefix to empty namespace.
+	(maybeAddNamespace) : Take extra isAttribute parameter - if true,
+	ignore default element namespace.
+	(walkApplyExp): In a direct attribute constructor, call
+	maybeAddNamespace with isAttribute parameter set.
+	* XQParser.java (castQName): Extra parameter to indicate if we
+	should consider or ignore the default element namespace.
+
 	* XQParser.java (peekOperand): Only recognize "empty-sequence"
 	if followed by '('.
 

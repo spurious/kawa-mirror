@@ -1,3 +1,9 @@
+2008-06-16  Per Bothner  <per@bothner.com>
+
+	* XIntegerType.java (valueOf): Initial signs are allowed even
+	for unsigned types, to be compatible XML Schema 1.1 (and maybe
+	XML Schema 1.0, but that is somewhat unclear).
+
 2008-04-26  Per Bothner  <per@bothner.com>
 
 	* SortedNodes.java (find): Use unsigned shift to avoid

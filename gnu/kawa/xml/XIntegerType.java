@@ -155,9 +155,7 @@ public class XIntegerType extends XDataType
     if (len > 0)
       {
         char ch = value.charAt(0);
-        if ((ch == '-' || ch == '+') && isUnsignedType())
-          throw new ClassCastException("cannot cast "+value+" to "+name);
-        else if (ch == '+')
+        if (ch == '+')
           value = value.substring(1);
       }
     return valueOf(IntNum.valueOf(value, 10));

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2008  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -204,6 +204,12 @@ public class NumberValue extends Procedure1
     Number number = numberCast(value);
     if (number == null)
       return value;
+    if (value instanceof Double || value instanceof Float)
+      {
+        double v = ((Number) value).doubleValue();
+        if (v == 0 || Double.isInfinite(v) || Double.isNaN(v))
+          return value;
+      }
     BigDecimal dec = (BigDecimal) XDataType.decimalType.cast(number);
     int prec = precision.intValue();
     /* #ifndef JAVA5 */

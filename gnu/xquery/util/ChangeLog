@@ -1,3 +1,8 @@
+2008-06-16  Per Bothner  <per@bothner.com>
+
+	* NumberValue.java (roundHalfToEven): If value is Double/Float
+	and non-finite or zero, return as-is.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* CastableAs.java (inline): Handle new argsInlined parameter.

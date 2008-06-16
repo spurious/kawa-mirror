@@ -223,6 +223,8 @@ public class RunXQTS extends FilterConsumer
     // expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
     //                "surrogates not handled by java.util.regex");
     /* #endif */
+    expectFailures("K2-Literals-34", "MainModule without QueryBody"); // should be fixed
+    expectFailures("K2-NameTest-68|K2-NameTest-69|K2-NameTest-75|K2-NameTest-87", "depends on typing");
     expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
                    +"ST-Axes006|ST-Axes007|ST-Axes008|ST-Axes009|ST-Axes010|"
@@ -1068,7 +1070,7 @@ public class RunXQTS extends FilterConsumer
           {
             Object value = gnu.kawa.xml.Document.parseCached(path);
             if (symbol != null)
-              Environment.getCurrent().put(symbol, null, value);
+              Environment.getCurrent().define(symbol, null, value);
             else
               contextItem = value;
           }

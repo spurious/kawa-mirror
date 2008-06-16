@@ -1,3 +1,11 @@
+2008-06-16  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (endElement): When setting variable from <input-file>
+	or <contextItem> use define rather than put to avoid problems if
+	variable was previously set.
+
+	* RunXQTS.java (<init>): Note some more expected failures.
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (handleStartTag): Clear local document cache,

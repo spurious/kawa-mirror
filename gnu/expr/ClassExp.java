@@ -305,11 +305,11 @@ public class ClassExp extends LambdaExp
             if (child.isAbstract())
               comp.error('e', "*init* method cannot be abstract", child);
           }
-	if ((child != initMethod && child != clinitMethod)
+	if ((child != initMethod && child != clinitMethod
+             && ! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
 	    || ! isMakingClassPair())
 	  child.addMethodFor(type, comp, null);
 	if (isMakingClassPair())
-          // FIXME this is wrong if the method is static
 	  child.addMethodFor(instanceType, comp, type);
       }
     if (! explicitInit && ! instanceType.isInterface())

@@ -1,3 +1,7 @@
+2008-06-19  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (declareParts): Check for static method.
+
 2008-06-11  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkSetExp): New method.  Check that we don't

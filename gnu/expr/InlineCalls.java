@@ -94,6 +94,11 @@ public class InlineCalls extends ExpWalker
             && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
                 == Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE))
           {
+            // FIXME.  This shouldn't be that hard to fix.  For example,
+            // we could treat reference to a one-argument method foo as if
+            // were (lambda (x) (foo x)).  Or we could treat it as (this):foo.
+            // However, it's a little tricky handling the general case.
+            // (What about overloading?  Varargs methods?  Static methods?)  
             comp.error('e', "unimplemented: reference to method "+decl.getName()+" as variable");
             comp.error('e', decl, "here is the definition of ", "");
           }

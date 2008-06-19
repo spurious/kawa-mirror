@@ -1,5 +1,9 @@
 2008-06-19  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (primBodyMethods): New field, so we don't step
+	on primMethods for methods in pair classes.  This fixes a part
+	of Savannah bug #23606.
+
 	* ClassExp.java (declareParts): Check for static method.
 
 2008-06-11  Per Bothner  <per@bothner.com>

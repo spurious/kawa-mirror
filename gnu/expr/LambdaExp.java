@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -308,6 +308,9 @@ public class LambdaExp extends ScopeExp
    * primMethods[primMethods.length-1] is used otherwise.
    */
   Method[] primMethods;
+  /** If in a ClassExp which isMakingClassPair, the static body methods.
+   * Otherwise, same as primMethods. */
+  Method[] primBodyMethods;
 
   /** Select the method used given an argument count. */
   public final Method getMethod(int argCount)
@@ -325,7 +328,7 @@ public class LambdaExp extends ScopeExp
    * (The other methods are just stubs that call that method.) */
   public final Method getMainMethod()
   {
-    Method[] methods = primMethods;
+    Method[] methods = primBodyMethods;
     return methods == null ? null : methods[methods.length-1];
   }
 
@@ -792,7 +795,14 @@ public class LambdaExp extends ScopeExp
     int numStubs =
       ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
-    primMethods = new Method[numStubs + 1];
+
+    Method[] methods = new Method[numStubs + 1];
+    // We assume that for "pair" class methods that ClassExp.declareParts first
+    // calls this method to create the interface method, and then calls us
+    // to create the static implementation method.
+    primBodyMethods = methods;
+    if (primMethods == null)
+      primMethods = methods;
 
     boolean isStatic;
     // 'I' if initMethod ($finit$); 'C' if clinitMethod (<clinit>).
@@ -1041,7 +1051,7 @@ public class LambdaExp extends ScopeExp
 	    }
 	}
 	Method method = ctype.addMethod(name, atypes, rtype, mflags);
-	primMethods[i] = method;
+	methods[i] = method;
 
 	if (throwsSpecification != null && throwsSpecification.length > 0)
 	  {
@@ -1687,6 +1697,7 @@ public class LambdaExp extends ScopeExp
     int conv = getCallConvention();
     Compilation comp = walker.getCompilation();
     Method method;
+    // Mostly duplicates logic with ApplyExp.compile.
     if (comp.inlineOk(this) && isClassMethod()
         && (conv <= Compilation.CALL_WITH_CONSUMER
             || (conv == Compilation.CALL_WITH_TAILCALLS))
@@ -1696,10 +1707,23 @@ public class LambdaExp extends ScopeExp
         // same ClassExp.  The result is a call to a PrimProcedure instead.
         // This isn't just an optimization, since the re-write is
         // needed to ensure that if we're in an inner lambda that the
-        // $this$ declaration is captured in a closure.
+        // $this$ declaration is captured in a closure.  (See the
+        // 'new ThisExp(d)' below.)  Otherwise, we could could defer this
+        // optimization to ApplyExp.compile.  (Conversely, we can't do the
+        // latter optimization here instead, because we may not have called
+        // addMethodFor yet - since (except in the case of class methods)
+        // that happens later, after FindCapturedVars.  Yuck.)
+        boolean isStatic = nameDecl.isStatic();
+        if (! isStatic && outer instanceof ClassExp)
+          {
+            ClassExp cl = (ClassExp) outer;
+            if (cl.isMakingClassPair())
+              {
+              }
+          }
         PrimProcedure mproc = new PrimProcedure(method, this);
         Expression[] margs;
-        if (mproc.getStaticFlag())
+        if (isStatic)
           margs = exp.args;
         else
           {

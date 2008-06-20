@@ -305,6 +305,11 @@ public class ClassExp extends LambdaExp
             if (child.isAbstract())
               comp.error('e', "*init* method cannot be abstract", child);
           }
+        // Setting child.outer isn't normally needed.  The exception is
+        // if we're called from object.rewriteClassDef and there is some
+        // funny macro expansion going on, in which case outer
+        // might be a TemplateScope.
+        child.outer = this;
 	if ((child != initMethod && child != clinitMethod
              && ! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
 	    || ! isMakingClassPair())

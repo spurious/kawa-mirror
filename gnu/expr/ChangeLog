@@ -1,3 +1,8 @@
+2008-06-20  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (declareParts): Semi-redundantly set the outer link
+	of a method.  This fixes another part of Savannah bug #23606.
+
 2008-06-19  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (primBodyMethods): New field, so we don't step

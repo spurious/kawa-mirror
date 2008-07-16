@@ -83,7 +83,9 @@ public class SourceFileAttr extends Attribute
     dst.print(getName());
     dst.print("\", length:");
     dst.print(getLength());
-    dst.print(", \"");
+    dst.print(", ");
+    dst.printOptionalIndex(filename_index);
+    dst.print('\"');
     dst.print(getSourceFile());
     dst.println('\"');
   }

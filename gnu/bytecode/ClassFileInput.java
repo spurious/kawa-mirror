@@ -242,6 +242,10 @@ public class ClassFileInput extends DataInputStream
 	  }
 	return attr;
       }
+    else if (name == "Signature" && container instanceof Member)
+      {
+	return new SignatureAttr(readUnsignedShort(), (Member) container);
+      }
     else if (name == "StackMapTable" && container instanceof CodeAttr)
       {
         int count = readUnsignedShort();

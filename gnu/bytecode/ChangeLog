@@ -1,3 +1,14 @@
+2008-07-16  Per Bothner  <per@bothner.com>
+
+	Various improvements in class file printing.
+	* SignatureAttr.java: New class, extends Attribute.
+	* Makefile.am: Update accordingly.
+	* ClassFileInput.java (readAttribute): Recognize "Signature" attribute.
+	* SourceFileAttr.java (print): Optionally index index.
+	* MiscAttr.java (print): Print contents, in hex.
+	* dump.java: Recognize -verbose/-verbose; only print constant pool
+	contents and indexes when verbose is set.
+
 2008-05-22  Per Bothner  <per@bothner.com>
 
 	* Type.java (javalangObjectType, javalangStringType, toStringType,

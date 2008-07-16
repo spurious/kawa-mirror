@@ -35,5 +35,23 @@ public class MiscAttr extends Attribute
     dstr.write(data, offset, length);
   }
 
+  public void print (ClassTypeWriter dst)
+  {
+    super.print(dst);
+    int len = getLength();
+    for (int i = 0;  i < len;  )
+      {
+        int b = data[i];
+        if ((i % 20) == 0)
+          dst.print(' ');
+        dst.print(' ');
+        dst.print(Character.forDigit((b >> 4) & 15, 16));
+        dst.print(Character.forDigit(b & 15, 16));
+        i++;
+        if ((i % 20) == 0 || i == len)
+          dst.println();
+      }
+  }
+
 }
 

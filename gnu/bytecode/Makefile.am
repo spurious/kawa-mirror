@@ -26,6 +26,7 @@ LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
 PrimType.java \
 Scope.java \
+SignatureAttr.java \
 SourceDebugExtAttr.java \
 SourceFileAttr.java \
 StackMapTableAttr.java \

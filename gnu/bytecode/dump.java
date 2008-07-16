@@ -25,12 +25,13 @@ public class dump extends ClassFileInput
 {
   ClassTypeWriter writer;
 
-  public dump (InputStream str)
+  public dump (InputStream str, boolean verbose)
        throws IOException, ClassFormatError
   {
     super(str);
     this.ctype = new ClassType();
     writer = new ClassTypeWriter (ctype, System.out, 0);
+    writer.printConstants = verbose;
     if (!readHeader())
       throw new ClassFormatError("invalid magic number");
     readConstants();
@@ -77,29 +78,39 @@ public class dump extends ClassFileInput
    */
   public static void main (String[] args)
   {
-    if (args.length == 0)
+    int alen = args.length;
+    if (alen == 0)
       usage();
-    String filename = args[0];
-    try
+    boolean verbose = false;
+    for (int i = 0; i < alen; i++)
       {
-	java.io.InputStream inp = new FileInputStream(filename);
-	new dump(inp);
-      }
-    catch (java.io.FileNotFoundException e)
-      {
-	System.err.println("File "+filename+" not found");
-	System.exit(-1);
-      }
-    catch (java.io.IOException e)
-      {
-	System.err.println(e);
-	System.exit(-1);
+        String filename = args[i];
+        if (filename.equals("-verbose") || filename.equals("--verbose"))
+          {
+            verbose = true;
+            continue;
+          }
+        try
+          {
+            java.io.InputStream inp = new FileInputStream(filename);
+            new dump(inp, verbose);
+          }
+        catch (java.io.FileNotFoundException e)
+          {
+            System.err.println("File "+filename+" not found");
+            System.exit(-1);
+          }
+        catch (java.io.IOException e)
+          {
+            System.err.println(e);
+            System.exit(-1);
+          }
       }
   }
 
   public static void usage()
   {
-    System.err.println("Usage: foo.class");
+    System.err.println("Usage: [--verbose] foo.class");
     System.exit(-1);
   }
 }

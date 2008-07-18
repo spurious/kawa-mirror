@@ -2128,23 +2128,191 @@ even if @code{x} is exact and @code{y} is 0.
 These functions operate on the 2's complement binary representation
 of an exact integer.
 
-@defun logand i ...
-Returns the bit-wise logical "and" of the arguments.
-If no argument is given, the result is -1.
-@end defun
-
-@defun logior i ...
-Returns the bit-wise logical "(inclusive) or" of the arguments.
-If no argument is given, the result is 0.
-@end defun
-
-@defun logxor i ...
-Returns the bit-wise logical "exclusive or" of the arguments.
-If no argument is given, the result is 0.
-@end defun
-
-@defun lognot i
+@defun bitwise-not i
 Returns the bit-wise logical inverse of the argument.
+More formally, returns the exact integer whose two's
+complement representation is the one's complement of the two's
+complement representation of @var{i}.
+@end defun
+
+@deffn Function  bitwise-and i ...
+@deffnx Function bitwise-ior i ...
+@deffnx Function bitwise-xor i ...
+These procedures return the exact integer that is the bit-wise
+``and'', ``inclusive or'', or ``exclusive or'' of the two's
+complement representations of their arguments.
+If they are passed only one argument, they return that argument.
+If they are passed no arguments, they return the integer
+that acts as identity for the operation: -1, 0, or 0, respectively. 
+@end deffn
+
+@defun bitwise-if i1 i2 i3
+
+Returns the exact integer that is the bit-wise ``if'' of the twos
+complement representations of its arguments, i.e. for each bit, if it
+is 1 in i1, the corresponding bit in i2 becomes the value of the
+corresponding bit in the result, and if it is 0, the corresponding bit
+in i3 becomes the corresponding bit in the value of the result. This
+is equivaent to the following computation:
+@example
+(bitwise-ior (bitwise-and i1 i2)
+             (bitwise-and (bitwise-not i1) i3))
+@end example
+@end defun
+
+@defun bitwise-bit-count i
+If ei is non-negative, returns the number of 1 bits in the twos complement
+representation of i. Otherwise it returns the result of the following
+computation:
+@example
+(bitwise-not (bitwise-bit-count (bitwise-not i)))
+@end example
+@end defun
+
+@defun bitwise-length i
+Returns the number of bits needed to represent i if it is positive,
+and the number of bits needed to represent @code{(bitwise-not @var{i})}
+if it is negative, which is the exact integer that is the result of the
+following computation:
+@example
+(do ((result 0 (+ result 1))
+     (bits (if (negative? i)
+               (bitwise-not i)
+               ei)
+           (bitwise-arithmetic-shift bits -1)))
+    ((zero? bits)
+     result))
+@end example
+This is the number of bits needed to represent @var{i} in an unsigned field.
+@end defun
+
+@defun bitwise-first-bit-set i
+Returns the index of the least significant 1 bit in the twos complement
+representation of i. If ei is 0, then - 1 is returned.
+@example
+(bitwise-first-bit-set 0) @result{} -1
+(bitwise-first-bit-set 1) @result{} 0
+(bitwise-first-bit-set -4) @result{} 2
+@end example
+@end defun
+
+@defun bitwise-bit-set? i1 i2
+Returns @code{#t} if the i2'th bit (where @var{i2} must be non-negative)
+is 1 in the two's complement representation of @var{i1}, and @code{#f}
+otherwise. This is the result of the following computation:
+@example
+(not (zero?
+       (bitwise-and
+         (bitwise-arithmetic-shift-left 1 i2)
+         i1)))
+@end example
+@end defun
+
+@defun bitwise-copy-bit i bitno replacement-bit
+Return the result of replacing the @var{bitno}'th bit of @var{i}
+by @var{replacement-bit}, where @var{bitno} must be non-negative,
+and @var{replacement-bit} must be either 0 or 1.
+This is the result of the following computation:
+@example
+(let* ((mask (bitwise-arithmetic-shift-left 1 bitno)))
+  (bitwise-if mask
+            (bitwise-arithmetic-shift-left replacement-bit bitno)
+            i))
+@end example
+@end defun
+
+@defun bitwise-bit-field n start end
+Return the integer formed from the (unsigned) bit-field
+starting at @var{start} and ending just before @var{end}.
+Same as:
+@example
+(let ((mask
+       (bitwise-not
+        (bitwise-arithmetic-shift-left -1 @var{end}))))
+  (bitwise-arithmetic-shift-right
+    (bitwise-and @var{n} mask)
+    @var{start}))
+@end example
+@end defun
+
+@defun bitwise-copy-bit-field to start end from
+Returns the result of replacing in @var{to} the bits at positions from @var{start} (inclusive) to @var{end} (exclusive) by the bits in @var{from} from position 0 (inclusive) to position @var{end} - @var{start} (exclusive).
+Both @var{start} and @var{start} must be non-negative,
+and @var{start} must be less than or equal to @var{start}.
+
+This is the result of the following computation:
+@example
+(let* ((mask1
+         (bitwise-arithmetic-shift-left -1 start))
+       (mask2
+         (bitwise-not
+           (bitwise-arithmetic-shift-left -1 end)))
+       (mask (bitwise-and mask1 mask2)))
+  (bitwise-if mask
+              (bitwise-arithmetic-shift-left from
+                                             start)
+              to))
+@end example
+@end defun
+
+@defun bitwise-arithmetic-shift i j
+Shifts @var{i} by @var{j}.
+It is a ``left'' shift if @code{@var{j}>0}, and
+a ``right'' shift if @code{@var{j}<0}.
+The result is equal to @code{(floor (* @var{i} (expt 2 @var{j})))}.
+
+Examples:
+@example
+(bitwise-arithmetic-shift -6 -1) @result{}-3
+(bitwise-arithmetic-shift -5 -1) @result{} -3
+(bitwise-arithmetic-shift -4 -1) @result{} -2
+(bitwise-arithmetic-shift -3 -1) @result{} -2
+(bitwise-arithmetic-shift -2 -1) @result{} -1
+(bitwise-arithmetic-shift -1 -1) @result{} -1
+@end example
+@end defun
+
+@deffn Function bitwise-arithmetic-shift-left i amount
+@deffnx Function bitwise-arithmetic-shift-right i amount
+The @var{amount} must be non-negative
+The @code{bitwise-arithmetic-shift-left} procedure returns the same
+result as @code{bitwise-arithmetic-shift},
+and @code{(bitwise-arithmetic-shift-right @var{i} @var{amount})} returns the
+same result as @code{(bitwise-arithmetic-shift @var{i} (- @var{amount}))};
+@end deffn
+
+@defun bitwise-rotate-bit-field n start end count
+Returns the result of cyclically permuting in @var{n} the bits at positions
+from @var{start} (inclusive) to @var{end} (exclusive) by
+@var{count} bits towards the more significant bits,
+@var{start} and @var{end} must be non-negative,
+and @var{start} must be less than or equal to @var{end}.
+This is the result of the following computation:
+@example
+(let* ((n     ei1)
+       (width (- end start)))
+  (if (positive? width)
+      (let* ((count (mod count width))
+             (field0
+               (bitwise-bit-field n start end))
+             (field1 (bitwise-arithmetic-shift-left
+                       field0 count))
+             (field2 (bitwise-arithmetic-shift-right
+                       field0
+                       (- width count)))
+             (field (bitwise-ior field1 field2)))
+        (bitwise-copy-bit-field n start end field))
+      n))
+@end example
+@end defun
+
+@defun bitwise-reverse-bit-field i start end
+Returns the result obtained from @var{i} by reversing the order of the bits at positions from @var{start} (inclusive) to @var{end} (exclusive),
+where @var{start} and @var{end} must be non-negative,
+and @var{start} must be less than or equal to @var{end}.
+@example
+(bitwise-reverse-bit-field #b1010010 1 4) @result{}  88 ; #b1011000
+@end example
 @end defun
 
 @defun logop op x y
@@ -2154,41 +2322,55 @@ depending on @var{op}.
 
 @defun logtest i j
 Returns true if the arguments have any bits in common.
-Same as @code{(not (zero? (logand @var{i} @var{j})))},
+Same as @code{(not (zero? (bitwise-and @var{i} @var{j})))},
 but is more efficient.
 @end defun
 
+@subsubsection Deprecated Logical Number Operations
+
+These older functions are still available, but we
+recommand using the R6RS-compatible functions.
+
+@defun lognot i
+Equivalent to @code{(bitwise-not @var{i})}.
+@end defun
+
+@defun logand i ...
+Equivalent to @code{(bitwise-and @var{i} ...)}.
+@end defun
+
+@defun logior i ...
+Equivalent to @code{(bitwise-ior @var{i} ...)}.
+@end defun
+
+@defun logxor i ...
+Equivalent to @code{(bitwise-xor @var{i} ...)}.
+@end defun
+
+@defun logcount i
+Count the number of 1-bits in @var{i}, if it is non-negative.
+If @var{i} is negative, count number of 0-bits.
+Same as @code{(bitwise-bit-count @var{i})} if @var{i} is non-negative.
+@end defun
+
+@defun integer-length i
+Equivalent to @code{(bitwise-length @var{i})}.
+@end defun
+
 @defun logbit? i pos
-Returns @code{#t} iff the bit numbered @var{pos} in @var{i} is one.
+Equivalent to @code{bitwise-bit-set? @var{i} @var{pos})}.
 @end defun
 
 @defun arithmetic-shift i j
-Shifts @var{i} by @var{j}.
-It is a "left" shift if @code{@var{j}>0}, and
-a "right" shift if @code{@var{j}<0}.
-
-The result is equal to @code{(floor (* @var{i} (expt 2 @var{j})))}.
+Equivalent to @code{bitwise-arithmetic-shift @var{i} @var{j})}.
 @end defun
 
 @defun ash i j
 Alias for @code{arithmetic-shift}.
 @end defun
 
-@defun logcount i
-Count the number of 1-bits in @var{i}, if it is non-negative.
-If @var{i} is negative, count number of 0-bits.
-@end defun
-
-@defun integer-length i
-Return number of bits needed to represent @var{i} in an unsigned field.
-Regardless of the sign of @var{i}, return one less than the number of bits
-needed for a field that can represent @var{i} as a two's complement integer.
-@end defun
-
 @defun bit-extract n start end
-Return the integer formed from the (unsigned) bit-field
-starting at @var{start} and ending just before @var{end}.
-Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
+Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
 @end defun
 
 @node Data structures, Exceptions, Numbers, Extensions

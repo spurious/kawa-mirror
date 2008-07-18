@@ -1,3 +1,8 @@
+2008-07-17  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Declare the various R6RS
+	bitwise- functions.
+
 2008-06-08  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxTemplate.java: Use Pair.setCdrBackdoor, since the

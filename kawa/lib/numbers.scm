@@ -1,6 +1,7 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
+(require <kawa.lib.misc>)
 
 (define (number? x) :: <boolean> (instance? x <number>))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))
@@ -193,23 +194,43 @@
       (invoke (as <real> num) 'toExact)
       num))
 
-(define (arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
-  (invoke-static <integer> 'shift value amount))
+(define (bitwise-arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
+  (gnu.math.IntNum:shift value amount))
 
-(define (lognot (i :: <integer>)) :: <integer>
-  (invoke-static <gnu.math.BitOps> 'not i))
+(define (bitwise-arithmetic-shift-left (value :: <integer>) (amount :: <int>)) :: <integer>
+  (if (< amount 0) (error "shift amount must be non-negative"))
+  (gnu.math.IntNum:shift value amount))
+
+(define (bitwise-arithmetic-shift-right (value :: <integer>) (amount :: <int>)) :: <integer>
+  (if (< amount 0) (error "shift amount must be non-negative"))
+  (gnu.math.IntNum:shift value (- amount)))
+
+(define (bitwise-not (i :: <integer>)) :: <integer>
+  (gnu.math.BitOps:not i))
 
 (define (logop (op :: <int>) (i :: <integer>) (j :: <integer>)) :: <integer>
   (invoke-static <gnu.math.BitOps> 'bitOp op i j))
 
-(define (logbit? (i :: <integer>) (bitno :: <int>)) :: <boolean>
-  (invoke-static <gnu.math.BitOps> 'bitValue i bitno))
+(define (bitwise-bit-set? (i :: <integer>) (bitno :: <int>)) :: <boolean>
+  (gnu.math.BitOps:bitValue i bitno))
 
-(define (bit-extract (i :: <integer>) (start :: <int>) (end :: <int>))
+(define (bitwise-copy-bit (i :: integer) (bitno :: int) (new-value :: int))
+  :: integer
+  (gnu.math.BitOps:setBitValue i bitno new-value))
+
+(define (bitwise-copy-bit-field (to :: integer) (start :: int) (end :: int) (from :: integer)) ::  integer
+  (let* ((mask1 (bitwise-arithmetic-shift-left -1 start))
+	 (mask2 (bitwise-not (bitwise-arithmetic-shift-left -1 end)))
+	 (mask (bitwise-and mask1 mask2)))
+    (bitwise-if mask
+		(bitwise-arithmetic-shift-left from start)
+		to)))
+
+(define (bitwise-bit-field (i :: <integer>) (start :: <int>) (end :: <int>))
   :: <integer>
   (invoke-static <gnu.math.BitOps> 'extract i start end))
 
-(define (logand #!rest (args :: <Object[]>)) :: <integer>
+(define (bitwise-and #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))
     (if (zero? n)
 	-1
@@ -219,7 +240,7 @@
 	    (let ((arg-i :: <integer> (args i)))
 	      (set! result (gnu.math.BitOps:and result arg-i))))))))
 
-(define (logior #!rest (args :: <Object[]>)) :: <integer>
+(define (bitwise-ior #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))
     (if (zero? n)
 	0
@@ -228,7 +249,7 @@
 	      ((>= i n) result)
 	    (set! result (gnu.math.BitOps:ior result (args i))))))))
 
-(define (logxor #!rest (args :: <Object[]>)) :: <integer>
+(define (bitwise-xor #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))
     (if (zero? n)
 	0
@@ -237,14 +258,43 @@
 	      ((>= i n) result)
 	    (set! result (gnu.math.BitOps:xor result (args i))))))))
 
+(define (bitwise-if (e1 :: integer) (e2 :: integer) (e3  integer)) :: integer
+  (bitwise-ior (bitwise-and e1 e2)
+	       (bitwise-and (bitwise-not e1) e3)))
+
 (define (logtest (i :: <integer>) (j :: <integer>))
   (invoke-static <gnu.math.BitOps> 'test i j))
 
 (define (logcount (i :: <integer>)) :: <int>
-  (invoke-static <gnu.math.BitOps> 'bitCount i))
+  (gnu.math.BitOps:bitCount
+   (if (>= i 0) i (gnu.math.BitOps:not i))))
 
-(define (integer-length (i :: <integer>)) :: <int>
+(define (bitwise-bit-count (i :: <integer>)) :: <int>
+  (if (>= i 0)
+      (gnu.math.BitOps:bitCount i)
+      (- -1 (gnu.math.BitOps:bitCount (gnu.math.BitOps:not i)))))  
+
+(define (bitwise-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))
+
+(define (bitwise-first-bit-set (i :: <integer>)) :: <int>
+  (gnu.math.BitOps:lowestBitSet i))
+
+(define (bitwise-rotate-bit-field (n :: integer) (start :: int) (end :: int) (count :: int)) :: integer
+  (let ((width (- end start)))
+    (if (positive? width)
+	(let* ((count (modulo count width))
+	       (field0 (bitwise-bit-field n start end))
+	       (field1 (bitwise-arithmetic-shift-left field0 count))
+	       (field2 (bitwise-arithmetic-shift-right
+			field0
+			(- width count)))
+	       (field (bitwise-ior field1 field2)))
+	  (bitwise-copy-bit-field n start end field))
+	n)))
+
+(define (bitwise-reverse-bit-field (n :: integer) (start :: int) (end :: int)) :: integer
+  (gnu.math.BitOps:reverseBits n start end))
 
 (define (number->string (arg :: <java.lang.Number>)
 			#!optional (radix :: <int> 10))

@@ -1,3 +1,9 @@
+2008-07-17  Per Bothner  <per@bothner.com>
+
+	* BitOps.java: New primitive for R6RS bitwise- operations.
+	(dataBufferFor): New helper method.
+	(setButValue, lowestBitSet, reverseBits): New static methods.
+
 2008-01-26  Per Bothner  <per@bothner.com>
 
 	* IntNum.java: Performance improvements for formatting.

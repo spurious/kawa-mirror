@@ -25,8 +25,74 @@ public class BitOps
       {
 	int wordno = bitno >> 5;
 	return wordno >= i ? x.words[i-1] < 0
-	  : (((x.words[wordno]) >> bitno) & 1) != 0;
+	  : ((x.words[wordno] >> bitno) & 1) != 0;
       }
+  }
+ 
+  /** Make a fresh buffer conatining the value of x.
+   * Make sure bitno ius within the buffer.
+   */
+  static int [] dataBufferFor (IntNum x, int bitno)
+  {
+    int i = x.ival;
+    int[] data;
+    int nwords = (bitno+1) >> 5;
+    if (x.words == null)
+      {
+        if (nwords == 0)
+          nwords = 1;
+        data = new int[nwords];
+        data[0] = i;
+        if (i < 0) // Sign-extend if needed.
+          {
+            for (int j = 1; j < nwords;  j++)
+              data[j] = -1;
+          }
+      }
+    else
+      {
+        nwords = (bitno+1) >> 5;
+        data = new int[nwords > i ? nwords : i];
+        for (int j = i;  --j >= 0; )
+          data[j] = x.words[j];
+        if (data[i-1] < 0) // Sign-extend if needed.
+          {
+            for (int j = i; j < nwords;  j++)
+              data[j] = -1;
+          }
+      }
+    return data;
+  }
+
+  /** Set the value of a specified bit in an IntNum. */
+  public static IntNum setBitValue (IntNum x, int bitno, int newValue)
+  {
+    newValue &= 1;
+    int i = x.ival;
+    int[] data;
+    int nwords;
+    if (x.words == null)
+      {
+        int oldValue = (i >> (bitno < 31 ? bitno : 31)) & 1;
+        if (oldValue == newValue)
+            return x;
+        if (bitno < 63)
+          return IntNum.make((long) i ^ (long) (1 << bitno));
+      }
+    else
+      {
+	int wordno = bitno >> 5;
+        int oldValue;
+        if (wordno >= i)
+          oldValue = x.words[i-1] < 0 ? 1  : 0;
+        else
+          oldValue = (x.words[wordno] >> bitno) & 1;
+        if (oldValue == newValue)
+          return x;
+      }
+    data = dataBufferFor(x, bitno);
+    data[bitno >> 5] ^= 1 << (bitno & 31);
+    return IntNum.make(data, data.length);
   }
  
   /** Return true iff an IntNum and an int have any true bits in common. */
@@ -379,6 +445,46 @@ public class BitOps
     return IntNum.make (buf, x_len + 1);
   }
 
+  public static int lowestBitSet (int i)
+  {
+    if (i == 0)
+      return -1;
+    int index = 0;
+    while ((i & 0xFF) == 0)
+      {
+        i >>>= 8;
+        index += 8;
+      }
+    while ((i & 3) == 0)
+      {
+        i >>>= 2;
+        index += 2;
+      }
+   if ((i & 1) == 0)
+     index++;
+   return index;
+  }
+
+  public static int lowestBitSet (IntNum x)
+  {
+    int[] x_words = x.words;
+    if (x_words == null)
+      {
+	return lowestBitSet(x.ival);
+      }
+    else
+      {
+	int x_len = x.ival;
+        for (int i = 0; i < x_len; )
+          {
+            int b = lowestBitSet(x_words[i]);
+            if (b >= 0)
+              return 32 * i + b;
+          }
+        return -1;
+      }
+ }
+
   // bit4count[I] is number of '1' bits in I.
   static final byte[] bit4_count = { 0, 1, 1, 2,  1, 2, 2, 3,
 				     1, 2, 2, 3,  2, 3, 3, 4};
@@ -419,5 +525,60 @@ public class BitOps
 	i = bitCount (x_words, x_len);
       }
     return x.isNegative () ? x_len * 32 - i : i;
+  }
+
+  public static IntNum reverseBits (IntNum x, int start, int end)
+  {
+    int ival = x.ival;
+    int[] xwords = x.words;
+    if (xwords == null)
+      {
+        if (end < 63)
+          {
+            long w = ival;
+            int i = start;
+            int j = end - 1;
+            while (i < j)
+              {
+                long biti = (w >> i) & 1;
+                long bitj = (w >> j) & 1;
+                w &= ~((1L << i) | (1L << j));
+                w = w | (biti << j) | (bitj << i);
+                i++;
+                j--;
+              }
+            return IntNum.make(w);
+          }
+      }
+    int[] data = dataBufferFor(x, end-1);
+    int i = start;
+    int j = end - 1;
+    while (i < j)
+      {
+        int ii = i >> 5;
+        int jj = j >> 5;
+        int wi = data[ii];
+        int biti = (wi >> i) & 1;
+        if (ii == jj)
+          {
+            int bitj = (wi >> j) & 1;
+            wi &= ~((1L << i) | (1L << j));
+            wi = wi | (biti << j) | (bitj << i);
+          }
+        else
+          {
+            int wj = data[jj];
+            int bitj = (wj >> (j & 31)) & 1;
+            wi &= ~(1 << (i & 31));
+            wj &= ~(1 << (j & 31));
+            wi |= bitj << (i & 31);
+            wj |= biti << (j & 31);
+            data[jj] = wj;
+          }
+        data[ii] = wi;
+        i++;
+        j--;
+      }
+    return IntNum.make(data, data.length);
   }
 }

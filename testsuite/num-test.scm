@@ -1,4 +1,4 @@
-(test-begin "numbers" 1666)
+(test-begin "numbers" 1698)
 
 (test-approximate 1.4 (sqrt 2) 0.02)
 (test-error
@@ -55,16 +55,59 @@
 (test-eqv 3/2 (magnitude (/ 6 -4)))
 (test-end "magnitude")
 
+
 (test-begin "shift")
+(test-eqv #b1000 (bitwise-arithmetic-shift #b1 3))
+(test-eqv #b101 (bitwise-arithmetic-shift #b1010 -1))
 (test-eqv 12676506002282294014967032053760 (arithmetic-shift 10 100))
 (test-end "shift")
 
-(test-begin "logcount")
+(test-begin "bitwise")
+(test-eqv #b1000 (bitwise-and #b1100 #b1010))
+(test-eqv #b1110 (bitwise-ior #b1100 #b1010))
+(test-eqv #b110 (bitwise-xor #b1100 #b1010))
+(test-equal "-10000001" (number->string (lognot #b10000000) 2))
+(test-equal "-1" (number->string (lognot #b0) 2))
+
+(test-equal '(-1 0 1 0 2 0 1 0 3 0 1 0 2 0 1 0 4)
+	    (map bitwise-first-bit-set
+		 '(0 -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16)))
+(test-equal '(-1 0 1 0 2 0 1 0 3 0 1 0 2 0 1 0 4)
+	    (map bitwise-first-bit-set
+		 '(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
+(test-equal '(#t #f #t #t #f)
+	    (map (lambda (bitno) (bitwise-bit-set? #b1101 bitno)) '(0 1 2 3 4)))
+(test-eqv 1 (bitwise-copy-bit 0 0 1))
+(test-eqv #b100 (bitwise-copy-bit 0 2 1))
+(test-eqv #b1011 (bitwise-copy-bit #b1111 2 0))
+(test-eqv #b1010 (bitwise-bit-field #b1101101010 0 4))
+(test-eqv #b10110 (bitwise-bit-field #b1101101010 4 9))
+(test-eqv #b1101100000 (bitwise-copy-bit-field #b1101101010 0 4 0))
+(test-eqv #b1101101111 (bitwise-copy-bit-field #b1101101010 0 4 -1))
+(test-eqv #b110100111110000 (bitwise-copy-bit-field #b110100100010000 5 9 -1))
+(test-eqv #b10 (bitwise-rotate-bit-field #b0100 0 4 3))
+(test-eqv #b10 (bitwise-rotate-bit-field #b0100 0 4 -1)) ;; Extension
+(test-eqv #b110100010010000 (bitwise-rotate-bit-field #b110100100010000 5 9 -1))
+(test-eqv #b110100000110000 (bitwise-rotate-bit-field #b110100100010000 5 9 1))
+(test-eqv #xe5 (bitwise-reverse-bit-field #xa7 0 8))
+(test-eqv #xabcdefabcdefabcdefabcdf7
+	  (bitwise-reverse-bit-field #xabcdefabcdefabcdefabcdef 0 8))
+(test-eqv #xe013 (bitwise-reverse-bit-field #xf3 5 16))
+(test-eqv #xe013aaaaaaaaaaaaaaaa
+	  (bitwise-reverse-bit-field #xf3aaaaaaaaaaaaaaaa 69 80))
+(test-end)
+
+
+(test-begin "logcount/bitwise-count")
+(test-eqv 4 (bitwise-bit-count #b10101010))
+(test-eqv 0 (bitwise-bit-count 0))
+(test-eqv 1 (logcount -2))
+(test-eqv -2 (bitwise-bit-count -2))
 (test-eqv 3 (logcount 13))
 (test-eqv 2 (logcount -13))
 (test-eqv 4 (logcount 30))
 (test-eqv 4 (logcount -30))
-(test-end "logcount")
+(test-end "logcount/bitwise-count")
 
 (test-begin "gcd")
 (test-eqv 3 (gcd 4294967295 3))
@@ -106,6 +149,8 @@
 
 (test-group
  "integer-length"
+ (test-eqv 8 (bitwise-length #b10101010))
+ (test-eqv 4 (bitwise-length #b1111))
  (test-eqv 0 (integer-length 0))
  (test-eqv 1 (integer-length 1))
  (test-eqv 2 (integer-length 3))

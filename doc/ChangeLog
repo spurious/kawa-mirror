@@ -1,3 +1,9 @@
+2008-07-17  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Logical Number Operations): Document all the
+	now-implemented R6RS functions.  Move some of the now-redundant
+	fuctions to a new subsubsection 'Deprecated Logical Number Operations'.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Some improvements here and there.

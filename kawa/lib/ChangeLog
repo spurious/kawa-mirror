@@ -1,3 +1,20 @@
+2008-07-17  Per Bothner  <per@bothner.com>
+
+	* numbers.scm: Implement R6RS bitwise- functions.
+	(arithmetic-shift): Rename to bitwise-arithmetic-shift.
+	(lognot): Rename to bitwise-not.
+	(logand): Rename to bitwise-and.
+	(logior): Rename to bitwise-ior.
+	(logxor): Rename to bitwise-xor.
+	(logbit?): Rename to bitwise-bit-set?.
+	(bit-extract): Rename to bitwise-bit-field.
+	(integer-length): Rename to bitwise-length;
+	(bitwise-arithmetic-shift-left, bitwise-arithmetic-shift-right,
+	bitwise-copy-bit, bitwise-copy-bit-field, bitwise-if, bitwise-bit-count,
+	bitwise-first-bit-set, bitwise-rotate-bit-field,
+	bitwise-reverse-bit-field): New functions.
+	(logcount): Fix to return non-zero, as specified.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* vectors.scm (vector): "vector" is now a LangObjType, so rename

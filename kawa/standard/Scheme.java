@@ -429,18 +429,43 @@ public class Scheme extends LispLanguage
 
       defProcStFld("exit", "kawa.lib.thread");
 
-      defProcStFld("arithmetic-shift", "kawa.lib.numbers");
-      defProcStFld("ash", "kawa.lib.numbers", "arithmetic$Mnshift");
-      defProcStFld("logand", "kawa.lib.numbers");
-      defProcStFld("logior", "kawa.lib.numbers");
-      defProcStFld("logxor", "kawa.lib.numbers");
-      defProcStFld("lognot", "kawa.lib.numbers");
+      defProcStFld("bitwise-arithmetic-shift", "kawa.lib.numbers");
+      defProcStFld("arithmetic-shift", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-arithmetic-shift"));
+      defProcStFld("ash", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-arithmetic-shift"));
+      defProcStFld("bitwise-arithmetic-shift-left", "kawa.lib.numbers");
+      defProcStFld("bitwise-arithmetic-shift-right", "kawa.lib.numbers");
+      defProcStFld("bitwise-and", "kawa.lib.numbers");
+      defProcStFld("logand", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-and"));
+      defProcStFld("bitwise-ior", "kawa.lib.numbers");
+      defProcStFld("logior", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-ior"));
+      defProcStFld("bitwise-xor", "kawa.lib.numbers");
+      defProcStFld("logxor", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-xor"));
+      defProcStFld("bitwise-if", "kawa.lib.numbers");
+      defProcStFld("bitwise-not", "kawa.lib.numbers");
+      defProcStFld("lognot", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-not"));
       defProcStFld("logop", "kawa.lib.numbers");
-      defProcStFld("logbit?", "kawa.lib.numbers");
+      defProcStFld("bitwise-bit-set?", "kawa.lib.numbers");
+      defProcStFld("logbit?", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-bit-set?"));
       defProcStFld("logtest", "kawa.lib.numbers");
+      defProcStFld("bitwise-bit-count", "kawa.lib.numbers");
       defProcStFld("logcount", "kawa.lib.numbers");
-      defProcStFld("bit-extract", "kawa.lib.numbers");
-      defProcStFld("integer-length", "kawa.lib.numbers");
+      defProcStFld("bitwise-copy-bit", "kawa.lib.numbers");
+      defProcStFld("bitwise-copy-bit-field", "kawa.lib.numbers");
+      defProcStFld("bitwise-bit-field", "kawa.lib.numbers");
+      defProcStFld("bit-extract", "kawa.lib.numbers",
+                   Compilation.mangleNameIfNeeded("bitwise-bit-field"));
+      defProcStFld("bitwise-length", "kawa.lib.numbers");
+      defProcStFld("integer-length", "kawa.lib.numbers", "bitwise$Mnlength");
+      defProcStFld("bitwise-first-bit-set", "kawa.lib.numbers");
+      defProcStFld("bitwise-rotate-bit-field", "kawa.lib.numbers");
+      defProcStFld("bitwise-reverse-bit-field", "kawa.lib.numbers");
 
       // These are from SLIB.
       defProcStFld("string-upcase!", "kawa.lib.strings");

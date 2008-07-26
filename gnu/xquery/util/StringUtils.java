@@ -368,29 +368,20 @@ public class StringUtils
 
   public static String encodeForUri (Object arg)
   {
-    return encodeForUri(arg, 'U');
+    String str = coerceToString(arg, "encode-for-uri", 1, "");
+    return URIPath.encodeForUri(str, 'U');
   }
 
   public static String iriToUri (Object arg)
   {
-    return encodeForUri(arg, 'I');
+    String str = coerceToString(arg, "iri-to-uru", 1, "");
+    return URIPath.encodeForUri(str, 'I');
   }
 
   public static String escapeHtmlUri (Object arg)
   {
-    return encodeForUri(arg, 'H');
-  }
-
-  static String encodeForUri (Object arg, char mode)
-  {
-    String str;
-    if (arg instanceof String || arg instanceof UntypedAtomic)
-      str = arg.toString();
-    else if (arg == null || arg == Values.empty)
-      str = "";
-    else
-      throw new ClassCastException();
-    return URIPath.encodeForUri(str, mode);
+    String str = coerceToString(arg, "escape-html-uri", 1, "");
+    return URIPath.encodeForUri(str, 'H');
   }
 
   public static String normalizeSpace (Object arg)
@@ -443,10 +434,17 @@ public class StringUtils
           case 'x':
             StringBuffer sbuf = new StringBuffer();
             int plen = pattern.length();
+            int inBracket = 0;
             for (int j = 0; j < plen;  j++)
               {
                 char pch = pattern.charAt(j);
-                if (! Character.isWhitespace(pch))
+                if (pch == '\\')
+                  j++;
+                else if (pch == '[')
+                  inBracket++;
+                else if (pch == ']')
+                  inBracket--;
+                else if (inBracket > 0 || ! Character.isWhitespace(pch))
                   sbuf.append(pch);
               }
             pattern = sbuf.toString();

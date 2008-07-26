@@ -1,3 +1,12 @@
+2008-07-25  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (encodeForUri, iriToUri, escapeHtmlUri): Use
+	coerceToString on parameter.
+	(encodeForUri(Object,char)): Remove no-longer-needed method.
+
+	* StringUtils.java (makePattern): With 'x' flag, don't strip spaces
+	with '[...]' brackets.
+
 2008-06-16  Per Bothner  <per@bothner.com>
 
 	* NumberValue.java (roundHalfToEven): If value is Double/Float

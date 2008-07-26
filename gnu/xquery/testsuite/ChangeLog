@@ -1,3 +1,7 @@
+2008-07-26  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (<init>): Remove some no-longer-expected-failues.
+
 2008-06-16  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (endElement): When setting variable from <input-file>

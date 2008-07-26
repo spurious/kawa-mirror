@@ -224,8 +224,7 @@ public class RunXQTS extends FilterConsumer
     //                "surrogates not handled by java.util.regex");
     /* #endif */
     expectFailures("K2-Literals-34", "MainModule without QueryBody"); // should be fixed
-    expectFailures("K2-NameTest-68|K2-NameTest-69|K2-NameTest-75|K2-NameTest-87", "depends on typing");
-    expectFailures("K-SeqExprInstanceOf-53", "too lenient about non-stanadrd types: void");
+    expectFailures("K2-NameTest-68", "depends on typing");
     expectFailures("ST-Axes001|ST-Axes002|ST-Axes003|ST-Axes004|ST-Axes005|"
                    +"ST-Axes006|ST-Axes007|ST-Axes008|ST-Axes009|ST-Axes010|"
                    +"ST-Axes011|ST-Axes012|ST-Axes013|ST-Axes014|ST-Axes015",

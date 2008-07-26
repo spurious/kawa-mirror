@@ -567,6 +567,8 @@ public class XQResolveNames extends ResolveNames
                     msg = "type to 'cast as' or 'castable as' must be atomic";
                   else if (value == XDataType.anyAtomicType)
                     msg = "type to 'cast as' or 'castable as' cannot be anyAtomicType";
+                  else if (value == XDataType.anySimpleType)
+                    msg = "type to 'cast as' or 'castable as' cannot be anySimpleType";
                   else if (value == XDataType.NotationType)
                     msg = "type to 'cast as' or 'castable as' cannot be NOTATION";
                   if (msg != null)

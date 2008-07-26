@@ -1,3 +1,9 @@
+2008-07-26  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (typeMap): Add anySimpleType.
+	* XQResolveNames.java: (walkApplyExp): anySimpleType is also
+	dis-allowed for 'cast as or 'castable as'.
+
 2008-07-25  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseItemType): Don't resolve QNames yet;

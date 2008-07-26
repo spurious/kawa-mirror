@@ -820,6 +820,7 @@ public class XQuery extends Language
       "IDREF", XStringType.IDREFType,
       "ENTITY", XStringType.ENTITYType,
       "anyAtomicType", XDataType.anyAtomicType,
+      "anySimpleType", XDataType.anySimpleType,
       "untyped", Type.objectType,
       "anyType", Type.objectType
     };

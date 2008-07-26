@@ -30,58 +30,60 @@ public class XDataType extends Type implements TypeValue
   /** One of the {@code XXXX_TYPE_CODE} constants. */
   int typeCode;
 
-  public static final int ANY_ATOMIC_TYPE_CODE = 1;
-  public static final int DECIMAL_TYPE_CODE = 2;
-  public static final int INTEGER_TYPE_CODE = 3;
-  public static final int NON_POSITIVE_INTEGER_TYPE_CODE = 4;
-  public static final int NEGATIVE_INTEGER_TYPE_CODE = 5;
-  public static final int LONG_TYPE_CODE = 6;
-  public static final int INT_TYPE_CODE = 7;
-  public static final int SHORT_TYPE_CODE = 8;
-  public static final int BYTE_TYPE_CODE = 9;
-  public static final int NONNEGATIVE_INTEGER_TYPE_CODE = 10;
-  public static final int UNSIGNED_LONG_TYPE_CODE = 11;
-  public static final int UNSIGNED_INT_TYPE_CODE = 12;
-  public static final int UNSIGNED_SHORT_TYPE_CODE = 13;
-  public static final int UNSIGNED_BYTE_TYPE_CODE = 14;
-  public static final int POSITIVE_INTEGER_TYPE_CODE = 15;
+  //public static final int ANY_TYPE_CODE = 1;
+  public static final int ANY_SIMPLE_TYPE_CODE = 2;
+  public static final int ANY_ATOMIC_TYPE_CODE = 3;
+  public static final int DECIMAL_TYPE_CODE = 4;
+  public static final int INTEGER_TYPE_CODE = 5;
+  public static final int NON_POSITIVE_INTEGER_TYPE_CODE = 6;
+  public static final int NEGATIVE_INTEGER_TYPE_CODE = 7;
+  public static final int LONG_TYPE_CODE = 8;
+  public static final int INT_TYPE_CODE = 9;
+  public static final int SHORT_TYPE_CODE = 10;
+  public static final int BYTE_TYPE_CODE = 11;
+  public static final int NONNEGATIVE_INTEGER_TYPE_CODE = 12;
+  public static final int UNSIGNED_LONG_TYPE_CODE = 13;
+  public static final int UNSIGNED_INT_TYPE_CODE = 14;
+  public static final int UNSIGNED_SHORT_TYPE_CODE = 15;
+  public static final int UNSIGNED_BYTE_TYPE_CODE = 16;
+  public static final int POSITIVE_INTEGER_TYPE_CODE = 17;
 
-  public static final int FLOAT_TYPE_CODE = 16;
-  public static final int DOUBLE_TYPE_CODE = 17;
+  public static final int FLOAT_TYPE_CODE = 18;
+  public static final int DOUBLE_TYPE_CODE = 19;
 
-  public static final int DATE_TIME_TYPE_CODE = 18;
-  public static final int DATE_TYPE_CODE = 19;
-  public static final int TIME_TYPE_CODE = 20;
-  public static final int G_YEAR_MONTH_TYPE_CODE = 21;
-  public static final int G_YEAR_TYPE_CODE = 22;
-  public static final int G_MONTH_DAY_TYPE_CODE = 23;
-  public static final int G_DAY_TYPE_CODE = 24;
-  public static final int G_MONTH_TYPE_CODE = 25;
-  public static final int DURATION_TYPE_CODE = 26;
-  public static final int YEAR_MONTH_DURATION_TYPE_CODE = 27;
-  public static final int DAY_TIME_DURATION_TYPE_CODE = 28;
+  public static final int DATE_TIME_TYPE_CODE = 20;
+  public static final int DATE_TYPE_CODE = 21;
+  public static final int TIME_TYPE_CODE = 22;
+  public static final int G_YEAR_MONTH_TYPE_CODE = 23;
+  public static final int G_YEAR_TYPE_CODE = 24;
+  public static final int G_MONTH_DAY_TYPE_CODE = 25;
+  public static final int G_DAY_TYPE_CODE = 26;
+  public static final int G_MONTH_TYPE_CODE = 27;
+  public static final int DURATION_TYPE_CODE = 28;
+  public static final int YEAR_MONTH_DURATION_TYPE_CODE = 29;
+  public static final int DAY_TIME_DURATION_TYPE_CODE = 30;
 
-  public static final int BOOLEAN_TYPE_CODE = 29;
+  public static final int BOOLEAN_TYPE_CODE = 31;
 
-  public static final int QNAME_TYPE_CODE = 30;
-  public static final int ANY_URI_TYPE_CODE = 31;
-  public static final int BASE64_BINARY_TYPE_CODE = 32;
-  public static final int HEX_BINARY_TYPE_CODE = 33;
-  public static final int NOTATION_TYPE_CODE = 34;
+  public static final int QNAME_TYPE_CODE = 32;
+  public static final int ANY_URI_TYPE_CODE = 33;
+  public static final int BASE64_BINARY_TYPE_CODE = 34;
+  public static final int HEX_BINARY_TYPE_CODE = 35;
+  public static final int NOTATION_TYPE_CODE = 36;
 
-  public static final int UNTYPED_ATOMIC_TYPE_CODE = 35;
+  public static final int UNTYPED_ATOMIC_TYPE_CODE = 37;
 
-  public static final int STRING_TYPE_CODE = 36;
+  public static final int STRING_TYPE_CODE = 38;
 
-  public static final int NORMALIZED_STRING_TYPE_CODE = 37;
-  public static final int TOKEN_TYPE_CODE = 38;
-  public static final int LANGUAGE_TYPE_CODE = 39;
-  public static final int NMTOKEN_TYPE_CODE = 40;
-  public static final int NAME_TYPE_CODE = 41;
-  public static final int NCNAME_TYPE_CODE = 42;
-  public static final int ID_TYPE_CODE = 43;
-  public static final int IDREF_TYPE_CODE = 44;
-  public static final int ENTITY_TYPE_CODE = 45;
+  public static final int NORMALIZED_STRING_TYPE_CODE = 39;
+  public static final int TOKEN_TYPE_CODE = 40;
+  public static final int LANGUAGE_TYPE_CODE = 41;
+  public static final int NMTOKEN_TYPE_CODE = 42;
+  public static final int NAME_TYPE_CODE = 43;
+  public static final int NCNAME_TYPE_CODE = 44;
+  public static final int ID_TYPE_CODE = 45;
+  public static final int IDREF_TYPE_CODE = 46;
+  public static final int ENTITY_TYPE_CODE = 47;
 
   public XDataType (Object name, Type implementationType, int typeCode)
   {
@@ -92,6 +94,11 @@ public class XDataType extends Type implements TypeValue
     this.implementationType = implementationType;
     this.typeCode = typeCode;
   }
+
+  public static final XDataType anySimpleType =
+    new XDataType("anySimpleType",
+                  Type.objectType,
+                  ANY_SIMPLE_TYPE_CODE);
 
   public static final XDataType anyAtomicType =
     new XDataType("anyAtomicType",
@@ -232,6 +239,12 @@ public class XDataType extends Type implements TypeValue
   {
     switch (typeCode)
       {
+      case ANY_SIMPLE_TYPE_CODE:
+        if (obj instanceof SeqPosition || obj instanceof Nodes)
+          return false;
+        // if (obj instanceof Values)
+        //    return false if any element is a sequence
+        return true;
       case ANY_ATOMIC_TYPE_CODE:
         return ! (obj instanceof Values || obj instanceof SeqPosition);
       case STRING_TYPE_CODE:

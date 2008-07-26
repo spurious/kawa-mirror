@@ -1,3 +1,7 @@
+2008-07-25  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (TYPE_NAME): New flag.
+
 2008-06-20  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (declareParts): Semi-redundantly set the outer link

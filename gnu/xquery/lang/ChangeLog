@@ -1,3 +1,15 @@
+2008-07-25  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseItemType): Don't resolve QNames yet;
+	instead defer to QXResolveNames.
+	(parseNamedNodeType): Don't just ignore type name, but pass it to ....
+	(makeNamedNodeType): Handle type-name, so we can catch now-deferred
+	errors.
+	* XQResolveNames.java (walkReferenceExp): Special handling for
+	TYPE_NAME - map resolved name to quoted type.
+	(walkApplyExp): Handle deferred errors for 'cast as' and 'castable as'.
+	* XQParser.java: Some improvements in line/column handling.
+
 2008-06-16  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseNamedNodeType): Use parseDataType.

@@ -8,9 +8,11 @@ import gnu.xml.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.QNameUtils;
+import kawa.standard.Scheme;
 
 public class XQResolveNames extends ResolveNames
 {
@@ -274,7 +276,8 @@ public class XQResolveNames extends ResolveNames
     if (exp.getBinding() == null)
       {
 	Object symbol = exp.getSymbol();
-        boolean function = exp.isProcedureName();
+        boolean needFunction = exp.isProcedureName();
+        boolean needType = exp.getFlag(ReferenceExp.TYPE_NAME);
         int namespace = call == null ? XQuery.VALUE_NAMESPACE
           : XQuery.namespaceForFunctions(call.getArgCount());
 	Declaration decl = lookup.lookup(symbol, namespace);
@@ -309,7 +312,7 @@ public class XQResolveNames extends ResolveNames
             if (name.indexOf(':') < 0)
               {
                 name = name.intern();
-                if (function)
+                if (needFunction)
                   {
                     for (int i = 0;  i < functionNamespacePath.length;  i++)
                       {
@@ -317,8 +320,6 @@ public class XQResolveNames extends ResolveNames
                         decl = lookup.lookup(sym, namespace);
                         if (decl != null)
                           break;
-                        if (! function)
-                          continue;
                         decl = flookup(sym);
                         if (decl != null)
                           break;
@@ -327,20 +328,26 @@ public class XQResolveNames extends ResolveNames
               }
             if (decl == null)
               {
-                sym = parser.namespaceResolve(name, function);
+                sym = parser.namespaceResolve(name, needFunction);
                 if (sym != null)
                   {
                     decl = lookup.lookup(sym, namespace);
-                    if (decl == null && function)
+                    if (decl == null
+                        && (needFunction || needType))
                       {
                         String uri = sym.getNamespaceURI();
+                        Type type = null;
                         if (XQuery.SCHEMA_NAMESPACE.equals(uri))
                           {
-                            Type type =
-                              XQuery.getStandardType(sym.getName());
-                            if (type != null)
-                              return QuoteExp.getInstance(type);
+                            type = XQuery.getStandardType(sym.getName());
                           }
+                        else if (needType && uri == ""
+                            && ! getCompilation().isPedantic())
+                          {
+                            type = Scheme.string2Type(sym.getName());
+                          }
+                        if (type != null)
+                          return new QuoteExp(type).setLine(exp);
                         if (uri != null && uri.length() > 6 &&
                             uri.startsWith("class:"))
                           {
@@ -354,10 +361,12 @@ public class XQResolveNames extends ResolveNames
           }
         if (decl != null)
           exp.setBinding(decl);
-        else if (function)
+        else if (needFunction)
           error('e', "unknown function "+symbol);
+        else if (needType)
+          messages.error('e', exp, "unknown type "+symbol, "XPST0051");
         else
-          messages.error('e',"unknown variable $"+symbol, "XPST0008");
+          messages.error('e', exp, "unknown variable $"+symbol, "XPST0008");
       }
     return exp;
   }
@@ -540,35 +549,57 @@ public class XQResolveNames extends ResolveNames
                   decl.setCanRead(true);
 		return new ReferenceExp(sym, decl);
               case CAST_AS_BUILTIN:
-                {
-		  Expression[] args = exp.getArgs();
-                  if (args[0].valueIfConstant() == Compilation.typeSymbol)
-                    return walkApplyExp(XQParser.castQName(args[1], true));
-                  func
-                    = XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
-                  return new ApplyExp(func, args);
-                }
               case CASTABLE_AS_BUILTIN:
                 {
 		  Expression[] args = exp.getArgs();
-                  if (args[1].valueIfConstant() == Compilation.typeSymbol
-                      && args[0] instanceof QuoteExp)
+                  Expression texp = args[code == CAST_AS_BUILTIN ? 0 : 1];
+                  Expression qexp = texp;
+                  if (texp instanceof ApplyExp)
                     {
-                      Object value = ((QuoteExp) args[0]).getValue();  
-                      try
-                        {
-                          QNameUtils.resolveQName(value,
-                                                  parser.constructorNamespaces,
-                                                  parser.prologNamespaces);
-                          return XQuery.trueExp;
-                        }
-                      catch (RuntimeException ex)
-                        {	
-                          return XQuery.falseExp;
-                        }
+                      ApplyExp taexp = (ApplyExp) texp;
+                      if (taexp.getFunction().valueIfConstant()
+                          == XQParser.proc_OccurrenceType_getInstance)
+                        qexp = taexp.getArg(0);
                     }
-                  func = XQParser.makeFunctionExp("gnu.xquery.lang.XQParser",                                       "castableAs");
-                  return new ApplyExp(func, args);
+                  Object value = qexp.valueIfConstant();
+                  String msg = null;
+                  if (value == SingletonType.getInstance())
+                    msg = "type to 'cast as' or 'castable as' must be atomic";
+                  else if (value == XDataType.anyAtomicType)
+                    msg = "type to 'cast as' or 'castable as' cannot be anyAtomicType";
+                  else if (value == XDataType.NotationType)
+                    msg = "type to 'cast as' or 'castable as' cannot be NOTATION";
+                  if (msg != null)
+                    messages.error('e', texp, msg, "XPST0080");
+                  boolean toQName = (value == Compilation.typeSymbol
+                                     && ! (texp instanceof ApplyExp));
+                  if (code == CAST_AS_BUILTIN)
+                    {
+                      if (toQName)
+                        return walkApplyExp(XQParser.castQName(args[1], true));
+                      func
+                        = XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
+                    }
+                  else
+                    {
+                      if (toQName && args[0] instanceof QuoteExp)
+                        {
+                          value = ((QuoteExp) args[0]).getValue();  
+                          try
+                            {
+                              QNameUtils.resolveQName(value,
+                                                      parser.constructorNamespaces,
+                                                      parser.prologNamespaces);
+                              return XQuery.trueExp;
+                            }
+                          catch (RuntimeException ex)
+                            {	
+                              return XQuery.falseExp;
+                            }
+                        }
+                      func = XQParser.makeFunctionExp("gnu.xquery.lang.XQParser",                                       "castableAs");
+                    }
+                  return new ApplyExp(func, args).setLine(exp);
                 }
 	      case XS_QNAME_BUILTIN:
 	      case XS_QNAME_IGNORE_DEFAULT_BUILTIN:

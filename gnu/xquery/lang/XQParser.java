@@ -1421,7 +1421,7 @@ public class XQParser extends Lexer
   public Expression parseNamedNodeType (boolean attribute)
       throws java.io.IOException, SyntaxException
   {
-    Expression qname;
+    Expression qname, tname = null;
     getRawToken();
     if (curToken == ')')
       {
@@ -1445,7 +1445,7 @@ public class XQParser extends Lexer
             getRawToken();
             if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
               {
-                Expression tname = parseDataType();
+                tname = parseDataType();
               }
             else
                syntaxError("expected QName");
@@ -1455,10 +1455,11 @@ public class XQParser extends Lexer
         else
           error("expected ')' after element");
       }
-    return makeNamedNodeType(attribute, qname);
+    return makeNamedNodeType(attribute, qname, tname);
   }
 
-  static Expression makeNamedNodeType (boolean attribute, Expression qname)
+  static Expression makeNamedNodeType (boolean attribute,
+                                       Expression qname, Expression tname)
   {
     Expression[] name = new Expression[2];
     ClassType nodeType = ClassType.make(attribute
@@ -1467,7 +1468,13 @@ public class XQParser extends Lexer
     ApplyExp elt = new ApplyExp(nodeType.getDeclaredMethod("make", 1),
                                 new Expression[] { qname });
     elt.setFlag(ApplyExp.INLINE_IF_CONSTANT);
-    return elt;
+    if (tname == null)
+      return elt;
+    else
+      {
+        // For now "tname" is ignored - except we want to catch errors.
+        return new BeginExp(tname, elt);
+      }
   }
 
   private boolean warnedOldStyleKindTest;
@@ -1540,14 +1547,17 @@ public class XQParser extends Lexer
                               QuoteExp.getInstance(gnu.math.IntNum.make(min)),
                               QuoteExp.getInstance(gnu.math.IntNum.make(max)) };
         ApplyExp otype
-          = new ApplyExp(ClassType.make("gnu.kawa.reflect.OccurrenceType")
-                         .getDeclaredMethod("getInstance", 3),
+          = new ApplyExp(proc_OccurrenceType_getInstance,
                          args);
         otype.setFlag(ApplyExp.INLINE_IF_CONSTANT);
         return otype;
       }
     return etype;
   }
+
+  static PrimProcedure proc_OccurrenceType_getInstance
+  = new PrimProcedure(ClassType.make("gnu.kawa.reflect.OccurrenceType")
+                      .getDeclaredMethod("getInstance", 3));
 
   public Expression parseMaybeKindTest ()
       throws java.io.IOException, SyntaxException
@@ -1609,7 +1619,7 @@ public class XQParser extends Lexer
     if (etype != null)
       {
         if (parseContext == 'C')
-          // Kludge to force error below.
+          // Kludge to force error later.
           type = XDataType.anyAtomicType;
         else
           return etype;
@@ -1622,25 +1632,14 @@ public class XQParser extends Lexer
     else if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
+        ReferenceExp rexp = new ReferenceExp(tname);
+        rexp.setFlag(ReferenceExp.TYPE_NAME);
+        maybeSetLine(rexp, curLine, curColumn);
 	getRawToken();
-	type = interpreter.getTypeFor(tname);
-	if (type == null)
-          {
-            error('e', "unknown type "+tname, "XPST0051");
-            type = Type.objectType;
-          }
+        return rexp;
       }
     else
       return null;
-    if (parseContext == 'C')
-      {
-        if (type == SingletonType.getInstance())
-          return syntaxError("type to 'cast as' or 'castable as' must be atomic", "XPST0080");
-        if (type == XDataType.anyAtomicType)
-          return syntaxError("type to 'cast as' or 'castable as' cannot be anyAtomicType", "XPST0080");
-        if (type == XDataType.NotationType)
-          return syntaxError("type to 'cast as' or 'castable as' cannot be NOTATION", "XPST0080");
-      }
     return QuoteExp.getInstance(type);
   }
 
@@ -1937,7 +1936,8 @@ public class XQParser extends Lexer
 	     || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
       {
         args[0] = makeNamedNodeType(axis == AXIS_ATTRIBUTE,
-                                    parseNameTest(axis == AXIS_ATTRIBUTE) );
+                                    parseNameTest(axis == AXIS_ATTRIBUTE),
+                                    null);
       }
     else if (axis >= 0)
       return syntaxError("unsupported axis '"+axisNames[axis]+"::'");
@@ -3573,6 +3573,7 @@ public class XQParser extends Lexer
     if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
       return syntaxError("missing function name");
     String name = new String(tokenBuffer, 0, tokenBufferLength);
+    getMessages().setLine(port.getName(), curLine, curColumn);
     Symbol sym = namespaceResolve(name, true);
     String uri = sym.getNamespaceURI();
     if (uri == NamespaceBinding.XML_NAMESPACE
@@ -3718,7 +3719,7 @@ public class XQParser extends Lexer
 	  }
         if (uri == null)
           {
-            error('e',
+            getMessages().error('e',
                   "unknown namespace prefix '" + prefix + "'",
                   "XPST0081");
             uri = "(unknown namespace)";
@@ -3826,7 +3827,10 @@ public class XQParser extends Lexer
 	  return syntaxError("missing Variable");
         Object name = decl.getSymbol();
         if (name instanceof String)
-          decl.setSymbol(namespaceResolve((String) name, false));
+          {
+            getMessages().setLine(port.getName(), curLine, curColumn);
+            decl.setSymbol(namespaceResolve((String) name, false));
+          }
         if (libraryModuleNamespace != null)
           {
             uri = ((Symbol) decl.getSymbol()).getNamespaceURI();
@@ -4198,12 +4202,14 @@ public class XQParser extends Lexer
         else
           {
             String str = new String(tokenBuffer, 0, tokenBufferLength);
+            getMessages().setLine(port.getName(), curLine, curColumn);
+            Symbol sym = namespaceResolve(str, false);
             getRawToken();
             if (curToken != STRING_TOKEN)
-              syntaxError("expected string literal after 'declare option <QName>'");
+              syntaxError("expected string literal after 'declare option "
+                          +str+'\'');
             else
-              handleOption(namespaceResolve(str, false),
-                           new String(tokenBuffer, 0, tokenBufferLength));
+              handleOption(sym, new String(tokenBuffer, 0, tokenBufferLength));
           }
         parseSeparator();
         seenDeclaration = true;
@@ -4448,7 +4454,7 @@ public class XQParser extends Lexer
   public void maybeSetLine (Expression exp, int line, int column)
   {
     String file = getName();
-    if (file != null)
+    if (file != null && exp.getFileName() == null)
       {
         exp.setFile(file);
 	exp.setLine(line, column);

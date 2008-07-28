@@ -411,7 +411,7 @@ public class XMLPrinter extends OutPort
                 // If we're not canonicalizing, we just want to suppress
                 // duplicates, rather than putting them in order.
                 // Note we put the bindings in reverse order, since that's
-                // the following print loop expects.
+                // what the following print loop expects.
                 if (! sortNamespaces)
                   continue;
                 if (prefix == null)

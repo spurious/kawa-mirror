@@ -21,8 +21,9 @@ public final class NamespaceBinding implements Externalizable
   String prefix;
 
   /** Namespace uri.  An interned String.
-   * The value null "undeclares" any following namespaces; it corresponds
-   * to an empty uri as in the XML Namespaces 1.1 Candidate Recommendation. */
+   * The value null "undeclares" any following namespaces with the same prefix;
+   * it corresponds to an empty uri as in the
+   * XML Namespaces 1.1 Candidate Recommendation. */
   public final String getUri () { return uri; }
   public final void setUri (String uri) { this.uri = uri; }
   String uri;

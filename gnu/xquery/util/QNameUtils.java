@@ -98,7 +98,7 @@ public class QNameUtils
             uri = prologNamespaces.resolve(prefix);
             break;
           }
-	if (ns.getPrefix() == prefix || ns.getUri() == null)
+	if (ns.getPrefix() == prefix)
           {
             uri = ns.getUri();
             break;

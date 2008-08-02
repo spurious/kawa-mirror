@@ -1,4 +1,4 @@
-// Copyright (c) 2005, 2006  Per M.A. Bothner.
+// Copyright (c) 2005, 2006, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -71,6 +71,9 @@ public class NodeUtils
          ns != null;
          ns = ns.getNext())
       {
+        String uri = ns.getUri();
+        if (uri == null)
+          continue; // An "undeclare-namespace" binding.
         String prefix = ns.getPrefix();
         // Check for duplicates.  This is an O(n^2) algorthm, but these
         // lists are usually quite short ...

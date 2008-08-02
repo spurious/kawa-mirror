@@ -1,5 +1,11 @@
 2008-08-02  Per Bothner  <per@bothner.com>
 
+	* QNameUtils.java (lookupPrefix): Don't stop searching if we find
+	null uri (for undeclare-namespace), unless prefix also matches.
+
+	* NodeUtils.java (prefixesFromNodetype): Skip bindings with null uri,
+	since those "undeclare" any outer matching prefixes.
+
 	* StringUtils.java (makePattern): Fix space-skipping logic.
 
 	* StringUtils.java (makePattern): Map "\p{IsXxxx}" to "\P{InXxxx}".

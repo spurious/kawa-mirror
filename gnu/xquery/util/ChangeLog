@@ -1,3 +1,12 @@
+2008-08-02  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (makePattern): Fix space-skipping logic.
+
+	* StringUtils.java (makePattern): Map "\p{IsXxxx}" to "\P{InXxxx}".
+
+	* StringUtils.java (replace): Check for invalid use of '\' in
+	replacement string.
+
 2008-07-25  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (encodeForUri, iriToUri, escapeHtmlUri): Use

@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2008  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -435,17 +435,21 @@ public class StringUtils
             StringBuffer sbuf = new StringBuffer();
             int plen = pattern.length();
             int inBracket = 0;
-            for (int j = 0; j < plen;  j++)
+            for (int j = 0; j < plen;  )
               {
-                char pch = pattern.charAt(j);
-                if (pch == '\\')
-                  j++;
+                char pch = pattern.charAt(j++);
+                if (pch == '\\' && j < plen)
+                  { 
+                    sbuf.append(pch);
+                    pch = pattern.charAt(j++);
+                  }
                 else if (pch == '[')
                   inBracket++;
                 else if (pch == ']')
                   inBracket--;
-                else if (inBracket > 0 || ! Character.isWhitespace(pch))
-                  sbuf.append(pch);
+                else if (inBracket == 0 && Character.isWhitespace(pch))
+                  continue;
+                sbuf.append(pch);
               }
             pattern = sbuf.toString();
             break;
@@ -455,6 +459,36 @@ public class StringUtils
           default:
             throw new IllegalArgumentException("unknown 'replace' flag");
           }
+      }
+    
+    if (pattern.indexOf("{Is") >= 0)
+      {
+        // Change "\p{IsXxxx}" to "\P{InXxxx}".
+        StringBuffer sbuf = new StringBuffer();
+        int plen = pattern.length();
+        for (int j = 0; j < plen;  )
+          {
+            char pch = pattern.charAt(j++);
+            if (pch == '\\' && j + 4 < plen)
+              { 
+                sbuf.append(pch);
+                pch = pattern.charAt(j++);  
+                sbuf.append(pch);
+                if ((pch == 'p' || pch == 'P')
+                    && pattern.charAt(j) == '{'
+                    && pattern.charAt(j+1) == 'I'
+                    && pattern.charAt(j+2) == 's')
+                  {
+                    sbuf.append('{');
+                    sbuf.append('I');
+                    sbuf.append('n');
+                    j += 3;
+                  }
+              }
+            else
+              sbuf.append(pch);
+          }
+        pattern = sbuf.toString();
       }
     return Pattern.compile(pattern, fl);
   }
@@ -498,6 +532,17 @@ public class StringUtils
       str = "";
     else
       throw new ClassCastException();
+    int rlen = replacement.length();
+    for (int i = 0; i < rlen; )
+      {
+        char rch = replacement.charAt(i++);
+        if (rch == '\\')
+          {
+            if (i >= rch
+                || ! ((rch = replacement.charAt(i++)) == '\\' || rch == '$'))
+              throw new IllegalArgumentException("invalid replacement string [FORX0004]");
+          }
+      }
     return makePattern(pattern, flags).matcher(str).replaceAll(replacement);
     /* #else */
     // throw new Error("fn:replace requires java.util.regex (JDK 1.4 or equivalent)");

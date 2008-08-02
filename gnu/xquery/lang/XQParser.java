@@ -2359,6 +2359,13 @@ public class XQParser extends Lexer
           }
 	if (next == delimiter || next < 0 || next == '{')
 	  {
+            int postBrace = next == '{' ? read() : -1;
+            if (postBrace == '{')
+              {
+                tokenBufferAppend('{');
+                skippable = false;
+                continue;
+              }
           addText:
             {
               String text;
@@ -2380,22 +2387,13 @@ public class XQParser extends Lexer
               eofError("unexpected end-of-file");
             else // if (next == '{')
               {
-                next = read();
-                if (next == '{')
-                  {
-                    tokenBufferAppend('{');
-                    skippable = false;
-                  }
-                else
-                  {
-                    unread(next);
-                    enclosedExpressionsSeen++;
-                    Expression exp = parseEnclosedExpr();
-                    result.addElement(exp);
-                    tokenBufferLength = 0;
-                    prevEnclosed = result.size();
-                    skippable = skipBoundarySpace;
-                  }
+                unread(postBrace);
+                enclosedExpressionsSeen++;
+                Expression exp = parseEnclosedExpr();
+                result.addElement(exp);
+                tokenBufferLength = 0;
+                prevEnclosed = result.size();
+                skippable = skipBoundarySpace;
               }
 	  }
 	else if (next == '}')
@@ -4081,6 +4079,8 @@ public class XQParser extends Lexer
           error('e',
                 "duplicate default namespace declaration",
                 "XQST0066");
+        else if (seenDeclaration && ! interactive)
+          error('e', "default namespace declared after function/variable/option");
 	getRawToken();
 	if (match("namespace"))
 	  getRawToken();

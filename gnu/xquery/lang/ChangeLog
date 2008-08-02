@@ -1,3 +1,12 @@
+2008-08-02  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseContent): Handle "{{" in content directly,
+	so it doesn't split up the quoted text.  This fixes a bug in
+	namespace-declarations.
+
+	* XQParser.java (parse): Error if default namespace declaration
+	followed variable/function declaration.
+
 2008-07-26  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (typeMap): Add anySimpleType.

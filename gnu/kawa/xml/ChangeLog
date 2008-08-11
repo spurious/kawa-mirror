@@ -1,3 +1,10 @@
+2008-08-11  Per Bothner  <per@bothner.com>
+
+	* XmlNamespace.java (make, <init>): Swap parameter order, to match
+	writeExternal output (as used for literals).
+	This fixes Savannah bug #24037 "xml namespace prefix and namespace
+	uri swapped in output from compiled code".
+
 2008-07-26  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (ANY_ATOMIC_TYPE_CODE): New constant.

@@ -77,11 +77,11 @@ public class LineInputStreamReader extends LineBufferedReader
   }
 
   /* #ifdef use:java.nio */
-  private int fillBytes () throws java.io.IOException
+  private int fillBytes (int remaining) throws java.io.IOException
   {
-    int n = istrm.read(barr, 0, barr.length);
+    int n = istrm.read(barr, remaining, barr.length-remaining);
     bbuf.position(0);
-    bbuf.limit(n < 0 ? 0 : n);
+    bbuf.limit(remaining + (n < 0 ? 0 : n));
     return n;
   }
   /* #endif */
@@ -109,7 +109,7 @@ public class LineInputStreamReader extends LineBufferedReader
     /* #ifdef use:java.nio */
     if (! bbuf.hasRemaining())
       {
-        int n = fillBytes();
+        int n = fillBytes(0);
         if (n <= 0)
           return -1;
       }
@@ -132,16 +132,25 @@ public class LineInputStreamReader extends LineBufferedReader
     cbuf.limit(pos+len);
     cbuf.position(pos);
     boolean eof = false;
-    if (! bbuf.hasRemaining())
+    int count;
+    for (;;)
       {
-        int n = fillBytes();
+        CoderResult cres = decoder.decode(bbuf, cbuf, eof);
+        count = cbuf.position() - pos;
+        if (count > 0 || ! cres.isUnderflow())
+          break;
+        int rem = bbuf.remaining();
+        if (rem > 0)
+          {
+            bbuf.compact();
+          }
+        int n = fillBytes(rem);
         if (n < 0)
           {
             eof = true;
+            break;
           }
       }
-    CoderResult cres = decoder.decode(bbuf, cbuf, eof);
-    int count = cbuf.position() - pos;
     return count == 0 && eof ? -1 : count;
     /* #else */
     // if (in == null)

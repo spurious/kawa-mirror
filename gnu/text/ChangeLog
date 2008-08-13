@@ -1,3 +1,9 @@
+2008-08-13  Per Bothner  <per@bothner.com>
+
+	* LineInputStreamReader.java (fill, fillBytes): Handle underflow
+	with CharsetDecoder by calling compact and reading more into the buffer.
+	CharsetDecoder doesn't do "partial" characters.
+
 2008-03-23  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (closeThis): New method.

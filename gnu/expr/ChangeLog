@@ -1,3 +1,13 @@
+2008-09-05  Per Bothner  <per@bothner.com>
+
+	* SeriesTarget.java: Removed class.  The optimization requires
+	jsr/ret, which isn't compatible with Java6 StackMapTable.
+	Re-writing to use an integer and a switch to return to the caller
+	may be possible, but seems difficult.  Probably not worthwhile.
+	* Makefile.am: Update accordingly.
+	* Declaration.java (load): Remove special handling for SeriesTarget.
+	* Compilation.java (compileConstant): Likewise.
+
 2008-07-25  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (TYPE_NAME): New flag.

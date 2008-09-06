@@ -224,8 +224,6 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
 	ConsumerTarget.compileUsingConsumer(exp, comp, target);
 	return;
       }
-    // Should also handle SeriesTarget - later? FIXME
-
     // At this point, we don't depend on last().
     LambdaExp lexp2 = (LambdaExp) exp2;
     ValuesMap.compileInlined(lexp2, exp1, 1, matchesMethod, comp, target);

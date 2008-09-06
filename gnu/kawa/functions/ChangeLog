@@ -1,3 +1,12 @@
+2008-09-05  Per Bothner  <per@bothner.com>
+
+	* AppendValues.java (compile): Remove special handling for SeriesTarget.
+	* ValuesMap.java (compile): Likewise.
+	(compileInlined): Instead of allocating a SeriesTarget, compile
+	sequence to StackTarget, and explicit loop Values using
+	nextIndex/nextValue.  Gives us the benefit of SeriesTarget in the
+	usual case without needing SeriesTarget.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* MakeList.java (getReturnType): Update to use new Type fields.

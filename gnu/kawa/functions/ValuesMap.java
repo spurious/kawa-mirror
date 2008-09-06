@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003, 2004  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2004, 2008  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -100,8 +100,7 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
       }
     Expression[] args = exp.getArgs();
     if (! (target instanceof IgnoreTarget
-	   || target instanceof ConsumerTarget
-	   || target instanceof SeriesTarget))
+	   || target instanceof ConsumerTarget))
       {
 	ConsumerTarget.compileUsingConsumer(exp, comp, target);
 	return;
@@ -116,13 +115,13 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
   {
     Declaration param = lambda.firstDecl();
     CodeAttr code = comp.getCode();
-    SeriesTarget starget = new SeriesTarget();
-    starget.scope = code.pushScope();
+    Scope scope = code.pushScope();
     Variable counter;
     Declaration counterDecl;
+    Type paramType = param.getType();
     if (startCounter >= 0)
       {
-	counter = starget.scope.addVariable(code, Type.intType, "position");
+	counter = scope.addVariable(code, Type.intType, "position");
 	code.emitPushInt(startCounter);
 	code.emitStore(counter);
         counterDecl = new Declaration(counter);
@@ -132,25 +131,12 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
         counter = null;
         counterDecl = null;
       }
-    starget.function = new Label(code);
-    if (target instanceof SeriesTarget)
-      starget.done = ((SeriesTarget) target).done;
-    else
-      starget.done = new Label(code);
     // If the param Declaration is captured, then it gets messy initializing
     // it.  So just cheat and create a helper variable.
     if (param.isSimple())
       param.allocateVariable(code);
     else
-      param = new Declaration(code.addLocal(param.getType(), param.getName()));
-    starget.param = param;
-    Type retAddrType = Type.pointer_type;
-    Variable retAddr = code.addLocal(retAddrType);
-    vals.compileWithPosition(comp, starget);
-
-    starget.function.define(code);
-    code.pushType(retAddrType);
-    code.emitStore(retAddr);
+      param = new Declaration(code.addLocal(paramType, param.getName()));
     Expression[] args;
     if (startCounter >= 0)
       {
@@ -170,24 +156,60 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
                                new ReferenceExp(counterDecl) });
         app = new IfExp(app, new ReferenceExp(param), QuoteExp.voidExp);
       }
-    if (target instanceof SeriesTarget)
-      {
-        SeriesTarget atarget = (SeriesTarget) target;
-        Label done = atarget.done;
-        atarget.done = null;
-        app.compile(comp, target);
-        atarget.done = done;
-      }
-    else
-      app.compile(comp, target);
+
+    /* emit the following:
+       int index = 0;
+       for (;;)
+       {
+         int next = Values.nextIndex(values, index);
+	 if (next < 0)
+	   goto done;
+	 Values.nextValue(values, index);
+	 compileFromStackSimple(comp, Type.pointerType);
+	 index = value;
+       }
+    */
+    Variable indexVar = code.addLocal(Type.intType);
+    Variable valuesVar = code.addLocal(Type.pointer_type);
+    Variable nextVar = code.addLocal(Type.intType); 
+
+    vals.compileWithPosition(comp, Target.pushObject);
+    code.emitStore(valuesVar);
+    code.emitPushInt(0);
+    code.emitStore(indexVar);
+
+    Label top = new Label(code);
+    Label doneLabel = new Label(code);
+    top.define(code);
+    code.emitLoad(valuesVar);
+    code.emitLoad(indexVar);
+    code.emitInvokeStatic(Compilation.typeValues.getDeclaredMethod("nextIndex", 2));
+    code.emitDup(Type.intType);
+    code.emitStore(nextVar);
+
+    code.emitGotoIfIntLtZero(doneLabel);
+
+    code.emitLoad(valuesVar);
+    code.emitLoad(indexVar);
+    code.emitInvokeStatic(Compilation.typeValues.getDeclaredMethod("nextValue", 2));
+
+    StackTarget.convert(comp, Type.objectType, paramType);
+    param.compileStore(comp);
+
+    app.compile(comp, target);
+
     if (startCounter >= 0)
       {
 	code.emitInc(counter, (short) 1);
       }
-    code.emitRet(retAddr);
+
+    code.emitLoad(nextVar);
+    code.emitStore(indexVar);
+    code.emitGoto(top);
+
+    doneLabel.define(code);
+
     code.popScope();
-    if (! (target instanceof SeriesTarget))
-      starget.done.define(code);
   }
 
   public Type getReturnType (Expression[] args)

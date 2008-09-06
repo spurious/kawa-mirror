@@ -1,3 +1,7 @@
+2008-09-05  Per Bothner  <per@bothner.com>
+
+	* ValuesFilter.java (compile): Remove special handling of SeriesTarget.
+
 2008-08-02  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java (lookupPrefix): Don't stop searching if we find

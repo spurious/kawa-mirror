@@ -433,24 +433,6 @@ public class Compilation implements SourceLocator
               } 
             return;
           }
-        else if (target instanceof SeriesTarget)
-          {
-            SeriesTarget starget = (SeriesTarget) target;
-            Label saveDone = starget.done;
-            if (len > 0)
-              {
-                starget.done = null;
-                for (int i = 0;  i < len;  i++)
-                  {
-                    if (i+1 == len)
-                      starget.done = saveDone;
-                    compileConstant(values[i], target);
-                  }
-              }
-            else if (saveDone != null && getCode().reachableHere())
-              getCode().emitGoto(saveDone);
-            return;
-          }
       }
     if (target instanceof ConditionalTarget)
       {

@@ -305,12 +305,7 @@ public class Declaration
             rtype = Type.pointer_type;
           }
       }
-    if (target instanceof SeriesTarget
-	&& getFlag(Declaration.IS_SINGLE_VALUE))
-      // A kludge until we get a better type system.
-      ((SeriesTarget) target).compileFromStackSimple(comp, rtype);
-    else
-      target.compileFromStack(comp, rtype);
+    target.compileFromStack(comp, rtype);
   }
 
   /* Compile code to store a value (which must already be on the

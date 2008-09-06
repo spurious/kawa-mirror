@@ -167,7 +167,7 @@ public class Values extends TreeList implements Printable, Externalizable
     return isEmpty() ? empty : this;
   }
 
-  /** Helper method called by code using a SeriesTarget.
+  /** Helper method called by compiled code.
    * The compiled code iterates through zero or more values.
    * Return the index of the next value, or -1 if currently at eof.
    * A non-Values object is treated as a singleton value,
@@ -181,7 +181,7 @@ public class Values extends TreeList implements Printable, Externalizable
       return curIndex == 0 ? 1 : -1;
   }
 
-  /** Helper method called by code using a SeriesTarget.
+  /** Helper method called by compiled code.
    * The compiled code iterates through zero or more values.
    * Extract the object referenced by the curIndex.
    * A non-Values object is treated as a singleton value.

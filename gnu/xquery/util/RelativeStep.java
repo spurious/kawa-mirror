@@ -234,9 +234,7 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
           }
       }
 
-    if (! (target instanceof ConsumerTarget
-           || (target instanceof SeriesTarget
-               && (expectedKind == 'A' || expectedKind == 'S'))))
+    if (! (target instanceof ConsumerTarget))
       {
 	ConsumerTarget.compileUsingConsumer(exp, comp, target);
 	return;

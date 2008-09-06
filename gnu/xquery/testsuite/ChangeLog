@@ -1,3 +1,7 @@
+2008-08-02  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java (<init>): Update expected failures.
+
 2008-07-26  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (<init>): Remove some no-longer-expected-failues.

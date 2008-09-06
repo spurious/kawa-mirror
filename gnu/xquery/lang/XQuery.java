@@ -821,7 +821,7 @@ public class XQuery extends Language
       "ENTITY", XStringType.ENTITYType,
       "anyAtomicType", XDataType.anyAtomicType,
       "anySimpleType", XDataType.anySimpleType,
-      "untyped", Type.objectType,
+      "untyped", XDataType.untypedType,
       "anyType", Type.objectType
     };
 

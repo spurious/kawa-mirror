@@ -4289,6 +4289,8 @@ public class XQParser extends Lexer
     if (curToken == EOL_TOKEN)
       unread('\n');
     maybeSetLine(exp, startLine, startColumn);
+    if (libraryModuleNamespace != null)
+      error('e', "query body in a library module", "XPST0003");
     return exp;
   }
 

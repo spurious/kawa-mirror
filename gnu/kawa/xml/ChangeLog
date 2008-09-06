@@ -1,3 +1,11 @@
+2008-09-05  Per Bothner  <per@bothner.com>
+
+	* XDataType.java (untypedType): New XDataType for xs:untyped.
+	(UNTYPED_TYPE_CODE): New constant.
+	(isInstance): Handle UNTYPED_TYPE_CODE.
+
+	* MakeElement.java (toString): New method.
+
 2008-08-11  Per Bothner  <per@bothner.com>
 
 	* XmlNamespace.java (make, <init>): Swap parameter order, to match

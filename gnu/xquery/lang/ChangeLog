@@ -1,3 +1,12 @@
+2008-09-05  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (typeMap): Map "untyped" to XDataType.untypedType.
+
+	* XQParser.java (parse): Error if query expression in a library module.
+
+	* XQResolveNames.java (walkApplyExp): Error if trying to 'cast as' or
+	'castable as' on XDataType.untypedType.
+
 2008-08-02  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseContent): Handle "{{" in content directly,

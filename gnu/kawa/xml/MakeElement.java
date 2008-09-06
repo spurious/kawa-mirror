@@ -18,6 +18,8 @@ public class MakeElement extends NodeConstructor
    * rather than the first parameter. */
   public Symbol tag;
 
+  public String toString() { return "makeElement["+tag+"]"; }
+
   public int copyNamespacesMode = XMLFilter.COPY_NAMESPACES_PRESERVE;
 
   private boolean handlingKeywordParameters;

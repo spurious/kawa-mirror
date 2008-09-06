@@ -210,15 +210,10 @@ public class RunXQTS extends FilterConsumer
     super(out);
     this.cout = out;
 
-    expectFailures("K-ReplaceFunc-8", "allow bad regex replacement string");
     expectFailures("K2-MatchesFunc-1", "allow bad regex pattern");
-    expectFailures("static-context-1", "unchecked unknownType in element(*,TypeName)");
-    expectFailures("fn-abs-more-args-023|fn-abs-more-args-024",
-                   "testsuite error (4023): -0 is not  valid unsignedLong/unsignedShort literal");
+    expectFailures("K2-MatchesFunc-8|K2-MatchesFunc-9|K2-MatchesFunc-10|K2-ReplaceFunc-3", "backwards references in regep not implemented");
     expectFailures("ST-WhereExpr001",
                    "testsuite error (4024) - should not require error");
-    expectFailures("K2-SeqExprCast-207",
-                   "was testsuite error(4252) - now mismatch between '>' and '&gt;'");
     /* #ifndef JAVA5 */
     // expectFailures("surrogates12|surrogates13|surrogates14|surrogates15",
     //                "surrogates not handled by java.util.regex");
@@ -272,7 +267,7 @@ public class RunXQTS extends FilterConsumer
                    "some string functions don't support collation argument");
     expectFailures("caselessmatch04",
                    "regex/unicode special case");
-    expectFailures("string-queries-results-q4|K2-FunctionProlog-7|K2-FunctionProlog-17|K2-FunctionProlog-18|K2-FunctionProlog-19|K2-FunctionProlog-22",
+    expectFailures("string-queries-results-q4|K2-FunctionProlog-7|K2-FunctionProlog-17|K2-FunctionProlog-18|K2-FunctionProlog-19|K2-FunctionProlog-22|XMark-Q18|XMark-All",
                    "function conversion incorrect for user-defined functions");
     expectFailures("caselessmatch10|caselessmatch11",
                    // Need to translate [xxx-[yyy]] to [xxx&&[^yyy]].

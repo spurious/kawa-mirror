@@ -85,6 +85,8 @@ public class XDataType extends Type implements TypeValue
   public static final int IDREF_TYPE_CODE = 46;
   public static final int ENTITY_TYPE_CODE = 47;
 
+  public static final int UNTYPED_TYPE_CODE = 48;
+
   public XDataType (Object name, Type implementationType, int typeCode)
   {
     super(implementationType);
@@ -171,6 +173,11 @@ public class XDataType extends Type implements TypeValue
     new XDataType("dayTimeDuration", ClassType.make("gnu.math.Duration"),
                   DAY_TIME_DURATION_TYPE_CODE);
 
+  public static final XDataType untypedType =
+    new XDataType("untyped",
+                  Type.objectType,
+                  UNTYPED_TYPE_CODE);
+
   public java.lang.Class getReflectClass()
   {
     return implementationType.getReflectClass();
@@ -239,6 +246,8 @@ public class XDataType extends Type implements TypeValue
   {
     switch (typeCode)
       {
+      case UNTYPED_TYPE_CODE:
+        return true;
       case ANY_SIMPLE_TYPE_CODE:
         if (obj instanceof SeqPosition || obj instanceof Nodes)
           return false;

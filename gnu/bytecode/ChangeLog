@@ -1,5 +1,13 @@
 2008-09-06  Per Bothner  <per@bothner.com>
 
+	* SwitchState.java (getNumCases): New method.
+	(switchValuePushed):` New method.
+	(<init>): Move position-dependent logic to switchValuePushed.
+	(addCase(int,CodeAttr,Label)): New method.
+	(addDefault(CodeAttr,Label)): New method.
+	(addCase): Rename internal method to insertCase.
+	* CodeAttr.java (startSwitch): New method.
+
 	Fix a problem where dump creates fixups, which messes up disassembly.
 	* CodeAttr.java (CodeAttr.java): If fixup_count is -1, skip fixups.
 	(processFixups): Also skip if fixup_count is negative, not just zero.

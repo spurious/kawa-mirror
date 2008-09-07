@@ -223,7 +223,7 @@ public class ApplyExp extends Expression
 	    Label l = new Label(code);
 	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	    int pc = fswitch.getMaxValue() + 1;
-	    fswitch.addCase(pc, l, code);
+	    fswitch.addCase(pc, code, l);
             exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
 	    comp.loadCallContext();
 

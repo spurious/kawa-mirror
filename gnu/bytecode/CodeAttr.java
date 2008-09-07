@@ -2127,6 +2127,17 @@ public class CodeAttr extends Attribute implements AttrContainer
     return try_stack != null;
   }
 
+  /** Start a new switch statment or expression.
+   * The switch value must have been calculated and left on the stack.
+   */
+  public SwitchState startSwitch ()
+  {
+    popType();
+    SwitchState sw = new SwitchState(this);
+    sw.switchValuePushed(this);
+    return sw;
+  }
+
   /** Compile a tail-call to position 0 of the current procedure.
    * @param pop_args if true, copy argument registers (except this) from stack.
    * @param scope Scope whose start we jump back to. */

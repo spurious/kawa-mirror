@@ -1298,7 +1298,7 @@ public class Compilation implements SourceLocator
 
 		code.emitLoad(code.getArg(1)); // method
 		code.emitGetField(procType.getField("selector"));
-		aswitch = new SwitchState(code);
+		aswitch = code.startSwitch();
 
 		needThisMatch = true;
 	      }
@@ -1419,7 +1419,7 @@ public class Compilation implements SourceLocator
 
     code.emitLoad(ctxVar);
     code.emitGetField(pcCallContextField);
-    SwitchState aswitch = new SwitchState(code);
+    SwitchState aswitch = code.startSwitch();
 
     for (int j = 0;  j < numApplyMethods;  ++j)
       {
@@ -1637,7 +1637,7 @@ public class Compilation implements SourceLocator
 
 		code.emitLoad(code.getArg(1)); // method
 		code.emitGetField(procType.getField("selector"));
-		aswitch = new SwitchState(code);
+		aswitch = code.startSwitch();
 
 		needThisApply = true;
 	      }
@@ -2001,10 +2001,10 @@ public class Compilation implements SourceLocator
       {
 	loadCallContext();
         code.emitGetField(pcCallContextField);
-        fswitch = new SwitchState(code);
+        fswitch = code.startSwitch();
 	Label l = new Label(code);
 	l.define(code);
-	fswitch.addCase(0, l, code);
+	fswitch.addCase(0, code, l);
       }
 
     module.compileBody(this);

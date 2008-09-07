@@ -1,3 +1,11 @@
+2008-09-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java: Update to use maybe-correct SwitchState code in
+	unfinished usingCPStyle() code.
+	* Compilation.java (generateBytecode): Likewise.
+	(generateApplyMethodsWithContext, generateApplyMethodsWithoutContext,
+	generateMatchMethods):  Use new startSwitch method.
+
 2008-09-05  Per Bothner  <per@bothner.com>
 
 	* SeriesTarget.java: Removed class.  The optimization requires

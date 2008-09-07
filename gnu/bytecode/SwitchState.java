@@ -3,7 +3,29 @@
 
 package gnu.bytecode;
 
-/** Maintains the state for generating a switch statement. */
+/** Maintains the state for generating a switch statement or expression.
+ *
+ * <h4>Simple example</h4>
+ * <p>To translate:
+ * <blockquote><pre>
+ * switch (exps) {
+ *   case 1: exp1; break;
+ *   case 2: exp2; break;
+ *   default: expd;
+ * } </pre></blockquote>
+ * you can do:
+ * <blockquote><pre>
+ * compile[exps]
+ * SwitchState sw = code.startSwitch();
+ * sw.addCase(1, code);
+ * compile[exp1];
+ * sw.addCase(2, code);
+ * compile[exp2];
+ * sw.addDefault(code);
+ * compile[expd];
+ * sw.finish(code);
+ * </pre></blockquote>
+ */
 
 public class SwitchState
 {
@@ -26,27 +48,47 @@ public class SwitchState
 
   public int getMaxValue() { return maxValue; }
 
+  public int getNumCases() { return numCases; }
+
   public SwitchState(CodeAttr code)
   {
     switch_label = new Label(code);
     cases_label = new Label(code);
 
-    code.popType();  // pop switch value
-
-    // Save stack types (except top int) into typeState
-    typeState = code.saveStackTypeState(false);
-
-    code.fixupChain(cases_label, switch_label);
+    //    code.popType();  // pop switch value
 
     numCases = 0;
   }
 
+  /** Needs to be called after the switch value has been pushed.
+   * I.e. in execution order, just before the actual switch instruction.
+   * Called implicitly by {@link CodeAttr#startSwitch}.
+   */
+  public void switchValuePushed (CodeAttr code)
+  {
+    // code.popType();  // pop switch value
+    // Save stack types (except top int) into typeState
+    typeState = code.saveStackTypeState(false);
+
+    code.fixupChain(cases_label, switch_label);
+  }
+
   /** Emit a new case, for the given value, whose label is here. */
+  /** Add a new case.
+   * @param value the case value to match against at run-time
+   * @param code the CodeAttr of the Method we are generating code for
+   * @return true on success;  false if value duplicates an existing value
+   */
   public boolean addCase(int value, CodeAttr code)
   {
     Label label = new Label(code);
-    boolean ok = addCase (value, label, code);
     label.define(code);
+    return addCase(value, code, label);
+  }
+
+  public boolean addCase(int value, CodeAttr code, Label label)
+  {
+    boolean ok = insertCase(value, label, code);
     code.restoreStackTypeState(typeState);
     return ok;
   }
@@ -55,22 +97,22 @@ public class SwitchState
   {
     Label label = new Label(code);
     label.define(code);
-    addDefault(label, code);
+    addDefault(code, label);
   }
 
-  public void addDefault(Label label, CodeAttr code)
+  public void addDefault(CodeAttr code, Label label)
   {
     defaultLabel = label;
     code.restoreStackTypeState(typeState);
   }
 
-  /** Add a new case.
+  /** Internal routine to add a new case.
    * @param value the case value to match against at run-time
    * @param label the location to go to if the value matches
    * @param code the CodeAttr of the Method we are generating code for
    * @return true on success;  false if value duplicates an existing value
    */
-  public boolean addCase(int value, Label label, CodeAttr code)
+  public boolean insertCase(int value, Label label, CodeAttr code)
   {
     if (values == null)
       {
@@ -154,6 +196,7 @@ public class SwitchState
 	code.pushType(Type.intType);
 	if (numCases == 1)
 	  {
+            // FIXME optimize if minValue == 0
 	    code.emitPushInt(minValue);
 	    code.emitGotoIfEq(labels[0]);
 	  }

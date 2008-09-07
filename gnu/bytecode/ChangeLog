@@ -1,3 +1,14 @@
+2008-09-06  Per Bothner  <per@bothner.com>
+
+	Fix a problem where dump creates fixups, which messes up disassembly.
+	* CodeAttr.java (CodeAttr.java): If fixup_count is -1, skip fixups.
+	(processFixups): Also skip if fixup_count is negative, not just zero.
+	(disAssembleWithFixups, disAssemble): Treat negative
+	fixup_count like zero.
+	* ClassFileInput.java (readAttribute): Set fixup_count of new CodeAttr
+	to -1.
+	* Label.java (define): Don't fixupAdd if fixup_count is negative.
+
 2008-07-16  Per Bothner  <per@bothner.com>
 
 	Various improvements in class file printing.
@@ -16,6 +27,8 @@
 	javalangClassType): New names for existing static fields.
 	(pointer_type, string_type, tostring_type, boolean_ctype,
 	throwable_type, number_type, java_lang_Class_type): The old names,
+
+
 	kept as deprecated aliases.
 	(objectTYpe): New synonym for javalangObjectType.
 

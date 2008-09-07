@@ -47,7 +47,8 @@ public class Label {
 
     position = code.PC;
     first_fixup = code.fixup_count;
-    code.fixupAdd(CodeAttr.FIXUP_DEFINE, this);
+    if (first_fixup >= 0)
+      code.fixupAdd(CodeAttr.FIXUP_DEFINE, this);
   }
 
   

@@ -175,6 +175,7 @@ public class ClassFileInput extends DataInputStream
     else if (name == "Code" && container instanceof Method)
       {
         CodeAttr code = new CodeAttr((Method) container);
+        code.fixup_count = -1;
 	code.setMaxStack(readUnsignedShort());
 	code.setMaxLocals(readUnsignedShort());
 	int code_len = readInt();

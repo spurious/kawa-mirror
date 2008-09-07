@@ -100,6 +100,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   static final int FIXUP_LINE_NUMBER = 14;
   int[] fixup_offsets;
   Label[] fixup_labels;
+  /** Active length of fixup_offsets and fixup_labels.
+   * If {@code fixup_count == -1} we're not doing fixups. */
   int fixup_count;
 
   /** This causes a later processFixup to rearrange the code.
@@ -2147,7 +2149,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void processFixups ()
   {
-    if (fixup_count == 0)
+    if (fixup_count <= 0)
       return;
 
     // For each label, set it to its maximum limit, assuming all
@@ -2516,7 +2518,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /* DEBUGGING:
   public void disAssembleWithFixups (ClassTypeWriter dst)
   {
-    if (fixup_count == 0)
+    if (fixup_count <= 0)
       {
 	disAssemble(dst, 0, PC);
 	return;
@@ -2745,7 +2747,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      {
 		if (op < 172) //  [tableswitch] or [lookupswitch]
 		  {
-		    if (fixup_count == 0)
+		    if (fixup_count <= 0)
 		      i = (i + 3) & ~3; // skip 0-3 byte padding.
 		    int code_offset = readInt(i);  i += 4;
 		    if (op == 170)

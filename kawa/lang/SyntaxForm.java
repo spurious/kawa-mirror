@@ -47,10 +47,7 @@ public class SyntaxForm implements Externalizable
    */
   public SyntaxForm fromDatum (Object form)
   {
-    SyntaxForm sf = new SyntaxForm();
-    sf.form = form;
-    sf.scope = this.scope;
-    return sf;
+    return make(form, this.scope);
   }
 
   /** Create a syntax object with specified form, and given syntatic context.

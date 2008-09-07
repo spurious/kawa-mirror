@@ -1,3 +1,7 @@
+2008-09-06  Per Bothner  <per@bothner.com>
+
+	* lang/SyntaxForm.java (formDatum): Just use 'make' method.
+
 2008-07-17  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Declare the various R6RS

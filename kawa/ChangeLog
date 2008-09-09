@@ -1,3 +1,9 @@
+2008-09-08  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (finishModule): Don't call declareThis here,
+	since that creates a Scope and Variable before we even create the
+	corresponding CodeAttr, which if nothing else is ugly and confusing.
+
 2008-09-06  Per Bothner  <per@bothner.com>
 
 	* lang/SyntaxForm.java (formDatum): Just use 'make' method.

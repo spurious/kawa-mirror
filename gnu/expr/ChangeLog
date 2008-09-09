@@ -1,3 +1,10 @@
+2008-09-08  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (addMethodFor): Don't call declareThis here, since
+	that creates a Scope and Variable before we even create the
+	corresponding CodeAttr, which if nothing else is ugly and confusing.
+	(allocChildClasses): Instead call declareThis here.
+
 2008-09-06  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java: Update to use maybe-correct SwitchState code in

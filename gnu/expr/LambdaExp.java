@@ -886,8 +886,6 @@ public class LambdaExp extends ScopeExp
       }
     if (ctype.isInterface() || isAbstract())
       mflags |= Access.ABSTRACT;
-    if (! isStatic)
-      declareThis(ctype);
 
     // If a class method has unspecified parameter types, see if we
     // can "inherit" the parameter types from an inherited method.
@@ -1094,6 +1092,9 @@ public class LambdaExp extends ScopeExp
   {
     Method main = getMainMethod();
 	
+    if (main != null && ! main.getStaticFlag())
+      declareThis(main.getDeclaringClass());
+
     Declaration decl = firstDecl();
     for (;;)
       {

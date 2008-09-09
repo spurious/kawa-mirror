@@ -1296,8 +1296,6 @@ public class Translator extends Compilation
 		 || mexp.getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
 	  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
       }
-    if (! moduleStatic)
-      mexp.declareThis(null);
   }
 
   public void resolveModule(ModuleExp mexp)

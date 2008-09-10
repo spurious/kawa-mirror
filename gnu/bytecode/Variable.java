@@ -104,6 +104,15 @@ public class Variable extends Location implements java.util.Enumeration
       code.setMaxLocals(varIndex + size);
     offset = varIndex;
     flags |= LIVE_FLAG;
+    if (offset == 0)
+      {
+        // Note that the this parameter in <init> is uninitialized,
+        // until we call super(...) or this(...) on it.
+        Method method = code.getMethod();
+        if ("<init>".equals(method.getName())
+            && ! "java.lang.Object".equals(method.classfile.getName()))
+          setType(UninitializedType.uninitializedThis((ClassType) getType()));
+      }
     return true;
   }
 

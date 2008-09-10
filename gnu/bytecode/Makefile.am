@@ -31,6 +31,7 @@ SourceDebugExtAttr.java \
 SourceFileAttr.java \
 StackMapTableAttr.java \
 Type.java \
+UninitializedType.java \
 Variable.java \
 VarEnumerator.java \
 ZipArchive.java \

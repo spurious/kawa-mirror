@@ -29,9 +29,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   SourceDebugExtAttr sourceDbgExt;
 
-  // In hindsight, maintaining stack_types is more hassle than it is worth.
-  // Instead, better to just keep track of SP, which should catch most
-  // stack errors, while being more general and less hassle.  FIXME.
   Type[] stack_types;
 
   int SP;  // Current stack size (in "words")
@@ -831,9 +828,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitPushThis()
   {
-    reserve(1);
-    put1(42);  // aload_0
-    pushType(getMethod().getDeclaringClass());
+    emitLoad(locals.used[0]);
   }
 
   /** Emit code to push a constant primitive array.
@@ -1008,7 +1003,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     reserve(3);
     put1(187); // new
     putIndex2(getConstants().addClass(type));
-    pushType(type);
+    pushType(UninitializedType.make(type));
   }
 
   /** Compile code to allocate a new array.
@@ -1302,10 +1297,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     reserve(opcode == 185 ? 5 : 3);
     int arg_count = method.arg_types.length;
     boolean is_invokestatic = opcode == 184;
+    boolean is_init = opcode == 183 && "<init>".equals(method.getName());
+
     if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
       throw new Error
 	("emitInvokeXxx static flag mis-match method.flags="+method.access_flags);
-    if (!is_invokestatic)
+    if (!is_invokestatic && !is_init)
       arg_count++;
     put1(opcode);  // invokevirtual, invokespecial, or invokestatic
     putIndex2(getConstants().addMethodRef(method));
@@ -1315,8 +1312,30 @@ public class CodeAttr extends Attribute implements AttrContainer
 	put1(0);
       }
     while (--arg_count >= 0)
-      popType();
-    if (method.return_type.size != 0)
+      {
+        Type t = popType();
+        if (t instanceof UninitializedType)
+          throw new Error("passing "+t+" as parameter");
+      }
+    if (is_init)
+      {
+        Type t = popType();
+        ClassType ctype;
+        if (! (t instanceof UninitializedType))
+          throw new Error("calling <init> on already-initialized object");
+        ctype = ((UninitializedType) t).ctype;
+        for (int i = 0;  i < SP;  i++)
+          if (stack_types[i] == t)
+            stack_types[i] = ctype;
+        Variable[] used = locals.used;
+        for (int i = used == null ? 0 : used.length;  --i >= 0; )
+          {
+            Variable var = used[i];
+            if (var != null && var.type == t)
+              var.type = ctype;
+          }
+      }
+   if (method.return_type.size != 0)
       pushType(method.return_type);
   }
 
@@ -1778,6 +1797,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public static boolean castNeeded (Type top, Type required)
   {
+    if (top instanceof UninitializedType)
+      top = ((UninitializedType) top).getImplementationType();
     for (;;)
       {
         if (required instanceof ClassType

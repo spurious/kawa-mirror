@@ -1,3 +1,18 @@
+2008-09-10  Per Bothner  <per@bothner.com>
+
+	Implement tracking of "uninitialized objects", as a preliminary
+	step for StackMapTable generation.
+	* UninitializedType.java: New class, extends ObjectType.
+	* Makefile.am: Update accordingly.
+	* Variable.java (reserveLocal): Note that the 'this' parameter in
+	an <init> starts out as uninitialized.
+	* CodeAttr.java (emitPushThis): Use emitLoad: If the variable
+	is uninitialized, we need to push an UninitializedType.
+	(emitNew): The pushed type is a new UninitializedType.
+	(emitInvokeMethod): Handle checkin and fixups for <init> methods:
+	Should be UninitializedType, change to regular ClassType after.
+	(castNeeded): Handle UninitializedType.
+
 2008-09-06  Per Bothner  <per@bothner.com>
 
 	* SwitchState.java (getNumCases): New method.

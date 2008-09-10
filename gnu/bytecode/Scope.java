@@ -151,4 +151,4 @@ public class Scope
 	  }
       }
   }
-};
+}

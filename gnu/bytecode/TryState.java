@@ -33,6 +33,11 @@ public class TryState {
   /** Only used in emitWithCleanupStart mode. */
   Type[] savedTypes;
 
+  /** If we're not using jsr/ret, we use a switch. */
+  SwitchState returnSwitch;
+
+  Variable exception;
+
   public TryState (CodeAttr code)
   {
     previous = code.try_stack;

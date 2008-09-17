@@ -39,6 +39,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   int PC;
   byte[] code;
 
+  private boolean useJsr()
+  {
+    return false;
+  }
+
   /* The exception handler table, as a vector of quadruples
      (start_pc, end_pc, handler_pc, catch_type).
      Only the first exception_table_length quadruples are defined. */
@@ -1408,6 +1413,23 @@ public class CodeAttr extends Attribute implements AttrContainer
     PC += 2;
   }
 
+  public final void callFinally(TryState tryState)
+  {
+    if (useJsr())
+      {
+        emitJsr(tryState.finally_subr);
+      }
+    else
+      {
+        if (tryState.returnSwitch == null)
+          tryState.returnSwitch = new SwitchState(this);
+        int caseValue = tryState.returnSwitch.numCases;
+        emitPushInt(caseValue);
+        emitGoto(tryState.finally_subr);
+        tryState.returnSwitch.addCase(caseValue, this);
+      }
+  }
+
   public final void emitGotoIfCompare1 (Label label, int opcode)
   {
     popType();
@@ -1876,7 +1898,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		result = addLocal(topType());
 		emitStore(result);
 	      }
-	    emitJsr(stack.finally_subr);
+            callFinally(stack);
 	  }
 
 	stack = stack.previous;
@@ -2040,10 +2062,19 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (try_stack.saved_result != null && reachableHere())
 	  emitStore(try_stack.saved_result);
 	try_stack.end_label = new Label();
+        if (try_stack.finally_subr != null)
+          try_stack.exception = addLocal(Type.javalangThrowableType);
 	if (reachableHere())
 	  {
 	    if (try_stack.finally_subr != null)
-	      emitJsr(try_stack.finally_subr);
+              {
+                if (! useJsr())
+                  {
+                    emitPushNull();
+                    emitStore(try_stack.exception);
+                  }
+                callFinally(try_stack);
+              }
 	    emitGoto(try_stack.end_label);
 	  }
 	try_stack.end_try = getLabel();
@@ -2075,7 +2106,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (try_stack.saved_result != null)
 	  emitStore(try_stack.saved_result);
 	if (try_stack.finally_subr != null)
-	  emitJsr(try_stack.finally_subr);
+	  callFinally(try_stack);
 	emitGoto(try_stack.end_label);
       }
     try_stack.try_type = null;
@@ -2090,16 +2121,45 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack.end_try = getLabel();
 
     pushScope();
-    Type except_type = Type.objectType;
-    Variable except = addLocal(except_type);
     emitCatchStart(null);
-    emitStore(except);
-    emitJsr(try_stack.finally_subr);
-    emitLoad(except);
+    emitStore(try_stack.exception);
+    if (useJsr())
+      {
+        emitJsr(try_stack.finally_subr);
+      }
+    else
+      {
+        if (try_stack.returnSwitch == null)
+          // If the try-clause cannot return.
+          try_stack.returnSwitch = new SwitchState(this);
+        emitPushInt(try_stack.returnSwitch.numCases);
+        popType();
+        if (try_stack.saved_result != null)
+          {
+            Type t = try_stack.saved_result.getType().getImplementationType();
+            if (t instanceof PrimType)
+              emitPushConstant(0, t);
+            else
+              emitPushNull();
+            emitStore(try_stack.saved_result);
+          }
+
+        emitGoto(try_stack.finally_subr);
+        try_stack.returnSwitch.addDefault(this);
+      }
+    emitLoad(try_stack.exception);
     emitThrow();
     
     try_stack.finally_subr.define(this);
-    Type ret_addr_type = Type.objectType;
+    Type ret_addr_type;
+    if (useJsr())
+      {
+        ret_addr_type = Type.objectType;
+      }
+    else
+      {
+        ret_addr_type = Type.intType;
+      }
     try_stack.finally_ret_addr = addLocal(ret_addr_type);
     pushType(ret_addr_type);
     emitStore(try_stack.finally_ret_addr);
@@ -2107,7 +2167,17 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitFinallyEnd()
   {
-    emitRet(try_stack.finally_ret_addr);
+    if (useJsr())
+      emitRet(try_stack.finally_ret_addr);
+    else
+      {
+        SwitchState sw = try_stack.returnSwitch;
+        emitLoad(try_stack.finally_ret_addr);
+        popType();
+        sw.switchValuePushed(this);
+        sw.finish(this);
+        try_stack.returnSwitch = null;
+      }
     setUnreachable();
     popScope();
     try_stack.finally_subr = null;

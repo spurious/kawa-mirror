@@ -1,3 +1,13 @@
+2008-09-16  Per Bothner  <per@bothner.com>
+
+	Add support for try-finally without using jsr,
+	which is incompatible with StackMapTable.
+	* TryState.java (returnSwitch, exception): New fields.
+	* CodeAttr.java (callFinally): New helper function.
+	(doPendingFinalizers): Use it.
+	(emitTryStart, emitTryEnd, emitFinallyStart, emitFinallyEnd):
+	Simulate jsr using a switch.	
+
 2008-09-10  Per Bothner  <per@bothner.com>
 
 	Implement tracking of "uninitialized objects", as a preliminary

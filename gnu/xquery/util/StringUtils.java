@@ -462,8 +462,7 @@ public class StringUtils
       }
     
     if (pattern.indexOf("{Is") >= 0)
-      {
-        // Change "\p{IsXxxx}" to "\P{InXxxx}".
+      { // Change "\p{IsXxxx}" to "\P{InXxxx}".
         StringBuffer sbuf = new StringBuffer();
         int plen = pattern.length();
         for (int j = 0; j < plen;  )
@@ -502,13 +501,7 @@ public class StringUtils
   public static boolean matches (Object arg, String pattern, String flags)
   {
     /* #ifdef use:java.util.regex */
-    String str;
-    if (arg instanceof String || arg instanceof UntypedAtomic)
-      str = arg.toString();
-    else if (arg == null || arg == Values.empty)
-      str = "";
-    else
-      throw new ClassCastException();
+    String str = coerceToString(arg, "matches", 1, "");
     return makePattern(pattern, flags).matcher(str).find();
     /* #else */
     // throw new Error("fn:matches requires java.util.regex (JDK 1.4 or equivalent)");
@@ -525,13 +518,7 @@ public class StringUtils
                                  String replacement, String flags)
   {
     /* #ifdef use:java.util.regex */
-    String str;
-    if (arg instanceof String || arg instanceof UntypedAtomic)
-      str = arg.toString();
-    else if (arg == null || arg == Values.empty)
-      str = "";
-    else
-      throw new ClassCastException();
+    String str = coerceToString(arg, "replace", 1, "");
     int rlen = replacement.length();
     for (int i = 0; i < rlen; )
       {
@@ -558,13 +545,7 @@ public class StringUtils
                                  String flags, CallContext ctx)
   {
     /* #ifdef use:java.util.regex */
-    String str;
-    if (arg instanceof String || arg instanceof UntypedAtomic)
-      str = arg.toString();
-    else if (arg == null || arg == Values.empty)
-      str = "";
-    else
-      throw new ClassCastException();
+    String str = coerceToString(arg, "tokenize", 1, "");
     Consumer out = ctx.consumer;
     Matcher matcher = makePattern(pattern, flags).matcher(str);
     int len = str.length();

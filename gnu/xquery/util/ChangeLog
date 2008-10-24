@@ -1,3 +1,11 @@
+2008-10-24  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (makePattern): Fix comment so it doesn't
+	break PreProcess.
+
+	* StringUtils.java (matches, replace, tokenize$X): Use coerceToString
+	for string argumemts.
+
 2008-09-05  Per Bothner  <per@bothner.com>
 
 	* ValuesFilter.java (compile): Remove special handling of SeriesTarget.

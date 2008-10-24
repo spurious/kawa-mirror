@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
+import gnu.kawa.util.IdentityHashTable;
 
 public class InlineCalls extends ExpWalker
 {
@@ -19,45 +20,16 @@ public class InlineCalls extends ExpWalker
   protected Expression walkApplyExp(ApplyExp exp)
   {
     Expression func = exp.func;
-
     // Replace (apply (lambda (param ...) body ...) arg ...)
     // by: (let ((param arg) ...) body ...).
     // Note this should be done *before* we walk the lambda, so we can
     // walk the body with params bound to the known args.
     if (func instanceof LambdaExp)
       {
-        Expression[] args = exp.args;
         LambdaExp lexp = (LambdaExp) func;
-        if (lexp.min_args == lexp.max_args
-            && lexp.min_args == args.length
-            // Since we re-use the Lambda in-place, we only want to do this
-            // for anonymous functions applied directly, as in:
-            // (apply (lambda (...) ...) ...)
-            // More general function inlining is desirable but more complex.
-            && lexp.nameDecl == null)
-          {
-            LetExp let = new LetExp(args);
-            Declaration prev = null;
-            int i = 0;
-            for (Declaration param = lexp.firstDecl(); param != null; i++)
-              {
-                Declaration next = param.nextDecl();
-                lexp.remove(prev, param);
-                let.add(prev, param);
-                Expression arg = args[i];
-                if ( ! param.getCanWrite())
-                  param.setValue(arg);
-                prev = param;
-                param = next;
-              }
-            for (Declaration param = let.firstDecl(); param != null; )
-              {
-                Declaration next = param.nextDecl();
-                param = next;
-              }
-            let.body = lexp.body;
-            return walk(let);
-          }
+        Expression inlined = inlineCall((LambdaExp) func, exp.args, false);
+        if (inlined != null)
+          return walk(inlined);
       }
     func = walk(func);
     exp.func = func;
@@ -208,5 +180,114 @@ public class InlineCalls extends ExpWalker
       }
     */
     return exp;
+  }
+
+  /** Attempt to inline a function call.
+   * @param lexp function to inline
+   * @param args list of actual arguments of function call
+   * @param makeCopy true if the body of lexp should of copied; false
+   *   if we can re-use lexp because it is no longer needed.
+   * @return the inlined expression (a LetExp), or null if we
+   *   weren't able to inline.
+   */
+  public static Expression inlineCall (LambdaExp lexp, Expression[] args,
+                                       boolean makeCopy)
+  {
+    if (lexp.keywords != null
+        // Since we re-use the Lambda in-place, we only want to do this
+        // for anonymous functions applied directly, as in:
+        // (apply (lambda (...) ...) ...)
+        || (lexp.nameDecl != null && ! makeCopy))
+      return null;
+    boolean varArgs = lexp.max_args < 0;
+    if ((lexp.min_args == lexp.max_args
+         && lexp.min_args == args.length)
+        || (varArgs && lexp.min_args == 0))
+      {
+        Declaration prev = null;
+        int i = 0;
+        IdentityHashTable mapper;
+        Expression[] cargs;
+        if (makeCopy)
+          {
+            mapper = new IdentityHashTable();
+            cargs = Expression.deepCopy(args, mapper);
+            if (cargs == null && args != null)
+              return null;
+          }
+        else
+          {
+            mapper = null;
+            cargs = args;
+          }
+        if (varArgs)
+          {
+            Expression[] xargs = new Expression[args.length+1];
+            xargs[0] = QuoteExp.getInstance(lexp.firstDecl().type);
+            System.arraycopy(args, 0, xargs, 1, args.length);
+            cargs = new Expression[] { new ApplyExp(Invoke.make, xargs) };
+          }
+        LetExp let = new LetExp(cargs);
+        for (Declaration param = lexp.firstDecl(); param != null; i++)
+          {
+            Declaration next = param.nextDecl();
+            if (makeCopy)
+              {
+                Declaration ldecl = let.addDeclaration(param.symbol, param.type);
+                if (param.typeExp != null)
+                  {
+                    ldecl.typeExp = Expression.deepCopy(param.typeExp);
+                    if (ldecl.typeExp == null)
+                      return null;
+                    
+                  }
+                mapper.put(param, ldecl);
+              }
+            else
+              {
+                lexp.remove(prev, param);
+                let.add(prev, param);
+              }
+            if (! varArgs)
+              {
+                if ( ! param.getCanWrite())
+                  param.setValue(cargs[i]);
+              }
+            prev = param;
+            param = next;
+          }
+        /*
+        for (Declaration param = let.firstDecl(); param != null; )
+          {
+            Declaration next = param.nextDecl();
+            param = next;
+          }
+        */
+        Expression body = lexp.body;
+        if (makeCopy)
+          {
+            body = Expression.deepCopy(body, mapper);
+            if (body == null && lexp.body != null)
+              return null;
+          }
+        let.body = body;
+        return let;
+      }
+    /*
+    if (lambda.min_args == 0 && lambda.max_args == -1)
+      {
+        Declaration pargs = lambda.firstDecl();
+        Expression[] cargs = Expression.deepCopy(args, mapper);
+        Declaration largs = new Declaration
+        IdentityHashTable mapper = new IdentityHashTable();
+        LetExp let = new LetExp();
+        return let;
+      }
+    if (lambda.min_args != lambda.max_args)
+      {
+        // FUTURE
+      }
+    */
+    return null;
   }
 }

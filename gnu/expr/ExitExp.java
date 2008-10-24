@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2006  Per M.A. Bothner.
+// Copyright (c) 1999, 2006, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -41,6 +41,18 @@ public class ExitExp extends Expression
     res.compileWithPosition(comp, block.subTarget);
     code.doPendingFinalizers(block.oldTryState);
     code.emitGoto(block.exitLabel);
+  }
+
+  protected Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
+  {
+    Expression res = deepCopy(result, mapper);
+    if (res == null && result != null)
+      return null;
+    Object b = mapper.get(block);
+    ExitExp copy
+      = new ExitExp((Expression) res, b == null ? block : (BlockExp) b);
+    copy.flags = getFlags();
+    return copy;
   }
 
   protected Expression walk (ExpWalker walker)

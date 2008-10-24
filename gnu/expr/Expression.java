@@ -5,6 +5,7 @@ import gnu.text.Printable;
 import gnu.text.SourceLocator;
 import gnu.lists.Consumer;
 import java.io.PrintWriter;
+import gnu.kawa.util.IdentityHashTable;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.
@@ -198,6 +199,51 @@ public abstract class Expression extends Procedure0
       }
   }
 
+  /** Make a deep copy of this expression, if possible.
+   * @param mapper used to lookup parts (expressions, declarations)
+   *   that have been translated in the parent.
+   *   Needed for copied Declarations and BlockExps.
+   * @return a copy, or null if we can't copy.
+   */
+  public static Expression deepCopy (Expression exp, IdentityHashTable mapper)
+  {
+    if (exp == null)
+      return null;
+    Object tr = mapper.get(exp);
+    if (tr != null) return (Expression) tr;
+    Expression copy = exp.deepCopy(mapper);
+    mapper.put(exp, copy);
+    return copy;
+  }
+
+  public static Expression[] deepCopy (Expression[] exps,
+                                       IdentityHashTable mapper)
+  {
+    if (exps == null)
+      return null;
+    int nargs = exps.length;
+    Expression[] a = new Expression[nargs];
+    for (int i = 0; i < nargs;  i++)
+      {
+        Expression ei = exps[i];
+        Expression ai = deepCopy(ei, mapper);
+        if (ai == null && ei != null)
+          return null;
+        a[i] = ai;
+      }
+    return a;
+  }
+
+  protected static Expression deepCopy (Expression exp)
+  {
+    return deepCopy(exp, new IdentityHashTable());
+  }
+
+  protected Expression deepCopy (IdentityHashTable mapper)
+  {
+    return null;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkExpression(this);
@@ -349,7 +395,7 @@ public abstract class Expression extends Procedure0
     flags |= flag;
   }
 
-  public int  getFlags()
+  public int getFlags()
   {
     return flags;
   }

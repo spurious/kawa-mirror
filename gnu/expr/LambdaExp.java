@@ -129,7 +129,8 @@ public class LambdaExp extends ScopeExp
   static final int DEFAULT_CAPTURES_ARG = 512;
   public static final int SEQUENCE_RESULT = 1024;
   public static final int OVERLOADABLE_FIELD = 2048;
-  protected static final int NEXT_AVAIL_FLAG = 4096;
+  public static final int ATTEMPT_INLINE = 4096;
+  protected static final int NEXT_AVAIL_FLAG = 8192;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -1476,6 +1477,8 @@ public class LambdaExp extends ScopeExp
     if ((flags & METHODS_COMPILED) != 0 || isAbstract())
       return;
     flags |= METHODS_COMPILED;
+    if (primMethods == null)
+      return;
     Method save_method = comp.method;
     LambdaExp save_lambda = comp.curLambda;
     comp.curLambda = this;
@@ -1689,7 +1692,15 @@ public class LambdaExp extends ScopeExp
   {
     Expression[] args = exp.getArgs();
     if (! argsInlined)
-      exp.args = walker.walkExps(exp.args, exp.args.length);
+      {
+        if ((flags & ATTEMPT_INLINE) != 0)
+          {
+            Expression inlined = InlineCalls.inlineCall(this, args, true);
+            if (inlined != null)
+              return walker.walk(inlined);
+          }
+        exp.args = walker.walkExps(exp.args, exp.args.length);
+      }
     int args_length = exp.args.length;
     String msg = WrongArguments.checkArgCount(getName(),
                                               min_args, max_args, args_length);

@@ -1,5 +1,19 @@
 2008-10-24  Per Bothner  <per@bothner.com>
 
+	Implement framework for inline-by-copying Expressions.
+	(It was intended for optimizing call/cc, but there may be a better
+	way of doing that, so we probably won't use it for now.)
+	* Expression.java (deepCopy): New method.
+	* ApplyExp.java (deepCopy): New method.
+	* ExitExp.java (deepCopy): New method.
+	* QuoteExp.java (deepCopy): New method.
+	* ReferenceExp.java (deepCopy): New method.
+	* LambdaExp.java (ATTEMPT_INLINE): New flag.
+	(inline): If ATTEMPT_INLINE is set, try to inline by deep-copying.
+	(compileAsMethod):  If we inlined, then primMethods may be null.
+	* InlineCalls.java (inlineCalls): New static method, based on inlining
+	logic from walkApplyExp, but generalized to use deepCopy when needed.
+
 	* BlockExp.java (setLabel): New method.
 	(print): Print space before label.
 

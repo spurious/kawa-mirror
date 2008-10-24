@@ -377,6 +377,17 @@ public class ApplyExp extends Expression
     target.compileFromStack(comp, Type.pointer_type);
   }
 
+  public Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
+  {
+    Expression f = deepCopy(func, mapper);
+    Expression[] a = deepCopy(args, mapper);
+    if ((f == null && func != null) || (a == null && args != null))
+      return null;
+    ApplyExp copy = new ApplyExp(f, a);
+    copy.flags = getFlags();
+    return copy;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkApplyExp(this);

@@ -154,6 +154,15 @@ public class ReferenceExp extends AccessExp
       binding.load(this, flags, comp, target);
   }
 
+  protected Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
+  {
+    Declaration d = (Declaration) mapper.get(binding, binding);
+    Object s = mapper.get(symbol, symbol);
+    ReferenceExp copy = new ReferenceExp(s, d);
+    copy.flags = getFlags();
+    return copy;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkReferenceExp(this);

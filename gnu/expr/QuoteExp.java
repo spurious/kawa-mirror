@@ -84,6 +84,11 @@ public class QuoteExp extends Expression
       }
   }
  
+  public Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)
+  {
+    return this;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkQuoteExp(this);

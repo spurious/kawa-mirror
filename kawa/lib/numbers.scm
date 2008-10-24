@@ -1,7 +1,6 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
-(require <kawa.lib.misc>)
 
 (define (number? x) :: <boolean> (instance? x <number>))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))
@@ -198,11 +197,11 @@
   (gnu.math.IntNum:shift value amount))
 
 (define (bitwise-arithmetic-shift-left (value :: <integer>) (amount :: <int>)) :: <integer>
-  (if (< amount 0) (error "shift amount must be non-negative"))
+  (if (< amount 0) (throw 'misc-error "shift amount must be non-negative"))
   (gnu.math.IntNum:shift value amount))
 
 (define (bitwise-arithmetic-shift-right (value :: <integer>) (amount :: <int>)) :: <integer>
-  (if (< amount 0) (error "shift amount must be non-negative"))
+  (if (< amount 0) (throw 'misc-error "shift amount must be non-negative"))
   (gnu.math.IntNum:shift value (- amount)))
 
 (define (bitwise-not (i :: <integer>)) :: <integer>

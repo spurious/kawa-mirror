@@ -1,5 +1,10 @@
 2008-10-24  Per Bothner  <per@bothner.com>
 
+	* numbers.scm: Don't require misc.scm, to avoid a cycle (ports
+	requires numbers requires misc requires numbers).
+	(bitwise-arithmetic-shift-left, bitwise-arithmetic-shift-right):
+	Inline call to error, to avoid a cycle.
+
 	* do.scm: Remove long-unused file.
 
 2008-07-17  Per Bothner  <per@bothner.com>

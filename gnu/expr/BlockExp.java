@@ -12,6 +12,7 @@ import gnu.mapping.*;
 
 public class BlockExp extends Expression
 {
+  /** Currently only used for identification. */
   Declaration label;
   Expression body;
 
@@ -27,6 +28,11 @@ public class BlockExp extends Expression
   {
     this.body = body;
     this.exitBody = exitBody;
+  }
+
+  public void setLabel (Declaration label)
+  {
+    this.label = label;
   }
 
   /* Target used to evaluate body. Temporary only used during compilation. */
@@ -104,7 +110,10 @@ public class BlockExp extends Expression
   {
     out.startLogicalBlock("(Block", ")", 2);
     if (label != null)
-     out.print(label.getName());
+      {
+        out.print(' ');
+        out.print(label.getName());
+      }
     out.writeSpaceLinear();
     body.print(out);
     if (exitBody != null)

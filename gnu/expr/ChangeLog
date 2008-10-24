@@ -1,3 +1,8 @@
+2008-10-24  Per Bothner  <per@bothner.com>
+
+	* BlockExp.java (setLabel): New method.
+	(print): Print space before label.
+
 2008-09-08  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor): Don't call declareThis here, since

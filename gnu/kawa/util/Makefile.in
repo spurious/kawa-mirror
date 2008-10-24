@@ -182,6 +182,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
 java_sources = \
   FixupHtmlToc.java \
   GeneralHashTable.java \
+  IdentityHashTable.java \
   HashNode.java \
   RangeTable.java
 

@@ -1,3 +1,11 @@
+2008-10-24  Per Bothner  <per@bothner.com>
+
+	* IdentityHashTable.java: New class, extends GeneralHashTable.
+	* Makefile.am: Update accordingly.
+
+	* GeneralHashTable.java (get(Object)): New method, for partial
+	compatibility with Map.
+
 2008-01-16  Per Bothner  <per@bothner.com>
 
 	* GeneralHashTable.java (remove): Fix thinko.

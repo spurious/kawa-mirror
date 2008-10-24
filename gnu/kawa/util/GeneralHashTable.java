@@ -69,6 +69,11 @@ public class GeneralHashTable
     return value1 == value2 || (value1 != null && value1.equals(value2));
   }
 
+  public Object get (Object key)
+  {
+    return get(key, null);
+  }
+
   public Object get (Object key, Object defaultValue)
   {
     int hash = hash(key);

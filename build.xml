@@ -376,12 +376,6 @@
     Kawa needs all the files listed for its scanning.
   -->
 
-  <!--
-    These files are in multiple filesets so that the first
-    set is listed before the second in the command 
-    line etc (otherwise they just go in directory order
-    and the compile fails).
-  -->
       <fileset id="lib-scm" dir="${src.dir}/kawa/lib"> 
         <include name="prim_syntax.scm"/>
         <include name="std_syntax.scm"/>

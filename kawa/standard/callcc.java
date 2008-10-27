@@ -1,6 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Implement the Scheme standard function "call-with-current-continuation".
@@ -8,7 +10,7 @@ import gnu.mapping.*;
  * @author Per Bothner
  */
 
-public class callcc extends MethodProc
+public class callcc extends MethodProc implements CanInline, Inlineable
 {
   public static final callcc callcc = new callcc();
 
@@ -32,19 +34,11 @@ public class callcc extends MethodProc
       {
 	proc.apply(ctx);
 	ctx.runUntilDone();
-      }
-    catch (CalledContinuation ex)
-      {
-	if (ex.continuation != cont)
-	  throw ex;
-	Object[] values = ex.values;
-	int nvalues = values.length;
-	for (int i = 0;  i < nvalues;  i++)
-	  ctx.consumer.writeObject(ex.values[i]);
-      }
-    finally
-      {
 	cont.invoked = true;
+      }
+    catch (Throwable ex)
+      {
+        Continuation.handleException$X(ex, cont, ctx);
       }
   }
 
@@ -57,6 +51,111 @@ public class callcc extends MethodProc
     stack.value = cont;
   }
   */
+
+  /** If we can inline, return LambdaExp for first arg; otherwise null. */
+  private LambdaExp canInline (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    Expression arg0;
+    if (args.length == 1 && (arg0 = args[0]) instanceof LambdaExp)
+      {
+        LambdaExp lexp = (LambdaExp) arg0;
+        if (lexp.min_args == 1 && lexp.max_args == 1
+            && ! lexp.firstDecl().getCanWrite())
+          {
+            return lexp;
+          }
+      }
+    return null;
+  }
+
+  public static final ClassType typeContinuation =
+    ClassType.make("kawa.lang.Continuation");
+
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
+  {
+    LambdaExp lexp = canInline(exp);
+    if (lexp != null)
+      {
+	lexp.setInlineOnly(true);
+	lexp.returnContinuation = exp;
+        Declaration contDecl = lexp.firstDecl();
+        if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
+          contDecl.setType(typeContinuation);
+      }
+    exp.walkArgs(walker, argsInlined);
+    return exp;
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    LambdaExp lambda = canInline(exp);
+    if (lambda == null)
+      {
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    CodeAttr code = comp.getCode();
+    Declaration param = lambda.firstDecl();
+    /* FUTURE:
+    if (param.isSimple() && ! param.getCanRead() && ! param.getCanWrite())
+      {
+        CompileTimeContinuation contProxy = new CompileTimeContinuation();
+        contProxy.oldTryState = code.getCurrentTry();
+        contProxy.exitLabel = new Label(code);
+        contProxy.blockTarget = target;
+        param.setValue(new QuoteExp(contProxy));
+        lambda.body.compile(comp, target);
+        contProxy.exitLabel.define(code);
+        return;
+      }
+    */
+    Scope sc = code.pushScope();
+    Variable contVar = sc.addVariable(code, typeContinuation, null);
+    Declaration contDecl = new Declaration(contVar);
+    code.emitNew(typeContinuation);
+    code.emitDup(typeContinuation);
+    comp.loadCallContext();
+    code.emitInvokeSpecial(typeContinuation.getDeclaredMethod("<init>", 1));
+    code.emitStore(contVar);
+    code.emitTryStart(false, target instanceof IgnoreTarget || target instanceof ConsumerTarget ? null : Type.objectType);
+    ApplyExp app = new ApplyExp(lambda, new Expression[] { new ReferenceExp(contDecl) });
+    app.compile(comp, target);
+    // Emit: cont.invoked = true
+    if (code.reachableHere())
+      {
+        code.emitLoad(contVar);
+        code.emitPushInt(1);
+        code.emitPutField(typeContinuation.getField("invoked"));
+      }
+    code.emitTryEnd();
+
+    // Emit: catch (Throwable ex) { handleException$(ex, cont, ctx); }
+    code.emitCatchStart(null);
+    code.emitLoad(contVar);
+    if (target instanceof ConsumerTarget)
+      {
+        comp.loadCallContext();
+        Method handleMethod = typeContinuation.getDeclaredMethod("handleException$X", 3);
+        code.emitInvokeStatic(handleMethod);
+      }
+    else
+      {
+        Method handleMethod = typeContinuation.getDeclaredMethod("handleException", 2);
+        code.emitInvokeStatic(handleMethod);
+        target.compileFromStack(comp, Type.objectType);
+      }
+    code.emitCatchEnd();
+
+    code.emitTryCatchEnd();
+    code.popScope();
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Type.pointer_type;
+  }
 }
 
 /*
@@ -74,3 +173,45 @@ class Continuation extends MethodProc
   }
 }
 */
+
+/** A hack to simplify inlining compilation calls. */
+
+class CompileTimeContinuation extends ProcedureN implements Inlineable
+{
+  Target blockTarget;
+  Label exitLabel; 
+  TryState oldTryState;
+
+  public Object applyN (Object[] args) throws Throwable
+  {
+    throw new Error("internal error");
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    CodeAttr code = comp.getCode();
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    if (blockTarget instanceof IgnoreTarget
+        || blockTarget instanceof ConsumerTarget
+        || (nargs == 1 && args[0].isSingleValue()))
+      {
+        for (int i = 0;  i < nargs;  i++)
+          args[i].compileWithPosition(comp, blockTarget);
+      }
+    else
+      {
+        new ApplyExp(Compilation.typeValues
+                     .getDeclaredMethod("make",
+                                        Compilation.applyNargs),
+                     args).compileWithPosition(comp, blockTarget);
+      }
+    code.doPendingFinalizers(oldTryState);
+    code.emitGoto(exitLabel);
+  }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return Type.neverReturnsType;
+  }
+}

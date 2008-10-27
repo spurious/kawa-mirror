@@ -1,5 +1,16 @@
 2008-10-26  Per Bothner  <per@bothner.com>
 
+	Inline call/cc (more coming).
+	* lang/CalledContinuation.java (ctx): Extra field.
+	(<init>): Pass and set ctx field.
+	* lang/Continuation.java (apply): Update accordingly.
+	(handleException, handleException$X): New methods, with logic taken
+	from callcc.apply.
+	* standard/callcc.java: Implement CanInline and Inlineable.
+	(apply): Use Continuation.handleException$X.
+	(canInline, inline, compile, getReturnType): New methods.
+	(class CompileTimeContinuation): New class - currently unused.
+
 	* lang/Translator.java (rewrite): Note that a variable reference
 	IS_SINGLE_VALUE.
 

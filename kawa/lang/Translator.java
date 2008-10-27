@@ -775,8 +775,13 @@ public class Translator extends Compilation
               }
             */
           }
-	if (decl != null && decl.getContext() instanceof PatternScope)
-	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
+	if (decl != null)
+          {
+            // In Scheme/Lisp a variable cannot donate multiple values.
+            decl.setFlag(Declaration.IS_SINGLE_VALUE);
+            if (decl.getContext() instanceof PatternScope)
+              return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
+          }
 
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
         rexp.setContextDecl(cdecl);

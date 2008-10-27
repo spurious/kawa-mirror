@@ -1,3 +1,8 @@
+2008-10-26  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Note that a variable reference
+	IS_SINGLE_VALUE.
+
 2008-09-08  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (finishModule): Don't call declareThis here,

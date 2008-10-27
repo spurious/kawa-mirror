@@ -1,3 +1,8 @@
+2008-10-26  Per Bothner  <per@bothner.com>
+
+	* Expression.java (isSingleValue): New method.
+	* ReferenceExp.java (isSingleValue): New method.
+
 2008-10-24  Per Bothner  <per@bothner.com>
 
 	Implement framework for inline-by-copying Expressions.

@@ -6,6 +6,7 @@ import gnu.text.SourceLocator;
 import gnu.lists.Consumer;
 import java.io.PrintWriter;
 import gnu.kawa.util.IdentityHashTable;
+import gnu.kawa.reflect.OccurrenceType;
 
 /**
  * Abstract class for syntactic forms that evaluate to a value.
@@ -373,6 +374,11 @@ public abstract class Expression extends Procedure0
   public Type getType()
   {
     return Type.pointer_type;
+  }
+
+  public boolean isSingleValue()
+  {
+    return OccurrenceType.itemCountIsOne(getType());
   }
 
   /** Return value if it is constant, or null if non-constant or unknown. */

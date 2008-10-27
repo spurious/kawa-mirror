@@ -236,6 +236,13 @@ public class ReferenceExp extends AccessExp
     return type;
   }
 
+  public boolean isSingleValue()
+  {
+    if (binding != null && binding.getFlag(Declaration.IS_SINGLE_VALUE))
+      return true;
+    return super.isSingleValue();
+  }
+
   public boolean side_effects ()
   {
     return binding == null || ! binding.isLexical();

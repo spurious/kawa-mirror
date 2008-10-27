@@ -83,8 +83,8 @@ public class MetaHelloWorld {
 		code.pushScope();
 		code.emitLoad(code.getArg(0));
 		code.emitLoad(code.getArg(1));
-		code.emitAdd(Type.int_type);
-		Variable resultVar = code.addLocal(Type.int_type, &quot;result&quot;);
+		code.emitAdd(Type.intType);
+		Variable resultVar = code.addLocal(Type.intType, &quot;result&quot;);
 		code.emitDup();
 		code.emitStore(resultVar);
 		code.emitReturn();

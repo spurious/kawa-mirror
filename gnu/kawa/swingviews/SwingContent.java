@@ -111,7 +111,9 @@ class GapPosition extends SeqPosition
 {
   public GapPosition(CharBuffer content, int offset)
   {
-    super(content, offset, false);
+    // Swing Position objects have the 'isAfter' property,
+    // except for the case when the offset is 0.
+    super(content, offset, offset!=0);
   }
 
   public int getOffset() { return nextIndex(); }

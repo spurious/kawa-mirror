@@ -1,3 +1,10 @@
+2008-10-29  Per Bothner  <per@bothner.com>
+
+	* SwingContent.java (GapPosition.<init>): Swing Position objects have
+	the 'isAfter' property, except for the case when the offset is 0.
+	This basically reverts the change from 2005-12-22 (revision 4996).
+	I'm confused - I have no idea why I made that change ...
+
 2006-01-11  Per Bothner  <per@bothner.com>
 
 	* SwingDisplay.java: New class, extends gnu.models.Display.

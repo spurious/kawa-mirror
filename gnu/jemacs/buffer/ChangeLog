@@ -1,3 +1,7 @@
+2008-10-29  Per Bothner  <per@bothner.com>
+
+	* Marker.java (insertChar): Return immediately on zero count.
+
 2008-05-26  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (readOnly): New field.

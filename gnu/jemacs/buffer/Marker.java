@@ -123,7 +123,7 @@ public final class Marker extends SeqPosition
   /** Insert count copies of ch at the current position. */
   public void insertChar (int ch, int count, Object style)
   {
-    if (count < 0)
+    if (count <= 0)
       return;
     int n = count > 500 ? 500 : count;
     char[] cbuf;

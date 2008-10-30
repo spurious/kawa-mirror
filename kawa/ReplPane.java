@@ -85,13 +85,12 @@ public class ReplPane extends JTextPane
 	  int lineAfter = b.indexOf('\n', document.outputMark);
 	  if (lineAfter < 0 || lineAfter == len) {
             document.insertString(len, "\n", null);
-            str = b.substring(document.outputMark, len)+'\n';
             lineAfter = len;
 	  }
 	  else {
 	    document.endMark = len;
-            str = b.substring(document.outputMark, lineAfter+1);
           }
+          str = b.substring(document.outputMark, lineAfter+1);
 	  document.outputMark = lineAfter+1;
           setCaretPosition(document.outputMark);
 	}

@@ -1,3 +1,7 @@
+2008-10-29  Per Bothner  <per@bothner.com>
+
+	* ReplPane.java (enter): Minor simplification *and* optimization.
+
 2008-10-26  Per Bothner  <per@bothner.com>
 
 	Inline call/cc (more coming).

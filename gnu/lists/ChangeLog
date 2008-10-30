@@ -1,3 +1,7 @@
+2008-10-29  Per Bothner  <per@bothner.com>
+
+	* SeqPosition.java (toString): Also write nextIndex().
+
 2008-06-08  Per Bothner  <per@bothner.com>
 
 	* ImmutablePair.java: New class, extends Pair.

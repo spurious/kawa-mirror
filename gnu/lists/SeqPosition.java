@@ -338,9 +338,7 @@ implements
     if (sequence == null)
       return toInfo();
     Object item = sequence.getPosNext(ipos);
-    if (item == null)
-      return toInfo();
-    return item.toString();
+    return "@"+nextIndex()+": "+(item==null ? "(null)" : item.toString());
   }
 
   public String toInfo()

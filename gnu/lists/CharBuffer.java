@@ -58,7 +58,7 @@ public class CharBuffer extends StableVector
     int limit = gapStart;
     if (i >= limit)
       {
-        i = gapEnd;
+        i += gapEnd-gapStart;
         limit = arr.length;
       }
     for ( ; ; i++)

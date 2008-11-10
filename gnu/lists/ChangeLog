@@ -1,3 +1,7 @@
+2008-11-10  Per Bothner  <per@bothner.com>
+
+	* CharBuffer.java (indexOf): Fix thinko.
+
 2008-10-29  Per Bothner  <per@bothner.com>
 
 	* SeqPosition.java (toString): Also write nextIndex().

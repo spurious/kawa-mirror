@@ -48,7 +48,7 @@ public class ReplDocument extends DefaultStyledDocument
 
   /** End of pending input.
    * If {@code endMark > 0} then the area between outputMark and endMark
-   * is pending input that hasn't been sent to the process yey. */
+   * is pending input that hasn't been sent to the process yet. */
   public int endMark = -1;
 
   int length = 0;
@@ -90,11 +90,9 @@ public class ReplDocument extends DefaultStyledDocument
         int lineBefore = (outputMark <= 0 ? 0
                           : (str.lastIndexOf('\n', outputMark-1)) + 1);
         remove(0, lineBefore);
-        outputMark -= lineBefore;
+        // Changelistener updates outputMark and endMark.
         if (pane != null)
           pane.setCaretPosition(outputMark);
-        if (endMark > 0)
-          endMark -= lineBefore;
       }
     catch (BadLocationException ex)
       {

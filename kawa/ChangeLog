@@ -1,3 +1,8 @@
+2008-11-10  Per Bothner  <per@bothner.com>
+
+	* ReplDocument.java (deleteOldText): Don't redundantly adjust
+	outputMark and endMark.  This fixes an IllegalArgumentException.
+
 2008-10-29  Per Bothner  <per@bothner.com>
 
 	* ReplPane.java (enter): Minor simplification *and* optimization.

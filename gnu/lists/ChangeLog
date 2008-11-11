@@ -1,5 +1,10 @@
 2008-11-10  Per Bothner  <per@bothner.com>
 
+	* SimpleVector.java (resizeShift): New internal method.
+	* GapVector.java (gapReserve(int,int)): Optimize so we don't
+	copy twice when doing gapReserve(int) followed by shiftGap.
+	* StableVector.java: Similar optimization.
+
 	* CharBuffer.java (indexOf): Fix thinko.
 
 2008-10-29  Per Bothner  <per@bothner.com>

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2008  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -89,30 +89,52 @@ public class GapVector extends AbstractSequence implements Sequence
   }
 
   /** Make sure gap is at least 'size' elements long. */
-  protected void gapReserve(int size)
+  protected final void gapReserve(int size)
   {
-    if (size > gapEnd - gapStart)
-      {
-	int oldLength = base.size;
-        int newLength = oldLength < 16 ? 16 : 2 * oldLength;
-	int minLength = oldLength - (gapEnd - gapStart) + size;
-	if (newLength < minLength)
-	  newLength = minLength;
-	// FIXME  this does unneeded copying.
-	// It may also leave unwanted junk in the gap (gap for gc).
-	base.setSize(newLength);
-	int newGapEnd = newLength - oldLength + gapEnd;
-	base.shift(gapEnd, newGapEnd, oldLength - gapEnd);
-	gapEnd = newGapEnd;
-      }
+    gapReserve(gapStart, size);
   }
 
-  /** Adjust gap to 'where', and make sure it is least `size' elements long. */
-  protected void gapReserve(int where, int size)
+  /** Adjust gap to 'where', and make sure it is least `needed'
+   * elements long. */
+  protected void gapReserve(int where, int needed)
   {
-    gapReserve(size);
-    if (where != gapStart)
+    /* DEBUG
+    int sz = size();
+    Object[] values = new Object[sz];
+    for (int i = 0;  i < sz;  i++)
+      values[i] = get(i);
+    */
+
+    if (needed > gapEnd - gapStart)
+      {
+        // Need to resize.
+	int oldLength = base.size;
+        int newLength = oldLength < 16 ? 16 : 2 * oldLength;
+        int size = oldLength - (gapEnd - gapStart);
+	int minLength = size + needed;
+	if (newLength < minLength)
+	  newLength = minLength;
+        int newGapEnd = newLength - size + where;
+        base.resizeShift(gapStart, gapEnd, where, newGapEnd);
+        gapStart = where;
+        gapEnd = newGapEnd;
+      }
+    else if (where != gapStart)
       shiftGap(where);
+
+    /* DEBUG
+    sz = size();
+    if (sz != values.length)
+      throw new Error("gapReserve error");
+    for (int i = 0;  i < sz;  i++) {
+      Object val = get(i);
+      if (values[i] == val)
+        continue;
+      if (val == null || values[i] == null
+          || ! (val.equals(values[i])))
+        throw new Error("gapReserve error");
+    }
+    */
   }
 
   /** If needed, move the gap so the given segment is contiguous.

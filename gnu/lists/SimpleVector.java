@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2008  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -50,6 +50,37 @@ public abstract class SimpleVector extends AbstractSequence
 	  }
       }
   }
+
+  /** Used by GapVector to grow and maybe move gap. */
+  protected void resizeShift(int oldGapStart, int oldGapEnd,
+                             int newGapStart, int newGapEnd)
+  {
+    int oldGapSize = oldGapEnd - oldGapStart;
+    int newGapSize = newGapEnd - newGapStart;
+    int oldLength = getBufferLength();
+    int newLength = oldLength - oldGapSize + newGapSize;
+    if (newLength > oldLength)
+      {
+        setBufferLength(newLength);
+        size = newLength;
+      }
+    int gapDelta = oldGapStart - newGapStart;
+    if (gapDelta >= 0)
+      {
+        int endLength = oldLength - oldGapEnd;
+        shift(oldGapEnd, newLength - endLength, endLength);
+        if (gapDelta > 0)
+          shift(newGapStart, newGapEnd, gapDelta);
+      }
+    else
+      {
+        int endLength = newLength - newGapEnd;
+        shift(oldLength-endLength, newGapEnd, endLength);
+        shift(oldGapEnd, oldGapStart, newGapStart-oldGapStart);
+      }
+    clearBuffer(newGapStart, newGapSize);
+  }
+  
 
   /** Get the allocated length of the data buffer. */
   public abstract int getBufferLength();

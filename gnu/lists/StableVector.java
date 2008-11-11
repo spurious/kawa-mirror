@@ -220,6 +220,33 @@ public class StableVector extends GapVector
     adjustPositions(low, high, adjust);
   }
 
+  /** Adjust gap to 'where', and make sure it is least `needed'
+   * elements long. */
+  protected void gapReserve(int where, int needed)
+  {
+    int oldGapEnd = gapEnd;
+    int oldGapStart = gapStart;
+    if (needed > oldGapEnd - oldGapStart)
+      {
+        int oldLength = base.size;
+        super.gapReserve(where, needed);
+        int newLength = base.size;
+        if (where == oldGapStart) // Optimization.
+          adjustPositions(oldGapEnd << 1, (newLength << 1) | 1,
+                          (newLength - oldLength) << 1);
+        else
+          {
+            // We do adjustPositions twice which is wasteful but simple.
+            // Adjust positions as if there were no gap.
+            adjustPositions(oldGapEnd << 1, (oldLength << 1) | 1, (oldGapStart - oldGapEnd) << 1);
+            // Adjust positions for new gap.
+            adjustPositions(gapStart << 1, (newLength << 1) | 1, (gapEnd - gapStart) << 1);
+          }
+      }
+    else if (where != gapStart)
+      shiftGap(where);
+  }
+
   /** Add a delta to all positions elements that point into a given range.
    * Assume x==positions[i], then if (unsigned)x>=(unsigned)low
    * && (unsigned)x <= (unsigned)high, then add delta to positions[i].
@@ -227,6 +254,11 @@ public class StableVector extends GapVector
    * which include both the index and the isAfter low-order bit.   */
   protected void adjustPositions(int low, int high, int delta)
   {
+    // Swing has positions in an array ordered by offset.
+    // That means it can use binary search to find only those
+    // positions that need to adjust, rather than check all the positions
+    // (including the 'free' ones).  FIXME.
+
     if (free >= 0)
       unchainFreelist();
 
@@ -246,16 +278,6 @@ public class StableVector extends GapVector
 	      positions[i] = pos + delta;
 	  }
       }
-  }
-
-  protected void gapReserve(int size)
-  {
-    int oldGapEnd = gapEnd;
-    int oldLength = base.getBufferLength();
-    super.gapReserve(size);
-    int newLength = base.getBufferLength();
-    adjustPositions(oldGapEnd << 1, (newLength << 1) | 1,
-		    (newLength - oldLength) << 1);
   }
 
   protected int addPos(int ipos, Object value)

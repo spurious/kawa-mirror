@@ -147,14 +147,12 @@ public class Shell
       }
   }
 
-  public static boolean dontPrompt;
-
   public static boolean run (Language language, Environment env)
   {
     InPort inp = InPort.inDefault ();
     SourceMessages messages = new SourceMessages();
     OutPort perr;
-    if (! dontPrompt && inp instanceof TtyInPort)
+    if (inp instanceof TtyInPort) // Interactive?
       {
 	Procedure prompter = language.getPrompter();
 	if (prompter != null)
@@ -162,7 +160,7 @@ public class Shell
         perr = OutPort.errDefault();
       }
     else
-      perr = null;
+      perr = null; // Non-interactive.
 
     Throwable ex = run(language, env, inp, OutPort.outDefault(),
                        perr, messages);

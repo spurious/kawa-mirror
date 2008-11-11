@@ -1,3 +1,7 @@
+2008-11-10  Per Bothner  <per@bothner.com>
+
+	* kawa.c (main): Change "--no-prompt" option to "--no-console".
+
 2007-09-02  Per Bothner  <per@bothner.com>
 
 	* kawa.c (main): Skip readline-handling if stdout (or stdin)

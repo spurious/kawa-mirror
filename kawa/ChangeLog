@@ -1,5 +1,12 @@
 2008-11-10  Per Bothner  <per@bothner.com>
 
+	* repl.java: If we have no Console, and no "active" arguments
+	were specified, default to a repl in a GuiConsole, just as we normally
+	default to a tty-based repl.  We check using either the --no-console
+	flag (passed in by kawa.c) or the Java 6 System.console method.
+	* Shell.java (dontPrompt): Remove static.
+	(run): Don't use dontPrompt to determine interactivity.
+
 	* ReplDocument.java (deleteOldText): Don't redundantly adjust
 	outputMark and endMark.  This fixes an IllegalArgumentException.
 

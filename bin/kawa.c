@@ -527,7 +527,7 @@ main(int argc, char** argv)
 
   if (! isatty(0) || ! isatty(1))
     {
-      out_argv[out_argc++] = "--no-prompt";
+      out_argv[out_argc++] = "--no-console";
       for (i = 1;  i < argc;  i++)
 	out_argv[out_argc++] = argv[i];
       out_argv[out_argc] = NULL;

@@ -401,17 +401,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    // Do this instead of just new GuiConsole in case we have
-	    // configured --without-awt.
-	    try
-	      {
-		Class.forName("kawa.GuiConsole").newInstance();
-	      }
-	    catch (Exception ex)
-	      {
-		System.err.println("failed to create Kawa window: "+ex);
-		System.exit (-1);
-	      }
+            startGuiConsole();
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))
@@ -579,8 +569,8 @@ public class repl extends Procedure0or1
 	  {
 	    gnu.expr.Compilation.inlineOk = false;
 	  }
-        else if (arg.equals("--no-prompt"))
-          kawa.Shell.dontPrompt = true;
+        else if (arg.equals("--no-console"))
+          noConsole = true;
 	else if (arg.equals("--inline"))
 	  {
 	    gnu.expr.Compilation.inlineOk = true;
@@ -867,11 +857,16 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    ok = Shell.run(Language.getDefaultLanguage(),
-                           Environment.getCurrent());
-	  }
-        if (! ok)
-          System.exit(-1);
+            if (shouldUseGuiConsole())
+              startGuiConsole();
+            else
+              {
+                ok = Shell.run(Language.getDefaultLanguage(),
+                               Environment.getCurrent());
+                if (! ok)
+                  System.exit(-1);
+              }
+          }
       }
     finally
       {
@@ -882,5 +877,39 @@ public class repl extends Procedure0or1
 	  }
 	exitDecrement();
       }
-   }
+  }
+
+  public static boolean noConsole;
+
+  public static boolean shouldUseGuiConsole ()
+  {
+    if (noConsole)
+      return true;
+    try
+      {
+        if ((Class.forName("java.lang.System")
+             .getMethod("console", new Class[0])
+             .invoke(new Object[0])) == null)
+          return true;
+      }
+    catch (Throwable ex)
+      {
+      }
+    return false;
+  }
+
+  private static void startGuiConsole ()
+  {
+    // Do this instead of just new GuiConsole in case we have
+    // configured --without-awt.
+    try
+      {
+        Class.forName("kawa.GuiConsole").newInstance();
+      }
+    catch (Exception ex)
+      {
+        System.err.println("failed to create Kawa window: "+ex);
+        System.exit (-1);
+      }
+  }
 }

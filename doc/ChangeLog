@@ -1,3 +1,8 @@
+2008-11-10  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Field operations): Remove <angles> around type names
+	in define-alias example.
+
 2008-07-17  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Logical Number Operations): Document all the

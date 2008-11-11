@@ -5918,8 +5918,8 @@ Here are 5 equivalent ways:
 (Int32:.MAX_VALUE)
 (define-namespace Integer "class:java.lang.Integer")
 (Integer:.MAX_VALUE)
-(define-alias <j.l.Integer> <java.lang.Integer>)
-(<j.l.Integer>:.MAX_VALUE)
+(define-alias j.l.Integer java.lang.Integer)
+(j.l.Integer:.MAX_VALUE)
 @end example
 You can set a static field using this syntax:
 @example

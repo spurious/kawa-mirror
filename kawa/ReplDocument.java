@@ -35,9 +35,9 @@ public class ReplDocument extends DefaultStyledDocument
 
   SwingContent content;
 
-  gnu.text.QueueReader in_r;
-  GuiInPort in_p;
-  ReplPaneOutPort out_stream, err_stream;
+  final gnu.text.QueueReader in_r;
+  final GuiInPort in_p;
+  final ReplPaneOutPort out_stream, err_stream;
 
   Language language;
   Environment environment;
@@ -65,7 +65,11 @@ public class ReplDocument extends DefaultStyledDocument
     addDocumentListener(this);
 
     this.language = language;
-    in_r = new gnu.text.QueueReader();
+
+    in_r = new gnu.text.QueueReader() {
+        public void checkAvailable() {
+          checkingPendingInput(); };
+    };
     out_stream = new ReplPaneOutPort(this, "/dev/stdout", defaultStyle);
     err_stream = new ReplPaneOutPort(this, "/dev/stderr", redStyle);
     in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
@@ -120,16 +124,56 @@ public class ReplDocument extends DefaultStyledDocument
       }
   }
 
-  public synchronized void write (String str, AttributeSet style) {
-    boolean moveCaret
-      = pane != null && pane.getCaretPosition() == outputMark;
-    insertString(outputMark, str, style);
-    int len = str.length();
-    outputMark += len;
-    if (moveCaret)
-      pane.setCaretPosition(outputMark);
-    if (endMark >= 0)
-      endMark += len;
+  /** Insert output from the client at the outputMark.
+   * Done indirectly, using SwingUtilities.invokeLater, so it can and should
+   * should be called by user threads, not the event thread.
+   */
+  public void write (final String str, final AttributeSet style)
+  {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      {
+        boolean moveCaret
+          = pane != null && pane.getCaretPosition() == outputMark;
+        insertString(outputMark, str, style);
+        int len = str.length();
+        outputMark += len;
+        if (moveCaret)
+         pane.setCaretPosition(outputMark);
+      }
+    });
+  }
+  
+  /** Check if there is any pending input.
+   * Can and should be called by user threads, not the event thread.
+   * The tricky aspect is supporting type-ahead and other multi-line input,
+   * since we want prompts and other output to be properly interleaved.
+   */
+  public void checkingPendingInput ()
+  {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      {
+        // For now, we don't support moving the outputMark using escape
+        // sequences, so inputStart is always just outputMark.
+        int inputStart = outputMark;
+        if (inputStart <= endMark)
+          {
+	    gnu.lists.CharBuffer b = content.buffer;
+            int lineAfter = b.indexOf('\n', inputStart);
+            if (lineAfter == endMark)
+              endMark = -1;
+            if (inputStart == outputMark) // Currently, always true.
+               outputMark = lineAfter+1;
+            if (in_r != null) {
+              synchronized (in_r) {
+                in_r.append(b.substring(inputStart, lineAfter+1));
+                in_r.notifyAll();
+              }
+	}
+        }
+      }
+    });
   }
 
   public void focusGained(FocusEvent e)

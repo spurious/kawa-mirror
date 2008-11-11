@@ -1,3 +1,7 @@
+2008-11-11  Per Bothner  <per@bothner.com>
+
+	* QueueReader.java (checkAvailable): New callback "hook".
+
 2008-08-13  Per Bothner  <per@bothner.com>
 
 	* LineInputStreamReader.java (fill, fillBytes): Handle underflow

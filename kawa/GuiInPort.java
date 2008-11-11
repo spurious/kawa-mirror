@@ -17,21 +17,6 @@ class GuiInPort extends TtyInPort
     this.document = document;
   }
 
-  /** Overrides lineStart.
-    * Needed to handle when a multi-line selection is pasted in.
-    * We want the output (and prompt) to be "interpolated" in the right
-    * places, so we fake an <Enter> when we're ready to read the
-    * next line.  This sends the next line to the reader.
-    */
-  public void lineStart (boolean revisited) throws java.io.IOException
-  {
-    super.lineStart(revisited);
-    if (! revisited && document.outputMark < document.endMark)
-      {
-	((ReplPane) document.pane).enter(); // FIXME
-      }
-  }
-
   public void emitPrompt (String prompt) throws java.io.IOException
   {
     document.write(prompt, ReplDocument.promptStyle);

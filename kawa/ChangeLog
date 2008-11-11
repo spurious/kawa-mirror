@@ -1,3 +1,14 @@
+2008-11-11  Per Bothner  <per@bothner.com>
+
+	More rebust support for multi-line input and type-ahead in GuiConsole.
+	* ReplDocument.java (write): Protect using SwingUtilities.invokeLater.
+	(checkingPendingInput) New method, to actually send pending input
+	to inferior reader.
+	(<init>): Have our QueueReader invoke checkingPendingInput.
+	* ReplPane.java (enter): Don't send entered text (if at end)
+	to inferior, instead let checkingPendingInput do it.
+	* GuiInPort.java (lineStart): Remove method.
+
 2008-11-10  Per Bothner  <per@bothner.com>
 
 	* repl.java: If we have no Console, and no "active" arguments

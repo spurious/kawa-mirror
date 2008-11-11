@@ -135,12 +135,20 @@ public class QueueReader extends Reader
     return pos < limit || EOFseen;
   }
 
+  /** Hook to check for and/or request more input.
+   * Used by GuiInPort.
+   */
+  public void checkAvailable ()
+  {
+  }
+
   public synchronized int read ()
   {
     while (pos >= limit)
       {
 	if (EOFseen)
 	  return -1;
+        checkAvailable();
 	try
 	  {
 	    wait();
@@ -161,7 +169,8 @@ public class QueueReader extends Reader
       {
 	if (EOFseen)
 	  return -1;
-	try
+        checkAvailable();
+        try
 	  {
 	    wait();
 	  }

@@ -52,7 +52,7 @@ public class ReplPane extends JTextPane
   void enter () // FIXME - move to document
   {
     // In the future we might handle curses-like applicatons, which
-    // outputMark may be moved backwatfs.  In that case the normal
+    // outputMark may be moved backwards.  In that case the normal
     // case is that caret position >= outputMark and all the intervening
     // text has style inputStyle, in which case we do:
     // Find the first character following outputMark that is either
@@ -74,44 +74,55 @@ public class ReplPane extends JTextPane
     // Otherwise, we do similar to Emacs shell mode:
     // Select the line containing the caret, stripping of any
     // characters that have prompt style, and add a newline.
-    // Send that to the inferior, and also copy it before outputMark.
+    // That should be sent to the inferior, and copied it before outputMark.
 
-	int pos = getCaretPosition();
-        CharBuffer b = document.content.buffer;
-	String str;
-	int len = b.length() - 1; // Ignore final newline.
-	document.endMark = -1;
-	if (pos >= document.outputMark) {
-	  int lineAfter = b.indexOf('\n', document.outputMark);
-	  if (lineAfter < 0 || lineAfter == len) {
-            document.insertString(len, "\n", null);
-            lineAfter = len;
-	  }
-	  else {
-	    document.endMark = len;
+    int pos = getCaretPosition();
+    CharBuffer b = document.content.buffer;
+    int len = b.length() - 1; // Ignore final newline.
+    document.endMark = -1;
+    if (pos >= document.outputMark)
+      {
+        int lineAfterCaret = b.indexOf('\n', pos);
+        if (lineAfterCaret == len)
+          {
+            if (len > document.outputMark && b.charAt(len-1) == '\n')
+              lineAfterCaret--;
+            else
+              document.insertString(len, "\n", null);
           }
-          str = b.substring(document.outputMark, lineAfter+1);
-	  document.outputMark = lineAfter+1;
-          setCaretPosition(document.outputMark);
-	}
-	else {
-          int lineBefore = pos == 0 ? 0 : 1 + b.lastIndexOf('\n', pos-1);
-          Element el = document.getCharacterElement(lineBefore);
-          int lineAfter = b.indexOf('\n', pos);
-          // Strip initial prompt:
-          if (el.getAttributes().isEqual(ReplDocument.promptStyle))
-            lineBefore = el.getEndOffset();
-          if (lineAfter < 0)
-            str = b.substring(lineBefore, len)+'\n';
-          else
-            str = b.substring(lineBefore, lineAfter+1);
-          setCaretPosition(document.outputMark);
-          document.write(str, ReplDocument.inputStyle);
-	}
+        document.endMark = lineAfterCaret;
+        // Note we don't actually send the input line to the inferior
+        // directly.  That happens in ReplDocument.checkingPendingInput,
+        // which is invoked by the inferior thread when it is woken up here.
+        // We do it this way to handle interleaving prompts and other output
+        // with multi-line input, including type-ahead.
+        synchronized (document.in_r)
+          {
+            document.in_r.notifyAll();
+          }
+        if (pos <= lineAfterCaret)
+          setCaretPosition(lineAfterCaret+1);
+      }
+    else
+      {
+        int lineBefore = pos == 0 ? 0 : 1 + b.lastIndexOf('\n', pos-1);
+        Element el = document.getCharacterElement(lineBefore);
+        int lineAfter = b.indexOf('\n', pos);
+        // Strip initial prompt:
+        if (el.getAttributes().isEqual(ReplDocument.promptStyle))
+          lineBefore = el.getEndOffset();
+        String str;
+        if (lineAfter < 0)
+          str = b.substring(lineBefore, len)+'\n';
+        else
+          str = b.substring(lineBefore, lineAfter+1);
+        setCaretPosition(document.outputMark);
+        document.write(str, ReplDocument.inputStyle);
 
 	if (document.in_r != null) {
 	  document.in_r.append(str);
 	}
+      }
   }
 
   public MutableAttributeSet getInputAttributes()

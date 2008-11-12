@@ -8,6 +8,7 @@ package gnu.bytecode;
 public class StackMapTableAttr extends Attribute
 {
   byte[] data;
+  int dataLength;
   int numEntries;
 
   /** Add a new StackMapTableAttr to a CodeAttr. */
@@ -17,11 +18,14 @@ public class StackMapTableAttr extends Attribute
     addToFrontOf(code);
     this.numEntries = numEntries;
     this.data = data;
+    this.dataLength = data.length;
   }
+
+  public Method getMethod() { return ((CodeAttr) container).getMethod(); }
 
   /** Return the length of the attribute in bytes.
     * Does not include the 6-byte header (for the name_index and the length).*/
-  public int getLength() { return 2 + data.length; }
+  public int getLength() { return 2 + dataLength; }
 
   /** Write out the contents of the Attribute.
     * Does not write the 6-byte attribute header. */
@@ -29,7 +33,7 @@ public class StackMapTableAttr extends Attribute
     throws java.io.IOException
   {
     dstr.writeShort(numEntries);
-    dstr.write(data, 0, data.length);
+    dstr.write(data, 0, dataLength);
   }
 
   private int u1(int offset)
@@ -42,14 +46,10 @@ public class StackMapTableAttr extends Attribute
     return ((data[offset]  & 0xFF) << 8) + (data[offset+1] & 0xFF);
   }
 
-  /** Extract a single verification_type_info.
-   * @param startOffset starting index in data
-   * @return offset in data after consuming one verification type
-   */
-  int print_verification_type (int startOffset, ClassTypeWriter dst)
+  void printVerificationType (int encoding, ClassTypeWriter dst)
   {
-    int consumed = 1;
-    switch (data[startOffset])
+    int tag = encoding & 0xff;
+    switch (tag)
       {
       case 0: // ITEM_Top
         dst.print("top/unavailable");
@@ -73,35 +73,100 @@ public class StackMapTableAttr extends Attribute
         dst.print("uninitialized this");
         break;
       case 7:  // ITEM_Object
-        int index = u2(startOffset+1);
+        int index = encoding >> 8;
         dst.printOptionalIndex(index);
         dst.printConstantTersely(index, ConstantPool.CLASS);
-        consumed += 2;
         break;
       case 8:  // ITEM_uninitialized
-        int offset = u2(startOffset+1);
-        consumed += 2;
+        int offset = encoding >> 8;
         dst.print("uninitialized object created at ");
         dst.print(offset);
         break;
       default:
-        throw new Error("bad verification type tag");
+        dst.print("<bad verification type tag "+tag+'>');
       }
-    return startOffset + consumed;
-
   }
 
-  int print_verification_types (int startOffset, int count, ClassTypeWriter dst)
+  /** Extract a single verification_type_info.
+   * @param startOffset starting index in data
+   * @return encoded verification type
+   */
+  int extractVerificationType (int startOffset, int tag)
+  {
+    if (tag == 7 || tag == 8)
+      {
+        int value = u2(startOffset+1);
+        tag |= (value << 8);
+      }
+    return tag;
+  }
+
+  static int[] reallocBuffer (int[] buffer, int needed)
+  {
+    if (buffer == null)
+      buffer = new int[needed+10];
+    else if (needed > buffer.length)
+      {
+        int[] tmp = new int[needed+10];
+        System.arraycopy(buffer, 0, tmp, 0, buffer.length);
+        buffer = tmp;
+      }
+    return buffer;
+  }
+
+  int extractVerificationTypes (int startOffset, int count, int startIndex,
+                                int[] buffer)
   {
     int offset = startOffset;
     while (--count >= 0)
       {
-        dst.print("    ");
-        offset = print_verification_type(offset, dst);
-        dst.println();
+        int encoding;
+        if (offset >= dataLength)
+          encoding = -1;
+        else
+          {
+            int tag = data[offset];
+            encoding = extractVerificationType(offset, tag);
+            offset += (tag == 7 || tag == 8 ? 3 : 1);
+          }
+        buffer[startIndex++] = encoding;
       }
     return offset;
   }
+
+  /** Print a sequence of encoded verification types.
+   * @param startIndex index if of encodings of first type to print
+   * @param count number of entries in encodings to print
+   */
+  void printVerificationTypes (int[] encodings, int startIndex, int count,
+         ClassTypeWriter dst)
+  {
+    int regno = 0;
+    for (int i = 0;  i < startIndex + count;  i++)
+      {
+        int encoding = encodings[i];
+        int tag = encoding & 0xff;
+        if (i >= startIndex)
+          {
+            dst.print("   ");
+            if (regno >= 100)
+              ;
+            else
+              {
+                if (regno >= 10)
+                  dst.print(' ');
+                dst.print(' ');
+              }
+            dst.print(regno);
+            dst.print(": ");
+            printVerificationType(encoding,  dst);
+            dst.println();
+          }
+        regno++;
+        if (tag == 3 || tag == 4)
+          regno++;
+      }
+  }                      
 
   public void print (ClassTypeWriter dst)
   {
@@ -113,63 +178,118 @@ public class StackMapTableAttr extends Attribute
     dst.println(numEntries);
     int ipos = 0;
     int pc_offset = -1;
+    Method method = getMethod();
+    int encodedTypes[] = null;
+    int curLocals = (method.getStaticFlag() ? 0 : 1) + method.arg_types.length;
+    int curStack = 0;
     for (int i = 0;  i < numEntries;  i++)
       {
+        if (ipos >= dataLength)
+          {
+            i = -1;
+            break;
+          }
         int tag = u1(ipos++);
         pc_offset++;
+        int delta = -1;
         if (tag <= 127)
           pc_offset += tag & 63;
+        else if (ipos + 1 >= dataLength)
+          {
+            ipos = -1;
+            break;
+          }
         else
           {
-            pc_offset += u2(ipos);
+            delta = u2(ipos);
+            pc_offset += delta;
             ipos += 2;
           }
         dst.print("  offset: ");
         dst.print(pc_offset);
         if (tag <= 63)
-          dst.println(" - same_frame");
-        else if (tag <= 127)
           {
-            dst.println(" - same_locals_1_stack_item_frame");
-            ipos = print_verification_types(ipos, 1, dst);
+            dst.println(" - same_frame");
+            curStack = 0;
+          }
+        else if (tag <= 127 || tag == 247)
+          {
+            dst.println(tag <= 127 ? " - same_locals_1_stack_item_frame"
+                        : " - same_locals_1_stack_item_frame_extended");
+            encodedTypes = reallocBuffer(encodedTypes, 1);
+            ipos = extractVerificationTypes(ipos, 1, 0, encodedTypes);
+            printVerificationTypes(encodedTypes, 0, 1, dst);
+            curStack = 1;
           }
         else if (tag <= 246)
           {
             dst.println(" - tag reserved for future use");
             break;
           }
-        else if (tag == 247)
-          {
-            dst.println(" - same_locals_1_stack_item_frame_extended");
-            ipos = print_verification_types(ipos, 1, dst);
-          }
         else if (tag <= 250)
-          dst.println(" - chop_frame");
+          {
+            int count = 251-tag;
+            dst.print(" - chop_frame - undefine ");
+            dst.print(count);
+            dst.println(" locals");
+            curLocals -= count;
+            curStack = 0;
+          }
         else if (tag == 251)
-          dst.println(" - same_frame_extended");
+          {
+            dst.println(" - same_frame_extended");
+            curStack = 0;
+          }
         else if (tag <= 254)
           {
-            dst.println(" - append_frame");
             int count = tag - 251;
-            ipos = print_verification_types(ipos, count, dst);
+            dst.print(" - append_frame - define ");
+            dst.print(count);
+            dst.println(" more locals");
+            encodedTypes = reallocBuffer(encodedTypes, curLocals+count);
+            ipos = extractVerificationTypes(ipos, count, curLocals, encodedTypes);
+            printVerificationTypes(encodedTypes, curLocals, count, dst);
+            curLocals += count;
+            curStack = 0;
           }
         else // tag == 255
           {
+            if (ipos + 1 >= dataLength)
+              {
+                ipos = -1;
+                break;
+              }
             int num_locals = u2(ipos);
             ipos += 2;
-            dst.print(" - full_frame.  Locals: ");
+            dst.print(" - full_frame.  Locals count: ");
             dst.println(num_locals);
-            ipos = print_verification_types(ipos, num_locals, dst);
+            encodedTypes = reallocBuffer(encodedTypes, num_locals);
+            ipos = extractVerificationTypes(ipos, num_locals, 0, encodedTypes);
+            printVerificationTypes(encodedTypes, 0, num_locals, dst);
+            curLocals = num_locals;
+            if (ipos + 1 >= dataLength)
+              {
+                ipos = -1;
+                break;
+              }
             int num_stack = u2(ipos);
             ipos += 2;
             dst.print("    (end of locals)");
-            // Align "Locals:" and "Stack length:":
+            // Align "Locals count:" and "Stack count:":
             for (int nspaces = Integer.toString(pc_offset).length();
                  --nspaces >= 0; )
               dst.print(' ');
-            dst.print("       Stack length: ");
+            dst.print("       Stack count: ");
             dst.println(num_stack);
-            ipos = print_verification_types(ipos, num_stack, dst);
+            encodedTypes = reallocBuffer(encodedTypes, num_stack);
+            ipos = extractVerificationTypes(ipos, num_stack, 0, encodedTypes);
+            printVerificationTypes(encodedTypes, 0, num_stack, dst);
+            curStack = num_stack;
+          }
+        if (ipos < 0)
+          {
+            dst.println("<ERROR - missing data>");
+            return;
           }
       }
   }

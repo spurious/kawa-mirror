@@ -1,3 +1,15 @@
+2008-11-11  Per Bothner  <per@bothner.com>
+
+	* StackMapTableAttr.java (dataLength): New field, for when we
+	generate this attribute.  Use it in place of data.length.
+
+	* StackMapTableAttr.java (print): Print locals/stack offset before
+	types, and generally make printing nicer.
+	(getMethod): New method.
+	(printVerificationType, extractVerificationType, reallocBuffer,
+	extractVerificationTypes, printVerificationTypes): New methods.
+	(print_verification_type, print_verification_types): Remove methods.
+
 2008-09-16  Per Bothner  <per@bothner.com>
 
 	Add support for try-finally without using jsr,

@@ -1,10 +1,12 @@
-// Copyright (c) 1999, 2001, 2004, 2005  Per M.A. Bothner.
+// Copyright (c) 1999, 2001, 2004, 200, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.bytecode.*;
+import gnu.kawa.functions.AddOp;
+import gnu.math.IntNum;
 
 /** An Expression to set (bind) or define a new value to a named variable.
  * @author	Per Bothner
@@ -253,16 +255,29 @@ public class SetExp extends AccessExp
 	else if (decl.isSimple ())
 	  {
             type = decl.getType();
-	    new_value.compile(comp, decl);
-	    if (needValue)
-              {
-                code.emitDup(type);  // dup or dup2
-                valuePushed = true;
-              }
 	    Variable var = decl.getVariable();
 	    if (var == null)
 	      var = decl.allocateVariable(code);
-	    code.emitStore(var);
+            int delta = canUseInc(new_value, decl);
+            if (delta != BAD_SHORT)
+              {
+                comp.getCode().emitInc(var, (short) delta);
+                if (needValue)
+                  {
+                    code.emitLoad(var);
+                    valuePushed = true;
+                  }
+              }
+            else
+              {
+                new_value.compile(comp, decl);
+                if (needValue)
+                  {
+                    code.emitDup(type);  // dup or dup2
+                    valuePushed = true;
+                  }
+                code.emitStore(var);
+              }
 	  }
 	else if (decl.context instanceof ClassExp && decl.field == null
 		 && ! getFlag(PROCEDURE)
@@ -316,6 +331,72 @@ public class SetExp extends AccessExp
       target.compileFromStack(comp, getType());
     else
       comp.compileConstant(Values.empty, target);
+  }
+
+  /** "Failure" return value of canUseInc. */
+  public static final int BAD_SHORT = 0x10000;
+
+  /* Check if we can use the 'iinc' instruction.
+   * @return return increment, or BAD_SHORT.
+   */
+  public static int canUseInc (Expression rhs, Declaration target)
+  {
+    ApplyExp aexp;
+    Variable var = target.getVariable();
+  body:
+    if (target.isSimple()
+        && var.getType().getImplementationType().promote() == Type.intType
+        && rhs instanceof ApplyExp
+        && (aexp = (ApplyExp) rhs).getArgCount() == 2)
+      {
+        Expression funcExp = aexp.getFunction();
+        Object func = funcExp.valueIfConstant();
+        int sign;
+        if (func == AddOp.$Pl)
+          sign = 1;
+        else if (func == AddOp.$Mn)
+          sign = -1;
+        else
+          break body;
+        Expression arg0 = aexp.getArg(0);
+        Expression arg1 = aexp.getArg(1);
+        if (arg0 instanceof QuoteExp && sign > 0)
+          {
+            Expression tmp = arg1;
+            arg1 = arg0;
+            arg0 = tmp;
+          }
+        if (arg0 instanceof ReferenceExp)
+          {
+            ReferenceExp ref0 = (ReferenceExp) arg0;
+            if (ref0.getBinding() != target || ref0.getDontDereference())
+              break body;
+            Object value1 = arg1.valueIfConstant();
+            int val1;
+            if (value1 instanceof Integer)
+              {
+                val1 = ((Integer) value1).intValue();
+                if (sign < 0)
+                  val1 = - val1;
+                if (((short) val1) == val1)
+                  return val1;
+              }
+            else if (value1 instanceof IntNum)
+              {
+                IntNum int1 = (IntNum) value1;
+                int hi = 0x7FFF;
+                int lo = -hi;
+                if (sign > 0)
+                  lo--;
+                else
+                  hi++;
+                if (IntNum.compare(int1, lo) >= 0
+                    && IntNum.compare(int1, hi) <= 0)
+                  return sign * int1.intValue();
+              }
+          }
+      }
+    return BAD_SHORT;
   }
 
   public final gnu.bytecode.Type getType()

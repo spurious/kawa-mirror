@@ -316,13 +316,6 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
     if ((tkind == Arithmetic.INT_CODE || tkind == Arithmetic.LONG_CODE)
         && kind >= Arithmetic.INT_CODE && kind <= Arithmetic.INTNUM_CODE)
       {
-	// FIXME would be nice to use iinc when appropriate!
-	// We would need to use a special LocalVariableTarget,
-	// created by SetExp when dest is a local variable.
-	// Then if len==2 && ptype==LangPrimType.intType
-	// && target instanceof LocalVariableTarget
-	// && one arg is QuoteExp && other arg is same local as target
-	// => then emit iinc.
         kind = tkind;
         wtype = tkind == Arithmetic.INT_CODE ? LangPrimType.intType
           : LangPrimType.longType;

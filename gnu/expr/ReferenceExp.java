@@ -70,6 +70,11 @@ public class ReferenceExp extends AccessExp
 
   protected boolean mustCompile () { return false; }
 
+  public final Object valueIfConstant()
+  {
+    return binding == null?  null : binding.getValue().valueIfConstant();
+  }
+
   public void apply (CallContext ctx)
     throws Throwable
   {

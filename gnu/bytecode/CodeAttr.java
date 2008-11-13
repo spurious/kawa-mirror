@@ -1217,9 +1217,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to increment unassigned variable"+var.getName()
 		       +" simple:"+var.isSimple()+", offset: "+offset);
-    Type type = var.getType().promote ();
     reserve(6);
-    if (type != Type.intType)
+    if (var.getType().getImplementationType().promote() != Type.intType)
       throw new Error("attempting to increment non-int variable");
 
     boolean wide = offset > 255 || inc > 255 || inc < -256;

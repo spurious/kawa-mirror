@@ -281,12 +281,12 @@ public class ApplyExp extends Expression
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
 	&& func_lambda.min_args == args_length)
       {
-        pushArgs(func_lambda, exp.args, comp);
+        pushArgs(func_lambda, exp.args, null, comp);
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
 	func_lambda.allocParameters(comp);
-	popParams (code, func_lambda, false);
+	popParams (code, func_lambda, null, false);
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
 	func_lambda.compileEnd(comp);
@@ -342,6 +342,7 @@ public class ApplyExp extends Expression
     boolean toArray
       = (tail_recurse ? func_lambda.min_args != func_lambda.max_args
          : args_length > 4);
+    int[] incValues = null; // Increments if we can use iinc.
     if (toArray)
       {
 	compileToArray(exp.args, comp);
@@ -349,7 +350,8 @@ public class ApplyExp extends Expression
       }
     else if (tail_recurse)
       {
-        pushArgs(func_lambda, exp.args, comp);
+        incValues = new int[exp.args.length];
+        pushArgs(func_lambda, exp.args, incValues, comp);
         method = null;
       }
     else
@@ -369,7 +371,7 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	popParams(code, func_lambda, toArray);
+	popParams(code, func_lambda, incValues, toArray);
 	code.emitTailCall(false, func_lambda.getVarScope());
 	return;
       }
@@ -433,14 +435,18 @@ public class ApplyExp extends Expression
   }
 
   /** Only used for inline- and tail-calls. */
-  private static void pushArgs (LambdaExp lexp, Expression[] args, Compilation comp)
+  private static void pushArgs (LambdaExp lexp, Expression[] args,
+                                int[] incValues, Compilation comp)
   {
     Declaration param = lexp.firstDecl();
     int args_length = args.length;
     for (int i = 0; i < args_length; ++i)
       {
         Expression arg = args[i];
-        if (param.ignorable())
+        if (incValues != null
+            && (incValues[i] = SetExp.canUseInc(arg, param)) != SetExp.BAD_SHORT)
+          ;
+        else if (param.ignorable())
           arg.compile(comp, Target.Ignore);
         else
           arg.compileWithPosition(comp,
@@ -450,7 +456,7 @@ public class ApplyExp extends Expression
   }
 
   private static void popParams (CodeAttr code, LambdaExp lexp,
-                                 boolean toArray)
+                                 int[] incValues, boolean toArray)
   {
     Variable vars = lexp.getVarScope().firstVar();
     Declaration decls = lexp.firstDecl();
@@ -462,23 +468,27 @@ public class ApplyExp extends Expression
       {
 	if (toArray)
 	  {
-	    popParams (code, 1, decls, vars);
+	    popParams (code, 0, 1, null, decls, vars);
 	    return;
 	  }
         vars = vars.nextVar();
       }
-    popParams (code, lexp.min_args, decls, vars);
+    popParams (code, 0, lexp.min_args, incValues, decls, vars);
   }
 
   // Recursive helper function.
-  private static void popParams (CodeAttr code, int count,
+  private static void popParams (CodeAttr code, int paramNo, int count,
+                                 int[] incValues,
                                  Declaration decl, Variable vars)
   {
     if (count > 0)
       {
-	popParams (code, count - 1, decl.nextDecl(),
+        count--;
+	popParams (code, paramNo+1, count, incValues, decl.nextDecl(),
                    decl.getVariable() == null ? vars : vars.nextVar());
-        if (! decl.ignorable())
+        if (incValues != null && incValues[paramNo] != SetExp.BAD_SHORT)
+          code.emitInc(vars, (short) incValues[paramNo]);
+        else if (! decl.ignorable())
           code.emitStore(vars);
       }
   }

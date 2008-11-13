@@ -1,3 +1,7 @@
+2008-11-13  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitInc): Generalize type check.
+
 2008-11-11  Per Bothner  <per@bothner.com>
 
 	* StackMapTableAttr.java (dataLength): New field, for when we

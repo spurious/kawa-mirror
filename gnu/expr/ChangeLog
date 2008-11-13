@@ -1,3 +1,14 @@
+2008-11-13  Per Bothner  <per@bothner.com>
+
+	* SetExp.java (canUseInc): New static method, to check if we
+	can use the iinc instruction.
+	(BAD_SHORT): New constant.
+	(compile): Use canUseInc; if OK, do emitInc.
+	* ApplyExp.java (compile):  If tail-recursing increments a parameter
+	variable, try to use the 'iinc' instruction.  This requires ...
+	(pushArgs, popParams): hanges, so we can maybe emit iinc.
+	* ReferenceExp.java (valueIfConstant): New method.
+
 2008-10-26  Per Bothner  <per@bothner.com>
 
 	* Expression.java (isSingleValue): New method.

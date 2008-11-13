@@ -1,3 +1,8 @@
+2008-11-13  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java: Update to use Type.byteType instead of
+	semi-deprecated Type.byte_type.
+
 2008-06-08  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (makePair): Remove unused method.

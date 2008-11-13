@@ -15,21 +15,21 @@ public class LangPrimType extends PrimType implements TypeValue
   PrimType implementationType;
 
   public static final LangPrimType byteType
-    = new LangPrimType(Type.byte_type);
+    = new LangPrimType(Type.byteType);
   public static final LangPrimType shortType
-    = new LangPrimType(Type.short_type);
+    = new LangPrimType(Type.shortType);
   public static final LangPrimType intType
-    = new LangPrimType(Type.int_type);
+    = new LangPrimType(Type.intType);
   public static final LangPrimType longType
-    = new LangPrimType(Type.long_type);
+    = new LangPrimType(Type.longType);
   public static final LangPrimType floatType
-    = new LangPrimType(Type.float_type);
+    = new LangPrimType(Type.floatType);
   public static final LangPrimType doubleType
-    = new LangPrimType(Type.double_type);
+    = new LangPrimType(Type.doubleType);
   public static final LangPrimType charType
-    = new LangPrimType(Type.char_type);
+    = new LangPrimType(Type.charType);
   public static final LangPrimType voidType
-    = new LangPrimType(Type.void_type);
+    = new LangPrimType(Type.voidType);
 
   public LangPrimType (PrimType type)
   {

@@ -99,11 +99,7 @@ public class ConstantValueAttr extends Attribute
       }
     else
       {
-	if (dst.printConstants)
-	  {
-	    dst.print(value_index);
-	    dst.print('=');
-	  }
+        dst.printOptionalIndex(value_index);
 	CpoolEntry entry = dst.ctype.constants.getPoolEntry(value_index);
 	entry.print(dst, 1);
       }

@@ -86,28 +86,32 @@ public class ObjectType extends Type
     throws java.lang.ClassNotFoundException
   {
     /* #ifdef JAVA2 */
-    ClassLoader loader;
+    /* Specifies optional 'initialize' argument. */
+    return Class.forName(cname, false, getContextClassLoader());
+    /* #else */
+    // return Class.forName(cname);
+    /* #endif */
+  }
+
+  /* #ifdef JAVA2 */
+  public static ClassLoader getContextClassLoader ()
+  {
     try
       {
-        loader = Thread.currentThread().getContextClassLoader();
+        return Thread.currentThread().getContextClassLoader();
       }
     catch (java.lang.SecurityException ex)
       {
         /* The .class syntax below also works for JDK 1.4, but it's just
            syntactic sugar, so there is no benefit in using it. */
         /* #ifdef JAVA5 */
-        loader = ObjectType.class.getClassLoader();
+        return ObjectType.class.getClassLoader();
         /* #else */
-        // loader = thisClassLoader;
+        // return thisClassLoader;
         /* #endif */
       }
-    /* Specifies optional 'initialize' argument. */
-    return Class.forName(cname, false, loader);
-    /* #else */
-    // return Class.forName(cname);
-    /* #endif */
   }
-
+  /* #endif */
 
   /** Get the java.lang.Class object for the representation type. */
   public Class getReflectClass()

@@ -51,10 +51,15 @@ public class ClassFileInput extends DataInputStream
     int magic = readInt();
     if (magic != 0xcafebabe)
       return false;
+    readFormatVersion();
+    return true;
+  }
+
+  public void readFormatVersion () throws IOException
+  {
     int minor = readUnsignedShort();
     int major = readUnsignedShort();
     ctype.classfileFormatVersion = major * 0x10000 + minor;
-    return true;
   }
 
   public ConstantPool readConstants () throws IOException

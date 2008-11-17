@@ -61,6 +61,7 @@ public class TryExp extends Expression
     Type result_type = target instanceof IgnoreTarget ? null
 	: getType();
     Target ttarg;
+    // FIXME optimize if target is ConsumerTarget
     if (result_type == null)
       ttarg = Target.Ignore;
     else if (result_type == Type.pointer_type)

@@ -1,3 +1,7 @@
+2008-11-16  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalToClass): Use ObjectType.getContextClassLoader.
+
 2008-11-13  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (canUseInc): New static method, to check if we

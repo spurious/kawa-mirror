@@ -54,16 +54,7 @@ public class ModuleExp extends LambdaExp
     SourceMessages messages = comp.getMessages();
     try
       {
-        ClassLoader parentLoader;
-        try
-          {
-            parentLoader = Thread.currentThread().getContextClassLoader();
-          }
-        catch (SecurityException ex)
-          {
-            parentLoader = comp.getClass().getClassLoader();
-          }
-
+        ClassLoader parentLoader = ObjectType.getContextClassLoader();
 	ArrayClassLoader loader = new ArrayClassLoader(parentLoader);
         if (url == null)
           url = Path.currentPath().toURL();

@@ -1,3 +1,25 @@
+2008-11-16  Per Bothner  <per@bothner.com>
+
+	Make 'dump' more convenient and more flexible.
+	* ClassTypeWriter.java (PRINT_VERSION, PRINT_VERBOSE,
+	PRINT_CONSTANT_POOL, PRINT_CONSTANT_POOL_INDEXES): New constants.
+	(setFlags): New field.
+	(printConstants): Remove field - use bits in flags field instead.
+	(print()): New flags field; also print attributes.
+	(print(ClassType), printAttributes): New methods.
+	* ClassFileInput.java (readFormatVersion): New method.
+	* dump.java (<init>): Change calling-sequence and make non-public.
+	(printAttributes): Move to super-class.
+	(process): New methods.  Handles .jar/.zip as well as .class files.
+	(main): Create ClassTypeWriter immediately.
+	New handling to use process and accept class names.
+	(uriSchemeLength, uriSchemeSpecified): Methods coped from
+	gnu.text.Path.
+	(usage): Expand.
+	* ObjectType.java (getContextClassLoader): New method.
+	(getContextClass): Use it.
+	* ConstantValueAttr.java (print): Use printOptionalIndex.
+
 2008-11-13  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitInc): Generalize type check.

@@ -6,7 +6,7 @@ import gnu.expr.*;
 
 /** Implement the standard Scheme procedure "not". */
 
-public class not extends Procedure1 implements Inlineable
+public class not extends Procedure1 implements CanInline, Inlineable
 {
   Language language;
   public QuoteExp trueExp;
@@ -29,6 +29,15 @@ public class not extends Procedure1 implements Inlineable
    {
      return language.booleanObject(! language.isTrue(arg1));
    }
+
+  
+  public Expression inline (ApplyExp exp, InlineCalls walker,
+                            boolean argsInlined)
+  {
+    exp.walkArgs(walker, argsInlined);
+    return exp.inlineIfConstant(this, walker);
+  }
+
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {

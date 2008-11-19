@@ -1,3 +1,9 @@
+2008-11-19  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Fix some buglets building with gcj.
+	Pass --rpath even when not using libtool.
+	Set libLTLIBRARIES_INSTALL - it doesn't seem to get defined any more.
+
 2008-11-10  Per Bothner  <per@bothner.com>
 
 	* kawa.c (main): Change "--no-prompt" option to "--no-console".

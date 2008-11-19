@@ -16,6 +16,11 @@ CDEFS = $(WITHOUT_GCJ_DEFS)
 else !WITH_GCJ_DBTOOL
 CDEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
 KAWAPROGS_KAWA_BIN = kawa-bin
+if WITH_LIBTOOL
+RPATH_OPTION = -rpath $(libdir)
+else !WITH_LIBTOOL
+RPATH_OPTION = -Wl,-rpath -Wl,$(libdir)
+endif !WITH_LIBTOOL
 endif !WITH_GCJ_DBTOOL
 DEFSy = 
 else !WITH_GCJ
@@ -144,6 +149,7 @@ gnu-xquery-util$(OEXT):
 
 if WITH_LIBTOOL
 LIBKAWA_LIB = libkawa.la
+libLTLIBRARIES_INSTALL = $(INSTALL_DATA)
 else
 LIBKAWA_LIB = libkawa-$(libkawa_VERSION).so
 endif
@@ -183,7 +189,7 @@ LIBTOOL = libtool
 
 $(LIBKAWA_LIB): $(libkawa_OFILES)
 if WITH_LIBTOOL
-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $(LIBKAWA_LIB) -rpath $(libdir) -release $(libkawa_VERSION) $(libkawa_OFILES)
+	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $(LIBKAWA_LIB) $(RPATH_OPTION) $(libdir) -release $(libkawa_VERSION) $(libkawa_OFILES)
 else
 	$(CC) -shared -Wl,-soname -Wl,libkawa-$(libkawa_VERSION).so -o libkawa-$(libkawa_VERSION).so $(libkawa_OFILES)
 endif
@@ -192,7 +198,7 @@ kawa-bin$(EXEEXT): $(LIBKAWA_LIB)
 if WITH_LIBTOOL
 	$(LIBTOOL) --mode=link --tag=GCJ $(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
 else
-	$(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa-$(libkawa_VERSION).so $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
+	$(GCJ)  $(AM_CFLAGS) $(CFLAGS) -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa-$(libkawa_VERSION).so $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML) $(RPATH_OPTION) 
 endif
 
 kawa$(EXEEXT): $(kawa_OBJECTS)

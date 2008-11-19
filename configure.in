@@ -106,9 +106,7 @@ case ${with_gcj} in
     JAVA=${JAVA-gij}
     JAVAC=${JAVAC-"gcj -C"}
 
-    # AM_PROG_GCJ isn't good enough, we have to roll our own.
-    # AC_CHECK_TOOL(GCJ, gcj)
-    LT_AC_PROG_GCJ
+    AC_CHECK_TOOL(GCJ, gcj)
     test -z "$GCJ" && AC_MSG_ERROR([no acceptable gcj found in \$PATH])
     if test "x${GCJFLAGS-unset}" = xunset; then
        GCJFLAGS="-g -O2"

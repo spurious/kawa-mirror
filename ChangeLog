@@ -1,3 +1,8 @@
+2008-11-19  Per Bothner  <per@bothner.com>
+
+	* configure.in: Use AC_CHECK_TOOL to find GCJ, rather than
+	LT_AC_PROG_GCJ, since the latter seems to be gone now.
+
 2008-01-26  Per Bothner  <per@bothner.com>
 
 	* configure.in: The default for --with-java-source is now 5.

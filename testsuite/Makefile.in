@@ -344,7 +344,7 @@ all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle $(SERVLET_TESTS) $(SAX2_TESTS) \
-  check-inlining check-use-slots
+  check-inlining check-jmc check-use-slots
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -535,6 +535,14 @@ check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \
 	  then echo '# inlining test passes'; \
 	  else echo FAIL inlining test; fi
+
+jmc.log: $(srcdir)/jmc.scm
+	$(KAWA) -f $(srcdir)/jmc.scm >jmc.log
+
+check-jmc: jmc.log $(srcdir)/jmc.expected
+	@if diff $(srcdir)/jmc.expected jmc.log; \
+	  then echo '# bytecompilation test jmc test passes'; \
+	  else echo FAIL bytecompilation test jmc; fi
 
 Base.class: $(srcdir)/Base.java
 	CLASSPATH=..:.:$$CLASSPATH $(JAVAC) -g $< -d .

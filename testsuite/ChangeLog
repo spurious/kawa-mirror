@@ -1,3 +1,10 @@
+2008-11-19  Yaroslav Kavenchuk <kavenchuk@jenty.by>
+	    Per Bothner  <per@bothner.com>
+
+	* jmc.scm: New test - bytecode generation and reflection from Scheme.
+	* jmc.expected: New file - expected output.
+	* Makefile.am: Add new rules to verify jmc output.
+
 2008-11-18  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (varargs1, varargs2, vararg3): New test functions.

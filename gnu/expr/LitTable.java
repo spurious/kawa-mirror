@@ -577,7 +577,7 @@ public class LitTable implements ObjectOutput
             code.emitGetStatic(ClassType.make(cname).getDeclaredField("TYPE"));
           }
         else
-          comp.loadClassRef((ClassType)Type.make(clas));
+          comp.loadClassRef((ObjectType)Type.make(clas));
 	store(literal, ignore, code);
       }
     else if (literal.value instanceof ClassType

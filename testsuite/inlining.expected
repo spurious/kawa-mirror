@@ -72,6 +72,9 @@ InliningTest.lengthIarr2(int[])int: 3 bytes
 InliningTest.lengthIarr3(int[])int: 3 bytes
 InliningTest.getIarr1(int[],int)int: 4 bytes
 InliningTest.setIarr1(int[],int,int)void: 5 bytes
+InliningTest.varargs1()java.lang.reflect.Method: 25 bytes
+InliningTest.varargs2(java.lang.Class[])java.lang.reflect.Method: 10 bytes
+InliningTest.varargs3(java.lang.Object)java.lang.reflect.Method: 35 bytes
 InliningTest.factoriali1(int)int: 18 bytes
 InliningTest.factoriali2(int)int: 18 bytes
 InliningTest.factoriall1(long)long: 19 bytes

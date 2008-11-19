@@ -1,3 +1,11 @@
+2008-11-18  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (isAppicable): For Java5-style VARARGS
+	allow last argument as an array *or* an argument list.
+	(compileArgs): Likewise improved VARARGS handling.
+
+	* LitTable.java (emit): Handle array Class objects.
+
 2008-11-16  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass): Use ObjectType.getContextClassLoader.

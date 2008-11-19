@@ -133,6 +133,14 @@
 (define (tohex3 (x :: <Int>))
   (x:toHex))
 
+(define (varargs1)
+  (invoke gnu.math.IntNum 'getMethod "valueOf"
+ java.lang.String java.lang.Integer:TYPE))
+(define (varargs2 (argtypes :: java.lang.Class[]))
+  (invoke gnu.math.IntNum 'getMethod "valueOf" argtypes))
+(define (varargs3 argtypes)
+  (invoke gnu.math.IntNum 'getMethod "valueOf" argtypes))
+
 (define-namespace xx "XX")
 (define xx:two 222)
 (define list-two (list 'xx:Two))

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2008  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -60,6 +60,24 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public static boolean takesContext(Method method)
   {
     return method.getName().endsWith("$X");
+  }
+
+  public int isApplicable(Type[] argTypes)
+  {
+    int app = super.isApplicable(argTypes);
+    int nargs = argTypes.length;
+    if (app == -1 && method != null
+        && (method.getModifiers() & Access.VARARGS) != 0
+        && nargs > 0 && argTypes[nargs-1] instanceof ArrayType)
+      {
+        // For a Java5-style VARARGS method, you're also allowed to
+        // explicitly pass in an array as the last argument.
+        Type[] tmp = new Type[nargs];
+        System.arraycopy(argTypes, 0, tmp, 0, nargs-1);
+        tmp[nargs-1] = ((ArrayType) argTypes[nargs-1]).getComponentType();
+        return super.isApplicable(tmp);
+      }
+    return app;
   }
 
   public final boolean isConstructor()
@@ -418,6 +436,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   /** Compile arguments and push unto stack.
    * @param args arguments to evaluate and push.
+   * @param normally 0, but 1 in the case of a constructor,
+   *   or the case of "static" method of a non-static class.
    * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
    *   If thisType==Type.voidType, ignore argTypes[0].  (It is used to to
@@ -434,8 +454,31 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int arg_count = argTypes.length - skipArg;
     if (takesContext())
       arg_count--;
+    int nargs = args.length - startArg;
     boolean is_static = thisType == null || skipArg != 0;
-    int fix_arg_count = variable ? arg_count - 1 : args.length - startArg;
+
+    // If Java5-style VARARS we allow both a variable-length argument list,
+    // or if the last argument already is an array we can use it as is.
+    // The tricky part is we sometimes have to distinguish these cases
+    // at run-time, in which case we set createVarargsArrayIfNeeded.
+    boolean createVarargsArrayIfNeeded = false;
+    if (variable && (method.getModifiers() & Access.VARARGS) != 0
+        && nargs > 0 && argTypes.length > 0
+        && nargs == arg_count + (is_static ? 0 : 1))
+      {
+        Type lastType = args[args.length-1].getType();
+        Type lastParam = argTypes[argTypes.length-1];
+        if (lastType instanceof ObjectType
+            && lastParam instanceof ArrayType // should always be true
+            && ! (((ArrayType) lastParam).getComponentType()
+                  instanceof ArrayType))
+          {
+            if (! (lastType instanceof ArrayType))
+              createVarargsArrayIfNeeded = true;
+            variable = false;
+          }
+      }
+    int fix_arg_count = variable ? arg_count - (is_static ? 1 : 0) : args.length - startArg;
     Declaration argDecl = source == null ? null : source.firstDecl();
     if (argDecl != null && argDecl.isThisParameter())
       argDecl = argDecl.nextDecl();
@@ -453,8 +496,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             arg_type = ((ArrayType) arg_type).getComponentType();
             code.emitNewArray(arg_type);
           }
-        if (i + startArg >= args.length)
+        if (i >= nargs)
           break;
+        boolean createVarargsNow = createVarargsArrayIfNeeded && i + 1 == nargs;
         if (i >= fix_arg_count)
           {
             code.emitDup(1); // dup array.
@@ -466,10 +510,31 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             : i==0 ? thisType
             : argTypes[i-1];
 	comp.usedClass(arg_type);
+        Type argTypeForTarget = createVarargsNow ? Type.objectType : arg_type;
 	Target target =
-	  source == null ? CheckedTarget.getInstance(arg_type, name, i+1)
-	  : CheckedTarget.getInstance(arg_type, source, i);
+	  source == null ? CheckedTarget.getInstance(argTypeForTarget, name, i+1)
+	  : CheckedTarget.getInstance(argTypeForTarget, source, i);
 	args[startArg+i].compileNotePosition(comp, target, args[startArg+i]);
+        if (createVarargsNow)
+          {
+            // Wrap final argument in array if not already an array:
+            // Emit: (arg instanceof T[] ? (T[]) arg : new T[]{arg})
+            Type eltype = ((ArrayType) arg_type).getComponentType();
+            code.emitDup();
+            code.emitInstanceof(arg_type);
+            code.emitIfIntNotZero();
+            code.emitCheckcast(arg_type);
+            code.emitElse();
+            code.emitPushInt(1);
+            code.emitNewArray(eltype); // Stack: value array
+            code.emitDupX(); // Stack: array value array
+            code.emitSwap(); // Stack: array array value
+            code.emitPushInt(0); // Stack array array value 0
+            code.emitSwap(); // Stack: array array 0 value
+            eltype.emitCoerceFromObject(code);
+            code.emitArrayStore(arg_type); // Stack: array
+            code.emitFi();
+          }
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
 	if (argDecl != null && (is_static || i > 0))

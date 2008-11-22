@@ -1,3 +1,15 @@
+2008-11-21  Per Bothner  <per@bothner.com>
+
+	* ReplDocument.java (class DocumentCloseListener):  Add a listener
+	class so classes can get notified when document "closes".
+	This allowed us to close a window by typing #!eof in it.
+	(<init>): Call fireDocumentClosed when repl thread finishes.
+	(close): Do fireDocumentClosed.
+	* GuiConsole.java: Request notification when document is closed.
+	* ReplPane.java (removeNotify): New method.
+	* GuiConsole.java (main): Also do some initialization so it works
+	to call GuiConsole directly as an application or class.
+
 2008-11-11  Per Bothner  <per@bothner.com>
 
 	More rebust support for multi-line input and type-ahead in GuiConsole.

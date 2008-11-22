@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
+import java.util.ArrayList;
 import gnu.kawa.swingviews.SwingContent;
 import gnu.text.Path;
 import gnu.expr.Language;
@@ -31,7 +32,9 @@ public class ReplDocument extends DefaultStyledDocument
     StyleConstants.setBold(inputStyle, true);
   }
 
+  /** The pane, in any, that contains this document and has focus. */
   JTextPane pane;
+  int paneCount;
 
   SwingContent content;
 
@@ -62,6 +65,8 @@ public class ReplDocument extends DefaultStyledDocument
   {
     super(content, styles);
     this.content = content;
+    repl.exitIncrement();
+
     addDocumentListener(this);
 
     this.language = language;
@@ -74,7 +79,16 @@ public class ReplDocument extends DefaultStyledDocument
     err_stream = new ReplPaneOutPort(this, "/dev/stderr", redStyle);
     in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
                          out_stream, this);
-    thread = new Future (new kawa.repl(language),
+    thread = new Future (new kawa.repl(language) {
+        public Object apply0 ()
+        {
+          Shell.run(language, Environment.getCurrent());
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() { ReplDocument.this.fireDocumentClosed(); }
+            });
+          return Values.empty;
+        }
+      },
 			 penvironment, in_p, out_stream, err_stream);
 
     Environment env = thread.getEnvironment();
@@ -95,8 +109,6 @@ public class ReplDocument extends DefaultStyledDocument
                           : (str.lastIndexOf('\n', outputMark-1)) + 1);
         remove(0, lineBefore);
         // Changelistener updates outputMark and endMark.
-        if (pane != null)
-          pane.setCaretPosition(outputMark);
       }
     catch (BadLocationException ex)
       {
@@ -227,7 +239,70 @@ public class ReplDocument extends DefaultStyledDocument
     }
     // Thread.stop is deprecated in JDK 1.2, but I see no good
     // alternative.  (Thread.destroy is not implemented!)
-    thread.stop(); 
-    kawa.repl.exitDecrement();
+    thread.stop();
+    fireDocumentClosed();
+    repl.exitDecrement();
  }
+
+  // Either null, a single DocumentCloseListener or an ArrayList of the latter.
+  Object closeListeners;
+
+  /** Register a DocumentCloseListener. */
+  public void addDocumentCloseListener (DocumentCloseListener listener)
+  {
+    if (closeListeners == null)
+      closeListeners = listener;
+    else
+      {
+        ArrayList vec;
+        if (closeListeners instanceof ArrayList)
+          vec = (ArrayList) closeListeners;
+        else
+          {
+            vec = new ArrayList(10);
+            vec.add(closeListeners);
+            closeListeners = vec;
+          }
+        vec.add(listener);
+      }
+  }
+
+  public void removeDocumentCloseListener (DocumentCloseListener listener)
+  {
+    if (closeListeners instanceof DocumentCloseListener)
+      {
+        if (closeListeners == listener)
+          closeListeners = null;
+      }
+    else if (closeListeners != null)
+      {
+        ArrayList vec = (ArrayList) closeListeners;
+        for (int i = vec.size();  --i >= 0; )
+          {
+            if (vec.get(i) == listener)
+              vec.remove(i);
+          }
+        if (vec.size() == 0)
+          closeListeners = null;
+      }
+  }
+
+  void fireDocumentClosed ()
+  {
+    if (closeListeners instanceof DocumentCloseListener)
+      ((DocumentCloseListener) closeListeners).closed(this);
+    else if (closeListeners != null)
+      {
+        ArrayList vec = (ArrayList) closeListeners;
+        for (int i = vec.size();  --i >= 0; )
+          ((DocumentCloseListener) vec.get(i)).closed(this);
+      }
+  }
+
+  /** Listener interface for when a document closes. */
+  public static interface DocumentCloseListener
+  {
+    /** Called when a ReplDocument closes. */
+    public void closed (ReplDocument doc);
+  }
 }

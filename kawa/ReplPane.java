@@ -37,6 +37,7 @@ public class ReplPane extends JTextPane
     super(document);
     this.document = document;
     document.pane = this;
+    document.paneCount++;
 
     addKeyListener(this);
     addFocusListener(document);
@@ -47,6 +48,17 @@ public class ReplPane extends JTextPane
 
   protected EditorKit createDefaultEditorKit() {
     return new ReplEditorKit(this);
+  }
+
+  /** This method is called by the toolkit when the component is removed.
+   * Used as a hook to decrement ReplDocument's reference count,
+   * and maybe close the document.
+   */
+  public void removeNotify()
+  {
+    super.removeNotify();
+    if (--document.paneCount == 0)
+      document.close();
   }
 
   void enter () // FIXME - move to document

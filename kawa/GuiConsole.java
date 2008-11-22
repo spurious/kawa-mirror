@@ -12,7 +12,8 @@ import kawa.standard.Scheme;
   * @author Per Bothner (extensive changes).
   */
 
-public class GuiConsole extends JFrame implements ActionListener {
+public class GuiConsole extends JFrame
+  implements ActionListener, ReplDocument.DocumentCloseListener {
   private static String CLOSE = "Close";
   private static String EXIT = "Exit";
   private static String NEW = "New";
@@ -25,6 +26,11 @@ public class GuiConsole extends JFrame implements ActionListener {
   ReplDocument document;
 
   public static void main(String[] args) {
+    repl.noConsole = false;
+    int iArg = repl.processArgs(args, 0, args.length);
+    repl.getLanguage();
+    repl.setArgs(args, iArg);
+    repl.checkInitFile();
     new GuiConsole();
   }
 
@@ -33,38 +39,44 @@ public class GuiConsole extends JFrame implements ActionListener {
     this(Language.getDefaultLanguage(), Environment.getCurrent(), false);
   }
 
-  public GuiConsole(Language language, Environment penvironment, boolean shared)
+  public GuiConsole (ReplDocument doc)
   {
     super("Kawa");
+    init(doc);
+  }
 
-    document = new ReplDocument(language, penvironment, shared);
+  void init(ReplDocument doc)
+  {
+    document = doc;
+    document.addDocumentCloseListener(this);
     pane = new ReplPane(document);
     window_number++;
-    kawa.repl.exitIncrement();
-    OutPort out_p = pane.getStdout();
-    OutPort err_p = pane.getStderr();
     this.setLayout(new BorderLayout(0,0));
     this.add("Center", new JScrollPane(pane));
-    // Code for testing same ReplDocument in two JFrames.
-    if (false)
-      {
-        JFrame other = new JFrame("frame2");
-        other.setLayout(new BorderLayout(0,0));
-        other.add("Center", new JScrollPane(new ReplPane(pane.document)));
-        other.setSize(700,500);
-        other.setVisible(true);
-      }
-
     setupMenus();
     //pack();
     setLocation(100 * window_number, 50 * window_number);
     setSize(700,500);
     setVisible(true);
+  }
 
+  public GuiConsole(Language language, Environment penvironment, boolean shared)
+  {
+    super("Kawa");
+    repl.getLanguage(); // In case a new GuiConsole is created from Java.
+    init(new ReplDocument(language, penvironment, shared));
+
+    // Uncomment to test same ReplDocument in two JFrames.
+    // new GuiConsole(document);
+  }
+
+  public void closed (ReplDocument doc)
+  {
+    close();
   }
 
   void close () {
-    pane.document.close(); 
+    document.removeDocumentCloseListener(this);
     dispose();
   }
 

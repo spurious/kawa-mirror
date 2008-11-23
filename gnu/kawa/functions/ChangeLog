@@ -1,3 +1,11 @@
+2008-11-23  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java: New abstract class, extends ProcedureN.
+	* Makefile.am (java_sources): Update accordingly.
+	* AddOp.java: Change to extend ArithOp.  Move useful code to ArithOp.
+	* MultiplyOp: Change to ArithOp - so we get better optimization for 
+	multiply.
+
 2008-09-05  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java (compile): Remove special handling for SeriesTarget.

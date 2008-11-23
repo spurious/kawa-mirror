@@ -1,3 +1,9 @@
+2008-11-23  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitBinop): Make public, so ArithOp can use it.
+
+	* CodeAttr.java (putLineNumber): Check for null filename.
+
 2008-11-16  Per Bothner  <per@bothner.com>
 
 	Make 'dump' more convenient and more flexible.

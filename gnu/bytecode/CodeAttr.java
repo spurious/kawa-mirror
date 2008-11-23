@@ -284,7 +284,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void putLineNumber (String filename, int linenumber)
   {
-    getMethod().classfile.setSourceFile(filename);
+    if (filename != null)
+      getMethod().classfile.setSourceFile(filename);
     putLineNumber(linenumber);
   }
 
@@ -1086,7 +1087,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.signatureToPrimitive(sig));
   }
 
-  private void emitBinop (int base_code, Type type)
+  public void emitBinop (int base_code, Type type)
   {
     popType();
     popType();

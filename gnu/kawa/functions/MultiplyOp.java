@@ -12,13 +12,23 @@ import gnu.mapping.*;
  * @author Per Bothner
  */
 
-public class MultiplyOp extends ProcedureN implements CanInline
+public class MultiplyOp extends ArithOp
 {
   public static final MultiplyOp $St = new MultiplyOp("*");
 
   public MultiplyOp(String name)
   {
     super(name);
+  }
+
+  public Object defaultResult ()
+  {
+    return IntNum.one();
+  }
+
+  public int primitiveOpcode ()
+  {
+    return 104;
   }
 
   public static Object apply (Object arg1, Object arg2)

@@ -8,6 +8,7 @@ java_sources=\
   Apply.java \
   ApplyToArgs.java \
   Arithmetic.java \
+  ArithOp.java \
   Arrays.java \
   ArrayRef.java \
   ArraySet.java \

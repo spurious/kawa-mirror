@@ -1,3 +1,7 @@
+2008-12-09  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Handle --target/-target arg.
+
 2008-11-21  Per Bothner  <per@bothner.com>
 
 	* ReplDocument.java (class DocumentCloseListener):  Add a listener

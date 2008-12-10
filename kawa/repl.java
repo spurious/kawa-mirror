@@ -412,6 +412,29 @@ public class repl extends Procedure0or1
             ModuleManager manager = ModuleManager.getInstance();
 	    manager.setCompilationDirectory(args[iArg]);
 	  }
+        else if (arg.equals("--target") || arg.equals("target"))
+          {
+	    iArg++;
+	    if (iArg == maxArg)
+	      bad_option (arg);
+            arg = args[iArg];
+            if (arg.equals("7"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_7_VERSION;
+            if (arg.equals("6") || arg.equals("1.6"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_6_VERSION;
+            else if (arg.equals("5") || arg.equals("1.5"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_5_VERSION;
+            else if (arg.equals("1.4"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_4_VERSION;
+            else if (arg.equals("1.3"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_3_VERSION;
+            else if (arg.equals("1.2"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_2_VERSION;
+            else if (arg.equals("1.1"))
+              Compilation.defaultClassFileVersion = ClassType.JDK_1_1_VERSION;
+            else
+              bad_option(arg);
+          }
 	else if (arg.equals ("-P"))
 	  {
 	    iArg++;

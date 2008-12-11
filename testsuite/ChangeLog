@@ -1,3 +1,8 @@
+2008-12-10  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add tests for exit (using call/cc) though
+	try-finally.
+
 2008-11-19  Yaroslav Kavenchuk <kavenchuk@jenty.by>
 	    Per Bothner  <per@bothner.com>
 

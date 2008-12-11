@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 155)
+(test-init "Miscellaneous" 158)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -744,3 +744,40 @@
 ;; Bug reported by Yaroslav Kavenchuk <kavenchuk@jenty.by> 2008-02-26:
 (define primes (<integer[]> 2 3 5 7 11 13))
 (test 11 'primes-integer-indexing (primes 4))
+
+(define sum 0)
+(define (test-exit-with-finally-1 x)
+  (call-with-current-continuation
+   (lambda (exit)
+     (try-finally
+      (if (< x 0)
+	  (exit (list x))
+	  (* 2 x))
+      (set! sum (+ sum 1))))))
+(test '(8 10 (-9) (-1) 24) 'test-exit-with-finally-1
+      (map test-exit-with-finally-1 '(4 5 -9 -1 12)))
+
+(set! sum 0)
+(define list-inner '())
+(define (test-exit-with-finally-2 x)
+  (call-with-current-continuation
+   (lambda (exit1)
+     (try-finally
+      (call-with-current-continuation
+       (lambda (exit2)
+	 (try-finally
+	  (begin
+	    (if (< x 0)
+		(exit2 (list 2 x)))
+	    (if (odd? x)
+		(exit1 (list 1 x)))
+	    (set! list-inner (cons x list-inner))
+	    (list 0 x))
+	  (set! sum (+ sum 1)) #| Inner finally |#)))
+      (set! sum (+ sum 10)) #| Outer finally |#))))
+(test '((0 4) (1 5) (2 -9) (0 14) (2 -1) (0 12) (1 7))
+	'test-exit-with-finally-2
+      (map test-exit-with-finally-2 '(4 5 -9 14 -1 12 7)))
+(test "Sum: 77 Inner: (12 14 4)"
+      'test-exit-with-finally-2-results
+      (format #f "Sum: ~s Inner: ~s" sum list-inner))

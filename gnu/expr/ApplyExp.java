@@ -217,6 +217,7 @@ public class ApplyExp extends Expression
 	  }
       }
 
+    /*
     if (comp.usingCPStyle())
       {
 	  {
@@ -263,15 +264,15 @@ public class ApplyExp extends Expression
 		  }
 	      }
 
-	    /* FIXME
+	    // FIXME
 	    // Load result from stack.value to target.
 	    comp.loadCallContext();
 	    code.emitGetField(comp.valueCallContextField);
 	    target.compileFromStack(comp, Type.pointer_type);
-	    */
 	  }
 	return;
       }
+    */
 
     // Check for tail-recursion.
     boolean tail_recurse

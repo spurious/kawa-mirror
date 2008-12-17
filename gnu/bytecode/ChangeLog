@@ -1,3 +1,8 @@
+2008-12-16  Yaroslav Kavenchuk <kavenchuk@gmail.com>
+            Per Bothner  <per@bothner.com>
+
+	* Method.java (makeSignature): New method.
+
 2008-11-23  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitBinop): Make public, so ArithOp can use it.

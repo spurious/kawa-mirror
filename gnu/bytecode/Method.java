@@ -230,21 +230,28 @@ public class Method implements AttrContainer, Member {
     Attribute.writeAll(this, dstr);
   }
 
+  public static String makeSignature (Type arg_types[], Type return_type)
+  {
+    /* #ifdef JAVA5 */
+    StringBuilder buf = new StringBuilder(100);
+    /* #else */
+    // StringBuffer buf = new StringBuffer(100);
+    /* #endif */
+    int args_count = arg_types.length; 
+    buf.append('(');
+    for (int i = 0; i < args_count; i++)
+      buf.append (arg_types[i].getSignature());
+    buf.append(')');
+    buf.append(return_type.getSignature());
+    return buf.toString();
+  }
+
   String signature;
 
   public String getSignature ()
   {
     if (signature == null)
-      {
-	StringBuffer buf = new StringBuffer(100);
-	int args_count = arg_types.length; 
-	buf.append('(');
-	for (int i = 0; i < args_count; i++)
-	  buf.append (arg_types[i].getSignature());
-	buf.append(')');
-	buf.append(return_type.getSignature());
-	signature = buf.toString();
-      }
+      signature = makeSignature(arg_types, return_type);
     return signature;
   }
 

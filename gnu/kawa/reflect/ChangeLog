@@ -1,3 +1,8 @@
+2008-12-24  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): For invoke-special we shouldn't do the
+	test on the receiver when checking protected methods for accessibility.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java: Update isAccessible call, needed so we can check that

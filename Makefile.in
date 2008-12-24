@@ -791,21 +791,23 @@ all: kawa-@VERSION@.jar
 
 selected-java-source: Makefile
 	@java_source=`cat $(srcdir)/selected-java-source 2>/dev/null || echo none`; \
-	if test "$$java_source" = "@JAVA_SOURCE@"; \
+	if test "$$java_source" = "$(JAVA_SOURCE)"; \
 	then echo current java-source is ok; \
-	elif test "@JAVA_SOURCE@" = 1; \
+	elif test "$(JAVA_SOURCE)" = 1; \
 	then $(MAKE) select-java1; \
-	elif test "@JAVA_SOURCE@" = 2; \
+	elif test "$(JAVA_SOURCE)" = 2; \
 	then $(MAKE) select-java2; \
-	elif test "@JAVA_SOURCE@" = 4; \
+	elif test "$(JAVA_SOURCE)" = 4; \
 	then $(MAKE) select-java4; \
-	elif test "@JAVA_SOURCE@" = 4x; \
+	elif test "$(JAVA_SOURCE)" = 4x; \
 	then $(MAKE) select-java4x; \
-	elif test "@JAVA_SOURCE@" = 5; \
+	elif test "$(JAVA_SOURCE)" = 5; \
 	then $(MAKE) select-java5; \
-	elif test "@JAVA_SOURCE@" = 6; \
+	elif test "$(JAVA_SOURCE)" = 6; \
 	then $(MAKE) select-java6; \
-	else echo Unrecognized JAVA_SOURCE: @JAVA_SOURCE@; exit 1; \
+	elif test "$(JAVA_SOURCE)" = android; \
+	then $(MAKE) select-android; \
+	else echo Unrecognized JAVA_SOURCE: $(JAVA_SOURCE); exit 1; \
 	fi
 
 $(srcdir)/patch-source-list:
@@ -828,7 +830,7 @@ select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=2
 
-# JDK 1.4, GCJ-4.x, without JAXP (default - matches CVS)
+# JDK 1.4, GCJ-4.x, without JAXP
 select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java4' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
@@ -840,7 +842,7 @@ select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=4x
 
-# JDK 1.5
+# JDK 1.5 (default - matches SVN)
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java5' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
@@ -852,9 +854,17 @@ select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=6
 
+# Android
+select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%android' \
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
+	$(MAKE) set-selected-java-source JAVA_SOURCE=android
+
 set-selected-java-source:
-	test "@JAVA_SOURCE@" = `cat $(srcdir)/selected-java-source` \
-	  || echo "@JAVA_SOURCE@" >$(srcdir)/selected-java-source
+	if test ! -e $(srcdir)/selected-java-source || \
+	   test "$(JAVA_SOURCE)" != "`cat $(srcdir)/selected-java-source`"; \
+	   then echo "$(JAVA_SOURCE)" >$(srcdir)/selected-java-source; \
+	fi
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz
 # Consider also:

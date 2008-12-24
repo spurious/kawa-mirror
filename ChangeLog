@@ -1,3 +1,10 @@
+2008-12-23  Per Bothner  <per@bothner.com>
+
+	* configure.in: New --with-android option.
+	* Makefile.am: Add "android" as new JAVA_SOURCE version.
+	(set-selected-java-source): Fix minor problem which causes error
+	message selected-java-source is missing.
+
 2008-11-19  Per Bothner  <per@bothner.com>
 
 	* configure.in: Use AC_CHECK_TOOL to find GCJ, rather than

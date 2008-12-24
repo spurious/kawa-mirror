@@ -28,6 +28,9 @@ AC_ARG_ENABLE(xml,
 AC_ARG_WITH(servlet,
   AS_HELP_STRING(--with-servlet@<:@=servlet-api.jar@:>@,Build support for generating servlets))
 
+AC_ARG_WITH(android,
+  AS_HELP_STRING(--with-android@<:@=android.jar@:>@,Build for the Android platform))
+
 AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
 
@@ -56,6 +59,9 @@ AC_ARG_WITH(sax2,
 AC_ARG_WITH(java-source,
   AS_HELP_STRING(--with-java-source=NUM,Assume functionality of given Java/JDK version))
 
+test -z "${with_java_source}" -a -n "${with_android}" \
+  && with_java_source=android
+
 with_java_source=`echo ${with_java_source} | tr A-Z a-z`
 case "/${with_java_source}/" in
   /1/) JAVA_SOURCE=1 ;;
@@ -72,6 +78,11 @@ case "/${with_java_source}/" in
   /gcj4/) JAVA_SOURCE=4x ;;
   /1.5*/) JAVA_SOURCE=5 ;;
   /1.6*/) JAVA_SOURCE=6 ;;
+  /android*/)
+        JAVA_SOURCE=android
+        test -z "$with_swing" && with_swing="no"
+        test -z "$with_awt" && with_awt="no"
+        ;;
   //) JAVA_SOURCE=5 ;;
   /*/) AC_MSG_ERROR([Invalid version for --with-java-version.
   (Must be 1, 2, 5, 6, or a JDK version such as 1.4.)]) ;;
@@ -161,6 +172,12 @@ case ${with_servlet} in
   no) ;;
   "") ;;
   *) conf_classpath=${with_servlet}${pathsep}$conf_classpath ;;
+esac
+case ${with_android} in
+  yes) ;;
+  no) ;;
+  "") ;;
+  *) conf_classpath=${with_android}${pathsep}$conf_classpath ;;
 esac
 
 case ${with_sax2} in

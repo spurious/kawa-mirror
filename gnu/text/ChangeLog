@@ -1,3 +1,8 @@
+2008-12-23  Per Bothner  <per@bothner.com>
+
+	* SourceLocator.java: Only implement javax.xml.transform.SourceLocator
+	if use:javax.xml.transform PreProcess directive is switched on.
+
 2008-11-11  Per Bothner  <per@bothner.com>
 
 	* QueueReader.java (checkAvailable): New callback "hook".

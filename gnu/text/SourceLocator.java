@@ -3,8 +3,8 @@ package gnu.text;
 public interface SourceLocator
   /* #ifdef SAX2 */
   extends
-  /* #ifdef JAXP-1.3 */
-  javax.xml.transform.SourceLocator, 
+  /* #ifdef use:javax.xml.transform */
+  // javax.xml.transform.SourceLocator, 
   /* #endif */
   org.xml.sax.Locator
   /* #endif */

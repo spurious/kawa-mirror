@@ -117,7 +117,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         if (caller == null)
           caller = Type.pointer_type;
         if (caller.isAccessible(field.getDeclaringClass(),
-                                field.getModifiers()))
+                                clas, field.getModifiers()))
           return field;
       }
 
@@ -233,7 +233,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 	    int modifiers = part.getModifiers();
             ClassType ptype = part.getDeclaringClass();
 	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
-	    if (caller != null && ! caller.isAccessible(ptype, modifiers))
+	    if (caller != null && ! caller.isAccessible(ptype, ctype, modifiers))
 	      comp.error('e', "slot '"+name +"' in "+ptype.getName()
 			 +" not accessible here");
 	    args[0].compile(comp,

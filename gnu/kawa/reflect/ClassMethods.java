@@ -96,10 +96,10 @@ public class ClassMethods extends Procedure2
                                            ClassType caller,
                                            Language language)
   {
-    MethodFilter filter = new MethodFilter(mname, 0, 0, caller);
     // FIXME kludge until we handle "language types".
     if (dtype == Type.tostring_type)
       dtype = Type.string_type;
+    MethodFilter filter = new MethodFilter(mname, 0, 0, caller, dtype);
     boolean named_class_only = mode == 'P' || "<init>".equals(mname);
     Vector methods = new Vector();
     dtype.getMethods(filter, named_class_only ? 0 : 2,
@@ -248,15 +248,17 @@ class MethodFilter implements gnu.bytecode.Filter
   int modifiers;
   int modmask;
   ClassType caller;
+  ObjectType receiver;
 
   public MethodFilter(String name, int modifiers, int modmask,
-		      ClassType caller)
+		      ClassType caller, ObjectType receiver)
   {
     this.name = name;
     this.nlen = name.length();
     this.modifiers = modifiers;
     this.modmask = modmask;
     this.caller = caller;
+    this.receiver = receiver;
   }
 
   public boolean select(Object value)
@@ -277,6 +279,6 @@ class MethodFilter implements gnu.bytecode.Filter
 	    || ! mname.endsWith("$V$X")))
       return false;
     return caller == null
-      || caller.isAccessible(method.getDeclaringClass(), mmods);
+      || caller.isAccessible(method.getDeclaringClass(), receiver, mmods);
   }
 }

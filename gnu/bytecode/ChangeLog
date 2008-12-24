@@ -1,3 +1,8 @@
+2008-12-23  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isAccessible):  Add extra parameter for the
+	"receiver" type, so we can properly check protected access.
+
 2008-12-16  Yaroslav Kavenchuk <kavenchuk@gmail.com>
             Per Bothner  <per@bothner.com>
 

@@ -212,7 +212,7 @@ public class SlotGet extends Procedure2
       {
         if (caller == null)
           caller = Type.pointer_type;
-        if (caller.isAccessible(field.getDeclaringClass(),
+        if (caller.isAccessible(field.getDeclaringClass(), clas,
                                 field.getModifiers()))
           return field;
       }
@@ -279,27 +279,28 @@ public class SlotGet extends Procedure2
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-            ctype = field.getDeclaringClass();
+            ClassType dtype = field.getDeclaringClass();
             int modifiers = field.getModifiers();
             boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
               return new ErrorExp("cannot access non-static field `" + name
                                   + "' using `" + getName() + '\'', comp);
-	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
-	      return new ErrorExp("field "+ctype.getName()+'.'+name
+	    if (caller != null
+                && ! caller.isAccessible(dtype, ctype, modifiers))
+	      return new ErrorExp("field "+dtype.getName()+'.'+name
                                   +" is not accessible here", comp);
           }
 
         else if (part instanceof gnu.bytecode.Method)
           {
             gnu.bytecode.Method method = (gnu.bytecode.Method) part;
-            ctype = method.getDeclaringClass();
+            ClassType dtype = method.getDeclaringClass();
 	    int modifiers = method.getModifiers();
             boolean isStaticMethod = method.getStaticFlag();
             if (isStatic && ! isStaticMethod)
               return new ErrorExp("cannot call non-static getter method `"
                                   + name + "' using `" + getName() + '\'', comp);
-	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
+	    if (caller != null && ! caller.isAccessible(dtype, ctype, modifiers))
 	      return new ErrorExp( "method "+method +" is not accessible here", 
                                    comp);
           }

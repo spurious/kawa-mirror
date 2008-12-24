@@ -1,3 +1,11 @@
+2008-12-23  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java: Update isAccessible call, needed so we can check that
+	the requiremens of protected access are satisfied.
+	* SlotGet.java: Likewise.
+	* ClassMethods.java: Likewise.
+	(class MethodFilter): Need to save receiver type in filter.
+
 2008-02-27  Per Bothner  <per@bothner.com>
 
 	* ArrayNew.java (apply1, compile): Use implementation-type.

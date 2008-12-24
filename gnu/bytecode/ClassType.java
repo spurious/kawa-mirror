@@ -304,10 +304,12 @@ public class ClassType extends ObjectType
   /** Check if a component is accessible from this class.
    * @param declaring the class containing the component (a field, method,
    *   or inner class)
+   * @param receiver the type of the receiver object, if applicable.
    * @param modifiers the access flags of the component
    * @return true if the specified component can be accessed from this class.
    */
-  public boolean isAccessible (ClassType declaring, int modifiers)
+  public boolean isAccessible (ClassType declaring,
+                               ObjectType receiver, int modifiers)
   {
     int cmods = declaring.getModifiers();
     if ((modifiers & Access.PUBLIC) != 0 && (cmods & Access.PUBLIC) != 0)
@@ -325,7 +327,9 @@ public class ClassType extends ObjectType
     if (callerPackage.equals(classPackage))
       return true;
     if ((modifiers & Access.PROTECTED) != 0
-        && this.isSubclass(declaring))
+        && this.isSubclass(declaring)
+        && (!(receiver instanceof ClassType)
+            || ((ClassType) receiver).isSubclass(this)))
       return true;
     return false;
   }

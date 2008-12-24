@@ -1474,6 +1474,8 @@ public class Compilation implements SourceLocator
 	      }
 
 	    Declaration var = source.firstDecl();
+            if (var != null && var.isThisParameter())
+              var = var.nextDecl();
 	    for (int k = 0; k < singleArgs;  k++)
 	      {
 		if (counter != null && k >= source.min_args)
@@ -1679,6 +1681,8 @@ public class Compilation implements SourceLocator
 	      }
 
 	    Declaration var = source.firstDecl();
+            if (var != null && var.isThisParameter())
+              var = var.nextDecl();
 	    for (int k = 0; k < singleArgs;  k++)
 	      {
 		if (counter != null && k >= source.min_args)

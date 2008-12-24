@@ -49,10 +49,8 @@ public class module_name extends Syntax
 	    && name.charAt(len-1) == '>')
 	  {
 	    name = name.substring(1, len-1);
-            decl = tr.define(arg, nameSyntax, defs);
 	  }
-	else
-	  err = "not implemented: plain name in module-name";
+        decl = tr.define(arg, nameSyntax, defs);
       }
     else
       err = "un-implemented expression in module-name";

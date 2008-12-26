@@ -1,3 +1,8 @@
+2008-12-25  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Partially revert previous check-in:
+	Don't enable JAXP-QName even if Java5 or Java5.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java:  Support "android" as a new "version".

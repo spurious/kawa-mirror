@@ -18,10 +18,7 @@ public class PreProcess
 
   static final String JAVA4_FEATURES = "+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex +SAX2 +use:java.nio";
   static final String NO_JAVA4_FEATURES = "-use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer -SAX2 -use:java.nio";
-  static final String JAVA5_FEATURES = "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +use:javax.xml.transform +JAXP-1.3 +JAXP-QName";
-
-  // use:javax.xml.transform
-  // -JAXP-QName" ?? availale when???
+  static final String JAVA5_FEATURES = "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +use:javax.xml.transform +JAXP-1.3 -JAXP-QName";
 
   static String[] version_features = {
     "java1", "-JAVA2 "+NO_JAVA4_FEATURES,

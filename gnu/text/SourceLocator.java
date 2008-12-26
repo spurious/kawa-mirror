@@ -4,7 +4,7 @@ public interface SourceLocator
   /* #ifdef SAX2 */
   extends
   /* #ifdef use:javax.xml.transform */
-  // javax.xml.transform.SourceLocator, 
+  javax.xml.transform.SourceLocator, 
   /* #endif */
   org.xml.sax.Locator
   /* #endif */

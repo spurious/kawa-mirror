@@ -38,9 +38,8 @@ public class ExitExp extends Expression
   {
     CodeAttr code = comp.getCode();
     Expression res = result == null ? QuoteExp.voidExp : result;
-    res.compileWithPosition(comp, block.subTarget);
-    code.doPendingFinalizers(block.oldTryState);
-    code.emitGoto(block.exitLabel);
+    res.compileWithPosition(comp, block.exitTarget);
+    block.exitableBlock.exit();
   }
 
   protected Expression deepCopy (gnu.kawa.util.IdentityHashTable mapper)

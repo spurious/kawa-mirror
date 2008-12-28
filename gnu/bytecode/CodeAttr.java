@@ -26,10 +26,16 @@ public class CodeAttr extends Attribute implements AttrContainer
   { this.attributes = attributes; }
   LineNumbersAttr lines;
   public LocalVarsAttr locals;
+  public StackMapTableAttr stackMap;
 
   SourceDebugExtAttr sourceDbgExt;
 
-  Type[] stack_types;
+  public static final int GENERATE_STACK_MAP_TABLE = 1;
+  public static final int DONT_USE_JSR = 2;
+  int flags;
+
+  public Type[] stack_types;
+  Type[] local_types;
 
   int SP;  // Current stack size (in "words")
   private int max_stack;
@@ -39,9 +45,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   int PC;
   byte[] code;
 
-  private boolean useJsr()
+  boolean useJsr()
   {
-    return false;
+    return (flags & DONT_USE_JSR) == 0;
   }
 
   /* The exception handler table, as a vector of quadruples
@@ -86,20 +92,21 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The fixup_offset points to the end of the fragment.
    * (The first processFixups patches these to FIXUP_MOVE.) */
   static final int FIXUP_MOVE_TO_END = 10;
-  /** FIXUP_TRY with the following FIXUP_CATCH marks an exception handler.
-   * The label is the start of the try clause;
+  /** FIXUP_TRY with the following FIXUP_TRY_END and FIXUP_TRY_HANDLER
+   * marks an exception handler.  The label is the start of the try clause;
    * the current offset marks the exception handler. */
   static final int FIXUP_TRY = 11;
-  /** Second half of a FIXUP_TRY/FIXUP_CATCH pair.
-   * The label is the ed of the try clause;
+  /** Second part of a FIXUP_TRY/FIXUP_TRY_END/FIXUP_TRY_HANDLER set.
+   * The label is the end of the try clause;
    * the current offset is the exception type as a constant pool index. */
-  static final int FIXUP_CATCH = 12;
+  static final int FIXUP_TRY_END = 12;
+  static final int FIXUP_TRY_HANDLER = 13;
   /** With following FIXUP_LINE_NUMBER associates an offset with a line number.
    * The fixup_offset is the code location; the fixup_label is null. */
-  static final int FIXUP_LINE_PC = 13;
+  static final int FIXUP_LINE_PC = 14;
   /** With preceding FIXUP_LINE_PC associates an offset with a line number.
    * The fixup_offset is the line number; the fixup_label is null. */
-  static final int FIXUP_LINE_NUMBER = 14;
+  static final int FIXUP_LINE_NUMBER = 15;
   int[] fixup_offsets;
   Label[] fixup_labels;
   /** Active length of fixup_offsets and fixup_labels.
@@ -115,7 +122,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void fixupChain (Label here, Label target)
   {
     fixupAdd(CodeAttr.FIXUP_MOVE, 0, target);
-    here.define(this);
+    here.defineRaw(this);
   }
 
   /** Add a fixup at this location.
@@ -219,6 +226,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     super ("Code");
     addToFrontOf(meth);
     meth.code = this;
+    if (meth.getDeclaringClass().getClassfileMajorVersion() >= 50)
+      flags |= GENERATE_STACK_MAP_TABLE|DONT_USE_JSR;
   }
 
   public final void reserve (int bytes)
@@ -297,11 +306,104 @@ public class CodeAttr extends Attribute implements AttrContainer
     fixupAdd(FIXUP_LINE_NUMBER, linenumber, null);
   }
 
+  /** Initialize local_types from parameters. */
+  void noteParamTypes ()
+  {
+    Method method = getMethod();
+    int offset = 0;
+    if ((method.access_flags & Access.STATIC) == 0)
+      {
+        Type type = method.classfile;
+        if ("<init>".equals(method.getName())
+            && ! "java.lang.Object".equals(type.getName()))
+          type = UninitializedType.uninitializedThis((ClassType) type);
+        noteVarType(offset++, type);
+      }
+    int arg_count = method.arg_types.length;
+    for (int i = 0;  i < arg_count;  i++)
+      {
+        Type type = method.arg_types[i];
+        noteVarType(offset++, type);
+        for (int size = type.getSizeInWords(); -- size > 0; )
+          offset++;
+      }
+    if ((flags & GENERATE_STACK_MAP_TABLE) != 0)
+      {
+        stackMap = new StackMapTableAttr();
+        
+        int[] encodedLocals = new int[20+offset];
+        int count = 0;
+        for (int i = 0; i < offset;  i++)
+          {
+            int encoded = stackMap.encodeVerificationType(local_types[i], this);
+            encodedLocals[count++] = encoded;
+            int tag = encoded & 0xFF;
+            if (tag == 3 || tag == 4)
+              i++;
+          }
+        stackMap.encodedLocals = encodedLocals;
+        stackMap.countLocals = count;
+        stackMap.encodedStack = new int[10];
+        stackMap.countStack = 0;
+      }
+  }
+
+  public void noteVarType (int offset, Type type)
+  {
+    int size = type.getSizeInWords();
+    
+    if (local_types == null)
+      local_types = new Type[20]; 
+    else if (offset + size > local_types.length) {
+      Type[] new_array = new Type[2 * local_types.length];
+      System.arraycopy (local_types, 0, new_array, 0, local_types.length);
+      local_types = new_array;
+    }
+    local_types[offset] = type;
+    if (offset > 0)
+      {
+        Type prev = local_types[offset-1];
+        if (prev != null && prev.getSizeInWords() == 2)
+          local_types[offset-1] = null;
+      }
+    while (--size > 0)
+      local_types[++offset] = null;
+  }
+
+  /** Set the current type state from a label. */
+  public final void setTypes (Label label)
+  {
+    setTypes(label.localTypes, label.stackTypes);
+  }
+
+  /** Set the current type state from a label. */
+  public final void setTypes (Type[] labelLocals, Type[] labelStack)
+  {
+    int labelSP = labelStack.length;
+    int usedLocals = labelLocals.length;
+    if (local_types != null)
+      {
+        if (usedLocals > 0)
+          System.arraycopy(labelLocals, 0, local_types, 0, usedLocals);
+        for (int i = usedLocals;  i < local_types.length;  i++)
+          local_types[i] = null;
+      }
+    if (stack_types == null || usedLocals > stack_types.length)
+      stack_types = new Type[labelSP];
+    else
+      {
+        for (int i = labelStack.length;  i < stack_types.length;  i++)
+          stack_types[i] = null;
+      }
+    System.arraycopy(labelStack, 0, stack_types, 0, labelSP);
+    SP = labelSP;
+  }
+
   public final void pushType(Type type)
   {
     if (type.size == 0)
       throw new Error ("pushing void type onto stack");
-    if (stack_types == null)
+    if (stack_types == null || stack_types.length == 0) // ??
       stack_types = new Type[20];
     else if (SP + 1 >= stack_types.length) {
       Type[] new_array = new Type[2 * stack_types.length];
@@ -359,14 +461,12 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Get a new Label for the current location.
-   * Unlike Label.define, Does not change reachableHere().
+   * Unlike Label.define, does not change reachableHere().
    */
   public Label getLabel ()
   {
-    boolean  unreachable = unreachable_here;
     Label label = new Label();
-    label.define(this);
-    unreachable_here = unreachable;
+    label.defineRaw(this);
     return label;
   }
 
@@ -832,6 +932,23 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.nullType);
   }
 
+  /** Push zero or null as appropriate for the given type. */
+  public void emitPushDefaultValue (Type type)
+  { 
+    type = type.getImplementationType();
+    if (type instanceof PrimType)
+      emitPushConstant(0, type);
+    else
+      emitPushNull();
+  }
+
+  /** Initialize a variable to zero or null, as appropriate. */
+  public void emitStoreDefaultValue (Variable var)
+  {
+    emitPushDefaultValue(var.getType());
+    emitStore(var);
+  }
+
   public final void emitPushThis()
   {
     emitLoad(locals.used[0]);
@@ -1036,9 +1153,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitNew (ClassType type)
   {
     reserve(3);
+    Label label = new Label(this);
+    label.defineRaw(this);
     put1(187); // new
     putIndex2(getConstants().addClass(type));
-    pushType(UninitializedType.make(type));
+    pushType(new UninitializedType(type, label));
   }
 
   /** Compile code to allocate a new array.
@@ -1229,6 +1348,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("attempting to store in unassigned "+var
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
+    noteVarType(offset, type);
     reserve(4);
     popType();
     int kind = adjustTypedOp(type);
@@ -1417,6 +1537,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   
   final void emitTransfer (Label label, int opcode)
   {
+    label.setTypes(this);
     fixupAdd(FIXUP_TRANSFER, label);
     put1(opcode);
     PC += 2;
@@ -1427,6 +1548,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitGoto (Label label)
   {
+    label.setTypes(this);
     fixupAdd(FIXUP_GOTO, label);
     reserve(3);
     put1(167);
@@ -1442,21 +1564,28 @@ public class CodeAttr extends Attribute implements AttrContainer
     PC += 2;
   }
 
-  public final void callFinally(TryState tryState)
+  ExitableBlock currentExitableBlock;
+  int exitableBlockLevel;
+
+  /** Enter a block which can be exited.
+   * Used to make sure finally-blocks are executed when exiting a block,
+   * loop, or method.
+   */
+  public ExitableBlock startExitableBlock (Type resultType, boolean runFinallyBlocks)
   {
-    if (useJsr())
-      {
-        emitJsr(tryState.finally_subr);
-      }
-    else
-      {
-        if (tryState.returnSwitch == null)
-          tryState.returnSwitch = new SwitchState(this);
-        int caseValue = tryState.returnSwitch.numCases;
-        emitPushInt(caseValue);
-        emitGoto(tryState.finally_subr);
-        tryState.returnSwitch.addCase(caseValue, this);
-      }
+    ExitableBlock bl = new ExitableBlock(resultType, this, runFinallyBlocks);
+    bl.outer = currentExitableBlock;
+    currentExitableBlock = bl;
+    return bl;
+  }
+
+  /** End a block entered by a previous startExitableBlock.
+   */
+  public void endExitableBlock ()
+  {
+    ExitableBlock bl = currentExitableBlock;
+    bl.finish();
+    currentExitableBlock = bl.outer;
   }
 
   public final void emitGotoIfCompare1 (Label label, int opcode)
@@ -1566,7 +1695,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(154); // ifne
   }
 
-  /** Compile start of conditional:  <tt>if (x <= 0)</tt>. */
+  /** Compile start of conditional:  {@code if (x <= 0)}. */
   public final void emitIfIntLEqZero()
   {
     emitIfCompare1(157); // ifgt
@@ -1703,10 +1832,10 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitElse ()
   {
     Label else_label = if_stack.end_label;
-    Label end_label = new Label (this);
-    if_stack.end_label = end_label;
     if (reachableHere ())
       {
+        Label end_label = new Label (this);
+        if_stack.end_label = end_label;
 	int growth = SP-if_stack.start_stack_size;
 	if_stack.stack_growth = growth;
 	if (growth > 0)
@@ -1719,6 +1848,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  if_stack.then_stacked_types = new Type[0];  // ???
 	emitGoto (end_label);
       }
+    else
+      if_stack.end_label = null;
     while (SP > if_stack.start_stack_size)
       popType();
     SP = if_stack.start_stack_size;
@@ -1904,43 +2035,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     put1 (195);  // monitorexit
   }
 
-  /** Call pending finalizer functions.
-   * @param limit Only call finalizers more recent than this.
-   */
-  public void doPendingFinalizers (TryState limit)
-  {
-    TryState stack = try_stack;
-
-    /* If a value is returned, it must be saved to a local variable,
-       to prevent a verification error because of inconsistent stack sizes.
-    */
-    boolean saveResult = ! getMethod().getReturnType().isVoid();
-    Variable result = null;
-
-    while (stack != limit)
-      {
-	if (stack.finally_subr != null         // there is a finally block
-	    && stack.finally_ret_addr == null) // 'return' is not inside it
-	  {
-	    if (saveResult && result == null)
-	      {
-		result = addLocal(topType());
-		emitStore(result);
-	      }
-            callFinally(stack);
-	  }
-
-	stack = stack.previous;
-      }
-
-    if (result != null)
-      emitLoad(result);
-    // We'd like to do freeLocal on the result Variable, but then we risk
-    // it being re-used in a finalizer, which would trash its value.  We
-    // don't have any convenient way to to do that (the pending Scope
-    // mechanism is over-kill), we for now we just leak the Variable.
-  }
-
   /**
    * Compile a method return.
    * If inside a 'catch' clause, first call 'finally' clauses.
@@ -1949,7 +2043,13 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitReturn ()
   {
-    doPendingFinalizers(null);
+    if (try_stack != null)
+      new Error();
+    emitRawReturn();
+  }
+
+  final void emitRawReturn ()
+  {
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
@@ -1959,8 +2059,10 @@ public class CodeAttr extends Attribute implements AttrContainer
       emitTypedOp (172, popType().promote());
     setUnreachable();
   }
+  
 
-  /** Add an exception handler. */
+  /** Add an exception handler.
+    * Low-level routine; {@code #emitCatchStart} is preferred. */
   public void addHandler (int start_pc, int end_pc,
 			  int handler_pc, int catch_type)
   {
@@ -1982,7 +2084,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     exception_table_length++;
   }
 
-  /** Add an exception handler. */
+  /** Add an exception handler.
+   * Low-level routine; {@link #emitCatchStart} is preferred. */
   public void addHandler (Label start_try, Label end_try,
 			  ClassType catch_type)
   {
@@ -1993,7 +2096,14 @@ public class CodeAttr extends Attribute implements AttrContainer
     else
       catch_type_index = constants.addClass(catch_type).index;
     fixupAdd(FIXUP_TRY, start_try);
-    fixupAdd(FIXUP_CATCH, catch_type_index, end_try);
+    fixupAdd(FIXUP_TRY_END, catch_type_index, end_try);
+    Label handler = new Label();
+    handler.localTypes = start_try.localTypes;
+    handler.stackTypes = new Type[1];
+    Type handler_class = catch_type == null ? Type.javalangThrowableType : catch_type;
+    handler.stackTypes[0] = handler_class;
+    setTypes(handler);
+    fixupAdd(FIXUP_TRY_HANDLER, 0, handler);
   }
 
   /** Beginning of code that has a cleanup handler.
@@ -2078,136 +2188,191 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     TryState try_state = new TryState(this);
     try_state.savedStack = savedStack;
+
+    int usedLocals = local_types == null ? 0 : local_types.length;
+    for (; usedLocals > 0; usedLocals--)
+      {
+        Type last = local_types[usedLocals-1];
+        if (last != null)
+          break;
+      }
+
+    Type[] startLocals;
+    if (usedLocals == 0)
+      startLocals = Type.typeArray0;
+    else
+      {
+        startLocals = new Type[usedLocals];
+        System.arraycopy(local_types, 0, startLocals, 0, usedLocals);
+      }
+    try_state.start_try.localTypes = startLocals;
+
     if (result_type != null)
       try_state.saved_result = addLocal(result_type);
     if (has_finally)
       try_state.finally_subr = new Label();
   }
 
-  public void emitTryEnd()
+  public void emitTryEnd ()
   {
-    if (try_stack.end_label == null)
-      {
-	if (try_stack.saved_result != null && reachableHere())
-	  emitStore(try_stack.saved_result);
-	try_stack.end_label = new Label();
-        if (try_stack.finally_subr != null)
-          try_stack.exception = addLocal(Type.javalangThrowableType);
-	if (reachableHere())
-	  {
-	    if (try_stack.finally_subr != null)
-              {
-                if (! useJsr())
-                  {
-                    emitPushNull();
-                    emitStore(try_stack.exception);
-                  }
-                callFinally(try_stack);
-              }
-	    emitGoto(try_stack.end_label);
-	  }
-	try_stack.end_try = getLabel();
-      }
+    emitTryEnd(false);
+  }
+  private void emitTryEnd (boolean fromFinally)
+  {
+    if (try_stack.tryClauseDone)
+      return;
+    try_stack.tryClauseDone = true;
+    if (try_stack.finally_subr != null)
+      try_stack.exception = addLocal(Type.javalangThrowableType);
+    gotoFinallyOrEnd(fromFinally);
+    try_stack.end_try = getLabel();
   }
 
   public void emitCatchStart(Variable var)
   {
-    emitTryEnd();
-    SP = 0;
+    emitTryEnd(false);
+    setTypes(try_stack.start_try.localTypes, Type.typeArray0);
     if (try_stack.try_type != null)
       emitCatchEnd();
     ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
     addHandler(try_stack.start_try, try_stack.end_try, type);
     if (var != null)
-      {
-	pushType(type);
-	emitStore(var);
-      }
-    else
-      pushType(Type.javalangThrowableType);
+      emitStore(var);
   }
 
   public void emitCatchEnd()
+  {
+    gotoFinallyOrEnd(false);
+    try_stack.try_type = null;
+  }
+
+  private void gotoFinallyOrEnd (boolean fromFinally)
   {
     if (reachableHere())
       {
 	if (try_stack.saved_result != null)
 	  emitStore(try_stack.saved_result);
-	if (try_stack.finally_subr != null)
-	  callFinally(try_stack);
-	emitGoto(try_stack.end_label);
+        if (try_stack.end_label == null)
+          try_stack.end_label = new Label();
+	if (try_stack.finally_subr == null || useJsr())
+          {
+            if (try_stack.finally_subr != null)
+              emitJsr(try_stack.finally_subr);
+            emitGoto(try_stack.end_label);
+          }
+        else
+          {
+            if (try_stack.exitCases != null)
+              emitPushInt(0);
+            emitPushNull(); // No caught Throwable.
+            if (! fromFinally)
+              emitGoto(try_stack.finally_subr);
+          }
       }
-    try_stack.try_type = null;
   }
 
   public void emitFinallyStart()
   {
-    emitTryEnd();
+    emitTryEnd(true);
     if (try_stack.try_type != null)
       emitCatchEnd();
-    SP = 0;
     try_stack.end_try = getLabel();
 
     pushScope();
-    emitCatchStart(null);
-    emitStore(try_stack.exception);
     if (useJsr())
       {
+        SP = 0;
+        emitCatchStart(null);
+        emitStore(try_stack.exception);
         emitJsr(try_stack.finally_subr);
+        emitLoad(try_stack.exception);
+        emitThrow();
       }
     else
       {
-        if (try_stack.returnSwitch == null)
-          // If the try-clause cannot return.
-          try_stack.returnSwitch = new SwitchState(this);
-        emitPushInt(try_stack.returnSwitch.numCases);
-        popType();
+        setUnreachable();
+        Label endLabel = new Label(this);
+        int fragment_cookie = beginFragment(endLabel);
+        addHandler(try_stack.start_try, try_stack.end_try, Type.javalangThrowableType);
         if (try_stack.saved_result != null)
+          emitStoreDefaultValue(try_stack.saved_result);
+        if (try_stack.exitCases != null)
           {
-            Type t = try_stack.saved_result.getType().getImplementationType();
-            if (t instanceof PrimType)
-              emitPushConstant(0, t);
-            else
-              emitPushNull();
-            emitStore(try_stack.saved_result);
+            emitPushInt(-1);  // Return switch case code.
+            emitSwap();
           }
-
         emitGoto(try_stack.finally_subr);
-        try_stack.returnSwitch.addDefault(this);
+        endFragment(fragment_cookie);
       }
-    emitLoad(try_stack.exception);
-    emitThrow();
-    
     try_stack.finally_subr.define(this);
-    Type ret_addr_type;
+    
     if (useJsr())
       {
-        ret_addr_type = Type.objectType;
+        Type ret_addr_type = Type.objectType;
+        try_stack.finally_ret_addr = addLocal(ret_addr_type);
+        pushType(ret_addr_type);
+        emitStore(try_stack.finally_ret_addr);
       }
     else
       {
-        ret_addr_type = Type.intType;
+        // Stack contents at the start of the finally block:
+        // an integer exit code, but only if (exitCases != null).
+        // a Throwable or null
       }
-    try_stack.finally_ret_addr = addLocal(ret_addr_type);
-    pushType(ret_addr_type);
-    emitStore(try_stack.finally_ret_addr);
   }
 
   public void emitFinallyEnd()
-  {
+  { 
     if (useJsr())
       emitRet(try_stack.finally_ret_addr);
+    else if (try_stack.end_label == null && try_stack.exitCases == null)
+      {
+        emitThrow();
+      }
     else
       {
-        SwitchState sw = try_stack.returnSwitch;
-        emitLoad(try_stack.finally_ret_addr);
-        popType();
-        sw.switchValuePushed(this);
-        sw.finish(this);
-        try_stack.returnSwitch = null;
+        emitStore(try_stack.exception);
+        emitLoad(try_stack.exception);
+        emitIfNotNull();
+        emitLoad(try_stack.exception);
+        emitThrow();
+        emitElse();
+
+        ExitableBlock exit = try_stack.exitCases;
+
+        if (exit != null)
+          {
+            SwitchState sw = startSwitch();
+
+            while (exit != null)
+              {
+                ExitableBlock next = exit.nextCase;
+                exit.nextCase = null;
+                exit.currentTryState = null;
+                TryState nextTry = TryState.outerHandler(try_stack.previous,
+                                                         exit.initialTryState);
+                if (nextTry == exit.initialTryState) // Optimization
+                  {
+                    sw.addCaseGoto(exit.switchCase, this, exit.endLabel);
+                  }
+                else
+                  {
+                    sw.addCase(exit.switchCase, this);
+                    exit.exit(nextTry);
+                  }
+                exit = next;
+              }
+            try_stack.exitCases = null;
+
+            
+            sw.addDefault(this);
+            sw.finish(this);
+          }
+        emitFi();
+
+        setUnreachable();
       }
-    setUnreachable();
     popScope();
     try_stack.finally_subr = null;
   }
@@ -2216,20 +2381,26 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     if (try_stack.finally_subr != null)
       emitFinallyEnd();
-    try_stack.end_label.define(this);
     Variable[] vars = try_stack.savedStack;
-    if (vars != null)
+    if (try_stack.end_label == null)
+      setUnreachable();
+    else
       {
-	for (int i = vars.length;  --i >= 0; )
-	  {
-	    Variable v = vars[i];
-	    if (v != null) {
-	      emitLoad(v);
-	    }
-	  }
+        setTypes(try_stack.start_try.localTypes, Type.typeArray0);
+        try_stack.end_label.define(this);
+        if (vars != null)
+          {
+            for (int i = vars.length;  --i >= 0; )
+              {
+                Variable v = vars[i];
+                if (v != null) {
+                  emitLoad(v);
+                }
+              }
+          }
+        if (try_stack.saved_result != null)
+          emitLoad(try_stack.saved_result);
       }
-    if (try_stack.saved_result != null)
-	emitLoad(try_stack.saved_result);
     if (try_stack.saved_result != null || vars != null)
 	popScope();
     try_stack = try_stack.previous;
@@ -2252,7 +2423,6 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public SwitchState startSwitch ()
   {
-    popType();
     SwitchState sw = new SwitchState(this);
     sw.switchValuePushed(this);
     return sw;
@@ -2302,6 +2472,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	switch (kind)
 	  {
 	  case FIXUP_TRY:
+            i+=2;
+            break;
 	  case FIXUP_LINE_PC:
 	    i++;
 	  case FIXUP_NONE:
@@ -2387,6 +2559,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 	switch (kind)
 	  {
 	  case FIXUP_TRY:
+            i+=2;
+            fixup_labels[i].position = offset + delta;
+            break;
 	  case FIXUP_LINE_PC:
 	    i++;
 	  case FIXUP_NONE:
@@ -2439,21 +2614,36 @@ public class CodeAttr extends Attribute implements AttrContainer
     int new_pc = 0;
     int next_fixup_index = 0;
     int next_fixup_offset = fixupOffset(0);
+    int oldPC = -1;
+    Label pendingStackMapLabel = null;
   loop3:
     for (int old_pc = 0;  ;  )
       {
 	if (old_pc < next_fixup_offset)
-	  {
-	  new_code[new_pc++] = code[old_pc++];
-	  }
+          new_code[new_pc++] = code[old_pc++];
 	else
 	  {
 	    int kind = fixup_offsets[next_fixup_index] & 15;
 	    Label label = fixup_labels[next_fixup_index];
+            if (pendingStackMapLabel != null
+                && pendingStackMapLabel.position < new_pc)
+              {
+                stackMap.emitStackMapEntry(pendingStackMapLabel, this);
+                pendingStackMapLabel = null;
+              }
+            if (pendingStackMapLabel != null
+                && pendingStackMapLabel.position > new_pc)
+              throw new Error("labels out of order");
 	    switch (kind)
 	      {
 	      case FIXUP_NONE:
+		break;
 	      case FIXUP_DEFINE:
+                if (stackMap != null && label != null && label.stackTypes != null && label.position != 0)
+                  {
+                    pendingStackMapLabel
+                      = mergeLabels(pendingStackMapLabel, label);
+                  }
 		break;
 	      case FIXUP_DELETE3:
 		old_pc += 3;
@@ -2514,11 +2704,16 @@ public class CodeAttr extends Attribute implements AttrContainer
 		  }
 		break;
 	      case FIXUP_TRY:
+                label = fixup_labels[next_fixup_index+2];
+                int handler_type_index = fixupOffset(next_fixup_index+1);
+                if (stackMap != null)
+                  pendingStackMapLabel
+                    = mergeLabels(pendingStackMapLabel, label);
 		addHandler(fixup_labels[next_fixup_index].position,
 			   fixup_labels[next_fixup_index+1].position,
 			   new_pc,
-			   fixupOffset(next_fixup_index+1));
-		next_fixup_index++;
+			   handler_type_index);
+		next_fixup_index+=2;
 		break;
 	      case FIXUP_LINE_PC:
 		if (lines == null)
@@ -2557,11 +2752,25 @@ public class CodeAttr extends Attribute implements AttrContainer
     fixup_offsets = null;
   }
 
+  private Label mergeLabels (Label oldLabel, Label newLabel)
+  {
+    if (oldLabel != null)
+      {
+        Type[] plocals = oldLabel.localTypes;
+        Type[] pstack = oldLabel.stackTypes;
+        newLabel.setTypes(plocals, plocals.length,
+                          pstack, pstack.length);
+      }
+    return newLabel;
+  }
+
   public void assignConstants (ClassType cl)
   {
     if (locals != null && locals.container == null && ! locals.isEmpty())
       locals.addToFrontOf(this);
     processFixups();
+    if (stackMap != null && stackMap.numEntries > 0)
+      stackMap.addToFrontOf(this);
     if (instructionLineMode)
       {
         // A kludge to low-level debugging:
@@ -2714,6 +2923,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    dst.print(fixup_labels[i]);
 	    dst.print(" type: ");
 	    dst.println(fixup_offsets[i] >> 4);
+            i++;
 	    break;
 	  case FIXUP_LINE_PC:
 	    dst.print(" LINE ");
@@ -3036,28 +3246,9 @@ public class CodeAttr extends Attribute implements AttrContainer
     dst.write(str, last, pos-last);
   }
 
-  /** Return an object encapsulating the type state of the JVM stack. */
-  public Type[] saveStackTypeState(boolean clear)
+  public int beginFragment (Label after)
   {
-    if (SP == 0)
-      return null;
-    Type[] typeState = new Type[SP];
-    System.arraycopy(stack_types, 0, typeState, 0, SP);
-    if (clear)
-      SP = 0;
-    return typeState;
-  }
-
-  /** Restore a type state as saved by saveStackTypeState. */
-  public void restoreStackTypeState (Type[] save)
-  {
-    if (save == null)
-      SP = 0;
-    else
-      {
-	SP = save.length;
-	System.arraycopy(save, 0, stack_types, 0, SP);
-      }
+    return beginFragment(new Label(), after);
   }
 
   public int beginFragment (Label start, Label after)

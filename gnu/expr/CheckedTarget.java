@@ -156,15 +156,16 @@ public class CheckedTarget extends StackTarget
     endTry.define(code);
 
     Label endLabel = new Label(code);
+    endLabel.setTypes(code);
     if (isInTry)
       code.emitGoto(endLabel);
     int fragment_cookie = 0;
+    code.setUnreachable();
     if (! isInTry)
-      fragment_cookie = code.beginFragment(new Label(code), endLabel);
+      fragment_cookie = code.beginFragment(endLabel);
     code.addHandler(startTry, endTry, typeClassCastException);
     // Push arguments:
     // ClassCastException is already pushed
-    code.pushType(typeClassCastException);
     boolean thisIsProc = false;
     if (proc != null && proc.isClassGenerated()
         && ! comp.method.getStaticFlag())

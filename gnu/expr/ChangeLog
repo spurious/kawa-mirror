@@ -1,5 +1,17 @@
 2008-12-27  Per Bothner  <per@bothner.com>
 
+	* TryExp.java (compile): Various tweaks to handle StackMapTable.
+	* BlockExp.java: Re-write to use ExitableBlock.
+	* ExitExp.java: Likewise.
+	* FluidLetExp.java: Minor tweak to enable an optimization.
+	* LambdaExp.java (enterFunction): Use new noteStartFunction method.
+	* IfExp.java (compile): Update for ExitExp changes.
+	* Compilation.java (defaultClassFileVersion): Change to
+	ClassType.JDK_1_6_VERSION if JAVA6 is selected.
+	(generateMatchMethods): Need to explicitly note type-state for loop.
+	* Declaration.java (load): Update for exception handling changes.
+	* CheckedTarget.java (emitCheckedCoerce): Likewise.
+
 	* LambdaExp.java (enterFunction): Use new emitArrayLoad variant.
 
 	* LambdaExp.java (compile): Commment out bit-rotted and never-finished

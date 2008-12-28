@@ -117,6 +117,13 @@ public class Scope
     start = code.getLabel();
   }
 
+  /** Should be called at the start of a logical function - inlined or not. */
+  public void noteStartFunction(CodeAttr code)
+  {
+    setStartPC(code);
+    start.setTypes(code);
+  }
+
   /**
    * Search by name for a Variable in this Scope (only).
    * @param name name to search for

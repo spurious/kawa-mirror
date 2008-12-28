@@ -140,6 +140,7 @@ public class Method implements AttrContainer, Member {
       classfile.constants = new ConstantPool();
     prepareCode(0);
     code.sourceDbgExt = classfile.sourceDbgExt;
+    code.noteParamTypes();
     code.pushScope();
   }
 

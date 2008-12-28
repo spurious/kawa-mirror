@@ -49,7 +49,8 @@ public class IfExp extends Expression
   {
     Language language = comp.getLanguage();
     gnu.bytecode.CodeAttr code = comp.getCode();
-    Label trueLabel, falseLabel;
+    Label trueLabel, falseLabel = null;
+    BlockExp block;
     boolean trueInherited, falseInherited;
     // A constant else_clause results from the expansion of (and ...),
     // and also if the else_clause if elided, so we optimize this case.
@@ -65,14 +66,15 @@ public class IfExp extends Expression
       }
     else if (else_clause instanceof ExitExp
              && ((ExitExp) else_clause).result instanceof QuoteExp
-             && ((ExitExp) else_clause).block.subTarget instanceof IgnoreTarget)
+             && (block = ((ExitExp) else_clause).block).exitTarget instanceof IgnoreTarget
+             && (falseLabel = block.exitableBlock.exitIsGoto()) != null)
       {
         falseInherited = true;
-        falseLabel = ((ExitExp) else_clause).block.exitLabel;
       }
     else
+      falseInherited = false;
+    if (falseLabel == null)
       {
-	falseInherited = false;
 	falseLabel = new Label(code);
       }
     // The expansion of "or" creates an IfExp with test==then_clause.
@@ -142,7 +144,8 @@ public class IfExp extends Expression
     Type t2 = else_clause == null ? Type.voidType : else_clause.getType();
     if (t1 == t2)
       return t1;
-    // FIXME - implement union types
+    // FIXME - implement union types:
+    // return Type.lowestCommonSuperType(t1, t2);
     return Type.pointer_type;
   }
 

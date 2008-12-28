@@ -1,3 +1,9 @@
+2008-12-27  Per Bothner  <per@bothner.com>
+
+	* standard/callcc.java: Optimize the case when calls to the
+	continuation are lexically know and exits to the same uninlined
+	function.  In this case we essentially meit a goto.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* standard/module_extends.java: Move setting of module's super-type

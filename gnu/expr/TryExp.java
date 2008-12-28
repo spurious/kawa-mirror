@@ -58,20 +58,16 @@ public class TryExp extends Expression
   {
     CodeAttr code = comp.getCode();
     boolean has_finally = finally_clause != null;
-    Type result_type = target instanceof IgnoreTarget ? null
-	: getType();
     Target ttarg;
-    // FIXME optimize if target is ConsumerTarget
-    if (result_type == null)
-      ttarg = Target.Ignore;
-    else if (result_type == Type.pointer_type)
-      ttarg = Target.pushObject;
+    if (target instanceof StackTarget
+        || target instanceof ConsumerTarget || target instanceof IgnoreTarget
+        || (target instanceof ConditionalTarget && finally_clause == null))
+      ttarg = target;
     else
-      ttarg = new StackTarget(result_type);
-    code.emitTryStart(has_finally, result_type);
+      ttarg = Target.pushValue(target.getType());
+    code.emitTryStart(has_finally,
+                      ttarg instanceof StackTarget ? ttarg.getType() : null);
     try_clause.compileWithPosition(comp, ttarg);
-    code.emitTryEnd();
-
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())
       {
@@ -85,8 +81,8 @@ public class TryExp extends Expression
 	code.emitFinallyEnd();
       }
     code.emitTryCatchEnd();
-    if (result_type != null)
-      target.compileFromStack(comp, result_type);
+    if (ttarg != target)
+      target.compileFromStack(comp, target.getType());
   }
 
   protected Expression walk (ExpWalker walker)
@@ -106,6 +102,14 @@ public class TryExp extends Expression
 
     if (walker.exitValue == null && finally_clause != null)
       finally_clause =walker.walk( finally_clause);
+  }
+
+  public gnu.bytecode.Type getType()
+  {
+    if (catch_clauses == null)
+      return try_clause.getType();
+    // FIXME - return union type
+    return super.getType();
   }
 
   public void print (OutPort ps)

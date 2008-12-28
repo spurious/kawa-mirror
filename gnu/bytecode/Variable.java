@@ -108,10 +108,8 @@ public class Variable extends Location implements java.util.Enumeration
       {
         // Note that the this parameter in <init> is uninitialized,
         // until we call super(...) or this(...) on it.
-        Method method = code.getMethod();
-        if ("<init>".equals(method.getName())
-            && ! "java.lang.Object".equals(method.classfile.getName()))
-          setType(UninitializedType.uninitializedThis((ClassType) getType()));
+        if ("<init>".equals(code.getMethod().getName()))
+          setType(code.local_types[0]);
       }
     return true;
   }

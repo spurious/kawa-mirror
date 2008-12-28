@@ -8,20 +8,23 @@ package gnu.bytecode;
 public class UninitializedType extends ObjectType
 {
   ClassType ctype;
+  /** If non-null, the location of the 'new' instruction. */
+  Label label;
 
-  public UninitializedType (ClassType ctype)
+  UninitializedType (ClassType ctype)
   {
     super(ctype.getName());
     setSignature(ctype.getSignature());
     this.ctype = ctype;
   }
 
-  public static UninitializedType uninitializedThis (ClassType ctype)
+  UninitializedType (ClassType ctype, Label label)
   {
-    return new UninitializedType(ctype);
+    this(ctype);
+    this.label = label;
   }
 
-  public static UninitializedType make (ClassType ctype)
+  static UninitializedType uninitializedThis (ClassType ctype)
   {
     return new UninitializedType(ctype);
   }

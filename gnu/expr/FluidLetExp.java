@@ -39,9 +39,7 @@ public class FluidLetExp extends LetExp
     doInits(decl, 0, save, comp, ctx);
     code.emitTryStart(true, result_type);
     body.compileWithPosition(comp, ttarg);
-    code.emitTryEnd();
     code.emitFinallyStart();
-
     
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {

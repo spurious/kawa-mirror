@@ -19,8 +19,10 @@ package gnu.bytecode;
  * SwitchState sw = code.startSwitch();
  * sw.addCase(1, code);
  * compile[exp1];
+ * sw.exitSwitch(code);
  * sw.addCase(2, code);
  * compile[exp2];
+ * sw.exitSwitch(code);
  * sw.addDefault(code);
  * compile[expd];
  * sw.finish(code);
@@ -41,10 +43,15 @@ public class SwitchState
   Label[] labels;
   /** The location to jump to if none of the cases match. */
   Label defaultLabel;
-  /* Location of the actual switch instruction. */
+  /** Location of the actual switch instruction. */
   Label switch_label;
+  /** Start of the "cases".
+   * This is used to store the type-state for each case. */
   Label cases_label;
-  Type[] typeState;
+  /** Code following the switch. */
+  Label after_label;
+
+  TryState outerTry;
 
   public int getMaxValue() { return maxValue; }
 
@@ -54,8 +61,8 @@ public class SwitchState
   {
     switch_label = new Label(code);
     cases_label = new Label(code);
-
-    //    code.popType();  // pop switch value
+    after_label = new Label(code);
+    outerTry = code.try_stack;
 
     numCases = 0;
   }
@@ -66,10 +73,8 @@ public class SwitchState
    */
   public void switchValuePushed (CodeAttr code)
   {
-    // code.popType();  // pop switch value
-    // Save stack types (except top int) into typeState
-    typeState = code.saveStackTypeState(false);
-
+    code.popType();  // pop switch value
+    cases_label.setTypes(code);
     code.fixupChain(cases_label, switch_label);
   }
 
@@ -82,28 +87,33 @@ public class SwitchState
   public boolean addCase(int value, CodeAttr code)
   {
     Label label = new Label(code);
+    if (code.reachableHere())
+      label.setTypes(cases_label);
+    else
+      label.setTypesSame(cases_label);
     label.define(code);
-    return addCase(value, code, label);
+    return insertCase(value, label, code);
   }
 
-  public boolean addCase(int value, CodeAttr code, Label label)
+  /** Optimization of {@code addCase(value, code); emitGoto(label)}. */
+  public boolean addCaseGoto(int value, CodeAttr code, Label label)
   {
     boolean ok = insertCase(value, label, code);
-    code.restoreStackTypeState(typeState);
+    label.setTypesSame(cases_label);
+    code.setUnreachable();
     return ok;
   }
 
   public void addDefault(CodeAttr code)
   {
     Label label = new Label(code);
+    if (code.reachableHere())
+      label.setTypes(cases_label);
+    else
+      label.setTypesSame(cases_label);
     label.define(code);
-    addDefault(code, label);
-  }
-
-  public void addDefault(CodeAttr code, Label label)
-  {
+    if (defaultLabel!=null) throw new Error();
     defaultLabel = label;
-    code.restoreStackTypeState(typeState);
   }
 
   /** Internal routine to add a new case.
@@ -171,6 +181,17 @@ public class SwitchState
     return true;
   }
 
+  /** Break/exit from this switch.
+   * Doesn't allow exiting through a try - if you need that,
+   * use an {@link ExitableBlock}.
+   */
+  public void exitSwitch (CodeAttr code)
+  {
+    if (outerTry != code.try_stack)
+      throw new Error("exitSwitch cannot exit through a try");
+    code.emitGoto(after_label);
+  }
+
   /** Handle the end of the switch statement.
    * Assume the case value is on the stack; go to the matching case label. */
   public void finish (CodeAttr code)
@@ -189,7 +210,6 @@ public class SwitchState
 	code.emitInvokeSpecial(con);
 	code.emitThrow();
       }
-    Label after_label = new Label(code);
     code.fixupChain(switch_label, after_label);
     if (numCases <= 1)
       {

@@ -1,5 +1,45 @@
 2008-12-27  Per Bothner  <per@bothner.com>
 
+	Generate StackMapTable attributes.
+	* ExitableBlock.java: New class.
+	* Makefile.am: Update accordingly.
+	* CodeAttr.java (startExitableBlock, endExitableBlock): New methods.
+	* StackMapTableAttr.java (emitStackMapEntry):  Generate an entry
+	for a given position in the StackMapTable attribute.  Handles
+	appropriate encoding and compression.
+	* SwitchState.java (typeState): Remove field - instead we remember
+	the type-state in cases_label.
+	(switchValuePushed): Do the popType of the switch value here.
+	(addCase, addDefault): Remove methods with explicit Labels.
+	(exitSwitch): New method.
+	* CodeAttr.java (startSwitch): Don't do popType here.
+	* UninitializedType.java (label): New field.
+	(<init>): New constructor - takes label of new instruction.
+	* Method.java (initCode): Call new noteParamTypes methods.
+	* Variable.java (reserveLocal): Don't explicitly set UninitializedType
+	here - that is taken care of in noteParamTypes.
+	* CodeAttr.java:  Support for genering StackMapTable.
+	That requires not using jsr/ret.
+	(useJsr): New method.
+	(flag): New field.
+	(noteParamTypes, noteVarType, setTypes, emitPushDefaultValue,
+	emitStoreDefaultValue): New methods.
+	(emitStore): Do noteVarType.
+	(doPendingFinalizers, saveStackTypeState, restoreStackTypeState):
+	Remove methods.
+	(emitTryStart, emitTryEnd, emitCatchStart, emitFinallyStart,
+	emitFinallyEnd, emitTryCatchEnd): Rewrite to not require jsr/ret.
+	(processFixups): Rewrite to emit StackMapTable entries.
+	* Scope.java (noteStartFunction): New convenience method.
+	* Label.java (stackTypes, localTypes): New fields.
+	(setTypes, setTypesSame, defineRaw): New methods.
+	(define): Update type-state.
+	* TryState.java (returnSwitch): Remove field.
+	(exitCases, tryClauseDone): New fields.
+	(outerHandler): New method.
+
+2008-12-27  Per Bothner  <per@bothner.com>
+
 	* CodeAttr.java (emitArrayLoad, emitArrayStore): New convenience
 	methods that don't require the element type to be explicitly specified.
 

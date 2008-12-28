@@ -16,6 +16,7 @@ CpoolRef.java \
 CpoolString.java \
 CpoolUtf8.java \
 EnclosingMethodAttr.java \
+ExitableBlock.java \
 Filter.java \
 Location.java Field.java \
 Label.java IfState.java TryState.java SwitchState.java \

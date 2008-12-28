@@ -134,10 +134,14 @@ public class Compilation implements SourceLocator
   }
 
   public static int defaultClassFileVersion =
+    /* #ifdef JAVA6 */
+    // ClassType.JDK_1_6_VERSION
+    /* #else */
     /* #ifdef JAVA5 */
     ClassType.JDK_1_5_VERSION
     /* #else */
     // ClassType.JDK_1_1_VERSION
+    /* #endif */
     /* #endif */
     ;
 
@@ -1748,8 +1752,9 @@ public class Compilation implements SourceLocator
 			code.emitLoad(counter);
 			code.emitNewArray(elType);
 			Label testLabel = new Label(code);
-			code.emitGoto(testLabel);
 			Label loopTopLabel = new Label(code);
+                        loopTopLabel.setTypes(code);
+			code.emitGoto(testLabel);
 			loopTopLabel.define(code);
 
 			code.emitDup(1); // new array
@@ -2006,9 +2011,7 @@ public class Compilation implements SourceLocator
 	loadCallContext();
         code.emitGetField(pcCallContextField);
         fswitch = code.startSwitch();
-	Label l = new Label(code);
-	l.define(code);
-	fswitch.addCase(0, code, l);
+	fswitch.addCase(0, code);
       }
 
     module.compileBody(this);

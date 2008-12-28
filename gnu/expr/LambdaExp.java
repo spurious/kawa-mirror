@@ -1258,7 +1258,7 @@ public class LambdaExp extends ScopeExp
     CodeAttr code = comp.getCode();
 
     // Tail-calls loop back to here!
-    getVarScope().setStartPC(code);
+    getVarScope().noteStartFunction(code);
 
     if (closureEnv != null && ! closureEnv.isParameter()
 	&& ! comp.usingCPStyle())

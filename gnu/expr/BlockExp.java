@@ -35,12 +35,10 @@ public class BlockExp extends Expression
     this.label = label;
   }
 
-  /* Target used to evaluate body. Temporary only used during compilation. */
-  Target subTarget;
-  /* Label to exit to.  Temporary only used during compilation. */
-  Label exitLabel;
-  /* Current TryState when we start compiling the.  Temporary. */
-  TryState oldTryState;
+  /* Temporary only used during compilation. */
+  ExitableBlock exitableBlock;
+
+  Target exitTarget;
 
   protected boolean mustCompile () { return false; }
 
@@ -64,34 +62,26 @@ public class BlockExp extends Expression
 
   public void compile (Compilation comp, Target target)
   {
-    Target subTarget;
-    if (target instanceof IgnoreTarget
-	|| target == Target.pushObject)
-      subTarget = target;
-    else
-      {
-	// We can probably do better - and this is probably
-	// wrong for TailTargets.  FIXME.
-	subTarget = new StackTarget(getType());
-      }
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    oldTryState = code.getCurrentTry();
-    exitLabel = new Label(code);
-    this.subTarget = exitBody == null ? subTarget : Target.Ignore;
-    body.compileWithPosition(comp, subTarget);
+    CodeAttr code = comp.getCode();
+    Type rtype = (exitBody == null && target instanceof StackTarget
+                  ? target.getType()
+                  : null);
+    // FIXME - be more clever than "true"
+    ExitableBlock bl = code.startExitableBlock(rtype, true);
+    exitableBlock = bl;
+    this.exitTarget = exitBody == null ? target : Target.Ignore;
+    body.compileWithPosition(comp, target);
     if (exitBody != null)
       {
         Label doneLabel = new Label(code);
         code.emitGoto(doneLabel);
-        exitLabel.define(code);
-        exitBody.compileWithPosition(comp, subTarget);
+        code.endExitableBlock();
+        exitBody.compileWithPosition(comp, target);
         doneLabel.define(code);
       }
     else
-      exitLabel.define(code);
-    if (subTarget != target)
-      target.compileFromStack(comp, subTarget.getType());
-    oldTryState = null;
+      code.endExitableBlock();
+    exitableBlock = null;
   }
 
   protected Expression walk (ExpWalker walker)

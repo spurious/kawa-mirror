@@ -278,15 +278,16 @@ public class Declaration
                 Label endTry = new Label(code);
                 endTry.define(code);
                 Label endLabel = new Label(code);
+                endLabel.setTypes(code);
                 if (isInTry)
                   code.emitGoto(endLabel);
+                else
+                  code.setUnreachable();
                 int fragment_cookie = 0;
                 if (! isInTry)
-                  fragment_cookie
-                    = code.beginFragment(new Label(code), endLabel);
+                  fragment_cookie = code.beginFragment(endLabel);
                 code.addHandler(startTry, endTry, typeUnboundLocationException);
 
-                code.pushType(typeUnboundLocationException);
                 code.emitDup(typeUnboundLocationException);
                 code.emitPushString(filename);
                 code.emitPushInt(line);
@@ -819,6 +820,8 @@ public class Declaration
     */
     sbuf.append("/fl:");
     sbuf.append(Integer.toHexString(flags));
+    if (ignorable())
+      sbuf.append("(ignorable)");
     Expression tx = typeExp;
     Type t = getType();
     if (tx != null && ! (tx instanceof QuoteExp))

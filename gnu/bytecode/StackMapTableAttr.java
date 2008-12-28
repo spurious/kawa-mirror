@@ -7,9 +7,23 @@ package gnu.bytecode;
 
 public class StackMapTableAttr extends Attribute
 {
+  public static boolean compressStackMapTable = true;
+
   byte[] data;
   int dataLength;
   int numEntries;
+
+  int prevPosition = -1;
+  int[] encodedLocals;
+  int[] encodedStack;
+  /** Length of in-use segments of encodedLocals and encodedStack.
+   * In this case, Long and Double counts as one. */
+  int countLocals, countStack;
+
+  public StackMapTableAttr()
+  {
+    super("StackMapTable");
+  }
 
   /** Add a new StackMapTableAttr to a CodeAttr. */
   public StackMapTableAttr(int numEntries, byte[] data, CodeAttr code)
@@ -44,6 +58,185 @@ public class StackMapTableAttr extends Attribute
   private int u2(int offset)
   {
     return ((data[offset]  & 0xFF) << 8) + (data[offset+1] & 0xFF);
+  }
+
+  private void put1(int val)
+  {
+    if (data == null)
+      data = new byte[20];
+    else if (dataLength >= data.length)
+      {
+        byte[] tmp = new byte[2 * data.length];
+        System.arraycopy(data, 0, tmp, 0, dataLength);
+        data = tmp;
+      }
+    data[dataLength++] = (byte) val;
+  }
+
+  private void put2(int val)
+  {
+    put1((byte) (val >> 8));
+    put1((byte) (val));
+  }
+
+  private void put2(int offset, int val)
+  {
+    data[offset] = (byte) (val >> 8);
+    data[offset+1] = (byte) val;
+  }
+
+  void emitVerificationType (int encoding)
+  {
+    int tag = encoding & 0xff;
+    put1(tag);
+    if (tag >= 7)
+      put2(encoding >> 8);
+  }
+
+  /** Return {@code (offset<<8)|tag} for {@code type}. */
+  int encodeVerificationType (Type type, CodeAttr code)
+  {
+    if (type == null)
+      return 0; // ITEM_Top
+    else if (type instanceof UninitializedType)
+      {
+        UninitializedType utype = (UninitializedType) type;
+        Label label = utype.label;
+        if (label == null)
+          return 6; // ITEM_UninitializedThis
+        else
+          return (label.position << 8) | 8; // ITEM_uninitialized
+      }
+    else
+      {
+        type = type.getImplementationType();
+        if (type instanceof PrimType)
+          {
+            switch (type.signature.charAt(0))
+              {
+              case 'B':  case 'S':  case 'I':  case 'C':  case 'Z':
+                return 1;  // ITEM_Integer
+              case 'J':
+                return 4;  // ITEM_Long
+              case 'F':
+                return 2;  // ITEM_Float
+              case 'D':
+                return 3;  // ITEM_Double
+              default:  // Should be: case 'V':
+                return 0; // ITEM_Top
+              }
+          }
+        else if (type == Type.nullType)
+          return 5; // ITEM_Null
+        else // ITEM_Object
+          return ((code.getConstants().addClass((ObjectType) type).index) << 8) | 7;
+      }
+  }
+
+  /** Emit type state for the given Label.
+   * This must be called by strictly increasing position.
+   * This is handled automatically by {@link Codeattr#processFixups}.
+   */
+  public void emitStackMapEntry (Label label, CodeAttr code)
+  {
+    int oldDL=dataLength;
+    int offset_delta = label.position - prevPosition - 1;
+    int matchingLocals = 0;
+    int rawLocalsCount = label.localTypes.length;
+    if (rawLocalsCount > encodedLocals.length)
+      {
+        int[] tmp = new int[rawLocalsCount + encodedLocals.length];
+        System.arraycopy(encodedLocals, 0, tmp, 0, countLocals);
+        encodedLocals = tmp;
+      }
+    int rawStackCount = label.stackTypes.length;
+    if (rawStackCount > encodedStack.length)
+      {
+        int[] tmp = new int[rawStackCount + encodedStack.length];
+        System.arraycopy(encodedStack, 0, tmp, 0, countStack);
+        encodedStack = tmp;
+      }
+    int unchangedLocals = 0;
+    int curLocalsCount = 0;
+    for (int i = 0;  i < rawLocalsCount;  i++)
+      {
+        int prevType = encodedLocals[curLocalsCount];
+        int nextType = encodeVerificationType(label.localTypes[i], code);
+
+        if (prevType == nextType && unchangedLocals == curLocalsCount)
+          unchangedLocals = curLocalsCount + 1;
+        encodedLocals[curLocalsCount++] = nextType;
+        if (nextType == 3 || nextType == 4) // Double or Long
+          i++;
+      }
+    int curStackCount = 0;
+    for (int i = 0;  i < rawStackCount;  i++)
+      {
+        int prevType = encodedStack[curStackCount];
+        Type t = label.stackTypes[i];
+        if (t == Type.voidType)
+          t = label.stackTypes[++i]; // long or double
+        int nextType = encodeVerificationType(t, code);
+        encodedStack[curStackCount++] = nextType;
+      }
+    int localsDelta = curLocalsCount - countLocals;
+    if (compressStackMapTable && localsDelta == 0
+        && curLocalsCount == unchangedLocals && curStackCount <= 1)
+      {
+        if (curStackCount == 0)
+          {
+            if (offset_delta <= 63)
+              put1(offset_delta); // same_frame
+            else
+              {
+                put1(251); // same_frame_extended
+                put2(offset_delta);
+              }
+          }
+        else
+          {
+            if (offset_delta <= 63)
+              put1(64 + offset_delta); // same_locals_1_stack_item_frame
+            else
+              {
+                put1(247); // same_locals_1_stack_item_frame_extended
+                put2(offset_delta);
+              }
+            emitVerificationType(encodedStack[0]);
+          }
+      }
+    else if (compressStackMapTable && curStackCount == 0
+             && curLocalsCount < countLocals
+             && unchangedLocals == curLocalsCount
+             && localsDelta >= -3)
+      {
+        put1(251 + localsDelta); // chop_frame
+        put2(offset_delta);
+      }
+    else if (compressStackMapTable && curStackCount == 0
+             && countLocals == unchangedLocals
+             && localsDelta <= 3)
+      {
+        put1(251+localsDelta); // append_frame
+        put2(offset_delta);
+        for (int i = 0;  i < localsDelta;  i++)
+          emitVerificationType(encodedLocals[unchangedLocals+i]);
+      }
+    else
+      {
+        put1(255);  // full_frame
+        put2(offset_delta);
+        put2(curLocalsCount);
+        for (int i = 0;  i < curLocalsCount;  i++)
+          emitVerificationType(encodedLocals[i]);
+        put2(curStackCount);
+        for (int i = 0;  i < curStackCount;  i++)
+          emitVerificationType(encodedStack[i]);
+      }
+    countLocals = curLocalsCount;
+    countStack = curStackCount;
+    prevPosition = label.position;
+    numEntries++;
   }
 
   void printVerificationType (int encoding, ClassTypeWriter dst)
@@ -148,12 +341,12 @@ public class StackMapTableAttr extends Attribute
         int tag = encoding & 0xff;
         if (i >= startIndex)
           {
-            dst.print("   ");
+            dst.print("  ");
             if (regno >= 100)
               ;
             else
               {
-                if (regno >= 10)
+                if (regno < 10)
                   dst.print(' ');
                 dst.print(' ');
               }
@@ -223,7 +416,8 @@ public class StackMapTableAttr extends Attribute
           }
         else if (tag <= 246)
           {
-            dst.println(" - tag reserved for future use");
+            dst.print(" - tag reserved for future use - ");
+            dst.println(tag);
             break;
           }
         else if (tag <= 250)

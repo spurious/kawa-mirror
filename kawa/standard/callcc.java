@@ -98,19 +98,21 @@ public class callcc extends MethodProc implements CanInline, Inlineable
       }
     CodeAttr code = comp.getCode();
     Declaration param = lambda.firstDecl();
-    /* FUTURE:
+
     if (param.isSimple() && ! param.getCanRead() && ! param.getCanWrite())
       {
         CompileTimeContinuation contProxy = new CompileTimeContinuation();
-        contProxy.oldTryState = code.getCurrentTry();
-        contProxy.exitLabel = new Label(code);
+        Type rtype = target instanceof StackTarget ? target.getType() : null;
+        // FIXME - be more clever than "true"
+        ExitableBlock bl = code.startExitableBlock(rtype, true);
+        contProxy.exitableBlock = bl;
         contProxy.blockTarget = target;
         param.setValue(new QuoteExp(contProxy));
         lambda.body.compile(comp, target);
-        contProxy.exitLabel.define(code);
+        code.endExitableBlock();
         return;
       }
-    */
+
     Scope sc = code.pushScope();
     Variable contVar = sc.addVariable(code, typeContinuation, null);
     Declaration contDecl = new Declaration(contVar);
@@ -179,8 +181,7 @@ class Continuation extends MethodProc
 class CompileTimeContinuation extends ProcedureN implements Inlineable
 {
   Target blockTarget;
-  Label exitLabel; 
-  TryState oldTryState;
+  ExitableBlock exitableBlock;
 
   public Object applyN (Object[] args) throws Throwable
   {
@@ -192,9 +193,10 @@ class CompileTimeContinuation extends ProcedureN implements Inlineable
     CodeAttr code = comp.getCode();
     Expression[] args = exp.getArgs();
     int nargs = args.length;
-    if (blockTarget instanceof IgnoreTarget
-        || blockTarget instanceof ConsumerTarget
-        || (nargs == 1 && args[0].isSingleValue()))
+    boolean noStack = (blockTarget instanceof IgnoreTarget
+                       || blockTarget instanceof ConsumerTarget);
+    Type typeNeeded = noStack ? null : target.getType();
+    if (noStack || (nargs == 1 && args[0].isSingleValue()))
       {
         for (int i = 0;  i < nargs;  i++)
           args[i].compileWithPosition(comp, blockTarget);
@@ -206,8 +208,7 @@ class CompileTimeContinuation extends ProcedureN implements Inlineable
                                         Compilation.applyNargs),
                      args).compileWithPosition(comp, blockTarget);
       }
-    code.doPendingFinalizers(oldTryState);
-    code.emitGoto(exitLabel);
+    exitableBlock.exit();
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)

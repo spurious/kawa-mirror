@@ -179,6 +179,17 @@ public class PrimType extends Type {
     return -3;
   }
 
+  public Type promotedType ()
+  {
+    switch (signature.charAt(0))
+      {
+      case 'B': case 'S':  case 'I':  case 'Z':  case 'C':
+        return Type.intType;
+      default:
+        return getImplementationType();
+      }
+  }
+
   public int compare(Type other)
   {
     if (other instanceof PrimType)

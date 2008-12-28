@@ -1,3 +1,9 @@
+2008-12-27  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (promotedType): New method.
+	* Type.java (lowestCommonSuperType): Use it to "merge" PrimTypes.
+	Merging otherwise incompatible ObjectTypes yields java.lang.Object.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isAccessible):  Add extra parameter for the

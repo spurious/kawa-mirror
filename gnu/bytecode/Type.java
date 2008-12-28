@@ -384,7 +384,14 @@ public abstract class Type
       return t1;
     if (t1 == null || t2 == null)
      return null;
-
+    if (t1 instanceof PrimType && t2 instanceof PrimType)
+      {
+        if (t1 == t2)
+          return t1;
+        t1 = ((PrimType) t1).promotedType();
+        t2 = ((PrimType) t2).promotedType();
+        return t1 == t2 ? t1 : null;
+      }
     if (t1.isSubtype(t2))
       return t2;
     else if (t2.isSubtype(t1))
@@ -393,12 +400,10 @@ public abstract class Type
       {
        // the only chance left is that t1 and t2 are ClassTypes.
        if (!(t1 instanceof ClassType && t2 instanceof ClassType))
-         return null;
+         return Type.objectType;
        ClassType c1 = (ClassType) t1;
        ClassType c2 = (ClassType) t2;
-       if (c1.isInterface())
-         return Type.objectType;
-       if (c2.isInterface())
+       if (c1.isInterface() || c2.isInterface())
          return Type.objectType;
 
        return lowestCommonSuperType(c1.getSuperclass(), c2.getSuperclass());

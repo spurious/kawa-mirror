@@ -216,15 +216,23 @@ public class SwitchState
 	code.pushType(Type.intType);
 	if (numCases == 1)
 	  {
-            // FIXME optimize if minValue == 0
-	    code.emitPushInt(minValue);
-	    code.emitGotoIfEq(labels[0]);
+            if (minValue == 0)
+              code.emitIfIntEqZero();
+            else
+              {
+                code.emitPushInt(minValue);
+                code.emitIfEq();
+              }
+            code.emitGoto(labels[0]);
+            code.emitElse();
+            code.emitGoto(defaultLabel);
+            code.emitFi();
 	  }
 	else
 	  {
 	    code.emitPop(1);
+            code.emitGoto(defaultLabel);
 	  }
-	code.emitGoto(defaultLabel);
       }
     else if (2 * numCases >= maxValue - minValue)
       {

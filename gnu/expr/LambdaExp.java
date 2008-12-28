@@ -652,6 +652,7 @@ public class LambdaExp extends ScopeExp
     Type rtype;
     CodeAttr code = comp.getCode();
 
+    /*
     if (comp.usingCPStyle())
       {
 	//	Label func_start = new Label(code);
@@ -660,26 +661,22 @@ public class LambdaExp extends ScopeExp
 	comp.curLambda = this;
 	type = saveLambda.type;
 	closureEnv = saveLambda.closureEnv;
-        /*
-	if (comp.usingCPStyle())
-	  {
-	    heapFrame = comp.thisDecl;
-	    for (Declaration var = firstDecl();
-		 var != null; var = var.nextDecl())
-	      var.assignField(comp);
-	  }
-        */
+	// if (comp.usingCPStyle())
+	//   {
+	//     heapFrame = comp.thisDecl;
+	//     for (Declaration var = firstDecl();
+	// 	 var != null; var = var.nextDecl())
+	//       var.assignField(comp);
+	//   }
 	gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	int pc = comp.fswitch.getMaxValue() + 1;
 	code.emitGoto(func_end);
 	Type[] stackTypes = code.saveStackTypeState(true);
 
 	fswitch.addCase(pc, code);
-        /*
-	code.emitPushThis();
-	code.emitGetField(comp.argsCallContextField);
-	code.emitStore(comp.argsArray);
-        */
+	// code.emitPushThis();
+	// code.emitGetField(comp.argsCallContextField);
+	// code.emitStore(comp.argsArray);
 	allocParameters(comp);
 	enterFunction(comp);
 
@@ -690,34 +687,33 @@ public class LambdaExp extends ScopeExp
 	code.restoreStackTypeState(stackTypes);
 	ClassType ctype = comp.curClass;
 	rtype = ctype;
-	/*
-	code.emitNew(ctype);
-	code.emitDup(ctype);
-	code.emitInvokeSpecial(ctype.constructor);
-	code.emitDup(ctype);
-	code.emitPushInt(pc);
-	code.emitPutField(comp.saved_pcCallFrameField);
-	if (isHandlingTailCalls())
-	  {
-	    // Set name field.
-	    if (name != null)
-	      {
-		code.emitDup(ctype);
-		code.emitPushString(name);
-		code.emitInvokeVirtual(comp.setNameMethod);
-	      }
-	    // Set numArgs field.
-	    code.emitDup(ctype);
-	    code.emitPushInt(min_args | (max_args << 12));
-	    code.emitPutField(comp.numArgsCallFrameField);
-	    // Set static link field to this CallFrame.
-	    code.emitDup(ctype);
-	    code.emitPushThis();
-	    code.emitPutField(comp.callerCallFrameField);
-	  }
-	*/
+	// code.emitNew(ctype);
+	// code.emitDup(ctype);
+	// code.emitInvokeSpecial(ctype.constructor);
+	// code.emitDup(ctype);
+	// code.emitPushInt(pc);
+	// code.emitPutField(comp.saved_pcCallFrameField);
+	// if (isHandlingTailCalls())
+	//   {
+	//     // Set name field.
+	//     if (name != null)
+	//       {
+	// 	code.emitDup(ctype);
+	// 	code.emitPushString(name);
+	// 	code.emitInvokeVirtual(comp.setNameMethod);
+	//       }
+	//     // Set numArgs field.
+	//     code.emitDup(ctype);
+	//     code.emitPushInt(min_args | (max_args << 12));
+	//     code.emitPutField(comp.numArgsCallFrameField);
+	//     // Set static link field to this CallFrame.
+	//     code.emitDup(ctype);
+	//     code.emitPushThis();
+	//     code.emitPutField(comp.callerCallFrameField);
+	//   }
       }
     else
+    */
       { LambdaExp outer = outerLambda();
 	rtype = Compilation.typeModuleMethod;
 	if ((flags & NO_FIELD) != 0
@@ -1394,7 +1390,7 @@ public class LambdaExp extends ScopeExp
 		code.emitIfIntLt();
                 code.emitLoad(argsArray);
 		code.emitPushInt(i - plainArgs);
-		code.emitArrayLoad(Type.objectType);
+		code.emitArrayLoad();
 		code.emitElse();
 		defaultArgs[defaultStart + opt_i++].compile(comp, paramType);
 		code.emitFi();

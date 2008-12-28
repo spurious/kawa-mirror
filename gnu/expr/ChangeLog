@@ -1,3 +1,10 @@
+2008-12-27  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction): Use new emitArrayLoad variant.
+
+	* LambdaExp.java (compile): Commment out bit-rotted and never-finished
+	usingCPStyle support.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateApplyMethodsWithContext,

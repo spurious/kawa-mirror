@@ -978,7 +978,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Store into an element of an array.
    * Must already have pushed the array reference, the index,
    * and the new value (in that order).
-   * Stack:  ..., array, index, value => ...
+   * Stack:  {@literal ..., array, index, value => ...}
    */
   public void emitArrayStore (Type element_type)
   {
@@ -988,15 +988,44 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitTypedOp(79, element_type);
   }
 
+  /** Store into an element of an array.
+   * Must already have pushed the array reference, the index,
+   * and the new value (in that order).
+   * Stack: {@literal ..., array, index, value => ...}
+   */
+  public void emitArrayStore ()
+  {
+    popType();  // Pop new value
+    popType();  // Pop index
+    Type arrayType = popType().getImplementationType(); // Pop array reference
+    Type elementType = ((ArrayType) arrayType).getComponentType();
+    emitTypedOp(79, elementType);
+  }
+
   /** Load an element from an array.
    * Must already have pushed the array and the index (in that order):
-   * Stack:  ..., array, index => ..., value */
+   * Stack: {@literal ..., array, index => ..., value}
+   */
   public void emitArrayLoad (Type element_type)
   {
     popType();  // Pop index
     popType();  // Pop array reference
     emitTypedOp(46, element_type);
     pushType(element_type);
+  }
+
+  /** Load an element from an array.
+   * Equivalent to {@code emitArrayLoad(Type)}, but element_type is implied.
+   * Must already have pushed the array and the index (in that order):
+   * Stack: {@literal ..., array, index => ..., value}
+   */
+  public void emitArrayLoad ()
+  {
+    popType();  // Pop index
+    Type arrayType = popType().getImplementationType();
+    Type elementType = ((ArrayType) arrayType).getComponentType();
+    emitTypedOp(46, elementType);
+    pushType(elementType);
   }
 
   /**

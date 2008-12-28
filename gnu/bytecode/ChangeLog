@@ -1,5 +1,8 @@
 2008-12-27  Per Bothner  <per@bothner.com>
 
+	* CodeAttr.java (emitArrayLoad, emitArrayStore): New convenience
+	methods that don't require the element type to be explicitly specified.
+
 	* PrimType.java (promotedType): New method.
 	* Type.java (lowestCommonSuperType): Use it to "merge" PrimTypes.
 	Merging otherwise incompatible ObjectTypes yields java.lang.Object.

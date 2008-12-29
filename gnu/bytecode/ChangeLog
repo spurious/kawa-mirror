@@ -1,3 +1,8 @@
+2008-12-29  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isAccessible): New convenience method.  This also
+	checks whether the member is static, in case of protected access.
+
 2008-12-28  Per Bothner  <per@bothner.com>
 
 	* SwitchState.java (finish): Optimize a single 'case 0'.

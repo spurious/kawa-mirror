@@ -301,6 +301,19 @@ public class ClassType extends ObjectType
     return field;
   }
 
+  /** Check if a member is accessible from this class.
+   * @param member the member (Field, Method) we're trting to access.
+   * @param receiver the type of the receiver object, if applicable.
+   * @return true if the specified component can be accessed from this class.
+   */
+  public boolean isAccessible (Member member, ObjectType receiver)
+  {
+    if (member.getStaticFlag())
+      receiver = null;
+    return isAccessible(member.getDeclaringClass(), receiver,
+                        member.getModifiers());
+  }
+
   /** Check if a component is accessible from this class.
    * @param declaring the class containing the component (a field, method,
    *   or inner class)

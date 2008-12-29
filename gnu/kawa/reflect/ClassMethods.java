@@ -279,7 +279,6 @@ class MethodFilter implements gnu.bytecode.Filter
 	&& (mlen != nlen + 4
 	    || ! mname.endsWith("$V$X")))
       return false;
-    return caller == null
-      || caller.isAccessible(method.getDeclaringClass(), receiver, mmods);
+    return caller == null || caller.isAccessible(method, receiver);
   }
 }

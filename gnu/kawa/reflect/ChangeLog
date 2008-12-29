@@ -1,3 +1,10 @@
+2008-12-29  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (lookupMember, inline): Use new isAccessible convenience
+	method, which fixes error when accessing static protected members.
+	* SlotSet.java (lookupMember, inline): Likewise.
+	* ClassMethods.java (select): Likewise.
+
 2008-12-24  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): For invoke-special we shouldn't do the

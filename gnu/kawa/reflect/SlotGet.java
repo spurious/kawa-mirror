@@ -212,8 +212,7 @@ public class SlotGet extends Procedure2
       {
         if (caller == null)
           caller = Type.pointer_type;
-        if (caller.isAccessible(field.getDeclaringClass(), clas,
-                                field.getModifiers()))
+        if (caller.isAccessible(field, clas))
           return field;
       }
 
@@ -279,16 +278,15 @@ public class SlotGet extends Procedure2
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-            ClassType dtype = field.getDeclaringClass();
             int modifiers = field.getModifiers();
             boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
               return new ErrorExp("cannot access non-static field `" + name
                                   + "' using `" + getName() + '\'', comp);
 	    if (caller != null
-                && ! caller.isAccessible(dtype, ctype, modifiers))
-	      return new ErrorExp("field "+dtype.getName()+'.'+name
-                                  +" is not accessible here", comp);
+                && ! caller.isAccessible(field, ctype))
+	      return new ErrorExp("field "+field.getDeclaringClass().getName()
+                                  +'.'+name+" is not accessible here", comp);
           }
 
         else if (part instanceof gnu.bytecode.Method)

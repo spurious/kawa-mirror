@@ -127,7 +127,9 @@ public class ExpWalker
   protected LambdaExp currentLambda = null;
 
   /** If exitValue is set to non-null, the walk stops. */
-  Object exitValue = null;
+  protected Object exitValue = null;
+
+  public Object getExitValue () { return exitValue; }
 
   public final LambdaExp getCurrentLambda() { return currentLambda; }
 

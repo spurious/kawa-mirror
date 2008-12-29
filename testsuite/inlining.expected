@@ -79,5 +79,6 @@ InliningTest.factoriali1(int)int: 18 bytes
 InliningTest.factoriali2(int)int: 18 bytes
 InliningTest.factoriall1(long)long: 19 bytes
 InliningTest.plusLambda1()int: 3 bytes
+InliningTest.firstNegative(double[])double: 35 bytes
 cycle1.isIsEven(int)boolean: 22 bytes
 cycle2.isIsOdd(int)boolean: 22 bytes

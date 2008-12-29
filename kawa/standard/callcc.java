@@ -97,14 +97,14 @@ public class callcc extends MethodProc implements CanInline, Inlineable
 	return;
       }
     CodeAttr code = comp.getCode();
-    Declaration param = lambda.firstDecl();
-
+    final Declaration param = lambda.firstDecl();
     if (param.isSimple() && ! param.getCanRead() && ! param.getCanWrite())
       {
         CompileTimeContinuation contProxy = new CompileTimeContinuation();
         Type rtype = target instanceof StackTarget ? target.getType() : null;
-        // FIXME - be more clever than "true"
-        ExitableBlock bl = code.startExitableBlock(rtype, true);
+        boolean runFinallyBlocks
+          = ExitThroughFinallyChecker.check(param, lambda.body);
+        ExitableBlock bl = code.startExitableBlock(rtype, runFinallyBlocks);
         contProxy.exitableBlock = bl;
         contProxy.blockTarget = target;
         param.setValue(new QuoteExp(contProxy));
@@ -157,6 +157,39 @@ public class callcc extends MethodProc implements CanInline, Inlineable
   public Type getReturnType (Expression[] args)
   {
     return Type.pointer_type;
+  }
+
+  /** An ExpWalker class to check if callcc exits through a try-finally. */
+  static class ExitThroughFinallyChecker extends ExpWalker
+  {
+    TryExp currentTry = null;
+    Declaration decl;
+
+    /** Does decl appear in body nested inside a try-finally? */
+    public static boolean check (Declaration decl, Expression body)
+    {
+      ExitThroughFinallyChecker walker = new ExitThroughFinallyChecker();
+      walker.decl = decl;
+      walker.walk(body);
+      return walker.exitValue != null;
+    }
+
+    protected Expression walkReferenceExp (ReferenceExp exp)
+    {
+      if (decl == exp.getBinding() && currentTry != null)
+        exitValue = Boolean.TRUE;
+      return exp;
+    }
+
+    protected Expression walkTryExp (TryExp exp)
+    {
+      TryExp saveTry = currentTry;
+      if (exp.getFinallyClause() != null)
+        currentTry = exp;
+      walkExpression(exp);
+      currentTry = saveTry;
+      return exp;
+    }
   }
 }
 

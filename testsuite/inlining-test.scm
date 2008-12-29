@@ -160,3 +160,14 @@
 
 (define (plus-lambda1) :: int
   ((lambda (x y) (+ x y)) 3 4))
+
+(define (first-negative (vals :: double[])) :: double
+  (let ((count vals:length))
+    (call-with-current-continuation
+     (lambda (exit)
+       (do ((i :: int 0 (+ i 1)))
+	   ((= i count)
+	    0)
+	   (let ((x (vals i)))
+	     (if (< x 0)
+		 (exit x))))))))

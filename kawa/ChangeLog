@@ -1,8 +1,14 @@
+2008-12-29  Per Bothner  <per@bothner.com>
+
+	* standard/callcc.java: Optimization to avoid temporary variable
+	if calling the continuation doesn't need to call a finally-clause.
+	(ExitThroughFinallyChecker): New helper class, extends ExpWalker.
+
 2008-12-27  Per Bothner  <per@bothner.com>
 
 	* standard/callcc.java: Optimize the case when calls to the
-	continuation are lexically know and exits to the same uninlined
-	function.  In this case we essentially meit a goto.
+	continuation are lexically known and exits to the same uninlined
+	function.  In this case we essentially make it a goto.
 
 2008-12-23  Per Bothner  <per@bothner.com>
 

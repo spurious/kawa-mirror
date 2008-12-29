@@ -16,6 +16,7 @@ public class TryExp extends Expression
   Expression finally_clause;
   
   public final CatchClause getCatchClauses () { return catch_clauses; }
+  public final Expression getFinallyClause () { return finally_clause; }
   public final void setCatchClauses (CatchClause catch_clauses)
   {
     this.catch_clauses = catch_clauses;

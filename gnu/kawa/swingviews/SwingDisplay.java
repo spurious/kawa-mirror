@@ -37,7 +37,11 @@ public class SwingDisplay extends Display
 
   public void addText (Text model, Object where)
   {
-    addView(new JTextField(getSwingDocument(model), null, 50),
+    // It seems silly that we have to specify an initial value when
+    // it's part of the Document, but otherwise Swing doesn't update the view.
+    // This means that the text in model.buffer gets deleted and re-inserted,
+    // which causes any existing positions to collapse.  FIXME.
+    addView(new JTextField(getSwingDocument(model), model.getText(), 50),
             where);
   }
 

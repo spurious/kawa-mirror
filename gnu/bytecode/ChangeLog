@@ -1,3 +1,8 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	* dump.java (main): Make more bullet-proof.
+	(usage): Fix typos for jar: URL syntax.
+
 2008-12-29  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isAccessible): New convenience method.  This also

@@ -174,13 +174,16 @@ public class dump extends ClassFileInput
                     if (! uriSchemeSpecified(part))
                       {
                         int excl = part.indexOf('!');
-                        String filepart = part.substring(0, excl);
-                        /* #ifdef JAVA5 */ 
-                        filepart = new File(filepart).toURI().toURL().toString();
-                        /* #else */
-                        // filepart = new File(filepart).toURL().toString();
-                        /* #endif */
-                        filename = "jar:" + filepart + part.substring(excl);
+                        if (excl >= 0)
+                          {
+                            String filepart = part.substring(0, excl);
+                            /* #ifdef JAVA5 */ 
+                            filepart = new File(filepart).toURI().toURL().toString();
+                            /* #else */
+                            // filepart = new File(filepart).toURL().toString();
+                            /* #endif */
+                            filename = "jar:" + filepart + part.substring(excl);
+                          }
                       }
                     // Allow "jar:xxxx!foo.bar.baz" -> "jar:xxxx!/foo/bar/baz.class"
                     if (part.indexOf("!/") < 0)
@@ -322,9 +325,9 @@ public class dump extends ClassFileInput
     err.println("If a .jar/.zip archive is named, all its.class file members are printed.");
     err.println();
     err.println("You can name a single .class member of an archive with a jar: URL,");
-    err.println("which looks like: jar:jar-spec#/p1/p2/cl.class");
+    err.println("which looks like: jar:jar-spec!/p1/p2/cl.class");
     err.println("The jar-spec can be a URL or the name of the .jar file.");
-    err.println("You can also use the shorthand syntax: jar:jar-spec#p1.p2.cl");
+    err.println("You can also use the shorthand syntax: jar:jar-spec!p1.p2.cl");
     System.exit(-1);
   }
 }

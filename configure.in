@@ -35,11 +35,13 @@ AC_ARG_WITH(XQTS,
   AS_HELP_STRING(--with-XQTS@<:@=XQTS-path@:>@,Support XQuery Test Suite))
 
 AC_ARG_ENABLE(echo2,
-  AS_HELP_STRING(--enable-echo2,Enable support for the Echo2 web toolkit),
-  enable_echo2=$enableval, enable_echo2=yes)
+  AS_HELP_STRING(--enable-echo2,Enable support for the Echo2 web toolkit))
 
 AC_ARG_ENABLE(jemacs,
   AS_HELP_STRING(--enable-jemacs,Build JEmacs))
+
+AC_ARG_ENABLE(xquery,
+  AS_HELP_STRING(--enable-xquery,Build XQuery language support (Qexo) (default on)))
 
 AC_ARG_ENABLE(brl,
   AS_HELP_STRING(--enable-brl,Build BRL emulation and KRL))
@@ -148,8 +150,11 @@ AM_CONDITIONAL(WITH_GCJ_DBTOOL, test "$with_gcj_dbtool" = "yes")
 AM_CONDITIONAL(WITH_GCJ_NO_DBTOOL,
   test "$with_gcj" = "yes" -a "$with_gcj_dbtool" != "yes")
 AM_CONDITIONAL(ENABLE_ECHO2, test "$enable_echo2" = "yes")
+AM_CONDITIONAL(WITH_ANDROID,
+  test "$with_android" != "" -a "$with_android" != "no")
 AM_CONDITIONAL(ENABLE_BRL, test "$enable_brl" = "yes")
 AM_CONDITIONAL(ENABLE_JEMACS, test "$enable_jemacs" = "yes")
+AM_CONDITIONAL(ENABLE_XQUERY, test "$enable_xquery" != "no")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
@@ -244,6 +249,6 @@ AC_CONFIG_FILES([Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
   gnu/kawa/ant/Makefile
   gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile
-  gnu/kawa/swtviews/Makefile
+  gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile])
 AC_OUTPUT

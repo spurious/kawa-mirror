@@ -38,7 +38,7 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
 	ChangeLog INSTALL NEWS TODO config.guess config.sub depcomp \
-	install-sh ltmain.sh missing mkinstalldirs
+	install-sh missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -61,14 +61,15 @@ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
-	gnu/mapping gnu/xml gnu/kawa/xml gnu/kawa/xslt gnu/expr \
-	gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions \
-	gnu/kawa/lispexpr gnu/kawa/models gnu/kawa/swingviews \
-	gnu/kawa/swtviews kawa gnu/kawa/slib gnu/commonlisp gnu/q2 \
-	gnu/ecmascript gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant \
+	gnu/mapping gnu/xml gnu/kawa/xml gnu/expr gnu/kawa/util \
+	gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
+	gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews kawa \
+	gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+	gnu/kawa/servlet gnu/kawa/echo2 gnu/kawa/sax gnu/kawa/ant \
 	gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
 	gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt \
-	gnu/xquery gnu/brl gnu/kawa/brl bin
+	gnu/xquery gnu/kawa/xslt gnu/brl gnu/kawa/brl gnu/kawa/android \
+	bin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -202,16 +203,18 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
   gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
-  gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
 
 @ENABLE_JEMACS_TRUE@JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
 @ENABLE_JEMACS_TRUE@  gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 
-@ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
+@ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml
 @ENABLE_BRL_TRUE@@ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
-@ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
+@ENABLE_XML_TRUE@@ENABLE_XQUERY_TRUE@XQUERY_SUBDIR = gnu/xquery gnu/kawa/xslt
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
+@ENABLE_ECHO2_TRUE@ECHO2_SUBDIRS = gnu/kawa/echo2
+@WITH_ANDROID_TRUE@ANDROID_SUBDIRS = gnu/kawa/android
 javadir = $(datadir)/java
 JAR = jar
 GCJ_DBTOOL = gcj-dbtool
@@ -231,9 +234,10 @@ JAVADOC_PACKAGES = \
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
   gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard kawa.lib \
   gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
-  gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang \
-  gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.q2.lang \
-  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
+  gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang gnu.q2.lang \
+  gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.kawa.echo2 \
+  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt \
+  gnu.kawa.android
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -use

@@ -5,21 +5,29 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
   gnu/kawa/models gnu/kawa/swingviews gnu/kawa/swtviews \
   kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
-  gnu/kawa/servlet $(SAX_SUBDIR) gnu/kawa/ant \
-  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  gnu/kawa/servlet $(ECHO2_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) $(ANDROID_SUBDIRS) bin
 if ENABLE_JEMACS
 JEMACS_SUBDIRS = gnu/jemacs/lang gnu/jemacs/buffer gnu/jemacs/lisp \
   gnu/jemacs/testsuite gnu/jemacs/swing gnu/jemacs/swt
 endif
 if ENABLE_XML
-XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
+XML_SUBDIRS = gnu/xml gnu/kawa/xml
 if ENABLE_BRL
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 endif
-XQUERY_SUBDIR = gnu/xquery
+if ENABLE_XQUERY
+XQUERY_SUBDIR = gnu/xquery gnu/kawa/xslt
+endif
 if WITH_SAX2
 SAX_SUBDIR = gnu/kawa/sax
 endif
+endif
+if ENABLE_ECHO2
+ECHO2_SUBDIRS = gnu/kawa/echo2
+endif
+if WITH_ANDROID
+ANDROID_SUBDIRS = gnu/kawa/android
 endif
 javadir=$(datadir)/java
 
@@ -99,9 +107,10 @@ JAVADOC_PACKAGES = \
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
   gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard kawa.lib \
   gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
-  gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang \
-  gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.q2.lang \
-  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt
+  gnu.kawa.xslt gnu.kawa.sax gnu.commonlisp.lang gnu.q2.lang \
+  gnu.kawa.models gnu.kawa.swingviews gnu.kawa.swtviews gnu.kawa.echo2 \
+  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.jemacs.swt \
+  gnu.kawa.android
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -use

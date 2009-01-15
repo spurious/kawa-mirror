@@ -1,3 +1,9 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	* configure.in: Add configure switches-enanle-xquery.
+	Add conditionals ENABLE_XQUERY and WITH_ANDROID.
+	* Makefile.am (SUBDIRS): Make use of new conditonals.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* configure.in: New --with-android option.

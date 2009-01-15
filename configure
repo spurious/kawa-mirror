@@ -573,10 +573,14 @@ ENABLE_SERVLET_FALSE
 ENABLE_SERVLET_TRUE
 ENABLE_XML_FALSE
 ENABLE_XML_TRUE
+ENABLE_XQUERY_FALSE
+ENABLE_XQUERY_TRUE
 ENABLE_JEMACS_FALSE
 ENABLE_JEMACS_TRUE
 ENABLE_BRL_FALSE
 ENABLE_BRL_TRUE
+WITH_ANDROID_FALSE
+WITH_ANDROID_TRUE
 ENABLE_ECHO2_FALSE
 ENABLE_ECHO2_TRUE
 WITH_GCJ_NO_DBTOOL_FALSE
@@ -703,6 +707,7 @@ with_android
 with_XQTS
 enable_echo2
 enable_jemacs
+enable_xquery
 enable_brl
 with_swing
 with_swt
@@ -1348,6 +1353,7 @@ Optional Features:
   --disable-xml           Don't build support for XML processing
   --enable-echo2          Enable support for the Echo2 web toolkit
   --enable-jemacs         Build JEmacs
+  --enable-xquery         Build XQuery language support (Qexo) (default on)
   --enable-brl            Build BRL emulation and KRL
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
@@ -2550,15 +2556,19 @@ fi
 
 # Check whether --enable-echo2 was given.
 if test "${enable_echo2+set}" = set; then
-  enableval=$enable_echo2; enable_echo2=$enableval
-else
-  enable_echo2=yes
+  enableval=$enable_echo2;
 fi
 
 
 # Check whether --enable-jemacs was given.
 if test "${enable_jemacs+set}" = set; then
   enableval=$enable_jemacs;
+fi
+
+
+# Check whether --enable-xquery was given.
+if test "${enable_xquery+set}" = set; then
+  enableval=$enable_xquery;
 fi
 
 
@@ -4344,6 +4354,14 @@ else
   ENABLE_ECHO2_FALSE=
 fi
 
+ if test "$with_android" != "" -a "$with_android" != "no"; then
+  WITH_ANDROID_TRUE=
+  WITH_ANDROID_FALSE='#'
+else
+  WITH_ANDROID_TRUE='#'
+  WITH_ANDROID_FALSE=
+fi
+
  if test "$enable_brl" = "yes"; then
   ENABLE_BRL_TRUE=
   ENABLE_BRL_FALSE='#'
@@ -4358,6 +4376,14 @@ fi
 else
   ENABLE_JEMACS_TRUE='#'
   ENABLE_JEMACS_FALSE=
+fi
+
+ if test "$enable_xquery" != "no"; then
+  ENABLE_XQUERY_TRUE=
+  ENABLE_XQUERY_FALSE='#'
+else
+  ENABLE_XQUERY_TRUE='#'
+  ENABLE_XQUERY_FALSE=
 fi
 
  if test "$enable_xml" = "yes"; then
@@ -4487,7 +4513,7 @@ Make_rules="$srcdir/Make-rules"
 ac_config_links="$ac_config_links gnu/xquery/testsuite/outline.xml:gnu/xquery/testsuite/outline.xml.in gnu/xquery/testsuite/tab.xml:gnu/xquery/testsuite/tab.xml.in gnu/xquery/testsuite/bib.xml:gnu/xquery/testsuite/bib.xml.in gnu/xquery/testsuite/auction.xml:gnu/xquery/testsuite/auction.xml.in gnu/xquery/testsuite/book1.xml:gnu/xquery/testsuite/book1.xml.in gnu/xquery/testsuite/report1.xml:gnu/xquery/testsuite/report1.xml.in gnu/xquery/testsuite/reviews.xml:gnu/xquery/testsuite/reviews.xml.in gnu/xquery/testsuite/items.xml:gnu/xquery/testsuite/items.xml.in gnu/xquery/testsuite/bids.xml:gnu/xquery/testsuite/bids.xml.in gnu/xquery/testsuite/users.xml:gnu/xquery/testsuite/users.xml.in testsuite/scribble.html:testsuite/scribble.html.in"
 
 
-ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile gnu/kawa/swtviews/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
+ac_config_files="$ac_config_files Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/q2/Makefile gnu/q2/lang/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile gnu/kawa/swtviews/Makefile gnu/kawa/echo2/Makefile gnu/kawa/android/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4658,12 +4684,20 @@ if test -z "${ENABLE_ECHO2_TRUE}" && test -z "${ENABLE_ECHO2_FALSE}"; then
   as_fn_error "conditional \"ENABLE_ECHO2\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${WITH_ANDROID_TRUE}" && test -z "${WITH_ANDROID_FALSE}"; then
+  as_fn_error "conditional \"WITH_ANDROID\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${ENABLE_BRL_TRUE}" && test -z "${ENABLE_BRL_FALSE}"; then
   as_fn_error "conditional \"ENABLE_BRL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_JEMACS_TRUE}" && test -z "${ENABLE_JEMACS_FALSE}"; then
   as_fn_error "conditional \"ENABLE_JEMACS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_XQUERY_TRUE}" && test -z "${ENABLE_XQUERY_FALSE}"; then
+  as_fn_error "conditional \"ENABLE_XQUERY\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_XML_TRUE}" && test -z "${ENABLE_XML_FALSE}"; then
@@ -5331,6 +5365,8 @@ do
     "gnu/kawa/models/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/models/Makefile" ;;
     "gnu/kawa/swingviews/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/swingviews/Makefile" ;;
     "gnu/kawa/swtviews/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/swtviews/Makefile" ;;
+    "gnu/kawa/echo2/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/echo2/Makefile" ;;
+    "gnu/kawa/android/Makefile") CONFIG_FILES="$CONFIG_FILES gnu/kawa/android/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES testsuite/Makefile" ;;
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;

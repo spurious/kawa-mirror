@@ -1,0 +1,6 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	New package for Android support.
+	* defs.scm: New file - definition of the activity macro.
+	
+

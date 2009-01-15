@@ -89,6 +89,7 @@ public class require extends Syntax
     map("hash-table", SLIB_PREFIX + "srfi69");
     map("gui", SLIB_PREFIX + "gui");
     map("swing-gui", SLIB_PREFIX + "swing");
+    map("android-defs", "gnu.kawa.android.defs");
   }
 
   public static String mapFeature(String featureName)

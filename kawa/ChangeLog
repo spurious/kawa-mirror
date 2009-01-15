@@ -1,3 +1,7 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (feature-map): Add 'android-defs.
+
 2008-12-29  Per Bothner  <per@bothner.com>
 
 	* standard/callcc.java: Optimization to avoid temporary variable

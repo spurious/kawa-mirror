@@ -1,5 +1,8 @@
 2009-01-14  Per Bothner  <per@bothner.com>
 
+	* BuiltinEnvironment.java: Minor javadoc fix.
+	(<init>): Make constructor private, since this is a singleton class.
+
 	* LambdaExp.java (Closure.apply): Check for null body, which can
 	happen if a syntax-case macro calls a function in the same module.
 

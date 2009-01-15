@@ -2,13 +2,15 @@ package gnu.expr;
 import gnu.mapping.*;
 
 /** An Environment containing the default bindings for the current Language.
- * All <code>lookup</code> operatiosn are indirected to the
+ * This is a singleton class.
+ * All <code>lookup</code> operations are indirected to the
  * current <code>Language</code>. */
 
 public class BuiltinEnvironment extends Environment
 {
   static final BuiltinEnvironment instance = new BuiltinEnvironment();
   static { instance.setName("language-builtins"); }
+  private BuiltinEnvironment() { }
 
   public static BuiltinEnvironment getInstance() { return instance; }
 

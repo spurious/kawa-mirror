@@ -41,7 +41,7 @@
 
 2008-02-02  Per Bothner  <per@bothner.com>
 
-	* emacs.scm (read-dialog): Updat single Scheme sumbol is no longer
+	* emacs.scm (read-dialog): Update as simple Scheme symbol is no longer
 	a java.lang.String.
 	* Buffer.java (getFileName, setFileName): Update to semi-recent
 	use of Path.

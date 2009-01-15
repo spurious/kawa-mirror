@@ -1,3 +1,8 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (Closure.apply): Check for null body, which can
+	happen if a syntax-case macro calls a function in the same module.
+
 2008-12-29  Per Bothner  <per@bothner.com>
 
 	* TryExp.java (getFinallyClause): New accessor method.

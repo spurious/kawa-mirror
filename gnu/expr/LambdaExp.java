@@ -2078,6 +2078,24 @@ class Closure extends MethodProc
 
     try
       {
+        if (lambda.body == null)
+          {
+            // This can happen if a syntax-case macro calls a function
+            // in the same compilation unit.  FIXME.
+            StringBuffer sbuf = new StringBuffer("procedure ");
+            String name = lambda.getName();
+            if (name == null)
+              name = "<anonymous>";
+            sbuf.append(name);
+            int line = lambda.getLineNumber();
+            if (line > 0)
+              {
+                sbuf.append(" at line ");
+                sbuf.append(line);
+              }
+            sbuf.append(" was called before it was expanded");
+            throw new RuntimeException(sbuf.toString());
+          }
         lambda.body.apply(ctx);
       }
     finally

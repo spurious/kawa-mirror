@@ -577,10 +577,10 @@
     buffer))    
 
 (define (scheme-interaction-window)
-  (interaction-window 'scheme "Scheme interaction"))
+  (interaction-window "scheme" "Scheme interaction"))
 
 (define (elisp-interaction-window)
-  (interaction-window 'elisp "Lisp interaction"))
+  (interaction-window "elisp" "Lisp interaction"))
 
 (define (interaction-window (lang-name :: <java.lang.String>) buffer-name)
   (let ((buffer (get-buffer-create buffer-name)))

@@ -1,3 +1,8 @@
+2009-01-14  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (scheme-interaction-window, elisp-interaction-window):
+	Update to use string literal rather than symbol.
+
 2008-10-29  Per Bothner  <per@bothner.com>
 
 	* Marker.java (insertChar): Return immediately on zero count.

@@ -4,7 +4,7 @@ package gnu.text;
  */
 
 public class SourceError
-  // FIXME: If JAVA6, should implement: javax.tools.Diagnostic
+  // FIXME: If JAVA6, should implement: javax.tools.Diagnostic<Path>
   implements SourceLocator
 {
   /** Used to chain to the "next" message. */

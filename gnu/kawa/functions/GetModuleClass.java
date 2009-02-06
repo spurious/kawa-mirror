@@ -34,7 +34,7 @@ public class GetModuleClass extends Procedure0
 
   /** Return an expression that evaluates to a module-relative URI.
    * This has the Kawa-specific URI scheme "class-resource:" and an
-   * assocatied ClassLoader (using a WekaHashMap).  It used to reference
+   * associated ClassLoader (using a WeakHashMap).  It's used to reference
    * resources located using the compiled class's ClassLoader. */
   public static Expression getModuleClassURI (Compilation comp)
   {

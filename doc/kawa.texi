@@ -3603,6 +3603,7 @@ A powerful pretty-printer.
 * Named output formats::
 * Paths:: Paths - file name, URLs, and URIs
 * Files:: File System Interface
+* Resources::
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
 @end menu
@@ -3670,7 +3671,7 @@ to infer an appropriate @code{Content-type} depending on the following value.
 Top-level values are ignored, instead of printed.
 @end table
 
-@node Paths, Files, Named output formats, Input-Output
+@node Paths, Resources, Named output formats, Input-Output
 @subsection Paths - file name, URLs, and URIs
 
 A @dfn{Path} is the name of a file or some other @dfn{resource}.
@@ -3729,6 +3730,13 @@ A URI can be a URL, or it be a relative URI.
 @deffn Predicate URI? arg
 True if @var{arg} is a @code{URI} - i.e. an instance of
 a @code{gnu.text.URIPath}.
+@end deffn
+
+@deffn Type URL
+A Uniform Resource Locator - a subtype of @code{URI}.
+Represented using the Java class @code{gnu.text.URLPath},
+which is a wrapper around a @code{java.net.URL}, in
+addition to extending @code{gnu.text.URIPath}.
 @end deffn
 
 @subsubsection Extracting Path components
@@ -3861,7 +3869,49 @@ part of after @samp{#}.
 @end example
 @end defun
 
-@node Files, Ports, Paths, Input-Output
+@defun resolve-uri uri base
+Returns a @var{uri} unchanged if it is an absolute URI.
+Otherwise resolves it against a base URI @var{base},
+which is normally (though not always) absolute.
+@end defun
+
+@node Resources, Files, Paths, Input-Output
+@subsection Resources
+
+A resource is a file or other fixed data that an application may access.
+Resources are part of the application and are shipped with it, but are
+stored in external files.  Examples are images, sounds,
+and translation (localization) of messages.
+In the Java world a resource is commonly bundled in the same jar file
+as the application itself.
+
+@deffn Syntax resource-url resource-name
+Returns a @code{URLPath} you can use as a @code{URL}, or
+you can pass to it @code{open-input-file} to read the resource data.
+The @var{resource-name} is a string which is passed to the
+@code{ClassLoader} of the containing module.
+If the module class is in a jar file, things will magically
+work if the resource is in the same jar file, and @var{resource-name}
+is a filename relative to the module class in the jar.
+If the module is immediately evaluated, the @var{resource-name} is resolved
+against the location of the module source file.
+@end deffn
+
+@deffn Syntax module-uri
+Evaluates to a special URI that can be used to access resources
+relative to the class of the containing module.
+The URI has the form @code{"class-resource://@var{CurrentClass}/"}.
+The current @code{ClassLoader} is associated with the URI, so accessing
+resources using the URI will use that @code{ClassLoader}.
+Therefore you should not create a @code{"class-resource:"} URI
+except by using this function or @code{resolve-uri},
+since that might try to use the wrong @code{ClassLoader}.
+
+The macro @code{resource-url} works by using @code{module-uri}
+and resolving that to a normal @code{URL}.
+@end deffn
+
+@node Files, Ports, Resources, Input-Output
 @subsection File System Interface
 
 @defun file-exists? filename

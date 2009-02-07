@@ -130,10 +130,11 @@
        (gnu.kawa.functions.GetModuleClass:getModuleClassURI
 	(gnu.expr.Compilation:getCurrent))))))
 
-(define-syntax resource-uri
+(define-syntax resource-url
   (syntax-rules ()
-    ((resource-uri uri)
-     ((module-uri):resolve uri))))
+    ((resource-url uri)
+     (gnu.text.URLPath:valueOf
+      (((((module-uri):resolve uri):toURL):openConnection):getURL)))))
 
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
 (define (make-temporary-file #!optional (fmt :: <string> "kawa~d.tmp"))

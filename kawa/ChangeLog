@@ -1,3 +1,7 @@
+2009-02-06  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: New function resource-url; removed resource-uri.
+
 2009-01-14  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (feature-map): Add 'android-defs.

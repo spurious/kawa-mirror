@@ -1,3 +1,8 @@
+2009-02-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Paths): Document URL type and resolve-uri function.
+	(Resources): New section for resource-url and module-uri.
+
 2008-11-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Field operations): Remove <angles> around type names

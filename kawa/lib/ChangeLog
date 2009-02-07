@@ -1,3 +1,8 @@
+2009-02-06  Per Bothner  <per@bothner.com>
+
+	* files.scm (resource-url): New function.
+	(resource-uri): Remove similarly-named function
+
 2008-10-24  Per Bothner  <per@bothner.com>
 
 	* numbers.scm: Don't require misc.scm, to avoid a cycle (ports

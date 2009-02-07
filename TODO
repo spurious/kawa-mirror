@@ -1,4 +1,24 @@
+Before Kawa 1.10:
+- Change version number to 1.10.
+- Evaluated reported JEmacs bugs.
+- Make module-static the default?
+- Format filter chain API?
+  CommonLisp repl: (arrayp 3) ==> false rather than ()
+    because writeBoolean not properly filtered.
+- Go through remaining "news" entries and update manual.
+- go through Evaluating-Scheme-expressions-from-Java.
+  Support javax.script
+  ScriptEngineFactory -> for each Language
+- Doc: cleanup define-alias vs define-namespace.
+  Preferred idiom: (define-alias jframe javax.swing.JFrame)
+- R6RS exception handling - see message from March 15, patch from March 16.
+- gnu/bytecode:
+-- Document emitIf../eithThen else, at overview level.
+- Verify that Path is consistent with new javax.nio (JDR 203)
+  http://openjdk.java.net/projects/nio
+
 HIGH PRIORITY:
+* Document meta-arg facility.
 * compile-file doesn't display warnings
 * When deferring imports (require) the 'run' actions shouldn't be deferred. FIXME
 * Optimize and/or in the case of ConditionalTarget or <boolean> target.
@@ -9,10 +29,11 @@ HIGH PRIORITY:
 * Name mangling, document library modules.
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))
 
+Localization support: gettext - see doc-resource.patch
+
 Remove pretty-print implementation in slib.
 
 Optimize NumberCompare further.
-document eval methods
 
 BRL/KRL:
 * sitedefs.scm should be loaded
@@ -20,7 +41,6 @@ BRL/KRL:
 The default output-pourt shold be re-directed.
 It should be the same as the ctx.consumer.
 
-BEFORE KAWA 1.8?
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * CL reader interface
 * More define-class functionality?
@@ -38,12 +58,6 @@ local variable is never written (except before all calls to these
 intermediate functions), then add the variable as an extra implicit
 parameter to thse intermediate functions, instead of storing the
 variable in a frame.
-
-Optimize (call/cc (lambda (exit) ... (exit ...))) when exit is only
-called, never read, to use BlockExp/ExitExp.  Assumes the latter are
-extended to handle non-local exists - perhaps using the call/cc
-machinery:  Advantage - in many cases call/cc is used to exit a
-loop, so it can be inlined.
 
 Perhaps CallFrame should extend ModuleBody.
 
@@ -215,12 +229,6 @@ New syntax:
 SYMBOLS
 If we have pre-process environments, (define exit ...) should only re-define
 exit in the current environment, not all.
-
-JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
-
-Rewrite (make-temporary-file) to use File.createTempFile.
-
-Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).
 
 JEMACS
 

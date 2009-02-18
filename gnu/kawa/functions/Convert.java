@@ -6,6 +6,7 @@ import gnu.bytecode.CodeAttr;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.lispexpr.LangObjType;
 
 public class Convert extends Procedure2 implements CanInline, Inlineable
 {
@@ -60,8 +61,7 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
 					      Type.pointer_type,
 					      gnu.bytecode.Access.PUBLIC);
 	  }
-
-	args[0].compile(comp, typeType);
+	args[0].compile(comp, LangObjType.typeClassType);
 	args[1].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(coerceMethod);
 	target.compileFromStack(comp, Type.pointer_type);

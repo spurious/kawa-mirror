@@ -18,13 +18,13 @@ public class FilePath
   /* #endif */
   /* #endif */
 {
-  File file;
+  final File file;
   /** Usually the same as {@code file.toString()}.
    * One important difference: {@code isDirectory} is true
    * if {@code path} ends with the {@code '/'} or the {@code separatorChar}.
    * The original String if constructed from a String.
    */
-  String path;
+  final String path;
 
   private FilePath (File file)
   {

@@ -22,10 +22,10 @@ public class URIPath
   /* #endif */
 {
   /* #ifdef use:java.net.URI */
-  URI uri;
+  final URI uri;
   URIPath (URI uri) { this.uri = uri; } 
   /* #else */
-  // String uri;
+  // final String uri;
   // protected URIPath (String uri) { this.uri = uri; } 
   /* #endif */
 

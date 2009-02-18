@@ -7,7 +7,7 @@ import gnu.mapping.WrappedException; // FIXME - move to gnu.kawa.util
 
 public class URLPath extends URIPath
 {
-  URL url;
+  final URL url;
 
   URLPath (URL url)
   {

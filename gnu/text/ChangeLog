@@ -1,3 +1,9 @@
+2009-02-17  Per Bothner  <per@bothner.com>
+
+	* URIPath.java (uri): Make final.
+	* URLPath.java (url): Make final.
+	* FilePath.java (file, path): Make final.
+
 2008-12-23  Per Bothner  <per@bothner.com>
 
 	* SourceLocator.java: Only implement javax.xml.transform.SourceLocator

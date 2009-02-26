@@ -7,34 +7,34 @@ package gnu.kawa.util;
  * This is a public class to allow overriding.
  */
 
-public class HashNode
+public class HashNode<K,V>
 /* #ifdef JAVA2 */
-implements java.util.Map.Entry
+  implements java.util.Map.Entry<K,V>
 /* #endif */
 {
-  public HashNode next;
+  public HashNode<K,V> next;
   int hash;
-  Object key;
-  Object value;
+  K key;
+  V value;
 
-  public Object get (Object defaultValue)
+  public V get (V defaultValue)
   {
     return value;
   }
 
-  public Object getKey ()
+  public K getKey ()
   {
     return key;
   }
 
-  public Object getValue ()
+  public V getValue ()
   {
     return value;
   }
 
-  public Object setValue (Object value)
+  public V setValue (V value)
   {
-    Object old = this.value;
+    V old = this.value;
     this.value = value;
     return old;
   }

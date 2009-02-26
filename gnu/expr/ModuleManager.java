@@ -86,7 +86,7 @@ public class ModuleManager
 
   public static synchronized ModuleInfo findWithClass (Class clas)
   {
-    ModuleInfo info = (ModuleInfo) ModuleInfo.mapClassToInfo.get(clas);
+    ModuleInfo info = ModuleInfo.mapClassToInfo.get(clas);
     if (info == null)
       {
         info = new ModuleInfo();

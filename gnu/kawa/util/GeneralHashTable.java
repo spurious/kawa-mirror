@@ -1,4 +1,4 @@
-// Copyright (c) 2005  Per M.A. Bothner.
+// Copyright (c) 2005, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see COPYING.
 
 package gnu.kawa.util;
@@ -7,109 +7,48 @@ package gnu.kawa.util;
  * Supports deletions, and re-allocates the table when too big.
  * The equivalence relation can be customized. */
 
-public class GeneralHashTable
-// FUTURE: implements java.util.Map
+public class GeneralHashTable<K,V>
+  extends AbstractHashTable<HashNode<K,V>,K,V>
+  // FUTURE:  implements java.util.Map<K,V>
 {
-  protected HashNode[] table;
-  protected int mask;
-  protected int num_bindings;
-
   public GeneralHashTable ()
   {
-    this(64);
+    super(64);
   }
 
   public GeneralHashTable (int capacity)
   {
-    int log2Size = 4;
-    while (capacity > (1 << log2Size))
-      log2Size++;
-    capacity = 1 << log2Size;
-    table = new HashNode[capacity];
-    mask = capacity - 1;
+    super(capacity);
   }
 
+  protected int getEntryHashCode (HashNode<K,V> entry) { return entry.hash; }
+  protected HashNode<K,V> getEntryNext (HashNode<K,V> entry) { return entry.next; }
+  protected void setEntryNext (HashNode<K,V> entry, HashNode<K,V> next) { entry.next = next; }
+  protected K getEntryKey (HashNode<K,V> entry) { return entry.key; }
+  protected V getEntryValue (HashNode<K,V> entry) { return entry.value; }
+  protected void setEntryValue (HashNode<K,V> entry, V value) { entry.value = value; }
+  protected HashNode<K,V>[] allocEntries(int n) { return (HashNode<K,V>[]) new HashNode[n]; }
+
   /** Allocate a new node in the hash table. */
-  protected HashNode makeEntry (Object key, int hash, Object value)
+  protected HashNode<K,V> makeEntry (K key, int hash, V value)
   {
-    HashNode node = new HashNode();
+    HashNode<K,V> node = new HashNode<K,V>();
     node.key = key;
     node.hash = hash;
     node.value = value;
     return node;
   }
 
-  /** Calculate hash code of a key.
-   * You may need to override this if you override the <code>matches</code> method.
-   */
-  public int hash (Object key)
-  {
-    // FIXME
-    return key == null ? 0 : key.hashCode();
-  }
-
-  public int hash (HashNode node)
-  {
-    //return hash(node.getKey());
-    return node.hash;
-  }
-
-  public boolean matches (Object key, int hash, HashNode node)
-  {
-    return node.hash == hash && matches(node.getKey(), key);
-  }
-
-  /** Compare two keys for equivalence.
-   * Override this and the {@link #hash(Object)} method if you want
-   * a different equivalence relation.
-   */
-  public boolean matches (Object value1, Object value2)
-  {
-    // FIXME
-    return value1 == value2 || (value1 != null && value1.equals(value2));
-  }
-
-  public Object get (Object key)
-  {
-    return get(key, null);
-  }
-
-  public Object get (Object key, Object defaultValue)
-  {
-    int hash = hash(key);
-    int index = hash & this.mask;
-    for (HashNode node = table[index];
-	 node != null;  node = node.next)
-      {
-	if (matches(key, hash, node))
-	  return node.getValue();
-      }
-    return defaultValue;
-  }
-
-  public HashNode getNode (Object key)
-  {
-    int hash = hash(key);
-    int index = hash & this.mask;
-    for (HashNode node = table[index];
-	 node != null;  node = node.next)
-      {
-	if (matches(key, hash, node))
-          return node;
-      }
-    return null;
-  }
-
-  public Object put (Object key, Object value)
+  public V put (K key, V value)
   {
     return put(key, hash(key), value);
   }
 
-  public Object put (Object key, int hash, Object value)
+  public V put (K key, int hash, V value)
   {
-    int index = hash & mask;
-    HashNode first = table[index];
-    HashNode node = first;
+    int index = hashToIndex(hash);
+    HashNode<K,V> first = table[index];
+    HashNode<K,V> node = first;
     for (;;)
       {
 	if (node == null)
@@ -117,7 +56,7 @@ public class GeneralHashTable
             if (++num_bindings >= table.length)
               {
                 rehash();
-                index = hash & mask;
+                index = hashToIndex(hash);
                 first = table[index];
               }
             node = makeEntry(key, hash, value);
@@ -133,15 +72,15 @@ public class GeneralHashTable
       }
   }
 
-  public Object remove (Object key)
+  public V remove (K key)
   {
     int hash = hash(key);
-    int index = hash & this.mask;
-    HashNode prev = null;
-    HashNode node = table[index];
+    int index = hashToIndex(hash);
+    HashNode<K,V> prev = null;
+    HashNode<K,V> node = table[index];
     while (node != null)
       {
-	HashNode next = node.next;
+	HashNode<K,V> next = node.next;
 	if (matches(key, hash, node))
 	  {
 	    if (prev == null)
@@ -155,66 +94,5 @@ public class GeneralHashTable
 	node = next;
       }
     return null;
-  }
-
-  protected void rehash ()
-  {
-    HashNode[] oldTable = table;
-    int oldCapacity = oldTable.length;
-    int newCapacity = 2 * oldCapacity;
-    HashNode[] newTable = new HashNode[newCapacity];
-    int newMask = newCapacity - 1;
-    for (int i = oldCapacity;  --i >= 0;)
-      {
-        HashNode chain = oldTable[i];
-        if (chain != null && chain.next != null)
-          {
-            // Reverse the old chain in place, so that after re-hashing the
-            // new chain has the same order.. This is useful for some
-            // subclasses (specifically gnu.expr.NameLookup), and it is
-            // cheap to so here where extra cache misses are unlikely.
-            HashNode prev = null;
-            do
-              {
-                HashNode node = chain;
-                chain = node.next;
-                node.next = prev;
-                prev = node;
-              }
-            while (chain != null);
-            chain = prev;
-          }
-
-	for (HashNode element = chain;  element != null; )
-	  {
-	    HashNode next = element.next;
-	    int hash = hash(element);
-	    int j = hash & newMask;
-	    HashNode head = newTable[j];
-	    element.next = head;
-	    newTable[j] = element;
-	    element = next;
-	  }
-      }
-    table = newTable;
-    mask = newMask;
-  }
-
-  public void clear ()
-  {
-    HashNode[] t = this.table;
-    for (int i = t.length;  --i >= 0; )
-      t[i] = null;
-    num_bindings = 0;
-  }
-
-  public int size ()
-  {
-    return num_bindings;
-  }
-
-  protected static HashNode next (HashNode node)
-  {
-    return node.next;
   }
 }

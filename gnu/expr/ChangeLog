@@ -1,3 +1,11 @@
+2009-02-25  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (class ClassToInfoMap): New class.
+	(mapClassToInfo): Use ClassToInfoMap instead of WeakHashMap.
+	* ModuleManager.java: Update accordingly.
+	* NameLookup.java: Update GeneralHashTable with generics.
+	Make sure to use AbstractHashTable.hashToIndex where needed.
+
 2009-01-14  Per Bothner  <per@bothner.com>
 
 	* BuiltinEnvironment.java: Minor javadoc fix.

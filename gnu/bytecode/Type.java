@@ -1,8 +1,9 @@
-// Copyright (c) 1997, 2000, 2003, 2004, 2006  Per M.A. Bothner.
+// Copyright (c) 1997, 2000, 2003, 2004, 2006, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 import java.util.*;
+import gnu.kawa.util.AbstractWeakHashTable;
 
 public abstract class Type
 /* #ifdef JAVA5 */
@@ -33,16 +34,7 @@ public abstract class Type
     return this;
   }
 
-  // Maps java.lang.Class to corresponding Type.
-  /* #ifdef JAVA2 */
-  /* #ifdef JAVA5 */
-  static WeakHashMap<Class,Type> mapClassToType;
-  /* #else */
-  // static WeakHashMap mapClassToType;
-  /* #endif */
-  /* #else */
-  // static Hashtable mapClassToType;
-  /* #endif */
+  static ClassToTypeMap mapClassToType;
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
   /* #ifdef JAVA5 */
@@ -95,23 +87,11 @@ public abstract class Type
   /** Register that the Type for class is type. */
   public synchronized static void registerTypeForClass(Class clas, Type type)
   {
-    /* #ifdef JAVA2 */
-    /* #ifdef JAVA5 */
-    WeakHashMap<Class,Type> map = mapClassToType;
+    ClassToTypeMap map = mapClassToType;
     if (map == null)
-      mapClassToType = map = new WeakHashMap<Class,Type>(100);
-    /* #else */
-    // WeakHashMap map = mapClassToType;
-    // if (map == null)
-    //   mapClassToType = map = new WeakHashMap(100);
-    /* #endif */
-    /* #else */
-    // Hashtable map = mapClassToType;
-    // if (map == null)
-    //   mapClassToType = map = new Hashtable(100);
-    /* #endif */
-    map.put(clas, type);
+      mapClassToType = map = new ClassToTypeMap(100);
     type.reflectClass = clas;
+    map.put(clas, type);
   }
 
   public synchronized static Type make(Class reflectClass)
@@ -120,9 +100,9 @@ public abstract class Type
     
     if (mapClassToType != null)
       {
-	Object t = mapClassToType.get(reflectClass);
+	Type t = mapClassToType.get(reflectClass);
 	if (t != null)
-	  return (Type) t;
+	  return t;
       }
     if (reflectClass.isArray())
       type = ArrayType.make(Type.make(reflectClass.getComponentType()));
@@ -604,5 +584,28 @@ public abstract class Type
   {
     String name = toString();
     return name == null ? 0 : name.hashCode ();
+  }
+}
+
+class ClassToTypeMap extends AbstractWeakHashTable<Class,Type>
+{
+  public ClassToTypeMap ()
+  {
+    super(64);
+  }
+
+  public ClassToTypeMap (int capacity)
+  {
+    super(capacity);
+  }
+
+  protected Class getKeyFromValue (Type type)
+  {
+    return type.reflectClass;
+  }
+
+  protected boolean matches (Type oldValue, Type newValue)
+  {
+    return oldValue.reflectClass == newValue.reflectClass;
   }
 }

@@ -3,11 +3,14 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  AbstractHashTable.java \
+  AbstractWeakHashTable.java \
   FixupHtmlToc.java \
   GeneralHashTable.java \
   IdentityHashTable.java \
   HashNode.java \
-  RangeTable.java
+  RangeTable.java \
+  WeakHashNode.java
 
 EXTRA_DIST = PreProcess.java
 PACKAGE_FNAME = gnu-kawa-util

@@ -1,3 +1,8 @@
+2009-02-23  Per Bothner  <per@bothner.com>
+
+	* Type.java (class ClassTypeToMap): New class.
+	(mapClassToType): Change to use ClassTypeToMap instead of WeakHashMap.
+
 2009-01-14  Per Bothner  <per@bothner.com>
 
 	* dump.java (main): Make more bullet-proof.

@@ -5,7 +5,7 @@ package gnu.kawa.util;
 
 /** A hash table where "equals" is object identity. */
 
-public class IdentityHashTable extends GeneralHashTable
+public class IdentityHashTable<K,V> extends GeneralHashTable<K,V>
 {
   public IdentityHashTable ()
   {
@@ -16,12 +16,12 @@ public class IdentityHashTable extends GeneralHashTable
     super(capacity);
   }
 
-  public int hash (Object key)
+  public int hash (K key)
   {
     return System.identityHashCode(key);
   }
 
-  public boolean matches (Object value1, Object value2)
+  public boolean matches (K value1, K value2)
   {
     return value1 == value2;
   }

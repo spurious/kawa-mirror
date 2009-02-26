@@ -7,6 +7,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.FieldLocation;
 import gnu.text.*;
 import java.util.*;
+import gnu.kawa.util.AbstractWeakHashTable;
 
 public class ModuleInfo
 {
@@ -16,19 +17,9 @@ public class ModuleInfo
    */
   public String className;
 
-  private Class moduleClass;
+  Class moduleClass;
 
-  // Maps java.lang.Class to corresponding ModuleInfo.
-  /* #ifdef JAVA2 */
-  /* #ifdef JAVA5 */
-  static WeakHashMap<Class,ModuleInfo> mapClassToInfo
-    = new WeakHashMap<Class,ModuleInfo>();
-  /* #else */
-  // static WeakHashMap mapClassToInfo = new WeakHashMap();
-  /* #endif */
-  /* #else */
-  // static Hashtable mapClassToInfo = new Hashtable();
-  /* #endif */
+  static ClassToInfoMap mapClassToInfo = new ClassToInfoMap();
 
   /** The namespace URI associated with this module, or {@code null}.
    * This is null for Scheme modules, but non-null for XQuery modules.
@@ -213,9 +204,9 @@ public class ModuleInfo
 
   public void setModuleClass (Class clas)
   {
-    mapClassToInfo.put(clas, this);
     moduleClass = clas;
     className = clas.getName();
+    mapClassToInfo.put(clas, this);
   }
 
   public static ModuleInfo findFromInstance (Object instance)
@@ -439,5 +430,23 @@ public class ModuleInfo
       }
     sbuf.append(']');
     return sbuf.toString();
+  }
+}
+
+class ClassToInfoMap extends AbstractWeakHashTable<Class,ModuleInfo>
+{
+  public ClassToInfoMap ()
+  {
+    super(64);
+  }
+
+  protected Class getKeyFromValue (ModuleInfo minfo)
+  {
+    return minfo.moduleClass;
+  }
+
+  protected boolean matches (ModuleInfo oldValue, ModuleInfo newValue)
+  {
+    return oldValue.moduleClass == newValue.moduleClass;
   }
 }

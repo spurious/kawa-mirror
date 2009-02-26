@@ -8,7 +8,7 @@ import gnu.kawa.util.HashNode;
 
 /** Manages the set of declarations "currently" in scope. */
 
-public class NameLookup extends GeneralHashTable
+public class NameLookup extends GeneralHashTable<Object,Declaration>
 {
   Language language;
 
@@ -26,7 +26,7 @@ public class NameLookup extends GeneralHashTable
       rehash();
     int hash = hash(symbol);
     HashNode node = makeEntry(symbol, hash, decl);
-    int index = hash & mask;
+    int index = hashToIndex(hash);
     node.next = table[index];
     table[index] = node;
   }
@@ -38,7 +38,7 @@ public class NameLookup extends GeneralHashTable
       return false;
     int hash = hash(symbol);
     HashNode prev = null;
-    int index = hash & this.mask;
+    int index = hashToIndex(hash);
     HashNode node = table[index];
     while (node != null)
       {
@@ -75,7 +75,7 @@ public class NameLookup extends GeneralHashTable
   public Declaration lookup (Object symbol, int namespace)
   {
     int hash = hash(symbol);
-    int index = hash & this.mask;
+    int index = hashToIndex(hash);
     for (HashNode node = table[index];
 	 node != null;  node = node.next)
       {

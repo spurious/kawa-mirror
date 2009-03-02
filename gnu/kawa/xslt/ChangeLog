@@ -1,5 +1,21 @@
 2009-03-01  Per Bothner  <per@bothner.com>
 
+	* XslTranslator.java (maybeSkipWhitespace): New method.
+	(startElement, endElement): Call maybeSkipWhitespace.
+	(startElement, endElement): Add support for xsl:text.
+	(endElement): Make sure xsl:value-of yields a text node.
+	Add support for xsl:copy-of.
+	Skip version attribute for xsl:stylesheet.
+	Create fresh makeElement instance for each element constructor,
+	because XQResolveNames.walkApplyExp calls setNamespaceNodes.
+	(parseXPath): Move and modify from XSLT.java.
+	Re-use existing Compilation.
+	* XSLT.java (parseXPath): Moved to XslTranslator.java.
+	(parse): Call XQResolveNames.resolveModule, mainly for xpath.
+	(process): Fix various bugs and missing functionality.
+
+2009-03-01  Per Bothner  <per@bothner.com>
+
 	* XSLT.java (getCompilation): Remove - use inherited version.
 	(parseXPath): Change to pass Compilation.
 	* XslTranslator.java: Update accordingly.

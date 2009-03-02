@@ -117,9 +117,9 @@ public class XQParser extends Lexer
               path = URIPath.valueOf(value.toString());
           }
 
-        if (path == null)
+        LineBufferedReader port;
+        if (path == null && (port = getPort()) != null)
           {
-            LineBufferedReader port = getPort();
             path = port.getPath();
             if (path instanceof FilePath
                 && (! path.exists()
@@ -2286,8 +2286,8 @@ public class XQParser extends Lexer
   /** Count of enclosed expressions seen in element or attribute content. */
   int enclosedExpressionsSeen;
 
-  static Expression makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
-                                               "makeText");
+  public static Expression makeText =
+    makeFunctionExp("gnu.kawa.xml.MakeText", "makeText");
 
   /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or

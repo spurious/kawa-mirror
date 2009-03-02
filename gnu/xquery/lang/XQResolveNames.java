@@ -17,7 +17,7 @@ import kawa.standard.Scheme;
 
 public class XQResolveNames extends ResolveNames
 {
-  XQParser parser;
+  public XQParser parser;
 
   /** Code number for the special <code>last</code> function. */
   public static final int LAST_BUILTIN = -1;

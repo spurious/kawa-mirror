@@ -31,6 +31,8 @@ public class XslTranslator extends Lexer implements Consumer
   /** Buffer to acumulate the value of the current attribute. */
   StringBuffer attributeValue = new StringBuffer(100);
 
+  boolean preserveSpace;
+
   XSLT interpreter;
   InPort in;
 
@@ -47,6 +49,31 @@ public class XslTranslator extends Lexer implements Consumer
 
   static final String XSL_TRANSFORM_URI
   = "http://www.w3.org/1999/XSL/Transform";
+
+  void maybeSkipWhitespace ()
+  {
+    if (preserveSpace)
+      return;
+    int size = comp.exprStack.size();
+    while (--size >= 0)
+      {
+        Object expr = (Expression) comp.exprStack.elementAt(size);
+        if (expr instanceof QuoteExp)
+          {
+            Object value = ((QuoteExp) expr).getValue();
+            String str = value == null ? "" : value.toString();
+            for (int j = str.length();  --j >= 0; )
+              {
+                char ch = str.charAt(j);
+                if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n')
+                  return;
+              }
+          }
+        else
+          break;
+      }
+    comp.exprStack.setSize(size+1);
+  }
 
   public String popMatchingAttribute(String ns, String name, int start)
   {
@@ -108,7 +135,8 @@ public class XslTranslator extends Lexer implements Consumer
   }
 
   public void startElement (Object type)
-  { 
+  {
+    maybeSkipWhitespace();
     String xslTag = isXslTag(type);
     if (xslTag == "template")
       {
@@ -118,6 +146,8 @@ public class XslTranslator extends Lexer implements Consumer
 	//templateLambda.setFile(getName());
 	//templateLambda.setLine(declLine, declColumn);
       }
+    else if (xslTag == "text")
+      preserveSpace = false;
     if (type instanceof XName)
       {
 	// This gets rid of namespace "nodes".   That's not really right.
@@ -152,6 +182,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void endElement ()
   {
+    maybeSkipWhitespace();
     int nlen = nesting.length()-1;
     int start = nesting.charAt(nlen);
     nesting.setLength(nlen);
@@ -162,10 +193,19 @@ public class XslTranslator extends Lexer implements Consumer
 	String select = popMatchingAttribute("", "select", start + 1);
 	if (select != null)
 	  {
-	    Expression exp = interpreter.parseXPath(select, comp);
-	    exp = new ApplyExp(ClassType.make("gnu.xml.TextUtils")
-                               .getDeclaredMethod("stringValue", 1),
-                               new Expression[] { exp });
+	    Expression exp = parseXPath(select);
+            exp = new ApplyExp(XQParser.makeText, new Expression[] { exp });
+	    comp.exprStack.pop();
+	    push(exp);
+	    return;
+	  }
+      }
+    else if (xslTag == "copy-of")
+      {
+	String select = popMatchingAttribute("", "select", start + 1);
+	if (select != null)
+	  {
+	    Expression exp = parseXPath(select);
 	    comp.exprStack.pop();
 	    push(exp);
 	    return;
@@ -183,7 +223,7 @@ public class XslTranslator extends Lexer implements Consumer
     else if (xslTag == "if")
       {
 	String select = popMatchingAttribute("", "test", start + 1);
-	Expression test = interpreter.parseXPath(select, comp);
+	Expression test = parseXPath(select);
 	test = XQParser.booleanValue(test);
 	Expression clause = popTemplateBody(start+1);
 	comp.exprStack.pop();
@@ -191,6 +231,7 @@ public class XslTranslator extends Lexer implements Consumer
       }
     else if (xslTag == "stylesheet" || xslTag == "transform")
       {
+	String version = popMatchingAttribute("", "version", start + 1);
 	push(new ApplyExp(new QuoteExp(runStylesheetProc),
 			  Expression.noExpressions));
 	Expression body = popTemplateBody(start+1);
@@ -215,15 +256,58 @@ public class XslTranslator extends Lexer implements Consumer
 	push(new ApplyExp(new QuoteExp(defineTemplateProc), args));
 	templateLambda = null;
       }
+    else if (xslTag == "text")
+      {
+        preserveSpace = false;
+	Expression[] args = new Expression[comp.exprStack.size() - start - 1];
+	for (int i = args.length;  --i >= 0; )
+	  args[i] = (Expression) comp.exprStack.pop();
+        comp.exprStack.pop();
+        Expression exp = new ApplyExp(XQParser.makeText, args);
+	push(exp);
+	mexp.body = exp;
+      }
     else
       {
 	Expression[] args = new Expression[comp.exprStack.size() - start];
 	for (int i = args.length;  --i >= 0; )
 	  args[i] = (Expression) comp.exprStack.pop();
-	// FIXME does not preserve namespace attributes.
-	Expression exp = new ApplyExp(MakeElement.makeElement, args);
+        MakeElement mkElement = new MakeElement();
+        // FIXME does not preserve namespace attributes.
+        Expression exp = new ApplyExp(new QuoteExp(mkElement), args);
 	push(exp);
 	mexp.body = exp;
+      }
+  }
+
+  Expression parseXPath (String string)
+  {
+    SourceMessages messages = comp.getMessages();
+    try
+      {
+	XQParser parser = new XQParser(new CharArrayInPort(string), messages, interpreter);
+	//parser.nesting = 1;
+	java.util.Vector exps = new java.util.Vector(20);
+	for (;;)
+	  {
+            // FIXME - need to set context.
+	    Expression sexp = parser.parse(comp);
+	    if (sexp == null)
+	      break;
+	    exps.addElement(sexp);
+	  }
+	int nexps = exps.size();
+	if (nexps == 0)
+	  return QuoteExp.voidExp;
+	else if (nexps == 1)
+	  return (Expression) exps.elementAt(0);
+	else
+	  throw new InternalError("too many xpath expressions"); // FIXME
+      }
+    catch (Throwable ex)
+      {
+	ex.printStackTrace();
+	throw new InternalError ("caught "+ex);
       }
   }
 

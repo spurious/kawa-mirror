@@ -1,3 +1,9 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (getStaticBaseUri): Tolerate getPort() being null.
+	(makeText): Make public, for XsltTranslator.
+	* XQResolveNames.java (parse): Make public, for XsltTranslator.
+
 2009-02-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (lexical): Remove field.

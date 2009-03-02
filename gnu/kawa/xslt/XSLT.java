@@ -35,38 +35,6 @@ public class XSLT extends XQuery
     return instance;
   }
 
-  Expression parseXPath (String string, Compilation comp)
-  {
-    SourceMessages messages = comp.getMessages();
-    try
-      {
-	Compilation tr = new Compilation(this, messages, comp.lexical);
-	XQParser parser
-	  = (XQParser) super.getLexer(new CharArrayInPort(string), messages);
-	//parser.nesting = 1;
-	java.util.Vector exps = new java.util.Vector(20);
-	for (;;)
-	  {
-	    Expression sexp = parser.parse(tr);
-	    if (sexp == null)
-	      break;
-	    exps.addElement(sexp);
-	  }
-	int nexps = exps.size();
-	if (nexps == 0)
-	  return QuoteExp.voidExp;
-	else if (nexps == 1)
-	  return (Expression) exps.elementAt(0);
-	else
-	  throw new InternalError("too many xpath expressions"); // FIXME
-      }
-    catch (Throwable ex)
-      {
-	ex.printStackTrace();
-	throw new InternalError ("caught "+ex);
-      }
-  }
-
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new XslTranslator(inp, messages, this);
@@ -77,6 +45,13 @@ public class XSLT extends XQuery
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     ((XslTranslator) comp.lexer).parse(comp);
+
+    XQParser xqparser = new XQParser(null, comp.getMessages(), this);
+    XQResolveNames resolver = new XQResolveNames(comp);
+    resolver.functionNamespacePath = xqparser.functionNamespacePath;
+    resolver.parser = xqparser;
+    resolver.resolveModule(comp.mainLambda);
+
     return true;
   }
 
@@ -123,15 +98,18 @@ public class XSLT extends XQuery
       {
 	int ipos = pos.ipos;
 	int kind = doc.getNextKind(ipos);
+        Object type;
+        String name;
+        Procedure proc;
 	switch (kind)
 	  {
 	  case Sequence.DOCUMENT_VALUE:
 	    ipos = doc.firstChildPos(ipos);
 	    break;
 	  case Sequence.ELEMENT_VALUE:
-	    Object type = pos.getNextTypeObject();
-	    Procedure proc = TemplateTable.nullModeTable.find(pos.getNextTypeName());
-	    String name = pos.getNextTypeName();
+	    type = pos.getNextTypeObject();
+	    name = pos.getNextTypeName();
+	    proc = TemplateTable.nullModeTable.find(name);
 	    if (proc != null)
 	      {
 		proc.check0(ctx);
@@ -140,8 +118,10 @@ public class XSLT extends XQuery
 	    else
 	      {
 		out.startElement(type);
-		// FIXME emit attributes
-		pos.push(doc, doc.firstChildPos(ipos));
+                int child = doc.firstAttributePos(ipos);
+                if (child == 0)
+                  child = doc.firstChildPos(ipos);
+		pos.push(doc, child);
 		process(doc, pos, ctx);
 		pos.pop();
 		out.endElement();
@@ -149,16 +129,31 @@ public class XSLT extends XQuery
 	    ipos = doc.nextDataIndex(ipos >>> 1) << 1;
 	    pos.gotoNext();
 	    break;
+	  case Sequence.ATTRIBUTE_VALUE:
+	    type = pos.getNextTypeObject();
+	    name = pos.getNextTypeName();
+	    proc = TemplateTable.nullModeTable.find("@"+name);
+            if (proc != null)
+	      {
+		proc.check0(ctx);
+		ctx.runUntilDone();
+                break;
+	      }
+            // else fall through ...
 	  case Sequence.CHAR_VALUE:
 	    int ichild = ipos >>> 1;
 	    int next = doc.nextNodeIndex(ichild, -1 >>> 1);
-	    if (ipos == next)
+	    if (ichild == next)
 	      next = doc.nextDataIndex(ichild);
 	    doc.consumeIRange(ichild, next, out);
 	    ipos = next << 1;
 	    break;
-	  case Sequence.TEXT_BYTE_VALUE:
-	  case Sequence.OBJECT_VALUE:
+          case Sequence.COMMENT_VALUE:
+          case Sequence.PROCESSING_INSTRUCTION_VALUE:
+	    ipos = doc.nextDataIndex(ipos >>> 1) << 1;
+            break;
+	  case Sequence.TEXT_BYTE_VALUE: // FIXME
+	  case Sequence.OBJECT_VALUE: // FIXME
 	  default:
 	    return;
 	  }

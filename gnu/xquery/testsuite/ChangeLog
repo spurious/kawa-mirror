@@ -1,3 +1,10 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* xsltest1.xsl: New XSLT test.
+	* xsltest1.expected: Expected output from xsltest1.xsl.
+	* Makefile.am: Update accordingly.
+	* exp-format-users.html: Update for XSLT whitespace changes.
+	
 2009-02-28  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java (evalTest): Clear current NameLookup.

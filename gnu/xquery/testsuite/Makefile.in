@@ -193,7 +193,7 @@ java_sources = TestMisc.java TestSuite.java RunXQTS.java
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql mod2a.xql \
-  bad-1.xql expected-1.errs XQTS-trace.exp \
+  bad-1.xql expected-1.errs XQTS-trace.exp xsltest1.xsl xsltest1.expected\
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
 
@@ -447,6 +447,12 @@ check-descend:  descend.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) descend >tmpdesc
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
 
+check-xsltest1:
+	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >xsltest1.log
+	@if diff -b $(srcdir)/>xsltest1.expected xsltest1.log; \
+	  then echo '# xsltest1 test passes'; \
+	  else echo FAIL xsltest1 test; fi
+
 check-format-users:
 	$(KAWA) --xslt $(srcdir)/format-users.xsl users.xml \
 	  |sed 's/^ *//'>tmp-format-users.html
@@ -475,7 +481,7 @@ check-bad-1: bad-1.log
 	  else echo FAIL bad-1 test; fi
 
 check-without-XQTS:  check-misc check-suite check-maketab1 check-multab \
-	  check-descend check-format-users check-mod check-bad-1
+	  check-descend check-format-users check-mod check-bad-1 check-xsltest1
 
 @WITH_XQTS_TRUE@check: check-without-XQTS check-XQTS
 @WITH_XQTS_FALSE@check: check-without-XQTS

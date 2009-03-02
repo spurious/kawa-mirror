@@ -901,23 +901,6 @@ public class Compilation implements SourceLocator
       }
   }
 
-  public Compilation (boolean immediate, SourceMessages messages)
-  {
-    this(messages);
-    this.immediate = immediate;
-  }
-
-  public Compilation (SourceMessages messages)
-  {
-    this.messages = messages;
-    lexical = new NameLookup(getLanguage());
-  }
-
-  public Compilation (Language language, SourceMessages messages)
-  {
-    this(language, messages, new NameLookup(language));
-  }
-
   public Compilation (Language language, SourceMessages messages,
 		      NameLookup lexical)
   {
@@ -2837,6 +2820,7 @@ public class Compilation implements SourceLocator
               chainUninitialized = next;
             else
               prev.nextUninitialized = next;
+            comp.nextUninitialized = null;
             return comp;
           }
         prev = comp;

@@ -1,3 +1,12 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (<init>): Also pass NameLookup.
+	(resolveModule): Don't pop in immediate mode.
+	(check_if_Syntax): Generalize.
+	(exp2Type): Don't InlineCalls twice.
+	(rewrite_body): We skip dynamic declarations when creating body.
+	* lang/Eval.java (evalBody): Update for new Translator constructor.
+
 2009-02-06  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: New function resource-url; removed resource-uri.

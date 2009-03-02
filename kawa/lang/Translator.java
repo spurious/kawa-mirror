@@ -86,9 +86,9 @@ public class Translator extends Compilation
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
 
-  public Translator (Language language, SourceMessages messages)
+  public Translator (Language language, SourceMessages messages, NameLookup lexical)
   {
-    super(language, messages);
+    super(language, messages, lexical);
     this.env = Environment.getCurrent();
   }
 
@@ -257,7 +257,7 @@ public class Translator extends Compilation
   Syntax check_if_Syntax (Declaration decl)
   {
     Declaration d = Declaration.followAliases(decl);
-
+    Object obj = null;
     Expression dval = d.getValue();
     if (dval != null && d.getFlag(Declaration.IS_SYNTAX))
       {
@@ -274,8 +274,7 @@ public class Translator extends Compilation
               }
             else if (current_scope instanceof TemplateScope)
               macroContext = ((TemplateScope) current_scope).macroContext;
-            Object obj = dval.eval(env);
-            return obj instanceof Syntax ? (Syntax) obj : null;
+            obj = dval.eval(env);
           }
         catch (Throwable ex)
           {
@@ -283,7 +282,12 @@ public class Translator extends Compilation
             error('e', "unable to evaluate macro for "+decl.getSymbol());
           }
       }
-    return null;
+    else if (decl.getFlag(Declaration.IS_SYNTAX) && ! decl.needsContext())
+      {
+	StaticFieldLocation loc = StaticFieldLocation.make(decl);
+	obj = loc.get(null);
+      }
+    return obj instanceof Syntax ? (Syntax) obj : null;
   }
 
   public Expression rewrite_pair (Pair p, boolean function)
@@ -871,7 +875,6 @@ public class Translator extends Compilation
         texp = new InlineCalls(this).walk(texp);
 	if (texp instanceof ErrorExp)
 	  return null;
-        texp = new InlineCalls(this).walk(texp);
 	Type type = getLanguage().getTypeFor(texp);
 	 if (type == null)
 	   {
@@ -1148,7 +1151,7 @@ public class Translator extends Compilation
 	scanBody(exp, defs, false);
 	if (formStack.size() == first)
 	  formStack.add(syntaxError ("body with no expressions"));
-	int ndecls = defs.countDecls();
+	int ndecls = defs.countNonDynamicDecls();
 	if (ndecls != 0)
 	  {
 	    Expression[] inits = new Expression[ndecls];
@@ -1334,7 +1337,9 @@ public class Translator extends Compilation
       {
 	Compilation.setCurrent(this);
 	mexp.body = makeBody(firstForm, mexp);
-	lexical.pop(mexp);
+        // In immediate mode need to preseve Declaration for current "seesion".
+        if (! immediate)
+	  lexical.pop(mexp);
       }
     finally
       {

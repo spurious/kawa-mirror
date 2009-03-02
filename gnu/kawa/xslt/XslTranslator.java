@@ -162,7 +162,7 @@ public class XslTranslator extends Lexer implements Consumer
 	String select = popMatchingAttribute("", "select", start + 1);
 	if (select != null)
 	  {
-	    Expression exp = interpreter.parseXPath(select, getMessages());
+	    Expression exp = interpreter.parseXPath(select, comp);
 	    exp = new ApplyExp(ClassType.make("gnu.xml.TextUtils")
                                .getDeclaredMethod("stringValue", 1),
                                new Expression[] { exp });
@@ -183,7 +183,7 @@ public class XslTranslator extends Lexer implements Consumer
     else if (xslTag == "if")
       {
 	String select = popMatchingAttribute("", "test", start + 1);
-	Expression test = interpreter.parseXPath(select, getMessages());
+	Expression test = interpreter.parseXPath(select, comp);
 	test = XQParser.booleanValue(test);
 	Expression clause = popTemplateBody(start+1);
 	comp.exprStack.pop();

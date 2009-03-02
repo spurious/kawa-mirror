@@ -582,7 +582,10 @@ public class LambdaExp extends ScopeExp
             if (! ((ModuleExp) nameDecl.context).isStatic())
               fflags &= ~Access.FINAL;
           }
-	if (! nameDecl.isPrivate() || external_access)
+        // In immediate mode we may need to access the field from a future
+        // command in a different "runtime package" (see JVM spec) because it
+        // gets loaded by a different class loader.  So make the field public.
+	if (! nameDecl.isPrivate() || external_access || comp.immediate)
 	  fflags |= Access.PUBLIC;
         if ((flags & OVERLOADABLE_FIELD) != 0)
           {

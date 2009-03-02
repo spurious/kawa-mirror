@@ -429,9 +429,9 @@ public abstract class Language
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
   {
-    return new Compilation(this, messages);
+    return new Compilation(this, messages, lexical);
   }
 
   /** Flag to tell parse that expression will be evaluated immediately.
@@ -475,10 +475,12 @@ public abstract class Language
     throws java.io.IOException, gnu.text.SyntaxException
   {
     SourceMessages messages = lexer.getMessages();
-    Compilation tr = getCompilation(lexer, messages);
+    boolean immediate = (options & PARSE_IMMEDIATE) != 0;
+    NameLookup lexical = immediate ? NameLookup.getInstance(getEnvironment(), this) : new NameLookup(this);
+    Compilation tr = getCompilation(lexer, messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
-    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
+    tr.immediate = immediate;;
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);

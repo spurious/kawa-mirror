@@ -1,3 +1,11 @@
+2009-02-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (lexical): Remove field.
+	(<init>): Don't allocate NameLookup.
+	Instead, get it from the Compilation where needed.
+	* XQResolveNames.java (resolveModule): Remove subsumed Declarations.
+	* XQuery.java (getCompilation): Update to pass NameLookup.
+
 2008-09-05  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (typeMap): Map "untyped" to XDataType.untypedType.

@@ -35,9 +35,9 @@ public abstract class LispLanguage extends Language
     return new LispReader(inp, messages);
   }
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
   {
-    return new Translator (this, messages);
+    return new Translator(this, messages, lexical);
   }
 
   public boolean parse (Compilation comp, int options)

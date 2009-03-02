@@ -504,6 +504,8 @@ public class RunXQTS extends FilterConsumer
           }
         throw ex;
       }
+    // This is mainly to avoid memory leaking.
+    NameLookup.setInstance(xqueryLanguage.getEnvironment(), null);
     Compilation comp;
     Procedure withContextProc = null;
     try
@@ -517,6 +519,12 @@ public class RunXQTS extends FilterConsumer
           comp = xqueryLanguage.parse(in, messages, Language.PARSE_IMMEDIATE);
         if (messages.seenErrors())
           throw new SyntaxException(messages);
+      }
+    catch (OutOfMemoryError ex)
+      {
+	System.err.println("caught "+ex);
+	System.exit(-1);
+        return;
       }
     catch (SyntaxException ex)
       {
@@ -588,6 +596,11 @@ public class RunXQTS extends FilterConsumer
           ctx.runUntilDone();
         else
           ModuleExp.evalModule(env, ctx, comp, null, null);
+      }
+    catch (OutOfMemoryError ex)
+      {
+	System.err.println("caught "+ex);
+	System.exit(-1);
       }
     catch (Throwable ex)
       {

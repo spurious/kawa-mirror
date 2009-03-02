@@ -1159,6 +1159,7 @@
   (test '#(dididit dah) list->vector '(dididit dah))
   (test '#() list->vector '())
   (SECTION 6 10 4)
+  (define-variable foo "FOO")
   (load "tmp1")
   (test write-test-obj 'load foo)
   (report-errs))

@@ -69,8 +69,6 @@ public class XQParser extends Lexer
   public static final CastableAs castableAs = CastableAs.castableAs;
   public static final Convert treatAs = Convert.as;
 
-  NameLookup lexical;
-
   NamedCollator defaultCollator = null;
 
   /** The default order for empty sequences.
@@ -1248,7 +1246,6 @@ public class XQParser extends Lexer
   {
     super(port, messages);
     interpreter = interp;
-    lexical = new NameLookup(interp);
     nesting = 1;
 
     // Push standard namespaces into lexical scope.
@@ -1827,7 +1824,7 @@ public class XQParser extends Lexer
     Expression step1;
     if (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
-	Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
+	Declaration dotDecl = comp.lexical.lookup(DOT_VARNAME, false);
         Expression dot;
 	if (dotDecl == null)
 	  dot = syntaxError("context item is undefined", "XPDY0002");
@@ -1944,7 +1941,7 @@ public class XQParser extends Lexer
     else
       return null;
 
-    Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
+    Declaration dotDecl = comp.lexical.lookup(DOT_VARNAME, false);
     Expression dot;
     if (dotDecl == null)
       dot = syntaxError("node test when context item is undefined", "XPDY0002");
@@ -2087,7 +2084,7 @@ public class XQParser extends Lexer
       {
 	axis = curToken == '.' ? AXIS_SELF : AXIS_PARENT;
 	getRawToken();
-	Declaration dotDecl = lexical.lookup(DOT_VARNAME, false);
+	Declaration dotDecl = comp.lexical.lookup(DOT_VARNAME, false);
         Expression exp;
 	if (dotDecl == null)
 	  exp = syntaxError("context item is undefined", "XPDY0002");

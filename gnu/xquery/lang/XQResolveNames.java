@@ -7,6 +7,7 @@ import gnu.kawa.xml.*;
 import gnu.xml.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.kawa.util.HashNode;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.SingletonType;
 import gnu.kawa.functions.GetNamedPart;
@@ -434,6 +435,14 @@ public class XQResolveNames extends ResolveNames
       }
     moduleDecl = exp.firstDecl();
     exp.body = walkStatements(exp.body);
+
+    // Remove old hidden declarations, for GC and speed.
+    for (Declaration decl = exp.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+        if (decl.getSymbol() != null)
+          lookup.removeSubsumed(decl);
+      }
   }
 
   /**

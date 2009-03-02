@@ -35,11 +35,12 @@ public class XSLT extends XQuery
     return instance;
   }
 
-  Expression parseXPath (String string, SourceMessages messages)
+  Expression parseXPath (String string, Compilation comp)
   {
+    SourceMessages messages = comp.getMessages();
     try
       {
-	Compilation tr = new Compilation(this, messages);
+	Compilation tr = new Compilation(this, messages, comp.lexical);
 	XQParser parser
 	  = (XQParser) super.getLexer(new CharArrayInPort(string), messages);
 	//parser.nesting = 1;
@@ -69,13 +70,6 @@ public class XSLT extends XQuery
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new XslTranslator(inp, messages, this);
-  }
-
-  /** Override {@code XQuery} implementation to get {@code Language} default.
-   */
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
-  {
-    return new Compilation(this, messages);
   }
 
   public boolean parse (Compilation comp, int options)

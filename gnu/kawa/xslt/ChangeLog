@@ -1,3 +1,9 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (getCompilation): Remove - use inherited version.
+	(parseXPath): Change to pass Compilation.
+	* XslTranslator.java: Update accordingly.
+
 2006-12-14  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java: Update for new XMLParser API.

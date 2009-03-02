@@ -246,6 +246,14 @@ public class ModuleExp extends LambdaExp
                   }
                 /* #endif */
 
+                mexp.body = null;
+                mexp.thisVariable = null;
+                if (msg != null ? messages.checkErrors(msg, 20)
+                    : messages.seenErrors())
+                  return false;
+                if (inst instanceof ModuleBody)
+                  ((ModuleBody) inst).run(ctx);
+
 		// Import declarations defined in module into the Environment.
 		for (Declaration decl = mexp.firstDecl();
 		     decl != null;  decl = decl.nextDecl())
@@ -258,11 +266,12 @@ public class ModuleExp extends LambdaExp
 		      : Symbol.make("", dname.toString().intern());
 		    Object property = comp.getLanguage()
 		      .getEnvPropertyFor(decl);
-		    // Would it be better to check if fld is FINAL?
-                    // If it is, gets its value; otherwise create
-                    // a FieldLocation to access it?  FIXME.
                     Expression dvalue = decl.getValue();
-		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.INDIRECT_BINDING)
+                    // It would be cleaner to not bind these values in
+                    // the environment, and just require lexical lookup
+                    // However, various parts of the code makes use of
+                    // the environment.
+		    if ((decl.field.getModifiers() & Access.FINAL) != 0
                         && ! (dvalue instanceof ReferenceExp
                               && ((ReferenceExp) dvalue).getBinding().needsContext()))
 		      {
@@ -271,11 +280,17 @@ public class ModuleExp extends LambdaExp
 			    && dvalue != QuoteExp.undefined_exp)
 			  value = ((QuoteExp) dvalue).getValue();
 			else
-                          value = decl.field.getReflectField().get(null);
+			  {
+			    value = decl.field.getReflectField().get(null);
+                            if (! decl.isIndirectBinding())
+                              decl.setValue(QuoteExp.getInstance(value));
+                            else if (! decl.isAlias() || ! (dvalue instanceof ReferenceExp))
+                              decl.setValue(null);
+                          }
 			if (decl.isIndirectBinding())
-			  env.addLocation(sym, property, (Location) value);
-			else
-			  env.define(sym, property, value);
+                          env.addLocation(sym, property, (Location) value);
+                        else
+                          env.define(sym, property, value);
 		      }
 		    else
 		      {
@@ -284,13 +299,9 @@ public class ModuleExp extends LambdaExp
                                                     fld.getName());
 			loc.setDeclaration(decl);
 			env.addLocation(sym, property, loc);
+			decl.setValue(null);
 		      }
 		  }
-                if (msg != null ? messages.checkErrors(msg, 20)
-                    : messages.seenErrors())
-                  return false;
-                if (inst instanceof ModuleBody)
-                  ((ModuleBody) inst).run(ctx);
 	      }
 	    catch (IllegalAccessException ex)
 	      {

@@ -1,3 +1,7 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* test.scm: Need to use define-variable.
+
 2008-12-29  Per Bothner  <per@bothner.com>
 
 	* testsuite/inlining-test.scm (first-negative): New test for

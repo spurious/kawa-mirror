@@ -1,3 +1,20 @@
+2009-02-27  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java (getInstance, setInstance): New methods.
+	(getLanguage, setLanguage): New methods.
+	* Language.java (getCompilation): Change to also pass NameLookup.
+	(parse): Get "session" NameLookup instance in immediate mode.
+	* ModuleExp.java (evalModule): Run compiled body before trying to
+	set values in Environment.
+	* Compilation.java: Remove 3 unused constructors.
+	* LambdaExp.java (allocFieldFor): In imediate mode, field
+	may need to be public.
+	* Declaration.java (makeField): Likewise.
+	* ScopeExp.java (countNonDynamicDecls): New method.
+
+	* NameLookup.java (removedSubsumed): Remove hidden declarations.
+	(subsumedBy): New method used by removedSubsumed.
+
 2009-02-25  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (class ClassToInfoMap): New class.

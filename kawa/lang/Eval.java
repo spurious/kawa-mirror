@@ -74,9 +74,10 @@ public class Eval extends Procedure1or2
     Environment saveGlobalEnv = Environment.getCurrent();
     try
       {
-	if (env != saveGlobalEnv)
+ 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
-	Translator tr = new Translator(language, messages);
+	Translator tr = new Translator(language, messages,
+                                       NameLookup.getInstance(env, language));
         tr.immediate = true;
 	ModuleExp mod = tr.pushNewModule((String) null);
         Compilation save_comp = Compilation.getCurrent();

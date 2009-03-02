@@ -94,9 +94,9 @@ public class XQuery extends Language
     return new XQParser(inp, messages, this);
   }
 
-  public Compilation getCompilation (Lexer lexer, SourceMessages messages)
+  public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
   {
-    return new Compilation(this, messages, ((XQParser) lexer).lexical);
+    return new Compilation(this, messages, lexical);
   }
 
   /** Special parser flag used by <code>evalToFocusProc</code>. */

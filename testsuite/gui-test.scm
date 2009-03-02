@@ -2,6 +2,8 @@
 
 (define test-image
   (image-read "http://nelsoncove.us/NC-USGS-topo.jpg"))
+;(define test-image
+;  (image-read "file:///home/pics/NelsonCove/NC-USGS-topo.jpg"))
 
 (define Yes-button :: <gnu.kawa.models.Button>
   (Button text: "Yes"
@@ -13,7 +15,8 @@
 (define oval (java.awt.geom.Ellipse2D$Float:new 10.0 10.0 50.0 30.0))
 (define fill-p3 (fill p3))
 (define draw-p3 (draw p3))
-(define text-field-1 (make <gnu.kawa.models.Text> "Hello ..."))
+(define text-field-1 (gnu.kawa.models.Text "Hello ..."))
+;(set!  Yes-button p3)
 
 (run-application
  (Window title: "Kawa GUI Test"

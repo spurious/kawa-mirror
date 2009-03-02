@@ -1,3 +1,7 @@
+2009-03-01  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (getCompilation): Update to pass NameLookup.
+
 2008-11-13  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java: Update to use Type.byteType instead of

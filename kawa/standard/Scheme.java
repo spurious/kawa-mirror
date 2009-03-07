@@ -8,6 +8,7 @@ import gnu.math.IntNum;
 import gnu.expr.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
@@ -814,6 +815,13 @@ public class Scheme extends LispLanguage
   public String getName()
   {
     return "Scheme";
+  }
+
+  public Lexer getLexer(InPort inp, SourceMessages messages)
+  {
+    LispReader reader = new LispReader(inp, messages);
+    reader.setFinalColonIsKeyword(true);
+    return reader;
   }
 
   /** Evalutate Scheme expressions from string.

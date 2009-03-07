@@ -7,10 +7,8 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
-import gnu.kawa.lispexpr.LispLanguage;
-import gnu.kawa.lispexpr.ReadTable;
-import gnu.kawa.lispexpr.ReadTable;
-import gnu.kawa.lispexpr.LangObjType;
+import gnu.text.*;
+import gnu.kawa.lispexpr.*;
 import gnu.kawa.reflect.FieldLocation;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
@@ -53,6 +51,13 @@ public abstract class Lisp2 extends LispLanguage
   public boolean selfEvaluatingSymbol (Object obj)
   {
     return obj instanceof Keyword || obj == TRUE || obj == FALSE;
+  }
+
+  public Lexer getLexer(InPort inp, SourceMessages messages)
+  {
+    LispReader reader = new LispReader(inp, messages);
+    reader.setInitialColonIsKeyword(true);
+    return reader;
   }
 
   public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)

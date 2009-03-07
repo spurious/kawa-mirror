@@ -1,3 +1,9 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeReadableSymbol (overloaded x2)): Rename to -
+	(writeSymbol (overloaded x2)): and change to take 'readable' paramater.
+	Add test for language-dependent handling of Keywords.
+
 2009-02-17  Per Bothner  <per@bothner.com>
 
 	* Convert.java (compile): When the target type isn't known at

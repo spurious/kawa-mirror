@@ -1,3 +1,7 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (getLexer): New method - call setInitialColonIsKeyword.
+
 2008-06-01  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (importLocation): Check for LangObjType - needed for

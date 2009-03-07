@@ -1700,16 +1700,6 @@ They are used mainly for specifying keyword arguments.
 @var{keyword} ::= @var{identifier}:
 @end display
 
-An alternative syntax, with the colon first, is supported for
-compatibility with Common Lisp and some other Scheme implementations:
-
-@display
-@var{keyword} ::= :@var{identifier}
-@end display
-
-Putting the colon first has exactly the same effect as putting it last;
-putting is last is recommended, and is how keywords are printed.
-
 A keyword is a single token; therefore no whitespace is allowed between
 the @var{identifier} and the colon (which is not considered part
 of the name of the keyword).

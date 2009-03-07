@@ -1,3 +1,8 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Keywords): We no longer support :IDENTIFIER syntax
+	for keywords in Scheme, only in Common Lisp and ELisp.
+
 2009-02-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Paths): Document URL type and resolve-uri function.

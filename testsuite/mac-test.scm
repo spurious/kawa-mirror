@@ -381,7 +381,7 @@
     ((_ slotname)
      (field (this) (quote slotname)))))
 (define-simple-class <xclass> ()
-  (x :init 0)
+  (x init: 0)
   ((incx) <void>
    (set! (slot x) (+ 1 (slot x))))
   ((incx2) <void>

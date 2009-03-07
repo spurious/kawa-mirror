@@ -1,3 +1,10 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (initialColonIsKeyword, finalColonIsKeyword):
+	Change defaults to false.
+	(setInitialColonIsKeyword,setFinalColonIsKeyword): New methods.
+	* LispLanguage.java (getLexer): Remove method - now in subclasses.
+
 2009-03-01  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getCompilation): Update to pass NameLookup.

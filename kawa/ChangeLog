@@ -1,3 +1,8 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* lang/Scheme.java (getLexer): New method - call
+	setInitialColonIsKeyword.
+
 2009-03-01  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (<init>): Also pass NameLookup.

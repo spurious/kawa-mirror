@@ -146,10 +146,22 @@ public class LispReader extends Lexer
   protected boolean seenEscapes;
 
   /** True if ":IDENTIFIER" should be treated as a keyword. */
-  protected boolean initialColonIsKeyword = true;
+  protected boolean initialColonIsKeyword;
 
   /** True if "IDENTIFIER:" should be treated as a keyword. */
-  protected boolean finalColonIsKeyword = true;
+  protected boolean finalColonIsKeyword;
+
+  /** Set whether ":IDENTIFIER" should be treated as a keyword. */
+  public void setInitialColonIsKeyword (boolean whenInitial)
+  {
+    initialColonIsKeyword = whenInitial;
+  }
+
+  /** Set whether "IDENTIFIER:" should be treated as a keyword. */
+  public void setFinalColonIsKeyword (boolean whenFinal)
+  {
+    finalColonIsKeyword = whenFinal;
+  }
 
   void readToken(int ch, char readCase, ReadTable rtable)
       throws java.io.IOException, SyntaxException

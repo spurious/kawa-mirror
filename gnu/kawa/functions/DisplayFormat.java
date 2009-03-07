@@ -8,6 +8,7 @@ import gnu.math.RatNum;
 import gnu.math.IntNum;
 import java.io.PrintWriter;
 import gnu.text.Char;
+import gnu.expr.Keyword;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
@@ -145,10 +146,8 @@ public class DisplayFormat extends AbstractFormat
             write("html:", out);
             write(sym.getLocalPart(), out);
           }
-        else if (readable)
-          writeReadableSymbol(sym, out);
         else
-          writeObject(obj.toString(), out);
+          writeSymbol(sym, out, readable);
       }
     /* #ifdef use:java.net.URI */
     /* #ifdef use:java.lang.CharSequence */
@@ -358,13 +357,22 @@ public class DisplayFormat extends AbstractFormat
                     + "|([-+]|[.][.][.])");
   /* #endif */
 
-  void writeReadableSymbol (Symbol sym, Consumer out)
+  void writeSymbol (Symbol sym, Consumer out, boolean readable)
   {
     String prefix = sym.getPrefix();
-    String uri = sym.getNamespaceURI();
-    if (prefix != null && prefix.length() > 0)
+    Namespace namespace = sym.getNamespace();
+    String uri = namespace == null ? null : namespace.getName();
+    boolean suffixColon = false;
+    if (namespace == Keyword.keywordNamespace)
       {
-        writeReadableSymbol(prefix, out);
+        if (language == 'C' || language == 'E')
+          out.write(':');
+        else
+          suffixColon = true;
+      }
+    else if (prefix != null && prefix.length() > 0)
+      {
+        writeSymbol(prefix, out, readable);
         out.write(':');
       }
     else if (uri != null && uri.length() > 0)
@@ -373,15 +381,17 @@ public class DisplayFormat extends AbstractFormat
         out.write(uri);
         out.write('}');
       }
-    writeReadableSymbol(sym.getName(), out);
+    writeSymbol(sym.getName(), out, readable);
+    if (suffixColon)
+      out.write(':');
   }
 
-  void writeReadableSymbol (String sym, Consumer out)
+  void writeSymbol (String sym, Consumer out, boolean readable)
   {
     /* #ifdef use:java.util.regex */
     /* Use |...| if symbol doesn't follow R5RS conventions
        for identifiers or has a colon in the interior. */
-    if (! r5rsIdentifierMinusInteriorColons.matcher(sym).matches())
+    if (readable && ! r5rsIdentifierMinusInteriorColons.matcher(sym).matches())
       {
         int len = sym.length();
         if (len == 0)

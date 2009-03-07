@@ -1,5 +1,8 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* mac-test.scm: Update keyword syntax :init -> init: .
+	* classes1.scm: Likewise.
+
 	* formatst.scm: Update for new preferred character names.
 
 2009-03-01  Per Bothner  <per@bothner.com>

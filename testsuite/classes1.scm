@@ -54,7 +54,7 @@
 
 (define-class <ClsC> (<ClsB>)
   (c :: <int>)
-  (:init (set! c (static-field <SimpleA> 'n22)))
+  (init: (set! c (static-field <SimpleA> 'n22)))
   ((f (y :: <int>)) :: <int> (+ xx c y)))
 
 (define-syntax define-class-using-syntax-rules

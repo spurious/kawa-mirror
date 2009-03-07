@@ -1,5 +1,7 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (readCharacter): Handle hex escapes.
+
 	* LispReader.java (initialColonIsKeyword, finalColonIsKeyword):
 	Change defaults to false.
 	(setInitialColonIsKeyword,setFinalColonIsKeyword): New methods.

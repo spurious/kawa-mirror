@@ -1,5 +1,7 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* formatst.scm: We now use hex escapes rather than octal for Char.
+
 	* mac-test.scm: Update keyword syntax :init -> init: .
 	* classes1.scm: Likewise.
 

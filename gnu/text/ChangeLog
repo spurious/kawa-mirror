@@ -1,5 +1,7 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* Char.java (toScmReadableString): Print hex rather than octal escapes.
+
 	* Char.java (charNames, charNameValues): Add support for R6RS
 	character names #\delete, #\alarm, and #\vtab.
 

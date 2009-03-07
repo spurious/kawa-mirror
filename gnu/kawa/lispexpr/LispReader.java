@@ -1038,14 +1038,29 @@ public class LispReader extends Lexer
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
     reader.readToken(reader.read(), 'D', ReadTable.getCurrent());
+    char[] tokenBuffer = reader.tokenBuffer;
     int length = reader.tokenBufferLength - startPos;
     if (length == 1)
-      return Char.make(reader.tokenBuffer[startPos]);
-    String name = new String(reader.tokenBuffer, startPos, length);
+      return Char.make(tokenBuffer[startPos]);
+    String name = new String(tokenBuffer, startPos, length);
     ch = Char.nameToChar(name);
     if (ch >= 0)
       return Char.make(ch);
-    ch = Character.digit(reader.tokenBuffer[startPos], 8);
+    ch = tokenBuffer[startPos];
+    if ((ch == 'x' || ch == 'X') && length < 7)
+      {
+        int value = 0;
+        for (int i = 1; ;  i++)
+          {
+             if (i == length)
+	      return Char.make(value);
+             int v = Character.digit (tokenBuffer[startPos + i], 16);
+             if (ch < 0)
+               break;
+             value = 16 * value + v;
+          }
+      }
+    ch = Character.digit(ch, 8);
     if (ch >= 0)
       {
 	int value = ch;
@@ -1053,7 +1068,7 @@ public class LispReader extends Lexer
 	  {
 	    if (i == length)
 	      return Char.make(value);
-	    ch = Character.digit(reader.tokenBuffer[startPos + i], 8);
+	    ch = Character.digit(tokenBuffer[startPos + i], 8);
 	    if (ch < 0)
 	      break;
 	    value = 8 * value + ch;

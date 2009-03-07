@@ -164,17 +164,17 @@
 (test `("~@c" ,(integer->char 0)) "#\\nul")
 (test `("~@c" ,(integer->char 27)) "#\\esc")
 (test `("~@c" ,(integer->char 127)) "#\\delete")
-(test `("~@c" ,(integer->char 128)) "#\\200")
-(test `("~@c" ,(integer->char 255)) "#\\377")
+(test `("~@c" ,(integer->char 128)) "#\\x80")
+(test `("~@c" ,(integer->char 255)) "#\\xff")
 (test '("~65c") "A")
 (test '("~7@c") "#\\alarm")
 (test '("~:c" #\a) "a")
 (test `("~:c" ,(integer->char 1)) "^A")
 (test `("~:c" ,(integer->char 27)) "^[")
 (test '("~7:c") "^G")
-(test `("~:c" ,(integer->char 128)) "#\\200")
-(test `("~:c" ,(integer->char 127)) "#\\177")
-(test `("~:c" ,(integer->char 255)) "#\\377")
+(test `("~:c" ,(integer->char 128)) "#\\x80")
+(test `("~:c" ,(integer->char 127)) "#\\x7f")
+(test `("~:c" ,(integer->char 255)) "#\\xff")
 
 
 ; plural test

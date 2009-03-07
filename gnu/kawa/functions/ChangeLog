@@ -1,5 +1,7 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* LispFormat.java (printChar): Using using hex rather than octal.
+
 	* DisplayFormat.java (writeReadableSymbol (overloaded x2)): Rename to -
 	(writeSymbol (overloaded x2)): and change to take 'readable' paramater.
 	Add test for language-dependent handling of Keywords.

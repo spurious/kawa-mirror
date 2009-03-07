@@ -643,8 +643,8 @@ class LispCharacterFormat extends ReportFormat
 	  }
 	else if (ch >= 0x7f)
 	  {
-	    print(dst, "#\\");
-	    print(dst, Integer.toString(ch, 8));
+	    print(dst, "#\\x");
+	    print(dst, Integer.toString(ch, 16));
 	  }
 	else
 	  dst.write(ch);

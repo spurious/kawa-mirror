@@ -220,14 +220,10 @@ public class Char
 	    return sbuf.toString();
 	  }
       }
-    if (ch < 8)
+    if (ch < ' ' || ch > 0x7F)
       {
-	sbuf.append('0');  // make sure there at least two octal digits
-	sbuf.append(ch);
-      }
-    else if (ch < ' ' || ch > 0x7F)
-      {
-	sbuf.append(Integer.toString(ch, 8));
+        sbuf.append('x');
+        sbuf.append(Integer.toString(ch, 16));
       }
     else
       sbuf.append((char) ch);
@@ -236,8 +232,9 @@ public class Char
 
   /**
    * @serialData Writes the char value as a char.
-   *   If the value is > 0xFFFF, write a pair of surrogate values.
-   *   If the value is is a high surrogate only, write it followed by '\0'.
+   *   If the value is {@code > 0xFFFF}, write a pair of surrogate values.
+   *   If the value is is a high surrogate only,
+   *   write it followed by {@code '\0'}.
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {

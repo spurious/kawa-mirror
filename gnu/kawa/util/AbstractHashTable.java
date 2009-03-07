@@ -74,8 +74,8 @@ public abstract class AbstractHashTable<Entry, K, V>
     return get(key, null);
   }
 
-  /** Find value for given key.  Return defaultValue if not found. */
-  public V get (K key, V defaultValue)
+  /** Find Entry for given key.  Return null if not found. */
+  public Entry getNode (K key)
   {
     int hash = hash(key);
     int index = hashToIndex(hash);
@@ -83,9 +83,16 @@ public abstract class AbstractHashTable<Entry, K, V>
 	 node != null;  node = getEntryNext(node))
       {
 	if (matches(key, hash, node))
-	  return getEntryValue(node);
+	  return node;
       }
-    return defaultValue;
+    return null;
+  }
+
+  /** Find value for given key.  Return defaultValue if not found. */
+  public V get (K key, V defaultValue)
+  {
+    Entry node = getNode(key);
+    return node == null ? defaultValue : getEntryValue(node);
   }
 
   protected void rehash ()

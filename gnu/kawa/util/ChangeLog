@@ -1,3 +1,9 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* AbstractHashTable.java (getNode): New (or rather restored) method.
+	(get): Re-implement to use getNode.
+	* GeneralHashTable.java (getNode): New method. 
+
 2009-02-25  Per Bothner  <per@bothner.com>
 
 	* AbstractHashTable.java: New abstract superclass of GeneralHashTable.

@@ -68,7 +68,7 @@
 	   ((< i 0) #!void)
 	 (do ((node :: <gnu.kawa.util.HashNode>
 		    ((primitive-array-get <gnu.kawa.util.HashNode>) table i)
-		    (invoke-static <gnu.kawa.util.GeneralHashTable> 'next node)))
+		    (invoke hash-table 'getEntryNext node)))
 	     ((eq? node #!null) #!void)
 	   use-node))))))
 
@@ -164,7 +164,7 @@
 
 (define (hash-table-update! (hash-table :: <srfi-hash-table>)
 			    key function #!optional thunk) :: <void>
-  (let ((node (*:getNode hash-table key)))
+  (let ((node (hash-table:getNode key)))
     (if (eq? node #!null)
 	(if thunk
 	    (hash-table-set! hash-table key (function (thunk)))
@@ -172,7 +172,7 @@
 	(*:setValue node (function (*:getValue node))))))
 
 (define (hash-table-update!/default (hash-table :: <srfi-hash-table>) key function default) :: <void>
-  (let ((node (*:getNode hash-table key)))
+  (let ((node (hash-table:getNode key)))
     (if (eq? node #!null)
 	(hash-table-set! hash-table key (function default))
 	(*:setValue node (function (*:getValue node))))))

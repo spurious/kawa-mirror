@@ -1,3 +1,7 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* srfi69.scm: Various updates for changes in GeneralHashTable.
+
 2007-09-02  Per Bothner  <per@bothner.com>
 
 	* gui.scm (button-keyword, window-keyword):  The java.lang.String

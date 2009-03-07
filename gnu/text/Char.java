@@ -110,9 +110,10 @@ public class Char
       && ((Char)obj).intValue() == value;
   }
 
-  static char[] charNameValues = { ' ', '\t', '\n', '\n'
-				   ,'\r', '\f', '\b',
-				   '\033', '\177', '\177', '\007', '\0' };
+  static char[] charNameValues = { ' ', '\t', '\n', '\n',
+				   '\r', '\f', '\b', '\033',
+                                   '\177', '\177', '\177',
+                                   '\007', '\007', '\013', '\0' };
   static String[] charNames = { "space",
 				"tab",
 				"newline",
@@ -121,9 +122,12 @@ public class Char
 				"page",
 				"backspace",
 				"esc",
+				"delete",
 				"del",
 				"rubout",
+				"alarm",
 				"bel",
+				"vtab",
 				"nul"};
 
   public static int nameToChar(String name)

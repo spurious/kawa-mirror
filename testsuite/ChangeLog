@@ -1,3 +1,7 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* formatst.scm: Update for new preferred character names.
+
 2009-03-01  Per Bothner  <per@bothner.com>
 
 	* test.scm: Need to use define-variable.

@@ -56,6 +56,7 @@ public class ReaderDispatch extends ReadTableEntry
     tab.set('U', entry);
     tab.set('X', entry);
     tab.set('|', entry);
+    tab.set(';', entry);
     tab.set('!', entry);
     tab.set('\\', entry);
     tab.set('\'', new ReaderQuote(rtable.makeSymbol("function")));

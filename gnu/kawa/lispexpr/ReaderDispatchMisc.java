@@ -103,6 +103,23 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	      ((InPort) port).readState = saveReadState;
 	  }
 	return Values.empty;
+      case ';':
+	port = reader.getPort();
+	if (port instanceof InPort)
+	  {
+	    saveReadState = ((InPort) port).readState;
+	    ((InPort) port).readState = ';';
+	  }
+	try
+	  {
+            reader.readObject();
+	  }
+	finally
+	  {
+	    if (port instanceof InPort)
+	      ((InPort) port).readState = saveReadState;
+	  }
+	return Values.empty;
       case ',':
 	port = reader.getPort();
         Object list;

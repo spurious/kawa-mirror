@@ -1,3 +1,8 @@
+2009-03-08  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatchMisc.java (read): Support SRFI-62 S-expression comments.
+	* ReaderDispatch.java (create): Likewise.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readEscape): Implement R6RS behavior for

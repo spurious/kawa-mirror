@@ -1,3 +1,7 @@
+2009-03-08  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add tests from SRFI-62 for S-expression comments.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* formatst.scm: We now use hex escapes rather than octal for Char.

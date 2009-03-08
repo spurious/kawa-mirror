@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 158)
+(test-init "Miscellaneous" 166)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -781,3 +781,13 @@
 (test "Sum: 77 Inner: (12 14 4)"
       'test-exit-with-finally-2-results
       (format #f "Sum: ~s Inner: ~s" sum list-inner))
+
+;; R6RS and SRFI-62 S-expression comments
+(test 5 'srfi-62-test-1 (+ 1 #;(* 2 3) 4))
+(test '(x z) 'srfi-62-test-2 (list 'x #;'y 'z))
+(test 12 'srfi-62-test-3 (* 3 4 #;(+ 1 2)))
+(test 16 'srfi-62-test-4 (#;sqrt abs -16))
+(test '(a d) 'srfi-62-test-5 (list 'a #; #;'b 'c 'd))
+(test '(a e) 'srfi-62-test-6 (list 'a #;(list 'b #;c 'd) 'e))
+(test '(a . c) 'srfi-62-test-7 '(a . #;b c))
+(test '(a . b) 'srfi-62-test-8 '(a . b #;c))

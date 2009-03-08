@@ -858,12 +858,13 @@ public class LispReader extends Lexer
 		return -1;
 	      }
 	    if (c == '\n')
-	      return -2;
+	      break;
 	    if (c == '\r')
 	      {
 		if (peek() == '\n')
 		  skip();
-		return -2;
+                c = '\n';
+                break;
 	      }
 	    if (c != ' ' && c != '\t')
 	      {
@@ -871,6 +872,21 @@ public class LispReader extends Lexer
 		break;
 	      }
 	  }
+        if (c != '\n')
+          break; // ERROR
+        // FIXME: if legacy-compatible non-R6RS-mode: return -2;
+        for (;;)
+          {
+            c = read();
+            if (c < 0)
+              {
+                eofError("unexpected EOF in character literal");
+                return -1;
+              }
+            if (c != ' ' && c != '\t')
+              break;
+          }
+        break;
       case '\r':
 	if (peek() == '\n')
 	  skip();
@@ -951,8 +967,12 @@ public class LispReader extends Lexer
 	      c = (c << 4) + v;
 	    else
 	      {
-		if (d >= 0)
-		  unread(d);
+                if (d != ';')
+                  {
+                    // FIXME: if strict-R6RS: ERROR
+                    if (d >= 0)
+                      unread(d);
+                  }
 		break;
 	      }
 	  }

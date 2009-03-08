@@ -1,5 +1,8 @@
 2009-03-07  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (readEscape): Implement R6RS behavior for
+	backslash-whitespace - i.e. skip initial whitespace on next line.
+
 	* LispReader.java (readCharacter): Handle hex escapes.
 
 	* LispReader.java (initialColonIsKeyword, finalColonIsKeyword):

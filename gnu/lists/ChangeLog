@@ -1,3 +1,7 @@
+2009-03-07  Per Bothner  <per@bothner.com>
+
+	* Strings.java (printQuoted): Also use R6RS escapes \a, \b, \v, and \f.
+
 2008-11-10  Per Bothner  <per@bothner.com>
 
 	* SimpleVector.java (resizeShift): New internal method.

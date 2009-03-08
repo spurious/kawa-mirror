@@ -57,13 +57,21 @@ public class Strings
 	  ps.print ('\\');
 	else if (escapes > 0)
 	  {
-	    // These escapes are not standard Scheme or CommonLisp.
+	    // These escapes are R6RS:
 	    if (ch == '\n')
 	     { ps.print("\\n"); continue; }
 	    else if (ch == '\r')
 	      { ps.print("\\r"); continue; }
 	    else if (ch == '\t')
 	      { ps.print("\\t"); continue; }
+            else if (ch == '\007')
+              { ps.print("\\a"); continue; }
+            else if (ch == '\b')
+              { ps.print("\\b"); continue; }
+            else if (ch == '\013')
+              { ps.print("\\v"); continue; }
+            else if (ch == '\f')
+              { ps.print("\\f"); continue; }
 	  }
 	ps.print (ch);
       }

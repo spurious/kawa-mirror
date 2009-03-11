@@ -26,6 +26,7 @@ public class BRL extends Scheme
     krl_instance = new BRL(brlEnvironment);
     brl_instance = new BRL(brlEnvironment);
     brl_instance.setBrlCompatible(true);
+    brl_instance.defaultReadTable.setInitialColonIsKeyword(true);
     CallContext ctx = CallContext.getInstance();
     Environment saveEnv = ctx.getEnvironmentRaw();
     try

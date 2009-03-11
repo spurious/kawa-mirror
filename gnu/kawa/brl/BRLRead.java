@@ -19,7 +19,6 @@ public class BRLRead extends LispReader
 
   void init()
   {
-    initialColonIsKeyword = false;
     ((InPort) port).readState = ']';
   }
 
@@ -101,7 +100,6 @@ public class BRLRead extends LispReader
   public void setBrlCompatible(boolean compat)
   {
     brlCompatible = compat;
-    initialColonIsKeyword = compat;
   }
 
   /** Record '[' location for error messages. */ 

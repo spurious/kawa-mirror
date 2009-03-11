@@ -1,3 +1,10 @@
+2009-03-10  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (initialColonIsKeyword, finalColonIsKeyword,
+	setInitialColonIsKeyword, setFinalColonIsKeyword): Move to ...
+	* ReadTable.java: ... here.
+	* LispLanguage.java (getLexer): Revert 03-07 change.
+
 2009-03-08  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatchMisc.java (read): Support SRFI-62 S-expression comments.

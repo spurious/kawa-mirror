@@ -1,3 +1,11 @@
+2009-03-10  Per Bothner  <per@bothner.com>
+
+	* BRLRead.java (init): Clearing initialColonIsKeyword is no
+	longer needed.
+	(setBrlCompatible): Can't set initialColonIsKeyword here.
+	* BRL.java (<clinit>): Instead, we set it here, on
+	brl_instance.defaultReadTable.
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA1): Remove unneeded macro.

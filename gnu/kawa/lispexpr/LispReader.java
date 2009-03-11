@@ -145,24 +145,6 @@ public class LispReader extends Lexer
    */
   protected boolean seenEscapes;
 
-  /** True if ":IDENTIFIER" should be treated as a keyword. */
-  protected boolean initialColonIsKeyword;
-
-  /** True if "IDENTIFIER:" should be treated as a keyword. */
-  protected boolean finalColonIsKeyword;
-
-  /** Set whether ":IDENTIFIER" should be treated as a keyword. */
-  public void setInitialColonIsKeyword (boolean whenInitial)
-  {
-    initialColonIsKeyword = whenInitial;
-  }
-
-  /** Set whether "IDENTIFIER:" should be treated as a keyword. */
-  public void setFinalColonIsKeyword (boolean whenFinal)
-  {
-    finalColonIsKeyword = whenFinal;
-  }
-
   void readToken(int ch, char readCase, ReadTable rtable)
       throws java.io.IOException, SyntaxException
   {
@@ -786,13 +768,13 @@ public class LispReader extends Lexer
 
     int len = endPos - startPos;
 
-    if (initialColonIsKeyword && packageMarker == startPos && len > 1)
+    if (rtable.initialColonIsKeyword && packageMarker == startPos && len > 1)
       {
 	startPos++;
 	String str = new String(tokenBuffer, startPos, endPos-startPos);
 	return Keyword.make(str.intern());
     }
-    if (finalColonIsKeyword && packageMarker == endPos - 1 && len > 1)
+    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1 && len > 1)
       {
 	String str = new String(tokenBuffer, startPos, len - 1);
 	return Keyword.make(str.intern());

@@ -30,6 +30,11 @@ public abstract class LispLanguage extends Language
   /** Create a fresh <code>ReadTable</code> appropriate for this language. */
   public abstract ReadTable createReadTable ();
 
+  public Lexer getLexer(InPort inp, SourceMessages messages)
+  {
+    return new LispReader(inp, messages);
+  }
+
   public Compilation getCompilation (Lexer lexer, SourceMessages messages, NameLookup lexical)
   {
     return new Translator(this, messages, lexical);

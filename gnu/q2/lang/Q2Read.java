@@ -13,7 +13,6 @@ public class Q2Read extends LispReader
 {
   void init()
   {
-    initialColonIsKeyword = false;
     ((InPort) port).readState = ' ';
   }
 

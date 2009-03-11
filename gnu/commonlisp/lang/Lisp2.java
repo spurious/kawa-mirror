@@ -53,13 +53,6 @@ public abstract class Lisp2 extends LispLanguage
     return obj instanceof Keyword || obj == TRUE || obj == FALSE;
   }
 
-  public Lexer getLexer(InPort inp, SourceMessages messages)
-  {
-    LispReader reader = new LispReader(inp, messages);
-    reader.setInitialColonIsKeyword(true);
-    return reader;
-  }
-
   public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
   {
     if (Compilation.typeProcedure.getReflectClass()
@@ -166,6 +159,7 @@ public abstract class Lisp2 extends LispLanguage
   {
     ReadTable tab = new Lisp2ReadTable();
     tab.initialize();
+    tab.setInitialColonIsKeyword(true);
     return tab;
   }
 }

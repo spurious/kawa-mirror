@@ -24,6 +24,24 @@ public class ReadTable extends RangeTable
   /** A character such that PreOpWord -> ($lookup$ Pre 'Word), if > 0. */
   public char postfixLookupOperator = (char) (-1);
 
+  /** True if ":IDENTIFIER" should be treated as a keyword. */
+  protected boolean initialColonIsKeyword;
+
+  /** True if "IDENTIFIER:" should be treated as a keyword. */
+  protected boolean finalColonIsKeyword;
+
+  /** Set whether ":IDENTIFIER" should be treated as a keyword. */
+  public void setInitialColonIsKeyword (boolean whenInitial)
+  {
+    initialColonIsKeyword = whenInitial;
+  }
+
+  /** Set whether "IDENTIFIER:" should be treated as a keyword. */
+  public void setFinalColonIsKeyword (boolean whenFinal)
+  {
+    finalColonIsKeyword = whenFinal;
+  }
+
   static final ThreadLocation current = new ThreadLocation("read-table");
 
   public ReadTable()

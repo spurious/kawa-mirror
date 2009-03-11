@@ -1,3 +1,9 @@
+2009-03-10  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (createReadTable): Do setFinalColonIsKeyword()
+	here, rather than in getLexer, since former was moved to ReadTable.
+	(getLexer): Can now be removed.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* lang/Scheme.java (getLexer): New method - call

@@ -74,6 +74,7 @@ public class Q2 extends Scheme
   {
     ReadTable rt = ReadTable.createInitial();
     rt.set('(', new Q2ReaderParens());
+    rt.setFinalColonIsKeyword(true);
     return rt;
   }
 }

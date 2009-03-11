@@ -817,13 +817,6 @@ public class Scheme extends LispLanguage
     return "Scheme";
   }
 
-  public Lexer getLexer(InPort inp, SourceMessages messages)
-  {
-    LispReader reader = new LispReader(inp, messages);
-    reader.setFinalColonIsKeyword(true);
-    return reader;
-  }
-
   /** Evalutate Scheme expressions from string.
    * @param string the string constaining Scheme expressions
    * @param env the Environment to evaluate the string in
@@ -1358,6 +1351,7 @@ public class Scheme extends LispLanguage
     tab.putReaderCtorFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
     tab.putReaderCtorFld("namespace", "kawa.lib.misc", "namespace");
     tab.putReaderCtorFld("duration", "kawa.lib.numbers", "duration");
+    tab.setFinalColonIsKeyword(true);
     return tab;
   }
 

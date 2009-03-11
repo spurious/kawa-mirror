@@ -1,3 +1,9 @@
+2009-03-10  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java (init): Clearing initialColonIsKeyword is no
+	longer needed.
+	* Q2.java (createReadTable): Do setFinalColonIsKeyword() here.
+
 2006-11-13  Per Bothner  <per@bothner.com>
 
 	* Q2Read.java: Update getColumn -> getColumnNumber.

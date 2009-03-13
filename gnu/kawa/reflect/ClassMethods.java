@@ -268,6 +268,7 @@ class MethodFilter implements gnu.bytecode.Filter
     String mname = method.getName();
     int mmods = method.getModifiers();
     if ((mmods & modmask) != modifiers
+        || (mmods & Access.SYNTHETIC) != 0
 	|| ! mname.startsWith(name))
       return false;
     int mlen = mname.length();

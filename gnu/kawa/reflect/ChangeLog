@@ -1,3 +1,7 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (MethodFilter.select): Skip SYNTHETIC methods.
+
 2008-12-29  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (lookupMember, inline): Use new isAccessible convenience

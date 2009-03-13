@@ -72,7 +72,13 @@ public class ReferenceExp extends AccessExp
 
   public final Object valueIfConstant()
   {
-    return binding == null?  null : binding.getValue().valueIfConstant();
+    if (binding != null)
+      {
+        Expression dvalue = binding.getValue();
+        if (dvalue != null)
+          return dvalue.valueIfConstant();
+      }
+    return null;
   }
 
   public void apply (CallContext ctx)

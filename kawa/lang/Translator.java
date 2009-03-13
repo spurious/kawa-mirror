@@ -995,8 +995,25 @@ public class Translator extends Compilation
               {
                 Expression part1 = rewrite(p.getCar());
                 Expression part2 = rewrite(((Pair) p.getCdr()).getCar());
-                obj = namespaceResolve(part1, part2);
+                Object value1 = part1.valueIfConstant();
+                Object value2 = part2.valueIfConstant();
+                if (value1 instanceof Class && value2 instanceof Symbol)
+                  {
+                    try
+                      {
+                        obj = GetNamedPart.getNamedPart(value1, (Symbol)value2);
+                        if (obj instanceof Syntax)
+                          syntax = (Syntax) obj;
+                      }
+                    catch (Throwable ex)
+                      {
+                        obj = null;
+                      }
+                  }
+                else
+                  obj = namespaceResolve(part1, part2);
               }
+            
             if (obj instanceof Symbol && ! selfEvaluatingSymbol(obj))
               {
                 Expression func = rewrite(obj, true);

@@ -1,3 +1,10 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (scanForm):  If seeing (PART1:PART2 ...)
+	check if PART2 is a static Syntax object in class PART1.
+	This allows invoking Syntax/Macro objects without putting them
+	in the Scheme namespace.
+
 2009-03-10  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (createReadTable): Do setFinalColonIsKeyword()

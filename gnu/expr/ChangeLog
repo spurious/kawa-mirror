@@ -1,3 +1,8 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (valueIfConstant): Check for binding.getValue()
+	being null.
+
 2009-02-27  Per Bothner  <per@bothner.com>
 
 	* NameLookup.java (getInstance, setInstance): New methods.

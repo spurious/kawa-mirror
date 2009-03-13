@@ -226,8 +226,9 @@ public class FString extends SimpleVector
   public FString copy (int start, int end)
   {
     char[] copy = new char[end-start];
+    char[] src = data; // Move to local to help optimizer.
     for (int i = start;  i < end;  i++)
-      copy[i-start] = data[i];
+      copy[i-start] = src[i];
     return new FString(copy);
   }
 
@@ -354,22 +355,25 @@ public class FString extends SimpleVector
   /** Set all the elements to a given character. */
   public final void fill (char ch)
   {
+    char[] d = data; // Move to local to help optimizer.
     for (int i = size;  --i >= 0; )
-      data[i] = ch;
+      d[i] = ch;
   }
 
   public void fill(int fromIndex, int toIndex, char value)
   {
     if (fromIndex < 0 || toIndex > size)
       throw new IndexOutOfBoundsException();
+    char[] d = data; // Move to local to help optimizer.
     for (int i = fromIndex;  i < toIndex;  i++)
-      data[i] = value;
+      d[i] = value;
   }
 
   protected void clearBuffer(int start, int count)
   {
+    char[] d = data; // Move to local to help optimizer.
     while (--count >= 0)
-      data[start++] = 0;
+      d[start++] = 0;
   }
 
   public void replace(int where, char[] chars, int start, int count)
@@ -402,9 +406,10 @@ public class FString extends SimpleVector
     int n = size;
     if (str == null || str.length != n)
       return false;
+    char[] d = data; // Move to local to help optimizer.
     for (int i = n;  --i >= 0; )
       {
-	if (data[i] != str[i])
+	if (d[i] != str[i])
 	  return false;
       }
     return true;
@@ -558,8 +563,9 @@ public class FString extends SimpleVector
   {
     int size = this.size;
     out.writeInt(size);
+    char[] d = data; // Move to local to help optimizer.
     for (int i = 0;  i < size;  i++)
-      out.writeChar(data[i]);
+      out.writeChar(d[i]);
   }
 
   public void readExternal(ObjectInput in)

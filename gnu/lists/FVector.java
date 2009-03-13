@@ -107,8 +107,9 @@ public class FVector extends SimpleVector
 
   protected void clearBuffer(int start, int count)
   {
+    Object[] d = data;
     while (--count >= 0)
-      data[start++] = null;
+      d[start++] = null;
   }
 
   public boolean equals (Object obj)
@@ -119,10 +120,11 @@ public class FVector extends SimpleVector
     int n = size;
     if (obj_vec.data == null || obj_vec.size != n)
       return false;
+    Object[] this_data = data;
     Object[] obj_data = obj_vec.data;
     for (int i = 0;  i < n;  i++)
       {
-	if (! (data[i].equals (obj_data[i])))
+	if (! (this_data[i].equals (obj_data[i])))
 	  return false;
       }
     return true;
@@ -161,8 +163,9 @@ public class FVector extends SimpleVector
   // FIXME - bad name - setAll should take a Collection
   public final void setAll (Object new_value)
   {
-     for (int i = size; --i >= 0; )
-       data[i] = new_value;
+    Object[] d = data;
+    for (int i = size; --i >= 0; )
+      d[i] = new_value;
   }
 
   public boolean consumeNext(int ipos, Consumer out)

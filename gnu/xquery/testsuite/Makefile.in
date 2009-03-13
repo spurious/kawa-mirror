@@ -188,7 +188,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
 
 KAWALIB = $(top_builddir)
 KAWA = ../../../bin/kawa.sh
-EXTRA_CLEAN = tmp* *.log testing.zip *.class Mod1/*.class Mod2/*.class
+EXTRA_CLEAN = tmp* *.log testing.zip */*.class
 java_sources = TestMisc.java TestSuite.java RunXQTS.java
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
@@ -301,8 +301,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
-
 clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
@@ -393,6 +391,9 @@ elisp-classes.stamp: $(java_ELISP)
 	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
+clean: clean-am clean-dirs
+clean-dirs:
+	rm -rf Mod1 Mod2
 
 all:
 
@@ -448,8 +449,8 @@ check-descend:  descend.class
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
 
 check-xsltest1:
-	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >xsltest1.log
-	@if diff -b $(srcdir)/>xsltest1.expected xsltest1.log; \
+	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >tmp-xsltest1.log
+	@if diff -b $(srcdir)/>xsltest1.expected tmp-xsltest1.log; \
 	  then echo '# xsltest1 test passes'; \
 	  else echo FAIL xsltest1 test; fi
 

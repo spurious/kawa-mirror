@@ -1,5 +1,8 @@
 2009-03-13  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java (SRFI97Map): New table.
+	(scanForDefinitions): Process SRFI-97-style SRFI library references.
+
 	* standard/ImportFromLibrary.java: New class, implements R6RS
 	import keyword.
 	*  standard/Makefile.am: Update accordingly.

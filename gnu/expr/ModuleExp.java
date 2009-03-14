@@ -211,9 +211,6 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-            if (comp.mainClass == null)
-              comp.addMainClass(mexp);
-
 	    try
 	      {
 		Class clas = evalToClass(comp, url);

@@ -1,3 +1,7 @@
+2009-03-14  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule): Remove duplicate comp.addMainClass call.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (valueIfConstant): Check for binding.getValue()

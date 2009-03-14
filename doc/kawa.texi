@@ -1335,7 +1335,13 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39}:
 @xref{Parameter objects}.
 @item
+@uref{http://srfi.schemers.org/srfi-62/srfi-62.html, SRFI 62}: S-expression comments.
+@item
+@uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
+@item
 @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
+@uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
+@uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
 @end itemize
 
 @node Restrictions, , Implemented SRFIs, Features

@@ -1,3 +1,7 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Implemented SRFIs): Update list.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Keywords): We no longer support :IDENTIFIER syntax

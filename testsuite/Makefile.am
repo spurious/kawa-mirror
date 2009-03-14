@@ -25,7 +25,7 @@ check2-full-tailcalls:
 check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
-check1:  check-num check-arr check-srfi-64 check-format \
+check1:  check-num check-arr check-srfi-64 check-srfi-69 check-format \
   check-ppfile scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
@@ -47,6 +47,9 @@ check-arr:
 
 check-srfi-64:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-64-test.scm"
+
+check-srfi-69:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-69-test.scm"
 
 check-misc: testing.zip moduleFT.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
@@ -229,7 +232,7 @@ check-use-slots: ASupport.class
 CLEANFILES = tmp* *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  srfi-64-test.scm use-slots.scm ASupport.scm Base.java \
+  srfi-64-test.scm srfi-69-test.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \

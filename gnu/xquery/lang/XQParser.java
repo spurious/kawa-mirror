@@ -3996,7 +3996,7 @@ public class XQParser extends Lexer
                 if (info == null)
                   comp.error('e', "malformed URL: "+at);
                 require.importDefinitions(className, info,
-                                          uri, forms, module, comp);
+                                          null, forms, module, comp);
                 next = skipSpace(nesting != 0);
                 if (next != ',')
                   {
@@ -4031,7 +4031,7 @@ public class XQParser extends Lexer
                 if (! uri.equals(info.getNamespaceUri()))
                   continue;
                 n++;
-                require.importDefinitions(info.className, info, uri, forms, module, comp);
+                require.importDefinitions(info.className, info, null, forms, module, comp);
               }
             if (n == 0)
               error('e', "no module found for "+uri);

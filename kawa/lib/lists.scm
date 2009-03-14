@@ -9,7 +9,6 @@
 
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
-(require <kawa.lib.syntax>)
 (require <kawa.lib.reflection>)
 
 (define (pair? x) :: <boolean>

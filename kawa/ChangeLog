@@ -1,7 +1,18 @@
 2009-03-13  Per Bothner  <per@bothner.com>
 
+	* standard/ImportFromLibrary.java: New class, implements R6RS
+	import keyword.
+	*  standard/Makefile.am: Update accordingly.
+	* standard/Scheme.java: Update - the implementations of various macros
+	were moved to different classes.
+	Add definition of 'import' keyword.
+	* standard/require.java (featureMap): Various updates.
+	(scanForDefinitions): Error if class not found.
+	(importDefinitions): Drop unused 'uri' parameter.
+	Add 'renamer' parameter.
+
 	* repl.java (processArgs): Don't run interactive shell if there are
-	command-line arguments after doing "something" (such an -f) 
+	command-line arguments after doing "something" (such as -f).
 
 	* lang/Translator.java (scanForm):  If seeing (PART1:PART2 ...)
 	check if PART2 is a static Syntax object in class PART1.

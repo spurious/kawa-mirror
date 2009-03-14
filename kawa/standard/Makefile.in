@@ -214,8 +214,9 @@ define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \
 Scheme.java \
 object.java define_class.java thisRef.java \
-TracedProcedure.java \
-IfFeature.java
+  IfFeature.java \
+  ImportFromLibrary.java \
+  TracedProcedure.java
 
 PACKAGE_FNAME = kawa-standard
 GCJ_INPUTS = $(java_Java)

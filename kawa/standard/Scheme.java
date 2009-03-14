@@ -536,9 +536,11 @@ public class Scheme extends LispLanguage
       defProcStFld("syntax-body->expression", "kawa.lib.prim_syntax");
       defProcStFld("generate-temporaries", "kawa.lib.std_syntax");
       defSntxStFld("with-syntax", "kawa.lib.std_syntax");
-      defProcStFld("syntax-source", "kawa.lib.syntax");
-      defProcStFld("syntax-line", "kawa.lib.syntax");
-      defProcStFld("syntax-column", "kawa.lib.syntax");
+      defProcStFld("identifier?", "kawa.lib.std_syntax");
+      defProcStFld("free-identifier=?", "kawa.lib.std_syntax");
+      defProcStFld("syntax-source", "kawa.lib.std_syntax");
+      defProcStFld("syntax-line", "kawa.lib.std_syntax");
+      defProcStFld("syntax-column", "kawa.lib.std_syntax");
       defSntxStFld("define-for-syntax", "kawa.lib.prim_syntax");
       defSntxStFld("include", "kawa.lib.files");
       defSntxStFld("include-relative", "kawa.lib.files");
@@ -586,8 +588,8 @@ public class Scheme extends LispLanguage
       defProcStFld("environment-bound?", "kawa.lib.misc");
       defProcStFld("scheme-implementation-version", "kawa.lib.misc");
       defProcStFld("scheme-window", "kawa.lib.windows");
-      defSntxStFld("define-procedure", "kawa.lib.syntax");
-      defProcStFld("add-procedure-properties", "kawa.lib.syntax");
+      defSntxStFld("define-procedure", "kawa.lib.std_syntax");
+      defProcStFld("add-procedure-properties", "kawa.lib.std_syntax");
       defProcStFld("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       defProcStFld("procedure-property", "kawa.lib.misc");
@@ -645,6 +647,7 @@ public class Scheme extends LispLanguage
                    "define_variable");
       defSntxStFld("define-member-alias", "kawa.standard.define_member_alias",
                    "define_member_alias");
+      defSntxStFld("import", "kawa.lib.syntax");
       defSntxStFld("require", "kawa.standard.require", "require");
       defSntxStFld("module-name", "kawa.standard.module_name",
                    "module_name");

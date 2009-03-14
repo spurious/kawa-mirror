@@ -87,6 +87,9 @@ public class require extends Syntax
     map("testing", SLIB_PREFIX + "testing");
     map("srfi-69", SLIB_PREFIX + "srfi69");
     map("hash-table", SLIB_PREFIX + "srfi69");
+    map("basic-hash-tables", SLIB_PREFIX + "srfi69");
+    map("srfi-95", "kawa.lib.srfi95");
+    map("sorting-and-merging", "kawa.lib.srfi95");
     map("gui", SLIB_PREFIX + "gui");
     map("swing-gui", SLIB_PREFIX + "swing");
     map("android-defs", "gnu.kawa.android.defs");
@@ -183,7 +186,17 @@ public class require extends Syntax
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
-    importDefinitions(null, ModuleInfo.find((ClassType) type), null,
+    ModuleInfo minfo;
+    try
+      {
+        minfo = ModuleInfo.find((ClassType) type);
+      }
+    catch (Exception ex)
+      {
+	tr.error('e', "unknown class "+type.getName());
+	return false;
+      }
+    importDefinitions(null, minfo, null,
                       forms, defs, tr);
     return true;
   }
@@ -202,9 +215,8 @@ public class require extends Syntax
    *   or null if unknown.
    */
   public static boolean
-  importDefinitions (String className, ModuleInfo info, String uri,
-                     Vector forms,
-                     ScopeExp defs, Compilation tr)
+  importDefinitions (String className, ModuleInfo info, Procedure renamer,
+                     Vector forms, ScopeExp defs, Compilation tr)
   {
     ModuleManager manager = ModuleManager.getInstance();
     long now;
@@ -281,6 +293,26 @@ public class require extends Syntax
           continue;
 
         Symbol aname = (Symbol) fdecl.getSymbol();
+        if (renamer != null)
+          {
+            Object mapped;
+            try
+              {
+                mapped = renamer.apply1(aname);
+              }
+            catch (Throwable ex)
+              {
+                mapped = ex;
+              }
+            if (mapped == null)
+              continue;
+            if (! (mapped instanceof Symbol))
+              {
+                tr.error('e', "internal error - import name mapper returned non-symbol: "+mapped.getClass().getName());
+                continue;
+              }
+            aname = (Symbol) mapped;
+          }
         boolean isStatic = fdecl.getFlag(Declaration.STATIC_SPECIFIED);
         if (! isStatic && decl == null)
           {

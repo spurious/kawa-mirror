@@ -1,23 +1,7 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.reflection>)
-
-;; Helper routines for define-procedure.
-(define (add-procedure-properties
-	 (proc :: <gnu.expr.GenericProc>)
-	 #!rest (args :: <object[]>)) :: <void>
-  (invoke proc 'setProperties args))
-
-(define-syntax define-procedure
-  (syntax-rules (:: <gnu.expr.GenericProc>)
-		((define-procedure name args ...)
-		 (begin
-		   ;; The GenericProc has to be allocated at init time, for
-		   ;; the sake of require, while the actual properties may
-		   ;; need to be evaluated at module-run-time.
-		   (define-constant name :: <gnu.expr.GenericProc>
-		     (make <gnu.expr.GenericProc> 'name))
-		   (add-procedure-properties name args ...)))))
+(require <kawa.lib.lists>)
 
 (define-syntax defmacro
   (syntax-rules ()
@@ -68,38 +52,74 @@
 		  (syntax->expression (syntax object))
 		  (syntax-body->expression (syntax body))))))
 
-(define (identifier? form) :: <boolean>
-  (and (instance? form <kawa.lang.SyntaxForm>)
-       (kawa.lang.SyntaxForm:isIdentifier form)))
+(define (identifier-list? obj)
+  (and (>= (kawa.lang.Translator:listLength obj) 0)
+       (let loop ((obj obj))
+	 (syntax-case obj ()
+	   ((x . y)
+	    (and (identifier? #'x) (loop #'y)))
+	   (() #t)
+	   (_ #f)))))
 
-(define (free-identifier=? id1 id2) :: <boolean>
-  (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
+(define (identifier-pair-list? obj)
+  (and (>= (kawa.lang.Translator:listLength obj) 0)
+       (let loop ((obj obj))
+	 (syntax-case obj ()
+	   (((from to) . y)
+	    (and (identifier? #'from) (identifier? #'to) (loop #'y)))
+	   (() #t)
+	   (_ #f)))))
 
-(define (syntax-source form)
-  (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
-	   (if (eq? str #!null) #f  str)))
-	(else
-	 #f)))
+(define (import-handle-only name list)
+  ;; FIXME handle if list element is a syntax object
+  (if (memq name list) name #!null))
+(define (import-handle-except name list)
+  ;; FIXME handle if list element is a syntax object
+  (if (memq name list) #!null name))
+(define (import-handle-prefix name prefix)
+  ;; FIXME handle if list element is a syntax object
+  (if (eq? name #!null) #!null
+      #!null))
+;;      (string->symbol (string-append (prefix:toString) (name:toString)))))
+(define (import-handle-rename name rename-pairs)
+  (if (pair? rename-pairs)
+      (if (eq? name (caar rename-pairs))
+	  (cadar rename-pairs)
+	  (import-handle-rename name (cdr rename-pairs)))
+      name))
+(define (import-mapper list)
+  (lambda (name)
+    (let loop ((l list) (n name))
+      (if (or (eq? n #!null) (null? l))
+	  n
+	  (loop (cdr l) ((caar l) n (cdar l)))))))
 
-(define (syntax-line form)
-  (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (*:getLineNumber (as <gnu.lists.PairWithPosition> form)))
-	(else
-	 #f)))
+(define-syntax import
+  (syntax-rules ()
+    ((import import-spec ...)
+     (begin (%import import-spec ()) ...))))
 
-;; zero-origin for compatility with MzScheme.
-(define (syntax-column form)
-  (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (- (*:getColumnNumber (as <gnu.lists.PairWithPosition> form)) 0))
-	(else
-	 #f)))
+(define-syntax-case %import (library only except prefix rename)
+  ((_ (rename import-set . pairs) mapper)
+   (if (identifier-pair-list? #'pairs)
+       #`(%import import-set ,(cons (cons import-handle-rename #`pairs) #`mapper))
+       (syntax-error (syntax rest) "invalid 'rename' clause in import")))
+  ((_ (only import-set . ids) mapper)
+   (if (identifier-list? #'ids)
+       #`(%import import-set ,(cons (cons import-handle-only #`ids) #`mapper))
+       (syntax-error (syntax ids) "invalid 'only' identifier list")))
+  ((_ (except import-set . ids) mapper)
+   (if (identifier-list? #'ids)
+       #`(%import import-set ,(cons (cons import-handle-except #`ids) #`mapper))
+       (syntax-error (syntax ids) "invalid 'except' identifier list")))
+  ((_ (prefix import-set pfix) mapper)
+   #`(%import import-set ,(cons (cons import-handle-prefix #`pfix) #`mapper)))
+  ((_ (prefix import-set . rest) mapper)
+   (syntax-error (syntax rest) "invalid prefix clause in import"))
+  ((_ (library libref) mapper)
+   #`(kawa.standard.ImportFromLibrary:instance libref ,(import-mapper (syntax-object->datum (syntax mapper)))))
+  ((_ libref mapper)
+   #`(kawa.standard.ImportFromLibrary:instance libref ,(import-mapper (syntax-object->datum (syntax mapper))))))
 
 ;; LET-VALUES implementation from SRFI-11, by Lars T Hansen.
 ;; http://srfi.schemers.org/srfi-11/srfi-11.html

@@ -4,7 +4,9 @@
 
 (module-export cond case and or let let* letrec do delay
 	       syntax-object->datum datum->syntax-object with-syntax
-	       generate-temporaries)
+	       generate-temporaries define-procedure add-procedure-properties
+	       identifier? free-identifier=?
+	       syntax-source syntax-line syntax-column)
 
 ;;; COND
 
@@ -220,6 +222,24 @@
 				   ((delay expression)
 				    (make <kawa.lang.Promise> (lambda () expression)))))
 
+;; Helper routines for define-procedure.
+(define (add-procedure-properties
+	 (proc :: <gnu.expr.GenericProc>)
+	 #!rest (args :: <object[]>)) :: <void>
+  (invoke proc 'setProperties args))
+
+(define-syntax define-procedure
+  (syntax-rules (:: <gnu.expr.GenericProc>)
+		((define-procedure name args ...)
+		 (begin
+		   ;; The GenericProc has to be allocated at init time, for
+		   ;; the sake of require, while the actual properties may
+		   ;; need to be evaluated at module-run-time.
+		   (define-constant name :: <gnu.expr.GenericProc>
+		     (make <gnu.expr.GenericProc> 'name))
+		   (add-procedure-properties name args ...)))))
+
+
 (define (syntax-object->datum obj)
   (kawa.lang.Quote:quote obj))
 
@@ -230,6 +250,41 @@
   (let loop ((n (kawa.lang.Translator:listLength list)) (lst '()))
     (if (= n 0) lst
 	(loop (- n 1) (make <pair> (datum->syntax-object list (gnu.expr.Symbols:gentemp)) lst)))))
+
+
+(define (identifier? form) :: <boolean>
+  (or (gnu.mapping.Symbol? form)
+      (and (kawa.lang.SyntaxForm? form)
+	   (kawa.lang.SyntaxForm:isIdentifier form))))
+
+(define (free-identifier=? id1 id2) :: <boolean>
+  (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
+
+(define (syntax-source form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
+	   (if (eq? str #!null) #f  str)))
+	(else
+	 #f)))
+
+(define (syntax-line form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (*:getLineNumber (as <gnu.lists.PairWithPosition> form)))
+	(else
+	 #f)))
+
+;; zero-origin for compatility with MzScheme.
+(define (syntax-column form)
+  (cond ((instance? form <kawa.lang.SyntaxForm>)
+	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
+	((instance? form <gnu.lists.PairWithPosition>)
+	 (- (*:getColumnNumber (as <gnu.lists.PairWithPosition> form)) 0))
+	(else
+	 #f)))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.

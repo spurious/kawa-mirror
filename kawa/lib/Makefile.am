@@ -22,6 +22,7 @@ java_SCM_ALWAYS =\
   uniform.scm \
   arrays.scm \
   system.scm \
+  srfi95.scm rnrs/sorting.scm \
   trace.scm
 
 scm_WITH_AWT = windows.scm
@@ -43,5 +44,6 @@ PACKAGE_FNAME = kawa-lib
 EXTRA_GCJ_COMPILED = scm-classes.stamp
 EXTRA_GCJ_INPUTS = *.class
 SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
+EXTRA_CLEAN = */*.class
 
 

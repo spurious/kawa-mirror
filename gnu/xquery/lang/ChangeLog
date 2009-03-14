@@ -1,3 +1,7 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parse): Update calls to require.importDefinitions.
+
 2009-03-01  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (getStaticBaseUri): Tolerate getPort() being null.

@@ -1,3 +1,15 @@
+2009-03-13  Per Bothner  <per@bothner.com>
+
+	* syntax.scm: Implement R6RS 'import' keyword.
+	* lists.scm, std_syntax.scm, syntax.scm: More some functons and macros
+	around so import can make use of what it needs.
+
+	* srfi95.scm: New SRFI-95 (sorting and merging) implementation,
+	based on the SRFI-95 public-domain reference implementation,
+	based on SLIB, by Richard A. O'Keefe and Aubrey Jaffer.
+	* rnrs/sorting.scm: New implementation of R6RS sorting library.
+	* Makefile.am: Update accordingly.
+
 2009-02-06  Per Bothner  <per@bothner.com>
 
 	* files.scm (resource-url): New function.

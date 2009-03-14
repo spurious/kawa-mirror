@@ -141,19 +141,20 @@ public class InheritingEnvironment extends SimpleEnvironment
       {
 	for (;;)
 	  {
-	    NamedLocation loc = it.curLoc;
+	    NamedLocation loc = it.nextLoc;
 	    for (;;)
 	      {
-		it.inherited.curLoc = loc;
+		it.inherited.nextLoc = loc;
 		if (! it.inherited.hasMoreElements())
 		  {
-		    it.curLoc = it.inherited.curLoc;
+                    it.prevLoc = null;
+		    it.nextLoc = it.inherited.nextLoc;
 		    break;
 		  }
-		loc = it.inherited.curLoc;
+		loc = it.inherited.nextLoc;
 		if (lookup(loc.name, loc.property) == loc)
 		  {
-		    it.curLoc = loc;
+		    it.nextLoc = loc;
 		    return true;
 		  }
 		loc = loc.next;

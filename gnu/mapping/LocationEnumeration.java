@@ -6,12 +6,13 @@ package gnu.mapping;
 public class LocationEnumeration
   implements
   /* #ifdef JAVA2 */
-  java.util.Iterator,
+  java.util.Iterator<Location>,
   /* #endif */
-  java.util.Enumeration
+  java.util.Enumeration<Location>
 {
-  Environment env;
-  NamedLocation curLoc;
+  SimpleEnvironment env;
+  NamedLocation prevLoc;
+  NamedLocation nextLoc;
   /** Index field used by Environment.hasMoreElements.
       If inherited==null, index in bindings, else index in env.inherited. */
   int index;
@@ -34,17 +35,26 @@ public class LocationEnumeration
     return env.hasMoreElements(this);
   }
 
-  public Object nextElement()
+  public Location nextElement()
   {
     return nextLocation();
   }
 
   public Location nextLocation()
   {
-    if (curLoc == null && ! hasMoreElements())
+    if (nextLoc == null && ! hasMoreElements())
       throw new java.util.NoSuchElementException();
-    Location r = curLoc;
-    curLoc = curLoc.next;
+    NamedLocation oldPrev = prevLoc;
+    if (prevLoc == null)
+      {
+        NamedLocation first = bindings[index];
+        if (nextLoc != first)
+          prevLoc = first;
+      }
+    while (prevLoc != null && prevLoc.next != nextLoc)
+      prevLoc = prevLoc.next;
+    Location r = nextLoc;
+    nextLoc = nextLoc.next;
     return r;
   }
 
@@ -53,14 +63,21 @@ public class LocationEnumeration
     return hasMoreElements();
   }
 
-  public Object next ()
+  public Location next ()
   {
     return nextElement();
   }
 
   public void remove ()
   {
-    throw new Error();  // FIXME
-    //env.remove(loc);
+    NamedLocation curLoc = prevLoc != null ? prevLoc.next : bindings[index];
+    if (curLoc == null || curLoc.next != nextLoc)
+      throw new IllegalStateException();
+    curLoc.next = null;
+    if (prevLoc != null)
+      prevLoc.next = nextLoc;
+    else
+      bindings[index] = nextLoc;
+    env.num_bindings--;
   }
 }

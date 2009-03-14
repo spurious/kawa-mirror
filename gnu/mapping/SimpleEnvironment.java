@@ -281,16 +281,17 @@ public class SimpleEnvironment extends Environment
   {
     for (;;)
       {
-	if (it.curLoc == null)
+	if (it.nextLoc == null)
 	  {
+            it.prevLoc = null;
 	    if (--it.index < 0)
 	      return false;
-	    it.curLoc = it.bindings[it.index];
-	    if (it.curLoc == null)
+	    it.nextLoc = it.bindings[it.index];
+	    if (it.nextLoc == null)
 	      continue;
 	  }
-	if (it.curLoc.name == null)
-	  it.curLoc = it.curLoc.next;
+	if (it.nextLoc.name == null)
+	  it.nextLoc = it.nextLoc.next;
 	else
 	  break;
       }

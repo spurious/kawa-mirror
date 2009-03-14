@@ -1,3 +1,12 @@
+2009-03-14  Per Bothner  <per@bothner.com>
+
+	* LocationEnumeration.java: Use generics.
+	(curLoc): Rename field to nextLoc.
+	(prevLoc): New field, used for remove.
+	(remove): Add working implementation.
+	* SimpleEnvironment.java (hasMoreElements): Update accordingly.
+	* InheritingEnvironment.java (hasMoreElements): Likewise.
+
 2008-03-23  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (closeThis): New method.

@@ -696,7 +696,7 @@ public class repl extends Procedure0or1
           {
             int ci = arg.indexOf('=');
             if (ci <= 0)
-              return iArg;
+              break;
             String key = arg.substring(0, ci);
             String value = arg.substring(ci+1);
             for (int i = 0; ; i++)

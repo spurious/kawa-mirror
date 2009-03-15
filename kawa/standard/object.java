@@ -16,6 +16,7 @@ public class object extends Syntax
 
   Lambda lambda;
   public static final Keyword accessKeyword = Keyword.make("access");
+  public static final Keyword classNameKeyword = Keyword.make("class-name");
   public static final Keyword interfaceKeyword = Keyword.make("interface");
   public static final Keyword throwsKeyword = Keyword.make("throws");
   static final Keyword typeKeyword = Keyword.make("type");
@@ -60,6 +61,7 @@ public class object extends Syntax
     tr.mustCompileHere();
     Object superlist = pair.getCar();
     Object components = pair.getCdr();
+    Object classNamePair = null;
     LambdaExp method_list = null;
     LambdaExp last_method = null;
     int classAccessFlag = 0;
@@ -95,6 +97,15 @@ public class object extends Syntax
                       oexp.setFlag(ClassExp.CLASS_SPECIFIED);
                     else
                       oexp.setFlag(ClassExp.INTERFACE_SPECIFIED);
+                    obj = ((Pair) obj).getCdr();
+                    tr.popPositionOf(savedPos1);
+                    continue;
+                  }
+                if (pair_car == classNameKeyword)
+                  {
+                    if (classNamePair != null)
+                      tr.error('e', "duplicate class-name specifiers");
+                    classNamePair = obj;
                     obj = ((Pair) obj).getCdr();
                     tr.popPositionOf(savedPos1);
                     continue;
@@ -316,7 +327,8 @@ public class object extends Syntax
       components,
       inits,
       method_list,
-      superlist
+      superlist,
+      classNamePair
     };
     return result;
   }
@@ -328,6 +340,7 @@ public class object extends Syntax
     Vector inits = (Vector) saved[2];
     LambdaExp method_list = (LambdaExp) saved[3];
     Object superlist = saved[4];
+    Object classNamePair = saved[5];
     oexp.firstChild = method_list;
 
     int num_supers = Translator.listLength(superlist);
@@ -347,6 +360,18 @@ public class object extends Syntax
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite_car(superpair, false);
 	superlist = superpair.getCdr();
+      }
+
+    if (classNamePair != null)
+      {
+        Expression classNameExp = tr.rewrite_car((Pair) classNamePair, false);
+        Object classNameVal = classNameExp.valueIfConstant();
+        String classNameSpecifier;
+        if (classNameVal instanceof String
+            && (classNameSpecifier = (String) classNameVal).length() > 0)
+          oexp.classNameSpecifier = classNameSpecifier;
+        else
+          tr.error('e', "class-name specifier must be a non-empty string literal");
       }
     oexp.supers = supers;
 

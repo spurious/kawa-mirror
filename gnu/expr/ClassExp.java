@@ -26,6 +26,8 @@ public class ClassExp extends LambdaExp
    * Using an interface plus a class gives us true multiple inheritance. */
   ClassType instanceType;
 
+  public String classNameSpecifier;
+
   /** True if we should make a pair of an interface and a class. */
   public boolean isMakingClassPair()
   {
@@ -186,14 +188,20 @@ public class ClassExp extends LambdaExp
 
     if (type.getName() == null)
       {
-	String name = getName();
-	if (name != null)
-	  {
-	    int nlen = name.length();
-	    if (nlen > 2
-		&& name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
-	      name = name.substring(1, nlen-1);
-	  }
+	String name;
+        if (classNameSpecifier != null)
+          name = classNameSpecifier;
+        else
+          {
+            name = getName();
+            if (name != null)
+              {
+                int nlen = name.length();
+                if (nlen > 2
+                    && name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
+                  name = name.substring(1, nlen-1);
+              }
+          }
         if (name == null)
           {
 	    StringBuffer nbuf = new StringBuffer(100);
@@ -223,8 +231,9 @@ public class ClassExp extends LambdaExp
 		  break;
 		nbuf.append(Compilation
 			    .mangleNameIfNeeded(name.substring(start, dot)));
-		nbuf.append('.');
 		start = dot + 1;
+                if (start < name.length())
+                  nbuf.append('.');
 	      }
 	    if (start == 0)
 	      {
@@ -236,6 +245,12 @@ public class ClassExp extends LambdaExp
 		else if (comp.classPrefix != null)
 		  nbuf.append(comp.classPrefix);
 	      }
+            else if (start == 1 && start < name.length())
+              {
+                nbuf.setLength(0);
+                nbuf.append(comp.mainClass.getName());
+                nbuf.append('$');
+              }
 	    if (start < name.length())
 	      nbuf.append(Compilation
 			  .mangleNameIfNeeded(name.substring(start)));

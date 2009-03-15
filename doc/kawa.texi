@@ -4862,6 +4862,22 @@ allows Kawa to implement true multiple inheritance.)
 Specifies the Java access permission on the class.
 Can be one of @code{'public} (which is the default in Kawa),
 or @code{'package} (which the default "unnamed" permission in Java code).
+
+@item @code{class-name:} @code{"}@var{cname}@code{"}
+Specifies the Java name of the created class.
+The @var{name} specified after @code{define-class}
+or @code{define-simple-class} is the @emph{Scheme name},
+i.e. the name of a Scheme variable that is bound to the class.
+The Java name is by default derived from the Scheme name,
+but you can override the default with a @code{class-name:} specifier.
+If the @var{cname} has no periods, then it is a name in
+the package of the main (module) class.
+If the @var{cname} starts with a period,
+then you get a class nested within the module class.
+In this case the actual class name is @var{moduleClass}@code{$}@var{rname},
+where @var{rname} is @var{cname} without the initial period.
+To force a class in the top-level (unnamed) package (something
+not recommended) write a period at the end of the @var{cname}.
 @end table
 
 @subsubsection Declaring fields

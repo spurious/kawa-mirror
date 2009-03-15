@@ -1,3 +1,10 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (classNameKeyword): New constant.
+	(scanClassDef): Recognize class-name: specifier.
+	(rewriteClassDef): If class-name: was seen, set classNameSpecifier
+	in ClassExp.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* standard/ImportFromLibrary.java (SRFI97Map): New table.

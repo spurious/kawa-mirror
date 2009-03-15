@@ -1,3 +1,7 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Document class-name: specifier.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Implemented SRFIs): Update list.

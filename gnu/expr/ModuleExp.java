@@ -23,12 +23,6 @@ public class ModuleExp extends LambdaExp
   public static final int LAZY_DECLARATIONS = STATIC_RUN_SPECIFIED << 1;
   public static final int IMMEDIATE = LAZY_DECLARATIONS << 1;
 
-  public String getJavaName ()
-  {
-    String name = getName();
-    return name == null ? "lambda" : Compilation.mangleName(name, 0);
-  }
-
   public ModuleExp ()
   {
   }

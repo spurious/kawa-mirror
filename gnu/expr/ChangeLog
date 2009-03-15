@@ -1,3 +1,8 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getJavaName): Remove unused method.
+	* ModuleExp.java (getJavaName): Remove unused method.
+
 2009-03-14  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): Remove duplicate comp.addMainClass call.

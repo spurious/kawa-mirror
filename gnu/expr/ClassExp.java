@@ -115,12 +115,6 @@ public class ClassExp extends LambdaExp
     target.compileFromStack(comp, typeType);
   }
 
-  public String getJavaName ()
-  {
-    String name = getName();
-    return name == null ? "object" : Compilation.mangleNameIfNeeded (name);
-  }
-
   protected ClassType getCompiledClassType(Compilation comp)
   {
     return type;

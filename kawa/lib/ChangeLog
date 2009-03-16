@@ -1,3 +1,9 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* kawa/hashtable.scm: New module, using code taken from srfi69.scm.
+	* rnrs/hashtables.scm: Implement R6RS (rnrs hashtables) library.
+	* Makefile.am: Update accordingly.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* syntax.scm: Implement R6RS 'import' keyword.

@@ -1,3 +1,9 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* srfi69.scm: Move some code into kawa/lib/kawa/hashtable.scm and
+	kawa/lib/rnrs/hashtables.scm.
+	Change to make use of that - and R6RS library support.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* srfi69.scm: Various updates for changes in GeneralHashTable.

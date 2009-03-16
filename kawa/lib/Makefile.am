@@ -22,6 +22,7 @@ java_SCM_ALWAYS =\
   uniform.scm \
   arrays.scm \
   system.scm \
+  kawa/hashtable.scm rnrs/hashtables.scm \
   srfi95.scm rnrs/sorting.scm \
   trace.scm
 

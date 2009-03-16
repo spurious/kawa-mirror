@@ -11,9 +11,11 @@ public class GeneralHashTable<K,V>
   extends AbstractHashTable<HashNode<K,V>,K,V>
   // FUTURE:  implements java.util.Map<K,V>
 {
+  public static final int DEFAULT_INITIAL_SIZE = 64;
+
   public GeneralHashTable ()
   {
-    super(64);
+    super(DEFAULT_INITIAL_SIZE);
   }
 
   public GeneralHashTable (int capacity)

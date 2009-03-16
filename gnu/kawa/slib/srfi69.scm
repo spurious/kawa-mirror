@@ -1,4 +1,4 @@
-; Copyright © Per Bothner (2005). All Rights Reserved.
+; Copyright © Per Bothner (2005, 2009). All Rights Reserved.
 ; (for Kawa-specific modifications and optimizations).
 ; Copyright © Panu Kalliokoski (2005). All Rights Reserved.
 
@@ -26,6 +26,22 @@
 			warn-invoke-unknown-method: #t)
 (provide 'srfi-69)
 (provide 'hash-table)
+(export make-hash-table hash-table? alist->hash-table 
+	hash-table-equivalence-function hash-table-hash-function 
+	hash-table-ref hash-table-ref/default hash-table-set!
+	hash-table-delete! hash-table-exists?
+	hash-table-update! hash-table-update!/default 
+	hash-table-size hash-table-keys hash-table-values hash-table-walk
+	hash-table-fold hash-table->alist hash-table-copy hash-table-merge! 
+	hash string-hash string-ci-hash hash-by-identity)
+(import (kawa hashtable))
+(import  (rename (except (rnrs hashtables)
+			 string-hash string-ci-hash symbol-hash)
+		 (hashtable-delete! hash-table-delete!)
+		 (hashtable-contains? hash-table-exists?)
+		 (hashtable-set! hash-table-set!)
+		 (hashtable? hash-table?)
+		 (hashtable-size hash-table-size)))
 
 (define *default-bound* #x100000000)
 
@@ -59,60 +75,11 @@
 
 (define *default-table-size* 64)
 
-(define-syntax hash-table-walk%
-  (syntax-rules ()
-    ((hash-table-walk% hash-table node use-node)
-     (let* ((table (*:.table hash-table))
-	    (length ((primitive-array-length <gnu.kawa.util.HashNode>) table)))
-       (do ((i :: <int> (- length 1) (- i 1)))
-	   ((< i 0) #!void)
-	 (do ((node :: <gnu.kawa.util.HashNode>
-		    ((primitive-array-get <gnu.kawa.util.HashNode>) table i)
-		    (invoke hash-table 'getEntryNext node)))
-	     ((eq? node #!null) #!void)
-	   use-node))))))
-
-(define-simple-class <srfi-hash-table> (<gnu.kawa.util.GeneralHashTable>)
-  (equivalenceFunction :: <procedure>)
-  (hashFunction :: <procedure>)
-  ((*init* (eq :: <procedure>) (h :: <procedure>) (sz :: <int>))
-   (invoke-special <gnu.kawa.util.GeneralHashTable> (this) '*init* sz)
-   (set! equivalenceFunction eq)
-   (set! hashFunction h))
-  ((hash key) :: <int>
-   (hashFunction key))
-  ((matches value1 value2) :: <boolean>
-   (equivalenceFunction value1 value2))
-  ((walk (proc :: <procedure>)) :: <void>
-   (hash-table-walk% (this) node (proc (*:getKey node) (*:getValue node))))
-  ((fold (proc :: <procedure>) acc)
-   (hash-table-walk% (this) node
-		     (set! acc (proc (*:getKey node) (*:getValue node) acc)))
-   acc)
-  ((toAlist)
-   (let ((result '()))
-     (hash-table-walk% (this) node
-		       (set! result (cons
-				     (cons (*:getKey node) (*:getValue node))
-				     result)))
-     result))
-  ((putAll (other :: <srfi-hash-table>)) :: <void>
-   (hash-table-walk% other node
-		     (*:put (this) (*:getKey node) (*:getValue node))))
-  ((clone) (hash-table-copy (this)))
-  )
-
-(define (hash-table? obj) :: <boolean>
-  (instance? obj <srfi-hash-table>))
-
-(define (hash-table-size (hash-table :: <srfi-hash-table>)) :: <int>
-  (*:size hash-table))
-
-(define (hash-table-equivalence-function (hash-table :: <srfi-hash-table>))
+(define (hash-table-equivalence-function (hash-table :: hashtable))
   :: <procedure>
   (*:.equivalenceFunction hash-table))
 
-(define (hash-table-hash-function (hash-table :: <srfi-hash-table>))
+(define (hash-table-hash-function (hash-table :: hashtable))
   :: <procedure>
   (*:.hashFunction hash-table))
 
@@ -129,8 +96,8 @@
 			 (hash :: <procedure>
 			       (appropriate-hash-function-for comparison))
 			 (size :: <int> *default-table-size*))
-  :: <srfi-hash-table>
-  (make <srfi-hash-table> comparison hash size))
+  :: hashtable
+  (make hashtable comparison hash size))
 
 #|
 ;; Are these part of the specification? FIXME
@@ -146,7 +113,7 @@
   (make-hash-table-maker = modulo))
 |#
 
-(define (hash-table-ref (hash-table :: <srfi-hash-table>)
+(define (hash-table-ref (hash-table :: hashtable)
 			key
 			#!optional default)
   (let ((node (*:getNode hash-table key)))
@@ -155,15 +122,13 @@
 	    (error "hash-table-ref: no value associated with" key))
 	(*:getValue node))))
 
-(define (hash-table-ref/default (hash-table :: <srfi-hash-table>)
+(define (hash-table-ref/default (hash-table :: hashtable)
 				key default)
   (*:get hash-table key default))
 
-(define (hash-table-set! (hash-table :: <srfi-hash-table>) key value) :: <void>
-  (*:put hash-table key value))
-
-(define (hash-table-update! (hash-table :: <srfi-hash-table>)
+(define (hash-table-update! (hash-table :: hashtable)
 			    key function #!optional thunk) :: <void>
+  (hashtable-check-mutable hash-table)
   (let ((node (hash-table:getNode key)))
     (if (eq? node #!null)
 	(if thunk
@@ -171,24 +136,19 @@
 	    (error "hash-table-update!: no value exists for key" key))
 	(*:setValue node (function (*:getValue node))))))
 
-(define (hash-table-update!/default (hash-table :: <srfi-hash-table>) key function default) :: <void>
+(define (hash-table-update!/default (hash-table :: hashtable) key function default) :: <void>
+  (hashtable-check-mutable hash-table)
   (let ((node (hash-table:getNode key)))
     (if (eq? node #!null)
 	(hash-table-set! hash-table key (function default))
 	(*:setValue node (function (*:getValue node))))))
 
-(define (hash-table-delete! (hash-table :: <srfi-hash-table>) key) :: <void>
-  (*:remove hash-table key))
-
-(define (hash-table-exists? (hash-table :: <srfi-hash-table>) key) :: <boolean>
-  (not (eq? (*:getNode hash-table key) #!null)))
-
-(define (hash-table-walk (hash-table :: <srfi-hash-table>)
+(define (hash-table-walk (hash-table :: hashtable)
 			 (proc :: <procedure>))
   :: <void>
   (*:walk hash-table proc))
 	
-(define (hash-table-fold (hash-table :: <srfi-hash-table>)
+(define (hash-table-fold (hash-table :: hashtable)
 			 (proc :: <procedure>)
 			 acc)
   (*:fold hash-table proc acc))
@@ -207,25 +167,20 @@
       alist)
     hash-table))
 
-(define (hash-table->alist (hash-table :: <srfi-hash-table>))
+(define (hash-table->alist (hash-table :: hashtable))
   (*:toAlist hash-table))
 
-(define (hash-table-copy (hash-table :: <srfi-hash-table>)) :: <srfi-hash-table>
-  (let* ((new (make-hash-table (hash-table-equivalence-function hash-table)
-			       (hash-table-hash-function hash-table)
-			       (max *default-table-size*
-				    (* 2 (hash-table-size hash-table))))))
-     (*:putAll new hash-table)
-     new))
+(define (hash-table-copy (hash-table :: hashtable)) :: hashtable
+  (make hashtable hash-table #t))
 
-(define (hash-table-merge! (hash-table1 :: <srfi-hash-table>)
-			   (hash-table2 :: <srfi-hash-table>))
+(define (hash-table-merge! (hash-table1 :: hashtable)
+			   (hash-table2 :: hashtable))
   :: <void>
   (*:putAll hash-table1 hash-table2)
   hash-table1)
 
-(define (hash-table-keys (hash-table :: <srfi-hash-table>))
+(define (hash-table-keys (hash-table :: hashtable))
   (hash-table-fold hash-table (lambda (key val acc) (cons key acc)) '()))
 
-(define (hash-table-values (hash-table :: <srfi-hash-table>))
+(define (hash-table-values (hash-table :: hashtable))
   (hash-table-fold hash-table (lambda (key val acc) (cons val acc)) '()))

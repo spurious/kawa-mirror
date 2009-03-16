@@ -1,3 +1,7 @@
+2009-03-15  Per Bothner  <per@bothner.com>
+
+	* GeneralHashTable.java (DEFAULT_INITIAL_SIZE): New constant.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* AbstractHashTable.java (getNode): New (or rather restored) method.

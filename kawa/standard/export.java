@@ -8,6 +8,9 @@ public class export extends Syntax
   public static final export module_export = new export();
   static { module_export.setName("module-export"); }
 
+  public static final export export = new export();
+  static { module_export.setName("export"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

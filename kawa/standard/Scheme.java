@@ -658,6 +658,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("module-static", "kawa.standard.module_static",
                    "module_static");
       defSntxStFld("module-export", "kawa.standard.export", "module_export");
+      defSntxStFld("export", "kawa.standard.export", "export");
       defSntxStFld("module-compile-options",
                    "kawa.standard.module_compile_options",
                    "module_compile_options");

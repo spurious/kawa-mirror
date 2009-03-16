@@ -1,5 +1,8 @@
 2009-03-15  Per Bothner  <per@bothner.com>
 
+	* standard/export.java (export): New field.
+	* standard/Scheme.java: Allow 'export' as synonym for 'module-export'.
+
 	* standard/object.java (classNameKeyword): New constant.
 	(scanClassDef): Recognize class-name: specifier.
 	(rewriteClassDef): If class-name: was seen, set classNameSpecifier

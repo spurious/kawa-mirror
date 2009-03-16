@@ -1,3 +1,7 @@
+2009-03-16  Per Bothner  <per@bothner.com>
+
+	* srfi95.scm: We require the vectors module.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* kawa/hashtable.scm: New module, using code taken from srfi69.scm.

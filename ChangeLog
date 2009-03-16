@@ -1,3 +1,9 @@
+2009-03-16  Per Bothner  <per@bothner.com>
+
+	* build.xml (lib-scm, slib-scm: Update for new modules.
+	(slib-scm-classes): Use fileset slib-scm rather than slib-scm-list.
+	(slib-scm-list): Remove duplicate filelist.
+
 2009-01-14  Per Bothner  <per@bothner.com>
 
 	* configure.in: Add configure switches-enanle-xquery.

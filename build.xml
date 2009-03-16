@@ -397,6 +397,10 @@
         <include name="trace.scm"/>
         <include name="windows.scm"/>
         <include name="system.scm"/>
+        <include name="srfi95.scm"/>
+        <include name="kawa/hashtable.scm"/>
+        <include name="rnrs/hashtables.scm"/>
+        <include name="rnrs/sorting.scm"/>
       </fileset>
 
   <target name="check-lib-scm-classes">
@@ -444,12 +448,6 @@
     </apply>
   </target>
 
-      <filelist id="slib-scm-list" dir="${src.dir}/gnu/kawa/slib"
-	       files="genwrite.scm pp.scm ppfile.scm printf.scm
-		DefineRecordType.scm srfi1.scm srfi34.scm conditions.scm
-		srfi37.scm srfi69.scm testing.scm readtable.scm cut.scm"/>
-      <!-- Ant doesn't seem to have a way to map a filelist to a fileset.
-	   There may be a way using pathconvet or a mapper, but for now .. -->
       <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib">
         <include name="genwrite.scm"/>
         <include name="pp.scm"/>
@@ -464,6 +462,9 @@
         <include name="testing.scm"/>
         <include name="readtable.scm"/>
         <include name="cut.scm"/>
+        <include name="gui.scm"/>
+        <include name="XML.scm"/>
+        <include name="swing.scm"/>
       </fileset>
 
   <target name="check-slib-scm-classes">
@@ -482,7 +483,7 @@
       <arg value="kawa.repl"/>
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
-      <filelist refid="slib-scm-list"/>
+      <fileset refid="slib-scm"/>
     </apply>
   </target>
   

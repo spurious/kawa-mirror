@@ -26,6 +26,7 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.misc>)
+(require <kawa.lib.vectors>)
 
 ;(provide 'srfi-95)
 ;(provide 'sort)

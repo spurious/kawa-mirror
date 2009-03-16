@@ -1,6 +1,10 @@
 2009-03-15  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (classNameSpecifier): New field.
+	(setTypes): If classNameSpecifier is set use it to generate class name.
+
 	* ClassExp.java (getJavaName): Remove unused method.
+
 	* ModuleExp.java (getJavaName): Remove unused method.
 
 2009-03-14  Per Bothner  <per@bothner.com>

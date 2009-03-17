@@ -18,7 +18,7 @@
 	   use-node))))))
 
 (define-simple-class hashtable (<gnu.kawa.util.GeneralHashTable>)
-  class-name: "HashTable"
+  class-name: ".HashTable"
   (equivalenceFunction :: <procedure>)
   (hashFunction :: <procedure>)
   (mutable :: boolean init: #t) ;; Not checked by these methods.

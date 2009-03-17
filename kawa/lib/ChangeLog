@@ -1,3 +1,8 @@
+2009-03-17  Per Bothner  <per@bothner.com>
+
+	* kawa/hashtable.scm: Change Java class name to avoid name conflict
+	on Windows.
+
 2009-03-16  Per Bothner  <per@bothner.com>
 
 	* srfi95.scm: We require the vectors module.

@@ -166,6 +166,11 @@ public class InlineCalls extends ExpWalker
         && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
             == (Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)))
       comp.error('e', "can't assign to method "+decl.getName(), exp);
+    if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
+      {
+        if (Invoke.checkKnownClass(decl.getType(), comp) < 0)
+          decl.setType(Type.errorType);
+      }
     /*
     if (decl != null && ! decl.getFlag(Declaration.TYPE_SPECIFIED))
       {

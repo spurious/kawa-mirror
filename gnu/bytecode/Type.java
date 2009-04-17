@@ -511,6 +511,8 @@ public abstract class Type
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
 
+  public static final ObjectType errorType = new ClassType("(error type)");
+
   static public ClassType javalangStringType = ClassType.make("java.lang.String");
   /* The String type. but coercion is handled by toString. */
   public static final ClassType toStringType

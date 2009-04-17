@@ -1,3 +1,7 @@
+2009-04-16  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkSetExp): Error if unknown type specified.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (classNameSpecifier): New field.

@@ -1,3 +1,7 @@
+2009-04-18  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (loadClassRef): Prefer Java5 class literal.
+
 2009-04-16  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkSetExp): Error if unknown type specified.

@@ -2679,15 +2679,15 @@ public class Compilation implements SourceLocator
   {
     CodeAttr code = getCode();
     // Try an optimization
-    if (clas == mainClass && mainLambda.isStatic()
+    if (curClass.getClassfileVersion() >= ClassType.JDK_1_5_VERSION)
+      code.emitPushClass(clas);
+    else if (clas == mainClass && mainLambda.isStatic()
         // moduleInstanceMainField may not have been set yet.
         && moduleInstanceMainField != null)
       {
         code.emitGetStatic(moduleInstanceMainField);
         code.emitInvokeVirtual(Type.objectType.getDeclaredMethod("getClass", 0));
       }
-    else if (curClass.getClassfileVersion() >= ClassType.JDK_1_5_VERSION)
-      code.emitPushClass(clas);
     else
       {
         String name = clas instanceof ClassType ? clas.getName()

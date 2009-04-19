@@ -1138,6 +1138,15 @@
         (output-port? test-file)))
 (check-test-file "tmp1")
 
+#|
+(define foo (lambda () 9))
+(test 9 'define (foo))
+(define foo foo)
+(test 9 'define (foo))
+(define foo (let ((foo foo)) (lambda () (+ 1 (foo)))))
+(test 10 'define (foo))
+|#
+
 (define test-file (open-output-file "tmp2"))
 (write-char #\; test-file)
 (display write-test-obj test-file)

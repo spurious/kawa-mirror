@@ -81,6 +81,7 @@ public class ModuleContext
           }
         catch (Throwable ex)
           {
+            ex.printStackTrace();
             throw new WrappedException
               ("exception while initializing module " + clas.getName(), ex);
           }

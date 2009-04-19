@@ -85,8 +85,10 @@ public class module_name extends Syntax
           {
             decl.noteValue(module);
             decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
+            if (module.outer == null)
+              decl.setFlag(Declaration.STATIC_SPECIFIED);
             decl.setPrivate(true);
-            decl.setType(Compilation.typeClassType);
+            decl.setType(Compilation.typeClass);
           }
         tr.mustCompileHere();
       }

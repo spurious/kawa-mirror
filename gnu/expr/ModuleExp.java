@@ -169,6 +169,20 @@ public class ModuleExp extends LambdaExp
                                        OutPort msg)
     throws Throwable
   {
+    ModuleExp mexp = comp.getModule();
+    Language language = comp.getLanguage();
+    Object inst = evalModule1(env, ctx, comp, url, msg);
+    if (inst == null)
+      return false;
+    evalModule2(env, ctx, language, mexp, inst, msg);
+    return true;
+  }
+
+  public final static Object evalModule1 (Environment env, CallContext ctx,
+                                       Compilation comp, URL url,
+                                       OutPort msg)
+    throws Throwable
+  {
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
     Environment orig_env = Environment.getCurrent();
@@ -183,17 +197,20 @@ public class ModuleExp extends LambdaExp
         if (comp != orig_comp)
           Compilation.setCurrent(comp);
 
-        if (alwaysCompile || comp.mustCompile)
+        if (alwaysCompile)
+          comp.mustCompile = true;
+
+        if (comp.mustCompile)
           comp.addMainClass(mexp);
 
         comp.walkModule(mexp);
         comp.setState(Compilation.WALKED);
 
         if (msg != null ? messages.checkErrors(msg, 20) : messages.seenErrors())
-          return false;
+          return null;
 
-	if (! alwaysCompile && ! comp.mustCompile)
-	  { // optimization - don't generate unneeded Class.
+	if (! comp.mustCompile)
+	  {
 	    if (Compilation.debugPrintFinalExpr && msg != null)
 	      {
 		msg.println ("[Evaluating final module \""+mexp.getName()+"\":");
@@ -201,15 +218,13 @@ public class ModuleExp extends LambdaExp
 		msg.println(']');
 		msg.flush();
 	      }
-	    mexp.body.apply(ctx);
-	  }
-	else
-	  {
-	    try
-	      {
+            return Boolean.TRUE;
+          }
+        else
+          {
 		Class clas = evalToClass(comp, url);
 		if (clas == null)
-		  return false;
+		  return null;
                 try
                   {
                     thread = Thread.currentThread();
@@ -241,7 +256,42 @@ public class ModuleExp extends LambdaExp
                 mexp.thisVariable = null;
                 if (msg != null ? messages.checkErrors(msg, 20)
                     : messages.seenErrors())
-                  return false;
+                  return null;
+                return inst;
+          }
+      }
+    finally
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
+	if (comp != orig_comp)
+	  Compilation.setCurrent(orig_comp);
+        if (thread != null)
+          thread.setContextClassLoader(savedLoader);
+      }
+  }
+
+  public final static void evalModule2 (Environment env, CallContext ctx,
+                                        Language language, ModuleExp mexp,
+                                        Object inst, OutPort msg)
+    throws Throwable
+  {
+    Environment orig_env = Environment.getCurrent();
+    ClassLoader savedLoader = null;
+    Thread thread = null; // Non-null if we need to restore context ClassLoader.
+    try
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(env);
+
+	if (inst == Boolean.TRUE)
+	  { // optimization - don't generate unneeded Class.
+	    mexp.body.apply(ctx);
+	  }
+	else
+	  {
+            //	    try
+	      {
                 if (inst instanceof ModuleBody)
                   ((ModuleBody) inst).run(ctx);
 
@@ -255,8 +305,7 @@ public class ModuleExp extends LambdaExp
 		    Field fld = decl.field;
 		    Symbol sym = dname instanceof Symbol ? (Symbol) dname
 		      : Symbol.make("", dname.toString().intern());
-		    Object property = comp.getLanguage()
-		      .getEnvPropertyFor(decl);
+		    Object property = language.getEnvPropertyFor(decl);
                     Expression dvalue = decl.getValue();
                     // It would be cleaner to not bind these values in
                     // the environment, and just require lexical lookup
@@ -294,10 +343,12 @@ public class ModuleExp extends LambdaExp
 		      }
 		  }
 	      }
+            /*
 	    catch (IllegalAccessException ex)
 	      {
 		throw new RuntimeException("class illegal access: in lambda eval");
 	      }
+            */
 	  }
 	ctx.runUntilDone();
       }
@@ -305,12 +356,9 @@ public class ModuleExp extends LambdaExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(orig_env);
-	if (comp != orig_comp)
-	  Compilation.setCurrent(orig_comp);
         if (thread != null)
           thread.setContextClassLoader(savedLoader);
       }
-    return true;
   }
 
   ClassType superType;
@@ -386,9 +434,9 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
-        if (value instanceof ModuleExp) // if decl set by a module-name command.
-          continue;
-	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
+	if (value instanceof LambdaExp
+            && ! (value instanceof ModuleExp // from a module-name command.
+                  || value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }

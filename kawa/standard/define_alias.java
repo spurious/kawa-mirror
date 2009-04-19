@@ -45,7 +45,20 @@ public class define_alias extends Syntax
             decl.setAlias(true);
             Expression arg = tr.rewrite_car(p, formSyntax);
             if (arg instanceof ReferenceExp)
-              ((ReferenceExp) arg).setDontDereference(true);
+              {
+                ReferenceExp rarg = (ReferenceExp) arg;
+                Declaration d = Declaration.followAliases(rarg.getBinding());
+                Expression dval;
+                if (d != null
+                    && ((dval = d.getValue()) instanceof ClassExp
+                        || dval instanceof ModuleExp))
+                  {
+                    decl.setIndirectBinding(false);
+                    decl.setFlag(Declaration.IS_CONSTANT);
+                  }
+                else
+                  rarg.setDontDereference(true);
+              }
             else if (arg instanceof QuoteExp)
               {
                 decl.setIndirectBinding(false);

@@ -1,3 +1,10 @@
+2009-04-18  Per Bothner  <per@bothner.com>
+
+	* standard/module_name.java (scanForm): Type of module name is now
+	Class, not ClassType.
+	* standard/define_alias.java (scanForDefinitions): If the aliasee
+	is a name for a ModuleExp or ClassExp, don't indirect.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* standard/export.java (export): New field.

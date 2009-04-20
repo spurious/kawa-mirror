@@ -1,5 +1,9 @@
 2009-04-18  Per Bothner  <per@bothner.com>
 
+	* BindingInitializer.java (emit): If the value is a ModuleExp,
+	use loadClassRef to load the Class instead.
+	* ModuleExp.java (allocFields): Don't allocFieldFor a ModuleExp.
+
 	* Compilation.java (loadClassRef): Prefer Java5 class literal.
 
 2009-04-16  Per Bothner  <per@bothner.com>

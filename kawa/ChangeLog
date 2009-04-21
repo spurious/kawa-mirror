@@ -1,3 +1,7 @@
+2009-04-20  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (scanForm): Push and pop source position.
+
 2009-04-18  Per Bothner  <per@bothner.com>
 
 	* standard/module_name.java (scanForm): Type of module name is now

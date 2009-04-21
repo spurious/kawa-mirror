@@ -977,7 +977,8 @@ public class Translator extends Compilation
         Pair st_pair = (Pair) st;
         Declaration saveContext = macroContext;
         Syntax syntax = null;
-        ScopeExp save_scope = current_scope;
+        ScopeExp savedScope = current_scope;
+        Object savedPosition = pushPositionOf(st);
         try
           {
             Object obj = st_pair.getCar();
@@ -1038,8 +1039,9 @@ public class Translator extends Compilation
           }
         finally
           {
-            if (save_scope != current_scope)
-              setCurrentScope(save_scope);
+            if (savedScope != current_scope)
+              setCurrentScope(savedScope);
+            popPositionOf(savedPosition);
           }
 	if (syntax != null)
 	  {

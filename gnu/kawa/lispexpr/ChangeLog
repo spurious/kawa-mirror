@@ -1,3 +1,8 @@
+2009-04-21  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber): Translate 'd'/'s'/... exponent
+	marker to the standard 'e' before calling parseDouble.
+
 2009-03-10  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (initialColonIsKeyword, finalColonIsKeyword,

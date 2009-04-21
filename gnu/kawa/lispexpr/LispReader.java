@@ -480,7 +480,7 @@ public class LispReader extends Lexer
 
     int realStart = pos - 1;
     boolean hash_seen = false;
-    char exp_seen = '\000';
+    int exp_seen = -1;
     int digits_start = -1;
     int decimal_point = -1;
     boolean copy_needed = false;
@@ -532,6 +532,7 @@ public class LispReader extends Lexer
 		    break loop;
 		  }
 		char next = buffer[pos];
+                int exp_pos = pos-1;
 		if (next == '+' || next == '-')
 		  {
 		    if (++ pos >= end
@@ -543,13 +544,13 @@ public class LispReader extends Lexer
 		    pos--;
 		    break loop;
 		  }
-		if (exp_seen != '\000')
+		if (exp_seen >= 0)
 		  return "duplicate exponent";
 		if (radix != 10)
 		  return "exponent in non-decimal number";
 		if (digits_start < 0)
 		  return "mantissa with no digits";
-		exp_seen = ch;
+		exp_seen = exp_pos;
 		for (;;)
 		  {
 		    pos++;
@@ -561,7 +562,7 @@ public class LispReader extends Lexer
 		  return "multiple fraction symbol '/'";
 		if (digits_start < 0)
 		  return "no digits before fraction symbol '/'";
-		if (exp_seen != '\000' || decimal_point >= 0)
+		if (exp_seen >= 0 || decimal_point >= 0)
 		  return "fraction symbol '/' following exponent or '.'";
 		numerator = valueOf(buffer, digits_start, pos - digits_start,
 				    radix, negative, lvalue);
@@ -592,13 +593,22 @@ public class LispReader extends Lexer
     boolean inexact = (exactness == 'i' || exactness == 'I'
 		       || (exactness == ' ' && hash_seen));
     RealNum number = null;
-    if (exp_seen != '\000' || decimal_point >= 0)
+    if (exp_seen >= 0 || decimal_point >= 0)
       {
 	if (digits_start > decimal_point && decimal_point >= 0)
 	  digits_start = decimal_point;
 	if (numerator != null)
 	  return "floating-point number after fraction symbol '/'";
 	String str = new String(buffer, digits_start, pos - digits_start);
+        if (exp_seen >= 0)
+          {
+            char exp = buffer[exp_seen];
+            if (exp != 'e' && exp != 'E')
+              {
+                int prefix = exp_seen - digits_start;
+                str = str.substring(0, prefix)+'e'+str.substring(prefix+1);
+              }
+          }
 	double d = Convert.parseDouble(str);
 	number = new DFloNum(negative ? - d : d);
       }

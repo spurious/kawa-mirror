@@ -1046,6 +1046,12 @@ public class Compilation implements SourceLocator
     new_class.setClassfileVersion(defaultClassFileVersion);
   }
 
+  public boolean makeRunnable ()
+  {
+    return ! generateServlet && ! generateApplet
+      && ! getModule().staticInitRun();
+  }
+
   public void addMainClass (ModuleExp module)
   {
     mustCompile = true;
@@ -1066,7 +1072,7 @@ public class Compilation implements SourceLocator
 	else
 	  sup = getModuleType();
       }
-    if (! generateServlet)
+    if (makeRunnable())
       type.addInterface(typeRunnable);
     type.setSuper(sup);
 
@@ -2030,7 +2036,7 @@ public class Compilation implements SourceLocator
 	    code.emitDup(moduleClass);
 	    code.emitInvokeSpecial(moduleClass.constructor);
 	    moduleInstanceMainField
-	      = moduleClass.addField("$instance", mainClass,
+	      = moduleClass.addField("$instance", moduleClass,
 				     Access.STATIC|Access.PUBLIC|Access.FINAL);
 	    code.emitPutStatic(moduleInstanceMainField);
 	  }
@@ -2044,7 +2050,7 @@ public class Compilation implements SourceLocator
 	if (! immediate && module.staticInitRun())
 	  {
 	    code.emitGetStatic(moduleInstanceMainField);
-	    code.emitInvokeInterface(typeRunnable.getDeclaredMethod("run", 0));
+	    code.emitInvoke(typeModuleBody.getDeclaredMethod("run", 0));
 	  }
 	code.emitReturn();
 

@@ -272,8 +272,9 @@ public class require extends Syntax
     ClassType type = info.getClassType();
     String tname = info.className;
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
-    boolean isRunnable = info.getState() < Compilation.RESOLVED
-      || type.isSubtype(Compilation.typeRunnable);
+    boolean isRunnable = (info.getState() < Compilation.RESOLVED
+                          ? info.getCompilation().makeRunnable()
+                          : type.isSubtype(Compilation.typeRunnable));
     Declaration decl = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
     Expression[] args = { new QuoteExp(tname) };

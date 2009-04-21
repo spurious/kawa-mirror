@@ -1,5 +1,8 @@
 2009-04-21  Per Bothner  <per@bothner.com>
 
+	* kawa/require.java (importDefinitions): Don't call run on new
+	module if we're not makeRunnable on it.
+
 	* standard/module_name.java (scanForm): Change the value of the
 	module-name Declaration to be mainClass with type=java.lang.Class.
 	* standard/module_name.java (scanForm): If the module-name is a String,

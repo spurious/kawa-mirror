@@ -31,6 +31,8 @@ public class ModuleInfo
   ModuleExp exp;
   Compilation comp;
 
+  public Compilation getCompilation () { return comp; }
+
   public void setCompilation (Compilation comp)
   {
     comp.minfo = this;

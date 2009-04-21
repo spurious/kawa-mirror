@@ -498,6 +498,11 @@ public class Compilation implements SourceLocator
 		// should print an ERROR.
 	      }
 	  }
+        if (type == Compilation.typeClass && value instanceof ClassType)
+          {
+            loadClassRef((ClassType) value);
+            return;
+          }
         try
           {
             value = type.coerceFromObject(value);

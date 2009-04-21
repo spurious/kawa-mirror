@@ -38,9 +38,9 @@ public class module_name extends Syntax
         else
           name = (String) p.getCar();
       }
-    else if (arg instanceof FString)
+    else if (arg instanceof FString || arg instanceof String)
       name = arg.toString();
-    else if (arg instanceof String || arg instanceof Symbol)
+    else if (arg instanceof Symbol)
       {
 	name = arg.toString();
 	int len = name.length();
@@ -83,7 +83,7 @@ public class module_name extends Syntax
 
         if (decl != null)
           {
-            decl.noteValue(module);
+            decl.noteValue(new QuoteExp(tr.mainClass, Compilation.typeClass));
             decl.setFlag(Declaration.IS_CONSTANT|Declaration.PRIVATE_SPECIFIED);
             if (module.outer == null)
               decl.setFlag(Declaration.STATIC_SPECIFIED);

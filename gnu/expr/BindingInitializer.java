@@ -103,10 +103,7 @@ public class BindingInitializer extends Initializer
     else
       {
         Type type = field == null ? decl.getType() : field.getType();
-        if (value instanceof ModuleExp && ((ModuleExp) value).outer == null)
-          comp.loadClassRef((ClassType) ((ModuleExp) value).getType());
-        else
-          value.compileWithPosition(comp, StackTarget.getInstance(type));
+        value.compileWithPosition(comp, StackTarget.getInstance(type));
       }
 
     // Optimization of Declaration.compileStore, to avoid swap.

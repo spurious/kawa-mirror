@@ -1,4 +1,4 @@
-(test-init "Objects" 130)
+(test-init "Objects" 131)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -367,6 +367,12 @@
 (require <cycle1>)
 (test #t is-even? 8)
 (test #f is-even? 3)
+(define c1-n1 (cycle1-name1))
+(define c1-n2 (cycle1-name2))
+(define c1-n3 (cycle1-name3))
+(test "cycle1" 'check-reference-module-name
+      (and (eq? c1-n1 c1-n2) (eq? c1-n1 c1-n3)
+	   (java.lang.Class? c1-n1) (invoke c1-n1 'getName)))
 (require <cycle2>)
 (test #t is-even? 8)
 (test #f is-even? 3)

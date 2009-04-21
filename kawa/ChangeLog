@@ -1,5 +1,10 @@
 2009-04-21  Per Bothner  <per@bothner.com>
 
+	* standard/module_name.java (scanForm): Change the value of the
+	module-name Declaration to be mainClass with type=java.lang.Class.
+	* standard/module_name.java (scanForm): If the module-name is a String,
+	treat it the same as FString, rather than the same a Symbol.
+
 	* standard/require.java (importDefinitions): Imported variable
 	should be read-only.
 

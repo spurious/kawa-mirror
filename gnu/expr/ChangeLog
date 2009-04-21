@@ -1,4 +1,10 @@
-2009-04-18  Per Bothner  <per@bothner.com>
+2009-04-21  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java (emit): Revert 2009-04-18 - no longer needed.
+	* Compilation.java (compileConstant): If compiling a ClassType with
+	Class as the expected type, do loadClassRef to get the Class.
+
+2009-04-18   Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (emit): If the value is a ModuleExp,
 	use loadClassRef to load the Class instead.

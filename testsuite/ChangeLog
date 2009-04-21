@@ -1,3 +1,8 @@
+2009-04-18  Per Bothner  <per@bothner.com>
+
+	* cycle1.scm: New definitions to test module-name and aliases.
+	* obj-test.scm: New test that it works.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* srfi-69-test.scm: Test of SRFI-69 (hashtables), from Larceny.

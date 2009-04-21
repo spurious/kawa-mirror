@@ -403,8 +403,8 @@ public class require extends Syntax
             if (! immediate)
               adecl.setPrivate(true);
           } 
-        if (fdecl.getFlag(Declaration.IS_CONSTANT))
-         adecl.setFlag(Declaration.IS_CONSTANT);
+        // Imported variables should be read-only.
+        adecl.setFlag(Declaration.IS_CONSTANT);
         if (fdecl.getFlag(Declaration.IS_SYNTAX))
           adecl.setFlag(Declaration.IS_SYNTAX);
         if (fdecl.isProcedureDecl())

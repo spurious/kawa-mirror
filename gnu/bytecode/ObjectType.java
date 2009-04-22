@@ -98,7 +98,11 @@ public class ObjectType extends Type
   {
     try
       {
+        /* #ifdef Android */
+        // return ClassLoader.getSystemClassLoader();
+        /* #else */
         return Thread.currentThread().getContextClassLoader();
+        /* #endif */
       }
     catch (java.lang.SecurityException ex)
       {

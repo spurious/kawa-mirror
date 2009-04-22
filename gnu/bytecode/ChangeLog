@@ -1,3 +1,8 @@
+2009-04-21  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getContextClassLoader): Reportedly on Android
+	Thread#getContextClassLoader doesn't work.
+
 2009-04-16  Per Bothner  <per@bothner.com>
 
 	* Type.java (errorType): New static.

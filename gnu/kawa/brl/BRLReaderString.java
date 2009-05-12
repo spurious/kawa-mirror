@@ -108,8 +108,6 @@ public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry
 		int length = in.tokenBufferLength - startPos;
 		if (length == 0)
 		  return BRL.emptyForm;
-		else if (((BRLRead) in).isBrlCompatible())
-		  return new FString(in.tokenBuffer, startPos, length);
 		else
 		  {
 		    String str = new String(in.tokenBuffer, startPos, length);

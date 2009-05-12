@@ -1,3 +1,8 @@
+2009-05-12  Per Bothner  <per@bothner.com>
+
+	* BRLReaderString.java: Top-level text now evaluates to an
+	UnescapedData instance in compatibility mode (as before in KRL mode).
+
 2009-03-10  Per Bothner  <per@bothner.com>
 
 	* BRLRead.java (init): Clearing initialColonIsKeyword is no

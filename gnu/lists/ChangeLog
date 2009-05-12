@@ -1,3 +1,7 @@
+2009-05-12  Per Bothner  <per@bothner.com>
+
+	* UnescapedData.java: Make UnescapedData implement CharSequence.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* FString.java:  Optimize by copying data field to local before loops.

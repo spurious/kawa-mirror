@@ -5,11 +5,16 @@ package gnu.lists;
 import java.io.*;
 
 /** Used for text that is supposed to be written out verbatim.
- * For example, the the output format is XML, can be used to write
- * a literal '<' as a plain "<", instead of being escaped as "&lt;".
+ * For example, if the output format is XML, can be used to write
+ * a literal {@code '<'} as a plain {@code "<"}, instead of being
+ * escaped as {@code "&lt;"}.
  */
 
-public class UnescapedData implements Externalizable
+public class UnescapedData implements
+                           /* #ifdef use:java.lang.CharSequence */
+                           CharSequence, 
+                           /* #endif */
+                           Externalizable
 {
   String data;
 
@@ -33,6 +38,23 @@ public class UnescapedData implements Externalizable
   }
 
   public final int hashCode() { return data == null ? 0 : data.hashCode(); }
+
+  public int length()
+  {
+    return data.length();
+  }
+
+  public char charAt(int index)
+  {
+    return data.charAt(index);
+  }
+
+  /* #ifdef use:java.lang.CharSequence */
+  public CharSequence subSequence(int start, int end)
+  {
+    return new UnescapedData(data.substring(start, end));
+  }
+  /* #endif */
 
   /**
    * @serialData Write 'data' (using writeObject).

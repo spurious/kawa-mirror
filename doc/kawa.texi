@@ -4815,7 +4815,7 @@ The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
 @deffn Syntax define-class name (supers ...) option-pair* field-or-method-decl ...
-@deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
+@deffnx Syntax define-simple-class name (supers ...) option-pair* field-or-method-decl ...
 @example
 @var{option-pair} ::= @var{option-keyword} @var{option-value}
 @var{field-or-method} ::= @var{field-decl} | @var{method-decl}
@@ -4834,7 +4834,7 @@ consisting of a Java interface and a Java implementation class.
 The class inherits from the classes and interfaces listed in @var{supers}.
 This is a list of names of classes that are in scope (perhaps imported
 using @code{require}), or names for existing classes or interfaces
-surrounded by @code{<>}, such as @code{<gnu.lists.Sequence>}.
+optionally surrounded by @code{<>}, such as @code{<gnu.lists.Sequence>}.
 If @code{define-simple-class} is used, at most one of these may be
 the name of a normal Java class or classes defined using
 @code{define-simple-class}; the rest must be interfaces or classes

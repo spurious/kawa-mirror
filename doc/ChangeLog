@@ -1,3 +1,7 @@
+2009-05-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Minor tweaks.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Document class-name: specifier.

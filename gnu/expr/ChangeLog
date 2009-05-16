@@ -1,3 +1,16 @@
+2009-05-15  Per Bothner  <per@bothner.com>
+
+	Fix bug reported by Alex Mitchell <alexm@nus.edu.sg>.
+	* Language.java (PARSE_CURRENT_NAMES): New flag, to split the old
+	functionality of PARSE_IMMEDIATE into two parts.
+	(PARSE_FOR_EVAL): Old combined functionality.
+	(parse(Inport,SourceMEssages,int,ModuleInfo)): New method.
+	(parse): Check PARSE_CURRENT_NAMES.
+	(eval): Use PARSE_FOR_EVAL rather than PARSE_IMMEDIATE.
+	* Compilation.java (process): If immediate create ClassLoader here.
+	(usedClass): Above change allows simplification here.
+	* ModuleExp.java (evalToClass): Don't create ArrayClassLoader here.
+
 2009-04-21  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (makeRunnable): New method.

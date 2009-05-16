@@ -437,13 +437,17 @@ public abstract class Language
   /** Flag to tell parse that expression will be evaluated immediately.
    * I.e. we're not creating class files for future execution. */
   public static final int PARSE_IMMEDIATE = 1;
+  /** Flag to tell parse to use current NameLookup.
+   * As opposed to creating a new instance. */
+  public static final int PARSE_CURRENT_NAMES = 2;
   /** Flag to tell parse to only read a single line if possible.
    * Multiple lines may be read if syntactically required. */
-  public static final int PARSE_ONE_LINE = 2;
+  public static final int PARSE_ONE_LINE = 4;
   /** Flag to tell parser to continue until we have the module name.
    * The parser is allowed to continue further, but must stop before
    * any module import. */
-  public static final int PARSE_PROLOG = 4;
+  public static final int PARSE_PROLOG = 8;
+  public static final int PARSE_FOR_EVAL = PARSE_IMMEDIATE|PARSE_CURRENT_NAMES;
 
   public static boolean requirePedantic;
 
@@ -471,12 +475,22 @@ public abstract class Language
     return parse(getLexer(port, messages), Language.PARSE_PROLOG, info);
   }
 
+  public final Compilation parse(InPort port,
+                                 gnu.text.SourceMessages messages,
+                                 int options, ModuleInfo info)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    return parse(getLexer(port, messages), options, info);
+  }
+
   public final Compilation parse(Lexer lexer, int options, ModuleInfo info)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     SourceMessages messages = lexer.getMessages();
+    NameLookup lexical = ((options & PARSE_CURRENT_NAMES) != 0
+                          ? NameLookup.getInstance(getEnvironment(), this)
+                          : new NameLookup(this));
     boolean immediate = (options & PARSE_IMMEDIATE) != 0;
-    NameLookup lexical = immediate ? NameLookup.getInstance(getEnvironment(), this) : new NameLookup(this);
     Compilation tr = getCompilation(lexer, messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
@@ -863,7 +877,7 @@ public abstract class Language
     setDefaultLanguage(this);
     try
       {
-	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
+	Compilation comp = parse(port, messages, PARSE_FOR_EVAL);
 	ModuleExp.evalModule(getEnvironment(), ctx, comp, null, null);
       }
     finally

@@ -1,3 +1,11 @@
+2009-05-15  Per Bothner  <per@bothner.com>
+
+	* Shell.java (run): Use PARSE_FOR_EVAL rather than PARSE_IMMEDIATE.
+	* standard/load.java (loadSource): Likewise.
+	* standard/require.java (importDefinitions): Make sure to set
+	PARSE_IMMEDIATE (and hence Compilation.immediate) before we parse.
+	This is needed if there are cycles.
+
 2009-04-21  Per Bothner  <per@bothner.com>
 
 	* kawa/require.java (importDefinitions): Don't call run on new

@@ -120,7 +120,7 @@ public class load extends Procedure1 {
     else
       {
 	Compilation comp
-          = language.parse(port, messages, Language.PARSE_IMMEDIATE);
+          = language.parse(port, messages, Language.PARSE_FOR_EVAL);
 	ModuleExp mexp = comp.getModule();
 	CallContext ctx = CallContext.getInstance();
 	Consumer save = ctx.consumer;

@@ -238,7 +238,7 @@ public class Shell
       {
 	for (;;)
 	  {
-	    int opts = Language.PARSE_IMMEDIATE|Language.PARSE_ONE_LINE;
+	    int opts = Language.PARSE_FOR_EVAL|Language.PARSE_ONE_LINE;
 	    try
 	      {
 		Compilation comp = language.parse(lexer, opts, null);

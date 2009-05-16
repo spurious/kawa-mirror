@@ -231,8 +231,10 @@ public class require extends Syntax
             InPort fstream = InPort.openFile(info.getSourceAbsPath());
             info.clearClass();
             info.className = className;
-            comp = language.parse(fstream, messages, info);
-            comp.immediate = tr.immediate;
+            int options = Language.PARSE_PROLOG;
+            if (tr.immediate)
+              options |= Language.PARSE_IMMEDIATE;
+            comp = language.parse(fstream, messages, options, info);
           }
         catch (java.io.FileNotFoundException ex)
           {

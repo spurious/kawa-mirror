@@ -48,17 +48,16 @@ public class ModuleExp extends LambdaExp
     SourceMessages messages = comp.getMessages();
     try
       {
-        ClassLoader parentLoader = ObjectType.getContextClassLoader();
-	ArrayClassLoader loader = new ArrayClassLoader(parentLoader);
-        if (url == null)
-          url = Path.currentPath().toURL();
-        loader.setResourceContext(url);
-	comp.loader = loader;
 
         comp.minfo.loadByStages(Compilation.COMPILED);
 
 	if (messages.seenErrors())
 	  return null;
+
+	ArrayClassLoader loader = comp.loader;
+        if (url == null)
+          url = Path.currentPath().toURL();
+        loader.setResourceContext(url);
 
 	java.util.zip.ZipOutputStream zout = null;
 	if (dumpZipPrefix != null)

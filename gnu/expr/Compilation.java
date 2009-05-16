@@ -1884,6 +1884,11 @@ public class Compilation implements SourceLocator
           }
         if (wantedState >= COMPILED && getState() < COMPILED)
           {
+            if (immediate)
+              {
+                ClassLoader parentLoader = ObjectType.getContextClassLoader();
+                loader = new ArrayClassLoader(parentLoader);
+              }
             generateBytecode();
             setState(messages.seenErrors() ? ERROR_SEEN : COMPILED);
           }
@@ -2459,13 +2464,8 @@ public class Compilation implements SourceLocator
   {
     while (type instanceof ArrayType)
       type = ((ArrayType) type).getComponentType();
-    if (! immediate || ! (type instanceof ClassType))
-      return;
-    ClassType clas = (ClassType) type;
-    if (loader != null)
-      {
-	loader.addClass(clas);
-      }
+    if (immediate && type instanceof ClassType)
+      loader.addClass((ClassType) type);
   }
 
   public SourceMessages getMessages() { return messages; }

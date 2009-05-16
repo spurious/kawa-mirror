@@ -1,3 +1,10 @@
+2009-05-16  Alex Mitchell <alexm@nus.edu.sg>
+	    Per Bothner  <per@bothner.com>
+
+	* test-load-require.scm, test-load-require-1.scm,
+	test-load-require-2.scm, test-load-require-3.scm,
+	test-load-require.expected:  New testcase from bug report.
+
 2009-04-18  Per Bothner  <per@bothner.com>
 
 	* cycle1.scm: New definitions to test module-name and aliases.

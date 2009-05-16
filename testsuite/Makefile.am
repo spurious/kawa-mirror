@@ -14,7 +14,7 @@ all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle $(SERVLET_TESTS) $(SAX2_TESTS) \
-  check-inlining check-jmc check-use-slots
+  check-inlining check-jmc check-use-slots check-load-require
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -229,6 +229,15 @@ ASupport.class: $(srcdir)/ASupport.scm Base.class
 check-use-slots: ASupport.class
 	$(KAWA) $(OPTIONS) -f $(srcdir)/use-slots.scm
 
+check-load-require:
+	$(KAWA) -e '(load "$(srcdir)/test-load-require.scm")' \
+	   -e '(mytest3)' >tmp-load-require.out
+	@if diff -b $(srcdir)/test-load-require.expected tmp-load-require.out; \
+	  then echo '# check-load-requir test passes'; \
+	  else echo FAIL check-load-require test; fi
+EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
+  test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
+
 CLEANFILES = tmp* *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
@@ -237,7 +246,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \
   HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
-  ppfile.out scribble.html.in \
+  ppfile.out scribble.html.in $(EXTRA_LOAD_REQUIRE_DIST) \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm

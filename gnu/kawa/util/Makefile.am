@@ -10,7 +10,8 @@ java_sources = \
   IdentityHashTable.java \
   HashNode.java \
   RangeTable.java \
-  WeakHashNode.java
+  WeakHashNode.java \
+  WeakIdentityHashMap.java
 
 EXTRA_DIST = PreProcess.java
 PACKAGE_FNAME = gnu-kawa-util

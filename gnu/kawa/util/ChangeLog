@@ -1,3 +1,18 @@
+2009-05-17  Per Bothner  <per@bothner.com>
+
+	* WeakIdentityHashMap.java: New class, extends AbstractHashTable.
+	* Makefile.am: Update accordingly.
+	* AbstractHashTable.java (makeEntry): New method.
+	(put*2, remove): Add new default methods.
+	* GeneralHashTable.java (put*2, remove):  Remove methods.
+	* WeakHashNode.java: Extend WeakReference<K> rather than
+	WeakReference<V> and add value field, so this class can be ued by
+	both AbstractWeakHashTable and WeakIdentityHashMap.
+	* AbstractWeakHashTable.java: Update accordingly.
+	(hash): New method.
+	(cleanup): Make a more abstract static method that can also be
+	used by WeakIdentityHashMap.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* GeneralHashTable.java (DEFAULT_INITIAL_SIZE): New constant.

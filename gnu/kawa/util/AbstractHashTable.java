@@ -38,6 +38,9 @@ public abstract class AbstractHashTable<Entry, K, V>
     mask = capacity - 1;
   }
 
+  /** Allocate a new node in the hash table. */
+  protected abstract Entry makeEntry (K key, int hash, V value);
+
   /** Calculate hash code of a key.
    */
   public int hash (K key)
@@ -63,9 +66,9 @@ public abstract class AbstractHashTable<Entry, K, V>
    * Override this and the {@link #hash(Object)} method if you want
    * a different equivalence relation.
    */
-  protected boolean matches (K value1, K value2)
+  protected boolean matches (K key1, K key2)
   {
-    return value1 == value2 || (value1 != null && value1.equals(value2));
+    return key1 == key2 || (key1 != null && key1.equals(key2));
   }
 
   /** Find value for given key.  Return null if not found. */
@@ -136,6 +139,65 @@ public abstract class AbstractHashTable<Entry, K, V>
 	    element = next;
 	  }
       }
+  }
+
+  public V put (K key, V value)
+  {
+    return put(key, hash(key), value);
+  }
+
+  public V put (K key, int hash, V value)
+  {
+    int index = hashToIndex(hash);
+    Entry first = table[index];
+    Entry node = first;
+    for (;;)
+      {
+	if (node == null)
+	  {
+            if (++num_bindings >= table.length)
+              {
+                rehash();
+                index = hashToIndex(hash);
+                first = table[index];
+              }
+            node = makeEntry(key, hash, value);
+            setEntryNext(node, first);
+            table[index] = node;
+	    return null;
+	  }
+	else if (matches(key, hash, node))
+	  {
+            V oldValue = getEntryValue(node);
+            setEntryValue(node, value);
+	    return oldValue;
+	  }
+	node = getEntryNext(node);
+      }
+  }
+
+  public V remove (K key)
+  {
+    int hash = hash(key);
+    int index = hashToIndex(hash);
+    Entry prev = null;
+    Entry node = table[index];
+    while (node != null)
+      {
+	Entry next = getEntryNext(node);
+	if (matches(key, hash, node))
+	  {
+	    if (prev == null)
+	      table[index] = next;
+	    else
+	      setEntryNext(prev, next);
+	    num_bindings--;
+	    return getEntryValue(node);
+	  }
+	prev = node;
+	node = next;
+      }
+    return null;
   }
 
   public void clear ()

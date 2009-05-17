@@ -6,7 +6,7 @@ package gnu.kawa.util;
  */
 
 public abstract class AbstractWeakHashTable<K,V>
-  extends AbstractHashTable<WeakHashNode<K,V>,K,V>
+  extends AbstractHashTable<WeakHashNode<V,V/*unused*/>,K,V>
 {
   /* #ifdef JAVA2 */
   java.lang.ref.ReferenceQueue<V> rqueue
@@ -25,15 +25,15 @@ public abstract class AbstractWeakHashTable<K,V>
 
   protected abstract K getKeyFromValue (V value);
 
-  protected int getEntryHashCode (WeakHashNode<K,V> entry) { return entry.hash; }
-  protected WeakHashNode<K,V> getEntryNext (WeakHashNode<K,V> entry) { return entry.next; }
-  protected void setEntryNext (WeakHashNode<K,V> entry, WeakHashNode<K,V> next) { entry.next = next; }
-  protected K getEntryKey (WeakHashNode<K,V> entry) { V t = getEntryValue(entry); return t==null ? null : getKeyFromValue(t); }
-  protected V getEntryValue (WeakHashNode<K,V> entry) { return entry.get(); }
-  protected void setEntryValue (WeakHashNode<K,V> entry, V value) { throw new UnsupportedOperationException(); }
-  protected WeakHashNode<K,V>[] allocEntries(int n) { return (WeakHashNode<K,V>[]) new WeakHashNode[n]; }
+  protected int getEntryHashCode (WeakHashNode<V,V> entry) { return entry.hash; }
+  protected WeakHashNode<V,V> getEntryNext (WeakHashNode<V,V> entry) { return entry.next; }
+  protected void setEntryNext (WeakHashNode<V,V> entry, WeakHashNode<V,V> next) { entry.next = next; }
+  protected K getEntryKey (WeakHashNode<V,V> entry) { V t = getEntryValue(entry); return t==null ? null : getKeyFromValue(t); }
+  protected V getEntryValue (WeakHashNode<V,V> entry) { return entry.get(); }
+  protected void setEntryValue (WeakHashNode<V,V> entry, V value) { throw new UnsupportedOperationException(); }
+  protected WeakHashNode<V,V>[] allocEntries(int n) { return (WeakHashNode<V,V>[]) new WeakHashNode[n]; }
 
-  protected V getValueIfMatching (WeakHashNode<K,V> node, K key)
+  protected V getValueIfMatching (WeakHashNode<V,V> node, K key)
   {
     V val = getEntryValue(node);
     if (val != null && matches(getKeyFromValue(val), key))
@@ -46,7 +46,7 @@ public abstract class AbstractWeakHashTable<K,V>
     cleanup();
     int hash = hash(key);
     int index = hashToIndex(hash);
-    for (WeakHashNode<K,V> node = table[index];
+    for (WeakHashNode<V,V> node = table[index];
 	 node != null;  node = node.next)
       {
         V val = getValueIfMatching(node, key);
@@ -56,19 +56,34 @@ public abstract class AbstractWeakHashTable<K,V>
     return defaultValue;
   }
 
+  public int hash (K key)
+  {
+    return System.identityHashCode(key);
+  }
+
   protected boolean valuesEqual (V oldValue, V newValue)
   {
     return oldValue == newValue;
   }
 
-  public void put (K key, V value)
+  protected WeakHashNode<V,V> makeEntry (K key, int hash, V value)
+  {
+    /* #ifdef JAVA2 */
+    return new WeakHashNode<V,V>(value, rqueue, hash);
+    /* #else */
+    // return new WeakHashNode<V,V>(value, hash);
+    /* #endif */
+  }
+
+  public V put (K key, V value)
   {
     cleanup();
     int hash = hash(key);
     int index = hashToIndex(hash);
-    WeakHashNode<K,V> first = table[index];
-    WeakHashNode<K,V> node = first;
-    WeakHashNode<K,V> prev = null;
+    WeakHashNode<V,V> first = table[index];
+    WeakHashNode<V,V> node = first;
+    WeakHashNode<V,V> prev = null;
+    V oldValue = null;
     for (;;)
       {
 	if (node == null)
@@ -79,24 +94,22 @@ public abstract class AbstractWeakHashTable<K,V>
                 index = hashToIndex(hash);
                 first = table[index];
               }
-            /* #ifdef JAVA2 */
-            node = new WeakHashNode<K,V>(value, rqueue, hash, first);
-            /* #else */
-            // node = new WeakHashNode<K,V>(value, hash, first);
-            /* #endif */
+            node = makeEntry(null, hash, value);
+            node.next = first;
             table[index] = node;
-	    return;
+	    return oldValue;
 	  }
-        V oldValue = getEntryValue(node);
-        if (oldValue == value)
-          return;
-        WeakHashNode<K,V> next = node.next;
-        if (oldValue != null && valuesEqual(oldValue, value))
+        V curValue = getEntryValue(node);
+        if (curValue == value)
+          return curValue;
+        WeakHashNode<V,V> next = node.next;
+        if (curValue != null && valuesEqual(curValue, value))
           {
             if (prev == null)
               table[index] = next;
             else
               prev.next = next;
+            oldValue = curValue;
           }
         else
           prev = node;
@@ -104,32 +117,37 @@ public abstract class AbstractWeakHashTable<K,V>
       }
   }
 
-  void cleanup ()
+  void cleanup () {
+    cleanup(this, rqueue);
+  }
+
+  static <Entry,K,V> void cleanup (AbstractHashTable<Entry,?,?> map,
+                                   java.lang.ref.ReferenceQueue<?> rqueue)
   {
     /* #ifdef JAVA2 */
     for (;;)
       {
-        WeakHashNode<?,?> oldref = (WeakHashNode<?,?>) rqueue.poll();
+        Entry oldref = (Entry) rqueue.poll();
         if (oldref == null)
           break;
-        int index = hashToIndex(oldref.hash);
-        WeakHashNode<K,V> prev = null;
-        for (WeakHashNode<K,V> node = table[index];
+        int index = map.hashToIndex(map.getEntryHashCode(oldref));
+        Entry prev = null;
+        for (Entry node = map.table[index];
              node != null;  )
           {
-            WeakHashNode<K,V> next = node.next;
+            Entry next = map.getEntryNext(node);
             if (node == oldref)
               {
                 if (prev == null)
-                  table[index] = next;
+                  map.table[index] = next;
                 else
-                  prev.next = next;
+                  map.setEntryNext(prev, next);
                 break;
               }
             prev = node;
             node = next;
           }
-        num_bindings--;
+        map.num_bindings--;
       }
     /* #endif */
   }

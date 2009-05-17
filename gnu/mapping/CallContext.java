@@ -291,7 +291,7 @@ public class CallContext // implements Runnable
    * from a finally clause but that is less efficient, partly
    * because the JVM stack must be empty before a finally subroutine.)
    */
-  public final void cleanupFromContext (int oldIndex) throws Throwable
+  public final void cleanupFromContext (int oldIndex)
   {
     ValueStack vst = vstack;
     char[] data = vst.data;

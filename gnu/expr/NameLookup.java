@@ -26,7 +26,7 @@ public class NameLookup extends GeneralHashTable<Object,Declaration>
   /** Get or create a NameLookup instance for a given Environment.
    * We want the same NameLookup instance to be used for multiple
    * interactive commands in the same "session", to preserve top-level
-   * declarations.  We do that be registering it in the Environment.
+   * declarations.  We do that by registering it in the Environment.
    */
   public static NameLookup getInstance (Environment env, Language language)
   {

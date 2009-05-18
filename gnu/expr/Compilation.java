@@ -2457,7 +2457,7 @@ public class Compilation implements SourceLocator
   /** Called for classes referenced in bytecode.
    * Since this only does something when immediate, we only care about
    * classes referenced in the bytecode when immediate.
-   * It is used to ensure that we can inherit from classes defines when in
+   * It is used to ensure that we can inherit from classes defined when in
    * immediate mode (in Scheme using define-class or similar).
    */
   public void usedClass (Type type)

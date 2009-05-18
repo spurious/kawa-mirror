@@ -66,7 +66,7 @@ public abstract class Language
 
   /** Add a language to the list.
    *
-   * @param langMapping is a language definition, the first index
+   * @param langMapping is a language definition, the first element
    *  is the language name, subsequent indexes are file types that
    *  might cause the language to be used and the final index is the
    *  name of the class that implements the language.
@@ -776,7 +776,7 @@ public abstract class Language
   {
     Language.setDefaultLanguage(lang);
     current.setGlobal(lang);
-    // Assuming this is the initial (main) thread, make it's Environment
+    // Assuming this is the initial (main) thread, make its Environment
     // the default (global) one, so child threads can inherit from it.
     // Thus command-line definitions etc get inherited.
     if (Environment.getGlobal() == BuiltinEnvironment.getInstance())

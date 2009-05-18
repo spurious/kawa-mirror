@@ -55,21 +55,17 @@ kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/kawa-tour.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
-dist-hook:
-	rm -f $(distdir)/patch-source-list
-	$(MAKE) srcdir=`pwd`/$(distdir) select-java5
-
-dist-kawa-@VERSION@.jar:
+dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && rm -f $$srcdir/patch-source-list \
-	  && $$srcdir/configure --with-servlet --with-java-source=5 \
+	  && tar xzf ../$(distdir).tar.gz \
+	  && rm -f ./patch-source-list \
+	  && JAVACFLAGS='-target 1.5' \
+	    ./kawa-@VERSION@/configure --with-java-source=5 --with-javax.script --with-servlet  \
 	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
-	  && $(JAR) cmf $$srcdir/jar-manifest \
-	    ../kawa-@VERSION@.jar \
-	    `find . -name '*.class' -print` \
+	  && mv kawa-@VERSION@.jar ../dist-kawa-@VERSION@.jar \
 	  && cd .. && rm -rf tmpdir
 
 jemacs-@JEMACS_VERSION@.jar:

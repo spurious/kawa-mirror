@@ -1,5 +1,10 @@
 2009-05-17  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (dist-kawa-@VERSION@.jar): Make copy of dist sources,
+	to allow re-condifure, even when "$srcdir" is ".".
+	Build with Java6 compiler, with target 5, and --with-javax.script,
+	to allowing running under Java5, but with scripting on Java6.
+
 	* configure.in (--with-java.script): New flag.
 	(WITH_JAVAX_SCRIPT): New conditional.
 	* Makefile.am: Add META-INF/services/javax.script.ScriptEngineFactory

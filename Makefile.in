@@ -460,9 +460,6 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) \
-	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
-	  dist-hook
 	-find $(distdir) -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
 	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
 	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
@@ -656,18 +653,17 @@ uninstall-am: uninstall-local
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-am clean clean-generic \
 	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
-	dist-hook dist-lzma dist-shar dist-tarZ dist-zip distcheck \
-	distclean distclean-generic distclean-tags distcleancheck \
-	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-local
+	dist-lzma dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-generic distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
+	tags-recursive uninstall uninstall-am uninstall-local
 
 
 kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
@@ -685,21 +681,17 @@ kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/kawa-tour.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
-dist-hook:
-	rm -f $(distdir)/patch-source-list
-	$(MAKE) srcdir=`pwd`/$(distdir) select-java5
-
-dist-kawa-@VERSION@.jar:
+dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && rm -f $$srcdir/patch-source-list \
-	  && $$srcdir/configure --with-servlet --with-java-source=5 \
+	  && tar xzf ../$(distdir).tar.gz \
+	  && rm -f ./patch-source-list \
+	  && JAVACFLAGS='-target 1.5' \
+	    ./kawa-@VERSION@/configure --with-java-source=5 --with-javax.script --with-servlet  \
 	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
-	  && $(JAR) cmf $$srcdir/jar-manifest \
-	    ../kawa-@VERSION@.jar \
-	    `find . -name '*.class' -print` \
+	  && mv kawa-@VERSION@.jar ../dist-kawa-@VERSION@.jar \
 	  && cd .. && rm -rf tmpdir
 
 jemacs-@JEMACS_VERSION@.jar:

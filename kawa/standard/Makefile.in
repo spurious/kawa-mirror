@@ -182,6 +182,10 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
+JAVAX_SCRIPT_EXTRA = \
+  SchemeScriptEngineFactory.java
+
+@WITH_JAVAX_SCRIPT_TRUE@JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
 java_sources = \
 set_b.java \
 prim_method.java prim_throw.java throw_name.java \
@@ -216,10 +220,12 @@ Scheme.java \
 object.java define_class.java thisRef.java \
   IfFeature.java \
   ImportFromLibrary.java \
+  $(JAVAX_SCRIPT_USED) \
   TracedProcedure.java
 
 PACKAGE_FNAME = kawa-standard
 GCJ_INPUTS = $(java_Java)
+EXTRA_DIST = $(JAVAX_SCRIPT_EXTRA)
 all: all-am
 
 .SUFFIXES:

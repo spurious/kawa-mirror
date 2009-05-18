@@ -178,9 +178,9 @@ public class ModuleExp extends LambdaExp
   }
 
   public final static Object evalModule1 (Environment env, CallContext ctx,
-                                       Compilation comp, URL url,
-                                       OutPort msg)
-    throws Throwable
+                                          Compilation comp, URL url,
+                                          OutPort msg)
+    throws SyntaxException
   {
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
@@ -235,28 +235,12 @@ public class ModuleExp extends LambdaExp
                     thread = null;
                   }
 
-                Object inst;
-                try
-                  {
-                    inst = clas.getDeclaredField("$instance").get(null);
-                  }
-                catch (NoSuchFieldException ex)
-                  {
-                    inst = clas.newInstance();
-                  }
-                /* #ifdef use:java.lang.Throwable.getCause */
-                catch (ExceptionInInitializerError ex)
-                  {
-                    throw ex.getCause();
-                  }
-                /* #endif */
-
                 mexp.body = null;
                 mexp.thisVariable = null;
                 if (msg != null ? messages.checkErrors(msg, 20)
                     : messages.seenErrors())
                   return null;
-                return inst;
+                return clas;
           }
       }
     finally
@@ -289,6 +273,25 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
+            if (inst instanceof Class)
+              {
+                Class clas = (Class) inst;
+                try
+                  {
+                    inst = clas.getDeclaredField("$instance").get(null);
+                  }
+                catch (NoSuchFieldException ex)
+                  {
+                    inst = clas.newInstance();
+                  }
+                /* #ifdef use:java.lang.Throwable.getCause */
+                catch (ExceptionInInitializerError ex)
+                  {
+                    throw ex.getCause();
+                  }
+                /* #endif */
+              }
+
             //	    try
 	      {
                 if (inst instanceof ModuleBody)
@@ -307,7 +310,7 @@ public class ModuleExp extends LambdaExp
 		    Object property = language.getEnvPropertyFor(decl);
                     Expression dvalue = decl.getValue();
                     // It would be cleaner to not bind these values in
-                    // the environment, and just require lexical lookup
+                    // the environment, and just require lexical lookup.
                     // However, various parts of the code makes use of
                     // the environment.
 		    if ((decl.field.getModifiers() & Access.FINAL) != 0

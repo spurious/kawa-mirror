@@ -180,12 +180,18 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
+JAVAX_SCRIPT_EXTRA = \
+  XQueryScriptEngineFactory.java
+
+@WITH_JAVAX_SCRIPT_TRUE@JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
 java_sources = \
   XQuery.java \
   XQParser.java \
-  XQResolveNames.java
+  XQResolveNames.java \
+  $(JAVAX_SCRIPT_USED)
 
 PACKAGE_FNAME = gnu-xquery-lang
+EXTRA_DIST = $(JAVAX_SCRIPT_EXTRA)
 all: all-am
 
 .SUFFIXES:

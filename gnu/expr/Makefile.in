@@ -180,6 +180,12 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
+JAVAX_SCRIPT_EXTRA = \
+    AbstractScriptEngineFactory.java \
+    KawaScriptBindings.java \
+    KawaScriptEngine.java
+
+@WITH_JAVAX_SCRIPT_TRUE@JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
 java_sources = \
   AccessExp.java \
   ApplyExp.java \
@@ -244,9 +250,10 @@ java_sources = \
   Target.java \
   ThisExp.java \
   TryExp.java \
-  TypeValue.java
+  TypeValue.java \
+  $(JAVAX_SCRIPT_USED)
 
-EXTRA_DIST = package.html
+EXTRA_DIST = package.html $(JAVAX_SCRIPT_EXTRA)
 PACKAGE_FNAME = gnu-expr
 GCJ_INPUTS = $(java_Java)
 all: all-am

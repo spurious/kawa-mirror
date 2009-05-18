@@ -2,6 +2,14 @@
 
 include $(top_srcdir)/Make-rules
 
+JAVAX_SCRIPT_EXTRA=\
+    AbstractScriptEngineFactory.java \
+    KawaScriptBindings.java \
+    KawaScriptEngine.java
+if WITH_JAVAX_SCRIPT
+  JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
+endif
+
 java_sources = \
   AccessExp.java \
   ApplyExp.java \
@@ -66,9 +74,10 @@ java_sources = \
   Target.java \
   ThisExp.java \
   TryExp.java \
-  TypeValue.java
+  TypeValue.java \
+  $(JAVAX_SCRIPT_USED)
 
-EXTRA_DIST = package.html
+EXTRA_DIST = package.html $(JAVAX_SCRIPT_EXTRA)
 
 PACKAGE_FNAME = gnu-expr
 GCJ_INPUTS =  $(java_Java)

@@ -2,6 +2,12 @@
 
 include $(top_srcdir)/Make-rules
 
+JAVAX_SCRIPT_EXTRA=\
+  SchemeScriptEngineFactory.java
+if WITH_JAVAX_SCRIPT
+  JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
+endif
+
 java_sources = \
 set_b.java \
 prim_method.java prim_throw.java throw_name.java \
@@ -36,9 +42,11 @@ Scheme.java \
 object.java define_class.java thisRef.java \
   IfFeature.java \
   ImportFromLibrary.java \
+  $(JAVAX_SCRIPT_USED) \
   TracedProcedure.java
 
 PACKAGE_FNAME = kawa-standard
 GCJ_INPUTS =  $(java_Java)
+EXTRA_DIST = $(JAVAX_SCRIPT_EXTRA)
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

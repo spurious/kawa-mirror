@@ -1,3 +1,13 @@
+2009-05-17  Per Bothner  <per@bothner.com>
+
+	Add support for JSR-223 scrpting (javax.script).
+	* AbstractScriptEngineFactory.java: New class.
+	* KawaScriptBindings.java: New class.
+	* KawaScriptEngine.java: New class
+	* Makefile.am: Update accordingly.
+	* ModuleExp.java (evalModule1, evalModule2): Create/find instance
+	in evalModule2, rather than evalModule1.
+
 2009-05-15  Per Bothner  <per@bothner.com>
 
 	Fix bug reported by Alex Mitchell <alexm@nus.edu.sg>.

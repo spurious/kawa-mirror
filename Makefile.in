@@ -218,6 +218,7 @@ SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 javadir = $(datadir)/java
 JAR = jar
 GCJ_DBTOOL = gcj-dbtool
+@WITH_JAVAX_SCRIPT_TRUE@META_INF_FILES = META-INF/services/javax.script.ScriptEngineFactory
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   patch-source-list selected-java-source \
@@ -669,9 +670,15 @@ uninstall-am: uninstall-local
 	uninstall-local
 
 
-kawa-@VERSION@.jar: ./kawa-jar.stamp
-	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
+kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
+	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar $(META_INF_FILES)\
 	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
+
+META-INF/services/javax.script.ScriptEngineFactory: Makefile
+	echo 'kawa.standard.SchemeScriptEngineFactory #Scheme' >tmp.ScriptEngineFactory
+@ENABLE_XQUERY_TRUE@	echo 'gnu.xquery.lang.XQueryScriptEngineFactory #XQuery' >>tmp.ScriptEngineFactory
+	mkdir -p META-INF/services
+	mv tmp.ScriptEngineFactory META-INF/services/javax.script.ScriptEngineFactory
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 

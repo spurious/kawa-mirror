@@ -34,9 +34,21 @@ javadir=$(datadir)/java
 JAR = jar
 GCJ_DBTOOL = gcj-dbtool
 
-kawa-@VERSION@.jar: ./kawa-jar.stamp
-	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
+if WITH_JAVAX_SCRIPT
+META_INF_FILES = META-INF/services/javax.script.ScriptEngineFactory
+endif
+
+kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
+	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar $(META_INF_FILES)\
 	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
+
+META-INF/services/javax.script.ScriptEngineFactory: Makefile
+	echo 'kawa.standard.SchemeScriptEngineFactory #Scheme' >tmp.ScriptEngineFactory
+if ENABLE_XQUERY
+	echo 'gnu.xquery.lang.XQueryScriptEngineFactory #XQuery' >>tmp.ScriptEngineFactory
+endif
+	mkdir -p META-INF/services
+	mv tmp.ScriptEngineFactory META-INF/services/javax.script.ScriptEngineFactory
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 

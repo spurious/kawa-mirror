@@ -227,6 +227,14 @@ public class OutPort extends PrintConsumer implements Printable
       print(numberFormat.format((double) v));
   }
 
+  public void print(boolean v)
+  {
+    if (objectFormat == null)
+      super.print(v);
+    else
+      objectFormat.writeBoolean(v, this);
+  }
+
   public void print(String v)
   {
     write(v == null ? "(null)" : v);

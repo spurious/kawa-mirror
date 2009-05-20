@@ -1,10 +1,9 @@
 Before Kawa 1.10:
+- Go through Savannah bugs.
+- Manual: should rename @node Extensions
 - Change version number to 1.10.
 - Evaluated reported JEmacs bugs.
 - Make module-static the default?
-- Format filter chain API?
-  CommonLisp repl: (arrayp 3) ==> false rather than ()
-    because writeBoolean not properly filtered.
 - Go through remaining "news" entries and update manual.
 - go through Evaluating-Scheme-expressions-from-Java.
   Support javax.script
@@ -18,6 +17,7 @@ Before Kawa 1.10:
   http://openjdk.java.net/projects/nio
 
 HIGH PRIORITY:
+* Allow co-variant return types.
 * Document meta-arg facility.
 * compile-file doesn't display warnings
 * When deferring imports (require) the 'run' actions shouldn't be deferred. FIXME
@@ -28,6 +28,7 @@ HIGH PRIORITY:
 * XQuery: Implement/document external functions.
 * Name mangling, document library modules.
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))
+* Format filter chain API?
 
 Localization support: gettext - see doc-resource.patch
 

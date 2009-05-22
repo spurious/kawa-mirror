@@ -1,3 +1,9 @@
+2009-05-22  Per Bothner  <per@bothner.com>
+
+	* kawa/SyntaxPattern.java (translate, match, literalIdentifierEq):
+	More correct handling of syntactic hygiene for literals.
+	(literalIdentifierEq): Remove one method.
+
 2009-05-17  Per Bothner  <per@bothner.com>
 
 	* lang/Eval.java (evalBody): Give module a unique name.

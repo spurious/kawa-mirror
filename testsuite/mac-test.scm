@@ -1,9 +1,8 @@
-(test-init "macros" 97)
+(test-init "macros" 99)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
-;;; FIXME this does not work - hygiene problem!
-;;;(test 'ok 'let=> (let ((=> #f)) (cond (#t => 'ok))))
+(test 'ok 'let=> (let ((=> #f)) (cond (#t => 'ok))))
 
 (load (string-append src-prefix "mac1.scm"))
 (test '(1 2) 'something (something 1 2))
@@ -503,3 +502,17 @@
      (string->list
       (symbol->string sym))))))
 (test 7 'symbol-altering-macro (call-reversename xam 3 2 7 6))
+
+;; Based on a bug reported by Dan Stanger <DStanger@EatonVance.Com>.
+(define (test-literal-capture-1)
+  (letrec-syntax
+      ((define-input
+	 (syntax-rules () ((define-input var) (define var 1))))
+       (test-out
+	(syntax-rules (test-content-type! define-input)
+	  ((test-out (test-content-type! expr ...)) (test-content-type! expr ...))
+	  ((test-out (define-input form)) (error (define-input form)))
+	  ((test-out expr) (list expr)))))
+
+    (test-out (symbol->string (quote b)))))
+(test '("b") test-literal-capture-1)

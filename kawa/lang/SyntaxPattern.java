@@ -336,10 +336,23 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  {
 	    for (int j = literal_identifiers.length;  --j >= 0; )
 	      {
-		ScopeExp scope = syntax == null ? tr.currentScope()
-		  : syntax.scope;
-		if (literalIdentifierEq(pattern, scope,
-					literal_identifiers[j]))
+                ScopeExp current = tr.currentScope();
+                ScopeExp scope1 = syntax == null ? current : syntax.scope;
+                ScopeExp scope2;
+                Object literal = literal_identifiers[j];
+                if (literal instanceof SyntaxForm)
+                  {
+                    SyntaxForm syntax2 = (SyntaxForm) literal;
+                    
+                    literal = syntax2.form;
+                    scope2 = syntax2.scope;
+                  }
+                else if (tr.currentMacroDefinition != null)
+                  scope2 = tr.currentMacroDefinition.getCapturedScope();
+                else
+                  scope2 = current;
+		if (literalIdentifierEq(pattern, scope1,
+					literal, scope2))
 		  {
 		    int i = SyntaxTemplate.indexOf(literals, pattern);
 		    if (i < 0)
@@ -558,9 +571,33 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    continue;
 	  case MATCH_EQUALS:
 	    Object lit = literals[value];
-	    // We should be using Translator's matches routine, but the current
-	    // Translator isn't available, so here is a special-purpose kludge.
-	    return lit.equals(obj);
+            Object id1, id2;
+            ScopeExp sc1, sc2;
+            Translator tr = (Translator) Compilation.getCurrent();
+            if (lit instanceof SyntaxForm)
+              {
+                SyntaxForm sf = (SyntaxForm) lit;
+                id1 = sf.form;
+                sc1 = sf.scope;
+              }
+            else
+              {
+                id1 = lit;
+                Syntax curSyntax = tr.getCurrentSyntax();
+                sc1 = curSyntax instanceof Macro ? ((Macro) curSyntax).getCapturedScope() : null;
+              }
+            if (obj instanceof SyntaxForm)
+              {
+                SyntaxForm sf = (SyntaxForm) obj;
+                id2 = sf.form;
+                sc2 = sf.scope;
+              }
+            else
+              {
+                id2 = obj;
+                sc2 = syntax == null ? tr.currentScope() : syntax.scope;
+              }
+            return literalIdentifierEq(id1, sc1, id2, sc2);
 	  case MATCH_ANY:
 	    if (syntax != null)
 	      obj = syntax.fromDatum(obj);
@@ -599,22 +636,16 @@ public class SyntaxPattern extends Pattern implements Externalizable
   }
 
   public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
-					     Object literal2)
-  {
-    if (literal2 instanceof SyntaxForm)
-      {
-	SyntaxForm syntax = (SyntaxForm) literal2;
-	return literalIdentifierEq(id1, sc1, syntax.form, syntax.scope);
-      }
-    return literalIdentifierEq(id1, sc1, literal2, null);
-  }
-
-  public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
 					     Object id2, ScopeExp sc2)
   {
     if (id1 != id2)
       return false;
+    if (sc1 == sc2)
+      return true;
     Declaration d1 = null, d2 = null;
+    // Ending the look before we get to ModuleExp isn't really right,
+    // but it's a hassle dealing the global Environment.
+    // FIXME when we re-do the library/globals imlementation.
     while (sc1 != null && ! (sc1 instanceof ModuleExp))
       {
 	d1 = sc1.lookup(id1);
@@ -624,7 +655,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
       }
     while (sc2 != null && ! (sc2 instanceof ModuleExp))
       {
-	d2 = sc1.lookup(id1);
+	d2 = sc2.lookup(id2);
 	if (d2 != null)
 	  break;
 	sc2 = sc2.outer;

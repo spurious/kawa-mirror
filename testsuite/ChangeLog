@@ -1,3 +1,8 @@
+2009-05-22  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: One R5RS syntactic hygiene testcase now works.
+	New test based on bug report from Dan Stanger <DStanger@EatonVance.Com>.
+
 2009-05-16  Alex Mitchell <alexm@nus.edu.sg>
 	    Per Bothner  <per@bothner.com>
 

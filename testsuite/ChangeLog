@@ -1,3 +1,7 @@
+2009-05-22  Felix Klock <felix_klock_ii@mac.com>
+
+	* mac-test.scm: Test literals in syntax-rules and syntaxtic hygiene.
+
 2009-05-22  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: One R5RS syntactic hygiene testcase now works.

@@ -4,6 +4,9 @@ import gnu.bytecode.*;
 import java.lang.reflect.Array;
 import java.util.*;
 import gnu.mapping.Table2D;
+/* #ifdef use:java.util.regex */
+import java.util.regex.*;
+/* #endif */
 
 /** Manages the literals of a Compilation.
  * Implements ObjectOutput, because we use externalization to determine
@@ -256,6 +259,14 @@ public class LitTable implements ObjectOutput
 	  push(obj, Type.charType);
         else if (obj instanceof Class)
           push(obj, Type.java_lang_Class_type);
+        /* #ifdef use:java.util.regex */
+        else if (obj instanceof Pattern)
+          {
+            Pattern pat = (Pattern) obj;
+            push(pat.pattern(), Type.string_type);
+            push(Integer.valueOf(pat.flags()), Type.intType);
+          }
+        /* #endif */
 	else
 	  error(obj.getClass().getName()+" does not implement Externalizable");
 	int nargs = stackPointer - oldStack;
@@ -605,12 +616,20 @@ public class LitTable implements ObjectOutput
 	    // look for matching "valueOf" or "make" method;
 	    method = getMethod(type, "valueOf", literal, true);
             if (method == null)
-              method = getMethod(type, "make", literal, true);
+              {
+                String mname = "make";
+                /* #ifdef use:java.util.regex */
+                if (literal.value instanceof Pattern)
+                  mname = "compile";
+                /* #endif */
+                method = getMethod(type, mname, literal, true);
+              }
 	    // otherwise look for matching constructor;
 	    if (method != null)
 	      makeStatic = true;
 	    else if (literal.argTypes.length > 0)
 	      method = getMethod(type, "<init>", literal, false);
+
 	    if (method == null)
 	      useDefaultInit = true;
 	  }

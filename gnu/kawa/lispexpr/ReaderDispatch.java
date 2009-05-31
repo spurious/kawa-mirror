@@ -59,6 +59,9 @@ public class ReaderDispatch extends ReadTableEntry
     tab.set(';', entry);
     tab.set('!', entry);
     tab.set('\\', entry);
+    /* #ifdef use:java.util.regex */
+    tab.set('/', entry);
+    /* #endif */
     tab.set('\'', new ReaderQuote(rtable.makeSymbol("function")));
     tab.set('(', new ReaderVector(')'));
     return tab;

@@ -10,6 +10,12 @@ public class ReaderString extends ReadTableEntry
   public Object read (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
+    return readString(in, ch, count);
+  }
+  
+  public static String readString (Lexer in, int ch, int count)
+    throws java.io.IOException, SyntaxException
+  {
     int startPos = in.tokenBufferLength;
     LineBufferedReader port = in.getPort();
     char saveReadState = '\0';

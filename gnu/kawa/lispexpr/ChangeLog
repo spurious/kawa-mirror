@@ -1,3 +1,15 @@
+2009-05-30  Per Bothner  <per@bothner.com>
+
+	New support for regex Pattern types and literal syntax.
+	* LangObjType.java (regexType): New static LangObjType, bound to
+	java.util.regex.Pattern.
+	* ReaderString.java (readString): New static method.
+	* LispReader.java (readEscape): Handle backslash-newline also
+	for other whitespace after the backslash.
+	* ReaderDispatchMisc.java (readRegex): New method.
+	(read): On '/' call readRegex.
+	* ReaderDispatch.java (create):  Map '/' to ReaderDispatchMisc.
+
 2009-04-21  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber): Translate 'd'/'s'/... exponent

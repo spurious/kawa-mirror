@@ -1,3 +1,9 @@
+2009-05-31  Per Bothner  <per@bothner.com>
+	    Dorai Sitaram
+
+	* regex-test.scm: New test-suite, based on the one package with
+	pregexp.  Test both pregexp and regex APIs.
+
 2009-05-22  Felix Klock <felix_klock_ii@mac.com>
 
 	* mac-test.scm: Test literals in syntax-rules and syntaxtic hygiene.

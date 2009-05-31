@@ -8,6 +8,9 @@ import gnu.mapping.Values;
 import gnu.mapping.Procedure;
 import gnu.bytecode.Type;
 import gnu.lists.*;
+/* #ifdef use:java.util.regex */
+import java.util.regex.*;
+/* #endif */
 
 public class ReaderDispatchMisc extends ReadTableEntry
 {
@@ -86,6 +89,10 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	reader.tokenBufferAppend('#');
 	reader.tokenBufferAppend(ch);
 	return LispReader.readNumberWithRadix(2, reader, 0);
+        /* #ifdef use:java.util.regex */
+      case '/':
+        return readRegex(in, ch, count);
+        /* #endif */
       case '|':
 	port = reader.getPort();
 	if (port instanceof InPort)
@@ -168,6 +175,83 @@ public class ReaderDispatchMisc extends ReadTableEntry
       default:
 	in.error("An invalid #-construct was read.");
 	return Values.empty;
+      }
+  }
+
+  public static Pattern readRegex (Lexer in, int ch, int count)
+    throws java.io.IOException, SyntaxException
+  {
+    int startPos = in.tokenBufferLength;
+    LineBufferedReader port = in.getPort();
+    char saveReadState = '\0';
+    int flags = 0;
+    if (port instanceof InPort)
+      {
+	saveReadState = ((InPort) port).readState;
+	((InPort) port).readState = '/';
+      }
+    try
+      {
+	for (;;)
+	  {
+	    int next;
+
+	    int c = port.read();
+            if (c < 0)
+              in.eofError("unexpected EOF in regex literal");
+	    if (c == ch)
+              break;
+            if (c == '\\')
+              {
+                c = port.read();
+                if ((c == ' ' ||  c == '\t' || c == '\r' || c == '\n')
+                    && in instanceof LispReader)
+                  {
+                    c = ((LispReader) in).readEscape(c);
+                    if (c == -2)
+                      continue;
+                  }
+                if (c < 0)
+                  in.eofError("unexpected EOF in regex literal");
+                if (c != ch)
+                  in.tokenBufferAppend('\\');
+              }
+            in.tokenBufferAppend(c);
+          }
+        String pattern = new String(in.tokenBuffer, startPos,
+                                    in.tokenBufferLength - startPos);
+        for (;;)
+          {
+            int c = in.peek();
+            if (c == 'i' || c == 'I')
+              flags |= Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE;
+            else if (c == 's' || c == 'S')
+              flags |= Pattern.DOTALL;
+            else if (c == 'm' || c == 'M')
+              flags |= Pattern.MULTILINE;
+            // Think this through more before adidng this feature:
+            // Perhaps we should use the 'x' handling from
+            // gnu.xquery.util.StringUtils.makePattern (which is
+            // smart enogh to handle space in character classes).
+            // Perhaps we should handle Scheme comments?
+            /*else if (c == 'x' || c == 'X')
+              flags |= Pattern.COMMENTS;
+            */
+            else if (Character.isLetter(c))
+              {
+                in.error("unrecognized regex option '"+((char) c)+'\'');
+              }
+            else
+              break;
+            in.skip();
+          }
+        return Pattern.compile(pattern, flags);
+      }
+    finally
+      {
+	in.tokenBufferLength = startPos;
+	if (port instanceof InPort)
+	  ((InPort) port).readState = saveReadState;
       }
   }
 }

@@ -1,3 +1,10 @@
+2009-05-30  Per Bothner  <per@bothner.com>
+	    Dorai Sitaram
+
+	* pregexp.scm: Get complete version.
+	Also add commented-out version based on java.util.regex.
+	* Makefile.am: Build pregexp.scm.
+
 2009-03-15  Per Bothner  <per@bothner.com>
 
 	* srfi69.scm: Move some code into kawa/lib/kawa/hashtable.scm and

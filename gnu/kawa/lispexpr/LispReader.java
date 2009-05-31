@@ -840,13 +840,15 @@ public class LispReader extends Lexer
       case 'e':  c = 27;  break;  // escape
       case '\"': c = 34;  break;  // quote
       case '\\': c = 92;  break;  // backslash
-      case ' ': // Skip to end of line, inclusive.
+      case ' ':  // Skip to end of line, inclusive.
+      case '\n': // Skip initial whitespace on following line.
+      case '\r':
+      case '\t':
 	for (;;)
 	  {
-	    c = read();
 	    if (c < 0)
 	      {
-		eofError("unexpected EOF in character literal");
+		eofError("unexpected EOF in literal");
 		return -1;
 	      }
 	    if (c == '\n')
@@ -863,6 +865,7 @@ public class LispReader extends Lexer
 		unread(c);
 		break;
 	      }
+	    c = read();
 	  }
         if (c != '\n')
           break; // ERROR
@@ -872,19 +875,15 @@ public class LispReader extends Lexer
             c = read();
             if (c < 0)
               {
-                eofError("unexpected EOF in character literal");
+                eofError("unexpected EOF in literal");
                 return -1;
               }
             if (c != ' ' && c != '\t')
-              break;
+              {
+                unread(c);
+                return -2;
+              }
           }
-        break;
-      case '\r':
-	if (peek() == '\n')
-	  skip();
-	return -2;
-      case '\n':
-	return -2;
       case 'M':
 	c = read();
 	if (c != '-')

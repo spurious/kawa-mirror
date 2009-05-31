@@ -24,6 +24,7 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int LIST_TYPE_CODE = 8;
   private static final int VECTOR_TYPE_CODE = 9;
   private static final int STRING_TYPE_CODE = 10;
+  private static final int REGEX_TYPE_CODE = 11;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -52,6 +53,10 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType vectorType =
     new LangObjType("vector", "gnu.lists.FVector",
                     VECTOR_TYPE_CODE);
+
+  public static final LangObjType regexType =
+    new LangObjType("regex", "java.util.regex.Pattern",
+                    REGEX_TYPE_CODE);
 
   public static final LangObjType stringType =
     new LangObjType("string",
@@ -156,6 +161,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case VECTOR_TYPE_CODE:
+      case REGEX_TYPE_CODE:
         implementationType.emitIsInstance(comp.getCode());
         target.compileFromStack(comp,
                                 comp.getLanguage().getTypeFor(Boolean.TYPE));
@@ -316,6 +322,7 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceIntNum(obj);
       case VECTOR_TYPE_CODE:
       case LIST_TYPE_CODE:
+      case REGEX_TYPE_CODE:
         // optimize?
       default:
         return super.coerceFromObject(obj);
@@ -341,6 +348,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
+      case REGEX_TYPE_CODE:
         code.emitCheckcast(implementationType);
         break;
       default:
@@ -370,6 +378,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return gnu.kawa.functions.MakeList.list;
       case STRING_TYPE_CODE:
         return new PrimProcedure("kawa.lib.strings", "$make$string$"+VARARGS_SUFFIX, 1);
+      case REGEX_TYPE_CODE:
+        return new PrimProcedure("java.util.regex.Pattern", "compile", 1);
       default:
         return null;
       }

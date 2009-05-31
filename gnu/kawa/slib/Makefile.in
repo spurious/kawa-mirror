@@ -185,15 +185,15 @@ EXTRA_GCJ_INPUTS = *.class
 @ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm
 @ENABLE_XML_TRUE@@WITH_SWING_TRUE@SWING_SCM = swing.scm
 
-# NOTE if this list is changed, also update build,xml.
+# NOTE if this list is changed, also update build.xml.
 java_SCM = DefineRecordType.scm readtable.scm \
   srfi1.scm \
   conditions.scm srfi34.scm \
-  srfi37.scm srfi69.scm \
+  srfi37.scm srfi69.scm pregexp.scm \
   genwrite.scm pp.scm ppfile.scm printf.scm \
   cut.scm testing.scm $(XML_SCM) gui.scm $(SWING_SCM)
 
-EXTRA_DIST = $(java_SCM) XML.scm gui.scm
+EXTRA_DIST = $(java_SCM) XML.scm swing.scm
 all: all-am
 
 .SUFFIXES:

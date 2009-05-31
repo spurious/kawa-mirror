@@ -785,6 +785,7 @@ public class Scheme extends LispLanguage
       defAliasStFld("vector", "gnu.kawa.lispexpr.LangObjType", "vectorType");
       defAliasStFld("string", "gnu.kawa.lispexpr.LangObjType", "stringType");
       defAliasStFld("list", "gnu.kawa.lispexpr.LangObjType", "listType");
+      defAliasStFld("regex", "gnu.kawa.lispexpr.LangObjType", "regexType");
       defProcStFld("path?", "kawa.lib.files");
       defProcStFld("filepath?", "kawa.lib.files");
       defProcStFld("URI?", "kawa.lib.files");

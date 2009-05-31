@@ -399,6 +399,7 @@
         <include name="system.scm"/>
         <include name="srfi95.scm"/>
         <include name="kawa/hashtable.scm"/>
+        <include name="kawa/regex.scm"/>
         <include name="rnrs/hashtables.scm"/>
         <include name="rnrs/sorting.scm"/>
       </fileset>
@@ -460,6 +461,7 @@
         <include name="srfi37.scm"/>
         <include name="srfi69.scm"/>
         <include name="testing.scm"/>
+        <include name="pregexp.scm"/>
         <include name="readtable.scm"/>
         <include name="cut.scm"/>
         <include name="gui.scm"/>

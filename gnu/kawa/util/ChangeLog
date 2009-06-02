@@ -1,3 +1,7 @@
+2009-06-01  Per Bothner  <per@bothner.com>
+
+	* AbstractWeakHashTable.java (cleanup): Make protected.
+
 2009-05-17  Per Bothner  <per@bothner.com>
 
 	* WeakIdentityHashMap.java: New class, extends AbstractHashTable.

@@ -117,7 +117,7 @@ public abstract class AbstractWeakHashTable<K,V>
       }
   }
 
-  void cleanup () {
+  protected void cleanup () {
     cleanup(this, rqueue);
   }
 

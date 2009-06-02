@@ -1,7 +1,7 @@
 package gnu.text;
 import java.io.*;
-import java.util.Hashtable;
 import gnu.lists.Consumer;
+import gnu.kawa.util.*;
 
 /**
  * A wrapper for characters.
@@ -35,7 +35,7 @@ public class Char
   {
   }
 
-  private Char (int ch)
+  Char (int ch)
   {
     value = ch;
   }
@@ -73,8 +73,7 @@ public class Char
 
   static Char[] ascii;
 
-  static Char temp = new Char (0);
-  static Hashtable hashTable;
+  static CharMap hashTable = new CharMap();
 
   static
   {
@@ -87,18 +86,9 @@ public class Char
   {
     if (ch < 128)
       return ascii[ch];
-    else
+    synchronized (hashTable)
       {
-	// Re-writing this will allow equals to just use ==.  FIXME.
-	temp.value = ch;
-	if (hashTable == null)
-	  hashTable = new Hashtable ();
-	Object entry = hashTable.get (temp);
-	if (entry != null)
-	  return (Char) entry;
-	Char newChar = new Char (ch);
-	hashTable.put (newChar, newChar);
-	return newChar;
+        return hashTable.get(ch);
       }
   }
 
@@ -274,5 +264,37 @@ public class Char
   public int compareTo(Object o)
   {
     return value - ((Char) o).value;
+  }
+}
+
+/** Helper class for mapping Unicode scalar value to Char object. */
+
+class CharMap extends AbstractWeakHashTable<Char,Char>
+{
+  public Char get (int key)
+  {
+    cleanup();
+    int hash = key;
+    int index = hashToIndex(hash);
+    for (WeakHashNode<Char,Char> node = table[index];
+	 node != null;  node = node.next)
+      {
+        Char val = getEntryValue(node);
+        if (val.intValue() == key)
+          return val;
+      }
+    Char val = new Char(key);
+    super.put(val, val);
+    return val;
+  }
+
+  protected Char getKeyFromValue (Char ch)
+  {
+    return ch;
+  }
+
+  protected boolean matches (Char oldValue, Char newValue)
+  {
+    return oldValue.intValue() == newValue.intValue();
   }
 }

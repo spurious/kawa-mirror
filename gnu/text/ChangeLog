@@ -1,3 +1,11 @@
+2009-06-01  Per Bothner  <per@bothner.com>
+
+	* Char.java (class CharMap): New helper class for mapping Unicode
+	scalar value to Char object.
+	(hashTable): Change to use CharMap.
+	(make): Use CharMap.
+	(temp): No longer needed.
+
 2009-03-07  Per Bothner  <per@bothner.com>
 
 	* Char.java (toScmReadableString): Print hex rather than octal escapes.

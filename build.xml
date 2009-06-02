@@ -402,6 +402,7 @@
         <include name="kawa/regex.scm"/>
         <include name="rnrs/hashtables.scm"/>
         <include name="rnrs/sorting.scm"/>
+        <include name="rnrs/unicode.scm"/>
       </fileset>
 
   <target name="check-lib-scm-classes">

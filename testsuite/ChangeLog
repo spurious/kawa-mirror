@@ -1,3 +1,9 @@
+2009-06-02  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: New test.  Initially mostly tests R6RS examples.
+	* Makefile.ma: Update accordingly.
+	* regex-test.scm: Add one test.
+
 2009-05-31  Per Bothner  <per@bothner.com>
 	    Dorai Sitaram
 

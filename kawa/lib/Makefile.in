@@ -202,7 +202,7 @@ java_SCM_ALWAYS = \
   arrays.scm \
   system.scm \
   kawa/hashtable.scm kawa/regex.scm rnrs/hashtables.scm \
-  srfi95.scm rnrs/sorting.scm \
+  srfi95.scm rnrs/unicode.scm rnrs/sorting.scm \
   trace.scm
 
 scm_WITH_AWT = windows.scm

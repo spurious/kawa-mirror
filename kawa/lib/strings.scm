@@ -29,9 +29,6 @@
 (define (string=? x y) :: <boolean>
   (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
 
-(define (string-ci=? x y) :: <boolean>
-  (invoke (invoke x 'toString) 'equalsIgnoreCase (invoke y 'toString)))
-
 (define (string<? x y) :: <boolean>
   (< (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
 
@@ -43,30 +40,6 @@
 
 (define (string>=? x y) :: <boolean>
   (>= (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
-
-(define (string-ci<? x y) :: <boolean>
-  (< (invoke (invoke (invoke x 'toString) 'toLowerCase)
-	     'compareTo
-	     (invoke (invoke y 'toString) 'toLowerCase))
-     0))
-
-(define (string-ci>? x y) :: <boolean>
-  (> (invoke (invoke (invoke x 'toString) 'toLowerCase)
-	     'compareTo
-	     (invoke (invoke y 'toString) 'toLowerCase))
-     0))
-
-(define (string-ci<=? x y) :: <boolean>
-  (<= (invoke (invoke (invoke x 'toString) 'toLowerCase)
-	      'compareTo
-	      (invoke (invoke y 'toString) 'toLowerCase))
-      0))
-
-(define (string-ci>=? x y) :: <boolean>
-  (>= (invoke (invoke (invoke x 'toString) 'toLowerCase)
-	      'compareTo
-	      (invoke (invoke y 'toString) 'toLowerCase))
-      0))
 
 (define (substring (str <string>) (start <int>) (end <int>))
   :: <string>
@@ -106,16 +79,6 @@
 (define (string-capitalize! (str :: <abstract-string>)) :: <string>
   (invoke-static <gnu.lists.Strings> 'makeCapitalize str)
   str)
-
-(define (string-upcase (str :: <string>)) :: <string> 
-  (let ((copy :: <gnu.lists.FString> (string-copy str)))
-    (invoke-static <gnu.lists.Strings> 'makeUpperCase copy)
-    copy))
-
-(define (string-downcase (str :: <string>)) :: <string> 
-  (let ((copy :: <gnu.lists.FString> (string-copy str)))
-    (invoke-static <gnu.lists.Strings> 'makeLowerCase copy)
-    copy))
 
 (define (string-capitalize (str :: <string>)) :: <string> 
   (let ((copy :: <gnu.lists.FString> (string-copy str)))

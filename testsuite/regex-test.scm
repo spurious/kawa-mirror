@@ -268,11 +268,12 @@
     "a man; a plan; a canal")
   ("a man; a plan; a canal")
   
-  (pregexp-match "(?ix:
+  (#(pregexp-match "(?ix:
     a \\ man  \\; \\   ; ignore
     a \\ plan \\; \\   ; me
     a \\ canal         ; completely
-    )"
+    )")
+   #(regex-match "(?i:a man; a plan; a canal)")
     "A Man; a Plan; a Canal")
   ("A Man; a Plan; a Canal")
   

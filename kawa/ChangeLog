@@ -1,3 +1,8 @@
+2009-06-02  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Update for (rnrs unicode)
+	functions - add new methods, and move old functions to new library.
+
 2009-05-31  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Add "regex" type name.

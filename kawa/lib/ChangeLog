@@ -1,3 +1,10 @@
+2009-06-02  Per Bothner  <per@bothner.com>
+
+	* rnrs/unicode.scm: New module, implements (rnrs unicode) library.
+	* Makefile.am: Update acordingly.
+	* characters.scm: Move some functions rnrs/unicode.scm.
+	* strings.scm: Likewise.
+
 2009-05-30  Per Bothner  <per@bothner.com>
 
 	* kawa/regex.scm: New module.

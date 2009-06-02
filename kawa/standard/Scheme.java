@@ -281,20 +281,24 @@ public class Scheme extends LispLanguage
       defProcStFld("char>?", "kawa.lib.characters");
       defProcStFld("char<=?", "kawa.lib.characters");
       defProcStFld("char>=?", "kawa.lib.characters");
-      defProcStFld("char-ci=?", "kawa.lib.characters");
-      defProcStFld("char-ci<?", "kawa.lib.characters");
-      defProcStFld("char-ci>?", "kawa.lib.characters");
-      defProcStFld("char-ci<=?", "kawa.lib.characters");
-      defProcStFld("char-ci>=?", "kawa.lib.characters");
-      defProcStFld("char-alphabetic?", "kawa.lib.characters");
-      defProcStFld("char-numeric?", "kawa.lib.characters");
-      defProcStFld("char-whitespace?", "kawa.lib.characters");
-      defProcStFld("char-upper-case?", "kawa.lib.characters");
-      defProcStFld("char-lower-case?", "kawa.lib.characters");
+      defProcStFld("char-ci=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-ci<?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-ci>?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-ci<=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-ci>=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-alphabetic?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-numeric?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-whitespace?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-upper-case?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-lower-case?", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-title-case?", "kawa.lib.rnrs.unicode");
       defProcStFld("char->integer", "kawa.lib.characters");
       defProcStFld("integer->char", "kawa.lib.characters");
-      defProcStFld("char-upcase", "kawa.lib.characters");
-      defProcStFld("char-downcase", "kawa.lib.characters");
+      defProcStFld("char-upcase", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-downcase", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-titlecase", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-foldcase", "kawa.lib.rnrs.unicode");
+      defProcStFld("char-general-category", "kawa.lib.rnrs.unicode");
       
       //-- Section 6.7  -- complete
       defProcStFld("string?", "kawa.lib.strings");
@@ -304,16 +308,20 @@ public class Scheme extends LispLanguage
       defProcStFld("string-set!", "kawa.lib.strings");
 
       defProcStFld("string=?", "kawa.lib.strings");
-      defProcStFld("string-ci=?", "kawa.lib.strings");
       defProcStFld("string<?", "kawa.lib.strings");
       defProcStFld("string>?", "kawa.lib.strings");
       defProcStFld("string<=?", "kawa.lib.strings");
       defProcStFld("string>=?", "kawa.lib.strings");
 
-      defProcStFld("string-ci<?", "kawa.lib.strings");
-      defProcStFld("string-ci>?", "kawa.lib.strings");
-      defProcStFld("string-ci<=?", "kawa.lib.strings");
-      defProcStFld("string-ci>=?", "kawa.lib.strings");
+      defProcStFld("string-ci=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-ci<?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-ci>?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-ci<=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-ci>=?", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-normalize-nfd", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-normalize-nfkd", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-normalize-nfc", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-normalize-nfkc", "kawa.lib.rnrs.unicode");
 
       defProcStFld("substring", "kawa.lib.strings");
       defProcStFld("string-append", "kawa.lib.strings");
@@ -472,8 +480,10 @@ public class Scheme extends LispLanguage
       defProcStFld("string-upcase!", "kawa.lib.strings");
       defProcStFld("string-downcase!", "kawa.lib.strings");
       defProcStFld("string-capitalize!", "kawa.lib.strings");
-      defProcStFld("string-upcase", "kawa.lib.strings");
-      defProcStFld("string-downcase", "kawa.lib.strings");
+      defProcStFld("string-upcase", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-downcase", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-titlecase", "kawa.lib.rnrs.unicode");
+      defProcStFld("string-foldcase", "kawa.lib.rnrs.unicode");
       defProcStFld("string-capitalize", "kawa.lib.strings");
       defSntxStFld("primitive-virtual-method",
                    "kawa.standard.prim_method", "virtual_method");

@@ -29,6 +29,7 @@ java_sources=\
   NumberCompare.java \
   SetNamedPart.java \
   Setter.java \
+  UnicodeUtils.java \
   ValuesMap.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 

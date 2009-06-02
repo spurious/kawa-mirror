@@ -26,7 +26,7 @@ check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
 check1:  check-num check-arr check-srfi-64 check-srfi-69 check-format \
-  check-ppfile check-regex scribble.class
+  check-ppfile check-text check-regex scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -50,6 +50,9 @@ check-srfi-64:
 
 check-srfi-69:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-69-test.scm"
+
+check-text:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/text-test.scm"
 
 check-regex:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/regex-test.scm"

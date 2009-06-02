@@ -1,3 +1,8 @@
+2009-06-01  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readCharacter): Fix two bugs so we can
+	read "long" hex character constants, such as #\x10ffff. 
+
 2009-05-30  Per Bothner  <per@bothner.com>
 
 	New support for regex Pattern types and literal syntax.

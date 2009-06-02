@@ -1058,7 +1058,7 @@ public class LispReader extends Lexer
     if (ch >= 0)
       return Char.make(ch);
     ch = tokenBuffer[startPos];
-    if ((ch == 'x' || ch == 'X') && length < 7)
+    if (ch == 'x' || ch == 'X')
       {
         int value = 0;
         for (int i = 1; ;  i++)
@@ -1066,9 +1066,11 @@ public class LispReader extends Lexer
              if (i == length)
 	      return Char.make(value);
              int v = Character.digit (tokenBuffer[startPos + i], 16);
-             if (ch < 0)
+             if (v < 0)
                break;
              value = 16 * value + v;
+             if (value > 0x10FFFF)
+               break;
           }
       }
     ch = Character.digit(ch, 8);

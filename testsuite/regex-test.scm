@@ -16,6 +16,16 @@
 ;   (test-equal expected-result (f2 args2 ... shared-args ...))
 ; It's used to test regex and pregexp versions at once.
 
+;Copyright (c) 1999-2005, Dorai Sitaram.
+;All rights reserved.
+
+;Permission to copy, modify, distribute, and use this work or
+;a modified copy of this work, for any purpose, is hereby
+;granted, provided that the copy includes this copyright
+;notice, and in the case of a modified copy, also includes a
+;notice of modification.  This work is provided as is, with
+;no warranty of any kind.
+
 (define-syntax (test form)
   (syntax-case form ()
     ((test) #!void)

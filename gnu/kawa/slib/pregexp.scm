@@ -1,9 +1,19 @@
 ;; Note at the end of this file is an alternative implementation
 ;; that makes use of java.util.regex.*.
-;; However, use the latter's regex syntax, which isn't
+;; However, the latter uses java.util.regex syntax, which isn't
 ;; quite compatible with pregexp.
 ;; Ideally, we'd take the pregexp pattern parser, and have
 ;; it translate to java.util.regex.Pattern syntax.
+
+;Copyright (c) 1999-2005, Dorai Sitaram.
+;All rights reserved.
+
+;Permission to copy, modify, distribute, and use this work or
+;a modified copy of this work, for any purpose, is hereby
+;granted, provided that the copy includes this copyright
+;notice, and in the case of a modified copy, also includes a
+;notice of modification.  This work is provided as is, with
+;no warranty of any kind.
 
 ;pregexp.scm
 ;Portable regular expressions for Scheme

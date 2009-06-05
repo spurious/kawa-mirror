@@ -1,3 +1,7 @@
+2009-06-02  Per Bothner  <per@bothner.com>
+
+	* build.xml (lib-scm): Add unicode.scm.
+
 2009-05-31  Per Bothner  <per@bothner.com>
 
 	* build.scm: Update to also compile regex.scm and pregexp.scm.

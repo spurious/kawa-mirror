@@ -1,3 +1,12 @@
+2009-06-05  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Characters and text): New node.
+	Incorporate text from R6RS about characters, strings, and Unicode.
+	Document regular expressions.  Some text and examples derived from
+	Dorai Sitaram's pregexp.
+	(String): Old node updated and moved under Characters and text.
+	* kawa.texi (manual-license): Various updates and additions.
+
 2009-05-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Minor tweaks.

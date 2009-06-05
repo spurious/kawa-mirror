@@ -1,6 +1,7 @@
 \input texinfo.tex      @c -*-texinfo-*-
 @c %**start of header
 @setfilename kawa.info
+@documentencoding UTF-8
 @settitle The Kawa language framework
 @setchapternewpage off
 @syncodeindex fn cp
@@ -8,6 +9,34 @@
 @syncodeindex pg cp
 @c version: %W% %G%
 @c %**end of header
+
+@macro false{}
+@code{#f}
+@end macro
+
+@macro true{}
+@code{#t}
+@end macro
+
+@macro func{NAME}
+@code{@sc{\NAME\}}
+@end macro
+
+@macro vari{THING}
+@var{\THING\1}
+@end macro
+
+@macro varii{THING}
+@var{\THING\2}
+@end macro
+
+@macro variii{THING}
+@var{\THING\3}
+@end macro
+
+@macro variv{THING}
+@var{\THING\4}
+@end macro
 
 @include version.texi
 
@@ -1226,6 +1255,7 @@ information about standard Scheme here as well.
 * Symbols and namespaces::
 * Procedures::
 * Numbers::              Quantities and Numbers
+* Characters and text::
 * Data structures::
 * Exceptions::           Exception handling
 * Eval and Environments::
@@ -2016,7 +2046,7 @@ evaluate it during every invocation of the resulting procedure.
 
 @end deffn
 
-@node Numbers, Data structures, Procedures, Extensions
+@node Numbers, Characters and text, Procedures, Extensions
 @section Quantities and Numbers
 
 Kawa supports the full Scheme set of number operations with some extensions.
@@ -2369,18 +2399,804 @@ Alias for @code{arithmetic-shift}.
 Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
 @end defun
 
-@node Data structures, Exceptions, Numbers, Extensions
+@node Characters and text, Data structures, Numbers, Extensions
+@section Characters and text
+
+@menu
+* Characters::
+* Strings::
+* Unicode::              Unicode character classes and conversions
+* Regular expressions::
+@end menu
+
+@node Characters, Strings, , Characters and text
+@subsection Characters
+
+@emph{Characters} are objects that represent Unicode scalar values.
+
+@quotation
+@emph{Note:}
+Unicode defines a standard mapping between sequences of
+@dfn{Unicode scalar values}  (integers in the range @code{0} to @code{#x10FFFF},
+excluding the range @code{#xD800} to @code{#xDFFF}) in the latest
+version of the standard and human--readable ``characters''.
+More precisely, Unicode distinguishes
+between glyphs, which are printed for humans to read, and characters,
+which are abstract entities that map to glyphs (sometimes in a way
+that’s sensitive to surrounding characters). Furthermore, different
+sequences of scalar values sometimes correspond to the same
+character. The relationships among scalar, characters, and glyphs are
+subtle and complex.
+
+Despite this complexity, most things that a literate human would call
+a ``character'' can be represented by a single Unicode scalar value
+(although several sequences of Unicode scalar values may represent
+that same character). For example, Roman letters, Cyrillic letters,
+Hebrew consonants, and most Chinese characters fall into this
+category.
+
+Unicode scalar values exclude the range @code{#xD800} to @code{#xDFFF},
+which are part of the range of Unicode @dfn{code points}.
+However, the Unicode code points in this range, the so-called
+@dfn{surrogates}, are an artifact of the UTF-16 encoding, and can only
+appear in specific Unicode encodings, and even then only in pairs that
+encode scalar values.  Consequently, all characters represent code
+points, but the surrogate code points do not have representations as
+characters.
+@end quotation
+
+@deffn Procedure {char?} @var{obj}
+Return @true{} if @var{obj} is a character, @false{} otherwise.
+@end deffn
+
+@deffn Procedure {char->integer} @var{char}
+@deffnx Procedure {integer->char} @var{sv}
+@var{sv} must be a Unicode scalar value, i.e., a non--negative exact
+integer object in @code{[0, #xD7FF] union [#xE000, #x10FFFF]}.
+
+Given a character, @func{char->integer} returns its Unicode scalar value
+as an exact integer object.  For a Unicode scalar value @var{sv},
+@func{integer->char} returns its associated character.
+
+@example
+(integer->char 32)                     @result{} #\space
+(char->integer (integer->char 5000))   @result{} 5000
+(integer->char #\xD800)                @result{} throws ClassCastException
+@end example
+@end deffn
+
+
+@deffn Procedure {char=?} @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure {char<?} @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure {char>?} @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure {char<=?} @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure {char>=?} @vari{char} @varii{char} @variii{char} @dots{}
+These procedures impose a total ordering on the set of characters
+according to their Unicode scalar values.
+
+@example
+(char<? #\z #\ß)      @result{} #t
+(char<? #\z #\Z)      @result{} #f
+@end example
+@end deffn
+
+@node Strings, Unicode, Characters, Characters and text
+@subsection Strings
+
+Strings are sequences of characters.  The @emph{length} of a string is
+the number of characters that it contains.  This number is fixed when
+the string is created.  The @emph{valid indices} of a string are the
+integers less than the length of the string.  The first character of a
+string has index 0, the second has index 1, and so on.
+
+@quotation
+@emph{Kawa note:}
+Kawa's implementation of strings that contain
+surrugate characters does not quite follow the R6RS specification.
+Specifically indexing into such a string retrieves a surrogate
+rather than a Unicode scalar value.
+It is not clear what the best solution is - there is a tradeoff
+between performance, compatibility with R6RS, and
+interoperability with Java APIs.
+@end quotation
+
+@deffn Procedure {string?} @var{obj}
+Return @true{} if @var{obj} is a string, @false{} otherwise.
+@end deffn
+
+
+@deffn Procedure make-string @var{k}
+@deffnx Procedure make-string @var{k} @var{char}
+Return a newly allocated string of length @var{k}.  If @var{char} is
+given, then all elements of the string are initialized to @var{char},
+otherwise the contents of the @var{string} are unspecified.
+@end deffn
+
+
+@deffn Procedure string @var{char} @dots{}
+Return a newly allocated string composed of the arguments.
+@end deffn
+
+
+@deffn Procedure string-length @var{string}
+Return the number of characters in the given @var{string} as an exact
+integer object.
+@end deffn
+
+
+@deffn Procedure string-ref @var{string} @var{k}
+@var{k} must be a valid index of @var{string}.  The @func{string-ref}
+procedure returns character @var{k} of @var{string} using zero--origin
+indexing.
+
+@c @quotation
+@c @emph{Note:} Implementors should make @func{string-ref} run in constant
+time.
+@c @end quotation
+@end deffn
+
+
+@deffn Procedure {string=?} @vari{string} @varii{string} @variii{string} @dots{}
+Return @true{} if the strings are the same length and contain the same
+characters in the same positions.  Otherwise, the @func{string=?}
+procedure returns @false{}.
+
+@example
+(string=? "Straße" "Strasse")    @result{} #f
+@end example
+@end deffn
+
+
+@deffn Procedure {string<?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string>?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string<=?} @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure {string>=?} @vari{string} @varii{string} @variii{string} @dots{}
+These procedures are the lexicographic extensions to strings of the
+corresponding orderings on characters.  For example, @func{string<?} is
+the lexicographic ordering on strings induced by the ordering
+@func{char<?} on characters.  If two strings differ in length but are
+the same up to the length of the shorter string, the shorter string is
+considered to be lexicographically less than the longer string.
+
+@example
+(string<? "z" "ß")      @result{} #t
+(string<? "z" "zz")     @result{} #t
+(string<? "z" "Z")      @result{} #f
+@end example
+@end deffn
+
+
+@deffn Procedure substring @var{string} @var{start} @var{end}
+@var{string} must be a string, and @var{start} and @var{end} must be
+exact integer objects satisfying:
+
+@example
+0 <= @var{start} <= @var{end} <= (string-length @var{string})
+@end example
+
+The @func{substring} procedure returns a newly allocated string formed
+from the characters of @var{string} beginning with index @var{start}
+(inclusive) and ending with index @var{end} (exclusive).
+@end deffn
+
+
+@deffn Procedure string-append @var{string} @dots{}
+Return a newly allocated string whose characters form the concatenation
+of the given strings.
+@end deffn
+
+@deffn Procedure string->list @var{string}
+@deffnx Procedure list->string @var{list}
+@var{list} must be a list of characters.
+
+The @func{string->list} procedure returns a newly allocated list of the
+characters that make up the given string.
+
+The @func{list->string} procedure returns a newly allocated string
+formed from the characters in @var{list}.
+
+The @func{string->list} and @func{list->string} procedures are inverses
+so far as @func{equal?} is concerned.
+@end deffn
+
+@ignore
+@deffn Procedure string-for-each @var{proc} @vari{string} @varii{string} @dots{}
+The @var{string}s must all have the same length.  @var{proc} should
+accept as many arguments as there are @var{string}s.
+
+The @func{string-for-each} procedure applies @var{proc} element--wise to
+the characters of the @var{string}s for its side effects, in order from
+the first characters to the last.  @var{proc} is always called in the
+same dynamic environment as @func{string-for-each} itself.  The return
+values of @func{string-for-each} are unspecified.
+
+Analogous to @func{for-each}.
+@end deffn
+@end ignore
+
+
+@deffn Procedure string-copy @var{string}
+Returns a newly allocated copy of the given @var{string}.
+@end deffn
+
+@node Unicode, Regular expressions, Strings, Characters and text
+@subsection Unicode character classes and conversions
+
+@ignore
+The procedures exported by the @rsixlibrary{unicode} library provide
+access to some aspects of the Unicode semantics for characters and
+strings: category information, case--independent comparisons, case
+mappings, and normalization.
+@end ignore
+
+Some of the procedures that operate on characters or strings ignore the
+difference between upper case and lower case.  These procedures have
+@code{-ci} (for ``case insensitive'') embedded in their names.
+
+@subsubsection Characters
+
+@deffn Procedure char-upcase @var{char}
+@deffnx Procedure char-downcase @var{char}
+@deffnx Procedure char-titlecase @var{char}
+@deffnx Procedure char-foldcase @var{char}
+These procedures take a character argument and return a character
+result.
+
+If the argument is an upper--case or title--case character, and if there
+is a single character that is its lower--case form, then
+@func{char-downcase} returns that character.
+
+If the argument is a lower--case or title--case character, and there is
+a single character that is its upper--case form, then @func{char-upcase}
+returns that character.
+
+If the argument is a lower--case or upper--case character, and there is
+a single character that is its title--case form, then
+@func{char-titlecase} returns that character.
+
+If the argument is not a title--case character and there is no single
+character that is its title--case form, then @func{char-titlecase}
+returns the upper--case form of the argument.
+
+Finally, if the character has a case--folded character, then
+@func{char-foldcase} returns that character.  Otherwise the character
+returned is the same as the argument.
+
+For Turkic characters @code{#\x130} and @code{#\x131},
+@func{char-foldcase} behaves as the identity function; otherwise
+@func{char-foldcase} is the same as @func{char-downcase} composed with
+@func{char-upcase}.
+
+@example
+(char-upcase #\i)               @result{}  #\I
+(char-downcase #\i)             @result{}  #\i
+(char-titlecase #\i)            @result{}  #\I
+(char-foldcase #\i)             @result{}  #\i
+
+(char-upcase #\ß)               @result{}  #\ß
+(char-downcase #\ß)             @result{}  #\ß
+(char-titlecase #\ß)            @result{}  #\ß
+(char-foldcase #\ß)             @result{}  #\ß
+
+(char-upcase #\Σ)               @result{}  #\Σ
+(char-downcase #\Σ)             @result{}  #\σ
+(char-titlecase #\Σ)            @result{}  #\Σ
+(char-foldcase #\Σ)             @result{}  #\σ
+
+(char-upcase #\ς)               @result{}  #\Σ
+(char-downcase #\ς)             @result{}  #\ς
+(char-titlecase #\ς)            @result{}  #\Σ
+(char-foldcase #\ς)             @result{}  #\σ
+@end example
+
+@quotation
+@emph{Note:} @func{char-titlecase} does not always return a title--case
+character.
+@end quotation
+
+@quotation
+@emph{Note:} These procedures are consistent with Unicode's
+locale--independent mappings from scalar values to scalar values for
+upcase, downcase, titlecase, and case--folding operations.  These
+mappings can be extracted from @file{UnicodeData.txt} and
+@file{CaseFolding.txt} from the Unicode Consortium, ignoring Turkic
+mappings in the latter.
+
+Note that these character--based procedures are an incomplete
+approximation to case conversion, even ignoring the user's locale.  In
+general, case mappings require the context of a string, both in
+arguments and in result.  The @func{string-upcase},
+@func{string-downcase}, @func{string-titlecase}, and
+@func{string-foldcase} procedures perform more general case conversion.
+@end quotation
+@end deffn
+
+@deffn Procedure char-ci=? @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure char-ci<? @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure char-ci>? @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure char-ci<=? @vari{char} @varii{char} @variii{char} @dots{}
+@deffnx Procedure char-ci>=? @vari{char} @varii{char} @variii{char} @dots{}
+These procedures are similar to @func{char=?}, etc., but operate on the
+case--folded versions of the characters.
+
+@example
+(char-ci<? #\z #\Z)             @result{} #f
+(char-ci=? #\z #\Z)             @result{} #f
+(char-ci=? #\ς #\σ)             @result{} #t
+@end example
+@end deffn
+
+
+@deffn Procedure char-alphabetic? @var{char}
+@deffnx Procedure char-numeric? @var{char}
+@deffnx Procedure char-whitespace? @var{char}
+@deffnx Procedure char-upper-case? @var{char}
+@deffnx Procedure char-lower-case? @var{char}
+@deffnx Procedure char-title-case? @var{char}
+These procedures return @true{} if their arguments are alphabetic,
+numeric, whitespace, upper--case, lower--case, or title--case
+characters, respectively; otherwise they return @false{}.
+
+A character is alphabetic if it has the Unicode ``Alphabetic'' property.
+A character is numeric if it has the Unicode ``Numeric'' property.  A
+character is whitespace if has the Unicode ``White_Space'' property.  A
+character is upper case if it has the Unicode ``Uppercase'' property,
+lower case if it has the ``Lowercase'' property, and title case if it is
+in the Lt general category.
+
+@example
+(char-alphabetic? #\a)          @result{}  #t
+(char-numeric? #\1)             @result{}  #t
+(char-whitespace? #\space)      @result{}  #t
+(char-whitespace? #\x00A0)      @result{}  #t
+(char-upper-case? #\Σ)          @result{}  #t
+(char-lower-case? #\σ)          @result{}  #t
+(char-lower-case? #\x00AA)      @result{}  #t
+(char-title-case? #\I)          @result{}  #f
+(char-title-case? #\x01C5)      @result{}  #t
+@end example
+@end deffn
+
+@deffn Procedure char-general-category @var{char}
+Return a symbol representing the Unicode general category of
+@var{char}, one of @code{Lu}, @code{Ll}, @code{Lt}, @code{Lm},
+@code{Lo}, @code{Mn}, @code{Mc}, @code{Me}, @code{Nd}, @code{Nl},
+@code{No}, @code{Ps}, @code{Pe}, @code{Pi}, @code{Pf}, @code{Pd},
+@code{Pc}, @code{Po}, @code{Sc}, @code{Sm}, @code{Sk}, @code{So},
+@code{Zs}, @code{Zp}, @code{Zl}, @code{Cc}, @code{Cf}, @code{Cs},
+@code{Co}, or @code{Cn}.
+
+@example
+(char-general-category #\a)         @result{} Ll
+(char-general-category #\space)     @result{} Zs
+(char-general-category #\x10FFFF)   @result{} Cn  
+@end example
+@end deffn
+
+
+@subsubsection Strings
+
+@deffn Procedure string-upcase @var{string}
+@deffnx Procedure string-downcase @var{string}
+@deffnx Procedure string-titlecase @var{string}
+@deffnx Procedure string-foldcase @var{string}
+These procedures take a string argument and return a string result.
+They are defined in terms of Unicode's locale--independent case mappings
+from Unicode scalar--value sequences to scalar--value sequences.  In
+particular, the length of the result string can be different from the
+length of the input string.  When the specified result is equal in the
+sense of @func{string=?} to the argument, these procedures may return
+the argument instead of a newly allocated string.
+
+The @func{string-upcase} procedure converts a string to upper case;
+@func{string-downcase} converts a string to lower case.  The
+@func{string-foldcase} procedure converts the string to its case--folded
+counterpart, using the full case--folding mapping, but without the
+special mappings for Turkic languages.  The @func{string-titlecase}
+procedure converts the first cased character of each word, and downcases
+all other cased characters.
+
+@example
+(string-upcase "Hi")              @result{} "HI"
+(string-downcase "Hi")            @result{} "hi"
+(string-foldcase "Hi")            @result{} "hi"
+
+(string-upcase "Straße")          @result{} "STRASSE"
+(string-downcase "Straße")        @result{} "straße"
+(string-foldcase "Straße")        @result{} "strasse"
+(string-downcase "STRASSE")       @result{} "strasse"
+
+(string-downcase "Σ")             @result{} "σ"
+; Chi Alpha Omicron Sigma:
+(string-upcase "ΧΑΟΣ")            @result{} "ΧΑΟΣ"
+(string-downcase "ΧΑΟΣ")          @result{} "χαος"
+(string-downcase "ΧΑΟΣΣ")         @result{} "χαοσς"
+(string-downcase "ΧΑΟΣ Σ")        @result{} "χαος σ"
+(string-foldcase "ΧΑΟΣΣ")         @result{} "χαοσσ"
+(string-upcase "χαος")            @result{} "ΧΑΟΣ"
+(string-upcase "χαοσ")            @result{} "ΧΑΟΣ"
+
+(string-titlecase "kNock KNoCK")  @result{} "Knock Knock"
+(string-titlecase "who's there?") @result{} "Who's There?"
+(string-titlecase "r6rs")         @result{} "R6rs"
+(string-titlecase "R6RS")         @result{} "R6rs"
+@end example
+
+@quotation
+@emph{Note:} The case mappings needed for implementing these procedures
+can be extracted from @file{UnicodeData.txt}, @file{SpecialCasing.txt},
+@file{WordBreakProperty.txt} (the ``MidLetter'' property partly defines
+case--ignorable characters), and @file{CaseFolding.txt} from the Unicode
+Consortium.
+
+Since these procedures are locale--independent, they may not be
+appropriate for some locales.
+@end quotation
+
+@quotation
+@emph{Note:} Word breaking, as needed for the correct casing of the
+upper case greek sigma and for @func{string-titlecase}, is specified in
+Unicode Standard Annex #29.
+@end quotation
+
+@quotation
+@emph{Kawa Note:}  The implementation of @func{string-titlecase}
+does not correctly handle the case where an initial character
+needs to be converted to multiple characters, such as
+``LATIN SMALL LIGATURE FL'' which should be converted to
+the two letters @code{"Fl"}.
+@end quotation
+@end deffn
+
+@deffn Procedure string-ci=? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci<? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci>? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci<=? @vari{string} @varii{string} @variii{string} @dots{}
+@deffnx Procedure string-ci>=? @vari{string} @varii{string} @variii{string} @dots{}
+These procedures are similar to @func{string=?}, etc., but operate on
+the case--folded versions of the strings.
+
+@example
+(string-ci<? "z" "Z")                   @result{} #f
+(string-ci=? "z" "Z")                   @result{} #t
+(string-ci=? "Straße" "Strasse")        @result{} #t
+(string-ci=? "Straße" "STRASSE")        @result{} #t
+(string-ci=? "ΧΑΟΣ" "χαοσ")             @result{} #t
+@end example
+@end deffn
+
+@deffn Procedure string-normalize-nfd @var{string}
+@deffnx Procedure string-normalize-nfkd @var{string}
+@deffnx Procedure string-normalize-nfc @var{string}
+@deffnx Procedure string-normalize-nfkc @var{string}
+These procedures take a string argument and return a string result,
+which is the input string normalized to Unicode normalization form D,
+KD, C, or KC, respectively.  When the specified result is equal in the
+sense of @func{string=?} to the argument, these procedures may return
+the argument instead of a newly allocated string.
+
+@example
+(string-normalize-nfd "\xE9;")          @result{} "\x65;\x301;"
+(string-normalize-nfc "\xE9;")          @result{} "\xE9;"
+(string-normalize-nfd "\x65;\x301;")    @result{} "\x65;\x301;"
+(string-normalize-nfc "\x65;\x301;")    @result{} "\xE9;"
+@end example
+@end deffn
+
+@subsubsection Deprecated in-place case modification
+
+The following functions are deprecated; they really don't
+and cannot do the right thing, because in some languages
+upper and lower case can use different number of characters.
+
+@defun string-upcase! str
+@emph{Deprecated:} Destructively modify @var{str}, replacing the letters
+by their upper-case equivalents.
+@end defun
+
+@defun string-downcase! str
+@emph{Deprecated:} Destructively modify @var{str}, replacing the letters
+by their upper-lower equivalents.
+@end defun
+
+@defun string-capitalize! str
+@emph{Deprecated:} Destructively modify @var{str}, such that the letters that start a new word
+are replaced by their title-case equivalents, while non-initial letters
+are replaced by their lower-case equivalents.
+@end defun
+
+@node Regular expressions, , Unicode, Characters and text
+@subsection Regular expressions
+
+Kawa provides @dfn{regular expressions}, which is a convenient
+mechanism for matching a string against a @dfn{pattern}
+and maybe replacing matching parts.
+
+A regexp is a string that describes a pattern. A regexp matcher tries
+to match this pattern against (a portion of) another string, which we
+will call the text string. The text string is treated as raw text and
+not as a pattern.
+
+Most of the characters in a regexp pattern are meant to match
+occurrences of themselves in the text string. Thus, the pattern ``@code{abc}''
+matches a string that contains the characters ``@code{a}'', ``@code{b}'',
+``@code{c}'' in succession.
+
+In the regexp pattern, some characters act as @dfn{metacharacters},
+and some character sequences act as @dfn{metasequences}. That is, they
+specify something other than their literal selves. For example, in the
+pattern ``@code{a.c}'', the characters ``@code{a}'' and ``@code{c}'' do stand
+for themselves but the metacharacter ``@code{.}'' can match any character
+(other than newline). Therefore, the pattern ``@code{a.c}'' matches an
+``@code{a}'', followed by any character, followed by a ``@code{c}''.
+
+If we needed to match the character ``@code{.}'' itself, we @dfn{escape}
+it, ie, precede it with a backslash ``@code{\}''. The character sequence
+``@code{\.}'' is thus a metasequence, since it doesn’t match itself but
+rather just ``@code{.}''.  So, to match ``@code{a}'' followed by a literal
+``@code{.}'' followed by ``@code{c}'' we use the regexp pattern
+``@code{a\.c}''.  To write this as a Scheme string literal,
+you need to quote the backslash, so you need to write @code{"a\\.c"}.
+Kawa also allows the literal syntax @code{#/a\.c/},
+which avoids the need to double the backslashes.
+
+You can choose between two similar styles of regular expressions.
+The two differ slightly in terms of which characters act as metacharacters,
+and what those metacharacters mean:
+@itemize
+@item
+Functions starting with @code{regex-} are implemented using
+the @code{java.util.regex} package.
+This is likely to be more efficient, has better Unicode support and
+some other minor extra features, and literal syntax @code{#/a\.c/}
+mentioned above.
+@item
+Functions starting with @code{pregexp-} are implemented in pure Scheme
+using Dorai Sitaram's ``Portable Regular Expressions for Scheme'' library.
+These will be portable to more Scheme implementations, including BRL,
+and is available on older Java versions.
+@end itemize
+
+
+@subsubsection Java regular expressions
+
+The syntax for regular expressions is
+@uref{http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html, documented here}.
+
+@deffn Type regex
+A compiled regular expression,
+implemented as @code{java.util.regex.Pattern}.
+@end deffn
+
+@deffn Constructor regex arg
+Given a regular expression pattern (as a string),
+compiles it to a @code{regex} object.
+
+@example
+(regex "a\\.c")
+@end example
+This compiles into a pattern that matches an
+``@code{a}'', followed by any character, followed by a ``@code{c}''.
+@end deffn
+
+The Scheme reader recognizes ``@code{#/}'' as the start of a
+regular expression @dfn{pattern literal}, which ends with the next
+un-escaped ``@code{/}''.
+This has the big advantage that you don't need to double the backslashes:
+@example
+#/a\.c/
+@end example
+This is equivalent to @code{(regex "a\\.c")}, except it is
+compiled at read-time.
+If you need a literal ``@code{/}'' in a pattern, just escape it
+with a backslash: ``@code{#/a\/c/}'' matches a ``@code{a}'',
+followed by a ``@code{/}'', followed by a ``@code{c}''.
+
+You can add single-letter @emph{modifiers} following the pattern literal.
+The following modifiers are allowed:
+@table @code
+@item i
+The modifier ``@code{i}'' cause the matching to ignore case.
+For example the following pattern matches ``@code{a}'' or ``@code{A}''.
+@example
+#/a/i
+@end example
+@item m
+Enables ``metaline'' mode.
+Normally metacharacters ``@code{^}'' and ``@code{$}'
+match at the start end end of the entire input string.
+In metaline mode ``@code{^}'' and ``@code{$}'' also
+match just before or after a line terminator.
+
+Multiline mode can also be enabled by the metasequence ``@code{(?m)}''. 
+@item s
+Enable ``singleline'' (aka ``dot-all'') mode.
+In this mode the matacharacter ``@code{.} matches any character,
+including a line breaks.
+This mode be enabled by the metasequence ``@code{(?s)}''.
+@end table
+
+The following functions accept a regex either as
+a pattern string or a compiled @code{regex} pattern.
+I.e. the following are all equivalent:
+@example
+(regex-match "b\\.c" "ab.cd")
+(regex-match #/b\.c/ "ab.cd")
+(regex-match (regex "b\\.c") "ab.cd")
+(regex-match (java.util.regex.Pattern:compile "b\\.c") "ab.cd")
+@end example
+These all evaluate to the list @code{("b.c")}.
+
+The following functions must be imported by doing one of:
+@example
+(require 'regex) ;; or
+(import (kawa regex))
+@end example
+
+@defun regex-match-positions regex string [start [end]]
+
+The procedure @code{regex‑match‑position} takes pattern and a
+text @var{string}, and returns a match if the regex matches (some part of)
+the text string.
+
+Returns @code{#f} if the regexp did not match the string;
+and a list of index pairs if it did match.
+@example
+(regex-match-positions "brain" "bird") @result{} #f
+(regex-match-positions "needle" "hay needle stack")
+  @result{} ((4 . 10))
+@end example
+
+In the second example, the integers 4 and 10 identify the substring
+that was matched. 4 is the starting (inclusive) index and 10 the
+ending (exclusive) index of the matching substring.
+
+@example
+(substring "hay needle stack" 4 10) @result{} "needle"
+@end example
+
+In this case the return list contains only one index
+pair, and that pair represents the entire substring matched by the
+regexp. When we discuss subpatterns later, we will see how a single
+match operation can yield a list of submatches.
+
+@code{regex‑match‑positions} takes optional third and fourth arguments
+that specify the indices of the text string within which the matching
+should take place.
+
+@example
+(regex-match-positions "needle"
+  "his hay needle stack -- my hay needle stack -- her hay needle stack"
+  24 43)
+  @result{} ((31 . 37))
+@end example
+
+Note that the returned indices are still reckoned relative to the full text string.
+@end defun
+
+@defun regex-match regex string [start [end]]
+The procedure @code{regex‑match} is called like @code{regex‑match‑positions}
+but instead of returning index pairs it returns the matching substrings:
+@example
+(regex-match "brain" "bird") @result{} #f
+(regex-match "needle" "hay needle stack")
+  @result{} ("needle")
+@end example
+
+@code{regex‑match} also takes optional third and fourth arguments,
+with the same meaning as does @code{regex‑match‑positions}.
+@end defun
+
+@defun regex-split regex string
+Takes two arguments, a @var{regex} pattern and a text @var{string},
+and returns a list of substrings of the text string,
+where the pattern identifies the delimiter separating the substrings.
+@example
+(regex-split ":" "/bin:/usr/bin:/usr/bin/X11:/usr/local/bin")
+  @result{} ("/bin" "/usr/bin" "/usr/bin/X11" "/usr/local/bin")
+
+(regex-split " " "pea soup")
+  @result{} ("pea" "soup")
+@end example
+
+If the first argument can match an empty string, then the list of all
+the single-character substrings is returned, plus we get
+a empty strings at each end.
+
+@example
+(regex-split "" "smithereens")
+@result{} => ("" "s" "m" "i" "t" "h" "e" "r" "e" "e" "n" "s" "")
+@end example
+
+(Note: This behavior is different from @code{pregexp-split}.)
+
+To identify one-or-more spaces as the delimiter, take care to use the regexp
+``@code{ +}'', not ``@code{ *}''.
+@example
+(regex-split " +" "split pea     soup")
+  @result{} ("split" "pea" "soup")
+(regex-split " *" "split pea     soup")
+  @result{} ("" "s" "p" "l" "i" "t" "" "p" "e" "a" "" "s" "o" "u" "p" "")
+@end example
+@end defun
+
+@defun regex‑replace regex string replacement
+Replaces the matched portion of the text @var{string} by another a
+@var{replacdement} string.
+@example
+(regex-replace "te" "liberte" "ty")
+  @result{} "liberty"
+@end example
+
+Submatches can be used in the replacement string argument.
+The replacement string can use ``@code{$@var{n}}''
+as a @dfn{backreference} to refer back to the @var{n}th
+submatch, ie, the substring that matched the @var{n}th
+subpattern.   ``@code{$0}'' refers to the entire match.
+@example
+(regex-replace #/_(.+?)_/
+               "the _nina_, the _pinta_, and the _santa maria_"
+		"*$1*"))
+  @result{} "the *nina*, the _pinta_, and the _santa maria_"
+@end example
+@end defun
+
+@defun regex‑replace* regex string replacement
+Replaces all matches in the text @var{string} by the @var{replacement} string:
+@example
+(regex-replace* "te" "liberte egalite fraternite" "ty")
+  @result{} "liberty egality fratyrnity"
+(regex-replace* #/_(.+?)_/
+                "the _nina_, the _pinta_, and the _santa maria_"
+                "*$1*")
+  @result{} "the *nina*, the *pinta*, and the *santa maria*"
+@end example
+@end defun
+
+@defun regex-quote pattern
+Takes an arbitrary string and returns a pattern string that precisely
+matches it. In particular, characters in the input string that could
+serve as regex metacharacters are escaped as needed.
+
+@example
+(regex-quote "cons")
+  @result{} "\Qcons\E"
+@end example
+@code{regex‑quote} is useful when building a composite regex
+from a mix of regex strings and verbatim strings.
+@end defun
+
+@subsubsection Portable Scheme regular expressions
+
+This provides the procedures @code{pregexp}, @code{pregexp‑match‑positions},
+@code{pregexp‑match}, @code{pregexp‑split}, @code{pregexp‑replace},
+@code{pregexp‑replace*}, and @code{pregexp‑quote}.
+
+Before using them, you must require them:
+@example
+(require 'pregexp)
+@end example
+
+These procedures have the same interface as the corresponding
+@code{regex-} versions, but take slightly different pattern syntax.
+The replace commands use ``@code{\}'' instead of ``@code{$}''
+to indicate substitutions.
+Also, @code{pregexp‑split} behaves differently from
+@code{regex‑split} if the pattern can match an empty string.
+
+See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
+
+@node Data structures, Exceptions, Characters and text, Extensions
 @section Data structures
 
 @menu
 * Lists::
-* Strings::
 * Arrays::  Multi-dimensional Arrays
 * Uniform vectors::
 * Hash tables::
 @end menu
 
-@node Lists, Strings, , Data structures
+@node Lists, Arrays, , Data structures
 @subsection Lists
 
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
@@ -2398,42 +3214,7 @@ with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
 was pair, it becomes the last pair of the reversed result.
 @end defun
 
-@node Strings, Arrays, Lists, Data structures
-@subsection Strings
-
-@defun string-upcase str
-Return a new string where the letters in @var{str} are replaced
-by their upper-case equivalents.
-@end defun
-
-@defun string-downcase str
-Return a new string where the letters in @var{str} are replaced
-by their lower-case equivalents.
-@end defun
-
-@defun string-capitalize str
-Return a new string where the letters in @var{str} that start a new word
-are replaced by their title-case equivalents, while non-initial letters
-are replaced by their lower-case equivalents.
-@end defun
-
-@defun string-upcase! str
-Destructively modify @var{str}, replacing the letters
-by their upper-case equivalents.
-@end defun
-
-@defun string-downcase! str
-Destructively modify @var{str}, replacing the letters
-by their upper-lower equivalents.
-@end defun
-
-@defun string-capitalize! str
-Destructively modify @var{str}, such that the letters that start a new word
-are replaced by their title-case equivalents, while non-initial letters
-are replaced by their lower-case equivalents.
-@end defun
-
-@node Arrays, Uniform vectors, Strings, Data structures
+@node Arrays, Uniform vectors, Lists, Data structures
 @subsection Multi-dimensional Arrays
 
 Arrays are heterogeneous data structures whose elements are indexed by
@@ -7412,12 +8193,6 @@ Here is the copyright license for this manual:
 
 Copyright @copyright{} 1996, 1997, 1998, 1999, 2005 Per Bothner
 
-Parts of this manual were derived from the SLIB manual,
-copyright @copyright{} 1993-1998 Todd R. Eigenschink and Aubrey Jaffer.
-
-Parts of this manual were derived from ISO/EIC 10179:1996(E)
-(Document Style and Specifical Language) - unknown copyright.
-
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
 are preserved on all copies.
@@ -7431,6 +8206,22 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation approved
 by the author.
+
+Parts of this manual is copied from the @uref{http://www.r6rs.org/,R6RS}
+specifications, which states:
+@quotation
+We intend this report to belong to the entire Scheme community, and so
+we grant permission to copy it in whole or in part without fee. In
+particular, we encourage implementors of Scheme to use this report as
+a starting point for manuals and other documentation, modifying it as
+necessary.
+@end quotation
+
+Parts of this manual were derived from the SLIB manual,
+copyright @copyright{} 1993-1998 Todd R. Eigenschink and Aubrey Jaffer.
+
+Parts of this manual were derived from ISO/EIC 10179:1996(E)
+(Document Style and Specifical Language) - unknown copyright.
 
 This manual has quoted from SRFI-6 (Basic String Ports),
 which is Copyright (C) William D Clinger (1999). All Rights Reserved.
@@ -7509,6 +8300,25 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 @end quotation
+
+This manual has made use text and examples from Dorai Sitaram's
+@code{pregexp} implementation.  But not where the latter talks about
+@code{pregexp-xxx} funtions the manual also also talks about
+the @code{regex-xxx} functions (which are are similar but use a
+slight different regular expression syntax).
+The @code{pregexp} distribution has the following @code{COPYING} file:
+@quotation
+Copyright (c) 1999-2005, Dorai Sitaram.
+All rights reserved.
+
+Permission to copy, modify, distribute, and use this work or
+a modified copy of this work, for any purpose, is hereby
+granted, provided that the copy includes this copyright
+notice, and in the case of a modified copy, also includes a
+notice of modification.  This work is provided as is, with
+no warranty of any kind.
+@end quotation
+
 
 @c I'd prefer to call this node plain "Index", but that causes a clash
 @c with index.html when generating HTML on case-insenstive file systems.

@@ -111,7 +111,7 @@ public class KawaScriptEngine extends AbstractScriptEngine
         OutPort errorPort
           = (errorWriter instanceof OutPort ? (OutPort) errorWriter
              : new OutPort(errorWriter));
-        Object inst = mexp.evalModule1(env, ctx, comp, url, errorPort);
+        Object inst = mexp.evalModule1(env, comp, url, errorPort);
         return new KawaCompiledScript(this, mexp, inst);
       }
     finally

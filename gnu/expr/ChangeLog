@@ -1,3 +1,9 @@
+2009-06-08  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule1): Remove unused CallContext parameter.
+	(evalModule): Update accordingly,
+	* KawaScriptEngine.java (compile): Likewise.
+
 2009-05-30  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (writeObject, emit): Add support for Pattern literals.

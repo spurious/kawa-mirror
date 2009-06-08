@@ -170,14 +170,14 @@ public class ModuleExp extends LambdaExp
   {
     ModuleExp mexp = comp.getModule();
     Language language = comp.getLanguage();
-    Object inst = evalModule1(env, ctx, comp, url, msg);
+    Object inst = evalModule1(env, comp, url, msg);
     if (inst == null)
       return false;
     evalModule2(env, ctx, language, mexp, inst, msg);
     return true;
   }
 
-  public final static Object evalModule1 (Environment env, CallContext ctx,
+  public final static Object evalModule1 (Environment env,
                                           Compilation comp, URL url,
                                           OutPort msg)
     throws SyntaxException

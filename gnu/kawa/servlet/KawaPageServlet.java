@@ -157,6 +157,7 @@ public class KawaPageServlet extends KawaServlet
     try
       {
         comp = language.parse(port, messages, minfo);
+        comp.immediate = true;
         /*
         int dot = path.indexOf('.');
         if (dot < 0)
@@ -177,8 +178,9 @@ public class KawaPageServlet extends KawaServlet
     if (! messages.seenErrors())
       {
         ModuleExp mexp = comp.getModule();
-        comp.addMainClass(mexp);
-        cl = ModuleExp.evalToClass(comp, url);
+        // FIXME - the env should probably be session-specific.
+        Environment env = Environment.getCurrent();
+        cl = (Class) ModuleExp.evalModule1(env, comp, url, null);
       }
 
     // FIXME: we could output a nice pretty HTML table of the errors

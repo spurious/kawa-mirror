@@ -1,3 +1,9 @@
+2009-06-08  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getModule): Use ModuleExp.evalModule1,
+	rather than (more basic) evalToClass.
+	* KawaPageServlet.java (getModule): Set immediate mode.
+
 2008-05-20  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Don't resolve the module - let

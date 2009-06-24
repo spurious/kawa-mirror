@@ -102,7 +102,7 @@ public class TryExp extends Expression
       }
 
     if (walker.exitValue == null && finally_clause != null)
-      finally_clause =walker.walk( finally_clause);
+      finally_clause = walker.walk(finally_clause);
   }
 
   public gnu.bytecode.Type getType()

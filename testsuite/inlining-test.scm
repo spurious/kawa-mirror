@@ -171,3 +171,24 @@
 	   (let ((x (vals i)))
 	     (if (< x 0)
 		 (exit x))))))))
+
+(define (inline-two-calls (x :: int)) :: int
+  (define (f (w :: int)) :: int (+ w 10))
+  (if (> x 0)
+      (let ((y1 :: int (+ x 1)))
+	(f y1))
+      (let ((y2 :: int (+ x 2)))
+	(f y2))))
+
+(define (check-even (x :: int))
+  (letrec ((even?
+	    (lambda ((n1 :: int))
+	      (if (= n1 0)
+		  #t
+		  (odd? (- n1 1)))))
+	   (odd?
+	    (lambda ((n2 :: int))
+	      (if (= n2 0)
+		  #f
+		  (even? (- n2 1))))))
+    (even? x)))

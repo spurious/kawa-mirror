@@ -1,3 +1,27 @@
+2009-06-28  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	Compile to tail-calls and do inlining more widely.
+	* LambdaExp.java (tailCallers): New field.
+	(returnContinuation): Generalize - need not be an ApplyExp.
+	* FindTailCalls.java (returnContinuation): New state variable.
+	(inTailContext): Replace field by method using returnContinuation.
+	(walkApplyExp): We now allow inlining a function with multiple calls
+	and multiple mutually recusive functions if they have the same (static)
+	continuation.
+	(walkBlockExp): New method.
+	(walkLetDecls): New method factored out from walkLetExp.
+	(walkDecls): Rename to postWalkDecls.
+	(walkLambdaExp): Actual determination of inlinability deferred
+	to FindCapturedVars.walkLambdaExp.
+	* FindCapturedVars.java (checkInlineable): New method - does actual
+	determination of inlineability.
+	(walkLambdaExp): Set inlineability based on checkInlineable.
+	* ApplyExp.java (compile): If we've already compiled/inlined this
+	method, then just push arguments and jump to start of body.
+
+	* Compilation.java (mangleNameIfNeeded): Allow null.
+
 2009-06-08  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule1): Remove unused CallContext parameter.

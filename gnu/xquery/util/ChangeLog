@@ -1,3 +1,9 @@
+2009-06-28  Per Bothner  <per@bothner.com>
+
+	* RelativeStep.java (inline): Update for new inlining framework.
+	* ValuesFilter.java (inline): Likewise.
+	Also re-order things so they're properly scoped.
+
 2008-10-24  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (makePattern): Fix comment so it doesn't

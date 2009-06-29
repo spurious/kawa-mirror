@@ -644,7 +644,7 @@ public class Compilation implements SourceLocator
 
   public static String mangleNameIfNeeded (String name)
   {
-    if (isValidJavaName(name))
+    if (name == null || isValidJavaName(name))
       return name;
     else
       return mangleName(name, 0);

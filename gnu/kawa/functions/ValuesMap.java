@@ -85,7 +85,8 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
     if (lexp != null)
       {
 	lexp.setInlineOnly(true);
-	lexp.returnContinuation = exp;
+        lexp.returnContinuation = exp;
+        lexp.inlineHome = walker.getCurrentLambda();
       }
     return exp;
   }
@@ -133,10 +134,13 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
       }
     // If the param Declaration is captured, then it gets messy initializing
     // it.  So just cheat and create a helper variable.
-    if (param.isSimple())
+    if (param.isSimple() && matchesMethod == null)
       param.allocateVariable(code);
     else
-      param = new Declaration(code.addLocal(paramType, param.getName()));
+    {
+      String pname = Compilation.mangleNameIfNeeded(param.getName());
+      param = new Declaration(code.addLocal(paramType.getImplementationType(), pname));
+    }
     Expression[] args;
     if (startCounter >= 0)
       {

@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -210,6 +210,66 @@ public class FindCapturedVars extends ExpWalker
     return super.walkLetExp(exp);
   }
 
+  static Expression checkInlineable (LambdaExp current,
+                                     java.util.Set<LambdaExp> seen)
+  {
+    if (current.returnContinuation == LambdaExp.unknownContinuation)
+      return current.returnContinuation;
+    if (seen.contains(current))
+      return current.returnContinuation;
+    if (current.getCanRead()
+        || current.isClassMethod()
+        || current.min_args != current.max_args)
+      {
+        current.returnContinuation = LambdaExp.unknownContinuation;
+        return LambdaExp.unknownContinuation;
+      }
+    seen.add(current);
+    Expression r = current.returnContinuation;
+    if (current.tailCallers != null)
+      {
+        LambdaExp outer = current.outerLambda();
+        for (LambdaExp p : current.tailCallers)
+          {
+            Expression t = checkInlineable(p, seen);
+            if (t == LambdaExp.unknownContinuation)
+              {
+                if (r == null || r == p.body)
+                  {
+                    r = p.body;
+                    current.inlineHome = p;
+                  }
+                else
+                  {
+                    current.returnContinuation = LambdaExp.unknownContinuation;
+                    return t;
+                  }
+              }
+            else if (r == null)
+              {
+                r = t;
+              }
+            else if ((t != null && r != t)
+                     || current.getFlag(LambdaExp.CANNOT_INLINE))
+              {
+                current.returnContinuation = LambdaExp.unknownContinuation;
+                return LambdaExp.unknownContinuation;
+              }
+          }
+      }
+    return r;
+  }
+
+  protected Expression walkLambdaExp (LambdaExp exp)
+  {
+    java.util.Set<LambdaExp> seen = new java.util.LinkedHashSet<LambdaExp>();
+    // Finish the job that was started in FindTailCalls.
+    Expression caller = checkInlineable(exp, seen);
+    if (caller != LambdaExp.unknownContinuation)
+      exp.setInlineOnly(true);
+    return super.walkLambdaExp(exp);
+  }
+
   public void capture(Declaration decl)
   {
     if (! (decl.getCanRead() || decl.getCanCall()))
@@ -225,7 +285,7 @@ public class FindCapturedVars extends ExpWalker
     LambdaExp declLambda = decl.getContext().currentLambda ();
 
     // If curLambda is inlined, the function that actually needs a closure
-    // is its caller.  We get its caller using returnContinuation.context.
+    // is its caller.  We get its caller using getCaller().
     // A complication is that we can have a chain of functions that
     // recursively call each other, and are hence inlined in each other.
     // Since a function is only inlined if it has a single call site,
@@ -249,14 +309,13 @@ public class FindCapturedVars extends ExpWalker
             chain = curParent.firstChild;
             oldParent = curParent;
           }
-        ApplyExp curReturn = curLambda.returnContinuation;
-        if (chain == null || curReturn == null)
+        if (chain == null || curLambda.inlineHome == null)
           {
             // Infinite loop of functions that are inlined in each other.
             curLambda.setCanCall(false);
             return;
-        }
-        curLambda = curReturn.context;
+          }
+        curLambda = curLambda.getCaller();
         chain = chain.nextSibling;
       }
     if (comp.usingCPStyle())

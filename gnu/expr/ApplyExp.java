@@ -116,7 +116,7 @@ public class ApplyExp extends Expression
   }
 
   static void compile (ApplyExp exp, Compilation comp, Target target,
-                              boolean checkInlineable)
+                       boolean checkInlineable)
   {
     int args_length = exp.args.length;
     Expression exp_func = exp.func;
@@ -283,6 +283,13 @@ public class ApplyExp extends Expression
 	&& func_lambda.min_args == args_length)
       {
         pushArgs(func_lambda, exp.args, null, comp);
+        if (func_lambda.getFlag(LambdaExp.METHODS_COMPILED))
+          {
+            popParams(code, func_lambda, null, false);
+            code.emitTailCall(false, func_lambda.getVarScope());
+            return;
+          }
+        func_lambda.flags |= LambdaExp.METHODS_COMPILED;
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
@@ -291,7 +298,7 @@ public class ApplyExp extends Expression
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
 	func_lambda.compileEnd(comp);
-	func_lambda.popScope(code);
+        code.popScope();
 	comp.curLambda = saveLambda;
 	return;
       }
@@ -444,11 +451,11 @@ public class ApplyExp extends Expression
     for (int i = 0; i < args_length; ++i)
       {
         Expression arg = args[i];
-        if (incValues != null
+        if (param.ignorable())
+          arg.compile(comp, Target.Ignore);
+        else if (incValues != null
             && (incValues[i] = SetExp.canUseInc(arg, param)) != SetExp.BAD_SHORT)
           ;
-        else if (param.ignorable())
-          arg.compile(comp, Target.Ignore);
         else
           arg.compileWithPosition(comp,
                                   StackTarget.getInstance(param.getType()));
@@ -487,10 +494,13 @@ public class ApplyExp extends Expression
         count--;
 	popParams (code, paramNo+1, count, incValues, decl.nextDecl(),
                    decl.getVariable() == null ? vars : vars.nextVar());
-        if (incValues != null && incValues[paramNo] != SetExp.BAD_SHORT)
-          code.emitInc(vars, (short) incValues[paramNo]);
-        else if (! decl.ignorable())
-          code.emitStore(vars);
+        if (! decl.ignorable())
+          {
+            if (incValues != null && incValues[paramNo] != SetExp.BAD_SHORT)
+              code.emitInc(vars, (short) incValues[paramNo]);
+            else
+              code.emitStore(vars);
+          }
       }
   }
 
@@ -581,6 +591,8 @@ public class ApplyExp extends Expression
 
   public String toString ()
   {
-    return "ApplyExp/"+args.length+'['+func+']';
+    if (this==LambdaExp.unknownContinuation)
+      return "ApplyExp[unknownContinuation]";
+    return "ApplyExp/"+(args == null?0:args.length)+'['+func+']';
   }
 }

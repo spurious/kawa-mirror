@@ -5,6 +5,9 @@ import gnu.bytecode.Type;
  * Also setCanRead, setCanCall on Declarations
  * and setCanRead, setCanCall on LambdaExp when appropriate.
  * (setCanWrite on Declarations needs to be set before this.)
+ * Note the final part of deciding inlineability has to be done after
+ * FindTailCalls finishes (or at least after we've walked all possible
+ * callers), so it is deferred to FindCapturedvars.walkLambdaExp.
  */
 
 public class FindTailCalls extends ExpWalker
@@ -16,99 +19,159 @@ public class FindTailCalls extends ExpWalker
     walker.walk(exp);
   }
 
-  boolean inTailContext = true;
+  Expression returnContinuation;
+
+  public boolean inTailContext ()
+  {
+    return returnContinuation == currentLambda.body;
+  }
+
+  protected Expression walkExpression (Expression exp)
+  {
+    Expression saveContext = returnContinuation;
+    returnContinuation = exp;
+    Expression ret = super.walkExpression(exp);
+    returnContinuation = saveContext;
+    return ret;
+  }
+
+  public Expression[] walkExps (Expression[] exps, int n)
+  {
+    Expression saveContext = returnContinuation;
+    for (int i = 0;  i < n;  i++)
+      {
+        Expression expi = exps[i];
+        returnContinuation = expi;
+        exps[i] = walk(expi);
+      }
+    returnContinuation = saveContext;
+    return exps;
+  }
 
   protected Expression walkApplyExp(ApplyExp exp)
   {
+    boolean inTailContext = inTailContext();
     if (inTailContext)
       exp.setTailCall(true);
     exp.context = currentLambda;
-    boolean save = inTailContext;
     LambdaExp lexp = null;
+    boolean isAppendValues = false;
+    if (exp.func instanceof ReferenceExp)
+      {
+        ReferenceExp func = (ReferenceExp) exp.func;
+        Declaration binding = Declaration.followAliases(func.binding);
+        if (binding != null)
+          {
+            // No point in building chain if STATIC_SPECIFIED, and it can
+            // lead to memory leaks.  At least if interactive calls cam
+            // resolve to previously-compiled Declarations (as in XQuery).
+            if (! binding.getFlag(Declaration.STATIC_SPECIFIED))
+              {
+                exp.nextCall = binding.firstCall;
+                binding.firstCall = exp;
+              }
+            Compilation comp = getCompilation();
+            binding.setCanCall();
+            if (! comp.mustCompile)
+              // Avoid tricky optimization if we're interpreting.
+              binding.setCanRead();
+            Expression value = binding.getValue();
+            if (value instanceof LambdaExp)
+              lexp = (LambdaExp) value;
+          }
+      }
+    else if (exp.func instanceof LambdaExp
+             && ! (exp.func instanceof ClassExp))
+      {
+        lexp = (LambdaExp) exp.func;
+        walkLambdaExp(lexp, false);
+        lexp.setCanCall(true);
+      }
+    else if (exp.func instanceof QuoteExp
+             && (((QuoteExp) exp.func).getValue()
+                 == gnu.kawa.functions.AppendValues.appendValues))
+      isAppendValues = true;
+    else
+      {
+        Expression saveContext = returnContinuation;
+        returnContinuation = exp.func;
+        exp.func = exp.func.walk(this);
+        returnContinuation = saveContext;
+      }
+    if (lexp != null)
+      {
+        if (lexp.returnContinuation == returnContinuation) ; // OK
+        else if (lexp == currentLambda && inTailContext)
+          ; // (Self-)tail-recursion is OK.
+        else if (inTailContext)
+          {
+            if (lexp.tailCallers == null)
+              lexp.tailCallers = new java.util.HashSet();
+            lexp.tailCallers.add(currentLambda);
+            if (lexp.inlineHome  == null)
+              lexp.inlineHome = currentLambda;
+          }
+        else if (lexp.returnContinuation == null)
+          {
+            lexp.returnContinuation = returnContinuation;
+            lexp.inlineHome = currentLambda;
+          }
+        else
+          {
+            lexp.returnContinuation = LambdaExp.unknownContinuation;
+            lexp.inlineHome = null;
+          }
+      }
+    if (isAppendValues
+        && currentLambda.getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
+     {
+       Expression[] args = exp.args;
+       int nargs = args.length;
+       for (int i = 0;  i < nargs;  i++)
+         {
+           args[i] = walk(args[i]);
+         }
+      }
+    else
+      exp.args = walkExps(exp.args);
+    return exp;
+  }
+
+  protected Expression walkBlockExp(BlockExp exp)
+  {
+    Expression saveContext = returnContinuation;
     try
       {
-	inTailContext = false;
-	boolean isAppendValues = false;
-	if (exp.func instanceof ReferenceExp)
-	  {
-	    ReferenceExp func = (ReferenceExp) exp.func;
-	    Declaration binding = Declaration.followAliases(func.binding);
-	    if (binding != null)
-	      {
-                // No point in building chain if STATIC_SPECIFIED, and it can
-                // lead to memory leaks.  At least if interactive calls cam
-                // resolve to previously-compiled Declarations (as in XQuery).
-                if (! binding.getFlag(Declaration.STATIC_SPECIFIED))
-                  {
-                    exp.nextCall = binding.firstCall;
-                    binding.firstCall = exp;
-                  }
-                Compilation comp = getCompilation();
-		binding.setCanCall();
-                if (! comp.mustCompile)
-                  // Avoid tricky optimization if we're interpreting.
-                  binding.setCanRead();
-		Expression value = binding.getValue();
-		if (value instanceof LambdaExp)
-		  lexp = (LambdaExp) value;
-	      }
-	  }
-	else if (exp.func instanceof LambdaExp
-		 && ! (exp.func instanceof ClassExp))
-	  {
-	    lexp = (LambdaExp) exp.func;
-	    walkLambdaExp(lexp, false);
-	    lexp.setCanCall(true);
-	  }
-	else if (exp.func instanceof QuoteExp
-		 && (((QuoteExp) exp.func).getValue()
-		     == gnu.kawa.functions.AppendValues.appendValues))
-	  isAppendValues = true;
-	else
-	  exp.func = (Expression) exp.func.walk(this);
-	if (lexp != null)
-	  {
-	    if (lexp.returnContinuation == exp) ; // OK
-	    else if (lexp == currentLambda && save)
-	      ; // (Self-)tail-recursion is OK.
-	    else if (lexp.returnContinuation == null)
-	      lexp.returnContinuation = exp;
-	    else
-	      lexp.returnContinuation = LambdaExp.unknownContinuation;
-	  }
-	if (isAppendValues && exp.args.length > 0)
-	  {
-	    int last = exp.args.length - 1;
-	    exp.args = walkExps(exp.args, last);
-	    inTailContext = save;
-	    exp.args[last] = walk(exp.args[last]);
-	  }
-	else
-	  exp.args = walkExps(exp.args);
-	return exp;
+        exp.body = exp.body.walk(this);
+        if (exp.exitBody != null)
+          {
+            returnContinuation = exp.exitBody;
+            exp.exitBody = exp.exitBody.walk(this);
+          }
+        return exp;
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
   }
 
   protected Expression walkBeginExp(BeginExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
     try
       {
 	int n = exp.length - 1;
 	for (int i = 0;  i <= n;  i++)
 	  {
-	    inTailContext = (i == n) && save;
+            returnContinuation = i == n ? saveContext : exp.exps[i];
 	    exp.exps[i] = (Expression) exp.exps[i].walk(this);
 	  }
 	return exp;
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
   }
 
@@ -121,28 +184,25 @@ public class FindTailCalls extends ExpWalker
         if (decl.base != null)
           decl.base.setCanRead(true);
       }
-    boolean save = inTailContext;
-    inTailContext = false;
+    Expression saveContext = returnContinuation;
     try
       {
-	return super.walkFluidLetExp(exp);
+        walkLetDecls(exp);
+        returnContinuation = exp.body;
+        exp.body = (Expression) exp.body.walk(this);
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
+    postWalkDecls(exp);
+    return exp;
   }
 
-  protected Expression walkLetExp (LetExp exp)
+  void walkLetDecls (LetExp exp)
   {
-    int n = exp.inits.length; 
-    boolean save = inTailContext;
-    Declaration decl;
-    try
-      {
-	inTailContext = false;
-
-	decl = exp.firstDecl();
+        Declaration decl = exp.firstDecl();
+        int n = exp.inits.length; 
 	for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
 	  {
 	    Expression init = walkSetExp (decl, exp.inits[i]);
@@ -156,17 +216,25 @@ public class FindTailCalls extends ExpWalker
 	      }
 	    exp.inits[i] = init;
 	  }
+  }
+
+  protected Expression walkLetExp (LetExp exp)
+  {
+    Expression saveContext = returnContinuation;
+    try
+      {
+        walkLetDecls(exp);
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
     exp.body = (Expression) exp.body.walk(this);
-    walkDecls(exp);
+    postWalkDecls(exp);
     return exp;
   }
 
-  public void walkDecls (ScopeExp exp)
+  public void postWalkDecls (ScopeExp exp)
   {
     Declaration decl = exp.firstDecl();
     for (;  decl != null;  decl = decl.nextDecl())
@@ -193,15 +261,15 @@ public class FindTailCalls extends ExpWalker
 
   protected Expression walkIfExp (IfExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
     try
       {
-	inTailContext = false;
+        returnContinuation = exp.test;
 	exp.test = (Expression) exp.test.walk(this);
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
     exp.then_clause = (Expression) exp.then_clause.walk(this);
     Expression else_clause = exp.else_clause;
@@ -218,79 +286,30 @@ public class FindTailCalls extends ExpWalker
 
   final void walkLambdaExp (LambdaExp exp, boolean canRead)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
+    returnContinuation = exp;
     LambdaExp parent = currentLambda;
     currentLambda = exp;
     if (canRead)
       exp.setCanRead(true);
     try
       {
-	inTailContext = false;
+        returnContinuation = exp;
 	if (exp.defaultArgs != null)
 	  exp.defaultArgs = walkExps(exp.defaultArgs);
-	inTailContext = exp.getInlineOnly() ? save : true;
+        returnContinuation = exp.getInlineOnly() ? saveContext : exp.body;
 	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
 	currentLambda = parent;
       }
 
-    walkDecls(exp);
-
-    for (LambdaExp child = exp.firstChild;  child != null;
-	 child = child.nextSibling)
-      {
-	if (child.getCanRead()
-	    || child.isClassMethod()
-	    || child.min_args != child.max_args)
-	  child.flags |= LambdaExp.CANNOT_INLINE;
-	else
-	  {
-	    ApplyExp caller = child.returnContinuation;
-	    if (caller != LambdaExp.unknownContinuation
-		&& ! comp.usingCPStyle())
-	      {
-		child.setInlineOnly(true);
-	      }
-	  }
-      }
-
-    for (LambdaExp child = exp.firstChild;  child != null;
-	 child = child.nextSibling)
-      {
-	if ((child.flags & (LambdaExp.CANNOT_INLINE|LambdaExp.INLINE_ONLY))!=0)
-	  continue;
-	// We can inline child if it is a member of a set of functions
-	// which can all be inlined in the same method, and for which
-	// all callers are known and members of the same set,
-	// and each function has at most one caller that is not a tail-call.
-	// FIXME  Basic algorithm:
-	/*
-	Vector inlineSet = new Vector();  // empty
-	ApplyExp[] apl = (ApplyExp[]) applications.get(child);
-	Stack queue = new Stack();
-	copy elements of apl to queue;
-	while (!queue.empty())
-	  {
-	    LambdaExp caller = (LambdaExp) queue.pop();
-	    if ((caller.flags & LambdaExp.CANNOT_INLINE) != 0)
-	      {
-		child.flags |= LambdaExp.CANNOT_INLINE;
-		break;
-	      }
-	    if (caller in inlineSet)
-	      continue;
-	    apl = (ApplyExp[]) applications.get(child);
-	    add elements of apl to queue;
-	    add caller to inlineSet;
-	    add caller.returnContinuation.context to inlineSet;
-	  }
-	*/
-      }
+    postWalkDecls(exp);
   }
+
 
   // Map LambdaExp to ApplyExp[], which is the set of non-self tails
   // calls that call the key.
@@ -298,20 +317,20 @@ public class FindTailCalls extends ExpWalker
 
   protected Expression walkClassExp (ClassExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
+    returnContinuation = exp;
     LambdaExp parent = currentLambda;
     currentLambda = exp;
     exp.setCanRead(true);
     try
       {
-	inTailContext = false;
 	for (LambdaExp child = exp.firstChild;
 	     child != null && exitValue == null;  child = child.nextSibling)
 	  walkLambdaExp(child, false);
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
 	currentLambda = parent;
       }
 
@@ -340,6 +359,7 @@ public class FindTailCalls extends ExpWalker
 
   final Expression walkSetExp (Declaration decl, Expression value)
   {
+    returnContinuation = value;
     if (decl != null && decl.getValue() == value
 	&& value instanceof LambdaExp && ! (value instanceof ClassExp)
         && ! decl.isPublic())
@@ -354,15 +374,15 @@ public class FindTailCalls extends ExpWalker
 
   protected Expression walkSetExp (SetExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
     try
       {
-	inTailContext = false;
 	Declaration decl = exp.binding;
 	if (decl != null && decl.isAlias())
 	  {
 	    if (exp.isDefining())
 	      {
+                returnContinuation = exp.new_value;
 		exp.new_value = (Expression) exp.new_value.walk(this);
 		return exp;
 	      }
@@ -385,35 +405,56 @@ public class FindTailCalls extends ExpWalker
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
   }
 
   protected Expression walkTryExp (TryExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
     try
       {
-	inTailContext = false;
-	return super.walkTryExp(exp);
+        if (exp.finally_clause != null)
+          {
+            returnContinuation = exp.try_clause;
+          }
+        exp.try_clause = exp.try_clause.walk(this);
+        CatchClause catch_clause = exp.catch_clauses;
+        while (exitValue == null && catch_clause != null)
+          {
+            if (exp.finally_clause != null)
+              returnContinuation = catch_clause.body;
+            catch_clause.body = catch_clause.body.walk(this);
+            catch_clause = catch_clause.getNext();
+          }
+        Expression finally_clause = exp.finally_clause;
+        if (finally_clause != null)
+          {
+            returnContinuation = finally_clause;
+            exp.finally_clause = finally_clause.walk(this);
+          }
+        return exp;
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
   }
 
   protected Expression walkSynchronizedExp (SynchronizedExp exp)
   {
-    boolean save = inTailContext;
+    Expression saveContext = returnContinuation;
     try
       {
-	inTailContext = false;
-	return super.walkSynchronizedExp(exp);
+        returnContinuation = exp.object;
+        exp.object = exp.object.walk(this);
+        returnContinuation = exp.body;
+        exp.body = exp.body.walk(this);
+        return exp;
       }
     finally
       {
-	inTailContext = save;
+        returnContinuation = saveContext;
       }
   }
 }

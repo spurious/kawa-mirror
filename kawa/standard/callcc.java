@@ -80,6 +80,7 @@ public class callcc extends MethodProc implements CanInline, Inlineable
       {
 	lexp.setInlineOnly(true);
 	lexp.returnContinuation = exp;
+        lexp.inlineHome = walker.getCurrentLambda();
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);

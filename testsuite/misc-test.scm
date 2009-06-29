@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 166)
+(test-init "Miscellaneous" 170)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -557,7 +557,6 @@
 (test "[ 23]" test-printf "[%3d]" 23)
 (test "[3.50 ]" test-printf "[%-5.2f]" 3.5)
 
-
 (define fluid-stack '())
 (define fluid-let-test-level 'main)
 (define (push-fluid-let-test-level!)
@@ -791,3 +790,9 @@
 (test '(a e) 'srfi-62-test-6 (list 'a #;(list 'b #;c 'd) 'e))
 (test '(a . c) 'srfi-62-test-7 '(a . #;b c))
 (test '(a . b) 'srfi-62-test-8 '(a . b #;c))
+
+(require <InliningTest>)
+(test 16 inline-two-calls 5)
+(test 7 inline-two-calls -5)
+(test #f check-even 200001)
+(test #t check-even 18)

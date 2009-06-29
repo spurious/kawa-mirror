@@ -122,6 +122,7 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
 
     lexp2.setInlineOnly(true);
     lexp2.returnContinuation = exp;
+    lexp2.inlineHome = walker.getCurrentLambda();
 
     // Splice out lastArg
     lexp2.remove(posArg, lastArg);
@@ -153,6 +154,11 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
     parser.letEnter();
 
     Expression pred = lexp2.body;
+    Type predType = lexp2.body.getType();
+    if (predType != XDataType.booleanType) // Overly conservative, but simple.
+      pred = new ApplyExp(matchesMethod,
+                          new Expression[] { pred,
+                                             new ReferenceExp(posArg) });
     if (kind == 'R')
       {
         Declaration posIncoming = new Declaration(null, Type.intType);
@@ -173,11 +179,6 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
         pred = let;
       }
 
-    Type predType = lexp2.body.getType();
-    if (predType != XDataType.booleanType) // Overly conservative, but simple.
-      pred = new ApplyExp(matchesMethod,
-                          new Expression[] { pred,
-                                             new ReferenceExp(posArg) });
     pred = new IfExp(pred,
                      new ReferenceExp(dotArg),
                      QuoteExp.voidExp);

@@ -54,6 +54,7 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
 	    LambdaExp lexp = (LambdaExp) args[i];
 	    lexp.setInlineOnly(true);
 	    lexp.returnContinuation = exp;
+            lexp.inlineHome = walker.getCurrentLambda();
 	  }
       }
     return exp;

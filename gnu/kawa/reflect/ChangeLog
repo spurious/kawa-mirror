@@ -1,3 +1,7 @@
+2009-06-28  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java (inline): Update for new inlining framework.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (MethodFilter.select): Skip SYNTHETIC methods.

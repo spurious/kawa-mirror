@@ -71,6 +71,7 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
 
     lexp2.setInlineOnly(true);
     lexp2.returnContinuation = exp;
+    lexp2.inlineHome = walker.getCurrentLambda();
 
     exp2 = lexp2.body;
 

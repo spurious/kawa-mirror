@@ -1,3 +1,9 @@
+2009-06-28  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitStore):  Don't check if var is dead - this can be
+	useful for pushing parameters to a previouly compiled inlined procedure,
+	followed by a jump to the procedure label - see gnu.expr.ApplyExp.
+
 2009-04-21  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getContextClassLoader): Reportedly on Android

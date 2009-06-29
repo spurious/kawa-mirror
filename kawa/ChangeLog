@@ -1,3 +1,7 @@
+2009-06-28  Per Bothner  <per@bothner.com>
+
+	* standard/callcc.java (inline): Update for new inlining framework.
+
 2009-06-02  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Update for (rnrs unicode)

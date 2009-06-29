@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007, 2008  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2007, 2008, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -73,15 +73,24 @@ public class LambdaExp extends ScopeExp
   /** A magic value to indicate there is no unique return continuation. */
   final static ApplyExp unknownContinuation = new ApplyExp ((Expression) null, null);
 
-  /** The unique caller that calls this lambda.
-      The value is null, if no callers have been seen.
-      A value of unknownContinuation means there are multiple call sites.
-      Tail-recursive calls do not count as multiple call sites. (With a
-      little more analysis, we could also allow multiple non-self tail-calls
-      as long as they all are ultimately called from the same place.)
-      This is used to see if we can inline the function at its unique
-      call site. */
-  public ApplyExp returnContinuation;
+  /** The unique call site that calls this lambda.
+   * The value is null if no callers have been seen.
+   * A value of unknownContinuation means there are multiple call sites.
+   * Tail-recursive calls do not count as multiple call sites.
+   * This is used to see if we can inline the function at its unique call site.
+   * Usually this is an ApplyExp, but it can also be the "tail position"
+   * for some outer expression, such as an IfExp.  This allows inlining f
+   * in the call 'if (cond) f(x) else f(y)' since both calls have the same
+   * return point.
+   */
+  public Expression returnContinuation;
+
+  /** If non-null, set of functions that tail-call this function. */
+  java.util.Set<LambdaExp> tailCallers;
+
+  /** If this lambda gets inlined this is the containing lambda.
+      Otherwise this is null. */
+  public LambdaExp inlineHome;
 
   /** Expressions that name classes that may be thrown. */
   ReferenceExp[] throwsSpecification;
@@ -389,7 +398,7 @@ public class LambdaExp extends ScopeExp
   /** For an INLINE_ONLY function, return the function it gets inlined in. */
   public LambdaExp getCaller ()
   {
-    return returnContinuation.context;
+    return inlineHome;
   }
 
   Variable thisVariable;

@@ -379,7 +379,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Set the current type state from a label. */
   public final void setTypes (Type[] labelLocals, Type[] labelStack)
   {
-    int labelSP = labelStack.length;
+    int usedStack = labelStack.length;
     int usedLocals = labelLocals.length;
     if (local_types != null)
       {
@@ -388,15 +388,15 @@ public class CodeAttr extends Attribute implements AttrContainer
         for (int i = usedLocals;  i < local_types.length;  i++)
           local_types[i] = null;
       }
-    if (stack_types == null || usedLocals > stack_types.length)
-      stack_types = new Type[labelSP];
+    if (stack_types == null || usedStack > stack_types.length)
+      stack_types = new Type[usedStack];
     else
       {
-        for (int i = labelStack.length;  i < stack_types.length;  i++)
+        for (int i = usedStack;  i < stack_types.length;  i++)
           stack_types[i] = null;
       }
-    System.arraycopy(labelStack, 0, stack_types, 0, labelSP);
-    SP = labelSP;
+    System.arraycopy(labelStack, 0, stack_types, 0, usedStack);
+    SP = usedStack;
   }
 
   public final void pushType(Type type)

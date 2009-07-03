@@ -1,3 +1,9 @@
+2009-07-02  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (setType): Fix thinko - compare against stack length.
+	Also rename local labelSP to usedStack.
+	Fixes bug reported by  Helmu Eller.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitStore):  Don't check if var is dead - this can be

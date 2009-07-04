@@ -2,7 +2,7 @@
 
 ;;; Definitions for some standard syntax.
 
-(module-export cond case and or let let* letrec do delay
+(module-export cond case and or let let* do delay
 	       syntax-object->datum datum->syntax-object with-syntax
 	       generate-temporaries define-procedure add-procedure-properties
 	       identifier? free-identifier=?
@@ -167,22 +167,6 @@
      (%syntax-error
       "missing bindings list in let*"))))
 
-;;; LETREC
-
-(define-syntax letrec
-  (syntax-rules ()
-    ((letrec bindings . body)
-     (%letrec1 () bindings . body))))
-
-(define-syntax %letrec1
-  (syntax-rules (::)
-    ((%letrec1 done ((x :: type init) . bindings) . body)
-     (%letrec1 ((x :: type #!undefined) . done) bindings (set! x init) . body))
-    ((%letrec1 done ((x init) . bindings) . body)
-     (%letrec1 ((x #!undefined) . done) bindings (set! x init) . body))
-    ((%letrec1 done () . body)
-     (%let done . body))))
-
 ;;; DO
 
 ;;; Helper macro for do, to handle optional step.
@@ -239,7 +223,6 @@
 		     (make <gnu.expr.GenericProc> 'name))
 		   (add-procedure-properties name args ...)))))
 
-
 (define (syntax-object->datum obj)
   (kawa.lang.Quote:quote obj))
 
@@ -250,7 +233,6 @@
   (let loop ((n (kawa.lang.Translator:listLength list)) (lst '()))
     (if (= n 0) lst
 	(loop (- n 1) (make <pair> (datum->syntax-object list (gnu.expr.Symbols:gentemp)) lst)))))
-
 
 (define (identifier? form) :: <boolean>
   (or (gnu.mapping.Symbol? form)
@@ -264,7 +246,7 @@
   (cond ((instance? form <kawa.lang.SyntaxForm>)
 	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
 	((instance? form <gnu.lists.PairWithPosition>)
-	 (let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
+	 (%let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
 	   (if (eq? str #!null) #f  str)))
 	(else
 	 #f)))

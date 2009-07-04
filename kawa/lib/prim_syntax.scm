@@ -99,3 +99,33 @@
 				 (syntax try-part)
 				 (syntax
 				  #((((var :: type)) . catch-body) ...)))))))
+
+(%define-syntax letrec
+  (lambda (form)
+    (%let ((out-bindings '()) (out-inits '()))
+      (syntax-case form ()
+	((_ bindings . body)
+	 (%let ((process-binding #!undefined))
+	       (set! process-binding
+		     (lambda (b)
+		       (syntax-case b ()
+			 (() #!void)
+			 (((name init) . rest)
+			  (begin
+			    (set! out-bindings
+				  (make <pair> (syntax (name #!undefined)) out-bindings))
+			    (set! out-inits (make <pair> (syntax (set! name init)) out-inits))
+			    (process-binding (syntax rest))))
+			 (((name :: type init) . rest)
+			  (begin
+			    (set! out-bindings (make <pair> (syntax (name :: type #!undefined)) out-bindings))
+			    (set! out-inits (make <pair> (syntax (set! name init)) out-inits))
+			    (process-binding (syntax rest))))
+			 (((name) . rest)
+			  (syntax-error b "missing initializion in letrec"))
+			 (whatever
+			  (syntax-error b "invalid bindings syntax in letrec")))))
+	       (process-binding (syntax bindings))
+	       (set! out-bindings (gnu.lists.LList:reverseInPlace out-bindings))
+	       (set! out-inits (gnu.lists.LList:reverseInPlace out-inits))
+	       #`(%let ,out-bindings ,@out-inits . body)))))))

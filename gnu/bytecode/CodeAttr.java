@@ -245,9 +245,10 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Get opcode that implements NOT (x OPCODE y). */
   byte invert_opcode (byte opcode)
   {
-    if ((opcode >= 153 && opcode <= 166)
-	|| (opcode >= 198 && opcode <= 199))
-      return (byte) (opcode ^ 1);
+    int iopcode = opcode & 0xFF;
+    if ((iopcode >= 153 && iopcode <= 166)
+	|| (iopcode >= 198 && iopcode <= 199))
+      return (byte) (iopcode ^ 1);
     throw new Error("unknown opcode to invert_opcode");
   }
 

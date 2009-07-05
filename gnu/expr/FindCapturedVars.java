@@ -248,6 +248,8 @@ public class FindCapturedVars extends ExpWalker
             else if (r == null)
               {
                 r = t;
+                if (current.inlineHome == null)
+                  current.inlineHome = current.nestedIn(p) ? p : p.inlineHome;
               }
             else if ((t != null && r != t)
                      || current.getFlag(LambdaExp.CANNOT_INLINE))

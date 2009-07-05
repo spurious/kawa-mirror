@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 170)
+(test-init "Miscellaneous" 171)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -790,6 +790,18 @@
 (test '(a e) 'srfi-62-test-6 (list 'a #;(list 'b #;c 'd) 'e))
 (test '(a . c) 'srfi-62-test-7 '(a . #;b c))
 (test '(a . b) 'srfi-62-test-8 '(a . b #;c))
+
+;; Savannah bug #26940 "Compiler stuck in endless loop"
+;; Reported by Helmut Eller
+(define (mutual-tailcals x)
+  ;; Note that the order of the functions is reversed relative to the
+  ;; Savannah bug report, because I recently fixed the implementation of
+  ;; the letrec macro, which used to create declarations in reverse order.
+  (letrec ((f0 (lambda () (if (= x 0) 1 (f1))))
+           (f1 (lambda () (if (= x 0) (f0) (f2))))
+	   (f2 (lambda () (if (= x 0) (f1) 0))))
+    (f2)))
+(test 0 mutual-tailcals 4)
 
 (require <InliningTest>)
 (test 16 inline-two-calls 5)

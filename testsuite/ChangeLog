@@ -1,3 +1,13 @@
+2009-07-05  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* misc-test.scm: New test based on Savannah bug #26940
+	"Compiler stuck in endless loop".
+
+	* inlining-test.scm (inline-two-functions): New test for inlining
+	submitted by Helmut to Kawa mailing list.
+	* inlining.expected, makefile.am: Update accordingly.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* inlining-test.scm (inline-two-calls, check-even):

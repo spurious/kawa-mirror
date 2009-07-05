@@ -180,6 +180,13 @@
       (let ((y2 :: int (+ x 2)))
 	(f y2))))
 
+(define (inline-two-functions x)
+  (letrec ((f (lambda ()
+                (if x (f) (g))))
+           (g (lambda ()
+                (if x (g) (f)))))
+    (f)))
+
 (define (check-even (x :: int))
   (letrec ((even?
 	    (lambda ((n1 :: int))

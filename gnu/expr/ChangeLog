@@ -1,3 +1,11 @@
+2009-07-05  Per Bothner  <per@bothner.com>
+
+	Fix Savannah bug #26940 "Compiler stuck in endless loop".
+	* FindTailCalls.java (walkApplyExp):  Don't set inlineHome
+	from tailCallers.
+	* FindCapturedVars.java (checkInlineable): Instead set it here.
+	* ScopeExp.java (nestedIn): New method.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

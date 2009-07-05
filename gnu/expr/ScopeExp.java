@@ -267,6 +267,16 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
+  /** True if given scope is nesed in this scope, perhaps indirectly. */
+  public boolean nestedIn (ScopeExp outer)
+  {
+    for (ScopeExp sc = this; sc != null; sc = sc.outer)
+      {
+        if (sc ==  outer)
+          return true;
+      }
+    return false;
+  }
   /** Size of evalFrame to allocate in interpreter. */
   protected int frameSize;
 

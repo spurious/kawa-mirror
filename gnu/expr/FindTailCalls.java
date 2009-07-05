@@ -108,8 +108,6 @@ public class FindTailCalls extends ExpWalker
             if (lexp.tailCallers == null)
               lexp.tailCallers = new java.util.HashSet();
             lexp.tailCallers.add(currentLambda);
-            if (lexp.inlineHome  == null)
-              lexp.inlineHome = currentLambda;
           }
         else if (lexp.returnContinuation == null)
           {

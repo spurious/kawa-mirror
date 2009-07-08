@@ -539,6 +539,7 @@ public class ClassExp extends LambdaExp
                 child.compileBody(comp);
               }
 	    child.compileEnd(comp);
+	    child.generateApplyMethods(comp);
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;

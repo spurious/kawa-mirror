@@ -1,5 +1,16 @@
 2009-07-07  Per Bothner  <per@bothner.com>
 
+	Fix for Savannah bug #24249 "Local define miscompiled".
+	* LambdaExp.java (compileEnd): No longer do generateApplyMethods
+	in compileEnd, because of generateBytecode change.
+	(compileAsMethod): Update to explicitly call generateApplyMethods.
+	* ApplyExp.java (compile): Likewise.
+	* ClassExp.java (compileMembers): Likewise.
+	* Compilation.java (generateBytecode): Call compileEnd right after
+	compileBody, so that to child function bodies are compiled before
+	we do dumpInitializers.  However, generateApplyMethods has to be done
+	later, which is why it was moved out of compileEnd.
+
 	* LambdaExp.java (compileEnd): Call single-argument version of
 	generateConstructor.
 

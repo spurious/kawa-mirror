@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 171)
+(test-init "Miscellaneous" 172)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -802,6 +802,18 @@
 	   (f2 (lambda () (if (= x 0) (f1) 0))))
     (f2)))
 (test 0 mutual-tailcals 4)
+
+;; Savannah bug #24249 "Local define miscompiled"
+(let ()
+  ;; Added 'list' to suppress tail-call-optimization.
+  (define (baz) (list (bar)))
+  (define (bar)
+    (let ((k (lambda () #f)))
+      (cond ((not (procedure? k))
+	     (error 'bad-k k)))
+      k))
+  (define (foo) (bar))
+  (test "#<procedure k>" 'test-savannah-24249 ((foo):toString)))
 
 (require <InliningTest>)
 (test 16 inline-two-calls 5)

@@ -2014,12 +2014,13 @@ public class Compilation implements SourceLocator
       }
 
     module.compileBody(this);
+    module.compileEnd(this);
 
     Label startLiterals = null;
     Label afterLiterals = null;
     Method initMethod = null;
 
-    if (curClass == mainClass)
+    if (curClass == mainClass) // redundant - never false.
       {
 	Method save_method = method;
         Variable callContextSave = callContextVar;
@@ -2032,7 +2033,7 @@ public class Compilation implements SourceLocator
         startLiterals = new Label(code);
         afterLiterals = new Label(code);
         code.fixupChain(afterLiterals, startLiterals);
-	  
+
 	if (staticModule)
 	  {
 	    generateConstructor (module);
@@ -2109,7 +2110,7 @@ public class Compilation implements SourceLocator
         callContextVar = callContextSave;
       }
 
-    module.compileEnd(this);
+    module.generateApplyMethods(this);
 
     curLambda = saveLambda;
 

@@ -553,8 +553,6 @@ public class LambdaExp extends ScopeExp
 
     if (heapFrame != null)
       comp.generateConstructor(this);
-    
-    generateApplyMethods(comp);
   }
 
   public void generateApplyMethods(Compilation comp)
@@ -694,6 +692,7 @@ public class LambdaExp extends ScopeExp
 
 	compileBody(comp);
 	compileEnd(comp);
+	generateApplyMethods(comp);
 	comp.curLambda = saveLambda;
 	func_end.define(code);
 	code.restoreStackTypeState(stackTypes);
@@ -1584,6 +1583,7 @@ public class LambdaExp extends ScopeExp
 
 	    compileBody(comp);
 	    compileEnd(comp);
+	    generateApplyMethods(comp);
 	  }
       }
 

@@ -552,7 +552,7 @@ public class LambdaExp extends ScopeExp
       }
 
     if (heapFrame != null)
-      comp.generateConstructor((ClassType) heapFrame.getType(), this);
+      comp.generateConstructor(this);
     
     generateApplyMethods(comp);
   }

@@ -1,3 +1,12 @@
+2009-07-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (clean-dirs): Move under mostlyclean-am, so removing
+	Mod1 and Mod2 directories is also done for mostlyclean - and more
+	importantly for distclean (which is needed for make distcheck).
+
+	* Makefile.am (check-xsltest1): Fix typo.
+	* xsltest1.expected: Fix to contain actual expected output.
+
 2009-03-13  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Some 'make clean' fixes.

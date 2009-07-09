@@ -3,8 +3,7 @@ include $(top_srcdir)/Make-rules
 KAWALIB = $(top_builddir)
 KAWA = ../../../bin/kawa.sh
 EXTRA_CLEAN = tmp* *.log testing.zip */*.class
-clean: clean-am clean-dirs
-clean-dirs:
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 	rm -rf Mod1 Mod2
 
 java_sources = TestMisc.java TestSuite.java RunXQTS.java
@@ -75,7 +74,7 @@ check-descend:  descend.class
 
 check-xsltest1:
 	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >tmp-xsltest1.log
-	@if diff -b $(srcdir)/>xsltest1.expected tmp-xsltest1.log; \
+	@if diff -b $(srcdir)/xsltest1.expected tmp-xsltest1.log; \
 	  then echo '# xsltest1 test passes'; \
 	  else echo FAIL xsltest1 test; fi
 

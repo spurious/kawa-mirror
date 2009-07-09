@@ -310,6 +310,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+clean: clean-am
+
 clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
@@ -362,8 +364,6 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
-
 pdf: pdf-am
 
 pdf-am:
@@ -412,8 +412,7 @@ elisp-classes.stamp: $(java_ELISP)
 	$(KAWA_COMPILER) --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 	echo timestamp > $(TO_TOPDIR)/kawa-jar.stamp
-clean: clean-am clean-dirs
-clean-dirs:
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 	rm -rf Mod1 Mod2
 
 all:
@@ -471,7 +470,7 @@ check-descend:  descend.class
 
 check-xsltest1:
 	$(KAWA) --xslt -f $(srcdir)/xsltest1.xsl outline.xml >tmp-xsltest1.log
-	@if diff -b $(srcdir)/>xsltest1.expected tmp-xsltest1.log; \
+	@if diff -b $(srcdir)/xsltest1.expected tmp-xsltest1.log; \
 	  then echo '# xsltest1 test passes'; \
 	  else echo FAIL xsltest1 test; fi
 

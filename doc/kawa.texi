@@ -1517,13 +1517,15 @@ feature which gives access to command line arguments. Note that an error
 will be signaled at macro-expansion time if this feature is not present.
 @end deffn
 
-@deffn Syntax include@anchor{include} path
+@anchor{include}
+@deffn Syntax include path
 Read the contents of the file at @var{path} as a sequence of forms,
 and treat the result as if the resulting forms were the forms
 of a @code{begin}.
 @end deffn
 
-@deffn Syntax include-relative@anchor{include-relative} path
+@anchor{include-relative}
+@deffn Syntax include-relative path
 Same as @code{include}, except that the @var{path} is relative to the
 path of the source-file containing the @code{include-file}.
 @end deffn

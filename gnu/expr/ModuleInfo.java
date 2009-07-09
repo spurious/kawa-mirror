@@ -355,14 +355,13 @@ public class ModuleInfo
   {
     if (sourceAbsPath == null)
       return true;
-    boolean hasClass = moduleClass != null;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
-      return hasClass || comp != null;
+      return moduleClass != null || comp != null;
     lastCheckedTime = now;
     long lastModifiedTime = sourceAbsPath.getLastModified();
     long oldModifiedTime = this.lastModifiedTime;
     this.lastModifiedTime = lastModifiedTime;
-    if (! hasClass && className != null)
+    if (moduleClass == null && className != null)
       {
         try
           {
@@ -373,7 +372,7 @@ public class ModuleInfo
             return false;
           }
       }
-    if (oldModifiedTime == 0 && hasClass)
+    if (oldModifiedTime == 0 && moduleClass != null)
       {
         String classFilename = className;
         int dot = classFilename.lastIndexOf('.');

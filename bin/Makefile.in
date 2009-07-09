@@ -688,7 +688,7 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
 @ENABLE_KAWA_FRONTEND_TRUE@	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa$(EXEEXT) $(DESTDIR)$(bindir)/kawa$(EXEEXT)
 @WITH_GCJ_DBTOOL_FALSE@@WITH_GCJ_TRUE@	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa-bin$(EXEEXT) $(DESTDIR)$(bindir)/kawa-bin$(EXEEXT)
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
+@ENABLE_SERVLET_TRUE@	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
 
 @WITH_GCJ_TRUE@install-exec-local: install-libkawa
 

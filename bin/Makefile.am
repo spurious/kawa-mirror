@@ -231,7 +231,9 @@ if ! WITH_GCJ_DBTOOL
 	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) kawa-bin$(EXEEXT) $(DESTDIR)$(bindir)/kawa-bin$(EXEEXT)
 endif
 endif
+if ENABLE_SERVLET
 	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(binPROGRAMS_INSTALL) cgi-servlet$(EXEEXT) $(DESTDIR)$(bindir)/cgi-servlet$(EXEEXT)
+endif
 
 if WITH_GCJ
 install-exec-local: install-libkawa

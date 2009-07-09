@@ -1,4 +1,5 @@
 Before Kawa 1.10:
+- Make Values constructors be private, so we can make Values be abstract.
 - Go through Savannah bugs.
 - Manual: should rename @node Extensions
 - Change version number to 1.10.
@@ -15,6 +16,10 @@ Before Kawa 1.10:
 -- Document emitIf../eithThen else, at overview level.
 - Verify that Path is consistent with new javax.nio (JDR 203)
   http://openjdk.java.net/projects/nio
+- internals: Update about procedures, inlining, tail-calls.
+
+R6RS
+- string-for-each
 
 HTTP/SERVLETS
 * Support Java6 com.sun.net.httpserver
@@ -23,11 +28,18 @@ http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/com/sun/net/httpse
   #t should print correctly
   BRL should by default not HTML-quote strings
 * Think about REST.
-* Support explicit and implcite require (BRL's sitedefs.scm).
+* Support explicit and implicit require (BRL's sitedefs.scm).
 * Module should not be static - vars should be session variables.
 * Dynamic Environment should be per-session.
-* Get repl working reliably.
+* Get repl.xml working reliably.
 * Annotations ...
+
+OPTIMIZATIONS
+* case/switch
+* translate Scheme character->int
+* optimize boolean operations (bitwise-and, bitwise-or, ...)
+* optimize zero?
+* other support for other single-element struct types, including unsigned int
 
 HIGH PRIORITY:
 * Allow co-variant return types.

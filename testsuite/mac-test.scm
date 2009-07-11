@@ -1,4 +1,4 @@
-(test-init "macros" 100)
+(test-init "macros" 101)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -565,3 +565,9 @@
         )))))
 (test '((els1 in-a) (lit1 in-b) (els1 ((2 in-c))) (lit2 in-d) (els3 ((4 in-e))) (els5 ((6 in-f))) (lit8 in-g))
       test-literal-capture-2)
+
+;; Savannah bug #26993 "String literals in syntax-rules don't match".
+(define-syntax foo-26993
+   (syntax-rules ()
+     ((foo-26993 "foo") 'ok)))
+(test 'ok 'test-savannah-26993 (foo-26993 "foo"))

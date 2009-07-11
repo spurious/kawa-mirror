@@ -638,7 +638,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
   public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
 					     Object id2, ScopeExp sc2)
   {
-    if (id1 != id2)
+    if (id1 != id2 && (id1 == null || id2 == null || ! id1.equals(id2)))
       return false;
     if (sc1 == sc2)
       return true;

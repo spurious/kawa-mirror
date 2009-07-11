@@ -208,7 +208,7 @@ use of this software.
             '(#f #f #f #f #f #f #f #f #f))
     (fail 'hash-table-exists?:1))
 
-(or (equal? (map (lambda (ht) (hash-table-exists? ht "cee"))
+(or (equal? (map (lambda (ht) (hash-table-exists? ht (string-copy "cee")))
                  (append (test-tables-general&nonempty)
                          (list ht6string= ht6string-ci=)))
             '(#t #t #t #f #f #f #f #t #t))

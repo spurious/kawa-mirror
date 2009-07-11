@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner
+// Copyright (c) 2001, 2009 Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
@@ -74,7 +74,7 @@ public class ReaderString extends ReadTableEntry
 	  }
         /* #ifdef use:java.lang.CharSequence */
 	return new String(in.tokenBuffer, startPos,
-                          in.tokenBufferLength - startPos);
+                          in.tokenBufferLength - startPos).intern();
         /* #else */
         // return new gnu.lists.FString (in.tokenBuffer, startPos,
         //                               in.tokenBufferLength - startPos);

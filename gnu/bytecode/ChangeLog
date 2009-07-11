@@ -1,3 +1,9 @@
+2009-07-11  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (noteVarType): Make sure fresh array is big enough.
+	This fixes Savannah bug #27011 "ArrayIndexOutOfBoundsException after
+	20 local variables".
+
 2009-07-03  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java: Fix thinko when comparing opcodes.

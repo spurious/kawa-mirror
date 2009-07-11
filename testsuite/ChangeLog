@@ -1,3 +1,9 @@
+2009-07-11  Helmut Eller  <eller.helmut@gmail.com>
+	    Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: New test based on Savannah bug #27011
+	"ArrayIndexOutOfBoundsException after 20 local variables".
+
 2009-07-11  Per Bothner  <per@bothner.com>
 
 	* srfi-69-test.scm: Add a string-copy, since we now intern

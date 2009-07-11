@@ -354,7 +354,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     int size = type.getSizeInWords();
     
     if (local_types == null)
-      local_types = new Type[20]; 
+      local_types = new Type[offset + size + 20]; 
     else if (offset + size > local_types.length) {
       Type[] new_array = new Type[2 * local_types.length];
       System.arraycopy (local_types, 0, new_array, 0, local_types.length);

@@ -3,6 +3,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
+import gnu.mapping.Values;
 
 public class InlineCalls extends ExpWalker
 {
@@ -91,18 +92,22 @@ public class InlineCalls extends ExpWalker
               test = value;
           }
       }
-    if (test instanceof QuoteExp)
-      {
-        return walk(comp.getLanguage().isTrue(((QuoteExp) test).getValue())
-                    ? exp.then_clause
-                    : exp.else_clause == null ? QuoteExp.voidExp
-                    : exp.else_clause);
-      }
     exp.test = test;
     if (exitValue == null)
       exp.then_clause = walk(exp.then_clause);
     if (exitValue == null && exp.else_clause != null)
       exp.else_clause = walk(exp.else_clause);
+    if (test instanceof QuoteExp)
+      {
+        boolean truth = comp.getLanguage().isTrue(((QuoteExp) test).getValue());
+        return exp.select(truth);
+      }
+    if (test.getType().isVoid())
+      {
+        boolean truth = comp.getLanguage().isTrue(Values.empty);
+        comp.error('w', "void-valued condition is always "+truth);
+        return new BeginExp(test, exp.select(truth));
+      }
     return exp;
   }
 

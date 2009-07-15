@@ -867,3 +867,9 @@
   (set! x20 x0 ) 
   x0)
 (test "a" big-let)
+
+;; Savannah bug #27014 "AND vs. VOID"
+(begin
+  (define (foo) (and (bar) (bar)))
+  (define baz #f)
+  (define (bar) (set! baz #f)))

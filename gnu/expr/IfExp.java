@@ -36,6 +36,13 @@ public class IfExp extends Expression
       else_clause.apply(ctx);
   }
 
+  Expression select (boolean truth)
+  {
+    return (truth ? then_clause
+            : else_clause == null ? QuoteExp.voidExp
+            : else_clause);
+  }
+
   public void compile (Compilation comp, Target target)
   {
     compile(test, then_clause,

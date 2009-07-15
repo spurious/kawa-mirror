@@ -1,5 +1,10 @@
 2009-07-14  Per Bothner  <per@bothner.com>
 
+	Fix for Savannah bug #27014 "AND vs. VOID".
+	* IfExp.java (select): New method.
+	* InlineCalls.java (walkIfExp): Use select.
+	Handle (with warning) the case when the condition has void type.
+
 	* LitTable.java (emit): For Values instances, we want to use the
 	constructor, rather than "make" as the latter's return type is Object.
 	Also, don't call readResolve for Values instances.

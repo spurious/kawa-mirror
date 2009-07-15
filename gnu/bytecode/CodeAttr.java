@@ -356,7 +356,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (local_types == null)
       local_types = new Type[offset + size + 20]; 
     else if (offset + size > local_types.length) {
-      Type[] new_array = new Type[2 * local_types.length];
+      Type[] new_array = new Type[2 * (offset + size)];
       System.arraycopy (local_types, 0, new_array, 0, local_types.length);
       local_types = new_array;
     }

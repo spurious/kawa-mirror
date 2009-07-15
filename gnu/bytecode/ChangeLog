@@ -1,3 +1,10 @@
+2009-07-15  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (noteVarType): Make sure re-sized array is big enough.
+	Follow-up to previous fix for Savannah bug #27011
+	"ArrayIndexOutOfBoundsException after 20 local variables" - now
+	with 42 variables.
+
 2009-07-11  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (noteVarType): Make sure fresh array is big enough.

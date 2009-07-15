@@ -4,6 +4,7 @@ import gnu.bytecode.*;
 import java.lang.reflect.Array;
 import java.util.*;
 import gnu.mapping.Table2D;
+import gnu.mapping.Values;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
 /* #endif */
@@ -615,7 +616,9 @@ public class LitTable implements ObjectOutput
 	  {
 	    // look for matching "valueOf" or "make" method;
 	    method = getMethod(type, "valueOf", literal, true);
-            if (method == null)
+            if (method == null
+                // Values.make has return type Object, so use the constructor.
+                && ! (literal.value instanceof Values))
               {
                 String mname = "make";
                 /* #ifdef use:java.util.regex */
@@ -660,7 +663,8 @@ public class LitTable implements ObjectOutput
 	    code.emitInvokeSpecial(method);
 	  }
 	Method resolveMethod
-	  = makeStatic ? null : type.getDeclaredMethod("readResolve", 0);
+	  = makeStatic || literal.value instanceof Values ? null
+          : type.getDeclaredMethod("readResolve", 0);
 	if (resolveMethod != null)
 	  {
 	    code.emitInvokeVirtual(resolveMethod);

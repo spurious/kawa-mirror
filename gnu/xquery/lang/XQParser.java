@@ -3016,6 +3016,7 @@ public class XQParser extends Lexer
 	if (name == null)
 	  return syntaxError("missing Variable");
 	exp = new ReferenceExp(name);
+        maybeSetLine(exp, curLine, curColumn);
         break;
       case FNAME_TOKEN:
 	name = new String(tokenBuffer, 0, tokenBufferLength);
@@ -4453,7 +4454,8 @@ public class XQParser extends Lexer
   public void maybeSetLine (Expression exp, int line, int column)
   {
     String file = getName();
-    if (file != null && exp.getFileName() == null)
+    if (file != null && exp.getFileName() == null
+        && ! (exp instanceof QuoteExp))
       {
         exp.setFile(file);
 	exp.setLine(line, column);

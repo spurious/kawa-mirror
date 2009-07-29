@@ -1,3 +1,12 @@
+2009-07-29  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getMethods(Filter,int,Vector,String)): Generalize
+	Vector argument to List<Method>.
+	(getMethods(Filter,int,Method[],String)): Re-implement to use
+	above method.
+	(countMethods, getMethods(Filter,int)): Likewise.
+	* ObjectType.java (getMethod): Likewise generalize Vector->List.
+
 2009-07-15  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (noteVarType): Make sure re-sized array is big enough.

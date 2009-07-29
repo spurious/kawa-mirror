@@ -1,9 +1,9 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005, 2008  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004, 2005, 2008, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 import java.io.*;
-import java.util.Vector;
+import java.util.*;
 
 public class ClassType extends ObjectType 
   implements AttrContainer, Externalizable, Member
@@ -726,12 +726,14 @@ public class ClassType extends ObjectType
    * @param filter to select methods to return
    * @param searchSupers 0 if only current class should be searched,
    *   1 if superclasses should also be searched,
-   *   2 if super-interfaces should also be search
+   *   2 if super-interfaces should also be searched
    * @return number of methods that match
    */
   public final int countMethods (Filter filter, int searchSupers)
   {
-    return getMethods(filter, searchSupers, null, 0);
+    Vector vec = new Vector();
+    getMethods(filter, searchSupers, vec, null);
+    return vec.size();
   }
 
   public Method[] getMethods (Filter filter, boolean searchSupers)
@@ -748,9 +750,12 @@ public class ClassType extends ObjectType
    */
   public Method[] getMethods (Filter filter, int searchSupers)
   {
-    int count = getMethods(filter, searchSupers, null, 0);
+    Vector<Method> vec = new Vector();
+    getMethods(filter, searchSupers, vec, null);
+    int count = vec.size();
     Method[] result = new Method[count];
-    getMethods(filter, searchSupers, result, 0);
+    for (int i = 0;  i < count;  i++)
+      result[i] = vec.elementAt(i);
     return result;
   }
 
@@ -767,32 +772,11 @@ public class ClassType extends ObjectType
   public int getMethods (Filter filter, int searchSupers,
 			 Method[] result, int offset)
   {
-    int count = 0;
-    for (ClassType ctype = this;  ctype != null;
-	 ctype = ctype.getSuperclass())
-    {
-      for (Method meth = ctype.getDeclaredMethods();
-	   meth != null;  meth = meth.getNext())
-	if (filter.select(meth))
-	  {
-	    if (result != null)
-	      result[offset + count] = meth;
-	    count++;
-	  }
-      if (searchSupers == 0)
-	break;
-
-      if (searchSupers > 1)
-	{
-	  ClassType[] interfaces = ctype.getInterfaces();
-	  if (interfaces != null)
-	    {
-	      for (int i = 0;  i < interfaces.length;  i++)
-		count += interfaces[i].getMethods(filter, searchSupers,
-						  result, offset+count);
-	    }
-	}
-    }
+    Vector<Method> vec = new Vector<Method>();
+    getMethods(filter, searchSupers, vec, null);
+    int count = vec.size();
+    for (int i = 0;  i < count;  i++)
+      result[offset+i] = vec.elementAt(i);
     return count;
   }
 
@@ -805,7 +789,12 @@ public class ClassType extends ObjectType
    * @param context If non-null, skip if class not visible in named package.
    * @return number of methods placed in result array
    */
-  public int getMethods (Filter filter, int searchSupers, Vector result,
+  public int getMethods (Filter filter, int searchSupers,
+                         /* #ifdef JAVA5 */
+                         List<Method> result,
+                         /* #else */
+                         // Vector result,
+                         /* #endif */
 			 String context)
   {
     int count = 0;
@@ -821,7 +810,13 @@ public class ClassType extends ObjectType
 	    if (filter.select(meth))
 	      {
 		if (result != null)
-		  result.addElement(meth);
+                  {
+                    /* #ifdef JAVA2 */
+                    result.add(meth);
+                    /* #else */
+                    // result.addElement(meth);
+                    /* #endif */
+                  }
 		count++;
 	      }
 	}

@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-import java.util.Vector;
+import java.util.*;
 
 /**
   * Semi-abstract class object reference types.
@@ -169,7 +169,12 @@ public class ObjectType extends Type
     return Type.objectType.getMethod(name, arg_types);
   }
 
-  public int getMethods (Filter filter, int searchSupers, Vector result,
+  public int getMethods (Filter filter, int searchSupers,
+                         /* #ifdef JAVA5 */
+                         List<Method> result,
+                         /* #else */
+                         // Vector result,
+                         /* #endif */
 			 String context)
   {
     return Type.objectType.getMethods(filter, searchSupers, result, context);

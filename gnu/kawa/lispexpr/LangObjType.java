@@ -5,6 +5,7 @@ import gnu.expr.*;
 import gnu.math.IntNum;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
+import java.util.*;
 
 /** A wrapper around a class type.
  * A LangObjType is implemented using some class type,
@@ -131,7 +132,12 @@ public class LangObjType extends ObjectType implements TypeValue
   }
 
   public int getMethods (Filter filter, int searchSupers,
-                         java.util.Vector result, String context)
+                         /* #ifdef JAVA5 */
+                         List<Method> result,
+                         /* #else */
+                         // Vector result,
+                         /* #endif */
+                         String context)
   {
     return implementationType.getMethods(filter, searchSupers, result, context);
   }

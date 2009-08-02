@@ -134,7 +134,25 @@ This package has nothing to do with the defunct
 @menu
 * Installation::         Building and installing Kawa
 * Running::              Invoking, Running, and Using Kawa
-* Extensions::           Features and Extensions of Kawa Scheme
+* Features::             Summary of Kawa Scheme Features
+* Syntax and conditional compilation::
+* Multiple values::
+* Symbols and namespaces::
+* Procedures::
+* Numbers::              Quantities and Numbers
+* Characters and text::
+* Data structures::
+* Exceptions::           Exception handling
+* Eval and Environments::
+* Debugging::
+* Threads::
+* Processes::
+* Miscellaneous::
+* Input-Output::         Input, output, and file handling
+* Types::
+* Objects Classes and Modules::
+* XML tools::            XML, HTML, and the web
+* Low-level functions::  Deprecated low-level functions
 * Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
@@ -529,7 +547,7 @@ However, there are some problems with filenames that make this
 more complicated than it should be.  It should be possible
 to build Kawa under Cygwin using @code{gcj} as descibed above.
 
-@node Running, Extensions, Installation, Top
+@node Running, Features, Installation, Top
 @chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa} program.
@@ -1241,37 +1259,12 @@ the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
 
-@node Extensions, Community, Running, Top
-@chapter Scheme Extensions and Language Reference
+@node Features, Syntax and conditional compilation, Running, Top
+@chapter Summary of Kawa Scheme Features
 
 This manual mostly documents how Kawa Scheme differs from
 standard (R5RS) Scheme, though the goal is to merge in
 information about standard Scheme here as well.
-
-@menu
-* Features::             Summary of Kawa Scheme Features
-* Syntax and conditional compilation::
-* Multiple values::
-* Symbols and namespaces::
-* Procedures::
-* Numbers::              Quantities and Numbers
-* Characters and text::
-* Data structures::
-* Exceptions::           Exception handling
-* Eval and Environments::
-* Debugging::
-* Threads::
-* Processes::
-* Miscellaneous::
-* Input-Output::         Input, output, and file handling
-* Types::
-* Objects Classes and Modules::
-* XML tools::            XML, HTML, and the web
-* Low-level functions::  Deprecated low-level functions
-@end menu
-
-@node Features, Syntax and conditional compilation, , Extensions
-@section Summary of Kawa Scheme Features
 
 Kawa is a full Scheme implementation.  It implements almost
 all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
@@ -1322,7 +1315,7 @@ Quantities, keyword values, and the expanded @code{lambda} form
 @end menu
 
 @node Implemented SRFIs, Restrictions, , Features
-@subsection Implemented SRFIs
+@section Implemented SRFIs
 
 Kawa implements the following semi-standard SRFIs
 (@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
@@ -1370,12 +1363,14 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
 @item
 @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
+@item
 @uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
+@item
 @uref{http://srfi.schemers.org/srfi-97/srfi-97.html, SRFI 97}: Names for SRFI Libraries.
 @end itemize
 
 @node Restrictions, , Implemented SRFIs, Features
-@subsection Features of R5RS not implemented
+@section Features of R5RS not implemented
 
 Kawa implements all the required and optional features of R5RS,
 with the following exceptions.
@@ -1409,8 +1404,8 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
-@node Syntax and conditional compilation, Multiple values, Features, Extensions
-@section Syntax and conditional compilation
+@node Syntax and conditional compilation, Multiple values, Features, Top
+@chapter Syntax and conditional compilation
 
 Kawa supports most of the @code{syntax-case} feature.
 
@@ -1530,8 +1525,8 @@ Same as @code{include}, except that the @var{path} is relative to the
 path of the source-file containing the @code{include-file}.
 @end deffn
 
-@node Multiple values, Symbols and namespaces, Syntax and conditional compilation, Extensions
-@section Multiple values
+@node Multiple values, Symbols and namespaces, Syntax and conditional compilation, Top
+@chapter Multiple values
 
 The multiple-value feature was added in R5RS.
 
@@ -1626,8 +1621,8 @@ The values resulting from evaluating each argument are appended
 together.
 @end defun
 
-@node Symbols and namespaces, Procedures, Multiple values, Extensions
-@section Symbols and namespaces
+@node Symbols and namespaces, Procedures, Multiple values, Top
+@chapter Symbols and namespaces
 
 An identifier is a name that appears in a program.
 
@@ -1645,7 +1640,7 @@ used the way enumerated values are used in other languages.
 @end menu
 
 @node Namespaces, Keywords, , Symbols and namespaces
-@subsection Namespaces and compound symbols
+@section Namespaces and compound symbols
 
 A compound symbol is one whose name is unique
 within a specific namespace, rather than globally.
@@ -1728,7 +1723,7 @@ is local to the current module.
 The variation @code{define-xml-namespace} is used for @ref{Creating XML nodes}.
 
 @node Keywords, Special named constants, Namespaces, Symbols and namespaces
-@subsection Keywords
+@section Keywords
 
 Keywords are similar to symbols.  The main difference is that keywords are
 self-evaluating and therefore do not need to be quoted in expressions.
@@ -1757,7 +1752,7 @@ Returns the keyword whose name is @var{string}.
 @end defun
 
 @node Special named constants, , Keywords, Symbols and namespaces
-@subsection Special named constants
+@section Special named constants
 
 @defvr Constant #!optional
 Special self-evaluating literal used in lambda parameter lists
@@ -1794,8 +1789,8 @@ The Java @code{null} value.  This is not really a Scheme value,
 but is useful when interfacing to low-level Java code.
 @end defvr
 
-@node Procedures, Numbers, Symbols and namespaces, Extensions
-@section Procedures
+@node Procedures, Numbers, Symbols and namespaces, Top
+@chapter Procedures
 
 @defun apply proc [arg1 ...] args
 @var{Args} must be a sequence (list, vector, or string) or a
@@ -1822,7 +1817,7 @@ is equivalent to @code{(quote #(a b c))}, assuming @code{vector}
 has not been re-bound.
 @end deffn
 
-@subsection Procedure properties
+@section Procedure properties
 
 You can associate arbitrary @dfn{properties} with any procedure.
 Each property is a (@var{key}, @var{value})-pair.  Usually the
@@ -1875,7 +1870,7 @@ one method, as well as the @code{setter} property:
 @end example
 @end deffn
 
-@subsection Generic (dynamically overloaded) procedures
+@section Generic (dynamically overloaded) procedures
 
 A @dfn{generic procedure} is a collection of @dfn{method procedures}.
 (A "method procedure" is not the same as a Java method, but
@@ -1911,7 +1906,7 @@ Unrecognized keywords are used to set the procedure properties of the result.
 @end example
 @end defun
 
-@subsection Extended Formal Arguments List
+@section Extended Formal Arguments List
 
 The formal arguments list of a lambda expression has two
 extendsions over standard Scheme:
@@ -2048,8 +2043,8 @@ evaluate it during every invocation of the resulting procedure.
 
 @end deffn
 
-@node Numbers, Characters and text, Procedures, Extensions
-@section Quantities and Numbers
+@node Numbers, Characters and text, Procedures, Top
+@chapter Quantities and Numbers
 
 Kawa supports the full Scheme set of number operations with some extensions.
 
@@ -2063,7 +2058,7 @@ and Java number types as appropriate.
 @end menu
 
 @node Quantities, Extended Number Operations, , Numbers
-@subsection Quantities and Units
+@section Quantities and Units
 
 As a super-class of numbers, Kawa also provides quantities.
 A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
@@ -2126,7 +2121,7 @@ so the above is equivalent to:
 @end deffn
 
 @node Extended Number Operations, Logical Number Operations, Quantities, Numbers
-@subsection Extended Number Operations
+@section Extended Number Operations
 
 @defun quotient x y
 Generalized to arbitrary real numbers, using the definition:
@@ -2151,7 +2146,7 @@ even if @code{x} is exact and @code{y} is 0.
 @end defun
 
 @node Logical Number Operations, , Extended Number Operations, Numbers
-@subsection Logical Number Operations
+@section Logical Number Operations
 
 These functions operate on the 2's complement binary representation
 of an exact integer.
@@ -2354,7 +2349,7 @@ Same as @code{(not (zero? (bitwise-and @var{i} @var{j})))},
 but is more efficient.
 @end defun
 
-@subsubsection Deprecated Logical Number Operations
+@subsection Deprecated Logical Number Operations
 
 These older functions are still available, but we
 recommand using the R6RS-compatible functions.
@@ -2401,8 +2396,8 @@ Alias for @code{arithmetic-shift}.
 Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
 @end defun
 
-@node Characters and text, Data structures, Numbers, Extensions
-@section Characters and text
+@node Characters and text, Data structures, Numbers, Top
+@chapter Characters and text
 
 @menu
 * Characters::
@@ -2412,7 +2407,7 @@ Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
 @end menu
 
 @node Characters, Strings, , Characters and text
-@subsection Characters
+@section Characters
 
 @emph{Characters} are objects that represent Unicode scalar values.
 
@@ -2483,7 +2478,7 @@ according to their Unicode scalar values.
 @end deffn
 
 @node Strings, Unicode, Characters, Characters and text
-@subsection Strings
+@section Strings
 
 Strings are sequences of characters.  The @emph{length} of a string is
 the number of characters that it contains.  This number is fixed when
@@ -2622,7 +2617,7 @@ Returns a newly allocated copy of the given @var{string}.
 @end deffn
 
 @node Unicode, Regular expressions, Strings, Characters and text
-@subsection Unicode character classes and conversions
+@section Unicode character classes and conversions
 
 @ignore
 The procedures exported by the @rsixlibrary{unicode} library provide
@@ -2635,7 +2630,7 @@ Some of the procedures that operate on characters or strings ignore the
 difference between upper case and lower case.  These procedures have
 @code{-ci} (for ``case insensitive'') embedded in their names.
 
-@subsubsection Characters
+@subsection Characters
 
 @deffn Procedure char-upcase @var{char}
 @deffnx Procedure char-downcase @var{char}
@@ -2776,7 +2771,7 @@ Return a symbol representing the Unicode general category of
 @end deffn
 
 
-@subsubsection Strings
+@subsection Strings
 
 @deffn Procedure string-upcase @var{string}
 @deffnx Procedure string-downcase @var{string}
@@ -2885,7 +2880,7 @@ the argument instead of a newly allocated string.
 @end example
 @end deffn
 
-@subsubsection Deprecated in-place case modification
+@subsection Deprecated in-place case modification
 
 The following functions are deprecated; they really don't
 and cannot do the right thing, because in some languages
@@ -2908,7 +2903,7 @@ are replaced by their lower-case equivalents.
 @end defun
 
 @node Regular expressions, , Unicode, Characters and text
-@subsection Regular expressions
+@section Regular expressions
 
 Kawa provides @dfn{regular expressions}, which is a convenient
 mechanism for matching a string against a @dfn{pattern}
@@ -2960,7 +2955,7 @@ and is available on older Java versions.
 @end itemize
 
 
-@subsubsection Java regular expressions
+@subsection Java regular expressions
 
 The syntax for regular expressions is
 @uref{http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html, documented here}.
@@ -3168,7 +3163,7 @@ serve as regex metacharacters are escaped as needed.
 from a mix of regex strings and verbatim strings.
 @end defun
 
-@subsubsection Portable Scheme regular expressions
+@subsection Portable Scheme regular expressions
 
 This provides the procedures @code{pregexp}, @code{pregexp‑match‑positions},
 @code{pregexp‑match}, @code{pregexp‑split}, @code{pregexp‑replace},
@@ -3188,8 +3183,8 @@ Also, @code{pregexp‑split} behaves differently from
 
 See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
 
-@node Data structures, Exceptions, Characters and text, Extensions
-@section Data structures
+@node Data structures, Exceptions, Characters and text, Top
+@chapter Data structures
 
 @menu
 * Lists::
@@ -3199,7 +3194,7 @@ See @uref{http://evalwhen.com/pregexp/index.html,here for details}.
 @end menu
 
 @node Lists, Arrays, , Data structures
-@subsection Lists
+@section Lists
 
 The @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI-1 List Library}
 is available, though not enabled by default.  To use its functions you
@@ -3217,7 +3212,7 @@ was pair, it becomes the last pair of the reversed result.
 @end defun
 
 @node Arrays, Uniform vectors, Lists, Data structures
-@subsection Multi-dimensional Arrays
+@section Multi-dimensional Arrays
 
 Arrays are heterogeneous data structures whose elements are indexed by
 integer sequences of fixed length.  The length of a valid index sequence
@@ -3381,7 +3376,7 @@ evaluates to a two-dimensionsal array of @code{<double>}:
 @end example
 
 @node Uniform vectors, Hash tables, Arrays, Data structures
-@subsection Uniform vectors
+@section Uniform vectors
 
 Uniform vectors are vectors whose elements are of the same numeric type.
 The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
@@ -3553,7 +3548,7 @@ with the elements of the list @var{l}.  The elements of @var{l}
 must be numbers coercible the new vector's element type.
 @end defun
 
-@subsubsection Relationship with Java arrays
+@subsection Relationship with Java arrays
 
 Each uniform array type is implemented as an @dfn{underlying Java array},
 and a length field.
@@ -3585,7 +3580,7 @@ It @code{vec} is re-sized so it needs a larger underlying array,
 then it will no longer use @code{arr}.
 
 @node Hash tables, , Uniform vectors, Data structures
-@subsection Hash tables
+@section Hash tables
 
 A hash table is a data structure that:
 @itemize
@@ -3617,7 +3612,7 @@ or
 (require 'hash-table)
 @end example
 
-@subsubsection Type constructors and predicate
+@subsection Type constructors and predicate
 @defun make-hash-table [ equal? [ hash [ size-hint]]] → hash-table
 
 Create a new hash table with no associations.
@@ -3662,7 +3657,7 @@ balance between the two approaches: using @var{cadr} would render this
 procedure unusable for @code{cdr} alists, but not vice versa.)
 @end defun
 
-@subsubsection Reflective queries
+@subsection Reflective queries
 @defun hash-table-equivalence-function hash-table
 Returns the equivalence predicate used for keys of @var{hash-table}.
 @end defun
@@ -3671,7 +3666,7 @@ Returns the equivalence predicate used for keys of @var{hash-table}.
 Returns the hash function used for keys of @var{hash-table}.
 @end defun
 
-@subsubsection Dealing with single elements
+@subsection Dealing with single elements
 @defun hash-table-ref hash-table key [ thunk ] → value
 This procedure returns the value associated to @var{key} in
 @var{hash-table}. If no value is associated to @var{key} and
@@ -3725,7 +3720,7 @@ Behaves as if it evaluates to
 @code{(hash-table-update! @var{hash-table} @var{key} @var{function} (lambda () @var{default}))}.
 @end defun
 
-@subsubsection Dealing with the whole contents
+@subsection Dealing with the whole contents
 
 @defun hash-table-size hash-table → integer
 Returns the number of associations in @var{hash-table}. This operation takes
@@ -3790,7 +3785,7 @@ returns the resulting hash table. This function may modify
 @var{hash-table1} destructively.
 @end defun
 
-@subsubsection Hashing
+@subsection Hashing
 Hashing means the act of taking some value and producing a number from
 the value. A hash function is a function that does this. Every
 equivalence predicate e has a set of acceptable hash functions for
@@ -3848,8 +3843,8 @@ to be acceptable for @code{eq?}.
 Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
 @end defun 
 
-@node Exceptions, Eval and Environments, Data structures, Extensions
-@section Exception handling
+@node Exceptions, Eval and Environments, Data structures, Top
+@chapter Exception handling
 
 @defun catch key thunk handler
 Invoke @var{thunk} in the dynamic context of @var{handler} for
@@ -3940,8 +3935,8 @@ is not yet possible in Kawa), the @var{in-guard} is called again.
 This function was added in R5RS.
 @end defun
 
-@node Eval and Environments, Debugging, Exceptions, Extensions
-@section Eval and Environments
+@node Eval and Environments, Debugging, Exceptions, Top
+@chapter Eval and Environments
 
 @defun eval expression [environment]
 @code{eval} evaluates @var{expression} in the environment indicated
@@ -4024,7 +4019,7 @@ It is highly recommended that you use instead use @ref{include-relative, include
 @end menu
 
 @node Locations, Parameter objects, , Eval and Environments
-@subsection Locations
+@section Locations
 
 A @dfn{location} is a place where a value can be stored.
 An @dfn{lvalue} is an expression that refers to a location.
@@ -4103,7 +4098,7 @@ think of the @code{location} syntax as similar to the C @samp{&} operator;
 for the @samp{*} indirection operator, Kawa uses procedure application.
 
 @node Parameter objects, , Locations, Eval and Environments
-@subsection Parameter objects
+@section Parameter objects
 
 A parameter object is a procedure that is bound to a location,
 and may optionally have a conversion procedure.
@@ -4224,8 +4219,8 @@ the parameterize form are the result(s) of the @var{<body>}.
 @end example
 @end deffn
 
-@node Debugging, Threads, Eval and Environments, Extensions
-@section Debugging
+@node Debugging, Threads, Eval and Environments, Top
+@chapter Debugging
 
 @deffn Syntax trace procedure
 Cause @var{procedure} to be "traced", that is debugging output will
@@ -4237,8 +4232,8 @@ is called, with the parameters and return value.
 Turn off tracing (debugging output) of @var{procedure}.
 @end deffn
 
-@node Threads, Processes, Debugging, Extensions
-@section Threads
+@node Threads, Processes, Debugging, Top
+@chapter Threads
 
 There is a very preliminary interface to create parallel threads.
 The interface is similar to the standard @code{delay}/@code{force},
@@ -4268,8 +4263,8 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
-@node Processes, Miscellaneous, Threads, Extensions
-@section Processes
+@node Processes, Miscellaneous, Threads, Top
+@chapter Processes
 
 @defun make-process command envp
 Creates a @code{<java.lang.Process>} object, using the specified
@@ -4308,8 +4303,8 @@ special characters.
 (This is the same as what @code{java.lang.Runtime.exec(String)} does.)
 @end defun
 
-@node Miscellaneous, Input-Output, Processes, Extensions
-@section Miscellaneous
+@node Miscellaneous, Input-Output, Processes, Top
+@chapter Miscellaneous
 
 @defun scheme-implementation-version
 Returns the Kawa version number as a string.
@@ -4369,8 +4364,8 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@node Input-Output, Types, Miscellaneous, Extensions
-@section Input, output, and file handling
+@node Input-Output, Types, Miscellaneous, Top
+@chapter Input, output, and file handling
 
 Kawa has a number of useful tools for controlling input and output:
 
@@ -4388,7 +4383,7 @@ A powerful pretty-printer.
 @end menu
 
 @node Named output formats, Paths, , Input-Output
-@subsection Named output formats
+@section Named output formats
 
 The @code{--output-format} (or @code{--format}) command-line switch
 can be used to override the default format for how values are
@@ -4451,7 +4446,7 @@ Top-level values are ignored, instead of printed.
 @end table
 
 @node Paths, Resources, Named output formats, Input-Output
-@subsection Paths - file name, URLs, and URIs
+@section Paths - file name, URLs, and URIs
 
 A @dfn{Path} is the name of a file or some other @dfn{resource}.
 The path mechanism provides a layer of abstraction, so you can
@@ -4518,7 +4513,7 @@ which is a wrapper around a @code{java.net.URL}, in
 addition to extending @code{gnu.text.URIPath}.
 @end deffn
 
-@subsubsection Extracting Path components
+@subsection Extracting Path components
 
 @defun path-scheme arg
 Returns the ``URI scheme'' of @var{arg} (coerced to a @code{path}) if it is
@@ -4655,7 +4650,7 @@ which is normally (though not always) absolute.
 @end defun
 
 @node Resources, Files, Paths, Input-Output
-@subsection Resources
+@section Resources
 
 A resource is a file or other fixed data that an application may access.
 Resources are part of the application and are shipped with it, but are
@@ -4691,7 +4686,7 @@ and resolving that to a normal @code{URL}.
 @end deffn
 
 @node Files, Ports, Resources, Input-Output
-@subsection File System Interface
+@section File System Interface
 
 @defun file-exists? filename
 Returns true iff the file named @var{filename} actually exists.
@@ -4754,7 +4749,7 @@ this will be fixed in a future release (using Java2 features).
 @end defun
 
 @node Ports, Format, Files, Input-Output
-@subsection Ports
+@section Ports
 
 @defun current-error-port
 Return the port to which errors and warnings should be sent
@@ -4956,7 +4951,7 @@ then the pretty printer switch to the more @dfn{miser} compact style.
 @end defvar
 
 @node Format, , Ports, Input-Output
-@subsection Formatted Output (Common-Lisp-style)
+@section Formatted Output (Common-Lisp-style)
 
 @defun format destination fmt . arguments
 An almost complete implementation of Common LISP format description
@@ -4994,7 +4989,7 @@ Neither justification, nor pretty-printing are supported yet.
 
 Plus of course, we need documentation for @code{format}!
 
-@subsubsection Implemented CL Format Control Directives
+@subsection Implemented CL Format Control Directives
 
 Documentation syntax: Uppercase characters represent the corresponding
 control directive characters. Lowercase characters represent control
@@ -5028,7 +5023,7 @@ prints a character as emacs does (eg. @code{^C} for ASCII 03).
 @end table
 @end table
 
-@subsubsection Formatting Integers
+@subsection Formatting Integers
 
 @table @asis
 @item @code{~D}
@@ -5100,7 +5095,7 @@ as @code{~@@P but jumps 1 argument backward.}
 @var{commawidth} is the number of characters between two comma characters.
 
 
-@subsubsection Formatting real numbers
+@subsection Formatting real numbers
 
 @table @asis
 @item @code{~F}
@@ -5150,7 +5145,7 @@ The sign appears before the padding.
 @end table
 @end table
 
-@subsubsection Miscellaneous formatting operators
+@subsection Miscellaneous formatting operators
 
 @table @asis
 @item @code{~%}
@@ -5261,7 +5256,7 @@ aborts if @var{n} <= @var{m} <= @var{k}
 @end table
 @end table
 
-@subsubsection Unimplemented CL Format Control Directives
+@subsection Unimplemented CL Format Control Directives
 
 @table @asis
 @item @code{~:A}
@@ -5273,7 +5268,7 @@ Justification.
 @item @code{~:^}
 @end table
 
-@subsubsection Extended, Replaced and Additional Control Directives
+@subsection Extended, Replaced and Additional Control Directives
 
 These are not necesasrily implemented in Kawa!
 
@@ -5313,8 +5308,8 @@ may also print number strings, i.e. passing a number as a string and
 format it accordingly.
 @end table
 
-@node Types, Objects Classes and Modules, Input-Output, Extensions
-@section Types
+@node Types, Objects Classes and Modules, Input-Output, Top
+@chapter Types
 
 A @dfn{type} is a set of values, plus an associated set of operations
 valid on those values.
@@ -5359,7 +5354,7 @@ that map to primitive Java types or java classes.
 @end menu
 
 @node Standard Types, Declaring Types of Variables, , Types
-@subsection Standard Types
+@section Standard Types
 
 These types are predefined with the following names.
 
@@ -5493,7 +5488,7 @@ Also, @code{java.lang.StringBuffer[]} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
 @node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
-@subsection Declaring Types of Variables
+@section Declaring Types of Variables
 
 @deffn Syntax let ((name [:: type] init) ...) body
 Declare new locals variables with the given @var{name}, initial value
@@ -5515,7 +5510,7 @@ If @var{type} is not specified, it defaults to @code{Object}.
 See also @code{define-private}, and @code{define-constant}.
 
 @node Type tests and conversions, , Declaring Types of Variables, Types
-@subsection Type tests and conversions
+@section Type tests and conversions
 
 Scheme defines a number of standard type testing predicates.
 For example @code{(vector? x)} is @code{#t} if and only if
@@ -5546,8 +5541,8 @@ Throws an exception if that cannot be done.
 Not supported for @var{type} to be a primitive type such as @code{<int>}.
 @end defun
 
-@node Objects Classes and Modules, XML tools, Types, Extensions
-@section Object, Classes and Modules
+@node Objects Classes and Modules, XML tools, Types, Top
+@chapter Object, Classes and Modules
 
 Kawa provides various ways to define, create, and access Java objects.
 Here are the currently supported features.
@@ -5580,7 +5575,7 @@ allow an optional class specifier (needed for nested clases).
 @end deffn
 
 @node Defining new classes, Anonymous classes, , Objects Classes and Modules
-@subsection Defining new classes
+@section Defining new classes
 
 Kawa provides various mechanisms for defining new classes.
 The @code{define-class} and @code{define-simple-class} forms
@@ -5612,7 +5607,7 @@ unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
 @end deffn
 
-@subsubsection General class properties
+@subsection General class properties
 
 The class inherits from the classes and interfaces listed in @var{supers}.
 This is a list of names of classes that are in scope (perhaps imported
@@ -5663,7 +5658,7 @@ To force a class in the top-level (unnamed) package (something
 not recommended) write a period at the end of the @var{cname}.
 @end table
 
-@subsubsection Declaring fields
+@subsection Declaring fields
 
 @example
 @var{field-decl} ::= (@var{fname} [:: @var{ftype}] @var{option-pair}*)
@@ -5733,7 +5728,7 @@ then its value is doubled.
   (init: (if (some-condition) (set! x (* x 2)))))
 @end example
 
-@subsubsection Declaring methods
+@subsection Declaring methods
 
 @example
 @var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{option-pair}* @var{body})
@@ -5796,7 +5791,7 @@ the @code{invoke-special} special function.
 form may be added in the future.)
 See the example below.
 
-@subsubsection Example
+@subsection Example
 
 In the following example we define a simple class @code{<2d-vector>}
 and a class @code{<3d-vector>} that extends it.  (This is for illustration
@@ -5852,7 +5847,7 @@ and since having non-default constructors suppresses
 the implicit default constructor we have to explicitly define it.
 Using both styles of constructors is rather redundant, though.
 
-@subsubsection Synchronized methods
+@subsection Synchronized methods
 @cindex synchronized methods
 Kawa doesn't directly support marking a method as @code{synchronized},
 but you can get the same effect using a @code{synchronized} expression:
@@ -5871,7 +5866,7 @@ but you can get the same effect using a @code{synchronized} expression:
 @end example
 
 @node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
-@subsection Anonymous classes
+@section Anonymous classes
 
 @deffn Syntax object (supers ...) field-or-method-decl ...
 Returns a new instance of an anonymous (inner) class.
@@ -5909,7 +5904,7 @@ A @var{method-decl} is as for @code{define-class}.
 @end deffn
 
 @node Module classes, Record types, Anonymous classes, Objects Classes and Modules
-@subsection Modules and how they are compiled to classes
+@section Modules and how they are compiled to classes
 
 A @dfn{module} is a set of definitions that the module @dfn{exports},
 as well as some @dfn{actions} (expressions evaluated for their side effect).
@@ -5939,7 +5934,7 @@ an instance module or a static module, is a module, and can be
 loaded or imported as such;  the class need not have written
 using Scheme.
 
-@subsubsection Name visibility
+@subsection Name visibility
 
 The definitions that a module exports are accessible to other modules.
 These are the "public" definitions, to use Java terminology.
@@ -5977,7 +5972,7 @@ Alternatively, you can write:
 (define (fact x) ...)
 @end example
 
-@subsubsection Definitions
+@subsection Definitions
 
 In addition to @code{define} (which can take an optional type specifier),
 Kawa has some extra definition forms.
@@ -6015,7 +6010,7 @@ However, the Kawa version is (currently) only allowed at module level.
 For @code{define-namespace} and @code{define-private-namespace}
 see @ref{Namespaces}.
 
-@subsubsection How a module becomes a class
+@subsection How a module becomes a class
 
 If you want to just use a Scheme module as a module (i.e. @code{load}
 or @code{require} it), you don't care how it gets translated
@@ -6153,7 +6148,7 @@ module class will also automatically implement @code{java.lang.Runnable}.
 case the @code{run} method return an @code{Object} rather than @code{void}.
 This will likely change.)
 
-@subsubsection Requiring (importing) a module
+@subsection Requiring (importing) a module
 
 You can import a module into the current namespace with @code{require}.
 
@@ -6205,7 +6200,7 @@ For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
 @node Record types, Dynamic records, Module classes, Objects Classes and Modules
-@subsection Record types
+@section Record types
 
 The @code{define-record-type} form can be used for creating new data
 types, called record types. A predicate, constructor, and field
@@ -6293,7 +6288,7 @@ Kawa generates efficient code for the resulting functions,
 without needing to use run-time reflection.
 
 @node Dynamic records, Method operations, Record types, Objects Classes and Modules
-@subsection Creating New Record Types On-the-fly
+@section Creating New Record Types On-the-fly
 
 Calling the @code{make-record-type} procedure creates a new record data
 type at run-time, without any compile-time support.
@@ -6409,12 +6404,12 @@ Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
 
 @node Method operations, Allocating objects, Dynamic records, Objects Classes and Modules
-@subsection Calling Java methods from Scheme
+@section Calling Java methods from Scheme
 
 You can call a Java method as if it were a Scheme procedure
 using various mechanisms.
 
-@subsubsection Using colon notation
+@subsection Using colon notation
 
 The general form of the @uref{PathExpressions.html,colon notation} is this:
 @example
@@ -6444,7 +6439,7 @@ or even (though Kawa does not promise to compile this efficiently):
 (let ((math <java.lang.Math>)) math:sqrt 9.0) @result{} 3.0
 @end example
 
-@subsubsection Using a namespace prefix
+@subsection Using a namespace prefix
 
 You can also use @code{define-namespace} to define an alias for a Java class:
 @example
@@ -6500,7 +6495,7 @@ You can also write:
 @end example
 Kawa is smart enough to convert the Kawa string to a Java String.
 
-@subsubsection Invoking non-static methods
+@subsection Invoking non-static methods
 
 To invoke a non-static method you can use a special prefix @code{*}:
 @example
@@ -6556,7 +6551,7 @@ This is equivalent to:
 @end example
 for some otherwise-unused @var{prefix}.
 
-@subsubsection Invoking a method with the @code{invoke} function
+@subsection Invoking a method with the @code{invoke} function
 
 If you prefer, you can instead use the following functions.
 (There is also an older deprecated lower-level interface
@@ -6673,7 +6668,7 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@subsubsection Method names
+@subsection Method names
 
 All of the above select a method to invoke base on specified
 method name and argments.  If specified name is not a Java name,
@@ -6695,7 +6690,7 @@ but you can specify a Java array type instead.  In tha case the
 array element type must be compatible with all the extra arguments.)
 
 @node Allocating objects, Field operations, Method operations, Objects Classes and Modules
-@subsection  Allocating objects
+@section  Allocating objects
 
 You can create a instance of a class-type
 by ``calling'' the class-type as a function:
@@ -6743,7 +6738,7 @@ All of these will usually be optimized to efficient bytecode, assuming
 Kawa knows at compile-time which class you're using.
 
 @node Field operations, Mangling, Allocating objects, Objects Classes and Modules
-@subsection Accessing fields of Java objects
+@section Accessing fields of Java objects
 
 The recommmended way to access fields 
 uses the namespace-colon syntax described in @pxref{Method operations}.
@@ -6804,7 +6799,7 @@ is equivalent to:
 (*:.@var{field-name} (as <@var{class}> @var{instance}))
 @end example
 
-@subsubsection Using field and static-field methods
+@subsection Using field and static-field methods
 
 Kawa has both a high-level interface and a low-level interface for accessing
 the fields of Java objects and static fields.
@@ -6855,7 +6850,7 @@ A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
 @end defun
 
 @node Mangling, Scheme types in Java, Field operations, Objects Classes and Modules
-@subsection Mapping Scheme names to Java names
+@section Mapping Scheme names to Java names
 
 Programs use "names" to refer to various values and procedures.
 The definition of what is a "name" is different in different
@@ -6926,7 +6921,7 @@ Because @samp{$} is used to encode special characters, you
 should avoid using it in names in your source file.
 
 @node Scheme types in Java, Array operations, Mangling, Objects Classes and Modules
-@subsection Scheme types in Java
+@section Scheme types in Java
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 
@@ -6965,9 +6960,9 @@ the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
 @node Array operations, Loading Java functions into Scheme, Scheme types in Java, Objects Classes and Modules
-@subsection Using Java Arrays
+@section Using Java Arrays
 
-@subsubsection Creating new Java arrays
+@subsection Creating new Java arrays
 
 To allocate a Java array you can use the @code{make} function.
 For example, you allocate an array with room for 10 elements
@@ -7000,7 +6995,7 @@ to the default value of zero,
 but elements with indexes 0, 1, 50, 51, 80, 81 are initialized
 to the values 10, 12, 13, 14, 15, 16, respectively.
 
-@subsubsection Accessing Java array elements
+@subsection Accessing Java array elements
 
 You can access the elements of a Java array by treating it as
 a one-argument function, where the argument is the index:
@@ -7044,12 +7039,12 @@ In general, if Kawa knows that
 a ``function'' is an array then it will generate efficient
 bytecode instructions for array operations.
 
-@subsubsection Old low-level array macros
+@subsection Old low-level array macros
 
 The deprecated @ref{Low-level array macros} are also supported.
 
 @node Loading Java functions into Scheme, Evaluating Scheme expressions from Java, Array operations, Objects Classes and Modules
-@subsection Loading Java functions into Scheme
+@section Loading Java functions into Scheme
 
 When @code{kawa -C} compiles (@pxref{Files compilation}) a Scheme module
 it creates a class that implements the @code{java.lang.Runnable} interface.
@@ -7187,7 +7182,7 @@ public class MyFunc2 extends Procedure2
 @end example
 
 @node Evaluating Scheme expressions from Java, , Loading Java functions into Scheme, Objects Classes and Modules
-@subsection Evaluating Scheme expressions from Java
+@section Evaluating Scheme expressions from Java
 
 The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
@@ -7233,8 +7228,8 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node XML tools, Low-level functions, Objects Classes and Modules, Extensions
-@section Working with XML and HTML
+@node XML tools, Low-level functions, Objects Classes and Modules, Top
+@chapter Working with XML and HTML
 
 Kawa has a number of features for working with XML, HTML,
 and generated web pages.
@@ -7287,7 +7282,7 @@ the same functions.
 @end menu
 
 @node Formatting XML, Creating HTML nodes, , XML tools
-@subsection Formatting XML
+@section Formatting XML
 
 The easiest way to generate HTML or XML output is to run Kawa
 with the appropriate @ref{Named output formats, , @code{--output-format} option}.
@@ -7355,7 +7350,7 @@ but @code{(unescaped-data "<?xml?>")} prints as  @samp{<?xml?>}.
 @end defun
 
 @node Creating HTML nodes, Creating XML nodes, Formatting XML, XML tools
-@subsection Creating HTML nodes
+@section Creating HTML nodes
 
 The @code{html} prefix names a special namespace
 (@pxref{Namespaces}) of functions to create HTML element nodes.
@@ -7399,7 +7394,7 @@ Kawa/Scheme currently followed the XQuery copying semantics,
 which may not be the most appropriate for Scheme.
 
 @node Creating XML nodes, Server-side scripts, Creating HTML nodes, XML tools
-@subsection Creating XML nodes
+@section Creating XML nodes
 
 The XML data model is similar to HTML, with one important addition:
 XML tags may be @dfn{qualified names}, which are similar
@@ -7512,7 +7507,7 @@ Crreate a processing-instruction object with the specified @var{target}
 @end deffn
 
 @node Server-side scripts, Servlets, Creating XML nodes, XML tools
-@subsection Writing web-server-side Kawa scripts
+@section Writing web-server-side Kawa scripts
 
 You can compile a Kawa program (written in any supported
 Kawa language, including Scheme, BRL, KRL, or XQuery),
@@ -7582,7 +7577,7 @@ The next two sections will explain how you can install this script
 as either a servlet or a CGI script.
 
 @node Servlets, CGI scripts, Server-side scripts, XML tools
-@subsection Installing Kawa programs as Servlets
+@section Installing Kawa programs as Servlets
 
 You can compile a Kawa program to a @code{Servlet}, and run it
 in a servlet engine (a Servlet-aware web server).
@@ -7615,7 +7610,7 @@ Returns the file path of the current servlet's "Web application".
 @end defun
 
 @node CGI scripts, HTTP requests, Servlets, XML tools
-@subsection Installing Kawa programs as CGI scripts
+@section Installing Kawa programs as CGI scripts
 
 The recommended way to have a web-server run a Kawa program
 as a CGI script is to compile the Kawa program to a servlet
@@ -7670,7 +7665,7 @@ which should have much reduced start-up time, making
 Kawa servlets more practical.
 
 @node HTTP requests, HTTP response, CGI scripts, XML tools
-@subsection Functions for accessing HTTP requests
+@section Functions for accessing HTTP requests
 
 The following functions are useful for accessing
 properties of a HTTP request, in a Kawa program that is
@@ -7717,7 +7712,7 @@ Corresponds to the CGI variable @code{QUERY_STRING}.
 @end defun
 
 @node HTTP response, XML beyond Scheme, HTTP requests, XML tools
-@subsection Generating HTTP responses
+@section Generating HTTP responses
 
 If using plain Scheme, you need to do the following
 before using these functions.
@@ -7754,9 +7749,9 @@ response message of @var{message}.
 @end defun
 
 @node XML beyond Scheme, , HTTP response, XML tools
-@subsection Using non-Scheme languages for XML/HTML 
+@section Using non-Scheme languages for XML/HTML 
 
-@subsubsection XSuery language
+@subsection XSuery language
 
 Bundled with Kawa is a fairly complete implementation of W3C's
 new @uref{http://www.w3c.org/XML/Query,XML Query language}.
@@ -7765,7 +7760,7 @@ source language; this also prints output using XML syntax.
 See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
 for examples and more information.
 
-@subsubsection XSL transformations
+@subsection XSL transformations
 
 There is an experimental implementation of the XSLT (XML Stylesheet
 Language Transformations) language.  Selecting @code{--xslt} at the
@@ -7779,7 +7774,7 @@ for more information.
 @end menu
 
 @node KRL, , ,  XML beyond Scheme
-@subsubsection KRL - The Kawa Report Language for generating XML/HTML
+@subsection KRL - The Kawa Report Language for generating XML/HTML
 
 KRL (the "Kawa Report Language") is powerful Kawa dialect for embedding
 Scheme code in text files such as HTML or XML templates.  You select
@@ -7791,7 +7786,7 @@ uses some of BRL's code, but there are some experimental differences,
 and the implementation core is different.  You can run KRL in
 BRL-compatility-mode by specifying @code{--brl} instead of @code{--krl}.
 
-@subsubsection Differences between KRL and BRL
+@subsection Differences between KRL and BRL
 
 This section summarizes the known differences between KRL and BRL.
 Unless otherwise specified, KRL in BRL-compatibility mode will
@@ -7830,8 +7825,8 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Low-level functions, , XML tools, Extensions
-@section Deprecated low-level functions
+@node Low-level functions, Community, XML tools, Top
+@chapter Deprecated low-level functions
 
 These sections document older and less convenient ways
 to call Java methods, access Java fields, and use Java arrays.
@@ -7843,7 +7838,7 @@ to call Java methods, access Java fields, and use Java arrays.
 @end menu
 
 @node Low-level Method invocation, Low-level Field operations, , Low-level functions
-@subsection Low-level Method invocation
+@section Low-level Method invocation
 
 The following lower-level primitives require you to specify
 the parameter and return types explicitly.
@@ -7881,7 +7876,7 @@ checks that there really is a method that matches the specification.)
 Otherwise, the Java reflection facility is used.
 
 @node Low-level Field operations, Low-level array macros, Low-level Method invocation, Low-level functions
-@subsection Low-level field operations
+@section Low-level field operations
 
 The following macros evaluate to procedures that can be used to
 access or change the fields of objects or static fields.
@@ -7924,7 +7919,7 @@ value of the static field to the argument.
 @end deffn
 
 @node Low-level array macros, , Low-level Field operations, Low-level functions
-@subsection Old low-level array macros
+@section Old low-level array macros
 
 The following macros evaluate to procedures that can be used to
 manipulate primitive Java array objects.
@@ -7960,7 +7955,7 @@ Applying the procedure returns the length of the array.
 (Alternatively, you can use @code{(field @var{array} 'length)}.)
 @end deffn
 
-@node Community, License, Extensions, Top
+@node Community, License, Low-level functions, Top
 @chapter The Kawa Community
 
 @menu

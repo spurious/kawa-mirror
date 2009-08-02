@@ -1,3 +1,10 @@
+2009-08-02  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Extensions): Remove this node, and bring children up
+	a level.  The intent is for the web version that each (new) section
+	gets its own page - and we can if needed subdivide each page into
+	subsubsections - i.e. two levels of page-internal hierarchy.
+
 2009-07-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Syntax and conditional compilation): Moved @anchor

@@ -1817,6 +1817,13 @@ is equivalent to @code{(quote #(a b c))}, assuming @code{vector}
 has not been re-bound.
 @end deffn
 
+@menu
+* Procedure properties::
+* Generic procedures::
+* Extended formals::
+@end menu
+
+@node Procedure properties, Generic procedures, , Procedures
 @section Procedure properties
 
 You can associate arbitrary @dfn{properties} with any procedure.
@@ -1870,6 +1877,7 @@ one method, as well as the @code{setter} property:
 @end example
 @end deffn
 
+@node Generic procedures, Extended formals, Procedure properties, Procedures
 @section Generic (dynamically overloaded) procedures
 
 A @dfn{generic procedure} is a collection of @dfn{method procedures}.
@@ -1906,6 +1914,7 @@ Unrecognized keywords are used to set the procedure properties of the result.
 @end example
 @end defun
 
+@node Extended formals, , Generic procedures, Procedures
 @section Extended Formal Arguments List
 
 The formal arguments list of a lambda expression has two
@@ -7970,7 +7979,7 @@ Applying the procedure returns the length of the array.
 
 To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
 best to use the
-@uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa,bug-submission page}.
+@uref{http://savannah.gnu.org/bugs/?func=additem&group=kawa,bug-submission page}.
 You can browse and comment on existing bug reports
 using the @uref{http://savannah.gnu.org/bugs/?group=kawa, Kawa Bugzilla page}.
 

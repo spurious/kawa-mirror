@@ -1,3 +1,9 @@
+2009-08-04  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Procedures): Create sub-notes for contained @sections.
+
+	* kawa.texi (Reporting bugs): Update Savannah bug-submission URL.
+
 2009-08-02  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Extensions): Remove this node, and bring children up

@@ -1,3 +1,8 @@
+2009-08-05  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Override declared type of method
+	so it matches receiver, for improved binary compatibility.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java (inline): Update for new inlining framework.

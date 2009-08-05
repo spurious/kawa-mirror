@@ -69,6 +69,19 @@ public class Method implements AttrContainer, Member {
     return method;
   }
 
+  /** A copy constructor, except you can override the declaring class.
+   * This can be used to improve binary compatibility by emitting method
+   * references where the declared class is the type of the receiver.
+   */
+  public Method (Method base, ClassType clas)
+  {
+    arg_types = base.arg_types;
+    return_type = base.return_type;
+    name = base.name;
+    access_flags = base.access_flags;
+    classfile = clas;
+  }
+
   Method (ClassType clfile, int flags)
   {
     if (clfile.last_method == null)

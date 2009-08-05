@@ -118,6 +118,13 @@ public class ClassMethods extends Procedure2
     for (int i = mlength;  --i >= 0; )
     {
       Method method = (Method) methods.elementAt(i);
+      if (! named_class_only && method.getDeclaringClass() != dtype)
+        {
+          // Override declared type of method so it matches receiver,
+          // like javac does, for improved binary compatibility.
+          method = new Method(method,
+                              (ClassType) dtype.getImplementationType());
+        }
       PrimProcedure pproc = new PrimProcedure(method, mode, language);
       result[count++] = pproc;
     }

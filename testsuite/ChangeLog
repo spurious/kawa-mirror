@@ -1,3 +1,8 @@
+2009-08-06  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* misc.scm: New test based on Savannah bug #27188 "Sequence printing".
+
 2009-08-05  Helmut Eller  <eller.helmut@gmail.com>
 	    Per Bothner  <per@bothner.com>
 

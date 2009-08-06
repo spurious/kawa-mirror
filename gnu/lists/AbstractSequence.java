@@ -772,9 +772,8 @@ public abstract class AbstractSequence
   /* #ifdef JAVA2 */
   public List subList(int fromIx, int toIx)
   {
-    return new SubSequence(this,
-                           createPos(fromIx, false),
-                	   createPos(toIx, true));
+    return subSequencePos(createPos(fromIx, false),
+                          createPos(toIx, true));
   }
   /* #endif */
 

@@ -4,7 +4,7 @@
 package gnu.lists;
 
 /** A sequence consisting of a sub-range of the elements of a base sequence.
- * The start and end positions are positions triples (on the same sequence).
+ * The start and end positions are position triples (on the same sequence).
  */
 
 public class SubSequence
@@ -103,11 +103,19 @@ extends AbstractSequence implements Sequence
     return base.getNextKind(ipos);
   }
 
+  public int startPos () { return ipos0; }
+  public int endPos () { return ipos1; }
+
   public Object getPosPrevious(int ipos)
   {
     if (base.compare(ipos, ipos0) <= 0)
       return eofValue;
     return base.getPosPrevious(ipos);
+  }
+
+  protected Sequence subSequencePos(int ipos0, int ipos1)
+  {
+    return new SubSequence(base, ipos0, ipos1);
   }
 
   public void clear()

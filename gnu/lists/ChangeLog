@@ -1,3 +1,11 @@
+2009-08-06  Per Bothner  <per@bothner.com>
+
+	Fix for Savannah bug #27188 "Sequence printing".
+	* SubSequence.java (startPos, endPos): New methods.
+
+	* SubSequence.java (subSequencePos): New optimized method.
+	* AbstractSequence.java (subList): Use subSequencePos.
+
 2009-05-12  Per Bothner  <per@bothner.com>
 
 	* UnescapedData.java: Make UnescapedData implement CharSequence.

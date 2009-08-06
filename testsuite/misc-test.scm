@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 173)
+(test-init "Miscellaneous" 174)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -873,3 +873,12 @@
   (define (foo) (and (bar) (bar)))
   (define baz #f)
   (define (bar) (set! baz #f)))
+
+;; Savannah bug #27019 "setLength method of StringBuilder not found"
+(define sb (java.lang.StringBuilder "abcdef"))
+(define (set-length (builder :: java.lang.StringBuilder) (len :: int))
+  (with-compile-options warn-invoke-unknown-method: #t
+			warn-as-error: #t
+			(builder:setLength len)))
+(set-length sb 4)
+(test "abcd" 'test-savannah-27019 (sb:toString))

@@ -103,13 +103,11 @@ public class ClassMethods extends Procedure2
                                            mode == 'P' ? null : dtype);
     boolean named_class_only = mode == 'P' || "<init>".equals(mname);
     Vector methods = new Vector();
-    dtype.getMethods(filter, named_class_only ? 0 : 2,
-		     methods,
-                     caller == null ? "-" : caller.getPackageName());
+    dtype.getMethods(filter, named_class_only ? 0 : 2, methods);
     if (! named_class_only &&
         // If not redundant (i.e. not a normal ClassType), also search Object.
         ! (dtype instanceof ClassType && ! ((ClassType) dtype).isInterface()))
-      Type.pointer_type.getMethods(filter, 0, methods, null);
+      Type.pointer_type.getMethods(filter, 0, methods);
     int mlength = (named_class_only ? methods.size()
 		   : removeRedundantMethods(methods));
 
@@ -287,6 +285,9 @@ class MethodFilter implements gnu.bytecode.Filter
 	&& (mlen != nlen + 4
 	    || ! mname.endsWith("$V$X")))
       return false;
-    return caller == null || caller.isAccessible(method, receiver);
+    ClassType declaring = receiver instanceof ClassType ? (ClassType) receiver
+      : method.getDeclaringClass();
+    return caller == null
+      || caller.isAccessible(declaring, receiver, method.getModifiers());
   }
 }

@@ -1,5 +1,9 @@
 2009-08-05  Per Bothner  <per@bothner.com>
 
+	* ClassMethods.java (getMethods): Update to new ClassType API.
+	(select): Use the receiver as the declaring class, for better
+	java spec compatibility.
+
 	* ClassMethods.java (getMethods): Override declared type of method
 	so it matches receiver, for improved binary compatibility.
 

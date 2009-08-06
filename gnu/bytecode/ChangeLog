@@ -1,5 +1,16 @@
 2009-08-05  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (isAccessible): Fix buglet.
+
+	* ClassType.java (getMethods): Follow java inheritance spec more
+	closely.  We don't need the call context - but whether a method is
+	inherited may depend on whether they're in the same package.
+	Update calls.
+	This fixes Savannah bug #27019 "setLength method of StringBuilder
+	not found".
+	* ObjectType.java (getMethods): Update, and create @deprecated stub.
+	* ArrayType.java (getMethods): Update for new API.
+
 	* Method.java (<init>): New constructor.
 
 2009-07-29  Per Bothner  <per@bothner.com>

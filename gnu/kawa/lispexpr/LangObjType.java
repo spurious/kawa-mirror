@@ -133,13 +133,13 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public int getMethods (Filter filter, int searchSupers,
                          /* #ifdef JAVA5 */
-                         List<Method> result,
+                         List<Method>
                          /* #else */
-                         // Vector result,
+                         // Vector
                          /* #endif */
-                         String context)
+                         result)
   {
-    return implementationType.getMethods(filter, searchSupers, result, context);
+    return implementationType.getMethods(filter, searchSupers, result);
   }
 
   public java.lang.Class getReflectClass()

@@ -325,6 +325,7 @@ public class ClassType extends ObjectType
                                ObjectType receiver, int modifiers)
   {
     int cmods = declaring.getModifiers();
+    // Fast, hopefully-common case.
     if ((modifiers & Access.PUBLIC) != 0 && (cmods & Access.PUBLIC) != 0)
       return true;
     String callerName = getName();
@@ -339,6 +340,8 @@ public class ClassType extends ObjectType
     String classPackage = dot >= 0 ? className.substring(0, dot) : "";
     if (callerPackage.equals(classPackage))
       return true;
+    if ((cmods & Access.PUBLIC) == 0)
+      return false;
     if ((modifiers & Access.PROTECTED) != 0
         && this.isSubclass(declaring)
         && (!(receiver instanceof ClassType)
@@ -732,7 +735,7 @@ public class ClassType extends ObjectType
   public final int countMethods (Filter filter, int searchSupers)
   {
     Vector vec = new Vector();
-    getMethods(filter, searchSupers, vec, null);
+    getMethods(filter, searchSupers, vec);
     return vec.size();
   }
 
@@ -751,7 +754,7 @@ public class ClassType extends ObjectType
   public Method[] getMethods (Filter filter, int searchSupers)
   {
     Vector<Method> vec = new Vector();
-    getMethods(filter, searchSupers, vec, null);
+    getMethods(filter, searchSupers, vec);
     int count = vec.size();
     Method[] result = new Method[count];
     for (int i = 0;  i < count;  i++)
@@ -773,7 +776,7 @@ public class ClassType extends ObjectType
 			 Method[] result, int offset)
   {
     Vector<Method> vec = new Vector<Method>();
-    getMethods(filter, searchSupers, vec, null);
+    getMethods(filter, searchSupers, vec);
     int count = vec.size();
     for (int i = 0;  i < count;  i++)
       result[offset+i] = vec.elementAt(i);
@@ -785,41 +788,51 @@ public class ClassType extends ObjectType
    * @param searchSupers 0 if only current class should be searched,
    *   1 if superclasses should also be searched,
    *   2 if super-interfaces should also be searched
-   * @param result Vector to add selected methods in
-   * @param context If non-null, skip if class not visible in named package.
-   * @return number of methods placed in result array
+   * @param result List to add selected methods in
+   * @return number of methods placed in result list
    */
   public int getMethods (Filter filter, int searchSupers,
                          /* #ifdef JAVA5 */
-                         List<Method> result,
+                         List<Method>
                          /* #else */
-                         // Vector result,
+                         // Vector
                          /* #endif */
-			 String context)
+                         result)
   {
     int count = 0;
+    String inheritingPackage = null;
     for (ClassType ctype = this;  ctype != null;
 	 ctype = ctype.getSuperclass())
     {
-      if (context == null
-	  || (ctype.getModifiers() & Access.PUBLIC) != 0
-	  || context.equals(ctype.getPackageName()))
-	{
-	  for (Method meth = ctype.getDeclaredMethods();
-	       meth != null;  meth = meth.getNext())
-	    if (filter.select(meth))
-	      {
-		if (result != null)
-                  {
-                    /* #ifdef JAVA2 */
-                    result.add(meth);
-                    /* #else */
-                    // result.addElement(meth);
-                    /* #endif */
-                  }
-		count++;
-	      }
-	}
+      String curPackage = ctype.getPackageName();
+      for (Method meth = ctype.getDeclaredMethods();
+           meth != null;  meth = meth.getNext())
+        {
+          if (ctype != this)
+            {
+              int mmods = meth.getModifiers();
+              if ((mmods & Access.PRIVATE) != 0)
+                continue;
+              if ((mmods & (Access.PUBLIC|Access.PROTECTED)) == 0
+                  && ! curPackage.equals(inheritingPackage))
+                continue;
+            }
+          if (filter.select(meth))
+            {
+              if (result != null)
+                {
+                  /* #ifdef JAVA2 */
+                  result.add(meth);
+                  /* #else */
+                  // result.addElement(meth);
+                  /* #endif */
+                }
+              count++;
+            }
+        }
+
+      inheritingPackage = curPackage;
+
       if (searchSupers == 0)
 	break;
 
@@ -830,7 +843,7 @@ public class ClassType extends ObjectType
 	    {
 	      for (int i = 0;  i < interfaces.length;  i++)
 		count += interfaces[i].getMethods(filter, searchSupers,
-						  result, context);
+						  result);
 	    }
 	}
     }

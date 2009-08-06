@@ -3,7 +3,7 @@
 
 package gnu.bytecode;
 import java.io.*;
-import java.util.Vector;
+import java.util.*;
 
 public class ArrayType extends ObjectType
   implements Externalizable
@@ -87,16 +87,28 @@ public class ArrayType extends ObjectType
   }
   /* #endif */
 
-  public int getMethods (Filter filter, int searchSupers, Vector result,
-			 String context)
+  public int getMethods (Filter filter, int searchSupers,
+                         /* #ifdef JAVA5 */
+                         List<Method>
+                         /* #else */
+                         // Vector
+                         /* #endif */
+			 result)
   {
     if (searchSupers > 0)
       {
-        int count = Type.objectType.getMethods(filter, 0, result, null);
+        int count = Type.objectType.getMethods(filter, 0, result);
         if (searchSupers > 1 && filter.select(Type.clone_method))
           {
             if (result != null)
-              result.addElement(Type.clone_method);
+              {
+                Method meth = Type.clone_method;
+                /* #ifdef JAVA2 */
+                result.add(meth);
+                /* #else */
+                // result.addElement(meth);
+                /* #endif */
+              }
             count++;
           }
         return count;

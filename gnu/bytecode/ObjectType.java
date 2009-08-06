@@ -169,15 +169,22 @@ public class ObjectType extends Type
     return Type.objectType.getMethod(name, arg_types);
   }
 
+  /** @deprecated */
+  public final int getMethods (Filter filter, int searchSupers,
+                               Vector result, String context)
+  {
+    return getMethods(filter, searchSupers, result);
+  }
+
   public int getMethods (Filter filter, int searchSupers,
                          /* #ifdef JAVA5 */
-                         List<Method> result,
+                         List<Method>
                          /* #else */
-                         // Vector result,
+                         // Vector
                          /* #endif */
-			 String context)
+			 result)
   {
-    return Type.objectType.getMethods(filter, searchSupers, result, context);
+    return Type.objectType.getMethods(filter, searchSupers, result);
   }
 
   public int compare(Type other)

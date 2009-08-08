@@ -1325,6 +1325,19 @@ public class Translator extends Compilation
       }
   }
 
+  static void vectorReverse (Vector vec, int start, int count)
+  {
+    // See http://www.azillionmonkeys.com/qed/case8.html
+    int j = count / 2;
+    int last = start + count - 1;
+    for (int i = 0; i < j; i++)
+      {
+        Object tmp = vec.elementAt(start + i);
+        vec.setElementAt(vec.elementAt(last - i), start+i);
+        vec.setElementAt(tmp, last - i);
+      }
+  }
+
   public void resolveModule(ModuleExp mexp)
   {
     int numPending = pendingImports == null ? 0 : pendingImports.size();
@@ -1333,20 +1346,31 @@ public class Translator extends Compilation
         ModuleInfo info = (ModuleInfo) pendingImports.elementAt(i++);
         ScopeExp defs = (ScopeExp) pendingImports.elementAt(i++);
         Expression posExp = (Expression) pendingImports.elementAt(i++);
+        Integer savedSize = (Integer) pendingImports.elementAt(i++);
         if (mexp == defs)
           {
             // process(BODY_PARSED);
             Expression savePos = new ReferenceExp((Object) null);
             savePos.setLine(this);
             setLine(posExp);
+            int beforeSize = formStack.size();
             kawa.standard.require.importDefinitions(null, info, null,
                                                     formStack, defs, this);
+            int desiredPosition = savedSize.intValue();
+            if (savedSize != beforeSize)
+              {
+                // Move the forms resulting from the import to desiredPosition:
+                int curSize = formStack.size();
+                int count = curSize - desiredPosition;
+                // See http://www.azillionmonkeys.com/qed/case8.html
+                vectorReverse(formStack, desiredPosition, beforeSize-desiredPosition);
+                vectorReverse(formStack, beforeSize, curSize - beforeSize);
+                vectorReverse(formStack, desiredPosition, count);
+              }
             setLine(savePos);
-            pendingImports.setElementAt(null, i-3);
-            pendingImports.setElementAt(null, i-2);
-            pendingImports.setElementAt(null, i-1);
           }
       }
+    pendingImports = null;
 
     processAccesses();
 

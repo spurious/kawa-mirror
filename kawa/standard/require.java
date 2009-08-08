@@ -269,6 +269,7 @@ public class require extends Syntax
           {
             // Oops.  We found a cycle.
             tr.pushPendingImport(info, defs);
+            tr.pendingImports.push(Integer.valueOf(forms.size()));
             return true;
           }
       }

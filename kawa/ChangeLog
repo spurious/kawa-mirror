@@ -1,5 +1,11 @@
 2009-08-07  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (resolveModule): Move the forms resulting from
+	in import into their proper place.
+	(vectorReverse): New helper method.
+	* standard/require.java (importDefinitions): Also remember
+	size of forms stack.
+
 	* repl.java (processArgs): Update copyright year printed by --version.
 
 2009-07-10  Per Bothner  <per@bothner.com>

@@ -57,7 +57,8 @@ check-text:
 check-regex:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/regex-test.scm"
 
-check-misc: testing.zip moduleFT.class InliningTest.class
+check-misc: testing.zip moduleFT.class InliningTest.class \
+	    cycle1.class cycle2.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
 check-mac: testing.zip
@@ -256,4 +257,4 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   ppfile.out scribble.html.in $(EXTRA_LOAD_REQUIRE_DIST) \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
-  inlining-test.scm inlining.expected cycle1.scm cycle2.scm
+  inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm

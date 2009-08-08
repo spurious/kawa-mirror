@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 175)
+(test-init "Miscellaneous" 176)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -886,3 +886,6 @@
 ;; Savannah bug #27188 "Sequence printing"
 (define sublist-27188 (invoke #(10 11 12 13 14 15) 'subList 1 3))
 (test "(#sequence 11 12)" 'test-savannah-27188 (format #f "~s" sublist-27188))
+
+(require "test-cycle12.scm")
+(test '(8 12) c1x-c2x)

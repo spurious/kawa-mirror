@@ -1,3 +1,12 @@
+2009-08-07  Per Bothner  <per@bothner.com>
+	    Chuah Teong Leong
+
+	* cycle1.scm, cycle2.scm, misc-test.scm: Another complex test of
+	cyclic require.
+	* test-cycle12.scm: New file.
+	* Makefile.am (check-misc): Add dependency.
+	(EXTRA_DIST): Update accordingly.
+
 2009-08-06  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

@@ -4,7 +4,7 @@
   <!-- Give the user a chance to override the defaults. -->
   <property file="build.properties"/>
 
-  <property name="version.release" value="1.9.3"/>
+  <property name="version.release" value="1.9.90"/>
   <property name="version.local" value=""/>
   <property name="version" value="${version.release}${version.local}"/>
 

@@ -120,6 +120,8 @@ public class FindTailCalls extends ExpWalker
             lexp.inlineHome = null;
           }
       }
+    /* This conflates the concepts of a tail-call with being able to
+       optimize away append-values.  FIXME
     if (isAppendValues
         && currentLambda.getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
      {
@@ -130,8 +132,8 @@ public class FindTailCalls extends ExpWalker
            args[i] = walk(args[i]);
          }
       }
-    else
-      exp.args = walkExps(exp.args);
+      else*/
+    exp.args = walkExps(exp.args);
     return exp;
   }
 

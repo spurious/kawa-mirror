@@ -1,3 +1,7 @@
+2009-08-08  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkApplyExp): Comment out bogus optmization.
+
 2009-07-14  Per Bothner  <per@bothner.com>
 
 	Fix for Savannah bug #27014 "AND vs. VOID".

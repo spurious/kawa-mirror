@@ -197,7 +197,7 @@ public class SimpleEnvironment extends Environment
 	// case of a lazy ClassMemberLocation referring to a missing class.
 	if (bound
 	    ? ((flags & CAN_REDEFINE) == 0)
-	    : ((flags & CAN_DEFINE) == 0) && loc.isBound());
+	    : ((flags & CAN_DEFINE) == 0) && loc.isBound())
 	  redefineError(name, property, nloc);
       }
     if ((flags & Environment.INDIRECT_DEFINES) != 0)

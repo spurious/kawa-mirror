@@ -1,3 +1,7 @@
+2009-08-10  Per Bothner  <per@bothner.com>
+
+	* SimpleEnvironment.java (addLocation): Fix typo.
+
 2009-05-19  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (print(boolean)): New method.

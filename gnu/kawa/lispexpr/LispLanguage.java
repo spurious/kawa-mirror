@@ -24,6 +24,10 @@ public abstract class LispLanguage extends Language
   /** Used for Kawa infix ':' operator. */
   static public final Symbol lookup_sym = Namespace.EmptyNamespace.getSymbol("$lookup$");
 
+  public static StaticFieldLocation getNamedPartLocation =
+    new StaticFieldLocation("gnu.kawa.functions.GetNamedPart", "getNamedPart");
+  static { getNamedPartLocation.setProcedure(); }
+
   /** The default <code>ReadTable</code> for this language. */
   public ReadTable defaultReadTable = createReadTable();
 

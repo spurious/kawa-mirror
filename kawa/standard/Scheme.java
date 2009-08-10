@@ -41,7 +41,6 @@ public class Scheme extends LispLanguage
   public static final gnu.kawa.functions.IsEq isEq;
   public static final gnu.kawa.functions.IsEqv isEqv;
   public static final gnu.kawa.functions.IsEqual isEqual;
-  public static final kawa.repl repl;
 
   public static final NumberCompare numEqu;
   public static final NumberCompare numGrt;
@@ -84,11 +83,6 @@ public class Scheme extends LispLanguage
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
 
-    // Declare the special symbol $lookup$ (from the reader)
-    // and bind it to getNamedPartDecl.
-    instance.environ.addLocation(LispLanguage.lookup_sym, null, Translator.getNamedPartLocation);
-
-    repl = new kawa.repl(instance);
     instance.initScheme();
   }
 
@@ -102,14 +96,13 @@ public class Scheme extends LispLanguage
     return kawaEnvironment;
   }
 
-  public static final Lambda lambda = new kawa.lang.Lambda();
-  static { lambda.setKeywords(Special.optional, Special.rest, Special.key); }
-
   private void initScheme ()
   {
       environ = nullEnvironment;
 
-      defSntxStFld("lambda", "kawa.standard.Scheme", "lambda");
+      environ.addLocation(LispLanguage.lookup_sym, null, getNamedPartLocation);
+
+      defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
 
       //-- Section 4.1  -- complete
       defSntxStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
@@ -418,7 +411,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
       defProcStFld("eval", "kawa.lang.Eval");
-      defProcStFld("repl", "kawa.standard.Scheme", "repl");
+      defProcStFld("repl", "kawa.standard.SchemeCompilation", "repl");
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
       defProcStFld("null-environment", "kawa.lib.misc");
       defProcStFld("interaction-environment", "kawa.lib.misc");

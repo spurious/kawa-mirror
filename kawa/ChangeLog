@@ -1,3 +1,17 @@
+2009-08-10  Per Bothner  <per@bothner.com>
+
+	One step in separating compilation from run-time classes.
+	* standard/SchemeCompilation.java: New class.
+	* standard/Makefile.am: Update accordingly.
+	* standard/Scheme.java (lambda, repl): Move to SchemeCompilation.
+	(initScheme): Bind LispLanguage.getNamedPartLocation, but don't
+	reference Translator fields while doing so.
+	* standard/try_catch.java: Update accordingly.
+	* standard/define.java: Likewise.
+	* standard/object.java: Likewise.
+	* lang/Translator.java (getNamedPartLocation): Remove field - it's
+	now in LispLanguage.
+
 2009-08-07  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (resolveModule): Move the forms resulting from

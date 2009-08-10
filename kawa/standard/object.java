@@ -11,7 +11,7 @@ import gnu.kawa.functions.Convert;
 public class object extends Syntax
 {
   public static final object objectSyntax
-    = new kawa.standard.object(Scheme.lambda);
+    = new kawa.standard.object(SchemeCompilation.lambda);
   static { objectSyntax.setName("object"); }
 
   Lambda lambda;

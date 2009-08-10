@@ -19,7 +19,7 @@ public class try_catch
     int n = vec.size();
     for (int i = 0;  i < n;  i++)
       {
-        Expression cl = Scheme.lambda.rewrite(vec.get(i), tr);
+        Expression cl = SchemeCompilation.lambda.rewrite(vec.get(i), tr);
         if (cl instanceof ErrorExp)
           return cl;
         if (! (cl instanceof LambdaExp))

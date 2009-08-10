@@ -50,17 +50,13 @@ public class Translator extends Compilation
   public LambdaExp curMethodLambda;
 
   public static final Declaration getNamedPartDecl;
-  public static final StaticFieldLocation getNamedPartLocation;
   static {
     // Declare the special symbol $lookup$ (from the reader)
     // and bind it to getNamedPartDecl.
     String cname = "gnu.kawa.functions.GetNamedPart";
     String fname = "getNamedPart";
     getNamedPartDecl = Declaration.getDeclarationFromStatic(cname, fname);
-    StaticFieldLocation loc = new StaticFieldLocation(cname, fname);
-    loc.setProcedure();
-    loc.setDeclaration(getNamedPartDecl);
-    getNamedPartLocation = loc;
+    LispLanguage.getNamedPartLocation.setDeclaration(getNamedPartDecl);
   }
 
   /** Return true if decl is lexical and not fluid. */

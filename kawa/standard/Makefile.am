@@ -38,7 +38,7 @@ try_catch.java \
 make.java location.java \
 define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \
-Scheme.java \
+Scheme.java SchemeCompilation.java \
 object.java define_class.java thisRef.java \
   IfFeature.java \
   ImportFromLibrary.java \

@@ -165,6 +165,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 KAWALIB = ../kawa-$(VERSION).jar
+KAWARTLIB = ../kawart-$(VERSION).jar
 KAWA = ../bin/kawa.sh
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 @ENABLE_SERVLET_TRUE@SERVLET_TESTS = check-HelloCgiS check-HelloCgiK check-HelloCgiX
@@ -537,7 +538,7 @@ check-pitfalls:
 
 # Not done by "make check" as it is interactive.
 check-scribble: scribble.class
-	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. scribble.html
+	$(APPLETVIEWER) -J-cp -J. -J-cp -J$(KAWARTLIB) scribble.html
 
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^

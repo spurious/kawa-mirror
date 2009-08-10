@@ -1,3 +1,10 @@
+2009-08-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawart-@VERSION@.jar): New rule.
+	* classes-to-skip-for-runtime: New file.
+
+	* Makefile.am (kawa-@VERSION@.jar): Minor optimization/simplification.
+
 2009-08-06  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.9.10.

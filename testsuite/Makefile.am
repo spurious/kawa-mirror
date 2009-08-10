@@ -1,6 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 KAWALIB = ../kawa-$(VERSION).jar
+KAWARTLIB = ../kawart-$(VERSION).jar
 KAWA = ../bin/kawa.sh
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
@@ -184,7 +185,7 @@ APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
 check-scribble: scribble.class
-	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. scribble.html
+	$(APPLETVIEWER) -J-cp -J. -J-cp -J$(KAWARTLIB) scribble.html
 
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^

@@ -1,3 +1,8 @@
+2009-08-12  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java (getReturnKind): New method.
+	(compile): Minor efficiency tweak.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (inline): Update for new inlining framework.

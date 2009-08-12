@@ -66,9 +66,13 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
 	ApplyExp.compile(exp, comp, target);
 	return;
       }
-    Type type = getReturnType(args);
-    int kind = Arithmetic.classifyType(type);
-    if (kind == 0)
+    // We know len >= 2 from above.
+    // We expect len == 2, assuming inline has been run.
+    int kind1 = Arithmetic.classifyType(args[0].getType());
+    int kind2 = Arithmetic.classifyType(args[1].getType());
+    int kind = getReturnKind(kind1, kind2);
+    Type type = Arithmetic.kindType(kind);
+    if (kind == 0 || len != 2 /* just in case */)
       {
 	ApplyExp.compile(exp, comp, target);
 	return;
@@ -134,11 +138,11 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
     target.compileFromStack(comp, wtype);
   }
 
-  public Type getReturnType (Expression[] args)
+  public int getReturnKind (Expression[] args)
   {
     int len = args.length;
     if (len == 0)
-      return Arithmetic.typeIntNum;
+      return Arithmetic.INTNUM_CODE;
     Type type = Type.pointer_type;
     int kindr = 0;
     for (int i = 0;  i < len;  i++)
@@ -149,6 +153,16 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
 	if (i == 0 || kind == 0 || kind > kindr)
 	  kindr = kind;
       }
-    return Arithmetic.kindType(kindr);
+    return kindr;
+  }
+
+  public int getReturnKind (int kind1, int kind2)
+  {
+    return kind1 > kind2 || kind1 == 0 ? kind1 : kind2;
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Arithmetic.kindType(getReturnKind(args));
   }
 }

@@ -4,7 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import java.util.Vector;
+import java.util.*;
 
 public class ClassExp extends LambdaExp
 {
@@ -273,6 +273,8 @@ public class ClassExp extends LambdaExp
     if (partsDeclared)
       return;
     partsDeclared = true;
+    Hashtable<String,Declaration> seenFields
+      = new Hashtable<String,Declaration>();
     for (Declaration decl = firstDecl();
 	 decl != null;  decl = decl.nextDecl())
       {
@@ -299,6 +301,10 @@ public class ClassExp extends LambdaExp
 		decl.field
 		  = instanceType.addField(fname, decl.getType(), flags);
 		decl.setSimple(false);
+                Declaration old = seenFields.get(fname);
+                if (old != null)
+                  duplicateDeclarationError(old, decl, comp);
+                seenFields.put(fname, decl);
 	      }
 	  }
       }

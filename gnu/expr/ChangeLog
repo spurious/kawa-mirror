@@ -1,3 +1,7 @@
+2009-08-12  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (declareParts): Check for duplicate field names.
+
 2009-08-08  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkApplyExp): Comment out bogus optmization.

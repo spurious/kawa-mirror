@@ -1,5 +1,8 @@
 2009-08-12  Per Bothner  <per@bothner.com>
 
+	* StackTarget.java (compileFromStack0): When checking is cast is
+	needed, use implementation types.
+
 	* ClassExp.java (declareParts): Check for duplicate field names.
 
 2009-08-08  Per Bothner  <per@bothner.com>

@@ -1,5 +1,10 @@
 2009-08-13  Per Bothner  <per@bothner.com>
 
+	* standard/define.java (scanForm, rewriteForm): If --no-inline flag
+	is specified (i.e. if ! Compilation.inlineOk), treat
+	"(define (foo args) body)" same as
+	"(define foo (lambda (args) name: 'foo body)".
+
 	* standard/Scheme.java: Various functions in kawa/lib were moved around.
 
 	* lang/Translator.java: Update GetNamedPart -> CompileNamedPart.

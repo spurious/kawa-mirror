@@ -79,10 +79,13 @@ public class define extends Syntax
     if ((options & 2) != 0)
       {
 	LambdaExp lexp = new LambdaExp();
-	decl.setProcedureDecl(true);
-        decl.setType(Compilation.typeProcedure);
 	lexp.setSymbol(name);
-	lexp.nameDecl = decl;
+        if (Compilation.inlineOk)
+          {
+            decl.setProcedureDecl(true);
+            decl.setType(Compilation.typeProcedure);
+            lexp.nameDecl = decl;
+          }
 	Object formals = p4.getCar();
 	Object body = p4.getCdr();
 	Translator.setLine(lexp, p1);
@@ -141,6 +144,8 @@ public class define extends Syntax
 	Object body = p4.getCdr();
 	lambda.rewriteBody(lexp, body, tr);
 	value = lexp;
+        if (! Compilation.inlineOk)
+          decl.noteValue(null);
       }
     else
       {

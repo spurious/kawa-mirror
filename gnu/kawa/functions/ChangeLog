@@ -1,5 +1,17 @@
 2009-08-12  Per Bothner  <per@bothner.com>
 
+	* CompilationHelpers.java: New class.
+	Used for inlining specific procedures.
+	* Makefile.am: Update accordingly.
+	* ApplyToArgs.java: No longer implements CanInline.
+	(inline):  Replaced by CompilationHelpers.inlineApplyToArgs.
+	* Setter.java: No longer implements CanInline.
+	(inline):  Replaced by CompilationHelpers.inlineSetter.
+	(class SetArrayExp, class SetListExp): Moved to CompilationHelpers.
+	* IsEqv.java: No longer implements CanInline.
+	(inline):  Replaced by CompilationHelpers.inlineIsEqv.
+	* AddOp.java (pairwise): Use InlineCalls.maybeInline.
+
 	* ArithOp.java (getReturnKind): New method.
 	(compile): Minor efficiency tweak.
 

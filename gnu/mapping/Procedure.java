@@ -12,6 +12,7 @@ public abstract class Procedure extends PropertySet
 {
   private static final String sourceLocationKey = "source-location";
   private static final Symbol setterKey = Namespace.EmptyNamespace.getSymbol("setter");
+  public static final Symbol inlinerKey = Namespace.EmptyNamespace.getSymbol("inliner");
 
   public void setSourceLocation (String file, int line)
   {

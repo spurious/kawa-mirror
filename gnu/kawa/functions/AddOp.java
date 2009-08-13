@@ -171,10 +171,8 @@ public class AddOp extends ArithOp
         args2[0] = prev;
         args2[1] = args[i];
         ApplyExp next = new ApplyExp(rproc, args2);
-        if (proc instanceof CanInline)
-          prev = ((CanInline) proc).inline(next, walker, true);
-        else
-          prev = next;
+        Expression inlined = walker.maybeInline(next, true, proc);
+        prev = inlined != null ? inlined : next;
       }
     return prev;
   }

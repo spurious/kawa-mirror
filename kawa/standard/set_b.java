@@ -3,7 +3,6 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.kawa.functions.Setter;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.
@@ -60,7 +59,8 @@ public class set_b extends Syntax
 	Expression[] xargs = new Expression[nargs+1];
 	System.arraycopy(args, skip, xargs, 0, nargs);
 	xargs[nargs] = value;
-	return new ApplyExp(new ApplyExp(new ReferenceExp(Setter.setterDecl),
+        Declaration setter = gnu.kawa.functions.CompilationHelpers.setterDecl;
+	return new ApplyExp(new ApplyExp(new ReferenceExp(setter),
                                          setterArgs), xargs);
       }
     else if (! (name instanceof ReferenceExp))

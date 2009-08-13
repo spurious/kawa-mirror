@@ -2,11 +2,11 @@ package gnu.kawa.functions;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.text.Char;
-import gnu.expr.*;
+import gnu.expr.Language;
 
 /** Implement that standard Scheme function "eqv?". */
 
-public class IsEqv extends Procedure2 implements CanInline
+public class IsEqv extends Procedure2
 {
   Language language;
   IsEq isEq;
@@ -16,6 +16,8 @@ public class IsEqv extends Procedure2 implements CanInline
     this.language = language;
     this.isEq = isEq;
     setName(name);
+    setProperty(Procedure.inlinerKey,
+                "gnu.kawa.functions.CompilationHelpers:inlineIsEqv");
   }
 
   public static boolean apply (Object arg1, Object arg2) 
@@ -33,25 +35,4 @@ public class IsEqv extends Procedure2 implements CanInline
   {
     return language.booleanObject(apply(arg1, arg2));
    }
-
-  private static boolean nonNumeric(Expression exp)
-  {
-    if (exp instanceof QuoteExp)
-      {
-        Object value = ((QuoteExp) exp).getValue();
-        return ! (value instanceof Numeric || value instanceof Char
-                  || value instanceof Symbol);
-      }
-    return false;
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression[] args = exp.getArgs();
-    if (nonNumeric(args[0]) || nonNumeric(args[1]))
-      return new ApplyExp(isEq, args);
-    return exp;
-  }
 }

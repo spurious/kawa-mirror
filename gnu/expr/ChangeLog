@@ -1,6 +1,10 @@
 2009-08-12  Per Bothner  <per@bothner.com>
 
-	* StackTarget.java (compileFromStack0): When checking is cast is
+	* InlineCalls.java (maybeInline): See if Procedure implements
+	CanInline *or* it has an "inliner" property, and if so apply it.
+	* QuoteExp.java (inline): Call maybeInline.
+
+	* StackTarget.java (compileFromStack0): When checking if cast is
 	needed, use implementation types.
 
 	* ClassExp.java (declareParts): Check for duplicate field names.

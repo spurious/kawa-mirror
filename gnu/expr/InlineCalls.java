@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
-import gnu.mapping.Values;
+import gnu.mapping.*;
 
 public class InlineCalls extends ExpWalker
 {
@@ -190,6 +190,74 @@ public class InlineCalls extends ExpWalker
       }
     */
     return exp;
+  }
+
+  private static Class[] inlinerMethodArgTypes;
+  private static synchronized Class[] getInlinerMethodArgTypes()
+    throws Exception
+  {
+    Class[] t = inlinerMethodArgTypes;
+    if (t == null)
+      {
+        t = new Class[] { Class.forName("gnu.expr.ApplyExp"),
+                         Class.forName("gnu.expr.InlineCalls"),
+                         Boolean.TYPE,
+                         Class.forName("gnu.mapping.Procedure") };
+        inlinerMethodArgTypes = t;
+      }
+    return t;
+  }
+
+  public Expression maybeInline (ApplyExp exp, boolean argsInlined, Procedure proc)
+  {
+    try
+      {
+        Object inliner = proc.getProperty(Procedure.inlinerKey, null);
+        if (inliner != null)
+          {
+            Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);
+            if (inliner instanceof Procedure)
+              return (Expression) ((Procedure) inliner).apply4(exp, this,
+                                                               argsInlinedBoxed,
+                                                               proc);
+            if (inliner instanceof String)
+              {
+                String inliners = (String) inliner;
+                int colon = inliners.indexOf(':');
+                java.lang.reflect.Method method = null;
+                if (colon > 0)
+                  {
+                    String cname = inliners.substring(0, colon);
+                    String mname = inliners.substring(colon+1);
+                    /* #ifdef JAVA2 */
+                    Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
+                    /* #else */
+                    // Class clas = Class.forName(cname);
+                    /* #endif */
+                    method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
+                  }
+                if (method == null)
+                  {
+                    error('e', "inliner property string for "+proc+" is not of the form CLASS:METHOD");
+                    return null;
+                  }
+                inliner = method;
+                proc.setProperty(Procedure.inlinerKey, method);
+              }
+            return (Expression) ((java.lang.reflect.Method) inliner).invoke(null,
+                                             new Object[] { exp, this,
+                                                            argsInlinedBoxed,
+                                                            proc });
+          }
+        if (proc instanceof CanInline)
+          return ((CanInline) proc).inline(exp, this, argsInlined);
+      }
+    catch (Throwable ex)
+      {
+        ex.printStackTrace();
+        error('e', "caught exception in inliner for "+proc+" - "+ex);
+      }
+    return null;
   }
 
   /** Attempt to inline a function call.

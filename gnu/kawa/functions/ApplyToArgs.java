@@ -1,16 +1,13 @@
 package gnu.kawa.functions;
-import gnu.bytecode.*;
-import gnu.expr.*;
+import gnu.expr.Language;
 import gnu.mapping.*;
 import gnu.kawa.reflect.Invoke;
-import gnu.kawa.reflect.ArrayGet;
 
 /** Implement the standard Scheme function "apply".
  * This has been generalized so that the last (list argument)
  * can be any sequence, or any primitive array coercible to Object[]. */
 
 public class ApplyToArgs extends ProcedureN
-  implements CanInline
 {
   public int match1 (Object arg1, CallContext ctx)
   {
@@ -126,83 +123,11 @@ public class ApplyToArgs extends ProcedureN
   {
     super(name);
     this.language = language;
+    setProperty(Procedure.inlinerKey,
+                "gnu.kawa.functions.CompilationHelpers:inlineApplyToArgs");
   }
 
   Language language;
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    Expression[] args = exp.getArgs();
-    int nargs = args.length - 1;
-    if (nargs >= 0)
-      {
-        Expression proc = args[0];
-        if (! argsInlined)
-          {
-            if (proc instanceof LambdaExp)
-              {
-                Expression[] rargs = new Expression[nargs];
-                System.arraycopy(args, 1, rargs, 0, nargs);
-                return walker.walk(new ApplyExp(proc, rargs));
-              }
-            proc = walker.walk(proc);
-            args[0] = proc;
-          }
-        Type ptype = proc.getType();
-        ApplyExp result;
-        Compilation comp = walker.getCompilation();
-        Language language = comp.getLanguage();
-        if (ptype.isSubtype(Compilation.typeProcedure))
-          {
-            Expression[] rargs = new Expression[nargs];
-            System.arraycopy(args, 1, rargs, 0, nargs);
-            return proc.inline(new ApplyExp(proc, rargs), walker, null,
-                               argsInlined);
-          }
-        if (! argsInlined)
-          {
-            for (int i = 1; i <= nargs;  i++)
-              args[i] = walker.walk(args[i]);
-          }
-        // This might be more cleanly handled at the type specifier. FIXME
-        if (Invoke.checkKnownClass(ptype, comp) < 0)
-          return exp;
-        ClassType ctype;
-        if (ptype.isSubtype(Compilation.typeType)
-                 || language.getTypeFor(proc,false) != null)
-          {
-            result = new ApplyExp(Invoke.make, args);
-          }
-        else if (ptype instanceof ArrayType)
-          {
-            Type elementType = ((ArrayType) ptype).getComponentType();
-            result = new ApplyExp(new ArrayGet(elementType), args);
-          }
-        else if (ptype instanceof ClassType
-                 && (ctype = (ClassType) ptype).isSubclass(typeList)
-                 && nargs == 1)
-          {
-            // We search for a "get(int)" method, rather than just using
-            // typeList.getDeclaredMethod("get", 1) to see if we make a
-            // a virtual call rather than an interface call.
-            Method get = ctype.getMethod("get", new Type[] { Type.intType  });
-            result = new ApplyExp(get, args);
-          }
-        else
-          return exp;
-        result.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(result);
-      }
-    return exp;
-  }
-
-  static final ClassType typeList
-  /* #ifdef JAVA2 */
-  = ClassType.make("java.util.List");
-  /* #else */
-  // = ClassType.make("gnu.lists.Sequence");
-  /* #endif */
 
   public Object applyN (Object[] args) throws Throwable
   {

@@ -1,3 +1,7 @@
+2009-08-12  Per Bothner  <per@bothner.com>
+
+	* standard/set_b (rewriteForm): Update Setter.setterDecl.
+
 2009-08-10  Per Bothner  <per@bothner.com>
 
 	One step in separating compilation from run-time classes.

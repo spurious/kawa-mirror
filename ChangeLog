@@ -1,3 +1,7 @@
+2009-08-12  Per Bothner  <per@bothner.com>
+
+	* classes-to-skip-for-runtime: Add more classes and patterns.
+
 2009-08-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawart-@VERSION@.jar): New rule.

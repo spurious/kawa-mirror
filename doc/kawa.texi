@@ -4235,6 +4235,27 @@ the parameterize form are the result(s) of the @var{<body>}.
 Cause @var{procedure} to be "traced", that is debugging output will
 be written to the standard error port every time @var{procedure}
 is called, with the parameters and return value.
+
+Note that Kawa will normally assume that a procedure defined with
+the procedure-defining variant of @code{define} is constant,
+and so it might be inlined:
+@example
+(define (ff x) (list x x))
+(trace ff) ;; probably won't work
+(ff 3)     ;; not traced
+@end example
+It works if you specify the @code{--no-inline} flag to Kawa.
+Alternatively, you can use the variable-defining variant of @code{define}:
+@example
+#|kawa:1|# (define ff (lambda (x) name: 'ff (list x x)))
+#|kawa:2|# (trace ff) ;; works
+#|kawa:3|# (ff 3)
+call to ff (3)
+return from ff => (3 3)
+(3 3)
+@end example
+Note the use of the @code{name:} procedure property to give the
+anonymous @code{lambda} a name.
 @end deffn
 
 @deffn Syntax untrace procedure

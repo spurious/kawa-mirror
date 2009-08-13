@@ -1,3 +1,7 @@
+2009-08-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Debugging): Note inline issue and solutions for trace.
+
 2009-08-04  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Procedures): Create sub-notes for contained @sections.

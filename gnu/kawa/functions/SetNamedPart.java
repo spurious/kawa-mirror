@@ -2,45 +2,16 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.reflect.*;
-import gnu.expr.*;
 
 /** Procedure to get the value of a named component of an object. */
 
-public class SetNamedPart extends Procedure3 implements HasSetter, CanInline
+public class SetNamedPart extends Procedure3 implements HasSetter
 {
   public static final SetNamedPart setNamedPart = new SetNamedPart();
-  static { setNamedPart.setName("setNamedPart"); }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression[] args = exp.getArgs();
-    if (args.length != 3 || ! (args[1] instanceof QuoteExp))
-      return exp;
-    Expression context = args[0];
-    String mname = ((QuoteExp) args[1]).getValue().toString();
-    Type type = context.getType();
-    Compilation comp = walker.getCompilation();
-    Language language = comp.getLanguage();
-    Type typeval = language.getTypeFor(context);
-    ClassType caller = comp == null ? null
-      : comp.curClass != null ? comp.curClass
-      : comp.mainClass;
-    if (typeval instanceof ClassType)
-      return new ApplyExp(SlotSet.set$Mnstatic$Mnfield$Ex, args);
-
-    if (type instanceof ClassType)
-      {
-        Object part = SlotSet.lookupMember((ClassType) type, mname, caller);
-        if (part != null)
-          {
-            // FIXME: future kludge to avoid re-doing SlotGet.getField.
-            // args = new Expression[] { context, new QuoteExp(part) });
-            return new ApplyExp(SlotSet.set$Mnfield$Ex, args);
-          }
-      }
-    return exp;
+  static {
+    setNamedPart.setName("setNamedPart");
+    setNamedPart.setProperty(Procedure.inlinerKey,
+                       "gnu.kawa.functions.CompileNamedPart:inlineSetNamedPart");
   }
 
   public Object apply3 (Object container, Object part, Object value)

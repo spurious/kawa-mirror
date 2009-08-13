@@ -10,7 +10,7 @@ import gnu.bytecode.*;
 import gnu.kawa.util.HashNode;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.kawa.reflect.SingletonType;
-import gnu.kawa.functions.GetNamedPart;
+import gnu.kawa.functions.CompileNamedPart;
 import gnu.xquery.util.NamedCollator;
 import gnu.xquery.util.QNameUtils;
 import kawa.standard.Scheme;
@@ -353,7 +353,7 @@ public class XQResolveNames extends ResolveNames
                             uri.startsWith("class:"))
                           {
                             ClassType ctype = ClassType.make(uri.substring(6));
-                            return GetNamedPart.makeExp(ctype, sym.getName());
+                            return CompileNamedPart.makeExp(ctype, sym.getName());
                           }
                         decl = flookup(sym);
                       }

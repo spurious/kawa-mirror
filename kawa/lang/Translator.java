@@ -11,6 +11,7 @@ import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
+import gnu.kawa.functions.CompileNamedPart;
 import gnu.text.SourceLocator;
 
 /** Used to translate from source to Expression.
@@ -412,7 +413,7 @@ public class Translator extends Compilation
         if (sym != null)
           return rewrite(sym, function);
         // FIXME don't copy the args array in makeExp ...
-        return GetNamedPart.makeExp(part1, part2);
+        return CompileNamedPart.makeExp(part1, part2);
       }
     return ((LispLanguage) getLanguage()).makeApply(func, args);
   }
@@ -577,7 +578,7 @@ public class Translator extends Compilation
             Symbol sym = namespaceResolve(part1, part2);
             if (sym != null)
               return sym;
-            String combinedName = GetNamedPart.combineName(part1, part2);
+            String combinedName = CompileNamedPart.combineName(part1, part2);
             if (combinedName != null)
               return Namespace.EmptyNamespace.getSymbol(combinedName);
           }
@@ -658,7 +659,7 @@ public class Translator extends Compilation
                   part1 = new ReferenceExp(((ClassExp) caller.outer).nameDecl);
                 else
                   part1 = new ThisExp(caller.firstDecl());
-                return GetNamedPart.makeExp(part1,
+                return CompileNamedPart.makeExp(part1,
                                             QuoteExp.getInstance(dname));
               }
           }

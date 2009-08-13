@@ -6,7 +6,7 @@ import gnu.lists.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispLanguage;
-import gnu.kawa.functions.GetNamedPart;
+import gnu.kawa.functions.CompileNamedPart;
 
 /**
  * The Syntax transformer that re-writes the "quote" "quasiquote" primitive.
@@ -125,7 +125,7 @@ public class Quote extends Syntax
             else if (part1 instanceof ReferenceExp
                      && part2 instanceof QuoteExp)
               cdr = tr.getGlobalEnvironment().getSymbol(((ReferenceExp) part1).getName() + ':' + ((QuoteExp) part2).getValue().toString());
-            else if ((combinedName = GetNamedPart.combineName(part1, part2)) != null)
+            else if ((combinedName = CompileNamedPart.combineName(part1, part2)) != null)
               cdr = tr.getGlobalEnvironment().getSymbol(combinedName);
             else
               {

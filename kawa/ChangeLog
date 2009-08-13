@@ -1,3 +1,8 @@
+2009-08-13  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java: Update GetNamedPart -> CompileNamedPart.
+	* lang/Quote.java: Likewise.
+
 2009-08-12  Per Bothner  <per@bothner.com>
 
 	* standard/set_b (rewriteForm): Update Setter.setterDecl.

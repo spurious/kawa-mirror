@@ -129,3 +129,11 @@
 
 (define (namespace name) :: <gnu.mapping.Namespace>
   (invoke-static <gnu.mapping.Namespace> 'getInstance name))
+
+(define (gentemp) :: <symbol>
+  (invoke-static <gnu.expr.Symbols> 'gentemp))
+
+(define (add-procedure-properties
+	 (proc :: <gnu.expr.GenericProc>)
+	 #!rest (args :: <object[]>)) :: <void>
+  (invoke proc 'setProperties args))

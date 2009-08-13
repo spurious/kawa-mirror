@@ -4,7 +4,7 @@
 
 (module-export cond case and or let let* do delay
 	       syntax-object->datum datum->syntax-object with-syntax
-	       generate-temporaries define-procedure add-procedure-properties
+	       generate-temporaries define-procedure
 	       identifier? free-identifier=?
 	       syntax-source syntax-line syntax-column)
 
@@ -206,12 +206,6 @@
 				   ((delay expression)
 				    (make <kawa.lang.Promise> (lambda () expression)))))
 
-;; Helper routines for define-procedure.
-(define (add-procedure-properties
-	 (proc :: <gnu.expr.GenericProc>)
-	 #!rest (args :: <object[]>)) :: <void>
-  (invoke proc 'setProperties args))
-
 (define-syntax define-procedure
   (syntax-rules (:: <gnu.expr.GenericProc>)
 		((define-procedure name args ...)
@@ -221,7 +215,7 @@
 		   ;; need to be evaluated at module-run-time.
 		   (define-constant name :: <gnu.expr.GenericProc>
 		     (make <gnu.expr.GenericProc> 'name))
-		   (add-procedure-properties name args ...)))))
+		   (invoke name 'setProperties (object[] args ...))))))
 
 (define (syntax-object->datum obj)
   (kawa.lang.Quote:quote obj))

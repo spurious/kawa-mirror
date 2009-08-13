@@ -51,23 +51,6 @@
 (define (output-port? x) :: <boolean>
   (instance? x <output-port>))
 
-(define-syntax define-alias-parameter
-  (syntax-rules ()
-    ((define-alias-parameter name type location)
-     (begin
-       (define-constant name :: <gnu.mapping.LocationProc>
-	 (gnu.mapping.LocationProc:makeNamed 'name location))
-       (gnu.mapping.LocationProc:pushConverter
-	name
-	(lambda (arg)
-	  (try-catch
-	   (as type arg)
-	   (ex <java.lang.ClassCastException>
-	       (let ((wt (gnu.mapping.WrongType:make ex name
-						     (as <int> 1) arg)))
-		 (set! (field wt 'expectedType) type)
-		 (primitive-throw wt))))))))))
-
 (define-alias-parameter current-input-port <input-port>
   (static-field <input-port> 'inLocation))
 (define-alias-parameter current-output-port <output-port>

@@ -97,3 +97,8 @@
 	    output)
     (if (invoke messages 'seenErrors)
 	(primitive-throw (make <gnu.text.SyntaxException> messages)))))
+
+(define (catch key (thunk :: <procedure>) (handler :: <procedure>))
+  (try-catch (thunk)
+	     (ex <kawa.lang.NamedException>
+		 (invoke ex 'applyHandler key handler))))

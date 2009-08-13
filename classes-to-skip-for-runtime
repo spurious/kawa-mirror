@@ -39,10 +39,13 @@ kawa/lang/Syntax.class
 kawa/lang/SyntaxForm.class
 kawa/lang/SyntaxPattern.class
 kawa/lang/SyntaxRule.class
-kawa/lang/SyntaxRules.clas
-skawa/lang/SyntaxTemplate.class
+kawa/lang/SyntaxRules.class
+kawa/lang/SyntaxTemplate.class
 kawa/lang/TemplateScope.class
 kawa/lang/VarListPat.class
+kawa/lib/prim_syntax.*.class
+kawa/lib/std_syntax.*.class
+kawa/lib/syntax.*.class
 kawa/standard/CompileTimeContinuation.class
 kawa/standard/constant_fold.class
 kawa/standard/define_alias.class

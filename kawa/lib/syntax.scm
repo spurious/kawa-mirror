@@ -22,9 +22,6 @@
         (lambda (form)
       (syntax-case form literals . parts))))))
 
-(define (gentemp) :: <symbol>
-  (invoke-static <gnu.expr.Symbols> 'gentemp))
-
 (define-syntax when (syntax-rules ()
 				  ((when cond exp ...)
 				   (if cond (begin exp ...)))))
@@ -32,11 +29,6 @@
 (define-syntax unless (syntax-rules ()
 				  ((when cond exp ...)
 				   (if (not cond) (begin exp ...)))))
-
-(define (catch key (thunk :: <procedure>) (handler :: <procedure>))
-  (try-catch (thunk)
-	     (ex <kawa.lang.NamedException>
-		 (invoke ex 'applyHandler key handler))))
 
 (define-syntax (try-finally x)
   (syntax-case x ()
@@ -263,3 +255,20 @@
     ((receive formals expression body ...)
      (call-with-values (lambda () expression)
                        (lambda formals body ...)))))
+
+(define-syntax define-alias-parameter
+  (syntax-rules ()
+    ((define-alias-parameter name type location)
+     (begin
+       (define-constant name :: <gnu.mapping.LocationProc>
+	 (gnu.mapping.LocationProc:makeNamed 'name location))
+       (gnu.mapping.LocationProc:pushConverter
+	name
+	(lambda (arg)
+	  (try-catch
+	   (as type arg)
+	   (ex <java.lang.ClassCastException>
+	       (let ((wt (gnu.mapping.WrongType:make ex name
+						     (as <int> 1) arg)))
+		 (set! (field wt 'expectedType) type)
+		 (primitive-throw wt))))))))))

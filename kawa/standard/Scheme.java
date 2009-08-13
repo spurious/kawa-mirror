@@ -500,7 +500,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("try-finally", "kawa.lib.syntax");
       defSntxStFld("try-catch", "kawa.lib.prim_syntax");
       defProcStFld("throw", "kawa.standard.throw_name", "throwName");
-      defProcStFld("catch", "kawa.lib.syntax");
+      defProcStFld("catch", "kawa.lib.system");
       defProcStFld("error", "kawa.lib.misc");
       defProcStFld("as", "gnu.kawa.functions.Convert", "as");
       defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
@@ -592,7 +592,7 @@ public class Scheme extends LispLanguage
       defProcStFld("scheme-implementation-version", "kawa.lib.misc");
       defProcStFld("scheme-window", "kawa.lib.windows");
       defSntxStFld("define-procedure", "kawa.lib.std_syntax");
-      defProcStFld("add-procedure-properties", "kawa.lib.std_syntax");
+      defProcStFld("add-procedure-properties", "kawa.lib.misc");
       defProcStFld("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       defProcStFld("procedure-property", "kawa.lib.misc");
@@ -615,7 +615,7 @@ public class Scheme extends LispLanguage
                    "define_base_unit");
       defProcStFld("duration", "kawa.lib.numbers");
 
-      defProcStFld("gentemp", "kawa.lib.syntax");
+      defProcStFld("gentemp", "kawa.lib.misc");
       defSntxStFld("defmacro", "kawa.lib.syntax");
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
       defSntxStFld("resource-url", "kawa.lib.files");

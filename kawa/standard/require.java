@@ -77,6 +77,8 @@ public class require extends Syntax
     map("http", "gnu.kawa.servlet.HTTP");
     map("srfi-1", SLIB_PREFIX + "srfi1");
     map("list-lib", SLIB_PREFIX + "srfi1");
+    map("srfi-13", SLIB_PREFIX + "srfi13");
+    map("string-lib", SLIB_PREFIX + "srfi13");
     map("srfi-34", SLIB_PREFIX + "srfi34");
     map("srfi-35", SLIB_PREFIX + "conditions");
     map("condition", SLIB_PREFIX + "conditions");

@@ -1,3 +1,9 @@
+2009-08-13  Per Bothner  <per@bothner.com>
+	    Olin Shivers
+
+	* srfi13.scm: Reference implementation of SRFI-13.  Will need work.
+	* Makefile.am: Update accordingly.
+
 2009-05-30  Per Bothner  <per@bothner.com>
 	    Dorai Sitaram
 

@@ -1,5 +1,8 @@
 2009-08-13  Per Bothner  <per@bothner.com>
 
+	* standard/require.java (featureMap): Add mappings for SRFI-13.
+	* standard/ImportFromLibrary.java (SRFI97Map): Likewise.
+
 	* standard/define.java (scanForm, rewriteForm): If --no-inline flag
 	is specified (i.e. if ! Compilation.inlineOk), treat
 	"(define (foo args) body)" same as

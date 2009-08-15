@@ -162,6 +162,14 @@
 
 	(values '() 0 slen))))
 
+(define (%check-bounds proc (s :: string) (start :: int) (end :: int))
+  (cond ((< start 0)
+	 (error "Illegal substring START spec" proc start s))
+	((> start end)
+	 (error "Illegal substring START/END spec"))
+	((> end (string-length s))
+	 (error "Illegal substring END spec" proc end s))))
+
 (define (string-parse-final-start+end proc s args)
   (receive (rest start end) (string-parse-start+end proc s args)
     (if (pair? rest) (error "Extra arguments to procedure" proc rest)
@@ -179,6 +187,12 @@
 
 (define (check-substring-spec proc s start end)
   (if (not (substring-spec-ok? s start end))
+      (error "Illegal substring spec." proc s start end)))
+
+(define-private (%check-substring-spec proc (s :: string) (start :: int) (end :: int))
+  (if (or (> 0 start)
+	  (> start end)
+	  (> end (string-length s)))
       (error "Illegal substring spec." proc s start end)))
 
 
@@ -217,7 +231,7 @@
 
 ;;; Split out so that other routines in this library can avoid arg-parsing
 ;;; overhead for END parameter.
-(define (%substring/shared s start end)
+(define (%substring/shared (s :: string) (start :: int) (end :: int))
   (if (and (zero? start) (= end (string-length s))) s
       (substring s start end)))
 
@@ -362,10 +376,10 @@
                   ((base       ""              (string? base))
 		   (make-final (lambda (x) "") (procedure? make-final)))
     (let lp ((chunks '())		; Previously filled chunks
-	     (nchars 0)			; Number of chars in CHUNKS
+	     (nchars :: int 0)		; Number of chars in CHUNKS
 	     (chunk (make-string 40))	; Current chunk into which we write
-	     (chunk-len 40)
-	     (i 0)			; Number of chars written into CHUNK
+	     (chunk-len :: int 40)
+	     (i :: int 0)		; Number of chars written into CHUNK
 	     (seed seed))
       (let lp2 ((i i) (seed seed))
 	(if (not (p seed))
@@ -375,8 +389,8 @@
 		  (begin (string-set! chunk i c)
 			 (lp2 (+ i 1) seed))
 
-		  (let* ((nchars2 (+ chunk-len nchars))
-			 (chunk-len2 (min 4096 nchars2))
+		  (let* ((nchars2 :: int (+ chunk-len nchars))
+			 (chunk-len2 :: int (min 4096 nchars2))
 			 (new-chunk (make-string chunk-len2)))
 		    (string-set! new-chunk 0 c)
 		    (lp (cons chunk chunks) (+ nchars chunk-len)
@@ -384,12 +398,12 @@
 
 	    ;; We're done. Make the answer string & install the bits.
 	    (let* ((final (make-final seed))
-		   (flen (string-length final))
-		   (base-len (string-length base))
-		   (j (+ base-len nchars i))
+		   (flen :: int (string-length final))
+		   (base-len :: int (string-length base))
+		   (j :: int (+ base-len nchars i))
 		   (ans (make-string (+ j flen))))
 	      (%string-copy! ans j final 0 flen)	; Install FINAL.
-	      (let ((j (- j i)))
+	      (let ((j :: int (- j i)))
 		(%string-copy! ans j chunk 0 i)		; Install CHUNK[0,I).
 		(let lp ((j j) (chunks chunks))		; Install CHUNKS.
 		  (if (pair? chunks)
@@ -516,12 +530,12 @@
 		       string-any criterion)))))
 
 
-(define (string-tabulate proc len)
+(define (string-tabulate proc (len :: int))
   (check-arg procedure? proc string-tabulate)
   (check-arg (lambda (val) (and (integer? val) (exact? val) (<= 0 val)))
 	     len string-tabulate)
   (let ((s (make-string len)))
-    (do ((i (- len 1) (- i 1)))
+    (do ((i :: int (- len 1) (- i 1)))
 	((< i 0))
       (string-set! s i (proc i)))
     s))
@@ -565,28 +579,30 @@
 	      (- (- end1 i) 1)
 	      (lp (- i 1) (- j 1)))))))
 
-(define (%string-prefix-length-ci s1 start1 end1 s2 start2 end2)
-  (let* ((delta (min (- end1 start1) (- end2 start2)))
-	 (end1 (+ start1 delta)))
+(define (%string-prefix-length-ci s1 (start1 :: int) (end1 :: int)
+				  s2 (start2 :: int) (end2 :: int)) :: int
+  (let* ((delta :: int (min (- end1 start1) (- end2 start2)))
+	 (end1 :: int (+ start1 delta)))
 
     (if (and (eq? s1 s2) (= start1 start2))	; EQ fast path
 	delta
 
-	(let lp ((i start1) (j start2))		; Regular path
+	(let lp ((i :: int start1) (j :: int start2))		; Regular path
 	  (if (or (>= i end1)
 		  (not (char-ci=? (string-ref s1 i)
 				  (string-ref s2 j))))
 	      (- i start1)
 	      (lp (+ i 1) (+ j 1)))))))
 
-(define (%string-suffix-length-ci s1 start1 end1 s2 start2 end2)
-  (let* ((delta (min (- end1 start1) (- end2 start2)))
-	 (start1 (- end1 delta)))
+(define (%string-suffix-length-ci s1 (start1 :: int) (end1 :: int)
+				  s2 (start2 :: int) (end2 :: int)) :: int
+  (let* ((delta  :: int (min (- end1 start1) (- end2 start2)))
+	 (start1 :: int  (- end1 delta)))
 
     (if (and (eq? s1 s2) (= end1 end2))		; EQ fast path
 	delta
 
-	(let lp ((i (- end1 1)) (j (- end2 1)))	; Regular path
+	(let lp ((i :: int  (- end1 1)) (j  :: int (- end2 1)))	; Regular path
 	  (if (or (< i start1)
 		  (not (char-ci=? (string-ref s1 i)
 				  (string-ref s2 j))))
@@ -989,15 +1005,13 @@
 	       n string-take-right)
     (%substring/shared s (- len n) len)))
 
-(define (string-drop s n)
-  (check-arg string? s string-drop)
+(define (string-drop (s :: string) n)
   (let ((len (string-length s)))
     (check-arg (lambda (val) (and (integer? n) (exact? n) (<= 0 n len)))
 	       n string-drop)
   (%substring/shared s n len)))
 
-(define (string-drop-right s n)
-  (check-arg string? s string-drop-right)
+(define (string-drop-right (s :: string) n)
   (let ((len (string-length s)))
     (check-arg (lambda (val) (and (integer? n) (exact? n) (<= 0 n len)))
 	       n string-drop-right)
@@ -1259,26 +1273,28 @@
 	((< i start))
       (string-set! s i char))))
 
-(define (string-copy! to tstart from . maybe-fstart+fend)
-  (let-string-start+end (fstart fend) string-copy! from maybe-fstart+fend
-    (check-arg integer? tstart string-copy!)
-    (check-substring-spec string-copy! to tstart (+ tstart (- fend fstart)))
-    (%string-copy! to tstart from fstart fend)))
+(define (string-copy! to (tstart :: int) (from :: string)
+		      #!optional (fstart :: int 0)
+		      (fend :: int (from:length)))
+   (%check-bounds string-copy! from fstart fend)
+   (%check-substring-spec string-copy! to tstart (+ tstart (- fend fstart)))
+   (%string-copy! to tstart from fstart fend))
 
 ;;; Library-internal routine
-(define (%string-copy! to tstart from fstart fend)
+(define (%string-copy! (to :: string) (tstart :: int) (from :: string) (fstart :: int) (fend :: int))
   (if (> fstart tstart)
-      (do ((i fstart (+ i 1))
-	   (j tstart (+ j 1)))
-	  ((>= i fend))
-	(string-set! to j (string-ref from i)))
-
-      (do ((i (- fend 1)                    (- i 1))
-	   (j (+ -1 tstart (- fend fstart)) (- j 1)))
-	  ((< i fstart))
-	(string-set! to j (string-ref from i)))))
-
-
+      ;; Use a separate 'let' for 'j' because 'for' doesn't
+      ;; support a type specifier except for a variable.
+      (let ((j :: int tstart))
+	(do ((i :: int fstart (+ i 1)))
+	    ((>= i fend))
+	  (string-set! to j (string-ref from i))
+	  (set! j (+ j 1))))
+      (let ((j :: int (+ -1 tstart (- fend fstart))))
+	(do ((i :: int (- fend 1) (- i 1)))
+	    ((< i fstart))
+	  (string-set! to j (string-ref from i))
+	  (set! j (- j 1))))))
 
 ;;; Returns starting-position in STRING or #f if not true.
 ;;; This implementation is slow & simple. It is useful as a "spec" or for

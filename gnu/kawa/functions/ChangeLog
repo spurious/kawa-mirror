@@ -1,3 +1,8 @@
+2009-08-15  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java (compile): Use implementation-type.
+	This fixes Savannah bug #27257 "non-int dim. spec. in emitNewArray".
+
 2009-08-13  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java: New class - compilation/optimization-related

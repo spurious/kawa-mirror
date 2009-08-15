@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 176)
+(test-init "Miscellaneous" 177)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -889,3 +889,9 @@
 
 (require "test-cycle12.scm")
 (test '(8 12) c1x-c2x)
+
+;; Savannah bug #27257 "non-int dim. spec. in emitNewArray"
+(define (alloc-array count val)
+  (object[] length: (+ 1 count) 1: val 2: (+ 1 val)))
+(test "[#!null 10 11 #!null #!null]" 'test-savannah-27257
+      (format #f "~s" (alloc-array 4 10)))

@@ -131,7 +131,7 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
           case Arithmetic.LONG_CODE:
           case Arithmetic.FLOAT_CODE:
           case Arithmetic.DOUBLE_CODE:
-            code.emitBinop(primitiveOpcode(), (PrimType) wtype);
+            code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
             break;
           }
       }

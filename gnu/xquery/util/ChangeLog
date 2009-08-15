@@ -1,3 +1,12 @@
+2009-08-15  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: New class - compilation/optimization-related
+	methods for ArithOp, Compare, BooleanValue.
+	* Makefile.am: Update accordingly.
+	* ArithOp.java: Keep only runtime-specific parts.
+	* Compare.java: Likewise.
+	* BooleanValue.java: Likewise.
+
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* RelativeStep.java (inline): Update for new inlining framework.

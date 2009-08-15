@@ -2,16 +2,14 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
-import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
-import gnu.math.*;
-import gnu.expr.*;
 import gnu.kawa.xml.*;
-import gnu.bytecode.ClassType;
+import gnu.math.*;
+import gnu.mapping.*;
 
 /** Compares two values (or sequences) according to XPath semantics. */
 
-public class Compare extends Procedure2 implements CanInline
+public class Compare extends Procedure2
 {
   static final int RESULT_GRT = 1;
   static final int RESULT_EQU = 0;
@@ -35,6 +33,8 @@ public class Compare extends Procedure2 implements CanInline
   {
     Compare proc = new Compare();
     proc.setName(name);
+    proc.setProperty(Procedure.inlinerKey,
+                     "gnu.xquery.util.CompileMisc:inlineCompare");
     proc.flags = flags;
     return proc;
   }
@@ -251,28 +251,4 @@ public class Compare extends Procedure2 implements CanInline
     make("lt",TRUE_IF_LSS|VALUE_COMPARISON);
   public static final Compare valLe =
     make("le",TRUE_IF_LSS|TRUE_IF_EQU|VALUE_COMPARISON);
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression folded = exp.inlineIfConstant(this, walker);
-    if (folded != exp)
-      return folded;
-    if ((flags & VALUE_COMPARISON) != 0)
-      {
-      }
-    else
-      {
-        exp = new ApplyExp(ClassType.make("gnu.xquery.util.Compare")
-                           .getDeclaredMethod("apply", 4),
-                           new Expression[] { new QuoteExp(IntNum.make(flags)),
-                                              exp.getArg(0),
-                                              exp.getArg(1),
-                                              QuoteExp.nullExp });
-      }
-    if (exp.getTypeRaw() == null)
-      exp.setType(XDataType.booleanType);
-    return exp;
-  }
 }

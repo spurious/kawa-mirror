@@ -9,7 +9,7 @@ import java.math.*;
 import gnu.math.*;
 
 public class ArithOp extends Procedure1or2
-  implements CanInline, Inlineable
+  implements Inlineable
 {
   char op;
 
@@ -27,6 +27,8 @@ public class ArithOp extends Procedure1or2
   ArithOp (String name, char op, int nargs)
   {
     super(name);
+    setProperty(Procedure.inlinerKey,
+                "gnu.xquery.util.CompileMisc:inlineArithOp");
     this.op = op;
   }
 
@@ -213,14 +215,6 @@ public class ArithOp extends Procedure1or2
           }
       }
     throw new UnsupportedOperationException(getName());
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    // FUTURE
-    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

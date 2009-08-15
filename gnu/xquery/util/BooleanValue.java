@@ -7,12 +7,9 @@ import gnu.lists.*;
 import gnu.math.Numeric;
 import gnu.math.RealNum;
 import gnu.kawa.xml.UntypedAtomic;
-import gnu.expr.*;
-import gnu.bytecode.Type;
 import gnu.kawa.xml.XDataType;
-import gnu.xquery.lang.XQuery;
 
-public class BooleanValue extends Procedure1 implements CanInline
+public class BooleanValue extends Procedure1
 {
   public static final BooleanValue booleanValue =
     new BooleanValue("boolean-value");
@@ -20,6 +17,8 @@ public class BooleanValue extends Procedure1 implements CanInline
   public BooleanValue (String name)
   {
     super(name);
+    setProperty(Procedure.inlinerKey,
+                "gnu.xquery.util.CompileMisc:inlineBooleanValue");
   }
 
   public static boolean booleanValue(Object value)
@@ -63,34 +62,4 @@ public class BooleanValue extends Procedure1 implements CanInline
     return booleanValue(arg) ? Boolean.TRUE : Boolean.FALSE;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression[] args = exp.getArgs();
-    if (args.length == 1)
-      {
-        Expression arg = args[0];
-        Type type = arg.getType();
-        if (type == XDataType.booleanType)
-          return arg;
-        if (type == null)
-          exp.setType(XDataType.booleanType);
-        if (arg instanceof QuoteExp)
-          {
-            Object value = ((QuoteExp) arg).getValue();
-            try
-              {
-                return booleanValue(value) ? XQuery.trueExp : XQuery.falseExp;
-              }
-            catch (Throwable ex)
-              {
-                String message = "cannot convert to a boolean";
-                walker.getMessages().error('e', message);
-                return new ErrorExp(message);
-              }
-          }
-      }
-    return exp;
-  }
 }

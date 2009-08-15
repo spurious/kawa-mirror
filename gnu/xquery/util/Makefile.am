@@ -9,6 +9,7 @@ java_sources = \
   CastableAs.java \
   CastAs.java \
   Compare.java \
+  CompileMisc.java \
   Debug.java \
   DistinctValues.java \
   IntegerRange.java \

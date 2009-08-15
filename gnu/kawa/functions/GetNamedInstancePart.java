@@ -1,8 +1,6 @@
 package gnu.kawa.functions;
-import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.reflect.*;
-import gnu.expr.*;
 import java.io.*;
 
 /** The value of the Kawa Scheme expression '*:PART-NAME'.
@@ -17,32 +15,20 @@ import java.io.*;
  */
 
 public class GetNamedInstancePart extends ProcedureN
-  implements Externalizable, CanInline, HasSetter
+  implements Externalizable, HasSetter
 {
   String pname;
   boolean isField;
 
-  public static Expression makeExp (Expression member)
-  {
-    String name;
-    if (member instanceof QuoteExp)
-      {
-        Object val = ((QuoteExp) member).getValue();
-        if (val instanceof SimpleSymbol)
-          return QuoteExp.getInstance(new GetNamedInstancePart(val.toString()));
-      }
-    Expression[] args = new Expression[2];
-    args[0] = new QuoteExp(ClassType.make("gnu.kawa.functions.GetNamedInstancePart"));
-    args[1] = member;
-    return new ApplyExp(Invoke.make, args);
-  }
-
   public GetNamedInstancePart ()
   {
+    setProperty(Procedure.inlinerKey,
+                "gnu.kawa.functions.CompileNamedPart:inlineGetNamedInstancePart");
   }
 
   public GetNamedInstancePart (String name)
   {
+    this();
     setPartName(name);
   }
 
@@ -62,31 +48,6 @@ public class GetNamedInstancePart extends ProcedureN
   }
 
   public int numArgs() { return isField ? 0x1001 : 0xfffff001; }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression[] args = exp.getArgs();
-    Expression[] xargs;
-    Procedure proc;
-    if (isField)
-      {
-        xargs = new Expression[] { args[0], new QuoteExp(pname) };
-        proc = SlotGet.field;
-      }
-    else
-      {
-        int nargs = args.length;
-        xargs = new Expression[nargs+1];
-        xargs[0] = args[0];
-        xargs[1] = new QuoteExp(pname);
-        System.arraycopy(args, 1, xargs, 2, nargs-1);
-        proc = Invoke.invoke;
-      }
-    return walker.walkApplyOnly(new ApplyExp(proc, xargs));
-  }
-
   public Object applyN (Object[] args)
     throws Throwable
   {
@@ -123,16 +84,19 @@ public class GetNamedInstancePart extends ProcedureN
 }
 
 class SetNamedInstancePart extends Procedure2
-  implements Externalizable, CanInline
+  implements Externalizable
 {
   String pname;
 
   public SetNamedInstancePart ()
   {
+    setProperty(Procedure.inlinerKey,
+                "gnu.kawa.functions.CompileNamedPart:inlineSetNamedInstancePart");
   }
 
   public SetNamedInstancePart (String name)
   {
+    this();
     setPartName(name);
   }
 
@@ -140,17 +104,6 @@ class SetNamedInstancePart extends Procedure2
   {
     setName("set-instance-part:."+name);
     pname = name;
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    Expression[] args = exp.getArgs();
-    Expression[] xargs = new Expression[]
-      { args[0], new QuoteExp(pname), args[1] };
-    Procedure proc = SlotSet.set$Mnfield$Ex;
-    return walker.walkApplyOnly(new ApplyExp(proc, xargs));
   }
 
   public Object apply2 (Object instance, Object value)

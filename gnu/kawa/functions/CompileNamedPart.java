@@ -22,7 +22,7 @@ public class CompileNamedPart
       {
         ReferenceExp rexp = (ReferenceExp) context;
         if ("*".equals(rexp.getName()))
-          return GetNamedInstancePart.makeExp(args[1]);
+          return makeGetNamedInstancePartExp(args[1]);
         decl = rexp.getBinding();
       }
 
@@ -307,6 +307,59 @@ public class CompileNamedPart
 
   static final ClassType typeHasNamedParts
   = ClassType.make("gnu.mapping.HasNamedParts");
+
+  public static Expression makeGetNamedInstancePartExp (Expression member)
+  {
+    String name;
+    if (member instanceof QuoteExp)
+      {
+        Object val = ((QuoteExp) member).getValue();
+        if (val instanceof SimpleSymbol)
+          return QuoteExp.getInstance(new GetNamedInstancePart(val.toString()));
+      }
+    Expression[] args = new Expression[2];
+    args[0] = new QuoteExp(ClassType.make("gnu.kawa.functions.GetNamedInstancePart"));
+    args[1] = member;
+    return new ApplyExp(Invoke.make, args);
+  }
+
+  public static Expression inlineGetNamedInstancePart
+  (ApplyExp exp, InlineCalls walker,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.walkArgs(walker, argsInlined);
+    Expression[] args = exp.getArgs();
+    Expression[] xargs;
+    Procedure property;
+    GetNamedInstancePart gproc = (GetNamedInstancePart) proc;
+    if (gproc.isField)
+      {
+        xargs = new Expression[] { args[0], new QuoteExp(gproc.pname) };
+        property = SlotGet.field;
+      }
+    else
+      {
+        int nargs = args.length;
+        xargs = new Expression[nargs+1];
+        xargs[0] = args[0];
+        xargs[1] = new QuoteExp(gproc.pname);
+        System.arraycopy(args, 1, xargs, 2, nargs-1);
+        property = Invoke.invoke;
+      }
+    return walker.walkApplyOnly(new ApplyExp(property, xargs));
+  }
+
+  public static Expression inlineSetNamedInstancePart
+  (ApplyExp exp, InlineCalls walker,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.walkArgs(walker, argsInlined);
+    Expression[] args = exp.getArgs();
+    String pname = ((SetNamedInstancePart) proc).pname;
+    Expression[] xargs = new Expression[]
+      { args[0], new QuoteExp(pname), args[1] };
+    return walker.walkApplyOnly(new ApplyExp(SlotSet.set$Mnfield$Ex, xargs));
+  }
 }
 
 class GetNamedExp extends ApplyExp

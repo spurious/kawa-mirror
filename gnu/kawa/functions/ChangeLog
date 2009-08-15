@@ -1,5 +1,10 @@
 2009-08-15  Per Bothner  <per@bothner.com>
 
+	* GetNamedInstancePart.java: Move inline/expression support
+	to CompileNamedPart.
+	* CompileNamedPart.java (makeGetNamedInstancePartExp,
+	inlineGetNamedInstancePart, inlineSetNamedInstancePart): New methods.
+
 	* ArithOp.java (compile): Use implementation-type.
 	This fixes Savannah bug #27257 "non-int dim. spec. in emitNewArray".
 

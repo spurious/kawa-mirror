@@ -1,3 +1,11 @@
+2009-08-13  Per Bothner  <per@bothner.com>
+
+	* CompileNamedPart.java: New class - compilation/optimization-related
+	methods for GetNamedPart and SetNamedPart.
+	* Makefile.am: Update accordingly.
+	* GetNamedPart.java: Keep only runtime-specific parts.
+	* SetNamedPart.java: Likewise.
+
 2009-08-12  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java: New class.

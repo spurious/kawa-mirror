@@ -353,10 +353,10 @@ public class ModuleInfo
    */
   public boolean checkCurrent (ModuleManager manager, long now)
   {
-    if (sourceAbsPath == null)
+    if (sourceAbsPath == null || comp != null)
       return true;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
-      return moduleClass != null || comp != null;
+      return moduleClass != null;
     lastCheckedTime = now;
     long lastModifiedTime = sourceAbsPath.getLastModified();
     long oldModifiedTime = this.lastModifiedTime;

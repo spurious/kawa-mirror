@@ -1,3 +1,8 @@
+2009-08-19  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (checkCurrent): We're always current if we're
+	currently compiling this module - i.e. comp!=null.
+
 2009-08-12  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (maybeInline): See if Procedure implements

@@ -8148,7 +8148,7 @@ which is quoted below.
 
 @example
 The software (with related files and documentation) in these packages
-are copyright (C) 1996-2006  Per Bothner.
+are copyright (C) 1996-2009  Per Bothner.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

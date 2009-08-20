@@ -1,3 +1,7 @@
+2009-08-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Software-License):  Update last year to 2009.
+
 2009-08-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Debugging): Note inline issue and solutions for trace.

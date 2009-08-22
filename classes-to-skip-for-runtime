@@ -13,6 +13,7 @@ gnu/kawa/functions/GetNamedExp.class
 gnu/kawa/functions/SetArrayExp.class
 gnu/kawa/functions/SetListExp.class
 gnu/kawa/lispexpr/DefineNamespace.class
+gnu/xquery/util/CompileMisc.class
 kawa/GuiConsole.*.class
 kawa/GuiInPort.class
 kawa/PaintableView.class

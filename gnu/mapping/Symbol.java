@@ -14,7 +14,7 @@ import java.io.*;
 /* #endif */
 
 /** A Symbol is a name, usually in a specific Namespace.
- * A Symbol is stateless:  Comon Lisp-style "value", "function" and
+ * A Symbol is stateless:  Common Lisp-style "value", "function" and
  * "property list" bindings are not part of the Symbol itself, but
  * looked up in the current Environment.
  * A <code>Symbol</code> may be viewed as an <code>EnvironmentKey</code>

@@ -1,5 +1,7 @@
 2009-08-23  Per Bothner  <per@bothner.com>
 
+	* Procedure.java (inlineCallsKey): New field.
+
 	* Procedure.java (compilerKey): New field.
 
 	* PropertyKey.java: New class.

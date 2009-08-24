@@ -1,5 +1,7 @@
 2009-08-23  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (maybeInline): Also check Procedure.inlineCallsKey.
+
 	* LambdaExp.java (setCoercedReturnValue): Moved from Convert.
 	* Compilation.java (makeCoercion*2): Moved from Convert.
 	* InlineCalls.java: Update accordingly.

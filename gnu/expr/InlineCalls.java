@@ -212,7 +212,11 @@ public class InlineCalls extends ExpWalker
   {
     try
       {
-        Object inliner = proc.getProperty(Procedure.inlinerKey, null);
+        Object inliner = Procedure.inlineCallsKey.get(proc);
+        if (inliner != null)
+          return ((CanInline) proc).inline(exp, this, argsInlined);
+        inliner = proc.getProperty(Procedure.inlinerKey, null);
+
         if (inliner != null)
           {
             Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);

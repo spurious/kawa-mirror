@@ -14,6 +14,7 @@ java_sources=\
   ArraySet.java \
   CompilationHelpers.java \
   CompileNamedPart.java \
+  CompileMisc.java \
   ConstantFunction0.java \
   Convert.java \
   CountValues.java \

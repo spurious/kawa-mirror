@@ -3,21 +3,19 @@
 
 package gnu.kawa.functions;
 import gnu.mapping.*;
-import gnu.expr.*;
+import gnu.expr.QuoteExp;
 
 /** A 0-argument function that returns a constant value.
  * Used for false() and true() in XQuery. */
 
-public class ConstantFunction0 extends Procedure0 implements CanInline
+public class ConstantFunction0 extends Procedure0
 {
   final Object value;
   final QuoteExp constant;
 
   public ConstantFunction0(String name, Object value)
   {
-    super(name);
-    this.value = value;
-    this.constant = QuoteExp.getInstance(value);
+    this(name, QuoteExp.getInstance(value));
   }
 
   public ConstantFunction0(String name, QuoteExp constant)
@@ -25,20 +23,8 @@ public class ConstantFunction0 extends Procedure0 implements CanInline
     super(name);
     this.value = constant.getValue();
     this.constant = constant;
+    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileMisc:forConstantFunction0");
   }
 
   public Object apply0() { return value; }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    int nargs = exp.getArgCount();
-    if (nargs != 0 && walker != null)
-      {
-	String message = WrongArguments.checkArgCount(this, nargs);
-	return walker.noteError(message);
-      }
-    return constant;
-  }
 }

@@ -1,5 +1,11 @@
 2009-08-23  Per Bothner  <per@bothner.com>
 
+	* CompileMisc.java: New file: Implements Inlineable and CanInline
+	for Convert and ConstantFunction0 - so far,
+	* Makefile.am: Update accordingly.
+	* Convert.java: Now longer implements CanInline or Inlineable.
+	* ConstantFunction0.java: Now longer implements CanInline
+
 	* Convert.java (makeCoercion*2): Moved to Compilation.
 	(setCoercedReturnValue): Moved to LambdaExp.
 	* CompilationHelpers.java: Update accordingly.

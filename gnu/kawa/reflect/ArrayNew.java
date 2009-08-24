@@ -1,16 +1,16 @@
 package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.expr.*;
 import java.io.*;
 
-public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
+public class ArrayNew extends Procedure1 implements Externalizable
 {
   Type element_type;
 
   public ArrayNew (Type element_type)
   {
     this.element_type = element_type;
+    Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayNew");
   }
 
   public Object apply1 (Object count)
@@ -18,19 +18,6 @@ public class ArrayNew extends Procedure1 implements Inlineable, Externalizable
     Class clas = element_type.getImplementationType().getReflectClass();
     return java.lang.reflect.Array.newInstance(clas,
 					       ((Number) count).intValue());
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    exp.getArgs()[0].compile(comp, Type.intType);
-    CodeAttr code = comp.getCode();
-    code.emitNewArray(element_type.getImplementationType());
-    target.compileFromStack(comp, ArrayType.make(element_type));
-  }
-
-  public gnu.bytecode.Type getReturnType (Expression[] args)
-  {
-    return ArrayType.make(element_type);
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

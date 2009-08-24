@@ -1,3 +1,13 @@
+2009-08-23  Per Bothner  <per@bothner.com>
+
+	* CompileArrays.java: New class, for Inlineable support
+	for following Procedures, so we can factor it out from run-time code.
+	* Makefile.am: Update accordingly.
+	* ArrayGet.java: Now longer implment Inlineable.
+	* ArrayLength.java: Likewise.
+	* ArrayNew.java: Likewise.
+	* ArraySet.java: Likewise.
+
 2009-08-05  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): Update to new ClassType API.

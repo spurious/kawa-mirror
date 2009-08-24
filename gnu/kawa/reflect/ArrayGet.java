@@ -1,37 +1,23 @@
 package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.expr.*;
 import java.io.*;
 import java.lang.reflect.Array;
 
-public class ArrayGet extends Procedure2 implements Inlineable, Externalizable
+public class ArrayGet extends Procedure2 implements Externalizable
 {
   Type element_type;
 
   public ArrayGet (Type element_type)
   {
     this.element_type = element_type;
+    Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayGet");
   }
 
   public Object apply2 (Object array, Object index)
   {
     Object value = Array.get(array, ((Number) index).intValue());
     return element_type.coerceToObject(value);
-  }
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    args[0].compile(comp, ArrayType.make(element_type));
-    args[1].compile(comp, Type.int_type);
-    CodeAttr code = comp.getCode();
-    code.emitArrayLoad(element_type);
-    target.compileFromStack(comp, element_type);
-  }
-
-  public gnu.bytecode.Type getReturnType (Expression[] args)
-  {
-    return element_type;
   }
   
   public void writeExternal(ObjectOutput out) throws IOException

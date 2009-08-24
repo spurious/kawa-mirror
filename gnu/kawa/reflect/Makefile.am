@@ -9,6 +9,7 @@ java_sources = \
   ArraySet.java \
   ClassMemberLocation.java \
   ClassMethods.java \
+  CompileArrays.java \
   FieldLocation.java \
   InstanceOf.java \
   Invoke.java \

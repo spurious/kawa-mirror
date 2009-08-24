@@ -8,6 +8,8 @@ gnu/expr/ObjectExp.class
 gnu/expr/ResolveNames.class
 gnu/expr/TryExp.class
 gnu/kawa/functions/CompilationHelpers.class
+gnu/kawa/functions/CompileArith.class
+gnu/kawa/functions/CompileMisc.class
 gnu/kawa/functions/CompileNamedPart.class
 gnu/kawa/functions/GetNamedExp.class
 gnu/kawa/functions/SetArrayExp.class

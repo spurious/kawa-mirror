@@ -14,6 +14,7 @@ java_sources=\
   InheritingEnvironment.java \
   InPort.java \
   KeyPair.java \
+  LazyPropertyKey.java \
   Location.java \
   LocationEnumeration.java \
   LocationProc.java \
@@ -36,6 +37,7 @@ java_sources=\
   Procedure4.java \
   ProcedureN.java \
   ProcLocation.java \
+  PropertyKey.java \
   PropertyLocation.java \
   PropertySet.java \
   ReadOnlyLocation.java \

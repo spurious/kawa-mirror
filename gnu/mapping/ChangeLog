@@ -1,3 +1,9 @@
+2009-08-23  Per Bothner  <per@bothner.com>
+
+	* PropertyKey.java: New class.
+	* LazyPropertyKey.java: New class, extends PropertyKey.
+	* Makefile.am: Update accordingly.
+
 2009-08-12  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (inlinerKey): New constant.

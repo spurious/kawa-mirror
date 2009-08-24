@@ -142,7 +142,7 @@ public class InlineCalls extends ExpWalker
                 Expression init = exp.inits[0];
                 Expression texp = d.getTypeExp();
                 if (texp != QuoteExp.classObjectExp)
-                  init = walkApplyOnly(Convert.makeCoercion(init, texp));
+                  init = walkApplyOnly(Compilation.makeCoercion(init, texp));
                 return init;
               }
             // Can also optimize if n > 1, but have to check if any

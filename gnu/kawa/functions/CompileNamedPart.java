@@ -257,7 +257,7 @@ public class CompileNamedPart
         SlotGet slotProc;
         if (args.length > 0)
           {
-            xargs[0] = Convert.makeCoercion(args[0],
+            xargs[0] = Compilation.makeCoercion(args[0],
                                             new QuoteExp(namedPart.container));
             slotProc = SlotGet.field;
           }
@@ -293,7 +293,7 @@ public class CompileNamedPart
         else if (exp.getArgCount() == 2)
           {
             xargs[0]
-              = Convert.makeCoercion(exp.getArgs()[0], new QuoteExp(get.container));
+              = Compilation.makeCoercion(exp.getArgs()[0], new QuoteExp(get.container));
            slotProc = SlotSet.set$Mnfield$Ex;
           }
         else

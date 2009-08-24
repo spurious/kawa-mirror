@@ -78,45 +78,4 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
       }
     return Type.pointer_type;
   }
-
-  /**
-   * Convenience method to make an Expression that coerces a value.
-   * @param value to be coerced
-   * @param type to coerce value to
-   * @return expression that coerces value to type
-   */
-  public static ApplyExp makeCoercion(Expression value, Expression type)
-  {
-    Expression[] exps = new Expression[2];
-    exps[0] = type;
-    exps[1] = value;
-    QuoteExp c = new QuoteExp(Convert.getInstance());
-    return new ApplyExp(c, exps);
-  }
-
-  /**
-   * Convenience method to make an Expression that coerces a value.
-   * @param value to be coerced
-   * @param type to coerce value to
-   * @return expression that coerces value to type
-   */
-  public static Expression makeCoercion(Expression value, Type type)
-  {
-    return makeCoercion(value, new QuoteExp(type));
-  }
-
-  /** Modify LambdaExp so result is coerced to given type. */
-  public static void setCoercedReturnValue (LambdaExp lexp, Expression type,
-					    Language language)
-  {
-    if (! lexp.isAbstract())
-      {
-        Expression value = lexp.body;
-        lexp.body = Convert.makeCoercion(value, type);
-        lexp.body.setLine(value);
-      }
-    gnu.bytecode.Type rtype = language.getTypeFor(type);
-    if (rtype != null)
-      lexp.setReturnType(rtype);
-  }
 }

@@ -1913,9 +1913,24 @@ public class LambdaExp extends ScopeExp
         && body != QuoteExp.abstractExp)
       {
         Expression value = body;
-	body = Convert.makeCoercion(value, returnType);
+	body = Compilation.makeCoercion(value, returnType);
 	body.setLine(value);
       }
+  }
+
+  /** Modify LambdaExp so result is coerced to given type. */
+  public final void setCoercedReturnValue (Expression type,
+					    Language language)
+  {
+    if (! isAbstract())
+      {
+        Expression value = body;
+        body = Compilation.makeCoercion(value, type);
+        body.setLine(value);
+      }
+    gnu.bytecode.Type rtype = language.getTypeFor(type);
+    if (rtype != null)
+      setReturnType(rtype);
   }
 }
 

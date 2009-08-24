@@ -1,3 +1,8 @@
+2009-08-23  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Update for Convert.makeCoercion moved to Compilation,
+	and Convert.setCoercedReturnValue moved to LambdaExp.
+
 2009-08-13  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java: Update GetNamedPart -> CompileNamedPart.

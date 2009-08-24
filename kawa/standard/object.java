@@ -591,7 +591,7 @@ public class object extends Syntax
         initValue = sexp;
       }
     else
-      initValue = Convert.makeCoercion(initValue, new QuoteExp(Type.voidType));
+      initValue = Compilation.makeCoercion(initValue, new QuoteExp(Type.voidType));
     ((BeginExp) initMethod.body).add(initValue);
     tr.curMethodLambda = saveLambda;
     tr.pop(initMethod);

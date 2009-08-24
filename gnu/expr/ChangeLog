@@ -1,5 +1,9 @@
 2009-08-23  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (setCoercedReturnValue): Moved from Convert.
+	* Compilation.java (makeCoercion*2): Moved from Convert.
+	* InlineCalls.java: Update accordingly.
+
 	* ApplyExp.java (asInlineable, inlineCompile): New static methods.
 	(compile): Support use of LazyPropertyKey Procedure.compilerKey.
 	* QuoteExp.java (inline): Generalized to use ApplyExp.asInlineable.

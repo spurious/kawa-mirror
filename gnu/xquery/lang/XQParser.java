@@ -3403,7 +3403,7 @@ public class XQParser extends Lexer
       }
     inits[0] = parseExprSingle();
     if (type != null && ! isFor) // FIXME - for now
-      inits[0] = Convert.makeCoercion(inits[0], type);
+      inits[0] = Compilation.makeCoercion(inits[0], type);
     popNesting(saveNesting);
     comp.push(sc);
     sc.addDeclaration(decl);
@@ -3648,7 +3648,7 @@ public class XQParser extends Lexer
     lexp.body = parseEnclosedExpr();
     comp.pop(lexp);
     if (retType != null)
-      Convert.setCoercedReturnValue(lexp, retType, interpreter);
+      lexp.setCoercedReturnValue(retType, interpreter);
     SetExp sexp = new SetExp(decl, lexp);
     sexp.setDefining (true);
     decl.noteValue(lexp);
@@ -3877,7 +3877,7 @@ public class XQParser extends Lexer
 	      init = err;
 	  }
         if (type != null)
-          init = Convert.makeCoercion(init, type);
+          init = Compilation.makeCoercion(init, type);
         decl.noteValue(init);
 	exp = SetExp.makeDefinition(decl, init);
 	maybeSetLine(exp, startLine, startColumn);

@@ -619,7 +619,7 @@ public class Lambda extends Syntax
             System.arraycopy(exps, 1, new_body, 0, len);
             lexp.body = BeginExp.canonicalize(new_body);
           }
-        Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
+        lexp.setCoercedReturnValue(rexp, tr.getLanguage());
       }
     else
       lexp.setCoercedReturnType(lexp.returnType);

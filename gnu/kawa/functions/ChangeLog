@@ -1,3 +1,10 @@
+2009-08-23  Per Bothner  <per@bothner.com>
+
+	* Convert.java (makeCoercion*2): Moved to Compilation.
+	(setCoercedReturnValue): Moved to LambdaExp.
+	* CompilationHelpers.java: Update accordingly.
+	* CompileNamedPart.java: Likewise.
+
 2009-08-15  Per Bothner  <per@bothner.com>
 
 	* GetNamedInstancePart.java: Move inline/expression support

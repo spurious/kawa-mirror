@@ -219,11 +219,11 @@ class SetListExp extends ApplyExp
         Expression[] xargs = new Expression[4];
         xargs[0] = this.getArgs()[0];
         xargs[1] = QuoteExp.getInstance("set");
-        xargs[2] = Convert.makeCoercion(args[0], Type.intType);
+        xargs[2] = Compilation.makeCoercion(args[0], Type.intType);
         xargs[3] = args[1];
         Expression set
           = walker.walkApplyOnly(new ApplyExp(Invoke.invoke, xargs));
-        return Convert.makeCoercion(set, Type.voidType);
+        return Compilation.makeCoercion(set, Type.voidType);
       }
     return exp;
   }

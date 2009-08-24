@@ -214,7 +214,7 @@ public class InlineCalls extends ExpWalker
       {
         Object inliner = Procedure.inlineCallsKey.get(proc);
         if (inliner != null)
-          return ((CanInline) proc).inline(exp, this, argsInlined);
+          return ((CanInline) inliner).inline(exp, this, argsInlined);
         inliner = proc.getProperty(Procedure.inlinerKey, null);
 
         if (inliner != null)

@@ -1,13 +1,10 @@
-// Copyright (c) 2000, 2001, 2003, 2005  Per M.A. Bothner.
+// Copyright (c) 2000, 2001, 2003, 2005, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
 import gnu.math.*;
 import java.math.*;
 import gnu.mapping.*;
-import gnu.expr.*;
-import gnu.bytecode.*;
-import gnu.kawa.lispexpr.LangPrimType;
 
 /**
  * Implement the Scheme standard functions "+" and "-".
@@ -22,6 +19,8 @@ public class AddOp extends ArithOp
   {
     super(name);
     this.plusOrMinus = plusOrMinus;
+    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forAddSub");
+    Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forAddSub");
   }
 
   public static final AddOp $Pl = new AddOp("+", 1);
@@ -156,138 +155,4 @@ public class AddOp extends ArithOp
   {
     return applyN(plusOrMinus, args);
   }
-
-  /** Convert (PROC A B C) to (PROC (PROC A B) C) etc. */
-
-  public static Expression pairwise(Procedure proc,
-                                    Expression rproc, Expression[] args,
-				    InlineCalls walker)
-  {
-    int len = args.length;
-    Expression prev = args[0];
-    for (int i = 1;  i < len;  i++)
-      {
-        Expression[] args2 = new Expression[2];
-        args2[0] = prev;
-        args2[1] = args[i];
-        ApplyExp next = new ApplyExp(rproc, args2);
-        Expression inlined = walker.maybeInline(next, true, proc);
-        prev = inlined != null ? inlined : next;
-      }
-    return prev;
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    // Inlining may yield PrimProcedure instructions of bytecode instructions
-    // which we don't know how to interpret (yet).
-    if (! walker.getCompilation().mustCompile)
-      return exp;
-    Expression folded = exp.inlineIfConstant(this, walker);
-    if (folded != exp)
-      return folded;
-    Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      return pairwise(this, exp.getFunction(), args, walker);
-    if (args.length == 1 && plusOrMinus < 0)
-      {
-        Type type0 = args[0].getType();
-        if (type0 instanceof PrimType)
-          {
-            char sig0 = type0.getSignature().charAt(0);
-            Type type = null;
-            int opcode = 0;
-            if (sig0 == 'V' || sig0 == 'Z' || sig0 == 'C')
-              {
-                // error
-              }
-            else if (sig0 == 'D')
-              {
-                opcode = 119 /* dneg */;
-                type = LangPrimType.doubleType;
-              }
-            else if (sig0 == 'F')
-              {
-                opcode = 118 /* fneg */;
-                type = LangPrimType.floatType;
-              }
-            else if (sig0 == 'J')
-              {
-                opcode = 117 /* lneg */;
-                type = LangPrimType.longType;
-              }
-            else
-              {
-                opcode = 116 /* ineg */;
-                type = LangPrimType.intType;
-              }
-            if (type != null)
-              {
-                PrimProcedure prim
-                  = PrimProcedure.makeBuiltinUnary(opcode, type);
-                return new ApplyExp(prim, args);
-              }
-          }
-      }
-    if (args.length == 2)
-      {
-	return primInline(primitiveOpcode(), exp);
-      }
-    return exp;
-  }
-
-  public int primitiveOpcode ()
-  {
-    return plusOrMinus > 0 ? 96 /* iadd */ : 100 /* isub */;
-  }
-
-  public static Expression primInline (int opcode, ApplyExp exp)
-  {
-    Expression[] args = exp.getArgs();
-    if (args.length == 2)
-      {
-        Type type0 = args[0].getType();
-        Type type1 = args[1].getType();
-        if (type0 instanceof PrimType && type1 instanceof PrimType)
-          {
-            char sig0 = type0.getSignature().charAt(0);
-            char sig1 = type1.getSignature().charAt(0);
-            Type type = null;
-            if (sig0 == 'V' || sig0 == 'Z' || sig0 == 'C'
-                || sig1 == 'V' || sig1 == 'Z' || sig1 == 'C')
-              {
-                // error
-              }
-            else if (sig0 == 'D' || sig1 == 'D')
-              {
-                opcode += 3;
-                type = LangPrimType.doubleType;
-              }
-            else if (sig0 == 'F' || sig1 == 'F')
-              {
-                opcode += 2;
-                type = LangPrimType.floatType;
-              }
-            else if (sig0 == 'J' || sig1 == 'J')
-              {
-                opcode += 1;
-                type = LangPrimType.longType;
-              }
-            else
-              {
-                type = LangPrimType.intType;
-              }
-            if (type != null)
-              {
-                PrimProcedure prim
-                  = PrimProcedure.makeBuiltinBinary(opcode, type);
-                return new ApplyExp(prim, args);
-              }
-          }
-      }
-    return exp;
-  }
-
 }

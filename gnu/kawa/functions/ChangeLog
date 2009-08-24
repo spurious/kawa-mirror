@@ -1,3 +1,14 @@
+2009-08-24  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java: New class, provides CanInline and Inlineable
+	support for ArithOp - i.e. AddOp and MultiplyOp, so far.
+	* Makefile.am: Update accordingly.
+	* ArithOp.java: Move code to CompileArith.
+	No longer inplement CanInline and Inlineable.
+	* DivideOp.java: Update as needed.
+	* MultiplyOp.java (inline, primitiveOpcode): Moved to CompileArith.
+	* AddOp.java (inline, pairwise, primitiveOpcode, primInline): Likewise.
+
 2009-08-23  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: New file: Implements Inlineable and CanInline

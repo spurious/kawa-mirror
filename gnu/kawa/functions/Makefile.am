@@ -13,6 +13,7 @@ java_sources=\
   ArrayRef.java \
   ArraySet.java \
   CompilationHelpers.java \
+  CompileArith.java \
   CompileNamedPart.java \
   CompileMisc.java \
   ConstantFunction0.java \

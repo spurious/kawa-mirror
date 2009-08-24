@@ -5,7 +5,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.lispexpr.LangPrimType;
 
-public abstract class ArithOp extends ProcedureN implements CanInline, Inlineable
+public abstract class ArithOp extends ProcedureN
 {
   public ArithOp (String name)
   {
@@ -16,8 +16,6 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
   {
     return IntNum.zero();
   }
-
-  public abstract int primitiveOpcode ();
 
   /** Classify an expression according to its numeric type.
    * kind==0:  not a number.
@@ -51,118 +49,4 @@ public abstract class ArithOp extends ProcedureN implements CanInline, Inlineabl
       return 0;
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    Expression[] args = exp.getArgs();
-    int len = args.length;
-    if (len == 0)
-      {
-	comp.compileConstant(defaultResult(), target);
-	return;
-      }
-    if (len == 1 || target instanceof IgnoreTarget)
-      {
-	// FIXME implement optimization for unary
-	ApplyExp.compile(exp, comp, target);
-	return;
-      }
-    // We know len >= 2 from above.
-    // We expect len == 2, assuming inline has been run.
-    int kind1 = Arithmetic.classifyType(args[0].getType());
-    int kind2 = Arithmetic.classifyType(args[1].getType());
-    int kind = getReturnKind(kind1, kind2);
-    Type type = Arithmetic.kindType(kind);
-    if (kind == 0 || len != 2 /* just in case */)
-      {
-	ApplyExp.compile(exp, comp, target);
-	return;
-      }
-    Type targetType = target.getType();
-    int tkind = Arithmetic.classifyType(targetType);
-    Type wtype;
-    if ((tkind == Arithmetic.INT_CODE || tkind == Arithmetic.LONG_CODE)
-        && kind >= Arithmetic.INT_CODE && kind <= Arithmetic.INTNUM_CODE)
-      {
-        kind = tkind;
-        wtype = tkind == Arithmetic.INT_CODE ? LangPrimType.intType
-          : LangPrimType.longType;
-      }
-    else if ((tkind == Arithmetic.DOUBLE_CODE
-              || tkind == Arithmetic.FLOAT_CODE)
-             
-             && kind > 0 && kind <= Arithmetic.REALNUM_CODE)
-      {
-        kind = tkind;
-        wtype = tkind == Arithmetic.FLOAT_CODE ? LangPrimType.floatType
-          : LangPrimType.doubleType;
-
-      }
-    else if (kind == Arithmetic.FLOAT_CODE)
-      wtype = LangPrimType.floatType;
-    else if (kind == Arithmetic.DOUBLE_CODE || kind == Arithmetic.FLONUM_CODE)
-      {
-        kind = Arithmetic.DOUBLE_CODE;
-        wtype = LangPrimType.doubleType;
-      }
-    else
-      wtype = type;
-
-    if (kind != Arithmetic.INT_CODE
-        && kind != Arithmetic.LONG_CODE
-        && kind != Arithmetic.FLOAT_CODE
-        && kind != Arithmetic.DOUBLE_CODE)
-      {
-        // FIXME
-        ApplyExp.compile(exp, comp, target);
-        return;
-      }
-      
-    Target wtarget = StackTarget.getInstance(wtype);
-
-    CodeAttr code = comp.getCode();
-    for (int i = 0;  i < len;  i++)
-      {
-        args[i].compile(comp, wtarget);
-        if (i == 0)
-          continue;
-        switch (kind)
-          {
-          case Arithmetic.INT_CODE:
-          case Arithmetic.LONG_CODE:
-          case Arithmetic.FLOAT_CODE:
-          case Arithmetic.DOUBLE_CODE:
-            code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
-            break;
-          }
-      }
-    target.compileFromStack(comp, wtype);
-  }
-
-  public int getReturnKind (Expression[] args)
-  {
-    int len = args.length;
-    if (len == 0)
-      return Arithmetic.INTNUM_CODE;
-    Type type = Type.pointer_type;
-    int kindr = 0;
-    for (int i = 0;  i < len;  i++)
-      {
-	Expression arg = args[i];
-	int kind = Arithmetic.classifyType(arg.getType());
-
-	if (i == 0 || kind == 0 || kind > kindr)
-	  kindr = kind;
-      }
-    return kindr;
-  }
-
-  public int getReturnKind (int kind1, int kind2)
-  {
-    return kind1 > kind2 || kind1 == 0 ? kind1 : kind2;
-  }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return Arithmetic.kindType(getReturnKind(args));
-  }
 }

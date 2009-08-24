@@ -4,7 +4,6 @@
 package gnu.kawa.functions;
 import gnu.math.*;
 import java.math.*;
-import gnu.expr.*;
 import gnu.mapping.*;
 
 /**
@@ -19,16 +18,13 @@ public class MultiplyOp extends ArithOp
   public MultiplyOp(String name)
   {
     super(name);
+    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forMul");
+    Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forMul");
   }
 
   public Object defaultResult ()
   {
     return IntNum.one();
-  }
-
-  public int primitiveOpcode ()
-  {
-    return 104;
   }
 
   public static Object apply (Object arg1, Object arg2)
@@ -102,21 +98,4 @@ public class MultiplyOp extends ArithOp
     return result;
    }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
-  {
-    exp.walkArgs(walker, argsInlined);
-    if (! walker.getCompilation().mustCompile)
-      return exp;
-    Expression folded = exp.inlineIfConstant(this, walker);
-    if (folded != exp)
-      return folded;
-    Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      return AddOp.pairwise(this, exp.getFunction(), args, walker);
-    if (args.length == 2)
-      return AddOp.primInline(104, exp);
-		
-    return exp;
-  }
 }

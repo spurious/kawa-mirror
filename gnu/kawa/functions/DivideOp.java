@@ -11,7 +11,7 @@ import gnu.bytecode.*;
 
 public class DivideOp extends ProcedureN implements CanInline
 {
-  /** True if result shoudl be cast to integer.
+  /** True if result should be cast to integer.
    * Basically a hack (that should be generalized) for XQuery's
    * idiv operator. */
   boolean asInteger;
@@ -51,7 +51,7 @@ public class DivideOp extends ProcedureN implements CanInline
       return exp;
     Expression[] args = exp.getArgs();
     if (args.length > 2)
-      return AddOp.pairwise(this, exp.getFunction(), args, walker);
+      return CompileArith.pairwise(this, exp.getFunction(), args, walker);
     if (args.length == 2)
       {
 	Type type0 = args[0].getType();
@@ -64,7 +64,7 @@ public class DivideOp extends ProcedureN implements CanInline
 			      args);
 	if (kind0 >= 3 && kind1 >= 3)
 	  {
-	    Expression opt = AddOp.primInline(108, exp);
+	    Expression opt = CompileArith.primInline(108, exp);
 	    if (opt != exp)
 	      return opt;
 	  }

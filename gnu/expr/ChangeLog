@@ -1,3 +1,9 @@
+2009-08-23  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (asInlineable, inlineCompile): New static methods.
+	(compile): Support use of LazyPropertyKey Procedure.compilerKey.
+	* QuoteExp.java (inline): Generalized to use ApplyExp.asInlineable.
+
 2009-08-19  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (checkCurrent): We're always current if we're

@@ -123,6 +123,7 @@ public class ApplyExp extends Expression
     LambdaExp func_lambda = null;
     String func_name = null;
     Declaration owner = null;
+    Object quotedValue = null;
     if (exp_func instanceof LambdaExp)
       {
 	func_lambda = (LambdaExp) exp_func;
@@ -151,26 +152,23 @@ public class ApplyExp extends Expression
 	    if (value != null && value instanceof LambdaExp) 
 	      func_lambda = (LambdaExp) value;
 	    if (value != null && value instanceof QuoteExp) 
-	      {
-		Object quotedValue = ((QuoteExp) value).getValue();
-		if (checkInlineable && quotedValue instanceof Inlineable)
-                  {
-                    ((Inlineable) quotedValue).compile(exp, comp, target);
-                    return;
-		  }
-	      }
+              quotedValue = ((QuoteExp) value).getValue();
 	  }
       }
     else if (exp_func instanceof QuoteExp)
       {
-        Object proc = ((QuoteExp) exp_func).getValue();
-	if (proc instanceof Inlineable)
-	  {
-            if (checkInlineable)
-              {
-                ((Inlineable) proc).compile(exp, comp, target);
-                return;
-              }
+        quotedValue = ((QuoteExp) exp_func).getValue();
+      }
+    if (checkInlineable && quotedValue instanceof Procedure)
+      {
+        try
+          {
+            if (inlineCompile((Procedure) quotedValue, exp, comp, target))
+              return;
+          }
+        catch (Throwable ex)
+          {
+            comp.error('e', "caught exception in inline-compiler for "+quotedValue+" - "+ex);
           }
       }
 
@@ -534,15 +532,34 @@ public class ApplyExp extends Expression
       }
     if (afunc instanceof QuoteExp)
       {
-	Object proc = ((QuoteExp) afunc).getValue();
-	if (proc instanceof Inlineable)
-	  type = ((Inlineable) proc).getReturnType(args);
+        Object value = ((QuoteExp) afunc).getValue();
+        Inlineable compiler;
+        if (value instanceof Procedure
+            && (compiler = asInlineable((Procedure) value)) != null)
+          type = compiler.getReturnType(args);
       }
     else if (afunc instanceof LambdaExp)
       {
 	type = ((LambdaExp) afunc).getReturnType();
       }
     return type;
+  }
+
+  public static Inlineable asInlineable (Procedure proc)
+  {
+    if (proc instanceof Inlineable)
+      return (Inlineable) proc;
+    return (Inlineable) Procedure.compilerKey.get(proc);
+  }
+
+  static boolean inlineCompile (Procedure proc, ApplyExp exp, Compilation comp, Target target)
+    throws Throwable
+  {
+    Inlineable compiler = asInlineable(proc);
+    if (compiler == null)
+      return false;
+    compiler.compile(exp, comp, target);
+    return true;
   }
 
   public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)

@@ -123,7 +123,7 @@ public class QuoteExp extends Expression
     Compilation comp = walker.getCompilation();
     if (comp.inlineOk(proc))
       {
-	if (proc instanceof Inlineable)
+	if (ApplyExp.asInlineable(proc) != null)
           {
             if (exp.getFunction() == this)
               return exp;

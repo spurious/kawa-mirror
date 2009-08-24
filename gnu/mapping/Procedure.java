@@ -13,6 +13,10 @@ public abstract class Procedure extends PropertySet
   private static final String sourceLocationKey = "source-location";
   private static final Symbol setterKey = Namespace.EmptyNamespace.getSymbol("setter");
   public static final Symbol inlinerKey = Namespace.EmptyNamespace.getSymbol("inliner");
+  // This should be a LazyPropertyKey<gnu.expr.Inlineable>, but we want
+  // to avoid any strict dependency on gnu.expr for run-time classes.
+  public static final LazyPropertyKey<?> compilerKey
+  = new LazyPropertyKey("compiler");
 
   public void setSourceLocation (String file, int line)
   {

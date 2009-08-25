@@ -102,12 +102,11 @@ public class CompileArith implements CanInline, Inlineable
       {
         compileIntNum(args[0], args[1], kind1, kind2, comp);
       }
-      else if (kind != Arithmetic.INT_CODE
+    else if (kind != Arithmetic.INT_CODE
         && kind != Arithmetic.LONG_CODE
         && kind != Arithmetic.FLOAT_CODE
         && kind != Arithmetic.DOUBLE_CODE)
       {
-        // FIXME
         ApplyExp.compile(exp, comp, target);
         return;
       }

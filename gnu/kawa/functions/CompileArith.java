@@ -10,18 +10,16 @@ public class CompileArith implements CanInline, Inlineable
   static final int ADD = 1;
   static final int SUB = 2;
   static final int MUL = 3;
-  int code;
+  int op;
   Procedure proc;
 
-  CompileArith(Object proc, int code)
+  public static CompileArith $Pl = new CompileArith(AddOp.$Pl, ADD);
+  public static CompileArith $Mn = new CompileArith(AddOp.$Mn, SUB);
+
+  CompileArith(Object proc, int op)
   {
     this.proc = (Procedure) proc;
-    this.code = code;
-  }
-
-  public static CompileArith forAddSub(Object proc)
-  {
-    return new CompileArith(proc, ((AddOp) proc).plusOrMinus > 0 ? ADD : SUB);
+    this.op = op;
   }
 
   public static CompileArith forMul(Object proc)
@@ -32,7 +30,7 @@ public class CompileArith implements CanInline, Inlineable
   public Expression inline (ApplyExp exp, InlineCalls walker,
                             boolean argsInlined)
   {
-    switch (code)
+    switch (op)
       {
       case ADD:
       case SUB:
@@ -99,7 +97,12 @@ public class CompileArith implements CanInline, Inlineable
     else
       wtype = type;
 
-    if (kind != Arithmetic.INT_CODE
+    if (kind == Arithmetic.INTNUM_CODE
+        && (op == ADD || op == MUL || op == SUB))
+      {
+        compileIntNum(args[0], args[1], kind1, kind2, comp);
+      }
+      else if (kind != Arithmetic.INT_CODE
         && kind != Arithmetic.LONG_CODE
         && kind != Arithmetic.FLOAT_CODE
         && kind != Arithmetic.DOUBLE_CODE)
@@ -108,26 +111,113 @@ public class CompileArith implements CanInline, Inlineable
         ApplyExp.compile(exp, comp, target);
         return;
       }
-      
-    Target wtarget = StackTarget.getInstance(wtype);
-
-    CodeAttr code = comp.getCode();
-    for (int i = 0;  i < len;  i++)
+    else
       {
-        args[i].compile(comp, wtarget);
-        if (i == 0)
-          continue;
-        switch (kind)
+        Target wtarget = StackTarget.getInstance(wtype);
+
+        CodeAttr code = comp.getCode();
+        for (int i = 0;  i < len;  i++)
           {
-          case Arithmetic.INT_CODE:
-          case Arithmetic.LONG_CODE:
-          case Arithmetic.FLOAT_CODE:
-          case Arithmetic.DOUBLE_CODE:
-            code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
-            break;
+            args[i].compile(comp, wtarget);
+            if (i == 0)
+              continue;
+            switch (kind)
+              {
+              case Arithmetic.INT_CODE:
+              case Arithmetic.LONG_CODE:
+              case Arithmetic.FLOAT_CODE:
+              case Arithmetic.DOUBLE_CODE:
+                code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
+                break;
+              }
           }
       }
     target.compileFromStack(comp, wtype);
+  }
+
+  static boolean inRange (Expression exp, int lo, int hi)
+  {
+    Object val = exp.valueIfConstant();
+    return val instanceof IntNum && inRange((IntNum) val, lo, hi);
+  }
+
+  static boolean inRange (IntNum val, int lo, int hi)
+  {
+    return IntNum.compare(val, Integer.MIN_VALUE) >= 0
+      && IntNum.compare(val, Integer.MAX_VALUE) <= 0;
+  }
+
+  public boolean compileIntNum (Expression arg1, Expression arg2, int kind1, int kind2, Compilation comp)
+  {
+    // Check if we can replace ARG1-CONSTANT by ARG1+(-CONSTANT),
+    // where (-CONSTANT) is an int, so we can use IntNum.add(IntNum,int).
+    if (op == SUB && arg2 instanceof QuoteExp)
+      {
+        Object val = arg2.valueIfConstant();
+        long lval;
+        boolean negateOk;
+        if (kind2 <= Arithmetic.LONG_CODE)
+          {
+            lval = ((Number) val).longValue();
+            negateOk = lval > Integer.MIN_VALUE && lval <= Integer.MAX_VALUE;
+          }
+        else if (val instanceof IntNum)
+          {
+            IntNum ival = (IntNum) val;
+            lval =  ival.longValue();
+            negateOk = inRange(ival, Integer.MIN_VALUE+1, Integer.MAX_VALUE);
+          }
+        else
+          {
+            negateOk = false;
+            lval = 0;
+          }
+        if (negateOk)
+          return $Pl.compileIntNum(arg1,
+                                   QuoteExp.getInstance(Integer.valueOf((int) - lval)),
+                                   kind1, Arithmetic.INT_CODE, comp);
+      }
+    boolean swap;
+    boolean addOrMul = op == ADD || op == MUL;
+    Type type1, type2;
+    Method meth;
+    if (addOrMul)
+      {
+        if (inRange(arg1, Integer.MIN_VALUE, Integer.MAX_VALUE))
+          kind1 = Arithmetic.INT_CODE;
+        if (inRange(arg2, Integer.MIN_VALUE, Integer.MAX_VALUE))
+          kind2 = Arithmetic.INT_CODE;
+        swap = kind1 == Arithmetic.INT_CODE && kind2 != Arithmetic.INT_CODE;
+        if (swap && ! (arg1.side_effects() && arg2.side_effects()))
+          return compileIntNum(arg2, arg1, kind2, kind1, comp);
+        type1 = kind1 == Arithmetic.INT_CODE ? Type.intType :  Arithmetic.typeIntNum;
+        type2 = kind2 == Arithmetic.INT_CODE ? Type.intType :  Arithmetic.typeIntNum;
+      }
+    else
+      {
+        type1 = type2 = Arithmetic.typeIntNum;
+        swap = false;
+      }
+    arg1.compile(comp, type1);
+    arg2.compile(comp, type2);
+    CodeAttr code = comp.getCode();
+    if (swap)
+      {
+        code.emitSwap();
+        type1 = Arithmetic.typeIntNum;
+        type2 = LangPrimType.intType;
+      }
+    String mname;
+    switch (op)
+      {
+      case ADD: mname = "add";  break;
+      case SUB: mname = "sub";  break;
+      case MUL: mname = "times";  break;
+      default: throw new Error();
+      }
+    meth = Arithmetic.typeIntNum.getMethod(mname, new Type[] { type1, type2 });
+    code.emitInvokeStatic(meth);
+    return true;
   }
 
   public int getReturnKind (int kind1, int kind2)
@@ -155,7 +245,7 @@ public class CompileArith implements CanInline, Inlineable
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    switch (code)
+    switch (op)
       {
       default:
         return Arithmetic.kindType(getReturnKind(args));
@@ -291,7 +381,7 @@ public class CompileArith implements CanInline, Inlineable
 
   public int primitiveOpcode ()
   {
-    switch (code)
+    switch (op)
       {
       case ADD:    return 96; /* iadd */
       case SUB:    return 100; /* isub */

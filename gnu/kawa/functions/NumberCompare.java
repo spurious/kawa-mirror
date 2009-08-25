@@ -292,7 +292,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		else
 		  ctypes[1] = Arithmetic.typeIntNum;
 		Method cmeth
-		  = Arithmetic.typeIntNum.getDeclaredMethod("compare", ctypes);
+		  = Arithmetic.typeIntNum.getMethod("compare", ctypes);
 		PrimProcedure compare = new PrimProcedure(cmeth);
 		arg0 = new ApplyExp(compare, args);
 		arg1 = new QuoteExp(IntNum.zero());

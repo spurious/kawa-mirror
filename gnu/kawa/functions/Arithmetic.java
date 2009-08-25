@@ -6,6 +6,7 @@ import gnu.math.*;
 import java.math.*;
 import gnu.bytecode.*;
 import gnu.kawa.lispexpr.LangPrimType;
+import gnu.kawa.lispexpr.LangObjType;
 
 public class Arithmetic
 {
@@ -109,7 +110,7 @@ public class Arithmetic
   static ClassType typeRealNum = ClassType.make("gnu.math.RealNum");
   static ClassType typeNumber = ClassType.make("java.lang.Number");
   static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
-  static ClassType typeIntNum = ClassType.make("gnu.math.IntNum");
+  static LangObjType typeIntNum = LangObjType.integerType;
 
   public static int classifyType (Type type)
   {

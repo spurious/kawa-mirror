@@ -1,3 +1,13 @@
+2009-08-25  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (compileIntNum): Add new support for optimizing
+	IntNum arithmetic: Call IntNum static operations directly.
+	* AddOp.java ($Pl, $Mn): New static fields.
+	* Arithmetic.java (typeIntNum): Use LangObjType.integerType, so we
+	get desired conversions.
+	* NumberCompare.java: Need to use getMethod, since LangObjType
+	doesn't support getDeclaredMethod.
+
 2009-08-24  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java: New class, provides CanInline and Inlineable

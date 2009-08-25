@@ -19,8 +19,11 @@ public class AddOp extends ArithOp
   {
     super(name);
     this.plusOrMinus = plusOrMinus;
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forAddSub");
-    Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forAddSub");
+    String compiler = plusOrMinus > 0
+      ? "gnu.kawa.functions.CompileArith:$Pl"
+      : "gnu.kawa.functions.CompileArith:$Mn";
+    Procedure.inlineCallsKey.set(this, compiler);
+    Procedure.compilerKey.set(this, compiler);
   }
 
   public static final AddOp $Pl = new AddOp("+", 1);

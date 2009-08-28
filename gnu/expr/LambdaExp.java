@@ -642,6 +642,8 @@ public class LambdaExp extends ScopeExp
 
   public Field compileSetField (Compilation comp)
   {
+    if (primMethods == null)
+      allocMethod(outerLambda(), comp);
     Field field = allocFieldFor(comp);
     if (comp.usingCPStyle())
       compile(comp, Type.objectType);
@@ -656,8 +658,7 @@ public class LambdaExp extends ScopeExp
 
   public void compile (Compilation comp, Target target)
   {
-    if (target instanceof IgnoreTarget
-	&& (getInlineOnly() || ! getCanRead()))
+    if (target instanceof IgnoreTarget)
       return;
     Type rtype;
     CodeAttr code = comp.getCode();
@@ -730,6 +731,8 @@ public class LambdaExp extends ScopeExp
 	if ((flags & NO_FIELD) != 0
 	    || (comp.immediate && outer instanceof ModuleExp))
 	  {
+            if (primMethods == null)
+              allocMethod(outerLambda(), comp);
 	    compileAsMethod(comp);
 	    addApplyMethod(comp, null);
 	    ProcInitializer.emitLoadModuleMethod(this, comp);
@@ -1161,26 +1164,32 @@ public class LambdaExp extends ScopeExp
     allocChildMethods(comp);
   }
 
+  void allocMethod (LambdaExp outer, Compilation comp)
+  {
+    ObjectType closureEnvType;
+    if (! getNeedsClosureEnv())
+      closureEnvType = null;
+    else if (outer instanceof ClassExp || outer instanceof ModuleExp)
+      closureEnvType = outer.getCompiledClassType(comp);
+    else
+      {
+        LambdaExp owner = outer;
+        while (owner.heapFrame == null)
+          owner = owner.outerLambda();
+        closureEnvType = (ClassType) owner.heapFrame.getType();
+      }
+    addMethodFor(comp, closureEnvType);
+  }
+
   void allocChildMethods (Compilation comp)
   {
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
-	if (! child.isClassGenerated() && ! child.getInlineOnly())
+	if (! child.isClassGenerated() && ! child.getInlineOnly()
+            && child.nameDecl != null)
 	  {
-	    ObjectType closureEnvType;
-	    if (! child.getNeedsClosureEnv())
-	      closureEnvType = null;
-	    else if (this instanceof ClassExp || this instanceof ModuleExp)
-	      closureEnvType = getCompiledClassType(comp);
-            else
-              {
-                LambdaExp owner = this;
-                while (owner.heapFrame == null)
-		  owner = owner.outerLambda();
-                closureEnvType = (ClassType) owner.heapFrame.getType();
-              }
-	    child.addMethodFor(comp, closureEnvType);
+            child.allocMethod(this, comp);
 	  }
         if (child instanceof ClassExp)
           {
@@ -1845,6 +1854,8 @@ public class LambdaExp extends ScopeExp
       cname = cname.substring(index+1);
     return cname;
   }
+
+  public boolean side_effects () { return false; }
 
   public String toString()
   {

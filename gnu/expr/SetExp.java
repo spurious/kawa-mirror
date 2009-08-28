@@ -165,7 +165,7 @@ public class SetExp extends AccessExp
       }
     else if (declValue instanceof LambdaExp
 	&& decl.context instanceof ModuleExp
-	&& (! decl.isPrivate() || declValue instanceof ClassExp)
+             && ! decl.ignorable()
 	&& ((LambdaExp) declValue).getName() != null // FIXME
 	&& declValue == new_value)
       {

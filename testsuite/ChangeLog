@@ -1,3 +1,7 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* module1.scm (<simpleAux>): Needs to be exported.
+
 2009-08-15  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

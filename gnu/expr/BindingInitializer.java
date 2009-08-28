@@ -14,7 +14,7 @@ public class BindingInitializer extends Initializer
                              Compilation comp)
   {
     BindingInitializer init = new BindingInitializer(decl, value);
-    if (decl.field != null && decl.field.getStaticFlag())
+    if (decl.field != null ? decl.field.getStaticFlag() : decl.isStatic())
       {
         init.next = comp.clinitChain;
         comp.clinitChain = init;
@@ -35,6 +35,12 @@ public class BindingInitializer extends Initializer
 
   public void emit(Compilation comp)
   {
+    if (decl.ignorable())
+      {
+        if (value != null)
+          value.compile(comp, Target.Ignore);
+        return;
+      }
     CodeAttr code = comp.getCode();
 
     if (value instanceof QuoteExp)

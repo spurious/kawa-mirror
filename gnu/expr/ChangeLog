@@ -1,5 +1,23 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	Avoid creating and setting unused fields, primarily for LambdaExp
+	and ClassExp.  Don't compile function if ignoring it.  One goal
+	is to not generate code for module-local macros.
+	* SetExp.java (compile): Check ignorable(), and don't special-case
+	for ClassExp.
+	* LambdaExp.java(compile): Also immeditely return if IgnoreTarget.
+	(allocMethod): New method, pulled from allocChildMethods.
+	(allocChildMethods): Only allocMethod if nameDecl != null; do so
+	lazily for anonymous lambda.
+	(compile, compileSetField): May need to allocMethod at this time.
+	* BindingInitializer.java (create): If we don't have a field (which
+	is now more likely) use different logic to decide <init? vs <clinit>.
+	(emit): If decl is ignorable, compile value with Ignore target.
+	* Declaration.java (load): If this is ignorable, compile value instead.
+	(makeField): Don't create field if ignorable().
+
+	* LambdaExp.java (side_effects): New method.
+
 	* PrimProcedure.java (sideEffectFree): New field.
 	(isSideEffectFree, setSideEffectFree): New methods.
 	* ApplyExp.java (side_effects): New method.

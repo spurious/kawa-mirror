@@ -235,6 +235,11 @@ public class Declaration
             comp.compileConstant(val, target);
             return;
           }
+        else if (value != QuoteExp.undefined_exp && ignorable())
+          {
+            value.compile(comp, target);
+            return;
+          }
         else
           {
             Variable var = getVariable();
@@ -903,44 +908,46 @@ public class Declaration
         ftype = ClassType.make("gnu.kawa.reflect.FieldLocation");
       else
         ftype = Compilation.typeLocation;
-    String fname = getName();
-    int nlength;
-    if (fname==null)
+    if (! ignorable())
       {
-        fname = "$unnamed$0";
-        nlength = fname.length() - 2; // Without the "$0".
-      }
-    else
-      {
-        fname = Compilation.mangleNameIfNeeded(fname);
-        if (getFlag(IS_UNKNOWN))
-          fname = UNKNOWN_PREFIX + fname;
-        if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
-          fname = PRIVATE_PREFIX + fname;
-        nlength = fname.length();
-      }
-    int counter = 0;
-    while (frameType.getDeclaredField(fname) != null)
-      fname = fname.substring(0, nlength) + '$' + (++ counter);
-
-    field = frameType.addField (fname, ftype, fflags);
-    if (value instanceof QuoteExp)
-      {
-	Object val = ((QuoteExp) value).getValue();
-	if (val.getClass().getName().equals(ftype.getName()))
-	  {
-	    Literal literal = comp.litTable.findLiteral(val);
-	    if (literal.field == null)
-	      literal.assign(field, comp.litTable);
-	  }
-	else if (ftype instanceof PrimType
-		 || "java.lang.String".equals(ftype.getName()))
-	  {
-	    if (val instanceof gnu.text.Char)
-	      val = gnu.math.IntNum.make(((gnu.text.Char) val).intValue());
-	    field.setConstantValue(val, frameType);
-	    return;
-	  }
+        String fname = getName();
+        int nlength;
+        if (fname==null)
+          {
+            fname = "$unnamed$0";
+            nlength = fname.length() - 2; // Without the "$0".
+          }
+        else
+          {
+            fname = Compilation.mangleNameIfNeeded(fname);
+            if (getFlag(IS_UNKNOWN))
+              fname = UNKNOWN_PREFIX + fname;
+            if (external_access && ! getFlag(Declaration.MODULE_REFERENCE))
+              fname = PRIVATE_PREFIX + fname;
+            nlength = fname.length();
+          }
+        int counter = 0;
+        while (frameType.getDeclaredField(fname) != null)
+          fname = fname.substring(0, nlength) + '$' + (++ counter);
+        field = frameType.addField (fname, ftype, fflags);
+        if (value instanceof QuoteExp)
+          {
+            Object val = ((QuoteExp) value).getValue();
+            if (val.getClass().getName().equals(ftype.getName()))
+              {
+                Literal literal = comp.litTable.findLiteral(val);
+                if (literal.field == null)
+                  literal.assign(field, comp.litTable);
+              }
+            else if (ftype instanceof PrimType
+                     || "java.lang.String".equals(ftype.getName()))
+              {
+                if (val instanceof gnu.text.Char)
+                  val = gnu.math.IntNum.make(((gnu.text.Char) val).intValue());
+                field.setConstantValue(val, frameType);
+                return;
+              }
+          }
       }
     // The EARLY_INIT case is handled in SetExp.compile.
     if (! getFlag(EARLY_INIT)

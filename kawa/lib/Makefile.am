@@ -18,6 +18,7 @@ java_SCM_ALWAYS =\
   ports.scm \
   files.scm \
   misc.scm \
+  misc_syntax.scm \
   vectors.scm \
   uniform.scm \
   arrays.scm \

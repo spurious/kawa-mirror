@@ -545,8 +545,8 @@ public class Scheme extends LispLanguage
       defProcStFld("syntax-line", "kawa.lib.std_syntax");
       defProcStFld("syntax-column", "kawa.lib.std_syntax");
       defSntxStFld("define-for-syntax", "kawa.lib.prim_syntax");
-      defSntxStFld("include", "kawa.lib.files");
-      defSntxStFld("include-relative", "kawa.lib.files");
+      defSntxStFld("include", "kawa.lib.misc_syntax");
+      defSntxStFld("include-relative", "kawa.lib.misc_syntax");
 
       defProcStFld("file-exists?", "kawa.lib.files");
       defProcStFld("file-directory?", "kawa.lib.files");
@@ -597,8 +597,8 @@ public class Scheme extends LispLanguage
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       defProcStFld("procedure-property", "kawa.lib.misc");
       defProcStFld("set-procedure-property!", "kawa.lib.misc");
-      defSntxStFld("provide", "kawa.lib.misc");
-      defSntxStFld("test-begin", "kawa.lib.misc");
+      defSntxStFld("provide", "kawa.lib.misc_syntax");
+      defSntxStFld("test-begin", "kawa.lib.misc_syntax");
       defProcStFld("namespace", "kawa.lib.misc");
 
       defProcStFld("quantity->number", "kawa.lib.numbers");
@@ -620,8 +620,8 @@ public class Scheme extends LispLanguage
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
       defSntxStFld("resource-url", "kawa.lib.files");
 
-      defProcStFld("resolve-uri", "kawa.lib.files");
-      defSntxStFld("module-uri", "kawa.lib.files");
+      defProcStFld("resolve-uri", "kawa.lib.misc_syntax");
+      defSntxStFld("module-uri", "kawa.lib.misc_syntax");
 
       defSntxStFld("future", "kawa.lib.thread");
       defProcStFld("sleep", "kawa.lib.thread");

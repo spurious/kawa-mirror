@@ -1,3 +1,12 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	Separation of syntax from runtime code.
+	* misc_syntax.scm: New file.
+	* Makefile.am: Update accordingly.
+	* misc.scm (provide, test-begin): Moved to misc_syntax.scm.
+	* files.scm (module-uri, resource-url, include, include-relative):
+	Likewise.
+
 2009-08-13  Per Bothner  <per@bothner.com>
 
 	Move some functions out of syntax*scm so the latter

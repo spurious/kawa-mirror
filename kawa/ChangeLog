@@ -1,5 +1,8 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java: Update for some functions moved
+	to new file kawa/lib/misc_syntax.scm.
+
 	* standard/define_syntax.java (<clinit>): Declare that makeHygienic
 	and makeNonHygienic are side-effect-free.
 

@@ -30,20 +30,6 @@
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))
 
-(define-syntax (provide form)
-  (syntax-case form ()
-    ((provide 'feature)
-     (cons (syntax define-constant)
-	   (cons (datum->syntax-object
-		  form
-		  (string->symbol
-		   (string-append "%provide%"
-				  (symbol->string
-				   (syntax-object->datum (syntax feature))))))
-		 (syntax (:: <int> 123)))))
-    ((_ . rest)
-     (syntax-error form "provide requires a quoted feature-name"))))
-	   
 
 (define (environment-bound? (env :: <gnu.mapping.Environment>) sym)
   :: <boolean>
@@ -115,17 +101,6 @@
 
   (make <gnu.kawa.util.Parameter> init converter))
 |#
-
-(define-syntax test-begin
-  (syntax-rules ()
-    ((test-begin suite-name)
-     (begin
-       (cond-expand (srfi-64 #!void) (else (require 'srfi-64)))
-       (%test-begin suite-name #f)))
-    ((test-begin suite-name count)
-     (begin
-       (cond-expand (srfi-64 #!void) (else (require 'srfi-64)))
-       (%test-begin suite-name count)))))
 
 (define (namespace name) :: <gnu.mapping.Namespace>
   (invoke-static <gnu.mapping.Namespace> 'getInstance name))

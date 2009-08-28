@@ -1,5 +1,8 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* repl.java (commandLineArgArray, commandLineArguments,
+	main body of setArgs): Move to gnu/expr/ModuleBody.java.
+
 	* standard/Scheme.java: Declare "command-line" and update "exit".
 
 	* standard/not.java:  Moved/renamed to gnu/kawa/functions/Not.java.

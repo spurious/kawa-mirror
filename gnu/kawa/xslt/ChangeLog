@@ -1,3 +1,8 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (runStylesheet): static commandLineArgArray was moved
+	from kawa.repl to ModuleBody.
+
 2009-03-01  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java (maybeSkipWhitespace): New method.

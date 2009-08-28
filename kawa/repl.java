@@ -143,9 +143,6 @@ public class repl extends Procedure0or1
       }
   }
 
-  public static String[] commandLineArgArray;
-  public static FVector commandLineArguments;
-
   public static String homeDirectory;
 
   static void checkInitFile ()
@@ -176,23 +173,7 @@ public class repl extends Procedure0or1
 
   public static void setArgs (String[] args, int arg_start)
   {
-    int nargs = args.length - arg_start;
-    Object[] array = new Object[nargs];
-    if (arg_start == 0)
-      commandLineArgArray = args;
-    else
-      {
-	String[] strings = new String[nargs];
-	for (int i = nargs;  --i >= 0; )
-	  strings[i] = args[i+arg_start];
-	commandLineArgArray = strings;
-      }
-    for (int i = nargs;  --i >= 0; )
-      array[i] = new FString (args[i + arg_start]);
-    commandLineArguments = new FVector (array);  // FIXME scsh has list
-    // FIXME scsh also has command-line proc
-    Environment.getCurrent().put("command-line-arguments",
-				 commandLineArguments);
+    ModuleBody.setArgs(args, arg_start);
   }
 
   public static void getLanguageFromFilenameExtension(String name)

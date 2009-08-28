@@ -4,7 +4,7 @@
 
 (define (command-line) :: list
   (let ((arg0 "kawa")) ;; FIXME
-    (cons arg0 (gnu.lists.LList:makeList kawa.repl:commandLineArgArray 0))))
+    (cons arg0 (gnu.lists.LList:makeList gnu.expr.ModuleBody:commandLineArgArray 0))))
 
 (define (exit #!optional (status :: <int> 0)) :: #!void
   (invoke-static <output-port> 'runCleanups)

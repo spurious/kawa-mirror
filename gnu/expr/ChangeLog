@@ -1,5 +1,9 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java (setArgs, commandLineArgArray, commandLineArguments):
+	Moved to here from kawa.repl, since these are needed for kawart.jar,
+	but kawa.repl doesn't belong in kawa.repl.
+
 	* InlineCalls.java (maybeInline): On exception, setCause on re-trow.
 	* ApplyExp.java (compile): Likewise.
 

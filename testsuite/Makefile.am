@@ -27,7 +27,7 @@ check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
 check1:  check-num check-arr check-srfi-64 check-srfi-69 check-format \
-  check-ppfile check-text check-regex scribble.class
+  check-ppfile check-text check-regex scribble.class check-pidigits
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -120,6 +120,17 @@ HelloCgiK.class: $(srcdir)/HelloCgiK.krl
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) --servlet --krl -C $(srcdir)/HelloCgiK.krl
 
+pidigits.class: $(srcdir)/pidigits.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/pidigits.scm
+
+check-pidigits: pidigits.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) pidigits 27 >pidigits27.log
+	@if diff $(srcdir)/pidigits-output.txt pidigits27.log; \
+	  then echo '# pidigits test passes'; \
+	  else echo FAIL pidigits test; fi
+
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
@@ -203,7 +214,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
-inlining.log: InliningTest.class cycle1.class cycle2.class Makefile
+inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -214,6 +225,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class Makefile
 	$(JAVA) gnu.bytecode.ListCodeSize cycle1.class isIsEven >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize Transformation.class next extract compose >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \
@@ -241,7 +254,7 @@ check-load-require:
 	$(KAWA) -e '(load "$(srcdir)/test-load-require.scm")' \
 	   -e '(mytest3)' >tmp-load-require.out
 	@if diff -b $(srcdir)/test-load-require.expected tmp-load-require.out; \
-	  then echo '# check-load-requir test passes'; \
+	  then echo '# check-load-require test passes'; \
 	  else echo FAIL check-load-require test; fi
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
@@ -258,4 +271,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   ppfile.out scribble.html.in $(EXTRA_LOAD_REQUIRE_DIST) \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
-  inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm
+  inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
+  pidigits.scm pidigits-output.txt

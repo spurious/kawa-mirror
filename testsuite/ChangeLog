@@ -1,4 +1,13 @@
 2009-08-27  Per Bothner  <per@bothner.com>
+	    Isaac Gouy
+
+	* pidigits.scm: New test-case/benchmark from shootout.alioth.debian.org
+	based on Java version contributed by Isaac Gouy.
+	* pidigits-output.txt: Expected output for 'pidigits 27'.
+	* Makefile.am: Update accordingly.  Test using $(KAWARTLIB).
+	* Makefile.am (inlining.log): Also check results from
+	compiling pidigits.scm.
+	* inlining.expected: Update accordingly.
 
 	* module1.scm (<simpleAux>): Needs to be exported.
 

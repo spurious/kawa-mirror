@@ -1,5 +1,9 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* repl.java (exitIncrement, exitDecrement, exitCounter):
+	Move to gnu/expr/ModuleBody.java.
+	* ReplDecument.java: Update accordingly.
+
 	* repl.java (commandLineArgArray, commandLineArguments,
 	main body of setArgs): Move to gnu/expr/ModuleBody.java.
 

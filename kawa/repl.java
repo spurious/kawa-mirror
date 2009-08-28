@@ -113,36 +113,6 @@ public class repl extends Procedure0or1
     out.println("For more information go to:  http://www.gnu.org/software/kawa/");
   }
 
-  /** Number of times exitDecrement calls before we exit. */
-  private static int exitCounter;
-  /** See exitDecrement. */
-  public static synchronized void exitIncrement()
-  {
-    if (exitCounter == 0)
-      exitCounter++;
-    exitCounter++;
-  }
-
-  /** Work around an AWT bug, where AWT threads are non-daemon.
-   * Thus if you start up AWT, the JVM will wait for the AWT to finish,
-   * even if there are no other non-daemon threads.
-   * So call exitIncrement() each time a Freme is created,
-   * and call exitDecrement() a Frame is closed. */
-  public static synchronized void exitDecrement()
-  {
-    int counter = exitCounter;
-    if (counter > 0)
-      {
-	counter--;
-	if (counter == 0)
-	  {
-	    System.exit(0);
-	  }
-	else
-	  exitCounter = counter;
-      }
-  }
-
   public static String homeDirectory;
 
   static void checkInitFile ()
@@ -879,7 +849,7 @@ public class repl extends Procedure0or1
 	    // Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
 	    gnu.mapping.OutPort.runCleanups();
 	  }
-	exitDecrement();
+	ModuleBody.exitDecrement();
       }
   }
 

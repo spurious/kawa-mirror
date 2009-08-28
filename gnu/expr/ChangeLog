@@ -1,5 +1,8 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java (exitIncrement, exitDecrement, exitCounter):
+	Moved to here from kawa.repl, since needed for kawart.jar.
+
 	* ModuleBody.java (setArgs, commandLineArgArray, commandLineArguments):
 	Moved to here from kawa.repl, since these are needed for kawart.jar,
 	but kawa.repl doesn't belong in kawa.repl.

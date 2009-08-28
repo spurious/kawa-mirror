@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import gnu.kawa.swingviews.SwingContent;
 import gnu.text.Path;
 import gnu.expr.Language;
+import gnu.expr.ModuleBody;
 import gnu.mapping.*;
 
 /** A Swing document that implements a read-eval-print-loop. */
@@ -65,7 +66,7 @@ public class ReplDocument extends DefaultStyledDocument
   {
     super(content, styles);
     this.content = content;
-    repl.exitIncrement();
+    ModuleBody.exitIncrement();
 
     addDocumentListener(this);
 
@@ -241,7 +242,7 @@ public class ReplDocument extends DefaultStyledDocument
     // alternative.  (Thread.destroy is not implemented!)
     thread.stop();
     fireDocumentClosed();
-    repl.exitDecrement();
+    ModuleBody.exitDecrement();
  }
 
   // Either null, a single DocumentCloseListener or an ArrayList of the latter.

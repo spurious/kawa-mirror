@@ -1,3 +1,7 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* classes-to-skip-for-runtime: Add more classes.
+
 2009-08-24  Per Bothner  <per@bothner.com>
 
 	* classes-to-skip-for-runtime: Add more classes.

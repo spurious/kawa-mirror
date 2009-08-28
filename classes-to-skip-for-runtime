@@ -15,6 +15,7 @@ gnu/kawa/functions/GetNamedExp.class
 gnu/kawa/functions/SetArrayExp.class
 gnu/kawa/functions/SetListExp.class
 gnu/kawa/lispexpr/DefineNamespace.class
+gnu/kawa/slib/testing*.class
 gnu/xquery/util/CompileMisc.class
 kawa/GuiConsole.*.class
 kawa/GuiInPort.class
@@ -46,9 +47,11 @@ kawa/lang/SyntaxRules.class
 kawa/lang/SyntaxTemplate.class
 kawa/lang/TemplateScope.class
 kawa/lang/VarListPat.class
+kawa/lib/misc_syntax.*.class
 kawa/lib/prim_syntax.*.class
 kawa/lib/std_syntax.*.class
 kawa/lib/syntax.*.class
+kawa/lib/trace.*.class
 kawa/standard/CompileTimeContinuation.class
 kawa/standard/constant_fold.class
 kawa/standard/define_alias.class

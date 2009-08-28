@@ -1,3 +1,8 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* standard/define_syntax.java (<clinit>): Declare that makeHygienic
+	and makeNonHygienic are side-effect-free.
+
 2009-08-23  Per Bothner  <per@bothner.com>
 
 	* standard/object.java: Update for makeCoercion moved to Compilation

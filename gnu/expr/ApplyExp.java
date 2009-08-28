@@ -161,9 +161,16 @@ public class ApplyExp extends Expression
       }
     if (checkInlineable && quotedValue instanceof Procedure)
       {
+        Procedure proc = (Procedure) quotedValue;
+        if (target instanceof IgnoreTarget && proc.isSideEffectFree())
+          {
+            for (int i = 0; i < args_length;  i++)
+              exp.args[i].compile(comp, target);
+            return;
+          }
         try
           {
-            if (inlineCompile((Procedure) quotedValue, exp, comp, target))
+            if (inlineCompile(proc, exp, comp, target))
               return;
           }
         catch (Throwable ex)
@@ -516,13 +523,26 @@ public class ApplyExp extends Expression
     this.type = type;
   }
 
-  public final gnu.bytecode.Type getType()
+  public boolean side_effects ()
   {
-    if (type != null)
-      return type;
-    Expression afunc = func;
-    // In case of cycles.
-    type = Type.pointer_type;
+    Object value = derefFunc(func).valueIfConstant();
+    if (value instanceof Procedure
+        && ((Procedure) value).isSideEffectFree())
+      {
+        Expression[] a = args;
+        int alen = a.length;
+        for (int i = 0;  i < alen;  i++)
+          {
+            if (a[i].side_effects())
+              return true;
+          }
+        return false;
+      }
+    return true;
+  }
+
+  static Expression derefFunc(Expression afunc)
+  {
     if (afunc instanceof ReferenceExp)
       {
 	Declaration func_decl = ((ReferenceExp) afunc).binding;
@@ -530,6 +550,16 @@ public class ApplyExp extends Expression
 	if (func_decl != null && ! func_decl.getFlag(Declaration.IS_UNKNOWN))
 	  afunc = func_decl.getValue();
       }
+    return afunc;
+  }
+
+  public final gnu.bytecode.Type getType()
+  {
+    if (type != null)
+      return type;
+    Expression afunc = derefFunc(func);
+    // In case of cycles.
+    type = Type.pointer_type;
     if (afunc instanceof QuoteExp)
       {
         Object value = ((QuoteExp) afunc).getValue();

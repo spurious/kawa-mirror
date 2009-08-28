@@ -17,6 +17,11 @@ public abstract class ArithOp extends ProcedureN
     return IntNum.zero();
   }
 
+  public boolean isSideEffectFree ()
+  {
+    return true;
+  }
+
   /** Classify an expression according to its numeric type.
    * kind==0:  not a number.
    * kind==1:  a non-real number

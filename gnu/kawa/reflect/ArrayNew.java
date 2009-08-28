@@ -13,6 +13,11 @@ public class ArrayNew extends Procedure1 implements Externalizable
     Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayNew");
   }
 
+  public boolean isSideEffectFree ()
+  {
+    return true;
+  }
+
   public Object apply1 (Object count)
   {
     Class clas = element_type.getImplementationType().getReflectClass();

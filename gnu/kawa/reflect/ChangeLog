@@ -1,3 +1,9 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* ArrayGet.java (isSideEffectFree): New method.
+	* ArrayLength.java (isSideEffectFree): New method.
+	* gnu/kawa/reflect/ArrayNew.java (isSideEffectFree): New method.
+
 2009-08-23  Per Bothner  <per@bothner.com>
 
 	* CompileArrays.java: New class, for Inlineable support

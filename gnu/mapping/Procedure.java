@@ -409,6 +409,15 @@ public abstract class Procedure extends PropertySet
     getSetter().applyN(args);
   }
 
+  /** True if this Procedure (definitely) has no side-effects.
+   * Note side-effect-free does not imply idempotent if this
+   * allocates an object with "identity".
+   */
+  public boolean isSideEffectFree ()
+  {
+    return false;
+  }
+
   public String toString ()
   {
     StringBuffer sbuf = new StringBuffer();

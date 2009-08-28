@@ -20,6 +20,11 @@ public class ArrayGet extends Procedure2 implements Externalizable
     return element_type.coerceToObject(value);
   }
   
+  public boolean isSideEffectFree ()
+  {
+    return true;
+  }
+
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(element_type);

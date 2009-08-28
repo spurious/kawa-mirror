@@ -22,6 +22,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    * 'V' means expect a target (this) argument, even if method is static;
    * '\0' means don't expect a target. */
   char mode;
+  boolean sideEffectFree;
 
   /** If non-null, the LambdaExp that this PrimProcedure implements. */
   LambdaExp source;
@@ -38,6 +39,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public Type getReturnType (Expression[] args) { return retType; }
 
   public Method getMethod () { return method; }
+
+  public boolean isSideEffectFree ()
+  {
+    return sideEffectFree;
+  }
+
+  public void setSideEffectFree ()
+  {
+    sideEffectFree = true;
+  }
 
   /** Return true iff the last parameter is a "rest" argument. */
   public boolean takesVarArgs()

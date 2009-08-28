@@ -34,6 +34,10 @@ public class define_syntax extends Syntax
     = new PrimProcedure(typeMacro.getDeclaredMethod("makeNonHygienic", 3));
   static PrimProcedure setCapturedScope
     = new PrimProcedure(typeMacro.getDeclaredMethod("setCapturedScope", 1));
+  static {
+    makeHygienic.setSideEffectFree();
+    makeNonHygienic.setSideEffectFree();
+  }
 
   boolean hygienic;
 

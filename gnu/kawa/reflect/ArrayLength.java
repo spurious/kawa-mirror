@@ -20,6 +20,11 @@ public class ArrayLength
     return gnu.math.IntNum.make(java.lang.reflect.Array.getLength(array));
   }
 
+  public boolean isSideEffectFree ()
+  {
+    return true;
+  }
+
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(element_type);

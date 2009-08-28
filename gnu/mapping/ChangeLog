@@ -1,3 +1,7 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (isSideEffectFree): New method.
+
 2009-08-23  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (inlineCallsKey): New field.

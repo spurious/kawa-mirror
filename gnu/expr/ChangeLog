@@ -1,3 +1,11 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (sideEffectFree): New field.
+	(isSideEffectFree, setSideEffectFree): New methods.
+	* ApplyExp.java (side_effects): New method.
+	(compile): If target is Ignore and we're calling a side-effect-free
+	known Procedure, just compile arguments with an Ignore target.
+
 2009-08-23  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (maybeInline): Also check Procedure.inlineCallsKey.

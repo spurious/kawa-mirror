@@ -1,3 +1,7 @@
+2009-08-27  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java (isSideEffectFree): New method.
+
 2009-08-25  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (compileIntNum): Add new support for optimizing

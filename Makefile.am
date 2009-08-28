@@ -200,7 +200,7 @@ kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
 	sed -e 's|VERSION|@VERSION@'"$$SVN_REVISION|" <$(srcdir)/kawa/Version.java.in >$@
 
 all-recursive:  kawa/Version.java selected-java-source
-all: kawa-@VERSION@.jar
+all: kawa-@VERSION@.jar kawart-@VERSION@.jar
 
 JAVA_SOURCE = @JAVA_SOURCE@
 

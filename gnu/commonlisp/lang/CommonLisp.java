@@ -137,7 +137,7 @@ public class CommonLisp extends Lisp2
     defun("prog2", prog1.prog2);
     defun("progn", new kawa.standard.begin());
     defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
-    Procedure not = new kawa.standard.not(this);
+    Procedure not = new gnu.kawa.functions.Not(this);
     defun("not", not);
     defun("null", not);
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));

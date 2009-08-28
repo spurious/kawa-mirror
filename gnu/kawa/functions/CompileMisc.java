@@ -10,6 +10,7 @@ public class CompileMisc implements CanInline, Inlineable
 {
   static final int CONSTANT_FUNCTION0 = 1;
   static final int CONVERT = 2;
+  static final int NOT = 3;
   int code;
   Procedure proc;
 
@@ -29,6 +30,11 @@ public class CompileMisc implements CanInline, Inlineable
     return new CompileMisc((Procedure) proc, CONVERT);
   }
 
+  public static CompileMisc forNot(Object proc)
+  {
+    return new CompileMisc((Procedure) proc, NOT);
+  }
+
   public Expression inline (ApplyExp exp, InlineCalls walker,
                             boolean argsInlined)
   {
@@ -39,6 +45,9 @@ public class CompileMisc implements CanInline, Inlineable
                                        walker, argsInlined);
       case CONVERT:
         return inlineConvert((Convert) proc, exp,
+                             walker, argsInlined);
+      case NOT:
+        return inlineNot((Not) proc, exp,
                              walker, argsInlined);
       default: throw new Error();
       }
@@ -51,6 +60,9 @@ public class CompileMisc implements CanInline, Inlineable
       case CONVERT:
         compileConvert((Convert) proc, exp, comp, target);
         return;
+      case NOT:
+        compileNot((Not) proc, exp, comp, target);
+        return;
       default: throw new Error();
       }
   }
@@ -61,6 +73,8 @@ public class CompileMisc implements CanInline, Inlineable
       {
       case CONVERT:
         return getReturnTypeConvert((Convert) proc, args);
+      case NOT:
+        return ((Not) proc).language.getTypeFor(Boolean.TYPE);
       default: throw new Error();
       }
   }
@@ -85,6 +99,14 @@ public class CompileMisc implements CanInline, Inlineable
   {
     exp.walkArgs(walker, argsInlined);
     return Invoke.inlineClassName(exp, 0, walker);
+  }
+
+  public static Expression inlineNot (Not proc, ApplyExp exp,
+                                      InlineCalls walker,
+                                      boolean argsInlined)
+  {
+    exp.walkArgs(walker, argsInlined);
+    return exp.inlineIfConstant(proc, walker);
   }
 
   static gnu.bytecode.ClassType typeType;
@@ -120,6 +142,34 @@ public class CompileMisc implements CanInline, Inlineable
 	args[1].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(coerceMethod);
 	target.compileFromStack(comp, Type.pointer_type);
+      }
+  }
+
+  public void compileNot (Not proc, ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression arg = exp.getArgs()[0];
+    Language language = proc.language;
+    if (target instanceof ConditionalTarget)
+      {
+	ConditionalTarget ctarget = (ConditionalTarget) target;
+	ConditionalTarget sub_target
+	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue, language);
+	sub_target.trueBranchComesFirst = ! ctarget.trueBranchComesFirst;
+	arg.compile(comp, sub_target);
+	return;
+      }
+    CodeAttr code = comp.getCode();
+    Type type = target.getType();
+    if (target instanceof StackTarget && type.getSignature().charAt(0) == 'Z')
+      {
+	arg.compile(comp, target);
+	code.emitNot(target.getType());
+      }
+    else
+      {
+        QuoteExp trueExp = QuoteExp.getInstance(language.booleanObject(true));
+        QuoteExp falseExp = QuoteExp.getInstance(language.booleanObject(false));
+	IfExp.compile(arg, falseExp, trueExp, comp, target);
       }
   }
 

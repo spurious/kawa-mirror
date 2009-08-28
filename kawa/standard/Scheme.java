@@ -12,12 +12,7 @@ import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.AbstractFormat;
-import gnu.kawa.functions.Apply;
-import gnu.kawa.functions.ApplyToArgs;
-import gnu.kawa.functions.DisplayFormat;
-import gnu.kawa.functions.NumberCompare;
-import gnu.kawa.functions.GetNamedPart;
-import gnu.kawa.functions.MultiplyOp;
+import gnu.kawa.functions.*;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.math.DFloNum;
@@ -35,7 +30,7 @@ public class Scheme extends LispLanguage
   public static final Scheme instance;
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf;
-  public static final not not;
+  public static final Not not;
   public static final kawa.standard.map map;
   public static final kawa.standard.map forEach;
   public static final gnu.kawa.functions.IsEq isEq;
@@ -61,7 +56,7 @@ public class Scheme extends LispLanguage
 
     instance = new Scheme(kawaEnvironment);
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
-    not = new not(instance, "not");
+    not = new Not(instance, "not");
     applyToArgs = new ApplyToArgs("apply-to-args", instance);
     applyFieldDecl
       = Declaration.getDeclarationFromStatic("kawa.standard.Scheme",

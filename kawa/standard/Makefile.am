@@ -11,7 +11,6 @@ endif
 java_sources = \
 set_b.java \
 prim_method.java prim_throw.java throw_name.java \
-not.java \
 append.java \
 fluid_let.java \
 expt.java \

@@ -138,7 +138,7 @@ public class ELisp extends Lisp2
     defun("%let", kawa.standard.let.let);
     defun("let*", new kawa.standard.fluid_let(true, nilExpr));
     defProcStFld("concat", "kawa.lib.strings", "string$Mnappend");
-    Procedure not = new kawa.standard.not(this);
+    Procedure not = new gnu.kawa.functions.Not(this);
     defun("not", not);
     defun("null", not);
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));

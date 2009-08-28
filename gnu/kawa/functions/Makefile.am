@@ -30,6 +30,7 @@ java_sources=\
   MakeList.java \
   MakeProcedure.java \
   MultiplyOp.java \
+  Not.java \
   NumberCompare.java \
   SetNamedPart.java \
   Setter.java \

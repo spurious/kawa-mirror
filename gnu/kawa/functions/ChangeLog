@@ -1,5 +1,10 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* Not.java:  Moved/renamed from kawa/standard/not.java.
+	Move CanInline and Inlineable support to CompileMisc.java.
+	* CompileMisc.java: CanInline and Inlineable support for Not.
+	* Makefile.am: Update accordingly.
+
 	* ArithOp.java (isSideEffectFree): New method.
 
 2009-08-25  Per Bothner  <per@bothner.com>

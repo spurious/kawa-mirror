@@ -1,5 +1,7 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* build.xml (lib-scm): Update for new source files.
+
 	* Makefile.am (all): Also build kawart-@VERSION@.jar.
 
 2009-08-27  Per Bothner  <per@bothner.com>

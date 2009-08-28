@@ -1,8 +1,10 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java: Declare "command-line" and update "exit".
+
 	* standard/not.java:  Moved/renamed to gnu/kawa/functions/Not.java.
 	* standard/Makefile.am: Update accordingly.
-	* standard/Scheme,java: Update accordingly.
+	* standard/Scheme.java: Update accordingly.
 
 	* standard/Scheme.java: Update for some functions moved
 	to new file kawa/lib/misc_syntax.scm.

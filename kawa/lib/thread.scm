@@ -1,10 +1,6 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 
-(define (exit #!optional (status :: <int> 0))
-  (invoke-static <output-port> 'runCleanups)
-  (invoke-static <java.lang.System> 'exit status))
-
 (define (sleep (time :: <quantity>)) :: <void>
   (kawa.standard.sleep:sleep time))
 

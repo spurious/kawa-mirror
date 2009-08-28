@@ -424,7 +424,8 @@ public class Scheme extends LispLanguage
                    "kawa.standard.define_autoload",
                    "define_autoloads_from_file");
 
-      defProcStFld("exit", "kawa.lib.thread");
+      defProcStFld("exit", "kawa.lib.rnrs.programs");
+      defProcStFld("command-line", "kawa.lib.rnrs.programs");
 
       defProcStFld("bitwise-arithmetic-shift", "kawa.lib.numbers");
       defProcStFld("arithmetic-shift", "kawa.lib.numbers",

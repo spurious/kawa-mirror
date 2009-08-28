@@ -1,5 +1,10 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* rnrs/programs.scm: New file, implements (rnrs library)
+	module.
+	* Makefile.am: Update accordingly.
+	* thread.scm (exit): Move to programs.scm.
+
 	Separation of syntax from runtime code.
 	* misc_syntax.scm: New file.
 	* Makefile.am: Update accordingly.

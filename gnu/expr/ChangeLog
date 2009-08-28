@@ -1,5 +1,8 @@
 2009-08-27  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (maybeInline): On exception, setCause on re-trow.
+	* ApplyExp.java (compile): Likewise.
+
 	Avoid creating and setting unused fields, primarily for LambdaExp
 	and ClassExp.  Don't compile function if ignoring it.  One goal
 	is to not generate code for module-local macros.

@@ -175,7 +175,7 @@ public class ApplyExp extends Expression
           }
         catch (Throwable ex)
           {
-            comp.error('e', "caught exception in inline-compiler for "+quotedValue+" - "+ex);
+            comp.getMessages().error('e', "caught exception in inline-compiler for "+quotedValue+" - "+ex, ex);
           }
       }
 

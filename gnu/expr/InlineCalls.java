@@ -258,8 +258,7 @@ public class InlineCalls extends ExpWalker
       }
     catch (Throwable ex)
       {
-        ex.printStackTrace();
-        error('e', "caught exception in inliner for "+proc+" - "+ex);
+        messages.error('e', "caught exception in inliner for "+proc+" - "+ex, ex);
       }
     return null;
   }

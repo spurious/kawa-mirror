@@ -188,6 +188,7 @@ public class LispReader extends Lexer
 	if (kind == ReadTable.MULTIPLE_ESCAPE)
 	  {
 	    inEscapes = ! inEscapes;
+	    seenEscapes = true;
 	    continue;
 	  }
 	if (inEscapes)
@@ -784,7 +785,8 @@ public class LispReader extends Lexer
 	String str = new String(tokenBuffer, startPos, endPos-startPos);
 	return Keyword.make(str.intern());
     }
-    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1 && len > 1)
+    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
+        && (len > 1 || seenEscapes))
       {
 	String str = new String(tokenBuffer, startPos, len - 1);
 	return Keyword.make(str.intern());

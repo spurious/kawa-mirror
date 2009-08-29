@@ -1,3 +1,9 @@
+2009-08-29  Per Bothner  <per@bothner.com>
+
+	Allow ||: as a keyword, as recommended by SRFI-88.
+	* LispReader.java (readToken): Set seenEscapes on a MULTIPLE_ESCAPE.
+	(returnSymbol): Allow zero-length keyword if seenEscapes.
+
 2009-08-10  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (getNamedPartLocation): New static, moved from

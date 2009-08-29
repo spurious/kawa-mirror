@@ -1,3 +1,7 @@
+2009-08-29  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add some keyword tests from SRFI-88 specification.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 	    Isaac Gouy
 

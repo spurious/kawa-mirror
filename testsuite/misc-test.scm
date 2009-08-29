@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 177)
+(test-init "Miscellaneous" 188)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -45,12 +45,23 @@
 	(cons x y))
       100)
 
-(test #t keyword? foo:)
 (test #t keyword? 'foo:)
 (test #f keyword? 'foo\:)
+(test #t keyword? 'foo:)
+(test #t keyword? foo:)
+(test #f keyword? 'foo)
+(test #f keyword? ':)
+(test #t keyword? ||:)
+(test #t keyword? (car '(a: b:)))
+(test #f keyword? "bar")
 
 ;;; DSSSL spec example 44
 (test "Argentina" keyword->string \Argentina:)
+(test "foo" keyword->string foo:)
+(test "" keyword->string ||:)
+(test "a b c" keyword->string (string->keyword "a b c"))
+(test foo: string->keyword "foo")
+(test ||: string->keyword "")
 
 ;;; DSSSL spec example 45
 (test foobar: string->keyword "foobar")

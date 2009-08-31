@@ -4,6 +4,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.*;
 import gnu.expr.*;
+import gnu.kawa.util.GeneralHashTable;
 
 /** A Lexer for reading S-expressions in generic Lisp-like syntax.
  * This class may have outlived its usefulness: It's mostly just a
@@ -23,6 +24,8 @@ public class LispReader extends Lexer
   {
     super(port, messages);
   }
+
+  GeneralHashTable<Integer,Object> sharedStructureTable;
 
   /** Read a #|...|#-style comment (which may contain other nested comments).
     * Assumes the initial "#|" has already been read.

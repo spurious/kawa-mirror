@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 188)
+(test-init "Miscellaneous" 189)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -906,3 +906,6 @@
   (object[] length: (+ 1 count) 1: val 2: (+ 1 val)))
 (test "[#!null 10 11 #!null #!null]" 'test-savannah-27257
       (format #f "~s" (alloc-array 4 10)))
+
+(define shared-1 '(#2=(3 4) 9 #2# #2#))
+(test '((3 4) 9 (3 4) (3 4)) 'shared-1 shared-1)

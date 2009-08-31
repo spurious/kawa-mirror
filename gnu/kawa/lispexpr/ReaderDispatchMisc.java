@@ -8,6 +8,7 @@ import gnu.mapping.Values;
 import gnu.mapping.Procedure;
 import gnu.bytecode.Type;
 import gnu.lists.*;
+import gnu.kawa.util.GeneralHashTable;
 /* #ifdef use:java.util.regex */
 import java.util.regex.*;
 /* #endif */
@@ -172,6 +173,35 @@ public class ReaderDispatchMisc extends ReadTableEntry
         else
           in.error("a non-empty list starting with a symbol must follow #,");
 	return Boolean.FALSE;
+      case '=':
+        Object object = reader.readObject();
+        if (in instanceof LispReader)
+          {
+            LispReader lin = (LispReader) in;
+            GeneralHashTable<Integer,Object> map = lin.sharedStructureTable;
+            if (map == null)
+              {
+                map = new GeneralHashTable<Integer,Object>();
+                lin.sharedStructureTable = map;
+              }
+            map.put(Integer.valueOf(count), object);
+          }
+        return object;
+      case '#':
+        if (in instanceof LispReader)
+          {
+            LispReader lin = (LispReader) in;
+            GeneralHashTable<Integer,Object> map = lin.sharedStructureTable;
+            if (map != null)
+              {
+                Integer key = Integer.valueOf(count);
+                object = map.get(key, in);
+                if (object != in)
+                  return object;
+              }
+          }
+        in.error("an unrecognized #n# back-reference was read");
+	return Values.empty;
       default:
 	in.error("An invalid #-construct was read.");
 	return Values.empty;

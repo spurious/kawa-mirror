@@ -1,5 +1,7 @@
 2009-08-31  Per Bothner  <per@bothner.com>
 
+	* misc-test.scm: Add test for shared substructure (SRFI-38) reading.
+
 	* lib-test.scm: New file - initially tests SRFI-2 functionality.
 	* Makefile.am: Update accordingly.
 

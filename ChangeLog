@@ -1,3 +1,7 @@
+2009-08-31  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawart-@VERSION@.jar): Add missing $(srcdir).
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* build.xml (lib-scm): Update for new source files.

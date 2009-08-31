@@ -42,9 +42,9 @@ kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
 	$(JAR) cmf $(srcdir)/jar-manifest $@ $(META_INF_FILES)\
 	    `find gnu kawa -name '*.class' -print`
 
-kawart-@VERSION@.jar: ./kawa-jar.stamp classes-to-skip-for-runtime
+kawart-@VERSION@.jar: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime
 	$(JAR) cf $@ \
-	  `find gnu kawa -name '*.class' -print | grep -v -f classes-to-skip-for-runtime`
+	  `find gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime`
 
 META-INF/services/javax.script.ScriptEngineFactory: Makefile
 	echo 'kawa.standard.SchemeScriptEngineFactory #Scheme' >tmp.ScriptEngineFactory

@@ -24,7 +24,7 @@ public class ImportFromLibrary extends Syntax
 
   static final String[][] SRFI97Map = {
     { "1", "lists", "gnu.kawa.slib.srfi1" },
-    { "2", "and-let*", MISSING },
+    { "2", "and-let*", "gnu.kawa.slib.srfi2" },
     { "5", "let", MISSING },
     { "6", "basic-string-ports", BUILTIN },
     { "8", "receive", BUILTIN },

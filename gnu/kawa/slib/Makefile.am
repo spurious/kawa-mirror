@@ -15,7 +15,7 @@ endif
 
 # NOTE if this list is changed, also update build.xml.
 java_SCM = DefineRecordType.scm readtable.scm \
-  srfi1.scm \
+  srfi1.scm srfi2.scm \
   conditions.scm srfi13.scm srfi34.scm \
   srfi37.scm srfi69.scm pregexp.scm \
   genwrite.scm pp.scm ppfile.scm printf.scm \

@@ -1,3 +1,8 @@
+2009-08-31  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: New file - initially tests SRFI-2 functionality.
+	* Makefile.am: Update accordingly.
+
 2009-08-29  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: Add some keyword tests from SRFI-88 specification.

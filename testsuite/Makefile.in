@@ -177,7 +177,7 @@ EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
 CLEANFILES = tmp* *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
-  srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
+  lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
   jmc.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
@@ -382,8 +382,9 @@ check2-full-tailcalls:
 check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
-check1:  check-num check-arr check-srfi-64 check-srfi-69 check-format \
-  check-ppfile check-text check-regex scribble.class check-pidigits
+check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
+  check-format check-ppfile check-text check-regex scribble.class \
+  check-pidigits
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -401,6 +402,9 @@ check-num:
 
 check-arr:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/arr-test.scm"
+
+check-lib:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/lib-test.scm"
 
 check-srfi-64:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-64-test.scm"

@@ -1,3 +1,8 @@
+2009-08-30  Per Bothner  <per@bothner.com>
+
+	* standard/require.scm (featureMap): Update for SRFI-2.
+	* standard/ImportFromLibrary.java (SRFI97Map): Likewise.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* repl.java (exitIncrement, exitDecrement, exitCounter):

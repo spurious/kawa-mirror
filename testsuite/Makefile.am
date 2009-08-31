@@ -28,7 +28,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-pidigits
+  check-binarytrees check-fannkuch check-pidigits
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -134,6 +134,28 @@ check-pidigits: pidigits.class
 	@if diff $(srcdir)/pidigits-output.txt pidigits27.log; \
 	  then echo '# pidigits test passes'; \
 	  else echo FAIL pidigits test; fi
+
+binarytrees.class: $(srcdir)/binarytrees.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/binarytrees.scm
+
+check-binarytrees: binarytrees.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) binarytrees 10 >binarytrees10.log
+	@if diff $(srcdir)/binarytrees-output.txt binarytrees10.log; \
+	  then echo '# binarytrees test passes'; \
+	  else echo FAIL binarytrees test; fi
+
+fannkuch.class: $(srcdir)/fannkuch.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/fannkuch.scm
+
+check-fannkuch: fannkuch.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fannkuch 7 >fannkuch7.log
+	@if diff $(srcdir)/fannkuch-output.txt fannkuch7.log; \
+	  then echo '# fannkuch test passes'; \
+	  else echo FAIL fannkuch test; fi
 
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
@@ -276,4 +298,6 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
+  binarytrees.scm binarytrees-output.txt \
+  fannkuch.scm fannkuch-output.txt \
   pidigits.scm pidigits-output.txt

@@ -1,5 +1,13 @@
 2009-08-31  Per Bothner  <per@bothner.com>
 
+	* fannkuch.scm: New benchmark from the
+	shootout.alioth.debian.org.
+	* fannkuch-output.txt: Expected output.
+	* binarytrees.scm: New benchmark from the
+	shootout.alioth.debian.org.
+	* binarytrees-output.txt: Expected output.
+	* Makefile.am: Update accordingly.
+
 	* misc-test.scm: Add test for shared substructure (SRFI-38) reading.
 
 	* lib-test.scm: New file - initially tests SRFI-2 functionality.

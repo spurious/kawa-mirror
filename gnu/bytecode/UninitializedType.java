@@ -3,7 +3,7 @@
 
 package gnu.bytecode;
 
-/** A pseudo-type used for allocated but uniniialized objects. */
+/** A pseudo-type used for allocated but uninitialized objects. */
 
 public class UninitializedType extends ObjectType
 {

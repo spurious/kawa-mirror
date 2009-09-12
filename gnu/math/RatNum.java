@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.math.BigDecimal;
 
 /** The abstract class of rational numbers. */
 
@@ -21,6 +22,45 @@ public abstract class RatNum extends RealNum
 	den = IntNum.quotient (den, g);
       }
     return den.isOne () ? (RatNum)num : (RatNum)(new IntFraction (num, den));
+  }
+
+  public static final IntNum ten_exp_9 = IntNum.make(1000000000);
+
+  public static RatNum valueOf (BigDecimal value)
+  {
+    RatNum v = IntNum.valueOf(value.unscaledValue().toString(), 10);
+    int scale = value.scale();
+    for (; scale >= 9; scale -= 9)
+      v = RatNum.divide(v, ten_exp_9);
+    for (; scale <= -9; scale += 9)
+      v = RatNum.times(v, ten_exp_9);
+    IntNum scaleVal;
+    switch (scale > 0 ? scale : -scale)
+      {
+      case 1: scaleVal = IntNum.make(10);  break;
+      case 2: scaleVal = IntNum.make(100);  break;
+      case 3: scaleVal = IntNum.make(1000);  break;
+      case 4: scaleVal = IntNum.make(10000);  break;
+      case 5: scaleVal = IntNum.make(100000);  break;
+      case 6: scaleVal = IntNum.make(1000000);  break;
+      case 7: scaleVal = IntNum.make(10000000);  break;
+      case 8: scaleVal = IntNum.make(100000000);  break;
+      default:
+        return v;
+      }
+    if (scale > 0)
+      return RatNum.divide(v, scaleVal);
+    else
+      return RatNum.times(v, scaleVal);
+  }
+
+  public static RatNum asRatNumOrNull (Object value)
+  {
+    if (value instanceof RatNum)
+      return (RatNum) value;
+    if (value instanceof BigDecimal)
+      return valueOf((BigDecimal) value);
+    return IntNum.asIntNumOrNull(value);
   }
 
   public boolean isExact ()
@@ -149,6 +189,7 @@ public abstract class RatNum extends RealNum
     else
       return IntNum.zero ();
   }
+
   private static RealNum simplest_rational2 (RealNum x, RealNum y)
   {
     RealNum fx = x.toInt (FLOOR);

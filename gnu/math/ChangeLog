@@ -1,3 +1,10 @@
+2009-09-11  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (asRealNumOrNull): New static method.
+	* RatNum.java (asRatNumOrNull): New static method.
+	(valueOf): New method, with logic moved from
+	gnu.kawa.functions.Arithmetic.asRatNum.
+
 2008-07-17  Per Bothner  <per@bothner.com>
 
 	* BitOps.java: New primitive for R6RS bitwise- operations.
@@ -11,7 +18,7 @@
 	Use {StringBuffer,StringBuilder}.append({int,long}) if possible,
 	since JDK (at least current OpenJDK) optimizes those.
 	When we have to do bignum division, divide by 10**9 each time
-	rather than 10 (assuming radix==10).	
+	rather than 10 (assuming radix==10).
 
 2007-11-05  Per Bothner  <per@bothner.com>
 

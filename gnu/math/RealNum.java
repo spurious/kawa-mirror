@@ -12,6 +12,15 @@ public abstract class RealNum extends Complex
   public final RealNum re() { return this; }
   public final RealNum im() { return IntNum.zero(); }
 
+  public static RealNum asRealNumOrNull (Object value)
+  {
+    if (value instanceof RealNum)
+      return (RealNum) value;
+    if (value instanceof Float || value instanceof Double)
+      return new DFloNum(((Number) value).doubleValue());
+    return RatNum.asRatNumOrNull(value);
+  }
+
   public abstract boolean isNegative ();
 
   /** Return 1 if >0; 0 if ==0; -1 if <0; -2 if NaN. */

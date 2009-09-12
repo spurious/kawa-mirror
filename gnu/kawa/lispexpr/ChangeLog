@@ -1,3 +1,9 @@
+2009-09-11  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (realType, rationalType): New static objects.
+	(coerceRealNum, coerceRatNum): New methods.
+	* LangObjType.java (getDeclaredMethod): New method.
+
 2009-08-31  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (sharedStructureTable): New field.

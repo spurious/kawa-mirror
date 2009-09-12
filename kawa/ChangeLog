@@ -1,3 +1,8 @@
+2009-09-11  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Map "real" and "rational" types to new
+	LangObjType objects.
+
 2009-08-30  Per Bothner  <per@bothner.com>
 
 	* standard/require.scm (featureMap): Update for SRFI-2.

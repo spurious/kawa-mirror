@@ -2,7 +2,7 @@ package gnu.kawa.lispexpr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.math.IntNum;
+import gnu.math.*;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
 import java.util.*;
@@ -22,10 +22,12 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int TYPE_TYPE_CODE = 5;
   private static final int CLASSTYPE_TYPE_CODE = 6;
   private static final int INTEGER_TYPE_CODE = 7;
-  private static final int LIST_TYPE_CODE = 8;
-  private static final int VECTOR_TYPE_CODE = 9;
-  private static final int STRING_TYPE_CODE = 10;
-  private static final int REGEX_TYPE_CODE = 11;
+  private static final int RATIONAL_TYPE_CODE = 8;
+  private static final int REAL_TYPE_CODE = 9;
+  private static final int LIST_TYPE_CODE = 10;
+  private static final int VECTOR_TYPE_CODE = 11;
+  private static final int STRING_TYPE_CODE = 12;
+  private static final int REGEX_TYPE_CODE = 13;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -46,6 +48,14 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType typeClassType =
     new LangObjType("class-type", "gnu.bytecode.ClassType",
                     CLASSTYPE_TYPE_CODE);
+
+  public static final LangObjType realType =
+    new LangObjType("real", "gnu.math.RealNum",
+                    REAL_TYPE_CODE);
+
+  public static final LangObjType rationalType =
+    new LangObjType("rational", "gnu.math.RatNum",
+                    RATIONAL_TYPE_CODE);
 
   public static final LangObjType integerType =
     new LangObjType("integer", "gnu.math.IntNum",
@@ -117,6 +127,16 @@ public class LangObjType extends ObjectType implements TypeValue
                 return 1;
               }
           }
+      case REAL_TYPE_CODE:
+        if (other instanceof PrimType)
+          {
+            char sig1 = other.getSignature().charAt(0);
+            switch (sig1)
+              {
+              case 'D': case 'F':
+                return 1;
+              }
+          }
       }
     return getImplementationType().compare(other.getImplementationType());
   }
@@ -129,6 +149,11 @@ public class LangObjType extends ObjectType implements TypeValue
   public Method getMethod(String name, Type[] arg_types)
   {
     return implementationType.getMethod(name, arg_types);
+  }
+
+  public Method getDeclaredMethod(String name, int argCount)
+  {
+    return implementationType.getDeclaredMethod(name, argCount);
   }
 
   public int getMethods (Filter filter, int searchSupers,
@@ -175,6 +200,22 @@ public class LangObjType extends ObjectType implements TypeValue
       default:
         gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
       }
+  }
+
+  public static RealNum coerceRealNum (Object value)
+  {
+    RealNum rval = RealNum.asRealNumOrNull(value);
+    if (rval == null && value != null)
+        throw new WrongType(WrongType.ARG_CAST, value, realType);
+    return rval;
+  }
+
+  public static RatNum coerceRatNum (Object value)
+  {
+    RatNum rval = RatNum.asRatNumOrNull(value);
+    if (rval == null && value != null)
+        throw new WrongType(WrongType.ARG_CAST, value, rationalType);
+    return rval;
   }
 
   public static IntNum coerceIntNum (Object value)
@@ -276,6 +317,14 @@ public class LangObjType extends ObjectType implements TypeValue
         methodDeclaringClass = typeLangObjType;
         mname = "coerceToTypeOrNull";
         break;
+      case REAL_TYPE_CODE:
+        methodDeclaringClass = implementationType;
+        mname = "asRealNumOrNull";
+        break;
+      case RATIONAL_TYPE_CODE:
+        methodDeclaringClass = implementationType;
+        mname = "asRatNumOrNull";
+        break;
       case INTEGER_TYPE_CODE:
         methodDeclaringClass = implementationType;
         mname = "asIntNumOrNull";
@@ -324,6 +373,10 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceToClassType(obj);
       case TYPE_TYPE_CODE:
         return coerceToType(obj);
+      case REAL_TYPE_CODE:
+        return coerceRealNum(obj);
+      case RATIONAL_TYPE_CODE:
+        return coerceRatNum(obj);
       case INTEGER_TYPE_CODE:
         return coerceIntNum(obj);
       case VECTOR_TYPE_CODE:
@@ -347,6 +400,12 @@ public class LangObjType extends ObjectType implements TypeValue
         break;
       case TYPE_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToType", 1));
+        break;
+      case REAL_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceRealNum", 1));
+        break;
+      case RATIONAL_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceRatNum", 1));
         break;
       case INTEGER_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceIntNum", 1));

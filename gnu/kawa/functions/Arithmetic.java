@@ -106,8 +106,8 @@ public class Arithmetic
   static ClassType typeLong = ClassType.make("java.lang.Long");
   */
   static ClassType typeDFloNum = ClassType.make("gnu.math.DFloNum");
-  static ClassType typeRatNum = ClassType.make("gnu.math.RatNum");
-  static ClassType typeRealNum = ClassType.make("gnu.math.RealNum");
+  static LangObjType typeRatNum = LangObjType.rationalType;
+  static LangObjType typeRealNum = LangObjType.realType;
   static ClassType typeNumber = ClassType.make("java.lang.Number");
   static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
   static LangObjType typeIntNum = LangObjType.integerType;
@@ -220,8 +220,6 @@ public class Arithmetic
     return new BigDecimal(value.toString());
   }
 
-  public static final IntNum ten_exp_9 = IntNum.make(1000000000);
-
   public static RatNum asRatNum (Object value)
   {
     if (value instanceof RatNum)
@@ -229,33 +227,7 @@ public class Arithmetic
     if (value instanceof BigInteger)
       return IntNum.valueOf(value.toString(), 10);
     if (value instanceof BigDecimal)
-      {
-	BigDecimal d = (BigDecimal) value;
-	RatNum v = IntNum.valueOf(d.unscaledValue().toString(), 10);
-	int scale = d.scale();
-	for (; scale >= 9; scale -= 9)
-	  v = RatNum.divide(v, ten_exp_9);
-	for (; scale <= -9; scale += 9)
-	  v = RatNum.times(v, ten_exp_9);
-	IntNum scaleVal;
-	switch (scale > 0 ? scale : -scale)
-	  {
-	  case 1: scaleVal = IntNum.make(10);  break;
-	  case 2: scaleVal = IntNum.make(100);  break;
-	  case 3: scaleVal = IntNum.make(1000);  break;
-	  case 4: scaleVal = IntNum.make(10000);  break;
-	  case 5: scaleVal = IntNum.make(100000);  break;
-	  case 6: scaleVal = IntNum.make(1000000);  break;
-	  case 7: scaleVal = IntNum.make(10000000);  break;
-	  case 8: scaleVal = IntNum.make(100000000);  break;
-	  default:
-	    return v;
-	  }
-	if (scale > 0)
-	  return RatNum.divide(v, scaleVal);
-	else
-	  return RatNum.times(v, scaleVal);
-      }
+      return RatNum.valueOf((BigDecimal) value);
     else
       return IntNum.make(((Number) value).longValue());
   }

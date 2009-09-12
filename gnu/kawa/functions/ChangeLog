@@ -1,5 +1,8 @@
 2009-09-11  Per Bothner  <per@bothner.com>
 
+	* Arithmetic.java (asRatNum): Use new method RatNum.valueOf.
+	(typeRatNum, typeRealNum): Use new LangObjType objects.
+
 	* Arithmetic.java (isExact): New helper method, to generalize
 	definition of exact/inexact to standard Java Number classes.
 	* IsEqual.java (numberEquals): New method, to likewise generalize,

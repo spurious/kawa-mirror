@@ -15,12 +15,23 @@ public class IsEqual extends gnu.mapping.Procedure2
     setName(name);
   }
 
+  public static boolean numberEquals (Number num1, Number num2)
+  {
+    boolean exact1 = Arithmetic.isExact(num1);
+    boolean exact2 = Arithmetic.isExact(num2);
+    if (exact1 && exact2)
+      return NumberCompare.$Eq(num1, num2);
+    return exact1 == exact2 && num1.equals(num2);
+  }
+
   public static boolean apply (Object arg1, Object arg2)
   {
     if (arg1 == arg2)
       return true;
     if (arg1 == null || arg2 == null)
       return false;
+    if (arg1 instanceof Number && arg2 instanceof Number)
+      return IsEqual.numberEquals((Number) arg1, (Number) arg2);
     // The complication is that we want a String and an FString to
     // compare as equal (if they are), because both a Scheme strings.
     /* #ifdef use:java.lang.CharSequence */

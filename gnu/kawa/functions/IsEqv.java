@@ -24,7 +24,9 @@ public class IsEqv extends Procedure2
   {
     if (arg1==arg2)
       return true;
-    if (arg1 instanceof Char || arg1 instanceof Numeric
+    if (arg1 instanceof Number && arg2 instanceof Number)
+      return IsEqual.numberEquals((Number) arg1, (Number) arg2);
+    if (arg1 instanceof Char
         // Symbols can now be equals even if not ==, due to namespace support.
         || arg1 instanceof Symbol)
       return arg1.equals (arg2);

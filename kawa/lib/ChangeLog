@@ -1,3 +1,7 @@
+2009-09-11  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (exact?, inexact?): Use Arithmetic.isExact.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* rnrs/programs.scm (command-line): commandLineArgArray was moved

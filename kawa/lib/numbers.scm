@@ -20,11 +20,13 @@
 	       (instance? x <java.lang.Short>)
 	       (instance? x <java.math.BigInteger>)))))
 
-(define (exact? x) :: <boolean> 
-  (and (instance? x <number>) (invoke (as <number> x) 'isExact)))
+(define (exact? x) :: boolean 
+  (and (java.lang.Number? x)
+       (gnu.kawa.functions.Arithmetic:isExact (as java.lang.Number x))))
 
-(define (inexact? x) :: <boolean>
-  (and (instance? x <number>) (not (invoke (as <number> x) 'isExact))))
+(define (inexact? x) :: boolean
+  (and (java.lang.Number? x)
+       (not (gnu.kawa.functions.Arithmetic:isExact (as java.lang.Number x)))))
 
 (define (zero? (x :: <number>)) :: <boolean> 
   (invoke x 'isZero))

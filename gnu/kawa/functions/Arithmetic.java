@@ -375,4 +375,11 @@ public class Arithmetic
         return (Number) value;
       }
   }
+
+  public static boolean isExact (Number num)
+  {
+    if (num instanceof Numeric)
+      return ((Numeric) num).isExact();
+    return !(num instanceof Double || num instanceof Float);
+  }
 }

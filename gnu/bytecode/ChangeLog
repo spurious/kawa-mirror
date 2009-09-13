@@ -1,3 +1,8 @@
+2009-09-12  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (emitCoerceToObject): Use '{Integer,...}.valueOf'
+	methods rather than 'new {Integer,...}' if Java5 or later.
+
 2009-08-05  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (isAccessible): Fix buglet.

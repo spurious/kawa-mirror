@@ -79,11 +79,16 @@ public class PrimType extends Type {
     clas = ClassType.make(cname);
     args = new Type[1];
     args[0] = this;
-    method = clas.getDeclaredMethod("<init>", args);
-    code.emitNew(clas);
-    code.emitDupX();
-    code.emitSwap();
-    code.emitInvokeSpecial(method);
+    if (code.getMethod().getDeclaringClass().classfileFormatVersion >= ClassType.JDK_1_5_VERSION)
+        method = clas.getDeclaredMethod("valueOf", args);
+    else
+      {
+        method = clas.getDeclaredMethod("<init>", args);
+        code.emitNew(clas);
+        code.emitDupX();
+        code.emitSwap();
+      }
+    code.emitInvoke(method);
   }
 
   public void emitIsInstance (CodeAttr code)

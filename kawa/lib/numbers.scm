@@ -2,7 +2,7 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
 
-(define (number? x) :: <boolean> (instance? x <number>))
+(define (number? x) :: <boolean> (java.lang.Number? x))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))
 (define (complex? x) :: <boolean>  (instance? x <complex>))
 (define (real? x) :: <boolean> (instance? x <real>))
@@ -28,13 +28,20 @@
   (and (java.lang.Number? x)
        (not (gnu.kawa.functions.Arithmetic:isExact (as java.lang.Number x)))))
 
-(define (zero? (x :: <number>)) :: <boolean> 
-  (invoke x 'isZero))
+(define (zero? (x :: java.lang.Number)) :: boolean
+  (cond ((gnu.math.Numeric? x)
+	 ((as gnu.math.Numeric x):isZero))
+	((java.math.BigInteger? x)
+	 (= 0 (as java.math.BigInteger x):signum))
+	((java.math.BigDecimal? x)
+	 (= 0 (as java.math.BigDecimal x):signum))
+	(else
+	 (= 0.0 (x:doubleValue)))))
 
 (define (positive? (x :: <real>)) :: <boolean>
   (> (invoke x 'sign) 0))
 
-(define (negative? (x :: <real>)) :: <boolean> 
+(define (negative? (x :: real)) :: <boolean> 
   (invoke x 'isNegative))
 
 (define (odd? (x :: <integer>)) :: <boolean> 
@@ -60,15 +67,20 @@
       (set! result
 	    (*:min result (args i))))))
 
-(define (abs (x :: <number>)) :: <number>
-  (invoke x 'abs))
+(define (abs (x :: java.lang.Number)) :: java.lang.Number
+  (cond ((gnu.math.Numeric? x)
+	 ((as gnu.math.Numeric x):abs))
+	((>= x 0)
+	 x)
+	(else
+	 (- x))))
 
 (define-procedure quotient
   ;; (x :: <real>) (y :: <real>)) :: <real>
   (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
 	  (invoke-static <integer> 'quotient x y))
   (lambda ((x :: <real>) (y :: <real>)) :: <real>
-	  (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))))
+	  (invoke (/ x y) 'toInt  gnu.math.Numeric:TRUNCATE)))
 
 (define-procedure remainder
   ;; (x :: <real>) (y :: <real>)) :: <real> 
@@ -77,7 +89,7 @@
   (lambda ((x :: <real>) (y :: <real>)) :: <real>
 	  (if (zero? y)
 	      (if (exact? y) x (exact->inexact x))
-	      (- x (* (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))
+	      (- x (* (invoke (/ x y) 'toInt gnu.math.Numeric:TRUNCATE)
 		      y)))))
 
 (define-procedure modulo
@@ -87,7 +99,7 @@
   (lambda ((x :: <real>) (y :: <real>)) :: <real>
 	  (if (zero? y)
 	      (if (exact? y) x (exact->inexact x))
-	      (- x (* (invoke (/ x y) 'toInt (static-field <number> 'FLOOR))
+	      (- x (* (invoke (/ x y) 'toInt gnu.math.Numeric:FLOOR)
 		      y)))))
 
 (define (gcd #!rest (args :: <Object[]>)) :: <integer>
@@ -109,22 +121,22 @@
 	    (set! result (gnu.math.IntNum:lcm result (<integer>:@ (args i)))))))))
 
 (define (numerator (x :: <rational>)) :: <integer>
-  (invoke x 'numerator))
+  (x:numerator))
 
 (define (denominator (x :: <rational>)) :: <integer>
-  (invoke x 'denominator))
+  (x:denominator))
 
-(define (floor (x :: <real>)) :: <real>
-  (invoke x 'toInt (static-field <number> 'FLOOR)))
+(define (floor (x :: real)) :: real
+  (x:toInt gnu.math.Numeric:FLOOR))
 
-(define (ceiling (x :: <real>)) :: <real>
-  (invoke x 'toInt (static-field <number> 'CEILING)))
+(define (ceiling (x :: real)) :: real
+  (x:toInt gnu.math.Numeric:CEILING))
 
-(define (truncate (x :: <real>)) :: <real>
-  (invoke x 'toInt (static-field <number> 'TRUNCATE)))
+(define (truncate (x :: real)) :: real
+  (x:toInt gnu.math.Numeric:TRUNCATE))
 
-(define (round (x :: <real>)) :: <real>
-  (invoke x 'toInt (static-field <number> 'ROUND)))
+(define (round (x :: real)) :: real
+  (x:toInt gnu.math.Numeric:ROUND))
 
 (define (rationalize (x :: <real>) (y :: <real>)) :: <real>
   (gnu.math.RatNum:rationalize
@@ -179,21 +191,21 @@
 (define (imag-part (x :: <complex>)) :: <real>
   (invoke x 'im))
 
-(define (magnitude (x :: <number>)) :: <number>
-  (invoke x 'abs))
+(define (magnitude (x :: java.lang.Number)) :: java.lang.Number
+  (abs x))
 
 (define (angle (x :: <complex>)) :: <real>
   (invoke x 'angle))
 
-(define (exact->inexact (num :: <number>)) :: <number>
-  (if (invoke num 'isExact)
-      (make <gnu.math.DFloNum> (invoke (as <real> num) 'doubleValue))
+(define (exact->inexact (num :: java.lang.Number)) :: java.lang.Number
+  (if (gnu.kawa.functions.Arithmetic:isExact num)
+      (gnu.math.DFloNum (num:doubleValue))
       num))
 
-(define (inexact->exact (num :: <number>)) :: <number>
-  (if (instance? num <real>)
-      (invoke (as <real> num) 'toExact)
-      num))
+(define (inexact->exact (num :: java.lang.Number)) :: java.lang.Number
+  (if (gnu.kawa.functions.Arithmetic:isExact num)
+      num
+      (invoke (as <real> num) 'toExact)))
 
 (define (bitwise-arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
   (gnu.math.IntNum:shift value amount))

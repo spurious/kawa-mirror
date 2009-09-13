@@ -1,3 +1,9 @@
+2009-09-12  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (number?): Say yes for any java.lang.Number.
+	(zero?, abs, magnitude, exact->inexact, inexact->exact):
+	Generalize to any java.lang.Number, not just Numeric.
+
 2009-09-11  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (exact?, inexact?): Use Arithmetic.isExact.

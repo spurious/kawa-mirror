@@ -45,7 +45,6 @@ public class StackTarget extends Target
 	if (type == Type.pointer_type
 	    || "java.lang.Cloneable".equals(type.getName()))
 	  return true;
-	// FIXME should check if stackType is compatible array type.
       }
     else
       {

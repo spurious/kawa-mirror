@@ -1982,6 +1982,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       top = ((UninitializedType) top).getImplementationType();
     for (;;)
       {
+        if (top == required)
+          return false;
         if (required instanceof ClassType
             && top instanceof ClassType
             && ((ClassType) top).isSubclass((ClassType) required))

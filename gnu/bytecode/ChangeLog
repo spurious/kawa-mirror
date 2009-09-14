@@ -1,3 +1,9 @@
+2009-09-14  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (castNeeded): Return false if types match.
+	In addition to being an optimization, this makes primitive-array
+	types work.
+
 2009-09-12  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (emitCoerceToObject): Use '{Integer,...}.valueOf'

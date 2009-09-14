@@ -56,6 +56,11 @@ public class CheckedTarget extends StackTarget
             : new CheckedTarget(type));
   }
 
+  public static Target getInstance (Declaration decl)
+  {
+    return getInstance(decl.getType(), decl.getName(), WrongType.ARG_VARNAME);
+  }
+
   static ClassType typeClassCastException;
   static ClassType typeWrongType;
   static Method initWrongTypeStringMethod;

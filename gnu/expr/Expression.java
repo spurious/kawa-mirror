@@ -176,10 +176,7 @@ public abstract class Expression extends Procedure0
    */
   public final void compile (Compilation comp, Declaration lhs)
   {
-    compile (comp,
-             CheckedTarget.getInstance(lhs.getType(),
-                                       lhs.getName(),
-                                       WrongType.ARG_VARNAME));
+    compile (comp, CheckedTarget.getInstance(lhs));
   }
 
   /** Compile all but the first sub-"statement".

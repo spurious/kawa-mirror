@@ -169,7 +169,7 @@ public class LetExp extends ScopeExp
 	else
 	  {
 	    Type varType = decl.getType();
-	    varTarget = CheckedTarget.getInstance(varType);
+            varTarget = CheckedTarget.getInstance(decl);
 	    if (init == QuoteExp.undefined_exp)
 	      {
 		// Typically created by letrec.

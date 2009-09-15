@@ -102,3 +102,6 @@
   (try-catch (thunk)
 	     (ex <kawa.lang.NamedException>
 		 (invoke ex 'applyHandler key handler))))
+
+(define (process-command-line-assignments)
+  (gnu.expr.ApplicationMainSupport:processSetProperties))

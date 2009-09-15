@@ -1,3 +1,9 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Some code moved to ApplicationMainSupport.
+	(propertyFields): Moved to ApplicationMainSupport.
+	* standard/Scheme.java: Define process-command-line-assignments.
+
 2009-09-11  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Map "real" and "rational" types to new

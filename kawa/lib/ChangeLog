@@ -1,3 +1,9 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* system.scm (process-command-line-assignments): New function.
+	* rnrs/programs.scm (exit): Make compatible with R6RS.
+	(command-line): Update for commandLineArgArray moved.
+
 2009-09-12  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (number?): Say yes for any java.lang.Number.

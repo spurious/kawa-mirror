@@ -191,6 +191,7 @@ JAVAX_SCRIPT_EXTRA = \
 @WITH_JAVAX_SCRIPT_TRUE@JAVAX_SCRIPT_USED = $(JAVAX_SCRIPT_EXTRA)
 java_sources = \
   AccessExp.java \
+  ApplicationMainSupport.java \
   ApplyExp.java \
   BeginExp.java \
   BindingInitializer.java \

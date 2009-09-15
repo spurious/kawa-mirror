@@ -95,37 +95,6 @@ public abstract class ModuleBody extends Procedure0
     mainPrintValues = value;
   }
 
-  public static String[] commandLineArgArray;
-
-  public static FVector commandLineArguments;
-
-  /** This is invoked by main when ModuleBody is compiled with --main. */
-  public static void processArgs (String[] args)
-  {
-    setArgs(args, 0);
-  }
-
-  public static void setArgs (String[] args, int arg_start)
-  {
-    int nargs = args.length - arg_start;
-    Object[] array = new Object[nargs];
-    if (arg_start == 0)
-     commandLineArgArray = args;
-    else
-      {
-	String[] strings = new String[nargs];
-	for (int i = nargs;  --i >= 0; )
-	  strings[i] = args[i+arg_start];
-	commandLineArgArray = strings;
-      }
-    for (int i = nargs;  --i >= 0; )
-      array[i] = new FString (args[i + arg_start]);
-    ModuleBody.commandLineArguments = new FVector (array);  // FIXME scsh has list
-    // FIXME scsh also has command-line proc
-    Environment.getCurrent().put("command-line-arguments",
-                                 commandLineArguments);
-  }
-
   /** Number of times exitDecrement calls before we exit. */
   private static int exitCounter;
   /** See exitDecrement. */

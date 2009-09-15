@@ -165,7 +165,8 @@ public class XSLT extends XQuery
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    String[] args = ModuleBody.commandLineArgArray;
+    ApplicationMainSupport.processSetProperties();
+    String[] args = ApplicationMainSupport.commandLineArgArray;
     for (int i = 0;  i < args.length;  i++)
       {
 	String arg = args[i];

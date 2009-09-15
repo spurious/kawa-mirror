@@ -4,8 +4,13 @@
 
 (define (command-line) :: list
   (let ((arg0 "kawa")) ;; FIXME
-    (cons arg0 (gnu.lists.LList:makeList gnu.expr.ModuleBody:commandLineArgArray 0))))
+    (cons arg0 (gnu.lists.LList:makeList gnu.expr.ApplicationMainSupport:commandLineArgArray 0))))
 
-(define (exit #!optional (status :: <int> 0)) :: #!void
+(define (exit #!optional (code 0)) :: #!void
   (invoke-static <output-port> 'runCleanups)
-  (invoke-static <java.lang.System> 'exit status))
+  (let ((status :: int
+		(cond ((integer? code) code)
+		      (code 0)
+		      (else -1))))
+    (invoke-static <java.lang.System> 'exit status)))
+

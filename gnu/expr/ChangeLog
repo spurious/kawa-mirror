@@ -1,3 +1,12 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* ApplicationMainSupport.java: New class.
+	Contains code moved from ModuleBody and repl.
+	* Makefile.am: Update accordingly.
+	* ModuleBody.java (commandLineArgArray, commandLineArguments,
+	processArgs, setArgs): Move to ApplicationMainSupport.
+	* Compilation.java (generateBytecode): Update accordingly.
+
 2009-09-14  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java (getInstance(Declaration)): New factory method.

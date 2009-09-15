@@ -1,3 +1,8 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (runStylesheet): Update for commandLineArgArray moved.
+	Also call new ApplicationMainSupport.processSetProperties.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (runStylesheet): static commandLineArgArray was moved

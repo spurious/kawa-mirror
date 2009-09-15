@@ -143,7 +143,7 @@ public class repl extends Procedure0or1
 
   public static void setArgs (String[] args, int arg_start)
   {
-    ModuleBody.setArgs(args, arg_start);
+    ApplicationMainSupport.setArgs(args, arg_start);
   }
 
   public static void getLanguageFromFilenameExtension(String name)
@@ -643,44 +643,8 @@ public class repl extends Procedure0or1
 		  }
 	      }
 	  }
-	else
-          {
-            int ci = arg.indexOf('=');
-            if (ci <= 0)
-              break;
-            String key = arg.substring(0, ci);
-            String value = arg.substring(ci+1);
-            for (int i = 0; ; i++)
-              {
-                String[] propertyField = propertyFields[i];
-                if (propertyField == null)
-                  break;
-                if (key.equals(propertyField[0]))
-                  {
-                    String cname = propertyField[1];
-                    String fname = propertyField[2];
-                    try
-                      {
-                        Class clas = Class.forName(cname);
-                        ThreadLocation loc = (ThreadLocation)
-                          clas.getDeclaredField(fname).get(null);
-                        loc.setGlobal(value);
-                        break;
-                      }
-                    catch (Throwable ex)
-                      {
-                        System.err.println("error setting property " + key
-                                           +" field "+cname+'.'+fname+": "+ex);
-                        System.exit(-1);
-                      }
-                  }
-              }
-            Symbol symbol = Symbol.parse(key);
-            // Run Language's static initializer.
-            Language.getDefaultLanguage();
-            Environment current = Environment.getCurrent();
-            current.define(symbol, null, value);
-          }
+	else if (! ApplicationMainSupport.processSetProperty(arg))
+          break;
       }
     return something_done ? -1 : iArg;
   }
@@ -790,25 +754,6 @@ public class repl extends Procedure0or1
     ex.printStackTrace(System.err);
     System.exit(-1);
   }
-
-  /** A list of standard command-line fluid names to map to static fields.
-   * For each entry:
-   * element 0 is a property name (before the '=' in the comamnd-line);
-   * element 1 is the name of a class;
-   * element 2 is the name of a static ThreadLocation field. */
-  static String[][] propertyFields =
-    {
-      { "out:doctype-system", "gnu.xml.XMLPrinter", "doctypeSystem" },
-      { "out:doctype-public", "gnu.xml.XMLPrinter", "doctypePublic" },
-      { "out:base", "gnu.kawa.functions.DisplayFormat", "outBase" },
-      { "out:radix", "gnu.kawa.functions.DisplayFormat", "outRadix" },
-      { "out:line-length", "gnu.text.PrettyWriter", "lineLengthLoc" },
-      { "out:right-margin", "gnu.text.PrettyWriter", "lineLengthLoc" },
-      { "out:miser-width", "gnu.text.PrettyWriter", "miserWidthLoc" },
-      { "out:xml-indent", "gnu.xml.XMLPrinter", "indentLoc" },
-      { "display:toolkit", "gnu.kawa.models.Display", "myDisplay" },
-      null
-    };
 
   public static void main(String args[])
   {

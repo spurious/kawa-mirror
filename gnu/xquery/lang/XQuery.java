@@ -756,6 +756,7 @@ public class XQuery extends Language
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
+    ApplicationMainSupport.processCommandLinePropertyAssignments = true;
     Language.setDefaults(instance);
   }
 

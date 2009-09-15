@@ -563,6 +563,7 @@ public class Scheme extends LispLanguage
       defProcStFld("tokenize-string-to-string-array", "kawa.lib.system");
       defProcStFld("tokenize-string-using-shell", "kawa.lib.system");
       defProcStFld("command-parse", "kawa.lib.system");
+      defProcStFld("process-command-line-assignments", "kawa.lib.system");
       
       defProcStFld("record-accessor", "kawa.lib.reflection");
       defProcStFld("record-modifier", "kawa.lib.reflection");

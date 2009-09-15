@@ -12,6 +12,7 @@ endif
 
 java_sources = \
   AccessExp.java \
+  ApplicationMainSupport.java \
   ApplyExp.java \
   BeginExp.java \
   BindingInitializer.java \

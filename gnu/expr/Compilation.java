@@ -2172,7 +2172,8 @@ public class Compilation implements SourceLocator
 				  .getDeclaredMethod("setDefaultFormat", 1));
 	  }
 	code.emitLoad(code.getArg(0));
-	code.emitInvokeStatic(typeModuleBody.getDeclaredMethod("processArgs", 1));
+	code.emitInvokeStatic(ClassType.make("gnu.expr.ApplicationMainSupport")
+                              .getDeclaredMethod("processArgs", 1));
 	if (moduleInstanceMainField != null)
 	  code.emitGetStatic(moduleInstanceMainField);
 	else

@@ -722,6 +722,12 @@ Set the global variable with the specified namespace uri and
 namespace-local name to the given value.
 @end table
 
+These options are processed when invoking the @code{kawa}
+application (i.e. the @code{kawa.repl} application).
+If you want a Kawa application compiled with @code{--main}
+to process these these assignments, call the
+@code{process-command-line-assignments} utility function.
+
 @subsection Options for controlling output formatting
 
 @table @code
@@ -1154,7 +1160,8 @@ This will create a @code{MyProgram.class} which you can either @code{load}
 java MyProgram [@var{args}]
 @end example
 Your Scheme program can access the command-line arguments @var{args}
-by using the global variable @samp{command-line-arguments}.
+by using the global variable @samp{command-line-arguments},
+or the R6RS function @samp{command-line}.
 
 @node Applet compilation, Compiling to executable, Application compilation, Compiling
 @subsection Compiling to an applet
@@ -4296,6 +4303,50 @@ or a quantity whose unit is a time unit (such as @code{10s}).
 @node Processes, Miscellaneous, Threads, Top
 @chapter Processes
 
+@defun command-line
+Returns a nonempty list of strings. The first element is
+an implementation-specific name for the running top-level
+program. (For now this is just @code{"kawa"}, but it may
+become something more useful in the future.)
+The remaining elements are the command-line arguments,
+as passed to the @code{main} method.
+@end defun
+
+@defvar command-line-arguments
+Any command-line arguments (following flags processed by Kawa itself)
+are assigned to the global variable @samp{command-line-arguments},
+which is a vector of strings.
+@end defvar
+
+@defun process-command-line-assignments
+Process any initial command-line options that set variables.
+These have the form @code{@var{name}=@var{value}}.
+Any such command-line options (at the start of the command-line)
+are processed and removed from the command-line.
+@example
+$ kawa -- abc=123 def
+#|kawa:1|# (command-line)
+(kawa abc=123 def)
+#|kawa:2|# (process-command-line-assignments)
+#|kawa:3|# (command-line)
+(kawa def)
+#|kawa:4|# abc
+123
+@end example
+This function is mostly useful for Kawa applications
+compiled with the @code{--main} option.
+(It is used to set XQuery @code{external} variables.)
+@end defun
+
+@defun exit [code]
+Exits the Kawa interpreter, and ends the Java session.
+The integer value @var{code} is returned to the operating
+system.  If @var{code} is not specified, zero is returned,
+indicating normal (non-error) termination.
+If the @var{code} is @code{#f}, it
+is treated as -1, which means an abnormal exit.
+@end defun
+
 @defun make-process command envp
 Creates a @code{<java.lang.Process>} object, using the specified
 @var{command} and @var{envp}.
@@ -4341,22 +4392,9 @@ Returns the Kawa version number as a string.
 @c (Compatible with slib.)
 @end defun
 
-@defvar command-line-arguments
-Any command-line arguments (following flags processed by Kawa itself)
-are assigned to the global variable @samp{command-line-arguments},
-which is a vector of strings.
-@end defvar
-
 @defvar home-directory
 A string containing the home directory of the user.
 @end defvar
-
-@defun exit [code]
-Exits the Kawa interpreter, and ends the Java session.
-The integer value @var{code} is returned to the operating
-system.  If @var{code} is not specified, zero is returned,
-indicating normal (non-error) termination.
-@end defun
 
 @defun scheme-window [shared]
 Create a read-eval-print-loop in a new top-level window.

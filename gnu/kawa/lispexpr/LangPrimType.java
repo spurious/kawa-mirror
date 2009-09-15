@@ -7,25 +7,22 @@ import gnu.text.Char;
 import gnu.mapping.Procedure;
 import gnu.mapping.Values;
 
-/** Use to implement some special types that convert differently. */
+/** Use to implement some special types that convert differently.
+ * May not be needed/appropriate any more now that we support
+ * arithmetic on a mix of Java and Kawa types.
+ */
 
 public class LangPrimType extends PrimType implements TypeValue
 {
   Language language;
   PrimType implementationType;
 
-  public static final LangPrimType byteType
-    = new LangPrimType(Type.byteType);
-  public static final LangPrimType shortType
-    = new LangPrimType(Type.shortType);
-  public static final LangPrimType intType
-    = new LangPrimType(Type.intType);
-  public static final LangPrimType longType
-    = new LangPrimType(Type.longType);
-  public static final LangPrimType floatType
-    = new LangPrimType(Type.floatType);
-  public static final LangPrimType doubleType
-    = new LangPrimType(Type.doubleType);
+  public static final PrimType byteType = Type.byteType;
+  public static final PrimType shortType = Type.shortType;
+  public static final PrimType intType = Type.intType;
+  public static final PrimType longType = Type.longType;
+  public static final PrimType floatType = Type.floatType;
+  public static final PrimType doubleType = Type.doubleType;
   public static final LangPrimType charType
     = new LangPrimType(Type.charType);
   public static final LangPrimType voidType
@@ -136,12 +133,6 @@ public class LangPrimType extends PrimType implements TypeValue
 	if (obj instanceof Char)
 	  return obj;
 	return Char.make(((Character) obj).charValue());
-      case 'B':  case 'S':  case 'I':
-	return IntNum.make(((Number) obj).intValue());
-      case 'J':
-	return IntNum.make(((Number) obj).longValue());
-      case 'D':  case 'F':
-	return DFloNum.make(((Number) obj).doubleValue());
       case 'V':
         // Perhaps we should return Language.noValue() instead?
 	return gnu.mapping.Values.empty;
@@ -167,21 +158,6 @@ public class LangPrimType extends PrimType implements TypeValue
 	ClassType scmCharType = ClassType.make("gnu.text.Char");
 	Method makeCharMethod = scmCharType.getDeclaredMethod("make", 1);
 	code.emitInvokeStatic(makeCharMethod);
-	break;
-      case 'B':  case 'S':  case 'I':
-	cname = "gnu.math.IntNum";
-	argType = Type.int_type;
-	break;
-      case 'J':
-	cname = "gnu.math.IntNum";
-	argType = Type.long_type;
-	break;
-      case 'F':
-	code.emitConvert(Type.float_type, Type.double_type);
-	// ... fall through ...
-      case 'D':
-	cname = "gnu.math.DFloNum";
-	argType = Type.double_type;
 	break;
       default:
 	super.emitCoerceToObject(code);

@@ -1,3 +1,7 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* Type.java (emitConvertFromPrimitive): New method.
+
 2009-09-14  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (coerceFromObject):  Use valueOf methods, if JAVA5.

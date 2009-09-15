@@ -388,6 +388,55 @@ public class LangObjType extends ObjectType implements TypeValue
       }
   }
 
+  public void emitConvertFromPrimitive (Type stackType, CodeAttr code)
+  {
+    Type argType = null;
+    String cname = null;
+    switch (typeCode)
+      {
+      case INTEGER_TYPE_CODE:
+      case RATIONAL_TYPE_CODE:
+      case REAL_TYPE_CODE:
+        if (stackType instanceof PrimType)
+          {
+            if (stackType == Type.intType
+                || stackType == Type.byteType
+                || stackType == Type.shortType)
+              {
+                cname = "gnu.math.IntNum";
+                argType = Type.int_type;
+              }
+            else if (stackType == Type.longType)
+              {
+                cname = "gnu.math.IntNum";
+                argType = Type.long_type;
+              }
+            else if (typeCode == REAL_TYPE_CODE)
+              {
+                if (stackType == Type.floatType)
+                  {
+                    code.emitConvert(Type.float_type, Type.double_type);
+                    stackType = Type.doubleType;
+                  }
+                if (stackType == Type.doubleType)
+                  {
+                    cname = "gnu.math.DFloNum";
+                    argType = Type.double_type;
+                  }
+              }
+          }
+        break;
+      }
+     if (cname != null)
+      {
+	ClassType clas = ClassType.make(cname);
+	Type[] args = { argType };
+	code.emitInvokeStatic(clas.getDeclaredMethod("make", args));
+      }
+     else
+       super.emitConvertFromPrimitive(stackType, code);
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     switch (typeCode)

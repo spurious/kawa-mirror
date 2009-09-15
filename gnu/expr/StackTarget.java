@@ -48,7 +48,7 @@ public class StackTarget extends Target
       }
     else
       {
-	stackType.emitCoerceToObject(code);
+        type.emitConvertFromPrimitive(stackType, code);
 	stackType = code.topType();
       }
     return ! CodeAttr.castNeeded(stackType.getImplementationType(),

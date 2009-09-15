@@ -396,7 +396,7 @@ public abstract class Type
    * -1: if this is a pure subtype of other;
    * -2: if they have values in common but neither is a subtype of the other;
    * -3: if the types have no values in common.
-   * "Same member" is rather loose;  by "A is a subtype of B"
+   * "Same values" is rather loose;  by "A is a subtype of B"
    * we mean that all instance of A can be "widened" to B.
    * More formally, A.compare(B) returns:
    *  1: all B values can be converted to A without a coercion failure
@@ -444,6 +444,18 @@ public abstract class Type
   public Object coerceToObject (Object obj)
   {
     return obj;
+  }
+
+  /** Convert from stackType (usually PrimType) to this type.
+   * However, we might only convert part-way, to some object type.
+   * If converting to this type might fail at run-time, only convert
+   * to Object (as by emitCoerceToObject); a caller can use
+   * {@code stackType.emitConvertFromObject} to convert the rest,
+   * but that might throw an exception. (This is a bit of a kludge.)
+   */
+  public void emitConvertFromPrimitive (Type stackType, CodeAttr code)
+  {
+    stackType.emitCoerceToObject(code);
   }
 
   /** Compile code to convert a object of this type on the stack to Object. */

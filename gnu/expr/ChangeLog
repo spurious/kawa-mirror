@@ -1,5 +1,9 @@
 2009-09-15  Per Bothner  <per@bothner.com>
 
+	* StackTarget.java (compileFromStack0): Use new
+	Type.emitConvertFromPrimitive this allows use to change the default
+	mapping int->java.lang.Integer but optimize when we need IntNum.
+
 	* InlineCalls.java (maybeInline): Check for InvocationTargetException.
 
 	* Language.java (coerceToObject(int)): Rmeove method.

@@ -1,3 +1,8 @@
+2009-09-15  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (getSlotValue):  Don't use old language.coerceToObject;
+	instead just do Integer.valueOf.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* ArrayGet.java (isSideEffectFree): New method.

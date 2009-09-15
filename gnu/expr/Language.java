@@ -767,11 +767,6 @@ public abstract class Language
     return getTypeFor(clas).coerceToObject(obj);
   }
 
-  public Object coerceToObject(int val)
-  {
-    return gnu.math.IntNum.make(val);
-  }
-
   public static synchronized void setDefaults (Language lang)
   {
     Language.setDefaultLanguage(lang);

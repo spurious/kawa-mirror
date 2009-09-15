@@ -98,7 +98,11 @@ public class SlotGet extends Procedure2
     if (fname == "length" && clas.isArray())
       {
 	int length = java.lang.reflect.Array.getLength(obj);
-	return language.coerceToObject(length);
+        /* #ifdef JAVA5 */
+        return Integer.valueOf(length);
+        /* #else */
+        // return new Integer(length);
+        /* #endif */
       }
     if (fname == "class")
       return clas;

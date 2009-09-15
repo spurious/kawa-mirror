@@ -1,5 +1,7 @@
 2009-09-15  Per Bothner  <per@bothner.com>
 
+	* Language.java (coerceToObject(int)): Rmeove method.
+
 	* ApplicationMainSupport.java: New class.
 	Contains code moved from ModuleBody and repl.
 	* Makefile.am: Update accordingly.

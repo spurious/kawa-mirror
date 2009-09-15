@@ -1,5 +1,7 @@
 2009-09-14  Per Bothner  <per@bothner.com>
 
+	* PrimType.java (coerceFromObject):  Use valueOf methods, if JAVA5.
+
 	* CodeAttr.java (castNeeded): Return false if types match.
 	In addition to being an optimization, this makes primitive-array
 	types work.

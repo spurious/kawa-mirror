@@ -22,15 +22,27 @@ public class PrimType extends Type {
       return obj;
     char sig1 = (signature == null || signature.length() != 1) ? ' '
       : signature.charAt(0);
+    /* #ifdef JAVA5 */
     switch (sig1)
       {
-      case 'B':	return new Byte(((Number) obj).byteValue());
-      case 'S':	return new Short(((Number) obj).shortValue());
-      case 'I':	return new Integer(((Number) obj).intValue());
-      case 'J':	return new Long(((Number) obj).longValue());
-      case 'F':	return new Float(((Number) obj).floatValue());
-      case 'D':	return new Double(((Number) obj).doubleValue());
+      case 'B':  return Byte.valueOf(((Number) obj).byteValue());
+      case 'S':  return Short.valueOf(((Number) obj).shortValue());
+      case 'I':  return Integer.valueOf(((Number) obj).intValue());
+      case 'J':  return Long.valueOf(((Number) obj).longValue());
+      case 'F':  return Float.valueOf(((Number) obj).floatValue());
+      case 'D':  return Double.valueOf(((Number) obj).doubleValue());
       }
+    /* #else */
+    // switch (sig1)
+    //   {
+    //   case 'B':  return new Byte(((Number) obj).byteValue());
+    //   case 'S':  return new Short(((Number) obj).shortValue());
+    //   case 'I':  return new Integer(((Number) obj).intValue());
+    //   case 'J':  return new Long(((Number) obj).longValue());
+    //   case 'F':  return new Float(((Number) obj).floatValue());
+    //   case 'D':  return new Double(((Number) obj).doubleValue());
+    //   }
+    /* #endif */
     throw new ClassCastException("don't know how to coerce "
 				 + obj.getClass().getName() + " to "
 				 + getName());

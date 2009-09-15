@@ -4,6 +4,7 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
+import java.lang.reflect.InvocationTargetException;
 
 public class InlineCalls extends ExpWalker
 {
@@ -141,6 +142,8 @@ public class InlineCalls extends ExpWalker
               {
                 Expression init = exp.inits[0];
                 Expression texp = d.getTypeExp();
+                // Note this optimization does yield worse error messages
+                // than using CheckedTarget.  FIXME.
                 if (texp != QuoteExp.classObjectExp)
                   init = walkApplyOnly(Compilation.makeCoercion(init, texp));
                 return init;
@@ -258,6 +261,8 @@ public class InlineCalls extends ExpWalker
       }
     catch (Throwable ex)
       {
+        if (ex instanceof InvocationTargetException)
+          ex = ((InvocationTargetException) ex).getTargetException();
         messages.error('e', "caught exception in inliner for "+proc+" - "+ex, ex);
       }
     return null;

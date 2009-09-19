@@ -1,3 +1,7 @@
+2009-09-19  Per Bothner  <per@bothner.com>
+
+	* DFloNum.java (toString): Change to use R6RS syntax for NaN/inf.
+
 2009-09-11  Per Bothner  <per@bothner.com>
 
 	* RealNum.java (asRealNumOrNull): New static method.

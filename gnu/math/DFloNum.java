@@ -232,9 +232,9 @@ public class DFloNum extends RealNum implements Externalizable
 
    public String toString ()
    {
-    return (value == 1.0/0.0 ? "#i1/0"
-	    : value == -1.0/0.0 ? "#i-1/0"
-	    : Double.isNaN (value) ? "#i0/0"
+    return (value == 1.0/0.0 ? "+inf.0"
+	    : value == -1.0/0.0 ? "-inf.0"
+	    : Double.isNaN (value) ? "+nan.0"
 	    : Double.toString (value));
    }
 

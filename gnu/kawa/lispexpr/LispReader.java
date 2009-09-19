@@ -463,7 +463,8 @@ public class LispReader extends Lexer
 
     boolean negative = ch == '-';
     boolean numeratorNegative = negative;
-    if (ch == '-' || ch == '+')
+    boolean sign_seen = ch == '-' || ch == '+';
+    if (sign_seen)
       {
 	if (pos >= end)
 	  return "no digits following sign";
@@ -586,8 +587,30 @@ public class LispReader extends Lexer
 	ch = buffer[pos++];
       }
 
+    char infnan = '\0';
+
     if (digits_start < 0)
-      return "no digits";
+      {
+        if (sign_seen
+            && pos + 4 < end && buffer[pos+3] == '.' && buffer[pos+4] == '0')
+          {
+            if (buffer[pos] == 'i'
+                && buffer[pos+1] == 'n'
+                && buffer[pos+2] == 'f')
+              {
+                infnan = 'i';
+              }
+            else if (buffer[pos] == 'n'
+                && buffer[pos+1] == 'a'
+                && buffer[pos+2] == 'n')
+              {
+                infnan = 'n';
+              }
+          }
+        if (infnan == '\0')
+          return "no digits";
+        pos += 5;
+      }
 
     if (hash_seen || underscore_seen)
       {
@@ -597,7 +620,13 @@ public class LispReader extends Lexer
     boolean inexact = (exactness == 'i' || exactness == 'I'
 		       || (exactness == ' ' && hash_seen));
     RealNum number = null;
-    if (exp_seen >= 0 || decimal_point >= 0)
+    if (infnan != '\0')
+      {
+        inexact = true;
+	double d = infnan == 'i' ? Double.POSITIVE_INFINITY : Double.NaN;
+	number = new DFloNum(negative ? - d : d);
+      }
+    else if (exp_seen >= 0 || decimal_point >= 0)
       {
 	if (digits_start > decimal_point && decimal_point >= 0)
 	  digits_start = decimal_point;

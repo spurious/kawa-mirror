@@ -1,3 +1,7 @@
+2009-09-19  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber): Parse R6RS +nan.0, +inf.0, and -inf.0.
+
 2009-09-15  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (byteType, shortType, intType, longType, floatType,

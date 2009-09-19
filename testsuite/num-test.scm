@@ -1,4 +1,40 @@
-(test-begin "numbers" 1698)
+(test-begin "numbers" 1729)
+
+(test-equal 7 (+ 3 4))
+(test-equal 3 (+ 3))
+(test-equal 0 (+))
+(test-equal +inf.0 (+ +inf.0 +inf.0))
+(test-equal +nan.0 (+ +inf.0 -inf.0))
+(test-equal 4 (* 4))
+(test-equal 1 (*))
+(test-equal +inf.0 (* 5 +inf.0))
+(test-equal -inf.0 (* -5 +inf.0))
+(test-equal +inf.0 (* +inf.0 +inf.0))
+(test-equal -inf.0 (* +inf.0 -inf.0))
+(test-equal +nan.0 (* 0 +inf.0))
+(test-equal +nan.0 (* 0 +nan.0))
+(test-equal 0.0 (* 1.0 0))
+
+(test-equal 0.0  (+  0.0 -0.0))
+(test-equal 0.0  (+ -0.0  0.0))
+(test-equal 0.0  (+  0.0  0.0))
+(test-equal -0.0 (+ -0.0 -0.0))
+
+(test-equal -1 (- 3 4))
+(test-equal -6 (- 3 4 5))
+(test-equal -3 (- 3))
+(test-equal +nan.0 (- +inf.0 +inf.0))
+
+(test-equal -0.0 (-  0.0))
+(test-equal  0.0 (- -0.0))
+(test-equal  0.0 (-  0.0 -0.0))
+(test-equal -0.0 (- -0.0  0.0))
+(test-equal  0.0 (-  0.0  0.0))
+
+(test-equal -1 (- 3 4))
+(test-equal -6 (- 3 4 5))
+(test-equal -3 (- 3))
+(test-equal +nan.0 (- +inf.0 +inf.0))
 
 (test-approximate 1.4 (sqrt 2) 0.02)
 (test-error

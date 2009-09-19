@@ -1333,6 +1333,8 @@ using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
 @item
 @uref{http://srfi.schemers.org/srfi-1/srfi-1.html, SRFI 1}: List Library, if @code{(require 'list-lib)}.
 @item
+@uref{http://srfi.schemers.org/srfi-2/srfi-2.html, SRFI 2}: AND-LET*: an AND with local bindings, a guarded LET* special form.
+@item
 @uref{http://srfi.schemers.org/srfi-4/srfi-4.html, SRFI 4}: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}.
 @item
 @uref{http://srfi.schemers.org/srfi-6/srfi-6.html, SRFI 6}: Basic String Ports - @pxref{Ports}.
@@ -1344,6 +1346,9 @@ using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
 @item
 @uref{http://srfi.schemers.org/srfi-11/srfi-11.html, SRFI 11}: Syntax for receiving multiple values,
 using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
+@item
+@uref{http://srfi.schemers.org/srfi-13/srfi-13.html, SRFI 13}: String Library.
+Needs some polishing.
 @item
 @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, SRFI 16}: Syntax for procedures of variable arity,
 using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
@@ -1370,6 +1375,8 @@ using @uref{http://srfi.schemers.org/srfi-16/srfi-16.html, @code{case-lambda}}.
 @uref{http://srfi.schemers.org/srfi-64/srfi-64.html, SRFI 64}: A Scheme API for test suites.
 @item
 @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69}: Basic hash tables - @pxref{Hash tables}.
+@item
+@uref{http://srfi.schemers.org/srfi-88/srfi-88.html, SRFI 88}: Keyword objects - @pxref{Keywords}.
 @item
 @uref{http://srfi.schemers.org/srfi-95/srfi-95.html, SRFI 95}: Sorting and Merging.
 @item

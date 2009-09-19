@@ -1,3 +1,7 @@
+2009-09-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Implemented SRFIs): Update list.
+
 2009-09-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Miscellaneous): Move command-line-arguments, exit ...

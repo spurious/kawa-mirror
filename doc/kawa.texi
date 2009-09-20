@@ -977,7 +977,7 @@ You can also compile your Scheme program to native code using GCJ.
 @node Archive compilation, Files compilation, Compiling, Compiling
 @subsection Compiling to an archive file
 
-@defun compile-file source-file compiled-archive
+@deffn Procedure compile-file source-file compiled-archive
 Compile the @var{source-file}, producing a @code{.zip} archive
 @var{compiled-file}.
 
@@ -993,7 +993,7 @@ To load the compiled file, you can later @code{load} the
 named file, as in either @code{(load "foo")} or @code{(load "foo.zip")}.
 This should have the same effect as
 loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
-@end defun
+@end deffn
 
 @node Files compilation
 @subsection Compiling to a set of .class files
@@ -1473,12 +1473,12 @@ as the actual arguments.  The resulting object must be a Scheme
 source form that is futher processed (it may be repeatedly macro-expanded).
 @end deffn
 
-@defun gentemp
+@deffn Procedure gentemp
 Returns a new (interned) symbol each time it is called.
 The symbol names are implementation-dependent.
 (This is not directly macro-related, but is often used in conjunction
 with @code{defmacro} to get a fresh unique identifier.)
-@end defun
+@end deffn
 
 @deffn Syntax cond-expand cond-expand-clause* [(else command-or-definition*)]
 @display
@@ -1544,15 +1544,15 @@ path of the source-file containing the @code{include-file}.
 
 The multiple-value feature was added in R5RS.
 
-@defun values object ...
+@deffn Procedure values object ...
 Delivers all of its arguments to its continuation.
-@end defun
+@end deffn
 
-@defun call-with-values thunk receiver
+@deffn Procedure call-with-values thunk receiver
 Call its @var{thunk} argument with a continuation that,
 when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
-@end defun
+@end deffn
 
 @deffn Syntax let-values ((formals expression) ...) body
 Each @var{formals} should be a formal arguments list as for a @code{lambda},
@@ -1630,10 +1630,10 @@ extended environment. The results of the last expression in the body are
 the values of the receive-expression.
 @end deffn
 
-@defun values-append arg1 ...
+@deffn Procedure values-append arg1 ...
 The values resulting from evaluating each argument are appended
 together.
-@end defun
+@end deffn
 
 @node Symbols and namespaces, Procedures, Multiple values, Top
 @chapter Symbols and namespaces
@@ -1677,14 +1677,14 @@ geom:zero
   @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
 @end example
 
-@defun namespace namespace-name
+@deffn Procedure namespace namespace-name
 Return the simple namespace whose name is the @var{namespace-name}, a string.
 If no such namespace exists, create it.
 The @var{namespace-name} is commonly a URI, especially when working with XML,
 in which case it is called a @var{namespace-URI}.  However, any non-empty
 string is allowed.  Two namespaces are the same (@code{eq?}) if they have
 the same (@code{equal?}) @var{namespace-name}s.
-@end defun
+@end deffn
 
 You can use a namespace-value directly in a compound name:
 @example
@@ -1751,19 +1751,19 @@ A keyword is a single token; therefore no whitespace is allowed between
 the @var{identifier} and the colon (which is not considered part
 of the name of the keyword).
 
-@defun keyword? obj
+@deffn Procedure keyword? obj
 Return @code{#t} if @var{obj} is a keyword, and otherwise returns @code{#f}.
-@end defun
+@end deffn
 
-@defun keyword->string keyword
+@deffn Procedure keyword->string keyword
 Returns the name of @var{keyword} as a string.
 The name does not include the final @code{#\:}.
-@end defun
+@end deffn
 
-@defun string->keyword string
+@deffn Procedure string->keyword string
 Returns the keyword whose name is @var{string}.
 (The @var{string} does not include a final @code{#\:}.)
-@end defun
+@end deffn
 
 @node Special named constants, , Keywords, Symbols and namespaces
 @section Special named constants
@@ -1806,14 +1806,14 @@ but is useful when interfacing to low-level Java code.
 @node Procedures, Numbers, Symbols and namespaces, Top
 @chapter Procedures
 
-@defun apply proc [arg1 ...] args
+@deffn Procedure apply proc [arg1 ...] args
 @var{Args} must be a sequence (list, vector, or string) or a
 primitive Java array.
 (This is an extension over standard Scheme, which requires that
 @var{args} be a list.)
 Calls the @var{proc} (which must be a procedure), using as arguments
 the @var{arg1}... values plus all the elements of @var{args}.
-@end defun
+@end deffn
 
 @deffn Syntax constant-fold proc arg1 ...
 Same as @code{(@var{proc} @var{arg1} ...)}, unless @var{proc} and
@@ -1850,15 +1850,15 @@ The system uses certain internal properties:
 specification;
 @code{'setter} is used to associate a @code{setter} prcedure.
 
-@defun procedure-property proc key [default]
+@deffn Procedure procedure-property proc key [default]
 Get the property value corresponding to the given @var{key}.
 If @var{proc} has no property with the given @var{key},
 return @var{default} (which defaults to @code{#f}) instead.
-@end defun
+@end deffn
 
-@defun set-procedure-property! proc key value
+@deffn Procedure set-procedure-property! proc key value
 Associate the given @var{value} with the @var{key} property of @var{proc}.
-@end defun
+@end deffn
 
 To change the print name of the standard @code{+} procedure (probably
 not a good idea!), you could do:
@@ -1911,7 +1911,7 @@ The main problem is we can't determine the most specific
 method, so Kawa just tries the methods in order.
 @end quotation
 
-@defun make-procedure [keyword: value]... method...
+@deffn Procedure make-procedure [keyword: value]... method...
 Create a generic procedure given the specific methods.
 You can also specify property values for the result.
 
@@ -1926,7 +1926,7 @@ Unrecognized keywords are used to set the procedure properties of the result.
                             method: (lambda (x y) (+ x y 10))
                             method: (lambda () 10)))
 @end example
-@end defun
+@end deffn
 
 @node Extended formals, , Generic procedures, Procedures
 @section Extended Formal Arguments List
@@ -2084,7 +2084,7 @@ and Java number types as appropriate.
 @node Arithmetic operations, Quantities, , Numbers
 @section Arithmetic operations
 
-@deffn Procedure+ @var{z} @dots{}
+@deffn Procedure + @var{z} @dots{}
 @deffnx Procedure * @var{z} @dots{}
 These procedures return the sum or product of their arguments.
 
@@ -2386,31 +2386,31 @@ The precise syntax of quantity literals may change,
 but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
 and @code{4cm^2} (4 square centimeters).
 
-@defun quantity? object
+@deffn Procedure quantity? object
 True iff @var{object} is a quantity.  Note that all numbers are
 quantities, but not the other way round.
 Currently, there are no quantities that re not numbers.
 To distinguish a plain unit-less number from a quantity,
 you can use @code{complex?}.
-@end defun
+@end deffn
 
-@defun quantity->number q
+@deffn Procedure quantity->number q
 Returns the pure number part of the quantity @var{q}, relative to
 primitive (base) units.
 If @var{q} is a number, returns @var{q}.
 If @var{q} is a unit, yields the magitude of @var{q} relative to base units.
-@end defun
+@end deffn
 
-@defun quantity->unit q
+@deffn Procedure quantity->unit q
 Returns the unit of the quantity @var{q}.
 If @var{q} is a number, returns the empty unit.
-@end defun
+@end deffn
 
-@defun make-quantity x unit
+@deffn Procedure make-quantity x unit
 Returns the product of @var{x} (a pure number) and @var{unit}.
 You can specify a string instead of @var{unit}, such as @code{"cm"}
 or @code{"s"} (seconds).
-@end defun
+@end deffn
 
 @deffn Syntax define-base-unit unit-name dimension
 Define @var{unit-name} as a base (primitive) unit,
@@ -2436,27 +2436,27 @@ so the above is equivalent to:
 @node Extended Number Operations, Logical Number Operations, Quantities, Numbers
 @section Extended Number Operations
 
-@defun quotient x y
+@deffn Procedure quotient x y
 Generalized to arbitrary real numbers, using the definition:
 @code{(truncate (/ x y))}.
-@end defun
+@end deffn
 
-@defun remainder x y
+@deffn Procedure remainder x y
 Generalized to arbitrary real numbers, using the definition:
 @code{(- x (* y (truncate (/ x y))))}.
 If @code{y} is @code{0}, the result is @code{x} - i.e. we take
 @code{(* 0 (quotient x 0))} to be @code{0}.
 The result is inexact if either argument is inexact,
 even if @code{x} is exact and @code{y} is 0.
-@end defun
+@end deffn
 
-@defun modulo x y
+@deffn Procedure modulo x y
 Generalized to arbitrary real numbers, using the definition:
 @code{(- x (* y (floor (/ x y))))}.
 If @code{y} is @code{0}, the result is @code{x}.
 The result is inexact if either argument is inexact,
 even if @code{x} is exact and @code{y} is 0.
-@end defun
+@end deffn
 
 @node Logical Number Operations, , Extended Number Operations, Numbers
 @section Logical Number Operations
@@ -2464,12 +2464,12 @@ even if @code{x} is exact and @code{y} is 0.
 These functions operate on the 2's complement binary representation
 of an exact integer.
 
-@defun bitwise-not i
+@deffn Procedure bitwise-not i
 Returns the bit-wise logical inverse of the argument.
 More formally, returns the exact integer whose two's
 complement representation is the one's complement of the two's
 complement representation of @var{i}.
-@end defun
+@end deffn
 
 @deffn Procedure  bitwise-and i ...
 @deffnx Procedure bitwise-ior i ...
@@ -2482,7 +2482,7 @@ If they are passed no arguments, they return the integer
 that acts as identity for the operation: -1, 0, or 0, respectively. 
 @end deffn
 
-@defun bitwise-if i1 i2 i3
+@deffn Procedure bitwise-if i1 i2 i3
 
 Returns the exact integer that is the bit-wise ``if'' of the twos
 complement representations of its arguments, i.e. for each bit, if it
@@ -2494,18 +2494,18 @@ is equivaent to the following computation:
 (bitwise-ior (bitwise-and i1 i2)
              (bitwise-and (bitwise-not i1) i3))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-bit-count i
+@deffn Procedure bitwise-bit-count i
 If ei is non-negative, returns the number of 1 bits in the twos complement
 representation of i. Otherwise it returns the result of the following
 computation:
 @example
 (bitwise-not (bitwise-bit-count (bitwise-not i)))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-length i
+@deffn Procedure bitwise-length i
 Returns the number of bits needed to represent i if it is positive,
 and the number of bits needed to represent @code{(bitwise-not @var{i})}
 if it is negative, which is the exact integer that is the result of the
@@ -2520,9 +2520,9 @@ following computation:
      result))
 @end example
 This is the number of bits needed to represent @var{i} in an unsigned field.
-@end defun
+@end deffn
 
-@defun bitwise-first-bit-set i
+@deffn Procedure bitwise-first-bit-set i
 Returns the index of the least significant 1 bit in the twos complement
 representation of i. If ei is 0, then - 1 is returned.
 @example
@@ -2530,9 +2530,9 @@ representation of i. If ei is 0, then - 1 is returned.
 (bitwise-first-bit-set 1) @result{} 0
 (bitwise-first-bit-set -4) @result{} 2
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-bit-set? i1 i2
+@deffn Procedure bitwise-bit-set? i1 i2
 Returns @code{#t} if the i2'th bit (where @var{i2} must be non-negative)
 is 1 in the two's complement representation of @var{i1}, and @code{#f}
 otherwise. This is the result of the following computation:
@@ -2542,9 +2542,9 @@ otherwise. This is the result of the following computation:
          (bitwise-arithmetic-shift-left 1 i2)
          i1)))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-copy-bit i bitno replacement-bit
+@deffn Procedure bitwise-copy-bit i bitno replacement-bit
 Return the result of replacing the @var{bitno}'th bit of @var{i}
 by @var{replacement-bit}, where @var{bitno} must be non-negative,
 and @var{replacement-bit} must be either 0 or 1.
@@ -2555,9 +2555,9 @@ This is the result of the following computation:
             (bitwise-arithmetic-shift-left replacement-bit bitno)
             i))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-bit-field n start end
+@deffn Procedure bitwise-bit-field n start end
 Return the integer formed from the (unsigned) bit-field
 starting at @var{start} and ending just before @var{end}.
 Same as:
@@ -2569,9 +2569,9 @@ Same as:
     (bitwise-and @var{n} mask)
     @var{start}))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-copy-bit-field to start end from
+@deffn Procedure bitwise-copy-bit-field to start end from
 Returns the result of replacing in @var{to} the bits at positions from @var{start} (inclusive) to @var{end} (exclusive) by the bits in @var{from} from position 0 (inclusive) to position @var{end} - @var{start} (exclusive).
 Both @var{start} and @var{start} must be non-negative,
 and @var{start} must be less than or equal to @var{start}.
@@ -2589,9 +2589,9 @@ This is the result of the following computation:
                                              start)
               to))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-arithmetic-shift i j
+@deffn Procedure bitwise-arithmetic-shift i j
 Shifts @var{i} by @var{j}.
 It is a ``left'' shift if @code{@var{j}>0}, and
 a ``right'' shift if @code{@var{j}<0}.
@@ -2606,7 +2606,7 @@ Examples:
 (bitwise-arithmetic-shift -2 -1) @result{} -1
 (bitwise-arithmetic-shift -1 -1) @result{} -1
 @end example
-@end defun
+@end deffn
 
 @deffn Procedure bitwise-arithmetic-shift-left i amount
 @deffnx Procedure bitwise-arithmetic-shift-right i amount
@@ -2617,7 +2617,7 @@ and @code{(bitwise-arithmetic-shift-right @var{i} @var{amount})} returns the
 same result as @code{(bitwise-arithmetic-shift @var{i} (- @var{amount}))};
 @end deffn
 
-@defun bitwise-rotate-bit-field n start end count
+@deffn Procedure bitwise-rotate-bit-field n start end count
 Returns the result of cyclically permuting in @var{n} the bits at positions
 from @var{start} (inclusive) to @var{end} (exclusive) by
 @var{count} bits towards the more significant bits,
@@ -2640,74 +2640,74 @@ This is the result of the following computation:
         (bitwise-copy-bit-field n start end field))
       n))
 @end example
-@end defun
+@end deffn
 
-@defun bitwise-reverse-bit-field i start end
+@deffn Procedure bitwise-reverse-bit-field i start end
 Returns the result obtained from @var{i} by reversing the order of the bits at positions from @var{start} (inclusive) to @var{end} (exclusive),
 where @var{start} and @var{end} must be non-negative,
 and @var{start} must be less than or equal to @var{end}.
 @example
 (bitwise-reverse-bit-field #b1010010 1 4) @result{}  88 ; #b1011000
 @end example
-@end defun
+@end deffn
 
-@defun logop op x y
+@deffn Procedure logop op x y
 Perform one of the 16 bitwise operations of @var{x} and @var{y},
 depending on @var{op}.
-@end defun
+@end deffn
 
-@defun logtest i j
+@deffn Procedure logtest i j
 Returns true if the arguments have any bits in common.
 Same as @code{(not (zero? (bitwise-and @var{i} @var{j})))},
 but is more efficient.
-@end defun
+@end deffn
 
 @subsection Deprecated Logical Number Operations
 
 These older functions are still available, but we
 recommand using the R6RS-compatible functions.
 
-@defun lognot i
+@deffn Procedure lognot i
 Equivalent to @code{(bitwise-not @var{i})}.
-@end defun
+@end deffn
 
-@defun logand i ...
+@deffn Procedure logand i ...
 Equivalent to @code{(bitwise-and @var{i} ...)}.
-@end defun
+@end deffn
 
-@defun logior i ...
+@deffn Procedure logior i ...
 Equivalent to @code{(bitwise-ior @var{i} ...)}.
-@end defun
+@end deffn
 
-@defun logxor i ...
+@deffn Procedure logxor i ...
 Equivalent to @code{(bitwise-xor @var{i} ...)}.
-@end defun
+@end deffn
 
-@defun logcount i
+@deffn Procedure logcount i
 Count the number of 1-bits in @var{i}, if it is non-negative.
 If @var{i} is negative, count number of 0-bits.
 Same as @code{(bitwise-bit-count @var{i})} if @var{i} is non-negative.
-@end defun
+@end deffn
 
-@defun integer-length i
+@deffn Procedure integer-length i
 Equivalent to @code{(bitwise-length @var{i})}.
-@end defun
+@end deffn
 
-@defun logbit? i pos
+@deffn Procedure logbit? i pos
 Equivalent to @code{bitwise-bit-set? @var{i} @var{pos})}.
-@end defun
+@end deffn
 
-@defun arithmetic-shift i j
+@deffn Procedure arithmetic-shift i j
 Equivalent to @code{bitwise-arithmetic-shift @var{i} @var{j})}.
-@end defun
+@end deffn
 
-@defun ash i j
+@deffn Procedure ash i j
 Alias for @code{arithmetic-shift}.
-@end defun
+@end deffn
 
-@defun bit-extract n start end
+@deffn Procedure bit-extract n start end
 Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
-@end defun
+@end deffn
 
 @node Characters and text, Data structures, Numbers, Top
 @chapter Characters and text
@@ -3199,21 +3199,21 @@ The following functions are deprecated; they really don't
 and cannot do the right thing, because in some languages
 upper and lower case can use different number of characters.
 
-@defun string-upcase! str
+@deffn Procedure string-upcase! str
 @emph{Deprecated:} Destructively modify @var{str}, replacing the letters
 by their upper-case equivalents.
-@end defun
+@end deffn
 
-@defun string-downcase! str
+@deffn Procedure string-downcase! str
 @emph{Deprecated:} Destructively modify @var{str}, replacing the letters
 by their upper-lower equivalents.
-@end defun
+@end deffn
 
-@defun string-capitalize! str
+@deffn Procedure string-capitalize! str
 @emph{Deprecated:} Destructively modify @var{str}, such that the letters that start a new word
 are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
-@end defun
+@end deffn
 
 @node Regular expressions, , Unicode, Characters and text
 @section Regular expressions
@@ -3343,7 +3343,7 @@ The following functions must be imported by doing one of:
 (import (kawa regex))
 @end example
 
-@defun regex-match-positions regex string [start [end]]
+@deffn Procedure regex-match-positions regex string [start [end]]
 
 The procedure @code{regex‑match‑position} takes pattern and a
 text @var{string}, and returns a match if the regex matches (some part of)
@@ -3382,9 +3382,9 @@ should take place.
 @end example
 
 Note that the returned indices are still reckoned relative to the full text string.
-@end defun
+@end deffn
 
-@defun regex-match regex string [start [end]]
+@deffn Procedure regex-match regex string [start [end]]
 The procedure @code{regex‑match} is called like @code{regex‑match‑positions}
 but instead of returning index pairs it returns the matching substrings:
 @example
@@ -3395,9 +3395,9 @@ but instead of returning index pairs it returns the matching substrings:
 
 @code{regex‑match} also takes optional third and fourth arguments,
 with the same meaning as does @code{regex‑match‑positions}.
-@end defun
+@end deffn
 
-@defun regex-split regex string
+@deffn Procedure regex-split regex string
 Takes two arguments, a @var{regex} pattern and a text @var{string},
 and returns a list of substrings of the text string,
 where the pattern identifies the delimiter separating the substrings.
@@ -3428,9 +3428,9 @@ To identify one-or-more spaces as the delimiter, take care to use the regexp
 (regex-split " *" "split pea     soup")
   @result{} ("" "s" "p" "l" "i" "t" "" "p" "e" "a" "" "s" "o" "u" "p" "")
 @end example
-@end defun
+@end deffn
 
-@defun regex‑replace regex string replacement
+@deffn Procedure regex‑replace regex string replacement
 Replaces the matched portion of the text @var{string} by another a
 @var{replacdement} string.
 @example
@@ -3449,9 +3449,9 @@ subpattern.   ``@code{$0}'' refers to the entire match.
 		"*$1*"))
   @result{} "the *nina*, the _pinta_, and the _santa maria_"
 @end example
-@end defun
+@end deffn
 
-@defun regex‑replace* regex string replacement
+@deffn Procedure regex‑replace* regex string replacement
 Replaces all matches in the text @var{string} by the @var{replacement} string:
 @example
 (regex-replace* "te" "liberte egalite fraternite" "ty")
@@ -3461,9 +3461,9 @@ Replaces all matches in the text @var{string} by the @var{replacement} string:
                 "*$1*")
   @result{} "the *nina*, the *pinta*, and the *santa maria*"
 @end example
-@end defun
+@end deffn
 
-@defun regex-quote pattern
+@deffn Procedure regex-quote pattern
 Takes an arbitrary string and returns a pattern string that precisely
 matches it. In particular, characters in the input string that could
 serve as regex metacharacters are escaped as needed.
@@ -3474,7 +3474,7 @@ serve as regex metacharacters are escaped as needed.
 @end example
 @code{regex‑quote} is useful when building a composite regex
 from a mix of regex strings and verbatim strings.
-@end defun
+@end deffn
 
 @subsection Portable Scheme regular expressions
 
@@ -3517,12 +3517,12 @@ must @code{(require 'list-lib)} or @code{(require 'srfi-1)}.
 (iota 5 0 -0.5) @result{} (0.0 -0.5 -1.0 -1.5 -2.0)
 @end example
 
-@defun reverse! list
+@deffn Procedure reverse! list
 The result is a list consisting of the elements of @var{list} in reverse order.
 No new pairs are allocated, instead the pairs of @var{list} are re-used,
 with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
 was pair, it becomes the last pair of the reversed result.
-@end defun
+@end deffn
 
 @node Arrays, Uniform vectors, Lists, Data structures
 @section Multi-dimensional Arrays
@@ -3543,11 +3543,11 @@ The size of an array is the product of the lengths of its dimensions.
 A shape is specified as an even number of exact integers. These are
 alternately the lower and upper bounds for the dimensions of an array.
 
-@defun array? obj
+@deffn Procedure array? obj
 Returns @code{#t} if @var{obj} is an array, otherwise returns @code{#f}.
-@end defun
+@end deffn
 
-@defun shape bound ...
+@deffn Procedure shape bound ...
 Returns a shape. The sequence @var{bound} ... must consist of an even number
 of exact integers that are pairwise not decreasing. Each pair gives the
 lower and upper bound of a dimension.
@@ -3563,41 +3563,41 @@ where the element at @var{k 0} contains the lower bound for an index along
 dimension @var{k} and the element at @var{k 1} contains the
 corresponding upper bound, where @var{k} satisfies @code{(<=  0 @var{k})}
 and @code{(< @var{k} @var{d})}.
-@end defun
+@end deffn
 
-@defun make-array shape
-@defunx make-array shape obj
+@deffn Procedure make-array shape
+@deffnx Procedure make-array shape obj
 Returns a newly allocated array whose shape is given by@var{ shape}.
 If @var{obj} is provided, then each element is initialized to it.
 Otherwise the initial contents of each element is unspecified.
 The array does not retain a reference to @var{shape}.
-@end defun
+@end deffn
 
-@defun array shape obj ...
+@deffn Procedure array shape obj ...
 Returns a new array whose shape is given by @var{shape} and the initial
 contents of the elements are @var{obj} ... in row major order. The array does
 not retain a reference to @var{shape}.
-@end defun
+@end deffn
 
-@defun array-rank array
+@deffn Procedure array-rank array
 Returns the number of dimensions of @var{array}.
 @example
 (array-rank
   (make-array (shape 1 2 3 4)))
 @end example
 Returns 2.
-@end defun
+@end deffn
 
-@defun array-start array k
+@deffn Procedure array-start array k
 Returns the lower bound for the index along dimension @var{k}.
-@end defun
+@end deffn
 
-@defun array-end array k
+@deffn Procedure array-end array k
 Returns the upper bound for the index along dimension @var{k}.
-@end defun
+@end deffn
 
-@defun array-ref array k ...
-@defunx array-ref array index
+@deffn Procedure array-ref array k ...
+@deffnx Procedure array-ref array index
 Returns the contents of the element of @var{array} at index @var{k} ....
 The sequence @var{k} ... must be a valid index to @var{array}.
 In the second form, @var{index} must be either a vector or a
@@ -3617,10 +3617,10 @@ Returns @code{cuatro}.
                          6 1))))
 @end example
 Returns @code{(3 1 4)}.
-@end defun
+@end deffn
 
-@defun array-set! array k ... obj
-@defunx array-set! array index obj
+@deffn Procedure array-set! array k ... obj
+@deffnx Procedure array-set! array index obj
 Stores @var{obj} in the element of @var{array} at index @var{k} ....
 Returns the void value.
 The sequence @var{k} ... must be a valid index to @var{array}.
@@ -3634,9 +3634,9 @@ In the second form, @var{index} must be either a vector or a
    (array-ref a 4 4 4))
 @end example
 Returns @code{"huuhkaja"}.
-@end defun
+@end deffn
 
-@defun share-array array shape proc
+@deffn Procedure share-array array shape proc
 Returns a new array of @var{shape} shape that shares elements of @var{array}
 through @var{proc}. The procedure @var{proc} must implement an affine
 function that returns indices of @var{array} when given indices of the
@@ -3668,7 +3668,7 @@ by setting each index in turn to 1 and others to 0,
 and all to 0 for the constant term; the composition can then be compiled
 away, together with any complexity that the user introduced in their
 procedure.
-@end defun
+@end deffn
 
 Multi-dimensional arrays are specified
 by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
@@ -3749,117 +3749,117 @@ The type of uniform vectors where each element can contain
 a 64-bit floating-point real.  Represented using an array of @code{<double>}.
 @end defvar
 
-@defun s8vector? value
-@defunx u8vector? value
-@defunx s16vector? value
-@defunx u16vector? value
-@defunx s32vector? value
-@defunx u32vector? value
-@defunx s64vector? value
-@defunx u64vector? value
-@defunx f32vector? value
-@defunx f64vector? value
+@deffn Procedure s8vector? value
+@deffnx Procedure u8vector? value
+@deffnx Procedure s16vector? value
+@deffnx Procedure u16vector? value
+@deffnx Procedure s32vector? value
+@deffnx Procedure u32vector? value
+@deffnx Procedure s64vector? value
+@deffnx Procedure u64vector? value
+@deffnx Procedure f32vector? value
+@deffnx Procedure f64vector? value
 Return true iff @var{value} is a uniform vector of the specified type.
-@end defun
+@end deffn
 
-@defun make-s8vector n [value]
-@defunx make-u8vector n [value]
-@defunx make-s16vector n [value]
-@defunx make-u16vector n [value]
-@defunx make-s32vector n [value]
-@defunx make-u32vector n [value]
-@defunx make-s64vector n [value]
-@defunx make-u64vector n [value]
-@defunx make-f32vector n [value]
-@defunx make-f64vector n [value]
+@deffn Procedure make-s8vector n [value]
+@deffnx Procedure make-u8vector n [value]
+@deffnx Procedure make-s16vector n [value]
+@deffnx Procedure make-u16vector n [value]
+@deffnx Procedure make-s32vector n [value]
+@deffnx Procedure make-u32vector n [value]
+@deffnx Procedure make-s64vector n [value]
+@deffnx Procedure make-u64vector n [value]
+@deffnx Procedure make-f32vector n [value]
+@deffnx Procedure make-f64vector n [value]
 Create a new uniform vector of the specified type,
 having room for @var{n} elements.
 Initialize each element to @var{value} if it is specified; zero otherwise.
-@end defun
+@end deffn
 
-@defun s8vector value ...
-@defunx u8vector value ...
-@defunx s16vector value ..
-@defunx u16vector value ...
-@defunx s32vector value ...
-@defunx u32vector value ...
-@defunx s64vector value ...
-@defunx u64vector value ...
-@defunx f32vector value ...
-@defunx f64vector value ...
+@deffn Procedure s8vector value ...
+@deffnx Procedure u8vector value ...
+@deffnx Procedure s16vector value ..
+@deffnx Procedure u16vector value ...
+@deffnx Procedure s32vector value ...
+@deffnx Procedure u32vector value ...
+@deffnx Procedure s64vector value ...
+@deffnx Procedure u64vector value ...
+@deffnx Procedure f32vector value ...
+@deffnx Procedure f64vector value ...
 Create a new uniform vector of the specified type,
 whose length is the number of @var{value}s specified,
 and initialize it using those @var{value}s.
-@end defun
+@end deffn
 
-@defun s8vector-length v
-@defunx u8vector-length v
-@defunx s16vector-length v
-@defunx u16vector-length v
-@defunx s32vector-length v
-@defunx u32vector-length v
-@defunx s64vector-length v
-@defunx u64vector-length v
-@defunx f32vector-length v
-@defunx f64vector-length v
+@deffn Procedure s8vector-length v
+@deffnx Procedure u8vector-length v
+@deffnx Procedure s16vector-length v
+@deffnx Procedure u16vector-length v
+@deffnx Procedure s32vector-length v
+@deffnx Procedure u32vector-length v
+@deffnx Procedure s64vector-length v
+@deffnx Procedure u64vector-length v
+@deffnx Procedure f32vector-length v
+@deffnx Procedure f64vector-length v
 Return the length (in number of elements) of the uniform vector @var{v}.
-@end defun
+@end deffn
 
-@defun s8vector-ref v i
-@defunx u8vector-ref v i
-@defunx s16vector-ref v i
-@defunx u16vector-ref v i
-@defunx s32vector-ref v i
-@defunx u32vector-ref v i
-@defunx s64vector-ref v i
-@defunx u64vector-ref v i
-@defunx f32vector-ref v i
-@defunx f64vector-ref v i
+@deffn Procedure s8vector-ref v i
+@deffnx Procedure u8vector-ref v i
+@deffnx Procedure s16vector-ref v i
+@deffnx Procedure u16vector-ref v i
+@deffnx Procedure s32vector-ref v i
+@deffnx Procedure u32vector-ref v i
+@deffnx Procedure s64vector-ref v i
+@deffnx Procedure u64vector-ref v i
+@deffnx Procedure f32vector-ref v i
+@deffnx Procedure f64vector-ref v i
 Return the element at index @var{i} of the uniform vector @var{v}.
-@end defun
+@end deffn
 
-@defun s8vector-set! v i x
-@defunx u8vector-set! v i x
-@defunx s16vector-set! v i x
-@defunx u16vector-set! v i x
-@defunx s32vector-set! v i x
-@defunx u32vector-set! v i x
-@defunx s64vector-set! v i x
-@defunx u64vector-set! v i x
-@defunx f32vector-set! v i x
-@defunx f64vector-set! v i x
+@deffn Procedure s8vector-set! v i x
+@deffnx Procedure u8vector-set! v i x
+@deffnx Procedure s16vector-set! v i x
+@deffnx Procedure u16vector-set! v i x
+@deffnx Procedure s32vector-set! v i x
+@deffnx Procedure u32vector-set! v i x
+@deffnx Procedure s64vector-set! v i x
+@deffnx Procedure u64vector-set! v i x
+@deffnx Procedure f32vector-set! v i x
+@deffnx Procedure f64vector-set! v i x
 Set the element at index @var{i} of uniform vector @var{v}
 to the value @var{x}, which must be a number coercible
 to the appropriate type.
-@end defun
+@end deffn
 
-@defun s8vector->list v
-@defunx u8vector->list v
-@defunx s16vector->list v
-@defunx u16vector->list v
-@defunx s32vector->list v
-@defunx u32vector->list v
-@defunx s64vector->list v
-@defunx u64vector->list v
-@defunx f32vector->list v
-@defunx f64vector->list v
+@deffn Procedure s8vector->list v
+@deffnx Procedure u8vector->list v
+@deffnx Procedure s16vector->list v
+@deffnx Procedure u16vector->list v
+@deffnx Procedure s32vector->list v
+@deffnx Procedure u32vector->list v
+@deffnx Procedure s64vector->list v
+@deffnx Procedure u64vector->list v
+@deffnx Procedure f32vector->list v
+@deffnx Procedure f64vector->list v
 Convert the uniform vetor @var{v} to a list containing the elments of @var{v}.
-@end defun
+@end deffn
 
-@defun list->s8vector l
-@defunx list->u8vector l
-@defunx list->s16vector l
-@defunx list->u16vector l
-@defunx list->s32vector l
-@defunx list->u32vector l
-@defunx list->s64vector l
-@defunx list->u64vector l
-@defunx list->f32vector l
-@defunx list->f64vector l
+@deffn Procedure list->s8vector l
+@deffnx Procedure list->u8vector l
+@deffnx Procedure list->s16vector l
+@deffnx Procedure list->u16vector l
+@deffnx Procedure list->s32vector l
+@deffnx Procedure list->u32vector l
+@deffnx Procedure list->s64vector l
+@deffnx Procedure list->u64vector l
+@deffnx Procedure list->f32vector l
+@deffnx Procedure list->f64vector l
 Create a uniform vector of the appropriate type, initializing it
 with the elements of the list @var{l}.  The elements of @var{l}
 must be numbers coercible the new vector's element type.
-@end defun
+@end deffn
 
 @subsection Relationship with Java arrays
 
@@ -3926,7 +3926,7 @@ or
 @end example
 
 @subsection Type constructors and predicate
-@defun make-hash-table [ equal? [ hash [ size-hint]]] → hash-table
+@deffn Procedure make-hash-table [ equal? [ hash [ size-hint]]] → hash-table
 
 Create a new hash table with no associations.
 The @var{equal?} parameter is a predicate
@@ -3950,13 +3950,13 @@ The @var{size-hint} parameter can be used to suggested an approriate
 initial size.  This option is not part of the SRFI-69 specification
 (though it is handled by the reference implementation), so specifying
 that option might be unportable.
-@end defun
+@end deffn
 
-@defun hash-table? obj → boolean
+@deffn Procedure hash-table? obj → boolean
 A predicate to test whether a given object @var{obj} is a hash table.
-@end defun
+@end deffn
 
-@defun alist->hash-table alist [ equal? [ hash [ size-hint]]] → hash-table
+@deffn Procedure alist->hash-table alist [ equal? [ hash [ size-hint]]] → hash-table
 
 Takes an association list @var{alist} and creates a hash table
 @var{hash-table} which maps the @code{car} of every element in
@@ -3968,99 +3968,99 @@ association will take precedence over later ones. (Note: the choice of
 using @code{cdr} (instead of @code{cadr}) for values tries to strike
 balance between the two approaches: using @var{cadr} would render this
 procedure unusable for @code{cdr} alists, but not vice versa.)
-@end defun
+@end deffn
 
 @subsection Reflective queries
-@defun hash-table-equivalence-function hash-table
+@deffn Procedure hash-table-equivalence-function hash-table
 Returns the equivalence predicate used for keys of @var{hash-table}.
-@end defun
+@end deffn
 
-@defun hash-table-hash-function hash-table
+@deffn Procedure hash-table-hash-function hash-table
 Returns the hash function used for keys of @var{hash-table}.
-@end defun
+@end deffn
 
 @subsection Dealing with single elements
-@defun hash-table-ref hash-table key [ thunk ] → value
+@deffn Procedure hash-table-ref hash-table key [ thunk ] → value
 This procedure returns the value associated to @var{key} in
 @var{hash-table}. If no value is associated to @var{key} and
 @var{thunk} is given, it is called with no arguments and its value is
 returned; if @var{thunk} is not given, an error is signalled. Given a
 good hash function, this operation should have an (amortised) complexity
 of O(1) with respect to the number of associations in @var{hash-table}.
-@end defun
+@end deffn
 
-@defun hash-table-ref/default hash-table key default → value
+@deffn Procedure hash-table-ref/default hash-table key default → value
 Evaluates to the same value as @code{(hash-table-ref @var{hash-table}
 @var{key} (lambda () @var{default}))}. Given a good hash function, this
 operation should have an (amortised) complexity of O(1) with respect
 to the number of associations in hash-table.
-@end defun
+@end deffn
 
-@defun hash-table-set! hash-table key value → void
+@deffn Procedure hash-table-set! hash-table key value → void
 This procedure sets the value associated to @var{key} in
 @var{hash-table}. The previous association (if any) is removed. Given
 a good hash function, this operation should have an (amortised)
 complexity of O(1) with respect to the number of associations in
 hash-table.
-@end defun
+@end deffn
 
-@defun hash-table-delete! hash-table key → void
+@deffn Procedure hash-table-delete! hash-table key → void
 This procedure removes any association to @var{key} in
 @var{hash-table}. It is not an error if no association for the
 @var{key} exists; in this case, nothing is done. Given a good hash
 function, this operation should have an (amortised) complexity of O(1)
 with respect to the number of associations in hash-table.
-@end defun
+@end deffn
 
-@defun hash-table-exists? hash-table key → boolean
+@deffn Procedure hash-table-exists? hash-table key → boolean
 This predicate tells whether there is any association to @var{key} in
 @var{hash-table}. Given a good hash function, this operation should
 have an (amortised) complexity of O(1) with respect to the number of
 associations in hash-table.
-@end defun
+@end deffn
 
-@defun hash-table-update! hash-table key function [ thunk ] → void
+@deffn Procedure hash-table-update! hash-table key function [ thunk ] → void
 Semantically equivalent to, but may be implemented more efficiently than,
 the following code:
 @example
 (hash-table-set! @var{hash-table key}
                  (function (hash-table-ref @var{hash-table} @var{key} @var{thunk})))
 @end example
-@end defun
+@end deffn
 
-@defun hash-table-update!/default hash-table key function default → void
+@deffn Procedure hash-table-update!/default hash-table key function default → void
 Behaves as if it evaluates to
 @code{(hash-table-update! @var{hash-table} @var{key} @var{function} (lambda () @var{default}))}.
-@end defun
+@end deffn
 
 @subsection Dealing with the whole contents
 
-@defun hash-table-size hash-table → integer
+@deffn Procedure hash-table-size hash-table → integer
 Returns the number of associations in @var{hash-table}. This operation takes
 constant time.
-@end defun
+@end deffn
 
-@defun hash-table-keys hash-table → list
+@deffn Procedure hash-table-keys hash-table → list
 Returns a list of keys in @var{hash-table}.
 The order of the keys is unspecified.
-@end defun
+@end deffn
 
-@defun hash-table-values hash-table → list
+@deffn Procedure hash-table-values hash-table → list
 Returns a list of values in @var{hash-table}. The order of the values is
 unspecified, and is not guaranteed to match the order of keys in the
 result of @code{hash-table-keys}.
-@end defun
+@end deffn
 
-@defun hash-table-walk hash-table proc → void
+@deffn Procedure hash-table-walk hash-table proc → void
 @var{proc} should be a function taking two arguments, a key and a
 value. This procedure calls @var{proc} for each association in
 @var{hash-table}, giving the key of the association as key and the
 value of the association as value. The results of @var{proc} are
 discarded. The order in which @var{proc} is called for the different
 associations is unspecified.
-@end defun
+@end deffn
 
-@defun hash-table-fold hash-table f init-value → final-value
+@deffn Procedure hash-table-fold hash-table f init-value → final-value
 This procedure calls @var{f} for every association in @var{hash-table}
 with three arguments: the key of the association key, the value of the
 association value, and an accumulated value, @var{val}. The @var{val}
@@ -4070,9 +4070,9 @@ invocation of @var{f}. The value @var{final-value} returned by
 @code{hash-table-fold} is the return value of the last invocation of
 @var{f}. The order in which @var{f} is called for different
 associations is unspecified.
-@end defun
+@end deffn
 
-@defun hash-table->alist hash-table → alist
+@deffn Procedure hash-table->alist hash-table → alist
 Returns an association list such that the @code{car} of each element
 in @var{alist} is a key in @var{hash-table} and the corresponding
 @code{cdr} of each element in @var{alist} is the value associated to
@@ -4085,18 +4085,18 @@ as a hash table @var{h}:
                         (hash-table-equivalence-function @var{h})
                         (hash-table-hash-function @var{h}))
 @end example
-@end defun
+@end deffn
 
-@defun hash-table-copy hash-table → hash-table
+@deffn Procedure hash-table-copy hash-table → hash-table
 Returns a new hash table with the same equivalence predicate, hash
 function and mappings as in @var{hash-table}.
-@end defun
+@end deffn
 
-@defun hash-table-merge! hash-table1 hash-table2 → hash-table
+@deffn Procedure hash-table-merge! hash-table1 hash-table2 → hash-table
 Adds all mappings in @var{hash-table2} into @var{hash-table1} and
 returns the resulting hash table. This function may modify
 @var{hash-table1} destructively.
-@end defun
+@end deffn
 
 @subsection Hashing
 Hashing means the act of taking some value and producing a number from
@@ -4125,7 +4125,7 @@ parameter, and expects the result to be within the entire
 (32-bit signed) @code{<int>} range, for compatibility with
 standard @code{hashCode} methods.
 
-@defun hash object [ bound ] → integer
+@deffn Procedure hash object [ bound ] → integer
 Produces a hash value for object in the range from 0 (inclusive) tp to
 @var{bound} (exclusive).
 
@@ -4136,30 +4136,30 @@ It does this by calling the standard @code{hashCode} method,
 and returning the result as is.
 (If the @var{object} is the Java @code{null} value, 0 is returned.)
 This hash function is acceptable for @code{equal?}.
-@end defun
+@end deffn
 
-@defun string-hash string [ bound ] → integer
+@deffn Procedure string-hash string [ bound ] → integer
 The same as @code{hash}, except that the argument string must be a string.
 (The Kawa implementation returns the same as the @code{hash} function.)
-@end defun
+@end deffn
 
-@defun string-ci-hash string [ bound ] → integer
+@deffn Procedure string-ci-hash string [ bound ] → integer
 The same as @code{string-hash}, except that the case of characters in
 string does not affect the hash value produced.
 (The Kawa implementation returns the same the @code{hash} function
 applied to teh lower-cased @var{string}.)
-@end defun
+@end deffn
 
-@defun hash-by-identity object [ bound ] → integer
+@deffn Procedure hash-by-identity object [ bound ] → integer
 The same as @code{hash}, except that this function is only guaranteed
 to be acceptable for @code{eq?}.
 Kawa uses the @code{identityHashCode} method of @code{java.lang.System}.
-@end defun 
+@end deffn 
 
 @node Exceptions, Eval and Environments, Data structures, Top
 @chapter Exception handling
 
-@defun catch key thunk handler
+@deffn Procedure catch key thunk handler
 Invoke @var{thunk} in the dynamic context of @var{handler} for
 exceptions matching @var{key}.  If thunk throws to the symbol @var{key},
 then @var{handler} is invoked this way:
@@ -4178,9 +4178,9 @@ up the call chain is invoked.
 
 If the key is @code{#t}, then a throw to @emph{any} symbol will match
 this call to @code{catch}.
-@end defun
+@end deffn
 
-@defun throw key &rest args ...
+@deffn Procedure throw key &rest args ...
 Invoke the catch form matching @var{key}, passing @var{args} to the
 @var{handler}.  
 
@@ -4188,7 +4188,7 @@ If the key is a symbol it will match catches of the same
 symbol or of #t.
 
 If there is no handler at all, an error is signaled.
-@end defun
+@end deffn
 
 @deffn procedure error message args ...
 Raise an error with key @code{misc-error} and a message constructed by
@@ -4198,10 +4198,10 @@ the top level, or exits kawa if you are not running interactively.
 This procedure is part of SRFI-23, and other Scheme implementations.
 @end deffn
 
-@defun primitive-throw exception
+@deffn Procedure primitive-throw exception
 Throws the @var{exception}, which must be an instance of a sub-class
 of @code{<java.lang.Throwable>}.
-@end defun
+@end deffn
 
 @deffn Syntax try-finally body handler
 Evaluate @var{body}, and return its result.
@@ -4235,7 +4235,7 @@ exception is thrown.
 (This is implemented just like Java's @code{try}-@code{catch}.)
 @end deffn
 
-@defun dynamic-wind in-guard thunk out-guard
+@deffn Procedure dynamic-wind in-guard thunk out-guard
 All three arguments must be 0-argument procedures.
 First calls @var{in-guard}, then @var{thunk}, then @var{out-guard}.
 The result of the expression is that of @var{thunk}.
@@ -4246,28 +4246,28 @@ If the continuation of the dynamic-wind is re-entered (which
 is not yet possible in Kawa), the @var{in-guard} is called again.
 
 This function was added in R5RS.
-@end defun
+@end deffn
 
 @node Eval and Environments, Debugging, Exceptions, Top
 @chapter Eval and Environments
 
-@defun eval expression [environment]
+@deffn Procedure eval expression [environment]
 @code{eval} evaluates @var{expression} in the environment indicated
 by @var{environment}.
 
 The default for @var{environment} is the result
 of @code{(interaction-environment)}.
-@end defun
+@end deffn
 
-@defun null-environment version
+@deffn Procedure null-environment version
 This procedure returns an environment that contains no variable bindings,
 but contains (syntactic) bindings for all the syntactic keywords.
 
 The effect of assigning to a variable in this environment (such
 as @code{let}) is undefined.
-@end defun
+@end deffn
 
-@defun scheme-report-environment version
+@deffn Procedure scheme-report-environment version
 The @var{version} must be an exact non-negative inetger corresponding to
 a version of one of the Revised@var{version} Reports on Scheme.
 The procedure returns an environment that contains exactly the set of
@@ -4277,17 +4277,17 @@ This implementation supports @var{version} that is 4 or 5.
 
 The effect of assigning to a variable in this environment (such
 as @code{car}) is undefined.
-@end defun
+@end deffn
 
-@defun interaction-environment
+@deffn Procedure interaction-environment
 This procedure return an environment that contains implementation-defined
 bindings, as well as top-level user bindings.
-@end defun
+@end deffn
 
-@defun environment-bound? environment symbol
+@deffn Procedure environment-bound? environment symbol
 Return true @code{#t} if there is a binding for @var{symbol}
 in @var{environment};  otherwise returns @code{#f}.
-@end defun
+@end deffn
 
 @deffn Syntax fluid-let ((variable init) ...) body ...
 Evaluate the @var{init} expressions.
@@ -4299,7 +4299,7 @@ The temporary bindings are only visible in the current thread, and its
 descendent threads.
 @end deffn
 
-@defun base-uri [node]
+@deffn Procedure base-uri [node]
 If @var{node} is specified, returns the base-URI property
 of the @var{node}.  If the @var{node} does not have the base-URI
 property, returns @code{#f}.
@@ -4309,22 +4309,22 @@ In the zero-argument case, returns the "base URI" of the current context.
 By default the base URI is the current working directory (as a URL).
 While a source file is @code{load}ed, the base URI is temporarily
 set to the URL of the document.
-@end defun
+@end deffn
 
-@defun load path
+@deffn Procedure load path
 The @var{path} can be an (absolute) URL or a filename.
 Since @code{load} is a run-time function it doesn't work well
 with Kawa's orientation towards compilation.
 It is highly recommended that you use instead use @code{@ref{include, include}}.
-@end defun
+@end deffn
 
-@defun load-relative path
+@deffn Procedure load-relative path
 Same as @code{load}, except that @var{path} is a
 URI that is relative to the context's current base URI.
 Since @code{load-relative} is a run-time function it doesn't work well
 with Kawa's orientation towards compilation.
 It is highly recommended that you use instead use @ref{include-relative, include-relative}.
-@end defun
+@end deffn
 
 @menu
 * Locations::
@@ -4361,7 +4361,7 @@ which is equivalent to:
 (set-car! x 10)
 @end example
 
-@defun setter procedure
+@deffn Procedure setter procedure
 Gets the "setter procedure" associated with a "getter procedure".
 Equivalent to @code{(procedure-property @var{procedure} 'setter)}.
 By convention, a setter procedure takes the same parameters as
@@ -4377,7 +4377,7 @@ For example the Scheme prologue effectively does the following:
 @example
 (set! (setter vector-set) vector-set!)
 @end example
-@end defun
+@end deffn
 
 Kawa also gives you access to locations as first-class values:
 
@@ -4460,7 +4460,7 @@ create anonymous locations accessed by calling a parameter procedure.
 The R5RS procedures @code{current-input-port} and @code{current-output-port}
 are parameter objects.
 
-@defun make-parameter init [converter]
+@deffn Procedure make-parameter init [converter]
 
 Returns a new parameter object which is bound in the global dynamic
 environment to a location containing the value returned by the call
@@ -4504,7 +4504,7 @@ passed to the parameter object, and an unspecified value is returned.
 (prompt ">")
 (prompt)       @result{}  ">"
 @end example
-@end defun
+@end deffn
 
 @deffn Syntax parameterize ((expr1 expr2) ...) <body>
 The expressions @var{expr1} and @var{expr2} are evaluated in an
@@ -4578,36 +4578,36 @@ evaluation may be in parallel.
 Creates a new thread that evaluates @var{expression}.
 @end deffn
 
-@defun force thread
+@deffn Procedure force thread
 The standard @code{force} function has generalized to also work
 on threads.  If waits for the thread's @var{expression} to finish
 executing, and returns the result.
-@end defun
+@end deffn
 
-@defun runnable function
+@deffn Procedure runnable function
 Creates a new @code{Runnable} instance from a function.
 Useful for passing the Java code that expects a @code{Runnable}.
 You can get the result (a value or a thrown exception) using the
 @code{getResult} method.
-@end defun
+@end deffn
 
-@defun sleep time
+@deffn Procedure sleep time
 Suspends the current thread for the specified time.
 The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
-@end defun
+@end deffn
 
 @node Processes, Miscellaneous, Threads, Top
 @chapter Processes
 
-@defun command-line
+@deffn Procedure command-line
 Returns a nonempty list of strings. The first element is
 an implementation-specific name for the running top-level
 program. (For now this is just @code{"kawa"}, but it may
 become something more useful in the future.)
 The remaining elements are the command-line arguments,
 as passed to the @code{main} method.
-@end defun
+@end deffn
 
 @defvar command-line-arguments
 Any command-line arguments (following flags processed by Kawa itself)
@@ -4615,7 +4615,7 @@ are assigned to the global variable @samp{command-line-arguments},
 which is a vector of strings.
 @end defvar
 
-@defun process-command-line-assignments
+@deffn Procedure process-command-line-assignments
 Process any initial command-line options that set variables.
 These have the form @code{@var{name}=@var{value}}.
 Any such command-line options (at the start of the command-line)
@@ -4633,18 +4633,18 @@ $ kawa -- abc=123 def
 This function is mostly useful for Kawa applications
 compiled with the @code{--main} option.
 (It is used to set XQuery @code{external} variables.)
-@end defun
+@end deffn
 
-@defun exit [code]
+@deffn Procedure exit [code]
 Exits the Kawa interpreter, and ends the Java session.
 The integer value @var{code} is returned to the operating
 system.  If @var{code} is not specified, zero is returned,
 indicating normal (non-error) termination.
 If the @var{code} is @code{#f}, it
 is treated as -1, which means an abnormal exit.
-@end defun
+@end deffn
 
-@defun make-process command envp
+@deffn Procedure make-process command envp
 Creates a @code{<java.lang.Process>} object, using the specified
 @var{command} and @var{envp}.
 The @var{command} is converted to an array of Java strings
@@ -4655,14 +4655,14 @@ or a Scheme string.  In the latter case, the command is converted
 using @code{command-parse}.
 The @var{envp} is process environment;  it should be either
 a Java array of Java strings, or the special @code{#!null} value.
-@end defun
+@end deffn
 
-@defun system command
+@deffn Procedure system command
 Runs the specified @var{command}, and waits for it to finish.
 Returns the return code from the command.  The return code is an integer,
 where 0 conventionally means successful completion.
 The @var{command} can be any of the types handled by @code{make-process}.
-@end defun
+@end deffn
 
 @defvar command-parse
 The value of this variable should be a one-argument procedure.
@@ -4673,27 +4673,27 @@ invoke @code{"/bin/sh" "-c"} concatenated with the command string;
 on non-Unix-systems, it is bound to @code{tokenize-string-to-string-array}.
 @end defvar
 
-@defun tokenize-string-to-string-array command
+@deffn Procedure tokenize-string-to-string-array command
 Uses a @code{java.util.StringTokenizer} to parse the @var{command} string
 into an array of words.  This splits the @var{command} using spaces
 to delimit words; there is no special processing for quotes or other
 special characters.
 (This is the same as what @code{java.lang.Runtime.exec(String)} does.)
-@end defun
+@end deffn
 
 @node Miscellaneous, Input-Output, Processes, Top
 @chapter Miscellaneous
 
-@defun scheme-implementation-version
+@deffn Procedure scheme-implementation-version
 Returns the Kawa version number as a string.
 @c (Compatible with slib.)
-@end defun
+@end deffn
 
 @defvar home-directory
 A string containing the home directory of the user.
 @end defvar
 
-@defun scheme-window [shared]
+@deffn Procedure scheme-window [shared]
 Create a read-eval-print-loop in a new top-level window.
 If @var{shared} is true, it uses the same environment as the
 current @code{(interaction-environment)};  if not (the default),
@@ -4701,7 +4701,7 @@ a new top-level environment is created.
 
 You can create multiple top-level window that can co-exist.
 They run in separate threads.
-@end defun
+@end deffn
 
 @deffn Syntax when condition form...
 If @var{condition} is true, evaluate each @var{form} in order,
@@ -4713,10 +4713,10 @@ If @var{condition} is false, evaluate each @var{form} in order,
 returning the value of the last one.
 @end deffn
 
-@defun vector-append @var{arg}...
+@deffn Procedure vector-append @var{arg}...
 Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
-@end defun
+@end deffn
 
 @deffn Syntax synchronized object form ...
 Synchronize on the given @var{object}.  (This means getting an
@@ -4880,16 +4880,16 @@ addition to extending @code{gnu.text.URIPath}.
 
 @subsection Extracting Path components
 
-@defun path-scheme arg
+@deffn Procedure path-scheme arg
 Returns the ``URI scheme'' of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.  The URI scheme of a @code{filepath}
 is @code{"file"} if the @code{filepath} is absolute, and @code{#f} otherwise.
 @example
 (path-scheme "http://gnu.org/") @result{} "http"
 @end example
-@end defun
+@end deffn
 
-@defun path-authority arg
+@deffn Procedure path-authority arg
 Returns the authority part of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.
 The ``authority'' is usually the hostname, but may also include user-info
@@ -4898,27 +4898,27 @@ or a port-number.
 @example
 (path-authority "http://me@@localhost:8000/home") @result{} "me@@localhost:8000"
 @end example
-@end defun
+@end deffn
 
-@defun path-host arg
+@deffn Procedure path-host arg
 Returns the name name part of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.
 
 @example
 (path-host "http://me@@localhost:8000/home") @result{} "localhost"
 @end example
-@end defun
+@end deffn
 
-@defun path-user-info arg
+@deffn Procedure path-user-info arg
 Returns the ``user info'' of @var{arg} (coerced to a @code{path}) if it is
 specified, or @code{#f} otherwise.
 
 @example
 (path-host "http://me@@localhost:8000/home") @result{} "me"
 @end example
-@end defun
+@end deffn
 
-@defun path-port arg
+@deffn Procedure path-port arg
 Returns the port number of @var{arg} (coerced to a @code{path}) if it is
 specified, or @code{-1} otherwise.  Even if there is a default port
 associated with a URI scheme (such as 80 for @code{http}), the value
@@ -4928,9 +4928,9 @@ associated with a URI scheme (such as 80 for @code{http}), the value
 (path-host "http://me@@localhost:8000/home") @result{} 8000
 (path-host "http://me@@localhost/home") @result{} -1
 @end example
-@end defun
+@end deffn
 
-@defun path-file arg
+@deffn Procedure path-file arg
 Returns the ``path component'' of the @var{arg}
 (coerced to a @code{path}).
 (The name @code{path-path} might be more logical,
@@ -4941,9 +4941,9 @@ without schema, authority, query, or fragment.
 @example
 (path-file "http://gnu.org/home/me.html?add-bug#body") @result{} "/home/me.html"
 @end example
-@end defun
+@end deffn
 
-@defun path-directory arg
+@deffn Procedure path-directory arg
 If @var{arg} (coerced to a @code{path}) is directory,
 return @var{arg}; otherwise return the ``parent'' path, without the
 final component.
@@ -4954,9 +4954,9 @@ final component.
   @result{} (path "http://gnu.org/home/me/")
 @end example
 @code{(path-directory "./dir")} @code{@result{}} @code{(path "./dir")} if @code{dir} is a directory, and @code{(path ".")} otherwise.
-@end defun
+@end deffn
 
-@defun path-parent arg
+@deffn Procedure path-parent arg
 Returns the ``parent directory'' of @var{arg} (coerced to a @code{path}).
 If @var{arg} is not a directory, same as @code{path-directory @var{arg}}.
 @example
@@ -4964,9 +4964,9 @@ If @var{arg} is not a directory, same as @code{path-directory @var{arg}}.
 (path-parent "file:/a/b/c") @result{} (path "file:/a/b/c")
 (path-parent "file:/a/b/c/") @result{} (path "file:/a/b/")
 @end example
-@end defun
+@end deffn
 
-@defun path-last arg
+@deffn Procedure path-last arg
 The last component of path component
 of @var{arg} (coerced to a @code{path}).
 Returns a substring of @code{(path-file @var{arg})}.
@@ -4979,40 +4979,40 @@ the last (non-final) @samp{/} or path separator.
 (path-last "http:/a/b/c/") @result{} "c"
 (path-last "a/b/c") @result{} "c"
 @end example
-@end defun
+@end deffn
 
-@defun path-extension arg
+@deffn Procedure path-extension arg
 Returns the ``extension'' of the @var{arg}
 (coerced to a @code{path}).
 @example
 (path-extension "http://gnu.org/home/me.html?add-bug#body") @result{} "html"
 (path-extension "/home/.init") @result{} #f
 @end example
-@end defun
+@end deffn
 
-@defun path-query arg
+@deffn Procedure path-query arg
 Returns the query part of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.  The query of a URI is the
 part of after @samp{?}.
 @example
 (path-query "http://gnu.org/home?add-bug") @result{} "add-bug"
 @end example
-@end defun
+@end deffn
 
-@defun path-fragment arg
+@deffn Procedure path-fragment arg
 Returns the fragment part of @var{arg} (coerced to a @code{path}) if it is
 defined, or @code{#f} otherwise.  The fragment of a URI is the
 part of after @samp{#}.
 @example
 (path-query "http://gnu.org/home#top") @result{} "top"
 @end example
-@end defun
+@end deffn
 
-@defun resolve-uri uri base
+@deffn Procedure resolve-uri uri base
 Returns a @var{uri} unchanged if it is an absolute URI.
 Otherwise resolves it against a base URI @var{base},
 which is normally (though not always) absolute.
-@end defun
+@end deffn
 
 @node Resources, Files, Paths, Input-Output
 @section Resources
@@ -5053,75 +5053,75 @@ and resolving that to a normal @code{URL}.
 @node Files, Ports, Resources, Input-Output
 @section File System Interface
 
-@defun file-exists? filename
+@deffn Procedure file-exists? filename
 Returns true iff the file named @var{filename} actually exists.
 This function is defined on arbitrary @code{path} values:
 for URI values we open a @code{URLConnection}
 and invoke @code{getLastModified()}.
-@end defun
+@end deffn
 
-@defun file-directory? filename
+@deffn Procedure file-directory? filename
 Returns true iff the file named @var{filename} actually exists
 and is a directory.
 This function is defined on arbitrary @code{path} values;
 the default implementation for non-file objects is to
 return @code{#t} iff the path string ends with the character @samp{/}.
-@end defun
+@end deffn
 
-@defun file-readable? filename
+@deffn Procedure file-readable? filename
 Returns true iff the file named @var{filename} actually exists
 and can be read from.
-@end defun
+@end deffn
 
-@defun file-writable? filename
+@deffn Procedure file-writable? filename
 Returns true iff the file named @var{filename} actually exists
 and can be writen to.
 (Undefined if the @var{filename} does not exist,
 but the file can be created in the directory.)
-@end defun
+@end deffn
 
-@defun delete-file filename
+@deffn Procedure delete-file filename
 Delete the file named @var{filename}.
 On failure, throws an exception.
-@end defun
+@end deffn
 
-@defun rename-file oldname newname
+@deffn Procedure rename-file oldname newname
 Renames the file named @var{oldname} to @var{newname}.
-@end defun
+@end deffn
 
-@defun copy-file oldname newname-from path-to
+@deffn Procedure copy-file oldname newname-from path-to
 Copy the file named @var{oldname} to @var{newname}.
 The return value is unspecified.
-@end defun
+@end deffn
 
-@defun create-directory dirname
+@deffn Procedure create-directory dirname
 Create a new directory named @var{dirname}.
 Unspecified what happens on error (such as exiting file with the same name).
 (Currently returns @code{#f} on error, but may change to be more compatible
 with scsh.)
-@end defun
+@end deffn
 
-@defun system-tmpdir
+@deffn Procedure system-tmpdir
 Return the name of the default directory for temporary files.
-@end defun
+@end deffn
 
-@defun make-temporary-file [format]
+@deffn Procedure make-temporary-file [format]
 Return a file with a name that does not match any existing file.
 Use @var{format} (which defaults to @code{"kawa~d.tmp"}) to generate
 a unique filename in @code{(system-tmpdir)}.
 The current implementation is @emph{not} safe from race conditions;
 this will be fixed in a future release (using Java2 features).
-@end defun
+@end deffn
 
 @node Ports, Format, Files, Input-Output
 @section Ports
 
-@defun current-error-port
+@deffn Procedure current-error-port
 Return the port to which errors and warnings should be sent
 (the @dfn{standard error} in Unix and C terminology).
-@end defun
+@end deffn
 
-@defun read-line [port [handle-newline]]
+@deffn Procedure read-line [port [handle-newline]]
 Reads a line of input from @var{port}.
 The @var{handle-newline} parameter determines what is done with
 terminating end-of-line delimiter.
@@ -5131,9 +5131,9 @@ The default, @code{'trim}, ignores the delimiter;
 and @code{'split} returns the delimiter as a second value.
 You can use the last three options to tell if the string was
 terminated by end-or-line or by end-of-file.
-@end defun
+@end deffn
 
-@defun open-input-string string
+@deffn Procedure open-input-string string
 Takes a string and returns an input port that delivers characters
 from the string. The port can be closed by @code{close-input-port},
 though its storage will be reclaimed by the
@@ -5148,9 +5148,9 @@ garbage collector if it becomes inaccessible.
 (read p)                        @result{}  34
 (eof-object? (peek-char p))     @result{}  #t
 @end example
-@end defun
+@end deffn
 
-@defun open-output-string
+@deffn Procedure open-output-string
 Returns an output port that will accumulate characters
 for retrieval by @code{get-output-string}.
 The port can be closed by the procedure @code{close-output-port},
@@ -5163,54 +5163,54 @@ if it becomes inaccessible.
     (write (cdr x) q)
     (get-output-string q))        @result{}  "a(b c)"
 @end example
-@end defun
+@end deffn
 
-@defun get-output-string output-port
+@deffn Procedure get-output-string output-port
 Given an output port created by @code{open-output-string},
 returns a string consisting of the characters that have been
 output to the port so far. 
-@end defun
+@end deffn
 
-@defun call-with-input-string string proc
+@deffn Procedure call-with-input-string string proc
 Create an input port that gets its data from @var{string},
 call @var{proc} with that port as its one argument, and return
 the result from the call of @var{proc}
-@end defun
+@end deffn
 
-@defun call-with-output-string proc
+@deffn Procedure call-with-output-string proc
 Create an output port that writes its data to a @var{string},
 and call @var{proc} with that port as its one argument.
 Return a string consisting of the data written to the port.
-@end defun
+@end deffn
 
-@defun force-output [port]
+@deffn Procedure force-output [port]
 Forces any pending output on @var{port} to be delivered to the output
 device and returns an unspecified value.  If the @var{port} argument is
 omitted it defaults to the value returned by @code{(current-output-port)}.
-@end defun
+@end deffn
 
 An interactive input port has a prompt procedure associated with it.
 The prompt procedure is called before a new line is read.  It is passed
 the port as an argument, and returns a string, which gets printed as a prompt.
 
-@defun input-port-prompter port
+@deffn Procedure input-port-prompter port
 Get the prompt procedure associated with @var{port}.
-@end defun
+@end deffn
 
-@defun set-input-port-prompter! port prompter
+@deffn Procedure set-input-port-prompter! port prompter
 Set the prompt procedure associated with @var{port} to @var{prompter},
 which must be a one-argument procedure taking an input port,
 and returning a string.
-@end defun
+@end deffn
 
-@defun default-prompter port
+@deffn Procedure default-prompter port
 The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
 @var{L} is the current line number of @var{port}.
 When reading a continuation line, the result
 is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
 by @code{(input-port-read-state @var{port})}.
 The prompt has the form of a comment to make it easier to cut-and-paste.
-@end defun
+@end deffn
 
 @deffn Function port-column input-port
 @deffnx Function port-line input-port
@@ -5225,37 +5225,37 @@ because lines and column numbers traditionally start with
 1, and that is what non-programmers will find most natural.)
 @end deffn
 
-@defun set-port-line! port line
+@deffn Procedure set-port-line! port line
 Set (0-origin) line number of the current line of @var{port} to @var{num}.
-@end defun
+@end deffn
 
-@defun input-port-line-number port
+@deffn Procedure input-port-line-number port
 Get the line number of the current line of @var{port},
 which must be a (non-binary) input port.
 The initial line is line 1.
 Deprecated; replaced by @code{(+ 1 (port-line @var{port}))}.
-@end defun
+@end deffn
 
-@defun set-input-port-line-number! port num
+@deffn Procedure set-input-port-line-number! port num
 Set line number of the current line of @var{port} to @var{num}.
 Deprecated;  replaced by @code{(set-port-line! @var{port} (- @var{num} 1))}.
-@end defun
+@end deffn
 
-@defun input-port-column-number port 
+@deffn Procedure input-port-column-number port 
 Get the column number of the current line of @var{port}, 
 which must be a (non-binary) input port.
 The initial column is column 1.
 Deprecated; replaced by @code{(+ 1 (port-column @var{port}))}.
-@end defun
+@end deffn
 
-@defun input-port-read-state port
+@deffn Procedure input-port-read-state port
 Returns a character indicating the current @code{read} state of the @var{port}.
 Returns @code{#\Return} if not current doing a @var{read},
 @code{#\"} if reading a string;  @code{#\|} if reading a comment;  @code{#\(}
 if inside a list; and @code{#\Space} when otherwise in a @code{read}.
 The result is intended for use by prompt prcedures, and is not necessarily
 correct except when reading a new-line.
-@end defun
+@end deffn
 
 @defvar symbol-read-case
 A symbol that controls how @code{read} handles letters when reading a symbol.
@@ -5318,7 +5318,7 @@ then the pretty printer switch to the more @dfn{miser} compact style.
 @node Format, , Ports, Input-Output
 @section Formatted Output (Common-Lisp-style)
 
-@defun format destination fmt . arguments
+@deffn Procedure format destination fmt . arguments
 An almost complete implementation of Common LISP format description
 according to the CL reference book @cite{Common LISP} from Guy L.
 Steele, Digital Press.  Backward compatible to most of the available
@@ -5338,13 +5338,13 @@ an output port and @code{#!void} is returned.@refill
 @var{fmt} must be a string or an instance of @code{gnu.text.MessageFormat}
 or @code{java.text.MessageFormat}.  If @var{fmt} is a string,
 it is parsed as if by @code{parse-format}.
-@end defun
+@end deffn
 
-@defun parse-format format-string
+@deffn Procedure parse-format format-string
 Parses @code{format-string}, which is a string of the form of a Common LISP
 format description.  Returns an instance of @code{gnu.text.ReportFormat},
 which can be passed to the @code{format} function.
-@end defun
+@end deffn
 
 A format string passed to @code{format} or @code{parse-format}
 consists of format directives (that start with @samp{~}),
@@ -5895,16 +5895,16 @@ In general:
 (@var{T}? @var{x}) @result{} (instance? @var{x} @var{T})
 @end example
 
-@defun instance? value type
+@deffn Procedure instance? value type
 Returns @code{#t} iff @var{value} is an instance of type @var{type}.
 (Undefined if @var{type} is a primitive type, such as @code{int}.)
-@end defun
+@end deffn
 
-@defun as type value
+@deffn Procedure as type value
 Converts or coerces @var{value} to a value of type @var{type}.
 Throws an exception if that cannot be done.
 Not supported for @var{type} to be a primitive type such as @code{<int>}.
-@end defun
+@end deffn
 
 @node Objects Classes and Modules, XML tools, Types, Top
 @chapter Object, Classes and Modules
@@ -6660,16 +6660,16 @@ type at run-time, without any compile-time support.
 It is primarily provided for compatibility; in most cases it is better
 to use the @code{define-record-type} form (@pxref{Record types}).
 
-@defun make-record-type type-name field-names
+@deffn Procedure make-record-type type-name field-names
 Returns a @dfn{record-type descriptor}, a value representing a new data
 type disjoint from all others.  The @var{type-name} argument must be a
 string, but is only used for debugging purposes (such as the printed
 representation of a record of the new type).  The @var{field-names}
 argument is a list of symbols naming the @dfn{fields} of a record of the
 new type.  It is an error if the list contains any duplicates.
-@end defun
+@end deffn
 
-@c @defun make-record-sub-type type-name field-names rtd
+@c @deffn Procedure make-record-sub-type type-name field-names rtd
 @c Returns a @dfn{record-type descriptor}, a value representing a new data
 @c type, disjoint from all others.  The @var{type-name} argument must be a
 @c string.  The @var{field-names} argument is a list of symbols naming the
@@ -6680,9 +6680,9 @@ new type.  It is an error if the list contains any duplicates.
 @c Record-modifiers and record-accessors for @var{rtd} work for the new
 @c record-sub-type as well.  But record-modifiers and record-accessors for
 @c the new record-sub-type will not neccessarily work for @var{rtd}.@refill
-@c @end defun
+@c @end deffn
 
-@defun record-constructor rtd [field-names]
+@deffn Procedure record-constructor rtd [field-names]
 Returns a procedure for constructing new members of the type represented
 by @var{rtd}.  The returned procedure accepts exactly as many arguments
 as there are symbols in the given list, @var{field-names}; these are
@@ -6698,9 +6698,9 @@ contains any duplicates or any symbols not in the default list.
 @c constructor, as long as the @var{field-names} are public instance
 @c fields.  (The fields should have type @code{Object} -- unless you
 @c know what you are doing!)
-@end defun
+@end deffn
 
-@defun record-predicate rtd
+@deffn Procedure record-predicate rtd
 Returns a procedure for testing membership in the type represented by
 @var{rtd}.  The returned procedure accepts exactly one argument and
 returns a true value if the argument is a member of the indicated record
@@ -6708,17 +6708,17 @@ type; it returns a false value otherwise.
 
 @c In Kawa, the returned procedure checks if the argument is an instance
 @c of @var{rtd} or one of its sub-classes.
-@end defun
+@end deffn
 
-@c @defun record-sub-predicate rtd
+@c @deffn Procedure record-sub-predicate rtd
 @c Returns a procedure for testing membership in the type represented by
 @c @var{rtd} or its parents.  The returned procedure accepts exactly one
 @c argument and returns a true value if the argument is a member of the
 @c indicated record type or its parents; it returns a false value
 @c otherwise.@refill
-@c @end defun
+@c @end deffn
 
-@defun record-accessor rtd field-name
+@deffn Procedure record-accessor rtd field-name
 Returns a procedure for reading the value of a particular field of a
 member of the type represented by @var{rtd}.  The returned procedure
 accepts exactly one argument which must be a record of the appropriate
@@ -6726,9 +6726,9 @@ type; it returns the current value of the field named by the symbol
 @var{field-name} in that record.  The symbol @var{field-name} must be a
 member of the list of field-names in the call to @code{make-record-type}
 that created the type represented by @var{rtd}.
-@end defun
+@end deffn
 
-@defun record-modifier rtd field-name
+@deffn Procedure record-modifier rtd field-name
 Returns a procedure for writing the value of a particular field of a
 member of the type represented by @var{rtd}.  The returned procedure
 accepts exactly two arguments: first, a record of the appropriate type,
@@ -6737,33 +6737,33 @@ the symbol @var{field-name} in that record to contain the given value.
 The returned value of the modifier procedure is unspecified.  The symbol
 @var{field-name} must be a member of the list of field-names in the call
 to @code{make-record-type} that created the type represented by @var{rtd}.
-@end defun
+@end deffn
 
-@defun record? obj
+@deffn Procedure record? obj
 Returns a true value if @var{obj} is a record of any type and a false
 value otherwise.
-@end defun
+@end deffn
 
-@defun record-type-descriptor record
+@deffn Procedure record-type-descriptor record
 Returns a record-type descriptor representing the type of the given
 record.  That is, for example, if the returned descriptor were passed to
 @code{record-predicate}, the resulting predicate would return a true
 value when passed the given record.
-@end defun
+@end deffn
 
-@defun record-type-name rtd
+@deffn Procedure record-type-name rtd
 Returns the type-name associated with the type represented by rtd.  The
 returned value is @code{eqv?} to the @var{type-name} argument given in
 the call to @code{make-record-type} that created the type represented by
 @var{rtd}.@refill
-@end defun
+@end deffn
 
-@defun record-type-field-names rtd
+@deffn Procedure record-type-field-names rtd
 Returns a list of the symbols naming the fields in members of the type
 represented by @var{rtd}.  The returned value is @code{equal?} to the
 field-names argument given in the call to @code{make-record-type} that
 created the type represented by @var{rtd}.@refill
-@end defun
+@end deffn
 
 Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
@@ -6922,7 +6922,7 @@ If you prefer, you can instead use the following functions.
 (There is also an older deprecated lower-level interface
 (@pxref{Low-level Method invocation}.)
 
-@defun invoke-static class name args ...
+@deffn Procedure invoke-static class name args ...
 The @var{class} can be a @code{<java.lang.Class>}, a
 @code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
 that names a Java class.  The @var{name} can be @code{<symbol>} or
@@ -6949,9 +6949,9 @@ unless you have designed the classes rather strangely.  The
 details will be nailed down later, but the basic idea is that
 the compiler will "inline" the @code{invoke-static} call
 if it can pick a single "best" matching method.
-@end defun
+@end deffn
 
-@defun invoke object name args ...
+@deffn Procedure invoke object name args ...
 The @var{name} can be @code{<symbol>} or
 @code{<string>} that names one or more methods in the Java class.
 
@@ -6987,9 +6987,9 @@ or
       (cur-date :: <int> (get-cur-date)))
   (invoke my-date 'setDate cur-date))
 @end example
-@end defun
+@end deffn
 
-@defun invoke-special class receiver-object name arg ...
+@deffn Procedure invoke-special class receiver-object name arg ...
 The @var{class} can be a @code{<java.lang.Class>}, a
 @code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
 that names a Java class.  
@@ -7018,16 +7018,16 @@ method.
   ((set-year (year :: <int>)) :: <void>
    (invoke-special <java.util.Date> (this) 'set-year (- year 1900))))
 @end example
-@end defun
+@end deffn
 
-@defun class-methods class name
+@deffn Procedure class-methods class name
 Return a generic function containing those methods of @var{class}
 that match the name @var{name}, in the sense of @code{invoke-static}.
 Same as:
 @example
 (lambda args (apply invoke-static (cons class (cons name args))))
 @end example
-@end defun
+@end deffn
 
 Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
@@ -7074,7 +7074,7 @@ For example:
 
 A third slightly more verbose option is to use the @code{make} builtin function.
 
-@defun make type args ...
+@deffn Procedure make type args ...
 Constructs a new object instance of the specified @var{type},
 which must be either a @code{java.lang.Class} or a
 @code{<gnu.bytecode.ClassType>}.
@@ -7097,7 +7097,7 @@ For example, the following are all equivalent:
 (slot-set! p 'x 3)
 (set! (slot-ref p 'y) 4)
 @end example
-@end defun
+@end deffn
 
 All of these will usually be optimized to efficient bytecode, assuming
 Kawa knows at compile-time which class you're using.
@@ -7172,7 +7172,7 @@ The lower-level interfaces are macros that return functions.
 These functions can be inlined, producing efficient code.
 The higher-level functions are less verbose and more convenient.
 
-@defun field object fieldname
+@deffn Procedure field object fieldname
 Get the instance field with the given @var{fieldname} from the given
 @var{Object}.  Returns the value of the field, which must be accessible.
 This procedure has a @code{setter}, and so can be used as the first
@@ -7186,9 +7186,9 @@ boolean property).
 
 If @var{object} is a primitive Java array, then @var{fieldname} can only
 be @code{'length}, and the result is the number of elements of the array.
-@end defun
+@end deffn
 
-@defun static-field class fieldname
+@deffn Procedure static-field class fieldname
 Get the static field with the given @var{fieldname} from the given
 @var{class}.  Returns the value of the field, which must be accessible.
 This procedure has a @code{setter}, and so can be used as the first
@@ -7197,7 +7197,7 @@ operand to @code{set!}.
 If the @var{fieldname} is the special name @code{class},
 then it returns the @code{java.lang.Class} object corresponding to
 @var{class} (which is usually a @code{gnu.bytecode.ClassType} object).
-@end defun
+@end deffn
 
 Examples:
 @example
@@ -7206,13 +7206,13 @@ Examples:
 (set! (field a 'car) (field b 'car))
 @end example
 
-@defun slot-ref object fieldname
+@deffn Procedure slot-ref object fieldname
 A synonym for @code{(field @var{object} @var{fieldname})}.
-@end defun
+@end deffn
 
-@defun slot-set! object fieldname value
+@deffn Procedure slot-set! object fieldname value
 A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
-@end defun
+@end deffn
 
 @node Mangling, Scheme types in Java, Field operations, Objects Classes and Modules
 @section Mapping Scheme names to Java names
@@ -7697,7 +7697,7 @@ $ kawa
 (@{http://www.w3.org/1999/xhtml@}img src: img.jpg )
 @end example
 
-@defun as-xml value
+@deffn Procedure as-xml value
 Return a value (or multiple values) that when printed will
 print @var{value} in XML syntax.
 @example
@@ -7705,14 +7705,14 @@ print @var{value} in XML syntax.
 (as-xml (make-element 'p "Some " (make-element 'em "text") "."))
 @end example
 prints @code{<p>Some <em>text</em>.</p>}.
-@end defun
+@end deffn
 
-@defun unescaped-data data
+@deffn Procedure unescaped-data data
 Creates a special value which causes @code{data} to be printed,
 as is, without normal escaping.  For example, when the output format
 is XML, then printing @code{"<?xml?>"} prints as @samp{&lt;?xml?&gt;},
 but @code{(unescaped-data "<?xml?>")} prints as  @samp{<?xml?>}.
-@end defun
+@end deffn
 
 @node Creating HTML nodes, Creating XML nodes, Formatting XML, XML tools
 @section Creating HTML nodes
@@ -7818,7 +7818,7 @@ The predefined @code{html} prefix could be defined thus:
 (define-xml-namespace html "http://www.w3.org/1999/xhtml")
 @end example
 
-@defun make-element tag [attribute ...] child ...
+@deffn Procedure make-element tag [attribute ...] child ...
 Create a representation of a XML element, corresponding to
 @example
 <@var{tag} @var{attribute}...>@var{child}...</@var{tag}>
@@ -7838,12 +7838,12 @@ but it can be any attribute-valued expression.
 	      "The time is now: "
 	      (make-element 'code (make <java.util.Date>)))
 @end example
-@end defun
+@end deffn
 
-@defun make-attribute name value...
+@deffn Procedure make-attribute name value...
 Create an "attribute", which is a name-value pair.
 For now, @var{name} should be a symbol.
-@end defun
+@end deffn
 
 You must do this to use the following types and functions:
 @example
@@ -7957,22 +7957,22 @@ for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
 You can then run the @code{hello} servlet using the URL
 @url{http://localhost:8080/myutils/servlet/hello}.
 
-@defun current-servlet
+@deffn Procedure current-servlet
 When called from a Kawa servlet's handler, returns the
 actual @code{javax.servlet.http.HttpServlet} instance.
-@end defun
+@end deffn
 
-@defun current-servlet-context
+@deffn Procedure current-servlet-context
 Returns the @code{ServletContext} of the currently executing servlet.
-@end defun
+@end deffn
 
-@defun current-servlet-config
+@deffn Procedure current-servlet-config
 Returns the @code{ServletConfig} of the currently executing servlet.
-@end defun
+@end deffn
 
-@defun servlet-context-realpath
+@deffn Procedure servlet-context-realpath
 Returns the file path of the current servlet's "Web application".
-@end defun
+@end deffn
 
 @node CGI scripts, HTTP requests, Servlets, XML tools
 @section Installing Kawa programs as CGI scripts
@@ -8045,36 +8045,36 @@ before using these functions.
 @end example
 This is not needed for KRL or XQuery.
 
-@defun request-method
+@deffn Procedure request-method
 Returns the method of the HTTP request, usually @code{"GET"}
 or @code{"POST"}.  Corresponds to the CGI variable @code{REQUEST_METHOD}.
-@end defun
+@end deffn
 
-@defun request-path-info
+@deffn Procedure request-path-info
 Corresponds to the CGI variable @code{PATH_INFO}.
-@end defun
+@end deffn
 
-@defun request-path-translated
+@deffn Procedure request-path-translated
 Corresponds to the CGI variable @code{PATH_TRANSLATED}.
-@end defun
+@end deffn
 
-@defun request-uri
+@deffn Procedure request-uri
 Returns the URI of the request, not including the query string,
 or server specification.
 The is the combination of CGI variables @code{SCRIPT_NAME}
 and @code{PATH_INFO}.
-@end defun
+@end deffn
 
-@defun request-url
+@deffn Procedure request-url
 Returns the complete URL of the request, except the query string.
-@end defun
+@end deffn
 
-@defun request-query-string
+@deffn Procedure request-query-string
 Returns the query string from an HTTP request.  The query string is
 the part of the request URL after a quetion mark.
 Returns false if there was no query string.
 Corresponds to the CGI variable @code{QUERY_STRING}.
-@end defun
+@end deffn
 
 @node HTTP response, XML beyond Scheme, HTTP requests, XML tools
 @section Generating HTTP responses
@@ -8086,37 +8086,37 @@ before using these functions.
 @end example
 This is not needed for KRL or XQuery.
 
-@defun response-header key value
+@deffn Procedure response-header key value
 Create the response header @samp{@var{key}: @var{value}} in the HTTP
 response.  The result is a "response header value" (of some unspecified
 type).  It does not directly set or print a response header, but only
 does so when you actually "print" its value to the response output stream.
-@end defun
+@end deffn
 
-@defun response-content-type type
+@deffn Procedure response-content-type type
 Species the content-type of the result - for example @code{"text/plain"}.
 Convenience function for @code{(response-header "Content-Type" @var{type})}.
-@end defun
+@end deffn
 
-@defun error-response code [message]
+@deffn Procedure error-response code [message]
 Creates a response-header with an error code of @var{code} and a
 response message of @var{message}.
 (For now this is the same as @code{response-status}.)
 
 Note this also returns a response-header value, which does not actually
 do anything unless it is returned as the result of executing a servlet body.
-@end defun
+@end deffn
 
-@defun response-status code [message]
+@deffn Procedure response-status code [message]
 Creates a response-header with an status code of @var{code} and a
 response message of @var{message}.
 (For now this is the same as @code{error-response}.)
-@end defun
+@end deffn
 
 @node XML beyond Scheme, , HTTP response, XML tools
 @section Using non-Scheme languages for XML/HTML 
 
-@subsection XSuery language
+@subsection XQuery language
 
 Bundled with Kawa is a fairly complete implementation of W3C's
 new @uref{http://www.w3c.org/XML/Query,XML Query language}.

@@ -24,10 +24,11 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int INTEGER_TYPE_CODE = 7;
   private static final int RATIONAL_TYPE_CODE = 8;
   private static final int REAL_TYPE_CODE = 9;
-  private static final int LIST_TYPE_CODE = 10;
-  private static final int VECTOR_TYPE_CODE = 11;
-  private static final int STRING_TYPE_CODE = 12;
-  private static final int REGEX_TYPE_CODE = 13;
+  private static final int NUMERIC_TYPE_CODE = 10;
+  private static final int LIST_TYPE_CODE = 11;
+  private static final int VECTOR_TYPE_CODE = 12;
+  private static final int STRING_TYPE_CODE = 13;
+  private static final int REGEX_TYPE_CODE = 14;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -48,6 +49,10 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType typeClassType =
     new LangObjType("class-type", "gnu.bytecode.ClassType",
                     CLASSTYPE_TYPE_CODE);
+
+  public static final LangObjType numericType =
+    new LangObjType("number", "gnu.math.Numeric",
+                    NUMERIC_TYPE_CODE);
 
   public static final LangObjType realType =
     new LangObjType("real", "gnu.math.RealNum",
@@ -202,6 +207,14 @@ public class LangObjType extends ObjectType implements TypeValue
       }
   }
 
+  public static Numeric coerceNumeric (Object value)
+  {
+    Numeric rval = Numeric.asNumericOrNull(value);
+    if (rval == null && value != null)
+        throw new WrongType(WrongType.ARG_CAST, value, numericType);
+    return rval;
+  }
+
   public static RealNum coerceRealNum (Object value)
   {
     RealNum rval = RealNum.asRealNumOrNull(value);
@@ -317,6 +330,10 @@ public class LangObjType extends ObjectType implements TypeValue
         methodDeclaringClass = typeLangObjType;
         mname = "coerceToTypeOrNull";
         break;
+      case NUMERIC_TYPE_CODE:
+        methodDeclaringClass = implementationType;
+        mname = "asNumericOrNull";
+        break;
       case REAL_TYPE_CODE:
         methodDeclaringClass = implementationType;
         mname = "asRealNumOrNull";
@@ -373,6 +390,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceToClassType(obj);
       case TYPE_TYPE_CODE:
         return coerceToType(obj);
+      case NUMERIC_TYPE_CODE:
+        return coerceNumeric(obj);
       case REAL_TYPE_CODE:
         return coerceRealNum(obj);
       case RATIONAL_TYPE_CODE:
@@ -397,6 +416,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case INTEGER_TYPE_CODE:
       case RATIONAL_TYPE_CODE:
       case REAL_TYPE_CODE:
+      case NUMERIC_TYPE_CODE:
         if (stackType instanceof PrimType)
           {
             if (stackType == Type.intType
@@ -411,7 +431,8 @@ public class LangObjType extends ObjectType implements TypeValue
                 cname = "gnu.math.IntNum";
                 argType = Type.long_type;
               }
-            else if (typeCode == REAL_TYPE_CODE)
+            else if (typeCode == REAL_TYPE_CODE
+                     || typeCode == NUMERIC_TYPE_CODE)
               {
                 if (stackType == Type.floatType)
                   {
@@ -449,6 +470,9 @@ public class LangObjType extends ObjectType implements TypeValue
         break;
       case TYPE_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToType", 1));
+        break;
+      case NUMERIC_TYPE_CODE:
+        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceNumeric", 1));
         break;
       case REAL_TYPE_CODE:
         code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceRealNum", 1));

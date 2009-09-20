@@ -234,18 +234,8 @@ public class Arithmetic
 
   public static Numeric asNumeric (Object value)
   {
-    if (! (value instanceof Numeric))
-      {
-	if (value instanceof BigInteger || value instanceof Long
-	    || value instanceof Short || value instanceof Byte
-	    || value instanceof Integer)
-	  return asIntNum(value);
-	if (value instanceof BigDecimal)
-	  return asRatNum(value);
-	if (value instanceof Float || value instanceof Double)
-	  return new DFloNum(asDouble(value));
-      }
-    return (Numeric) value;
+    Numeric n = Numeric.asNumericOrNull(value);
+    return n != null ? n : (Numeric) value;
   }
 
   /** Convert a number to a String.

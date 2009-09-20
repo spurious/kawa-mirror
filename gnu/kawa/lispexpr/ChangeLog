@@ -1,3 +1,11 @@
+2009-09-20  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (numericType): New static.
+	(NUMERIC_TYPE_CODE): New type code constant.
+	(coerceToNumeric): New method.
+	(coercionOrNullMethod, coerceFromObject, emitConvertFromPrimitive,
+	emitCoerceFromObject): Implement support for numericType.
+
 2009-09-19  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber): Parse R6RS +nan.0, +inf.0, and -inf.0.

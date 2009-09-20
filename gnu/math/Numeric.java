@@ -2,6 +2,8 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.math.BigInteger;
+import java.math.BigDecimal;
 
 public abstract class Numeric extends java.lang.Number
 {
@@ -26,6 +28,21 @@ public abstract class Numeric extends java.lang.Number
   public abstract String toString (int radix);
 
   public String toString () { return toString (10); }
+
+  public static Numeric asNumericOrNull (Object value)
+  {
+    if (value instanceof Numeric)
+      return (Numeric) value;
+    if (value instanceof BigInteger || value instanceof Long
+        || value instanceof Short || value instanceof Byte
+        || value instanceof Integer)
+      return IntNum.asIntNumOrNull(value);
+    if (value instanceof BigDecimal)
+      return RatNum.asRatNumOrNull(value);
+    if (value instanceof Float || value instanceof Double)
+      return new DFloNum(((Number) value).doubleValue());
+    return null;
+  }
 
   public abstract boolean isExact ();
 

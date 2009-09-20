@@ -941,7 +941,7 @@ public class Scheme extends LispLanguage
 	types.put ("String", Type.toStringType);
 
 	types.put ("object", Type.objectType);
-	types.put ("number", ClassType.make("gnu.math.Numeric"));
+	types.put ("number", LangObjType.numericType);
 	types.put ("quantity", ClassType.make("gnu.math.Quantity"));
 	types.put ("complex", ClassType.make("gnu.math.Complex"));
 	types.put ("real", LangObjType.realType);
@@ -1020,6 +1020,8 @@ public class Scheme extends LispLanguage
       return LangObjType.rationalType;
     if ("gnu.math.RealNum".equals(name))
       return LangObjType.realType;
+    if ("gnu.math.Numeric".equals(name))
+      return LangObjType.numericType;
     if ("gnu.lists.FVector".equals(name))
       return LangObjType.vectorType;
     if ("gnu.lists.LList".equals(name))

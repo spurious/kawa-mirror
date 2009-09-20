@@ -1,5 +1,15 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* DivideOp: No longer implement CanInline; inline support moved
+	to CompileArith.java.
+	(op, rounding_mode): New fields to specify more operations (including
+	MODULO/remainder) and more variants (including rounding modes).
+	(quotient, remainder, modulo, div, mod, div0, mod0): New static
+	DivideOp instances for the different Scheme division operations.
+	(applyN): Re-write to handle different variants.
+	(numArgs): New method.
+	* CompileArith.java: Add opitmization support for DivideOp.
+
 	* Arithmetic.java (asNumeric): Change to use Numeric.asNumericOrNull.
 
 	* Arithmetic.java (isExact): Consider BigDecimal as inexact.

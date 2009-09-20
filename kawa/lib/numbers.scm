@@ -1,6 +1,7 @@
 (require <kawa.lib.prim_syntax>)
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.syntax>)
+(require <kawa.lib.misc>)
 
 (define (number? x) :: <boolean> (java.lang.Number? x))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))
@@ -75,32 +76,15 @@
 	(else
 	 (- x))))
 
-(define-procedure quotient
-  ;; (x :: <real>) (y :: <real>)) :: <real>
-  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
-	  (invoke-static <integer> 'quotient x y))
-  (lambda ((x :: <real>) (y :: <real>)) :: <real>
-	  (invoke (/ x y) 'toInt  gnu.math.Numeric:TRUNCATE)))
+(define (div-and-mod (x :: real) (y :: real))
+  (let* ((q (div x y))
+	 (r (- x (* q y))))
+    (values q r)))
 
-(define-procedure remainder
-  ;; (x :: <real>) (y :: <real>)) :: <real> 
-  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
-	  (invoke-static <integer> 'remainder x y))
-  (lambda ((x :: <real>) (y :: <real>)) :: <real>
-	  (if (zero? y)
-	      (if (exact? y) x (exact->inexact x))
-	      (- x (* (invoke (/ x y) 'toInt gnu.math.Numeric:TRUNCATE)
-		      y)))))
-
-(define-procedure modulo
-  ;; (x :: <real>) (y :: <real>)) :: <real>
-  (lambda ((x :: <integer>) (y :: <integer>)) :: <integer>
-	  (invoke-static <integer> 'modulo x y))
-  (lambda ((x :: <real>) (y :: <real>)) :: <real>
-	  (if (zero? y)
-	      (if (exact? y) x (exact->inexact x))
-	      (- x (* (invoke (/ x y) 'toInt gnu.math.Numeric:FLOOR)
-		      y)))))
+(define (div0-and-mod0 (x :: real) (y :: real))
+  (let* ((q (div0 x y))
+	 (r (- x (* q y))))
+    (values q r)))
 
 (define (gcd #!rest (args :: <Object[]>)) :: <integer>
   (let ((n :: <int> args:length))

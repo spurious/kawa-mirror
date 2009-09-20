@@ -3,13 +3,15 @@ import gnu.math.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
-import gnu.kawa.lispexpr.LangPrimType;
+import gnu.kawa.lispexpr.*;
 
 public class CompileArith implements CanInline, Inlineable
 {
   static final int ADD = 1;
   static final int SUB = 2;
   static final int MUL = 3;
+  static final int DIV = 4;
+  static final int REM = 5;
   int op;
   Procedure proc;
 
@@ -27,6 +29,13 @@ public class CompileArith implements CanInline, Inlineable
     return new CompileArith(proc, MUL);
   }
 
+  public static CompileArith forDiv(Object proc)
+  {
+    int op = ((DivideOp) proc).op == DivideOp.MODULO ? REM : DIV;
+    return new CompileArith(proc, op);
+                          
+  }
+
   public Expression inline (ApplyExp exp, InlineCalls walker,
                             boolean argsInlined)
   {
@@ -37,6 +46,9 @@ public class CompileArith implements CanInline, Inlineable
         return inlineAdd((AddOp) proc, exp, walker, argsInlined);
       case MUL:
         return inlineMul((MultiplyOp) proc, exp, walker, argsInlined);
+      case DIV:
+      case REM:
+        return inlineDiv((DivideOp) proc, exp, walker, argsInlined);
       default: throw new Error();
       }
   }
@@ -97,7 +109,55 @@ public class CompileArith implements CanInline, Inlineable
     else
       wtype = type;
 
-    if (kind == Arithmetic.INTNUM_CODE
+    if (op == DIV || op == REM)
+      {
+        DivideOp dproc = (DivideOp) proc;
+        if (dproc.op == DivideOp.GENERIC
+            && (kind <= Arithmetic.INTNUM_CODE || kind == Arithmetic.RATNUM_CODE))
+          ;
+        else if ((dproc.op == DivideOp.DIVIDE_INEXACT && kind <= Arithmetic.REALNUM_CODE)
+            || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
+          kind = Arithmetic.DOUBLE_CODE;
+        else if (dproc.op == DivideOp.QUOTIENT_EXACT
+                 && (dproc.getRoundingMode() == Numeric.TRUNCATE
+                     || kind == Arithmetic.FLOAT_CODE
+                     || kind == Arithmetic.DOUBLE_CODE))
+          ;
+        else if (dproc.op == DivideOp.MODULO
+                 && dproc.getRoundingMode() == Numeric.TRUNCATE)
+          ;
+        else
+          {
+            ApplyExp.compile(exp, comp, target);
+            return;
+          }
+      }
+    if (op == DIV && ((DivideOp) proc).op == DivideOp.GENERIC
+        && kind <= Arithmetic.REALNUM_CODE 
+        && kind != Arithmetic.DOUBLE_CODE && kind != Arithmetic.FLOAT_CODE)
+      {
+        Method meth;
+        if (kind == Arithmetic.RATNUM_CODE
+            || kind > Arithmetic.INTNUM_CODE)
+          {
+            
+            LangObjType ctype = kind == Arithmetic.RATNUM_CODE
+              ? Arithmetic.typeRatNum
+              : Arithmetic.typeRealNum;
+            wtype = ctype;
+            meth = ctype.getDeclaredMethod("divide", 2);
+          }
+        else // if (kind <= Arithmetic.INTNUM_CODE)
+          {
+            wtype = Arithmetic.typeIntNum;
+            meth = Arithmetic.typeRatNum.getDeclaredMethod("make", 2);
+          }
+        Target wtarget = StackTarget.getInstance(wtype);
+        args[0].compile(comp, wtarget);
+        args[1].compile(comp, wtarget);
+        comp.getCode().emitInvokeStatic(meth);
+      }
+    else if (kind == Arithmetic.INTNUM_CODE
         && (op == ADD || op == MUL || op == SUB))
       {
         compileIntNum(args[0], args[1], kind1, kind2, comp);
@@ -207,14 +267,29 @@ public class CompileArith implements CanInline, Inlineable
         type2 = LangPrimType.intType;
       }
     String mname;
+    Type[] argTypes = null;
     switch (op)
       {
       case ADD: mname = "add";  break;
       case SUB: mname = "sub";  break;
       case MUL: mname = "times";  break;
+      case DIV:
+      case REM:
+        mname = op == DIV ? "quotient" : "remainder";
+        DivideOp dproc = (DivideOp) proc;
+        if (op == REM && dproc.rounding_mode == Numeric.FLOOR)
+          mname = "modulo";
+        else if (dproc.rounding_mode != Numeric.TRUNCATE)
+          {
+            code.emitPushInt(dproc.rounding_mode);
+            argTypes = new Type[] { type1, type2, Type.intType };
+          }
+        break;
       default: throw new Error();
       }
-    meth = Arithmetic.typeIntNum.getMethod(mname, new Type[] { type1, type2 });
+    if (argTypes == null)
+      argTypes = new Type[] { type1, type2 };
+    meth = Arithmetic.typeIntNum.getMethod(mname, argTypes);
     code.emitInvokeStatic(meth);
     return true;
   }
@@ -331,6 +406,25 @@ public class CompileArith implements CanInline, Inlineable
     return exp;
   }
 
+  public static Expression inlineDiv (DivideOp proc,
+                                      ApplyExp exp, InlineCalls walker,
+                                      boolean argsInlined)
+  {
+    exp.walkArgs(walker, argsInlined);
+    Expression folded = exp.inlineIfConstant(proc, walker);
+    if (folded != exp)
+      return folded;
+    Expression[] args = exp.getArgs();
+    if (args.length > 2)
+      return CompileArith.pairwise(proc, exp.getFunction(), args, walker);
+    if (args.length == 1)
+      {
+        args = new Expression[] { QuoteExp.getInstance(IntNum.one()), args[1] };
+        exp = new ApplyExp(exp.getFunction(), args);
+      }
+    return exp;
+  }
+
   public static Expression primInline (int opcode, ApplyExp exp)
   {
     Expression[] args = exp.getArgs();
@@ -385,6 +479,8 @@ public class CompileArith implements CanInline, Inlineable
       case ADD:    return 96; /* iadd */
       case SUB:    return 100; /* isub */
       case MUL:    return 104;
+      case DIV:    return 108;
+      case REM:    return 112;
       default:     return -1;
       }
   }

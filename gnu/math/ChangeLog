@@ -1,5 +1,9 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* Numeric.java (NONNEG_MOD): New rounding mode.
+	* IntNum.java (divide*2): Support NONNEG_MOD.
+	(remainder): New static method takes a rounding-mode parameter.
+
 	* Numeric.java (asNumericOrNull): New static method.
 
 	* Numeric.java (toExact, toInexact): New methods.

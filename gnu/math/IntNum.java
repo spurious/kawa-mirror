@@ -550,6 +550,8 @@ public class IntNum extends RatNum implements Externalizable
 			     int rounding_mode)
   {
     boolean xNegative, yNegative;
+    if (rounding_mode == NONNEG_MOD)
+      rounding_mode = y < 0 ? CEILING : FLOOR;
     if (x < 0)
       {
 	xNegative = true;
@@ -740,6 +742,10 @@ public class IntNum extends RatNum implements Externalizable
     boolean add_one = false;
     if (rlen > 1 || ywords[0] != 0)
       { // Non-zero remainder i.e. in-exact quotient.
+        if (rounding_mode == NONNEG_MOD)
+          {
+            rounding_mode = yNegative ? CEILING : FLOOR;
+          }
 	switch (rounding_mode)
 	  {
 	  case TRUNCATE:
@@ -838,22 +844,23 @@ public class IntNum extends RatNum implements Externalizable
     return this;
   }
 
-  public static IntNum remainder (IntNum x, IntNum y)
+  public static IntNum remainder (IntNum x, IntNum y, int rounding_mode)
   {
     if (y.isZero())
       return x;
     IntNum rem = new IntNum ();
-    divide (x, y, null, rem, TRUNCATE);
+    divide (x, y, null, rem, rounding_mode);
     return rem.canonicalize ();
+  }
+
+  public static IntNum remainder (IntNum x, IntNum y)
+  {
+    return remainder(x, y, TRUNCATE);
   }
 
   public static IntNum modulo (IntNum x, IntNum y)
   {
-    if (y.isZero())
-      return x;
-    IntNum rem = new IntNum ();
-    divide (x, y, null, rem, FLOOR);
-    return rem.canonicalize ();
+    return remainder(x, y, FLOOR);
   }
 
   public Numeric power (IntNum y)

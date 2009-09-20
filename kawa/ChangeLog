@@ -1,5 +1,9 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Update quotient, remainder, and
+	modulo, which are now implemented by DivideOp.
+	Add R6RS functions div, mod, div0, mod0, div-and-mod, div0-and-mod0.
+
 	* standard/Scheme.java: Map "number" to LangObjType.numericType.
 
 	* standard/Scheme.java: Define R6RS functions exact and inexact.

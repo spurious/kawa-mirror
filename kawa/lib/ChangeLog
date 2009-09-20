@@ -1,5 +1,9 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (quotient, remainder, module): These are now
+	implemented by DivideOp.
+	(div-and-mod, div0-and-mod0): New R6RS functions.
+
 	* numbers.scm (bitwise-copy-bit-field, bitwise-rotate-bit-field,
 	bitwise-if): Optimization, primarily inlining.
 

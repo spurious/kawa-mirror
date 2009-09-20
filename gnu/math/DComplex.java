@@ -31,6 +31,16 @@ public class DComplex extends Complex implements Externalizable
   public RealNum im () { return new DFloNum (imag); }
   public double doubleImagValue () { return imag; }
 
+  public boolean isExact ()
+  {
+    return false;
+  }
+
+  public Complex toExact ()
+  {
+    return new CComplex(DFloNum.toExact(real), DFloNum.toExact(imag));
+  }
+
   public boolean equals (Object obj)
   {
     if (obj == null || ! (obj instanceof Complex))

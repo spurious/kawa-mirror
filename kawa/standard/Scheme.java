@@ -257,6 +257,8 @@ public class Scheme extends LispLanguage
       defProcStFld("imag-part", "kawa.lib.numbers");
       defProcStFld("magnitude", "kawa.lib.numbers");
       defProcStFld("angle", "kawa.lib.numbers");
+      defProcStFld("inexact", "kawa.lib.numbers");
+      defProcStFld("exact", "kawa.lib.numbers");
       defProcStFld("exact->inexact", "kawa.lib.numbers");
       defProcStFld("inexact->exact", "kawa.lib.numbers");
       defProcStFld("number->string", "kawa.lib.numbers");

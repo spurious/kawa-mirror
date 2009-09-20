@@ -77,11 +77,19 @@ public abstract class RealNum extends Complex
   }
 
   /** Convert to an exact number.
-   * Implements the Scheme inexact->exact (for real numbers).
+   * Implements the Scheme {@code inexact->exact} (for real numbers).
    */
   public RatNum toExact ()
   {
-    return DFloNum.toExact (doubleValue ());
+    return DFloNum.toExact(doubleValue ());
+  }
+
+  public RealNum toInexact ()
+  {
+    if (isExact())
+      return new DFloNum(doubleValue());
+    else
+      return this;
   }
 
   /** Converts a real to an integer, according to a specified rounding mode.

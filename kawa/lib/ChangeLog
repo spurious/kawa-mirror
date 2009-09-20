@@ -1,3 +1,9 @@
+2009-09-20  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (inexact, exact): New R6RS functions.
+	(exact->inexact, inexact->exact): Re-implement using new
+	Arithmetic.toInexact and Arithetic.toExact methods.
+
 2009-09-15  Per Bothner  <per@bothner.com>
 
 	* system.scm (process-command-line-assignments): New function.

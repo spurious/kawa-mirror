@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
@@ -28,6 +28,16 @@ public abstract class Numeric extends java.lang.Number
   public String toString () { return toString (10); }
 
   public abstract boolean isExact ();
+
+  public Numeric toExact ()
+  {
+    return this;
+  }
+
+  public Numeric toInexact ()
+  {
+    return this;
+  }
 
   public abstract boolean isZero ();
 
@@ -99,7 +109,7 @@ public abstract class Numeric extends java.lang.Number
 
   /** Return this raised to an integer power.
    * Implemented by repeated squaring and multiplication.
-   * If y < 0, returns div_inv of the result. */
+   * If {@code y < 0}, returns div_inv of the result. */
   public Numeric power (IntNum y)
   {
     if (y.isNegative ())

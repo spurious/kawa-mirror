@@ -197,15 +197,17 @@
 (define (angle (x :: <complex>)) :: <real>
   (invoke x 'angle))
 
+(define (inexact (num :: java.lang.Number)) :: java.lang.Number
+  (gnu.kawa.functions.Arithmetic:toInexact num))
+
+(define (exact (num :: java.lang.Number)) :: java.lang.Number
+  (gnu.kawa.functions.Arithmetic:toExact num))
+
 (define (exact->inexact (num :: java.lang.Number)) :: java.lang.Number
-  (if (gnu.kawa.functions.Arithmetic:isExact num)
-      (gnu.math.DFloNum (num:doubleValue))
-      num))
+  (gnu.kawa.functions.Arithmetic:toInexact num))
 
 (define (inexact->exact (num :: java.lang.Number)) :: java.lang.Number
-  (if (gnu.kawa.functions.Arithmetic:isExact num)
-      num
-      (invoke (as <real> num) 'toExact)))
+  (gnu.kawa.functions.Arithmetic:toExact num))
 
 (define (bitwise-arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
   (gnu.math.IntNum:shift value amount))

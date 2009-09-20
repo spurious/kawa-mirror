@@ -13,6 +13,25 @@ public abstract class Complex extends Quantity
     return re().isExact() && im().isExact();
   }
 
+  public Complex toExact ()
+  {
+    RealNum re = re();
+    RealNum im = im();
+    RatNum xre = re.toExact();
+    RatNum xim = im.toExact();
+    if (xre == re && xim == im)
+      return this;
+    else
+      return new CComplex(xre, xim);
+  }
+
+  public Complex toInexact ()
+  {
+    if(isExact())
+      return this;
+    return new DComplex(re().doubleValue(), im().doubleValue());
+  }
+
   private static CComplex imOne;
   private static CComplex imMinusOne;
 

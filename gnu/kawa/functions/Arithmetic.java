@@ -352,6 +352,29 @@ public class Arithmetic
   {
     if (num instanceof Numeric)
       return ((Numeric) num).isExact();
-    return !(num instanceof Double || num instanceof Float);
+    return !(num instanceof Double || num instanceof Float
+             || num instanceof BigDecimal);
+  }
+
+  public static Number toExact (Number num)
+  {
+    if (num instanceof Numeric)
+      return ((Numeric) num).toExact();
+    if (num instanceof Double || num instanceof Float
+        || num instanceof BigDecimal)
+      return DFloNum.toExact(num.doubleValue());
+    else
+      return num;
+  }
+
+  public static Number toInexact (Number num)
+  {
+    if (num instanceof Numeric)
+      return ((Numeric) num).toInexact();
+    if (num instanceof Double || num instanceof Float
+        || num instanceof BigDecimal)
+      return num;
+    else
+      return Double.valueOf(num.doubleValue());
   }
 }

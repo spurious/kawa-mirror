@@ -1,3 +1,8 @@
+2009-09-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Arithmetic operations): New (unfinished) node,
+	mostly based on R6RS.
+
 2009-09-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Implemented SRFIs): Update list.

@@ -2075,12 +2075,302 @@ Kawa converts between Scheme number types
 and Java number types as appropriate.
 
 @menu
+* Arithmetic operations::
 * Quantities::
 * Extended Number Operations::
 * Logical Number Operations::
 @end menu
 
-@node Quantities, Extended Number Operations, , Numbers
+@node Arithmetic operations, Quantities, , Numbers
+@section Arithmetic operations
+
+@deffn Procedure+ @var{z} @dots{}
+@deffnx Procedure * @var{z} @dots{}
+These procedures return the sum or product of their arguments.
+
+@example
+(+ 3 4)                          @result{}  7
+(+ 3)                            @result{}  3
+(+)                              @result{}  0
+(+ +inf.0 +inf.0)                @result{}  +inf.0
+(+ +inf.0 -inf.0)                @result{}  +nan.0
+
+(* 4)                            @result{}  4
+(*)                              @result{}  1
+(* 5 +inf.0)                     @result{}  +inf.0
+(* -5 +inf.0)                    @result{}  -inf.0
+(* +inf.0 +inf.0)                @result{}  +inf.0
+(* +inf.0 -inf.0)                @result{}  -inf.0
+(* 0 +inf.0)                     @result{}  +nan.0
+(* 0 +nan.0)                     @result{}  +nan.0
+(* 1.0 0)                        @result{}  0.0
+@end example
+
+For any real number object @var{x} that is neither infinite nor NaN:
+
+@example
+(+ +inf.0 @var{x})                   @result{}  +inf.0
+(+ -inf.0 @var{x})                   @result{}  -inf.0
+@end example
+
+For any real number object @var{x}:
+
+@example
+(+ +nan.0 @var{x})                   @result{}  +nan.0
+@end example
+
+For any real number object @var{x} that is not an exact 0:
+
+@example
+(* +nan.0 @var{x})                   @result{}  +nan.0
+@end example
+
+@c If any of these procedures are applied to mixed non--rational real and
+@c non--real complex arguments, they either raise an exception with
+@c condition type @code{&implementation-restriction} or return an
+@c unspecified number object.
+
+The behavior of @code{-0.0} is illustrated by the following examples:
+
+@example
+(+  0.0 -0.0)  @result{}  0.0
+(+ -0.0  0.0)  @result{}  0.0
+(+  0.0  0.0)  @result{}  0.0
+(+ -0.0 -0.0)  @result{} -0.0
+@end example
+@end deffn
+
+@deffn Procedure - @var{z}
+@deffnx Procedure - @vari{z} @varii{z} @variii{z} @dots{}
+With two or more arguments, this procedures returns the difference of
+its arguments, associating to the left.  With one argument, however, it
+returns the negation (additive inverse) of its argument.
+
+@example
+(- 3 4)                               @result{}  -1
+(- 3 4 5)                             @result{}  -6
+(- 3)                                 @result{}  -3
+(- +inf.0 +inf.0)                     @result{}  +nan.0
+@end example
+
+@c If this procedure is applied to mixed non--rational real and non--real
+@c complex arguments, it either raises an exception with condition type
+@c @code{&implementation-restriction} or returns an unspecified number
+@c object.
+
+The behavior of @code{-0.0} is illustrated by the following examples:
+
+@example
+(-  0.0)       @result{} -0.0
+(- -0.0)       @result{}  0.0
+(-  0.0 -0.0)  @result{}  0.0
+(- -0.0  0.0)  @result{} -0.0
+(-  0.0  0.0)  @result{}  0.0
+(- -0.0 -0.0)  @result{}  0.0
+@end example
+@end deffn
+
+@deffn Procedure / @var{z}
+@deffnx Procedure / @vari{z} @varii{z} @variii{z} @dots{}
+If all of the arguments are exact, then the divisors must all be
+nonzero.  With two or more arguments, this procedure returns the
+quotient of its arguments, associating to the left.  With one argument,
+however, it returns the multiplicative inverse of its argument.
+
+@example
+(/ 3 4 5)                         @result{}  3/20
+(/ 3)                             @result{}  1/3
+(/ 0.0)                           @result{}  +inf.0
+(/ 1.0 0)                         @result{}  +inf.0
+(/ -1 0.0)                        @result{}  -inf.0
+(/ +inf.0)                        @result{}  0.0
+(/ 0 0)                           @result{}  exception &assertion
+(/ 3 0)                           @result{}  exception &assertion
+(/ 0 3.5)                         @result{}  0.0
+(/ 0 0.0)                         @result{}  +nan.0
+(/ 0.0 0)                         @result{}  +nan.0
+(/ 0.0 0.0)                       @result{}  +nan.0
+@end example
+
+If this procedure is applied to mixed non--rational real and non--real
+complex arguments, it either raises an exception with condition type
+@code{&implementation-restriction} or returns an unspecified number
+object.
+@end deffn
+
+@deffn Procedure div @vari{x} @varii{x}
+@deffnx Procedure mod @vari{x} @varii{x}
+@deffnx Procedure div-and-mod @vari{x} @varii{x}
+
+These procedures implement number--theoretic integer division.
+They accept two real numbers @vari{x} and @varii{x} as operands,
+where @varii{x} must be nonzero.
+(Kawa allows @varii{x} to be zero for @code{mod}.)
+@code{div} returns an integer, and @code{mod} returns a real.
+Their results are specified by:
+
+@example
+(div @vari{x} @varii{x}) @result{} @var{nd}
+(mod @vari{x} @varii{x}) @result{} @var{xm}
+@end example
+
+such that:
+
+@example
+@vari{x} = @var{nd} * @varii{x} + @var{xm}
+0  <= @var{xm} < |@varii{x}|
+@end example
+
+@c In the cases where the mathematical
+@c requirements cannot be satisfied by
+@c any number object, either an exception is raised with condition type
+@c @code{&implementation-restriction}, or unspecified number objects (one
+@c for for @func{div}, @func{mod}, @func{div0} and @func{mod0}, two for
+@c @func{div-and-mod} and @func{div0-and-mod0}) are returned.
+
+@example
+(div-and-mod @vari{x} @varii{x})
+  @result{} (values (div @vari{x} @varii{x}) (mod @vari{x} @varii{x}))
+@end example
+
+@example
+(div 123 10)    @result{}  12
+(mod 123 10)    @result{}  3
+(div 123 -10)   @result{}  -12
+(mod 123 -10)   @result{}  3
+(div -123 10)   @result{}  -13
+(mod -123 10)   @result{}  7
+(div -123 -10)  @result{}  13
+(mod -123 -10)  @result{}  7
+(mod 123 0)     @result{}  123 ;; Kawa extension
+@end example
+@end deffn
+
+
+@deffn Procedure div0 @vari{x} @varii{x}
+@deffnx Procedure mod0 @vari{x} @varii{x}
+@deffnx Procedure div0-and-mod0 @vari{x} @varii{x}
+@code{div0} and @code{mod0} are like @code{div} and @code{mod}, except
+the result of @code{mod0} lies within a half--open interval centered on
+zero.  The results are specified by:
+@example
+(div0 @vari{x} @varii{x}) @result{} @var{nd}
+(mod0 @vari{x} @varii{x}) @result{} @var{xm}
+@end example
+such that:
+@example
+@vari{x} = @var{nd} * @varii{x} + @var{xm}
+-|@varii{x}| <= @var{xm} < |@varii{x}/2|
+@end example
+
+@example
+(div0-and-mod0 @vari{x} @varii{x})
+  @result{} (values (div0 @vari{x} @varii{x}) (mod0 @vari{x} @varii{x}))
+@end example
+
+@example
+(div0 123 10)   @result{}  12
+(mod0 123 10)   @result{}  3
+(div0 123 -10)  @result{}  -12
+(mod0 123 -10)  @result{}  3
+(div0 -123 10)  @result{}  -12
+(mod0 -123 10)  @result{}  -3
+(div0 -123 -10) @result{}  12
+(mod0 -123 -10) @result{}  -3
+@end example
+@end deffn
+
+@deffn Procedure abs @var{x}
+Returns the absolute value of its argument.
+
+@example
+(abs -7)                         @result{}  7
+(abs -inf.0)                     @result{}  +inf.0
+@end example
+@end deffn
+
+@deffn Procedure gcd @vari{n} @dots{}
+@deffnx Procedure lcm @vari{n} @dots{}
+These procedures return the greatest common divisor or least common
+multiple of their arguments.  The result is always non--negative.
+(R6RS allows inexact integer arguments; Kawa does not.)
+
+@example
+(gcd 32 -36)                     @result{}  4
+(gcd)                            @result{}  0
+(lcm 32 -36)                     @result{}  288
+(lcm 32.0 -36)                   @result{}  288.0
+(lcm)                            @result{}  1
+@end example
+@end deffn
+
+@deffn Procedure numerator @var{q}
+@deffnx Procedure denominator @var{q}
+These procedures return the numerator or denominator of their argument;
+the result is computed as if the argument was represented as a fraction
+in lowest terms.  The denominator is always positive.  The denominator
+of @code{0} is defined to be @code{1}.
+(R6RS allows inexact integer arguments; Kawa does not.)
+
+@example
+(numerator   (/ 6 4))            @result{}  3
+(denominator (/ 6 4))            @result{}  2
+@c (denominator (inexact (/ 6 4)))        =>  2.0
+@end example
+@end deffn
+
+@deffn Procedure floor @var{x}
+@deffnx Procedure ceiling @var{x}
+@deffnx Procedure truncate @var{x}
+@deffnx Procedure round @var{x}
+These procedures return inexact integer objects for inexact arguments
+that are not infinities or NaNs, and exact integer objects for exact
+rational arguments.
+
+@table @func
+@item floor
+Returns the largest integer object not larger than @var{x}.
+
+@item ceiling
+Returns the smallest integer object not smaller than @var{x}.
+@item truncate
+Returns the integer object closest to @var{x} whose absolute value is
+not larger than the absolute value of @var{x}.
+
+@item round
+Returns the closest integer object to @var{x}, rounding to even when
+@var{x} represents a number halfway between two integers.
+@end table
+
+If the argument to one of these procedures is inexact, then the result
+is also inexact.  If an exact value is needed, the result should be
+passed to the @func{exact} procedure.
+
+Although infinities and NaNs are not integer objects, these procedures
+return an infinity when given an infinity as an argument, and a NaN when
+given a NaN.
+
+@example
+(floor -4.3)                     @result{}  -5.0
+(ceiling -4.3)                   @result{}  -4.0
+(truncate -4.3)                  @result{}  -4.0
+(round -4.3)                     @result{}  -4.0
+
+(floor 3.5)                      @result{}  3.0
+(ceiling 3.5)                    @result{}  4.0
+(truncate 3.5)                   @result{}  3.0
+(round 3.5)                      @result{}  4.0
+
+(round 7/2)                      @result{}  4
+(round 7)                        @result{}  7
+
+(floor +inf.0)                   @result{}  +inf.0
+(ceiling -inf.0)                 @result{}  -inf.0
+(round +nan.0)                   @result{}  +nan.0
+@end example
+@end deffn
+
+@node Quantities, Extended Number Operations, Arithmetic operations, Numbers
 @section Quantities and Units
 
 As a super-class of numbers, Kawa also provides quantities.
@@ -2181,9 +2471,9 @@ complement representation is the one's complement of the two's
 complement representation of @var{i}.
 @end defun
 
-@deffn Function  bitwise-and i ...
-@deffnx Function bitwise-ior i ...
-@deffnx Function bitwise-xor i ...
+@deffn Procedure  bitwise-and i ...
+@deffnx Procedure bitwise-ior i ...
+@deffnx Procedure bitwise-xor i ...
 These procedures return the exact integer that is the bit-wise
 ``and'', ``inclusive or'', or ``exclusive or'' of the two's
 complement representations of their arguments.
@@ -2318,8 +2608,8 @@ Examples:
 @end example
 @end defun
 
-@deffn Function bitwise-arithmetic-shift-left i amount
-@deffnx Function bitwise-arithmetic-shift-right i amount
+@deffn Procedure bitwise-arithmetic-shift-left i amount
+@deffnx Procedure bitwise-arithmetic-shift-right i amount
 The @var{amount} must be non-negative
 The @code{bitwise-arithmetic-shift-left} procedure returns the same
 result as @code{bitwise-arithmetic-shift},

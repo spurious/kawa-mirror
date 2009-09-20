@@ -1,5 +1,8 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (bitwise-copy-bit-field, bitwise-rotate-bit-field,
+	bitwise-if): Optimization, primarily inlining.
+
 	* numbers.scm (inexact, exact): New R6RS functions.
 	(exact->inexact, inexact->exact): Re-implement using new
 	Arithmetic.toInexact and Arithetic.toExact methods.

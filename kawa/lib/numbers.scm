@@ -234,11 +234,11 @@
   (gnu.math.BitOps:setBitValue i bitno new-value))
 
 (define (bitwise-copy-bit-field (to :: integer) (start :: int) (end :: int) (from :: integer)) ::  integer
-  (let* ((mask1 (bitwise-arithmetic-shift-left -1 start))
-	 (mask2 (bitwise-not (bitwise-arithmetic-shift-left -1 end)))
-	 (mask (bitwise-and mask1 mask2)))
+  (let* ((mask1 (gnu.math.IntNum:shift -1 start))
+	 (mask2 (gnu.math.BitOps:not (gnu.math.IntNum:shift -1 end)))
+	 (mask (gnu.math.BitOps:and mask1 mask2)))
     (bitwise-if mask
-		(bitwise-arithmetic-shift-left from start)
+		(gnu.math.IntNum:shift from start)
 		to)))
 
 (define (bitwise-bit-field (i :: <integer>) (start :: <int>) (end :: <int>))
@@ -274,8 +274,8 @@
 	    (set! result (gnu.math.BitOps:xor result (args i))))))))
 
 (define (bitwise-if (e1 :: integer) (e2 :: integer) (e3  integer)) :: integer
-  (bitwise-ior (bitwise-and e1 e2)
-	       (bitwise-and (bitwise-not e1) e3)))
+  (gnu.math.BitOps:ior (gnu.math.BitOps:and e1 e2)
+		       (gnu.math.BitOps:and (gnu.math.BitOps:not e1) e3)))
 
 (define (logtest (i :: <integer>) (j :: <integer>))
   (invoke-static <gnu.math.BitOps> 'test i j))
@@ -297,14 +297,14 @@
 
 (define (bitwise-rotate-bit-field (n :: integer) (start :: int) (end :: int) (count :: int)) :: integer
   (let ((width (- end start)))
-    (if (positive? width)
-	(let* ((count (modulo count width))
+    (if (> width 0)
+	(let* (;; Optimization of modulo.
+	       (r (remainder count width))
+	       (count (if (< r 0) (+ r width) r))
 	       (field0 (bitwise-bit-field n start end))
-	       (field1 (bitwise-arithmetic-shift-left field0 count))
-	       (field2 (bitwise-arithmetic-shift-right
-			field0
-			(- width count)))
-	       (field (bitwise-ior field1 field2)))
+	       (field1 (gnu.math.IntNum:shift field0 count))
+	       (field2 (gnu.math.IntNum:shift field0 (- count width)))
+	       (field (gnu.math.BitOps:ior field1 field2)))
 	  (bitwise-copy-bit-field n start end field))
 	n)))
 

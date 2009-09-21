@@ -189,6 +189,9 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
   binarytrees.scm binarytrees-output.txt \
   fannkuch.scm fannkuch-output.txt \
+  fasta.scm fasta-output.txt \
+  mandelbrot.scm mandelbrot-output.bmp \
+  nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt
 
 all: all-am
@@ -386,7 +389,8 @@ check-no-inline:
 
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-binarytrees check-fannkuch check-pidigits
+  check-binarytrees check-fannkuch check-fasta check-mandelbrot \
+  check-nsieve check-pidigits
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -514,6 +518,39 @@ check-fannkuch: fannkuch.class
 	@if diff $(srcdir)/fannkuch-output.txt fannkuch7.log; \
 	  then echo '# fannkuch test passes'; \
 	  else echo FAIL fannkuch test; fi
+
+fasta.class: $(srcdir)/fasta.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/fasta.scm
+
+check-fasta: fasta.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fasta 1000 >fasta1000.log
+	@if diff $(srcdir)/fasta-output.txt fasta1000.log; \
+	  then echo '# fasta test passes'; \
+	  else echo FAIL fasta test; fi
+
+nsieve.class: $(srcdir)/nsieve.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/nsieve.scm
+
+check-nsieve: nsieve.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) nsieve 7 >nsieve7.log
+	@if diff $(srcdir)/nsieve-output.txt nsieve7.log; \
+	  then echo '# nsieve test passes'; \
+	  else echo FAIL nsieve test; fi
+
+mandelbrot.class: $(srcdir)/mandelbrot.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/mandelbrot.scm
+
+check-mandelbrot: mandelbrot.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) mandelbrot 200 >tmp-mandelbrot-200.bmp
+	@if diff $(srcdir)/mandelbrot-output.bmp tmp-mandelbrot-200.bmp; \
+	  then echo '# mandelbrot test passes'; \
+	  else echo FAIL mandelbrot test; fi
 
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK

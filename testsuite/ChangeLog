@@ -1,5 +1,22 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* fasta.scm: New benchmark, converted from shootout.alioth.debian.org.
+	This was inspired by a combination of
+        (1) PLT version contributed by Matthew Flatt
+	derived from the Chicken variant by Anthony Borla
+	(2) Java version "modified by Mehmet D. AKIN"
+	* mandelbrot.scm: Likewise.  Based on (i.e. a fairly direct
+	transcription of) the "Java 6 -server" version contributed by
+	Stefan Krause and slightly modified by Chad Whipkey.
+	* nsieve.scm: New test program - used to be on alioth, but now gone.
+	* fannkuch.scm: Minor tweak.
+	* mandelbrot-output.bmp: Expected output, from
+	http://shootout.alioth.debian.org/u32q/iofile.php?test=mandelbrot&file=output
+	* fasta-output.txt: Likewise, from
+	http://shootout.alioth.debian.org/u32q/iofile.php?test=fasta&file=output
+	* nsieve-output.txt:: Expected output.
+	* Makefile.am: Update accordingly.
+
 	* num-test.scm: Add numerous arithmetic tests from R6RS.
 
 2009-09-19  Per Bothner  <per@bothner.com>

@@ -68,7 +68,7 @@
 	  )))))
 
 (define args (cdr (command-line)))
-(if (< (args:size) 1)
+(if (< (length args) 1)
     (begin (display "An argument is required") (newline) 2)
     (let ((n (string->number (car args))))
       (if (not (integer? n))

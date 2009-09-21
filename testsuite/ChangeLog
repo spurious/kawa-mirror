@@ -1,6 +1,6 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
-	* num-test.scm: Add numerous division tests from R6RS.
+	* num-test.scm: Add numerous arithmetic tests from R6RS.
 
 2009-09-19  Per Bothner  <per@bothner.com>
 

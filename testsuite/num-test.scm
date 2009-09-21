@@ -1,4 +1,4 @@
-(test-begin "numbers" 1760)
+(test-begin "numbers" 1793)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -75,6 +75,40 @@
 (test-equal 7 (abs -7))
 (test-equal +inf.0 (abs -inf.0))
 
+(test-equal 3 (numerator (/ 6 4)))
+(test-equal 2 (denominator (/ 6 4)))
+(test-equal 1 (denominator 0))
+
+(test-equal -5.0 (floor -4.3))
+(test-equal -4.0 (ceiling -4.3))
+(test-equal -4.0 (truncate -4.3))
+(test-equal -4.0 (round -4.3))
+(test-equal 3.0 (floor 3.5))
+(test-equal 4.0 (ceiling 3.5))
+(test-equal 3.0 (truncate 3.5))
+(test-equal 4.0 (round 3.5))
+(test-equal 4 (round 7/2))
+(test-equal 7 (round 7))
+
+(test-equal +inf.0 (floor +inf.0))
+(test-equal -inf.0 (ceiling -inf.0))
+(test-equal +nan.0 (round +nan.0))
+
+(test-equal +inf.0 (exp +inf.0))
+(test-equal 0.0 (exp -inf.0))
+(test-equal +inf.0 (log +inf.0))
+(test-equal -inf.0 (log 0.0))
+(test-equal +inf.0+3.141592653589793i (log -inf.0))    ; approximately
+(test-approximate -1.5707963267948965 (atan -inf.0) 0.00000001)
+(test-approximate 1.5707963267948965 (atan +inf.0) 0.00000001)
+(test-equal 0.0+3.141592653589793i (log -1.0+0.0i))
+(test-expect-fail 1)
+(test-equal 0.0-3.141592653589793i (log -1.0-0.0i))
+
+(test-equal 0.0+2.23606797749979i (sqrt -5))
+(test-equal +inf.0 (sqrt +inf.0))
+(test-equal +inf.0i (sqrt -inf.0))
+
 (test-approximate 1.4 (sqrt 2) 0.02)
 (test-error
    #t (test-read-eval-string "0.0.0"))
@@ -121,6 +155,14 @@
 (test-eqv 1.4285714285714286e22 (exact->inexact 14285714285714285714285))
 (test-eqv 0 (inexact->exact 0.0))
 (test-eqv 123451/10 (rationalize (inexact->exact 12345.1) (inexact->exact 0.00001)))
+
+(test-equal 1/3 (rationalize (exact .3) 1/10))
+(test-equal #i1/3 (rationalize .3 1/10)) ; approximately
+(test-equal +inf.0 (rationalize +inf.0 3))
+(test-equal +nan.0 (rationalize +inf.0 +inf.0))
+(test-expect-fail 1)
+(test-equal 0.0 (rationalize 3 +inf.0))
+
 (test-end "convert")
 
 (test-begin "magnitude")
@@ -311,4 +353,3 @@
 (test-assert (= seven 7))
 
 (test-end)
-

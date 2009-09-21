@@ -296,7 +296,7 @@ public class CompileArith implements CanInline, Inlineable
 
   public int getReturnKind (int kind1, int kind2)
   {
-    return kind1 > kind2 || kind1 == 0 ? kind1 : kind2;
+    return kind1 > kind2 && kind2 > 0 ? kind1 : kind2;
   }
 
   public int getReturnKind (Expression[] args)
@@ -327,7 +327,7 @@ public class CompileArith implements CanInline, Inlineable
   }
 
   public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls walker,
-                            boolean argsInlined)
+                               boolean argsInlined)
   {
     exp.walkArgs(walker, argsInlined);
     // Inlining may yield PrimProcedure instructions of bytecode instructions

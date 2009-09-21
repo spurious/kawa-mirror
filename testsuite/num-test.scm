@@ -1,4 +1,4 @@
-(test-begin "numbers" 1793)
+(test-begin "numbers" 1794)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -351,5 +351,9 @@
 ;; <java.lang.Integer> in the interpreter gives ClassCastException.
 (define seven (make <java.lang.Integer> 7))(- (as <int> seven) 3)
 (test-assert (= seven 7))
+
+;; Bug reported by Alex Mitchell
+(define denom 10.0)
+(test-equal 0.0 (let ((numer2 0)) (/ numer2 denom)))
 
 (test-end)

@@ -106,14 +106,21 @@
 	      (gnu.kawa.functions.UnicodeUtils:foldCase str2))
       0))
 
+(define-syntax string-normalize
+  (syntax-rules ()
+    ((string-normalize str kind)
+     (cond-expand (string-normalize-unicode
+		   (java.text.Normalizer:normalize str (static-field java.text.Normalizer$Form 'kind)))
+		  (else (error "unicode string normalization not available"))))))
+
 (define (string-normalize-nfd (str :: string)) :: string
-  (java.text.Normalizer:normalize str java.text.Normalizer$Form:NFD))
+  (string-normalize str NFD))
 
 (define (string-normalize-nfkd (str :: string)) :: string
-  (java.text.Normalizer:normalize str java.text.Normalizer$Form:NFKD))
+  (string-normalize str NFKD))
 
 (define (string-normalize-nfc (str :: string)) :: string
-  (java.text.Normalizer:normalize str java.text.Normalizer$Form:NFC))
+  (string-normalize str NFC))
 
 (define (string-normalize-nfkc (str :: string)) :: string
-  (java.text.Normalizer:normalize str java.text.Normalizer$Form:NFKC))
+  (string-normalize str NFKC))

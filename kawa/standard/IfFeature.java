@@ -50,6 +50,10 @@ public class IfFeature
       return true;
     if (name == "srfi-39") // Parameter objects
       return true;
+    /* #ifdef use:java.text.Normalizer */
+    // if (name == "string-normalize-unicode")
+    //   return true;
+    /* #endif */
 
     String provide_name = ("%provide%"+name).intern();
     Compilation comp = Compilation.getCurrent();

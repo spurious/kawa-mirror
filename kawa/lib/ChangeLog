@@ -1,5 +1,9 @@
 2009-09-20  Per Bothner  <per@bothner.com>
 
+	* rnrs/unicode.scm (string-normalize-nfd, string-normalize-nfkd,
+	string-normalize-nfc, string-normalize-nfkc): Compile as just stubs
+	if we don't have feature string-normalize-unicode.
+
 	* numbers.scm (quotient, remainder, module): These are now
 	implemented by DivideOp.
 	(div-and-mod, div0-and-mod0): New R6RS functions.

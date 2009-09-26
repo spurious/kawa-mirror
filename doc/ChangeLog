@@ -1,3 +1,8 @@
+2009-09-26  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Application compilation): Note that the default
+	when --main is specified is that no bindings are exported.
+
 2009-09-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Change @defun (and @deffn Function) to @deffn Procedure,

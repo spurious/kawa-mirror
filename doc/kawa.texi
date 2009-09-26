@@ -1163,6 +1163,10 @@ Your Scheme program can access the command-line arguments @var{args}
 by using the global variable @samp{command-line-arguments},
 or the R6RS function @samp{command-line}.
 
+If there is no explicit @code{module-export} in a module compiled
+with @code{--main} then no names are exported.  (The default
+otherwise is for all names to be exported.)
+
 @node Applet compilation, Compiling to executable, Application compilation, Compiling
 @subsection Compiling to an applet
 An applet is a Java class that inherits from @code{java.applet.Applet}.

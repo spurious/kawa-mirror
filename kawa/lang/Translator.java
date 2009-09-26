@@ -1297,7 +1297,8 @@ public class Translator extends Compilation
 		 : "' declared but never defined");
 	    error('e', decl, msg1, msg2);
 	  }
-	if (mexp.getFlag(ModuleExp.EXPORT_SPECIFIED))
+	if (mexp.getFlag(ModuleExp.EXPORT_SPECIFIED)
+            || (generateMain && ! immediate))
 	  {
 	    if (decl.getFlag(Declaration.EXPORT_SPECIFIED))
 	      {

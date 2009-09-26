@@ -6,8 +6,6 @@
 ;;; derived from the Chicken variant by Anthony Borla
 ;;; (2) Java version "modified by Mehmet D. AKIN"
 
-(module-export) ;; FIXME - needed so generate-fasta macro isn't exported
-
 (define ALU :: byte[]
   ("GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG\
     GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA\

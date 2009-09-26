@@ -1,5 +1,9 @@
 2009-09-26  Per Bothner  <per@bothner.com>
 
+	* inlining-test.scm (inline-two-calls): Remove some explicit
+	type specifiers - they're no longer needed.
+	* inlining.expected: Updated for new optimization.
+
 	* fasta.scm: Empty module-export is no longer needed.
 
 2009-09-20  Per Bothner  <per@bothner.com>

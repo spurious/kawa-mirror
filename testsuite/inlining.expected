@@ -85,6 +85,6 @@ InliningTest.inlineTwoFunctions(java.lang.Object)java.lang.Object: 23 bytes
 InliningTest.checkEven(int)java.lang.Object: 34 bytes
 cycle1.isIsEven(int)boolean: 22 bytes
 cycle2.isIsOdd(int)boolean: 22 bytes
-Transformation.next()void: 61 bytes
+Transformation.next()void: 59 bytes
 Transformation.extract(int)int: 41 bytes
 Transformation.compose(Transformation)Transformation: 110 bytes

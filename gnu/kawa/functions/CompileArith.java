@@ -36,19 +36,92 @@ public class CompileArith implements CanInline, Inlineable
                           
   }
 
+  public boolean appropriateIntConstant(Expression[] args, int iarg)
+  {
+    Expression arg = args[iarg];
+    if (arg instanceof QuoteExp)
+      {
+        QuoteExp qarg = (QuoteExp) arg;
+        Object value = qarg.getValue();
+        if (qarg.getRawType() == null && value instanceof IntNum
+            && inRange((IntNum) value, Integer.MIN_VALUE, Integer.MAX_VALUE))
+          {
+            value = Integer.valueOf(((IntNum) value).intValue());
+            arg = new QuoteExp(value, Type.intType);
+            args[iarg] = arg;
+            return true;
+          }
+      }
+    return false;
+  }
+
+  public boolean appropriateLongConstant(Expression[] args, int iarg)
+  {
+    Expression arg = args[iarg];
+    if (arg instanceof QuoteExp)
+      {
+        QuoteExp qarg = (QuoteExp) arg;
+        Object value = qarg.getValue();
+        if (qarg.getRawType() == null && value instanceof IntNum
+            && inRange((IntNum) value, Long.MIN_VALUE, Long.MAX_VALUE))
+          {
+            value = Long.valueOf(((IntNum) value).longValue());
+            arg = new QuoteExp(value, Type.longType);
+            args[iarg] = arg;
+            return true;
+          }
+      }
+    return false;
+  }
+
   public Expression inline (ApplyExp exp, InlineCalls walker,
                             boolean argsInlined)
   {
+    exp.walkArgs(walker, argsInlined);
+ 
+   // Inlining may yield PrimProcedure instructions of bytecode instructions
+    // which we don't know how to interpret (yet).
+    if (! walker.getCompilation().mustCompile)
+      return exp;
+
+    Expression[] args = exp.getArgs();
+    if (args.length > 2)
+      return pairwise(proc, exp.getFunction(), args, walker);
+
+    Expression folded = exp.inlineIfConstant(proc, walker);
+    if (folded != exp)
+      return folded;
+
+    if (args.length == 2)
+      {
+        int kind1 = Arithmetic.classifyType(args[0].getType());
+        int kind2 = Arithmetic.classifyType(args[1].getType());
+        int rkind = getReturnKind(kind1, kind2);
+        if (rkind == Arithmetic.INTNUM_CODE)
+          {
+            if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1))
+              rkind = Arithmetic.INT_CODE;
+            else if (kind2 == Arithmetic.INT_CODE && appropriateIntConstant(args, 0))
+              rkind = Arithmetic.INT_CODE;
+            else if (kind1 ==Arithmetic. LONG_CODE && appropriateLongConstant(args, 1))
+              rkind = Arithmetic.LONG_CODE;
+            else if (kind2 == Arithmetic.LONG_CODE && appropriateLongConstant(args, 0))
+              rkind = Arithmetic.LONG_CODE;
+          }
+        rkind = adjustReturnKind(rkind);
+        exp.setType(Arithmetic.kindType(rkind));
+      }
+
     switch (op)
       {
       case ADD:
       case SUB:
-        return inlineAdd((AddOp) proc, exp, walker, argsInlined);
+        return inlineAdd((AddOp) proc, exp, walker);
       case MUL:
-        return inlineMul((MultiplyOp) proc, exp, walker, argsInlined);
+        return inlineMul((MultiplyOp) proc, exp, walker);
       case DIV:
       case REM:
-        return inlineDiv((DivideOp) proc, exp, walker, argsInlined);
+        return inlineDiv((DivideOp) proc, exp, walker);
       default: throw new Error();
       }
   }
@@ -115,7 +188,8 @@ public class CompileArith implements CanInline, Inlineable
         if (dproc.op == DivideOp.GENERIC
             && (kind <= Arithmetic.INTNUM_CODE || kind == Arithmetic.RATNUM_CODE))
           ;
-        else if ((dproc.op == DivideOp.DIVIDE_INEXACT && kind <= Arithmetic.REALNUM_CODE)
+        else if ((dproc.op == DivideOp.DIVIDE_INEXACT
+                  && kind <= Arithmetic.REALNUM_CODE && kind != Arithmetic.FLOAT_CODE)
             || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
           kind = Arithmetic.DOUBLE_CODE;
         else if (dproc.op == DivideOp.QUOTIENT_EXACT
@@ -200,10 +274,9 @@ public class CompileArith implements CanInline, Inlineable
     return val instanceof IntNum && inRange((IntNum) val, lo, hi);
   }
 
-  static boolean inRange (IntNum val, int lo, int hi)
+  static boolean inRange (IntNum val, long lo, long hi)
   {
-    return IntNum.compare(val, Integer.MIN_VALUE) >= 0
-      && IntNum.compare(val, Integer.MAX_VALUE) <= 0;
+    return IntNum.compare(val, lo) >= 0 && IntNum.compare(val, hi) <= 0;
   }
 
   public boolean compileIntNum (Expression arg1, Expression arg2, int kind1, int kind2, Compilation comp)
@@ -299,6 +372,9 @@ public class CompileArith implements CanInline, Inlineable
     return kind1 > kind2 && kind2 > 0 ? kind1 : kind2;
   }
 
+  /** This actually returns the "promoted argument type".
+   * The result kind is different for divide.
+   */
   public int getReturnKind (Expression[] args)
   {
     int len = args.length;
@@ -317,29 +393,40 @@ public class CompileArith implements CanInline, Inlineable
     return kindr;
   }
 
+  // semi-deprecated.
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    switch (op)
-      {
-      default:
-        return Arithmetic.kindType(getReturnKind(args));
-      }
+    return Arithmetic.kindType(adjustReturnKind(getReturnKind(args)));
   }
 
-  public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls walker,
-                               boolean argsInlined)
+  int adjustReturnKind (int rkind)
   {
-    exp.walkArgs(walker, argsInlined);
-    // Inlining may yield PrimProcedure instructions of bytecode instructions
-    // which we don't know how to interpret (yet).
-    if (! walker.getCompilation().mustCompile)
-      return exp;
-    Expression folded = exp.inlineIfConstant(proc, walker);
-    if (folded != exp)
-      return folded;
+    if (op == DIV && rkind > 0)
+      {
+        DivideOp dproc = (DivideOp) proc;
+        switch (dproc.op)
+          {
+          case DivideOp.GENERIC:
+            if (rkind <= Arithmetic.INTNUM_CODE)
+              rkind = Arithmetic.RATNUM_CODE;
+            break;
+          case DivideOp.DIVIDE_INEXACT:
+            if (rkind <= Arithmetic.REALNUM_CODE
+                && rkind != Arithmetic.FLOAT_CODE)
+              rkind = Arithmetic.DOUBLE_CODE;
+            break;
+          case DivideOp.QUOTIENT_EXACT:
+            if (rkind <= Arithmetic.REALNUM_CODE)
+              rkind = Arithmetic.INTNUM_CODE;
+          default: ;
+          }
+      }
+    return rkind;
+  }
+
+  public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls walker)
+  {
     Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      return pairwise(proc, exp.getFunction(), args, walker);
     if (args.length == 1 && proc.plusOrMinus < 0)
       {
         Type type0 = args[0].getType();
@@ -380,94 +467,23 @@ public class CompileArith implements CanInline, Inlineable
               }
           }
       }
-    if (args.length == 2)
-      {
-	return primInline(primitiveOpcode(), exp);
-      }
     return exp;
   }
 
   public static Expression inlineMul (MultiplyOp proc,
-                                      ApplyExp exp, InlineCalls walker,
-                                      boolean argsInlined)
+                                      ApplyExp exp, InlineCalls walker)
   {
-    exp.walkArgs(walker, argsInlined);
-    if (! walker.getCompilation().mustCompile)
-      return exp;
-    Expression folded = exp.inlineIfConstant(proc, walker);
-    if (folded != exp)
-      return folded;
-    Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      return pairwise(proc, exp.getFunction(), args, walker);
-    if (args.length == 2)
-      return primInline(104, exp);
-		
     return exp;
   }
 
   public static Expression inlineDiv (DivideOp proc,
-                                      ApplyExp exp, InlineCalls walker,
-                                      boolean argsInlined)
+                                      ApplyExp exp, InlineCalls walker)
   {
-    exp.walkArgs(walker, argsInlined);
-    Expression folded = exp.inlineIfConstant(proc, walker);
-    if (folded != exp)
-      return folded;
     Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      return CompileArith.pairwise(proc, exp.getFunction(), args, walker);
     if (args.length == 1)
       {
         args = new Expression[] { QuoteExp.getInstance(IntNum.one()), args[1] };
         exp = new ApplyExp(exp.getFunction(), args);
-      }
-    return exp;
-  }
-
-  public static Expression primInline (int opcode, ApplyExp exp)
-  {
-    Expression[] args = exp.getArgs();
-    if (args.length == 2)
-      {
-        Type type0 = args[0].getType();
-        Type type1 = args[1].getType();
-        if (type0 instanceof PrimType && type1 instanceof PrimType)
-          {
-            char sig0 = type0.getSignature().charAt(0);
-            char sig1 = type1.getSignature().charAt(0);
-            Type type = null;
-            if (sig0 == 'V' || sig0 == 'Z' || sig0 == 'C'
-                || sig1 == 'V' || sig1 == 'Z' || sig1 == 'C')
-              {
-                // error
-              }
-            else if (sig0 == 'D' || sig1 == 'D')
-              {
-                opcode += 3;
-                type = LangPrimType.doubleType;
-              }
-            else if (sig0 == 'F' || sig1 == 'F')
-              {
-                opcode += 2;
-                type = LangPrimType.floatType;
-              }
-            else if (sig0 == 'J' || sig1 == 'J')
-              {
-                opcode += 1;
-                type = LangPrimType.longType;
-              }
-            else
-              {
-                type = LangPrimType.intType;
-              }
-            if (type != null)
-              {
-                PrimProcedure prim
-                  = PrimProcedure.makeBuiltinBinary(opcode, type);
-                return new ApplyExp(prim, args);
-              }
-          }
       }
     return exp;
   }

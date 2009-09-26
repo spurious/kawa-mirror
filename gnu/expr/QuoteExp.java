@@ -16,6 +16,7 @@ public class QuoteExp extends Expression
   public final Object valueIfConstant() { return value; }
 
   protected Type type;
+  public final gnu.bytecode.Type getRawType() { return type; }
   public final gnu.bytecode.Type getType()
   {
     if (type != null)

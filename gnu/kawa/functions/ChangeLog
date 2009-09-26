@@ -1,3 +1,14 @@
+2009-09-26  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (inlineAdd, inlineMul, inlineDiv): Move some
+	common code to the geneic inline method.
+	(inline):  Change (OP int-expression integer-literal) to
+	(OP int-expression java.lang.Integer-literal) for better
+	type-inference and better code-generation.
+	Also, call setType on argument ApplyExp.
+	(primInline):  Remove method and its callers.  It redundant, plus
+	it prevents the iinc optimization.
+
 2009-09-20  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (getReturnKind): Fix thinko.

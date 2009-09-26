@@ -173,11 +173,11 @@
 		 (exit x))))))))
 
 (define (inline-two-calls (x :: int)) :: int
-  (define (f (w :: int)) :: int (+ w 10))
+  (define (f (w :: int)) (+ w 10))
   (if (> x 0)
-      (let ((y1 :: int (+ x 1)))
+      (let ((y1 (+ x 1)))
 	(f y1))
-      (let ((y2 :: int (+ x 2)))
+      (let ((y2 (+ x 2)))
 	(f y2))))
 
 (define (inline-two-functions x)

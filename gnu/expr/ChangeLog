@@ -1,3 +1,7 @@
+2009-09-26  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (getRawType): New method.
+
 2009-09-15  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java (compileFromStack0): Use new

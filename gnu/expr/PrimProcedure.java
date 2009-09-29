@@ -5,6 +5,8 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.lispexpr.LangObjType;
+import gnu.lists.ConsumerWriter;
+import java.io.Writer;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
@@ -761,6 +763,51 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       return null;
     return getMethodFor((ClassType) Type.make(pclass), pproc.getName(),
 			decl, atypes, language);
+  }
+
+  public static void disassemble$X (Procedure pproc, CallContext ctx)
+    throws Exception
+  {
+    gnu.lists.Consumer cons = ctx.consumer;
+    disassemble(pproc, cons instanceof Writer ? (Writer) cons: new ConsumerWriter(cons));
+  }
+
+  public static void disassemble (Procedure pproc, Writer out)
+    throws Exception
+  {
+    String pname = Compilation.mangleName(pproc.getName());
+    Class cl;
+    if (pproc instanceof ModuleMethod)
+      cl = ((ModuleMethod) pproc).module.getClass();
+    else
+      cl = pproc.getClass();
+    ClassLoader loader = cl.getClassLoader();
+    String cname = cl.getName();
+    String rname = cname.replace('.', '/') + ".class";
+    ClassType ctype = new ClassType();
+    java.io.InputStream rin = loader.getResourceAsStream(rname);
+    if (rin == null)
+      throw new RuntimeException("missing resource "+rname); // FIXME exception
+    ClassFileInput cinput = new ClassFileInput(ctype, rin);
+    ClassTypeWriter cwriter = new ClassTypeWriter(ctype, out, 0);
+    java.net.URL resource = loader.getResource(rname);
+    cwriter.print("In class ");
+    cwriter.print(cname);
+    if (resource != null)
+      {
+        cwriter.print(" at ");
+        cwriter.print(resource);
+      }
+    cwriter.println();
+    for (Method method = ctype.getMethods();
+         method != null; method = method.getNext())
+      {
+        String mname = method.getName();
+        if (mname.equals(pname)) {
+          cwriter.printMethod(method);
+        }
+      }
+    cwriter.flush();
   }
 
   public static Class getProcedureClass (Object pproc)

@@ -1,5 +1,8 @@
 2009-09-29  Per Bothner  <per@bothner.com>
 
+	* ClassTypeWriter.java (printMethod): New method.
+	(printMethods): Use it.
+
 	* ArrayClassLoader.java (getResourceAsStream): New overriding method.
 	If asking with a matching .class file, open a ByteArrayInputStream
 	on the class bytes - which means these now have to be preserved

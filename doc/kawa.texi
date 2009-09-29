@@ -4661,6 +4661,11 @@ anonymous @code{lambda} a name.
 Turn off tracing (debugging output) of @var{procedure}.
 @end deffn
 
+@deffn Procedure disassemble procedure
+Returns a string representation of the disassembled bytecode
+for @var{procedure}, when known.
+@end deffn
+
 @node Threads, Processes, Debugging, Top
 @chapter Threads
 

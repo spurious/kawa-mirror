@@ -18,3 +18,5 @@
 		((untrace proc ...)
 		 (begin (%do-trace proc #f) ...))))
 
+(define (disassemble (proc :: procedure))
+  (gnu.expr.PrimProcedure:disassemble proc))

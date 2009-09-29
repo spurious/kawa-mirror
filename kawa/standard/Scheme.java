@@ -634,6 +634,7 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("trace", "kawa.lib.trace");
       defSntxStFld("untrace", "kawa.lib.trace");
+      defSntxStFld("disassemble", "kawa.lib.trace");
 
       defProcStFld("format", "gnu.kawa.functions.Format");
       defProcStFld("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");

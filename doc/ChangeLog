@@ -1,3 +1,7 @@
+2009-09-29  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Debugging): Document 'disassemble' function.
+
 2009-09-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Application compilation): Note that the default

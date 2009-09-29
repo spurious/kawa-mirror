@@ -170,7 +170,11 @@ public class ClassTypeWriter extends PrintWriter
     println();
     Method method = ctype.methods;
     for (; method != null; method = method.next)
-      {
+      printMethod(method);
+  }
+
+  public void printMethod (Method method)
+  {
 	println();
 	print("Method name:");
 	if (method.name_index != 0)
@@ -193,7 +197,6 @@ public class ClassTypeWriter extends PrintWriter
 	printSignature(method.return_type);
 	println();
 	printAttributes(method);
-      }
   }
 
   final void printConstantTersely(int index, int expected_tag)

@@ -74,6 +74,11 @@ public class ClassTypeWriter extends PrintWriter
     printAttributes();
   }
 
+  public void setClass (ClassType ctype)
+  {
+    this.ctype = ctype;
+  }
+
   public void print (ClassType ctype)
   {
     this.ctype = ctype;

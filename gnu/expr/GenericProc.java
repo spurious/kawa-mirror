@@ -23,6 +23,16 @@ public class GenericProc extends MethodProc
   {
   }
 
+  public int getMethodCount ()
+  {
+    return count;
+  }
+
+  public MethodProc getMethod (int i)
+  {
+    return i >= count ? null : methods[i];
+  }
+
   public int numArgs()
   {
     return minArgs | (maxArgs << 12);

@@ -772,15 +772,46 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     disassemble(pproc, cons instanceof Writer ? (Writer) cons: new ConsumerWriter(cons));
   }
 
-  public static void disassemble (Procedure pproc, Writer out)
+  public static void disassemble (Procedure proc, Writer out)
     throws Exception
   {
-    String pname = Compilation.mangleName(pproc.getName());
-    Class cl;
-    if (pproc instanceof ModuleMethod)
-      cl = ((ModuleMethod) pproc).module.getClass();
-    else
-      cl = pproc.getClass();
+    disassemble(proc, new ClassTypeWriter(null, out, 0));
+  }
+
+  public static void disassemble (Procedure proc, ClassTypeWriter cwriter)
+    throws Exception
+  {
+    if (proc instanceof GenericProc)
+      {
+        GenericProc gproc = (GenericProc) proc;
+        int n = gproc.getMethodCount();
+        cwriter.print("Generic procedure with ");
+        cwriter.print(n);
+        cwriter.println(n == 1 ? " method." : "methods.");
+        for (int i = 0;  i < n;  i++)
+          {
+            Procedure mproc = gproc.getMethod(i);
+            if (mproc != null)
+              {
+                cwriter.println();
+                disassemble(mproc, cwriter);
+              }
+          }
+        return;
+      }
+    String pname = null;
+    Class cl = proc.getClass();
+    if (proc instanceof ModuleMethod)
+      cl = ((ModuleMethod) proc).module.getClass();
+    else if (proc instanceof PrimProcedure)
+      {
+        Method pmethod = ((PrimProcedure) proc).method;
+        if (pmethod != null)
+          {
+            cl = pmethod.getDeclaringClass().getReflectClass();
+            pname = pmethod.getName();
+          }
+      }
     ClassLoader loader = cl.getClassLoader();
     String cname = cl.getName();
     String rname = cname.replace('.', '/') + ".class";
@@ -789,7 +820,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (rin == null)
       throw new RuntimeException("missing resource "+rname); // FIXME exception
     ClassFileInput cinput = new ClassFileInput(ctype, rin);
-    ClassTypeWriter cwriter = new ClassTypeWriter(ctype, out, 0);
+    cwriter.setClass(ctype);
     java.net.URL resource = loader.getResource(rname);
     cwriter.print("In class ");
     cwriter.print(cname);
@@ -799,6 +830,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         cwriter.print(resource);
       }
     cwriter.println();
+    if (pname == null)
+      {
+        pname = proc.getName();
+        if (pname == null)
+          {
+            cwriter.println("Anonymous function - unknown method.");
+            return;
+          }
+        pname = Compilation.mangleName(pname);
+      }
     for (Method method = ctype.getMethods();
          method != null; method = method.getNext())
       {

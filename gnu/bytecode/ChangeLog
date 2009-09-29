@@ -1,5 +1,7 @@
 2009-09-29  Per Bothner  <per@bothner.com>
 
+	* ClassTypeWriter.java (setClass): New method.
+
 	* ClassTypeWriter.java (printMethod): New method.
 	(printMethods): Use it.
 

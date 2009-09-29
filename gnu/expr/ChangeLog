@@ -1,5 +1,9 @@
 2009-09-29  Per Bothner  <per@bothner.com>
 
+	* GenericProc.java (getMethod, getMethodCount): New methods.
+	* PrimProcedure.java (disassemble): Add support for GenericProc.
+	Recover more cleanly from anonymous functions.
+
 	* PrimProcedure.java (disassemble, disassemble$X): New static methods
 	to help with debugging.
 

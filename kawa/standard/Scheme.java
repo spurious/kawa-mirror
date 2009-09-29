@@ -623,7 +623,7 @@ public class Scheme extends LispLanguage
       defProcStFld("gentemp", "kawa.lib.misc");
       defSntxStFld("defmacro", "kawa.lib.syntax");
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
-      defSntxStFld("resource-url", "kawa.lib.files");
+      defSntxStFld("resource-url", "kawa.lib.misc_syntax");
 
       defProcStFld("resolve-uri", "kawa.lib.misc_syntax");
       defSntxStFld("module-uri", "kawa.lib.misc_syntax");

@@ -79,7 +79,7 @@ public class CompileArith implements CanInline, Inlineable
   {
     exp.walkArgs(walker, argsInlined);
  
-   // Inlining may yield PrimProcedure instructions of bytecode instructions
+    // Inlining may yield PrimProcedure instructions of bytecode instructions
     // which we don't know how to interpret (yet).
     if (! walker.getCompilation().mustCompile)
       return exp;

@@ -1,3 +1,10 @@
+2009-09-29  Per Bothner  <per@bothner.com>
+
+	* ArrayClassLoader.java (getResourceAsStream): New overriding method.
+	If asking with a matching .class file, open a ByteArrayInputStream
+	on the class bytes - which means these now have to be preserved
+	even after the class has been loaded.
+
 2009-09-15  Per Bothner  <per@bothner.com>
 
 	* Type.java (emitConvertFromPrimitive): New method.

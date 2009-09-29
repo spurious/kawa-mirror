@@ -1,6 +1,7 @@
 package gnu.bytecode;
 import java.util.Hashtable;
 import java.net.URL;
+import java.io.*;
 
 /** Load classes from a set of byte arrays.
  * @author	Per Bothner
@@ -8,8 +9,10 @@ import java.net.URL;
 
 public class ArrayClassLoader extends ClassLoader
 {
-  /** Map String to union(byte[], Class, ClassType). */
+  /** Map String to union(byte[], ClassType). */
   Hashtable map = new Hashtable(100);
+  /** Map String to Class. */
+  Hashtable cmap = new Hashtable(100);
 
   /** If non-null, context to use for finding resources. */
   URL context;
@@ -45,7 +48,7 @@ public class ArrayClassLoader extends ClassLoader
 
   public void addClass(Class clas)
   {
-    map.put(clas.getName(), clas);
+    cmap.put(clas.getName(), clas);
   }
 
   public void addClass(String name, byte[] bytes)
@@ -56,6 +59,19 @@ public class ArrayClassLoader extends ClassLoader
   public void addClass (ClassType ctype)
   {
     map.put(ctype.getName(), ctype);
+  }
+
+  public InputStream getResourceAsStream(String name)
+  {
+    InputStream in = super.getResourceAsStream(name);
+    if (in == null && name.endsWith(".class"))
+      {
+        String cname = name.substring(0, name.length()-6).replace('/', '.');
+        Object r = map.get(cname);
+        if (r instanceof byte[])
+          return new ByteArrayInputStream((byte[]) r);
+      }
+    return in;
   }
 
   protected URL findResource(String name)
@@ -93,7 +109,10 @@ public class ArrayClassLoader extends ClassLoader
   public Class loadClass (String name)
     throws ClassNotFoundException
   {
-    Object r = map.get(name);
+    Object r = cmap.get(name);
+    if (r != null)
+      return (Class) r;
+    r = map.get(name);
     if (r instanceof ClassType)
       {
         ClassType ctype = (ClassType) r;
@@ -113,7 +132,7 @@ public class ArrayClassLoader extends ClassLoader
 	      {
 		byte[] bytes = (byte[]) r;
 		clas = defineClass (name, bytes, 0, bytes.length);
-		map.put(name, clas);
+		cmap.put(name, clas);
 	      }
 	    else
 	      clas = (Class) r;

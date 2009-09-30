@@ -1,3 +1,11 @@
+2009-09-30  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (dflonumType): New static.
+	(DFLONUM_TYPE_CODE): New type code constant.
+	(coerceDFloNum): New method.
+	(coercionOrNullMethod, coerceFromObject, emitConvertFromPrimitive,
+	emitCoerceFromObject): Implement support for numericType.
+
 2009-09-20  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (numericType): New static.

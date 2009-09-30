@@ -1023,6 +1023,8 @@ public class Scheme extends LispLanguage
       return Type.toStringType;
     if ("gnu.math.IntNum".equals(name))
       return LangObjType.integerType;
+    if ("gnu.math.DFloNum".equals(name))
+      return LangObjType.dflonumType;
     if ("gnu.math.RatNum".equals(name))
       return LangObjType.rationalType;
     if ("gnu.math.RealNum".equals(name))

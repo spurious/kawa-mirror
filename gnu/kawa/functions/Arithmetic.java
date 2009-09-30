@@ -105,7 +105,7 @@ public class Arithmetic
   static ClassType typeInteger = ClassType.make("java.lang.Integer");
   static ClassType typeLong = ClassType.make("java.lang.Long");
   */
-  static ClassType typeDFloNum = ClassType.make("gnu.math.DFloNum");
+  static LangObjType typeDFloNum = LangObjType.dflonumType;
   static LangObjType typeRatNum = LangObjType.rationalType;
   static LangObjType typeRealNum = LangObjType.realType;
   static ClassType typeNumber = ClassType.make("java.lang.Number");

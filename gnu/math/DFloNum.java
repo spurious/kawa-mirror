@@ -43,6 +43,15 @@ public class DFloNum extends RealNum implements Externalizable
     return new DFloNum (value);
   }
 
+  public static DFloNum asDFloNumOrNull (Object value)
+  {
+    if (value instanceof DFloNum)
+      return (DFloNum) value;
+    if (value instanceof RealNum || value instanceof Number)
+      return new DFloNum(((Number) value).doubleValue());
+    return null;
+  }
+
   public final double doubleValue ()
   {
     return value;

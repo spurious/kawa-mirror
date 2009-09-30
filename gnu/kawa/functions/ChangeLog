@@ -1,5 +1,7 @@
 2009-09-30  Per Bothner  <per@bothner.com>
 
+	* Arithmetic.java (typeDFloNum): Use LangObjType.dflonumType.
+
 	* CompileArith.java (getReturnKind): Try again ...
 
 2009-09-26  Per Bothner  <per@bothner.com>

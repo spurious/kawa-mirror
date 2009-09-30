@@ -1,3 +1,7 @@
+2009-09-30  Per Bothner  <per@bothner.com>
+
+	* DFloNum.java (asDFloNumOrNull): New static method.
+
 2009-09-20  Per Bothner  <per@bothner.com>
 
 	* Numeric.java (NONNEG_MOD): New rounding mode.

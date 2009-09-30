@@ -369,7 +369,7 @@ public class CompileArith implements CanInline, Inlineable
 
   public int getReturnKind (int kind1, int kind2)
   {
-    return kind1 > kind2 && kind2 > 0 ? kind1 : kind2;
+    return kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
   }
 
   /** This actually returns the "promoted argument type".

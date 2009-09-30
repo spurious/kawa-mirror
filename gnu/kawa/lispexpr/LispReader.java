@@ -620,6 +620,7 @@ public class LispReader extends Lexer
     boolean inexact = (exactness == 'i' || exactness == 'I'
 		       || (exactness == ' ' && hash_seen));
     RealNum number = null;
+    char exp_char = '\0';
     if (infnan != '\0')
       {
         inexact = true;
@@ -635,8 +636,8 @@ public class LispReader extends Lexer
 	String str = new String(buffer, digits_start, pos - digits_start);
         if (exp_seen >= 0)
           {
-            char exp = buffer[exp_seen];
-            if (exp != 'e' && exp != 'E')
+            exp_char = Character.toLowerCase(buffer[exp_seen]);
+            if (exp_char != 'e')
               {
                 int prefix = exp_seen - digits_start;
                 str = str.substring(0, prefix)+'e'+str.substring(prefix+1);
@@ -744,6 +745,19 @@ public class LispReader extends Lexer
 	  }
         return "excess junk after number";
 	
+      }
+    else if (number instanceof DFloNum && exp_char > 0 && exp_char != 'e')
+      {
+        double d = number.doubleValue();
+        switch (exp_char)
+          {
+          case 'f':  case 's':
+            return Float.valueOf((float) d);
+          case 'd':
+            return Double.valueOf(d);
+          case 'l':
+            return java.math.BigDecimal.valueOf(d);
+          }
       }
     return number;
   }

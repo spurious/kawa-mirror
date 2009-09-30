@@ -1,4 +1,8 @@
 2009-09-30  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: New tests for floating-point literals.
+
+2009-09-30  Per Bothner  <per@bothner.com>
 	    Alex Mitchell
 
 	* num-test.scm: New test based on conversion failure

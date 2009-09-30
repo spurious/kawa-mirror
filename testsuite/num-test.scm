@@ -1,4 +1,4 @@
-(test-begin "numbers" 1795)
+(test-begin "numbers" 1801)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -358,5 +358,12 @@
 
 ;; Bug reported by Alex Mitchell
 (test-equal '(20.0) (let ((b (* denom 2.0))) (list b)))
+
+(test-equal "java.lang.Float" (invoke (invoke 12.5s2 'getClass) 'getName))
+(test-equal "java.lang.Float" (invoke (invoke 12.5F2 'getClass) 'getName))
+(test-equal "java.lang.Double" (invoke (invoke 12.5d2 'getClass) 'getName))
+(test-equal "java.math.BigDecimal" (invoke (invoke 12.5l2 'getClass) 'getName))
+(test-equal "gnu.math.DFloNum" (invoke (invoke 12.5e2 'getClass) 'getName))
+(test-equal "gnu.math.DFloNum" (invoke (invoke 12.5 'getClass) 'getName))
 
 (test-end)

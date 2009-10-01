@@ -40,8 +40,7 @@ public class location extends Syntax
 	Declaration decl = rexp.getBinding();
 	if (decl != null)
           {
-            if (decl.isLexical())
-              decl.setIndirectBinding(true);
+            decl.maybeIndirectBinding(tr);
             decl = Declaration.followAliases(decl);
             decl.setCanRead(true);
             decl.setCanWrite(true);

@@ -1,5 +1,8 @@
 2009-09-30  Per Bothner  <per@bothner.com>
 
+	* testing.scm (fail-expected): Use define-variable, since this may
+	be modified by clients.
+
 	* num-test.scm: New tests for floating-point literals.
 
 2009-09-30  Per Bothner  <per@bothner.com>

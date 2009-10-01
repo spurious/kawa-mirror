@@ -1,3 +1,16 @@
+2009-09-30  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (load): Create FieldLocation if this is indirect
+	and DONT_DEREFERENCE, rather than using CREATE_FIELD_REFERENCE.
+	(maybeIndirectBinding): New method.
+	(makeField): Only setIndirectBinding if immediate.  (It may have
+	been set previously if maybeIndirectBinding was called.)
+	Also, never set field type to gnu.kawa.reflect.FieldLocation.
+	* ModuleInfo.java (setupModuleExp): ..
+	* Language.java (declFromField): Only set name from value if final.
+	* ModuleInfo.java (makeDeclInModule2); Don't set CREATE_FIELD_REFERENCE.
+	* ReferenceExp.java (CREATE_FIELD_REFERENCE): Remove - no longer used.
+
 2009-09-29  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (getMethod, getMethodCount): New methods.

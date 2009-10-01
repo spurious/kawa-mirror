@@ -45,7 +45,7 @@
 (define test-name "<unknown>")
 
 ;;; Set this (to an explanatory string) if the next test is known to fail.
-(define fail-expected #f)
+(define-variable fail-expected #f)
 
 ;;; The current section.
 (define cur-section #f)

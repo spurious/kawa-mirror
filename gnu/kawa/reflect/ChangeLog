@@ -1,5 +1,8 @@
 2009-09-30  Per Bothner  <per@bothner.com>
 
+	* ClassMemberLocation.java (define): Only grab name from value
+	if the field is final.
+
 	* FieldLocation.java (toString): Check for null type.
 
 2009-09-15  Per Bothner  <per@bothner.com>

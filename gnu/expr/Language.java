@@ -663,9 +663,10 @@ public abstract class Language
     // get name from value of field.
     boolean isImportedInstance;
     boolean externalAccess = false;
+    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if ((isImportedInstance = fname.endsWith("$instance")))
       fdname = fname;
-    else if (fvalue instanceof Named) // && ! isAlias
+    else if (isFinal && fvalue instanceof Named) // && ! isAlias
       fdname = ((Named) fvalue).getSymbol();
     else
       {
@@ -691,7 +692,6 @@ public abstract class Language
       : getTypeFor(ftype.getReflectClass());
     Declaration fdecl = mod.addDeclaration(fdname, dtype);
     boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
-    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if (isAlias)
       fdecl.setIndirectBinding(true);
     else if (isFinal && ftype instanceof ClassType)

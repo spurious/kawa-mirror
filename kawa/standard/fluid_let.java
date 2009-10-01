@@ -82,8 +82,7 @@ public class fluid_let extends Syntax
             Declaration found = tr.lexical.lookup(name, false);
             if (found != null)
               {
-                if (found.isLexical())
-                  found.setIndirectBinding(true);
+                found.maybeIndirectBinding(tr);
                 decl.base = found;
                 found.setCanWrite(true);
               }

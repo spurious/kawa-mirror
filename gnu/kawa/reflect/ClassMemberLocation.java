@@ -179,7 +179,9 @@ public abstract class ClassMemberLocation extends Location
     Type ftype = Type.make(rfield.getType());
     boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
     boolean isProcedure = ftype.isSubtype(Compilation.typeProcedure);
-    Object fdname = ((fvalue instanceof Named && ! isAlias)
+    int rModifiers = rfield.getModifiers();
+    boolean isFinal = (rModifiers & Access.FINAL) != 0;
+    Object fdname = (isFinal && (fvalue instanceof Named && ! isAlias)
 		     ? ((Named) fvalue).getSymbol()
 		     : Compilation.demangleName(rfield.getName(), true));
     Symbol sym;
@@ -190,8 +192,6 @@ public abstract class ClassMemberLocation extends Location
 	sym = Symbol.make(uri == null ? "" : uri,
 			  fdname.toString().intern());
       }
-    int rModifiers = rfield.getModifiers();
-    boolean isFinal = (rModifiers & Access.FINAL) != 0;
     Location loc;
     Object property = null;
     if (isAlias && isFinal)

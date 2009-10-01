@@ -259,7 +259,6 @@ public class ModuleInfo
         ReferenceExp fref = new ReferenceExp(vdecl);
         fdecl.setAlias(true);
         fref.setDontDereference(true);
-        fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
         fdecl.setValue(fref);
         if (vdecl.isProcedureDecl())
           fdecl.setProcedureDecl(true);

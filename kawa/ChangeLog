@@ -1,5 +1,12 @@
 2009-09-30  Per Bothner  <per@bothner.com>
 
+	* standard/location.java (rewrite): Use new maybeIndirectBinding method.
+	* standard/fluid_let.java (rewrite): Likewise.
+	* standard/define.java (scanForm): Only setCanWrite if immediate.
+	* standard/require.java (importDefinitions): Don't set no-longer-used
+	CREATE_FIELD_REFERENCE.
+	* standard/set_b.java (rewriteForm): Warn if setting imported variable.
+
 	* standard/Scheme.java (getTypeFor): Map gnu.math.DFloNum to
 	LangObjType.dflonumType.
 

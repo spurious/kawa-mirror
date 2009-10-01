@@ -409,7 +409,6 @@ public class require extends Syntax
         if (! isImportedInstance)
           {
             fref.setDontDereference(true);
-            fref.setFlag(ReferenceExp.CREATE_FIELD_REFERENCE);
             if (! immediate)
               adecl.setPrivate(true);
           } 

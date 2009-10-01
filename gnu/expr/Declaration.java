@@ -173,7 +173,8 @@ public class Declaration
       }
     CodeAttr code = comp.getCode();
     Type rtype = getType();
-    if ((flags & ReferenceExp.CREATE_FIELD_REFERENCE) != 0)
+    if (! isIndirectBinding()
+        && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
       {
         if (field == null)
           throw new Error("internal error: cannot take location of "+this);
@@ -541,6 +542,13 @@ public class Declaration
     setFlag(indirectBinding, INDIRECT_BINDING);
   }
 
+  public void maybeIndirectBinding (Compilation comp)
+  {
+    if (isLexical() 
+        && ! (context instanceof ModuleExp) || context == comp.mainLambda)
+      setIndirectBinding(true);
+  }
+
   /* Note:  You probably want to use !ignorable(). */
   public final boolean getCanRead() { return (flags & CAN_READ) != 0; }
   public final void setCanRead(boolean read)
@@ -882,7 +890,8 @@ public class Declaration
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
-    if (isPublic() && ! isConstant && ! typeSpecified)
+    if (comp.immediate && context instanceof ModuleExp
+        && ! isConstant && ! typeSpecified)
       setIndirectBinding(true);
     // In immediate mode we may need to access the field from a future
     // command in a different "runtime package" (see JVM spec) because it
@@ -904,10 +913,7 @@ public class Declaration
       fflags |= Access.FINAL;
     Type ftype = getType().getImplementationType();
     if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))
-      if (getFlag(EARLY_INIT) && isAlias())
-        ftype = ClassType.make("gnu.kawa.reflect.FieldLocation");
-      else
-        ftype = Compilation.typeLocation;
+      ftype = Compilation.typeLocation;
     if (! ignorable())
       {
         String fname = getName();

@@ -19,10 +19,8 @@ public class ReferenceExp extends AccessExp
   public static final int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
   public static final int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
   public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
-  /** Create a FieldLocation referencing the binding. */
-  public static final int CREATE_FIELD_REFERENCE = NEXT_AVAIL_FLAG << 3;
   /** Flag indicates a reference to a type name. */
-  public static final int TYPE_NAME = NEXT_AVAIL_FLAG << 4;
+  public static final int TYPE_NAME = NEXT_AVAIL_FLAG << 3;
 
   /* If true, must have binding.isIndirectBinding().  Don't dereference it. */
   public final boolean getDontDereference()

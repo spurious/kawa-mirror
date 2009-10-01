@@ -103,9 +103,7 @@ public class define extends Syntax
 	    decl.setCanRead(true);
 	    // (define (f) ...) defaults f to being read-only,
 	    // unless f is assigned to in this module.
-	    if (! makeConstant
-		&& ((options & 2) == 0
-		    || ! Compilation.inlineOk))
+            if (! Compilation.inlineOk || tr.immediate)
 	      decl.setCanWrite(true);
 	  }
       }

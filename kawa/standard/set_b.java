@@ -78,7 +78,12 @@ public class set_b extends Syntax
 	if (decl != null)
 	  decl.noteValue (value);
 	if (decl.getFlag(Declaration.IS_CONSTANT))
-	  return tr.syntaxError ("constant variable is set!");
+	  return tr.syntaxError ("constant variable "+decl.getName()+" is set!");
+        else if (decl.context != tr.mainLambda
+                 && decl.context instanceof ModuleExp
+                 && ! decl.context.getFlag(ModuleExp.IMMEDIATE))
+          // Should be an error, but for now make it a warning
+	  tr.error('w', decl, "imported variable ", " is set!");
       }
     return sexp;
   }

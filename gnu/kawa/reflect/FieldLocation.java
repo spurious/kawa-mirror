@@ -379,10 +379,10 @@ public class FieldLocation extends ClassMemberLocation
 	sbuf.append(instance);
 	sbuf.append(' ');
       }
-    sbuf.append(type.getName());
+    sbuf.append(type == null ? "(null)" : type.getName());
     sbuf.append('.');
     sbuf.append(mname);
-    /* DEBGUGGING:
+    /* DEBUGGING:
     sbuf.append(" #:");
     sbuf.append(id);
     */

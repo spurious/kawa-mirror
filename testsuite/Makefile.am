@@ -29,7 +29,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-fannkuch check-fasta check-mandelbrot \
-  check-nsieve check-pidigits
+  check-nsieve check-pidigits check-regexdna
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -191,6 +191,21 @@ check-mandelbrot: mandelbrot.class
 	  then echo '# mandelbrot test passes'; \
 	  else echo FAIL mandelbrot test; fi
 
+regexdna.class: $(srcdir)/regexdna.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/regexdna.scm
+
+regexdna-input.txt: fasta.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fasta 10000 >regexdna-input.txt
+
+check-regexdna: regexdna.class regexdna-input.txt
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) regexdna < regexdna-input.txt >tmp-regexdna.log
+	@if diff $(srcdir)/regexdna-output.txt tmp-regexdna.log; \
+	  then echo '# regexdna test passes'; \
+	  else echo FAIL regexdna test; fi
+
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
@@ -319,7 +334,7 @@ check-load-require:
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
-CLEANFILES = tmp* *.log testing.zip *.class HelloCgiK HelloCgiS
+CLEANFILES = tmp* *.log testing.zip regexdna-input.txt *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
@@ -337,4 +352,6 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   fasta.scm fasta-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \
   nsieve.scm nsieve-output.txt \
-  pidigits.scm pidigits-output.txt
+  pidigits.scm pidigits-output.txt \
+  regexdna.scm regexdna-output.txt
+

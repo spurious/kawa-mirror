@@ -1,3 +1,11 @@
+2009-10-01  Per Bothner  <per@bothner.com>
+
+	* regexdna.scm: New benchmark, for shootout.alioth.debian.org.
+	Based on Java 6 server #4 version contributed by Razii,
+	idea taken from Elliott Hughes and Roger Millington.
+	* regexdna-output.txt: Expected output file.
+	* Makefile.am: Update for regexdna.
+
 2009-09-30  Per Bothner  <per@bothner.com>
 
 	* testing.scm (fail-expected): Use define-variable, since this may

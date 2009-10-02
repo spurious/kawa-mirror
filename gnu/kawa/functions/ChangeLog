@@ -1,3 +1,7 @@
+2009-10-01  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (inRange): Make public - used by Invoke.
+
 2009-09-30  Per Bothner  <per@bothner.com>
 
 	* Arithmetic.java (typeDFloNum): Use LangObjType.dflonumType.

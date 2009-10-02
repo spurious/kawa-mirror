@@ -5,6 +5,8 @@ import gnu.bytecode.*;
 import gnu.lists.FString;
 import java.lang.reflect.Array;
 import gnu.kawa.lispexpr.ClassNamespace; // FIXME
+import gnu.kawa.functions.CompileArith;
+import gnu.math.IntNum;
 
 public class Invoke extends ProcedureN implements CanInline
 {
@@ -289,7 +291,27 @@ public class Invoke extends ProcedureN implements CanInline
     for (int src = argsStartIndex; 
          src < args.length && dst < atypes.length; 
          src++, dst++)
-      atypes[dst] = args[src].getType();
+      {
+        Expression arg = args[src];
+        Type atype = null;
+        // Treat IntNum constant argument in int/long range as int/long.
+        if (arg instanceof QuoteExp)
+          {
+            QuoteExp qexp = (QuoteExp) arg;
+            Object val = qexp.getValue();
+            if (val instanceof IntNum && qexp.getRawType() == null)
+              {
+                IntNum inum = (IntNum) val;
+                if (CompileArith.inRange(inum, Integer.MIN_VALUE, Integer.MAX_VALUE))
+                  atype = Type.intType;
+                else if (CompileArith.inRange(inum, Long.MIN_VALUE, Long.MAX_VALUE))
+                  atype = Type.longType;
+              }
+          }
+        if (atype == null)
+          atype = arg.getType();
+        atypes[dst] = atype;
+      }
     return ClassMethods.selectApplicable(methods, atypes);
   }
 

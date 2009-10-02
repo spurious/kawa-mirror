@@ -1,3 +1,8 @@
+2009-10-01  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (selectApplicable): If arguments are IntNum literals
+	in int or long range, set argument type to int or long.
+
 2009-09-30  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (define): Only grab name from value

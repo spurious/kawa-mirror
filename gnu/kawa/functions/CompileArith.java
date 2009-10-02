@@ -190,7 +190,7 @@ public class CompileArith implements CanInline, Inlineable
           ;
         else if ((dproc.op == DivideOp.DIVIDE_INEXACT
                   && kind <= Arithmetic.REALNUM_CODE && kind != Arithmetic.FLOAT_CODE)
-            || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
+                 || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
           kind = Arithmetic.DOUBLE_CODE;
         else if (dproc.op == DivideOp.QUOTIENT_EXACT
                  && (dproc.getRoundingMode() == Numeric.TRUNCATE
@@ -232,14 +232,14 @@ public class CompileArith implements CanInline, Inlineable
         comp.getCode().emitInvokeStatic(meth);
       }
     else if (kind == Arithmetic.INTNUM_CODE
-        && (op == ADD || op == MUL || op == SUB))
+             && (op == ADD || op == MUL || op == SUB))
       {
         compileIntNum(args[0], args[1], kind1, kind2, comp);
       }
     else if (kind != Arithmetic.INT_CODE
-        && kind != Arithmetic.LONG_CODE
-        && kind != Arithmetic.FLOAT_CODE
-        && kind != Arithmetic.DOUBLE_CODE)
+             && kind != Arithmetic.LONG_CODE
+             && kind != Arithmetic.FLOAT_CODE
+             && kind != Arithmetic.DOUBLE_CODE)
       {
         ApplyExp.compile(exp, comp, target);
         return;
@@ -274,7 +274,7 @@ public class CompileArith implements CanInline, Inlineable
     return val instanceof IntNum && inRange((IntNum) val, lo, hi);
   }
 
-  static boolean inRange (IntNum val, long lo, long hi)
+  public static boolean inRange (IntNum val, long lo, long hi)
   {
     return IntNum.compare(val, lo) >= 0 && IntNum.compare(val, hi) <= 0;
   }

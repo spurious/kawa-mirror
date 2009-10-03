@@ -39,7 +39,7 @@
 	(if (= i 0)
 	    (set! bits (+ bits 1)))
 
-	(cond ((= (remainder x (as int 8)#|FIXME|#) 7)
+	(cond ((= (remainder x 8) 7)
 	       (set! (buf buf-len) bits)
 	       (set! buf-len (+ buf-len 1))
 	       (cond ((= buf-len buffer-size)

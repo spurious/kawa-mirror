@@ -191,7 +191,10 @@ public class FixedRealFormat extends java.text.Format
   public StringBuffer format(Object num, StringBuffer sbuf, FieldPosition fpos)
   {
     // Common Lisp says if value is non-real, print as if with ~wD.  FIXME.
-    return format(((RealNum) num).doubleValue(), sbuf, fpos);
+    RealNum rnum = RealNum.asRealNumOrNull(num);
+    if (rnum == null)
+      rnum = (RealNum) num;
+    return format(rnum.doubleValue(), sbuf, fpos);
   }
 
   public java.lang.Number parse(String text, java.text.ParsePosition status)

@@ -88,3 +88,8 @@ cycle2.isIsOdd(int)boolean: 22 bytes
 Transformation.next()void: 59 bytes
 Transformation.extract(int)int: 41 bytes
 Transformation.compose(Transformation)Transformation: 110 bytes
+spectralnorm.Approximate(int)double: 212 bytes
+spectralnorm.A(int,int)double: 19 bytes
+spectralnorm.multiplyAv(int,double[],double[])void: 53 bytes
+spectralnorm.multiplyAtv(int,double[],double[])void: 53 bytes
+spectralnorm.multiplyAtAv(int,double[],double[])void: 17 bytes

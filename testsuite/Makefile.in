@@ -193,7 +193,8 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   mandelbrot.scm mandelbrot-output.bmp \
   nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt \
-  regexdna.scm regexdna-output.txt
+  regexdna.scm regexdna-output.txt \
+  spectralnorm.scm spectralnorm-output.txt
 
 all: all-am
 
@@ -391,7 +392,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-fannkuch check-fasta check-mandelbrot \
-  check-nsieve check-pidigits check-regexdna
+  check-nsieve check-pidigits check-regexdna check-spectralnorm
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -568,6 +569,17 @@ check-regexdna: regexdna.class regexdna-input.txt
 	  then echo '# regexdna test passes'; \
 	  else echo FAIL regexdna test; fi
 
+spectralnorm.class: $(srcdir)/spectralnorm.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/spectralnorm.scm
+
+check-spectralnorm: spectralnorm.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) spectralnorm 100 >tmp-spectralnorm100.log
+	@if diff $(srcdir)/spectralnorm-output.txt tmp-spectralnorm100.log; \
+	  then echo '# spectralnorm test passes'; \
+	  else echo FAIL spectralnorm test; fi
+
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
@@ -649,7 +661,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
-inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class Makefile
+inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class spectralnorm.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -662,6 +674,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class Makefi
 	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize Transformation.class next extract compose >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \

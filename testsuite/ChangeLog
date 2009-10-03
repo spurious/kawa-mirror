@@ -1,5 +1,13 @@
 2009-10-03  Per Bothner  <per@bothner.com>
 
+	* spectralnorm.scm:  New benchmark, from shootout.alioth.debian.org.
+	Based on Java version contributed by Jarkko Miettinen,
+	based on the original C#-version by Isaac Gouy.
+	* spectralnorm-output.txt: Expected output file.
+	* Makefile.am: Update accordingly.
+	Also add more inlining tests from spectralnorm.
+	* inlining.expected: Update accordingly.
+
 	* mandelbrot.scm:  Remove no-longer-needed cast.
 
 	* inlining.expected: Update for beter 'do' code generation.
@@ -7,7 +15,7 @@
 
 2009-10-01  Per Bothner  <per@bothner.com>
 
-	* regexdna.scm: New benchmark, for shootout.alioth.debian.org.
+	* regexdna.scm: New benchmark, from shootout.alioth.debian.org.
 	Based on Java 6 server #4 version contributed by Razii,
 	idea taken from Elliott Hughes and Roger Millington.
 	* regexdna-output.txt: Expected output file.

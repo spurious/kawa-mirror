@@ -1,3 +1,11 @@
+2009-10-03  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (compile): 	If target is float/double and args
+	are int/long we still want to use int/long arithmetic and then
+	convert to float/double rather than vice versa.
+	Most important for quotient/remainder operations.
+	Also some other optimization tweaks for division.
+
 2009-10-01  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (inRange): Make public - used by Invoke.

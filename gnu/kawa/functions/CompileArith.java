@@ -164,8 +164,7 @@ public class CompileArith implements CanInline, Inlineable
       }
     else if ((tkind == Arithmetic.DOUBLE_CODE
               || tkind == Arithmetic.FLOAT_CODE)
-             
-             && kind > 0 && kind <= Arithmetic.REALNUM_CODE)
+             && kind > Arithmetic.LONG_CODE && kind <= Arithmetic.REALNUM_CODE)
       {
         kind = tkind;
         wtype = tkind == Arithmetic.FLOAT_CODE ? LangPrimType.floatType
@@ -186,13 +185,16 @@ public class CompileArith implements CanInline, Inlineable
       {
         DivideOp dproc = (DivideOp) proc;
         if (dproc.op == DivideOp.GENERIC
-            && (kind <= Arithmetic.INTNUM_CODE || kind == Arithmetic.RATNUM_CODE))
+            && (kind <= Arithmetic.INTNUM_CODE
+                || (kind >= Arithmetic.RATNUM_CODE || kind <= Arithmetic.FLONUM_CODE)))
           ;
         else if ((dproc.op == DivideOp.DIVIDE_INEXACT
                   && kind <= Arithmetic.REALNUM_CODE && kind != Arithmetic.FLOAT_CODE)
                  || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
           kind = Arithmetic.DOUBLE_CODE;
-        else if (dproc.op == DivideOp.QUOTIENT_EXACT
+        else if ((dproc.op == DivideOp.QUOTIENT_EXACT
+                  || (dproc.op == DivideOp.QUOTIENT
+                      && kind <= Arithmetic.INTNUM_CODE))
                  && (dproc.getRoundingMode() == Numeric.TRUNCATE
                      || kind == Arithmetic.FLOAT_CODE
                      || kind == Arithmetic.DOUBLE_CODE))

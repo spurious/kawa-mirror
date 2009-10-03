@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 189)
+(test-init "Miscellaneous" 190)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -909,3 +909,10 @@
 
 (define shared-1 '(#2=(3 4) 9 #2# #2#))
 (test '((3 4) 9 (3 4) (3 4)) 'shared-1 shared-1)
+
+(test 25 'multiple-do-with-type-specs
+      (let ((ll '(1 3 5 7 9)))
+	(do ((x :: list ll (cdr x))
+	     (sum :: int 0 (+ sum (car x))))
+	    ((null? x) sum))))
+

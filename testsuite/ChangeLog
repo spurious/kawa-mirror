@@ -1,3 +1,8 @@
+2009-10-03  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update for beter 'do' code generation.
+	* misc-test.scm: Add test for 'do' with multiple type specifiers.
+
 2009-10-01  Per Bothner  <per@bothner.com>
 
 	* regexdna.scm: New benchmark, for shootout.alioth.debian.org.

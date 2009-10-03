@@ -171,34 +171,65 @@
 
 ;;; Helper macro for do, to handle optional step.
 (define-syntax %do-step
+  (syntax-rules (::)
+		((%do-step variable :: type init step) step)
+		((%do-step variable :: type init) variable)
+		((%do-step variable init step) step)
+		((%do-step variable init) variable)))
+
+(define-syntax %do-init
+  (syntax-rules (::)
+		((%do-init (var :: type init step))
+		 init)
+		((%do-init (var :: type init))
+		 init)
+		((%do-init (var init step))
+		 init)
+		((%do-init (var init))
+		 init)
+		((%do-init (var type init))
+		 init)
+		((%do-init (var))
+		 (%syntax-error "do binding with no value"))
+		((%do-init (var a b c))
+		 (%syntax-error
+		  "do binding must have syntax: (var [:: type] init [step])"))))
+
+(define-syntax %do-lambda1
+  (syntax-rules (::)
+		((%do-lambda1 ((var :: type init step) . in) out body)
+		 (%do-lambda1 in ((var :: type) . out) body))
+		((%do-lambda1 ((var :: type init) . in) out body)
+		 (%do-lambda1 in ((var :: type) . out) body))
+		((%do-lambda1 ((var init step) . in) out body)
+		 (%do-lambda1 in (var . out) body))
+		((%do-lambda1 ((var init) . in) out body)
+		 (%do-lambda1 in (var . out) body))
+		((%do-lambda1 () out body)
+		 (%do-lambda2 out () body))))
+
+;;; This is just to reverse the argument list yielded by %do-lambda1.
+(define-syntax %do-lambda2
   (syntax-rules ()
-		((%do-step variable step) step)
-		((%do-step variable) variable)))
+		((%do-lambda2 (arg . in) out body)
+		 (%do-lambda2 in (arg . out) body))
+		((%do-lambda2 () out body)
+		 (lambda out body))))
 
 (define-syntax do
   (syntax-rules (::)
-		;;; Handle type specifier - but only for one variable.
-		;;; I don't know how to handle the general case, by just
-		;;; using syntax-rules, so fix that later.  FIXME.
-		((do ((name :: type init step))
-		     (test . result) commands ...)
-		 (letrec ((%do%loop
-			   (lambda ((name type))
-			     (if test
-				 (begin #!void . result)
-				 (begin commands ...
-					(%do%loop step))))))
-		   (%do%loop init)))
-		((do ((name init . step) ...)
+		((do (binding ...)
 		     (test . result) commands ...)
 		 ;; The identifier %do%loop is optimized specially ...
 		 (letrec ((%do%loop
-			   (lambda (name ...)
-			     (if test
-				 (begin #!void . result)
-				 (begin commands ...
-					(%do%loop (%do-step name . step) ...))))))
-		   (%do%loop init ...)))))
+			   (%do-lambda1 (binding ...) ()
+					;; Use a 'not' so the exit clause is
+					;; at the end, which avoids a goto.
+					(if (not test)
+					    (begin commands ...
+						   (%do%loop (%do-step . binding) ...))
+					    (begin #!void . result)))))
+		   (%do%loop (%do-init binding) ...)))))
 
 ;;; DELAY
 

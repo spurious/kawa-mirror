@@ -1,3 +1,11 @@
+2009-10-03  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (do):  Re-write so we can handle type-specifiers
+	for mutliple variable clauses.
+
+	* std_syntax.scm (do):  Re-order parts of 'do' to avoid a goto
+	in generated code.
+
 2009-09-29  Per Bothner  <per@bothner.com>
 
 	* trace.scm (disassemble): New function.

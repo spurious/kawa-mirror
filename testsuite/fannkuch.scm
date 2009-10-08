@@ -6,17 +6,17 @@
 ;; Converted to Kawa by Per Bothner
 
 (define (vector-reverse-slice! (v :: int[]) (i :: int) (j :: int)) :: void
-  (let loop ((i :: int i)
-	     (j :: int (- j 1))) ; exclude position j
+  (let loop ((j :: int (- j 1))) ; exclude position j
     (if (< i j)
 	(let ((t (v i)))
 	  (set! (v i) (v j))
 	  (set! (v j) t)
-	  (loop (+ i 1) (- j 1))))))
+	  (set! i (+ i 1))
+	  (loop (- j 1))))))
 
-(define (count-flips pi)
-  (do ((rho (vector-copy pi))
-         (i 0 (+ i 1)))
+(define (count-flips (pi :: int[])) :: int
+  (do ((rho :: int[] (vector-copy pi))
+       (i :: int 0 (+ i 1)))
         ((= (rho 0) 0) i)
       (vector-reverse-slice! rho 0 (+ (rho 0) 1))))
 

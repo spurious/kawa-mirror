@@ -1,3 +1,11 @@
+2009-10-08  Per Bothner  <per@bothner.com>
+
+	* spectralnorm.scm (Approximate): Use 'let' instead of inner 'define',
+	because the latter isn't optimized as well, yet.
+	* inlining.expected: Update accordingly.
+	* fannkuch.scm (vector-reverse-slice!): Minor optimization.
+	(count-flips): Add type specifiers.
+
 2009-10-03  Per Bothner  <per@bothner.com>
 
 	* spectralnorm.scm:  New benchmark, from shootout.alioth.debian.org.

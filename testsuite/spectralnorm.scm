@@ -8,23 +8,22 @@
 |#
 
 (define (Approximate (n :: int)) :: double
-  ;; Create unit vector
-  (define u (double[] length: n))
-  (define v (double[] length: n))
-  (do ((i :: int 0 (+ i 1))) ((>= i n)) (set! (u i) 1))
-  ;; 20 steps of the power method
-  (do ((i :: int 0 (+ i 1))) ((>= i 10))
-    (multiplyAtAv n u v)
-    (multiplyAtAv n v u))
-  ;; B=AtA         A multiplied by A transposed
-  ;; v.Bv /(v.v)   eigenvalue of v
-  (define vBv :: double 0)
-  (define vv :: double 0)
-  (do ((i :: int 0 (+ i 1))) ((>= i n))
-    (let ((vi (v i)))
-      (set! vBv (+ vBv (* (u i) vi)))
-      (set! vv (+ vv (* vi vi)))))
-  (java.lang.Math:sqrt (/ vBv vv)))
+  (let ((u (double[] length: n))  ;; Create unit vector
+	(v (double[] length: n))
+	(vBv :: double 0)
+	(vv :: double 0))
+    (do ((i :: int 0 (+ i 1))) ((>= i n)) (set! (u i) 1))
+    ;; 20 steps of the power method
+    (do ((i :: int 0 (+ i 1))) ((>= i 10))
+      (multiplyAtAv n u v)
+      (multiplyAtAv n v u))
+    ;; B=AtA         A multiplied by A transposed
+    ;; v.Bv /(v.v)   eigenvalue of v
+    (do ((i :: int 0 (+ i 1))) ((>= i n))
+      (let ((vi (v i)))
+	(set! vBv (+ vBv (* (u i) vi)))
+	(set! vv (+ vv (* vi vi)))))
+    (java.lang.Math:sqrt (/ vBv vv))))
 
 ;;; return element i,j of infinite matrix A
 (define (A (i :: int) (j :: int)) :: double

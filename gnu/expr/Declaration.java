@@ -626,6 +626,8 @@ public class Declaration
       return true;
     if (getFlag(NONSTATIC_SPECIFIED))
       return false;
+    if (getFlag(IS_CONSTANT) && hasConstantValue())
+      return true;
     LambdaExp lambda = context.currentLambda();
     return lambda instanceof ModuleExp
       && ((ModuleExp) lambda).isStatic();
@@ -899,7 +901,6 @@ public class Declaration
     if (isPublic() || external_access || comp.immediate)
       fflags |= Access.PUBLIC;
     if (isStatic()
-	|| (isConstant && value instanceof QuoteExp)
         // "Dynamic" variables use ThreadLocation, based on the current
         // Environment, so we don't need more than one static field.
         || (getFlag(Declaration.IS_UNKNOWN

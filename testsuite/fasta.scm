@@ -43,13 +43,12 @@
 (define-private last :: int 42)
 
 (define (random-next (max :: double)) :: double
-  (let* ((im 139968))
-    (set! last (modulo (+ 29573 (* last 3877)) im))
+  (let* ((im :: int 139968))
+    (set! last (remainder (+ 29573 (* last 3877)) 139968))
     (/ (* max last) im)))
 
 (define (select-random (frequency-table :: vector) (cumulative-table :: double[]))
-  (let ((rvalue (random-next 1.0))
-	(n (vector-length frequency-table)))
+  (let ((rvalue (random-next 1.0)))
     (do ((i :: int 0 (+ i 1)))
 	((<= rvalue (cumulative-table i))
 	 (char->integer (car (frequency-table i)))))))

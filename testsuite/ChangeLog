@@ -1,5 +1,7 @@
 2009-10-09  Per Bothner  <per@bothner.com>
 
+	* fasta.scm: Minor optimization tweaks.
+
 	* text-test.scm: Add cond-expand test for string-normalize-unicode
 	availability.
 

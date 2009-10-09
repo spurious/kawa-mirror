@@ -622,12 +622,13 @@ public class Declaration
 
   public boolean isStatic()
   {
-    if (getFlag(STATIC_SPECIFIED))
+    if (field != null)
+      return field.getStaticFlag();
+    if (getFlag(STATIC_SPECIFIED)
+        || (getFlag(IS_CONSTANT) && hasConstantValue()))
       return true;
     if (getFlag(NONSTATIC_SPECIFIED))
       return false;
-    if (getFlag(IS_CONSTANT) && hasConstantValue())
-      return true;
     LambdaExp lambda = context.currentLambda();
     return lambda instanceof ModuleExp
       && ((ModuleExp) lambda).isStatic();

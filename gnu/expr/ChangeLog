@@ -1,3 +1,7 @@
+2009-10-09  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (isStatic):  Tweak previous change.
+
 2009-10-08  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (isStatic):  Also static if a compiler-time constant.

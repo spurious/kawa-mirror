@@ -326,7 +326,7 @@ public class Lambda extends Syntax
 	Translator.setLine(decl, bindings);
 	if (typeSpecPair != null)
 	  {
-	    decl.setType(tr.exp2Type(typeSpecPair));
+            decl.setTypeExp(new LangExp(typeSpecPair));
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
 	else if (mode == restKeyword)
@@ -395,15 +395,11 @@ public class Lambda extends Syntax
 	  break;
 	if (attrName == null)
 	  {
-            Expression attrExpr = tr.rewrite_car(pair2, syntax);
             if (lexp.isClassMethod() && "*init*".equals(lexp.getName()))
               tr.error('e', "explicit return type for '*init*' method");
             else
-              {
-                gnu.bytecode.Type rtype = tr.getLanguage().getTypeFor(attrExpr);
-                if (rtype != null)
-                  lexp.setReturnType(rtype);
-              }
+              // Defer rewrite until rewriteBody.
+              lexp.body = new LangExp(new Object[] { pair2, syntax });
 	  }
 	else if (attrName == kawa.standard.object.accessKeyword)
 	  {
@@ -573,6 +569,12 @@ public class Lambda extends Syntax
 	    numRenamedAlias++;
 	    cur = param;
 	  }
+        Expression texp = cur.getTypeExp();
+        if (texp instanceof LangExp)
+          {
+            Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
+            cur.setType(tr.exp2Type(typeSpecPair));
+          }
 	prev = cur;
 
         if (arg_i >= lexp.min_args
@@ -597,6 +599,14 @@ public class Lambda extends Syntax
 
     LambdaExp saveLambda = tr.curLambda;
     tr.curLambda = lexp;
+    Type rtype = lexp.returnType;
+    if (lexp.body instanceof LangExp)
+      {
+        Object[] tform = (Object[]) ((LangExp) lexp.body).getLangValue();
+        Expression texp = tr.rewrite_car((Pair) tform[0],
+                                         (SyntaxForm) tform[1]);
+        rtype = tr.getLanguage().getTypeFor(texp);
+      }
     lexp.body = tr.rewrite_body (body);
     tr.curLambda = saveLambda;
     Expression[] exps;
@@ -622,7 +632,7 @@ public class Lambda extends Syntax
         lexp.setCoercedReturnValue(rexp, tr.getLanguage());
       }
     else
-      lexp.setCoercedReturnType(lexp.returnType);
+      lexp.setCoercedReturnType(rtype);
     tr.pop(lexp);
     lexp.countDecls();
     tr.popRenamedAlias(numRenamedAlias);

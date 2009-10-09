@@ -1,3 +1,9 @@
+2009-10-09  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java: Defer from rewriteFormals and rewriteAttrs to
+	rewriteBody the exp2Type/getTypeFor calls for parameter and returns
+	types, allowing lexical lookkup and forward references of ClassExps.
+
 2009-09-30  Per Bothner  <per@bothner.com>
 
 	* standard/location.java (rewrite): Use new maybeIndirectBinding method.

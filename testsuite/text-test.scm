@@ -72,6 +72,9 @@
 (test-equal #t (string-ci=? "Straße" "STRASSE"))
 (test-equal #t (string-ci=? "ΧΑΟΣ" "χαοσ"))
 
+(cond-expand (string-normalize-unicode)
+             (else
+              (test-expect-fail 4)))
 (test-equal "\x65;\x301;" (string-normalize-nfd "\xE9;"))
 (test-equal "\xE9;" (string-normalize-nfc "\xE9;"))
 (test-equal "\x65;\x301;" (string-normalize-nfd "\x65;\x301;"))

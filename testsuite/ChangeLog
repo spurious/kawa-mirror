@@ -1,3 +1,8 @@
+2009-10-09  Per Bothner  <per@bothner.com>
+
+	* text-test.scm: Add cond-expand test for string-normalize-unicode
+	availability.
+
 2009-10-08  Per Bothner  <per@bothner.com>
 
 	* spectralnorm.scm (Approximate): Use 'let' instead of inner 'define',

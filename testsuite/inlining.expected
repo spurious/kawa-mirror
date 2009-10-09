@@ -85,9 +85,16 @@ InliningTest.inlineTwoFunctions(java.lang.Object)java.lang.Object: 23 bytes
 InliningTest.checkEven(int)java.lang.Object: 34 bytes
 cycle1.isIsEven(int)boolean: 22 bytes
 cycle2.isIsOdd(int)boolean: 22 bytes
+fasta.randomNext(double)double: 31 bytes
+fannkuch.countFlips(int[])int: 33 bytes
+fannkuch.vectorCopy(int[])int[]: 27 bytes
 Transformation.next()void: 59 bytes
 Transformation.extract(int)int: 41 bytes
 Transformation.compose(Transformation)Transformation: 110 bytes
+nbody.nbodySystem(int)void: 207 bytes
+nbody.advance(Body[],double)void: 330 bytes
+nbody.energy(Body[])double: 181 bytes
+nbody.jupiter()Body: 57 bytes
 spectralnorm.Approximate(int)double: 110 bytes
 spectralnorm.A(int,int)double: 19 bytes
 spectralnorm.multiplyAv(int,double[],double[])void: 53 bytes

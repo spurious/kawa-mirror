@@ -191,6 +191,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   fannkuch.scm fannkuch-output.txt \
   fasta.scm fasta-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \
+  nbody.scm nbody-output.txt \
   nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt \
   regexdna.scm regexdna-output.txt \
@@ -391,7 +392,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-binarytrees check-fannkuch check-fasta check-mandelbrot \
+  check-binarytrees check-fannkuch check-fasta check-mandelbrot check-nbody \
   check-nsieve check-pidigits check-regexdna check-spectralnorm
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
@@ -532,6 +533,17 @@ check-fasta: fasta.class
 	  then echo '# fasta test passes'; \
 	  else echo FAIL fasta test; fi
 
+nbody.class: $(srcdir)/nbody.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/nbody.scm
+
+check-nbody: nbody.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) nbody 1000 >nbody1000.log
+	@if diff $(srcdir)/nbody-output.txt nbody1000.log; \
+	  then echo '# nbody test passes'; \
+	  else echo FAIL nbody test; fi
+
 nsieve.class: $(srcdir)/nsieve.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) --main -C $(srcdir)/nsieve.scm
@@ -661,7 +673,8 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
-inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class spectralnorm.class Makefile
+inlining.log: InliningTest.class cycle1.class cycle2.class \
+  fannkuch.class fasta.class nbody.class pidigits.class spectralnorm.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -673,7 +686,13 @@ inlining.log: InliningTest.class cycle1.class cycle2.class pidigits.class spectr
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize fasta.class randomNext >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$Ex' countFlips vectorCopy >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize Transformation.class next extract compose >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize nbody.class A nbodySystem advance energy jupiter >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
 

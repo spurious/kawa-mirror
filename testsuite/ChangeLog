@@ -1,5 +1,12 @@
 2009-10-09  Per Bothner  <per@bothner.com>
 
+	* nbody.scm: New benchmark, from shootout.alioth.debian.org.
+	Based on Java version contributed by Mark C. Lewis,
+	modified slightly by Chad Whipkey.
+	* nbody-output.txt: Expected output file.
+	* Makefile.am: Updatde accordingly.
+	* inlining.expected:  Likewise.
+
 	* fasta.scm: Minor optimization tweaks.
 
 	* text-test.scm: Add cond-expand test for string-normalize-unicode

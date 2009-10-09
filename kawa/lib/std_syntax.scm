@@ -246,7 +246,7 @@
 		   ;; need to be evaluated at module-run-time.
 		   (define-constant name :: <gnu.expr.GenericProc>
 		     (make <gnu.expr.GenericProc> 'name))
-		   (invoke name 'setProperties (object[] args ...))))))
+		   (invoke name 'setProperties (java.lang.Object[] args ...))))))
 
 (define (syntax-object->datum obj)
   (kawa.lang.Quote:quote obj))

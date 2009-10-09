@@ -1,5 +1,10 @@
 2009-10-09  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (rewrite): Handle ambiguity of 'object'
+	as both anonymous-class-constructor macro and type-specifier.
+	* standard/Scheme.java (checkDefaultBinding): When checking for array
+	type use rewrite so we find lexically-defined class.
+
 	* lang/Lambda.java: Defer from rewriteFormals and rewriteAttrs to
 	rewriteBody the exp2Type/getTypeFor calls for parameter and returns
 	types, allowing lexical lookkup and forward references of ClassExps.

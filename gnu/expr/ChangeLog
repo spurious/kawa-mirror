@@ -1,5 +1,8 @@
 2009-10-09  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (setTypeExp): Simplify/generalize by using
+	Language.getTypeFor.
+
 	* Declaration.java (isStatic):  Tweak previous change.
 
 2009-10-08  Per Bothner  <per@bothner.com>

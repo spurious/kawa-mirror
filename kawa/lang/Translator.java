@@ -725,7 +725,11 @@ public class Translator extends Compilation
                     if (! inlineOk(null)
                         // A kludge - we get a bunch of testsuite failures
                         // if we don't inline $lookup$.  FIXME.
-                        && decl != getNamedPartDecl)
+                        && (decl != getNamedPartDecl
+                            && ! ("objectSyntax".equals(floc.getMemberName())
+                                  // Another kludge to support "object" as a
+                                  // type specifier.
+                                  && "kawa.standard.object".equals(floc. getDeclaringClass().getName()))))
                       decl = null;
                     else if (immediate)
                       {
@@ -778,6 +782,13 @@ public class Translator extends Compilation
           }
 	if (decl != null)
           {
+            // A special kludge to deal with the overloading between the
+            // object macro and object as being equivalent to java.lang.Object.
+            // A cleaner solution would be to use an identifier macro.
+            if (! function
+                && decl.getConstantValue() instanceof kawa.standard.object)
+              return QuoteExp.getInstance(Object.class);
+
             // In Scheme/Lisp a variable cannot donate multiple values.
             decl.setFlag(Declaration.IS_SINGLE_VALUE);
             if (decl.getContext() instanceof PatternScope)

@@ -1283,11 +1283,15 @@ public class Scheme extends LispLanguage
               }
           }
       }
+    boolean sawAngle;
     if (len > 2 && ch0 == '<' && name.charAt(len-1) == '>')
       {
         name = name.substring(1, len-1);
         len -= 2;
+        sawAngle = true;
       }
+    else
+      sawAngle = false;
     int rank = 0;
     while (len > 2 && name.charAt(len-2) == '[' && name.charAt(len-1) == ']')
       {
@@ -1302,6 +1306,14 @@ public class Scheme extends LispLanguage
       { 
         Class clas;
         Type type = getNamedType(cname);
+        if (rank > 0 && (! sawAngle || type == null))
+          {
+            Symbol tsymbol = namespace.getSymbol(cname.intern());
+            Expression texp = tr.rewrite(tsymbol, false);
+            texp = new InlineCalls(tr).walk(texp);
+            if (! (texp instanceof ErrorExp))
+              type = tr.getLanguage().getTypeFor(texp);
+          }
         if (type != null)
           {
             // Somewhat inconsistent: Types named by getNamedType are Type,

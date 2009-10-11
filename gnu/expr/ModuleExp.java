@@ -313,9 +313,7 @@ public class ModuleExp extends LambdaExp
                     // the environment, and just require lexical lookup.
                     // However, various parts of the code makes use of
                     // the environment.
-		    if ((decl.field.getModifiers() & Access.FINAL) != 0
-                        && ! (dvalue instanceof ReferenceExp
-                              && ((ReferenceExp) dvalue).getBinding().needsContext()))
+		    if ((decl.field.getModifiers() & Access.FINAL) != 0)
 		      {
 			Object value;
 			if (dvalue instanceof QuoteExp

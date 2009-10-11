@@ -56,10 +56,24 @@ public class Declaration
 
   public ScopeExp context;
 
+  /** The type of the value of this Declaration.
+   * It is null if the type is un-specified and not yet inferred.
+   * Will get set implicitly by getType, to avoid inconsistencies.
+   */
   protected Type type;
   protected Expression typeExp;
-  public final Expression getTypeExp() { return typeExp; }
-  public final Type getType() { return type; }
+  public final Expression getTypeExp()
+  {
+    if (typeExp == null)
+      setType(Type.objectType);
+    return typeExp;
+  }
+  public final Type getType()
+  {
+    if (type == null)
+      setType(Type.objectType);
+    return type;
+  }
   public final void setType(Type type)
   {
     this.type = type;
@@ -344,15 +358,30 @@ public class Declaration
    */
   public final Expression getValue()
   {
-    if (value == QuoteExp.undefined_exp
-        && field != null
-        && ((field.getModifiers() & Access.STATIC+Access.FINAL)
-            == Access.STATIC+Access.FINAL)
-        && ! isIndirectBinding())
+    if (value == QuoteExp.undefined_exp)
+      {
+        if (field != null
+            && ((field.getModifiers() & Access.STATIC+Access.FINAL)
+                == Access.STATIC+Access.FINAL)
+            && ! isIndirectBinding())
+          {
+            try
+              {
+                value = new QuoteExp(field.getReflectField().get(null));
+              }
+            catch (Throwable ex)
+              {
+              }
+          }
+      }
+    else if (value instanceof QuoteExp && getFlag(TYPE_SPECIFIED)
+             && value.getType() != type)
       {
         try
           {
-            value = new QuoteExp(field.getReflectField().get(null));
+            Object val = ((QuoteExp) value).getValue();
+            Type t = getType();
+            value = new QuoteExp(t.coerceFromObject(val), t);
           }
         catch (Throwable ex)
           {
@@ -670,12 +699,12 @@ public class Declaration
 
   public Declaration (Object name)
   {
-    this(name, Type.pointer_type);
+    setName(name);
   }
 
-  public Declaration (Object s, Type type)
+  public Declaration (Object name, Type type)
   {
-    setName(s);
+    setName(name);
     setType(type);
   }
 

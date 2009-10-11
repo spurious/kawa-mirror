@@ -1,3 +1,9 @@
+2009-10-11  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (inline): Do inlineIfConstant after we've adjusted
+	the result type, so the former can make use of the latter.
+	Also set and adjust return type for unary calls, not just binary.
+
 2009-10-03  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (compile): 	If target is float/double and args

@@ -1,3 +1,16 @@
+2009-10-11  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (type, typeExp): This are now initially null,
+	unless the type is specifier.  The get set by type inference or
+	the first getType access.  This allows better type inference.
+	(<init>(Object)): Set name but not type as null.
+	(getValue): Coerce/override type of value.
+	* InlineCalls.java (walkScopeExp): New method.
+	* ModuleExp.java (evalModule2): Simplify the Declaration->Location
+	import.
+	* ApplyExp.java (inlineIfConstant): Set type of resulting QuoteExp.
+	* ExpWalk.java (walkDeclarationType): Get "raw" typeExp.
+
 2009-10-09  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setTypeExp): Simplify/generalize by using

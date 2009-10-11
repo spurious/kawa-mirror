@@ -59,7 +59,7 @@ public class ExpWalker
 
   protected final void walkDeclarationType (Declaration decl)
   {
-    Expression texp1 = decl.getTypeExp();
+    Expression texp1 = decl.typeExp;
     if (texp1 != null)
       {
         Expression texp2 = texp1.walk(this);

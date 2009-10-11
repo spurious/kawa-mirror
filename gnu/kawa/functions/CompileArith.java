@@ -88,29 +88,35 @@ public class CompileArith implements CanInline, Inlineable
     if (args.length > 2)
       return pairwise(proc, exp.getFunction(), args, walker);
 
-    Expression folded = exp.inlineIfConstant(proc, walker);
-    if (folded != exp)
-      return folded;
-
-    if (args.length == 2)
+    if (args.length == 2 || args.length == 1)
       {
         int kind1 = Arithmetic.classifyType(args[0].getType());
-        int kind2 = Arithmetic.classifyType(args[1].getType());
-        int rkind = getReturnKind(kind1, kind2);
-        if (rkind == Arithmetic.INTNUM_CODE)
+        int rkind;
+        if (args.length == 2)
           {
-            if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1))
-              rkind = Arithmetic.INT_CODE;
-            else if (kind2 == Arithmetic.INT_CODE && appropriateIntConstant(args, 0))
-              rkind = Arithmetic.INT_CODE;
-            else if (kind1 ==Arithmetic. LONG_CODE && appropriateLongConstant(args, 1))
-              rkind = Arithmetic.LONG_CODE;
-            else if (kind2 == Arithmetic.LONG_CODE && appropriateLongConstant(args, 0))
-              rkind = Arithmetic.LONG_CODE;
+            int kind2 = Arithmetic.classifyType(args[1].getType());
+            rkind = getReturnKind(kind1, kind2);
+            if (rkind == Arithmetic.INTNUM_CODE)
+              {
+                if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1))
+                  rkind = Arithmetic.INT_CODE;
+                else if (kind2 == Arithmetic.INT_CODE && appropriateIntConstant(args, 0))
+                  rkind = Arithmetic.INT_CODE;
+                else if (kind1 ==Arithmetic. LONG_CODE && appropriateLongConstant(args, 1))
+                  rkind = Arithmetic.LONG_CODE;
+                else if (kind2 == Arithmetic.LONG_CODE && appropriateLongConstant(args, 0))
+                  rkind = Arithmetic.LONG_CODE;
+              }
           }
+        else
+          rkind = kind1;
         rkind = adjustReturnKind(rkind);
         exp.setType(Arithmetic.kindType(rkind));
       }
+
+    Expression folded = exp.inlineIfConstant(proc, walker);
+    if (folded != exp)
+      return folded;
 
     switch (op)
       {

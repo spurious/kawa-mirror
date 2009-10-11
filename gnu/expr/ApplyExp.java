@@ -626,7 +626,7 @@ public class ApplyExp extends Expression
       }
     try
       {
-	return new QuoteExp(proc.applyN(vals));
+	return new QuoteExp(proc.applyN(vals), type);
       }
     catch (Throwable ex)
       {

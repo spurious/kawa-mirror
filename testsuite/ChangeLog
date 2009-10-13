@@ -1,3 +1,11 @@
+2009-10-12  Per Bothner  <per@bothner.com>
+
+	* revcomp.scm: New benchmark, for shootout.alioth.debian.org.
+	Loosely based on Java version contributed by Anthony Donnefort
+	and slightly modified to read 82 bytes at a time by Razii.
+	* revcomp-output.txt: Expected output.
+	* Makefile.am: Update accordingly.
+
 2009-10-09  Per Bothner  <per@bothner.com>
 
 	* nbody.scm: New benchmark, from shootout.alioth.debian.org.

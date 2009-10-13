@@ -11,6 +11,9 @@ endif
 if WITH_SAX2
 SAX2_TESTS = check-MySAXApp
 endif
+
+WARN_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
+
 all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
@@ -29,7 +32,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-fannkuch check-fasta check-mandelbrot check-nbody \
-  check-nsieve check-pidigits check-regexdna check-spectralnorm
+  check-nsieve check-pidigits check-regexdna check-revcomp check-spectralnorm
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -160,7 +163,7 @@ check-fannkuch: fannkuch.class
 
 fasta.class: $(srcdir)/fasta.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
-	$(KAWA) --main -C $(srcdir)/fasta.scm
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/fasta.scm
 
 check-fasta: fasta.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
@@ -216,6 +219,21 @@ check-regexdna: regexdna.class regexdna-input.txt
 	@if diff $(srcdir)/regexdna-output.txt tmp-regexdna.log; \
 	  then echo '# regexdna test passes'; \
 	  else echo FAIL regexdna test; fi
+
+revcomp-input.txt: fasta.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fasta 1000 >revcomp-input.txt
+
+revcomp.class: $(srcdir)/revcomp.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/revcomp.scm
+
+check-revcomp: revcomp.class revcomp-input.txt
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) revcomp < revcomp-input.txt >tmp-revcomp.log
+	@if diff $(srcdir)/revcomp-output.txt tmp-revcomp.log; \
+	  then echo '# revcomp test passes'; \
+	  else echo FAIL revcomp test; fi
 
 spectralnorm.class: $(srcdir)/spectralnorm.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
@@ -386,4 +404,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt \
   regexdna.scm regexdna-output.txt \
+  revcomp.scm revcomp-output.txt \
   spectralnorm.scm spectralnorm-output.txt

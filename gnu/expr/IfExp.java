@@ -149,11 +149,7 @@ public class IfExp extends Expression
   {
     Type t1 = then_clause.getType();
     Type t2 = else_clause == null ? Type.voidType : else_clause.getType();
-    if (t1 == t2)
-      return t1;
-    // FIXME - implement union types:
-    // return Type.lowestCommonSuperType(t1, t2);
-    return Type.pointer_type;
+    return Language.unionType(t1, t2);
   }
 
   public void print (OutPort out)

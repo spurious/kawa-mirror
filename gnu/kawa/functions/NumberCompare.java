@@ -403,6 +403,6 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return Compilation.scmBooleanType;
+    return Type.booleanType;
   }
 }

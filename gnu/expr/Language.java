@@ -653,6 +653,35 @@ public abstract class Language
     return null;
   }
 
+  public static/* for now */ Type unionType (Type t1, Type t2)
+  {
+    if (t1 == Type.toStringType)
+      t1 = Type.javalangStringType;
+    if (t2 == Type.toStringType)
+      t2 = Type.javalangStringType;
+    if (t1 == t2)
+      return t1;
+    if (t1 instanceof PrimType && t2 instanceof PrimType)
+      {
+        char sig1 = t1.getSignature().charAt(0);
+        char sig2 = t2.getSignature().charAt(0);
+        if (sig1 == sig2)
+          return t1;
+        if ((sig1 == 'B' || sig1 == 'S' || sig1 == 'I') && (sig2 == 'I' || sig2 == 'J'))
+          return t2;
+        if ((sig2 == 'B' || sig2 == 'S' || sig2 == 'I') && (sig1 == 'I' || sig1 == 'J'))
+          return t1;
+        if (sig1 == 'F' && sig2 == 'D')
+          return t2;
+        if (sig2 == 'F' && sig1 == 'D')
+          return t1;
+        return Type.objectType;
+      }
+    // FIXME handle class types better:
+    // Type.lowestCommonSuperType(t1, t2);
+    return Type.objectType;
+  }
+
   public Declaration declFromField (ModuleExp mod, Object fvalue, Field fld)
   {
     String fname = fld.getName();

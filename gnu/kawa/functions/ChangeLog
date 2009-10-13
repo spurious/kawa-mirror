@@ -1,3 +1,7 @@
+2009-10-12  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (getReturnType): Change to Type.booleanType.
+
 2009-10-11  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (inline): Do inlineIfConstant after we've adjusted

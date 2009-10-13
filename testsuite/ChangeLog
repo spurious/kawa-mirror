@@ -1,5 +1,9 @@
 2009-10-12  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (inlining.class):  Also check recomp#revcomp.
+	* revcomp.scm (revcomp): Set explicit void return type.
+	* inlining.expected: Update accordingly.
+
 	* revcomp.scm: New benchmark, for shootout.alioth.debian.org.
 	Loosely based on Java version contributed by Anthony Donnefort
 	and slightly modified to read 82 bytes at a time by Razii.

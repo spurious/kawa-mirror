@@ -26,7 +26,7 @@ and slightly modified to read 82 bytes at a time by Razii.
 	  (loop)))
     c))
 
-(define (revcomp (in :: java.io.InputStream))
+(define (revcomp (in :: java.io.InputStream)) :: void
   (let* ((line (byte[] length: 82))
 	 (i :: int 0) ;; index in line
 	 (read :: int 0) ;; used size of line

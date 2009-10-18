@@ -1,3 +1,9 @@
+2009-10-17  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (walkLambdaExp):  Don't compare getType of
+	this-paramater with null - since getType is never null.
+	This caused the type of this to incorrectly be objectType.
+
 2009-10-12  Per Bothner  <per@bothner.com>
 
 	* Language.java (unionType): New method.

@@ -178,7 +178,7 @@ public class InlineCalls extends ExpWalker
   {
     Declaration firstDecl = exp.firstDecl();
     if (firstDecl != null && firstDecl.isThisParameter()
-        && ! exp.isClassMethod() && firstDecl.getType() == null)
+        && ! exp.isClassMethod() && firstDecl.type == null)
       {
         firstDecl.setType(comp.mainClass);
       }

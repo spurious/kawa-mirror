@@ -6,9 +6,6 @@
 (define (make-vector (k :: <int>) #!optional (fill #!undefined)) :: vector
   (gnu.lists.FVector k fill))
 
-(define ($make$vector$ #!rest (args :: <Object[]>)) :: <vector>
-  (gnu.lists.FVector args))
-
 (define (vector-length x :: <vector>) :: <int>
   (invoke x 'size))
 

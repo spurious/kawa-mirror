@@ -553,7 +553,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case URI_TYPE_CODE:
         return makeURIProc;
       case VECTOR_TYPE_CODE:
-        return new PrimProcedure("kawa.lib.vectors", "$make$vector$"+VARARGS_SUFFIX, 1);
+        return new PrimProcedure("gnu.lists.FVector", "make", 1);
       case LIST_TYPE_CODE:
         return gnu.kawa.functions.MakeList.list;
       case STRING_TYPE_CODE:

@@ -1,3 +1,7 @@
+2009-10-17  Per Bothner  <per@bothner.com>
+
+	* vectors.scm ($make$vector$): Remove no-longer used procedure.
+
 2009-10-09  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (define-procedure): Use 'java.lang.Object' explicitly

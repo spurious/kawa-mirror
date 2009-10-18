@@ -5,6 +5,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.Method;
 import gnu.kawa.lispexpr.LispLanguage;
 import gnu.kawa.functions.CompileNamedPart;
 
@@ -207,8 +208,8 @@ public class Quote extends Syntax
                     Expression[] args = new Expression[nargs];
                     vec.copyInto(args);
                     args[nargs-1] = coerceExpression(cdr, tr);
-                    String method = splicing == 0 ? "consX" : "append";
-                    cdr = Invoke.makeInvokeStatic(quoteType, method, args);
+                    Method method = splicing == 0 ? consXMethod : appendMethod;
+                    cdr = new ApplyExp(method, args);
                   }
                 rest = pair;
                 break;
@@ -232,7 +233,7 @@ public class Quote extends Syntax
             Expression[] args = new Expression[2];
             args[0] = coerceExpression(car, tr);
             args[1] = coerceExpression(cdr, tr);
-            cdr = Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
+            cdr = new ApplyExp(makePairMethod, args);
           }
         else
           cdr = Translator.makePair(pair, car, cdr);
@@ -274,12 +275,12 @@ public class Quote extends Syntax
           {
             // The n==1 case: Only a single pair before rest.
             args[0] = leaf(list.getCar(), tr);
-	    return Invoke.makeInvokeStatic(Compilation.typePair, "make", args);
+	    return new ApplyExp(makePairMethod, args);
           }
         else
           {
             args[0] = leaf(result, tr);
-	    return Invoke.makeInvokeStatic(quoteType, "append", args);
+	    return new ApplyExp(appendMethod, args);
           }
       }
     return result;
@@ -395,7 +396,7 @@ public class Quote extends Syntax
 	    if (max_state < 3)
 	      result = makeInvokeMakeVector(args);
 	    else
-	      result = Invoke.makeInvokeStatic(vectorAppendType, "apply", args);
+	      result = new ApplyExp(vectorAppendMethod, args);
 	  }
       }
     else
@@ -410,13 +411,7 @@ public class Quote extends Syntax
 
   private static ApplyExp makeInvokeMakeVector (Expression[] args)
   {
-    return Invoke.makeInvokeStatic(ClassType.make("kawa.lib.vectors"),
-                                   /* #ifdef JAVA5 */
-                                   "$make$vector$",
-                                   /* #else */
-                                   // "$make$vector$$V",
-                                   /* #endif */
-                                   args);
+    return new ApplyExp(makeVectorMethod, args);
   }
 
   public Expression rewrite (Object obj, Translator tr)
@@ -477,7 +472,13 @@ public class Quote extends Syntax
     return result;
   }
 
-  static final ClassType vectorAppendType
-    = ClassType.make("kawa.standard.vector_append");
+  static final Method vectorAppendMethod
+  = ClassType.make("kawa.standard.vector_append")
+    .getDeclaredMethod("apply$V", 1);
   static final ClassType quoteType = ClassType.make("kawa.lang.Quote");
+  static final Method consXMethod = quoteType.getDeclaredMethod("consX$V", 1);
+  static final Method appendMethod = quoteType.getDeclaredMethod("append$V", 1);
+  static final Method makePairMethod = Compilation.typePair.getDeclaredMethod("make", 2);
+  static final Method makeVectorMethod = ClassType.make("gnu.lists.FVector")
+    .getDeclaredMethod("make", 1);
 }

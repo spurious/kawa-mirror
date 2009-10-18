@@ -61,6 +61,11 @@ public class FVector extends SimpleVector
   // }
   /* #endif */
 
+  public static FVector make(Object... data)
+  {
+    return new FVector(data);
+  }
+
   /** Get the allocated length of the data buffer. */
   public int getBufferLength()
   {

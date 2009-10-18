@@ -1137,6 +1137,8 @@ public class Scheme extends LispLanguage
           }
       }
     char ch0 = name.charAt(0);
+
+    // Look for quantities.
     if (ch0 == '-' || ch0 == '+' || Character.digit(ch0, 10) >= 0)
       {
         // 1: initial + or -1 seen.
@@ -1283,6 +1285,7 @@ public class Scheme extends LispLanguage
               }
           }
       }
+
     boolean sawAngle;
     if (len > 2 && ch0 == '<' && name.charAt(len-1) == '>')
       {

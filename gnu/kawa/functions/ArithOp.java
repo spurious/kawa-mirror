@@ -7,6 +7,20 @@ import gnu.kawa.lispexpr.LangPrimType;
 
 public abstract class ArithOp extends ProcedureN
 {
+  static final int ADD = 1;
+  static final int SUB = 2;
+  static final int MUL = 3;
+  static final int DIV = 4;
+  static final int REM = 5;
+  public static final int ASHIFT_GENERAL = 6;
+  public static final int ASHIFT_LEFT = 7;
+  public static final int ASHIFT_RIGHT = 8;
+  public static final int LSHIFT_RIGHT = 9; // Not implemented yet.
+  public static final int AND = 10;
+  public static final int IOR = 11;
+  public static final int XOR = 12;
+  public static final int NOT = 13;
+
   public ArithOp (String name)
   {
     super(name);
@@ -53,5 +67,4 @@ public abstract class ArithOp extends ProcedureN
     else
       return 0;
   }
-
 }

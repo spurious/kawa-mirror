@@ -4,14 +4,10 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.lispexpr.*;
+import static gnu.kawa.functions.ArithOp.*;
 
 public class CompileArith implements CanInline, Inlineable
 {
-  static final int ADD = 1;
-  static final int SUB = 2;
-  static final int MUL = 3;
-  static final int DIV = 4;
-  static final int REM = 5;
   int op;
   Procedure proc;
 
@@ -33,7 +29,11 @@ public class CompileArith implements CanInline, Inlineable
   {
     int op = ((DivideOp) proc).op == DivideOp.MODULO ? REM : DIV;
     return new CompileArith(proc, op);
-                          
+  }
+
+  public static CompileArith forBitwise(Object proc)
+  {
+    return new CompileArith(proc, ((BitwiseOp) proc).op);
   }
 
   public boolean appropriateIntConstant(Expression[] args, int iarg)
@@ -79,20 +79,21 @@ public class CompileArith implements CanInline, Inlineable
   {
     exp.walkArgs(walker, argsInlined);
  
-    // Inlining may yield PrimProcedure instructions of bytecode instructions
-    // which we don't know how to interpret (yet).
-    if (! walker.getCompilation().mustCompile)
-      return exp;
-
     Expression[] args = exp.getArgs();
     if (args.length > 2)
       return pairwise(proc, exp.getFunction(), args, walker);
 
+    Expression folded = exp.inlineIfConstant(proc, walker);
+    if (folded != exp)
+      return folded;
+
+    int rkind = 0;
     if (args.length == 2 || args.length == 1)
       {
         int kind1 = Arithmetic.classifyType(args[0].getType());
-        int rkind;
-        if (args.length == 2)
+        if (args.length == 2
+            // Ignore shift count when figuring return type of shifts.
+            && (op < ASHIFT_GENERAL || op > LSHIFT_RIGHT))
           {
             int kind2 = Arithmetic.classifyType(args[1].getType());
             rkind = getReturnKind(kind1, kind2);
@@ -109,26 +110,32 @@ public class CompileArith implements CanInline, Inlineable
               }
           }
         else
-          rkind = kind1;
+          {
+            rkind = kind1;
+          }
         rkind = adjustReturnKind(rkind);
         exp.setType(Arithmetic.kindType(rkind));
       }
 
-    Expression folded = exp.inlineIfConstant(proc, walker);
-    if (folded != exp)
-      return folded;
+    // Inlining may yield PrimProcedure instructions of bytecode instructions
+    // which we don't know how to interpret (yet).
+    if (! walker.getCompilation().mustCompile)
+      return exp;
 
     switch (op)
       {
       case ADD:
       case SUB:
         return inlineAdd((AddOp) proc, exp, walker);
-      case MUL:
-        return inlineMul((MultiplyOp) proc, exp, walker);
       case DIV:
       case REM:
         return inlineDiv((DivideOp) proc, exp, walker);
-      default: throw new Error();
+      case NOT:
+        if (rkind > 0)
+          return inlineNot(exp, rkind, walker);
+        // else fall through ...
+      default:
+        return exp;
       }
   }
 
@@ -240,25 +247,25 @@ public class CompileArith implements CanInline, Inlineable
         comp.getCode().emitInvokeStatic(meth);
       }
     else if (kind == Arithmetic.INTNUM_CODE
-             && (op == ADD || op == MUL || op == SUB))
+             && (op == ADD || op == MUL || op == SUB
+                 || op == AND || op == IOR || op == XOR
+                 || (op >= ASHIFT_GENERAL && op <= ASHIFT_RIGHT)))
       {
         compileIntNum(args[0], args[1], kind1, kind2, comp);
       }
-    else if (kind != Arithmetic.INT_CODE
-             && kind != Arithmetic.LONG_CODE
-             && kind != Arithmetic.FLOAT_CODE
-             && kind != Arithmetic.DOUBLE_CODE)
-      {
-        ApplyExp.compile(exp, comp, target);
-        return;
-      }
-    else
+    else if (kind == Arithmetic.INT_CODE
+             || kind == Arithmetic.LONG_CODE
+             || ((kind == Arithmetic.FLOAT_CODE
+                  || kind == Arithmetic.DOUBLE_CODE)
+                 && (op <= REM || op >= AND)))
       {
         Target wtarget = StackTarget.getInstance(wtype);
 
         CodeAttr code = comp.getCode();
         for (int i = 0;  i < len;  i++)
           {
+            if (i == 1 && op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
+              wtarget = StackTarget.getInstance(Type.intType);
             args[i].compile(comp, wtarget);
             if (i == 0)
               continue;
@@ -268,10 +275,22 @@ public class CompileArith implements CanInline, Inlineable
               case Arithmetic.LONG_CODE:
               case Arithmetic.FLOAT_CODE:
               case Arithmetic.DOUBLE_CODE:
-                code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
+                if (op == ASHIFT_GENERAL)
+                  {
+                    Type[] margs = { wtype, Type.intType };
+                    Method method = ClassType.make("gnu.math.IntNum").getDeclaredMethod("shift", margs);
+                    code.emitInvokeStatic(method);
+                  }
+                else
+                  code.emitBinop(primitiveOpcode(), (PrimType) wtype.getImplementationType());
                 break;
               }
           }
+      }
+    else
+      {
+        ApplyExp.compile(exp, comp, target);
+        return;
       }
     target.compileFromStack(comp, wtype);
   }
@@ -333,6 +352,12 @@ public class CompileArith implements CanInline, Inlineable
         type1 = kind1 == Arithmetic.INT_CODE ? Type.intType :  Arithmetic.typeIntNum;
         type2 = kind2 == Arithmetic.INT_CODE ? Type.intType :  Arithmetic.typeIntNum;
       }
+    else if (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
+      {
+        type1 = Arithmetic.typeIntNum;
+        type2 = Type.intType;
+        swap = false;
+      }
     else
       {
         type1 = type2 = Arithmetic.typeIntNum;
@@ -347,13 +372,26 @@ public class CompileArith implements CanInline, Inlineable
         type1 = Arithmetic.typeIntNum;
         type2 = LangPrimType.intType;
       }
-    String mname;
+    String mname = null;
     Type[] argTypes = null;
+    ObjectType mclass = Arithmetic.typeIntNum;
     switch (op)
       {
       case ADD: mname = "add";  break;
       case SUB: mname = "sub";  break;
       case MUL: mname = "times";  break;
+      case AND:
+        mname = "and";
+        /* ... fall through ... */
+      case IOR:
+        if (mname == null)
+          mname = "ior";
+        /* ... fall through ... */
+      case XOR:
+        if (mname == null)
+          mname = "xor";
+        mclass = ClassType.make("gnu.math.BitOps");
+        break;
       case DIV:
       case REM:
         mname = op == DIV ? "quotient" : "remainder";
@@ -366,17 +404,27 @@ public class CompileArith implements CanInline, Inlineable
             argTypes = new Type[] { type1, type2, Type.intType };
           }
         break;
+      case ASHIFT_LEFT:
+      case ASHIFT_RIGHT:
+        mname = op == ASHIFT_LEFT ? "shiftLeft" : "shiftRight";
+        mclass = ClassType.make("gnu.kawa.functions.BitwiseOp");
+        break;
+      case ASHIFT_GENERAL:
+        mname = "shift";
+        break;
       default: throw new Error();
       }
     if (argTypes == null)
       argTypes = new Type[] { type1, type2 };
-    meth = Arithmetic.typeIntNum.getMethod(mname, argTypes);
+    meth = mclass.getMethod(mname, argTypes);
     code.emitInvokeStatic(meth);
     return true;
   }
 
   public int getReturnKind (int kind1, int kind2)
   {
+    if (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
+      return kind1;
     return kind1 <= 0 || (kind1 > kind2 && kind2 > 0) ? kind1 : kind2;
   }
 
@@ -478,12 +526,6 @@ public class CompileArith implements CanInline, Inlineable
     return exp;
   }
 
-  public static Expression inlineMul (MultiplyOp proc,
-                                      ApplyExp exp, InlineCalls walker)
-  {
-    return exp;
-  }
-
   public static Expression inlineDiv (DivideOp proc,
                                       ApplyExp exp, InlineCalls walker)
   {
@@ -492,6 +534,30 @@ public class CompileArith implements CanInline, Inlineable
       {
         args = new Expression[] { QuoteExp.getInstance(IntNum.one()), args[1] };
         exp = new ApplyExp(exp.getFunction(), args);
+      }
+    return exp;
+  }
+
+  public Expression inlineNot (ApplyExp exp, int kind, InlineCalls walker)
+  {
+    if (exp.getArgCount() == 1)
+      {
+        Expression arg = exp.getArg(0);
+        if (kind == Arithmetic.INT_CODE || kind == Arithmetic.LONG_CODE)
+          {
+            Expression[] args = {arg, QuoteExp.getInstance(IntNum.minusOne())};
+            return walker.walkApplyOnly(new ApplyExp(BitwiseOp.xor, args));
+          }
+        String cname;
+        if (kind == Arithmetic.INTNUM_CODE)
+          cname = "gnu.math.BitOps";
+        else if (kind == Arithmetic.BIGINTEGER_CODE)
+          cname = "java.meth.BigInteger";
+        else
+          cname = null;
+        if (cname != null)
+          return new ApplyExp(ClassType.make(cname).getDeclaredMethod("not", 1),
+                              exp.getArgs());
       }
     return exp;
   }
@@ -505,6 +571,12 @@ public class CompileArith implements CanInline, Inlineable
       case MUL:    return 104;
       case DIV:    return 108;
       case REM:    return 112;
+      case ASHIFT_LEFT:  return 120; // ishl
+      case ASHIFT_RIGHT:  return 122; // ishr
+      case LSHIFT_RIGHT:  return 124; // iushr
+      case AND:  return 126; // iand
+      case IOR:  return 128; // ior
+      case XOR:  return 130; // ixor
       default:     return -1;
       }
   }

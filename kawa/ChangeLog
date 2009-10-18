@@ -1,3 +1,8 @@
+2009-10-18  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Many bitwise-* functions
+	are now implemented by gnu.kawa.functions.BitwiseOp.
+
 2009-10-17  Per Bothner  <per@bothner.com>
 
 	* Quote.java:  Use statically-looked-up helper Methods, rather than

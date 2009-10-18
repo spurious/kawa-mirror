@@ -193,20 +193,6 @@
 (define (inexact->exact (num :: java.lang.Number)) :: java.lang.Number
   (gnu.kawa.functions.Arithmetic:toExact num))
 
-(define (bitwise-arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
-  (gnu.math.IntNum:shift value amount))
-
-(define (bitwise-arithmetic-shift-left (value :: <integer>) (amount :: <int>)) :: <integer>
-  (if (< amount 0) (throw 'misc-error "shift amount must be non-negative"))
-  (gnu.math.IntNum:shift value amount))
-
-(define (bitwise-arithmetic-shift-right (value :: <integer>) (amount :: <int>)) :: <integer>
-  (if (< amount 0) (throw 'misc-error "shift amount must be non-negative"))
-  (gnu.math.IntNum:shift value (- amount)))
-
-(define (bitwise-not (i :: <integer>)) :: <integer>
-  (gnu.math.BitOps:not i))
-
 (define (logop (op :: <int>) (i :: <integer>) (j :: <integer>)) :: <integer>
   (invoke-static <gnu.math.BitOps> 'bitOp op i j))
 
@@ -228,34 +214,6 @@
 (define (bitwise-bit-field (i :: <integer>) (start :: <int>) (end :: <int>))
   :: <integer>
   (invoke-static <gnu.math.BitOps> 'extract i start end))
-
-(define (bitwise-and #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
-	-1
-	(let ((result :: <integer> (args 0)))
-	  (do ((i :: <int> 1 (+ i 1)))
-	      ((>= i n) result)
-	    (let ((arg-i :: <integer> (args i)))
-	      (set! result (gnu.math.BitOps:and result arg-i))))))))
-
-(define (bitwise-ior #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
-	0
-	(let ((result :: <integer> (args 0)))
-	  (do ((i :: <int> 1 (+ i 1)))
-	      ((>= i n) result)
-	    (set! result (gnu.math.BitOps:ior result (args i))))))))
-
-(define (bitwise-xor #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
-	0
-	(let ((result :: <integer> (args 0)))
-	  (do ((i :: <int> 1 (+ i 1)))
-	      ((>= i n) result)
-	    (set! result (gnu.math.BitOps:xor result (args i))))))))
 
 (define (bitwise-if (e1 :: integer) (e2 :: integer) (e3  integer)) :: integer
   (gnu.math.BitOps:ior (gnu.math.BitOps:and e1 e2)

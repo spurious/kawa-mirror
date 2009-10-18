@@ -1,3 +1,9 @@
+2009-10-18  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (bitwise-arithmetic-shift, bitwise-arithmetic-shift-left,
+	bitwise-arithmetic-shift-right, bitwise-not, bitwise-and, bitwise-ior,
+	bitwise-xor): Removed - now implemented by gnu.kawa.functions.BitwiseOp.
+
 2009-10-17  Per Bothner  <per@bothner.com>
 
 	* vectors.scm ($make$vector$): Remove no-longer used procedure.

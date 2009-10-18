@@ -435,26 +435,25 @@ public class Scheme extends LispLanguage
       defProcStFld("exit", "kawa.lib.rnrs.programs");
       defProcStFld("command-line", "kawa.lib.rnrs.programs");
 
-      defProcStFld("bitwise-arithmetic-shift", "kawa.lib.numbers");
-      defProcStFld("arithmetic-shift", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-arithmetic-shift"));
-      defProcStFld("ash", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-arithmetic-shift"));
-      defProcStFld("bitwise-arithmetic-shift-left", "kawa.lib.numbers");
-      defProcStFld("bitwise-arithmetic-shift-right", "kawa.lib.numbers");
-      defProcStFld("bitwise-and", "kawa.lib.numbers");
-      defProcStFld("logand", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-and"));
-      defProcStFld("bitwise-ior", "kawa.lib.numbers");
-      defProcStFld("logior", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-ior"));
-      defProcStFld("bitwise-xor", "kawa.lib.numbers");
-      defProcStFld("logxor", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-xor"));
+      defProcStFld("bitwise-arithmetic-shift",
+                   "gnu.kawa.functions.BitwiseOp", "ashift");
+      defProcStFld("arithmetic-shift",
+                   "gnu.kawa.functions.BitwiseOp", "ashift");
+      defProcStFld("ash",
+                   "gnu.kawa.functions.BitwiseOp", "ashift");
+      defProcStFld("bitwise-arithmetic-shift-left",
+                   "gnu.kawa.functions.BitwiseOp", "ashiftl");
+      defProcStFld("bitwise-arithmetic-shift-right",
+                   "gnu.kawa.functions.BitwiseOp", "ashiftr");
+      defProcStFld("bitwise-and", "gnu.kawa.functions.BitwiseOp", "and");
+      defProcStFld("logand", "gnu.kawa.functions.BitwiseOp", "and");
+      defProcStFld("bitwise-ior", "gnu.kawa.functions.BitwiseOp", "ior");
+      defProcStFld("logior", "gnu.kawa.functions.BitwiseOp", "ior");
+      defProcStFld("bitwise-xor", "gnu.kawa.functions.BitwiseOp", "xor");
+      defProcStFld("logxor", "gnu.kawa.functions.BitwiseOp", "xor");
       defProcStFld("bitwise-if", "kawa.lib.numbers");
-      defProcStFld("bitwise-not", "kawa.lib.numbers");
-      defProcStFld("lognot", "kawa.lib.numbers",
-                   Compilation.mangleNameIfNeeded("bitwise-not"));
+      defProcStFld("bitwise-not", "gnu.kawa.functions.BitwiseOp", "not");
+      defProcStFld("lognot", "gnu.kawa.functions.BitwiseOp", "not");
       defProcStFld("logop", "kawa.lib.numbers");
       defProcStFld("bitwise-bit-set?", "kawa.lib.numbers");
       defProcStFld("logbit?", "kawa.lib.numbers",

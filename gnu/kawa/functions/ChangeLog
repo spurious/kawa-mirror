@@ -1,3 +1,12 @@
+2009-10-18  Per Bothner  <per@bothner.com>
+
+	* BitwiseOp.java: New class, extends ArithOp.  (Re-)implements
+	bitwise-ior, bitwise-arithmetic-shift, etc.
+	* Makefile.am: Update accordingly.
+	* CompileArith.java: Optimize BitwiseOp procedures.
+	* ArithOp.java (ADD, SUB, ...): New constants, some from CompileArith.
+	* CompileArith.java: Update to use static import of ADD/....
+
 2009-10-12  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (getReturnType): Change to Type.booleanType.

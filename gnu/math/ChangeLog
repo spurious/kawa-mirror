@@ -1,3 +1,8 @@
+2009-10-18  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (shift): Two new overloaded static methods, for
+	int and long general shift, useful for compiled code.
+
 2009-10-02  Per Bothner  <per@bothner.com>
 
 	* FixedRealFormat.java (format): Use asRealNumOrNull rather than a

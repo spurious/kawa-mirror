@@ -193,6 +193,7 @@ java_sources = \
   Arrays.java \
   ArrayRef.java \
   ArraySet.java \
+  BitwiseOp.java \
   CompilationHelpers.java \
   CompileArith.java \
   CompileNamedPart.java \

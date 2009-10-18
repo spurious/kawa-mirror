@@ -6,8 +6,8 @@
   ((item-check) :: int
    (if (eq? left #!null)
        item
-       (+ item (- (left:item-check) (right:item-check)))))
-)
+       (+ item (- (left:item-check) (right:item-check))))))
+
 (define (bottom-up-tree (item :: int) (depth :: int)) :: TreeNode
   (if (= depth 0)
       (TreeNode item: item)
@@ -17,7 +17,6 @@
 		  right: (bottom-up-tree item2 depth-1)
 		  item: item))))
 
-
 (define (test (max-depth :: int ))
   (let ((stretch-depth :: int (+ max-depth 1)))
     (format #t "stretch tree of depth ~d~c check: ~d~%" stretch-depth #\tab
@@ -25,7 +24,8 @@
   (define long-lived-tree :: TreeNode (bottom-up-tree 0 max-depth))
   (do ((d :: int min-depth (+ d 2)))
       ((> d max-depth) #!void)
-    (let ((iterations :: int (ash 1 (+ max-depth min-depth (- d))))
+    (let ((iterations :: int (bitwise-arithmetic-shift-left
+			      1 (+ max-depth min-depth (- d))))
 	  (check :: int 0))
       (format #t "~d~c trees of depth ~d~c check: ~d~%"
 	      (* iterations 2) #\tab d #\tab
@@ -39,5 +39,3 @@
 
 (define N (string->number (cadr (command-line))))
 (test N)
-
-

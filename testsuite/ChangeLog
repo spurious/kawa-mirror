@@ -1,3 +1,13 @@
+2009-10-18  Per Bothner  <per@bothner.com>
+
+	* fasta.scm (make-cumulative-table) Using vector-ref directly
+	optimizes better.
+	* mandelbrot.scm: Do inlining and other optimizations.
+	* fannkuch.scm: Various optimizations.
+	* Makefile.am (inlining.log): Also check inlining of binarytrees,
+	fasta, and mandelbrot benchmarks.  Add/fix fannkuch test.
+	* inlining.expected: Update accordingly.
+
 2009-10-12  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (inlining.class):  Also check recomp#revcomp.

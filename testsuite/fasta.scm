@@ -36,7 +36,7 @@
     (do ((i :: int 0 (+ i 1)))
 	((>= i n)
 	 cumulative)
-      (let ((x :: pair (frequency-table i)))
+      (let ((x :: pair (vector-ref frequency-table i)))
 	(set! cp (+ cp (cdr x)))
 	(set! (cumulative i) cp)))))
 

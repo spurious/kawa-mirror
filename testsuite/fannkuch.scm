@@ -26,32 +26,31 @@
 	((= i source:length) vec)
       (set! (vec i) (source i)))))
 
-(define (fannkuch n)
-  (let ((pi (do ((pi (int[] length: n))
-		 (i 0 (+ i 1)))
-                ((= i n) pi)
-	      (set! (pi i) i)))
-	(r n)
+(define (fannkuch (n :: int)) :: int
+  (let ((pi (int[] length: n))
+	(r :: int n)
 	(count (int[] length: n)))
-    (let loop ((flips 0)
-	       (perms 0))
+    (do ((i :: int 0 (+ i 1))) ((= i n))
+      (set! (pi i) i))
+    (let loop ((flips :: int 0)
+	       (perms :: int 0))
       (cond ((< perms 30)
 	     (do ((i :: int 0 (+ i 1)))
 		 ((>= i n))
 	       (format #t "~d" (+ (pi i) 1)))
 	     (newline)))
-     ;; (format #t "n:~d r:~d~%~!" n r)
       (do ()
           ((= r 1))
 	(set! (count (- r 1)) r)
 	(set! r (- r 1)))
-      (let ((flips2 (max (count-flips pi) flips)))
-	(let ((result
+      (let* ((flips1 (count-flips pi))
+	     (flips2 (if (> flips1 flips) flips1 flips)))
+	(let ((result :: int
 	       (let loop2 ()
 		 (if (= r n)
 		     flips2
 		     (let ((perm0 (pi 0)))
-		       (do ((i 0))
+		       (do ((i :: int 0))
 			   ((>= i r))
 			 (let ((j (+ i 1)))
 			   (set! (pi i) (pi j))
@@ -62,8 +61,8 @@
 			      (set! r (+ r 1))
 			      (loop2))
 			     (else
-			      #f)))))))
-	  (or result
+			      -1)))))))
+	  (if (>= result 0) result
 	      (loop flips2 (+ perms 1)))
 	  )))))
 

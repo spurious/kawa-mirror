@@ -692,7 +692,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
 inlining.log: InliningTest.class cycle1.class cycle2.class \
-  fannkuch.class fasta.class nbody.class pidigits.class revcomp.class spectralnorm.class Makefile
+  binarytrees.class fannkuch.class fasta.class mandelbrot.class nbody.class pidigits.class revcomp.class spectralnorm.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -704,11 +704,17 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize binarytrees.class bottomUpTree test >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize TreeNode.class itemCheck >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$$Ex' countFlips vectorCopy fannkuch >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize fasta.class randomNext >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$Ex' countFlips vectorCopy >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize Transformation.class next extract compose >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize mandelbrot.class compute >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize nbody.class A nbodySystem advance energy jupiter >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \

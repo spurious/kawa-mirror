@@ -1,3 +1,10 @@
+2009-10-19  Per Bothner  <per@bothner.com>
+
+	* nbody.scm: Moving constants earlier makes for better code.
+	* regexdna.scm: Inlining and other optimizations.
+	* Makefile.am (inlining.log): Add inlining tests.
+	* inlining.expected: Update accordingly.
+
 2009-10-18  Per Bothner  <per@bothner.com>
 
 	* fasta.scm (make-cumulative-table) Using vector-ref directly

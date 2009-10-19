@@ -45,37 +45,38 @@
 		   "agggtaa[cgt]|[acg]ttaccct"))
 
 (define (regexdna (in :: java.io.InputStream))
-  (define r (java.io.InputStreamReader in "ISO-8859-1"))
-  (define sb (java.lang.StringBuilder 5100000))
-  (let ((cbuf (char[] length: 16384)))
-    (let loop ()
-      (let ((chars-read (r:read cbuf)))
-	(cond ((>= chars-read 0)
-	       (sb:append cbuf 0 chars-read)
-	       (loop))))))
-  (define initial-length (sb:length))
-  (define sequence :: string
-    (rewrite #/>.*\n|\n/ sb
-           (lambda (matcher destination) #!void)))
+  (let* ((r (java.io.InputStreamReader in "ISO-8859-1"))
+	 (sb :: java.lang.StringBuilder
+	  (let ((cbuf (char[] length: 16384))
+		(sb (java.lang.StringBuilder 5100000)))
+	    (let loop ()
+	      (let ((chars-read (r:read cbuf)))
+		(cond ((>= chars-read 0)
+		       (sb:append cbuf 0 chars-read)
+		       (loop)))))
+	    sb))
+	 (initial-length (sb:length))
+	 (sequence :: string
+		   (rewrite #/>.*\n|\n/ sb
+			   (lambda (matcher destination) #!void)))
+	 (code-length (sequence:length))
+	 (nvariants variants:length))
+    (do ((i :: int 0 (+ i 1)))
+	((>= i nvariants))
+      (let* ((count :: int 0)
+	     (variant (variants i))
+	     (m ((java.util.regex.Pattern:compile variant):matcher sequence)))
+	(do ()
+	    ((not (m:find)))
+	  (set! count (+ count 1)))
+	(format #t "~a ~d~%" variant count)))
 
-  (define code-length (sequence:length))
-  (define nvariants variants:length)
-  (do ((i :: int 0 (+ i 1)))
-      ((>= i nvariants))
-    (let* ((count :: int 0)
-	   (variant (variants i))
-	   (m ((java.util.regex.Pattern:compile variant):matcher sequence)))
-      (do ()
-	  ((not (m:find)))
-	(set! count (+ count 1)))
-      (format #t "~a ~d~%" variant count)))
+    (set! sequence
+	  (rewrite #/[WYKMSRBDVHN]/ sequence
+		   (lambda (matcher destination)
+		     (destination:append (replacements:get(matcher:group 0))))))
 
-  (set! sequence
-	(rewrite #/[WYKMSRBDVHN]/ sequence
-		 (lambda (matcher destination)
-		   (destination:append (replacements:get(matcher:group 0))))))
-
-  (format #t "~%~d~%~d~%~d~%"
-	  initial-length code-length (sequence:length)))
+    (format #t "~%~d~%~d~%~d~%"
+	    initial-length code-length (sequence:length))))
 
 (regexdna java.lang.System:in)

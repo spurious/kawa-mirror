@@ -22,6 +22,10 @@ modified slightly by Chad Whipkey.
     ((increment lhs rhs)
      (set! lhs (- lhs rhs)))))
 
+(define-constant PI :: double 3.141592653589793)
+(define-constant SOLAR_MASS :: double (* 4 PI PI))
+(define-constant DAYS_PER_YEAR :: double 365.24)
+
 (define-simple-class Body ()
   (x :: double)
   (y :: double)
@@ -94,10 +98,6 @@ modified slightly by Chad Whipkey.
 		 (distance (java.lang.Math:sqrt (+ (square dx) (square dy) (square dz)))))
 	    (decrement e (/ (* ibody:mass jbody:mass) distance))))))
     e))
-
-(define-constant PI :: double 3.141592653589793)
-(define-constant SOLAR_MASS :: double (* 4 PI PI))
-(define-constant DAYS_PER_YEAR :: double 365.24)
 
 (define (jupiter) :: Body
   (Body x: 4.84143144246472090e+00

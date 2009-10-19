@@ -36,7 +36,7 @@
     (do ((i :: int 0 (+ i 1)))
 	((>= i n)
 	 cumulative)
-      (let ((x :: pair (vector-ref frequency-table i)))
+      (let ((x :: pair (frequency-table i)))
 	(set! cp (+ cp (cdr x)))
 	(set! (cumulative i) cp)))))
 
@@ -47,7 +47,7 @@
     (set! last (remainder (+ 29573 (* last 3877)) 139968))
     (/ (* max last) im)))
 
-(define (select-random (frequency-table :: vector) (cumulative-table :: double[]))
+(define (select-random (frequency-table :: vector) (cumulative-table :: double[])) :: int
   (let ((rvalue (random-next 1.0)))
     (do ((i :: int 0 (+ i 1)))
 	((<= rvalue (cumulative-table i))
@@ -59,7 +59,8 @@
   (syntax-rules ()
     ((generate-fasta id desc n_ line-length out action)
      (let ((n :: int n_)
-	   (index :: int 0))
+	   (index :: int 0)
+	   (NL (char->integer #\newline)))
        (out:write (((string-append ">" id " " desc "\n"):toString):getBytes))
        (do ()
 	   ((<= n 0))
@@ -72,7 +73,7 @@
 	       ((>= i m))
 	     (set! (bbuffer index) action)
 	     (set! index (+ index 1)))
-	   (set! (bbuffer index) (char->integer #\newline))
+	   (set! (bbuffer index) NL)
 	   (set! index (+ index 1))
 	   (set! n (- n line-length))))
 	 (if (> index 0)

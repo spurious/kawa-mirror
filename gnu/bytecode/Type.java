@@ -34,6 +34,13 @@ public abstract class Type
     return this;
   }
 
+  /** If this is a type alias, get the aliased type.
+   */
+  public Type getRealType ()
+  {
+    return this;
+  }
+
   static ClassToTypeMap mapClassToType;
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */

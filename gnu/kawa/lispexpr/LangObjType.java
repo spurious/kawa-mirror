@@ -183,6 +183,11 @@ public class LangObjType extends ObjectType implements TypeValue
     return implementationType.getReflectClass();
   }
 
+  public Type getRealType()
+  {
+    return implementationType;
+  }
+
   public Type getImplementationType()
   {
     return implementationType;

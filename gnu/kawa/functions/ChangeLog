@@ -1,3 +1,8 @@
+2009-10-19  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (inlineApplyToArgs): Use getRealType.
+	This allows optimizing (v i) where v is a LangObjType.vectorType.
+
 2009-10-18  Per Bothner  <per@bothner.com>
 
 	* BitwiseOp.java: New class, extends ArithOp.  (Re-)implements

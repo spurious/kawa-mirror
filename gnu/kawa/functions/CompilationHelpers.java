@@ -53,7 +53,7 @@ public class CompilationHelpers
             proc = walker.walk(proc);
             args[0] = proc;
           }
-        Type ptype = proc.getType();
+        Type ptype = proc.getType().getRealType();
         ApplyExp result;
         Compilation comp = walker.getCompilation();
         Language language = comp.getLanguage();

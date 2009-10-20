@@ -31,7 +31,7 @@ check-no-inline:
 
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-binarytrees check-fannkuch check-fasta check-mandelbrot check-nbody \
+  check-binarytrees check-fannkuch check-fasta check-knucleotide check-mandelbrot check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp check-spectralnorm
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
@@ -172,9 +172,20 @@ check-fasta: fasta.class
 	  then echo '# fasta test passes'; \
 	  else echo FAIL fasta test; fi
 
+knucleotide.class: $(srcdir)/knucleotide.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/knucleotide.scm
+
+check-knucleotide: knucleotide.class regexdna-input.txt
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) knucleotide < regexdna-input.txt >tmp-knucleotide.log
+	@if diff $(srcdir)/knucleotide-output.txt tmp-knucleotide.log; \
+	  then echo '# knucleotide test passes'; \
+	  else echo FAIL knucleotide test; fi
+
 nbody.class: $(srcdir)/nbody.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
-	$(KAWA) --main -C $(srcdir)/nbody.scm
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/nbody.scm
 
 check-nbody: nbody.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
@@ -415,6 +426,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   binarytrees.scm binarytrees-output.txt \
   fannkuch.scm fannkuch-output.txt \
   fasta.scm fasta-output.txt \
+  knucleotide.scm knucleotide-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \
   nbody.scm nbody-output.txt \
   nsieve.scm nsieve-output.txt \

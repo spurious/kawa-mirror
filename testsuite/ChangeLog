@@ -1,5 +1,11 @@
 2009-10-19  Per Bothner  <per@bothner.com>
 
+	* knucleotide.scm: New benchmark, for shootout.alioth.debian.org.
+	Based on mzscheme version, with some bits based on
+	Java version contributed by James McIlree.
+	* knucleotide-output.txt: Expected output.
+	* Makefile.am: Update accordingly.
+
 	* fasta.scm: Add some optimization tweaks.
 	(make-cumulative-table): Revert previous use of vector-ref,
 	since it is no longer needed.

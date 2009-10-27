@@ -1,3 +1,8 @@
+2009-10-27  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (rewriteClassDef): Allow *init* methods for
+	non-simple class if CLASS_SPECIFIED.
+
 2009-10-18  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Many bitwise-* functions

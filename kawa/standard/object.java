@@ -515,7 +515,8 @@ public class object extends Syntax
                 if ("*init*".equals(meth.getName()))
                   {
                     meth.setReturnType(Type.voidType);
-                    if (! oexp.isSimple())
+                    if (! oexp.isSimple() && ! oexp.getFlag(ClassExp.CLASS_SPECIFIED))
+
                       tr.error('e', "'*init*' methods only supported for simple classes");
                   }
                 Translator.setLine(meth, pair);

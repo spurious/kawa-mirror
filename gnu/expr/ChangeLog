@@ -1,5 +1,10 @@
 2009-10-28  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (compile): Handle passing a static link from a
+	constructor when it calls another (this) constructor.
+	in a class that takes a static link.
+	Fixes bug reported 10/26 by Yaroslav Kavenchuk.
+
 	* ApplyExp.java (compile): Return if inlineCompile throws an
 	exception.  This avoids errors due to compiling twice.
 

@@ -449,7 +449,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   /** Compile arguments and push unto stack.
    * @param args arguments to evaluate and push.
-   * @param normally 0, but 1 in the case of a constructor,
+   * @param startArg Normally 0, but 1 in the case of a constructor,
    *   or the case of "static" method of a non-static class.
    * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
@@ -558,7 +558,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    ClassType mclass = method == null ? null :  method.getDeclaringClass();
+    ClassType mclass = method == null ? null : method.getDeclaringClass();
     Expression[] args = exp.getArgs();
     if (isConstructor())
       {
@@ -587,6 +587,21 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           }
         thisType = null;
         startArg = 1;
+      }
+    // Handle: (invoke-special ThisClass (this) '*init* arg ....)
+    // (This test is perhaps not quote as robust as it should be.)
+    else if (opcode() == 183 && mode == 'P' && "<init>".equals(method.getName()))
+      {
+        // Specifically handle passing a static-link.
+        ClassType mclass = method == null ? null :  method.getDeclaringClass();
+        if (mclass.hasOuterLink())
+          {
+            code.emitPushThis();
+            // Push the incoming static-link.
+            code.emitLoad(code.getCurrentScope().getVariable(1));
+            thisType = null;
+            startArg = 1;
+          }
       }
     else if (takesTarget() && method.getStaticFlag())
       startArg = 1;

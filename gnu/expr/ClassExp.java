@@ -523,7 +523,7 @@ public class ClassExp extends LambdaExp
                     if (calledInit != instanceType && calledInit != superClass)
                       comp.error('e', "call to <init> for not this or super class");
                   }
-                else if (calledInit != superClass)
+                else if (superClass != null)
                   {
                     // Call default super constructor if there isn't an explicit
                     // call to a super constructor.

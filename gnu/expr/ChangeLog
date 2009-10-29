@@ -1,3 +1,8 @@
+2009-10-28  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile): Return if inlineCompile throws an
+	exception.  This avoids errors due to compiling twice.
+
 2009-10-17  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkLambdaExp):  Don't compare getType of

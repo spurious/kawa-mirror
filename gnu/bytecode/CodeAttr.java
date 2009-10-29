@@ -1286,6 +1286,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(type1_raw);
   }
 
+  /** Compile 'not', assuming 0 or 1 is on the JVM stack. */
   public final void emitNot(Type type)
   {
     emitPushConstant(1, type);

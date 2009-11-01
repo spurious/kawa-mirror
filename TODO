@@ -1,4 +1,5 @@
 Before Kawa 1.10:
+- Check that 'ant' works.
 - Make Values constructors be private, so we can make Values be abstract.
 - Go through Savannah bugs.
 - Manual: should rename @node Extensions
@@ -37,9 +38,14 @@ http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/com/sun/net/httpse
 OPTIMIZATIONS
 * case/switch
 * translate Scheme character->int
-* optimize boolean operations (bitwise-and, bitwise-or, ...)
-* optimize zero?
+* Optimize (make T) where T is a known non-simple class.
+  This should not need to use reflection.
+* optimize zero? etc
 * other support for other single-element struct types, including unsigned int
+* warning about String conversions
+(See email from helmut Eller 2009/09/26)
+* warning about non-tail-calls
+(See email from helmut Eller 2009/09/26)
 
 HIGH PRIORITY:
 * Allow co-variant return types.

@@ -294,7 +294,7 @@ public class ModuleExp extends LambdaExp
 
             //	    try
 	      {
-                if (inst instanceof ModuleBody)
+                if (inst instanceof ModuleBody && ! mexp.staticInitRun())
                   ((ModuleBody) inst).run(ctx);
 
 		// Import declarations defined in module into the Environment.
@@ -378,7 +378,7 @@ public class ModuleExp extends LambdaExp
     // In immediate mode there is no point in a non-static module:
     // a static module is simpler and more efficient.
     return (getFlag(STATIC_SPECIFIED)
-	    || ((gnu.expr.Compilation.moduleStatic > Compilation.MODULE_STATIC_DEFAULT
+	    || ((gnu.expr.Compilation.moduleStatic >= Compilation.MODULE_STATIC_DEFAULT
                  || getFlag(IMMEDIATE))
 		&& ! getFlag(SUPERTYPE_SPECIFIED)
 		&& ! getFlag(NONSTATIC_SPECIFIED)));
@@ -442,10 +442,9 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-            if (! (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias())
-		|| value == QuoteExp.undefined_exp)
-	      value = null;
-	    decl.makeField(comp, value);
+	    decl.makeField(comp,
+                           decl.shouldEarlyInit() || decl.isAlias() ? value
+                           : null);
 	  }
       }
   }

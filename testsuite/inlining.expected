@@ -83,8 +83,8 @@ InliningTest.firstNegative(double[])double: 32 bytes
 InliningTest.inlineTwoCalls(int)int: 27 bytes
 InliningTest.inlineTwoFunctions(java.lang.Object)java.lang.Object: 23 bytes
 InliningTest.checkEven(int)java.lang.Object: 34 bytes
-cycle1.isIsEven(int)boolean: 22 bytes
-cycle2.isIsOdd(int)boolean: 22 bytes
+cycle1.isIsEven(int)boolean: 17 bytes
+cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)TreeNode: 60 bytes
 binarytrees.test(int)java.lang.Object: 222 bytes
 TreeNode.itemCheck()int: 36 bytes
@@ -92,7 +92,7 @@ fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[])int: 33 bytes
 fannkuch.vectorCopy(int[])int[]: 27 bytes
 fannkuch.fannkuch(int)int: 233 bytes
-fasta.randomNext(double)double: 31 bytes
+fasta.randomNext(double)double: 28 bytes
 pidigits.pidigits(int,java.io.PrintStream)void: 125 bytes
 Transformation.next()void: 59 bytes
 Transformation.extract(int)int: 41 bytes
@@ -108,8 +108,8 @@ nbody.advance(Body[],double)void: 330 bytes
 nbody.energy(Body[])double: 181 bytes
 nbody.jupiter()Body: 57 bytes
 Body.offsetMomentum(double,double,double)void: 32 bytes
-regexdna.regexdna(java.io.InputStream)java.lang.Object: 380 bytes
-revcomp.revcomp(java.io.InputStream)void: 390 bytes
+regexdna.regexdna(java.io.InputStream)java.lang.Object: 372 bytes
+revcomp.revcomp(java.io.InputStream)void: 382 bytes
 spectralnorm.Approximate(int)double: 110 bytes
 spectralnorm.A(int,int)double: 19 bytes
 spectralnorm.multiplyAv(int,double[],double[])void: 53 bytes

@@ -158,10 +158,17 @@ public class SetExp extends AccessExp
 
     Declaration decl = binding;
     Expression declValue = decl.getValue();
-    if (decl.getFlag(Declaration.EARLY_INIT)
+    if ((decl.shouldEarlyInit() || decl.isAlias())
+        && decl.context instanceof ModuleExp
 	&& isDefining() && ! decl.ignorable())
       {
-	BindingInitializer.create(decl, new_value, comp);
+        if (decl.shouldEarlyInit())
+          BindingInitializer.create(decl, new_value, comp);
+        if (needValue)
+          {
+            decl.load(this, 0, comp, Target.pushObject);
+	    valuePushed = true;
+	  }
       }
     else if (declValue instanceof LambdaExp
 	&& decl.context instanceof ModuleExp
@@ -170,17 +177,6 @@ public class SetExp extends AccessExp
 	&& declValue == new_value)
       {
 	((LambdaExp) new_value).compileSetField(comp);
-      }
-    else if (decl.context instanceof ModuleExp
-	     && (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias())
-             && isDefining()
-             && declValue != null)
-      { // This is handled in ModuleExp's allocFields method.  But:
-        if (needValue)
-          {
-            decl.load(this, 0, comp, Target.pushObject);
-	    valuePushed = true;
-	  }
       }
     else
       {

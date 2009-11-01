@@ -1,5 +1,16 @@
 2009-10-31  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (isStatic):  Make static modules be the default.
+	(evalModule2): Don't execute run if staticInitRun().
+	(allocFields): Change/simplify logic to use shouldEarlyInit.
+	* Declaration.java (shouldEarlyInit): New method.
+	(setSyntax): Also set EARLY_INIT flag.
+	(makeField): Only assign field to literal if field is static.
+	Use shouldEarlyInit instead of testing EARLY_INIT.
+	* SetExp.java (compile): Some re-orginization using shouldEarlyInit.
+	* ModuleBody.java (runAsMain): Remove questionable and apparently
+	no-longer-needed call to ClassMemberLocation.defineAll.
+
 	* Declaration.java (isCompiletimeConstant): New method.
 	(isStatic): Use it.
 

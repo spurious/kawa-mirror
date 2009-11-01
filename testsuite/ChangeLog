@@ -1,3 +1,7 @@
+2009-11-01  Per Bothner  <per@bothner.com>
+
+	* inlining.expected: Update since static modules are now the default.
+
 2009-10-19  Per Bothner  <per@bothner.com>
 
 	* knucleotide.scm: New benchmark, for shootout.alioth.debian.org.

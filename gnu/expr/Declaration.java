@@ -132,7 +132,7 @@ public class Declaration
   public final void setSyntax ()
   {
     setSimple(false);
-    setFlag(Declaration.IS_CONSTANT | Declaration.IS_SYNTAX);
+    setFlag(IS_CONSTANT|IS_SYNTAX|EARLY_INIT);
   }
 
   /** Return the ScopeExp that contains (declares) this Declaration. */
@@ -407,6 +407,11 @@ public class Declaration
   {
     Object v = getValue();
     return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
+  }
+
+  boolean shouldEarlyInit ()
+  {
+    return getFlag(EARLY_INIT) || isCompiletimeConstant ();
   }
 
   public boolean isCompiletimeConstant ()
@@ -967,7 +972,8 @@ public class Declaration
         if (value instanceof QuoteExp)
           {
             Object val = ((QuoteExp) value).getValue();
-            if (val.getClass().getName().equals(ftype.getName()))
+            if (field.getStaticFlag()
+                  && val.getClass().getName().equals(ftype.getName()))
               {
                 Literal literal = comp.litTable.findLiteral(val);
                 if (literal.field == null)
@@ -984,7 +990,7 @@ public class Declaration
           }
       }
     // The EARLY_INIT case is handled in SetExp.compile.
-    if (! getFlag(EARLY_INIT)
+    if (! shouldEarlyInit()
 	&& (isIndirectBinding()
 	    || (value != null && ! (value instanceof ClassExp))))
       {

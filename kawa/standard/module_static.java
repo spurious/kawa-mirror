@@ -19,14 +19,15 @@ public class module_static extends Syntax
 	tr.error('e', "\'" + getName() + "\' not at module level");
 	return true;
       }
+    ModuleExp mexp = (ModuleExp) defs;
     if (list instanceof Pair
 	&& (st = (Pair) list).getCdr() == LList.Empty
 	&& st.getCar() instanceof Boolean)
       {
 	if (st.getCar() == Boolean.FALSE)
-	  ((ModuleExp) defs).setFlag(ModuleExp.NONSTATIC_SPECIFIED);
+	  mexp.setFlag(ModuleExp.NONSTATIC_SPECIFIED);
 	else
-	  ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
+	  mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
       }
     else if (list instanceof Pair
              && (st = (Pair) list).getCdr() == LList.Empty
@@ -38,8 +39,8 @@ public class module_static extends Syntax
             && st.getCar().toString() == "init-run")
           {
             // (module-static 'init-run) implies (module-static #t)
-            ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
-            ((ModuleExp) defs).setFlag(ModuleExp.STATIC_RUN_SPECIFIED);
+            mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
+            mexp.setFlag(ModuleExp.STATIC_RUN_SPECIFIED);
           }
           else
           {
@@ -49,7 +50,7 @@ public class module_static extends Syntax
       }
     else
       {
-	((ModuleExp) defs).setFlag(ModuleExp.NONSTATIC_SPECIFIED);
+	mexp.setFlag(ModuleExp.NONSTATIC_SPECIFIED);
 
 
 	while (list != LList.Empty)
@@ -68,6 +69,9 @@ public class module_static extends Syntax
 	    list = st.getCdr();
 	  }
       }
+    if (mexp.getFlag(ModuleExp.NONSTATIC_SPECIFIED)
+        && mexp.getFlag(ModuleExp.STATIC_SPECIFIED))
+      tr.error('e', "inconsistent module-static specifiers");
     return true;
   }
 

@@ -1,3 +1,8 @@
+2009-10-31  Per Bothner  <per@bothner.com>
+
+	* standard/module_static.java( scanForDefinitions): Minor cleanup.
+	Add error if inconsistent module-static specifiers.
+
 2009-10-27  Per Bothner  <per@bothner.com>
 
 	* standard/object.java (rewriteClassDef): Allow *init* methods for

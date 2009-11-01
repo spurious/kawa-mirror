@@ -409,6 +409,11 @@ public class Declaration
     return (v instanceof QuoteExp) && v != QuoteExp.undefined_exp;
   }
 
+  public boolean isCompiletimeConstant ()
+  {
+    return getFlag(IS_CONSTANT) && hasConstantValue();
+  }
+
   /** This prefix is prepended to field names for unknown names. */
   static final String UNKNOWN_PREFIX = "loc$";
 
@@ -646,7 +651,7 @@ public class Declaration
     if (field != null)
       return field.getStaticFlag();
     if (getFlag(STATIC_SPECIFIED)
-        || (getFlag(IS_CONSTANT) && hasConstantValue()))
+        || isCompiletimeConstant())
       return true;
     if (getFlag(NONSTATIC_SPECIFIED))
       return false;

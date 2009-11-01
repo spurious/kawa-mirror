@@ -2058,7 +2058,7 @@ public class Compilation implements SourceLocator
             dumpInitializers(init);
           }
 
-	if (! immediate && module.staticInitRun())
+	if (module.staticInitRun())
 	  {
 	    code.emitGetStatic(moduleInstanceMainField);
 	    code.emitInvoke(typeModuleBody.getDeclaredMethod("run", 0));
@@ -2410,7 +2410,7 @@ public class Compilation implements SourceLocator
     ModuleExp module = new ModuleExp();
     if (filename != null)
       module.setFile(filename);
-    if (Compilation.generateAppletDefault)
+    if (generateApplet || generateServlet)
       module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     if (immediate)
       {

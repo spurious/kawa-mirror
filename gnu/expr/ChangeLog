@@ -1,5 +1,14 @@
 2009-10-31  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (isCompiletimeConstant): New method.
+	(isStatic): Use it.
+
+	* Compilation.java (generateBytecode): Generate call to run method
+	if --module-static-run, even if immediate.
+
+	* Compilation.java (pushNewModule): Set SUPERTYPE_SPECIFIED
+	for if generateServlet.
+
 	* Compilation.java (MODULE_NONSTATIC, MODULE_STATIC_DEFAULT,
 	MODULE_STATIC, MODULE_STATIC_RUN): New constants.
 	* ModuleExp.java (isStatic, staticInitRun): Use new constants.

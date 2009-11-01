@@ -1,3 +1,9 @@
+2009-10-31  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (MODULE_NONSTATIC, MODULE_STATIC_DEFAULT,
+	MODULE_STATIC, MODULE_STATIC_RUN): New constants.
+	* ModuleExp.java (isStatic, staticInitRun): Use new constants.
+
 2009-10-28  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compile): Handle passing a static link from a

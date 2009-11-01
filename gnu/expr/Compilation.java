@@ -164,10 +164,14 @@ public class Compilation implements SourceLocator
   public boolean usingTailCalls()
   { return defaultCallConvention >= CALL_WITH_TAILCALLS; }
 
+  public static final int MODULE_NONSTATIC = -1;
+  public static final int MODULE_STATIC_DEFAULT = 0;
+  public static final int MODULE_STATIC = 1;
+  public static final int MODULE_STATIC_RUN = 2;
   /** If moduleStatic > 0, (module-static #t) is implied by default.
    * If moduleStatic == 2, <clinit> calls run.
    * If moduleStatic < 0, (module-static #f) is implied by default. */
-  public static int moduleStatic = 0;
+  public static int moduleStatic = MODULE_STATIC_DEFAULT;
 
   ClassType[] classes;
   int numClasses;

@@ -526,13 +526,18 @@ public class repl extends Procedure0or1
 	  {
             SourceMessages.debugStackTraceOnWarning = true;
 	  }
+	else if (arg.equals("--module-nonstatic")
+                 || arg.equals("--no-module-static"))
+	  {
+	    gnu.expr.Compilation.moduleStatic = Compilation.MODULE_NONSTATIC;
+	  }
 	else if (arg.equals("--module-static"))
 	  {
-	    gnu.expr.Compilation.moduleStatic = 1;
+	    gnu.expr.Compilation.moduleStatic = Compilation.MODULE_STATIC;
 	  }
         else if (arg.equals("--module-static-run"))
           {
-            gnu.expr.Compilation.moduleStatic = 2;
+            gnu.expr.Compilation.moduleStatic = Compilation.MODULE_STATIC_RUN;
           }
 	else if (arg.equals("--fewer-classes"))
 	  {

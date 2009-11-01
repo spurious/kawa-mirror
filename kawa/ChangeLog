@@ -1,5 +1,9 @@
 2009-10-31  Per Bothner  <per@bothner.com>
 
+	* repl.java (processArgs): Use new Compile.MODULE_XXX flags.
+	Add new --module-nonstatic or --no-module-static to explicitly
+	set moduleStatic to Compilation.MODULE_NONSTATIC.
+
 	* standard/module_static.java( scanForDefinitions): Minor cleanup.
 	Add error if inconsistent module-static specifiers.
 

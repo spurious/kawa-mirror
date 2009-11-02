@@ -1,3 +1,9 @@
+2009-11-01  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (capture): More informative warning about
+	needing static link - and don't warn for ObjectExp.
+	(walkClassExp): Remove now-redundant warning.
+
 2009-10-31  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (isStatic):  Make static modules be the default.

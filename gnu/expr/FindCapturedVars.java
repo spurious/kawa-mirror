@@ -123,13 +123,9 @@ public class FindCapturedVars extends ExpWalker
               child.setNeedsStaticLink(true);
           }
       }
-    if (exp.isSimple() && exp.getNeedsClosureEnv() && exp.nameDecl != null)
-      {
-        comp.error('w', "simple class requiring lexical link - use define-class instead");
-        //exp.setSimple(false);
-        if (exp.nameDecl.getType() == Compilation.typeClass)
-          exp.nameDecl.setType(Compilation.typeClassType);
-      }
+    if (exp.isSimple() && exp.getNeedsClosureEnv() && exp.nameDecl != null
+        && exp.nameDecl.getType() == Compilation.typeClass)
+      exp.nameDecl.setType(Compilation.typeClassType);
     return ret;
   }
 
@@ -384,6 +380,11 @@ public class FindCapturedVars extends ExpWalker
 		    comp.error('e', "static " + heapLambda.getName()
 			       + " references non-static " + decl.getName());
 		  }
+                if (heapLambda instanceof ClassExp
+                    && heapLambda.getName() != null
+                    && ((ClassExp) heapLambda).isSimple())
+                  comp.error('w', heapLambda.nameDecl,
+                             "simple class ", " requiring lexical link (because of reference to "+decl.getName()+") - use define-class instead");
 		heapLambda.setNeedsStaticLink();
 		outer = heapLambda.outerLambda();
 	      }

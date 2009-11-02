@@ -1,3 +1,8 @@
+2009-11-01  Per Bothner  <per@bothner.com>
+
+	* standard/define.java: Defer processing of type-specifier from
+	scanForm to rewriteForm.
+
 2009-10-31  Per Bothner  <per@bothner.com>
 
 	* repl.java (processArgs): Use new Compile.MODULE_XXX flags.

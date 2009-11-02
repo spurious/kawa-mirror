@@ -110,7 +110,7 @@ public class define extends Syntax
 
     if ((options & 1) != 0)
       {
-	decl.setType(tr.exp2Type(p3));
+        decl.setTypeExp(new LangExp(p3));
 	decl.setFlag(Declaration.TYPE_SPECIFIED);
       }
 
@@ -134,6 +134,13 @@ public class define extends Syntax
     if (! (name instanceof Declaration))
       return tr.syntaxError(getName(options) + " is only allowed in a <body>");
     Declaration decl = (Declaration) name;
+
+    Expression texp = decl.getTypeExp();
+    if (texp instanceof LangExp)
+      {
+        Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
+        decl.setType(tr.exp2Type(typeSpecPair));
+      }
 
     Expression value;
     if ((options & 2) != 0)

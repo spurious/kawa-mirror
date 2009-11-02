@@ -1,3 +1,11 @@
+2009-11-01  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Module classes, Compilation options): Update since
+	--module-static is now the default.
+	* kawa.text (Defining new classes): Update that the access: specifier
+	now supports 'volatile, 'transient, or a list.
+	Also fix think for interface:.
+
 2009-09-29  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Debugging): Document 'disassemble' function.

@@ -1073,6 +1073,12 @@ Various named option control how Kawa compiles certain forms.
 @item --module-static
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static #t)} were specified). @xref{Module classes}.
+This is (now) the default.
+@item --module-nonstatic
+@itemx --no-module-static
+If no @code{module-static} is specified, generate a non-static module
+(as if @code{(module-static #f)} were specified). @xref{Module classes}.
+This used to be the default.
 @item --module-static-run
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static 'init-run)} were specified). @xref{Module classes}.
@@ -1105,9 +1111,8 @@ You can also negate an option by prefixing it with @code{no-}:
 The option @code{--no-warn-invoke-unknown-method}
 is the same as @code{--warn-invoke-unknown-method=no}.
 
-You can set the same options (except, for now, @code{module-static})
-within your Scheme source file.  (In that case they override the
-options on the command line.)
+You can set the same options within your Scheme source file.
+(In that case they override the options on the command line.)
 
 @deffn Syntax module-compile-options [key: value] ...
 This sets the value of the @code{key} option to @code{value}
@@ -6093,7 +6098,7 @@ If @var{make-interface} is @code{#t}, then a Java interface is generated.
 In that case all the supertypes must be interfaces, and
 all the declared methods must be abstract.
 If @var{make-interface} is @code{#f}, then a Java class is generated.
-If @code{interface:}  is unspecified, the default is @code{#t}
+If @code{interface:}  is unspecified, the default is @code{#f}
 for @code{define-simple-class}.  For @code{define-class} the default
 is to generate an interface, and in addition (if needed) a helper
 class that implements the interface.  (In that case any non-abstract methods
@@ -6104,7 +6109,13 @@ allows Kawa to implement true multiple inheritance.)
 @item @code{access:} @var{kind}
 Specifies the Java access permission on the class.
 Can be one of @code{'public} (which is the default in Kawa),
-or @code{'package} (which the default "unnamed" permission in Java code).
+@code{'package} (which the default "unnamed" permission in Java code),
+@code{'protected}, @code{'private},
+@code{'volatile}, or @code{'transient}.
+Can also be a list, as for example:
+@example
+access: '(protected volatile)
+@end example
 
 @item @code{class-name:} @code{"}@var{cname}@code{"}
 Specifies the Java name of the created class.
@@ -6247,7 +6258,8 @@ create instance of the enclosing class.
 @end example
 
 The special @var{method-name} @samp{*init*} can be used to name
-a non-default constructor (in a @code{define-simple-class} only).
+a non-default constructor (only if @var{make-interface} discussed above
+is @code{#f}).
 It can be used to initialize a freshly-allocated instance
 using passed-in parameters.
 You can call a superclass or a sibling constructor using
@@ -6318,7 +6330,6 @@ Kawa doesn't directly support marking a method as @code{synchronized},
 but you can get the same effect using a @code{synchronized} expression:
 
 @example
-(module-static #t)
 (define-simple-class <Bar> ()
   ;; non-static method
   ((foo) :: void
@@ -6573,22 +6584,21 @@ that are explicitly listed will be compiled to static fields and methods.
 If @code{#f} is specified, then all exported names will
 be compiled to non-static (instance) fields and methods.
 
-By default, if no @code{module-static} is specified, the following rules apply:
+By default, if no @code{module-static} is specified:
 @enumerate
 @item
 If there is a @code{module-extends} or @code{module-implements}
-declaration, then @code{(module-static #f)} is implied.
+declaration, or one of the @code{--applet} or @code{--servlet}
+caommand-line flags was specified, then @code{(module-static #f)} is implied.
 @item
-If the @code{--module-static} command-line parameter is specified,
-then @code{(module-static #t)} is implied.
+If one of the command-line flags
+@code{--no-module-static}, @code{--module-nonstatic},
+@code{--module-static}, or @code{--module-static-run} was specified,
+the the default @code{#f}, @code{#f}, @code{#t}, or @code{'init-run},
+respectively.
 @item
-(Not yet implemented: If there are no top-level actions and all
-definitions are procedure definitions, macro definitions, or
-constant definitions, then @code{(module-static #t)} is implied.)
-@item
-Otherwise, a method will be static iff it doesn't need to reference non-static
-fields or methods of the module instance.  In that case, the corresponding
-field will also be static.
+Otherwise the default is @code{(module-static #t)}.
+(It used to be @code{(module-static #f)} in older Kawa versions.)
 @end enumerate
 
 Note @code{(module-static #t)} usually produces more efficient

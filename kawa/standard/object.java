@@ -64,7 +64,7 @@ public class object extends Syntax
     Object classNamePair = null;
     LambdaExp method_list = null;
     LambdaExp last_method = null;
-    int classAccessFlag = 0;
+    long classAccessFlag = 0;
     // First pass (get Declarations).
     Vector inits = new Vector(20);
     for (Object obj = components;  obj != LList.Empty;  )
@@ -145,7 +145,7 @@ public class object extends Syntax
 	    Object args;
 	    Declaration decl;
 	    int allocationFlag = 0;
-	    int accessFlag = 0;
+	    long accessFlag = 0;
 	    if (sname instanceof Keyword)
 	      {
 		decl = null;
@@ -218,13 +218,11 @@ public class object extends Syntax
 		      }
 		    else if (key == accessKeyword)
 		      {
-                        int newAccessFlag = matchAccess(value, tr);
+                        long newAccessFlag = matchAccess(value, tr);
                         if (newAccessFlag == 0)
                           tr.error('e', "unknown access specifier");
                         else if (accessFlag != 0)
-                          tr.error('e', "duplicate access specifiers - "
-                                   + accessString(accessFlag) + " and "
-                                   + accessString(newAccessFlag));
+                          tr.error('e', "duplicate access specifiers");
 			accessFlag = newAccessFlag;
 		      }
 		    else
@@ -604,46 +602,67 @@ public class object extends Syntax
   static boolean matches (Object exp, String tag, Translator tr)
   {
     String value;
+    Object qvalue;
     Pair pair;
     if (exp instanceof Keyword)
       value = ((Keyword) exp).getName();
     else if (exp instanceof FString)
       value = ((FString) exp).toString();
     else if (exp instanceof Pair
-	     && tr.matches((pair = (Pair) exp).getCar(), Scheme.quote_sym)
-	     && pair.getCdr() instanceof Pair
-	     && (pair = (Pair) pair.getCdr()).getCdr() == LList.Empty
-	     && pair.getCar() instanceof gnu.mapping.SimpleSymbol)
-      value = pair.getCar().toString();
+             && (qvalue = tr.matchQuoted((Pair) exp)) instanceof gnu.mapping.SimpleSymbol)
+      value = qvalue.toString();
     else
       return false;
     return tag == null || tag.equals(value);
   }
 
-  static int matchAccess (Object value, Translator tr)
+  static long matchAccess (Object value, Translator tr)
   {
-    if (matches(value, "private", tr))
-      return Declaration.PRIVATE_ACCESS;
-    else if (matches(value, "protected", tr))
-      return Declaration.PROTECTED_ACCESS;
-    else if (matches(value, "public", tr))
-      return Declaration.PUBLIC_ACCESS;
-    else if (matches(value, "package", tr))
-      return Declaration.PACKAGE_ACCESS;
-    else
-      return 0;
+    if (value instanceof Pair)
+      {
+        Pair p = (Pair) value;
+        value = tr.matchQuoted((Pair) value);
+        if (value instanceof Pair)
+          return matchAccess2((Pair) value, tr);
+      }
+    return matchAccess1(value, tr);
   }
 
-  static String accessString (int accessFlag)
+  private static long matchAccess2 (Pair pair, Translator tr)
   {
-    if (accessFlag == Declaration.PRIVATE_ACCESS)
-      return "private";
-    if (accessFlag == Declaration.PROTECTED_ACCESS)
-      return "protected";
-    if (accessFlag == Declaration.PUBLIC_ACCESS)
-      return "public";
-    if (accessFlag == Declaration.PACKAGE_ACCESS)
-      return "package";
-    return "<internal error>";
+    long icar = matchAccess1(pair.getCar(), tr);
+    Object cdr = pair.getCdr();
+    if (cdr == LList.Empty || icar == 0)
+      return icar;
+    else if (cdr instanceof Pair)
+      {
+        long icdr = matchAccess2((Pair) cdr, tr);
+        if (icdr != 0)
+          return icar | icdr;
+      }
+    return 0;
+  }
+
+  private static long matchAccess1 (Object value, Translator tr)
+  {
+    if (value instanceof Keyword)
+      value = ((Keyword) value).getName();
+    else if (value instanceof FString)
+      value = ((FString) value).toString();
+    else if (value instanceof gnu.mapping.SimpleSymbol)
+      value = value.toString();
+    if ("private".equals(value))
+      return Declaration.PRIVATE_ACCESS;
+    if ("protected".equals(value))
+      return Declaration.PROTECTED_ACCESS;
+    if ("public".equals(value))
+      return Declaration.PUBLIC_ACCESS;
+    if ("package".equals(value))
+      return Declaration.PACKAGE_ACCESS;
+    if ("volatile".equals(value))
+      return Declaration.VOLATILE_ACCESS;
+    if ("transient".equals(value))
+      return Declaration.TRANSIENT_ACCESS;
+    return 0;
   }
 }

@@ -1504,10 +1504,10 @@ public class LambdaExp extends ScopeExp
     int numStubs = primMethods.length - 1;
     Type restArgType = restArgType();
 
-    int[] saveDeclFlags = null;
+    long[] saveDeclFlags = null;
     if (numStubs > 0)
       {
-	saveDeclFlags = new int[min_args + numStubs];
+	saveDeclFlags = new long[min_args + numStubs];
 	int k = 0;
 	for (Declaration decl = firstDecl();
 	     k < min_args + numStubs; decl = decl.nextDecl())

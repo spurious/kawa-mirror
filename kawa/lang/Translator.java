@@ -219,6 +219,15 @@ public class Translator extends Compilation
     return form == literal;
   }
 
+  public Object matchQuoted (Pair pair)
+  {
+    if (matches(pair.getCar(), LispLanguage.quote_sym)
+        && pair.getCdr() instanceof Pair
+        && (pair = (Pair) pair.getCdr()).getCdr() == LList.Empty)
+      return pair.getCar();
+    return null;
+  }
+
   public Declaration lookup(Object name, int namespace)
   {
     Declaration decl = lexical.lookup(name, namespace);

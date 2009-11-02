@@ -503,20 +503,23 @@ public class Declaration
   /** A reference to a module instance. */
   public static final int MODULE_REFERENCE = 0x40000000;
 
-  protected int flags = IS_SIMPLE;
+  public static final long VOLATILE_ACCESS = 0x80000000;
+  public static final long TRANSIENT_ACCESS = 0x100000000l;
 
-  public final boolean getFlag (int flag)
+  protected long flags = IS_SIMPLE;
+
+  public final boolean getFlag (long flag)
   {
     return (flags & flag) != 0;
   }
 
-  public final void setFlag (boolean setting, int flag)
+  public final void setFlag (boolean setting, long flag)
   {
     if (setting) flags |= flag;
     else flags &= ~flag;
   }
 
-  public final void setFlag (int flag)
+  public final void setFlag (long flag)
   {
     flags |= flag;
   }
@@ -533,15 +536,24 @@ public class Declaration
 
   public short getAccessFlags (short defaultFlags)
   {
-    if (getFlag(Declaration.PRIVATE_ACCESS))
-      return Access.PRIVATE;
-    if (getFlag(Declaration.PROTECTED_ACCESS))
-      return Access.PROTECTED;
-    if (getFlag(Declaration.PACKAGE_ACCESS))
-      return 0;
-    if (getFlag(Declaration.PUBLIC_ACCESS))
-      return Access.PUBLIC;
-    return defaultFlags;
+    short flags;
+    if (getFlag(PRIVATE_ACCESS|PROTECTED_ACCESS|PACKAGE_ACCESS|PUBLIC_ACCESS))
+      {
+        flags = 0;
+        if (getFlag(PRIVATE_ACCESS))
+          flags |= Access.PRIVATE;
+        if (getFlag(PROTECTED_ACCESS))
+          flags |= Access.PROTECTED;
+        if (getFlag(PUBLIC_ACCESS))
+          flags |= Access.PUBLIC;
+      }
+    else
+      flags = defaultFlags;
+    if (getFlag(VOLATILE_ACCESS))
+      flags |= Access.VOLATILE;
+    if (getFlag(TRANSIENT_ACCESS))
+      flags |= Access.TRANSIENT;
+    return flags;
   }
 
   public final boolean isAlias() { return (flags & IS_ALIAS) != 0; }
@@ -866,7 +878,7 @@ public class Declaration
       }
     */
     sbuf.append("/fl:");
-    sbuf.append(Integer.toHexString(flags));
+    sbuf.append(Long.toHexString(flags));
     if (ignorable())
       sbuf.append("(ignorable)");
     Expression tx = typeExp;

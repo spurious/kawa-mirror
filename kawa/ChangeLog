@@ -1,5 +1,10 @@
 2009-11-01  Per Bothner  <per@bothner.com>
 
+	* standard/object.java (matchAccess): Re-write to support
+	volatile and transient flags, and also a list of multiple flags.
+	(scanClassDef): Update accordingly.
+	* lang/Translator.java (matchQuoted): New helper method.
+
 	* standard/define.java: Defer processing of type-specifier from
 	scanForm to rewriteForm.
 

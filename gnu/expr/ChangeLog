@@ -1,5 +1,11 @@
 2009-11-01  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (flags): Chaneg from int to long.
+	(getFlag, setFlag, printInfo): Update accordingly.
+	* LambdaExp.java (compileAsMethod): Update accordingly.
+	(VOLATILE_ACCESS, TRANSIENT_ACCESS): New flags.
+	(getAccessFlags): Re-write to support new flags.
+
 	* FindCapturedVars.java (capture): More informative warning about
 	needing static link - and don't warn for ObjectExp.
 	(walkClassExp): Remove now-redundant warning.

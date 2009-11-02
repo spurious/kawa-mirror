@@ -32,7 +32,8 @@ check-no-inline:
 check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-fannkuch check-fasta check-knucleotide check-mandelbrot check-nbody \
-  check-nsieve check-pidigits check-regexdna check-revcomp check-spectralnorm
+  check-nsieve check-pidigits check-regexdna check-revcomp \
+  check-spectralnorm check-threadring
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -257,6 +258,17 @@ check-spectralnorm: spectralnorm.class
 	  then echo '# spectralnorm test passes'; \
 	  else echo FAIL spectralnorm test; fi
 
+threadring.class: $(srcdir)/threadring.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/threadring.scm
+
+check-threadring: threadring.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) threadring 1000 >threadring1000.log
+	@if diff $(srcdir)/threadring-output.txt threadring1000.log; \
+	  then echo '# threadring test passes'; \
+	  else echo FAIL threadring test; fi
+
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
@@ -433,4 +445,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   pidigits.scm pidigits-output.txt \
   regexdna.scm regexdna-output.txt \
   revcomp.scm revcomp-output.txt \
-  spectralnorm.scm spectralnorm-output.txt
+  spectralnorm.scm spectralnorm-output.txt \
+  threadring.scm threadring-output.scm

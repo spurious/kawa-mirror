@@ -1,3 +1,10 @@
+2009-11-02  Per Bothner  <per@bothner.com>
+
+	* threadring.scm: New benchmark, for shootout.alioth.debian.org.
+	Based on Java 6 -server #4 version contributed by Fabien Le Floc'h
+	* threadring-output.txt: Expected output.
+	* Makefile.am: Update accordingly.
+
 2009-11-01  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update since static modules are now the default.

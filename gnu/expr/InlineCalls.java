@@ -185,6 +185,14 @@ public class InlineCalls extends ExpWalker
     return walkScopeExp(exp);
   }
 
+  protected Expression walkTryExp (TryExp exp)
+  {
+    if (exp.getCatchClauses() == null && exp.getFinallyClause() == null)
+      return walk(exp.try_clause);
+    else
+      return super.walkTryExp(exp);
+  }
+
   protected Expression walkSetExp (SetExp exp)
   {
     super.walkSetExp(exp);

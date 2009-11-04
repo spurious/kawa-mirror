@@ -160,8 +160,14 @@ public class ModuleExp extends LambdaExp
       }
   }
 
+  // TODO: This should be false #ifdef Android.
+  // The complication is that it needs to be true while building
+  // Kawa itself, or generally compiling code *for* Android.
+  // I.e. we need to be able to distinguish compile-time and run-time.
+  public static boolean compilerAvailable = true;
+
   /** Flag to force compilation, even when not required. */
-  public static boolean alwaysCompile = true;
+  public static boolean alwaysCompile = compilerAvailable;
 
   public final static boolean evalModule (Environment env, CallContext ctx,
                                        Compilation comp, URL url,

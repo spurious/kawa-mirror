@@ -996,6 +996,8 @@ public class Translator extends Compilation
         Syntax syntax = null;
         ScopeExp savedScope = current_scope;
         Object savedPosition = pushPositionOf(st);
+        if (st instanceof SourceLocator && defs.getLineNumber() < 0)
+          defs.setLocation((SourceLocator) st);
         try
           {
             Object obj = st_pair.getCar();

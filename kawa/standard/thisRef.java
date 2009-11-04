@@ -24,7 +24,7 @@ public class thisRef extends Syntax
               tr.error('e', "use of 'this' in a static method");
             else
               {
-                firstParam = new Declaration(ThisExp.THIS_NAME, (Type) null);
+                firstParam = new Declaration(ThisExp.THIS_NAME);
                 method.add(null, firstParam);
                 method.nameDecl.setFlag(Declaration.NONSTATIC_SPECIFIED);
               }

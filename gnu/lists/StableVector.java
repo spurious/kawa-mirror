@@ -80,7 +80,7 @@ public class StableVector extends GapVector
     positions[START_POSITION] = 0;
     positions[END_POSITION] = (base.getBufferLength() << 1) | 1;
     free = -1;
-    for (int i = positions.length;  --i >= 2; )
+    for (int i = positions.length;  --i > END_POSITION; )
       {
 	positions[i] = free;
 	free = i;
@@ -248,8 +248,9 @@ public class StableVector extends GapVector
   }
 
   /** Add a delta to all positions elements that point into a given range.
-   * Assume x==positions[i], then if (unsigned)x>=(unsigned)low
-   * && (unsigned)x <= (unsigned)high, then add delta to positions[i].
+   * Assume {@code x==positions[i]}, then if
+   * {@code (unsigned)x>=(unsigned)low && (unsigned)x <= (unsigned)high},
+   * then add {@code delta} to {@code positions[i]}.
    * Using unsigned comparisons allows us to compare ipos values,
    * which include both the index and the isAfter low-order bit.   */
   protected void adjustPositions(int low, int high, int delta)
@@ -259,7 +260,7 @@ public class StableVector extends GapVector
     // positions that need to adjust, rather than check all the positions
     // (including the 'free' ones).  FIXME.
 
-    if (free >= 0)
+    if (free >= -1)
       unchainFreelist();
 
     // Invert the high-order bit, because:
@@ -305,7 +306,7 @@ public class StableVector extends GapVector
     // adjust positions in gap
     int low = gapStart;
     int high = gapEnd;
-    if (free >= 0)
+    if (free >= -1)
       unchainFreelist();
     for (int i = positions.length;  --i > START_POSITION; )
       {
@@ -339,4 +340,35 @@ public class StableVector extends GapVector
   {
     super.consumePosRange(positions[iposStart], positions[iposEnd], out);
   }
+
+  /* DEBUGGING
+  void checkInvariants()
+  {
+    if (free==-2)
+      {
+        for (int i = positions.length;  --i > END_POSITION; )
+          {
+            int pos = positions[i];
+            if (pos != FREE_POSITION && pos < 0)
+              {
+                throw new Error();
+              }
+          }
+      }
+    else
+      {
+        int n = positions.length-2;
+        int i = free;
+        while (i != -1)
+          {
+            if (--n < 0)
+              throw new Error("cycle");
+            int next = positions[i];
+            if (i < 2)
+              throw new Error();
+            i = next;
+          }
+      }
+  }
+  */
 }

@@ -170,7 +170,7 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
 	   goto done;
 	 Values.nextValue(values, index);
 	 compileFromStackSimple(comp, Type.pointerType);
-	 index = value;
+	 index = index;
        }
     */
     Variable indexVar = code.addLocal(Type.intType);

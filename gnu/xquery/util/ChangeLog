@@ -1,3 +1,8 @@
+2009-11-22  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (stringJoin): Fix error in nextIndex/nextValue
+	handling.
+
 2009-08-15  Per Bothner  <per@bothner.com>
 
 	* CompileMisc.java: New class - compilation/optimization-related

@@ -269,18 +269,19 @@ public class StringUtils
     StringBuffer s = new StringBuffer();
     String glue = coerceToString(join, "string-join", 2, ERROR_VALUE);
     int glen = glue.length();
-    int index=0;
+    int index=0, next;
     boolean started = false;
 
-    while((index=Values.nextIndex(strseq, index)) >= 0)
+    while((next=Values.nextIndex(strseq, index)) >= 0)
       {
-	Object obj = Values.nextValue(strseq, index-1);
+	Object obj = Values.nextValue(strseq, index);
 	if (obj == Values.empty) continue;
 
 	if (started && glen > 0)
           s.append(glue);
         s.append(TextUtils.stringValue(obj));
 	started=true;
+        index = next;
       }
 
     return s.toString();

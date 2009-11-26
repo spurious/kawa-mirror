@@ -362,7 +362,10 @@ public class Shell
       }
     catch (FileNotFoundException e)
       {
-	System.err.println("Cannot open file "+fname);
+        // We really should distinguish a FileNotFoundException because
+        // fname doesn't name a file vs a FileNotFoundException that
+        // happens at runtime.  FIXME.
+	System.err.println("Cannot read file "+e.getMessage());
         return false;
       }
     catch (Throwable e)

@@ -1,3 +1,12 @@
+2009-11-30  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (compile): Use plain emitInvoke, rather than unreliably
+	trying to decide between emitInvokeVirtual/emitInvokeInterface.
+	The latter fails for getters of a PairClassType.
+	* SlotSet.java (compileSet): Likewise.
+	* Invoke.java (inline): Only extract instanceType from PairClassType
+	if this is a 'make' - otherwise we want the interface method.
+
 2009-10-01  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (selectApplicable): If arguments are IntNum literals

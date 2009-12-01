@@ -403,7 +403,7 @@ public class Invoke extends ProcedureN implements CanInline
     ObjectType type;
     Expression arg0 = args[0];
     Type type0 = (kind == 'V' || kind == '*' ? arg0.getType() : language.getTypeFor(arg0));
-    if (type0 instanceof PairClassType)
+    if (type0 instanceof PairClassType && kind == 'N')
       type = ((PairClassType) type0).instanceType;
     else if (type0 instanceof ObjectType)
       type = (ObjectType) type0;

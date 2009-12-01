@@ -418,10 +418,8 @@ public class SlotGet extends Procedure2
                             : Target.pushValue(ctype));
             if (isStaticMethod)
               code.emitInvokeStatic(method);
-            else if (ctype.isInterface())
-              code.emitInvokeInterface(method);
             else
-              code.emitInvokeVirtual(method);
+              code.emitInvoke(method);
 	    target.compileFromStack(comp, method.getReturnType());
             return;
           }

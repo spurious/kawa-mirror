@@ -162,10 +162,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         valArg.compile(comp, CheckedTarget.getInstance(language.getLangTypeFor(setArgTypes[0])));
         if (isStaticMethod)
           code.emitInvokeStatic(method);
-        else if (ctype.isInterface())
-          code.emitInvokeInterface(method);
         else
-          code.emitInvokeVirtual(method);
+          code.emitInvoke(method);
         return;
       }
   }

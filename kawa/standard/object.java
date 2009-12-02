@@ -357,6 +357,13 @@ public class object extends Syntax
 	  }
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite_car(superpair, false);
+        if (supers[i] instanceof ReferenceExp)
+          {
+            Declaration decl = Declaration.followAliases(((ReferenceExp) supers[i]).getBinding());
+            Expression svalue = decl.getValue();
+            if (svalue instanceof ClassExp)
+              ((ClassExp) svalue).setFlag(ClassExp.HAS_SUBCLASS);
+          }
 	superlist = superpair.getCdr();
       }
 
@@ -511,12 +518,7 @@ public class object extends Syntax
 		if (memberSyntax != null)
 		  tr.setCurrentScope(memberSyntax.scope);
                 if ("*init*".equals(meth.getName()))
-                  {
-                    meth.setReturnType(Type.voidType);
-                    if (! oexp.isSimple() && ! oexp.getFlag(ClassExp.CLASS_SPECIFIED))
-
-                      tr.error('e', "'*init*' methods only supported for simple classes");
-                  }
+                  meth.setReturnType(Type.voidType);
                 Translator.setLine(meth, pair);
                 LambdaExp saveLambda = tr.curMethodLambda;
                 tr.curMethodLambda = meth;

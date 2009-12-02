@@ -100,9 +100,6 @@ public class define extends Syntax
       {
 	if (! makePrivate)
 	  {
-	    decl.setCanRead(true);
-	    // (define (f) ...) defaults f to being read-only,
-	    // unless f is assigned to in this module.
             if (! Compilation.inlineOk || tr.immediate)
 	      decl.setCanWrite(true);
 	  }

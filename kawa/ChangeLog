@@ -1,3 +1,11 @@
+2009-12-01  Per Bothner  <per@bothner.com>
+
+	* standard/define.java (scanForm): Don't setCanRead.
+	* standard/object.java (rewriteClassDef): Set HAS_SUBCLASS
+	on super-classes.
+	(rewriteClassDef): Move move error about *init* method in non-simple
+	classes to later, since we might optimize define-class to simple class.
+
 2009-11-25  Per Bothner  <per@bothner.com>
 
 	* Shell.java (runFile): Better handlng of FileNotFoundException -

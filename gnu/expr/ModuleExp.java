@@ -435,8 +435,7 @@ public class ModuleExp extends LambdaExp
             // Kludge - needed for macros - see Savannah bug #13601.
             && ! decl.isNamespaceDecl()
             && ! (decl.getFlag(Declaration.IS_CONSTANT)
-                  && decl.getFlag(Declaration.CAN_READ|Declaration.CAN_CALL))
-	    && ! (value instanceof ClassExp))
+                  && decl.getFlag(Declaration.CAN_READ|Declaration.CAN_CALL)))
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;

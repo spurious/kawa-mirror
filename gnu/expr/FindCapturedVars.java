@@ -263,7 +263,11 @@ public class FindCapturedVars extends ExpWalker
     java.util.Set<LambdaExp> seen = new java.util.LinkedHashSet<LambdaExp>();
     // Finish the job that was started in FindTailCalls.
     Expression caller = checkInlineable(exp, seen);
-    if (caller != LambdaExp.unknownContinuation)
+    if (caller != LambdaExp.unknownContinuation
+        // Usually best to not inline a module-level function, since that
+        // makes stack traces less helpful, and increases the risk of
+        // methods getting too big.
+        && (! (exp.outer instanceof ModuleExp) || exp.nameDecl == null))
       exp.setInlineOnly(true);
     return super.walkLambdaExp(exp);
   }
@@ -361,7 +365,7 @@ public class FindCapturedVars extends ExpWalker
 	decl.base.setCanRead(true);
 	capture(decl.base);
       }
-    else if (decl.getCanRead() || declValue == null)
+    else if (decl.getCanRead() || decl.getCanCall() || declValue == null)
       {
 	if (! decl.isStatic())
 	  {

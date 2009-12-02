@@ -16,6 +16,7 @@ public class ClassExp extends LambdaExp
   public static final int IS_ABSTRACT = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int INTERFACE_SPECIFIED = 2 * LambdaExp.NEXT_AVAIL_FLAG;
   public static final int CLASS_SPECIFIED = 4 * LambdaExp.NEXT_AVAIL_FLAG;
+  public static final int HAS_SUBCLASS = 8 * LambdaExp.NEXT_AVAIL_FLAG;
 
   /** True if there is at least one explicit "<init>" ("*init*"} method. */
   boolean explicitInit;
@@ -50,19 +51,12 @@ public class ClassExp extends LambdaExp
 
   public ClassExp ()
   {
-    type = null;
-    // Make sure we actually generate a class.
-    setCanRead(true);
   }
 
   public ClassExp (boolean simple)
   {
     this.simple = simple;
-    if (simple)
-      instanceType = type = new ClassType();
-    else
-      instanceType = type = new PairClassType(); // For now.
-    setCanRead(true);
+    instanceType = type = new ClassType();
   }
 
   protected boolean mustCompile () { return true; }
@@ -78,7 +72,6 @@ public class ClassExp extends LambdaExp
   public void compilePushClass (Compilation comp, Target target)
   {
     ClassType new_class = type;
-    // Type.make(Class.forname)
 
     gnu.bytecode.CodeAttr code = comp.getCode();
     comp.loadClassRef(new_class);
@@ -161,14 +154,16 @@ public class ClassExp extends LambdaExp
       }
     if (superType != null && (flags & INTERFACE_SPECIFIED) != 0)
       comp.error('e', "cannot be interface since has superclass");
-    if (! simple && superType == null && (flags & CLASS_SPECIFIED) == 0)
+    if (! simple && superType == null && (flags & CLASS_SPECIFIED) == 0
+        && (getFlag(HAS_SUBCLASS)
+            || (nameDecl != null && nameDecl.isPublic())))
       {
-        PairClassType ptype = (PairClassType) type;
-        instanceType = new ClassType();
+        PairClassType ptype = new PairClassType();//(PairClassType) type;
+        type = ptype;
         ptype.setInterface(true);
         ptype.instanceType = instanceType;
         ClassType[] interfaces = { type };
-        // Can we better.  FIXME.
+        // Can do better.  FIXME.
         instanceType.setSuper(Type.pointer_type);
         instanceType.setInterfaces(interfaces);
       }
@@ -319,6 +314,8 @@ public class ClassExp extends LambdaExp
             explicitInit = true;
             if (child.isAbstract())
               comp.error('e', "*init* method cannot be abstract", child);
+            if (type instanceof PairClassType)
+              comp.error('e', "'*init*' methods only supported for simple classes");
           }
         // Setting child.outer isn't normally needed.  The exception is
         // if we're called from object.rewriteClassDef and there is some

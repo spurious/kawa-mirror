@@ -321,7 +321,6 @@ public class FindTailCalls extends ExpWalker
     returnContinuation = exp;
     LambdaExp parent = currentLambda;
     currentLambda = exp;
-    exp.setCanRead(true);
     try
       {
 	for (LambdaExp child = exp.firstChild;

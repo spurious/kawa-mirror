@@ -1,5 +1,7 @@
 2009-12-01  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (getNamedType): Change 'document' type.
+
 	* standard/define.java (scanForm): Don't setCanRead.
 	* standard/object.java (rewriteClassDef): Set HAS_SUBCLASS
 	on super-classes.

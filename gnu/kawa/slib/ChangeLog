@@ -1,3 +1,7 @@
+2009-12-01  Per Bothner  <per@bothner.com>
+
+	* XML.scm: Minor tweaks.
+
 2009-08-30  Per Bothner  <per@bothner.com>
 
 	* srfi2.scm: New module, implements srfi-2.

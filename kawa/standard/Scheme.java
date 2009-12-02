@@ -991,7 +991,7 @@ public class Scheme extends LispLanguage
         types.put ("u64vector", ClassType.make("gnu.lists.U64Vector"));
         types.put ("f32vector", ClassType.make("gnu.lists.F32Vector"));
         types.put ("f64vector", ClassType.make("gnu.lists.F64Vector"));
-        types.put ("document", ClassType.make("gnu.lists.TreeList"));
+        types.put ("document", ClassType.make("gnu.kawa.xml.KDocument"));
         types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
       }
     Type type = (Type) types.get(name);

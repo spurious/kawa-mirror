@@ -1,3 +1,9 @@
+2009-12-02  Per Bothner  <per@bothner.com>
+	    Jamison Hope <jrh@theptrgroup.com>
+
+	* classes1.scm (import-class): New test of syntax-case in compiled
+	class.  Based on bug reported by Jamison Hope <jrh@theptrgroup.com>.
+
 2009-12-01  Per Bothner  <per@bothner.com>
 
 	* binarytrees.scm: Use define-class rather than define-simple-class.

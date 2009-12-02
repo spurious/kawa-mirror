@@ -1,5 +1,15 @@
 (module-static counter get-new-count call-lambda)
 
+;; Based on a test-case from Jamison Hope <jrh@theptrgroup.com>
+(define-syntax (import-class form)
+  (syntax-case form ()
+    ((import-class fqcn)
+     (let* ((cls :: java.lang.Class (eval (syntax fqcn)))
+	    (name (string->symbol (java.lang.Class:getSimpleName cls))))
+       #`(define-alias ,(datum->syntax-object form name) fqcn)))))
+
+(import-class java.util.Date)
+
 (define-constant xx :: <int> 20)
 
 (define-simple-class <SimpleA> ()
@@ -66,10 +76,11 @@
 (define (default-offset)
   *MY-YEAR-OFFSET*)
 
-(define-simple-class <DateTest> (<java.util.Date>)
+(define-simple-class <DateTest> (Date)
   (offset init-form:  (default-offset))
   ((get-year) :: <int>
-   (+ (invoke-special <java.util.Date> (this) 'get-year) offset)))
+   ;; Saying plain Date below doesn't work - we get (this):getDate
+   (+ (invoke-special java.util.Date (this) 'get-year) offset)))
 
 (define-simple-class <SimpleDateTest> (<java.util.Date>)
   ((get-year) :: <int>

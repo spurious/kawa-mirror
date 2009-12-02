@@ -1,3 +1,10 @@
+2009-12-02  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (apply): Restore old value of evalFrames[level].
+	This is normally null, but not always when we deal with TemplateScope
+	and other weird scope.
+	Fixes bug reported by Jamison Hope <jrh@theptrgroup.com>.
+
 2009-12-01  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkClassExp): Don't setCanRead.

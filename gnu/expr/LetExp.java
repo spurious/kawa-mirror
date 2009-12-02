@@ -38,6 +38,7 @@ public class LetExp extends ScopeExp
         System.arraycopy(evalFrames, 0, newFrames, 0, evalFrames.length);
         ctx.evalFrames = evalFrames = newFrames;
       }
+    Object[] oldFrame = evalFrames[level]; // usually null
     evalFrames[level] = evalFrame;
 
     try
@@ -65,7 +66,7 @@ public class LetExp extends ScopeExp
       }
     finally
       {
-        evalFrames[level] = null;
+        evalFrames[level] = oldFrame;
       }
   }
 

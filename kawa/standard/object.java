@@ -360,8 +360,8 @@ public class object extends Syntax
         if (supers[i] instanceof ReferenceExp)
           {
             Declaration decl = Declaration.followAliases(((ReferenceExp) supers[i]).getBinding());
-            Expression svalue = decl.getValue();
-            if (svalue instanceof ClassExp)
+            Expression svalue;
+            if (decl != null && (svalue = decl.getValue()) instanceof ClassExp)
               ((ClassExp) svalue).setFlag(ClassExp.HAS_SUBCLASS);
           }
 	superlist = superpair.getCdr();

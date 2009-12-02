@@ -1,8 +1,9 @@
-// Copyright (c) 2004  Per M.A. Bothner.
+// Copyright (c) 2004, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
 import gnu.xml.*;
+import gnu.lists.Sequence;
 /* #ifdef use:org.w3c.dom.Node */
 import org.w3c.dom.*;
 /* #endif */
@@ -37,12 +38,21 @@ public class KDocument extends KNode
   {
     return null;
   }
-
-  public Element getDocumentElement ()
-  {
-    return (Element) getFirstChild();
-  }
   /* #endif */
+
+  public KElement getDocumentElement ()
+  {
+    int child = ((NodeTree) sequence).posFirstChild(ipos);
+    for (;;)
+      {
+        if (child == -1)
+          return null;
+        if (sequence.getNextKind(child) != Sequence.COMMENT_VALUE)
+          break;
+        child = sequence.nextPos(child);
+      }
+    return (KElement) make((NodeTree) sequence, child);
+  }
 
   /* #ifdef use:org.w3c.dom.Node */
   public short getNodeType () { return Node.DOCUMENT_NODE; }

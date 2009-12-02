@@ -26,7 +26,7 @@ modified slightly by Chad Whipkey.
 (define-constant SOLAR_MASS :: double (* 4 PI PI))
 (define-constant DAYS_PER_YEAR :: double 365.24)
 
-(define-simple-class Body ()
+(define-class Body ()
   (x :: double)
   (y :: double)
   (z :: double)

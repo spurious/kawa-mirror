@@ -1,3 +1,14 @@
+2009-12-01  Per Bothner  <per@bothner.com>
+
+	* binarytrees.scm: Use define-class rather than define-simple-class.
+	We now optimize the former as if it were the latter, except that
+	we get a nested class, which is cleaner.
+	* pidigits.scm: Likewise.
+	* threadring.scm: Likewise.
+	* nbody.scm: Likewise.
+	* Makefile.am: Update accordingly, as various classes now are nested.
+	* inlining.expected: Likewise.
+
 2009-11-02  Per Bothner  <per@bothner.com>
 
 	* threadring.scm: New benchmark, for shootout.alioth.debian.org.

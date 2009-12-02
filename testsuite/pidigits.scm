@@ -4,7 +4,7 @@
 ;; http://shootout.alioth.debian.org/u32q/benchmark.php?test=pidigits&lang=javaxint&id=1
 ;;  contributed by Isaac Gouy
 
-(define-simple-class Transformation ()
+(define-class Transformation ()
   (q :: integer)
   (r :: integer)
   (s :: integer)
@@ -36,7 +36,7 @@
 		   s: (+ (* s a:q) (* t a:s))
 		   t: (+ (* s a:r) (* t a:t)))))
 
-(define-simple-class PiDigitSpigot ()
+(define-class PiDigitSpigot ()
   (z :: Transformation init: (Transformation q: 1 r: 0 s: 0 t: 1))
   (x :: Transformation init: (Transformation q: 0 r: 0 s: 0 t: 0))
   (inverse :: Transformation init: (Transformation q: 0 r: 0 s: 0 t: 0))

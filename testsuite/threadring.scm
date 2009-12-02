@@ -13,7 +13,7 @@
 
 (define n :: int (string->number (cadr (command-line))))
 
-(define-simple-class TokenMessage ()
+(define-class TokenMessage ()
   (node-id :: int)
   (value :: int access: 'volatile)
   (is-stop :: boolean)
@@ -25,7 +25,7 @@
    (set! (this):value value)
    (set! (this):is-stop is-stop)))
 
-(define-simple-class Node (java.lang.Runnable)
+(define-class Node (java.lang.Runnable)
   (node-id :: int)
   (next-node :: Node)
   (queue :: java.util.concurrent.BlockingQueue

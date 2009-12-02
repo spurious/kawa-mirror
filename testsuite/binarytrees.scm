@@ -1,5 +1,5 @@
 (define-constant min-depth :: int 4)
-(define-simple-class TreeNode ()
+(define-class TreeNode ()
   (left :: TreeNode)
   (right :: TreeNode)
   (item :: int)

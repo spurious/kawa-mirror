@@ -366,44 +366,46 @@ public class Lambda extends Syntax
     String allocationFlagName = null;
     int accessFlag = 0;
     int allocationFlag = 0;
-    SyntaxForm syntax = null;
+    SyntaxForm syntax0 = null;
     for (;;)
       {
 	while (body instanceof SyntaxForm)
 	  {
-	    syntax = (SyntaxForm) body;
-	    body = syntax.form;
+	    syntax0 = (SyntaxForm) body;
+	    body = syntax0.form;
 	  }
 	if (! (body instanceof Pair))
 	  break;
 	Pair pair1 = (Pair) body;
 	Object attrName = Translator.stripSyntax(pair1.getCar());
+	if (tr.matches(attrName, "::"))
+	  attrName = null;
+	else if (! (attrName instanceof Keyword))
+	  break;
+
+        SyntaxForm syntax1 = syntax0;
 	Object pair1_cdr = pair1.getCdr();
 	while (pair1_cdr instanceof SyntaxForm)
 	  {
-	    syntax = (SyntaxForm) pair1_cdr;
-	    pair1_cdr = syntax.form;
+	    syntax1 = (SyntaxForm) pair1_cdr;
+	    pair1_cdr = syntax1.form;
 	  }
 	if (! (pair1_cdr instanceof Pair))
 	  break;
 	Pair pair2 = (Pair) pair1_cdr;
 
 	Object attrValue;
-	if (tr.matches(attrName, "::"))
-	  attrName = null;
-	else if (! (attrName instanceof Keyword))
-	  break;
 	if (attrName == null)
 	  {
             if (lexp.isClassMethod() && "*init*".equals(lexp.getName()))
               tr.error('e', "explicit return type for '*init*' method");
             else
               // Defer rewrite until rewriteBody.
-              lexp.body = new LangExp(new Object[] { pair2, syntax });
+              lexp.body = new LangExp(new Object[] { pair2, syntax1 });
 	  }
 	else if (attrName == kawa.standard.object.accessKeyword)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
+	    Expression attrExpr = tr.rewrite_car(pair2, syntax1);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof SimpleSymbol
                       /* #ifdef use:java.lang.CharSequence */
@@ -440,7 +442,7 @@ public class Lambda extends Syntax
 	  }
 	else if (attrName == kawa.standard.object.allocationKeyword)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
+	    Expression attrExpr = tr.rewrite_car(pair2, syntax1);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof SimpleSymbol
                       /* #ifdef use:java.lang.CharSequence */
@@ -480,16 +482,16 @@ public class Lambda extends Syntax
 	    else
 	      {
 		ReferenceExp[] exps = new ReferenceExp[count];
-		SyntaxForm syntaxLocal = syntax;
+		SyntaxForm syntax2 = syntax1;
 		for (int i = 0;  i < count; i++)
 		  {
 		    while (attrValue instanceof SyntaxForm)
 		      {
-			syntaxLocal = (SyntaxForm) attrValue;
-			attrValue = syntaxLocal.form;
+			syntax2 = (SyntaxForm) attrValue;
+			attrValue = syntax2.form;
 		      }
 		    Pair pair3 = (Pair) attrValue;
-		    Expression throwsExpr = tr.rewrite_car(pair3, syntaxLocal);
+		    Expression throwsExpr = tr.rewrite_car(pair3, syntax2);
 		    if (throwsExpr instanceof ReferenceExp)
 		      {
 			exps[i] = (ReferenceExp) throwsExpr;
@@ -507,7 +509,7 @@ public class Lambda extends Syntax
 	  }
         else if (attrName == nameKeyword)
           {
-            Expression attrExpr = tr.rewrite_car(pair2, syntax);
+            Expression attrExpr = tr.rewrite_car(pair2, syntax1);
             if (attrExpr instanceof QuoteExp)
               lexp.setName(((QuoteExp) attrExpr).getValue().toString());
           }
@@ -520,8 +522,8 @@ public class Lambda extends Syntax
     accessFlag |= allocationFlag;
     if (accessFlag != 0)
       lexp.nameDecl.setFlag(accessFlag);
-    if (syntax != null)
-      body = syntax.fromDatumIfNeeded(body);
+    if (syntax0 != null)
+      body = syntax0.fromDatumIfNeeded(body);
     return body;
   }
 
@@ -551,6 +553,7 @@ public class Lambda extends Syntax
         && lexp.nameDecl != null
         && tr.getModule().getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
       tr.curMethodLambda = lexp;
+    ScopeExp curs = tr.currentScope();
     tr.pushScope(lexp);
     Declaration prev = null;
     int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;

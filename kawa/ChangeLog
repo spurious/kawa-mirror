@@ -1,5 +1,11 @@
 2009-12-04  Per Bothner  <per@bothner.com>
 
+	* lang/Lambda.java (rewriteAttr): Fix processing of SyntaxForms.
+	This fixes Savannah bug #27042: "Bad interaction between syntax-rules
+	and call-with-values".
+
+2009-12-04  Per Bothner  <per@bothner.com>
+
 	* lang/SyntaxForm.java (toString): Better debugging output.
 	* lang/TemplateScope.java (toString): Also print Syntax object.
 

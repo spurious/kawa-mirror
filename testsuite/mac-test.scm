@@ -1,4 +1,4 @@
-(test-init "macros" 101)
+(test-init "macros" 102)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -571,3 +571,24 @@
    (syntax-rules ()
      ((foo-26993 "foo") 'ok)))
 (test 'ok 'test-savannah-26993 (foo-26993 "foo"))
+
+;; Savannah bug #27042: Bad interaction between syntax-rules and call-with-values
+;; (Though the was actually in the hygiene handling of lambda,
+;; and had nothing to do specifically with call-with-values.)
+(test '(0 10 0) 'test-savannah-27042
+      (let-syntax ((dlet
+		    (syntax-rules ()
+		      ((dlet (var val) body)
+		       (let ((saved var))
+			 (set! var val)
+			 (call-with-values (lambda () body)
+			   (lambda (result)
+			     (set! var saved)
+			     result)))))))
+	(let* ((x 0)
+	       (x0 x)
+	       (x1 
+		(dlet (x (+ x 10))
+		      x))
+	       (x2 x))
+	  (list x0 x1 x2))))

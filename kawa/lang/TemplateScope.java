@@ -16,6 +16,8 @@ public class TemplateScope extends LetExp implements Externalizable
    * This is used to setContextDecl() of such references. */
   Declaration macroContext;
 
+  private Syntax syntax; // Only used for debugging
+
   public TemplateScope ()
   {
     super(null);
@@ -41,8 +43,11 @@ public class TemplateScope extends LetExp implements Externalizable
         templateScope.outer = ((Macro) curSyntax).getCapturedScope();
         templateScope.macroContext = tr.macroContext;
       }
+    templateScope.syntax = curSyntax;
     return templateScope;
   }
+
+  public String toString() { return super.toString()+"(for "+syntax+")"; }
 
   public void writeExternal(ObjectOutput out) throws IOException
   {

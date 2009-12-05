@@ -13,10 +13,8 @@ public class SyntaxForm implements Externalizable
 
   // PairPosition pos;
 
-  /*DEBUGGING:
   static int counter;
   int id = ++counter;
-  */
 
   private SyntaxForm ()
   {
@@ -30,15 +28,25 @@ public class SyntaxForm implements Externalizable
     return sf;
   }
 
+  public static final boolean DEBUGGING = true;
+
   public String toString ()
   {
-    return "#<syntax "
-      + form
-      ///* DEBUGGING:
-      // + " #" id +
-      + " in #"+scope.id
-      //*/
-      +">";
+    StringBuilder sbuf = new StringBuilder("#<syntax");
+    if (DEBUGGING)
+      {
+        sbuf.append('#');
+        sbuf.append(id);
+      }
+    sbuf.append(' ');
+    sbuf.append(form);
+    if (DEBUGGING)
+      {
+        sbuf.append(" in #");
+        sbuf.append(scope.id);
+      }
+    sbuf.append(">");
+    return sbuf.toString();
   }
 
   /** Make a SyntaxForm object with the same contextual information as this.

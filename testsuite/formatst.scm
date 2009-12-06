@@ -649,6 +649,75 @@ def")
 (test '("~:<~W.~:I~W.~W~1I.~W~:>" (defun prod (x y) (* x y)))
       "(defun.prod.(x y).(* x y))")
 
+;; From email by Ken Dicky posted to SRFI-48 mailing list 2005-06-07:
+(test '("~10,3F" 1.02) "     1.020")
+(test '("~10,3F" 1.025) "     1.025")
+(test '("~10,3F" 1.0256) "     1.026")
+(test '("~10,3F" 1.002) "     1.002")
+(test '("~10,3F" 1.0025) "     1.002")
+(test '("~10,3F" 1.00256) "     1.003")
+(test '("~6,3F" 1/3)  " 0.333") ;;; "  .333" OK
+;(test '("~4F" 12) "  12")
+(test '("~8,3F" 12.3456) "  12.346")
+(test '("~6,3F" 123.3456) "123.346")
+(test '("~4,3F" 123.3456) "123.346")
+(set! fail-expected "~F doesn't (yet) support complex numbers")
+(test `("~8,3F" ,(sqrt -3.8)) "0.000+1.949i")
+(test '("~6,2F" 32) " 32.00")
+;; NB: (not (and (exact? 32.) (integer? 32.)))
+#| SRFI-48 results
+(test '("~6F" 32.) "   32.") ;; "  32.0" OK
+(test '("~6F" 32) "    32")
+(test '("~8F" 32e45) "  3.2e46")
+(test '("~8,2F" 3.4567e20) " 3.46e20")
+(test '("~8,2F" 3.4567e21) " 3.46e21")
+(test '("~8,2F" 3.4567e22) " 3.46e22")
+(test '("~8,2F" 3.4567e23) " 3.46e23")
+(test '("~8,0F" 3.4567e24) "   3.e24")
+(test '("~8,1F" 3.4567e24) "  3.5e24")
+(test '("~8,2F" 3.4567e24) " 3.46e24")
+(test '("~8,3F" 3.4567e24) "3.457e24")
+(test '("~8,0F" 3.5567e24) "   4.e24")
+(test '("~8,1F" 3.5567e24) "  3.6e24")
+(test '("~8,2F" 3.5567e24) " 3.56e24")
+(test '("~8F" 32e20) "  3.2e21")
+|#
+;; Common Lisp results.
+(test '("~6F" 32.) "  32.0")
+(test '("~8F" 32e17) "3200000000000000000.")
+(test '("~8F" 32e-45) "     0.0"); CLisp: ".00000000" SRFI-48: " 3.2e-44"
+(test '("~8F" 32e20) "3200000000000000000000.")
+;;(expect "   3.2e6" (format "~8F" 32e5)) ;; ok.  converted in input to 3200000.0
+(test '("~8F" 32e2) "  3200.0") ;; "   3200." OK for SRFI-48
+
+(test '("~8,2F" 32e10) "320000000000.00") ;; SRFI-48: " 3.20e11"
+(test '("~12F" 1.2345) "      1.2345")
+(test '("~12,2F" 1.2345) "        1.23")
+(test '("~12,3F" 1.2345) "       1.234")
+(test `("~20,3F" ,(sqrt -3.8)) "+1.9493588689617927i") ; SRFI-48: "        0.000+1.949i"
+(test `("~8,3F" ,(sqrt -3.8)) "+1.9493588689617927i"); SRFI-48: "0.000+1.949i")
+(test '("~8,2F" 3.4567e11) "345670000000.00") ; SRFI-48: " 3.46e11")
+; (expect "#1=(a b c . #1#)"
+;         (format "~w" (let ( (c '(a b c)) ) (set-cdr! (cddr c) c) c)))
+(test `("~A~A~&" ,(list->string (list #\newline)) "") "\n")
+(test '("~a ~? ~a" a "~s" (new) test) "a new test")
+(test '("~a ~?, ~a!" a "~s ~a" (new test) yes) "a new test, yes!")
+#|
+Does not match implementation - or Common Lisp.
+|#
+(test '("~10,0F" -3e-4) "       -0.")
+(test '("~10,1F" -3e-4) "      -0.0")
+(test '("~10,2F" -3e-4) "     -0.00")
+(test '("~10,3F" -3e-4) "    -0.000")
+(test '("~10,4F" -3e-4) "   -0.0003")
+(test '("~10,5F" -3e-4) "  -0.00030")
+(test '("~10,3F" 1.02) "     1.020")
+(test '("~10,3F" 1.025) "     1.025")
+(test '("~10,3F" 1.0256) "     1.026")
+(test '("~10,3F" 1.002) "     1.002")
+(test '("~10,3F" 1.0025) "     1.002")
+(test '("~10,3F" 1.00256) "     1.003")
+
 ; inquiry test
 
 ;; SLIB specific: (test '("~:q") format:version)

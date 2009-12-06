@@ -1,3 +1,11 @@
+2009-12-05  Per Bothner  <per@bothner.com>
+
+	* RatNum.java (rneg): New method.
+	* RealNum.java (rneg): Hence needs to be non-final.
+	* FixedRealFormat.java: Major re-write.  Minimal support for Complex.
+	If the precision is unspecified, then use Double.toString for
+	better rounding.  Little fixes based on test failures.
+
 2009-10-18  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (shift): Two new overloaded static methods, for

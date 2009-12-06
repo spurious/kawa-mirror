@@ -73,6 +73,8 @@ public abstract class RatNum extends RealNum
     return numerator().isZero();
   }
 
+  public final RatNum rneg() { return RatNum.neg(this); }
+
   /** Return exact "rational" infinity.
   * @param sign either 1 or -1 for positive or negative infinity */
   public static RatNum infinity(int sign)

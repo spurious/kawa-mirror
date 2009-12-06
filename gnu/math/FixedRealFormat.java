@@ -1,10 +1,10 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2009  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
 import java.text.FieldPosition;
 
-// Can't user NumberFormat, because it's format(Object, StringBuffer,
+// Can't use NumberFormat, because its format(Object, StringBuffer,
 // FieldPosition) method is final - and does the wrong thing.
 // (It ends up converting gnu.math number types to long!)
 
@@ -28,36 +28,123 @@ public class FixedRealFormat extends java.text.Format
   public boolean internalPad;
   public char overflowChar;
 
-  public void format(RatNum number, boolean negative,
-		     StringBuffer sbuf, FieldPosition fpos)
+  public void format(RealNum number, StringBuffer sbuf, FieldPosition fpos)
   {
-    int decimals = getMaximumFractionDigits();
-    int digits;
-    int oldSize = sbuf.length();
-    int signLen = 1;
-    if (negative)
-      sbuf.append('-');
-    else if (showPlus)
-      sbuf.append('+');
-    else
-      signLen = 0;
-    String string;
-    int length;
-    if (decimals < 0)
+    int decimals;
+    if (number instanceof RatNum
+        && (decimals = getMaximumFractionDigits()) >= 0)
       {
-	double val = number.doubleValue();
-	int log = (int) (Math.log(val) / ExponentialFormat.LOG10);
-	int cur_scale = log == 0x80000000 ? 0 : 17 - log;
-	string = RealNum.toScaledInt(val, cur_scale).toString();
+        RatNum ratnum = (RatNum) number;
+        boolean negative = ratnum.isNegative();
+        if (negative)
+          ratnum = ratnum.rneg();
+        int oldSize = sbuf.length();
+        int signLen = 1;
+        if (negative)
+          sbuf.append('-');
+        else if (showPlus)
+          sbuf.append('+');
+        else
+          signLen = 0;
+        String string = RealNum.toScaledInt(ratnum, decimals+scale)
+          .toString();
+        sbuf.append(string);
+        int length = string.length();
+        int digits = length - decimals;
+        format(sbuf, fpos, length, digits, decimals, signLen, oldSize);
+      }
+    else
+      format(number.doubleValue(), sbuf, fpos);
+  }
+
+  public StringBuffer format(long num, StringBuffer sbuf, FieldPosition fpos)
+  {
+    format(IntNum.make(num), sbuf, fpos);
+    return sbuf;
+  }
+
+  public StringBuffer format(double num, StringBuffer sbuf, FieldPosition fpos)
+  {
+    if (Double.isNaN(num) || Double.isInfinite(num))
+      return sbuf.append(num);
+    if (getMaximumFractionDigits() >= 0)
+      format(DFloNum.toExact(num), sbuf, fpos);
+    else
+      {
+        boolean negative;
+        if (num < 0)
+          {
+            negative = true;
+            num = -num;
+          }
+        else
+          negative = false;
+        int oldSize = sbuf.length();
+        int signLen = 1;
+        if (negative)
+          sbuf.append('-');
+        else if (showPlus)
+          sbuf.append('+');
+        else
+          signLen = 0;
+
+        String string = Double.toString(num);
+        int cur_scale = scale;
+        int seenE = string.indexOf('E');
+        if (seenE >= 0)
+          {
+            int expStart = seenE+1;
+            if (string.charAt(expStart) == '+')
+              expStart++;
+            cur_scale += Integer.parseInt(string.substring(expStart));
+            string = string.substring(0, seenE);
+          }
+        int seenDot = string.indexOf('.');
+        int length = string.length();
+        if (seenDot >= 0) // Should always be true.
+          {
+            cur_scale -= length - seenDot - 1;
+            length--;
+            string = string.substring(0, seenDot) + string.substring(seenDot+1);
+          }
+
 	int i = string.length();
-	digits = i - cur_scale + scale;
-	if (width > 0)
-	  decimals = width - signLen - 1 - digits;
+
+        // Skip leading zeros.  May happen if scale != 0.
+        int initial_zeros = 0;
+        while (initial_zeros < i - 1 && string.charAt(initial_zeros) == '0')
+          initial_zeros++;
+        if (initial_zeros > 0)
+          {
+            string = string.substring(initial_zeros);
+            i -= initial_zeros;
+          }
+
+        int decimals;
+        int digits = i + cur_scale;
+        if (width > 0)
+          {
+            // Add zeros after the decimal point.  This could be made implicit,
+            // but that would complicate rounding to fit in the field width.
+            while (digits < 0)
+              {
+                sbuf.append('0');
+                digits++;
+                i++;
+              }
+            decimals = width - signLen - 1 - digits;
+          }
 	else
 	  decimals = (i > 16 ? 16 : i) - digits;
 	if (decimals < 0)
 	  decimals = 0;
 	sbuf.append(string);
+        while (cur_scale > 0)
+          {
+            sbuf.append('0');
+            cur_scale--;
+            i++;
+          }
 	int digStart = oldSize + signLen;
 	int digEnd = digStart + digits + decimals;
 	i = sbuf.length();
@@ -68,7 +155,7 @@ public class FixedRealFormat extends java.text.Format
 	    nextDigit = '0';
 	  }
 	else
-	  nextDigit =  sbuf.charAt(digEnd);
+	  nextDigit = sbuf.charAt(digEnd);
 	boolean addOne = nextDigit >= '5';
 	char skip = addOne ? '9' : '0';
 	while (digEnd > digStart + digits && sbuf.charAt(digEnd - 1) == skip)
@@ -93,15 +180,37 @@ public class FixedRealFormat extends java.text.Format
 	    sbuf.insert(digStart+digits, '0');
 	  }
 	sbuf.setLength(digStart + length);
-      }
-    else
-      {
-	string = RealNum.toScaledInt(number, decimals+scale).toString();
-	sbuf.append(string);
-	length = string.length();
-	digits = length - decimals;
-      }
 
+        format(sbuf, fpos, length, digits, decimals,
+               negative ? 1 : 0,
+               oldSize);
+      }
+    return sbuf;
+  }
+
+  public StringBuffer format(Object num, StringBuffer sbuf, FieldPosition fpos)
+  {
+    RealNum rnum = RealNum.asRealNumOrNull(num);
+    if (rnum == null)
+      {
+        if (num instanceof Complex)
+          {
+            // Common Lisp says if value is non-real, print as if with ~wD.
+            String str = num.toString();
+            int padding = width - str.length();
+            while (--padding >= 0)
+              sbuf.append(' ');
+            sbuf.append(str);
+            return sbuf;
+          }
+        rnum = (RealNum) num;
+      }
+    return format(rnum.doubleValue(), sbuf, fpos);
+  }
+
+  /** Do padding and similar adjustments on the converted number. */
+  private void format (StringBuffer sbuf, FieldPosition fpos, int length, int digits, int decimals, int signLen, int oldSize)
+  {
     int total_digits = digits + decimals;
     // Number of initial zeros to add.
     int zero_digits = getMinimumIntegerDigits();
@@ -134,6 +243,7 @@ public class FixedRealFormat extends java.text.Format
      }
     int newSize = sbuf.length();
     sbuf.insert(newSize - decimals, '.');
+
     /* Requires JDK1.2 FieldPosition extensions:
     if (fpos == null)
       {
@@ -150,51 +260,6 @@ public class FixedRealFormat extends java.text.Format
 	  }
       }
     */
-  }
-
-  public void format(RatNum number, StringBuffer sbuf, FieldPosition fpos)
-  {
-    boolean negative = number.isNegative();
-    if (negative)
-      number = (RatNum) number.rneg();
-    format(number, negative, sbuf, fpos);
-  }
-
-  public void format(RealNum number, StringBuffer sbuf, FieldPosition fpos)
-  {
-    if (number instanceof RatNum)
-      format((RatNum) number, sbuf, fpos);
-    else
-      format(number.doubleValue(), sbuf, fpos);
-  }
-
-  public StringBuffer format(long num, StringBuffer sbuf, FieldPosition fpos)
-  {
-    format(IntNum.make(num), sbuf, fpos);
-    return sbuf;
-  }
-
-  public StringBuffer format(double num, StringBuffer sbuf, FieldPosition fpos)
-  {
-    boolean negative;
-    if (num < 0)
-      {
-	negative = true;
-	num = -num;
-      }
-    else
-      negative = false;
-    format(DFloNum.toExact(num), negative, sbuf, fpos);
-    return sbuf;
-  }
-
-  public StringBuffer format(Object num, StringBuffer sbuf, FieldPosition fpos)
-  {
-    // Common Lisp says if value is non-real, print as if with ~wD.  FIXME.
-    RealNum rnum = RealNum.asRealNumOrNull(num);
-    if (rnum == null)
-      rnum = (RealNum) num;
-    return format(rnum.doubleValue(), sbuf, fpos);
   }
 
   public java.lang.Number parse(String text, java.text.ParsePosition status)

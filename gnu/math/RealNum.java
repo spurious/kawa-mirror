@@ -69,7 +69,7 @@ public abstract class RealNum extends Complex
     return isNegative () ? neg () : this;
   }
 
-  public final RealNum rneg() { return (RealNum) neg(); }
+  public RealNum rneg() { return (RealNum) neg(); }
 
   public boolean isZero ()
   {

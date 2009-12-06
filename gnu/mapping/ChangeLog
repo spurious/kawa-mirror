@@ -1,3 +1,9 @@
+2009-12-06  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (mostSpecific): Fix logic bugs.
+	This is one fix for Savannah bug #28022, though I decided it
+	was best to *not* try to sort the methods for specificity.
+
 2009-08-27  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (isSideEffectFree): New method.

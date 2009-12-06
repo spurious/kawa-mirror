@@ -109,7 +109,8 @@ public abstract class MethodProc extends ProcedureN
    * @return null if neither is more specific. */
   public static MethodProc mostSpecific(MethodProc proc1, MethodProc proc2)
   {
-    // True if we've determined proc1 cannot be the more specific.
+    // True if we've determined proc1 cannot be the more specific.  I.e. there
+    // can be aguments lists that are applicable to proc1 and not proc2.
     boolean not1 = false;
     // True if we've determined proc2 cannot be the more specific.
     boolean not2 = false;
@@ -126,14 +127,14 @@ public abstract class MethodProc extends ProcedureN
     if (max1 != max2)
       {
         if (max1 < 0)
-          not2 = true;
-        if (max2 < 0)
           not1 = true;
+        if (max2 < 0)
+          not2 = true;
       }
     if (min1 < min2)
-      not2 = true;
-    else if (min1 > min2)
       not1 = true;
+    else if (min1 > min2)
+      not2 = true;
     for (int i = 0; i < limit; i++)
       {
         Type t1 = proc1.getParameterType(i);

@@ -47,27 +47,19 @@ public class GenericProc extends MethodProc
       add(procs[i]);
   }
 
-  public synchronized void add(MethodProc method)
+  public synchronized void addAtEnd (MethodProc method)
   {
+    int oldCount = count;
     if (methods == null)
       methods = new MethodProc[8];
-    else if (count >= methods.length)
+    else if (oldCount >= methods.length)
       {
         MethodProc[] copy = new MethodProc[2 * methods.length];
-        System.arraycopy(methods, 0, copy, 0, count);
+        System.arraycopy(methods, 0, copy, 0, oldCount);
         methods = copy;
       }
 
-    int i;
-    for (i = 0;  i < count;  i++)
-      {
-	MethodProc best = MethodProc.mostSpecific(method, methods[i]);
-	if (best == method)
-	  break;
-      }
-    if (i < count)
-      System.arraycopy(methods, i, methods, i + 1, count - i);
-    methods[i] = method;
+    methods[oldCount] = method;
 
     int n = method.minArgs();
     if (n < minArgs || count==0)
@@ -75,7 +67,24 @@ public class GenericProc extends MethodProc
     n = method.maxArgs();
     if (n == -1 || n > maxArgs)
       maxArgs = n;
-    count++;
+    count = ++oldCount;
+  }
+
+  public synchronized void add(MethodProc method)
+  {
+    int oldCount = count;
+    addAtEnd(method);
+
+    for (int i = 0;  i < oldCount;  i++)
+      {
+	MethodProc best = MethodProc.mostSpecific(method, methods[i]);
+	if (best == method)
+          {
+            System.arraycopy(methods, i, methods, i + 1, oldCount - i);
+            methods[i] = method;
+            break;
+          }
+      }
   }
 
   /* Possibly optimization.  Likewise for apply0, apply2, apply3, apply4.
@@ -261,6 +270,17 @@ public class GenericProc extends MethodProc
     return NO_MATCH;
   }
 
+  public void setProperty (Keyword key, Object value)
+  {
+    String name = key.getName();
+    if (name == "name")
+      setName(value.toString());
+    else if (name == "method")
+      add((MethodProc) value);
+    else
+      super.setProperty(key.asSymbol(), value);
+  }
+
   public final void setProperties (Object[] args)
   {
     int alen = args.length;
@@ -268,17 +288,7 @@ public class GenericProc extends MethodProc
       {
 	Object arg = args[i];
 	if (arg instanceof Keyword)
-	  {
-            Keyword key = (Keyword) arg;
-	    String name = key.getName();
-	    Object value = args[++i];
-	    if (name == "name")
-	      setName(value.toString());
-	    else if (name == "method")
-	      add((MethodProc) value);
-	    else
-	      setProperty(key.asSymbol(), value);
-	  }
+          setProperty((Keyword) arg, args[++i]);
 	else
 	  add((MethodProc) arg);
       }
@@ -289,6 +299,23 @@ public class GenericProc extends MethodProc
   {
     GenericProc result = new GenericProc();
     result.setProperties(args);
+    return result;
+  }
+
+  public static GenericProc makeWithoutSorting (Object... args)
+  {
+    GenericProc result = new GenericProc();
+
+    int alen = args.length;
+    for (int i = 0;  i < alen;  i++)
+      {
+	Object arg = args[i];
+	if (arg instanceof Keyword)
+          result.setProperty((Keyword) arg, args[++i]);
+	else
+	  result.addAtEnd((MethodProc) arg);
+      }
+
     return result;
   }
 }

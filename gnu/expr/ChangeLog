@@ -1,3 +1,10 @@
+2009-12-06  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java (addAtEnd): New method.
+	(add): Re-implement by calling addAtEnd and then adjusting.
+	(setProperty): New method.
+	(makeWithoutSorting): New factory method.
+
 2009-12-02  Per Bothner  <per@bothner.com>
 
 	* LetExp.java (apply): Restore old value of evalFrames[level].

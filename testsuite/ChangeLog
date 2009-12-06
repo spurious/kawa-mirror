@@ -1,3 +1,11 @@
+2009-12-06  Per Bothner  <per@bothner.com>
+	    Andrea Girotto <andrea.girotto@gmail.com>
+
+	* srfi-16-test.scm: New testcase from Savannah bug #28022:
+	"case-lambda (srfi 16) not working with strings".  Converted to
+	use SRFI-64 style, and also fixed a few test errors.
+	* Makefile.am: Update accordingly.
+
 2009-12-05  Ken Dickey
 	    Per Bothner  <per@bothner.com>
 

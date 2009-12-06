@@ -395,7 +395,8 @@ check2-full-tailcalls:
 check-no-inline:
 	$(MAKE) check2 OPTIONS=--no-inline
 
-check1:  check-num check-arr check-lib check-srfi-64 check-srfi-69 \
+check1:  check-num check-arr check-lib \
+  check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-fannkuch check-fasta check-knucleotide check-mandelbrot check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
@@ -420,6 +421,9 @@ check-arr:
 
 check-lib:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/lib-test.scm"
+
+check-srfi-16:
+	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-16-test.scm"
 
 check-srfi-64:
 	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-64-test.scm"

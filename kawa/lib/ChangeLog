@@ -1,3 +1,10 @@
+2009-12-06  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (case-lambda): Build GenericProc without sorting the
+	methods for specificity.  This fixes Savannah bug #28022:
+	"case-lambda (srfi 16) not working with strings".
+	At the same time clean up to use #` and #' for syntax templates.
+
 2009-10-18  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (bitwise-arithmetic-shift, bitwise-arithmetic-shift-left,

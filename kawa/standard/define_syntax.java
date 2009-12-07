@@ -53,7 +53,7 @@ public class define_syntax extends Syntax
     while (st_cdr instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) st_cdr;
-	st_cdr = syntax.form;
+	st_cdr = syntax.getDatum();
       }
     Object p = st_cdr;
     Object name;
@@ -69,7 +69,7 @@ public class define_syntax extends Syntax
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;
-	name = nameSyntax.form;
+	name = nameSyntax.getDatum();
       }
     name = tr.namespaceResolve(name);
     if (! (name instanceof Symbol))

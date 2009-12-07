@@ -1,3 +1,40 @@
+2009-12-07  Per Bothner  <per@bothner.com>
+
+	Change SyntaxForm to an interface, and use accessor methods.
+	A primary goal is to create a PairSyntaxForm class that is both a
+	Pair (so car and cdr work as in SRFI-72) and a SyntaxForm.
+	* lang/SyntaxForm.java: Change to an interface.
+	Most actual code moved to SyntaxForms.
+	(getDatum, getScope): New accessor methods.
+	* lang/SyntaxForms.java: New helper class containing static methods
+	and member classes.
+	Note the new classes are no longer Externalizable.
+	(class SimpleSyntaxForm): New member class, replaces old SyntaxForm.
+	Note the 'form' field was renamed to 'datum'.
+	(class PairSyntaxForm): New member class, for when the datum is a Pair.
+	* Makefile.am: Update according.
+	* lang/SyntaxRules.java: Update to use new accessors andstatic methods.
+	* lang/Lambda.java
+	* lang/SyntaxTemplate.java: Likewise.
+	* lang/SyntaxPattern.java: Likewise.
+	* lang/Makefile.am: Likewise.
+	* lang/Translator.java: Likewise.
+	* lang/Quote.java: Likewise.
+	* standard/define_syntax.java: Likewise.
+	* standard/IfFeature.java: Likewise.
+	* standard/export.java: Likewise.
+	* standard/syntax_case.java: Likewise.
+	* standard/let.java: Likewise.
+	* standard/module_name.java: Likewise.
+	* standard/define.java: Likewise.
+	* standard/define_alias.java: Likewise.
+	* standard/object.java: Likewise.
+	* standard/fluid_let.java: Likewise.
+	* standard/define_class.java: Likewise.
+	* standard/let_syntax.java: Likewise.
+	* standard/set_b.java: Likewise.
+	* standard/with_compile_options.java: Likewise.
+
 2009-12-04  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java (rewriteAttr): Fix processing of SyntaxForms.

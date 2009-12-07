@@ -21,7 +21,7 @@ public class set_b extends Syntax
     while (o1 instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) o1;
-	o1 = syntax.form;
+	o1 = syntax.getDatum();
       }
     if (! (o1 instanceof Pair))
       return tr.syntaxError ("missing name");
@@ -31,7 +31,7 @@ public class set_b extends Syntax
     while (o2 instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) o2;
-	o2 = syntax.form;
+	o2 = syntax.getDatum();
       }
     Pair p2;
     if (! (o2 instanceof Pair)

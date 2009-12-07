@@ -49,7 +49,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	while (srules instanceof SyntaxForm)
 	  {
 	    rules_syntax = (SyntaxForm) srules;
-	    srules = rules_syntax.form;
+	    srules = rules_syntax.getDatum();
 	  }
 	rules_pair = (Pair) srules;
 
@@ -59,7 +59,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	while (syntax_rule instanceof SyntaxForm)
 	  {
 	    rule_syntax = (SyntaxForm) syntax_rule;
-	    syntax_rule = rule_syntax.form;
+	    syntax_rule = rule_syntax.getDatum();
 	  }
 	if (! (syntax_rule instanceof Pair))
 	  {
@@ -84,7 +84,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    while (syntax_rule instanceof SyntaxForm)
 	      {
 		template_syntax = (SyntaxForm) syntax_rule;
-		syntax_rule = template_syntax.form;
+		syntax_rule = template_syntax.getDatum();
 	      }
 	    if (! (syntax_rule instanceof Pair))
 	      {
@@ -105,7 +105,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    while (pattern instanceof SyntaxForm)
 	      {
 		pattern_syntax = (SyntaxForm) pattern;
-		pattern = pattern_syntax.form;
+		pattern = pattern_syntax.getDatum();
 	      }
 
 	    StringBuffer programbuf = new StringBuffer();
@@ -167,7 +167,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	SyntaxForm sf = (SyntaxForm) arg;
 	Translator tr = (Translator) Compilation.getCurrent();
 	ScopeExp save_scope = tr.currentScope();
-	tr.setCurrentScope(sf.scope);
+	tr.setCurrentScope(sf.getScope());
 	try
 	  {
 	    return expand(sf, tr);

@@ -79,7 +79,7 @@ public class syntax_case extends Syntax
         while (tail instanceof SyntaxForm)
           {
             syntax = (SyntaxForm) tail;
-            tail = syntax.form;
+            tail = syntax.getDatum();
           }
 	pair = (Pair) tail;
 	if (pair.getCdr() == LList.Empty)

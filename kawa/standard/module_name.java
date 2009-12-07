@@ -16,13 +16,13 @@ public class module_name extends Syntax
     while (form_cdr instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) form_cdr;
-	form_cdr = nameSyntax.form;
+	form_cdr = nameSyntax.getDatum();
       }
     Object arg = form_cdr instanceof Pair ? ((Pair) form_cdr).getCar() : null;
     while (arg instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) arg;
-	arg = nameSyntax.form;
+	arg = nameSyntax.getDatum();
       }
     String name = null;
     Pair p;

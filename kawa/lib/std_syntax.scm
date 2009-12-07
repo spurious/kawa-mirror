@@ -252,7 +252,7 @@
   (kawa.lang.Quote:quote obj))
 
 (define (datum->syntax-object template-identifier obj)
-  (kawa.lang.SyntaxForm:makeWithTemplate template-identifier obj))
+  (kawa.lang.SyntaxForms:makeWithTemplate template-identifier obj))
 
 (define (generate-temporaries list)
   (let loop ((n (kawa.lang.Translator:listLength list)) (lst '()))
@@ -262,34 +262,34 @@
 (define (identifier? form) :: <boolean>
   (or (gnu.mapping.Symbol? form)
       (and (kawa.lang.SyntaxForm? form)
-	   (kawa.lang.SyntaxForm:isIdentifier form))))
+	   (kawa.lang.SyntaxForms:isIdentifier form))))
 
 (define (free-identifier=? id1 id2) :: <boolean>
-  (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
+  (kawa.lang.SyntaxForms:freeIdentifierEquals id1 id2))
 
 (define (syntax-source form)
-  (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-source (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (%let ((str (*:getFileName (as  <gnu.lists.PairWithPosition> form))))
+  (cond ((instance? form kawa.lang.SyntaxForm)
+	 (syntax-source (as kawa.lang.SyntaxForm form):datum))
+	((instance? form gnu.lists.PairWithPosition)
+	 (%let ((str (*:getFileName (as  gnu.lists.PairWithPosition form))))
 	   (if (eq? str #!null) #f  str)))
 	(else
 	 #f)))
 
 (define (syntax-line form)
-  (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (*:getLineNumber (as <gnu.lists.PairWithPosition> form)))
+  (cond ((instance? form kawa.lang.SyntaxForm)
+	 (syntax-line (as kawa.lang.SyntaxForm form):datum))
+	((instance? form gnu.lists.PairWithPosition)
+	 ((as gnu.lists.PairWithPosition form):getLineNumber))
 	(else
 	 #f)))
 
 ;; zero-origin for compatility with MzScheme.
 (define (syntax-column form)
   (cond ((instance? form <kawa.lang.SyntaxForm>)
-	 (syntax-line (*:.form (as <kawa.lang.SyntaxForm> form))))
-	((instance? form <gnu.lists.PairWithPosition>)
-	 (- (*:getColumnNumber (as <gnu.lists.PairWithPosition> form)) 0))
+	 (syntax-line (as kawa.lang.SyntaxForm form):datum))
+	((instance? form gnu.lists.PairWithPosition)
+	 (- ((as gnu.lists.PairWithPosition form):getColumnNumber) 0))
 	(else
 	 #f)))
 

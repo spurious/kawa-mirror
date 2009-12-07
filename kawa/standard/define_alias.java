@@ -18,7 +18,7 @@ public class define_alias extends Syntax
     while (formCdr instanceof SyntaxForm)
       {
 	formSyntax = (SyntaxForm) formCdr;
-	formCdr = formSyntax.form;
+	formCdr = formSyntax.getDatum();
       }
     if (formCdr instanceof Pair)
       {
@@ -28,13 +28,13 @@ public class define_alias extends Syntax
         while (name instanceof SyntaxForm)
           {
             nameSyntax = (SyntaxForm) name;
-            name = nameSyntax.form;
+            name = nameSyntax.getDatum();
           }
         formCdr = p.getCdr();
         while (formCdr instanceof SyntaxForm)
           {
             formSyntax = (SyntaxForm) formCdr;
-            formCdr = formSyntax.form;
+            formCdr = formSyntax.getDatum();
           }
         if ((name instanceof String || name instanceof Symbol)
             && formCdr instanceof Pair

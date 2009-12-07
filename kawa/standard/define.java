@@ -50,7 +50,7 @@ public class define extends Syntax
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;
-	name = nameSyntax.form;
+	name = nameSyntax.getDatum();
       }
     int options = ((Number) Translator.stripSyntax(p2.getCar())).intValue();
     boolean makePrivate = (options & 4) != 0;

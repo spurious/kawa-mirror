@@ -87,7 +87,7 @@ public class Lambda extends Syntax
 	  {
 	    SyntaxForm sf = (SyntaxForm) bindings;
 	    // FIXME
-	    bindings = sf.form;
+	    bindings = sf.getDatum();
 	  }
 	if (! (bindings instanceof Pair))
 	  break;
@@ -95,7 +95,7 @@ public class Lambda extends Syntax
         // An initial pass to count the parameters.
 	Object pair_car = pair.getCar();
 	if (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  pair_car = ((SyntaxForm) pair_car).getDatum();
 	if (pair_car == optionalKeyword)
 	  {
 	    if (opt_args >= 0)
@@ -192,10 +192,10 @@ public class Lambda extends Syntax
 	if (bindings instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) bindings;
-	    bindings = sf.form;
+	    bindings = sf.getDatum();
 	    // The SyntaxForm "surrounds" both the current binding (the car),
 	    // as well as the cdr - i.e. the remaining bindings.
-	    templateScopeRest = sf.scope;
+	    templateScopeRest = sf.getScope();
 	  }
 	TemplateScope templateScope = templateScopeRest;
 	if (! (bindings instanceof Pair))
@@ -205,8 +205,8 @@ public class Lambda extends Syntax
 	if (pair_car instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) pair_car;
-	    pair_car = sf.form;
-	    templateScope = sf.scope;
+	    pair_car = sf.getDatum();
+	    templateScope = sf.getScope();
 	  }
 	if (pair_car == optionalKeyword
 	    || pair_car == restKeyword || pair_car == keyKeyword)
@@ -249,8 +249,8 @@ public class Lambda extends Syntax
 	    if (pair_car instanceof SyntaxForm)
 	      {
 		SyntaxForm sf = (SyntaxForm) pair_car;
-		pair_car = sf.form;
-		templateScope = sf.scope;
+		pair_car = sf.getDatum();
+		templateScope = sf.getScope();
 	      }
             pair_car = tr.namespaceResolve(pair_car);
 	    if (pair_car instanceof Symbol
@@ -338,8 +338,8 @@ public class Lambda extends Syntax
     if (bindings instanceof SyntaxForm)
       {
 	SyntaxForm sf = (SyntaxForm) bindings;
-	bindings = sf.form;
-	templateScopeRest = sf.scope;
+	bindings = sf.getDatum();
+	templateScopeRest = sf.getScope();
       }
     if (bindings instanceof Symbol)
       {
@@ -372,7 +372,7 @@ public class Lambda extends Syntax
 	while (body instanceof SyntaxForm)
 	  {
 	    syntax0 = (SyntaxForm) body;
-	    body = syntax0.form;
+	    body = syntax0.getDatum();
 	  }
 	if (! (body instanceof Pair))
 	  break;
@@ -388,7 +388,7 @@ public class Lambda extends Syntax
 	while (pair1_cdr instanceof SyntaxForm)
 	  {
 	    syntax1 = (SyntaxForm) pair1_cdr;
-	    pair1_cdr = syntax1.form;
+	    pair1_cdr = syntax1.getDatum();
 	  }
 	if (! (pair1_cdr instanceof Pair))
 	  break;
@@ -488,7 +488,7 @@ public class Lambda extends Syntax
 		    while (attrValue instanceof SyntaxForm)
 		      {
 			syntax2 = (SyntaxForm) attrValue;
-			attrValue = syntax2.form;
+			attrValue = syntax2.getDatum();
 		      }
 		    Pair pair3 = (Pair) attrValue;
 		    Expression throwsExpr = tr.rewrite_car(pair3, syntax2);
@@ -523,7 +523,7 @@ public class Lambda extends Syntax
     if (accessFlag != 0)
       lexp.nameDecl.setFlag(accessFlag);
     if (syntax0 != null)
-      body = syntax0.fromDatumIfNeeded(body);
+      body = SyntaxForms.fromDatumIfNeeded(body, syntax0);
     return body;
   }
 

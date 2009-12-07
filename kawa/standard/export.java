@@ -32,7 +32,7 @@ public class export extends Syntax
             while (list instanceof SyntaxForm)
               {
                 restSyntax = (SyntaxForm) list;
-                list = restSyntax.form;
+                list = restSyntax.getDatum();
               }
             SyntaxForm nameSyntax = restSyntax;
             if (list instanceof Pair)
@@ -42,7 +42,7 @@ public class export extends Syntax
                 while (symbol instanceof SyntaxForm)
                   {
                     nameSyntax = (SyntaxForm) symbol;
-                    symbol = nameSyntax.form;
+                    symbol = nameSyntax.getDatum();
                   }
                 if (symbol instanceof String)
                   {

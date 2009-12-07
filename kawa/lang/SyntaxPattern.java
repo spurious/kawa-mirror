@@ -254,7 +254,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	while (pattern instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) pattern;
-	    pattern = syntax.form;
+	    pattern = syntax.getDatum();
 	  }
 	if (pattern instanceof Pair)
 	  {
@@ -269,7 +269,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		while (next instanceof SyntaxForm)
 		  {
 		    syntax = (SyntaxForm) next;
-		    next = syntax.form;
+		    next = syntax.getDatum();
 		  }
 		boolean repeat = false;
 		if (next instanceof Pair
@@ -280,7 +280,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		    while (next instanceof SyntaxForm)
 		      {
 			syntax = (SyntaxForm) next;
-			next = syntax.form;
+			next = syntax.getDatum();
 		      }
 		  }
 
@@ -337,15 +337,15 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    for (int j = literal_identifiers.length;  --j >= 0; )
 	      {
                 ScopeExp current = tr.currentScope();
-                ScopeExp scope1 = syntax == null ? current : syntax.scope;
+                ScopeExp scope1 = syntax == null ? current : syntax.getScope();
                 ScopeExp scope2;
                 Object literal = literal_identifiers[j];
                 if (literal instanceof SyntaxForm)
                   {
                     SyntaxForm syntax2 = (SyntaxForm) literal;
                     
-                    literal = syntax2.form;
-                    scope2 = syntax2.scope;
+                    literal = syntax2.getDatum();
+                    scope2 = syntax2.getScope();
                   }
                 else if (tr.currentMacroDefinition != null)
                   scope2 = tr.currentMacroDefinition.getCapturedScope();
@@ -433,7 +433,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
     if ((ch & 7) == MATCH_ANY_CAR)
       {
 	if (syntax != null && ! (p.getCar() instanceof SyntaxForm))
-	  p = Translator.makePair(p, syntax.fromDatum(p.getCar()), p.getCdr());
+	  p = Translator.makePair(p, SyntaxForms.fromDatum(p.getCar(), syntax), p.getCdr());
 	vars[start_vars + value] = p;
 	return true;
       }
@@ -450,7 +450,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	while (obj instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) obj;
-	    obj = syntax.form;
+	    obj = syntax.getDatum();
 	  }
 	char ch = program.charAt(pc++);
 	int opcode = ch & 7;
@@ -481,7 +481,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    for (int i = 0;;i++)
 	      {
 		while (o instanceof SyntaxForm)
-		  o = ((SyntaxForm) o).form;
+		  o = ((SyntaxForm) o).getDatum();
 		if (i == npairs)
 		  {
 		    if ((value&1) == 0 ? o != LList.Empty : o instanceof Pair)
@@ -554,7 +554,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		while (obj instanceof SyntaxForm)
 		  {
 		    syntax = (SyntaxForm) obj;
-		    obj = syntax.form;
+		    obj = syntax.getDatum();
 		  }
 		p = (Pair) obj;
 		if (! match_car (p, vars, start_vars, repeat_pc, syntax))
@@ -577,8 +577,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
             if (lit instanceof SyntaxForm)
               {
                 SyntaxForm sf = (SyntaxForm) lit;
-                id1 = sf.form;
-                sc1 = sf.scope;
+                id1 = sf.getDatum();
+                sc1 = sf.getScope();
               }
             else
               {
@@ -589,18 +589,18 @@ public class SyntaxPattern extends Pattern implements Externalizable
             if (obj instanceof SyntaxForm)
               {
                 SyntaxForm sf = (SyntaxForm) obj;
-                id2 = sf.form;
-                sc2 = sf.scope;
+                id2 = sf.getDatum();
+                sc2 = sf.getScope();
               }
             else
               {
                 id2 = obj;
-                sc2 = syntax == null ? tr.currentScope() : syntax.scope;
+                sc2 = syntax == null ? tr.currentScope() : syntax.getScope();
               }
             return literalIdentifierEq(id1, sc1, id2, sc2);
 	  case MATCH_ANY:
 	    if (syntax != null)
-	      obj = syntax.fromDatum(obj);
+	      obj = SyntaxForms.fromDatum(obj, syntax);
 	    vars[start_vars + value] = obj;
 	    return true;
 	  case MATCH_ANY_CAR: // Disallowed here.
@@ -680,7 +680,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	while (list instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) list;
-	    list = syntax.form;
+	    list = syntax.getDatum();
 	  }
 	Pair pair = (Pair) list;
 	tr.pushPositionOf(pair);
@@ -689,7 +689,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	if (literal instanceof SyntaxForm)
 	  {
 	    wrapped = literal;
-	    literal = (( SyntaxForm) literal).form;
+	    literal = ((SyntaxForm) literal).getDatum();
 	  }
 	else
 	  wrapped = literal; // FIXME

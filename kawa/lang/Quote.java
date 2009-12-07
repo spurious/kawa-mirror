@@ -166,7 +166,7 @@ public class Quote extends Syntax
             while (form instanceof SyntaxForm)
               {
                 subsyntax = (SyntaxForm) form;
-                form = subsyntax.form;
+                form = subsyntax.getDatum();
               }
             int splicing = -1;
             if (form instanceof Pair)
@@ -189,7 +189,7 @@ public class Quote extends Syntax
                     if (form instanceof SyntaxForm)
                       {
                         subsyntax = (SyntaxForm) form;
-                        form = subsyntax.form;
+                        form = subsyntax.getDatum();
                       }
                     if (form == LList.Empty)
                       break;
@@ -322,7 +322,7 @@ public class Quote extends Syntax
     else if (template instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) template;
-	result = expand(syntax.form, depth, syntax, seen, tr);
+	result = expand(syntax.getDatum(), depth, syntax, seen, tr);
       }
     else if (template instanceof FVector)
       {
@@ -447,14 +447,14 @@ public class Quote extends Syntax
             while (list instanceof SyntaxForm)
               {
                 syntax = (SyntaxForm) list;
-                list = syntax.form;
+                list = syntax.getDatum();
               }
             if (list == LList.Empty)
               break;
 	    Pair list_pair = (Pair) list;
             Object car = list_pair.getCar();
             if (syntax != null && ! (car instanceof SyntaxForm))
-              car = SyntaxForm.make(car, syntax.scope);
+              car = SyntaxForms.makeForm(car, syntax.getScope());
 	    Pair new_pair = new Pair(car, null);
 	    if (last == null)
 	      copy = new_pair;

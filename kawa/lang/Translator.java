@@ -98,13 +98,13 @@ public class Translator extends Compilation
 
   public final Expression rewrite_car (Pair pair, SyntaxForm syntax)
   {
-    if (syntax == null || syntax.scope == current_scope
+    if (syntax == null || syntax.getScope() == current_scope
 	|| pair.getCar() instanceof SyntaxForm)
       return rewrite_car(pair, false);
     ScopeExp save_scope = current_scope;
     try
       {
-	setCurrentScope(syntax.scope);
+	setCurrentScope(syntax.getScope());
 	return rewrite_car(pair, false);
       }
     finally
@@ -187,7 +187,7 @@ public class Translator extends Compilation
     if (form instanceof SyntaxForm)
       {
 	// FIXME
-	form = ((SyntaxForm) form).form;
+	form = ((SyntaxForm) form).getDatum();
       }
     if (form instanceof SimpleSymbol && ! selfEvaluatingSymbol(form))
       {
@@ -208,7 +208,7 @@ public class Translator extends Compilation
     if (form instanceof SyntaxForm)
       {
 	// FIXME
-	form = ((SyntaxForm) form).form;
+	form = ((SyntaxForm) form).getDatum();
       }
     if (form instanceof SimpleSymbol && ! selfEvaluatingSymbol(form))
       {
@@ -376,8 +376,8 @@ public class Translator extends Compilation
 	if (cdr instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) cdr;
-	    cdr = sf.form;
-	    setCurrentScope(sf.scope);
+	    cdr = sf.getDatum();
+	    setCurrentScope(sf.getScope());
 	  }
 	Pair cdr_pair = (Pair) cdr;
 	Expression arg = rewrite_car (cdr_pair, false);
@@ -477,14 +477,14 @@ public class Translator extends Compilation
   public static Object stripSyntax (Object obj)
   {
     while (obj instanceof SyntaxForm)
-      obj = ((SyntaxForm) obj).form;
+      obj = ((SyntaxForm) obj).getDatum();
     return obj;
   }
 
   public static Object safeCar (Object obj)
   {
     while (obj instanceof SyntaxForm)
-      obj = ((SyntaxForm) obj).form;
+      obj = ((SyntaxForm) obj).getDatum();
     if (! (obj instanceof Pair))
       return null;
     return stripSyntax(((Pair) obj).getCar());
@@ -493,7 +493,7 @@ public class Translator extends Compilation
   public static Object safeCdr (Object obj)
   {
     while (obj instanceof SyntaxForm)
-      obj = ((SyntaxForm) obj).form;
+      obj = ((SyntaxForm) obj).getDatum();
     if (! (obj instanceof Pair))
       return null;
     return stripSyntax(((Pair) obj).getCdr());
@@ -515,9 +515,9 @@ public class Translator extends Compilation
       {
 	// 'n' is number of previous Pairs before 'fast' cursor.
 	while (fast instanceof SyntaxForm)
-	  fast = ((SyntaxForm) fast).form;
+	  fast = ((SyntaxForm) fast).getDatum();
 	while (slow instanceof SyntaxForm)
-	  slow = ((SyntaxForm) slow).form;
+	  slow = ((SyntaxForm) slow).getDatum();
 	if (fast == LList.Empty)
 	  return n;
 	if (! (fast instanceof Pair))
@@ -525,7 +525,7 @@ public class Translator extends Compilation
 	n++;
 	Object next = ((Pair) fast).getCdr();
 	while (next instanceof SyntaxForm)
-	  next = ((SyntaxForm) next).form;
+	  next = ((SyntaxForm) next).getDatum();
 	if (next == LList.Empty)
 	  return n;
 	if (! (next instanceof Pair))
@@ -546,8 +546,8 @@ public class Translator extends Compilation
 	ScopeExp save_scope = current_scope;
 	try
 	  {
-	    setCurrentScope(sf.scope);
-	    rewriteInBody(sf.form);
+	    setCurrentScope(sf.getScope());
+	    rewriteInBody(sf.getDatum());
 	  }
 	finally
 	  {
@@ -606,8 +606,8 @@ public class Translator extends Compilation
 	ScopeExp save_scope = current_scope;
 	try
 	  {
-	    setCurrentScope(sf.scope);
-	    Expression s = rewrite(sf.form, function);
+	    setCurrentScope(sf.getScope());
+	    Expression s = rewrite(sf.getDatum(), function);
 	    return s;
 	  }
 	finally
@@ -841,7 +841,7 @@ public class Translator extends Compilation
   public Object pushPositionOf(Object pair)
   {
     if (pair instanceof SyntaxForm)
-      pair = ((SyntaxForm) pair).form;
+      pair = ((SyntaxForm) pair).getDatum();
     if (! (pair instanceof PairWithPosition))
       return null;
     PairWithPosition ppair = (PairWithPosition) pair;
@@ -936,7 +936,7 @@ public class Translator extends Compilation
     if (syntax == null || form instanceof Expression)
       return form;
     else
-      return syntax.fromDatumIfNeeded(form);
+      return SyntaxForms.fromDatumIfNeeded(form, syntax);
   }
 
   public Object popForms (int first)
@@ -966,9 +966,9 @@ public class Translator extends Compilation
 	ScopeExp save_scope = currentScope();
 	try
 	  {
-	    setCurrentScope(sf.scope);
+	    setCurrentScope(sf.getScope());
 	    int first = formStack.size();
-	    scanForm(sf.form, defs);
+	    scanForm(sf.getDatum(), defs);
 	    formStack.add(wrapSyntax(popForms(first), sf));
 	    return;
 	  }
@@ -1004,8 +1004,8 @@ public class Translator extends Compilation
             if (obj instanceof SyntaxForm)
               {
                 SyntaxForm sf = (SyntaxForm) st_pair.getCar();
-                setCurrentScope(sf.scope);
-                obj = sf.form;
+                setCurrentScope(sf.getScope());
+                obj = sf.getDatum();
               }
             Pair p;
             if (obj instanceof Pair
@@ -1104,9 +1104,9 @@ public class Translator extends Compilation
 	    ScopeExp save_scope = current_scope;
 	    try
 	      {
-		setCurrentScope(sf.scope);
+		setCurrentScope(sf.getScope());
 		int first = formStack.size();
-		Object f = scanBody(sf.form, defs, makeList);
+		Object f = scanBody(sf.getDatum(), defs, makeList);
                 if (makeList)
                   {
                     f = wrapSyntax(f, sf);
@@ -1488,13 +1488,13 @@ public class Translator extends Compilation
 
   public Declaration define (Object name, SyntaxForm nameSyntax, ScopeExp defs)
   {
-    boolean aliasNeeded = nameSyntax != null && nameSyntax.scope != currentScope();
+    boolean aliasNeeded = nameSyntax != null && nameSyntax.getScope() != currentScope();
     Object declName = aliasNeeded ? new String(name.toString()) : name;
     Declaration decl = defs.getDefine(declName, 'w', this);
     if (aliasNeeded)
       {
-	Declaration alias = makeRenamedAlias(name, decl, nameSyntax.scope);
-	nameSyntax.scope.addDeclaration(alias);
+	Declaration alias = makeRenamedAlias(name, decl, nameSyntax.getScope());
+        nameSyntax.getScope().addDeclaration(alias);
       }
     push(decl);
     return decl;

@@ -38,7 +38,7 @@ public class let extends Syntax
 	while (bindings instanceof SyntaxForm)
 	  {
 	    syntaxRest = (SyntaxForm) bindings;
-	    bindings = syntaxRest.form;
+	    bindings = syntaxRest.getDatum();
 	    // The SyntaxForm "surrounds" both the current binding (the car),
 	    // as well as the cdr - i.e. the remaining bindings.
 	  }
@@ -48,7 +48,7 @@ public class let extends Syntax
 	if (bind_pair_car instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) bind_pair_car;
-	    bind_pair_car = syntax.form;
+	    bind_pair_car = syntax.getDatum();
 	  }
 	if (! (bind_pair_car instanceof Pair))
 	  return tr.syntaxError ("let binding is not a pair:"+bind_pair_car);
@@ -58,11 +58,11 @@ public class let extends Syntax
 	if (name instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) name;
-	    name = sf.form;
-	    templateScope = sf.scope;
+	    name = sf.getDatum();
+	    templateScope = sf.getScope();
 	  }
 	else
-	  templateScope = syntax == null ? null : syntax.scope;
+	  templateScope = syntax == null ? null : syntax.getScope();
         name = tr.namespaceResolve(name);
 	if (! (name instanceof String) && ! (name instanceof Symbol))
 	  return tr.syntaxError("variable "+name+" in let binding is not a symbol: "+obj);
@@ -82,7 +82,7 @@ public class let extends Syntax
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) binding_cdr;
-	    binding_cdr = syntax.form;
+	    binding_cdr = syntax.getDatum();
 	  }
 	if (! (binding_cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for '"+name+"'");
@@ -92,7 +92,7 @@ public class let extends Syntax
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) binding_cdr;
-	    binding_cdr = syntax.form;
+	    binding_cdr = syntax.getDatum();
 	  }
 	if (tr.matches(binding.getCar(), "::"))
 	  {
@@ -103,7 +103,7 @@ public class let extends Syntax
 	    while (binding_cdr instanceof SyntaxForm)
 	      {
 		syntax = (SyntaxForm) binding_cdr;
-		binding_cdr = syntax.form;
+		binding_cdr = syntax.getDatum();
 	      }
 	  }
 	if (binding_cdr == LList.Empty)

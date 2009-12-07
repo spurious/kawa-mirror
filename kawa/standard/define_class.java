@@ -35,7 +35,7 @@ public class define_class extends Syntax
     while (st_cdr instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) st_cdr;
-	st_cdr = nameSyntax.form;
+	st_cdr = nameSyntax.getDatum();
       }
     if (! (st_cdr instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
@@ -44,7 +44,7 @@ public class define_class extends Syntax
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;
-	name = nameSyntax.form;
+	name = nameSyntax.getDatum();
       }
     name = tr.namespaceResolve(name);
     if (! (name instanceof String || name instanceof Symbol))
@@ -72,7 +72,7 @@ public class define_class extends Syntax
     while (members instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) members;
-	members = nameSyntax.form;
+	members = nameSyntax.getDatum();
       }
     if (! (members instanceof Pair))
       {
@@ -82,7 +82,7 @@ public class define_class extends Syntax
     p = (Pair) members;
     ScopeExp save_scope = tr.currentScope();
     if (nameSyntax != null)
-      tr.setCurrentScope(nameSyntax.scope);
+      tr.setCurrentScope(nameSyntax.getScope());
     Object[] saved = objectSyntax.scanClassDef(p, oexp, tr);
     if (nameSyntax != null)
       tr.setCurrentScope(save_scope);

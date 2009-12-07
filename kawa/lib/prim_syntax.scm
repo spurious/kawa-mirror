@@ -64,12 +64,12 @@
 (%define-syntax syntax->expression
   (syntax-rules ()
     ((syntax->expression x)
-     (invoke-static <kawa.lang.SyntaxForm> 'rewrite x))))
+     (kawa.lang.SyntaxForms:rewrite x))))
 
 (%define-syntax syntax-body->expression
   (syntax-rules ()
     ((syntax-body->expression x)
-     (invoke-static <kawa.lang.SyntaxForm> 'rewriteBody x))))
+     (kawa.lang.SyntaxForms:rewriteBody x))))
 
 (%define-syntax if
   (lambda (x)

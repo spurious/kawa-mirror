@@ -10,7 +10,7 @@ public class IfFeature
     if (form instanceof SyntaxForm)
       {
 	SyntaxForm sf = (SyntaxForm) form;
-	form = sf.form;
+	form = sf.getDatum();
       }
     if (form instanceof String || form instanceof SimpleSymbol)
       return hasFeature(form.toString());

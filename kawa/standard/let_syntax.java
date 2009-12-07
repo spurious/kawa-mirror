@@ -47,7 +47,7 @@ public class let_syntax extends Syntax
 	while (bindings instanceof SyntaxForm)
 	  {
 	    listSyntax = (SyntaxForm) bindings;
-	    bindings = listSyntax.form;
+	    bindings = listSyntax.getDatum();
 	  }
 	SyntaxForm bindingSyntax = listSyntax;
 	Pair bind_pair = (Pair) bindings;
@@ -55,7 +55,7 @@ public class let_syntax extends Syntax
 	if (bind_pair_car instanceof SyntaxForm)
 	  {
 	    bindingSyntax = (SyntaxForm) bind_pair_car;
-	    bind_pair_car = bindingSyntax.form;
+	    bind_pair_car = bindingSyntax.getDatum();
 	  }
 	if (! (bind_pair_car instanceof Pair))
 	  return tr.syntaxError (getName()+" binding is not a pair");
@@ -65,7 +65,7 @@ public class let_syntax extends Syntax
 	while (name instanceof SyntaxForm)
 	  {
 	    nameSyntax = (SyntaxForm) name;
-	    name = nameSyntax.form;
+	    name = nameSyntax.getDatum();
 	  }
 	if (! (name instanceof String || name instanceof Symbol))
 	  return tr.syntaxError("variable in "+getName()+" binding is not a symbol");
@@ -73,7 +73,7 @@ public class let_syntax extends Syntax
 	while (binding_cdr instanceof SyntaxForm)
 	  {
 	    bindingSyntax = (SyntaxForm) binding_cdr;
-	    binding_cdr = bindingSyntax.form;
+	    binding_cdr = bindingSyntax.getDatum();
 	  }
 	if (! (binding_cdr instanceof Pair))
 	  return tr.syntaxError(getName()+" has no value for '"+name+"'");
@@ -86,7 +86,7 @@ public class let_syntax extends Syntax
 	transformers[i] = binding;
 	trSyntax[i] = bindingSyntax;
         let.addDeclaration(decl);
-	ScopeExp templateScope = nameSyntax == null ? null : nameSyntax.scope;
+	ScopeExp templateScope = nameSyntax == null ? null : nameSyntax.getScope();
 	if (templateScope != null)
 	  {
 	    Declaration alias = tr.makeRenamedAlias(decl, templateScope);
@@ -95,7 +95,7 @@ public class let_syntax extends Syntax
 	    renamedAliases.push(alias);
 	    renamedAliasesCount++;
 	  }
-        macro.setCapturedScope(bindingSyntax != null ? bindingSyntax.scope
+        macro.setCapturedScope(bindingSyntax != null ? bindingSyntax.getScope()
                                : recursive ? let : tr.currentScope());
         decls[i] = decl;
 	inits[i] = QuoteExp.nullExp;

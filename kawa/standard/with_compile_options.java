@@ -38,7 +38,7 @@ public class with_compile_options extends Syntax
 	while (form instanceof SyntaxForm)
 	  {
 	    syntax = (SyntaxForm) form;
-	    form = syntax.form;
+	    form = syntax.getDatum();
 	  }
 	if (! (form instanceof Pair))
 	  break;
@@ -55,7 +55,7 @@ public class with_compile_options extends Syntax
 	    while (form instanceof SyntaxForm)
 	      {
 		syntax = (SyntaxForm) form;
-		form = syntax.form;
+		form = syntax.getDatum();
 	      }
 	    if (! (form instanceof Pair))
 	      {

@@ -218,7 +218,7 @@ public class SyntaxTemplate implements Externalizable
     while (form instanceof SyntaxForm)
       {
 	syntax = (SyntaxForm) form;
-	form = syntax.form;
+	form = syntax.getDatum();
       }
     /* #ifdef use:java.util.IdentityHashMap */ 
     if (form instanceof Pair || form instanceof FVector)
@@ -516,7 +516,7 @@ public class SyntaxTemplate implements Externalizable
     else if (ch == BUILD_SYNTAX)
       {
 	Object v = execute(pc+1, vars, nesting, indexes, tr, templateScope);
-	return v == LList.Empty ? v : SyntaxForm.make(v, templateScope);
+	return v == LList.Empty ? v : SyntaxForms.makeForm(v, templateScope);
       }
     else if ((ch & 7) == BUILD_CONS)
       {

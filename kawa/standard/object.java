@@ -72,7 +72,7 @@ public class object extends Syntax
 	// The SyntaxForm scopes aren't used in scanClassDef, but they are
 	// used in rewriteClassDef, and might as well make the code the same.
 	while (obj instanceof SyntaxForm)
-	  obj = ((SyntaxForm) obj).form;
+	  obj = ((SyntaxForm) obj).getDatum();
 	if (! (obj instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -81,13 +81,13 @@ public class object extends Syntax
 	pair = (Pair) obj;
 	Object pair_car = pair.getCar();
 	while (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  pair_car = ((SyntaxForm) pair_car).getDatum();
 	obj = pair.getCdr(); // Next member.
 	Object savedPos1 = tr.pushPositionOf(pair);
         if (pair_car instanceof Keyword)
           {
             while (obj instanceof SyntaxForm)
-              obj = ((SyntaxForm) obj).form;
+              obj = ((SyntaxForm) obj).getDatum();
             if (obj instanceof Pair)
               {
                 if (pair_car == interfaceKeyword)
@@ -136,7 +136,7 @@ public class object extends Syntax
 	pair = (Pair) pair_car;
 	pair_car = pair.getCar();
 	while (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  pair_car = ((SyntaxForm) pair_car).getDatum();
 	if (pair_car instanceof String || pair_car instanceof Symbol
 	    || pair_car instanceof Keyword)
 	  { // Field declaration.
@@ -165,12 +165,12 @@ public class object extends Syntax
 	    while (args != LList.Empty)
 	      {
                 while (args instanceof SyntaxForm)
-                  args = ((SyntaxForm) args).form;
+                  args = ((SyntaxForm) args).getDatum();
 		pair = (Pair) args;
 		Pair keyPair = pair;
 		Object key = pair.getCar();
                 while (key instanceof SyntaxForm)
-                  key = ((SyntaxForm) key).form;
+                  key = ((SyntaxForm) key).getDatum();
 		Object savedPos2 = tr.pushPositionOf(pair);
 		args = pair.getCdr();
 		if ((key == coloncolon || key instanceof Keyword)
@@ -353,7 +353,7 @@ public class object extends Syntax
 	while (superlist instanceof SyntaxForm)
 	  {
 	    // FIXME - need to pass syntax.
-	    superlist = ((SyntaxForm) superlist).form;
+	    superlist = ((SyntaxForm) superlist).getDatum();
 	  }
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite_car(superpair, false);
@@ -403,7 +403,7 @@ public class object extends Syntax
 	while (obj instanceof SyntaxForm)
 	  {
 	    componentsSyntax = (SyntaxForm) obj;
-	    obj = componentsSyntax.form;
+	    obj = componentsSyntax.getDatum();
 	  }
 	Pair pair = (Pair) obj;
 	Object savedPos1 = tr.pushPositionOf(pair);
@@ -412,7 +412,7 @@ public class object extends Syntax
 	while (pair_car instanceof SyntaxForm)
 	  {
 	    memberSyntax = (SyntaxForm) pair_car;
-	    pair_car = memberSyntax.form;
+	    pair_car = memberSyntax.getDatum();
 	  }
 	try
 	  {
@@ -430,7 +430,7 @@ public class object extends Syntax
 	    while (pair_car instanceof SyntaxForm)
 	      {
 		memberCarSyntax = (SyntaxForm) pair_car;
-		pair_car = memberCarSyntax.form;
+		pair_car = memberCarSyntax.getDatum();
 	      }
 	    if (pair_car instanceof String || pair_car instanceof Symbol
 		|| pair_car instanceof Keyword)
@@ -445,12 +445,12 @@ public class object extends Syntax
                     while (args instanceof SyntaxForm)
                       {
                         memberSyntax = (SyntaxForm) args;
-                        args = memberSyntax.form;
+                        args = memberSyntax.getDatum();
                       }
 		    pair = (Pair) args;
 		    Object key = pair.getCar();
                     while (key instanceof SyntaxForm)
-                      key = ((SyntaxForm) key).form;
+                      key = ((SyntaxForm) key).getDatum();
 		    Object savedPos2 = tr.pushPositionOf(pair);
 		    args = pair.getCdr();
 		    if ((key == coloncolon || key instanceof Keyword)
@@ -516,7 +516,7 @@ public class object extends Syntax
 		// renamed alias.  A TemplateScope that covers the formals
 		// *and* the body we handle using setCurrentScope.
 		if (memberSyntax != null)
-		  tr.setCurrentScope(memberSyntax.scope);
+		  tr.setCurrentScope(memberSyntax.getScope());
                 if ("*init*".equals(meth.getName()))
                   meth.setReturnType(Type.voidType);
                 Translator.setLine(meth, pair);
@@ -525,8 +525,8 @@ public class object extends Syntax
 		lambda.rewrite(meth, ((Pair) pair_car).getCdr(), pair.getCdr(), tr,
 			       memberCarSyntax != null
 			       && (memberSyntax == null
-				   || memberCarSyntax.scope != memberSyntax.scope)
-			       ? memberCarSyntax.scope
+				   || memberCarSyntax.getScope() != memberSyntax.getScope())
+			       ? memberCarSyntax.getScope()
 			       : null);
                 tr.curMethodLambda = saveLambda;
 		if (memberSyntax != null)

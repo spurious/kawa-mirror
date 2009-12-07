@@ -1,3 +1,8 @@
+2009-12-07  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm: Update for SyntaxForm made an interface.
+	* prim_syntax.java: Likewise.
+
 2009-12-06  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (case-lambda): Build GenericProc without sorting the

@@ -65,7 +65,7 @@ public class fluid_let extends Syntax
               {
                 name = binding.getCar();
                 if (name instanceof SyntaxForm)
-                  name = ((SyntaxForm)name).form;
+                  name = ((SyntaxForm) name).getDatum();
 
                 if (binding.getCdr() == LList.Empty)
                   value = defaultInit;

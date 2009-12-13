@@ -1,3 +1,8 @@
+2009-12-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (FAQs): New chapter node for Frequenlt Asked Questions.
+	Start by discussing define-alias used like Java import.
+
 2009-11-01  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Module classes, Compilation options): Update since

@@ -153,6 +153,7 @@ This package has nothing to do with the defunct
 * Objects Classes and Modules::
 * XML tools::            XML, HTML, and the web
 * Low-level functions::  Deprecated low-level functions
+* FAQs:: Frequently Asked Questions
 * Community::
 * License::
 * Overall Index::	 Index of functions, macros, concepts, and more.
@@ -1736,6 +1737,9 @@ and belongs to the package itself.)
 If the namespace-name starts with the string @code{"class:"}, then the
 @var{name} can be used for invoking Java methods
 (@pxref{Method operations}) and accessing fields (@pxref{Field operations}).
+
+You can use a namespace as an abbreviation or renaming of a
+class name, but as a matter of style @code{define-alias} is preferred.
 @end deffn
 
 @deffn Syntax define-private-namespace name namespace-name
@@ -4509,6 +4513,12 @@ Some people might find it helpful to think of a location
 as a settable @dfn{thunk}.  Others may find it useful to
 think of the @code{location} syntax as similar to the C @samp{&} operator;
 for the @samp{*} indirection operator, Kawa uses procedure application.
+
+You can use @code{define-alias} to define a shorter type synonym,
+similar to Java's  @code{import TypeName} (single-type-import) declaration:
+@example
+(define-alias StrBuf java.lang.StringBuffer)
+@end example
 
 @node Parameter objects, , Locations, Eval and Environments
 @section Parameter objects
@@ -8300,7 +8310,7 @@ BRL has an extensive utility library.  Most of this has not yet been ported
 to KRL, even in BRL-compatibility mode.
 @end itemize
 
-@node Low-level functions, Community, XML tools, Top
+@node Low-level functions, FAQs, XML tools, Top
 @chapter Deprecated low-level functions
 
 These sections document older and less convenient ways
@@ -8430,7 +8440,34 @@ Applying the procedure returns the length of the array.
 (Alternatively, you can use @code{(field @var{array} 'length)}.)
 @end deffn
 
-@node Community, License, Low-level functions, Top
+@node FAQs, Community, Low-level functions, Top
+@chapter Frequently Asked Questions
+
+@subsubsection What is the equivalent of Java import?
+
+Kawa's @code{import} follows R6RS, so it is bit like
+Java's @code{import static TypeName.*} (static-import-on-demand) declaration.
+
+Jawa doesn't have a direct equivalent of
+Java's @code{import TypeName} (single-type-import) declaration,
+but @code{define-alias} provides similar functionality:
+@example
+(define-alias StrBuf java.lang.StringBuffer)
+@end example
+This has the advantage that you can pick an arbitrary name as an alias.
+
+There is no direct equivalent to Java's @code{import PackageOrTypeName.*}
+(type-import-on-demand) declaration, but you can alias a package:
+@example
+(define-alias jutil java.util)
+(define mylist :: jutil:List (jutil:ArrayList))
+@end example
+
+You can also use @code{define-namespace} to introduce an abbreviation or
+renaming of a class name, but as a matter of style @code{define-alias}
+is preferred.
+
+@node Community, License, FAQs, Top
 @chapter The Kawa Community
 
 @menu

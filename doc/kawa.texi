@@ -8448,7 +8448,7 @@ Applying the procedure returns the length of the array.
 Kawa's @code{import} follows R6RS, so it is bit like
 Java's @code{import static TypeName.*} (static-import-on-demand) declaration.
 
-Jawa doesn't have a direct equivalent of
+Kawa doesn't have a direct equivalent of
 Java's @code{import TypeName} (single-type-import) declaration,
 but @code{define-alias} provides similar functionality:
 @example

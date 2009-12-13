@@ -892,8 +892,22 @@ public class Translator extends Compilation
         texp = new InlineCalls(this).walk(texp);
 	if (texp instanceof ErrorExp)
 	  return null;
-	Type type = getLanguage().getTypeFor(texp);
-	 if (type == null)
+        Type type = getLanguage().getTypeFor(texp);
+        if (type == null)
+          {
+            try
+              {
+                Object t = texp.eval(env);
+                if (t instanceof Class)
+                  type = Type.make((Class) t);
+                else if (t instanceof Type)
+                  type = (Type) t;
+              }
+            catch (Throwable ex)
+              {
+              }
+          }
+        if (type == null)
 	   {
 	     if (texp instanceof ReferenceExp)
 	       error('e', "unknown type name '"

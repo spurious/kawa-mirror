@@ -1,3 +1,10 @@
+2009-12-13  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Don't set STATIC on a field initialized
+	in the run method, even if it is constant.
+	* SetExp.java (compile): Re-arranges cases, since shouldEarlyInit()
+	is now also true for ClassExp-valued Declaration.
+
 2009-12-06  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (addAtEnd): New method.

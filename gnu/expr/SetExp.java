@@ -158,7 +158,15 @@ public class SetExp extends AccessExp
 
     Declaration decl = binding;
     Expression declValue = decl.getValue();
-    if ((decl.shouldEarlyInit() || decl.isAlias())
+    if (declValue instanceof LambdaExp
+	&& decl.context instanceof ModuleExp
+        && ! decl.ignorable()
+	&& ((LambdaExp) declValue).getName() != null // FIXME
+	&& declValue == new_value)
+      {
+	((LambdaExp) new_value).compileSetField(comp);
+      }
+    else if ((decl.shouldEarlyInit() || decl.isAlias())
         && decl.context instanceof ModuleExp
 	&& isDefining() && ! decl.ignorable())
       {
@@ -169,14 +177,6 @@ public class SetExp extends AccessExp
             decl.load(this, 0, comp, Target.pushObject);
 	    valuePushed = true;
 	  }
-      }
-    else if (declValue instanceof LambdaExp
-	&& decl.context instanceof ModuleExp
-             && ! decl.ignorable()
-	&& ((LambdaExp) declValue).getName() != null // FIXME
-	&& declValue == new_value)
-      {
-	((LambdaExp) new_value).compileSetField(comp);
       }
     else
       {

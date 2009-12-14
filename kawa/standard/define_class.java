@@ -57,7 +57,7 @@ public class define_class extends Syntax
       decl.setLocation((PairWithPosition) p);
     ClassExp oexp = new ClassExp(isSimple);
     decl.noteValue(oexp);
-    decl.setFlag(Declaration.IS_CONSTANT);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.EARLY_INIT);
     decl.setType(isSimple ? Compilation.typeClass : Compilation.typeClassType);
     tr.mustCompileHere();
 

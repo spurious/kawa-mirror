@@ -1,5 +1,8 @@
 2009-12-13  Per Bothner  <per@bothner.com>
 
+	* standard/define_class.java (scanForDefinitions):  Set EARLY_INIT
+	on class Declaration.
+
 	* lang/Translator.java (exp2Type): If getTypeFor doesn't work,
 	try evaluating the type expression.  The goal is handle
 	PACKAGE:TYPE, where PACKAGE may be an alias.

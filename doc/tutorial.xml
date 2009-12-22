@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<?xml-stylesheet href="docbook-css/driver.css" type="text/css"?>
+<article id="root">
+<title>Kawa Scheme Tutorial</title>
+
+<sect1 id="Introduction"><title>Introduction</title>
+<para>
+You've heard about all the hot scripting languages
+-- you might even be tired of hearing about them.
+But Kawa offers you something different than the
+scripting-language-<foreignphrase>du-jour</foreignphrase> can.
+You may be interested in one that runs on the Java virtual machine,
+either because you have to interact with other Java tools,
+or because you like having access to all the Java packages out there.
+Or maybe you don't care about Java, but you care about performance.
+If so, let me tell you about Kawa, which is actually one of the
+very oldest language implementations running on the Java Virtual Machine,
+dating back to 1996.</para>
+<para>
+The Kawa language is a dialect/implementation of the Scheme language.
+(The Kawa project also supports other languages, including
+<ulink url="http://www.w3.org/XML/Query">XQuery</ulink>
+and <ulink url="http://jemacs.sourceforge.net">Emacs Lisp</ulink>,
+as well as tools for implementing mew programming languages,
+but we won't cover that in this tutorial.)</para>
+<para><ulink url="http://www.schemers.org/">Scheme</ulink>
+is an established language with many
+<ulink url="http://community.schemewiki.org/?scheme-faq-standards#implementations">implementations</ulink>,
+a <ulink url="http://www.schemers.org/Documents/Standards/">standard</ulink> specification
+(the established <ulink url="http://www.schemers.org/Documents/Standards/R5RS/">R5RS</ulink>,
+and <ulink url="http://www.r6rs.org/">R6RS</ulink> which was ratified in 2007),
+and is used by universities for both teaching and research.
+Scheme also has a reputation for being difficult to learn,
+with a weird parenthesis-heavy syntax,
+and hard-to-understand concepts like <ulink url="http://en.wikipedia.org/wiki/Continuation">continuations</ulink>.
+Luckily, you don't need to understand continuations!
+(Kawa doesn't fully implement them anyway.)
+</para>
+<para>
+The following assumes that Kawa is already installed on your computer;
+if not see these <ulink url="../Installation.html">installation instructions</ulink>.</para>
+<para>The best way to learn Kawa is by starting the
+<literal>kawa</literal> command in interactive mode:</para>
+<programlisting>
+$ kawa
+#|kawa:1|# 
+</programlisting>
+<para>If you don't have <literal>kawa</literal> but you have a
+Kawa <quote>jar</quote> and you have Java installed you can instead do:
+</para>
+<programlisting>
+$ java -jar kawa-<replaceable>version-number</replaceable>.jar
+#|kawa:1|# 
+</programlisting>
+<para>
+The prompt string has the form of a Scheme comment,
+to make it easier to cut-and-paste.
+Kawa is expecting you type type in an expression or command,
+which it will evaluate and print out the result.
+For example a quoted string is a simple expression that evaluates to a
+string value, which will print as itself, before printing the next prompt:
+</para>
+<programlisting>
+#|kawa:1|# "Hello, world!"
+Hello, world!
+#|kawa:2|# 
+</programlisting>
+<!-- Thus the Kawa equivalent of the traditional
+ <ulink url="http://en.wikipedia.org/wiki/Hello_world"><quote>hello world</quote></ulink> is trivial.
+-->
+<para>
+The most noticable difference from most other programming languages
+is that Scheme uses <quote>prefix</quote> notation for function calls.
+For example Kawa has a function <function>max</function> which returns the
+largest value of the arguments.
+Instead of <literal>max(5, 7, 3)</literal>
+you write <literal>(max 5 7 3)</literal>:
+</para>
+<programlisting>
+(max 5 7 3) &rArr; 7
+</programlisting>
+<para>
+(We use the <literal>&rArr;</literal> symbol above to indicate that
+the expression <literal>(max 5 7 3)</literal> evaluates to the
+value <literal>7</literal>.)</para>
+<para>
+The prefix notation may feel a bit weird, but you quickly
+get used to it, and it has some advantages.
+One is consistency: What are special infix operators in most languages
+in most languages are just regular functions in Scheme.
+For example addition is just a regular ordinary function call,
+and <literal>+</literal> is just a regular function name:</para>
+<programlisting>
+(+ 2.5 1.2) &rArr; 3.7
+</programlisting>
+<para>
+The same prefix notation is used for special operations like assignments:</para>
+<programlisting>
+#|kawa:1|# (set! sqrt-of-2 (sqrt 2))
+#|kawa:2|# sqrt-of-2
+1.4142135623730951
+</programlisting>
+</sect1>
+<sect1 id="Booleans"><title>Booleans</title>
+<para>
+Scheme uses the syntax <literal>#t</literal> and <literal>#f</literal>
+for Boolean true and false value.  For example the
+<quote>less-than</quote> function is named <literal>&lt;</literal>.
+Its result is true if the first argument is less than the second (or if
+there are more than two arguments: that they are in increasing order):</para>
+<programlisting>
+(&lt; 3 4) &rArr; #t
+(&lt; -3 -4) &rArr; #f
+(&lt; 2 3 5 7 11)) &rArr; #t
+</programlisting>
+<para>
+The <literal>if</literal> special form takes two or three sub-expressions:
+It evaluates the first expression.
+If that is true it evaluates the second expression;
+otherwise it evaluates the third expression, if provided:</para>
+<programlisting>
+(if (&lt; 3 4) (+ 5 5) (+ 5 6)) &rArr; 10
+</programlisting>
+<para>
+We call <literal>if</literal> a special form rather than a function,
+because for a function all the arguments are evaluated before the
+function is called, but in a special form that is not neceassarily the case.
+</para>
+<para>
+In addition to <literal>#t</literal> any value except <literal>#f</literal>
+counts as <quote>true</quote> when evaluating the first expression of an <literal>if</literal>:
+</para>
+<programlisting>
+(if 0 (+ 5 5) (+ 5 6)) &rArr; 11
+</programlisting>
+<para>
+You can use <literal>and</literal>, <literal>or</literal>,
+and not <literal>and</literal> to create complex boolean expressions.
+Of these <literal>and</literal> and <literal>or</literal>
+are special forms that only evaluate as many of the sub-expressions as needed.
+<programlisting>
+(if (not (and (&gt;= i 0) (&lt;= i 9)))
+    (display "error"))
+</programlisting>
+</para>
+<para>
+ You can use <literal>cond</literal> form as an alternative to
+<literal>if</literal>:</para>
+<programlisting>
+(cond ((&gt; 3 3) ’greater)
+      ((&lt; 3 3) ’less)
+      (else ’equal))       &rArr; equal
+</programlisting>
+</sect1>
+<sect1 id="Numbers"><title>Numbers</title>
+<sect2><title>Exact integers and fractions</title>
+<para>
+Kawa has the usual syntax for decimal integers.
+Addition, subtraction, and mutliplication
+are written using the usual <literal>+</literal>,
+<literal>-</literal>, and  <literal>*</literal>,
+but these are all prefix functions that take a variable number of arguments:
+</para>
+<programlisting>
+(+ 1 2 3) &rArr; 6
+(- 10 3 4) &rArr; (- (- 10 3) 4)  &rArr; 3
+(* 2 -6)  &rArr; -12
+</programlisting>
+<para>
+Kawa has arbitrary-precision integers.
+</para>
+<para>
+Let us implement the <ulink url="http://en.wikipedia.org/wiki/Factorial">factorial</ulink> function.
+Type in the following (we'll look at the syntax shortly):</para>
+<programlisting>
+#|kawa:1|# (define (factorial x)
+#|(---:2|#   (if (&lt; x 1) 1
+#|(---:3|#     (* x (factorial (- x 1)))))
+</programlisting>
+<para>
+(The prompt changes to indicate a continuation line.)
+This binds the name <function>factorial</function>
+to new function, with formal parameter <literal>x</literal>.
+This new function is immediately compiled to Java bytecodes,
+and later a JIT compiler may compile it to native code.
+</para>
+<para>
+A few tests:
+</para>
+<programlisting>
+#|kawa:4|# (list (factorial 3) (factorial 4))
+(6 24)
+#|kawa:5|# (factorial 30)
+265252859812191058636308480000000
+</programlisting>
+</sect2>
+<sect2><title>Floating-point real numbers</title>
+<para></para>
+</sect2>
+<sect2><title>Complex numbers</title>
+<para></para>
+</sect2>
+<sect2><title>Units and dimensions</title>
+<para></para>
+</sect2>
+</sect1>
+
+<sect1 id="Functions"><title>Functions</title>
+<para></para>
+</sect1>
+
+<sect1 id="Sequences"><title>Lists and sequences</title>
+<para>A <firstterm>list</firstterm> is a sequence of values,
+which is implemented as a chain of linked <firstterm>pairs</firstterm>.
+You can create a constant list by quoting a parenthesized list:</para>
+<programlisting>
+'(3 4 (10 20 30) "a string")
+</programlisting>
+<para>A <firstterm>vector</firstterm> is a sequence is whose elements are
+indexed by integers.
+A vector uses less space than a list of the same length,
+and is generally more efficient than a list.</para>
+<para>Lists and vectors are examples of <firstterm>sequences</firstterm>,
+as are strings, and some other data types.  Sequences have certain common
+operations ...
+</para>
+</sect1>
+
+<sect1 id="Types"><title>Types and declarations</title>
+<para>
+A <firstterm>type</firstterm> is a named value for a set
+of objects with related properties.
+For example <literal>vector</literal> is the type for standard Scheme vectors.
+You can use a type to specify that a variable can only have
+values of the specified types:
+</para>
+<programlisting>
+#|kawa:5|# (define v :: vector #(3 4 5))
+#|kawa:6|# v
+#(3 4 5)
+#|kawa:7|# (set! v 12)
+/dev/stdin:7:1: warning - cannot convert literal (of type gnu.math.IntNum) to vector
+Value (12) for variable 'v' has wrong type (gnu.math.IntNum) (gnu.math.IntNum cannot be cast to gnu.lists.FVector)
+	at atInteractiveLevel$7.run(stdin:7)
+	at gnu.expr.ModuleExp.evalModule(ModuleExp.java:302)
+	at kawa.Shell.run(Shell.java:275)
+	at kawa.Shell.run(Shell.java:186)
+	at kawa.Shell.run(Shell.java:167)
+	at kawa.repl.main(repl.java:870)
+Caused by: java.lang.ClassCastException: gnu.math.IntNum cannot be cast to gnu.lists.FVector
+	... 6 more
+</programlisting>
+<para>
+Using a type specification catches errors, and matches your programs
+more readable.  It also can allow the Kawa compiler to generate code
+that runs faster.</para>
+<para>
+You can use a type to check that a value is an instance of the type,
+using either the <literal>instance?</literal> function:
+</para>
+<programlisting>
+(instance? #(3 4 5) vector) &rArr; #t
+(instance? '(3 4 5) vector) &rArr; #f
+</programlisting>
+<para>
+As a convenience, you can use a type-name followed by a <quote><literal>?</literal></quote>:</para>
+<programlisting>
+(<replaceable>type</replaceable>? <replaceable>val</replaceable>) == (instance? <replaceable>val</replaceable> <replaceable>type</replaceable>)
+</programlisting>
+<para>
+You can <quote>call</quote> a type as if it were a function.
+That constructs a new instance of the type.</para>
+<programlisting>
+((EXAMPLE NEEDED))
+</programlisting>
+<para>
+A fully-qualified Java class is a type name.
+So are the names of Java primitive types.
+So are Java array types. ((EXAMPLES NEEDED))</para>
+<para>
+A type is true run-time value:
+</para>
+<programlisting>
+(define mytypes (list vector list string))
+(instance? #(3 4 5) (car mytypes) &rArr; #t
+</programlisting>
+<para>
+The <literal>define-alias</literal> form is useful for defining shorter names
+for types, like a generalization of Java's <literal>import</literal> statement>:
+</para>
+<programlisting>
+(define-alias jframe javax.swing.JFrame)
+</programlisting>
+
+</sect1>
+
+<sect1 id ="Classes"><title>Classes</title>
+<para></para>
+</sect1>
+
+</article>

@@ -498,7 +498,7 @@ public class Declaration
   public static final int IS_DYNAMIC = 0x10000000;
 
   /** Initialize in {@code <init>}/{@code <clinit>}
-   * rather than in {@code run}/{@code $run$}>. */
+   * rather than in {@code run}/{@code $run$}. */
   public static final int EARLY_INIT = 0x20000000;
   /** A reference to a module instance. */
   public static final int MODULE_REFERENCE = 0x40000000;

@@ -157,7 +157,7 @@
                (list (invoke obj1 'one)
                      (invoke obj2 'two))))
 
-(define internal-node-name list)
+(define-variable internal-node-name list)
 (require <module2>)
 (test 4 list-length-1 '(a b c d))
 (test 2 list-length-3 '(a b))

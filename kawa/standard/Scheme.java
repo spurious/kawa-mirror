@@ -547,7 +547,8 @@ public class Scheme extends LispLanguage
       defProcStFld("syntax-source", "kawa.lib.std_syntax");
       defProcStFld("syntax-line", "kawa.lib.std_syntax");
       defProcStFld("syntax-column", "kawa.lib.std_syntax");
-      defSntxStFld("define-for-syntax", "kawa.lib.prim_syntax");
+      defSntxStFld("begin-for-syntax", "kawa.lib.std_syntax");
+      defSntxStFld("define-for-syntax", "kawa.lib.std_syntax");
       defSntxStFld("include", "kawa.lib.misc_syntax");
       defSntxStFld("include-relative", "kawa.lib.misc_syntax");
 

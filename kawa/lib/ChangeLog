@@ -1,3 +1,9 @@
+2009-12-25  root  <per@bothner.com>
+
+	* std_syntax.scm (begin-for-syntax, define-for-syntax): New macros,
+	implemented by calling eval at macro-expansion time.
+	* prim_syntax.scm (define-for-syntax): Remove place-holder definition.
+
 2009-12-07  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm: Update for SyntaxForm made an interface.

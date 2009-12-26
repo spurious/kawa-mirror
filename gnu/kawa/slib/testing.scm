@@ -600,7 +600,7 @@
    (kawa
     (define (%test-syntax-file form)
       (syntax-source form))))
-  (define-for-syntax (%test-source-line2 form)
+  (define (%test-source-line2 form)
     (let* ((line (syntax-line form))
 	   (file (%test-syntax-file form))
 	   (line-pair (if line (list (cons 'source-line line)) '())))
@@ -679,7 +679,7 @@
 	  (let* ((r (test-runner-get)))
 	    (test-result-alist! r line)
 	    (%test-comp1body r expr)))))))
-  (define-for-syntax (%test-comp2 comp x)
+  (define (%test-comp2 comp x)
     (syntax-case (list x (list 'quote (%test-source-line2 x)) comp) ()
       (((mac tname expected expr) line comp)
        (syntax

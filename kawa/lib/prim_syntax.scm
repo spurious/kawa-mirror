@@ -26,12 +26,6 @@
     ((define name value)
      (%define name 0 #!null value))))
 
-;; For now the same as plain define.
-(%define-syntax define-for-syntax
-  (syntax-rules (::)
-    ((define-for-syntax . rest)
-     (define . rest))))
-
 (%define-syntax define-private
   (syntax-rules (:: $lookup$)
     ((define-private ($lookup$ part1 'part2) :: type value)

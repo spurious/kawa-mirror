@@ -284,9 +284,9 @@
 (define f8-10 ((caddr f7-20) 10))
 (test '(100 20 10 2) 'closure-test3 ((cadddr f8-10) 2))
 
-(define (f6 a)
+(define (f60 a)
   (define (x6 b) a)
-  (define (f7 b)
+  (define (f70 b)
     (define (x7 c) b)
     (define (f8 c)
       (define (x8 d) c)
@@ -294,11 +294,11 @@
         (list a b c d))
       (list a b c f9))
     (list a b f8))
-  (list a f7))
-(define f6-100 (f6 100)) 
-(define f7-20 ((cadr f6-100) 20)) 
-(define f8-10 ((caddr f7-20) 10)) 
-(test '(100 20 10 2) 'closure-test4 ((cadddr f8-10) 2)) 
+  (list a f70))
+(define f60-100 (f60 100)) 
+(define f70-20 ((cadr f60-100) 20)) 
+(define f80-10 ((caddr f70-20) 10)) 
+(test '(100 20 10 2) 'closure-test4 ((cadddr f80-10) 2))
 
 ;; A bug reported by Edward Mandac <ed@texar.com>.
 (test "Done" 'do-future (do   ((test 'empty))

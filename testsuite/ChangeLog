@@ -1,3 +1,12 @@
+2009-12-25  root  <per@bothner.com>
+
+	* misc-test.scm (f6 renamed to f60, etc): Rename to avoid duplicate
+	declaration when compiled as a unit.
+	* mac-test.scm: Likewise.
+	Use begin-for-syntax.
+	* obj-test.scm (internal-node-name list): Use define-variable, rather
+	than define, so the definition is visible to module2.scm.
+
 2009-12-06  Per Bothner  <per@bothner.com>
 	    Andrea Girotto <andrea.girotto@gmail.com>
 

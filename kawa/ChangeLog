@@ -1,3 +1,8 @@
+2009-12-25  root  <per@bothner.com>
+
+	* standard/Scheme.java (begin-for-syntax, define-for-syntax): New and
+	updated syntax.
+
 2009-12-13  Per Bothner  <per@bothner.com>
 
 	* standard/define_class.java (scanForDefinitions):  Set EARLY_INIT

@@ -4,7 +4,8 @@
 
 (test 'ok 'let=> (let ((=> #f)) (cond (#t => 'ok))))
 
-(load (string-append src-prefix "mac1.scm"))
+(begin-for-syntax
+ (load (string-append src-prefix "mac1.scm")))
 (test '(1 2) 'something (something 1 2))
 
 (test '(2 3) 'something (something 2 3))
@@ -280,9 +281,9 @@
     ((def-and-use-of-x val)
      ; x below originates from this macro:
      (begin (define x val) x))))
-(define x 1)
+(define x1 1)
 (test 2 'mzscheme-lang-12.3.5-1 (def-and-use-of-x 2))
-(test 1 'mzscheme-lang-12.3.5-2 x)
+(test 1 'mzscheme-lang-12.3.5-2 x1)
 
 ;; From FLT MzScheme Manual section 12.3.5 Macro-Gnerated Top-Level
 (define-syntax def-and-use
@@ -439,7 +440,7 @@
 (set! fail-expected "define-for-syntax for now is just a synonym for define")
 (define x-72-x3 1)
 (define-for-syntax x-72-x3 2)
-(test '(1 2) 'srfi-72-example-3
+(test '(1 2) 'srfi-72-example-4
        (let-syntax ((m (lambda (form)
                     (quasisyntax (list x-72-x3 ,x-72-x3)))))
 	 (m)))

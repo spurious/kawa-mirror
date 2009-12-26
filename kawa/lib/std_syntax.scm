@@ -4,6 +4,7 @@
 
 (module-export cond case and or let let* do delay
 	       syntax-object->datum datum->syntax-object with-syntax
+	       begin-for-syntax define-for-syntax
 	       generate-temporaries define-procedure
 	       identifier? free-identifier=?
 	       syntax-source syntax-line syntax-column)
@@ -292,6 +293,19 @@
 	 (- ((as gnu.lists.PairWithPosition form):getColumnNumber) 0))
 	(else
 	 #f)))
+
+(define-syntax begin-for-syntax
+  (lambda (form)
+    (syntax-case form ()
+      ((begin-for-syntax . body)
+       (eval (syntax-object->datum (gnu.lists.Pair 'begin (syntax body))))
+       (syntax #!void)))))
+
+(define-syntax define-for-syntax
+  (syntax-rules ()
+    ((define-for-syntax . rest)
+     (begin-for-syntax
+      (define . rest)))))
 
 ;;; The definition of include is based on that in the portable implementation
 ;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.

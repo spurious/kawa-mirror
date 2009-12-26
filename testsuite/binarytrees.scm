@@ -17,7 +17,8 @@
 		  right: (bottom-up-tree item2 depth-1)
 		  item: item))))
 
-(define (test (max-depth :: int ))
+(define (test (n :: int))
+  (define max-depth :: int (if (> (+ min-depth 2) n) (+ min-depth 2) n))
   (let ((stretch-depth :: int (+ max-depth 1)))
     (format #t "stretch tree of depth ~d~c check: ~d~%" stretch-depth #\tab
 	    ((bottom-up-tree 0 stretch-depth):item-check)))

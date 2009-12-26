@@ -1,3 +1,7 @@
+2009-12-26  Per Bothner  <per@bothner.com>
+
+	* binarytrees.scm (test): Fix max-depth test.
+
 2009-12-25  root  <per@bothner.com>
 
 	* misc-test.scm (f6 renamed to f60, etc): Rename to avoid duplicate

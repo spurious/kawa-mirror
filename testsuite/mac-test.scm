@@ -387,7 +387,8 @@
   ((incx2) <void>
    (set! (slot (this) x) (+ 1 (slot (this) x)))))
 (define xinstance (make <xclass>))
-(invoke xinstance 'incx)
+(with-compile-options warn-invoke-unknown-method: #f
+		      (invoke xinstance 'incx))
 (test 1 'xclass (slot xinstance x))
 
 (define x (list "X1" "X2"))
@@ -481,7 +482,7 @@
   (test 3 'savannah-bug-18105 ((crashing-syntax (arg1 arg2) 3) 1 2)))
 
 ;; Luis Casillas <luis@casillas.org> posted to Kawa list 2007-02-02:
-(define (alter-syntax-datum proc stx)
+(define-for-syntax (alter-syntax-datum proc stx)
   ;; must use define-syntax-datum in PLT
   (datum->syntax-object stx (proc (syntax-object->datum stx))))
 (define-syntax define-symbol-altering-macro

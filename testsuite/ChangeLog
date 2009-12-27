@@ -1,3 +1,9 @@
+2009-12-27  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Use define-for-syntax and with-compile-options to
+	support loading as a module, rather than line-at-a-time.
+	* lib-test.scm: Replace local variable x by global to avoid warning.
+
 2009-12-26  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update.

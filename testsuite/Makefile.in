@@ -453,8 +453,7 @@ check-polytype: testing.zip
 	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
 
 check-format: testing.zip
-	$(KAWATEST) \
-	  -f "$(srcdir)/formatst.scm" -e '(test-report)'
+	$(KAWA) "$(srcdir)/formatst.scm"
 
 check-ppfile:
 	$(KAWA) -e "(require 'pprint-file)" \

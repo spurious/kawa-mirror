@@ -28,6 +28,12 @@
 ;      (newline)
 ;      (format:abort)))
 
+(test-begin "format" 423)
+(define-syntax test 
+  (syntax-rules ()
+    ((test format-args out-str)
+     (test-equal out-str (apply (cons format (cons #f format-args)))))))
+
 (define slib:tab (integer->char 9))
 (define slib:form-feed (integer->char 12))
 
@@ -52,10 +58,6 @@
 	    (call-with-output-string (lambda (p) (display iobj p))))
 	   (call-with-output-string (lambda (p) (display iobj p)))))
       (call-with-output-string (lambda (p) (display iobj p)))))
-(define standard-test test)
-
-(define (test format-args out-str)
-  (apply standard-test (cons out-str (cons format  (cons #f format-args)))))
 
 ; ensure format default configuration
 
@@ -302,12 +304,12 @@ def")
 
 (define format:old-scc format:symbol-case-conv)
 (set! format:symbol-case-conv string-upcase)
-(set! fail-expected "format:symbol-case-conv not implemented")
+(test-expect-fail 1) ; format:symbol-case-conv not implemented
 (test '("~a" abc) "ABC")
 (set! format:symbol-case-conv string-downcase)
 (test '("~s" abc) "abc")
 (set! format:symbol-case-conv string-capitalize)
-(set! fail-expected "format:symbol-case-conv not implemented")
+(test-expect-fail 1) ; format:symbol-case-conv not implemented
 (test '("~s" abc) "Abc")
 (set! format:symbol-case-conv format:old-scc)
 
@@ -322,13 +324,12 @@ def")
 ; internal object case type force test
 
 (set! format:iobj-case-conv string-upcase)
-(set! fail-expected "format:iobj-case-conv not implemented")
+(test-expect-fail 1) ; format:iobj-case-conv not implemented
 (test `("~a" ,display) (string-upcase (format:iobj->str display)))
 (set! format:iobj-case-conv string-downcase)
-(set! fail-expected "format:iobj-case-conv not implemented")
 (test `("~s" ,display) (string-downcase (format:iobj->str display)))
 (set! format:iobj-case-conv string-capitalize)
-(set! fail-expected "format:iobj-case-conv not implemented")
+(test-expect-fail 1) ; format:iobj-case-conv not implemented
 (test `("~s" ,display) (string-capitalize (format:iobj->str display)))
 (set! format:iobj-case-conv #f)
 
@@ -661,7 +662,7 @@ def")
 (test '("~8,3F" 12.3456) "  12.346")
 (test '("~6,3F" 123.3456) "123.346")
 (test '("~4,3F" 123.3456) "123.346")
-(set! fail-expected "~F doesn't (yet) support complex numbers")
+(test-expect-fail 1) ; ~F doesn't properly support complex numbers
 (test `("~8,3F" ,(sqrt -3.8)) "0.000+1.949i")
 (test '("~6,2F" 32) " 32.00")
 ;; NB: (not (and (exact? 32.) (integer? 32.)))
@@ -727,3 +728,4 @@ Does not match implementation - or Common Lisp.
 ;(format #t "~%~a Test~:p completed. (~a failure~:p)~2%" total fails)
 
 ; eof
+(test-end)

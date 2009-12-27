@@ -1,5 +1,8 @@
 2009-12-26  Per Bothner  <per@bothner.com>
 
+	* formatst.scm (test): Change to use SRFI-64 testing API.
+	* Makefile.am: Update accordingly.
+
 	* binarytrees.scm (test): Fix max-depth test.
 
 2009-12-25  root  <per@bothner.com>

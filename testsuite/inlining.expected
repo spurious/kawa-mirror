@@ -86,7 +86,7 @@ InliningTest.checkEven(int)java.lang.Object: 34 bytes
 cycle1.isIsEven(int)boolean: 17 bytes
 cycle2.isIsOdd(int)boolean: 17 bytes
 binarytrees.bottomUpTree(int,int)binarytrees$TreeNode: 60 bytes
-binarytrees.test(int)java.lang.Object: 222 bytes
+binarytrees.test(int)java.lang.Object: 240 bytes
 binarytrees$TreeNode.itemCheck()int: 36 bytes
 fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[])int: 33 bytes

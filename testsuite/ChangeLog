@@ -1,5 +1,7 @@
 2009-12-26  Per Bothner  <per@bothner.com>
 
+	* inlining.expected: Update.
+
 	* formatst.scm (test): Change to use SRFI-64 testing API.
 	* Makefile.am: Update accordingly.
 

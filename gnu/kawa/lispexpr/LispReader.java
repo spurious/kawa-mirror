@@ -119,20 +119,19 @@ public class LispReader extends Lexer
 	return Values.empty;
       case ReadTable.TERMINATING_MACRO:
       case ReadTable.NON_TERMINATING_MACRO:
-	Object value = entry.read(this, ch, -1);
-	return value;
+	return entry.read(this, ch, -1);
       case ReadTable.CONSTITUENT:
-        if (ch == rtable.postfixLookupOperator)
-          { // Force an initial ':' to be treated as a CONSTITUENT.
-            tokenBufferAppend(ch);
-            ch = read();
-          }
       case ReadTable.SINGLE_ESCAPE: // Step 5:
       case ReadTable.MULTIPLE_ESCAPE: // Step 6:
       default:  // 
 	break;
       }
+       return readAndHandleToken(ch, startPos, rtable);
+  }
 
+  protected Object readAndHandleToken(int ch, int startPos, ReadTable rtable)
+    throws java.io.IOException, SyntaxException
+  {
     readToken(ch, getReadCase(), rtable);
     int endPos = tokenBufferLength;
     if (seenEscapes)
@@ -174,9 +173,17 @@ public class LispReader extends Lexer
 	    break;
 	  }
 	int kind = entry.getKind();
-        if (ch == rtable.postfixLookupOperator && ! inEscapes
-            && validPostfixLookupStart(rtable))
-          kind = ReadTable.TERMINATING_MACRO;
+        if (ch == rtable.postfixLookupOperator && ! inEscapes)
+          {
+            int next = port.peek();
+            if (next == rtable.postfixLookupOperator)
+              { // Looking at '::'
+                unread(ch);
+                break;
+              }
+            if (validPostfixLookupStart(next, rtable))
+              kind = ReadTable.TERMINATING_MACRO;
+          }
                   
 	if (kind == ReadTable.SINGLE_ESCAPE)
 	  {
@@ -262,10 +269,9 @@ public class LispReader extends Lexer
       }
   }
 
-  protected boolean validPostfixLookupStart (ReadTable rtable)
+  protected boolean validPostfixLookupStart (int ch, ReadTable rtable)
       throws java.io.IOException
   {
-    int ch = port.peek();
     ReadTableEntry entry;
     if (ch < 0 || ch == ':' || (entry = rtable.lookup(ch)) == null
         || ch == rtable.postfixLookupOperator)
@@ -291,7 +297,7 @@ public class LispReader extends Lexer
           break;
         // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
         port.read();
-        if (! validPostfixLookupStart(rtable))
+        if (! validPostfixLookupStart(port.peek(), rtable))
           {
             unread();
             break;

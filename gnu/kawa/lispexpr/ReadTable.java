@@ -73,7 +73,6 @@ public class ReadTable extends RangeTable
     set('-',  entry);
     set('.',  entry);
     set('/',  entry);
-    set(':',  entry);
     set('=',  entry);
     set('>',  entry);
     set('?',  entry);
@@ -85,6 +84,7 @@ public class ReadTable extends RangeTable
     set('~',  entry);
     set('\177',entry);
     set('\b', entry);
+    set(':',  new ReaderColon());
     set('\"', new ReaderString());
     set('#',  ReaderDispatch.create(this));
     set(';',  ReaderIgnoreRestOfLine.getInstance());

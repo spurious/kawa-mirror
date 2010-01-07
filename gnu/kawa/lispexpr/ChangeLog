@@ -1,3 +1,11 @@
+2010-01-06  Per Bothner  <per@bothner.com>
+
+	Make space be options before and after :: in type specifier.
+	* ReaderColon.java:  New class, extends ReadTableEntry.
+	* Makefile.am: Update accordingly.
+	* ReadTable.java (initialize): Enter ReaderColon.
+	* LispReader.java (readToken): Check for '::'.
+
 2009-11-03  Per Bothner  <per@bothner.com>
 
 	* COPYING: Removed obsolete file.

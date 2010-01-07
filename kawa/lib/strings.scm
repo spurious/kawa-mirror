@@ -6,30 +6,30 @@
 (define (string? x) :: <boolean>
   (instance? x <string>))
 
-(define (make-string (n :: <int>) #!optional (ch #\Space)) :: <string>
+(define (make-string n ::int #!optional (ch #\Space)) :: <string>
   (make <gnu.lists.FString> n ch))
 
-(define ($make$string$ #!rest (args :: <Object[]>)) :: <string>
+(define ($make$string$ #!rest args ::Object[]) :: <string>
   (let* ((n :: <int> args:length)
 	 (str (<gnu.lists.FString> n)))
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i n) str)
 	(str:setCharAt i ((as <character> (args i)):charValue)))))
 
-(define (string-length (str :: <string>)) :: <int>
+(define (string-length str ::string) :: <int>
   (invoke str 'length))
 
 (define (string-ref (string :: <string>) (k :: <int>)) :: <char>
   (invoke string 'charAt k))
 
-(define (string-set! (string :: <abstract-string>) (k <int>) (char <char>))
-  :: <void>
+(define (string-set! string::abstract-string k::int char::char)
+  ::void
   (invoke string 'setCharAt k char))
 
-(define (string=? x y) :: <boolean>
-  (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
+(define (string=? x y) ::boolean
+  ((x:toString):equals (y:toString)))
 
-(define (string<? x y) :: <boolean>
+(define (string<? x y) ::boolean
   (< (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
 
 (define (string>? x y) :: <boolean>
@@ -65,11 +65,11 @@
 (define (string-copy (str <string>)) :: <gnu.lists.FString>
   (make <gnu.lists.FString> str))
 
-(define (string-fill! (str <abstract-string>) (ch <char>)) :: <void>
-  (invoke str 'fill ch))
+(define (string-fill! str ::abstract-string ch ::char) ::void
+  (str:fill ch))
 
-(define (string-upcase! (str :: <abstract-string>)) :: <string>
-  (invoke-static <gnu.lists.Strings> 'makeUpperCase str)
+(define (string-upcase! str ::abstract-string) ::string
+  (gnu.lists.Strings:makeUpperCase str)
   str)
 
 (define (string-downcase! (str :: <abstract-string>)) :: <string>

@@ -1,3 +1,9 @@
+2010-01-06  Per Bothner  <per@bothner.com>
+
+	* strings.scm:  Update some of the type specifiers to use the
+	new format, where separators before or after are uptional.
+	This is mainly for testing, but more will be changed later.
+
 2009-12-25  root  <per@bothner.com>
 
 	* std_syntax.scm (begin-for-syntax, define-for-syntax): New macros,

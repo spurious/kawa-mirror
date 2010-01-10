@@ -4,6 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 import java.util.zip.*;
+import java.net.URL;
 
 /** Class to read a ClassType from a DataInputStream (.class file).
  * 
@@ -167,7 +168,8 @@ public class dump extends ClassFileInput
           {
             if (isURL)
               {
-                if (filename.startsWith("jar:"))
+                boolean isJarURL = filename.startsWith("jar:");
+                if (isJarURL)
                   {
                     String part = filename.substring(4);
                     // If no URL scheme follows "jar:", then assume "file:".
@@ -189,7 +191,9 @@ public class dump extends ClassFileInput
                     if (part.indexOf("!/") < 0)
                       {
                         int excl = filename.lastIndexOf('!');
-                        if (excl > 0 && filename.indexOf('/', excl) < 0)
+                        if (excl <= 0)
+                          isJarURL = false;
+                        else if (filename.indexOf('/', excl) < 0)
                           {
                             part = filename.substring(excl+1);
                             part = part.replace('.', '/');
@@ -200,13 +204,50 @@ public class dump extends ClassFileInput
                   }
                 try
                   {
-                    in = new java.net.URL(filename).openConnection().getInputStream();
+                    URL url = new URL(filename);
+                    try
+                      {
+                        in = url.openConnection().getInputStream();
+                      }
+                    catch (java.util.zip.ZipException e1)
+                      {
+                        if (isJarURL)
+                          {
+                            String filepart = url.getFile();
+                            int sl = filepart.lastIndexOf('!');
+                            if (sl > 0)
+                              filepart = filepart.substring(0, sl);
+                            try
+                              {
+                                new URL(filepart).openConnection().getInputStream();
+                              }
+                            catch (java.io.FileNotFoundException e2)
+                              {
+                                System.err.print("Jar File for URL ");
+                                System.err.print(filepart);
+                                System.err.println(" not found.");
+                                System.exit(-1);
+                              }
+                          }
+                        throw e1;
+                      }
                   }
                 catch (java.io.FileNotFoundException e1)
                   {
                     System.err.print("File for URL ");
                     System.err.print(filename);
                     System.err.println(" not found.");
+                    System.exit(-1);
+                    in = null;
+                  }
+                catch (java.util.zip.ZipException e1)
+                  {
+                    System.err.print("Error opening zip archive ");
+                    System.err.print(filename);
+                    System.err.println(" not found.");
+                    e1.printStackTrace();
+                    if (e1.getCause() != null)
+                      e1.getCause().printStackTrace();
                     System.exit(-1);
                     in = null;
                   }

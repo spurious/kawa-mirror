@@ -74,8 +74,7 @@ public class ClassFileInput extends DataInputStream
     String name;
 
     ctype.thisClassIndex = readUnsignedShort();
-    clas = (CpoolClass) ctype.constants.getForced(ctype.thisClassIndex,
-						  ConstantPool.CLASS);
+    clas = getClassConstant(ctype.thisClassIndex);
     name = clas.name.string;
     ctype.this_name = name.replace('/', '.');
     ctype.setSignature("L"+name+";");
@@ -85,8 +84,7 @@ public class ClassFileInput extends DataInputStream
       ctype.setSuper((ClassType) null);
     else
       {
-	clas = (CpoolClass) ctype.constants.getForced(ctype.superClassIndex,
-						      ConstantPool.CLASS);
+	clas = getClassConstant(ctype.superClassIndex);
 	name = clas.name.string;
 	ctype.setSuper(name.replace('/', '.'));
       }
@@ -336,5 +334,10 @@ public class ClassFileInput extends DataInputStream
 	meth.setSignature(descriptorIndex);
 	readAttributes(meth);
       }
+  }
+
+  CpoolClass getClassConstant (int index)
+  {
+    return (CpoolClass) ctype.constants.getForced(index, ConstantPool.CLASS);
   }
 }

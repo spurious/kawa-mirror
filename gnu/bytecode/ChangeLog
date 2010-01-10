@@ -1,5 +1,9 @@
 2010-01-10  Per Bothner  <per@bothner.com>
 
+	* StackMapTableAttr.java (write): Call super write.
+	* ClassFileInput.java (getClassConstant): New convenience method.
+	(readClassInfo): Use it.
+
 	* dump.java (main): Better error message if opening jar: URL fails.
 
 	* StackMapTableAttr.java:  Change to extend MiscAttr.

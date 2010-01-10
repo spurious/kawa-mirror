@@ -40,7 +40,7 @@ public class StackMapTableAttr extends MiscAttr
     throws java.io.IOException
   {
     put2(0, numEntries);
-    dstr.write(data, 0, dataLength);
+    super.write(dstr);
   }
 
   void emitVerificationType (int encoding)

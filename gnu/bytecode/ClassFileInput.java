@@ -254,10 +254,9 @@ public class ClassFileInput extends DataInputStream
       }
     else if (name == "StackMapTable" && container instanceof CodeAttr)
       {
-        int count = readUnsignedShort();
-        byte[] data = new byte[length-2];
-        readFully(data, 0, length-2);
-        return new StackMapTableAttr(count, data, (CodeAttr) container);
+        byte[] data = new byte[length];
+        readFully(data, 0, length);
+        return new StackMapTableAttr(data, (CodeAttr) container);
       }
     else if (name == "ConstantValue" && container instanceof Field)
       {

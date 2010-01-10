@@ -1,3 +1,14 @@
+2010-01-10  Per Bothner  <per@bothner.com>
+
+	* StackMapTableAttr.java:  Change to extend MiscAttr.
+	Move data, dataLength to MiscAttr.
+	Data and fdataLength now include the initial 'numEntries' field.
+	(put1, pu2, u1, u2): Likewise.
+	* ClassFileInput.java (readAttribute): Change since the data array
+	passed to StackMapTableAttr includes initial 2-byte numEntries field.
+	* MiscAttr.java (put1, pu2, u1, u2): Moved from StackMapTableAttr.
+	(length): Rename to dataLength.
+
 2009-10-19  Per Bothner  <per@bothner.com>
 
 	* Type.java (getRealType): New method.

@@ -1,16 +1,14 @@
-// Copyright (c) 2008  Per M.A. Bothner.
+// Copyright (c) 2008, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 
 /** Represents a "StackMapTable" attribute, as added in Java 6. */
 
-public class StackMapTableAttr extends Attribute
+public class StackMapTableAttr extends MiscAttr
 {
   public static boolean compressStackMapTable = true;
 
-  byte[] data;
-  int dataLength;
   int numEntries;
 
   int prevPosition = -1;
@@ -22,67 +20,27 @@ public class StackMapTableAttr extends Attribute
 
   public StackMapTableAttr()
   {
-    super("StackMapTable");
+    super("StackMapTable", null, 0, 0);
+    put2(0); // numEntries
   }
 
   /** Add a new StackMapTableAttr to a CodeAttr. */
-  public StackMapTableAttr(int numEntries, byte[] data, CodeAttr code)
+  public StackMapTableAttr(byte[] data, CodeAttr code)
   {
-    super("StackMapTable");
+    super("StackMapTable", data, 0, data.length);
     addToFrontOf(code);
-    this.numEntries = numEntries;
-    this.data = data;
-    this.dataLength = data.length;
+    this.numEntries = u2(0);
   }
 
   public Method getMethod() { return ((CodeAttr) container).getMethod(); }
-
-  /** Return the length of the attribute in bytes.
-    * Does not include the 6-byte header (for the name_index and the length).*/
-  public int getLength() { return 2 + dataLength; }
 
   /** Write out the contents of the Attribute.
     * Does not write the 6-byte attribute header. */
   public void write (java.io.DataOutputStream dstr)
     throws java.io.IOException
   {
-    dstr.writeShort(numEntries);
+    put2(0, numEntries);
     dstr.write(data, 0, dataLength);
-  }
-
-  private int u1(int offset)
-  {
-    return data[offset] & 0xFF;
-  }
-
-  private int u2(int offset)
-  {
-    return ((data[offset]  & 0xFF) << 8) + (data[offset+1] & 0xFF);
-  }
-
-  private void put1(int val)
-  {
-    if (data == null)
-      data = new byte[20];
-    else if (dataLength >= data.length)
-      {
-        byte[] tmp = new byte[2 * data.length];
-        System.arraycopy(data, 0, tmp, 0, dataLength);
-        data = tmp;
-      }
-    data[dataLength++] = (byte) val;
-  }
-
-  private void put2(int val)
-  {
-    put1((byte) (val >> 8));
-    put1((byte) (val));
-  }
-
-  private void put2(int offset, int val)
-  {
-    data[offset] = (byte) (val >> 8);
-    data[offset+1] = (byte) val;
   }
 
   void emitVerificationType (int encoding)
@@ -139,7 +97,6 @@ public class StackMapTableAttr extends Attribute
    */
   public void emitStackMapEntry (Label label, CodeAttr code)
   {
-    int oldDL=dataLength;
     int offset_delta = label.position - prevPosition - 1;
     int matchingLocals = 0;
     int rawLocalsCount = label.localTypes.length;
@@ -369,7 +326,7 @@ public class StackMapTableAttr extends Attribute
     dst.print(getLength());
     dst.print(", number of entries: ");
     dst.println(numEntries);
-    int ipos = 0;
+    int ipos = 2; // Start in the data array after the numEntries field.
     int pc_offset = -1;
     Method method = getMethod();
     int encodedTypes[] = null;

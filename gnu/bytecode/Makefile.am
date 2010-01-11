@@ -26,6 +26,7 @@ CodeAttr.java ConstantValueAttr.java \
 LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
 PrimType.java \
+RuntimeAnnotationsAttr.java \
 Scope.java \
 SignatureAttr.java \
 SourceDebugExtAttr.java \

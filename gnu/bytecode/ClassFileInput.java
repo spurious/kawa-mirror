@@ -256,6 +256,16 @@ public class ClassFileInput extends DataInputStream
         readFully(data, 0, length);
         return new StackMapTableAttr(data, (CodeAttr) container);
       }
+    else if ((name == "RuntimeVisibleAnnotations"
+              || name == "RuntimeInvisibleAnnotations")
+             && (container instanceof Field
+                 || container instanceof Method
+                 || container instanceof ClassType))
+      {
+        byte[] data = new byte[length];
+        readFully(data, 0, length);
+        return new RuntimeAnnotationsAttr(name, data, container);
+      }
     else if (name == "ConstantValue" && container instanceof Field)
       {
 	return new ConstantValueAttr(readUnsignedShort());

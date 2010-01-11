@@ -1,5 +1,16 @@
 2010-01-10  Per Bothner  <per@bothner.com>
 
+	Support reading/printing (but not yet generating) annotations.
+	* RuntimeAnnotationsAttr.java: New class, extends MiscAttr, for
+	"RuntimeVisibleAnnotations" or "RuntimeInvisibleAnnotations".
+	* Makefile.am: Update accordingly.
+	* ClassTypeWriter.java (PRINT_EXTRAS): New flag.
+	(printSpaces, getCpoolEntry, printConstantTersely,
+	printContantUtf8AsClass): New methods.
+	* ClassFileInput.java (readAttribute): Handle
+	"RuntimeVisibleAnnotations" and "RuntimeInvisibleAnnotations".
+	* MiscAttr.java (u1, u2): New methods.
+
 	* Type.java (printSignature): Add fall-back/default.
 
 	* StackMapTableAttr.java (write): Call super write.

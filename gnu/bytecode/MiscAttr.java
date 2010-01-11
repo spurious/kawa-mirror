@@ -41,6 +41,18 @@ public class MiscAttr extends Attribute
     return ((data[offset]  & 0xFF) << 8) + (data[offset+1] & 0xFF);
   }
 
+  protected int u1()
+  {
+    return u1(offset++);
+  }
+
+  protected int u2()
+  {
+    int v = u2(offset);
+    offset += 2;
+    return v;
+  }
+
   protected void put1(int val)
   {
     if (data == null)
@@ -66,6 +78,8 @@ public class MiscAttr extends Attribute
     data[offset+1] = (byte) val;
   }
 
+  /** Write out the contents of the Attribute.
+    * Does not write the 6-byte attribute header. */
   public void write (DataOutputStream dstr)
     throws java.io.IOException
   {

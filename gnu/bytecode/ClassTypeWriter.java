@@ -20,8 +20,9 @@ public class ClassTypeWriter extends PrintWriter
   public static final int PRINT_CONSTANT_POOL_INDEXES = 2;
   /** Flag to print classfile version  numbers. */
   public static final int PRINT_VERSION = 4;
+  public static final int PRINT_EXTRAS = 8;
   public static final int PRINT_VERBOSE =
-    PRINT_CONSTANT_POOL|PRINT_CONSTANT_POOL_INDEXES|PRINT_VERSION;
+    PRINT_CONSTANT_POOL|PRINT_CONSTANT_POOL_INDEXES|PRINT_EXTRAS|PRINT_VERSION;
 
   public ClassTypeWriter (ClassType ctype, Writer stream, int flags)
   {
@@ -204,12 +205,18 @@ public class ClassTypeWriter extends PrintWriter
 	printAttributes(method);
   }
 
-  final void printConstantTersely(int index, int expected_tag)
+  CpoolEntry getCpoolEntry (int index)
   {
     CpoolEntry[] pool = ctype.constants.pool;
-    CpoolEntry entry;
-    if (pool == null || index < 0 || index >= pool.length
-	|| (entry = pool[index]) == null)
+    if (pool == null || index < 0 || index >= pool.length)
+      return null;
+    else
+      return pool[index];
+  }
+
+  final void printConstantTersely(CpoolEntry entry, int expected_tag)
+  {
+    if (entry == null)
       print("<invalid constant index>");
     else if (entry.getTag() != expected_tag)
       {
@@ -219,6 +226,23 @@ public class ClassTypeWriter extends PrintWriter
       }
     else
       entry.print(this, 0);
+  }
+
+  final void printConstantTersely(int index, int expected_tag)
+  {
+    printConstantTersely(getCpoolEntry(index), expected_tag);
+  }
+
+  final void printContantUtf8AsClass(int type_index)
+  {
+    CpoolEntry entry = getCpoolEntry(type_index);
+    if (entry != null && entry.getTag() == ConstantPool.UTF8)
+      {
+        String name = ((CpoolUtf8) entry).string;
+        Type.printSignature(name, 0, name.length(), this);
+      }
+    else
+      printConstantTersely(type_index, ConstantPool.UTF8);
   }
 
   /** Print constant pool index for dis-assembler. */
@@ -430,5 +454,11 @@ public class ClassTypeWriter extends PrintWriter
       print("<unknown type>");
     else
       printSignature(type.getSignature());
+  }
+
+  public void printSpaces (int count)
+  {
+    while (--count >= 0)
+      print(' ');
   }
 }

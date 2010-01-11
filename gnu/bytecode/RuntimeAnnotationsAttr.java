@@ -119,6 +119,8 @@ public class RuntimeAnnotationsAttr extends MiscAttr
         break;
       case 'c': // class
         int class_info_index = u2();
+        dst.printOptionalIndex(class_info_index);
+        dst.printContantUtf8AsClass(class_info_index);
         break;
       case '@': // annotation type
         dst.println();

@@ -1,8 +1,12 @@
 2010-01-10  Per Bothner  <per@bothner.com>
 
+	* RuntimeAnnotationsAttr.java (printAnnotationElementValue):
+	Print a class annotation value.
+
 	Support reading/printing (but not yet generating) annotations.
 	* RuntimeAnnotationsAttr.java: New class, extends MiscAttr, for
 	"RuntimeVisibleAnnotations" or "RuntimeInvisibleAnnotations".
+
 	* Makefile.am: Update accordingly.
 	* ClassTypeWriter.java (PRINT_EXTRAS): New flag.
 	(printSpaces, getCpoolEntry, printConstantTersely,

@@ -1,5 +1,7 @@
 2010-01-10  Per Bothner  <per@bothner.com>
 
+	* Type.java (printSignature): Add fall-back/default.
+
 	* StackMapTableAttr.java (write): Call super write.
 	* ClassFileInput.java (getClassConstant): New convenience method.
 	(readClassInfo): Use it.

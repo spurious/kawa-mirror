@@ -226,16 +226,16 @@ public abstract class Type
 	type = signatureToPrimitive(c);
 	if (type != null)
 	  out.print(type.getName());
-        return;
       }
-    if (c == '[')
+    else if (c == '[')
       {
         printSignature(sig, off+1, len-1, out);
         out.print("[]");
-        return;
       }
-    if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
+    else if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
       out.print(sig.substring(off+1,len-1+off).replace('/', '.'));
+    else
+      out.append(sig, off, len-off);
   }
 
   /** Return the length of the signature starting at a given string position.

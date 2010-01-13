@@ -1,7 +1,7 @@
 KAWALIB = ../../..
 KAWA = ../../../bin/kawa.sh
 DOTEST = $(KAWA) --clisp\
- -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
+ -f "$(KAWALIB)/testsuite/testing.zip" $(OPTIONS)
 
 EXTRA_DIST = lang-test.lisp
 CLEANFILES = *.log

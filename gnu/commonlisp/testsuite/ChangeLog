@@ -1,3 +1,7 @@
+2010-01-13  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (DOTEST): Use -f option.
+
 2007-01-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA): Use bin's kawa.sh directly.

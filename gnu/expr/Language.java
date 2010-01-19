@@ -377,17 +377,21 @@ public abstract class Language
   public void loadClass(String name)
     throws java.lang.ClassNotFoundException
   {
+    Class clas;
     try
       {
-	Class clas = Class.forName(name);
-	Object inst = clas.newInstance ();
-	ClassMemberLocation.defineAll(inst, this, Environment.getCurrent());
-	if (inst instanceof ModuleBody)
-	  ((ModuleBody)inst).run();
+        clas = Class.forName(name);
       }
     catch (java.lang.ClassNotFoundException ex)
       {
 	throw ex;
+      }
+    try
+      {
+	Object inst = clas.newInstance ();
+	ClassMemberLocation.defineAll(inst, this, Environment.getCurrent());
+	if (inst instanceof ModuleBody)
+	  ((ModuleBody)inst).run();
       }
     catch (Exception ex)
       {

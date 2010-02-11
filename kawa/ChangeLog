@@ -1,3 +1,10 @@
+2010-02-10  Per Bothner  <per@bothner.com>
+
+	* standard/let.java (rewrite): No longer allow a java.lang.String
+	as an identifier.
+	This fixes Savannah bug #28860 "Strings as identifiers".
+	* standard/define.java (scanForm): Likewise.
+
 2009-12-25  root  <per@bothner.com>
 
 	* standard/Scheme.java (begin-for-syntax, define-for-syntax): New and

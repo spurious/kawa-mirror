@@ -64,7 +64,7 @@ public class let extends Syntax
 	else
 	  templateScope = syntax == null ? null : syntax.getScope();
         name = tr.namespaceResolve(name);
-	if (! (name instanceof String) && ! (name instanceof Symbol))
+	if (! (name instanceof Symbol))
 	  return tr.syntaxError("variable "+name+" in let binding is not a symbol: "+obj);
 
 	Declaration decl = let.addDeclaration(name);

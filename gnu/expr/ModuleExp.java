@@ -298,11 +298,22 @@ public class ModuleExp extends LambdaExp
                 /* #endif */
               }
 
-            //	    try
-	      {
-                if (inst instanceof ModuleBody && ! mexp.staticInitRun())
-                  ((ModuleBody) inst).run(ctx);
+            if (inst instanceof Runnable)
+              {
+                if (inst instanceof ModuleBody)
+                  {
+                    ModuleBody mb = (ModuleBody) inst;
+                    if (! mb.runDone)
+                      {
+                        mb.runDone = true;
+                        mb.run(ctx);
+                      }
+                  }
+                else
+                  ((Runnable) inst).run();
+              }
 
+              {
 		// Import declarations defined in module into the Environment.
 		for (Declaration decl = mexp.firstDecl();
 		     decl != null;  decl = decl.nextDecl())

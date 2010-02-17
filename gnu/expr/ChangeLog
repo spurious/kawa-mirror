@@ -1,3 +1,10 @@
+2010-02-16  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule2): Invoke run() for all Runnables, not
+	just ModuleBody.  However, do check the runDone field.
+	Note there is no need to check staticInitRun - in that case
+	the ModuleBody does not implement Runnable.
+
 2010-01-18  Per Bothner  <per@bothner.com>
 
 	* Language.java (loadClass): Only catch ClassNotFoundException

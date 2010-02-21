@@ -25,6 +25,7 @@ java_sources = \
   ClassExp.java \
   ClassInitializer.java \
   Compilation.java \
+  CompiledModule.java \
   ConditionalTarget.java \
   ConsumerTarget.java \
   Declaration.java \

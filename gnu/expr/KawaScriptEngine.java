@@ -125,49 +125,30 @@ public class KawaScriptEngine extends AbstractScriptEngine
 class KawaCompiledScript extends CompiledScript
 {
   KawaScriptEngine engine;
-  ModuleExp mexp;
-  Object cookie;
+  CompiledModule cmodule;
 
   public KawaCompiledScript(KawaScriptEngine engine,
                             ModuleExp mexp, Object cookie)
   {
     this.engine = engine;
-    this.mexp = mexp;
-    this.cookie = cookie;
+    this.cmodule = new CompiledModule(mexp, cookie, engine.factory.language);
   }
 
   public Object eval(ScriptContext context) throws ScriptException
   {
-    CallContext ctx = CallContext.getInstance();
-    int oldIndex = ctx.startFromContext();
-    Language saveLang = Language.getDefaultLanguage();
-    Language language = engine.factory.language;
-    Language.setDefaultLanguage(language);
-    Environment saveEnv = ctx.getEnvironmentRaw();
-    Environment env = engine.factory.getEnvironment(context);
-    ctx.setEnvironmentRaw(env);
-    Writer errWriter = context.getErrorWriter();
-    OutPort errPort = errWriter instanceof OutPort ? (OutPort) errWriter
-      : new OutPort(errWriter);
     try
       {
-        mexp.evalModule2(env, ctx, language, mexp, cookie, errPort);
-	return ctx.getFromContext(oldIndex);
+        return cmodule.evalToResultvalue(engine.factory.getEnvironment(context),
+                                         CallContext.getInstance());
       }
     catch (Throwable ex)
-      { 
-	ctx.cleanupFromContext(oldIndex);
+      {
         if (ex instanceof Exception)
           throw new ScriptException((Exception) ex);
         else if (ex instanceof Error)
           throw (Error) ex;
         else
           throw new RuntimeException(ex);
-      }
-    finally
-      {
-	Language.setDefaultLanguage(saveLang);
-        ctx.setEnvironmentRaw(saveEnv);
       }
   }
 

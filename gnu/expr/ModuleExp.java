@@ -41,6 +41,9 @@ public class ModuleExp extends LambdaExp
    * if there is a race condition on the counter.) */
   public static int interactiveCounter;
 
+  /** Compile to a class for immediate evaluation.
+   * Return null on error, if so errors go to comp.getMessages().
+   */
   public static Class evalToClass (Compilation comp, URL url)
     throws SyntaxException
   {
@@ -179,10 +182,14 @@ public class ModuleExp extends LambdaExp
     Object inst = evalModule1(env, comp, url, msg);
     if (inst == null)
       return false;
-    evalModule2(env, ctx, language, mexp, inst, msg);
+    evalModule2(env, ctx, language, mexp, inst);
     return true;
   }
 
+  /** Parse and compile a module.
+   * @return null on error; otherwise a "cookie" that can be passed
+   * to evalModule2 or CompiledModule.
+   */
   public final static Object evalModule1 (Environment env,
                                           Compilation comp, URL url,
                                           OutPort msg)
@@ -262,7 +269,7 @@ public class ModuleExp extends LambdaExp
 
   public final static void evalModule2 (Environment env, CallContext ctx,
                                         Language language, ModuleExp mexp,
-                                        Object inst, OutPort msg)
+                                        Object inst)
     throws Throwable
   {
     Environment orig_env = Environment.getCurrent();

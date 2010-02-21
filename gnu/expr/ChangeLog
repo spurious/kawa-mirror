@@ -1,5 +1,12 @@
 2010-02-21  Per Bothner  <per@bothner.com>
 
+	* CompiledModule.java: New class, encapsulates a compiled module.
+	* Makefile.am:  Update accordingly.
+	* KawaScriptEngine.java (class KawaCompiledScript): Change to
+	use CompiledModule for our guts.
+
+	* ModuleExp.java (evalModule2): Remove unused parameter.
+
 	* ModuleContext.java (clear): New method.
 
 2010-02-16  Per Bothner  <per@bothner.com>

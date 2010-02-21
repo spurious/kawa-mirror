@@ -2,8 +2,9 @@
 
 	* CompiledModule.java: New class, encapsulates a compiled module.
 	* Makefile.am:  Update accordingly.
-	* KawaScriptEngine.java (class KawaCompiledScript): Change to
-	use CompiledModule for our guts.
+	* KawaScriptEngine.java (class KawaCompiledScript): Use CompiledModule
+	class to replace two old fields.
+	(eval): Re-write to use CompiledModule.
 
 	* ModuleExp.java (evalModule2): Remove unused parameter.
 

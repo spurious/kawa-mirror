@@ -1,3 +1,7 @@
+2010-02-21  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java (clear): New method.
+
 2010-02-16  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule2): Invoke run() for all Runnables, not

@@ -103,4 +103,11 @@ public class ModuleContext
     return info;
   }
 
+  /** Remove all entries.
+   * This can be used to avoids memory leaks.
+   */
+  public void clear ()
+  {
+    table.clear();
+  }
 }

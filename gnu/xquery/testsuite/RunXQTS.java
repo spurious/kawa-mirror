@@ -178,6 +178,10 @@ public class RunXQTS extends FilterConsumer
             runner.summaryReport();
             xqlog.close();
 	  }
+        catch (OutOfMemoryError ex)
+          {
+            throw ex;
+          }
 	catch (Throwable ex)
 	  {
             ex.printStackTrace();
@@ -392,6 +396,7 @@ public class RunXQTS extends FilterConsumer
         outputCompareAlts.clear();
         expectedErrorsBuf.setLength(1);
         manager.clear();
+        ModuleContext.getContext().clear();
         Document.clearLocalCache();
       }
     else if (tagMatches("query"))
@@ -520,12 +525,6 @@ public class RunXQTS extends FilterConsumer
         if (messages.seenErrors())
           throw new SyntaxException(messages);
       }
-    catch (OutOfMemoryError ex)
-      {
-	System.err.println("caught "+ex);
-	System.exit(-1);
-        return;
-      }
     catch (SyntaxException ex)
       {
         in.close();
@@ -599,8 +598,7 @@ public class RunXQTS extends FilterConsumer
       }
     catch (OutOfMemoryError ex)
       {
-	System.err.println("caught "+ex);
-	System.exit(-1);
+        throw ex;
       }
     catch (Throwable ex)
       {
@@ -797,6 +795,10 @@ public class RunXQTS extends FilterConsumer
                   c2 = (c2 - 0xD800) * 0x400
                     + (arg2.charAt(++i2) - 0xDC00) + 0x10000;
               }
+            catch (OutOfMemoryError ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 return false;
@@ -927,6 +929,10 @@ public class RunXQTS extends FilterConsumer
                 if (Float.floatToIntBits(f1) != Float.floatToIntBits(f2))
                   return false;
               }
+            catch (OutOfMemoryError ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 return false;
@@ -1003,6 +1009,10 @@ public class RunXQTS extends FilterConsumer
                 // Other attributes and <test-case> body written by evalTest.
                 evalTest(testName);
               }
+            catch (OutOfMemoryError ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 System.err.println("test-case name:"+testName);
@@ -1043,6 +1053,10 @@ public class RunXQTS extends FilterConsumer
                 current.define(symbol, null, value);
                 externalVariablesSet.push(symbol);
               }
+            catch (OutOfMemoryError ex)
+              {
+                throw ex;
+              }
             catch (Throwable ex)
               {
                 System.err.println("input-query for "+testName+": cannot open "+filename);
@@ -1080,6 +1094,10 @@ public class RunXQTS extends FilterConsumer
               Environment.getCurrent().define(symbol, null, value);
             else
               contextItem = value;
+          }
+        catch (OutOfMemoryError ex)
+          {
+            throw ex;
           }
         catch (Throwable ex)
           {
@@ -1126,7 +1144,11 @@ public class RunXQTS extends FilterConsumer
             KDocument value = (KDocument) Document.parseCached(path);
             collectionDocuments.writeObject(value);
           }
-         catch (Throwable ex)
+        catch (OutOfMemoryError ex)
+          {
+            throw ex;
+          }
+        catch (Throwable ex)
           {
             System.err.println("caught "+ex);
             System.err.println("reading data file "+path);

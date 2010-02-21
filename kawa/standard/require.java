@@ -279,7 +279,7 @@ public class require extends Syntax
       }
 
     ClassType type = info.getClassType();
-    String tname = info.className;
+    String tname = type.getName();
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
     boolean isRunnable = (info.getState() < Compilation.RESOLVED
                           ? info.getCompilation().makeRunnable()

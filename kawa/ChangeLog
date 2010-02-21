@@ -1,3 +1,8 @@
+2010-02-21  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): Get module classname
+	from the module ClassType, which is more robust.
+
 2010-02-10  Per Bothner  <per@bothner.com>
 
 	* standard/let.java (rewrite): No longer allow a java.lang.String

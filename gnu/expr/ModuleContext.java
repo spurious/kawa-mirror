@@ -44,7 +44,6 @@ public class ModuleContext
   /** If there is no instance of the argument's class, allocated one. */
   public Object findInstance (ModuleInfo info)
   {
-    String cname = info.className;
     Class clas;
     try
       {
@@ -52,6 +51,7 @@ public class ModuleContext
       }
     catch (java.lang.ClassNotFoundException ex)
       {
+        String cname = info.getClassName();
         throw new WrappedException("cannot find module " + cname, ex);
       }
     return findInstance(clas);
@@ -81,7 +81,6 @@ public class ModuleContext
           }
         catch (Throwable ex)
           {
-            ex.printStackTrace();
             throw new WrappedException
               ("exception while initializing module " + clas.getName(), ex);
           }

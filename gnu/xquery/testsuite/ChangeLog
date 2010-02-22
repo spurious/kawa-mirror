@@ -1,5 +1,8 @@
 2010-02-21  Per Bothner  <per@bothner.com>
 
+	* RunXQTS.java: Update since ModuleInfo's className method
+	is now private.
+
 	* RunXQTS.java (handleStartTag): Call ModuleContext's clear
 	method to avoid a memory leak.
 	Also, never catch OutOfMemoryError.

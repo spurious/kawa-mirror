@@ -15,7 +15,7 @@ public class ModuleInfo
    * Must be non-null unless we're currently compiling the module,
    * in which case sourcePath and comp must both be non-null.
    */
-  public String className;
+  private String className;
 
   Class moduleClass;
 
@@ -113,6 +113,23 @@ public class ModuleInfo
     if (comp != null && comp.mainClass != null)
       return comp.mainClass;
     return ClassType.make(className);
+  }
+
+  public String getClassName ()
+  {
+    if (className == null)
+      {
+        if (moduleClass != null)
+          className = moduleClass.getName();
+        else if (comp != null && comp.mainClass != null)
+          className = comp.mainClass.getName();
+      }
+    return className;
+  }
+
+  public void setClassName (String name)
+  {
+    className = name;
   }
 
   public synchronized ModuleExp getModuleExp ()

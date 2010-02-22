@@ -236,7 +236,7 @@ public class require extends Syntax
           {
             InPort fstream = InPort.openFile(info.getSourceAbsPath());
             info.clearClass();
-            info.className = className;
+            info.setClassName(className);
             int options = Language.PARSE_PROLOG;
             if (tr.immediate)
               options |= Language.PARSE_IMMEDIATE;
@@ -259,9 +259,7 @@ public class require extends Syntax
             // otherwise ignore it - it's already been recorded in messages.
             return false;
           }
-        ModuleExp mexp = comp.getModule();
-        ClassType ctype = mexp.classFor(comp);
-        info.className = ctype.getName();
+        info.setClassName(comp.getModule().classFor(comp).getName());
       }
 
     if (tr.minfo != null && tr.getState() < Compilation.BODY_PARSED)

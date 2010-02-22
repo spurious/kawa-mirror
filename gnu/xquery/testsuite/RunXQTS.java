@@ -1175,7 +1175,7 @@ public class RunXQTS extends FilterConsumer
         String mclass = Compilation.mangleURI(uri)
           + '.' + XQuery.makeClassName(mpath);
         ModuleInfo minfo = manager.findWithSourcePath(mpath);
-        minfo.className = mclass;
+        minfo.setClassName(mclass);
         minfo.setNamespaceUri(uri);
       }
     /*

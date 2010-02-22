@@ -53,7 +53,7 @@ public class ModuleManager
     String fileName = mexp.getFileName();
     Path sourceAbsPath = ModuleInfo.absPath(fileName);
     ModuleInfo info = findWithSourcePath(sourceAbsPath, fileName);
-    info.className = ctype.getName();
+    info.setClassName(ctype.getName());
     info.exp = mexp;
     comp.minfo = info;
     info.comp = comp;
@@ -78,7 +78,7 @@ public class ModuleManager
     for (int i = numModules;  --i >= 0; )
       {
         ModuleInfo info = modules[i];
-        if (className.equals(info.className))
+        if (className.equals(info.getClassName()))
           return info;
       }
     return null;
@@ -194,7 +194,7 @@ public class ModuleManager
             return;
           }
       }
-    info.className = moduleClass;
+    info.setClassName(moduleClass);
     info.sourcePath = moduleSource;
     info.uri = moduleUri;
     add(info);

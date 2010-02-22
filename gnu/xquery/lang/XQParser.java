@@ -4032,7 +4032,7 @@ public class XQParser extends Lexer
                 if (! uri.equals(info.getNamespaceUri()))
                   continue;
                 n++;
-                require.importDefinitions(info.className, info, null, forms, module, comp);
+                require.importDefinitions(info.getClassName(), info, null, forms, module, comp);
               }
             if (n == 0)
               error('e', "no module found for "+uri);

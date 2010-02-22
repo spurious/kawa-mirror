@@ -1,5 +1,18 @@
 2010-02-21  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java (className): Make private.
+	(getClassName): New method, uses same logic as getClassType.
+	(setClassType): New method.
+	* ModuleManager.java: Update accordingly.
+	(searchWithClassName): Use getClassName(), which works better than
+	searching with just the className field, and is the purpose of
+	this particular exercise.
+	* ModuleContext.java: Update accordingly.
+	* Compilation.java: Update accordingly.
+	* ModuleExp.java (evalModule2): Avoid code duplication by using
+	ModuleContext's findInstance method.
+	Do ClassMemberLocation.defineAll if we're loading a class file.
+
 	* CompiledModule.java: New class, encapsulates a compiled module.
 	* Makefile.am:  Update accordingly.
 	* KawaScriptEngine.java (class KawaCompiledScript): Use CompiledModule

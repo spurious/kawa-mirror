@@ -197,6 +197,7 @@ public class ModuleExp extends LambdaExp
   {
     comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
+    mexp.info = comp.minfo;
     Environment orig_env = Environment.getCurrent();
     Compilation orig_comp = Compilation.getCurrent();
     SourceMessages messages = comp.getMessages();
@@ -287,23 +288,7 @@ public class ModuleExp extends LambdaExp
 	else
 	  {
             if (inst instanceof Class)
-              {
-                Class clas = (Class) inst;
-                try
-                  {
-                    inst = clas.getDeclaredField("$instance").get(null);
-                  }
-                catch (NoSuchFieldException ex)
-                  {
-                    inst = clas.newInstance();
-                  }
-                /* #ifdef use:java.lang.Throwable.getCause */
-                catch (ExceptionInInitializerError ex)
-                  {
-                    throw ex.getCause();
-                  }
-                /* #endif */
-              }
+              inst = ModuleContext.getContext().findInstance((Class) inst);
 
             if (inst instanceof Runnable)
               {
@@ -320,8 +305,11 @@ public class ModuleExp extends LambdaExp
                   ((Runnable) inst).run();
               }
 
+            if (mexp == null)
+              gnu.kawa.reflect.ClassMemberLocation.defineAll(inst, language, env);
+            else
               {
-		// Import declarations defined in module into the Environment.
+                // Import declarations defined in module into the Environment.
 		for (Declaration decl = mexp.firstDecl();
 		     decl != null;  decl = decl.nextDecl())
 		  {

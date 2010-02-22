@@ -2244,7 +2244,7 @@ public class Compilation implements SourceLocator
         for (int i = manager.numModules;  --i >= 0; )
           {
             ModuleInfo mi = manager.modules[i];
-            String miClassName = mi.className;
+            String miClassName = mi.getClassName();
             if (miClassName == null
                 || ! miClassName.startsWith(mainPrefix))
               continue;

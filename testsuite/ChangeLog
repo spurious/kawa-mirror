@@ -1,3 +1,8 @@
+2010-02-21  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: define-for-syntax is now working, as long as it
+	is in the same compuilation unit (module) unit as it is being used.
+
 2009-12-27  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Use define-for-syntax and with-compile-options to

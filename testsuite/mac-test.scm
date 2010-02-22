@@ -438,13 +438,15 @@
 			    (quasisyntax (list x ,x))))))
 	  (m))))
 
-(set! fail-expected "define-for-syntax for now is just a synonym for define")
-(define x-72-x3 1)
-(define-for-syntax x-72-x3 2)
-(test '(1 2) 'srfi-72-example-4
-       (let-syntax ((m (lambda (form)
-                    (quasisyntax (list x-72-x3 ,x-72-x3)))))
-	 (m)))
+(begin
+  ;; Note we need to compile define and define-for-syntax
+  ;; in the same comilation unit for it to make sense.
+  (define x-72-x3 1)
+  (define-for-syntax x-72-x3 2)
+  (test '(1 2) 'srfi-72-example-4
+	(let-syntax ((m (lambda (form)
+			  (quasisyntax (list x-72-x3 ,x-72-x3)))))
+	  (m))))
 
 ;; Based on Savannah bug #17984 Chris Wegrzyn <chris.wegrzyn@gmail.com>
 ;; Compile time error in expansion of hygienic macros ending in literals

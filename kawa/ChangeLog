@@ -1,3 +1,7 @@
+2010-02-23  Per Bothner  <per@bothner.com>
+
+	* GuiConsole.java: Remove unneeded import.
+
 2010-02-21  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Get module classname

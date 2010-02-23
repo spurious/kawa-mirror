@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import gnu.mapping.*;
 import gnu.expr.Language;
-import kawa.standard.Scheme;
 
 /** A Frame containing a Kawa read-eval-print loop.
   * @author Albert Ting <alt@artisan.com> (original base)

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 191)
+(test-init "Miscellaneous" 192)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -136,6 +136,7 @@
 (call-with-input-string
  cr-test-string
  (lambda (iport)
+   (iport:setConvertCR #t)
    (test 1 input-port-column-number iport)
    (test 1 input-port-line-number iport)
    (test 'a read iport)
@@ -919,3 +920,8 @@
 ;; Savannah bug #28957: exception in inliner, from Helmut Eller
 (test "Type java.lang.CharSequence[]" 'test-savannah-28957
       (((string[]):getClass):toString))
+
+;; Savannah bug #28926: EOL conversion in READ
+(test "(#\\X #\\return #\\Y #\\return #\\newline #\\Z)" 'test-savannah-28926
+      (format "~w" (let ((in (string #\" #\X #\return #\Y #\return #\newline #\Z #\")))
+		     (string->list (call-with-input-string in read)))))

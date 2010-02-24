@@ -30,8 +30,6 @@ public class ReaderString extends ReadTableEntry
       {
 	for (;;)
 	  {
-	    int next;
-
 	    prev = c;
 
 	    // Read next char - inline the common case.
@@ -52,7 +50,16 @@ public class ReaderString extends ReadTableEntry
 	    switch (c)
 	      {
 	      case '\r':
-		in.tokenBufferAppend('\n');
+                int t;
+                if (port.getConvertCR())
+                  t = '\n';
+                else
+                  {
+                    t = '\r';
+                    // To suppress possible "\r\n"-conversion.
+                    c = ' ';
+                  }
+		in.tokenBufferAppend(t);
 		continue;
 	      case '\\':
 		if (in instanceof LispReader)

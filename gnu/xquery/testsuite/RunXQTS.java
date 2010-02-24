@@ -1122,7 +1122,6 @@ public class RunXQTS extends FilterConsumer
     else if (tagMatches("defaultCollection"))
       {
         String inputFile = getElementValue();
-        Object inputValue = sources.get(inputFile);
         Object val = NodeUtils.getSavedCollection("collection:"+inputFile);
         NodeUtils.setSavedCollection("#default", val);
       }

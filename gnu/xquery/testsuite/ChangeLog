@@ -1,3 +1,7 @@
+2010-02-24  Per Bothner  <per@bothner.com>
+
+	* RunXQTS.java: Remove unused local variable.
+
 2010-02-21  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Update since ModuleInfo's className method

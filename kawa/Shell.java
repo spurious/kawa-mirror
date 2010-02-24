@@ -6,12 +6,22 @@ import java.io.*;
 import gnu.text.*;
 import gnu.lists.*;
 import gnu.bytecode.ArrayClassLoader;
+import gnu.bytecode.ZipLoader;
+import java.net.URL;
 
 /** Utility functions (static methods) for kawa.repl.
- * Should probably be merged with kawa.repl.  FIXME. */
+ * It also contains methods for file loading (source and compiled).
+ */
 
 public class Shell
 {
+  /* #ifdef JAVA2 */
+  public static ThreadLocal currentLoadPath = new ThreadLocal();
+  /* #else */
+  // public static Location currentLoadPath =
+  //   Location.make(null, "load-path");
+  /* #endif */
+
   private static Class[] noClasses = { };
   private static  Class[] boolClasses = { Boolean.TYPE };
   private static  Class[] xmlPrinterClasses
@@ -192,7 +202,7 @@ public class Shell
 
   public static boolean run (Language language,  Environment env,
                              InPort inp, Consumer out, OutPort perr,
-                             java.net.URL url)
+                             URL url)
   {
     SourceMessages messages = new SourceMessages();
     Throwable ex = run(language, env, inp, out, perr, url, messages);
@@ -339,39 +349,181 @@ public class Shell
       }
   }
 
-  public static boolean runFile (String fname, int skipLines)
+  public final static CompiledModule checkCompiledZip (InputStream fs, Path path, Environment env, Language language)
+    throws IOException
   {
-    Environment env = Environment.getCurrent();
     try
       {
-	if (fname.equals ("-"))
+        fs.mark(5);
+        boolean isZip = (fs.read() == 'P' && fs.read() == 'K'
+                         && fs.read() == '\003' && fs.read() == '\004');
+        fs.reset();
+        if (! isZip)
+          return null;
+      }
+    catch (IOException ex)
+      {
+        return null;
+      }
+    fs.close ();
+    Environment orig_env = Environment.getCurrent();
+    String name = path.toString();
+    try
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(env);
+        if (! (path instanceof FilePath))
+          throw new RuntimeException ("load: "+name+" - not a file path");
+	File zfile = ((FilePath) path).toFile();
+	if (!zfile.exists ())
+	  throw new RuntimeException ("load: "+name+" - not found");
+	if (!zfile.canRead ())
+	  throw new RuntimeException ("load: "+name+" - not readable");
+	ZipLoader loader = new ZipLoader (name);
+        Class clas = loader.loadAllClasses();
+        return CompiledModule.make(clas, language);
+      }
+    catch (java.io.IOException ex)
+      {
+	throw new WrappedException ("load: "+name+" - "+ex.toString (), ex);
+      }
+    finally
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
+      }
+  }
+
+  /** Run a named source file, compiled .zip, or class.
+   * We try in order if {@code fname} names a compiled zip file,
+   * or names some other file (in which case it is assumed to be source),
+   * or is the name of a class in the classpath.
+   * @param lineByLine Should we read and evaluate a source file line-by-line
+   *   (i.e. read and evaluate each line before reading the next one),
+   *   or should be read and compile the whole file as a module before
+   *   running it?  Only used when parsing a source file.
+   * @param skipLines  If reading a source file, the number of initial
+   *   lines to skip before beginning parsing.
+   * @return True on success, false on failure.
+   */
+
+  public static boolean runFileOrClass (String fname,
+                                        boolean lineByLine, int skipLines)
+  {
+    Language language = Language.getDefaultLanguage();
+    try
+      {
+        Path path;
+        InputStream fs;
+        if (fname.equals("-"))
           {
-            InPort in = InPort.inDefault();
-            while (--skipLines >= 0)
-              in.skipRestOfLine();
-            kawa.standard.load.loadSource(in, env, null);
+            path = Path.valueOf("/dev/stdin");
+            fs = System.in;
           }
-	else
-	  kawa.standard.load.apply(fname, env, false, skipLines);
-        return true;
-      }
-    catch (gnu.text.SyntaxException e)
-      {
-	e.printAll(OutPort.errDefault(), 20);
-        return false;
-      }
-    catch (FileNotFoundException e)
-      {
-        // We really should distinguish a FileNotFoundException because
-        // fname doesn't name a file vs a FileNotFoundException that
-        // happens at runtime.  FIXME.
-	System.err.println("Cannot read file "+e.getMessage());
-        return false;
+        else
+          {
+            path = Path.valueOf(fname);
+            fs = path.openInputStream();
+          }
+        try
+          {
+            Environment env = Environment.getCurrent();
+            return runFile(fs, path, env, lineByLine, skipLines);
+          }
+        catch (Throwable e)
+          {
+            e.printStackTrace(System.err);
+            return false;
+          }
       }
     catch (Throwable e)
       {
-	e.printStackTrace(System.err);
-        return false;
+        try
+          {
+            Class clas = Class.forName(fname);
+            CompiledModule cmodule = CompiledModule.make(clas, language);
+            cmodule.evalModule(Environment.getCurrent(), OutPort.outDefault());
+            return true;
+          }
+        catch (Throwable ex)
+          {
+            System.err.println("Cannot read file "+e.getMessage());
+            return false;
+          }
       }
+  }
+
+
+  public static final boolean runFile(InputStream fs, Path path,
+                                      Environment env,
+                                      boolean lineByLine, int skipLines)
+    throws Throwable
+  {
+    if (! (fs instanceof BufferedInputStream))
+      fs = new BufferedInputStream(fs);
+    Language language = Language.getDefaultLanguage();
+    Path savePath = (Path) currentLoadPath.get();
+    try
+      {
+        currentLoadPath.set(path);
+        CompiledModule cmodule = checkCompiledZip(fs, path, env, language);
+        if (cmodule == null)
+          {
+            InPort src = InPort.openFile(fs, path);
+            while (--skipLines >= 0)
+              src.skipRestOfLine();
+            try
+              {
+                SourceMessages messages = new SourceMessages();
+                URL url = path.toURL();
+                if (lineByLine)
+                  {
+                    boolean print = ModuleBody.getMainPrintValues();
+                    Consumer out = (print ? getOutputConsumer(OutPort.outDefault())
+                                    : new VoidConsumer());
+                    Throwable ex
+                      = run(language, env, src, out, null, url, messages);
+                    if (ex != null)
+                      throw ex;
+                  }
+                else
+                  {
+                    cmodule = compileSource (src, env, url, language, messages);
+                    messages.printAll(OutPort.errDefault(), 20);
+                    if (cmodule == null)
+                      return false;
+                  }
+              }
+            finally
+              {
+                src.close();
+              }
+          }
+        if (cmodule != null)
+          cmodule.evalModule(env, OutPort.outDefault());
+      }
+    finally
+      {
+        currentLoadPath.set(savePath);
+      }
+    return true;
+  }
+
+  /** Parse and compile a module from the given port.
+   * Return null on error, which gets reported to {@code messages}.
+   */
+  static CompiledModule compileSource (InPort port, Environment env, URL url, Language language, SourceMessages messages)
+    throws SyntaxException, IOException
+  {
+    ModuleManager manager = ModuleManager.getInstance();
+    ModuleInfo minfo = manager.findWithSourcePath(port.getName());
+    Compilation comp
+      = language.parse(port, messages, Language.PARSE_FOR_EVAL, minfo);
+    CallContext ctx = CallContext.getInstance();
+    ctx.values = Values.noArgs;
+    Object inst = ModuleExp.evalModule1(env, comp, url, null);
+    if (inst == null || messages.seenErrors())
+      return null;
+    return new CompiledModule(comp.getModule(), inst, language);
   }
 }

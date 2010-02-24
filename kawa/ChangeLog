@@ -1,5 +1,15 @@
 2010-02-23  Per Bothner  <per@bothner.com>
 
+	Re-write of "runFile", load, and interfaces for running/loading files
+	and modules from the command line or the Scheme load function.
+	Most importantly, handle running a class name on the command line,
+	and handle mutually-referring source files from command line.
+	* Shell.java: Bunch of stuff was moved here from load.java.
+	(checkCompiledZip, runFileOrClass, compileSource): New methods.
+	(runFile): Re-organized and changed interfaces.
+	* repl.java: Change calls to runFile to call runFileOrClass.
+	* standard/load.java: Move most of the logic to Shell.java.
+
 	* GuiConsole.java: Remove unneeded import.
 
 2010-02-21  Per Bothner  <per@bothner.com>

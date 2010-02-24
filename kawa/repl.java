@@ -136,7 +136,7 @@ public class repl extends Procedure0or1
 	  scmHomeDirectory = Boolean.FALSE;
 	Environment.getCurrent().put("home-directory", scmHomeDirectory);
 	if (initFile != null && initFile.exists())
-	  if (! Shell.runFile(initFile.getPath(), 0))
+	  if (! Shell.runFileOrClass(initFile.getPath(), true, 0))
             System.exit(-1);
       }
   }
@@ -209,7 +209,7 @@ public class repl extends Procedure0or1
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    if (! Shell.runFile (filename, 0))
+	    if (! Shell.runFileOrClass(filename, true, 0))
               System.exit(-1);
 	    something_done = true;
 	  }
@@ -235,7 +235,7 @@ public class repl extends Procedure0or1
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    if (! Shell.runFile(filename, skipLines))
+	    if (! Shell.runFileOrClass(filename, true, skipLines))
               System.exit(-1);
             return -1;
 	  }
@@ -774,7 +774,7 @@ public class repl extends Procedure0or1
 	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    ok = Shell.runFile(filename, 0);
+	    ok = Shell.runFileOrClass(filename, false, 0);
 	  }
 	else
 	  {

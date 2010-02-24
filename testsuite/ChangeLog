@@ -1,3 +1,15 @@
+2010-02-23  Per Bothner  <per@bothner.com>
+	    Alex Mitchell <lexaay@gmail.com>
+
+	* cycleb1.scm, cycleb2.scm, cycleb.expected: New test-case, for
+	compiling cycle from source from by named file.
+	* Makefile.am: Update accordingly.
+
+2010-02-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Various updates since naming a source file or class
+	on the command line now runs it as a module.
+
 2010-02-21  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: define-for-syntax is now working, as long as it

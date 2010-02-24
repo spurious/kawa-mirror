@@ -17,7 +17,8 @@ WARN_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-er
 all:
 
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
-  check-interpreted-cycle $(SERVLET_TESTS) $(SAX2_TESTS) \
+  check-interpreted-cycle check-interpreted-cycleb check-interpreted-cyclebr \
+  $(SERVLET_TESTS) $(SAX2_TESTS) \
   check-inlining check-jmc check-use-slots check-load-require
 
 check2-no-full-tailcalls:
@@ -48,40 +49,40 @@ check-scm: testing.zip
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
 check-num:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/num-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/num-test.scm"
 
 check-arr:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/arr-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/arr-test.scm"
 
 check-lib:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/lib-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/lib-test.scm"
 
 check-srfi-16:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-16-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-16-test.scm"
 
 check-srfi-64:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-64-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-64-test.scm"
 
 check-srfi-69:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/srfi-69-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/srfi-69-test.scm"
 
 check-text:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/text-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/text-test.scm"
 
 check-regex:
-	$(KAWA) $(OPTIONS) -f "$(srcdir)/regex-test.scm"
+	$(KAWA) $(OPTIONS) "$(srcdir)/regex-test.scm"
 
 check-misc: testing.zip moduleFT.class InliningTest.class \
 	    cycle1.class cycle2.class
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
 check-mac: testing.zip
-	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
-	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
+	$(KAWATEST) \
+	  -e '(define src-prefix "$(srcdir)/")' -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
 check-obj: testing.zip module2.class module3.class classes2.class \
   MyFunc.class MyModule.class cycle1.class cycle2.class
-	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
+	$(KAWATEST) --no-warn-invoke-unknown-method -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
 	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
@@ -137,8 +138,7 @@ pidigits.class: $(srcdir)/pidigits.scm
 	$(KAWA) --main -C $(srcdir)/pidigits.scm
 
 check-pidigits: pidigits.class
-	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) pidigits 27 >pidigits27.log
+	$(KAWA) pidigits 27 >pidigits27.log
 	@if diff $(srcdir)/pidigits-output.txt pidigits27.log; \
 	  then echo '# pidigits test passes'; \
 	  else echo FAIL pidigits test; fi
@@ -149,7 +149,7 @@ binarytrees.class: $(srcdir)/binarytrees.scm
 
 check-binarytrees: binarytrees.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) binarytrees 10 >binarytrees10.log
+	$(KAWA) binarytrees 10 >binarytrees10.log
 	@if diff $(srcdir)/binarytrees-output.txt binarytrees10.log; \
 	  then echo '# binarytrees test passes'; \
 	  else echo FAIL binarytrees test; fi
@@ -351,6 +351,18 @@ check-interpreted-cycle:
 	  -e '(test-error (is-odd? 4))' \
 	  -e '(test-end)'
 
+check-interpreted-cycleb:
+	CLASSPATH=.. $(KAWA) cycleb1.scm > cycleb.log
+	@if diff $(srcdir)/cycleb.expected cycleb.log; \
+	  then echo '# cycleb test passes'; \
+	  else echo FAIL cycleb test; fi
+
+check-interpreted-cyclebr:
+	CLASSPATH=.. $(KAWA) -e '(require "cycleb1.scm")' > cyclebr.log
+	@if diff $(srcdir)/cycleb.expected cyclebr.log; \
+	  then echo '# cyclebr test passes'; \
+	  else echo FAIL cyclebr test; fi
+
 InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
@@ -434,6 +446,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \
   HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
+  cycleb1.scm cycleb2.scm cycleb.expected \
   ppfile.out scribble.html.in $(EXTRA_LOAD_REQUIRE_DIST) \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \

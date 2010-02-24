@@ -1,3 +1,8 @@
+2010-02-23  Per Bothner  <per@bothner.com>
+
+	* CompiledModule.java (evalModule(Environment,OutPort)): New method.
+	Partly moved from removed kawa.standard.load#loadSource.
+
 2010-02-21  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (className): Make private.

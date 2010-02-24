@@ -89,7 +89,7 @@ public class GetNamedPart extends Procedure2 implements HasSetter
     if (container instanceof HasNamedParts)
       return ((HasNamedParts) container).get(name);
     if (container instanceof Class)
-      container = (ClassType) Type.make((Class) container);
+      container = Type.make((Class) container);
     if (container instanceof Package)
       {
         try

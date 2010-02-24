@@ -1,3 +1,9 @@
+2010-02-24  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java (getNamedPart): Don't coerce Type to ClassTYpe,
+	since it might fail in the case of an ArrayType, for example.
+	This fixes Savannah bug #28957 "exception in inliner".
+
 2009-10-19  Per Bothner  <per@bothner.com>
 
 	* CompilationHelpers.java (inlineApplyToArgs): Use getRealType.

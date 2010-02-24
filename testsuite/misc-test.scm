@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 190)
+(test-init "Miscellaneous" 191)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -916,3 +916,6 @@
 	     (sum :: int 0 (+ sum (car x))))
 	    ((null? x) sum))))
 
+;; Savannah bug #28957: exception in inliner, from Helmut Eller
+(test "Type java.lang.CharSequence[]" 'test-savannah-28957
+      (((string[]):getClass):toString))

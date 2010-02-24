@@ -1,3 +1,9 @@
+2010-02-24  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods): Check that implementation type
+	is a ClassType before casting to it.
+	This fixes Savannah bug #28957 "exception in inliner".
+
 2009-11-30  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (compile): Use plain emitInvoke, rather than unreliably

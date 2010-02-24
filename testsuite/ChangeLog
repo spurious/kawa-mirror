@@ -1,3 +1,9 @@
+2010-02-24  Per Bothner  <per@bothner.com>
+            Helmut Eller  <eller.helmut@gmail.com>
+
+	* misc-test.scm: New test, based on Savannah bug #28957
+	"exception in inliner".
+
 2010-02-23  Per Bothner  <per@bothner.com>
 	    Alex Mitchell <lexaay@gmail.com>
 

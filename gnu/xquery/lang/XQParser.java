@@ -3238,6 +3238,7 @@ public class XQParser extends Lexer
 
     if (match ("order"))
       {
+        char saveNesting = pushNesting(isFor ? 'f' : 'l');
         getRawToken();
         if (match ("by"))
           getRawToken();
@@ -3313,6 +3314,7 @@ public class XQParser extends Lexer
         //maybeSetLine(lexp, declLine, declColumn);
         for (int i = flworDeclsFirst;  i < flworDeclsCount;  i++)
           lexp.addDeclaration(flworDecls[i].getSymbol());
+        popNesting(saveNesting);
         comp.push(lexp);
 	lexp.body = parseExprSingle();
         comp.pop(lexp);

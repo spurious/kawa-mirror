@@ -1,3 +1,9 @@
+2010-02-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseFLWRExpression): Do pushNesting/popNesting
+	in 'order by' clause, to fix parsing in REPL.
+	Fixes bug reported by Karl Krukow.
+
 2010-02-21  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Update since ModuleInfo's className method

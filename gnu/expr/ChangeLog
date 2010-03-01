@@ -1,3 +1,7 @@
+2010-03-01  Per Bothner  <per@bothner.com>
+
+	* KawaScriptEngine.java: Fix typo.
+
 2010-02-23  Per Bothner  <per@bothner.com>
 
 	* CompiledModule.java (evalModule(Environment,OutPort)): New method.

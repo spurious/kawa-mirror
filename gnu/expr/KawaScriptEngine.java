@@ -138,7 +138,7 @@ class KawaCompiledScript extends CompiledScript
   {
     try
       {
-        return cmodule.evalToResultvalue(engine.factory.getEnvironment(context),
+        return cmodule.evalToResultValue(engine.factory.getEnvironment(context),
                                          CallContext.getInstance());
       }
     catch (Throwable ex)

@@ -1,3 +1,7 @@
+2010-03-17  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (inlineDiv): Fix thinko.
+
 2010-02-24  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java (getNamedPart): Don't coerce Type to ClassTYpe,

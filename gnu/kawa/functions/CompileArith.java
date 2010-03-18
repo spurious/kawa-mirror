@@ -532,7 +532,7 @@ public class CompileArith implements CanInline, Inlineable
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {
-        args = new Expression[] { QuoteExp.getInstance(IntNum.one()), args[1] };
+        args = new Expression[] { QuoteExp.getInstance(IntNum.one()), args[0] };
         exp = new ApplyExp(exp.getFunction(), args);
       }
     return exp;

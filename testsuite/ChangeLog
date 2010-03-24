@@ -1,3 +1,10 @@
+2010-03-23  Per Bothner  <per@bothner.com>
+
+	* fannkuch.scm (vector-copy): Remove.  Pre-allocate vector into
+	caller (fannkuch function), and inline initialization into count-flips.
+	* Makefile.am (inlining.log): Update accordingly.
+	* inlining.expected: Likewise.
+
 2010-02-24  Per Bothner  <per@bothner.com>
             Helmut Eller  <eller.helmut@gmail.com>
 

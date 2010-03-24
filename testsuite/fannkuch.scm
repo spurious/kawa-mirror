@@ -14,20 +14,17 @@
 	  (set! i (+ i 1))
 	  (loop (- j 1))))))
 
-(define (count-flips (pi :: int[])) :: int
-  (do ((rho :: int[] (vector-copy pi))
-       (i :: int 0 (+ i 1)))
-        ((= (rho 0) 0) i)
-      (vector-reverse-slice! rho 0 (+ (rho 0) 1))))
-
-(define (vector-copy (source :: int[])) :: int[]
-  (let ((vec (int[] length: source:length)))
-    (do ((i :: int 0 (+ i 1)))
-	((= i source:length) vec)
-      (set! (vec i) (source i)))))
+(define (count-flips pi::int[] pt::int[]) :: int
+  (do ((i :: int 0 (+ i 1)))
+      ((= i pi:length))
+    (set! (pt i) (pi i)))
+  (do ((i :: int 0 (+ i 1)))
+        ((= (pt 0) 0) i)
+      (vector-reverse-slice! pt 0 (+ (pt 0) 1))))
 
 (define (fannkuch (n :: int)) :: int
   (let ((pi (int[] length: n))
+	(pt (int[] length: n))
 	(r :: int n)
 	(count (int[] length: n)))
     (do ((i :: int 0 (+ i 1))) ((= i n))
@@ -43,7 +40,7 @@
           ((= r 1))
 	(set! (count (- r 1)) r)
 	(set! r (- r 1)))
-      (let* ((flips1 (count-flips pi))
+      (let* ((flips1 (count-flips pi pt))
 	     (flips2 (if (> flips1 flips) flips1 flips)))
 	(let ((result :: int
 	       (let loop2 ()

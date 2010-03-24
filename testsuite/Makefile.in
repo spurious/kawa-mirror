@@ -749,7 +749,7 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize 'binarytrees$$TreeNode.class' itemCheck >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$$Ex' countFlips vectorCopy fannkuch >>inlining.log
+	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$$Ex' countFlips fannkuch >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize fasta.class randomNext >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \

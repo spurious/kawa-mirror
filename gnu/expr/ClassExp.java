@@ -619,7 +619,7 @@ public class ClassExp extends LambdaExp
 		    String msg = vec.size() == 0
 		      ? "missing implementation for "
 		      : "ambiguous implementation for ";
-		    comp.error('e', msg+meth+" mname:"+mname);
+		    comp.error('e', msg+meth);
 		  }
 		else
 		  {

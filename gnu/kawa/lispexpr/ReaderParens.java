@@ -10,6 +10,7 @@ public class ReaderParens extends ReadTableEntry
   char open;
   char close;
   int kind;
+  Object command;
 
   public int getKind()
   {
@@ -28,20 +29,29 @@ public class ReaderParens extends ReadTableEntry
     if (open == '(' && close == ')' && kind == ReadTable.TERMINATING_MACRO)
       {
 	if (instance == null)
-	  instance = new ReaderParens(open, close, kind);
+	  instance = new ReaderParens(open, close, kind, null);
 	return instance;
       }
     else
       {
-	return new ReaderParens(open, close, kind);
+	return new ReaderParens(open, close, kind, null);
       }
   }
 
-  public ReaderParens(char open, char close, int kind)
+  public static ReaderParens getInstance(char open, char close, int kind, Object command)
+  {
+    if (command == null)
+      return getInstance(open, close, kind);
+    else
+      return new ReaderParens(open, close, kind, command);
+  }
+
+  public ReaderParens(char open, char close, int kind, Object command)
   {
     this.open = open;
     this.close = close;
     this.kind = kind;
+    this.command = command;
   }
 
  /** Read a list (possibly improper) of zero or more Scheme forms.
@@ -50,7 +60,17 @@ public class ReaderParens extends ReadTableEntry
   public Object read (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
-    return readList((LispReader) in, ch, count, close);
+    Object r = readList((LispReader) in, ch, count, close);
+    if (command != null)
+      {
+        LineBufferedReader port = in.getPort();
+        int startLine = port.getLineNumber();
+        int startColumn = port.getColumnNumber();
+        Object p = ((LispReader) in).makePair(command, startLine, startColumn);
+        ((LispReader) in).setCdr(p, r);
+        r = p;
+      }
+    return r;
   }
 
   public static Object readList (LispReader lexer,

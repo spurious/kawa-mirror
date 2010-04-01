@@ -23,6 +23,13 @@ public abstract class LispLanguage extends Language
   static public final String quasiquote_sym = "quasiquote";
   /** Used for Kawa infix ':' operator. */
   static public final Symbol lookup_sym = Namespace.EmptyNamespace.getSymbol("$lookup$");
+  // FUTURE: Used for: [ e1 e2 ... ]
+  // for future sequence/list constructors.
+  static public final Symbol bracket_list_sym = Namespace.EmptyNamespace.getSymbol("$bracket-list$");
+  // FUTURE: Used for: name[ e1 e2 ... ]
+  // Needed for array types - e.g. Object[]
+  // and (possible future) parameterized types - e.g. java.util.List[integer]
+  static public final Symbol bracket_apply_sym = Namespace.EmptyNamespace.getSymbol("$bracket-apply$");
 
   public static StaticFieldLocation getNamedPartLocation =
     new StaticFieldLocation("gnu.kawa.functions.GetNamedPart", "getNamedPart");

@@ -95,7 +95,11 @@ public class ReadTable extends RangeTable
     set(',',  new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
                               '@', makeSymbol(LispLanguage.unquotesplicing_sym)));
 
-    setBracketMode();  // Sets the entries for '[', ']', and '<'.
+    if (false) // FUTURE
+      set('[',  ReaderParens.getInstance('[', ']', ReadTable.TERMINATING_MACRO,
+                                         LispLanguage.bracket_list_sym));
+    else
+      setBracketMode();  // Sets the entries for '[', ']', and '<'.
 
   }
 

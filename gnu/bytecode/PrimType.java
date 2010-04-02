@@ -31,6 +31,7 @@ public class PrimType extends Type {
       case 'J':  return Long.valueOf(((Number) obj).longValue());
       case 'F':  return Float.valueOf(((Number) obj).floatValue());
       case 'D':  return Double.valueOf(((Number) obj).doubleValue());
+      case 'Z':  return Boolean.valueOf(((Boolean) obj).booleanValue());
       }
     /* #else */
     // switch (sig1)
@@ -41,6 +42,7 @@ public class PrimType extends Type {
     //   case 'J':  return new Long(((Number) obj).longValue());
     //   case 'F':  return new Float(((Number) obj).floatValue());
     //   case 'D':  return new Double(((Number) obj).doubleValue());
+    //   case 'Z':  return ((Boolean) obj).booleanValue() ? Boolean.TRUE : Boolean.FALSE;
     //   }
     /* #endif */
     throw new ClassCastException("don't know how to coerce "

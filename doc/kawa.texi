@@ -3999,28 +3999,258 @@ then it will no longer use @code{arr}.
 @node Hash tables, , Uniform vectors, Data structures
 @section Hash tables
 
-A hash table is a data structure that:
+A @dfn{hashtable} is a data structure that
+associates keys with values.
+The hashtable has no intrinsic order for the (key, value) associations
+it contains, and
+supports in-place modification as the primary means of setting the contents
+of a hash table.
+Any object can be used as a key, provided a @dfn{hash function} and a suitable
+@dfn{equivalence function} is available.
+A hash function is a procedure that
+maps keys to exact integer objects.
+
+The hashtable provides key lookup and destructive update in amortised
+constant time, provided that a good hash function is used. 
+A hash funtion @var{h} is acceptable for an equivalence predicate @var{e} iff
+@code{(@var{e} @var{obj1} @var{obj2})} implies
+@code{(= (@var{h} @var{obj1}) (@var{h} @var{obj2}))}.
+A hash function @var{h} is good for a equivalence predicate @var{e} if
+it distributes the resulting hash values for non-equal objects
+(by @var{e}) as uniformly as possible over the range of hash
+values, especially in the case when some (non-equal) objects resemble
+each other by e.g. having common subsequences. This definition is
+vague but should be enough to assert that e.g. a constant function is
+not a good hash function.
+
+Kawa provides two complete sets of functions for hashtables:
 @itemize
 @item
-provides a mapping from some set of keys to some set of values associated 
-to those keys; 
+The functions specified by R6RS have names starting with @code{hashtable-}
 @item
-has no intrinsic order for the (key, value) associations it contains;
-@item
-supports in-place modification as the primary means of setting the contents
-of a hash table; and
-@item
-provides key lookup and destructive update in amortised constant time,
-provided that a good hash function is used. 
+The functions specified by the older
+@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI-69} specifiation
+have names starting with @code{hash-table-}
 @end itemize
 
-The Kawa hash table functions follow the
-@uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI-69} specifiation.
-The Kawa implementation has been optimized for performance and better
-Java integration.  Specifically, the default hash function uses
-the standard Java @code{hashCode} method.
+Both interfaces use the same underlying datatype, so it is possible 
+to mix and match from both sets.
+@c The Kawa implementation has been optimized for performance and better
+@c Java integration.  Specifically, the default hash function uses
+@c the standard Java @code{hashCode} method.
+Freshly-written code should probably use the R6RS functions.
 
-To use the hash table functions in your Kawa program you must first:
+@subsection R6RS hash tables
+
+To use these hash table functions in your Kawa program you must first:
+
+@example
+(import (rnrs hashtables))
+@end example
+
+This section uses the @var{hashtable} parameter name for arguments that
+must be hashtables, and the @var{key} parameter name for arguments that
+must be hashtable keys.
+
+@deffn Procedure make-eq-hashtable
+@deffnx Procedure make-eq-hashtable @var{k}
+Return a newly allocated mutable hashtable that accepts arbitrary
+objects as keys, and compares those keys with @func{eq?}.  If an
+argument is given, the initial capacity of the hashtable is set to
+approximately @var{k} elements.
+@end deffn
+
+
+@deffn Procedure make-eqv-hashtable
+@deffnx Procedure make-eqv-hashtable @var{k}
+Return a newly allocated mutable hashtable that accepts arbitrary
+objects as keys, and compares those keys with @func{eqv?}.  If an
+argument is given, the initial capacity of the hashtable is set to
+approximately @var{k} elements.
+@end deffn
+
+@deffn Procedure make-hashtable @var{hash-function} @var{equiv}
+@deffnx Procedure make-hashtable @var{hash-function} @var{equiv} @var{k}
+@var{hash-function} and @var{equiv} must be procedures.
+@var{hash-function} should accept a key as an argument and should return
+a non--negative exact integer object.  @var{equiv} should accept two
+keys as arguments and return a single value.  Neither procedure should
+mutate the hashtable returned by @func{make-hashtable}.
+
+The @func{make-hashtable} procedure returns a newly allocated mutable
+hashtable using @var{hash-function} as the hash function and @var{equiv}
+as the equivalence function used to compare keys.  If a third argument
+is given, the initial capacity of the hashtable is set to approximately
+@var{k} elements.
+
+Both @var{hash-function} and @var{equiv} should behave like pure
+functions on the domain of keys.  For example, the @func{string-hash}
+and @func{string=?} procedures are permissible only if all keys are
+strings and the contents of those strings are never changed so long as
+any of them continues to serve as a key in the hashtable.  Furthermore,
+any pair of keys for which @var{equiv} returns true should be hashed to
+the same exact integer objects by @var{hash-function}.
+
+@quotation
+@emph{Note:} Hashtables are allowed to cache the results of calling the
+hash function and equivalence function, so programs cannot rely on the
+hash function being called for every lookup or update.  Furthermore any
+hashtable operation may call the hash function more than once.
+@end quotation
+@end deffn
+
+@subsubsection Procedures
+
+@deffn Procedure {hashtable?} @var{obj}
+Return @true{} if @var{obj} is a hashtable, @false{} otherwise.
+@end deffn
+
+@deffn Procedure hashtable-size @var{hashtable}
+Return the number of keys contained in @var{hashtable} as an exact
+integer object.
+@end deffn
+
+@deffn Procedure hashtable-ref @var{hashtable} @var{key} @var{default}
+Return the value in @var{hashtable} associated with @var{key}.  If
+@var{hashtable} does not contain an association for @var{key},
+@var{default} is returned.
+@end deffn
+
+@deffn Procedure {hashtable-set!} @var{hashtable} @var{key} @var{obj}
+Change @var{hashtable} to associate @var{key} with @var{obj}, adding a
+new association or replacing any existing association for @var{key}, and
+returns unspecified values.
+@end deffn
+
+@deffn Procedure {hashtable-delete!} @var{hashtable} @var{key}
+Remove any association for @var{key} within @var{hashtable} and returns
+unspecified values.
+@end deffn
+
+@deffn Procedure {hashtable-contains?} @var{hashtable} @var{key}
+Return @true{} if @var{hashtable} contains an association for @var{key},
+@false{} otherwise.
+@end deffn
+
+@deffn Procedure {hashtable-update!} @var{hashtable} @var{key} @var{proc} @var{default}
+@var{proc} should accept one argument, should return a single value, and
+should not mutate @var{hashtable}.
+
+The @func{hashtable-update!} procedure applies @var{proc} to the value
+in @var{hashtable} associated with @var{key}, or to @var{default} if
+@var{hashtable} does not contain an association for @var{key}.  The
+@var{hashtable} is then changed to associate @var{key} with the value
+returned by @var{proc}.
+
+The behavior of @func{hashtable-update!} is equivalent to the following
+code, but is may be (and is in Kawa) implemented more efficiently in cases
+where the implementation can avoid multiple lookups of the same key:
+
+@example
+(hashtable-set!
+  hashtable key
+  (proc (hashtable-ref
+         hashtable key default)))
+@end example
+@end deffn
+
+
+@deffn Procedure hashtable-copy @var{hashtable}
+@deffnx Procedure hashtable-copy @var{hashtable} @var{mutable}
+Return a copy of @var{hashtable}.  If the @var{mutable} argument is
+provided and is true, the returned hashtable is mutable; otherwise it is
+immutable.
+@end deffn
+
+@deffn Procedure {hashtable-clear!} @var{hashtable}
+@deffnx Procedure {hashtable-clear!} @var{hashtable} @var{k}
+Remove all associations from @var{hashtable} and returns unspecified
+values.
+
+If a second argument is given, the current capacity of the hashtable is
+reset to approximately @var{k} elements.
+@end deffn
+
+@deffn Procedure hashtable-keys @var{hashtable}
+Return a vector of all keys in @var{hashtable}.  The order of the vector
+is unspecified.
+@end deffn
+
+@deffn Procedure hashtable-entries @var{hashtable}
+Return two values, a vector of the keys in @var{hashtable}, and a vector
+of the corresponding values.
+
+Example:
+
+@example
+(let ((h (make-eqv-hashtable)))
+  (hashtable-set! h 1 'one)
+  (hashtable-set! h 2 'two)
+  (hashtable-set! h 3 'three)
+  (hashtable-entries h))
+=> #(1 2 3) #(one two three) ; two return values
+@end example
+
+@noindent
+the order of the entries in the result vectors is not known.
+@end deffn
+
+@subsubsection Inspection
+
+@deffn Procedure hashtable-equivalence-function @var{hashtable}
+Return the equivalence function used by @var{hashtable} to compare keys.
+For hashtables created with @func{make-eq-hashtable} and
+@func{make-eqv-hashtable}, returns @func{eq?} and @func{eqv?}
+respectively.
+@end deffn
+
+@deffn Procedure hashtable-hash-function @var{hashtable}
+Return the hash function used by @var{hashtable}.  For hashtables
+created by @func{make-eq-hashtable} or @func{make-eqv-hashtable},
+@false{} is returned.
+@end deffn
+
+@deffn Procedure {hashtable-mutable?} @var{hashtable}
+Return @true{} if @var{hashtable} is mutable, otherwise @false{}.
+@end deffn
+
+@subsubsection Hash functions
+
+The @func{equal-hash}, @func{string-hash}, and @func{string-ci-hash}
+procedures of this section are acceptable as the hash functions of a
+hashtable only if the keys on which they are called are not mutated
+while they remain in use as keys in the hashtable.
+
+@deffn Procedure equal-hash @var{obj}
+Return an integer hash value for @var{obj}, based on its structure and
+current contents.  This hash function is suitable for use with
+@func{equal?} as an equivalence function.
+@quotation
+@emph{Note:} Like @func{equal?}, the @func{equal-hash} procedure must
+always terminate, even if its arguments contain cycles.
+@end quotation
+@end deffn
+
+@deffn Procedure string-hash @var{string}
+Return an integer hash value for @var{string}, based on its current
+contents.  This hash function is suitable for use with @func{string=?}
+as an equivalence function.
+@end deffn
+
+@deffn Procedure string-ci-hash @var{string}
+Return an integer hash value for @var{string} based on its current
+contents, ignoring case.  This hash function is suitable for use with
+@func{string-ci=?} as an equivalence function.
+@end deffn
+
+@deffn Procedure symbol-hash @var{symbol}
+Return an integer hash value for @var{symbol}.
+@end deffn
+
+
+@subsection SRFI-69 hash tables
+
+To use these hash table functions in your Kawa program you must first:
 @example
 (require 'srfi-69)
 @end example
@@ -4028,8 +4258,12 @@ or
 @example
 (require 'hash-table)
 @end example
+or
+@example
+(import (srfi :69 basic-hash-tables))
+@end example
 
-@subsection Type constructors and predicate
+@subsubsection Type constructors and predicate
 @deffn Procedure make-hash-table [ equal? [ hash [ size-hint]]] → hash-table
 
 Create a new hash table with no associations.
@@ -4074,7 +4308,7 @@ balance between the two approaches: using @var{cadr} would render this
 procedure unusable for @code{cdr} alists, but not vice versa.)
 @end deffn
 
-@subsection Reflective queries
+@subsubsection Reflective queries
 @deffn Procedure hash-table-equivalence-function hash-table
 Returns the equivalence predicate used for keys of @var{hash-table}.
 @end deffn
@@ -4083,7 +4317,7 @@ Returns the equivalence predicate used for keys of @var{hash-table}.
 Returns the hash function used for keys of @var{hash-table}.
 @end deffn
 
-@subsection Dealing with single elements
+@subsubsection Dealing with single elements
 @deffn Procedure hash-table-ref hash-table key [ thunk ] → value
 This procedure returns the value associated to @var{key} in
 @var{hash-table}. If no value is associated to @var{key} and
@@ -4137,7 +4371,7 @@ Behaves as if it evaluates to
 @code{(hash-table-update! @var{hash-table} @var{key} @var{function} (lambda () @var{default}))}.
 @end deffn
 
-@subsection Dealing with the whole contents
+@subsubsection Dealing with the whole contents
 
 @deffn Procedure hash-table-size hash-table → integer
 Returns the number of associations in @var{hash-table}. This operation takes
@@ -4202,29 +4436,9 @@ returns the resulting hash table. This function may modify
 @var{hash-table1} destructively.
 @end deffn
 
-@subsection Hashing
-Hashing means the act of taking some value and producing a number from
-the value. A hash function is a function that does this. Every
-equivalence predicate e has a set of acceptable hash functions for
-that predicate; a hash funtion hash is acceptable iff
-@code{(e @var{obj1} @var{obj2})} implies
-@code{(= (hash @var{obj1}) (hash @var{obj2}))}.
+@subsubsection Hash functions
 
-A hash function @var{h} is good for a equivalence predicate @var{e} if
-it distributes the result numbers (hash values) for non-equal objects
-(by @var{e}) as uniformly as possible over the numeric range of hash
-values, especially in the case when some (non-equal) objects resemble
-each other by e.g. having common subsequences. This definition is
-vague but should be enough to assert that e.g. a constant function is
-not a good hash function.
-
-When the definition of @code{make-hash-table} above talks about an
-appropriate hashing function for @var{e}, it means a hashing function
-that gives decent performance (for the hashing operation) while being
-both acceptable and good for @var{e}. This definition, too, is
-intentionally vague.
-
-The Kawa implementation always calls the hash functions with a single
+The Kawa implementation always calls these hash functions with a single
 parameter, and expects the result to be within the entire
 (32-bit signed) @code{<int>} range, for compatibility with
 standard @code{hashCode} methods.

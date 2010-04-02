@@ -6,7 +6,8 @@ import gnu.lists.*;
 import gnu.mapping.*;
 
 /** A procedure that implements the "response-header" function.
- * It is implemented by report an attribute objects.
+ * It is implemented by returning an attribute object,
+ * which represents the (header-key, header-value)-pair.
  * Document-level attributes are otherwise not valid. */
 
 public class MakeResponseHeader extends MethodProc

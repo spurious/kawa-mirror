@@ -1,3 +1,11 @@
+2010-04-02  Per Bothner  <per@bothner.com>
+
+	* TryExp.java (apply): Add support for interpreting catch-clauses.
+	(mustCompile): Now always return false.
+	* CatchClause.java: Noew extends LetExpr.
+	(evalVariable): New hook to get exception passed from TryExpr.apply.
+	* LetExp.java (evalVariable): New hook.
+
 2010-03-01  Per Bothner  <per@bothner.com>
 
 	* KawaScriptEngine.java: Fix typo.

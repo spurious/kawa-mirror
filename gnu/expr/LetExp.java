@@ -19,6 +19,12 @@ public class LetExp extends ScopeExp
 
   protected boolean mustCompile () { return false; }
 
+  protected Object evalVariable (int i, CallContext ctx) throws Throwable
+  {
+    Expression init = inits[i];
+    return init.eval(ctx);
+  }
+
   public void apply (CallContext ctx) throws Throwable
   {
     setIndexes();
@@ -47,10 +53,9 @@ public class LetExp extends ScopeExp
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl(), i++)
           {
-            Expression init = inits[i];
-            if (init == QuoteExp.undefined_exp)
+            if (inits[i] == QuoteExp.undefined_exp)
               continue;
-            Object value = init.eval(ctx);
+            Object value = evalVariable(i, ctx);
             Type type = decl.type;
             if (type != null && type != Type.pointer_type)
               value = type.coerceFromObject(value);

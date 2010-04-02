@@ -28,12 +28,10 @@ public class TryExp extends Expression
     this.finally_clause = finally_clause;
   }
 
-  protected boolean mustCompile () { return catch_clauses != null; }
+  protected boolean mustCompile () { return false; }
 
   public void apply (CallContext ctx) throws Throwable
   {
-    if (catch_clauses != null)
-      throw new RuntimeException("internal error - TryExp.eval called");
     try
       {
 	try_clause.apply(ctx);
@@ -44,14 +42,21 @@ public class TryExp extends Expression
         for (CatchClause clause = catch_clauses; clause != null;
              clause = clause.next)
           {
-            // Declaration decl = clause.firstDecl();
-            // FIXME
+            Declaration decl = clause.firstDecl();
+            ClassType typeVal = (ClassType) decl.getTypeExp().eval(ctx);
+            if (typeVal.isInstance(ex))
+              {
+                ctx.value1 = ex;
+                clause.apply(ctx);
+                return;
+              }
           }
         throw ex;
       }
     finally
       {
-	finally_clause.eval(ctx);
+        if (finally_clause != null)
+          finally_clause.eval(ctx);
       }
   }
 

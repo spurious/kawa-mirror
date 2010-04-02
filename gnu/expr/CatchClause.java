@@ -1,24 +1,30 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.OutPort;
+import gnu.mapping.CallContext;
 
 /** A "catch" clause of a "try-catch" form.
   */
 
-public class CatchClause extends ScopeExp
+public class CatchClause extends LetExp
 {
-  Expression body;
   CatchClause next;
+
+  public CatchClause ()
+  {
+    super(new Expression[] { QuoteExp.voidExp });
+  }
 
   public CatchClause (Object name, ClassType type)
   {
-    super ();
+    this();
     addDeclaration (name, type);
   }
 
   /** "Convert" a <code>LambdaExp</code> to a <code>CatchClause</code>. */
   public CatchClause (LambdaExp lexp)
   {
+    this();
     Declaration decl = lexp.firstDecl();
     lexp.remove(null, decl);
     add(decl);
@@ -31,7 +37,13 @@ public class CatchClause extends ScopeExp
   public final Expression getBody() { return body; }
   public final void setBody(Expression body) { this.body = body; }
 
-  protected boolean mustCompile () { return true; }
+  protected boolean mustCompile () { return false; }
+
+  protected Object evalVariable (int i, CallContext ctx) throws Throwable
+  {
+    // This is the Throwable caught and set by TryExpr.apply.
+    return ctx.value1;
+  }
 
   public void compile (Compilation comp, Target target)
   {

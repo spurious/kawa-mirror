@@ -1,3 +1,10 @@
+2010-04-02  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java (filter): Factor out pre-processing from writing
+	into new method, to allow some flexiobility is uses.
+
+	* PreProcess.java (NO_JAVA4_FEATURES): Add "-JAVA5".
+
 2009-06-01  Per Bothner  <per@bothner.com>
 
 	* AbstractWeakHashTable.java (cleanup): Make protected.

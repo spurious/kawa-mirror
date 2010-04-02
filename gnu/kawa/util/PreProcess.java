@@ -1,4 +1,4 @@
-// Copyright (c) 2005, 2009  Per M.A. Bothner
+// Copyright (c) 2005, 2009, 2010  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see COPYING.
 
 package gnu.kawa.util;
@@ -17,7 +17,7 @@ public class PreProcess
   int lineno;
 
   static final String JAVA4_FEATURES = "+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex +SAX2 +use:java.nio";
-  static final String NO_JAVA4_FEATURES = "-use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer -SAX2 -use:java.nio -Android";
+  static final String NO_JAVA4_FEATURES = "-JAVA5 -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAVA5 -JAVA6 -JAXP-QName -use:java.text.Normalizer -SAX2 -use:java.nio -Android";
   static final String JAVA5_FEATURES = "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +use:javax.xml.transform +JAXP-1.3 -JAXP-QName";
 
   static String[] version_features = {
@@ -38,15 +38,27 @@ public class PreProcess
     System.exit(-1);
   }
 
+  byte[] resultBuffer;
+  int resultLength;
+
   public void filter (String filename) throws Throwable
+  {
+    if (filter(filename, new BufferedInputStream(new FileInputStream(filename))))
+      {
+	FileOutputStream out = new FileOutputStream(filename);
+	out.write(resultBuffer, 0, resultLength);
+	out.close();
+	System.err.println("Pre-processed "+filename);
+      }
+  }
+
+  public boolean filter (String filename, BufferedInputStream in) throws Throwable
   {
     this.filename = filename;
     boolean changed = false;
-    BufferedInputStream in
-      = new BufferedInputStream(new FileInputStream(filename));
     
     byte[] buf = new byte[2000];
-    int len = 0;;
+    int len = 0;
     int lineStart = 0;
     int dataStart = -1;
     int cmdLine= 0;
@@ -255,13 +267,9 @@ public class PreProcess
 	lineno = cmdLine;
 	error("unterminated "+cmd);
       }
-    if (changed)
-      {
-	FileOutputStream out = new FileOutputStream(filename);
-	out.write(buf, 0, len);
-	out.close();
-	System.err.println("Pre-processed "+filename);
-      }
+    resultBuffer = buf;
+    resultLength = len;
+    return changed;
   }
 
   void handleArg (String arg)

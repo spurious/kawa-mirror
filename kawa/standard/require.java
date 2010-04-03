@@ -485,7 +485,7 @@ public class require extends Syntax
         dofind.setLine(tr);
         forms.addElement(dofind);
       }
-    tr.mustCompileHere();
+
     return true;
   }
 

@@ -1,3 +1,8 @@
+2010-04-02  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): Don't call
+	mustCompileHere, since import/require usually works when interpreting.
+
 2010-02-23  Per Bothner  <per@bothner.com>
 
 	Re-write of "runFile", load, and interfaces for running/loading files

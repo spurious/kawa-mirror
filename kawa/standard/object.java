@@ -372,11 +372,21 @@ public class object extends Syntax
         Expression classNameExp = tr.rewrite_car((Pair) classNamePair, false);
         Object classNameVal = classNameExp.valueIfConstant();
         String classNameSpecifier;
-        if (classNameVal instanceof String
-            && (classNameSpecifier = (String) classNameVal).length() > 0)
+        boolean isString;
+        /* #ifdef use:java.lang.CharSequence */
+        // isString = classNameVal instanceof CharSequence;
+        /* #else */
+        isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
+        /* #endif */
+        if (isString
+            && (classNameSpecifier = classNameVal.toString()).length() > 0)
           oexp.classNameSpecifier = classNameSpecifier;
         else
-          tr.error('e', "class-name specifier must be a non-empty string literal");
+          {
+            Object savedPos = tr.pushPositionOf(classNamePair);
+            tr.error('e', "class-name specifier must be a non-empty string literal");
+            tr.popPositionOf(savedPos);
+          }
       }
     oexp.supers = supers;
 

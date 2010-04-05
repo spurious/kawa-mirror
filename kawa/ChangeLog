@@ -1,3 +1,9 @@
+2010-04-04  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (rewriteClassDef): Handle the case when
+	java.lang.CharSequence is unavailable - i.e. pre-Java4.
+	Also, improve location for an error message.
+
 2010-04-02  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Don't call

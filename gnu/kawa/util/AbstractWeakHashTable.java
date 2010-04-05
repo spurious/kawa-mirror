@@ -63,7 +63,43 @@ public abstract class AbstractWeakHashTable<K,V>
   public V put (K key, V value)
   {
     cleanup();
-    return super.put(key, value);
+    int hash = hash(key);
+    int index = hashToIndex(hash);
+    WEntry<K,V> first = table[index];
+    WEntry<K,V> node = first;
+    WEntry<K,V> prev = null;
+    V oldValue = null;
+    for (;;)
+      {
+	if (node == null)
+	  {
+            if (++num_bindings >= table.length)
+              {
+                rehash();
+                index = hashToIndex(hash);
+                first = table[index];
+              }
+            node = makeEntry(null, hash, value);
+            node.next = first;
+            table[index] = node;
+	    return oldValue;
+	  }
+        V curValue = node.getValue();
+        if (curValue == value)
+          return curValue;
+        WEntry<K,V> next = node.next;
+        if (curValue != null && valuesEqual(curValue, value))
+          {
+            if (prev == null)
+              table[index] = next;
+            else
+              prev.next = next;
+            oldValue = curValue;
+          }
+        else
+          prev = node;
+	node = next;
+      }
   }
 
   protected void cleanup ()

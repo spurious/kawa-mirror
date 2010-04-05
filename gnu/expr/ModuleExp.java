@@ -195,7 +195,6 @@ public class ModuleExp extends LambdaExp
                                           OutPort msg)
     throws SyntaxException
   {
-    comp.getLanguage().resolve(comp);
     ModuleExp mexp = comp.getModule();
     mexp.info = comp.minfo;
     Environment orig_env = Environment.getCurrent();
@@ -213,11 +212,8 @@ public class ModuleExp extends LambdaExp
         if (alwaysCompile)
           comp.mustCompile = true;
 
-        if (comp.mustCompile)
-          comp.addMainClass(mexp);
-
-        comp.walkModule(mexp);
-        comp.setState(Compilation.WALKED);
+        comp.process(Compilation.RESOLVED);
+        comp.minfo.loadByStages(Compilation.WALKED);
 
         if (msg != null ? messages.checkErrors(msg, 20) : messages.seenErrors())
           return null;

@@ -1059,10 +1059,7 @@ public class Compilation implements SourceLocator
 
   public void addMainClass (ModuleExp module)
   {
-    mustCompile = true;
-
     mainClass = module.classFor(this);
-
     ClassType type = mainClass;
     ClassType[] interfaces = module.getInterfaces();
     if (interfaces != null)
@@ -1869,6 +1866,11 @@ public class Compilation implements SourceLocator
           }
         if (wantedState >= RESOLVED && getState() < RESOLVED)
           {
+            // Doing addMainClass is a bit flakey in the case that
+            // ModuleExp.alwaysCompile is false.  We don't want to
+            // call addMainClass *unless* we're compiling, but when
+            // dealing with eval, mutually recursive modules, etc
+            // it doesn't quite work.
             addMainClass(mexp);
             language.resolve(this);
             setState(messages.seenErrors() ? ERROR_SEEN : RESOLVED);

@@ -79,6 +79,7 @@ public class Eval extends Procedure1or2
 	Translator tr = new Translator(language, messages,
                                        NameLookup.getInstance(env, language));
         tr.immediate = true;
+        tr.setState(Compilation.BODY_PARSED);
 	ModuleExp mod = tr.pushNewModule((String) null);
         Compilation save_comp = Compilation.getCurrent();
         try

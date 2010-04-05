@@ -1,3 +1,11 @@
+2010-04-05  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule1): Call module resolve and walk using
+	Compilation 'process' mechanism.  This makes things both simpler
+	and more robust in different scenarios, such as servlets.
+	* Compilation.java (addMainClass): Don't set mustCompile - we shouldn't
+	be calling addMainClass otherwise.
+
 2010-04-02  Per Bothner  <per@bothner.com>
 
 	* TryExp.java (apply): Add support for interpreting catch-clauses.

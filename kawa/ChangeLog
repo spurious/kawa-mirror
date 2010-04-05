@@ -1,3 +1,8 @@
+2010-04-05  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Set compilation state to BODY_PARSED
+	to avoid confusion if Compilation.process is called.
+
 2010-04-04  Per Bothner  <per@bothner.com>
 
 	* ReplDocument.java: Change call to QueueReader.append so it also works

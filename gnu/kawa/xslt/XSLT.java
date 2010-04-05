@@ -45,6 +45,7 @@ public class XSLT extends XQuery
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     ((XslTranslator) comp.lexer).parse(comp);
+    comp.setState(Compilation.BODY_PARSED);
 
     XQParser xqparser = new XQParser(null, comp.getMessages(), this);
     XQResolveNames resolver = new XQResolveNames(comp);

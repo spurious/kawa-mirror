@@ -13,7 +13,13 @@ public class ReaderString extends ReadTableEntry
     return readString(in, ch, count);
   }
   
-  public static String readString (Lexer in, int ch, int count)
+  public static
+  /* #ifdef use:java.lang.CharSequence */
+  String
+  /* #else */
+  // gnu.lists.FString
+  /* #endif */
+  readString (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
     int startPos = in.tokenBufferLength;

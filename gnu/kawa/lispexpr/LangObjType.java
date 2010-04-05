@@ -85,7 +85,7 @@ public class LangObjType extends ObjectType implements TypeValue
                     "java.lang.CharSequence",
                     /* #else */
                     // /* better would be a union of CharSeq and j.l.String. */
-                    // "gnu.lists.FString",
+                    // "gnu.lists.CharSeq",
                     /* #endif */
                     STRING_TYPE_CODE);
 

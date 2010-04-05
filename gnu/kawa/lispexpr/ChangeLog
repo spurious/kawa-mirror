@@ -1,3 +1,12 @@
+2010-04-04  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (stringType): If java.lang.CharSequence is
+	unavailable, define string as gnu.lists.CharSeq rather than FString.
+	* ReaderString.java (readString): If java.lang.CharSequence is
+	unavailable, return type should be FString, not String.
+	* ReaderDispatchMisc.java: Fixi handling of the case when
+	java.util.regex is unavailable.
+
 2010-02-24  Per Bothner  <per@bothner.com>
 
 	* ReaderString.java (readString): Check poer.getConvertCR() before

@@ -90,10 +90,10 @@ public class ReaderDispatchMisc extends ReadTableEntry
 	reader.tokenBufferAppend('#');
 	reader.tokenBufferAppend(ch);
 	return LispReader.readNumberWithRadix(2, reader, 0);
-        /* #ifdef use:java.util.regex */
+      /* #ifdef use:java.util.regex */
       case '/':
-        return readRegex(in, ch, count);
-        /* #endif */
+      return readRegex(in, ch, count);
+      /* #endif */
       case '|':
 	port = reader.getPort();
 	if (port instanceof InPort)
@@ -208,6 +208,7 @@ public class ReaderDispatchMisc extends ReadTableEntry
       }
   }
 
+  /* #ifdef use:java.util.regex */
   public static Pattern readRegex (Lexer in, int ch, int count)
     throws java.io.IOException, SyntaxException
   {
@@ -217,16 +218,16 @@ public class ReaderDispatchMisc extends ReadTableEntry
     int flags = 0;
     if (port instanceof InPort)
       {
-	saveReadState = ((InPort) port).readState;
-	((InPort) port).readState = '/';
+        saveReadState = ((InPort) port).readState;
+        ((InPort) port).readState = '/';
       }
     try
       {
-	for (;;)
-	  {
-	    int next;
+        for (;;)
+          {
+            int next;
 
-	    int c = port.read();
+            int c = port.read();
             if (c < 0)
               in.eofError("unexpected EOF in regex literal");
 	    if (c == ch)
@@ -259,12 +260,13 @@ public class ReaderDispatchMisc extends ReadTableEntry
               flags |= Pattern.DOTALL;
             else if (c == 'm' || c == 'M')
               flags |= Pattern.MULTILINE;
-            // Think this through more before adidng this feature:
-            // Perhaps we should use the 'x' handling from
-            // gnu.xquery.util.StringUtils.makePattern (which is
-            // smart enogh to handle space in character classes).
-            // Perhaps we should handle Scheme comments?
-            /*else if (c == 'x' || c == 'X')
+            /* Think this through more before adding this feature:
+            Perhaps we should use the 'x' handling from
+            gnu.xquery.util.StringUtils.makePattern (which is
+            smart enogh to handle space in character classes).
+            Perhaps we should handle Scheme comments?
+
+            else if (c == 'x' || c == 'X')
               flags |= Pattern.COMMENTS;
             */
             else if (Character.isLetter(c))
@@ -279,9 +281,10 @@ public class ReaderDispatchMisc extends ReadTableEntry
       }
     finally
       {
-	in.tokenBufferLength = startPos;
-	if (port instanceof InPort)
-	  ((InPort) port).readState = saveReadState;
+        in.tokenBufferLength = startPos;
+        if (port instanceof InPort)
+          ((InPort) port).readState = saveReadState;
       }
   }
+  /* #endif */
 }

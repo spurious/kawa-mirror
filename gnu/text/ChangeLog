@@ -1,5 +1,7 @@
 2010-04-04  Per Bothner  <per@bothner.com>
 
+	* Char.java (CharMap.get): Update for changes in AbstractWeakHashTable.
+
 	* QueueReader.java (append): Fix cases where java.lang.CharSequence
 	is unavailable.
 

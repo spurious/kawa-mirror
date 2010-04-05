@@ -1,3 +1,23 @@
+2010-04-04  Per Bothner  <per@bothner.com>
+
+	Change AbstractHashTable to implement java.util.Map.
+	* AbstractHashTable.java: Change to extend java.util.AbstractMap.
+	(getEntryKey, getEntryValue, setEntryValue): Remove - just use
+	the correspondong Map.Entry methods.
+	(hash, matches, get, getNode, remove): Change type of key parameter
+	to be Object rather than K, to be compatible with java.util.Map.
+	(class AbstractEntrySet): New helper class, for entrySet method/
+	* HashNode.java: Change to extend AbstractMap.SimpleEntry, if JAVA6.
+	In that case, #ifndef out stuff that is now inherited.
+	Add 2-argument constructor.
+	* GeneralHashTable.java: Update accordingly.
+	* IdentityHashTable.java: Likewise.
+	* WeakIdentityHashMap.java: Likewise.
+	* WeakHashNode.java: Now implements Map.Entry.
+	* AbstractWeakHashTable.java: Somewhat more major changes.
+	(class WEntry): Use this in place of WeakHashNode, since WeakHashNode
+	was being used in a way that made it incompatible with Map.Entry.
+
 2010-04-02  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java (filter): Factor out pre-processing from writing

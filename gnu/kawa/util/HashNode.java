@@ -8,35 +8,59 @@ package gnu.kawa.util;
  */
 
 public class HashNode<K,V>
+/* #ifdef JAVA6 */
+//   extends java.util.AbstractMap.SimpleEntry<K,V>
+/* #endif */
 /* #ifdef JAVA2 */
   implements java.util.Map.Entry<K,V>
 /* #endif */
 {
   public HashNode<K,V> next;
   int hash;
+
+  // Skip stuff inherited from SimpleEntry.
+  /* #ifndef JAVA6 */
   K key;
   V value;
-
-  public V get (V defaultValue)
-  {
-    return value;
-  }
 
   public K getKey ()
   {
     return key;
   }
-
   public V getValue ()
   {
     return value;
   }
-
   public V setValue (V value)
   {
     V old = this.value;
     this.value = value;
     return old;
+  }
+  /** Implements the general Map.Entry specification.
+   * But note that a GeneralHashTable subclass may override {@code hash},
+   * so it no longer uses equals, in which case it won't be consistent
+   * with this method, unless it is overridden. */
+  public int hashCode ()
+  {
+    return (key ==null ? 0 : key.hashCode())
+      ^ (value==null ? 0: value.hashCode());
+  }
+  /* #endif */
+
+  public HashNode(K key, V value)
+  {
+    /* #ifdef JAVA6 */
+    // super(key, value);
+    /* #else */
+    this.key = key;
+    this.value = value;
+    /* #endif */
+  }
+
+  public V get (V defaultValue)
+  {
+    return getValue();
   }
 
   /** Implements the general Map.Entry specification.
@@ -47,18 +71,12 @@ public class HashNode<K,V>
   {
     if (! (o instanceof HashNode))
       return false;
+    /* #ifdef JAVA6 */
+    // return super.equals(o);
+    /* #else */
     HashNode h2 = (HashNode) o;
     return (key == null ? h2.key == null : key.equals(h2.key))
       && (value == null ? h2.value == null : value.equals(h2.value));
-  }
-
-  /** Implements the general Map.Entry specification.
-   * But note that a GeneralHashTable subclass may override {@code hash},
-   * so it no longer uses equals, in which case it won't be consistent
-   * with this method, unless it is overridden. */
-  public int hashCode ()
-  {
-    return (key ==null ? 0 : key.hashCode())
-      ^ (value==null ? 0: value.hashCode());
+    /* #endif */
   }
 }

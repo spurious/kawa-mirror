@@ -2,12 +2,16 @@
 // This is free software;  for terms and warranty disclaimer see COPYING.
 
 package gnu.kawa.util;
+import java.util.*;
 
 /** An abstract hash map from K to V.
  * The entries are represented by an Entry type parameter.
  */
 
-public abstract class AbstractHashTable<Entry, K, V>
+public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
+  /* #ifdef JAVA2 */
+  // extends AbstractMap<K,V>
+  /* #endif */
 {
   protected Entry[] table;
   protected int mask;
@@ -19,12 +23,6 @@ public abstract class AbstractHashTable<Entry, K, V>
   protected abstract Entry getEntryNext (Entry entry);
   /** Set next Entry in same hash-bucket. */
   protected abstract void setEntryNext (Entry entry, Entry next);
-  /** Extract key from Entry. */
-  protected abstract K getEntryKey (Entry entry);
-  /** Extract mapped value from Entry. */
-  protected abstract V getEntryValue (Entry entry);
-  /** Set mapped value in Entry. */
-  protected abstract void setEntryValue (Entry entry, V value);
   /** Allocate Entry[n]. */
   protected abstract Entry[] allocEntries(int n);
 
@@ -43,7 +41,7 @@ public abstract class AbstractHashTable<Entry, K, V>
 
   /** Calculate hash code of a key.
    */
-  public int hash (K key)
+  public int hash (Object key)
   {
     return key == null ? 0 : key.hashCode();
   }
@@ -57,28 +55,28 @@ public abstract class AbstractHashTable<Entry, K, V>
   }
 
   /** True if an Entry matches a key. */
-  protected boolean matches (K key, int hash, Entry node)
+  protected boolean matches (Object key, int hash, Entry node)
   {
-    return getEntryHashCode(node) == hash && matches(getEntryKey(node), key);
+    return getEntryHashCode(node) == hash && matches(node.getKey(), key);
   }
 
   /** Compare two keys for equivalence.
    * Override this and the {@link #hash(Object)} method if you want
    * a different equivalence relation.
    */
-  protected boolean matches (K key1, K key2)
+  protected boolean matches (K key1, Object key2)
   {
     return key1 == key2 || (key1 != null && key1.equals(key2));
   }
 
   /** Find value for given key.  Return null if not found. */
-  public V get (K key)
+  public V get (Object key)
   {
     return get(key, null);
   }
 
   /** Find Entry for given key.  Return null if not found. */
-  public Entry getNode (K key)
+  public Entry getNode (Object key)
   {
     int hash = hash(key);
     int index = hashToIndex(hash);
@@ -92,10 +90,10 @@ public abstract class AbstractHashTable<Entry, K, V>
   }
 
   /** Find value for given key.  Return defaultValue if not found. */
-  public V get (K key, V defaultValue)
+  public V get (Object key, V defaultValue)
   {
     Entry node = getNode(key);
-    return node == null ? defaultValue : getEntryValue(node);
+    return node == null ? defaultValue : node.getValue();
   }
 
   protected void rehash ()
@@ -168,15 +166,15 @@ public abstract class AbstractHashTable<Entry, K, V>
 	  }
 	else if (matches(key, hash, node))
 	  {
-            V oldValue = getEntryValue(node);
-            setEntryValue(node, value);
+            V oldValue = node.getValue();
+            node.setValue(value);
 	    return oldValue;
 	  }
 	node = getEntryNext(node);
       }
   }
 
-  public V remove (K key)
+  public V remove (Object key)
   {
     int hash = hash(key);
     int index = hashToIndex(hash);
@@ -192,7 +190,7 @@ public abstract class AbstractHashTable<Entry, K, V>
 	    else
 	      setEntryNext(prev, next);
 	    num_bindings--;
-	    return getEntryValue(node);
+	    return node.getValue();
 	  }
 	prev = node;
 	node = next;
@@ -212,4 +210,84 @@ public abstract class AbstractHashTable<Entry, K, V>
   {
     return num_bindings;
   }
+
+  /* #ifdef JAVA2 */
+  public Set<Map.Entry<K,V>> entrySet()
+  {
+    return new AbstractEntrySet(this);
+  }
+
+  static class AbstractEntrySet<Entry extends Map.Entry<K,V>, K, V> extends AbstractSet<Entry>
+  {
+    AbstractHashTable<Entry, K, V> htable;
+
+    public AbstractEntrySet(AbstractHashTable<Entry, K, V> htable)
+    {
+      this.htable = htable;
+    }
+
+    public int size ()
+    {
+      return htable.size();
+    }
+
+    public Iterator<Entry> iterator()
+    {
+      return new Iterator<Entry>()
+        {
+          int nextIndex;
+          Entry previousEntry;
+          Entry currentEntry;
+          Entry nextEntry;
+          int curIndex = -1;
+
+          // Invariants:
+          // currentEntry == (previousEntry == null ? htable.table[curIndex] ? previousEntry.next)
+          // nextEntry == (curIndex == nextIndex ? currentEntry.next : nextIndex >= 0 ? htable.table[nextIndex] : 0)
+          // nextIndex <= curIndex, except before initialization.
+
+          public boolean hasNext()
+          {
+            if (curIndex < 0)
+              { // initialize.
+                nextIndex = htable.table.length;
+                curIndex = nextIndex;
+                advance();
+              }
+            return nextEntry != null;
+          }
+          private void advance ()
+          {
+            while (nextEntry == null && --nextIndex >= 0)
+              {
+                nextEntry = htable.table[nextIndex];
+              }
+          }
+
+          public Entry next()
+          {
+            if (nextEntry == null)
+              throw new NoSuchElementException();
+            previousEntry = currentEntry;
+            currentEntry = nextEntry;
+            curIndex = nextIndex;
+            nextEntry = htable.getEntryNext(currentEntry);
+            advance();
+            return currentEntry;
+          }
+          public void remove ()
+          {
+            if (previousEntry == currentEntry)
+              throw new IllegalStateException();
+            if (previousEntry == null)
+              htable.table[curIndex] = nextEntry;
+            else
+              htable.setEntryNext(previousEntry, nextEntry);
+            htable.num_bindings--;
+            previousEntry = currentEntry; // As a marker to detect IllegalStateException.
+          }
+        };
+    }
+  }
+  /* #endif */
 }

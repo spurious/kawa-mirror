@@ -276,10 +276,10 @@ class CharMap extends AbstractWeakHashTable<Char,Char>
     cleanup();
     int hash = key;
     int index = hashToIndex(hash);
-    for (WeakHashNode<Char,Char> node = table[index];
+    for (AbstractWeakHashTable.WEntry<Char,Char> node = table[index];
 	 node != null;  node = node.next)
       {
-        Char val = getEntryValue(node);
+        Char val = node.getValue();
         if (val.intValue() == key)
           return val;
       }

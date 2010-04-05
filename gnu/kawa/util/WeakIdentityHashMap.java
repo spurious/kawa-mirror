@@ -23,21 +23,15 @@ public class WeakIdentityHashMap<K,V>
   { return entry.next; }
   protected void setEntryNext (WeakHashNode<K,V> entry, WeakHashNode<K,V> next)
   { entry.next = next; }
-  protected K getEntryKey (WeakHashNode<K,V> entry)
-  { return entry.get(); }
-  protected V getEntryValue (WeakHashNode<K,V> entry)
-  { return entry.value; }
-  protected void setEntryValue (WeakHashNode<K,V> entry, V value)
-  { entry.value = value; }
   protected WeakHashNode<K,V>[] allocEntries(int n)
   { return (WeakHashNode<K,V>[]) new WeakHashNode[n]; }
 
-  public int hash (K key)
+  public int hash (Object key)
   {
     return System.identityHashCode(key);
   }
 
-  protected boolean matches (K key1, K key2)
+  protected boolean matches (K key1, Object key2)
   {
     return key1 == key2;
   }
@@ -54,7 +48,7 @@ public class WeakIdentityHashMap<K,V>
     return node;
   }
 
-  public V get (K key, V defaultValue)
+  public V get (Object key, V defaultValue)
   {
     cleanup();
     return super.get(key, defaultValue);
@@ -66,7 +60,7 @@ public class WeakIdentityHashMap<K,V>
     return super.put(key, hash, value);
   }
 
-  public V remove (K key)
+  public V remove (Object key)
   {
     cleanup();
     return super.remove(key);

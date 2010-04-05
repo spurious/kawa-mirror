@@ -16,12 +16,12 @@ public class IdentityHashTable<K,V> extends GeneralHashTable<K,V>
     super(capacity);
   }
 
-  public int hash (K key)
+  public int hash (Object key)
   {
     return System.identityHashCode(key);
   }
 
-  public boolean matches (K value1, K value2)
+  public boolean matches (K value1, Object value2)
   {
     return value1 == value2;
   }

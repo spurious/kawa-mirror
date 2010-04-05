@@ -85,13 +85,29 @@ public class QueueReader extends Reader
     return this;
   }
   /* #else */
-  // public synchronized void append (String str)
+  // public synchronized QueueReader append (String csq, int start, int end)
   // {
-  //   int len = str.length();
+  //   if (csq == null)
+  //     csq = "null";
+  //   int len = end - start;
   //   reserveSpace(len);
-  //   str.getChars(offset, offset+len, buffer, limit)l
-  //   limit += len;
+  //   int sz = limit;
+  //   char[] d = buffer;
+  //   csq.getChars(start, end, d, sz);
+  //   limit = sz + len;
   //   notifyAll();
+  //   return this;
+  // }
+  // public synchronized QueueReader append (CharSeq csq, int start, int end)
+  // {
+  //   int len = end - start;
+  //   reserveSpace(len);
+  //   int sz = limit;
+  //   char[] d = buffer;
+  //   csq.getChars(start, end, d, sz);
+  //   limit = sz + len;
+  //   notifyAll();
+  //   return this;
   // }
   /* #endif */
 

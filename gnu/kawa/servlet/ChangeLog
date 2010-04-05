@@ -1,3 +1,8 @@
+2010-04-04  Per Bothner  <per@bothner.com>
+
+	* ReplSession.java: Change call to QueueReader.append so it also works
+	for version compiled when java.lang.CharSequence is unavailable.
+
 2009-06-08  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getModule): Use ModuleExp.evalModule1,

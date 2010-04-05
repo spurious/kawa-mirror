@@ -132,7 +132,7 @@ public class ReplPane extends JTextPane
         document.write(str, ReplDocument.inputStyle);
 
 	if (document.in_r != null) {
-	  document.in_r.append(str);
+	  document.in_r.append(str, 0, str.length());
 	}
       }
   }

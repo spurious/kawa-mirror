@@ -132,13 +132,13 @@ public class ReplSession extends Writer
 
   void appendInputLine (String line)
   {
-    qreader.append(line);
+    qreader.append(line, 0, line.length());
     qreader.append('\n');
   }
 
   void appendInput (String line)
   {
-    qreader.append(line);
+    qreader.append(line, 0, line.length());
   }
 }
 

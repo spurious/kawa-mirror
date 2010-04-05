@@ -180,7 +180,7 @@ public class ReplDocument extends DefaultStyledDocument
                outputMark = lineAfter+1;
             if (in_r != null) {
               synchronized (in_r) {
-                in_r.append(b.substring(inputStart, lineAfter+1));
+                in_r.append(b, inputStart, lineAfter+1);
                 in_r.notifyAll();
               }
 	}

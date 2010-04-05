@@ -1,3 +1,8 @@
+2010-04-04  Per Bothner  <per@bothner.com>
+
+	* QueueReader.java (append): Fix cases where java.lang.CharSequence
+	is unavailable.
+
 2009-06-01  Per Bothner  <per@bothner.com>
 
 	* Char.java (class CharMap): New helper class for mapping Unicode

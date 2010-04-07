@@ -1,3 +1,7 @@
+2010-04-07  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java: Fix name of class implementing "resolve-uri".
+
 2010-04-05  Per Bothner  <per@bothner.com>
 
 	* lang/Eval.java (evalBody): Set compilation state to BODY_PARSED

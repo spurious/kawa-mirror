@@ -623,9 +623,8 @@ public class Scheme extends LispLanguage
       defProcStFld("gentemp", "kawa.lib.misc");
       defSntxStFld("defmacro", "kawa.lib.syntax");
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
-      defSntxStFld("resource-url", "kawa.lib.misc_syntax");
 
-      defProcStFld("resolve-uri", "kawa.lib.misc_syntax");
+      defSntxStFld("resource-url", "kawa.lib.misc_syntax");
       defSntxStFld("module-uri", "kawa.lib.misc_syntax");
 
       defSntxStFld("future", "kawa.lib.thread");
@@ -791,6 +790,8 @@ public class Scheme extends LispLanguage
       defAliasStFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
       defAliasStFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
       defAliasStFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
+      defProcStFld("resolve-uri", "kawa.lib.files");
+
       defAliasStFld("vector", "gnu.kawa.lispexpr.LangObjType", "vectorType");
       defAliasStFld("string", "gnu.kawa.lispexpr.LangObjType", "stringType");
       defAliasStFld("list", "gnu.kawa.lispexpr.LangObjType", "listType");

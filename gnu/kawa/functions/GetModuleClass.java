@@ -2,38 +2,79 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.*;
 
 /** Special procedure to get the Class of the current module.
  * Since "current module" is defined by lexical scope,
  * this isn't a first-class procedure - it has to be inlined.
  */
 
-public class GetModuleClass extends Procedure0
+public class GetModuleClass extends ProcedureN
   implements Inlineable
 {
+  /** A function that returns the class of the current module. */
   public static final GetModuleClass getModuleClass
     = new GetModuleClass();
+  /** A function that returns the URLPath of the current module.
+   * This is {@code "class-resource:"} URL (see {@link gnu.textResourceStreamHandler}),
+   * though in immediate mode it gets optimized to a {@code "file:"} URL.
+   */
+  public static final GetModuleClass getModuleUri
+    = new GetModuleClass();
+  /** A dummy 1-argument functions used in implementing getModuleUri.
+   * It takes one argument - a reference to a declaration containing
+   * the intended result, with a value to initialize it.
+   * The compile method sets up the needed static initialization.
+   */
+  public static final GetModuleClass getModuleUriDummy
+    = new GetModuleClass();
 
-  public Object apply0 ()
+  static final ClassType typeURLPath = ClassType.make("gnu.text.URLPath");
+  static final Method maker = typeURLPath.getDeclaredMethod("classResourcePath", 1);
+
+  public Object applyN (Object[] args)
   {
     throw new Error("get-module-class must be inlined");
   }
 
+  public int numArgs()
+  {
+    return this == getModuleUriDummy ? 0x1001 : 0;
+  }
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    comp.loadClassRef(comp.mainClass);
-    target.compileFromStack(comp, ClassType.make("java.lang.Class"));
+    if (this == getModuleUriDummy)
+      {
+        ReferenceExp ref = (ReferenceExp) exp.getArgs()[0];
+        ref.compile(comp, target);
+        Declaration decl = ref.getBinding();
+        Expression init = decl.getValue();
+        if (init != null)
+          {
+            BindingInitializer.create(decl, init, comp);
+            decl.setValue(null);
+          }
+      }
+    else
+      {
+        comp.loadClassRef(comp.mainClass);
+        if (this == getModuleUri)
+          comp.getCode().emitInvoke(maker);
+        target.compileFromStack(comp, getReturnType(null));
+      }
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return ClassType.make("java.lang.Class");
+    return this == getModuleClass ? Type.javalangClassType : typeURLPath;
   }
 
-  private static String CLASS_RESOURCE_NAME = "$class_resource_URI$";
+  private static Symbol CLASS_RESOURCE_NAME =
+    Namespace.getDefaultSymbol("$class_resource_URL$");
 
-  /** Return an expression that evaluates to a module-relative URI.
-   * This has the Kawa-specific URI scheme "class-resource:" and an
+  /** Return an expression that evaluates to a module-relative URL.
+   * This has the Kawa-specific URL scheme "class-resource:" and an
    * associated ClassLoader (using a WeakHashMap).  It's used to reference
    * resources located using the compiled class's ClassLoader. */
   public static Expression getModuleClassURI (Compilation comp)
@@ -41,17 +82,32 @@ public class GetModuleClass extends Procedure0
     Declaration decl = comp.mainLambda.lookup(CLASS_RESOURCE_NAME);
     if (decl == null)
       {
-        comp.mustCompileHere();
-        decl = new Declaration(CLASS_RESOURCE_NAME);
-        decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
-        Method maker = ClassType.make("gnu.text.URLPath")
-          .getDeclaredMethod("classResourcePath", 1);
-        Expression clas
-          = new ApplyExp(gnu.kawa.functions.GetModuleClass.getModuleClass,
-                         Expression.noExpressions);
-        decl.setValue(new ApplyExp(maker, new Expression[] { clas }));
+        decl = new Declaration(CLASS_RESOURCE_NAME, typeURLPath);
+        decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED|Declaration.EARLY_INIT);
+        Expression value;
+        if (comp.immediate)
+          {
+            Path path = comp.minfo.getSourceAbsPath();
+            if (path == null)
+              path = Path.currentPath();
+            if (! (path instanceof URLPath))
+              path = URLPath.valueOf(path.toURL());
+            value = QuoteExp.getInstance(path);
+          }
+        else
+          {
+            Expression clas
+              = new ApplyExp(gnu.kawa.functions.GetModuleClass.getModuleClass,
+                             Expression.noExpressions);
+            value = new ApplyExp(maker, new Expression[] { clas });
+          }
+        decl.setValue(value);
         comp.mainLambda.add(null, decl);
       }
-    return new ReferenceExp(decl);
+    ReferenceExp ref = new ReferenceExp(decl);
+    if (comp.immediate)
+      return ref;
+    else
+      return new ApplyExp(getModuleUriDummy, new Expression[] { ref });
   }
 }

@@ -1,3 +1,9 @@
+2010-04-08  Per Bothner  <per@bothner.com>
+
+	* GeneralHashTable.java (getNode): Fix parameter inconsistency
+	introduced by recent changes to add java.util.Map-compatibility.
+	Fixes bug reported by Yaroslav Kavenchuk <kavenchuk@jenty.by>.
+
 2010-04-05  Per Bothner  <per@bothner.com>
 
 	* AbstractWeakHashTable.java (put): Restore (and update) custom

@@ -36,7 +36,7 @@ public class GeneralHashTable<K,V>
   }
 
   /** This override helps Kawa type-inference - for example in srfi69.scm. */
-  public HashNode<K,V> getNode (K key)
+  public HashNode<K,V> getNode (Object key)
   {
     return super.getNode(key);
   }

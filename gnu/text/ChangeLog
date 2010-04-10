@@ -1,3 +1,7 @@
+2010-04-10  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: Wrap caught exceptions in RuntimeException.
+
 2010-04-04  Per Bothner  <per@bothner.com>
 
 	* Char.java (CharMap.get): Update for changes in AbstractWeakHashTable.

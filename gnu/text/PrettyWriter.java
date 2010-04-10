@@ -953,7 +953,7 @@ public class PrettyWriter extends java.io.Writer
 		  }
 		catch (IOException ex)
 		  {
-		    throw new RuntimeException(ex.toString());
+		    throw new RuntimeException(ex);
 		  }
 	      }
 	    break;
@@ -1169,7 +1169,7 @@ public class PrettyWriter extends java.io.Writer
       }
     catch (IOException ex)
       {
-	throw new RuntimeException(ex.toString());
+	throw new RuntimeException(ex);
       }
     bufferFillPointer = count; // For the sake of the following:
     bufferStartColumn = getColumnNumber();

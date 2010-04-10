@@ -1,5 +1,8 @@
 2010-04-10  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Binary distribution, Source distribution): Update
+	since sources now default to Java 6.
+
 	* kawa.texi (Hash tables): Note that Kawa hashtables implement
 	java.util.Map.
 

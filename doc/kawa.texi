@@ -250,11 +250,13 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you the time and trouble of
 compiling the sources.
 
-The binary release depends on certain "Java 5" features
-correspondiong to JDK 1.5. If you have an older Java implementation (including
-JDK 1.1.x) you will need to get the source distribution.
-The same is true is you want to have Kawa make use of JDK 1.6
-features.
+The binary release requires Java 5 (JDK 1.5) or later.
+It does include support for certain Java 6 features
+(@code{HttpServer}, @code{javax.script}, and Unicode normalization),
+but these feature only work if you use Java 6, not Java 5.
+If you have an older Java implementation, or build for a mobile
+environment like Android, or optimize for Java 6,
+then you will need to get the source distribution.
 
 The binary release comes as a @code{.jar} archive
 @samp{kawa-@value{VERSION}.jar}.
@@ -288,8 +290,8 @@ java kawa.repl -w
 @section Installing and using the source distribution
 The Kawa release normally comes as a gzip-compressed tar file named
 @samp{kawa-@value{VERSION}.tar.gz}.
-The same sources are available as a zip file
-@samp{kawa-@value{VERSION}-src.zip}.
+@c The same sources are available as a zip file
+@c @samp{kawa-@value{VERSION}-src.zip}.
 Two methods are supporting for compiling the Kawa sources;
 choose whichever is most convenient for you.
 
@@ -344,21 +346,27 @@ If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
 conflict with the new ones.
 
-If you use an old or bare-bones Java implementation that not have
-certain "Java 5" features
-(such as @code{java.util.List}, @code{java.lang.ref}, or @code{ThreadLocal})
-then you need to convert the Kawa source-code so it doesn't depend
-on those features.
-You do this with the following command:
+As-distributed, the Kawa source code requires Java 6.
+If you only have Java 5, use the @code{--with-have-source} option:
 @example
-make select-java4
+./configure --with-java-source=5
 @end example
-or even (if you have a @emph{very} bare-bases version of Java):
+
+If you want to add support for certain Java 6 features,
+but produce a @code{.jar} file that will execute under Java 5 do:
 @example
-make select-java1
+./configure --with-java-source=6compat5
 @end example
-Most people should not need to do this. (If you
-need to convert the code back to the default, do: @code{make select-java5}.)
+Note this requires that you build Kawa with Java 6.
+
+In theory Kawa supports older versions of Java (such as JDK 1.4
+or even 1.1), though this has not been tested in a while.
+You use the appropriate @code{--with-java-source} option,
+but you still need a Java 5 or later version of @code{javac}
+to build Kawa.  You then need to use a tool
+like @uref{http://retroweaver.sourceforge.net/, Retroweaver}
+on the Kawa @code{.jar} to fix up Java 5 dependencies.
+Contact the Kawa author if you want to be a tester for this.
 
 Then you need to compile all the .java source files.
 Just run make:

@@ -136,10 +136,10 @@ public class Compilation implements SourceLocator
 
   public static int defaultClassFileVersion =
     /* #ifdef JAVA6 */
-    // ClassType.JDK_1_6_VERSION
+    ClassType.JDK_1_6_VERSION
     /* #else */
     /* #ifdef JAVA5 */
-    ClassType.JDK_1_5_VERSION
+    // ClassType.JDK_1_5_VERSION
     /* #else */
     // ClassType.JDK_1_1_VERSION
     /* #endif */

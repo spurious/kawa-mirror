@@ -10,7 +10,7 @@ import gnu.mapping.*;
 
 public abstract class Path
 /* #ifdef JAVA6 */
-// implements javax.tools.FileObject
+implements javax.tools.FileObject
 /* #endif */
 {
   /** This is equivalent to the System {@code "user.dir} property.

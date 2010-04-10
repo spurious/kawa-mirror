@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 /* #endif */
 import gnu.text.*;
 /* #ifdef use:java.text.Normalizer */
-// import java.text.Normalizer;
+import java.text.Normalizer;
 /* #endif */
 
 public class StringUtils
@@ -597,18 +597,18 @@ public class StringUtils
     // try
     //   {
     /* #endif */
-    //     Normalizer.Form nform;
-    //     if ("NFC".equals(form))
-    //       nform = Normalizer.Form.NFC;
-    //     else if ("NFD".equals(form))
-    //       nform = Normalizer.Form.NFD;
-    //     else if ("NFKC".equals(form))
-    //       nform = Normalizer.Form.NFKC;
-    //     else if ("NFKD".equals(form))
-    //       nform = Normalizer.Form.NFKD;
-    //     else
-    //       throw new RuntimeException("normalize-unicode: unknown normalization form '"+form+'\'');
-    //     return Normalizer.normalize(str, nform);
+        Normalizer.Form nform;
+        if ("NFC".equals(form))
+          nform = Normalizer.Form.NFC;
+        else if ("NFD".equals(form))
+          nform = Normalizer.Form.NFD;
+        else if ("NFKC".equals(form))
+          nform = Normalizer.Form.NFKC;
+        else if ("NFKD".equals(form))
+          nform = Normalizer.Form.NFKD;
+        else
+          throw new RuntimeException("normalize-unicode: unknown normalization form '"+form+'\'');
+        return Normalizer.normalize(str, nform);
     /* #ifdef JAVA6COMPAT5 */
     //   }
     // catch (java.lang.NoClassDefFoundError ex)
@@ -617,7 +617,7 @@ public class StringUtils
     //   }
     /* #endif */
     /* #else */
-    throw new UnsupportedOperationException("normalize-unicode: unicode string normalization not available");
+    // throw new UnsupportedOperationException("normalize-unicode: unicode string normalization not available");
     /* #endif */
   }
 }

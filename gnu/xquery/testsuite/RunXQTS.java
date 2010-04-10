@@ -240,23 +240,23 @@ public class RunXQTS extends FilterConsumer
                    +"fn-idref-dtd-20|fn-idref-dtd-21|fn-idref-dtd-23|",
                    "fn:idref doesn't do much yet");
     /* #ifndef use:java.text.Normalizer */
-    expectFailures("fn-normalize-unicode1args-1|"
-                   +"fn-normalize-unicode1args-2|"
-                   +"fn-normalize-unicode1args-3|"
-                   +"fn-normalize-unicode1args-4|"
-                   +"fn-normalize-unicode1args-5|"
-                   +"fn-normalize-unicode1args-6|"
-                   +"fn-normalize-unicode2args-1|"
-                   +"fn-normalize-unicode2args-2|"
-                   +"fn-normalize-unicode2args-3|"
-                   +"fn-normalize-unicode-1|"
-                   +"fn-normalize-unicode-3|fn-normalize-unicode-4|"
-                   +"fn-normalize-unicode-5|fn-normalize-unicode-6|"
-                   +"fn-normalize-unicode-7|K-NormalizeUnicodeFunc-4|"
-                   +"K-NormalizeUnicodeFunc-5|K-NormalizeUnicodeFunc-6|"
-                   +"K-NormalizeUnicodeFunc-7|K-NormalizeUnicodeFunc-8|"
-                   +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
-                   "fn:normalize-unicode not unimplemented yet");
+    // expectFailures("fn-normalize-unicode1args-1|"
+    //                +"fn-normalize-unicode1args-2|"
+    //                +"fn-normalize-unicode1args-3|"
+    //                +"fn-normalize-unicode1args-4|"
+    //                +"fn-normalize-unicode1args-5|"
+    //                +"fn-normalize-unicode1args-6|"
+    //                +"fn-normalize-unicode2args-1|"
+    //                +"fn-normalize-unicode2args-2|"
+    //                +"fn-normalize-unicode2args-3|"
+    //                +"fn-normalize-unicode-1|"
+    //                +"fn-normalize-unicode-3|fn-normalize-unicode-4|"
+    //                +"fn-normalize-unicode-5|fn-normalize-unicode-6|"
+    //                +"fn-normalize-unicode-7|K-NormalizeUnicodeFunc-4|"
+    //                +"K-NormalizeUnicodeFunc-5|K-NormalizeUnicodeFunc-6|"
+    //                +"K-NormalizeUnicodeFunc-7|K-NormalizeUnicodeFunc-8|"
+    //                +"K-NormalizeUnicodeFunc-11|K-NormalizeUnicodeFunc-12",
+    //                "fn:normalize-unicode not unimplemented yet");
     /* #endif */
     // RunXQTS failures rather than Qexo errors:
     // Some work under gcj but not JDK 1.4.x or 1.5.0_05:

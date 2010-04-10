@@ -51,22 +51,22 @@ public class IfFeature
     if (name == "srfi-39") // Parameter objects
       return true;
     /* #ifdef use:java.text.Normalizer */
-    // if (name == "string-normalize-unicode")
-    //   {
-    //     /* #ifdef JAVA6COMPAT5 */
-    //     try
-    //       // {
-    //         // Class.forName("java.text.Normalizer");
-    //         // return true;
-    //       // }
-    //     catch (ClassNotFoundException ex)
-    //       // {
-    //         // return false;
-    //       // }
-    //     /* #else */
-    //     return true;
-    //     /* #endif */
-    //   }
+    if (name == "string-normalize-unicode")
+      {
+        /* #ifdef JAVA6COMPAT5 */
+        // try
+        //   {
+        //     Class.forName("java.text.Normalizer");
+        //     return true;
+        //   }
+        // catch (ClassNotFoundException ex)
+        //   {
+        //     return false;
+        //   }
+        /* #else */
+        return true;
+        /* #endif */
+      }
     /* #endif */
 
     String provide_name = ("%provide%"+name).intern();

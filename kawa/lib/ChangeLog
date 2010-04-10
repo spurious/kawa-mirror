@@ -1,5 +1,8 @@
 2010-04-10  Per Bothner  <per@bothner.com>
 
+	* rnrs/unicode.scm (string-normalize): Add a try-catch for a better
+	error when java.text.Normalizer is missing, in java6compat5 mode.
+
 	* misc.scm (force): Now just call kawa.lang.Promise:force,
 	to all for a conditional on JAVA5.
 

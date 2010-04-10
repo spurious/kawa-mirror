@@ -1,5 +1,8 @@
 2010-04-10  Per Bothner  <per@bothner.com>
 
+	* standard/IfFeature.java (hasFeature): If JAVA6COMPAT5 then
+	use reflection to test for feature string-normalize-unicode.
+
 	* lang/Promise.java (force): New static method, used to implement
 	Scheme 'force' method.  Condtionally handle java.util.concurrent.Future.
 

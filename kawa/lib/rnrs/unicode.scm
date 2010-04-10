@@ -110,7 +110,10 @@
   (syntax-rules ()
     ((string-normalize str kind)
      (cond-expand (string-normalize-unicode
-		   (java.text.Normalizer:normalize str (static-field java.text.Normalizer$Form 'kind)))
+		   (try-catch
+		    (java.text.Normalizer:normalize str (static-field java.text.Normalizer$Form 'kind))
+		    (ex java.lang.NoClassDefFoundError
+			(error "unicode string normalization not available"))))
 		  (else (error "unicode string normalization not available"))))))
 
 (define (string-normalize-nfd (str :: string)) :: string

@@ -1,3 +1,8 @@
+2010-04-10  Per Bothner  <per@bothner.com>
+
+	* StringUtils.java (normalizeUnicode): Add a try-catch for a better
+	error when java.text.Normalizer is missing, in JAVA6COMPAT5 mode.
+
 2009-11-22  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (stringJoin): Fix error in nextIndex/nextValue

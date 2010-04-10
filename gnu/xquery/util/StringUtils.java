@@ -593,20 +593,31 @@ public class StringUtils
     if ("".equals(form))
       return str;
     /* #ifdef use:java.text.Normalizer */
-    // Normalizer.Form nform;
-    // if ("NFC".equals(form))
-    //   nform = Normalizer.Form.NFC;
-    // else if ("NFD".equals(form))
-    //   nform = Normalizer.Form.NFD;
-    // else if ("NFKC".equals(form))
-    //   nform = Normalizer.Form.NFKC;
-    // else if ("NFKD".equals(form))
-    //   nform = Normalizer.Form.NFKD;
-    // else
-    //   throw new RuntimeException("normalize-unicode: unknown normalization form '"+form+'\'');
-    // return Normalizer.normalize(str, nform);
+    /* #ifdef JAVA6COMPAT5 */
+    // try
+    //   {
+    /* #endif */
+    //     Normalizer.Form nform;
+    //     if ("NFC".equals(form))
+    //       nform = Normalizer.Form.NFC;
+    //     else if ("NFD".equals(form))
+    //       nform = Normalizer.Form.NFD;
+    //     else if ("NFKC".equals(form))
+    //       nform = Normalizer.Form.NFKC;
+    //     else if ("NFKD".equals(form))
+    //       nform = Normalizer.Form.NFKD;
+    //     else
+    //       throw new RuntimeException("normalize-unicode: unknown normalization form '"+form+'\'');
+    //     return Normalizer.normalize(str, nform);
+    /* #ifdef JAVA6COMPAT5 */
+    //   }
+    // catch (java.lang.NoClassDefFoundError ex)
+    //   {
+    //     throw new UnsupportedOperationException("normalize-unicode: unicode string normalization not available");
+    //   }
+    /* #endif */
     /* #else */
-    throw AbstractSequence.unsupportedException("normalize-unicode form "+form);
+    throw new UnsupportedOperationException("normalize-unicode: unicode string normalization not available");
     /* #endif */
   }
 }

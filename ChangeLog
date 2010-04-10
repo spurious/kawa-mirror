@@ -1,3 +1,11 @@
+2010-04-10  Per Bothner  <per@bothner.com>
+
+	* configure.in: New --java-source option '6compat5': Compile assuming
+	a Java 6 compiler, but so .jar (with most features) can run on Java5.
+	This implies compiling with -target 1.5.
+	* Makefile.am: Various fixes for 'distclean'.
+	(dist-kawa-@VERSION@.jar): Build --with-java-source=6compat5.
+
 2010-01-07  Per Bothner  <per@bothner.com>
 
 	* **/Makefile.in, aclocal.m4: Regenerate using automake 1.11.1.

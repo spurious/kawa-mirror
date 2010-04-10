@@ -34,8 +34,9 @@ javadir=$(datadir)/java
 JAR = jar
 GCJ_DBTOOL = gcj-dbtool
 
+META_ScriptEngineFactory = META-INF/services/javax.script.ScriptEngineFactory
 if WITH_JAVAX_SCRIPT
-META_INF_FILES = META-INF/services/javax.script.ScriptEngineFactory
+META_INF_FILES = $(META_ScriptEngineFactory)
 endif
 
 kawa-@VERSION@.jar: ./kawa-jar.stamp $(META_INF_FILES)
@@ -46,13 +47,13 @@ kawart-@VERSION@.jar: ./kawa-jar.stamp $(srcdir)/classes-to-skip-for-runtime
 	$(JAR) cf $@ \
 	  `find gnu kawa -name '*.class' -print | grep -v -f $(srcdir)/classes-to-skip-for-runtime`
 
-META-INF/services/javax.script.ScriptEngineFactory: Makefile
+$(META_ScriptEngineFactory): Makefile
 	echo 'kawa.standard.SchemeScriptEngineFactory #Scheme' >tmp.ScriptEngineFactory
 if ENABLE_XQUERY
 	echo 'gnu.xquery.lang.XQueryScriptEngineFactory #XQuery' >>tmp.ScriptEngineFactory
 endif
 	mkdir -p META-INF/services
-	mv tmp.ScriptEngineFactory META-INF/services/javax.script.ScriptEngineFactory
+	mv tmp.ScriptEngineFactory $(META_ScriptEngineFactory)
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 
@@ -66,8 +67,7 @@ dist-kawa-@VERSION@.jar: $(DIST_ARCHIVES)
 	  && cd tmpdir \
 	  && tar xzf ../$(distdir).tar.gz \
 	  && rm -f ./patch-source-list \
-	  && JAVACFLAGS='-target 1.5' \
-	    ./kawa-@VERSION@/configure --with-java-source=5 --with-javax.script --with-servlet  \
+	  && ./kawa-@VERSION@/configure --with-java-source=6compat5 --with-servlet  \
 	  && CLASSPATH=@conf_classpath@.:$$CLASSPATH $(MAKE) \
 	  && mv kawa-@VERSION@.jar ../dist-kawa-@VERSION@.jar \
 	  && cd .. && rm -rf tmpdir
@@ -110,7 +110,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   kawa/Version.java jar-manifest Make-rules classes-to-skip-for-runtime
 
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext) *.stamp
-CLEANFILES = *.jar kawa/Version.java
+CLEANFILES = *.jar kawa/Version.java $(META_ScriptEngineFactory)
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -218,6 +218,8 @@ selected-java-source: Makefile
 	then $(MAKE) select-java4x; \
 	elif test "$(JAVA_SOURCE)" = 5; \
 	then $(MAKE) select-java5; \
+	elif test "$(JAVA_SOURCE)" = 6compat5; \
+	then $(MAKE) select-java6compat5; \
 	elif test "$(JAVA_SOURCE)" = 6; \
 	then $(MAKE) select-java6; \
 	elif test "$(JAVA_SOURCE)" = android; \
@@ -265,6 +267,14 @@ select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java5' \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=5
+
+# JDK 1.5 with some Java6 features.
+# Requires building with Java6, but runs on Java5 (without those features)
+# or on Java6 (with those features).
+select-java6compat5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java6compat5' \
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
+	$(MAKE) set-selected-java-source JAVA_SOURCE=6compat5
 
 # JDK 1.6
 select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class

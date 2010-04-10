@@ -175,7 +175,7 @@ APPLETVIEWER = appletviewer
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
-CLEANFILES = tmp* *.log testing.zip regexdna-input.txt *.class HelloCgiK HelloCgiS
+CLEANFILES = tmp* *.log testing.zip revcomp-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
@@ -200,7 +200,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   regexdna.scm regexdna-output.txt \
   revcomp.scm revcomp-output.txt \
   spectralnorm.scm spectralnorm-output.txt \
-  threadring.scm threadring-output.scm
+  threadring.scm threadring-output.txt
 
 all: all-am
 
@@ -717,13 +717,13 @@ check-interpreted-cycle:
 	  -e '(test-end)'
 
 check-interpreted-cycleb:
-	CLASSPATH=.. $(KAWA) cycleb1.scm > cycleb.log
+	CLASSPATH=.. $(KAWA) $(srcdir)/cycleb1.scm > cycleb.log
 	@if diff $(srcdir)/cycleb.expected cycleb.log; \
 	  then echo '# cycleb test passes'; \
 	  else echo FAIL cycleb test; fi
 
 check-interpreted-cyclebr:
-	CLASSPATH=.. $(KAWA) -e '(require "cycleb1.scm")' > cyclebr.log
+	CLASSPATH=.. $(KAWA) -e '(require "$(srcdir)/cycleb1.scm")' > cyclebr.log
 	@if diff $(srcdir)/cycleb.expected cyclebr.log; \
 	  then echo '# cyclebr test passes'; \
 	  else echo FAIL cyclebr test; fi

@@ -2717,6 +2717,7 @@ case "/${with_java_source}/" in
   /4x/) JAVA_SOURCE=4x ;;
   /5/) JAVA_SOURCE=5 ;;
   /6/) JAVA_SOURCE=6 ;;
+  /6compat5/) JAVA_SOURCE=6compat5 ;;
   /7/) JAVA_SOURCE=6 ;;
   /1.1*/) JAVA_SOURCE=1 ;;
   /1.2*/) JAVA_SOURCE=2 ;;
@@ -2732,7 +2733,7 @@ case "/${with_java_source}/" in
         test -z "$with_swing" && with_swing="no"
         test -z "$with_awt" && with_awt="no"
         ;;
-  //) JAVA_SOURCE=5 ;;
+  //) JAVA_SOURCE=6 ;;
   /*/) { { $as_echo "$as_me:$LINENO: error: Invalid version for --with-java-version.
   (Must be 1, 2, 5, 6, or a JDK version such as 1.4.)" >&5
 $as_echo "$as_me: error: Invalid version for --with-java-version.
@@ -2749,7 +2750,7 @@ fi
 
 if test -z "$with_javax_script"; then
   case "$JAVA_SOURCE" in
-  6|7) with_javax_script="yes";;
+  6compat5|6|7) with_javax_script="yes";;
   esac
 fi
 
@@ -4732,6 +4733,9 @@ fi
     ;;
 esac
 JAVACFLAGS=${JAVACFLAGS--g}
+case "$JAVA_SOURCE" in
+  6compat5) JAVACFLAGS="${JAVACFLAGS} -target 1.5" ;;
+esac
 
 # Partly for compatibility (--enable/--disable-servlet was the old option);
 # partly to allow --with-servlet=path-to-jar --disable-servlet.

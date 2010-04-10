@@ -1,3 +1,10 @@
+2010-04-01  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (bracket_list_sym, bracket_apply_sym):
+	New constants.
+	* ReaderParens.java (command): New hook for creating an application
+	with a fixed "function".  Future use for square brackets.
+
 2010-04-04  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (stringType): If java.lang.CharSequence is

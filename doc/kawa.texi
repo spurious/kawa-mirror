@@ -4035,6 +4035,7 @@ have names starting with @code{hash-table-}
 
 Both interfaces use the same underlying datatype, so it is possible 
 to mix and match from both sets.
+That datatype implements @code{java.util.Map}.
 @c The Kawa implementation has been optimized for performance and better
 @c Java integration.  Specifically, the default hash function uses
 @c the standard Java @code{hashCode} method.
@@ -5147,7 +5148,11 @@ The path mechanism provides a layer of abstraction, so you can
 use the same functions on either a filename or a URL/URI.
 Functions that in standard Scheme take a filename
 have been generalized to take a path or a path string,
-as if using the @code{path} function below.
+as if using the @code{path} function below.  For example:
+@example
+(open-input-file "http://www.gnu.org/index.html")
+(open-input-file (URI "ftp://ftp.gnu.org/README"))
+@end example
 
 @deffn Type path
 A general path, which can be a @code{filename} or a @code{URI}.

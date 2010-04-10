@@ -1,3 +1,8 @@
+2010-04-10  Per Bothner  <per@bothner.com>
+
+	* lang/Promise.java (force): New static method, used to implement
+	Scheme 'force' method.  Condtionally handle java.util.concurrent.Future.
+
 2010-04-07  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java: Fix name of class implementing "resolve-uri".

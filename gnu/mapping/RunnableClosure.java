@@ -1,6 +1,11 @@
 package gnu.mapping;
 
-public class RunnableClosure implements Runnable
+public class RunnableClosure
+  implements
+  /* #ifdef JAVA5 */
+  java.util.concurrent.Callable<Object>,
+  /* #endif */
+  Runnable
 {
   Object result;
   CallContext context;
@@ -118,6 +123,23 @@ public class RunnableClosure implements Runnable
     Throwable ex = exception;
     if (ex != null)
       throw ex;
+    return result;
+  }
+
+  public Object call()
+    throws Exception
+  {
+    run();
+    Throwable ex = exception;
+    if (ex != null)
+      {
+        if (ex instanceof Exception)
+          throw (Exception) ex;
+        else if (ex instanceof Error)
+          throw (Error) ex;
+        else
+          throw new RuntimeException(ex);
+      }
     return result;
   }
 

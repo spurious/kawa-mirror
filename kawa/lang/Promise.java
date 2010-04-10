@@ -31,6 +31,19 @@ public class Promise implements Printable
     return result;
   }
 
+  public static Object force (Object arg) throws Throwable
+  {
+    if (arg instanceof Promise)
+      return ((Promise) arg).force();
+    if (arg instanceof gnu.mapping.Future)
+      return ((gnu.mapping.Future) arg).waitForResult();
+    /* #ifdef JAVA5 */
+    if (arg instanceof java.util.concurrent.Future<?>)
+      return ((java.util.concurrent.Future<?>) arg).get();
+    /* #endif */
+    return arg;
+  }
+
   public void print (Consumer out)
   {
     if (result == null)

@@ -71,11 +71,7 @@
    (after)))
 
 (define (force arg)
-  (cond ((instance? arg <kawa.lang.Promise>)
-	 (invoke (as <kawa.lang.Promise> arg) 'force))
-	((instance? arg <gnu.mapping.Future>)
-	 (invoke (as <gnu.mapping.Future> arg) 'waitForResult))
-	(else arg)))
+  (kawa.lang.Promise:force arg))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

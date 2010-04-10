@@ -1,3 +1,8 @@
+2010-04-10  Per Bothner  <per@bothner.com>
+
+	* RunnableClosure.java: Also implement java.util.concurrent.Callable.
+	(call): New method, to implement Callable.
+
 2009-12-06  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java (mostSpecific): Fix logic bugs.

@@ -1,6 +1,7 @@
 package gnu.mapping;
 
 public class Future extends Thread
+                    // FUTURE: implements java.util.concurrent.Future
 {
   public RunnableClosure closure;
 

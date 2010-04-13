@@ -1,3 +1,8 @@
+2010-04-13  Per Bothner  <per@bothner.com>
+
+	* Path.java (pathLocation): Add generic parameter.
+	(currentPath): Remove no-longer-needed cast.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: Wrap caught exceptions in RuntimeException.

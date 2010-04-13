@@ -22,7 +22,7 @@ implements javax.tools.FileObject
   public static Path defaultPath = userDirPath;
 
   /* #ifdef JAVA2 */
-  private static ThreadLocal pathLocation = new ThreadLocal();
+  private static ThreadLocal<Path> pathLocation = new ThreadLocal<Path>();
   /* #endif */
 
   protected Path ()
@@ -32,9 +32,9 @@ implements javax.tools.FileObject
   public static Path currentPath ()
   {
     /* #ifdef JAVA2 */
-    Object path = pathLocation.get();
+    Path path = pathLocation.get();
     if (path != null)
-      return (Path) path;
+      return path;
     /* #endif */
     return defaultPath;
   }

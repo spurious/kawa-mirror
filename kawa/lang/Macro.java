@@ -187,7 +187,6 @@ public class Macro extends Syntax implements Printable, Externalizable
       }
     catch (Throwable ex)
       {
-	ex.printStackTrace();
         return tr.syntaxError("evaluating syntax transformer '"
                               + getName() + "' threw " + ex);
       }

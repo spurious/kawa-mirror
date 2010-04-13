@@ -2,6 +2,7 @@ package gnu.mapping;
 import java.io.*;
 import gnu.lists.*;
 import gnu.text.Printable;
+import java.util.*;
 
 /** Encapsulate multiple values in a single object.
  * In Scheme and Lisp mainly used to return multiple values from a function.
@@ -57,17 +58,28 @@ public class Values extends TreeList implements Printable, Externalizable
       return new Values(vals);    
   }
 
-  public static Object make (Sequence seq)
+  public static Object make
+  /* #ifdef JAVA2 */
+  (List seq)
+  /* #else */
+  // (Sequence seq)
+  /* #endif */
   {
-    int count = seq.size();
+    int count = seq == null ? 0 : seq.size();
     if (count == 0)
       return empty;
     if (count == 1)
       return seq.get(0);
     Values vals = new Values();
-    java.util.Enumeration it = seq.elements();
-    while (it.hasMoreElements())
-      vals.writeObject(it.nextElement());
+    /* #ifdef JAVA2 */
+    java.util.Iterator it = seq.iterator();
+    while (it.hasNext())
+      vals.writeObject(it.next());
+    /* #else */
+    // java.util.Enumeration it = seq.elements();
+    // while (it.hasMoreElements())
+    //   vals.writeObject(it.nextElement());
+    /* #endif */
     return vals;
   }
 

@@ -1,3 +1,7 @@
+2010-04-13  Per Bothner  <per@bothner.com>
+
+	* Values.java (make): Generalize from Sequence to java.util.List.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* RunnableClosure.java: Also implement java.util.concurrent.Callable.

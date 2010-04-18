@@ -1,5 +1,8 @@
 2010-04-18  Per Bothner  <per@bothner.com>
 
+	* PreProcess.java: The use:com.sun.net.httpserver option is now
+	passed in by the top-level Makefile.
+
 	* AbstractHashTable.java: Fix comment to it is PreProcess-safe.
 
 2010-04-10  Per Bothner  <per@bothner.com>

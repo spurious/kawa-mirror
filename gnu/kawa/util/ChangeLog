@@ -1,3 +1,7 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	* AbstractHashTable.java: Fix comment to it is PreProcess-safe.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: Add support for "java6compat5" version.

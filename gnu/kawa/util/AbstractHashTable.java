@@ -10,7 +10,7 @@ import java.util.*;
 
 public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
   /* #ifdef JAVA2 */
-  // extends AbstractMap<K,V>
+  extends AbstractMap<K,V>
   /* #endif */
 {
   protected Entry[] table;
@@ -241,10 +241,11 @@ public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
           Entry nextEntry;
           int curIndex = -1;
 
-          // Invariants:
-          // currentEntry == (previousEntry == null ? htable.table[curIndex] ? previousEntry.next)
-          // nextEntry == (curIndex == nextIndex ? currentEntry.next : nextIndex >= 0 ? htable.table[nextIndex] : 0)
-          // nextIndex <= curIndex, except before initialization.
+          /* Invariants:
+           * currentEntry == (previousEntry == null ? htable.table[curIndex] ? previousEntry.next)
+           * nextEntry == (curIndex == nextIndex ? currentEntry.next : nextIndex >= 0 ? htable.table[nextIndex] : 0)
+           * nextIndex <= curIndex, except before initialization.
+           */
 
           public boolean hasNext()
           {

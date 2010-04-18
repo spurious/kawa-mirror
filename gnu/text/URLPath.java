@@ -48,7 +48,7 @@ public class URLPath extends URIPath
 
   public long getContentLength ()
   {
-    return getLastModified(url);
+    return getContentLength(url);
   }
 
   public static int getContentLength (URL url)

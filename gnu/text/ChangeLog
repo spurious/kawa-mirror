@@ -1,3 +1,7 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	* URLPath.java (getContentLength): Fix thinko.
+
 2010-04-13  Per Bothner  <per@bothner.com>
 
 	* Path.java (pathLocation): Add generic parameter.

@@ -374,9 +374,9 @@ public class object extends Syntax
         String classNameSpecifier;
         boolean isString;
         /* #ifdef use:java.lang.CharSequence */
-        // isString = classNameVal instanceof CharSequence;
+        isString = classNameVal instanceof CharSequence;
         /* #else */
-        isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
+        // isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
         /* #endif */
         if (isString
             && (classNameSpecifier = classNameVal.toString()).length() > 0)

@@ -183,20 +183,26 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
-java_sources = \
-  CGIServletWrapper.java \
-  GetRequest.java \
-  GetResponse.java \
-  KawaPageServlet.java \
-  KawaServlet.java \
-  ReplServlet.java \
-  ReplSession.java \
-  ServletCallContext.java \
-  ServletPrinter.java
+@ENABLE_SERVLET_TRUE@SERVLET_JSOURCES = \
+@ENABLE_SERVLET_TRUE@  CGIServletWrapper.java \
+@ENABLE_SERVLET_TRUE@  KawaPageServlet.java \
+@ENABLE_SERVLET_TRUE@  KawaServlet.java \
+@ENABLE_SERVLET_TRUE@  ReplServlet.java \
+@ENABLE_SERVLET_TRUE@  ReplSession.java
 
-java_SCM = HTTP.scm
+@ENABLE_SERVLET_TRUE@SERVLET_SCM = servlets.scm
+@WITH_HTTPSERVER_TRUE@HTTPSERVER_JSOURCES = \
+@WITH_HTTPSERVER_TRUE@  KawaHttpHandler.java
+
+java_sources = \
+  HttpRequestContext.java \
+  KawaAutoHandler.java \
+  ServletPrinter.java \
+  $(SERVLET_JSOURCES) $(HTTPSERVER_JSOURCES)
+
+java_SCM = HTTP.scm $(SERVLET_SCM)
 PACKAGE_FNAME = gnu-kawa-servlet
-@ENABLE_SERVLET_TRUE@ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+ALL = java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 all: all-am
 
 .SUFFIXES:

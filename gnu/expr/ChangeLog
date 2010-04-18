@@ -1,3 +1,10 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	* ModuleContext.java (flag): New field.
+	(IN_HTTP_SERVER, IN_SERVLET): New flags.
+	(getFlags, setFlags, addFlags): New methods.
+	* ModuleInfo.java (cleanupAfterCompilation): New convenience methods.
+
 2010-04-05  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule1): Call module resolve and walk using

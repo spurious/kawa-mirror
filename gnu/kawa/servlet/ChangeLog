@@ -1,3 +1,27 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	Add support for using the com.sun.net.httpserver web server,
+	as an alternative to using servlets.
+	* HttpRequestContext.java: New abstract class.
+	* KawaAutoHandler.java: New class, based on KawaPageServlet,
+	but making use of HttpRequestContext rather than requiring servlets.
+	* KawaHttpHandler.java: New class implements the JDK 6interface
+	com.sun.net.httpserver.HttpHandler.
+	(class Context): Member class that extends HttpRequestContext.
+	* KawaPageServlet.java: Now just a skeleton class, mainly for
+	compatibility.
+	* KawaServlet.java: Add glue layer forwarding to KawaAutoHandler.
+	(class Context): Member class that extends HttpRequestContext.
+	* ServletPrinter.java: Tweak to work with HttpRequestContext rather
+	than ServletCallContext.
+	* ServletCallContext.java: Removed - effectively replaced
+	by KawaServlet.Context.
+	* GetRequest.java: Remove class.
+	* GetResponse.java: Remove class.
+	* HTTP.scm: Re-implement using HttpRequestContext.
+	* servlets.scm: Move servlet-specific functions here.
+	* Makefile.am: Add appropriate configuration magic.
+
 2010-04-04  Per Bothner  <per@bothner.com>
 
 	* ReplSession.java: Change call to QueueReader.append so it also works

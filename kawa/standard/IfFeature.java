@@ -68,6 +68,14 @@ public class IfFeature
         /* #endif */
       }
     /* #endif */
+    if (name == "in-http-server" || name == "in-servlet")
+      {
+        int mflags = ModuleContext.getContext().getFlags();
+        if (name == "in-http-server")
+          return (mflags & ModuleContext.IN_HTTP_SERVER) != 0;
+        if (name == "in-servlet")
+          return (mflags & ModuleContext.IN_SERVLET) != 0;
+      }
 
     String provide_name = ("%provide%"+name).intern();
     Compilation comp = Compilation.getCurrent();

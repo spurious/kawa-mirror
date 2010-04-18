@@ -1,3 +1,8 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	* XQResolveNames.java (walkReferenceExp): Change to match changes
+	in gnu.kawa.servlet.
+
 2010-02-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseFLWRExpression): Do pushNesting/popNesting

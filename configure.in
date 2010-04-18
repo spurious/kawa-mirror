@@ -46,6 +46,9 @@ AC_ARG_ENABLE(xquery,
 AC_ARG_ENABLE(brl,
   AS_HELP_STRING(--enable-brl,Build BRL emulation and KRL))
 
+AC_ARG_WITH(httpserver,
+  AS_HELP_STRING(--with-httpserver,Make use of JDK6's builtin http server))
+
 AC_ARG_WITH(swing,
   AS_HELP_STRING(--with-swing,Assume Swing is available (default on)))
 
@@ -106,6 +109,12 @@ fi
 if test -z "$with_javax_script"; then
   case "$JAVA_SOURCE" in
   6compat5|6|7) with_javax_script="yes";;
+  esac
+fi
+
+if test -z "$with_httpserver"; then
+  case "$JAVA_SOURCE" in
+  6compat5|6|7) with_httpserver="yes";;
   esac
 fi
 
@@ -178,6 +187,7 @@ AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" != "no")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" != "no")
 AM_CONDITIONAL(WITH_JAVAX_SCRIPT, test "$with_javax_script" = "yes")
+AM_CONDITIONAL(WITH_HTTPSERVER, test "$with_httpserver" = "yes")
 AM_CONDITIONAL(WITH_XQTS, test "$with_XQTS" != "" -a "$with_XQTS" != "no")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 AM_CONDITIONAL(WITH_LIBTOOL, test "$with_libtool" = "yes")

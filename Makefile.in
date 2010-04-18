@@ -278,6 +278,8 @@ ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
 JAVADOC_ANT_JARS = $(ECLIPSE_PLUGINS_PATH)/org.apache.ant_1.6.5/lib/ant.jar
 JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk.linux.x86_3.1.0.jar
 JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
+@WITH_HTTPSERVER_FALSE@USE_HTTPSERVER = -use:com.sun.net.httpserver
+@WITH_HTTPSERVER_TRUE@USE_HTTPSERVER = +use:com.sun.net.httpserver
 COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
 COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 all: all-recursive
@@ -907,53 +909,43 @@ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 
 # JDK 1.1
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java1' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=1
+	$(MAKE) do-preprocess SELECTOR='%java1'
 
 # JDK 1.2+, GCJ-3.x
 select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java2' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=2
+	$(MAKE) do-preprocess SELECTOR='%java2'
 
 # JDK 1.4, GCJ-4.x, without JAXP
 select-java4: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java4' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=4
+	$(MAKE) do-preprocess SELECTOR='%java4'
 
 # JDK 1.4, GCJ-4.x with JAXP 1.3
 select-java4x: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java4x' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=4x
+	$(MAKE) do-preprocess SELECTOR='%java4x'
 
 # JDK 1.5 (default - matches SVN)
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java5' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=5
+	$(MAKE) do-preprocess SELECTOR='%java5'
 
 # JDK 1.5 with some Java6 features.
 # Requires building with Java6, but runs on Java5 (without those features)
 # or on Java6 (with those features).
 select-java6compat5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java6compat5' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=6compat5
+	$(MAKE) do-preprocess SELECTOR='%java6compat5'
 
 # JDK 1.6
 select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%java6' \
-	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=6
+	$(MAKE) do-preprocess SELECTOR='%java6'
 
 # Android
 select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
-	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess '%android' \
+	$(MAKE) do-preprocess SELECTOR='%android'
+
+do-preprocess:
+	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess \
+	  $(SELECTOR) $(USE_HTTPSERVER) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
-	$(MAKE) set-selected-java-source JAVA_SOURCE=android
+	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 
 set-selected-java-source:
 	if test ! -e $(srcdir)/selected-java-source || \

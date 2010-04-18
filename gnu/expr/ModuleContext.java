@@ -14,6 +14,13 @@ public class ModuleContext
   static ModuleContext global = new ModuleContext(ModuleManager.instance);
   ModuleManager manager;
 
+  public static int IN_HTTP_SERVER = 1;
+  public static int IN_SERVLET = 2;
+  int flags;
+  public int getFlags () { return flags; }
+  public void setFlags(int flags) { this.flags = flags; }
+  public void addFlags(int flags) { this.flags |= flags; }
+
   public ModuleContext (ModuleManager manager)
   {
     this.manager = manager;

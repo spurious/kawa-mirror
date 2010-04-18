@@ -290,17 +290,20 @@ public class XQResolveNames extends ResolveNames
           {
             // kludge - use xxx_BUILTIN mechanism?  FIXME
             String name = sym.getLocalName();
-            Expression f;
+            String mname;
             if ("request".equals(name))
-              f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetRequest", 
-                                           "getRequest");
+              mname = "getCurrentRequest";
             else if ("response".equals(name))
-              f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetResponse",
-                                           "getResponse");
+              mname = "getCurrentResponse";
             else
-              f = null;
-            if (f != null)
-              return new ApplyExp(f, Expression.noExpressions);
+              mname = null;
+            if (mname != null)
+              {
+                Method meth =
+                  ClassType.make("gnu.kawa.servlet.ServletRequestContext")
+                  .getDeclaredMethod(mname, 0);
+                return new ApplyExp(meth, Expression.noExpressions);
+              }
           }
         else if (symbol instanceof Symbol)
           {

@@ -1,3 +1,9 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	* HelloCgiK.expected: Update.
+	* HelloCgiS.expected: Update.
+	* HelloCgiK.expected: Update.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Fix some distclean errors.

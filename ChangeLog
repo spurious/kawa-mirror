@@ -1,3 +1,10 @@
+2010-04-18  Per Bothner  <per@bothner.com>
+
+	Add support for using the com.sun.net.httpserver web server.
+	* configure.in(--with-httpserver): New option.
+	(WITH_HTTPSERVER): New conditional.
+	* Makefile.am: Conditionalize pre-processing on WITH_HTTPSERVER.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* configure.in: New --java-source option '6compat5': Compile assuming

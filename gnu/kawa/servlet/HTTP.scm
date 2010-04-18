@@ -16,55 +16,79 @@
   (response-header '|Status|
 		     (format "~d ~a" code message)))
 
-(define (current-servlet) :: <javax.servlet.http.HttpServlet>
-  (invoke-static <gnu.kawa.servlet.ServletCallContext> "getServlet"))
-
-(define (current-servlet-context) :: <javax.servlet.ServletContext>
-  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getServletContext))
-
-(define (current-servlet-config) :: <javax.servlet.ServletConfig>
-  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getServletConfig))
-
-(define (servlet-context-realpath #!optional (path :: <String> '||)) :: <String>
-  (let ((context :: <javax.servlet.ServletContext>
-		 (invoke-static <gnu.kawa.servlet.ServletCallContext>
-				'getServletContext)))
-    (invoke context 'getRealPath path)))
-
-(define (get-response) :: <javax.servlet.http.HttpServletResponse>
-  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getResponse))
-
-(define (get-request) :: <javax.servlet.http.HttpServletRequest>
-  ((static-field <gnu.kawa.servlet.GetRequest> 'getRequest)))
-
 (define (request-method) :: <String>
-  (invoke (get-request) 'getMethod))
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-method"):getRequestMethod))
 
-(define (request-uri) :: <String>
-  (invoke (get-request) 'getRequestURI))
+(define (request-scheme) ::String
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-scheme"):getRequestScheme))
 
-(define (request-url) :: <String>
-  (invoke (get-request) 'getRequestURL))
+(define (request-local-socket-address)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-local-socket-address"):getLocalSocketAddress))
 
-(define (request-path-info) :: <String>
-  (invoke (get-request) 'getPathInfo))
+(define (request-local-IP-address)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-local-IP-address"):getLocalIPAddress))
 
-(define (request-path-translated) :: <String>
-  (invoke (get-request) 'getPathTranslated))
+(define (request-local-port)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-local-port"):getLocalPort))
 
-(define (request-servlet-path) :: <String>
-  (invoke (get-request) 'getServletPath))
+(define (request-local-host)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-local-host"):getLocalHost))
 
-(define (request-query-string)
-  (let ((query (invoke (get-request) 'getQueryString)))
+(define (request-remote-socket-address)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-remote-socket-address"):getRemoteSocketAddress))
+
+(define (request-remote-IP-address)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-remote-IP-address"):getRemoteIPAddress))
+
+(define (request-remote-port)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-remote-port"):getRemotePort))
+
+(define (request-remote-host)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-remote-host"):getRemoteHost))
+
+(define (request-header name)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-header"):getRequestHeader name))
+
+(define (request-header-map)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-header-map"):getRequestHeaders))
+
+(define (request-URI) :: URI
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-URI"):getRequestURI))
+
+(define (request-context-path) :: URI
+  (URI ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-context-path"):getContextPath)))
+(define (request-script-path) :: URI
+  (URI ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-script-path"):getScriptPath)))
+(define (request-local-path) :: URI
+  (URI ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-local-path"):getLocalPath)))
+
+(define (request-path) :: String
+  (URI ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-path"):getRequestPath)))
+
+;; Deprecated.
+(define (request-uri) :: String
+  (request-path))
+
+(define (request-url) ::java.lang.StringBuffer
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-path"):getRequestURLBuffer))
+
+(define (request-path-translated) ::String
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-path-translated"):getPathTranslated))
+
+(define (request-query-string) ::object
+  (let ((query ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-query-string"):getQueryString)))
     (if (eq? query #!null) #f query)))
 
 (define (request-parameter (name :: <String>) #!optional (default #!null))
   :: <String>
   (let ((value :: <java.lang.String>
-	       (invoke (get-request) 'getParameter name)))
+	       ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-parameter"):getRequestParameter name)))
     (if (eq? value #!null) default value)))
 
-(define (request-parameters (name :: <String>))
-  (make <gnu.mapping.Values>
-    (invoke (get-request) 'getParameterValues name)))
+(define (request-parameters (name :: String))
+  (let* ((instance (gnu.kawa.servlet.HttpRequestContext:getInstance "request-parameters"))
+	 (plist :: java.util.List ((instance:getRequestParameters):get name)))
+  (gnu.mapping.Values:make plist)))
+
+(define (request-parameter-map)
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-parameter-map"):getRequestParameters))

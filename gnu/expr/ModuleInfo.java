@@ -48,6 +48,12 @@ public class ModuleInfo
       }
   }
 
+  public void cleanupAfterCompilation ()
+  {
+    if (comp != null)
+      comp.cleanupAfterCompilation();
+  }
+
   public static Path absPath (String path)
   {
     return Path.valueOf(path).getCanonical();

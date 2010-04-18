@@ -1,30 +1,24 @@
-// Copyright (c) 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2002, 2010  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.servlet;
 import gnu.kawa.xml.*;
 import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
 
-/** A Consumer that sends output to a ServletResponse.
- * This is the initial result destination when running a KawaServlet.
+/** A Consumer that sends output to an http-server's response stream.
+ * A "response-header" object is handled specially.
+ * In spite of the name, this is also used for non-servlet-based servers.
  */
 
 public class ServletPrinter extends HttpPrinter
 {
-  HttpServletResponse response;
+  HttpRequestContext hctx;
 
-  public ServletPrinter(HttpServletResponse response)
+  public ServletPrinter(HttpRequestContext hctx, int bufSize)
     throws IOException
   {
-    super(response.getOutputStream());
-    this.response = response;
-  }
-
-  public ServletPrinter(OutputStream ostream)
-  {
-    super(ostream);
+    super(new HttpOutputStream(hctx, bufSize));
+    this.hctx = hctx;
   }
 
   public void addHeader(String label, String value)
@@ -32,7 +26,7 @@ public class ServletPrinter extends HttpPrinter
     if (label.equalsIgnoreCase("Content-type"))
       {
 	super.sawContentType = value;
-	response.setContentType(value);
+	hctx.setContentType(value);
       }
     else if (label.equalsIgnoreCase("Status"))
       {
@@ -43,14 +37,7 @@ public class ServletPrinter extends HttpPrinter
 	  {
 	    if (i >= lval)
 	      {
-		try
-		  {
-		    response.sendError(code);
-		  }
-		catch (java.io.IOException ex)
-		  {
-		    System.err.println("caught "+ex);
-		  }
+                hctx.statusCode = code;
 		break;
 	      }
 	    char ch = value.charAt(i);
@@ -61,20 +48,14 @@ public class ServletPrinter extends HttpPrinter
 	      {
 		if (ch == ' ')
 		  i++;
-		try
-		  {
-		response.sendError(code, value.substring(i));
-		  }
-		catch (java.io.IOException ex)
-		  {
-		    System.err.println("caught "+ex);
-		  }
+                hctx.statusCode = code;
+                hctx.statusReasonPhrase = value.substring(i);
 		break;
 	      }
 	  }
       }
     else
-      response.addHeader(label, value);
+      hctx.setResponseHeader(label, value);
   }
 
   public void printHeaders()

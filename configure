@@ -622,6 +622,8 @@ ENABLE_KAWA_FRONTEND_FALSE
 ENABLE_KAWA_FRONTEND_TRUE
 WITH_XQTS_FALSE
 WITH_XQTS_TRUE
+WITH_HTTPSERVER_FALSE
+WITH_HTTPSERVER_TRUE
 WITH_JAVAX_SCRIPT_FALSE
 WITH_JAVAX_SCRIPT_TRUE
 WITH_SAX2_FALSE
@@ -772,6 +774,7 @@ enable_echo2
 enable_jemacs
 enable_xquery
 enable_brl
+with_httpserver
 with_swing
 with_swt
 with_awt
@@ -1444,6 +1447,7 @@ Optional Packages:
   --with-android[=android.jar]
                           Build for the Android platform
   --with-XQTS[=XQTS-path] Support XQuery Test Suite
+  --with-httpserver       Make use of JDK6's builtin http server
   --with-swing            Assume Swing is available (default on)
   --with-swt              Assume SWT is available
   --with-awt              Assume AWT is available (default on)
@@ -2665,6 +2669,13 @@ fi
 
 
 
+# Check whether --with-httpserver was given.
+if test "${with_httpserver+set}" = set; then
+  withval=$with_httpserver;
+fi
+
+
+
 # Check whether --with-swing was given.
 if test "${with_swing+set}" = set; then
   withval=$with_swing;
@@ -2751,6 +2762,12 @@ fi
 if test -z "$with_javax_script"; then
   case "$JAVA_SOURCE" in
   6compat5|6|7) with_javax_script="yes";;
+  esac
+fi
+
+if test -z "$with_httpserver"; then
+  case "$JAVA_SOURCE" in
+  6compat5|6|7) with_httpserver="yes";;
   esac
 fi
 
@@ -4863,6 +4880,14 @@ else
   WITH_JAVAX_SCRIPT_FALSE=
 fi
 
+ if test "$with_httpserver" = "yes"; then
+  WITH_HTTPSERVER_TRUE=
+  WITH_HTTPSERVER_FALSE='#'
+else
+  WITH_HTTPSERVER_TRUE='#'
+  WITH_HTTPSERVER_FALSE=
+fi
+
  if test "$with_XQTS" != "" -a "$with_XQTS" != "no"; then
   WITH_XQTS_TRUE=
   WITH_XQTS_FALSE='#'
@@ -5222,6 +5247,13 @@ if test -z "${WITH_JAVAX_SCRIPT_TRUE}" && test -z "${WITH_JAVAX_SCRIPT_FALSE}"; 
   { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_JAVAX_SCRIPT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"WITH_JAVAX_SCRIPT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WITH_HTTPSERVER_TRUE}" && test -z "${WITH_HTTPSERVER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"WITH_HTTPSERVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"WITH_HTTPSERVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

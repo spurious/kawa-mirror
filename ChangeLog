@@ -1,3 +1,8 @@
+2010-04-19  Per Bothner  <per@bothner.com>
+
+	* build.xml: Update to auto-select Java5 and Java6, including
+	HttpServer.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	Add support for using the com.sun.net.httpserver web server.

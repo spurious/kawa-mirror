@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!-- A build file for use by Ant to build Kawa. -->
-<project name="Kawa" default="all" basedir=".">
+<!-- Requires Ant 1.6.3 -->
+<project name="Kawa" default="default" basedir=".">
   <!-- Give the user a chance to override the defaults. -->
   <property file="build.properties"/>
 
@@ -54,6 +55,8 @@
   <property name="preprocess.overwrite" value="false"/>
 
   <target name="all" depends="classes, jar"/>
+
+  <target name="default" depends="select-java-auto, classes, jar"/>
 
   <target name="classes" 
           depends="java-classes, lib-scm-classes
@@ -228,7 +231,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java1"/>
+      <arg line="%java1 -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -239,7 +242,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java2"/>
+      <arg line="%java2 -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -250,7 +253,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java4"/>
+      <arg line="%java4 -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -261,35 +264,56 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java5"/>
+      <arg line="%java5 -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
     
-  <target name="select-java6" depends="build-tools">
+  <target name="select-java6" depends="build-tools,check-for-HttpServer">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java6"/>
+      <arg line="%java6 ${use-HttpServer}"/>
       <arg line="${fileList}"/>
     </java>
   </target>
-    
-  <target name="check-for-java2">
-     <available property="has-java2" classname="java.lang.ThreadLocal"/>
+
+  <target name="check-for-HttpServer">
+    <condition property="use-HttpServer" value="+use:com.sun.net.httpserver"
+	       else="-use:com.sun.net.httpserver">
+      <available classname="com.sun.net.httpserver.HttpServer"/>
+    </condition>
   </target>
-  
-  <target name="select-java1-auto" depends="check-for-java2" unless="has-java2">
-     <antcall target="select-java1"/>
+
+  <target name="maybe-select-java1" unless="has-java2">
+    <antcall target="select-java1"/>
   </target>
-  
-  <target name="select-java2-auto" depends="check-for-java2" if="has-java2">
-     <antcall target="select-java2"/>
+  <target name="maybe-select-java2" unless="has-java4">
+    <antcall target="select-java2"/>
   </target>
-  
-  <target name="select-java-auto" depends="select-java1-auto, select-java2-auto"/>
+  <target name="maybe-select-java4" unless="has-java5">
+    <antcall target="select-java4"/>
+  </target>
+  <target name="maybe-select-java5" unless="has-java6">
+    <antcall target="select-java5"/>
+  </target>
+  <target name="maybe-select-java6" if="has-java6">
+    <antcall target="select-java6"/>
+  </target>
+
+  <target name="select-java-auto">
+    <available property="has-java2" classname="java.lang.ThreadLocal"/>
+    <available property="has-java4" classname="java.lang.CharSequence"/>
+    <available property="has-java5" classname="java.lang.Appendable"/>
+    <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
+    <antcall target="maybe-select-java1"/>
+    <antcall target="maybe-select-java2"/>
+    <antcall target="maybe-select-java4"/>
+    <antcall target="maybe-select-java5"/>
+    <antcall target="maybe-select-java6"/>
+  </target>
   
   <!-- 
      This preprocessing jazz is rather involved and verbose,
@@ -352,6 +376,10 @@
       <include name="gnu/commonlisp/lang/"/>
       <include name="gnu/ecmascript/"/>
       <include name="gnu/expr/"/>
+      <exclude name="gnu/expr/AbstractScriptEngineFactory.java" unless="has-java6"/>
+      <exclude name="gnu/expr/KawaScriptBindings.java" unless="has-java6"/>
+      <exclude name="gnu/expr/KawaScriptEngine.java" unless="has-java6"/>
+      <exclude name="kawa/standard/SchemeScriptEngineFactory.java" unless="has-java6"/>
       <include name="gnu/kawa/functions/"/>
       <include name="gnu/kawa/lispexpr/"/>
       <include name="gnu/kawa/reflect/"/>
@@ -504,6 +532,7 @@
       <include name="gnu/kawa/xml/"/>
       <include name="gnu/kawa/xslt/"/>
       <include name="gnu/xquery/lang/"/>
+      <exclude name="gnu/xquery/lang/XQueryScriptEngineFactory.java" unless="has-java6"/>
       <include name="gnu/xquery/util/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
     </javac>

@@ -4474,7 +4474,7 @@ The same as @code{hash}, except that the argument string must be a string.
 The same as @code{string-hash}, except that the case of characters in
 string does not affect the hash value produced.
 (The Kawa implementation returns the same the @code{hash} function
-applied to teh lower-cased @var{string}.)
+applied to the lower-cased @var{string}.)
 @end deffn
 
 @deffn Procedure hash-by-identity object [ bound ] → integer
@@ -5381,7 +5381,8 @@ against the location of the module source file.
 @deffn Syntax module-uri
 Evaluates to a special URI that can be used to access resources
 relative to the class of the containing module.
-The URI has the form @code{"class-resource://@var{CurrentClass}/"}.
+The URI has the form @code{"class-resource://@var{CurrentClass}/"}
+in compiled code, to allow moving the classes/jars.
 The current @code{ClassLoader} is associated with the URI, so accessing
 resources using the URI will use that @code{ClassLoader}.
 Therefore you should not create a @code{"class-resource:"} URI
@@ -8304,20 +8305,59 @@ for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
 You can then run the @code{hello} servlet using the URL
 @url{http://localhost:8080/myutils/servlet/hello}.
 
+The following functions only work within a servlet container.
+To use these functions, first do:
+@example
+(require 'servlets)
+@end example
+
+You can conditionalize your code to check for servlets, like this:
+
+@example
+(cond-expand
+ (in-servlet
+   (require 'servlets)
+   (format "[servlet-context: ~s]" (current-servlet-context)))
+ (else
+   "[Not in a servlet]"))
+@end example
+
 @deffn Procedure current-servlet
-When called from a Kawa servlet's handler, returns the
+When called from a Kawa servlet handler, returns the
 actual @code{javax.servlet.http.HttpServlet} instance.
 @end deffn
 
 @deffn Procedure current-servlet-context
-Returns the @code{ServletContext} of the currently executing servlet.
+Returns the context of the currently executing servlet,
+as an instance of @code{javax.servlet.ServletContext}.
 @end deffn
 
 @deffn Procedure current-servlet-config
 Returns the @code{ServletConfig} of the currently executing servlet.
 @end deffn
 
-@deffn Procedure servlet-context-realpath
+@deffn Procedure get-request
+Return the current servlet request, as an instance of
+@code{javax.servlet.http.HttpServletRequest}.
+@end deffn
+
+@deffn Procedure get-response
+Return the current servlet response, as an instance of
+@code{javax.servlet.http.HttpServletResponse}.
+@end deffn
+
+@deffn Procedure request-servlet-path
+Get the servlet path of the current request.
+Similar to @code{request-script-path}, but not always the same,
+depending on configuration, and does @emph{not} end with a @code{"/"}.
+@end deffn
+
+@deffn Procedure request-path-info
+Get the path info of the current request.
+Corresponds to the CGI variable @code{PATH_INFO}.
+@end deffn
+
+@deffn Procedure servlet-context-realpath [path]
 Returns the file path of the current servlet's "Web application".
 @end deffn
 
@@ -8371,10 +8411,7 @@ using the URL @url{http://localhost/cgi-bin/hello}.
 It may take a few seconds to get the reply, mainly because of the
 start-up time of the Java VM.  That is why servlets are
 preferred.  Using the CGI interface can still be useful
-for testing or when you can't run servlets.  We hope to
-soon be able to run Kawa CGI scripts compiled using GCJ,
-which should have much reduced start-up time, making
-Kawa servlets more practical.
+for testing or when you can't run servlets.
 
 @node HTTP requests, HTTP response, CGI scripts, XML tools
 @section Functions for accessing HTTP requests
@@ -8390,37 +8427,224 @@ before using these functions.
 @example
 (require 'http)
 @end example
-This is not needed for KRL or XQuery.
+
+The examples below assume the request @code{http://example.com:8080/myapp/foo/bar?val1=xyz&val2=abc}, where @code{myapp} is the application context.
+We also assume that this is handled by a script @code{foo/+default+}.
+
+@subsection Request URL components
+
+@deffn Procedure request-URI
+Returns the URI of the request, as a value of type @code{URI}.
+This excludes the server specification,
+but includes the query string.
+(It is the combination of CGI variables @code{SCRIPT_NAME},
+@code{PATH_INFO}, and @code{QUERY_STRING}.
+Using servlets terminology, it is the combination of
+Context Path, Servlet Path, PathInfo, and Query String.)
+@example
+(request-URI) @result{} "/myapp/foo/bar?val1=xyz&val2=abc"
+@end example
+@end deffn
+
+@deffn Procedure request-path
+Returns the URI of the request, as a value of type @code{URI}.
+This excludes the server specification and the query string.
+Equivalent to @code{(path-file (request-URI))}.
+(It is the combination of CGI variables @code{SCRIPT_NAME}, and
+@code{PATH_INFO}.
+Same as the concatenation of @code{(request-context-path)},
+@code{(request-script-path)}, and @code{(request-local-path)}.
+Using servlets terminology, it is the combination of
+Context Path, Servlet Path, and PathInfo.)
+@example
+(request-path) @result{} "/myapp/foo/bar"
+@end example
+@end deffn
+
+@deffn Procedure request-uri
+This function is deprecated, because of possible confusion
+with @code{request-URI}.  Use @code{request-path} instead.
+@end deffn
+
+@deffn Procedure request-url
+Returns the complete URL of the request, except the query string.
+The result is a @code{java.lang.StringBuffer}.
+@example
+(request-url) @result{} "http://example.com:8080/myapp/foo/bar"
+@end example
+@end deffn
+
+@deffn Procedure request-context-path
+Returns the context path, relative to the server root.
+This is an initial substring of the @code{(request-path)}.
+Similar to the Context Path of a servlet request,
+except that it ends with a @code{"/"}.
+@example
+(request-context-path) @result{} "/myapp/"
+@end example
+@end deffn
+
+@deffn Procedure request-script-path
+Returns the path of the script, relative to the context.
+This is either an empty string, or a string that ends with @code{"/"},
+but does not start with one. (The reason for this is to produce URIs
+that work better with operations like @code{resolve-uri}.)
+This is conceptually similar to @code{request-servlet-path},
+though not always the same, and the @code{"/"} conventions differ.
+@example
+(request-script-path) @result{} "foo/"
+@end example
+@end deffn
+
+@deffn Procedure request-local-path
+Returns the remainder of the @code{request-path},
+relative to the @code{request-script-path}.
+@example
+(request-local-path) @result{} "bar"
+@end example
+@end deffn
+
+@deffn Procedure request-query-string
+Returns the query string from an HTTP request.  The query string is
+the part of the request URL after a question mark.
+Returns false if there was no query string.
+Corresponds to the CGI variable @code{QUERY_STRING}.
+@example
+(request-query-string) @result{} "val1=xyz&val2=abc"
+@end example
+@end deffn
+
+@subsection Request parameters
+
+Request parameters are used for data returned from forms,
+and for other uses.
+They may be encoded in the query string or in the request body.
+
+@deffn Procedure request-parameter name [default]
+If there is a parameter with the given name (a string),
+return the (first) corresponding value, as a string.
+Otherwise, return the @var{default} value,
+or @code{#!null} if there is no @var{default}.
+@example
+(request-parameter "val1") @result{} "xyz"
+(request-parameter "val9" "(missing)") @result{} "(missing)"
+@end example
+@end deffn
+
+@deffn Procedure request-parameters name
+If there is are one or more parameter with the given name (a string),
+return them all (as multiple values).
+Otherwise, return no values (i.e. @code{(values)}).
+@example
+(request-parameters "val1") @result{} "xyz"
+(request-parameters "val9") @result{} #!void
+@end example
+@end deffn
+
+@deffn Procedure request-parameter-map
+Request a map of all the parameters.
+This is a map from strings to a sequence of strings.
+(Specifically, a @code{java.util.Map<String,java.util.List<String>>}.)
+@end deffn
+
+@subsection Request headers
+
+The request headers are a set of (keyword, string)-pairs
+transmitted as part of the HTTP request, before the request body.
+
+@deffn Procedure request-header name
+If there is a header with the given @var{name} (a string),
+return the corresponding value string.
+Otherwise, return @code{#!null}.
+@example
+(request-header "accept-language") @result{} "en-us,en;q=0.5"
+@end example
+@end deffn
+
+@deffn Procedure request-header-map
+Request a map of all the headers.
+This is a map from strings to a sequence of strings.
+(Specifically, a @code{java.util.Map<String,java.util.List<String>>}.)
+@end deffn
+
+@subsection Request body
+
+@emph{Functions for reading the request body are not yet implemented.
+We should have procedures for both returning binary and textual input ports.
+Email the kawa mailing list if you need a work-around.}
+
+@c @deffn Procedure request-body-string
+@c Return the entire request body as a string
+@c @end deffn
+
+@subsection Request IP addresses and ports
+
+Information about the interface and port on which the request was received.
+
+@deffn Procedure request-local-socket-address
+The local address on which the request was received.
+This is the combination of @code{(request-local-host)}
+and @code{(request-local-port)}, as an instance of
+@code{java.net.InetSocketAddress}.
+@end deffn
+@deffn Procedure request-local-host
+Get the IP address of the interface on which request was received,
+as an @code{java.net.InetAddress}.
+@end deffn
+@deffn Procedure request-local-IP-address
+Get the IP address of the interface on which request was received,
+a string in numeric form:
+@example
+(request-local-host) @result{} "127.0.0.1"
+@end example
+@end deffn
+@deffn Procedure request-local-port
+Get the port this request was received on.
+@example
+(request-local-port) @result{} 8080
+@end example
+@end deffn
+
+Information about the interface and port of the remote client that invoked the request.
+
+@deffn Procedure request-remote-socket-address
+The address of the remote client (usually a web browser)
+which invoked the request.
+This is the combination of @code{(request-remove-host)}
+and @code{(request-remote-port)}, as an instance of
+@code{java.net.InetSocketAddress}.
+@end deffn
+@deffn Procedure request-remote-host
+Get the IP address of the remote client which invoked the request,
+as an @code{java.net.InetAddress}.
+@end deffn
+@deffn Procedure request-remote-IP-address
+Get the IP address of the remote client which invoked the request,
+as a string in numeric form.
+@example
+(request-remote-host) @result{} "123.45.6.7"
+@end example
+@end deffn
+@deffn Procedure request-remote-port
+The port used by the remote client.
+@end deffn
+
+@subsection Miscellaneous request properties
+
+@deffn Procedure request-path-translated
+Map the request-path to a file name (a string)
+in the server application directory.
+Corresponds to the CGI variable @code{PATH_TRANSLATED}.
+@end deffn
 
 @deffn Procedure request-method
 Returns the method of the HTTP request, usually @code{"GET"}
 or @code{"POST"}.  Corresponds to the CGI variable @code{REQUEST_METHOD}.
 @end deffn
 
-@deffn Procedure request-path-info
-Corresponds to the CGI variable @code{PATH_INFO}.
-@end deffn
-
-@deffn Procedure request-path-translated
-Corresponds to the CGI variable @code{PATH_TRANSLATED}.
-@end deffn
-
-@deffn Procedure request-uri
-Returns the URI of the request, not including the query string,
-or server specification.
-The is the combination of CGI variables @code{SCRIPT_NAME}
-and @code{PATH_INFO}.
-@end deffn
-
-@deffn Procedure request-url
-Returns the complete URL of the request, except the query string.
-@end deffn
-
-@deffn Procedure request-query-string
-Returns the query string from an HTTP request.  The query string is
-the part of the request URL after a quetion mark.
-Returns false if there was no query string.
-Corresponds to the CGI variable @code{QUERY_STRING}.
+@deffn Procedure request-scheme
+Returns the scheme (protocol) of the request.
+Usually @code{"http"}, or @code{"https"}.
 @end deffn
 
 @node HTTP response, XML beyond Scheme, HTTP requests, XML tools

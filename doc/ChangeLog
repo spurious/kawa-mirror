@@ -1,5 +1,9 @@
 2010-04-24  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (HTTP requests): Add lots more documentation for
+	new and old functions in HTTP.scm.
+	(Servlets): Add some more documentation for functions in servlets.scm.
+
 	* kawa.texi (Extended formals): Use boldface for literal syntax.
 
 2010-04-10  Per Bothner  <per@bothner.com>

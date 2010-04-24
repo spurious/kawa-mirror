@@ -1957,31 +1957,31 @@ extendsions over standard Scheme:
 Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
-@display
-@var{lambda-expression} ::= (lambda @var{formals} [@var{rtype}] @var{body})
-@end display
+@example
+@var{lambda-expression} ::= @b{(lambda} @var{formals} [@var{rtype}] @var{body}@b{)}
+@end example
 where
-@display
-@var{formals} ::= (@var{formal-arguments}) | @var{rest-arg}
-@end display
+@example
+@var{formals} ::= @b{(}@var{formal-arguments}@b{)} | @var{rest-arg}
+@end example
 You can of course also use the extended format in a @code{define}:
-@display
-(define (@var{name} @var{formal-arguments}) [@var{rtype}] @var{body})
-@end display
-@display
+@example
+@b{(define (}@var{name} @var{formal-arguments}@b{)} [@var{rtype}] @var{body}@b{)}
+@end example
+@example
 @var{formal-arguments} ::=
-    @var{req-opt-args} (@var{rest-key-args} | . @var{rest-arg})
-@end display
-@display
-@var{req-opt-args} ::= @var{req-arg} ... [#!optional @var{opt-arg} ...]
-@var{rest-key-args} ::= [#!rest @var{rest-arg}] [#!key @var{key-arg} ...]
-@var{req-arg} ::= @var{variable} [:: @var{type}] | (@var{variable} [[::] @var{type}] )
+    @var{req-opt-args} @b{(}@var{rest-key-args} | . @var{rest-arg}@b{)}
+@end example
+@example
+@var{req-opt-args} ::= @var{req-arg} ... [@b{#!optional} @var{opt-arg} ...]
+@var{rest-key-args} ::= [@b{#!rest} @var{rest-arg}] [@b{#!key} @var{key-arg} ...]
+@var{req-arg} ::= @var{variable} [@b{::} @var{type}] | (@var{variable} [[@b{::}] @var{type}] )
 @var{opt-arg} ::= @var{arg-with-default}
-@var{key-arg} ::=  @var{arg-with-default}
-@var{arg-with-default} ::= @var{variable} [:: @var{type}]
-    | ( @var{variable} [:: @var{type} [@var{initializer}] | @var{initializer} [[::] @var{type}]] )
+@var{key-arg} ::= @var{arg-with-default}
+@var{arg-with-default} ::= @var{variable} [@b{::} @var{type}]
+    | ( @var{variable} [@b{::} @var{type} [@var{initializer}] | @var{initializer} [[@b{::}] @var{type}]] )
 @var{rest-arg} ::= @var{variable}
-@end display
+@end example
 
 When the procedure is applied to a list of actual arguments, the formal and
 actual arguments are processed from left to right as follows:

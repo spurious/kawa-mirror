@@ -1,3 +1,7 @@
+2010-04-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Extended formals): Use boldface for literal syntax.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Binary distribution, Source distribution): Update

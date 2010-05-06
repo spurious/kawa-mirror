@@ -18,6 +18,8 @@ public class repl extends Procedure0or1
   Language language;
   static Language previousLanguage;
 
+  static int defaultParseOptions = 0;
+
   public repl(Language language)
   {
     this.language = language;
@@ -559,11 +561,11 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--applet"))
 	  {
-	    Compilation.generateAppletDefault = true;
+	    defaultParseOptions |= Language.PARSE_FOR_APPLET;
 	  }
 	else if (arg.equals("--servlet"))
 	  {
-	    Compilation.generateServletDefault = true;
+	    defaultParseOptions |= Language.PARSE_FOR_SERVLET;
 	  }
 	else if (arg.equals("--debug-dump-zip"))
 	  {
@@ -740,7 +742,8 @@ public class repl extends Procedure0or1
               }
             
             comp
-              = language.parse(fstream, messages, Language.PARSE_PROLOG);
+              = language.parse(fstream, messages,
+                               Language.PARSE_PROLOG|defaultParseOptions);
 
             if (compilationTopname != null)
               {

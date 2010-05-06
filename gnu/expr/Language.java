@@ -452,6 +452,8 @@ public abstract class Language
    * any module import. */
   public static final int PARSE_PROLOG = 8;
   public static final int PARSE_FOR_EVAL = PARSE_IMMEDIATE|PARSE_CURRENT_NAMES;
+  public static final int PARSE_FOR_APPLET = 16;
+  public static final int PARSE_FOR_SERVLET = 32;
 
   public static boolean requirePedantic;
 
@@ -498,7 +500,11 @@ public abstract class Language
     Compilation tr = getCompilation(lexer, messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
-    tr.immediate = immediate;;
+    tr.immediate = immediate;
+    if ((options & PARSE_FOR_APPLET) != 0)
+      tr.generateApplet = true;
+    if ((options & PARSE_FOR_SERVLET) != 0)
+      tr.generateServlet = true;
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);

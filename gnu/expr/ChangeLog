@@ -1,3 +1,12 @@
+2010-05-06  Per Bothner  <per@bothner.com>
+
+	Fix issue where required modules inherit --aplet and --servlet options.
+	* Compilation.java (generateAppletDefault, generateServletDefault):
+	Remove static fields.
+	* Language.java (PARSE_FOR_APPLET, PARSE_FOR_SERVLET): New flags.
+	(parse): Use these to set Compilation.generateApplet
+	and generateServlet.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (flag): New field.

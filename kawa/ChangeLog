@@ -1,3 +1,11 @@
+2010-05-06  Per Bothner  <per@bothner.com>
+
+	Fix issue where required modules inherit --aplet and --servlet options.
+	* repl.java (defaultParseOptions): New field.
+	(processArgs): Change --applet and --servlet to just
+	set bits in defaultParseOptions.
+	(compileFiles): Pass defaultParseOptions to Language.parse.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	* repl.java (processArgs): Add new options --http-auto-handler and 

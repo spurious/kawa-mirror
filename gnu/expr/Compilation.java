@@ -369,13 +369,11 @@ public class Compilation implements SourceLocator
 
   LitTable litTable;
 
-  public static boolean generateAppletDefault = false;
   /** True if we should generate an Applet. */
-  public boolean generateApplet = generateAppletDefault;
+  public boolean generateApplet;
 
-  public static boolean generateServletDefault = false;
   /** True if we should generate an Servlet. */
-  public boolean generateServlet = generateServletDefault;
+  public boolean generateServlet;
 
   public final ClassType getModuleType()
   {

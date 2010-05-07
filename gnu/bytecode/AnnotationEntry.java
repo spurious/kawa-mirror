@@ -11,7 +11,7 @@ public class AnnotationEntry
 implements java.lang.annotation.Annotation
 /* #endif */
 /* #ifdef JAVA6 */
-// /* FUTURE also implements: javax.lang.model.element.AnnotationMirror */
+/* FUTURE also implements: javax.lang.model.element.AnnotationMirror */
 /* #endif */
 {
   ClassType annotationType;

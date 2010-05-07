@@ -454,6 +454,8 @@ public abstract class Language
   public static final int PARSE_FOR_EVAL = PARSE_IMMEDIATE|PARSE_CURRENT_NAMES;
   public static final int PARSE_FOR_APPLET = 16;
   public static final int PARSE_FOR_SERVLET = 32;
+  /** Compilation explicitly requested, not just because of an import. */
+  public static final int PARSE_EXPLICIT = 64;
 
   public static boolean requirePedantic;
 
@@ -505,6 +507,8 @@ public abstract class Language
       tr.generateApplet = true;
     if ((options & PARSE_FOR_SERVLET) != 0)
       tr.generateServlet = true;
+    if ((options & PARSE_EXPLICIT) != 0)
+      tr.explicit = true;
     if ((options & PARSE_PROLOG) != 0)
       tr.setState(Compilation.PROLOG_PARSING);
     tr.pushNewModule(lexer);

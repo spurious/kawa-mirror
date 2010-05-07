@@ -18,7 +18,7 @@ public class repl extends Procedure0or1
   Language language;
   static Language previousLanguage;
 
-  static int defaultParseOptions = 0;
+  static int defaultParseOptions = Language.PARSE_PROLOG|Language.PARSE_EXPLICIT;
 
   public repl(Language language)
   {
@@ -743,7 +743,7 @@ public class repl extends Procedure0or1
             
             comp
               = language.parse(fstream, messages,
-                               Language.PARSE_PROLOG|defaultParseOptions);
+                               defaultParseOptions);
 
             if (compilationTopname != null)
               {

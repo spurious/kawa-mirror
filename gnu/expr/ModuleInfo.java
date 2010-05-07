@@ -375,15 +375,17 @@ public class ModuleInfo
    */
   public boolean checkCurrent (ModuleManager manager, long now)
   {
-    if (sourceAbsPath == null || comp != null)
+    if (sourceAbsPath == null)
       return true;
+    if (className == null)
+      return false;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
       return moduleClass != null;
     lastCheckedTime = now;
     long lastModifiedTime = sourceAbsPath.getLastModified();
     long oldModifiedTime = this.lastModifiedTime;
     this.lastModifiedTime = lastModifiedTime;
-    if (moduleClass == null && className != null)
+    if (moduleClass == null)
       {
         try
           {
@@ -415,12 +417,12 @@ public class ModuleInfo
           }
         if (resource == null)
           {
-            // Couldn't open timestand of the .class file.
+            // Couldn't open timestamp of the .class file.
             // Assume it is current.
             return true;
           }
       }
-    if (className == null || lastModifiedTime > oldModifiedTime)
+    if (lastModifiedTime > oldModifiedTime)
       {
         moduleClass = null;
         return false;
@@ -428,7 +430,7 @@ public class ModuleInfo
     for (int i = numDependencies;  --i >= 0; )
       {
         ModuleInfo dep = dependencies[i];
-        if (! dep.checkCurrent(manager, now))
+        if (dep.comp == null && ! dep.checkCurrent(manager, now))
           {
             moduleClass = null;
             return false;

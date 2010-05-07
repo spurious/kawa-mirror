@@ -1,3 +1,15 @@
+2010-05-07  Per Bothner  <per@bothner.com>
+
+	Avoid writing imported "source" class if current.  I.e. if required
+	using a source file name, we parse it to check for dependencies.
+	* Compilation.java (explicit): New boolean.
+	(process): Don't compile and write class if class is current.
+	* Language.java (PARSE_EXPLICIT): New flag.
+	(parse): Set Compilation#explicit if PARSE_EXPLICIT set.
+	* ModuleInfo.java (checkCurrent): Don't quickly return true if comp is
+	non-null (callers should check comp instead to guard against cycles).
+	However, do quickly return false if classname is null.
+
 2010-05-06  Per Bothner  <per@bothner.com>
 
 	Fix issue where required modules inherit --aplet and --servlet options.

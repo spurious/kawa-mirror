@@ -1,3 +1,9 @@
+2010-05-07  Per Bothner  <per@bothner.com>
+
+	* repl.java: Also pass PARSE_EXPLICIT to parse when compiling.
+	* standard/require.java (importDefinitions): Check that compilation
+	is null before checkCurrent, since the latter no longer does.
+
 2010-05-06  Per Bothner  <per@bothner.com>
 
 	Fix issue where required modules inherit --aplet and --servlet options.

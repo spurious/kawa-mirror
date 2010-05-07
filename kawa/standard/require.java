@@ -36,7 +36,7 @@ public class require extends Syntax
 
      One complication is knowing whether a (require <B>) refers to a
      source file to be compiled.  It is not enough to check if a class
-     B exists, since if we're compiljng B we want to use the current
+     B exists, since if we're compiling B we want to use the current
      source B.scm, not an older B.class.  This is complicated by the
      (module-name B) declaration: We don't know whether source file
      B.scm provides the B class until we've parsed B.scm.  A solution
@@ -228,6 +228,7 @@ public class require extends Syntax
     ModuleManager manager = ModuleManager.getInstance();
     long now;
     if ((info.getState() & 1) == 0
+        && info.getCompilation() == null
         && ! info.checkCurrent(manager, (now = System.currentTimeMillis())))
       {
         SourceMessages messages = tr.getMessages();

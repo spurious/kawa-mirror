@@ -1,3 +1,7 @@
+2010-05-07  Per Bothner  <per@bothner.com>
+
+	* system.scm (compile-file): Set Compilation#explicit.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* rnrs/unicode.scm (string-normalize): Add a try-catch for a better

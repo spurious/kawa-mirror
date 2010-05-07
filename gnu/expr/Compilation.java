@@ -183,6 +183,9 @@ public class Compilation implements SourceLocator
   /** True if the compiled result will be immediately loaded. */ 
   public boolean immediate;
 
+  /** Compilation was explicitly requested, rather than being a dependency. */
+  public boolean explicit;
+
   /** The current method. */
   public Method method;
 
@@ -949,8 +952,7 @@ public class Compilation implements SourceLocator
 	  new File(parent).mkdirs();
 	clas.writeToFile(out_name);
       }
-    cleanupAfterCompilation();
-    litTable = null;
+    minfo.cleanupAfterCompilation();
   }
 
   public void cleanupAfterCompilation ()
@@ -964,6 +966,8 @@ public class Compilation implements SourceLocator
       minfo.exp.body = null;
     mainLambda.body = null;
     mainLambda = null;
+    if (! immediate)
+      litTable = null;
   }
 
   public void compileToArchive (ModuleExp mexp, String fname)
@@ -1873,6 +1877,15 @@ public class Compilation implements SourceLocator
             language.resolve(this);
             setState(messages.seenErrors() ? ERROR_SEEN : RESOLVED);
           }
+
+        // Avoid writing class needlessly.
+        if (! explicit && ! immediate
+            && minfo.checkCurrent(ModuleManager.getInstance(), System.currentTimeMillis()))
+          {
+            minfo.cleanupAfterCompilation();
+            setState(CLASS_WRITTEN);
+          }
+
         if (wantedState >= WALKED && getState() < WALKED)
           {
             walkModule(mexp);

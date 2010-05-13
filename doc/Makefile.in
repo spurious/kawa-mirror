@@ -133,6 +133,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 SAX2_PREPROCESS = @SAX2_PREPROCESS@
@@ -701,7 +702,7 @@ html: $(KAWA_HTMLS)
 
 .texi.pdf:
 	TEXINPUTS=$(top_srcdir)/../texinfo/texinfo.tex:$$TEXINPUTS \
-	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) $<
+	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) -E $<
 kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1

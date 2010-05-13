@@ -19,7 +19,7 @@ TEXI2PDF = texi2pdf
 
 .texi.pdf:
 	TEXINPUTS=$(top_srcdir)/../texinfo/texinfo.tex:$$TEXINPUTS \
-	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) $<
+	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) -E $<
 
 man_MANS = kawa.1 qexo.1
 kawa.1: $(srcdir)/kawa.man

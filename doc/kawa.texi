@@ -22,6 +22,15 @@
 @code{@sc{\NAME\}}
 @end macro
 
+@macro stxdef{NAME}
+@findex @i{\NAME\}
+@var{\NAME\} @code{::=}
+@end macro
+
+@macro stxlit{TEXT}
+@code{@b{\TEXT\}}
+@end macro
+
 @macro vari{THING}
 @var{\THING\1}
 @end macro
@@ -427,7 +436,7 @@ Once Ant has been installed and configured (you may need to set the
 be able to change to the directory containing the @code{build.xml} file,
 and invoke the @samp{ant} command.  With the default settings, a
 successful build will result in a @code{kawa-@value{VERSION}.jar} in the
-current directory
+current directory.
 
 There are a few Ant "targets" of interest (they can be supplied on the
 Ant command line):
@@ -1500,12 +1509,13 @@ with @code{defmacro} to get a fresh unique identifier.)
 
 @deffn Syntax cond-expand cond-expand-clause* [(else command-or-definition*)]
 @display
-@var{cond-expand-clause} ::= @code{(@var{feature-requirement} @var{command-or-definition}*)}
-@var{feature-requirement} ::= @var{feature-identifier}
-  | @code{(and @var{feature-requirement}*)}
-  | @code{(or @var{feature-requirement}*)}
-  | @code{(not @var{feature-requirement})}
-@var{feature-identifier} ::= a symbol which is the name or alias of a SRFI
+@stxdef{cond-expand-clause} @stxlit{(}@var{feature-requirement} @var{command-or-definition}*@stxlit{)}
+@findex @i{fff-rec}
+@stxdef{feature-requirement} @var{feature-identifier}
+  | @stxlit{(and} @var{feature-requirement}*@stxlit{)}
+  | @stxlit{(or} @var{feature-requirement}*@stxlit{)}
+  | @stxlit{(not} @var{feature-requirement}@stxlit{)}
+@stxdef{feature-identifier} a symbol which is the name or alias of a SRFI
 @end display
 
 The @code{cond-expand} form tests for the existence of features at
@@ -1765,7 +1775,7 @@ self-evaluating and therefore do not need to be quoted in expressions.
 They are used mainly for specifying keyword arguments.
 
 @display
-@var{keyword} ::= @var{identifier}:
+@stxdef{keyword} ::= @var{identifier}@stxlit{:}
 @end display
 
 A keyword is a single token; therefore no whitespace is allowed between
@@ -1957,31 +1967,31 @@ extendsions over standard Scheme:
 Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
-@example
-@var{lambda-expression} ::= @b{(lambda} @var{formals} [@var{rtype}] @var{body}@b{)}
-@end example
+@display
+@stxdef{lambda-expression} @stxlit{(lambda} @var{formals} [@var{rtype}] @var{body}@stxlit{)}
+@end display
 where
-@example
-@var{formals} ::= @b{(}@var{formal-arguments}@b{)} | @var{rest-arg}
-@end example
+@display
+@stxdef{formals} @stxlit{(}@var{formal-arguments}@stxlit{)} | @var{rest-arg}
+@end display
 You can of course also use the extended format in a @code{define}:
 @example
 @b{(define (}@var{name} @var{formal-arguments}@b{)} [@var{rtype}] @var{body}@b{)}
 @end example
-@example
-@var{formal-arguments} ::=
-    @var{req-opt-args} @b{(}@var{rest-key-args} | . @var{rest-arg}@b{)}
-@end example
-@example
-@var{req-opt-args} ::= @var{req-arg} ... [@b{#!optional} @var{opt-arg} ...]
-@var{rest-key-args} ::= [@b{#!rest} @var{rest-arg}] [@b{#!key} @var{key-arg} ...]
-@var{req-arg} ::= @var{variable} [@b{::} @var{type}] | (@var{variable} [[@b{::}] @var{type}] )
-@var{opt-arg} ::= @var{arg-with-default}
-@var{key-arg} ::= @var{arg-with-default}
-@var{arg-with-default} ::= @var{variable} [@b{::} @var{type}]
-    | ( @var{variable} [@b{::} @var{type} [@var{initializer}] | @var{initializer} [[@b{::}] @var{type}]] )
-@var{rest-arg} ::= @var{variable}
-@end example
+@display
+@stxdef{formal-arguments}
+    @var{req-opt-args} (@var{rest-key-args} | @stxlit{.} @var{rest-arg})
+@end display
+@display
+@stxdef{req-opt-args} @var{req-arg} ... [@stxlit{#!optional} @var{opt-arg} ...]
+@stxdef{rest-key-args} [@stxlit{#!rest} @var{rest-arg}] [@stxlit{#!key} @var{key-arg} ...]
+@stxdef{req-arg}  @var{variable} [@stxlit{::} @var{type}] | @stxlit{(}@var{variable} [[@stxlit{::}] @var{type}] @stxlit{)}
+@stxdef{opt-arg} @var{arg-with-default}
+@stxdef{key-arg} @var{arg-with-default}
+@stxdef{arg-with-default} @var{variable} [@stxlit{::} @var{type}]
+    | @stxlit{(} @var{variable} [@stxlit{::} @var{type} [@var{initializer}] | @var{initializer} [[@stxlit{::}] @var{type}]] @stxlit{)}
+@stxdef{rest-arg} @var{variable}
+@end display
 
 When the procedure is applied to a list of actual arguments, the formal and
 actual arguments are processed from left to right as follows:
@@ -2348,7 +2358,7 @@ These procedures return inexact integer objects for inexact arguments
 that are not infinities or NaNs, and exact integer objects for exact
 rational arguments.
 
-@table @func
+@table @code
 @item floor
 Returns the largest integer object not larger than @var{x}.
 
@@ -6302,10 +6312,10 @@ in the Guile and Stk dialects of Scheme.
 
 @deffn Syntax define-class name (supers ...) option-pair* field-or-method-decl ...
 @deffnx Syntax define-simple-class name (supers ...) option-pair* field-or-method-decl ...
-@example
-@var{option-pair} ::= @var{option-keyword} @var{option-value}
-@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
-@end example
+@display
+@stxdef{option-pair} @var{option-keyword} @var{option-value}
+@stxdef{field-or-method} @var{field-decl} | @var{method-decl}
+@end display
 
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
@@ -6374,9 +6384,9 @@ not recommended) write a period at the end of the @var{cname}.
 
 @subsection Declaring fields
 
-@example
-@var{field-decl} ::= (@var{fname} [:: @var{ftype}] @var{option-pair}*)
-@end example
+@display
+@stxdef{field-decl} @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] @var{option-pair}*@stxlit{)}
+@end display
 
 Each @var{field-decl} declares a instance "slot" (field)
 with the given @var{fname}. 
@@ -6444,9 +6454,9 @@ then its value is doubled.
 
 @subsection Declaring methods
 
-@example
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{option-pair}* @var{body})
-@end example
+@display
+@stxdef{method-decl} @stxlit{(}(@var{method-name} @var{formal-arguments}) @stxlit{::} @var{rtype}] @var{option-pair}* @var{body}@stxlit{)}
+@end display
 
 Each @var{method-decl} declares a method,
 which is by default public and non-static, and whose name is @var{method-name}.
@@ -6586,10 +6596,10 @@ but you can get the same effect using a @code{synchronized} expression:
 Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
-@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
-@var{field-decl} ::= (@var{fname} [[[::] @var{ftype}] @var{finit}])
-    | (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
+@stxdef{field-or-method} @var{field-decl} | @var{method-decl}
+@stxdef{field-decl} @stxlit{(}@var{fname} [[[@stxlit{::}] @var{ftype}] @var{finit}]@stxlit{)}
+    | @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] [@var{option-keyword} @var{option-value}]*@stxlit{)}
+@stxdef{method-decl} @stxlit{((}@var{method-name} @var{formal-arguments}@stxlit{)} [[@stxlit{::}] @var{rtype}] @var{body}@stxlit{)}
 @end display
 
 Returns a new instance of a unique (anonymous) class.

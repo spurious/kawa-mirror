@@ -1,3 +1,10 @@
+2010-05-13  Per Bothner  <per@bothner.com>
+
+	* Kawa.texi (stxdef, stxlit): New macros.
+	Use thse to regularize the form of syntax definitions.
+	* Makefile.am (.texi.pdf): Pass -E flag to texi2pdf, telling it to
+	use makeinfo for macro-expansion.
+
 2010-04-24  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (HTTP requests): Add lots more documentation for

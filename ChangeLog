@@ -1,3 +1,7 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* configure, aclocal.m4, **/Makefile.in: Re-generate.
+
 2010-04-19  Per Bothner  <per@bothner.com>
 
 	* build.xml: Update to auto-select Java5 and Java6, including

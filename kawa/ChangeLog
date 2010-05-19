@@ -1,3 +1,9 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Remove "namespace" function.
+	(getNamedType): Add "namespace" type instead.
+	(unitNamespace): Update Namespace.make -> valueOf.
+
 2010-05-07  Per Bothner  <per@bothner.com>
 
 	* repl.java: Also pass PARSE_EXPLICIT to parse when compiling.

@@ -1,5 +1,8 @@
 2010-05-19  Per Bothner  <per@bothner.com>
 
+	* misc.scm (namespace): Remove function; "namespace" is now a type
+	alias instead.
+
 	* misc.scm (namespace): Handle optional prefix argument.
 
 2010-05-07  Per Bothner  <per@bothner.com>

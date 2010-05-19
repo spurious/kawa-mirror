@@ -234,9 +234,9 @@ public class Symbol
       {
         Namespace namespace1 = sym1.namespace;
         Namespace namespace2 = sym2.namespace;
-        return (namespace1 != null && namespace2 != null
-                && (namespace1 == namespace2
-                    || namespace1.name == namespace2.name));
+        return namespace1 == namespace2
+          || (namespace1 != null && namespace2 != null
+              && namespace1.name == namespace2.name);
       }
     return false;
   }

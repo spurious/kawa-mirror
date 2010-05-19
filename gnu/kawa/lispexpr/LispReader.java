@@ -126,7 +126,7 @@ public class LispReader extends Lexer
       default:  // 
 	break;
       }
-       return readAndHandleToken(ch, startPos, rtable);
+    return readAndHandleToken(ch, startPos, rtable);
   }
 
   protected Object readAndHandleToken(int ch, int startPos, ReadTable rtable)
@@ -297,13 +297,39 @@ public class LispReader extends Lexer
           break;
         // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
         port.read();
-        if (! validPostfixLookupStart(port.peek(), rtable))
+        int ch2 = port.peek();
+        if (! validPostfixLookupStart(ch2, rtable))
           {
             unread();
             break;
           }
         ch = port.read();
-        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+        Object rightOperand;
+        if (ch2 == '{' && value instanceof SimpleSymbol)
+          {
+            tokenBufferLength = 0;
+            for (;;)
+              {
+                ch = read();
+                if (ch < 0 || ch == '\r' || ch == '\n')
+                  {
+                    error("non-terminated URI in compound symbol");
+                    break;
+                  }
+                if (ch == '}')
+                  break;
+                tokenBufferAppend(ch);
+              }
+            String uri = tokenBufferString();
+            ch = read();
+            rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+            if (rightOperand instanceof SimpleSymbol)
+              return Symbol.make(uri, rightOperand.toString(), value.toString());
+            else
+              error("expected simple symbol");
+          }
+        else
+          rightOperand = readValues(ch, rtable.lookup(ch), rtable);
         value = LList.list2(value,
                             LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
         value = PairWithPosition.make(LispLanguage.lookup_sym, value,

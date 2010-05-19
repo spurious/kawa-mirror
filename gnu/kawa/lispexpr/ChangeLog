@@ -1,5 +1,8 @@
 2010-05-19  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (handlePostfix): Handle extended syntax
+	for a compound symbol: PREFIX:{URI}NAME
+
 	* ReaderDispatchMisc.java (read): Fix broken handling of #,(NAME ...).
 	The symbol NAME is no longer implemented by a String, but by a Symbol.
 

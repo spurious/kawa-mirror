@@ -1,3 +1,7 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* misc.scm (namespace): Handle optional prefix argument.
+
 2010-05-07  Per Bothner  <per@bothner.com>
 
 	* system.scm (compile-file): Set Compilation#explicit.

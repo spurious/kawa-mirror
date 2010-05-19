@@ -1,3 +1,9 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* Namespace.java (make(String,String)): Intern both uri and prefix.
+	(toString): Also emit optional prefix.
+	* Symbol.java (equals): Minor fix.
+
 2010-04-13  Per Bothner  <per@bothner.com>
 
 	* Values.java (make): Generalize from Sequence to java.util.List.

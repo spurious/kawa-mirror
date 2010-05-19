@@ -363,6 +363,7 @@ public class DisplayFormat extends AbstractFormat
     Namespace namespace = sym.getNamespace();
     String uri = namespace == null ? null : namespace.getName();
     boolean suffixColon = false;
+    boolean writeUri = false;
     if (namespace == Keyword.keywordNamespace)
       {
         if (language == 'C' || language == 'E')
@@ -374,8 +375,11 @@ public class DisplayFormat extends AbstractFormat
       {
         writeSymbol(prefix, out, readable);
         out.write(':');
+        writeUri = readable;
       }
     else if (uri != null && uri.length() > 0)
+      writeUri = true;
+    if (writeUri)
       {
         out.write('{');
         out.write(uri);

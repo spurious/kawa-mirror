@@ -92,8 +92,8 @@ public class Namespace
 	if (old instanceof Namespace)
 	  return (Namespace) old;
 	Namespace ns = new Namespace();
-        ns.setName(uri);
-        ns.prefix = prefix;
+        ns.setName(uri.intern());
+        ns.prefix = prefix.intern();
 	nsTable.put(xname, ns);
 	return ns;
       }
@@ -312,7 +312,18 @@ public class Namespace
   }
 
   public String toString()
-  { return "#,(namespace \""+name+"\")"; }
+  {
+    StringBuilder sbuf = new StringBuilder("#,(namespace \"");
+    sbuf.append(name);
+    sbuf.append('\"');
+    if (prefix != null && prefix != "")
+      {
+        sbuf.append(' ');
+        sbuf.append(prefix);
+      }
+    sbuf.append(')');
+    return sbuf.toString();
+  }
 }
 
 /** A week reference to a <code>Symbol</code>.

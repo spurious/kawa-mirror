@@ -98,11 +98,6 @@
   (make <gnu.kawa.util.Parameter> init converter))
 |#
 
-(define (namespace (name ::string) #!optional (prefix ::gnu.mapping.SimpleSymbol #!null)) :: <gnu.mapping.Namespace>
-  (if (eq? prefix #!null)
-      (gnu.mapping.Namespace:make name)
-      (gnu.mapping.Namespace:make name prefix:name)))
-
 (define (gentemp) :: <symbol>
   (invoke-static <gnu.expr.Symbols> 'gentemp))
 

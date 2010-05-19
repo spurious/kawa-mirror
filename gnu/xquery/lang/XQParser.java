@@ -4103,7 +4103,7 @@ public class XQParser extends Lexer
 	if (forFunctions)
 	  {
 	    functionNamespacePath = new Namespace[1];
-	    functionNamespacePath[0] = Namespace.getInstance(uri);
+	    functionNamespacePath[0] = Namespace.valueOf(uri);
 	  }
 	else
 	  {

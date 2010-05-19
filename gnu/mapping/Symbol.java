@@ -102,7 +102,7 @@ public class Symbol
    */
   public static Symbol make (String uri, String name, String prefix)
   {
-    return Namespace.make(uri, prefix).getSymbol(name.intern());
+    return Namespace.valueOf(uri, prefix).getSymbol(name.intern());
   }
 
   /** Find or create a symbol in a specificed namespace.
@@ -114,11 +114,31 @@ public class Symbol
   public static Symbol make (Object namespace, String name)
   {
     Namespace ns = namespace instanceof String
-      ? Namespace.getInstance((String) namespace)
+      ? Namespace.valueOf((String) namespace)
       : (Namespace) namespace;
     if (ns == null || name == null)
       return makeUninterned(name);
     return ns.getSymbol(name.intern());
+  }
+
+  public static SimpleSymbol valueOf (String name)
+  {
+    return (SimpleSymbol) Namespace.EmptyNamespace.getSymbol(name.intern());
+  }
+
+  public static Symbol valueOf (String name, Namespace namespace)
+  {
+    return namespace.getSymbol(name.intern());
+  }
+
+  public static Symbol valueOf (String name, String namespace)
+  {
+    return Namespace.valueOf(namespace).getSymbol(name.intern());
+  }
+
+  public static Symbol valueOf (String name, String namespace, String prefix)
+  {
+    return Namespace.valueOf(namespace, prefix).getSymbol(name.intern());
   }
 
   /** Parse a String as a Symbol.

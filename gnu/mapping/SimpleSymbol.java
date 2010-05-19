@@ -17,11 +17,6 @@ public class SimpleSymbol extends Symbol
     super(Namespace.EmptyNamespace, key);
   }
 
-  public static SimpleSymbol valueOf (String name)
-  {
-    return (SimpleSymbol) Namespace.EmptyNamespace.getSymbol(name.intern());
-  }
-
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(getName());

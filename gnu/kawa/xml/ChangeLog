@@ -1,3 +1,8 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* XmlNamespace.java: Update Namespace.getInstance -> valueOf.
+	(make): Remove to valueOf.
+
 2009-12-02  Per Bothner  <per@bothner.com>
 
 	* KDocument.java (getDocumentElement): Need to skip comments.

@@ -74,7 +74,7 @@ public class DefineNamespace extends Syntax
           }
         else
           {
-            namespace = Namespace.getInstance(literal);
+            namespace = Namespace.valueOf(literal);
             decl.setType(ClassType.make("gnu.mapping.Namespace"));
           }
         value = new QuoteExp(namespace);

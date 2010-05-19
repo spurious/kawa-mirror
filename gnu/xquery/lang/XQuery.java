@@ -39,11 +39,11 @@ public class XQuery extends Language
   public static final String XHTML_NAMESPACE
     = "http://www.w3.org/1999/xhtml";
   public static final Namespace xqueryFunctionNamespace
-    = Namespace.getInstance(XQUERY_FUNCTION_NAMESPACE);
+    = Namespace.valueOf(XQUERY_FUNCTION_NAMESPACE);
   public static final Namespace kawaFunctionNamespace
-    = Namespace.getInstance(KAWA_FUNCTION_NAMESPACE);
+    = Namespace.valueOf(KAWA_FUNCTION_NAMESPACE);
   public static final Namespace qexoFunctionNamespace
-    = Namespace.getInstance(QEXO_FUNCTION_NAMESPACE);
+    = Namespace.valueOf(QEXO_FUNCTION_NAMESPACE);
   public static final  Namespace[] defaultFunctionNamespacePath
     = { qexoFunctionNamespace,
 	xqueryFunctionNamespace,

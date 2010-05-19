@@ -1,5 +1,12 @@
 2010-05-19  Per Bothner  <per@bothner.com>
 
+	* SimpleSymbol.java (valueOf(String)): Move to super-class Symbol.
+	* Symbol.java (valueOf): Also add 3 new overloaded methods.
+	* Namespace.java (valueOf): Add new methods.
+	(make, getInstance): Remove some old method names.
+	(<init>): Make constructor be protected.
+	(create): New factory methods in place of protected constructors.
+
 	* Namespace.java (make(String,String)): Intern both uri and prefix.
 	(toString): Also emit optional prefix.
 	* Symbol.java (equals): Minor fix.

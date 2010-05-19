@@ -6,6 +6,7 @@ import gnu.kawa.util.RangeTable;
 import gnu.mapping.*;
 import gnu.expr.Language;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.bytecode.Type;
 
 public class ReadTable extends RangeTable
 {
@@ -160,6 +161,13 @@ public class ReadTable extends RangeTable
   {
     initCtorTable();
     ctorTable.put(key, proc);
+  }
+
+  /** Add a mapping for a SRFI-10 constructor tag. */
+  public synchronized void putReaderCtor (String key, Type type)
+  {
+    initCtorTable();
+    ctorTable.put(key, type);
   }
 
   /** Map a SRFI-10 constructor tag to Procedure-valued lazy field  */

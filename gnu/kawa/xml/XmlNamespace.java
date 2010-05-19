@@ -7,7 +7,7 @@ public class XmlNamespace extends Namespace
   implements Externalizable
 {
   public static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
-  public static final XmlNamespace HTML = getInstance("", XHTML_NAMESPACE);
+  public static final XmlNamespace HTML = valueOf(XHTML_NAMESPACE, "");
   public static final NamespaceBinding HTML_BINDINGS =
     new NamespaceBinding(null, XHTML_NAMESPACE,
                          NamespaceBinding.predefinedXML);
@@ -30,7 +30,7 @@ public class XmlNamespace extends Namespace
 
   /* #ifdef JAVA5 */
   /** Emitted by compiler to handle literals. */
-  public static XmlNamespace make (String name, String prefix)
+  public static XmlNamespace valueOf (String name, String prefix)
   {
     return getInstance(prefix, name);
   }

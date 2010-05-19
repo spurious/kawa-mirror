@@ -604,7 +604,6 @@ public class Scheme extends LispLanguage
       defProcStFld("set-procedure-property!", "kawa.lib.misc");
       defSntxStFld("provide", "kawa.lib.misc_syntax");
       defSntxStFld("test-begin", "kawa.lib.misc_syntax");
-      defProcStFld("namespace", "kawa.lib.misc");
 
       defProcStFld("quantity->number", "kawa.lib.numbers");
       defProcStFld("quantity->unit", "kawa.lib.numbers");
@@ -956,6 +955,7 @@ public class Scheme extends LispLanguage
 	types.put ("rational", LangObjType.rationalType);
 	types.put ("integer", LangObjType.integerType);
 	types.put ("symbol", ClassType.make("gnu.mapping.Symbol"));
+	types.put ("namespace", ClassType.make("gnu.mapping.Namespace"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
 	types.put ("pair", ClassType.make("gnu.lists.Pair"));
 	types.put ("pair-with-position",
@@ -1084,7 +1084,7 @@ public class Scheme extends LispLanguage
   }
 
   public static final Namespace unitNamespace =
-    Namespace.make("http://kawa.gnu.org/unit", "unit");
+    Namespace.valueOf("http://kawa.gnu.org/unit", "unit");
 
   /** If a symbol is lexically unbound, look for a default binding.
    * If the symbol is the name of an existing Java type/class,
@@ -1387,7 +1387,7 @@ public class Scheme extends LispLanguage
     tab.putReaderCtorFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
     tab.putReaderCtorFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
     tab.putReaderCtorFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
-    tab.putReaderCtorFld("namespace", "kawa.lib.misc", "namespace");
+    tab.putReaderCtor("namespace", ClassType.make("gnu.mapping.Namespace"));
     tab.putReaderCtorFld("duration", "kawa.lib.numbers", "duration");
     tab.setFinalColonIsKeyword(true);
     return tab;

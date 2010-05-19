@@ -7,7 +7,7 @@ import gnu.lists.Consumer;
 public class Keyword extends Symbol
   implements Printable, Externalizable
 {
-  public static final Namespace keywordNamespace = new Namespace();
+  public static final Namespace keywordNamespace = Namespace.create();
   static { keywordNamespace.setName("(keywords)"); }
 
   public Keyword()

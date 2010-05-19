@@ -23,7 +23,7 @@ public class Namespace
   protected static final Hashtable nsTable = new Hashtable(50);
 
   /** The Namespace with the empty name. */
-  public static final Namespace EmptyNamespace = getInstance("");
+  public static final Namespace EmptyNamespace = valueOf("");
 
   /** Should be interned. */
   String name;
@@ -35,12 +35,12 @@ public class Namespace
   /** Set the name of this Namespace. */
   public final void setName (String name) { this.name = name; }
 
-  public Namespace ()
+  protected Namespace ()
   {
     this(64);
   }
 
-  public Namespace (int capacity)
+  protected Namespace (int capacity)
   {
     log2Size = 4;
     while (capacity > (1 << log2Size))
@@ -48,6 +48,16 @@ public class Namespace
     capacity = 1 << log2Size;
     table = new SymbolRef[capacity];
     mask = capacity - 1;
+  }
+
+  public static Namespace create (int capacity)
+  {
+    return new Namespace(capacity);
+  }
+
+  public static Namespace create ()
+  {
+    return new Namespace(64);
   }
 
   public static Namespace getDefault ()
@@ -60,12 +70,12 @@ public class Namespace
     return EmptyNamespace.getSymbol(name);
   }
 
-  public static Namespace make(String name) // Needed for Literals.
+  public static Namespace valueOf ()
   {
-    return getInstance(name);
+    return EmptyNamespace;
   }
 
-  public static Namespace getInstance(String name)
+  public static Namespace valueOf (String name)
   {
     if (name == null)
       name = "";
@@ -81,10 +91,10 @@ public class Namespace
       }
   }
 
-  public static Namespace make (String uri, String prefix)
+  public static Namespace valueOf (String uri, String prefix)
   {
     if (prefix == null || prefix.length() == 0)
-      return getInstance(uri);
+      return valueOf(uri);
     String xname = prefix + " -> "+ uri;
     synchronized (nsTable)
       {
@@ -99,6 +109,11 @@ public class Namespace
       }
   }
 
+  public static Namespace valueOf (String uri, SimpleSymbol prefix)
+  {
+    return valueOf(uri, prefix == null ? null : prefix.getName());
+  }
+
   /** Create a "placeholder" for a namespace with a known prefix
    * but unknown uri.
    * @see Symbol#makeWithUnknownNamespace
@@ -110,7 +125,7 @@ public class Namespace
       uri = "";
     else
       uri = "http://kawa.gnu.org/unknown-namespace/"+prefix;
-    return Namespace.make(uri, prefix);
+    return Namespace.valueOf(uri, prefix);
   }
 
   public Object get (String key)

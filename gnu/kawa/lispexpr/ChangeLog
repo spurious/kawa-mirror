@@ -1,3 +1,8 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatchMisc.java (read): Fix broken handling of #,(NAME ...).
+	The symbol NAME is no longer implemented by a String, but by a Symbol.
+
 2010-04-01  Per Bothner  <per@bothner.com>
 
 	* LispLanguage.java (bracket_list_sym, bracket_apply_sym):

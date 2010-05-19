@@ -3,9 +3,7 @@
 
 package gnu.kawa.lispexpr;
 import gnu.text.*;
-import gnu.mapping.InPort;
-import gnu.mapping.Values;
-import gnu.mapping.Procedure;
+import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.kawa.util.GeneralHashTable;
@@ -135,9 +133,9 @@ public class ReaderDispatchMisc extends ReadTableEntry
             && ((length
                  = LList.listLength(list = reader.readObject(), false))
                 > 0)
-            && ((Pair) list).getCar() instanceof String)
+            && ((Pair) list).getCar() instanceof Symbol)
           {
-            name = (String) ((Pair) list).getCar();
+            name = ((Pair) list).getCar().toString();
             Object proc = ReadTable.getCurrent().getReaderCtor(name);
             if (proc == null)
               in.error("unknown reader constructor "+name);

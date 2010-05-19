@@ -291,6 +291,10 @@ public class Lexer extends Reader
     tokenBufferLength = len + 1;
   }
 
+  public String tokenBufferString ()
+  {
+    return new String(tokenBuffer, 0, tokenBufferLength);
+  }
 
   private int saveTokenBufferLength = -1;
 

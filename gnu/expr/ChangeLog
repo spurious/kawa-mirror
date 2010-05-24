@@ -1,3 +1,8 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* Keyword.java (keywordNamespace): Namespace constructors are
+	now protected; use factory method instead.
+
 2010-05-07  Per Bothner  <per@bothner.com>
 
 	Avoid writing imported "source" class if current.  I.e. if required

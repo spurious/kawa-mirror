@@ -1,3 +1,8 @@
+2010-05-19  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Update Namespace.getInstance -> valueOf.
+	* XQuery: Likewise.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	* XQResolveNames.java (walkReferenceExp): Change to match changes

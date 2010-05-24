@@ -1,3 +1,8 @@
+2010-05-24  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): If we've seen errors in single-line-mode
+	then skip to end of line.
+
 2010-05-23  Per Bothner  <per@bothner.com>
 
 	* LispReader.java: Change syntax for literal uri in symbols

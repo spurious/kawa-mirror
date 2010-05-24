@@ -79,7 +79,20 @@ public abstract class LispLanguage extends Language
               }
             tr.scanForm(sexp, mexp);
             if ((options & PARSE_ONE_LINE) != 0)
-              break;
+              {
+                if (tr.getMessages().seenErrors())
+                  {
+                    // Skip to end of line.
+                    for (;;)
+                      {
+                        int ch = reader.peek();
+                        if (ch < 0 || ch == '\r' || ch == '\n')
+                          break;
+                        reader.skip();
+                      }
+                  }
+                break;
+              }
             if ((options & PARSE_PROLOG) != 0
                 && tr.getState() >= Compilation.PROLOG_PARSED)
               {

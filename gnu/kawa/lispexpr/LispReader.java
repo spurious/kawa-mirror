@@ -1077,7 +1077,7 @@ public class LispReader extends Lexer
     return LList.Empty;
   }
 
-  protected Object makePair (Object car, int line, int column)
+  protected Pair makePair (Object car, int line, int column)
   {
     String pname = port.getName();
     if (pname != null && line >= 0)
@@ -1089,7 +1089,7 @@ public class LispReader extends Lexer
 
   protected void setCdr (Object pair, Object cdr)
   {
-    ((PairWithPosition) pair).setCdrBackdoor(cdr);
+    ((Pair) pair).setCdrBackdoor(cdr);
   }
 
   /** Read a number from a LispReader

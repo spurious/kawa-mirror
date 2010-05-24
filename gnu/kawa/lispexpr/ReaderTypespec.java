@@ -23,7 +23,6 @@ public class ReaderTypespec extends ReadTableEntry
     int startPos = in.tokenBufferLength;
     LineBufferedReader port = in.getPort();
     ReadTable rtable = ReadTable.getCurrent();
-    ReadTableEntry entry;
     char saveReadState = '\0';
     in.tokenBufferAppend(ch);
     int c = ch;
@@ -59,8 +58,7 @@ public class ReaderTypespec extends ReadTableEntry
 		      && true == (got_open_square = true))
 		     || (got_open_square && c == ']'
 			 && false == (got_open_square = false))
-		     || (null != (entry = rtable.lookup(c))
-			 && entry.getKind() == ReadTable.CONSTITUENT))
+		     || rtable.lookup(c).getKind() == ReadTable.CONSTITUENT)
 		  {
 		      in.tokenBufferAppend(c);
 		      continue;

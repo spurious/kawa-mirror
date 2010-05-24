@@ -1,5 +1,12 @@
 2010-05-24  Per Bothner  <per@bothner.com>
 
+	*  ReadTableEntry.java (illegal): New final field.
+	(getIllegalInstance): New method.
+	* ReadTable.java (lookup): If no entry, default to illegal instance.
+	* LispReader.java: Allows minor simplifications.
+	* ReaderParens.java: Likewise.
+	* ReaderTypespec.java: Likewise.
+
 	* LispReader.java (makePair): Change to more precise return type.
 	(setCdr): Change to more lenient cast.
 

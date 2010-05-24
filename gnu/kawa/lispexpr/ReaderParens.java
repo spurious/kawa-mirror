@@ -103,7 +103,7 @@ public class ReaderParens extends ReadTableEntry
 	      {
 		ch = port.peek();
 		entry = readTable.lookup(ch);
-		int kind = entry == null ? ReadTable.ILLEGAL : entry.getKind();
+		int kind = entry.getKind();
 		if (kind == ReadTable.WHITESPACE
 		    || kind == ReadTable.TERMINATING_MACRO
 		    || kind == ReadTable.ILLEGAL)

@@ -7,6 +7,8 @@ import gnu.text.SyntaxException;
 
 public abstract class ReadTableEntry
 {
+  public static final ReadTableEntry illegal
+    = new ReaderMisc(ReadTable.ILLEGAL);
   public static final ReadTableEntry whitespace
     = new ReaderMisc(ReadTable.WHITESPACE);
   public static final ReadTableEntry singleEscape
@@ -16,6 +18,8 @@ public abstract class ReadTableEntry
   public static final ReadTableEntry constituent
     = new ReaderMisc(ReadTable.CONSTITUENT);
 
+  public static ReadTableEntry getIllegalInstance()
+  { return illegal; }
   public static ReadTableEntry getWhitespaceInstance()
   { return whitespace; }
   public static ReadTableEntry getSingleEscapeInstance()

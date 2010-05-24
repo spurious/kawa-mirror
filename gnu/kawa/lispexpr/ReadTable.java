@@ -222,6 +222,8 @@ public class ReadTable extends RangeTable
 	// Current code assumes lookup(')') returns null.
 	if (entry == null && ch >= 128)
 	  entry = ReadTableEntry.getConstituentInstance();
+        if (entry == null)
+          entry = ReadTableEntry.getIllegalInstance();
       }
     return entry;
   }

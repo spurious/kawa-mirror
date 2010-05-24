@@ -102,18 +102,16 @@ public class LispReader extends Lexer
     // Step 1:
     int startPos = tokenBufferLength;
 
-    if (entry == null)
+    seenEscapes = false;
+    int kind = entry.getKind();
+    switch (kind)
       {
+      case ReadTable.ILLEGAL:
 	// Step 2:
 	String err = ("invalid character #\\"+((char) ch));  // FIXME
 	if (interactive) fatal(err);
 	else error(err);
 	return Values.empty;
-      }
-    int kind = entry.getKind();
-    seenEscapes = false;
-    switch (kind)
-      {
       case ReadTable.WHITESPACE:
 	// Step 3:
 	return Values.empty;
@@ -279,7 +277,8 @@ public class LispReader extends Lexer
 	      break;
 	  }
 	ReadTableEntry entry = rtable.lookup(ch);
-	if (entry == null)
+	int kind = entry.getKind();
+	if (kind == ReadTable.ILLEGAL)
 	  {
 	    if (inEscapes)
 	      {
@@ -290,7 +289,6 @@ public class LispReader extends Lexer
 	    unread(ch);
 	    break;
 	  }
-	int kind = entry.getKind();
         if (ch == rtable.postfixLookupOperator && ! inEscapes)
           {
             int next = port.peek();
@@ -382,13 +380,11 @@ public class LispReader extends Lexer
   protected boolean validPostfixLookupStart (int ch, ReadTable rtable)
       throws java.io.IOException
   {
-    ReadTableEntry entry;
-    if (ch < 0 || ch == ':' || (entry = rtable.lookup(ch)) == null
-        || ch == rtable.postfixLookupOperator)
+    if (ch < 0 || ch == ':' || ch == rtable.postfixLookupOperator)
       return false;
     if (ch == ',')
       return true;
-    int kind = entry.getKind();
+    int kind = rtable.lookup(ch).getKind();
     return kind == ReadTable.CONSTITUENT
       || kind == ReadTable.NON_TERMINATING_MACRO
       || kind == ReadTable.MULTIPLE_ESCAPE

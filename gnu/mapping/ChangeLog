@@ -1,3 +1,10 @@
+2010-05-23  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (parse): Also recognize 'prefix{uri}:local' and
+	'{uri}local'.
+	(toString(char)): New method, to control printing of prefix and uri.
+	(toString): Change to use toString(char).
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* SimpleSymbol.java (valueOf(String)): Move to super-class Symbol.

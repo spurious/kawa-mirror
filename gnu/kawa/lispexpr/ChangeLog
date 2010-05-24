@@ -1,3 +1,11 @@
+2010-05-23  Per Bothner  <per@bothner.com>
+
+	* LispReader.java: Change syntax for literal uri in symbols
+	from 'prefix:{uri}local' (incomplete) to 'prefix{uri}:local'.
+	(returnSymbol, handleToken): Remove and merge into readAndHandleToken.
+	(readToken): Remove redundant case-folding.
+	Instead, do it only in readAndHandleToken.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Update Namespace.getInstance -> valueOf.

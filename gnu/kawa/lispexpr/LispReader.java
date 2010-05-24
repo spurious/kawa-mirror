@@ -63,7 +63,7 @@ public class LispReader extends Lexer
 
   /** Get specification of how symbols should be case-folded.
     * @return Either 'P' (means preserve case), 'U' (upcase),
-    * 'D' (downcase, or 'I' (invert case).
+    * 'D' (downcase), or 'I' (invert case).
     */
   static char getReadCase()
   {
@@ -134,10 +134,128 @@ public class LispReader extends Lexer
   {
     readToken(ch, getReadCase(), rtable);
     int endPos = tokenBufferLength;
-    if (seenEscapes)
-      return returnSymbol(startPos, endPos, rtable);
-    else
-      return handleToken(startPos, endPos, rtable);
+    if (! seenEscapes)
+      {
+        Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
+                                   '\0', 0, SCM_NUMBERS);
+        if (value != null && ! (value instanceof String))
+          return value;
+        /* Common Lisp only?  FIXME
+        if (isPotentialNumber(tokenBuffer, startPos, endPos))
+          {
+            error(value == null ? "not a valid number"
+                  : "not a valid number: " + value);
+            return IntNum.zero();
+          }
+        */
+      }
+
+    char readCase = getReadCase();
+    if (readCase == 'I')
+      {
+	int upperCount = 0;
+	int lowerCount = 0;
+	for (int i = startPos;  i < endPos;  i++)
+	  {
+	    char ci = tokenBuffer[i];
+	    if (ci == TOKEN_ESCAPE_CHAR)
+	      i++;
+	    else if (Character.isLowerCase(ci))
+	      lowerCount++;
+	    else if (Character.isUpperCase(ci))
+	      upperCount++;
+	  }
+	if (lowerCount == 0)
+	  readCase = 'D';
+	else if (upperCount == 0)
+	  readCase = 'U';
+	else
+	  readCase = 'P';
+      }
+
+    boolean handleUri =
+      (endPos >= startPos + 2
+       && tokenBuffer[endPos-1] == '}'
+       && tokenBuffer[endPos-2] != TOKEN_ESCAPE_CHAR
+       && peek() == ':');
+    int packageMarker = -1;
+    int lbrace = -1, rbrace = -1, braceNesting = 0;
+    int j = startPos;
+    boolean uriBad = false;
+    for (int i = startPos;  i < endPos;  i++)
+      {
+	char ci = tokenBuffer[i];
+	if (ci == TOKEN_ESCAPE_CHAR)
+	  {
+	    if (++ i < endPos)
+	      tokenBuffer[j++] = tokenBuffer[i];
+	    continue;
+	  }
+        if (handleUri)
+          {
+            if (ci == '{')
+              {
+                if (lbrace < 0)
+                  lbrace = j;
+                else if (braceNesting == 0)
+                  uriBad = true;
+                braceNesting++;
+              }
+            else if (ci == '}')
+              {
+                braceNesting--;
+                if (braceNesting < 0)
+                   uriBad = true;
+                else if (braceNesting == 0)
+                  {
+                    if (rbrace < 0)
+                      rbrace = j;
+                    else
+                      uriBad = true;
+                  }
+              }
+          }
+        if (braceNesting > 0)
+          ;
+	else if (ci == ':')
+	  packageMarker = packageMarker >= 0 ? -1 : j;
+	else if (readCase == 'U')
+	  ci = Character.toUpperCase(ci);
+	else if (readCase == 'D')
+	  ci = Character.toLowerCase(ci);
+	tokenBuffer[j++] = ci;
+      }
+    endPos = j;
+
+    int len = endPos - startPos;
+
+    if (lbrace >= 0 && rbrace > lbrace)
+      {
+        String prefix = lbrace > 0 ? new String(tokenBuffer, startPos, lbrace-startPos) : null;
+        lbrace++;
+        String uri = new String(tokenBuffer, lbrace, rbrace-lbrace);
+        ch = read(); // skip ':' - previously peeked.
+        ch = read();
+        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+        if (! (rightOperand instanceof SimpleSymbol))
+          error("expected identifier in symbol after '{URI}:'");
+        // FIXME should allow "compound keyword" - for attribute names
+        return Symbol.valueOf(rightOperand.toString(), uri, prefix);
+      }
+
+    if (rtable.initialColonIsKeyword && packageMarker == startPos && len > 1)
+      {
+	startPos++;
+	String str = new String(tokenBuffer, startPos, endPos-startPos);
+	return Keyword.make(str.intern());
+    }
+    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
+        && (len > 1 || seenEscapes))
+      {
+	String str = new String(tokenBuffer, startPos, len - 1);
+	return Keyword.make(str.intern());
+      }
+    return rtable.makeSymbol(new String(tokenBuffer, startPos, len));
   }
 
   public static final char TOKEN_ESCAPE_CHAR = '\uffff';
@@ -213,15 +331,7 @@ public class LispReader extends Lexer
 	    switch (kind)
 	      {
 	      case ReadTable.CONSTITUENT:
-		// ... fall through ...
 	      case ReadTable.NON_TERMINATING_MACRO:
-		if (readCase == 'U'
-		    || (readCase == 'I' && Character.isLowerCase((char) ch)))
-		  ch = Character.toUpperCase((char) ch);
-		else if (readCase == 'D'
-			 || (readCase == 'I'
-			     && Character.isUpperCase((char) ch)))
-		  ch = Character.toLowerCase ((char) ch);
 		tokenBufferAppend(ch);
 		continue;
 	      case ReadTable.MULTIPLE_ESCAPE:
@@ -304,32 +414,7 @@ public class LispReader extends Lexer
             break;
           }
         ch = port.read();
-        Object rightOperand;
-        if (ch2 == '{' && value instanceof SimpleSymbol)
-          {
-            tokenBufferLength = 0;
-            for (;;)
-              {
-                ch = read();
-                if (ch < 0 || ch == '\r' || ch == '\n')
-                  {
-                    error("non-terminated URI in compound symbol");
-                    break;
-                  }
-                if (ch == '}')
-                  break;
-                tokenBufferAppend(ch);
-              }
-            String uri = tokenBufferString();
-            ch = read();
-            rightOperand = readValues(ch, rtable.lookup(ch), rtable);
-            if (rightOperand instanceof SimpleSymbol)
-              return Symbol.make(uri, rightOperand.toString(), value.toString());
-            else
-              error("expected simple symbol");
-          }
-        else
-          rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
         value = LList.list2(value,
                             LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
         value = PairWithPosition.make(LispLanguage.lookup_sym, value,
@@ -807,87 +892,6 @@ public class LispReader extends Lexer
     else
       return IntNum.valueOf(buffer, digits_start, number_of_digits,
 			    radix, negative);
-  }
-
-  protected Object returnSymbol(int startPos, int endPos, ReadTable rtable)
-  {
-    char readCase = getReadCase();
-    if (readCase == 'I')
-      {
-	int upperCount = 0;
-	int lowerCount = 0;
-	for (int i = startPos;  i < endPos;  i++)
-	  {
-	    char ch = tokenBuffer[i];
-	    if (ch == TOKEN_ESCAPE_CHAR)
-	      i++;
-	    else if (Character.isLowerCase(ch))
-	      lowerCount++;
-	    else if (Character.isUpperCase(ch))
-	      upperCount++;
-	  }
-	if (lowerCount == 0)
-	  readCase = 'D';
-	else if (upperCount == 0)
-	  readCase = 'U';
-	else
-	  readCase = 'P';
-      }
-
-    int packageMarker = -1;
-    int j = startPos;
-    for (int i = startPos;  i < endPos;  i++)
-      {
-	char ch = tokenBuffer[i];
-	if (ch == TOKEN_ESCAPE_CHAR)
-	  {
-	    if (++ i < endPos)
-	      tokenBuffer[j++] = tokenBuffer[i];
-	    continue;
-	  }
-	if (ch == ':')
-	  packageMarker = packageMarker >= 0 ? -1 : j;
-	else if (readCase == 'U')
-	  ch = Character.toUpperCase(ch);
-	else if (readCase == 'D')
-	  ch = Character.toLowerCase(ch);
-	tokenBuffer[j++] = ch;
-      }
-    endPos = j;
-
-    int len = endPos - startPos;
-
-    if (rtable.initialColonIsKeyword && packageMarker == startPos && len > 1)
-      {
-	startPos++;
-	String str = new String(tokenBuffer, startPos, endPos-startPos);
-	return Keyword.make(str.intern());
-    }
-    if (rtable.finalColonIsKeyword && packageMarker == endPos - 1
-        && (len > 1 || seenEscapes))
-      {
-	String str = new String(tokenBuffer, startPos, len - 1);
-	return Keyword.make(str.intern());
-      }
-    return rtable.makeSymbol(new String(tokenBuffer, startPos, len));
-  }
-
-  /** Classify and return a token in tokenBuffer from startPos to endPos. */
-  public Object handleToken(int startPos, int endPos,  ReadTable rtable)
-  {
-    Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
-			       '\0', 0, SCM_NUMBERS);
-    if (value != null && ! (value instanceof String))
-      return value;
-    /* Common Lisp only?  FIXME
-    if (isPotentialNumber(tokenBuffer, startPos, endPos))
-      {
-	error(value == null ? "not a valid number"
-	      : "not a valid number: " + value);
-	return IntNum.zero();
-      }
-    */
-    return returnSymbol(startPos, endPos, rtable);
   }
 
   /** Reads a C-style String escape sequence.

@@ -1,3 +1,8 @@
+2010-05-23  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeSymbol): Change from 'prefix:{uri}local'
+	to 'prefix{uri}:local'.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeSymbol): If the output should be readable,

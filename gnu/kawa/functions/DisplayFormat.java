@@ -362,8 +362,9 @@ public class DisplayFormat extends AbstractFormat
     String prefix = sym.getPrefix();
     Namespace namespace = sym.getNamespace();
     String uri = namespace == null ? null : namespace.getName();
+    boolean hasUri = uri != null && uri.length() > 0;
+    boolean hasPrefix = prefix != null && prefix.length() > 0;
     boolean suffixColon = false;
-    boolean writeUri = false;
     if (namespace == Keyword.keywordNamespace)
       {
         if (language == 'C' || language == 'E')
@@ -371,19 +372,17 @@ public class DisplayFormat extends AbstractFormat
         else
           suffixColon = true;
       }
-    else if (prefix != null && prefix.length() > 0)
+    else if (hasPrefix || hasUri)
       {
-        writeSymbol(prefix, out, readable);
+        if (hasPrefix)
+          writeSymbol(prefix, out, readable);
+        if (hasUri && (readable || ! hasPrefix))
+          {
+            out.write('{');
+            out.write(uri);
+            out.write('}');
+          }
         out.write(':');
-        writeUri = readable;
-      }
-    else if (uri != null && uri.length() > 0)
-      writeUri = true;
-    if (writeUri)
-      {
-        out.write('{');
-        out.write(uri);
-        out.write('}');
       }
     writeSymbol(sym.getName(), out, readable);
     if (suffixColon)

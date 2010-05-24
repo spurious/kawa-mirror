@@ -144,8 +144,11 @@ public class Symbol
   /** Parse a String as a Symbol.
    * Recognizes:
    * <ul>
-   * <li>{@code "{namespace-uri}local-name"} - which creates a
+   * <li>{@code "{namespace-uri}:local-name"} - which creates a
    * symbol with that namespace-uri and an empty prefix;
+   * <li>{@code "{namespace-uri}local-name"} - which is the same as above
+   * <li>{@code "prefix{namespace-uri}:local-name"} - which creates a
+   * symbok with that prefix and namespace-uri
    * </li>
    * <li>{@code "prefix:local-name"}- which creates a symbol with that prefix
    * and an "unknown" namespace-uri, using {@link #makeWithUnknownNamespace};
@@ -156,24 +159,59 @@ public class Symbol
    */
   public static Symbol parse (String symbol)
   {
-    if (symbol.length() > 0 && symbol.charAt(0) == '{')
+    int slen = symbol.length();
+    int lbr = -1, rbr = -1;
+    int braceCount = 0;
+    int mainStart = 0;
+    int prefixEnd = 0;
+    for (int i = 0;  i < slen; i++)
       {
-        int rbrace = symbol.lastIndexOf('}');
-        if (rbrace <= 0)
+        char ch = symbol.charAt(i);
+        if (ch == ':' && braceCount == 0)
           {
-            throw new RuntimeException("missing '}' in property name '"+symbol+"'");
+            prefixEnd = i;
+            mainStart = i+1;
+            break;
           }
-        return Symbol.make(symbol.substring(1, rbrace), symbol.substring(rbrace+1), "");
+        if (ch == '{')
+          {
+            if (lbr < 0)
+              {
+                prefixEnd = i;
+                lbr = i;
+              }
+            braceCount++;
+          }
+        if (ch == '}')
+          {
+            braceCount--;
+            if (braceCount == 0)
+              {
+                rbr = i;
+                mainStart = (i < slen && symbol.charAt(i+1) == ':') ? i+2 : i+1;
+                break;
+              }
+            if (braceCount < 0) // error
+              {
+                mainStart = prefixEnd;
+                break;
+              }
+          }
       }
-    int colon = symbol.indexOf(':');
-    if (colon > 0)
+    if (lbr >= 0 && rbr > 0)
       {
-        return Symbol.makeWithUnknownNamespace(symbol.substring(colon+1),
-                                               symbol.substring(0, colon));
+        String uri = symbol.substring(lbr+1, rbr);
+        String prefix = prefixEnd > 0 ? symbol.substring(0, prefixEnd) : null;
+        return Symbol.valueOf(symbol.substring(mainStart), uri, prefix);
+      }
+    else if (prefixEnd > 0)
+      {
+        return Symbol.makeWithUnknownNamespace(symbol.substring(mainStart),
+                                               symbol.substring(0, prefixEnd));
       }
     else
       {
-        return Symbol.make("", symbol, "");
+        return Symbol.valueOf(symbol);
       }
   }
 
@@ -302,25 +340,39 @@ public class Symbol
 
   public String toString()
   {
+    return toString('P');
+  }
+
+  /** Convert a Symbol to a printable String.
+   * @param style if 'P' then print prefix if available (otherwise Uri),
+                  if 'U' then print Uri if available (otherwise prefix),
+                  if '+' then print both if available.
+  */
+  public String toString(char style)
+  {
     // String h = "@"+Integer.toHexString(System.identityHashCode(this));
     String uri = getNamespaceURI();
-    if (uri == null || uri.length() == 0)
-      return getName();
-    StringBuffer sbuf = new StringBuffer();
     String prefix = getPrefix();
-    if (prefix == null || prefix.length() == 0)
+    boolean hasUri = uri != null && uri.length() > 0;
+    boolean hasPrefix = prefix != null && prefix.length() > 0;
+    String name = getName();
+    if (hasUri || hasPrefix)
       {
-        sbuf.append('{');
-        sbuf.append(getNamespaceURI());
-        sbuf.append('}');
+        StringBuilder sbuf = new StringBuilder();
+        if (hasPrefix && (style != 'U' || ! hasUri))
+          sbuf.append(prefix);
+        if (hasUri && (style != 'P' || ! hasPrefix))
+          {
+            sbuf.append('{');
+            sbuf.append(getNamespaceURI());
+            sbuf.append('}');
+          }
+        sbuf.append(':');
+        sbuf.append(name);
+        return sbuf.toString();
       }
     else
-      {
-        sbuf.append(prefix);
-        sbuf.append(':');
-      }
-    sbuf.append(getName());
-    return sbuf.toString();
+      return name;
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

@@ -205,9 +205,14 @@ all: kawa-@VERSION@.jar kawart-@VERSION@.jar
 JAVA_SOURCE = @JAVA_SOURCE@
 
 if WITH_HTTPSERVER
-USE_HTTPSERVER = +use:com.sun.net.httpserver
+PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
 else
-USE_HTTPSERVER = -use:com.sun.net.httpserver
+PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
+endif
+if ENABLE_XML
+PREPROCESS_XML = +enable:XML
+else
+PREPROCESS_XML = -enable:XML
 endif
 
 selected-java-source: Makefile
@@ -280,7 +285,7 @@ select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 
 do-preprocess:
 	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess \
-	  $(SELECTOR) $(USE_HTTPSERVER) \
+	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 

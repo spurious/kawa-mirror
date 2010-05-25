@@ -1,3 +1,9 @@
+2010-05-24  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (PREPROCESS_XML): New mecro.
+	(USE_HTTPSERVER): Rename to PREPROCESS_HTTPSERVER.
+	(do-preprocess): Use new macros.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* configure, aclocal.m4, **/Makefile.in: Re-generate.

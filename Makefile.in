@@ -279,8 +279,10 @@ ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
 JAVADOC_ANT_JARS = $(ECLIPSE_PLUGINS_PATH)/org.apache.ant_1.6.5/lib/ant.jar
 JAVADOC_ECLIPSE_JARS = $(ECLIPSE_PLUGINS_PATH)/org.eclipse.jface_3.1.0.jar:$(ECLIPSE_PLUGINS_PATH)/org.eclipse.swt.gtk.linux.x86_3.1.0.jar
 JAVADOC_EXTRA_PATH = $(JAVADOC_ECLIPSE_JARS):$(JAVADOC_ANT_JARS)
-@WITH_HTTPSERVER_FALSE@USE_HTTPSERVER = -use:com.sun.net.httpserver
-@WITH_HTTPSERVER_TRUE@USE_HTTPSERVER = +use:com.sun.net.httpserver
+@WITH_HTTPSERVER_FALSE@PREPROCESS_HTTPSERVER = -use:com.sun.net.httpserver
+@WITH_HTTPSERVER_TRUE@PREPROCESS_HTTPSERVER = +use:com.sun.net.httpserver
+@ENABLE_XML_FALSE@PREPROCESS_XML = -enable:XML
+@ENABLE_XML_TRUE@PREPROCESS_XML = +enable:XML
 COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
 COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 all: all-recursive
@@ -944,7 +946,7 @@ select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 
 do-preprocess:
 	CLASSPATH=.:$$CLASSPATH $(JAVA) gnu.kawa.util.PreProcess \
-	  $(SELECTOR) $(USE_HTTPSERVER) \
+	  $(SELECTOR) $(PREPROCESS_HTTPSERVER) $(PREPROCESS_XML) \
 	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	$(MAKE) set-selected-java-source JAVA_SOURCE=$(JAVA_SOURCE)
 

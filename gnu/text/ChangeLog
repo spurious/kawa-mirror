@@ -1,3 +1,8 @@
+2010-05-24  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (readUnicodeChar): New method.
+	(readDelimited): New method, moved from QParser.java.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (tokenBufferString): New convenience method.

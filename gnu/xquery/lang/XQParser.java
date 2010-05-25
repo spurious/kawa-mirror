@@ -500,7 +500,7 @@ public class XQParser extends Lexer
     int next;
     for (;;)
       {
-	next = read();
+	next = readUnicodeChar();
 	if (next < 0)
 	  return setToken(EOF_TOKEN, 0);
 	if (next == '\n' || next == '\r')
@@ -586,7 +586,7 @@ public class XQParser extends Lexer
 	char saveReadState = pushNesting ((char) next);
 	for (;;)
 	  {
-	    next = read();
+	    next = readUnicodeChar();
 	    if (next < 0)
 	      eofError("unexpected end-of-file in string starting here");
 	    if (next == '&')
@@ -596,14 +596,12 @@ public class XQParser extends Lexer
 	      }
 	    else if (ch == next)
 	      {
-		next = read ();
+		next = peek();
 		if (ch != next)
-		  {
-		    unread(next);
-		    break;
-		  }
+                  break;
+                next = read();
 	      }
-	    tokenBufferAppend((char) next);
+	    tokenBufferAppend(next);
 	  }
 	popNesting(saveReadState);
 	ch = STRING_TOKEN;
@@ -634,7 +632,7 @@ public class XQParser extends Lexer
 		next = read();
 		if (next == '+' || next == '-')
 		  {
-		    tokenBufferAppend((char) next);
+		    tokenBufferAppend(next);
 		    next = read();
 		  }
 		int expDigits = 0;
@@ -735,33 +733,8 @@ public class XQParser extends Lexer
   public void getDelimited(String delimiter)
       throws java.io.IOException, SyntaxException
   {
-    tokenBufferLength = 0;
-    int dlen = delimiter.length();
-    char last = delimiter.charAt(dlen-1);
-    for (;;)
-      {
-	int ch = read();
-	if (ch < 0)
-	  eofError("unexpected end-of-file looking for '"+delimiter+'\'');
-	int dstart, j;
-	// Look for a match for the last delimiter character.
-	if (ch == last
-	    && (dstart = tokenBufferLength - (j = dlen - 1)) >= 0)
-	  {
-	    // Check that the initial part of the delimiter has also been seen.
-	    do
-	      {
-		if (j == 0)
-		  {
-		    tokenBufferLength = dstart;
-		    return;
-		  }
-		j--;
-	      }
-	    while (tokenBuffer[dstart+j] == delimiter.charAt(j));
-	  }
-	tokenBufferAppend((char) ch);
-      }
+    if (! readDelimited(delimiter))
+      eofError("unexpected end-of-file looking for '"+delimiter+'\'');
   }
 
   public void appendNamedEntity(String name)

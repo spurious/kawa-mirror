@@ -64,6 +64,19 @@ public class Lexer extends Reader
     return port.read();
   }
 
+  public int readUnicodeChar () throws java.io.IOException
+  {
+    int c = port.read();
+    if (c >= 0xD800 && c < 0xDBFF)
+      {
+	int next = port.read();
+        // FIXME: if (c < 0) ????
+	if (next >= 0xDC00 && next <= 0xDFFF)
+	  c = ((c - 0xD800) << 10) + (c - 0xDC00) + 0x10000;
+      }
+    return c;
+  }
+
   public int read(char[] buf, int offset, int length)
     throws java.io.IOException
   {
@@ -225,6 +238,42 @@ public class Lexer extends Reader
     if (overflow)
       return sign == '-' ? Integer.MIN_VALUE : Integer.MAX_VALUE;
     return value;
+  }
+
+  /** Scan until a given delimiter.
+   * On success, text upto the delimiter is in then tokenBuffer (with
+   * tokenBufferLength marking its length); the delimiter is not included.
+   */
+  public boolean readDelimited(String delimiter)
+      throws java.io.IOException, SyntaxException
+  {
+    tokenBufferLength = 0;
+    int dlen = delimiter.length();
+    char last = delimiter.charAt(dlen-1);
+    for (;;)
+      {
+	int ch = read();
+	if (ch < 0)
+	  return false;
+	int dstart, j;
+	// Look for a match for the last delimiter character.
+	if (ch == last
+	    && (dstart = tokenBufferLength - (j = dlen - 1)) >= 0)
+	  {
+	    // Check that the initial part of the delimiter has also been seen.
+	    do
+	      {
+		if (j == 0)
+		  {
+		    tokenBufferLength = dstart;
+		    return true;
+		  }
+		j--;
+	      }
+	    while (tokenBuffer[dstart+j] == delimiter.charAt(j));
+	  }
+	tokenBufferAppend((char) ch);
+      }
   }
 
   /** Read digits, up to the first non-digit or the buffer limit

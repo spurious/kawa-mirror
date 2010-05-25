@@ -6,9 +6,13 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.math.RatNum;
 import gnu.math.IntNum;
-import java.io.PrintWriter;
+import java.io.*;
 import gnu.text.Char;
 import gnu.expr.Keyword;
+/* #ifdef enable:XML */
+import gnu.kawa.xml.KNode;
+import gnu.xml.XMLPrinter;
+/* #endif */
 import gnu.kawa.xml.XmlNamespace;
 import gnu.text.Printable;
 /* #ifdef use:java.util.regex */
@@ -228,6 +232,17 @@ public class DisplayFormat extends AbstractFormat
       {
 	write((Array) obj, 0, 0, out);
       }
+    /* #ifdef enable:XML */
+    else if (obj instanceof KNode)
+      {
+        write("#", out);
+        Writer wout = out instanceof Writer ? (Writer) out
+          : new ConsumerWriter(out);
+        XMLPrinter xout = new XMLPrinter(wout);
+        xout.writeObject(obj);
+        xout.closeThis();
+      }
+    /* #endif */
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable)

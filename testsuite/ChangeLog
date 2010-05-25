@@ -1,3 +1,7 @@
+2010-05-24  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Add some tests of XML literal syntax.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	* HelloCgiK.expected: Update.

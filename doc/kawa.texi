@@ -30,6 +30,9 @@
 @macro stxlit{TEXT}
 @code{@b{\TEXT\}}
 @end macro
+@macro stxlitlbrace
+@code{@b{@{}}
+@end macro
 
 @macro vari{THING}
 @var{\THING\1}
@@ -7996,6 +7999,7 @@ the same functions.
 * Formatting XML::
 * Creating HTML nodes::
 * Creating XML nodes::
+* XML literals::
 * Server-side scripts::  Writing web-server-side Kawa scripts
 * Servlets::             Installing Kawa programs as Servlets
 * CGI scripts::          Installing Kawa programs as CGI scripts
@@ -8116,7 +8120,7 @@ copied.  (In the actual implemention copying is commonly avoided.)
 Kawa/Scheme currently followed the XQuery copying semantics,
 which may not be the most appropriate for Scheme.
 
-@node Creating XML nodes, Server-side scripts, Creating HTML nodes, XML tools
+@node Creating XML nodes, XML literals, Creating HTML nodes, XML tools
 @section Creating XML nodes
 
 The XML data model is similar to HTML, with one important addition:
@@ -8229,7 +8233,191 @@ Crreate a processing-instruction object with the specified @var{target}
 (a simple symbol) and @var{contents} (a string).
 @end deffn
 
-@node Server-side scripts, Servlets, Creating XML nodes, XML tools
+@node XML literals, Server-side scripts, Creating XML nodes, XML tools
+@section XML literals
+
+You can write XML literals directly in Scheme code,
+following a @code{#}:
+@example
+#<p>The result is <b>final</b>!</p>
+@end example
+
+Actually, these are not really a literals since they can contain
+enclosed expressions:
+@example
+#<em>The result is &@{result@}.</em>
+@end example
+The value of @var{result} is substituted into the output,
+in a similar way to quasi-quotation.
+(If you try to quote one of these ``XML literals'',
+what you get is unspecified and is subject to change.)
+
+@display
+@stxdef{xml-literal} @stxlit{#}@var{xml-constructor}
+@stxdef{xml-constructor} @var{xml-element-constructor}
+  | @var{xml-PI-constructor}
+  | @var{xml-comment-constructor}
+  | @var{xml-CDATA-constructor}
+@end display
+
+The important is the @var{xml-element-constructor},
+which takes one of these forms:
+
+@display
+@stxdef{xml-element-constructor}
+    @stxlit{<}@var{QName} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</}@var{QName} @stxlit{>}
+  | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</>}
+  | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{/>}
+@end display
+
+The third variant above is an XML ``empty element'';
+it is equivalent to the second variant
+when there are no @var{xml-element-datum} items.
+
+(Note that every well-formed XML element, as defined in the XML specifications,
+is a valid @var{xml-element-constructor}, but not vice versa.)
+
+The first variant uses a literal @var{QName}, and looks like
+standard non-empty XML element, where the starting @var{QName}
+and the ending @var{QName} must match exactly:
+
+@example
+#<a href="next.html">Next</a>
+@end example
+
+As a convenience, you can leave out the ending tag(s):
+@example
+<para>This is a paragraph in <emphasis>DocBook</> syntax.</>
+@end example
+
+You can use an expression to compute the element tag at runtime:
+@example
+#<p>This is <(if be-bold 'strong 'em)>important</>!</p>
+@end example
+
+@display
+@stxdef{xml-name-form} @var{QName}
+  | @var{xml-enclosed-expression}
+@stxdef{xml-enclosed-expression}
+    @stxlitlbrace{}@var{expression}@stxlit{@}}
+  | @stxlit{(}@var{expression}...@stxlit{)}
+@end display
+
+You can use arbitrary @var{expression} inside curly braces,
+as long as it evaluates to a symbol.
+You can leave out the curly braces
+if the @var{expression} is a simple parenthesised compound expression.
+The previous example is equivalent to:
+@example
+#<p>This is <@{(if be-bold 'strong 'em)@}>important</>!</p>
+@end example
+
+@subsubsection Elements contents (children)
+
+@display
+@stxdef{xml-element-datum}
+    any character except @code{&}, or @code{<}.
+  | @var{xml-constructor}
+  | @var{xml-escaped}
+@stxdef{xml-escaped}
+    @stxlit{&}@var{enclosed-xml-expression}
+  | @stxlit{&}@var{xml-entity-name}@stxlit{;}
+  | @stxlit{&#}@var{decimal-digit}+@stxlit{;}
+  | @stxlit{&#x}@var{hex-digit}+@stxlit{;}
+@end display
+
+@example
+#<p>A&#66;C&#x44;E</p>  @result{}  <p>ABCDE</p>
+@end example
+
+Currently, the only supported values for @var{xml-entity-name}
+are the builtin XML names @code{lt}, @code{gt}, @code{amp},
+@code{quot}, and @code{apos}, which stand for the characters
+@code{<}, @code{>}, @code{&}, @code{"}, and @code{'}, respectively.
+The following two expressions are equivalent:
+@example
+#<p>&lt; &gt; &amp; &quot; &apos;</p>
+#<p>&@{"< > & \" '"@}</p>
+@end example
+
+@subsubsection Attributes
+
+@display
+@stxdef{xml-attribute}
+    @var{xml-name-form}@stxlit{=}@stxlit{"}@var{quot-attribute-datum}*@stxlit{"}
+  | @var{xml-name-form}@stxlit{=}@stxlit{'}@var{apos-attribute-datum}*@stxlit{'}
+@stxdef{quot-attribute-datum}
+    any character except @code{"}, @code{&}, or @code{<}.
+  | @var{xml-escaped}
+@stxdef{apos-attribute-datum}
+    any character except @code{'}, @code{&}, or @code{<}.
+  | @var{xml-escaped}
+@end display
+
+If the @var{xml-name-form} is either @code{xmlns} or
+a compound named with the prefix @code{xmlns}, then
+technically we have a namespace declaration, than
+en attribute.  XXX
+
+@subsection Other XML types
+
+@subsubsection Processing instructions
+
+An @var{xml-PI-constructor} can be used to create an XML
+@dfn{processing instruction}, which can be used to pass
+instructions or annotations to an XML processor (or tool).
+(Alternatively, you can use the @code{processing-instruction}
+type constructor.)
+
+@display
+@stxdef{xml-PI-constructor} @stxlit{<?}@var{xml-PI-target} @var{xml-PI-content}@stxlit{?>}
+@stxdef{xml-PI-target} @var{NCname} (i.e. a simple (non-compound) identifier)
+@stxdef{xml-PI-content} any characters, not containing @code{?>}.
+@end display
+
+For example, the DocBook XSLT stylesheets can use the @code{dbhtml}
+instructions to specify that a specific chapter should be
+written to a named HTML file:
+@example
+#<chapter><?dbhtml filename="intro.html" ?>
+<title>Introduction</title>
+...
+</chapter>
+@end example
+
+@subsubsection XML comments
+
+You can cause XML comments to be emitted in the XML output document.
+Such comments can be useful for humans reading the XML document,
+but are usually ignored by programs.
+(Alternatively, you can use the @code{comment} type constructor.)
+
+@display
+@stxdef{xml-comment-constructor} @stxlit{<!--}@var{xml-comment-content}@stxlit{-->}
+@stxdef{xml-comment-content} any characters, not containing @code{--}.
+@end display
+
+@subsubsection CDATA sections
+
+A @code{CDATA} section can be used to avoid excessive use of
+@var{xml-entity-ref} such as @code{&amp;} in element content.
+
+@display
+@stxdef{xml-CDATA-constructor} @stxlit{<![CDATA[}@var{xml-CDATA-content}@stxlit{]]>}
+@stxdef{xml-CDATA-content} any characters, not containing @code{]]>}.
+@end display
+
+The following are equivalent:
+@example
+#<p>Specal characters <![CDATA[< > & ' "]]> here.</p>
+#<p>Specal characters &lt; &gt; &amp; &quot; &apos; here.</p>
+@end example
+
+Kawa remembers that you used a @code{CDATA} section in
+the @var{xml-element-constructor} and will write it out
+using a @code{CDATA} constructor.
+
+@node Server-side scripts, Servlets, XML literals, XML tools
 @section Writing web-server-side Kawa scripts
 
 You can compile a Kawa program (written in any supported

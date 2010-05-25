@@ -1,3 +1,7 @@
+2010-05-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (XML literals): New section.
+
 2010-05-13  Per Bothner  <per@bothner.com>
 
 	* Kawa.texi (stxdef, stxlit): New macros.

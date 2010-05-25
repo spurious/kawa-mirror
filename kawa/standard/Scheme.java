@@ -1387,6 +1387,7 @@ public class Scheme extends LispLanguage
     tab.putReaderCtorFld("path", "gnu.kawa.lispexpr.LangObjType", "pathType");
     tab.putReaderCtorFld("filepath", "gnu.kawa.lispexpr.LangObjType", "filepathType");
     tab.putReaderCtorFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
+    tab.putReaderCtor("symbol", ClassType.make("gnu.mapping.Symbol"));
     tab.putReaderCtor("namespace", ClassType.make("gnu.mapping.Namespace"));
     tab.putReaderCtorFld("duration", "kawa.lib.numbers", "duration");
     tab.setFinalColonIsKeyword(true);

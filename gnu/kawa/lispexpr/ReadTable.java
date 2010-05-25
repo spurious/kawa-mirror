@@ -80,8 +80,7 @@ public class ReadTable extends RangeTable
     set('@',  entry);
     set('^',  entry);
     set('_',  entry);
-    set('{',  entry);
-    set('}',  entry);
+    set('{',  ReadTableEntry.brace);
     set('~',  entry);
     set('\177',entry);
     set('\b', entry);

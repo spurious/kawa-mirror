@@ -13,6 +13,9 @@ import java.util.*;
 import gnu.kawa.functions.GetNamedPart;
 import gnu.kawa.functions.CompileNamedPart;
 import gnu.text.SourceLocator;
+/* #ifdef enable:XML */
+import gnu.xml.NamespaceBinding;
+/* #endif */
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -49,6 +52,10 @@ public class Translator extends Compilation
   public Object pendingForm;
 
   public LambdaExp curMethodLambda;
+
+  /* #ifdef enable:XML */
+  public NamespaceBinding xmlElementNamespaces = NamespaceBinding.predefinedXML;
+  /* #endif */
 
   public static final Declaration getNamedPartDecl;
   static {

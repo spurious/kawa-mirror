@@ -1,5 +1,7 @@
 2010-05-24  Per Bothner  <per@bothner.com>
 
+	* lang/Translator.java (xmlElementNamespaces): New field.
+
 	* standard/Scheme.java (createReadTable): Add "symbol".
 
 2010-05-19  Per Bothner  <per@bothner.com>

@@ -66,6 +66,9 @@ public class ReaderDispatch extends ReadTableEntry
     /* #endif */
     tab.set('\'', new ReaderQuote(rtable.makeSymbol("function")));
     tab.set('(', new ReaderVector(')'));
+    /* #ifdef enable:XML */
+    tab.set('<', new ReaderXmlElement());
+    /* #endif */
     return tab;
   }
 

@@ -2,6 +2,13 @@
 
 include $(top_srcdir)/Make-rules
 
+if ENABLE_XML
+XML_JSOURCES = \
+  MakeXmlElement.java \
+  ReaderXmlElement.java \
+  ResolveNamespace.java
+endif
+
 java_sources = \
   ClassNamespace.java \
   DefineNamespace.java \
@@ -23,7 +30,8 @@ java_sources = \
   ReaderTypespec.java \
   ReaderVector.java \
   ReadTable.java \
-  ReadTableEntry.java
+  ReadTableEntry.java \
+  $(XML_JSOURCES)
 
 KAWA = $(JAVA) kawa.repl
 

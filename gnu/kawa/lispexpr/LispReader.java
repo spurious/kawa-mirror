@@ -267,6 +267,7 @@ public class LispReader extends Lexer
       throws java.io.IOException, SyntaxException
   {
     boolean inEscapes = false;
+    int braceNesting = 0;
     for (;; ch = read())
       {
 	if (ch < 0)
@@ -286,6 +287,11 @@ public class LispReader extends Lexer
 		tokenBufferAppend(ch);
 		continue;
 	      }
+            if (ch == '}' && --braceNesting >= 0)
+              {
+                tokenBufferAppend(ch);
+		continue;
+              }
 	    unread(ch);
 	    break;
 	  }
@@ -329,6 +335,9 @@ public class LispReader extends Lexer
 	    switch (kind)
 	      {
 	      case ReadTable.CONSTITUENT:
+                if (ch == '{' && entry == ReadTableEntry.brace)
+                  braceNesting++;
+                /* ... fall thotugh ... */
 	      case ReadTable.NON_TERMINATING_MACRO:
 		tokenBufferAppend(ch);
 		continue;

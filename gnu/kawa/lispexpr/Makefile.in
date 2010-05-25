@@ -184,6 +184,11 @@ CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(PACKAGE_OFILE) $(EXTRA_CLEAN)
 KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
   -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`.
 
+@ENABLE_XML_TRUE@XML_JSOURCES = \
+@ENABLE_XML_TRUE@  MakeXmlElement.java \
+@ENABLE_XML_TRUE@  ReaderXmlElement.java \
+@ENABLE_XML_TRUE@  ResolveNamespace.java
+
 java_sources = \
   ClassNamespace.java \
   DefineNamespace.java \
@@ -205,7 +210,8 @@ java_sources = \
   ReaderTypespec.java \
   ReaderVector.java \
   ReadTable.java \
-  ReadTableEntry.java
+  ReadTableEntry.java \
+  $(XML_JSOURCES)
 
 KAWA = $(JAVA) kawa.repl
 PACKAGE_FNAME = gnu-kawa-lispexpr

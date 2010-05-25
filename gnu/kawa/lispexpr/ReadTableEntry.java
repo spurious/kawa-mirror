@@ -17,6 +17,8 @@ public abstract class ReadTableEntry
     = new ReaderMisc(ReadTable.MULTIPLE_ESCAPE);
   public static final ReadTableEntry constituent
     = new ReaderMisc(ReadTable.CONSTITUENT);
+  public static final ReadTableEntry brace // special handling for '{' and '}'
+    = new ReaderMisc(ReadTable.CONSTITUENT);
 
   public static ReadTableEntry getIllegalInstance()
   { return illegal; }

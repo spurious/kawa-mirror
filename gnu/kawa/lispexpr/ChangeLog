@@ -1,5 +1,17 @@
 2010-05-24  Per Bothner  <per@bothner.com>
 
+	* ReaderXmlElement.java: New class, extends ReadTableEntry.
+	Implements XML literals: #<NAME ...>...</>.
+	* MakeXmlElement.java: New Syntax helper class used by the above to
+	handle and declare namespace attributes during the re-write phase.
+	* ResolveNamespace.java: New Syntax helper class to resolve QName
+	literals after namespace declarations are added.
+	* Makefile.am: Update accordingly.
+	* ReaderDispatch.java (create): Map '<' to ReaderXmlElement.
+	* LispReader.java (readToken): Add special handling of '{' and'}'.
+	* ReadTable.java (initialize): Set up above handling.
+	* ReadTableEntry.java (brace): New final field.
+
 	*  ReadTableEntry.java (illegal): New final field.
 	(getIllegalInstance): New method.
 	* ReadTable.java (lookup): If no entry, default to illegal instance.

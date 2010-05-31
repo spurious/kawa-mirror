@@ -1,3 +1,7 @@
+2010-05-31  Per Bothner  <per@bothner.com>
+
+	* XML.scm (element-name, attribute-name): New functions.
+
 2009-12-25  root  <per@bothner.com>
 
 	* testing.scm (%test-source-line2, %test-comp2): Use plain define,

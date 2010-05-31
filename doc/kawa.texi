@@ -8180,6 +8180,11 @@ The predefined @code{html} prefix could be defined thus:
 (define-xml-namespace html "http://www.w3.org/1999/xhtml")
 @end example
 
+The following types and functions assume:
+@example
+(require 'xml)
+@end example
+
 @deffn Procedure make-element tag [attribute ...] child ...
 Create a representation of a XML element, corresponding to
 @example
@@ -8202,15 +8207,18 @@ but it can be any attribute-valued expression.
 @end example
 @end deffn
 
+@deffn Procedure element-name element
+Returns the name (tag) of the element node, as a symbol (QName).
+@end deffn
+
 @deffn Procedure make-attribute name value...
 Create an "attribute", which is a name-value pair.
 For now, @var{name} should be a symbol.
 @end deffn
 
-You must do this to use the following types and functions:
-@example
-(require 'xml)
-@end example
+@deffn Procedure attribute-name element
+Returns the name of the attribute node, as a symbol (QName).
+@end deffn
 
 @deffn Type comment
 Instances of this type represent comment values,

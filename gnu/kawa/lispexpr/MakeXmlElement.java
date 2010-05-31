@@ -19,8 +19,8 @@ public class MakeXmlElement extends Syntax
   public static final MakeXmlElement makeXml = new MakeXmlElement();
   static { makeXml.setName("$make-xml$"); }
 
-  static final ClassType XmlNamespaceClass =
-    ClassType.make("gnu.kawa.xml.XmlNamespace");
+  static final ClassType typeNamespace =
+    ClassType.make("gnu.mapping.Namespace");
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
@@ -39,7 +39,8 @@ public class MakeXmlElement extends Syntax
           }
         Pair namespacePair = (Pair) namespaceList;
         Pair namespaceNode = (Pair) namespacePair.getCar();
-        String nsPrefix = ((String) namespaceNode.getCar()).intern();;
+        String nsPrefix = (String) namespaceNode.getCar();
+        nsPrefix = nsPrefix.length() == 0 ? null : nsPrefix.intern();
         Object valueList = namespaceNode.getCdr();
         StringBuilder sbuf = new StringBuilder();
         while (valueList instanceof Pair)
@@ -76,9 +77,18 @@ public class MakeXmlElement extends Syntax
           = new NamespaceBinding(nsPrefix,
                                  nsUri == "" ? null : nsUri,
                                  nsBindings);
-        Namespace namespace = XmlNamespace.getInstance(nsPrefix, nsUri);
+        Namespace namespace;
+        if (nsPrefix == null)
+          {
+            namespace = Namespace.valueOf(nsUri);
+            nsPrefix = ReaderXmlElement.DEFAULT_ELEMENT_NAMESPACE;
+          }
+        else
+          {
+            namespace = XmlNamespace.getInstance(nsPrefix, nsUri);
+          }
         Symbol nsSymbol = Namespace.EmptyNamespace.getSymbol(nsPrefix);
-        Declaration decl = tr.letVariable(nsSymbol, XmlNamespaceClass,
+        Declaration decl = tr.letVariable(nsSymbol, typeNamespace,
                                           new QuoteExp(namespace));
         decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX|Declaration.TYPE_SPECIFIED);
         // FIXME:  Translator.setLine(decl, p1);

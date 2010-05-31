@@ -25,12 +25,14 @@ public class ReaderXmlElement extends ReadTableEntry
     return LList.list2(q, obj);
   }
 
+  static final String DEFAULT_ELEMENT_NAMESPACE = "[default-element-namespace]";
+
   /** Read either a QName literal or an enclosed QName-producing form.
    * If literal, returns a quoted symbol, and the source literal
    * in the non-empty token-buffer.
    * If non-literal, tokenBufferLength is set to 0.
    */
-  public static Object readQNameExpression (LispReader reader, int ch)
+  public static Object readQNameExpression (LispReader reader, int ch, boolean forElement)
       throws java.io.IOException, SyntaxException
   {
     String file = reader.getName();
@@ -52,12 +54,13 @@ public class ReaderXmlElement extends ReadTableEntry
                 break;
               }
           }
-        if (colon >= 0)
+        if (colon >= 0 || forElement)
           {
-            String prefix = new String(reader.tokenBuffer, 0, colon).intern();
             int llen = reader.tokenBufferLength - colon - 1;
             String local
               = new String(reader.tokenBuffer, colon+1, llen).intern();
+            String prefix = colon < 0 ? DEFAULT_ELEMENT_NAMESPACE
+              : new String(reader.tokenBuffer, 0, colon).intern();
             Symbol psym = Namespace.EmptyNamespace.getSymbol(prefix);
 
             return new Pair(ResolveNamespace.resolveQName,
@@ -234,7 +237,7 @@ public class ReaderXmlElement extends ReadTableEntry
   {
     int startLine = reader.getLineNumber() + 1;
     int startColumn = reader.getColumnNumber() - 2;
-    Object tag = readQNameExpression(reader, ch);
+    Object tag = readQNameExpression(reader, ch, true);
     // Note that we cannot do namespace resolution at reader time,
     // because of constructs like this:  <a x="&{x:v}" xmlns:x="xx"/>
     // Instead we defer namespace lookup until rewrite-time.
@@ -259,7 +262,7 @@ public class ReaderXmlElement extends ReadTableEntry
 	  break;
         if (! sawSpace)
           reader.error("missing space before attribute");
-        Object attrName = readQNameExpression(reader, ch);
+        Object attrName = readQNameExpression(reader, ch, false);
 	int line = reader.getLineNumber() + 1;
 	int column = reader.getColumnNumber() + 1 - reader.tokenBufferLength;
 	String definingNamespace = null;

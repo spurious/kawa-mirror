@@ -31,11 +31,16 @@ public class ResolveNamespace extends Syntax
     Namespace namespace = tr.namespaceResolvePrefix(prefix);
     if (namespace == null)
       {
-        Object savePos = tr.pushPositionOf(pair);
         String pstr = pair.getCar().toString();
-        tr.error('e', "unknown namespace prefix "+pstr);
-        tr.popPositionOf(savePos);
-        namespace = Namespace.valueOf(pstr, pstr);
+        if (pstr == ReaderXmlElement.DEFAULT_ELEMENT_NAMESPACE)
+          namespace = Namespace.EmptyNamespace;
+        else
+          {
+            Object savePos = tr.pushPositionOf(pair);
+            tr.error('e', "unknown namespace prefix "+pstr);
+            tr.popPositionOf(savePos);
+            namespace = Namespace.valueOf(pstr, pstr);
+          }
       }
     if (resolvingQName)
       {

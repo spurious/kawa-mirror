@@ -1,3 +1,15 @@
+2010-05-31  Per Bothner  <per@bothner.com>
+
+	Add support for xmlsns="xxx" - i.e. default namespace declarations.
+	* ReaderXmlElement.java (DEFAULT_ELEMENT_NAMESPACE): New constant.
+	(readQNameExpression): Extra parameter forElement, in which case
+	use DEFAULT_ELEMENT_NAMESPACE if there is no prefix.
+	(readElementConstructor): Update calls to readQNameExpression.
+	* ResolveNamespace.java (rewriteForm): If DEFAULT_ELEMENT_NAMESPACE
+	default to EmptyNamespace.
+	* MakeXmlElement.java (rewriteForm): If prefix is empty,
+	declare namespace declaration using DEFAULT_ELEMENT_NAMESPACE.
+
 2010-05-24  Per Bothner  <per@bothner.com>
 
 	* ReaderXmlElement.java: New class, extends ReadTableEntry.

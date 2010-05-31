@@ -21,6 +21,25 @@
 (define (symbol->string (s <symbol>)) :: constant-string
   (s:toString))
 
+(define-procedure symbol=?
+  (lambda (s1::symbol s2::symbol)::boolean
+	  (gnu.mapping.Symbol:equals s1 s2))
+  (lambda (s1::symbol s2::symbol #!rest r)::boolean
+	  (and (gnu.mapping.Symbol:equals s1 s2)
+	       (apply symbol=? s2 r))))
+
+(define (symbol-local-name s::symbol) ::constant-string
+  (s:getLocalPart))
+
+(define (symbol-namespace s::symbol) ::namespace
+  (s:getNamespace))
+
+(define (symbol-namespace-uri s::symbol) ::constant-string
+  (s:getNamespaceURI))
+
+(define (symbol-prefix s::symbol) ::constant-string
+  (s:getPrefix))
+
 (define (string->symbol (str <string>))
   (gnu.mapping.SimpleSymbol:valueOf (str:toString)))
 

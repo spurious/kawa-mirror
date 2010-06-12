@@ -142,13 +142,28 @@ public class URLPath extends URIPath
 
   public static URLPath classResourcePath (Class clas)
   {
+    URL url;
     try
       {
-        return valueOf(ResourceStreamHandler.makeURL(clas));
+        try
+          {
+            // This throws a SecurityException in the applet case.
+            url = ResourceStreamHandler.makeURL(clas);
+          }
+        catch (SecurityException ex)
+          {
+            // The following assumes we have an actual .class file
+            // (possibly inside a .jar) available in the classpath.
+            // That would be the case in a normal Java environment,
+            // though not (for example) on Android.
+            String classFileName = clas.getName().replace('.', '/')+".class";
+            url = clas.getClassLoader().getResource(classFileName);
+          }
       }
     catch (Throwable ex)
       {
         throw WrappedException.wrapIfNeeded(ex);
       }
+    return valueOf(url);
   }
 }

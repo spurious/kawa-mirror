@@ -1,3 +1,8 @@
+2010-06-11  Per Bothner  <per@bothner.com>
+
+	* URLPath.java (classResourcePath): If we get a SecurityException,
+	try getResource(CLASSNAME+".class");
+
 2010-05-24  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (readUnicodeChar): New method.

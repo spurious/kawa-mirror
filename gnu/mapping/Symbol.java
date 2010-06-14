@@ -126,15 +126,37 @@ public class Symbol
     return (SimpleSymbol) Namespace.EmptyNamespace.getSymbol(name.intern());
   }
 
+  public static Symbol valueOf (String name, Object spec)
+  {
+    if (spec == null || spec == Boolean.FALSE)
+      return makeUninterned(name);
+    Namespace ns;
+    if (spec instanceof Namespace)
+      ns = (Namespace) spec;
+    else if (spec == Boolean.TRUE)
+      ns = Namespace.EmptyNamespace;
+    else
+      {
+        /* #ifdef use:java.lang.CharSequence */
+        spec = (CharSequence) spec;
+        /* #else */
+        //spec = (CharSeq) spec;
+        /* #endif */
+        ns = Namespace.valueOf(spec.toString());
+      }
+    return ns.getSymbol(name.intern());
+  }
+
+  /* Redundant, and cause method invocation to pick the wrong method.
   public static Symbol valueOf (String name, Namespace namespace)
   {
     return namespace.getSymbol(name.intern());
   }
-
   public static Symbol valueOf (String name, String namespace)
   {
     return Namespace.valueOf(namespace).getSymbol(name.intern());
   }
+  */
 
   public static Symbol valueOf (String name, String namespace, String prefix)
   {

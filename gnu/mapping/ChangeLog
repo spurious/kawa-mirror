@@ -1,3 +1,9 @@
+2010-06-14  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (valueOf[2-argument]): Combine two methods to one that
+	takes an Object argument, and add some extra options.  Avoids certain
+	problems with method resolution.
+
 2010-06-13  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (equals): Revert 2010-05-19 change (but add comment and

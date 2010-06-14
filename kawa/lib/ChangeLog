@@ -1,3 +1,7 @@
+2010-06-14  Per Bothner  <per@bothner.com>
+
+	* misc.scm (namespace-uri, namespace-prefix): New functions.
+
 2010-05-31  Per Bothner  <per@bothner.com>
 
 	* misc.scm (symbol=?, symbol-local-name, symbol-namespace,

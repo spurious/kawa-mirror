@@ -1,5 +1,7 @@
 2010-06-14  Per Bothner  <per@bothner.com>
 
+	* Namespace.java (getPrefix): New method.
+
 	* Symbol.java (valueOf[2-argument]): Combine two methods to one that
 	takes an Object argument, and add some extra options.  Avoids certain
 	problems with method resolution.

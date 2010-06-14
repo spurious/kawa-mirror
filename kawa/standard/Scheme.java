@@ -202,11 +202,13 @@ public class Scheme extends LispLanguage
       defProcStFld("symbol?", "kawa.lib.misc");
       defProcStFld("symbol->string", "kawa.lib.misc");
       defProcStFld("string->symbol", "kawa.lib.misc");
-      defProcStFld("symbol=?", "kawa.ib.misc");
+      defProcStFld("symbol=?", "kawa.lib.misc");
       defProcStFld("symbol-local-name", "kawa.lib.misc");
       defProcStFld("symbol-namespace", "kawa.lib.misc");
       defProcStFld("symbol-namespace-uri", "kawa.lib.misc");
       defProcStFld("symbol-prefix", "kawa.lib.misc");
+      defProcStFld("namespace-uri", "kawa.lib.misc");
+      defProcStFld("namespace-prefix", "kawa.lib.misc");
 
       //-- Section 6.5
       defProcStFld("number?", "kawa.lib.numbers");

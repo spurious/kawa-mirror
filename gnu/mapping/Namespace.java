@@ -35,6 +35,8 @@ public class Namespace
   /** Set the name of this Namespace. */
   public final void setName (String name) { this.name = name; }
 
+  public final String getPrefix () { return prefix; }
+
   protected Namespace ()
   {
     this(64);

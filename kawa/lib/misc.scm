@@ -40,6 +40,12 @@
 (define (symbol-prefix s::symbol) ::constant-string
   (s:getPrefix))
 
+(define (namespace-uri (ns::gnu.mapping.Namespace)) ::string
+  (invoke ns 'getName))
+
+(define (namespace-prefix (ns::gnu.mapping.Namespace)) ::string
+  (invoke ns 'getPrefix))
+
 (define (string->symbol (str <string>))
   (gnu.mapping.SimpleSymbol:valueOf (str:toString)))
 

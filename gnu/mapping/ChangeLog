@@ -1,3 +1,9 @@
+2010-06-13  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (equals): Revert 2010-05-19 change (but add comment and
+	minor simplification) - uninterned symbols should only be equals if
+	they're the same Symbol object.
+
 2010-05-23  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (parse): Also recognize 'prefix{uri}:local' and

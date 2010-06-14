@@ -292,9 +292,10 @@ public class Symbol
       {
         Namespace namespace1 = sym1.namespace;
         Namespace namespace2 = sym2.namespace;
-        return namespace1 == namespace2
-          || (namespace1 != null && namespace2 != null
-              && namespace1.name == namespace2.name);
+        // If a namespace is null, it means an uninterned symbol,
+        // which is only equals to the same Symbol instance.
+        if (namespace1 != null && namespace2 != null)
+          return namespace1.name == namespace2.name;
       }
     return false;
   }

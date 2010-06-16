@@ -1,3 +1,8 @@
+2010-06-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Update and add details about compound symbols and
+	namespaces.
+
 2010-05-31  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Creating XML nodes): Document new functions element-name

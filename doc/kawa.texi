@@ -1674,65 +1674,221 @@ An identifier is a name that appears in a program.
 A symbol is an object representing a string that cannot be
 modified. This string is called the symbol's name. Unlike strings, two
 symbols whose names are spelled the same way are indistinguishable.
-A symbol immutable (unmodifyable) and normally viewed as atomic.
+A symbol is immutable (unmodifiable) and normally viewed as atomic.
 Symbols are useful for many applications; for instance, they may be
 used the way enumerated values are used in other languages.
 
+In addition to the simple symbols or standard Scheme, Kawa
+also has compound (two-part) symbols.
+
 @menu
+* Simple symbols::
 * Namespaces::
 * Keywords::
 * Special named constants::
 @end menu
 
-@node Namespaces, Keywords, , Symbols and namespaces
+@node Simple symbols, Namespaces, , Symbols and namespaces
+@section Simple symbols
+
+Simple symbols have no properties other than their name, an immutable string.
+They have the useful property that two simple symbols
+are identical (in the sense of @func{eq?}, @func{eqv?} and
+@func{equal?}) if and only if their names are spelled the same way.  A
+symbol literal is formed using @func{quote}.
+
+@deffn Procedure {symbol?} @var{obj}
+Return @true{} if @var{obj} is a symbol, @false{} otherwise.
+
+@example
+(symbol? 'foo)          @result{} #t
+(symbol? (car '(a b)))  @result{} #t
+(symbol? "bar")         @result{} #f
+(symbol? 'nil)          @result{} #t
+(symbol? '())           @result{} #f
+(symbol? #f)            @result{} #f
+@end example
+@end deffn
+
+@deffn Procedure {symbol->string} @var{symbol}
+Return the name of @var{symbol} as an immutable string.
+
+@example
+(symbol->string 'flying-fish)                   @result{}  "flying-fish"
+(symbol->string 'Martin)                        @result{}  "Martin"
+(symbol->string (string->symbol "Malvina"))     @result{}  "Malvina"
+@end example
+@end deffn
+
+@deffn Procedure {string->symbol} @var{string}
+Return the symbol whose name is @var{string}.
+
+@example
+(eq? 'mISSISSIppi 'mississippi)
+@result{} #f
+
+(string->symbol "mISSISSIppi")
+@result{} the symbol with name "mISSISSIppi"
+
+(eq? 'bitBlt (string->symbol "bitBlt"))
+@result{} #t
+
+(eq? 'JollyWog (string->symbol (symbol->string 'JollyWog)))
+@result{} #t
+
+(string=? "K. Harper, M.D."
+          (symbol->string (string->symbol "K. Harper, M.D.")))
+@result{} #t
+@end example
+@end deffn
+
+@node Namespaces, Keywords, Simple symbols, Symbols and namespaces
 @section Namespaces and compound symbols
 
-A compound symbol is one whose name is unique
-within a specific namespace, rather than globally.
-It is written using the infix colon operator:
-@example
-@var{namespace}:@var{local-name}
-@end example
+Different applications may want to use the same symbol
+to mean different things.  To avoid such @dfn{name clashes}
+we can use @dfn{compound symbols}, which have two string parts:
+a @dfn{local name} and a @dfn{namespace URI}.
+The namespace-uri can be any string, but it is
+recommended that it have the form of an absolute
+@uref{http://en.wikipedia.org/wiki/Uniform_Resource_Identifier,URI}.
+It would be too verbose to write the full URI all the
+time, so one usually uses a @dfn{namespace prefix}
+(namespace alias) as a short local alias to refer to a
+namespace URI.
 
-A namespace is a mapping from @var{local-name} strings to symbols.
-A simple namespace is named by a string,
-and there is only one such namespace by that name.
-A namespace is usually referenced using a shorter @dfn{namespace prefix},
-as in this example:
+Compound symbols are usually written using the infix colon operator:
 @example
-(define-namespace geom "http://foo.org/lib/geometry")
-(define (geom:translate x y)
-  (java.awt.geom.AffineTransform:getTranslateInstance x y))
-(define geom:zero (geom:translate 0 0))
-geom:zero
-  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+@var{prefix}@b{:}@var{local-name}
 @end example
+where @var{prefix} is is namespace alias bound
+to some (lexically-known) namespace URI.
 
-@deffn Procedure namespace namespace-name
-Return the simple namespace whose name is the @var{namespace-name}, a string.
+Compound symbols are used for namespace-aware XML processing.
+
+@subsection Namespace objects
+
+A @dfn{namespace} is a mapping from strings to symbols.
+The string is the local-name of resulting symbol.
+A namespace is similar to a Commn Lisp @dfn{package}.
+
+A namespace has a namespace-uri, which a string;
+it recommended that it have the form of an absolute URI.
+A namespace may optionally have a prefix, which is a string used
+when printing out symbols belonging to the namespace.
+If you want ``equivalent symbols'' (i.e. those that have the same
+local-name and same uri) to be the identical symbol object, then
+you should use namespaces whose prefix is the empty string.
+
+@deffn Constructor namespace name [prefix]
+Return a namespace with the given @var{name} and @var{prefix}.
 If no such namespace exists, create it.
 The @var{namespace-name} is commonly a URI, especially when working with XML,
 in which case it is called a @var{namespace-URI}.  However, any non-empty
-string is allowed.  Two namespaces are the same (@code{eq?}) if they have
-the same (@code{equal?}) @var{namespace-name}s.
+string is allowed.
+The prefix can be a string or a simple symbol.
+(If a symbol is used, then the symbol's local-name is used.)
+The default for @var{prefix} is the empty string.
+Multiple calls with the same arguments will yield the same namespace object.
 @end deffn
-
-You can use a namespace-value directly in a compound name:
-@example
-(namespace "http://foo.org/lib/geometry"):zero
-  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
-@end example
 
 The reader macro @code{#,namespace} is equivalent to the
 @code{namespace} function, but it is invoked at read-time:
 @example
+#,(namespace "http://www.w3.org/1999/XSL/Transform" xsl)
 (eq? #,(namespace "foo") (namespace "foo")) @result{} #t
 @end example
 
+The form @code{(,#namespace "" "")} returns the default @dfn{empty namespace},
+which is used for simple symbols.
+
+@deffn Procedure namespace-uri namespace
+Return the namespace-uri of the argument @var{namespace}, as a string.
+@end deffn
+
+@deffn Procedure namespace-prefix namespace
+Return the namespace prefix of the argument @var{namespace}, as a string.
+@end deffn
+
+@subsection Compound symbols
+
+A compound symbol is one that belongs to a namespace other than the
+default empty namespace, and (normally) has a non-empty namespace uri.
+(It is possible for a symbol to belong to a non-default namespace
+and have an empty namespace uri, but that is not recommended.)
+
+@deffn Constructor symbol local-name namespace-spec
+@deffnx Constructor symbol local-name [uri [prefix]]
+Construct a symbol with the given @var{local-name} and namespace.
+If @var{namespace-spec} is a namespace object, then find (or if needed
+construct) a symbol with the given @var{local-name} belonging to the
+namespace.  Multiple calls to @code{symbol} with the same namespace
+and @var{local-name} will yield the same symbol object.
+
+If uri is a string (optionally followed by a prefix),
+then:
+@example
+(symbol lname uri [prefix])
+@end example
+is equivalent to:
+@example
+(symbol lname (namespace uri [prefix]))
+@end example
+
+Using @code{#t} for the @var{namespace-spec} is equivalent to
+using the empty namespace @code{#,(namespace "")}.
+
+Using @code{#!null} or @code{#f} for the @var{namespace-spec}
+creates an @var{uninterned} symbol, which does not belong to
+any namespace.
+@end deffn
+
+@deffn Procedure symbol-local-name symbol
+Return the local name of the argument symbol, as an immutable string.
+(The string is interned, except in the case of an uninterned symbol.)
+@end deffn
+
+@deffn Procedure symbol-prefix symbol
+Return the prefix of the argument symbol, as an immutable
+(and interned) string.
+@end deffn
+
+@deffn Procedure symbol-namespace-uri symbol
+Return the namespace uri of the argument symbol, as an immutable
+(and interned) string.
+@end deffn
+
+@deffn Procedure symbol-namespace symbol
+Return the namespace object (if any) of the argument symbol.
+Returns @code{#!null} if the symbol is uninterned.
+@end deffn
+
+@deffn Procedure {symbol=?} @vari{symbol} @varii{symbol} @variii{symbol} @dots{}
+Return @true{} if the symbols are equivalent as symbols,
+i.e., if their local-names and namespace-uris are the same.
+They may have different values of @code{symbol-prefix} and @code{symbol-namespace}.
+If a symbol is uninterned (or is @code{#!null}) then @code{symbol=?}
+returns the same result as @code{eq?}.
+@end deffn
+
+Two symbols are @code{equal?} or @code{eqv?} if they're @code{symbol=?}.
+
+@subsection Namespace aliases
+
+A namespace is usually referenced using a shorter @dfn{namespace alias},
+which is is a lexical definition that binds a namespace prefix
+to a namespace object (and thus a namespace uri).
+This allows using compound symbols as identifiers in Scheme programs.
+
 @deffn Syntax define-namespace name namespace-name
 Defines @var{name} as a @dfn{namespace prefix} - a lexically scoped
-"nickname" for the namespace (or package)
-whose full name is @var{namespace-name}, which should be a string literal.
+"nickname" for the namespace
+whose full name is @var{namespace-name}, which should be a non-empty
+string literal.
+It is customary for the string have syntactic form of
+a @uref{http://en.wikipedia.org/wiki/Uniform_Resource_Identifier,URI},
+but any non-empty string is acceptable and is used without
+further interpretation.
 
 Any symbols in the scope of this definitions that contain a colon, and
 where the part before the colon matches the @var{name} will be
@@ -1749,11 +1905,16 @@ is recommended if you want to use compound symbols as names of
 variables, especially local variables, or if you want to quote
 compound symbols.
 
-(A namespace is similar to a Common Lisp package,
+Note that the prefix is only visible lexically: it is not
+part of the namespace, or thus indirectly the symbols, and
+so is not available when printing the symbol.
+You might consider using @code{define-xml-namespace} as an alternative.
+
+A namespace is similar to a Common Lisp package,
 and the @var{namespace-name} is like the name of the package.
 However, a namespace alias belongs to the lexical scope,
 while a Common Lisp package nickname is global
-and belongs to the package itself.)
+and belongs to the package itself.
 
 If the namespace-name starts with the string @code{"class:"}, then the
 @var{name} can be used for invoking Java methods
@@ -1768,7 +1929,94 @@ Same as @code{define-namespace}, but the prefix @var{name}
 is local to the current module.
 @end deffn
 
+For example you might have a set of a geometry definitions
+defined under the namespace-uri @code{"http://foo.org/lib/geometry"}:
+
+@example
+(define-namespace geom "http://foo.org/lib/geometry")
+(define (geom:translate x y)
+  (java.awt.geom.AffineTransform:getTranslateInstance x y))
+(define geom:zero (geom:translate 0 0))
+geom:zero
+  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+@end example
+
+You could have some other definitions for complex math:
+@example
+(define-namespace complex "http://foo.org/lib/math/complex")
+(define complex:zero +0+0i)
+@end example
+
+You can use a namespace-value directly in a compound name:
+@example
+(namespace "http://foo.org/lib/geometry"):zero
+  @result{} AffineTransform[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+@end example
+
 The variation @code{define-xml-namespace} is used for @ref{Creating XML nodes}.
+
+@deffn Syntax define-xml-namespace prefix "namespace-uri"
+Defines a namespace with prefix @var{prefix} and URI @var{namespace-uri}.
+This is similar to @code{define-namespace} but with two important differences:
+@itemize
+@item
+Every symbol in the namespace automatically maps to
+an element-constructor-type, as with  the @code{html} namespace.
+@item
+The @var{prefix} is a component of the namespace object, and
+hence indirectly of any symbols belongining to the namespace.
+@end itemize
+
+Thus the definition is roughly equivalent to:
+@example
+(define-constant @var{name} #,(namespace @var{namespace-name name})
+@end example
+along with an infinite set of definitions, for every possible @var{tag}:
+@example
+(define (name:@var{tag} . rest) (apply make-element 'name:@var{tag} rest))
+@end example
+
+@end deffn
+
+@example
+$ kawa --output-format xml
+#|kawa:1|# (define-xml-namespace na "Namespace1")
+#|kawa:2|# (define-xml-namespace nb "Namespace1")
+#|kawa:3|# (define xa (na:em "Info"))
+#|kawa:4|# xa
+<na:em xmlns:na="Namespace1">Info</na:em>
+#|kawa:5|# (define xb (nb:em "Info"))
+#|kawa:6|# xa
+<nb:em xmlns:nb="Namespace1">Info</nb:em>
+@end example
+
+Note that the prefix is part of the qualified name
+(it is actually part of the namespace object),
+and it is used when printing the tag.
+Two qualified names (symbols) that have the same
+local-name and the same namespace-name are considered
+equal, even if they have different prefix.  You can think of
+the prefix as annotation used when printing, but not
+otherwise part of the ``meaning'' of a compound symbol.
+They are the same object if they also have the same prefix.
+This is an important different from traditional Lisp/Scheme symbols,
+but it is how XML QNames work.
+@example
+#|kawa:7|# (instance? xb na:em)
+true
+#|kawa:8|# (eq? 'na:em 'nb:em)
+false
+#|kawa:9|# (equal? 'na:em 'nb:em)
+true
+#|kawa:10|# (eqv? 'na:em 'nb:em)
+true
+@end example
+(Note that @code{#t} is printed as @code{true} when using XML formatting.)
+
+The predefined @code{html} prefix could be defined thus:
+@example
+(define-xml-namespace html "http://www.w3.org/1999/xhtml")
+@end example
 
 @node Keywords, Special named constants, Namespaces, Symbols and namespaces
 @section Keywords
@@ -8127,57 +8375,9 @@ The XML data model is similar to HTML, with one important addition:
 XML tags may be @dfn{qualified names}, which are similar
 to @ref{Namespaces, , compound symbols}.
 
-@deffn Syntax define-xml-namespace prefix "namespace-uri"
-Defines a namespace with prefix @var{prefix} and URI @var{namespace-uri}.
-This is similar to @code{define-namespace} but with two important differences:
-@itemize
-@item
-Every symbol in the namespace automatically maps to
-an element-constructor-type, as with  the @code{html} namespace.
-@item
-The @var{prefix} is a component of the namespace object, and
-hence indirectly of any symbols belongining to the namespace.
-@end itemize
-@end deffn
-
+You must do this to use the following types and functions:
 @example
-$ kawa --output-format xml
-#|kawa:1|# (define-xml-namespace na "Namespace1")
-#|kawa:2|# (define-xml-namespace nb "Namespace1")
-#|kawa:3|# (define xa (na:em "Info"))
-#|kawa:4|# xa
-<na:em xmlns:na="Namespace1">Info</na:em>
-#|kawa:5|# (define xb (nb:em "Info"))
-#|kawa:6|# xa
-<nb:em xmlns:nb="Namespace1">Info</nb:em>
-@end example
-
-Note that the prefix is part of the qualified name
-(it is actually part of the namespace object),
-and it is used when printing the tag.
-Two qualified names (symbols) that have the same
-local-name and the same namespace-name are considered
-equal, even if they have different prefix.  You can think of
-the prefix as annotation used when printing, but not
-otherwise part of the ``meaning'' of a compound symbol.
-They are the same object if they also have the same prefix.
-This is an important different from traditional Lisp/Scheme symbols,
-but it is how XML QNames work.
-@example
-#|kawa:7|# (instance? xb na:em)
-true
-#|kawa:8|# (eq? 'na:em 'nb:em)
-false
-#|kawa:9|# (equal? 'na:em 'nb:em)
-true
-#|kawa:10|# (eqv? 'na:em 'nb:em)
-true
-@end example
-(Note that @code{#t} is printed as @code{true} when using XML formatting.)
-
-The predefined @code{html} prefix could be defined thus:
-@example
-(define-xml-namespace html "http://www.w3.org/1999/xhtml")
+(require 'xml)
 @end example
 
 The following types and functions assume:
@@ -8245,12 +8445,19 @@ Crreate a processing-instruction object with the specified @var{target}
 @section XML literals
 
 You can write XML literals directly in Scheme code,
-following a @code{#}:
+following a @code{#}.
+Notice that the outermost element needs to be prefixed
+by @code{#}, but nested elements do (and must not).
 @example
 #<p>The result is <b>final</b>!</p>
 @end example
 
-Actually, these are not really a literals since they can contain
+
+@display
+@stxdef{xml-literal} @stxlit{#}@var{xml-constructor}
+@end display
+
+Actually, these are not really literals since they can contain
 enclosed expressions:
 @example
 #<em>The result is &@{result@}.</em>
@@ -8321,6 +8528,11 @@ The previous example is equivalent to:
 @end example
 
 @subsubsection Elements contents (children)
+
+The ``contents'' (children) of an element
+are a sequence of character (text) data, and nested nodes.
+The characters @code{&}, @code{<}, and @code{>} are special,
+and need to be escaped.
 
 @display
 @stxdef{xml-element-datum}

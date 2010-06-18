@@ -34,6 +34,18 @@
 @code{@b{@{}}
 @end macro
 
+@macro arbno{THING}
+\THING\*
+@end macro
+
+@macro atleastone{THING}
+\THING\+
+@end macro
+
+@macro meta{THING}
+@var{\THING\}
+@end macro
+
 @macro vari{THING}
 @var{\THING\1}
 @end macro
@@ -147,7 +159,7 @@ This package has nothing to do with the defunct
 * Installation::         Building and installing Kawa
 * Running::              Invoking, Running, and Using Kawa
 * Features::             Summary of Kawa Scheme Features
-* Syntax and conditional compilation::
+* Syntax::
 * Multiple values::
 * Symbols and namespaces::
 * Procedures::
@@ -1296,7 +1308,7 @@ the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
 
-@node Features, Syntax and conditional compilation, Running, Top
+@node Features, Syntax, Running, Top
 @chapter Summary of Kawa Scheme Features
 
 This manual mostly documents how Kawa Scheme differs from
@@ -1448,8 +1460,470 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
-@node Syntax and conditional compilation, Multiple values, Features, Top
-@chapter Syntax and conditional compilation
+@node Syntax, Multiple values, Features, Top
+@chapter Syntax
+
+@menu
+* Syntax notation::
+* Lexical and datum syntax::
+* Lexical syntax::
+* Datum syntax::
+* Hash-prefixed forms::
+* Syntax and conditional compilation::
+@end menu
+
+@node Syntax notation, Lexical and datum syntax, , Syntax
+@section Notation
+
+The formal syntax for Kawa Scheme is written in an extended @acronym{BNF}.
+Non--terminals are written @var{like-this}.  Case is insignificant
+for non--terminal names.
+Literal text (terminals) are written @stxlit{like this}.
+
+All spaces in the grammar are for legibility.
+@c  @meta{Empty} stands for the empty string.
+
+The following extensions to @acronym{BNF} are used to make the
+description more concise: @arbno{@meta{thing}} means zero or more
+occurrences of @meta{thing}, and @atleastone{@meta{thing}} means at
+least one @meta{thing}.
+
+Some non-terminal names refer to the Unicode scalar values of the same
+name: @meta{character tabulation} (U+0009), @meta{linefeed} (U+000A),
+@meta{carriage return} (U+000D), @meta{line tabulation} (U+000B),
+@meta{form feed} (U+000C), @meta{space} (U+0020), @meta{next line}
+(U+0085), @meta{line separator} (U+2028), and @meta{paragraph separator}
+(U+2029).
+
+@node Lexical and datum syntax, Lexical syntax, Syntax notation, Syntax
+@section Lexical and datum syntax
+
+The syntax of Scheme code is organized in three levels:
+
+@enumerate
+@item
+the @emph{lexical syntax} that describes how a program text is split
+into a sequence of lexemes,
+
+@item
+the @emph{datum syntax}, formulated in terms of the lexical syntax, that
+structures the lexeme sequence as a sequence of @emph{syntactic data},
+where a syntactic datum is a recursively structured entity,
+
+@item
+the @emph{program syntax} formulated in terms of the datum syntax,
+imposing further structure and assigning meaning to syntactic data.
+@end enumerate
+
+Syntactic data (also called @emph{external representations}) double as a
+notation for objects, and the @func{read} and
+@func{write} procedures can be used for reading and writing syntactic data,
+converting between their textual representation and the corresponding
+objects.  Each syntactic datum represents a corresponding
+@emph{datum value}.  A syntactic datum can be used in a program to obtain the
+corresponding datum value using @code{quote}.
+@c FIXME (@ref{base expressions quotation}).
+
+Scheme source code consists of syntactic data and (non--significant)
+comments.  Syntactic data in Scheme source code are called @emph{forms}.
+(A form nested inside another form is called a @emph{subform}.)
+Consequently, Scheme's syntax has the property that any sequence of
+characters that is a form is also a syntactic datum representing some
+object.  This can lead to confusion, since it may not be obvious out of
+context whether a given sequence of characters is intended to be a
+representation of objects or the text of a program.  It is also a source
+of power, since it facilitates writing programs such as interpreters or
+compilers that treat programs as objects (or vice versa).
+
+A datum value may have several different external representations.  For
+example, both @code{#e28.000} and @code{#x1c} are syntactic data
+representing the exact integer object 28, and the syntactic data
+@code{(8 13)}, @code{( 08 13 )}, @code{(8 . (13 . ()))} all represent a
+list containing the exact integer objects 8 and 13.  Syntactic data that
+represent equal objects (in the sense of @func{equal?})
+are always equivalent as forms of a program.
+
+Because of the close correspondence between syntactic data and datum
+values, we sometimes uses the term @emph{datum} for either a
+syntactic datum or a datum value when the exact meaning is apparent from
+the context.
+
+@c An implementation must not extend the lexical or datum syntax in any
+@c way, with one exception: it need not treat the syntax
+@c @code{#!<identifier>}, for any <identifier> (@ref{lex syntax
+@c identifiers}) that is not @code{r6rs}, as a syntax violation, and it may
+@c use specific @code{#!}--prefixed identifiers as flags indicating that
+@c subsequent input contains extensions to the standard lexical or datum
+@c syntax.  The syntax @code{#!r6rs} may be used to signify that the input
+@c afterward is written with the lexical syntax and datum syntax described
+@c by this report.  @code{#!r6rs} is otherwise treated as a comment;
+@c @ref{lex syntax whitespace and comments}.
+
+@node Lexical syntax, Datum syntax, Lexical and datum syntax, Syntax
+@section Lexical syntax
+
+The lexical syntax determines how a character sequence is split into a
+sequence of lexemes, omitting non--significant portions such as comments
+and whitespace.  The character sequence is assumed to be text according
+to the @uref{http://unicode.org/,Unicode standard}.
+Some of the lexemes, such as
+identifiers, representations of number objects, strings etc., of the
+lexical syntax are syntactic data in the datum syntax, and thus
+represent objects.  Besides the formal account of the syntax, this
+section also describes what datum values are represented by these
+syntactic data.
+
+The lexical syntax, in the description of comments, contains a forward
+reference to @meta{datum}, which is described as part of the datum
+syntax.  Being comments, however, these @meta{datum}s do not play a
+significant role in the syntax.
+
+Case is significant except in representations of booleans, number
+objects, and in hexadecimal numbers specifying Unicode scalar values.
+For example, @code{#x1A} and @code{#X1a} are equivalent.  The identifier
+@code{Foo} is, however, distinct from the identifier @code{FOO}.
+
+@subsection Formal account
+
+@noindent
+@meta{Interlexeme space} may occur on either side of any lexeme, but not
+within a lexeme.
+
+@meta{Identifier}s, @code{.}, @meta{number}s, @meta{character}s, and
+@meta{boolean}s, must be terminated by a @meta{delimiter} or by the end
+of the input.
+
+@c The following two characters are reserved for future extensions to the
+@c language: @code{@{ @}}
+
+@display
+@stxdef{lexeme} @var{identifier} | @var{boolean} | @var{number}
+         | @var{character} | @var{string}
+         | @stxlit{(} |  @stxlit{)} |  @stxlit{[} |  @stxlit{]} |  @stxlit{#(}
+@c | #vu8( |
+         | @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@} | @stxlit{.}
+         | @stxlit{#'} |  @stxlit{#`} |  @stxlit{#,} |  @stxlit{#,@@}
+@stxdef{delimiter} @stxlit{(} |  @stxlit{)} |  @stxlit{[} | @stxlit{]} | @stxlit{"} | @stxlit{}; | @stxlit{#}
+         | @var{whitespace}
+@end display
+
+((UNFINISHED))
+
+@subsection Line endings
+
+Line endings are significant in Scheme in single--line comments
+and within string literals.
+In Scheme source code, any of the line endings in @meta{line-ending}
+marks the end of a line.  Moreover, the two--character line endings
+@meta{carriage-return} @meta{linefeed} and @meta{carriage-return}
+@meta{next-line} each count as a single line ending.
+
+In a string literal, a @meta{line-ending} not preceded by a @code{\}
+stands for a linefeed character, which is the standard line--ending
+character of Scheme.
+
+@subsection Whitespace and comments
+
+@display
+@stxdef{whitespace} @var{character-tabulation}
+         | @var{linefeed} | @var{line-tabulation} | @var{form-feed}
+         | @var{carriage-return} | @var{next-line}
+         | @i{any character whose category is Zs, Zl, or Zp}
+@stxdef{line ending} @var{linefeed} | @var{carriage return}
+         | @var{carriage-return} @var{linefeed} | @var{next-line}
+         | @var{carriage-return} @var{next-line} | @var{line-separator}
+@stxdef{comment}  @stxlit{;} all subsequent characters up to a @var{line-ending}
+                or @var{paragraph-separator}
+         | @var{nested comment}
+         | @stxlit{#;} @var{interlexeme-space} @var{datum}
+@stxdef{nested-comment}  @stxlit{#|} @var{comment-text} @var{comment-cont}* @stxlit{|#}
+@stxdef{comment-text} character sequence not containing @stxlit{#|} or @stxlit{|#}
+@stxdef{comment-cont} @var{nested-comment} @var{comment-text}
+@stxdef{atmosphere} @var{whitespace} | @var{comment}
+@stxdef{interlexeme-space} @var{atmosphere}*
+@end display
+
+@noindent
+@emph{Whitespace} characters are spaces, linefeeds, carriage returns,
+character tabulations, form feeds, line tabulations, and any other
+character whose category is Zs, Zl, or Zp.  Whitespace is used for
+improved readability and as necessary to separate lexemes from each
+other.  Whitespace may occur between any two lexemes, but not within a
+lexeme.  Whitespace may also occur inside a string, where it is
+significant.
+
+The lexical syntax includes several comment forms.  In all cases,
+comments are invisible to Scheme, except that they act as delimiters,
+so, for example, a comment cannot appear in the middle of an identifier
+or representation of a number object.
+
+A semicolon (@code{;}) indicates the start of a line comment.  The
+comment continues to the end of the line on which the semicolon appears.
+
+Another way to indicate a comment is to prefix a @meta{datum} (cf.
+section ``Formal account'') with @code{#;}, possibly with
+@meta{interlexeme-space} before the @meta{datum}.  The comment consists
+of the comment prefix @code{#;} and the @meta{datum} together.  This
+notation is useful for ``commenting out'' sections of code.
+
+Block comments may be indicated with properly nested @code{#|} and
+@code{|#} pairs.
+@example
+#|
+   The FACT procedure computes the factorial of a
+   non-negative integer.
+|#
+(define fact
+  (lambda (n)
+    ;; base case
+    (if (= n 0)
+        #;(= n 1)
+        1       ; identity of *
+        (* n (fact (- n 1))))))
+@end example
+
+The lexeme @code{#!r6rs}, which signifies that the program text that
+follows is written with the lexical and datum syntax described in this
+report, is also otherwise treated as a comment.
+
+@subsection Identifiers
+
+@display
+@stxdef{identifier} @var{initial} @var{subsequent}*
+         | @var{peculiar-identifier}
+@stxdef{initial}  @var{constituent} | @var{special-initial}
+         | @var{inline-hex-escape}
+@stxdef{letter} @stxlit{a} | @stxlit{b} | @stxlit{c} | ... | @stxlit{z}
+         | @stxlit{A} | @stxlit{B} | @stxlit{C} | ... | @stxlit{Z}
+@stxdef{constituent} @var{letter}
+         | @i{any character whose Unicode scalar value is greater than
+             127, and whose category is Lu, Ll, Lt, Lm, Lo, Mn,
+             Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, or Co}
+@stxdef{special-initial} @stxlit{!} | @stxlit{$} | @stxlit{%} | @stxlit{&} | @stxlit{*} | @stxlit{/} | @stxlit{<} | @stxlit{=}
+         | @stxlit{>} | @stxlit{?} | @stxlit{^} | @stxlit{_} | @stxlit{~}
+@stxdef{subsequent} @var{initial} | @var{digit}
+         | @i{any character whose category is Nd, Mc, or Me}
+         | @var{special-subsequent}
+@stxdef{digit} @stxlit{0} | @stxlit{1} | @stxlit{2} | @stxlit{3} | @stxlit{4} | @stxlit{5} | @stxlit{6} | @stxlit{7} | @stxlit{8} | @stxlit{9}
+@stxdef{hex-digit} @var{digit}
+         | @stxlit{a} | @stxlit{A} | @stxlit{b} | @stxlit{B} | @stxlit{c} | @stxlit{C} | @stxlit{d} | @stxlit{D} | @stxlit{e} | @stxlit{E} | @stxlit{f} | @stxlit{F}
+@stxdef{special-subsequent} @stxlit{+} | @stxlit{-} | @stxlit{.} | @stxlit{@@}
+@stxdef{escape-sequence} @var{inline-hex-escape}
+         | @stxlit{\\}@var{character-except-x}
+         | @var{multi-escape-sequence}
+@stxdef{inline-hex-escape} @stxlit{\\x}@var{hex-scalar-value}@stxlit{;}
+@stxdef{hex-scalar-value} @var{hex-digit}+
+@stxdef{multi-escape-sequence} @stxlit{|}@var{character-except-vbar}...@stxlit{|}
+@stxdef{character-except-vbar} @i{any character except @code{|}}
+@stxdef{character-except-x} @i{any character except @code{x}}
+@stxdef{peculiar-identifier} @stxlit{+} | @stxlit{-} | @stxlit{...} | @stxlit{->} @var{subsequent}*
+@end display
+
+Most identifiers allowed by other programming languages are also
+acceptable to Scheme.  In general, a sequence of letters, digits, and
+``extended alphabetic characters'' is an identifier when it begins with
+a character that cannot begin a representation of a number object.  In
+addition, @code{+}, @code{-}, and @code{...} are identifiers, as is a
+sequence of letters, digits, and extended alphabetic characters that
+begins with the two--character sequence @code{->}.  Here are some
+examples of identifiers:
+
+@example
+lambda         q                soup
+list->vector   +                V17a
+<=             a34kTMNs         ->-
+the-word-recursion-has-many-meanings
+@end example
+
+Extended alphabetic characters may be used within identifiers as if they
+were letters.  The following are extended alphabetic characters:
+
+@example
+! $ % & * + - . / < = > ? @@ ^ _ ~
+@end example
+
+Moreover, all characters whose Unicode scalar values are greater than
+127 and whose Unicode category is Lu, Ll, Lt, Lm, Lo, Mn, Mc, Me, Nd,
+Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, or Co can be used within
+identifiers.  In addition, any character can be used within an
+identifier when specified using an @meta{escape-sequence}.  For example,
+the identifier @code{H\x65;llo} is the same as the identifier
+@code{Hello}.
+
+Kawa supports two additional non-R6RS ways of making
+identifiers using special characters, both taken from Common Lisp:
+Any character (except @code{x}) following a backslash is treated
+as if it were a @var{letter};
+as is any character between a pair of vertical bars.
+
+@c , and the identifier @code{\x3BB;} is the same as the
+@c identifier $\lambda$.
+
+Any identifier may be used as a variable or as a syntactic keyword
+@c (@ref{basic variables keywords regions} and @ref{syntax macros})
+in a Scheme program.  Any identifier may also be used as a syntactic datum,
+in which case it represents a @emph{symbol}.
+@c (@ref{base symbols}).
+
+Note that colon @code{:} is treated specially for the
+``colon operator'' (FIXME NEEDS DOCUMENTATION) in Kawa Scheme,
+though it is @var{special-initial} in standard Scheme (R6RS).
+
+@node Datum syntax, Hash-prefixed forms, Lexical syntax, Syntax
+@section Datum syntax
+
+The datum syntax describes the syntax of syntactic data in terms of a
+sequence of @meta{lexeme}s, as defined in the lexical syntax.
+
+The following grammar describes the syntax of syntactic data in terms of
+various kinds of lexemes defined in the grammar in section ``Lexical
+Syntax'':
+
+@display
+@stxdef{datum} @meta{defining-datum}
+         | @meta{nondefining-datum}
+         | @meta{defined-datum}
+
+@stxdef{defining-datum} @stxlit{#}@meta{indexnum}@stxlit{=}@meta{nondefining-datum}
+@stxdef{defined-datum} @stxlit{#}@var{indexnum}@stxlit{#}
+@stxdef{nondefining-datum} @meta{lexeme-datum}
+         | @meta{compound-datum}
+@stxdef{indexnum} @var{digit-10}+
+
+@stxdef{lexeme-datum} @meta{boolean} | @meta{number}
+         | @meta{character} | @meta{string} | @meta{symbol}
+@stxdef{symbol} @var{identifier}
+@stxdef{compound-datum} @meta{list} | @meta{vector} | @meta{uniform-vector} | @meta{xml-literal}
+@stxdef{list} @stxlit{(}@meta{datum}*@stxlit{)}
+         | @stxlit{(}@meta{datum}+ @stxlit{.} @meta{datum}@stxlit{)}
+         | @meta{abbreviation}
+@stxdef{abbreviation} @meta{abbrev-prefix} @meta{datum}
+@stxdef{abbrev-prefix} @stxlit{'} | @stxlit{`} | @stxlit{,} | @stxlit{,@@}
+         | @stxlit{#'} | @stxlit{#`}
+@stxdef{vector} @stxlit{#(}@meta{datum}*@stxlit{)}
+@stxdef{uniform-vector} TODO
+@end display
+@c FIXME: add to abbrev-prefix: @stxlit{#,} | @stxlit{#,@@}
+
+@subsection Abbreviations
+
+The following are abbreviations:
+
+@table @asis
+@item @stxlit{'}@meta{datum}     
+for @code{(quote @meta{datum})},
+
+@item @stxlit{`}@meta{datum}     
+for @code{(quasiquote @meta{datum})},
+
+@item @stxlit{,}@meta{datum}     
+for @code{(unquote @meta{datum})},
+
+@item @stxlit{,@@}@meta{datum}     
+for @code{(unquote-splicing @meta{datum})},
+
+@item @stxlit{#'}@meta{datum}     
+for @code{(syntax @meta{datum})}, and
+
+@item @stxlit{#`}@meta{datum}     
+for @code{(quasisyntax @meta{datum})}.
+
+@c FIXME
+@c @item @stxlit{#,}@meta{datum}     
+@c for @code{(unsyntax @meta{datum})}, and
+@c @item @stxlit{#,@@}@meta{datum}
+@c for @code{(unsyntax-splicing @meta{datum})}.
+@end table
+
+
+@node Hash-prefixed forms, Syntax and conditional compilation, Datum syntax, Syntax
+@section Hash-prefixed forms
+
+A number of different special forms are indicated by an
+initial hash (number) symbols (@code{#}).
+Here is a table summarizing them.
+
+Case is ignored for the character followed the @code{#}.
+Thus @code{#x} and @code{#X} are the same.
+
+@table @asis
+@item @stxlit{#:}@var{keyword}
+Guile-style keyword syntax (deprecated).
+@item @stxlit{#\\}
+Character literals.
+@item @stxlit{#!}
+@xref{Special named constants}.
+@item @stxlit{#`}@var{datum}
+Equivalent to @code{(quasisyntax @var{datum})}.
+Convenience syntax for syntax-case macros.
+@item @stxlit{#'}@var{datum}
+Equivalent to @code{(syntax @var{datum})}.
+Convenience syntax for syntax-case macros.
+@item @stxlit{#(}
+A vector.
+@item @stxlit{#|}
+Start of nested-comment.
+@item @stxlit{#/}@var{regex}@stxlit{/}
+@xref{Regular expressions}.
+@item @stxlit{#<}
+@xref{XML literals}.
+@item @stxlit{#;}@var{datum}
+A datum comment - the @var{datum} is ignored.
+(An @var{interlexeme-space} may appear before the @var{datum}.)
+@item @stxlit{#,(}@var{name} @var{datum} ...@stxlit{)}
+Special named constructors.
+@item @stxlit{#}@var{number}@stxlit{=}@var{datum}
+A reference definitions, allowing cyclic and shared structure.
+Equivalent to the @var{datum}, but also defines an association between
+the integer @var{number} and that @var{datum},
+@item @stxlit{#}@var{number}@stxlit{#}
+A back-reference, allowing cyclic and shared structure.
+@item @stxlit{#b}
+A binary (base-2) number.
+@item @stxlit{#d}
+A decimal (base-10) number.
+@item @stxlit{#e}
+A prefix to treat the following number as exact.
+@item @stxlit{#f}
+The standard boolean false object.
+@item @stxlit{#f}@var{n}@stxlit{(}@var{number} ...@stxlit{)}
+A uniform vector of floating-point numbers.
+The parameter @var{n} is a precision, which can be 32 or 64.
+@xref{Uniform vectors}.
+@item @stxlit{#i}
+A prefix to treat the following number as inexact.
+@item @stxlit{#o}
+An octal (base-8) number.
+@item @stxlit{#}@var{base}@stxlit{r}
+A number in the specified @var{base} (radix).
+@item @stxlit{#s}@var{n}@stxlit{(}@var{number} ...@stxlit{)}
+A uniform vector of signed integers.
+The parameter @var{n} is a precision, which can be 8, 16, 32, or 64.
+@xref{Uniform vectors}.
+@item @stxlit{#t}
+The standard boolean true object.
+@item @stxlit{#u}@var{n}@stxlit{(}@var{number} ...@stxlit{)}
+A uniform vector of unsigned integers.
+The parameter @var{n} is a precision, which can be 8, 16, 32, or 64.
+@xref{Uniform vectors}.
+@item @stxlit{#x}
+A hexadecimal (base-16) number.
+@end table
+
+The follow named constructor forms are supported:
+
+@table @asis
+@item @stxlit{#,(path} @var{path}@stxlit{)}
+@item @stxlit{#,(filepath} @var{path}@stxlit{)}
+@item @stxlit{#,(URI} @var{path}@stxlit{)}
+@item @stxlit{#,(symbol} @var{local-name} [@var{uri} [@var{prefix}]]@stxlit{)}
+@itemx @stxlit{#,(symbol} @var{local-name} @var{namespace}@stxlit{)}
+@item @stxlit{#,(namespace} @var{uri} [@var{prefix}]@stxlit{)}
+@item @stxlit{#,(duration} @var{duration}@stxlit{)}
+@end table
+
+@node Syntax and conditional compilation, , Hash-prefixed forms, Syntax
+@section Syntax and conditional compilation
 
 Kawa supports most of the @code{syntax-case} feature.
 
@@ -1457,7 +1931,7 @@ Kawa supports most of the @code{syntax-case} feature.
 Pattern ...
 @end deffn
 
-@deffn Syntax define-syntax-case name (literals) (pattern expr) ...
+@deffn Syntax define-syntax-case name @stxlit{(}literals@stxlit{)} @stxlit{(}pattern expr@stxlit{)} ...
 A convenience macro to make it easy to define @code{syntax-case}-style macros.
 Defines a macros with the given @var{name} and list of @var{literals}.
 Each @var{pattern} has the form of a @code{syntax-rules}-style pattern,
@@ -1467,7 +1941,7 @@ It must evaluate to a syntax form,
 which replaces the macro invocation.
 @end deffn
 
-@deffn Syntax define-macro (name lambda-list) form ...
+@deffn Syntax define-macro @stxlit{(}name lambda-list@stxlit{)} form ...
 @emph{This form is deprecated.}
 Functionally equivalent to @code{defmacro}.
 @end deffn
@@ -1510,7 +1984,7 @@ The symbol names are implementation-dependent.
 with @code{defmacro} to get a fresh unique identifier.)
 @end deffn
 
-@deffn Syntax cond-expand cond-expand-clause* [(else command-or-definition*)]
+@deffn Syntax cond-expand cond-expand-clause* [@stxlit{(else} command-or-definition*@stxlit{)}]
 @display
 @stxdef{cond-expand-clause} @stxlit{(}@var{feature-requirement} @var{command-or-definition}*@stxlit{)}
 @findex @i{fff-rec}
@@ -1570,7 +2044,7 @@ Same as @code{include}, except that the @var{path} is relative to the
 path of the source-file containing the @code{include-file}.
 @end deffn
 
-@node Multiple values, Symbols and namespaces, Syntax and conditional compilation, Top
+@node Multiple values, Symbols and namespaces, Syntax, Top
 @chapter Multiple values
 
 The multiple-value feature was added in R5RS.
@@ -1585,7 +2059,7 @@ when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
 @end deffn
 
-@deffn Syntax let-values ((formals expression) ...) body
+@deffn Syntax let-values @stxlit{((}formals expression@stxlit{)} ...@stxlit{)} body
 Each @var{formals} should be a formal arguments list as for a @code{lambda},
 cf section 4.1.4 of the R5RS.
 
@@ -1611,7 +2085,7 @@ match its corresponding @var{formals}.
 @end example
 @end deffn
 
-@deffn Syntax let*-values ((formals expression) ...) body
+@deffn Syntax let*-values @stxlit{((}formals expression@stxlit{)} ...@stxlit{)} body
 
 Each @var{formals} should be a formal arguments list as for a
 @code{lambda} expression, cf section 4.1.4 of the R5RS.
@@ -2026,7 +2500,7 @@ self-evaluating and therefore do not need to be quoted in expressions.
 They are used mainly for specifying keyword arguments.
 
 @display
-@stxdef{keyword} ::= @var{identifier}@stxlit{:}
+@stxdef{keyword} @var{identifier}@stxlit{:}
 @end display
 
 A keyword is a single token; therefore no whitespace is allowed between
@@ -6459,7 +6933,7 @@ an array of references to @code{java.lang.StringBuffer} objects.
 @node Declaring Types of Variables,  Type tests and conversions, Standard Types, Types
 @section Declaring Types of Variables
 
-@deffn Syntax let ((name [:: type] init) ...) body
+@deffn Syntax let @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
 Declare new locals variables with the given @var{name}, initial value
 @var{init}, and optional type specification @var{type}.
 If @var{type} is specified, then the expression @var{init} is evaluated,
@@ -6467,13 +6941,13 @@ the result coerced to @var{type}, and then assigned to the variable.
 If @var{type} is not specified, it defaults to @code{Object}.
 @end deffn
 
-@deffn Syntax let* ((name [:: type] init) ...) body
+@deffn Syntax let* @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
 @end deffn
 
-@deffn Syntax letrec ((name [:: type] init) ...) body
+@deffn Syntax letrec @stxlit{((}name [@stxlit{::} type] init@stxlit{)} ...@stxlit{)} body
 @end deffn
 
-@deffn Syntax define [:: type] value
+@deffn Syntax define [@stxlit{::} type] value
 @end deffn
 
 See also @code{define-private}, and @code{define-constant}.
@@ -8452,11 +8926,6 @@ by @code{#}, but nested elements do (and must not).
 #<p>The result is <b>final</b>!</p>
 @end example
 
-
-@display
-@stxdef{xml-literal} @stxlit{#}@var{xml-constructor}
-@end display
-
 Actually, these are not really literals since they can contain
 enclosed expressions:
 @example
@@ -8467,6 +8936,10 @@ in a similar way to quasi-quotation.
 (If you try to quote one of these ``XML literals'',
 what you get is unspecified and is subject to change.)
 
+An @var{xml-literal} is usually an element constructor,
+but there some rarely used forms (processing-instructions,
+comments, and CDATA section) we'll cover later.
+
 @display
 @stxdef{xml-literal} @stxlit{#}@var{xml-constructor}
 @stxdef{xml-constructor} @var{xml-element-constructor}
@@ -8475,8 +8948,7 @@ what you get is unspecified and is subject to change.)
   | @var{xml-CDATA-constructor}
 @end display
 
-The important is the @var{xml-element-constructor},
-which takes one of these forms:
+@subsection Element constructors
 
 @display
 @stxdef{xml-element-constructor}
@@ -8527,7 +8999,7 @@ The previous example is equivalent to:
 #<p>This is <@{(if be-bold 'strong 'em)@}>important</>!</p>
 @end example
 
-@subsubsection Elements contents (children)
+@subsection Elements contents (children)
 
 The ``contents'' (children) of an element
 are a sequence of character (text) data, and nested nodes.
@@ -8560,7 +9032,7 @@ The following two expressions are equivalent:
 #<p>&@{"< > & \" '"@}</p>
 @end example
 
-@subsubsection Attributes
+@subsection Attributes
 
 @display
 @stxdef{xml-attribute}

@@ -8955,17 +8955,15 @@ comments, and CDATA section) we'll cover later.
     @stxlit{<}@var{QName} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</}@var{QName} @stxlit{>}
   | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{>}@var{xml-element-datum}...@stxlit{</>}
   | @stxlit{<}@var{xml-name-form} @var{xml-attribute}*@stxlit{/>}
+@stxdef{xml-name-form} @var{QName}
+  | @var{xml-enclosed-expression}
+@stxdef{xml-enclosed-expression}
+    @stxlitlbrace{}@var{expression}@stxlit{@}}
+  | @stxlit{(}@var{expression}...@stxlit{)}
 @end display
 
-The third variant above is an XML ``empty element'';
-it is equivalent to the second variant
-when there are no @var{xml-element-datum} items.
-
-(Note that every well-formed XML element, as defined in the XML specifications,
-is a valid @var{xml-element-constructor}, but not vice versa.)
-
-The first variant uses a literal @var{QName}, and looks like
-standard non-empty XML element, where the starting @var{QName}
+The first @var{xml-element-constructor} variant uses a literal @var{QName},
+and looks like standard non-empty XML element, where the starting @var{QName}
 and the ending @var{QName} must match exactly:
 
 @example
@@ -8977,18 +8975,11 @@ As a convenience, you can leave out the ending tag(s):
 <para>This is a paragraph in <emphasis>DocBook</> syntax.</>
 @end example
 
-You can use an expression to compute the element tag at runtime:
+You can use an expression to compute the element tag at runtime -
+in that case you @emph{must} leave out the ending tag:
 @example
 #<p>This is <(if be-bold 'strong 'em)>important</>!</p>
 @end example
-
-@display
-@stxdef{xml-name-form} @var{QName}
-  | @var{xml-enclosed-expression}
-@stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@var{expression}@stxlit{@}}
-  | @stxlit{(}@var{expression}...@stxlit{)}
-@end display
 
 You can use arbitrary @var{expression} inside curly braces,
 as long as it evaluates to a symbol.
@@ -8998,6 +8989,13 @@ The previous example is equivalent to:
 @example
 #<p>This is <@{(if be-bold 'strong 'em)@}>important</>!</p>
 @end example
+
+The third @var{xml-element-constructor} variant above is an XML
+``empty element''; it is equivalent to the second variant
+when there are no @var{xml-element-datum} items.
+
+(Note that every well-formed XML element, as defined in the XML specifications,
+is a valid @var{xml-element-constructor}, but not vice versa.)
 
 @subsection Elements contents (children)
 
@@ -9012,12 +9010,15 @@ and need to be escaped.
   | @var{xml-constructor}
   | @var{xml-escaped}
 @stxdef{xml-escaped}
-    @stxlit{&}@var{enclosed-xml-expression}
+    @stxlit{&}@var{xml-enclosed-expression}
   | @stxlit{&}@var{xml-entity-name}@stxlit{;}
-  | @stxlit{&#}@var{decimal-digit}+@stxlit{;}
+  | @var{xml-character-reference}
+@stxdef{xml-character-reference}
+    @stxlit{&#}@var{decimal-digit}+@stxlit{;}
   | @stxlit{&#x}@var{hex-digit}+@stxlit{;}
 @end display
 
+Here is an example shows both hex and decimal character references:
 @example
 #<p>A&#66;C&#x44;E</p>  @result{}  <p>ABCDE</p>
 @end example

@@ -31,6 +31,11 @@ public class ReadTable extends RangeTable
   /** True if "IDENTIFIER:" should be treated as a keyword. */
   protected boolean finalColonIsKeyword;
 
+  /** Control whether we should handle R6RS inline hex escape.
+   * I.e. "\x"<hexdigits>";".
+   */
+  protected boolean hexEscapeAfterBackslash = true;
+
   /** Set whether ":IDENTIFIER" should be treated as a keyword. */
   public void setInitialColonIsKeyword (boolean whenInitial)
   {

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 197)
+(test-init "Miscellaneous" 198)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -62,6 +62,8 @@
 (test "a b c" keyword->string (string->keyword "a b c"))
 (test foo: string->keyword "foo")
 (test ||: string->keyword "")
+
+(test "Hello" symbol->string 'H\x65;llo)
 
 ;;; DSSSL spec example 45
 (test foobar: string->keyword "foobar")

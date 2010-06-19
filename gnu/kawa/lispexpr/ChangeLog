@@ -1,3 +1,8 @@
+2010-06-18  Per Bothner  <per@bothner.com>
+
+	* ReadTable.java (hexEscapeAfterBackslash): New field.
+	* LispReader.java (readToken): Possibly handle R6RS inline hex escape.
+
 2010-05-31  Per Bothner  <per@bothner.com>
 
 	Add support for xmlsns="xxx" - i.e. default namespace declarations.

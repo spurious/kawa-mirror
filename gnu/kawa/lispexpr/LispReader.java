@@ -312,6 +312,9 @@ public class LispReader extends Lexer
 	    ch = read();
 	    if (ch < 0)
 	      eofError("unexpected EOF after single escape");
+            if (rtable.hexEscapeAfterBackslash
+                && (ch == 'x' || ch == 'X'))
+              ch = readHexEscape();
 	    tokenBufferAppend(TOKEN_ESCAPE_CHAR);
 	    tokenBufferAppend(ch);
 	    seenEscapes = true;
@@ -1037,27 +1040,34 @@ public class LispReader extends Lexer
 	  }
 	break;
       case 'x':
-	c = 0;
-	/* A hex escape, as in ANSI C.  */
-	for (;;)
-	  {
-	    int d = read();
-	    int v = Character.digit((char) d, 16);
-	    if (v >= 0)
-	      c = (c << 4) + v;
-	    else
-	      {
-                if (d != ';')
-                  {
-                    // FIXME: if strict-R6RS: ERROR
-                    if (d >= 0)
-                      unread(d);
-                  }
-		break;
-	      }
-	  }
-	break;
+      case 'X':
+	return readHexEscape();
       default:  break;
+      }
+    return c;
+  }
+
+  public int readHexEscape ()
+    throws java.io.IOException, SyntaxException 
+  {
+    int c = 0;
+    /* A hex escape, as in ANSI C.  */
+    for (;;)
+      {
+        int d = read();
+        int v = Character.digit((char) d, 16);
+        if (v >= 0)
+          c = (c << 4) + v;
+        else
+          {
+            if (d != ';')
+              {
+                // FIXME: if strict-R6RS: ERROR
+                if (d >= 0)
+                  unread(d);
+              }
+            break;
+          }
       }
     return c;
   }

@@ -1,3 +1,8 @@
+2010-06-18  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (nextMatching, nextDataIndex): Add missing
+	FLOAT_FOLLOWS cases.
+
 2009-11-19  Per Bothner  <per@bothner.com>
 
 	* StableVector.java (adjustPositions, removePosRange): Fix thinkos.

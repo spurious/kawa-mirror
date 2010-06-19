@@ -157,7 +157,7 @@ public class TreeList extends AbstractSequence
    */
   static final int LONG_FOLLOWS = 0xF103;
 
-  /** A 64-bit float floating-pointer number.
+  /** A 32-bit float floating-pointer number.
    *
    * [FLOAT_FOLLOWS]
    * [word1], [word2]:  The big-endian bits of the float.
@@ -2061,6 +2061,7 @@ public class TreeList extends AbstractSequence
 	  case POSITION_REF_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
 	  case INT_FOLLOWS:
+	  case FLOAT_FOLLOWS:
 	    next = pos + 3;
 	    if (checkText) break;
 	    continue;
@@ -2211,6 +2212,7 @@ public class TreeList extends AbstractSequence
       case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
       case INT_FOLLOWS:
+      case FLOAT_FOLLOWS:
 	return pos + 2;
       case POSITION_PAIR_FOLLOWS:
 	return pos + 4;

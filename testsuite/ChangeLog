@@ -1,5 +1,7 @@
 2010-06-18  Per Bothner  <per@bothner.com>
 
+	* lib-test.scm: Add some tests for compound symbols.
+
 	* misc-test.scm: Add test for R6RS inline-hex-escape in symbol.
 
 2010-05-24  Per Bothner  <per@bothner.com>

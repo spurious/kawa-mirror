@@ -1,4 +1,4 @@
-(test-begin "libs" 30)
+(test-begin "libs" 32)
 
 (import (srfi :2 and-let*))
 
@@ -39,5 +39,18 @@
 (test-equal #f  (let ((x 0)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
 (test-equal #f (and-let* (xf (y (- xf 1)) ((positive? y))) (/ xf y)))
 (test-equal 3/2  (let ((x 3)) (and-let* (x (y (- x 1)) ((positive? y))) (/ x y))))
+
+(define (symbol-parts s::symbol)
+  (list (symbol-local-name s) (symbol-namespace-uri s) (symbol-prefix s)))
+
+(test-equal '("abc:def" "" "")
+	    (symbol-parts '|abc:def|))
+;(test-equal '("abc:def" "" "")
+;	    (symbol-parts 'abc:def))
+
+(require 'xml)
+
+(test-equal '("abc" "URI" "")
+	    (symbol-parts (element-name #<abc xmlns="URI"/>)))
 
 (test-end)

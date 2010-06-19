@@ -88,6 +88,12 @@ public class Values extends TreeList implements Printable, Externalizable
     return make(list, 0, list.data.length);
   }
 
+  /**
+   * Extract a value (single or Values) from a sub-range of a TreeList.
+   * @param list the TreeList to copy
+   * @param startPosition start of range, as a raw index in data
+   * @param endPosition end of range, as a raw index in data
+   */
   public static Object make (TreeList list, int startPosition, int endPosition)
   {
     int next;

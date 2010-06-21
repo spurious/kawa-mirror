@@ -9037,8 +9037,10 @@ The following two expressions are equivalent:
 
 @display
 @stxdef{xml-attribute}
-    @var{xml-name-form}@stxlit{=}@stxlit{"}@var{quot-attribute-datum}*@stxlit{"}
-  | @var{xml-name-form}@stxlit{=}@stxlit{'}@var{apos-attribute-datum}*@stxlit{'}
+    @var{xml-name-form}@stxlit{=}@var{xml-attribute-value}
+@stxdef{xml-attribute-value}
+    @stxlit{"}@var{quot-attribute-datum}*@stxlit{"}
+  | @stxlit{'}@var{apos-attribute-datum}*@stxlit{'}
 @stxdef{quot-attribute-datum}
     any character except @code{"}, @code{&}, or @code{<}.
   | @var{xml-escaped}
@@ -9049,8 +9051,49 @@ The following two expressions are equivalent:
 
 If the @var{xml-name-form} is either @code{xmlns} or
 a compound named with the prefix @code{xmlns}, then
-technically we have a namespace declaration, than
-en attribute.  XXX
+technically we have a namespace declaration, ratherthan
+en attribute.
+
+@subsection QNames and namespaces
+
+The names of elements and attributes are @dfn{qualified names}
+(QNames), which are represented using compound symbols (@pxref{Namespaces}).
+The lexical syntax for a QName is either a simple identifier,
+or a (prefix,local-name) pair:
+
+@display
+@stxdef{QName} @var{xml-local-part}
+   | @var{xml-prefix}@stxlit{:}@var{xml-local-part}
+@stxdef{xml-local-part} @var{identifier}
+@stxdef{xml-prefix} @var{identifier}
+@end display
+
+An @var{xml-prefix} is an alias for a namespace-uri,
+and the mapping between them is defined by a namespace-declaration.
+You can either use a @code{define-namespace} form, or you
+can use a @dfn{namespace declaration attribute}:
+
+@display
+@stxdef{xml-namespace-declaration-attribute}
+    @stxlit{xmlns:}@var{xml-prefix}@stxlit{=}@var{xml-attribute-value}
+  | @stxlit{xmlns=}@var{xml-attribute-value}
+@end display
+
+The former declares @var{xml-prefix} as a namespace alias for
+the namespace-uri specified by @var{xml-attribute-value}
+(which must be a compile-time constant).
+The second declares that @var{xml-attribute-value} is the default
+namespace for simple (unprefixed) element tags.
+(A default namespace declaration is ignored for attribute names.)
+
+@example
+(let ((qn (element-name #<gnu:b xmlns:gnu="http://gnu.org/"/>)))
+  (list (symbol-local-name qn)
+        (symbol-prefix qn)
+        (symbol-namespace-uri qn)))
+@result{} ("b" "gnu" "http://gnu.org/")
+
+@end example
 
 @subsection Other XML types
 

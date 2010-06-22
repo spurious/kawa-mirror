@@ -149,7 +149,7 @@ public class Q2Read extends LispReader
 	    continue;
 	  }
 	else
-	  last.setCdr(cur);
+	  last.setCdrBackdoor(cur);
 	last = cur;
       }
     if (! forceList)

@@ -305,12 +305,14 @@ public class Translator extends Compilation
 
   public Expression rewrite_pair (Pair p, boolean function)
   {
-    if (p.getCar() instanceof Syntax)
-      return apply_rewrite((Syntax) p.getCar(), p);
-    Object cdr = p.getCdr();
-
     Expression func = rewrite_car (p, true);
     Object proc = null;
+    if (func instanceof QuoteExp)
+      {
+        proc = func.valueIfConstant();
+        if (proc instanceof Syntax)
+          return apply_rewrite((Syntax) proc, p);
+      }
     ReferenceExp ref = null;
     if (func instanceof ReferenceExp)
       {
@@ -367,6 +369,7 @@ public class Translator extends Compilation
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
+    Object cdr = p.getCdr();
     int cdr_length = listLength(cdr);
 
     if (cdr_length == -1)

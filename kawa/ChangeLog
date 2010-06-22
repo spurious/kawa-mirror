@@ -1,3 +1,8 @@
+2010-06-21  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite_pair): Check for literal Syntax *after*
+	rewrite_pair.  This is needed for macro that returns an xml literal.
+
 2010-06-14  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Fix typo for symbol=?.

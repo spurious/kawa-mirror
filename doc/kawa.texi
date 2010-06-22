@@ -2244,15 +2244,15 @@ Compound symbols are used for namespace-aware XML processing.
 
 A @dfn{namespace} is a mapping from strings to symbols.
 The string is the local-name of resulting symbol.
-A namespace is similar to a Commn Lisp @dfn{package}.
+A namespace is similar to a Common Lisp @dfn{package}.
 
 A namespace has a namespace-uri, which a string;
 it recommended that it have the form of an absolute URI.
 A namespace may optionally have a prefix, which is a string used
 when printing out symbols belonging to the namespace.
-If you want ``equivalent symbols'' (i.e. those that have the same
+(If you want for ``equivalent symbols'' (i.e. those that have the same
 local-name and same uri) to be the identical symbol object, then
-you should use namespaces whose prefix is the empty string.
+you should use namespaces whose prefix is the empty string.)
 
 @deffn Constructor namespace name [prefix]
 Return a namespace with the given @var{name} and @var{prefix}.
@@ -2360,7 +2360,7 @@ Defines @var{name} as a @dfn{namespace prefix} - a lexically scoped
 whose full name is @var{namespace-name}, which should be a non-empty
 string literal.
 It is customary for the string have syntactic form of
-a @uref{http://en.wikipedia.org/wiki/Uniform_Resource_Identifier,URI},
+an absolute @uref{http://en.wikipedia.org/wiki/Uniform_Resource_Identifier,URI},
 but any non-empty string is acceptable and is used without
 further interpretation.
 
@@ -9051,8 +9051,8 @@ The following two expressions are equivalent:
 
 If the @var{xml-name-form} is either @code{xmlns} or
 a compound named with the prefix @code{xmlns}, then
-technically we have a namespace declaration, ratherthan
-en attribute.
+technically we have a namespace declaration, rather than
+an attribute.
 
 @subsection QNames and namespaces
 

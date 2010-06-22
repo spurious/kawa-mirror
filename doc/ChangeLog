@@ -1,3 +1,7 @@
+2010-06-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Fix some minor mistakes.
+
 2010-06-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (XML literals): Add a subsection about QNames and namespaces.

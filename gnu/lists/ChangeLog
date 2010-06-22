@@ -1,3 +1,10 @@
+2010-06-21  Per Bothner  <per@bothner.com>
+
+	* ByteVector.java: New abstract class, extends SimpleVector.
+	* S8Vector.java: Change to extend ByteVector.
+	* U8Vector.java: Likewise.
+	* Makefile.am: Update accordingly.
+
 2010-06-18  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (nextMatching, nextDataIndex): Add missing

@@ -6,17 +6,11 @@ import java.io.*;
 
 /** Simple adjustable-length vector of unsigned 8-bit integers (bytes). */
 
-public class U8Vector extends SimpleVector
-  implements Externalizable
-  /* #ifdef JAVA2 */
-  , Comparable
-  /* #endif */
+public class U8Vector extends ByteVector
 {
-  byte[] data;
-
   public U8Vector ()
   {
-    data = S8Vector.empty;
+    data = ByteVector.empty;
   }
 
   public U8Vector(int size, byte value)
@@ -46,38 +40,6 @@ public class U8Vector extends SimpleVector
     addAll(seq);
   }
 
-  /** Get the allocated length of the data buffer. */
-  public int getBufferLength()
-  {
-    return data.length;
-  }
-
-  public void setBufferLength(int length)
-  {
-    int oldLength = data.length;
-    if (oldLength != length)
-      {
-	byte[] tmp = new byte[length];
-	System.arraycopy(data, 0, tmp, 0,
-			 oldLength < length ? oldLength : length);
-	data = tmp;
-      }
-  }
-
-  protected Object getBuffer() { return data; }
-
-  public final byte byteAt(int index)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    return data[index];
-  }
-
-  public final byte byteAtBuffer(int index)
-  {
-    return data[index];
-  }
-
   public final int intAtBuffer(int index)
   {
     return data[index] & 0xff;
@@ -102,24 +64,6 @@ public class U8Vector extends SimpleVector
     return Convert.toObjectUnsigned(old);
   }
 
-  public final void setByteAt(int index, byte value)
-  {
-    if (index > size)
-      throw new IndexOutOfBoundsException();
-    data[index] = value;
-  }
-
-  public final void setByteAtBuffer(int index, byte value)
-  {
-    data[index] = value;
-  }
-
-  protected void clearBuffer(int start, int count)
-  {
-    while (--count >= 0)
-      data[start++] = 0;
-  }
-
   public int getElementKind()
   {
     return INT_U8_VALUE;
@@ -127,52 +71,8 @@ public class U8Vector extends SimpleVector
 
   public String getTag() { return "u8"; }
 
-  public boolean consumeNext (int ipos, Consumer out)
-  {
-    int index = ipos >>> 1;
-    if (index >= size)
-      return false;
-    out.writeInt(data[index] & 0xff);
-    return true;
-  }
-
-  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
-  {
-    if (out.ignoring())
-      return;
-    int i = iposStart >>> 1;
-    int end = iposEnd >>> 1;
-    if (end > size)
-      end = size;
-    for (;  i < end;  i++)
-      out.writeInt(data[i] & 0xff);
-  }
-
   public int compareTo(Object obj)
   {
     return compareToInt(this, (U8Vector) obj);
-  }
-
-  /**
-   * @serialData Write 'size' (using writeInt),
-   *   followed by 'size' elements in order (using writeByte).
-   */
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    int size = this.size;
-    out.writeInt(size);
-    for (int i = 0;  i < size;  i++)
-      out.writeByte(data[i]);
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    int size = in.readInt();
-    byte[] data = new byte[size];
-    for (int i = 0;  i < size;  i++)
-      data[i] = in.readByte();
-    this.data = data;
-    this.size = size;
   }
 }

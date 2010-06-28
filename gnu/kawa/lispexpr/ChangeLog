@@ -1,3 +1,8 @@
+2010-06-27  Per Bothner  <per@bothner.com>
+
+	* ReaderXmlElement.java (readContent): Need to reset tokenBufferLength
+	before reading escaped expression.
+
 2010-06-18  Per Bothner  <per@bothner.com>
 
 	* ReadTable.java (hexEscapeAfterBackslash): New field.

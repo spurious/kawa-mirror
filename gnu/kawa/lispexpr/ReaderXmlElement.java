@@ -413,6 +413,7 @@ public class ReaderXmlElement extends ReadTableEntry
               {
                 if (reader.tokenBufferLength > 0 || prevWasEnclosed)
                   text = reader.tokenBufferString();
+                reader.tokenBufferLength = 0;
                 item = readEscapedExpression(reader, next);
               }
             else

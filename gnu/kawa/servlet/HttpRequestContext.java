@@ -18,6 +18,7 @@ public abstract class HttpRequestContext
   public static final int HTTP_OK = 200;
   public static final int HTTP_NOT_FOUND = 404;
 
+  static final int STATUS_SENT = -999;
   public int statusCode = HTTP_OK;
   public String statusReasonPhrase = null;
 
@@ -60,7 +61,7 @@ public abstract class HttpRequestContext
   public abstract URI getRequestURI();
 
   /** Returns the context path, relative to the server root.
-   * This is an initial substring of the {@link #getRequestURI}.
+   * This is an initial substring of the {@link #getRequestPath}.
    * Like {@code ServletContext#getContextPath}, but ends with a {@code '/'}.
    * The string {@code getRequestURI()} is the same as the concatenation of
    * {@code getContextPath()}, {@code getScriptPath()}, and {code getLocationPath()}.
@@ -193,6 +194,7 @@ public abstract class HttpRequestContext
    * @param responseLength response length in bytes, or -1 (unspecified).
    *  Note this is different from HttpExchange.sendResponseHeaders.
    * This method must be called before getResponseStream.
+   * Implementations should set statusCode to STATUS_SENT.
    */
   public abstract void sendResponseHeaders(int reasonCode, String reasonPhrase, long responseLength)
     throws IOException;
@@ -263,7 +265,7 @@ class HttpOutputStream extends OutputStream
   {
     if (out == null)
       {
-        context.sendResponseHeaders(context.statusCode, context.statusReasonPhrase, -1);
+        maybeSendResponseHeaders(-1);
         out = context.getResponseStream();
       }
     if (count > 0)
@@ -273,12 +275,23 @@ class HttpOutputStream extends OutputStream
       }
   }
 
-  public void close()
-           throws IOException
+  void maybeSendResponseHeaders (int count)
+    throws IOException
+  {
+    int statusCode = context.statusCode;
+    if (statusCode != HttpRequestContext.STATUS_SENT)
+      {
+        context.sendResponseHeaders(statusCode, context.statusReasonPhrase, count);
+        context.statusCode = HttpRequestContext.STATUS_SENT;
+      }
+  }
+
+  public void close() 
+    throws IOException
   {
     if (out == null)
       {
-        context.sendResponseHeaders(context.statusCode, context.statusReasonPhrase, count);
+        maybeSendResponseHeaders(count);
         out = context.getResponseStream();
       }
     flush();

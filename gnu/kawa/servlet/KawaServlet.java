@@ -361,6 +361,7 @@ extends HttpServlet
       //if (reasonCode >= 200 && reasonCode < 300)
       response.setStatus(reasonCode);
       //      else        response.sendError(reasonCode, reasonPhrase);
+      statusCode = HttpRequestContext.STATUS_SENT;
     }
 
     public void log (String message)

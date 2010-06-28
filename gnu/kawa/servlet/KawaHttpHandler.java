@@ -281,6 +281,7 @@ public class KawaHttpHandler
       if (responseLength <= 0)
         responseLength = responseLength < 0 ? 0 : -1;
       exchange.sendResponseHeaders(reasonCode, responseLength);
+      statusCode = HttpRequestContext.STATUS_SENT;
     }
 
     /* The following two methods (parseQuery and parsePostParameters) were

@@ -1,3 +1,11 @@
+2010-06-27  Per Bothner  <per@bothner.com>
+
+	* HttpRequestContext.java (STATUS_SENT): New constant.
+	(maybeSendResponseHeaders): New method.
+	(close): Use maybeSendResponseHeaders rather than sendResponseHeaders.
+	* KawaServlet.java (sendResponseHeaders): Set statusCode to STATUS_SENT.
+	* KawaHttpHandler.java (sendResponseHeaders): Likewise.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	Add support for using the com.sun.net.httpserver web server,

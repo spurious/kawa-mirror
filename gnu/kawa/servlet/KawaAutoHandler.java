@@ -106,6 +106,10 @@ public class KawaAutoHandler
 
     Path absPath = minfo.getSourceAbsPath();
     InputStream resourceStream = absPath.openInputStream();
+    if (! (resourceStream instanceof BufferedInputStream))
+      // Not just a performance issue, since we need marks to be supported
+      // for Language.detect below.
+      resourceStream = new BufferedInputStream(resourceStream);
 
     Language language
       = Language.getInstanceFromFilenameExtension(path);
@@ -121,7 +125,7 @@ public class KawaAutoHandler
           {
             if (path != upath)
               {
-                String msg = "1The requested URL "+path+" was not found on this server."
+                String msg = "The requested URL "+path+" was not found on this server."
                   +" upath="+upath+".\r\n";
                 byte[] bmsg = msg.getBytes();
                 hctx.sendResponseHeaders(HttpRequestContext.HTTP_NOT_FOUND,null,  bmsg.length);

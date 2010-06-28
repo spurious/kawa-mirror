@@ -1,3 +1,8 @@
+2010-06-28  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (getModule): Force resourceStream to be
+	buffered - needed for Language detection.
+
 2010-06-27  Per Bothner  <per@bothner.com>
 
 	* HttpRequestContext.java (STATUS_SENT): New constant.

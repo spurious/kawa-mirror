@@ -1,0 +1,88 @@
+;; This is -*- scheme -*-
+(require 'http)
+
+(cond-expand
+ (in-servlet
+  (require 'servlets))
+ (else))
+(define arrow (html:tt " => "))
+(define-syntax show
+  (syntax-rules ()
+    ((_ prefix expr)
+     #<p><tt>&{prefix}</tt> &{arrow} <tt>&{expr}</tt></p>)
+    ((_ prefix expr comment)
+      (html:p (html:tt prefix) arrow (html:tt expr)
+	      " " comment))))
+
+#<html>
+ <head><title>Kawa Default handler</></>
+ <body>
+  <p>This is the default handler, written in Kawa-Scheme.</>
+  <p>Here are various request properties:</>
+<pre>
+(request-scheme)&{arrow} (request-scheme)
+(request-method) &{arrow} &(request-method)
+
+(request-path) &{arrow} &(request-path)
+(request-URI) &{arrow} &(request-URI)
+(request-context-path) &{arrow} &(request-context-path)
+(request-script-path) &{arrow} &(request-script-path)
+(request-local-path) &{arrow} &(request-local-path)
+(request-uri) &{arrow} &(request-uri) (deprecated - use request-path instead)
+(request-url) &{arrow} &(request-url)
+
+(module-uri) &{arrow} (module-uri)
+(resource-url "foo.png") &{arrow} &(resource-url "foo.png")
+(request-path-translated)" &{arrow} &(request-path-translated)
+
+(request-local-socket-address) &{arrow} &(request-local-socket-address)
+(request-local-IP-address) &{arrow} &(request-local-IP-address)
+(request-local-host) &{arrow} &(request-local-host)
+(request-local-port) &{arrow} &(request-local-port)
+
+(request-remote-socket-address) &{arrow} (request-remote-socket-address)
+(request-remote-IP-address) &{arrow} &(request-remote-IP-address)
+(request-remote-host) &{arrow} &(request-remote-host)
+(request-remote-port) &{arrow} &(request-remote-port)
+
+(request-query-string) &{arrow} &(request-query-string)
+(request-parameters "abc") &{arrow} &(request-parameters "abc")
+</pre>
+<p><tt>(request-parameter-map)</tt> &{arrow}
+	  &(apply html:ul
+		 (let ((it (((request-parameter-map):entrySet):iterator))
+		       (result '()))
+		   (do ()
+		       ((not (it:hasNext)) (reverse result))
+		     (set! result (cons #<li><tt>&(it:next)</tt></li> result)))))</p>
+ <p><tt>(request-header-map)</tt> <tt> => </tt>
+	  &(apply html:ul
+		 (let ((it (((request-header-map):entrySet):iterator))
+		       (result '()))
+		   (do ()
+		       ((not (it:hasNext)) (reverse result))
+		     (set! result (cons #<li><tt>&(it:next)</tt></li> result)))))</p>
+ &{
+  (cond-expand
+   (in-servlet
+#<div>
+<p>Servlet-specific request properties:</>
+<pre>
+(current-servlet-context) &{arrow} &(current-servlet-context)
+(get-request) &{arrow} &(get-request)
+(get-response) &{arrow} &(get-response)
+
+((get-request):getContextPath) &{arrow} &((get-request):getContextPath)
+((get-request):getServletPath) &{arrow} &((get-request):getServletPath)
+((get-request):getPathInfo) &{arrow} &((get-request):getPathInfo) "
+((get-request):getPathTranslated) &{arrow} &((get-request):getPathTranslated) "
+((current-servlet-context):getRealPath "/") &{arrow} &((current-servlet-context):getRealPath "/")
+((current-servlet-context):getResource "/") &{arrow} &((current-servlet-context):getResource "/")
+
+(request-servlet-path) &{arrow} &(request-servlet-path)
+(request-path-info) &{arrow} &(request-path-info)</pre>
+     </div>)
+   (else
+    #<p>(Not running in a servlet container.)</p>))
+}</body>
+</html>

@@ -173,6 +173,7 @@ KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 @WITH_SAX2_TRUE@SAX2_TESTS = check-MySAXApp
 WARN_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
 APPLETVIEWER = appletviewer
+HTTPD_PORT = 8888
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
@@ -704,6 +705,9 @@ check-pitfalls:
 # Not done by "make check" as it is interactive.
 check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J$(KAWARTLIB) scribble.html
+# Not done by "make check" as it is interactive.
+check-server:
+	CLASSPATH=..:$$CLASSPATH $(JAVA) kawa.repl --http-auto-handler / $(srcdir)/webtest/ --http-start $(HTTPD_PORT)
 
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^

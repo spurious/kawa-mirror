@@ -339,6 +339,11 @@ APPLETVIEWER = appletviewer
 check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J$(KAWARTLIB) scribble.html
 
+HTTPD_PORT = 8888
+# Not done by "make check" as it is interactive.
+check-server:
+	CLASSPATH=..:$$CLASSPATH $(JAVA) kawa.repl --http-auto-handler / $(srcdir)/webtest/ --http-start $(HTTPD_PORT)
+
 cycle1.class cycle2.class: $(srcdir)/cycle1.scm $(srcdir)/cycle2.scm
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $^
 

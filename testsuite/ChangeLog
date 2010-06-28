@@ -1,3 +1,9 @@
+2010-06-27  Per Bothner  <per@bothner.com>
+
+	* webtest, webtest/info: new sub-directories.
+	* webtest/info/+default+: New test file for http server.
+	* Makefile.am (check-server): New rule.
+
 2010-06-18  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Add some tests for compound symbols.

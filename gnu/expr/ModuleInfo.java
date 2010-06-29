@@ -377,14 +377,14 @@ public class ModuleInfo
   {
     if (sourceAbsPath == null)
       return true;
-    if (className == null)
-      return false;
     if (lastCheckedTime + manager.lastModifiedCacheTime >= now)
       return moduleClass != null;
-    lastCheckedTime = now;
     long lastModifiedTime = sourceAbsPath.getLastModified();
     long oldModifiedTime = this.lastModifiedTime;
     this.lastModifiedTime = lastModifiedTime;
+    lastCheckedTime = now;
+    if (className == null)
+      return false;
     if (moduleClass == null)
       {
         try

@@ -1,3 +1,8 @@
+2010-06-29  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (checkCurrent): Make sure to set lastModifiedTime
+	even if there is no class yet.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* Keyword.java (keywordNamespace): Namespace constructors are

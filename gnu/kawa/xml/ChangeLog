@@ -1,3 +1,8 @@
+2010-06-29  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (endDocument): Handle the case when sbuf
+	has content.
+
 2010-05-19  Per Bothner  <per@bothner.com>
 
 	* XmlNamespace.java: Update Namespace.getInstance -> valueOf.

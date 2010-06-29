@@ -1,4 +1,4 @@
-// Copyright (c) 2002. 2006  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2002, 2006, 2010  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -15,11 +15,8 @@ import java.util.Vector;
 public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
-  /* #ifdef JAVA5 */
+  /** Used as output buffer is base is null. */
   StringBuilder sbuf = new StringBuilder(100);
-  /* #else */
-  // StringBuffer sbuf = new StringBuffer(100);
-  /* #endif */
   Object currentHeader;
 
   /** 1 - implicit; 2: explicit. */
@@ -248,6 +245,15 @@ public class HttpPrinter extends FilterConsumer
       base.endDocument();
     try
       {
+        if (sbuf.length() > 0)
+          {
+            String str = sbuf.toString();
+            sbuf.setLength(0);
+            if (writer != null)
+              writer.write(str);
+            else
+              ostream.write(str.getBytes());
+          }
 	// else ???;
 	if (writer != null)
 	  writer.close();

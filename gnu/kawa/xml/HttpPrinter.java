@@ -78,7 +78,6 @@ public class HttpPrinter extends FilterConsumer
     for (int i = 0;  i < num;  i += 2)
       printHeader(headers.elementAt(i).toString(),
 		  headers.elementAt(i + 1).toString());
-    //  if (sawContentType == null) writeRaw("Content-Type: text/html"); FIXME
     writeRaw("\n");
   }
 
@@ -117,7 +116,7 @@ public class HttpPrinter extends FilterConsumer
     if (base == null)
       {
 	if (sawContentType == null)
-	  addHeader("Content-type", "text/html");
+	  addHeader("Content-type", "text/plain");
 	if (writer == null)
 	  writer = new OutPort(ostream); // FIXME use encoding.
 	String style = null;
@@ -245,6 +244,8 @@ public class HttpPrinter extends FilterConsumer
       base.endDocument();
     try
       {
+        if (sawContentType == null)
+          addHeader("Content-type", "text/plain");
         if (sbuf.length() > 0)
           {
             String str = sbuf.toString();

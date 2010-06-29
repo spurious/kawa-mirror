@@ -1,5 +1,9 @@
 2010-06-29  Per Bothner  <per@bothner.com>
 
+	* HttpPrinter.java (endDocument):  If content-type is so far
+	unspecified, defailt to text/plain.
+	(beginData): Likewise.
+
 	* HttpPrinter.java (endDocument): Handle the case when sbuf
 	has content.
 

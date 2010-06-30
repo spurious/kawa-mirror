@@ -102,7 +102,7 @@ public class repl extends Procedure0or1
     printOption(out, "--main", "Generate an application, with a main method");
     printOption(out, "--applet", "Generate an applet");
     printOption(out, "--servlet", "Generate a servlet");
-    printOption(out, "--module-static", "Top-leval definitions are by default static");
+    printOption(out, "--module-static", "Top-level definitions are by default static");
 
     Vector keys = Compilation.options.keys();
     for (int i = 0; i < keys.size(); ++i)

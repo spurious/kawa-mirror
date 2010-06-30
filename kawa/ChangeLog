@@ -1,3 +1,7 @@
+2010-06-29  Mario Domenech Goulart <mario.goulart@gmail.com>
+
+	* repl.java: Fix typo.
+
 2010-06-21  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite_pair): Check for literal Syntax *after*

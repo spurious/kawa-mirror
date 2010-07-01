@@ -56,6 +56,7 @@ public class TestSuite extends FilterConsumer
   private TestSuite(CharArrayOutPort cout, XMLPrinter xout)
   {
     super(xout);
+    xout.canonicalizeCDATA = true;
     this.cout = cout;
     this.xout = xout;
   }

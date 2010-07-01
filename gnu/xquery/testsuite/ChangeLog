@@ -1,3 +1,7 @@
+2010-06-30  Per Bothner  <per@bothner.com>
+
+	* TestSuite.java (<init>): Force canonicalizeCDATA.
+
 2010-02-24  Per Bothner  <per@bothner.com>
 
 	* RunXQTS.java: Remove unused local variable.

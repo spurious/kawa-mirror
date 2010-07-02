@@ -1173,7 +1173,7 @@ public class XMLFilter implements
           }
       }
 
-    if ("xml".equalsIgnoreCase(target))
+    if ("xml".equalsIgnoreCase(target) /*&& inElement()*/)
       error('e',
             "processing-instruction target may not be 'xml' (ignoring case)");
     if (! XName.isNCName(target))

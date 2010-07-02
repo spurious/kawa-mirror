@@ -1,3 +1,7 @@
+2010-07-01  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java: Add space after xml-declaration, if needed.
+
 2007-12-30  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java: Add support for XML 'standalone' declaration.

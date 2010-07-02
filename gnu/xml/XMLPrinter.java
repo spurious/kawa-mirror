@@ -79,6 +79,7 @@ public class XMLPrinter extends OutPort
   private static final int ELEMENT_END = -4;
   private static final int COMMENT = -5;
   private static final int KEYWORD = -6;
+  private static final int PROC_INST = -7;
   int prev = ' ';
 
   char savedHighSurrogate; // should perhaps be combined with prev?
@@ -272,6 +273,7 @@ public class XMLPrinter extends OutPort
 	    startLogicalBlock("", "", 2);
 	  }
 	needXMLdecl = false;
+        prev = '>';
       }
   }
 
@@ -343,6 +345,8 @@ public class XMLPrinter extends OutPort
       {
         if (! inDocument)
           setIndentMode();
+        if (prev == PROC_INST)
+          write('\n');
         Object systemIdentifier = doctypeSystem.get(null);
         if (systemIdentifier != null)
           {
@@ -873,7 +877,7 @@ public class XMLPrinter extends OutPort
     print(' ');
     bout.write(content, offset, length);
     bout.write("?>");
-    prev = '>';
+    prev = PROC_INST;
   }
 
   public void consume (SeqPosition position)

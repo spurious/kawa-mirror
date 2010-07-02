@@ -1,5 +1,6 @@
 declare boundary-space preserve;
 response-header("X-Count", 6+7),
+response-header("Content-Type", "text/html"),
 unescaped-data("<?xml version='1.0'?>
 "),
 <body>

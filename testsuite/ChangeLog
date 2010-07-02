@@ -1,3 +1,10 @@
+2010-07-01  Per Bothner  <per@bothner.com>
+
+	* HelloCgiS.scm: Use XML literals.  Need explicit contnet-type.
+	Add coment literal.
+	* HelloCgiS.expected: Update accordingly.
+	* HelloCgiX.xql: Need to specify content-type response-header.
+
 2010-06-27  Per Bothner  <per@bothner.com>
 
 	* webtest, webtest/info: new sub-directories.

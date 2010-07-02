@@ -62,6 +62,13 @@ public class HttpPrinter extends FilterConsumer
       }
   }
 
+  protected void beforeNode ()
+  {
+    if (sawContentType == null)
+      addHeader("Content-type", "text/xml");
+    beginData();
+  }
+
   public void printHeader(String label, String value)
     throws java.io.IOException
   {
@@ -122,7 +129,7 @@ public class HttpPrinter extends FilterConsumer
 	String style = null;
 	if ("text/html".equalsIgnoreCase(sawContentType))
 	  style = "html";
-	else if ("text/xhtml".equalsIgnoreCase(sawContentType))
+	else if ("application/xhtml+xml".equalsIgnoreCase(sawContentType))
 	  style = "xhtml";
 	else if ("text/plain".equalsIgnoreCase(sawContentType))
 	  style = "plain";
@@ -188,40 +195,16 @@ public class HttpPrinter extends FilterConsumer
   }
 
   /* #ifdef use:java.lang.CharSequence */
-  public Consumer append (CharSequence csq, int start, int end)
-  {
-    if (base == null)
-      {
-        /* #ifdef JAVA5 */
-        sbuf.append(csq, start, end);
-        /* #else */
-        // if (csq == null)
-        //   csq = "null";
-        // sbuf.append(csq.subSequence(start, end).toString());
-        /* #endif */
-      }
-    else
-      base.write(csq, start, end);
-    return this;
-  }
-
-  public Consumer append (CharSequence csq)
-  {
-    if (base == null)
-      {
-        /* #ifdef JAVA5 */
-        sbuf.append(csq);
-        /* #else */
-        // sbuf.append(csq.toString());
-        /* #endif */
-      }
-    else if (csq == null)
-      base.write("null");
-    else
-      base.write(csq, 0, csq.length());
-    return this;
-  }
+  public void write (CharSequence str, int start, int length)
+  /* #else */
+  // public void write (String str, int start, int length)
   /* #endif */
+  {
+    if (base == null)
+      sbuf.append(str, start, start+length);
+    else
+      base.write(str, start, length);
+  }
 
   public void write(char[] buf, int off, int len)
   {

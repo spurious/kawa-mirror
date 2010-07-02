@@ -6,7 +6,7 @@ package gnu.lists;
 /** A Consumer that wraps some other Consumer. */
 
 public class FilterConsumer
-  implements Consumer
+  implements XConsumer
 {
   protected Consumer base;
   protected boolean skipping;
@@ -21,6 +21,10 @@ public class FilterConsumer
   }
 
   protected void beforeContent ()
+  {
+  }
+
+  protected void beforeNode ()
   {
   }
 
@@ -81,7 +85,10 @@ public class FilterConsumer
   public void startElement (Object type)
   {
     if (! skipping)
-      base.startElement(type);
+      {
+        beforeNode();
+        base.startElement(type);
+      }
   }
 
   public void endElement ()
@@ -95,7 +102,10 @@ public class FilterConsumer
     attributeType = attrType;
     inAttribute = true;
     if (! skipping)
-      base.startAttribute(attrType);
+      {
+        beforeNode();
+        base.startAttribute(attrType);
+      }
   }
 
   public void endAttribute()
@@ -103,6 +113,56 @@ public class FilterConsumer
     if (! skipping)
       base.endAttribute();
     inAttribute = false;
+  }
+
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    if (! skipping)
+      {
+        beforeNode();
+        if (base instanceof XConsumer)
+          ((XConsumer) base).writeComment(chars, offset, length);
+      }
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    if (! skipping)
+      {
+        beforeNode();
+        if (base instanceof XConsumer)
+          ((XConsumer) base).writeProcessingInstruction(target,
+                                                        content, offset, length);
+      }
+  }
+
+  public void writeCDATA(char[] chars, int offset, int length)
+  {
+    beforeContent();
+    if (! skipping)
+      {
+        if (base instanceof XConsumer)
+          ((XConsumer) base).writeCDATA(chars, offset, length);
+        else
+          base.write(chars, offset, length);
+      }
+  }
+
+  public void beginEntity (Object baseUri)
+  {
+    if (! skipping)
+      {
+        beforeNode();
+        if (base instanceof XConsumer)
+          ((XConsumer) base).beginEntity(baseUri);
+      }
+  }
+
+  public void endEntity ()
+  {
+    if (! skipping && base instanceof XConsumer)
+      ((XConsumer) base).endEntity();
   }
 
   public void writeObject(Object v)
@@ -151,19 +211,15 @@ public class FilterConsumer
   {
     if (csq == null)
       csq = "null";
-    append(csq, 0, csq.length());
+    write(csq, 0, csq.length());
     return this;
   }
 
   public Consumer append (CharSequence csq, int start, int end)
   {
-    beforeContent();
-    if (! skipping)
-      {
-        if (csq == null)
-          csq = "null";
-        base.append(csq, start, end);
-      }
+    if (csq == null)
+      csq = "null";
+    write(csq, start, end-start);
     return this;
   }
   /* #endif */

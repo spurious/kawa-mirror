@@ -1,3 +1,9 @@
+2010-06-30  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (beforeNode): New method override.
+	(append): Remove method, replace by:
+	(write): Override this instead.
+
 2010-06-29  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (endDocument):  If content-type is so far

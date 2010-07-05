@@ -1,3 +1,8 @@
+2010-07-05  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (emit): For backward compatibility for we prefer
+	Symbol's 'make' method over 'valueOf' - they differ in argument order.
+
 2010-06-29  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java (checkCurrent): Make sure to set lastModifiedTime

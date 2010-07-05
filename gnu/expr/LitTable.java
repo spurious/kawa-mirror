@@ -614,8 +614,11 @@ public class LitTable implements ObjectOutput
 	boolean makeStatic = false;
 	if (! useDefaultInit)
 	  {
-	    // look for matching "valueOf" or "make" method;
-	    method = getMethod(type, "valueOf", literal, true);
+	    // Look for matching "valueOf" or "make" method.
+            // (For backward compatibility for we prefer Symbol's 'make'
+            // method over 'valueOf' - they differ in argument order.)
+            if (! (literal.value instanceof gnu.mapping.Symbol))
+              method = getMethod(type, "valueOf", literal, true);
             if (method == null
                 // Values.make has return type Object, so use the constructor.
                 && ! (literal.value instanceof Values))

@@ -16,14 +16,23 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
   public static final WriteTo writeToIfChanged = new WriteTo();
   static { writeToIfChanged.ifChanged = true; }
 
+  public static void writeTo(Object value, Path ppath, OutputStream outs)
+    throws Throwable
+  {
+    OutPort out = new OutPort(outs, ppath);
+    XMLPrinter consumer = new XMLPrinter(out, false);
+    String extension = ppath.getExtension();
+    if ("html".equals(extension))
+      consumer.setStyle("html"); // Perhaps "xhtml"?
+    Values.writeValues(value, consumer);
+    out.close();
+  }
+
   public static void writeTo(Object value, Object path) throws Throwable
   {
     Path ppath = Path.valueOf(path);
     OutputStream outs = ppath.openOutputStream();
-    OutPort out = new OutPort(outs, ppath);
-    XMLPrinter consumer = new XMLPrinter(out, false);
-    Values.writeValues(value, consumer);
-    out.close();
+    writeTo(value, ppath, outs);
   }
 
   public static void writeToIfChanged (Object value, Object path)
@@ -31,10 +40,7 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
   {
     Path ppath = Path.valueOf(path);
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    OutPort out = new OutPort(bout, ppath);
-    XMLPrinter consumer = new XMLPrinter(out, false);
-    Values.writeValues(value, consumer);
-    out.close();
+    writeTo(value, ppath, bout);
     byte[] bbuf = bout.toByteArray();
     try
       {

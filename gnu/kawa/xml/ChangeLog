@@ -1,3 +1,9 @@
+2010-07-05  Per Bothner  <per@bothner.com>
+
+	* WriteTo.java (writeTo(Object,Path,OutputStream)): New method,
+	factoring out commonality of writeTo and writeToIfChanged.
+	(writeTo): If extension is "html" default style to "html".
+
 2010-06-30  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (beforeNode): New method override.

@@ -46,6 +46,7 @@ public class XMLPrinter extends OutPort
   public boolean escapeText = true;
   public boolean escapeNonAscii = true;
   boolean isHtml = false;
+  boolean isHtmlOrXhtml = false;
   boolean undeclareNamespaces = false;
   Object style;
   /** Fluid parameter to control whether a DOCTYPE declaration is emitted.
@@ -137,6 +138,7 @@ public class XMLPrinter extends OutPort
     if ("html".equals(style))
       {
 	isHtml = true;
+        isHtmlOrXhtml = true;
 	useEmptyElementTag = 2;
         // Pre-establish the html namespace, so it doesn't get printed.
         if (namespaceBindings == NamespaceBinding.predefinedXML)
@@ -145,7 +147,10 @@ public class XMLPrinter extends OutPort
     else if (namespaceBindings == XmlNamespace.HTML_BINDINGS)
       namespaceBindings = NamespaceBinding.predefinedXML;
     if ("xhtml".equals(style))
-      useEmptyElementTag = 2;
+      {
+        isHtmlOrXhtml = true;
+        useEmptyElementTag = 2;
+      }
     if ("plain".equals(style))
       escapeText = false;
   }
@@ -495,14 +500,10 @@ public class XMLPrinter extends OutPort
       }
 
     inStartTag = true;
-    if (isHtml)
-      {
-        String typeName = (type instanceof Symbol
-                           ? ((Symbol) type).getLocalPart()
-                           : type.toString());
-	if ("script".equals(typeName) || "style".equals(typeName))
-          escapeText = false;
-      }
+    
+    String typeName = getHtmlTag(type);
+    if ("script".equals(typeName) || "style".equals(typeName))
+      escapeText = false;
   }
 
   static final String HtmlEmptyTags
@@ -515,23 +516,56 @@ public class XMLPrinter extends OutPort
       && HtmlEmptyTags.charAt(index+name.length()) == '/';
   }
 
+  protected String getHtmlTag (Object type)
+  {
+    if (type instanceof Symbol)
+      {
+        Symbol sym = (Symbol) type;
+        String uri =  sym.getNamespaceURI();
+        if (uri == XmlNamespace.XHTML_NAMESPACE
+            || (isHtmlOrXhtml && uri == ""))
+          return sym.getLocalPart();
+      }
+    else if (isHtmlOrXhtml)
+      return type.toString();
+    return null;
+  }
+
   public void endElement ()
   {
     if (useEmptyElementTag == 0)
       closeTag();
     Object type = elementNameStack[elementNesting-1];
-    String typeName = ! isHtml ? null // not needed
-      : type instanceof Symbol ? ((Symbol) type).getLocalPart()
-      : type.toString();
+
+    // typeName is only used for checking certain HTML tags.
+    String typeName = getHtmlTag(type);
+
     if (inStartTag)
       {
 	if (printIndent >= 0 && indentAttributes)
 	  {
 	    endLogicalBlock("");
 	  }
-	bout.write(isHtml
-		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
-		 : (useEmptyElementTag == 2 ? " />" : "/>"));
+        String end = null;
+        boolean isEmpty = typeName != null && isHtmlEmptyElementTag(typeName);
+        if (useEmptyElementTag == 0
+            || (typeName != null && ! isEmpty))
+          {
+            if (type instanceof Symbol)
+              {
+                Symbol sym = (Symbol) type;
+                String prefix = sym.getPrefix();
+                String uri = sym.getNamespaceURI();
+                String local = sym.getLocalName();
+                if (prefix != "")
+                  end = "></"+prefix+":"+local+">";
+                else if (uri == "" || uri == null)
+                  end = "></"+local+">";
+              }
+          }
+        if (end == null)
+          end = isEmpty && isHtml ? ">" : useEmptyElementTag == 2 ? " />" : "/>";
+        bout.write(end);
 	inStartTag = false;
       }
     else
@@ -552,7 +586,7 @@ public class XMLPrinter extends OutPort
 	endLogicalBlock("");
       }
     prev = ELEMENT_END;
-    if (isHtml && ! escapeText
+    if (typeName != null && ! escapeText
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = true;
 

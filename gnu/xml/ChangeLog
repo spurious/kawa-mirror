@@ -1,3 +1,9 @@
+2010-07-05  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (isHtmlOrXhtml): New flag.
+	(getHtmlTag): New method.
+	(endElement): Re-do logic for handle "empty-elements".
+
 2010-07-01  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java: Add space after xml-declaration, if needed.

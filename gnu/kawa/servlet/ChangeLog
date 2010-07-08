@@ -1,3 +1,8 @@
+2010-07-07  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm: Add explicit export list.
+	* servets.scm: Import and re-export HTTP module.
+
 2010-06-28  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule): Force resourceStream to be

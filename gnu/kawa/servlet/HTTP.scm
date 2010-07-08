@@ -1,3 +1,15 @@
+(module-export response-header response-content-type response-status
+	       request-method request-scheme error-response
+	       request-local-socket-address request-local-IP-address
+	       request-local-port request-local-host
+	       request-remote-socket-address request-remote-IP-address
+	       request-remote-port request-remote-host
+	       request-header request-header-map request-URI
+	       request-context-path request-script-path request-local-path
+	       request-path request-uri request-url request-path-translated
+	       request-query-string request-parameter request-parameters
+	       request-parameter-map)
+
 (define (response-header key value)
   ((static-field <gnu.kawa.xml.MakeResponseHeader> 'makeResponseHeader)
    key value))

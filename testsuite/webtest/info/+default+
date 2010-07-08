@@ -1,6 +1,6 @@
 ;; A web page script to display information about the request. -*- scheme -*- 
 
-(define arrow (html:tt " => "))
+(define arrow #<tt> &#x21D2; </tt>) ;; rightwards double arrow, U+21D2
 (define-syntax show
   (syntax-rules ()
     ((_ prefix expr)
@@ -9,13 +9,24 @@
       (html:p (html:tt prefix) arrow (html:tt expr)
 	      " " comment))))
 
+(define (show-entries map::java.util.Map)
+  (let ((entries (map:entrySet)))
+    (if (entries:isEmpty)
+	#<i>empty</i>
+	(apply html:ul
+	       (let ((it (entries:iterator))
+		     (result '()))
+		 (do ()
+		     ((not (it:hasNext)) (reverse result))
+		   (set! result (cons #<li><tt>&(it:next)</tt></li> result))))))))
+
 #<html>
  <head><title>Kawa Default handler</></>
  <body>
   <p>This is the default handler, written in Kawa-Scheme.</>
   <p>Here are various request properties:</>
 <pre>
-(request-scheme)&{arrow} (request-scheme)
+(request-scheme) &{arrow} &(request-scheme)
 (request-method) &{arrow} &(request-method)
 
 (request-path) &{arrow} &(request-path)
@@ -44,19 +55,9 @@
 (request-parameters "abc") &{arrow} &(request-parameters "abc")
 </pre>
 <p><tt>(request-parameter-map)</tt> &{arrow}
-	  &(apply html:ul
-		 (let ((it (((request-parameter-map):entrySet):iterator))
-		       (result '()))
-		   (do ()
-		       ((not (it:hasNext)) (reverse result))
-		     (set! result (cons #<li><tt>&(it:next)</tt></li> result)))))</p>
- <p><tt>(request-header-map)</tt> <tt> => </tt>
-	  &(apply html:ul
-		 (let ((it (((request-header-map):entrySet):iterator))
-		       (result '()))
-		   (do ()
-		       ((not (it:hasNext)) (reverse result))
-		     (set! result (cons #<li><tt>&(it:next)</tt></li> result)))))</p>
+	  &(show-entries (request-parameter-map))</p>
+ <p><tt>(request-header-map)</tt> &{arrow}
+	  &(show-entries (request-header-map))</p>
  &{
   (cond-expand
    (in-servlet

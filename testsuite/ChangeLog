@@ -1,3 +1,9 @@
+2010-07-08  Per Bothner  <per@bothner.com>
+
+	* webtest/date.scm: New simple text/plain example.
+	* webtest/hello.scm: New simple text/html example.
+	* webtest/info/+default+: Various minor fixes and re-factoring.
+
 2010-07-07  Per Bothner  <per@bothner.com>
 
 	* HelloCgiS.scm: Importing 'http is no longer needed.

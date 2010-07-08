@@ -1,10 +1,5 @@
-;; This is -*- scheme -*-
-(require 'http)
+;; A web page script to display information about the request. -*- scheme -*- 
 
-(cond-expand
- (in-servlet
-  (require 'servlets))
- (else))
 (define arrow (html:tt " => "))
 (define-syntax show
   (syntax-rules ()
@@ -40,7 +35,7 @@
 (request-local-host) &{arrow} &(request-local-host)
 (request-local-port) &{arrow} &(request-local-port)
 
-(request-remote-socket-address) &{arrow} (request-remote-socket-address)
+(request-remote-socket-address) &{arrow} &(request-remote-socket-address)
 (request-remote-IP-address) &{arrow} &(request-remote-IP-address)
 (request-remote-host) &{arrow} &(request-remote-host)
 (request-remote-port) &{arrow} &(request-remote-port)

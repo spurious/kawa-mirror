@@ -1,4 +1,3 @@
-(require 'http)
 (response-content-type "text/html")
 ;;Not a valid processing-instruction, technically.
 ;;#<?xml version='1.0'?>

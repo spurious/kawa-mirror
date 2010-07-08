@@ -1,3 +1,9 @@
+2010-07-07  Per Bothner  <per@bothner.com>
+
+	* HelloCgiS.scm: Importing 'http is no longer needed.
+	* webtest/info/+default+: Likewise for 'http or 'servlet.
+	Also fix typo.
+
 2010-07-01  Per Bothner  <per@bothner.com>
 
 	* HelloCgiS.scm: Use XML literals.  Need explicit contnet-type.

@@ -107,6 +107,11 @@ public class KawaHttpHandler
     URI requestURI;
     Map<String,List<String>> requestParameters;
 
+    static {
+      if (HttpRequestContext.importServletDefinitions == 0)
+        HttpRequestContext.importServletDefinitions = 1;
+    }
+
     public void setExchange (HttpExchange exchange, KawaHttpHandler httpHandler)
     {
       this.statusCode = HTTP_OK;

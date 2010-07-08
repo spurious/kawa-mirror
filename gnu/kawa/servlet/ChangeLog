@@ -1,5 +1,11 @@
 2010-07-07  Per Bothner  <per@bothner.com>
 
+	A mechanism to auto-import the HTTP/servlet definition into Scheme
+	when running in the appropriate context.
+	* HttpRequestContext.java (importServletDefinitions): New static field.
+	* KawaHttpHandler.java: Set importServletDefinitions to 1.
+	* KawaServlet.java: Set importServletDefinitions to 2.
+
 	* HTTP.scm: Add explicit export list.
 	* servets.scm: Import and re-export HTTP module.
 

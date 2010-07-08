@@ -8,6 +8,7 @@ import gnu.text.SyntaxException;
 import gnu.lists.*;
 import java.util.Vector;
 import gnu.bytecode.ClassType;
+import gnu.kawa.servlet.HttpRequestContext;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -566,6 +567,7 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--servlet"))
 	  {
 	    defaultParseOptions |= Language.PARSE_FOR_SERVLET;
+            HttpRequestContext.importServletDefinitions = 2;
 	  }
 	else if (arg.equals("--debug-dump-zip"))
 	  {

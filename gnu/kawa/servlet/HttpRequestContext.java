@@ -22,6 +22,13 @@ public abstract class HttpRequestContext
   public int statusCode = HTTP_OK;
   public String statusReasonPhrase = null;
 
+  /** This is a bit of a kludge, to import servlet functions into Scheme.
+   * (The kludge is that we really shouldn't be using a static.)
+   * If importServletDefinitions == 1, then we're running in (or compiling for)
+   * a web server context; if it is 2 we specifically support servlets.
+   */
+  public static int importServletDefinitions;
+
   protected static final ThreadLocal<HttpRequestContext> instance
     = new ThreadLocal<HttpRequestContext>();
 

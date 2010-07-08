@@ -1,3 +1,10 @@
+2010-07-07  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): The --servlet flag also sets the
+	HttpRequestContext.importServletDefinitions static field.
+	* standard/Scheme.java (<clinit>): Import HTTP or servlet library class
+	if HttpRequestContext.importServletDefinitions is non-zero.
+
 2010-06-29  Mario Domenech Goulart <mario.goulart@gmail.com>
 
 	* repl.java: Fix typo.

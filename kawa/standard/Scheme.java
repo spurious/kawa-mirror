@@ -18,6 +18,7 @@ import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.math.DFloNum;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.math.Unit;
+import gnu.kawa.servlet.HttpRequestContext;
 
 public class Scheme extends LispLanguage
 {
@@ -79,6 +80,19 @@ public class Scheme extends LispLanguage
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
 
     instance.initScheme();
+
+    int withServlets = HttpRequestContext.importServletDefinitions;
+    if (withServlets > 0)
+      {
+        try
+          {
+            instance.loadClass(withServlets > 1 ? "gnu.kawa.servlet.servlets"
+                               : "gnu.kawa.servlet.HTTP");
+          }
+        catch (Throwable ex)
+          {
+          }
+      }
   }
 
   public static Scheme getInstance()

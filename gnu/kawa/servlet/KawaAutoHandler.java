@@ -197,22 +197,14 @@ public class KawaAutoHandler
 
     if (messages.seenErrors())
       {
-        byte[] msg = messages.toString(20).getBytes();
-        hctx.sendResponseHeaders(500, "Syntax errors", msg.length);
         // FIXME: we could output a nice pretty HTML table of the errors
         // or show the script with the errors highlighted
         // In that case error message needs to be properly escaped,
         // and HTML headers added.
-        OutputStream out = hctx.getResponseStream();
-        try
-          {
-            out.write(msg);
-            out.close();
-          }
-        catch (java.io.IOException ex)
-          {
-            // nothing to do?
-          }
+        String msg = "script syntax error:\n" + messages.toString(20); 
+        ((ServletPrinter) ctx.consumer).addHeader("Content-type", "text/plain");
+        hctx.sendResponseHeaders(500, "Syntax errors", -1);
+        ctx.consumer.write(msg);
         minfo.cleanupAfterCompilation();
         return null;
       }

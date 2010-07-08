@@ -1,3 +1,9 @@
+2010-07-08  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java (getModule): If we have a syntax error,
+	write diagnostics to consumer, rather than directly to response stream.
+	Using the latter caused problems with the diagnostics getting lost.
+
 2010-07-07  Per Bothner  <per@bothner.com>
 
 	A mechanism to auto-import the HTTP/servlet definition into Scheme

@@ -1,5 +1,7 @@
 2010-07-15  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Options): Document --target.
+
 	* kawa.texi (Projects): Mention Google's App Inventor for Android.
 
 2010-06-21  Per Bothner  <per@bothner.com>

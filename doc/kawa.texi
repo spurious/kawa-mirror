@@ -743,7 +743,7 @@ Kawa convenience features.  This flags so far only affects
 the XQuery parser, but that will hopefully change.
 @end table
 
-@subsection Options for setting variable
+@subsection Options for setting variables
 
 @table @code
 @item @var{name}=@var{value}
@@ -834,6 +834,18 @@ primarily interested in using Kawa for scripting Java systems.
 Both calling conventions can co-exist:  Code compiled
 with @code{--full-tailcalls} can call code compiled
 with @code{--no-full-tailcalls} and vice versa.
+
+@table @code
+@item --target @var{version}
+The @var{version} can be a JDK or Java specification version:
+@code{1.1}, @code{1.2}, @code{1.3}, @code{1.4},
+@code{5}, @code{6}, or @code{7}.
+The JDK versions @code{1.5} and @code{1.6} are equivalent to @code{5}
+or @code{6}, respectively.
+Specify a JVM (classfile) version to target.  This is useful
+if (for example) you use Java 6, but want to create @code{.class} files
+that can run on Java 5.  In that case specify @code{--target 5}.
+@end table
 
 The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, @samp{--main}
 @samp{--applet}, and @code{--servlet} are used to compile a Scheme file;

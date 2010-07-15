@@ -20,6 +20,11 @@ public class KawaHttpHandler
   int counter;
   Path resourceRoot;
 
+  static {
+    if (HttpRequestContext.importServletDefinitions == 0)
+      HttpRequestContext.importServletDefinitions = 1;
+  }
+
   public KawaHttpHandler(String resourceRoot)
   {
     this.resourceRoot = Path.valueOf(resourceRoot);
@@ -106,11 +111,6 @@ public class KawaHttpHandler
     Map<String,Object> attributes;
     URI requestURI;
     Map<String,List<String>> requestParameters;
-
-    static {
-      if (HttpRequestContext.importServletDefinitions == 0)
-        HttpRequestContext.importServletDefinitions = 1;
-    }
 
     public void setExchange (HttpExchange exchange, KawaHttpHandler httpHandler)
     {

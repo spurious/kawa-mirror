@@ -1,3 +1,10 @@
+2010-07-15  Per Bothner  <per@bothner.com>
+
+	* KawaHttpHandler.java: Move to outer class the setting of
+	HttpRequestContext.importServletDefinitions.
+	* KawaServlet.java: Likewise.  This is needed for standalone
+	manually-compiled servlets, which use KawaServlet only.
+
 2010-07-08  Per Bothner  <per@bothner.com>
 
 	* KawaAutoHandler.java (getModule): If we have a syntax error,

@@ -14,6 +14,11 @@ import gnu.text.Path;
 public abstract class KawaServlet
 extends HttpServlet
 {
+  static {
+    if (HttpRequestContext.importServletDefinitions < 2)
+      HttpRequestContext.importServletDefinitions = 2;
+  }
+
   public void run(CallContext ctx) throws Throwable
   {
     throw new AbstractMethodError();
@@ -104,11 +109,6 @@ extends HttpServlet
     ServletConfig config;
     ServletContext context;
     Map<String,Object> requestParameters;
-
-    static {
-      if (HttpRequestContext.importServletDefinitions < 2)
-        HttpRequestContext.importServletDefinitions = 2;
-    }
 
     public void init(HttpServlet servlet, HttpServletRequest request,
                      HttpServletResponse response)

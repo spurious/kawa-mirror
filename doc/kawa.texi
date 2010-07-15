@@ -9926,6 +9926,9 @@ Per is also available for development projects.
 @node Projects, , Support, Community
 @section Projects using Kawa
 
+Google's @uref{http://appinventor.googlelabs.com/,App Inventor for Android}
+uses Kawa to translate its visual blocks language.
+
 @uref{http://www.mercedsystems.com/, Merced Systems@comma{} Inc.} uses Kawa
 extensively in their contact center performance management product
 Merced Peformance Suite.  Kawa Scheme is used for all development

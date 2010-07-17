@@ -592,30 +592,30 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--module-nonstatic")
                  || arg.equals("--no-module-static"))
 	  {
-	    gnu.expr.Compilation.moduleStatic = Compilation.MODULE_NONSTATIC;
+	    Compilation.moduleStatic = Compilation.MODULE_NONSTATIC;
 	  }
 	else if (arg.equals("--module-static"))
 	  {
-	    gnu.expr.Compilation.moduleStatic = Compilation.MODULE_STATIC;
+	    Compilation.moduleStatic = Compilation.MODULE_STATIC;
 	  }
         else if (arg.equals("--module-static-run"))
           {
-            gnu.expr.Compilation.moduleStatic = Compilation.MODULE_STATIC_RUN;
+            Compilation.moduleStatic = Compilation.MODULE_STATIC_RUN;
           }
 	else if (arg.equals("--fewer-classes"))
 	  {
-	    gnu.expr.Compilation.fewerClasses = true;
+	    Compilation.fewerClasses = true;
 	  }
 	else if (arg.equals("--no-inline")
 		 || arg.equals("--inline=none"))
 	  {
-	    gnu.expr.Compilation.inlineOk = false;
+	    Compilation.inlineOk = false;
 	  }
         else if (arg.equals("--no-console"))
           noConsole = true;
 	else if (arg.equals("--inline"))
 	  {
-	    gnu.expr.Compilation.inlineOk = true;
+	    Compilation.inlineOk = true;
 	  }
 	else if (arg.equals("--cps"))
 	  {

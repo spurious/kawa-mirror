@@ -37,6 +37,10 @@ implements Inlineable
       return (XMLFilter) out;
     else
       {
+        // FIXME: It would be more efficinet to just do:
+        // filter = new XMLFilter(out);
+        // There is at least one problem "JOINER" isn't handled properly;
+        // it's not obvious how to ensure we get the right whitespace.
 	XMLFilter filter = new XMLFilter(new NodeTree());
 	ctx.consumer = filter;
 	return filter;

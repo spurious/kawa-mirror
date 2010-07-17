@@ -61,6 +61,11 @@ public class ServletPrinter extends HttpPrinter
   public void printHeaders()
   {
   }
+
+  public boolean reset (boolean headersAlso)
+  {
+    return ((HttpOutputStream) ostream).reset() & super.reset(headersAlso);
+  }
 }
 
 class HttpOutputStream extends OutputStream
@@ -104,8 +109,14 @@ class HttpOutputStream extends OutputStream
       }
   }
 
+  public boolean reset ()
+  {
+    count = 0;
+    return out == null;
+  }
+
   public void flush()
-           throws IOException
+    throws IOException
   {
     if (out == null)
       {

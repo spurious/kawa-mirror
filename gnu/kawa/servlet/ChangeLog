@@ -1,11 +1,21 @@
 2010-07-17  Per Bothner  <per@bothner.com>
 
+	* ServletPrinter.java (reset): New method.
+	(HttpOutputStream.reset): New method.
+	* HttpRequestContext.java (reset): New abstract method.
+	(getConsumer): New method.
+	(log(String,Throwable)): New method.
+	* KawaHttpHandler.java (reset, log): New implementation methods.
+	(handle): Working catching of exception.
+	* KawaServlet.java (doGet): Minor tweaks.
+	(reset, log): New implementation methods.
+
 	* HttpRequestContext.java (class HttpOutputStream): Move class ...
 	* ServletPrinter.java: ... to here.
 
 2010-07-15  Per Bothner  <per@bothner.com>
 
-	* KawaHttpHandler.java: Move to outer class the setting of
+	* Kaw0paHttpHandler.java: Move to outer class the setting of
 	HttpRequestContext.importServletDefinitions.
 	* KawaServlet.java: Likewise.  This is needed for standalone
 	manually-compiled servlets, which use KawaServlet only.

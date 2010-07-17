@@ -58,6 +58,22 @@ public abstract class HttpRequestContext
    */
   public abstract OutputStream getResponseStream ();
 
+  ServletPrinter consumer;
+
+  public ServletPrinter getConsumer ()
+    throws IOException
+  {
+    if (consumer == null)
+      consumer = new ServletPrinter(this, 8192);
+    return consumer;
+  }
+
+  /** Try to reset (delete) any response generated so far.
+   * @param headersAlso if response headers should also be reset.
+   * @return true on success, false if it's too late.
+   */
+  public abstract boolean reset (boolean headersAlso);
+
   public String getRequestParameter (String name)
   {
     List<String> p = getRequestParameters().get(name);
@@ -224,5 +240,5 @@ public abstract class HttpRequestContext
   }
 
   public abstract void log (String message);
+  public abstract void log (String message, Throwable ex);
 }
-

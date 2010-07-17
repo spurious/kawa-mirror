@@ -37,43 +37,46 @@ public class KawaHttpHandler
 
   public void handle(HttpExchange t) throws IOException
   {
-    HttpRequestContext hctx = HttpRequestContext.instance.get();
-    KawaHttpHandler.Context rctx;
-    if (hctx instanceof KawaHttpHandler.Context)
+    KawaHttpHandler.Context hctx; 
+    HttpRequestContext tctx = HttpRequestContext.instance.get();
+    if (tctx instanceof KawaHttpHandler.Context)
       {
-        rctx = (KawaHttpHandler.Context) hctx;
+        hctx = (KawaHttpHandler.Context) tctx;
       }
     else
       {
-        rctx = new KawaHttpHandler.Context();
-        HttpRequestContext.setInstance(rctx);
+        hctx = new KawaHttpHandler.Context();
+        HttpRequestContext.setInstance(hctx);
       }
-    rctx.setExchange(t, this);
+    hctx.setExchange(t, this);
 
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = ctx.consumer;
+    ServletPrinter consumer = hctx.getConsumer();
     try
       {
-        ctx.consumer = new ServletPrinter(rctx, 8192);
+        ctx.consumer = consumer;
         ctx.consumer.startDocument();
 
-        KawaAutoHandler.run(rctx, ctx);
-        ctx.consumer.endDocument();
-        //t.close();
+        KawaAutoHandler.run(hctx, ctx);
       }
     catch (Throwable ex)
       {
-        if (ex instanceof Error)
-          throw (Error) ex;
-        if (ex instanceof RuntimeException)
-          throw (RuntimeException) ex;
-        throw new RuntimeException(ex);
+        hctx.log("Caught an exception: ", ex);
+        hctx.reset(true);
+        hctx.setContentType("text/plain");
+        if (hctx.statusCode != HttpRequestContext.STATUS_SENT)
+          hctx.statusCode = 500;
+        ctx.consumer.write("internal exception: ");
+        ctx.consumer.writeObject(ex);
+        ctx.consumer.write("\nSee logs for specifics.");
       }
     finally
       {
+        ctx.consumer.endDocument();
         ctx.consumer = saveConsumer;
+        t.close();
       }
-    t.close();
   }
 
   public static HttpServer serverInstance;
@@ -123,6 +126,7 @@ public class KawaHttpHandler
       requestURI = exchange.getRequestURI();
       requestParameters = null;
       this.httpHandler = httpHandler;
+      consumer = null;
     }
 
     public URL getResourceURL (String path)
@@ -148,6 +152,15 @@ public class KawaHttpHandler
     public OutputStream getResponseStream ()
     {
       return exchange.getResponseBody();
+    }
+
+    public boolean reset (boolean headersAlso)
+    {
+      if (statusCode == STATUS_SENT)
+        return false;
+      if (headersAlso)
+        responseHeaders.clear();
+      return consumer == null || consumer.reset(headersAlso);
     }
 
     public Map<String, List<String>> getRequestParameters ()
@@ -353,6 +366,12 @@ public class KawaHttpHandler
     public void log (String message)
     {
       System.err.println(message);
+    }
+
+    public void log (String message, Throwable ex)
+    {
+      System.err.println(message);
+      ex.printStackTrace(System.err);
     }
   }
 }

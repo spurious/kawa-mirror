@@ -15,7 +15,7 @@ import java.util.Vector;
 public class HttpPrinter extends FilterConsumer
 {
   Vector headers = new Vector();
-  /** Used as output buffer is base is null. */
+  /** Used as output buffer if base is null. */
   StringBuilder sbuf = new StringBuilder(100);
   Object currentHeader;
 
@@ -34,14 +34,12 @@ public class HttpPrinter extends FilterConsumer
   {
     super(null);
     ostream = out;
-    //ostream = System.out;
   }
 
   public HttpPrinter(OutPort out)
   {
     super(null);
     writer = out;
-    //ostream = System.out;
   }
 
   public static HttpPrinter make (OutPort out)
@@ -247,5 +245,29 @@ public class HttpPrinter extends FilterConsumer
     catch (Throwable ex)
       {
       }
+  }
+
+  /** Try to reset (delete) any response generated so far.
+   * @param headersAlso if response headers should also be reset.
+   * @return true on success, false if it's too late.
+   */
+  public boolean reset (boolean headersAlso)
+  {
+    if (headersAlso)
+      {
+        headers.clear();
+        sawContentType = null;
+        currentHeader = null;
+        elementNesting = 0;
+      }
+    sbuf.setLength(0);
+    base = null;
+    boolean ok = true;
+    if (ostream != null)
+      {
+        ok = writer == null;
+        writer = null;
+      }
+    return ok;
   }
 }

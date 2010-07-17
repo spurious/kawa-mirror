@@ -49,7 +49,7 @@ extends HttpServlet
         Context.setInstance(sctx);
       }
     sctx.init(this, request, response);
-    ctx.consumer = new ServletPrinter(sctx, 8192);  // FIXME - should re-use
+    ctx.consumer = sctx.getConsumer();
     // FIXME should path be relative to context?
     Path.setCurrentPath(Path.valueOf(request.getRequestURL().toString()));
     ctx.values = Values.noArgs;
@@ -82,9 +82,8 @@ extends HttpServlet
       }
     catch (Throwable throwable)
       {
-        throwable.printStackTrace(); // FIXME
 	// Clear partial output on an error.
-	response.resetBuffer();
+	response.reset();
 	if (throwable instanceof WrappedException)
 	  {
 	    Throwable cause = ((WrappedException) throwable).getCause();
@@ -123,6 +122,7 @@ extends HttpServlet
       this.statusCode = HTTP_OK;
       this.statusReasonPhrase = null;
       this.requestParameters = null;
+      this.consumer = null; // FIXME should re-use
     }
 
     public static Context getInstance(String command)
@@ -330,6 +330,24 @@ extends HttpServlet
       response.setContentType(type);
     }
 
+    public boolean reset (boolean headersAlso)
+    {
+      if (statusCode == STATUS_SENT)
+        return false;
+      try
+        {
+          if (headersAlso)
+            response.reset();
+          else
+            response.resetBuffer();
+        }
+      catch (IllegalStateException ex)
+        {
+          return false;
+        }
+      return true;
+    }
+
     public URL getResourceURL (String path)
     {
       path = normalizeToContext(path);
@@ -341,7 +359,6 @@ extends HttpServlet
         }
       catch (Exception ex)
         {
-          ex.printStackTrace(); // FIXME
           return null;
         }
     }
@@ -372,6 +389,11 @@ extends HttpServlet
     public void log (String message)
     {
       context.log(message);
+    }
+
+    public void log (String message, Throwable ex)
+    {
+      context.log(message, ex);
     }
   }
 }

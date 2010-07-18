@@ -877,6 +877,23 @@ Prints a stack trace with any error found during compilation.
 Prints a stack trace with any warning found during compilation.
 @end table
 
+@subsection Options for web servers
+
+JDK 6, the standard Java 6 distribution by Sun/Oracle,
+includes a complete web server library.
+
+@table @code
+@item --http-auto-handler @var{context-path} @var{appdir}
+Register a web application handler that uses files
+in the directory @var{appdir} to handle HTTP (web) requests
+containing the given @var{context-path}.  That is it handles
+requests that start with @code{http://localhost:@var{port}@var{context-path}}.
+(This assumes the @var{context-path} starts with a @code{/}.)
+@xref{Self-configuring page scripts}.
+@item --http-start @var{port}
+Start the web server, listing on the specified @var{port}.
+@end table
+
 @node Scripts, New-Window, Options, Running
 @section Running Command Scripts
 
@@ -8735,6 +8752,7 @@ the same functions.
 * Creating XML nodes::
 * XML literals::
 * Server-side scripts::  Writing web-server-side Kawa scripts
+* Self-configuring page scripts::
 * Servlets::             Installing Kawa programs as Servlets
 * CGI scripts::          Installing Kawa programs as CGI scripts
 * HTTP requests::        Functions for accessing HTTP requests
@@ -9165,47 +9183,88 @@ Kawa remembers that you used a @code{CDATA} section in
 the @var{xml-element-constructor} and will write it out
 using a @code{CDATA} constructor.
 
-@node Server-side scripts, Servlets, XML literals, XML tools
-@section Writing web-server-side Kawa scripts
+@node Server-side scripts, Self-configuring page scripts, XML literals, XML tools
+@section Web page scripts
 
-You can compile a Kawa program (written in any supported
-Kawa language, including Scheme, BRL, KRL, or XQuery),
-and run it as either servlet engine (using a web server
-that supports servlets), or as a "CGI script" on most web servers.
+A Kawa @dfn{web page script} is a Kawa program that is invoked
+by a web server because the server received an HTTP request.
+The result of evaluating the top-level expressions becomes
+the HTTP response that the servlet sends back to the client, usually a browser.
 
-In either case, the result of evaluating the top-level expressions
-becomes the HTTP response that the servlet sends back to the browser.
-The result is typically an HTML/XML element code object;
-Kawa will automatically format the result as appropriate for the type.
-The initial result values may be special "response header values",
-as created by the @code{response-header} function.
-Kawa will use the response header values to set various
-required and optional fields of the HTTP response.
-Note that @code{response-header} does not actually do anything
-until it is "printed" to the standard output.
-Note also that if a @code{"Content-Type"} response value is
-printed that controls the formatting of the following
-non-response-header values.
+A web page script may be as simple as:
+@example
+(format "The time is <~s>." (java.util.Date))
+@end example
+This returns a response of consisting of a formatted string
+giving the current time.
+The string would interpreted as @code{text/plain} content:
+The angle brackets are regular characters, and not
+HTML tag markers.
 
-Here is a simple program @code{hello.scm}:
+The script can alternatively evaluate to XML/HTML node
+values, for example those created by @ref{XML literals}:
+@example
+#<p>Hello, <b>&(request-remote-host)</b>!</p>
+@end example
+In this case the response would be @code{text/html} or similar content:
+The angle brackets should be interpreted by the browser as HTML tag markers.
+The function @code{request-remote-host} is available (automatically)
+to web page scripts; it returns the host that made the HTTP request,
+which is then interpolated into the response.
+
+Following sections will go into more details about how
+to write web page scripts.  You can do so in any supported
+Kawa language, including Scheme, BRL, KRL, or XQuery.
+
+A web server will use a URL mapping to map a request URL
+to a specific web page script.  This can be done in a
+number of different ways:
+@itemize
+@item
+The easiest to manage is to use Kawa's mechanism for
+@ref{Self-configuring page scripts}.  Ths is especially
+easy if you the web server built in to JDK 6, since no
+configuration files are needed.
+You can also use a ``serlvet engine'' like Tomcat or Glassfish.
+
+@item
+You can explicitly compile the web page script to a servlet,
+in the same way Java servlets are compiled.
+This can then be installed ("deployed") in a servlet-supporting
+web server, such a Tomcat or Glassfish.  @xref{Servlets}.
+@item
+You can run the servlet as a @ref{CGI scripts,CGI script}.
+@end itemize
+
+For details on how to extract information from the request
+see @ref{HTTP requests}.
+For details on how the response is created see @ref{HTTP response,Generating HTTP responses}.
+If the response is HTML or XML, you may want to
+read @ref{Creating HTML nodes}, or @ref{Creating XML nodes},
+or @ref{XML literals}.
+
+Here are some examples, starting with a simple @code{hello.scm}:
 @example
 (response-content-type 'text/html) ; Optional
-(make-element 'p
+(html:p
   "The request URL was: " (request-url))
 (make-element 'p
   (let ((query (request-query-string)))
     (if query
       (values-append "The query string was: " query)
       "There was no query string.")))
-#\newline ; emit a new-line at the end
 @end example
+This returns two @code{<p>} (paragraph) elements: One using
+@code{make-element} and one using the @code{html:p} constructor.
+Or you may prefer to use @ref{XML literals}.
 
-The same program using KRL is shorter:
+The same program using KRL:
 @example
 <p>The request URL was: [(request-url)]</p>,
 <p>[(let ((query (request-query-string)))
     (if query
       (begin ]The query string was: [query)
+
       ]There was no query string.[))]</p>
 @end example
 
@@ -9218,7 +9277,233 @@ You can also use XQuery:
     else "There was no query string."@}</p>
 @end example
 
-Either way, you compile your program to a servlet:
+@node Self-configuring page scripts, Servlets, Server-side scripts, XML tools
+@section Self-configuring web page scripts
+
+Kawa makes it easy to set up a web site without have configuration
+files.  Instead, the mapping from request URL to web page script
+matches the layout of files in the application directory.
+
+Many web servers make it easy to execute a script using a script
+processor which is selected depending on the extension of the
+requested URL. That is why you see lots of URLs that end in
+@code{.cgi}, @code{.php}, or @code{.jsp}. This is bad, because it
+exposes the server-side implementation to the user: Not only are such
+URLs ugly, but they make it difficult to change the server without
+breaking people's bookmarks and search engines. A server will usually
+provide a mechanism to use prettier URLs, but doing so requires extra
+effort, so many web-masters don't.
+
+Instead Kawa determines how to handle a request based on the contents
+of a script, rather than the file name.  Once Kawa has
+found a script, it looks at the first line to see if it can recognize
+the kind (language) of the script. Normally this would be a comment
+that contains the name of a programming language that Kawa
+knows about.  For example:
+@example
+;; Hello world page script written in -*- scheme -*- 
+#<p>Hello, <b>&(request-remote-host)</b>!</p>
+@end example
+(Using the funny-looking string @code{-*- scheme -*-} has the
+bonus is that it recognized by the Emacs text editor.)
+
+@subsection Using the JDK 6 built-in web server
+
+The easiest way to run a Kawa web server is to
+use the web server built in to JDK 6, the standard Java 6 distribution
+shipped by Sun/Oracle.
+
+@example
+kawa --http-auto-handler @var{context-path} @var{appdir} --http-start @var{port}
+@end example
+
+This starts a web server that listens on the given @var{port},
+using the files in directory @var{appdir} to handle
+requests that start with the given @var{context-path}.
+
+You can specify multiple @code{--http-auto-handler} options.
+
+For example use the files in the current directory to handle
+all requests on the standard port 80 do:
+@example
+kawa --http-auto-handler / . --http-start 80
+@end example
+
+@subsection Using a servlet container
+
+You can also can use a ``servlet container''
+such as Tomcat or Glassfish with self-configuring script.
+See @ref{Servlets} for information on how to install
+these servers, and the concept of web applications.
+Once you have these server installed, you create a
+web application with the following in the
+@code{@var{appdir}/WEB-INF/web.xml} configuration file:
+@example
+<web-app>
+  <display-name>Kawa auto-servlet</display-name>
+  <servlet>
+    <servlet-name>KawaPageServlet</servlet-name>
+    <servlet-class>gnu.kawa.servlet.KawaPageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>KawaPageServlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+</web-app>
+@end example
+This creates a web application where all URLs
+are handled by the @code{gnu.kawa.servlet.KawaPageServlet} servelet class,
+which is included in the Kawa jar file.
+The @code{KawaPageServlet} class handles the searching
+and compiling described in this page.
+
+@subsection Finding a matching script
+
+When Kawa receives a request for:
+@example
+http://host:port/appname/a/b/anything
+@end example
+it will look for a file:
+@example
+@var{appdir}/a/b/anything
+@end example
+
+If such a file exists, the script will be executed, as described
+below. If not, it will look for a file name @code{+default+} in the same
+directory. If that desn't exist either, it will look for @code{+default+}
+in the parent
+directory, then the grand-parent directory, and so on until it gets to
+the appname web application root directory. So the default script is
+this: @code{@var{appdir}/+default}.
+
+If that doesn't exist then Kawa returns a 404 "page not found" error. 
+
+@subsection Determining script language
+
+Once Kawa has found a script file corresponding to a request URL,
+it needs to determine if this is a data file or a web page script,
+and in the latter case, what language it is written in.
+
+Kawa recognizes the following "magic strings" in the first line of a script:
+
+@table @code
+@item kawa:scheme
+The Scheme language.
+
+@item kawa:xquery
+The XQuery language.
+
+@item kawa:@var{language}
+Some other language known to Kawa.
+@end table
+
+Kawa also recognizes Emacs-style "mode specifiers":
+
+@table @code
+@item -*- scheme -*-
+The Scheme language.
+@item -*- xquery -*-
+The XQuery language (though Emacs doesn't know about XQuery).
+@item -*- emacs-lisp -*-
+@itemx -*- elisp -*-
+The Emacs Lisp extension language.
+@item -*- common-lisp -*-
+@itemx -*- lisp -*-
+    The Common Lisp language.
+@end table
+
+Also, it also recognizes comments in the first two columns of the line:
+@table @code
+@item ;;
+A Scheme or Lisp comment - assumed to be in the Scheme language.
+@item (:
+Start of an XQuery comment, so assumed to be in the XQuery language.
+@end table
+
+If Kawa doesn't recognize the language of a script (and it
+isn't named +default+) then it assumes the file is a data file. It
+asks the servlet engine to figure out the content type (using the
+getMimeType method of ServletContext), and just copies the file into
+the response.
+
+@subsection Compilation and caching
+
+Kawa automatically compiles a script into a class. The
+class is internal to the server, and is not written out to
+disk. (There is an unsupported option to write the compiled file to a
+class file, but there is no support to use previously-compiled
+classes.) The server then creates a module instance to handle the
+actual request, and runs the body (the @code{run} method)
+of the script class. On subsequence
+requests for the same script, the same class and instance are reused;
+only the @code{run} is re-executed.
+
+If the script is changed, then it is re-compiled and a new module
+instance created. This makes it very easy to develop and modify a
+script. (Kawa for performance reasons doesn't check more
+than once a second whether a script has been modified.)
+
+@node Servlets, CGI scripts, Self-configuring page scripts, XML tools
+@section Installing web page scripts as Servlets
+
+You can compile a Kawa program to a @uref{http://en.wikipedia.org/wiki/Java_Servlet,Servlet}, and run it
+in a servlet engine (a Servlet-aware web server).
+One or more servlets are installed together as a web application.
+This section includes specific information for
+the Tomcat and Glassfish web servers.
+
+@subsection Creating a web application
+
+A @dfn{web application} is a group of data, servlets, and
+configuration files to handle a related set of URLs.
+The @uref{http://jcp.org/aboutJava/communityprocess/final/jsr315/index.html,
+servlet specification}
+specifies the directory structure of a web application.
+
+Assume the web application is called @code{myapp}, and lives in a
+directory with the same name.  The application normally handles
+requests for URLs that start with @code{http://example.com/myapp}.
+Most files in the application directory are used to handle
+requests with corresponding URL.  For example,
+a file @code{myapp/list/help.html} would be the response
+to the request @code{http://example.com/myapp/list/help.html}.
+
+The directory @code{WEB-INF} is special.  It contains configuration
+files, library code, and other server data.
+
+So to create the @code{myapp} application, start with:
+@example
+mkdir myapp
+cd myapp
+mkdir WEB-INF WEB-INF/lib WEB-INF/classes
+@end example
+
+Copy the Kawa jar from the @code{lib} direcory.
+(You can also use a ``hard'' link, but symbolic links may not
+work, for security systems.)
+@example
+cp @var{kawa-home}/kawa-@value{VERSION}.jar WEB-INF/lib/kawa.jar
+@end example
+
+You should also create the file @code{WEB-INF/web.xml}.
+For now, this is is just a place-holder:
+@example
+<web-app>
+  <display-name>My Application</display-name>
+</web-app>
+@end example
+
+@subsection Compiling a web page script to a servlet
+
+Assume for simplicity that the source files
+are in the @code{WEB-INF/classes} directory, and make that the
+current directory:
+@example
+cd .../myapp/WEB-INF/classes
+@end example
+
+Depending on the source language, you compile your script
+sing the @code{--servlet} switch:
 @example
 kawa --servlet -C hello.scm
 @end example
@@ -9231,24 +9516,83 @@ or:
 kawa --servlet --xquery -C hello.xql
 @end example
 
-The next two sections will explain how you can install this script
-as either a servlet or a CGI script.
+This lets the web-application find the compiled servlets.
+Finally, you just need to add the new servlet to
+the @code{WEB-INF/web.xml} file:
+@example
+<web-app>
+  <display-name>My Application</display-name>
 
-@node Servlets, CGI scripts, Server-side scripts, XML tools
-@section Installing Kawa programs as Servlets
+  <servlet>
+    <selvlet-name>MyHello</servlet-name>
+    <selvlet-class>hello</servlet-class>
+  </servlet>
 
-You can compile a Kawa program to a @code{Servlet}, and run it
-in a servlet engine (a Servlet-aware web server).
-I assume you have compiled your program to a servlet as
-descrbibed in the previous section.
+  <servlet-mapping>
+    <selvlet-name>MyHello</servlet-name>
+    <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+</web-app>
+@end example
 
-If you have Tomcat 4.x installed, and you want @code{hello} to be
-part of the @code{myutils} "web application", copy @code{hello*.class}
-into @code{$CATALINA_HOME/webapps/myutils/WEB-INF/classes/}.
-You also need to copy Kawa somewhere where Tomcat can find it,
-for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
-You can then run the @code{hello} servlet using the URL
-@url{http://localhost:8080/myutils/servlet/hello}.
+The @code{<servlet>} clause says that the servlet named
+@code{MyHello} is implemented by the Java class @code{hello}.
+The @code{<servlet-mapping>} clause says that a request
+URL @code{/hello} should be handled by the servlet named @code{MyHello}.
+The URL is relative to the application context path,
+so the actual URL would be @code{http://example.com/myapp/hello}.
+
+@subsection Installing a servlet under Tomcat
+
+Apache's @uref{http://tomcat.apache.org/,Tomcat} is an open-source
+implementation of the servlet specifications.
+After you @uref{http://tomcat.apache.org/download-60.cgi, download it},
+uncompress it in some convenient location,
+which is commonly referred to as @code{$CATALINA_HOME}.
+
+To install your web application, copy/move its directory
+to be in the @code{$CATALINA_HOME/webapps} directory.
+Thus for the example above you would have
+a @code{$CATALINA_HOME/webapps/myapp} directory.
+
+To start or stop Tomcat use the scripts in @code{$CATALINA_HOME/bin}.
+For example to start Tomcat on a GNU/Linux system run
+@code{$CATALINA_HOME/bin/startup.sh}.  This will start a web server
+that listens on the default port of 8080,
+so you can browse the above example at @code{http://localhost:8080/myapp/hello}.
+
+@subsection Installing a servlet under Glassfish
+
+@uref{https://glassfish.dev.java.net/,Glassfish} from Oracle/Sun
+is a open-source ``application server'' that implements
+Java EE 6, including the 3.0 servlet specification.
+After you @uref{https://glassfish.dev.java.net/downloads/3.0.1-final.html, download it}, uncompress it in some convenient location.
+This location is called @var{as-install-parent} in the
+@uref{http://docs.sun.com/app/docs/doc/820-7689/aboaa?a=view,Quick Start Guide}.
+The commands you will use is most in @code{@var{as-install}/bin},
+where @var{as-install} is @code{@var{as-install}/glassfish}.
+
+To start the server, do:
+@example
+@var{as-install}/bin/startserv
+@end example
+or under under Windows:
+@example
+@var{as-install}\bin\startserv.bat
+@end example
+The default post to listen to is @code{8080};
+you can the port (and lots of other properties)
+using the adminstration console at port @code{4848}.
+
+A web application does not need to be any particular
+location, instead you just install it with this command:
+@example
+@var{as-install}/bin/adadmin deploy @var{appdir}
+@end example
+where @var{appdir} is the application directory - @code{myapp} in the example.
+(Use @code{asadmin.bat} under Windows.)
+
+@subsection Servlet-specific script functions
 
 The following functions only work within a servlet container.
 To use these functions, first do:
@@ -9315,7 +9659,7 @@ as a CGI script is to compile the Kawa program to a servlet
 Kawa's supplied CGI-to-servlet bridge.
 
 First, compile your program to one or more class files
-as explain in @ref{Server-side scripts}.  For example:
+as explained in @ref{Server-side scripts}.  For example:
 @example
 kawa --servlet --xquery -C hello.xql
 @end example
@@ -9588,6 +9932,21 @@ Usually @code{"http"}, or @code{"https"}.
 
 @node HTTP response, XML beyond Scheme, HTTP requests, XML tools
 @section Generating HTTP responses
+
+The result of evaluating the top-level expressions of a web page script
+becomes the HTTP response that the servlet sends back to the browser.
+The result is typically an HTML/XML element code object
+Kawa will automatically format the result as appropriate for the type.
+Before the main part of the response there may be
+special "response header values",
+as created by the @code{response-header} function.
+Kawa will use the response header values to set various
+required and optional fields of the HTTP response.
+Note that @code{response-header} does not actually do anything
+until it is "printed" to the standard output.
+Note also that a @code{"Content-Type"} response value is
+special since it controls the formatting of the following
+non-response-header values.
 
 @deffn Procedure response-header key value
 Create the response header @samp{@var{key}: @var{value}} in the HTTP

@@ -120,7 +120,7 @@ version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 For lots of Scheme resources, see
 @uref{http://www.schemers.org/,www.schemers.org},
 including an online copy of the
-@uref{http://www.schemers.org/Documents/Standards/,R5RS standard}.
+@uref{http://www.schemers.org/Documents/Standards/,R6RS standard}.
 A nice quick introduction to Scheme can be found in
 @uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
 discusses Scheme implementation is
@@ -9189,7 +9189,6 @@ non-response-header values.
 
 Here is a simple program @code{hello.scm}:
 @example
-(require 'http) ; Required for Scheme, though not BRL/KRL.
 (response-content-type 'text/html) ; Optional
 (make-element 'p
   "The request URL was: " (request-url))
@@ -9367,12 +9366,6 @@ properties of a HTTP request, in a Kawa program that is
 run either as a servlet or a CGI script.  These functions
 can be used from plain Scheme, from KRL (whether
 in BRL-compatible mode or not), and from XQuery.
-
-If using plain Scheme, you need to do the following
-before using these functions.
-@example
-(require 'http)
-@end example
 
 The examples below assume the request @code{http://example.com:8080/myapp/foo/bar?val1=xyz&val2=abc}, where @code{myapp} is the application context.
 We also assume that this is handled by a script @code{foo/+default+}.
@@ -9595,13 +9588,6 @@ Usually @code{"http"}, or @code{"https"}.
 
 @node HTTP response, XML beyond Scheme, HTTP requests, XML tools
 @section Generating HTTP responses
-
-If using plain Scheme, you need to do the following
-before using these functions.
-@example
-(require 'http)
-@end example
-This is not needed for KRL or XQuery.
 
 @deffn Procedure response-header key value
 Create the response header @samp{@var{key}: @var{value}} in the HTTP

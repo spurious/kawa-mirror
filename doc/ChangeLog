@@ -1,3 +1,7 @@
+2010-07-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various updates.
+
 2010-07-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Options): Document --target.

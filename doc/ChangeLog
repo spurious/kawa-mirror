@@ -1,3 +1,7 @@
+2010-07-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: More on web page scripts.
+
 2010-07-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Self-configuring page scripts): New section.

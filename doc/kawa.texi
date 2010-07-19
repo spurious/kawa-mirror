@@ -9294,8 +9294,17 @@ breaking people's bookmarks and search engines. A server will usually
 provide a mechanism to use prettier URLs, but doing so requires extra
 effort, so many web-masters don't.
 
-Instead Kawa determines how to handle a request based on the contents
-of a script, rather than the file name.  Once Kawa has
+If you want a script to be executed in response to a URL
+@code{http://host/app/foo/bar} you give the script the name
+@code{app/foo/bar}, in the appropriate server ``application''
+directory (as explained below). You get to pick the name @code{bar}.
+Or you can use the name @code{bar.html}, even though the file named
+@code{bar.html} isn't actually
+an html file - rather it produces html when evaluated. Or better: just use
+a name without an extension at all.
+Kawa figures
+out what kind of script it is based on the content of the file,
+rather than the file name.  Once Kawa has
 found a script, it looks at the first line to see if it can recognize
 the kind (language) of the script. Normally this would be a comment
 that contains the name of a programming language that Kawa
@@ -9306,6 +9315,22 @@ knows about.  For example:
 @end example
 (Using the funny-looking string @code{-*- scheme -*-} has the
 bonus is that it recognized by the Emacs text editor.)
+
+A script named @code{+default+} is run if there isn't a matching script.
+For example assume the following is a file named @code{+default}.
+@example
+;; This is -*- scheme -*-
+(make-element 'p "servlet-path: " (request-servlet-path))
+@end example
+This becomes the default script for HTTP requests that aren't handled
+by a more specific script. 
+The @code{request-servlet-path} function
+returns the "servlet path", which is the part of the requested URL
+that is relative to the current web application. Thus a request for
+@code{http://host:port/app/this/is/a/test} will return:
+@example
+servlet-path: /this/is/a/test
+@end example
 
 @subsection Using the JDK 6 built-in web server
 
@@ -9328,6 +9353,13 @@ all requests on the standard port 80 do:
 @example
 kawa --http-auto-handler / . --http-start 80
 @end example
+
+There are some examples in the @code{testsuite/webtest} directory
+the Kawa source distribution.  You can start the server thus:
+@example
+bin/kawa --http-auto-handler / testsuite/webtest/ --http-start 8888
+@end example
+and then for example browse to @code{http://localhost:8888/adder.scm}.
 
 @subsection Using a servlet container
 
@@ -9543,6 +9575,7 @@ The URL is relative to the application context path,
 so the actual URL would be @code{http://example.com/myapp/hello}.
 
 @subsection Installing a servlet under Tomcat
+@cindex Tomcat
 
 Apache's @uref{http://tomcat.apache.org/,Tomcat} is an open-source
 implementation of the servlet specifications.
@@ -9561,7 +9594,16 @@ For example to start Tomcat on a GNU/Linux system run
 that listens on the default port of 8080,
 so you can browse the above example at @code{http://localhost:8080/myapp/hello}.
 
+If you're running Fedora GNU/Linux, you can use the @code{tomcat6} package:
+@example
+# yum install tomcat6
+# export CATALINA_HOME=/usr/share/tomcat6
+@end example
+You can the manage Tomcat like other system services.
+You can install webapps under @code{$CATALINA_HOME/webapps}.
+
 @subsection Installing a servlet under Glassfish
+@cindex Glassfish
 
 @uref{https://glassfish.dev.java.net/,Glassfish} from Oracle/Sun
 is a open-source ``application server'' that implements

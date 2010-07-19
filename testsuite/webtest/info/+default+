@@ -1,13 +1,6 @@
 ;; A web page script to display information about the request. -*- scheme -*- 
 
 (define arrow #<tt> &#x21D2; </tt>) ;; rightwards double arrow, U+21D2
-(define-syntax show
-  (syntax-rules ()
-    ((_ prefix expr)
-     #<p><tt>&{prefix}</tt> &{arrow} <tt>&{expr}</tt></p>)
-    ((_ prefix expr comment)
-      (html:p (html:tt prefix) arrow (html:tt expr)
-	      " " comment))))
 
 (define (show-entries map::java.util.Map)
   (let ((entries (map:entrySet)))

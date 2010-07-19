@@ -1,3 +1,7 @@
+2010-07-19  Per Bothner  <per@bothner.com>
+
+	* webtest/info/+default+ (show): Remove unused macro.
+
 2010-07-08  Per Bothner  <per@bothner.com>
 
 	* webtest/date.scm: New simple text/plain example.

@@ -1,3 +1,8 @@
+2010-07-19  Per Bothner  <per@bothner.com>
+
+	* CpoolFloat.java: Remove no-longer-used class.
+	Replaced by CpoolValue1.java - in 1997!
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* AnnotationEntry.java: New class - a placeholder for future

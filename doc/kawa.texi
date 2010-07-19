@@ -33,6 +33,9 @@
 @macro stxlitlbrace
 @code{@b{@{}}
 @end macro
+@macro stxlitat
+@code{@b{@@}}
+@end macro
 
 @macro arbno{THING}
 \THING\*
@@ -8988,7 +8991,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @var{QName}
   | @var{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@var{expression}@stxlit{@}}
+    @stxlitlbrace{}@var{expression}@stxlitat{}
   | @stxlit{(}@var{expression}...@stxlit{)}
 @end display
 

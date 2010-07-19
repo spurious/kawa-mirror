@@ -1,5 +1,8 @@
 2010-07-19  Per Bothner  <per@bothner.com>
 
+	* kawa.text (stxlitat): New macro - @stxlit{@} hangs
+	when making kawa.dvi.
+
 	* kawa.texi: More on web page scripts.
 
 2010-07-18  Per Bothner  <per@bothner.com>

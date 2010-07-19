@@ -1,3 +1,9 @@
+2010-07-19  Per Bothner  <per@bothner.com>
+
+	* build.xml: Pass +enable:XML or -enable:XML to PreProcess as needed.
+
+	* build.xml (slib-scm): Include srfi13.scm.
+
 2010-05-24  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (PREPROCESS_XML): New mecro.

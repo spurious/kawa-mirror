@@ -163,6 +163,10 @@
     <available property="enable-servlet" classname="javax.servlet.Filter"/>
     <property name="enable-servlet" value="false"/>
   
+    <condition property="preprocess-xml" value="+enable:XML" else="-enable:XML">
+      <istrue value="${enable-xml}"/>
+    </condition>
+
     <echo>
         version=${version}
         dist.kawa.jar=${dist.kawa.jar}
@@ -231,7 +235,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java1 -use:com.sun.net.httpserver"/>
+      <arg line="%java1 ${preprocess-xml} -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -242,7 +246,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java2 -use:com.sun.net.httpserver"/>
+      <arg line="%java2 ${preprocess-xml} -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -253,7 +257,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java4 -use:com.sun.net.httpserver"/>
+      <arg line="%java4 ${preprocess-xml} -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -264,7 +268,7 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java5 -use:com.sun.net.httpserver"/>
+      <arg line="%java5 ${preprocess-xml} -use:com.sun.net.httpserver"/>
       <arg line="${fileList}"/>
     </java>
   </target>
@@ -275,13 +279,13 @@
     </pathconvert>
     <java classname="gnu.kawa.util.PreProcess">
       <classpath location="${build.tools}"/>
-      <arg line="%java6 ${use-HttpServer}"/>
+      <arg line="%java6 ${preprocess-xml} ${preprocess-HttpServer}"/>
       <arg line="${fileList}"/>
     </java>
   </target>
 
   <target name="check-for-HttpServer">
-    <condition property="use-HttpServer" value="+use:com.sun.net.httpserver"
+    <condition property="preprocess-HttpServer" value="+use:com.sun.net.httpserver"
 	       else="-use:com.sun.net.httpserver">
       <available classname="com.sun.net.httpserver.HttpServer"/>
     </condition>
@@ -487,6 +491,7 @@
         <include name="printf.scm"/>
         <include name="DefineRecordType.scm"/>
         <include name="srfi1.scm"/>
+        <include name="srfi13.scm"/>
         <include name="srfi34.scm"/>
         <include name="conditions.scm"/>
         <include name="srfi37.scm"/>

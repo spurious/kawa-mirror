@@ -1,3 +1,8 @@
+2010-07-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (HTTP requests): Document request-input-stream.
+	request-input-port, and request-body-string.
+
 2010-07-19  Per Bothner  <per@bothner.com>
 
 	* kawa.text (stxlitat): New macro - @stxlit{@} hangs

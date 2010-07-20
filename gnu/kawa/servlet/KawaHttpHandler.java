@@ -149,6 +149,11 @@ public class KawaHttpHandler
         }
     }
 
+    public InputStream getRequestStream ()
+    {
+      return exchange.getRequestBody();
+    }
+
     public OutputStream getResponseStream ()
     {
       return exchange.getResponseBody();

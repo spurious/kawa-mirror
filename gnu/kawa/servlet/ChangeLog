@@ -1,5 +1,12 @@
 2010-07-20  Per Bothner  <per@bothner.com>
 
+	* HTTP.scm (request-input-stream, request-input-port,
+	request-body-string): New functions.
+	* HttpRequestContext.java (getRequestStream): New abstract method.
+	(getRquestPort, getRequestBodyChars): New methods.
+	* KawaHttpHandler.java (getRequestStream): New concrete method.
+	* KawaServlet.java (getRequestStream): New concerete method.
+
 	* servlets.scm (servlet-context-realpath): Syntax tweaks.
 	Change default value from symbol to string.
 

@@ -9897,13 +9897,19 @@ This is a map from strings to a sequence of strings.
 
 @subsection Request body
 
-@emph{Functions for reading the request body are not yet implemented.
-We should have procedures for both returning binary and textual input ports.
-Email the kawa mailing list if you need a work-around.}
+@deffn Procedure request-input-port
+Return a textual input port for reading the request body,
+as a sequence of characters.
+@end deffn
 
-@c @deffn Procedure request-body-string
-@c Return the entire request body as a string
-@c @end deffn
+@deffn Procedure request-input-stream
+Return a binary input stream for reading the request body,
+as a sequence of bytes.
+@end deffn
+
+@deffn Procedure request-body-string
+Return the entire request body as a string
+@end deffn
 
 @subsection Request IP addresses and ports
 

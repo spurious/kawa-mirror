@@ -8,7 +8,8 @@
 	       request-context-path request-script-path request-local-path
 	       request-path request-uri request-url request-path-translated
 	       request-query-string request-parameter request-parameters
-	       request-parameter-map)
+	       request-parameter-map
+	       request-input-stream request-input-port request-body-string)
 
 (define (response-header key value)
   ((static-field <gnu.kawa.xml.MakeResponseHeader> 'makeResponseHeader)
@@ -104,3 +105,15 @@
 
 (define (request-parameter-map)
   ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-parameter-map"):getRequestParameters))
+
+(define (request-body-string) ::string
+(let ((r
+   ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-body-string"):getRequestBodyChars)))
+  ;;(format (current-error-port) "request-body-string-> [~a]~%~!" r)
+  r))
+
+(define (request-input-stream) ::java.io.InputStream
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-input-stream"):getRequestStream))
+
+(define (request-input-port) ::input-port
+  ((gnu.kawa.servlet.HttpRequestContext:getInstance "request-input-port"):getRequestPort))

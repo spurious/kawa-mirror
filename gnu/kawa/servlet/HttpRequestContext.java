@@ -6,6 +6,8 @@ package gnu.kawa.servlet;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import gnu.lists.*;
+import gnu.mapping.InPort;
 
 /** A representation of the an http request as it's being handled.
  * It abstracts over different http server's API - specially, there are are
@@ -51,6 +53,41 @@ public abstract class HttpRequestContext
   public static void setInstance (HttpRequestContext ctx)
   {
     instance.set(ctx);
+  }
+
+  public abstract InputStream getRequestStream();
+
+  public InPort getRequestPort()
+  {
+    return new InPort(getRequestStream());
+  }
+
+  public String getRequestBodyChars ()
+    throws IOException
+  {
+    InputStream is = getRequestStream();
+    Reader reader = new InputStreamReader(is);
+    int buflen = 1024;
+    char[] buf = new char[buflen];
+    int pos = 0;
+    for (;;)
+      {
+        int avail = buflen - pos;
+        if (avail <= 0)
+          {
+            char[] tmp = new char[2*buflen];
+            System.arraycopy(buf, 0, tmp, 0, buflen);
+            buf = tmp;
+            buflen += buflen;
+          }
+        int count = reader.read(buf, pos, avail);
+        if (count < 0)
+          break;
+        pos += count;
+      }
+    reader.close();
+    String str = new String(buf, 0, pos);
+    return str;
   }
 
   /** Return an OutputStream for the result body.

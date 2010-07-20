@@ -308,6 +308,18 @@ extends HttpServlet
       return list;
     }
 
+    public InputStream getRequestStream ()
+    {
+      try
+        {
+          return request.getInputStream();
+        }
+      catch (IOException ex)
+        {
+          throw new RuntimeException(ex);
+        }
+    }
+
     public OutputStream getResponseStream ()
     {
       try

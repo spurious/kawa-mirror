@@ -1,3 +1,8 @@
+2010-07-20  Per Bothner  <per@bothner.com>
+
+	* servlets.scm (servlet-context-realpath): Syntax tweaks.
+	Change default value from symbol to string.
+
 2010-07-17  Per Bothner  <per@bothner.com>
 
 	* ServletPrinter.java (reset): New method.

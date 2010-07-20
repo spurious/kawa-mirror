@@ -1,5 +1,12 @@
-2010-07-19  Per Bothner  <per@bothner.com>
+2010-07-20  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (knucleotide-input.txt): New rule, different from
+	regexdna-input.txt in that it is created with 25000 as the fasta
+	parameter, matching the correctness test shootout.alioth.debian.org.
+	* knucleotide-output.txt: Updated downloaded version.
+
+2010-07-19  Per Bothner  <per@bothner.com>
+ 
 	* webtest/adder.scm: New web page script example.
 
 2010-07-19  Per Bothner  <per@bothner.com>

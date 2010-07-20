@@ -177,7 +177,7 @@ HTTPD_PORT = 8888
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
-CLEANFILES = tmp* *.log testing.zip revcomp-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
+CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
@@ -545,13 +545,17 @@ check-fasta: fasta.class
 	  then echo '# fasta test passes'; \
 	  else echo FAIL fasta test; fi
 
+knucleotide-input.txt: fasta.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fasta 25000 >knucleotide-input.txt
+
 knucleotide.class: $(srcdir)/knucleotide.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/knucleotide.scm
 
-check-knucleotide: knucleotide.class regexdna-input.txt
+check-knucleotide: knucleotide.class knucleotide-input.txt
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) knucleotide < regexdna-input.txt >tmp-knucleotide.log
+	$(JAVA) knucleotide < knucleotide-input.txt >tmp-knucleotide.log
 	@if diff $(srcdir)/knucleotide-output.txt tmp-knucleotide.log; \
 	  then echo '# knucleotide test passes'; \
 	  else echo FAIL knucleotide test; fi

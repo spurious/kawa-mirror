@@ -1,3 +1,7 @@
+2010-07-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi: Various small improvements.
+
 2010-07-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (HTTP requests): Document request-input-stream.

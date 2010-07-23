@@ -1521,10 +1521,10 @@ occurrences of @meta{thing}, and @atleastone{@meta{thing}} means at
 least one @meta{thing}.
 
 Some non-terminal names refer to the Unicode scalar values of the same
-name: @meta{character tabulation} (U+0009), @meta{linefeed} (U+000A),
-@meta{carriage return} (U+000D), @meta{line tabulation} (U+000B),
-@meta{form feed} (U+000C), @meta{space} (U+0020), @meta{next line}
-(U+0085), @meta{line separator} (U+2028), and @meta{paragraph separator}
+name: @meta{character-tabulation} (U+0009), @meta{linefeed} (U+000A),
+@meta{carriage-return} (U+000D), @meta{line-tabulation} (U+000B),
+@meta{form-feed} (U+000C), @meta{space} (U+0020), @meta{next-line}
+(U+0085), @meta{line-separator} (U+2028), and @meta{paragraph-separator}
 (U+2029).
 
 @node Lexical and datum syntax, Lexical syntax, Syntax notation, Syntax
@@ -1714,9 +1714,9 @@ Block comments may be indicated with properly nested @code{#|} and
         (* n (fact (- n 1))))))
 @end example
 
-The lexeme @code{#!r6rs}, which signifies that the program text that
-follows is written with the lexical and datum syntax described in this
-report, is also otherwise treated as a comment.
+@c The lexeme @code{#!r6rs}, which signifies that the program text that
+@c follows is written with the lexical and datum syntax described in this
+@c report, is also otherwise treated as a comment.
 
 @subsection Identifiers
 
@@ -1905,9 +1905,10 @@ A datum comment - the @var{datum} is ignored.
 @item @stxlit{#,(}@var{name} @var{datum} ...@stxlit{)}
 Special named constructors.
 @item @stxlit{#}@var{number}@stxlit{=}@var{datum}
-A reference definitions, allowing cyclic and shared structure.
+A reference definition, allowing cyclic and shared structure.
 Equivalent to the @var{datum}, but also defines an association between
-the integer @var{number} and that @var{datum},
+the integer @var{number} and that @var{datum}, which can be
+used by a subsequent @code{#@var{number}#} form.
 @item @stxlit{#}@var{number}@stxlit{#}
 A back-reference, allowing cyclic and shared structure.
 @item @stxlit{#b}

@@ -4,15 +4,16 @@
 (require <kawa.lib.std_syntax>)
 (require <kawa.lib.misc>)
 
+(define-alias hashnode gnu.kawa.util.HashNode)
+
 (define-syntax hash-table-walk%
   (syntax-rules ()
     ((hash-table-walk% hash-table node use-node)
-     (let* ((table (*:.table hash-table))
-	    (length ((primitive-array-length <gnu.kawa.util.HashNode>) table)))
+     (let* ((table ::hashnode[] (*:.table hash-table))
+	    (length table:length))
        (do ((i :: <int> (- length 1) (- i 1)))
 	   ((< i 0) #!void)
-	 (do ((node :: <gnu.kawa.util.HashNode>
-		    ((primitive-array-get <gnu.kawa.util.HashNode>) table i)
+	 (do ((node ::hashnode (table i)
 		    (invoke hash-table 'getEntryNext node)))
 	     ((eq? node #!null) #!void)
 	   use-node))))))
@@ -64,6 +65,19 @@
 		       (set! result (cons
 				     (cons (*:getKey node) (*:getValue node))
 				     result)))
+     result))
+  ((toNodeList) ::list
+   (let ((result '()))
+     (hash-table-walk% (this) node
+		       (set! result (cons node result)))
+     result))
+  ((toNodeArray) ::hashnode[]
+   (let* ((n ::int ((this):size))
+	  (result (hashnode[] length: n))
+	  (i ::int 0))
+     (hash-table-walk% (this) node
+		       (begin (set! (result i) node)
+			      (set! i (+ i 1))))
      result))
   ((putAll (other :: hashtable)) :: <void>
    (hash-table-walk% other node

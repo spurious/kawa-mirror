@@ -1,3 +1,8 @@
+2010-07-23  Per Bothner  <per@bothner.com>
+
+	* kawa/hashtable.scm (class hashtable): Added toNodeList
+	and toNodeArray methods.
+
 2010-06-14  Per Bothner  <per@bothner.com>
 
 	* misc.scm (namespace-uri, namespace-prefix): New functions.

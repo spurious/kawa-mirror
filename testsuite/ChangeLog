@@ -1,3 +1,9 @@
+2010-07-23  Per Bothner  <per@bothner.com>
+
+	* knucleotide-2.scm: Alternative (faster but uglier) implementation
+	of the knucleotide benchmark.
+	* Makefile.am: Update to compile and run knucleotide-2.scm.
+
 2010-07-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (knucleotide-input.txt): New rule, different from

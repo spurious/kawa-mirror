@@ -194,7 +194,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   binarytrees.scm binarytrees-output.txt \
   fannkuch.scm fannkuch-output.txt \
   fasta.scm fasta-output.txt \
-  knucleotide.scm knucleotide-output.txt \
+  knucleotide.scm knucleotide-2.scm knucleotide-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \
   nbody.scm nbody-output.txt \
   nsieve.scm nsieve-output.txt \
@@ -549,16 +549,27 @@ knucleotide-input.txt: fasta.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) fasta 25000 >knucleotide-input.txt
 
-knucleotide.class: $(srcdir)/knucleotide.scm
+knucleotide1.class: $(srcdir)/knucleotide.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
-	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/knucleotide.scm
+	$(KAWA) $(WARN_FLAGS) --main -T knucleotide1 -C $(srcdir)/knucleotide.scm
 
-check-knucleotide: knucleotide.class knucleotide-input.txt
+knucleotide2.class: $(srcdir)/knucleotide-2.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -T knucleotide2 -C $(srcdir)/knucleotide-2.scm
+
+check-knucleotide-1: knucleotide1.class knucleotide-input.txt
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) knucleotide < knucleotide-input.txt >tmp-knucleotide.log
-	@if diff $(srcdir)/knucleotide-output.txt tmp-knucleotide.log; \
-	  then echo '# knucleotide test passes'; \
-	  else echo FAIL knucleotide test; fi
+	$(JAVA) knucleotide1 < knucleotide-input.txt >tmp-knucleotide1.log
+	@if diff $(srcdir)/knucleotide-output.txt tmp-knucleotide1.log; \
+	  then echo '# knucleotide1 test passes'; \
+	  else echo FAIL knucleotide1 test; fi
+check-knucleotide-2: knucleotide2.class knucleotide-input.txt
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) knucleotide2 < knucleotide-input.txt >tmp-knucleotide2.log
+	@if diff $(srcdir)/knucleotide-output.txt tmp-knucleotide2.log; \
+	  then echo '# knucleotide2 test passes'; \
+	  else echo FAIL knucleotide2 test; fi
+check-knucleotide: check-knucleotide-1 check-knucleotide-2
 
 nbody.class: $(srcdir)/nbody.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \

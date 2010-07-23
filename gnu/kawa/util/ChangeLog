@@ -1,3 +1,10 @@
+2010-07-23  Per Bothner  <per@bothner.com>
+
+	* AbstractHashTable.java (<init>): New default constructor.
+	(DEFAULT_INITIAL_SIZE): Moved from GeneralHashTable.
+	* GeneralHashTable.java (<init>): Default constructor
+	just calls super default constructor.
+
 2010-04-18  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java: The use:com.sun.net.httpserver option is now

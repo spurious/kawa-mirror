@@ -26,6 +26,13 @@ public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
   /** Allocate Entry[n]. */
   protected abstract Entry[] allocEntries(int n);
 
+  public static final int DEFAULT_INITIAL_SIZE = 64;
+
+  public AbstractHashTable ()
+  {
+    this(DEFAULT_INITIAL_SIZE);
+  }
+
   public AbstractHashTable (int capacity)
   {
     int log2Size = 4;

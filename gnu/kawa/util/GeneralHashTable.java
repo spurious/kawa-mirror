@@ -10,11 +10,8 @@ package gnu.kawa.util;
 public class GeneralHashTable<K,V>
   extends AbstractHashTable<HashNode<K,V>,K,V>
 {
-  public static final int DEFAULT_INITIAL_SIZE = 64;
-
   public GeneralHashTable ()
   {
-    super(DEFAULT_INITIAL_SIZE);
   }
 
   public GeneralHashTable (int capacity)

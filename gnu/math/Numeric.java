@@ -69,7 +69,7 @@ public abstract class Numeric extends java.lang.Number
    */
   public static final int NONNEG_MOD = 5;
 
-  /** Return an integer for which of {# code this} or {#code obj} is larger.
+  /** Return an integer for which of {@code this} or {@code obj} is larger.
    * Return 1 if {@code this>obj}; 0 if {@code this==obj};
    * -1 if {@code this<obj};
    * -2 if {@code this!=obj} otherwise (for example if either is NaN);

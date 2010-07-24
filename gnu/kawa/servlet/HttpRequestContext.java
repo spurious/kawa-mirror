@@ -9,7 +9,7 @@ import java.util.*;
 import gnu.lists.*;
 import gnu.mapping.InPort;
 
-/** A representation of the an http request as it's being handled.
+/** A representation of an http request as it is being handled.
  * It abstracts over different http server's API - specially, there are are
  * concrete implementations on top of JDK6's com.sun.net.httpserver,
  * javax.servlet.http, and CGI (on top of servlets).

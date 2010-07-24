@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.zip.*;
 import java.net.URL;
 
-/** Class to read a ClassType from a DataInputStream (.class file).
+/** Application to read a ClassType from a DataInputStream (.class file).
  * 
  * To print out the contents of a class file foo.class, you can use
  * the class <code>dump</code> as an application:

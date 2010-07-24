@@ -3,6 +3,8 @@
 
 package gnu.bytecode;
 
+/** Information about a local variable in a method's code. */
+
 public class Variable extends Location implements java.util.Enumeration
 {
   /* Variables in a Scope are linked together in a linked list. */

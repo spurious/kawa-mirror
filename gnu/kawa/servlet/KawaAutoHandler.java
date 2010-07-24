@@ -1,3 +1,6 @@
+// Copyright (c) 2003, 2010  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ../../../COPYING.
+
 package gnu.kawa.servlet;
 import gnu.expr.*;
 import gnu.mapping.*;
@@ -5,6 +8,18 @@ import gnu.text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+/**
+ * The generic framework for auto-configuring web page scripts.
+ * This works using either a servlet (J2EE) engine, or using
+ * the HttpServer built in to JDK 6.
+ *
+ * The implementation borrows ideas from Apache Jakarta Tomcat Jasper.
+ *
+ * @author Ivelin Ivanov
+ * @author Tom Reilly
+ * @author Per Bothner
+ */
 
 public class KawaAutoHandler
 {

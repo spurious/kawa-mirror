@@ -11,6 +11,8 @@ import java.util.*;
 import java.net.*;
 import gnu.text.Path;
 
+/** Generic HttpServlet wrapper that support the Kawa web page script APIs. */
+
 public abstract class KawaServlet
 extends HttpServlet
 {

@@ -1,5 +1,5 @@
-// Copyright (c) 2003  Per M.A. Bothner.
-// This is free software;  for terms and warranty disclaimer see ./COPYING.
+// Copyright (c) 2010  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ../../../COPYING.
 
 package gnu.kawa.servlet;
 
@@ -13,16 +13,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 /**
- * The Kawa servlet interpreter
- *
- * This servlet is responsible for reading and interpeting Kawa language files
- * using the QEXO GNU library.
- *
- * The implementation borrows ideas from Apache Jakarta Tomcat Jasper.
- *
- * @author Ivelin Ivanov
- * @author Tom Reilly
- * @author Per Bothner
+ * Handle auto-configuring web page scripts using a servlet engine.
+ * This is a wrapper that forwards to {@link KawaAutoHandler}.
  */
 public class KawaPageServlet extends KawaServlet
 {

@@ -4,6 +4,8 @@
 package gnu.bytecode;
 import java.io.*;
 
+/** A CONSTANT_Utf8 entry in the constant pool. */
+
 public class CpoolUtf8 extends CpoolEntry
 {
   String string;
@@ -25,7 +27,7 @@ public class CpoolUtf8 extends CpoolEntry
 
   public final void intern () { string = string.intern(); }
 
-  public int getTag() { return 1; } // CONSTANT_CUtf8
+  public int getTag() { return 1; } // CONSTANT_Utf8
 
   public final String getString()
   {

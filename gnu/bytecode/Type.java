@@ -5,6 +5,8 @@ package gnu.bytecode;
 import java.util.*;
 import gnu.kawa.util.AbstractWeakHashTable;
 
+/** An abstract type as used by both gnu.bytecode and gnu.expr. */
+
 public abstract class Type
 /* #ifdef JAVA5 */
  implements java.lang.reflect.Type

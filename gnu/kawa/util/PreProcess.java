@@ -5,7 +5,7 @@ package gnu.kawa.util;
 import java.io.*;
 import java.util.*;
 
-/** Help class to pre-process Java source. */
+/** Helper class to pre-process Java source. */
 
 public class PreProcess
 {

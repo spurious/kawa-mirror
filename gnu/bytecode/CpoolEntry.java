@@ -5,7 +5,7 @@ package gnu.bytecode;
 import java.io.*;
 
 /**
- * An entry in the constant pool for a ClassType.
+ * An entry in the constant pool of a ClassType.
  * Each entry belong to the constant pool table of the "owning"
  * ClassType.  Hashing is used to make each entry unique (with a ClassType).
  * By convention, each sub-class has a static get_const method which is

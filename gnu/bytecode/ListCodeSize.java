@@ -1,7 +1,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-/** Lists the number of bytes in named methods.
+/** Application that lists the number of bytes in named methods.
  * Useful for regression testing of code generation and inlining.
  */
 

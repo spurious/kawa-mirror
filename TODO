@@ -1,20 +1,19 @@
+Document:
+  in-http-server and in-servlet cond-expand options.
+
 Before Kawa 1.10:
+- Update Android build procedure.
 - Check that 'ant' works.
 - Make Values constructors be private, so we can make Values be abstract.
 - Go through Savannah bugs.
 - Manual: should rename @node Extensions
 - Change version number to 1.10.
-- Evaluated reported JEmacs bugs.
-- Make module-static the default?
+- Evaluate reported JEmacs bugs.
 - Go through remaining "news" entries and update manual.
 - go through Evaluating-Scheme-expressions-from-Java.
-  Support javax.script
-  ScriptEngineFactory -> for each Language
-- Doc: cleanup define-alias vs define-namespace.
-  Preferred idiom: (define-alias jframe javax.swing.JFrame)
 - R6RS exception handling - see message from March 15, patch from March 16.
 - gnu/bytecode:
--- Document emitIf../eithThen else, at overview level.
+-- Document emitIf../emitThen else, at overview level.
 - Verify that Path is consistent with new javax.nio (JDR 203)
   http://openjdk.java.net/projects/nio
 - internals: Update about procedures, inlining, tail-calls.
@@ -34,6 +33,7 @@ http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/com/sun/net/httpse
 * Dynamic Environment should be per-session.
 * Get repl.xml working reliably.
 * Annotations ...
+- In ReplDocument don't use SwingContent.
 
 OPTIMIZATIONS
 * case/switch

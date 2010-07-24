@@ -155,8 +155,7 @@ developing Kawa.
 Kawa is a re-write of Kawa 0.2, which was written by
 R. Alexander Milowski @email{alex@@milowski.com}.
 
-This package has nothing to do with the defunct
-@uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
+This package has nothing to do with the defunct Kawa commercial Java IDE.
 
 @menu
 * Installation::         Building and installing Kawa

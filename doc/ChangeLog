@@ -1,5 +1,7 @@
 2010-07-23  Per Bothner  <per@bothner.com>
 
+	* kawa.text (Top): Remove dead link to commercial Kawa IDE.
+
 	* kawa.texi: Various small improvements.
 
 2010-07-20  Per Bothner  <per@bothner.com>

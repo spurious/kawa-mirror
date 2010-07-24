@@ -250,7 +250,7 @@ public abstract class HttpRequestContext
 
   /** Send headers.
    * @param reasonCode response code - e.g. 200 for OK.
-   * @param reasonCode response string - e.g. "OK" or "Not Found".
+   * @param reasonPhrase response string - e.g. "OK" or "Not Found".
    * @param responseLength response length in bytes, or -1 (unspecified).
    *  Note this is different from HttpExchange.sendResponseHeaders.
    * This method must be called before getResponseStream.

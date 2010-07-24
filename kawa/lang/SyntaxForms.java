@@ -26,7 +26,7 @@ public class SyntaxForms {
    * @param template If this is a SyntaxForm, use its scope;
    *   otherwise use the current Compilation's current scope.
    *   (This means just returning the datum as-is.)
-   * @param datum The value (S-expression datum) to use.
+   * @param form The value (S-expression datum) to use.
    */
   public static Object makeWithTemplate (Object template, Object form)
   {

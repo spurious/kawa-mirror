@@ -16,7 +16,7 @@ public class GetModuleClass extends ProcedureN
   public static final GetModuleClass getModuleClass
     = new GetModuleClass();
   /** A function that returns the URLPath of the current module.
-   * This is {@code "class-resource:"} URL (see {@link gnu.textResourceStreamHandler}),
+   * This is {@code "class-resource:"} URL (see {@link gnu.text.ResourceStreamHandler}),
    * though in immediate mode it gets optimized to a {@code "file:"} URL.
    */
   public static final GetModuleClass getModuleUri

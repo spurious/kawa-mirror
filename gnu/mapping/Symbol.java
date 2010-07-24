@@ -242,7 +242,7 @@ public class Symbol
    * {@code "prefix:name=value"} - such as on the Kawa command-line -
    * where we don't yet know the namespace-uri.  Code that later looks
    * for a value should look both under the true namespace-uri and
-   * the prefix combined with {@link Namespace#makeUnknownNamespace(prefix)}.
+   * the prefix combined with {@link Namespace#makeUnknownNamespace(String)}.
    */
   public static Symbol makeWithUnknownNamespace (String local, String prefix)
   {

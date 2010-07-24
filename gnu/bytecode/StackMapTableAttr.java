@@ -93,7 +93,7 @@ public class StackMapTableAttr extends MiscAttr
 
   /** Emit type state for the given Label.
    * This must be called by strictly increasing position.
-   * This is handled automatically by {@link Codeattr#processFixups}.
+   * This is handled automatically by {@link CodeAttr#processFixups}.
    */
   public void emitStackMapEntry (Label label, CodeAttr code)
   {

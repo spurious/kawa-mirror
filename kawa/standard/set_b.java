@@ -81,6 +81,7 @@ public class set_b extends Syntax
 	  return tr.syntaxError ("constant variable "+decl.getName()+" is set!");
         else if (decl.context != tr.mainLambda
                  && decl.context instanceof ModuleExp
+                 && ! decl.getFlag(Declaration.IS_DYNAMIC)
                  && ! decl.context.getFlag(ModuleExp.IMMEDIATE))
           // Should be an error, but for now make it a warning
 	  tr.error('w', decl, "imported variable ", " is set!");

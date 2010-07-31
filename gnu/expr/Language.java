@@ -736,7 +736,12 @@ public abstract class Language
     Declaration fdecl = mod.addDeclaration(fdname, dtype);
     boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     if (isAlias)
-      fdecl.setIndirectBinding(true);
+      {
+        fdecl.setIndirectBinding(true);
+        if (ftype instanceof ClassType
+            && ((ClassType) ftype).isSubclass("gnu.mapping.ThreadLocation"))
+          fdecl.setFlag(Declaration.IS_DYNAMIC);
+      }
     else if (isFinal && ftype instanceof ClassType)
       {
         if (ftype.isSubtype(Compilation.typeProcedure))

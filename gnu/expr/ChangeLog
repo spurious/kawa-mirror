@@ -1,3 +1,8 @@
+2010-07-31  Per Bothner  <per@bothner.com>
+
+	* Language.java (declFromField): Set IS_DYNAMIC if field
+	type is ThreadLocation.
+
 2010-07-05  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (emit): For backward compatibility for we prefer

@@ -1,3 +1,8 @@
+2010-07-31  Per Bothner  <per@bothner.com>
+
+	* standard/set_b.java (rewriteForm): Don't complain about assigning
+	to imported variable it it is dynamic.
+
 2010-07-17  Per Bothner  <per@bothner.com>
 
 	* repl.java:  Remove unneeded package prefixes.

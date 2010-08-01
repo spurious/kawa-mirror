@@ -666,7 +666,7 @@ public class repl extends Procedure0or1
 		if (previousLanguage == null)
 		  Language.setDefaults(lang);
                 else
-                  Language.setDefaultLanguage(lang);
+                  Language.setCurrentLanguage(lang);
 		previousLanguage = lang;
 	      }
 	    else

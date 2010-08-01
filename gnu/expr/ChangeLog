@@ -1,5 +1,11 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* Language.java (setDefaultLanguage): Rename to setCurrentLanguage.
+	(setSaveCurrent, restoreCurrent): New convenience methods.
+	(setDefault, eval): Update accordingly.
+	* CompiledModule.java (evalModule): Likewise.
+	* KawaScriptEngine.java (compile): Likewise.
+
 	* Compilation.java (setSaveCurrent, restoreCurrent):
 	New convenience methods.
 	(process): Use it.

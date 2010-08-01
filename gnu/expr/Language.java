@@ -35,9 +35,21 @@ public abstract class Language
 
   static { Environment.setGlobal(BuiltinEnvironment.getInstance()); }
 
-  public static void setDefaultLanguage(Language language)
+  public static void setCurrentLanguage (Language language)
   {
     current.set(language);
+  }
+
+  public static Language setSaveCurrent (Language language)
+  {
+    Language save = current.get();
+    current.set(language);
+    return save;
+  }
+
+  public static void restoreCurrent (Language saved)
+  {
+    current.set(saved);
   }
 
   /**
@@ -821,7 +833,7 @@ public abstract class Language
 
   public static synchronized void setDefaults (Language lang)
   {
-    Language.setDefaultLanguage(lang);
+    Language.setCurrentLanguage(lang);
     global = lang;
     // Assuming this is the initial (main) thread, make its Environment
     // the default (global) one, so child threads can inherit from it.
@@ -920,8 +932,7 @@ public abstract class Language
   public void eval (InPort port, CallContext ctx) throws Throwable
   {
     SourceMessages messages = new SourceMessages();
-    Language saveLang = getDefaultLanguage();
-    setDefaultLanguage(this);
+    Language saveLang = Language.setSaveCurrent(this);
     try
       {
 	Compilation comp = parse(port, messages, PARSE_FOR_EVAL);
@@ -929,7 +940,7 @@ public abstract class Language
       }
     finally
       {
-	setDefaultLanguage(saveLang);
+	Language.restoreCurrent(saveLang);
       }
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"

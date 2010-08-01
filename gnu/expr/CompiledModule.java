@@ -34,8 +34,7 @@ public class CompiledModule
   public void evalModule (Environment env, CallContext ctx)
     throws Throwable
   {
-    Language saveLang = Language.getDefaultLanguage();
-    Language.setDefaultLanguage(language);
+    Language saveLang = Language.setSaveCurrent(language);
     Environment saveEnv = ctx.getEnvironmentRaw();
     ctx.setEnvironmentRaw(env);
     try
@@ -44,7 +43,7 @@ public class CompiledModule
       }
     finally
       {
-	Language.setDefaultLanguage(saveLang);
+	Language.restoreCurrent(saveLang);
         ctx.setEnvironmentRaw(saveEnv);
       }
   }

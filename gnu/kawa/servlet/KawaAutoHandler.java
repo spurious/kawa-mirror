@@ -175,7 +175,7 @@ public class KawaAutoHandler
           }
       }
     InPort port = new InPort(resourceStream, absPath);
-    Language.setDefaultLanguage(language);
+    Language.setCurrentLanguage(language);
     SourceMessages messages = new SourceMessages();
     Compilation comp;
     try

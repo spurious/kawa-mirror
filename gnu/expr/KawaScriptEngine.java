@@ -92,11 +92,10 @@ public class KawaScriptEngine extends AbstractScriptEngine
     throws SyntaxException, IOException
   {
     CallContext ctx = CallContext.getInstance();
-    Language saveLang = Language.getDefaultLanguage();
+    Language saveLang = Language.setSaveCurrent(factory.language);
     Environment saveEnv = ctx.getEnvironmentRaw();
     Environment env = factory.getEnvironment(context);
     ctx.setEnvironmentRaw(env);
-    Language.setDefaultLanguage(factory.language);
     try
       {
         Compilation comp = factory.language.parse(port, messages, Language.PARSE_IMMEDIATE);
@@ -116,7 +115,7 @@ public class KawaScriptEngine extends AbstractScriptEngine
       }
     finally
       {
-	Language.setDefaultLanguage(saveLang);
+	Language.restoreCurrent(saveLang);
         ctx.setEnvironmentRaw(saveEnv);
       }
   }

@@ -1,3 +1,8 @@
+2010-08-01  Per Bothner  <per@bothner.com>
+
+	* KawaAutoHandler.java: Update Language.setDefaultLanguage
+	to Language.setCurrentLanguage.
+
 2010-07-20  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm (request-input-stream, request-input-port,

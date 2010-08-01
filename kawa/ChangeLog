@@ -1,5 +1,8 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* repl.java: Update Language setting calls.
+	* Shell.java: Likewise.
+
 	* lang/Eval.java (evalBody): Use new Compilation convenience methods.
 	* lang/Translator.java (resolveModule): Likewise.
 

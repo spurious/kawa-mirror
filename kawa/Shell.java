@@ -215,7 +215,7 @@ public class Shell
                                InPort inp, Consumer out, OutPort perr,
                                java.net.URL url, SourceMessages messages)
   {
-    Language saveLanguage = Language.getDefaultLanguage();
+    Language saveLanguage = Language.setSaveCurrent(language);
     Lexer lexer = language.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
     //boolean interactive = inp instanceof TtyInPort;
@@ -228,8 +228,6 @@ public class Shell
 	saveConsumer = ctx.consumer;
 	ctx.consumer = out;
       }
-    if (language != saveLanguage)
-      Language.setDefaultLanguage(language);
     try
       {
         Thread thread = Thread.currentThread();
@@ -299,8 +297,7 @@ public class Shell
       {
 	if (out != null)
 	  ctx.consumer = saveConsumer;
-        if (language != saveLanguage)
-          Language.setDefaultLanguage(saveLanguage);
+        Language.restoreCurrent(saveLanguage);
       }
     return null;
   }

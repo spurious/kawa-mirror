@@ -78,7 +78,7 @@ public class Field extends Location implements AttrContainer, Member {
     Attribute.assignConstants(this, classfile);
   }
 
-  public java.lang.reflect.Field getReflectField()
+  public synchronized java.lang.reflect.Field getReflectField()
     throws java.lang.NoSuchFieldException
   {
     if (rfield == null)

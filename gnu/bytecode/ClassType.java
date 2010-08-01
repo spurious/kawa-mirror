@@ -98,7 +98,7 @@ public class ClassType extends ObjectType
   }
 
   /** Return the modifiers (access flags) for this class. */
-  public final int getModifiers()
+  public final synchronized int getModifiers()
   {
     if (access_flags == 0
 	&& (flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
@@ -114,7 +114,7 @@ public class ClassType extends ObjectType
   public final void setModifiers(int flags) { access_flags = flags; }
   public final void addModifiers(int flags) { access_flags |= flags; }
 
-  public String getSimpleName ()
+  public synchronized String getSimpleName ()
   {
     /* #ifdef JAVA5 */
     if ((flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
@@ -202,7 +202,7 @@ public class ClassType extends ObjectType
     enclosingMember = member;
   }
 
-  void addEnclosingMember ()
+  synchronized void addEnclosingMember ()
   {
     if ((flags & (ADD_ENCLOSING_DONE|EXISTING_CLASS)) != EXISTING_CLASS)
       return;
@@ -237,7 +237,7 @@ public class ClassType extends ObjectType
     /* #endif */
   }
 
-  public void addMemberClasses ()
+  public synchronized void addMemberClasses ()
   {
     if ((flags & (ADD_MEMBERCLASSES_DONE|EXISTING_CLASS)) != EXISTING_CLASS)
       return;
@@ -403,7 +403,7 @@ public class ClassType extends ObjectType
     this.superClass = superClass;
   }
 
-  public ClassType getSuperclass ()
+  public synchronized ClassType getSuperclass ()
   {
     if (superClass == null
 	&& ! isInterface()
@@ -531,7 +531,7 @@ public class ClassType extends ObjectType
    *   Howeve, if mask is -1, ignore the access flags.
    * @return the matching field, or null if there is no such field.
    */
-  public Field getField(String name, int mask)
+  public synchronized Field getField(String name, int mask)
   {
     ClassType cl = this;
     for (;;)
@@ -597,7 +597,7 @@ public class ClassType extends ObjectType
    * Does not add private or package-private fields.
    * Does not check for duplicate (already-known) fields.
    * Is not thread-safe if another thread may access this ClassType. */
-  public void addFields()
+  public synchronized void addFields()
   {
     Class clas = getReflectClass();
     java.lang.reflect.Field[] fields;
@@ -661,7 +661,7 @@ public class ClassType extends ObjectType
     * If an existing method matches, return that.  Otherwise, create
     * a new one.
     * In contrast, the other addMethod methods always create new Methods. */
-  public Method addMethod (String name, int flags,
+  public synchronized Method addMethod (String name, int flags,
 			   Type[] arg_types, Type return_type)
   {
     Method method = getDeclaredMethod(name, arg_types);
@@ -891,7 +891,7 @@ public class ClassType extends ObjectType
   }
 
   /** Get a method with matching name and number of arguments. */
-  public Method getDeclaredMethod(String name, int argCount)
+  public synchronized Method getDeclaredMethod(String name, int argCount)
   {
     Method result = null;
     int needOuterLinkArg = "<init>".equals(name) && hasOuterLink() ? 1 : 0;
@@ -911,7 +911,7 @@ public class ClassType extends ObjectType
     return result;
   }
 
-  public Method getMethod(String name, Type[] arg_types)
+  public synchronized Method getMethod(String name, Type[] arg_types)
   {
     ClassType cl = this;
     for (;;)
@@ -948,7 +948,7 @@ public class ClassType extends ObjectType
    * Does not add constructors nor private or package-private methods.
    * Does not check for duplicate (already-known) methods.
    * @param clas should be the same as getReflectClass(). */
-  public void addMethods(Class clas)
+  public synchronized void addMethods(Class clas)
   {
     // Set this flag BEFORE the actual addition.
     // This prevents this method to be called indirectly for the same class

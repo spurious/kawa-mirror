@@ -1,5 +1,10 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* ClassType.java: Add 'synchronized' a bunch of places.  This is needed
+	when reading "existing" classes, because we share a global
+	mapNameToType and hence the set of existing classes is shared.
+	* Field.java: Likewise.
+
 	* ClassType.java (make(String,ClassType)): Deprecate.
 
 2010-07-19  Per Bothner  <per@bothner.com>

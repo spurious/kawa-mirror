@@ -54,6 +54,7 @@ public class ClassType extends ObjectType
     return (ClassType) Type.getType(name);
   }
 
+  /** @deprecated */
   public static ClassType make (String name, ClassType superClass)
   {
     ClassType type = make(name);

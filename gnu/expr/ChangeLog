@@ -1,5 +1,8 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* Compilation.java: Fix calls to deprecated 2-argument
+	version of ClassType.make.
+
 	* Compilation.java (pendingImports, exprStack, callInitMethods):
 	Add generic type parameters to avoid "unchecked" warning.
 

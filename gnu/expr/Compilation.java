@@ -215,9 +215,9 @@ public class Compilation implements SourceLocator
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
   public static ClassType typeType = ClassType.make("gnu.bytecode.Type");
   public static ClassType typeObjectType
-    = ClassType.make("gnu.bytecode.ObjectType", typeType);
+    = ClassType.make("gnu.bytecode.ObjectType");
   public static ClassType typeClass = Type.javalangClassType;
-  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
+  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType");
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeLanguage
@@ -315,21 +315,21 @@ public class Compilation implements SourceLocator
     apply4method, applyNmethod };
 
   public static ClassType typeProcedure0
-    = ClassType.make("gnu.mapping.Procedure0", typeProcedure);
+    = ClassType.make("gnu.mapping.Procedure0");
   public static ClassType typeProcedure1
-    = ClassType.make("gnu.mapping.Procedure1", typeProcedure);
+    = ClassType.make("gnu.mapping.Procedure1");
   public static ClassType typeProcedure2
-    = ClassType.make("gnu.mapping.Procedure2", typeProcedure);
+    = ClassType.make("gnu.mapping.Procedure2");
   public static ClassType typeProcedure3
-    = ClassType.make("gnu.mapping.Procedure3", typeProcedure);
+    = ClassType.make("gnu.mapping.Procedure3");
   public static ClassType typeProcedure4
-    = ClassType.make("gnu.mapping.Procedure4", typeProcedure);
+    = ClassType.make("gnu.mapping.Procedure4");
   public static ClassType typeProcedureN
-    = ClassType.make("gnu.mapping.ProcedureN", typeProcedure);
+    = ClassType.make("gnu.mapping.ProcedureN");
   public static ClassType typeModuleBody
-    = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
+    = ClassType.make("gnu.expr.ModuleBody");
   public static ClassType typeModuleWithContext
-    = ClassType.make("gnu.expr.ModuleWithContext", typeModuleBody);
+    = ClassType.make("gnu.expr.ModuleWithContext");
   public static ClassType typeApplet = ClassType.make("java.applet.Applet");
   public static ClassType typeServlet = ClassType.make("gnu.kawa.servlet.KawaServlet");
 
@@ -347,9 +347,9 @@ public class Compilation implements SourceLocator
   public static Field pcCallContextField
     = typeCallContext.getDeclaredField("pc");
   public static ClassType typeMethodProc
-  = ClassType.make("gnu.mapping.MethodProc", typeProcedureN);
+  = ClassType.make("gnu.mapping.MethodProc");
   public static ClassType typeModuleMethod
-  = ClassType.make("gnu.expr.ModuleMethod", typeMethodProc);
+  = ClassType.make("gnu.expr.ModuleMethod");
   //  public static Field numArgsCallFrameField = typeCallFrame.getDeclaredField("numArgs");
   public static Field argsCallContextField
     = typeCallContext.getDeclaredField("values");

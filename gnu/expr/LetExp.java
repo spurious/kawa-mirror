@@ -167,7 +167,7 @@ public class LetExp extends ScopeExp
 	Target varTarget;
 	Expression init = inits[i];
         boolean needsInit = decl.needsInit();
-	if (needsInit)
+	if (needsInit && decl.isSimple())
           decl.allocateVariable(code);
 	if (! needsInit
 	    || (decl.isIndirectBinding() && init == QuoteExp.undefined_exp))

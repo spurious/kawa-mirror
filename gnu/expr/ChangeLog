@@ -1,5 +1,11 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (setSaveCurrent, restoreCurrent):
+	New convenience methods.
+	(process): Use it.
+	* ResolveNames.java (resolveModule): Likewise.
+	* ModuleExp.java (evalModule1): Likewise.
+
 	Fixes race condition reported by Daniele Benegiamo.
 	* Compilation.java (current): Change from ThreadLocation to
 	InheritableThreadLocal.  Using ThreadLocation would be ok, but

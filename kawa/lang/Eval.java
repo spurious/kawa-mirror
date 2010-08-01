@@ -81,10 +81,9 @@ public class Eval extends Procedure1or2
         tr.immediate = true;
         tr.setState(Compilation.BODY_PARSED);
 	ModuleExp mod = tr.pushNewModule((String) null);
-        Compilation save_comp = Compilation.getCurrent();
+        Compilation saveComp = Compilation.setSaveCurrent(tr);
         try
           {
-            Compilation.setCurrent(tr);
             int first = tr.formStack.size();
             tr.scanBody(body, mod, false);
             tr.firstForm = first;
@@ -92,7 +91,7 @@ public class Eval extends Procedure1or2
           }
         finally
           {
-            Compilation.setCurrent(save_comp);
+            Compilation.restoreCurrent(saveComp);
           }
 
 	if (body instanceof PairWithPosition)

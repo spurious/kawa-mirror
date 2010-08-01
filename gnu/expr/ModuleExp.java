@@ -198,7 +198,7 @@ public class ModuleExp extends LambdaExp
     ModuleExp mexp = comp.getModule();
     mexp.info = comp.minfo;
     Environment orig_env = Environment.getCurrent();
-    Compilation orig_comp = Compilation.getCurrent();
+    Compilation orig_comp = Compilation.setSaveCurrent(comp);
     SourceMessages messages = comp.getMessages();
     ClassLoader savedLoader = null;
     Thread thread = null; // Non-null if we need to restore context ClassLoader.
@@ -206,8 +206,6 @@ public class ModuleExp extends LambdaExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
-        if (comp != orig_comp)
-          Compilation.setCurrent(comp);
 
         if (alwaysCompile)
           comp.mustCompile = true;
@@ -257,8 +255,7 @@ public class ModuleExp extends LambdaExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(orig_env);
-	if (comp != orig_comp)
-	  Compilation.setCurrent(orig_comp);
+        Compilation.restoreCurrent(orig_comp);
         if (thread != null)
           thread.setContextClassLoader(savedLoader);
       }

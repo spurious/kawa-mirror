@@ -1,3 +1,8 @@
+2010-08-01  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Use new Compilation convenience methods.
+	* lang/Translator.java (resolveModule): Likewise.
+
 2010-07-31  Per Bothner  <per@bothner.com>
 
 	* standard/set_b.java (rewriteForm): Don't complain about assigning

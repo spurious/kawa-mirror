@@ -59,10 +59,9 @@ public abstract class LispLanguage extends Language
     ModuleExp mexp = tr.mainLambda;
     Values forms = new Values();
     LispReader reader = (LispReader) lexer;
-    Compilation save_comp = Compilation.getCurrent();
+    Compilation saveComp = Compilation.setSaveCurrent(tr);
     try
       {
-        Compilation.setCurrent(tr);
         if (tr.pendingForm != null)
           {
             tr.scanForm(tr.pendingForm, mexp);
@@ -113,7 +112,7 @@ public abstract class LispLanguage extends Language
       }
     finally
       {
-        Compilation.setCurrent(save_comp);
+        Compilation.restoreCurrent(saveComp);
       }
     return true;
   }

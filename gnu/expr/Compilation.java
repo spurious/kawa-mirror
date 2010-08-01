@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000-2005, 2006 Per M.A. Bothner.
+// Copyright (c) 1999, 2000-2005, 2006, 2010 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -1851,10 +1851,9 @@ public class Compilation implements SourceLocator
    */
   public void process (int wantedState)
   {
-    Compilation saveCompilation = Compilation.getCurrent();
+    Compilation saveCompilation = Compilation.setSaveCurrent(this);
     try
       {
-        Compilation.setCurrent(this);
         ModuleExp mexp = getModule();
         if (wantedState >= BODY_PARSED && getState() < BODY_PARSED-1)
           {
@@ -1932,7 +1931,7 @@ public class Compilation implements SourceLocator
       }
     finally
       {
-        Compilation.setCurrent(saveCompilation);
+        Compilation.restoreCurrent(saveCompilation);
       }
   }
 
@@ -2907,6 +2906,18 @@ public class Compilation implements SourceLocator
   public static void setCurrent (Compilation comp)
   {
     current.set(comp);
+  }
+
+  public static Compilation setSaveCurrent (Compilation comp)
+  {
+    Compilation save = current.get();
+    current.set(comp);
+    return save;
+  }
+
+  public static void restoreCurrent (Compilation saved)
+  {
+    current.set(saved);
   }
 
   public String toString ()

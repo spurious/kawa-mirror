@@ -1419,10 +1419,9 @@ public class Translator extends Compilation
     processAccesses();
 
     setModule(mexp);
-    Compilation save_comp = Compilation.getCurrent();
+    Compilation save_comp = Compilation.setSaveCurrent(this);
     try
       {
-	Compilation.setCurrent(this);
 	mexp.body = makeBody(firstForm, mexp);
         // In immediate mode need to preseve Declaration for current "seesion".
         if (! immediate)
@@ -1430,7 +1429,7 @@ public class Translator extends Compilation
       }
     finally
       {
-	Compilation.setCurrent(save_comp);
+	Compilation.restoreCurrent(save_comp);
       }
 
     /* DEBUGGING:

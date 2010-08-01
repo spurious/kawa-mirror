@@ -1,3 +1,7 @@
+2010-08-01  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (parse): Use new Compilation convenience methods.
+
 2010-06-27  Per Bothner  <per@bothner.com>
 
 	* ReaderXmlElement.java (readContent): Need to reset tokenBufferLength

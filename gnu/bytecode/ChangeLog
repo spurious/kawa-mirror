@@ -125,12 +125,12 @@
 
 	* CodeAttr.java (setType): Fix thinko - compare against stack length.
 	Also rename local labelSP to usedStack.
-	Fixes bug reported by  Helmu Eller.
+	Fixes bug reported by  Helmut Eller.
 
 2009-06-28  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitStore):  Don't check if var is dead - this can be
-	useful for pushing parameters to a previouly compiled inlined procedure,
+	useful for pushing parameters to a previously compiled inlined procedure,
 	followed by a jump to the procedure label - see gnu.expr.ApplyExp.
 
 2009-04-21  Per Bothner  <per@bothner.com>
@@ -325,9 +325,7 @@
 	javalangBooleanType, javalangThrowableType, javalangNumberType,
 	javalangClassType): New names for existing static fields.
 	(pointer_type, string_type, tostring_type, boolean_ctype,
-	throwable_type, number_type, java_lang_Class_type): The old names,
-
-
+	throwable_type, number_type, java_lang_Class_type): The old names
 	kept as deprecated aliases.
 	(objectTYpe): New synonym for javalangObjectType.
 
@@ -338,7 +336,7 @@
 	existing static fields.
 	(byte_type, short_type, int_type, long_type, float_type,
 	double_type, boolean_type, char_type, void_type): The old names,
-	kept as deprecated aliases. 
+	kept as deprecated aliases.
 
 2008-05-18  Per Bothner  <per@bothner.com>
 

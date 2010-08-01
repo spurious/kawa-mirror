@@ -1,5 +1,8 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (pendingImports, exprStack, callInitMethods):
+	Add generic type parameters to avoid "unchecked" warning.
+
 	* Language.java (setDefaultLanguage): Rename to setCurrentLanguage.
 	(setSaveCurrent, restoreCurrent): New convenience methods.
 	(setDefault, eval): Update accordingly.

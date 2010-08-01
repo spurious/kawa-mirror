@@ -88,12 +88,13 @@ public class Compilation implements SourceLocator
    */
   Field moduleInstanceMainField;
 
-  public java.util.Stack pendingImports;
+  /** Stack of pairs of (ModuleInfo,ScpeExp). */
+  public java.util.Stack<Object> pendingImports;
 
   public void pushPendingImport (ModuleInfo info, ScopeExp defs)
   {
     if (pendingImports == null)
-      pendingImports = new java.util.Stack();
+      pendingImports = new java.util.Stack<Object>();
     pendingImports.push(info);
     pendingImports.push(defs);
     Expression posExp = new ReferenceExp((Object) null);
@@ -1162,7 +1163,7 @@ public class Compilation implements SourceLocator
     if (lexp instanceof ClassExp)
       {
 	ClassExp cexp = (ClassExp) lexp;
-	callInitMethods(cexp.getCompiledClassType(this), new Vector(10));
+	callInitMethods(cexp.getCompiledClassType(this), new Vector<ClassType>(10));
       }
 
     code.emitReturn();
@@ -1176,7 +1177,7 @@ public class Compilation implements SourceLocator
    * @param clas Class to search for $finit$, and to search supertypes.
    * @param seen array of seen classes, to avoid duplicate $finit$ calls.
    */
-  void callInitMethods (ClassType clas, Vector seen)
+  void callInitMethods (ClassType clas, Vector<ClassType> seen)
   {
     if (clas == null)
       return;
@@ -2581,7 +2582,7 @@ public class Compilation implements SourceLocator
   }
 
   /** A help vector for building expressions. */
-  public Stack exprStack;
+  public Stack<Expression> exprStack;
 
   public void letStart ()
   {
@@ -2646,7 +2647,7 @@ public class Compilation implements SourceLocator
     LambdaExp loopLambda = (LambdaExp) current_scope;
     Declaration decl = loopLambda.addDeclaration(name, type);
     if (exprStack == null)
-      exprStack = new Stack();
+      exprStack = new Stack<Expression>();
     exprStack.push(init);
     loopLambda.min_args++;
     return decl;

@@ -1,3 +1,14 @@
+2010-08-01  Per Bothner  <per@bothner.com>
+
+	Fixes race condition reported by Daniele Benegiamo.
+	* Compilation.java (current): Change from ThreadLocation to
+	InheritableThreadLocal.  Using ThreadLocation would be ok, but
+	only if we used the proper fluid protocol for thread-local setting.
+	The problem is that ThreadLocation by default shares with parent.
+	There doesn't seem to be much use for that.
+	* Language.java (current): Likewise.
+	(global): New static, to provide a default for getDefaultLanguage.
+
 2010-07-31  Per Bothner  <per@bothner.com>
 
 	* Language.java (declFromField): Set IS_DYNAMIC if field

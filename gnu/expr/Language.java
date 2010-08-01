@@ -23,11 +23,15 @@ import gnu.kawa.lispexpr.ClassNamespace; // FIXME
 
 public abstract class Language
 {
-   protected static final ThreadLocation current
-     = new ThreadLocation("language");
+   protected static final InheritableThreadLocal<Language> current
+   = new InheritableThreadLocal<Language>();
+  protected static Language global;
 
   public static Language getDefaultLanguage()
-  { return (Language) current.get(null); }
+  {
+    Language lang = current.get();
+    return lang != null ? lang : global;
+  }
 
   static { Environment.setGlobal(BuiltinEnvironment.getInstance()); }
 
@@ -818,7 +822,7 @@ public abstract class Language
   public static synchronized void setDefaults (Language lang)
   {
     Language.setDefaultLanguage(lang);
-    current.setGlobal(lang);
+    global = lang;
     // Assuming this is the initial (main) thread, make its Environment
     // the default (global) one, so child threads can inherit from it.
     // Thus command-line definitions etc get inherited.

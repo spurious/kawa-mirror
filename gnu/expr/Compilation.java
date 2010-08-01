@@ -2896,12 +2896,12 @@ public class Compilation implements SourceLocator
 
   protected SourceMessages messages;
 
-  private static final ThreadLocation current =
-    new ThreadLocation("current-compilation");
+  private static final ThreadLocal<Compilation> current =
+    new InheritableThreadLocal<Compilation>();
 
   public static Compilation getCurrent ()
   {
-    return (Compilation) current.get();
+    return current.get();
   }
 
   public static void setCurrent (Compilation comp)

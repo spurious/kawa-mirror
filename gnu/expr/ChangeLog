@@ -1,5 +1,8 @@
 2010-08-02  Per Bothner  <per@bothner.com>
 
+	* ModuleContext.java: Add synchronized qualifies as needed.
+	* ModuleManager.java: Likewise.
+
 	* InlineCalls.java (maybeInline): Do the property-lookup
 	stuff inside a synchronized block, since we cache the method.
 

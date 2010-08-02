@@ -4,7 +4,7 @@ import gnu.mapping.WrappedException;
 import gnu.bytecode.ClassType;
 import gnu.text.*;
 
-/** A database of known modules as represented by {@link ModuleInfo}..
+/** A database of known modules as represented by {@link ModuleInfo}.
  * Current there is only a single global instanceof {@code ModuleManager};
  * in the future each different "applications" may have their own.
  */
@@ -41,12 +41,12 @@ public class ModuleManager
   ModuleInfo[] modules;
   int numModules;
 
-  public ModuleInfo getModule (int index)
+  public synchronized ModuleInfo getModule (int index)
   {
     return index >= numModules ? null : modules[index];
   }
 
-  public ModuleInfo find (Compilation comp)
+  public synchronized ModuleInfo find (Compilation comp)
   {
     ModuleExp mexp = comp.getModule();
     ClassType ctype = mexp.classFor(comp);
@@ -60,7 +60,7 @@ public class ModuleManager
     return info;
   }
 
-  private void add (ModuleInfo info)
+  private synchronized void add (ModuleInfo info)
   {
     if (modules == null)
       modules = new ModuleInfo[10];
@@ -73,7 +73,7 @@ public class ModuleManager
     modules[numModules++] = info;
   }
 
-  public ModuleInfo searchWithClassName (String className)
+  public synchronized ModuleInfo searchWithClassName (String className)
   {
     for (int i = numModules;  --i >= 0; )
       {
@@ -110,7 +110,7 @@ public class ModuleManager
       }
   }
 
-  private ModuleInfo searchWithAbsSourcePath (String sourcePath)
+  private synchronized ModuleInfo searchWithAbsSourcePath (String sourcePath)
   {
     for (int i = numModules;  --i >= 0; )
       {
@@ -137,12 +137,12 @@ public class ModuleManager
     return info;
   }
 
-  public ModuleInfo findWithSourcePath (String sourcePath)
+  public synchronized ModuleInfo findWithSourcePath (String sourcePath)
   {
     return findWithSourcePath(ModuleInfo.absPath(sourcePath), sourcePath);
   }
 
-  public ModuleInfo findWithURL (URL url)
+  public synchronized ModuleInfo findWithURL (URL url)
   {
     Path sourceAbsPath = URLPath.valueOf(url);
     String sourcePath = url.toExternalForm();
@@ -155,7 +155,7 @@ public class ModuleManager
    * {@link ModuleSet#register(ModuleManager)} method that calls
    * back to this method.  This method then registers the specified module.
    */
-  public void register (String moduleClass, String moduleSource, String moduleUri)
+  public synchronized void register (String moduleClass, String moduleSource, String moduleUri)
   {
     // Unclear what is the right thing to do if we have an existing module
     // with the same source or class name.  One case is when we're explicitly
@@ -227,7 +227,7 @@ public class ModuleManager
   }
 
   /** Reset the set of known modules. */
-  public void clear ()
+  public synchronized void clear ()
   {
     // Clear modules and packageIndoChain lists.
     // We also clean the 'next' fields, to avoid leaks if

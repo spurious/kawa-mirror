@@ -49,7 +49,7 @@ public class ModuleContext
   /* #endif */
 
   /** If there is no instance of the argument's class, allocated one. */
-  public Object findInstance (ModuleInfo info)
+  public synchronized Object findInstance (ModuleInfo info)
   {
     Class clas;
     try
@@ -64,12 +64,12 @@ public class ModuleContext
     return findInstance(clas);
   }
 
-  public Object searchInstance (Class clas)
+  public synchronized Object searchInstance (Class clas)
   {
     return table.get(clas);
   }
 
-  public Object findInstance (Class clas)
+  public synchronized Object findInstance (Class clas)
   {
     Object inst = table.get(clas);
     if (inst == null)
@@ -96,7 +96,7 @@ public class ModuleContext
     return inst;
   }
 
-  public void setInstance (Object instance)
+  public synchronized void setInstance (Object instance)
   {
     table.put(instance.getClass(), instance);
   }
@@ -104,15 +104,18 @@ public class ModuleContext
   public ModuleInfo findFromInstance (Object instance)
   {
     Class instanceClass = instance.getClass();
-    ModuleInfo info = manager.findWithClass(instanceClass);
-    setInstance(instance);
-    return info;
+    synchronized (this)
+      {
+        ModuleInfo info = manager.findWithClass(instanceClass);
+        setInstance(instance);
+        return info;
+      }
   }
 
   /** Remove all entries.
    * This can be used to avoids memory leaks.
    */
-  public void clear ()
+  public synchronized void clear ()
   {
     table.clear();
   }

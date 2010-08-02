@@ -112,7 +112,7 @@ public class ModuleInfo
     dependencies[numDependencies++] = dep;
   }
 
-  public ClassType getClassType ()
+  public synchronized ClassType getClassType ()
   {
     if (moduleClass != null)
       return (ClassType) Type.make(moduleClass);
@@ -121,7 +121,7 @@ public class ModuleInfo
     return ClassType.make(className);
   }
 
-  public String getClassName ()
+  public synchronized String getClassName ()
   {
     if (className == null)
       {
@@ -211,7 +211,7 @@ public class ModuleInfo
     return mod;
   }
 
-  public Class getModuleClass ()
+  public synchronized Class getModuleClass ()
     throws ClassNotFoundException
   {
     Class mclass = moduleClass;

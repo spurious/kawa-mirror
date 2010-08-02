@@ -1,6 +1,8 @@
 2010-08-02  Per Bothner  <per@bothner.com>
 
-	* ModuleContext.java: Add synchronized qualifies as needed.
+	* ModuleInfo.java: Add synchronized qualifiers.
+
+	* ModuleContext.java: Add synchronized qualifiers as needed.
 	* ModuleManager.java: Likewise.
 
 	* InlineCalls.java (maybeInline): Do the property-lookup

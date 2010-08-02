@@ -9,6 +9,7 @@ import gnu.mapping.Symbol;
 import org.xml.sax.*;
 import gnu.kawa.sax.*;
 /* #endif */
+import java.util.List;
 import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
 
 /** Fixup XML input events.
@@ -17,7 +18,7 @@ import gnu.expr.Keyword; // FIXME - bad cross-package dependency.
  * This wrapper should be used when creating a NodeTree,
  * as is done for XQuery node constructor expressions.
  * Can also be called directly from XMLParser, in which case we use a slightly
- * lower-level interface where we array char array segments rather than
+ * lower-level interface where we use char array segments rather than
  * Strings.  This is to avoid duplicate String allocation and interning.
  * The combination XMLParser+XMLFilter+NodeTree makes for a fast and
  * compact way to read an XML file into a DOM.
@@ -679,6 +680,14 @@ public class XMLFilter implements
       }
     else if (v instanceof TreeList)
       ((TreeList) v).consume(this);
+    else if (v instanceof List && ! (v instanceof CharSeq))
+      {
+        List seq = (List) v;
+        java.util.Iterator it = seq.iterator();
+        boolean wasAtomic = false;
+        for (int i = 0; it.hasNext(); i++)
+          writeObject(it.next());
+      }
     else if (v instanceof Keyword)
       {
         Keyword k = (Keyword) v;

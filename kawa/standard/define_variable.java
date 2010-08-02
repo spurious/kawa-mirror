@@ -27,7 +27,7 @@ public class define_variable extends Syntax
 	tr.push(decl);
 	decl.setSimple(false);
 	decl.setPrivate(true);
-	decl.setFlag(Declaration.IS_DYNAMIC);
+	decl.setFlag(Declaration.IS_DYNAMIC|Declaration.IS_SINGLE_VALUE);
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
 	decl.setIndirectBinding(true);

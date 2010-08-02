@@ -68,7 +68,7 @@ public class let extends Syntax
 	  return tr.syntaxError("variable "+name+" in let binding is not a symbol: "+obj);
 
 	Declaration decl = let.addDeclaration(name);
-
+        decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	if (templateScope != null)
 	  {
 	    Declaration alias = tr.makeRenamedAlias(decl, templateScope);

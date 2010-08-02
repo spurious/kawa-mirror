@@ -75,6 +75,7 @@ public class define extends Syntax
       }
     if (makeConstant)
       decl.setFlag(Declaration.IS_CONSTANT);
+    decl.setFlag(Declaration.IS_SINGLE_VALUE);
 
     if ((options & 2) != 0)
       {

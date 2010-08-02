@@ -1,5 +1,7 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* FindCapturedVars.java (allocUnboundDecl): Set IS_SINGLE_VALUE.
+
 	* LetExp.java (compile): Only allocateVariable if isSimple.
 
 	* Compilation.java: Fix calls to deprecated 2-argument

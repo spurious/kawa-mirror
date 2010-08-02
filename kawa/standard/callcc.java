@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.functions.AppendValues;
 
 /**
  * Implement the Scheme standard function "call-with-current-continuation".
@@ -230,17 +231,15 @@ class CompileTimeContinuation extends ProcedureN implements Inlineable
     boolean noStack = (blockTarget instanceof IgnoreTarget
                        || blockTarget instanceof ConsumerTarget);
     Type typeNeeded = noStack ? null : target.getType();
-    if (noStack || (nargs == 1 && args[0].isSingleValue()))
+    if (noStack || nargs == 1)
       {
         for (int i = 0;  i < nargs;  i++)
           args[i].compileWithPosition(comp, blockTarget);
       }
     else
       {
-        new ApplyExp(Compilation.typeValues
-                     .getDeclaredMethod("make",
-                                        Compilation.applyNargs),
-                     args).compileWithPosition(comp, blockTarget);
+        AppendValues app = AppendValues.appendValues;
+        app.compile(new ApplyExp(app, args), comp, blockTarget);
       }
     exitableBlock.exit();
   }

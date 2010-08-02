@@ -808,8 +808,6 @@ public class Translator extends Compilation
                 && decl.getConstantValue() instanceof kawa.standard.object)
               return QuoteExp.getInstance(Object.class);
 
-            // In Scheme/Lisp a variable cannot donate multiple values.
-            decl.setFlag(Declaration.IS_SINGLE_VALUE);
             if (decl.getContext() instanceof PatternScope)
               return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
           }

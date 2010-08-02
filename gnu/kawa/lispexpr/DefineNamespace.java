@@ -40,7 +40,8 @@ public class DefineNamespace extends Syntax
     Symbol name = (Symbol) p1.getCar();
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
-    decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX
+                 |Declaration.IS_SINGLE_VALUE);
     if (makePrivate)
       {
         decl.setFlag(Declaration.PRIVATE_SPECIFIED);

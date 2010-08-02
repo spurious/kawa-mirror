@@ -331,6 +331,7 @@ public class Lambda extends Syntax
 	  }
 	else if (mode == restKeyword)
 	  decl.setType(LangObjType.listType);
+        decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	decl.noteValue(null);  // Does not have a known value.
 	addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
@@ -345,6 +346,7 @@ public class Lambda extends Syntax
       {
 	Declaration decl = new Declaration(bindings);
         decl.setType(LangObjType.listType);
+        decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	decl.noteValue (null);  // Does not have a known value.
 	addParam(decl, templateScopeRest, lexp, tr);
       }

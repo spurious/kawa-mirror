@@ -1,5 +1,16 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* standard/callcc.java (CompileTimeContinuation.compile): Use
+	AppendValues when we need to deal with multiple values,
+	rather than (incorrectly) Values.make.
+	* lang/Translator.java (rewrite): Don't set IS_SINGLE_VALUE in
+	Declarations - among other problems it causes a (probably-harmless)
+	race condition.
+	* lang/Lambda.java (rewriteFormals): Set IS_SINGLE_VALUE on formals.
+	* standard/let.java (rewrite): Set IS_SINGLE_VALUE on variables.
+	* standard/define.java (scanForm): Likewise.
+	* standard/define_variable.java (scanForDefinitions): Likewise.
+
 	* repl.java: Update Language setting calls.
 	* Shell.java: Likewise.
 

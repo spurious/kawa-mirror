@@ -1,5 +1,8 @@
 2010-08-01  Per Bothner  <per@bothner.com>
 
+	* DefineNamespace.java (scanForDefinitions): Set IS_SINGLE_VALUE
+	on namespace variable.
+
 	* LispLanguage.java (parse): Use new Compilation convenience methods.
 
 2010-06-27  Per Bothner  <per@bothner.com>

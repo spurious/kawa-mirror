@@ -430,7 +430,11 @@ public class FindCapturedVars extends ExpWalker
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
-	decl.setFlag(Declaration.IS_UNKNOWN);
+        // Setting IS_SINGLE_VALUE unconditionally is a kludge.
+        // It is OK for Scheme/Lisp, since a variable can't be
+        // bound to multiple value.  It is OK for XQuery, since we
+        // XQuery doesn't allow unknown/dynamic variables.  FIXME.
+	decl.setFlag(Declaration.IS_UNKNOWN|Declaration.IS_SINGLE_VALUE);
 	decl.setIndirectBinding(true);
 	unknownDecls.put(key, decl);
       }

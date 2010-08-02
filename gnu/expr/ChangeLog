@@ -1,3 +1,8 @@
+2010-08-02  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (maybeInline): Do the property-lookup
+	stuff inside a synchronized block, since we cache the method.
+
 2010-08-01  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (allocUnboundDecl): Set IS_SINGLE_VALUE.

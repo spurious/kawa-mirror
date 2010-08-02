@@ -242,18 +242,13 @@ public class InlineCalls extends ExpWalker
   {
     try
       {
-        Object inliner = Procedure.inlineCallsKey.get(proc);
-        if (inliner != null)
-          return ((CanInline) inliner).inline(exp, this, argsInlined);
-        inliner = proc.getProperty(Procedure.inlinerKey, null);
-
-        if (inliner != null)
+        Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);
+        Object inliner;
+        synchronized (proc)
           {
-            Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);
-            if (inliner instanceof Procedure)
-              return (Expression) ((Procedure) inliner).apply4(exp, this,
-                                                               argsInlinedBoxed,
-                                                               proc);
+            inliner = Procedure.inlineCallsKey.get(proc);
+            if (inliner == null)
+              inliner = proc.getProperty(Procedure.inlinerKey, null);
             if (inliner instanceof String)
               {
                 String inliners = (String) inliner;
@@ -278,13 +273,18 @@ public class InlineCalls extends ExpWalker
                 inliner = method;
                 proc.setProperty(Procedure.inlinerKey, method);
               }
-            return (Expression) ((java.lang.reflect.Method) inliner).invoke(null,
-                                             new Object[] { exp, this,
-                                                            argsInlinedBoxed,
-                                                            proc });
-          }
-        if (proc instanceof CanInline)
-          return ((CanInline) proc).inline(exp, this, argsInlined);
+          } /* end synchronized */
+        if (inliner == null && proc instanceof CanInline)
+          inliner = proc;
+        if (inliner instanceof CanInline)
+          return ((CanInline) inliner).inline(exp, this, argsInlined);
+        else if (inliner instanceof Procedure)
+                  return (Expression) ((Procedure) inliner).apply4(exp, this,
+                                                                   argsInlinedBoxed,
+                                                                   proc);
+        else if (inliner instanceof java.lang.reflect.Method)
+          return (Expression) ((java.lang.reflect.Method) inliner)
+            .invoke(null,                                                                          new Object[] { exp, this,  argsInlinedBoxed, proc });
       }
     catch (Throwable ex)
       {

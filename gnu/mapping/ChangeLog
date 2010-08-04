@@ -1,3 +1,11 @@
+2010-08-03  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java: Change to extend NamedLocation.
+	(<init>): Update accordingly.
+	(name, property): Remove now-inherited fields.
+	(getKeySymbol, getKeyProperty): Remove now-inherited methods.
+	* ThreadLocation.java (unlink): Replace field by (property==ANONYMOUS).
+
 2010-06-14  Per Bothner  <per@bothner.com>
 
 	* Namespace.java (getPrefix): New method.

@@ -6,12 +6,9 @@ package gnu.mapping;
 /** A Location that forwards to a thread-specific Location.
  */
 
-public class ThreadLocation extends Location implements Named
+public class ThreadLocation extends NamedLocation implements Named
 {
-  final Symbol name;
-  final Object property;
   static int counter;
-  boolean unlink;
   private static synchronized int nextCounter() { return ++counter; }
 
   /** Magic property value used for the "anonymous" ThreadLocations.
@@ -37,25 +34,20 @@ public class ThreadLocation extends Location implements Named
    * However, the binding is not bound to the name as a visible binding. */
   public ThreadLocation (String name)
   {
-    this.name = Symbol.makeUninterned(name);
-    this.property = ANONYMOUS;
-    unlink = true;
+    super(Symbol.makeUninterned(name), ANONYMOUS);
     global = new SharedLocation(this.name, null, 0);
   }
 
   private ThreadLocation (Symbol name)
   {
-    this.name = name;
+    super(name, ANONYMOUS);
     String str = name == null ? null : name.toString();
-    this.property = ANONYMOUS;
-    unlink = true;
     global = new SharedLocation(Symbol.makeUninterned(str), null, 0);
   }
 
   public ThreadLocation (Symbol name, Object property, Location global)
   {
-    this.name = name;
-    this.property = property;
+    super(name, property);
     this.global = global;
   }
 
@@ -106,7 +98,7 @@ public class ThreadLocation extends Location implements Named
 	      }
 	  }
 	
-	if (unlink)
+	if (property == ANONYMOUS)
 	  {
 	    LocationRef lref = new LocationRef();
 	    lref.env = env;
@@ -147,8 +139,6 @@ public class ThreadLocation extends Location implements Named
     getLocation().setRestore(oldValue, ctx);
   }
 
-  public Symbol getKeySymbol () { return name; }
-  public Object getKeyProperty () { return property; }
   public String getName () { return name == null ? null : name.toString(); }
   public Object getSymbol () // Implements Named
   {

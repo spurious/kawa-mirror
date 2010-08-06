@@ -1,3 +1,9 @@
+2010-08-06  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java (rewriteAttrs): The classes of the throws specifier
+	may evaluate to a QuoteExp as well as a ReferenceExp.  Defer
+	error-checking and resolution to LambdaExp.addMethodFor.
+
 2010-08-01  Per Bothner  <per@bothner.com>
 
 	* standard/callcc.java (CompileTimeContinuation.compile): Use

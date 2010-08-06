@@ -483,7 +483,7 @@ public class Lambda extends Syntax
 	      tr.error('e', "throws: not followed by a list");
 	    else
 	      {
-		ReferenceExp[] exps = new ReferenceExp[count];
+		Expression[] exps = new Expression[count];
 		SyntaxForm syntax2 = syntax1;
 		for (int i = 0;  i < count; i++)
 		  {
@@ -493,17 +493,9 @@ public class Lambda extends Syntax
 			attrValue = syntax2.getDatum();
 		      }
 		    Pair pair3 = (Pair) attrValue;
-		    Expression throwsExpr = tr.rewrite_car(pair3, syntax2);
-		    if (throwsExpr instanceof ReferenceExp)
-		      {
-			exps[i] = (ReferenceExp) throwsExpr;
-		      }
-		    else
-		      {
-			Object savePos = tr.pushPositionOf(pair3);
-			tr.error('e', "throws not followed by a classname");
-			tr.popPositionOf(savePos);
-		      }
+		    exps[i] = tr.rewrite_car(pair3, syntax2);
+                    // Error-checking is done later.
+                    Translator.setLine(exps[i], pair3);
 		    attrValue = pair3.getCdr(); 
 		  }
 		lexp.setExceptions(exps);

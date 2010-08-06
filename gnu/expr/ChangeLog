@@ -1,5 +1,13 @@
 2010-08-06  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (throwsSpecification): Change to Expression array.
+	(addMethodFor): Better error checking of throws specification.
+	Allow a constant class in a throws specification - the name of
+	a constant class would now resolve to a QuoteExpr of a Class.
+	Fixes bug reported by John Whittaker <john.whittaker@sbcglobal.net>.
+
+	* LambdaExp.java (walkChildrenOnly): Also walk throwsSpecification.
+
 	* ExpWalker.java (walkExps): Allow a null argument.
 	(walkDefaultArgs): No longer need null check here.
 

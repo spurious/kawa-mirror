@@ -93,9 +93,9 @@ public class LambdaExp extends ScopeExp
   public LambdaExp inlineHome;
 
   /** Expressions that name classes that may be thrown. */
-  ReferenceExp[] throwsSpecification;
+  Expression[] throwsSpecification;
 
-  public void setExceptions(ReferenceExp[] exceptions)
+  public void setExceptions(Expression[] exceptions)
   {
     throwsSpecification = exceptions;
   }
@@ -1069,27 +1069,43 @@ public class LambdaExp extends ScopeExp
 	    for (int j = 0;  j < n;  j++)
 	      {
 		ClassType exception = null;
-		Declaration decl = throwsSpecification[j].getBinding();
-		if (decl != null)
-		  {
-		    Expression declValue = decl.getValue();
-		    if (declValue instanceof ClassExp)
-		      exception
-			= ((ClassExp) declValue).getCompiledClassType(comp);
-		    else
-		      comp.error('e', "throws specification "+decl.getName()
-				 + " has non-class lexical binding");
-		  }
-		if (exception == null)
-		  {
-		    String exName = throwsSpecification[j].getName();
-		    int nlen = exName.length();
-		    if (nlen > 2
-			&& exName.charAt(0) == '<'
-			&& exName.charAt(nlen-1) == '>')
-		      exName = exName.substring(1, nlen-1);
-		    exception = ClassType.make(exName);
-		  }
+                Expression throwsExpr = throwsSpecification[j];
+                String msg = null;
+                if (throwsExpr instanceof ReferenceExp)
+                  {
+                    ReferenceExp throwsRef = (ReferenceExp) throwsExpr;
+                    Declaration decl = throwsRef.getBinding();
+                    if (decl != null)
+                      {
+                        Expression declValue = decl.getValue();
+                        if (declValue instanceof ClassExp)
+                          exception
+                            = ((ClassExp) declValue).getCompiledClassType(comp);
+                        else
+                          msg = "throws specification "+decl.getName()
+                            + " has non-class lexical binding";
+                      }
+                    else
+                      msg = "unknown class "+throwsRef.getName();
+                  }
+                else if (throwsExpr instanceof QuoteExp)
+                  {
+                    Object value = ((QuoteExp) throwsExpr).getValue();
+                    if (value instanceof Class)
+                      value = Type.make((Class) value);
+                    if (value instanceof ClassType)
+                      exception = (ClassType) value;
+                    if (exception != null
+                        && ! exception.isSubtype(Type.javalangThrowableType))
+                      msg = exception.getName() + " does not extend Throwable";
+                  }
+                if (exception == null && msg == null)
+                  msg = "invalid throws specification";
+                if (msg != null)
+                  {
+                    comp.error('e', msg, throwsExpr);
+                    exception = Type.javalangThrowableType;
+                  }
 		exceptions[j] = exception;
 	      }
 	    ExceptionsAttr attr = new ExceptionsAttr(method);
@@ -1639,6 +1655,7 @@ public class LambdaExp extends ScopeExp
     walker.currentLambda = this;
     try
       {
+        throwsSpecification = walker.walkExps(throwsSpecification);
 	walker.walkDefaultArgs(this);
 	if (walker.exitValue == null && body != null)
 	  body = walker.walk(body);

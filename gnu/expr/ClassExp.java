@@ -323,6 +323,7 @@ public class ClassExp extends LambdaExp
         // might be a TemplateScope.
         child.outer = this;
 	if ((child != initMethod && child != clinitMethod
+             && child.nameDecl != null // only if error
              && ! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
 	    || ! isMakingClassPair())
 	  child.addMethodFor(type, comp, null);

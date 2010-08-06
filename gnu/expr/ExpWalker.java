@@ -135,7 +135,7 @@ public class ExpWalker
 
   public Expression[] walkExps (Expression[] exps)
   {
-    return walkExps(exps, exps.length);
+    return exps == null ? null : walkExps(exps, exps.length);
   }
 
   /** Call walk on the Expressions in an array.
@@ -182,8 +182,7 @@ public class ExpWalker
 
   public void walkDefaultArgs (LambdaExp exp)
   {
-    if (exp.defaultArgs != null)
-      exp.defaultArgs = walkExps(exp.defaultArgs);
+    exp.defaultArgs = walkExps(exp.defaultArgs);
   }
 
   public void error(char kind, String message)

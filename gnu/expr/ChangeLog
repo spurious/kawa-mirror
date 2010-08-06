@@ -1,5 +1,8 @@
 2010-08-06  Per Bothner  <per@bothner.com>
 
+	* ExpWalker.java (walkExps): Allow a null argument.
+	(walkDefaultArgs): No longer need null check here.
+
 	* ClassExp.java (declareParts): Add null check, in case of error.
 
 2010-08-02  Per Bothner  <per@bothner.com>

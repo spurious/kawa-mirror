@@ -456,22 +456,17 @@ public class ModuleInfo
     sbuf.append(']');
     return sbuf.toString();
   }
-}
 
-class ClassToInfoMap extends AbstractWeakHashTable<Class,ModuleInfo>
-{
-  public ClassToInfoMap ()
+  static class ClassToInfoMap extends AbstractWeakHashTable<Class,ModuleInfo>
   {
-    super(64);
-  }
+    protected Class getKeyFromValue (ModuleInfo minfo)
+    {
+      return minfo.moduleClass;
+    }
 
-  protected Class getKeyFromValue (ModuleInfo minfo)
-  {
-    return minfo.moduleClass;
-  }
-
-  protected boolean matches (ModuleInfo oldValue, ModuleInfo newValue)
-  {
-    return oldValue.moduleClass == newValue.moduleClass;
+    protected boolean matches (Class oldValue, Class newValue)
+    {
+      return oldValue == newValue;
+    }
   }
 }

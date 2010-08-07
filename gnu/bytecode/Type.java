@@ -98,7 +98,7 @@ public abstract class Type
   {
     ClassToTypeMap map = mapClassToType;
     if (map == null)
-      mapClassToType = map = new ClassToTypeMap(100);
+      mapClassToType = map = new ClassToTypeMap();
     type.reflectClass = clas;
     map.put(clas, type);
   }
@@ -608,27 +608,18 @@ public abstract class Type
     String name = toString();
     return name == null ? 0 : name.hashCode ();
   }
-}
 
-class ClassToTypeMap extends AbstractWeakHashTable<Class,Type>
-{
-  public ClassToTypeMap ()
+  static class ClassToTypeMap extends AbstractWeakHashTable<Class,Type>
   {
-    super(64);
-  }
+    protected Class getKeyFromValue (Type type)
+    {
+      return type.reflectClass;
+    }
 
-  public ClassToTypeMap (int capacity)
-  {
-    super(capacity);
-  }
-
-  protected Class getKeyFromValue (Type type)
-  {
-    return type.reflectClass;
-  }
-
-  protected boolean matches (Type oldValue, Type newValue)
-  {
-    return oldValue.reflectClass == newValue.reflectClass;
+    protected boolean matches (Class oldValue, Class newValue)
+    {
+      // Minor optimization.
+      return oldValue == newValue;
+    }
   }
 }

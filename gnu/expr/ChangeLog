@@ -1,3 +1,10 @@
+2010-08-07  Per Bothner  <per@bothner.com>
+
+	* ModuleInfo.java (class ClassToInfoMap): Change to member class.
+	Remove default constructor.
+	(ClassToInfoMap.matches): Fix - parameter should be key type,
+	not value type.
+
 2010-08-06  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (throwsSpecification): Change to Expression array.

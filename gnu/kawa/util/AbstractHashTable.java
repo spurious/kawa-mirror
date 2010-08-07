@@ -209,7 +209,17 @@ public abstract class AbstractHashTable<Entry extends Map.Entry<K,V>, K, V>
   {
     Entry[] t = this.table;
     for (int i = t.length;  --i >= 0; )
-      setEntryNext(t[i], null);
+      {
+        // Clearing the links is probably not needed,
+        // but just in case someone has a reference to an entry.
+        for (Entry e = t[i]; e != null; )
+          {
+            Entry next = getEntryNext(e);
+            setEntryNext(e, null);
+            e = next;
+          }
+        t[i] = null;
+      }
     num_bindings = 0;
   }
 

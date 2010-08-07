@@ -1,3 +1,7 @@
+2010-08-07  Per Bothner  <per@bothner.com>
+
+	* AbstractHashTable.java (clear):  Fix thinko.
+
 2010-07-23  Per Bothner  <per@bothner.com>
 
 	* AbstractHashTable.java (<init>): New default constructor.

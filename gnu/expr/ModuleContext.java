@@ -1,9 +1,10 @@
-// Copyright (c) 2005, 2007  Per M.A. Bothner.
+// Copyright (c) 2005, 2007, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.mapping.*;
 import java.util.*;
+import gnu.kawa.util.AbstractWeakHashTable;
 
 /** Maps modules to module instances.
  * Given a class, species a specific instance object for that class.
@@ -38,15 +39,7 @@ public class ModuleContext
     return manager;
   }
 
-  /* #ifdef JAVA2 */
-  /* #ifdef JAVA5 */
-  private static WeakHashMap<Class,Object> table = new WeakHashMap<Class,Object>();
-  /* #else */
-  // private static WeakHashMap table = new WeakHashMap();
-  /* #endif */
-  /* #else */
-  // private static Hashtable table = new Hashtable();
-  /* #endif */
+  private ClassToInstanceMap table = new ClassToInstanceMap();
 
   /** If there is no instance of the argument's class, allocated one. */
   public synchronized Object findInstance (ModuleInfo info)
@@ -118,5 +111,18 @@ public class ModuleContext
   public synchronized void clear ()
   {
     table.clear();
+  }
+
+  static class ClassToInstanceMap extends AbstractWeakHashTable<Class,Object>
+  {
+    protected Class getKeyFromValue (Object instance)
+    {
+      return instance.getClass();
+    }
+
+    protected boolean matches (Class oldValue, Class newValue)
+    {
+      return oldValue == newValue;
+    }
   }
 }

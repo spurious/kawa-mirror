@@ -1,5 +1,10 @@
 2010-08-07  Per Bothner  <per@bothner.com>
 
+	* ModuleContext.java (table): Change from using WeakHashMap to
+	ClassToInstanceMap, a new sub-class of AbstractWeakHashTable.
+	This fixes a memory leak reported by Daniele Benegiamo.
+	(ClassToInstanceMap): New member class, extends AbstractWeakHashTable.
+
 	* ModuleInfo.java (class ClassToInfoMap): Change to member class.
 	Remove default constructor.
 	(ClassToInfoMap.matches): Fix - parameter should be key type,

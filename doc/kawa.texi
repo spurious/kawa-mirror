@@ -3681,7 +3681,7 @@ string has index 0, the second has index 1, and so on.
 @quotation
 @emph{Kawa note:}
 Kawa's implementation of strings that contain
-surrugate characters does not quite follow the R6RS specification.
+surrogate characters does not quite follow the R6RS specification.
 Specifically indexing into such a string retrieves a surrogate
 rather than a Unicode scalar value.
 It is not clear what the best solution is - there is a tradeoff

@@ -237,7 +237,7 @@ You can use a type to specify that a variable can only have
 values of the specified types:
 </para>
 <programlisting>
-#|kawa:5|# (define v :: vector #(3 4 5))
+#|kawa:5|# (define v ::vector #(3 4 5))
 #|kawa:6|# v
 #(3 4 5)
 #|kawa:7|# (set! v 12)
@@ -288,7 +288,7 @@ A type is true run-time value:
 </programlisting>
 <para>
 The <literal>define-alias</literal> form is useful for defining shorter names
-for types, like a generalization of Java's <literal>import</literal> statement>:
+for types, like a generalization of Java's <literal>import</literal> statement:
 </para>
 <programlisting>
 (define-alias jframe javax.swing.JFrame)

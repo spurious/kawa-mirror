@@ -51,6 +51,18 @@ public class syntax_case extends Syntax
 	PatternScope clauseScope = PatternScope.push(tr);
 	clauseScope.matchArray = tr.matchArray;
 	tr.push(clauseScope);
+
+        SyntaxForm syntax = null;
+        Object tail = pair.getCdr();
+        while (tail instanceof SyntaxForm)
+          {
+            syntax = (SyntaxForm) tail;
+            tail = syntax.getDatum();
+          }
+        // Check for nonsense before bothering to analyze the pattern.
+        if (! (tail instanceof Pair))
+          return tr.syntaxError("missing syntax-case output expression");
+
 	int outerVarCount = clauseScope.pattern_names.size();
 	SyntaxPattern pattern
 	  = new SyntaxPattern(pair.getCar(), work.literal_identifiers, tr);
@@ -74,13 +86,6 @@ public class syntax_case extends Syntax
 	clauseScope.inits = inits;
 
 	Expression output;
-        SyntaxForm syntax = null;
-        Object tail = pair.getCdr();
-        while (tail instanceof SyntaxForm)
-          {
-            syntax = (SyntaxForm) tail;
-            tail = syntax.getDatum();
-          }
 	pair = (Pair) tail;
 	if (pair.getCdr() == LList.Empty)
 	  output = tr.rewrite_car(pair, syntax);

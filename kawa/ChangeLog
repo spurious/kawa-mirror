@@ -1,5 +1,8 @@
 2010-08-15  Per Bothner  <per@bothner.com>
 
+	* standard/syntax_case.java (rewriteClauses): Check for
+	missing output expression.
+
 	* repl.java: Fix tab/space problem, which broke PreProcess.
 
 2010-08-06  Per Bothner  <per@bothner.com>

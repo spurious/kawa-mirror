@@ -508,9 +508,9 @@ public class repl extends Procedure0or1
                 gnu.kawa.servlet.KawaHttpHandler.addAutoHandler(args[iArg-1], args[iArg]);
               }
             catch (java.io.IOException ex)
-	      {
-		throw new RuntimeException(ex);
-	      }
+              {
+                throw new RuntimeException(ex);
+              }
             catch (NoClassDefFoundError ex)
               {
                 System.err.println("kawa: HttpServer classes not found");

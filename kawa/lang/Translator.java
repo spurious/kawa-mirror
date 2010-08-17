@@ -67,27 +67,6 @@ public class Translator extends Compilation
     LispLanguage.getNamedPartLocation.setDeclaration(getNamedPartDecl);
   }
 
-  /** Return true if decl is lexical and not fluid. */
-  public boolean isLexical (Declaration decl)
-  {
-    if (decl == null)
-      return false;
-    if (! decl.isFluid())
-      return true;
-    ScopeExp scope = currentScope();
-    ScopeExp context = decl.getContext();
-    for (;; scope = scope.outer)
-      {
-	if (scope == null)
-	  return false;
-	if (scope == context)
-	  return true;
-	if (scope instanceof LambdaExp
-	    && ! ((LambdaExp) scope).getInlineOnly())
-	  return false;
-      }
-  }
-
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
 
   public Translator (Language language, SourceMessages messages, NameLookup lexical)
@@ -707,10 +686,7 @@ public class Translator extends Compilation
 	boolean separate = getLanguage().hasSeparateFunctionNamespace();
         if (decl != null)
           {
-            if (! isLexical(decl)
-                || (separate && decl.isProcedureDecl()))
-              decl = null;
-            else if (current_scope instanceof TemplateScope && decl.needsContext())
+            if (current_scope instanceof TemplateScope && decl.needsContext())
               cdecl = ((TemplateScope) current_scope).macroContext;
             else if (decl.getFlag(Declaration.FIELD_OR_METHOD)
                      && ! decl.isStatic())

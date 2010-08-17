@@ -1,3 +1,10 @@
+2010-08-17  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (isLexical): Remove method.  Moved logic to
+	FindCapturedvars.walkReferenceExp.
+	(rewrite): Don't call isLexical to check for fluid-variable - it
+	causes false postives for --warn-undefined-variable.
+
 2010-08-16  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewriteBody): Change to take an LList.

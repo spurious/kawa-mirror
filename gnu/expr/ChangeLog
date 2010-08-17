@@ -1,3 +1,8 @@
+2010-08-17  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkReferenceExp): If the declaration is
+	a fluid in a different function, treat as dynamic.
+
 2010-08-07  Per Bothner  <per@bothner.com>
 
 	* ModuleContext.java (table): Change from using WeakHashMap to

@@ -444,13 +444,29 @@ public class FindCapturedVars extends ExpWalker
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
     Declaration decl = exp.getBinding();
+    boolean isFluid = decl != null && decl.isFluid();
+    if (isFluid)
+      {
+        ScopeExp scope = getCurrentLambda ();
+        ScopeExp declLambda = decl.getContext().currentLambda();
+        for (; scope != declLambda; scope = scope.outer)
+          {
+            if (scope == null
+                || (scope instanceof LambdaExp
+                    && ! ((LambdaExp) scope).getInlineOnly()))
+              {
+                decl = null;
+                break;
+              }
+          }
+      }
     if (decl == null)
       {
 	decl = allocUnboundDecl(exp.getSymbol(),
 				exp.isProcedureName());
 	exp.setBinding(decl);
       }
-    if (decl.getFlag(Declaration.IS_UNKNOWN))
+    if (decl.getFlag(Declaration.IS_UNKNOWN) && ! isFluid)
       {
 	if (comp.getBooleanOption("warn-undefined-variable", false))
 	  {

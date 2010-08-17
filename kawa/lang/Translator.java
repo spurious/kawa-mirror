@@ -1114,9 +1114,9 @@ public class Translator extends Compilation
    * in a <code>SyntaxForm</code>); otherwise <code>null</code>.
    */
 
-  public Object scanBody (Object body, ScopeExp defs, boolean makeList)
+  public LList scanBody (Object body, ScopeExp defs, boolean makeList)
   {
-    Object list = makeList ? LList.Empty : null;
+    LList list = makeList ? LList.Empty : null;
     Pair lastPair = null;
     while (body != LList.Empty)
       {
@@ -1128,10 +1128,10 @@ public class Translator extends Compilation
 	      {
 		setCurrentScope(sf.getScope());
 		int first = formStack.size();
-		Object f = scanBody(sf.getDatum(), defs, makeList);
+		LList f = scanBody(sf.getDatum(), defs, makeList);
                 if (makeList)
                   {
-                    f = wrapSyntax(f, sf);
+                    f = (LList) SyntaxForms.fromDatumIfNeeded(f, sf);
                     if (lastPair == null)
 		      return f;
                     lastPair.setCdrBackdoor(f);
@@ -1208,8 +1208,8 @@ public class Translator extends Compilation
     current_scope = defs;
     try
       {
-	scanBody(exp, defs, false);
-	if (formStack.size() == first)
+        LList list = scanBody(exp, defs, true);
+	if (list.isEmpty())
 	  formStack.add(syntaxError ("body with no expressions"));
 	int ndecls = defs.countNonDynamicDecls();
 	if (ndecls != 0)
@@ -1219,6 +1219,7 @@ public class Translator extends Compilation
 	      inits[i] = QuoteExp.undefined_exp;
 	    defs.inits = inits;
 	  }
+        rewriteBody(list);
 	Expression body = makeBody(first, null);
 	setLineOf(body);
 	if (ndecls == 0)
@@ -1234,32 +1235,27 @@ public class Translator extends Compilation
       }
   }
 
-  /* Rewrite forms on formStack above first. */
-  public void rewriteBody (int first)
+  private void rewriteBody (LList forms)
   {
-    int nforms = formStack.size() - first;
-    if (nforms == 0)
-      return;
-    else if (nforms == 1)
+    while (forms != LList.Empty)
       {
-	Object f = formStack.pop();
-	rewriteInBody(f);
-      }
-    else
-      {
-	Object[] forms = new Object [nforms];
-	for (int i = 0; i < nforms; i++)
-	  forms[i] = formStack.elementAt(first + i);
-	formStack.setSize(first);
-	for (int i = 0; i < nforms; i++)
-	  rewriteInBody(forms[i]);
+        Pair pair = (Pair) forms;
+        Object saved = pushPositionOf(pair);
+        try
+          {
+            rewriteInBody(pair.getCar());
+          }
+        finally
+          {
+            popPositionOf(saved);
+          }
+        forms = (LList) pair.getCdr();
       }
   }
 
   /** Combine a list of zero or more expression forms into a "body". */
-  public Expression makeBody(int first, ScopeExp scope)
+  private Expression makeBody(int first, ScopeExp scope)
   {
-    rewriteBody(first);
     int nforms = formStack.size() - first;
     if (nforms == 0)
       return QuoteExp.voidExp; 
@@ -1420,6 +1416,7 @@ public class Translator extends Compilation
     Compilation save_comp = Compilation.setSaveCurrent(this);
     try
       {
+        rewriteInBody(popForms(firstForm));
 	mexp.body = makeBody(firstForm, mexp);
         // In immediate mode need to preseve Declaration for current "seesion".
         if (! immediate)

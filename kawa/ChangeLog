@@ -1,3 +1,8 @@
+2010-08-16  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewriteBody): Change to take an LList.
+	This allows using the incoming Pairs for position information.
+
 2010-08-15  Per Bothner  <per@bothner.com>
 
 	* standard/syntax_case.java (rewriteClauses): Check for

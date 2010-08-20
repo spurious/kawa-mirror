@@ -1,3 +1,7 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* ELisp.java: Update to use new Environment-setting methods.
+
 2008-05-25  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (asChar): Generalize to use 20-bit ints.

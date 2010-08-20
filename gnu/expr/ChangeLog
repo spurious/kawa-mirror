@@ -1,3 +1,19 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* CompiledModule.java: Update to use new Environment-setting methods.
+	* SetExp.java: Likewise.
+	* Expression.java: Likewise.
+	* KawaScriptEngine.java: Likewise.
+	* ReferenceExp.java: Likewise.
+	* Declaration.java (load): If this is a fluid variable declaration,
+	then load the base Declaration instead.
+	* FindCapturedVars.java (maybeWarnNoDeclarationSeen): New method.
+	(walkFluidLetExp, walkReferenceExp): Call it.
+	(walkReferenceExp): Remove recent code to handle fluids.
+	(capture): If this is a fluid, capture base instead.
+	* BindingInitializer.java (emit): If declaration is fluid,
+	create anonymous ThreadLocation instead.
+
 2010-08-17  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (walkReferenceExp): If the declaration is

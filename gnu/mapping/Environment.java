@@ -367,14 +367,36 @@ public abstract class Environment
     * @deprecated
     */
   public static Environment current () { return getCurrent(); }
+
+  protected static final InheritedLocal curEnvironment = new InheritedLocal();
+
   public static Environment getCurrent ()
   {
-    return CallContext.getInstance().getEnvironment();
+    Environment env = curEnvironment.get();
+    if (env == null)
+      {
+	env = Environment.make(Thread.currentThread().getName(), Environment.global);
+        env.flags |= Environment.THREAD_SAFE;
+        curEnvironment.set(env);
+      }
+    return env;
   }
 
   public static void setCurrent (Environment env)
   {
-    CallContext.getInstance().curEnvironment = env;
+    curEnvironment.set(env);
+  }
+
+  public static Environment setSaveCurrent (Environment env)
+  {
+    Environment save = curEnvironment.get();;
+    curEnvironment.set(env);
+    return save;
+  }
+
+  public static void restoreCurrent (Environment saved)
+  {
+    curEnvironment.set(saved);
   }
 
   public static Environment user () { return getCurrent(); }
@@ -415,5 +437,61 @@ public abstract class Environment
   public String toStringVerbose ()
   {
     return toString();
+  }
+
+  SimpleEnvironment cloneForThread ()
+  {
+    InheritingEnvironment env = new InheritingEnvironment(null, this);
+
+    // There is no point for a lookup to search this Environment,
+    // since its bindings will be cloned.  Instead patch the new Environment
+    // so it inherits from its grandparents instead.
+    if (this instanceof InheritingEnvironment)
+      {
+        InheritingEnvironment p = (InheritingEnvironment) this;
+        int numInherited = p.numInherited;
+        env.numInherited = numInherited;
+        env.inherited = new Environment[numInherited];
+        for (int i = 0;  i < numInherited;  i++)
+          env.inherited[i] = p.inherited[i];
+      }
+
+    LocationEnumeration e = enumerateLocations();
+    while (e.hasMoreElements())
+      {
+        Location loc = e.nextLocation();
+
+        Symbol name = loc.getKeySymbol();
+        Object property = loc.getKeyProperty();
+        if (name != null && loc instanceof NamedLocation)
+          {
+            NamedLocation nloc = (NamedLocation) loc;
+            if (nloc.base == null)
+              {
+                SharedLocation sloc = new SharedLocation(name, property, 0);
+                sloc.value = nloc.value;
+                nloc.base = sloc;
+                nloc.value = null;
+                nloc = sloc;
+              }
+            int hash = name.hashCode() ^ System.identityHashCode(property);
+            NamedLocation xloc = env.addUnboundLocation(name, property, hash);
+            xloc.base = nloc;
+          }
+      }
+    return env;
+  }
+
+  static class InheritedLocal extends InheritableThreadLocal<Environment>
+  {
+    protected Environment childValue(Environment parentValue)
+    {
+      if (parentValue == null)
+        parentValue = getCurrent();
+      SimpleEnvironment env = parentValue.cloneForThread();
+      env.flags |= Environment.THREAD_SAFE;
+      env.flags &= ~Environment.DIRECT_INHERITED_ON_SET;
+      return env;
+    }
   }
 }

@@ -106,21 +106,16 @@ public abstract class NamedLocation extends IndirectableLocation
 
   public synchronized Object setWithSave (Object newValue, CallContext ctx)
   {
-    Object old;
-    if (base != null)
-      {	
-	if (value == INDIRECT_FLUIDS)
-          return base.setWithSave(newValue, ctx);
-	old = base;
-	base = null;
-      }
-    else
-      {
-	old = value;
-      }
-    value = newValue;
-    ctx.pushFluid(this);
-    return old;
+    if (value == INDIRECT_FLUIDS)
+      return base.setWithSave(newValue, ctx);
+    ThreadLocation thloc = ThreadLocation.makePrivate(name);
+    thloc.global.base = base;
+    thloc.global.value = value;
+    setAlias(thloc);
+    NamedLocation entry = thloc.getLocation();
+    entry.value = newValue;
+    entry.base = null;
+    return thloc.global;
   }
 
   public synchronized void setRestore (Object oldValue, CallContext ctx)
@@ -139,7 +134,6 @@ public abstract class NamedLocation extends IndirectableLocation
             value = oldValue;
             base = null;
           }
-        ctx.popFluid();
       }
   }
 }

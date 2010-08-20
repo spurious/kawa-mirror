@@ -80,7 +80,6 @@ public abstract class Location
    * a simple save-restore isn't always the right thing. */
   public Object setWithSave (Object newValue, CallContext ctx)
   {
-    ctx.pushFluid(this);
     Object old = get(UNBOUND);
     set(newValue);
     return old;
@@ -92,7 +91,6 @@ public abstract class Location
   {
     // if (oldValue == UNBOUND) ???;  // FIXME
     set(oldValue);
-    ctx.popFluid();
   }
 
   public boolean isBound ()

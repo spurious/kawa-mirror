@@ -1,3 +1,7 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java: Update to use new Environment-setting methods.
+
 2009-03-10  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (createReadTable): Do setFinalColonIsKeyword()

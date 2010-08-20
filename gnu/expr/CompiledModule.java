@@ -35,8 +35,7 @@ public class CompiledModule
     throws Throwable
   {
     Language saveLang = Language.setSaveCurrent(language);
-    Environment saveEnv = ctx.getEnvironmentRaw();
-    ctx.setEnvironmentRaw(env);
+    Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
         ModuleExp.evalModule2(env, ctx, language, mexp, cookie);
@@ -44,7 +43,7 @@ public class CompiledModule
     finally
       {
 	Language.restoreCurrent(saveLang);
-        ctx.setEnvironmentRaw(saveEnv);
+        Environment.restoreCurrent(saveEnv);
       }
   }
 

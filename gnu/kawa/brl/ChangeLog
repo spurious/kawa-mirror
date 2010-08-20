@@ -1,3 +1,7 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* BRL.java: Update to use new Environment-setting methods.
+
 2009-05-12  Per Bothner  <per@bothner.com>
 
 	* BRLReaderString.java: Top-level text now evaluates to an

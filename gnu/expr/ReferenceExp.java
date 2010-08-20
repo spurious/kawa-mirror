@@ -131,7 +131,7 @@ public class ReferenceExp extends AccessExp
              || (binding.context instanceof ModuleExp
                 && ! binding.isPrivate()))
       {
-        Environment env = ctx.getEnvironment();
+        Environment env = Environment.getCurrent();
         Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
           : env.getSymbol(symbol.toString());
         Object property = getFlag(PREFER_BINDING2) && isProcedureName()

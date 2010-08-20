@@ -16,13 +16,14 @@ public class ThreadLocation extends NamedLocation implements Named
    * that are not tied to a specfic name. */
   public static final String ANONYMOUS = new String("(dynamic)");
 
-  Location global;
+  SharedLocation global;
 
-  /* #ifdef JAVA2 */
-  ThreadLocal thLocal = new ThreadLocal();
-  /* #else */
-  // java.util.Hashtable threadMap = new java.util.Hashtable(50);
-  /* #endif */
+  // Only used when property==ANONYMOUS.
+  private ThreadLocal<NamedLocation> thLocal;
+
+  // Only used when property!=ANONYMOUS.
+  private int hash;
+
 
   /** A new anonymous fluid location. */
   public ThreadLocation ()
@@ -35,24 +36,26 @@ public class ThreadLocation extends NamedLocation implements Named
   public ThreadLocation (String name)
   {
     super(Symbol.makeUninterned(name), ANONYMOUS);
+    thLocal = new InheritingLocation();
     global = new SharedLocation(this.name, null, 0);
   }
 
   private ThreadLocation (Symbol name)
   {
     super(name, ANONYMOUS);
+    thLocal = new InheritingLocation();
     String str = name == null ? null : name.toString();
     global = new SharedLocation(Symbol.makeUninterned(str), null, 0);
   }
 
-  public ThreadLocation (Symbol name, Object property, Location global)
+  public ThreadLocation (Symbol name, Object property, SharedLocation global)
   {
     super(name, property);
+    hash = name.hashCode() ^ System.identityHashCode(property);
     this.global = global;
   }
 
-  /** Create a fresh ThreadLocation, independent of other ThreaDLocations.
-   * Creates new unique EnvironmentKey, using a unique property key.
+  /** Create a fresh ThreadLocation, independent of other ThreadLocations.
    * @param name used for printing, but not identification.
    */
   public static ThreadLocation makePrivate (String name)
@@ -60,6 +63,9 @@ public class ThreadLocation extends NamedLocation implements Named
     return new ThreadLocation(name);
   }
 
+  /** Create a fresh ThreadLocation, independent of other ThreadLocations.
+   * @param name used for printing, but not identification.
+   */
   public static ThreadLocation makePrivate (Symbol name)
   {
     return new ThreadLocation(name);
@@ -77,46 +83,36 @@ public class ThreadLocation extends NamedLocation implements Named
   }
 
   /** Get the thread-specific Location for this Location. */
-  public Location getLocation ()
+  public NamedLocation getLocation ()
   {
-    Object entry;
-    /* #ifdef JAVA2 */
-    entry = thLocal.get();
-    /* #else */
-    // entry = threadMap.get(Thread.currentThread());
-    /* #endif */
+    if (property != ANONYMOUS)
+      {
+        return Environment.getCurrent().getLocation(name, property, hash, true);
+      }
+    NamedLocation entry = (NamedLocation) thLocal.get();
     if (entry == null)
       {
-	Environment env = Environment.getCurrent();
-	NamedLocation loc = env.getLocation(name, property, true);
-	if (global != null)
-	  {
-	    synchronized (loc)
-	      {
-		if (loc.base == null && loc.value == Location.UNBOUND)
-		  loc.setBase(global);
-	      }
-	  }
-	
-	if (property == ANONYMOUS)
-	  {
-	    LocationRef lref = new LocationRef();
-	    lref.env = env;
-	    lref.loc = loc;
-	    entry = lref;
-	  }
-	else
-	  entry = loc;
-	/* #ifdef JAVA2 */
+        if (property == ANONYMOUS)
+          {
+            entry = new SharedLocation(name, property, 0);
+            if (global != null)
+              entry.setBase(global);
+          }
+        else
+          {
+            entry = Environment.getCurrent().getLocation(name, property, true);
+            if (global != null)
+              {
+                synchronized (entry)
+                  {
+                    if (entry.base == null && entry.value == Location.UNBOUND)
+                      entry.setBase(global);
+                  }
+              }
+          }
 	thLocal.set(entry);
-	/* #else */
-	// threadMap.put(Thread.currentThread(), entry);
-	/* #endif */
       }
-    if (entry instanceof LocationRef)
-      return ((LocationRef) entry).loc;
-    else
-      return (Location) entry;
+    return entry;
   }
 
   public Object get (Object defaultValue)
@@ -128,7 +124,6 @@ public class ThreadLocation extends NamedLocation implements Named
   {
     getLocation().set(value);
   }
-
   public Object setWithSave (Object newValue, CallContext ctx)
   {
     return getLocation().setWithSave(newValue, ctx);
@@ -171,18 +166,29 @@ public class ThreadLocation extends NamedLocation implements Named
     loc.base = tloc;
     return tloc;
   }
-}
 
-class LocationRef
-{
-  Environment env;
-  Location loc;
-
-  public void finalize ()
+  public class InheritingLocation
+    extends InheritableThreadLocal<NamedLocation>
   {
-    Symbol symbol = loc.getKeySymbol();
-    Object property = loc.getKeyProperty();
-    int hash = symbol.hashCode() ^ System.identityHashCode(property);
-    env.unlink(symbol, property, hash);
+    protected SharedLocation childValue(NamedLocation parentValue)
+    {
+      if (property != ANONYMOUS)
+        throw new Error();
+      if (parentValue == null)
+        parentValue = (SharedLocation) getLocation();
+      NamedLocation nloc = parentValue;
+      if (nloc.base == null)
+        {
+          SharedLocation sloc = new SharedLocation(name, property, 0);
+          sloc.value = nloc.value;
+          nloc.base = sloc;
+          nloc.value = null;
+          nloc = sloc;
+        }
+      SharedLocation sloc = new SharedLocation(name, property, 0);
+      sloc.value = null;
+      sloc.base = nloc;
+      return sloc;
+    }
   }
 }

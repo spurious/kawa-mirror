@@ -125,7 +125,7 @@ public class ReplSession extends Writer
     prompt_p = new OutBufferWriter(this, 'P', Path.valueOf("/dev/prompt"));
     in_p = new MyTtyInPort(qreader, Path.valueOf("/dev/stdin"), out_p, this);
 
-    thread = new Future (new kawa.repl(language),
+    thread = Future.make(new kawa.repl(language),
                          penvironment, in_p, out_p, err_p);
     thread.start();
   }

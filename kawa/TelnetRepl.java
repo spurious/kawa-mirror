@@ -56,7 +56,6 @@ public class TelnetRepl extends Procedure0
     */
 
     Thread thread = new Future(new TelnetRepl(language, client),
-			       Environment.getCurrent(),
 			       in, out, out);
     thread.start();
   }

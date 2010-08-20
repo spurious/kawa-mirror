@@ -1,3 +1,7 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* CompileNamedPart.java: Update to use new Environment-setting methods.
+
 2010-05-24  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObjectRaw): Write KNode using new

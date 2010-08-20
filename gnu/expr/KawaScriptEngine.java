@@ -91,11 +91,9 @@ public class KawaScriptEngine extends AbstractScriptEngine
   public KawaCompiledScript compile(InPort port, ScriptContext context, SourceMessages messages)
     throws SyntaxException, IOException
   {
-    CallContext ctx = CallContext.getInstance();
     Language saveLang = Language.setSaveCurrent(factory.language);
-    Environment saveEnv = ctx.getEnvironmentRaw();
     Environment env = factory.getEnvironment(context);
-    ctx.setEnvironmentRaw(env);
+    Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
         Compilation comp = factory.language.parse(port, messages, Language.PARSE_IMMEDIATE);
@@ -116,7 +114,7 @@ public class KawaScriptEngine extends AbstractScriptEngine
     finally
       {
 	Language.restoreCurrent(saveLang);
-        ctx.setEnvironmentRaw(saveEnv);
+        Environment.restoreCurrent(saveEnv);
       }
   }
 }

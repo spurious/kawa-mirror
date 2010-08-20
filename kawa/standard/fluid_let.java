@@ -84,6 +84,7 @@ public class fluid_let extends Syntax
               {
                 found.maybeIndirectBinding(tr);
                 decl.base = found;
+                found.setFluid(true);
                 found.setCanWrite(true);
               }
             decl.setCanWrite(true);

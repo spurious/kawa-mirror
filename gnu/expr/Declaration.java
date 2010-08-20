@@ -177,6 +177,14 @@ public class Declaration
             return;
           }
       }
+    if (isFluid())
+      {
+        if (context instanceof FluidLetExp)
+          {
+            base.load(access, flags, comp, target);
+            return;
+          }
+      }
     CodeAttr code = comp.getCode();
     Type rtype = getType();
     if (! isIndirectBinding()
@@ -559,7 +567,8 @@ public class Declaration
   public final boolean isAlias() { return (flags & IS_ALIAS) != 0; }
   public final void setAlias(boolean flag) { setFlag(flag, IS_ALIAS); }
 
-  /** True if this is a fluid binding (in a FluidLetExp). */
+  /** True if this is a fluid binding (in a FluidLetExp).
+   * Also true if this binding is the one re-bound by a FluidLetExp. */
   public final boolean isFluid () { return (flags & IS_FLUID) != 0; }
 
   public final void setFluid (boolean fluid) { setFlag(fluid, IS_FLUID); }
@@ -892,6 +901,12 @@ public class Declaration
       {
 	sbuf.append("::");
 	sbuf.append(t.getName());
+      }
+    if (base != null)
+      {
+        sbuf.append("(base:#");
+        sbuf.append(base.id);
+        sbuf.append(')');
       }
   }
 

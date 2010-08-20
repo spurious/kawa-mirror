@@ -80,16 +80,14 @@ public class CommonLisp extends Lisp2
                                 NumberCompare.TRUE_IF_LSS);
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
-    CallContext ctx = CallContext.getInstance();
-    Environment saveEnv = ctx.getEnvironmentRaw();
+    Environment saveEnv = Environment.setSaveCurrent(clispEnvironment);
     try
       {
-        ctx.setEnvironmentRaw(clispEnvironment);
         instance.initLisp();
       }
     finally
       {
-        ctx.setEnvironmentRaw(saveEnv);
+        Environment.restoreCurrent(saveEnv);
       }
   }
 

@@ -15,29 +15,10 @@ public class CallContext // implements Runnable
   /* #else */
   // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
   /* #endif */
-  Thread currentThread;
-
-  Environment curEnvironment;
-
-  public final Environment getEnvironmentRaw() { return curEnvironment; }
-  public final void setEnvironmentRaw(Environment env) { curEnvironment = env;}
-
-  public final Environment getEnvironment()
-  {
-    if (curEnvironment == null)
-      {
-	Environment env
-          = Environment.make(currentThread.getName(), Environment.global);
-        env.flags |= Environment.THREAD_SAFE;
-        curEnvironment = env;
-      }
-    return curEnvironment;
-  }
 
   public static void setInstance(CallContext ctx)
   {
     Thread thread = Thread.currentThread();
-    ctx.currentThread = thread; 
     /* #ifdef JAVA2 */
     currentContext.set(ctx);
     /* #else */
@@ -342,35 +323,6 @@ public class CallContext // implements Runnable
   public void writeValue(Object value)
   {
     Values.writeValues(value, consumer);
-  }
-
-  /** A stack of currently re-bound fluids variables.
-   * There is one for each active fluids-let or parameterize variable. */
-  Location[] pushedFluids;
-  /** The number of active elements of the pushedFluids array. */
-  int pushedFluidsCount;
-
-  public final void pushFluid (Location loc)
-  {
-    Location[] fluids = pushedFluids;
-    int count = pushedFluidsCount;
-    if (fluids == null)
-      {
-        pushedFluids = fluids = new Location[10];
-      }
-    else if (count == fluids.length)
-      {
-        Location[] newFluids = new Location[2 * count];
-        System.arraycopy(fluids, 0, newFluids, 0, count);
-        pushedFluids = fluids = newFluids;
-      }
-    fluids[count] = loc;
-    pushedFluidsCount = count + 1;
-  }
-
-  public final void popFluid ()
-  {
-    pushedFluids[--pushedFluidsCount] = null;
   }
 
   /** Current stack of evaluation frames for interpreter. */

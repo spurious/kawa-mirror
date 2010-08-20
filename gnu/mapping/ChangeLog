@@ -1,3 +1,33 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	Re-write fluid-variables and thread inheritance to make use of
+	java.lang.InheritableThreadLocal, and so inheritance/fluids
+	works even for threads not created using 'future'/RunnableClosure.
+	* RunnableClosure.java:	Don't explicitly inherit Environments here
+	- this is handled by InheritableThreadLocal.  Likewise don't
+	clone bindings in the ClassContext.pushedFluids list, which is removed.
+	(environment): Remove field.
+	* CallContext.java (curEnvironment, currentThread): Remove fields.
+	(getEnvironmentRaw, setEnvironmentRaw, getEnvironment): Remove methods.
+	(pushFluid, popFluid): Remove methods.
+	(pushedFluids, pushedFluidsCount): Remove fields.
+	* ThreadLocation.java:  If ANONYMOUS use a InheritableThreadLocal,
+	rather than a plain ThreadLocal.  Otherwise, use neither - just
+	lookup in Environment.getCurrent().
+	(class LocationRef): Remove local class.
+	* Environment.java (class InheritedLocal): New member class which
+	extends InheritableThreadLocal, and handles Environment inheritance.
+	(curEnvironment): New static InheritedLocal field.
+	(setCurrent): Re-implement to use curEnvironment.
+	(setSaveCurrent, restoreCurrent): New static methods.
+	* Location.java (setWithSave, setRestore): Don't call
+	pushFluid/popFluid.
+	* NamedLocation.java (setWithSave, setRestore): Likewise.
+	(setWithSave): Indirect to a new anonymous THreadLocation.
+	* Future.java: Simplify various places to not explicitly
+	inherit Environments, since that is now handled by InheritedLocal.
+	(getEnvironment): Remove field.
+
 2010-08-03  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java: Change to extend NamedLocation.

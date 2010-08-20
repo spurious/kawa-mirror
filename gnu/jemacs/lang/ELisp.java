@@ -62,16 +62,14 @@ public class ELisp extends Lisp2
 
     instance.define("t", TRUE);
     instance.define("nil", FALSE);
-    CallContext ctx = CallContext.getInstance();
-    Environment saveEnv = ctx.getEnvironmentRaw();
+    Environment saveEnv = Environment.setSaveCurrent(elispEnvironment);
     try
       {
-        ctx.setEnvironmentRaw(elispEnvironment);
         instance.initELisp();
       }
     finally
       {
-        ctx.setEnvironmentRaw(saveEnv);
+        Environment.restoreCurrent(saveEnv);
       }
   }
 

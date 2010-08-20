@@ -382,7 +382,7 @@ class GetNamedExp extends ApplyExp
   {
     if (combinedName != null)
       {
-        Environment env = ctx.getEnvironment();
+        Environment env = Environment.getCurrent();
         Symbol sym = env.getSymbol(combinedName);
         Object unb = gnu.mapping.Location.UNBOUND;
         Object property = null;  // FIXME?

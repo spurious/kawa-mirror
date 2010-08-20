@@ -1,3 +1,9 @@
+2010-08-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/fluid_let.java: Call setFLuid on lexical base.
+	* TelnetRepl.java: No longer pass current environment to Future.
+	* ReplDocument.java: Various Environment/Fuure updates.
+
 2010-08-17  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (isLexical): Remove method.  Moved logic to

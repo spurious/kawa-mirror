@@ -85,7 +85,7 @@ public class SetExp extends AccessExp
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Environment env = ctx.getEnvironment();
+    Environment env = Environment.getCurrent();
     Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
       : env.getSymbol(symbol.toString());
     Object property = null;

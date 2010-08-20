@@ -24,7 +24,7 @@ public class ReplMode extends ProcessMode
     PipedReader preader = new PipedReader();
     toInferior = new PipedWriter(preader);
     in = new TtyInPort(preader, Path.valueOf("/dev/stdin"), out);
-    thread = new Future (new kawa.repl(language),
+    thread = Future.make(new kawa.repl(language),
 			 environment, in, out, err);
     thread.setPriority(Thread.currentThread().getPriority() + 1);
     thread.start();

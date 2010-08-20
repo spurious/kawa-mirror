@@ -70,9 +70,8 @@ public class BindingInitializer extends Initializer
 
 	Object name = decl.getSymbol();
 
-	if (decl.getFlag(Declaration.IS_UNKNOWN
-                         |Declaration.IS_DYNAMIC|Declaration.IS_FLUID))
-	  {
+	if (decl.getFlag(Declaration.IS_UNKNOWN|Declaration.IS_DYNAMIC))
+          {
             if (name instanceof String)
               name = Namespace.EmptyNamespace.getSymbol((String) name);
             comp.compileConstant(name, Target.pushObject);
@@ -81,25 +80,20 @@ public class BindingInitializer extends Initializer
             else
               comp.compileConstant(property, Target.pushObject);
             code.emitInvokeStatic(typeThreadLocation.getDeclaredMethod("getInstance", 2));
-	  }
-        /*
-         * This option supports module-local dynamic variables.
-         * I.e. A lexically bound "cell" whose value is fluid (dynamic and
-         * thread-local).  Don't know how useful this is - at the least
-         * it seems rather heavy-weight for a plain Scheme 'define'.
-        else if (! decl.isAlias())
+          }
+	else if (decl.isFluid())
           {
+            // This is basically an optimization, since if we don't initialize
+            // to an anonymous ThreadLocation, then a fluid-let will lazily
+            // do it - in NamedLocation.setWithSave.
             Type[] atypes = new Type[1];
-            if (name instanceof Symbol)
-              atypes[0] = Compilation.typeSymbol;
-            else
-              atypes[0] = Type.toStringType;
+            atypes[0] = name instanceof Symbol ? Compilation.typeSymbol
+              : Type.toStringType;
             comp.compileConstant(name, Target.pushObject);
             Method m = typeThreadLocation
               .getDeclaredMethod("makePrivate", atypes);
             code.emitInvokeStatic(m);
           }
-        */
         else
           {
             comp.compileConstant(name, Target.pushObject);

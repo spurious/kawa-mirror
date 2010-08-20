@@ -35,17 +35,14 @@ public abstract class Expression extends Procedure0
   public final Object eval (Environment env) throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    Environment save = ctx.getEnvironmentRaw();
-    if (env != save)
-      ctx.setEnvironmentRaw(env);
+    Environment saveEnv = Environment.setSaveCurrent(env);
     try
       {
         return eval(ctx);
       }
     finally
       {
-        if (env != save)
-          ctx.setEnvironmentRaw(save);
+        Environment.restoreCurrent(saveEnv);
       }
   }
 

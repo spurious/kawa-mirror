@@ -7,20 +7,13 @@ public class Future extends Thread
 
   public Future (Procedure action, CallContext parentContext)
   {
-    closure = new RunnableClosure(action, parentContext);
+    closure = new RunnableClosure (action, parentContext);
   }
 
   public Future (Procedure action,
-                 CallContext parentContext, Environment penvironment)
-  {
-    closure = new RunnableClosure (action, parentContext, penvironment);
-    closure.environment.setName(getName());
-  }
-
-  public Future (Procedure action, Environment penvironment,
 		 InPort in, OutPort out, OutPort err)
   {
-    closure = new RunnableClosure (action, penvironment, in, out, err);
+    closure = new RunnableClosure (action, in, out, err);
   }
 
   public Future (Procedure action)
@@ -28,13 +21,23 @@ public class Future extends Thread
     closure = new RunnableClosure(action);
   }
 
+  public static Future make (Procedure action, Environment penvironment,
+                             InPort in, OutPort out, OutPort err)
+  {
+    Environment saveEnv = Environment.setSaveCurrent(penvironment);
+    try
+      {
+        return new Future(action, in, out, err);
+      }
+    finally
+      {
+        Environment.restoreCurrent(saveEnv);
+      }
+  }
+
   /** Get the CallContext we use for this Thread. */
   public final CallContext getCallContext() {
     return closure.getCallContext();
-  }
-
-  public Environment getEnvironment() {
-    return closure.environment;
   }
 
   public void run() {

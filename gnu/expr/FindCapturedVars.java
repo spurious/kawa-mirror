@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.io.Externalizable;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
+import gnu.text.SourceLocator;
 
 public class FindCapturedVars extends ExpWalker
 {
@@ -146,13 +147,21 @@ public class FindCapturedVars extends ExpWalker
       }
   }
 
+  void maybeWarnNoDeclarationSeen (Object name, Compilation comp, SourceLocator location)
+  {
+    if (comp.getBooleanOption("warn-undefined-variable", false))
+      comp.error('w', "no declaration seen for "+name, location);
+  }
+
   protected Expression walkFluidLetExp (FluidLetExp exp)
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
         if (decl.base == null)
           {
-            Declaration bind = allocUnboundDecl(decl.getSymbol(), false);
+            Object name = decl.getSymbol();
+            Declaration bind = allocUnboundDecl(name, false);
+            maybeWarnNoDeclarationSeen(name, comp, exp);
             capture(bind);
             decl.base = bind;
           }
@@ -370,7 +379,8 @@ public class FindCapturedVars extends ExpWalker
 	if (! decl.isStatic())
 	  {
 	    LambdaExp heapLambda = curLambda;
-	    heapLambda.setImportsLexVars();
+            if (! decl.isFluid())
+              heapLambda.setImportsLexVars();
 	    LambdaExp parent = heapLambda.outerLambda();
 	    for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
 	      {
@@ -444,37 +454,16 @@ public class FindCapturedVars extends ExpWalker
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
     Declaration decl = exp.getBinding();
-    boolean isFluid = decl != null && decl.isFluid();
-    if (isFluid)
-      {
-        ScopeExp scope = getCurrentLambda ();
-        ScopeExp declLambda = decl.getContext().currentLambda();
-        for (; scope != declLambda; scope = scope.outer)
-          {
-            if (scope == null
-                || (scope instanceof LambdaExp
-                    && ! ((LambdaExp) scope).getInlineOnly()))
-              {
-                decl = null;
-                break;
-              }
-          }
-      }
     if (decl == null)
       {
 	decl = allocUnboundDecl(exp.getSymbol(),
 				exp.isProcedureName());
 	exp.setBinding(decl);
       }
-    if (decl.getFlag(Declaration.IS_UNKNOWN) && ! isFluid)
+    if (decl.getFlag(Declaration.IS_UNKNOWN)
+        && comp.resolve(exp.getSymbol(), exp.isProcedureName()) != null)
       {
-	if (comp.getBooleanOption("warn-undefined-variable", false))
-	  {
-	    Object resolved
-	      = comp.resolve(exp.getSymbol(), exp.isProcedureName());
-	    if (resolved == null)
-	      comp.error('w', "no declaration seen for "+exp.getName(), exp);
-	  }
+        maybeWarnNoDeclarationSeen(exp.getSymbol(), comp, exp);
       }
 
     capture(exp.contextDecl(), decl);
@@ -493,6 +482,10 @@ public class FindCapturedVars extends ExpWalker
 	    capture(rexp.contextDecl(), orig);
 	    return;
 	  }
+      }
+    while (decl.isFluid() && decl.context instanceof FluidLetExp)
+      {
+        decl = decl.base;
       }
     if (containing != null && decl.needsContext())
       capture(containing);

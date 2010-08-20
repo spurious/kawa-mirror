@@ -62,7 +62,7 @@ public class ReplDocument extends DefaultStyledDocument
     this(new SwingContent(), language, penvironment, shared);
   }
 
-  private ReplDocument (SwingContent content, Language language, Environment penvironment, boolean shared)
+  private ReplDocument (SwingContent content, Language language, Environment penvironment, final boolean shared)
   {
     super(content, styles);
     this.content = content;
@@ -80,22 +80,21 @@ public class ReplDocument extends DefaultStyledDocument
     err_stream = new ReplPaneOutPort(this, "/dev/stderr", redStyle);
     in_p = new GuiInPort(in_r, Path.valueOf("/dev/stdin"),
                          out_stream, this);
-    thread = new Future (new kawa.repl(language) {
+    thread = Future.make(new kawa.repl(language) {
         public Object apply0 ()
         {
-          Shell.run(language, Environment.getCurrent());
+          Environment env = Environment.getCurrent();
+          if (shared)
+            env.setIndirectDefines();
+          environment = env;
+          Shell.run(language, env);
           SwingUtilities.invokeLater(new Runnable() {
               public void run() { ReplDocument.this.fireDocumentClosed(); }
             });
           return Values.empty;
         }
       },
-			 penvironment, in_p, out_stream, err_stream);
-
-    Environment env = thread.getEnvironment();
-    if (shared)
-      env.setIndirectDefines();
-    this.environment = env;
+                         penvironment, in_p, out_stream, err_stream);
     thread.start();
   }
 

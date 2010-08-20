@@ -1,5 +1,9 @@
 2010-08-20  Per Bothner  <per@bothner.com>
 
+	* ThreadLocation.java (makePrivate): Renamed to ..
+	(makeAnonymous): New method name.
+	* NamedLocation.java: Update accordingly.
+
 	* Location.java (setWithSave, setRestore): Remove unused ctx parameter.
 	* NamedLocation.java: Likewise.
 	* ConstrainedLocation.java: Likewise.

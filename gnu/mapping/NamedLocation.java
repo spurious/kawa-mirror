@@ -108,7 +108,7 @@ public abstract class NamedLocation extends IndirectableLocation
   {
     if (value == INDIRECT_FLUIDS)
       return base.setWithSave(newValue);
-    ThreadLocation thloc = ThreadLocation.makePrivate(name);
+    ThreadLocation thloc = ThreadLocation.makeAnonymous(name);
     thloc.global.base = base;
     thloc.global.value = value;
     setAlias(thloc);

@@ -91,7 +91,7 @@ public class BindingInitializer extends Initializer
               : Type.toStringType;
             comp.compileConstant(name, Target.pushObject);
             Method m = typeThreadLocation
-              .getDeclaredMethod("makePrivate", atypes);
+              .getDeclaredMethod("makeAnonymous", atypes);
             code.emitInvokeStatic(m);
           }
         else

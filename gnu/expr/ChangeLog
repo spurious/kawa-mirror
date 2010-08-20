@@ -1,5 +1,7 @@
 2010-08-20  Per Bothner  <per@bothner.com>
 
+	* BindingInitializer.java (emit): Update for renamed method.
+
 	* FluidLetExp.java (doInits, compile): Update since
 	setWithSave/setRestore no longer take CallContext argument.
 

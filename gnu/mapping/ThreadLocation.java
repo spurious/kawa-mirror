@@ -1,4 +1,4 @@
-// Copyright (c) 2005  Per M.A. Bothner.
+// Copyright (c) 2005, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -58,7 +58,7 @@ public class ThreadLocation extends NamedLocation implements Named
   /** Create a fresh ThreadLocation, independent of other ThreadLocations.
    * @param name used for printing, but not identification.
    */
-  public static ThreadLocation makePrivate (String name)
+  public static ThreadLocation makeAnonymous (String name)
   {
     return new ThreadLocation(name);
   }
@@ -66,7 +66,7 @@ public class ThreadLocation extends NamedLocation implements Named
   /** Create a fresh ThreadLocation, independent of other ThreadLocations.
    * @param name used for printing, but not identification.
    */
-  public static ThreadLocation makePrivate (Symbol name)
+  public static ThreadLocation makeAnonymous (Symbol name)
   {
     return new ThreadLocation(name);
   }
@@ -137,7 +137,7 @@ public class ThreadLocation extends NamedLocation implements Named
   public String getName () { return name == null ? null : name.toString(); }
   public Object getSymbol () // Implements Named
   {
-    // If this was allocated using makePrivate(String) it is better
+    // If this was allocated using makeAnonymous(String) it is better
     // to return the original String, rather than a generated Symbol.
     // One motivation is when a module is imported with a specified namespace
     // URI (only in XQuery at this point); we want to use the latter namespace.

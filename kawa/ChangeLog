@@ -1,3 +1,8 @@
+2010-08-20  Per Bothner  <per@bothner.com>
+
+	* standard/TracedProcedure.java (applyN): Update since
+	setWithSave/setRestore no longer take CallContext argument.
+
 2010-08-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/fluid_let.java: Call setFLuid on lexical base.

@@ -78,7 +78,7 @@ public abstract class Location
   /** Set a value, but return cookie so old value can be restored.
    * This is intended for fluid-let where (in the case of multiple threads)
    * a simple save-restore isn't always the right thing. */
-  public Object setWithSave (Object newValue, CallContext ctx)
+  public Object setWithSave (Object newValue)
   {
     Object old = get(UNBOUND);
     set(newValue);
@@ -87,7 +87,7 @@ public abstract class Location
 
   /** Restore an old value.
    * @param oldValue the return value from a prior setWithSave. */
-  public void setRestore (Object oldValue, CallContext ctx)
+  public void setRestore (Object oldValue)
   {
     // if (oldValue == UNBOUND) ???;  // FIXME
     set(oldValue);

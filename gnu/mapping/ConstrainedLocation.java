@@ -60,14 +60,14 @@ public class ConstrainedLocation extends Location
     base.set(coerce(newValue));
   }
 
-  public Object setWithSave (Object newValue, CallContext ctx)
+  public Object setWithSave (Object newValue)
   {
-    return base.setWithSave(coerce(newValue), ctx);
+    return base.setWithSave(coerce(newValue));
   }
 
-  public void setRestore (Object oldValue, CallContext ctx)
+  public void setRestore (Object oldValue)
   {
-    base.setRestore(oldValue, ctx);
+    base.setRestore(oldValue);
   }
 }
 

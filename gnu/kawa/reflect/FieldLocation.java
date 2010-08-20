@@ -270,12 +270,12 @@ public class FieldLocation extends ClassMemberLocation
       }
   }
 
-  public Object setWithSave (Object newValue, CallContext ctx)
+  public Object setWithSave (Object newValue)
   {
     if ((flags & KIND_FLAGS_SET) == 0)
       setKindFlags();
     if ((flags & INDIRECT_LOCATION) == 0)
-      return super.setWithSave(newValue, ctx);
+      return super.setWithSave(newValue);
     else
       {
 	Object v;
@@ -287,16 +287,16 @@ public class FieldLocation extends ClassMemberLocation
 	    v = getFieldValue();
 	    value = v;
 	  }
-	return ((Location) v).setWithSave(newValue, ctx);
+	return ((Location) v).setWithSave(newValue);
       }
   }
 
-  public void setRestore (Object oldValue, CallContext ctx)
+  public void setRestore (Object oldValue)
   {
     if ((flags & INDIRECT_LOCATION) == 0)
-      super.setRestore(oldValue, ctx);
+      super.setRestore(oldValue);
     else
-      ((Location) value).setRestore(oldValue, ctx);
+      ((Location) value).setRestore(oldValue);
   }
 
   public boolean isConstant ()

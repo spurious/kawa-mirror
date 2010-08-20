@@ -1,3 +1,8 @@
+2010-08-20  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (setWithSave, setRestore): Remove unused ctx
+	parameter.
+
 2010-02-24  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods): Check that implementation type

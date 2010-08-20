@@ -46,9 +46,8 @@ public class FluidLetExp extends LetExp
 	decl.load(null, ReferenceExp.DONT_DEREFERENCE,
 		  comp, Target.pushObject);
 	code.emitLoad(save[i]);
-        code.emitLoad(ctx);
 	code.emitInvokeVirtual(Compilation.typeLocation
-			       .getDeclaredMethod("setRestore", 2));
+			       .getDeclaredMethod("setRestore", 1));
 	
       }
     code.emitTryCatchEnd();
@@ -71,9 +70,8 @@ public class FluidLetExp extends LetExp
     code.emitStore(decl.getVariable());
     inits[i].compile(comp, Target.pushObject);
     doInits(decl.nextDecl(), i+1, save, comp, ctx);
-    code.emitLoad(ctx);
     code.emitInvokeVirtual(Compilation.typeLocation
-			   .getDeclaredMethod("setWithSave", 2));
+			   .getDeclaredMethod("setWithSave", 1));
     code.emitStore(save[i]);
   }
 

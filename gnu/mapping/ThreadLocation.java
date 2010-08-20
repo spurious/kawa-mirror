@@ -124,14 +124,14 @@ public class ThreadLocation extends NamedLocation implements Named
   {
     getLocation().set(value);
   }
-  public Object setWithSave (Object newValue, CallContext ctx)
+  public Object setWithSave (Object newValue)
   {
-    return getLocation().setWithSave(newValue, ctx);
+    return getLocation().setWithSave(newValue);
   }
 
-  public void setRestore (Object oldValue, CallContext ctx)
+  public void setRestore (Object oldValue)
   {
-    getLocation().setRestore(oldValue, ctx);
+    getLocation().setRestore(oldValue);
   }
 
   public String getName () { return name == null ? null : name.toString(); }

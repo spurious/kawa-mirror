@@ -6,7 +6,11 @@ KAWA = ../bin/kawa.sh
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 if ENABLE_SERVLET
+if ENABLE_XQUERY
 SERVLET_TESTS = check-HelloCgiS check-HelloCgiK check-HelloCgiX
+else
+SERVLET_TESTS = check-HelloCgiS check-HelloCgiK
+endif
 endif
 if WITH_SAX2
 SAX2_TESTS = check-MySAXApp

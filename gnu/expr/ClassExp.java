@@ -35,6 +35,18 @@ public class ClassExp extends LambdaExp
     return type != instanceType;
   }
 
+  /** The ClassType generated for this class.
+   * Note difference from {@code getClassType}: The value of a {@code ClassExp}
+   * (viewed as an expression) is a class/type object, so getType returns
+   * the type of a type.
+   */
+  public Type getType()
+  { return simple ? Compilation.typeClass : Compilation.typeClassType; }
+
+  /** The ClassType generated for this class.
+   */
+  public ClassType getClassType() { return type; }
+
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
   /** Index in supers array of class we extend, or -1. */

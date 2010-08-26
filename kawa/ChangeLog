@@ -1,3 +1,7 @@
+2010-08-26  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Use new ClassExp#getClassType.
+
 2010-08-20  Per Bothner  <per@bothner.com>
 
 	* standard/TracedProcedure.java (applyN): Update since

@@ -636,7 +636,7 @@ public class Translator extends Compilation
                   break;
                 LambdaExp caller = (LambdaExp) scope;
                 ClassExp cexp = (ClassExp) scope.outer;
-                ClassType ctype = (ClassType) cexp.getType();
+                ClassType ctype = (ClassType) cexp.getClassType();
                 Object part = SlotGet.lookupMember(ctype, dname, ctype);
                 boolean contextStatic
                   = (caller == cexp.clinitMethod

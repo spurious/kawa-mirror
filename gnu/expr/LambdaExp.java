@@ -282,6 +282,11 @@ public class LambdaExp extends ScopeExp
     return type;
   }
 
+  /** The ClassType generated for this class.
+   * Only used for ClassExp (which overrides this method) or ModuleExp.
+   */
+  public ClassType getClassType() { return type; }
+
   public void setType (ClassType type)
   {
     this.type = type;

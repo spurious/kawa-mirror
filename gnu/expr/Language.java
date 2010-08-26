@@ -565,7 +565,7 @@ public abstract class Language
 
   public String formatType (Type type)
   {
-    return type.toString();
+    return type.getName();
   }
 
   public static Type string2Type (String name)
@@ -678,7 +678,7 @@ public abstract class Language
       }
     else if (exp instanceof ClassExp || exp instanceof ModuleExp)
       {
-	return ((LambdaExp) exp).getType();
+	return ((LambdaExp) exp).getClassType();
       }
     return null;
   }

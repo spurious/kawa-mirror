@@ -8,6 +8,8 @@ public class ObjectExp extends ClassExp
     super(true);
   }
 
+  public Type getType() { return type; }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkObjectExp(this);

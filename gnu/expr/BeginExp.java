@@ -24,7 +24,7 @@ public class BeginExp extends Expression
    * A key String that names the option;
    * a place to save the old value of the option;
    * the value the value the option should have during traversal
-   * (using an ExpWalker or compilation) of this BeginExp.
+   * (using an ExpVisitor or compilation) of this BeginExp.
    * Note traversal is not thread-safe because the "old value" is saved 
    * in this same array.  A cleaner (future) solution might be to use
    * a stack in the Compilation.  Since expressions (except for QuoteExp)
@@ -148,24 +148,23 @@ public class BeginExp extends Expression
       }
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkBeginExp(this);
+    return visitor.visitBeginExp(this, d);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    pushOptions(walker.comp);
+    pushOptions(visitor.comp);
     try
       {
-	exps = walker.walkExps(exps, length);
+	exps = visitor.visitExps(exps, length, d);
       }
     finally
       {
-	popOptions(walker.comp);
+	popOptions(visitor.comp);
       }
   }
-
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Begin", ")", 2);

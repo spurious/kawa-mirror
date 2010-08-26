@@ -405,27 +405,22 @@ public class ApplyExp extends Expression
     return copy;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkApplyExp(this);
+    return visitor.visitApplyExp(this, d);
   }
 
-  public void walkArgs (ExpWalker walker)
-  {
-    args = walker.walkExps(args, args.length);
-  }
-
-  public void walkArgs (ExpWalker walker, boolean argsInlined)
+  public void visitArgs (InlineCalls visitor, boolean argsInlined)
   {
     if (! argsInlined)
-      args = walker.walkExps(args, args.length);
+      args = visitor.visitExps(args, args.length, null);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {
-    func = walker.walk(func);
-    if (walker.exitValue == null)
-      args = walker.walkExps(args, args.length);
+    func = visitor.visitAndUpdate(func, d);
+    if (visitor.exitValue == null)
+      args = visitor.visitExps(args, args.length, d);
   }
 
   public void print (OutPort out)
@@ -593,9 +588,9 @@ public class ApplyExp extends Expression
     return true;
   }
 
-  public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
+  public final Expression inlineIfConstant(Procedure proc, InlineCalls visitor)
   {
-    return inlineIfConstant(proc, walker.getMessages());
+    return inlineIfConstant(proc, visitor.getMessages());
   }
 
   /** Inline this ApplyExp if parameters are constant.

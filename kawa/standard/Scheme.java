@@ -1335,7 +1335,7 @@ public class Scheme extends LispLanguage
           {
             Symbol tsymbol = namespace.getSymbol(cname.intern());
             Expression texp = tr.rewrite(tsymbol, false);
-            texp = new InlineCalls(tr).walk(texp);
+            texp = InlineCalls.inlineCalls(texp, tr);
             if (! (texp instanceof ErrorExp))
               type = tr.getLanguage().getTypeFor(texp);
           }

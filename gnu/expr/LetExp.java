@@ -202,29 +202,33 @@ public class LetExp extends ScopeExp
     return body.getType();
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkLetExp(this);
+    return visitor.visitLetExp(this, d);
   }
 
-  public void walkInitializers (ExpWalker walker)
+  public <R,D> void visitInitializers (ExpVisitor<R,D> visitor, D d)
   {
     Declaration decl = firstDecl();
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
         Expression init0 = inits[i];
-        Expression init = walker.walk(init0);
+        if (init0 == null)
+          throw new Error("null1 init for "+this+" i:"+i+" d:"+decl);
+        Expression init = visitor.visitAndUpdate(init0, d);
+        if (init == null)
+          throw new Error("null2 init for "+this+" was:"+init0);
         inits[i] = init;
         if (decl.value == init0)
           decl.value = init;
       }
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    walkInitializers(walker);
-    if (walker.exitValue == null)
-      body = (Expression) walker.walk(body);
+    visitInitializers(visitor, d);
+    if (visitor.exitValue == null)
+      body = visitor.visitAndUpdate(body, d);
   }
 
   public void print (OutPort out)

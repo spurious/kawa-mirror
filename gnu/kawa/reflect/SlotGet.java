@@ -229,11 +229,11 @@ public class SlotGet extends Procedure2
       return method;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
-    Compilation comp = walker.getCompilation();
+    exp.visitArgs(visitor, argsInlined);
+    Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();
     Type type;
     Expression[] args = exp.getArgs();
@@ -338,7 +338,7 @@ public class SlotGet extends Procedure2
                            QuoteExp.getInstance(isName),
                            QuoteExp.getInstance(language)});
         nexp.setLine(exp);
-        return walker.walkApplyOnly(nexp);
+        return visitor.visitApplyOnly(nexp, null); // FIXME
       }
     return exp;
   }

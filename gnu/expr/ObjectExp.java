@@ -10,9 +10,9 @@ public class ObjectExp extends ClassExp
 
   public Type getType() { return type; }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkObjectExp(this);
+    return visitor.visitObjectExp(this, d);
   }
 
   public void compile (Compilation comp, Target target)

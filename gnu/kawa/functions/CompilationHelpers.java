@@ -34,9 +34,10 @@ public class CompilationHelpers
   /* #endif */
 
   public static Expression inlineApplyToArgs
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure applyToArgs)
   {
+    Type required = null; // FIXME
     Expression[] args = exp.getArgs();
     int nargs = args.length - 1;
     if (nargs >= 0)
@@ -48,26 +49,27 @@ public class CompilationHelpers
               {
                 Expression[] rargs = new Expression[nargs];
                 System.arraycopy(args, 1, rargs, 0, nargs);
-                return walker.walk(new ApplyExp(proc, rargs));
+                return visitor.visit(new ApplyExp(proc, rargs), required);
               }
-            proc = walker.walk(proc);
+            proc = visitor.visit(proc, null);
             args[0] = proc;
           }
         Type ptype = proc.getType().getRealType();
         ApplyExp result;
-        Compilation comp = walker.getCompilation();
+        Compilation comp = visitor.getCompilation();
         Language language = comp.getLanguage();
         if (ptype.isSubtype(Compilation.typeProcedure))
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            return proc.inline(new ApplyExp(proc, rargs), walker, null,
-                               argsInlined);
+            return proc.validateApply(new ApplyExp(proc, rargs), visitor,
+                                      required, null, argsInlined);
           }
         if (! argsInlined)
           {
+            // FIXME visitArgs, but skip first.
             for (int i = 1; i <= nargs;  i++)
-              args[i] = walker.walk(args[i]);
+              args[i] = visitor.visit(args[i], null);
           }
         // This might be more cleanly handled at the type specifier. FIXME
         if (Invoke.checkKnownClass(ptype, comp) < 0)
@@ -96,7 +98,7 @@ public class CompilationHelpers
         else
           return exp;
         result.setLine(exp);
-        return ((InlineCalls) walker).walkApplyOnly(result);
+        return ((InlineCalls) visitor).visitApplyOnly(result, required);
       }
     return exp;
   }
@@ -107,10 +109,10 @@ public class CompilationHelpers
   static { setterDecl.noteValue(new QuoteExp(Setter.setter)); }
 
   public static Expression inlineSetter
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {
@@ -157,10 +159,10 @@ public class CompilationHelpers
   }
 
   public static Expression inlineIsEqv
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (nonNumeric(args[0]) || nonNumeric(args[1]))
       return new ApplyExp(((IsEqv) proc).isEq, args);
@@ -181,11 +183,11 @@ class SetArrayExp extends ApplyExp
     elementType = arrayType.getComponentType();
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
-    if (! argsInlined)
-      exp.walkArgs(walker);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {
@@ -195,7 +197,7 @@ class SetArrayExp extends ApplyExp
         xargs[1] = args[0];
         xargs[2] = args[1];
         ArraySet arrSetter = new ArraySet(elementType);
-        return walker.walkApplyOnly(new ApplyExp(arrSetter, xargs));
+        return visitor.visitApplyOnly(new ApplyExp(arrSetter, xargs), required);
       }
     return exp;
   }
@@ -208,11 +210,11 @@ class SetListExp extends ApplyExp
     super(func, args);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
-    if (! argsInlined)
-      exp.walkArgs(walker);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {
@@ -222,7 +224,7 @@ class SetListExp extends ApplyExp
         xargs[2] = Compilation.makeCoercion(args[0], Type.intType);
         xargs[3] = args[1];
         Expression set
-          = walker.walkApplyOnly(new ApplyExp(Invoke.invoke, xargs));
+          = visitor.visitApplyOnly(new ApplyExp(Invoke.invoke, xargs), required);
         return Compilation.makeCoercion(set, Type.voidType);
       }
     return exp;

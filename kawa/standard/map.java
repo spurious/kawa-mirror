@@ -130,12 +130,12 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       }
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
     // FIXME: We should inline the list arguments first before inlining the
     // procedure argument, for better type inference etc.
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (nargs < 2)
@@ -186,14 +186,14 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	doArgs[i+1] = walker.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"));
-	recArgs[i] = walker.walkApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"));
+	doArgs[i+1] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"), null);
+	recArgs[i] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"), null);
       }
     if (! procSafeForMultipleEvaluation)
       proc = new ReferenceExp(procDecl);
     doArgs[0] = proc;
-    Expression doit = walker.walkApplyOnly(new ApplyExp(new ReferenceExp(applyFieldDecl), doArgs));
-    Expression rec = walker.walkApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs));
+    Expression doit = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(applyFieldDecl), doArgs), null);
+    Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
     if (collect)
       {
 	Expression[] consArgs = new Expression[2];
@@ -219,14 +219,14 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	Expression result
 	  = collect ? (Expression) new ReferenceExp(resultDecl)
 	  : (Expression) QuoteExp.voidExp;
-	lexp.body = new IfExp(walker.walkApplyOnly(new ApplyExp(isEq, compArgs)),
+	lexp.body = new IfExp(visitor.visitApplyOnly(new ApplyExp(isEq, compArgs), null),
 			      result, lexp.body);
 	initArgs[i] = args[i+1];
       }
     if (collect)
       initArgs[nargs] = empty;
 
-    Expression body = walker.walkApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), initArgs));
+    Expression body = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), initArgs), null);
     if (collect)
       {
 	Expression[] reverseArgs = new Expression[1];

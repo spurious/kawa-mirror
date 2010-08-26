@@ -75,9 +75,9 @@ public class FluidLetExp extends LetExp
     code.emitStore(save[i]);
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkFluidLetExp(this);
+    return visitor.visitFluidLetExp(this, d);
   }
 
   public void print (OutPort out)

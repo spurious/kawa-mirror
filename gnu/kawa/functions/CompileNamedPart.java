@@ -8,10 +8,11 @@ import kawa.lang.Translator;
 public class CompileNamedPart
 {
   public static Expression inlineGetNamedPart
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    Type required = null; // FIXME
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp)
         || ! (exp instanceof GetNamedExp))
@@ -29,7 +30,7 @@ public class CompileNamedPart
     String mname = ((QuoteExp) args[1]).getValue().toString();
     Type type = context.getType();
     boolean isInstanceOperator = context == QuoteExp.nullExp;
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();
     Type typeval = language.getTypeFor(context, false);
     ClassType caller = comp == null ? null
@@ -74,7 +75,7 @@ public class CompileNamedPart
           }
         ApplyExp aexp = new ApplyExp(SlotGet.staticField, args);
         aexp.setLine(exp);
-        return walker.walkApplyOnly(aexp);
+        return visitor.visitApplyOnly(aexp, required);
                             
       }
     if (typeval != null)
@@ -134,7 +135,7 @@ public class CompileNamedPart
             // args = new Expression[] { context, new QuoteExp(part) });
             ApplyExp aexp = new ApplyExp(SlotGet.field, args);
             aexp.setLine(exp);
-            return walker.walkApplyOnly(aexp);
+            return visitor.visitApplyOnly(aexp, required);
           }
       }
 
@@ -144,17 +145,17 @@ public class CompileNamedPart
   }
 
   public static Expression inlineSetNamedPart
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length != 3 || ! (args[1] instanceof QuoteExp))
       return exp;
     Expression context = args[0];
     String mname = ((QuoteExp) args[1]).getValue().toString();
     Type type = context.getType();
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();
     Type typeval = language.getTypeFor(context);
     ClassType caller = comp == null ? null
@@ -242,10 +243,11 @@ public class CompileNamedPart
   }
 
   public static Expression inlineNamedPart
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    Type required = null; // FIXME
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     NamedPart namedPart = (NamedPart) proc;
     switch (namedPart.kind)
@@ -268,16 +270,17 @@ public class CompileNamedPart
           }
         ApplyExp aexp = new ApplyExp(slotProc, xargs);
         aexp.setLine(exp);
-        return walker.walkApplyOnly(aexp);
+        return visitor.visitApplyOnly(aexp, required);
       }
     return exp;
   }
 
   public static Expression inlineNamedPartSetter
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    Type required = null; // FIXME
+    exp.visitArgs(visitor, argsInlined);
     NamedPart get = (NamedPart) ((NamedPartSetter) proc).getGetter();
     if (get.kind == 'D')
       {
@@ -300,7 +303,7 @@ public class CompileNamedPart
           return exp;
         ApplyExp aexp = new ApplyExp(slotProc, xargs);
         aexp.setLine(exp);
-        return walker.walkApplyOnly(aexp);
+        return visitor.visitApplyOnly(aexp, required);
       }
     return exp;
   }
@@ -324,10 +327,11 @@ public class CompileNamedPart
   }
 
   public static Expression inlineGetNamedInstancePart
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    Type required = null; // FIXME
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     Expression[] xargs;
     Procedure property;
@@ -346,19 +350,20 @@ public class CompileNamedPart
         System.arraycopy(args, 1, xargs, 2, nargs-1);
         property = Invoke.invoke;
       }
-    return walker.walkApplyOnly(new ApplyExp(property, xargs));
+    return visitor.visitApplyOnly(new ApplyExp(property, xargs), required);
   }
 
   public static Expression inlineSetNamedInstancePart
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    Type required = null; // FIXME
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     String pname = ((SetNamedInstancePart) proc).pname;
     Expression[] xargs = new Expression[]
       { args[0], new QuoteExp(pname), args[1] };
-    return walker.walkApplyOnly(new ApplyExp(SlotSet.set$Mnfield$Ex, xargs));
+    return visitor.visitApplyOnly(new ApplyExp(SlotSet.set$Mnfield$Ex, xargs), required);
   }
 }
 
@@ -416,11 +421,11 @@ class GetNamedExp extends ApplyExp
     return this;
   }
 
- public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
-    if (! argsInlined)
-      exp.walkArgs(walker);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] pargs = getArgs();
     Expression context = pargs[0];
     Expression[] args = exp.getArgs();
@@ -466,7 +471,7 @@ class GetNamedExp extends ApplyExp
       }
     ApplyExp result = new ApplyExp(new ReferenceExp(decl), xargs);
     result.setLine(exp);
-    return walker.walkApplyOnly(result);
+    return visitor.visitApplyOnly(result, required);
   }
 
   public boolean side_effects ()

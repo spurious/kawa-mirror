@@ -42,10 +42,10 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
     defaultProc.check1(selector, ctx);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     for (int i = 1;  i < args.length;  i++)
       {
@@ -54,7 +54,7 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
 	    LambdaExp lexp = (LambdaExp) args[i];
 	    lexp.setInlineOnly(true);
 	    lexp.returnContinuation = exp;
-            lexp.inlineHome = walker.getCurrentLambda();
+            lexp.inlineHome = visitor.getCurrentLambda();
 	  }
       }
     return exp;

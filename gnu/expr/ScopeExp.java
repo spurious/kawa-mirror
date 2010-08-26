@@ -291,9 +291,9 @@ public abstract class ScopeExp extends Expression
     frameSize = i;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkScopeExp(this);
+    return visitor.visitScopeExp(this, d);
   }
 
   public String toString() { return getClass().getName()+"#"+id; }

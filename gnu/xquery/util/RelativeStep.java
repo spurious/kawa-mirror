@@ -51,16 +51,16 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
     filter.finish();
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
     // FIXME make use of type of E1 to set dot in E2.
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     Expression exp1 = args[0];
     Expression exp2 = args[1];
     LambdaExp lexp2;
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     if (! (exp2 instanceof LambdaExp)
         // The following optimization breaks when interpreting, because
         // then CoerceToNodes may not work.
@@ -71,7 +71,7 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
 
     lexp2.setInlineOnly(true);
     lexp2.returnContinuation = exp;
-    lexp2.inlineHome = walker.getCurrentLambda();
+    lexp2.inlineHome = visitor.getCurrentLambda();
 
     exp2 = lexp2.body;
 
@@ -88,9 +88,9 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
     Type type1 = exp1.getType();
     if (type1 != null &&NodeType.anyNodeTest.compare(type1) == -3)
       {
-        Language language = walker.getCompilation().getLanguage();
+        Language language = visitor.getCompilation().getLanguage();
         String message = "step input is "+language.formatType(type1)+" - not a node sequence";
-        walker.getMessages().error('e', message);
+        visitor.getMessages().error('e', message);
         return new ErrorExp(message);
       }
       

@@ -239,12 +239,12 @@ public abstract class Expression extends Procedure0
     return null;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkExpression(this);
+    return visitor.visitExpression(this, d);
   }
 
-  protected void walkChildren (ExpWalker walker) { }
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d) { }
 
   /** Apply inlining transformations on a given ApplyExp.
    * Assumes the ApplyExp's function is this expression,
@@ -256,11 +256,12 @@ public abstract class Expression extends Procedure0
    * @param argsInlined true iff {@code exp.getArgs()} have been walked.
    * @return an Expression equivalent to the passed-in exp.
    */
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
     if (! argsInlined)
-      exp.args = walker.walkExps(exp.args, exp.args.length);
+      exp.args = visitor.visitExps(exp.args, null);
     return exp;
   }
 

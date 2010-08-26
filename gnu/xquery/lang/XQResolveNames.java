@@ -267,12 +267,12 @@ public class XQResolveNames extends ResolveNames
     return null;
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp)
+  protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
   {
-    return walkReferenceExp(exp, null);
+    return visitReferenceExp(exp, (ApplyExp) null);
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp, ApplyExp call)
+  protected Expression visitReferenceExp (ReferenceExp exp, ApplyExp call)
   {
     if (exp.getBinding() == null)
       {
@@ -375,9 +375,9 @@ public class XQResolveNames extends ResolveNames
     return exp;
   }
 
-  protected Expression walkSetExp (SetExp exp)
+  protected Expression visitSetExp (SetExp exp, Void ignored)
   {
-    Expression result = super.walkSetExp(exp);
+    Expression result = super.visitSetExp(exp, ignored);
     Declaration decl = exp.getBinding();
     Object name;
     Expression new_value;
@@ -394,11 +394,11 @@ public class XQResolveNames extends ResolveNames
   }
 
   private Declaration moduleDecl;
-  private Expression walkStatements (Expression exp)
+  private Expression visitStatements (Expression exp)
   {
     // The tricky part here is interleaving declarations and statements
     // so that a variable declaration is only visible *after* we have
-    // walked its initializing expression.
+    // visited its initializing expression.
     if (exp instanceof BeginExp)
       {
         BeginExp bbody = (BeginExp) exp;
@@ -406,14 +406,14 @@ public class XQResolveNames extends ResolveNames
         int nexps = bbody.getExpressionCount();
         for (int i = 0;  i < nexps;  i++)
           {
-            exps[i] = walkStatements(exps[i]);
+            exps[i] = visitStatements(exps[i]);
           }
       }
     else if (exp instanceof SetExp)
       {
         Declaration decl = moduleDecl;
         SetExp sexp = (SetExp) exp;
-        exp = walkSetExp(sexp);
+        exp = visitSetExp(sexp, null);
         if (sexp.isDefining() && sexp.getBinding() == decl)
           {
             if (! decl.isProcedureDecl())
@@ -423,7 +423,7 @@ public class XQResolveNames extends ResolveNames
         moduleDecl = decl;
       }
     else
-      exp = walk(exp);
+      exp = visit(exp, null);
     return exp;
   }
 
@@ -437,7 +437,7 @@ public class XQResolveNames extends ResolveNames
 	  push(decl);
       }
     moduleDecl = exp.firstDecl();
-    exp.body = walkStatements(exp.body);
+    exp.body = visitStatements(exp.body);
 
     // Remove old hidden declarations, for GC and speed.
     for (Declaration decl = exp.firstDecl();
@@ -519,7 +519,7 @@ public class XQResolveNames extends ResolveNames
       return getCompilation().syntaxError(err);
   }
 
-  protected Expression walkApplyExp (ApplyExp exp)
+  protected Expression visitApplyExp (ApplyExp exp, Void ignored)
   {
     Expression func = exp.getFunction();
     NamespaceBinding namespaceSave = parser.constructorNamespaces;
@@ -533,11 +533,11 @@ public class XQResolveNames extends ResolveNames
         parser.constructorNamespaces = nschain;
       }
     if (func instanceof ReferenceExp)
-      func = walkReferenceExp((ReferenceExp) func, exp);
+      func = visitReferenceExp((ReferenceExp) func, exp);
     else
-      func = walk(func);
+      func = visit(func, ignored);
     exp.setFunction(func);
-    walkExps(exp.getArgs());
+    visitExps(exp.getArgs(), ignored);
     parser.constructorNamespaces = namespaceSave;
     func = exp.getFunction();
     if (func instanceof ReferenceExp)
@@ -592,7 +592,7 @@ public class XQResolveNames extends ResolveNames
                   if (code == CAST_AS_BUILTIN)
                     {
                       if (toQName)
-                        return walkApplyExp(XQParser.castQName(args[1], true));
+                        return visitApplyExp(XQParser.castQName(args[1], true), ignored);
                       func
                         = XQParser.makeFunctionExp("gnu.xquery.util.CastAs", "castAs");
                     }

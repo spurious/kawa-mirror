@@ -32,7 +32,8 @@ java_sources = \
   ErrorExp.java \
   ExitExp.java \
   Expression.java \
-  ExpWalker.java \
+  ExpExpVisitor.java \
+  ExpVisitor.java \
   FindCapturedVars.java \
   FindTailCalls.java \
   FluidLetExp.java \

@@ -6,37 +6,26 @@ package gnu.expr;
  * Also, if lambda is bound to a unique declaration, make that its name.
  */
 
-public class ChainLambdas extends ExpWalker
+public class ChainLambdas extends ExpExpVisitor<ScopeExp>
 {
-  ScopeExp currentScope;
-
   public static void chainLambdas (Expression exp, Compilation comp)
   {
-    ChainLambdas walker = new ChainLambdas();
-    walker.setContext(comp);
-    walker.walk(exp);
+    ChainLambdas visitor = new ChainLambdas();
+    visitor.setContext(comp);
+    visitor.visit(exp, null);
   }
 
-  protected Expression walkScopeExp (ScopeExp exp)
+  protected Expression visitScopeExp (ScopeExp exp, ScopeExp scope)
   {
-    ScopeExp saveScope = currentScope;
-    try
-      {
-	exp.outer = currentScope;
-	currentScope = exp;
-	exp.walkChildren(this);
-        exp.setIndexes();
-        if (exp.mustCompile())
-          comp.mustCompileHere();
-	return exp;
-      }
-    finally
-      {
-	currentScope = saveScope;
-      }
+    exp.outer = scope;
+    exp.visitChildren(this, exp);
+    exp.setIndexes();
+    if (exp.mustCompile())
+      comp.mustCompileHere();
+    return exp;
   }
 
-  protected Expression walkLambdaExp (LambdaExp exp)
+  protected Expression visitLambdaExp (LambdaExp exp, ScopeExp scope)
   {    
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
@@ -45,19 +34,10 @@ public class ChainLambdas extends ExpWalker
 	parent.firstChild = exp;
       }
 
-    ScopeExp saveScope = currentScope;
-    try
-      {
-	exp.outer = currentScope;
-        exp.firstChild = null;
-	currentScope = exp;
-	exp.walkChildrenOnly(this);
-      }
-    finally
-      {
-	currentScope = saveScope;
-      }
-    exp.walkProperties(this);
+    exp.outer = scope;
+    exp.firstChild = null;
+    exp.visitChildrenOnly(this, exp);
+    exp.visitProperties(this, exp);
 
     // Put list of children in proper order.
     LambdaExp prev = null, child = exp.firstChild;
@@ -78,7 +58,7 @@ public class ChainLambdas extends ExpWalker
     return exp;
   }
 
-  protected Expression walkClassExp (ClassExp exp)
+  protected Expression visitClassExp (ClassExp exp, ScopeExp scope)
   {
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
@@ -87,7 +67,7 @@ public class ChainLambdas extends ExpWalker
 	parent.firstChild = exp;
       }
 
-    walkScopeExp(exp);
+    visitScopeExp(exp, scope);
 
     return exp;
   }

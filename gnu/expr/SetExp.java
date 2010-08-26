@@ -401,16 +401,15 @@ public class SetExp extends AccessExp
       : binding == null ? Type.pointer_type : binding.getType();
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkSetExp(this);
+    return visitor.visitSetExp(this, d);
   }
 
-  protected void walkChildren (ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    new_value = (Expression) walker.walk(new_value);
+    new_value = visitor.visitAndUpdate(new_value, d);
   }
-
   public void print (OutPort out)
   {
     out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);

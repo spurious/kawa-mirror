@@ -84,9 +84,9 @@ public class ThisExp extends ReferenceExp
       }
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkThisExp(this);
+    return visitor.visitThisExp(this, d);
   }
 
   public final gnu.bytecode.Type getType()

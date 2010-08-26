@@ -53,16 +53,16 @@ public class SynchronizedExp extends Expression
     code.popScope();
  }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkSynchronizedExp(this);
+    return visitor.visitSynchronizedExp(this, d);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {
-    object = walker.walk(object);
-    if (walker.exitValue == null)
-      body = walker.walk(body);
+    object = visitor.visitAndUpdate(object, d);
+    if (visitor.exitValue == null)
+      body = visitor.visitAndUpdate(body, d);
   }
 
   public void print (OutPort ps)

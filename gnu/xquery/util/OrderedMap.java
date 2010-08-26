@@ -45,10 +45,10 @@ public class OrderedMap extends MethodProc
   static final ClassType typeTuples
     = ClassType.make("gnu.xquery.util.OrderedTuples");
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length > 2)
       {

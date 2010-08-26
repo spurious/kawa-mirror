@@ -1,3 +1,6 @@
+// Copyright (c) 2010  Per M.A. Bothner.
+// This is free software; for terms and warranty disclaimer see ../../COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
@@ -6,12 +9,23 @@ import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
 import java.lang.reflect.InvocationTargetException;
 
-public class InlineCalls extends ExpWalker
+/**
+ * The main Expression re-writing pass.
+ * This pass handles type-checking (work in progress).
+ * Also checks for calls to known Procedures, and may call
+ * a procedure-specific handler, which may do inlining, constant-folding,
+ * error-checking, and general munging.
+ *
+ * Should perhaps rename to something like "Validate" since
+ * we do type-checking and other stuff beyond inlining.
+ */
+
+public class InlineCalls extends ExpExpVisitor<Type>
 {
-  public static void inlineCalls (Expression exp, Compilation comp)
+  public static Expression inlineCalls (Expression exp, Compilation comp)
   {
-    InlineCalls walker = new InlineCalls(comp);
-    walker.walk(exp);
+    InlineCalls visitor = new InlineCalls(comp);
+    return visitor.visit(exp, null);
   }
 
   public InlineCalls (Compilation comp)
@@ -19,39 +33,58 @@ public class InlineCalls extends ExpWalker
     setContext(comp);
   }
 
-  protected Expression walkApplyExp(ApplyExp exp)
+  public boolean isCompatible (Type required, Type available)
+  {
+    return required.compare(available) != -3;
+  }
+
+  public Expression visit(Expression exp, Type required)
+  {
+    Expression r = super.visit(exp, required);
+    Type expType = exp.getType();
+    if (required != null && ! isCompatible(required, expType))
+      {
+        Language language = comp.getLanguage();
+        comp.error('w', "type "+(language.formatType(expType)
+                                 +" is incompatible with required type "
+                                 +language.formatType(required)));
+      }
+    return r;
+  }
+
+  protected Expression visitApplyExp(ApplyExp exp, Type required)
   {
     Expression func = exp.func;
     // Replace (apply (lambda (param ...) body ...) arg ...)
     // by: (let ((param arg) ...) body ...).
-    // Note this should be done *before* we walk the lambda, so we can
-    // walk the body with params bound to the known args.
+    // Note this should be done *before* we visit the lambda, so we can
+    // visit the body with params bound to the known args.
     if (func instanceof LambdaExp)
       {
         LambdaExp lexp = (LambdaExp) func;
         Expression inlined = inlineCall((LambdaExp) func, exp.args, false);
         if (inlined != null)
-          return walk(inlined);
+          return visit(inlined, required);
       }
-    func = walk(func);
+    func = visit(func, null);
     exp.func = func;
-    return func.inline(exp, this, null, false);
+    return func.validateApply(exp, this, required, null, false);
   }
 
-  /** Walk an ApplyExp assuming function and arguments have been walked. */
-  public final Expression walkApplyOnly(ApplyExp exp)
+  /** Visit an ApplyExp assuming function and arguments have been visited. */
+  public final Expression visitApplyOnly(ApplyExp exp, Type required)
   {
-    return exp.func.inline(exp, this, null, true);
+    return exp.func.validateApply(exp, this, required, null, true);
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp)
+  protected Expression visitReferenceExp (ReferenceExp exp, Type required)
   {
     Declaration decl = exp.getBinding();
     if (decl != null && decl.field == null && ! decl.getCanWrite())
       {
         Expression dval = decl.getValue();
         if (dval instanceof QuoteExp && dval != QuoteExp.undefined_exp)
-          return walkQuoteExp((QuoteExp) dval);
+          return visitQuoteExp((QuoteExp) dval, required);
         if (dval instanceof ReferenceExp && ! decl.isAlias())
           {
             ReferenceExp rval = (ReferenceExp) dval;
@@ -62,7 +95,7 @@ public class InlineCalls extends ExpWalker
                     // We could also allow (some) widening conversions.
                     || dtype == rdecl.getType())
                 && ! rval.getDontDereference())
-              return walkReferenceExp(rval);
+              return visitReferenceExp(rval, required);
           }
         if (! exp.isProcedureName()
             && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
@@ -77,12 +110,12 @@ public class InlineCalls extends ExpWalker
             comp.error('e', decl, "here is the definition of ", "");
           }
       }
-    return super.walkReferenceExp(exp);
+    return super.visitReferenceExp(exp, required);
   }
 
-  protected Expression walkIfExp (IfExp exp)
+  protected Expression visitIfExp (IfExp exp, Type required)
   {
-    Expression test = exp.test.walk(this);
+    Expression test = exp.test.visit(this, null);
     if (test instanceof ReferenceExp)
       {
         Declaration decl = ((ReferenceExp) test).getBinding();
@@ -95,9 +128,9 @@ public class InlineCalls extends ExpWalker
       }
     exp.test = test;
     if (exitValue == null)
-      exp.then_clause = walk(exp.then_clause);
+      exp.then_clause = visit(exp.then_clause, required);
     if (exitValue == null && exp.else_clause != null)
-      exp.else_clause = walk(exp.else_clause);
+      exp.else_clause = visit(exp.else_clause, required);
     if (test instanceof QuoteExp)
       {
         boolean truth = comp.getLanguage().isTrue(((QuoteExp) test).getValue());
@@ -112,10 +145,20 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
-  protected Expression walkScopeExp (ScopeExp exp)
+  protected Expression visitBeginExp (BeginExp exp, Type required)
   {
-    exp.walkChildren(this);
-    walkDeclarationTypes(exp);
+    int last = exp.length - 1;
+    for (int i = 0;  i <= last;  i++)
+      {
+        exp.exps[i] = visit(exp.exps[i], i < last ? null : required);
+      }
+    return exp;
+  }
+
+  protected Expression visitScopeExp (ScopeExp exp, Type required)
+  {
+    exp.visitChildren(this, null);
+    visitDeclarationTypes(exp);
     for (Declaration decl = exp.firstDecl();  decl != null;
          decl = decl.nextDecl())
       {
@@ -131,14 +174,14 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
-  protected Expression walkLetExp (LetExp exp)
+  protected Expression visitLetExp (LetExp exp, Type required)
   {
     Declaration decl = exp.firstDecl();
     int n = exp.inits.length;
     for (int i = 0; i < n; i++, decl = decl.nextDecl())
       {
 	Expression init0 = exp.inits[i];
-	Expression init = walk(init0);
+	Expression init = visit(init0, null);
 	exp.inits[i] = init;
 	Expression dvalue = decl.value;
 	if (dvalue == init0)
@@ -150,7 +193,7 @@ public class InlineCalls extends ExpWalker
       }
 
     if (exitValue == null)
-      exp.body = (Expression) walk(exp.body);
+      exp.body = visit(exp.body, required);
     if (exp.body instanceof ReferenceExp)
       {
         ReferenceExp ref = (ReferenceExp) exp.body;
@@ -164,7 +207,7 @@ public class InlineCalls extends ExpWalker
                 // Note this optimization does yield worse error messages
                 // than using CheckedTarget.  FIXME.
                 if (texp != QuoteExp.classObjectExp)
-                  init = walkApplyOnly(Compilation.makeCoercion(init, texp));
+                  init = visitApplyOnly(Compilation.makeCoercion(init, texp), null);
                 return init;
               }
             // Can also optimize if n > 1, but have to check if any
@@ -174,7 +217,7 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
-  protected Expression walkLambdaExp (LambdaExp exp)
+  protected Expression visitLambdaExp (LambdaExp exp, Type required)
   {
     Declaration firstDecl = exp.firstDecl();
     if (firstDecl != null && firstDecl.isThisParameter()
@@ -182,21 +225,27 @@ public class InlineCalls extends ExpWalker
       {
         firstDecl.setType(comp.mainClass);
       }
-    return walkScopeExp(exp);
+    return visitScopeExp(exp, required);
   }
 
-  protected Expression walkTryExp (TryExp exp)
+  protected Expression visitTryExp (TryExp exp, Type required)
   {
     if (exp.getCatchClauses() == null && exp.getFinallyClause() == null)
-      return walk(exp.try_clause);
+      return visit(exp.try_clause, required);
     else
-      return super.walkTryExp(exp);
+      return super.visitTryExp(exp, required);
   }
 
-  protected Expression walkSetExp (SetExp exp)
+  protected Expression visitSetExpValue (Expression new_value, Type required,
+                                         Declaration decl)
   {
-    super.walkSetExp(exp);
+    return visit(new_value, decl == null || decl.isAlias() ? null : decl.getType());
+  }
+
+  protected Expression visitSetExp (SetExp exp, Type required)
+  {
     Declaration decl = exp.getBinding();
+    super.visitSetExp(exp, required);
     if (! exp.isDefining() && decl != null
         && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
             == (Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)))
@@ -238,7 +287,7 @@ public class InlineCalls extends ExpWalker
     return t;
   }
 
-  public Expression maybeInline (ApplyExp exp, boolean argsInlined, Procedure proc)
+  public Expression maybeInline (ApplyExp exp, Type required, boolean argsInlined, Procedure proc)
   {
     try
       {

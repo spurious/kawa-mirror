@@ -91,23 +91,23 @@ public class TryExp extends Expression
       target.compileFromStack(comp, target.getType());
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkTryExp(this);
+    return visitor.visitTryExp(this, d);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    try_clause = walker.walk(try_clause);
+    try_clause = visitor.visitAndUpdate(try_clause, d);
     CatchClause catch_clause = catch_clauses;
-    while (walker.exitValue == null && catch_clause != null)
+    while (visitor.exitValue == null && catch_clause != null)
       {
-	walker.walk(catch_clause);
+	visitor.visit(catch_clause, d); // FIXME update?
 	catch_clause = catch_clause.getNext();
       }
 
-    if (walker.exitValue == null && finally_clause != null)
-      finally_clause = walker.walk(finally_clause);
+    if (visitor.exitValue == null && finally_clause != null)
+      finally_clause = visitor.visitAndUpdate(finally_clause, d);
   }
 
   public gnu.bytecode.Type getType()

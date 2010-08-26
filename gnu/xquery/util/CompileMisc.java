@@ -12,11 +12,11 @@ public class CompileMisc
 {
   /** Inliner for the Compare procedure. */
   public static Expression inlineCompare
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
-    Expression folded = exp.inlineIfConstant(proc, walker);
+    exp.visitArgs(visitor, argsInlined);
+    Expression folded = exp.inlineIfConstant(proc, visitor);
     if (folded != exp)
       return folded;
     Compare cproc = (Compare) proc;
@@ -39,10 +39,10 @@ public class CompileMisc
 
   /** Inliner for the BooleanValue procedure. */
   public static Expression inlineBooleanValue
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {
@@ -62,7 +62,7 @@ public class CompileMisc
             catch (Throwable ex)
               {
                 String message = "cannot convert to a boolean";
-                walker.getMessages().error('e', message);
+                visitor.getMessages().error('e', message);
                 return new ErrorExp(message);
               }
           }
@@ -72,10 +72,10 @@ public class CompileMisc
 
   /** Inliner for the ArithOp procedure. */
   public static Expression inlineArithOp
-  (ApplyExp exp, InlineCalls walker,
+  (ApplyExp exp, InlineCalls visitor,
    boolean argsInlined, Procedure proc)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     // FUTURE
     return exp;
   }

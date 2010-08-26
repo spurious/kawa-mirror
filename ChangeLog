@@ -1,3 +1,8 @@
+2010-08-26  Per Bothner  <per@bothner.com>
+
+	Replace ExpWalker expression-visitor API by new ExpVisitor.
+	Lots of little changes; a few big ones - see gnu/expr/ChangeLog.
+
 2010-07-23  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT): Set version to 1.10.

@@ -74,16 +74,16 @@ public class CompileArith implements CanInline, Inlineable
     return false;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
  
     Expression[] args = exp.getArgs();
     if (args.length > 2)
-      return pairwise(proc, exp.getFunction(), args, walker);
+      return pairwise(proc, exp.getFunction(), args, visitor);
 
-    Expression folded = exp.inlineIfConstant(proc, walker);
+    Expression folded = exp.inlineIfConstant(proc, visitor);
     if (folded != exp)
       return folded;
 
@@ -119,20 +119,20 @@ public class CompileArith implements CanInline, Inlineable
 
     // Inlining may yield PrimProcedure instructions of bytecode instructions
     // which we don't know how to interpret (yet).
-    if (! walker.getCompilation().mustCompile)
+    if (! visitor.getCompilation().mustCompile)
       return exp;
 
     switch (op)
       {
       case ADD:
       case SUB:
-        return inlineAdd((AddOp) proc, exp, walker);
+        return inlineAdd((AddOp) proc, exp, visitor);
       case DIV:
       case REM:
-        return inlineDiv((DivideOp) proc, exp, walker);
+        return inlineDiv((DivideOp) proc, exp, visitor);
       case NOT:
         if (rkind > 0)
-          return inlineNot(exp, rkind, walker);
+          return inlineNot(exp, rkind, visitor);
         // else fall through ...
       default:
         return exp;
@@ -480,7 +480,7 @@ public class CompileArith implements CanInline, Inlineable
     return rkind;
   }
 
-  public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls walker)
+  public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls visitor)
   {
     Expression[] args = exp.getArgs();
     if (args.length == 1 && proc.plusOrMinus < 0)
@@ -527,7 +527,7 @@ public class CompileArith implements CanInline, Inlineable
   }
 
   public static Expression inlineDiv (DivideOp proc,
-                                      ApplyExp exp, InlineCalls walker)
+                                      ApplyExp exp, InlineCalls visitor)
   {
     Expression[] args = exp.getArgs();
     if (args.length == 1)
@@ -538,7 +538,7 @@ public class CompileArith implements CanInline, Inlineable
     return exp;
   }
 
-  public Expression inlineNot (ApplyExp exp, int kind, InlineCalls walker)
+  public Expression inlineNot (ApplyExp exp, int kind, InlineCalls visitor)
   {
     if (exp.getArgCount() == 1)
       {
@@ -546,7 +546,7 @@ public class CompileArith implements CanInline, Inlineable
         if (kind == Arithmetic.INT_CODE || kind == Arithmetic.LONG_CODE)
           {
             Expression[] args = {arg, QuoteExp.getInstance(IntNum.minusOne())};
-            return walker.walkApplyOnly(new ApplyExp(BitwiseOp.xor, args));
+            return visitor.visitApplyOnly(new ApplyExp(BitwiseOp.xor, args), null); // FIXME
           }
         String cname;
         if (kind == Arithmetic.INTNUM_CODE)
@@ -585,7 +585,7 @@ public class CompileArith implements CanInline, Inlineable
    */
   public static Expression pairwise(Procedure proc,
                                     Expression rproc, Expression[] args,
-				    InlineCalls walker)
+				    InlineCalls visitor)
   {
     int len = args.length;
     Expression prev = args[0];
@@ -595,7 +595,7 @@ public class CompileArith implements CanInline, Inlineable
         args2[0] = prev;
         args2[1] = args[i];
         ApplyExp next = new ApplyExp(rproc, args2);
-        Expression inlined = walker.maybeInline(next, true, proc);
+        Expression inlined = visitor.maybeInline(next, null/*FIXME*/, true, proc);
         prev = inlined != null ? inlined : next;
       }
     return prev;

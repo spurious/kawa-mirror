@@ -661,16 +661,17 @@ public class ClassExp extends LambdaExp
       }
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     if (comp == null)
-      return walker.walkClassExp(this);
+      return visitor.visitClassExp(this, d);
     ClassType saveClass = comp.curClass;
     try
+
       {
 	comp.curClass = type;
-	return walker.walkClassExp(this);
+	return visitor.visitClassExp(this, d);
       }
     finally
       {
@@ -678,15 +679,15 @@ public class ClassExp extends LambdaExp
       }
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    LambdaExp save = walker.currentLambda;
-    walker.currentLambda = this;
-    supers = walker.walkExps(supers, supers.length);
+    LambdaExp save = visitor.currentLambda;
+    visitor.currentLambda = this;
+    supers = visitor.visitExps(supers, supers.length, d);
     try
       {
 	for (LambdaExp child = firstChild;
-	     child != null && walker.exitValue == null;
+	     child != null && visitor.exitValue == null;
 	     child = child.nextSibling)
           {
             if (instanceType != null)
@@ -695,12 +696,12 @@ public class ClassExp extends LambdaExp
                 if (firstParam != null && firstParam.isThisParameter())
                   firstParam.setType(type);
               }
-            walker.walkLambdaExp(child);
+            visitor.visitLambdaExp(child, d);
           }
       }
     finally
       {
-	walker.currentLambda = save;
+	visitor.currentLambda = save;
       }
   }
 

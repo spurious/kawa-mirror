@@ -1,56 +1,52 @@
 package gnu.expr;
 import gnu.bytecode.Type;
 
-/** Does setTailCall on ApplyExp's that are tail-calls.
+/** A visitor that checks for tails-calls; also notes read/write/call accesses.
+ *
+ * Does setTailCall on ApplyExp's that are tail-calls.
  * Also setCanRead, setCanCall on Declarations
  * and setCanRead, setCanCall on LambdaExp when appropriate.
  * (setCanWrite on Declarations needs to be set before this.)
  * Note the final part of deciding inlineability has to be done after
- * FindTailCalls finishes (or at least after we've walked all possible
- * callers), so it is deferred to FindCapturedvars.walkLambdaExp.
+ * FindTailCalls finishes (or at least after we've visited all possible
+ * callers), so it is deferred to FindCapturedvars.visitLambdaExp.
+ *
+ * The extra parameter is the {@code returnContinuation} - the expression we
+ * "return to" - i.e. when done eveluating an expression, we're also done
+ * with the {@code returnContinuation}.  Normally it is is same
+ * {@code Expression} as we are visiting, but (for example) when visiting the
+ * last expression of a {@code BeginExp} the  {@code returnContinuation}
+ * is the same as that of the containing {@code BeginExp}.
  */
 
-public class FindTailCalls extends ExpWalker
+public class FindTailCalls extends ExpExpVisitor<Expression>
 {
   public static void findTailCalls (Expression exp, Compilation comp)
   {
-    FindTailCalls walker = new FindTailCalls();
-    walker.setContext(comp);
-    walker.walk(exp);
+    FindTailCalls visitor = new FindTailCalls();
+    visitor.setContext(comp);
+    visitor.visit(exp, exp);
   }
 
-  Expression returnContinuation;
-
-  public boolean inTailContext ()
+  protected Expression visitExpression (Expression exp, Expression returnContinuation)
   {
-    return returnContinuation == currentLambda.body;
+    return super.visitExpression(exp, exp);
   }
 
-  protected Expression walkExpression (Expression exp)
+  public Expression[] visitExps (Expression[] exps)
   {
-    Expression saveContext = returnContinuation;
-    returnContinuation = exp;
-    Expression ret = super.walkExpression(exp);
-    returnContinuation = saveContext;
-    return ret;
-  }
-
-  public Expression[] walkExps (Expression[] exps, int n)
-  {
-    Expression saveContext = returnContinuation;
+    int n = exps.length;
     for (int i = 0;  i < n;  i++)
       {
         Expression expi = exps[i];
-        returnContinuation = expi;
-        exps[i] = walk(expi);
+        exps[i] = visit(expi, expi);
       }
-    returnContinuation = saveContext;
     return exps;
   }
 
-  protected Expression walkApplyExp(ApplyExp exp)
+  protected Expression visitApplyExp (ApplyExp exp, Expression returnContinuation)
   {
-    boolean inTailContext = inTailContext();
+    boolean inTailContext = returnContinuation == currentLambda.body;
     if (inTailContext)
       exp.setTailCall(true);
     exp.context = currentLambda;
@@ -84,7 +80,7 @@ public class FindTailCalls extends ExpWalker
              && ! (exp.func instanceof ClassExp))
       {
         lexp = (LambdaExp) exp.func;
-        walkLambdaExp(lexp, false);
+        visitLambdaExp(lexp, false);
         lexp.setCanCall(true);
       }
     else if (exp.func instanceof QuoteExp
@@ -93,10 +89,7 @@ public class FindTailCalls extends ExpWalker
       isAppendValues = true;
     else
       {
-        Expression saveContext = returnContinuation;
-        returnContinuation = exp.func;
-        exp.func = exp.func.walk(this);
-        returnContinuation = saveContext;
+        exp.func = visitExpression(exp.func, exp.func);
       }
     if (lexp != null)
       {
@@ -129,53 +122,31 @@ public class FindTailCalls extends ExpWalker
        int nargs = args.length;
        for (int i = 0;  i < nargs;  i++)
          {
-           args[i] = walk(args[i]);
+           args[i] = visit(args[i], null);
          }
       }
       else*/
-    exp.args = walkExps(exp.args);
+    exp.args = visitExps(exp.args);
     return exp;
   }
 
-  protected Expression walkBlockExp(BlockExp exp)
+  protected Expression visitBlockExp (BlockExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
-      {
-        exp.body = exp.body.walk(this);
-        if (exp.exitBody != null)
-          {
-            returnContinuation = exp.exitBody;
-            exp.exitBody = exp.exitBody.walk(this);
-          }
-        return exp;
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
+    exp.body = exp.body.visit(this, returnContinuation);
+    if (exp.exitBody != null)
+      exp.exitBody = exp.exitBody.visit(this, exp.exitBody);
+    return exp;
   }
 
-  protected Expression walkBeginExp(BeginExp exp)
+  protected Expression visitBeginExp (BeginExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
-      {
-	int n = exp.length - 1;
-	for (int i = 0;  i <= n;  i++)
-	  {
-            returnContinuation = i == n ? saveContext : exp.exps[i];
-	    exp.exps[i] = (Expression) exp.exps[i].walk(this);
-	  }
-	return exp;
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
+    int n = exp.length - 1;
+    for (int i = 0;  i <= n;  i++)
+      exp.exps[i] = exp.exps[i].visit(this, i == n ? returnContinuation : exp.exps[i]);
+    return exp;
   }
 
-  protected Expression walkFluidLetExp (FluidLetExp exp)
+  protected Expression visitFluidLetExp (FluidLetExp exp, Expression returnContinuation)
   {
     for (Declaration decl = exp.firstDecl();
          decl != null; decl = decl.nextDecl())
@@ -184,57 +155,40 @@ public class FindTailCalls extends ExpWalker
         if (decl.base != null)
           decl.base.setCanRead(true);
       }
-    Expression saveContext = returnContinuation;
-    try
-      {
-        walkLetDecls(exp);
-        returnContinuation = exp.body;
-        exp.body = (Expression) exp.body.walk(this);
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
-    postWalkDecls(exp);
+    visitLetDecls(exp);
+    exp.body = exp.body.visit(this, exp.body);
+    postVisitDecls(exp);
     return exp;
   }
 
-  void walkLetDecls (LetExp exp)
+  void visitLetDecls (LetExp exp)
   {
-        Declaration decl = exp.firstDecl();
-        int n = exp.inits.length; 
-	for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
-	  {
-	    Expression init = walkSetExp (decl, exp.inits[i]);
-	    // Optimize letrec-like forms.
-	    if (init == QuoteExp.undefined_exp)
-	      {
-		Expression value = decl.getValue();
-		if (value instanceof LambdaExp
-		    || (value != init && value instanceof QuoteExp))
-		  init = value;
-	      }
-	    exp.inits[i] = init;
-	  }
+    Declaration decl = exp.firstDecl();
+    int n = exp.inits.length; 
+    for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
+      {
+        Expression init = visitSetExp(decl, exp.inits[i]);
+        // Optimize letrec-like forms.
+        if (init == QuoteExp.undefined_exp)
+          {
+            Expression value = decl.getValue();
+            if (value instanceof LambdaExp
+                || (value != init && value instanceof QuoteExp))
+              init = value;
+          }
+        exp.inits[i] = init;
+      }
   }
 
-  protected Expression walkLetExp (LetExp exp)
+  protected Expression visitLetExp (LetExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
-      {
-        walkLetDecls(exp);
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
-    exp.body = (Expression) exp.body.walk(this);
-    postWalkDecls(exp);
+    visitLetDecls(exp);
+    exp.body = exp.body.visit(this, returnContinuation);
+    postVisitDecls(exp);
     return exp;
   }
 
-  public void postWalkDecls (ScopeExp exp)
+  public void postVisitDecls (ScopeExp exp)
   {
     Declaration decl = exp.firstDecl();
     for (;  decl != null;  decl = decl.nextDecl())
@@ -259,55 +213,41 @@ public class FindTailCalls extends ExpWalker
       }
   }
 
-  protected Expression walkIfExp (IfExp exp)
+  protected Expression visitIfExp (IfExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
-      {
-        returnContinuation = exp.test;
-	exp.test = (Expression) exp.test.walk(this);
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
-    exp.then_clause = (Expression) exp.then_clause.walk(this);
+    exp.test = exp.test.visit(this, exp.test);
+    exp.then_clause = exp.then_clause.visit(this, returnContinuation);
     Expression else_clause = exp.else_clause;
     if (else_clause != null)
-      exp.else_clause = (Expression) else_clause.walk(this);
+      exp.else_clause = else_clause.visit(this, returnContinuation);
     return exp;
   }
 
-  protected Expression walkLambdaExp (LambdaExp exp)
+  protected Expression visitLambdaExp (LambdaExp exp, Expression returnContinuation)
   {
-    walkLambdaExp (exp, true);
+    visitLambdaExp (exp, true);
     return exp;
   }
 
-  final void walkLambdaExp (LambdaExp exp, boolean canRead)
+  final void visitLambdaExp (LambdaExp exp, boolean canRead)
   {
-    Expression saveContext = returnContinuation;
-    returnContinuation = exp;
     LambdaExp parent = currentLambda;
     currentLambda = exp;
     if (canRead)
       exp.setCanRead(true);
     try
       {
-        returnContinuation = exp;
 	if (exp.defaultArgs != null)
-	  exp.defaultArgs = walkExps(exp.defaultArgs);
-        returnContinuation = exp.getInlineOnly() ? saveContext : exp.body;
+	  exp.defaultArgs = visitExps(exp.defaultArgs);
 	if (exitValue == null && exp.body != null)
-	  exp.body = (Expression) exp.body.walk(this);
+	  exp.body = exp.body.visit(this, exp.getInlineOnly() ? exp : exp.body);
       }
     finally
       {
-        returnContinuation = saveContext;
 	currentLambda = parent;
       }
 
-    postWalkDecls(exp);
+    postVisitDecls(exp);
   }
 
 
@@ -315,28 +255,25 @@ public class FindTailCalls extends ExpWalker
   // calls that call the key.
   // Hashtable applications = new Hashtable();
 
-  protected Expression walkClassExp (ClassExp exp)
+  protected Expression visitClassExp (ClassExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    returnContinuation = exp;
     LambdaExp parent = currentLambda;
     currentLambda = exp;
     try
       {
 	for (LambdaExp child = exp.firstChild;
 	     child != null && exitValue == null;  child = child.nextSibling)
-	  walkLambdaExp(child, false);
+	  visitLambdaExp(child, false);
       }
     finally
       {
-        returnContinuation = saveContext;
 	currentLambda = parent;
       }
 
     return exp;
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp)
+  protected Expression visitReferenceExp (ReferenceExp exp, Expression returnContinuation)
   {
     Declaration decl = Declaration.followAliases(exp.binding);
     if (decl != null)
@@ -356,104 +293,71 @@ public class FindTailCalls extends ExpWalker
     return exp;
   }
 
-  final Expression walkSetExp (Declaration decl, Expression value)
+  final Expression visitSetExp (Declaration decl, Expression value)
   {
-    returnContinuation = value;
     if (decl != null && decl.getValue() == value
 	&& value instanceof LambdaExp && ! (value instanceof ClassExp)
         && ! decl.isPublic())
       {
 	LambdaExp lexp = (LambdaExp) value; 
-	walkLambdaExp(lexp, false);
+	visitLambdaExp(lexp, false);
 	return lexp;
       }
     else
-      return (Expression) value.walk(this);
+      return value.visit(this, value);
   }
 
-  protected Expression walkSetExp (SetExp exp)
+  protected Expression visitSetExp (SetExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
+    Declaration decl = exp.binding;
+    if (decl != null && decl.isAlias())
       {
-	Declaration decl = exp.binding;
-	if (decl != null && decl.isAlias())
-	  {
-	    if (exp.isDefining())
-	      {
-                returnContinuation = exp.new_value;
-		exp.new_value = (Expression) exp.new_value.walk(this);
-		return exp;
-	      }
-	    decl = Declaration.followAliases(decl);
-	  }
-        Declaration ctx = exp.contextDecl();
-        if (ctx != null)
-          ctx.setCanRead(true);
-	Expression value = walkSetExp(decl, exp.new_value);
-	if (decl != null && decl.context instanceof LetExp
-	    && value == decl.getValue()
-	    && (value instanceof LambdaExp || value instanceof QuoteExp))
-	  {
-	    // The assignment is redundant, as it has been moved to the
-	    // initialization of the LetExp.
-	    return QuoteExp.voidExp;
-	  }
-	exp.new_value = value;
-	return exp;
+        if (exp.isDefining())
+          {
+            exp.new_value = exp.new_value.visit(this, exp.new_value);
+            return exp;
+          }
+        decl = Declaration.followAliases(decl);
       }
-    finally
+    Declaration ctx = exp.contextDecl();
+    if (ctx != null)
+      ctx.setCanRead(true);
+    Expression value = visitSetExp(decl, exp.new_value);
+    if (decl != null && decl.context instanceof LetExp
+        && value == decl.getValue()
+        && (value instanceof LambdaExp || value instanceof QuoteExp))
       {
-        returnContinuation = saveContext;
+        // The assignment is redundant, as it has been moved to the
+        // initialization of the LetExp.
+        return QuoteExp.voidExp;
       }
+    exp.new_value = value;
+    return exp;
   }
 
-  protected Expression walkTryExp (TryExp exp)
+  protected Expression visitTryExp (TryExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
+    Expression tryContinuation
+      = exp.finally_clause == null ? returnContinuation : exp.try_clause;
+    exp.try_clause = exp.try_clause.visit(this, tryContinuation);
+    CatchClause catch_clause = exp.catch_clauses;
+    while (exitValue == null && catch_clause != null)
       {
-        if (exp.finally_clause != null)
-          {
-            returnContinuation = exp.try_clause;
-          }
-        exp.try_clause = exp.try_clause.walk(this);
-        CatchClause catch_clause = exp.catch_clauses;
-        while (exitValue == null && catch_clause != null)
-          {
-            if (exp.finally_clause != null)
-              returnContinuation = catch_clause.body;
-            catch_clause.body = catch_clause.body.walk(this);
-            catch_clause = catch_clause.getNext();
-          }
-        Expression finally_clause = exp.finally_clause;
-        if (finally_clause != null)
-          {
-            returnContinuation = finally_clause;
-            exp.finally_clause = finally_clause.walk(this);
-          }
-        return exp;
+        Expression clauseContinuation
+          = exp.finally_clause == null ? returnContinuation : catch_clause.body;
+        catch_clause.body = catch_clause.body.visit(this, clauseContinuation);
+        catch_clause = catch_clause.getNext();
       }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
+    Expression finally_clause = exp.finally_clause;
+    if (finally_clause != null)
+      exp.finally_clause = finally_clause.visit(this, finally_clause);
+    return exp;
   }
 
-  protected Expression walkSynchronizedExp (SynchronizedExp exp)
+  protected Expression visitSynchronizedExp (SynchronizedExp exp, Expression returnContinuation)
   {
-    Expression saveContext = returnContinuation;
-    try
-      {
-        returnContinuation = exp.object;
-        exp.object = exp.object.walk(this);
-        returnContinuation = exp.body;
-        exp.body = exp.body.walk(this);
-        return exp;
-      }
-    finally
-      {
-        returnContinuation = saveContext;
-      }
+    exp.object = exp.object.visit(this, exp.object);
+    exp.body = exp.body.visit(this, exp.body);
+    return exp;
   }
 }

@@ -90,38 +90,39 @@ public class QuoteExp extends Expression
     return this;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkQuoteExp(this);
+    return visitor.visitQuoteExp(this, d);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
     if (this == QuoteExp.undefined_exp)
       return exp;
     Object fval = getValue();
     if (! (fval instanceof Procedure))
-      return walker.noteError(decl == null || fval == null ? "called value is not a procedure"
+      return visitor.noteError(decl == null || fval == null ? "called value is not a procedure"
 			      : ("calling " + decl.getName()
 				 + " which is a "+fval.getClass().getName()));
     Procedure proc = (Procedure) fval;
     int nargs = exp.getArgCount();
     String msg = WrongArguments.checkArgCount(proc, nargs);
     if (msg != null)
-      return walker.noteError(msg);
-    Expression inlined = walker.maybeInline(exp, argsInlined, proc);
+      return visitor.noteError(msg);
+    Expression inlined = visitor.maybeInline(exp, required, argsInlined, proc);
     if (inlined != null)
       return inlined;
     if (! argsInlined)
-      exp.args = walker.walkExps(exp.args, exp.args.length);
+      exp.args = visitor.visitExps(exp.args, exp.args.length, null);
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
       {
-	Expression e = exp.inlineIfConstant(proc, walker);
+	Expression e = exp.inlineIfConstant(proc, visitor);
 	if (e != exp)
-	  return walker.walk(e);
+	  return visitor.visit(e, required);
       }
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     if (comp.inlineOk(proc))
       {
 	if (ApplyExp.asInlineable(proc) != null)

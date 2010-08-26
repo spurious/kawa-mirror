@@ -35,20 +35,20 @@ public class CompileMisc implements CanInline, Inlineable
     return new CompileMisc((Procedure) proc, NOT);
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
     switch (code)
       {
       case CONSTANT_FUNCTION0:
         return inlineConstantFunction0((ConstantFunction0) proc, exp,
-                                       walker, argsInlined);
+                                       visitor, argsInlined);
       case CONVERT:
         return inlineConvert((Convert) proc, exp,
-                             walker, argsInlined);
+                             visitor, argsInlined);
       case NOT:
         return inlineNot((Not) proc, exp,
-                             walker, argsInlined);
+                             visitor, argsInlined);
       default: throw new Error();
       }
   }
@@ -80,33 +80,33 @@ public class CompileMisc implements CanInline, Inlineable
   }
 
   public static Expression inlineConstantFunction0 (ConstantFunction0 proc,
-                                                    ApplyExp exp, InlineCalls walker,
+                                                    ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     int nargs = exp.getArgCount();
-    if (nargs != 0 && walker != null)
+    if (nargs != 0 && visitor != null)
       {
 	String message = WrongArguments.checkArgCount(proc, nargs);
-	return walker.noteError(message);
+	return visitor.noteError(message);
       }
     return proc.constant;
   }
 
   public static Expression inlineConvert (Convert proc, ApplyExp exp,
-                                   InlineCalls walker,
+                                   InlineCalls visitor,
                                    boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
-    return Invoke.inlineClassName(exp, 0, walker);
+    exp.visitArgs(visitor, argsInlined);
+    return Invoke.inlineClassName(exp, 0, visitor);
   }
 
   public static Expression inlineNot (Not proc, ApplyExp exp,
-                                      InlineCalls walker,
+                                      InlineCalls visitor,
                                       boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
-    return exp.inlineIfConstant(proc, walker);
+    exp.visitArgs(visitor, argsInlined);
+    return exp.inlineIfConstant(proc, visitor);
   }
 
   static gnu.bytecode.ClassType typeType;

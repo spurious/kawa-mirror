@@ -8,21 +8,21 @@ import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.text.SourceLocator;
 
-public class FindCapturedVars extends ExpWalker
+public class FindCapturedVars extends ExpExpVisitor<Void>
 {
   public static void findCapturedVars (Expression exp, Compilation comp)
   {
-    FindCapturedVars walker = new FindCapturedVars();
-    walker.setContext(comp);
-    exp.walk(walker);
+    FindCapturedVars visitor = new FindCapturedVars();
+    visitor.setContext(comp);
+    exp.visit(visitor, null);
   }
 
-  protected Expression walkApplyExp (ApplyExp exp)
+  protected Expression visitApplyExp (ApplyExp exp, Void ignored)
   {
     boolean skipFunc = false;
     // If the func is bound to a module-level known function, and it
     // doesn't need a closure yet (i.e. could be compiled to a static
-    // method), don't walk the function, since that might force it to
+    // method), don't visit the function, since that might force it to
     // unnecessarily get "captured" which might force the current
     // function to require a closure.  That would be wasteful if the
     // alternative is to just call func using invokestatic.  (It is
@@ -48,7 +48,7 @@ public class FindCapturedVars extends ExpWalker
 	  }
       }
     // Similar hack for constructor calls, but here we want to
-    // avoid walking the type argument.
+    // avoid visiting the type argument.
     else if (exp.func instanceof QuoteExp && exp.getArgCount() > 0)
       {
         Object val = ((QuoteExp) exp.func).getValue();
@@ -71,7 +71,7 @@ public class FindCapturedVars extends ExpWalker
                         exp.nextCall = decl.firstCall;
                         decl.firstCall = exp;
                         for (int i = 1;  i < args.length;  i++)
-                          args[i].walk(this);
+                          args[i].visit(this, ignored);
                         return exp;
                       }
                   }
@@ -79,18 +79,18 @@ public class FindCapturedVars extends ExpWalker
           }
       }
     if (! skipFunc)
-      exp.func = (Expression) exp.func.walk(this);
+      exp.func = exp.func.visit(this, ignored);
     if (exitValue == null)
-      exp.args = walkExps(exp.args);
+      exp.args = visitExps(exp.args, ignored);
     return exp;
   }
 
-  public void walkDefaultArgs (LambdaExp exp)
+  public void visitDefaultArgs (LambdaExp exp, Void ignored)
   {
     if (exp.defaultArgs == null)
       return;
 
-    super.walkDefaultArgs(exp);
+    super.visitDefaultArgs(exp, ignored);
 
     // Check if any default expression "captured" a parameters.
     // If so, evaluating a default expression cannot be done until the
@@ -109,9 +109,9 @@ public class FindCapturedVars extends ExpWalker
       }
   }
 
-  protected Expression walkClassExp (ClassExp exp)
+  protected Expression visitClassExp (ClassExp exp, Void ignored)
   {
-    Expression ret = super.walkClassExp(exp);
+    Expression ret = super.visitClassExp(exp, ignored);
     if (! exp.explicitInit && ! exp.instanceType.isInterface())
       // Make sure <init> has been declared, in case we need to invoke it.
       Compilation.getConstructor(exp.instanceType, exp);
@@ -130,7 +130,7 @@ public class FindCapturedVars extends ExpWalker
     return ret;
   }
 
-  protected Expression walkModuleExp (ModuleExp exp)
+  protected Expression visitModuleExp (ModuleExp exp, Void ignored)
   {
     ModuleExp saveModule = currentModule;
     Hashtable saveDecls = unknownDecls;
@@ -138,7 +138,7 @@ public class FindCapturedVars extends ExpWalker
     unknownDecls = null;
     try
       {
-	return walkLambdaExp(exp);
+	return visitLambdaExp(exp, ignored);
       }
     finally
       {
@@ -153,7 +153,7 @@ public class FindCapturedVars extends ExpWalker
       comp.error('w', "no declaration seen for "+name, location);
   }
 
-  protected Expression walkFluidLetExp (FluidLetExp exp)
+  protected Expression visitFluidLetExp (FluidLetExp exp, Void ignored)
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
@@ -166,10 +166,10 @@ public class FindCapturedVars extends ExpWalker
             decl.base = bind;
           }
       }
-    return super.walkLetExp(exp);
+    return super.visitLetExp(exp, ignored);
   }
 
-  protected Expression walkLetExp (LetExp exp)
+  protected Expression visitLetExp (LetExp exp, Void ignored)
   {
     if (exp.body instanceof BeginExp)
       {
@@ -212,7 +212,7 @@ public class FindCapturedVars extends ExpWalker
 	      }
 	  }
       }
-    return super.walkLetExp(exp);
+    return super.visitLetExp(exp, ignored);
   }
 
   static Expression checkInlineable (LambdaExp current,
@@ -267,7 +267,7 @@ public class FindCapturedVars extends ExpWalker
     return r;
   }
 
-  protected Expression walkLambdaExp (LambdaExp exp)
+  protected Expression visitLambdaExp (LambdaExp exp, Void ignored)
   {
     java.util.Set<LambdaExp> seen = new java.util.LinkedHashSet<LambdaExp>();
     // Finish the job that was started in FindTailCalls.
@@ -278,7 +278,7 @@ public class FindCapturedVars extends ExpWalker
         // methods getting too big.
         && (! (exp.outer instanceof ModuleExp) || exp.nameDecl == null))
       exp.setInlineOnly(true);
-    return super.walkLambdaExp(exp);
+    return super.visitLambdaExp(exp, ignored);
   }
 
   public void capture(Declaration decl)
@@ -293,7 +293,9 @@ public class FindCapturedVars extends ExpWalker
       return;
 
     LambdaExp curLambda = getCurrentLambda ();
-    LambdaExp declLambda = decl.getContext().currentLambda ();
+    ScopeExp sc = decl.getContext();
+    if (sc==null) throw new Error("null context for "+decl+" curL:"+curLambda);
+    LambdaExp declLambda = sc.currentLambda ();
 
     // If curLambda is inlined, the function that actually needs a closure
     // is its caller.  We get its caller using getCaller().
@@ -403,7 +405,12 @@ public class FindCapturedVars extends ExpWalker
 		outer = heapLambda.outerLambda();
 	      }
 	  }
-
+        if (declLambda==null) {
+          System.err.println("null declLambda for "+decl+" curL:"+curLambda);
+          ScopeExp c = decl.context;
+          for (; c!=null; c = c.outer)
+            System.err.println("- context:"+c);
+        }
         declLambda.capture(decl);
       }
   }
@@ -451,7 +458,7 @@ public class FindCapturedVars extends ExpWalker
     return decl;
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp)
+  protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
   {
     Declaration decl = exp.getBinding();
     if (decl == null)
@@ -493,7 +500,7 @@ public class FindCapturedVars extends ExpWalker
       capture(decl);
   }
 
-  protected Expression walkThisExp (ThisExp exp)
+  protected Expression visitThisExp (ThisExp exp, Void ignored)
   {
     if (exp.isForContext())
       {
@@ -503,10 +510,10 @@ public class FindCapturedVars extends ExpWalker
         return exp;
       }
     else
-      return walkReferenceExp (exp);
+      return visitReferenceExp(exp, ignored);
   }
 
-  protected Expression walkSetExp (SetExp exp)
+  protected Expression visitSetExp (SetExp exp, Void ignored)
   {
     Declaration decl = exp.binding;
     if (decl == null)
@@ -520,7 +527,7 @@ public class FindCapturedVars extends ExpWalker
 	  decl = Declaration.followAliases(decl);
 	capture(exp.contextDecl(), decl);
       }
-    return super.walkSetExp(exp);
+    return super.visitSetExp(exp, ignored);
   }
 
 }

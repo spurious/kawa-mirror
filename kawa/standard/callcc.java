@@ -73,7 +73,7 @@ public class callcc extends MethodProc implements CanInline, Inlineable
   public static final ClassType typeContinuation =
     ClassType.make("kawa.lang.Continuation");
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
     LambdaExp lexp = canInline(exp);
@@ -81,12 +81,12 @@ public class callcc extends MethodProc implements CanInline, Inlineable
       {
 	lexp.setInlineOnly(true);
 	lexp.returnContinuation = exp;
-        lexp.inlineHome = walker.getCurrentLambda();
+        lexp.inlineHome = visitor.getCurrentLambda();
         Declaration contDecl = lexp.firstDecl();
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);
       }
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     return exp;
   }
 
@@ -161,35 +161,35 @@ public class callcc extends MethodProc implements CanInline, Inlineable
     return Type.pointer_type;
   }
 
-  /** An ExpWalker class to check if callcc exits through a try-finally. */
-  static class ExitThroughFinallyChecker extends ExpWalker
+  /** An ExpVisitor class to check if callcc exits through a try-finally. */
+  static class ExitThroughFinallyChecker extends ExpVisitor<Expression,TryExp>
   {
-    TryExp currentTry = null;
     Declaration decl;
 
     /** Does decl appear in body nested inside a try-finally? */
     public static boolean check (Declaration decl, Expression body)
     {
-      ExitThroughFinallyChecker walker = new ExitThroughFinallyChecker();
-      walker.decl = decl;
-      walker.walk(body);
-      return walker.exitValue != null;
+      ExitThroughFinallyChecker visitor = new ExitThroughFinallyChecker();
+      visitor.decl = decl;
+      visitor.visit(body, null);
+      return visitor.exitValue != null;
     }
 
-    protected Expression walkReferenceExp (ReferenceExp exp)
+    protected Expression defaultValue(Expression r, TryExp d)
+    {
+      return r;
+    }
+
+    protected Expression visitReferenceExp (ReferenceExp exp, TryExp currentTry)
     {
       if (decl == exp.getBinding() && currentTry != null)
         exitValue = Boolean.TRUE;
       return exp;
     }
 
-    protected Expression walkTryExp (TryExp exp)
+    protected Expression visitTryExp (TryExp exp, TryExp currentTry)
     {
-      TryExp saveTry = currentTry;
-      if (exp.getFinallyClause() != null)
-        currentTry = exp;
-      walkExpression(exp);
-      currentTry = saveTry;
+      visitExpression(exp, exp.getFinallyClause() != null ? exp : currentTry);
       return exp;
     }
   }

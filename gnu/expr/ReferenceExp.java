@@ -172,12 +172,14 @@ public class ReferenceExp extends AccessExp
     return copy;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkReferenceExp(this);
+    return visitor.visitReferenceExp(this, d);
   }
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
     decl = this.binding; // We don't use the passed-in Declaration.
     if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
@@ -187,7 +189,7 @@ public class ReferenceExp extends AccessExp
           {
             Expression dval = decl.getValue();
             if (dval != null)
-              return dval.inline(exp, walker, decl, argsInlined);
+              return dval.validateApply(exp, visitor, required, decl, argsInlined);
           }
       }
     else if (getSymbol() instanceof Symbol)
@@ -195,10 +197,10 @@ public class ReferenceExp extends AccessExp
         Symbol symbol = (Symbol) getSymbol();
         Object fval = Environment.getCurrent().getFunction(symbol, null);
         if (fval instanceof Procedure)
-          return new QuoteExp(fval).inline(exp, walker, null, argsInlined);
+          return new QuoteExp(fval).validateApply(exp, visitor, required, null, argsInlined);
       }
     if (! argsInlined)
-      exp.args = walker.walkExps(exp.args, exp.args.length);
+      exp.args = visitor.visitExps(exp.args, exp.args.length, null);
     return exp;
   }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -6,7 +6,7 @@ package gnu.expr;
 /** This resolves references to lexical Declarations.
  * So far it is only used for XQuery, which overrides it. */
 
-public class ResolveNames extends ExpWalker
+public class ResolveNames extends ExpExpVisitor<Void>
 {
   protected NameLookup lookup;
 
@@ -26,7 +26,7 @@ public class ResolveNames extends ExpWalker
     try
       {
         push(exp);
-        exp.walkChildren(this);
+        exp.visitChildren(this, null);
       }
     finally
       {
@@ -41,21 +41,21 @@ public class ResolveNames extends ExpWalker
     lookup.push(exp);
   }
 
-  protected Expression walkScopeExp (ScopeExp exp)
+  protected Expression visitScopeExp (ScopeExp exp, Void ignored)
   {
-    walkDeclarationTypes(exp);
+    visitDeclarationTypes(exp);
     push(exp);
-    exp.walkChildren(this);
+    exp.visitChildren(this, ignored);
     lookup.pop(exp);
     return exp;
   }
 
-  protected Expression walkLetExp (LetExp exp)
+  protected Expression visitLetExp (LetExp exp, Void ignored)
   {
-    walkDeclarationTypes(exp);
-    exp.walkInitializers(this);
+    visitDeclarationTypes(exp);
+    exp.visitInitializers(this, ignored);
     push(exp);
-    exp.body = (Expression) walk(exp.body);
+    exp.body = visit(exp.body, ignored);
     lookup.pop(exp);
     return exp;
   }
@@ -65,7 +65,7 @@ public class ResolveNames extends ExpWalker
     return lookup.lookup(symbol, function);
   }
 
-  protected Expression walkReferenceExp (ReferenceExp exp)
+  protected Expression visitReferenceExp (ReferenceExp exp, Void ignored)
   {
     Declaration decl = exp.getBinding();
     if (decl == null)
@@ -77,7 +77,7 @@ public class ResolveNames extends ExpWalker
     return exp;
  }
 
-  protected Expression walkSetExp (SetExp exp)
+  protected Expression visitSetExp (SetExp exp, Void ignored)
   {
     if (exp.binding == null)
       {
@@ -86,6 +86,6 @@ public class ResolveNames extends ExpWalker
           decl.setCanWrite(true);
         exp.binding = decl;
       }
-    return super.walkSetExp(exp);
+    return super.visitSetExp(exp, ignored);
   }
 }

@@ -84,16 +84,16 @@ public class BlockExp extends Expression
     exitableBlock = null;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkBlockExp(this);
+    return visitor.visitBlockExp(this, d);
   }
 
-  protected void walkChildren (ExpWalker walker)
+  protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {
-    body = walker.walk(body);
-    if (walker.exitValue == null && exitBody != null)
-      exitBody = walker.walk(exitBody);
+    body = visitor.visitAndUpdate(body, d);
+    if (visitor.exitValue == null && exitBody != null)
+      exitBody = visitor.visitAndUpdate(exitBody, d);
   }
 
   public void print (OutPort out)

@@ -1643,35 +1643,35 @@ public class LambdaExp extends ScopeExp
   /** A cache if this has already been evaluated. */
   Procedure thisValue;
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkLambdaExp(this);
+    return visitor.visitLambdaExp(this, d);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    walkChildrenOnly(walker);
-    walkProperties(walker);
+    visitChildrenOnly(visitor, d);
+    visitProperties(visitor, d);
   }
 
-  protected final void walkChildrenOnly(ExpWalker walker)
+  protected final <R,D> void visitChildrenOnly (ExpVisitor<R,D> visitor, D d)
   {
-    LambdaExp save = walker.currentLambda;
-    walker.currentLambda = this;
+    LambdaExp save = visitor.currentLambda;
+    visitor.currentLambda = this;
     try
       {
-        throwsSpecification = walker.walkExps(throwsSpecification);
-	walker.walkDefaultArgs(this);
-	if (walker.exitValue == null && body != null)
-	  body = walker.walk(body);
+        throwsSpecification = visitor.visitExps(throwsSpecification, d);
+	visitor.visitDefaultArgs(this, d);
+	if (visitor.exitValue == null && body != null)
+          body = visitor.update(body, visitor.visit(body, d));
       }
     finally
       {
-	walker.currentLambda = save;
+	visitor.currentLambda = save;
       }
   }
 
-  protected final void walkProperties(ExpWalker walker)
+  protected final <R,D> void visitProperties (ExpVisitor<R,D> visitor, D d)
   {
     if (properties != null)
       {
@@ -1681,7 +1681,7 @@ public class LambdaExp extends ScopeExp
 	    Object val = properties[i];
 	    if (val instanceof Expression)
 	      {
-		properties[i] = walker.walk((Expression) properties[i]);
+		properties[i] = visitor.visitAndUpdate((Expression) val, d);
 	      }
 	  }
       }
@@ -1726,8 +1726,9 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
-                            Declaration decl, boolean argsInlined)
+  public Expression validateApply (ApplyExp exp, InlineCalls visitor,
+                                   Type required,
+                                   Declaration decl, boolean argsInlined)
   {
     Expression[] args = exp.getArgs();
     if (! argsInlined)
@@ -1736,17 +1737,17 @@ public class LambdaExp extends ScopeExp
           {
             Expression inlined = InlineCalls.inlineCall(this, args, true);
             if (inlined != null)
-              return walker.walk(inlined);
+              return visitor.visit(inlined, required);
           }
-        exp.args = walker.walkExps(exp.args, exp.args.length);
+        exp.args = visitor.visitExps(exp.args, null);
       }
     int args_length = exp.args.length;
     String msg = WrongArguments.checkArgCount(getName(),
                                               min_args, max_args, args_length);
     if (msg != null)
-      return walker.noteError(msg);
+      return visitor.noteError(msg);
     int conv = getCallConvention();
-    Compilation comp = walker.getCompilation();
+    Compilation comp = visitor.getCompilation();
     Method method;
     // Mostly duplicates logic with ApplyExp.compile.
     if (comp.inlineOk(this) && isClassMethod()
@@ -1778,20 +1779,20 @@ public class LambdaExp extends ScopeExp
           margs = exp.args;
         else
           {
-            LambdaExp curLambda = walker.getCurrentLambda();
+            LambdaExp curLambda = visitor.getCurrentLambda();
             for (;;)
               {
                 if (curLambda == null)
-                  return walker.noteError("internal error: missing "+this);
+                  return visitor.noteError("internal error: missing "+this);
                 if (curLambda.outer == outer) // I.e. same class.
                   break;
                 curLambda = curLambda.outerLambda();
               }
             Declaration d = curLambda.firstDecl();
             if (d==null || ! d.isThisParameter())
-              return walker.noteError("calling non-static method "
-                                      +getName()+" from static method "
-                                      +curLambda.getName());
+              return visitor.noteError("calling non-static method "
+                                       +getName()+" from static method "
+                                       +curLambda.getName());
             int nargs = exp.getArgCount();
             margs = new Expression[1 + nargs];
             System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);

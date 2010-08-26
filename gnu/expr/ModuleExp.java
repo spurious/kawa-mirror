@@ -453,9 +453,9 @@ public class ModuleExp extends LambdaExp
       }
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkModuleExp(this);
+    return visitor.visitModuleExp(this, d);
   }
 
   public void print (OutPort out)

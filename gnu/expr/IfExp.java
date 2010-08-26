@@ -131,18 +131,18 @@ public class IfExp extends Expression
     code.emitFi();
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkIfExp(this);
+    return visitor.visitIfExp(this, d);
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {
-    test = test.walk(walker);
-    if (walker.exitValue == null)
-      then_clause = walker.walk(then_clause);
-    if (walker.exitValue == null && else_clause != null)
-     else_clause = walker.walk(else_clause);
+    test = visitor.visitAndUpdate(test, d);
+    if (visitor.exitValue == null)
+      then_clause = visitor.visitAndUpdate(then_clause, d);
+    if (visitor.exitValue == null && else_clause != null)
+      else_clause = visitor.visitAndUpdate(else_clause, d);
   }
 
   public gnu.bytecode.Type getType()

@@ -54,14 +54,14 @@ public class ExitExp extends Expression
     return copy;
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkExitExp(this);
+    return visitor.visitExitExp(this, d);
   }
 
-  protected void walkChildren (ExpWalker walker)
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
   {
-    result = walker.walk(result);
+    result = visitor.visitAndUpdate(result, d);
   }
 
   public void print (OutPort out)

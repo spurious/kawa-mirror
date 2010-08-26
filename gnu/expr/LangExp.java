@@ -24,9 +24,9 @@ public class LangExp extends Expression
     out.print("(LangExp ???)");
   }
 
-  protected Expression walk (ExpWalker walker)
+  protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return walker.walkLangExp(this);
+    return visitor.visitLangExp(this, d);
   }
 
   public void compile (Compilation comp, Target target)

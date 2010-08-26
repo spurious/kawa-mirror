@@ -388,15 +388,15 @@ public class Invoke extends ProcedureN implements CanInline
     return exp;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
-    Compilation comp = walker.getCompilation();
+    exp.visitArgs(visitor, argsInlined);
+    Compilation comp = visitor.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (! comp.mustCompile
-        // This should never happen, as InlineCalls.walkApplyExp
+        // This should never happen, as InlineCalls.visitApplyExp
         // checks the number of arguments before inline is called.
         || nargs == 0 || ((kind == 'V' || kind == '*') && nargs == 1))
       return exp;
@@ -508,8 +508,8 @@ public class Invoke extends ProcedureN implements CanInline
               {
                 Expression[] xargs = new Expression[nargs-1];
                 System.arraycopy(args, 1, xargs, 0, nargs-1);
-                return ((InlineCalls) walker)
-                  .walkApplyOnly(new ApplyExp(constructor, xargs));
+                return visitor
+                  .visitApplyOnly(new ApplyExp(constructor, xargs), null/*FIXME*/);
               }
           }
         PrimProcedure[] methods;

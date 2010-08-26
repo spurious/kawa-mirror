@@ -57,9 +57,9 @@ public class CatchClause extends LetExp
     code.popScope ();
   }
 
-  protected void walkChildren(ExpWalker walker)
+  protected <R,D> void visitChildren(ExpVisitor<R,D> visitor, D d)
   {
-    body = walker.walk(body);
+    body = visitor.visitAndUpdate(body, d);
   }
 
   public void print (OutPort out)

@@ -26,16 +26,16 @@ public class AppendValues extends MethodProc implements CanInline, Inlineable
       }
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls walker,
+  public Expression inline (ApplyExp exp, InlineCalls visitor,
                             boolean argsInlined)
   {
-    exp.walkArgs(walker, argsInlined);
+    exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       return args[0];
     if (args.length == 0)
       return QuoteExp.voidExp;
-    Expression folded = exp.inlineIfConstant(this, walker);
+    Expression folded = exp.inlineIfConstant(this, visitor);
     if (folded != exp)
       return folded;
     return exp;

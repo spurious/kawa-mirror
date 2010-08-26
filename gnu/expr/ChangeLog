@@ -1,5 +1,27 @@
 2010-08-26  Per Bothner  <per@bothner.com>
 
+	Replace ExpWalker expression-visitor API by new ExpVisitor.
+	* ExpWalker.java: Removed - replaced by ...
+	* ExpVisitor.java:  New generic abstract class.
+	* ExpExpVisitor.java: New convenience class extends ExpVisitor.
+	* PushApply.java: Change to extend ExpExpVisitor.
+	* ResolveNames.java: Likewise.
+	* FindCapturedVars.java: Likewise.
+	* ChainLambda.java: Extend ExpVisitor, and change to pass
+	current scope as parameter rather than field.
+	* FindTailCalls.java: Likewise pass in returnContinuation.
+	* InlineCalls.java: Likewise, passing in "expected type".
+	The beginnings of a general type-checking framework.
+	* Expression.java (walk(ExpWalker,D)): Replace by ...
+	(visit(ExpVisitor,D)): new method.
+	(walkChildren(ExpWalker)): Replace by ...
+	(visitChildren(ExpVisitor,D): New method.
+	(inline): Replace by ...
+	(validateApply): New method.
+	* ApplyExp.java, BeginExp.java, BlockExp.java, CatchClause, ClassExp.java, ExitExp.java, FluidLetExp.java, IfExp.java, LambdaExp.java, LangExp.java, ModulExp.java, ObjectExp.java, ReferenceExp.java, ScopeExp.java, ThisExp.java, TryExp.java, SetExp.java, SynchronizedExp.java: Update accordingly.
+
+2010-08-26  Per Bothner  <per@bothner.com>
+
 	* LambdaExp.java (getClassType): new method.
 	* ClassExp.java (getClassType, getType): New overriddes.
 	* ObjectExp.java (getType): New override.

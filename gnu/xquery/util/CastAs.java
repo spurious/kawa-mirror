@@ -6,10 +6,17 @@ import gnu.kawa.xml.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.mapping.Values;
+import gnu.mapping.Procedure;
 
 public class CastAs extends Convert
 {
   public static final CastAs castAs = new CastAs();
+
+  public CastAs ()
+  {
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.xquery.util.CompileMisc:validateApplyCastAs");
+  }
 
   public Object apply2 (Object arg1, Object arg2)
   {
@@ -59,26 +66,9 @@ public class CastAs extends Convert
     return super.apply2(arg1, arg2);
   }
 
-  static final ClassType typeXDataType =
-    ClassType.make("gnu.kawa.xml.XDataType");
-  static final Method castMethod = typeXDataType.getDeclaredMethod("cast", 1);
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    exp = Invoke.inlineClassName(exp, 0, visitor);
-    Expression[] args = exp.getArgs();
-    if (args.length != 2 || ! (args[0] instanceof QuoteExp))
-      return exp;
-    Object type = ((QuoteExp) args[0]).getValue();
-    if (type instanceof XDataType)
-      return new ApplyExp(castMethod, args);
-    return exp;
-  }
-
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    // To override Convert.compile.
     ApplyExp.compile(exp, comp, target);
   }
 }

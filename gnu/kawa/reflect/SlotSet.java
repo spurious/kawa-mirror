@@ -4,7 +4,7 @@ import gnu.bytecode.*;
 import gnu.lists.FString;
 import gnu.expr.*;
 
-public class SlotSet extends Procedure3 implements CanInline, Inlineable
+public class SlotSet extends Procedure3 implements Inlineable
 {
   /** True if this is a "static-field" operation. */
   boolean isStatic;
@@ -24,6 +24,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   {
     super(name);
     this.isStatic = isStatic;
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.reflect.CompileReflect:validateApplySlotSet");
   }
 
   public static void setField (Object obj, String name, Object value)
@@ -166,20 +168,6 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
           code.emitInvoke(method);
         return;
       }
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    // Unlike, for SlotGet, we do the field-lookup at compile time
-    // rather than inline time.  The main reason is that optimizing
-    // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)
-    // afte we've inlined setter, this method doesn't get called.
-    if (isStatic && visitor.getCompilation().mustCompile)
-      return Invoke.inlineClassName (exp, 0, visitor);
-    else
-      return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

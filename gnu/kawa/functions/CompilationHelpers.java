@@ -2,6 +2,7 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.mapping.*;
+import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.reflect.ArrayGet;
 import gnu.kawa.reflect.ArraySet;
@@ -71,7 +72,7 @@ public class CompilationHelpers
               args[i] = visitor.visit(args[i], null);
           }
         // This might be more cleanly handled at the type specifier. FIXME
-        if (Invoke.checkKnownClass(ptype, comp) < 0)
+        if (CompileReflect.checkKnownClass(ptype, comp) < 0)
           return exp;
         ClassType ctype;
         if (ptype.isSubtype(Compilation.typeType)

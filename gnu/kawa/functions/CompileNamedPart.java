@@ -61,7 +61,7 @@ public class CompileNamedPart
             // However, it makes optimzing the 'setter' case harder.
             return new QuoteExp(new NamedPart(typeval, mname, 'D'));
           }
-        if (Invoke.checkKnownClass(typeval, comp) < 0)
+        if (CompileReflect.checkKnownClass(typeval, comp) < 0)
           return exp;
         PrimProcedure[] methods
           = ClassMethods.getMethods((ObjectType) typeval,

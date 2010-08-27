@@ -15,13 +15,15 @@ import gnu.mapping.*;
  * must be LambdaExps, and the call must be inlined.
  */
 
-public class TypeSwitch extends MethodProc implements CanInline, Inlineable
+public class TypeSwitch extends MethodProc implements Inlineable
 {
   public static final TypeSwitch typeSwitch = new TypeSwitch("typeswitch");
 
   public TypeSwitch(String name)
   {
     setName(name);
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.reflect.CompileReflect:validateApplyTypeSwitch");
   }
 
   public int numArgs() { return 0xfffff002; }
@@ -40,24 +42,6 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
       }
     Procedure defaultProc = (Procedure) args[n];
     defaultProc.check1(selector, ctx);
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    Expression[] args = exp.getArgs();
-    for (int i = 1;  i < args.length;  i++)
-      {
-	if (args[i] instanceof LambdaExp)
-	  {
-	    LambdaExp lexp = (LambdaExp) args[i];
-	    lexp.setInlineOnly(true);
-	    lexp.returnContinuation = exp;
-            lexp.inlineHome = visitor.getCurrentLambda();
-	  }
-      }
-    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

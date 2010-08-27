@@ -4,6 +4,7 @@ import gnu.xquery.lang.XQuery;
 import gnu.bytecode.*;
 import gnu.kawa.xml.*;
 import gnu.expr.*;
+import gnu.mapping.Procedure;
 
 public class CastableAs extends InstanceOf
 {
@@ -12,6 +13,8 @@ public class CastableAs extends InstanceOf
   CastableAs ()
   {
     super(XQuery.getInstance(), "castable as");
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.xquery.util.CompileMisc:validateApplyCastableAs");
   }
 
   public Object apply2 (Object arg1, Object arg2)
@@ -23,24 +26,6 @@ public class CastableAs extends InstanceOf
     else
       result = type.isInstance(arg1);
     return language.booleanObject(result);
-  }
-
-  static final Method castableMethod
-    = CastAs.typeXDataType.getDeclaredMethod("castable", 1);
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    exp = Invoke.inlineClassName(exp, 1, visitor);
-    Expression[] args = exp.getArgs();
-    if (args.length != 2 || ! (args[1] instanceof QuoteExp))
-      return exp;
-    Object type = ((QuoteExp) args[1]).getValue();
-    if (type instanceof XDataType)
-      return new ApplyExp(castableMethod,
-                          new Expression[] { args[1], args[0] });
-    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

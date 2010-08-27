@@ -1,5 +1,10 @@
 2010-08-27  Per Bothner  <per@bothner.com>
 
+	* CastableAs.java: Update to use Procedure.validateApplyKey,
+	and move inlineXxx method to CompileMisc.
+	* CastAs.java: Likewise.
+	* CompileMisc.java: New (Moved/renamed) validateXxx methods.
+
 	* ValuesFilter.java: Update to use Procedure.validateApplyKey,
 	and move inlineXxx method to CompileMisc.
 	* RelativeStep.java: Likewise.

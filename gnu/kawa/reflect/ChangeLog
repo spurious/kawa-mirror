@@ -1,3 +1,15 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java: Update to use Procedure.validateApplyKey,
+	and move inlineXxx method to CompileReflect.
+	* InstanceOf.java: Likewise.
+	* SlotSet.java: Likewise.
+	* SlotGet.java: Likewise.
+	* Invoke.java: Similar, but move a bunch of methods to CompileInvoke.
+	* CompileInvoke.java: New class.
+	* CompileReflect.java: New class.
+	* Makefile.am: Update accordingly.
+
 2010-08-20  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (setWithSave, setRestore): Remove unused ctx

@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
@@ -252,7 +253,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
       {
-        if (Invoke.checkKnownClass(decl.getType(), comp) < 0)
+        if (CompileReflect.checkKnownClass(decl.getType(), comp) < 0)
           decl.setType(Type.errorType);
       }
     /*

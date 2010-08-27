@@ -192,6 +192,8 @@ java_sources = \
   ClassMemberLocation.java \
   ClassMethods.java \
   CompileArrays.java \
+  CompileInvoke.java \
+  CompileReflect.java \
   FieldLocation.java \
   InstanceOf.java \
   Invoke.java \

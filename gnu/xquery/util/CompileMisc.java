@@ -9,6 +9,7 @@ import gnu.xquery.lang.XQuery;
 import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.functions.ValuesMap;
+import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.reflect.OccurrenceType;
 
 public class CompileMisc
@@ -365,5 +366,43 @@ public class CompileMisc
     PrimProcedure.compileInvoke(comp, mm, target, exp.isTailCall(),
                                 182/*invokevirtual*/, Type.pointer_type);
     code.popScope();
+  }
+
+  static final ClassType typeXDataType =
+    ClassType.make("gnu.kawa.xml.XDataType");
+  static final Method castMethod = typeXDataType.getDeclaredMethod("cast", 1);
+
+  public static Expression validateApplyCastAs
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    exp = CompileReflect.inlineClassName(exp, 0, visitor);
+    Expression[] args = exp.getArgs();
+    if (args.length != 2 || ! (args[0] instanceof QuoteExp))
+      return exp;
+    Object type = ((QuoteExp) args[0]).getValue();
+    if (type instanceof XDataType)
+      return new ApplyExp(castMethod, args);
+    return exp;
+  }
+
+  static final Method castableMethod
+    = typeXDataType.getDeclaredMethod("castable", 1);
+
+  public static Expression validateApplyCastableAs
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    exp = CompileReflect.inlineClassName(exp, 1, visitor);
+    Expression[] args = exp.getArgs();
+    if (args.length != 2 || ! (args[1] instanceof QuoteExp))
+      return exp;
+    Object type = ((QuoteExp) args[1]).getValue();
+    if (type instanceof XDataType)
+      return new ApplyExp(castableMethod,
+                          new Expression[] { args[1], args[0] });
+    return exp;
   }
 }

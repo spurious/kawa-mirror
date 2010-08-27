@@ -1,5 +1,8 @@
 2010-08-27  Per Bothner  <per@bothner.com>
 
+	* CompilationHelpers.java, CompileMisc.java, CompileNamedPart.java:
+	Update for changes in gnu.kawa.reflect.
+
 	*  NumberCompare.java: Update to use Procedure.validateApplyKey,
 	and move inlineXxx method to CompileArith.
 	* AppendValues.java: Likewise, except moving method to CompileMisc.

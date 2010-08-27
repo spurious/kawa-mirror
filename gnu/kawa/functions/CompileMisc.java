@@ -2,7 +2,7 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.reflect.Invoke;
+import gnu.kawa.reflect.CompileReflect;
 import gnu.kawa.lispexpr.LangObjType;
 import kawa.standard.Scheme;
 
@@ -74,7 +74,7 @@ public class CompileMisc implements Inlineable
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
-    return Invoke.inlineClassName(exp, 0, visitor);
+    return CompileReflect.inlineClassName(exp, 0, visitor);
   }
 
   public static Expression validateApplyNot

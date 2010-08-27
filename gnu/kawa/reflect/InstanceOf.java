@@ -3,18 +3,20 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class InstanceOf extends Procedure2 implements CanInline, Inlineable
+public class InstanceOf extends Procedure2 implements Inlineable
 {
   protected Language language;
 
   public InstanceOf(Language language)
   {
     this.language = language;
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.reflect.CompileReflect:validateApplyInstanceOf");
   }
 
   public InstanceOf(Language language, String name)
   {
-    this.language = language;
+    this(language);
     setName(name);
   }
 
@@ -26,39 +28,6 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method instanceMethod;
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    exp = Invoke.inlineClassName(exp, 1, visitor);
-    Expression[] args = exp.getArgs();
-    if (args.length == 2)
-      {
-        Expression value = args[0];
-        Expression texp = args[1];
-        if (texp instanceof QuoteExp)
-          {
-            Object t = ((QuoteExp) texp).getValue();
-            if (t instanceof Type)
-              {
-                Type type = (Type) t;
-                if (value instanceof QuoteExp)
-                  return type.isInstance(((QuoteExp) value).getValue())
-                    ? QuoteExp.trueExp : QuoteExp.falseExp;
-                if (! value.side_effects())
-                  {
-                    int comp = type.compare(value.getType());
-                    if (comp == 1 || comp == 0)
-                      return QuoteExp.trueExp;
-                    if (comp == -3)
-                      return QuoteExp.falseExp;
-                  }
-              }
-          }
-      }
-    return exp;
-  }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {

@@ -13,6 +13,7 @@ java_sources=\
   ArrayRef.java \
   ArraySet.java \
   BitwiseOp.java \
+  CallCC.java \
   CompilationHelpers.java \
   CompileArith.java \
   CompileNamedPart.java \
@@ -30,6 +31,7 @@ java_sources=\
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
   MakeProcedure.java \
+  Map.java \
   MultiplyOp.java \
   Not.java \
   NumberCompare.java \

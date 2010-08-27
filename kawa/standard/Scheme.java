@@ -32,8 +32,8 @@ public class Scheme extends LispLanguage
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf;
   public static final Not not;
-  public static final kawa.standard.map map;
-  public static final kawa.standard.map forEach;
+  public static final gnu.kawa.functions.Map map;
+  public static final gnu.kawa.functions.Map forEach;
   public static final gnu.kawa.functions.IsEq isEq;
   public static final gnu.kawa.functions.IsEqv isEqv;
   public static final gnu.kawa.functions.IsEqual isEqual;
@@ -62,12 +62,12 @@ public class Scheme extends LispLanguage
     applyFieldDecl
       = Declaration.getDeclarationFromStatic("kawa.standard.Scheme",
                                              "applyToArgs");
-    map = new map(true, applyToArgs, applyFieldDecl);
-    forEach = new map(false, applyToArgs, applyFieldDecl);
     apply = new Apply("apply", applyToArgs);
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
+    map = new gnu.kawa.functions.Map(true, applyToArgs, applyFieldDecl, isEq);
+    forEach = new gnu.kawa.functions.Map(false, applyToArgs, applyFieldDecl, isEq);
     numEqu = NumberCompare.make(instance, "=",
                                 NumberCompare.TRUE_IF_EQU);
     numGrt = NumberCompare.make(instance, ">",
@@ -368,7 +368,7 @@ public class Scheme extends LispLanguage
       defProcStFld("map", "kawa.standard.Scheme", "map");
       defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
       defProcStFld("call-with-current-continuation",
-                   "kawa.standard.callcc", "callcc");
+                   "gnu.kawa.functions.CallCC", "callcc");
       defProcStFld("call/cc", "kawa.standard.callcc", "callcc");
       defProcStFld("force", "kawa.lib.misc");
 

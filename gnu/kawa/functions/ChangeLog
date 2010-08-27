@@ -1,5 +1,10 @@
 2010-08-27  Per Bothner  <per@bothner.com>
 
+	* Map.java: Moved/renamed from kawa/standard/map.java.
+	* CallCC.java: Moved/renamed from kawa/standard/callcc.java.
+	* CompileMisc.java: Moved validateApply (inline) code from above here.
+	* Makefile.am: Update accordingly.
+
 	* CompilationHelpers.java, CompileMisc.java, CompileNamedPart.java:
 	Update for changes in gnu.kawa.reflect.
 

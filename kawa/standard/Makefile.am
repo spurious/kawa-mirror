@@ -20,8 +20,6 @@ read_line.java \
 char_ready_p.java \
 load.java \
 constant_fold.java \
-map.java \
-callcc.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java \
 syntax.java syntax_case.java \

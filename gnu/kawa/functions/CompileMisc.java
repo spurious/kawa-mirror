@@ -2,8 +2,9 @@ package gnu.kawa.functions;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.reflect.CompileReflect;
+import gnu.kawa.reflect.*;
 import gnu.kawa.lispexpr.LangObjType;
+import gnu.lists.LList;
 import kawa.standard.Scheme;
 
 public class CompileMisc implements Inlineable
@@ -252,5 +253,256 @@ public class CompileMisc implements Inlineable
 	  return type;
       }
     return Type.pointer_type;
+  }
+
+  public static Expression validateApplyCallCC
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    LambdaExp lexp = canInlineCallCC(exp);
+    if (lexp != null)
+      {
+	lexp.setInlineOnly(true);
+	lexp.returnContinuation = exp;
+        lexp.inlineHome = visitor.getCurrentLambda();
+        Declaration contDecl = lexp.firstDecl();
+        if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
+          contDecl.setType(typeContinuation);
+      }
+    exp.visitArgs(visitor, argsInlined);
+    return exp;
+  }
+
+  public static final ClassType typeContinuation =
+    ClassType.make("kawa.lang.Continuation");
+
+  public static void compileCallCC (ApplyExp exp, Compilation comp, Target target, Procedure proc)
+  {
+    LambdaExp lambda = canInlineCallCC(exp);
+    if (lambda == null)
+      {
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    CodeAttr code = comp.getCode();
+    final Declaration param = lambda.firstDecl();
+    if (param.isSimple() && ! param.getCanRead() && ! param.getCanWrite())
+      {
+        CompileTimeContinuation contProxy = new CompileTimeContinuation();
+        Type rtype = target instanceof StackTarget ? target.getType() : null;
+        boolean runFinallyBlocks
+          = ExitThroughFinallyChecker.check(param, lambda.body);
+        ExitableBlock bl = code.startExitableBlock(rtype, runFinallyBlocks);
+        contProxy.exitableBlock = bl;
+        contProxy.blockTarget = target;
+        param.setValue(new QuoteExp(contProxy));
+        lambda.body.compile(comp, target);
+        code.endExitableBlock();
+        return;
+      }
+
+    Scope sc = code.pushScope();
+    Variable contVar = sc.addVariable(code, typeContinuation, null);
+    Declaration contDecl = new Declaration(contVar);
+    code.emitNew(typeContinuation);
+    code.emitDup(typeContinuation);
+    comp.loadCallContext();
+    code.emitInvokeSpecial(typeContinuation.getDeclaredMethod("<init>", 1));
+    code.emitStore(contVar);
+    code.emitTryStart(false, target instanceof IgnoreTarget || target instanceof ConsumerTarget ? null : Type.objectType);
+    ApplyExp app = new ApplyExp(lambda, new Expression[] { new ReferenceExp(contDecl) });
+    app.compile(comp, target);
+    // Emit: cont.invoked = true
+    if (code.reachableHere())
+      {
+        code.emitLoad(contVar);
+        code.emitPushInt(1);
+        code.emitPutField(typeContinuation.getField("invoked"));
+      }
+    code.emitTryEnd();
+
+    // Emit: catch (Throwable ex) { handleException$(ex, cont, ctx); }
+    code.emitCatchStart(null);
+    code.emitLoad(contVar);
+    if (target instanceof ConsumerTarget)
+      {
+        comp.loadCallContext();
+        Method handleMethod = typeContinuation.getDeclaredMethod("handleException$X", 3);
+        code.emitInvokeStatic(handleMethod);
+      }
+    else
+      {
+        Method handleMethod = typeContinuation.getDeclaredMethod("handleException", 2);
+        code.emitInvokeStatic(handleMethod);
+        target.compileFromStack(comp, Type.objectType);
+      }
+    code.emitCatchEnd();
+
+    code.emitTryCatchEnd();
+    code.popScope();
+  }
+
+  /** If we can inline, return LambdaExp for first arg; otherwise null. */
+  private static LambdaExp canInlineCallCC (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    Expression arg0;
+    if (args.length == 1 && (arg0 = args[0]) instanceof LambdaExp)
+      {
+        LambdaExp lexp = (LambdaExp) arg0;
+        if (lexp.min_args == 1 && lexp.max_args == 1
+            && ! lexp.firstDecl().getCanWrite())
+          {
+            return lexp;
+          }
+      }
+    return null;
+  }
+
+  /** An ExpVisitor class to check if callcc exits through a try-finally. */
+  static class ExitThroughFinallyChecker extends ExpVisitor<Expression,TryExp>
+  {
+    Declaration decl;
+
+    /** Does decl appear in body nested inside a try-finally? */
+    public static boolean check (Declaration decl, Expression body)
+    {
+      ExitThroughFinallyChecker visitor = new ExitThroughFinallyChecker();
+      visitor.decl = decl;
+      visitor.visit(body, null);
+      return visitor.exitValue != null;
+    }
+
+    protected Expression defaultValue(Expression r, TryExp d)
+    {
+      return r;
+    }
+
+    protected Expression visitReferenceExp (ReferenceExp exp, TryExp currentTry)
+    {
+      if (decl == exp.getBinding() && currentTry != null)
+        exitValue = Boolean.TRUE;
+      return exp;
+    }
+
+    protected Expression visitTryExp (TryExp exp, TryExp currentTry)
+    {
+      visitExpression(exp, exp.getFinallyClause() != null ? exp : currentTry);
+      return exp;
+    }
+  }
+
+  public static Expression validateApplyMap
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure xproc)
+  {
+    Map mproc = (Map) xproc;
+    boolean collect = mproc.collect;
+    // FIXME: We should inline the list arguments first before inlining the
+    // procedure argument, for better type inference etc.
+    exp.visitArgs(visitor, argsInlined);
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    if (nargs < 2)
+      return exp;  // ERROR
+
+    nargs--;
+
+    Expression proc = args[0];
+    // If evaluating proc doesn't have side-effects, then we want to do
+    // so inside loop, since that turns a "read" info a "call", which
+    // may allow better inlining.
+    boolean procSafeForMultipleEvaluation = ! proc.side_effects();
+
+    // First an outer (let ((%proc PROC)) L2), where PROC is args[0].
+    Expression[] inits1 = new Expression[1];
+    inits1[0] = proc;
+    LetExp let1 = new LetExp(inits1);
+    Declaration procDecl
+      = let1.addDeclaration("%proc", Compilation.typeProcedure);
+    procDecl.noteValue(args[0]);
+
+    // Then an inner L2=(let ((%loop (lambda (argi ...) ...))) (%loop ...))
+    Expression[] inits2 = new Expression[1];
+    LetExp let2 = new LetExp(inits2);
+    let1.setBody(let2);
+    LambdaExp lexp = new LambdaExp(collect ? nargs + 1 : nargs);
+    inits2[0] = lexp;
+    Declaration loopDecl = let2.addDeclaration("%loop");
+    loopDecl.noteValue(lexp);
+
+    // Finally an inner L3=(let ((parg1 (as <pair> arg1)) ...) ...)
+    Expression[] inits3 = new Expression[nargs];
+    LetExp let3 = new LetExp(inits3);
+
+    Declaration[] largs = new Declaration[nargs];
+    Declaration[] pargs = new Declaration[nargs];
+    for (int i = 0;  i < nargs;  i++)
+      {
+	String argName = "arg"+i;
+	largs[i] = lexp.addDeclaration(argName);
+	pargs[i] = let3.addDeclaration(argName, Compilation.typePair);
+	inits3[i] = new ReferenceExp(largs[i]);
+	pargs[i].noteValue(inits3[i]);
+      }
+    Declaration resultDecl = collect ? lexp.addDeclaration("result") : null;
+    Expression[] doArgs = new Expression[1+nargs];
+    Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
+    for (int i = 0;  i < nargs;  i++)
+      {
+	doArgs[i+1] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car"), null);
+	recArgs[i] = visitor.visitApplyOnly(SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr"), null);
+      }
+    if (! procSafeForMultipleEvaluation)
+      proc = new ReferenceExp(procDecl);
+    doArgs[0] = proc;
+    Expression doit = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(mproc.applyFieldDecl), doArgs), null);
+    Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
+    if (collect)
+      {
+	Expression[] consArgs = new Expression[2];
+	consArgs[0] = doit;
+	consArgs[1] = new ReferenceExp(resultDecl);
+	recArgs[nargs] = Invoke.makeInvokeStatic(Compilation.typePair,
+						 "make", consArgs);
+	lexp.body = rec;
+      }
+    else
+      {
+	lexp.body = new BeginExp(doit, rec);
+      }
+    let3.setBody(lexp.body);
+    lexp.body = let3;
+    Expression[] initArgs = new Expression[collect ? nargs + 1 : nargs];
+    QuoteExp empty = new QuoteExp(LList.Empty);
+    for (int i = nargs;  --i >= 0; )
+      {
+	Expression[] compArgs = new Expression[2];
+	compArgs[0] = new ReferenceExp(largs[i]);
+	compArgs[1] = empty;
+	Expression result
+	  = collect ? (Expression) new ReferenceExp(resultDecl)
+	  : (Expression) QuoteExp.voidExp;
+	lexp.body = new IfExp(visitor.visitApplyOnly(new ApplyExp(mproc.isEq, compArgs), null),
+			      result, lexp.body);
+	initArgs[i] = args[i+1];
+      }
+    if (collect)
+      initArgs[nargs] = empty;
+
+    Expression body = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), initArgs), null);
+    if (collect)
+      {
+	Expression[] reverseArgs = new Expression[1];
+	reverseArgs[0] = body;
+	body = Invoke.makeInvokeStatic(Compilation.scmListType,
+				       "reverseInPlace", reverseArgs);
+      }
+    let2.setBody(body);
+
+    if (procSafeForMultipleEvaluation)
+      return let2;
+    else
+      return let1;
   }
 }

@@ -1,3 +1,10 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	* standard/map.java: Oved/renamed to gnu/kawa/functions/Map.java.
+	* standard/callcc.java: Moved/renamed to gnu/kawa/functions/CallCC.java.
+	* standard/Makefile.am: Update accordingly.
+	* standard/Scheme.java: Update accordingly.
+
 2010-08-26  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (rewrite): Use new ClassExp#getClassType.

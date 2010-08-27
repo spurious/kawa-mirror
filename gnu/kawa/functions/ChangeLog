@@ -1,3 +1,15 @@
+2010-08-26  Per Bothner  <per@bothner.com>
+
+	* ApplyToArgs.java: Update to use Procedure.validateApplyKey.
+	* GetNamedPart.java: Likewise.
+	* SetNamedPart.java: Likewise.
+	* GetNamedInstancePart.java: Likewise.
+	* IsEqv.java: Likewise.
+	* Setter.java: Likewise.
+	* CompilationHelpers.java: Rename inlineXxx methods to validateXxx
+	methods that take an extra require_type parameter.
+	* CompileNamedPart.java: Likewise.
+
 2010-08-19  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java: Update to use new Environment-setting methods.

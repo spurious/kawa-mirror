@@ -1,3 +1,11 @@
+2010-08-26  Per Bothner  <per@bothner.com>
+
+	* ArithOp.java: Update to use Procedure.validateApplyKey.
+	* BooleanValue.java: Likewise.
+	* Compare.java: Likewise.
+	* CompileMisc.java: Rename inlineXxx methods to validateXxx
+	methods that take an extra require_type parameter.
+
 2010-04-10  Per Bothner  <per@bothner.com>
 
 	* StringUtils.java (normalizeUnicode): Add a try-catch for a better

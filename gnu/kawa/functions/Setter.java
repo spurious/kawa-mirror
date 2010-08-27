@@ -12,8 +12,8 @@ public class Setter extends Procedure1 implements HasSetter
   public static final Setter setter = new Setter();
   static {
     setter.setName("setter");
-    setter.setProperty(Procedure.inlinerKey,
-                       "gnu.kawa.functions.CompilationHelpers:inlineSetter");
+    setter.setProperty(Procedure.validateApplyKey,
+                       "gnu.kawa.functions.CompilationHelpers:validateSetter");
   }
 
   public static Object setter (Procedure arg)

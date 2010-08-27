@@ -22,8 +22,8 @@ public class GetNamedInstancePart extends ProcedureN
 
   public GetNamedInstancePart ()
   {
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompileNamedPart:inlineGetNamedInstancePart");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileNamedPart:validateGetNamedInstancePart");
   }
 
   public GetNamedInstancePart (String name)
@@ -90,8 +90,8 @@ class SetNamedInstancePart extends Procedure2
 
   public SetNamedInstancePart ()
   {
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompileNamedPart:inlineSetNamedInstancePart");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileNamedPart:validateSetNamedInstancePart");
   }
 
   public SetNamedInstancePart (String name)

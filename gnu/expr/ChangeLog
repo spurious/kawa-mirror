@@ -1,5 +1,9 @@
 2010-08-26  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (maybeInline): Support new inliner methods with
+	key Procedure.valiateApplyKey.
+	These need an extra required-Type argument.
+
 	Replace ExpWalker expression-visitor API by new ExpVisitor.
 	* ExpWalker.java: Removed - replaced by ...
 	* ExpVisitor.java:  New generic abstract class.

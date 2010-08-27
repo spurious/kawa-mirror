@@ -16,8 +16,8 @@ public class IsEqv extends Procedure2
     this.language = language;
     this.isEq = isEq;
     setName(name);
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompilationHelpers:inlineIsEqv");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompilationHelpers:validateIsEqv");
   }
 
   public static boolean apply (Object arg1, Object arg2) 

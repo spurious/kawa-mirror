@@ -33,11 +33,10 @@ public class CompilationHelpers
   // = ClassType.make("gnu.lists.Sequence");
   /* #endif */
 
-  public static Expression inlineApplyToArgs
+  public static Expression validateApplyToArgs
   (ApplyExp exp, InlineCalls visitor,
-   boolean argsInlined, Procedure applyToArgs)
+   Type required, boolean argsInlined, Procedure applyToArgs)
   {
-    Type required = null; // FIXME
     Expression[] args = exp.getArgs();
     int nargs = args.length - 1;
     if (nargs >= 0)
@@ -108,8 +107,8 @@ public class CompilationHelpers
   public static final Declaration setterDecl = new Declaration("setter", setterField);
   static { setterDecl.noteValue(new QuoteExp(Setter.setter)); }
 
-  public static Expression inlineSetter
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateSetter
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
@@ -158,8 +157,8 @@ public class CompilationHelpers
     return exp;
   }
 
-  public static Expression inlineIsEqv
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateIsEqv
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);

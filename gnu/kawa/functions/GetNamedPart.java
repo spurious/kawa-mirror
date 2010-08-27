@@ -12,8 +12,8 @@ public class GetNamedPart extends Procedure2 implements HasSetter
 {
   public static final GetNamedPart getNamedPart = new GetNamedPart();
   static {
-      getNamedPart.setProperty(Procedure.inlinerKey,
-                       "gnu.kawa.functions.CompileNamedPart:inlineGetNamedPart");
+      getNamedPart.setProperty(Procedure.validateApplyKey,
+                       "gnu.kawa.functions.CompileNamedPart:validateGetNamedPart");
   }
 
 
@@ -144,8 +144,8 @@ class NamedPart extends ProcedureN
     this.container = container;
     this.member = member;
     this.kind = kind;
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompileNamedPart:inlineNamedPart");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileNamedPart:validateNamedPart");
   }
 
   public NamedPart (Object container, String mname, char kind,
@@ -277,8 +277,8 @@ class NamedPartSetter extends gnu.mapping.Setter
   public NamedPartSetter (NamedPart getter)
   {
     super(getter);
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompileNamedPart:inlineNamedPartSetter");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileNamedPart:validateNamedPartSetter");
   }
 
   public int numArgs()

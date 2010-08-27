@@ -17,8 +17,8 @@ public class BooleanValue extends Procedure1
   public BooleanValue (String name)
   {
     super(name);
-    setProperty(Procedure.inlinerKey,
-                "gnu.xquery.util.CompileMisc:inlineBooleanValue");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.xquery.util.CompileMisc:validateBooleanValue");
   }
 
   public static boolean booleanValue(Object value)

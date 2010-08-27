@@ -10,8 +10,8 @@ public class SetNamedPart extends Procedure3 implements HasSetter
   public static final SetNamedPart setNamedPart = new SetNamedPart();
   static {
     setNamedPart.setName("setNamedPart");
-    setNamedPart.setProperty(Procedure.inlinerKey,
-                       "gnu.kawa.functions.CompileNamedPart:inlineSetNamedPart");
+    setNamedPart.setProperty(Procedure.validateApplyKey,
+                       "gnu.kawa.functions.CompileNamedPart:validateSetNamedPart");
   }
 
   public Object apply3 (Object container, Object part, Object value)

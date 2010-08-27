@@ -123,8 +123,8 @@ public class ApplyToArgs extends ProcedureN
   {
     super(name);
     this.language = language;
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompilationHelpers:inlineApplyToArgs");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompilationHelpers:validateApplyToArgs");
   }
 
   Language language;

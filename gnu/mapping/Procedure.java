@@ -12,12 +12,21 @@ public abstract class Procedure extends PropertySet
 {
   private static final String sourceLocationKey = "source-location";
   private static final Symbol setterKey = Namespace.EmptyNamespace.getSymbol("setter");
-  /** @deprecated */
-  public static final Symbol inlinerKey = Namespace.EmptyNamespace.getSymbol("inliner");
+
+  /** Key for a property used by gnu.expr.Inlinecalls.
+   * The property value is either a String of the form "CLASSNAME:METHODNAME",
+   * or a java.lang.reflect.Method (or FUTURE: MethodHandle) for a static
+   * method whose parameters are
+   * {@code (ApplyExp exp, InlineCalls visitor, Type required, boolean argsInlined, Procedure proc)} and returns a re-written/validated {@code Expression}.
+   */
+  public static final Symbol validateApplyKey =
+    Namespace.EmptyNamespace.getSymbol("validate-apply");
+
   // This should be a LazyPropertyKey<gnu.expr.Inlineable>, but we want
   // to avoid any strict dependency on gnu.expr for run-time classes.
   public static final LazyPropertyKey<?> compilerKey
   = new LazyPropertyKey("compiler");
+  /** @deprecated */
   public static final LazyPropertyKey<?> inlineCallsKey
   = new LazyPropertyKey("inliner");
 

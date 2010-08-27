@@ -11,8 +11,8 @@ import gnu.xquery.lang.XQuery;
 public class CompileMisc
 {
   /** Inliner for the Compare procedure. */
-  public static Expression inlineCompare
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateCompare
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
@@ -38,8 +38,8 @@ public class CompileMisc
   }
 
   /** Inliner for the BooleanValue procedure. */
-  public static Expression inlineBooleanValue
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateBooleanValue
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
@@ -71,8 +71,8 @@ public class CompileMisc
   }
 
   /** Inliner for the ArithOp procedure. */
-  public static Expression inlineArithOp
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateArithOp
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);

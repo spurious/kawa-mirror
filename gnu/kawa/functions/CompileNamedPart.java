@@ -7,11 +7,10 @@ import kawa.lang.Translator;
 
 public class CompileNamedPart
 {
-  public static Expression inlineGetNamedPart
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateGetNamedPart
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    Type required = null; // FIXME
     exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp)
@@ -144,8 +143,8 @@ public class CompileNamedPart
     return exp;
   }
 
-  public static Expression inlineSetNamedPart
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateSetNamedPart
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
@@ -242,11 +241,10 @@ public class CompileNamedPart
     return makeExp(new QuoteExp(type), new QuoteExp(member));
   }
 
-  public static Expression inlineNamedPart
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateNamedPart
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    Type required = null; // FIXME
     exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     NamedPart namedPart = (NamedPart) proc;
@@ -275,11 +273,10 @@ public class CompileNamedPart
     return exp;
   }
 
-  public static Expression inlineNamedPartSetter
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateNamedPartSetter
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    Type required = null; // FIXME
     exp.visitArgs(visitor, argsInlined);
     NamedPart get = (NamedPart) ((NamedPartSetter) proc).getGetter();
     if (get.kind == 'D')
@@ -326,11 +323,10 @@ public class CompileNamedPart
     return new ApplyExp(Invoke.make, args);
   }
 
-  public static Expression inlineGetNamedInstancePart
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateGetNamedInstancePart
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    Type required = null; // FIXME
     exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     Expression[] xargs;
@@ -353,11 +349,10 @@ public class CompileNamedPart
     return visitor.visitApplyOnly(new ApplyExp(property, xargs), required);
   }
 
-  public static Expression inlineSetNamedInstancePart
-  (ApplyExp exp, InlineCalls visitor,
+  public static Expression validateSetNamedInstancePart
+  (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    Type required = null; // FIXME
     exp.visitArgs(visitor, argsInlined);
     Expression[] args = exp.getArgs();
     String pname = ((SetNamedInstancePart) proc).pname;
@@ -404,8 +399,6 @@ class GetNamedExp extends ApplyExp
   public GetNamedExp(Expression[] args)
   {
     super(GetNamedPart.getNamedPart, args);
-    setProperty(Procedure.inlinerKey,
-                "gnu.kawa.functions.CompileGetNamedPart:inlineGetNamedExp");
   }
 
   protected GetNamedExp setProcedureKind (char kind)

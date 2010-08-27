@@ -27,8 +27,8 @@ public class ArithOp extends Procedure1or2
   ArithOp (String name, char op, int nargs)
   {
     super(name);
-    setProperty(Procedure.inlinerKey,
-                "gnu.xquery.util.CompileMisc:inlineArithOp");
+    setProperty(Procedure.validateApplyKey,
+                "gnu.xquery.util.CompileMisc:validateArithOp");
     this.op = op;
   }
 

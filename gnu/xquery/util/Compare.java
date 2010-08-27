@@ -33,8 +33,8 @@ public class Compare extends Procedure2
   {
     Compare proc = new Compare();
     proc.setName(name);
-    proc.setProperty(Procedure.inlinerKey,
-                     "gnu.xquery.util.CompileMisc:inlineCompare");
+    proc.setProperty(Procedure.validateApplyKey,
+                     "gnu.xquery.util.CompileMisc:validateCompare");
     proc.flags = flags;
     return proc;
   }

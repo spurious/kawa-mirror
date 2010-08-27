@@ -1,3 +1,9 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (maybeInline): Remove support for old inliner API
+	found using Procedure.inlineCallsKey.
+	(getInlinerMethodArgTypes): Simplify appropriately.
+
 2010-08-26  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (maybeInline): Support new inliner methods with

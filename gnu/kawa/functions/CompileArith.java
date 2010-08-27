@@ -6,7 +6,7 @@ import gnu.expr.*;
 import gnu.kawa.lispexpr.*;
 import static gnu.kawa.functions.ArithOp.*;
 
-public class CompileArith implements CanInline, Inlineable
+public class CompileArith implements Inlineable
 {
   int op;
   Procedure proc;
@@ -27,8 +27,7 @@ public class CompileArith implements CanInline, Inlineable
 
   public static CompileArith forDiv(Object proc)
   {
-    int op = ((DivideOp) proc).op == DivideOp.MODULO ? REM : DIV;
-    return new CompileArith(proc, op);
+    return new CompileArith(proc, ((DivideOp) proc).op);
   }
 
   public static CompileArith forBitwise(Object proc)
@@ -36,7 +35,7 @@ public class CompileArith implements CanInline, Inlineable
     return new CompileArith(proc, ((BitwiseOp) proc).op);
   }
 
-  public boolean appropriateIntConstant(Expression[] args, int iarg)
+  public static boolean appropriateIntConstant(Expression[] args, int iarg)
   {
     Expression arg = args[iarg];
     if (arg instanceof QuoteExp)
@@ -55,7 +54,7 @@ public class CompileArith implements CanInline, Inlineable
     return false;
   }
 
-  public boolean appropriateLongConstant(Expression[] args, int iarg)
+  public static boolean appropriateLongConstant(Expression[] args, int iarg)
   {
     Expression arg = args[iarg];
     if (arg instanceof QuoteExp)
@@ -74,9 +73,12 @@ public class CompileArith implements CanInline, Inlineable
     return false;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
+  public static Expression validateApplyArithOp
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
   {
+    ArithOp aproc = (ArithOp) proc;
+    int op = aproc.op;
     exp.visitArgs(visitor, argsInlined);
  
     Expression[] args = exp.getArgs();
@@ -96,7 +98,7 @@ public class CompileArith implements CanInline, Inlineable
             && (op < ASHIFT_GENERAL || op > LSHIFT_RIGHT))
           {
             int kind2 = Arithmetic.classifyType(args[1].getType());
-            rkind = getReturnKind(kind1, kind2);
+            rkind = getReturnKind(kind1, kind2, op);
             if (rkind == Arithmetic.INTNUM_CODE)
               {
                 if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1))
@@ -113,7 +115,7 @@ public class CompileArith implements CanInline, Inlineable
           {
             rkind = kind1;
           }
-        rkind = adjustReturnKind(rkind);
+        rkind = adjustReturnKind(rkind, op);
         exp.setType(Arithmetic.kindType(rkind));
       }
 
@@ -126,13 +128,16 @@ public class CompileArith implements CanInline, Inlineable
       {
       case ADD:
       case SUB:
-        return inlineAdd((AddOp) proc, exp, visitor);
-      case DIV:
-      case REM:
-        return inlineDiv((DivideOp) proc, exp, visitor);
+        return validateApplyAdd((AddOp) proc, exp, visitor);
+      case DIVIDE_GENERIC:
+      case DIVIDE_INEXACT:
+      case QUOTIENT:
+      case QUOTIENT_EXACT:
+      case MODULO:
+        return validateApplyDiv((DivideOp) proc, exp, visitor);
       case NOT:
         if (rkind > 0)
-          return inlineNot(exp, rkind, visitor);
+          return validateApplyNot(exp, rkind, visitor);
         // else fall through ...
       default:
         return exp;
@@ -158,7 +163,7 @@ public class CompileArith implements CanInline, Inlineable
     // We expect len == 2, assuming inline has been run.
     int kind1 = Arithmetic.classifyType(args[0].getType());
     int kind2 = Arithmetic.classifyType(args[1].getType());
-    int kind = getReturnKind(kind1, kind2);
+    int kind = getReturnKind(kind1, kind2, op);
     Type type = Arithmetic.kindType(kind);
     if (kind == 0 || len != 2 /* just in case */)
       {
@@ -194,16 +199,16 @@ public class CompileArith implements CanInline, Inlineable
     else
       wtype = type;
 
-    if (op == DIV || op == REM)
+    if (op >= DIVIDE_GENERIC && op <= MODULO)
       {
         DivideOp dproc = (DivideOp) proc;
-        if (dproc.op == DivideOp.GENERIC
+        if (dproc.op == DivideOp.DIVIDE_GENERIC
             && (kind <= Arithmetic.INTNUM_CODE
                 || (kind >= Arithmetic.RATNUM_CODE || kind <= Arithmetic.FLONUM_CODE)))
           ;
         else if ((dproc.op == DivideOp.DIVIDE_INEXACT
                   && kind <= Arithmetic.REALNUM_CODE && kind != Arithmetic.FLOAT_CODE)
-                 || (dproc.op == DivideOp.GENERIC && kind == Arithmetic.REALNUM_CODE))
+                 || (dproc.op == DivideOp.DIVIDE_GENERIC && kind == Arithmetic.REALNUM_CODE))
           kind = Arithmetic.DOUBLE_CODE;
         else if ((dproc.op == DivideOp.QUOTIENT_EXACT
                   || (dproc.op == DivideOp.QUOTIENT
@@ -221,7 +226,7 @@ public class CompileArith implements CanInline, Inlineable
             return;
           }
       }
-    if (op == DIV && ((DivideOp) proc).op == DivideOp.GENERIC
+    if (op == DIVIDE_GENERIC
         && kind <= Arithmetic.REALNUM_CODE 
         && kind != Arithmetic.DOUBLE_CODE && kind != Arithmetic.FLOAT_CODE)
       {
@@ -257,7 +262,7 @@ public class CompileArith implements CanInline, Inlineable
              || kind == Arithmetic.LONG_CODE
              || ((kind == Arithmetic.FLOAT_CODE
                   || kind == Arithmetic.DOUBLE_CODE)
-                 && (op <= REM || op >= AND)))
+                 && (op <= MODULO || op >= AND)))
       {
         Target wtarget = StackTarget.getInstance(wtype);
 
@@ -392,11 +397,14 @@ public class CompileArith implements CanInline, Inlineable
           mname = "xor";
         mclass = ClassType.make("gnu.math.BitOps");
         break;
-      case DIV:
-      case REM:
-        mname = op == DIV ? "quotient" : "remainder";
+      case DIVIDE_GENERIC:
+      case DIVIDE_INEXACT:
+      case QUOTIENT:
+      case QUOTIENT_EXACT:
+      case MODULO:
+        mname = op == MODULO ? "remainder" : "quotient";
         DivideOp dproc = (DivideOp) proc;
-        if (op == REM && dproc.rounding_mode == Numeric.FLOOR)
+        if (op == MODULO && dproc.rounding_mode == Numeric.FLOOR)
           mname = "modulo";
         else if (dproc.rounding_mode != Numeric.TRUNCATE)
           {
@@ -421,7 +429,7 @@ public class CompileArith implements CanInline, Inlineable
     return true;
   }
 
-  public int getReturnKind (int kind1, int kind2)
+  public static int getReturnKind (int kind1, int kind2, int op)
   {
     if (op >= ASHIFT_GENERAL && op <= LSHIFT_RIGHT)
       return kind1;
@@ -452,17 +460,16 @@ public class CompileArith implements CanInline, Inlineable
   // semi-deprecated.
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return Arithmetic.kindType(adjustReturnKind(getReturnKind(args)));
+    return Arithmetic.kindType(adjustReturnKind(getReturnKind(args), op));
   }
 
-  int adjustReturnKind (int rkind)
+  static int adjustReturnKind (int rkind, int op)
   {
-    if (op == DIV && rkind > 0)
+    if (op >= DIVIDE_GENERIC && op <= QUOTIENT_EXACT && rkind > 0)
       {
-        DivideOp dproc = (DivideOp) proc;
-        switch (dproc.op)
+        switch (op)
           {
-          case DivideOp.GENERIC:
+          case DivideOp.DIVIDE_GENERIC:
             if (rkind <= Arithmetic.INTNUM_CODE)
               rkind = Arithmetic.RATNUM_CODE;
             break;
@@ -480,7 +487,7 @@ public class CompileArith implements CanInline, Inlineable
     return rkind;
   }
 
-  public Expression inlineAdd (AddOp proc, ApplyExp exp, InlineCalls visitor)
+  public static Expression validateApplyAdd (AddOp proc, ApplyExp exp, InlineCalls visitor)
   {
     Expression[] args = exp.getArgs();
     if (args.length == 1 && proc.plusOrMinus < 0)
@@ -526,7 +533,7 @@ public class CompileArith implements CanInline, Inlineable
     return exp;
   }
 
-  public static Expression inlineDiv (DivideOp proc,
+  public static Expression validateApplyDiv (DivideOp proc,
                                       ApplyExp exp, InlineCalls visitor)
   {
     Expression[] args = exp.getArgs();
@@ -538,7 +545,7 @@ public class CompileArith implements CanInline, Inlineable
     return exp;
   }
 
-  public Expression inlineNot (ApplyExp exp, int kind, InlineCalls visitor)
+  public static Expression validateApplyNot (ApplyExp exp, int kind, InlineCalls visitor)
   {
     if (exp.getArgCount() == 1)
       {
@@ -569,8 +576,12 @@ public class CompileArith implements CanInline, Inlineable
       case ADD:    return 96; /* iadd */
       case SUB:    return 100; /* isub */
       case MUL:    return 104;
-      case DIV:    return 108;
-      case REM:    return 112;
+      case DIVIDE_GENERIC:
+      case DIVIDE_INEXACT:
+      case QUOTIENT:
+      case QUOTIENT_EXACT:
+        return 108;
+      case MODULO:    return 112;
       case ASHIFT_LEFT:  return 120; // ishl
       case ASHIFT_RIGHT:  return 122; // ishr
       case LSHIFT_RIGHT:  return 124; // iushr

@@ -8,77 +8,39 @@ import java.math.*;
  * @author Per Bothner
  */
 
-public class DivideOp extends ProcedureN
+public class DivideOp extends ArithOp
 {
-  /** Implement's Scheme {@code /} operation. */
-  public static final int GENERIC = 0;
-
-  /** Implements a division operation.
-   * Like Scheme's {@code (exact->inexact (/ x y))}.
-   */
-  public static final int DIVIDE_INEXACT = 1;
-
-  /** Implements a quotient operation.
-   * Depends on the value of {@code getRoundingMode()}.
-   * Operands are real; result is an integer.
-   * Inexact operands yield inexact integer result.
-   */
-  public static final int QUOTIENT = 2;
-  /** Implements a quotient operation.
-   * Depends on the value of {@code getRoundingMode()}.
-   * Operands and result are real.
-   * Operands are real; result is an integer.
-   * Inexact operands yield exact integer result.
-   */
-  public static final int QUOTIENT_EXACT = 3;
-
-  /** Implements a modulo/remainder operation.
-   * Depends on the value of {@code getRoundingMode()}.
-   * Operands and result are real.
-   */
-  public static final int MODULO = 4;
-
-  // GENERIC, MODULO, QUOTIENT, QUOTIENT_EXACT
-  int op;
-
   /** Return one of FLOOR, CEILING, TRUNCATE, ROUND, or 0 if not applicable.
    * These are defined in gnu.math.Numeric.
    */
   public int getRoundingMode() { return rounding_mode; }
   int rounding_mode;
 
-  public static final DivideOp $Sl = new DivideOp("/");
-  public static final DivideOp idiv = new DivideOp("idiv");
-  public static final DivideOp quotient = new DivideOp("quotient");
-  public static final DivideOp remainder = new DivideOp("remainder");
-  public static final DivideOp modulo = new DivideOp("modulo");
-  public static final DivideOp div = new DivideOp("div");
-  public static final DivideOp mod = new DivideOp("mod");
-  public static final DivideOp div0 = new DivideOp("div0");
-  public static final DivideOp mod0 = new DivideOp("mod0");
+  public static final DivideOp $Sl = new DivideOp("/", DIVIDE_GENERIC);
+  public static final DivideOp idiv = new DivideOp("idiv", QUOTIENT_EXACT);
+  public static final DivideOp quotient = new DivideOp("quotient", QUOTIENT);
+  public static final DivideOp remainder = new DivideOp("remainder", MODULO);
+  public static final DivideOp modulo = new DivideOp("modulo", MODULO);
+  public static final DivideOp div = new DivideOp("div", QUOTIENT);
+  public static final DivideOp mod = new DivideOp("mod", MODULO);
+  public static final DivideOp div0 = new DivideOp("div0", QUOTIENT);
+  public static final DivideOp mod0 = new DivideOp("mod0", MODULO);
   static {
-    idiv.op = QUOTIENT_EXACT;
     idiv.rounding_mode = Numeric.TRUNCATE;
-    quotient.op = QUOTIENT;
     quotient.rounding_mode = Numeric.TRUNCATE;
-    remainder.op = MODULO;
     remainder.rounding_mode = Numeric.TRUNCATE;
-    modulo.op = MODULO;
     modulo.rounding_mode = Numeric.FLOOR;
-    div.op = QUOTIENT;
     div.rounding_mode = Numeric.NONNEG_MOD;
-    mod.op = MODULO;
     mod.rounding_mode = Numeric.NONNEG_MOD;
-    div0.op = QUOTIENT;
     div0.rounding_mode = Numeric.ROUND;
-    mod0.op = MODULO;
     mod0.rounding_mode = Numeric.ROUND;
   }
 
-  public DivideOp(String name)
+  public DivideOp(String name, int op)
   {
-    super(name);
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forDiv");
+    super(name, op);
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileArith:validateApplyArithOp");
     Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forDiv");
   }
 
@@ -102,7 +64,7 @@ public class DivideOp extends ProcedureN
           {
             switch (op)
               {
-              case GENERIC:
+              case DIVIDE_GENERIC:
               case DIVIDE_INEXACT:
                 scode = code = Arithmetic.INTNUM_CODE;
                 break;
@@ -171,7 +133,7 @@ public class DivideOp extends ProcedureN
                                           Arithmetic.asIntNum(arg2),
                                           getRoundingMode());
                 break;
-              case GENERIC:
+              case DIVIDE_GENERIC:
                 result = RatNum.make(Arithmetic.asIntNum(result),
                                      Arithmetic.asIntNum(arg2));
                 code = result instanceof IntNum ? Arithmetic.INTNUM_CODE
@@ -206,7 +168,7 @@ public class DivideOp extends ProcedureN
             MathContext mcontext = new MathContext(mprec, mround);
             switch (op)
               {
-              case GENERIC:
+              case DIVIDE_GENERIC:
                 result = bd1.divide(bd2);
                 break;
               case QUOTIENT:
@@ -228,7 +190,7 @@ public class DivideOp extends ProcedureN
 	    double d2 = Arithmetic.asDouble(arg2);
             switch (op)
               {
-              case GENERIC:
+              case DIVIDE_GENERIC:
               case DIVIDE_INEXACT:
                 result = DFloNum.make(d1 / d2);
                 break;
@@ -297,6 +259,6 @@ public class DivideOp extends ProcedureN
 
   public int numArgs()
   {
-    return op == GENERIC ? 0xfffff001 : 0x2002;
+    return op == DIVIDE_GENERIC ? 0xfffff001 : 0x2002;
   }
 }

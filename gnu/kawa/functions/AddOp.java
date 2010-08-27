@@ -17,14 +17,15 @@ public class AddOp extends ArithOp
 
   public AddOp(String name, int plusOrMinus)
   {
-    super(name);
+    super(name, plusOrMinus > 0 ? ADD : SUB);
     this.plusOrMinus = plusOrMinus;
     String compiler = plusOrMinus > 0
       ? "gnu.kawa.functions.CompileArith:$Pl"
       : "gnu.kawa.functions.CompileArith:$Mn";
-    Procedure.inlineCallsKey.set(this, compiler);
     Procedure.compilerKey.set(this, compiler);
-  }
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileArith:validateApplyArithOp");
+ }
 
   public static final AddOp $Pl = new AddOp("+", 1);
   public static final AddOp $Mn = new AddOp("-", -1);

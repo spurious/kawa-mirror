@@ -7,7 +7,8 @@ public class Convert extends Procedure2
   public static final Convert as = new Convert();
   static {
     as.setName("as"); 
-    Procedure.inlineCallsKey.set(as, "*gnu.kawa.functions.CompileMisc:forConvert");
+    as.setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.functions.CompileMisc:validateApplyConvert");
     Procedure.compilerKey.set(as, "*gnu.kawa.functions.CompileMisc:forConvert");
   }
 

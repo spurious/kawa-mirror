@@ -25,13 +25,11 @@ public class BitwiseOp extends ArithOp
   public static final BitwiseOp not
   = new BitwiseOp("bitwise-not", NOT);
 
-  int op;
-
   public BitwiseOp (String name, int op)
   {
-    super(name);
-    this.op = op;
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forBitwise");
+    super(name, op);
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileArith:validateApplyArithOp");
     Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forBitwise");
   }
 

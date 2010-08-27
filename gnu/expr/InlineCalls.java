@@ -272,14 +272,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
   }
 
   private static Class[] inlinerMethodArgTypes;
-  private static synchronized Class[] getInlinerMethodArgTypes(int vargsn)
+  private static synchronized Class[] getInlinerMethodArgTypes()
     throws Exception
   {
-    if (vargsn == 4)
-      return new Class[] { Class.forName("gnu.expr.ApplyExp"),
-                           Class.forName("gnu.expr.InlineCalls"),
-                           Boolean.TYPE,
-                           Class.forName("gnu.mapping.Procedure") };
     Class[] t = inlinerMethodArgTypes;
     if (t == null)
       {
@@ -299,19 +294,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
       {
         Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);
         Object inliner;
-        int vargsn = 5;
-        Object key = null;
         synchronized (proc)
           {
             inliner = proc.getProperty(Procedure.validateApplyKey, null);
-            if (inliner != null)
-              key = Procedure.validateApplyKey;
-            else
-              {
-                inliner = Procedure.inlineCallsKey.get(proc);
-                key = null;
-                vargsn = 4;
-              }
             if (inliner instanceof String)
               {
                 String inliners = (String) inliner;
@@ -321,12 +306,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
                   {
                     String cname = inliners.substring(0, colon);
                     String mname = inliners.substring(colon+1);
-                    /* #ifdef JAVA2 */
                     Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
-                    /* #else */
-                    // Class clas = Class.forName(cname);
-                    /* #endif */
-                    method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes(vargsn));
+                    method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
                   }
                 if (method == null)
                   {
@@ -334,13 +315,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
                     return null;
                   }
                 inliner = method;
-                if (key != null)
-                  proc.setProperty(key, method);
               }
           } /* end synchronized */
-        if (inliner == null && proc instanceof CanInline)
-          inliner = proc;
-        if (vargsn == 5 && inliner != null)
+        if (inliner != null)
           {
             Object[] vargs = new Object[] { exp, this,  required, argsInlinedBoxed, proc };
             if (inliner instanceof Procedure)
@@ -349,15 +326,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
               return (Expression) ((java.lang.reflect.Method) inliner)
                 .invoke(null, vargs);
           }
-        if (inliner instanceof CanInline)
-          return ((CanInline) inliner).inline(exp, this, argsInlined);
-        else if (inliner instanceof Procedure)
-                  return (Expression) ((Procedure) inliner).apply4(exp, this,
-                                                                   argsInlinedBoxed,
-                                                                   proc);
-        else if (inliner instanceof java.lang.reflect.Method)
-          return (Expression) ((java.lang.reflect.Method) inliner)
-            .invoke(null,                                                                          new Object[] { exp, this,  argsInlinedBoxed, proc });
+        if (proc instanceof CanInline)
+          return ((CanInline) proc).inline(exp, this, argsInlined);
       }
     catch (Throwable ex)
       {

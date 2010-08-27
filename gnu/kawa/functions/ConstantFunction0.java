@@ -23,7 +23,8 @@ public class ConstantFunction0 extends Procedure0
     super(name);
     this.value = constant.getValue();
     this.constant = constant;
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileMisc:forConstantFunction0");
+     setProperty(Procedure.validateApplyKey,
+                 "gnu.kawa.functions.CompileMisc:validateApplyConstantFunction0");
   }
 
   public Object apply0() { return value; }

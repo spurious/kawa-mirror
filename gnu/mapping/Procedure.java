@@ -26,9 +26,6 @@ public abstract class Procedure extends PropertySet
   // to avoid any strict dependency on gnu.expr for run-time classes.
   public static final LazyPropertyKey<?> compilerKey
   = new LazyPropertyKey("compiler");
-  /** @deprecated */
-  public static final LazyPropertyKey<?> inlineCallsKey
-  = new LazyPropertyKey("inliner");
 
   public void setSourceLocation (String file, int line)
   {

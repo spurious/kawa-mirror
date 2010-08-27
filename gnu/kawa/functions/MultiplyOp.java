@@ -17,8 +17,9 @@ public class MultiplyOp extends ArithOp
 
   public MultiplyOp(String name)
   {
-    super(name);
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileArith:forMul");
+    super(name, MUL);
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.functions.CompileArith:validateApplyArithOp");
     Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileArith:forMul");
   }
 

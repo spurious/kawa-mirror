@@ -1,3 +1,7 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (inlineCallsKey): Remove constant field.
+
 2010-08-26  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (inlinerKey): Remove constant field.

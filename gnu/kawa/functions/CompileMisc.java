@@ -6,9 +6,8 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.lispexpr.LangObjType;
 import kawa.standard.Scheme;
 
-public class CompileMisc implements CanInline, Inlineable
+public class CompileMisc implements Inlineable
 {
-  static final int CONSTANT_FUNCTION0 = 1;
   static final int CONVERT = 2;
   static final int NOT = 3;
   int code;
@@ -20,11 +19,6 @@ public class CompileMisc implements CanInline, Inlineable
     this.code = code;
   }
 
-  public static CompileMisc forConstantFunction0(Object proc)
-  {
-    return new CompileMisc((Procedure) proc, CONSTANT_FUNCTION0);
-  }
-
   public static CompileMisc forConvert(Object proc)
   {
     return new CompileMisc((Procedure) proc, CONVERT);
@@ -33,24 +27,6 @@ public class CompileMisc implements CanInline, Inlineable
   public static CompileMisc forNot(Object proc)
   {
     return new CompileMisc((Procedure) proc, NOT);
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    switch (code)
-      {
-      case CONSTANT_FUNCTION0:
-        return inlineConstantFunction0((ConstantFunction0) proc, exp,
-                                       visitor, argsInlined);
-      case CONVERT:
-        return inlineConvert((Convert) proc, exp,
-                             visitor, argsInlined);
-      case NOT:
-        return inlineNot((Not) proc, exp,
-                             visitor, argsInlined);
-      default: throw new Error();
-      }
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -79,9 +55,9 @@ public class CompileMisc implements CanInline, Inlineable
       }
   }
 
-  public static Expression inlineConstantFunction0 (ConstantFunction0 proc,
-                                                    ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
+  public static Expression validateApplyConstantFunction0
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
     int nargs = exp.getArgCount();
@@ -90,20 +66,20 @@ public class CompileMisc implements CanInline, Inlineable
 	String message = WrongArguments.checkArgCount(proc, nargs);
 	return visitor.noteError(message);
       }
-    return proc.constant;
+    return ((ConstantFunction0) proc).constant;
   }
 
-  public static Expression inlineConvert (Convert proc, ApplyExp exp,
-                                   InlineCalls visitor,
-                                   boolean argsInlined)
+  public static Expression validateApplyConvert
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
     return Invoke.inlineClassName(exp, 0, visitor);
   }
 
-  public static Expression inlineNot (Not proc, ApplyExp exp,
-                                      InlineCalls visitor,
-                                      boolean argsInlined)
+  public static Expression validateApplyNot
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
   {
     exp.visitArgs(visitor, argsInlined);
     return exp.inlineIfConstant(proc, visitor);

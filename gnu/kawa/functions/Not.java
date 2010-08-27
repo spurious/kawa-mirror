@@ -11,7 +11,8 @@ public class Not extends Procedure1
   public Not(Language language)
   {
     this.language = language;
-    Procedure.inlineCallsKey.set(this, "*gnu.kawa.functions.CompileMisc:forNot");
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.functions.CompileMisc:validateApplyNot");
     Procedure.compilerKey.set(this, "*gnu.kawa.functions.CompileMisc:forNot");
  }
 

@@ -1,3 +1,12 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	* TreeScanner.java: Update to use Procedure.validateApplyKey,
+	and move inlineXxx method to CompileArith.
+	* MakeUnescapedData.java: Likewise.
+	* CompileXmlFunctions.java: New class
+	with new (moved/renamed) validateXxx methods.
+	* Makefile.am: Update accordingly.
+
 2010-07-17  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (reset): New method.

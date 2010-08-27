@@ -14,6 +14,7 @@ java_sources = \
   Children.java \
   CoerceNodes.java \
   CommentConstructor.java \
+  CompileXmlFunctions.java \
   DescendantAxis.java \
   DescendantOrSelfAxis.java \
   Document.java \

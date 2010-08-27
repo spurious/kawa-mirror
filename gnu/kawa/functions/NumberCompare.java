@@ -5,9 +5,9 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import java.math.*;
 
-/** This implements the numeric comparison relations: <, <=, etc. */
+/** This implements the numeric comparison relations: {@code <}, {@code <=}, etc. */
 
-public class NumberCompare extends ProcedureN implements CanInline, Inlineable
+public class NumberCompare extends ProcedureN implements Inlineable
 {
   Language language;
 
@@ -101,6 +101,8 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     proc.language = language;
     proc.setName(name);
     proc.flags = flags;
+    proc.setProperty(Procedure.validateApplyKey,
+                     "gnu.kawa.functions.CompileArith:validateApplyNumberCompare");
     return proc;
   }
 
@@ -231,16 +233,6 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     //  if (args.length < 2)
     //  throw new WrongArguments(this.name(),2,"(< x1 x2 ...)");
     return getLanguage().booleanObject(applyN(flags, args));
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    Expression folded = exp.inlineIfConstant(this, visitor);
-    if (folded != exp)
-      return folded;
-    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

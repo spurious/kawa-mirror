@@ -16,9 +16,15 @@ import gnu.kawa.reflect.OccurrenceType;
  * (relative-step E1 (lambda (dot position last) E2)).
  */
 
-public class RelativeStep extends MethodProc implements CanInline, Inlineable
+public class RelativeStep extends MethodProc implements Inlineable
 {
   public static final RelativeStep relativeStep = new RelativeStep();
+
+  RelativeStep ()
+  {
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.xquery.util.CompileMisc:validateApplyRelativeStep");
+  }
 
   public int numArgs() { return 0x2002; }
 
@@ -49,141 +55,6 @@ public class RelativeStep extends MethodProc implements CanInline, Inlineable
         Values.writeValues(ctx.runUntilValue(), filter);
       }
     filter.finish();
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    // FIXME make use of type of E1 to set dot in E2.
-    exp.visitArgs(visitor, argsInlined);
-    Expression[] args = exp.getArgs();
-    Expression exp1 = args[0];
-    Expression exp2 = args[1];
-    LambdaExp lexp2;
-    Compilation comp = visitor.getCompilation();
-    if (! (exp2 instanceof LambdaExp)
-        // The following optimization breaks when interpreting, because
-        // then CoerceToNodes may not work.
-        || ! comp.mustCompile
-	|| (lexp2 = (LambdaExp) exp2).min_args != 3
-	|| lexp2.max_args != 3)
-      return exp;
-
-    lexp2.setInlineOnly(true);
-    lexp2.returnContinuation = exp;
-    lexp2.inlineHome = visitor.getCurrentLambda();
-
-    exp2 = lexp2.body;
-
-    Declaration dotArg = lexp2.firstDecl();
-    Declaration posArg = dotArg.nextDecl();
-    Declaration lastArg = posArg.nextDecl();
-    // Splice out the "last" argument - we'll move it out.
-    // The remaining two arguments are suitable for a ValuesMap.
-    posArg.setNext(lastArg.nextDecl());
-    lastArg.setNext(null);
-    lexp2.min_args = 2;
-    lexp2.max_args = 2;
-
-    Type type1 = exp1.getType();
-    if (type1 != null &&NodeType.anyNodeTest.compare(type1) == -3)
-      {
-        Language language = visitor.getCompilation().getLanguage();
-        String message = "step input is "+language.formatType(type1)+" - not a node sequence";
-        visitor.getMessages().error('e', message);
-        return new ErrorExp(message);
-      }
-      
-    Type rtype = exp.getTypeRaw();
-    Type rtypePrime;
-    int nodeCompare;
-    if (rtype == null || rtype == Type.pointer_type)
-      {
-        Type type2 = exp2.getType();
-        rtypePrime = OccurrenceType.itemPrimeType(type2);
-        nodeCompare = NodeType.anyNodeTest.compare(rtypePrime);
-        if (nodeCompare >= 0)
-          rtype = NodeSetType.getInstance(rtypePrime);
-        else
-          rtype = OccurrenceType.getInstance(rtypePrime, 0, -1);
-        exp.setType(rtype);
-      }
-    if (lastArg.getCanRead())
-      {
-        ClassType typeNodes = CoerceNodes.typeNodes;
-        comp.letStart();
-        Declaration sequence
-          = comp.letVariable(null, typeNodes,
-                             new ApplyExp(CoerceNodes.coerceNodes,
-                                          new Expression [] { exp1 }));
-        comp.letEnter();
-
-        Method sizeMethod = typeNodes.getDeclaredMethod("size", 0);
-        Expression lastInit
-          =  new ApplyExp(sizeMethod,
-                          new Expression[] {new ReferenceExp(sequence)});
-        LetExp lastLet = new LetExp(new Expression[] { lastInit });
-        lastLet.addDeclaration(lastArg);
-        lastLet.body = new ApplyExp(exp.getFunction(),
-                                    new Expression[] { new ReferenceExp(sequence),
-                                                       lexp2 });
-        return comp.letDone(lastLet);
-      }
-
-    ApplyExp result = exp;
-
-    // Try to rewrite A/B[P] to (A/B)[P].
-    // This only works if P doesn't depend in position() or last().
-    if (exp2 instanceof ApplyExp)
-      {
-        ApplyExp aexp2 = (ApplyExp) exp2;
-        Object proc2 = aexp2.getFunction().valueIfConstant();
-        Expression vexp2;
-        if (proc2 instanceof ValuesFilter
-            && (vexp2 = aexp2.getArgs()[1]) instanceof LambdaExp)
-          {
-            LambdaExp lvexp2 = (LambdaExp) vexp2;
-            Declaration dot2 = lvexp2.firstDecl();
-            Declaration pos2;
-            if (dot2 != null && (pos2 = dot2.nextDecl()) != null
-                && pos2.nextDecl() == null
-                && ! pos2.getCanRead()
-                // If the predicate can evaluate to a number, then the
-                // optimization is unsafe, since we implicitly
-                // compare against position().
-                && ClassType.make("java.lang.Number").compare(lvexp2.body.getType()) == -3)
-              {
-                exp2 = aexp2.getArg(0);
-                lexp2.body = exp2;
-                aexp2.setArg(0, exp);
-                result = aexp2;
-              }
-          }
-      }
-    // Now we can rewrite 'descendant-or-self::node()/B' (which is the
-    // expansion of the abbreviated syntax '//B') to /descendant::B'.
-    if (exp1 instanceof ApplyExp && exp2 instanceof ApplyExp)
-      {
-        ApplyExp aexp1 = (ApplyExp) exp1;
-        ApplyExp aexp2 = (ApplyExp) exp2;
-        Object p1 = aexp1.getFunction().valueIfConstant();
-        Object p2 = aexp2.getFunction().valueIfConstant();
-        Expression exp12;
-        if (p1 == relativeStep && p2 instanceof ChildAxis
-            && aexp1.getArgCount() == 2
-            && (exp12 = aexp1.getArg(1)) instanceof LambdaExp)
-          {
-            LambdaExp lexp12 = (LambdaExp) exp12;
-            if (lexp12.body instanceof ApplyExp
-                && ((ApplyExp) lexp12.body).getFunction().valueIfConstant() == DescendantOrSelfAxis.anyNode)
-              {
-                exp.setArg(0, aexp1.getArg(0));
-                aexp2.setFunction(new QuoteExp(DescendantAxis.make(((ChildAxis) p2).getNodePredicate())));
-              }
-          }
-      }
-    
-    return result;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

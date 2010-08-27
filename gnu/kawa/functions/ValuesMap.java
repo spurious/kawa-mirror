@@ -14,7 +14,7 @@ import gnu.math.IntNum;
  * Used to implement XQuery's 'for' form.
  */
 
-public class ValuesMap extends MethodProc implements CanInline, Inlineable
+public class ValuesMap extends MethodProc implements Inlineable
 {
   public static final ValuesMap valuesMap = new ValuesMap(-1);
   public static final ValuesMap valuesMapWithPos = new ValuesMap(1);
@@ -22,6 +22,8 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
   private ValuesMap (int startCounter)
   {
     this.startCounter = startCounter;
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.functions.CompileMisc:validateApplyValuesMap");
   }
 
   /** If non-negative also define a counter variable.
@@ -62,7 +64,7 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
   }
 
   /** If we can inline, return LambdaExp for first arg; otherwise null. */
-  private LambdaExp canInline (ApplyExp exp)
+  static LambdaExp canInline (ApplyExp exp, ValuesMap proc)
   {
     Expression[] args = exp.getArgs();
     Expression arg0;
@@ -71,29 +73,15 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
       {
 	LambdaExp lexp = (LambdaExp) arg0;
 	if (lexp.min_args == lexp.max_args
-	    && 	lexp.min_args == (startCounter >= 0 ? 2 : 1))
+	    && 	lexp.min_args == (proc.startCounter >= 0 ? 2 : 1))
 	  return lexp;
       }
     return null;
   }
 
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    LambdaExp lexp = canInline(exp);
-    if (lexp != null)
-      {
-	lexp.setInlineOnly(true);
-        lexp.returnContinuation = exp;
-        lexp.inlineHome = visitor.getCurrentLambda();
-      }
-    return exp;
-  }
-
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    LambdaExp lambda = canInline(exp);
+    LambdaExp lambda = canInline(exp, this);
     if (lambda == null)
       {
 	ApplyExp.compile(exp, comp, target);

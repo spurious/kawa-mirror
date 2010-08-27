@@ -7,9 +7,16 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
-public class AppendValues extends MethodProc implements CanInline, Inlineable
+public class AppendValues extends MethodProc implements Inlineable
 {
   public static final AppendValues appendValues = new AppendValues();
+
+  public AppendValues ()
+  {
+    super();
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.kawa.functions.CompileMisc:validateApplyAppendValues");
+  }
 
   public void apply (CallContext ctx)
   {
@@ -24,21 +31,6 @@ public class AppendValues extends MethodProc implements CanInline, Inlineable
 	else
 	  ctx.writeValue(arg);
       }
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    Expression[] args = exp.getArgs();
-    if (args.length == 1)
-      return args[0];
-    if (args.length == 0)
-      return QuoteExp.voidExp;
-    Expression folded = exp.inlineIfConstant(this, visitor);
-    if (folded != exp)
-      return folded;
-    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

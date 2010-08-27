@@ -1,12 +1,15 @@
 package gnu.xquery.util;
 import gnu.expr.*;
 import gnu.mapping.Procedure;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.xml.*;
 import gnu.math.*;
 import gnu.xquery.lang.XQuery;
+import gnu.kawa.functions.AddOp;
+import gnu.kawa.functions.NumberCompare;
+import gnu.kawa.functions.ValuesMap;
+import gnu.kawa.reflect.OccurrenceType;
 
 public class CompileMisc
 {
@@ -78,5 +81,289 @@ public class CompileMisc
     exp.visitArgs(visitor, argsInlined);
     // FUTURE
     return exp;
+  }
+
+  /** Inliner for the {@link ValuesFilter} procedure. */
+  public static Expression validateApplyValuesFilter
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    ValuesFilter vproc = (ValuesFilter) proc;
+    exp.visitArgs(visitor, argsInlined); // FIXME - be smarter about type propagation
+    Expression[] args = exp.getArgs();
+    Expression exp2 = args[1];
+    LambdaExp lexp2;
+    if (! (exp2 instanceof LambdaExp)
+	|| (lexp2 = (LambdaExp) exp2).min_args != 3
+	|| lexp2.max_args != 3)
+      return exp;
+
+    exp.setType(args[0].getType());
+
+    Compilation parser = visitor.getCompilation();
+
+    Declaration dotArg = lexp2.firstDecl();
+    Declaration posArg = dotArg.nextDecl();
+    Declaration lastArg = posArg.nextDecl();
+
+    lexp2.setInlineOnly(true);
+    lexp2.returnContinuation = exp;
+    lexp2.inlineHome = visitor.getCurrentLambda();
+
+    // Splice out lastArg
+    lexp2.remove(posArg, lastArg);
+    lexp2.min_args = 2;
+    lexp2.max_args = 2;
+
+    if (! lastArg.getCanRead() && vproc.kind != 'R')
+      {
+        // Don't need to do anything more - lastArg is not needed.
+        return exp;
+      }
+
+    parser.letStart();
+    Expression seq = args[0];
+    Type seqType;
+    Method sizeMethod;
+    if (vproc.kind == 'P')
+      {
+        seqType = seq.getType();
+        sizeMethod = Compilation.typeValues.getDeclaredMethod("countValues", 1);
+      }
+    else
+      {
+        seqType = SortNodes.typeSortedNodes;
+        seq = new ApplyExp(SortNodes.sortNodes, new Expression [] {seq});
+        sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
+      }
+    Declaration sequence = parser.letVariable("sequence", seqType, seq);
+    parser.letEnter();
+
+    Expression pred = lexp2.body;
+    Type predType = lexp2.body.getType();
+    if (predType != XDataType.booleanType) // Overly conservative, but simple.
+      pred = new ApplyExp(vproc.matchesMethod,
+                          new Expression[] { pred,
+                                             new ReferenceExp(posArg) });
+    if (vproc.kind == 'R')
+      {
+        Declaration posIncoming = new Declaration(null, Type.intType);
+	Expression init
+	  = new ApplyExp(AddOp.$Mn,
+			 new Expression[] {
+			   new ReferenceExp(lastArg),
+			   new ReferenceExp(posIncoming)});
+	init
+	  = new ApplyExp(AddOp.$Pl,
+			 new Expression[] {
+			   init,
+			   new QuoteExp(IntNum.one())});
+        LetExp let = new LetExp(new Expression[] { init });
+        lexp2.replaceFollowing(dotArg, posIncoming);
+        let.add(posArg);
+        let.body = pred;
+        pred = let;
+      }
+
+    pred = new IfExp(pred,
+                     new ReferenceExp(dotArg),
+                     QuoteExp.voidExp);
+    lexp2.body = pred;
+
+    ApplyExp doMap
+      = new ApplyExp(ValuesMap.valuesMapWithPos,
+		     new Expression[] { lexp2,
+					new ReferenceExp(sequence) });
+    doMap.setType(dotArg.getType());
+    lexp2.returnContinuation = doMap;
+
+    Expression lastInit = new ApplyExp(sizeMethod,
+                                       new Expression[] {
+                                         new ReferenceExp(sequence)});
+
+    LetExp let2 = new LetExp(new Expression[] { lastInit });
+    let2.add(lastArg);
+    let2.body = gnu.kawa.functions.CompileMisc.validateApplyValuesMap(doMap, visitor, required, true, ValuesMap.valuesMapWithPos);
+
+    return parser.letDone(let2);
+  }
+
+  public static Expression validateApplyRelativeStep
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    // FIXME make use of type of E1 to set dot in E2.
+    exp.visitArgs(visitor, argsInlined);
+    Expression[] args = exp.getArgs();
+    Expression exp1 = args[0];
+    Expression exp2 = args[1];
+    LambdaExp lexp2;
+    Compilation comp = visitor.getCompilation();
+    if (! (exp2 instanceof LambdaExp)
+        // The following optimization breaks when interpreting, because
+        // then CoerceToNodes may not work.
+        || ! comp.mustCompile
+	|| (lexp2 = (LambdaExp) exp2).min_args != 3
+	|| lexp2.max_args != 3)
+      return exp;
+
+    lexp2.setInlineOnly(true);
+    lexp2.returnContinuation = exp;
+    lexp2.inlineHome = visitor.getCurrentLambda();
+
+    exp2 = lexp2.body;
+
+    Declaration dotArg = lexp2.firstDecl();
+    Declaration posArg = dotArg.nextDecl();
+    Declaration lastArg = posArg.nextDecl();
+    // Splice out the "last" argument - we'll move it out.
+    // The remaining two arguments are suitable for a ValuesMap.
+    posArg.setNext(lastArg.nextDecl());
+    lastArg.setNext(null);
+    lexp2.min_args = 2;
+    lexp2.max_args = 2;
+
+    Type type1 = exp1.getType();
+    if (type1 != null &&NodeType.anyNodeTest.compare(type1) == -3)
+      {
+        Language language = visitor.getCompilation().getLanguage();
+        String message = "step input is "+language.formatType(type1)+" - not a node sequence";
+        visitor.getMessages().error('e', message);
+        return new ErrorExp(message);
+      }
+      
+    Type rtype = exp.getTypeRaw();
+    Type rtypePrime;
+    int nodeCompare;
+    if (rtype == null || rtype == Type.pointer_type)
+      {
+        Type type2 = exp2.getType();
+        rtypePrime = OccurrenceType.itemPrimeType(type2);
+        nodeCompare = NodeType.anyNodeTest.compare(rtypePrime);
+        if (nodeCompare >= 0)
+          rtype = NodeSetType.getInstance(rtypePrime);
+        else
+          rtype = OccurrenceType.getInstance(rtypePrime, 0, -1);
+        exp.setType(rtype);
+      }
+    if (lastArg.getCanRead())
+      {
+        ClassType typeNodes = CoerceNodes.typeNodes;
+        comp.letStart();
+        Declaration sequence
+          = comp.letVariable(null, typeNodes,
+                             new ApplyExp(CoerceNodes.coerceNodes,
+                                          new Expression [] { exp1 }));
+        comp.letEnter();
+
+        Method sizeMethod = typeNodes.getDeclaredMethod("size", 0);
+        Expression lastInit
+          =  new ApplyExp(sizeMethod,
+                          new Expression[] {new ReferenceExp(sequence)});
+        LetExp lastLet = new LetExp(new Expression[] { lastInit });
+        lastLet.addDeclaration(lastArg);
+        lastLet.body = new ApplyExp(exp.getFunction(),
+                                    new Expression[] { new ReferenceExp(sequence),
+                                                       lexp2 });
+        return comp.letDone(lastLet);
+      }
+
+    ApplyExp result = exp;
+
+    // Try to rewrite A/B[P] to (A/B)[P].
+    // This only works if P doesn't depend in position() or last().
+    if (exp2 instanceof ApplyExp)
+      {
+        ApplyExp aexp2 = (ApplyExp) exp2;
+        Object proc2 = aexp2.getFunction().valueIfConstant();
+        Expression vexp2;
+        if (proc2 instanceof ValuesFilter
+            && (vexp2 = aexp2.getArgs()[1]) instanceof LambdaExp)
+          {
+            LambdaExp lvexp2 = (LambdaExp) vexp2;
+            Declaration dot2 = lvexp2.firstDecl();
+            Declaration pos2;
+            if (dot2 != null && (pos2 = dot2.nextDecl()) != null
+                && pos2.nextDecl() == null
+                && ! pos2.getCanRead()
+                // If the predicate can evaluate to a number, then the
+                // optimization is unsafe, since we implicitly
+                // compare against position().
+                && ClassType.make("java.lang.Number").compare(lvexp2.body.getType()) == -3)
+              {
+                exp2 = aexp2.getArg(0);
+                lexp2.body = exp2;
+                aexp2.setArg(0, exp);
+                result = aexp2;
+              }
+          }
+      }
+    // Now we can rewrite 'descendant-or-self::node()/B' (which is the
+    // expansion of the abbreviated syntax '//B') to /descendant::B'.
+    if (exp1 instanceof ApplyExp && exp2 instanceof ApplyExp)
+      {
+        ApplyExp aexp1 = (ApplyExp) exp1;
+        ApplyExp aexp2 = (ApplyExp) exp2;
+        Object p1 = aexp1.getFunction().valueIfConstant();
+        Object p2 = aexp2.getFunction().valueIfConstant();
+        Expression exp12;
+        if (p1 == RelativeStep.relativeStep && p2 instanceof ChildAxis
+            && aexp1.getArgCount() == 2
+            && (exp12 = aexp1.getArg(1)) instanceof LambdaExp)
+          {
+            LambdaExp lexp12 = (LambdaExp) exp12;
+            if (lexp12.body instanceof ApplyExp
+                && ((ApplyExp) lexp12.body).getFunction().valueIfConstant() == DescendantOrSelfAxis.anyNode)
+              {
+                exp.setArg(0, aexp1.getArg(0));
+                aexp2.setFunction(new QuoteExp(DescendantAxis.make(((ChildAxis) p2).getNodePredicate())));
+              }
+          }
+      }
+    return result;
+  }
+
+  public static Expression validateApplyOrderedMap
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    Expression[] args = exp.getArgs();
+    if (args.length > 2)
+      {
+        Expression[] rargs = new Expression[args.length-1];
+        System.arraycopy(args, 1, rargs, 0, rargs.length);
+        Expression[] xargs = new Expression[2];
+        Method makeTupleMethod = typeTuples.getDeclaredMethod("make$V", 2); 
+        xargs[0] = args[0];
+        xargs[1] = new ApplyExp(makeTupleMethod, rargs);
+        return new ApplyExp(proc, xargs);
+      }
+    return exp;
+  }
+
+  static final ClassType typeTuples
+    = ClassType.make("gnu.xquery.util.OrderedTuples");
+
+  public static void compileOrderedMap (ApplyExp exp, Compilation comp, Target target, Procedure proc)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length != 2)
+      {
+        ApplyExp.compile(exp, comp, target);
+        return;
+      }
+    CodeAttr code = comp.getCode();
+    Scope scope = code.pushScope();
+    Variable consumer = scope.addVariable(code, typeTuples, null);
+    args[1].compile(comp, Target.pushValue(typeTuples));
+    code.emitStore(consumer);
+    ConsumerTarget ctarget = new ConsumerTarget(consumer);
+    args[0].compile(comp, ctarget);
+    Method mm = typeTuples.getDeclaredMethod("run$X", 1);
+    code.emitLoad(consumer);
+    PrimProcedure.compileInvoke(comp, mm, target, exp.isTailCall(),
+                                182/*invokevirtual*/, Type.pointer_type);
+    code.popScope();
   }
 }

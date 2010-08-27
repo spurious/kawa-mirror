@@ -1,3 +1,13 @@
+2010-08-27  Per Bothner  <per@bothner.com>
+
+	*  NumberCompare.java: Update to use Procedure.validateApplyKey,
+	and move inlineXxx method to CompileArith.
+	* AppendValues.java: Likewise, except moving method to CompileMisc.
+	* ValuesMap.java: Likewise.
+	* MakeProcedure.java: Likewise.
+	* CompileMisc.java: New (Moved/renamed) validateXxx methods.
+	* CompileArith.java: Likewise.
+
 2010-08-26  Per Bothner  <per@bothner.com>
 
 	* ApplyToArgs.java: Update to use Procedure.validateApplyKey.

@@ -569,6 +569,17 @@ public class CompileArith implements Inlineable
     return exp;
   }
 
+  public static Expression validateApplyNumberCompare
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    Expression folded = exp.inlineIfConstant(proc, visitor);
+    if (folded != exp)
+      return folded;
+    return exp;
+  }
+
   public int primitiveOpcode ()
   {
     switch (op)

@@ -85,6 +85,100 @@ public class CompileMisc implements Inlineable
     return exp.inlineIfConstant(proc, visitor);
   }
 
+  public static Expression validateApplyAppendValues
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    Expression[] args = exp.getArgs();
+    if (args.length == 1)
+      return args[0];
+    if (args.length == 0)
+      return QuoteExp.voidExp;
+    Expression folded = exp.inlineIfConstant(proc, visitor);
+    if (folded != exp)
+      return folded;
+    return exp;
+  }
+
+  public static Expression validateApplyMakeProcedure
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    Expression[] args = exp.getArgs();
+    int alen = args.length;
+    Expression method = null;
+    int countMethods = 0;
+    String name = null;
+    for (int i = 0;  i < alen;  i++)
+      {
+	Expression arg = args[i];
+        Object key;
+	if (arg instanceof QuoteExp
+            && (key = ((QuoteExp) arg).getValue()) instanceof Keyword)
+	  {
+	    String keyword = ((Keyword) key).getName();
+	    Expression next = args[++i];
+	    if (keyword == "name")
+              {
+                if (next instanceof QuoteExp)
+                  name = ((QuoteExp) next).getValue().toString();
+              }
+	    else if (keyword == "method")
+              {
+                countMethods++;
+                method = next;
+              }
+	    else
+	      ; // result.setProperty(keyword, value);
+	  }
+	else
+          {
+            countMethods++;
+            method = arg;
+          }
+      }
+    if (countMethods == 1 && method instanceof LambdaExp)
+      {
+        LambdaExp lexp = (LambdaExp) method;
+        for (int i = 0;  i < alen;  i++)
+          {
+            Expression arg = args[i];
+            Object key;
+            if (arg instanceof QuoteExp
+                && (key = ((QuoteExp) arg).getValue()) instanceof Keyword)
+              {
+                String keyword = ((Keyword) key).getName();
+                Expression next = args[++i];
+                if (keyword == "name")
+                  lexp.setName(name);
+                else if (keyword == "method")
+                  ;
+                else
+                  lexp.setProperty(Namespace.EmptyNamespace.getSymbol(keyword), next);
+              }
+          }
+        return method;
+      }
+    return exp;
+  }
+
+  public static Expression validateApplyValuesMap
+  (ApplyExp exp, InlineCalls visitor, Type required,
+   boolean argsInlined, Procedure proc)
+  {
+    exp.visitArgs(visitor, argsInlined);
+    LambdaExp lexp = ValuesMap.canInline(exp, (ValuesMap) proc);
+    if (lexp != null)
+      {
+	lexp.setInlineOnly(true);
+        lexp.returnContinuation = exp;
+        lexp.inlineHome = visitor.getCurrentLambda();
+      }
+    return exp;
+  }
+
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
 

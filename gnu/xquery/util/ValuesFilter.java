@@ -12,7 +12,7 @@ import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.NumberCompare;
 import gnu.kawa.functions.ValuesMap;
 
-public class ValuesFilter extends MethodProc implements CanInline, Inlineable
+public class ValuesFilter extends MethodProc implements Inlineable
 {
   /** 'F' if following a ForwardStep; 'R' if following a ReverseStep;
    * 'P' if following a PrimaryExpr. */
@@ -21,6 +21,8 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
   public ValuesFilter (char kind)
   {
     this.kind = kind;
+    setProperty(Procedure.validateApplyKey,
+                   "gnu.xquery.util.CompileMisc:validateApplyValuesFilter");
   }
 
   public static ValuesFilter get (char kind)
@@ -98,109 +100,6 @@ public class ValuesFilter extends MethodProc implements CanInline, Inlineable
 	  out.writeObject(dot);
       }
     return;
-  }
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined); // FIXME - be smarter about type propagation
-    Expression[] args = exp.getArgs();
-    Expression exp2 = args[1];
-    LambdaExp lexp2;
-    if (! (exp2 instanceof LambdaExp)
-	|| (lexp2 = (LambdaExp) exp2).min_args != 3
-	|| lexp2.max_args != 3)
-      return exp;
-
-    exp.setType(args[0].getType());
-
-    Compilation parser = visitor.getCompilation();
-
-    Declaration dotArg = lexp2.firstDecl();
-    Declaration posArg = dotArg.nextDecl();
-    Declaration lastArg = posArg.nextDecl();
-
-    lexp2.setInlineOnly(true);
-    lexp2.returnContinuation = exp;
-    lexp2.inlineHome = visitor.getCurrentLambda();
-
-    // Splice out lastArg
-    lexp2.remove(posArg, lastArg);
-    lexp2.min_args = 2;
-    lexp2.max_args = 2;
-
-    if (! lastArg.getCanRead() && kind != 'R')
-      {
-        // Don't need to do anything more - lastArg is not needed.
-        return exp;
-      }
-
-    parser.letStart();
-    Expression seq = args[0];
-    Type seqType;
-    Method sizeMethod;
-    if (kind == 'P')
-      {
-        seqType = seq.getType();
-        sizeMethod = Compilation.typeValues.getDeclaredMethod("countValues", 1);
-      }
-    else
-      {
-        seqType = SortNodes.typeSortedNodes;
-        seq = new ApplyExp(SortNodes.sortNodes, new Expression [] {seq});
-        sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
-      }
-    Declaration sequence = parser.letVariable("sequence", seqType, seq);
-    parser.letEnter();
-
-    Expression pred = lexp2.body;
-    Type predType = lexp2.body.getType();
-    if (predType != XDataType.booleanType) // Overly conservative, but simple.
-      pred = new ApplyExp(matchesMethod,
-                          new Expression[] { pred,
-                                             new ReferenceExp(posArg) });
-    if (kind == 'R')
-      {
-        Declaration posIncoming = new Declaration(null, Type.intType);
-	Expression init
-	  = new ApplyExp(AddOp.$Mn,
-			 new Expression[] {
-			   new ReferenceExp(lastArg),
-			   new ReferenceExp(posIncoming)});
-	init
-	  = new ApplyExp(AddOp.$Pl,
-			 new Expression[] {
-			   init,
-			   new QuoteExp(IntNum.one())});
-        LetExp let = new LetExp(new Expression[] { init });
-        lexp2.replaceFollowing(dotArg, posIncoming);
-        let.add(posArg);
-        let.body = pred;
-        pred = let;
-      }
-
-    pred = new IfExp(pred,
-                     new ReferenceExp(dotArg),
-                     QuoteExp.voidExp);
-    lexp2.body = pred;
-
-    ApplyExp doMap
-      = new ApplyExp(ValuesMap.valuesMapWithPos,
-		     new Expression[] { lexp2,
-					new ReferenceExp(sequence) });
-    doMap.setType(dotArg.getType());
-    lexp2.returnContinuation = doMap;
-
-    Expression lastInit = new ApplyExp(sizeMethod,
-                                       new Expression[] {
-                                         new ReferenceExp(sequence)});
-
-    LetExp let2 = new LetExp(new Expression[] { lastInit });
-    let2.add(lastArg);
-    let2.body = ValuesMap.valuesMapWithPos.inline(doMap, visitor, true);
-
-
-    return parser.letDone(let2);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

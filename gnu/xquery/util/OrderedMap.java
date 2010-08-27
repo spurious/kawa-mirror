@@ -33,34 +33,17 @@ import gnu.bytecode.*;
  */
 
 public class OrderedMap extends MethodProc
-  implements CanInline, Inlineable
+  implements Inlineable
 {
   public static final OrderedMap orderedMap = new OrderedMap();
+  static {
+    orderedMap.setProperty(Procedure.validateApplyKey,
+                   "gnu.xquery.util.CompileMisc:validateApplyOrderedMap");
+ }
 
   public static Object[] makeTuple$V (Object[] values)
   {
     return values;
-  }
-
-  static final ClassType typeTuples
-    = ClassType.make("gnu.xquery.util.OrderedTuples");
-
-  public Expression inline (ApplyExp exp, InlineCalls visitor,
-                            boolean argsInlined)
-  {
-    exp.visitArgs(visitor, argsInlined);
-    Expression[] args = exp.getArgs();
-    if (args.length > 2)
-      {
-        Expression[] rargs = new Expression[args.length-1];
-        System.arraycopy(args, 1, rargs, 0, rargs.length);
-        Expression[] xargs = new Expression[2];
-        Method makeTupleMethod = typeTuples.getDeclaredMethod("make$V", 2); 
-        xargs[0] = args[0];
-        xargs[1] = new ApplyExp(makeTupleMethod, rargs);
-        return new ApplyExp(this, xargs);
-      }
-    return exp;
   }
 
   public void apply (CallContext ctx) throws Throwable
@@ -84,24 +67,7 @@ public class OrderedMap extends MethodProc
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    Expression[] args = exp.getArgs();
-    if (args.length != 2)
-      {
-        ApplyExp.compile(exp, comp, target);
-        return;
-      }
-    CodeAttr code = comp.getCode();
-    Scope scope = code.pushScope();
-    Variable consumer = scope.addVariable(code, typeTuples, null);
-    args[1].compile(comp, Target.pushValue(typeTuples));
-    code.emitStore(consumer);
-    ConsumerTarget ctarget = new ConsumerTarget(consumer);
-    args[0].compile(comp, ctarget);
-    Method mm = typeTuples.getDeclaredMethod("run$X", 1);
-    code.emitLoad(consumer);
-    PrimProcedure.compileInvoke(comp, mm, target, exp.isTailCall(),
-                                182/*invokevirtual*/, Type.pointer_type);
-    code.popScope();
+    CompileMisc.compileOrderedMap(exp, comp, target, this);
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)

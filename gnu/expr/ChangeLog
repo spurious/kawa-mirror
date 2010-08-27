@@ -1,5 +1,9 @@
 2010-08-27  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java: Remove check for no-longer used CanInline.
+	* CanInline.java: Remove interface.
+	* Makefile.am: Update accordingly.
+
 	* InlineCalls.java (maybeInline): Remove support for old inliner API
 	found using Procedure.inlineCallsKey.
 	(getInlinerMethodArgTypes): Simplify appropriately.

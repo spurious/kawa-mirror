@@ -18,7 +18,6 @@ java_sources = \
   BindingInitializer.java \
   BlockExp.java \
   BuiltinEnvironment.java \
-  CanInline.java \
   CatchClause.java \
   ChainLambdas.java \
   CheckedTarget.java \

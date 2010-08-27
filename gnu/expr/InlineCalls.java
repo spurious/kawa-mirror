@@ -327,8 +327,6 @@ public class InlineCalls extends ExpExpVisitor<Type>
               return (Expression) ((java.lang.reflect.Method) inliner)
                 .invoke(null, vargs);
           }
-        if (proc instanceof CanInline)
-          return ((CanInline) proc).inline(exp, this, argsInlined);
       }
     catch (Throwable ex)
       {

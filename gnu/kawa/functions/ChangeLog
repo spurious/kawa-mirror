@@ -1,5 +1,24 @@
 2010-08-27  Per Bothner  <per@bothner.com>
 
+	* ArithOp.java (op): New field.
+	(<init>): New parameter, for setting op.
+	(DIV, REM): Remove constants.
+	(DIVIDE_GENERIC, DIVIDE_INEXACT, QUOTIENT, QUOTIENT_EXACT, MODULO):
+	New constants.
+	* DivideOp.java: Change to extend ArithOp.
+	(GENERIC, DIVIDE_INEXACT, QUOTIENT, QUOTIENT_EXACT, MODULO):
+	Remove constants - use the inherited ones instead.
+	* DivideOp.java: Remove fields - now inherited.
+	* BitwiseOp.java: Likewise.
+	* AddOp.java, MultiplyOp.java, DivideOp.java, BitwiseOp.java,
+	Not.java, Convert.java, ConstantFunction0.java
+	Update to use Procedure.validateApplyKey.
+	* CompileMisc.java: Rename inlineXxx methods to validateXxx
+	methods that take an extra required-Type parameter.
+	* CompileArith.java: Likewise.  No longer implement CanInline.
+
+2010-08-27  Per Bothner  <per@bothner.com>
+
 	* Map.java: Moved/renamed from kawa/standard/map.java.
 	* CallCC.java: Moved/renamed from kawa/standard/callcc.java.
 	* CompileMisc.java: Moved validateApply (inline) code from above here.
@@ -25,7 +44,7 @@
 	* IsEqv.java: Likewise.
 	* Setter.java: Likewise.
 	* CompilationHelpers.java: Rename inlineXxx methods to validateXxx
-	methods that take an extra require_type parameter.
+	methods that take an extra required-Type parameter.
 	* CompileNamedPart.java: Likewise.
 
 2010-08-19  Per Bothner  <per@bothner.com>

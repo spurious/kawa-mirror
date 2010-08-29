@@ -1,3 +1,12 @@
+2010-08-28  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitInvokeMethod): After initialization we also need
+	to remove UninitializedType from the local_types array.
+
+	* Label.java (mergeTypes): New method.  It differs from
+	Type.lowestCommonSuperType in that merging a PrimType and a
+	non-PrimType returns null rather than objectType.
+
 2010-08-07  Per Bothner  <per@bothner.com>
 
 	* Type.java (class ClassToTypeMap): Change to a member class.

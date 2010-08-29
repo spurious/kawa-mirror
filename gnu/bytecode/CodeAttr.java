@@ -1488,6 +1488,9 @@ public class CodeAttr extends Attribute implements AttrContainer
             if (var != null && var.type == t)
               var.type = ctype;
           }
+        for (int i = local_types == null ? 0 : local_types.length;  --i >= 0; )
+          if (local_types[i] == t)
+            local_types[i] = ctype;
       }
    if (method.return_type.size != 0)
       pushType(method.return_type);

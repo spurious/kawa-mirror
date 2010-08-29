@@ -76,16 +76,23 @@ public class Label {
           throw new Error("inconsistent stack len was:"+slen+" now:"+SP+" for "+this);
         for (int i = 0; i < SP; i++)
           {
-            stackTypes[i] = Type.lowestCommonSuperType(stackTypes[i], stack[i]);
+            stackTypes[i] = mergeTypes(stackTypes[i], stack[i]);
           }
         int min = usedLocals < localTypes.length ? usedLocals : localTypes.length ;
         for (int i = 0; i < min; i++)
           {
-            localTypes[i] = Type.lowestCommonSuperType(localTypes[i], locals[i]);
+            localTypes[i] = mergeTypes(localTypes[i], locals[i]);
           }
         for (int i = usedLocals; i < localTypes.length;  i++)
           localTypes[i] = null;
       }
+  }
+
+  Type mergeTypes (Type t1, Type t2)
+  {
+    if ((t1 instanceof PrimType) != (t2 instanceof PrimType))
+      return null;
+    return Type.lowestCommonSuperType(t1, t2);
   }
 
   public void setTypes (CodeAttr code)

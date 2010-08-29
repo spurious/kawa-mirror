@@ -1,3 +1,8 @@
+2010-08-28  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (identifier-list?, identifier-pair-list? obj):
+	Specify that return types are boolean.
+
 2010-08-20  Per Bothner  <per@bothner.com>
 
 	* parameters.scm (parameterize%): Update since setWithSave/setRestore

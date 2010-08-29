@@ -44,7 +44,7 @@
 		  (syntax->expression (syntax object))
 		  (syntax-body->expression (syntax body))))))
 
-(define (identifier-list? obj)
+(define (identifier-list? obj) ::boolean
   (and (>= (kawa.lang.Translator:listLength obj) 0)
        (let loop ((obj obj))
 	 (syntax-case obj ()
@@ -53,7 +53,7 @@
 	   (() #t)
 	   (_ #f)))))
 
-(define (identifier-pair-list? obj)
+(define (identifier-pair-list? obj) ::boolean
   (and (>= (kawa.lang.Translator:listLength obj) 0)
        (let loop ((obj obj))
 	 (syntax-case obj ()

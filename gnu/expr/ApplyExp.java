@@ -192,7 +192,7 @@ public class ApplyExp extends Expression
 	  throw new Error ("internal error - wrong number of parameters for "
 			   + func_lambda);
 	int conv = func_lambda.getCallConvention();
-        // Mostly duplicates logic with LambdaExp.inline.
+        // Mostly duplicates logic with LambdaExp.validateApply.
         // See comment there.
 	if (comp.inlineOk(func_lambda)
 	    && (conv <= Compilation.CALL_WITH_CONSUMER

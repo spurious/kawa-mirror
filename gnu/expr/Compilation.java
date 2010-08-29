@@ -1845,7 +1845,7 @@ public class Compilation implements SourceLocator
     return method;
   }
 
-  /** Parse/walk/compile this module as needed and requested.
+  /** Parse/visit/compile this module as needed and requested.
    * This method does not process any dependent modules (expect indirectly,
    * such as may be done by a require form).
    * @param wantedState the desired value of getState().

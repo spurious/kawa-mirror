@@ -284,6 +284,17 @@
     </java>
   </target>
 
+  <target name="select-java7" depends="build-tools,check-for-HttpServer">
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="%java7 ${preprocess-xml} ${preprocess-HttpServer}"/>
+      <arg line="${fileList}"/>
+    </java>
+  </target>
+
   <target name="check-for-HttpServer">
     <condition property="preprocess-HttpServer" value="+use:com.sun.net.httpserver"
 	       else="-use:com.sun.net.httpserver">

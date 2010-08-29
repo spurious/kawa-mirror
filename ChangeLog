@@ -1,5 +1,7 @@
 2010-08-28  Per Bothner  <per@bothner.com>
 
+	* build/xml (select-java7): New target.
+
 	* Makefile.am (select-java7, selected-java-source):
 	Add missing jdk7 support.
 	* configure.in: Map --with-jave-source to JAVA_SOURCE=7 - not 6.

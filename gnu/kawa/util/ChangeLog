@@ -1,3 +1,7 @@
+2010-08-28  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java (version_features): Add "java7".
+
 2010-08-07  Per Bothner  <per@bothner.com>
 
 	* AbstractHashTable.java (clear):  Fix thinko.

@@ -233,6 +233,8 @@ selected-java-source: Makefile
 	then $(MAKE) select-java6compat5; \
 	elif test "$(JAVA_SOURCE)" = 6; \
 	then $(MAKE) select-java6; \
+	elif test "$(JAVA_SOURCE)" = 7; \
+	then $(MAKE) select-java7; \
 	elif test "$(JAVA_SOURCE)" = android; \
 	then $(MAKE) select-android; \
 	else echo Unrecognized JAVA_SOURCE: $(JAVA_SOURCE); exit 1; \
@@ -278,6 +280,10 @@ select-java6compat5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 # JDK 1.6
 select-java6: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(MAKE) do-preprocess SELECTOR='%java6'
+
+# JDK 1.7
+select-java7: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(MAKE) do-preprocess SELECTOR='%java7'
 
 # Android
 select-android: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class

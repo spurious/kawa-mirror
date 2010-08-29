@@ -19,18 +19,19 @@ public class PreProcess
   static final String JAVA4_FEATURES = "+JAVA2 +use:java.util.IdentityHashMap +use:java.lang.CharSequence +use:java.lang.Throwable.getCause +use:java.net.URI +use:java.util.regex +SAX2 +use:java.nio";
   static final String NO_JAVA4_FEATURES = "-JAVA5 -use:java.util.IdentityHashMap -use:java.lang.CharSequence -use:java.lang.Throwable.getCause -use:java.net.URI -use:java.util.regex -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAVA5 -JAVA6 -JAVA6COMPAT5 -JAXP-QName -use:java.text.Normalizer -SAX2 -use:java.nio -Android";
   static final String JAVA5_FEATURES = "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +use:javax.xml.transform +JAXP-1.3 -JAXP-QName";
-  static final String NO_JAVA6_FEATURES = "-use:java.text.Normalizer";
+  static final String NO_JAVA6_FEATURES = "-JAVA6 -JAVA7 -use:java.dyn -use:java.text.Normalizer";
 
   static String[] version_features = {
     "java1", "-JAVA2 "+NO_JAVA4_FEATURES+" "+NO_JAVA6_FEATURES,
     "java2", "+JAVA2 "+NO_JAVA4_FEATURES+" "+NO_JAVA6_FEATURES,
     // We don't use Node for java4 because there are inconsistencies between
     // the version of DOM used in Java4 and the one in Java 5 (and GCJ).
-    "java4", "-JAVA5 "+JAVA4_FEATURES+" -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAXP-QName -JAVA6 -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
-    "java4x", "-JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 +use:javax.xml.transform -JAXP-QName -JAVA6 -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
-    "java5", JAVA5_FEATURES+" -JAVA6 -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
-    "java6compat5", JAVA5_FEATURES+" -JAVA6 +JAVA6COMPAT5 +use:java.text.Normalizer -Android",
-    "java6", JAVA5_FEATURES+" +JAVA6 -JAVA6COMPAT5 +use:java.text.Normalizer -Android",
+    "java4", "-JAVA5 "+JAVA4_FEATURES+" -use:org.w3c.dom.Node -JAXP-1.3 -use:javax.xml.transform -JAXP-QName -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
+    "java4x", "-JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 +use:javax.xml.transform -JAXP-QName -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
+    "java5", JAVA5_FEATURES+" -JAVA6COMPAT5 -Android "+NO_JAVA6_FEATURES,
+    "java6compat5", JAVA5_FEATURES+" -JAVA6 -JAVA7 +JAVA6COMPAT5 +use:java.text.Normalizer -use:java.dyn -Android",
+    "java6", JAVA5_FEATURES+" +JAVA6 -JAVA7 -JAVA6COMPAT5 +use:java.text.Normalizer -use:java.dyn -Android",
+    "java7", JAVA5_FEATURES+" +JAVA6 +JAVA7 -JAVA6COMPAT5 +use:java.text.Normalizer +use:java.dyn -Android",
     "android", "+JAVA5 "+JAVA4_FEATURES+" +use:org.w3c.dom.Node +JAXP-1.3 -JAXP-QName -use:javax.xml.transform -JAVA6 -JAVA6COMPAT5 +Android "+NO_JAVA6_FEATURES,
   };
 

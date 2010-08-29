@@ -18,6 +18,7 @@ public class ApplyExp extends Expression
 
   public static final int TAILCALL = NEXT_AVAIL_FLAG;
   public static final int INLINE_IF_CONSTANT = NEXT_AVAIL_FLAG << 1;
+  public static final int MAY_CONTAIN_BACK_JUMP = NEXT_AVAIL_FLAG << 2;
 
   /** Containing LambdaExp. */
   LambdaExp context;

@@ -17,9 +17,13 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     exp.visit(visitor, null);
   }
 
+  int backJumpPossible = 0;
+
   protected Expression visitApplyExp (ApplyExp exp, Void ignored)
   {
+    int oldBackJumpPossible = backJumpPossible;
     boolean skipFunc = false;
+    boolean skipArgs = false;
     // If the func is bound to a module-level known function, and it
     // doesn't need a closure yet (i.e. could be compiled to a static
     // method), don't visit the function, since that might force it to
@@ -72,7 +76,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
                         decl.firstCall = exp;
                         for (int i = 1;  i < args.length;  i++)
                           args[i].visit(this, ignored);
-                        return exp;
+                        skipFunc = skipArgs = true;
                       }
                   }
               }
@@ -80,8 +84,10 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
       }
     if (! skipFunc)
       exp.func = exp.func.visit(this, ignored);
-    if (exitValue == null)
+    if (exitValue == null && ! skipArgs)
       exp.args = visitExps(exp.args, ignored);
+    if (backJumpPossible > oldBackJumpPossible)
+      exp.setFlag(ApplyExp.MAY_CONTAIN_BACK_JUMP);
     return exp;
   }
 
@@ -277,7 +283,10 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
         // makes stack traces less helpful, and increases the risk of
         // methods getting too big.
         && (! (exp.outer instanceof ModuleExp) || exp.nameDecl == null))
-      exp.setInlineOnly(true);
+      {
+        exp.setInlineOnly(true);
+        backJumpPossible++;
+      }
     return super.visitLambdaExp(exp, ignored);
   }
 

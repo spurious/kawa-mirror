@@ -1,3 +1,10 @@
+2010-08-28  Per Bothner  <per@bothner.com>
+
+	Fix verification problem (backward jump between new and constructor).
+	* ApplyExp.java (MAY_CONTAIN_BACK_JUMP): New flag.
+	* FindCapturedVars.java: Set MAY_CONTAIN_BACK_JUMP if indicated.
+	* PrimProcedure.java: Rewrite constructor if it MAY_CONTAIN_BACK_JUMP.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java: Remove check for no-longer used CanInline.

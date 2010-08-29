@@ -562,6 +562,35 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Expression[] args = exp.getArgs();
     if (isConstructor())
       {
+        if (exp.getFlag(ApplyExp.MAY_CONTAIN_BACK_JUMP))
+          {
+            // JVM spec for Java6:
+            // "There must never be an uninitialized class instance
+            // on the operand stack or in a local variable when
+            // any backwards branch is taken."
+            // Hence re-write:
+            //   (make Foo a1 backward_dump_containing_expression a3 ...)
+            // to:
+            //   (let ((t1 a1)
+            //         (t2 backward_dump_containing_expression)
+            //         (t3 q2) ...)
+            //     (make Foo a1 t1 t2 t3 ...))
+            int nargs = args.length;
+            comp.letStart();
+            Expression[] xargs = new Expression[nargs];
+            xargs[0] = args[0];
+            for (int i = 1;  i < nargs;  i++)
+              {
+                Expression argi = args[i];
+                Declaration d = comp.letVariable(null, argi.getType(), argi);
+                d.setCanRead(true);
+                xargs[i] = new ReferenceExp(d);
+              }
+            comp.letEnter();
+            LetExp let = comp.letDone(new ApplyExp(exp.func, xargs));
+            let.compile(comp, target);
+            return;
+          }
         code.emitNew(mclass);
         code.emitDup(mclass);
       }

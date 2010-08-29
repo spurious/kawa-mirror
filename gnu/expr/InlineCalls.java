@@ -9,6 +9,9 @@ import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
 import java.lang.reflect.InvocationTargetException;
+/* #ifdef use:java.dyn */
+// import java.dyn.*;
+/* #endif */
 
 /**
  * The main Expression re-writing pass.
@@ -272,6 +275,15 @@ public class InlineCalls extends ExpExpVisitor<Type>
     return exp;
   }
 
+  /* #ifdef use:java.dyn */
+  // static final java.dyn.MethodType validateApplyMType =
+  //   java.dyn.MethodType.make(gnu.expr.Expression.class,
+  //                            gnu.expr.ApplyExp.class,
+  //                            gnu.expr.InlineCalls.class,
+  //                            gnu.bytecode.Type.class,
+  //                            Boolean.TYPE,
+  //                            gnu.mapping.Procedure.class);
+  /* #else */
   private static Class[] inlinerMethodArgTypes;
   private static synchronized Class[] getInlinerMethodArgTypes()
     throws Exception
@@ -288,6 +300,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
       }
     return t;
   }
+  /* #endif */
 
   public Expression maybeInline (ApplyExp exp, Type required, boolean argsInlined, Procedure proc)
   {
@@ -302,13 +315,21 @@ public class InlineCalls extends ExpExpVisitor<Type>
               {
                 String inliners = (String) inliner;
                 int colon = inliners.indexOf(':');
+                /* #ifdef use:java.dyn */
+                // MethodHandle method = null;
+                /* #else */
                 java.lang.reflect.Method method = null;
+                /* #endif */
                 if (colon > 0)
                   {
                     String cname = inliners.substring(0, colon);
                     String mname = inliners.substring(colon+1);
                     Class clas = Class.forName(cname, true, proc.getClass().getClassLoader());
+                    /* #ifdef use:java.dyn */
+                    // method = MethodHandles.lookup().findStatic(clas, mname, validateApplyMType);
+                    /* #else */
                     method = clas.getDeclaredMethod(mname, getInlinerMethodArgTypes());
+                    /* #endif */
                   }
                 if (method == null)
                   {
@@ -320,12 +341,18 @@ public class InlineCalls extends ExpExpVisitor<Type>
           } /* end synchronized */
         if (inliner != null)
           {
+            /* #ifdef use:java.dyn */
+            // if (inliner instanceof MethodHandle)
+            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this,  required, argsInlined, proc);
+            /* #endif */
             Object[] vargs = new Object[] { exp, this,  required, argsInlinedBoxed, proc };
             if (inliner instanceof Procedure)
               return (Expression) ((Procedure) inliner).applyN(vargs);
+            /* #ifndef use:java.dyn */
             else if (inliner instanceof java.lang.reflect.Method)
               return (Expression) ((java.lang.reflect.Method) inliner)
                 .invoke(null, vargs);
+            /* #endif */
           }
       }
     catch (Throwable ex)

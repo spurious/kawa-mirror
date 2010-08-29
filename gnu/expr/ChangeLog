@@ -1,5 +1,10 @@
 2010-08-28  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (defaultClassFileVersion):  If JAVA7 is PreProcessed,
+	select ClassType.JDK_1_7_VERSION.
+	* InlineCalls.java (maybeInline): If use:java.dyn is PreProcess-enabled,
+	use a MethodHandle instead of reflection.  Note is compile-time-only.
+
 	Fix verification problem (backward jump between new and constructor).
 	* ApplyExp.java (MAY_CONTAIN_BACK_JUMP): New flag.
 	* FindCapturedVars.java: Set MAY_CONTAIN_BACK_JUMP if indicated.

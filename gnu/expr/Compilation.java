@@ -102,10 +102,6 @@ public class Compilation implements SourceLocator
     pendingImports.push(posExp);
   }
 
-  /** If true, minimize the number of classes generated.
-   * Do this even if it makes things a little slower. */
-  public static boolean fewerClasses;
-
   /** If true, print out expressions after parsing and before optimizations. */
   public static boolean debugPrintExpr = false;
 
@@ -1978,8 +1974,7 @@ public class Compilation implements SourceLocator
 	arg_types = new Type[1];
 	arg_types[0] = typeCallContext;
       }
-    else if (module.min_args != module.max_args || module.min_args > 4
-	|| (fewerClasses && curClass == mainClass))
+    else if (module.min_args != module.max_args || module.min_args > 4)
       {
 	arg_count = 1;
 	arg_types = new Type[1];
@@ -2136,11 +2131,8 @@ public class Compilation implements SourceLocator
 
     curLambda = saveLambda;
 
-    if (Compilation.fewerClasses) // FIXME
-      method.popScope(); // Undoes pushScope in method.initCode.
-
     module.heapFrame = heapFrame;  // Restore heapFrame.
-    if (usingCPStyle() || (fewerClasses && curClass == mainClass))
+    if (usingCPStyle())
       {
 	code = getCode();
 	fswitch.finish(code);

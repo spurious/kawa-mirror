@@ -1,3 +1,9 @@
+2010-08-31  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (fewerClass): Remove unused flag.
+	Update accordingly.
+	* LambdaExp.java: Likewise.
+
 2010-08-28  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (defaultClassFileVersion):  If JAVA7 is PreProcessed,

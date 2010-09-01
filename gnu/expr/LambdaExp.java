@@ -543,8 +543,7 @@ public class LambdaExp extends ScopeExp
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
 	popScope(code);        // Undoes enterScope in allocParameters
-	if (! Compilation.fewerClasses) // FIXME
-	  code.popScope(); // Undoes pushScope in method.initCode.
+        code.popScope(); // Undoes pushScope in method.initCode.
       }
 
     for (LambdaExp child = firstChild;  child != null; )
@@ -1357,7 +1356,7 @@ public class LambdaExp extends ScopeExp
       }
 
     Variable argsArray = this.argsArray;
-    if (min_args == max_args && ! Compilation.fewerClasses
+    if (min_args == max_args
 	&& primMethods == null
 	&& getCallConvention () < Compilation.CALL_WITH_CONSUMER)
       argsArray = null;

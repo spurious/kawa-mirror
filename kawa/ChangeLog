@@ -1,3 +1,7 @@
+2010-08-31  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Remove unused --fewer-classes option.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* standard/map.java: Oved/renamed to gnu/kawa/functions/Map.java.

@@ -602,10 +602,6 @@ public class repl extends Procedure0or1
           {
             Compilation.moduleStatic = Compilation.MODULE_STATIC_RUN;
           }
-	else if (arg.equals("--fewer-classes"))
-	  {
-	    Compilation.fewerClasses = true;
-	  }
 	else if (arg.equals("--no-inline")
 		 || arg.equals("--inline=none"))
 	  {
@@ -619,7 +615,6 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--cps"))
 	  {
-	    Compilation.fewerClasses = true;
 	    Compilation.defaultCallConvention
 	      = Compilation.CALL_WITH_CONTINUATIONS;
 	  }

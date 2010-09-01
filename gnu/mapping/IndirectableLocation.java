@@ -24,7 +24,7 @@ public abstract class IndirectableLocation extends Location
    * this <code>Location</code>.
    * If <code>base</code> is non-null, then <code>value</code> is generally
    * ignored.  However, the special value <code>DIRECT_ON_SET</code> means that
-   * writes change change <code>value</code> directly, instead of setting
+   * writes change <code>value</code> directly, instead of setting
    * the value of <code>base</code>.
    */
   protected Object value;

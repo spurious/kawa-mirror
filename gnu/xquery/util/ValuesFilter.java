@@ -85,8 +85,8 @@ public class ValuesFilter extends MethodProc implements Inlineable
     int count = values.size();
     int it = 0;
     IntNum countObj = IntNum.make(count);
-    // The filter procedures takes 3 arguments is last() is needed,
-    // or 2 arguments if inline has determined we don't need last().
+    // The filter procedures takes 3 arguments if last() is needed,
+    // or 2 arguments if validateApply has determined we don't need last().
     int pmax = proc.maxArgs();
     for (int i = 0;  i < count;  i++)
       {

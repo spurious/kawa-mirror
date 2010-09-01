@@ -557,7 +557,8 @@ public class XQResolveNames extends ResolveNames
 		if (decl == null)
 		  error('e', "undefined context for " + sym.getName());
                 else
-                  // So ValuesFilter.inline can tell whether last() is used.
+                  // So CompileMisc:validateApplyValuesFilter
+                  // can tell whether last() is used.
                   decl.setCanRead(true);
 		return new ReferenceExp(sym, decl);
               case CAST_AS_BUILTIN:

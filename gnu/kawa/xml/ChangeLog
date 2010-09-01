@@ -1,3 +1,8 @@
+2010-08-31  Per Bothner  <per@bothner.com>
+
+	* XIntegerType.java (valueOf): Don't need to check for initial
+	'+' since that is now handled by IntNum.valueOf.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* TreeScanner.java: Update to use Procedure.validateApplyKey,

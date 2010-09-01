@@ -1,3 +1,8 @@
+2010-08-31  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (valueOf): Handle an initial '+'.
+	This is handled by Long.parseLong in JDK 7, but not JDK 6.
+
 2009-12-05  Per Bothner  <per@bothner.com>
 
 	* RatNum.java (rneg): New method.

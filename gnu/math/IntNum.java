@@ -1348,7 +1348,14 @@ public class IntNum extends RatNum implements Externalizable
     // Testing (len < 2 * MPN.chars_per_word(radix)) would be more accurate,
     // but slightly more expensive, for little practical gain.
     if (len + radix <= 28)
-      return IntNum.make (Long.parseLong (s, radix));
+      {
+        /* # ifndef JAVA7 */
+        if (len > 1 && s.charAt(0) == '+'
+            && Character.digit(s.charAt(1), radix) >= 0)
+          s = s.substring(1);
+        /* #endif */
+        return IntNum.make (Long.parseLong (s, radix));
+      }
     
     int byte_len = 0;
     byte[] bytes = new byte[len];
@@ -1356,8 +1363,10 @@ public class IntNum extends RatNum implements Externalizable
     for (int i = 0;  i < len;  i++)
       {
 	char ch = s.charAt (i);
-	if (ch == '-')
+	if (ch == '-' && i == 0)
 	  negative = true;
+	else if (ch == '+' && i == 0)
+          ; // ignore
 	else if (ch == '_' || (byte_len == 0 && (ch == ' ' || ch == '\t')))
 	  continue;
 	else

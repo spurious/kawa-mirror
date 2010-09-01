@@ -150,15 +150,7 @@ public class XIntegerType extends XDataType
 
   public Object valueOf (String value)
   {
-    value = value.trim();
-    int len = value.length();
-    if (len > 0)
-      {
-        char ch = value.charAt(0);
-        if (ch == '+')
-          value = value.substring(1);
-      }
-    return valueOf(IntNum.valueOf(value, 10));
+    return valueOf(IntNum.valueOf(value.trim(), 10));
   }
 
   public IntNum valueOf (String value, int radix)

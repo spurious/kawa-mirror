@@ -1,3 +1,10 @@
+2010-09-02  Per Bothner  <per@bothner.com>
+
+	In interactive mode allow re-binding existing procedures.
+	* ProcInitializer.java (emitLoadModuleMethod): If interactive, check
+	if there is an existing ModuleMethod binding, and if so re-use it.
+	* ModuleMethod.java (init): New method.
+
 2010-09-01  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (allocParameters): Remove some obsolate code - we

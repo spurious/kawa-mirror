@@ -14,28 +14,31 @@ import java.lang.reflect.*;
 public class ModuleMethod extends MethodProc
 {
   public ModuleBody module;
-  public final int selector;
+  public int selector;
   protected int numArgs;
 
   public ModuleMethod(ModuleBody module, int selector,
                       Object name, int numArgs)
   {
-    this.module = module;
-    this.selector = selector;
-    this.numArgs = numArgs;
-    if (name != null)
-      setSymbol(name);
+    init(module, selector, name, numArgs);
   }
 
   public ModuleMethod (ModuleBody module, int selector,
 		       Object name, int numArgs, Object argTypes)
+  {
+    init(module, selector, name, numArgs);
+    this.argTypes = argTypes;
+  }
+
+  public ModuleMethod init(ModuleBody module, int selector,
+                           Object name, int numArgs)
   {
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
     if (name != null)
       setSymbol(name);
-    this.argTypes = argTypes;
+    return this;
   }
 
   /** Figure out parameter types.

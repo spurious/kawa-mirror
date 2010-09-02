@@ -1,6 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.PropertySet;
+import gnu.mapping.*;
 
 public class ProcInitializer extends Initializer
 {
@@ -27,10 +27,36 @@ public class ProcInitializer extends Initializer
   /** Create and load a ModuleMethod for the given procedure. */
   public static void emitLoadModuleMethod(LambdaExp proc, Compilation comp)
   {
+    Declaration pdecl = proc.nameDecl;
+    Object pname = pdecl == null ? proc.getName() : pdecl.getSymbol();
+    ModuleMethod oldproc = null;
+    if (comp.immediate && pname != null)
+      {
+        // In interactive mode allow dynamic rebinding of procedures.
+        // If there is an existing ModuleMethod binding, re-use it.
+        Environment env = Environment.getCurrent();
+        Symbol sym = pname instanceof Symbol ? (Symbol) pname
+          : Symbol.make("", pname.toString().intern());
+        Object property = comp.getLanguage().getEnvPropertyFor(proc.nameDecl);
+        Object old = env.get(sym, property, null);
+        if (old instanceof ModuleMethod)
+          oldproc = (ModuleMethod) old;
+      }
     CodeAttr code = comp.getCode();
     ClassType procClass = Compilation.typeModuleMethod;
-    code.emitNew(procClass);
-    code.emitDup(1);
+    String initName;
+    if (oldproc == null)
+      {
+        code.emitNew(procClass);
+        code.emitDup(1);
+        initName = "<init>";
+      }
+    else
+      {
+        comp.compileConstant(oldproc, Target.pushValue(procClass));
+        initName = "init";
+      }
+    Method initModuleMethod = procClass.getDeclaredMethod(initName, 4);
     LambdaExp owning = proc.getNeedsClosureEnv() ? proc.getOwningLambda()
       : comp.getModule();
     if (owning instanceof ClassExp && owning.staticLinkField != null)
@@ -65,16 +91,12 @@ public class ProcInitializer extends Initializer
 	code.emitLoad(comp.moduleInstanceVar);
       }
     code.emitPushInt(proc.getSelectorValue(comp));
-    comp.compileConstant(proc.nameDecl != null ? proc.nameDecl.getSymbol()
-			 : proc.getName(),
-			 Target.pushObject);
+    comp.compileConstant(pname, Target.pushObject);
     // If there are keyword arguments, we treat that as "unlimited" maxArgs,
     // so that ModuleBody.matchX methods call matchN.  A kludge, I guess.
     code.emitPushInt(proc.min_args
                      | ((proc.keywords == null ? proc.max_args : -1) << 12));
-    Method initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
-    code.emitInvokeSpecial(initModuleMethod);
-
+    code.emitInvoke(initModuleMethod);
 
     if (proc.properties != null)
       {

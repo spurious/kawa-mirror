@@ -1262,27 +1262,6 @@ public class LambdaExp extends ScopeExp
     if (line > 0)
       code.putLineNumber(getFileName(), line);
 
-    for (Declaration decl = firstDecl();  decl != null;  )
-      {
-	// If the only reason we are using an argsArray is because there
-	// are more than 4 arguments, copy the arguments in local register.
-	// Then forget about the args array.  We do this first, before
-	// the label that tail-recursion branches back to.
-	// This way, a self-tail-call knows where to leave the argumnents.
-	if (argsArray != null && min_args == max_args
-	    && primMethods == null
-	    && getCallConvention() < Compilation.CALL_WITH_CONSUMER)
-	  {
-	    code.emitLoad(argsArray);
-	    code.emitPushInt(j);
-	    code.emitArrayLoad(Type.objectType);
-	    decl.getType().emitCoerceFromObject(code);
-	    code.emitStore(decl.getVariable());
-	  }
-	j++;
-	i++;
-	decl = decl.nextDecl();
-      }
     if (heapFrame != null)
       heapFrame.allocateLocal(code);
   }

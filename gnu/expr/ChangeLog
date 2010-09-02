@@ -1,3 +1,9 @@
+2010-09-01  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (allocParameters): Remove some obsolate code - we
+	no longer use an argsArray solely because we have have > 4 parameters
+	in the function method, only apply methods.
+
 2010-08-31  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (fewerClass): Remove unused flag.

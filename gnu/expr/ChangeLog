@@ -1,3 +1,12 @@
+2010-09-04  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (inlineOk): In interactive mode don't inline
+	non-self calls to top-level functions.
+	* LambdaExp.java (visit): Set and restore Compilation's curLambda.
+	* ProcInitializer.java (emitLoadModuleMethod): Allow rebinding
+	only if there is a Declaration.  (Probably redundant change.)
+	* ScopeExp.java (topLevel): New method.
+
 2010-09-02  Per Bothner  <per@bothner.com>
 
 	In interactive mode allow re-binding existing procedures.

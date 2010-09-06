@@ -415,16 +415,26 @@ public class Compilation implements SourceLocator
   {
     if (proc instanceof LambdaExp)
       {
+        LambdaExp lproc = (LambdaExp) proc;
+        Declaration nameDecl = lproc.nameDecl;
 	// The compiler gets confused if we turn off inlining for nested
 	// procedures - and they can't be rebound anyway.
-	if (! (((LambdaExp) proc).currentLambda() instanceof ModuleExp))
-	  return true;
+        if (nameDecl == null || nameDecl.getSymbol() == null
+            || ! (nameDecl.context instanceof ModuleExp))
+          return true;
+        if (immediate
+            && ! lproc.getFlag(LambdaExp.OVERLOADABLE_FIELD)
+            && (curLambda == null || lproc.topLevel() != curLambda.topLevel()))
+          return false;
       }
     return inlineOk;
   }
 
   public boolean inlineOk (Procedure proc)
   {
+    if (immediate && proc instanceof ModuleMethod
+        && ((ModuleMethod) proc).module.getClass().getClassLoader() instanceof ArrayClassLoader)
+      return false;
     return inlineOk;
   }
 

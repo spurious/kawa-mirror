@@ -127,6 +127,19 @@ public abstract class ScopeExp extends Expression
       }
   }
 
+  /** Return the outermost non-module scope, if there is one. */
+  public ScopeExp topLevel ()
+  {
+    ScopeExp exp = this;
+    for (;; )
+      {
+        ScopeExp outer = exp.outer;
+        if (outer == null || outer instanceof ModuleExp)
+          return exp;
+        exp = outer;
+      }
+  }
+
   public ModuleExp currentModule ()
   {
     ScopeExp exp = this;

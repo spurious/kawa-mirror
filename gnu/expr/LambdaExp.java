@@ -1623,7 +1623,24 @@ public class LambdaExp extends ScopeExp
 
   protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return visitor.visitLambdaExp(this, d);
+    Compilation comp = visitor.getCompilation();
+    LambdaExp saveLambda;
+    if (comp == null)
+      saveLambda = null;
+    else
+      {
+        saveLambda = comp.curLambda;
+        comp.curLambda = this;
+      }
+    try
+      {
+        return visitor.visitLambdaExp(this, d);
+      }
+    finally
+      {
+        if (comp != null)
+          comp.curLambda = saveLambda;
+      }
   }
 
   protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)

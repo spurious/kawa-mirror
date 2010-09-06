@@ -1,3 +1,8 @@
+2010-09-05  Per Bothner  <per@bothner.com>
+
+	* cycle1.scm (double-c2x): Move before require so it also works when
+	running with --no-inline.
+
 2010-08-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SERVLET_TESTS): Only check-HelloCgiX if ENABLE_XQUERY.

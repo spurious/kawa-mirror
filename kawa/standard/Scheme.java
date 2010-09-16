@@ -6,8 +6,7 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.math.IntNum;
 import gnu.expr.*;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import gnu.kawa.lispexpr.*;
@@ -945,15 +944,16 @@ public class Scheme extends LispLanguage
     return getInstance().getTypeFor(exp);
   }
 
-  static Hashtable types;
+  static HashMap<String,Type> types;
+  static HashMap<Type,String> typeToStringMap;
 
-  public static Type getNamedType (String name)
+  static synchronized HashMap<String,Type> getTypeMap ()
   {
     if (types == null)
       {
 	booleanType
 	  = new LangPrimType(Type.booleanType, Scheme.getInstance());
-	types = new Hashtable ();
+	types = new HashMap<String,Type> ();
 	types.put ("void", LangPrimType.voidType);
 	types.put ("int", LangPrimType.intType);
 	types.put ("char", LangPrimType.charType);
@@ -1017,6 +1017,12 @@ public class Scheme extends LispLanguage
         types.put ("document", ClassType.make("gnu.kawa.xml.KDocument"));
         types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
       }
+    return types;
+  }
+
+  public static Type getNamedType (String name)
+  {
+    getTypeMap();
     Type type = (Type) types.get(name);
     if (type == null
 	&& (name.startsWith("elisp:") || name.startsWith("clisp:")))
@@ -1070,6 +1076,28 @@ public class Scheme extends LispLanguage
     if ("gnu.bytecode.ClassType".equals(name))
       return LangObjType.typeClassType;
     return Type.make(clas);
+  }
+
+  public String formatType (Type type)
+  {
+    // FIXME synchronize
+    if (typeToStringMap == null)
+      {
+        typeToStringMap = new HashMap<Type,String>();
+        for (java.util.Map.Entry<String,Type> e : getTypeMap().entrySet())
+          {
+            String s = e.getKey();
+            Type t = e.getValue();
+            typeToStringMap.put(t, s);
+            Type it = t.getImplementationType();
+            if (it != t)
+              typeToStringMap.put(it, s);
+          }
+      }
+    String str = typeToStringMap.get(type);
+    if (str != null)
+      return str;
+    return super.formatType(type);
   }
 
   public static Type string2Type (String name)

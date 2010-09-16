@@ -197,16 +197,13 @@ public class ModuleExp extends LambdaExp
   {
     ModuleExp mexp = comp.getModule();
     mexp.info = comp.minfo;
-    Environment orig_env = Environment.getCurrent();
+    Environment orig_env = Environment.setSaveCurrent(env);
     Compilation orig_comp = Compilation.setSaveCurrent(comp);
     SourceMessages messages = comp.getMessages();
     ClassLoader savedLoader = null;
     Thread thread = null; // Non-null if we need to restore context ClassLoader.
     try
       {
-	if (env != orig_env)
-	  Environment.setCurrent(env);
-
         if (alwaysCompile)
           comp.mustCompile = true;
 
@@ -253,8 +250,7 @@ public class ModuleExp extends LambdaExp
       }
     finally
       {
-	if (env != orig_env)
-	  Environment.setCurrent(orig_env);
+        Environment.restoreCurrent(orig_env);
         Compilation.restoreCurrent(orig_comp);
         if (thread != null)
           thread.setContextClassLoader(savedLoader);
@@ -266,14 +262,11 @@ public class ModuleExp extends LambdaExp
                                         Object inst)
     throws Throwable
   {
-    Environment orig_env = Environment.getCurrent();
+    Environment orig_env = Environment.setSaveCurrent(env);
     ClassLoader savedLoader = null;
     Thread thread = null; // Non-null if we need to restore context ClassLoader.
     try
       {
-	if (env != orig_env)
-	  Environment.setCurrent(env);
-
 	if (inst == Boolean.TRUE)
 	  { // optimization - don't generate unneeded Class.
 	    mexp.body.apply(ctx);
@@ -359,8 +352,7 @@ public class ModuleExp extends LambdaExp
       }
     finally
       {
-	if (env != orig_env)
-	  Environment.setCurrent(orig_env);
+        Environment.restoreCurrent(orig_env);
         if (thread != null)
           thread.setContextClassLoader(savedLoader);
       }

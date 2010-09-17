@@ -32,7 +32,7 @@
 (define-syntax test 
   (syntax-rules ()
     ((test format-args out-str)
-     (test-equal out-str (apply (cons format (cons #f format-args)))))))
+     (test-equal out-str (apply format #f format-args)))))
 
 (define slib:tab (integer->char 9))
 (define slib:form-feed (integer->char 12))

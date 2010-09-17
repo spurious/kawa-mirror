@@ -802,7 +802,7 @@ public class Translator extends Compilation
     else if (exp == Special.abstractSpecial)
       return QuoteExp.abstractExp;
     else
-      return QuoteExp.getInstance(Quote.quote(exp, this));
+      return QuoteExp.getInstance(Quote.quote(exp, this), this);
   }
 
   public static void setLine(Expression exp, Object location)
@@ -861,7 +861,9 @@ public class Translator extends Compilation
 
   public void setLineOf (Expression exp)
   {
-    if (exp instanceof QuoteExp)
+    // "Special" QuoteExps may be shared, but the position gets set (in the
+    // call to QuoteExp.getInstance at end of re-write) for normal ones.
+    if (exp instanceof QuoteExp) 
       return;
     exp.setLocation(this);
   }

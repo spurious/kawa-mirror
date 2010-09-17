@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
+import gnu.text.SourceLocator;
 
 /**
  * An Expression that evaluates to a constant value.
@@ -46,6 +47,11 @@ public class QuoteExp extends Expression
 
   public static QuoteExp getInstance (Object value)
   {
+    return getInstance(value, null);
+  }
+
+  public static QuoteExp getInstance (Object value, SourceLocator position)
+  {
     if (value == null)
       return nullExp;
     if (value == Type.pointer_type)
@@ -57,7 +63,10 @@ public class QuoteExp extends Expression
     // Note we deliberately don't map abstractSpecial to abstractExp.
     if (value instanceof Boolean)
       return ((Boolean) value).booleanValue() ? trueExp : falseExp;
-    return new QuoteExp(value);
+    QuoteExp q = new QuoteExp(value);
+    if (position != null)
+      q.setLocation(position);
+    return q;
   }
 
   public QuoteExp (Object val) { value = val; }

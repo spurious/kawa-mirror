@@ -56,7 +56,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
         Language language = comp.getLanguage();
         comp.error('w', "type "+(language.formatType(expType)
                                  +" is incompatible with required type "
-                                 +language.formatType(required)));
+                                 +language.formatType(required)),
+                   exp);
       }
     return exp;
   }

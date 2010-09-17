@@ -1,3 +1,8 @@
+2010-09-17  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (rewrite): Pass SourceLocator when
+	creating QuoteExp.
+
 2010-09-15  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (formatType): New method.

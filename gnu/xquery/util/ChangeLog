@@ -1,3 +1,8 @@
+2010-09-16  Per Bothner  <per@bothner.com>
+
+	* CompileMisc.java: Update validateApply methods, which no longer
+	take a 'boolean argsInlined' parameter.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* CastableAs.java: Update to use Procedure.validateApplyKey,

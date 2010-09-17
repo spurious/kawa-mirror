@@ -16,10 +16,9 @@ public class CompileMisc
 {
   /** Inliner for the Compare procedure. */
   public static Expression validateCompare
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression folded = exp.inlineIfConstant(proc, visitor);
     if (folded != exp)
       return folded;
@@ -43,10 +42,9 @@ public class CompileMisc
 
   /** Inliner for the BooleanValue procedure. */
   public static Expression validateBooleanValue
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {
@@ -76,21 +74,19 @@ public class CompileMisc
 
   /** Inliner for the ArithOp procedure. */
   public static Expression validateArithOp
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     // FUTURE
     return exp;
   }
 
   /** Inliner for the {@link ValuesFilter} procedure. */
   public static Expression validateApplyValuesFilter
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     ValuesFilter vproc = (ValuesFilter) proc;
-    exp.visitArgs(visitor, argsInlined); // FIXME - be smarter about type propagation
+    exp.visitArgs(visitor); // FIXME - be smarter about type propagation
     Expression[] args = exp.getArgs();
     Expression exp2 = args[1];
     LambdaExp lexp2;
@@ -184,17 +180,16 @@ public class CompileMisc
 
     LetExp let2 = new LetExp(new Expression[] { lastInit });
     let2.add(lastArg);
-    let2.body = gnu.kawa.functions.CompileMisc.validateApplyValuesMap(doMap, visitor, required, true, ValuesMap.valuesMapWithPos);
+    let2.body = gnu.kawa.functions.CompileMisc.validateApplyValuesMap(doMap, visitor, required, ValuesMap.valuesMapWithPos);
 
     return parser.letDone(let2);
   }
 
   public static Expression validateApplyRelativeStep
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     // FIXME make use of type of E1 to set dot in E2.
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     Expression exp1 = args[0];
     Expression exp2 = args[1];
@@ -325,10 +320,9 @@ public class CompileMisc
   }
 
   public static Expression validateApplyOrderedMap
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length > 2)
       {
@@ -373,10 +367,9 @@ public class CompileMisc
   static final Method castMethod = typeXDataType.getDeclaredMethod("cast", 1);
 
   public static Expression validateApplyCastAs
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     exp = CompileReflect.inlineClassName(exp, 0, visitor);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[0] instanceof QuoteExp))
@@ -391,10 +384,9 @@ public class CompileMisc
     = typeXDataType.getDeclaredMethod("castable", 1);
 
   public static Expression validateApplyCastableAs
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     exp = CompileReflect.inlineClassName(exp, 1, visitor);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp))

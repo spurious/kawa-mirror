@@ -286,7 +286,6 @@ public class InlineCalls extends ExpExpVisitor<Type>
   //                            gnu.expr.ApplyExp.class,
   //                            gnu.expr.InlineCalls.class,
   //                            gnu.bytecode.Type.class,
-  //                            Boolean.TYPE,
   //                            gnu.mapping.Procedure.class);
   /* #else */
   private static Class[] inlinerMethodArgTypes;
@@ -299,7 +298,6 @@ public class InlineCalls extends ExpExpVisitor<Type>
         t = new Class[] { Class.forName("gnu.expr.ApplyExp"),
                          Class.forName("gnu.expr.InlineCalls"),
                          Class.forName("gnu.bytecode.Type"),
-                         Boolean.TYPE,
                          Class.forName("gnu.mapping.Procedure") };
         inlinerMethodArgTypes = t;
       }
@@ -347,9 +345,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
           {
             /* #ifdef use:java.dyn */
             // if (inliner instanceof MethodHandle)
-            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this,  required, false, proc);
+            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this, required, proc);
             /* #endif */
-            Object[] vargs = new Object[] { exp, this,  required, Boolean.FALSE, proc };
+            Object[] vargs = new Object[] { exp, this, required, proc };
             if (inliner instanceof Procedure)
               return (Expression) ((Procedure) inliner).applyN(vargs);
             /* #ifndef use:java.dyn */

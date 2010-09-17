@@ -55,10 +55,9 @@ public class CompileReflect
   }
 
   public static Expression validateApplyInstanceOf
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     exp = inlineClassName(exp, 1, visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
@@ -89,10 +88,9 @@ public class CompileReflect
   }
 
   public static Expression validateApplySlotGet
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Compilation comp = visitor.getCompilation();
     Language language = comp.getLanguage();
     SlotGet gproc = (SlotGet) proc;
@@ -206,10 +204,9 @@ public class CompileReflect
   }
 
   public static Expression validateApplySlotSet
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     // Unlike, for SlotGet, we do the field-lookup at compile time
     // rather than inline time.  The main reason is that optimizing
     // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)
@@ -222,10 +219,9 @@ public class CompileReflect
   }
 
   public static Expression validateApplyTypeSwitch
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     for (int i = 1;  i < args.length;  i++)
       {

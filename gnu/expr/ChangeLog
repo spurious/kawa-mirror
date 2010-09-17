@@ -1,5 +1,9 @@
 2010-09-16  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (visitArgs): Remove version that takes argsInlined.
+	* InlineCalls.java (maybeInline): The validateApply methods no
+	longer take a boolean argsInlined parameter.
+
 	* Expression.java (VALIDATED): New flag.
 	(NEXT_AVAIL_FLAG): Update accordingly.
 	(validateApply): Remove no-longer-used argsInlined parameter.

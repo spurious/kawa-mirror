@@ -1,3 +1,9 @@
+2010-09-16  Per Bothner  <per@bothner.com>
+
+	* CompileReflect.java: Update validateApply methods, which no longer
+	take a 'boolean argsInlined' parameter.
+	* CompileInvoke.java: Likewise.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java: Update to use Procedure.validateApplyKey,

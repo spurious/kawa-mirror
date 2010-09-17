@@ -17,7 +17,7 @@ public abstract class Procedure extends PropertySet
    * The property value is either a String of the form "CLASSNAME:METHODNAME",
    * or a java.lang.reflect.Method (or FUTURE: MethodHandle) for a static
    * method whose parameters are
-   * {@code (ApplyExp exp, InlineCalls visitor, Type required, boolean argsInlined, Procedure proc)} and returns a re-written/validated {@code Expression}.
+   * {@code (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)} and returns a re-written/validated {@code Expression}.
    */
   public static final Symbol validateApplyKey =
     Namespace.EmptyNamespace.getSymbol("validate-apply");

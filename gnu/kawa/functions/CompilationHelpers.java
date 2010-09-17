@@ -36,7 +36,7 @@ public class CompilationHelpers
 
   public static Expression validateApplyToArgs
   (ApplyExp exp, InlineCalls visitor,
-   Type required, boolean argsInlined, Procedure applyToArgs)
+   Type required, Procedure applyToArgs)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length - 1;
@@ -105,8 +105,7 @@ public class CompilationHelpers
   static { setterDecl.noteValue(new QuoteExp(Setter.setter)); }
 
   public static Expression validateSetter
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
@@ -155,8 +154,7 @@ public class CompilationHelpers
   }
 
   public static Expression validateIsEqv
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();

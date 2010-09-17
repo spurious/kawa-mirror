@@ -74,8 +74,7 @@ public class CompileArith implements Inlineable
   }
 
   public static Expression validateApplyArithOp
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     ArithOp aproc = (ArithOp) proc;
     int op = aproc.op;
@@ -570,8 +569,7 @@ public class CompileArith implements Inlineable
   }
 
   public static Expression validateApplyNumberCompare
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
     Expression folded = exp.inlineIfConstant(proc, visitor);

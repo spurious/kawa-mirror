@@ -57,10 +57,9 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyConstantFunction0
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     int nargs = exp.getArgCount();
     if (nargs != 0 && visitor != null)
       {
@@ -71,26 +70,23 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyConvert
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     return CompileReflect.inlineClassName(exp, 0, visitor);
   }
 
   public static Expression validateApplyNot
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     return exp.inlineIfConstant(proc, visitor);
   }
 
   public static Expression validateApplyAppendValues
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       return args[0];
@@ -103,10 +99,9 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyMakeProcedure
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     int alen = args.length;
     Expression method = null;
@@ -166,10 +161,9 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyValuesMap
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     LambdaExp lexp = ValuesMap.canInline(exp, (ValuesMap) proc);
     if (lexp != null)
       {
@@ -256,8 +250,7 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyCallCC
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     LambdaExp lexp = canInlineCallCC(exp);
     if (lexp != null)
@@ -269,7 +262,7 @@ public class CompileMisc implements Inlineable
         if (! contDecl.getFlag(Declaration.TYPE_SPECIFIED))
           contDecl.setType(typeContinuation);
       }
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     return exp;
   }
 
@@ -393,14 +386,13 @@ public class CompileMisc implements Inlineable
   }
 
   public static Expression validateApplyMap
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure xproc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure xproc)
   {
     Map mproc = (Map) xproc;
     boolean collect = mproc.collect;
     // FIXME: We should inline the list arguments first before inlining the
     // procedure argument, for better type inference etc.
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     if (nargs < 2)

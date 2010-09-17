@@ -8,10 +8,9 @@ import kawa.lang.Translator;
 public class CompileNamedPart
 {
   public static Expression validateGetNamedPart
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length != 2 || ! (args[1] instanceof QuoteExp)
         || ! (exp instanceof GetNamedExp))
@@ -144,10 +143,9 @@ public class CompileNamedPart
   }
 
   public static Expression validateSetNamedPart
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length != 3 || ! (args[1] instanceof QuoteExp))
       return exp;
@@ -242,10 +240,9 @@ public class CompileNamedPart
   }
 
   public static Expression validateNamedPart
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     NamedPart namedPart = (NamedPart) proc;
     switch (namedPart.kind)
@@ -274,10 +271,9 @@ public class CompileNamedPart
   }
 
   public static Expression validateNamedPartSetter
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     NamedPart get = (NamedPart) ((NamedPartSetter) proc).getGetter();
     if (get.kind == 'D')
       {
@@ -324,10 +320,9 @@ public class CompileNamedPart
   }
 
   public static Expression validateGetNamedInstancePart
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     Expression[] xargs;
     Procedure property;
@@ -350,10 +345,9 @@ public class CompileNamedPart
   }
 
   public static Expression validateSetNamedInstancePart
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     String pname = ((SetNamedInstancePart) proc).pname;
     Expression[] xargs = new Expression[]

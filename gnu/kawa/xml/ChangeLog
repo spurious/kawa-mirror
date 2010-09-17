@@ -1,3 +1,8 @@
+2010-09-16  Per Bothner  <per@bothner.com>
+
+	* CompileXmlFunctions.java: Update validateApply methods, which
+	no longer take a 'boolean argsInlined' parameter.
+
 2010-08-31  Per Bothner  <per@bothner.com>
 
 	* XIntegerType.java (valueOf): Don't need to check for initial

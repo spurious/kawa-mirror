@@ -8,12 +8,11 @@ import gnu.math.IntNum;
 public class CompileInvoke
 {
   public static Expression validateApplyInvoke
-  (ApplyExp exp, InlineCalls visitor, Type required,
-   boolean argsInlined, Procedure proc)
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     Invoke iproc = (Invoke) proc;
     char kind = iproc.kind;
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Compilation comp = visitor.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;

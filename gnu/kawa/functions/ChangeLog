@@ -1,5 +1,11 @@
 2010-09-16  Per Bothner  <per@bothner.com>
 
+	* CompilationHelpers.java: Update validateApply methods, which no longer
+	take a 'boolean argsInlined' parameter.
+	* CompileMisc.java: Likewise.
+	* CompileArith.java: Likewise.
+	* CompileNamedPart.java: Likewise.
+
 	* CompileMisc.java: Update for using VALIDATED flag instead
 	of argsInlined boolean parameter.
 	* CompileArith.java: Likewise.

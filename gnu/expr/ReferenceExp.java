@@ -178,8 +178,7 @@ public class ReferenceExp extends AccessExp
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
     decl = this.binding; // We don't use the passed-in Declaration.
     if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
@@ -189,7 +188,7 @@ public class ReferenceExp extends AccessExp
           {
             Expression dval = decl.getValue();
             if (dval != null)
-              return dval.validateApply(exp, visitor, required, decl, argsInlined);
+              return dval.validateApply(exp, visitor, required, decl);
           }
       }
     else if (getSymbol() instanceof Symbol)
@@ -197,10 +196,9 @@ public class ReferenceExp extends AccessExp
         Symbol symbol = (Symbol) getSymbol();
         Object fval = Environment.getCurrent().getFunction(symbol, null);
         if (fval instanceof Procedure)
-          return new QuoteExp(fval).validateApply(exp, visitor, required, null, argsInlined);
+          return new QuoteExp(fval).validateApply(exp, visitor, required, null);
       }
-    if (! argsInlined)
-      exp.args = visitor.visitExps(exp.args, exp.args.length, null);
+    exp.visitArgs(visitor);
     return exp;
   }
 

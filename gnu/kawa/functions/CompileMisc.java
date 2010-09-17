@@ -457,7 +457,6 @@ public class CompileMisc implements Inlineable
       proc = new ReferenceExp(procDecl);
     doArgs[0] = proc;
     Expression doit = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(mproc.applyFieldDecl), doArgs), null);
-    Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
     if (collect)
       {
 	Expression[] consArgs = new Expression[2];
@@ -465,12 +464,9 @@ public class CompileMisc implements Inlineable
 	consArgs[1] = new ReferenceExp(resultDecl);
 	recArgs[nargs] = Invoke.makeInvokeStatic(Compilation.typePair,
 						 "make", consArgs);
-	lexp.body = rec;
       }
-    else
-      {
-	lexp.body = new BeginExp(doit, rec);
-      }
+    Expression rec = visitor.visitApplyOnly(new ApplyExp(new ReferenceExp(loopDecl), recArgs), null);
+    lexp.body = collect ? rec : new BeginExp(doit, rec);
     let3.setBody(lexp.body);
     lexp.body = let3;
     Expression[] initArgs = new Expression[collect ? nargs + 1 : nargs];

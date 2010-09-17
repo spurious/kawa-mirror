@@ -1,3 +1,18 @@
+2010-09-16  Per Bothner  <per@bothner.com>
+
+	* Expression.java (VALIDATED): New flag.
+	(NEXT_AVAIL_FLAG): Update accordingly.
+	(validateApply): Remove no-longer-used argsInlined parameter.
+	* ApplyExp.java (visitArgs): New method without argsInlined parameter.
+	* LambdaExp.java (INLINE_ONLY): Renumber so it doesn't conflict
+	with VALIDATED.
+	(validateApply): Update to not use argsInlined.
+	* QuoteExp.java: Likewise.
+	* ReferenceExp.java: Likewise.
+	* InlineCalls.java (visit): Check and set VALIDATED flag.
+	Short-circuit if VALIDATED was set.
+	(maybeInline):  Remove no-longer-used argsInlined parameter.
+
 2010-09-15  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule1, evalModule2): Use Environment's

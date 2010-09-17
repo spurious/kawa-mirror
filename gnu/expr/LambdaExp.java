@@ -124,7 +124,6 @@ public class LambdaExp extends ScopeExp
    * See declareClosureEnv and closureEnvField. */
   Variable closureEnv;
 
-  static final int INLINE_ONLY = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
   static final int IMPORTS_LEX_VARS = 8;
@@ -139,7 +138,8 @@ public class LambdaExp extends ScopeExp
   public static final int SEQUENCE_RESULT = 1024;
   public static final int OVERLOADABLE_FIELD = 2048;
   public static final int ATTEMPT_INLINE = 4096;
-  protected static final int NEXT_AVAIL_FLAG = 8192;
+  static final int INLINE_ONLY = 8192;
+  protected static final int NEXT_AVAIL_FLAG = 16384;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -1722,20 +1722,16 @@ public class LambdaExp extends ScopeExp
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
     Expression[] args = exp.getArgs();
-    if (! argsInlined)
+    if ((flags & ATTEMPT_INLINE) != 0)
       {
-        if ((flags & ATTEMPT_INLINE) != 0)
-          {
-            Expression inlined = InlineCalls.inlineCall(this, args, true);
-            if (inlined != null)
-              return visitor.visit(inlined, required);
-          }
-        exp.args = visitor.visitExps(exp.args, null);
+        Expression inlined = InlineCalls.inlineCall(this, args, true);
+        if (inlined != null)
+          return visitor.visit(inlined, required);
       }
+    exp.visitArgs(visitor);
     int args_length = exp.args.length;
     String msg = WrongArguments.checkArgCount(getName(),
                                               min_args, max_args, args_length);

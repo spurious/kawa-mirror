@@ -253,15 +253,12 @@ public abstract class Expression extends Procedure0
    *  to this expression.
    * @param walker the context for the current inlining pass
    * @param decl if non-null, a Declaration bound to this expression.
-   * @param argsInlined true iff {@code exp.getArgs()} have been walked.
    * @return an Expression equivalent to the passed-in exp.
    */
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
-    if (! argsInlined)
-      exp.args = visitor.visitExps(exp.args, null);
+    exp.args = visitor.visitExps(exp.args, null);
     return exp;
   }
 
@@ -383,7 +380,8 @@ public abstract class Expression extends Procedure0
   }
 
   protected int flags;
-  protected static final int NEXT_AVAIL_FLAG = 1;
+  public static final int VALIDATED = 1;
+  protected static final int NEXT_AVAIL_FLAG = 2;
 
   public void setFlag (boolean setting, int flag)
   {

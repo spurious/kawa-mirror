@@ -415,10 +415,9 @@ class GetNamedExp extends ApplyExp
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] pargs = getArgs();
     Expression context = pargs[0];
     Expression[] args = exp.getArgs();

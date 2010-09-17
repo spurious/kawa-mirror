@@ -43,7 +43,7 @@ public class CompilationHelpers
     if (nargs >= 0)
       {
         Expression proc = args[0];
-        if (! argsInlined)
+        if (! proc.getFlag(Expression.VALIDATED))
           {
             if (proc instanceof LambdaExp)
               {
@@ -55,7 +55,6 @@ public class CompilationHelpers
             args[0] = proc;
           }
         Type ptype = proc.getType().getRealType();
-        ApplyExp result;
         Compilation comp = visitor.getCompilation();
         Language language = comp.getLanguage();
         if (ptype.isSubtype(Compilation.typeProcedure))
@@ -63,19 +62,14 @@ public class CompilationHelpers
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
             return proc.validateApply(new ApplyExp(proc, rargs), visitor,
-                                      required, null, argsInlined);
+                                      required, null);
           }
-        if (! argsInlined)
-          {
-            // FIXME visitArgs, but skip first.
-            for (int i = 1; i <= nargs;  i++)
-              args[i] = visitor.visit(args[i], null);
-          }
-        // This might be more cleanly handled at the type specifier. FIXME
-        if (CompileReflect.checkKnownClass(ptype, comp) < 0)
-          return exp;
+
         ClassType ctype;
-        if (ptype.isSubtype(Compilation.typeType)
+        ApplyExp result = null;
+        if (CompileReflect.checkKnownClass(ptype, comp) < 0)
+          ; // This might be more cleanly handled at the type specifier. FIXME
+        else if (ptype.isSubtype(Compilation.typeType)
                  || language.getTypeFor(proc,false) != null)
           {
             result = new ApplyExp(Invoke.make, args);
@@ -95,11 +89,13 @@ public class CompilationHelpers
             Method get = ctype.getMethod("get", new Type[] { Type.intType  });
             result = new ApplyExp(get, args);
           }
-        else
-          return exp;
-        result.setLine(exp);
-        return ((InlineCalls) visitor).visitApplyOnly(result, required);
+        if (result != null)
+          {
+            result.setLine(exp);
+            return ((InlineCalls) visitor).visitApplyOnly(result, required);
+          }
       }
+    exp.visitArgs(visitor);
     return exp;
   }
 
@@ -112,7 +108,7 @@ public class CompilationHelpers
   (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 1)
       {
@@ -162,7 +158,7 @@ public class CompilationHelpers
   (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (nonNumeric(args[0]) || nonNumeric(args[1]))
       return new ApplyExp(((IsEqv) proc).isEq, args);
@@ -184,10 +180,9 @@ class SetArrayExp extends ApplyExp
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {
@@ -211,10 +206,9 @@ class SetListExp extends ApplyExp
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression[] args = exp.getArgs();
     if (args.length == 2)
       {

@@ -79,7 +79,7 @@ public class CompileArith implements Inlineable
   {
     ArithOp aproc = (ArithOp) proc;
     int op = aproc.op;
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
  
     Expression[] args = exp.getArgs();
     if (args.length > 2)
@@ -573,7 +573,7 @@ public class CompileArith implements Inlineable
   (ApplyExp exp, InlineCalls visitor, Type required,
    boolean argsInlined, Procedure proc)
   {
-    exp.visitArgs(visitor, argsInlined);
+    exp.visitArgs(visitor);
     Expression folded = exp.inlineIfConstant(proc, visitor);
     if (folded != exp)
       return folded;
@@ -617,7 +617,7 @@ public class CompileArith implements Inlineable
         args2[0] = prev;
         args2[1] = args[i];
         ApplyExp next = new ApplyExp(rproc, args2);
-        Expression inlined = visitor.maybeInline(next, null/*FIXME*/, true, proc);
+        Expression inlined = visitor.maybeInline(next, null/*FIXME*/, proc);
         prev = inlined != null ? inlined : next;
       }
     return prev;

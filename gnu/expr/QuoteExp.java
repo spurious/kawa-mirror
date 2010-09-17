@@ -96,8 +96,7 @@ public class QuoteExp extends Expression
   }
 
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
-                                   Type required,
-                                   Declaration decl, boolean argsInlined)
+                                   Type required, Declaration decl)
   {
     if (this == QuoteExp.undefined_exp)
       return exp;
@@ -111,11 +110,10 @@ public class QuoteExp extends Expression
     String msg = WrongArguments.checkArgCount(proc, nargs);
     if (msg != null)
       return visitor.noteError(msg);
-    Expression inlined = visitor.maybeInline(exp, required, argsInlined, proc);
+    Expression inlined = visitor.maybeInline(exp, required, proc);
     if (inlined != null)
       return inlined;
-    if (! argsInlined)
-      exp.args = visitor.visitExps(exp.args, exp.args.length, null);
+    exp.args = visitor.visitExps(exp.args, exp.args.length, null);
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
       {
 	Expression e = exp.inlineIfConstant(proc, visitor);

@@ -42,9 +42,14 @@ public class InlineCalls extends ExpExpVisitor<Type>
     return required.compare(available) != -3;
   }
 
-  public Expression visit(Expression exp, Type required)
+  public Expression visit (Expression exp, Type required)
   {
-    Expression r = super.visit(exp, required);
+    if (! exp.getFlag(Expression.VALIDATED))
+      {
+        exp.setFlag(Expression.VALIDATED); // Protect againts cycles.
+        exp = super.visit(exp, required);
+        exp.setFlag(Expression.VALIDATED);
+      }
     Type expType = exp.getType();
     if (required != null && ! isCompatible(required, expType))
       {
@@ -53,7 +58,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                                  +" is incompatible with required type "
                                  +language.formatType(required)));
       }
-    return r;
+    return exp;
   }
 
   protected Expression visitApplyExp(ApplyExp exp, Type required)
@@ -72,13 +77,13 @@ public class InlineCalls extends ExpExpVisitor<Type>
       }
     func = visit(func, null);
     exp.func = func;
-    return func.validateApply(exp, this, required, null, false);
+    return func.validateApply(exp, this, required, null);
   }
 
   /** Visit an ApplyExp assuming function and arguments have been visited. */
   public final Expression visitApplyOnly(ApplyExp exp, Type required)
   {
-    return exp.func.validateApply(exp, this, required, null, true);
+    return exp.func.validateApply(exp, this, required, null);
   }
 
   protected Expression visitReferenceExp (ReferenceExp exp, Type required)
@@ -302,11 +307,10 @@ public class InlineCalls extends ExpExpVisitor<Type>
   }
   /* #endif */
 
-  public Expression maybeInline (ApplyExp exp, Type required, boolean argsInlined, Procedure proc)
+  public Expression maybeInline (ApplyExp exp, Type required, Procedure proc)
   {
     try
       {
-        Boolean argsInlinedBoxed = Boolean.valueOf(argsInlined);
         Object inliner;
         synchronized (proc)
           {
@@ -343,9 +347,9 @@ public class InlineCalls extends ExpExpVisitor<Type>
           {
             /* #ifdef use:java.dyn */
             // if (inliner instanceof MethodHandle)
-            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this,  required, argsInlined, proc);
+            //   return ((MethodHandle) inliner).<Expression>invokeExact(exp, this,  required, false, proc);
             /* #endif */
-            Object[] vargs = new Object[] { exp, this,  required, argsInlinedBoxed, proc };
+            Object[] vargs = new Object[] { exp, this,  required, Boolean.FALSE, proc };
             if (inliner instanceof Procedure)
               return (Expression) ((Procedure) inliner).applyN(vargs);
             /* #ifndef use:java.dyn */

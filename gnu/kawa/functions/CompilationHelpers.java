@@ -49,7 +49,7 @@ public class CompilationHelpers
               {
                 Expression[] rargs = new Expression[nargs];
                 System.arraycopy(args, 1, rargs, 0, nargs);
-                return visitor.visit(new ApplyExp(proc, rargs), required);
+                return visitor.visit(new ApplyExp(proc, rargs).setLine(exp), required);
               }
             proc = visitor.visit(proc, null);
             args[0] = proc;
@@ -61,8 +61,9 @@ public class CompilationHelpers
           {
             Expression[] rargs = new Expression[nargs];
             System.arraycopy(args, 1, rargs, 0, nargs);
-            return proc.validateApply(new ApplyExp(proc, rargs), visitor,
-                                      required, null);
+            ApplyExp nexp = new ApplyExp(proc, rargs);
+            nexp.setLine(exp);
+            return proc.validateApply(nexp, visitor, required, null);
           }
 
         ClassType ctype;

@@ -1,3 +1,10 @@
+2010-09-17  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (boxedType): New method.
+	(emitCoerceToObject): Use boxedType.
+
+	* PrimType (compare): Return -3 if not shown to be compatible.
+
 2010-08-28  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitInvokeMethod): After initialization we also need

@@ -1,3 +1,7 @@
+2010-09-17  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (compare): Return -1 for (char,gnu.text.Char).
+
 2010-08-01  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions): Set IS_SINGLE_VALUE

@@ -64,23 +64,13 @@ public class PrimType extends Type {
     return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
   }
 
-  public void emitCoerceToObject (CodeAttr code)
+  public ClassType boxedType ()
   {
     char sig1 = getSignature().charAt(0);
-    ClassType clas;
-    Method method;
     String cname;
-    Type[] args;
     switch (sig1)
       {
-      case 'Z':
-	clas = ClassType.make("java.lang.Boolean");
-	code.emitIfIntNotZero();
-	code.emitGetStatic(clas.getDeclaredField("TRUE"));
-	code.emitElse();
-	code.emitGetStatic(clas.getDeclaredField("FALSE"));
-	code.emitFi();
-	return;
+      case 'Z':  cname = "java.lang.Boolean";   break;
       case 'C':  cname = "java.lang.Character"; break;
       case 'B':  cname = "java.lang.Byte";      break;
       case 'S':  cname = "java.lang.Short";     break;
@@ -90,8 +80,24 @@ public class PrimType extends Type {
       case 'D':  cname = "java.lang.Double";    break;
       default:   cname = null; // Should never happen.
       }
-    clas = ClassType.make(cname);
-    args = new Type[1];
+    return ClassType.make(cname);
+ }
+
+  public void emitCoerceToObject (CodeAttr code)
+  {
+    char sig1 = getSignature().charAt(0);
+    ClassType clas = boxedType();
+    if (sig1 == 'Z')
+      {
+	code.emitIfIntNotZero();
+	code.emitGetStatic(clas.getDeclaredField("TRUE"));
+	code.emitElse();
+	code.emitGetStatic(clas.getDeclaredField("FALSE"));
+	code.emitFi();
+	return;
+      }
+    Method method;
+    Type[] args = new Type[1];
     args[0] = this;
     if (code.getMethod().getDeclaringClass().classfileFormatVersion >= ClassType.JDK_1_5_VERSION)
         method = clas.getDeclaredMethod("valueOf", args);
@@ -260,6 +266,6 @@ public class PrimType extends Type {
     if (otherName.equals("java.lang.Object")
 	|| other == toStringType)
       return -1;
-    return -2;
+    return -3;
   }
 }

@@ -12,7 +12,6 @@ public class CompileInvoke
   {
     Invoke iproc = (Invoke) proc;
     char kind = iproc.kind;
-    exp.visitArgs(visitor);
     Compilation comp = visitor.getCompilation();
     Expression[] args = exp.getArgs();
     int nargs = args.length;
@@ -20,9 +19,13 @@ public class CompileInvoke
         // This should never happen, as InlineCalls.visitApplyExp
         // checks the number of arguments before inline is called.
         || nargs == 0 || ((kind == 'V' || kind == '*') && nargs == 1))
-      return exp;
+      {
+        exp.visitArgs(visitor);
+        return exp;
+      }
     ObjectType type;
-    Expression arg0 = args[0];
+    Expression arg0 = visitor.visit(args[0], null);
+    args[0] = arg0;
     Type type0 = (kind == 'V' || kind == '*' ? arg0.getType() : iproc.language.getTypeFor(arg0));
     if (type0 instanceof PairClassType && kind == 'N')
       type = ((PairClassType) type0).instanceType;
@@ -58,7 +61,10 @@ public class CompileInvoke
         objIndex = 1;
       }
     else
-      return exp;
+      {
+        exp.visitArgs(visitor);
+        return exp;
+      }
 
     if (kind == 'N' && type instanceof ArrayType)
       {
@@ -79,6 +85,7 @@ public class CompileInvoke
           }
         if (sizeArg == null)
           sizeArg = QuoteExp.getInstance(new Integer(args.length-1));
+        sizeArg = visitor.visit(sizeArg, Type.intType);
         Expression alloc = new ApplyExp(new ArrayNew(elementType),
                                         new Expression[] { sizeArg } );
         if (lengthSpecified && args.length == 3)
@@ -109,6 +116,7 @@ public class CompileInvoke
                       }
                   }
               }
+            arg = visitor.visit(arg, elementType);
             begin.add(new ApplyExp(new ArraySet(elementType),
                                    new Expression[] {
                                      new ReferenceExp(adecl),
@@ -129,8 +137,7 @@ public class CompileInvoke
               {
                 Expression[] xargs = new Expression[nargs-1];
                 System.arraycopy(args, 1, xargs, 0, nargs-1);
-                return visitor
-                  .visitApplyOnly(new ApplyExp(constructor, xargs), null/*FIXME*/);
+                return visitor.visit(new ApplyExp(constructor, xargs), required);
               }
           }
         PrimProcedure[] methods;
@@ -139,6 +146,7 @@ public class CompileInvoke
           : comp.curClass != null ? comp.curClass
           : comp.mainClass;
         ObjectType ctype = (ObjectType) type;
+        exp.visitArgs(visitor);
         try
           {
             methods = getMethods(ctype, name, caller, iproc);
@@ -284,10 +292,11 @@ public class CompileInvoke
             for (int src = argsStartIndex; 
                  src < args.length && dst < margs.length; 
                  src++, dst++)
-              margs[dst] = args[src];
+              margs[dst] = visitor.visit(args[src], methods[index].getParameterType(dst));
             return new ApplyExp(methods[index], margs).setLine(exp);
           }
       }
+    exp.visitArgs(visitor);
     return exp;
   }
 

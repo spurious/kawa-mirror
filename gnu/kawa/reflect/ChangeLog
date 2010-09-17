@@ -1,3 +1,9 @@
+2010-09-17  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Defer visitArgs.
+	This allows passing required element type when creating arrays.
+	Also visit method argument when method type is known.
+
 2010-09-16  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java: Update validateApply methods, which no longer

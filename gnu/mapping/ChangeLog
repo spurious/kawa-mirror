@@ -1,3 +1,8 @@
+2010-09-20  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (minArgs, maxArgs): New static methods.
+	Use them as appropriate.
+
 2010-08-27  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (inlineCallsKey): Remove constant field.

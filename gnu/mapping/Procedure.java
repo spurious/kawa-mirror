@@ -61,12 +61,25 @@ public abstract class Procedure extends PropertySet
 				Object arg3,Object arg4) throws Throwable;
 
   /** Minimum number of arguments required. */
-  public final int minArgs() { return numArgs() & 0xFFF; }
+  public final int minArgs() { return minArgs(numArgs()); }
 
   /** Maximum number of arguments allowed, or -1 for unlimited.
    * (May also return -1 if there are keyword arguments, for implementation
    * reasons.) */
-  public final int maxArgs() { return numArgs() >> 12; }
+  public final int maxArgs() { return maxArgs(numArgs()); }
+
+  /** Return {@code minArgs()|(maxArgs<<12)}.
+   * We use a single virtual function to reduce the number of methods
+   * in the system, as well as the number of virtual method table entries.
+   * We shift by 12 so the number can normally be represented using a
+   * sipush instruction, without requiring a constant pool entry.
+   */
+  public int numArgs() { return 0xfffff000; }
+
+  /** Extract minimum number of arguments from {@code numArgs()} encoding. */
+  public static int minArgs (int num) { return num & 0xFFF; }
+  /** Extract maximum number of arguments from {@code numArgs()} encoding. */
+  public static int maxArgs (int num) { return num >> 12; }
 
   /** Check that the number of arguments in a call is valid.
     * @param proc the Procedure being called
@@ -77,19 +90,10 @@ public abstract class Procedure extends PropertySet
   public static void checkArgCount(Procedure proc, int argCount)
   {
     int num = proc.numArgs();
-    if (argCount < (num & 0xFFF)
-	|| (num >= 0 && argCount > (num >> 12)))
+    if (argCount < minArgs(num)
+	|| (num >= 0 && argCount > maxArgs(num)))
       throw new WrongArguments(proc, argCount);
   }
-
-  /** Return minArgs()|(maxArgs<<12). */
-
-  /* We use a single virtual function to reduce the number of methods
-   * in the system, as well as the number of virtual method table entries.
-   * We shift by 12 so the number can normally be represented using a
-   * sipush instruction, without requiring a constant pool entry.
-   */
-  public int numArgs() { return 0xfffff000; }
 
   /* CPS: ??
   public void apply1(Object arg, CallContext stack, CallFrame rlink, int rpc)
@@ -150,7 +154,7 @@ public abstract class Procedure extends PropertySet
   public int match0 (CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (min > 0)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num < 0)
@@ -168,12 +172,12 @@ public abstract class Procedure extends PropertySet
   public int match1 (Object arg1, CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (min > 1)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num >= 0)
       {
-        int max = num >> 12;
+        int max = maxArgs(num);
 	if (max < 1)
           return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
 	ctx.value1 = arg1;
@@ -193,12 +197,12 @@ public abstract class Procedure extends PropertySet
   public int match2 (Object arg1, Object arg2, CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (min > 2)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num >= 0)
       {
-        int max = num >> 12;
+        int max = maxArgs(num);
 	if (max < 2)
           return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
 	ctx.value1 = arg1;
@@ -220,12 +224,12 @@ public abstract class Procedure extends PropertySet
   public int match3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (min > 3)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num >= 0)
       {
-        int max = num >> 12;
+        int max = maxArgs(num);
 	if (max < 3)
           return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
 	ctx.value1 = arg1;
@@ -250,12 +254,12 @@ public abstract class Procedure extends PropertySet
 		     CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (min > 4)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num >= 0)
       {
-        int max = num >> 12;
+        int max = maxArgs(num);
 	if (max < 4)
           return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
 	ctx.value1 = arg1;
@@ -278,7 +282,7 @@ public abstract class Procedure extends PropertySet
   public int matchN (Object[] args, CallContext ctx)
   {
     int num = numArgs();
-    int min = num & 0xFFF;
+    int min = minArgs(num);
     if (args.length < min)
       return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
     if (num >= 0)
@@ -296,7 +300,7 @@ public abstract class Procedure extends PropertySet
 	  case 4:
 	    return match4(args[0], args[1], args[2], args[3], ctx);
 	  default:
-	    int max = num >> 12;
+	    int max = maxArgs(num);
 	    if (args.length > max)
 	      return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
 	  }

@@ -249,7 +249,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
   protected Expression visitSetExpValue (Expression new_value, Type required,
                                          Declaration decl)
   {
-    return visit(new_value, decl == null || decl.isAlias() ? null : decl.getType());
+    return visit(new_value, decl == null || decl.isAlias() ? null : decl.type);
   }
 
   protected Expression visitSetExp (SetExp exp, Type required)

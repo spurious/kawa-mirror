@@ -1,5 +1,11 @@
 2010-09-20  Per Bothner  <per@bothner.com>
 
+	* Language.java (parse): Set mustCompile here as appropriate.
+	* ModuleExp.java (evalModule1): Don't need to set it here.
+
+	* InlineCalls.java (visitSetExpValue): Use the raw type of decl,
+	rather than using getType, which may force it to Object.
+
 	* ClassExp.java (AbstractMethodFilter): Helper class moved to
 	gnu.bytecode.ClassType.
 	(compileMembers): Use new gnu.bytecode.ClassType#getAbstractMethods.

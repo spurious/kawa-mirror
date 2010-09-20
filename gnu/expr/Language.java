@@ -518,6 +518,8 @@ public abstract class Language
     Compilation tr = getCompilation(lexer, messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
+    if (! immediate || ModuleExp.alwaysCompile)
+      tr.mustCompile = true;
     tr.immediate = immediate;
     if ((options & PARSE_FOR_APPLET) != 0)
       tr.generateApplet = true;

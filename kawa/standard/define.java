@@ -133,11 +133,14 @@ public class define extends Syntax
       return tr.syntaxError(getName(options) + " is only allowed in a <body>");
     Declaration decl = (Declaration) name;
 
-    Expression texp = decl.getTypeExp();
-    if (texp instanceof LangExp)
+    if (decl.getFlag(Declaration.TYPE_SPECIFIED))
       {
-        Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
-        decl.setType(tr.exp2Type(typeSpecPair));
+        Expression texp = decl.getTypeExp();
+        if (texp instanceof LangExp)
+          {
+            Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
+            decl.setType(tr.exp2Type(typeSpecPair));
+          }
       }
 
     Expression value;

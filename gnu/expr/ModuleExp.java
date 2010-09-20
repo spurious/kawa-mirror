@@ -204,9 +204,6 @@ public class ModuleExp extends LambdaExp
     Thread thread = null; // Non-null if we need to restore context ClassLoader.
     try
       {
-        if (alwaysCompile)
-          comp.mustCompile = true;
-
         comp.process(Compilation.RESOLVED);
         comp.minfo.loadByStages(Compilation.WALKED);
 

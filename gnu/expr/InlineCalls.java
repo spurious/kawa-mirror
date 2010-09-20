@@ -37,11 +37,6 @@ public class InlineCalls extends ExpExpVisitor<Type>
     setContext(comp);
   }
 
-  public boolean isCompatible (Type required, Type available)
-  {
-    return required.compare(available) != -3;
-  }
-
   public Expression visit (Expression exp, Type required)
   {
     if (! exp.getFlag(Expression.VALIDATED))
@@ -50,8 +45,40 @@ public class InlineCalls extends ExpExpVisitor<Type>
         exp = super.visit(exp, required);
         exp.setFlag(Expression.VALIDATED);
       }
+    return checkType(exp, required);
+  }
+
+  public Expression checkType(Expression exp, Type required)
+  {
     Type expType = exp.getType();
-    if (required != null && ! isCompatible(required, expType))
+    boolean incompatible;
+    if (required instanceof ClassType && ((ClassType) required).isInterface()
+        && expType.isSubtype(Compilation.typeProcedure)
+        && ! expType.isSubtype(required))
+      {
+        if (exp instanceof LambdaExp)
+          {
+            Method amethod = ((ClassType) required).checkSingleAbstractMethod();
+            if (amethod != null)
+              {
+                LambdaExp lexp = (LambdaExp) exp;
+                ObjectExp oexp = new ObjectExp();
+                oexp.setLocation(exp);
+                oexp.supers = new Expression[] { new QuoteExp(required) };
+                oexp.setTypes(getCompilation());
+                Object mname = amethod.getName();
+                oexp.addMethod(lexp, mname);
+                Declaration mdecl = oexp.addDeclaration(mname, Compilation.typeProcedure);
+                oexp.firstChild = lexp;
+                oexp.declareParts(comp);
+                return visit(oexp, required);
+             }
+          }
+        incompatible = true;
+      }
+    else
+      incompatible = required != null && required.compare(expType) == -3;
+    if (incompatible)
       {
         Language language = comp.getLanguage();
         comp.error('w', "type "+(language.formatType(expType)

@@ -1,5 +1,7 @@
 2010-09-20  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (checkSingleAbstractMethod): New method.
+
 	* ClassType.java (AbstractMethodFilter): New static member class.
 	(getAbstractMethods): New method.
 

@@ -1,5 +1,9 @@
 2010-09-20  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (checkType): New method, extracted from visit.
+	Do SAM conversion: If the required type has a Single Abstract Method,
+	you can use a lambda expression.
+
 	* Language.java (parse): Set mustCompile here as appropriate.
 	* ModuleExp.java (evalModule1): Don't need to set it here.
 

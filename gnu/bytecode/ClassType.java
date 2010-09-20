@@ -1348,4 +1348,33 @@ public class ClassType extends ObjectType
     attributes = null;
     sourceDbgExt = null;
   }
+
+  /** Check to see if this is a Single Abstract Method (SAM) type.
+   * I.e. an interface or abstract class that has one and only one
+   * abstract method.  (One way that lambdas/closures are useful
+   * is that when given a lambda in a context that requires a SAM,
+   * create an implementing class using the lambda for the abstract method.)
+   * @return the single abstract Method, or null if this is not a SAM type.
+   */
+  public Method checkSingleAbstractMethod ()
+  {
+    Method[] methods = getAbstractMethods();
+    int nmethods = methods.length;
+    Method result = null;
+    for (int i = 0;  i < nmethods;  i++)
+      {
+        Method meth = methods[i];
+        String mname = meth.getName();
+        Type[] ptypes = meth.getParameterTypes();
+
+        Method mimpl = getMethod(mname, ptypes);
+        if (mimpl != null && ! mimpl.isAbstract())
+          continue;
+        if (result != null)
+          return null;
+        result = meth;
+      }
+    return result;
+  }
+
 }

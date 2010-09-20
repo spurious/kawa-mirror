@@ -61,7 +61,7 @@
   <target name="classes" 
           depends="java-classes, lib-scm-classes
           , slib-scm-classes, commonlisp-scm-classes, brl-classes
-          , xml-classes, servlet-classes, jemacs-classes" />
+          , xml-classes, servlet-classes, jemacs-classes, android-classes" />
   
   <!-- 
      These are the files that are Kawa.    
@@ -153,6 +153,8 @@
 
     <property name="enable-brl" value="false"/>
 
+    <property name="enable-android" value="false"/>
+
     <!--
        If javax.servlet.http.HttpServlet is in the classpath, then we'll
        compile Kawa' servlet interface, unless you override enable-servlet.
@@ -177,6 +179,7 @@
         enable-jemacs=${enable-jemacs}
         enable-xml=${enable-xml}
         enable-servlet=${enable-servlet}
+        enable-android=${enable-android}
     </echo>
 
     <!-- 
@@ -229,7 +232,7 @@
 
   </target>
   
-  <target name="select-java1" depends="build-tools">
+  <target name="select-java1" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -240,7 +243,7 @@
     </java>
   </target>
     
-  <target name="select-java2" depends="build-tools">
+  <target name="select-java2" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -251,7 +254,7 @@
     </java>
   </target>
     
-  <target name="select-java4" depends="build-tools">
+  <target name="select-java4" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -262,7 +265,7 @@
     </java>
   </target>
     
-  <target name="select-java5" depends="build-tools">
+  <target name="select-java5" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -273,7 +276,7 @@
     </java>
   </target>
     
-  <target name="select-java6" depends="build-tools,check-for-HttpServer">
+  <target name="select-java6" depends="build-settings,check-for-HttpServer">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -284,6 +287,17 @@
     </java>
   </target>
 
+  <target name="select-android" depends="build-settings">
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="%android ${preprocess-xml} -use:com.sun.net.httpserver"/>
+      <arg line="${fileList}"/>
+    </java>
+  </target>
+    
   <target name="select-java7" depends="build-tools,check-for-HttpServer">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
@@ -302,32 +316,40 @@
     </condition>
   </target>
 
-  <target name="maybe-select-java1" unless="has-java2">
+  <target name="-maybe-select-java1" unless="has-java2">
     <antcall target="select-java1"/>
   </target>
-  <target name="maybe-select-java2" unless="has-java4">
+  <target name="-maybe-select-java2" unless="has-java4">
     <antcall target="select-java2"/>
   </target>
-  <target name="maybe-select-java4" unless="has-java5">
+  <target name="-maybe-select-java4" unless="has-java5">
     <antcall target="select-java4"/>
   </target>
-  <target name="maybe-select-java5" unless="has-java6">
+  <target name="-maybe-select-java5" unless="has-java6">
     <antcall target="select-java5"/>
   </target>
-  <target name="maybe-select-java6" if="has-java6">
+  <target name="-maybe-select-java6" if="has-java6">
     <antcall target="select-java6"/>
+  </target>
+  <target name="-maybe-select-android" if="${enable-android}">
+    <antcall target="select-android"/>
   </target>
 
   <target name="select-java-auto">
+    <antcall target="-select-java-non-android"/>
+    <antcall target="-maybe-select-android"/>
+  </target>
+
+  <target name="-select-java-non-android" unless="${enable-android}">
     <available property="has-java2" classname="java.lang.ThreadLocal"/>
     <available property="has-java4" classname="java.lang.CharSequence"/>
     <available property="has-java5" classname="java.lang.Appendable"/>
     <available property="has-java6" classname="javax.script.AbstractScriptEngine"/>
-    <antcall target="maybe-select-java1"/>
-    <antcall target="maybe-select-java2"/>
-    <antcall target="maybe-select-java4"/>
-    <antcall target="maybe-select-java5"/>
-    <antcall target="maybe-select-java6"/>
+    <antcall target="-maybe-select-java1"/>
+    <antcall target="-maybe-select-java2"/>
+    <antcall target="-maybe-select-java4"/>
+    <antcall target="-maybe-select-java5"/>
+    <antcall target="-maybe-select-java6"/>
   </target>
   
   <!-- 
@@ -618,6 +640,22 @@
       <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
       <fileset dir="${src.dir}/gnu/kawa/servlet"> 
         <include name="HTTP.scm"/>
+      </fileset>
+    </apply>
+  </target>
+   
+  <target name="android-classes" 
+          depends="build-settings, java-classes" 
+          if="${enable-android}">
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <!-- I don't quite get why the Java classpath has to be tacked on here, but it does. -->
+      <arg value="-classpath"/> <arg path="${build.classes}:${java.class.path}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.android. --module-static-run -C"/>
+      <fileset dir="${src.dir}/gnu/kawa/android"> 
+        <include name="defs.scm"/>
       </fileset>
     </apply>
   </target>

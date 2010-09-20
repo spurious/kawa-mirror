@@ -1,3 +1,14 @@
+2010-09-20  Per Bothner  <per@bothner.com>
+
+	* build.xml: Add enable-android support.
+	(android-classes): New target.
+
+	* build.xml: Change various targets to depend on build-settings
+	rather than build-tools.
+
+	* build.xml: Change some targets to "internal" by prefixing
+	their names with '-'.
+
 2010-08-28  Per Bothner  <per@bothner.com>
 
 	* build/xml (select-java7): New target.

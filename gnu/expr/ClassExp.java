@@ -575,7 +575,7 @@ public class ClassExp extends LambdaExp
           }
         else
           {
-            methods = type.getMethods(AbstractMethodFilter.instance, 2);
+            methods = type.getAbstractMethods();
             nmethods = methods.length;
           }
 	for (int i = 0;  i < nmethods;  i++)
@@ -751,12 +751,14 @@ public class ClassExp extends LambdaExp
     if (supers.length > 0)
       {
 
-        out.print(" supers:");
+        out.writeSpaceFill();
+        out.startLogicalBlock("supers:", "", 2);
         for (int i = 0;  i < supers.length;  i++)
           {
             supers[i].print(out);
-            out.print(' ');
+            out.writeSpaceFill();
           }
+        out.endLogicalBlock("");
       }
     out.print('(');
     Special prevMode = null;
@@ -805,17 +807,15 @@ public class ClassExp extends LambdaExp
     return sbuf.toString();
   }
 
-  /** Helper class uses by ClassExp.compile.
-   */
-  private static class AbstractMethodFilter implements gnu.bytecode.Filter
+  public Declaration addMethod (LambdaExp lexp, Object mname)
   {
-    public static final AbstractMethodFilter instance
-      = new AbstractMethodFilter();
-
-    public boolean select(Object value)
-    {
-      gnu.bytecode.Method method = (gnu.bytecode.Method) value;
-      return method.isAbstract();
-    }
+    Declaration mdecl = addDeclaration(mname, Compilation.typeProcedure);
+    lexp.outer = this;
+    lexp.setClassMethod(true);
+    mdecl.noteValue(lexp);
+    mdecl.setFlag(Declaration.FIELD_OR_METHOD);
+    mdecl.setProcedureDecl(true);
+    lexp.setSymbol(mname);
+    return mdecl;
   }
 }

@@ -297,16 +297,9 @@ public class object extends Syntax
 		tr.error('e', "missing method name");
 		return null;
 	      }
-	    Declaration decl
-              = oexp.addDeclaration(mname, Compilation.typeProcedure);
-	    Translator.setLine(decl, mpair);
 	    LambdaExp lexp = new LambdaExp();
-	    lexp.outer = oexp;
-	    lexp.setClassMethod(true);
-	    decl.noteValue(lexp);
-	    decl.setFlag(Declaration.FIELD_OR_METHOD);
-	    decl.setProcedureDecl(true);
-	    lexp.setSymbol(mname);
+	    Declaration decl = oexp.addMethod(lexp, mname);
+	    Translator.setLine(decl, mpair);
 	    if (last_method == null)
 	      method_list = lexp;
 	    else

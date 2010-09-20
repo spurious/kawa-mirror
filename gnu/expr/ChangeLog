@@ -1,3 +1,13 @@
+2010-09-20  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (AbstractMethodFilter): Helper class moved to
+	gnu.bytecode.ClassType.
+	(compileMembers): Use new gnu.bytecode.ClassType#getAbstractMethods.
+
+	* ClassExp.java (print) Some pretty-printing tweaks.
+
+	* ClassExp.java (addMethod): New convenience method.
+
 2010-09-17  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (getInstance): New factory method taking SourceLocator.

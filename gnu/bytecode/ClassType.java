@@ -851,6 +851,23 @@ public class ClassType extends ObjectType
     return count;
   }
 
+  static class AbstractMethodFilter implements gnu.bytecode.Filter
+  {
+    public static final AbstractMethodFilter instance
+      = new AbstractMethodFilter();
+
+    public boolean select(Object value)
+    {
+      gnu.bytecode.Method method = (gnu.bytecode.Method) value;
+      return method.isAbstract();
+    }
+  }
+
+  public Method[] getAbstractMethods ()
+  {
+    return getMethods(AbstractMethodFilter.instance, 2);
+  }
+
   /** Look for a matching method.
    * @param name method name
    * @param arg_types parameter types that must match.

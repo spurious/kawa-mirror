@@ -286,14 +286,25 @@ public class CompileInvoke
         if (index >= 0)
           {
             Expression[] margs = new Expression[margsLength];
+            PrimProcedure method = methods[index];
+            boolean variable = method.takesVarArgs();
             int dst = 0;
             if (objIndex >= 0)
               margs[dst++] = args[objIndex];
             for (int src = argsStartIndex; 
                  src < args.length && dst < margs.length; 
                  src++, dst++)
-              margs[dst] = visitor.visit(args[src], methods[index].getParameterType(dst));
-            return new ApplyExp(methods[index], margs).setLine(exp);
+              {
+                Type ptype = method.getParameterType(dst);
+                // KLUDGE If varargs, then the last parameter is special:
+                // If can be an array, or a single argument.
+                if (variable && dst+1 == margs.length)
+                  ptype = null;
+                margs[dst] = visitor.visit(args[src], ptype);
+              }
+            ApplyExp e = new ApplyExp(method, margs);
+            e.setLine(exp);
+            return visitor.visitApplyOnly(e, required);
           }
       }
     exp.visitArgs(visitor);

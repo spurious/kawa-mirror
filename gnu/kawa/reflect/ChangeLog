@@ -1,3 +1,8 @@
+2010-09-20  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): A klduge - type-checking
+	the last argument of a varargs method is tricky (array *or* non-array).
+
 2010-09-17  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Defer visitArgs.

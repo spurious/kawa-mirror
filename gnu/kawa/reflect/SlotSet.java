@@ -38,15 +38,29 @@ public class SlotSet extends Procedure3 implements Inlineable
     apply(true, obj, name, value);
   }
 
-  public static void apply (boolean isStatic, Object obj, String name, Object value)
+  public static void apply (boolean isStatic, Object obj, Object member, Object value)
   {
     Language language = Language.getDefaultLanguage();
     boolean illegalAccess = false;
-    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
-    Class clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
+    String name;
+    String fname;
+    Class clas;
+    if (member instanceof String
+        || member instanceof FString
+        || member instanceof Symbol) {
+      name = member.toString();
+      fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
+      clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
+    }
+    else {
+      fname = name = ((Member) member).getName();
+      clas = null;
+    }
     try
       {
-        java.lang.reflect.Field field = clas.getField(fname);
+        java.lang.reflect.Field field
+          = member instanceof Field ? ((Field) member).getReflectField()
+          : clas.getField(fname);
 	Class ftype = field.getType();
         field.set(obj, language.coerceFromObject(ftype, value));
         return;
@@ -65,15 +79,22 @@ public class SlotSet extends Procedure3 implements Inlineable
       {
         java.lang.reflect.Method getmethod = null;
     
+        boolean haveSetter = member instanceof Method;
+	String setName = haveSetter ? fname
+          : ClassExp.slotToMethodName("set", name);
+        if (haveSetter && ! setName.startsWith("set"))
+          haveSetter = false;
+
         try {
-          String getName = ClassExp.slotToMethodName("get", name);
+          String getName = haveSetter ? "get" + setName.substring(3)
+            : ClassExp.slotToMethodName("get", name);
           getmethod = clas.getMethod(getName, SlotGet.noClasses);
         } catch (Exception getEx) {
-          String getName = ClassExp.slotToMethodName("is", name);
+          String getName = haveSetter ? "is" + setName.substring(3)
+            : ClassExp.slotToMethodName("is", name);
           getmethod = clas.getMethod(getName, SlotGet.noClasses);
         }
         
-	String setName = ClassExp.slotToMethodName("set", name);
         Class[] setArgTypes = new Class[1];
         setArgTypes[0] = getmethod.getReturnType();
         java.lang.reflect.Method setmethod
@@ -104,8 +125,7 @@ public class SlotSet extends Procedure3 implements Inlineable
 
   public Object apply3 (Object obj, Object fname, Object value)
   {
-    // Should actually check type rather than just calling toString.  FIXME.
-    apply(isStatic, obj, fname.toString(), value);
+    apply(isStatic, obj, fname, value);
     return returnSelf ? obj : Values.empty;
   }
 

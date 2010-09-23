@@ -1,3 +1,8 @@
+2010-09-23  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (apply): Handle the case where the "name" is actually
+	a Field or Method, which could happen if inlining is only partial.
+
 2010-09-20  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): A klduge - type-checking

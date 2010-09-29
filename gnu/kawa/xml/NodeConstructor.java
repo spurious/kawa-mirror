@@ -120,10 +120,8 @@ implements Inlineable
 	    int nargs = args.length;
 	    CodeAttr code = comp.getCode();
 	    Scope scope = code.pushScope();
-	    Variable saved
-	      = scope.addVariable(code, Compilation.typeConsumer, null);
-	    code.emitLoad(cvar);
-	    code.emitStore(saved);
+            Variable xvar
+	      = scope.addVariable(code, typeXMLFilter, null);
 	    if (ctarget.isContextTarget())
 	      {
 		comp.loadCallContext();
@@ -134,17 +132,13 @@ implements Inlineable
 		code.emitLoad(cvar);
 		code.emitInvokeStatic(pushNodeConsumerMethod);
 	      }
-	    code.emitStore(cvar);
+	    code.emitStore(xvar);
 	    code.emitTryStart(true, Type.void_type);
-            Type saveType = cvar.getType();
-            // For slightly improved code generation.  We can potentially use
-            // the faster invokevirtual rather than invokeinterface.
-            cvar.setType(typeXMLFilter);
-	    compileToNode(exp, comp, ctarget);
-            cvar.setType(saveType);
+            ConsumerTarget xtarget = new ConsumerTarget(xvar);
+	    compileToNode(exp, comp, xtarget);
 	    code.emitTryEnd();
 	    code.emitFinallyStart();
-	    code.emitLoad(saved);
+	    code.emitLoad(cvar);
 	    if (ctarget.isContextTarget())
 	      {
 		comp.loadCallContext();
@@ -152,11 +146,9 @@ implements Inlineable
 	      }
 	    else
 	      {
-		code.emitLoad(cvar);
+		code.emitLoad(xvar);
 		code.emitInvokeStatic(popNodeConsumerMethod);
 	      }
-	    code.emitLoad(saved);
-	    code.emitStore(cvar);
 	    code.emitFinallyEnd();
 	    code.emitTryCatchEnd();
 	    code.popScope();

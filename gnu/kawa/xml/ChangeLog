@@ -1,5 +1,7 @@
 2010-09-28  Per Bothner  <per@bothner.com>
 
+	* NodeConstructor.java (compile): 
+
 	* XDataType.java (emitTestIf): Add necessary coercion before
 	storing into Declaration.
 

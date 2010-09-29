@@ -239,7 +239,6 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
     Expression r = current.returnContinuation;
     if (current.tailCallers != null)
       {
-        LambdaExp outer = current.outerLambda();
         for (LambdaExp p : current.tailCallers)
           {
             Expression t = checkInlineable(p, seen);

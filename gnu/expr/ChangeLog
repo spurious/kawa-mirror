@@ -1,3 +1,7 @@
+2010-09-28  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (checkInlineable): Remove unused local.
+
 2010-09-20  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (checkType): New method, extracted from visit.

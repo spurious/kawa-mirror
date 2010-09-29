@@ -1478,7 +1478,12 @@ public class LambdaExp extends ScopeExp
 	    if (param.isIndirectBinding())
               param.pushIndirectBinding(comp);
 	    if (param.isSimple())
-	      code.emitStore(param.getVariable());
+              {
+                Variable var = param.getVariable();
+                if (param.isIndirectBinding())
+                  var.setType(Compilation.typeLocation);
+                code.emitStore(var);
+              }
             else
 	      code.emitPutField(param.field);
 	  }

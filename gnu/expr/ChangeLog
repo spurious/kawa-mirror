@@ -1,5 +1,8 @@
 2010-09-28  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (enterFunction):  If parameter is indirect-binding,
+	change Variable's type to Location.
+
 	* FindCapturedVars.java (checkInlineable): Remove unused local.
 
 2010-09-20  Per Bothner  <per@bothner.com>

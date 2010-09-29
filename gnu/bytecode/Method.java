@@ -162,8 +162,7 @@ public class Method implements AttrContainer, Member {
    */
   public void init_param_slots ()
   {
-    initCode ();
-    code.addParamLocals();
+    startCode();
   }
 
   /** Recommended method to create a new CodeAttr for this Method. */

@@ -134,8 +134,13 @@ public class Variable extends Location implements java.util.Enumeration
   {
     flags &= ~LIVE_FLAG;
     int size = getType().size > 4 ? 2 : 1;
-    while (--size >= 0)
-      code.locals.used[offset + size] = null;
+    for (int vnum = offset + size;  --vnum >= offset; )
+      {
+        code.locals.used[vnum] = null;
+        Type[] local_types = code.local_types;
+        if (local_types != null)
+          local_types[vnum] = null;
+      }
   }
 
   boolean shouldEmit ()

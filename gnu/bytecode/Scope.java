@@ -114,7 +114,9 @@ public class Scope
 
   public void setStartPC(CodeAttr code)
   {
-    start = code.getLabel();
+    if (start == null)
+      start = new Label();
+    start.define(code);
   }
 
   /** Should be called at the start of a logical function - inlined or not. */
@@ -137,7 +139,7 @@ public class Scope
     return null;
   }
 
-  /** Make local variable slots of this scope availabel for re-use.
+  /** Make local variable slots of this scope available for re-use.
    * However, if the 'preserved' flag is set, defer doing so until
    * we exit a non-preserved Scope. */
   void freeLocals (CodeAttr code)

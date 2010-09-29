@@ -87,10 +87,7 @@ public class SwitchState
   public boolean addCase(int value, CodeAttr code)
   {
     Label label = new Label(code);
-    if (code.reachableHere())
-      label.setTypes(cases_label);
-    else
-      label.setTypesSame(cases_label);
+    label.setTypes(cases_label);
     label.define(code);
     return insertCase(value, label, code);
   }
@@ -99,7 +96,7 @@ public class SwitchState
   public boolean addCaseGoto(int value, CodeAttr code, Label label)
   {
     boolean ok = insertCase(value, label, code);
-    label.setTypesSame(cases_label);
+    label.setTypes(cases_label);
     code.setUnreachable();
     return ok;
   }
@@ -107,10 +104,7 @@ public class SwitchState
   public void addDefault(CodeAttr code)
   {
     Label label = new Label(code);
-    if (code.reachableHere())
-      label.setTypes(cases_label);
-    else
-      label.setTypesSame(cases_label);
+    label.setTypes(cases_label);
     label.define(code);
     if (defaultLabel!=null) throw new Error();
     defaultLabel = label;

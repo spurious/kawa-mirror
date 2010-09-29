@@ -1,7 +1,8 @@
-// Copyright (c) 1997, 2004, 2008  Per M.A. Bothner.
+// Copyright (c) 1997, 2004, 2008, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.util.ArrayList;
 
 /**
  * A Label represents a location in a Code attribute.
@@ -18,6 +19,8 @@ public class Label {
    * This PC may be tentative if we later run processFixups.
    * The offset in the code array is cattr.fixupOffset(first_fixup). */
   int position;
+
+  boolean needsStackMapEntry;
 
   // FIXME Probably more efficient to have a single array:
   // local-types followed by stack-types.  We'd need an extra short field.
@@ -39,6 +42,13 @@ public class Label {
   public Label (int position)
   {
     this.position = position;
+  }
+
+  Type mergeTypes (Type t1, Type t2)
+  {
+    if ((t1 instanceof PrimType) != (t2 instanceof PrimType))
+      return null;
+    return Type.lowestCommonSuperType(t1, t2);
   }
 
   void setTypes (Type[] locals, int usedLocals,
@@ -72,8 +82,7 @@ public class Label {
         int SP = usedStack;
         int slen = stackTypes.length;
         if (SP != slen)
-          //          throw new Error();
-          throw new Error("inconsistent stack len was:"+slen+" now:"+SP+" for "+this);
+          throw new InternalError("inconsistent stack length");
         for (int i = 0; i < SP; i++)
           {
             stackTypes[i] = mergeTypes(stackTypes[i], stack[i]);
@@ -81,24 +90,18 @@ public class Label {
         int min = usedLocals < localTypes.length ? usedLocals : localTypes.length ;
         for (int i = 0; i < min; i++)
           {
-            localTypes[i] = mergeTypes(localTypes[i], locals[i]);
+            mergeLocalType(i, locals[i]);
           }
         for (int i = usedLocals; i < localTypes.length;  i++)
           localTypes[i] = null;
       }
   }
 
-  Type mergeTypes (Type t1, Type t2)
-  {
-    if ((t1 instanceof PrimType) != (t2 instanceof PrimType))
-      return null;
-    return Type.lowestCommonSuperType(t1, t2);
-  }
-
   public void setTypes (CodeAttr code)
   {
+    addTypeChangeListeners(code);
     if (stackTypes != null && code.SP != stackTypes.length)
-      throw new Error();
+      throw new InternalError();
     setTypes(code.local_types,
              code.local_types == null ? 0 : code.local_types.length,
              code.stack_types,
@@ -111,12 +114,85 @@ public class Label {
              other.stackTypes, other.stackTypes.length);
   }
 
-  void setTypesSame (Label other)
+  private void mergeLocalType (int varnum, Type newType)
   {
-    stackTypes = other.stackTypes;
-    localTypes = other.localTypes;
+    Type oldLocal = localTypes[varnum];
+    Type newLocal = mergeTypes(oldLocal, newType);
+    localTypes[varnum] = newLocal;
+    if (newLocal != oldLocal)
+      notifyTypeChangeListeners(varnum, newLocal);
   }
 
+  private void notifyTypeChangeListeners (int varnum, Type newType)
+  {
+    Object[] arr = typeChangeListeners;
+    if (arr == null || arr.length <= varnum)
+      return;
+    Object listeners = arr[varnum];
+    if (listeners == null)
+      return;
+    if (listeners instanceof Label)
+      ((Label) listeners).mergeLocalType(varnum, newType);
+    else
+      {
+        for (Label listener : (ArrayList<Label>) listeners)
+          listener.mergeLocalType(varnum, newType);
+      }
+    if (newType == null)
+      arr[varnum] = null;
+  }
+
+  /** Map from Variable number to set of listeners.
+   * When {@code this.localTypes[varnum]} is invalidated, then we also
+   * need to invalidate that variable in all the listeners.
+   * The type is actually a {@code Union<Label,ArrayList<Label>>[]}.
+   */
+  private Object[] typeChangeListeners;
+
+  void addTypeChangeListener (int varnum, Label listener)
+  {
+    Object[] arr = typeChangeListeners;
+    if (arr == null)
+      typeChangeListeners = arr = new Object[varnum + 10];
+    else if (arr.length <= varnum)
+      {
+        arr = new Object[varnum + 10];
+        System.arraycopy(typeChangeListeners, 0, arr, 0, typeChangeListeners.length);
+        typeChangeListeners = arr;
+      }
+    Object set = arr[varnum];
+    if (set == null)
+      arr[varnum] = listener;
+    else
+      {
+        ArrayList<Label> list;
+        if (set instanceof Label)
+          {
+            list = new ArrayList<Label>();
+            list.add((Label) set);
+            arr[varnum] = list;
+          }
+        else
+          list = (ArrayList<Label>) set;
+        list.add(listener);
+      }
+  }
+
+  void addTypeChangeListeners (CodeAttr code)
+  {
+    if (code.local_types != null && code.previousLabel != null)
+      {
+        int len = code.local_types.length;
+        for (int varnum = 0;  varnum < len;  varnum++)
+          {
+            if (code.local_types[varnum] != null
+                && (code.varsSetInCurrentBlock == null
+                    || code.varsSetInCurrentBlock.length <= varnum
+                    || ! code.varsSetInCurrentBlock[varnum]))
+              code.previousLabel.addTypeChangeListener(varnum, this);
+          }
+      }
+  }
   /**
    * Define the value of a label as having the current location.
    * @param code the "Code" attribute of the current method
@@ -138,12 +214,27 @@ public class Label {
   public void define (CodeAttr code)
   {
     if (code.reachableHere())
-      setTypes(code);
+      {
+        setTypes(code);
+      }
+    else if (localTypes != null)
+      {
+        for (int i = localTypes.length; --i >= 0; )
+          {
+            if (localTypes[i] != null
+                && (code.locals.used == null || code.locals.used[i] == null))
+              {
+                localTypes[i] = null;
+              }
+          }
+      }
+    code.previousLabel = this;
+    code.varsSetInCurrentBlock = null; // FIXME - zero out instead.
+    defineRaw(code);
     if (localTypes != null)
       // Copy merged type back to current state.
       code.setTypes(this);
     code.setReachable(true);
-    defineRaw(code);
   }
 
   /* DEBUG

@@ -126,6 +126,8 @@ public class StackMapTableAttr extends MiscAttr
         if (nextType == 3 || nextType == 4) // Double or Long
           i++;
       }
+    while (curLocalsCount > 0 && encodedLocals[curLocalsCount-1] == 0)
+      curLocalsCount--;
     int curStackCount = 0;
     for (int i = 0;  i < rawStackCount;  i++)
       {

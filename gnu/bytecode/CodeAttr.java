@@ -36,6 +36,12 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public Type[] stack_types;
   Type[] local_types;
+  /** Previously-defined label. */
+  Label previousLabel;
+  /** Set of vars set in current block (since previousLabel).
+   * This is so we can differentiate variable set locally, versus definitions
+   * that reach us (and that might be invalidated by future flows). */
+  boolean[] varsSetInCurrentBlock;
 
   int SP;  // Current stack size (in "words")
   private int max_stack;
@@ -135,6 +141,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   final void fixupAdd (int kind, int offset, Label label)
   {
+    if (label != null && kind != FIXUP_DEFINE
+        && kind != FIXUP_NONE && kind != FIXUP_SWITCH && kind != FIXUP_TRY)
+      label.needsStackMapEntry = true;
     int count = fixup_count;
     if (count == 0)
       {
@@ -361,6 +370,15 @@ public class CodeAttr extends Attribute implements AttrContainer
       local_types = new_array;
     }
     local_types[offset] = type;
+    if (varsSetInCurrentBlock == null)
+      varsSetInCurrentBlock = new boolean[local_types.length];
+    else if (varsSetInCurrentBlock.length <= offset)
+      {
+        boolean[] tmp = new boolean[local_types.length];
+        System.arraycopy(varsSetInCurrentBlock, 0, tmp, 0, varsSetInCurrentBlock.length);
+        varsSetInCurrentBlock = tmp;
+      }
+    varsSetInCurrentBlock[offset] = true;
     if (offset > 0)
       {
         Type prev = local_types[offset-1];
@@ -612,7 +630,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     locals.enterScope(scope);
   }
 
-  public Scope pushScope () {
+  public Scope pushScope ()
+  {
     Scope scope = new Scope ();
     if (locals == null)
       locals = new LocalVarsAttr(getMethod());
@@ -2370,7 +2389,6 @@ public class CodeAttr extends Attribute implements AttrContainer
               }
             try_stack.exitCases = null;
 
-            
             sw.addDefault(this);
             sw.finish(this);
           }
@@ -2644,7 +2662,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      case FIXUP_NONE:
 		break;
 	      case FIXUP_DEFINE:
-                if (stackMap != null && label != null && label.stackTypes != null && label.position != 0)
+                if (stackMap != null && label != null && label.stackTypes != null && label.needsStackMapEntry)
                   {
                     pendingStackMapLabel
                       = mergeLabels(pendingStackMapLabel, label);
@@ -2760,12 +2778,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   private Label mergeLabels (Label oldLabel, Label newLabel)
   {
     if (oldLabel != null)
-      {
-        Type[] plocals = oldLabel.localTypes;
-        Type[] pstack = oldLabel.stackTypes;
-        newLabel.setTypes(plocals, plocals.length,
-                          pstack, pstack.length);
-      }
+      newLabel.setTypes(oldLabel);
     return newLabel;
   }
 

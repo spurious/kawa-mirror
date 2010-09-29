@@ -1,3 +1,25 @@
+2010-09-29  Per Bothner  <per@bothner.com>
+
+	Fix various problems with StackMapTable.
+	* SwitchState.java: Replace calls to Label#setTypesSame (optimization
+	which causes problems with StackMapTable) by calls to setTypes.
+	* StackMapTableAttr.java (emitStackMapEntry): Don't include unused
+	"tail" locals in local variable count/
+	* Variable.java (freeLocal):  Also null out local_types element.
+	* CodeAttr.java (previousLabel, varsSetInCurrentBlock): New fields.
+	(fixupAdd): Explicitly note when needsStackMapEntry.
+	(noteVarType): Note definition in varsSetInCurrentBlock array.
+	(processFixups): Use needsStackMapEntry.
+	(mergeLabels): Simplify.
+	* Scope.java (setStartPC): Need to use define rather than more
+	efficinet defineraw, since tailcalls may jump to the start label.
+	* Label.java: Add a framework so that when a locaTypes[varnum] is
+	changed (nulled) then also invalidate for any labels that depend
+	on this labels - i.e. that the variable flows to.
+	(needsStackMapEntry, typeChangeListeners): New fields.
+	(mergeLocalType, notifyTypeChangeListeners, addTypeChangeListener,
+	addTypeChangeListeners): New methods.
+
 2010-09-28  Per Bothner  <per@bothner.com>
 
 	* Method.java (init_param_slots):  Change to just call startCode.

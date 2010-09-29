@@ -1349,7 +1349,7 @@ public class IntNum extends RatNum implements Externalizable
     // but slightly more expensive, for little practical gain.
     if (len + radix <= 28)
       {
-        /* # ifndef JAVA7 */
+        /* #ifndef JAVA7 */
         if (len > 1 && s.charAt(0) == '+'
             && Character.digit(s.charAt(1), radix) >= 0)
           s = s.substring(1);

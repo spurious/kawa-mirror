@@ -1,7 +1,8 @@
 Document:
   in-http-server and in-servlet cond-expand options.
 
-Before Kawa 1.10:
+Before Kawa 1.11:
+- LOGO!
 - Update Android build procedure.
 - Check that 'ant' works.
 - Make Values constructors be private, so we can make Values be abstract.
@@ -36,6 +37,10 @@ http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/com/sun/net/httpse
 - In ReplDocument don't use SwingContent.
 
 OPTIMIZATIONS
+* optimize fluid-let and fluid references:
+  - in fluid-let call getLocation before calling setWithSave so we don't
+  have to call it again in setRestore.
+  - In local references inside a fluid-let use the location from above.
 * case/switch
 * translate Scheme character->int
 * Optimize (make T) where T is a known non-simple class.
@@ -257,6 +262,28 @@ of <java.awt.event.MouseEvent>, and hence an interface of
 New syntax:
 (listener [(EXTRA-INTERFACE ...)]
   ((METHOD-NAME ... EVENT-ARG-NAME [:: EVENT-TYPE]) ...))
+
+Listeners on JComponent etc:
+(javax.swing.JButton text: "Click Me" item-state-changed: (lambda (e) ...))
+It KEYWORD does not match a setter:
+Make list of all 1-argument methods that match addXxxListener.
+Look at parameter type - assume an interface type Yyy or abstract class.
+See if there is a method named KEYWORD (after mangling) in type Yyy.
+If so add to "handler list".
+If "handler list" is non-empty, create an anonymous "handler" class.
+(If any Yyy is an abstract class, create separate handler classes for each.)
+Handler class implements all the Yyy interfaces.
+Add methods for each argument.  Add any other void non-implemented methods.
+For example:
+  (object (ItemListener)
+    ((itemStateChange $e::ItemEvent) ((lambda (e) ...) $e)))
+Then: call addItemListener.
+Issue: (set! foo:item-state-changed (lambda (e) ...new handler...))
+In that case we want to remove old handler before adding new one.
+Can use getItemListeners followed by removedItemListener.
+Problem is that this may remove other unrelated handlers,
+unless we have one handler only for each method.
+Or have the handler have a set of settable slots.
 
 SYMBOLS
 If we have pre-process environments, (define exit ...) should only re-define

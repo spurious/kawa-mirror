@@ -1,3 +1,10 @@
+2010-09-29  Per Bothner  <per@bothner.com>
+
+	* build.xml: Make use of <condition> with else clause.
+	Move setting of preprocess-HttpServer into build-setting target.
+	(check-for-HttpServer): Remove target.
+	(select-java7): Depend on build-settings rather than build-tools.
+
 2010-09-20  Per Bothner  <per@bothner.com>
 
 	* build.xml: Add enable-android support.

@@ -114,38 +114,25 @@
   <property name="true" value="true"/>
 
   <target name="build-settings" depends="build-tools">
-    <!--
-       In the following you'll see that each conditional property is set
-       twice.  That is because available will not set the property at
-       all if the condition is false.  We need the explicit "false" value
-       so that we can work consistently with "-D" and build.properties.
-       Ant only sets a property once (within a given task chain) and so
-       the second setting is ignored if "available" set it to "true".
-    -->
+    <!-- If java.awt.Component is in the classpath, then we'll compile the
+       AWT UI, unless you override the setting of with-awt. -->
+    <condition property="with-awt" else="false">
+      <available classname="java.awt.Component"/>
+    </condition>
     
-    <!-- 
-       If java.awt.Component is in the classpath, then we'll compile the
-       AWT UI, unless you override the setting of with-awt.
-    -->
-    <available property="with-awt" classname="java.awt.Component"/>
-    <property name="with-awt" value="false"/>
-    
-    <!-- 
-       If org.xml.sax.ContentHandler is in the classpath, then we'll compile
-       in SAX2 support, unless you override the setting of with-sax2.
-    -->
-    <available property="with-sax2" classname="org.xml.sax.ContentHandler"/>
-    <property name="with-sax2" value="false"/>
-    
-    <!-- 
-       If java.awt.Component is in the classpath, then we'll compile the
-       JEmacs Swing UI, unless you override the setting of with-swing.
-    -->
-    <available property="with-swing" classname="javax.swing.JComponent"/>
-    <property name="with-swing" value="false"/>
+    <!-- If org.xml.sax.ContentHandler is in the classpath, then we'll compile
+       in SAX2 support, unless you override the setting of with-sax2.   -->
+    <condition property="with-sax2" else="false">
+      <available classname="org.xml.sax.ContentHandler"/>
+    </condition>
 
-    <!--
-       JEmacs stuff is compiled if Swing is used, unless enable-jemacs is false.
+    <!-- If java.awt.Component is in the classpath, then we'll compile the
+       JEmacs Swing UI, unless you override the setting of with-swing.  -->
+    <condition property="with-swing" else="false">
+      <available classname="javax.swing.JComponent"/>
+    </condition>
+
+    <!-- JEmacs stuff is compiled if Swing is used, unless enable-jemacs is false.
     -->
     <property name="enable-jemacs" value="false"/>
 
@@ -155,18 +142,22 @@
 
     <property name="enable-android" value="false"/>
 
-    <!--
-       If javax.servlet.http.HttpServlet is in the classpath, then we'll
-       compile Kawa' servlet interface, unless you override enable-servlet.
-    -->
-    <!-- The servlet code uses methods from the 2.3 specification now.
-         So test for a class that is new for the 2.3 API.
-    -->
-    <available property="enable-servlet" classname="javax.servlet.Filter"/>
-    <property name="enable-servlet" value="false"/>
+    <!-- If javax.servlet.http.HttpServlet is in the classpath, then we'll
+         compile Kawa' servlet interface, unless you override enable-servlet.
+
+         The servlet code uses methods from the 2.3 specification now.
+         So test for a class that is new for the 2.3 API. -->
+    <condition property="enable-servlet" else="false">
+      <available classname="javax.servlet.Filter"/>
+    </condition>
   
     <condition property="preprocess-xml" value="+enable:XML" else="-enable:XML">
       <istrue value="${enable-xml}"/>
+    </condition>
+
+    <condition property="preprocess-HttpServer" value="+use:com.sun.net.httpserver"
+	       else="-use:com.sun.net.httpserver">
+      <available classname="com.sun.net.httpserver.HttpServer"/>
     </condition>
 
     <echo>
@@ -276,7 +267,7 @@
     </java>
   </target>
     
-  <target name="select-java6" depends="build-settings,check-for-HttpServer">
+  <target name="select-java6" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -298,7 +289,7 @@
     </java>
   </target>
     
-  <target name="select-java7" depends="build-tools,check-for-HttpServer">
+  <target name="select-java7" depends="build-settings">
     <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
       <path><fileset refid="build.selectjava"/></path>
     </pathconvert>
@@ -307,13 +298,6 @@
       <arg line="%java7 ${preprocess-xml} ${preprocess-HttpServer}"/>
       <arg line="${fileList}"/>
     </java>
-  </target>
-
-  <target name="check-for-HttpServer">
-    <condition property="preprocess-HttpServer" value="+use:com.sun.net.httpserver"
-	       else="-use:com.sun.net.httpserver">
-      <available classname="com.sun.net.httpserver.HttpServer"/>
-    </condition>
   </target>
 
   <target name="-maybe-select-java1" unless="has-java2">

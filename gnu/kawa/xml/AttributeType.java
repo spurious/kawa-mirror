@@ -115,10 +115,10 @@ implements TypeValue, Externalizable, AttributePredicate
       != null;
   }
 
-  public static SeqPosition coerceOrNull (Object obj,
+  public static KAttr coerceOrNull (Object obj,
 				    String namespaceURI, String localName)
   {
-    SeqPosition pos = NodeType.coerceOrNull(obj, ATTRIBUTE_OK);
+    KNode pos = NodeType.coerceOrNull(obj, ATTRIBUTE_OK);
     if (pos == null)
       return null;
     if (localName != null && localName.length() == 0)
@@ -148,7 +148,7 @@ implements TypeValue, Externalizable, AttributePredicate
       }
     if ((localName == curLocalName || localName == null)
 	&& (namespaceURI == curNamespaceURI || namespaceURI == null))
-      return pos;
+      return (KAttr) pos;
     return null;
   }
 

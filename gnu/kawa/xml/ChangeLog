@@ -1,3 +1,10 @@
+2010-09-28  Per Bothner  <per@bothner.com>
+
+	* XDataType.java (emitTestIf): Add necessary coercion before
+	storing into Declaration.
+
+	* AttributeType.java (coerceOrNull): Change return type to KAttr.
+
 2010-09-16  Per Bothner  <per@bothner.com>
 
 	* CompileXmlFunctions.java: Update validateApply methods, which

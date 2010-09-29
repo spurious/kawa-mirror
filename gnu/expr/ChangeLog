@@ -1,5 +1,7 @@
 2010-09-28  Per Bothner  <per@bothner.com>
 
+	* TypeValue.java (emitTestIf): Fix error in javadoc.
+
 	* LambdaExp.java (enterFunction):  If parameter is indirect-binding,
 	change Variable's type to Location.
 

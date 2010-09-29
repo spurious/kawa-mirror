@@ -232,14 +232,15 @@ public class XDataType extends Type implements TypeValue
       code.emitSwap();
     else
       code.emitLoad(incoming);
-    if (decl != null)
-      {
-        code.emitDup();
-        decl.compileStore(comp);
-      }
     code.emitInvokeVirtual(Compilation.typeType
                            .getDeclaredMethod("isInstance", 1));
     code.emitIfIntNotZero();
+    if (decl != null)
+      {
+        code.emitLoad(incoming);
+        emitCoerceFromObject(code);
+        decl.compileStore(comp);
+      }
   }
 
   public boolean isInstance (Object obj)

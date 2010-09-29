@@ -24,7 +24,7 @@ public interface TypeValue
    * by calls to <tt>emitElse</tt> and <tt>emitFi</tt>.
    * @param incoming Contains the value we are testing to see if it has the
    *        type of <tt>this</tt>.  If null, use top-of-stack.
-   *        May not be null if incoming is non-null.
+   *        May not be null if decl is non-null.
    * @param decl If non-null, assign value after coercion to <tt>Declaration</tt>.
    * @param comp The compilation state.
    */

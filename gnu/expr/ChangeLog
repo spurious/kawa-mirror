@@ -1,3 +1,11 @@
+2010-09-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (langOptions): New field.
+	(generateApplet, generateServlet): Remove fields. Instead use
+	bits in langOptions.
+	(generatingApplet, generatingServlet, sharedModuleDefs): New methods.
+	* Language.java (parse): Set langOptions from options parameter.
+
 2010-09-28  Per Bothner  <per@bothner.com>
 
 	* TypeValue.java (emitTestIf): Fix error in javadoc.

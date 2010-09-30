@@ -373,11 +373,24 @@ public class Compilation implements SourceLocator
 
   LitTable litTable;
 
+  int langOptions;
+  
   /** True if we should generate an Applet. */
-  public boolean generateApplet;
+  public boolean generatingApplet ()
+  {
+    return (langOptions & Language.PARSE_FOR_APPLET) != 0;
+  }
 
-  /** True if we should generate an Servlet. */
-  public boolean generateServlet;
+  /** True if we should generate a Servlet. */
+  public boolean generatingServlet ()
+  {
+    return (langOptions & Language.PARSE_FOR_SERVLET) != 0;
+  }
+
+  public boolean sharedModuleDefs ()
+  {
+    return (langOptions & Language.PARSE_CURRENT_NAMES) != 0;
+  }
 
   public final ClassType getModuleType()
   {
@@ -1066,7 +1079,7 @@ public class Compilation implements SourceLocator
 
   public boolean makeRunnable ()
   {
-    return ! generateServlet && ! generateApplet
+    return ! generatingServlet() && ! generatingApplet()
       && ! getModule().staticInitRun();
   }
 
@@ -1080,9 +1093,9 @@ public class Compilation implements SourceLocator
     ClassType sup = module.getSuperType();
     if (sup == null)
       {
-        if (generateApplet)
+        if (generatingApplet())
 	  sup = typeApplet;
-	else if (generateServlet)
+	else if (generatingServlet())
 	  sup = typeServlet;
 	else
 	  sup = getModuleType();
@@ -1843,7 +1856,7 @@ public class Compilation implements SourceLocator
 
     CodeAttr code = method.startCode();
 
-    if (generateMain || generateApplet || generateServlet)
+    if (generateMain || generatingApplet() || generatingServlet())
       {
 	ClassType languageType
 	  = (ClassType) Type.make(getLanguage().getClass());
@@ -2431,7 +2444,7 @@ public class Compilation implements SourceLocator
     ModuleExp module = new ModuleExp();
     if (filename != null)
       module.setFile(filename);
-    if (generateApplet || generateServlet)
+    if (generatingApplet() || generatingServlet())
       module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     if (immediate)
       {

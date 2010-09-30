@@ -1,3 +1,12 @@
+2010-09-30  Per Bothner  <per@bothner.com>
+
+	* Shell.java (compileSource): Pass PARSE_IMMEDIATE only to parse;
+	don't pass PARSE_CURRENT_NAMES (which is part of PARSE_FOR_EVAL).
+	* standard/define.java (scanForm): Only set CAN_WRITE if
+	sharedModuleDefs(), not for all immediate compilations.
+	* standard/require.java (importDefinitions):  Always make alias
+	declarations private, regardless of Compilation#immediate.
+
 2010-09-29  Per Bothner  <per@bothner.com>
 
 	* standard/module_implements.java: Move logic from rewriteForm to

@@ -97,14 +97,9 @@ public class define extends Syntax
 	decl.noteValue(lexp);
       }
 
-    if (defs instanceof ModuleExp)
-      {
-	if (! makePrivate)
-	  {
-            if (! Compilation.inlineOk || tr.immediate)
-	      decl.setCanWrite(true);
-	  }
-      }
+    if (defs instanceof ModuleExp && ! makePrivate
+        && (! Compilation.inlineOk || tr.sharedModuleDefs()))
+      decl.setCanWrite(true);
 
     if ((options & 1) != 0)
       {
@@ -158,7 +153,7 @@ public class define extends Syntax
 	value = tr.rewrite (p4.getCar());
 	decl.noteValue((decl.context instanceof ModuleExp && ! makePrivate
 			&& decl.getCanWrite())
-		       ? null : value);
+		        ? null : value);
       }
     SetExp sexp = new SetExp(decl, value);
     sexp.setDefining (true);

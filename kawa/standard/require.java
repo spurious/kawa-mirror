@@ -280,7 +280,6 @@ public class require extends Syntax
 
     ClassType type = info.getClassType();
     String tname = type.getName();
-    boolean immediate = tr.immediate && defs instanceof ModuleExp;
     boolean isRunnable = (info.getState() < Compilation.RESOLVED
                           ? info.getCompilation().makeRunnable()
                           : type.isSubtype(Compilation.typeRunnable));
@@ -328,8 +327,7 @@ public class require extends Syntax
           {
             String iname = tname.replace('.', '$') + "$instance";
             decl = new Declaration(SimpleSymbol.valueOf(iname), type);
-            if (! immediate)
-              decl.setPrivate(true);
+            decl.setPrivate(true);
             decl.setFlag(Declaration.IS_CONSTANT
                          |Declaration.MODULE_REFERENCE);
             defs.addDeclaration(decl);
@@ -409,8 +407,7 @@ public class require extends Syntax
         if (! isImportedInstance)
           {
             fref.setDontDereference(true);
-            if (! immediate)
-              adecl.setPrivate(true);
+            adecl.setPrivate(true);
           } 
         // Imported variables should be read-only.
         adecl.setFlag(Declaration.IS_CONSTANT);

@@ -478,7 +478,7 @@ public abstract class Language
   /** Parse one or more expressions.
    * @param port the InPort to read the expressions from.
    * @param messages where to send error messages and warnings
-   * @param options various flags, includding PARSE_IMMEDIATE 
+   * @param options various flags, including PARSE_IMMEDIATE 
    *   and PARSE_ONE_LINE
    * @return a new Compilation.
    *   May return null if PARSE_ONE_LINE on end-of-file.
@@ -521,10 +521,7 @@ public abstract class Language
     if (! immediate || ModuleExp.alwaysCompile)
       tr.mustCompile = true;
     tr.immediate = immediate;
-    if ((options & PARSE_FOR_APPLET) != 0)
-      tr.generateApplet = true;
-    if ((options & PARSE_FOR_SERVLET) != 0)
-      tr.generateServlet = true;
+    tr.langOptions = options;
     if ((options & PARSE_EXPLICIT) != 0)
       tr.explicit = true;
     if ((options & PARSE_PROLOG) != 0)

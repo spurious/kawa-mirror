@@ -515,7 +515,7 @@ public class Shell
     ModuleManager manager = ModuleManager.getInstance();
     ModuleInfo minfo = manager.findWithSourcePath(port.getName());
     Compilation comp
-      = language.parse(port, messages, Language.PARSE_FOR_EVAL, minfo);
+      = language.parse(port, messages, Language.PARSE_IMMEDIATE, minfo);
     CallContext ctx = CallContext.getInstance();
     ctx.values = Values.noArgs;
     Object inst = ModuleExp.evalModule1(env, comp, url, null);

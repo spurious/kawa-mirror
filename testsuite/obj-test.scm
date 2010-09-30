@@ -1,4 +1,4 @@
-(test-init "Objects" 131)
+(test-init "Objects" 134)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -378,3 +378,10 @@
 (test #f is-even? 3)
 (test #f is-odd? 8)
 (test #t is-odd? 3)
+
+(define m2-object (module2))
+(set-cdr! m2-object '(5 6 7))
+(test 4 length m2-object)
+(test #!null 'before-m2-close m2-object:my-array-7)
+(let ((cl ::java.io.Closeable m2-object)) (cl:close))
+(test #f 'after-m2-close m2-object:my-array-7)

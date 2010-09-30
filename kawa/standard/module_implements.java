@@ -10,12 +10,15 @@ public class module_implements extends Syntax
     = new module_implements();
   static { module_implements.setName("module-implements"); }
 
-  public Expression rewriteForm (Pair form, Translator tr)
+  public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
     Object args = form.getCdr();
     int len = LList.listLength(args, false);
     if (len < 0)
-      return tr.syntaxError("improper argument list for " + getName());
+      {
+        tr.syntaxError("improper argument list for " + getName());
+        return;
+      }
     ClassType[] interfaces = new ClassType[len];
     for (int i = 0;  i < len;  i++)
       {
@@ -26,6 +29,5 @@ public class module_implements extends Syntax
     ModuleExp module = tr.getModule();
     module.setInterfaces(interfaces);
     module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
-    return QuoteExp.voidExp;
   }
 }

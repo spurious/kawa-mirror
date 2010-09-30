@@ -1,3 +1,9 @@
+2010-09-29  Per Bothner  <per@bothner.com>
+
+	* module2.scm: Add a module-implements.
+	(close): New function.
+	* obj-test.scm: Test module-extends and module-implements support.
+
 2010-09-16  Per Bothner  <per@bothner.com>
 
 	* formatst.scm (test): Simplify.

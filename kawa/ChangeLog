@@ -1,3 +1,9 @@
+2010-09-29  Per Bothner  <per@bothner.com>
+
+	* standard/module_implements.java: Move logic from rewriteForm to
+	scanFrom, for same reason as 2008-12-23 change to module_extends.java.
+	Fixes bug reported 2010-09-13 by Jamison Hope <jrh@theptrgroup.com>.
+
 2010-09-20  Per Bothner  <per@bothner.com>
 
 	* standard/define.java (rewriteForm):  Don't prematurely getTypeExp

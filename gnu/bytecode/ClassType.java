@@ -1292,11 +1292,13 @@ public class ClassType extends ObjectType
     if (cother.isSubclass(this))
       return 1;
     if (this == toStringType)
-      return cother == Type.pointer_type ? -1 : 1;
+      return cother == Type.javalangObjectType ? -1 : 1;
     if (cother == toStringType)
-      return this == Type.pointer_type ? 1 : -1;
-    if (this.isInterface() || cother.isInterface())
-      return -2;
+      return this == Type.javalangObjectType ? 1 : -1;
+    if (this.isInterface())
+      return cother == Type.javalangObjectType ? -1 : -2;
+    if (cother.isInterface())
+      return this == Type.javalangObjectType ? 1 : -2;
     return -3;
   }
 

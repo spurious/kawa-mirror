@@ -1,3 +1,8 @@
+2010-09-30  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (compare): Special-case the care of comparing
+	Object and an inteface.
+
 2010-09-29  Per Bothner  <per@bothner.com>
 
 	Fix various problems with StackMapTable.

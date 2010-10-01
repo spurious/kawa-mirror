@@ -203,7 +203,7 @@ EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
 
 XQTS_DIR = @XQTS_PATH@
 XQTS_CATALOG = $(XQTS_DIR)/XQTSCatalog.xml
-XQTS_JAVA_FLAGS = -Xmx90m
+XQTS_JAVA_FLAGS = -Xmx95m
 all: all-am
 
 .SUFFIXES:

@@ -1,3 +1,7 @@
+2010-09-30  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (XQTS_JAVA_FLAGS): Increase memory requirement slightly.
+
 2010-06-30  Per Bothner  <per@bothner.com>
 
 	* TestSuite.java (<init>): Force canonicalizeCDATA.

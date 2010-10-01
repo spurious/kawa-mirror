@@ -165,7 +165,7 @@ public class CompileInvoke
             && (ClassMethods.selectApplicable(methods,
                                               new Type[] { Compilation.typeClassType })
                 >> 32) == 1
-            && (slots = checkKeywords(type, args, 1, caller)) != null
+            && (slots = checkKeywords(ctype, args, 1, caller)) != null
             && (2 * slots.length == (args.length - 1)
                 || ClassMethods.selectApplicable(addMethods = ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
           {
@@ -404,7 +404,7 @@ public class CompileInvoke
 
   /** Return an array if args (starting with start) is a set of
    * (keyword, value)-value pairs. */
-  static Object[] checkKeywords(Type type, Expression[] args,
+  static Object[] checkKeywords(ObjectType type, Expression[] args,
                                 int start, ClassType caller)
   {
     int len = args.length;
@@ -417,7 +417,15 @@ public class CompileInvoke
       {
         Object value = args[start + 2 * i].valueIfConstant();
         String name = ((Keyword) value).getName();
-        Member slot = SlotSet.lookupMember((ObjectType) type, name, caller);
+        // Look for field name for a "set" method.
+        Member slot = SlotSet.lookupMember(type, name, caller);
+        if (slot == null)
+          {
+            // Look for for an "add" method.
+            // For example: (define b (JButton action-listener: ...))
+            // maps to: (define b ...) (b:addActionListener ...)
+            slot = type.getMethod(ClassExp.slotToMethodName("add", name), SlotSet.type1Array);
+          }
         fields[i] = slot != null ? (Object) slot : (Object) name;
       }
     return fields;

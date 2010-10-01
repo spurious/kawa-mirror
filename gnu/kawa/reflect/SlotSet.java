@@ -129,6 +129,8 @@ public class SlotSet extends Procedure3 implements Inlineable
     return returnSelf ? obj : Values.empty;
   }
 
+  static final Type[] type1Array = new Type[1];
+
   public static Member
   lookupMember (ObjectType clas, String name, ClassType caller)
   {
@@ -143,7 +145,7 @@ public class SlotSet extends Procedure3 implements Inlineable
       }
 
     String setName = ClassExp.slotToMethodName("set", name);
-    gnu.bytecode.Method method = clas.getMethod(setName, new Type[1]);
+    gnu.bytecode.Method method = clas.getMethod(setName, type1Array);
     if (method == null)
       return field;
     else

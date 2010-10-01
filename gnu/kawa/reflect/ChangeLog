@@ -1,3 +1,11 @@
+2010-10-01  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (checkKeywords): Also search for "add" methods.
+	E.g. (define b (JButton action-listener: ...))
+        gets implemented as: (define b ...) (b:addActionListener ...)
+	(checkKeywords): Change parameter to ObjectType to avoid casting.
+	* SlotSet.java (type1Array): Pre-allocated 1-element type array.
+
 2010-09-30  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (hasKeywordArgument): New method.

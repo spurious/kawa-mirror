@@ -175,6 +175,48 @@ public class ClassMethods extends Procedure2
     return (((long) numDefApplicable) << 32) + (long) numPosApplicable;
   }
 
+  /** Select methods that have the right number of parameters.
+   * @return number of methods that apply, NO_MATCH_TOO_FEW_ARGS,
+   *  or NO_MATCH_TOO_MANY_ARGS.
+   */
+  public static int selectApplicable(PrimProcedure[] methods, int numArgs)
+  {
+    int limit = methods.length;
+    int numTooManyArgs = 0;
+    int numTooFewArgs = 0;
+    int numOk = 0;
+    for (int i = 0;  i < limit;  )
+      {
+        int num = methods[i].numArgs();
+        int min = Procedure.minArgs(num);
+        int max = Procedure.maxArgs(num);
+        boolean ok = false;
+        if (numArgs < min)
+          numTooFewArgs++;
+        else if (numArgs > max && max >= 0)
+          numTooManyArgs++;
+        else
+          ok = true;
+        if (ok)
+          {
+            numOk++;
+            i++;
+          }
+        else
+          { // Not applicable.
+            // swap(methods[limit-1], methods[i]):
+            PrimProcedure tmp = methods[limit-1];
+            methods[limit-1] = methods[i];
+            methods[i] = tmp;
+            limit--;
+          }
+      }
+    return numOk > 0 ? numOk
+      : numTooFewArgs > 0 ? MethodProc.NO_MATCH_TOO_FEW_ARGS
+      : numTooManyArgs > 0 ? MethodProc.NO_MATCH_TOO_MANY_ARGS
+      : 0;
+  }
+
   /** Find methods.
    * @param dtype class to search
    * @param mname method name (already mangled, if need be).

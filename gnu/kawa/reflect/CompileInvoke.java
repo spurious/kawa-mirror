@@ -141,19 +141,15 @@ public class CompileInvoke
               }
           }
         PrimProcedure[] methods;
-        int okCount, maybeCount;
         ClassType caller = comp == null ? null
           : comp.curClass != null ? comp.curClass
           : comp.mainClass;
         ObjectType ctype = (ObjectType) type;
-        exp.visitArgs(visitor);
+        int numCode;
         try
           {
             methods = getMethods(ctype, name, caller, iproc);
-            long num = selectApplicable(methods, ctype, args, 
-                                        margsLength, argsStartIndex, objIndex);
-            okCount = (int) (num >> 32);
-            maybeCount = (int) num;
+            numCode = ClassMethods.selectApplicable(methods, margsLength);
           }
         catch (Exception ex)
           {
@@ -162,12 +158,16 @@ public class CompileInvoke
           }
         int index = -1;
         Object[] slots;
-        if (okCount + maybeCount == 0
+        PrimProcedure[] addMethods;
+        if ((numCode <= 0 || hasKeywordArgument(argsStartIndex, args))
             && kind == 'N'
+            // There is a default constructor.
             && (ClassMethods.selectApplicable(methods,
                                               new Type[] { Compilation.typeClassType })
                 >> 32) == 1
-            && (slots = checkKeywords(type, args, 1, caller)) != null)
+            && (slots = checkKeywords(type, args, 1, caller)) != null
+            && (2 * slots.length == (args.length - 1)
+                || ClassMethods.selectApplicable(addMethods = ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
           {
             StringBuffer errbuf = null;
             for (int i = 0;  i < slots.length;  i++)
@@ -195,16 +195,105 @@ public class CompileInvoke
               }
             else
               {
-                ApplyExp e = new ApplyExp(methods[0],
-                                          new Expression[] { arg0 });
-                for (int i = 0;  i < slots.length;  i++)
+                ApplyExp ae = new ApplyExp(methods[0],
+                                           new Expression[] { arg0 });
+                ae.setType(ctype);
+                Expression e = ae;
+                if (args.length > 0)
                   {
-                    Expression[] sargs
-                      = { e, new QuoteExp(slots[i]), args[2 * i + 2] };
-                    e = new ApplyExp(SlotSet.setFieldReturnObject, sargs);
+                    for (int i = 0;  i < slots.length;  i++)
+                      {
+                        Object slot = slots[i];
+                        Type stype;
+                        if (slot instanceof Method)
+                          stype = ((Method) slot).getParameterTypes()[0];
+                        else if (slot instanceof Field)
+                          stype = ((Field) slot).getType();
+                        else
+                          stype = null;
+                        Expression arg = visitor.visit(args[2 * i + 2], stype);
+                        Expression[] sargs
+                          = { ae, new QuoteExp(slot),  arg};
+                        ae = new ApplyExp(SlotSet.setFieldReturnObject, sargs);
+                        ae.setType(ctype);
+                      }
+                    int sargs = 2 * slots.length + 1;
+                    e = ae;
+                    if (sargs < args.length)
+                      {
+                        LetExp let = new LetExp(new Expression[] { e });
+                        Declaration adecl = let.addDeclaration((String) null, ctype);
+                        adecl.noteValue(e);
+                        BeginExp begin = new BeginExp();
+                        for (int i = sargs;  i < args.length;  i++)
+                          {
+                            Expression[]  iargs = {
+                              new ReferenceExp(adecl),
+                              QuoteExp.getInstance("add"),
+                              args[i]
+                            };
+                            begin.add(visitor.visit(new ApplyExp(Invoke.invoke,
+                                                                 iargs),
+                                                    null));
+                          }
+                        begin.add(new ReferenceExp(adecl));
+                        let.body = begin;
+                        e = let;
+                      }
                   }
-                return e.setLine(exp);
+                return visitor.checkType(e.setLine(exp), required);
               }
+          }
+        int okCount, maybeCount;
+        if (numCode >= 0)
+          {
+            for (int i = 1;  i < nargs; i++)
+              {
+                Type atype = null;
+                boolean last = i == nargs-1;
+                if ((kind == 'P' && i == 2) || (kind != 'N' && i == 1))
+                  atype = null; // actually string or symbol
+                else if (kind == 'P' && i == 1)
+                  atype = ctype;
+                else if (numCode > 0)
+                  {
+                    int pi = i - (kind == 'N' ? 1 : argsStartIndex);
+                    for (int j = 0;  j < numCode;  j++)
+                      {
+                        PrimProcedure pproc = methods[j];
+                        int pii = pi+(kind!='S'&&pproc.takesTarget()?1:0);
+                        // KLUDGE If varargs, then the last parameter is
+                        // special: If can be an array, or a single argument.
+                        if (last && pproc.takesVarArgs()
+                            && pii == pproc.minArgs())
+                          atype = null;
+                        else
+                          {
+                            Type ptype = pproc.getParameterType(pii);
+                            if (j==0)
+                              atype = ptype;
+                            else if ((ptype instanceof PrimType) != (atype instanceof PrimType))
+                              atype = null;
+                            else
+                              {
+                                atype = Type.lowestCommonSuperType(atype, ptype);
+                              }
+                          }
+                        if (atype == null)
+                          break;
+                      }
+                  }
+                args[i] = visitor.visit(args[i], atype);
+              }
+            long num = selectApplicable(methods, ctype, args, 
+                                        margsLength, argsStartIndex, objIndex);
+            okCount = (int) (num >> 32);
+            maybeCount = (int) num;
+          }
+        else
+          {
+            okCount = 0;
+            maybeCount = 0;
           }
         int nmethods = methods.length;
         if (okCount + maybeCount == 0 && kind == 'N')
@@ -224,12 +313,19 @@ public class CompileInvoke
               {
                 if (kind=='N')
                   name = name+"/valueOf";
-                String message = 
-                  (nmethods + methods.length == 0
-                   ? "no accessible method '"+name+"' in "+type.getName()
-                   : ("no possibly applicable method '"
-                      +name+"' in "+type.getName()));
-                comp.error(kind == 'P' ? 'e' : 'w', message);
+                StringBuilder sbuf = new StringBuilder();;
+                if (nmethods + methods.length == 0)
+                  sbuf.append("no accessible method '");
+                else if (numCode == MethodProc.NO_MATCH_TOO_FEW_ARGS)
+                  sbuf.append("too few arguments for method '");
+                else if (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS)
+                  sbuf.append("too many arguments for method '");
+                else
+                  sbuf.append("no possibly applicable method '");
+                sbuf.append(name);
+                sbuf.append("' in ");
+                sbuf.append(type.getName());
+                comp.error(kind == 'P' ? 'e' : 'w', sbuf.toString());
               }
           }
         else if (okCount == 1 || (okCount == 0 && maybeCount == 1))
@@ -295,12 +391,7 @@ public class CompileInvoke
                  src < args.length && dst < margs.length; 
                  src++, dst++)
               {
-                Type ptype = method.getParameterType(dst);
-                // KLUDGE If varargs, then the last parameter is special:
-                // If can be an array, or a single argument.
-                if (variable && dst+1 == margs.length)
-                  ptype = null;
-                margs[dst] = visitor.visit(args[src], ptype);
+                margs[dst] = args[src];
               }
             ApplyExp e = new ApplyExp(method, margs);
             e.setLine(exp);
@@ -317,17 +408,14 @@ public class CompileInvoke
                                 int start, ClassType caller)
   {
     int len = args.length;
-    if (((len - start) & 1) != 0)
-      return null;
-    Object[] fields = new Object[(len-start) >> 1];
-    for (int i = fields.length;  -- i>= 0; )
+    int npairs = 0;
+    while (start + 2 * npairs + 1 < len
+           && args[start + 2 * npairs].valueIfConstant() instanceof Keyword)
+      npairs++;
+    Object[] fields = new Object[npairs];
+    for (int i = 0;  i < npairs;  i++)
       {
-        Expression arg = args[start + 2 * i];
-        if (! (arg instanceof QuoteExp))
-          return null;
-        Object value = ((QuoteExp) arg).getValue();
-        if (! (value instanceof Keyword))
-          return null;
+        Object value = args[start + 2 * i].valueIfConstant();
         String name = ((Keyword) value).getName();
         Member slot = SlotSet.lookupMember((ObjectType) type, name, caller);
         fields[i] = slot != null ? (Object) slot : (Object) name;
@@ -364,6 +452,16 @@ public class CompileInvoke
                                    : '\0',
                                    caller, iproc.language);
   }
+
+  static boolean hasKeywordArgument (int argsStartIndex, Expression[] args)
+  {
+    for (int i = argsStartIndex; i < args.length; i++)
+      {
+        if (args[i].valueIfConstant() instanceof Keyword)
+          return true;
+      }
+    return false;
+ }
 
   private static long selectApplicable(PrimProcedure[] methods,
                                        ObjectType ctype,

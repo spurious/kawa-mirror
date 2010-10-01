@@ -1,3 +1,11 @@
+2010-09-30  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (hasKeywordArgument): New method.
+	(validateApplyInvoke): Convert unnamed constructor arguments to
+	calls to an "add" method.
+	Make "visit" calls on  argument expressions be context-dependent.
+	* ClassMethods.java (selectApplicable): New overloaded method.
+
 2010-09-23  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (apply): Handle the case where the "name" is actually

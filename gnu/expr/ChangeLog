@@ -1,3 +1,12 @@
+2010-10-01  Per Bothner  <per@bothner.com>
+
+	Fix Savannah bug #31180 "exception in inline-compiler".
+	* Declaration.java (load): Don't try to expand in-place the LambdaExp
+	of a module-level functions since that is not inlined.
+	See FindCaturedvars#visitLambdaExp.
+	* Compilation.java (inlineOk): However, we do want to "inline" call to
+	a private module-level procedure as a method call, even when immediate.
+
 2010-09-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (langOptions): New field.

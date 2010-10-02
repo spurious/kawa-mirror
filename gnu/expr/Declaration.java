@@ -250,7 +250,9 @@ public class Declaration
             comp.compileConstant(val, target);
             return;
           }
-        else if (value != QuoteExp.undefined_exp && ignorable())
+        else if (value != QuoteExp.undefined_exp && ignorable()
+                 && ! (value instanceof LambdaExp
+                       && ((LambdaExp) value).outer instanceof ModuleExp))
           {
             value.compile(comp, target);
             return;

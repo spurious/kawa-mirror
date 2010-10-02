@@ -1,3 +1,10 @@
+2010-10-01  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* sva31180.scm: New testcase based on Savannah bug #31180
+	"exception in inline-compiler".
+	* Makefile.am (check-sva31180): New rule to run test.
+
 2010-09-30  Per Bothner  <per@bothner.com>
 
 	* test-load-require-1.scm: Add needed module-exports.

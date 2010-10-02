@@ -23,7 +23,7 @@ all:
 check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   check-interpreted-cycle check-interpreted-cycleb check-interpreted-cyclebr \
   $(SERVLET_TESTS) $(SAX2_TESTS) \
-  check-inlining check-jmc check-use-slots check-load-require
+  check-inlining check-jmc check-use-slots check-load-require check-sva31180
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -461,11 +461,18 @@ check-load-require:
 EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
+check-sva31180:
+	$(KAWA) -e '(require "$(srcdir)/sva31180.scm")' -e '(display (foo 5 "foo"))(newline)' > sva31180.log
+	sed -n -e 's|;;Output: *\(.*$$\)|\1|p' <$(srcdir)/sva31180.scm >tmp-sva31180.expected
+	@if diff tmp-sva31180.expected sva31180.log; \
+	  then echo '# check-sva31180 passes'; \
+	  else echo FAIL check-sva31180; fi
+
 CLEANFILES = tmp* *.log testing.zip revcomp-input.txt knucleotide-input.txt regexdna-input.txt *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   lib-test.scm srfi-64-test.scm srfi-69-test.scm text-test.scm regex-test.scm \
-  jmc.scm use-slots.scm ASupport.scm Base.java \
+  jmc.scm sva31180.scm use-slots.scm ASupport.scm Base.java \
   MyFunc.java MyModule.java MyDate.java MyTimestamp.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm moduleFT.scm \
   module0.scm module1.scm module1a.scm module2.scm module3.scm included-1.scm \

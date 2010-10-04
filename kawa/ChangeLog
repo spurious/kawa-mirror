@@ -1,3 +1,8 @@
+2010-10-04  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (getTypeMap): Remove redundant (over-written)
+	setting for "string".
+
 2010-09-30  Per Bothner  <per@bothner.com>
 
 	* Shell.java (compileSource): Pass PARSE_IMMEDIATE only to parse;

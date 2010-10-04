@@ -981,12 +981,6 @@ public class Scheme extends LispLanguage
 	types.put ("pair", ClassType.make("gnu.lists.Pair"));
 	types.put ("pair-with-position",
 		   ClassType.make("gnu.lists.PairWithPosition"));
-        /* #ifdef use:java.lang.CharSequence */
-	types.put ("string", ClassType.make("java.lang.CharSequence"));
-        /* #else */
-        // /* better would be a union of CharSeq and java.lang.String. */
-	// types.put ("string", ClassType.make("gnu.lists.FString"));
-        /* #endif */
 	types.put ("constant-string", ClassType.make("java.lang.String"));
 	types.put ("abstract-string", ClassType.make("gnu.lists.CharSeq"));
 	types.put ("character", ClassType.make("gnu.text.Char"));

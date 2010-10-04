@@ -411,7 +411,6 @@ class GetNamedExp extends ApplyExp
   public Expression validateApply (ApplyExp exp, InlineCalls visitor,
                                    Type required, Declaration decl)
   {
-    exp.visitArgs(visitor);
     Expression[] pargs = getArgs();
     Expression context = pargs[0];
     Expression[] args = exp.getArgs();
@@ -457,7 +456,7 @@ class GetNamedExp extends ApplyExp
       }
     ApplyExp result = new ApplyExp(new ReferenceExp(decl), xargs);
     result.setLine(exp);
-    return visitor.visitApplyOnly(result, required);
+    return visitor.visit(result, required);
   }
 
   public boolean side_effects ()

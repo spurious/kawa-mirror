@@ -16,6 +16,8 @@ public class QuoteExp extends Expression
 
   public final Object valueIfConstant() { return value; }
 
+  public static final int EXPLICITLY_TYPED = Expression.NEXT_AVAIL_FLAG;
+
   protected Type type;
   public final gnu.bytecode.Type getRawType() { return type; }
   public final gnu.bytecode.Type getType()
@@ -30,6 +32,17 @@ public class QuoteExp extends Expression
       return Type.pointer_type;
     else
       return Type.make(value.getClass());
+  }
+
+  public void setType (Type type)
+  {
+    this.type = type;
+    setFlag(EXPLICITLY_TYPED);
+  }
+
+  public boolean isExplicitlyTyped ()
+  {
+    return getFlag(EXPLICITLY_TYPED);
   }
 
   static public QuoteExp undefined_exp =
@@ -71,7 +84,7 @@ public class QuoteExp extends Expression
 
   public QuoteExp (Object val) { value = val; }
 
-  public QuoteExp (Object val, Type type) { value = val; this.type = type; }
+  public QuoteExp (Object val, Type type) { value = val; setType(type);}
   
   protected boolean mustCompile () { return false; }
 

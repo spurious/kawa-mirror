@@ -488,20 +488,11 @@ public class CompileInvoke
         Expression arg = args[src];
         Type atype = null;
         // Treat IntNum constant argument in int/long range as int/long.
-        if (arg instanceof QuoteExp)
-          {
-            QuoteExp qexp = (QuoteExp) arg;
-            Object val = qexp.getValue();
-            if (val instanceof IntNum && qexp.getRawType() == null)
-              {
-                IntNum inum = (IntNum) val;
-                if (CompileArith.inRange(inum, Integer.MIN_VALUE, Integer.MAX_VALUE))
-                  atype = Type.intType;
-                else if (CompileArith.inRange(inum, Long.MIN_VALUE, Long.MAX_VALUE))
-                  atype = Type.longType;
-              }
-          }
-        if (atype == null)
+        if (InlineCalls.checkIntValue(arg) != null)
+          atype = Type.intType;
+        else if (InlineCalls.checkLongValue(arg) != null)
+          atype = Type.longType;
+        else if (atype == null)
           atype = arg.getType();
         atypes[dst] = atype;
       }

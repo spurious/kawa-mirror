@@ -1,5 +1,11 @@
 2010-10-04  Per Bothner  <per@bothner.com>
 
+	* CompileArith.java (appropriateIntConstant, appropriateLongConstant):
+	Take InlineCalls parameters, so we can simplify and use the new
+	fixIntValue and fixLongValue methods - and get language-dependent types.
+	(validateApplyArithOp): Update accordingly.
+	(inRange): Remove methods moved elsewhere.
+
 	* CompileNamedPart.java (GetNamedExp.validateApply): Don't prematurely
 	call visitArgs.
 

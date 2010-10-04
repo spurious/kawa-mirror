@@ -1,3 +1,9 @@
+2010-10-04  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (inRange): New method.  Previously a static method
+	in gnu/kawa/functions/CompileArith.java.
+	(inIntRange, inLongRange): New convenience methods.
+
 2010-08-31  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (valueOf): Handle an initial '+'.

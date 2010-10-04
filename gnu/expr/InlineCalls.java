@@ -8,6 +8,7 @@ import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
+import gnu.math.IntNum;
 import java.lang.reflect.InvocationTargetException;
 /* #ifdef use:java.dyn */
 // import java.dyn.*;
@@ -112,6 +113,73 @@ public class InlineCalls extends ExpExpVisitor<Type>
   public final Expression visitApplyOnly(ApplyExp exp, Type required)
   {
     return exp.func.validateApply(exp, this, required, null);
+  }
+
+  public static Integer checkIntValue (Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        QuoteExp qarg = (QuoteExp) exp;
+        Object value = qarg.getValue();
+        if (! qarg.isExplicitlyTyped() && value instanceof IntNum)
+          {
+            IntNum ivalue = (IntNum) value;
+            if (ivalue.inIntRange())
+              return Integer.valueOf(ivalue.intValue());
+          }
+      }
+    return null;
+  }
+
+  public static Long checkLongValue (Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        QuoteExp qarg = (QuoteExp) exp;
+        Object value = qarg.getValue();
+        if (! qarg.isExplicitlyTyped() && value instanceof IntNum)
+          {
+            IntNum ivalue = (IntNum) value;
+            if (ivalue.inLongRange())
+              return Long.valueOf(ivalue.longValue());
+          }
+      }
+    return null;
+  }
+
+  public QuoteExp fixIntValue (Expression exp)
+  {
+    Integer ival = InlineCalls.checkIntValue(exp);
+    if (ival != null)
+      return new QuoteExp(ival, comp.getLanguage().getTypeFor(Integer.TYPE));
+    return null;
+  }
+
+  public QuoteExp fixLongValue (Expression exp)
+  {
+    Long ival = InlineCalls.checkLongValue(exp);
+    if (ival != null)
+      return new QuoteExp(ival, comp.getLanguage().getTypeFor(Long.TYPE));
+    return null;
+  }
+
+  protected Expression visitQuoteExp (QuoteExp exp, Type required)
+  {
+    Object value;
+    if (exp.getRawType() == null && (value = exp.getValue()) != null)
+      {
+        Language language = comp.getLanguage();
+        exp.type = language.getTypeFor(value.getClass());
+        if (required instanceof PrimType)
+          {
+            char sig1 = required.getSignature().charAt(0);
+            QuoteExp ret = sig1 == 'I' ? fixIntValue(exp)
+              : sig1 == 'J'? fixLongValue(exp) : null;
+            if (ret != null)
+              exp = ret;
+          }
+      }
+    return exp;
   }
 
   protected Expression visitReferenceExp (ReferenceExp exp, Type required)

@@ -1,3 +1,11 @@
+2010-10-04  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (EXPLICITLY_TYPED): New flag.
+	(isExplicitlyTyped, setType): New methods.
+	* InlineCalls.java (checkIntValue, checkLongValue, fixIntValue,
+	fixLongValue): New methods.  Based on code that was in CompileArith.
+	(visitQuoteExp): New method.
+
 2010-10-01  Per Bothner  <per@bothner.com>
 
 	Fix Savannah bug #31180 "exception in inline-compiler".

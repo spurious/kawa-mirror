@@ -35,40 +35,24 @@ public class CompileArith implements Inlineable
     return new CompileArith(proc, ((BitwiseOp) proc).op);
   }
 
-  public static boolean appropriateIntConstant(Expression[] args, int iarg)
+  public static boolean appropriateIntConstant(Expression[] args, int iarg, InlineCalls visitor)
   {
-    Expression arg = args[iarg];
-    if (arg instanceof QuoteExp)
+    Expression exp = visitor.fixIntValue(args[iarg]);
+    if (exp != null)
       {
-        QuoteExp qarg = (QuoteExp) arg;
-        Object value = qarg.getValue();
-        if (qarg.getRawType() == null && value instanceof IntNum
-            && inRange((IntNum) value, Integer.MIN_VALUE, Integer.MAX_VALUE))
-          {
-            value = Integer.valueOf(((IntNum) value).intValue());
-            arg = new QuoteExp(value, Type.intType);
-            args[iarg] = arg;
-            return true;
-          }
+        args[iarg] = exp;
+        return true;
       }
     return false;
   }
 
-  public static boolean appropriateLongConstant(Expression[] args, int iarg)
+  public static boolean appropriateLongConstant(Expression[] args, int iarg, InlineCalls visitor)
   {
-    Expression arg = args[iarg];
-    if (arg instanceof QuoteExp)
+    Expression exp = visitor.fixLongValue(args[iarg]);
+    if (exp != null)
       {
-        QuoteExp qarg = (QuoteExp) arg;
-        Object value = qarg.getValue();
-        if (qarg.getRawType() == null && value instanceof IntNum
-            && inRange((IntNum) value, Long.MIN_VALUE, Long.MAX_VALUE))
-          {
-            value = Long.valueOf(((IntNum) value).longValue());
-            arg = new QuoteExp(value, Type.longType);
-            args[iarg] = arg;
-            return true;
-          }
+        args[iarg] = exp;
+        return true;
       }
     return false;
   }
@@ -100,13 +84,13 @@ public class CompileArith implements Inlineable
             rkind = getReturnKind(kind1, kind2, op);
             if (rkind == Arithmetic.INTNUM_CODE)
               {
-                if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1))
+                if (kind1 == Arithmetic.INT_CODE && appropriateIntConstant(args, 1, visitor))
                   rkind = Arithmetic.INT_CODE;
-                else if (kind2 == Arithmetic.INT_CODE && appropriateIntConstant(args, 0))
+                else if (kind2 == Arithmetic.INT_CODE && appropriateIntConstant(args, 0, visitor))
                   rkind = Arithmetic.INT_CODE;
-                else if (kind1 ==Arithmetic. LONG_CODE && appropriateLongConstant(args, 1))
+                else if (kind1 == Arithmetic. LONG_CODE && appropriateLongConstant(args, 1, visitor))
                   rkind = Arithmetic.LONG_CODE;
-                else if (kind2 == Arithmetic.LONG_CODE && appropriateLongConstant(args, 0))
+                else if (kind2 == Arithmetic.LONG_CODE && appropriateLongConstant(args, 0, visitor))
                   rkind = Arithmetic.LONG_CODE;
               }
           }
@@ -299,17 +283,6 @@ public class CompileArith implements Inlineable
     target.compileFromStack(comp, wtype);
   }
 
-  static boolean inRange (Expression exp, int lo, int hi)
-  {
-    Object val = exp.valueIfConstant();
-    return val instanceof IntNum && inRange((IntNum) val, lo, hi);
-  }
-
-  public static boolean inRange (IntNum val, long lo, long hi)
-  {
-    return IntNum.compare(val, lo) >= 0 && IntNum.compare(val, hi) <= 0;
-  }
-
   public boolean compileIntNum (Expression arg1, Expression arg2, int kind1, int kind2, Compilation comp)
   {
     // Check if we can replace ARG1-CONSTANT by ARG1+(-CONSTANT),
@@ -328,7 +301,7 @@ public class CompileArith implements Inlineable
           {
             IntNum ival = (IntNum) val;
             lval =  ival.longValue();
-            negateOk = inRange(ival, Integer.MIN_VALUE+1, Integer.MAX_VALUE);
+            negateOk = ival.inRange(Integer.MIN_VALUE+1, Integer.MAX_VALUE);
           }
         else
           {
@@ -346,9 +319,9 @@ public class CompileArith implements Inlineable
     Method meth;
     if (addOrMul)
       {
-        if (inRange(arg1, Integer.MIN_VALUE, Integer.MAX_VALUE))
+        if (InlineCalls.checkIntValue(arg1) != null)
           kind1 = Arithmetic.INT_CODE;
-        if (inRange(arg2, Integer.MIN_VALUE, Integer.MAX_VALUE))
+        if (InlineCalls.checkIntValue(arg2) != null)
           kind2 = Arithmetic.INT_CODE;
         swap = kind1 == Arithmetic.INT_CODE && kind2 != Arithmetic.INT_CODE;
         if (swap && ! (arg1.side_effects() && arg2.side_effects()))

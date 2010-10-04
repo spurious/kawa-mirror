@@ -1708,4 +1708,23 @@ public class IntNum extends RatNum implements Externalizable
       return BigDecimal.valueOf(longValue());
     return new BigDecimal(toString());
   }
+
+  /** Is this integer both {@code >= lo} and {@code <= hi}?. */
+  public boolean inRange (long lo, long hi)
+  {
+    return compare(this, lo) >= 0 && compare(this, hi) <= 0;
+  }
+
+  /** Does this value fit in a signed 32-bit {@code int}? */
+  public boolean inIntRange ()
+  {
+    return inRange(Integer.MIN_VALUE, Integer.MAX_VALUE);
+  }
+
+  /** Does this value fit in a signed 64-bit {@code long}? */
+  public boolean inLongRange ()
+  {
+    return inRange(Long.MIN_VALUE, Long.MAX_VALUE);
+  }
+
 }

@@ -1,3 +1,9 @@
+2010-10-05  Per Bothner  <per@bothner.com>
+
+	* revcomp-2.scm: New version of the revcomp benchmark.
+	* Makefile.am: Update accordingly.
+	* inlining.expected: Updated.
+
 2010-10-01  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

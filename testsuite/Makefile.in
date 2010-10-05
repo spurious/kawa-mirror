@@ -201,7 +201,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt \
   regexdna.scm regexdna-output.txt \
-  revcomp.scm revcomp-output.txt \
+  revcomp.scm revcomp-2.scm revcomp-output.txt \
   spectralnorm.scm spectralnorm-output.txt \
   threadring.scm threadring-output.txt
 
@@ -624,16 +624,27 @@ revcomp-input.txt: fasta.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) fasta 1000 >revcomp-input.txt
 
-revcomp.class: $(srcdir)/revcomp.scm
+revcomp1.class: $(srcdir)/revcomp.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
-	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/revcomp.scm
+	$(KAWA) $(WARN_FLAGS) --main -T revcomp1 -C $(srcdir)/revcomp.scm
 
-check-revcomp: revcomp.class revcomp-input.txt
+revcomp2.class: $(srcdir)/revcomp-2.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -T revcomp2 -C $(srcdir)/revcomp-2.scm
+
+check-revcomp-1: revcomp1.class revcomp-input.txt
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) revcomp < revcomp-input.txt >tmp-revcomp.log
-	@if diff $(srcdir)/revcomp-output.txt tmp-revcomp.log; \
-	  then echo '# revcomp test passes'; \
-	  else echo FAIL revcomp test; fi
+	$(JAVA) revcomp1 < revcomp-input.txt >tmp-revcomp1.log
+	@if diff $(srcdir)/revcomp-output.txt tmp-revcomp1.log; \
+	  then echo '# revcomp-1 test passes'; \
+	  else echo FAIL revcomp-1 test; fi
+check-revcomp-2: revcomp2.class revcomp-input.txt
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) revcomp2 < revcomp-input.txt >tmp-revcomp2.log
+	@if diff $(srcdir)/revcomp-output.txt tmp-revcomp2.log; \
+	  then echo '# revcomp-2 test passes'; \
+	  else echo FAIL revcomp-2 test; fi
+check-revcomp: check-revcomp-1 check-revcomp-2
 
 spectralnorm.class: $(srcdir)/spectralnorm.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
@@ -754,7 +765,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
 inlining.log: InliningTest.class cycle1.class cycle2.class \
-  binarytrees.class fannkuch.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp.class spectralnorm.class Makefile
+  binarytrees.class fannkuch.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -788,7 +799,11 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize regexdna.class regexdna >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize revcomp.class revcomp >>inlining.log
+	$(JAVA) gnu.bytecode.ListCodeSize revcomp1.class revcomp >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize revcomp2.class run >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize 'revcomp2$$RevByteArray'.class reverseAndPrint >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
 

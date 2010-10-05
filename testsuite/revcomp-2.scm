@@ -6,7 +6,7 @@
 
 (define-constant NL :: int 10) ; #\newline as byte
 (define-constant GT ::int 62)  ; #\> as byte
-(define-constant cmp :: byte[]
+(define cmp :: byte[]
   (let* ((c (byte[] length: 128))
 	 (from "TAGCVHRMYKBDU")
 	 (to "ATCGBDYKRMVHA")
@@ -27,27 +27,28 @@
   class-name: ".RevByteArray"
   ((reverse-and-print) ::void ;; throws Exception FIXME
    (if (> count 0)
-       (let ((begin ::int 0)
-	     (end ::int (- count 1)))
+       (let ((i ::int 0)
+	     (j ::int (- count 1))
+	     (b ::byte[] buf))
 	 (let loop ()
-	     (let ((old (buf begin)))
-	       (set! begin (+ begin 1))
+	     (let ((old (b i)))
+	       (set! i (+ i 1))
 	       (if (not (= old NL))
 		   (loop))))
 	 (let loop ()
-	   (cond ((<= begin end)
-		  (if (= (buf begin) NL)
-		      (set! begin (+ begin 1)))
-		  (if (= (buf end) NL)
-		      (set! end (- end 1)))
-		  (if (<= begin end)
-		      (let ((tmp (buf begin)))
-			(set! (buf begin) (cmp (buf end)))
-			(set! begin (+ begin 1))
-			(set! (buf end) (cmp tmp))
-			(set! end (- end 1))))
+	   (cond ((<= i j)
+		  (if (= (b i) NL)
+		      (set! i (+ i 1)))
+		  (if (= (b j) NL)
+		      (set! j (- j 1)))
+		  (if (<= i j)
+		      (let ((tmp (b i)))
+			(set! (b i) (cmp (b j)))
+			(set! i (+ i 1))
+			(set! (b j) (cmp tmp))
+			(set! j (- j 1))))
 		  (loop))))
-	 (java.lang.System:out:write buf 0 count)))))
+	 (java.lang.System:out:write b 0 count)))))
 
 (let ((line (byte[] length: 82))
       (buf (ReversibleByteArray)))

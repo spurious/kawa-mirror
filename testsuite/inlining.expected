@@ -110,7 +110,7 @@ nbody$Body.offsetMomentum(double,double,double)void: 32 bytes
 regexdna.regexdna(java.io.InputStream)java.lang.Object: 372 bytes
 revcomp1.revcomp(java.io.InputStream)void: 382 bytes
 revcomp2.run(gnu.mapping.CallContext)void: 212 bytes
-revcomp2$RevByteArray.reverseAndPrint()void: 144 bytes
+revcomp2$RevByteArray.reverseAndPrint()void: 129 bytes
 spectralnorm.Approximate(int)double: 110 bytes
 spectralnorm.A(int,int)double: 19 bytes
 spectralnorm.multiplyAv(int,double[],double[])void: 53 bytes

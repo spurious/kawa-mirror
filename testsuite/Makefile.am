@@ -477,7 +477,8 @@ EXTRA_LOAD_REQUIRE_DIST = test-load-require.scm test-load-require-1.scm \
   test-load-require-2.scm  test-load-require-3.scm test-load-require.expected
 
 check-sva31180:
-	$(KAWA) -e '(require "$(srcdir)/sva31180.scm")' -e '(display (foo 5 "foo"))(newline)' > sva31180.log
+	$(KAWA) -e '(require "$(srcdir)/sva31180.scm")' \
+	  -e '(format #t "~a~%~a~%" (foo 5 "foo") (foo2))' > sva31180.log
 	sed -n -e 's|;;Output: *\(.*$$\)|\1|p' <$(srcdir)/sva31180.scm >tmp-sva31180.expected
 	@if diff tmp-sva31180.expected sva31180.log; \
 	  then echo '# check-sva31180 passes'; \

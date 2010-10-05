@@ -1,4 +1,11 @@
 2010-10-05  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* sva31180.scm: Enhance to include a test for Savannah bug #31256
+	"Verify error".
+	* Makefile.am: Likewise.
+
+2010-10-05  Per Bothner  <per@bothner.com>
 
 	* revcomp-2.scm: Use local-variable cache of buf field.
 	* inlining.expected: Update accordingly.

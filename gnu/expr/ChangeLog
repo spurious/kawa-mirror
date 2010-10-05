@@ -1,3 +1,10 @@
+2010-10-05  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (inlineOk): Tweak 2010-10-01 fix (to Savannah
+	bug #31180) to check the nameDecl's isPublic() rather than ignorable().
+	This fixes the case when the lambda is only called but not read.
+	Fixes Savannah bug #31256 "Verify error".
+
 2010-10-04  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (EXPLICITLY_TYPED): New flag.

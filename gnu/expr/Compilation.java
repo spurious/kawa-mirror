@@ -436,7 +436,7 @@ public class Compilation implements SourceLocator
             || ! (nameDecl.context instanceof ModuleExp))
           return true;
         if (immediate
-            && ! nameDecl.ignorable()
+            && nameDecl.isPublic()
             && ! lproc.getFlag(LambdaExp.OVERLOADABLE_FIELD)
             && (curLambda == null || lproc.topLevel() != curLambda.topLevel()))
           return false;

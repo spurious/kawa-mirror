@@ -1,3 +1,9 @@
+2010-10-06  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (findInHierarchy): Calculate priority/hierarchy of
+	Number class.
+	(compare): Use above to compare primtive type with Number class.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	Fix Savannah 31250 "try/catch & endless loop".

@@ -215,6 +215,32 @@ public class PrimType extends Type {
       }
   }
 
+  /** An encoding of the subset/priority order of Number class.
+   * Each entry is a letter, then ':', then a class name, then ';'.
+   * Classes with letters later in alphabet are more general.
+   */
+  private static final String numberHierarchy =
+    "A:java.lang.Byte;" +
+    "B:java.lang.Short;" +
+    "C:java.lang.Integer;" +
+    "D:java.lang.Long;" +
+    "E:gnu.math.IntNum;E:java.gnu.math.BitInteger;" +
+    "G:gnu.math.RatNum;" +
+    "H:java.lang.Float;" +
+    "I:java.lang.Double;I:gnu.math.DFloNum;" +
+    "J:gnu.math.RealNum;" +
+    "K:gnu.math.Complex;" +
+    "L:gnu.math.Quantity;" +
+    "K:gnu.math.Numeric;" +
+    "N:java.lang.Number;";
+
+  /** Map a class name to a priority letter, using the numberHierarchy table. */
+  private static char findInHierarchy (String cname)
+  {
+    int pos = numberHierarchy.indexOf(cname) - 2;
+    return pos < 0 ? '\0' : numberHierarchy.charAt(pos);
+  }
+
   public int compare(Type other)
   {
     if (other instanceof PrimType)
@@ -230,6 +256,7 @@ public class PrimType extends Type {
     String otherName = other.getName();
     if (otherName == null)
        return -1;
+    char thisPriority = '\0';
     switch (sig1)
       {
       case 'V':
@@ -237,31 +264,19 @@ public class PrimType extends Type {
       case 'Z':
       case 'C':
         break;
-      case 'D':
-        if (otherName.equals("java.lang.Double")
-            || otherName.equals("gnu.math.DFloNum"))
-          return 0; // Or maybe 1?
-        if (otherName.equals("java.lang.Float"))
-          return 1;
-        break;
-      case 'F':
-        if (otherName.equals("java.lang.Double")
-            || otherName.equals("gnu.math.DFloNum"))
-          return -1;
-        if (otherName.equals("java.lang.Float"))
-          return 0; // Or maybe 1?
-        break;
-      case 'I':
-        if (otherName.equals("java.lang.Integer"))
-          return 0; // Or maybe 1?
-        if (otherName.equals("gnu.math.IntNum"))
-          return -1;
-        /* fall through */
-      default:
-        if (otherName.equals("java.lang.Double")
-            || otherName.equals("java.lang.Float")
-            || otherName.equals("gnu.math.DFloNum"))
-          return -1;
+      case 'B': thisPriority = 'A'; break;
+      case 'S': thisPriority = 'B'; break;
+      case 'I': thisPriority = 'C'; break;
+      case 'J': thisPriority = 'D'; break;
+      case 'F': thisPriority = 'H'; break;
+      case 'D': thisPriority = 'I'; break;
+      }
+    if (thisPriority != '\0')
+      {
+        char otherPriority = findInHierarchy(otherName);
+        if (otherPriority != '\0')
+          return otherPriority == thisPriority ? 0
+            : otherPriority < thisPriority ? 1 : -1;
       }
     if (otherName.equals("java.lang.Object")
 	|| other == toStringType)

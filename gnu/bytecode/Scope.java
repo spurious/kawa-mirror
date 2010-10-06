@@ -116,7 +116,9 @@ public class Scope
   {
     if (start == null)
       start = new Label();
+    boolean reachable = code.reachableHere();
     start.define(code);
+    code.setReachable(reachable);
   }
 
   /** Should be called at the start of a logical function - inlined or not. */

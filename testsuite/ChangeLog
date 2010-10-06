@@ -1,6 +1,12 @@
 2010-10-05  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 
+	* misc-test.scm: Add test for Savannah bug #31250
+	"try/catch & endless loop".
+
+2010-10-05  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
 	* sva31180.scm: Enhance to include a test for Savannah bug #31256
 	"Verify error".
 	* Makefile.am: Likewise.

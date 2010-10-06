@@ -942,3 +942,12 @@
 (test "(#\\X #\\return #\\Y #\\return #\\newline #\\Z)" 'test-savannah-28926
       (format "~w" (let ((in (string #\" #\X #\return #\Y #\return #\newline #\Z #\")))
 		     (string->list (call-with-input-string in read)))))
+
+;; Savannah bug #31250: try/catch & endless loop
+(define (test-savannah-31250 f)
+  (try-catch
+   (let loop ()
+     (f)
+     (loop))
+   (e java.lang.Exception 
+      (e:printStackTrace))))

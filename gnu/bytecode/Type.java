@@ -414,7 +414,7 @@ public abstract class Type
    *  0: all A values can be converted to B without a coercion failure
    *     and vice versa;
    * -1: all A values can be converted to B without a coercion failure
-   *     not not vice versa;
+   *     but not vice versa;
    * -2: there are (potentially) some A values that can be converted to B,
    *     and some B values can be converted to A;
    * -3: there are no A values that can be converted to B, and neither

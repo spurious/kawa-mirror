@@ -17,6 +17,7 @@ public class QuoteExp extends Expression
   public final Object valueIfConstant() { return value; }
 
   public static final int EXPLICITLY_TYPED = Expression.NEXT_AVAIL_FLAG;
+  public static final int SHARED_CONSTANT = EXPLICITLY_TYPED << 1;
 
   protected Type type;
   public final gnu.bytecode.Type getRawType() { return type; }
@@ -45,18 +46,18 @@ public class QuoteExp extends Expression
     return getFlag(EXPLICITLY_TYPED);
   }
 
-  static public QuoteExp undefined_exp =
-    new QuoteExp (Special.undefined);
-  static public QuoteExp abstractExp =
-    new QuoteExp(Special.abstractSpecial);
-  static public QuoteExp voidExp =
-    new QuoteExp (Values.empty, Type.voidType);
-  static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
-  static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
-  static public QuoteExp nullExp =
-    new QuoteExp(null, Type.nullType);
-  public static final QuoteExp classObjectExp =
-    new QuoteExp(Type.pointer_type);
+  public boolean isSharedConstant ()
+  {
+    return getFlag(SHARED_CONSTANT);
+  }
+
+  static public QuoteExp undefined_exp =  makeShared(Special.undefined);
+  static public QuoteExp abstractExp = makeShared(Special.abstractSpecial);
+  static public QuoteExp voidExp = makeShared(Values.empty, Type.voidType);
+  static public QuoteExp trueExp = makeShared(Boolean.TRUE);
+  static public QuoteExp falseExp = makeShared(Boolean.FALSE);
+  static public QuoteExp nullExp = makeShared(null, Type.nullType);
+  public static final QuoteExp classObjectExp = makeShared(Type.objectType);
 
   public static QuoteExp getInstance (Object value)
   {
@@ -80,6 +81,20 @@ public class QuoteExp extends Expression
     if (position != null)
       q.setLocation(position);
     return q;
+  }
+
+  static QuoteExp makeShared (Object value)
+  {
+    QuoteExp exp = new QuoteExp(value);
+    exp.setFlag(SHARED_CONSTANT);
+    return exp;
+  }
+
+  static QuoteExp makeShared (Object value, Type type)
+  {
+    QuoteExp exp = new QuoteExp(value, type);
+    exp.setFlag(SHARED_CONSTANT);
+    return exp;
   }
 
   public QuoteExp (Object val) { value = val; }

@@ -232,7 +232,7 @@ public class ReferenceExp extends AccessExp
     if (type == null || type == Type.pointer_type)
       {
         Expression value = decl.getValue();
-        if (value != null)
+        if (value != null && value != QuoteExp.undefined_exp)
           {
             // Kludge to guard against cycles.
             // Not verified if it is really needed, but just in case ...

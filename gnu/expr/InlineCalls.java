@@ -174,7 +174,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
   protected Expression visitQuoteExp (QuoteExp exp, Type required)
   {
     Object value;
-    if (exp.getRawType() == null && (value = exp.getValue()) != null)
+    if (exp.getRawType() == null && ! exp.isSharedConstant()
+        && (value = exp.getValue()) != null)
       {
         Language language = comp.getLanguage();
         exp.type = language.getTypeFor(value.getClass());

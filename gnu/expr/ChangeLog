@@ -1,5 +1,15 @@
 2010-10-06  Per Bothner  <per@bothner.com>
 
+	Fix Savannah bug# 31251 "defvar", reported by Helmut Eller.
+	* QuoteExp.java (SHARED_CONSTANT): New flag.
+	(isSharedConstant): New method.
+	(makeShared): Two new factory methods - which set SHARED_CONSTANT.
+	(undefined_exp, abstractExp, voidExp, trueExp, falseExp, nullExp,
+	classObjectExp): Change to allocate using makeShared.
+	* InlineCalls.java (visitQuoteExp): Don't patch expression type
+	if isSharedConstant is true.
+	* ReferenceExp.java (getType): Check for undefined_exp.
+
 	* Inlineable.java (getReturnType): Remove method.  Instead we have a
 	default (deprecated) implementation in Procedure.
 	* ApplyExp.java (getType): Update accordingly.

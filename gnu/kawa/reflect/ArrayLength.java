@@ -12,6 +12,8 @@ public class ArrayLength
   public ArrayLength (Type element_type)
   {
     this.element_type = element_type;
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.reflect.CompileArrays:validateArrayLength");
     Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayLength");
   }
 

@@ -427,6 +427,12 @@ public abstract class Procedure extends PropertySet
   {
     return false;
   }
+  
+  /** Semi-deprecated - instead should be set at Inline time. FIXME */
+  public gnu.bytecode.Type getReturnType (gnu.expr.Expression[] args)
+  {
+    return gnu.bytecode.Type.objectType;
+  }
 
   public String toString ()
   {

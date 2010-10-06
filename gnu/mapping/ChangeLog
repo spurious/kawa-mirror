@@ -1,3 +1,8 @@
+2010-10-06  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (getReturnType): New semi-deprecated method
+	replaces method in Inlineable interface.
+
 2010-09-20  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (minArgs, maxArgs): New static methods.

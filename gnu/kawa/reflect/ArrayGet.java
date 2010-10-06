@@ -11,6 +11,8 @@ public class ArrayGet extends Procedure2 implements Externalizable
   public ArrayGet (Type element_type)
   {
     this.element_type = element_type;
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.reflect.CompileArrays:validateArrayGet");
     Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayGet");
   }
 

@@ -555,14 +555,14 @@ public class ApplyExp extends Expression
       return type;
     Expression afunc = derefFunc(func);
     // In case of cycles.
-    type = Type.pointer_type;
+    type = Type.objectType;
     if (afunc instanceof QuoteExp)
       {
         Object value = ((QuoteExp) afunc).getValue();
         Inlineable compiler;
-        if (value instanceof Procedure
-            && (compiler = asInlineable((Procedure) value)) != null)
-          type = compiler.getReturnType(args);
+        // This logic is deprecated - instead set type during InlineCalls.
+        if (value instanceof Procedure)
+          type = ((Procedure) value).getReturnType(args);
       }
     else if (afunc instanceof LambdaExp)
       {

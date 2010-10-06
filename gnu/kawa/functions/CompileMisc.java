@@ -44,18 +44,6 @@ public class CompileMisc implements Inlineable
       }
   }
 
-  public gnu.bytecode.Type getReturnType (Expression[] args)
-  {
-    switch (code)
-      {
-      case CONVERT:
-        return getReturnTypeConvert((Convert) proc, args);
-      case NOT:
-        return ((Not) proc).language.getTypeFor(Boolean.TYPE);
-      default: throw new Error();
-      }
-  }
-
   public static Expression validateApplyConstantFunction0
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
@@ -72,14 +60,31 @@ public class CompileMisc implements Inlineable
   public static Expression validateApplyConvert
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
+    Compilation comp = visitor.getCompilation();
+    Language language = comp.getLanguage();
+    Expression[] args = exp.getArgs();
+    if (args.length == 2)
+      {
+        args[0] = visitor.visit(args[0], null);
+        Type type = language.getTypeFor(args[0]);
+        if (type instanceof Type)
+          {
+            args[0] = new QuoteExp(type);
+            args[1] = visitor.visit(args[1], type);
+            CompileReflect.checkKnownClass(type, comp);
+            exp.setType(type);
+            return exp;
+          }
+      }
     exp.visitArgs(visitor);
-    return CompileReflect.inlineClassName(exp, 0, visitor);
+    return exp;
   }
 
   public static Expression validateApplyNot
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
+    exp.setType(visitor.getCompilation().getLanguage().getTypeFor(Boolean.TYPE));
     return exp.inlineIfConstant(proc, visitor);
   }
 
@@ -236,17 +241,6 @@ public class CompileMisc implements Inlineable
         QuoteExp falseExp = QuoteExp.getInstance(language.booleanObject(false));
 	IfExp.compile(arg, falseExp, trueExp, comp, target);
       }
-  }
-
-  public static Type getReturnTypeConvert (Convert proc, Expression[] args)
-  {
-    if (args != null && args.length == 2)
-      {
-	Type type = Scheme.getTypeValue(args[0]);
-	if (type != null)
-	  return type;
-      }
-    return Type.pointer_type;
   }
 
   public static Expression validateApplyCallCC

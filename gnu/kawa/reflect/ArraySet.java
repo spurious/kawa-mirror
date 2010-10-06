@@ -10,6 +10,8 @@ public class ArraySet extends Procedure3 implements Externalizable
   public ArraySet (Type element_type)
   {
     this.element_type = element_type;
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.reflect.CompileArrays:validateArraySet");
     Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArraySet");
   }
 

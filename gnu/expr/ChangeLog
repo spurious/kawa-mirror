@@ -1,3 +1,9 @@
+2010-10-06  Per Bothner  <per@bothner.com>
+
+	* Inlineable.java (getReturnType): Remove method.  Instead we have a
+	default (deprecated) implementation in Procedure.
+	* ApplyExp.java (getType): Update accordingly.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	* TypeValue.java (getConstructor): New abstract method.

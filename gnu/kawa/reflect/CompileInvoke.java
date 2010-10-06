@@ -86,8 +86,9 @@ public class CompileInvoke
         if (sizeArg == null)
           sizeArg = QuoteExp.getInstance(new Integer(args.length-1));
         sizeArg = visitor.visit(sizeArg, Type.intType);
-        Expression alloc = new ApplyExp(new ArrayNew(elementType),
-                                        new Expression[] { sizeArg } );
+        ApplyExp alloc = new ApplyExp(new ArrayNew(elementType),
+                                      new Expression[] { sizeArg } );
+        alloc.setType(atype);
         if (lengthSpecified && args.length == 3)
           return alloc;
         LetExp let = new LetExp(new Expression[] { alloc });

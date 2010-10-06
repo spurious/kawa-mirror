@@ -61,7 +61,7 @@ public class GetModuleClass extends ProcedureN
         comp.loadClassRef(comp.mainClass);
         if (this == getModuleUri)
           comp.getCode().emitInvoke(maker);
-        target.compileFromStack(comp, getReturnType(null));
+        target.compileFromStack(comp, exp.getType());
       }
   }
 

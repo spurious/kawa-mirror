@@ -32,7 +32,7 @@ public class MakeList extends ProcedureN implements Inlineable
   {
     Expression[] args = exp.getArgs();
     compile(args, 0, comp);
-    target.compileFromStack(comp, getReturnType(args));
+    target.compileFromStack(comp, exp.getType());
   }
 
   public static void compile (Expression[] args, int offset,

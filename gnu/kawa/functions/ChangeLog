@@ -1,3 +1,11 @@
+2010-10-06  Per Bothner  <per@bothner.com>
+
+	* MakeList.java (compile): Use getType rather than getReturnType.
+	* GetModuleClass.java (compile): Likewise.
+	* CompileMisc.java (getReturnType, getReturnTypeConvert): Removed.
+	(validateApplyConstantFunction0): Visit 2nd argument in context
+ 	of type from 1st argument.
+
 2010-10-04  Per Bothner  <per@bothner.com>
 
 	* CompileArith.java (appropriateIntConstant, appropriateLongConstant):

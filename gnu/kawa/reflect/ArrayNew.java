@@ -10,6 +10,8 @@ public class ArrayNew extends Procedure1 implements Externalizable
   public ArrayNew (Type element_type)
   {
     this.element_type = element_type;
+    setProperty(Procedure.validateApplyKey,
+                "gnu.kawa.reflect.CompileArrays:validateArrayNew");
     Procedure.compilerKey.set(this, "*gnu.kawa.reflect.CompileArrays:getForArrayNew");
   }
 

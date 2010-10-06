@@ -1,3 +1,15 @@
+2010-10-06  Per Bothner  <per@bothner.com>
+
+	* CompileArrays.java: Update for removed CInlineable#getReturnType.
+	(getReturnType): Removed.
+	(validateArrayNew, validateArrayLength, validateArrayGet,
+	validateArraySet): New methods.
+	* ArrayGet.java: Set validate-apply property.
+	* ArrayLength.java: Likewise.
+	* ArrayNew.java: Likewise.
+	* ArraySet.java: Likewise.
+	* CompileInvoke.java (validateApplyInvoke): Set type of expression.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java (convertValue): New method.

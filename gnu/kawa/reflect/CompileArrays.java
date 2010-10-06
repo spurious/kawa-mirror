@@ -98,15 +98,35 @@ public class CompileArrays implements Inlineable
     target.compileFromStack(comp, gnu.kawa.lispexpr.LangPrimType.intType);
   }
 
-  public gnu.bytecode.Type getReturnType (Expression[] args)
+  public static Expression validateArrayNew
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
-    switch (code)
-      {
-      case 'L': return gnu.kawa.lispexpr.LangPrimType.intType;
-      case 'G': return ((ArrayGet) proc).element_type;
-      case 'N': return ArrayType.make(((ArrayNew) proc).element_type);
-      case 'S': default: return Type.void_type;
-      }
+    exp.visitArgs(visitor);
+    exp.setType(ArrayType.make(((ArrayNew) proc).element_type));
+    return exp;
   }
 
+  public static Expression validateArrayLength
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    exp.visitArgs(visitor);
+    exp.setType(gnu.kawa.lispexpr.LangPrimType.intType); // FIXME
+    return exp;
+  }
+
+  public static Expression validateArrayGet
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    exp.visitArgs(visitor);
+    exp.setType(((ArrayGet) proc).element_type);
+    return exp;
+  }
+
+  public static Expression validateArraySet
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    exp.visitArgs(visitor);
+    exp.setType(Type.void_type);
+    return exp;
+  }
 }

@@ -243,6 +243,11 @@ public class XDataType extends Type implements TypeValue
       }
   }
 
+  public Expression convertValue (Expression value)
+  {
+    return null;
+  }
+
   public boolean isInstance (Object obj)
   {
     switch (typeCode)

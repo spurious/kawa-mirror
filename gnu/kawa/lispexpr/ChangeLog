@@ -1,3 +1,9 @@
+2010-10-05  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (convertValue): New method.
+	* LangObjType.java (coercionMethod, convertValue): New methods.
+	(emitCoerceFromObject): Make use of coercionMethod.
+
 2010-09-17  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (compare): Return -1 for (char,gnu.text.Char).

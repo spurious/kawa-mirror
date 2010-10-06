@@ -155,6 +155,11 @@ public class OccurrenceType extends ObjectType
     gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
   }
 
+  public Expression convertValue (Expression value)
+  {
+    return null;
+  }
+
   public Procedure getConstructor ()
   {
     return null;

@@ -1,5 +1,10 @@
 2010-10-05  Per Bothner  <per@bothner.com>
 
+	* TypeValue.java (getConstructor): New abstract method.
+	* InlineCalls.java (checkType): Make use type nwe convert value method.
+	* InlineCalls.java (visitLetExp): Use declaration type, if specified,
+	when visiting initializing expresssion.
+
 	* Compilation.java (inlineOk): Tweak 2010-10-01 fix (to Savannah
 	bug #31180) to check the nameDecl's isPublic() rather than ignorable().
 	This fixes the case when the lambda is only called but not read.

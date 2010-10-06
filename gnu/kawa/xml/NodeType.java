@@ -43,6 +43,13 @@ public class NodeType extends ObjectType implements TypeValue, NodePredicate, Ex
     code.emitInvokeStatic(coerceMethod);
   }
 
+  public Expression convertValue (Expression value)
+  {
+    ApplyExp aexp = new ApplyExp(coerceMethod, new Expression[] { value });
+    aexp.setType(this);
+    return aexp;
+  }
+
   public Object coerceFromObject (Object obj)
   {
     return coerceForce(obj, kinds);

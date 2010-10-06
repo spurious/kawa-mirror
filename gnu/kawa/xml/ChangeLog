@@ -1,6 +1,12 @@
+2010-10-05  Per Bothner  <per@bothner.com>
+
+	* XDataType.java (convertValue): New method.
+	* NodeType.java (convertValue): New method.
+
 2010-09-28  Per Bothner  <per@bothner.com>
 
-	* NodeConstructor.java (compile): 
+	* NodeConstructor.java (compile): Change to be less kludgy - i.e.
+	don't existing Variable.  This avoids a StackMapTable failure.
 
 	* XDataType.java (emitTestIf): Add necessary coercion before
 	storing into Declaration.

@@ -50,4 +50,7 @@ public interface TypeValue
    * standard Java constructors (<init> methods) should be used.
    */
   public Procedure getConstructor ();
+
+  /** Return converted expression or null. */
+  public Expression convertValue (Expression value);
 }

@@ -214,6 +214,11 @@ public class LangPrimType extends PrimType implements TypeValue
     code.emitIfIntNotZero();
   }
 
+  public Expression convertValue (Expression value)
+  {
+    return null;
+  }
+
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target)
   {

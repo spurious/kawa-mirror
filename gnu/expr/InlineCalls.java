@@ -78,7 +78,15 @@ public class InlineCalls extends ExpExpVisitor<Type>
         incompatible = true;
       }
     else
-      incompatible = required != null && required.compare(expType) == -3;
+      {
+        incompatible = required != null && required.compare(expType) == -3;
+        if (incompatible && required instanceof TypeValue)
+          {
+            Expression converted = ((TypeValue) required).convertValue(exp);
+            if (converted != null)
+              return converted;
+          }
+      }
     if (incompatible)
       {
         Language language = comp.getLanguage();
@@ -286,13 +294,15 @@ public class InlineCalls extends ExpExpVisitor<Type>
     for (int i = 0; i < n; i++, decl = decl.nextDecl())
       {
 	Expression init0 = exp.inits[i];
-	Expression init = visit(init0, null);
+        boolean typeSpecified = decl.getFlag(Declaration.TYPE_SPECIFIED);
+        Type dtype = typeSpecified && init0 != QuoteExp.undefined_exp ? decl.getType() : null;
+	Expression init = visit(init0, dtype);
 	exp.inits[i] = init;
 	Expression dvalue = decl.value;
 	if (dvalue == init0)
 	  {
 	    decl.value = dvalue = init;
-	    if (! decl.getFlag(Declaration.TYPE_SPECIFIED))
+	    if (! typeSpecified)
 	      decl.setType(dvalue.getType());
 	  }
       }

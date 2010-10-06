@@ -322,6 +322,36 @@ public class LangObjType extends ObjectType implements TypeValue
     return coerced;
   }
 
+  Method coercionMethod ()
+  {
+    switch (typeCode)
+      {
+      case CLASS_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToClass", 1);
+      case CLASSTYPE_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToClassType", 1);
+      case TYPE_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToType", 1);
+      case NUMERIC_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceNumeric", 1);
+      case REAL_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceRealNum", 1);
+      case RATIONAL_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceRatNum", 1);
+      case INTEGER_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceIntNum", 1);
+      case DFLONUM_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceDFloNum", 1);
+      case VECTOR_TYPE_CODE:
+      case STRING_TYPE_CODE:
+      case LIST_TYPE_CODE:
+      case REGEX_TYPE_CODE:
+        return null;
+      default:
+        return ((PrimProcedure) getConstructor()).getMethod();
+      }
+  }
+
   Method coercionOrNullMethod()
   {
     ClassType methodDeclaringClass = implementationType;
@@ -502,34 +532,20 @@ public class LangObjType extends ObjectType implements TypeValue
        super.emitConvertFromPrimitive(stackType, code);
   }
 
+  public Expression convertValue (Expression value)
+  {
+    Method method = coercionMethod();
+    if (method == null)
+      return null;
+    ApplyExp aexp = new ApplyExp(method, new Expression[] { value });
+    aexp.setType(this);
+    return aexp;
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     switch (typeCode)
       {
-      case CLASS_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToClass", 1));
-        break;
-      case CLASSTYPE_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToClassType", 1));
-        break;
-      case TYPE_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceToType", 1));
-        break;
-      case NUMERIC_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceNumeric", 1));
-        break;
-      case REAL_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceRealNum", 1));
-        break;
-      case RATIONAL_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceRatNum", 1));
-        break;
-      case INTEGER_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceIntNum", 1));
-        break;
-      case DFLONUM_TYPE_CODE:
-        code.emitInvokeStatic(typeLangObjType.getDeclaredMethod("coerceDFloNum", 1));
-        break;
       case VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
@@ -537,7 +553,7 @@ public class LangObjType extends ObjectType implements TypeValue
         code.emitCheckcast(implementationType);
         break;
       default:
-        code.emitInvoke(((PrimProcedure) getConstructor()).getMethod());
+        code.emitInvoke(coercionMethod());
       }
   }
 

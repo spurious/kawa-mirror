@@ -1,3 +1,7 @@
+2010-10-05  Per Bothner  <per@bothner.com>
+
+	* OccurrenceType.java (convertValue): New method.
+
 2010-10-04  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (selectApplicable): Use new checkIntValue and

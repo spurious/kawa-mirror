@@ -1,3 +1,9 @@
+2010-10-08  Per Bothner  <per@bothner.com>
+
+	* standard/require.java (importDefinitions): Partly refer 2010-09-30
+	change.  However, check Compilation#sharedModuleDefs rather than
+	immediate.
+
 2010-10-04  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (getTypeMap): Remove redundant (over-written)

@@ -280,6 +280,7 @@ public class require extends Syntax
 
     ClassType type = info.getClassType();
     String tname = type.getName();
+    boolean sharedModule = tr.sharedModuleDefs();
     boolean isRunnable = (info.getState() < Compilation.RESOLVED
                           ? info.getCompilation().makeRunnable()
                           : type.isSubtype(Compilation.typeRunnable));
@@ -407,7 +408,8 @@ public class require extends Syntax
         if (! isImportedInstance)
           {
             fref.setDontDereference(true);
-            adecl.setPrivate(true);
+            if (! sharedModule)
+              adecl.setPrivate(true);
           } 
         // Imported variables should be read-only.
         adecl.setFlag(Declaration.IS_CONSTANT);

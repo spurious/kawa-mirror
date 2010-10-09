@@ -400,7 +400,7 @@ public class Declaration
     return value;
   }
 
-  /** Set the value assoociated with this Declaration.
+  /** Set the value associated with this Declaration.
    * Most code should use noteValue instead. */
   public final void setValue(Expression value) { this.value = value; }
 

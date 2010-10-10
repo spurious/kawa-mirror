@@ -1,4 +1,4 @@
-// Copyright (C) 2005 Per M.A. Bothner.
+// Copyright (C) 2005, 2010 Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ../../COPYING.
 
 package kawa.lang;
@@ -79,7 +79,9 @@ public class Eval extends Procedure1or2
 	Translator tr = new Translator(language, messages,
                                        NameLookup.getInstance(env, language));
         tr.immediate = true;
-        tr.setState(Compilation.BODY_PARSED);
+        // The state value BODY_PARSED-1 causes require#importDefinitions
+        // to do the right thing.
+        tr.setState(Compilation.BODY_PARSED-1);
         tr.setSharedModuleDefs(true);
 	ModuleExp mod = tr.pushNewModule((String) null);
         Compilation saveComp = Compilation.setSaveCurrent(tr);

@@ -1,3 +1,8 @@
+2010-10-10  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Change the initial Compilation 'state'
+	so require#importDefinitions does the right thing.
+
 2010-10-09  Per Bothner  <per@bothner.com>
 
 	* standard/requires.java (importDefinitions): Update

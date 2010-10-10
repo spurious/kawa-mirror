@@ -88,10 +88,10 @@ public class Compilation implements SourceLocator
    */
   Field moduleInstanceMainField;
 
-  /** Stack of pairs of (ModuleInfo,ScpeExp). */
+  /** Stack of quads of (ModuleInfo, ScopeExp, position, formSize). */
   public java.util.Stack<Object> pendingImports;
 
-  public void pushPendingImport (ModuleInfo info, ScopeExp defs)
+  public void pushPendingImport (ModuleInfo info, ScopeExp defs, int formSize)
   {
     if (pendingImports == null)
       pendingImports = new java.util.Stack<Object>();
@@ -100,6 +100,7 @@ public class Compilation implements SourceLocator
     Expression posExp = new ReferenceExp((Object) null);
     posExp.setLine(this);
     pendingImports.push(posExp);
+    pendingImports.push(Integer.valueOf(formSize));
   }
 
   /** If true, print out expressions after parsing and before optimizations. */

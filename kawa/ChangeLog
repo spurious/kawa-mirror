@@ -1,5 +1,8 @@
 2010-10-09  Per Bothner  <per@bothner.com>
 
+	* standard/requires.java (importDefinitions): Update
+	pushPendingImport call.
+
 	* lang/Eval.java (evalBody): Do setSharedModuleDefs, like
 	other interfactive evaluations.
 

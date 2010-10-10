@@ -272,8 +272,7 @@ public class require extends Syntax
             && info.getState() < Compilation.RESOLVED)
           {
             // Oops.  We found a cycle.
-            tr.pushPendingImport(info, defs);
-            tr.pendingImports.push(Integer.valueOf(forms.size()));
+            tr.pushPendingImport(info, defs, forms.size());
             return true;
           }
       }

@@ -1,7 +1,10 @@
 2010-10-09  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (pushPendingImport): Take extra parameter.
+
 	* Compilation.java (mustCompile): Initialize to ModuleExp.alwaysCompile.
 	This does the right thing for for Eval for pre-parsed Scheme forms.
+
 	* Language.java (parse): No longer need to check for alwaysCompile.
 
 	* Compilation.java (setSharedModuleDefs): New method.

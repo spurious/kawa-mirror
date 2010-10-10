@@ -1,3 +1,11 @@
+2010-10-09  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mustCompile): Initialize to ModuleExp.alwaysCompile.
+	This does the right thing for for Eval for pre-parsed Scheme forms.
+	* Language.java (parse): No longer need to check for alwaysCompile.
+
+	* Compilation.java (setSharedModuleDefs): New method.
+
 2010-10-06  Per Bothner  <per@bothner.com>
 
 	Fix Savannah bug# 31251 "defvar", reported by Helmut Eller.

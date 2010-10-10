@@ -1,3 +1,8 @@
+2010-10-09  Per Bothner  <per@bothner.com>
+
+	* lang/Eval.java (evalBody): Do setSharedModuleDefs, like
+	other interfactive evaluations.
+
 2010-10-08  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (importDefinitions): Partly refer 2010-09-30

@@ -23,7 +23,7 @@ public class Compilation implements SourceLocator
    * This is because it contains a construct we know how to compile, but not
    * evaluate, and it it outside a function (which we always compile).
    * This can be a let scope, or primitive procedure. */
-  public boolean mustCompile;
+  public boolean mustCompile = ModuleExp.alwaysCompile;
 
   /** Used by LambdaExp.getSelectorValue if need to allocate new selector. */
   int maxSelectorValue;
@@ -390,6 +390,14 @@ public class Compilation implements SourceLocator
   public boolean sharedModuleDefs ()
   {
     return (langOptions & Language.PARSE_CURRENT_NAMES) != 0;
+  }
+
+  public void setSharedModuleDefs (boolean shared)
+  {
+    if (shared)
+      langOptions |= Language.PARSE_CURRENT_NAMES;
+    else
+      langOptions &= ~Language.PARSE_CURRENT_NAMES;
   }
 
   public final ClassType getModuleType()

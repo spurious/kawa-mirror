@@ -80,6 +80,7 @@ public class Eval extends Procedure1or2
                                        NameLookup.getInstance(env, language));
         tr.immediate = true;
         tr.setState(Compilation.BODY_PARSED);
+        tr.setSharedModuleDefs(true);
 	ModuleExp mod = tr.pushNewModule((String) null);
         Compilation saveComp = Compilation.setSaveCurrent(tr);
         try

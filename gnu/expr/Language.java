@@ -518,7 +518,7 @@ public abstract class Language
     Compilation tr = getCompilation(lexer, messages, lexical);
     if (requirePedantic)
       tr.pedantic = true;
-    if (! immediate || ModuleExp.alwaysCompile)
+    if (! immediate)
       tr.mustCompile = true;
     tr.immediate = immediate;
     tr.langOptions = options;

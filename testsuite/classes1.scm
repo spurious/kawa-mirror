@@ -48,6 +48,12 @@
   ((f (y :: <int>)) :: <int>
    (if (equal? hyphenated-field? "yes") (+ (g) b y) 999))
 
+  ((asText (i ::int))::string (java.lang.Integer:toString i))
+  ((asText (t ::java.lang.CharSequence))::string (t:toString))
+  ((test-asText)
+   (with-compile-options warn-invoke-unknown-method: #t warn-as-error: #t
+			 ((this):asText "hello")))
+
   ;; Bug reported by Dean Ferreyra <dferreyra@igc.org> 2005-06-09
   ((trouble)
    (let ((fn (lambda (o)

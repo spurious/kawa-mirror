@@ -1,3 +1,7 @@
+2010-10-11  Per Bothner  <per@bothner.com>
+
+	* classes1.scm:  Add test for overload-resolution bug.
+
 2010-10-10  Helmut Eller  <eller.helmut@gmail.com>
 
 	* lib-test.scm: New test-case for interactive module re-loading.

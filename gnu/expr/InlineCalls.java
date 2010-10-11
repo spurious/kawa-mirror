@@ -79,6 +79,8 @@ public class InlineCalls extends ExpExpVisitor<Type>
       }
     else
       {
+        if (expType == Type.toStringType)
+          expType = Type.javalangStringType;
         incompatible = required != null && required.compare(expType) == -3;
         if (incompatible && required instanceof TypeValue)
           {
@@ -178,7 +180,10 @@ public class InlineCalls extends ExpExpVisitor<Type>
         && (value = exp.getValue()) != null)
       {
         Language language = comp.getLanguage();
-        exp.type = language.getTypeFor(value.getClass());
+        Type vtype = language.getTypeFor(value.getClass());
+        if (vtype == Type.toStringType)
+          vtype = Type.javalangStringType;
+        exp.type = vtype;
         if (required instanceof PrimType)
           {
             char sig1 = required.getSignature().charAt(0);

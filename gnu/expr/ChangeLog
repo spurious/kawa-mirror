@@ -1,5 +1,9 @@
 2010-10-11  Per Bothner  <per@bothner.com>
 
+	* ReferenceExp.java (getType): Fix to not return toStringType.
+	* InlineCalls.java (visitQuoteExp): Likewise for setting type.
+	(checkType): Similarly fix argument to Type#compare.
+
 	* PrimProcedure.java (toString): Check for null retType.
 
 	* BeginExp.java (visitChildren): Move pushOptions/popOptions from

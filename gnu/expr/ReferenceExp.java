@@ -242,6 +242,8 @@ public class ReferenceExp extends AccessExp
             decl.value = save;
           }
       }
+    if (type == Type.toStringType)
+      type = Type.javalangStringType;
     return type;
   }
 

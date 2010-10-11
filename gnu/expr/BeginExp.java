@@ -150,21 +150,22 @@ public class BeginExp extends Expression
 
   protected <R,D> R visit (ExpVisitor<R,D> visitor, D d)
   {
-    return visitor.visitBeginExp(this, d);
-  }
-
-  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
-  {
     pushOptions(visitor.comp);
     try
       {
-	exps = visitor.visitExps(exps, length, d);
+        return visitor.visitBeginExp(this, d);
       }
     finally
       {
 	popOptions(visitor.comp);
       }
   }
+
+  protected <R,D> void visitChildren (ExpVisitor<R,D> visitor, D d)
+  {
+    exps = visitor.visitExps(exps, length, d);
+  }
+
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Begin", ")", 2);

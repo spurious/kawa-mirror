@@ -1,3 +1,10 @@
+2010-10-11  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (visitChildren): Move pushOptions/popOptions from
+	here ...
+	(visit): ... to here, since (for example) InlineCalls#visitBeginExp
+	doesn't call BeginExp's visitChildren.
+
 2010-10-09  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (pushPendingImport): Take extra parameter.

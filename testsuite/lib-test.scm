@@ -1,4 +1,4 @@
-(test-begin "libs" 32)
+(test-begin "libs" 33)
 
 (import (srfi :2 and-let*))
 
@@ -52,5 +52,55 @@
 
 (test-equal '("abc" "URI" "")
 	    (symbol-parts (element-name #<abc xmlns="URI"/>)))
+
+;; Contributed by Helmut Eller.
+(define version-1
+ '((module-export foo)
+   (module-static #t)
+   (module-compile-options
+    warn-invoke-unknown-method: #t
+    warn-undefined-variable: #t)
+   (define (foo) (bar))
+   (define (bar) "version 1")))
+(define version-2
+ '((module-export foo)
+   (module-static #t)
+   (module-compile-options
+    warn-invoke-unknown-method: #t
+    warn-undefined-variable: #t)
+   (define (foo) (bar))
+   (define (bar) "version 2")))
+(define (test-ev-req)
+  (let* ((file (java.io.File:createTempFile "foo" ".scm"))
+	 (filename (file:getAbsolutePath))
+	 (now (lambda () (java.lang.System:currentTimeMillis)))
+	 (cache-time (max gnu.expr.ModuleManager:LAST_MODIFIED_CACHE_TIME
+			  1000))
+	 (wait (lambda () (let* ((date (file:lastModified)))
+			    (let loop ()
+			      (when (< (- (now) date) (* 2 cache-time))
+				(sleep 0.5))))))
+	 (write-forms (lambda (forms)
+			(wait)
+			(call-with-output-file filename
+			  (lambda (stream)
+			    (format stream "~{~s~%~}" forms)))
+			(wait))))
+    (try-finally
+     (begin
+       (write-forms version-1)
+       (eval `(begin (require ,filename)
+		     (define foo-1 foo)
+		   (define result-1 (foo-1)))
+	     (interaction-environment))
+       (write-forms version-2)
+       (eval `(begin (require ,filename)
+		     (define result-2 (foo-1))
+		     (list result-1 result-2))
+	     (interaction-environment)))
+     (delete-file filename))))
+(test-equal
+ '("version 1" "version 2")
+ (test-ev-req))
 
 (test-end)

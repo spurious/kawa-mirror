@@ -1,3 +1,7 @@
+2010-10-10  Helmut Eller  <eller.helmut@gmail.com>
+
+	* lib-test.scm: New test-case for interactive module re-loading.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

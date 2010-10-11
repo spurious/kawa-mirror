@@ -1053,7 +1053,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public String toString()
   {
     StringBuffer buf = new StringBuffer(100);
-    buf.append(retType.getName());
+    buf.append(retType == null ? "<unknown>" : retType.getName());
     buf.append(' ');
     buf.append(getVerboseName());
     return buf.toString();

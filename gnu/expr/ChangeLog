@@ -1,5 +1,7 @@
 2010-10-11  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (toString): Check for null retType.
+
 	* BeginExp.java (visitChildren): Move pushOptions/popOptions from
 	here ...
 	(visit): ... to here, since (for example) InlineCalls#visitBeginExp

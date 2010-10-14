@@ -1,3 +1,8 @@
+2010-10-14  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction): Don't set stackType to object
+	just because the parameter is non-simple.
+
 2010-10-11  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (getType): Fix to not return toStringType.

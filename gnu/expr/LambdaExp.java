@@ -1379,9 +1379,7 @@ public class LambdaExp extends ScopeExp
 	    || param.isIndirectBinding())
 	  {
 	    Type paramType = param.getType();
-	    Type stackType
-	      = (mainMethod == null || plainArgs >= 0 ? Type.objectType
-		 : paramType);
+	    Type stackType = plainArgs >= 0 ? Type.objectType : paramType;
 	    // If the parameter is captured by an inferior lambda,
 	    // then the incoming parameter needs to be copied into its
 	    // slot in the heapFrame.  Thus we emit an aaload instruction.

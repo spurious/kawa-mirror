@@ -207,15 +207,18 @@ public class CompileReflect
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
+    SlotSet sproc = (SlotSet) proc;
     // Unlike, for SlotGet, we do the field-lookup at compile time
     // rather than inline time.  The main reason is that optimizing
     // (set! CLASS-OR-OBJECT:FIELD-NAME VALUE) is tricky, since (currently)
     // afte we've inlined setter, this method doesn't get called.
-    boolean isStatic = ((SlotSet) proc).isStatic;
+    boolean isStatic = sproc.isStatic;
     if (isStatic && visitor.getCompilation().mustCompile)
-      return inlineClassName (exp, 0, visitor);
-    else
-      return exp;
+      exp = inlineClassName (exp, 0, visitor);
+    exp.setType(sproc.returnSelf && exp.getArgCount() == 3
+                ? exp.getArg(0).getType()
+                : Type.voidType);
+    return exp;
   }
 
   public static Expression validateApplyTypeSwitch

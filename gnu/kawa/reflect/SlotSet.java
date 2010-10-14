@@ -188,6 +188,8 @@ public class SlotSet extends Procedure3 implements Inlineable
           code.emitInvokeStatic(method);
         else
           code.emitInvoke(method);
+        if (! method.getReturnType().isVoid())
+          code.emitPop(1);
         return;
       }
   }
@@ -257,12 +259,5 @@ public class SlotSet extends Procedure3 implements Inlineable
 	  }
       }
     ApplyExp.compile(exp, comp, target);
-  }
-
-  public Type getReturnType (Expression[] args)
-  {
-    if (returnSelf && args.length == 3)
-      return args[0].getType();
-    return Type.void_type;
   }
 }

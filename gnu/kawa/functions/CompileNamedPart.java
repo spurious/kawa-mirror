@@ -158,19 +158,24 @@ public class CompileNamedPart
     ClassType caller = comp == null ? null
       : comp.curClass != null ? comp.curClass
       : comp.mainClass;
+    ApplyExp original = exp;
     if (typeval instanceof ClassType)
-      return new ApplyExp(SlotSet.set$Mnstatic$Mnfield$Ex, args);
-
-    if (type instanceof ClassType)
+      {
+        exp = new ApplyExp(SlotSet.set$Mnstatic$Mnfield$Ex, args);
+      }
+    else if (type instanceof ClassType)
       {
         Object part = SlotSet.lookupMember((ClassType) type, mname, caller);
         if (part != null)
           {
             // FIXME: future kludge to avoid re-doing SlotGet.getField.
             // args = new Expression[] { context, new QuoteExp(part) });
-            return new ApplyExp(SlotSet.set$Mnfield$Ex, args);
+            exp = new ApplyExp(SlotSet.set$Mnfield$Ex, args);
           }
       }
+    if (exp != original)
+      exp.setLine(original);
+    exp.setType(Type.voidType);
     return exp;
   }
 

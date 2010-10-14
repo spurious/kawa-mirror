@@ -1,5 +1,8 @@
 2010-10-14  Per Bothner  <per@bothner.com>
 
+	* CompileNamedPart.java (validateSetNamedPart): Set result type to void.
+	Also copy over line-number information.
+
 	* DisplayFormat.java (writeObject): When printing XML nodes,
 	only emit initial '#' if getReadableOutput().
 

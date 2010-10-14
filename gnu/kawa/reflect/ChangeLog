@@ -1,3 +1,10 @@
+2010-10-14  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (compileSet): If we have a setter method that returns
+	non-void (presumably same as this), ignore the result.
+	(getReturnType): Remove method - no longer needed.
+	* CompileReflect.java (validateApplySlotSet): Set result type.
+
 2010-10-06  Per Bothner  <per@bothner.com>
 
 	* CompileArrays.java: Update for removed CInlineable#getReturnType.

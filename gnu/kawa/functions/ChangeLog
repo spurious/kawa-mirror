@@ -1,3 +1,8 @@
+2010-10-14  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObject): When printing XML nodes,
+	only emit initial '#' if getReadableOutput().
+
 2010-10-06  Per Bothner  <per@bothner.com>
 
 	* MakeList.java (compile): Use getType rather than getReturnType.

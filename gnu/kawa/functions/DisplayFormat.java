@@ -235,7 +235,8 @@ public class DisplayFormat extends AbstractFormat
     /* #ifdef enable:XML */
     else if (obj instanceof KNode)
       {
-        write("#", out);
+        if (getReadableOutput())
+          write("#", out);
         Writer wout = out instanceof Writer ? (Writer) out
           : new ConsumerWriter(out);
         XMLPrinter xout = new XMLPrinter(wout);

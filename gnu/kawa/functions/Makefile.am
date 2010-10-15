@@ -35,6 +35,7 @@ java_sources=\
   MultiplyOp.java \
   Not.java \
   NumberCompare.java \
+  NumberPredicate.java \
   SetNamedPart.java \
   Setter.java \
   UnicodeUtils.java \

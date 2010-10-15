@@ -45,13 +45,6 @@
 (define (negative? (x :: real)) :: <boolean> 
   (invoke x 'isNegative))
 
-(define (odd? (x :: <integer>)) :: <boolean> 
-  ((primitive-virtual-method <integer> "isOdd" <boolean> ())
-   x))
-
-(define (even? (x :: <integer>)) :: <boolean> 
-  (not (odd? x)))
-
 (define (max #!rest (args :: <Object[]>))
   (let ((n :: <int> args:length)
 	(result :: <real> (args 0)))

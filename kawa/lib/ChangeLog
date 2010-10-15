@@ -1,3 +1,7 @@
+2010-10-15  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (odd?, even?): Remove functions.
+
 2010-08-28  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (identifier-list?, identifier-pair-list? obj):

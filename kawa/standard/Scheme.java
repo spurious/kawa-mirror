@@ -42,6 +42,8 @@ public class Scheme extends LispLanguage
   public static final NumberCompare numGEq;
   public static final NumberCompare numLss;
   public static final NumberCompare numLEq;
+  public static final NumberPredicate isOdd;
+  public static final NumberPredicate isEven;
 
   public static final Apply apply;
   public static final ApplyToArgs applyToArgs;
@@ -77,6 +79,8 @@ public class Scheme extends LispLanguage
                                 NumberCompare.TRUE_IF_LSS);
     numLEq = NumberCompare.make(instance, "<=",
                                 NumberCompare.TRUE_IF_LSS|NumberCompare.TRUE_IF_EQU);
+    isOdd = new NumberPredicate(instance, "odd?", NumberPredicate.ODD);
+    isEven = new NumberPredicate(instance, "even?", NumberPredicate.EVEN);
 
     instance.initScheme();
 
@@ -240,8 +244,8 @@ public class Scheme extends LispLanguage
       defProcStFld("zero?", "kawa.lib.numbers");
       defProcStFld("positive?", "kawa.lib.numbers");
       defProcStFld("negative?", "kawa.lib.numbers");
-      defProcStFld("odd?", "kawa.lib.numbers");
-      defProcStFld("even?", "kawa.lib.numbers");
+      defProcStFld("odd?", "kawa.standard.Scheme", "isOdd");
+      defProcStFld("even?", "kawa.standard.Scheme", "isEven");
       defProcStFld("max", "kawa.lib.numbers");
       defProcStFld("min", "kawa.lib.numbers");
       defProcStFld("+", "gnu.kawa.functions.AddOp", "$Pl");

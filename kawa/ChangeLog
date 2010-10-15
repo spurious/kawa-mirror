@@ -1,3 +1,8 @@
+2010-10-15  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (isOdd, isEven): New static fields.
+	(initScheme): Change definitions of odd? and even?.
+
 2010-10-10  Per Bothner  <per@bothner.com>
 
 	* lang/Eval.java (evalBody): Change the initial Compilation 'state'

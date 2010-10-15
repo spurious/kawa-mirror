@@ -1,3 +1,9 @@
+2010-10-15  Per Bothner  <per@bothner.com>
+
+	* NumberPredicate.java: New class - implements odd? and even?.
+	* Makefile.am: Update accordingly.
+	* CompileArith.java (validateApplyNumberPredicate): New method.
+
 2010-10-14  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java (validateSetNamedPart): Set result type to void.

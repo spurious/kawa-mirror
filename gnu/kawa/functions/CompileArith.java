@@ -593,4 +593,15 @@ public class CompileArith implements Inlineable
       }
     return prev;
   }
+
+  public static Expression validateApplyNumberPredicate
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    NumberPredicate nproc = (NumberPredicate) proc;
+    int op = nproc.op;
+    Expression[] args = exp.getArgs();
+    args[0] = visitor.visit(args[0], LangObjType.integerType);
+    exp.setType(Type.booleanType);
+    return exp;
+  }
 }

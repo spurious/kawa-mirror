@@ -1,3 +1,7 @@
+2010-10-15  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java (getLocation): Remove some dead code.
+
 2010-10-06  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (getReturnType): New semi-deprecated method

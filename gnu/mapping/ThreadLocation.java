@@ -92,24 +92,9 @@ public class ThreadLocation extends NamedLocation implements Named
     NamedLocation entry = (NamedLocation) thLocal.get();
     if (entry == null)
       {
-        if (property == ANONYMOUS)
-          {
-            entry = new SharedLocation(name, property, 0);
-            if (global != null)
-              entry.setBase(global);
-          }
-        else
-          {
-            entry = Environment.getCurrent().getLocation(name, property, true);
-            if (global != null)
-              {
-                synchronized (entry)
-                  {
-                    if (entry.base == null && entry.value == Location.UNBOUND)
-                      entry.setBase(global);
-                  }
-              }
-          }
+        entry = new SharedLocation(name, property, 0);
+        if (global != null)
+          entry.setBase(global);
 	thLocal.set(entry);
       }
     return entry;

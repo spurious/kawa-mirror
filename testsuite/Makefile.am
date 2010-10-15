@@ -37,7 +37,8 @@ check-no-inline:
 check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-binarytrees check-fannkuch check-fasta check-knucleotide check-mandelbrot check-nbody \
+  check-binarytrees check-fannkuch check-fannkuchredux check-fasta \
+  check-knucleotide check-mandelbrot check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
 check2:  check-scm check-misc check-mac check-obj check-polytype
@@ -168,6 +169,17 @@ check-fannkuch: fannkuch.class
 	@if diff $(srcdir)/fannkuch-output.txt fannkuch7.log; \
 	  then echo '# fannkuch test passes'; \
 	  else echo FAIL fannkuch test; fi
+
+fannkuchredux.class: $(srcdir)/fannkuchredux.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/fannkuchredux.scm
+
+check-fannkuchredux: fannkuchredux.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) fannkuchredux 7 >fannkuchredux7.log
+	@if diff $(srcdir)/fannkuchredux-output.txt fannkuchredux7.log; \
+	  then echo '# fannkuch-redux test passes'; \
+	  else echo FAIL fannkuch-redux test; fi
 
 fasta.class: $(srcdir)/fasta.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
@@ -403,7 +415,7 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
 inlining.log: InliningTest.class cycle1.class cycle2.class \
-  binarytrees.class fannkuch.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
+  binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
@@ -420,6 +432,8 @@ inlining.log: InliningTest.class cycle1.class cycle2.class \
 	$(JAVA) gnu.bytecode.ListCodeSize 'binarytrees$$TreeNode.class' itemCheck >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$$Ex' countFlips fannkuch >>inlining.log
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(JAVA) gnu.bytecode.ListCodeSize fannkuchredux.class fannkuch >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
 	$(JAVA) gnu.bytecode.ListCodeSize fasta.class randomNext >>inlining.log
 	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
@@ -499,7 +513,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
   binarytrees.scm binarytrees-output.txt \
-  fannkuch.scm fannkuch-output.txt \
+  fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.tx \
   fasta.scm fasta-output.txt \
   knucleotide.scm knucleotide-2.scm knucleotide-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \

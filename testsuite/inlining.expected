@@ -91,6 +91,7 @@ binarytrees$TreeNode.itemCheck()int: 36 bytes
 fannkuch.vectorReverseSlice$Ex(int[],int,int)void: 35 bytes
 fannkuch.countFlips(int[],int[])int: 46 bytes
 fannkuch.fannkuch(int)int: 243 bytes
+fannkuchredux.fannkuch(int)int: 289 bytes
 fasta.randomNext(double)double: 28 bytes
 pidigits.pidigits(int,java.io.PrintStream)void: 125 bytes
 pidigits$Transformation.next()void: 59 bytes

@@ -150,7 +150,17 @@ public class QuoteExp extends Expression
     Expression inlined = visitor.maybeInline(exp, required, proc);
     if (inlined != null)
       return inlined;
-    exp.args = visitor.visitExps(exp.args, exp.args.length, null);
+    Expression[] args = exp.args;
+    MethodProc asMProc = proc instanceof MethodProc ? (MethodProc) proc : null;
+    for (int i = 0;  i < nargs;  i++)
+      {
+        Type ptype = asMProc != null ? asMProc.getParameterType(i) : null;
+        // The final varargs parameter T[] can match T or T[].
+        if (i == nargs - 1 && ptype != null
+            && asMProc.maxArgs() < 0 && i == asMProc.minArgs())
+          ptype = null;
+        args[i] = visitor.visit(args[i], ptype);
+      }
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
       {
 	Expression e = exp.inlineIfConstant(proc, visitor);

@@ -1,5 +1,8 @@
 2010-10-15  Per Bothner  <per@bothner.com>
 
+	* QuoteExp.java (validateApply): Pass MethodProc's expected parameter
+	type as required type to InlineCalls#visit.
+
 	* Compilation.java (generateApplyMethodsWithoutContext):  When
 	allocating a varargs array, make sure to use the implementation type.
 

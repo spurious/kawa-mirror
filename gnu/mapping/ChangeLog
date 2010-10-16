@@ -1,5 +1,7 @@
 2010-10-15  Per Bothner  <per@bothner.com>
 
+	* MethodProc.java (getParameterType): Handle varargs methods.
+
 	* ThreadLocation.java (getLocation): Remove some dead code.
 
 2010-10-06  Per Bothner  <per@bothner.com>

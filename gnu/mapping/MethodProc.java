@@ -3,6 +3,7 @@
 
 package gnu.mapping;
 import gnu.bytecode.Type;
+import gnu.bytecode.ArrayType;
 
 /** Similar to a CLOS method.
  * Can check if arguments "match" before committing to calling method. */
@@ -61,9 +62,16 @@ public abstract class MethodProc extends ProcedureN
       resolveParameterTypes();
 
     Type[] atypes = (Type[]) argTypes;
-    if (index >= atypes.length)
-      index = atypes.length - 1;
-    return atypes[index];
+    if (index < atypes.length
+        && (index < atypes.length - 1 || maxArgs() >= 0))
+      return atypes[index];
+    if (maxArgs() < 0)
+      {
+        Type rtype = atypes[atypes.length-1];
+        if (rtype instanceof ArrayType)
+          return ((ArrayType) rtype).getComponentType();
+      }
+    return Type.objectType;
   }
 
   /** Return code from match:  Unspecified failure. */

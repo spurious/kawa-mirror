@@ -1,5 +1,11 @@
 2010-10-15  Per Bothner  <per@bothner.com>
 
+	* numbers.scm (gcd, lcm):  Change args #!rest array from Object[]
+	to integer[], now that the latter works.
+
+	* numbers.scm (number->string): Set explicit return type as string.
+	Type inference depends on compilation order, which is bad.
+
 	* numbers.scm (odd?, even?): Remove functions.
 
 2010-08-28  Per Bothner  <per@bothner.com>

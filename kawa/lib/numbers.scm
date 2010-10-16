@@ -79,23 +79,23 @@
 	 (r (- x (* q y))))
     (values q r)))
 
-(define (gcd #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
+(define (gcd #!rest (args ::integer[])) :: integer
+  (let ((n args:length))
+    (if (= n 0)
 	0
-	(let ((result :: <integer> (args 0)))
-	  (do ((i :: <int> 1 (+ i 1)))
+	(let ((result ::integer (args 0)))
+	  (do ((i ::int 1 (+ i 1)))
 	      ((>= i n) result)
-	    (set! result (gnu.math.IntNum:gcd result (<integer>:@ (args i)))))))))
+	    (set! result (gnu.math.IntNum:gcd result (args i))))))))
 
-(define (lcm #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
+(define (lcm #!rest (args ::integer[])) :: <integer>
+  (let ((n args:length))
+    (if (= n 0)
 	1
-	(let ((result :: <integer> (gnu.math.IntNum:abs (<integer>:@ (args 0)))))
-	  (do ((i :: <int> 1 (+ i 1)))
+	(let ((result ::integer (gnu.math.IntNum:abs (args 0))))
+	  (do ((i ::int 1 (+ i 1)))
 	      ((>= i n) result)
-	    (set! result (gnu.math.IntNum:lcm result (<integer>:@ (args i)))))))))
+	    (set! result (gnu.math.IntNum:lcm result (args i))))))))
 
 (define (numerator (x :: <rational>)) :: <integer>
   (x:numerator))
@@ -247,11 +247,12 @@
   (gnu.math.BitOps:reverseBits n start end))
 
 (define (number->string (arg :: <java.lang.Number>)
-			#!optional (radix :: <int> 10))
+			#!optional (radix :: <int> 10)) ::string
   (make <gnu.lists.FString>
     (gnu.kawa.functions.Arithmetic:toString arg radix)))
 
 (define (string->number (str :: <string>) #!optional (radix :: <int> 10))
+  ::object
   (let ((result (gnu.kawa.lispexpr.LispReader:parseNumber str radix)))
     (if (instance? result <gnu.math.Numeric>) result #f)))
 

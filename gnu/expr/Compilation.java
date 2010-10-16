@@ -1782,7 +1782,7 @@ public class Compilation implements SourceLocator
 			    code.emitStore(counter);
 			  }
 			code.emitLoad(counter);
-			code.emitNewArray(elType);
+			code.emitNewArray(elType.getImplementationType());
 			Label testLabel = new Label(code);
 			Label loopTopLabel = new Label(code);
                         loopTopLabel.setTypes(code);

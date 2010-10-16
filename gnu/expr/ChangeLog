@@ -1,5 +1,8 @@
 2010-10-15  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (generateApplyMethodsWithoutContext):  When
+	allocating a varargs array, make sure to use the implementation type.
+
 	* LambdaExp.java (addMethodFor): Make use of Java5 varargs array
 	parameter for any array type, not just Object[].
 

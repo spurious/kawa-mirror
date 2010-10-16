@@ -534,6 +534,14 @@ public class LangObjType extends ObjectType implements TypeValue
 
   public Expression convertValue (Expression value)
   {
+    // In these cases, using the coercion metod would by-pass
+    // the static type-checking in InlineCalls#checkType, to no benefit.
+    if (typeCode == INTEGER_TYPE_CODE
+        || typeCode == NUMERIC_TYPE_CODE
+        || typeCode == REAL_TYPE_CODE
+        || typeCode == RATIONAL_TYPE_CODE
+        || typeCode == DFLONUM_TYPE_CODE)
+      return null;
     Method method = coercionMethod();
     if (method == null)
       return null;

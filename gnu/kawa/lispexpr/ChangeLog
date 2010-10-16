@@ -1,3 +1,8 @@
+2010-10-15  Per Bothner  <per@bothner.com>
+
+	* LangObjType.java (convertValue): Just return null for 'integer',
+	to avoid some hiding of static type mismatches.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (convertValue): New method.

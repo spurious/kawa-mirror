@@ -212,6 +212,8 @@ public class CompileInvoke
                           stype = ((Field) slot).getType();
                         else
                           stype = null;
+                        if (stype != null)
+                          stype = iproc.language.getLangTypeFor(stype);
                         Expression arg = visitor.visit(args[2 * i + 2], stype);
                         Expression[] sargs
                           = { ae, new QuoteExp(slot),  arg};

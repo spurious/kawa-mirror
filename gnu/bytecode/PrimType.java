@@ -262,7 +262,11 @@ public class PrimType extends Type {
       case 'V':
         return 1;
       case 'Z':
+        if (otherName.equals("java.lang.Boolean"))
+          return 0;
       case 'C':
+        if (otherName.equals("java.lang.Character"))
+          return 0;
         break;
       case 'B': thisPriority = 'A'; break;
       case 'S': thisPriority = 'B'; break;

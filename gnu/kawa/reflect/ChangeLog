@@ -1,3 +1,8 @@
+2010-10-16  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): When visiting the value
+	used to set a property, use the property's language-specific type.
+
 2010-10-14  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (compileSet): If we have a setter method that returns

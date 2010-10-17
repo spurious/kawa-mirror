@@ -21,6 +21,10 @@ public class IfExp extends Expression
     test = i;  then_clause = t;  else_clause = e;
   }
 
+  public Expression getTest () { return test; }
+  public Expression getThenClause () { return then_clause; }
+  public Expression getElseClause () { return else_clause; }
+
   protected final Language getLanguage()
   {
     return Language.getDefaultLanguage(); // FIXME

@@ -244,6 +244,8 @@ public class DisplayFormat extends AbstractFormat
         xout.closeThis();
       }
     /* #endif */
+    else if (obj == Values.empty && getReadableOutput())
+      write("#!void", out);
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable)

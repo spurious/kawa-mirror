@@ -70,6 +70,8 @@ public class CompileReflect
             if (t instanceof Type)
               {
                 Type type = (Type) t;
+                if (type instanceof PrimType)
+                  type = ((PrimType) type).boxedType();
                 if (value instanceof QuoteExp)
                   return type.isInstance(((QuoteExp) value).getValue())
                     ? QuoteExp.trueExp : QuoteExp.falseExp;

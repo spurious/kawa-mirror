@@ -1,3 +1,8 @@
+2010-10-16  Per Bothner  <per@bothner.com>
+	    Helmut Eller  <eller.helmut@gmail.com>
+
+	* misc-test.scm: New tests based on Savannah bug #31353 "boolean type".
+
 2010-10-15  Per Bothner  <per@bothner.com>
 
 	* fannkuchredux.scm: New "shootout" program.

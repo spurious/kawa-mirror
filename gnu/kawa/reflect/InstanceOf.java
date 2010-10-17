@@ -23,6 +23,8 @@ public class InstanceOf extends Procedure2 implements Inlineable
   public Object apply2 (Object arg1, Object arg2)
   {
     Type type = language.asType(arg2);
+    if (type instanceof PrimType)
+      type = ((PrimType) type).boxedType();
     return language.booleanObject(type.isInstance(arg1));
   }
 
@@ -50,6 +52,8 @@ public class InstanceOf extends Procedure2 implements Inlineable
       type = language.getTypeFor(typeArg);
     if (type != null)
       {
+        if (type instanceof PrimType)
+          type = ((PrimType) type).boxedType();
 	args[0].compile(comp, Target.pushObject);
 	if (type instanceof TypeValue)
 	  {

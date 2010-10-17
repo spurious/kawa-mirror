@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 198)
+(test-init "Miscellaneous" 204)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -537,6 +537,15 @@
 (test #t instance? "x" <string>)
 (test #f instance? "x" <number>)
 (test #f instance? #!null <string>)
+;; Tests based on Savannah bug #31353 "boolean type"
+(test #t instance? #f boolean)
+(test #f instance? 123 boolean)
+(test #t 'test-instance (instance? #f boolean))
+(test #f 'test-instance (instance? 123 boolean))
+(define (is-prim-boolean x)
+   (instance? x boolean))
+(test #f is-prim-boolean 123)
+(test #t is-prim-boolean #t)
 
 ;; Based on a bug reported 05-26 Sven.Hartrumpf@FernUni-Hagen.de
 (define (list-cond compare a b)

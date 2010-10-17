@@ -1,5 +1,11 @@
 2010-10-16  Per Bothner  <per@bothner.com>
 
+	Fix Savannah bug #31353 "boolean type".
+	* InstanceOf.java (apply2): If type argument is PrimType,
+	used boxed type instead.
+	(compile): Likewise.
+	* CompileReflect.java (validateApplyInstanceOf): Likewise.
+
 	* CompileInvoke.java (validateApplyInvoke): When visiting the value
 	used to set a property, use the property's language-specific type.
 

@@ -577,7 +577,7 @@ the class @code{org.apache.tools.ant.Main} directly from the Ant jar.
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
 environment.  If you want to build Kawa from source under Windows,
 you could use a Unix empulation package, such
-as the free @uref{http://sources.redhat.com/cygwin/,Cygwin}.
+as the free @uref{http://sourceware.org/cygwin/,Cygwin}.
 However, there are some problems with filenames that make this
 more complicated than it should be.  It should be possible
 to build Kawa under Cygwin using @code{gcj} as descibed above.
@@ -10288,18 +10288,18 @@ the archives through the
 @node Mailing lists, Support, Reporting bugs, Community
 @section General Kawa email and discussion
 
-The general Kawa email list is @email{kawa@@sources.redhat.com}.
+The general Kawa email list is @email{kawa@@sourceware.org}.
 This mailing list is used for announcements, questions, patches,
 and general discussion relating to Kawa.  If you wish to subscribe,
-send a blank message request to @email{kawa-subscribe@@sources.redhat.com}.
+send a blank message request to @email{kawa-subscribe@@sourceware.org}.
 To unsubscribe, send a blank message to
-@email{kawa-unsubscribe@@sources.redhat.com}.
+@email{kawa-unsubscribe@@sourceware.org}.
 (If your mail is forwarded and you're not sure which email address you're
 subscribed as send mail to the address following @code{mailto:} in the
 @code{List-Unsubscribe} line in the headers of the messages you get from
 the list.)
 
-You can browse the @uref{http://sources.redhat.com/ml/kawa/,
+You can browse the @uref{http://sourceware.org/ml/kawa/,
 archive of past messages}.
 
 There are separate mailing lists for

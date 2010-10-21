@@ -1,3 +1,11 @@
+2010-10-20  Per Bothner  <per@bothner.com>
+
+	Fixes Savannah bug #31355 "warn-access-unknown-field".
+	* SlotSet.java (compileSet): Generalize to ObjectType.
+	(compile): Likewise.
+	* CompileReflect.java (validateApplySlotGet): Generalize handling to
+	ObjectType - but not ArrayType - i.e. handle LangObjType.
+
 2010-10-16  Per Bothner  <per@bothner.com>
 
 	Fix Savannah bug #31353 "boolean type".

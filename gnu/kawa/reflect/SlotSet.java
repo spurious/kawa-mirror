@@ -152,7 +152,7 @@ public class SlotSet extends Procedure3 implements Inlineable
       return method;
   }
 
-  static void compileSet(Procedure thisProc, ClassType ctype,
+  static void compileSet(Procedure thisProc, ObjectType ctype,
                          Expression valArg, Object part, Compilation comp)
   {
     CodeAttr code = comp.getCode();
@@ -211,10 +211,10 @@ public class SlotSet extends Procedure3 implements Inlineable
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
     Member part = null;
-    if (type instanceof ClassType && arg1 instanceof QuoteExp)
+    if (type instanceof ObjectType && arg1 instanceof QuoteExp)
       {
         Object val1 = ((QuoteExp) arg1).getValue();
-        ClassType ctype = (ClassType) type;
+        ObjectType ctype = (ObjectType) type;
 	String name;
         ClassType caller = comp.curClass != null ? comp.curClass
           : comp.mainClass;
@@ -249,7 +249,7 @@ public class SlotSet extends Procedure3 implements Inlineable
 			    isStaticField ? Target.Ignore
 			    : Target.pushValue(ctype));
 	    if (returnSelf)
-	      comp.getCode().emitDup(ctype);
+	      comp.getCode().emitDup(ctype.getImplementationType());
 	    compileSet(this, ctype, args[2], part, comp);
 	    if (returnSelf)
 	      target.compileFromStack(comp, ctype);

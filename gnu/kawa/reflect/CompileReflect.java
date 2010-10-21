@@ -101,15 +101,14 @@ public class CompileReflect
     Expression[] args = exp.getArgs();
     Expression arg0 = args[0];
     Expression arg1 = args[1];
+    Object val1 = arg1.valueIfConstant();
     String name = null;
-    if (arg1 instanceof QuoteExp)
-      {
-        Object val1 = ((QuoteExp) arg1).getValue();
-        if (val1 instanceof String
-            || val1 instanceof FString
-            || val1 instanceof Symbol)
-          name = val1.toString();
-      }
+    if (val1 instanceof String
+        || val1 instanceof FString
+        || val1 instanceof Symbol)
+      name = val1.toString();
+    else
+      return exp;
     if (isStatic)
       {
         type = language.getTypeFor(arg0);
@@ -135,9 +134,11 @@ public class CompileReflect
       }
     else
       type = arg0.getType();
-    if (type instanceof ClassType && name != null)
+    if (type instanceof ArrayType)
+      return exp;
+    if (type instanceof ObjectType)
       {
-	ClassType ctype = (ClassType) type;
+	ObjectType ctype = (ObjectType) type;
 	ClassType caller = comp.curClass != null ? comp.curClass
 	  : comp.mainClass;
         Member part = gproc.lookupMember(ctype, name, caller);
@@ -179,30 +180,27 @@ public class CompileReflect
         if (type != Type.pointer_type)
           comp.error('e', "no slot `"+name+"' in "+ctype.getName());
       }
-    if (name != null && ! (type instanceof ArrayType))
-      {
-        String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
-        // So we can quickly check for "class" or "length".
-        // The name gets interned anyway when compiled.
-        fname = fname.intern();
-        String getName = ClassExp.slotToMethodName("get", name);
-        String isName = ClassExp.slotToMethodName("is", name);
-        ApplyExp nexp
-          = new ApplyExp(Invoke.invokeStatic,
-                         new Expression[] {
-                           QuoteExp.getInstance("gnu.kawa.reflect.SlotGet"),
-                           QuoteExp.getInstance("getSlotValue"),
-                           isStatic ? QuoteExp.trueExp : QuoteExp.falseExp,
-                           args[0],
-                           QuoteExp.getInstance(name),
-                           QuoteExp.getInstance(fname),
-                           QuoteExp.getInstance(getName),
-                           QuoteExp.getInstance(isName),
-                           QuoteExp.getInstance(language)});
-        nexp.setLine(exp);
-        return visitor.visitApplyOnly(nexp, null); // FIXME
-      }
-    return exp;
+
+    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name);
+    // So we can quickly check for "class" or "length".
+    // The name gets interned anyway when compiled.
+    fname = fname.intern();
+    String getName = ClassExp.slotToMethodName("get", name);
+    String isName = ClassExp.slotToMethodName("is", name);
+    ApplyExp nexp
+      = new ApplyExp(Invoke.invokeStatic,
+                     new Expression[] {
+                       QuoteExp.getInstance("gnu.kawa.reflect.SlotGet"),
+                       QuoteExp.getInstance("getSlotValue"),
+                       isStatic ? QuoteExp.trueExp : QuoteExp.falseExp,
+                       args[0],
+                       QuoteExp.getInstance(name),
+                       QuoteExp.getInstance(fname),
+                       QuoteExp.getInstance(getName),
+                       QuoteExp.getInstance(isName),
+                       QuoteExp.getInstance(language)});
+    nexp.setLine(exp);
+    return visitor.visitApplyOnly(nexp, null); // FIXME
   }
 
   public static Expression validateApplySlotSet

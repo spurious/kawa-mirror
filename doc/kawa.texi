@@ -7067,8 +7067,8 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-@deffn Syntax define-class name (supers ...) option-pair* field-or-method-decl ...
-@deffnx Syntax define-simple-class name (supers ...) option-pair* field-or-method-decl ...
+@deffn Syntax define-class name @stxlit{(}supers ...@stxlit{)} option-pair* field-or-method-decl ...
+@deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)} option-pair* field-or-method-decl ...
 @display
 @stxdef{option-pair} @var{option-keyword} @var{option-value}
 @stxdef{field-or-method} @var{field-decl} | @var{method-decl}
@@ -7097,7 +7097,7 @@ in @var{supers} should be interfaces or classes defined using
 @code{define-class}.
 
 @table @asis
-@item @code{interface:} @var{make-interface}
+@item @stxlit{interface:} @var{make-interface}
 Specifies whether Kawa generates a Java class, interface, or both.
 If @var{make-interface} is @code{#t}, then a Java interface is generated.
 In that case all the supertypes must be interfaces, and
@@ -7111,7 +7111,7 @@ are compiled to static methods.  The methods that implement the interface
 are just wrapper methods that call the real static methods.  This
 allows Kawa to implement true multiple inheritance.)
 
-@item @code{access:} @var{kind}
+@item @stxlit{access:} @var{kind}
 Specifies the Java access permission on the class.
 Can be one of @code{'public} (which is the default in Kawa),
 @code{'package} (which the default "unnamed" permission in Java code),
@@ -7122,7 +7122,7 @@ Can also be a list, as for example:
 access: '(protected volatile)
 @end example
 
-@item @code{class-name:} @code{"}@var{cname}@code{"}
+@item @stxlit{class-name:} @code{"}@var{cname}@code{"}
 Specifies the Java name of the created class.
 The @var{name} specified after @code{define-class}
 or @code{define-simple-class} is the @emph{Scheme name},
@@ -7152,10 +7152,10 @@ a different visiblity with the @code{access:} specifier.
  If @var{ftype} is specified it is the
 type of the slot.  The following @var{option-keyword}s are implemented:
 @table @asis
-@item @code{type:} @var{ftype}
+@item @stxlit{type:} @var{ftype}
 Specifies that @var{ftype} is the type of (the values of) the field.
 Equivalent to @samp{:: @var{ftype}}.
-@item @code{allocation:} @var{kind}
+@item @stxlit{allocation:} @var{kind}
 If @var{kind} is @code{'class} or @code{'static} a single slot is shared
 between all instances of the class (and its sub-classes).
 Not yet implemented for @code{define-class},
@@ -7170,27 +7170,27 @@ This is the default.
 @c You can use a keyword like @code{class:} or a string like @code{"class"}
 @c if you prefer instead of a quoted symbol like @code{'class};
 @c the latter is recommended.
-@item @code{access:} @var{kind}
+@item @stxlit{access:} @var{kind}
 Specifies the Java access permission on the field.
 Can be one of @code{'private}, @code{'protected},
 @code{'public} (which is the default in Kawa),
 or @code{'package} (which the default "unnamed" permission
 in Java code).
-@item @code{init:} @var{expr}
+@item @stxlit{init:} @var{expr}
 An expression used to initialize the slot.
 The expression is evaluated in a scope that includes the field and
 method names of the current class.
-@item @code{init-form:} @var{expr}
+@item @stxlit{init-form:} @var{expr}
 An expression used to initialize the slot.
 The lexical environment of the @var{expr} is that of the @code{define-class};
 it does @emph{not} include the field and method names of the current class.
 or @code{define-simple-class}.
-@item @code{init-value:} @var{value}
+@item @stxlit{init-value:} @var{value}
 A value expression used to initialize the slot.
 For now this is synonymous with @var{init-form:}, but that may change
 (depending on what other implementation do), so to be safe only use
 @code{init-value:} with a literal.
-@item @code{init-keyword:} @code{@var{name}:}
+@item @stxlit{init-keyword:} @code{@var{name}:}
 A keyword that that can be used to initialize instance in @code{make} calls.
 For now, this is ignored, and @var{name} should be the same as the
 field's @var{fname}.
@@ -7212,7 +7212,7 @@ then its value is doubled.
 @subsection Declaring methods
 
 @display
-@stxdef{method-decl} @stxlit{(}(@var{method-name} @var{formal-arguments}) @stxlit{::} @var{rtype}] @var{option-pair}* @var{body}@stxlit{)}
+@stxdef{method-decl} @stxlit{((}@var{method-name} @var{formal-arguments} @stxlit{)} @stxlit{::} @var{rtype}] @var{option-pair}* @var{body}@stxlit{)}
 @end display
 
 Each @var{method-decl} declares a method,
@@ -7230,21 +7230,21 @@ implemented using multiple overloaded methods.)
 A @var{method-decl} in a @code{define-simple-class}
 can have the following @var{option-keyword}s:
 @table @asis
-@item @code{access:} @var{kind}
+@item @stxlit{access:} @var{kind}
 Specifies the Java access permission on the method.
 Can be one of @code{'private}, @code{'protected},
 @code{'public}, or @code{'package}.
-@item @code{allocation:} @var{kind}
+@item @stxlit{allocation:} @var{kind}
 If @var{kind} is @code{'class} or @code{'static} creates a static method.
-@item @code{throws:} ( @var{exception-class-name} ... )
+@item @stxlit{throws:} ( @var{exception-class-name} ... )
 Specifies a list of checked exception that the method may throw.
 Equivalent to a @code{throws} specification in Java code.
 For example:
 @example
-(define-simple-class <T>
+(define-simple-class T
   (prefix)
-  ((lookup name) throws: (<java.io.FileNotFoundException>)
-   (make <java.io.FileReader> (string-append prefix name))))
+  ((lookup name) throws: (java.io.FileNotFoundException)
+   (make java.io.FileReader (string-append prefix name))))
 @end example
 @end table
 
@@ -7255,7 +7255,7 @@ superclasses and implemented interfaces.
 If the @var{body} is the special form @code{#!abstract},
 then the method is abstract.  This means the method must
 be overridden in a subclass, and you're not allowed to
-create instance of the enclosing class.
+create an instance of the enclosing class.
 
 @example
 (define-simple-class Searchable () interface: #t
@@ -7275,56 +7275,55 @@ See the example below.
 
 @subsection Example
 
-In the following example we define a simple class @code{<2d-vector>}
-and a class @code{<3d-vector>} that extends it.  (This is for illustration
+In the following example we define a simple class @code{2d-vector}
+and a class @code{3d-vector} that extends it.  (This is for illustration
 only - defining 3-dimensional points as an extension
 of 2-dimensional points does not really make sense.)
 
 @example
-(define-simple-class <2d-vector> ()
-  (x type: <double> init-keyword: x:)
-  (y type: <double> init-keyword: y:)
-  (zero-2d :: <2d-vector> allocation: 'static
-   init-value: (make <2d-vector> 0))
+(define-simple-class 2d-vector ()
+  (x ::double init-keyword: x:)
+  ;; Alternative type-specification syntax.
+  (y type: double init-keyword: y:)
+  (zero-2d :: 2d-vector allocation: 'static
+   init-value: (2d-vector 0))
   ;; An object initializer (constructor) method.
-  ((*init* (x0 :: <double>) (y0 :: <double>))
+  ((*init* (x0 ::double) (y0 ::double))
    (set! x x0)
    (set! y y0))
-  ((*init* (xy0 :: <double>))
+  ((*init* (xy0 ::double))
    ;; Call above 2-argument constructor.
-   (invoke-special <2d-vector> (this) '*init* xy0 xy0))
-  ;; Need a default constructor as well, for the  (make ..) below.
+   (invoke-special 2d-vector (this) '*init* xy0 xy0))
+  ;; Need a default constructor as well.
   ((*init*) #!void)
-  ((add (other :: <2d-vector>)) :: <2d-vector>
+  ((add (other ::2d-vector)) ::2d-vector
    ;; Kawa compiles this using primitive Java types!
-   (make <2d-vector>
-     x: (+ x (slot-ref other 'x))
-     y: (+ y (slot-ref other 'y))))
-  ((scale (factor :: <double>)) :: <2d-vector>
-   (make <2d-vector> x: (* factor x) y: (* factor y))))
+   (2d-vector
+     x: (+ x other:x)
+     y: (+ y other:y)))
+  ((scale (factor ::double)) ::2d-vector
+   (2d-vector x: (* factor x) y: (* factor y))))
 
-(define-simple-class <3d-vector> (<2d-vector>)
-  (z type: <double> init-value: 0.0 init-keyword: z:)
+(define-simple-class 3d-vector (2d-vector)
+  (z type: double init-value: 0.0 init-keyword: z:)
   ;; A constructor which calls the superclass constructor.
-  ((*init* (x0 :: <double>) (y0 :: <double>) (z0 :: <double>))
-   (invoke-special <2d-vector> (this) '*init* x0 y0)
+  ((*init* (x0 ::double) (y0 ::double) (z0 ::double))
+   (invoke-special 2d-vector (this) '*init* x0 y0)
    (set! z z0))
-  ;; Need a default constructor for the  (make ..) below.
+  ;; Need a default constructor.
   ((*init*) #!void)
-  ((scale (factor :: <double>)) :: <2d-vector>
-   ;; Note we cannot override the return type to <3d-vector>
-   ;; because Java does not allow that.  Should hide that. .
-   (make <3d-vector>
-     ;; Unfortunately, slot names of inherited classes are not visible.
-     ;; Until this is fixed, use slot-ref.
-     x: (* factor (slot-ref (this) 'x))
-     y: (* factor (*:.y (this))) ;; Alternative syntax.
+  ((scale (factor ::double)) ::2d-vector
+   ;; Note we cannot override the return type to 3d-vector
+   ;; because Kawa doesn't yet support covariant rteurn typesk.
+   (3d-vector
+     x: (* factor x)
+     y: (* factor (this):y) ;; Alternative syntax.
      z: (* factor z))))
 @end example
 
 Note we define both explicit non-default constructor methods,
 and we associate fields with keywords, so they can be named
-in a @code{make} call.  The latter requires a default constructor,
+when allocating an object.  Using keywords requires a default constructor,
 and since having non-default constructors suppresses
 the implicit default constructor we have to explicitly define it.
 Using both styles of constructors is rather redundant, though.
@@ -7349,7 +7348,7 @@ but you can get the same effect using a @code{synchronized} expression:
 @node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
 @section Anonymous classes
 
-@deffn Syntax object (supers ...) field-or-method-decl ...
+@deffn Syntax object @stxlit{(}supers ...@stxlit{)} field-or-method-decl ...
 Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display

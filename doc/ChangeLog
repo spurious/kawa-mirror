@@ -1,3 +1,8 @@
+2010-10-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes): Wrap @stxlit around more literals.
+	Modernize syntax used in example.  Fix some minor errors.
+
 2010-10-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi: Update sources.redhat.com -> sourceware.org.

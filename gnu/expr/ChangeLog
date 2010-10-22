@@ -1,3 +1,11 @@
+2010-10-21  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateApplyMethodsWithoutContext): Move copying
+	of incoming argument to vararms/#!rest array to separate ...
+	(varArgsToArray): ... new method.  Generalize so it also works
+	for the WithContext case.
+	(generateApplyMethodsWithContext): Use varArgsToArray.
+
 2010-10-17  Per Bothner  <per@bothner.com>
 
 	* IfExp.java (getTest, getThenClause, getElseClause): New accessors.

@@ -117,6 +117,8 @@ public class CallContext // implements Runnable
     return values[i];
   }
 
+  public int getArgCount () { return count; }
+
   /** Get the next incoming argument.
    * Throw WrongArguments if there are no more arguments.
    * FIXME: This and following methods don't really fit until the

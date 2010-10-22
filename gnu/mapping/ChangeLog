@@ -1,3 +1,7 @@
+2010-10-21  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (getArgCount): New method.
+
 2010-10-15  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java (getParameterType): Handle varargs methods.

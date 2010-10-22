@@ -1490,7 +1490,7 @@ public class Compilation implements SourceLocator
 	      {
 		counter = code.addLocal(Type.intType);
 		code.emitLoad(ctxVar);
-		code.emitGetField(typeCallContext.getDeclaredField("count"));
+                code.emitInvoke(typeCallContext.getDeclaredMethod("getArgCount", 0));
 		if (source.min_args != 0)
 		  {
 		    code.emitPushInt(source.min_args);
@@ -1551,17 +1551,7 @@ public class Compilation implements SourceLocator
 	      {
 		Type lastArgType = primArgTypes[explicitFrameArg+singleArgs];
 		if (lastArgType instanceof ArrayType)
-		  {
-		    Type elType
-		      = ((ArrayType) lastArgType).getComponentType();
-		    boolean mustConvert
-		      = ! "java.lang.Object".equals(elType.getName());
-		    if (mustConvert)
-		      new Error("not implemented mustConvert restarg");
-		    code.emitLoad(ctxVar);
-		    code.emitPushInt(singleArgs);
-		    code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("getRestArgsArray", 1));
-		  }
+                  varArgsToArray(source, singleArgs, counter, lastArgType, ctxVar);
 		else if ("gnu.lists.LList".equals
 			 (lastArgType.getName()))
 		  {	
@@ -1759,60 +1749,7 @@ public class Compilation implements SourceLocator
 	      {
 		Type lastArgType = primArgTypes[explicitFrameArg+singleArgs];
 		if (lastArgType instanceof ArrayType)
-		  {
-		    Type elType
-		      = ((ArrayType) lastArgType).getComponentType();
-		    boolean mustConvert
-		      = ! "java.lang.Object".equals(elType.getName());
-		    if (singleArgs == 0 && ! mustConvert)
-		      code.emitLoad(code.getArg(2)); // load args array.
-		    else
-		      {
-			code.pushScope();
-			if (counter == null)
-			  {
-			    counter = code.addLocal(Type.intType);
-			    code.emitLoad(code.getArg(2));
-			    code.emitArrayLength();
-			    if (singleArgs != 0)
-			      {
-				code.emitPushInt(singleArgs);
-				code.emitSub(Type.intType);
-			      }
-			    code.emitStore(counter);
-			  }
-			code.emitLoad(counter);
-			code.emitNewArray(elType.getImplementationType());
-			Label testLabel = new Label(code);
-			Label loopTopLabel = new Label(code);
-                        loopTopLabel.setTypes(code);
-			code.emitGoto(testLabel);
-			loopTopLabel.define(code);
-
-			code.emitDup(1); // new array
-			code.emitLoad(counter);
-			code.emitLoad(code.getArg(2));
-			code.emitLoad(counter);
-			if (singleArgs != 0)
-			  {
-			    code.emitPushInt(singleArgs);
-			    code.emitAdd(Type.intType);
-			  }
-			code.emitArrayLoad(Type.objectType);
-			if (mustConvert)
-			  {
-			    CheckedTarget.emitCheckedCoerce
-			      (this, source, source.getName(),
-			       0, elType, null);
-			  }
-			code.emitArrayStore(elType);
-			testLabel.define(code);
-			code.emitInc(counter, (short) (-1));
-			code.emitLoad(counter);
-			code.emitGotoIfIntGeZero(loopTopLabel);
-			code.popScope();	
-		      }
-		  }
+                  varArgsToArray(source, singleArgs, counter, lastArgType, null);
 		else if ("gnu.lists.LList".equals
 			 (lastArgType.getName()))
 		  {	
@@ -1857,6 +1794,85 @@ public class Compilation implements SourceLocator
       }
     method = save_method;
     curClass = save_class;
+  }
+
+  /** Copy incoming arguments to varargs/#!rest array.
+   */
+  private void varArgsToArray (LambdaExp source, int singleArgs,
+                               Variable counter, Type lastArgType,
+                               Variable ctxVar)
+  {
+    CodeAttr code = getCode();
+    Type elType = ((ArrayType) lastArgType).getComponentType();
+    boolean mustConvert = ! "java.lang.Object".equals(elType.getName());
+    if (ctxVar != null && ! mustConvert)
+      {
+        code.emitLoad(ctxVar);
+        code.emitPushInt(singleArgs);
+        code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("getRestArgsArray", 1));
+      }
+    else if (singleArgs == 0 && ! mustConvert)
+      code.emitLoad(code.getArg(2)); // load args array.
+    else
+      {
+        code.pushScope();
+        if (counter == null)
+          {
+            counter = code.addLocal(Type.intType);
+            if (ctxVar != null)
+              {
+                code.emitLoad(ctxVar);
+                code.emitInvoke(typeCallContext.getDeclaredMethod("getArgCount", 0));
+              }
+            else
+              {
+                code.emitLoad(code.getArg(2));
+                code.emitArrayLength();
+              }
+            if (singleArgs != 0)
+              {
+                code.emitPushInt(singleArgs);
+                code.emitSub(Type.intType);
+              }
+            code.emitStore(counter);
+          }
+        code.emitLoad(counter);
+        code.emitNewArray(elType.getImplementationType());
+        Label testLabel = new Label(code);
+        Label loopTopLabel = new Label(code);
+        loopTopLabel.setTypes(code);
+        code.emitGoto(testLabel);
+        loopTopLabel.define(code);
+
+        code.emitDup(1); // new array
+        code.emitLoad(counter);
+        if (ctxVar != null)
+          code.emitLoad(ctxVar);
+        else
+          code.emitLoad(code.getArg(2));
+        code.emitLoad(counter);
+        if (singleArgs != 0)
+          {
+            code.emitPushInt(singleArgs);
+            code.emitAdd(Type.intType);
+          }
+        if (ctxVar != null)
+          code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("getArgAsObject", 1));
+        else
+          code.emitArrayLoad(Type.objectType);
+        if (mustConvert)
+          {
+            CheckedTarget.emitCheckedCoerce
+              (this, source, source.getName(),
+               0, elType, null);
+          }
+        code.emitArrayStore(elType);
+        testLabel.define(code);
+        code.emitInc(counter, (short) (-1));
+        code.emitLoad(counter);
+        code.emitGotoIfIntGeZero(loopTopLabel);
+        code.popScope();	
+      }
   }
 
   private Method startClassInit ()

@@ -4,7 +4,6 @@
    by Michael Barker.
 |#
 
-(module-static 'init-run)
 (define-alias ArrayBlockingQueue java.util.concurrent.ArrayBlockingQueue)
 (define-alias BlockingQueue java.util.concurrent.BlockingQueue)
 (define-alias CountDownLatch java.util.concurrent.CountDownLatch)
@@ -156,19 +155,6 @@
       (set! total (+ total (creatures i):count)))
     (format #t "~A~2%" (get-number total))))
 
-(define (main args :: String[]) :: void
-  (let ((n :: int 600))
-    (try-catch
-     (set! n (java.lang.Integer:parse-int (args 0)))
-     (ex java.lang.Exception #!void))
-
-    (print-all-colors)
-    (newline)
-
-    (run n Color:blue Color:red Color:yellow)
-    (run n Color:blue Color:red Color:yellow Color:red Color:yellow
-         Color:blue Color:red Color:yellow Color:red Color:blue)))
-
 (define (get-number (n :: int)) :: String
   (let ((sb :: StringBuilder (StringBuilder))
         (nStr :: String (java.lang.Integer:to-string n)))
@@ -192,3 +178,15 @@
 
 (define (print-colors (c1 :: Color) (c2 :: Color)) :: void
   (format #t "~A + ~A -> ~A~%" c1 c2 (complement c1 c2)))
+
+(define (main (n::int)) ::void
+    (print-all-colors)
+    (newline)
+
+    (run n Color:blue Color:red Color:yellow)
+    (run n Color:blue Color:red Color:yellow Color:red Color:yellow
+         Color:blue Color:red Color:yellow Color:red Color:blue))
+
+(main (try-catch
+       (java.lang.Integer:parse-int (cadr (command-line)))
+       (ex java.lang.Exception 600)))

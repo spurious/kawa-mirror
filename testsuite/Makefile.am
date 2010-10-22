@@ -4,6 +4,8 @@ KAWALIB = ../kawa-$(VERSION).jar
 KAWARTLIB = ../kawart-$(VERSION).jar
 KAWA = ../bin/kawa.sh
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
+# Used to test chameneosredux
+NDIFF = ndiff
 
 if ENABLE_SERVLET
 if ENABLE_XQUERY
@@ -37,7 +39,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-binarytrees check-fannkuch check-fannkuchredux check-fasta \
+  check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
   check-knucleotide check-mandelbrot check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
@@ -158,6 +160,17 @@ check-binarytrees: binarytrees.class
 	@if diff $(srcdir)/binarytrees-output.txt binarytrees10.log; \
 	  then echo '# binarytrees test passes'; \
 	  else echo FAIL binarytrees test; fi
+
+chameneosredux.class: $(srcdir)/chameneosredux.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) --main -C $(srcdir)/chameneosredux.scm
+
+check-chameneosredux: chameneosredux.class
+	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) chameneosredux 600 >chameneosredux600.log
+	@if $(NDIFF) -fields 2-10 $(srcdir)/chameneosredux-output.txt chameneosredux600.log; \
+	  then echo '# chameneosredux test passes'; \
+	  else echo FAIL chameneosredux test; fi
 
 fannkuch.class: $(srcdir)/fannkuch.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
@@ -513,7 +526,8 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
   binarytrees.scm binarytrees-output.txt \
-  fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.tx \
+  chameneosredux.scm chameneosredux-output.txt\
+  fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.txt \
   fasta.scm fasta-output.txt \
   knucleotide.scm knucleotide-2.scm knucleotide-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \

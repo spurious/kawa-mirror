@@ -1,3 +1,12 @@
+2010-10-21  Per Bothner  <per@bothner.com>
+
+	* chameneosredux.scm:  Change so that 'main' action
+	is evaluated at top-level.
+	* chameneosredux-output.txt: New file for expected output.
+	* Makefile.am (check-chameneosredux): New rule.  Related updates.
+
+	* Makefile.am (EXTRA_DIST): Fix typo.
+
 2010-10-21  Jamison Hope  <jrh@theptrgroup.com>
 
 	* chameneosredux.scm: New benchmark "shootout" program.
@@ -10,7 +19,7 @@
 2010-10-15  Per Bothner  <per@bothner.com>
 
 	* fannkuchredux.scm: New "shootout" program.
-	* fannkuchredux-output.txt: new files for expected output.
+	* fannkuchredux-output.txt: New file for expected output.
 	* inlining.expected: Add btecode for fannkuchredux#fannkuch.
 	* Makefile.am: Update accordingly.
 

@@ -195,43 +195,63 @@ public class Invoke extends ProcedureN
     else
       {
         CallContext vars = CallContext.getInstance();
-        int err = proc.matchN(args, vars);
-        if (err == 0)
-          return vars.runUntilValue();
+        int keywordStart = 0;
+        while (keywordStart < args.length
+               && ! (args[keywordStart] instanceof Keyword))
+          keywordStart++;
 
-        if ((nargs & 1) == 1)
+        Object result;
+        int err = MethodProc.NO_MATCH;
+        if (keywordStart == args.length)
           {
-            // Check if args is a set of (keyword,value)-pairs.
-            for (int i = 1;  ;  i += 2)
-              {
-                if (i == nargs)
-                  {
-                    Object result;
-                    result = proc.apply1(args[0]);
-                    for (i = 1;  i < nargs;  i += 2)
-                      {
-                        Keyword key = (Keyword) args[i];
-                        Object arg = args[i+1];
-                        SlotSet.apply(false, result, key.getName(), arg);
-                      }
-                    return result;
-                  }
-                if (! (args[i] instanceof Keyword))
-                  break;
-              }
-          }
-        MethodProc vproc = ClassMethods.apply((ClassType) dtype, "valueOf",
-                                              '\0', language);
-        if (vproc != null)
-          {
-            Object[] margs = new Object[nargs-1];
-            System.arraycopy(args, 1, margs, 0, nargs-1);
-            err = vproc.matchN(margs, vars);
+            err = proc.matchN(args, vars);
             if (err == 0)
               return vars.runUntilValue();
+
+            MethodProc vproc = ClassMethods.apply((ClassType) dtype, "valueOf",
+                                                  '\0', language);
+            if (vproc != null)
+              {
+                Object[] margs = new Object[nargs-1];
+                System.arraycopy(args, 1, margs, 0, nargs-1);
+                err = vproc.matchN(margs, vars);
+                if (err == 0)
+                  return vars.runUntilValue();
+              }
+            result = proc.apply1(args[0]);
+          }
+        else
+          {
+            Object[] cargs = new Object[keywordStart];
+            System.arraycopy(args, 0, cargs, 0, keywordStart);
+            result = proc.applyN(cargs);
           }
 
-        throw MethodProc.matchFailAsException(err, proc, args);
+        int i = keywordStart;
+        // Look for (keyword,value)-pairs.
+        for (; i + 1 < args.length;  i += 2)
+          {
+            Object arg = args[i];
+            if (! (arg instanceof Keyword))
+              break;
+            Keyword key = (Keyword) arg;
+            arg = args[i+1];
+            SlotSet.apply(false, result, key.getName(), arg);
+          }
+
+        if (keywordStart == args.length)
+          i = 1;
+        if (i != args.length)
+          {
+            MethodProc aproc = ClassMethods.apply((ClassType) dtype, "add",
+                                              '\0', language);
+            if (aproc == null)
+              throw MethodProc.matchFailAsException(err, proc, args);
+            while (i < args.length)
+              aproc.apply2(result, args[i++]);
+          }
+
+        return result;
       }
   }
 

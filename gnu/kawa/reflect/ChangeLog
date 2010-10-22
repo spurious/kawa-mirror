@@ -1,3 +1,10 @@
+2010-10-22  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Allow constructor
+	arguments before keyword setters.
+	* Invoke.java (applyN): Update to support (most of) the newer
+	functionality supported by the compiler.
+
 2010-10-20  Per Bothner  <per@bothner.com>
 
 	Fixes Savannah bug #31355 "warn-access-unknown-field".

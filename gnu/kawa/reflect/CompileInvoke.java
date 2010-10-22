@@ -159,16 +159,17 @@ public class CompileInvoke
           }
         int index = -1;
         Object[] slots;
-        PrimProcedure[] addMethods;
-        if ((numCode <= 0 || hasKeywordArgument(argsStartIndex, args))
-            && kind == 'N'
-            // There is a default constructor.
-            && (ClassMethods.selectApplicable(methods,
-                                              new Type[] { Compilation.typeClassType })
-                >> 32) == 1
-            && (slots = checkKeywords(ctype, args, 1, caller)) != null
-            && (2 * slots.length == (args.length - 1)
-                || ClassMethods.selectApplicable(addMethods = ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
+        int keywordStart;
+        if (kind == 'N'
+            && ((keywordStart = hasKeywordArgument(1, args)) < args.length
+                || (numCode <= 0
+                    // There is a default constructor.
+                    && (ClassMethods.selectApplicable(methods,
+                                                      new Type[] { Compilation.typeClassType })
+                        >> 32) == 1))
+            && ((slots = checkKeywords(ctype, args, keywordStart, caller))
+                .length * 2 == (args.length - keywordStart)
+                || ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
           {
             StringBuffer errbuf = null;
             for (int i = 0;  i < slots.length;  i++)
@@ -196,8 +197,15 @@ public class CompileInvoke
               }
             else
               {
-                ApplyExp ae = new ApplyExp(methods[0],
-                                           new Expression[] { arg0 });
+                ApplyExp ae;
+                if (keywordStart < args.length)
+                  {
+                    Expression[] xargs = new Expression[keywordStart];
+                    System.arraycopy(args, 0, xargs, 0, keywordStart);
+                    ae = (ApplyExp) visitor.visit(new ApplyExp(exp.getFunction(), xargs), ctype);
+                  }
+                else
+                  ae = new ApplyExp(methods[0], new Expression[] { arg0 });
                 ae.setType(ctype);
                 Expression e = ae;
                 if (args.length > 0)
@@ -214,13 +222,14 @@ public class CompileInvoke
                           stype = null;
                         if (stype != null)
                           stype = iproc.language.getLangTypeFor(stype);
-                        Expression arg = visitor.visit(args[2 * i + 2], stype);
+                        Expression arg = visitor.visit(args[keywordStart + 2 * i + 1], stype);
                         Expression[] sargs
-                          = { ae, new QuoteExp(slot),  arg};
+                          = { ae, new QuoteExp(slot), arg};
                         ae = new ApplyExp(SlotSet.setFieldReturnObject, sargs);
                         ae.setType(ctype);
                       }
-                    int sargs = 2 * slots.length + 1;
+                    int sargs = keywordStart == args.length ? 1
+                      : 2 * slots.length + keywordStart;
                     e = ae;
                     if (sargs < args.length)
                       {
@@ -464,14 +473,14 @@ public class CompileInvoke
                                    caller, iproc.language);
   }
 
-  static boolean hasKeywordArgument (int argsStartIndex, Expression[] args)
+  static int hasKeywordArgument (int argsStartIndex, Expression[] args)
   {
     for (int i = argsStartIndex; i < args.length; i++)
       {
         if (args[i].valueIfConstant() instanceof Keyword)
-          return true;
+          return i;
       }
-    return false;
+    return args.length;
  }
 
   private static long selectApplicable(PrimProcedure[] methods,

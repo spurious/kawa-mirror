@@ -27,7 +27,10 @@ public class Q2Read extends LispReader
     super(port, messages);
     init();
   }
-  
+
+  /** Skip initial tabs and spaces.
+   * @return indentation, encoded as @{code (numberOfTabs<<16)+numberOfSpaces}.
+   */
   int skipIndentation ()
       throws java.io.IOException, SyntaxException
   {
@@ -49,6 +52,92 @@ public class Q2Read extends LispReader
     return (numTabs << 16) + numSpaces;
   }
 
+  int curIndentation;
+
+  /** Read a "command".
+   * Assume curIndentation has been set.
+   * After return, the read position is before the first non-WS character
+   * of the next command (on the next line); curIndentation has been
+   * updated to that of the initial whitespace of that line; and a
+   * mark() has been set of the start of the line.
+   * Exception: If PARSE_ONE_LINE, return position is *before* newline,
+   * and mark is not set.
+   */
+  Object readIndentCommand ()
+    throws java.io.IOException, SyntaxException
+  {
+    int startIndentation = curIndentation;
+    LList rresult = LList.Empty;
+    Object obj = LList.Empty;
+    PairWithPosition pair = null, last = null;
+
+    for (;;)
+      {
+	int ch = read();
+	if (ch < 0)
+	  break;
+	if (ch == ' ' || ch == '\t')
+	  continue;
+	unread();
+	if (ch == ')')
+	  break;
+        if (ch == '\r' || ch == '\n')
+          {
+	    if (singleLine())
+	      break;
+	    ch = read();
+            port.mark(Integer.MAX_VALUE);
+	    int subIndentation = skipIndentation(); // skipHorSpace.
+            LList qresult = LList.Empty;
+            curIndentation = subIndentation;
+            for (;;)
+              {
+                if (curIndentation == -1)
+                  break;
+                if (subIndentation != curIndentation)
+                  {
+                    break;
+                  }
+                int comparedIndent = Q2.compareIndentation(subIndentation, startIndentation);
+                if (comparedIndent == Integer.MIN_VALUE)
+                  {
+                    error('e', "cannot compare indentation - mix of tabs and spaces");
+                    break;
+                  }
+                if (comparedIndent == -1 || comparedIndent == 1)
+                  {
+                    error('e', "indentation must differ by 2 or more");
+                    break;
+                  }
+                if (comparedIndent <= 0)
+                  {
+                    // reset to start of line FIXME
+                    break;
+                  }
+                // comparedIndent >= 2
+                int line = port.getLineNumber();
+                int column = port.getColumnNumber();
+                Object val = readIndentCommand();
+                qresult = makePair(val, qresult, line, column);
+              }
+            if (qresult != LList.Empty)
+              {
+                qresult = new Pair(kawa.standard.begin.begin,
+                                   LList.reverseInPlace(qresult));
+                rresult = new Pair(qresult, rresult);
+              }
+            break;
+          }
+        int line = port.getLineNumber();
+        int column = port.getColumnNumber();
+
+        Object val = readObject();
+
+        rresult = makePair(val, rresult, line, column);
+      }
+    return LList.reverseInPlace(rresult);
+  }
+
   boolean singleLine()
   {
     return interactive && nesting == 0;
@@ -57,8 +146,94 @@ public class Q2Read extends LispReader
   public Object readCommand ()
       throws java.io.IOException, SyntaxException
   {
-    return readCommand(false);
+    int indent = skipIndentation();
+    if (indent < 0)
+      return Sequence.eofValue;
+    curIndentation = indent;
+    Object result = readIndentCommand();
+    if (! interactive)
+      port.reset();
+    return result;
   }
+
+  // RULE: Every newline (not preceded by backslash)
+  //   is equivalent to ';'
+  // RULE: If a line is followed by one or more lines that are
+  //   indented more, add a '(BEGIN' at the end of this line, and
+  //   and a ')' at the end of the last line indented more.
+  // RULE: Forms separate ';' make a "block": Each form is
+  //   either a declaration (visible throughout the block);
+  //   or an expression.  Value of block is concatenation of
+  //   values of expressions (producting multiple values).
+  //   
+  /* if parens:
+     x + (a b
+            c d
+              e f) + y
+    == x + (a b (c d (e f))) + y [OLD]
+    == x + (a b (c d (; e f))) + y OR[*]
+    == x + (a b; c d (; e f)) + y
+    [*] New RULE[?]: Indentation relative to most recent lparen
+
+    What about:
+       x + (a b
+        c d
+        e f) + y
+    == x + (a b (; c d (; e f))) + y OR
+       ERROR
+     */
+    /*
+      a b (d e
+        f g h)
+     */
+    /*
+      a b c
+        d e
+    */
+    /* <body>
+       [%x%]
+          a b c
+          e f g
+            h i
+          j k
+      == [%x%] (CONCAT (a b c) (e f g (h i)) (j k))
+      == [%x%] (; a b c; e f g (; h i); j k)
+
+       [%x%] a b c
+          e f g
+      == ???
+       [%x%] a b c (e f g)
+      OR:
+       [%x%] (CONCAT (a b c) (e f g))
+      == [%x%] a b c (; e f g)
+
+    f a b c
+        d e
+    == f a (b c) (d e) [probably not]
+    == f a b c (; d e)
+
+    if e1
+    then
+       a b
+       c d
+    else
+       e f
+       g h
+    ==
+      if e1 then (CONCAT (a b) (c d)) else (CONCAT (e f) (g h))
+
+    f
+      a b
+      c d
+    == f (CONCAT (a b) (c d))
+    OR f (a b) (c d)
+    == f (; a b; c d)
+    DEPENDING ON f
+    Even if former, what about explicit:
+    f (a b) (c d)
+    Same?
+    Depends on whether f takes a <body> or an <arguments>
+    */
 
   public Object readCommand (boolean forceList)
       throws java.io.IOException, SyntaxException
@@ -120,7 +295,7 @@ public class Q2Read extends LispReader
 			  }
 			last = (PairWithPosition)
 			  makePair(np, port.getLineNumber(), column);
-			p.setCdr(last);
+			p.setCdrBackdoor(last);
 		      }
 		    break;
 		  }

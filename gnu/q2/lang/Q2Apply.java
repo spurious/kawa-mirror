@@ -12,10 +12,17 @@ public class Q2Apply extends MethodProc
   {
     Object endMarker = Special.dfault;
     Object arg = ctx.getNextArg(endMarker);
-    if (arg instanceof Procedure)
+    if (arg instanceof Procedure || arg instanceof gnu.bytecode.Type || arg instanceof Class)
       {
-	Procedure proc = (Procedure) arg;
+	Procedure proc;
 	Vector vec = new Vector();
+        if (arg instanceof Procedure)
+          proc = (Procedure) arg;
+        else
+          {
+            vec.add(arg);
+            proc = gnu.kawa.reflect.Invoke.make;
+          }
 	for (;;)
 	  {
 	    arg = ctx.getNextArg(endMarker);

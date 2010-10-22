@@ -1094,12 +1094,17 @@ public class LispReader extends Lexer
 
   protected Pair makePair (Object car, int line, int column)
   {
+    return makePair(car, LList.Empty, line, column);
+  }
+
+  protected Pair makePair (Object car, Object cdr, int line, int column)
+  {
     String pname = port.getName();
     if (pname != null && line >= 0)
-      return PairWithPosition.make(car, LList.Empty,
+      return PairWithPosition.make(car, cdr,
                                    pname, line + 1, column + 1);
     else
-      return Pair.make(car, LList.Empty);
+      return Pair.make(car, cdr);
   }
 
   protected void setCdr (Object pair, Object cdr)

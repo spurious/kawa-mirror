@@ -1,3 +1,7 @@
+2010-10-21  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (makePair): New overloaded method.
+
 2010-10-15  Per Bothner  <per@bothner.com>
 
 	* LangObjType.java (convertValue): Just return null for 'integer',

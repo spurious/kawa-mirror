@@ -1,3 +1,7 @@
+2010-10-21  Jamison Hope  <jrh@theptrgroup.com>
+
+	* chameneosredux.scm: New benchmark "shootout" program.
+
 2010-10-16  Per Bothner  <per@bothner.com>
 	    Helmut Eller  <eller.helmut@gmail.com>
 

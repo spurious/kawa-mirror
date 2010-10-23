@@ -1,5 +1,7 @@
 package gnu.kawa.functions;
 import gnu.lists.*;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.text.MessageFormat;
 import gnu.text.ReportFormat;
 import gnu.mapping.*;
@@ -7,40 +9,58 @@ import gnu.mapping.*;
 public class Format extends ProcedureN
 {
   public static final Format format = new Format();
-  static { format.setName("format"); }
+  static {
+    format.setName("format");
+    format.setProperty(Procedure.validateApplyKey,
+                       "gnu.kawa.functions.CompileMisc:validateApplyFormat");
+  }
 
-  public static void format(OutPort dst, Object[] args, int arg_offset)
+  public static void format (Writer dst, Object[] args, int arg_offset)
   {
     Object format = args[arg_offset++];
     Object[] vals = new Object[args.length - arg_offset];
     System.arraycopy(args, arg_offset, vals, 0, vals.length);
-    if (format instanceof MessageFormat)
+    formatToWriter(dst, format, vals);
+  }
+
+  public static void formatToWriter (Writer dst, Object format, Object... vals)
+  {
+    if (dst == null)
+      dst = OutPort.outDefault();
+    try
       {
-	String out = ((MessageFormat) format).format(vals);
-	dst.print(out);
-      }
-    else
-      {
-	if (! (format instanceof ReportFormat))
-	  format = ParseFormat.parseFormat.apply1(format);
-	try
-	  {
+        if (format instanceof MessageFormat)
+          {
+            String out = ((MessageFormat) format).format(vals);
+            dst.write(out);
+          }
+        else
+          {
+            if (! (format instanceof ReportFormat))
+              format = ParseFormat.parseFormat.apply1(format);
 	    ((ReportFormat) format).format(vals, 0, dst, null);
 	  }
-	catch (java.io.IOException ex)
-	  {
-	    throw new RuntimeException("Error in format: "+ ex);
-	  }
+      }
+    catch (java.io.IOException ex)
+      {
+        throw new RuntimeException("Error in format: "+ ex);
       }
   }
 
-  public static FString formatToString (Object[] args, int arg_offset)
+  public static void formatToOutputStream (OutputStream dst, Object format, Object... vals)
+  {
+    OutPort port = new OutPort(dst);
+    format(port, format, vals);
+    port.closeThis();
+  }
+
+  public static String formatToString (int arg_offset, Object... args)
   {
     CharArrayOutPort port = new CharArrayOutPort();
     format(port, args, arg_offset);
-    char[] chars = port.toCharArray();
+    String str = port.toString();
     port.close ();
-    return new FString(chars);
+    return str;
   }
 
   /**
@@ -50,7 +70,7 @@ public class Format extends ProcedureN
    * @param fmt the format string or specification
    * @param args the arguments to be formatted
    */
-  public static FString formatToString(char style, Object fmt, Object[] args)
+  public static FString formatToFString (char style, Object fmt, Object[] args)
   {
     ReportFormat rfmt = ParseFormat.asFormat(fmt, style);
     CharArrayOutPort port = new CharArrayOutPort();
@@ -90,7 +110,7 @@ public class Format extends ProcedureN
       }
     else if (port_arg == Boolean.FALSE)
       {
-	return formatToString(args, 1);
+	return formatToString(1, args);
       }
     else if (port_arg instanceof MessageFormat
              /* #ifdef use:java.lang.CharSequence */
@@ -100,28 +120,28 @@ public class Format extends ProcedureN
              /* #endif */
 	     || port_arg instanceof ReportFormat)
       {
-	return formatToString(args, 0);
+	return formatToString(0, args);
       }
-    else if (port_arg instanceof OutPort)
+    else if (port_arg instanceof Writer)
       {
-	format((OutPort) port_arg, args, 1);
+	format((Writer) port_arg, args, 1);
 	return Values.empty;
       }
-    else if (port_arg instanceof java.io.Writer)
-      { 
-	OutPort port = new OutPort((java.io.Writer) port_arg);
-        format(port, args, 1);
-	port.closeThis();
-	return Values.empty;
-      } 
-    else if (port_arg instanceof java.io.OutputStream)
-      { 
-	OutPort port = new OutPort((java.io.OutputStream) port_arg);
-        format(port, args, 1);
-	port.closeThis();
+    else if (port_arg instanceof OutputStream)
+      {
+        formatToOutputStream((OutputStream) port_arg,
+                             args[1], drop2(args));
 	return Values.empty;
       }
     else
       throw new RuntimeException("bad first argument to format");
+  }
+
+  static Object[] drop2 (Object[] vals)
+  {
+    int xlen = vals.length - 2;
+    Object[] xvals = new Object[xlen];
+    System.arraycopy(vals, 2, xvals, 0, xlen);
+    return xvals;
   }
 }

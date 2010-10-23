@@ -55,7 +55,7 @@
 		 (setq place (cons x place)))))
 
 (define (format fmt #!rest (args :: <Object[]>))
-  (invoke-static 'gnu.kawa.functions.Format 'formatToString #\% fmt args))
+  (invoke-static 'gnu.kawa.functions.Format 'formatToFString #\% fmt args))
 
 (define (quit-char) #\bel)
 

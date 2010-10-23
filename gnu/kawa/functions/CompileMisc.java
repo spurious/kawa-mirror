@@ -88,6 +88,51 @@ public class CompileMisc implements Inlineable
     return exp.inlineIfConstant(proc, visitor);
   }
 
+  /** Validate-apply handling for "format".
+   * Sets the correct return-type, and may replace by call to a static method.
+   */
+  public static Expression validateApplyFormat
+  (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
+  {
+    exp.visitArgs(visitor);
+    Type retType = Type.objectType;
+    Expression[] args = exp.getArgs();
+    if (args.length > 0)
+      {
+        ClassType typeFormat = ClassType.make("gnu.kawa.functions.Format");
+        Object f = args[0].valueIfConstant();
+        Type ftype = args[0].getType();
+        if (f == Boolean.FALSE || ftype.isSubtype(LangObjType.stringType))
+          {
+            int skip = f == Boolean.FALSE ? 1 : 0;
+            Expression[] xargs = new Expression[args.length+1-skip];
+            xargs[0] = new QuoteExp(Integer.valueOf(0), Type.intType);
+            System.arraycopy(args, skip, xargs, 1, xargs.length-1);
+            ApplyExp ae = new ApplyExp(typeFormat.getDeclaredMethod("formatToString", 2), xargs);
+            ae.setType(Type.javalangStringType);
+            return ae;
+          }
+        if (f == Boolean.TRUE
+            || ftype.isSubtype(ClassType.make("java.io.Writer")))
+          {
+            if (f == Boolean.TRUE)
+              {
+                Expression[] xargs = new Expression[args.length];
+                xargs[0] = QuoteExp.nullExp;
+                System.arraycopy(args, 1, xargs, 1, args.length-1);
+                args = xargs;
+              }
+            ApplyExp ae = new ApplyExp(typeFormat.getDeclaredMethod("formatToWriter", 3), args);
+            ae.setType(Type.voidType);
+            return ae;
+          }
+        if (ftype.isSubtype(ClassType.make("java.io.OutputStream")))
+          retType = Type.voidType;
+      }
+    exp.setType(retType);
+    return null;
+  }
+
   public static Expression validateApplyAppendValues
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {

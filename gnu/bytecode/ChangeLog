@@ -1,3 +1,12 @@
+2010-10-24  Per Bothner  <per@bothner.com>
+
+	* Type.java (getSignature): Make non-final.
+	* ArrayType.java (<init>): Don't set signature yet, instead set it
+	lazily, as component type might not have a name yet.
+	(getSignature): If signature field is null, set it now.
+	* Field.java (assign_constants): Use getSignature method.
+	* LocalVarsAttr.java: Likewise.
+
 2010-10-23  Per Bothner  <per@bothner.com>
 
 	* Type.java (isExisting): New method.

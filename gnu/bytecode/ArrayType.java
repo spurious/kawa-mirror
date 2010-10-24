@@ -18,8 +18,14 @@ public class ArrayType extends ObjectType
   ArrayType (Type elements, String name)
   {
     this_name = name;
-    setSignature("[" + elements.getSignature());
     this.elements = elements;
+  }
+
+  public String getSignature ()
+  {
+    if (signature == null)
+      setSignature("[" + elements.getSignature());
+    return signature;
   }
 
   public Type getImplementationType()

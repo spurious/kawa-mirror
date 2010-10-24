@@ -115,7 +115,7 @@ public class LocalVarsAttr extends Attribute
 	      var.name_index = cl.getConstants().addUtf8(var.getName()).index;
 	    if (var.signature_index == 0)
 	      var.signature_index
-		= cl.getConstants().addUtf8(var.getType().signature).index;
+		= cl.getConstants().addUtf8(var.getType().getSignature()).index;
 	  }
       }
   }

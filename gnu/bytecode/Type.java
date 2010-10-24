@@ -149,7 +149,7 @@ public abstract class Type
     return type;
   }
 
-  public final String getSignature () { return signature; }
+  public String getSignature () { return signature; }
   protected void setSignature(String sig) { this.signature = sig; }
 
   Type (String nam, String sig) {

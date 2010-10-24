@@ -74,7 +74,7 @@ public class Field extends Location implements AttrContainer, Member {
     if (name_index == 0 && name != null)
       name_index = constants.addUtf8(name).index;
     if (signature_index == 0 && type != null)
-      signature_index = constants.addUtf8(type.signature).index;
+      signature_index = constants.addUtf8(type.getSignature()).index;
     Attribute.assignConstants(this, classfile);
   }
 

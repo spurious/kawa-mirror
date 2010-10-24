@@ -330,9 +330,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     for (int i = nTypes;  --i >= 0; )
       {
 	Type javaType = pTypes[i];
-        if (javaType instanceof ClassType
-            && ! ((ClassType) javaType).isExisting())
-          continue;
 	Type langType = language.getLangTypeFor(javaType);
 	if (javaType != langType)
 	  {

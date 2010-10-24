@@ -1,3 +1,9 @@
+2010-10-23  Per Bothner  <per@bothner.com>
+
+	* Language.java (getLangTypeFor): Can simplify now.
+	(getTypeFor): Handle ReferenceExp that dereferences to a ClassExp.
+	* PrimProcedure.java (<init>): Can simplify.
+
 2010-10-21  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateApplyMethodsWithoutContext): Move copying

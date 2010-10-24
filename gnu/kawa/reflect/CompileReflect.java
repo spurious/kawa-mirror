@@ -13,7 +13,7 @@ public class CompileReflect
    */
   public static int checkKnownClass (Type type, Compilation comp)
   {
-    if (type instanceof ClassType && ((ClassType) type).isExisting())
+    if (type instanceof ClassType && type.isExisting())
       {
         try
           {

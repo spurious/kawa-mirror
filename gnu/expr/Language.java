@@ -553,7 +553,7 @@ public abstract class Language
 
   public final Type getLangTypeFor (Type type)
   {
-    if (! (type instanceof ObjectType) || ((ObjectType) type).isExisting())
+    if (type.isExisting())
       {
         Class clas = type.getReflectClass();
         if (clas != null)
@@ -647,6 +647,10 @@ public abstract class Language
               {
 		Object val = ((QuoteExp) exp).getValue();
                 return getTypeFor(val, lenient);
+              }
+            else if (exp instanceof ClassExp || exp instanceof ModuleExp)
+              {
+                return ((LambdaExp) exp).getClassType();
               }
 	    else if (decl.isAlias()
 		&& exp instanceof QuoteExp)

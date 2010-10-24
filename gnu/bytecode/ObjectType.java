@@ -42,7 +42,7 @@ public class ObjectType extends Type
     if (t == this)
       return (flags & EXISTING_CLASS) != 0;
     else
-      return ! (t instanceof ObjectType) || ((ObjectType) t).isExisting();
+      return t.isExisting();
   }
 
   public final void setExisting(boolean existing)

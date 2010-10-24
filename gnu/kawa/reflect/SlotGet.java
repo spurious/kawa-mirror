@@ -287,11 +287,8 @@ public class SlotGet extends Procedure2
               }
             else
               code.emitGetField(field);
-	    Type ftype = field.getType();
-	    Class fclass = ftype.getReflectClass();
-	    if (fclass != null)
-	      ftype = language.getTypeFor(fclass);
-	    target.compileFromStack(comp, ftype);
+            Type ftype = language.getLangTypeFor(field.getType());
+            target.compileFromStack(comp, ftype);
             return;
           }
         if (part instanceof Method)

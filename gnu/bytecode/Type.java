@@ -43,6 +43,12 @@ public abstract class Type
     return this;
   }
 
+  public boolean isExisting()
+  {
+    // Overridden in ObjectType.
+    return true;
+  }
+
   static ClassToTypeMap mapClassToType;
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */

@@ -101,7 +101,9 @@
     (<gnu.expr.IfExp> 
      `(if ,(unrewrite (! get-test exp))
 	  ,(unrewrite (! get-then-clause exp))
-	  ,(unrewrite (! get-else-clause exp))))
+	  ,@(let ((eclause (! get-else-clause exp)))
+	      (if (eq? eclause #!null) '()
+		  (list (unrewrite eclause))))))
     (#t exp)))
 
 (define (unrewrite* (exps <gnu.expr.Expression[]>))

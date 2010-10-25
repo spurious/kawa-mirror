@@ -650,6 +650,7 @@ public abstract class Language
               }
             else if (exp instanceof ClassExp || exp instanceof ModuleExp)
               {
+                decl.setCanRead(true);
                 return ((LambdaExp) exp).getClassType();
               }
 	    else if (decl.isAlias()

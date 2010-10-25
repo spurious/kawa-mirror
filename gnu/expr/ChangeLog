@@ -1,3 +1,7 @@
+2010-10-24  Per Bothner  <per@bothner.com>
+
+	* Language.java (getTypeFor): Do setCanRead on ClassExp.
+
 2010-10-23  Per Bothner  <per@bothner.com>
 
 	* Language.java (getLangTypeFor): Can simplify now.

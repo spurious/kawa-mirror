@@ -2076,6 +2076,20 @@ Same as @code{include}, except that the @var{path} is relative to the
 path of the source-file containing the @code{include-file}.
 @end deffn
 
+@deffn Procedure expand form
+The result of evaluating @var{form} is treated as a Scheme expression,
+syntax-expanded to internal form, and then converted back to (roughly)
+the equivalent expanded Scheme form.
+
+This can be useful for debugging macros.
+
+To access this function, you must first @code{(require 'syntax-utils)}.
+@example
+(require 'syntax-utils)
+(expand '(cond ((> x y) 0) (else 1))) @result{} (if (> x y) 0 1)
+@end example
+@end deffn
+
 @node Multiple values, Symbols and namespaces, Syntax, Top
 @chapter Multiple values
 

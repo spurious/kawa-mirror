@@ -1,3 +1,8 @@
+2010-10-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Syntax and conditional compilation): Document
+	new 'expand' function.
+
 2010-10-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes): Wrap @stxlit around more literals.

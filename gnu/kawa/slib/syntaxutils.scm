@@ -1,9 +1,9 @@
-;; macroexpand.scm --- Expand macros in S-exps.
+;; syntaxexpand.scm --- Expand macros in S-exps.
 ;;
 ;; This code was written by Helmut Eller and has been placed in the
 ;; public domain.
 
-(module-export macroexpand)
+(module-export expand)
 
 (module-static #t)
 
@@ -64,7 +64,7 @@
 
 
 ;; Take a S-expression and return a Sexp with all macros expanded.
-(define (macroexpand sexp #!key (env (interaction-environment)))
+(define (expand sexp #!key (env (interaction-environment)))
   (unrewrite (rewrite-form `(begin ,sexp) env: env)))
 
 ;; Take a Sexp and return the expanded Expression tree.

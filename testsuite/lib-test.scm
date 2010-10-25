@@ -1,4 +1,4 @@
-(test-begin "libs" 33)
+(test-begin "libs" 48)
 
 (import (srfi :2 and-let*))
 
@@ -102,5 +102,28 @@
 (test-equal
  '("version 1" "version 2")
  (test-ev-req))
+
+(require 'syntax-utils)
+(test-equal 'x (expand 'x))
+(test-equal 1 (expand 1))
+(test-equal '(let ((x 10)) x) (expand '(let ((x 10)) x)))
+(test-equal '(lambda (x) x) (expand '(lambda (x) x)))
+(test-equal '(if x 'a 'b) (expand '(if x 'a 'b)))
+(test-equal '(set x 10) (expand '(set! x 10)))
+(test-equal '(begin (x) (y)) (expand '(begin (x) (y))))
+(test-equal "foo" (expand "foo"))
+(test-equal '(quote (a b c)) (expand ''(a b c)))
+(test-equal #f (expand '#f))
+(test-equal #t (expand '#t))
+(test-equal '(if (= x 1) (quote a) (if (= x 2) (quote b)))
+      (expand '(cond ((= x 1) 'a)
+			  ((= x 2) 'b))))
+(test-equal '((let ((loop #!undefined)) 
+	  (begin (set loop (lambda () (loop))) loop)))
+      (expand '(let loop () (loop))))
+(test-equal '(let ((x #!undefined)) (set x 10))
+      (expand '(define x 10)))
+(test-equal '(as <java.lang.String> (quote a))
+      (expand '(as String 'a)))
 
 (test-end)

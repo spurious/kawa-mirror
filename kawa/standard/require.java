@@ -100,6 +100,7 @@ public class require extends Syntax
     map("gui", SLIB_PREFIX + "gui");
     map("swing-gui", SLIB_PREFIX + "swing");
     map("android-defs", "gnu.kawa.android.defs");
+    map("syntax-utils", SLIB_PREFIX + "syntaxutils");
   }
 
   public static String mapFeature(String featureName)

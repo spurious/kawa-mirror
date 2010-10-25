@@ -1,5 +1,9 @@
 2010-10-24  Per Bothner  <per@bothner.com>
 
+	* syntaxutils.scm (macroexpand): Rename to ...
+	(expand): ... new name.
+	* Makefile.am (java_SCM): Add syntaxutils.scm.
+
 	* syntaxutils.scm (unrewrite): Check for #!null else in IfExp.
 
 2010-10-24  Helmut Eller <eller.helmut@gmail.com>

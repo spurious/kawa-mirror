@@ -18,7 +18,7 @@ java_SCM = DefineRecordType.scm readtable.scm \
   srfi1.scm srfi2.scm \
   conditions.scm srfi13.scm srfi34.scm \
   srfi37.scm srfi69.scm pregexp.scm \
-  genwrite.scm pp.scm ppfile.scm printf.scm \
+  genwrite.scm pp.scm ppfile.scm printf.scm syntaxutils.scm \
   cut.scm testing.scm $(XML_SCM) gui.scm $(SWING_SCM)
 EXTRA_DIST = $(java_SCM) XML.scm swing.scm
 

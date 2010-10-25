@@ -1,3 +1,8 @@
+2010-10-24  Helmut Eller  <eller.helmut@gmail.com>
+            Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: New tests for syntax-utils's expand function.
+
 2010-10-23  Per Bothner  <per@bothner.com>
 
 	* inlining.expected: Update.  Optimization of format led to

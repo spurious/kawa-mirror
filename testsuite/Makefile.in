@@ -200,7 +200,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   fasta.scm fasta-output.txt \
   knucleotide.scm knucleotide-2.scm knucleotide-output.txt \
   mandelbrot.scm mandelbrot-output.bmp \
-  nbody.scm nbody-output.txt \
+  meteor.scm meteor-output.txt nbody.scm nbody-output.txt \
   nsieve.scm nsieve-output.txt \
   pidigits.scm pidigits-output.txt \
   regexdna.scm regexdna-output.txt \
@@ -407,7 +407,7 @@ check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
-  check-knucleotide check-mandelbrot check-nbody \
+  check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
   check-spectralnorm check-threadring
 check2:  check-scm check-misc check-mac check-obj check-polytype
@@ -597,6 +597,16 @@ check-knucleotide-2: knucleotide2.class knucleotide-input.txt
 	  then echo '# knucleotide2 test passes'; \
 	  else echo FAIL knucleotide2 test; fi
 check-knucleotide: check-knucleotide-1 check-knucleotide-2
+
+meteor.class: $(srcdir)/meteor.scm
+	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) $(WARN_FLAGS) --main -C $(srcdir)/meteor.scm
+
+check-meteor: meteor.class
+	$(KAWA) meteor 2098 >meteor2098.log
+	@if diff $(srcdir)/meteor-output.txt meteor2098.log; \
+	  then echo '# meteor test passes'; \
+	  else echo FAIL meteor test; fi
 
 nbody.class: $(srcdir)/nbody.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \

@@ -244,7 +244,14 @@ public class PrimType extends Type {
   public int compare(Type other)
   {
     if (other instanceof PrimType)
-      return compare(this, (PrimType) other);
+      {
+        // Catches the case that other is a gnu.kawa.listpexpr.LangPrimType,
+        // in which case it's best that LangPrimType's compare handle it.
+        // For example intType.compare(Scheme.booleanType) should be -1.
+        if (other.getImplementationType() != other)
+          return swappedCompareResult(other.compare(this));
+        return compare(this, (PrimType) other);
+      }
     if (! (other instanceof ClassType))
       {
         if (other instanceof ArrayType)

@@ -1,3 +1,8 @@
+2010-10-26  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare): Catch case where other is a LangPrimType.
+	For example compare of Type.intType and Scheme.booleanType should be -1.
+
 2010-10-24  Per Bothner  <per@bothner.com>
 
 	* Type.java (getSignature): Make non-final.

@@ -446,7 +446,7 @@
              (else
               (set-xor! (to-fill 0) r-new)
               (let ((n-cells :: int (count-ones (to-fill 0))))
-                (not (= 0 (modulo n-cells N-ELEM)))))))))
+                (not (= 0 (remainder n-cells N-ELEM)))))))))
 
   ((has-bad-islands (board-vec :: int) (row :: int)) :: int
    allocation: 'static
@@ -752,7 +752,7 @@
    (let ((pts :: int[][] (make-2d-array int 5 2)))
      (Piece:set-coord-list vec pts)
 
-     (let* ((rot :: int (modulo i-orient 6))
+     (let* ((rot :: int (remainder i-orient 6))
             (flip :: boolean (>= i-orient 6)))
        (when flip
              (do ((i-pt :: int 0 (+ i-pt 1)))

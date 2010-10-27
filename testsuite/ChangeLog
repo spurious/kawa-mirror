@@ -1,3 +1,8 @@
+2010-10-27  Per Bothner  <per@bothner.com>
+
+	* meteor.scm: Use remainder instead of modulo, since former can
+	be optimized to single Java instruction.
+
 2010-10-26  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

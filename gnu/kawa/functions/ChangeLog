@@ -1,3 +1,10 @@
+2010-10-26  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (classify(Type)): Remove. 
+	(Unknown_KIND, ..., int_KIND): Removed constants.
+	(classify(Expression)): Re-write to use	Arithmetic.classifyType.
+	(compile): Rewrite to use Arithmetic's XXX_CODE values.
+
 2010-10-23  Per Bothner  <per@bothner.com>
 
 	* Format.java: Set validateApplyKey property.
@@ -6,7 +13,7 @@
 	and swap args to make use of varargs.
 	(formatToString(char,Object,Object[])): Rename to formatToFString.
 	(format): Generalize to take Writer.  Use formatToWriter.
-	* CompileMisc.java (validateApplyFormat): New method.  
+	* CompileMisc.java (validateApplyFormat): New method.
 
 2010-10-17  Per Bothner  <per@bothner.com>
 

@@ -245,9 +245,10 @@ public class NumberCompare extends ProcedureN implements Inlineable
 	int kind0 = classify(arg0);
 	int kind1 = classify(arg1);
 	CodeAttr code = comp.getCode();
-	if (kind0 >= RealNum_KIND && kind1 >= RealNum_KIND
-	    // Don't optimize if both operands are fractions.
-	    && (kind0 != RealNum_KIND || kind1 != RealNum_KIND))
+	if (kind0 > 0 && kind1 > 0
+            && kind0 <= Arithmetic.REALNUM_CODE && kind1 <= Arithmetic.REALNUM_CODE
+	    // Don't optimize if both operands are fractions. FIXME???
+	    && (kind0 != Arithmetic.RATNUM_CODE || kind1 != Arithmetic.RATNUM_CODE))
 	  {
 	    if (! (target instanceof ConditionalTarget))
 	      {
@@ -258,16 +259,16 @@ public class NumberCompare extends ProcedureN implements Inlineable
 	    int mask = flags;
 	    if (mask == TRUE_IF_NEQ)
 	      mask = TRUE_IF_GRT|TRUE_IF_LSS;
-	    if (kind0 >= IntNum_KIND && kind1 >= IntNum_KIND
-		&& (kind0 < long_KIND || kind1 < long_KIND))
+	    if (kind0 <= Arithmetic.INTNUM_CODE && kind1 <= Arithmetic.INTNUM_CODE
+		&& (kind0 > Arithmetic.LONG_CODE || kind1 > Arithmetic.LONG_CODE))
 	      {
 		Type[] ctypes = new Type[2];
 		ctypes[0] = Arithmetic.typeIntNum;
-		if (kind1 >= long_KIND)
+		if (kind1 <= Arithmetic.LONG_CODE)
 		  {
 		    ctypes[1] = Type.longType;
 		  }
-		else if (kind0 >= long_KIND
+		else if (kind0 <= Arithmetic.LONG_CODE
 			 // Simple check to avoid re-ordering side-effects.
 			 && (arg0 instanceof QuoteExp
 			     || arg1 instanceof QuoteExp
@@ -288,12 +289,12 @@ public class NumberCompare extends ProcedureN implements Inlineable
 		PrimProcedure compare = new PrimProcedure(cmeth);
 		arg0 = new ApplyExp(compare, args);
 		arg1 = new QuoteExp(IntNum.zero());
-		kind0 = kind1 = int_KIND;
+		kind0 = kind1 = Arithmetic.INT_CODE;
 	      }
 	    Type commonType;
-	    if (kind0 >= int_KIND && kind1 >= int_KIND)
+	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE)
 	      commonType = Type.intType;
-	    else if (kind0 >= long_KIND && kind1 >= long_KIND)
+	    else if (kind0 <= Arithmetic.LONG_CODE && kind1 <= Arithmetic.LONG_CODE)
 	      commonType = Type.longType;
 	    else
 	      commonType = Type.doubleType;
@@ -323,7 +324,7 @@ public class NumberCompare extends ProcedureN implements Inlineable
 	      }
 	    arg0.compile(comp, subTarget);
 	    Object value;
-	    if (kind0 >= int_KIND && kind1 >= int_KIND
+	    if (kind0 <= Arithmetic.INT_CODE && kind1 <= Arithmetic.INT_CODE
 		&& arg1 instanceof QuoteExp
 		&& (value = ((QuoteExp) arg1).getValue()) instanceof IntNum
 		&& ((IntNum) value).isZero())
@@ -342,55 +343,21 @@ public class NumberCompare extends ProcedureN implements Inlineable
     ApplyExp.compile(exp, comp, target);
   }
 
-  // Return a code indicate type of number:
-  private static final int Unknown_KIND = 0; // unknown or invalid type
-  private static final int Number_KIND = 1; // java.lang.Number - not used
-  private static final int Numeric_KIND = 2;  // gnu.math.Numeric
-  private static final int RealNum_KIND = 3; // exact or unknown real
-  private static final int double_KIND = 4; // inexact real (double or DFloNum)
-  private static final int IntNum_KIND = 5; // gnu.math.IntNum
-  private static final int long_KIND = 6; // long
-  private static final int int_KIND = 7; // int
-
   static int classify (Expression exp)
   {
     Type type = exp.getType();
-    int kind = classify(type);
+    int kind = Arithmetic.classifyType(type);
     Object value;
-    if (kind == IntNum_KIND && exp instanceof QuoteExp
+    if (kind == Arithmetic.INTNUM_CODE && exp instanceof QuoteExp
 	&& (value = ((QuoteExp) exp).getValue()) instanceof IntNum)
       {
 	int ilength = ((IntNum) value).intLength();
 	if (ilength < 32)
-	  return int_KIND;
+	  return Arithmetic.INT_CODE;
 	if (ilength < 64)
-	  return long_KIND;
+	  return Arithmetic.LONG_CODE;
       }
     return kind;
-  }
-
-  static int classify (Type type)
-  {
-    if (type instanceof PrimType)
-      {
-	char sig = type.getSignature().charAt(0);
-	if (sig == 'V' || sig == 'Z' || sig == 'C')
-	  return Unknown_KIND;
-	if (sig == 'D' || sig == 'F')
-	  return double_KIND;
-	if (sig == 'J')
-	  return long_KIND;
-	return int_KIND;
-      }
-     if (type.isSubtype(Arithmetic.typeIntNum))
-       return IntNum_KIND;
-     if (type.isSubtype(Arithmetic.typeDFloNum))
-       return double_KIND;
-     if (type.isSubtype(Arithmetic.typeRealNum))
-       return RealNum_KIND;
-     if (type.isSubtype(Arithmetic.typeNumeric))
-       return Numeric_KIND;
-    return Unknown_KIND;
   }
 
   public Type getReturnType (Expression[] args)

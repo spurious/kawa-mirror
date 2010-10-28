@@ -1,5 +1,7 @@
 2010-10-28  Per Bothner  <per@bothner.com>
 
+	* standard/Scheme.java (initScheme): Declare 'define-enum'.
+
 	* standard/object.java (rewriteInit): Explicitly set return type of
 	initMethod to null.
 

@@ -678,6 +678,7 @@ public class Scheme extends LispLanguage
                    "define_variable");
       defSntxStFld("define-member-alias", "kawa.standard.define_member_alias",
                    "define_member_alias");
+      defSntxStFld("define-enum", "gnu.kawa.slib.enums");
       defSntxStFld("import", "kawa.lib.syntax");
       defSntxStFld("require", "kawa.standard.require", "require");
       defSntxStFld("module-name", "kawa.standard.module_name",

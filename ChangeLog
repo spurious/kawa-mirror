@@ -1,3 +1,7 @@
+2010-10-28  Per Bothner  <per@bothner.com>
+
+	* build.xml (slib-scm): Also compile enums.scm.
+
 2010-10-27  Jamison Hope  <jrh@theptrgroup.com>
 
 	* build.xml (slib-scm): Update for new scm files.

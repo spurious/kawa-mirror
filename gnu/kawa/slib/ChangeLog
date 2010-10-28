@@ -1,3 +1,9 @@
+2010-10-28  Jamison Hope  <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* enums.scm: New module implements define-enum.
+	* Makefile.am: Update accordingly.
+
 2010-10-24  Per Bothner  <per@bothner.com>
 
 	* syntaxutils.scm (macroexpand): Rename to ...

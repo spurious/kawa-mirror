@@ -518,6 +518,7 @@
         <include name="pregexp.scm"/>
         <include name="readtable.scm"/>
         <include name="cut.scm"/>
+        <include name="enums.scm"/>
         <include name="gui.scm"/>
         <include name="XML.scm"/>
         <include name="swing.scm"/>

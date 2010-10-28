@@ -1,4 +1,4 @@
-(module-static counter get-new-count call-lambda)
+(module-static counter get-new-count <IdClass1> <IdClass2> call-lambda)
 
 ;; Based on a test-case from Jamison Hope <jrh@theptrgroup.com>
 (define-syntax (import-class form)

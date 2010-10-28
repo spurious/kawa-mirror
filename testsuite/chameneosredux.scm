@@ -13,13 +13,7 @@
 (define-alias Thread java.lang.Thread)
 
 
-;;; Color enum
-(define-simple-class Color (java.lang.Enum)
-  (blue :: Color allocation: 'static init: (Color "blue" 0))
-  (red :: Color allocation: 'static init: (Color "red" 1))
-  (yellow :: Color allocation: 'static init: (Color "yellow" 2))
-  ((*init* (name :: String) (ordinal :: int))
-   (invoke-special java.lang.Enum (this) '*init* name ordinal)))
+(define-enum Color (blue red yellow))
 
 (define (complement (c1 :: Color) (c2 :: Color)) :: Color
   (cond ((eq? c1 Color:blue)

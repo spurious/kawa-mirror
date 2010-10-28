@@ -1,5 +1,7 @@
 2010-10-28  Per Bothner  <per@bothner.com>
 
+	* chameneosredux.scm (Color): Use new define-enum feature.
+
 	* classes1.scm: Make <IdClass1> and <IdClass2> explicitly static.
 
 2010-10-27  Per Bothner  <per@bothner.com>

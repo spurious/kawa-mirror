@@ -197,11 +197,15 @@ public class CompileArith implements Inlineable
                   || (dproc.op == DivideOp.QUOTIENT
                       && kind <= Arithmetic.INTNUM_CODE))
                  && (dproc.getRoundingMode() == Numeric.TRUNCATE
+                     || kind == Arithmetic.INTNUM_CODE
                      || kind == Arithmetic.FLOAT_CODE
-                     || kind == Arithmetic.DOUBLE_CODE))
+                     || kind == Arithmetic.DOUBLE_CODE)) 
+          // FIXME Should optimize primitive non-TRUNCATE quotient.
           ;
         else if (dproc.op == DivideOp.MODULO
-                 && dproc.getRoundingMode() == Numeric.TRUNCATE)
+                 && (dproc.getRoundingMode() == Numeric.TRUNCATE
+                     || kind == Arithmetic.INTNUM_CODE))
+          // FIXME Should optimize primitive non-TRUNCATE modulo.
           ;
         else
           {
@@ -237,6 +241,7 @@ public class CompileArith implements Inlineable
     else if (kind == Arithmetic.INTNUM_CODE
              && (op == ADD || op == MUL || op == SUB
                  || op == AND || op == IOR || op == XOR
+                 || op == QUOTIENT_EXACT || op == MODULO
                  || (op >= ASHIFT_GENERAL && op <= ASHIFT_RIGHT)))
       {
         compileIntNum(args[0], args[1], kind1, kind2, comp);

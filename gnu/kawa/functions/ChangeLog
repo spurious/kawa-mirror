@@ -1,3 +1,8 @@
+2010-10-28  Per Bothner  <per@bothner.com>
+
+	* CompileArith.java (compile): We can special-case the general case (any
+	rounding mode) of DIVIDE_EXACT and MODULO of IntNums.
+
 2010-10-26  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (classify(Type)): Remove. 

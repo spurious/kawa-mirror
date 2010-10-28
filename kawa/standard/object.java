@@ -563,6 +563,7 @@ public class object extends Syntax
       {
         initMethod = new LambdaExp(new BeginExp());        
         initMethod.setClassMethod(true);
+        initMethod.setReturnType(Type.voidType);
         if (isStatic)
           {
             initMethod.setName("$clinit$");

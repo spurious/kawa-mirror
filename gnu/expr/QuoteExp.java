@@ -99,7 +99,7 @@ public class QuoteExp extends Expression
 
   public QuoteExp (Object val) { value = val; }
 
-  public QuoteExp (Object val, Type type) { value = val; setType(type);}
+  public QuoteExp (Object val, Type type) { value = val; setType(type); }
   
   protected boolean mustCompile () { return false; }
 
@@ -218,6 +218,11 @@ public class QuoteExp extends Expression
       {
 	out.objectFormat = Language.getDefaultLanguage().getFormat(true);
 	out.print(val);
+        if (type != null)
+          {
+            out.print(" ::");
+            out.print(type.getName());
+          }
         /*
         if (value != null)
           {

@@ -1,3 +1,10 @@
+2010-10-28  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (addAccessFlags): New convenience method.
+	(scanClassDef): Make use of it for class and field access flags.
+	(matchAccess): Check for SyntaxForm.
+	(matchAccess1): Update to handle "enum" and "final".
+
 2010-10-24  Per Bothner  <per@bothner.com>
 
 	* standard/require.java (featureMap): Add "syntax-utils".

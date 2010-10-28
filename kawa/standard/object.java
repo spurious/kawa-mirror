@@ -112,16 +112,14 @@ public class object extends Syntax
                   }
                 if (pair_car == accessKeyword)
                   {
+                    Object savedPos2 = tr.pushPositionOf(obj);
+                    classAccessFlag = addAccessFlags(((Pair) obj).getCar(),
+                                                     classAccessFlag,
+                                                     Declaration.CLASS_ACCESS_FLAGS,
+                                                     "class", tr);
                     if (oexp.nameDecl == null)
                       tr.error('e', "access specifier for anonymous class");
-                    else if (classAccessFlag != 0)
-                      tr.error('e', "duplicate access specifiers");
-                    else
-                      {
-                        classAccessFlag = matchAccess(((Pair) obj).getCar(), tr);
-                        if ((classAccessFlag & (Declaration.PRIVATE_ACCESS|Declaration.PROTECTED_ACCESS)) != 0)
-                          tr.error('e', "invalid class access specifier");
-                      }
+                    tr.popPositionOf(savedPos2);
                     obj = ((Pair) obj).getCdr();
                     tr.popPositionOf(savedPos1);
                     continue;
@@ -218,12 +216,11 @@ public class object extends Syntax
 		      }
 		    else if (key == accessKeyword)
 		      {
-                        long newAccessFlag = matchAccess(value, tr);
-                        if (newAccessFlag == 0)
-                          tr.error('e', "unknown access specifier");
-                        else if (accessFlag != 0)
-                          tr.error('e', "duplicate access specifiers");
-			accessFlag = newAccessFlag;
+                        Object savedPos3 = tr.pushPositionOf(pair);
+                        accessFlag = addAccessFlags(value, accessFlag,
+                                                    Declaration.FIELD_ACCESS_FLAGS,
+                                                    "field", tr);
+                        tr.popPositionOf(savedPos3);
 		      }
 		    else
 		      {
@@ -621,8 +618,23 @@ public class object extends Syntax
     return tag == null || tag.equals(value);
   }
 
+  static long addAccessFlags (Object value, long previous, long allowed,
+                             String kind, Translator tr)
+  {
+    long flags = matchAccess(value, tr);
+    if (flags == 0)
+      tr.error('e', "unknown access specifier "+value);
+    else if ((flags & ~allowed) != 0)
+      tr.error('e', "invalid "+kind+" access specifier "+value);
+    else if ((previous & flags) != 0)
+      tr.error('w', "duplicate "+kind+" access specifiers "+value);
+    return previous | flags;
+  }
+
   static long matchAccess (Object value, Translator tr)
   {
+    while (value instanceof SyntaxForm)
+      value = ((SyntaxForm) value).getDatum();
     if (value instanceof Pair)
       {
         Pair p = (Pair) value;
@@ -668,6 +680,10 @@ public class object extends Syntax
       return Declaration.VOLATILE_ACCESS;
     if ("transient".equals(value))
       return Declaration.TRANSIENT_ACCESS;
+    if ("enum".equals(value))
+      return Declaration.ENUM_ACCESS;
+    if ("final".equals(value))
+      return Declaration.FINAL_ACCESS;
     return 0;
   }
 }

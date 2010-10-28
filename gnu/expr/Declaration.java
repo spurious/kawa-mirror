@@ -1,4 +1,4 @@
-// Copyright (c) 2003, 2009  Per M.A. Bothner.
+// Copyright (c) 2003, 2009, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -513,8 +513,17 @@ public class Declaration
   /** A reference to a module instance. */
   public static final int MODULE_REFERENCE = 0x40000000;
 
-  public static final long VOLATILE_ACCESS = 0x80000000;
+  public static final long VOLATILE_ACCESS = 0x80000000l;
   public static final long TRANSIENT_ACCESS = 0x100000000l;
+  public static final long ENUM_ACCESS = 0x200000000l;
+  public static final long FINAL_ACCESS = 0x400000000l;
+  public static final long CLASS_ACCESS_FLAGS =
+    PRIVATE_ACCESS|PROTECTED_ACCESS|ENUM_ACCESS|FINAL_ACCESS;
+  public static final long FIELD_ACCESS_FLAGS = PRIVATE_ACCESS|PROTECTED_ACCESS|
+    PUBLIC_ACCESS|PACKAGE_ACCESS|VOLATILE_ACCESS|TRANSIENT_ACCESS|
+    ENUM_ACCESS|FINAL_ACCESS;
+  public static final long METHOD_ACCESS_FLAGS = PRIVATE_ACCESS
+    |PROTECTED_ACCESS|PUBLIC_ACCESS|PACKAGE_ACCESS|FINAL_ACCESS;
 
   protected long flags = IS_SIMPLE;
 
@@ -563,6 +572,10 @@ public class Declaration
       flags |= Access.VOLATILE;
     if (getFlag(TRANSIENT_ACCESS))
       flags |= Access.TRANSIENT;
+    if (getFlag(ENUM_ACCESS))
+      flags |= Access.ENUM;
+    if (getFlag(FINAL_ACCESS))
+      flags |= Access.FINAL;
     return flags;
   }
 

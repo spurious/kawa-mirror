@@ -1,5 +1,11 @@
 2010-10-28  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (ENUM_ACCESS, FINAL_ACCESS): New flags.
+	(VOLATILE_ACCESS): Make sure constant is long.
+	(CLASS_ACCESS_FLAGS, FIELD_ACCESS_FLAGS, METHOD_ACCESS_FLAGS):
+	New masks.
+	(getAccessFlags): Check ENUM_ACCESS and FINAL_ACCESS.
+
 	* QuoteExp.java (print): Print type.
 
 2010-10-24  Per Bothner  <per@bothner.com>

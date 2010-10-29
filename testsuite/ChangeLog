@@ -1,5 +1,8 @@
 2010-10-28  Per Bothner  <per@bothner.com>
 
+	* meteor.scm: Replace many 2d array by flattened 1d arrays.
+	(do-decrementing): New convenience macro.
+
 	* chameneosredux.scm (Color): Use new define-enum feature.
 
 	* classes1.scm: Make <IdClass1> and <IdClass2> explicitly static.

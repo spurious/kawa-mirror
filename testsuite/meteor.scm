@@ -140,12 +140,26 @@
 (define-constant BaseVecs :: int[]
   (int[] #x10f #x0cb #x1087 #x427 #x465 #x0c7 #x8423 #x0a7 #x187 #x08f))
 
-(define s-base-piece :: Piece[][] (make-2d-array Piece 10 12))
-(do ((i :: int 0 (+ i 1)))
-    ((= i N-PIECE-TYPE))
-  (do ((j :: int 0 (+ j 1)))
-      ((= j N-ORIENT))
-    (set! ((s-base-piece i) j) (Piece))))
+;; (do-decrementing COUNTER START . BODY)
+;; Do BODY with COUNTER set top START-1 down to 0.
+;; Equivalent to Java's: for (int COUNTER=START; --COUNTER>=0; ) { BODY }
+(define-syntax do-decrementing
+  (syntax-rules ()
+    ((_ counter start . body)
+     (let ((counter ::int start))
+       (let loop ()
+	 (set! counter (- counter 1))
+	 (if (>= counter 0)
+	     (begin
+	       (begin . body)
+	       (loop))))))))
+
+(define s-base-pieces ::Piece[] (Piece[] length: (* N-PIECE-TYPE N-ORIENT)))
+(do-decrementing i (* N-PIECE-TYPE N-ORIENT)
+		 (set! (s-base-pieces i) (Piece)))
+(define-syntax s-base-piece
+  (syntax-rules ()
+    ((_ ipiece iorient) (s-base-pieces (+ (* N-ORIENT ipiece) iorient)))))
 
 ;; Global variables
 (define g-island-info :: IslandInfo[]
@@ -153,8 +167,7 @@
 
 (define g-n-island-info :: int 0)
 
-(define g-ok-pieces :: OkPieces[][]
-  (make-2d-array OkPieces 10 5))
+(define g-ok-pieces :: OkPieces[] (OkPieces[] length: N-CELL))
 
 (define-constant g-first-region :: int[]
   (int[]
@@ -228,8 +241,8 @@
                   (eo :: int)
                   (always :: boolean))
   :: void
-  (set-ior! ((info:has-bad eo) OPEN) mask)
-  (set-ior! ((info:has-bad eo) CLOSED) mask)
+  (set-ior! (info:has-bad (+ (* eo N-PARITY) OPEN)) mask)
+  (set-ior! (info:has-bad (+ (* eo N-PARITY) CLOSED)) mask)
   (when always
         (set-ior! (info:always-bad eo) mask)))
 
@@ -238,21 +251,18 @@
       ((= i MAX-ISLAND-OFFSET))
     (set! (g-island-info i) (IslandInfo)))
 
-  (do ((i :: int 0 (+ i 1)))
-      ((= i N-ROW))
-    (do ((j :: int 0 (+ j 1)))
-        ((= j N-COL))
-      (set! ((g-ok-pieces i) j) (OkPieces)))))
+  (do-decrementing yx N-CELL
+		   (set! (g-ok-pieces yx) (OkPieces))))
 
 ;; OkPieces
 (define-simple-class OkPieces ()
   (n-pieces :: byte[] init: (byte[] length: N-PIECE-TYPE))
-  (piece-vec :: int[][] init: (make-2d-array int 10 12)))
+  (piece-vec :: int[] init: (int[] length: (* N-PIECE-TYPE N-ORIENT))))
 
 ;; IslandInfo
 (define-simple-class IslandInfo ()
-  (has-bad :: int[][] init: (make-2d-array int 2 2))
-  (is-known :: int[][] init: (make-2d-array int 2 2))
+  (has-bad :: int[] init: (int[] length: (* N-FIXED N-PARITY)))
+  (is-known :: int[] init: (int[] length: (* N-FIXED N-PARITY)))
   (always-bad :: int[] init: (int[] length: N-PARITY)))
 
 ;; SPiece
@@ -269,12 +279,22 @@
    (set! i-piece other:i-piece)
    (set! row other:row)))
 
+(define-syntax m-cell
+  (syntax-rules ()
+    ((_ obj r c) (obj:m-cells (+ (* N-COL r) c)))))
+
+#|
+     (do ((counter ::int start))
+	 ((begin (set! counter (- counter 1)) (< counter 0)))
+       . body))))
+|#
+
 ;; Soln
 (define-simple-class Soln ()
   (NO-PIECE :: int allocation: 'static init: -1)
   (m-pieces :: SPiece[] (SPiece[] length: N-PIECE-TYPE))
   (m-n-piece :: int)
-  (m-cells :: byte[][] init: (make-2d-array byte 10 5))
+  (m-cells :: byte[] init: (byte[] length: N-CELL))
   (m-synched :: boolean)
 
   ((is-empty) :: boolean (= 0 m-n-piece))
@@ -310,21 +330,15 @@
          ((= i m-pieces:length))
        (set! (s:m-pieces i) (SPiece (m-pieces i))))
      (set! s:m-n-piece m-n-piece)
-     (do ((i :: int 0 (+ i 1)))
-         ((= i N-ROW))
-       (do ((j :: int 0 (+ j 1)))
-           ((= j N-COL))
-         (set! ((s:m-cells i) j) ((m-cells i) j))))
+     (do-decrementing ij N-CELL
+		      (set! (s:m-cells ij) (m-cells ij)))
      (set! s:m-synched m-synched)
      s))
 
   ((fill (val :: int)) :: void
    (set! m-synched #f)
-   (do ((i :: int 0 (+ i 1)))
-       ((= i N-ROW))
-     (do ((j :: int 0 (+ j 1)))
-         ((= j N-COL))
-       (set! ((m-cells i) j) val))))
+   (do-decrementing ij N-CELL
+		    (set! (m-cells ij) val)))
 
   ((to-string) :: String
    (let ((result :: SB (SB)))
@@ -334,7 +348,7 @@
            ((= x N-COL) (result:append
                          (constant-fold
                           list->string '(#\newline))))
-         (let ((val :: int ((m-cells y) x)))
+         (let ((val :: int (m-cell (this) y x)))
            (result:append val))
          (result:append " "))
        (when (even? y) (result:append " ")))))
@@ -355,7 +369,7 @@
                     (do ((x :: int 0 (+ x 1)))
                         ((= x N-COL))
                       (when (not (= 0 (bitwise-and vec 1)))
-                            (set! ((m-cells y) x) p-id)
+                            (set! (m-cell (this) y x) p-id)
                             (++! n-new-cells))
                       (set->>! vec 1))
                     (when (= n-new-cells N-ELEM)
@@ -375,20 +389,17 @@
                  ((= y N-ROW) (return #f))
                (do ((x :: int 0 (+ x 1)))
                    ((= x N-COL))
-                 (let ((lval :: int ((m-cells y) x))
-                       (rval :: int ((r:m-cells y) x)))
+                 (let ((lval :: int (m-cell (this) y x))
+                       (rval :: int (m-cell r y x)))
                    (when (not (= lval rval))
                          (return (< lval rval)))))))))))
 
   ((spin (spun :: Soln)) :: void
    (*:set-cells (this))
 
-   (do ((y :: int 0 (+ y 1)))
-       ((= y N-ROW))
-     (do ((x :: int 0 (+ x 1)))
-         ((= x N-COL))
-       (let ((flipped :: byte ((m-cells (- N-ROW y 1)) (- N-COL x 1))))
-         (set! ((spun:m-cells y) x) flipped))))
+   (do-decrementing yx N-CELL
+		    (set! (spun:m-cells yx)
+			  (m-cells (- N-CELL 1 yx))))
 
    (set! (spun:m-pieces 0):i-piece (m-pieces (- N-PIECE-TYPE 1)):i-piece)
    (set! spun:m-synched #t)))
@@ -466,7 +477,8 @@
             TOP-ROW))
           (mask :: int (get-mask last-row))
           (is-odd :: int (bitwise-and row 1))
-          (is-closed :: int (if (> row 6) 1 0)))
+          (is-closed :: int (if (> row 6) 1 0))
+	  (odd-closed-index (+ (* is-odd N-PARITY) is-closed)))
      (cond ((not (= 0 (bitwise-and mask (info:always-bad is-odd))))
             BAD)
            ((not (= 0 (bitwise-and board-vec
@@ -474,14 +486,14 @@
                                     TOP-ROW (* N-COL 3)))))
             (Board:calc-bad-islands board-vec row))
            ((not (= 0 (bitwise-and mask
-                                   ((info:is-known is-odd) is-closed))))
-            (bitwise-and mask ((info:has-bad is-odd) is-closed)))
+                                   (info:is-known odd-closed-index))))
+            (bitwise-and mask (info:has-bad odd-closed-index)))
            ((= 0 board-vec) GOOD)
            (else
             (let ((has-bad :: int (Board:calc-bad-islands board-vec row)))
-              (set-ior! ((info:is-known is-odd) is-closed) mask)
+              (set-ior! (info:is-known odd-closed-index) mask)
               (when (not (= 0 has-bad))
-                    (set-ior! ((info:has-bad is-odd) is-closed) mask))
+                    (set-ior! (info:has-bad odd-closed-index) mask))
               has-bad)))))
 
   ((calc-bad-islands (board-vec :: int) (row :: int)) :: int
@@ -535,8 +547,8 @@
            (flipped :: IslandInfo (g-island-info (flip-two-rows i-word))))
        (let loop ((i :: int 0) (mask :: int 1))
          (cond ((= i 32))
-               ((not (= 0 (bitwise-and mask ((isle-info:is-known 0) OPEN))))
-                (loop (+ i 1) (bitwise-arithmetic-shift-left mask 1)))
+               ((not (= 0 (bitwise-and mask (isle-info:is-known OPEN))))
+		(loop (+ i 1) (bitwise-arithmetic-shift-left mask 1)))
                (else
                 (let* ((board-vec
                        :: int
@@ -553,8 +565,8 @@
                             (mark-bad flipped flip-mask ODD always))))
                   (loop (+ i 1) (bitwise-arithmetic-shift-left mask 1))))))
 
-       (set! ((flipped:is-known 1) OPEN) -1)
-       (set! ((isle-info:is-known 0) OPEN) -1))))
+       (set! (flipped:is-known (+ N-PARITY OPEN)) -1)
+       (set! (isle-info:is-known OPEN) -1))))
 
   ((has-bad-islands-single (board-vec :: int) (row :: int)) :: boolean
    allocation: 'static
@@ -595,7 +607,7 @@
 
    (let* ((i-next-fill :: int (s-first-one
                                (bitwise-and TOP-ROW (bitwise-not board-vec))))
-          (allowed :: OkPieces ((g-ok-pieces row) i-next-fill))
+          (allowed :: OkPieces (g-ok-pieces (+ (* row N-COL) i-next-fill)))
           (i-piece :: int (get-first-one (bitwise-not placed-pieces)))
           (piece-mask :: int (get-mask i-piece)))
 
@@ -612,7 +624,7 @@
               ((= i-orient (allowed:n-pieces i-piece)))
             (call-with-current-continuation
              (lambda (continue-inner)
-               (let ((piece-vec :: int ((allowed:piece-vec i-piece) i-orient)))
+               (let ((piece-vec :: int (allowed:piece-vec (+ (* i-piece N-ORIENT) i-orient))))
                  (when (not (= 0 (bitwise-and piece-vec board-vec)))
                        (continue-inner))
                  (set-ior! board-vec piece-vec)
@@ -755,9 +767,8 @@
      (let* ((rot :: int (remainder i-orient 6))
             (flip :: boolean (>= i-orient 6)))
        (when flip
-             (do ((i-pt :: int 0 (+ i-pt 1)))
-                 ((= i-pt N-ELEM))
-               (set! ((pts i-pt) Y) (- ((pts i-pt) Y)))))
+             (do-decrementing i-pt N-ELEM
+			      (set! ((pts i-pt) Y) (- ((pts i-pt) Y)))))
 
        (while (not (= 0 (!-- rot)))
               (do ((i-pt :: int 0 (+ i-pt 1)))
@@ -800,7 +811,7 @@
      (let ((ref-piece :: int (BaseVecs i-piece)))
        (do ((i-orient :: int 0 (+ i-orient 1)))
            ((= i-orient N-ORIENT))
-         (let ((p :: Piece ((s-base-piece i-piece) i-orient)))
+         (let ((p :: Piece (s-base-piece i-piece i-orient)))
            (Piece:gen-orientation ref-piece i-orient p)
            (when (and (= i-piece SKIP-PIECE) ;; 5
                       (not (= 0 (bitwise-and 1 (quotient i-orient 3)))))
@@ -819,17 +830,17 @@
                  ((= i-col N-COL))
                (when (not (= 0 (bitwise-and p:m-allowed mask)))
                      (let* ((allowed :: OkPieces
-                                     ((g-ok-pieces i-row) i-col))
+                                     (g-ok-pieces (+ (* i-row N-COL) i-col)))
                             (val :: int (bitwise-arithmetic-shift-left
                                          p:m-vec i-col))
                             (i2 :: int (allowed:n-pieces i-piece)))
-                       (set! ((allowed:piece-vec i-piece) i2) val)
+                       (set! (allowed:piece-vec (+ (* i-piece N-ORIENT) i2)) val)
                        (++! (allowed:n-pieces i-piece))))
                (set-<<! mask 1))))))))
 
   ((get-piece (i-piece :: int) (i-orient :: int) (i-parity :: int))
    :: Instance allocation: 'static
-   (((s-base-piece i-piece) i-orient):m-instance i-parity)))
+   ((s-base-piece i-piece i-orient):m-instance i-parity)))
 
 
 ;;;; main

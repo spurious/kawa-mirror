@@ -283,12 +283,6 @@
   (syntax-rules ()
     ((_ obj r c) (obj:m-cells (+ (* N-COL r) c)))))
 
-#|
-     (do ((counter ::int start))
-	 ((begin (set! counter (- counter 1)) (< counter 0)))
-       . body))))
-|#
-
 ;; Soln
 (define-simple-class Soln ()
   (NO-PIECE :: int allocation: 'static init: -1)
@@ -416,7 +410,7 @@
   (m-max-soln :: Soln init: (Soln Soln:NO-PIECE))
   (m-n-soln :: int init: 0)
 
-  ((bad-region (to-fill :: int[]) (r-new :: int)) :: boolean
+  ((bad-region (to-fill ::int) (r-new ::int)) ::int
    allocation: 'static
    ;; grow empty region until it doesn't change anymore
    (let loop ((r-new :: int r-new))
@@ -432,7 +426,7 @@
 
        ;; tricky growth
        (let ((even-region
-              :: int
+	      :: int
               (bitwise-and
                region (bitwise-and ROW-0-MASK (bitwise-not L-EDGE-MASK)))))
          (set-ior! r-new
@@ -449,15 +443,13 @@
                    (bitwise-arithmetic-shift-left odd-region (+ N-COL 1))))
 
        ;; clamp against existing pieces
-       (set-and! r-new (to-fill 0))
+       (set-and! r-new to-fill)
 
-       (cond ((and (not (= r-new (to-fill 0)))
+       (cond ((and (not (= r-new to-fill))
                    (not (= r-new region)))
               (loop r-new))
              (else
-              (set-xor! (to-fill 0) r-new)
-              (let ((n-cells :: int (count-ones (to-fill 0))))
-                (not (= 0 (remainder n-cells N-ELEM)))))))))
+              (bitwise-xor to-fill r-new))))))
 
   ((has-bad-islands (board-vec :: int) (row :: int)) :: int
    allocation: 'static
@@ -498,46 +490,47 @@
 
   ((calc-bad-islands (board-vec :: int) (row :: int)) :: int
    allocation: 'static
-   (let ((to-fill :: int[] (int[] (bitwise-not board-vec)))
+   (let ((to-fill :: int (bitwise-not board-vec))
          (board-mask :: int BOARD-MASK)
          (bottom :: int (bitwise-arithmetic-shift-left TOP-ROW (* 5 N-COL)))
          (start-region :: int 0))
      (when (not (= 0 (bitwise-and row 1)))
            (!-- row)
-           (set-<<! (to-fill 0) N-COL))
+           (set-<<! to-fill N-COL))
      (when (> row 4)
            (let ((board-mask-shift :: int (* (- row 4) N-COL)))
              (set->>! board-mask board-mask-shift)))
-     (set-and! (to-fill 0) board-mask)
+     (set-and! to-fill board-mask)
 
-     (let ((filled :: boolean (= bottom (bitwise-and bottom (to-fill 0)))))
-       (while (= bottom (bitwise-and bottom (to-fill 0)))
-              (set-xor! (to-fill 0) bottom)
+     (let ((filled :: boolean (= bottom (bitwise-and bottom to-fill))))
+       (while (= bottom (bitwise-and bottom to-fill))
+              (set-xor! to-fill bottom)
               (set->>! bottom N-COL))
 
        (if (or filled (< row 4))
-           (set! start-region (bitwise-and bottom (to-fill 0)))
+           (set! start-region (bitwise-and bottom to-fill))
            (begin
              (set! start-region
-                   (g-first-region (bitwise-and (to-fill 0) TOP-ROW)))
+                   (g-first-region (bitwise-and to-fill TOP-ROW)))
              (when (= 0 start-region)
                    (set! start-region
                          (bitwise-and (bitwise-arithmetic-shift-right
-                                       (to-fill 0) N-COL) TOP-ROW))
+                                       to-fill N-COL) TOP-ROW))
                    (set! start-region
                          (g-first-region start-region))
                    (set-<<! start-region N-COL))
              (set-ior! start-region
                        (bitwise-and
                         (bitwise-arithmetic-shift-left start-region N-COL)
-                        (to-fill 0)))))
+                        to-fill))))
 
        (call-with-current-continuation
         (lambda (return)
-          (while (not (= 0 (to-fill 0)))
-                 (when (Board:bad-region to-fill start-region)
-                       (return (if (not (= 0 (to-fill 0))) ALWAYS-BAD BAD)))
-                 (set! start-region (get-mask (get-first-one (to-fill 0)))))
+          (while (not (= 0 to-fill))
+                 (set! to-fill (bad-region to-fill start-region))
+                 (when (> (remainder (count-ones to-fill) N-ELEM) 0)
+                       (return (if (not (= 0 to-fill)) ALWAYS-BAD BAD)))
+                 (set! start-region (get-mask (get-first-one to-fill))))
           (return GOOD))))))
 
   ((calc-always-bad) :: void allocation: 'static
@@ -570,7 +563,7 @@
 
   ((has-bad-islands-single (board-vec :: int) (row :: int)) :: boolean
    allocation: 'static
-   (let ((to-fill :: int[] (int[] (bitwise-not board-vec)))
+   (let ((to-fill :: int (bitwise-not board-vec))
          (is-odd :: boolean (not (= 0 (bitwise-and row 1))))
          (start-region :: int TOP-ROW)
          (last-row :: int (bitwise-arithmetic-shift-left
@@ -578,23 +571,24 @@
          (board-mask :: int BOARD-MASK))
      (when is-odd
            (!-- row)
-           (set-<<! (to-fill 0) N-COL)
-           (set-ior! (to-fill 0) TOP-ROW))
+           (set-<<! to-fill N-COL)
+           (set-ior! to-fill TOP-ROW))
      (cond ((>= row 4)
             (set->>! board-mask (* (- row 4) N-COL)))
            ((or is-odd (= row 0))
             (set! start-region last-row)))
 
-     (set-and! (to-fill 0) board-mask)
-     (set-and! start-region (to-fill 0))
+     (set-and! to-fill board-mask)
+     (set-and! start-region to-fill)
 
      (call-with-current-continuation
       (lambda (return)
-        (while (not (= 0 (to-fill 0)))
-               (when (Board:bad-region to-fill start-region)
+        (while (not (= 0 to-fill))
+	       (set! to-fill (bad-region to-fill start-region))
+               (when (> (remainder (count-ones to-fill) N-ELEM) 0)
                      (return #t))
                (set! start-region
-                     (get-mask (get-first-one (to-fill 0)))))
+                     (get-mask (get-first-one to-fill))))
         (return #f)))))
 
   ((gen-all-solutions (board-vec :: int)
@@ -633,7 +627,7 @@
                        (continue-inner))
                  (m-cur-soln:push-piece piece-vec i-piece row)
                  ;; recur or record solution
-                 (if (not (= placed-pieces ALL-PIECE-MASK))
+                 (if (< placed-pieces ALL-PIECE-MASK)
                      (*:gen-all-solutions (this) board-vec
                                           placed-pieces row)
                      (*:record-solution (this) m-cur-soln))
@@ -857,9 +851,10 @@
           (format #t "~A solutions found~2%" b:m-n-soln)
           (format #t "~A~%~A~%" b:m-min-soln b:m-max-soln))))
 
-
+#|
 (do ((i :: int 0 (+ i 1)))
     ((= i 65))
   (program-main (cdr (command-line)) #f))
+|#
 
 (program-main (cdr (command-line)) #t)

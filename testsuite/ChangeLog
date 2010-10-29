@@ -1,3 +1,10 @@
+2010-10-29  Per Bothner  <per@bothner.com>
+
+	* meteor.scm (bad-region): Instead of passing in a 1-element array,
+	pass and return a single int primitive.
+	* meteor.scm (bad-region): Don't run the program 65 times, for the
+	steady-state approximation -the test-suite runner doesn't support that.
+
 2010-10-28  Per Bothner  <per@bothner.com>
 
 	* meteor.scm: Replace many 2d array by flattened 1d arrays.

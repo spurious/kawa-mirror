@@ -435,16 +435,25 @@ public class Shell
       }
     catch (Throwable e)
       {
+        Class clas;
         try
           {
-            Class clas = Class.forName(fname);
+            clas = Class.forName(fname);
+          }
+        catch (Throwable ex)
+          {
+            System.err.println("Cannot read file "+e.getMessage());
+            return false;
+          }
+        try
+          {
             CompiledModule cmodule = CompiledModule.make(clas, language);
             cmodule.evalModule(Environment.getCurrent(), OutPort.outDefault());
             return true;
           }
         catch (Throwable ex)
           {
-            System.err.println("Cannot read file "+e.getMessage());
+            ex.printStackTrace();
             return false;
           }
       }

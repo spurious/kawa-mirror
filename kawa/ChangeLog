@@ -1,5 +1,8 @@
 2010-10-28  Per Bothner  <per@bothner.com>
 
+	* Shell.java (runFileOrClass): Print stack trace if running class
+	throws exception.
+
 	* standard/Scheme.java (initScheme): Declare 'define-enum'.
 
 	* standard/object.java (rewriteInit): Explicitly set return type of

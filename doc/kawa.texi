@@ -2879,11 +2879,11 @@ and Java number types as appropriate.
 @menu
 * Arithmetic operations::
 * Quantities::
-* Extended Number Operations::
 * Logical Number Operations::
+* Performance of numeric operations::
 @end menu
 
-@node Arithmetic operations, Quantities, , Numbers
+@node Arithmetic operations
 @section Arithmetic operations
 
 @deffn Procedure + @var{z} @dots{}
@@ -3082,6 +3082,43 @@ such that:
 @end example
 @end deffn
 
+@deffn Procedure quotient x y
+Kawa generalizes @code{quotient} to arbitrary real numbers,
+using the definition:
+@code{(truncate (/ x y))}.
+@end deffn
+
+@deffn Procedure remainder x y
+Generalized to arbitrary real numbers, using the definition:
+@code{(- x (* y (truncate (/ x y))))}.
+If @code{y} is @code{0}, the result is @code{x} - i.e. we take
+@code{(* 0 (quotient x 0))} to be @code{0}.
+The result is inexact if either argument is inexact,
+even if @code{x} is exact and @code{y} is 0.
+@example
+(remainder 13 4)     @result{} 1
+(remainder -13 4)    @result{} -1
+(remainder 13 -4)    @result{} 1
+(remainder -13 -4)   @result{} -1
+(remainder -13 -4.0) @result{} -1.0
+@end example
+@end deffn
+
+@deffn Procedure modulo x y
+Generalized to arbitrary real numbers, using the definition:
+@code{(- x (* y (floor (/ x y))))}.
+If @code{y} is @code{0}, the result is @code{x}.
+The result is inexact if either argument is inexact,
+even if @code{x} is exact and @code{y} is 0.
+
+@example
+(modulo 13 4)   @result{} 1
+(modulo -13 4)  @result{} 3
+(modulo 13 -4)  @result{} -4
+(modulo -13 -4) @result{} -1
+@end example
+@end deffn
+
 @deffn Procedure abs @var{x}
 Returns the absolute value of its argument.
 
@@ -3263,7 +3300,7 @@ an exact argument.
 @end example
 @end deffn
 
-@node Quantities, Extended Number Operations, Arithmetic operations, Numbers
+@node Quantities
 @section Quantities and Units
 
 As a super-class of numbers, Kawa also provides quantities.
@@ -3326,32 +3363,7 @@ so the above is equivalent to:
 @end example
 @end deffn
 
-@node Extended Number Operations, Logical Number Operations, Quantities, Numbers
-@section Extended Number Operations
-
-@deffn Procedure quotient x y
-Generalized to arbitrary real numbers, using the definition:
-@code{(truncate (/ x y))}.
-@end deffn
-
-@deffn Procedure remainder x y
-Generalized to arbitrary real numbers, using the definition:
-@code{(- x (* y (truncate (/ x y))))}.
-If @code{y} is @code{0}, the result is @code{x} - i.e. we take
-@code{(* 0 (quotient x 0))} to be @code{0}.
-The result is inexact if either argument is inexact,
-even if @code{x} is exact and @code{y} is 0.
-@end deffn
-
-@deffn Procedure modulo x y
-Generalized to arbitrary real numbers, using the definition:
-@code{(- x (* y (floor (/ x y))))}.
-If @code{y} is @code{0}, the result is @code{x}.
-The result is inexact if either argument is inexact,
-even if @code{x} is exact and @code{y} is 0.
-@end deffn
-
-@node Logical Number Operations, , Extended Number Operations, Numbers
+@node Logical Number Operations
 @section Logical Number Operations
 
 These functions operate on the 2's complement binary representation
@@ -3601,6 +3613,65 @@ Alias for @code{arithmetic-shift}.
 @deffn Procedure bit-extract n start end
 Equivalent to @code{(bitwise-bit-field @var{n} @var{start} @var{end})}.
 @end deffn
+
+@node Performance of numeric operations
+@section Performance of numeric operations
+
+Kawa can generally do a pretty good job of generating
+efficient code for numeric operations, at least when
+it knows or can figure out the types of the operands.
+
+The basic operations @code{+}, @code{-}, and @code{*}
+are compiled to single-instruction bytecode if both
+operands are @code{int} or @code{long}.
+Likewise, if both operands are floating-point (or
+one is floating-point and the other is rational),
+then single-instruction @code{double} or @code{float}
+instructions are emitted.
+
+A binary operation involing an infinite-precision @code{integer}
+and a fixed-size @code{int} or @code{long} is normally
+evaluated by expanding the latter to @code{integer}
+and using @code{integer} arithmetic.  An exception is the
+@code{integer} argument is an integer literal whose
+value fits in a @code{int} or @code{long} - in that case
+the operation is done using  @code{int} or @code{long}
+arithmetic.
+
+In general, integer literals have amorphous type.
+When used to infer the type of a variable, they have @code{integer} type:
+@example
+(let ((v1 0))
+  ... v1 has type integer ... )
+@end example
+However, a literal whose value fits in the @code{int} or @code{long} range
+is implicitly viewed @code{int} or @code{long} in certain contexts,
+primarily method overload resolution and binary arithmethic
+(as mentioned above).
+
+The comparison functions @code{<}, @code{<=}, @code{=},
+@code{>}, and @code{=>} are also optimized to single instriction
+operations if the operands have appropriate type.
+However, the functions @code{zero?}, @code{positive?}, and @code{negative?}
+have not yet been optimized.
+Instead of @code{(positive? x)} write @code{(> x 0)}.
+
+There are a number of integer division and modulo operations.
+If the operands are @code{int} or @code{long}, it is faster
+to use @code{quotient} and @code{remainder} rather
+than @code{div} and @code{mod} (or @code{modulo}).
+If you know the first operand is non-negative and the second is positive,
+then use @code{quotient} and @code{remainder}.
+(If an operand is an arbitrary-precision @code{integer},
+then it dosn't really matter.)
+
+The logical operations @code{bitwise-and}, @code{bitwise-ior},
+@code{bitwise-xor}, @code{bitwise-not}, @code{bitwise-arithmetic-shift-left},
+@code{bitwise-arithmetic-shift-right} are compiled
+to single bitcode instructions if the operands are @code{int} or @code{long}.
+Avoid @code{bitwise-arithmetic-shift} if the sign of the shift is known.
+If the operands are arbitrary-precision @code{integer},
+a library call is needed, but run-time type dispatch is avoided.
 
 @node Characters and text, Data structures, Numbers, Top
 @chapter Characters and text
@@ -4801,7 +4872,7 @@ maps keys to exact integer objects.
 
 The hashtable provides key lookup and destructive update in amortised
 constant time, provided that a good hash function is used. 
-A hash funtion @var{h} is acceptable for an equivalence predicate @var{e} iff
+A hash function @var{h} is acceptable for an equivalence predicate @var{e} iff
 @code{(@var{e} @var{obj1} @var{obj2})} implies
 @code{(= (@var{h} @var{obj1}) (@var{h} @var{obj2}))}.
 A hash function @var{h} is good for a equivalence predicate @var{e} if

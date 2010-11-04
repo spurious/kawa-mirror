@@ -1,4 +1,4 @@
-(test-begin "numbers" 1801)
+(test-begin "numbers" 1802)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -66,6 +66,8 @@
 (test-equal -3 (mod0 -123 10))
 (test-equal -3 (mod0 -123 -10))
 (test-equal 123 (mod 123 0))
+
+(test-equal -1.0 (remainder -13 -4.0))
 
 (test-equal #(-12 3) (let-values (((r q) (div-and-mod 123 -10)))
 		       (vector r q)))

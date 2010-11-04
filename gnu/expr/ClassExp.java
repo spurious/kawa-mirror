@@ -793,17 +793,21 @@ public class ClassExp extends LambdaExp
   }
 
   /** Mangle a "slot" name to a get- or set- method name.
-   * @param prefix either "get" or "set"
+   * @param prefix either "get" or "set" or "add"
    * @param sname a "slot" (property) name.  This is mangled if needed.
    */
   public static String slotToMethodName(String prefix, String sname)
   {
     if (! Compilation.isValidJavaName(sname))
       sname = Compilation.mangleName(sname, false);
-    StringBuffer sbuf = new StringBuffer(sname.length()+3);
+    int slen = sname.length();
+    StringBuffer sbuf = new StringBuffer(slen+3);
     sbuf.append(prefix);
-    sbuf.append(Character.toTitleCase(sname.charAt(0)));
-    sbuf.append(sname.substring(1));
+    if (slen > 0)
+      {
+        sbuf.append(Character.toTitleCase(sname.charAt(0)));
+        sbuf.append(sname.substring(1));
+      }
     return sbuf.toString();
   }
 

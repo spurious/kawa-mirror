@@ -476,7 +476,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 	exp.setBinding(decl);
       }
     if (decl.getFlag(Declaration.IS_UNKNOWN)
-        && comp.resolve(exp.getSymbol(), exp.isProcedureName()) != null)
+        && comp.resolve(exp.getSymbol(), exp.isProcedureName()) == null)
       {
         maybeWarnNoDeclarationSeen(exp.getSymbol(), comp, exp);
       }

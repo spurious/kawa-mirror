@@ -1,5 +1,8 @@
 2010-11-03  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Anonymous classes): Talk about SAM-conversion.
+	(Allocating objects): Lots of stuff about recent improvements.
+
 	* kawa.texi (Extended Number Operations): Remove node. merging
 	content into Arithmetic operations.
 	(Performance of numeric operations): New node.

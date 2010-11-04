@@ -2279,7 +2279,7 @@ namespace URI.
 
 Compound symbols are usually written using the infix colon operator:
 @example
-@var{prefix}@b{:}@var{local-name}
+@var{prefix}@stxlit{:}@var{local-name}
 @end example
 where @var{prefix} is is namespace alias bound
 to some (lexically-known) namespace URI.
@@ -7134,7 +7134,7 @@ it using parentheses: @samp{(this)}.  A planned extension will
 allow an optional class specifier (needed for nested clases).
 @end deffn
 
-@node Defining new classes, Anonymous classes, , Objects Classes and Modules
+@node Defining new classes
 @section Defining new classes
 
 Kawa provides various mechanisms for defining new classes.
@@ -7430,7 +7430,7 @@ but you can get the same effect using a @code{synchronized} expression:
 		 (synchronized-block))))
 @end example
 
-@node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
+@node Anonymous classes
 @section Anonymous classes
 
 @deffn Syntax object @stxlit{(}supers ...@stxlit{)} field-or-method-decl ...
@@ -7467,6 +7467,33 @@ in a scope where all the @var{fname}s are visible.
 
 A @var{method-decl} is as for @code{define-class}.
 @end deffn
+
+@subsection Lambda as shorthand for anonymous class
+@anchor{SAM-conversion}
+An anonymous class is commonly used in the Java platform where a
+function language would use a lambda expression.
+Examples are call-back handlers, events handlers, and @code{run} methods.
+In these cases Kawa lets you use a lambda expression as a short-hand
+for an anonymous class.  For example:
+@example
+(button:addActionListener
+  (lambda (e) (do-something)))
+@end example
+is equivalent to:
+@example
+(button:addActionListener
+  (object (java.awt.event.ActionListener)
+    ((actionPerformed (e ::java.awt.event.ActionEvent))::void
+     (do-something))))
+@end example
+This is possible when the required type is an interface or
+abstract class with a Single (exactly one) Abstract Methods.
+Such a class is sometypes called a @dfn{SAM-type}, and the
+conversion from a lambda expression to an anonymous class
+is sometimes called @dfn{SAM-conversion}.
+
+Note that Kawa can also infer the parameter and return types
+of a method that overrides a method in a super-class.
 
 @node Module classes, Record types, Anonymous classes, Objects Classes and Modules
 @section Modules and how they are compiled to classes
@@ -8256,50 +8283,202 @@ array element type must be compatible with all the extra arguments.)
 @node Allocating objects, Field operations, Method operations, Objects Classes and Modules
 @section  Allocating objects
 
-You can create a instance of a class-type
-by ``calling'' the class-type as a function:
+The recommended way to create an instance of a type @var{T}
+is to ``call'' @var{T} as if it were a function, with the
+arguments used to initialize the object.
+If @code{T} is a class and @code{T} has a matching constructor,
+then the arguments will used for constructor arguments:
 @example
-(java.util.Vector 20)
+(java.util.StringTokenizer "this/is/a/test" "/")
 @end example
-I.e. if you call a type as if were a function,
-then the type is coerced to an instance-constructor function.
+(You can think of the type @var{T} as being
+coerced to an instance-constructor function.)
 
-Often the most convenient way to allocate a new object
-is to use the namespace-colon syntax discussed in the previous section.
-For example:
+If @code{T} is a container or collection type,
+then typically the arguments will be used to specify
+the child or component values.
+Many standard Scheme procedures fit this convention.
+For example in Kawa @code{list} and @code{vector} evaluate to
+types, rather than procedures as in standard Scheme,
+but because types can be used as constructor functions it just works:
 @example
-(java.util.Vector:new 20)
-@end example 
+(list 'a (+ 3 4) 'c) @result{} (a 7 c)
+(vector 'a 'b 'c) @result{} #(a b c)
+@end example
+Any class @code{T} that has a default constructor
+and an @code{add} method can be initialized this way.
+Examples are @code{java.util} collection classes,
+and @code{jawa.awt} and @code{javax.swing} containers.
+@example
+(java.util.ArrayList 11 22 33) @result{} [11, 22, 333]
+@end example
+The above expression is equivalent to:
+@example
+(let ((tmp (java.util.ArrayList)))
+  (tmp:add 11)
+  (tmp:add 22)
+  (tmp:add 33)
+  tmp)
+@end example
 
-A third slightly more verbose option is to use the @code{make} builtin function.
+Allocating Java arrays (@pxref{Creating-new-Java-arrays}) uses a
+similar pattern:
+@example
+(int[] 2 3 5 7 11)
+@end example
+
+Sometimes you want to set some named property to an initial value.
+You can do that using a keyword argument.  For example:
+@example
+(javax.swing.JButton text: "Do it!" tool-tip-text: "do it")
+@end example
+
+This is equivalent to using @dfn{setter methods}:
+@example
+(let ((tmp (javax.swing.JButton)))
+  (tmp:setText "Do it!")
+  (tmp:setToolTipText "do it")
+  tmp)
+@end example
+
+A keyword argument @code{@var{key-name}}@stxlit{:} can
+can translated to either a @code{@stxlit{set}@var{KeyName}@stxlit{:}}
+or a  @code{@stxlit{add}@var{KeyName}@stxlit{:}} method.
+The latter makes it convenient to add listeners:
+
+@example
+(javax.swing.JButton
+  text: "Do it!"
+  action-listener:
+   (object (java.awt.event.ActionListener)
+     ((actionPerformed e) (do-the-action))))
+@end example
+This is equivalent to: 
+@example
+(let ((tmp (javax.swing.JButton)))
+  (tmp:setText "Do it!")
+  (tmp:addActionListener
+    (object (java.awt.event.ActionListener)
+      ((actionPerformed e) (do-the-action))))
+  tmp)
+@end example
+
+Making use of so-called ``SAM-conversion'' (@pxref{SAM-conversion})
+ makes it even more convenient:
+@example
+(javax.swing.JButton
+  text: "Do it!"
+  action-listener:
+   (lambda (e) (do-the-action)))
+@end example
+
+The general case allows for a mix of
+constructor arguments, property keywords, and child values:
+@display
+@var{class-type} @var{constructor-value}... @var{property-initializer}... @var{child-value}...
+@stxdef{constructor-value} @var{expression}
+@stxdef{property-initializer} @var{keyword} @var{expression}
+@stxdef{child-value} @var{expression}
+@end display
+
+First an object is constructed with the @var{constructor-value} arguments
+(if any) passed to the object constructor; 
+then named properties (if any) are used to initialize named properties;
+and then remaining arguments are used to add child values.
+
+There is an ambiguity if there is no @var{property-initializer} -
+we can't distinguish between a @var{constructor-value}
+and a @var{child-value}.
+In that case, if there is a matching constructor method, then all of the
+arguments are constructor arguments;
+otherwise, there must a default constructor, and all
+of the arguments are @var{child-value} arguments.
+
+There is a trick you can you if you need both
+@var{constructor-value} and @var{child-value} arguments:
+separate them with an ``empty keyword'' @code{||:}.
+This matches a method named @code{add}, which means that
+the next argument effectively a @var{child-value} - as do
+all the remaining arguments. Example:
+@example
+(let ((vec #(1 2 3)))
+  (java.util.ArrayList vec ||: 4 5 6))
+  @result{} [1, 2, 3, 4, 5, 6]
+@end example
+
+The compiler rewrites these allocations expression
+to generated efficient bytecode, assuming that the ``function''
+being applied is a type known by the compiler.
+Most of the above expressions also work if the type is applied
+at run-time, in which case Kawa has to use slower reflection:
+@example
+(define iarr int[])
+(apply iarr (list 3 4 5)) @result{} [3 4 5]
+@end example
+However @code{add@var{Xxx}} methods and SAM-conversion
+are currently only recognized in the case of a class known at compile-time,
+not at run-time.
+
+Here is a working Swing demo illustrating many of these techniques:
+
+@example
+(define-alias JButton javax.swing.JButton)
+(define-simple-class HBox (javax.swing.Box)
+  ((*init*) (invoke-special javax.swing.Box (this) '*init* 0)))
+(define-alias JFrame javax.swing.JFrame)
+(define-alias Box javax.swing.Box)
+
+(define value 0)
+
+(define txt
+  (javax.swing.JLabel
+   text: "0"))
+
+(define (set-value i)
+  (set! value i)
+  (set! txt:text (number->string i)))
+
+(define fr
+  (JFrame
+     title: "Hello!"
+     (Box 1#|VERTICAL|# ||:
+      (javax.swing.Box:createGlue)
+      txt
+      (javax.swing.Box:createGlue)
+      (HBox
+       (JButton ;; uses 1-argument constructor
+	"Decrement" ;; constructor argument
+	tool-tip-text: "decrement"
+	action-listener: (lambda (e) (set-value (- value 1))))
+       (javax.swing.Box:createGlue)
+       (JButton ;; uses 0-argument constructor
+	text: "Increment"
+	tool-tip-text: "increment"
+	action-listener: (lambda (e) (set-value (+ value 1))))))))
+(fr:setSize 200 100)
+(set! fr:visible #t)
+@end example
+
+If you prefer, you can use the older @code{make} special function:
 
 @deffn Procedure make type args ...
 Constructs a new object instance of the specified @var{type},
 which must be either a @code{java.lang.Class} or a
 @code{<gnu.bytecode.ClassType>}.
-
-The @var{args ...} are passed to the constructor of the class type.
-If there is no applicable constructor, and the @var{args ...}
-consist of a set of (@var{keyword},@var{value})-pairs,
-then the default constructor is called, and each
-(@var{keyword},@var{value})-pair is used to set the correspdong slot
-of the result, as if by:
-@code{(slot-set! @var{result} @var{keyword} @var{value})}.
-
-For example, the following are all equivalent:
+Equivalent to:
 @example
-(set! p (make <java.awt.Point> 3 4))
-
-(set! p (make <java.awt.Point> y: 4 x: 3))
-
-(set! p (make <java.awt.Point>))
-(slot-set! p 'x 3)
-(set! (slot-ref p 'y) 4)
+@var{type} @var{args} ...
 @end example
 @end deffn
 
-All of these will usually be optimized to efficient bytecode, assuming
-Kawa knows at compile-time which class you're using.
+Another (semi-deprecated) function is to use the colon notation
+with the @code{new} pseudo-function.
+The following three are all equivalent:
+@example
+(java.awt.Point:new x: 4 y: 3)
+(make java.awt.Point: x: 4 y: 3)
+(java.awt.Point x: 4 y: 3)
+@end example 
 
 @node Field operations, Mangling, Allocating objects, Objects Classes and Modules
 @section Accessing fields of Java objects
@@ -8527,32 +8706,33 @@ which must be provided by any class that extends @code{Procedure2}.
 @section Using Java Arrays
 
 @subsection Creating new Java arrays
-
-To allocate a Java array you can use the @code{make} function.
-For example, you allocate an array with room for 10 elements
-each of each is a primitive @code{int} you can do this:
+@anchor{Creating-new-Java-arrays}
+To allocate a Java array you can use the array type specifier
+as a constructor function.  For example, to allocate an array with room for 10 elements
+each of each is a primitive @code{int}:
 @example
-(make <int[]> length: 10)
-@end example
-
-If you use the type ``expression'' @code{<int[]>} as a function,
-you can leave out the @code{make} name, so this is equivalent:
-@example
-(<int[]> length: 10)
+(int[] length: 10)
 @end example
 
 You can specify the initial elements instead of the length:
 @example
-(<object[]> 31 32 33 34)
+(object[] 31 32 33 34)
 @end example
 This creates a 4-length array, initialized to the given values.
+
+Note this is a variation of the generation object-allocation
+(@pxref{Allocating objects}) pattern.  You can explicitly
+use the @code{make} function, if you prefer:
+@example
+(make object[] 31 32 33 34)
+@end example
 
 If you specify a length, you can also specify initial values for selected
 elements.
 If you specify an index, in the form of a literal integer-valued keyword,
 then following elements are placed starting at that position.
 @example
-(<int[]> length: 100 10 12 80: 15 16 50: 13 14)
+(int[] length: 100 10 12 80: 15 16 50: 13 14)
 @end example
 This creates an array with 100 elements.  Most of them are initialized
 to the default value of zero,
@@ -8564,7 +8744,7 @@ to the values 10, 12, 13, 14, 15, 16, respectively.
 You can access the elements of a Java array by treating it as
 a one-argument function, where the argument is the index:
 @example
-(define primes (<integer[]> 2 3 5 7 11 13))
+(define primes (integer[] 2 3 5 7 11 13))
 (primes 0) @result{} 2
 (primes 5) @result{} 13
 @end example
@@ -8585,16 +8765,17 @@ primes:length @result{} 6
 
 Here is a longer example.  This is the actual definition of the
 standard @code{gcd} function.  Note the @code{args} variable
-receives all the arguments on the form of an @code{Object} array.
+receives all the arguments on the form of an @code{integer} array.
+(This uses the Java5 varargs feature.)
 @example
-(define (gcd #!rest (args :: <Object[]>)) :: <integer>
-  (let ((n :: <int> args:length))
-    (if (zero? n)
+(define (gcd #!rest (args ::integer[])) ::integer
+  (let ((n ::int args:length))
+    (if (= n 0)
 	0
-	(let ((result :: <integer> (args 0)))
-	  (do ((i :: <int> 1 (+ i 1)))
+	(let ((result ::integer (args 0)))
+	  (do ((i ::int 1 (+ i 1)))
 	      ((>= i n) result)
-	    (set! result (<integer>:gcd result (<integer>:@ (args i)))))))))
+	    (set! result (gnu.math.IntNum:gcd result (args i))))))))
 @end example
 
 The above example generates good code,
@@ -9367,7 +9548,7 @@ You can also use XQuery:
 @node Self-configuring page scripts, Servlets, Server-side scripts, XML tools
 @section Self-configuring web page scripts
 
-Kawa makes it easy to set up a web site without have configuration
+Kawa makes it easy to set up a web site without configuration
 files.  Instead, the mapping from request URL to web page script
 matches the layout of files in the application directory.
 
@@ -10692,7 +10873,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 This manual has made use text and examples from Dorai Sitaram's
 @code{pregexp} implementation.  But not where the latter talks about
-@code{pregexp-xxx} funtions the manual also also talks about
+@code{pregexp-xxx} functions the manual also also talks about
 the @code{regex-xxx} functions (which are are similar but use a
 slight different regular expression syntax).
 The @code{pregexp} distribution has the following @code{COPYING} file:

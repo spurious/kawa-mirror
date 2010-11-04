@@ -224,8 +224,9 @@ public class SlotSet extends Procedure3 implements Inlineable
 	  {
             name = val1.toString();
 	    part = lookupMember(ctype, name, caller);
-	    if (part == null && type != Type.pointer_type)
-	      comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+	    if (part == null && type != Type.pointer_type
+                && comp.warnUnknownMember())
+	      comp.error('w', "no slot `"+name+"' in "+ctype.getName());
 	  }
 	else if (val1 instanceof Member)
 	  {

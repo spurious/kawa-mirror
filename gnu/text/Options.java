@@ -1,10 +1,8 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2010  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Enumeration;
+import java.util.*;
 
 /** Mananges a table of named options,
  * Can inherit from another table of "default" options. */
@@ -32,25 +30,32 @@ public class Options
   }
 
   /** Maps property keys to options values. */
-  Hashtable valueTable;
+  HashMap<String,Object> valueTable;
 
   /** Maps property keys to OptionInfo. */
-  Hashtable infoTable;
+  HashMap<String,OptionInfo> infoTable;
 
   /** Create a new option and enters it in this table.
    * A duplicate option throws a RuntimeException.
    * @param key the options name (key).
    * @param kind type and other flag bits of the option.
    * @param documentation a String describing what the option does. */
-  public void add(String key, int kind, String documentation)
+  public OptionInfo add(String key, int kind, String documentation)
+  {
+    return add(key, kind, null, documentation);
+  }
+
+  public OptionInfo add(String key, int kind, Object defaultValue,
+                        String documentation)
   {
     if (infoTable == null)
-      infoTable = new Hashtable();
+      infoTable = new HashMap<String,OptionInfo>();
     else if (infoTable.get(key) != null)
       throw new RuntimeException("duplicate option key: "+key);
     OptionInfo info = new OptionInfo();
     info.key = key;
     info.kind = kind;
+    info.defaultValue = defaultValue;
     info.documentation = documentation;
     if (first == null)
       first = info;
@@ -58,6 +63,7 @@ public class Options
       last.next = info;
     last = info;
     infoTable.put(key, info);
+    return info;
   }
 
   static Object valueOf (OptionInfo info, String argument)
@@ -118,7 +124,7 @@ public class Options
     else if (value == null)
       value = "";
     if (valueTable == null)
-      valueTable = new Hashtable();
+      valueTable = new HashMap<String,Object>();
     valueTable.put(key, value);
   }
 
@@ -126,7 +132,7 @@ public class Options
   public void reset (String key, Object oldValue)
   {
     if (valueTable == null)
-      valueTable = new Hashtable();
+      valueTable = new HashMap<String,Object>();
     if (oldValue == null)
       valueTable.remove(key);
     else
@@ -150,7 +156,7 @@ public class Options
 	  return "value of option "+key+" must be yes/no/true/false/on/off/1/0";
       }
     if (valueTable == null)
-      valueTable = new Hashtable();
+      valueTable = new HashMap<String,Object>();
     valueTable.put(key, value);
     return null;
   }
@@ -169,15 +175,40 @@ public class Options
    * hasn't been set. */
   public Object get (String key, Object defaultValue)
   {
-    Object val = valueTable == null ? null : valueTable.get(key);
-    if (val != null)
-      return val;
-    if (previous != null)
-      return previous.get(key, defaultValue);
     OptionInfo info = getInfo(key);
     if (info == null)
       throw new RuntimeException("invalid option key: "+key);
+    return get(info, defaultValue);
+  }
+
+  public Object get (OptionInfo key, Object defaultValue)
+  {
+    Options options = this;
+    while (options != null)
+      {
+        for (OptionInfo info = key;  ; )
+          {
+            Object val = options.valueTable == null ? null
+              : options.valueTable.get(info.key);
+            if (val != null)
+              return val;
+            if (info.defaultValue instanceof OptionInfo)
+              info = (OptionInfo) info.defaultValue;
+            else
+              {
+                if (info.defaultValue != null)
+                  defaultValue = info.defaultValue;
+                break;
+              }
+          }
+        options = options.previous;
+      }
     return defaultValue;
+  }
+
+  public Object get (OptionInfo key)
+  {
+    return get(key, null);
   }
 
   /** Get current option value.
@@ -199,6 +230,18 @@ public class Options
   {
     Boolean defaultObject = defaultValue ? Boolean.TRUE : Boolean.FALSE;
     return ((Boolean) get (key, defaultObject)).booleanValue();
+  }
+
+  public boolean getBoolean (OptionInfo key, boolean defaultValue)
+  {
+    Boolean defaultObject = defaultValue ? Boolean.TRUE : Boolean.FALSE;
+    return ((Boolean) get (key, defaultObject)).booleanValue();
+  }
+
+  public boolean getBoolean (OptionInfo key)
+  {
+    Object value = get (key, null);
+    return value == null ? false : ((Boolean) value).booleanValue();
   }
 
   /** Set a list of options, remember the old value.
@@ -234,18 +277,16 @@ public class Options
 
   /** Return the list of option keys.
    */
-  public Vector keys ()
+  public ArrayList<String> keys ()
   {
-    Vector allKeys = new Vector();
+    ArrayList<String> allKeys = new  ArrayList<String>();
     for (Options options = this;  options != null;  options = options.previous)
       {
 	if (options.infoTable != null)
 	  {
-	    Enumeration e = options.infoTable.keys();
-	    while (e.hasMoreElements())
-	      {
-		Object k = e.nextElement();
-		if (! allKeys.contains(k))
+	    for (String k : options.infoTable.keySet())
+              {
+                if (! allKeys.contains(k))
 		  allKeys.add(k);
 	      }
 	  }
@@ -260,13 +301,13 @@ public class Options
       return null;
     return info.documentation;
   }
-  
-}
 
-final class OptionInfo
-{
-  OptionInfo next;
-  String key;
-  int kind;
-  String documentation;
+  public static final class OptionInfo
+  {
+    OptionInfo next;
+    String key;
+    int kind;
+    String documentation;
+    Object defaultValue;
+  }
 }

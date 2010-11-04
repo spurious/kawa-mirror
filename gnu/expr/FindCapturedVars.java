@@ -155,7 +155,7 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
   void maybeWarnNoDeclarationSeen (Object name, Compilation comp, SourceLocator location)
   {
-    if (comp.getBooleanOption("warn-undefined-variable", false))
+    if (comp.warnUndefinedVariable())
       comp.error('w', "no declaration seen for "+name, location);
   }
 

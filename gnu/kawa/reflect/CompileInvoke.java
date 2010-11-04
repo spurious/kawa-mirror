@@ -320,8 +320,7 @@ public class CompileInvoke
           }
         if (okCount + maybeCount == 0)
           {
-            if (kind == 'P'
-                || comp.getBooleanOption("warn-invoke-unknown-method", true))
+            if (kind == 'P' || comp.warnInvokeUnknownMethod())
               {
                 if (kind=='N')
                   name = name+"/valueOf";
@@ -368,8 +367,7 @@ public class CompileInvoke
                   }
               }
             if (index < 0
-                && (kind == 'P'
-                    || comp.getBooleanOption("warn-invoke-unknown-method", true)))
+                && (kind == 'P' || comp.warnInvokeUnknownMethod()))
               {
                 StringBuffer sbuf = new StringBuffer();
                 sbuf.append("more than one definitely applicable method `");
@@ -380,8 +378,7 @@ public class CompileInvoke
                 comp.error(kind == 'P' ? 'e' : 'w', sbuf.toString());
               }
           }
-        else if (kind == 'P'
-                 || comp.getBooleanOption("warn-invoke-unknown-method", true))
+        else if (kind == 'P' || comp.warnInvokeUnknownMethod())
           {
             StringBuffer sbuf = new StringBuffer();
             sbuf.append("more than one possibly applicable method '");

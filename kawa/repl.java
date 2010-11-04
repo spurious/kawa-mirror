@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.*;
+import java.util.ArrayList;
 import java.util.Vector;
 import gnu.bytecode.ClassType;
 import gnu.kawa.servlet.HttpRequestContext;
@@ -105,10 +106,10 @@ public class repl extends Procedure0or1
     printOption(out, "--servlet", "Generate a servlet");
     printOption(out, "--module-static", "Top-level definitions are by default static");
 
-    Vector keys = Compilation.options.keys();
+    ArrayList<String> keys = Compilation.options.keys();
     for (int i = 0; i < keys.size(); ++i)
       {
-        String name = (String) keys.get(i);
+        String name = keys.get(i);
         printOption(out, "--" + name, Compilation.options.getDoc(name));
       }
         

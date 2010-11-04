@@ -45,7 +45,7 @@ all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_
 PACKAGE_FNAME = kawa-lib
 EXTRA_GCJ_COMPILED = scm-classes.stamp
 EXTRA_GCJ_INPUTS = *.class
-SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
+SCM_COMPILE_FLAGS = --warn-undefined-variable --warn-unknown-member --warn-as-error
 EXTRA_CLEAN = */*.class
 
 

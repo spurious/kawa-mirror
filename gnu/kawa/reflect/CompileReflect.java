@@ -177,7 +177,7 @@ public class CompileReflect
             nexp.setLine(exp);
             return nexp;
           }
-        if (type != Type.pointer_type)
+        if (type != Type.pointer_type && comp.warnUnknownMember())
           comp.error('e', "no slot `"+name+"' in "+ctype.getName());
       }
 

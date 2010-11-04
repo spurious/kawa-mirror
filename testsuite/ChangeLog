@@ -1,5 +1,8 @@
 2010-11-04  Per Bothner  <per@bothner.com>
 
+	* module2.scm: Add define-variable to avoid warning.
+	* module3.scm: Add with-compile-options to suppress warning,
+
 	* num-test.scm: Add a test from R6RS for remainder.
 
 2010-10-29  Per Bothner  <per@bothner.com>

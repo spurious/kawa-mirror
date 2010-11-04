@@ -14,6 +14,7 @@
 (define list1234 (deldup (call-to-first '((1 1 2 3 4 4)))))
 
 ;; Caused VerifyError
+(define-variable internal-node-name)
 (define name internal-node-name)
 (define (classify)
   (let node-loop ((classes '()))

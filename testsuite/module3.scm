@@ -48,7 +48,9 @@
   (let ((setter (primitive-array-set <int>)))
     (setter array index value)))
 
-(define-variable dvar1 (+ (get-mod0-v1) 1)) ;; 11
+(define-variable dvar1
+  (with-compile-options warn-undefined-variable: #f
+			(+ (get-mod0-v1) 1))) ;; 11
 (define-variable dvar2)
 (define-variable dvar3 13)
 (define dvar-test-1

@@ -1,3 +1,11 @@
+2010-11-04  Per Bothner  <per@bothner.com>
+
+	* Options.java: Modernize. to use generics and Java2 collections.
+	(OptionInfo): Change to public member class. New defaultValue field.
+	(add): Return OptionInfo.
+	(get, getBoolean): New variants that take OptionInfo as parameter.
+	Add support for defaulting to another option.
+
 2010-06-11  Per Bothner  <per@bothner.com>
 
 	* URLPath.java (classResourcePath): If we get a SecurityException,

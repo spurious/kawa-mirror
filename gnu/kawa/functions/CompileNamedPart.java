@@ -137,7 +137,7 @@ public class CompileNamedPart
           }
       }
 
-    if (comp.getBooleanOption("warn-invoke-unknown-method", ! comp.immediate))
+    if (comp.warnUnknownMember())
       comp.error('w', "no known slot '"+mname+"' in "+type.getName());
     return exp;
   }

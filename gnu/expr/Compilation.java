@@ -110,14 +110,39 @@ public class Compilation implements SourceLocator
   public static boolean debugPrintFinalExpr;
 
   public static Options options = new Options();
-  public Options currentOptions = new Options(options);
-  static {
-    options.add("warn-undefined-variable", Options.BOOLEAN_OPTION,
+  public static Options.OptionInfo warnUndefinedVariable =
+    options.add("warn-undefined-variable",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
 		"warn if no compiler-visible binding for a variable");
-    options.add("warn-invoke-unknown-method", Options.BOOLEAN_OPTION,
-		"warn if invoke calls an unknown method");
-    options.add("warn-as-error", Options.BOOLEAN_OPTION,
+  public static Options.OptionInfo warnUnknownMember =
+    options.add("warn-unknown-member",
+                Options.BOOLEAN_OPTION, Boolean.TRUE,
+		"warn if referencing an unknown method or field");
+  public static Options.OptionInfo warnInvokeUnknownMethod =
+    options.add("warn-invoke-unknown-method",
+                Options.BOOLEAN_OPTION, warnUnknownMember,
+		"warn if invoke calls an unknown method (subsumed by warn-unknown-member)");
+  public static Options.OptionInfo warnAsError =
+    options.add("warn-as-error", Options.BOOLEAN_OPTION, Boolean.FALSE,
 		"Make all warnings into errors");
+
+  public Options currentOptions = new Options(options);
+
+  public boolean warnUndefinedVariable ()
+  {
+    return currentOptions.getBoolean(warnUndefinedVariable);
+  }
+  public boolean warnUnknownMember ()
+  {
+    return currentOptions.getBoolean(warnUnknownMember);
+  }
+  public boolean warnInvokeUnknownMethod ()
+  {
+    return currentOptions.getBoolean(warnInvokeUnknownMethod);
+  }
+  public boolean warnAsError ()
+  {
+    return currentOptions.getBoolean(warnAsError);
   }
 
   /** Get a named boolean option. */
@@ -2553,14 +2578,14 @@ public class Compilation implements SourceLocator
         column = getColumnNumber();
       }
 
-    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+    if (severity == 'w' && warnAsError())
       severity = 'e';
     messages.error(severity, file, line, column, message);
   }
 
   public void error(char severity, String message)
   {
-    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+    if (severity == 'w' && warnAsError())
       severity = 'e';
     
     messages.error(severity, this, message);
@@ -2574,7 +2599,7 @@ public class Compilation implements SourceLocator
   public void error(char severity, String message,
                     String code, Declaration decl)
   {
-    if (severity == 'w' && getBooleanOption("warn-as-error", false))
+    if (severity == 'w' && warnAsError())
       severity = 'e';
     
     String filename = getFileName();

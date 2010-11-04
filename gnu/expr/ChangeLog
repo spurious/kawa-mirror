@@ -1,5 +1,13 @@
 2010-11-04  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (warnUndefinedVariable, warnUnknownMember,
+	warnInvokeUnknownMethod, warnAsError): New static OptionInfo fields.
+	Change warnInvokeUnknownMethod to default to warnUnknownMember.
+	(warnUndefinedVariable, warnUnknownMember,
+	warnInvokeUnknownMethod, warnAsError): New methods.
+	* ExpVisitor.java (error): Update to use Compilation#warnAsError.
+	* FindCapturedVars.java: Similar, but with warnUndefinedVariable.
+
 	* ClassExp.java (slotToMethodName): Handle an empty sname.
 
 	* FindCapturedVars.java (visitReferenceExp): Fix thinko.

@@ -1148,11 +1148,17 @@ If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static 'init-run)} were specified). @xref{Module classes}.
 @cindex --warn-@var{whatever}
 @cindex --no-warn-@var{whatever}
+@pindex warn-unknown-member
+@item --warn-unknown-member
+Emit a warning if the code references a named member (field or method)
+for which there is no match in the compile-time type of the receiver.
+This defaults to on;
+to turn it off use the @code{--no-warn-unknown-member} flag.
 @pindex warn-invoke-unknown-method
 @item --warn-invoke-unknown-method
 Emit a warning if the @code{invoke} function calls a named method
 for which there is no matching method in the compile-time type of the receiver.
-This (currently) defaults to on;
+This defaults to the value of @code{--warn-unknown-member},
 to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
 @pindex warn-undefined-variable
 @item --warn-undefined-variable
@@ -1172,8 +1178,8 @@ For boolean options, the values @code{yes}, @code{true}, @code{on}, or @code{1}
 enable the option, while @code{no}, @code{false}, @code{off},
 or @code{0} disable it.
 You can also negate an option by prefixing it with @code{no-}:
-The option @code{--no-warn-invoke-unknown-method}
-is the same as @code{--warn-invoke-unknown-method=no}.
+The option @code{--no-warn-unknown-member}
+is the same as @code{--warn-unknown-member=no}.
 
 You can set the same options within your Scheme source file.
 (In that case they override the options on the command line.)

@@ -183,7 +183,7 @@ public class ExpVisitor<R,D>
 
   public void error(char kind, String message)
   {
-    if (kind == 'w' && comp.getBooleanOption("warn-as-error", false))
+    if (kind == 'w' && comp.warnAsError())
       kind = 'e';
     if (messages != null)
       messages.error(kind, message);

@@ -238,9 +238,10 @@ public class SlotGet extends Procedure2
     Type type = isStatic ? language.getTypeFor(arg0)
       : arg0.getType();
     CodeAttr code = comp.getCode();
-    if (type instanceof ClassType && arg1 instanceof QuoteExp)
+
+    if (type instanceof ObjectType && arg1 instanceof QuoteExp)
       {
-	ClassType ctype = (ClassType) type;
+	ObjectType ctype = (ObjectType) type;
         Object part = ((QuoteExp) arg1).getValue();
         if (part instanceof gnu.bytecode.Field)
           {

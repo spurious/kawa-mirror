@@ -1,3 +1,8 @@
+2010-11-06  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeObjectRaw): For readable output of enums
+	use "ClassName:enumName" format.
+
 2010-11-04  Per Bothner  <per@bothner.com>
 
 	* CompileNamedPart.java: Use new Compilation#warnUnknownMember.

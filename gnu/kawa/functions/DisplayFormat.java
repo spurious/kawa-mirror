@@ -280,6 +280,12 @@ public class DisplayFormat extends AbstractFormat
         if (showRadix && b == 10 && obj instanceof IntNum)
           write(".", out);
       }
+    else if (obj instanceof java.lang.Enum && getReadableOutput())
+      {
+        write(obj.getClass().getName(), out);
+        write(":", out);
+        write(((java.lang.Enum) obj).name(), out);
+      }
     else
       {
         String asString;

@@ -1,3 +1,7 @@
+2010-11-06  Per Bothner  <per@bothner.com>
+
+	* enums.scm (%define-enum): Add static valueOf method.
+
 2010-10-28  Jamison Hope  <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

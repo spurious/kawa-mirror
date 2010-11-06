@@ -66,5 +66,8 @@
            ,@(datum->syntax-object form opts)
            ,(datum->syntax-object form init)
            ,(datum->syntax-object form values-method)
+	   ((valueOf s::String)::,(datum->syntax-object form t-name)
+	    allocation: 'static
+	    (java.lang.Enum:valueOf ,(datum->syntax-object form t-name) s))
            ,@(datum->syntax-object form field-descs)
            ,@(datum->syntax-object form other-defs))))))

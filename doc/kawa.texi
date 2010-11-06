@@ -1521,9 +1521,9 @@ All spaces in the grammar are for legibility.
 @c  @meta{Empty} stands for the empty string.
 
 The following extensions to @acronym{BNF} are used to make the
-description more concise: @arbno{@meta{thing}} means zero or more
-occurrences of @meta{thing}, and @atleastone{@meta{thing}} means at
-least one @meta{thing}.
+description more concise: @arbno{@meta{thing}} or @meta{thing}@code{...}
+both mean zero or more occurrences of @meta{thing},
+and @atleastone{@meta{thing}} means at least one @meta{thing}.
 
 Some non-terminal names refer to the Unicode scalar values of the same
 name: @meta{character-tabulation} (U+0009), @meta{linefeed} (U+000A),
@@ -7118,6 +7118,7 @@ The Kawa module system is based on the features of the Java class system.
 @menu
 * Defining new classes::
 * Anonymous classes::
+* Enumerations::          Enumeration types
 * Module classes::        Modules and how they are compiled to classes
 * Record types::          Defining Record Types
 * Dynamic records::       Creating New Record Types On-the-fly
@@ -7162,7 +7163,7 @@ in the Guile and Stk dialects of Scheme.
 @deffnx Syntax define-simple-class name @stxlit{(}supers ...@stxlit{)} option-pair* field-or-method-decl ...
 @display
 @stxdef{option-pair} @var{option-keyword} @var{option-value}
-@stxdef{field-or-method} @var{field-decl} | @var{method-decl}
+@stxdef{field-or-method-decl} @var{field-decl} | @var{method-decl}
 @end display
 
 Defines a new class named @var{name}.  If @code{define-simple-class} is
@@ -7208,6 +7209,7 @@ Can be one of @code{'public} (which is the default in Kawa),
 @code{'package} (which the default "unnamed" permission in Java code),
 @code{'protected}, @code{'private},
 @code{'volatile}, or @code{'transient}.
+Can also be used to specify @code{final} or @code{enum}, as in Java.
 Can also be a list, as for example:
 @example
 access: '(protected volatile)
@@ -7267,6 +7269,8 @@ Can be one of @code{'private}, @code{'protected},
 @code{'public} (which is the default in Kawa),
 or @code{'package} (which the default "unnamed" permission
 in Java code).
+Can also be used to specify @code{volatile}, @code{transient},
+@code{enum}, or @code{final}, as in Java.
 @item @stxlit{init:} @var{expr}
 An expression used to initialize the slot.
 The expression is evaluated in a scope that includes the field and
@@ -7443,7 +7447,7 @@ but you can get the same effect using a @code{synchronized} expression:
 Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
-@stxdef{field-or-method} @var{field-decl} | @var{method-decl}
+@stxdef{field-or-method-decl} @var{field-decl} | @var{method-decl}
 @stxdef{field-decl} @stxlit{(}@var{fname} [[[@stxlit{::}] @var{ftype}] @var{finit}]@stxlit{)}
     | @stxlit{(}@var{fname} [@stxlit{::} @var{ftype}] [@var{option-keyword} @var{option-value}]*@stxlit{)}
 @stxdef{method-decl} @stxlit{((}@var{method-name} @var{formal-arguments}@stxlit{)} [[@stxlit{::}] @var{rtype}] @var{body}@stxlit{)}
@@ -7501,7 +7505,62 @@ is sometimes called @dfn{SAM-conversion}.
 Note that Kawa can also infer the parameter and return types
 of a method that overrides a method in a super-class.
 
-@node Module classes, Record types, Anonymous classes, Objects Classes and Modules
+@node Enumerations
+@section Enumeration types
+
+An enumeration type is a set of named atomic enumeration values
+that are distinct from other values.  You define the type
+using @code{define-enum}, and you reference enumeration values
+using colon notation:
+@example
+(define-enum colors (red blue green))
+(define favorite-color colors:green)
+@end example
+Displaying an enum just prints the enum name,
+but readable output using @code{write} (or the @code{~s} @code{format}
+specifier) prepends the type name:
+@example
+(format "~a" favorite-color) @result{} "green"
+(format "~s" favorite-color) @result{} "colors:green"
+@end example
+The static @code{values} method returns a Java array of the enumeration
+values, in declaration order, while @code{ordinal} yields the index
+of an enumeration value:
+@example
+(colors:values) @result{} [red blue green]
+((colors:values) 1) @result{} blue
+(favorite-color:ordinal) @result{} 2
+@end example
+If you invoke the enumeration type as a function,
+it will map the name (as a string) to the corresponding value.
+(This uses the @code{valueOf} method.)
+@example
+(colors "red") @result{} red
+(colors "RED") @result{} throws IllegalArgumentException
+(eq? favorite-color (colors:valueOf "green")) @result{} #t
+@end example
+
+Kawa enumerations are based on Java enumerations.
+Thus the above is similar to a Java5 @code{enum} declaration,
+and the type @code{colors} above extends @code{java.lang.Enum}.
+
+@deffn Syntax define-enum enum-type-name @var{option-pair}... @stxlit{(}enum-value-name ...@stxlit{)} @var{field-or-method-decl}...
+This declares a new enumeration type @var{enum-type-name},
+whose enumerations values are the @var{enum-value-name} list.
+You can specify extra options and members using
+@var{option-pair} and @var{field-or-method-decl},
+which are as in @code{define-simple-class}.
+(The @var{define-enum} syntax is similar to a
+@code{define-simple-class} that extends @code{java.lang.Enum}.)
+@end deffn
+
+(Note that R6RS has a separate Enumerations library @code{(rnrs enum)}.
+Unfortunately, this is not compatible with standard Java enums.
+R6RS enums are simple symbols, which means you cannot distinguish
+two enum values from different enumeration types if they have the
+same value, nor from a vanilla symbol.  That makes them less useful.)
+
+@node Module classes
 @section Modules and how they are compiled to classes
 
 A @dfn{module} is a set of definitions that the module @dfn{exports},

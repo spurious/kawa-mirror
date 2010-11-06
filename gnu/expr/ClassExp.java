@@ -347,13 +347,9 @@ public class ClassExp extends LambdaExp
     if (isAbstract())
       instanceType.setModifiers(instanceType.getModifiers() | Access.ABSTRACT);
     if (nameDecl != null)
-      {
-        short access = nameDecl.getAccessFlags((short) 0);
-        if (access != 0)
-          instanceType.setModifiers((instanceType.getModifiers()
-                                     & ~Access.PUBLIC)
-                                    | access);
-      }
+      instanceType.setModifiers((instanceType.getModifiers()
+                                 & ~Access.PUBLIC)
+                                | nameDecl.getAccessFlags(Access.PUBLIC));
   }
 
   /** Return implementation method matching name and param types.

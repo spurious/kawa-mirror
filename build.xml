@@ -212,6 +212,9 @@
     <taskdef name="xcopy"
              classname="gnu.kawa.ant.XCopy"
              classpath="${build.tools}"/>
+    <taskdef name="kawac"
+             classname="gnu.kawa.ant.Kawac"
+             classpath="${build.tools}"/>
 
     <!-- 
        This doesn't really help us because user data 
@@ -456,52 +459,28 @@
         <include name="rnrs/programs.scm"/>
       </fileset>
 
-  <target name="check-lib-scm-classes">
-    <uptodate property="lib-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="${build.dir}/kawa/lib/*.class"/>
-      <srcfiles refid="lib-scm"/> 
-    </uptodate>
-  </target>
-
   <target name="lib-scm-classes" 
-          depends="java-classes, check-lib-scm-classes" 
-          unless="lib-scm-classes-uptodate">
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P kawa.lib. --module-static-run --warn-undefined-variable"/>
-      <arg value="-C"/>
+          depends="java-classes">
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="kawa.lib." modulestatic="run" language="scheme">
+      <arg line="--warn-undefined-variable --warn-unknown-member --warn-as-error"/>
       <fileset refid="lib-scm"/>
-    </apply>
+    </kawac>
   </target>
   
-      <fileset id="commonlisp-scm" dir="${src.dir}/gnu/commonlisp/lisp"> 
-        <include name="PrimOps.scm"/>
-      </fileset>
-
-  <target name="check-commonlisp-scm-classes">
-    <uptodate property="commonlisp-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="${build.dir}/gnu/commonlisp/lisp/*.class"/>
-      <srcfiles refid="commonlisp-scm"/>
-    </uptodate>
-  </target>
+  <fileset id="commonlisp-scm" dir="${src.dir}/gnu/commonlisp/lisp"> 
+    <include name="PrimOps.scm"/>
+  </fileset>
 
   <target name="commonlisp-scm-classes"
-          depends="java-classes, check-commonlisp-scm-classes" 
-          unless="commonlisp-scm-classes-uptodate">
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.commonlisp.lisp. --module-static-run -C"/>
+          depends="java-classes">
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="gnu.commonlisp.lisp." modulestatic="run" language="scheme">
       <fileset refid="commonlisp-scm"/>
-    </apply>
+    </kawac>
   </target>
 
-      <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib">
+  <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib">
         <include name="genwrite.scm"/>
         <include name="pp.scm"/>
         <include name="ppfile.scm"/>
@@ -523,28 +502,16 @@
         <include name="XML.scm"/>
         <include name="swing.scm"/>
         <include name="syntaxutils.scm"/>
-      </fileset>
+  </fileset>
 
-  <target name="check-slib-scm-classes">
-    <uptodate property="slib-scm-classes-uptodate">
-      <mapper type="glob" from="*.scm" to="${build.dir}/gnu/kawa/slib/*.class"/>
-      <srcfiles refid="slib-scm"/>
-    </uptodate>
-  </target>
-
-  <target name="slib-scm-classes"
-          depends="java-classes, check-slib-scm-classes" 
-          unless="slib-scm-classes-uptodate">
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
+  <target name="slib-scm-classes" depends="java-classes">
+    <kawac failonerror="true" destdir="${build.classes}"
+	   prefix="gnu.kawa.slib." modulestatic="run"
+	   language="scheme">
       <fileset refid="slib-scm"/>
-    </apply>
-  </target>
-  
+    </kawac>
+  </target> 
+
   <target name="xml-classes"
           depends="build-settings, java-classes" 
           if="${enable-xml}">
@@ -561,17 +528,13 @@
       <include name="gnu/xquery/util/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
     </javac>
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.kawa.slib."  modulestatic="run" language="scheme">
       <fileset dir="${src.dir}/gnu/kawa/slib"> 
         <include name="XML.scm"/>
         <include name="XStrings.scm"/>
       </fileset>
-    </apply>
+    </kawac>
   </target>
 
   <target name="brl-classes"
@@ -586,26 +549,18 @@
       <include name="gnu/kawa/brl/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
     </javac>
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.brl. --module-static-run -C"/>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.brl."  modulestatic="run" language="scheme">
       <fileset dir="${src.dir}/gnu/brl"> 
         <include name="stringfun.scm"/>
       </fileset>
-    </apply>
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.brl. --module-static-run -C"/>
+    </kawac>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.kawa.brl."  modulestatic="run" language="scheme">
       <fileset dir="${src.dir}/gnu/kawa/brl"> 
         <include name="progfun.scm"/>
       </fileset>
-    </apply>
+    </kawac>
   </target>
 
   <target name="servlet-classes" 
@@ -647,61 +602,6 @@
     </apply>
   </target>
    
-      <fileset id="jemacs-lang-scm" dir="${src.dir}/gnu/jemacs/lang"> 
-        <include name="MiscOps.scm"/>
-        <include name="NumberOps.scm"/>
-      </fileset>
-      <fileset id="jemacs-buffer-scm" dir="${src.dir}/gnu/jemacs/buffer"> 
-        <include name="emacs.scm"/>
-      </fileset>
-      <fileset id="jemacs-slib-scm" dir="${src.dir}/gnu/kawa/slib"> 
-        <include name="gui.scm"/>
-      </fileset>
-      <fileset id="jemacs-el" dir="${src.dir}/gnu/jemacs/lisp"> 
-        <include name="primitives.el"/>
-        <include name="alist.el"/>
-        <include name="simple.el"/>
-        <include name="alist.el"/>
-        <include name="keymap.el"/>
-        <include name="keydefs.el"/>
-        <include name="hanoi.el"/>
-        <include name="rect.el"/>
-        <include name="editfns.el"/>
-        <include name="subr.el"/>
-        <include name="autoloads.el"/>
-      </fileset>
-
-  <target name="check-jemacs-lisp-classes">
-    <condition property="jemacs-lisp-classes-uptodate"> 
-      <and>
-        <uptodate>
-          <mapper type="glob" 
-          	  from="*.scm" 
-          	  to="${build.dir}/gnu/jemacs/lang/*.class"/>
-          <srcfiles refid="jemacs-lang-scm"/>
-        </uptodate>
-      	<uptodate>
-          <mapper type="glob" 
-          	  from="*.scm" 
-          	  to="${build.dir}/gnu/jemacs/buffer/*.class"/>
-          <srcfiles refid="jemacs-buffer-scm"/>
-        </uptodate>
-        <uptodate>
-          <mapper type="glob" 
-          	  from="*.scm" 
-          	  to="${build.dir}/gnu/kawa/slib/*.class"/>
-          <srcfiles refid="jemacs-slib-scm"/>
-        </uptodate>
-        <uptodate>
-          <mapper type="glob" 
-          	  from="*.el" 
-          	  to="${build.dir}/gnu/jemacs/lisp/*.class"/>
-          <srcfiles refid="jemacs-el"/>
-        </uptodate>
-      </and>
-    </condition>
-  </target>
-
   <target name="jemacs-java-classes" 
           depends="build-settings, java-classes" 
           if="${enable-jemacs}">
@@ -725,48 +625,48 @@
   </target>
 
   <target name="jemacs-classes" 
-          depends="build-settings, java-classes
-            , jemacs-java-classes
-            , check-jemacs-lisp-classes" 
-          if="${enable-jemacs}" 
-          unless="jemacs-lisp-classes-uptodate">
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.lang. --module-static-run -C"/>
-      <fileset refid="jemacs-lang-scm"/>
-    </apply>
+          depends="build-settings, java-classes, jemacs-java-classes"
+          if="${enable-jemacs}">
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.jemacs.lang."  modulestatic="run" language="scheme">
+      <fileset dir="${src.dir}/gnu/jemacs/lang"> 
+	<include name="MiscOps.scm"/>
+	<include name="NumberOps.scm"/>
+      </fileset>
+    </kawac>
 
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.buffer. --module-static-run -C"/>
-      <fileset refid="jemacs-buffer-scm"/>
-    </apply>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.jemacs.buffer."  modulestatic="run" language="scheme">
+      <fileset dir="${src.dir}/gnu/jemacs/buffer"> 
+	<include name="emacs.scm"/>
+      </fileset>
+    </kawac>
 
-    <apply taskname="kawa" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.kawa.slib. --module-static-run -C"/>
-      <fileset refid="jemacs-slib-scm"/>
-    </apply>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.kawa.slib" modulestatic="run" language="scheme">
+      <fileset dir="${src.dir}/gnu/kawa/slib"> 
+	<include name="gui.scm"/>
+      </fileset>
+    </kawac>
 
-    <apply taskname="elisp" executable="java" 
-           failonerror="true" parallel="true">
-      <arg value="-classpath"/> <arg path="${build.classes}"/>
-      <arg value="kawa.repl"/>
-      <arg value="-d"/> <arg path="${build.classes}"/>
-      <arg line="-P gnu.jemacs.lisp. --elisp -C"/>
-      <fileset refid="jemacs-el"/>
-    </apply>
+    <kawac failonerror="true" destdir="${build.classes}"
+	    prefix="gnu.jemacs.lisp." language="elisp">
+      <fileset dir="${src.dir}/gnu/jemacs/lisp"> 
+        <include name="primitives.el"/>
+        <include name="alist.el"/>
+        <include name="simple.el"/>
+        <include name="alist.el"/>
+        <include name="keymap.el"/>
+        <include name="keydefs.el"/>
+        <include name="hanoi.el"/>
+        <include name="rect.el"/>
+        <include name="editfns.el"/>
+        <include name="subr.el"/>
+        <include name="autoloads.el"/>
+      </fileset>
+    </kawac>
   </target>
-  
+
   <target name="jar">
     <jar jarfile="${dist.kawa.jar}"
          manifest="${src.dir}/jar-manifest">

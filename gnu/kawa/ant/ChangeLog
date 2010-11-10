@@ -1,3 +1,9 @@
+2010-11-10  Jamison Hope <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* Kawac.java: New Ant task.
+	* Makefile.am: Update accordingly.
+
 2006-05-23  Per Bothner  <per@bothner.com>
 
 	* LineCommenterSet.java: Remove unused local variable.

@@ -441,7 +441,7 @@ This is done automatically if you use the @samp{kawa} script.
 @subsection Build Kawa using @code{ant}
 
 Kawa now includes an Ant buildfile (@code{build.xml}).
-@uref{http://jakarta.apache.org/ant/, Ant} is a part of the Apache
+@uref{http://ant.apache.org, Ant} is a part of the Apache
 Jakarta project.
 If you don't hava Ant installed,
 get it from @uref{http://ant.apache.org/bindownload.cgi}.
@@ -1033,6 +1033,7 @@ You can also compile your Scheme program to native code using GCJ.
 * Archive compilation::         Compiling to an archive file
 * Files compilation::           Compiling to a set of .class files
 * Compilation options::
+* Compiling using Ant::
 * Application compilation::     Compiling to a standalone application
 * Applet compilation::          Compiling to an applet
 * Compiling to executable::     Compiling to a native executable
@@ -1213,6 +1214,15 @@ is only active within @var{body}.
     (invoke x 'size)))
 @end example
 @end deffn
+
+@node Compiling using Ant
+@subsection Compiling using Ant
+
+Many Java projects use @uref{http://ant.apache.org, Ant}
+for building Java projects.  Kawa includes a @code{<kawac>}
+Ant ask that simplifies compiling Kawa sources files to classes.
+See the @code{build.xml} in the Kawa source distribution for examples.
+See the @uref{ant-kawac.html, @code{kawac} task documentation} for details.
 
 @node Application compilation
 @subsection Compiling to a standalone application

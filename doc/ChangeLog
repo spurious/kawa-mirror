@@ -1,3 +1,7 @@
+2010-11-10  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Compiling using Ant): New subsection.
+
 2010-11-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Enumerations): New section.

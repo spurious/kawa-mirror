@@ -10,7 +10,7 @@ import java.io.*;
  * or LList.Empty (which represents the end of the list).  (The names
  * "car" and "cdr" [pronounced "coulder"] are historical; better names
  * might be "value" and "next".)  While a Pair is normally usued to
- * implement a linked list, sometimes the 'cdr' field ponus to some
+ * implement a linked list, sometimes the 'cdr' field points to some
  * other non-list object; this is traditionally callled a "dotted list".
  */
 

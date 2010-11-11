@@ -251,7 +251,7 @@ public abstract class Expression extends Procedure0
    * or can be optimized to this expression.
    * @param exp an application whose function expression can be simplified
    *  to this expression.
-   * @param walker the context for the current inlining pass
+   * @param visitor the context for the current inlining pass
    * @param decl if non-null, a Declaration bound to this expression.
    * @return an Expression equivalent to the passed-in exp.
    */

@@ -22,6 +22,7 @@ public class ReaderIgnoreRestOfLine extends ReadTableEntry
 	if (ch < 0)
 	  return Sequence.eofValue;
       } while (ch != '\n' && ch!= '\r');
+    in.unread(ch);
     return Values.empty;
   }
 }

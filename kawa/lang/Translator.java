@@ -835,7 +835,7 @@ public class Translator extends Compilation
 	|| positionPair.getLineNumber() != getLineNumber()
 	|| positionPair.getColumnNumber() != getColumnNumber())
       {
-        saved = new PairWithPosition(this, Special.eof, positionPair);
+        saved = new PairWithPosition(this, this, positionPair);
       }
     else
       saved = positionPair;
@@ -853,7 +853,7 @@ public class Translator extends Compilation
       return;
     setLine(saved);
     positionPair = (PairWithPosition) saved;
-    if (positionPair.getCar() == Special.eof)
+    if (positionPair.getCar() == this)
       positionPair = (PairWithPosition) positionPair.getCdr();
   }
 
@@ -1051,7 +1051,7 @@ public class Translator extends Compilation
                   }
               }
             // Recognize deferred begin created in scanBody for pendingForms.
-            // A seemingly-cleaned (obj instanceof Syntax) causes problems
+            // A seemingly-cleaner (obj instanceof Syntax) causes problems
             // with some Syntax forms, such as define.
             else if (obj == kawa.standard.begin.begin)
               syntax = (Syntax) obj;

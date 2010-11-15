@@ -1,14 +1,11 @@
 Document:
   in-http-server and in-servlet cond-expand options.
 
-Before Kawa 1.11:
-- LOGO!
-- Update Android build procedure.
-- Check that 'ant' works.
+Before Kawa 1.12:
+- Jemacs type ctrl-C --> TooLongAction
 - Make Values constructors be private, so we can make Values be abstract.
 - Go through Savannah bugs.
 - Manual: should rename @node Extensions
-- Change version number to 1.10.
 - Evaluate reported JEmacs bugs.
 - Go through remaining "news" entries and update manual.
 - go through Evaluating-Scheme-expressions-from-Java.

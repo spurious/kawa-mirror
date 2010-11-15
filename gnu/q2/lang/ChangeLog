@@ -1,3 +1,11 @@
+2010-11-14  Per Bothner  <per@bothner.com>
+
+	* Operator.java: New class, extends Syntax.
+	* Q2Translator.java: New class - extends kawa.lang.Translator.
+	* Makefile.am: Update accordingly.
+	* Q2.java: Various fixes.
+	* Q2Read.java: Major changes to support new intentation parsing.
+
 2010-10-21  Per Bothner  <per@bothner.com>
 
 	* Q2.java (compareIndentation): New static method.

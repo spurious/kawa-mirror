@@ -1,11 +1,12 @@
 package gnu.q2.lang;
 import gnu.kawa.lispexpr.*;
-import gnu.expr.QuoteExp;
+import gnu.expr.*;
 import gnu.text.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.Keyword;
 import gnu.kawa.xml.MakeAttribute;
+import kawa.lang.*;
 
 /** A class to read Scheme forms (S-expressions). */
 
@@ -53,6 +54,7 @@ public class Q2Read extends LispReader
   }
 
   int curIndentation;
+  boolean resetNeeded;
 
   /** Read a "command".
    * Assume curIndentation has been set.
@@ -60,16 +62,18 @@ public class Q2Read extends LispReader
    * of the next command (on the next line); curIndentation has been
    * updated to that of the initial whitespace of that line; and a
    * mark() has been set of the start of the line.
-   * Exception: If PARSE_ONE_LINE, return position is *before* newline,
+   * Exception: If singleLine, return position is *before* newline,
    * and mark is not set.
    */
-  Object readIndentCommand ()
+  Object readIndentCommand (boolean singleLine)
     throws java.io.IOException, SyntaxException
   {
     int startIndentation = curIndentation;
     LList rresult = LList.Empty;
     Object obj = LList.Empty;
     PairWithPosition pair = null, last = null;
+    Object prev = null;
+    ReadTable rtable = ReadTable.getCurrent();
 
     for (;;)
       {
@@ -83,10 +87,29 @@ public class Q2Read extends LispReader
 	  break;
         if (ch == '\r' || ch == '\n')
           {
-	    if (singleLine())
-	      break;
+	    if (singleLine)
+	      {
+		if (prev instanceof Symbol && ! Q2.instance.selfEvaluatingSymbol(prev))
+		  {
+		    Compilation comp = Compilation.getCurrent();
+		    Expression func = ((Translator) comp).rewrite(prev, true);
+		    Declaration decl;
+		    Object value;
+		    if (func instanceof ReferenceExp
+			&& (decl = ((ReferenceExp) func).getBinding()) != null
+			&& (value = decl.getConstantValue()) instanceof Operator
+			&& (((Operator) value).flags & Operator.RHS_NEEDED) != 0)
+		      
+		      ;
+		    else
+		      break;
+		  }
+		else
+		  break;
+	      }
 	    ch = read();
             port.mark(Integer.MAX_VALUE);
+            resetNeeded = true;
 	    int subIndentation = skipIndentation(); // skipHorSpace.
             LList qresult = LList.Empty;
             curIndentation = subIndentation;
@@ -117,7 +140,9 @@ public class Q2Read extends LispReader
                 // comparedIndent >= 2
                 int line = port.getLineNumber();
                 int column = port.getColumnNumber();
-                Object val = readIndentCommand();
+                Object val = readIndentCommand(false);
+                if (val == LList.Empty)
+                  break;
                 qresult = makePair(val, qresult, line, column);
               }
             if (qresult != LList.Empty)
@@ -126,21 +151,30 @@ public class Q2Read extends LispReader
                                    LList.reverseInPlace(qresult));
                 rresult = new Pair(qresult, rresult);
               }
+            prev = qresult;
             break;
           }
         int line = port.getLineNumber();
         int column = port.getColumnNumber();
-
-        Object val = readObject();
-
-        rresult = makePair(val, rresult, line, column);
+        ch = port.read();
+        if (ch < 0)
+          break;
+        Object val = readValues(ch, rtable);
+        prev = val;
+        if (val != Values.empty)
+          rresult = makePair(val, rresult, line, column);
       }
-    return LList.reverseInPlace(rresult);
+    return makeCommand(LList.reverseInPlace(rresult));
+  }
+
+  Object makeCommand (Object command)
+  {
+    return command;
   }
 
   boolean singleLine()
   {
-    return interactive && nesting == 0;
+    return interactive && nesting <= 1;
   }
 
   public Object readCommand ()
@@ -150,11 +184,31 @@ public class Q2Read extends LispReader
     if (indent < 0)
       return Sequence.eofValue;
     curIndentation = indent;
-    Object result = readIndentCommand();
-    if (! interactive)
-      port.reset();
-    return result;
-  }
+    char saveReadState = pushNesting('-');
+    try
+      {
+        Object result = readIndentCommand(singleLine());
+        if (resetNeeded)
+          {
+            resetNeeded = false;
+            int line = port.getLineNumber();
+            int column = port.getColumnNumber();
+            port.reset();
+          }
+        if (result instanceof Pair)
+          {
+            Pair presult = (Pair) result;
+            if (presult.getCdr() == LList.Empty
+                && presult.getCar() == Special.eof)
+              return Special.eof;
+          }
+        return result;
+      }
+    finally
+      {
+        popNesting(saveReadState);
+      }
+ }
 
   // RULE: Every newline (not preceded by backslash)
   //   is equivalent to ';'
@@ -235,6 +289,7 @@ public class Q2Read extends LispReader
     Depends on whether f takes a <body> or an <arguments>
     */
 
+  /*
   public Object readCommand (boolean forceList)
       throws java.io.IOException, SyntaxException
   {
@@ -336,6 +391,7 @@ public class Q2Read extends LispReader
       }
     return obj;
   }
+  */
 
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
@@ -354,28 +410,45 @@ public class Q2Read extends LispReader
     expressionStartLine = port.getLineNumber();
     expressionStartColumn = port.getColumnNumber();
   }
-}
 
-class Q2ReaderParens extends ReaderDispatchMisc
-{
-  public Object read (Lexer in, int ch, int count)
-    throws java.io.IOException, SyntaxException
+ static class ReadTableEntry extends ReaderDispatchMisc
   {
-    Q2Read reader = (Q2Read) in;
-    char saveReadState = reader.pushNesting('(');
-    try
-      {
-	Object result = reader.readCommand(true);
+    public Object read (Lexer in, int ch, int count)
+      throws java.io.IOException, SyntaxException
+    {
+      switch (ch)
+        {
+        case '(':  return readParens(in);
+        case ';':  return Symbol.valueOf(";");
+        default: throw new Error();
+        }
+    }
 
-	LineBufferedReader port = reader.getPort();
-	if (port.read() != ')')
-	  reader.error("missing ')'");
-	return result;
-      }
-    finally
-      {
-	reader.popNesting(saveReadState);
-      }
+    public Object readParens (Lexer in)
+      throws java.io.IOException, SyntaxException
+    {
+      Q2Read reader = (Q2Read) in;
+      char saveReadState = reader.pushNesting('(');
+      try
+        {
+          Object result = reader.readIndentCommand(false);
+	  LineBufferedReader port = reader.getPort();
+          if (port.read() != ')')
+            {
+              reader.error("missing ')'");
+            }
+          if (reader.resetNeeded)
+            {
+              reader.resetNeeded = false;
+              port.mark(0);
+            }
+          return reader.makeCommand(result);
+        }
+      finally
+        {
+          reader.popNesting(saveReadState);
+        }
+    }
   }
 
 }

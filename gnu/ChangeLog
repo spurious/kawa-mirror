@@ -1,3 +1,8 @@
+2010-11-14  Per Bothner  <per@bothner.com>
+
+	* q2/testsuite: New directory.
+	* q2/Makefile.am (SUBDIRS): Add testsuite.
+
 2006-12-20  Per Bothner  <per@bothner.com>
 
 	* brl/Makefile.am (KAWA1): Remove unneeded macro.

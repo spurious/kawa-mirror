@@ -1,0 +1,8 @@
+2010-11-14  Per Bothner  <per@bothner.com>
+
+	New directory.
+	* binary1.q2: New testcase.
+	* comment1.q2: New testcase.
+	* function1.q2: New testcase.
+	* indent1.q2: New testcase.
+	* Makefile.am: New file.

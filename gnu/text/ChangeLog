@@ -1,3 +1,7 @@
+2010-11-14  Per Bothner  <per@bothner.com>
+
+	* Char.java (toString): New static convenience function.
+
 2010-11-04  Per Bothner  <per@bothner.com>
 
 	* Options.java: Modernize. to use generics and Java2 collections.

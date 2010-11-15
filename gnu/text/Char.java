@@ -163,6 +163,11 @@ public class Char
 
   public String toString ()
   {
+    return toString(value);
+  }
+
+  public static String toString (int value)
+  {
     StringBuffer buf = new StringBuffer();
     buf.append('\'');
     if (value >= (int) ' ' && value < 127 && value != '\'')

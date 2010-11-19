@@ -1,3 +1,7 @@
+2010-11-18  Per Bothner  <per@bothner.com>
+
+	* InnerClassesAttr.java (print): Add a printOptionalIndex call.
+
 2010-10-26  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (compare): Catch case where other is a LangPrimType.

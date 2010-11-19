@@ -128,7 +128,10 @@ public class InnerClassesAttr  extends Attribute
         dst.print(name);
         dst.print(" = ");
         if (centry != null)
-          name = centry.getClassName();
+          {
+            dst.printOptionalIndex(inner_index);
+            name = centry.getClassName();
+          }
         else
           name = "(Unknown)";
         dst.print(name);

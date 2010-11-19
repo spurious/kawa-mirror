@@ -1,3 +1,10 @@
+2010-11-18  Per Bothner  <per@bothner.com>
+
+	* DefineRecordType.scm (define-record-type):  Instead of expanding to
+	define-simple-class, expand to define-class with an explicit
+	'interface: #f' argument.  This is to force a member class, rather
+	than a package-level class.
+
 2010-11-06  Per Bothner  <per@bothner.com>
 
 	* enums.scm (%define-enum): Add static valueOf method.

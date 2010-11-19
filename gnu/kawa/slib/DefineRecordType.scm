@@ -25,7 +25,7 @@
        predicate
        (field-tag accessor . more) ...)
      (begin
-       (define-simple-class type ()
+       (define-class type () interface: #f
 	 (field-tag) ...)
        (define (predicate obj) :: <boolean>
 	 (instance? obj type))

@@ -1,3 +1,8 @@
+2010-11-18  Per Bothner  <per@bothner.com>
+
+	* standard/object.java (scanClassDef): For 'interface:' argument,
+	check for SyntaxForm, in case the class definition is macro-generated.
+
 2010-11-14  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (pushPositionOf, popPositionOf): Use 'this'

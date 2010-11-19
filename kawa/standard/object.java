@@ -93,6 +93,8 @@ public class object extends Syntax
                 if (pair_car == interfaceKeyword)
                   {
                     Object val = ((Pair) obj).getCar();
+                    while (val instanceof SyntaxForm)
+                      val = ((SyntaxForm) val).getDatum();
                     if (val == Boolean.FALSE)
                       oexp.setFlag(ClassExp.CLASS_SPECIFIED);
                     else

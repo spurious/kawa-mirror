@@ -128,24 +128,18 @@ public class ClassType extends ObjectType
       }
     /* #endif */
     String name = getName();
+    if (enclosingMember instanceof ClassType)
+      {
+        String enclosingName = ((ClassType) enclosingMember).getName();
+        int enclosingLength;
+        if (enclosingName != null && name.startsWith(enclosingName)
+            && name.length() > (enclosingLength = enclosingName.length()) + 1
+            && name.charAt(enclosingLength) == '$')
+          return name.substring(enclosingLength+1);
+      }
     int dot = name.lastIndexOf('.');
     if (dot > 0)
       name = name.substring(dot+1);
-    int dollar = name.lastIndexOf('$');
-    if (dollar >= 0)
-      {
-        int len = name.length();
-        int start = dollar + 1;
-        while (start < len)
-          {
-            char ch = name.charAt(start);
-            if (ch >= '0' && ch <= '9')
-              start++;
-            else
-              break;
-          }
-        name = name.substring(start);
-      }
     return name;
   }
 

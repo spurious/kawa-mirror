@@ -1,5 +1,8 @@
 2010-11-18  Per Bothner  <per@bothner.com>
 
+	* ClassType.java (getSimpleName): Make use of enclosingMember,
+	rather than unreliable scanning for '$'.
+
 	* InnerClassesAttr.java (print): Add a printOptionalIndex call.
 
 2010-10-26  Per Bothner  <per@bothner.com>

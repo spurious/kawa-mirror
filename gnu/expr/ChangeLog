@@ -1,3 +1,10 @@
+2010-11-18  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (IS_PACKAGE_MEMBER): New flag.
+	(setTypes): Set IS_PACKAGE_MEMBER as appropriate.
+	(compileMembers): Use IS_PACKAGE_MEMBER to help determine if class
+	is a member class, rather than unreliably scanning for '$'.
+
 2010-11-05  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (setTypes): Tweak logic for setting modifiers.

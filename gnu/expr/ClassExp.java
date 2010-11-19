@@ -17,6 +17,7 @@ public class ClassExp extends LambdaExp
   public static final int INTERFACE_SPECIFIED = 2 * LambdaExp.NEXT_AVAIL_FLAG;
   public static final int CLASS_SPECIFIED = 4 * LambdaExp.NEXT_AVAIL_FLAG;
   public static final int HAS_SUBCLASS = 8 * LambdaExp.NEXT_AVAIL_FLAG;
+  public static final int IS_PACKAGE_MEMBER = 16 * LambdaExp.NEXT_AVAIL_FLAG;
 
   /** True if there is at least one explicit "<init>" ("*init*"} method. */
   boolean explicitInit;
@@ -244,6 +245,7 @@ public class ClassExp extends LambdaExp
 	      }
 	    if (start == 0)
 	      {
+                setFlag(IS_PACKAGE_MEMBER);
 		String mainName = comp.mainClass == null ? null
 		  : comp.mainClass.getName();
 		int dot = mainName == null ? -1 : mainName.lastIndexOf('.');
@@ -258,6 +260,8 @@ public class ClassExp extends LambdaExp
                 nbuf.append(comp.mainClass.getName());
                 nbuf.append('$');
               }
+            else
+              setFlag(IS_PACKAGE_MEMBER);
 	    if (start < name.length())
 	      nbuf.append(Compilation
 			  .mangleNameIfNeeded(name.substring(start)));
@@ -438,8 +442,8 @@ public class ClassExp extends LambdaExp
           enclosing = outer.type;
         else if (outer != null && ! (outer instanceof ModuleExp))
           enclosing = saveMethod;
-        else if (outer instanceof ModuleExp && type.getName().indexOf('$') > 0)
-         enclosing = outer.type;
+        else if (outer instanceof ModuleExp && ! getFlag(IS_PACKAGE_MEMBER))
+          enclosing = outer.type;
         if (enclosing != null)
           {
             new_class.setEnclosingMember(enclosing);

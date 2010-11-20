@@ -1,3 +1,11 @@
+2010-11-20  Jamison Hope <jrh@theptrgroup.com>
+	    Per Bothner  <per@bothner.com>
+
+	* standard/require.java (faturemap): Add SRFI-41 features.
+	* ImportFromLibrary.java (SRFI97Map): Add SRFI-41 library names.
+	(scanForDefinitions): Handle multiple libraries (or sub-libraries)
+	for the same SRFI.
+
 2010-11-18  Per Bothner  <per@bothner.com>
 
 	* standard/object.java (scanClassDef): For 'interface:' argument,

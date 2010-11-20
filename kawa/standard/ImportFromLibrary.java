@@ -46,7 +46,11 @@ public class ImportFromLibrary extends Syntax
     { "31", "rec", MISSING },
     { "38", "with-shared-structure", MISSING },
     { "39", "parameters", BUILTIN },
-    { "41", "streams", MISSING },
+    // Note the default for (srfi :41) should be "streams".  We put that last,
+    // since the lable is searched from high index to low index.
+    { "41", "streams.primitive", "gnu.kawa.slib.StreamsPrimitive" },
+    { "41", "streams.derived", "gnu.kawa.slib.StreamsDerived" },
+    { "41", "streams", "gnu.kawa.slib.Streams" },
     { "42", "eager-comprehensions", MISSING },
     { "43", "vectors", MISSING },
     { "44", "collections", MISSING },
@@ -140,6 +144,8 @@ public class ImportFromLibrary extends Syntax
         String demangled = Compilation.demangleName(lname.substring(5));
         int dot = demangled.indexOf('.');
         String srfiName;
+        StringBuilder badNameBuffer = null;
+
         if (dot < 0)
           {
             srfiName = null;
@@ -171,28 +177,39 @@ public class ImportFromLibrary extends Syntax
           {
             if (--srfiIndex < 0)
               {
-                tr.error('e', "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
+                tr.error('e', badNameBuffer != null ? badNameBuffer.toString()
+                         : "unknown SRFI number '"+srfiNumber+"' in SRFI library reference");
                 return false;
               }
-            if (SRFI97Map[srfiIndex][0].equals(srfiNumber))
-              break;
-          }
-        String srfiNameExpected = SRFI97Map[srfiIndex][1];
-        String srfiClass = SRFI97Map[srfiIndex][2];
-        if (srfiName != null && ! srfiName.equals(srfiNameExpected))
-          {
-            tr.error('w', "the name of SRFI "+srfiNumber+" should be '"+srfiNameExpected+'\'');
-          }
+            if (!SRFI97Map[srfiIndex][0].equals(srfiNumber))
+              continue;
+            String srfiNameExpected = SRFI97Map[srfiIndex][1];
+            String srfiClass = SRFI97Map[srfiIndex][2];
+            if (srfiName != null && ! srfiName.equals(srfiNameExpected))
+              {
+                if (badNameBuffer == null)
+                  {
+                    badNameBuffer = new StringBuilder("the name of SRFI ");
+                    badNameBuffer.append(srfiNumber);
+                    badNameBuffer.append(" should be '");
+                  }
+                else
+                  badNameBuffer.append(" or '");
+                badNameBuffer.append(srfiNameExpected);
+                badNameBuffer.append('\'');
+                continue;
+              }
 
-        if (srfiClass == BUILTIN)
-          return true; // Nothing to do.
-        else if (srfiClass == MISSING)
-          {
-            tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
-            return false;
+            if (srfiClass == BUILTIN)
+              return true; // Nothing to do.
+            else if (srfiClass == MISSING)
+              {
+                tr.error('e', "sorry - Kawa does not support SRFI "+srfiNumber+" ("+srfiNameExpected+')');
+              }
+            else
+              lname = srfiClass;
+            break;
           }
-        else
-          lname = srfiClass;
       }
 
     int classPrefixPathLength = classPrefixPath.length;

@@ -502,6 +502,10 @@
         <include name="XML.scm"/>
         <include name="swing.scm"/>
         <include name="syntaxutils.scm"/>
+        <include name="Streams.scm"/>
+        <include name="StreamsDerived.scm"/>
+        <include name="StreamsPrimitive.scm"/>
+        <include name="StreamsType.scm"/>
   </fileset>
 
   <target name="slib-scm-classes" depends="java-classes">

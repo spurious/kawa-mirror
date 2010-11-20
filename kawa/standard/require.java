@@ -88,6 +88,11 @@ public class require extends Syntax
     map("conditions", SLIB_PREFIX + "conditions");
     map("srfi-37", SLIB_PREFIX + "srfi37");
     map("args-fold", SLIB_PREFIX + "srfi37");
+    map("srfi-41", SLIB_PREFIX + "Streams");
+    map("srfi-41-streams", SLIB_PREFIX + "Streams");
+    map("srfi-41-streams-type", SLIB_PREFIX + "StreamsType");
+    map("srfi-41-streams-primitive", SLIB_PREFIX + "StreamsPrimitive");
+    map("srfi-41-streams-derived", SLIB_PREFIX + "StreamsDerived");
     map("srfi-64", SLIB_PREFIX + "testing");
     map("testing", SLIB_PREFIX + "testing");
     map("srfi-69", SLIB_PREFIX + "srfi69");

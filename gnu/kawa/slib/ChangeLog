@@ -1,3 +1,14 @@
+2010-11-20  Philip L. Bewig
+            Jamison Hope <jrh@theptrgroup.com>
+            Per Bothner  <per@bothner.com>
+
+	Implementation of SRFI-41.
+	* StreamsPrimitive.scm: New file, implements (streams primitive).
+	* StreamsDerived.scm: New file, implements (streams derived).
+	* Streams.scm: New file, implements (streams).
+	* StreamsType.scm: New file, defines stream-type.
+	* Makefile.am (java_SCM): Update accordingly.
+
 2010-11-18  Per Bothner  <per@bothner.com>
 
 	* DefineRecordType.scm (define-record-type):  Instead of expanding to

@@ -1,3 +1,7 @@
+2010-11-20  Per Bothner  <per@bothner.com>
+
+	* build.xml (slib-scm): Add SRFI-41 files in gnu.kawa.slib.
+
 2010-11-14  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_CONFIG_FILES): Add gnu/q2/testsuite/Makefile.

@@ -15,8 +15,8 @@ import java.util.*;
  * vectors are also adjustable (by re-allocating the buffer)
  * and have a fill pointer (the size field). */
 
-public abstract class SimpleVector extends AbstractSequence
-  implements Sequence, Array
+public abstract class SimpleVector<E> extends AbstractSequence<E>
+  implements Sequence<E>, Array<E>
 {
   /** The (current) number of elements.
    * Must always have size() >= 0 && size() <= getBufferLength(). */
@@ -125,7 +125,7 @@ public abstract class SimpleVector extends AbstractSequence
 
   protected abstract Object getBuffer();
 
-  public Object get(int index)
+  public E get(int index)
   {
     if (index >= size)
       throw new IndexOutOfBoundsException();
@@ -162,31 +162,31 @@ public abstract class SimpleVector extends AbstractSequence
     return Convert.toLong(getBuffer(index));
   }
 
-  public Object getRowMajor (int i)
+  public E getRowMajor (int i)
   {
     return get(i);
   }
 
-  protected abstract Object getBuffer(int index);
+  protected abstract E getBuffer(int index);
 
-  public Object set(int index, Object value)
+  public E set(int index, E value)
   {
     if (index >= size)
       throw new IndexOutOfBoundsException();
-    Object old = getBuffer(index);
+    E old = getBuffer(index);
     setBuffer(index, value);
     return old;
   }
 
-  protected abstract Object setBuffer(int index, Object value);
+  protected abstract E setBuffer(int index, E value);
 
-  public void fill(Object value)
+  public void fill(E value)
   {
     for (int i = size;  --i >= 0; )
       setBuffer(i, value);
   }
 
-  public void fillPosRange(int fromPos, int toPos, Object value)
+  public void fillPosRange(int fromPos, int toPos, E value)
   {
     int i = fromPos == -1 ? size : fromPos >>> 1;
     int j = toPos == -1 ? size : toPos >>> 1;
@@ -194,7 +194,7 @@ public abstract class SimpleVector extends AbstractSequence
       setBuffer(i, value);
   }
 
-  public void fill(int fromIndex, int toIndex, Object value)
+  public void fill(int fromIndex, int toIndex, E value)
   {
     if (fromIndex < 0 || toIndex > size)
       throw new IndexOutOfBoundsException();
@@ -208,13 +208,13 @@ public abstract class SimpleVector extends AbstractSequence
     System.arraycopy(data, srcStart, data, dstStart, count);
   }
 
-  public boolean add(Object o)
+  public boolean add(E o)
   {
     add(size, o);
     return true;
   }
 
-  protected int addPos(int ipos, Object value)
+  protected int addPos(int ipos, E value)
   {
     int index = ipos >>> 1;
     add(index, value);
@@ -222,7 +222,7 @@ public abstract class SimpleVector extends AbstractSequence
     return (index << 1) + 3;
   }
 
-  public void add(int index, Object o)
+  public void add(int index, E o)
   {
     int newSize = size + 1;
     size = newSize;
@@ -236,13 +236,13 @@ public abstract class SimpleVector extends AbstractSequence
   }
 
   /* #ifdef JAVA2 */
-  public boolean addAll(int index, Collection c)
+  public boolean addAll(int index, Collection<? extends E> c)
   {
     boolean changed = false;
     int count = c.size();
     setSize(size + count);
     shift(index, index + count, size - count - index);
-    for (Iterator it = c.iterator();  it.hasNext(); )
+    for (Iterator<? extends E> it = c.iterator();  it.hasNext(); )
       {
         set(index++, it.next());
         changed = true;
@@ -306,7 +306,7 @@ public abstract class SimpleVector extends AbstractSequence
     clearBuffer(size, count);
   }
 
-  public Object remove(int index)
+  public E remove(int index)
   {
     if (index < 0 || index >= size)
       throw new IndexOutOfBoundsException();
@@ -314,7 +314,7 @@ public abstract class SimpleVector extends AbstractSequence
     shift(index + 1, index, 1);
     size = size - 1;
     clearBuffer(size, 1);
-    return result;
+    return (E) result;
   }
 
   public boolean remove(Object o)
@@ -329,7 +329,7 @@ public abstract class SimpleVector extends AbstractSequence
   }
 
   /* #ifdef JAVA2 */
-  public boolean removeAll(Collection c)
+  public boolean removeAll(Collection<?> c)
   {
     boolean changed = false;
     int j = 0;
@@ -343,7 +343,7 @@ public abstract class SimpleVector extends AbstractSequence
         else
         {
           if (changed)
-            set(j, value);
+            set(j, (E) value);
           j++;
         }
       }
@@ -351,7 +351,7 @@ public abstract class SimpleVector extends AbstractSequence
     return changed;
   }
 
-  public boolean retainAll(Collection c)
+  public boolean retainAll(Collection<?> c)
   {
     boolean changed = false;
     int j = 0;
@@ -365,7 +365,7 @@ public abstract class SimpleVector extends AbstractSequence
         else
           {
             if (changed)
-              set(j, value);
+              set(j, (E) value);
             j++;
           }
       }

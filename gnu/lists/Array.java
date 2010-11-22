@@ -5,7 +5,7 @@ package gnu.lists;
 
 /** General interface to arrays of arbitrary dimension. */
 
-public interface Array
+public interface Array<E>
 {
   public boolean isEmpty();
 
@@ -17,11 +17,11 @@ public interface Array
 
   public int getEffectiveIndex(int[] indexes);
 
-  public Object get(int[] indexes);
+  public E get(int[] indexes);
 
-  public Object set(int[] indexes, Object value);
+  public E set(int[] indexes, E value);
 
-  public Object getRowMajor(int index);
+  public E getRowMajor(int index);
 
   //public void setRowMajor(int index, Object value);
 
@@ -31,6 +31,6 @@ public interface Array
   /** Get length along specified dimension. */
   public int getSize(int dim);
 
-  public Array transpose(int[] lowBounds, int[] dimensions,
-			 int offset0, int[] factors);
+  public Array<E> transpose(int[] lowBounds, int[] dimensions,
+                            int offset0, int[] factors);
 }

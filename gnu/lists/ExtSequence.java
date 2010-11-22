@@ -8,7 +8,7 @@ package gnu.lists;
  * just using a Pos int.
  */
 
-public abstract class ExtSequence extends AbstractSequence
+public abstract class ExtSequence<E> extends AbstractSequence<E>
 {
   public int copyPos (int ipos)
   { 

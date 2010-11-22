@@ -22,7 +22,7 @@ import java.util.*;
  * @author Per Bothner
  */
 
-public abstract class AbstractSequence
+public abstract class AbstractSequence<E>
 {
   /** See java.util.List. */
   public abstract int size();
@@ -38,19 +38,19 @@ public abstract class AbstractSequence
   }
 
   /** See java.util.List. */
-  public abstract Object get (int index);
+  public abstract E get (int index);
 
   public int getEffectiveIndex(int[] indexes)
   {
     return indexes[0];
   }
 
-  public Object get(int[] indexes)
+  public E get(int[] indexes)
   {
     return get(indexes[0]);
   }
 
-  public Object set(int[] indexes, Object value)
+  public E set(int[] indexes, E value)
   {
     return set(indexes[0], value);
   }
@@ -81,18 +81,18 @@ public abstract class AbstractSequence
     /* #endif */
   }
 
-  public Object set(int index, Object element)
+  public E set(int index, E element)
   {
     throw unsupported("set");
   }
 
-  public void fill(Object value)
+  public void fill(E value)
   {
     for (int i = startPos(); (i = nextPos(i)) != 0; )
       setPosPrevious(i, value);
   }
 
-  public void fillPosRange(int fromPos, int toPos, Object value)
+  public void fillPosRange(int fromPos, int toPos, E value)
   {
     int i = copyPos(fromPos);
     for (;  compare(i, toPos) < 0;  i = nextPos(i))
@@ -100,7 +100,7 @@ public abstract class AbstractSequence
     releasePos(i);
   }
 
-  public void fill(int fromIndex, int toIndex, Object value)
+  public void fill(int fromIndex, int toIndex, E value)
   {
     int i = createPos(fromIndex, false);
     int limit = createPos(toIndex, true);
@@ -173,9 +173,9 @@ public abstract class AbstractSequence
 
   /* #ifdef JAVA2 */
   /** See java.util.List. */
-  public boolean containsAll(Collection c)
+  public boolean containsAll(Collection<?> c)
   {
-    Iterator i = c.iterator();
+    Iterator<?> i = c.iterator();
     while (i.hasNext())
       {
         Object e = i.next();
@@ -186,38 +186,38 @@ public abstract class AbstractSequence
   }
   /* #endif */
 
-  public final Enumeration elements()
+  public final Enumeration<E> elements()
   {
     return getIterator();
   }
 
-  public final SeqPosition getIterator()
+  public final SeqPosition<E> getIterator()
   {
     return getIterator(0);
   }
 
-  public SeqPosition getIterator(int index)
+  public SeqPosition<E> getIterator(int index)
   {
-    return new SeqPosition(this, index, false);
+    return new SeqPosition<E>(this, index, false);
   }
 
-  public SeqPosition getIteratorAtPos(int ipos)
+  public SeqPosition<E> getIteratorAtPos(int ipos)
   {
-    return new SeqPosition(this, copyPos(ipos));
+    return new SeqPosition<E>(this, copyPos(ipos));
   }
 
   /* #ifdef JAVA2 */
-  public final Iterator iterator()
+  public final Iterator<E> iterator()
   {
     return getIterator();
   }
 
-  public final ListIterator listIterator()
+  public final ListIterator<E> listIterator()
   {
     return getIterator(0);
   }
 
-  public final ListIterator listIterator(int index)
+  public final ListIterator<E> listIterator(int index)
   {
     return getIterator(index);
   }
@@ -226,20 +226,20 @@ public abstract class AbstractSequence
   /** Add a value at a specified Pos.
    * @return the updated Pos, which is after the inserted value..
    */
-  protected int addPos (int ipos, Object value)
+  protected int addPos (int ipos, E value)
   {
     throw unsupported("addPos");
   }
 
   /** See java.util.Collection. */
-  public boolean add(Object o)
+  public boolean add(E o)
   {
     addPos(endPos(), o);
     return true;
   }
 
   /** See java.util.List. */
-  public void add(int index, Object o)
+  public void add(int index, E o)
   {
     int pos = createPos(index, false);
     addPos(pos, o);
@@ -248,17 +248,17 @@ public abstract class AbstractSequence
 
   /* #ifdef JAVA2 */
   /** See java.util.Collection. */
-  public boolean addAll(Collection c)
+  public boolean addAll(Collection<? extends E> c)
   {
     return addAll(size(), c);
   }
 
   /** See java.util.Collection. */
-  public boolean addAll(int index, Collection c)
+  public boolean addAll(int index, Collection<? extends E> c)
   {
     boolean changed = false;
     int pos = createPos(index, false);
-    for (Iterator it = c.iterator();  it.hasNext(); )
+    for (Iterator<? extends E> it = c.iterator();  it.hasNext(); )
       {
         pos = addPos(pos, it.next());
         changed = true;
@@ -320,7 +320,7 @@ public abstract class AbstractSequence
     throw unsupported("removePosRange");
   }
 
-  public Object remove(int index)
+  public E remove(int index)
   {
     if (index < 0 || index >= size())
       throw new IndexOutOfBoundsException();
@@ -328,7 +328,7 @@ public abstract class AbstractSequence
     Object result = getPosNext(ipos);
     removePos(ipos, 1);
     releasePos(ipos);
-    return result;
+      return (E) result;
   }
 
   public boolean remove(Object o)
@@ -343,7 +343,7 @@ public abstract class AbstractSequence
   }
 
   /* #ifdef JAVA2 */
-  public boolean removeAll(Collection c)
+  public boolean removeAll(Collection<?> c)
   {
     boolean changed = false;
     for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
@@ -358,7 +358,7 @@ public abstract class AbstractSequence
     return changed;
   }
 
-  public boolean retainAll(Collection c)
+  public boolean retainAll(Collection<?> c)
   {
     boolean changed = false;
     for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
@@ -470,7 +470,7 @@ public abstract class AbstractSequence
     return null;
   }
 
-  public Object getNextTypeObject(int ipos)
+  public E getNextTypeObject(int ipos)
   {
     return null;
   }
@@ -607,7 +607,7 @@ public abstract class AbstractSequence
     return get(index - 1);
   }
 
-  protected void setPosNext(int ipos, Object value)
+  protected void setPosNext(int ipos, E value)
   {
     int index = nextIndex(ipos);
     if (index >= size())
@@ -615,7 +615,7 @@ public abstract class AbstractSequence
     set(index, value);
   }
 
-  protected void setPosPrevious(int ipos, Object value)
+  protected void setPosPrevious(int ipos, E value)
   {
     int index = nextIndex(ipos);
     if (index == 0)
@@ -658,21 +658,21 @@ public abstract class AbstractSequence
     return arr;
   } 
 
-  public Object[] toArray(Object[] arr) 
+  public <T> T[] toArray(T[] arr) 
   { 
     int alen = arr.length; 
     int len = size(); 
     if (len > alen) 
     { 
       Class componentType = arr.getClass().getComponentType();
-      arr = (Object[]) java.lang.reflect.Array.newInstance(componentType, len);
+      arr = (T[]) java.lang.reflect.Array.newInstance(componentType, len);
       alen = len; 
     }
     
     int it = startPos();
     for (int i = 0;  (it = nextPos(it)) != 0; i++)
     {
-      arr[i] = getPosPrevious(it);
+      arr[i] = (T) getPosPrevious(it);
     } 
     if (len < alen) 
       arr[len] = null; 
@@ -718,8 +718,8 @@ public abstract class AbstractSequence
     if (! (this instanceof java.util.List)
         || ! (o instanceof java.util.List))
       return this == o;
-    Iterator it1 = iterator();
-    Iterator it2 = ((java.util.List) o).iterator();
+    Iterator<E> it1 = iterator();
+    Iterator<E> it2 = ((java.util.List<E>) o).iterator();
     /* #endif */
     /* #ifndef JAVA2 */
     // if (! (this instanceof Sequence) || ! (o instanceof Sequence))
@@ -742,8 +742,8 @@ public abstract class AbstractSequence
         if (! more1)
           return true;
 	/* #ifdef JAVA2 */
-        Object e1 = it1.next();
-        Object e2 = it2.next();
+        E e1 = it1.next();
+        E e2 = it2.next();
 	/* #endif */
 	/* #ifndef JAVA2 */
         // Object e1 = it1.nextElement();

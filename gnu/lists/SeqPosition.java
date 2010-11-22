@@ -20,19 +20,19 @@ import java.util.NoSuchElementException;
  * for more information.
  */
 
-public class SeqPosition
+public class SeqPosition<E>
 implements
     /* #ifdef JAVA2 */
-    java.util.ListIterator,
+    java.util.ListIterator<E>,
     /* #endif */
-    java.util.Enumeration
+    java.util.Enumeration<E>
 {
   /**
    * The Sequence relative to which ipos and xpos have meaning.
    * This is normally the same as the Sequence we iterate through.
    * However, if this is a TreePosition, it may an ancestor instead.
    */
-  public AbstractSequence sequence;
+  public AbstractSequence<E> sequence;
 
   /**
    * An integer that (together with xpos) indicates the current position.
@@ -44,12 +44,12 @@ implements
   {
   }
 
-  public SeqPosition(AbstractSequence seq)
+  public SeqPosition(AbstractSequence<E> seq)
   {
     this.sequence = seq;
   }
 
-  public SeqPosition(AbstractSequence seq, int offset, boolean isAfter)
+  public SeqPosition(AbstractSequence<E> seq, int offset, boolean isAfter)
   {
     this.sequence = seq;
     ipos = seq.createPos(offset, isAfter);
@@ -124,7 +124,7 @@ implements
   }
 
   /** Get the "tag object" for the next element, if any. */
-  public Object getNextTypeObject()
+  public E getNextTypeObject()
   {
     return sequence.getNextTypeObject(getPos());
   }
@@ -136,12 +136,12 @@ implements
   }
 
   /** See java.util.ListIterator. */
-  public Object next()
+  public E next()
   {
     Object result = getNext();
     if (result == Sequence.eofValue || ! gotoNext())
       throw new NoSuchElementException();
-    return result;
+    return (E) result;
   }
 
   /** Move one element forwards, if possible.
@@ -181,16 +181,16 @@ implements
   }
 
   /** See java.util.ListIterator. */
-  public Object previous()
+  public E previous()
   {
     Object result = getPrevious();
     if (result == Sequence.eofValue || ! gotoPrevious())
       throw new NoSuchElementException();
-    return result;
+    return (E) result;
   }
 
   /** See java.util.Enumeration. */
-  public final Object nextElement()
+  public final E nextElement()
   {
     return next();
   }
@@ -248,7 +248,7 @@ implements
     return sequence.isAfterPos(getPos());
   }
 
-  public final void set(Object value)
+  public final void set(E value)
   {
     if (isAfter())
       setPrevious(value);
@@ -256,12 +256,12 @@ implements
       setNext(value);
   }
 
-  public void setNext (Object value)
+  public void setNext (E value)
   {
     sequence.setPosNext(getPos(), value);
   }
 
-  public void setPrevious (Object value)
+  public void setPrevious (E value)
   {
     sequence.setPosPrevious(getPos(), value);
   }
@@ -271,7 +271,7 @@ implements
     sequence.removePos(getPos(), isAfter() ? -1 : 1);
   }
 
-  public void add(Object o)
+  public void add(E o)
   { 
     setPos(sequence.addPos(getPos(), o));
   }

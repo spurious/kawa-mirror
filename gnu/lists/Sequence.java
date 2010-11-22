@@ -16,10 +16,10 @@ package gnu.lists;
  * @author Per Bothner
  */
 
-public interface Sequence
+public interface Sequence<E>
 extends
     /* #ifdef JAVA2 */
-    java.util.List,
+    java.util.List<E>,
     /* #endif */
     Consumable
 {
@@ -33,14 +33,14 @@ extends
   public int size();
 
   /** See java.util.List. */
-  public Object get (int index);
+  public E get (int index);
 
   /** See java.util.List. */
-  public Object set (int index, Object value);
+  public E set (int index, E value);
 
-  public void fill(Object value);
+  public void fill(E value);
 
-  public java.util.Enumeration elements();
+  public java.util.Enumeration<E> elements();
 
   /** Return code used to indicate a position is at end of the sequence. */
   public static final int EOF_VALUE = 0;

@@ -1,3 +1,14 @@
+2010-11-21  Per Bothner  <per@bothner.com>
+
+	Partially generic-ize.
+	* Sequence.java: Add generic parameter for element type.
+	* Array.java: Likewise.
+	* AbstractSequence.java: Likewise.
+	* ExtSequence.java: Likewise.
+	* SimpleVector.java: Likewise.
+	* FVector.java: Likewise.
+	* SeqPosition.java: Likewise, for pointed-to element type.
+
 2010-06-30  Per Bothner  <per@bothner.com>
 
 	* FilterConsumer.java: Change to implement XConsumer.

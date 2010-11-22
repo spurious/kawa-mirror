@@ -4,9 +4,10 @@
 package gnu.lists;
 import java.io.*;
 
-/** Simple adjustable-length vector whose elements are Object references. */
+/** Simple adjustable-length vector whose elements are Object references.
+ */
 
-public class FVector extends SimpleVector
+public class FVector<E> extends SimpleVector<E>
   implements Externalizable, Consumable
   /* #ifdef JAVA2 */
   , Comparable
@@ -91,16 +92,16 @@ public class FVector extends SimpleVector
     System.arraycopy(data, srcStart, data, dstStart, count);
   }
 
-  public final Object getBuffer(int index)
+  public final E getBuffer(int index)
   {
-    return data[index];
+    return (E) data[index];
   }
 
-  public final Object get (int index)
+  public final E get (int index)
   {
     if (index >= size)
       throw new ArrayIndexOutOfBoundsException();
-    return data[index];
+    return (E) data[index];
   }
 
   public final Object setBuffer(int index, Object value)

@@ -343,6 +343,42 @@ public class XMLPrinter extends OutPort
       bout.write(name == null ? "{null name}" : (String) name);
   }
 
+  /** Write DOCTYPE using ThreadLocations doctypeSystem and doctypePublic */
+  public void writeDoctypeIfDefined (String tagname)
+  {
+    Object systemIdentifier = doctypeSystem.get(null);
+    if (systemIdentifier != null)
+      {
+        String systemId = systemIdentifier.toString();
+        if (systemId.length() > 0)
+          {
+            Object publicIdentifier = doctypePublic.get(null);
+            String publicId = publicIdentifier == null ? null
+              : publicIdentifier.toString();
+            writeDoctype(tagname, systemId, publicId);
+          }
+      }
+  }
+
+  public void writeDoctype (String tagname, String systemId, String publicId)
+  {
+    bout.write("<!DOCTYPE ");
+    bout.write(tagname);
+    if (publicId != null && publicId.length() > 0)
+      {
+        bout.write(" PUBLIC \"");
+        bout.write(publicId);
+        bout.write("\" \"");
+      }
+    else
+      {
+        bout.write(" SYSTEM \"");
+      }
+    bout.write(systemId);
+    bout.write("\">");
+    println();
+  }
+
   public void startElement(Object type)
   {
     closeTag();
@@ -352,32 +388,7 @@ public class XMLPrinter extends OutPort
           setIndentMode();
         if (prev == PROC_INST)
           write('\n');
-        Object systemIdentifier = doctypeSystem.get(null);
-        if (systemIdentifier != null)
-          {
-            String systemId = systemIdentifier.toString();
-            if (systemId.length() > 0)
-              {
-                Object publicIdentifier = doctypePublic.get(null);
-                bout.write("<!DOCTYPE ");
-                bout.write(type.toString());
-                String publicId = publicIdentifier == null ? null
-                  : publicIdentifier.toString();
-                if (publicId != null && publicId.length() > 0)
-                  {
-                    bout.write(" PUBLIC \"");
-                    bout.write(publicId);
-                    bout.write("\" \"");
-                  }
-                else
-                  {
-                    bout.write(" SYSTEM \"");
-                  }
-                bout.write(systemId);
-                bout.write("\">");
-                println();
-              }
-          }
+        writeDoctypeIfDefined(type.toString());
       }
     if (printIndent >= 0)
       {

@@ -1,3 +1,8 @@
+2010-11-21  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeDoctypeIfDefined, writeDoctype): New methods.
+	(startElement): Use writeDoctypeIfDefined.
+
 2010-08-02  Per Bothner  <per@bothner.com>
 
 	* XMLFilter.java (writeObject): Treat a java.util.List as

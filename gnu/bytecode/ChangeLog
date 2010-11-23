@@ -1,3 +1,8 @@
+2010-11-22  Per Bothner  <per@bothner.com>
+
+	* StackMapTableAttr.java (encodeVerificationType): Fix handling of
+	Type.nullType - it's imlementation-type is objectType.
+
 2010-11-18  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getSimpleName): Make use of enclosingMember,

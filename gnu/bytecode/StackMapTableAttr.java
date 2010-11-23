@@ -65,6 +65,8 @@ public class StackMapTableAttr extends MiscAttr
         else
           return (label.position << 8) | 8; // ITEM_uninitialized
       }
+    else if (type == Type.nullType)
+      return 5; // ITEM_Null
     else
       {
         type = type.getImplementationType();
@@ -84,8 +86,6 @@ public class StackMapTableAttr extends MiscAttr
                 return 0; // ITEM_Top
               }
           }
-        else if (type == Type.nullType)
-          return 5; // ITEM_Null
         else // ITEM_Object
           return ((code.getConstants().addClass((ObjectType) type).index) << 8) | 7;
       }

@@ -154,10 +154,10 @@
 	      (lp (cdr list)))))))
 
 ;;;  The optional test argument is an srfi-1 extension.
-(define (assoc x list #!optional (test :: <procedure> equal?))
+(define (assoc key list #!optional (test :: <procedure> equal?))
   (let lp ((list list))
     (if (eq? list '())
 	 #f
 	(let ((pair :: <pair> (car list)))
-	  (if (test pair:car x) pair
+	  (if (test key pair:car) pair
 	      (lp (cdr list)))))))

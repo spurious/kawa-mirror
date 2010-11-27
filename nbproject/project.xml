@@ -94,5 +94,42 @@
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent">
+                <node name="CodeStyle">
+                    <property name="usedProfile" value="project"/>
+                    <node name="project">
+                        <property name="spaces-per-tab" value="4"/>
+                        <property name="tab-size" value="8"/>
+                        <property name="indent-shift-width" value="4"/>
+                        <property name="expand-tabs" value="true"/>
+                        <property name="text-limit-width" value="80"/>
+                        <property name="text-line-wrap" value="none"/>
+                    </node>
+                </node>
+                <node name="text">
+                    <node name="x-java">
+                        <node name="CodeStyle">
+                            <node name="project">
+                                <property name="blankLinesAfterClassHeader" value="0"/>
+                                <property name="wrapExtendsImplementsKeyword" value="WRAP_IF_LONG"/>
+                                <property name="indent-shift-width" value="2"/>
+                                <property name="text-limit-width" value="80"/>
+                                <property name="text-line-wrap" value="none"/>
+                                <property name="wrapThrowsKeyword" value="WRAP_ALWAYS"/>
+                                <property name="spaces-per-tab" value="2"/>
+                                <property name="spaceBeforeMethodDeclParen" value="true"/>
+                                <property name="wrapExtendsImplementsList" value="WRAP_IF_LONG"/>
+                                <property name="tab-size" value="8"/>
+                                <property name="classDeclBracePlacement" value="NEW_LINE"/>
+                                <property name="expand-tabs" value="true"/>
+                                <property name="methodDeclBracePlacement" value="NEW_LINE"/>
+                            </node>
+                        </node>
+                    </node>
+                </node>
+            </module>
+            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
+        </preferences>
     </configuration>
 </project>

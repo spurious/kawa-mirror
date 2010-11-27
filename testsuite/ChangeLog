@@ -1,3 +1,7 @@
+2010-11-26  Per Bothner  <per@bothner.com>
+
+	* lib-test.scm: New tests for symbol constructor function.
+
 2010-11-19  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: Add a bunch of SRFI-41 (streams) tests.

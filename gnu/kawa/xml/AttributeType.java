@@ -26,7 +26,7 @@ implements TypeValue, Externalizable, AttributePredicate
     else if (localName == ElementType.MATCH_ANY_LOCALNAME)
       qname = ElementType.MATCH_ANY_QNAME;
     else
-      qname = new Symbol(null, localName);
+      qname = Symbol.makeUninterned(localName, null);
     return new AttributeType(qname);
   }
 

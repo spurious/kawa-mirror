@@ -17,7 +17,7 @@ public class XName extends Symbol implements Externalizable
 
   public XName (Symbol symbol, NamespaceBinding namespaceNodes)
   {
-    super(symbol.getNamespace(), symbol.getName());
+    super(symbol.getName(), symbol.getNamespace());
     this.namespaceNodes = namespaceNodes;
   }
 

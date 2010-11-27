@@ -1,3 +1,8 @@
+2010-11-26  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Fix some errors in
+	resolution of constructor calls.
+
 2010-11-04  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java: Update to use new warnInvokeUnknownMethod

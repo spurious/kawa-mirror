@@ -1859,7 +1859,7 @@ public class XQParser extends Lexer
 	    else if (next != '*')
 	      syntaxError("missing local-name after '*:'");
 	  }
-        return QuoteExp.getInstance(new Symbol(null, local));
+        return QuoteExp.getInstance(Symbol.makeUninterned(local));
       }
     else if (curToken == NCNAME_TOKEN)
       {

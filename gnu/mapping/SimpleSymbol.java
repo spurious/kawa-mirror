@@ -14,7 +14,7 @@ public class SimpleSymbol extends Symbol
 
   public SimpleSymbol (String key)
   {
-    super(Namespace.EmptyNamespace, key);
+    super(key, Namespace.EmptyNamespace);
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

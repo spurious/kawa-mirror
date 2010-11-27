@@ -1,4 +1,4 @@
-(test-begin "libs" 71)
+(test-begin "libs" 76)
 
 (import (srfi :2 and-let*))
 
@@ -43,6 +43,16 @@
 (define (symbol-parts s::symbol)
   (list (symbol-local-name s) (symbol-namespace-uri s) (symbol-prefix s)))
 
+(test-equal '("loc1" "uri1" "pre")
+            (symbol-parts (symbol "loc1" "uri1" "pre")))
+(test-equal '("loc2" "uri2" "pre")
+            (symbol-parts (symbol 'loc2 'uri2 'pre)))
+(test-equal '("loc3" "uri3" "pre")
+            (symbol-parts (apply symbol (list "loc3" "uri3" "pre"))))
+(test-equal '("loc4" "uri4" "")
+            (symbol-parts (symbol "loc4" "uri4")))
+(test-equal '("loc5" "uri5" "pre")
+            (symbol-parts (symbol "loc5" (namespace "uri5" "pre"))))
 (test-equal '("abc:def" "" "")
 	    (symbol-parts '|abc:def|))
 ;(test-equal '("abc:def" "" "")

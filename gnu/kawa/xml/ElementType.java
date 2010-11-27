@@ -14,7 +14,7 @@ implements TypeValue, Externalizable, ElementPredicate
 {
   public static final String MATCH_ANY_LOCALNAME = "";
   public static final Symbol MATCH_ANY_QNAME
-    = new Symbol(null, MATCH_ANY_LOCALNAME);
+  = Symbol.makeUninterned(MATCH_ANY_LOCALNAME, null);
 
   Symbol qname;
 
@@ -32,7 +32,7 @@ implements TypeValue, Externalizable, ElementPredicate
     else if (localName == MATCH_ANY_LOCALNAME)
       qname = MATCH_ANY_QNAME;
     else
-      qname = new Symbol(null, localName);
+      qname = Symbol.makeUninterned(localName, null);
     return new ElementType(qname);
   }
 

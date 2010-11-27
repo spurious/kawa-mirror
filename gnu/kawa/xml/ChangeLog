@@ -1,3 +1,8 @@
+2010-11-26  Per Bothner  <per@bothner.com>
+
+	* ElementType.java: Update, since Symbol constructor is now protected.
+	* AttributeType.java: Likewise.
+
 2010-10-05  Per Bothner  <per@bothner.com>
 
 	* XDataType.java (convertValue): New method.

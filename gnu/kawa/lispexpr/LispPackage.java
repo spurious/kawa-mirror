@@ -57,7 +57,7 @@ public class LispPackage extends Namespace
       }
 
     if (create)
-      return add(new Symbol(this, name), hash);
+      return add(Symbol.makeUninterned(name, this), hash); // Optimization
     else
       return null;
   }

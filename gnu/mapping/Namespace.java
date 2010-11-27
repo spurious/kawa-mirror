@@ -221,7 +221,7 @@ public class Namespace
             if (this == EmptyNamespace)
               sym = new SimpleSymbol(key);
             else
-              sym = new Symbol(this, key);
+              sym = new Symbol(key, this);
             return add(sym, hash);
           }
 	else

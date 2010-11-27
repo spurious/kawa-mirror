@@ -16,13 +16,13 @@ public class Keyword extends Symbol
 
   private Keyword (String name)
   {
-    super(keywordNamespace, name);
+    super(name, keywordNamespace);
   }
 
   /** Used for constructing literals (int gnu.expr.LitTable). */
   public Keyword (Namespace namespace, String name)
   {
-    super(namespace, name);
+    super(name, namespace);
   }
 
   /** Get the corresponding non-keyword symbol.

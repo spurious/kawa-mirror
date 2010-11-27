@@ -147,10 +147,13 @@ public class CompileInvoke
           : comp.mainClass;
         ObjectType ctype = (ObjectType) type;
         int numCode;
+        int keywordStart = kind == 'N' ? hasKeywordArgument(1, args) : nargs;
+        int tailArgs = nargs - keywordStart;
         try
           {
             methods = getMethods(ctype, name, caller, iproc);
-            numCode = ClassMethods.selectApplicable(methods, margsLength);
+            numCode = ClassMethods.selectApplicable(methods,
+                                                    margsLength - tailArgs);
           }
         catch (Exception ex)
           {
@@ -159,16 +162,15 @@ public class CompileInvoke
           }
         int index = -1;
         Object[] slots;
-        int keywordStart;
         if (kind == 'N'
-            && ((keywordStart = hasKeywordArgument(1, args)) < args.length
-                || (numCode <= 0
+            && ((tailArgs > 0 && numCode > 0) // Have keywords
+                || (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
                     // There is a default constructor.
                     && (ClassMethods.selectApplicable(methods,
                                                       new Type[] { Compilation.typeClassType })
                         >> 32) == 1))
-            && ((slots = checkKeywords(ctype, args, keywordStart, caller))
-                .length * 2 == (args.length - keywordStart)
+            && (((slots = checkKeywords(ctype, args, keywordStart, caller))
+                 .length * 2 == tailArgs && numCode> 0)
                 || ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
           {
             StringBuffer errbuf = null;

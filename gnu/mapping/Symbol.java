@@ -269,20 +269,26 @@ public class Symbol
     //       {
     //         Symbol sym = ns.lookup(sname, hash, false);
     //         if (sym == null)
-    //           return ns.add(new Symbol(ns, sname.intern()), hash);
+    //           return ns.add(new Symbol(sname.intern(), ns), hash);
     //       }
     //     sname = name + '.' + ++i;
     //   }
     /* #else */
-    return new Symbol(null, name);
+    return new Symbol(name, null);
     /* #endif */
   }
+
+  public static Symbol makeUninterned (String name, Namespace namespace)
+  {
+    return new Symbol(name, namespace);
+  }
+
 
   /** Create new Symbol in a given namespace.
    * Does not enter the result in the namespace's symbol table.
    * @param name an interned String
    */
-  public Symbol (Namespace ns, String name)
+  protected Symbol (String name, Namespace ns)
   {
     /* #ifdef JAXP-QName */
     // super(ns == null ? "" : ns.getName(), name, ns == null ? "" : ns.prefix);

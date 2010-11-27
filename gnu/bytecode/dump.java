@@ -282,6 +282,8 @@ public class dump extends ClassFileInput
                       }
                     // Ok - we found a class - now find the class file.
                     String clfilename = filename.replace('.', '/') + ".class";
+                    if (loader == null)
+                      loader = ClassLoader.getSystemClassLoader();
                     try
                       {
                         java.net.URL resource = loader.getResource(clfilename);

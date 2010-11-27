@@ -11,6 +11,9 @@ public class OutPort extends PrintConsumer implements Printable
 {
   Path path;
   private Writer base;
+  static final int FLUSH_ON_FINALIZE = 1;
+  static final int CLOSE_ON_FINALIZE = 2;
+  int finalizeAction;
 
   // To keep track of column-numbers, we use a helper class.
   // Otherwise, it is too painful, as there is no documented
@@ -20,15 +23,15 @@ public class OutPort extends PrintConsumer implements Printable
 
   /** An index into the WriterManager's internal table.
    * The value zero means it is unregistered. */
-  protected Object unregisterRef;
-  
+  protected WriterManager.WriterRef unregisterRef;
+
   protected OutPort(Writer base, PrettyWriter out, boolean autoflush)
   {
     super(out, autoflush);
     this.bout = out;
     this.base = base;
     if (closeOnExit())
-      unregisterRef = WriterManager.instance.register(out);
+      unregisterRef = WriterManager.instance.register(this);
   }
 
   protected OutPort (OutPort out, boolean autoflush)
@@ -89,8 +92,9 @@ public class OutPort extends PrintConsumer implements Printable
   public boolean printReadable;
 
   static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, Path.valueOf("/dev/stdout"));
-
+  static { outInitial.finalizeAction = FLUSH_ON_FINALIZE; }
   private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, Path.valueOf("/dev/stderr"));
+  static { errInitial.finalizeAction = FLUSH_ON_FINALIZE; }
 
   public static final ThreadLocation outLocation
     = new ThreadLocation("out-default");
@@ -134,7 +138,9 @@ public class OutPort extends PrintConsumer implements Printable
 	    conv = "8859_1";
 	  wr = new java.io.OutputStreamWriter(strm, conv.toString());
 	}
-      return new OutPort(wr, path);
+      OutPort op = new OutPort(wr, path);
+      op.finalizeAction = CLOSE_ON_FINALIZE;
+      return op;
   }
 
   public void echo (char[] buf, int off, int len)  throws java.io.IOException
@@ -345,30 +351,39 @@ public class OutPort extends PrintConsumer implements Printable
   {
     try
       {
-        if (! (base instanceof OutPort && ((OutPort) base).bout == bout))
+        if (! (base instanceof OutPort && ((OutPort) base).bout == bout)) {
           bout.closeThis();
+          base = null;
+          out = null;
+        }
       }
     catch (IOException ex)
       {
         setError();
       }
     WriterManager.instance.unregister(unregisterRef);
+    unregisterRef = null;
   }
 
   public void close()
   {
     try
       {
-        if (base instanceof OutPort && ((OutPort) base).bout == bout)
+        if (base instanceof OutPort && ((OutPort) base).bout == bout) {
           base.close();
-        else
+          base = null;
+        }
+        else if (out != null) {
           out.close();
+          out = null;
+        }
       }
     catch (IOException ex)
       {
         setError();
       }
     WriterManager.instance.unregister(unregisterRef);
+    unregisterRef = null;
   }
 
   /** True if the port should be automatically closed on exit.
@@ -376,6 +391,16 @@ public class OutPort extends PrintConsumer implements Printable
   protected boolean closeOnExit ()
   {
     return true;
+  }
+
+  public void finalize ()
+  {
+    if ((finalizeAction & FLUSH_ON_FINALIZE) != 0)
+      flush();
+    if ((finalizeAction & CLOSE_ON_FINALIZE) != 0)
+      close();
+    else
+      closeThis();
   }
 
   public static void runCleanups ()

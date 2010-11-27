@@ -52,6 +52,10 @@ public class CharArrayOutPort extends OutPort
     return false;
   }
 
+  public void finalize ()
+  {
+  }
+
   /** Returns the written data as a new {@code String}. */
   public String toString ()
   {

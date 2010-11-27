@@ -128,7 +128,7 @@ public abstract class ModuleBody extends Procedure0
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain ()
   {
-    gnu.text.WriterManager.instance.registerShutdownHook();
+    boolean registered = gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {
 	CallContext ctx = CallContext.getInstance();
@@ -145,8 +145,8 @@ public abstract class ModuleBody extends Procedure0
 	    run();
 	    ctx.runUntilDone();
 	  }
-	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
-	gnu.mapping.OutPort.runCleanups();
+        if (! registered)
+          gnu.mapping.OutPort.runCleanups();
 	exitDecrement();
       }
     catch (Throwable ex)

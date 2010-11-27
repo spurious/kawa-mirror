@@ -93,7 +93,7 @@ public abstract class AbstractFormat extends java.text.Format
       {
 	OutPort port = new OutPort(out, false, true);
 	writeObject(obj, (Consumer) out);
-	port.close();
+	port.closeThis();
       }
   }
 

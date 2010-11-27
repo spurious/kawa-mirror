@@ -3,6 +3,7 @@
 
 package gnu.text;
 import java.io.*;
+import gnu.mapping.OutPort;
 
 /** Manages a collection of Writers, handling automatic closing.
  * This class is useful for making sure that a Writer is closed (and its
@@ -11,8 +12,9 @@ import java.io.*;
  * addShutdownHook in Runtime.
  */
 
-public class WriterManager implements Runnable
+public final class WriterManager implements Runnable
 {
+  private WriterManager() { }
   public static final WriterManager instance = new WriterManager();
 
   WriterRef first;
@@ -20,13 +22,13 @@ public class WriterManager implements Runnable
   /** Register a Writer.
    * @return an object that can be passed to {@link #unregister}.
    */
-  public synchronized WriterRef register (Writer port)
+  public synchronized WriterRef register (OutPort port)
   {
     WriterRef ref = new WriterRef(port);
     WriterRef first = this.first; // Copy field to local variable.
     if (first != null)
       {
-        ref.next = first.next;
+        ref.next = first;
         first.prev = ref;
       }
     this.first = ref;
@@ -36,7 +38,7 @@ public class WriterManager implements Runnable
   /** Unregister a Writer.
    * @param key the object returned by the correspodning {@link #register}.
    */
-  public synchronized void unregister (Object key)
+  public synchronized void unregister (WriterRef key)
   {
     if (key == null)
       return;
@@ -47,26 +49,30 @@ public class WriterManager implements Runnable
       next.prev = prev;
     if (prev != null)
       prev.next = next;
+    ref.next = null;
+    ref.prev = null;
     if (ref == first)
       first = next;
   }
 
   public synchronized void run()
   {
-    for (WriterRef ref = first;  ref != null;  ref = ref.next)
+    for (WriterRef ref = first;  ref != null; )
       {
+        WriterRef next = ref.next;
         Object port = ref.get();
         if (port != null)
           {
             try
               {
-                ((Writer) port).close();
+                ((OutPort) port).finalize();
               }
-            catch (Exception ex)
+            catch (Throwable ex)
               {
                 // ignore
               }
           }
+        ref = next;
       }
     first = null;
   }
@@ -92,18 +98,21 @@ public class WriterManager implements Runnable
 	return false;
       }
   }
-}
 
-class WriterRef
-/* #ifdef JAVA2 */
-extends java.lang.ref.WeakReference
-/* #endif */
-{
-  WriterRef next;
-  WriterRef prev;
-
-  public WriterRef (Writer wr)
+  public static class WriterRef
+  /* #ifdef JAVA2 */
+    extends java.lang.ref.WeakReference
+    /* #endif */
   {
-    super(wr);
+    WriterRef next;
+    WriterRef prev;
+
+    public WriterRef (Writer wr)
+    {
+      super(wr);
+    }
+
+    int id=++counter; static int counter;
+    public String toString() { return "WriterRef#"+id+":"+get(); }
   }
 }

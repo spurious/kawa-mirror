@@ -76,6 +76,8 @@ public abstract class LispLanguage extends Language
                   return false;  // FIXME
                 break;
               }
+            if (lexer.peek() == ')')
+              lexer.fatal("An unexpected close paren was read.");
             tr.scanForm(sexp, mexp);
             if ((options & PARSE_ONE_LINE) != 0)
               {
@@ -98,8 +100,6 @@ public abstract class LispLanguage extends Language
                 return true;
               }
           }
-        if (lexer.peek() == ')')
-          lexer.fatal("An unexpected close paren was read.");
 
         // Must be done before any other module imports this module.
         tr.finishModule(mexp);

@@ -1,5 +1,7 @@
 2010-11-26  Per Bothner  <per@bothner.com>
 
+	* LispLanguage.java (parse): Move check for unexpected ')' inside loop.
+
 	* LispPackage.java (lookup): Update, since Symbol constructor is
 	now protected.
 

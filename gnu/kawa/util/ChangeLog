@@ -1,3 +1,8 @@
+2010-11-29  Per Bothner  <per@bothner.com>
+
+	* PreProcess.java: Add "use:javax.lang.model" as a separate feature
+	name, implied by JAVA6.
+
 2010-08-28  Per Bothner  <per@bothner.com>
 
 	* PreProcess.java (version_features): Add "java7".

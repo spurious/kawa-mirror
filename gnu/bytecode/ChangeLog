@@ -1,3 +1,21 @@
+2010-11-29  Per Bothner  <per@bothner.com>
+
+	Aim for complete support for Annotations.
+	* AttrContainer.java (getConstants): New method.
+	* Attribute.java (getConstants): New method.
+	* Field.java (getConstants): New method.
+	* ClassTypeWriter.java (printOptionalIndex): Skip if index is <= 0.
+	* AnnotationEntry.java (Value): New member class.
+	Add partial javax.lang.model.AnnotationValue support.
+	Add support for printing AnnotationEntry and Value instances.
+	* RuntimeAnnotationsAttr.java: Add support for parsing, generating,
+	and printing Annotation attributes.
+	Split support for printing RuntimeAnnotationsAttr into separate
+	pieces: First read/parse, then separate print parsed AnnotationEntrys.
+	* ClassFileInput.java (readAttribute): Change to use new
+	RuntimeAnnotationsAttr.readAnnotationEntry rather than reading an
+	unparsed data array.
+
 2010-11-26  Per Bothner  <per@bothner.com>
 
 	* dump.java (main): If the context ClassLoader is null,

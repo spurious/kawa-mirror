@@ -27,6 +27,11 @@ public abstract class Attribute
   /** Set the next Attribute in the chain belonging to getContainer(). */
   public final void setNext(Attribute next) { this.next = next; }
 
+  public ConstantPool getConstants ()
+  {
+    return getContainer().getConstants();
+  }
+
   /** Add this to (the front of) of the specified attribute container. */
   public void addToFrontOf(AttrContainer container)
   {

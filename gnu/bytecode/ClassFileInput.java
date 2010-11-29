@@ -262,9 +262,13 @@ public class ClassFileInput extends DataInputStream
                  || container instanceof Method
                  || container instanceof ClassType))
       {
-        byte[] data = new byte[length];
-        readFully(data, 0, length);
-        return new RuntimeAnnotationsAttr(name, data, container);
+        int numEntries = readUnsignedShort();
+        AnnotationEntry[] entries = new AnnotationEntry[numEntries];
+        for (int i = 0;  i < numEntries; i++)
+          {
+            entries[i] = RuntimeAnnotationsAttr.readAnnotationEntry(this, container.getConstants());
+          }
+        return new RuntimeAnnotationsAttr(name, entries, numEntries, container);
       }
     else if (name == "ConstantValue" && container instanceof Field)
       {

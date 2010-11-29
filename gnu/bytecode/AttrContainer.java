@@ -12,4 +12,6 @@ public interface AttrContainer
 
   /** Set the (list of) Attributes of this container. */
   public void setAttributes (Attribute attribute);
+
+  public ConstantPool getConstants ();
 }

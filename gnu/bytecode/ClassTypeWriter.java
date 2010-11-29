@@ -305,7 +305,7 @@ public class ClassTypeWriter extends PrintWriter
 
   public final void printOptionalIndex(int index)
   {
-    if ((flags & PRINT_CONSTANT_POOL_INDEXES) != 0)
+    if (index >= 0 && (flags & PRINT_CONSTANT_POOL_INDEXES) != 0)
       {
 	print('#');
 	print(index);

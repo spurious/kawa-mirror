@@ -4,7 +4,10 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Field extends Location implements AttrContainer, Member {
+public class Field extends Location
+  implements AttrContainer, Member
+  // FUTURE: javax.lang.model.VariableElement
+{
   int flags;
   Field next;
 
@@ -39,6 +42,11 @@ public class Field extends Location implements AttrContainer, Member {
     return owner;
   }
 
+  public final ConstantPool getConstants ()
+  {
+    return owner.constants;
+  }
+    
   public final void setStaticFlag (boolean is_static) {
     if (is_static)
       flags |= Access.STATIC;

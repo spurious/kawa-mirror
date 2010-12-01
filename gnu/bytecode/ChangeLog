@@ -1,3 +1,12 @@
+2010-12-01  Per Bothner  <per@bothner.com>
+
+	* AnnotationDefaultAttr.java: New class, extends Attribute.
+	* Makefile.am: Update accordingly.
+	* ClassFileInput.java (readAttribute): Read AnnotationDefault attribute.
+	* RuntimeAnnotationsAttr.java (write, assignConstants): Change to
+	static, so they can be called from AnnotationDefaultAttr.
+	* AnnotationEntry.java (print): Use printQuoteString for strings.
+
 2010-11-29  Per Bothner  <per@bothner.com>
 
 	Aim for complete support for Annotations.

@@ -2,6 +2,7 @@
 
 java_sources = \
 Access.java \
+AnnotationDefaultAttr.java \
 AnnotationEntry.java \
 Attribute.java \
 AttrContainer.java \

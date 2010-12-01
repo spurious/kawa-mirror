@@ -310,6 +310,11 @@ public class ClassFileInput extends DataInputStream
 	attr.dlength = length;
 	return attr;
       }
+    else if (name == "AnnotationDefault" && container instanceof Method)
+      {
+        AnnotationEntry.Value value = RuntimeAnnotationsAttr.readAnnotationValue(this, container.getConstants());
+        return new AnnotationDefaultAttr(name, value, container);
+      }
     else
       {
 	byte[] data = new byte[length];

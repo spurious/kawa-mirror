@@ -150,7 +150,7 @@ public class RuntimeAnnotationsAttr extends Attribute
       dataLength += assignConstants(entries[i], cl.getConstants());
   }
 
-  public int assignConstants (AnnotationEntry aentry, ConstantPool constants)
+  static int assignConstants (AnnotationEntry aentry, ConstantPool constants)
   {
     Map<String,AnnotationEntry.Value> map = aentry.elementsValue;
     int dlen = 4;
@@ -165,7 +165,7 @@ public class RuntimeAnnotationsAttr extends Attribute
     return dlen;
   }
 
-  public int assignConstants (AnnotationEntry.Value val, ConstantPool constants)
+  static int assignConstants (AnnotationEntry.Value val, ConstantPool constants)
   {
     Object value = val.getValue();
     switch (val.kind)
@@ -244,13 +244,12 @@ public class RuntimeAnnotationsAttr extends Attribute
   public void write (DataOutputStream dstr) throws java.io.IOException
   {
     for (int i = 0;  i < numEntries;  i++)
-      write(entries[i], dstr);
+      write(entries[i], getConstants(), dstr);
   }
 
-  void write (AnnotationEntry aentry, DataOutputStream dstr) throws java.io.IOException
+  static void write (AnnotationEntry aentry, ConstantPool constants, DataOutputStream dstr) throws java.io.IOException
 
   {
-    ConstantPool constants = getConstants();
     dstr.writeShort(aentry.annotationTypeIndex);
     Map<String,AnnotationEntry.Value> map = aentry.elementsValue;
     dstr.writeShort(map.size());
@@ -258,13 +257,12 @@ public class RuntimeAnnotationsAttr extends Attribute
       {
         AnnotationEntry.Value val = e.getValue();
         dstr.writeShort(val.nindex);
-        write(val, dstr);
+        write(val, constants, dstr);
       }
   }
 
-  void write (AnnotationEntry.Value val, DataOutputStream dstr) throws java.io.IOException
+  static void write (AnnotationEntry.Value val, ConstantPool constants, DataOutputStream dstr) throws java.io.IOException
   {
-    ConstantPool constants = getConstants();
     Object value = val.getValue();
     int kind = val.kind;
     dstr.writeByte((byte)kind);
@@ -285,7 +283,7 @@ public class RuntimeAnnotationsAttr extends Attribute
         int sz = vals.size();
         dstr.writeShort(sz);
         for (int i = 0;  i < sz;  i++)
-          write(vals.get(i), dstr);
+          write(vals.get(i), constants, dstr);
         break;
       case 'e':
         Field fld = (Field) value;
@@ -296,7 +294,7 @@ public class RuntimeAnnotationsAttr extends Attribute
         dstr.writeShort(constants.addUtf8(((ClassType) value).getSignature()).index);
         break;
       case '@':
-        write((AnnotationEntry) value, dstr);
+        write((AnnotationEntry) value, constants, dstr);
         break;
       default:
         throw new UnsupportedOperationException();

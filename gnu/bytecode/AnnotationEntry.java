@@ -226,8 +226,10 @@ implements java.lang.annotation.Annotation
       case 'F':
       case 's': // String
         out.printOptionalIndex(out.getCpoolEntry(index1));
-        // FIXME - should quote strings, at least.
-        out.print(value.toString());
+        if (value instanceof String)
+          out.printQuotedString((String) value);
+        else
+          out.print(value.toString());
         break;
       case 'e': // enum constant
         String cname, ename;

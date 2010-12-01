@@ -166,6 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 java_sources = \
 Access.java \
+AnnotationDefaultAttr.java \
 AnnotationEntry.java \
 Attribute.java \
 AttrContainer.java \

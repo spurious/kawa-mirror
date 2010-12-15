@@ -146,6 +146,7 @@ public class RuntimeAnnotationsAttr extends Attribute
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
+    dataLength = 2;
     for (int i = 0;  i < numEntries;  i++)
       dataLength += assignConstants(entries[i], cl.getConstants());
   }
@@ -198,7 +199,7 @@ public class RuntimeAnnotationsAttr extends Attribute
         return 3;
       case 's':
         if (val.index1 == 0)
-          val.index1 = constants.addString((String) value).index;
+          val.index1 = constants.addUtf8((String) value).index;
         return 3;
       case '[':
         int dlen = 3;
@@ -243,6 +244,7 @@ public class RuntimeAnnotationsAttr extends Attribute
 
   public void write (DataOutputStream dstr) throws java.io.IOException
   {
+    dstr.writeShort(numEntries);
     for (int i = 0;  i < numEntries;  i++)
       write(entries[i], getConstants(), dstr);
   }
@@ -278,6 +280,7 @@ public class RuntimeAnnotationsAttr extends Attribute
       case 'C':
       case 's':
         dstr.writeShort(val.index1);
+        break;
       case '[':
         List<AnnotationEntry.Value> vals = (List<AnnotationEntry.Value>) value;
         int sz = vals.size();

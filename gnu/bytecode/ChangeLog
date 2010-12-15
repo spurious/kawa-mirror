@@ -1,3 +1,13 @@
+2010-12-14  Per Bothner  <per@bothner.com>
+
+	* RuntimeAnnotationsAttr.java (write): Write entry count.
+	(assignConstants): Count space needed for entry count.
+
+	* RuntimeAnnotationsAttr.java (write): Add missing break statement.
+
+	* RuntimeAnnotationsAttr.java (assignConstants): String annotation
+	value uses a UTF8 constant, not a String constant.
+
 2010-12-01  Per Bothner  <per@bothner.com>
 
 	* AnnotationDefaultAttr.java: New class, extends Attribute.

@@ -154,8 +154,22 @@ public class CompileReflect
                 && ! caller.isAccessible(field, ctype))
 	      return new ErrorExp("field "+field.getDeclaringClass().getName()
                                   +'.'+name+" is not accessible here", comp);
+            // FIXME Also inline to constant for Java "compile-time-constant"
+            // - i.e. static final field that has a "ConstantValue" attribute.
+            // See SlotGet#compile.
+            if (isStatic &&
+                (modifiers & (Access.ENUM|Access.FINAL)) == (Access.ENUM|Access.FINAL))
+              {
+                try
+                  {
+                    return new QuoteExp(field.getReflectField().get(null),
+                                        field.getType());
+                  }
+                catch (Throwable ex)
+                  {
+                  }
+              }
           }
-
         else if (part instanceof gnu.bytecode.Method)
           {
             gnu.bytecode.Method method = (gnu.bytecode.Method) part;
@@ -177,6 +191,26 @@ public class CompileReflect
             nexp.setLine(exp);
             return nexp;
           }
+
+        if (part == null && type instanceof ClassType && isStatic)
+          {
+            ClassType mcl = ((ClassType) type).getDeclaredClass(name);
+            if (mcl != null)
+              {
+                if (arg0.valueIfConstant() instanceof Class)
+                  {
+                    try
+                      {
+                        return new QuoteExp(mcl.getReflectClass());
+                      }
+                    catch (Throwable ex)
+                      {
+                      }
+                  }
+                return new QuoteExp(mcl);
+              }
+          }
+
         if (type != Type.pointer_type && comp.warnUnknownMember())
           comp.error('e', "no slot `"+name+"' in "+ctype.getName());
       }

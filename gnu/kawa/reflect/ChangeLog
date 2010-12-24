@@ -1,3 +1,9 @@
+2010-12-23  Per Bothner  <per@bothner.com>
+
+	* CompileReflect.java (validateApplySlotGet): Inline access to enum
+	constant to constant enum value.
+	Also inline reference to member class.
+
 2010-11-26  Per Bothner  <per@bothner.com>
 
 	* CompileInvoke.java (validateApplyInvoke): Fix some errors in

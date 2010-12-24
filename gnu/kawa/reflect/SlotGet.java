@@ -86,9 +86,10 @@ public class SlotGet extends Procedure2
   }
 
   /** The actual gets of finding the field value.
-   * The compiler emits calls to this method if the field name is literals
+   * The compiler emits calls to this method if the field name is literal
    * but the actual field is not known at compile time.
    * This speeds lookup a bit.
+   * If fname equals "length" or "class", it is assumed to be interned.
    */
   public static Object
   getSlotValue (boolean isStatic, Object obj, String name, String fname,
@@ -255,6 +256,8 @@ public class SlotGet extends Procedure2
               {
                 boolean inlined = false;
                 /*
+                FIXME This should be done at inline-time, not compile-time.
+                See CompileReflect#validateApplySlotGet.
                 FIXME This isn't quite safe.  We should only "inline"
                 the value if the field whose initializer is a constant
                 expression (JLS 2nd ed 15.28).  We cannot determine this

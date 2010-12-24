@@ -9,6 +9,7 @@ import gnu.kawa.functions.Convert;
 import gnu.kawa.util.IdentityHashTable;
 import gnu.mapping.*;
 import gnu.math.IntNum;
+import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
 /* #ifdef use:java.dyn */
 // import java.dyn.*;
@@ -42,7 +43,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
   {
     if (! exp.getFlag(Expression.VALIDATED))
       {
-        exp.setFlag(Expression.VALIDATED); // Protect againts cycles.
+        exp.setFlag(Expression.VALIDATED); // Protect against cycles.
         exp = super.visit(exp, required);
         exp.setFlag(Expression.VALIDATED);
       }
@@ -184,13 +185,41 @@ public class InlineCalls extends ExpExpVisitor<Type>
         if (vtype == Type.toStringType)
           vtype = Type.javalangStringType;
         exp.type = vtype;
-        if (required instanceof PrimType)
+        if (required instanceof PrimType && ! exp.isExplicitlyTyped())
           {
             char sig1 = required.getSignature().charAt(0);
-            QuoteExp ret = sig1 == 'I' ? fixIntValue(exp)
-              : sig1 == 'J'? fixLongValue(exp) : null;
-            if (ret != null)
-              exp = ret;
+            if (value instanceof IntNum)
+              {
+                IntNum ivalue = (IntNum) value;
+                Object ival = null;
+                switch (sig1)
+                  {
+                  case 'B':
+                    if (ivalue.inRange(Byte.MIN_VALUE, Byte.MAX_VALUE))
+                      ival = Byte.valueOf(ivalue.byteValue());
+                    break;
+                  case 'S':
+                    if (ivalue.inRange(Short.MIN_VALUE, Short.MAX_VALUE))
+                      ival = Short.valueOf(ivalue.shortValue());
+                    break;
+                  case 'I':
+                    if (ivalue.inRange(Integer.MIN_VALUE, Integer.MAX_VALUE))
+                      ival = Integer.valueOf(ivalue.intValue());
+                    break;
+                  case 'J':
+                    if (ivalue.inRange(Long.MIN_VALUE, Long.MAX_VALUE))
+                      ival = Long.valueOf(ivalue.longValue());
+                    break;
+                  }
+                if (ival != null)
+                  exp = new QuoteExp(ival, required);
+              }
+            if (value instanceof Char && sig1 == 'C')
+              {
+                int ival = ((Char) value).intValue();
+                if (ival >= 0 && ival <= 0xFFFF)
+                  exp = new QuoteExp(Character.valueOf((char) ival), required);
+              }
           }
       }
     return exp;

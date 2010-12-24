@@ -1,3 +1,9 @@
+2010-12-23  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (visitQuoteExp): Generalize handling of conversion
+	of integer literals to primitives to also support byte and short.
+	Likewise for converting gnu.text.Char constants to char.
+
 2010-11-27  Per Bothner  <per@bothner.com>
 
 	* ModuleBody.java (runAsMain): Only runCleanups at end if

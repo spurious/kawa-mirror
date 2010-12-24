@@ -1,3 +1,8 @@
+2010-12-24  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CPJAVA, KPKAWA, LIST_CODE_SIZE): New macros
+	to reduce repetion and verbosity.
+
 2010-11-26  Per Bothner  <per@bothner.com>
 
 	* lib-test.scm: New tests for symbol constructor function.

@@ -3,6 +3,8 @@
 KAWALIB = ../kawa-$(VERSION).jar
 KAWARTLIB = ../kawart-$(VERSION).jar
 KAWA = ../bin/kawa.sh
+CPJAVA = CLASSPATH=..:@conf_classpath@.:$$CLASSPATH $(JAVA)
+CPKAWA = CLASSPATH=@conf_classpath@.:$$CLASSPATH $(KAWA)
 KAWATEST = CLASSPATH=.:$$CLASSPATH $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 # Used to test chameneosredux
 NDIFF = ndiff
@@ -151,8 +153,7 @@ check-pidigits: pidigits.class
 	  else echo FAIL pidigits test; fi
 
 binarytrees.class: $(srcdir)/binarytrees.scm
-	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
-	$(KAWA) --main -C $(srcdir)/binarytrees.scm
+	$(CPKAWA) --main -C $(srcdir)/binarytrees.scm
 
 check-binarytrees: binarytrees.class
 	CLASSPATH=$(KAWARTLIB):@conf_classpath@.:$$CLASSPATH \
@@ -437,50 +438,33 @@ InliningTest.class: $(srcdir)/inlining-test.scm
 	CLASSPATH=@conf_classpath@.:$$CLASSPATH \
 	$(KAWA) -T InliningTest -C $(srcdir)/inlining-test.scm
 
+LIST_CODE_SIZE = $(CPJAVA) gnu.bytecode.ListCodeSize
+
 inlining.log: InliningTest.class cycle1.class cycle2.class \
   binarytrees.class fannkuch.class fannkuchredux.class fasta.class mandelbrot.class nbody.class pidigits.class regexdna.class revcomp1.class revcomp2.class spectralnorm.class Makefile
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize InliningTest.class \
+	$(LIST_CODE_SIZE) InliningTest.class \
 	setCar getHome setHome isPair isEmpty castToPair newPair tohex \
 	makeIarr lengthIarr getIarr setIarr varargs \
 	factoriali1 factoriali2 factoriall1 plusLambda1 firstNegative \
 	inlineTwoCalls inlineTwoFunctions checkEven >inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize cycle1.class isIsEven >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize cycle2.class isIsOdd >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize binarytrees.class bottomUpTree test >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize 'binarytrees$$TreeNode.class' itemCheck >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize fannkuch.class 'vectorReverseSlice$$Ex' countFlips fannkuch >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize fannkuchredux.class fannkuch >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize fasta.class randomNext >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize pidigits.class pidigits >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize 'pidigits$$Transformation.class' next extract compose >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize 'pidigits$$PiDigitSpigot.class' next digit isSafe produce consume >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize mandelbrot.class compute >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize nbody.class A nbodySystem advance energy jupiter >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize 'nbody$$Body.class' offsetMomentum >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize regexdna.class regexdna >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize revcomp1.class revcomp >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize revcomp2.class run >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize 'revcomp2$$RevByteArray'.class reverseAndPrint >>inlining.log
-	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
-	$(JAVA) gnu.bytecode.ListCodeSize spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
+	$(LIST_CODE_SIZE) cycle1.class isIsEven >>inlining.log
+	$(LIST_CODE_SIZE) cycle2.class isIsOdd >>inlining.log
+	$(LIST_CODE_SIZE) binarytrees.class bottomUpTree test >>inlining.log
+	$(LIST_CODE_SIZE) 'binarytrees$$TreeNode.class' itemCheck >>inlining.log
+	$(LIST_CODE_SIZE) fannkuch.class 'vectorReverseSlice$$Ex' countFlips fannkuch >>inlining.log
+	$(LIST_CODE_SIZE) fannkuchredux.class fannkuch >>inlining.log
+	$(LIST_CODE_SIZE) fasta.class randomNext >>inlining.log
+	$(LIST_CODE_SIZE) pidigits.class pidigits >>inlining.log
+	$(LIST_CODE_SIZE) 'pidigits$$Transformation.class' next extract compose >>inlining.log
+	$(LIST_CODE_SIZE) 'pidigits$$PiDigitSpigot.class' next digit isSafe produce consume >>inlining.log
+	$(LIST_CODE_SIZE) mandelbrot.class compute >>inlining.log
+	$(LIST_CODE_SIZE) nbody.class A nbodySystem advance energy jupiter >>inlining.log
+	$(LIST_CODE_SIZE) 'nbody$$Body.class' offsetMomentum >>inlining.log
+	$(LIST_CODE_SIZE) regexdna.class regexdna >>inlining.log
+	$(LIST_CODE_SIZE) revcomp1.class revcomp >>inlining.log
+	$(LIST_CODE_SIZE) revcomp2.class run >>inlining.log
+	$(LIST_CODE_SIZE) 'revcomp2$$RevByteArray'.class reverseAndPrint >>inlining.log
+	$(LIST_CODE_SIZE) spectralnorm.class A multiplyAv multiplyAtv multiplyAtAv >>inlining.log
 
 check-inlining: inlining.log $(srcdir)/inlining.expected
 	@if diff $(srcdir)/inlining.expected inlining.log; \

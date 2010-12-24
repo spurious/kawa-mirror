@@ -15,6 +15,8 @@ public class ExpVisitor<R,D>
   /** Get the Compilation associated with this visitor. */
   public Compilation getCompilation () { return comp; }
 
+  public Language getLanguage () { return comp.getLanguage(); }
+
   public SourceMessages getMessages () { return messages; }
 
   protected R defaultValue(Expression r, D d)

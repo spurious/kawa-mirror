@@ -1,5 +1,7 @@
 2010-12-24  Per Bothner  <per@bothner.com>
 
+	* ExpVisitor.java (getLanguage): New convenience method.
+
 	* ApplyExp.java (inlineIfConstant): Copy line number to result.
 
 2010-12-23  Per Bothner  <per@bothner.com>

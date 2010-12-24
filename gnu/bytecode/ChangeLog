@@ -1,3 +1,14 @@
+2010-12-01  Per Bothner  <per@bothner.com>
+
+	* AnnotationEntry.java: Also implement
+	java.lang.reflect.InvocationHandler.
+	(invoke): New method.
+	(Value.getValue, Value.print): Add/fix support for enums and arrays.
+	* RuntimeAnnotationsAttr.java (getAnnotationsAttr, addAnnotation,
+	getRuntimeVisibleAnnotations, getRuntimeInvisibleAnnotations):
+	New methods.
+	(assignConstants, write): Add/fix support for enums and arrays.
+
 2010-12-14  Per Bothner  <per@bothner.com>
 
 	* RuntimeAnnotationsAttr.java (write): Write entry count.

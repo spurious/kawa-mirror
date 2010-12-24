@@ -5,6 +5,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.util.*;
+import java.lang.reflect.Proxy;
 
 public class ClassExp extends LambdaExp
 {
@@ -470,6 +471,22 @@ public class ClassExp extends LambdaExp
 	allocFrame(comp);
 	CodeAttr code;
 
+        for (Declaration decl = firstDecl(); decl != null;
+             decl = decl.nextDecl())
+          {
+            int n = decl.numAnnotations();
+            for (int i = 0;  i < n;  i++)
+              {
+                Object ann = decl.getAnnotation(i).valueIfConstant();
+                if (ann != null && decl.field != null)
+                  {
+                    AnnotationEntry aentry = (AnnotationEntry) Proxy.getInvocationHandler(ann);
+                    RuntimeAnnotationsAttr.getRuntimeVisibleAnnotations(decl.field)
+                      .addAnnotation(aentry);
+                  }
+              }
+          }
+
 	for (LambdaExp child = firstChild;  child != null;
              child = child.nextSibling)
 	  {
@@ -760,19 +777,14 @@ public class ClassExp extends LambdaExp
           }
         out.endLogicalBlock("");
       }
-    out.print('(');
     Special prevMode = null;
-    int i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
     //int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     for (Declaration decl = firstDecl();  decl != null; decl = decl.nextDecl())
       {
-	if (i > 0)
-	  out.print(' ');
+        out.writeSpaceFill();
         decl.printInfo(out);
-	i++;
       }
-    out.print(") ");
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {

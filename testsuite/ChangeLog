@@ -1,7 +1,12 @@
 2010-12-24  Per Bothner  <per@bothner.com>
 
+	* annotations1.scm: New test for testing annotations.
+	* MyAnnotType.java: Provide annotation type used by annotations1.scm.
+	* annotations1-bytecode.expected: Expected bytecode dump output.
+	* Makefile.am: Update accordingly.
+
 	* Makefile.am (CPJAVA, KPKAWA, LIST_CODE_SIZE): New macros
-	to reduce repetion and verbosity.
+	to reduce repetition and verbosity.
 
 2010-11-26  Per Bothner  <per@bothner.com>
 

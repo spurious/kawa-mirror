@@ -1,3 +1,11 @@
+2010-12-24  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Declare 'annotation'.
+	(checkDefaultBinding): Map '@NAME' to MakeAnnotation.
+	* standard/object.java (scanClassDef): Recognize field annotations.
+	(rewriteClassDef): Handle annotations.
+	(isAnnotationSymbol): Helper method.
+
 2010-11-20  Jamison Hope <jrh@theptrgroup.com>
 	    Per Bothner  <per@bothner.com>
 

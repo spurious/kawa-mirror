@@ -3,8 +3,7 @@ import gnu.expr.*;
 import kawa.lang.*;
 import gnu.lists.*;
 import java.util.Vector;
-import gnu.mapping.Symbol;
-import gnu.mapping.Namespace;
+import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.kawa.functions.Convert;
 
@@ -245,6 +244,11 @@ public class object extends Syntax
 		    args = pair.getCdr();
 		    seenInit = true;
 		  }
+                else if (key instanceof Pair
+                         && isAnnotationSymbol(((Pair)key).getCar()))
+                  {
+                    decl.addAnnotation(new LangExp(keyPair));
+                  }
 		else
 		  {
 		    args = null;  // Trigger error message
@@ -383,6 +387,20 @@ public class object extends Syntax
     oexp.supers = supers;
 
     oexp.setTypes(tr);
+
+    for (Declaration decl = oexp.firstDecl(); decl != null;  decl = decl.nextDecl())
+      {
+        int n = decl.numAnnotations();
+        for (int i = 0;  i < n;  i++)
+          {
+            Expression ann = decl.getAnnotation(i);
+            if (ann instanceof LangExp)
+              {
+                ann = tr.rewrite_car((Pair) ((LangExp) ann).getLangValue(), false);
+                decl.setAnnotation(i, ann);
+              }
+          }
+      }
 
     // First a pass over init-form: specifiers, since these are evaluated
     // in a scope outside the current class.
@@ -688,5 +706,16 @@ public class object extends Syntax
     if ("final".equals(value))
       return Declaration.FINAL_ACCESS;
     return 0;
+  }
+
+  static boolean isAnnotationSymbol (Object key)
+  {
+    if (key instanceof SimpleSymbol)
+      {
+        String name = ((SimpleSymbol) key).getName();
+        if (name.length() > 1 && name.charAt(0) == '@')
+          return true;
+      }
+    return false;
   }
 }

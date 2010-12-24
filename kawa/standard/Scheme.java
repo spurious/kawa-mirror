@@ -14,6 +14,7 @@ import gnu.lists.AbstractFormat;
 import gnu.kawa.functions.*;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.reflect.MakeAnnotation;
 import gnu.math.DFloNum;
 import gnu.kawa.xml.XmlNamespace;
 import gnu.math.Unit;
@@ -837,6 +838,8 @@ public class Scheme extends LispLanguage
       defProcStFld("path-fragment", "kawa.lib.files");
       defProcStFld("path-query", "kawa.lib.files");
 
+      defProcStFld("annotation", "gnu.kawa.reflect.MakeAnnotation", "instance");
+
       kawaEnvironment.setLocked();
   }
 
@@ -1186,6 +1189,13 @@ public class Scheme extends LispLanguage
           }
       }
     char ch0 = name.charAt(0);
+
+    if (ch0 == '@')
+      {
+        String rest = name.substring(1);
+        Expression classRef = tr.rewrite(Symbol.valueOf(rest));
+        return MakeAnnotation.makeAnnotationMaker(classRef);
+      }
 
     // Look for quantities.
     if (ch0 == '-' || ch0 == '+' || Character.digit(ch0, 10) >= 0)

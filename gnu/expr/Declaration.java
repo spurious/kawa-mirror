@@ -5,6 +5,8 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.text.SourceLocator;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The static information associated with a local variable binding.
@@ -761,6 +763,36 @@ public class Declaration
     setSimple(false);
   }
 
+  List<Expression> annotations;
+
+  /** The number of annotations associated with the declaration. */
+  public int numAnnotations ()
+  {
+    return annotations == null ? 0 : annotations.size();
+  }
+
+  /** Indexed get of one of the annotations associated with this declaration. */
+  public Expression getAnnotation (int i)
+  {
+    return annotations.get(i);
+  }
+
+  /** Replace one of the annotations associated with this declaration. */
+  public void setAnnotation (int i, Expression ann)
+  {
+    annotations.set(i, ann);
+  }
+
+  /** Add an annotation to the set of our annotations.
+   * @param exp A constant-valued expression that evaluates to an Annotation.
+   */
+  public void addAnnotation (Expression exp)
+  {
+    if (annotations == null)
+      annotations = new ArrayList<Expression>();
+    annotations.add(exp);
+  }
+
   Method makeLocationMethod = null;
 
   /** Create a Location object, given that isIndirectBinding().
@@ -868,7 +900,20 @@ public class Declaration
   {
     StringBuffer sbuf = new StringBuffer();
     printInfo(sbuf);
+    out.startLogicalBlock("", "", 2);
     out.print(sbuf.toString());
+    int numAnnotations = numAnnotations();
+    if (numAnnotations > 0)
+      {
+        out.writeSpaceLinear();
+        out.print("Annotations:");
+        for (int i = 0;  i < numAnnotations;  i++)
+          {
+            out.writeSpaceLinear();
+            annotations.get(i).print(out);
+          }
+      }
+    out.endLogicalBlock("");
   }
 
   public void printInfo(StringBuffer sbuf)

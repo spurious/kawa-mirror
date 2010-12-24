@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.text.SourceLocator;
+import gnu.kawa.reflect.MakeAnnotation;
 
 /**
  * An Expression that evaluates to a constant value.
@@ -161,13 +162,23 @@ public class QuoteExp extends Expression
           ptype = null;
         args[i] = visitor.visit(args[i], ptype);
       }
+    Compilation comp = visitor.getCompilation();
     if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
       {
 	Expression e = exp.inlineIfConstant(proc, visitor);
 	if (e != exp)
 	  return visitor.visit(e, required);
+        if (proc == MakeAnnotation.makeMethodProc && nargs == 1 && visitor.processingAnnotations())
+          {
+            Object name = null;
+            if (args[0] instanceof ReferenceExp)
+              name = ((ReferenceExp) args[0]).getName();
+            msg = "unknown annotation type";
+            if (name != null)
+              msg = msg + " '" + name + '\'';
+            comp.error('e', msg, args[0]);
+          }
       }
-    Compilation comp = visitor.getCompilation();
     if (comp.inlineOk(proc))
       {
 	if (ApplyExp.asInlineable(proc) != null)

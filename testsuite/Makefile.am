@@ -41,6 +41,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
+  check-annotations1 \
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
   check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
@@ -399,6 +400,16 @@ MyDate.class MyTimestamp.class: $(srcdir)/MyDate.java $(srcdir)/MyTimestamp.java
 check-pitfalls:
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -f $(srcdir)/r5rs_pitfall.scm
 
+MyAnnotType.class: $(srcdir)/MyAnnotType.java
+	CLASSPATH=..:.:$$CLASSPATH $(JAVAC) -g -d . $?
+annotations1.class: $(srcdir)/annotations1.scm MyAnnotType.class
+	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $(srcdir)/annotations1.scm
+check-annotations1: annotations1.class
+	$(CPJAVA) gnu.bytecode.dump 'annotations1$$MyClass'.class >tmp-annotations1.bytecode
+	@if diff $(srcdir)/annotations1-bytecode.expected tmp-annotations1.bytecode; \
+	  then echo '# annotations1 test passes'; \
+	  else echo FAIL annotations1 test; fi
+
 APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
@@ -519,6 +530,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
+  MyAnnotType.java annotations1.scm annotations1-bytecode.expected\
   binarytrees.scm binarytrees-output.txt \
   chameneosredux.scm chameneosredux-output.txt\
   fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.txt \

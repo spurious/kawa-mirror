@@ -30,6 +30,43 @@ public class RuntimeAnnotationsAttr extends Attribute
     addToFrontOf(container);
   }
 
+  public static RuntimeAnnotationsAttr
+  getAnnotationsAttr (AttrContainer container, String name)
+  {
+    Attribute attr = Attribute.get(container, name);
+    if (attr != null)
+      return (RuntimeAnnotationsAttr) attr;
+    return new RuntimeAnnotationsAttr(name, null, 0, container);
+  }
+
+  /** Get or create a RuntimeVisibleAnnotations attribute. */
+  public static RuntimeAnnotationsAttr
+  getRuntimeVisibleAnnotations (AttrContainer container)
+  {
+    return getAnnotationsAttr(container, "RuntimeVisibleAnnotations");
+  }
+
+  /** Get or create a RuntimeInvisibleAnnotations attribute. */
+  public static RuntimeAnnotationsAttr
+  getRuntimeInvisibleAnnotations (AttrContainer container)
+  {
+    return getAnnotationsAttr(container, "RuntimeInvisibleAnnotations");
+  }
+
+  /** Add an annotation to this attribute. */
+  public void addAnnotation (AnnotationEntry ann)
+  {
+    if (entries == null)
+      entries = new AnnotationEntry[4];
+    else if (entries.length <= numEntries)
+      {
+        AnnotationEntry[] tmp = new AnnotationEntry[2 * entries.length];
+        System.arraycopy(entries, 0, tmp, 0, numEntries);
+        entries = tmp;
+      }
+    entries[numEntries++] = ann;
+  }
+
   /** Return the length of the attribute in bytes.
     * Does not include the 6-byte header (for the name_index and the length).*/
   public int getLength() { return dataLength; }
@@ -72,7 +109,7 @@ public class RuntimeAnnotationsAttr extends Attribute
   {
     byte kind = dstr.readByte();
     int expected = 0;
-    AnnotationEntry.Value val = new AnnotationEntry.Value((char) kind, null);
+    AnnotationEntry.Value val = new AnnotationEntry.Value((char) kind, null, null);
     CpoolEntry cpentry;
     int index;
     Object value;
@@ -168,7 +205,7 @@ public class RuntimeAnnotationsAttr extends Attribute
 
   static int assignConstants (AnnotationEntry.Value val, ConstantPool constants)
   {
-    Object value = val.getValue();
+    Object value = val.value;
     switch (val.kind)
       {
       case 'B':
@@ -215,6 +252,12 @@ public class RuntimeAnnotationsAttr extends Attribute
             Field fld = (Field) value;
             cname = fld.getDeclaringClass().getInternalName();
             ename = fld.getName();
+          }
+        else if (value instanceof Enum)
+          {
+            Enum evalue = (Enum) value;
+            cname = evalue.getDeclaringClass().getName().replace('.', '/');
+            ename = evalue.name();
           }
         else
           {
@@ -265,7 +308,7 @@ public class RuntimeAnnotationsAttr extends Attribute
 
   static void write (AnnotationEntry.Value val, ConstantPool constants, DataOutputStream dstr) throws java.io.IOException
   {
-    Object value = val.getValue();
+    Object value = val.value;
     int kind = val.kind;
     dstr.writeByte((byte)kind);
     switch (kind)
@@ -289,7 +332,6 @@ public class RuntimeAnnotationsAttr extends Attribute
           write(vals.get(i), constants, dstr);
         break;
       case 'e':
-        Field fld = (Field) value;
         dstr.writeShort(val.index1);
         dstr.writeShort(val.index2);
         break;

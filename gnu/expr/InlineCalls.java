@@ -11,6 +11,7 @@ import gnu.mapping.*;
 import gnu.math.IntNum;
 import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 /* #ifdef use:java.dyn */
 // import java.dyn.*;
 /* #endif */
@@ -93,9 +94,10 @@ public class InlineCalls extends ExpExpVisitor<Type>
     if (incompatible)
       {
         Language language = comp.getLanguage();
-        comp.error('w', "type "+(language.formatType(expType)
-                                 +" is incompatible with required type "
-                                 +language.formatType(required)),
+        comp.error(processingAnnotations() ? 'e' : 'w',
+                   ("type "+language.formatType(expType)
+                    +" is incompatible with required type "
+                    +language.formatType(required)),
                    exp);
       }
     return exp;
@@ -318,6 +320,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                          ? val.getType()
                          : Type.objectType);
          }
+        visitAnnotations(decl);
       }
     return exp;
   }
@@ -390,6 +393,35 @@ public class InlineCalls extends ExpExpVisitor<Type>
                                          Declaration decl)
   {
     return visit(new_value, decl == null || decl.isAlias() ? null : decl.type);
+  }
+
+  boolean processingAnnotations;
+  /** If currently processing an annotation belonging to a declaration.
+   * In this case expressions must resolve to constants,
+   * annotations must resolve to know annotation types.
+   */
+  public boolean processingAnnotations () { return processingAnnotations; }
+
+  protected void visitAnnotations (Declaration decl)
+  {
+    List<Expression> annotations = decl.annotations;
+    if (annotations != null)
+      {
+        boolean saveProcessingAnnotations = processingAnnotations;
+        processingAnnotations = true;
+        try
+          {
+            int num = annotations.size();
+            for (int i = 0;  i < num;  i++)
+              {
+                annotations.set(i, visit(annotations.get(i), null));
+              }
+          }
+        finally
+          {
+            processingAnnotations = saveProcessingAnnotations;
+          }
+      }
   }
 
   protected Expression visitSetExp (SetExp exp, Type required)

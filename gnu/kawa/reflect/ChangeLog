@@ -1,3 +1,10 @@
+2010-12-24  Per Bothner  <per@bothner.com>
+
+	* MakeAnnotation.java: New class, extends ProcedureN.
+	* Makefile.am: Update accordingly.
+	* CompileInvoke.java (validateApplyInvoke): Constant-fold array
+	construction if processingAnnotations().
+
 2010-12-23  Per Bothner  <per@bothner.com>
 
 	* CompileReflect.java (validateApplySlotGet): Inline access to enum

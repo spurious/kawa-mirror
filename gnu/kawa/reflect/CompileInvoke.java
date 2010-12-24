@@ -4,6 +4,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.functions.CompileArith;
 import gnu.math.IntNum;
+import java.lang.reflect.Array;
 
 public class CompileInvoke
 {
@@ -86,6 +87,19 @@ public class CompileInvoke
         if (sizeArg == null)
           sizeArg = QuoteExp.getInstance(new Integer(args.length-1));
         sizeArg = visitor.visit(sizeArg, Type.intType);
+        Object constantValue = null;
+        if (visitor.processingAnnotations() && sizeArg instanceof QuoteExp)
+          {
+            try
+              {
+                int sz = ((Number) sizeArg.valueIfConstant()).intValue();
+                constantValue = Array.newInstance(elementType.getReflectClass(), sz);
+              }
+            catch (Throwable ex)
+              {
+                comp.error('e', "bad array size: "+ex.getMessage());
+              }
+          }
         ApplyExp alloc = new ApplyExp(new ArrayNew(elementType),
                                       new Expression[] { sizeArg } );
         alloc.setType(atype);
@@ -118,6 +132,10 @@ public class CompileInvoke
                   }
               }
             arg = visitor.visit(arg, elementType);
+            if (! (arg instanceof QuoteExp))
+              constantValue = null;
+            else if (constantValue != null)
+              Array.set(constantValue, index, arg.valueIfConstant());
             begin.add(new ApplyExp(new ArraySet(elementType),
                                    new Expression[] {
                                      new ReferenceExp(adecl),
@@ -127,6 +145,8 @@ public class CompileInvoke
           }
         begin.add(new ReferenceExp(adecl));
         let.body = begin;
+        if (constantValue != null)
+          return new QuoteExp(constantValue, type);
         return let;
       }
     else if (type != null && name != null)

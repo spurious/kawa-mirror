@@ -3,6 +3,7 @@
 
 package gnu.bytecode;
 import java.util.*;
+import java.lang.reflect.Array;
 /* #ifdef use:javax.lang.model */
 import javax.lang.model.element.*;
 /* #endif */
@@ -10,8 +11,9 @@ import javax.lang.model.element.*;
 /** An annotation value mirror. */
 
 public class AnnotationEntry
+implements java.lang.reflect.InvocationHandler
 /* #ifdef JAVA5 */
-implements java.lang.annotation.Annotation
+, java.lang.annotation.Annotation
 /* #endif */
 /* #ifdef use:javax.lang.model */
 /* FUTURE also implements: javax.lang.model.element.AnnotationMirror */
@@ -19,6 +21,15 @@ implements java.lang.annotation.Annotation
 {
   ClassType annotationType;
   int annotationTypeIndex;
+
+  public AnnotationEntry ()
+  {
+  }
+
+  public AnnotationEntry (ClassType annotationType)
+  {
+    this.annotationType = annotationType;
+  }
 
   LinkedHashMap<String,Value> elementsValue = new LinkedHashMap<String,Value>(10);
 
@@ -139,11 +150,24 @@ implements java.lang.annotation.Annotation
       }
   }
 
+  public Object invoke (Object proxy, java.lang.reflect.Method method, Object[] args)
+  {
+    String mname = method.getName();
+    int nargs = args == null ? 0 : args.length;
+    if (mname.equals("toString") && nargs == 0)
+      return this.toString();
+    if (mname.equals("hashCode") && nargs == 0)
+      return this.hashCode();
+    return elementsValue.get(mname).getValue();
+  }
+
   public static class Value
   /* #ifdef use:javax.lang.model */
   implements AnnotationValue
   /* #endif */
   {
+    Type type;
+
     /** Either one of the standard primitize signature code
      * B (byte), S (short), I (int) , J (long), F (float), D (double),
      * Z (boolean), C (char).
@@ -157,6 +181,7 @@ implements java.lang.annotation.Annotation
     char kind;
 
     Object value;
+    Object valuex;
 
     /** Indexes in ConstantPool of corresponding name. */
     int nindex;
@@ -164,20 +189,40 @@ implements java.lang.annotation.Annotation
     int index1;
     int index2;
 
-    public Value (char kind, Object value)
+    public Value (char kind, Type type, Object value)
     {
       this.kind = kind;
+      this.type = type;
       this.value = value;
     }
 
     /** Get an Object representing the annotation value.
      * If the kind is 'e', the value is *either* a Field or an 2-element
-     * array [ClassName, EnumName].
+     * array [ClassName, EnumName] or the actual Enum value.
      * If kind is 'c', the value is *either* a ClassType or a String.
      */
-    public Object getValue() { return value; }
+    public Object getValue()
+    {
+      if (kind == '[')
+        {
+          if (valuex == null)
+            {
+              List<? extends AnnotationEntry.Value> lvalue =
+                (List<? extends AnnotationEntry.Value>) value;
+              int n = lvalue.size();
+              Class eltype = type.getReflectClass().getComponentType();
+              Object arr = Array.newInstance(eltype, n);
+              for (int i = 0;  i < n;  i++)
+                Array.set(arr, i, lvalue.get(i).getValue());
+              valuex = arr;
+            }
+          return valuex;
+        }
+      // FIXME other conversions needed?
+      return value;
+    }
 
-    public String toString() { return value.toString(); } // FIXME
+    public String toString() { return getValue().toString(); }
  
     /* #ifdef use:javax.lang.model */
     public <R,P> R accept(AnnotationValueVisitor<R,P> v, P p)
@@ -193,7 +238,8 @@ implements java.lang.annotation.Annotation
         case 'F':  return v.visitFloat(((Float) value).floatValue(), p);
         case 'D':  return v.visitDouble(((Double) value).doubleValue(), p);
         case 's':  return v.visitString((String) value, p);
-        case '[':  return v.visitArray((List<? extends AnnotationValue>) value, p);
+        case '[': 
+          return v.visitArray((List<? extends AnnotationValue>) value, p);
         case 'e': /* FIXME:   return v.visitEnumConstant((Field) value, p);*/
         case '@':
         default:
@@ -238,6 +284,12 @@ implements java.lang.annotation.Annotation
             Field fld = (Field) value;
             cname = fld.getDeclaringClass().getInternalName();
             ename = fld.getName();
+          }
+        else if (value instanceof Enum)
+          {
+            Enum evalue = (Enum) value;
+            cname = evalue.getDeclaringClass().getName().replace('.', '/');
+            ename = evalue.name();
           }
         else
           {

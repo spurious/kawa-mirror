@@ -1,0 +1,49 @@
+Reading .class from annotations1$MyClass.class.
+
+Access flags: public super
+This class: annotations1$MyClass super: java.lang.Object
+Interfaces (count: 0):
+
+Fields (count: 2):
+Field name: x public Signature: gnu.math.IntNum
+Attribute "RuntimeVisibleAnnotations", length:0, number of entries: 1
+  @MyAnnotType
+    svalue => 4324
+    name => "myName"
+    bvalue => 2
+    ivalue => 112
+    blvalue => false
+    chvalue => B
+    etype => enum[java/lang/annotation/ElementType PACKAGE]
+Field name: y public Signature: gnu.math.IntNum
+Attribute "RuntimeVisibleAnnotations", length:0, number of entries: 2
+  @MyAnnotType
+    names => array length:2
+      0: "name1"
+      1: "name2"
+    clvalue => java.io.InputStream
+  @javax.annotation.Resource
+    authenticationType => enum[javax/annotation/Resource$AuthenticationType CONTAINER]
+    type => java.util.ArrayList
+
+Methods (count: 1):
+
+Method name:"<init>" public Signature: ()void
+Attribute "Code", length:17, max_stack:1, max_locals:1, code_length:5
+  0: aload_0
+  1: invokespecial <Method java.lang.Object.<init> ()void>
+  4: return
+
+Attributes (count: 3):
+Attribute "InnerClasses", length:10, count: 1
+  public MyClass = annotations1$MyClass; member of annotations1
+Attribute "SourceFile", length:2, "annotations1.scm"
+Attribute "SourceDebugExtension", length:85
+SMAP
+annotations1.scm
+Scheme
+*S Scheme
+*F
++ 1 annotations1.scm
+./annotations1.scm
+*E

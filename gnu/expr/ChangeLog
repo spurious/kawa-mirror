@@ -1,5 +1,19 @@
 2010-12-24  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (annotations): New field.
+	(numAnnotations, getAnnotation, setAnnotation, addAnnotation):
+	New methods.
+	(printInfo): Also print out annotations.
+	* ClassExp.java (compileMembers): Emit annotations.
+	(print): Some tweaks.
+	* QuoteExp.java (validateApply): Add error check for if
+	MakeAnnotation.makeMethodProc didn't get get inlined.
+	* InlineCalls.java (processingAnnotations): New field.
+	(processingAnnotations, visitAnnotations): New methods.
+	(visitScopeExp): Call visitAnnotations.
+	(checkType): If incompatible types, and we're
+	processingAnnotations force an error rather than a warning.
+
 	* ExpVisitor.java (getLanguage): New convenience method.
 
 	* ApplyExp.java (inlineIfConstant): Copy line number to result.

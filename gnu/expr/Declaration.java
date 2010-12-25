@@ -7,6 +7,8 @@ import gnu.mapping.*;
 import gnu.text.SourceLocator;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.reflect.Proxy;
+import java.lang.annotation.ElementType;
 
 /**
  * The static information associated with a local variable binding.
@@ -593,6 +595,16 @@ public class Declaration
   public final boolean isProcedureDecl () { return (flags & PROCEDURE) != 0; }
 
   public final void setProcedureDecl (boolean val) { setFlag(val, PROCEDURE); }
+
+  public final boolean isClassMethod ()
+  {
+    return (flags & FIELD_OR_METHOD+PROCEDURE) == FIELD_OR_METHOD+PROCEDURE;
+  }
+
+  public final boolean isClassField ()
+  {
+    return (flags & FIELD_OR_METHOD+PROCEDURE) == FIELD_OR_METHOD;
+  }
 
   public final boolean isNamespaceDecl ()
   {

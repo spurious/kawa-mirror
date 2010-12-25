@@ -212,9 +212,13 @@ public class InlineCalls extends ExpExpVisitor<Type>
                     if (ivalue.inRange(Long.MIN_VALUE, Long.MAX_VALUE))
                       ival = Long.valueOf(ivalue.longValue());
                     break;
+                  default:
+                    ivalue = null;
                   }
                 if (ival != null)
                   exp = new QuoteExp(ival, required);
+                else if (ivalue != null)
+                  error('w', "integer "+ivalue+" not in range of "+required.getName());
               }
             if (value instanceof Char && sig1 == 'C')
               {
@@ -247,9 +251,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
                 && ! rval.getDontDereference())
               return visitReferenceExp(rval, required);
           }
-        if (! exp.isProcedureName()
-            && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
-                == Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE))
+        if (! exp.isProcedureName() && decl.isClassMethod())
           {
             // FIXME.  This shouldn't be that hard to fix.  For example,
             // we could treat reference to a one-argument method foo as if
@@ -428,9 +430,7 @@ public class InlineCalls extends ExpExpVisitor<Type>
   {
     Declaration decl = exp.getBinding();
     super.visitSetExp(exp, required);
-    if (! exp.isDefining() && decl != null
-        && ((decl.flags & Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)
-            == (Declaration.FIELD_OR_METHOD+Declaration.PROCEDURE)))
+    if (! exp.isDefining() && decl != null && decl.isClassMethod())
       comp.error('e', "can't assign to method "+decl.getName(), exp);
     if (decl != null && decl.getFlag(Declaration.TYPE_SPECIFIED))
       {

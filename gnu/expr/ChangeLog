@@ -1,3 +1,11 @@
+2010-12-25  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (isClassMethod, isClassField): New methods.
+	* InlineCalls.java: Use isClassMethod.
+
+	* InlineCalls.java (visitQuoteExp): Warning if integer literal
+	is out of range.
+
 2010-12-24  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (annotations): New field.

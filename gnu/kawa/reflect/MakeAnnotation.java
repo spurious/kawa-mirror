@@ -103,6 +103,7 @@ public class MakeAnnotation extends ProcedureN
     for (; i < nargs;  i++)
       {
         String name;
+        int ikey = i;
         if (i == istart && nargs == istart+1)
           name = "value";
         else
@@ -130,7 +131,7 @@ public class MakeAnnotation extends ProcedureN
             Method method = annotationType.getDeclaredMethod(name, Type.typeArray0);
             if (method == null)
               {
-                messages.error('e', "no annotation element named '"+name+'\'');
+                comp.error('e', "no annotation element named '"+name+'\'', args[ikey]);
                 aentry = null;
               }
             else

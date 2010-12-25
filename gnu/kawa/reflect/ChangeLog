@@ -1,5 +1,8 @@
 2010-12-24  Per Bothner  <per@bothner.com>
 
+	* MakeAnnotation.java (validate): Fix SourceLocator used for
+	unknown annotation element name error message.
+
 	* MakeAnnotation.java: New class, extends ProcedureN.
 	* Makefile.am: Update accordingly.
 	* CompileInvoke.java (validateApplyInvoke): Constant-fold array

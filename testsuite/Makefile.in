@@ -198,6 +198,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
   MyAnnotType.java annotations1.scm annotations1-bytecode.expected\
+  bad-annotations2.scm bad-annotations2.expected\
   binarytrees.scm binarytrees-output.txt \
   chameneosredux.scm chameneosredux-output.txt\
   fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.txt \
@@ -410,7 +411,7 @@ check-no-inline:
 check1:  check-num check-arr check-lib \
   check-srfi-16 check-srfi-64 check-srfi-69 \
   check-format check-ppfile check-text check-regex scribble.class \
-  check-annotations1 \
+  check-annotations1 check-annotations2\
   check-binarytrees check-chameneosredux check-fannkuch check-fannkuchredux check-fasta \
   check-knucleotide check-mandelbrot check-meteor check-nbody \
   check-nsieve check-pidigits check-regexdna check-revcomp \
@@ -773,11 +774,20 @@ MyAnnotType.class: $(srcdir)/MyAnnotType.java
 	CLASSPATH=..:.:$$CLASSPATH $(JAVAC) -g -d . $?
 annotations1.class: $(srcdir)/annotations1.scm MyAnnotType.class
 	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $(srcdir)/annotations1.scm
-check-annotations1: annotations1.class
+tmp-annotations1.bytecode: annotations1.class
 	$(CPJAVA) gnu.bytecode.dump 'annotations1$$MyClass'.class >tmp-annotations1.bytecode
+check-annotations1: tmp-annotations1.bytecode
 	@if diff $(srcdir)/annotations1-bytecode.expected tmp-annotations1.bytecode; \
 	  then echo '# annotations1 test passes'; \
 	  else echo FAIL annotations1 test; fi
+
+tmp-bad-annotations2.err: bad-annotations2.scm MyAnnotType.class
+	-$(CPKAWA) -C $< 2>&1 \
+        | sed -e '1d' -e 's|^.*/$(<F)|$(<F)|' >tmp-bad-annotations2.err
+check-annotations2: tmp-bad-annotations2.err
+	@if diff $(srcdir)/bad-annotations2.expected tmp-bad-annotations2.err; \
+	  then echo '# annotations2 test passes'; \
+	  else echo FAIL annotations2 test; fi
 
 # Not done by "make check" as it is interactive.
 check-scribble: scribble.class

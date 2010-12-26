@@ -1,3 +1,12 @@
+2010-12-26  Per Bothner  <per@bothner.com>
+
+	* annotations1.scm: Add some method anc class annotations.
+	* annotations1-bytecode.expected: Update accordingly.
+
+	* bad-annotations2.scm: New test for catching errors.
+	* bad-annotations2.expected: Expected error messages from above.
+	* Makefile.am: Update acordingly.
+
 2010-12-24  Per Bothner  <per@bothner.com>
 
 	* annotations1.scm: New test for testing annotations.

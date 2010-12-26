@@ -1,3 +1,7 @@
+2010-12-26  Jamison Hope  <jrh@theptrgroup.com>
+
+	* build.xml: Set includeantruntime on javac commands - mostly to false.
+
 2010-11-20  Per Bothner  <per@bothner.com>
 
 	* build.xml (slib-scm): Add SRFI-41 files in gnu.kawa.slib.

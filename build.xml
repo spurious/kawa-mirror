@@ -204,7 +204,8 @@
            classpath="lib/ext/ant.jar"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}">
+           optimize="${optimize}"
+	   includeantruntime="true">
       <include name="gnu/kawa/util/PreProcess.java"/>
       <include name="gnu/kawa/ant/*.java"/>
     </javac>
@@ -395,7 +396,8 @@
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}" >
+           optimize="${optimize}"
+	   includeantruntime="false">
       <include name="gnu/bytecode/"/>
       <include name="gnu/commonlisp/lang/"/>
       <include name="gnu/ecmascript/"/>
@@ -523,7 +525,8 @@
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}" >
+           optimize="${optimize}"
+	   includeantruntime="false">
       <include name="gnu/xml/"/>
       <include name="gnu/kawa/xml/"/>
       <include name="gnu/kawa/xslt/"/>
@@ -548,7 +551,8 @@
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}" >
+           optimize="${optimize}"
+	   includeantruntime="false">
       <include name="gnu/brl/"/>
       <include name="gnu/kawa/brl/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
@@ -574,7 +578,8 @@
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}" >
+           optimize="${optimize}"
+	   includeantruntime="false">
       <include name="gnu/kawa/servlet/"/>
     </javac>
     <apply taskname="kawa" executable="java" 
@@ -613,7 +618,8 @@
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
-           optimize="${optimize}" >
+           optimize="${optimize}"
+	   includeantruntime="false">
       <include name="gnu/jemacs/buffer/"/>
       <include name="gnu/jemacs/lang/"/>
       <include name="gnu/jemacs/swing/"/>
@@ -623,7 +629,8 @@
   </target>
    
   <target name="jemacs-swt-classes" depends="jemacs-classes">
-    <javac srcdir="${src.dir}" destdir="${build.classes}">
+    <javac srcdir="${src.dir}" destdir="${build.classes}"
+	   includeantruntime="false">
       <include name="gnu/jemacs/swt/"/>
     </javac>
   </target>

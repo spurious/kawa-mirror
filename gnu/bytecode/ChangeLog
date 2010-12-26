@@ -1,3 +1,8 @@
+2010-12-26  Per Bothner  <per@bothner.com>
+
+	* RuntimeAnnotationsAttr.java (maybeAddAnnotation): New method.
+	* AnnotationEntry.java (getRetention, hasTarget): New methods.
+
 2010-12-01  Per Bothner  <per@bothner.com>
 
 	* AnnotationEntry.java: Also implement

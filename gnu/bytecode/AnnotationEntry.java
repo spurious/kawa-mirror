@@ -4,6 +4,7 @@
 package gnu.bytecode;
 import java.util.*;
 import java.lang.reflect.Array;
+import java.lang.annotation.*;
 /* #ifdef use:javax.lang.model */
 import javax.lang.model.element.*;
 /* #endif */
@@ -21,6 +22,36 @@ implements java.lang.reflect.InvocationHandler
 {
   ClassType annotationType;
   int annotationTypeIndex;
+
+  public RetentionPolicy getRetention ()
+  {
+    Annotation retention = getAnnotationType().getReflectClass()
+      .getAnnotation(Retention.class);
+    if (retention == null)
+      return RetentionPolicy.CLASS;
+    return ((Retention) retention).value();
+  }
+
+  /** Is there is a @Target meta-annotation that includes {@var etype}?.
+   * If the annotationType has no @Target meta-annotation, return true,
+   * since in that case the annotation type is allowed in all contexts.
+   * If etype==null, return false iff there is a @Target meta-annotation.
+   */
+  public boolean hasTarget (ElementType etype)
+  {
+    Annotation target = getAnnotationType().getReflectClass()
+      .getAnnotation(Target.class);
+    if (target == null)
+      return true;
+    if (etype != null)
+      {
+        ElementType[] etypes = (ElementType[]) ((Target) target).value();
+        for (int i = etypes.length;  --i >= 0; )
+          if (etypes[i] == etype)
+            return true;
+      }
+    return false;
+  }
 
   public AnnotationEntry ()
   {

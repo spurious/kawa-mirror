@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.util.*;
 import java.lang.reflect.Proxy;
+import java.lang.annotation.ElementType;
 
 public class ClassExp extends LambdaExp
 {
@@ -471,20 +472,12 @@ public class ClassExp extends LambdaExp
 	allocFrame(comp);
 	CodeAttr code;
 
+        if (nameDecl != null)
+          nameDecl.compileAnnotations(type, ElementType.TYPE);
         for (Declaration decl = firstDecl(); decl != null;
              decl = decl.nextDecl())
           {
-            int n = decl.numAnnotations();
-            for (int i = 0;  i < n;  i++)
-              {
-                Object ann = decl.getAnnotation(i).valueIfConstant();
-                if (ann != null && decl.field != null)
-                  {
-                    AnnotationEntry aentry = (AnnotationEntry) Proxy.getInvocationHandler(ann);
-                    RuntimeAnnotationsAttr.getRuntimeVisibleAnnotations(decl.field)
-                      .addAnnotation(aentry);
-                  }
-              }
+            decl.compileAnnotations(decl.field, ElementType.FIELD);
           }
 
 	for (LambdaExp child = firstChild;  child != null;
@@ -504,6 +497,8 @@ public class ClassExp extends LambdaExp
             if (childDecl == null
                 || ! childDecl.getFlag(Declaration.STATIC_SPECIFIED))
               child.declareThis(comp.curClass);
+            if (childDecl != null)
+              childDecl.compileAnnotations(comp.method, ElementType.METHOD);
 	    comp.curClass = instanceType;
 	    comp.curLambda = child;
 	    comp.method.initCode();

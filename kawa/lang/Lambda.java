@@ -382,6 +382,16 @@ public class Lambda extends Syntax
 	Object attrName = Translator.stripSyntax(pair1.getCar());
 	if (tr.matches(attrName, "::"))
 	  attrName = null;
+        else if (attrName instanceof Pair
+                 && isAnnotationSymbol(((Pair)attrName).getCar()))
+          {
+            if (lexp.nameDecl == null)
+              tr.error('e', "annotation for anonymous function");
+            else
+              lexp.nameDecl.addAnnotation(new LangExp(pair1));
+            body = pair1.getCdr();
+            continue;
+          }
 	else if (! (attrName instanceof Keyword))
 	  break;
 
@@ -549,6 +559,8 @@ public class Lambda extends Syntax
       tr.curMethodLambda = lexp;
     ScopeExp curs = tr.currentScope();
     tr.pushScope(lexp);
+    if (lexp.nameDecl != null)
+      rewriteAnnotations(lexp.nameDecl, tr);
     Declaration prev = null;
     int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
     int opt_args = lexp.defaultArgs == null ? 0
@@ -641,5 +653,30 @@ public class Lambda extends Syntax
   public void print (Consumer out)
   {
     out.write("#<builtin lambda>");
+  }
+
+  public static boolean isAnnotationSymbol (Object key)
+  {
+    if (key instanceof SimpleSymbol)
+      {
+        String name = ((SimpleSymbol) key).getName();
+        if (name.length() > 1 && name.charAt(0) == '@')
+          return true;
+      }
+    return false;
+  }
+
+  public static void rewriteAnnotations (Declaration decl, Translator tr)
+  {
+    int n = decl.numAnnotations();
+    for (int i = 0;  i < n;  i++)
+      {
+        Expression ann = decl.getAnnotation(i);
+        if (ann instanceof LangExp)
+          {
+            ann = tr.rewrite_car((Pair) ((LangExp) ann).getLangValue(), false);
+            decl.setAnnotation(i, ann);
+          }
+      }
   }
 }

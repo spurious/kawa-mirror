@@ -12,6 +12,8 @@ import gnu.math.IntNum;
 import gnu.text.Char;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.lang.reflect.Proxy;
+import java.lang.annotation.ElementType;
 /* #ifdef use:java.dyn */
 // import java.dyn.*;
 /* #endif */
@@ -251,6 +253,12 @@ public class InlineCalls extends ExpExpVisitor<Type>
                 && ! rval.getDontDereference())
               return visitReferenceExp(rval, required);
           }
+        if (dval instanceof ClassExp && processingAnnotations())
+          {
+            ClassExp cval = (ClassExp) dval;
+            if (cval.type != null)
+              return new QuoteExp(cval.type, required);
+          }
         if (! exp.isProcedureName() && decl.isClassMethod())
           {
             // FIXME.  This shouldn't be that hard to fix.  For example,
@@ -416,7 +424,24 @@ public class InlineCalls extends ExpExpVisitor<Type>
             int num = annotations.size();
             for (int i = 0;  i < num;  i++)
               {
-                annotations.set(i, visit(annotations.get(i), null));
+                Expression before = annotations.get(i);
+                Expression ann = visit(before, null);
+                Object aval = ann.valueIfConstant();
+                if (aval instanceof Proxy
+                    && ((aval = Proxy.getInvocationHandler(aval))
+                        instanceof AnnotationEntry))
+                  {
+                    AnnotationEntry ae = (AnnotationEntry) aval;
+                    if (decl.isClassMethod() && !ae.hasTarget(ElementType.METHOD))
+                      comp.error('e', "annotation "+ae.getAnnotationType().getName()+" allowed on methods", before);
+                    if (decl.isClassField() && !ae.hasTarget(ElementType.FIELD))
+                      comp.error('e', "annotation "+ae.getAnnotationType().getName()+" not allowed on fields", before);
+                    if (decl.value instanceof ClassExp
+                        && !ae.hasTarget(ElementType.TYPE)
+                        && !ae.hasTarget(ElementType.FIELD))
+                      comp.error('e', "annotation "+ae.getAnnotationType().getName()+" not allowed on classes", before);
+                  }
+                annotations.set(i, ann);
               }
           }
         finally

@@ -1,3 +1,12 @@
+2010-12-26  Per Bothner  <per@bothner.com>
+
+	* lang/Lambda.java: Recognize and handle function/method annotations.
+	(rewriteAnnotations): New method
+	(isAnnotationSymbol): New method - to moved object.java.
+	* standard/object.java Handle class annotations.
+	(isAnnotationSymbol): Moved to Lambda.java.
+	(rewriteClassDef): Make use of rewriteAnnotations.
+
 2010-12-24  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (initScheme): Declare 'annotation'.

@@ -127,6 +127,15 @@ public class object extends Syntax
                   }
               }
           }
+        else if (pair_car instanceof Pair
+                 && Lambda.isAnnotationSymbol(((Pair)pair_car).getCar()))
+          {
+            if (oexp.nameDecl == null)
+              tr.error('e', "annotation for anonymous class");
+            else
+              oexp.nameDecl.addAnnotation(new LangExp(pair));
+            continue;
+          }
 	if (! (pair_car instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -245,7 +254,7 @@ public class object extends Syntax
 		    seenInit = true;
 		  }
                 else if (key instanceof Pair
-                         && isAnnotationSymbol(((Pair)key).getCar()))
+                         && Lambda.isAnnotationSymbol(((Pair)key).getCar()))
                   {
                     decl.addAnnotation(new LangExp(keyPair));
                   }
@@ -388,18 +397,11 @@ public class object extends Syntax
 
     oexp.setTypes(tr);
 
+    if (oexp.nameDecl != null)
+      Lambda.rewriteAnnotations(oexp.nameDecl, tr);
     for (Declaration decl = oexp.firstDecl(); decl != null;  decl = decl.nextDecl())
       {
-        int n = decl.numAnnotations();
-        for (int i = 0;  i < n;  i++)
-          {
-            Expression ann = decl.getAnnotation(i);
-            if (ann instanceof LangExp)
-              {
-                ann = tr.rewrite_car((Pair) ((LangExp) ann).getLangValue(), false);
-                decl.setAnnotation(i, ann);
-              }
-          }
+        Lambda.rewriteAnnotations(decl, tr);
       }
 
     // First a pass over init-form: specifiers, since these are evaluated
@@ -708,14 +710,4 @@ public class object extends Syntax
     return 0;
   }
 
-  static boolean isAnnotationSymbol (Object key)
-  {
-    if (key instanceof SimpleSymbol)
-      {
-        String name = ((SimpleSymbol) key).getName();
-        if (name.length() > 1 && name.charAt(0) == '@')
-          return true;
-      }
-    return false;
-  }
 }

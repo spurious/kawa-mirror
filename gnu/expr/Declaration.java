@@ -805,6 +805,23 @@ public class Declaration
     annotations.add(exp);
   }
 
+  public void compileAnnotations (AttrContainer container, ElementType etype)
+  {
+    if (container == null)
+      return;
+    int n = numAnnotations();
+    for (int i = 0;  i < n;  i++)
+      {
+        Object ann = getAnnotation(i).valueIfConstant();
+        if (ann != null)
+          {
+            AnnotationEntry ae = (AnnotationEntry) Proxy.getInvocationHandler(ann);
+            if (container != null && ae.hasTarget(etype))
+              RuntimeAnnotationsAttr.maybeAddAnnotation(container, ae);
+          }
+      }
+  }
+
   Method makeLocationMethod = null;
 
   /** Create a Location object, given that isIndirectBinding().

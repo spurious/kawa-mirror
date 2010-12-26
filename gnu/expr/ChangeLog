@@ -1,3 +1,14 @@
+2010-12-26  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (compileAnnotations): New method, partially
+	based on code from ClassExp#compileMembers, but using new
+	RuntimeAnnotationsAttr#maybeAddAnnotation.
+	* ClassExp.java (compileMembers): Use Declaration#compileAnnotations.
+	Also call compileAnnotations on nameDecl of methods and class itself.
+	* InlineCalls.java (visitReferenceExp):  If processingAnnotations()
+	treat a reference to a ClassExp as a constant.
+	(visitAnnotations): Check if annotation use matches @Target.
+
 2010-12-25  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (isClassMethod, isClassField): New methods.

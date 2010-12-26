@@ -4,6 +4,7 @@
 package gnu.bytecode;
 import java.util.*;
 import java.io.*;
+import java.lang.annotation.*;
 /* #ifdef use:javax.lang.model */
 import javax.lang.model.element.*;
 /* #endif */
@@ -51,6 +52,27 @@ public class RuntimeAnnotationsAttr extends Attribute
   getRuntimeInvisibleAnnotations (AttrContainer container)
   {
     return getAnnotationsAttr(container, "RuntimeInvisibleAnnotations");
+  }
+
+  /** Add to appropriate annotations attribute.
+   * If the annotation's retention policy is {@code RUNTIME},
+   * add to the {@code RuntimeVisibleAnnotations} attribute.
+   * If the annotation's retention policy is {@code CLASS},
+   * add to the {@code RuntimeInvisibleAnnotations} attribute.
+   * Otherwise, ignore the annotation.
+   */
+  public static void maybeAddAnnotation (AttrContainer container,
+                                         AnnotationEntry annotation)
+  {
+    RetentionPolicy retention = annotation.getRetention();
+    String attrname;
+    if (retention == RetentionPolicy.RUNTIME)
+      attrname = "RuntimeVisibleAnnotations";
+    else if (retention == RetentionPolicy.CLASS)
+      attrname = "RuntimeInvisibleAnnotations";
+    else
+      return;
+    getAnnotationsAttr(container, attrname).addAnnotation(annotation);
   }
 
   /** Add an annotation to this attribute. */

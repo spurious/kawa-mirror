@@ -239,13 +239,18 @@ public class DFloNum extends RealNum implements Externalizable
       return RatNum.make (mant, IntNum.shift (IntNum.one(), 1075 - exp));
   }
 
-   public String toString ()
-   {
+  public String toString ()
+  {
+    return toString(value);
+  }
+
+  public static String toString (double value)
+  {
     return (value == 1.0/0.0 ? "+inf.0"
 	    : value == -1.0/0.0 ? "-inf.0"
 	    : Double.isNaN (value) ? "+nan.0"
 	    : Double.toString (value));
-   }
+  }
 
    public String toString (int radix)
    {

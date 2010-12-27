@@ -177,7 +177,7 @@ public abstract class RealNum extends Complex
     if (d >= 0)
       return new DFloNum(Math.sqrt(d));
     else
-      return DComplex.sqrt(d, 0);
+      return Complex.make(IntNum.zero(), new DFloNum(Math.sqrt(-d)));
   }
 
   /** Convert double to (rounded) integer, after multiplying by 10**k. */

@@ -1,3 +1,16 @@
+2010-12-27  Per Bothner  <per@bothner.com>
+
+	* RealNum.java (sqrt): If the argument is negative, return a CComplex,
+	with exact real part and inexact imaginary part.  This also uses
+	a simpler and faster algorothm, but it does need an extra object.
+	* DFloNum.java (toString(String)): New static method.
+	* Complex.java (make): Return real part of only if imaginary part
+	is exact zero, not any zero.
+	Also only return a DComplex if both parts are inexact.
+	(toString): Don't add '+' before imaginary part if it starts with '='.
+	* DComplex.java (toString): General re-write.
+	Use new R6RS syntax for inexact non-finite reals.
+
 2010-10-04  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (inRange): New method.  Previously a static method

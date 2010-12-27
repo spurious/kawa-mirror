@@ -56,9 +56,9 @@ public abstract class Complex extends Quantity
 
   public static Complex make (RealNum re, RealNum im)
   {
-    if (im.isZero ())
+    if (im.isZero() && im.isExact())
       return re;
-    if (! re.isExact() || ! im.isExact())
+    if (! re.isExact() && ! im.isExact())
       return new DComplex(re.doubleValue(), im.doubleValue());
     return new CComplex (re, im);
   }
@@ -158,7 +158,8 @@ public abstract class Complex extends Quantity
     if (im().isZero ())
       return re().toString(radix);
     String imString = im().toString(radix) + "i";
-    if (imString.charAt(0) != '-')
+    char ch0 = imString.charAt(0);
+    if (ch0 != '-' && ch0 != '+')
       imString = "+" + imString;
     if (re().isZero())
       return imString;

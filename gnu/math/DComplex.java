@@ -57,47 +57,21 @@ public class DComplex extends Complex implements Externalizable
   {
     String prefix = "";
 
-    String reString;
-    if (real == 1.0/0.0)
-      {
-	prefix = "#i"; reString = "1/0";
-      }
-    else if (real == -1.0/0.0)
-      {
-	prefix = "#i"; reString = "-1/0";
-      }
-    else if (Double.isNaN (real))
-      {
-	prefix = "#i"; reString = "0/0";
-      }
-    else
-      reString = Double.toString (real);
+    String reString = DFloNum.toString(real);
 
     if (Double.doubleToLongBits (imag) == 0)  // i.e. imag is 0.0 and not -0.0
-      return prefix + reString;
+      return reString;
 
-    String imString;
-    if (imag == 1.0/0.0)
-      {
-	prefix = "#i"; imString = "+1/0i";
-      }
-    else if (imag == -1.0/0.0)
-      {
-	prefix = "#i"; imString = "-1/0i";
-      }
-    else if (Double.isNaN (imag))
-      {
-	prefix = "#i"; imString = "+0/0i";
-      }
-    else
-      {
-	imString = Double.toString (imag) + "i";
-	if (imString.charAt (0) != '-')
-	  imString = "+" + imString;
-      }
-
-    return ((Double.doubleToLongBits (real) == 0 ? prefix : prefix + reString)
-            + imString);
+    String imString = DFloNum.toString(imag);
+    StringBuilder sbuf = new StringBuilder();
+    if (! reString.equals("0.0"))
+      sbuf.append(reString);
+    char ch0 = imString.charAt(0);
+    if (ch0 != '-' && ch0 != '+')
+      sbuf.append('+');
+    sbuf.append(imString);
+    sbuf.append('i');
+    return sbuf.toString();
   }
 
   public String toString (int radix)

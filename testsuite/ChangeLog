@@ -1,3 +1,7 @@
+2010-12-27  Per Bothner  <per@bothner.com>
+
+	* num-test.scm: One expected failure no longer fails.
+
 2010-12-26  Per Bothner  <per@bothner.com>
 
 	* annotations1.scm: Add some method anc class annotations.

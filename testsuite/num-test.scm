@@ -104,7 +104,6 @@
 (test-approximate -1.5707963267948965 (atan -inf.0) 0.00000001)
 (test-approximate 1.5707963267948965 (atan +inf.0) 0.00000001)
 (test-equal 0.0+3.141592653589793i (log -1.0+0.0i))
-(test-expect-fail 1)
 (test-equal 0.0-3.141592653589793i (log -1.0-0.0i))
 
 (test-equal 0.0+2.23606797749979i (sqrt -5))

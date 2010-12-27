@@ -996,7 +996,7 @@ public class Scheme extends LispLanguage
 	types.put ("string", LangObjType.stringType);
 	types.put ("list", LangObjType.listType);
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
-	types.put ("procedure", ClassType.make("gnu.mapping.Procedure"));
+	types.put ("procedure", LangObjType.procedureType);
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
 	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
 	types.put ("string-output-port",

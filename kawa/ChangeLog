@@ -1,3 +1,10 @@
+2010-12-27  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (getTypeMap): Change 'procedure' to
+	LangObjType.procedureType.
+	* standard/call_with_values.java (apply, apply2): Use new
+	LangObjType.coerceToProcedure instead of cast to Procedure.
+
 2010-12-26  Per Bothner  <per@bothner.com>
 
 	* lang/Lambda.java: Recognize and handle function/method annotations.

@@ -5,6 +5,7 @@ import gnu.expr.*;
 import gnu.math.*;
 import gnu.text.*;
 import gnu.kawa.functions.Arithmetic;
+import gnu.kawa.reflect.Invoke;
 import java.util.*;
 
 /** A wrapper around a class type.
@@ -30,6 +31,7 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int STRING_TYPE_CODE = 13;
   private static final int REGEX_TYPE_CODE = 14;
   private static final int DFLONUM_TYPE_CODE = 15;
+  private static final int PROCEDURE_TYPE_CODE = 16;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -96,6 +98,10 @@ public class LangObjType extends ObjectType implements TypeValue
   static final ClassType typeArithmetic =
     ClassType.make("gnu.kawa.functions.Arithmetic");
 
+  public static final LangObjType procedureType =
+    new LangObjType("procedure", "gnu.mapping.Procedure",
+                    PROCEDURE_TYPE_CODE);
+
   LangObjType(String name, String implClass, int typeCode)
   {
     super(name);
@@ -124,8 +130,13 @@ public class LangObjType extends ObjectType implements TypeValue
       case CLASSTYPE_TYPE_CODE:
         if (other == typeClass || other == typeClass.implementationType)
           return 1;
-        if (other == typeType || other == typeClass.implementationType)
+        if (other == typeType || other == typeClass.implementationType
+            || other == procedureType)
           return -1;
+        break;
+      case PROCEDURE_TYPE_CODE:
+        if (other == typeClassType)
+          return 1;
         break;
       case INTEGER_TYPE_CODE:
         if (other instanceof PrimType)
@@ -322,6 +333,37 @@ public class LangObjType extends ObjectType implements TypeValue
     return coerced;
   }
 
+  public static Procedure coerceToProcedureOrNull (final Object obj)
+  {
+    if (obj instanceof Procedure)
+      return (Procedure) obj;
+    if (obj instanceof LangObjType)
+      {
+        Procedure cons = ((LangObjType) obj).getConstructor();
+        if (cons != null)
+          return cons;
+        return new ProcedureN () {
+          public Object applyN (Object[] args) throws Throwable
+          {
+            int nargs = args.length;
+            Object[] xargs = new Object[nargs+1];
+            System.arraycopy(args, 0, xargs, 1, nargs);
+            xargs[0] = obj;
+            return Invoke.make.applyN(xargs);
+          }
+        };
+      }
+    return null;
+  }
+
+  public static Procedure coerceToProcedure (Object obj)
+  {
+   Procedure coerced = coerceToProcedureOrNull(obj);
+    if (coerced == null && obj != null)
+       throw new ClassCastException("cannot cast "+obj+" to procedure");
+    return coerced;  
+  }
+
   Method coercionMethod ()
   {
     switch (typeCode)
@@ -332,6 +374,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return typeLangObjType.getDeclaredMethod("coerceToClassType", 1);
       case TYPE_TYPE_CODE:
         return typeLangObjType.getDeclaredMethod("coerceToType", 1);
+      case PROCEDURE_TYPE_CODE:
+        return typeLangObjType.getDeclaredMethod("coerceToProcedure", 1);
       case NUMERIC_TYPE_CODE:
         return typeLangObjType.getDeclaredMethod("coerceNumeric", 1);
       case REAL_TYPE_CODE:
@@ -378,6 +422,10 @@ public class LangObjType extends ObjectType implements TypeValue
       case TYPE_TYPE_CODE:
         methodDeclaringClass = typeLangObjType;
         mname = "coerceToTypeOrNull";
+        break;
+      case PROCEDURE_TYPE_CODE:
+        methodDeclaringClass = typeLangObjType;
+        mname = "coerceToProcedureOrNull";
         break;
       case NUMERIC_TYPE_CODE:
         methodDeclaringClass = implementationType;
@@ -443,6 +491,8 @@ public class LangObjType extends ObjectType implements TypeValue
         return coerceToClassType(obj);
       case TYPE_TYPE_CODE:
         return coerceToType(obj);
+      case PROCEDURE_TYPE_CODE:
+        return coerceToProcedure(obj);
       case NUMERIC_TYPE_CODE:
         return coerceNumeric(obj);
       case REAL_TYPE_CODE:

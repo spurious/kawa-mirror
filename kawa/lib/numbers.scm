@@ -20,6 +20,12 @@
 	       (instance? x <java.lang.Integer>)
 	       (instance? x <java.lang.Short>)
 	       (instance? x <java.math.BigInteger>)))))
+(define (real-valued? x) ::boolean
+  (and (complex? x) (zero? (imag-part x)) (real? (real-part x))))
+(define (rational-valued? x) ::boolean
+  (and (complex? x) (zero? (imag-part x)) (rational? (real-part x))))
+(define (integer-valued? x) ::boolean
+  (and (complex? x) (zero? (imag-part x)) (integer? (real-part x))))
 
 (define (exact? x) :: boolean 
   (and (java.lang.Number? x)
@@ -44,6 +50,18 @@
 
 (define (negative? (x :: real)) :: <boolean> 
   (invoke x 'isNegative))
+
+(define (finite? (x :: real)) :: boolean
+  (let ((d :: double (*:doubleValue x)))
+    (not (java.lang.Double:isInfinite d))))
+
+(define (infinite? (x :: real)) :: boolean
+  (let ((d :: double (*:doubleValue x)))
+    (java.lang.Double:isInfinite d)))
+
+(define (nan? (x :: real)) :: boolean
+  (let ((d :: double (*:doubleValue x)))
+    (java.lang.Double:isNaN d)))
 
 (define (max #!rest (args :: <Object[]>))
   (let ((n :: <int> args:length)
@@ -155,6 +173,27 @@
 	   (invoke (invoke num 'unit) 'sqrt)))
   (lambda ((x :: <double>)) :: <double>
 	  (java.lang.Math:sqrt x)))
+
+(define (exact-integer-sqrt (i :: integer))
+  (if (< i 0)
+      (primitive-throw (java.lang.IllegalArgumentException
+                        (format #f "negative argument: ~A" i)))
+      (let* ((s :: real (sqrt i))
+             (r :: integer (exact (floor s)))
+             (d :: integer (- i (* r r))))
+        ; This loop is necessary because the <real> sqrt loses
+        ; precision for large values of i. r might start out too small
+        ; (and d too large). This happens, for example, with
+        ; (sqrt 10000000000000000000000000000000000000000000000). I
+        ; haven't noticed any cases in which the initial computed r is
+        ; too large, but I haven't exhaustively tested all the natural
+        ; numbers.
+        (let loop ((r r) (d d))
+          (let* ((r+1 (+ r 1))
+                 (r+1-squared (* r+1 r+1)))
+            (if (< i r+1-squared)
+                (values r d)
+                (loop r+1 (- i r+1-squared))))))))
 
 (define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
   (invoke-static <complex> 'make x y))

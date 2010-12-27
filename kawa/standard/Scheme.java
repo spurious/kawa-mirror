@@ -25,6 +25,7 @@ public class Scheme extends LispLanguage
   public static final Environment nullEnvironment;
   public static final Environment r4Environment;
   public static final Environment r5Environment;
+  public static final Environment r6Environment;
   protected static final SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
@@ -55,7 +56,8 @@ public class Scheme extends LispLanguage
     nullEnvironment = Environment.make("null-environment");
     r4Environment = Environment.make("r4rs-environment", nullEnvironment);
     r5Environment = Environment.make("r5rs-environment", r4Environment);
-    kawaEnvironment = Environment.make("kawa-environment", r5Environment);
+    r6Environment = Environment.make("r6rs-environment", r5Environment);
+    kawaEnvironment = Environment.make("kawa-environment", r6Environment);
 
     instance = new Scheme(kawaEnvironment);
     instanceOf = new gnu.kawa.reflect.InstanceOf(instance, "instance?");
@@ -446,6 +448,22 @@ public class Scheme extends LispLanguage
       defProcStFld("dynamic-wind", "kawa.lib.misc");
 
       r5Environment.setLocked();
+      environ = r6Environment;
+
+      defProcStFld("vector-map", "kawa.lib.vectors");
+      defProcStFld("vector-for-each", "kawa.lib.vectors");
+      defProcStFld("string-for-each", "gnu.kawa.slib.srfi13");
+      defProcStFld("real-valued?", "kawa.lib.numbers");
+      defProcStFld("rational-valued?", "kawa.lib.numbers");
+      defProcStFld("integer-valued?", "kawa.lib.numbers");
+      defProcStFld("finite?", "kawa.lib.numbers");
+      defProcStFld("infinite?", "kawa.lib.numbers");
+      defProcStFld("nan?", "kawa.lib.numbers");
+      defProcStFld("exact-integer-sqrt", "kawa.lib.numbers");
+      // TODO Some of the bindings made below in kawaEnvironment
+      // should be moved here instead.
+
+      r6Environment.setLocked();
       environ = kawaEnvironment;
  
       defSntxStFld("define-private", "kawa.lib.prim_syntax");

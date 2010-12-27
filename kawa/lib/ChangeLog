@@ -1,3 +1,12 @@
+2010-12-27  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (real-valued?, rational-valued?, integer-valued?): New.
+
+2010-12-27  Jamison Hope <jrh@theptrgroup.com>
+
+	* vectors.scm (vector-map, vector-for-each): New procedures.
+	* numbers.scm (finite?, infinite?, nan?, exact-integer-sqrt): Likewise.
+
 2010-11-25  Jamison Hope <jrh@theptrgroup.com>
 
 	* lists.scm (assoc): Order of operands to test predicate was

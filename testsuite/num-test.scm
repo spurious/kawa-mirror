@@ -1,4 +1,4 @@
-(test-begin "numbers" 1802)
+(test-begin "numbers" 1858)
 
 (test-equal 7 (+ 3 4))
 (test-equal 3 (+ 3))
@@ -116,6 +116,9 @@
 (test-assert
  (eq? 3 3))
 
+(test-equal '(2 0) (call-with-values (lambda () (exact-integer-sqrt 4)) list))
+(test-equal '(2 1) (call-with-values (lambda () (exact-integer-sqrt 5)) list))
+
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
 (define (dickey-test x y)
@@ -147,6 +150,19 @@
 	  (- 1250137720722158536144460577767424 17280012451545786657095548928))
 (test-eqv -1250120440709706990357803482218496
 	  (- 17280012451545786657095548928 1250137720722158536144460577767424))
+
+(test-eqv #t (zero? +0.0))
+(test-eqv #t (zero? -0.0))
+(test-eqv #f (zero? +nan.0))
+(test-eqv #t (positive? +inf.0))
+(test-eqv #t (negative? -inf.0))
+(test-eqv #f (positive? +nan.0))
+(test-eqv #f (negative? +nan.0))
+(test-eqv #f (finite? +inf.0))
+(test-eqv #t (finite? 5))
+(test-eqv #t (finite? 5.0))
+(test-eqv #f (infinite? 5.0))
+(test-eqv #t (infinite? +inf.0))
 
 (test-group "expt"
 	    (test-eqv 9223372036854775808 (expt 2 63)))
@@ -232,6 +248,58 @@
 (test-eqv 3 (gcd 4294967298 3))
 (test-eqv 2874009600 (gcd 1307674368000 2874009600))
 (test-end "gcd")
+
+(test-begin "numerical operations")
+(test-eqv #t (complex? 3+4i))
+(test-eqv #t (complex? 3))
+(test-eqv #t (real? 3))
+(test-eqv #f (real? -2.5+0.0i))
+(test-eqv #t (real? -2.5+0i))
+(test-eqv #t (real? -2.5))
+(test-eqv #t (real? #e1e10))
+(test-eqv #t (rational? 6/10))
+(test-eqv #t (rational? 6/3))
+(test-eqv #t (rational? 2))
+(test-eqv #t (integer? 3+0i))
+(test-eqv #t (integer? 3.0))
+(test-eqv #t (integer? 8/4))
+
+(test-eqv #t (number? +nan.0))
+(test-eqv #t (complex? +nan.0))
+(test-eqv #t (real? +nan.0))
+(test-eqv #f (rational? +nan.0))
+(test-eqv #t (complex? +inf.0))
+(test-eqv #t (real? -inf.0))
+(test-eqv #f (rational? -inf.0))
+(test-eqv #f (integer? -inf.0))
+
+(test-eqv #t (real-valued? +nan.0))
+(test-eqv #t (real-valued? +nan.0+0i))
+(test-eqv #t (real-valued? -inf.0))
+(test-eqv #t (real-valued? 3))
+
+(test-eqv #t (real-valued? -2.5+0.0i))
+(test-eqv #t (real-valued? -2.5+0i))
+(test-eqv #t (real-valued? -2.5))
+(test-eqv #t (real-valued? #e1e10))
+
+(test-eqv #f (rational-valued? +nan.0))
+(test-eqv #f (rational-valued? -inf.0))
+(test-eqv #t (rational-valued? 6/10))
+(test-eqv #t (rational-valued? 6/10+0.0i))
+(test-eqv #t (rational-valued? 6/10+0i))
+(test-eqv #t (rational-valued? 6/3))
+
+(test-eqv #t (integer-valued? 3+0i))
+(test-eqv #t (integer-valued? 3+0.0i))
+(test-eqv #t (integer-valued? 3.0))
+(test-eqv #t (integer-valued? 3.0+0.0i))
+(test-eqv #t (integer-valued? 8/4))
+
+(test-eqv #t (exact? 5))
+(test-eqv #t (inexact? +inf.0))
+
+(test-end "numerical operations")
 
 (test-begin "logop")
 

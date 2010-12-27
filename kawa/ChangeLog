@@ -1,3 +1,7 @@
+2010-12-27  Jamison Hope <jrh@theptrgroup.com>
+
+	* standard/Scheme.java (initScheme): Define some R6RS procedures.
+
 2010-12-27  Per Bothner  <per@bothner.com>
 
 	* standard/Scheme.java (getTypeMap): Change 'procedure' to

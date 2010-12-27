@@ -279,7 +279,7 @@ public class CompileNamedPart
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
     exp.visitArgs(visitor);
-    NamedPart get = (NamedPart) ((NamedPartSetter) proc).getGetter();
+    NamedPart get = (NamedPart) ((NamedPart.Setter) proc).getGetter();
     if (get.kind == 'D')
       {
         Expression[] xargs = new Expression[3];

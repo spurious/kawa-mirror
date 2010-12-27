@@ -1,3 +1,11 @@
+2010-12-27  Per Bothner  <per@bothner.com>
+
+	* GetNamedPart.java: Move classes NamedPart and NamedPartSetter to ...
+	* NamedPart.java: ... new file.
+	(class Setter): New member class - used to be NamedPartSetter.
+	* CompileNamedPart.java: Update accordingly.
+	* Makefile.am: Likewise.
+
 2010-11-06  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObjectRaw): For readable output of enums

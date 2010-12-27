@@ -33,6 +33,7 @@ java_sources=\
   MakeProcedure.java \
   Map.java \
   MultiplyOp.java \
+  NamedPart.java \
   Not.java \
   NumberCompare.java \
   NumberPredicate.java \

@@ -747,6 +747,8 @@ public class repl extends Procedure0or1
               {
                 String cname
                   = Compilation.mangleNameIfNeeded(compilationTopname);
+                if (comp.classPrefix != null)
+                  cname = comp.classPrefix + cname;
                 ClassType ctype = new ClassType(cname);
                 ModuleExp mexp = comp.getModule();
                 mexp.setType(ctype);

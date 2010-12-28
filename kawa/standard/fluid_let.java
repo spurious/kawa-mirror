@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.kawa.reflect.StaticFieldLocation;
 
 /**
  * The Syntax transformer that re-writes the Scheme "fluid-let" primitive.
@@ -79,7 +80,16 @@ public class fluid_let extends Syntax
             else
               return tr.syntaxError("invalid " + getName() + " syntax");
             Declaration decl = let.addDeclaration(name);
-            Declaration found = tr.lexical.lookup(name, false);
+            Declaration found = tr.lookup(name, -1);
+            if (found == null && name instanceof Symbol)
+              {
+                Location loc = tr.getLanguage().getLangEnvironment()
+                  .lookup((Symbol) name, null);
+                if (loc != null)
+                  loc = loc.getBase();
+                if (loc instanceof StaticFieldLocation)
+                  found = ((StaticFieldLocation) loc).getDeclaration();
+              }
             if (found != null)
               {
                 found.maybeIndirectBinding(tr);

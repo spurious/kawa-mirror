@@ -1,6 +1,14 @@
+2010-12-28  Per Bothner  <per@bothner.com>
+
+	* standard/Scheme.java (initScheme): Declare '*print-xml-indent*"'.
+
+	* repl.java (compileFiles): If both -T and -P flags are specified,
+	prepend prefix to to topclassname.
+
 2010-12-27  Jamison Hope <jrh@theptrgroup.com>
 
 	* standard/Scheme.java (initScheme): Define some R6RS procedures.
+	(r6Environment): New static field.
 
 2010-12-27  Per Bothner  <per@bothner.com>
 

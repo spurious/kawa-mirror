@@ -827,6 +827,8 @@ public class Scheme extends LispLanguage
                     "gnu.text.PrettyWriter", "lineLengthLoc");
       defAliasStFld("*print-miser-width*",
                     "gnu.text.PrettyWriter", "miserWidthLoc");
+      defAliasStFld("*print-xml-indent*",
+                    "gnu.xml.XMLPrinter", "indentLoc");
       defAliasStFld("html", "gnu.kawa.xml.XmlNamespace", "HTML");
       defAliasStFld("unit", "kawa.standard.Scheme", "unitNamespace");
 

@@ -69,14 +69,13 @@ Attribute "RuntimeVisibleAnnotations", length:0, number of entries: 1
   @MyAnnotType
     name => "MyClassName"
 Attribute "SourceFile", length:2, "annotations1.scm"
-Attribute "SourceDebugExtension", length:98
+Attribute "SourceDebugExtension", length:77
 SMAP
 annotations1.scm
 Scheme
 *S Scheme
 *F
-+ 1 annotations1.scm
-./annotations1.scm
+1 annotations1.scm
 *L
 30#1,6:30
 *E

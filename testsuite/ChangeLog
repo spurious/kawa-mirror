@@ -1,3 +1,10 @@
+2010-12-28  Per Bothner  <per@bothner.com>
+
+	* jaxb-annotations3.scm: New test/demo of using JAXB annotations.
+	* jaxb-annotations3.expected: Expected output.
+	* Makefile.am: Update accordingly.
+	* annotations1-bytecode.expected: Minor update.
+
 2010-12-27  Per Bothner  <per@bothner.com>
 
 	* num-test.scm: New R6RS tests.

@@ -17,7 +17,7 @@ SERVLET_TESTS = check-HelloCgiS check-HelloCgiK
 endif
 endif
 if WITH_SAX2
-SAX2_TESTS = check-MySAXApp
+SAX2_TESTS = check-MySAXApp check-jaxb-annotations3
 endif
 
 WARN_FLAGS = --warn-undefined-variable --warn-invoke-unknown-method --warn-as-error
@@ -403,7 +403,7 @@ check-pitfalls:
 MyAnnotType.class: $(srcdir)/MyAnnotType.java
 	CLASSPATH=..:.:$$CLASSPATH $(JAVAC) -g -d . $?
 annotations1.class: $(srcdir)/annotations1.scm MyAnnotType.class
-	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $(srcdir)/annotations1.scm
+	CLASSPATH=.:$$CLASSPATH $(KAWA) -C $<
 tmp-annotations1.bytecode: annotations1.class
 	$(CPJAVA) gnu.bytecode.dump 'annotations1$$MyClass'.class >tmp-annotations1.bytecode
 check-annotations1: tmp-annotations1.bytecode
@@ -418,6 +418,16 @@ check-annotations2: tmp-bad-annotations2.err
 	@if diff $(srcdir)/bad-annotations2.expected tmp-bad-annotations2.err; \
 	  then echo '# annotations2 test passes'; \
 	  else echo FAIL annotations2 test; fi
+
+JaxbAnnotations3.class: $(srcdir)/jaxb-annotations3.scm
+	$(CPKAWA) -d .. -P testsuite. -T JaxbAnnotations3 -C $<
+tmp-jaxb-annotations3.out: JaxbAnnotations3.class
+	CLASSPATH=..:@conf_classpath@.:$$CLASSPATH \
+	$(KAWA) testsuite.JaxbAnnotations3 <../gnu/xquery/testsuite/bib.xml >tmp-jaxb-annotations3.out
+check-jaxb-annotations3: tmp-jaxb-annotations3.out
+	@if diff $(srcdir)/jaxb-annotations3.expected tmp-jaxb-annotations3.out; \
+	  then echo '# jaxb-annotations3 test passes'; \
+	  else echo FAIL jaxb-annotations3 test; fi
 
 APPLETVIEWER = appletviewer
 
@@ -541,6 +551,7 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   inlining-test.scm inlining.expected cycle1.scm cycle2.scm test-cycle12.scm \
   MyAnnotType.java annotations1.scm annotations1-bytecode.expected\
   bad-annotations2.scm bad-annotations2.expected\
+  jaxb-annotations3.scm jaxb-annotations3.expected\
   binarytrees.scm binarytrees-output.txt \
   chameneosredux.scm chameneosredux-output.txt\
   fannkuch.scm fannkuch-output.txt fannkuchredux.scm fannkuchredux-output.txt \

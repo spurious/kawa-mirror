@@ -185,17 +185,26 @@ public class ModuleInfo
 	  continue;
 	try
 	  {
-            if ((flags & Access.STATIC) == 0 && instance == null)
-              instance = getInstance();
-            Object fvalue = rclass.getField(fld.getName()).get(instance);
-
-            Declaration fdecl = language.declFromField(mod, fvalue, fld);
+            Type ftype = fld.getType();
+            Declaration fdecl;
             if ((flags & Access.FINAL) != 0
-                && (! (fvalue instanceof gnu.mapping.Location)
-                    || fvalue instanceof FieldLocation))
-              fdecl.noteValue(new QuoteExp(fvalue));
+                && (! ftype.isSubtype(Compilation.typeLocation)
+                    || ftype.isSubtype(Compilation.typeFieldLocation)))
+              {
+                if ((flags & Access.STATIC) == 0 && instance == null)
+                  instance = getInstance();
+                Object fvalue = rclass.getField(fld.getName()).get(instance);
+                fdecl = language.declFromField(mod, fvalue, fld);
+                fdecl.noteValue(new QuoteExp(fvalue));
+              }
             else
-              fdecl.noteValue(null);
+              {
+                // FIXME - Only used to get name - better to use an annotation.
+                Object fvalue = (flags & Access.STATIC) == 0 ? null
+                  : rclass.getField(fld.getName()).get(null);
+                fdecl = language.declFromField(mod, fvalue, fld);
+                fdecl.noteValue(null);
+              }
 	  }
 	catch (Exception ex)
 	  {

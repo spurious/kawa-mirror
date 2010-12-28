@@ -201,12 +201,12 @@ public class Declaration
         boolean immediate = comp.immediate;
         if (field.getStaticFlag())
           {
-            ltype = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
+            ltype = Compilation.typeStaticFieldLocation;
             meth = ltype.getDeclaredMethod("make", immediate ? 1 : 2);
           }
         else
           {
-            ltype = ClassType.make("gnu.kawa.reflect.FieldLocation");
+            ltype = Compilation.typeFieldLocation;
             meth = ltype.getDeclaredMethod("make", immediate ? 2 : 3);
 
             loadOwningObject(owner, comp);

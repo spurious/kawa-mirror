@@ -226,7 +226,13 @@ public class ReferenceExp extends AccessExp
     if (decl == null || decl.isFluid())
       return Type.pointer_type;
     if (getDontDereference())
-      return Compilation.typeLocation;
+      {
+        if (decl.field != null && ! decl.isIndirectBinding())
+          return decl.field.getStaticFlag()
+            ? Compilation.typeStaticFieldLocation
+            : Compilation.typeFieldLocation;
+        return Compilation.typeLocation;
+      }
     decl = Declaration.followAliases(decl);
     Type type = decl.getType();
     if (type == null || type == Type.pointer_type)

@@ -252,6 +252,10 @@ public class Compilation implements SourceLocator
     = ClassType.make("gnu.mapping.Environment");
   static public ClassType typeLocation
     = ClassType.make("gnu.mapping.Location");
+  static public ClassType typeFieldLocation
+    = ClassType.make("gnu.kawa.reflect.FieldLocation");
+  static public ClassType typeStaticFieldLocation
+    = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
   static public ClassType typeSymbol
     = ClassType.make("gnu.mapping.Symbol");
   static public final Method getSymbolValueMethod

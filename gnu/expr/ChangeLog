@@ -1,3 +1,12 @@
+2010-12-28  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (typeFieldLocation, typeStaticFieldLocation):
+	New static Classtype fields.
+	* Declaration.java (load): Use them.
+	* ReferenceExp.java (getType): Return more specific Location types.
+	* ModuleInfo.java (setupModuleExp): Avoid some needless getInstance
+	calls - which caused references to say *print-miser-width* to fail.
+
 2010-12-26  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (compileAnnotations): New method, partially

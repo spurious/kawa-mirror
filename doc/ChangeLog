@@ -1,3 +1,11 @@
+2010-12-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Ports): New variable *print-xml-indent*.
+	(Paths): Fix typos.
+
+	* kawa.texi (Module classes): Update documentation of require.
+	Add documentation for import.
+
 2010-11-10  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Compiling using Ant): New subsection.

@@ -6202,8 +6202,8 @@ Returns the ``extension'' of the @var{arg}
 
 @deffn Procedure path-query arg
 Returns the query part of @var{arg} (coerced to a @code{path}) if it is
-defined, or @code{#f} otherwise.  The query of a URI is the
-part of after @samp{?}.
+defined, or @code{#f} otherwise.  The query part of a URI is the
+part after @samp{?}.
 @example
 (path-query "http://gnu.org/home?add-bug") @result{} "add-bug"
 @end example
@@ -6524,6 +6524,15 @@ The right margin (or line width) to use when pretty-printing.
 @defvar *print-miser-width*
 If this an integer, and the available width is less or equal to this value,
 then the pretty printer switch to the more @dfn{miser} compact style.
+@end defvar
+
+@defvar *print-xml-indent*
+When writing to XML, controls pretty-printing and indentation.
+If the value is @code{'always} or  @code{'yes} force each element to
+start on a new suitably-indented line.
+If the value is @code{'pretty} only force new lines for elements that
+won't fit completely on a line.
+The the value is @code{'no} or unset, don't add extra whitespace.
 @end defvar
 
 @node Format, , Ports, Input-Output
@@ -7818,15 +7827,16 @@ This will likely change.)
 
 You can import a module into the current namespace with @code{require}.
 
-@deffn Syntax require modulespec
-The @var{modulespec} can be either a @code{<@var{classname}>}
-or a @code{'@var{featurename}}.  In either case the names
-exported by the specified module (class) are added to the current
-set of visible names.
+@deffn Syntax require @stxlit{'}featureName
+@deffnx Syntax require classname [@stxlit{"}sourcepath@stxlit{"}]
+@deffnx Syntax require @stxlit{"}sourcepath@stxlit{"}
+Search for a matching module (class), and add the names
+exported by that module to the current set of visible names.
+Normally, the module is specified using @var{classname}.
+The module can be static module (all public fields must be static),
+or an instance module (it has a public default constructor).
 
-If @var{modulespec} is @code{<@var{classname}>} where @var{classname}
-is an instance module (it has a public default constructor),
-and if no module instance for that class
+If the module is a instance module and if no module instance for that class
 has been registered in the current environment, then a new instance
 is created and registered (using a "magic" identifier).
 If the module class either inherits from @code{gnu.expr.ModuleBody}
@@ -7838,18 +7848,85 @@ time and at run time, if necessary.
 
 All the public fields of the module class are then incorporated
 in the current set of local visible names in the current module.
+(This is for both instance and static modules.)
 This is done at compile time - no new bindings are created at run-time
 (except for the magic binding used to register the module instance),
 and the imported bindings are private to the current module.
 References to the imported bindings will be compiled as field
 references, using the module instance (except for static fields).
 
-If the @var{modulespec} is @code{'@var{featurename}} then the
+If a @code{@stxlit{"}@var{sourcepath}@stxlit{"}} is specified then
+that is used to locate the source file for the module, and if necessary,
+compile it.
+
+If a @code{'@var{featurename}} is specified then the
 @var{featurename} is looked up (at compile time) in the "feature table"
-which yields the implementing @code{<@var{classname}>}.
+which yields the implementing @var{classname}.
 @end deffn
 
-@deffn Syntax provide 'featurename
+@deffn Syntax import import-set ...
+Similar functionality as @code{require}, but specified by R6RS.
+@display
+@stxdef{import-set} @var{library-reference}
+  | @stxlit{(library} @var{library-reference} @stxlit{)}
+  | @stxlit{(only} @var{import-set} @var{identifier} ...@stxlit{)}
+  | @stxlit{(except} @var{import-set} @var{identifier} ...@stxlit{)}
+  | @stxlit{(prefix} @var{import-set} @var{identifier} @stxlit{)}
+  | @stxlit{(rename} @var{import-set} @stxlit{(} @var{identifier1} @var{identifier2} @stxlit{)} ...@stxlit{)}
+@stxdef{library-reference} @stxlit{(} @var{identifier}+ @stxlit{)}
+@end display
+
+A @var{library-reference} is mapped to a class name by concatenating
+all the identifiers, separated by dots.
+For example:
+@example
+(import (gnu kawa slib srfi37))
+@end example
+is equivalent to:
+@example
+(require gnu.kawa.slib.srfi37)
+@end example
+
+By default, all of an imported library's exported bindings are made
+visible within an importing library using the names given to the
+bindings by the imported library.  The precise set of bindings to be
+imported and the names of those bindings can be adjusted with the
+@code{only}, @code{except}, @code{prefix}, and @code{ rename} forms as
+described below.
+
+@itemize
+@item 
+An @code{only} form produces a subset of the bindings from another
+@meta{import-set}, including only the listed @meta{identifier}s.  The
+included @meta{identifier}s must be in the original @meta{import-set}.
+
+@item 
+An @code{except} form produces a subset of the bindings from another
+@meta{import-set}, including all but the listed @meta{identifier}s.  All
+of the excluded @meta{identifier}s must be in the original @meta{import-set}.
+
+@item 
+A @code{prefix} form adds the @meta{identifier} prefix to each name from
+another @meta{import-set}.
+
+@item 
+A @code{rename} form:
+
+@example
+(rename (@var{identifier1} @var{identifier2}) @dots{})
+@end example
+@noindent
+removes the bindings for @code{@var{identifier1}} @dots{}} to form an
+intermediate @meta{import-set}, then adds the bindings back for the
+corresponding @code{@var{identifier2} @dots{}} to form the final
+@meta{import-set}.  Each @var{identifier1} must be in the original
+@meta{import-set}, each @var{identifier2} must not be in the
+intermediate @meta{import-set}, and the @var{identifier2}s must be
+distinct.
+@end itemize
+@end deffn
+
+@deffn Syntax provide @stxlit{'}featurename
 Declare that @code{'@var{featurename}} is available.
 A following @code{cond-expand} in this scope will match @var{featurename}.
 @end deffn
@@ -9331,7 +9408,7 @@ comments, and CDATA section) we'll cover later.
 @stxdef{xml-name-form} @var{QName}
   | @var{xml-enclosed-expression}
 @stxdef{xml-enclosed-expression}
-    @stxlitlbrace{}@var{expression}@stxlitat{}
+    @stxlitlbrace{}@var{expression}@stxlit{@}}
   | @stxlit{(}@var{expression}...@stxlit{)}
 @end display
 

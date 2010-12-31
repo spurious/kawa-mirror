@@ -7916,7 +7916,7 @@ A @code{rename} form:
 (rename (@var{identifier1} @var{identifier2}) @dots{})
 @end example
 @noindent
-removes the bindings for @code{@var{identifier1}} @dots{}} to form an
+removes the bindings for @code{@var{identifier1} @dots{}} to form an
 intermediate @meta{import-set}, then adds the bindings back for the
 corresponding @code{@var{identifier2} @dots{}} to form the final
 @meta{import-set}.  Each @var{identifier1} must be in the original

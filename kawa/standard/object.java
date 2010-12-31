@@ -290,7 +290,10 @@ public class object extends Syntax
 	    else
 	      {
 		if (typePair != null)
-		  decl.setType(tr.exp2Type(typePair));
+                  {
+                    decl.setTypeExp(new LangExp(typePair));
+                    decl.setFlag(Declaration.TYPE_SPECIFIED);
+                  }
 		if (allocationFlag != 0)
 		  decl.setFlag(allocationFlag);
 		if (accessFlag != 0)
@@ -562,8 +565,18 @@ public class object extends Syntax
 	  {
 	    tr.popPositionOf(savedPos1);
 	  }
-	
       }
+    for (Declaration decl = oexp.firstDecl();
+	 decl != null;  decl = decl.nextDecl())
+      {
+        Expression texp = decl.getTypeExpRaw();
+        if (texp instanceof LangExp)
+          {
+            Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
+            tr.exp2Type(typeSpecPair, decl);
+          }
+      }
+
     // If initMethod/clinitMethod were created by the "outer" (first) call
     // to rewriteInit, then we may need to fix up their outer chain.
     if (oexp.initMethod != null)

@@ -19,6 +19,13 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
   int backJumpPossible = 0;
 
+  protected final void visitDeclarationType (Declaration decl)
+  {
+    // If decl.typeExp references a ClassExp then we might get a
+    // needless capture of the ClassExp's declarations.
+    // For now ignore the issue ... FIXME
+  }
+
   protected Expression visitApplyExp (ApplyExp exp, Void ignored)
   {
     int oldBackJumpPossible = backJumpPossible;

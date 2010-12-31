@@ -871,6 +871,11 @@ public class Translator extends Compilation
   /** Extract a type from the car of a pair. */
   public Type exp2Type(Pair typeSpecPair)
   {
+    return exp2Type(typeSpecPair, null);
+  }
+
+  public Type exp2Type(Pair typeSpecPair, Declaration decl)
+  {
     Object saved = pushPositionOf(typeSpecPair);
     try
       {
@@ -901,9 +906,11 @@ public class Translator extends Compilation
 	     else
 	       error('e',
 		 "invalid type spec (must be \"type\" or 'type or <type>)");
-	     return Type.pointer_type;
+	     type = Type.pointer_type;
 	   }
-	 return type;
+        if (decl != null)
+          decl.setType(texp, type);
+        return type;
       }
     finally
       {

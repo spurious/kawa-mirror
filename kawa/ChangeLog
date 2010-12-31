@@ -1,3 +1,11 @@
+2010-12-30  Per Bothner  <per@bothner.com>
+
+	* lang/Translator.java (exp2Type(Pair,Declaration)): New method.
+	* lang/Lambda.java: Use new exp2Type and Declaration#setType methods.
+	* standard/object.java (scanClassDef): Don't rewrite parameter
+	type-specifier here - instead create a LangExp, and ...
+	(rewriteClassDef): Do the rewrite here instead.
+
 2010-12-28  Per Bothner  <per@bothner.com>
 
 	* standard/fluid_let.java (rewrite): Check for base definition in

@@ -326,7 +326,7 @@ public class Lambda extends Syntax
 	Translator.setLine(decl, bindings);
 	if (typeSpecPair != null)
 	  {
-            decl.setTypeExp(new LangExp(typeSpecPair));
+            decl.setType(new LangExp(typeSpecPair), null);
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
 	else if (mode == restKeyword)
@@ -578,11 +578,11 @@ public class Lambda extends Syntax
 	    numRenamedAlias++;
 	    cur = param;
 	  }
-        Expression texp = cur.getTypeExp();
+        Expression texp = cur.getTypeExpRaw();
         if (texp instanceof LangExp)
           {
             Pair typeSpecPair = (Pair) ((LangExp) texp).getLangValue(); 
-            cur.setType(tr.exp2Type(typeSpecPair));
+            tr.exp2Type(typeSpecPair, cur);
           }
 	prev = cur;
 

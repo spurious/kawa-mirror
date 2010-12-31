@@ -1,3 +1,9 @@
+2010-12-30  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (getTypeRaw, setType): New method.
+	* ExpVisitor.java (visitDeclarationType): Change to protected.
+	* Declaration.java (visitDeclarationType):  New method.
+
 2010-12-28  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (typeFieldLocation, typeStaticFieldLocation):

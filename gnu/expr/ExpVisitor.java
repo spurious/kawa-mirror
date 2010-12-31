@@ -72,7 +72,7 @@ public class ExpVisitor<R,D>
     return visitExpression(exp, d);
   }
 
-  protected final void visitDeclarationType (Declaration decl)
+  protected void visitDeclarationType (Declaration decl)
   {
     Expression texp1 = decl.typeExp;
     if (texp1 != null)

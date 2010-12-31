@@ -99,6 +99,14 @@ public class Declaration
     if (var != null) var.setType(t);
   }
 
+  public Expression getTypeExpRaw () { return typeExp; }
+
+  public final void setType (Expression typeExp, Type type)
+  {
+    this.typeExp = typeExp;
+    this.type = type;
+  }
+
   public final String getName()
   {
     return symbol == null ? null : symbol instanceof Symbol ? ((Symbol) symbol).getName()

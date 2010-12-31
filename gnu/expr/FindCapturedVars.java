@@ -302,7 +302,6 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 
     LambdaExp curLambda = getCurrentLambda ();
     ScopeExp sc = decl.getContext();
-    if (sc==null) throw new Error("null context for "+decl+" curL:"+curLambda);
     LambdaExp declLambda = sc.currentLambda ();
 
     // If curLambda is inlined, the function that actually needs a closure
@@ -413,12 +412,6 @@ public class FindCapturedVars extends ExpExpVisitor<Void>
 		outer = heapLambda.outerLambda();
 	      }
 	  }
-        if (declLambda==null) {
-          System.err.println("null declLambda for "+decl+" curL:"+curLambda);
-          ScopeExp c = decl.context;
-          for (; c!=null; c = c.outer)
-            System.err.println("- context:"+c);
-        }
         declLambda.capture(decl);
       }
   }

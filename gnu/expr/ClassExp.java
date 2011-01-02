@@ -175,6 +175,8 @@ public class ClassExp extends LambdaExp
     if (superType != null && (flags & INTERFACE_SPECIFIED) != 0)
       comp.error('e', "cannot be interface since has superclass");
     if (! simple && superType == null && (flags & CLASS_SPECIFIED) == 0
+        // If the class is module-local and has no sub-classes, we can
+        // optimze away the need for a pair-class.
         && (getFlag(HAS_SUBCLASS)
             || (nameDecl != null && nameDecl.isPublic())))
       {

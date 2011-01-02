@@ -48,7 +48,6 @@ public class object extends Syntax
 	pair = (Pair) pair.getCdr();
       }
     Object[] saved = scanClassDef(pair, oexp, tr);
-    oexp.setClassType(new ClassType());
     if (saved != null)
       rewriteClassDef(saved, tr);
     return oexp;

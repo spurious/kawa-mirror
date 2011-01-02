@@ -1,4 +1,4 @@
-// Copyright (c) 2008  Per M.A. Bothner.
+// Copyright (c) 2008, 2011  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -70,13 +70,10 @@ public class ClassExp extends LambdaExp
    * static initializations. */
   public LambdaExp clinitMethod;
 
-  public ClassExp ()
-  {
-  }
-
-  public ClassExp (boolean simple)
+  public ClassExp (boolean simple, ClassType type)
   {
     this.simple = simple;
+    setClassType(type);
   }
 
   protected boolean mustCompile () { return true; }

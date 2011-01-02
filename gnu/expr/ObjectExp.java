@@ -5,7 +5,7 @@ public class ObjectExp extends ClassExp
 {
   public ObjectExp ()
   {
-    super(true);
+    super(true, new ClassType());
   }
 
   public Type getType() { return type; }

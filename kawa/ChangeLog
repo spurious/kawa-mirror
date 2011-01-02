@@ -1,5 +1,10 @@
 2011-01-01  Per Bothner  <per@bothner.com>
 
+	* standard/object.java (rewriteForm): Don't need to allocate
+	ClassTypes here, since done in ObjectExp constructor.
+	* standard/define_class.java (scanForDefinitions): Update call
+	to constructor.
+
 	* repl.java (processArgs): Don't set compiled class name here directly
 	here, even if -T flag was given.  Instead, note class name in
 	ModuleInfo instance.

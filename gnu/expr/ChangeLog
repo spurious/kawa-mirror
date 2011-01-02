@@ -1,5 +1,8 @@
 2011-01-01  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java (<init>): Replace by single 2-argument constructor.
+	* ObjectExp.java (<init>): Allocation ClassTypes here.
+
 	Add support for combining explicit class (e.g. define-simple-class)
 	and module class, if they have eh same name.
 	* ClassExp.java (setClassType): New method.

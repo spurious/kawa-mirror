@@ -56,7 +56,7 @@ public class define_class extends Syntax
     Declaration decl = tr.define(name, nameSyntax, defs);
     if (p instanceof PairWithPosition)
       decl.setLocation((PairWithPosition) p);
-    ClassExp oexp = new ClassExp(isSimple);
+    ClassExp oexp = new ClassExp(isSimple, null);
     decl.noteValue(oexp);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.EARLY_INIT);
     decl.setType(isSimple ? Compilation.typeClass : Compilation.typeClassType);

@@ -1,3 +1,16 @@
+2011-01-01  Per Bothner  <per@bothner.com>
+
+	Add support for combining explicit class (e.g. define-simple-class)
+	and module class, if they have eh same name.
+	* ClassExp.java (setClassType): New method.
+	(<init>): Don't set type or instanceType yet.
+	(getClassName): New method.
+	* ModuleInfo.java (className): Change to protected.
+	* ModuleExp.java (USE_DEFINED_CLASS): New constant.
+	(classFor): Improvements to name-setting logic.
+	* Compilation.java (generateBytecode): Don't generate constructor
+	if module does USE_DEFINED_CLASS.
+
 2010-12-30  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (getTypeRaw, setType): New method.

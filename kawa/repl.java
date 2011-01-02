@@ -739,24 +739,22 @@ public class repl extends Procedure0or1
                 break; // Kludge to shut up compiler.
               }
             
-            comp
-              = language.parse(fstream, messages,
-                               defaultParseOptions);
-
+            ModuleInfo minfo = manager.findWithSourcePath(arg);
+    
             if (compilationTopname != null)
               {
                 String cname
                   = Compilation.mangleNameIfNeeded(compilationTopname);
-                if (comp.classPrefix != null)
-                  cname = comp.classPrefix + cname;
-                ClassType ctype = new ClassType(cname);
-                ModuleExp mexp = comp.getModule();
-                mexp.setType(ctype);
-                mexp.setName(compilationTopname);
-                comp.mainClass = ctype;
+                if (Compilation.classPrefixDefault != null)
+                  cname = Compilation.classPrefixDefault + cname;
+                minfo.setClassName(cname);
               }
-            
-            infos[i-iArg] = manager.find(comp);
+
+            comp
+              = language.parse(fstream, messages,
+                               defaultParseOptions, minfo);
+            comp.getModule().classFor(comp);
+            infos[i-iArg] = minfo;
             comps[i-iArg] = comp;
 
           }

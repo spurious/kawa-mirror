@@ -22,6 +22,8 @@ public class ModuleExp extends LambdaExp
   public static final int STATIC_RUN_SPECIFIED = SUPERTYPE_SPECIFIED << 1;
   public static final int LAZY_DECLARATIONS = STATIC_RUN_SPECIFIED << 1;
   public static final int IMMEDIATE = LAZY_DECLARATIONS << 1;
+  /** Using explicit class (e.g. define-simple-class) for module class. */
+  public static final int USE_DEFINED_CLASS = IMMEDIATE << 1;
 
   public ModuleExp ()
   {
@@ -496,52 +498,51 @@ public class ModuleExp extends LambdaExp
   {
     if (type != null && type != Compilation.typeProcedure)
       return (ClassType) type;
-    String fileName = getFileName();
     String mname = getName();
-    String className = null;
+    String className = getFileName();
     Path path = null;
-    if (mname != null)
-      fileName = mname;
-    else if (fileName == null)
-      {
-        fileName = getName();
-        if (fileName == null)
-          fileName = "$unnamed_input_file$";
-      }
-    else if (filename.equals("-") || filename.equals("/dev/stdin"))
-      {
-        fileName = getName();
-        if (fileName == null)
-          fileName = "$stdin$";
-      }
+    if (comp.getModule() == this && comp.minfo != null
+        && comp.minfo.className != null)
+      // If explicitly set, perhaps using command-line flags.
+      className = comp.minfo.className;
     else
       {
-        path = Path.valueOf(fileName);
-        fileName = path.getLast();
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex > 0)
-          fileName = fileName.substring (0, dotIndex);
+        if (mname != null)
+          className = mname;
+        else if (className == null)
+          className = "$unnamed_input_file$";
+        else if (className.equals("-") || className.equals("/dev/stdin"))
+          className = "$stdin$";
+        else
+          {
+            path = Path.valueOf(className);
+            className = path.getLast();
+            int dotIndex = className.lastIndexOf('.');
+            if (dotIndex > 0)
+              className = className.substring (0, dotIndex);
+          }
+        className = Compilation.mangleNameIfNeeded(className);
+
+        Path parentPath;
+        String parent;
+        if (comp.classPrefix.length() == 0
+            && path != null
+            && ! path.isAbsolute()
+            && (parentPath = path.getParent()) != null
+            && (parent = parentPath.toString()).length() > 0 // Probably redundant.
+            && parent.indexOf("..") < 0)
+          {
+            parent = parent.replaceAll(System.getProperty("file.separator"), "/");
+            if (parent.startsWith("./"))
+              parent = parent.substring(2);
+            className = parent.equals(".") ? className
+              : Compilation.mangleURI(parent) + "." + className;
+          }
+        else
+          className = comp.classPrefix + className;
       }
-    Path parentPath;
-    String parent;
-    if (getName() == null)
-      setName(fileName);
-    fileName = Compilation.mangleNameIfNeeded(fileName);
-    if (comp.classPrefix.length() == 0
-        && path != null
-        && ! path.isAbsolute()
-        && (parentPath = path.getParent()) != null
-        && (parent = parentPath.toString()).length() > 0 // Probably redundant.
-        && parent.indexOf("..") < 0)
-      {
-        parent = parent.replaceAll(System.getProperty("file.separator"), "/");
-        if (parent.startsWith("./"))
-          parent = parent.substring(2);
-        className = parent.equals(".") ? fileName
-          : Compilation.mangleURI(parent) + "." + fileName;
-      }
-    else
-      className = comp.classPrefix + fileName;
+    if (mname == null)
+      setName(className);
     ClassType clas = new ClassType(className);
     setType(clas);
     if (comp.mainLambda == this)

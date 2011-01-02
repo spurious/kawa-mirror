@@ -1990,8 +1990,7 @@ public class Compilation implements SourceLocator
           }
         if (wantedState >= CLASS_WRITTEN && getState() < CLASS_WRITTEN)
           { 
-            ModuleManager manager = ModuleManager.getInstance();
-            outputClass(manager.getCompilationDirectory());
+            outputClass(ModuleManager.getInstance().getCompilationDirectory());
             setState(CLASS_WRITTEN);
           }
       }
@@ -2131,7 +2130,8 @@ public class Compilation implements SourceLocator
 
 	if (staticModule)
 	  {
-	    generateConstructor (module);
+            if (! module.getFlag(ModuleExp.USE_DEFINED_CLASS))
+              generateConstructor (module);
 
 	    code.emitNew(moduleClass);
 	    code.emitDup(moduleClass);

@@ -1,3 +1,17 @@
+2011-01-01  Per Bothner  <per@bothner.com>
+
+	* repl.java (processArgs): Don't set compiled class name here directly
+	here, even if -T flag was given.  Instead, note class name in
+	ModuleInfo instance.
+	* standard/object.java (rewriteForm): Do setClassType, since it is
+	no longer done by constructor.
+	(rewriteClassDef): Move logic for rewriting and setting explicit
+	class name from here ...
+	(scanClassDef): ... to and of scan phase here.
+	* standard/define_class.java (scanForDefinitions): Set class name here.
+	Allocate ClassType - after checking if class name matches module class
+	name.
+
 2010-12-30  Per Bothner  <per@bothner.com>
 
 	* lang/Translator.java (exp2Type(Pair,Declaration)): New method.

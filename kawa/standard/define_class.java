@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.mapping.Symbol;
+import gnu.bytecode.ClassType;
 
 public class define_class extends Syntax
 {
@@ -86,6 +87,18 @@ public class define_class extends Syntax
     Object[] saved = objectSyntax.scanClassDef(p, oexp, tr);
     if (nameSyntax != null)
       tr.setCurrentScope(save_scope);
+    ClassType mtype = tr.getModule().classFor(tr);
+    String clname = oexp.getClassName(tr);
+    String mname = mtype.getName();
+    ClassType ctype;
+    if (clname.equals(mname))
+      {
+        ctype = mtype;
+        tr.getModule().setFlag(ModuleExp.USE_DEFINED_CLASS);
+      }
+    else
+      ctype = new ClassType(clname);
+    oexp.setClassType(ctype);
     if (saved == null)
 	return false;
     st = Translator.makePair(st, this, Translator.makePair(p, decl, saved));

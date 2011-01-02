@@ -5,6 +5,7 @@ import gnu.lists.*;
 import java.util.Vector;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
+import gnu.bytecode.ClassType;
 import gnu.kawa.functions.Convert;
 
 public class object extends Syntax
@@ -47,6 +48,7 @@ public class object extends Syntax
 	pair = (Pair) pair.getCdr();
       }
     Object[] saved = scanClassDef(pair, oexp, tr);
+    oexp.setClassType(new ClassType());
     if (saved != null)
       rewriteClassDef(saved, tr);
     return oexp;
@@ -328,13 +330,34 @@ public class object extends Syntax
   if (classAccessFlag != 0)
     oexp.nameDecl.setFlag(classAccessFlag);
 
+    if (classNamePair != null)
+      {
+        Expression classNameExp = tr.rewrite_car((Pair) classNamePair, false);
+        Object classNameVal = classNameExp.valueIfConstant();
+        String classNameSpecifier;
+        boolean isString;
+        /* #ifdef use:java.lang.CharSequence */
+        isString = classNameVal instanceof CharSequence;
+        /* #else */
+        // isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
+        /* #endif */
+        if (isString
+            && (classNameSpecifier = classNameVal.toString()).length() > 0)
+          oexp.classNameSpecifier = classNameSpecifier;
+        else
+          {
+            Object savedPos = tr.pushPositionOf(classNamePair);
+            tr.error('e', "class-name specifier must be a non-empty string literal");
+            tr.popPositionOf(savedPos);
+          }
+      }
+
     Object[] result = {
       oexp,
       components,
       inits,
       method_list,
-      superlist,
-      classNamePair
+      superlist
     };
     return result;
   }
@@ -346,7 +369,6 @@ public class object extends Syntax
     Vector inits = (Vector) saved[2];
     LambdaExp method_list = (LambdaExp) saved[3];
     Object superlist = saved[4];
-    Object classNamePair = saved[5];
     oexp.firstChild = method_list;
 
     int num_supers = Translator.listLength(superlist);
@@ -375,27 +397,6 @@ public class object extends Syntax
 	superlist = superpair.getCdr();
       }
 
-    if (classNamePair != null)
-      {
-        Expression classNameExp = tr.rewrite_car((Pair) classNamePair, false);
-        Object classNameVal = classNameExp.valueIfConstant();
-        String classNameSpecifier;
-        boolean isString;
-        /* #ifdef use:java.lang.CharSequence */
-        isString = classNameVal instanceof CharSequence;
-        /* #else */
-        // isString = classNameVal instanceof CharSeq || classNameVal instanceof String;
-        /* #endif */
-        if (isString
-            && (classNameSpecifier = classNameVal.toString()).length() > 0)
-          oexp.classNameSpecifier = classNameSpecifier;
-        else
-          {
-            Object savedPos = tr.pushPositionOf(classNamePair);
-            tr.error('e', "class-name specifier must be a non-empty string literal");
-            tr.popPositionOf(savedPos);
-          }
-      }
     oexp.supers = supers;
 
     oexp.setTypes(tr);

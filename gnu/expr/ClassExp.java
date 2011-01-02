@@ -50,6 +50,12 @@ public class ClassExp extends LambdaExp
    */
   public ClassType getClassType() { return type; }
 
+  public void setClassType(ClassType type)
+  {
+    this.type = type;
+    this.instanceType = type;
+  }
+
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
   /** Index in supers array of class we extend, or -1. */
@@ -71,7 +77,6 @@ public class ClassExp extends LambdaExp
   public ClassExp (boolean simple)
   {
     this.simple = simple;
-    instanceType = type = new ClassType();
   }
 
   protected boolean mustCompile () { return true; }
@@ -197,86 +202,89 @@ public class ClassExp extends LambdaExp
     type.setInterfaces(interfaces);
 
     if (type.getName() == null)
+      type.setName(getClassName(comp));
+    comp.addClass(type);
+    if (isMakingClassPair())
       {
-	String name;
-        if (classNameSpecifier != null)
-          name = classNameSpecifier;
-        else
+        instanceType.setName(type.getName()+"$class");
+        comp.addClass(instanceType);
+      }
+  }
+
+  public String getClassName (Compilation comp)
+  {
+    String name;
+    if (classNameSpecifier != null)
+      name = classNameSpecifier;
+    else
+      {
+        name = getName();
+        if (name != null)
           {
-            name = getName();
-            if (name != null)
-              {
-                int nlen = name.length();
-                if (nlen > 2
-                    && name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
-                  name = name.substring(1, nlen-1);
-              }
-          }
-        if (name == null)
-          {
-	    StringBuffer nbuf = new StringBuffer(100);
-            comp.getModule().classFor(comp);
-            nbuf.append(comp.mainClass.getName());
-            nbuf.append('$');
-            int len = nbuf.length();
-            for (int i = 0;  ; i++)
-              {
-                nbuf.append(i);
-                name = nbuf.toString();
-                if (comp.findNamedClass(name) == null)
-                  break;
-                nbuf.setLength(len);
-              }
-          }
-	else if (! isSimple() || this instanceof ObjectExp)
-	  name = comp.generateClassName(name);
-	else
-	  {
-	    int start = 0;
-	    StringBuffer nbuf = new StringBuffer(100);
-	    for (;;)
-	      {
-		int dot = name.indexOf('.', start);
-		if (dot < 0)
-		  break;
-		nbuf.append(Compilation
-			    .mangleNameIfNeeded(name.substring(start, dot)));
-		start = dot + 1;
-                if (start < name.length())
-                  nbuf.append('.');
-	      }
-	    if (start == 0)
-	      {
-                setFlag(IS_PACKAGE_MEMBER);
-		String mainName = comp.mainClass == null ? null
-		  : comp.mainClass.getName();
-		int dot = mainName == null ? -1 : mainName.lastIndexOf('.');
-		if (dot > 0)
-		  nbuf.append(mainName.substring(0, dot + 1));
-		else if (comp.classPrefix != null)
-		  nbuf.append(comp.classPrefix);
-	      }
-            else if (start == 1 && start < name.length())
-              {
-                nbuf.setLength(0);
-                nbuf.append(comp.mainClass.getName());
-                nbuf.append('$');
-              }
-            else
-              setFlag(IS_PACKAGE_MEMBER);
-	    if (start < name.length())
-	      nbuf.append(Compilation
-			  .mangleNameIfNeeded(name.substring(start)));
-	    name = nbuf.toString();
-	  }
-	type.setName(name);
-        comp.addClass(type);
-        if (isMakingClassPair())
-          {
-            instanceType.setName(type.getName()+"$class");
-            comp.addClass(instanceType);
+            int nlen = name.length();
+            if (nlen > 2
+                && name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
+              name = name.substring(1, nlen-1);
           }
       }
+    if (name == null)
+      {
+        StringBuffer nbuf = new StringBuffer(100);
+        comp.getModule().classFor(comp);
+        nbuf.append(comp.mainClass.getName());
+        nbuf.append('$');
+        int len = nbuf.length();
+        for (int i = 0;  ; i++)
+          {
+            nbuf.append(i);
+            name = nbuf.toString();
+            if (comp.findNamedClass(name) == null)
+              break;
+            nbuf.setLength(len);
+          }
+      }
+    else if (! isSimple() || this instanceof ObjectExp)
+      name = comp.generateClassName(name);
+    else
+      {
+        int start = 0;
+        StringBuffer nbuf = new StringBuffer(100);
+        for (;;)
+          {
+            int dot = name.indexOf('.', start);
+            if (dot < 0)
+              break;
+            nbuf.append(Compilation
+                        .mangleNameIfNeeded(name.substring(start, dot)));
+            start = dot + 1;
+            if (start < name.length())
+              nbuf.append('.');
+          }
+        if (start == 0)
+          {
+            setFlag(IS_PACKAGE_MEMBER);
+            String mainName = comp.mainClass == null ? null
+              : comp.mainClass.getName();
+            int dot = mainName == null ? -1 : mainName.lastIndexOf('.');
+            if (dot > 0)
+              nbuf.append(mainName.substring(0, dot + 1));
+            else if (comp.classPrefix != null)
+              nbuf.append(comp.classPrefix);
+          }
+        else if (start == 1 && start < name.length())
+          {
+            nbuf.setLength(0);
+            nbuf.append(comp.mainClass.getName());
+            nbuf.append('$');
+          }
+        else
+          setFlag(IS_PACKAGE_MEMBER);
+        if (start < name.length())
+          nbuf.append(Compilation
+                      .mangleNameIfNeeded(name.substring(start)));
+        name = nbuf.toString();
+      }
+    return name;
   }
 
   boolean partsDeclared;

@@ -15,7 +15,7 @@ public class ModuleInfo
    * Must be non-null unless we're currently compiling the module,
    * in which case sourcePath and comp must both be non-null.
    */
-  private String className;
+  protected String className;
 
   Class moduleClass;
 

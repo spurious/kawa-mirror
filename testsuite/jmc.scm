@@ -12,7 +12,6 @@
 
 (define-alias System java.lang.System)
 (define-alias Class java.lang.Class)
-(define-alias Class[] java.lang.Class[])
 (define-alias Integer java.lang.Integer)
 
 ;; code

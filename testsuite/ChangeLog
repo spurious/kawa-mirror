@@ -1,3 +1,11 @@
+2011-01-02  Per Bothner  <per@bothner.com>
+
+	* meteor.scm: Change 'pts' from array-or-array to flat array.
+	(p-cell): New macro.
+	(make-2d-array): Remove macro.
+	* jmc.scm (Class[]): Remove unneeded define-alias.
+	* num-test.scm: Don't sort literal vectors.
+
 2010-12-28  Per Bothner  <per@bothner.com>
 
 	* jaxb-annotations3.scm: New test/demo of using JAXB annotations.

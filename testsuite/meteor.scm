@@ -9,23 +9,6 @@
 
 ;; Some helpful macros
 
-(define-syntax (make-2d-array form)
-  (syntax-case form ()
-    ((_ type rows cols)
-     (let* ((r :: int (syntax rows))
-            (c :: int (syntax cols))
-            (t :: symbol (syntax type))
-            (tstr :: String (symbol->string t))
-            (t[] :: symbol (string->symbol (string-append tstr "[]")))
-            (t[][] :: symbol (string->symbol (string-append tstr "[][]"))))
-       #`(let ((res :: ,(datum->syntax-object form t[][])
-                    (,(datum->syntax-object form t[][]) length:
-                     ,(datum->syntax-object form r))))
-           (do ((i :: int 0 (+ i 1)))
-               ((= i ,(datum->syntax-object form r)) res)
-             (set! (res i) (,(datum->syntax-object form t[]) length:
-                            ,(datum->syntax-object form c)))))))))
-
 (define-syntax while
   (syntax-rules ()
     ((_ pred e ...)
@@ -281,7 +264,10 @@
 
 (define-syntax m-cell
   (syntax-rules ()
-    ((_ obj r c) (obj:m-cells (+ (* N-COL r) c)))))
+    ((_ obj r c) (obj:m-cells (get-index c r)))))
+(define-syntax p-cell
+  (syntax-rules ()
+    ((_ pts x y) (pts (+ (* N-ELEM y) x)))))
 
 ;; Soln
 (define-simple-class Soln ()
@@ -669,7 +655,7 @@
              ((= i N-PARITY))
            (set! (m-instance i) (Instance))))
 
-  ((set-coord-list (vec :: int) (pts :: int[][])) :: void
+  ((set-coord-list (vec :: int) (pts :: int[])) :: void
    allocation: 'static
 
    (let ((i-pt :: int 0)
@@ -679,50 +665,48 @@
        (do ((x :: int 0 (+ x 1)))
            ((= x N-COL))
          (when (not (= 0 (bitwise-and mask vec)))
-               (set! ((pts i-pt) X) x)
-               (set! ((pts i-pt) Y) y)
+               (set! (p-cell pts i-pt X) x)
+               (set! (p-cell pts i-pt Y) y)
                (!++ i-pt))
          (set-<<! mask 1)))))
 
-  ((to-bit-vector (pts :: int[][])) :: int allocation: 'static
+  ((to-bit-vector (pts :: int[])) :: int allocation: 'static
    (let ((result :: int 0))
      (do ((i-pt :: int 0 (+ i-pt 1)))
          ((= i-pt N-ELEM) result)
-       (let ((pt :: int[] (pts i-pt)))
-         (set-ior! result
-                   (bitwise-arithmetic-shift-left
-                    1 (get-index (pt X) (pt Y))))))))
+       (set-ior! result
+                 (bitwise-arithmetic-shift-left
+                  1 (get-index (p-cell pts i-pt X) (p-cell pts i-pt Y)))))))
 
-  ((shift-up-lines (pts :: int[][]) (shift :: int)) :: void
+  ((shift-up-lines (pts :: int[]) (shift :: int)) :: void
    allocation: 'static
 
    (do ((i-pt :: int 0 (+ i-pt 1)))
        ((= i-pt N-ELEM))
-     (let ((pt :: int[] (pts i-pt)))
-       (when (not (= 0 (bitwise-and (pt Y) shift #x1)))
-             (++! (pt X)))
-       (--! (pt Y) shift))))
+     (when (not (= 0 (bitwise-and (p-cell pts i-pt Y) shift #x1)))
+           (++! (p-cell pts i-pt X)))
+     (--! (p-cell pts i-pt Y) shift)))
 
-  ((shift-to-x0 (pts :: int[][])
+  ((shift-to-x0 (pts :: int[])
                 (instance :: Instance)
                 (offset-row :: int))
    :: int allocation: 'static
 
-   (let* ((x-min :: int ((pts 0) X))
+   (let* ((x-min :: int (p-cell pts 0 X))
           (x-max :: int x-min))
      (do ((i-pt :: int 1 (+ i-pt 1)))
          ((= i-pt N-ELEM))
-       (let ((x :: int ((pts i-pt) X)))
+       (let ((x :: int (p-cell pts i-pt X)))
          (cond ((< x x-min) (set! x-min x))
                ((> x x-max) (set! x-max x)))))
 
      (let ((offset :: int N-ELEM))
        (do ((i-pt :: int 0 (+ i-pt 1)))
            ((= i-pt N-ELEM))
-         (--! ((pts i-pt) X) x-min)
-         (when (and (= ((pts i-pt) Y) offset-row)
-                    (< ((pts i-pt) X) offset))
-               (set! offset ((pts i-pt) X))))
+         (--! (p-cell pts i-pt X) x-min)
+         (when (and (= (p-cell pts i-pt Y) offset-row)
+                    (< (p-cell pts i-pt X) offset))
+               (set! offset (p-cell pts i-pt X))))
 
        (set! instance:m-offset offset)
        (set! instance:m-vec (Piece:to-bit-vector pts))
@@ -755,34 +739,34 @@
 
   ((gen-orientation (vec :: int) (i-orient :: int) (target :: Piece))
    :: void allocation: 'static
-   (let ((pts :: int[][] (make-2d-array int 5 2)))
+   (let ((pts :: int[] (int[] length: (* N-ELEM N-DIM))))
      (Piece:set-coord-list vec pts)
 
      (let* ((rot :: int (remainder i-orient 6))
             (flip :: boolean (>= i-orient 6)))
        (when flip
              (do-decrementing i-pt N-ELEM
-			      (set! ((pts i-pt) Y) (- ((pts i-pt) Y)))))
+			      (set! (p-cell pts i-pt Y) (- (p-cell pts i-pt Y)))))
 
        (while (not (= 0 (!-- rot)))
               (do ((i-pt :: int 0 (+ i-pt 1)))
                   ((= i-pt N-ELEM))
-                (let ((x :: int ((pts i-pt) X))
-                      (y :: int ((pts i-pt) Y)))
+                (let ((x :: int (p-cell pts i-pt X))
+                      (y :: int (p-cell pts i-pt Y)))
                   (let ((x-new
                          :: int
                          (my-floor (+ (* 2 x) (* -3 y) 1) 4))
                         (y-new
                          :: int
                          (my-floor (+ (* 2 x) y 1) 2)))
-                    (set! ((pts i-pt) X) x-new)
-                    (set! ((pts i-pt) Y) y-new)))))
+                    (set! (p-cell pts i-pt X) x-new)
+                    (set! (p-cell pts i-pt Y) y-new)))))
 
-       (let* ((y-min :: int ((pts 0) Y))
+       (let* ((y-min :: int (p-cell pts 0 Y))
               (y-max :: int y-min))
          (do ((i-pt :: int 1 (+ i-pt 1)))
              ((= i-pt N-ELEM))
-           (let ((y :: int ((pts i-pt) Y)))
+           (let ((y :: int (p-cell pts i-pt Y)))
              (cond ((< y y-min) (set! y-min y))
                    ((> y y-max) (set! y-max y)))))
 

@@ -4,10 +4,6 @@
 (module-static #t)
 (module-export define-enum)
 
-(define (symbol-append . syms)
-  ;; "Concatentates the given symbols SYMS together."
-  (string->symbol (apply string-append (map symbol->string syms))))
-
 (define (make-field-desc (t-name :: symbol)
                          (e-name :: symbol)
                          (e-val :: int))
@@ -53,7 +49,8 @@
   (syntax-case form ()
     ((_ typename option-pairs (e ...) other-def ...)
      (let* ((t-name :: symbol (syntax typename))
-            (t-arr :: symbol (symbol-append t-name '[]))
+            (t-arr :: symbol (string->symbol (string-append
+                                              (symbol->string t-name) "[]")))
             (e-names :: list (syntax (e ...)))
             (n :: int (length e-names))
             (field-descs :: list (map-names t-name e-names 0))

@@ -1,3 +1,9 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* enums.scm (%define-enum): Inline use of symbol-append.
+	Use string literal instead of quoted symbol for "[]".
+	(symbol-append): Remove function.
+
 2010-11-20  Philip L. Bewig
             Jamison Hope <jrh@theptrgroup.com>
             Per Bothner  <per@bothner.com>

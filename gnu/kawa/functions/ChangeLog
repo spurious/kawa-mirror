@@ -1,3 +1,7 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* CompilationHelpers.java (typeList): Field moved to Compilation. 
+
 2010-12-27  Per Bothner  <per@bothner.com>
 
 	* GetNamedPart.java: Move classes NamedPart and NamedPartSetter to ...

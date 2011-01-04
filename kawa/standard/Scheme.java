@@ -118,6 +118,7 @@ public class Scheme extends LispLanguage
       environ.addLocation(LispLanguage.lookup_sym, null, getNamedPartLocation);
 
       defSntxStFld("lambda", "kawa.standard.SchemeCompilation", "lambda");
+      defSntxStFld("$bracket-apply$", "gnu.kawa.lispexpr.BracketApply", "instance");
 
       //-- Section 4.1  -- complete
       defSntxStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
@@ -837,6 +838,7 @@ public class Scheme extends LispLanguage
       defAliasStFld("URI", "gnu.kawa.lispexpr.LangObjType", "URIType");
       defProcStFld("resolve-uri", "kawa.lib.files");
 
+      defAliasStFld("$bracket-list$", "gnu.kawa.lispexpr.LangObjType", "constVectorType");
       defAliasStFld("vector", "gnu.kawa.lispexpr.LangObjType", "vectorType");
       defAliasStFld("string", "gnu.kawa.lispexpr.LangObjType", "stringType");
       defAliasStFld("list", "gnu.kawa.lispexpr.LangObjType", "listType");

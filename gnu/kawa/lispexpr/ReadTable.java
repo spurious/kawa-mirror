@@ -20,7 +20,7 @@ public class ReadTable extends RangeTable
   public static final int NON_TERMINATING_MACRO = 6;
 
   /** Default value to pass to setBracketMode() unless overridden. */
-  public static int defaultBracketMode = -1;
+  public static int defaultBracketMode = -2;
 
   /** A character such that PreOpWord -> ($lookup$ Pre 'Word), if > 0. */
   public char postfixLookupOperator = (char) (-1);
@@ -100,12 +100,7 @@ public class ReadTable extends RangeTable
     set(',',  new ReaderQuote(makeSymbol(LispLanguage.unquote_sym),
                               '@', makeSymbol(LispLanguage.unquotesplicing_sym)));
 
-    if (false) // FUTURE
-      set('[',  ReaderParens.getInstance('[', ']', ReadTable.TERMINATING_MACRO,
-                                         LispLanguage.bracket_list_sym));
-    else
-      setBracketMode();  // Sets the entries for '[', ']', and '<'.
-
+    setBracketMode();  // Sets the entries for '[', ']', and '<'.
   }
 
   /** Create a new ReadTable and initialize it appropriately for Common Lisp. */
@@ -117,6 +112,8 @@ public class ReadTable extends RangeTable
   }
 
   /** Specify how '[' and ']' (and '<') are handled.
+   * The value -2 means {@code [a b c]} is {@code ($bracket-list$ a b c)}
+   * and {@code f[a b]} is {@code ($bracket-apply$ f a b)}.
    * The value -1 means that '[' and ']' are plain token constituents.
    * The value 0 means that '[' and ']' are equivalent to '(' and ')'.
    * The value 1 means that '[' and ']' are equivalent to '(' and ')', except
@@ -125,7 +122,13 @@ public class ReadTable extends RangeTable
    */
   public void setBracketMode(int mode)
   {
-    if (mode <= 0)
+    if (mode == -2)
+      {
+        set('[',  ReaderParens.getInstance('[', ']', ReadTable.TERMINATING_MACRO,
+                                           LispLanguage.bracket_list_sym));
+        set('<', new ReaderTypespec());
+      }
+    else if (mode <= 0)
       {
 	ReadTableEntry token = ReadTableEntry.getConstituentInstance();
 	set('<', token);

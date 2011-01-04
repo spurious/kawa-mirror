@@ -3,11 +3,16 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.functions.CompileArith;
+import gnu.kawa.functions.CompilationHelpers;
+import gnu.kawa.lispexpr.LangObjType;
 import gnu.math.IntNum;
 import java.lang.reflect.Array;
 
 public class CompileInvoke
 {
+  public static final Method newConstVectorMethod =
+    Compilation.typeConstVector.getDeclaredMethod("<init>", new Type[] { Compilation.objArrayType });
+
   public static Expression validateApplyInvoke
   (ApplyExp exp, InlineCalls visitor, Type required, Procedure proc)
   {
@@ -67,6 +72,9 @@ public class CompileInvoke
         return exp;
       }
 
+    if (kind == 'N' && type == LangObjType.constVectorType
+        && required instanceof ArrayType)
+      type = (ObjectType) required;
     if (kind == 'N' && type instanceof ArrayType)
       {
         ArrayType atype = (ArrayType) type;
@@ -102,11 +110,11 @@ public class CompileInvoke
           }
         ApplyExp alloc = new ApplyExp(new ArrayNew(elementType),
                                       new Expression[] { sizeArg } );
-        alloc.setType(atype);
+        alloc.setType(type);
         if (lengthSpecified && args.length == 3)
           return alloc;
         LetExp let = new LetExp(new Expression[] { alloc });
-        Declaration adecl = let.addDeclaration((String) null, atype);
+        Declaration adecl = let.addDeclaration((String) null, type);
         adecl.noteValue(alloc);
         BeginExp begin = new BeginExp();
         int index = 0;
@@ -182,6 +190,36 @@ public class CompileInvoke
           }
         int index = -1;
         Object[] slots;
+        boolean usingConstVector = false;
+        if (kind == 'N' && type == LangObjType.constVectorType)
+          {
+            Method defcons;
+            ClassType creq;
+            if (tailArgs == 0 && required instanceof ClassType
+                && (creq = (ClassType) required).isSubclass(Compilation.typeList)
+                && (defcons = creq.getDefaultConstructor()) != null)
+              {
+                ctype = creq;
+                type = ctype;
+                usingConstVector = true;
+                keywordStart = args.length;
+                numCode = 1;
+                tailArgs = nargs - 1;
+                methods[0] = new PrimProcedure(defcons, iproc.language);
+                arg0 = new QuoteExp(ctype.getReflectClass());
+              }
+            else
+              {
+                Expression[] xargs = new Expression[nargs];
+                System.arraycopy(args, 1, xargs, 1, nargs-1);
+                xargs[0] = new QuoteExp(Compilation.objArrayType);
+                return visitor.visit(new ApplyExp(iproc,
+                                                  new Expression[] {
+                                                    new QuoteExp(Compilation.typeConstVector),
+                                                    new ApplyExp(exp.getFunction(), xargs).setLine(exp)}).setLine(exp), required);
+              }
+          }
+
         if (kind == 'N'
             && ((tailArgs > 0 && numCode > 0) // Have keywords
                 || (numCode == MethodProc.NO_MATCH_TOO_MANY_ARGS
@@ -190,7 +228,7 @@ public class CompileInvoke
                                                       new Type[] { Compilation.typeClassType })
                         >> 32) == 1))
             && (((slots = checkKeywords(ctype, args, keywordStart, caller))
-                 .length * 2 == tailArgs && numCode> 0)
+                 .length * 2 == tailArgs && numCode > 0)
                 || ClassMethods.selectApplicable(ClassMethods.getMethods(ctype, "add", 'V', null, iproc.language), 2) > 0))
           {
             StringBuffer errbuf = null;

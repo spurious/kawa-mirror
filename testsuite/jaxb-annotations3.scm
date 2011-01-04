@@ -72,7 +72,7 @@
 (bb:books:add
  (Book year: "2006"
        title: "JavaScript: The Definitive Guide (5th edtion)"
-       authors: (ArrayList ||: (Author last: "Flanagan" first: "David"))
+       authors: [(Author last: "Flanagan" first: "David")]
        publisher: "O'Reilly"
        price: (BigDecimal "49.99")))
 

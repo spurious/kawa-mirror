@@ -190,6 +190,7 @@ KAWA_COMPILER = $(CLASSPATH_ENV) $(JAVA) kawa.repl -d $(top_builddir) \
 @ENABLE_XML_TRUE@  ResolveNamespace.java
 
 java_sources = \
+  BracketApply.java \
   ClassNamespace.java \
   DefineNamespace.java \
   LangObjType.java \

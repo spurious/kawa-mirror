@@ -28,10 +28,11 @@ public class LangObjType extends ObjectType implements TypeValue
   private static final int NUMERIC_TYPE_CODE = 10;
   private static final int LIST_TYPE_CODE = 11;
   private static final int VECTOR_TYPE_CODE = 12;
-  private static final int STRING_TYPE_CODE = 13;
-  private static final int REGEX_TYPE_CODE = 14;
-  private static final int DFLONUM_TYPE_CODE = 15;
-  private static final int PROCEDURE_TYPE_CODE = 16;
+  private static final int CONST_VECTOR_TYPE_CODE = 13;
+  private static final int STRING_TYPE_CODE = 14;
+  private static final int REGEX_TYPE_CODE = 15;
+  private static final int DFLONUM_TYPE_CODE = 16;
+  private static final int PROCEDURE_TYPE_CODE = 17;
 
   public static final LangObjType pathType =
     new LangObjType("path", "gnu.text.Path",
@@ -76,6 +77,10 @@ public class LangObjType extends ObjectType implements TypeValue
   public static final LangObjType vectorType =
     new LangObjType("vector", "gnu.lists.FVector",
                     VECTOR_TYPE_CODE);
+
+  public static final LangObjType constVectorType =
+    new LangObjType("constant-vector", "gnu.lists.ConstVector",
+                    CONST_VECTOR_TYPE_CODE);
 
   public static final LangObjType regexType =
     new LangObjType("regex", "java.util.regex.Pattern",
@@ -219,6 +224,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case VECTOR_TYPE_CODE:
+      case CONST_VECTOR_TYPE_CODE:
       case REGEX_TYPE_CODE:
         implementationType.emitIsInstance(comp.getCode());
         target.compileFromStack(comp,
@@ -387,6 +393,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case DFLONUM_TYPE_CODE:
         return typeLangObjType.getDeclaredMethod("coerceDFloNum", 1);
       case VECTOR_TYPE_CODE:
+      case CONST_VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
@@ -504,6 +511,7 @@ public class LangObjType extends ObjectType implements TypeValue
       case DFLONUM_TYPE_CODE:
         return coerceDFloNum(obj);
       case VECTOR_TYPE_CODE:
+      case CONST_VECTOR_TYPE_CODE:
       case LIST_TYPE_CODE:
       case REGEX_TYPE_CODE:
         // optimize?
@@ -604,6 +612,7 @@ public class LangObjType extends ObjectType implements TypeValue
   {
     switch (typeCode)
       {
+      case CONST_VECTOR_TYPE_CODE:
       case VECTOR_TYPE_CODE:
       case STRING_TYPE_CODE:
       case LIST_TYPE_CODE:

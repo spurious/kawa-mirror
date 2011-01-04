@@ -1,3 +1,7 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* jaxb-annotations3.scm: Use new bracket syntax.
+
 2011-01-02  Per Bothner  <per@bothner.com>
 
 	* meteor.scm: Change 'pts' from array-or-array to flat array.

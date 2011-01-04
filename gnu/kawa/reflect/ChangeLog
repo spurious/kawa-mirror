@@ -1,3 +1,8 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* CompileInvoke.java (validateApplyInvoke): Add special handling
+	for LangObjType.constVectorType, including coercion to array and List.
+
 2010-12-24  Per Bothner  <per@bothner.com>
 
 	* MakeAnnotation.java (validate): Fix SourceLocator used for

@@ -27,13 +27,6 @@ public class CompilationHelpers
     return false;
   }
 
-  static final ClassType typeList
-  /* #ifdef JAVA2 */
-  = ClassType.make("java.util.List");
-  /* #else */
-  // = ClassType.make("gnu.lists.Sequence");
-  /* #endif */
-
   public static Expression validateApplyToArgs
   (ApplyExp exp, InlineCalls visitor,
    Type required, Procedure applyToArgs)
@@ -81,7 +74,7 @@ public class CompilationHelpers
             result = new ApplyExp(new ArrayGet(elementType), args);
           }
         else if (ptype instanceof ClassType
-                 && (ctype = (ClassType) ptype).isSubclass(typeList)
+                 && (ctype = (ClassType) ptype).isSubclass(Compilation.typeList)
                  && nargs == 1)
           {
             // We search for a "get(int)" method, rather than just using
@@ -120,7 +113,7 @@ public class CompilationHelpers
             return new SetArrayExp(arg, (ArrayType) argType);
           }
         if (argType instanceof ClassType
-            && (ctype = (ClassType) argType).isSubclass(typeList))
+            && (ctype = (ClassType) argType).isSubclass(Compilation.typeList))
           {
             if (exp instanceof SetListExp)
               return exp;

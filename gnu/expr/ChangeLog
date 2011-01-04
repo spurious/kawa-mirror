@@ -1,3 +1,7 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (typeList, typeConstVector): New fields.
+
 2011-01-01  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (<init>): Replace by single 2-argument constructor.

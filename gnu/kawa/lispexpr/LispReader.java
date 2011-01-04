@@ -411,22 +411,34 @@ public class LispReader extends Lexer
     for (;;)
       {
         int ch = port.peek();
-        if (ch < 0 || ch != rtable.postfixLookupOperator)
-          break;
-        // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
-        port.read();
-        int ch2 = port.peek();
-        if (! validPostfixLookupStart(ch2, rtable))
+        if (ch == '[' && rtable.defaultBracketMode == -2)
           {
-            unread();
-            break;
+            port.read();
+            Object lst = ReaderParens.readList(this, ch, 1, ']');
+            value = PairWithPosition.make(value, lst,
+                                          port.getName(), line+1, column+1);
+            value = PairWithPosition.make(LispLanguage.bracket_apply_sym, value,
+                                          port.getName(), line+1, column+1);
           }
-        ch = port.read();
-        Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
-        value = LList.list2(value,
-                            LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
-        value = PairWithPosition.make(LispLanguage.lookup_sym, value,
-                                      port.getName(), line+1, column+1);
+        else if (ch == rtable.postfixLookupOperator)
+          {
+            // A kludge to map PreOpWord to ($lookup$ Pre 'Word).
+            port.read();
+            int ch2 = port.peek();
+            if (! validPostfixLookupStart(ch2, rtable))
+              {
+                unread();
+                break;
+              }
+            ch = port.read();
+            Object rightOperand = readValues(ch, rtable.lookup(ch), rtable);
+            value = LList.list2(value,
+                                LList.list2(rtable.makeSymbol(LispLanguage.quasiquote_sym), rightOperand));
+            value = PairWithPosition.make(LispLanguage.lookup_sym, value,
+                                          port.getName(), line+1, column+1);
+          }
+        else
+          break;
       }
     return value;
   }

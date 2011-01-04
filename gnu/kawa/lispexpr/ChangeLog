@@ -1,5 +1,15 @@
 2011-01-03  Per Bothner  <per@bothner.com>
 
+	Support square brackets for constructing immutable vectors.
+	* BracketApply.java: New Syntax.  Currently handles 'type[]'.
+	* Makefile.am: Update accordingly.
+	* LangObjType.java (CONST_VECTOR_TYPE_CODE): New constant.
+	(constVectorType): New static LangObjectType field.
+	* ReadTable.java (defaultBracketMode): No default -2, which
+	treats [x y z] as an immutable-sequence constructor.
+	(setBracketMode): Handle new mode==-2
+	* LispReader.java (handlePostfix): Handle 'exp[exps]'.
+
 	* ReaderVector.java (readVector):  Return ConstVector rather than
 	FVector, to produce immutable result.
 

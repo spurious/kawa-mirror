@@ -10,6 +10,7 @@ XML_JSOURCES = \
 endif
 
 java_sources = \
+  BracketApply.java \
   ClassNamespace.java \
   DefineNamespace.java \
   LangObjType.java \

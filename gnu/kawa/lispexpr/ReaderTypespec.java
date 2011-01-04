@@ -70,8 +70,8 @@ public class ReaderTypespec extends ReadTableEntry
 		  }
 	      }
 	    }
-	return (new java.lang.String (in.tokenBuffer, startPos,
-				      in.tokenBufferLength - startPos)).intern();
+	return rtable.makeSymbol(new java.lang.String(in.tokenBuffer, startPos,
+                                                      in.tokenBufferLength - startPos));
       }
     finally
       {

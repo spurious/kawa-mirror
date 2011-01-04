@@ -11,6 +11,7 @@ java_sources = \
   ByteVector.java \
   CharBuffer.java \
   CharSeq.java \
+  ConstVector.java \
   Consumer.java \
   ConsumerWriter.java \
   Consumable.java \

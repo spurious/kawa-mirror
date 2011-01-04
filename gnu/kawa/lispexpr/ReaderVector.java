@@ -6,6 +6,7 @@ import gnu.text.*;
 import gnu.mapping.InPort;
 import gnu.mapping.Values;
 import gnu.lists.FVector;
+import gnu.lists.ConstVector;
 
 public class ReaderVector extends ReadTableEntry
 {
@@ -59,7 +60,7 @@ public class ReaderVector extends ReadTableEntry
 	   }
 	 Object[] objs = new Object[vec.size()];
 	 vec.copyInto(objs);
-	 return new FVector(objs);
+	 return new ConstVector(objs);
        }
      finally
        {

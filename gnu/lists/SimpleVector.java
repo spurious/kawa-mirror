@@ -24,6 +24,8 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public final int size() { return size; }
 
+  protected void checkCanWrite () { }
+
   /**
    * Set the size to a specified value.
    * The data buffer is grown if needed, with new elements set to zero/null. If
@@ -36,6 +38,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
    */
   public void setSize(int size)
   {
+    checkCanWrite();
     int oldSize = this.size;
     this.size = size;
     if (size < oldSize)
@@ -55,6 +58,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   protected void resizeShift(int oldGapStart, int oldGapEnd,
                              int newGapStart, int newGapEnd)
   {
+    checkCanWrite();
     int oldGapSize = oldGapEnd - oldGapStart;
     int newGapSize = newGapEnd - newGapStart;
     int oldLength = getBufferLength();
@@ -171,6 +175,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public E set(int index, E value)
   {
+    checkCanWrite();
     if (index >= size)
       throw new IndexOutOfBoundsException();
     E old = getBuffer(index);
@@ -182,12 +187,14 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public void fill(E value)
   {
+    checkCanWrite();
     for (int i = size;  --i >= 0; )
       setBuffer(i, value);
   }
 
   public void fillPosRange(int fromPos, int toPos, E value)
   {
+    checkCanWrite();
     int i = fromPos == -1 ? size : fromPos >>> 1;
     int j = toPos == -1 ? size : toPos >>> 1;
     for (; i < j;  i++)
@@ -196,6 +203,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public void fill(int fromIndex, int toIndex, E value)
   {
+    checkCanWrite();
     if (fromIndex < 0 || toIndex > size)
       throw new IndexOutOfBoundsException();
     for (int i = fromIndex;  i < toIndex;  i++)
@@ -204,6 +212,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public void shift(int srcStart, int dstStart, int count)
   {
+    checkCanWrite();
     Object data = getBuffer();
     System.arraycopy(data, srcStart, data, dstStart, count);
   }
@@ -224,6 +233,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
 
   public void add(int index, E o)
   {
+    checkCanWrite();
     int newSize = size + 1;
     size = newSize;
     int length = getBufferLength();
@@ -238,6 +248,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   /* #ifdef JAVA2 */
   public boolean addAll(int index, Collection<? extends E> c)
   {
+    checkCanWrite();
     boolean changed = false;
     int count = c.size();
     setSize(size + count);
@@ -253,6 +264,7 @@ public abstract class SimpleVector<E> extends AbstractSequence<E>
   /* #ifndef JAVA2 */
   // public boolean addAll(int index, Sequence c)
   // {
+  //   checkCanWrite();
   //   boolean changed = false;
   //   int count = c.size();
   //   setSize(size + count);

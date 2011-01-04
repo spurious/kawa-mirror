@@ -1,3 +1,12 @@
+2011-01-03  Per Bothner  <per@bothner.com>
+
+	* SimpleVector.java (checkCanWrite): New method.
+	Call checkCanWrite before any mutation.
+	* FVector.java: Likewise call checkCanWrite before any mutation.
+	* ConstVector.java: New class, extends FVector.
+	(checkCanWrite): Override to throw exception.
+	* Makefile.am: Update.
+
 2010-11-27  Per Bothner  <per@bothner.com>
 
 	* AbstractFormat.java (writeObject): Only closeThis, don't close.

@@ -75,6 +75,7 @@ public class FVector<E> extends SimpleVector<E>
 
   public void setBufferLength(int length)
   {
+    checkCanWrite();
     int oldLength = data.length;
     if (oldLength != length)
       {
@@ -89,6 +90,7 @@ public class FVector<E> extends SimpleVector<E>
 
   public void shift(int srcStart, int dstStart, int count)
   {
+    checkCanWrite();
     System.arraycopy(data, srcStart, data, dstStart, count);
   }
 
@@ -106,6 +108,7 @@ public class FVector<E> extends SimpleVector<E>
 
   public final Object setBuffer(int index, Object value)
   {
+    checkCanWrite();
     Object old = data[index];
     data[index] = value;
     return old;
@@ -113,6 +116,7 @@ public class FVector<E> extends SimpleVector<E>
 
   protected void clearBuffer(int start, int count)
   {
+    checkCanWrite();
     Object[] d = data;
     while (--count >= 0)
       d[start++] = null;
@@ -169,6 +173,7 @@ public class FVector<E> extends SimpleVector<E>
   // FIXME - bad name - setAll should take a Collection
   public final void setAll (Object new_value)
   {
+    checkCanWrite();
     Object[] d = data;
     for (int i = size; --i >= 0; )
       d[i] = new_value;

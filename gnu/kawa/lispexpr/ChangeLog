@@ -1,5 +1,8 @@
 2011-01-03  Per Bothner  <per@bothner.com>
 
+	* ReaderVector.java (readVector):  Return ConstVector rather than
+	FVector, to produce immutable result.
+
 	* ReaderTypespec.java (read): Update belatedly to use
 	ReadTable#makeSymbol.
 

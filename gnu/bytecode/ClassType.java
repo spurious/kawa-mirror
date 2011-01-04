@@ -955,6 +955,11 @@ public class ClassType extends ObjectType
     return null;
   }
 
+  public Method getDefaultConstructor ()
+  {
+    return getDeclaredMethod("<init>", Type.typeArray0);
+  }
+
   /** Use reflection to add all the declared methods of this class.
    * Does not add constructors nor private or package-private methods.
    * Does not check for duplicate (already-known) methods.
